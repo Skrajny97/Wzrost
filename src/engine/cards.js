@@ -48,11 +48,12 @@ import { say } from './text.js';
 /** @typedef {{ level: number, area: string, land: number, landName: string, regionId: string }} Home A creature's first home: the lowest place it lives in (its level and id, whose picture is the card's background), and its land (0 for the first). */
 /** @typedef {{ key: number, id: string, level: number, type: string, attack: number, life: number, max: number, shifted?: true }} MatchCard A card in a match: its place in its deck (`key`), creature, level, type (a Mag's skill may change it), Atak, Życie left and full. */
 /** @typedef {{ classId: string, stage: number, used: boolean }} Hero A side's hero: its class, its evolution's stage (0 for none) and whether its skill is used. */
-/** @typedef {{ cards: MatchCard[], deck: number[], hand: number[], lines: (number | null)[], out: number[], hero: Hero | null, smart: number }} Side A side of a match: its cards, those still in its deck (in draw order), in its reserve, on its three lines, and beaten. */
 /** @typedef {{ card: number, target?: number, type?: string, swap?: number }} SkillUse A hero's skill as a turn uses it: the player's card it works on, and the rival's line aimed at (aim), the new type (shift) or the reserve's card swapped in (swap). */
+/** @typedef {SkillUse & { kind: string }} RivalPlan The rival's hero's skill in this round (rivalSkill, 900 A): its kind, the rival's card it works on, and the player's line aimed at (aim), the new type (shift) or the reserve's card swapped in (swap). */
+/** @typedef {{ cards: MatchCard[], deck: number[], hand: number[], lines: (number | null)[], out: number[], hero: Hero | null, smart: number, plan?: RivalPlan }} Side A side of a match: its cards, those still in its deck (in draw order), in its reserve, on its three lines, and beaten; the rival's hero's skill of this round. */
 /** @typedef {{ round: number, lines: (number | null)[], skill?: SkillUse | null }} Turn The player's turn: the round it is for, its cards on its three lines after it, and its hero's skill. */
 /** @typedef {{ side: Seat, line: number, key: number, target: { line: number, key: number }, damage: number, advantage: boolean, boosted: boolean }} Hit A card's blow in a round. */
-/** @typedef {{ round: number, hits: Hit[], beaten: { me: number[], foe: number[] }, revived: number | null, skill: (SkillUse & { kind: string }) | null, placed: number[] }} RoundLog What a round did: its blows, the cards beaten, the card a Kleryk brought back, the skill used and the rival's lines filled for the next round. */
+/** @typedef {{ round: number, hits: Hit[], beaten: { me: number[], foe: number[] }, revived: number | null, skill: (SkillUse & { kind: string }) | null, placed: number[], rivalSkill?: RivalPlan, rivalRevived?: number | null }} RoundLog What a round did: its blows, the cards beaten, the card a Kleryk brought back, the skill used and the rival's lines filled for the next round; the rival's hero's skill used in it and the card its Wskrzeszenie brought back. */
 /**
  * A match as the server keeps it: its seed (never shown), the round to be
  * played, the two sides, the last round's account, the result once it is
@@ -527,6 +528,148 @@ export function heroSkill(classId, stage, content) {
   return { id: hero.id, kind: hero.kind, name: hero.name, text, power };
 }
 
+// --- The rival's hero (900 A) ----------------------------------------------
+
+// A card's blow on another this round: its Atak, typeBonus more against a
+// type it beats and `extra` more from a hero's skill, as roundHits deals it.
+/**
+ * @param {MatchCard} card
+ * @param {MatchCard} target
+ * @param {number} extra
+ * @param {Content} content
+ */
+export const cardBlow = (card, target, extra, content) =>
+  Math.max(1, Math.round(card.attack * (1 + (typeBeats(card.type, target.type, content) ? cardRules(content).typeBonus : 0)) * (1 + extra)));
+
+// The rival's hero, where it has one (the Arena's players' decks, played by
+// the server for an absent player with its hero card, 900 A; Szczęsny has
+// none): its skill once a match, chosen at the start of a round once the
+// rival's cards are laid, so the player sees it before answering, and only
+// where it does something against a card of the player's that stands on
+// the table (so never in the first round). Szarża on the card whose blow it
+// makes beat the card it faces, the most dangerous one; Celny strzał on the
+// card that beats with it another of the player's cards than the one it
+// hits anyway, the most dangerous; Przemiana on the strongest card that
+// does not beat the card it faces, into the type that does; Wskrzeszenie on
+// the strongest card the card it faces will beat; Podmiana takes that card
+// back to the reserve, the reserve's card best against the card it faces
+// taking its line. Przemiana and Podmiana change the table at once; the
+// others work in the round (roundHits, playTurn). Returns the line of the
+// card Podmiana laid, new on the table, or null.
+/**
+ * @param {Match} match
+ * @param {Content} content
+ * @returns {number | null}
+ */
+function rivalSkill(match, content) {
+  const { foe, me } = match;
+  const hero = foe.hero && !foe.hero.used ? heroSkill(foe.hero.classId, foe.hero.stage, content) : null;
+  if (!hero || !foe.hero) return null;
+  // The rival's cards facing a card of the player's that stands on the table.
+  const facing = LINES.filter((line) => foe.lines[line] !== null && me.lines[line] !== null).map((line) => ({
+    line,
+    card: foe.cards[/** @type {number} */ (foe.lines[line])],
+    other: me.cards[/** @type {number} */ (me.lines[line])],
+  }));
+  /** @typedef {{ line: number, card: MatchCard, other: MatchCard }} Pair */
+  // The pair worth the most, the front one first among equal ones.
+  /**
+   * @param {Pair[]} pairs
+   * @param {(pair: Pair) => number} worth
+   */
+  const best = (pairs, worth) => [...pairs].sort((a, b) => worth(b) - worth(a) || a.line - b.line)[0] ?? null;
+  // The rival's card falls to the blow of the card it faces.
+  /** @param {Pair} pair */
+  const falls = (pair) => cardBlow(pair.other, pair.card, 0, content) >= pair.card.life;
+  /** @type {RivalPlan | null} */
+  let plan = null;
+  /** @type {number | null} */
+  let laid = null;
+  if (hero.kind === 'fury') {
+    const pick = best(
+      facing.filter((pair) => cardBlow(pair.card, pair.other, hero.power, content) >= pair.other.life && cardBlow(pair.card, pair.other, 0, content) < pair.other.life),
+      (pair) => pair.other.attack,
+    );
+    if (pick) plan = { kind: 'fury', card: pick.card.key };
+  } else if (hero.kind === 'aim') {
+    /** @type {{ line: number, at: number, card: MatchCard, target: MatchCard }[]} */
+    const shots = [];
+    for (const line of LINES) {
+      for (const at of LINES) {
+        const card = onLine(foe, line);
+        const target = onLine(me, at);
+        // Another card than the one it hits anyway.
+        if (card && target && at !== targetLine(me, line) && cardBlow(card, target, hero.power, content) >= target.life) shots.push({ line, at, card, target });
+      }
+    }
+    shots.sort((a, b) => b.target.attack - a.target.attack || a.line - b.line || a.at - b.at);
+    if (shots[0]) plan = { kind: 'aim', card: shots[0].card.key, target: shots[0].at };
+  } else if (hero.kind === 'shift') {
+    const pick = best(
+      facing.filter((pair) => !typeBeats(pair.card.type, pair.other.type, content)),
+      (pair) => pair.card.attack,
+    );
+    const type = pick && cardRules(content).types.find((/** @type {{ id: string, target: string }} */ one) => one.target === pick.other.type);
+    if (pick && type) {
+      pick.card.type = type.id;
+      pick.card.shifted = true;
+      plan = { kind: 'shift', card: pick.card.key, type: type.id };
+    }
+  } else if (hero.kind === 'revive') {
+    const pick = best(facing.filter(falls), (pair) => pair.card.attack);
+    if (pick) plan = { kind: 'revive', card: pick.card.key };
+  } else if (hero.kind === 'swap' && foe.hand.length > 0) {
+    const pick = best(facing.filter(falls), (pair) => pair.card.attack);
+    if (pick) {
+      const against = [pick.other];
+      const swap = [...foe.hand].sort((a, b) => cardWorth(foe.cards[b], against, 2, content) - cardWorth(foe.cards[a], against, 2, content) || a - b)[0];
+      foe.lines[pick.line] = swap;
+      foe.hand = [...foe.hand.filter((key) => key !== swap), pick.card.key];
+      plan = { kind: 'swap', card: pick.card.key, swap };
+      laid = pick.line;
+    }
+  }
+  if (!plan) return null;
+  foe.hero.used = true;
+  foe.plan = plan;
+  return laid;
+}
+
+// What the rival's hero's skill of this round does to the blows, as the
+// player's does to its own (playTurn): Szarża's card hits harder, and from
+// the first evolution on so do Celny strzał's, Przemiana's and the card
+// Podmiana laid; Celny strzał's hits the player's card on the line aimed at.
+/**
+ * @param {Match} match
+ * @param {Content} content
+ * @returns {{ boost: Record<number, number>, aim: { key: number, line: number } | null }}
+ */
+function rivalMods(match, content) {
+  const plan = match.foe.plan;
+  const hero = plan && match.foe.hero ? heroSkill(match.foe.hero.classId, match.foe.hero.stage, content) : null;
+  /** @type {Record<number, number>} */
+  const boost = {};
+  if (!plan || !hero) return { boost, aim: null };
+  if (plan.kind === 'fury') boost[plan.card] = hero.power;
+  if ((plan.kind === 'aim' || plan.kind === 'shift') && hero.power > 0) boost[plan.card] = hero.power;
+  if (plan.kind === 'swap' && hero.power > 0) boost[/** @type {number} */ (plan.swap)] = hero.power;
+  return { boost, aim: plan.kind === 'aim' ? { key: plan.card, line: /** @type {number} */ (plan.target) } : null };
+}
+
+// The rival's part at the start of a round after the first: its cards laid
+// (rivalSetup), then its hero's skill (rivalSkill). Returns the lines of
+// its cards new on the table.
+/**
+ * @param {Match} match
+ * @param {Content} content
+ * @returns {number[]}
+ */
+function rivalRound(match, content) {
+  const placed = rivalSetup(match, content);
+  const laid = rivalSkill(match, content);
+  return laid === null || placed.includes(laid) ? placed : [...placed, laid].sort((a, b) => a - b);
+}
+
 // --- The match -------------------------------------------------------------
 
 // The cards of a side left: on its lines, in its reserve and in its deck.
@@ -778,22 +921,24 @@ export function turnBlock(match, turn, content) {
  * @returns {Hit[]}
  */
 export function roundHits(match, content, { boost = {}, aim = null } = {}) {
-  const { typeBonus } = cardRules(content);
+  // The rival's hero's skill of this round (900 A), as the player's.
+  const rival = rivalMods(match, content);
   /** @type {Hit[]} */
   const hits = [];
   for (const who of /** @type {Seat[]} */ (['me', 'foe'])) {
     const side = match[who];
     const other = match[who === 'me' ? 'foe' : 'me'];
+    const mods = who === 'me' ? { boost, aim } : rival;
     for (const line of LINES) {
       const card = onLine(side, line);
       if (!card) continue;
-      const aimed = who === 'me' && aim?.key === card.key && other.lines[aim.line] !== null ? aim.line : null;
+      const aimed = mods.aim?.key === card.key && other.lines[mods.aim.line] !== null ? mods.aim.line : null;
       const at = aimed ?? targetLine(other, line);
       if (at === null) continue;
       const target = /** @type {MatchCard} */ (onLine(other, at));
       const advantage = typeBeats(card.type, target.type, content);
-      const extra = who === 'me' ? (boost[card.key] ?? 0) : 0;
-      const damage = Math.max(1, Math.round(card.attack * (1 + (advantage ? typeBonus : 0)) * (1 + extra)));
+      const extra = mods.boost[card.key] ?? 0;
+      const damage = cardBlow(card, target, extra, content);
       hits.push({ side: who, line, key: card.key, target: { line: at, key: target.key }, damage, advantage, boosted: extra > 0 || aimed !== null });
     }
   }
@@ -849,6 +994,11 @@ export function playTurn(current, turn, content) {
   /** @type {{ me: number[], foe: number[] }} */
   const beaten = { me: [], foe: [] };
   let revived = null;
+  // The rival's hero's Wskrzeszenie of this round (rivalSkill, 900 A).
+  const rivalPlan = foe.plan ?? null;
+  const rivalHero = rivalPlan?.kind === 'revive' && foe.hero ? heroSkill(foe.hero.classId, foe.hero.stage, content) : null;
+  /** @type {number | null} */
+  let rivalRevived = null;
   for (const who of /** @type {Seat[]} */ (['me', 'foe'])) {
     const side = match[who];
     for (const line of LINES) {
@@ -859,12 +1009,18 @@ export function playTurn(current, turn, content) {
         revived = card.key;
         continue;
       }
+      if (who === 'foe' && rivalHero && card.key === rivalPlan?.card) {
+        card.life = Math.max(1, Math.round(card.max * rivalHero.power));
+        rivalRevived = card.key;
+        continue;
+      }
       side.lines[line] = null;
       side.out.push(card.key);
       beaten[who].push(card.key);
     }
   }
-  match.last = { round: match.round, hits, beaten, revived, skill: hero && skill ? { ...skill, kind: hero.kind } : null, placed: [] };
+  match.last = { round: match.round, hits, beaten, revived, skill: hero && skill ? { ...skill, kind: hero.kind } : null, placed: [], ...(rivalPlan && { rivalSkill: rivalPlan, rivalRevived }) };
+  delete foe.plan;
   const mine = cardsLeft(me);
   const theirs = cardsLeft(foe);
   if (mine === 0 || theirs === 0) {
@@ -880,7 +1036,7 @@ export function playTurn(current, turn, content) {
   }
   match.round += 1;
   refill(me, content);
-  match.last.placed = rivalSetup(match, content);
+  match.last.placed = rivalRound(match, content);
   return match;
 }
 
@@ -970,7 +1126,9 @@ export function matchView(match, content) {
     result: match.result,
     end: match.end,
     me: { lines: lines(match.me), hand: match.me.hand.map((key) => card(match.me.cards[key])), deck: match.me.deck.length, out: match.me.out.length, left: cardsLeft(match.me), hero: heroOf(match.me.hero) },
-    foe: { lines: lines(match.foe), hand: match.foe.hand.length, deck: match.foe.deck.length, out: match.foe.out.length, left: cardsLeft(match.foe), hero: heroOf(match.foe.hero) },
+    // The rival's hero's skill of this round (900 A), shown before the
+    // player answers it.
+    foe: { lines: lines(match.foe), hand: match.foe.hand.length, deck: match.foe.deck.length, out: match.foe.out.length, left: cardsLeft(match.foe), hero: heroOf(match.foe.hero), ...(match.foe.plan && { plan: match.foe.plan }) },
     // The cards beaten last round, with their names, for its account.
     last: match.last && {
       ...match.last,

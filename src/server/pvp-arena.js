@@ -53,6 +53,7 @@ import {
   seasonFactor,
 } from '../engine/index.js';
 import { assertion, atomically } from './atomic.js';
+import { cardArenaBrief } from './card-arena.js';
 import { attackBlocked, characterView, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireNotExploring, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
@@ -237,11 +238,14 @@ async function recentDefences(db, row, record) {
 // fight with its log, its last defences (`defences`, at a look), this
 // week's table (the first table.size and its own place), the rewards of the
 // places and those waiting for "Odbierz", the season's end, the numbers of
-// the rules and the words of the screen.
+// the rules and the words of the screen; and its third tab, the Karty
+// (card-arena.js, 900 A), where the Arena has them: its words and the card
+// rewards waiting.
 async function arenaView(db, player, record, rivals, now, defences = null) {
   const { row } = player;
   const arena = rules();
   const week = arenaWeek(now, content());
+  const cards = await cardArenaBrief(db, row, now);
   const [table, own, due] = await db.batch([
     db
       .prepare(
@@ -289,6 +293,7 @@ async function arenaView(db, player, record, rivals, now, defences = null) {
       share: Math.round(arena.season.share * 100),
     },
     texts: arena.texts,
+    cards,
     now,
   };
 }

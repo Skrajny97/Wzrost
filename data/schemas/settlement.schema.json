@@ -772,6 +772,79 @@
               { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
             ]
           }
+        },
+        "cards": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Karty na Arenie (900 A; src/engine/card-arena.js, src/server/card-arena.js): partie Talii Systemu z taliami innych graczy, za nieobecnych gra serwer jak Szczęsny na wyższych stopniach, z kartą bohatera rywala; osobna ocena kart, partie dziennie, tabela tygodnia z nagrodami o rewards.share nagród pojedynków. Opis zasad w $comment bloku w data/settlement.json.",
+          "required": ["matchesPerDay", "smart", "rivals", "rating", "season", "table", "keepDays", "defences", "rewards", "texts"],
+          "properties": {
+            "$comment": { "type": "string" },
+            "matchesPerDay": { "type": "integer", "minimum": 1, "description": "Partie dziennie (od północy czasu polskiego), liczone przy rozpoczęciu." },
+            "smart": { "type": "integer", "minimum": 0, "maximum": 2, "description": "Jak serwer gra talią rywala, jak Szczęsny (cards.json host.tiers): 0 losowo, 1 najmocniejsze karty, 2 karty pod karty gracza." },
+            "rivals": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["count", "pool", "rerollsPerDay"],
+              "properties": {
+                "count": { "type": "integer", "minimum": 1, "description": "Ilu rywali do wyboru." },
+                "pool": { "type": "integer", "minimum": 1, "description": "Spośród ilu postaci z ułożoną talią o najbliższej ocenie kart się ich losuje." },
+                "rerollsPerDay": { "type": "integer", "minimum": 1, "description": "Ile razy dziennie gracz może wylosować innych rywali („Losuj innych”)." }
+              }
+            },
+            "rating": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["start", "floor", "scale", "attackK", "defenceK"],
+              "properties": {
+                "start": { "type": "integer", "minimum": 0 },
+                "floor": { "type": "integer", "minimum": 0 },
+                "scale": { "type": "number", "exclusiveMinimum": 0 },
+                "attackK": { "type": "number", "minimum": 0 },
+                "defenceK": { "type": "number", "minimum": 0 }
+              }
+            },
+            "season": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["share"],
+              "properties": { "share": { "type": "number", "minimum": 0, "maximum": 1, "description": "O jaką część drogi do oceny startowej przesuwa się każda ocena kart na początku miesiąca." } }
+            },
+            "table": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["size"],
+              "properties": { "size": { "type": "integer", "minimum": 1 } }
+            },
+            "keepDays": { "type": "integer", "minimum": 1, "description": "Ile dni zostają skończone partie (obrony talii)." },
+            "defences": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["shown"],
+              "properties": { "shown": { "type": "integer", "minimum": 1, "description": "Ile ostatnich obron talii postać widzi na Arenie." } }
+            },
+            "rewards": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["share"],
+              "properties": { "share": { "type": "number", "minimum": 0, "description": "Jaką część nagród tygodnia za pojedynki (arena.rewards) dają nagrody tygodnia za karty; złoto i Punkty Systemu zaokrąglone." } }
+            },
+            "texts": {
+              "type": "object",
+              "required": [
+                "tab", "boardDuels", "boardCards", "intro", "rating", "place", "noPlace", "matchesLeft", "used", "deck", "strength", "typeCount", "deckNote", "noStarter", "noDeck", "noDeckPlay",
+                "defences", "defencesNew", "noDefences", "defenceNew", "defenceWin", "defenceLoss", "defenceDraw", "rivals", "noRivals", "rival", "stake", "play", "reroll", "rerollsUsed", "noOthers",
+                "gone", "running", "noMatch", "rivalHero", "rivalHeroUsed", "rivalSkillNow", "rivalSkillUsed", "divider", "aim", "surrender", "endWith", "endRating", "endChange",
+                "tableEnds", "tableEmpty", "ownPlace", "column", "rewards", "rewardsNote", "tierOne", "tierMany", "tierRest", "due", "claim", "claimed", "noReward", "season", "rules", "tableRules"
+              ],
+              "additionalProperties": {
+                "anyOf": [
+                  { "type": "string", "minLength": 1 },
+                  { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+                ]
+              }
+            }
+          }
         }
       }
     },

@@ -114,6 +114,7 @@ import { buyTicket, drawLotteries, getCasino, spinCasinoWheel } from './casino.j
 import { buyPack, getCards, playCardTurn, saveDeck, startMatch, surrenderCards, takeStarter } from './cards.js';
 import { enterTrialHall } from './trial-hall.js';
 import { arenaFight, claimArenaReward, getArena, getArenaDefence, rerollArenaRivals } from './pvp-arena.js';
+import { claimCardArenaReward, getCardArena, playCardArenaTurn, rerollCardArena, startCardArenaMatch, surrenderCardArena } from './card-arena.js';
 import { buyFromHerbalist, buyMug, chooseReforged, claimStandingReward, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, redrawCandidates, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, setCompanionStay, settlementTests, takeCompanionGift, testSettlement, trainCompanion, unequipCompanion, upgradeCompanionItem } from './settlement.js';
 import { claimWanted, dropWanted, takeWanted } from './wanted.js';
 import { claimMercenary, listMercenaries, offerMercenary, withdrawMercenary } from './mercenaries.js';
@@ -336,6 +337,14 @@ const routes = [
   ['POST', '/api/settlement/arena/reroll', rerollArenaRivals],
   ['GET', '/api/settlement/arena/defences/:id', getArenaDefence],
   ['POST', '/api/settlement/arena/claim', claimArenaReward],
+  // The Arena's Karty: matches of Talia Systemu with other players' decks
+  // (card-arena.js, 900 A), where both the Arena and the cards are on.
+  ['GET', '/api/cards/arena', getCardArena],
+  ['POST', '/api/cards/arena/match', startCardArenaMatch],
+  ['POST', '/api/cards/arena/turn', playCardArenaTurn],
+  ['POST', '/api/cards/arena/surrender', surrenderCardArena],
+  ['POST', '/api/cards/arena/reroll', rerollCardArena],
+  ['POST', '/api/cards/arena/claim', claimCardArenaReward],
   ['POST', '/api/settlement/casino/ticket', buyTicket],
   ['POST', '/api/settlement/casino/spin', spinCasinoWheel],
   // Talia Systemu, the Salon Gier's card game (cards.js; 871–877), where
