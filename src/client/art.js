@@ -446,12 +446,13 @@ export const SPRITES = {
     ids: ['forest-ambush', 'fern-glade'],
   },
   // The figures the evolutions' skills summon in fights, by the skill's id
-  // (Przywołanie żywiołaka, Trujący Szlam): square, cut close around the
-  // figure, shown in a card of its own before the summoner.
+  // (Przywołanie żywiołaka, Trujący Szlam, Przywołanie enta, Przebudzenie
+  // dębu: 893 B and C, 13.11.2026): square, cut close around the figure,
+  // shown in a card of its own before the summoner.
   summons: {
     size: 48,
     fit: true,
-    ids: ['elemental-summon', 'toxic-slime'],
+    ids: ['elemental-summon', 'toxic-slime', 'ent-summon', 'oak-awakening'],
   },
   // The Osada (data/settlement.json): its places on the board, by the
   // place's id, each cut to its outline, the Targowisko in the middle the
@@ -607,7 +608,7 @@ export const monsterSprite = (monsterId) => sprite('monsters', monsterId, 'sprit
 // The figure a summoning skill puts in fights: its own, else the creature
 // it calls (`figure`: a wolf, a bear, a skeleton, the white wolf as the
 // Basior, the bison as the Tur, as the creatures are drawn), else that of
-// the skill it stands in with (the ancient oak: the ent's, the elemental).
+// the skill it stands in with (a later form's summon without its own).
 export function summonSprite(skillId, figure) {
   const [own, ...stand] = artChain(skillId);
   return sprite('summons', own, 'sprite--summon') ?? (figure ? sprite('monsters', figure, 'sprite--summon') : null) ?? firstSprite('summons', stand, 'sprite--summon');

@@ -604,6 +604,10 @@
     "0.3.0": {
       "title": "Version 0.3.0",
       "body": "- The third class evolution: at class level 200 every second form grows into a third. 15 new forms, among them the Horde Slayer, the Colossus, the Bowmaster, the Frost King, the Archdruid, the Prophet, the Lich and the Shadow Lord, each with its own portrait, walk and rider in every skin tone, a new trait and two new skills with icons and sounds.\n- The points of the second form's skills come back to spend, and class levels 200 to 299 give a point each for the new skills."
+    },
+    "0.3.1": {
+      "title": "Version 0.3.1",
+      "body": "- The Druid's Ent and the Archdruid's Ancient Oak have their own figures in fights.\n- \"Set out again\" on a report stays above the bottom tabs, like \"Set out\" on a place's screen.\n- A report with a level up lets you spend your free points at once: \"Spend by class\" or \"Spend by hand\".\n- When creating a character, \"Begin\" is always at hand, with what is still missing beside it. On a computer the classes stand in two columns.\n- Marketplace: when listing an item, tap it to unfold its full card with a comparison to the one you wear."
     }
   }
 }

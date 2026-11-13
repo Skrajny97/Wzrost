@@ -26,6 +26,38 @@ const materialsText = (materials) => materials.map((material) => (material.count
 const capitalized = (text) => text.charAt(0).toUpperCase() + text.slice(1);
 
 const RESULT_CLASS = { success: 'result--success', fainted: 'result--fainted', escaped: 'result--escaped' };
+
+// The introduction is over (or the character never had one): the narrator
+// leads it with the buttons where they always stood.
+const introOver = (character) => !character?.tutorial || character.tutorial.includes('ending');
+
+// The free points of a report that raised a level, spent from its System
+// words (894.5 A, 13.11.2026): "Rozdaj według klasy" at once, or "Rozdaj
+// ręcznie" in the Statystyki; after the introduction only.
+function pointsBox(report) {
+  const character = state.character;
+  const summary = report.summary;
+  if (!introOver(character) || !isUnlocked('stats') || !(character.freePoints > 0)) return null;
+  if (!(summary?.levelAfter > summary?.levelBefore) && !(summary?.classLevelAfter > summary?.classLevelBefore)) return null;
+  const box = h('div', { class: 'report-points' });
+  const auto = h('button', {
+    type: 'button',
+    class: 'button button--system button--small system-action',
+    text: t('Rozdaj według klasy'),
+    onClick: (event) =>
+      withButton(event.currentTarget, async () => {
+        const spent = state.character.freePoints;
+        await call('POST', '/api/character/points/auto');
+        box.replaceChildren(h('p', { class: 'system-text report-points-done', text: t('Rozdano według klasy: {count}. Zmienisz je w Statystykach.', { count: formatNumber(spent) }) }));
+        toast(t('Punkty rozdane według klasy.'));
+      }),
+  });
+  box.append(
+    h('p', { class: 'system-text', text: t('Wolne punkty statystyk: {count}.', { count: formatNumber(character.freePoints) }) }),
+    h('div', { class: 'report-points-buttons' }, auto, h('a', { class: 'button button--world button--small system-action', href: '#/postac/statystyki', text: t('Rozdaj ręcznie') })),
+  );
+  return box;
+}
 // Shown through t(), as the page loads its English after this module.
 const FIGHT_RESULTS = { true: 'wygrana', false: 'przegrana', null: 'odwrót' };
 const fightResult = (won) => t(FIGHT_RESULTS[String(won)]);
@@ -67,6 +99,9 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         .catch(() => null)
     : Promise.resolve(null);
   const actionBox = h('div', { class: 'stack' });
+  // "Wyrusz ponownie" held above the bottom tabs while the report scrolls,
+  // after the introduction (894.4 A, 13.11.2026).
+  const againBar = h('div', { class: 'start-bar report-again-bar', hidden: true });
   const fightBox = h('div', { class: 'fight-view' });
   // The narrator points at the tabs, or at the title of a single fight.
   const tabList = h('div', { class: 'fight-tabs', role: 'tablist', 'aria-label': t('Walki wyprawy'), 'data-guide': 'report-fights' });
@@ -189,7 +224,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       skipLines(report.skips).map((line) => h('p', { class: 'report-party', text: line })),
       summaryCard(report),
       report.event && eventCard(report.event),
-      report.system.length > 0 && guided(systemPanel(...report.system), 'report-system'),
+      report.system.length > 0 && guided(systemPanel(...report.system, ...[pointsBox(report)].filter(Boolean)), 'report-system'),
       count > 0 &&
         h(
           'section',
@@ -204,6 +239,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       droppedCardsSection(report.cards),
       accountSection(report),
       actionBox,
+      againBar,
     );
     renderTabs();
     showFight(selected);
@@ -605,6 +641,9 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       idle &&
       character.bag.length > 0 &&
       h('button', { type: 'button', class: 'button button--world', onClick: scrapperSheet, text: t('Sprzedaj zbędne przedmioty u złomiarza') });
+    const held = Boolean(again) && introOver(character);
+    fill(againBar, held ? again : null);
+    againBar.hidden = !held;
     fill(
       actionBox,
       report.tower && h('a', { class: 'button button--system', href: '#/wieze', text: t('Wróć do Wież') }),
@@ -613,7 +652,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       report.labyrinth && h('a', { class: 'button button--system', href: '#/osada/trial-hall', text: t('Wróć do Labiryntu') }),
       report.portal && h('a', { class: 'button button--system', href: '#/portale', text: t('Wróć do Portali') }),
       report.hall && h('a', { class: 'button button--system', href: unlockInfo('labyrinth') && isUnlocked('labyrinth') ? '#/osada/trial-hall/trials' : '#/osada/trial-hall', text: t('Wróć do Sali prób') }),
-      again,
+      !held && again,
       scrap,
       waiting && h('a', { class: 'button button--system', href: '#/walka', text: t('Kolejny raport czeka na odbiór') }),
       h('a', { class: 'button button--world', href: '#/postac', text: t('Postać i plecak') }),

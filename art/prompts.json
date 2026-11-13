@@ -15,7 +15,9 @@
         "smuggler": "src/client/art/monsters/bandit-knifer.png",
         "arsonist": "src/client/art/monsters/bandit-thug.png",
         "highwaywoman": "src/client/art/monsters/bandit-knifer.png",
-        "grave-robber": "src/client/art/monsters/bandit-crossbow.png"
+        "grave-robber": "src/client/art/monsters/bandit-crossbow.png",
+        "ent": "src/client/art/monsters/leshy.png",
+        "oak": "src/client/art/monsters/leshy.png"
       },
       "references": {
         "drought-husk": [{ "path": "art/references/monsters/drought-husk-b.png", "usage": "the creature's look chosen by the author: the same gaunt cracked husk, its big skull-like head, face and colours, but drawn whole down to both feet, hunched so that it fills the whole picture" }]
@@ -23,6 +25,8 @@
     },
     "prompts": {
       "wolf": "lean grey wolf with amber eyes, snarling, full body, three-quarter view",
+      "ent": "an ent, a tall walking tree guardian of the forest, a body of gnarled grey-brown oak bark, two long branch arms with twig fingers, a calm bark face with deep-set glowing green eyes and a beard of moss, a small crown of green leaves on its head, thick roots for feet, standing on both feet, friendly and protective, not menacing, full body, three-quarter view, isolated figure on a plain background, no scene, the whole figure inside the frame, nothing cut off at the edges",
+      "oak": "an awakened ancient oak, a huge old oak tree come alive, a thick gnarled trunk with a wise old bearded face in the bark and glowing amber eyes, a wide rounded crown of deep green oak leaves with acorns, two massive bough arms, great spreading roots it stands on, moss on its bark, friendly and protective, not menacing, the whole tree from roots to crown, three-quarter view, isolated figure on a plain background, no scene, nothing cut off at the edges",
       "alpha-wolf": "huge dark grey alpha wolf with a scarred muzzle, glowing red eyes and raised hackles, full body, three-quarter view",
       "bandit-chief": "burly forest bandit chief in a fur-trimmed leather coat and a dented iron helmet, a heavy cleaver in one hand and a round wooden shield in the other, scarred bearded face, a red sash across the chest, full body, three-quarter view",
       "poacher": "lean poacher in a hooded mossy-green cloak holding a short crossbow, snares and a hare hanging at the belt, full body, three-quarter view",

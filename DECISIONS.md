@@ -3233,6 +3233,26 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Oceny autora 892–895 (13.11.2026, w grze od 0.3.1)
+
+Autor zaznaczył oceny na stronie ocen: „oceny zaznaczone”.
+
+1. **892: animacje ciosów w walkach, C „Kinowe”.** Wariant C wchodzi do gry jako jedyny wygląd walk, bez przełącznika i bez plików pracowni efektów. Wejdzie w następnym etapie.
+2. **895: animacje gry w karty, C „Widowiskowe”.** Też jako jedyny wygląd, bez przełącznika, w następnym etapie.
+3. **893: przywołańce Druida i Arcydruida.** Ent (Przywołanie enta) w wersji B i Prastary dąb (Przebudzenie dębu) w wersji C mają w walkach własne postacie zamiast zastępczych (zob. „Grafika zastępcza”).
+4. **894: łatwiejszy start.**
+   - 894.1 C, 894.3 C i 894.6 C: zostaje jak jest (bez paska zadania i „Następnego kroku”, bez karty „Nowe miejsce”, powiadomienia włącza się w Ustawieniach).
+   - 894.2: oba warianty odrzucone, zamknięte zakładki zostają jak są.
+   - 894.4 A: „Wyrusz ponownie” w raporcie trzyma się nad dolnymi zakładkami przez cały raport, jak „Wyrusz” na ekranie miejsca. Napisy „z drużyną” i „bez drużyny” zostają. W czasie wprowadzenia przycisk stoi jak dawniej, na końcu raportu, żeby nie zasłaniał wskazań narratora.
+   - 894.5 A: raport, który podniósł poziom postaci albo klasy, ma pod słowami Systemu „Wolne punkty statystyk: N.” oraz „Rozdaj według klasy” (od razu, potem „Rozdano według klasy: N. Zmienisz je w Statystykach.”) i „Rozdaj ręcznie” (do Statystyk). Tylko po wprowadzeniu i gdy Statystyki są już otwarte.
+   - 894.7 A: w tworzeniu postaci „Rozpocznij” trzyma się dołu ekranu, a obok stoi, czego brakuje („Brakuje: wyglądu, klasy i imienia.”, stuknięcie przenosi do brakującego pola i na chwilę obwodzi je złotą ramką), albo co wybrano (klasa · wygląd · imię). „Rozpocznij” bez wyglądu albo klasy przewija ekran do brakującego wyboru. Na komputerze karty klas stoją w dwóch kolumnach, a ekran jest szerszy (820 px).
+   - 894.8: zdanie przy zamkniętym Rdzeniu zostaje.
+5. **Odmowa przy tworzeniu postaci (brakujący szczegół).** Gdy serwer odmówi po „Rozpocznij” (np. imię zajęte), ekran przewija się do słów odmowy nad paskiem, bo przy przyklejonym przycisku mogłyby zostać poza ekranem.
+
+## Targowisko: pełna karta przedmiotu przy wystawianiu (uwaga gracza przez autora, 13.11.2026, w grze od 0.3.1)
+
+Gracz (poz. 42) napisał, że przy wystawianiu widać tylko nazwę, poziom i Tier, więc trudno zapamiętać, który przedmiot chce się wystawić. Autor: „trzeba dodać na Targowisku przy wystawianiu przedmiotów opcję podglądania ich w pełni”. W oknie „Wystaw na Targowisku” stuknięcie w przedmiot rozwija jego kartę tak jak w ofertach: wszystkie liczby, klasy, przekucie u Kowala i porównanie z tym, co postać nosi w tym miejscu. Cena u złomiarza zostaje pod nazwą, a „Wybierz” obok nazwy.
+
 ## Trzecia ewolucja klas: mechanika (11.11.2026, w grze od 0.3.0)
 
 Opisy, cechy i umiejętności trzecich form zatwierdził autor (815 z 815.4 v2 i 815.5 v2, 812 A i 819 A). Dane są w `data/evolutions.json` (trzecia forma ma w `from` drugą formę, a `thirdForms` podaje zasady punktów), zasady w `src/engine/evolutions.js` i `src/engine/combat.js`. Liczby umiejętności i cech to brakujące szczegóły, ustawione w symulacji (punkt 9).
@@ -7391,7 +7411,7 @@ Plan „Druga ewolucja, Warownia i dwie nowe profesje” (punkt 1: 382 A, 383 A,
 8. **Bez zerowania statystyk.** Po drugiej ewolucji nie ma darmowego zerowania punktów statystyk, bo ścieżka zostaje ta sama. Zerowanie po pierwszej ewolucji, jeśli jeszcze czeka, czeka dalej.
 9. **Pustelnik.** Postać z dalszą postacią zmienia u Pustelnika ścieżkę i dostaje dalszą postać innej ewolucji swojej klasy, np. Berserker zmienia się w Czempiona Areny albo Bastion. Umiejętności zaczynają od 0, a punkty wracają. Ceny i darmowe zerowanie statystyk są jak przy zmianie pierwszej ewolucji.
 10. **Testuj ewolucję.** Na wersji testowej postać z pierwszą ewolucją może wypróbować jej dalszą postać na dowolnym poziomie klasy. „Ustaw 100. poziom klasy” zostawia pierwszą ewolucję. „Cofnij ewolucję” wraca do stanu sprzed testu: do pierwszej ewolucji przyjętej na stałe albo do klasy, z umiejętnościami sprzed testu.
-11. **Grafika zastępcza.** Dopóki dalsza postać nie ma swojej grafiki, ma portret, chód i jazdę pierwszej ewolucji, w swoim kolorze skóry. Rozwinięta umiejętność ma ikonę, dźwięk i wygląd w walce umiejętności, z której wyrasta. Nowa ma te umiejętności pierwszej ewolucji, która stoi na tym samym miejscu, a gdy rozwinięta wyrasta właśnie z niej, tej drugiej: Boska ochrona ma Wielkie błogosławieństwo, a Przywołanie niedźwiedzia Lustro many. Przywołaniec bez obrazka pokazuje stwora z Bestiariusza (wilk, niedźwiedź, szkielet), a ent żywiołaka. Prawdziwa grafika potrzebuje tylko plików i ich id na listach w `src/client/art.js`, a dźwięk wpisu `skill-<id>` w `data/sounds.json`, bez zmian w kodzie.
+11. **Grafika zastępcza.** Dopóki dalsza postać nie ma swojej grafiki, ma portret, chód i jazdę pierwszej ewolucji, w swoim kolorze skóry. Rozwinięta umiejętność ma ikonę, dźwięk i wygląd w walce umiejętności, z której wyrasta. Nowa ma te umiejętności pierwszej ewolucji, która stoi na tym samym miejscu, a gdy rozwinięta wyrasta właśnie z niej, tej drugiej: Boska ochrona ma Wielkie błogosławieństwo, a Przywołanie niedźwiedzia Lustro many. Przywołaniec bez obrazka pokazuje stwora z Bestiariusza (wilk, niedźwiedź, szkielet), a ent żywiołaka. *Od 0.3.1 ent i Prastary dąb mają własne postacie (893 B i C).* Prawdziwa grafika potrzebuje tylko plików i ich id na listach w `src/client/art.js`, a dźwięk wpisu `skill-<id>` w `data/sounds.json`, bez zmian w kodzie.
 12. **Walka.**
     - Kruszący cios ogłusza na dwa ruchy. Wir stali i Deszcz meteorów kładą swój efekt na każdego trafionego.
     - Ryk berserkera osłabia ciosy wszystkich wrogów, Mur tarcz wzmacnia pancerz całej drużyny, a Chór dodaje jej obrażeń, każde przez kilka ruchów postaci. Chór nie czeka na rany.

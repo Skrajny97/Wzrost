@@ -200,8 +200,9 @@ export const stackButton = (goods, options, actions) =>
 // compares it with what each of them wears there too (a player's remark
 // passed on by the author, 11.11.2026), the one shopped for (`first`, "Dla
 // mnie" for a companion) before the character, whose notes then say
-// nothing.
-export function itemEntry(item, key, opened, { notes: noted = true, wearers = null, team = [], first = 'me' } = {}) {
+// nothing. `under` stands under its name, folded or not, as what the
+// scrapper pays for an item put up (listSheet).
+export function itemEntry(item, key, opened, { notes: noted = true, wearers = null, team = [], first = 'me', under = null } = {}) {
   const character = state.character;
   const usable = !item.classIds || item.classIds.includes(character.classId);
   const worn = character.equipment?.[item.slot] ?? null;
@@ -221,7 +222,7 @@ export function itemEntry(item, key, opened, { notes: noted = true, wearers = nu
         open: opened.has(key),
         onToggle: (event) => (event.currentTarget.open ? opened.add(key) : opened.delete(key)),
       },
-      h('summary', {}, itemSummary(item, { tier: true })),
+      h('summary', {}, under ? h('span', { class: 'market-pick-goods' }, itemSummary(item, { tier: true }), h('span', { class: 'muted market-scrap', text: under })) : itemSummary(item, { tier: true })),
       h(
         'ul',
         { class: 'item-properties' },
@@ -569,8 +570,17 @@ export function mountMarket(holder) {
           h(
             'ul',
             { class: 'market-picks' },
+            // An item's whole card unfolds under a tap, with the comparison
+            // to the one worn (a player's remark passed on by the author,
+            // 13.11.2026: only the name, level and Tier told items apart);
+            // what the scrapper pays stays under its name.
             bag.map(({ item }) =>
-              h('li', { class: 'market-pick' }, pickWithScrap(itemSummary(item, { tier: true }), scrapText(item.price)), choose({ kind: 'item', itemId: item.id, name: item.name, count: 1, scrap: item.price })),
+              h(
+                'li',
+                { class: 'market-pick market-pick--item' },
+                itemEntry({ ...item, price: undefined }, `sell:${item.id}`, opened, { notes: false, under: scrapText(item.price) }),
+                choose({ kind: 'item', itemId: item.id, name: item.name, count: 1, scrap: item.price }),
+              ),
             ),
           ),
         others.length > 0 &&
