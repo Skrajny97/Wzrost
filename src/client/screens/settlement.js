@@ -297,12 +297,15 @@ export function mountSettlement(container, { params = {} } = {}) {
         { class: 'settlement-fold-body' },
         h('p', { class: 'settlement-story', text: t('„{line}”', { line: order.story }) }),
         h('p', { class: 'settlement-ask', text: t('Masz {have} z {count}', { have: formatNumber(order.have), count: formatNumber(order.count) }) }),
+        // With the Punkty Systemu it pays: a special order's, the week's
+        // order's (the server's orderView).
         h('p', {
           class: 'muted',
-          text: t(order.special ? 'Zapłata: {gold} złota, +{reputation} reputacji: {brotherhood}, +1 PS' : 'Zapłata: {gold} złota, +{reputation} reputacji: {brotherhood}', {
+          text: t(order.systemPoints > 0 ? 'Zapłata: {gold} złota, +{reputation} reputacji: {brotherhood}, +{points} PS' : 'Zapłata: {gold} złota, +{reputation} reputacji: {brotherhood}', {
             gold: formatNumber(order.gold),
             reputation: order.reputation,
             brotherhood: order.brotherhoodName,
+            points: order.systemPoints,
           }),
         }),
         order.expiresAt && h('p', { class: 'muted', text: t('Termin: jeszcze {time}', { time: timeLeft(order.expiresAt - serverNow()) }) }),

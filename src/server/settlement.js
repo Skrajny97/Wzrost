@@ -60,6 +60,7 @@ import {
   mugCost,
   orderGold,
   orderStories,
+  orderSystemPoints,
   parseStack,
   pathResetCost,
   piecesOfRarity,
@@ -299,6 +300,9 @@ function orderView(order, stocks, sellBonus) {
     ...(takes && { takes }),
     story: storyOf(order),
     brotherhoodName: content().settlement.brotherhoods.find((one) => one.id === order.brotherhood).name,
+    // The Punkty Systemu it pays, for its "Zapłata" line: the week's order
+    // its own too (the code review, 13.11.2026: its line left them out).
+    systemPoints: orderSystemPoints(order, order.id === 'weekly', content()),
     have,
   };
 }

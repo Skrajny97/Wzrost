@@ -158,7 +158,9 @@ describe('the report of a room of the Labirynt', () => {
 });
 
 // The Tablica zleceń in the Osada (screens/settlement.js): an empty slot's
-// countdown moves with the screen's tick instead of standing still.
+// countdown moves with the screen's tick instead of standing still, and
+// the week's order's "Zapłata" tells its Punkty Systemu as a special
+// order's does.
 describe("the Osada's Tablica zleceń", () => {
   const order = (id, extra = {}) => ({
     id,
@@ -211,6 +213,16 @@ describe("the Osada's Tablica zleceń", () => {
     assert.deepEqual(lines('Nowe zlecenie'), ['Nowe zlecenie za 2:00:00.']);
     mounted.tick(readyAt - 61000);
     assert.deepEqual(lines('Nowe zlecenie'), ['Nowe zlecenie za 01:01.']);
+    mounted.unmount();
+  });
+
+  test('each order says the Punkty Systemu it pays, the week\'s order too', async () => {
+    const { mounted, lines } = await board();
+    assert.deepEqual(lines('Zapłata'), [
+      'Zapłata: 120 złota, +2 reputacji: Bractwo Łowców, +1 PS',
+      'Zapłata: 120 złota, +2 reputacji: Bractwo Łowców',
+      'Zapłata: 120 złota, +2 reputacji: Bractwo Łowców, +5 PS',
+    ]);
     mounted.unmount();
   });
 });

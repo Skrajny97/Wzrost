@@ -737,7 +737,7 @@
   "Zlecenie specjalne": "Special order",
   "Można oddać": "Ready to deliver",
   "Masz {have} z {count}": "You have {have} of {count}",
-  "Zapłata: {gold} złota, +{reputation} reputacji: {brotherhood}, +1 PS": "Pay: {gold} gold, +{reputation} reputation: {brotherhood}, +1 System Point",
+  "Zapłata: {gold} złota, +{reputation} reputacji: {brotherhood}, +{points} PS": "Pay: {gold} gold, +{reputation} reputation: {brotherhood}, System Points +{points}",
   "Zapłata: {gold} złota, +{reputation} reputacji: {brotherhood}": "Pay: {gold} gold, +{reputation} reputation: {brotherhood}",
   "Termin: jeszcze {time}": "Time left: {time}",
   "Oddasz: {list}.": "You will hand in: {list}.",
