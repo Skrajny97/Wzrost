@@ -474,6 +474,17 @@ export async function beginHunt(
   // only: hired with the start, in its batch, its fee paid at once; it
   // fights beside the character as a Drużyna's member would.
   const hire = mercenary === null ? null : await hireMercenary(db, player, mercenary, { area, minutes, startsAt, endsAt, now, plain: !quick && !crew });
+  // What an exploration of its own keeps and a Drużyna's trip does not. The
+  // Ołtarz's blessing of the day, for its first fights; a trip's fights are
+  // one for all (fortress.js). The professions' levels as it sets out, whose
+  // stats its fights count: the Awatar's report claimed on the way raises
+  // them (avatar.js), and its fights would count the new levels (the code
+  // review, 0.2.72), as a gem or a training would, which wait for the
+  // report; a trip keeps its roster as it set out anyway. A leader whose
+  // members all stayed home after all goes as on its own, and its
+  // exploration gets them then (parties.js).
+  const blessing = blessingOf(player.row);
+  const own = { ...(blessing && { blessing }), professions: JSON.parse(player.row.professions ?? '{}') };
   const options = {
     // When it really set out, which a "Przewiń" leaves as it was (started_at
     // moves back with a skip): a trial of the Próby Gildii moves on only
@@ -495,15 +506,7 @@ export async function beginHunt(
     ...(sought && { wanted: sought }),
     ...(hard && { hard: true }),
     ...(hire && { partners: [hire.partner], mercenary: hire.view }),
-    // The Ołtarz's blessing of the day, for this exploration's first fights;
-    // not on a Drużyna's trip, whose fights are one for all (fortress.js).
-    ...(!crew && blessingOf(player.row) && { blessing: blessingOf(player.row) }),
-    // The professions' levels as it sets out, whose stats its fights count:
-    // the Awatar's report claimed on the way raises them (avatar.js), and
-    // its fights would count the new levels (the code review, 0.2.72), as a
-    // gem or a training would, which wait for the report. A Drużyna's trip
-    // keeps its roster as it set out anyway.
-    ...(!crew && { professions: JSON.parse(player.row.professions ?? '{}') }),
+    ...(!crew && own),
     ...(quick && { quick }),
     ...(flash && { flash }),
   };
@@ -560,8 +563,9 @@ export async function beginHunt(
     }
     throw error;
   }
-  // What it set out with, for the roster of a Drużyna's trip (parties.js).
-  return { windows, trophies, taken, healBelow: healBelow ?? content().potionUse.healBelow, tracked, unknown, rumor, rareMore, avoidRare, seekRare, wanted: sought };
+  // What it set out with, for the roster of a Drużyna's trip (parties.js),
+  // and what it keeps should its leader go alone after all (`own`).
+  return { windows, trophies, taken, healBelow: healBelow ?? content().potionUse.healBelow, tracked, unknown, rumor, rareMore, avoidRare, seekRare, wanted: sought, own };
 }
 
 // Calling the character back early gives nothing and costs nothing. A
