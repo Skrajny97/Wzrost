@@ -22472,3 +22472,34 @@ a.discord-button {
 .duel-match .cards-table-head .cards-round {
   margin-left: auto;
 }
+
+/* The login screen's background (proposal 932): the edge of the primeval
+   forest at dusk with the System's runes, as the System's words say
+   ("na skraju puszczy"). On a phone a band behind the emblem, fading into
+   the page; on a computer the whole screen, dimmed behind the form. */
+#view-auth {
+  position: relative;
+  isolation: isolate;
+}
+
+#view-auth::before {
+  content: '';
+  position: absolute;
+  inset: 0 calc(50% - 50vw) auto;
+  height: calc(100vw * 107 / 192);
+  background:
+    linear-gradient(to bottom, rgb(14 18 15 / 0.15) 0%, rgb(14 18 15 / 0.4) 60%, var(--bg) 100%),
+    url('/art/places/login.png') center top / 100% auto no-repeat;
+  image-rendering: pixelated;
+  z-index: -1;
+  pointer-events: none;
+}
+
+:root[data-layout='desktop'] #view-auth::before {
+  position: fixed;
+  inset: 0;
+  height: auto;
+  background:
+    radial-gradient(60% 75% at 50% 45%, rgb(14 18 15 / 0.35), rgb(14 18 15 / 0.82)),
+    url('/art/places/login.png') center / cover no-repeat;
+}
