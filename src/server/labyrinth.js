@@ -24,9 +24,6 @@ import {
   buyAtMerchant,
   cardDropText,
   chooseBlessing,
-  companionReady,
-  companionsGoingMost,
-  companionStays,
   enterRoom,
   hpAfterHunt,
   huntKills,
@@ -55,7 +52,7 @@ import {
 import { say } from '../engine/text.js';
 import { atomically, sameVersion } from './atomic.js';
 import { cardCollection, cardsHere, cardSummary, cardUpserts, droppedCards, maxedCards } from './cards.js';
-import { characterView, coreOf, engineCharacter, equippedItems, loadPlayer, questsNow, requireNotExploring, requirePlayer, trophiesFor } from './characters.js';
+import { characterView, coreOf, engineCharacter, equippedItems, loadPlayer, questsNow, requirePlayer, trophiesFor } from './characters.js';
 import { content } from './content.js';
 import { artifactData } from './core.js';
 import { toHex } from './encoding.js';
@@ -63,6 +60,9 @@ import { labyrinthOn } from './features.js';
 import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
+// As into a Portal: not while serving as a mercenary (requireFree), with
+// the companions who go there (companionsOf, 850 A).
+import { companionsOf, requireFree } from './portals.js';
 import { trimReports } from './reports.js';
 import { weekNow } from './weeks.js';
 
@@ -75,22 +75,6 @@ function requireLabyrinth(row) {
     throw new ApiError(403, 'locked', `Labirynt Systemu odblokujesz na poziomie postaci ${content().unlocksById.labyrinth.level}.`);
   }
 }
-
-// A character offering itself as a mercenary, or serving, goes into no
-// Labirynt, as into no Portal (portals.js); an exploration or a work leaves
-// it open.
-function requireFree(player, now) {
-  if (player.activity?.kind === 'mercenary') requireNotExploring(player, now);
-}
-
-// The companions who go into the Labirynt now (850 A): those hired who do
-// not stay in the Kwatery, a wounded one too (the Labirynt takes nobody's
-// HP outside it), none while the character is in a Drużyna, at most as many
-// as go on explorations; as the Portale take them.
-const companionsOf = (player) =>
-  (JSON.parse(player.row.settlement ?? '{}').companions ?? [])
-    .filter((companion) => !companionStays(companion, player.inParty) && companionReady(companion, true))
-    .slice(0, companionsGoingMost(content()));
 
 // The companions of the day's team still hired, as they are now.
 const teamOf = (player, state) => (JSON.parse(player.row.settlement ?? '{}').companions ?? []).filter((companion) => state.team.includes(String(companion.id)));
@@ -296,11 +280,14 @@ export async function enterLabyrinth(context) {
   }
   if (opensCore) lines.push(say(texts, 'coreOpen', 0));
 
+  // A new level heals fully, unless an exploration's report settles the HP;
+  // then the report says nothing of a heal either.
+  const away = ['hunt', 'mercenary'].includes(player.activity?.kind);
   // A fight: its XP to the character (applyHunt) and its report.
   let applied = null;
   let report = null;
   if (hunt) {
-    applied = applyHunt(character, hunt, content());
+    applied = applyHunt(character, hunt, content(), { heal: !away });
     const base = huntReport({ hunt, applied, character, areaId: hunt.areaId, startedAt: now, endsAt: now }, content());
     report = {
       ...base,
@@ -348,8 +335,6 @@ export async function enterLabyrinth(context) {
   const kills = hunt ? huntKills(hunt, content()) : {};
   const opened = applied ? areasOpened(character.classLevel, applied.classLevel, content()) : 0;
   const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { kills, opened }));
-  // A new level heals fully, unless an exploration's report settles the HP.
-  const away = ['hunt', 'mercenary'].includes(player.activity?.kind);
   const healed = applied?.levelled && !away ? hpAfterHunt({ character, applied, hunt, equipped, name: row.name }, content()) : null;
 
   const statements = [

@@ -12355,18 +12355,6 @@ a.profession-square:active {
   font-family: var(--font-system);
 }
 
-.settlement-pick-art {
-  flex: none;
-  display: inline-flex;
-  width: 28px;
-  height: 28px;
-}
-
-.settlement-pick-art .sprite {
-  width: 28px;
-  height: 28px;
-}
-
 .settlement-result-title {
   margin: 0;
   color: var(--system);
@@ -20529,39 +20517,12 @@ a.discord-button {
   font-size: 16px;
 }
 
-.labyrinth-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.labyrinth-chip {
-  min-height: 32px;
-  background: transparent;
-  border-color: var(--system-line);
-  color: var(--system-text);
-  font-family: var(--font-system);
-  white-space: normal;
-  text-align: left;
-  overflow-wrap: anywhere;
-}
-
 .meter--down .meter-label,
 .meter--down .meter-value {
   color: var(--danger);
 }
 
-/* A choice waiting over the map: three blessings, or the merchant. */
-.labyrinth-choice {
-  border-color: var(--system-line);
-  background: linear-gradient(rgba(143, 227, 239, 0.06), rgba(143, 227, 239, 0.02)), var(--surface);
-}
-
-.labyrinth-choice .section-title,
-.labyrinth-choice p {
-  margin: 0;
-}
-
+/* A choice in the sheet: three blessings, or the merchant's wares. */
 .labyrinth-blessings-choice {
   display: grid;
   gap: 8px;
@@ -20607,143 +20568,12 @@ a.discord-button {
   white-space: normal;
 }
 
-/* The map: the rows from the entrance down to the guardian, the roads
-   behind the rooms. */
-.labyrinth-map {
-  position: relative;
-  width: 100%;
-  margin-top: 4px;
-}
-
-.labyrinth-map-card--hell {
-  border-color: rgba(214, 69, 97, 0.45);
-}
-
-.labyrinth-roads {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.labyrinth-road {
-  stroke: var(--bark-line);
-  stroke-width: 2;
-  stroke-dasharray: 4 4;
-}
-
-.labyrinth-road--walked {
-  stroke: var(--gold);
-  stroke-dasharray: none;
-}
-
-.labyrinth-road--open {
-  stroke: var(--system);
-  stroke-dasharray: none;
-}
-
-.labyrinth-room {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  width: 80px;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--text);
-  font: inherit;
-  transform: translateX(-50%);
-  cursor: pointer;
-}
-
-.labyrinth-room-circle {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  border: 1.5px solid var(--bark-line);
-  border-radius: 50%;
-  background: var(--bg-deep);
-}
-
-.labyrinth-room-name {
-  max-width: 100%;
-  overflow: hidden;
-  color: var(--text-muted);
-  font-size: 13px;
-  line-height: 1.2;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.labyrinth-room--guardian .labyrinth-room-circle {
-  width: 54px;
-  height: 54px;
-  border-color: rgba(240, 138, 156, 0.7);
-}
-
-.labyrinth-room--shut {
-  opacity: 0.5;
-}
-
-.labyrinth-room--done {
-  opacity: 0.8;
-}
-
-.labyrinth-room--done .labyrinth-room-circle {
-  border-color: var(--gold);
-}
-
-.labyrinth-room-check {
-  position: absolute;
-  right: -4px;
-  bottom: -4px;
-  display: flex;
-  border-radius: 50%;
-  background: var(--bg-deep);
-  color: var(--gold);
-}
-
-.labyrinth-room--here .labyrinth-room-circle {
-  border: 2px solid var(--gold);
-  box-shadow: 0 0 10px rgba(217, 180, 90, 0.55);
-}
-
-.labyrinth-room--open .labyrinth-room-circle {
-  border: 2px solid var(--system);
-  box-shadow: 0 0 12px rgba(143, 227, 239, 0.55);
-}
-
-.labyrinth-room--open .labyrinth-room-name {
-  color: var(--system-text);
-}
-
-/* The glow breathes, unless animations are off in the game (`calm`). */
-.labyrinth-room--open .labyrinth-room-circle {
-  animation: labyrinth-glow 1.8s ease-in-out infinite;
-}
-
-.calm .labyrinth-room--open .labyrinth-room-circle {
-  animation: none;
-}
-
+/* The glow of the entrance's way in breathes (.labyrinth-door-label),
+   unless animations are off in the game (`calm`). */
 @keyframes labyrinth-glow {
   50% {
     box-shadow: 0 0 4px rgba(143, 227, 239, 0.25);
   }
-}
-
-.labyrinth-room:focus-visible {
-  outline: none;
-}
-
-.labyrinth-room:focus-visible .labyrinth-room-circle {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
 }
 
 .labyrinth-artifact {
@@ -20940,10 +20770,7 @@ a.discord-button {
   text-decoration: none;
 }
 
-/* A smaller line of the Labirynt and the Rdzeń. */
-.labyrinth-party .small,
-.labyrinth-map-card .small,
-.labyrinth-gains .small,
+/* A smaller line of the Rdzeń. */
 .core-artifact .small,
 .core-resonance .small {
   margin: 0;

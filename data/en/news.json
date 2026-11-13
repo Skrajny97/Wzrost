@@ -676,6 +676,10 @@
     "0.3.19": {
       "title": "Version 0.3.19",
       "body": "- Live card matches: on the card of another player who is in the game, you can challenge them to a System Deck match, without a stake or for gold. You take turns, 30 seconds a move, and a win gets you both stakes minus 5%."
+    },
+    "0.3.20": {
+      "title": "Version 0.3.20",
+      "body": "- Arena, Cards tab: the defending deck now has +12% Attack and Life, since it lays its cards first, face up. Equal decks now win about half of their matches each.\n- Fixes: the card table reloads when the match moved on on another device, chat messages stay in the order they were written, the players online count reads \"1 player\", \"2 players\", and the threat on the Fight screen counts your bond with your companions."
     }
   }
 }

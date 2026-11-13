@@ -10,10 +10,11 @@
 // saved in the Salon Gier (card_decks), and plays a match of Talia Systemu
 // against that deck, its cards at the rival's levels, the server laying the
 // rival's cards as Szczęsny on his higher tiers, openly before the player's
-// turn, with the rival's hero card (rivalSkill in src/engine/cards.js). The
-// player's own deck defends it so while it is away. Five matches a Polish
-// day, each counted at its start; one running at a time, apart from the
-// Salon's (card_matches). What the match puts at stake for both card
+// turn, with the rival's hero card (rivalSkill in src/engine/cards.js); for
+// laying first, the defending deck's cards have defenceBonus more Atak and
+// Życie (915 B). The player's own deck defends it so while it is away. Five
+// matches a Polish day, each counted at its start; one running at a time,
+// apart from the Salon's (card_matches). What the match puts at stake for both card
 // ratings is fixed at its start, and both move at its end: a match given up
 // is lost. Its defender sees it among its deck's last defences, those since
 // its last visit marked new. "Losuj innych" draws other rivals a few times
@@ -53,7 +54,7 @@ import {
   turnBlock,
 } from '../engine/index.js';
 import { assertion, atomically } from './atomic.js';
-import { cardGameOf } from './cards.js';
+import { cardGameOf, heroOf, heroView } from './cards.js';
 import { characterView, engineCharacter, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
@@ -215,10 +216,6 @@ async function offeredRivals(db, row, record) {
   return { record: next, rivals: await rivalsOf(db, row, next) };
 }
 
-// A character's hero card (872 A) for a match: its class and its
-// evolution's stage (0 before the first), as the Salon's (cards.js).
-const heroOf = (row) => ({ classId: row.class_id, stage: row.evolution ? (content().evolutionsById[row.evolution]?.stage ?? 1) : 0 });
-
 // A rival as the Karty show it: its name, class (its evolution's name),
 // level, look and card rating, its deck's strength (900 A: the Atak and
 // Życie of its twelve cards), what a win, a loss and a draw with it would
@@ -287,20 +284,6 @@ function runningView(match) {
   return { rival: JSON.parse(match.rival), stakes: JSON.parse(match.stakes).attacker, ...matchView(JSON.parse(match.state), content()) };
 }
 
-// The character's hero card for the page (872 A): its portrait, its class
-// or evolution's name and its skill at the evolution's stage.
-function heroView(row) {
-  const hero = heroOf(row);
-  return {
-    ...hero,
-    appearance: row.appearance,
-    skin: row.skin ?? content().defaultSkin,
-    evolution: content().evolutionsById[row.evolution] ? row.evolution : null,
-    title: content().evolutionsById[row.evolution]?.name ?? content().classesById[row.class_id]?.name ?? '',
-    skill: heroSkill(hero.classId, hero.stage, content()),
-  };
-}
-
 // The Karty for the page: the character's card rating and place on this
 // week's table, the matches left today, its deck (its strength, its types,
 // whether it has taken Szczęsny's starter deck) and hero card, the rivals
@@ -358,6 +341,7 @@ async function cardArenaView(db, player, record, rivals, now, defences = null) {
       rerolls: data.rivals.rerollsPerDay,
       start: data.rating.start,
       share: Math.round(data.season.share * 100),
+      defence: Math.round(data.defenceBonus * 100),
       deckSize: cards.deckSize,
     },
     texts: data.texts,
@@ -403,8 +387,8 @@ export async function getCardArena(context) {
 
 // POST /api/cards/arena/match { rivalId }: a match with one of the rivals
 // offered, against its saved deck, the character's own deck on its side,
-// both at their cards' levels now and with their hero cards; one of the
-// day's matches. What it puts at stake for both card ratings is fixed now
+// both at their cards' levels now and with their hero cards, the rival's
+// raised by the defence's bonus (915 B); one of the day's matches. What it puts at stake for both card ratings is fixed now
 // (cardRatingStakes). Saved in one batch over the record as read, with the
 // rival's record made for its rating (so two taps start one match); one
 // match at a time.
@@ -431,7 +415,7 @@ export async function startCardArenaMatch(context) {
   const theirs = decks.get(rivalId);
   if (!rival || !fairRival(rival, row) || !theirs) throw new ApiError(409, 'gone', texts().gone);
   const stakes = cardRatingStakes(record.rating, rival.card_rating, content());
-  const state = newMatch({ seed: newSeed(), me: { cards: mine, hero: heroOf(row) }, foe: { cards: theirs, hero: heroOf(rival), smart: rules().smart } }, content());
+  const state = newMatch({ seed: newSeed(), me: { cards: mine, hero: heroOf(row) }, foe: { cards: theirs, hero: heroOf(rival), smart: rules().smart, boost: rules().defenceBonus } }, content());
   const today = arenaDay(now, content()).key;
   try {
     await atomically(

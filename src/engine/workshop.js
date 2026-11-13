@@ -370,8 +370,7 @@ export function craftItems({ baseId, rarityId, count, level, professionLevel, me
       results.push({ made });
       continue;
     }
-    // items.js is not checked yet.
-    const item = generateItem(/** @type {any} */ ({ baseId, level, rarityId: luckyRarity(rarityId, professionLevel, rng, content, luck), area }), rng, content);
+    const item = generateItem({ baseId, level, rarityId: luckyRarity(rarityId, professionLevel, rng, content, luck), area }, rng, content);
     const upgrade = rollCraftUpgrade(professionLevel, rng, content);
     results.push({ made, item: { ...item, ...(upgrade > 0 && { upgrade }), crafted: { parts, rarity: rarityId, upgrade } } });
   }
@@ -428,7 +427,7 @@ export function workshopReport({ base, rarityId, results, scrolls, learned = [],
     line: say(texts, 'report', createRng(`${seed}:line`).int(0, texts.report.length - 1)),
     base: { id: base.id, name: base.name },
     rarity: rarityId ? { id: rarityId, name: content.raritiesById[rarityId].name } : null,
-    items: made.map((item) => itemView(/** @type {any} */ (item), content)),
+    items: made.map((item) => itemView(item, content)),
     ...(scrolls !== undefined && { scrolls }),
     failed,
     made: madeCount > 0 ? say(texts, 'made', 0, { items: countList({ [base.id]: madeCount }, { [base.id]: base }) }) : null,
@@ -440,7 +439,7 @@ export function workshopReport({ base, rarityId, results, scrolls, learned = [],
     revealed: patterns.map((candidate) => candidate.id),
     summary: { xp, levelBefore: character.level, levelAfter: work.level, timePoints: work.timePoints },
     system: [
-      ...lucky.map((item) => say(texts, 'lucky', 0, { item: itemName(/** @type {any} */ (item), content), rarity: content.raritiesById[item.rarity].name })),
+      ...lucky.map((item) => say(texts, 'lucky', 0, { item: itemName(item, content), rarity: content.raritiesById[item.rarity].name })),
       ...professionLevelLines(profession, before, after, content),
       ...(patterns.length > 0 ? [say(texts, 'revealed', 0, { patterns: patterns.map((candidate) => candidate.name).join(', ') })] : []),
       ...rarities.map((rarity, index) => say(texts, 'rarity', index, { rarity: content.raritiesById[rarity.id].name })),

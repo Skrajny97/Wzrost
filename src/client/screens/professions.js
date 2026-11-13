@@ -1,19 +1,22 @@
-// The Profesje tab: the professions as squares in a triangle (Zielarstwo on
-// top, Alchemia and Rzemieślnictwo below it, grey until they come), the
-// Zielarstwo screen: the Systemowy Zagajnik, the profession's level and
-// stats, the herbs (those the System still hides are shadows), the herbs to
-// gather and the time, and the gathering under way with "Przewiń",
-// "Przerwij" and its report at the end; and the Alchemia screen in the same
-// way: the Systemowa Pracownia, the recipes, how many potions and the
-// brewing under way; and the Rzemieślnictwo screen: the Systemowy
-// Warsztat, the patterns by slot, the rarity, how many items, the order
-// under way and the parts' exchange; the Górnictwo screen: the Systemowa
-// Kopalnia, the time, what a digging should bring and the digging under way;
-// and the Jubilerstwo screen: the Systemowa Szlifiernia with two tabs, the
-// jewellery by pattern and gem, and the gems set in the items worn. Each
-// work can be done by the character or by the Awatar Systemu, bought on the
-// tab, which works beside the character in its own card. Locked, or hidden
-// in this deployment, the tab says so as before.
+// The Profesje tab: the professions as squares in their rows (`rows` of
+// data/professions.json: the gathering ones on top, each above the one that
+// works with what it brings, and Rzemieślnictwo below; grey until they
+// come), the Zielarstwo screen: the Systemowy Zagajnik, the profession's
+// level and stats, the herbs (those the System still hides are shadows),
+// the herbs to gather and the time, and the gathering under way with
+// "Przewiń", "Przerwij" and its report at the end; and the Alchemia screen
+// in the same way: the Systemowa Pracownia, the recipes, how many potions
+// and the brewing under way; and the Rzemieślnictwo screen: the Systemowy
+// Warsztat, the patterns by slot, the rarity, how many items and the order
+// under way, with the parts' exchange and the Przechowalnia in tabs; the
+// Górnictwo screen: the Systemowa Kopalnia, the time, what a digging should
+// bring and the digging under way; and the Jubilerstwo screen: the
+// Systemowa Szlifiernia with its tabs, the jewellery by pattern and gem, the
+// gems set in the items worn (on the character's figure), the przemiana of
+// gems and the Przechowalnia. Each work can be done by the character or by
+// the Awatar Systemu, bought on the tab, which works beside the character in
+// its own card. Locked, or hidden in this deployment, the tab says so as
+// before.
 
 import { goldArt, herbSprite, itemSprite, mineralSprite, placeArt, potionSprite, professionSprite, scrollArt } from '../art.js';
 import { droppedCardsSection } from '../cards.js';
@@ -1092,8 +1095,11 @@ export function mountProfessions(container, { params, navigate }) {
   function craftForm(character, workshop) {
     const who = workerPicker(character);
     const known = (slot) => slot.patterns.filter((pattern) => !pattern.hidden);
-    // A slot's pattern for the character's class comes first.
-    const firstFor = (slot) => known(slot).find((pattern) => !pattern.classNames || pattern.classNames.includes(character.className)) ?? known(slot)[0];
+    // A slot's pattern for the character's class comes first. The patterns
+    // name the classes themselves, so an evolved character goes by its
+    // class (baseClassName), not by its evolution's name (className).
+    const firstFor = (slot) =>
+      known(slot).find((pattern) => !pattern.classNames || pattern.classNames.includes(character.baseClassName ?? character.className)) ?? known(slot)[0];
     const rarities = workshop.rarities.filter((rarity) => !rarity.hidden);
     const next = workshop.rarities.find((rarity) => rarity.hidden);
     let slot = workshop.slots.find((candidate) => candidate.id === craftChoice.slot) ?? workshop.slots[0];
@@ -1202,7 +1208,8 @@ export function mountProfessions(container, { params, navigate }) {
     }
 
     // A slider of the items with buttons for one at a time, what they take
-    // and how long, the chance, the room in the bag and the start.
+    // and how long, the chance, where the items wait (the Przechowalnia, 842)
+    // and the start.
     function countPicker({ byParts, byResources, most }) {
       const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
       const estimate = h('p', { class: 'herb-estimate' });
@@ -1789,9 +1796,10 @@ export function mountProfessions(container, { params, navigate }) {
     return workUnderWay(activity, t('Kopanie w toku: {place}, {time}.', { place: activity.placeName, time: formatMinutes(activity.minutes) }), t('Kopanie'), cancel, avatar);
   }
 
-  // Jubilerstwo: the works under way, two tabs (the jewellery and the
-  // setting of gems), the Systemowa Szlifiernia with how the chosen work
-  // goes folded under "Jak to działa?", the level and the tab's form.
+  // Jubilerstwo: the works under way, its tabs (the jewellery, the setting
+  // of gems, the przemiana and the Przechowalnia), the Systemowa Szlifiernia
+  // with how the chosen work goes folded under "Jak to działa?", the level
+  // and the tab's form.
   function renderJewelcraft(character) {
     const { list, jewelcrafting, storage } = character.professions;
     const profession = list.find((candidate) => candidate.id === jewelcrafting.professionId);
@@ -1878,7 +1886,8 @@ export function mountProfessions(container, { params, navigate }) {
       remember();
       show();
     }
-    // How many jewels the gems, the ore and the bag allow.
+    // How many jewels the gems and the ore allow; the bag's room does not
+    // count, as they wait in the Przechowalnia (842).
     function affordable() {
       const byGems = rarity.gem.have;
       const byOre = Math.floor(rarity.ore.have / slot.ores);
@@ -1955,7 +1964,8 @@ export function mountProfessions(container, { params, navigate }) {
     }
 
     // A slider of the jewels with buttons for one at a time, what they take
-    // and how long, the chance, the room in the bag and the start.
+    // and how long, the chance, where the jewels wait (the Przechowalnia,
+    // 842) and the start.
     function countPicker({ byGems, byOre, most }) {
       const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
       const estimate = h('p', { class: 'herb-estimate' });

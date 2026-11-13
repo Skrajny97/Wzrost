@@ -2,11 +2,12 @@
 // Społeczność tab, its Gildia part and the guild page's tabs (the author:
 // "Jeśli żadna próba jest niewzięta z Prób gildii niech podświetla się
 // ikonka powiadomienia żółtą kropką i podobnie inne rzeczy w Gildii do
-// zrobienia"): a trial to take while none is taken, or a trials' chest to
-// open; an attack on the Bestia Gildii left today while it lives, or its
-// chest to open; an attack left today on the Wyprawa's guardian barring the
-// way, for one who added minutes this week, or a guardian's chest to open
-// (no attack while the character offers itself or serves as a mercenary);
+// zrobienia"): a trials' chest to open (since 617 the trials run without
+// taking, so none waits to be taken); an attack on the Bestia Gildii left
+// today while it lives, or its chest to open; an attack left today on the
+// Wyprawa's guardian barring the way, for one who added minutes this week,
+// or a guardian's chest to open (no attack while the character offers
+// itself or serves as a mercenary);
 // a gift to its request not thanked for yet; an item waiting for it in the
 // Skrzynia Gildii (guild-chest.js; the author, 10.11.2026: an item left
 // for one member lights its dot). The page asks

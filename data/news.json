@@ -850,6 +850,11 @@
       "id": "0.3.19",
       "title": "Wersja 0.3.19",
       "body": "- Partie kart na żywo: w karcie postaci innego gracza, który jest w grze, wyzwiesz go na partię Talii Systemu, bez stawki albo o złoto. Ruchy robicie na zmianę, 30 sekund na ruch, a za wygraną zgarniesz obie stawki bez 5%."
+    },
+    {
+      "id": "0.3.20",
+      "title": "Wersja 0.3.20",
+      "body": "- Arena, zakładka „Karty”: talia, która się broni, ma teraz +12% Ataku i Życia, bo to ona wykłada karty pierwsza i jawnie. Równe talie wygrywają teraz mniej więcej po połowie partii.\n- Poprawki: stół kart wczytuje się na nowo, gdy partia poszła dalej na innym urządzeniu, wiadomości czatu stoją w kolejności pisania, licznik graczy online mówi „1 gracz”, „2 gracze”, a zagrożenie na Walce uwzględnia relację z towarzyszem."
     }
   ]
 }

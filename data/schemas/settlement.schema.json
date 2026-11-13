@@ -777,11 +777,12 @@
           "type": "object",
           "additionalProperties": false,
           "description": "Karty na Arenie (900 A; src/engine/card-arena.js, src/server/card-arena.js): partie Talii Systemu z taliami innych graczy, za nieobecnych gra serwer jak Szczęsny na wyższych stopniach, z kartą bohatera rywala; osobna ocena kart, partie dziennie, tabela tygodnia z nagrodami o rewards.share nagród pojedynków. Opis zasad w $comment bloku w data/settlement.json.",
-          "required": ["matchesPerDay", "smart", "rivals", "rating", "season", "table", "keepDays", "defences", "rewards", "texts"],
+          "required": ["matchesPerDay", "smart", "defenceBonus", "rivals", "rating", "season", "table", "keepDays", "defences", "rewards", "texts"],
           "properties": {
             "$comment": { "type": "string" },
             "matchesPerDay": { "type": "integer", "minimum": 1, "description": "Partie dziennie (od północy czasu polskiego), liczone przy rozpoczęciu." },
             "smart": { "type": "integer", "minimum": 0, "maximum": 2, "description": "Jak serwer gra talią rywala, jak Szczęsny (cards.json host.tiers): 0 losowo, 1 najmocniejsze karty, 2 karty pod karty gracza." },
+            "defenceBonus": { "type": "number", "minimum": 0, "maximum": 1, "description": "O ile więcej Ataku i Życia mają karty talii, która się broni (915 B), bo to ona wykłada karty pierwsza, jawnie." },
             "rivals": {
               "type": "object",
               "additionalProperties": false,

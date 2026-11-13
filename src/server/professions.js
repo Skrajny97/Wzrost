@@ -70,7 +70,11 @@ export function workGains(player, profession, before, minutes, avatar, now) {
   const character = engineCharacter(row);
   const share = avatar ? content().avatar.share : 1;
   const week = weekFactor(keptWeek(workOf(player, avatar).activity?.options), 'profession-xp');
-  const after = workProfession(profession, before, Math.round(minutes * share), week);
+  const worked = Math.round(minutes * share);
+  const progress = workProfession(profession, before, worked, week);
+  // The report's XP of the profession (professionProgress) is what the work
+  // gave: the Awatar's share too, not the minutes the report counts.
+  const after = { ...progress, gained: progress.gained ?? worked };
   const xp = Math.round(workXp(row.level, minutes, content()) * share);
   const work = applyWork(character, xp, content());
   // A new level heals fully; otherwise resting simply goes on.
@@ -98,12 +102,20 @@ export const workClaim = (db, row, table, activity) =>
     row.version,
   ]);
 
+// A work claimed or called back by another request a moment ago.
+export const alreadyClaimed = () => new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
+
 // Why such a claim failed on its head: the work claimed or called back by
 // another request a moment ago, or the character changed meanwhile.
 export async function workClaimFailed(db, row, table, activity) {
   const still = await db.prepare(`SELECT 1 AS found FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at).first();
-  return still ? characterChanged() : new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
+  return still ? characterChanged() : alreadyClaimed();
 }
+
+// A share of what an order took, by id: for `of` pieces out of `count`
+// (the Warsztat's parts and resources, the Szlifiernia's gems and ore).
+export const shareOf = (amounts, of, count) =>
+  Object.fromEntries(Object.entries(amounts ?? {}).map(([id, amount]) => [id, Math.round((amount * of) / Math.max(1, count))]));
 
 // The start of a work that takes things from the bag or the camp (brewing.js,
 // workshop.js): its activity, for the character with its HP at the start or
@@ -260,7 +272,7 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
       db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at),
     ]);
   } catch (error) {
-    if (String(error?.message).includes('UNIQUE')) throw new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
+    if (String(error?.message).includes('UNIQUE')) throw alreadyClaimed();
     if (raced(error)) throw await workClaimFailed(db, row, table, activity);
     throw error;
   }

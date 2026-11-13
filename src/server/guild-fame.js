@@ -18,11 +18,11 @@
 // best guild of the week before (the most Sława, if any; of two with as
 // much, the older) has its tag in gold the whole week (380 C).
 
-import { WAR_DAYS, countedForm, questPeriod } from '../engine/index.js';
+import { WAR_DAYS, questPeriod } from '../engine/index.js';
 import { requireChatter } from './chat.js';
 import { content } from './content.js';
 import { guildWarsOn } from './features.js';
-import { memberFameFreeze } from './guild-members.js';
+import { fameNumbers, memberFameFreeze } from './guild-members.js';
 import { settleWars } from './guild-wars.js';
 import { json } from './http.js';
 import { askedPage, lastOffset } from './ranking-pages.js';
@@ -142,22 +142,8 @@ export async function championOf(db, now) {
 // The words of the Ranking's "Gildie", with the rules' numbers filled in;
 // the war's line only where the guild wars are on.
 function rankingTexts() {
-  const { beast, expedition, trials, requests, exchange, war } = rules();
   const texts = words();
-  const points = (count) => `${count} ${countedForm(count, texts.pointForms)}`;
-  const vars = {
-    beastPercent: points(beast.perPercent),
-    beastFell: points(beast.fell),
-    perGuardian: points(expedition.perGuardian),
-    lastGuardian: points(expedition.last),
-    perTrial: points(trials.perTrial),
-    trialCap: content().guilds.trials.cap,
-    perPiece: points(requests.perPiece),
-    giftCap: requests.cap,
-    perExchange: points(exchange.perExchange),
-    exchangeCap: exchange.cap,
-    warWon: points(war.won),
-  };
+  const vars = fameNumbers();
   const { howWar, ...rest } = texts;
   const how = guildWarsOn() ? [...texts.how.slice(0, -2), howWar, ...texts.how.slice(-2)] : texts.how;
   return { ...rest, how: how.map((line) => filled(line, vars)) };

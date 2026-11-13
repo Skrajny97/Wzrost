@@ -784,22 +784,28 @@ function rivalSetup(match, content) {
 // A new match (871 B): each side's cards ({ id, level } in deck order, which
 // the seed shuffles), its hero ({ classId, stage }, or none) and, for the
 // rival, how its AI plays (`smart`); both reserves drawn and the rival's
-// first lines laid. `seed` is the server's, never shown.
+// first lines laid. `seed` is the server's, never shown. A side's `boost`
+// raises the Atak and Życie of all its cards by that share, rounded: the
+// deck that defends on the Arena (915 B, card-arena.js), as the page
+// shows its cards.
 /**
- * @param {{ seed: string, me: { cards: { id: string, level: number }[], hero?: { classId: string, stage: number } | null }, foe: { cards: { id: string, level: number }[], hero?: { classId: string, stage: number } | null, smart?: number } }} setup
+ * @param {{ seed: string, me: { cards: { id: string, level: number }[], hero?: { classId: string, stage: number } | null, boost?: number }, foe: { cards: { id: string, level: number }[], hero?: { classId: string, stage: number } | null, smart?: number, boost?: number } }} setup
  * @param {Content} content
  * @returns {Match}
  */
 export function newMatch({ seed, me, foe }, content) {
   /**
    * @param {Seat} who
-   * @param {{ cards: { id: string, level: number }[], hero?: { classId: string, stage: number } | null, smart?: number }} spec
+   * @param {{ cards: { id: string, level: number }[], hero?: { classId: string, stage: number } | null, smart?: number, boost?: number }} spec
    * @returns {Side}
    */
   const side = (who, spec) => {
+    const raised = (/** @type {number} */ value) => (spec.boost ? Math.round(value * (1 + spec.boost)) : value);
     const cards = spec.cards.map((card, key) => {
       const level = cardLevel(card.level, content);
-      const { attack, life } = cardStats(card.id, level, content);
+      const stats = cardStats(card.id, level, content);
+      const attack = raised(stats.attack);
+      const life = raised(stats.life);
       return { key, id: card.id, level, type: cardType(card.id, content), attack, life, max: life };
     });
     return {
@@ -1052,10 +1058,11 @@ export function surrenderMatch(current) {
   return match;
 }
 
-// A turn for the player's side chosen by the game (the simulations, and the
-// absent players of the second stage): its reserve's cards on its empty
-// lines, those that hit hardest and take least this round (every way of
-// them is tried: 4 cards on 3 lines is 24 at most), with no skill.
+// A turn for the player's side chosen by the game (the simulations, and a
+// live match's move missed, card-duel.js; the Arena's absent players are
+// played as Szczęsny, rivalSetup): its reserve's cards on its empty lines,
+// those that hit hardest and take least this round (every way of them is
+// tried: 4 cards on 3 lines is 24 at most), with no skill.
 /**
  * @param {Match} match
  * @param {Content} content

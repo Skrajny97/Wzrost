@@ -12,7 +12,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { artifactUpgradeCost, breakShards, coreEffects, labyrinthMap, makeArtifact, createRng, playerCombatant, resetPrice } from '../src/engine/index.js';
+import { artifactUpgradeCost, breakShards, coreEffects, labyrinthMap, makeArtifact, createRng, playerCombatant, resetPrice, xpToNext } from '../src/engine/index.js';
 import { makeClimber } from './helpers/climb.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -310,6 +310,44 @@ describe('the Labirynt Systemu through the API', () => {
       .bind(id, Date.now(), Date.now() + 3600000)
       .run();
     assert.equal((await enter({ level: 1, row: 0, room: 0 })).status, 200);
+    // Offered as a mercenary, it goes into no Labirynt, as into no Portal
+    // (portals.js: requireFree).
+    await (await db()).prepare('DELETE FROM activities').run();
+    await (await db())
+      .prepare("INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options) VALUES (?, 'mercenary', '', 240, ?, ?, '', 100, ?)")
+      .bind(id, Date.now(), Date.now() + 4 * 3600000, JSON.stringify({ perHour: 400 }))
+      .run();
+    const serving = await call('POST', '/api/labyrinth/room', { cookie, body: { level: 1, row: 1, room: 0 } });
+    assert.deepEqual([serving.status, serving.data.error.code], [409, 'busy']);
+  });
+
+  // The code review, 13.11.2026: a new level won in the Labirynt during an
+  // exploration heals nothing (the exploration's report settles the HP), so
+  // its report says nothing of a heal either, as a party event's does.
+  test('a new level during an exploration: its XP at once, no heal and no words of one', async () => {
+    const database = await db();
+    const id = (await database.prepare('SELECT id FROM characters').first()).id;
+    await makeClimber(database, id);
+    await set('level = 60, class_level = 60, xp = ?', xpToNext(60, content) - 1);
+    await database
+      .prepare("INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options) VALUES (?, 'hunt', 'windfalls-edge', 60, ?, ?, 'x', 100, '{}')")
+      .bind(id, Date.now(), Date.now() + 3600000)
+      .run();
+    const heals = new Set([...content.texts.levelHeal, ...content.texts.levelHealFemale]);
+    const away = await enter({ level: 1, row: 0, room: 0 });
+    assert.equal(away.status, 200, JSON.stringify(away.data).slice(0, 400));
+    assert.equal(away.data.room.won, true);
+    assert.equal(away.data.character.level, 61);
+    assert.ok(!away.data.report.system.some((line) => heals.has(line)), away.data.report.system.join(' | '));
+    // Its free points wait for the return too, so the report offers no
+    // "Rozdaj według klasy" then (screens/report.js: pointsBox).
+    assert.equal((await call('POST', '/api/character/points/auto', { cookie })).data.error?.code, 'busy');
+    // At home the same new level heals, and says so.
+    await database.prepare('DELETE FROM activities').run();
+    await set(`labyrinth = '{}', level = 60, xp = ?`, xpToNext(60, content) - 1);
+    const home = await enter({ level: 1, row: 0, room: 0 });
+    assert.equal(home.data.room.won, true);
+    assert.ok(home.data.report.system.some((line) => heals.has(line)), home.data.report.system.join(' | '));
   });
 });
 

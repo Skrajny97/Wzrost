@@ -499,7 +499,6 @@
     "lower": ["Wśród łupu leży karta stwora z niższej krainy: {card}."],
     "guild": ["Wpadła karta: {card}."],
     "trial": ["Za ukończoną Próbę Gildii wpadła karta: {card}."],
-    "firstWin": "Za pierwsze pokonanie stopnia „{tier}” Szczęsny daje ci kartę: {card}.",
     "pack": {
       "offer": "Trzy losowe karty stworów z krain niższych niż Twoja. Najpierw wypadają te, których jeszcze nie masz.",
       "opened": "Szczęsny rozkłada na stole trzy karty."

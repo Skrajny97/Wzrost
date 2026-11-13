@@ -190,7 +190,7 @@ export function craftJewels({ baseId, rarityId, count, level, professionLevel, m
   const results = [];
   for (let index = 0; index < count; index += 1) {
     const made = rng.chance(chance);
-    results.push(made ? { made, item: generateItem(/** @type {any} */ ({ baseId, level, rarityId, area }), rng, content) } : { made });
+    results.push(made ? { made, item: generateItem({ baseId, level, rarityId, area }, rng, content) } : { made });
   }
   return results;
 }

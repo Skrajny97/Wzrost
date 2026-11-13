@@ -37,14 +37,10 @@ import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { requireOpen } from './mining.js';
-import { addTo, insertWork, requireProfessions, workClaim, workClaimFailed, workGains } from './professions.js';
+import { addTo, alreadyClaimed, insertWork, requireProfessions, shareOf, workClaim, workClaimFailed, workGains } from './professions.js';
 import { workFamePoints } from './fame.js';
 import { mineralsOf } from './professions-view.js';
 import { trimReports } from './reports.js';
-
-// A share of what an order took, by id: for `of` jewels out of `count`.
-const shareOf = (amounts, of, count) =>
-  Object.fromEntries(Object.entries(amounts ?? {}).map(([id, amount]) => [id, Math.round((amount * of) / Math.max(1, count))]));
 
 // An order of jewels: a pattern the character knows, by the level or from a
 // jewel taken apart, a gem it cuts, how many and what they take, at the
@@ -190,9 +186,6 @@ export async function transmuteGemsNow(context) {
   return json({ transmuted: { from: gemId, to: nextGem(gemId, content())?.id ?? null, count: body.count }, character: characterView(await loadPlayer(db, session.userId), context.now) });
 }
 
-// A work claimed or called back by another request a moment ago.
-const alreadyDone = () => new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
-
 // The report of a work in the Szlifiernia (claimHunt sends a finished one
 // here), or with `stop` of the part done before now (cancelHunt). Stopped
 // before the first jewel, or a setting called back, it only gives everything
@@ -217,7 +210,7 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
     await atomically(
       db,
       [stillThere, db.prepare(`UPDATE characters SET version = version + 1${minerals.sql} WHERE id = ? AND ${ongoing}`).bind(...minerals.binds, row.id, row.id, activity.started_at), end],
-      alreadyDone,
+      alreadyClaimed,
     );
     return null;
   };
@@ -364,7 +357,7 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
         end,
       ]);
     } catch (error) {
-      if (String(error?.message).includes('UNIQUE')) throw alreadyDone();
+      if (String(error?.message).includes('UNIQUE')) throw alreadyClaimed();
       if (raced(error)) {
         const failed = await workClaimFailed(db, row, table, activity);
         throw item && failed.code !== 'already_claimed' ? new ApiError(409, 'conflict', 'Coś zmieniło się w międzyczasie. Spróbuj ponownie.') : failed;

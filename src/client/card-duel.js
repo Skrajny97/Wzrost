@@ -235,7 +235,16 @@ async function askWaiting() {
   }
   take(answer);
   const duel = answer.duel;
-  if (!waiting || waiting.id !== id || !duel || duel.state === 'proposed') return;
+  if (!waiting || waiting.id !== id) return;
+  // The challenge is no longer this character's to wait for (another of the
+  // account's characters played now, another account, its row gone): the
+  // server answers none, and asking every two seconds would never end.
+  if (!duel) {
+    waiting = null;
+    if (news?.id === id) news = null;
+    return;
+  }
+  if (duel.state === 'proposed') return;
   waiting = null;
   const { texts } = table;
   const vars = { name: duel.other.name };

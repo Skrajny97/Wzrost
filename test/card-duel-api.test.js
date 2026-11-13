@@ -321,13 +321,22 @@ describe('Partie kart na żywo', () => {
     assert.equal((await duelRow()).version, 2);
   });
 
-  test('a character removed in a match loses it: the other takes both stakes but 5%', async () => {
+  test('a character removed in a match loses it: the other takes both stakes but 5%; its rows keep it by a negative id', async () => {
+    // A match Szuler won before, given up by Karciarka.
+    const won = await started(0);
+    assert.equal((await call('POST', '/api/cards/duel/surrender', { cookie: cookies.Karciarka, body: { id: won } })).status, 200);
+    const szuler = (await row('Szuler')).id;
+    const winnerOf = async (duel) => (await (await db()).prepare('SELECT winner FROM card_duels WHERE id = ?').bind(duel).first()).winner;
+    assert.equal(await winnerOf(won), szuler);
     const id = await started(500);
     assert.equal((await call('DELETE', '/api/character', { cookie: cookies.Szuler })).status, 200);
     assert.equal((await row('Karciarka')).gold, 9500 + 950);
     const stored = await duelRow();
     assert.equal(stored.state, 'done');
     assert.ok(stored.to_id < 0);
+    assert.equal(stored.winner, (await row('Karciarka')).id);
+    // Its win too: the database may give its id to a new character.
+    assert.equal(await winnerOf(won), -szuler);
     const end = (await call('GET', `/api/cards/duel?id=${id}`, { cookie: cookies.Karciarka })).data.duel;
     assert.deepEqual([end.match.result, end.match.end, end.gold], ['won', 'gone', 950]);
     assert.equal(end.other.id, null);

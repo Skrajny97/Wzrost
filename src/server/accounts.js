@@ -296,7 +296,13 @@ async function removeAccount(db, session, now) {
     db.prepare('DELETE FROM characters WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM sessions WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM email_links WHERE user_id = ?').bind(id),
-    db.prepare('DELETE FROM gift_codes_used WHERE user_id = ?').bind(id),
+    // Its gift codes taken stay, detached as its purchases (the account's id
+    // made negative): a code for one character is taken for every account
+    // once taken (gift-codes.js usedCodes), and deleting the record made it
+    // free again for a new character of that name (the code review of
+    // 13.11.2026). OR REPLACE: a record of an account deleted before with
+    // the same id (the ids are given again) gives way to this one.
+    db.prepare('UPDATE OR REPLACE gift_codes_used SET user_id = -user_id WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM chest_items WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM chest_goods WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM bug_report_images WHERE report_id IN (SELECT id FROM bug_reports WHERE user_id = ?)').bind(id),

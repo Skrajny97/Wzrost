@@ -117,6 +117,19 @@ describe('Tłumaczenie na czacie', () => {
     assert.deepEqual(await used('Rowan'), { day: today(), used: 1 });
   });
 
+  // The code review of 13.11.2026, as for the other limits of a day
+  // (0.2.71, 0.2.74, 0.2.76): a request begun before midnight and done after
+  // one of the new day took the new day's count for none, counted itself as
+  // the first of its own day and wrote that day back over it, so the new
+  // day's count began again. A count of a later day is the day's limit used.
+  test("the day's translations: a count of a later day is neither used again nor written over", async () => {
+    const sent = await send(players.ala, 'Cześć wszystkim, kto idzie na bagno?', 'pl');
+    await (await db()).prepare("UPDATE users SET translations_day = '2999-01-01', translations_used = 3 WHERE login = 'Rowan'").run();
+    const refused = await translate(players.rowan, sent.data.message.id, 'en');
+    assert.deepEqual([refused.status, refused.data.error?.code], [429, 'translations_used']);
+    assert.deepEqual(await used('Rowan'), { day: '2999-01-01', used: 3 });
+  });
+
   test('only messages the reader may read: not taken down, not the System\'s, not another guild\'s, not of a hidden player', async () => {
     const sent = await send(players.ala, 'Cześć, ktoś ma zbędne zioła?', 'pl');
     const id = sent.data.message.id;

@@ -52,8 +52,9 @@ const today = (now) => questPeriod('daily', now, content()).key;
 // towarzyszy, ale w tym przypadku - nie drużyn"); at most as many as go on
 // explorations. While the character is in a Drużyna its companions stay in
 // the Kwatery (828 B), so none comes along, as before, when every one of
-// them had to be told to stay first.
-const companionsOf = (player) =>
+// them had to be told to stay first. The Labirynt takes them the same way
+// (850 A, labyrinth.js).
+export const companionsOf = (player) =>
   (JSON.parse(player.row.settlement ?? '{}').companions ?? [])
     .filter((companion) => !companionStays(companion, player.inParty) && companionReady(companion, true))
     .slice(0, companionsGoingMost(content()));
@@ -126,8 +127,8 @@ function storesSql({ resources, materials, parts }) {
 // stage and sweeps none, as it fights no Arena duel (DECISIONS.md,
 // "Najemnicy w Karczmie" 2: it does nothing until it takes its offer down;
 // the code review, 12.11.2026). An exploration or a profession's work
-// leaves the Portale open.
-function requireFree(player, now) {
+// leaves the Portale open, and the Labirynt (labyrinth.js).
+export function requireFree(player, now) {
   if (player.activity?.kind === 'mercenary') requireNotExploring(player, now);
 }
 

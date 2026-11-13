@@ -1148,7 +1148,16 @@
     "src/client/cards-fx.js",
     "src/engine/card-duel.js",
     "src/server/card-duel.js",
-    "src/client/card-duel.js"
+    "src/client/card-duel.js",
+    "src/client/account-name.js",
+    "src/client/chat-bubble.js",
+    "src/client/guild-chest.js",
+    "src/client/guild-ranking.js",
+    "src/client/online.js",
+    "src/client/rename.js",
+    "src/client/screens/chat.js",
+    "src/server/guild-chest.js",
+    "src/server/guild-members.js"
   ],
   "ignore": [
     "w z na nie się sie jest że ze co jak ktoś ktos gdzie mam masz ma czy ale tak już juz jestem dla po od ja ty mi mnie tu tam jaki jakie który ktory kto ile bo też tez teraz jeszcze może moze wszyscy wszystkim proszę prosze dzięki dzieki siema hej cześć czesc elo spoko fajnie fajny dobry dobra dobre poziom poziomie mój moj twój twoj ten ta tego tym kiedy coś cos nic był byl była byla będzie bedzie trzeba warto chyba bardzo",
