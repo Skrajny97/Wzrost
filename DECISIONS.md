@@ -3249,6 +3249,10 @@ Autor zaznaczył oceny na stronie ocen: „oceny zaznaczone”.
    - 894.8: zdanie przy zamkniętym Rdzeniu zostaje.
 5. **Odmowa przy tworzeniu postaci (brakujący szczegół).** Gdy serwer odmówi po „Rozpocznij” (np. imię zajęte), ekran przewija się do słów odmowy nad paskiem, bo przy przyklejonym przycisku mogłyby zostać poza ekranem.
 
+## Przechowalnia: porównanie z założonym (13.11.2026, w grze od 0.3.2)
+
+Autor: „Niech porównywarka działa też w przechowalni w Warsztacie”. W Przechowalni Warsztatu i Szlifierni pod ostatnio zaznaczonym przedmiotem stoi porównanie z tym, co postać nosi w tym miejscu, tak jak w karcie przedmiotu z plecaka i na Targowisku. Gdy w tym miejscu nic nie jest założone, gra to mówi. Przedmiot innej klasy porównania nie ma.
+
 ## Targowisko: pełna karta przedmiotu przy wystawianiu (uwaga gracza przez autora, 13.11.2026, w grze od 0.3.1)
 
 Gracz (poz. 42) napisał, że przy wystawianiu widać tylko nazwę, poziom i Tier, więc trudno zapamiętać, który przedmiot chce się wystawić. Autor: „trzeba dodać na Targowisku przy wystawianiu przedmiotów opcję podglądania ich w pełni”. W oknie „Wystaw na Targowisku” stuknięcie w przedmiot rozwija jego kartę tak jak w ofertach: wszystkie liczby, klasy, przekucie u Kowala i porównanie z tym, co postać nosi w tym miejscu. Cena u złomiarza zostaje pod nazwą, a „Wybierz” obok nazwy.

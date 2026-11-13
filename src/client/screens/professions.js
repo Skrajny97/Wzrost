@@ -25,7 +25,7 @@ import { playSound } from '../sound.js';
 import { activityFinished, call, reportCache, serverNow, state, testModeOn } from '../state.js';
 import { skipControl } from '../time.js';
 import { confirmAction, howItWorks, splitLead, systemPanel, toast, withButton } from '../ui.js';
-import { findMark, itemSummary, itemTitle, salvagedText } from './character.js';
+import { compareTable, findMark, itemSummary, itemTitle, salvagedText } from './character.js';
 import { lockedScreen } from './locked.js';
 
 const HOME = '#/profesje';
@@ -1372,6 +1372,10 @@ export function mountProfessions(container, { params, navigate }) {
     const chosen = () => items.filter((item) => storageMarks.has(item.id));
     let last = null;
     const described = h('div', { class: 'salvage-last', 'aria-live': 'polite', hidden: true });
+    // The item marked last beside what the character wears in its place, as
+    // the bag's card and the Targowisko compare them (the author, 13.11.2026:
+    // „Niech porównywarka działa też w przechowalni w Warsztacie”).
+    const compared = h('div', { class: 'storage-compare', hidden: true });
     const summary = h('p', { class: 'sheet-text', role: 'status' });
     const roomNote = h('p', { class: 'region-warning', hidden: true });
     const button = (kind, className) => h('button', { type: 'button', class: `button ${className}`, onClick: (event) => storageAct(event.currentTarget, kind, chosen()) });
@@ -1400,6 +1404,9 @@ export function mountProfessions(container, { params, navigate }) {
       const shown = marked.find((item) => item.id === last) ?? marked.at(-1);
       described.hidden = !shown;
       fill(described, shown && storageItem(shown));
+      const comparison = shown && storageComparison(character, shown);
+      compared.hidden = !comparison;
+      fill(compared, comparison);
       fill(
         summary,
         marked.length === 0
@@ -1454,7 +1461,7 @@ export function mountProfessions(container, { params, navigate }) {
         : [
             h('div', { class: 'storage-head' }, h('p', { class: 'muted', text: t('Przedmiotów: {count}. Nie zajmują miejsca w plecaku.', { count: formatNumber(items.length) }) }), all),
             grid,
-            h('div', { class: 'salvage-bar salvage-bar--inline' }, described, summary, roomNote, h('div', { class: 'storage-actions' }, toBag, sell, salvage)),
+            h('div', { class: 'salvage-bar salvage-bar--inline' }, described, compared, summary, roomNote, h('div', { class: 'storage-actions' }, toBag, sell, salvage)),
           ];
     update();
     return h(
@@ -1464,6 +1471,14 @@ export function mountProfessions(container, { params, navigate }) {
       h('p', { class: 'muted', text: t('Tu czekają przedmioty z Warsztatu i biżuteria ze Szlifierni. Zaznacz je i włóż do plecaka, sprzedaj złomiarzowi albo rozbierz na Stole rozbiórki.') }),
       body,
     );
+  }
+
+  // A marked item of the Przechowalnia beside the one worn in its place,
+  // or that nothing is worn there; nothing for an item of another class.
+  function storageComparison(character, item) {
+    if (item.classIds && !item.classIds.includes(character.classId)) return null;
+    const worn = character.equipment?.[item.slot] ?? null;
+    return worn ? compareTable(item, worn) : h('p', { class: 'muted', text: t('W miejscu „{slot}” postać nic teraz nie nosi.', { slot: item.slotName }) });
   }
 
   // A marked item of the Przechowalnia as its card describes it, as the
