@@ -26,6 +26,7 @@
 // motion.js) every change shows at once.
 
 import { areaArtUrl, monsterSprite, placeArt, portraitSprite, residentBust } from './art.js';
+import { mountDuel } from './card-duel.js';
 import { createCardsFx, fxDroppedCards } from './cards-fx.js';
 import { h, icon } from './dom.js';
 import { countOf, formatNumber } from './format.js';
@@ -131,7 +132,11 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
   const fx = createCardsFx(holder);
   let deferred = false;
 
-  const playing = () => Boolean(view?.match) && !building;
+  // A live match with another player (901 B, card-duel.js) takes the table
+  // while it runs; once its end is seen, Szczęsny's tab comes back.
+  const duel = mountDuel(holder, { cardFace, onLayout: () => onLayout(), onEnd: () => load() });
+
+  const playing = () => duel.on() || (Boolean(view?.match) && !building);
 
   // The tab brought up under the top bar, which stays over the page
   // (styles.css, .topbar), once the screen has laid itself out anew.
@@ -981,6 +986,8 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
   // --- The tab -------------------------------------------------------------
 
   function render() {
+    // The live match draws the tab itself (card-duel.js).
+    if (duel.on()) return;
     // While the table's motion plays, the redraw waits for its end.
     if (fx.holding()) {
       deferred = true;
@@ -1031,6 +1038,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
       gone = true;
       clearTimeout(timer);
       fx.stop();
+      duel.unmount();
     },
   };
 }

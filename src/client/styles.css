@@ -21925,3 +21925,134 @@ a.discord-button {
     display: none;
   }
 }
+
+/* Partie kart na żywo (901 B, card-duel.js; mock-ups 908.1–908.4): the
+   challenge's sheets (the other's bust beside its name, the stakes as
+   chips, the actions side by side) and the bar of whose move it is, with
+   the time left, on the table under its head. */
+.duel-sheet {
+  gap: 12px;
+}
+
+.duel-sheet p {
+  margin: 0;
+}
+
+.duel-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.duel-row > p,
+.duel-who {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.duel-name {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.duel-name-inline {
+  color: var(--gold);
+  overflow-wrap: anywhere;
+}
+
+.duel-stakes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.duel-stakes .chat-tab {
+  max-width: 100%;
+}
+
+.duel-stakes .chat-tab:disabled {
+  opacity: 0.45;
+}
+
+.duel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.duel-actions > .button {
+  flex: 1 1 140px;
+}
+
+.duel-turn {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--system-line);
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.82);
+}
+
+.duel-turn--mine {
+  border-color: var(--gold);
+}
+
+.duel-turn-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--system-text);
+  font-family: var(--font-system);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.duel-turn-head > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.duel-clock {
+  flex: none;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.duel-turn p {
+  margin: 0;
+}
+
+.duel-turn-text {
+  overflow-wrap: anywhere;
+}
+
+.duel-bar {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--xp-track);
+}
+
+.duel-bar-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--gold);
+}
+
+/* A player's name (up to 20 letters) in the live table's head stays whole
+   on the narrowest phones: the round's badge goes under it instead. */
+.duel-match .cards-table-head {
+  flex-wrap: wrap;
+}
+
+.duel-match .cards-table-who {
+  flex: 1 1 150px;
+}
+
+.duel-match .cards-table-head .cards-round {
+  margin-left: auto;
+}

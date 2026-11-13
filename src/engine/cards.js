@@ -539,14 +539,14 @@ export const cardsLeft = (side) => side.lines.filter((key) => key !== null).leng
 /**
  * @param {Side} side
  */
-const lifeLeft = (side) => side.cards.filter((card) => !side.out.includes(card.key)).reduce((sum, card) => sum + card.life, 0);
+export const lifeLeft = (side) => side.cards.filter((card) => !side.out.includes(card.key)).reduce((sum, card) => sum + card.life, 0);
 
 // The reserve drawn up to its size from the deck.
 /**
  * @param {Side} side
  * @param {Content} content
  */
-function refill(side, content) {
+export function refill(side, content) {
   const size = cardRules(content).hand;
   while (side.hand.length < size && side.deck.length > 0) side.hand.push(/** @type {number} */ (side.deck.shift()));
 }

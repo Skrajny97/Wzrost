@@ -124,6 +124,7 @@ import {
 import { mountView } from '../engine/stable.js';
 import { say } from '../engine/text.js';
 import { cardRemoval } from './cards.js';
+import { duelOpen, duelRemoval } from './card-duel.js';
 import { chatRole } from './chat.js';
 import { relationTo } from './community.js';
 import { content, contentIn } from './content.js';
@@ -1760,7 +1761,7 @@ export async function characterProfile(context) {
   const db = context.env.DB;
   const name = String(context.params.name ?? '');
   const found = await db
-    .prepare(`SELECT c.*, u.login, u.google_sub, u.chat_moderator FROM characters c JOIN users u ON u.id = c.user_id WHERE c.name_key = ? AND c.${OWN_CHARACTERS}`)
+    .prepare(`SELECT c.*, u.login, u.google_sub, u.chat_moderator, u.seen_at FROM characters c JOIN users u ON u.id = c.user_id WHERE c.name_key = ? AND c.${OWN_CHARACTERS}`)
     .bind(nameKey(name))
     .first();
   if (!found) throw new ApiError(404, 'no_character', 'Nie ma takiej postaci.');
@@ -1829,6 +1830,9 @@ export async function characterProfile(context) {
       guildInvite,
       relation: mine ? { state: 'self' } : own ? await relationTo(db, own.id, found.id, context.now) : null,
       tradeBlocked: await tradeBlockOf(db, session.userId, found.user_id),
+      // „Zagraj w karty” (908.1): a live card match, while its player is in
+      // the game now (card-duel.js); never with one's own characters.
+      cardDuel: !mine && duelOpen(found, context.now),
       equipment: content().slots.map((slot) => ({ slot: slot.id, slotName: slot.name, item: worn(view.equipment[slot.id]) })),
       skills: view.skills.pools.flatMap((pool) =>
         pool.options
@@ -2218,6 +2222,8 @@ export function characterRemoval(db, id, now) {
     db.prepare('DELETE FROM storage_items WHERE character_id = ?').bind(id),
     // The Artefakty of its Skrytka Rdzenia (core.js).
     db.prepare('DELETE FROM core_artifacts WHERE character_id = ?').bind(id),
+    // Its live card matches, ended as lost (card-duel.js), before its rows go.
+    ...duelRemoval(db, '= ?', [id]),
     // Its cards, deck and matches of the Talia Systemu (cards.js).
     ...cardRemoval(db, '= ?', [id]),
     db.prepare('DELETE FROM buildings WHERE character_id = ?').bind(id),

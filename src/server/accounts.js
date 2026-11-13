@@ -7,6 +7,7 @@ import { ApiError, json, readJson } from './http.js';
 import { LANGUAGES, language } from './i18n.js';
 import { englishOn } from './features.js';
 import { cardRemoval } from './cards.js';
+import { duelRemoval } from './card-duel.js';
 import { detachedRows } from './characters.js';
 import { marketRemoval } from './market.js';
 import { guildRemoval } from './guilds.js';
@@ -278,6 +279,8 @@ async function removeAccount(db, session, now) {
     ...['reports', 'activities', 'avatar_activities', 'items', 'storage_items', 'core_artifacts', 'buildings', 'lottery_tickets'].map((table) =>
       db.prepare(`DELETE FROM ${table} WHERE character_id IN (${characters})`).bind(id),
     ),
+    // Its characters' live card matches, ended as lost (card-duel.js).
+    ...duelRemoval(db, `IN (${characters})`, [id]),
     // The Talia Systemu's cards, decks and matches (cards.js).
     ...cardRemoval(db, `IN (${characters})`, [id]),
     ...marketRemoval(db, characters, [id]),

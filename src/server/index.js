@@ -112,6 +112,7 @@ import {
 import { buyScrolls, raiseAtForge } from './forge.js';
 import { buyTicket, drawLotteries, getCasino, spinCasinoWheel } from './casino.js';
 import { buyPack, getCards, playCardTurn, saveDeck, startMatch, surrenderCards, takeStarter } from './cards.js';
+import { answerDuel, challengeDuel, duelOffer, duelTurn, readDuel, surrenderDuelMatch, withoutDuel } from './card-duel.js';
 import { enterTrialHall } from './trial-hall.js';
 import { arenaFight, claimArenaReward, getArena, getArenaDefence, rerollArenaRivals } from './pvp-arena.js';
 import { buyFromHerbalist, buyMug, chooseReforged, claimStandingReward, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, redrawCandidates, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, setCompanionStay, settlementTests, takeCompanionGift, testSettlement, trainCompanion, unequipCompanion, upgradeCompanionItem } from './settlement.js';
@@ -342,10 +343,18 @@ const routes = [
   ['GET', '/api/cards', getCards],
   ['POST', '/api/cards/starter', takeStarter],
   ['POST', '/api/cards/deck', saveDeck],
-  ['POST', '/api/cards/match', startMatch],
+  // Szczęsny's match waits while a live one runs (card-duel.js).
+  ['POST', '/api/cards/match', withoutDuel(startMatch)],
   ['POST', '/api/cards/turn', playCardTurn],
   ['POST', '/api/cards/surrender', surrenderCards],
   ['POST', '/api/cards/pack', buyPack],
+  // Live matches with other players (card-duel.js; 901 B).
+  ['GET', '/api/cards/duel', readDuel],
+  ['GET', '/api/cards/duel/offer', duelOffer],
+  ['POST', '/api/cards/duel/challenge', challengeDuel],
+  ['POST', '/api/cards/duel/answer', answerDuel],
+  ['POST', '/api/cards/duel/turn', duelTurn],
+  ['POST', '/api/cards/duel/surrender', surrenderDuelMatch],
   ['GET', '/api/test/settlement', settlementTests],
   ['POST', '/api/test/settlement', testSettlement],
   ['GET', '/api/chat', readChat],

@@ -41,7 +41,8 @@
       "New cards are rarely left by creatures you beat on explorations and in the Labyrinth, more often by elites, champions and guardians. The same card won again raises its level, up to level 5: each level means more Attack and Life.",
       "Every fight you win on an exploration may also give a card of a creature from a lower land. Now and then a card drops for work in a profession, for an attack on the Beast or a Guild Expedition guardian and for a completed Guild Trial: a card of a creature from the lands at your level or lower. From these sources, the cards you do not have yet come first.",
       "Once a day Szczęsny sells a pack of three cards of creatures from lands lower than yours, for as much gold as an hour of exploring brings at your level. Cards you do not have yet come first.",
-      "Your collection gives a lasting bonus: every 10 different cards add +1% XP and +1% gold from explorations, up to +15% for all 156 cards. It works from the moment you win a card. You can see your collection and its bonus in the Encyclopedia, under \"Cards\"."
+      "Your collection gives a lasting bonus: every 10 different cards add +1% XP and +1% gold from explorations, up to +15% for all 156 cards. It works from the moment you win a card. You can see your collection and its bonus in the Encyclopedia, under \"Cards\".",
+      "Live matches: on the card of another player who is in the game now, you can challenge them to a card match, without a stake or for gold (from level 20 of both characters, at most 10 a day). You take turns, 30 seconds a move. Win and you take both stakes without the 5% the System takes."
     ],
     "win": ["\"A good match! I didn't see that coming.\"", "\"Your win. The cards like you today.\"", "\"Well played! Next time I won't hold back.\""],
     "loss": ["\"My match. The deck forgives no mistakes.\"", "\"This time the stake stays with me.\"", "\"That was close. Shuffle and come back.\""],
@@ -54,6 +55,54 @@
     "pack": {
       "offer": "Three random cards of creatures from lands lower than yours. Cards you do not have yet come first.",
       "opened": "Szczęsny lays three cards on the table."
+    },
+    "live": {
+      "challengeTitle": "A card match with: {name}",
+      "online": "{className} · lvl {level} · in the game",
+      "staked": "At the start of the match each side pays {stake} gold. Win and you take {pot} gold: both stakes without the {cut}% the System takes. A draw gives the stakes back.",
+      "free": "Without a stake nobody pays and nobody takes anything. You can play such matches without a limit.",
+      "limits": "The highest stake is {max} gold, as much as Szczęsny's highest stake at the lower of your levels. Live matches today: {used} of {limit}.",
+      "lowLevel": "You play for gold once both characters are at level {level}, so for now only without a stake.",
+      "rules": "{name} has 2 minutes to accept the challenge. You take turns, 30 seconds a move. Two rounds in a row without a move lose the match.",
+      "sent": "Challenge sent. {name} has 2 minutes to accept it.",
+      "incomingTitle": "A challenge to a card match",
+      "incoming": "{name} ({className}, lvl {level}) challenges you to a live card match.",
+      "incomingStake": "Stake: {stake} gold from each side. Win and you take {pot} gold.",
+      "incomingFree": "A match without a stake: nobody pays and nobody takes anything.",
+      "incomingGold": "You have {gold} gold. Live matches today: {used} of {limit}.",
+      "accepted": "{name} accepts the challenge. The match begins!",
+      "declined": "{name} turns the challenge down.",
+      "expired": "{name} does not answer. The challenge is gone.",
+      "tableStaked": "Live match · stake {stake} gold",
+      "tableFree": "Live match · no stake",
+      "dividerStaked": "Live · {stake} gold",
+      "dividerFree": "Live · no stake",
+      "lead": "You start this round: {name} will see your cards and answer.",
+      "answer": "{name} laid cards first. Next round you start.",
+      "theirLead": "{name} starts this round. Once their cards are down, you answer them.",
+      "theirAnswer": "{name} sees your cards and answers.",
+      "missedMe": "The game made your move for you. One more round without a move and you lose.",
+      "missedFoe": "{name} ran out of time, so the game made the move.",
+      "yourMove": "Your move in the card match with: {name}.",
+      "ends": {
+        "won": {
+          "out": "All the rival's cards beaten.",
+          "cap": "After {rounds} rounds you have more cards or more Life.",
+          "surrender": "{name} gave up the match.",
+          "missed": "{name} made no move for two rounds in a row.",
+          "gone": "The rival left the game."
+        },
+        "lost": {
+          "out": "All your cards beaten.",
+          "cap": "After {rounds} rounds {name} has more cards or more Life.",
+          "surrender": "You give up the match.",
+          "missed": "Two rounds in a row without your move."
+        },
+        "drawn": {
+          "out": "Both sides lost their last cards at once.",
+          "cap": "After {rounds} rounds it is even."
+        }
+      }
     },
     "collection": {
       "summary": ["Collection: {found} of {all}"],

@@ -19,6 +19,7 @@
 // mark goes to the server under that channel's own id.
 
 import { request } from './api.js';
+import { duelSeen } from './card-duel.js';
 import { t } from './i18n.js';
 import { isUnlocked, state } from './state.js';
 import { toast } from './ui.js';
@@ -348,6 +349,8 @@ export async function checkChat({ now = false } = {}) {
     for (const [other, id] of Object.entries(answer.seen?.private ?? {})) privateSeen = { ...privateSeen, [other]: Math.max(privateSeen[other] ?? 0, id) };
   });
   if (answer.seen) keep(null);
+  // A live card match challenged or going on (card-duel.js).
+  duelSeen(answer.duel ?? null);
   if (answer.activityEndsAt !== undefined) activityListener?.(answer.activityEndsAt);
   checkGuildTodo();
 }

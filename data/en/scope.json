@@ -1140,7 +1140,10 @@
     "src/engine/cards.js",
     "src/server/cards.js",
     "src/client/cards.js",
-    "src/client/cards-fx.js"
+    "src/client/cards-fx.js",
+    "src/engine/card-duel.js",
+    "src/server/card-duel.js",
+    "src/client/card-duel.js"
   ],
   "ignore": [
     "w z na nie się sie jest że ze co jak ktoś ktos gdzie mam masz ma czy ale tak już juz jestem dla po od ja ty mi mnie tu tam jaki jakie który ktory kto ile bo też tez teraz jeszcze może moze wszyscy wszystkim proszę prosze dzięki dzieki siema hej cześć czesc elo spoko fajnie fajny dobry dobra dobre poziom poziomie mój moj twój twoj ten ta tego tym kiedy coś cos nic był byl była byla będzie bedzie trzeba warto chyba bardzo",
