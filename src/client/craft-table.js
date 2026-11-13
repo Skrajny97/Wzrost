@@ -10,6 +10,7 @@ import { materialSprite } from './art.js';
 import { h, icon } from './dom.js';
 import { countOf, formatCountdown, formatDecimal, formatMinutes, formatNumber, saleGold, timeFormat } from './format.js';
 import { t } from './i18n.js';
+import { reorderable } from './reorder.js';
 import { playSound } from './sound.js';
 import { call, state, testModeOn } from './state.js';
 import { afterSheet, closeSheet, confirmAction, openSheet, systemPanel, toast, withButton } from './ui.js';
@@ -354,12 +355,32 @@ async function cancelAll(crafting) {
   toast(filled(stored > 0 ? crafting.texts.doneAllStored : crafting.texts.doneAll, { count: formatNumber(cancelled) }));
 }
 
+// An order waiting dragged by its ≡ to a new place, or moved by the arrows
+// on it (the author's 905 C, after a player's note: „Do zrobienia w stole
+// do rozbiórki jakiś shuffle w kolejce”; reorder.js): it goes right before
+// the order now after it, or last. The server counts the "Gotowe o" anew
+// (moveOrder in crafting.js), and the page draws the queue again from its
+// answer, the arrows' focus still on the order moved.
+async function moveQueued(row, next, { keyboard }) {
+  const id = row.dataset.order;
+  try {
+    await call('POST', '/api/craft/move', { id, before: next?.dataset.order ?? null });
+  } catch (error) {
+    toast(error.message);
+    throw error;
+  }
+  if (keyboard) document.querySelector(`.craft-row[data-order="${CSS.escape(id)}"] .craft-handle`)?.focus();
+}
+
 // The orders, the first one at work with its countdown; `ticks` gets its
 // update. Each that can leave the queue has "Usuń z kolejki", and two or
-// more such have "Usuń wszystkie" under them.
+// more such have "Usuń wszystkie" under them. While two or more wait, each
+// of them has its ≡ to move it (moveQueued), with a line on how under them;
+// the order at work stays first.
 function queueCard(crafting, ticks) {
   const [first, ...waiting] = crafting.queue;
   const { texts } = crafting;
+  const moving = waiting.length > 1;
   const countdown = h('strong', { class: 'craft-countdown' });
   const progress = h('div', { class: 'bar-fill bar-fill--gold' });
   ticks.push((now) => {
@@ -377,10 +398,19 @@ function queueCard(crafting, ticks) {
           onClick: (event) => withButton(event.currentTarget, () => cancelOrder(crafting, order)),
         })
       : h('span', { class: 'item-meta', text: texts.old });
-  const row = (order, extra) =>
+  const handle = (order) =>
+    h('button', {
+      type: 'button',
+      class: 'craft-handle',
+      text: '≡',
+      'aria-label': filled(texts.move, { what: orderLabel(order) }),
+      'aria-keyshortcuts': 'ArrowUp ArrowDown',
+    });
+  const row = (order, extra, moves = false) =>
     h(
       'li',
-      { class: 'craft-row' },
+      { class: moves ? 'craft-row craft-row--moves' : 'craft-row', 'data-order': order.id },
+      moves && handle(order),
       h('span', { class: 'craft-art' }, order.materialId ? materialIcon(order.materialId) : icon('hammer', { size: 24 })),
       h(
         'span',
@@ -395,15 +425,18 @@ function queueCard(crafting, ticks) {
       ),
     );
   const leaving = crafting.queue.filter((order) => order.cancellable).length;
+  const list = h(
+    'ol',
+    { class: 'craft-list' },
+    row(first, h('span', { class: 'craft-progress' }, h('div', { class: 'bar' }, progress), countdown)),
+    waiting.map((order) => row(order, h('span', { class: 'item-meta', text: t('Gotowe o {time}', { time: timeFormat.format(new Date(order.endsAt)) }) }), moving)),
+  );
+  if (moving) reorderable(list, { row: '.craft-row--moves', handle: '.craft-handle', onDrop: moveQueued });
   return h(
     'section',
     { class: 'craft-card', 'aria-label': t('Kolejka ({count} z {limit})', { count: crafting.queue.length, limit: crafting.limit }) },
-    h(
-      'ol',
-      { class: 'craft-list' },
-      row(first, h('span', { class: 'craft-progress' }, h('div', { class: 'bar' }, progress), countdown)),
-      waiting.map((order) => row(order, h('span', { class: 'item-meta', text: t('Gotowe o {time}', { time: timeFormat.format(new Date(order.endsAt)) }) }))),
-    ),
+    list,
+    moving && h('p', { class: 'craft-note', text: texts.moveHint }),
     leaving > 1 &&
       h('button', {
         type: 'button',

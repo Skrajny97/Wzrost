@@ -78,12 +78,14 @@
       "queue": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["cancel", "cancelAll", "old", "confirm", "done", "doneAll", "doneStored", "doneAllStored", "errors"],
-        "description": "Tylko Stół rozbiórki (craftSpeed): usuwanie zleceń z kolejki („Usuń z kolejki”, „Usuń wszystkie”). Zlecenie oddaje wszystko, co wzięło, a zadania i Próby Gildii tracą to, co za nie policzyły. old: dopisek przy rozbiórce sprzed 0.1.65, której nie da się cofnąć. W tekstach: {what} to zlecenie („Skóra wilka ×12”), {count} liczba zleceń, {minerals} kamienie i kruszce, {patterns} nazwy wzorów, {need} i {free} miejsca w plecaku, {quest} treść zadania. Teksty ze Stored mówią o zleceniach z przedmiotami z Przechowalni (842), które wracają tam, a nie do plecaka.",
+        "required": ["cancel", "cancelAll", "old", "move", "moveHint", "confirm", "done", "doneAll", "doneStored", "doneAllStored", "errors"],
+        "description": "Tylko Stół rozbiórki (craftSpeed): usuwanie zleceń z kolejki („Usuń z kolejki”, „Usuń wszystkie”). Zlecenie oddaje wszystko, co wzięło, a zadania i Próby Gildii tracą to, co za nie policzyły. old: dopisek przy rozbiórce sprzed 0.1.65, której nie da się cofnąć. W tekstach: {what} to zlecenie („Skóra wilka ×12”), {count} liczba zleceń, {minerals} kamienie i kruszce, {patterns} nazwy wzorów, {need} i {free} miejsca w plecaku, {quest} treść zadania. Teksty ze Stored mówią o zleceniach z przedmiotami z Przechowalni (842), które wracają tam, a nie do plecaka. Przesuwanie zleceń (905 C): move to nazwa ≡ przy czekającym zleceniu dla czytnika ekranu ({what}), moveHint dopisek pod kolejką, a errors.atWork, errors.beforeWork i errors.changed to odmowy: przesunięcie zlecenia w pracy, wstawienie przed nie i kolejka zmieniona w międzyczasie.",
         "properties": {
           "cancel": { "type": "string", "minLength": 1 },
           "cancelAll": { "type": "string", "minLength": 1 },
           "old": { "type": "string", "minLength": 1 },
+          "move": { "type": "string", "pattern": "\\{what\\}" },
+          "moveHint": { "type": "string", "minLength": 1 },
           "confirm": {
             "type": "object",
             "additionalProperties": false,
@@ -115,7 +117,7 @@
           "errors": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["gone", "empty", "old", "bagFull", "minerals", "rewarded", "patternInUse"],
+            "required": ["gone", "empty", "old", "bagFull", "minerals", "rewarded", "patternInUse", "atWork", "beforeWork", "changed"],
             "properties": {
               "gone": { "type": "string", "minLength": 1 },
               "empty": { "type": "string", "minLength": 1 },
@@ -123,7 +125,10 @@
               "bagFull": { "type": "string", "pattern": "\\{need\\}" },
               "minerals": { "type": "string", "pattern": "\\{minerals\\}" },
               "rewarded": { "type": "string", "pattern": "\\{quest\\}" },
-              "patternInUse": { "type": "string", "pattern": "\\{pattern\\}" }
+              "patternInUse": { "type": "string", "pattern": "\\{pattern\\}" },
+              "atWork": { "type": "string", "minLength": 1 },
+              "beforeWork": { "type": "string", "minLength": 1 },
+              "changed": { "type": "string", "minLength": 1 }
             }
           }
         }
