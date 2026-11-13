@@ -938,7 +938,7 @@ export function mountDuel(holder, { cardFace, onLayout = () => {}, onEnd = () =>
           h('p', { class: 'cards-table-name', text: other.name }),
           h('p', { class: 'cards-table-tier', text: duel.stake > 0 ? filled(texts.tableStaked, { stake: formatNumber(duel.stake) }) : texts.tableFree }),
           h('p', { class: 'muted cards-table-count' }, backs(match.foe.hand), h('span', { text: t('Rezerwa {hand} · talia {deck} · zbite {out}', { hand: match.foe.hand, deck: match.foe.deck, out: match.foe.out }) })),
-          foeHero && h('p', { class: 'muted cards-table-count', text: match.foe.hero.used ? t('Bohater rywala: {skill} (użyta)', { skill: foeHero.name }) : t('Bohater rywala: {skill}', { skill: foeHero.name }) }),
+          foeHero && h('p', { class: 'muted cards-table-count', text: match.foe.hero.used ? t('Bohater rywala: {skill} (już użyty)', { skill: foeHero.name }) : t('Bohater rywala: {skill}', { skill: foeHero.name }) }),
         ),
         h('span', { class: 'cards-round', text: t('Runda {round}/{cap}', { round: match.round, cap: match.cap }) }),
       ),

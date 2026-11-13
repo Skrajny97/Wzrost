@@ -3188,7 +3188,7 @@
   "Wskaż kartę rywala, w którą uderzy Twoja karta.": "Point at the rival's card your card will hit.",
   "Twój ruch": "Your move",
   "Ruch: {name}": "Move: {name}",
-  "Bohater rywala: {skill} (użyta)": "Rival's hero: {skill} (used)",
+  "Bohater rywala: {skill} (już użyty)": "Rival's hero: {skill} (already used)",
   "Bohater rywala: {skill}": "Rival's hero: {skill}",
   "Czekasz na ruch rywala.": "Waiting for the rival's move.",
   "Wyłóż karty": "Lay the cards",

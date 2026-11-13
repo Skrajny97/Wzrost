@@ -777,3 +777,17 @@ test('the Labirynt and the Rdzeń have a picture of every room, Artefakt, the Od
   assert.equal(size(join(CLIENT, 'art', 'labyrinth', 'core.png')), '96x96');
   for (const name of ['labyrinth', 'labyrinth-hell']) assert.equal(size(join(CLIENT, 'art', 'places', `${name}.png`)), '192x96', name);
 });
+
+// A rival's hero whose skill is spent reads the same at the Arena's Karty
+// (data/settlement.json) and at a live table (card-duel.js), in Polish and
+// in English: the hero is "bohater", so "użyty" (the code review: the live
+// table said "(użyta)" and "(used)").
+test("a rival's hero used up reads the same at the Arena's Karty and at a live table", () => {
+  const data = (path) => JSON.parse(readFileSync(new URL(`../data/${path}`, import.meta.url), 'utf8'));
+  const polish = data('settlement.json').arena.cards.texts.rivalHeroUsed;
+  const english = data('en/settlement.json').arena.cards.texts.rivalHeroUsed;
+  const duel = readFileSync(join(CLIENT, 'card-duel.js'), 'utf8');
+  const said = [...duel.matchAll(/t\('(Bohater rywala: \{skill\} \([^)]*\))'/g)].map((found) => found[1]);
+  assert.deepEqual(said, [polish]);
+  assert.equal(data('en/strings.json')[polish], english);
+});
