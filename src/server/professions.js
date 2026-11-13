@@ -25,6 +25,7 @@ import {
 } from '../engine/index.js';
 import { content } from './content.js';
 import { bagPlaces, characterView, currentHp, engineCharacter, equippedItems, loadPlayer, questsNow, requirePlayer, requireWorker, workOf } from './characters.js';
+import { cardSummary, cardUpserts, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { professionsOn } from './features.js';
 import { assertion, characterChanged, raced } from './atomic.js';
@@ -209,12 +210,15 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
   const capacity = bagCapacity(campLevels(player.buildings, now, content()), content());
   const { stored, lost } = storeStacks(herbsOf(row), found, capacity - bagPlaces(player), content());
   const { character, after, xp, work, sets } = workGains(player, profession, before, activity.minutes, avatar, now);
+  // A card the work may leave (903, cards.js).
+  const card = await workCard(db, row, activity, activity.minutes);
   const report = {
     ...gatheringReport(
       { minutes: activity.minutes, startedAt: activity.started_at, endsAt: activity.ends_at, seed: activity.seed, found, stored, lost, before, after, character, xp, work },
       content(),
     ),
     ...(avatar && { avatar: true }),
+    ...(card && { cards: card.cards }),
   };
   const summary = {
     placeName: report.placeName,
@@ -227,6 +231,7 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
     levelAfter: work.level,
     system: report.system,
     ...(avatar && { avatar: true }),
+    ...(card && { cards: cardSummary(card.cards) }),
   };
   const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { herbs: found }));
   const herbs = addTo('herbs', stored);
@@ -250,6 +255,8 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
       ...trialProgress(db, row.id, { herbs: found }, now, takenBefore(JSON.parse(activity.options ?? '{}').begun)),
       // The Punkty Sławy of the work (fame.js), the Awatar's a quarter.
       ...workFamePoints(db, row.id, activity.minutes, avatar, now),
+      // The card the work left, a copy (cards.js).
+      ...cardUpserts(db, row.id, card?.ids ?? [], now),
       db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at),
     ]);
   } catch (error) {

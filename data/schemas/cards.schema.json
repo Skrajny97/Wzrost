@@ -72,12 +72,17 @@
     "drops": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["ordinary", "elite", "champion", "guardian"],
+      "required": ["ordinary", "elite", "champion", "guardian", "lower", "professionPerHour", "professionMax", "guild"],
+      "description": "Szanse kart: pokonany stwór na wyprawie i w Labiryncie według rodzaju (guardian: strażnik Labiryntu), lower: wygrana walka wyprawy na kartę z niższej krainy (902 B), professionPerHour i professionMax: praca w profesji za godzinę i najwyżej, guild: atak na Bestię, walka ze strażnikiem Wyprawy Gildii i ukończona Próba (903).",
       "properties": {
         "ordinary": { "$ref": "#/definitions/chance" },
         "elite": { "$ref": "#/definitions/chance" },
         "champion": { "$ref": "#/definitions/chance" },
-        "guardian": { "$ref": "#/definitions/chance" }
+        "guardian": { "$ref": "#/definitions/chance" },
+        "lower": { "$ref": "#/definitions/chance" },
+        "professionPerHour": { "$ref": "#/definitions/chance" },
+        "professionMax": { "$ref": "#/definitions/chance" },
+        "guild": { "$ref": "#/definitions/chance" }
       }
     },
     "starter": {
@@ -169,7 +174,7 @@
     "texts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["intro", "starterOffer", "starterTaken", "rules", "win", "loss", "draw", "drop", "firstWin", "collection"],
+      "required": ["intro", "starterOffer", "starterTaken", "rules", "win", "loss", "draw", "drop", "lower", "guild", "trial", "firstWin", "collection"],
       "properties": {
         "intro": { "type": "string", "minLength": 1 },
         "starterOffer": { "type": "string", "minLength": 1 },
@@ -179,6 +184,9 @@
         "loss": { "$ref": "#/definitions/texts" },
         "draw": { "$ref": "#/definitions/texts" },
         "drop": { "$ref": "#/definitions/texts" },
+        "lower": { "$ref": "#/definitions/texts", "description": "Zdanie raportu wyprawy o karcie z niższej krainy (902 B)." },
+        "guild": { "$ref": "#/definitions/texts", "description": "Słowa po ataku na Bestię albo strażnika Wyprawy Gildii, gdy wpadła karta (903)." },
+        "trial": { "$ref": "#/definitions/texts", "description": "Słowa przy karcie za ukończoną Próbę Gildii (903)." },
         "firstWin": { "type": "string", "minLength": 1 },
         "collection": {
           "type": "object",

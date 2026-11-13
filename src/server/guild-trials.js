@@ -12,11 +12,14 @@
 // that week, claimed that week or the next. What an action brings to the
 // character's trial is saved in the action's own batch (trialProgress), so
 // it lands only with the action. No line in the guild's chat: the chat has
-// no System lines, as for the Bestia Gildii.
+// no System lines, as for the Bestia Gildii. Where Talia Systemu is on, each
+// trial finished may leave a card, given at the next look (903,
+// trialCards).
 
 import {
   campBonus,
   campLevels,
+  casinoDay,
   countedForm,
   drawTrialBoard,
   isUnlocked,
@@ -37,6 +40,8 @@ import {
   trialText,
   trialThresholds,
 } from '../engine/index.js';
+import { atomically, sameVersion } from './atomic.js';
+import { cardGameOf, cardsHere, cardUpserts, sourceCards } from './cards.js';
 import { characterView, engineCharacter, loadPlayer, questContext, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { craftingOn, professionsOn, settlementOn } from './features.js';
@@ -44,6 +49,7 @@ import { guildOf } from './guilds.js';
 import { ApiError, json, readJson } from './http.js';
 import { counted } from './market.js';
 import { trialFame } from './fame.js';
+import { say } from '../engine/text.js';
 
 const rules = () => content().guilds.trials;
 const words = () => rules().texts;
@@ -512,11 +518,55 @@ const answer = async (db, player, guild, now, extra = {}) => json({ ...(await tr
 // the chests earned in a guild the character is no longer in.
 const outsideView = async (db, player, now) => ({ guild: null, elsewhere: await chestsElsewhere(db, player, null, now), texts: cardTexts() });
 
-// GET /api/guild/trials
+// The cards of the Próby finished (903, drops.guild in data/cards.json):
+// each trial the character finished this week or the last one, in any
+// guild, rolls once, from its own seed (the character and the trial), so
+// every look draws the same. A card that comes is given at the first look
+// at the Próby, or at what waits in the Gildia (the page asks about once a
+// minute, guild-todo.js), after the trial was finished, wherever the action
+// that finished it was; the trial is then kept with the character's card
+// game (`trials`, cardGameOf in cards.js), so it gives its card once, and
+// those of the weeks gone leave it. Saved only while the character is as
+// read, its version moving with its collection: a look that loses a race
+// gives nothing, and the next one gives the card. Returns the cards given,
+// as the page shows them, with their words for its toast.
+export async function trialCards(db, player, now) {
+  if (!cardsHere()) return [];
+  const { row } = player;
+  const { current, previous } = weeksAround(now);
+  const { results } = await db
+    .prepare("SELECT id FROM guild_trials WHERE character_id = ? AND week IN (?, ?) AND state = 'done'")
+    .bind(row.id, current.key, previous.key)
+    .all();
+  const game = cardGameOf(row, casinoDay(now, content()).key);
+  const done = results.map((trial) => trial.id);
+  const seedOf = (id) => `${row.id}:trial:${id}:cards`;
+  const due = done.filter((id) => !game.trials.includes(id));
+  const found = due.length > 0 ? await sourceCards(db, row, due.map(seedOf), content().cards.drops.guild) : null;
+  if (!found) return [];
+  const given = due.filter((id) => found.seeds.includes(seedOf(id)));
+  const next = { ...game, trials: [...game.trials.filter((id) => done.includes(id)), ...given] };
+  try {
+    await atomically(db, [
+      sameVersion(db, row),
+      db.prepare('UPDATE characters SET card_game = ?, version = version + 1 WHERE id = ?').bind(JSON.stringify(next), row.id),
+      ...cardUpserts(db, row.id, found.ids, now),
+    ]);
+  } catch (error) {
+    if (error?.code === 'character_changed') return [];
+    throw error;
+  }
+  return found.cards.map((card) => ({ ...card, text: say(content().cards.texts, 'trial', 0, { card: card.name }) }));
+}
+
+// GET /api/guild/trials, with the cards of the Próby finished since the
+// last look (trialCards), inside a guild and out of it.
 export async function getGuildTrials(context) {
   const { player, guild, db } = await guildPlayer(context);
-  if (!guild) return json(await outsideView(db, player, context.now));
-  return answer(db, player, guild, context.now);
+  const cards = await trialCards(db, player, context.now);
+  const given = cards.length > 0 ? { cards } : {};
+  if (!guild) return json({ ...(await outsideView(db, player, context.now)), ...given });
+  return answer(db, player, guild, context.now, given);
 }
 
 // POST /api/guild/trials/take and /drop: nothing to take or drop any more,

@@ -13,13 +13,14 @@
 // minutes in the guild that week attacks the guardian attacksPerDay times a
 // Polish day, apart from the Bestia's attacks, as the Bestia is attacked:
 // one fight, with the report at once, whatever the character is doing,
-// since it changes nothing of it. A fallen guardian gives a chest to each
-// character that added minutes in that guild that week, once a week and
-// stage whatever its guild, opened that week or the next. Each save holds
-// only while what was read still holds (atomic.js). A character removed and
-// its id given again (the characters' ids are not AUTOINCREMENT) takes
-// nothing of the one before. No line in the guild's chat, as for the
-// Bestia.
+// since it changes nothing of it, but for a card of Talia Systemu it may
+// leave where the game has them (903, cards.js). A fallen guardian gives a
+// chest to each character that added minutes in that guild that week, once
+// a week and stage whatever its guild, opened that week or the next. Each
+// save holds only while what was read still holds (atomic.js). A character
+// removed and its id given again (the characters' ids are not
+// AUTOINCREMENT) takes nothing of the one before. No line in the guild's
+// chat, as for the Bestia.
 
 import {
   bagCapacity,
@@ -39,6 +40,7 @@ import {
   questPeriod,
 } from '../engine/index.js';
 import { assertion, atomically, sameVersion } from './atomic.js';
+import { cardGains, guildCard } from './cards.js';
 import { attackBlocked, bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requireNotExploring, requirePlayer, trophiesFor } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
@@ -360,6 +362,8 @@ export async function attackGuildGuardian(context) {
   const trophies = trophiesFor(player, now, [guardian.monster_id]);
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const fight = guildBeastFight({ character: engineCharacter(row), equipped: equippedItems(player), name: row.name, beast: engineGuardian(guardian), seed, trophies }, content());
+  // A card the fight may leave (903, cards.js), from the attack's seed.
+  const card = await guildCard(db, row, seed);
   const [, , , , before, , , after] = await atomically(
     db,
     [
@@ -379,6 +383,8 @@ export async function attackGuildGuardian(context) {
         )
         .bind(fight.damage, fight.damage, now, fight.damage, row.id, guardian.id),
       db.prepare('SELECT hp FROM guild_expedition_guardians WHERE id = ?').bind(guardian.id),
+      // The card it left, a copy (cards.js).
+      ...(card ? cardGains(db, row, card.ids, now) : []),
     ],
     () => new ApiError(409, 'raced', errors().raced),
   );
@@ -396,6 +402,8 @@ export async function attackGuildGuardian(context) {
       log: fight.log,
       fight: fight.replay,
     },
+    // The card the fight left, with its words for the page's toast.
+    ...(card && { cards: card.cards }),
     ...(await expeditionView(db, row, guild, now, player.activity)),
   });
 }

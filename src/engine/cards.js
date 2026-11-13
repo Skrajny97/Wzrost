@@ -29,6 +29,14 @@
 // left wins, then the one with more Życie, and else it is a draw. Every
 // number is the data's; hits are not random, so the page can show what a
 // round will do before "Walcz".
+//
+// Cards come from the creatures beaten on explorations and in the Labirynt,
+// each its own (cardDrop), and from more sources (902 B, 903): a won fight
+// of an exploration may give a card of a lower land's creature, and a
+// profession's work, an attack on the Bestia or on a guardian of the
+// Wyprawa Gildii and a Próba finished a card of the lands at the
+// character's level or lower; one picker chooses for all of them (pickCard),
+// first a card the character has not got.
 
 import { monsterCombatant } from './combatant.js';
 import { createRng } from './rng.js';
@@ -73,6 +81,18 @@ const clone = (value) => JSON.parse(JSON.stringify(value));
 /** @type {WeakMap<Content, Map<string, Home>>} */
 const homesBuilt = new WeakMap();
 
+// The lands in the game's order: those of the regions as they come.
+/**
+ * @param {Content} content
+ * @returns {string[]}
+ */
+function landsInOrder(content) {
+  /** @type {string[]} */
+  const lands = [];
+  for (const region of content.regions) if (!lands.includes(region.land)) lands.push(region.land);
+  return lands;
+}
+
 // The creatures that are cards, each with its first home: the lowest place
 // it lives in (an ordinary creature of its encounters, its elite or its
 // champion, or the region's elite at the region's first place), and the
@@ -86,10 +106,8 @@ export function cardHomes(content) {
   if (built) return built;
   /** @type {Map<string, Home>} */
   const homes = new Map();
-  /** @type {string[]} */
-  const lands = [];
+  const lands = landsInOrder(content);
   for (const region of content.regions) {
-    if (!lands.includes(region.land)) lands.push(region.land);
     const land = lands.indexOf(region.land);
     /** @type {Record<string, any>[]} */
     const areas = [...region.areas].sort((a, b) => a.minLevel - b.minLevel);
@@ -244,11 +262,12 @@ export function cardView(id, level, content, extra = {}) {
   };
 }
 
-// The card a creature beaten on an exploration leaves, or null (874 A): one
-// roll for each creature, so the draws after it never hang on what it is; by
-// its kind's chance (an elite and a champion more often, and theirs are the
-// better cards), never of a card at its top level (`maxed`) nor of a
-// creature that is no card.
+// The card a creature beaten on an exploration (874 A) or in the Labirynt
+// (903) leaves, or null: one roll for each creature, so the draws after it
+// never hang on what it is; by its kind's chance (an elite and a champion
+// more often, and theirs are the better cards; the Labirynt's guardian by
+// the guardians', `guardian`), never of a card at its top level (`maxed`)
+// nor of a creature that is no card.
 /**
  * @param {string} id
  * @param {Rng} rng
@@ -265,13 +284,103 @@ export function cardDrop(id, rng, { maxed = [], guardian = false }, content) {
 }
 
 // A report's sentence of a card left (the data's, by its place in the
-// report).
+// report): `key` "drop" for a creature's own card, "lower" for one of a
+// lower land (902 B).
 /**
  * @param {string} id
  * @param {number} step
  * @param {Content} content
+ * @param {'drop' | 'lower'} [key]
  */
-export const cardDropText = (id, step, content) => say(cardRules(content).texts, 'drop', step, { card: content.monstersById[id].name });
+export const cardDropText = (id, step, content, key = 'drop') => say(cardRules(content).texts, key, step, { card: content.monstersById[id].name });
+
+// --- Cards from the lower lands and the other sources (902 B, 903) ---------
+
+// The land of a place, counted from the first (0), as a card's home counts
+// it (cardHomes); -1 for a place the game has not.
+/**
+ * @param {string} areaId
+ * @param {Content} content
+ */
+export function areaLand(areaId, content) {
+  const area = content.areasById[areaId];
+  return area ? landsInOrder(content).indexOf(area.land) : -1;
+}
+
+// The cards of the creatures whose home is in a land lower than `land`
+// (902 B): those a won fight of an exploration there may give besides its
+// creatures' own. None in the first land.
+/**
+ * @param {number} land
+ * @param {Content} content
+ * @returns {string[]}
+ */
+export const lowerLandCards = (land, content) => [...cardHomes(content)].filter(([, home]) => home.land < land).map(([id]) => id);
+
+// The cards of the creatures whose home is at `level` or lower (903): those
+// the professions and the Gildia give, for the higher of a character's
+// level and its class level.
+/**
+ * @param {number} level
+ * @param {Content} content
+ * @returns {string[]}
+ */
+export const cardsUpTo = (level, content) => [...cardHomes(content)].filter(([, home]) => home.level <= level).map(([id]) => id);
+
+// Whether a source's roll gives a card (902 B, 903): one draw, under its
+// chance (0 never, 1 always).
+/**
+ * @param {Rng} rng
+ * @param {number} chance
+ */
+export const cardComes = (rng, chance) => rng.next() < chance;
+
+// The card a source gives once its roll came (cardComes), the one picker of
+// every source (902 B, 903): one draw among the cards of `pool` the
+// character has not got yet (`owned` holds those it has), all alike; once it
+// has them all, among those it has below their top level. Never one at its
+// top level (`maxed`) nor one just given (`found`, as an exploration's
+// cards). Null when none is left.
+/**
+ * @param {string[]} pool
+ * @param {Rng} rng
+ * @param {{ owned?: Iterable<string>, maxed?: Iterable<string>, found?: Iterable<string> }} [have]
+ * @returns {string | null}
+ */
+export function pickCard(pool, rng, { owned = [], maxed = [], found = [] } = {}) {
+  const roll = rng.next();
+  const mine = new Set(owned);
+  const out = new Set([...maxed, ...found]);
+  const left = pool.filter((id) => !out.has(id));
+  const fresh = left.filter((id) => !mine.has(id));
+  const from = fresh.length > 0 ? fresh : left;
+  return from.length > 0 ? from[Math.min(from.length - 1, Math.floor(roll * from.length))] : null;
+}
+
+// A source's roll and its card at once (an exploration's lower lands, 902
+// B): always both draws, so the draws after it never hang on what it gave.
+/**
+ * @param {string[]} pool
+ * @param {Rng} rng
+ * @param {{ chance: number, owned?: Iterable<string>, maxed?: Iterable<string>, found?: Iterable<string> }} source
+ * @returns {string | null}
+ */
+export function cardFrom(pool, rng, { chance, ...have }) {
+  const comes = cardComes(rng, chance);
+  const card = pickCard(pool, rng, have);
+  return comes ? card : null;
+}
+
+// The chance of a card for a profession's work of `minutes` (903): its
+// share for each hour of the work, up to the most.
+/**
+ * @param {number} minutes
+ * @param {Content} content
+ */
+export function workCardChance(minutes, content) {
+  const { professionPerHour, professionMax } = cardRules(content).drops;
+  return Math.min(professionMax, (professionPerHour * Math.max(0, minutes)) / 60);
+}
 
 // The report's line of the collection's bonus (884 A: "Kolekcja kart: +3%
 // XP i +3% złota z wyprawy."), where it gave some of the exploration's XP

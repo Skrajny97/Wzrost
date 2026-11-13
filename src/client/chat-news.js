@@ -21,6 +21,7 @@
 import { request } from './api.js';
 import { t } from './i18n.js';
 import { isUnlocked, state } from './state.js';
+import { toast } from './ui.js';
 
 const SEEN_KEY = 'insight-chat-seen';
 const CHANNELS_KEY = 'insight-chat-channels-seen';
@@ -369,6 +370,9 @@ export async function checkGuildTodo({ now = false } = {}) {
   update(() => {
     guildTodo = answer.todo ?? null;
   });
+  // The cards of Talia Systemu the Próby Gildii finished since the last
+  // look left (903, src/server/guild-trials.js).
+  if (answer.cards?.length > 0) toast(answer.cards.map((card) => card.text).join(' '));
 }
 
 // The end of the character's activity, as each check hears it: a Drużyna's

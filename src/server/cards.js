@@ -17,13 +17,20 @@
 // starter deck taken and the tiers beaten are kept in the character's row
 // (`card_game`, as JSON). A training match pays nothing and touches nothing
 // of the character. The creatures beaten on an exploration may leave cards
-// (874 A): hunts.js asks for the collection here and adds them as the
-// report is claimed.
+// (874 A), and its won fights cards of a lower land (902 B): hunts.js asks
+// for the collection here and adds them as the report is claimed; so does
+// labyrinth.js for the creatures beaten in the Labirynt (903). A
+// profession's work, an attack of the Gildia and a Próba finished may give
+// a card of the lands at the character's level or lower (903,
+// sourceCards).
 
 import {
+  cardComes,
   cardLevel,
+  cardsUpTo,
   cardView,
   casinoDay,
+  createRng,
   deckBlock,
   expectedExploration,
   firstWinCard,
@@ -34,6 +41,7 @@ import {
   matchPayout,
   matchView,
   newMatch,
+  pickCard,
   playTurn,
   portalArea,
   samePeriod,
@@ -42,7 +50,9 @@ import {
   surrenderMatch,
   tierStake,
   turnBlock,
+  workCardChance,
 } from '../engine/index.js';
+import { say } from '../engine/text.js';
 import { assertion, atomically, characterChanged } from './atomic.js';
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
@@ -68,7 +78,9 @@ function requireCards(row) {
 // The character's game at the table on `day` (the Polish day): the starter
 // deck taken, the tiers ever beaten, and the day's staked matches and the
 // tiers whose reward of the day it took; a later day's kept as it is, as a
-// day never goes back (quests.js, samePeriod).
+// day never goes back (quests.js, samePeriod). Also the Próby Gildii whose
+// card it was given (`trials`, their ids; guild-trials.js, trialCards),
+// kept through every change of the rest.
 export function cardGameOf(row, day) {
   let stored;
   try {
@@ -83,6 +95,7 @@ export function cardGameOf(row, day) {
     day: today ? stored.day : day,
     staked: today && Number.isInteger(stored.staked) ? stored.staked : 0,
     rewarded: today && Array.isArray(stored.rewarded) ? stored.rewarded.filter((number) => Number.isInteger(number)) : [],
+    trials: Array.isArray(stored?.trials) ? stored.trials.filter((id) => Number.isInteger(id)) : [],
   };
 }
 
@@ -108,6 +121,60 @@ export const cardUpserts = (db, characterId, ids, now) =>
 // it has now (`collection`: as it was before them), new or not.
 export const droppedCards = (ids, collection) =>
   ids.map((id) => cardView(id, (collection.get(id) ?? 0) + 1, content(), { fresh: !collection.has(id) }));
+
+// The cards of a report as its Dziennik's row keeps them.
+export const cardSummary = (cards) => cards.map(({ name, color, level }) => ({ name, color, level }));
+
+// Whether Talia Systemu is in this game: anything of the cards needs it.
+export const cardsHere = () => cardsOn() && Boolean(rules());
+
+// The level whose lands the professions' and the Gildia's cards come from
+// (903): the higher of the character's level and its class level.
+const sourceLevel = (row) => Math.max(row.level, row.class_level ?? 0);
+
+// The cards of the sources of 903 for the character of `row`, one roll for
+// each seed of `seeds` with `chance` (cardComes) and, for each that comes,
+// a creature of the lands at the character's level or lower (pickCard),
+// one it has not got first, none at its top level, none twice; the
+// collection is read only when a roll comes. A seed of the source's own
+// gives the same draw however often it is tried. Returns { ids, cards, seeds }
+// (the ids to add, the cards as a report shows them and the seeds that
+// came), or null for none or where the game has no cards.
+export async function sourceCards(db, row, seeds, chance) {
+  if (!cardsHere()) return null;
+  const rolls = seeds.map((seed) => ({ seed, rng: createRng(seed) })).filter((roll) => cardComes(roll.rng, chance));
+  if (rolls.length === 0) return null;
+  const collection = await cardCollection(db, row.id);
+  const pool = cardsUpTo(sourceLevel(row), content());
+  const ids = [];
+  for (const { rng } of rolls) {
+    const id = pickCard(pool, rng, { owned: collection.keys(), maxed: maxedCards(collection), found: ids });
+    if (id) ids.push(id);
+  }
+  return ids.length > 0 ? { ids, cards: droppedCards(ids, collection), seeds: rolls.map((roll) => roll.seed) } : null;
+}
+
+// The card a profession's work leaves as its report is claimed (903): by
+// the hours it lasted (workCardChance), from the work's own seed, so a
+// claim tried again draws the same. The Awatar Systemu's work too, as it
+// brings the work's herbs, potions and items whole.
+export const workCard = (db, row, activity, minutes) => (cardsHere() ? sourceCards(db, row, [`${activity.seed}:cards`], workCardChance(minutes, content())) : null);
+
+// The card an attack of the Gildia leaves (903, drops.guild): on the Bestia
+// and on a guardian of the Wyprawa Gildii, from the attack's own seed. Its
+// cards come with their words for the page's toast.
+export async function guildCard(db, row, seed) {
+  const found = cardsHere() ? await sourceCards(db, row, [`${seed}:cards`], rules().drops.guild) : null;
+  return found && { ...found, cards: found.cards.map((card) => ({ ...card, text: say(rules().texts, 'guild', 0, { card: card.name }) })) };
+}
+
+// The statements that give the cards `ids` of a source that changes nothing
+// else of the character (an attack of the Gildia): a copy of each card, and
+// the character's version moved with its collection, as every claim that
+// reads the collection holds only while the character is as read
+// (hunts.js). In a batch whose head asserts the character as read
+// (sameVersion).
+export const cardGains = (db, row, ids, now) => [db.prepare('UPDATE characters SET version = version + 1 WHERE id = ?').bind(row.id), ...cardUpserts(db, row.id, ids, now)];
 
 // The character's deck: its twelve cards, or null when it has none whole
 // (a card gone from the collection or from the data).

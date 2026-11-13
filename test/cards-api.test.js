@@ -7,12 +7,32 @@
 // zgarniesz podwójną stawkę, the tier's reward of the day once a day and its
 // card at the first win, a draw's stake back, a surrender lost; the cards
 // the creatures of an exploration leave in the report and the collection;
-// the cards gone with the character and the account.
+// the cards gone with the character and the account; and the cards of the
+// sources of 903: a profession's work, a Próba Gildii finished, an attack
+// on the Bestia and the creatures beaten in the Labirynt.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { casinoDay, cardRarity, expectedExploration, hostTier, portalArea, starterDeck, tierStake } from '../src/engine/index.js';
+import {
+  cardComes,
+  cardKind,
+  cardRarity,
+  cardsUpTo,
+  casinoDay,
+  createRng,
+  expectedExploration,
+  hostTier,
+  labyrinthDay,
+  labyrinthFoes,
+  newLabyrinth,
+  portalArea,
+  questPeriod,
+  starterDeck,
+  tierStake,
+  workCardChance,
+} from '../src/engine/index.js';
+import { makeClimber } from './helpers/climb.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -310,5 +330,127 @@ describe('Talia Systemu through the API', () => {
     assert.deepEqual(await count(), [12, 1, 1]);
     assert.equal((await call('DELETE', '/api/me', { cookie, body: { login: 'karciarz' } })).status, 200);
     assert.deepEqual(await count(), [0, 0, 0]);
+  });
+});
+
+describe('Talia Systemu: the cards of the professions, the Gildia and the Labirynt (903)', () => {
+  const { call, db, signUp } = useServer({ CARDS: 'on', PROFESSIONS: 'on', LABYRINTH: 'on' });
+  let cookie;
+  let id;
+  const run = async (sql, ...binds) => (await db()).prepare(sql).bind(...binds).run();
+  const first = async (sql, ...binds) => (await db()).prepare(sql).bind(...binds).first();
+  const copies = async () => (await first('SELECT COALESCE(SUM(copies), 0) AS n FROM cards')).n;
+  // The first seed `prefix:N` whose roll comes (or not) with `chance`, as
+  // the server draws a card from it (cards.js, sourceCards: the first draw
+  // of the seed `seedOf(it)` against the chance).
+  function seedWhere(prefix, chance, comes, seedOf = (seed) => seed) {
+    for (let index = 0; index < 100000; index += 1) {
+      const seed = `${prefix}:${index}`;
+      if (cardComes(createRng(seedOf(seed)), chance) === comes) return seed;
+    }
+    throw new Error('no such seed');
+  }
+
+  beforeEach(async () => {
+    ({ cookie } = await signUp('zbieracz'));
+    await call('POST', '/api/character', { cookie, body: { name: 'Zbieracz', classId: 'warrior', appearance: 'female' } });
+    await run("UPDATE characters SET level = 40, class_level = 45, gold = 100000 WHERE name = 'Zbieracz'");
+    id = (await first("SELECT id FROM characters WHERE name = 'Zbieracz'")).id;
+  });
+
+  // A gathering of an hour with the seed `seed` (its card is drawn from
+  // `${seed}:cards`), claimed once its time has passed.
+  async function gathered(seed) {
+    const started = await call('POST', '/api/professions/gather', { cookie, body: { herbs: ['comfrey'], minutes: 60 } });
+    assert.equal(started.status, 201, JSON.stringify(started.data));
+    await run('UPDATE activities SET seed = ?, started_at = started_at - 86400000, ends_at = ?', seed, Date.now() - 1);
+    const claimed = await call('POST', '/api/hunts/claim', { cookie });
+    assert.equal(claimed.status, 200, JSON.stringify(claimed.data));
+    return claimed.data.report;
+  }
+
+  test('a profession\'s work may leave a card by the hours it lasted, from its own seed: one not got yet, of the lands up to the higher of the levels, in the report, the Dziennik and the collection', async () => {
+    const chance = workCardChance(60, content);
+    const ofWork = (seed) => `${seed}:cards`;
+    const plain = await gathered(seedWhere('praca', chance, false, ofWork));
+    assert.equal(plain.kind, 'herbs');
+    assert.equal(plain.cards, undefined);
+    assert.equal(await copies(), 0);
+    // Every card of the lands up to the class's level (45) but one: that one comes.
+    const pool = cardsUpTo(45, content);
+    const missing = pool.at(-1);
+    const owned = pool.filter((card) => card !== missing);
+    await run(`INSERT INTO cards (character_id, monster_id, copies, created_at) VALUES ${owned.map(() => '(?, ?, 1, 0)').join(', ')}`, ...owned.flatMap((card) => [id, card]));
+    const report = await gathered(seedWhere('praca', chance, true, ofWork));
+    assert.equal(report.cards.length, 1);
+    const [card] = report.cards;
+    assert.deepEqual([card.id, card.fresh, card.level], [missing, true, 1]);
+    assert.equal((await first('SELECT copies FROM cards WHERE monster_id = ?', missing)).copies, 1);
+    const journal = await first("SELECT summary, data FROM reports WHERE kind = 'herbs' ORDER BY id DESC LIMIT 1");
+    assert.deepEqual(JSON.parse(journal.summary).cards.map((one) => one.name), [card.name]);
+    assert.equal(JSON.parse(journal.data).cards[0].id, missing);
+  });
+
+  test('a Próba finished leaves a card once, at the next look at the Próby or at what waits in the Gildia; an attack on the Bestia may leave one', async () => {
+    const founded = await call('POST', '/api/guild/found', { cookie, body: { name: 'Karciane Bractwo', tag: 'KB' } });
+    assert.equal(founded.status, 200, JSON.stringify(founded.data));
+    const guildId = (await call('GET', '/api/guild', { cookie })).data.guild.id;
+    const week = questPeriod('weekly', Date.now(), content).key;
+    // A trial finished by hand, its id one whose roll comes or not (a
+    // Próba's card is drawn from `${character}:trial:${trial}:cards`).
+    const trialWhere = (comes, from) => {
+      for (let trial = from; ; trial += 1) if (cardComes(createRng(`${id}:trial:${trial}:cards`), content.cards.drops.guild) === comes) return trial;
+    };
+    const finished = (trial, index) =>
+      run("INSERT INTO guild_trials (id, guild_id, week, character_id, trial, kind, count, progress, state, taken_at, done_at) VALUES (?, ?, ?, ?, ?, 'explore', 1, 1, 'done', 0, 0)", trial, guildId, week, id, index);
+    const miss = trialWhere(false, 5000);
+    const hit = trialWhere(true, 6000);
+    await finished(miss, 90);
+    await finished(hit, 91);
+    const seen = await call('GET', '/api/guild/trials', { cookie });
+    assert.equal(seen.status, 200, JSON.stringify(seen.data));
+    assert.equal(seen.data.cards.length, 1);
+    const [card] = seen.data.cards;
+    assert.equal(card.text, `Za ukończoną Próbę Gildii wpadła karta: ${card.name}.`);
+    assert.ok(cardsUpTo(45, content).includes(card.id));
+    assert.equal(await copies(), 1);
+    const kept = async () => JSON.parse((await first('SELECT card_game FROM characters WHERE id = ?', id)).card_game).trials;
+    assert.deepEqual(await kept(), [hit]);
+    // Once: the next looks give nothing.
+    assert.equal((await call('GET', '/api/guild/trials', { cookie })).data.cards, undefined);
+    assert.equal((await call('GET', '/api/guild/todo', { cookie })).data.cards, undefined);
+    assert.equal(await copies(), 1);
+    // Another one comes with what waits in the Gildia.
+    const next = trialWhere(true, hit + 1);
+    await finished(next, 92);
+    const todo = await call('GET', '/api/guild/todo', { cookie });
+    assert.equal(todo.data.cards.length, 1);
+    assert.equal(await copies(), 2);
+    assert.deepEqual((await kept()).sort(), [hit, next].sort());
+    // An attack on the Bestia answers with the card it left, if any.
+    const attack = await call('POST', '/api/guild/beast/attack', { cookie });
+    assert.equal(attack.status, 200, JSON.stringify(attack.data));
+    assert.equal(await copies(), 2 + (attack.data.cards?.length ?? 0));
+  });
+
+  test('the creatures beaten in a room of the Labirynt leave their cards, from the day\'s seed and the room: in the room\'s lines, its report and the collection', async () => {
+    await makeClimber(await db(), id);
+    const day = labyrinthDay(Date.now(), content);
+    const charLevel = 60;
+    const foes = labyrinthFoes({ day, level: 1, row: 0, room: 0, type: 'fight', charLevel }, content).encounter.members.map((member) => member.monsterId);
+    // A seed of the day whose first draw for the room gives the first
+    // creature's card (labyrinth.js: one draw a creature, from
+    // `${seed}:${level}:${row}:${room}:cards`).
+    const seed = seedWhere('dzien', content.cards.drops[cardKind(foes[0], content)], true, (one) => `${one}:1:0:0:cards`);
+    await run('UPDATE characters SET labyrinth = ? WHERE id = ?', JSON.stringify(newLabyrinth({ day, charLevel, companions: [], seed })), id);
+    const entered = await call('POST', '/api/labyrinth/room', { cookie, body: { level: 1, row: 0, room: 0 } });
+    assert.equal(entered.status, 200, JSON.stringify(entered.data));
+    assert.equal(entered.data.room.won, true);
+    const card = entered.data.report.cards.find((one) => one.id === foes[0]);
+    assert.ok(card, JSON.stringify(entered.data.report.cards));
+    assert.equal(card.fresh, true);
+    assert.ok(entered.data.room.lines.some((line) => line.includes(`karta: ${card.name}.`)));
+    assert.equal((await first('SELECT copies FROM cards WHERE monster_id = ?', foes[0])).copies, 1);
+    assert.equal(await copies(), entered.data.report.cards.length);
   });
 });

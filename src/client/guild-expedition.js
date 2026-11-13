@@ -108,7 +108,9 @@ export function mountGuildExpedition(container) {
       const dialog = openSheet(h('h2', { class: 'sheet-title', text: texts.fightTitle }), h('p', { class: 'sheet-text', text: words }), arena.element);
       dialog.addEventListener('close', () => arena.stop(), { once: true });
     }
-    if (answer.attack.fell) toast(answer.attack.last ? texts.fellLast : texts.fell);
+    // The guardian's fall and a card of Talia Systemu the fight left (903).
+    const said = [answer.attack.fell && (answer.attack.last ? texts.fellLast : texts.fell), ...(answer.cards ?? []).map((card) => card.text)].filter(Boolean);
+    if (said.length > 0) toast(said.join(' '));
   }
 
   async function claim(week, stage) {

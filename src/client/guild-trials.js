@@ -287,7 +287,12 @@ export function mountGuildTrials(container) {
   }
 
   call('GET', '/api/guild/trials')
-    .then(show)
+    .then((answer) => {
+      show(answer);
+      // The cards of Talia Systemu the Próby finished since the last look
+      // left (903).
+      if (answer.cards?.length > 0) toast(answer.cards.map((one) => one.text).join(' '));
+    })
     .catch((error) => {
       if (!gone) fill(card, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać Prób Gildii.') }));
     });
