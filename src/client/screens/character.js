@@ -303,9 +303,9 @@ export function mountCharacter(container, { switchCharacter } = {}) {
           onClick: () =>
             openSheet(
               h('h2', { class: 'sheet-title', text: slot.name }),
-              // A part with no level or condition yet says so in full (the
-              // author, 12.11.2026: „Rdzeń zostanie odblokowany podczas
-              // jednej z kolejnych aktualizacji.”).
+              // A part whose way to open is told in a whole sentence says
+              // it in full (the Rdzeń: its first guardian of the Labirynt,
+              // data/unlocks.json).
               systemPanel(core.locked ?? t('{name} odblokuje się {condition}.', { name: core.name, condition: core.condition })),
             ),
         },
