@@ -369,6 +369,27 @@ test("a faint's report not fetched yet waits for it", async () => {
   assert.equal(lights().length, 1);
 });
 
+// The timer of a line's moment can come a millisecond before Date.now() says
+// the moment is over (two clocks; it failed the tests of 0.3.19 on GitHub):
+// the timer alone ends the wait, or the line would wait for a call that does
+// not come.
+test("a line's moment ends with its timer, even before the clock says so", async () => {
+  place(mark('report-summary'));
+  reportCache.set('9', { id: 9, result: 'fainted', summary: { forfeit: 'Po porażce nic z tej wyprawy nie zostaje.' } });
+  state.character = character({ level: 12 });
+  narrator.narrate('#/raport/9');
+  assert.equal(lights().length, 0);
+  const now = Date.now;
+  Date.now = () => now() - 50;
+  try {
+    await seen();
+  } finally {
+    Date.now = now;
+  }
+  assert.equal(lights().length, 1);
+  assert.match(told(), new RegExp(words('faint-first')));
+});
+
 test('"Testuj samouczki" starts a single place\'s line anew on the same page', async () => {
   place(mark('account-chest'));
   state.character = character();

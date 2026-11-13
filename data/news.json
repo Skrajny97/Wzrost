@@ -855,6 +855,11 @@
       "id": "0.3.20",
       "title": "Wersja 0.3.20",
       "body": "- Arena, zakładka „Karty”: talia, która się broni, ma teraz +12% Ataku i Życia, bo to ona wykłada karty pierwsza i jawnie. Równe talie wygrywają teraz mniej więcej po połowie partii.\n- Poprawki: stół kart wczytuje się na nowo, gdy partia poszła dalej na innym urządzeniu, wiadomości czatu stoją w kolejności pisania, licznik graczy online mówi „1 gracz”, „2 gracze”, a zagrożenie na Walce uwzględnia relację z towarzyszem."
+    },
+    {
+      "id": "0.3.21",
+      "title": "Wersja 0.3.21",
+      "body": "- Czat, kanał „Wymiana”: do oferty dołączysz teraz nie tylko przedmioty z plecaka, ale też materiały, minerały, zioła, mikstury i zasoby obozu, do 5 rodzajów naraz, z liczbą sztuk. Dotknij takiego towaru w cudzej ofercie, a zobaczysz, co to jest i ile go masz."
     }
   ]
 }

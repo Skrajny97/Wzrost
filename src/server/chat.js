@@ -3,8 +3,9 @@
 // on (chatChannels in content.js), and the private conversations of
 // two characters beside them, open from the character level of its unlock
 // (community in data/unlocks.json). A message in the Wymiana can show items
-// from the writer's bag, as they were when it was sent, for offers made in
-// words. A character closes a private conversation until a newer message
+// from the writer's bag, as they were when it was sent, and the writer's
+// materials, minerals, herbs, potions and camp resources, each with the
+// number of pieces shown, for offers made in words. A character closes a private conversation until a newer message
 // comes. The open chat asks every few seconds for the messages after the
 // last one it has. A player writes once they accept the rules, once every few seconds,
 // with no links and with rude words masked (both lists, the Polish and the
@@ -22,7 +23,7 @@
 // other language than the reader's has "A→ Przetłumacz", a machine's
 // translation (translate.js).
 
-import { isUnlocked, itemView, questPeriod } from '../engine/index.js';
+import { isUnlocked, itemView, knownStack, materialView, questPeriod } from '../engine/index.js';
 import { isAuthor } from './author.js';
 import { chatChannels, content } from './content.js';
 import { friendNews } from './community.js';
@@ -201,6 +202,7 @@ const playerMessageView = (row, userId, env, readerId) => ({
   own: row.user_id === userId,
   role: chatRole(env, row),
   ...(row.items && { items: JSON.parse(row.items) }),
+  ...stacksPart(row.stacks),
   // The names it tags, as written, and whether it tags the reader.
   ...mentionsView(JSON.parse(row.mentions ?? '[]'), readerId),
   // The language it is written in, where the chat translates (translate.js).
@@ -241,6 +243,59 @@ async function offeredItems(db, channel, characterId, ids) {
   const byId = new Map(rows.results.map((row) => [row.id, JSON.parse(row.data)]));
   if (byId.size !== ids.length) throw new ApiError(409, 'not_in_bag', 'Pokażesz tylko przedmioty z plecaka, nie założone.');
   return ids.map((id) => offeredItem(byId.get(id)));
+}
+
+// The goods beside the items (a player's request through the author,
+// 13.11.2026: "oznaczanie nie tylko przedmiotów z plecaka ale także
+// materiałów, żeby się nimi wymieniać"): what a trade carries besides gold
+// and items (trades.js), each kind in the characters' column of its name.
+const STACK_COLUMNS = { material: 'materials', mineral: 'minerals', herb: 'herbs', potion: 'potions', resource: 'resources' };
+
+// A good a message shows, as the reader sees it: its name in the reader's
+// language, its rarity where it has one, and what it is; null for one the
+// game no longer has. The message keeps only its kind, id and count.
+function stackView({ kind, id, count }) {
+  const game = content();
+  if (kind === 'material') {
+    if (!knownStack(id, game)) return null;
+    const { materialId, label, rarity, rarityName, color } = materialView(id, count, game);
+    return { kind, id, count, materialId, name: label.charAt(0).toUpperCase() + label.slice(1), rarity, rarityName, color, description: game.materialsById[materialId].description ?? '' };
+  }
+  const table = { mineral: game.mineralsById, herb: game.herbsById, potion: game.potionsById, resource: game.resourcesById }[kind];
+  const entry = table && Object.hasOwn(table, id) ? table[id] : null;
+  if (!entry) return null;
+  const rarity = kind === 'mineral' ? game.raritiesById[entry.rarity ?? entry.for[0]] : null;
+  return { kind, id, count, name: entry.name, ...(rarity && { rarity: rarity.id, rarityName: rarity.name, color: rarity.color }), description: entry.description ?? '' };
+}
+
+// The goods of a message as kept, for its view: those the game still has.
+function stacksPart(raw) {
+  if (!raw) return {};
+  const stacks = JSON.parse(raw).map(stackView).filter(Boolean);
+  return stacks.length > 0 ? { stacks } : {};
+}
+
+// The goods the writer names, {kind, id, count} each, in that order: in a
+// channel that has items, at most rules.stacks kinds, none twice, none more
+// pieces than the writer has now.
+async function offeredStacks(db, channel, characterId, asked) {
+  if (asked === undefined || (Array.isArray(asked) && asked.length === 0)) return null;
+  if (!channel?.items) throw new ApiError(400, 'no_items_here', 'Materiały pokażesz tylko w kanale Wymiana.');
+  const most = content().chat.rules.stacks;
+  const shaped =
+    Array.isArray(asked) &&
+    asked.every((one) => one && typeof one === 'object' && Object.hasOwn(STACK_COLUMNS, one.kind) && typeof one.id === 'string' && Number.isInteger(one.count) && one.count > 0);
+  if (!shaped || new Set(asked.map((one) => `${one.kind} ${one.id}`)).size !== asked.length) throw new ApiError(400, 'bad_stacks', 'Nie ma takich materiałów.');
+  if (asked.length > most) throw new ApiError(400, 'too_many_stacks', `Jedna wiadomość pokaże najwyżej ${most} rodzajów materiałów.`);
+  const row = await db.prepare('SELECT herbs, potions, materials, minerals, resources FROM characters WHERE id = ?').bind(characterId).first();
+  const stacks = asked.map(({ kind, id, count }) => ({ kind, id, count }));
+  for (const stack of stacks) {
+    const view = stackView(stack);
+    if (!view) throw new ApiError(400, 'bad_stacks', 'Nie ma takich materiałów.');
+    const have = JSON.parse(row?.[STACK_COLUMNS[stack.kind]] ?? '{}');
+    if (!Object.hasOwn(have, stack.id) || have[stack.id] < stack.count) throw new ApiError(409, 'not_enough', `Masz mniej sztuk: ${view.name}.`);
+  }
+  return stacks;
 }
 
 const blockedList = (db, userId) => db.prepare('SELECT id, name FROM chat_blocks WHERE user_id = ? ORDER BY id').bind(userId);
@@ -303,7 +358,7 @@ export async function readChat(context) {
   const [messages, hidden, blocked, reports, conversations] = await db.batch([
     db
       .prepare(
-        `SELECT m.id, m.user_id, m.character_id, m.name, COALESCE(c.level, m.level) AS level, m.class_id, m.text, m.items, m.created_at, m.system, u.login, u.google_sub, u.chat_moderator, u.language AS writer_language, u.account_name,
+        `SELECT m.id, m.user_id, m.character_id, m.name, COALESCE(c.level, m.level) AS level, m.class_id, m.text, m.items, m.stacks, m.created_at, m.system, u.login, u.google_sub, u.chat_moderator, u.language AS writer_language, u.account_name,
                 c.cosmetics, ${guildTagSql('m.character_id')} AS guild_tag, ${mentionsSql('m.id')} AS mentions
          FROM chat_messages m JOIN users u ON u.id = m.user_id LEFT JOIN characters c ON c.id = m.character_id
          WHERE ${where} AND m.id > ? AND m.hidden_at IS NULL AND (m.system = 1 OR m.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?))
@@ -460,7 +515,9 @@ async function privateAllowed(db, userId, other) {
 }
 
 // POST /api/chat {channel, text}, or {with: character id, text} for a
-// private message: a message under the character's name, level and class.
+// private message: a message under the character's name, level and class;
+// in the Wymiana also with items (ids from the bag) and stacks
+// ({kind, id, count} each, offeredStacks).
 // The channel keeps its last messages, a private conversation its last
 // privateKeep, and both the reported ones still waiting for the moderation.
 // The characters it tags with "@" are kept with it (mentions.js); a
@@ -479,6 +536,8 @@ export async function sendChat(context) {
   if (other) await privateAllowed(db, userId, other);
   const offered = await offeredItems(db, channel, character.id, body.items);
   const items = offered && JSON.stringify(offered);
+  const goods = await offeredStacks(db, channel, character.id, body.stacks);
+  const stacks = goods && JSON.stringify(goods);
   const tags = await findMentions(db, shownText(text), { userId, channel: other ? PRIVATE : (guild ?? channel.id), recipientId: other?.id ?? null }, now);
   const { everySeconds, keep, privateKeep } = content().chat.rules;
   const where = other ? `m.channel = '${PRIVATE}' AND ${PAIR}` : 'm.channel = ?';
@@ -486,10 +545,10 @@ export async function sendChat(context) {
   const [sent] = await db.batch([
     db
       .prepare(
-        `INSERT INTO chat_messages (channel, user_id, character_id, recipient_id, name, level, class_id, text, items, created_at)
-         SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM chat_messages WHERE user_id = ? AND created_at > ? AND system = 0)`,
+        `INSERT INTO chat_messages (channel, user_id, character_id, recipient_id, name, level, class_id, text, items, stacks, created_at)
+         SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM chat_messages WHERE user_id = ? AND created_at > ? AND system = 0)`,
       )
-      .bind(other ? PRIVATE : (guild ?? channel.id), userId, character.id, other?.id ?? null, character.name, character.level, character.class_id, text, items, now, userId, now - everySeconds * 1000),
+      .bind(other ? PRIVATE : (guild ?? channel.id), userId, character.id, other?.id ?? null, character.name, character.level, character.class_id, text, items, stacks, now, userId, now - everySeconds * 1000),
     db
       .prepare(
         `DELETE FROM chat_messages WHERE id IN (SELECT m.id FROM chat_messages m WHERE ${where}
@@ -521,6 +580,7 @@ export async function sendChat(context) {
     cosmetics: character.cosmetics,
     text,
     items,
+    stacks,
     created_at: now,
     writer_language: account.language,
     mentions: JSON.stringify(kept.map((tag) => ({ id: tag.characterId, text: tag.written }))),

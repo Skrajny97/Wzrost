@@ -434,6 +434,7 @@ export function publicContent() {
       linkMaxLength: game.chat.rules.linkMaxLength,
       link: game.chat.texts.link,
       itemsMax: game.chat.rules.items,
+      stacksMax: game.chat.rules.stacks,
       pollSeconds: game.chat.rules.pollSeconds,
       rules: game.chat.texts.rules,
       // The window of a name the filter blocks (names.js).

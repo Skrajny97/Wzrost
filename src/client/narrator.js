@@ -807,8 +807,14 @@ export function narrate(hash = place) {
   place = hash;
   const read = state.character?.tutorial;
   if (!read || !state.content?.tutorial) {
-    // Without a character, as after "Usuń postać", its lines go too.
+    // Without a character, as after "Usuń postać", its lines go too, and so
+    // does the moment a line was waiting for: the next character's line
+    // waits its own.
     if (!state.character) passedHere.clear();
+    if (pause) {
+      clearTimeout(pause.timer);
+      pause = null;
+    }
     closeCard();
     stopLight();
     aim([]);
@@ -868,7 +874,15 @@ export function narrate(hash = place) {
       stopLight();
       aim([]);
       hold();
-      pause = { id: line.id, at: Date.now() + delay, timer: setTimeout(() => narrate(), delay) };
+      // The timer alone ends the wait: it can come a millisecond before
+      // Date.now() says the delay is over (two clocks), and nothing else
+      // would call again, so the line would never show.
+      const waiting = { id: line.id, at: Date.now() + delay, timer: undefined };
+      waiting.timer = setTimeout(() => {
+        waiting.at = 0;
+        narrate();
+      }, delay);
+      pause = waiting;
       return;
     }
     if (Date.now() < pause.at) return;
