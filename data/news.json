@@ -880,6 +880,11 @@
       "id": "0.3.25",
       "title": "Wersja 0.3.25",
       "body": "- Karty na żywo: wysłane wyzwanie możesz wycofać, a na pierwszy ruch każdej rundy masz 35 sekund.\n- Szczęsny: gdy wszystkie karty danej rzadkości masz już na 5. poziomie, za pierwszą wygraną na stopniu zgarniasz jego stawkę w złocie.\n- Wynik Loterii pojawia się też na kanale English, po angielsku.\n- Wyprawy: walki liczą Twój poziom z chwili wyruszenia, nawet gdy w trakcie awansujesz.\n- Walka: przy zaznaczonym „Z drużyną” widać, że zagrożenie jest liczone dla Ciebie samego.\n- Warzenie: przerwane warzenie czeka, aż zioła zmieszczą się w plecaku.\n- Wiele drobnych poprawek: drużyna, Tablica zleceń, Przechowalnia, Labirynt, gildie i znajomi."
+    },
+    {
+      "id": "0.3.26",
+      "title": "Wersja 0.3.26",
+      "body": "- Gracze online: stuknij zieloną kropkę z liczbą graczy, a pod nią pojawi się „Lista”. Zobaczysz, kto teraz gra, a stuknięcie imienia otworzy kartę postaci."
     }
   ]
 }
