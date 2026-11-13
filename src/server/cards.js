@@ -23,8 +23,16 @@
 // profession's work, an attack of the Gildia and a Próba finished may give
 // a card of the lands at the character's level or lower (903,
 // sourceCards).
+//
+// The residents of the Osada play too, each at their own place (904 B;
+// card-residents.js in the engine): the same matches against a resident's
+// table ("resident:<id>"), staked among the day's ten or for training. A
+// staked win gives twice the stake, the first one over a resident a card of
+// its deck the character has not got and every later one a chance of one;
+// the residents ever beaten for a stake are kept in `card_game` too.
 
 import {
+  aboveTiers,
   areaLand,
   cardComes,
   cardLevel,
@@ -48,6 +56,11 @@ import {
   pickCard,
   playTurn,
   portalArea,
+  residentCardsLeft,
+  residentStake,
+  residentTable,
+  residentTables,
+  residentWinCard,
   samePeriod,
   startBlock,
   starterDeck,
@@ -84,8 +97,10 @@ function requireCards(row) {
 // deck taken, the tiers ever beaten, and the day's staked matches and the
 // tiers whose reward of the day it took; a later day's kept as it is, as a
 // day never goes back (quests.js, samePeriod). Also the Próby Gildii whose
-// card it was given (`trials`, their ids; guild-trials.js, trialCards),
-// kept through every change of the rest.
+// card it was given (`trials`, their ids; guild-trials.js, trialCards), and
+// the residents of the Osada it has beaten for a stake (`residents`, their
+// ids, 904 B: their first win's card given), both kept through every
+// change of the rest.
 export function cardGameOf(row, day) {
   let stored;
   try {
@@ -103,6 +118,7 @@ export function cardGameOf(row, day) {
     trials: Array.isArray(stored?.trials) ? stored.trials.filter((id) => Number.isInteger(id)) : [],
     // The day's pack bought at Szczęsny's (902 C).
     pack: today && stored.pack === true,
+    residents: Array.isArray(stored?.residents) ? stored.residents.filter((id) => typeof id === 'string') : [],
   };
 }
 
@@ -207,8 +223,47 @@ const heroOf = (row) => ({ classId: row.class_id, stage: row.evolution ? (conten
 // rewards count it: a tier's reward of the day.
 const explorationGold = (minutes, level) => (minutes > 0 ? Math.max(1, Math.round(expectedExploration(portalArea(level, content()), level, minutes, content()).gold)) : 0);
 
-// The tier's number in a match's opponent ("host:3").
-const tierOfMatch = (match) => Number(String(match.opponent).split(':')[1]);
+// A match's opponent: Szczęsny's tier ("host:3", its number) or a resident
+// of the Osada ("resident:herbalist", its id, 904 B), the other null.
+function opponentOf(match) {
+  const [kind, id] = String(match.opponent).split(':');
+  return kind === 'resident' ? { tier: null, resident: id } : { tier: Number(id), resident: null };
+}
+
+// The residents' tables (904 B) for the page: each resident's name, place,
+// the forms of the name its words take, its deck's name and style, its place
+// among Szczęsny's tiers, the stake at the character's level and what a win
+// gives, whether its first staked win is behind the character, how many of
+// its cards the character has not got and how many can still come, its
+// first cards (the rest it shows at the table) and its words after a match.
+function residentsView(row, game, collection) {
+  const data = rules();
+  const { places, residents } = content().settlement;
+  return residentTables(content()).map((table) => {
+    const stake = residentStake(table, row.level, content());
+    return {
+      id: table.id,
+      name: residents.find((resident) => resident.id === table.id)?.name ?? table.id,
+      place: places.find((place) => place.resident === table.id)?.id ?? null,
+      gender: table.gender,
+      with: table.with,
+      of: table.of,
+      deck: table.name,
+      style: table.style,
+      icon: table.icon,
+      after: table.after,
+      top: aboveTiers(table, content()),
+      stake,
+      win: 2 * stake,
+      chance: data.residents.chance,
+      beaten: game.residents.includes(table.id),
+      ...residentCardsLeft(table, collection, content()),
+      size: table.cards.length,
+      cards: table.cards.slice(0, data.residents.shown).map((card) => cardView(card.monster, card.level, content())),
+      texts: { win: table.win, loss: table.loss, draw: table.draw },
+    };
+  });
+}
 
 // A finished match's summary, kept in place of its state.
 function summaryOf(row) {
@@ -219,10 +274,6 @@ function summaryOf(row) {
   }
 }
 
-// The Salon's third tab for the page: the words and rules, the collection
-// with the deck marked, the hero, Szczęsny's tiers with their stakes and the
-// rewards still waiting, the day's staked matches, the running match as the
-// page sees it (matchView), and the last match finished.
 // The character's own land (902 C): the land of the place at the higher of
 // its level and its class level, as for the cards of the professions (903).
 const characterLand = (row) => areaLand(portalArea(Math.max(row.level, row.class_level ?? row.level), content()).id, content());
@@ -246,6 +297,11 @@ function packView(row, game, collection) {
   };
 }
 
+// The Salon's third tab for the page: the words and rules, the collection
+// with the deck marked, the hero, Szczęsny's tiers with their stakes and the
+// rewards still waiting, the day's pack (902 C), the residents' tables (904
+// B), the day's staked matches, the running match as the page sees it
+// (matchView) with its opponent, and the last match finished.
 async function cardsView(db, player, now) {
   const { row } = player;
   const day = casinoDay(now, content());
@@ -302,10 +358,11 @@ async function cardsView(db, player, now) {
         levels: [Math.min(...tier.cards.map((card) => card.level)), Math.max(...tier.cards.map((card) => card.level))],
       };
     }),
+    residents: residentsView(row, game, collection),
     staked: { today: game.staked, limit: data.stakes.perDay },
     pack: game.starter ? packView(row, game, collection) : null,
-    match: running ? { id: running.id, tier: tierOfMatch(running), mode: running.mode, stake: running.stake, ...matchView(JSON.parse(running.state), content()) } : null,
-    last: last ? { id: last.id, tier: tierOfMatch(last), mode: last.mode, stake: last.stake, result: last.result, at: last.finished_at, ...summaryOf(last) } : null,
+    match: running ? { id: running.id, ...opponentOf(running), mode: running.mode, stake: running.stake, ...matchView(JSON.parse(running.state), content()) } : null,
+    last: last ? { id: last.id, ...opponentOf(last), mode: last.mode, stake: last.stake, result: last.result, at: last.finished_at, ...summaryOf(last) } : null,
     endsAt: day.endsAt,
   };
 }
@@ -399,9 +456,11 @@ export async function buyPack(context) {
   return respond(context, session, { pack: opened });
 }
 
-// POST /api/cards/match { tier, staked }: a match against Szczęsny's tier,
-// for its stake (paid now, one of the day's ten) or for training. One match
-// at a time (the table's index); finished ones older than two weeks go.
+// POST /api/cards/match { tier, staked } or { resident, staked }: a match
+// against Szczęsny's tier or a resident's table (904 B), for its stake (paid
+// now, one of the day's ten, the same ten at every table) or for training.
+// One match at a time (the table's index); finished ones older than two
+// weeks go.
 export async function startMatch(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -412,17 +471,21 @@ export async function startMatch(context) {
   const day = casinoDay(now, content()).key;
   const game = cardGameOf(row, day);
   const staked = body?.staked === true;
-  const tier = hostTier(body?.tier, content());
+  const asksResident = body?.resident !== undefined && body?.resident !== null;
+  const table = asksResident ? residentTable(body.resident, content()) : null;
+  if (asksResident && !table) throw new ApiError(400, 'invalid_resident', 'Ten mieszkaniec nie gra w karty.');
+  const tier = table ? null : hostTier(body?.tier, content());
+  const rival = table ?? tier;
   const [collection, running] = await Promise.all([cardCollection(db, row.id), runningMatch(db, row.id)]);
   const deck = await deckOf(db, row.id, collection);
-  const stake = staked && tier ? tierStake(tier, row.level, content()) : 0;
-  const block = startBlock({ tier, staked, hasDeck: Boolean(deck), running: Boolean(running), stakedToday: game.staked, gold: row.gold, stake }, content());
+  const stake = staked && rival ? (table ? residentStake(table, row.level, content()) : tierStake(tier, row.level, content())) : 0;
+  const block = startBlock({ tier: rival, staked, hasDeck: Boolean(deck), running: Boolean(running), stakedToday: game.staked, gold: row.gold, stake }, content());
   if (block) throw new ApiError(block.status ?? 400, block.code, block.message);
   const state = newMatch(
     {
       seed: newSeed(),
       me: { cards: deck.map((id) => ({ id, level: cardLevel(collection.get(id), content()) })), hero: heroOf(row) },
-      foe: { cards: tier.cards.map((card) => ({ id: card.monster, level: card.level })), smart: tier.smart },
+      foe: { cards: rival.cards.map((card) => ({ id: card.monster, level: card.level })), smart: rival.smart },
     },
     content(),
   );
@@ -430,7 +493,7 @@ export async function startMatch(context) {
     db.prepare('DELETE FROM card_matches WHERE character_id = ? AND result IS NOT NULL AND finished_at < ?').bind(row.id, now - KEEP_FINISHED_MS),
     db
       .prepare('INSERT INTO card_matches (character_id, opponent, mode, stake, day, state, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
-      .bind(row.id, `host:${body.tier}`, staked ? 'staked' : 'training', stake, day, JSON.stringify(state), now),
+      .bind(row.id, table ? `resident:${table.id}` : `host:${body.tier}`, staked ? 'staked' : 'training', stake, day, JSON.stringify(state), now),
   ];
   if (staked) {
     statements.unshift(
@@ -449,33 +512,45 @@ export async function startMatch(context) {
 
 // The statements that end a match with its result: its summary in place of
 // its state, and for a staked one what it pays (matchPayout) with the
-// character's day counters and tiers beaten, only over the character as
-// read. Returns them with the summary.
+// character's day counters, tiers beaten and residents beaten, only over
+// the character as read. A resident's table (904 B) has no reward of the
+// day: its staked win gives a card of its deck, at the first win over it
+// always (`first`) and later with its chance (residentWinCard). Returns
+// the statements with the summary.
 async function endStatements(db, player, match, state, now) {
   const { row } = player;
-  const number = tierOfMatch(match);
-  const tier = hostTier(number, content());
+  const { tier: number, resident } = opponentOf(match);
+  const table = resident ? residentTable(resident, content()) : null;
+  const tier = table || resident ? null : hostTier(number, content());
   const staked = match.mode === 'staked';
+  const won = staked && state.result === 'won';
   const day = casinoDay(now, content()).key;
   const game = cardGameOf(row, day);
-  const collection = staked && state.result === 'won' && !game.beaten.includes(number) ? await cardCollection(db, row.id) : new Map();
+  const firstTier = Boolean(tier) && won && !game.beaten.includes(number);
+  const firstResident = Boolean(table) && won && !game.residents.includes(table.id);
+  const collection = firstTier || (table && won) ? await cardCollection(db, row.id) : new Map();
   const payout = matchPayout({
     result: state.result,
     staked,
     stake: match.stake,
     dailyGold: tier ? explorationGold(tier.rewardMinutes, row.level) : 0,
-    rewardedToday: game.rewarded.includes(number),
-    beatenBefore: game.beaten.includes(number),
-    firstCard: tier && staked && state.result === 'won' && !game.beaten.includes(number) ? firstWinCard(tier, collection, state.seed, content()) : null,
+    rewardedToday: tier ? game.rewarded.includes(number) : true,
+    beatenBefore: tier ? game.beaten.includes(number) : true,
+    firstCard: firstTier ? firstWinCard(tier, collection, state.seed, content()) : null,
   });
+  const card =
+    table && won ? residentWinCard({ table, first: firstResident, seed: state.seed, owned: collection.keys(), maxed: maxedCards(collection) }, content()) : payout.card;
   const summary = {
     end: state.end,
     rounds: state.round,
     left: { me: state.me.lines.filter((key) => key !== null).length + state.me.hand.length + state.me.deck.length, foe: state.foe.lines.filter((key) => key !== null).length + state.foe.hand.length + state.foe.deck.length },
     gold: payout.gold,
     daily: payout.daily,
-    card: payout.card ? cardView(payout.card, (collection.get(payout.card) ?? 0) + 1, content(), { fresh: !collection.has(payout.card) }) : null,
+    card: card ? cardView(card, (collection.get(card) ?? 0) + 1, content(), { fresh: !collection.has(card) }) : null,
     tierName: tier?.name ?? null,
+    // At a resident's table: its deck's name, and whether the card is the
+    // first win's (else its chance's).
+    ...(table && { deck: table.name, first: firstResident }),
   };
   const statements = [
     db
@@ -483,15 +558,15 @@ async function endStatements(db, player, match, state, now) {
       .bind(JSON.stringify(summary), state.result, now, match.id, match.version),
   ];
   if (staked) {
-    const won = state.result === 'won';
     const next = {
       ...game,
-      rewarded: won && !game.rewarded.includes(number) ? [...game.rewarded, number] : game.rewarded,
-      beaten: won && !game.beaten.includes(number) ? [...game.beaten, number] : game.beaten,
+      rewarded: tier && won && !game.rewarded.includes(number) ? [...game.rewarded, number] : game.rewarded,
+      beaten: tier && won && !game.beaten.includes(number) ? [...game.beaten, number] : game.beaten,
+      residents: firstResident ? [...game.residents, table.id] : game.residents,
     };
     statements.unshift(assertion(db, '(SELECT version FROM characters WHERE id = ?) = ?', [row.id, row.version]));
     statements.push(db.prepare('UPDATE characters SET gold = gold + ?, card_game = ?, version = version + 1 WHERE id = ?').bind(payout.gold + payout.daily, JSON.stringify(next), row.id));
-    if (payout.card) statements.push(...cardUpserts(db, row.id, [payout.card], now));
+    if (card) statements.push(...cardUpserts(db, row.id, [card], now));
   }
   return { statements, summary };
 }
@@ -526,12 +601,12 @@ export async function playCardTurn(context) {
   return respond(
     context,
     session,
-    ended ? { end: { result: next.result, tier: tierOfMatch(match), mode: match.mode, stake: match.stake, ...ended.summary }, played: matchView(next, content()) } : {},
+    ended ? { end: { result: next.result, ...opponentOf(match), mode: match.mode, stake: match.stake, ...ended.summary }, played: matchView(next, content()) } : {},
   );
 }
 
 // POST /api/cards/surrender: the running match given up, lost (a staked
-// one's stake stays with Szczęsny).
+// one's stake stays with Szczęsny, or with the resident at its table).
 export async function surrenderCards(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -542,7 +617,7 @@ export async function surrenderCards(context) {
   const next = surrenderMatch(JSON.parse(match.state));
   const ended = await endStatements(db, player, match, next, context.now);
   await atomically(db, [assertion(db, '(SELECT version FROM card_matches WHERE id = ?) = ?', [match.id, match.version]), ...ended.statements], matchChanged);
-  return respond(context, session, { end: { result: next.result, tier: tierOfMatch(match), mode: match.mode, stake: match.stake, ...ended.summary } });
+  return respond(context, session, { end: { result: next.result, ...opponentOf(match), mode: match.mode, stake: match.stake, ...ended.summary } });
 }
 
 // The rows of the cards of the characters `which` (SQL after

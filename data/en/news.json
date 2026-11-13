@@ -664,6 +664,10 @@
     "0.3.16": {
       "title": "Version 0.3.16",
       "body": "- A weapon with an elemental enchantment shows in a fight how much damage its element dealt: over the creature a second number in the element's colour pops up under the damage, and in the fight log the blow says, e.g., \"Cormorant loses 231 HP, 35 of it from nature\". The creature's resistance and weakness to that element work on this part of the blow."
+    },
+    "0.3.17": {
+      "title": "Version 0.3.17",
+      "body": "- The residents of the Settlement play cards, each at their own place: tap \"Play cards\" on a resident's card. Each has their own deck in their own style, and their decks fill the gaps between Szczęsny's tiers. The hermit Sambor plays stronger than Szczęsny himself.\n- Matches for a stake with the residents count towards the same 10 a day as Szczęsny's. Your first win for a stake against a resident gets you a card from their deck that you don't have, and every later win a 10% chance of a card from their deck."
     }
   }
 }

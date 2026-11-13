@@ -13638,6 +13638,37 @@ button.tcard-slot {
   gap: 8px;
 }
 
+/* A resident's card table under its bust (904 B, mock-ups 910.1 and
+   910.2): "Zagraj w karty" with the dice in the resident's card, then the
+   table's title, the day's staked matches and the table itself, as a tier
+   of Szczęsny's. A long fact ("karta z talii Gościwita, której nie masz")
+   comes whole under its label, and on the narrowest phones wraps. */
+.resident-cards-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.resident-cards {
+  gap: 10px;
+}
+
+.resident-cards > .section-title {
+  margin: 0;
+}
+
+.resident-cards .cards-tier-facts strong {
+  display: inline-block;
+  max-width: 100%;
+  white-space: normal;
+}
+
+/* A match waiting at another table: where, and the way there. */
+.cards-elsewhere p {
+  margin: 0;
+}
+
 /* The end of a match. */
 .cards-end {
   gap: 8px;

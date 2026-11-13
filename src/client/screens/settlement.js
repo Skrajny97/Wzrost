@@ -24,6 +24,7 @@ import { companionCard } from '../companions.js';
 import { mercenariesCard, mountMercenaryHire, serviceWaiting } from '../mercenaries.js';
 import { askGuildButton } from '../guild-requests.js';
 import { mountCasino } from '../casino.js';
+import { mountCards } from '../cards.js';
 import { mountLabyrinth } from '../labyrinth.js';
 import { trialHallCards } from '../trial-hall.js';
 import { mountPvpArena } from '../pvp-arena.js';
@@ -69,6 +70,9 @@ const CASINO_TABS = ['lottery', 'wheel', 'cards'];
 // The Tablica zleceń's tabs (boardTabs), the first without a name in the
 // address.
 const BOARD_TABS = ['orders', 'wanted'];
+// A resident's card table (904 B, cards.js) the address may name
+// (#/osada/herbalist/cards): it opens with the place.
+const RESIDENT_CARDS = 'cards';
 // Whether the Sala prób holds the Labirynt: where the game has it on and
 // the character has reached it (data/unlocks.json, 855 A).
 const labyrinthHere = () => Boolean(unlockInfo('labyrinth')) && isUnlocked('labyrinth');
@@ -164,6 +168,22 @@ export function mountSettlement(container, { params = {} } = {}) {
     return labyrinth.holder;
   };
   if (placeId === 'trial-hall' && trialHallTab === 'labyrinth' && labyrinthHere()) labyrinthPanel();
+  // The resident's card table under its bust (904 B, cards.js): opened by
+  // "Zagraj w karty" or by the address (#/osada/herbalist/cards), mounted
+  // once and kept while the screen redraws. While its match is on, the
+  // table takes the screen: the resident's card and services fold away, as
+  // Szczęsny's in the Salon.
+  let cardsOpen = params.tab === RESIDENT_CARDS;
+  let residentCards = null;
+  const residentCardsPanel = (resident) => {
+    if (!residentCards) {
+      const holder = h('div', { class: 'cards resident-cards-holder' });
+      residentCards = { holder, ...mountCards(holder, { resident: resident.id, onLayout: () => !gone && data && render() }) };
+    } else residentCards.refresh();
+    return residentCards.holder;
+  };
+  // Whether the place's resident plays cards there (904 B).
+  const playsCards = (place, resident) => Boolean(resident?.cards) && !place.soon && place.id !== 'casino';
   // The Arena (pvp-arena.js, 762 A), kept so too.
   let pvpArena = null;
   const pvpArenaPanel = (place) => {
@@ -1385,9 +1405,11 @@ export function mountSettlement(container, { params = {} } = {}) {
   // The resident of a place (question 76): the bust, who they are, their
   // story and how they greet the character at its relation, then the gift
   // of the day for them and a friend's present of the week (818.1 and
-  // 818.2); the place's room dim behind, where it has one (the Salon Gier's,
-  // 550.5 D), as the professions' places behind their cards.
-  const residentCard = (resident, backdrop) => {
+  // 818.2), and "Zagraj w karty" where the resident plays cards (904 B,
+  // mock-up 910.1) until its table opens under the card; the place's room
+  // dim behind, where it has one (the Salon Gier's, 550.5 D), as the
+  // professions' places behind their cards.
+  const residentCard = (resident, backdrop, plays = false) => {
     const art = backdrop && placeArt(backdrop);
     const card = h(
       'section',
@@ -1406,6 +1428,22 @@ export function mountSettlement(container, { params = {} } = {}) {
       ),
       h('p', { class: 'settlement-greeting', text: t('„{line}”', { line: resident.greeting }) }),
       residentGifts(resident, data.gifts, apply),
+      plays &&
+        !cardsOpen &&
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'button button--world resident-cards-button',
+            'data-guide': 'resident-cards-button',
+            onClick: () => {
+              cardsOpen = true;
+              render();
+            },
+          },
+          icon('dice', { size: 18 }),
+          h('span', { text: t('Zagraj w karty') }),
+        ),
     );
     if (art) card.style.setProperty('--place-art', `url("${art}")`);
     return card;
@@ -1664,6 +1702,10 @@ export function mountSettlement(container, { params = {} } = {}) {
   // and the brotherhoods; a place of a later part says so.
   function placeView(place) {
     const resident = data.residents.find((one) => one.id === place.resident);
+    const plays = playsCards(place, resident);
+    // While a card match is on, its table alone under the heading: Talia
+    // Systemu's in the Salon (casino.js), or the resident's at its place.
+    const compact = (place.id === 'casino' && casino?.compact()) || (plays && Boolean(residentCards?.playing()));
     fill(
       container,
       h(
@@ -1679,13 +1721,15 @@ export function mountSettlement(container, { params = {} } = {}) {
       ),
       place.soon && systemPanel(t('{name} otworzy się w jednej z kolejnych aktualizacji gry.', { name: place.name })),
       // While Talia Systemu's match is on, its table instead (cards.js).
-      resident && !(place.id === 'casino' && casino?.compact()) && residentCard(resident, place.backdrop),
-      !place.soon && resident && !(place.id === 'casino' && casino?.compact()) && services(resident),
+      resident && !compact && residentCard(resident, place.backdrop, plays),
+      // The resident's card table under its bust (904 B, mock-up 910.2).
+      plays && cardsOpen && residentCardsPanel(resident),
+      !place.soon && resident && !compact && services(resident),
       // The sołtys's orders and Poszukiwani (619 B), each in its tab.
-      place.id === 'board' && boardTabs(),
-      place.id === 'market' && !place.soon && marketPanel(),
+      place.id === 'board' && !compact && boardTabs(),
+      place.id === 'market' && !place.soon && !compact && marketPanel(),
       // The Stajnia's mounts (327 A), under Mirosław's card.
-      place.id === 'stable' && !place.soon && data.stable && stableCard(data.stable, apply),
+      place.id === 'stable' && !place.soon && !compact && data.stable && stableCard(data.stable, apply),
       // The Salon Gier's Loteria and Koło Fortuny (523–526), under Szczęsny's.
       place.id === 'casino' && !place.soon && casinoPanel(),
       // The Sala prób: the Labirynt Systemu, and the trial of the day (620 B)
@@ -1705,7 +1749,7 @@ export function mountSettlement(container, { params = {} } = {}) {
     // An unknown place in the address leads back to the board, and a tab
     // the place does not have to the place.
     if (placeId && !place) return location.replace(SETTLEMENT);
-    const tabs =
+    const placeTabs =
       place?.id === 'tavern'
         ? TAVERN_TABS
         : place?.id === 'trial-hall' && labyrinthHere()
@@ -1715,6 +1759,8 @@ export function mountSettlement(container, { params = {} } = {}) {
             : place?.id === 'board' && data.wanted
               ? BOARD_TABS
               : [];
+    // A resident who plays cards there: its table by the address (904 B).
+    const tabs = place && playsCards(place, data.residents.find((one) => one.id === place.resident)) ? [...placeTabs, RESIDENT_CARDS] : placeTabs;
     if (place && params.tab && !tabs.includes(params.tab)) return location.replace(`${SETTLEMENT}/${place.id}`);
     if (place) placeView(place);
     else boardView();
@@ -1739,6 +1785,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       stopLayout();
       market?.unmount();
       casino?.unmount();
+      residentCards?.unmount();
       labyrinth?.unmount();
       pvpArena?.unmount();
       hire?.unmount();

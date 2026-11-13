@@ -27,6 +27,91 @@
       "host": { "name": "Szczęsny's Deck", "text": "His own deck: champions and elites at levels 4 and 5. Few rise from this table with a full purse." }
     }
   },
+  "residents": {
+    "tables": {
+      "innkeeper": {
+        "with": "with Zbylut",
+        "of": "Zbylut",
+        "name": "The Tavern Deck",
+        "style": "Zbylut plays ordinary creatures of the first lands, four of each type.",
+        "win": ["\"A good match! I'll tell the whole tavern about it tonight.\""],
+        "loss": ["\"My win. Sit down, a tankard to cheer you up.\""],
+        "draw": ["\"A draw. Let's drink to that and play again.\""]
+      },
+      "groom": {
+        "with": "with Mirosław",
+        "of": "Mirosław",
+        "name": "The Stable Deck",
+        "style": "Mirosław plays creatures of the forest paths, Strength above all.",
+        "win": ["\"Your win. Your cards are quicker than my horses.\""],
+        "loss": ["\"My match. Don't come at a deck from behind, it'll kick.\""],
+        "draw": ["\"A draw, like two horses neck and neck.\""]
+      },
+      "herbalist": {
+        "with": "with Jagna",
+        "of": "Jagna",
+        "name": "The Bog Deck",
+        "style": "Jagna plays creatures of the Peatlands, Magic above all.",
+        "win": ["\"Nicely played. Not everyone would manage in the bogs.\""],
+        "loss": ["\"My win. Shall I brew you some herbs to cheer you up?\""],
+        "draw": ["\"A draw. I'll put the kettle on and we'll play again.\""]
+      },
+      "tanner": {
+        "with": "with Wszebor",
+        "of": "Wszebor",
+        "name": "The Hunter's Deck",
+        "style": "Wszebor plays creatures he tracked in the wilds, Dexterity above all.",
+        "win": ["\"Your win. You track cards better than I track game.\""],
+        "loss": ["\"My match. In the wilds the patient one wins.\""],
+        "draw": ["\"A draw. This time we come back without a catch.\""]
+      },
+      "merchant": {
+        "with": "with Gościwit",
+        "of": "Gościwit",
+        "name": "The Deck from Across the River",
+        "style": "Gościwit plays creatures of the Peatlands and the Whispering Pines, four of each type.",
+        "win": ["\"Your win. A good deal, though not for me.\""],
+        "loss": ["\"My match. Whoever plays with me knows I don't cheat. Not much.\""],
+        "draw": ["\"A draw. A fair exchange: nobody lost.\""]
+      },
+      "headman": {
+        "with": "with Bogumił",
+        "of": "Bogumił",
+        "name": "The Headman's Deck",
+        "style": "Bogumił plays elites and the most dangerous creatures of the first lands.",
+        "win": ["\"Your win. I'll remember it, like every debt.\""],
+        "loss": ["\"My match. Thirty winters at this table do their work.\""],
+        "draw": ["\"A draw. Fair, as befits the Crossroads.\""]
+      },
+      "enchantress": {
+        "with": "with Wiedana",
+        "of": "Wiedana",
+        "name": "The Rune Deck",
+        "style": "Wiedana plays spirits and wraiths, Magic above all.",
+        "win": ["\"Your win. Today the cards listened to you, not to me.\""],
+        "loss": ["\"My match. The runes don't lie.\""],
+        "draw": ["\"A draw. That rarely happens to me.\""]
+      },
+      "smith": {
+        "with": "with Żelisław",
+        "of": "Żelisław",
+        "name": "The Iron Deck",
+        "style": "Żelisław plays hardy creatures, Strength above all.",
+        "win": ["\"Your win. You're a tough one.\""],
+        "loss": ["\"My match. Iron doesn't crack.\""],
+        "draw": ["\"A draw. Shall we keep forging?\""]
+      },
+      "hermit": {
+        "with": "with Sambor",
+        "of": "Sambor",
+        "name": "The Hermit's Deck",
+        "style": "Sambor plays creatures he met on his old explorations, mostly champions and elites.",
+        "win": ["\"Your win. It's been long since anyone beat me like that.\""],
+        "loss": ["\"My match. Come back when you know your deck better.\""],
+        "draw": ["\"A draw. That's a lesson too.\""]
+      }
+    }
+  },
   "texts": {
     "intro": "Szczęsny shuffles a deck of cards with creatures of the Bestiary. \"Twelve cards, three lines, as in a real battle. Build your deck and take a seat.\"",
     "starterOffer": "\"For a good start I'll give you a deck: twelve cards, four of each type. The rest you'll win on your explorations.\"",
@@ -41,7 +126,8 @@
       "New cards are rarely left by creatures you beat on explorations and in the Labyrinth, more often by elites, champions and guardians. The same card won again raises its level, up to level 5: each level means more Attack and Life.",
       "Every fight you win on an exploration may also give a card of a creature from a lower land. Now and then a card drops for work in a profession, for an attack on the Beast or a Guild Expedition guardian and for a completed Guild Trial: a card of a creature from the lands at your level or lower. From these sources, the cards you do not have yet come first.",
       "Once a day Szczęsny sells a pack of three cards of creatures from lands lower than yours, for as much gold as an hour of exploring brings at your level. Cards you do not have yet come first.",
-      "Your collection gives a lasting bonus: every 10 different cards add +1% XP and +1% gold from explorations, up to +15% for all 156 cards. It works from the moment you win a card. You can see your collection and its bonus in the Encyclopedia, under \"Cards\"."
+      "Your collection gives a lasting bonus: every 10 different cards add +1% XP and +1% gold from explorations, up to +15% for all 156 cards. It works from the moment you win a card. You can see your collection and its bonus in the Encyclopedia, under \"Cards\".",
+      "In the Settlement you can also play the residents: each plays at their own place, with their own deck. Their decks fill the gaps between Szczęsny's tiers, and the hermit Sambor's deck is stronger even than tier V. Matches for a stake with the residents count towards the same 10 a day. Your first win for a stake against a resident gives a card from their deck that you don't have, and every later one a 10% chance of a card from their deck."
     ],
     "win": ["\"A good match! I didn't see that coming.\"", "\"Your win. The cards like you today.\"", "\"Well played! Next time I won't hold back.\""],
     "loss": ["\"My match. The deck forgives no mistakes.\"", "\"This time the stake stays with me.\"", "\"That was close. Shuffle and come back.\""],

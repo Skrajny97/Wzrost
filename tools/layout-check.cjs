@@ -78,6 +78,8 @@ const SCREENS = [
   '#/labirynt',
   '#/osada/arena',
   '#/osada/casino/cards',
+  '#/osada/herbalist/cards',
+  '#/osada/market/cards',
   '#/spolecznosc',
   '#/spolecznosc/ranking',
   '#/spolecznosc/slawa',
@@ -124,6 +126,8 @@ const TRANSLATED = new Set([
   '#/labirynt',
   '#/osada/arena',
   '#/osada/casino/cards',
+  '#/osada/herbalist/cards',
+  '#/osada/market/cards',
   '#/spolecznosc',
   '#/spolecznosc/ranking',
   '#/spolecznosc/slawa',
@@ -323,7 +327,9 @@ async function main() {
   // Talia Systemu (the Salon Gier's "Karty", where CARDS is on: npm run
   // dev): the starter deck taken and a match against Szczęsny's last tier,
   // its strongest cards, on the table. Without the cards the Encyklopedia
-  // has no "Karty", so no card's sheet to open there.
+  // has no "Karty", so no card's sheet to open there. The residents' tables
+  // (904 B: Jagna's, and Gościwit's with the longest forms of a name) open
+  // by their address, under the busts, with that match waiting in the Salon.
   if ((await api('POST', '/api/cards/starter')) < 400) {
     if ((await api('POST', '/api/cards/match', { tier: 5, staked: false })) >= 400) throw new Error('Nie zaczęła się partia kart.');
   } else delete SHEETS['#/encyklopedia/cards'];
