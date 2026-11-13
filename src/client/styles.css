@@ -10453,6 +10453,8 @@ a.profession-square:active {
   gap: 8px;
   font-size: 20px;
   font-weight: 700;
+  /* A very long name breaks inside its frame on a 320 px phone. */
+  overflow-wrap: anywhere;
 }
 
 .select-tag {
