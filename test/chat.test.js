@@ -380,4 +380,50 @@ describe('Czat', () => {
     await database.prepare('DELETE FROM items WHERE id = ?').bind(one).run();
     assert.equal((await call('GET', '/api/chat?channel=trade', { cookie: players.ola })).data.messages[0].items.length, 2);
   });
+
+  test('a message in the Wymiana shows the writer\'s materials, minerals, herbs, potions and camp resources, no more than it has', async () => {
+    const database = await db();
+    await database
+      .prepare("UPDATE characters SET materials = ?, minerals = ?, herbs = ?, potions = ?, resources = ? WHERE name = 'Ala'")
+      .bind(JSON.stringify({ 'wolf-pelt:rare': 12 }), JSON.stringify({ quartz: 3 }), JSON.stringify({ comfrey: 40 }), JSON.stringify({ 'lesser-healing': 2 }), JSON.stringify({ wood: 500 }))
+      .run();
+    const offer = (stacks, channel = 'trade') => call('POST', '/api/chat', { cookie: players.ala, body: { channel, text: 'Sprzedam', stacks } });
+    const goods = [
+      { kind: 'material', id: 'wolf-pelt:rare', count: 10 },
+      { kind: 'mineral', id: 'quartz', count: 3 },
+      { kind: 'herb', id: 'comfrey', count: 40 },
+      { kind: 'potion', id: 'lesser-healing', count: 1 },
+      { kind: 'resource', id: 'wood', count: 500 },
+    ];
+    const sent = await offer(goods);
+    assert.equal(sent.status, 201);
+    assert.equal(sent.data.message.stacks.length, 5);
+    const [seen] = (await call('GET', '/api/chat?channel=trade', { cookie: players.ola })).data.messages;
+    assert.deepEqual(
+      seen.stacks.map(({ kind, id, count }) => ({ kind, id, count })),
+      goods,
+    );
+    // Each with its name in the reader's language, a material and a mineral
+    // with their rarity, and what each is.
+    const [pelt, quartz, comfrey] = seen.stacks;
+    assert.match(pelt.name, /^Rzadka skóra wilka$/);
+    assert.equal(pelt.materialId, 'wolf-pelt');
+    assert.ok(pelt.color && pelt.rarityName && pelt.description);
+    assert.equal(quartz.rarity, 'common');
+    assert.equal(comfrey.name, 'Żywokost');
+    assert.equal(comfrey.rarity, undefined);
+    // Only in the Wymiana, only what the writer has, at most five kinds,
+    // none twice.
+    await age();
+    assert.equal((await offer([goods[0]], 'global')).data.error.code, 'no_items_here');
+    assert.equal((await offer([{ ...goods[0], count: 13 }])).data.error.code, 'not_enough');
+    assert.equal((await offer([{ kind: 'herb', id: 'nothing', count: 1 }])).data.error.code, 'bad_stacks');
+    assert.equal((await offer([{ kind: 'gold', id: 'gold', count: 1 }])).data.error.code, 'bad_stacks');
+    assert.equal((await offer([{ ...goods[2], count: 0 }])).data.error.code, 'bad_stacks');
+    assert.equal((await offer([goods[2], goods[2]])).data.error.code, 'bad_stacks');
+    assert.equal((await offer([...goods, { kind: 'mineral', id: 'iron-ore', count: 1 }])).data.error.code, 'too_many_stacks');
+    // Spent later, the offer still shows the pieces it named.
+    await database.prepare("UPDATE characters SET herbs = '{}' WHERE name = 'Ala'").run();
+    assert.equal((await call('GET', '/api/chat?channel=trade', { cookie: players.ola })).data.messages[0].stacks.length, 5);
+  });
 });
