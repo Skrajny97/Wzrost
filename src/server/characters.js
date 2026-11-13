@@ -1260,7 +1260,8 @@ function craftingView(row, levels, now) {
     maxRarity: table.maxRarity < 0 ? null : content().rarities[table.maxRarity].id,
     bonusChance: table.bonusChance,
     limit: content().balance.crafting.queueLimit,
-    // The words of "Usuń z kolejki" and "Usuń wszystkie" (data/buildings.json).
+    // The words of "Usuń z kolejki", "Usuń wszystkie" and the ≡ that moves
+    // an order waiting (data/buildings.json).
     texts: queueTexts(),
     materials: Object.entries(materials)
       .map(([key, count]) => {

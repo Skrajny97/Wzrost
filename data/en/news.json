@@ -640,6 +640,10 @@
     "0.3.10": {
       "title": "Version 0.3.10",
       "body": "- After a lost fight in the Labyrinth you can start it again once a day: from level 1, with your party at full HP. It costs a lot of gold, and the rewards you gained earlier that day stay.\n- An item card with a stone set in it shows each value without the stone and, beside it in brackets in the stone's colour, the value with it."
+    },
+    "0.3.11": {
+      "title": "Version 0.3.11",
+      "body": "- The Labyrinth gets harder with every level: level 1 is easy, level 2 medium, level 3 hard and the Hellish level very hard.\n- You can change the order of the Salvage Table's queue: hold ≡ by a waiting order and drag it to a new place. The order at work stays first, and the “Ready at” times are counted anew."
     }
   }
 }

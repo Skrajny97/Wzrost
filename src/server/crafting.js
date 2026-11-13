@@ -3,7 +3,8 @@
 // (crafting.js in the engine). The table's level sets the highest rarity it
 // takes and, later, the chance of extra parts. The queue works on its own,
 // also while the character is away, and an order not finished yet can leave
-// it with all it took given back (cancelOrders). An order's work counts for
+// it with all it took given back (cancelOrders); one waiting can move to
+// another place in it (moveOrder). An order's work counts for
 // the narrator's quests and the Próby Gildii once it ends, as the queue is
 // settled (settleTable in characters.js). Every change first settles the
 // queue at the present time and is saved only if the character is as read
@@ -21,6 +22,7 @@ import {
   itemName,
   knownStack,
   materialPrice,
+  moveInQueue,
   orderCancellable,
   orderMaterials,
   orderSalvage,
@@ -435,6 +437,41 @@ export async function cancelOrders(context) {
     ...trials.map(([trial, next]) => trialTakenBack(db, trial, next)),
   ]);
   return json({ cancelled: leaving.length, items: carried.length, stored: stored.length, character: characterView(await loadPlayer(db, session.userId), now) });
+}
+
+// The answers to a move the queue does not allow (moveInQueue): the code
+// and the words of data/buildings.json (the table's `queue.errors`).
+const MOVE_REFUSALS = {
+  gone: ['not_queued', 'gone'],
+  running: ['order_at_work', 'atWork'],
+  first: ['before_work', 'beforeWork'],
+  changed: ['queue_changed', 'changed'],
+};
+
+// A waiting order dragged by its ≡ to a new place (the author's 905 C,
+// after a player's note: „Do zrobienia w stole do rozbiórki jakiś shuffle w
+// kolejce”): { id, before } puts the order `id` right before the order
+// `before`, or last with `before` null (moveInQueue). The order at work
+// stays first: it does not move, and nothing goes before it. The orders
+// after it are counted anew from its end, each as long as it was, so the
+// queue ends when it did. Nothing else changes: each order keeps what it
+// took and what it will make, and the queue keeps its length. Saved only
+// if the character is as read, so a change made meanwhile asks for
+// another try, and the page draws the queue again from the answer.
+export async function moveOrder(context) {
+  const { session, player } = await requirePlayer(context);
+  const body = await readJson(context.request);
+  const now = context.now;
+  const settled = settleCrafting(craftingState(player.row), now);
+  const moved = moveInQueue(settled, body.id, body.before, now);
+  if (moved.reason) {
+    const [code, text] = MOVE_REFUSALS[moved.reason];
+    throw new ApiError(409, code, queueTexts().errors[text]);
+  }
+  const db = context.env.DB;
+  const result = await saveState(db, player.row, moved.state).run();
+  if (result.meta.changes !== 1) throw changed();
+  return json({ character: characterView(await loadPlayer(db, session.userId), now) });
 }
 
 // "Pomiń czas" at the table in test mode: every order ends now, and then

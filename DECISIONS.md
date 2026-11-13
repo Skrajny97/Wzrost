@@ -3231,6 +3231,13 @@ Autor: „W idle gierkach gdzie sie ma drużynę są często tak zwane labirynty
     - **Potwierdzenie:** okienko „Zacząć Labirynt od nowa?” mówi, co się stanie i ile to kosztuje.
     - To mały przycisk w istniejącym panelu, więc poszedł bez makiet. Sprawdzony na 320, 390, 1366 i 1920 px.
 
+24. **Trudność rosnąca z poziomem (autor, 13.11.2026, 0.3.11).** Autor: „Trudność Labiryntu powinna jednak być rosnaca, przy czym Poziom 1 powinien być łatwy, Poziom 2 średni-średnio trudny, Poziom 3 trudny i Poziom Piekielny bardzo trudny”. Siła poziomów (`levels[].strength` w `data/labyrinth.json`) to teraz: poziom 1 ×0,8 (było ×1,0), poziom 2 ×1,1 (było ×1,2), poziom 3 ×1,5 (było ×1,45), Piekielny ×3,0, wciąż dwa razy trzeci (854 A). Pomiar `tools/labyrinth-sim.mjs` (pięć klas, po 30 dni na 35., 50., 80., 120. i 200. poziomie, gracz z dwoma towarzyszami i rozsądnym wyborem komnat):
+    - poziom 1 przechodzi 98–100% dni (było 87–95%): łatwy;
+    - poziom 2 średnio 82% dni, od 60% do 93% zależnie od poziomu postaci (było 39–69%): średni;
+    - poziom 3 średnio 46% dni, od 25% do 70% (było 21–54%): trudny;
+    - Piekielny 0–3% dni: bardzo trudny.
+    Złoto całego dnia Labiryntu to teraz średnio 87–147 minut eksploracji, więc opłata za reset (150 minut, punkt 23) dalej jest wyższa niż złoto drugiego podejścia.
+
 ### Rozdział narratora o Labiryncie (878, 12.11.2026)
 
 Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą bez zatwierdzania (zasada z 6.11.2026).
@@ -3240,6 +3247,21 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 3. **Kwestia Sali prób** o próbach (645) przychodzi, jak dotąd, przy pierwszym spojrzeniu na Salę prób, ale dopiero po rozdziale Labiryntu, bo żadna kwestia miejsca nie przychodzi, gdy czeka rozdział.
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
+
+## Wersja 0.3.11 (13.11.2026): trudność Labiryntu rosnąca z poziomem, przeciąganie zleceń w kolejce Stołu rozbiórki (905 C)
+
+1. **Labirynt (autor, 13.11.2026):** poziom 1 łatwy, poziom 2 średni, poziom 3 trudny, Piekielny bardzo trudny. Siła poziomów ×0,8, ×1,1, ×1,5 i ×3,0. Liczby z pomiaru: „Labirynt Systemu i Rdzeń: zasady”, punkt 24.
+2. **Stół rozbiórki (905 C):** czekające zlecenie przestawia się w kolejce, przytrzymując ≡ i przeciągając je na nowe miejsce. Zasady: „Stół rozbiórki: przestawianie zleceń w kolejce (905 C, 13.11.2026)”.
+3. **Sprawdzone:** testy Labiryntu, kolejki Stołu rozbiórki (z nowym testem przestawiania), wież i rzemiosła oraz klienta (93 testy), typy, dane i tłumaczenia. Przeciąganie pomocnik sprawdził w przeglądarce na 320, 390, 1366 i 1920 px (dotyk i mysz, klawiatura, przewijanie strony, wyłączone animacje, po angielsku).
+
+## Stół rozbiórki: przestawianie zleceń w kolejce (905 C, 13.11.2026)
+
+Gracz przez autora: „Do zrobienia w stole do rozbiórki jakiś shuffle w kolejce”. Z trzech makiet autor wybrał C: przytrzymać ≡ przy zleceniu i przeciągnąć je na nowe miejsce.
+
+1. **Przeciąganie.** Gdy czekają co najmniej dwa zlecenia, każde czekające ma po lewej ≡. Zlecenie unosi się po chwili przytrzymania ≡ palcem (0,25 s), a myszą od razu, gdy mysz się ruszy. Uniesione zlecenie idzie za palcem, z cieniem i złotą obwódką, a przerywana ramka pokazuje, gdzie wyląduje. Szybkie przesunięcie palcem po ≡ dalej przewija stronę. Przy górnym i dolnym pasku strona przewija się sama, najdalej do końca kolejki. Pod kolejką stoi dopisek z makiety: „Przytrzymaj ≡ i przeciągnij zlecenie na nowe miejsce. Zlecenie w pracy zostaje pierwsze, a godziny „Gotowe o” liczą się od nowa.”
+2. **Zasady.** Zlecenie w pracy zostaje pierwsze: nie da się go przesunąć ani postawić niczego przed nim. Godziny „Gotowe o” liczą się od nowa od końca zlecenia w pracy, a każde zlecenie trwa tyle co dotąd, więc kolejka kończy się o tej samej porze. Zlecenie zachowuje wszystko, co wzięło i co da, a kolejka swoją długość (limit 10 zleceń bez zmian).
+3. **Brakujące szczegóły.** Przy jednym czekającym zleceniu ≡ nie ma, bo nie ma go dokąd przesunąć. Strzałki w górę i w dół na ≡ wybranym klawiszem Tab przesuwają zlecenie o jedno miejsce. Z wyłączonymi animacjami nic nie sunie: zlecenia od razu stają na nowym miejscu. Gdy kolejka zmieni się, zanim przesunięcie dotrze do gry (np. zlecenie w pracy właśnie się skończyło), gra odmawia, mówi dlaczego i rysuje kolejkę od nowa.
+4. **API.** `POST /api/craft/move` z `{ id, before }`: zlecenie `id` staje tuż przed zleceniem `before`, a z `before: null` na końcu (`moveInQueue` w `src/engine/crafting.js`). Zapis tylko przy postaci takiej jak przy odczycie. Teksty są w `data/buildings.json` (`queue` przy Stole rozbiórki). Przeciąganie rysuje `src/client/reorder.js`.
 
 ## Wersja 0.3.10 (13.11.2026): Labirynt od nowa po przegranej walce, wartości z kamieniem w nawiasie (906 B)
 
@@ -3284,7 +3306,7 @@ Autor 13.11.2026, ze zrzutem zakładki Rdzeń postaci na 31. poziomie: „Dalej 
 
 ## Wersja 0.3.7 (13.11.2026): Labirynt łatwiejszy, powrót po raporcie wyprawy i kamień w cudzej karcie postaci
 
-1. **Labirynt pośrodku (autor, 13.11.2026).** Autor: „Labirynt jest za trudny teraz. Trzeba znaleźć coś po środku między poprzednim a aktualnym poziomem trudności.” Stwory zostają na wyższym z poziomów postaci i klasy (0.2.90, decyzja autora), a niższa jest siła poziomów (`levels[].strength` w `data/labyrinth.json`): poziom 1 ×1,1 → ×1,0, poziom 2 ×1,35 → ×1,2, poziom 3 ×1,65 → ×1,45, Piekielny ×3,3 → ×2,9 (wciąż dwa razy trzeci, 854 A). Brakujący szczegół: środek liczony wynikami, nie poziomem stworów. Poziom pośrodku między poziomem postaci a wyższym z poziomów skakał z miejscami eksploracji: na 35. i 45. poziomie był łatwiejszy niż dawny Labirynt, a na 63. i 80. tak trudny jak obecny.
+1. **Labirynt pośrodku (autor, 13.11.2026).** *Zmienione w 0.3.11: siła poziomów rośnie wyraźniej, od łatwego poziomu 1 (zob. „Labirynt Systemu i Rdzeń: zasady”, punkt 24).* Autor: „Labirynt jest za trudny teraz. Trzeba znaleźć coś po środku między poprzednim a aktualnym poziomem trudności.” Stwory zostają na wyższym z poziomów postaci i klasy (0.2.90, decyzja autora), a niższa jest siła poziomów (`levels[].strength` w `data/labyrinth.json`): poziom 1 ×1,1 → ×1,0, poziom 2 ×1,35 → ×1,2, poziom 3 ×1,65 → ×1,45, Piekielny ×3,3 → ×2,9 (wciąż dwa razy trzeci, 854 A). Brakujący szczegół: środek liczony wynikami, nie poziomem stworów. Poziom pośrodku między poziomem postaci a wyższym z poziomów skakał z miejscami eksploracji: na 35. i 45. poziomie był łatwiejszy niż dawny Labirynt, a na 63. i 80. tak trudny jak obecny.
    - Symulacja (`tools/labyrinth-sim.mjs --days 48`, wszystkie klasy, typowa postać z dwoma towarzyszami, bez Rdzenia), ile dni kończy się przejściem poziomu 1 / 2 / 3: dawny Labirynt (poziom postaci) → przed 0.3.7 → teraz.
    - 35: 98/74/45% → 95/53/25% → 99/78/51%
    - 45: 100/98/79% → 79/28/10% → 92/56/28%

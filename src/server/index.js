@@ -45,7 +45,7 @@ import { changePassword, forgotPassword, resetPassword } from './password.js';
 import { guildRanking } from './guild-fame.js';
 import { getGuildRanking } from './guild-members.js';
 import { claimFame, getFame } from './fame.js';
-import { cancelOrders, craftMaterials, salvageItem, salvageItems, sellMaterials, skipCrafting } from './crafting.js';
+import { cancelOrders, craftMaterials, moveOrder, salvageItem, salvageItems, sellMaterials, skipCrafting } from './crafting.js';
 import { buyCosmetic, setNameColor, wearCosmetic } from './cosmetics.js';
 import { authorPaymentAction, authorPayments, getPayments, orderPoints, paymentNotice, paymentNoticeAddress, paymentReturn, withdrawPurchase } from './payments.js';
 import { confirmEmail, requestLink } from './email.js';
@@ -228,6 +228,7 @@ const routes = [
   ['POST', '/api/items/:id/salvage', salvageItem],
   ['POST', '/api/craft/materials', craftMaterials],
   ['POST', '/api/craft/cancel', cancelOrders],
+  ['POST', '/api/craft/move', moveOrder],
   ['POST', '/api/materials/sell', sellMaterials],
   ['POST', '/api/quests/claim', claimQuest],
   ['POST', '/api/quests/claim-all', claimAllQuests],

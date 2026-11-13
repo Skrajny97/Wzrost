@@ -5753,6 +5753,87 @@ a.camp-level-button {
   color: var(--text);
 }
 
+/* An order waiting moves by its ≡ at the row's left (the author's 905 C,
+   craft-table.js): the handle takes the row's whole height and a little
+   more than its strip, so a finger finds it. */
+.craft-row--moves {
+  position: relative;
+  padding-left: 30px;
+}
+
+.craft-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  width: 40px;
+  padding: 0 0 0 8px;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font-size: 22px;
+  line-height: 1;
+  cursor: grab;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.craft-handle:focus-visible {
+  outline-offset: -3px;
+}
+
+/* A row lifted by its handle (reorder.js): its copy follows the pointer
+   over the list, raised, with a shadow and a gold edge, and its own place
+   is a dashed frame where it will land. The page selects no text and shows
+   the grabbing hand meanwhile. */
+.reorder-list {
+  position: relative;
+}
+
+.reorder-ghost {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 3;
+  border-radius: 6px;
+  outline: 2px solid var(--gold);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.75);
+  transform: rotate(-1.2deg) scale(1.03);
+  pointer-events: none;
+  animation: reorder-lift 0.12s ease-out;
+}
+
+@keyframes reorder-lift {
+  from {
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+.reorder-frame {
+  border-color: transparent;
+  border-radius: 6px;
+  outline: 2px dashed var(--gold);
+  outline-offset: -2px;
+  background: transparent;
+  opacity: 0.7;
+}
+
+.reorder-frame > * {
+  visibility: hidden;
+}
+
+:root.reorder-dragging,
+:root.reorder-dragging * {
+  cursor: grabbing;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 /* Volume sliders in the settings */
 
 .status-row--volume {
@@ -6947,7 +7028,8 @@ a.camp-level-button {
 .calm .guide-ring,
 .calm .guide-ring--nudge,
 .calm .guide-note .sprite--narrator,
-.calm .quest-chest--ready .quest-chest-art {
+.calm .quest-chest--ready .quest-chest-art,
+.calm .reorder-ghost {
   animation: none;
 }
 
