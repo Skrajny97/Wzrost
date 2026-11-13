@@ -156,3 +156,61 @@ describe('the report of a room of the Labirynt', () => {
     mounted.unmount();
   });
 });
+
+// The Tablica zleceń in the Osada (screens/settlement.js): an empty slot's
+// countdown moves with the screen's tick instead of standing still.
+describe("the Osada's Tablica zleceń", () => {
+  const order = (id, extra = {}) => ({
+    id,
+    kind: 'resource',
+    key: 'wood',
+    count: 10,
+    have: 0,
+    gold: 120,
+    reputation: 2,
+    brotherhood: 'hunters',
+    brotherhoodName: 'Bractwo Łowców',
+    story: 'Most na brodzie znowu się sypie.',
+    label: 'Drewno',
+    systemPoints: 0,
+    ...extra,
+  });
+  const readyAt = Date.now() + 3 * HOUR;
+  const osada = {
+    name: 'Osada',
+    places: [{ id: 'board', name: 'Tablica zleceń' }],
+    residents: [],
+    brotherhoods: [],
+    board: { slots: [{ readyAt }, { order: order(2, { special: true, systemPoints: 1 }) }, { order: order(3) }], weekly: order('weekly', { systemPoints: 5 }), weeklyDone: false, refillMinutes: 180 },
+  };
+  let kept;
+  before(() => {
+    kept = { fetch: globalThis.fetch, remove: globalThis.window.removeEventListener };
+    globalThis.fetch = async () => new Response(JSON.stringify({ settlement: osada }), { status: 200 });
+    globalThis.window.removeEventListener = () => {};
+  });
+  after(() => {
+    globalThis.fetch = kept.fetch;
+    globalThis.window.removeEventListener = kept.remove;
+  });
+
+  // The board's place on the screen, and its lines that begin with `start`.
+  async function board() {
+    const { mountSettlement } = await import('../src/client/screens/settlement.js');
+    state.character = character(null);
+    const screen = globalThis.document.createElement('main');
+    const mounted = mountSettlement(screen, { params: { place: 'board' } });
+    await settled();
+    const lines = (start) => screen.find((node) => node.tagName === 'P' && node.textContent.startsWith(start)).map((node) => node.textContent);
+    return { mounted, lines };
+  }
+
+  test('an empty slot counts down every second', async () => {
+    const { mounted, lines } = await board();
+    mounted.tick(readyAt - 2 * HOUR);
+    assert.deepEqual(lines('Nowe zlecenie'), ['Nowe zlecenie za 2:00:00.']);
+    mounted.tick(readyAt - 61000);
+    assert.deepEqual(lines('Nowe zlecenie'), ['Nowe zlecenie za 01:01.']);
+    mounted.unmount();
+  });
+});
