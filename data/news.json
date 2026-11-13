@@ -860,6 +860,11 @@
       "id": "0.3.21",
       "title": "Wersja 0.3.21",
       "body": "- Czat, kanał „Wymiana”: do oferty dołączysz teraz nie tylko przedmioty z plecaka, ale też materiały, minerały, zioła, mikstury i zasoby obozu, do 5 rodzajów naraz, z liczbą sztuk. Dotknij takiego towaru w cudzej ofercie, a zobaczysz, co to jest i ile go masz."
+    },
+    {
+      "id": "0.3.22",
+      "title": "Wersja 0.3.22",
+      "body": "- Walka: lista krain jest krótsza. Otwarte krainy mają swoje karty, a kraina na Twój poziom ma znaczek „Twój poziom”. Krainy, które jeszcze się nie otworzyły, są zwinięte w „Kolejne krainy”.\n- Karty na telefonie: stuknij pustą linię, a wysunie się Twoja rezerwa i wybierzesz kartę na tę linię. „Walcz” jest zawsze na dole ekranu, a „Poddaj” pod stołem.\n- Targowisko: przedmiot, który się nie sprzeda albo który wycofasz, wraca do Ciebie taki, jaki był. Twoje znalezisko nie staje się już przedmiotem zdobytym od innych graczy.\n- Kółko czatu nie zasłania już ostatniego przycisku na ekranie."
     }
   ]
 }
