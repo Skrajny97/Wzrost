@@ -18,8 +18,10 @@
 // see (guilds.js), and one for each private conversation, which only its two
 // characters see; "Prywatna wiadomość" on a character's sheet opens one
 // (profile.js), and its × closes it until a newer message comes. In the
-// Wymiana a message can show up to three items of the bag, picked under the
-// line to write in, for offers made in words; a tap on one shows its card.
+// Wymiana a message can show up to three items of the bag and up to five
+// kinds of materials, minerals, herbs, potions and camp resources, each with
+// its number of pieces (goods.js), picked under the line to write in, for
+// offers made in words; a tap on one shows its card.
 // The newest messages are at the bottom, over the line to
 // write in. While the chat
 // is open and the page is in front, it asks for new messages every few
@@ -42,7 +44,7 @@
 // is read (chat-news.js, src/server/mentions.js).
 
 import { $, fill, h, icon } from '../dom.js';
-import { dateTimeFormat, timeFormat } from '../format.js';
+import { dateTimeFormat, formatNumber, timeFormat } from '../format.js';
 import {
   channelNews,
   channelRead,
@@ -66,6 +68,7 @@ import { accountNameHint } from '../account-name.js';
 import { discordButton } from '../discord.js';
 import { language, t } from '../i18n.js';
 import { CLASS_ICONS } from '../icons.js';
+import { GOODS_KINDS, goodsArt, goodsHeading, goodsKindName, ownedCount, ownedGoods } from '../goods.js';
 import { appendMention, matchingPeople, taggedParts, typedMention, withMention } from '../mentions.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, serverNow, state } from '../state.js';
@@ -305,8 +308,10 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   const tagged = person || mention ? null : mentionChannel();
   let channel = (tagged === GUILD.id && guildChannel() ? GUILD : chat.channels.find((entry) => entry.id === tagged)) ?? chat.channels[0];
   let talk = person && { id: person.id, name: person.name };
-  // The items of the bag the next message in the Wymiana shows.
+  // The items of the bag the next message in the Wymiana shows, and its
+  // goods with the number of pieces of each (goods.js).
   let attached = [];
+  let goods = [];
   let conversations = [];
   let messages = [];
   let account = null;
@@ -336,7 +341,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   const sendButton = h('button', { type: 'submit', class: 'button button--system chat-send', text: t('Wyślij') });
   const attachButton = h(
     'button',
-    { type: 'button', class: 'icon-button chat-attach', 'aria-label': t('Pokaż przedmioty z plecaka'), onClick: pickItems },
+    { type: 'button', class: 'icon-button chat-attach', 'aria-label': t('Pokaż przedmioty i materiały'), onClick: () => pickOffer() },
     icon('pouch', { size: 20 }),
   );
   // "Dodaj link", the admin's alone: a label and an address, put into the
@@ -380,7 +385,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
     );
     label.focus();
   }
-  const attachedList = h('ul', { class: 'chat-attached', 'aria-label': t('Przedmioty w wiadomości') });
+  const attachedList = h('ul', { class: 'chat-attached', 'aria-label': t('Przedmioty i materiały w wiadomości') });
   // The names "@" suggests, over the line (see suggest below).
   const suggestions = h('ul', { class: 'chat-mentions', id: `${id}-mentions`, role: 'listbox', 'aria-label': tagWords.suggestions, hidden: true });
   const form = h(
@@ -526,10 +531,24 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   // The line takes the focus once it shows (a name put in before).
   let focusLine = false;
 
-  // The items picked for the next message, each with a × to leave it out;
-  // the button to pick them only in a channel with items.
+  // The items and goods picked for the next message, each with a × to leave
+  // it out; the button to pick them only in a channel with items.
   function renderAttached() {
     attachButton.hidden = Boolean(talk) || !channel.items;
+    const drop = (label, leave) =>
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'chat-attached-drop',
+          'aria-label': label,
+          onClick: () => {
+            leave();
+            renderAttached();
+          },
+        },
+        icon('close', { size: 14 }),
+      );
     fill(
       attachedList,
       attached.map((item) =>
@@ -537,35 +556,57 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
           'li',
           { class: 'chat-attached-item' },
           h('span', { class: 'item-name', vars: { '--rarity': item.color }, text: item.name }),
-          h(
-            'button',
-            {
-              type: 'button',
-              class: 'chat-attached-drop',
-              'aria-label': t('Bez przedmiotu {name}', { name: item.name }),
-              onClick: () => {
-                attached = attached.filter((other) => other.id !== item.id);
-                renderAttached();
-              },
-            },
-            icon('close', { size: 14 }),
-          ),
+          drop(t('Bez przedmiotu {name}', { name: item.name }), () => {
+            attached = attached.filter((other) => other.id !== item.id);
+          }),
+        ),
+      ),
+      goods.map((good) =>
+        h(
+          'li',
+          { class: 'chat-attached-item chat-attached-good' },
+          h('span', { class: 'potion-pick-art' }, goodsArt(good, 20)),
+          h('span', { class: 'item-name', vars: good.color ? { '--rarity': good.color } : {}, text: `${good.name} ×${formatNumber(good.count)}` }),
+          drop(t('Bez materiału {name}', { name: good.name }), () => {
+            goods = goods.filter((other) => other !== good);
+          }),
         ),
       ),
     );
-    attachedList.hidden = attached.length === 0;
+    attachedList.hidden = attached.length === 0 && goods.length === 0;
   }
 
-  // The bag in a sheet: up to chat.itemsMax of its items for the message.
-  function pickItems() {
+  // What the next message shows, in a sheet of two tabs: up to
+  // chat.itemsMax items of the bag, and up to chat.stacksMax kinds of goods,
+  // each with as many pieces as the player types, all it has to start with.
+  function pickOffer() {
     const bag = state.character.bag ?? [];
+    const owned = ownedGoods(state.character);
+    const keyOf = (good) => `${good.kind} ${good.id}`;
     const picked = new Set(attached.map((item) => item.id).filter((id) => bag.some((item) => item.id === id)));
-    const count = h('p', { class: 'muted' });
-    const showCount = () => {
-      count.textContent = t('Wybrane: {count} z {max}.', { count: picked.size, max: chat.itemsMax });
-    };
-    showCount();
-    const rows = bag.map((item) => {
+    // The goods chosen, by kind and id, with the pieces to show: those
+    // picked before, at most as many as the character has now.
+    const chosen = new Map(
+      goods.flatMap((good) => {
+        const have = owned.find((one) => keyOf(one) === keyOf(good));
+        return have ? [[keyOf(good), Math.min(good.count, have.count)]] : [];
+      }),
+    );
+    let tab = picked.size === 0 && chosen.size > 0 ? 'goods' : 'items';
+    const tabs = h('div', { class: 'segmented chat-offer-tabs', role: 'group', 'aria-label': t('Co pokaże wiadomość') });
+    const body = h('div', { class: 'chat-offer-body' });
+    const tabButton = (id, label) =>
+      h('button', {
+        type: 'button',
+        class: 'segmented-option',
+        'aria-pressed': String(tab === id),
+        text: label,
+        onClick: () => {
+          tab = id;
+          draw();
+        },
+      });
+    const itemRow = (item) => {
       const row = h(
         'button',
         {
@@ -578,19 +619,100 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
               toast(t('Jedna wiadomość pokaże najwyżej {count} przedmioty.', { count: chat.itemsMax }));
               return;
             } else picked.add(item.id);
-            row.setAttribute('aria-pressed', String(picked.has(item.id)));
-            showCount();
+            draw();
           },
         },
         itemSummary(item),
         h('span', { class: 'trade-pick-mark', 'aria-hidden': 'true' }, icon('check', { size: 18 })),
       );
       return h('li', {}, row);
-    });
+    };
+    // A good: a tap picks it or leaves it out; picked, its number of pieces.
+    const goodRow = (good) => {
+      const key = keyOf(good);
+      const on = chosen.has(key);
+      const id = `chat-good-${good.kind}-${good.id.replace(/[^\w-]/g, '-')}`;
+      const input = h('input', {
+        type: 'number',
+        id,
+        class: 'trade-number',
+        min: '1',
+        max: String(good.count),
+        step: '1',
+        inputmode: 'numeric',
+        value: String(chosen.get(key) ?? good.count),
+        onInput: () => {
+          const value = Number(input.value);
+          if (Number.isInteger(value) && value >= 1) chosen.set(key, Math.min(value, good.count));
+        },
+      });
+      return h(
+        'li',
+        { class: 'chat-good-pick' },
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'item-row trade-pick chat-good-row',
+            'aria-pressed': String(on),
+            onClick: () => {
+              if (on) chosen.delete(key);
+              else if (chosen.size >= chat.stacksMax) {
+                toast(t('Jedna wiadomość pokaże najwyżej {count} rodzajów materiałów.', { count: chat.stacksMax }));
+                return;
+              } else chosen.set(key, good.count);
+              draw();
+            },
+          },
+          h('span', { class: 'potion-pick-art' }, goodsArt(good, 20)),
+          h('span', { class: 'trade-stack-name', vars: good.color ? { '--rarity': good.color } : {}, text: good.name }),
+          h('span', { class: 'muted trade-stack-count', text: `×${formatNumber(good.count)}` }),
+          h('span', { class: 'trade-pick-mark', 'aria-hidden': 'true' }, icon('check', { size: 18 })),
+        ),
+        on &&
+          h(
+            'div',
+            { class: 'trade-field chat-good-amount' },
+            h('label', { for: id, class: 'trade-field-label', text: t('Ile sztuk pokazać') }),
+            input,
+            h('span', { class: 'muted trade-field-most', text: t('z {max}', { max: formatNumber(good.count) }) }),
+          ),
+      );
+    };
+    function draw() {
+      fill(
+        tabs,
+        tabButton('items', picked.size > 0 ? t('Przedmioty ({count})', { count: picked.size }) : t('Przedmioty')),
+        tabButton('goods', chosen.size > 0 ? t('Materiały ({count})', { count: chosen.size }) : t('Materiały')),
+      );
+      if (tab === 'items') {
+        fill(
+          body,
+          bag.length === 0
+            ? h('p', { class: 'muted', text: t('W plecaku nie ma przedmiotów. Założonych nie pokażesz.') })
+            : [h('p', { class: 'muted', text: t('Wybrane: {count} z {max}.', { count: picked.size, max: chat.itemsMax }) }), h('ul', { class: 'item-list' }, bag.map(itemRow))],
+        );
+        return;
+      }
+      fill(
+        body,
+        owned.length === 0
+          ? h('p', { class: 'muted', text: t('Nie masz materiałów, minerałów, ziół, mikstur ani zasobów obozu.') })
+          : [
+              h('p', { class: 'muted', text: t('Wybrane: {count} z {max}.', { count: chosen.size, max: chat.stacksMax }) }),
+              GOODS_KINDS.map((kind) => {
+                const ofKind = owned.filter((good) => good.kind === kind);
+                return ofKind.length > 0 && [h('h3', { class: 'profile-section', text: goodsHeading(kind) }), h('ul', { class: 'item-list chat-goods' }, ofKind.map(goodRow))];
+              }),
+            ],
+      );
+    }
+    draw();
     openSheet(
-      h('h2', { class: 'sheet-title chat-sheet', text: t('Przedmioty do oferty') }),
-      h('p', { class: 'sheet-text', text: t('Wiadomość pokaże je wszystkim w Wymianie, tak jak wyglądają teraz. Same przedmioty zostają w plecaku.') }),
-      bag.length === 0 ? h('p', { class: 'muted', text: t('W plecaku nie ma przedmiotów. Założonych nie pokażesz.') }) : [count, h('ul', { class: 'item-list' }, rows)],
+      h('h2', { class: 'sheet-title chat-sheet', text: t('Do oferty') }),
+      h('p', { class: 'sheet-text', text: t('Wiadomość pokaże je wszystkim w Wymianie, tak jak wyglądają teraz. Wszystko zostaje u Ciebie.') }),
+      tabs,
+      body,
       h(
         'div',
         { class: 'sheet-actions' },
@@ -601,6 +723,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
           text: t('Gotowe'),
           onClick: () => {
             attached = bag.filter((item) => picked.has(item.id));
+            goods = owned.filter((good) => chosen.has(keyOf(good))).map((good) => ({ ...good, count: chosen.get(keyOf(good)) }));
             closeSheet();
             renderAttached();
             text.focus();
@@ -614,6 +737,29 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   const showItem = (item) =>
     openSheet(
       itemDetails(item),
+      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Zamknij'), onClick: closeSheet })),
+    );
+  // A good a message shows: what it is, how many pieces the message shows
+  // and how many the reader has.
+  const showGood = (good) =>
+    openSheet(
+      h(
+        'div',
+        { class: 'item-details' },
+        h(
+          'div',
+          { class: 'item-head' },
+          h('span', { class: 'item-art', vars: good.color ? { '--rarity': good.color } : {} }, goodsArt(good, 40)),
+          h(
+            'div',
+            {},
+            h('h2', { class: 'item-title', vars: good.color ? { '--rarity': good.color } : {}, text: good.name }),
+            h('p', { class: 'item-meta', text: t('{kind} · {count} szt.', { kind: good.rarityName ?? goodsKindName(good.kind), count: formatNumber(good.count) }) }),
+          ),
+        ),
+        good.description && h('p', { class: 'sheet-text', text: good.description }),
+        h('p', { class: 'muted', text: t('Ty masz: {count} szt.', { count: formatNumber(ownedCount(state.character, good.kind, good.id)) }) }),
+      ),
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Zamknij'), onClick: closeSheet })),
     );
   // The narrator points here at the chat's rules (narrator.js).
@@ -683,6 +829,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
     channel = nextChannel;
     talk = next && { id: next.id, name: next.name };
     attached = [];
+    goods = [];
     closeSuggestions();
     messages = [];
     fill(list);
@@ -803,6 +950,24 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
           'ul',
           { class: 'chat-items', 'aria-label': t('Przedmioty w ofercie') },
           message.items.map((item) => h('li', {}, h('button', { type: 'button', class: 'item-row chat-item', onClick: () => showItem(item) }, itemSummary(item)))),
+        ),
+      message.stacks?.length > 0 &&
+        h(
+          'ul',
+          { class: 'chat-goods-shown', 'aria-label': t('Materiały w ofercie') },
+          message.stacks.map((good) =>
+            h(
+              'li',
+              {},
+              h(
+                'button',
+                { type: 'button', class: 'chat-good', vars: good.color ? { '--rarity': good.color } : {}, onClick: () => showGood(good) },
+                h('span', { class: 'potion-pick-art' }, goodsArt(good, 20)),
+                h('span', { class: 'chat-good-name', text: good.name }),
+                h('span', { class: 'chat-good-count', text: `×${formatNumber(good.count)}` }),
+              ),
+            ),
+          ),
         ),
     );
   }
@@ -1087,13 +1252,15 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
     const value = text.value.trim();
     if (!value) return;
     const items = attached.map((item) => item.id);
+    const stacks = goods.map(({ kind, id, count }) => ({ kind, id, count }));
     const { message } = await call(
       'POST',
       '/api/chat',
-      talk ? { with: talk.id, text: value } : { channel: channel.id, text: value, ...(items.length > 0 && { items }) },
+      talk ? { with: talk.id, text: value } : { channel: channel.id, text: value, ...(items.length > 0 && { items }), ...(stacks.length > 0 && { stacks }) },
     );
     text.value = '';
     attached = [];
+    goods = [];
     renderAttached();
     add([message]);
     delay = chat.pollSeconds.min;

@@ -7614,6 +7614,67 @@ a.camp-level-button {
   padding: 6px 10px;
 }
 
+/* The goods a Wymiana message shows (materials, minerals, herbs, potions,
+   camp resources), each a chip with its picture, name and pieces that
+   opens its card; chips wrap to the next line on a narrow phone. */
+.chat-goods-shown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chat-good {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-height: 36px;
+  padding: 4px 10px 4px 6px;
+  border: 1px solid var(--rarity, var(--line));
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+}
+
+.chat-good-name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--rarity, var(--text));
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-good-count {
+  flex: none;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.chat-attached-good {
+  gap: 6px;
+  padding-left: 6px;
+}
+
+/* The goods in the sheet that picks them: a row to tap, and under a picked
+   one the number of pieces to show. */
+.chat-offer-tabs {
+  margin: 4px 0 8px;
+}
+
+.chat-good-row .trade-stack-name {
+  color: var(--rarity, var(--text));
+}
+
+.chat-good-amount {
+  margin: 4px 0 8px;
+}
+
 .chat-form input {
   flex: 1;
   min-width: 0;

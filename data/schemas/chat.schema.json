@@ -17,7 +17,7 @@
         "properties": {
           "id": { "type": "string", "pattern": "^[a-z]+$" },
           "name": { "type": "string" },
-          "items": { "type": "boolean", "description": "Wiadomość może pokazać przedmioty z plecaka (oferty Wymiany)." },
+          "items": { "type": "boolean", "description": "Wiadomość może pokazać przedmioty z plecaka oraz materiały, minerały, zioła, mikstury i zasoby obozu (oferty Wymiany)." },
           "language": { "type": "string", "enum": ["pl", "en"], "description": "Kanał jednego języka: tylko tam, gdzie serwer ma ten język (przełącznik ENGLISH), a czat strony w tym języku otwiera się na nim; czytać i pisać może tam każdy." }
         }
       }
@@ -25,7 +25,7 @@
     "rules": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["maxLength", "linkMaxLength", "everySeconds", "keep", "privateKeep", "items", "conversations", "page", "hideAfterReports", "pollSeconds", "translations"],
+      "required": ["maxLength", "linkMaxLength", "everySeconds", "keep", "privateKeep", "items", "stacks", "conversations", "page", "hideAfterReports", "pollSeconds", "translations"],
       "properties": {
         "maxLength": { "type": "integer", "minimum": 1 },
         "linkMaxLength": { "type": "integer", "minimum": 1, "description": "Najwięcej znaków wiadomości admina z linkami, razem z adresami (do maxLength liczy się tylko to, co widać: podpis zamiast adresu)." },
@@ -33,6 +33,7 @@
         "keep": { "type": "integer", "minimum": 1 },
         "privateKeep": { "type": "integer", "minimum": 1 },
         "items": { "type": "integer", "minimum": 1, "description": "Ile najwyżej przedmiotów pokazuje jedna wiadomość w kanale z items." },
+        "stacks": { "type": "integer", "minimum": 1, "description": "Ile najwyżej rodzajów materiałów, minerałów, ziół, mikstur i zasobów obozu pokazuje jedna wiadomość w kanale z items, każdy z liczbą sztuk." },
         "conversations": { "type": "integer", "minimum": 1 },
         "page": { "type": "integer", "minimum": 1 },
         "hideAfterReports": { "type": "integer", "minimum": 1 },
