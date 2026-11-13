@@ -414,6 +414,89 @@ export function labyrinthFighters(state, { character, equipped, name, companions
 /** @param {number} value */
 const shareOf = (value) => Math.round(Math.min(1, Math.max(0, value)) * 10000) / 10000;
 
+// The danger of a fight room on the board (899 A, 13.11.2026): how the
+// room's creatures stand against the party as it is now, with its HP,
+// blessings, companions and trophies. Sample fights against the room's
+// creatures at the room's strength, as labyrinthFight fights them, seeded by
+// `seed` (the server's: the day and the character) and the room, so the
+// board does not change until the party does; the room's own fight has a
+// seed of its own, so the samples never tell how it goes. 'deadly' (red)
+// when the party loses a quarter of them or more, 'even' (yellow) when it
+// loses fewer or wins them only at the cost of 40% of its HP or more, and
+// 'easy' (green) otherwise. A fight that drags on counts as lost, as in
+// labyrinthFight. First DANGER_SAMPLES fights; a room in doubt (some lost,
+// or a costly win) gets DANGER_MORE fights more. A healer can leave the
+// party with more HP than it had: a negative cost. Only the board shows it:
+// the creatures stay as strong as they are.
+export const DANGER_LEVELS = ['easy', 'even', 'deadly'];
+const DANGER_SAMPLES = 3;
+const DANGER_MORE = 3;
+// The share of the sample fights lost from which a room is deadly.
+const DEADLY_LOSSES = 0.25;
+// The share of the party's HP before the fight that a won fight may cost
+// at most, on average, to count as easy.
+const EASY_COST = 0.4;
+
+/**
+ * @param {{ state: LabyrinthState, type: string, row: number, room: number, party: { character: Record<string, any>, equipped: Record<string, any>[], name: string, companions?: Record<string, any>[], trophies?: Record<string, any>, week?: Record<string, any> | null }, seed: string }} options
+ * @param {Content} content
+ * @returns {string | null} One of DANGER_LEVELS, or null for a room without a fight.
+ */
+export function roomDanger({ state, type, row, room, party, seed }, content) {
+  if (!['fight', 'elite', 'guardian'].includes(type)) return null;
+  const { trophies = {} } = party;
+  const plan = labyrinthFoes({ day: state.day, level: state.level, row, room, type, charLevel: state.charLevel }, content);
+  const area = content.areasById[plan.areaId];
+  const standing = labyrinthFighters(state, { ...party, area }, content).filter((fighter) => fighter.unit.hp > 0);
+  if (!standing.some((fighter) => fighter.key === 'me')) return 'deadly';
+  const allies = standing.map((fighter) => (fighter.key === 'me' && Object.keys(trophies).length > 0 ? { ...fighter.unit, trophies } : fighter.unit));
+  const before = allies.reduce((sum, unit) => sum + unit.hp, 0);
+  const strength = labyrinthStrength(state.level, type, state.charLevel, content);
+  let fought = 0;
+  let lost = 0;
+  let cost = 0;
+  /** @param {number} times */
+  const sample = (times) => {
+    for (let i = 0; i < times; i++, fought++) {
+      const rng = createRng(`${seed}:${state.level}:${row}:${room}:${fought}`);
+      const enemies = encounterCombatants(plan.encounter, content, { strength });
+      const fight = simulateFight({ allies: allies.map((unit) => ({ ...unit })), enemies, rng, content, trait: area.trait });
+      if (fight.won !== true) {
+        lost += 1;
+        continue;
+      }
+      const after = allies.reduce((sum, unit) => sum + Math.max(0, fight.units.find((/** @type {{ id: string }} */ one) => one.id === unit.id)?.hp ?? 0), 0);
+      cost += (before - after) / before;
+    }
+  };
+  sample(DANGER_SAMPLES);
+  const won = () => fought - lost;
+  const costly = () => won() > 0 && cost / won() >= EASY_COST;
+  if (lost < fought && (lost > 0 || costly())) sample(DANGER_MORE);
+  if (lost > 0 && lost >= fought * DEADLY_LOSSES) return 'deadly';
+  return lost > 0 || costly() ? 'even' : 'easy';
+}
+
+// The rooms of a level's map the party can still reach from where it stands
+// (row -1: the entrance, any room of the first row), as "row:room" keys: the
+// rooms whose danger the board shows.
+/**
+ * @param {LabyrinthMap} map
+ * @param {number} row
+ * @param {number | null} room
+ * @returns {Set<string>}
+ */
+export function roomsAhead(map, row, room) {
+  /** @type {Set<string>} */
+  const ahead = new Set();
+  let current = reachableRooms(map, row, room);
+  for (let next = row + 1; next < map.rows.length && current.length > 0; next++) {
+    for (const index of current) ahead.add(`${next}:${index}`);
+    current = [...new Set(current.flatMap((index) => reachableRooms(map, next, index)))].sort((a, b) => a - b);
+  }
+  return ahead;
+}
+
 // Every fighter of the day's party healed by `share` of its maximum HP, the
 // fallen companions too (a spring, the merchant).
 /**

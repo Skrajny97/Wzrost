@@ -91,6 +91,16 @@ describe('the Labirynt Systemu through the API', () => {
     // author, 12.11.2026.
     assert.equal(labyrinth.charLevel, 50);
     assert.ok(labyrinth.map[0].every((room) => room.foes.length > 0 && room.foes.every((foe) => foe.level === 50)));
+    // At the entrance every fight of the level has its danger against the
+    // party (899 A), the other rooms none; the elites and the treasures
+    // show the level's Odłamki.
+    for (const row of labyrinth.map) {
+      for (const room of row) {
+        if (['fight', 'elite', 'guardian'].includes(room.type)) assert.ok(['easy', 'even', 'deadly'].includes(room.danger), `${room.type}: ${room.danger}`);
+        else assert.equal(room.danger, null);
+        assert.equal(room.shards, content.labyrinth.levels[0].shards[room.type] ?? null);
+      }
+    }
     assert.equal(labyrinth.fighters[0].key, 'me');
     assert.equal(labyrinth.fighters[0].hp, labyrinth.fighters[0].maxHp);
     // The same map as the engine's for the day, for everyone.
@@ -128,6 +138,13 @@ describe('the Labirynt Systemu through the API', () => {
       assert.equal(me.hp, report.fights[0].hpAfter);
       const map = labyrinthMap(today(), 1, content);
       assert.deepEqual(labyrinth.reachable, map.rows[0][0].links);
+      // The danger only on the rooms still ahead: none in the first row,
+      // nor in the second on the rooms its road misses.
+      assert.ok(labyrinth.map[0].every((one) => one.danger === null));
+      labyrinth.map[1].forEach((one, index) => {
+        if (!map.rows[0][0].links.includes(index)) assert.equal(one.danger, null);
+        else if (['fight', 'elite'].includes(one.type)) assert.ok(one.danger);
+      });
     }
     // The report is in the Dziennik, apart from the others.
     const journal = (await call('GET', '/api/reports', { cookie })).data.reports;

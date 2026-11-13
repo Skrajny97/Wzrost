@@ -41,6 +41,7 @@ import { renderCreate } from './screens/create.js';
 import { renderSelect } from './screens/select.js';
 import { mountJournal } from './screens/journal.js';
 import { mountSettlement } from './screens/settlement.js';
+import { mountLabyrinthBoard } from './labyrinth.js';
 import { mountShop } from './screens/shop.js';
 import { takePaymentReturn } from './screens/shop-points.js';
 import { mountProfessions } from './screens/professions.js';
@@ -92,6 +93,9 @@ const ROUTES = [
   // The Osada's board, or one of its places, the Karczma at one of its
   // tabs (settlement.js).
   { pattern: /^#\/osada(?:\/(?<place>[a-z0-9-]+)(?:\/(?<tab>[a-z]+))?)?$/, nav: 'main', tab: 'osada', part: ({ place }) => place, mount: mountSettlement },
+  // The Labirynt's board over the whole page (labyrinth.js), from its
+  // entrance in the Sala prób; a report opened from it comes back to it.
+  { pattern: /^#\/labirynt$/, nav: 'main', tab: 'osada', part: () => 'trial-hall', mount: mountLabyrinthBoard },
   // The Czat's address of the days it was a part of the Społeczność, in the
   // notifications sent before 0.2.40: the Czat's own screen now.
   { pattern: /^#\/spolecznosc\/czat$/, redirect: '#/czat' },

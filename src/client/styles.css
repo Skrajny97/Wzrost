@@ -20585,3 +20585,1064 @@ a.discord-button {
 .tavern-redraw p {
   margin: 0;
 }
+
+/* The Labirynt's entrance in the Sala prób (labyrinth.js): the way in over
+   the picture of the board, the fighters with their HP and the day's
+   rewards, all in one card. */
+.labyrinth-entry {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 10px 18px;
+}
+
+.labyrinth-entry > .system-action,
+.labyrinth-entry > p {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+/* The day's rewards one under another beside the party: big numbers
+   (+987,7 tys.) keep the whole width of the column. */
+.labyrinth-entry .labyrinth-gains-row {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+}
+
+.labyrinth-entry .labyrinth-gain {
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 5px;
+  padding: 4px 6px;
+}
+
+/* On the narrowest phones the party stands over the day's rewards, two
+   by two, so the rewards' numbers keep their room (+9,9 mln was cut at
+   320 px). */
+@media (max-width: 379px) {
+  .labyrinth-entry {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .labyrinth-entry .labyrinth-gains-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.labyrinth-over {
+  margin: 0;
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.labyrinth-door {
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--system-text);
+  text-decoration: none;
+}
+
+.labyrinth-door--over::before {
+  filter: saturate(0.5) brightness(0.8);
+}
+
+.labyrinth-door .labyrinth-head-text {
+  flex: 1 1 140px;
+}
+
+.labyrinth-door-label {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 8px 14px;
+  border: 1px solid var(--system);
+  border-radius: 8px;
+  background: rgba(8, 22, 26, 0.88);
+  font-family: var(--font-system);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  box-shadow: 0 0 14px rgba(143, 227, 239, 0.35);
+}
+
+.labyrinth-hero--hell .labyrinth-door-label {
+  border-color: #f08a9c;
+  box-shadow: 0 0 14px rgba(214, 69, 97, 0.4);
+}
+
+.labyrinth-door:not(.labyrinth-door--over) .labyrinth-door-label {
+  animation: labyrinth-glow 1.8s ease-in-out infinite;
+}
+
+.calm .labyrinth-door .labyrinth-door-label {
+  animation: none;
+}
+
+.labyrinth-hero .labyrinth-over {
+  margin: 10px 0 0;
+}
+
+.labyrinth-entry-party,
+.labyrinth-entry-gains {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.labyrinth-entry .labyrinth-subtitle {
+  margin: 0;
+}
+
+/* The fighters' small portraits with their HP. */
+.labyrinth-fighters {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+}
+
+.labyrinth-fighter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 46px;
+  min-width: 0;
+}
+
+.labyrinth-fighter-face {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border: 1px solid var(--system-line);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #1c2b2f, #0a1114);
+  color: var(--text-muted);
+}
+
+.labyrinth-fighter-face .sprite--bust {
+  width: 100%;
+  height: 100%;
+  object-fit: none;
+  image-rendering: pixelated;
+}
+
+.labyrinth-fighter-bar {
+  display: block;
+  width: 100%;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--hp-track);
+}
+
+.labyrinth-fighter-fill {
+  display: block;
+  height: 100%;
+  background: var(--hp);
+}
+
+.labyrinth-fighter-hp {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 11px;
+  line-height: 1;
+}
+
+.labyrinth-fighter--down .labyrinth-fighter-face {
+  filter: grayscale(1) brightness(0.55);
+}
+
+/* The day's rewards in one row. */
+.labyrinth-gains-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.labyrinth-gain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  padding: 6px 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(143, 227, 239, 0.04);
+  text-align: center;
+}
+
+.labyrinth-gain-value {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--text);
+  font-family: var(--font-system);
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.labyrinth-gain-label {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The board (labyrinth.js, #/labirynt): a screen over the whole page, its
+   bar at the top, the floor of the level's hall in the middle and, on a
+   phone, the party and its buttons at the bottom; on a computer the
+   panels stand beside the board. */
+.lab-board {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  padding-top: env(safe-area-inset-top, 0px);
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(143, 227, 239, 0.08), transparent 70%),
+    #05080a;
+  color: var(--text);
+}
+
+.lab-board--hell {
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(214, 69, 97, 0.12), transparent 70%),
+    #0a0405;
+}
+
+.lab-board-message {
+  margin: auto;
+  padding: 16px;
+}
+
+.lab-bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  min-height: 54px;
+  padding: 6px max(12px, env(safe-area-inset-right, 0px)) 6px max(12px, env(safe-area-inset-left, 0px));
+  border-bottom: 1px solid var(--system-line);
+  background: linear-gradient(rgba(6, 12, 15, 0.98), rgba(6, 12, 15, 0.86));
+}
+
+.lab-board--hell .lab-bar {
+  border-bottom-color: rgba(214, 69, 97, 0.55);
+}
+
+.lab-bar-back {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--system-line);
+  border-radius: 8px;
+  background: rgba(143, 227, 239, 0.06);
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.lab-bar-title {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.lab-bar-name {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.lab-bar-level {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 5px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.lab-board--hell .lab-bar-level > span:first-child {
+  color: #f08a9c;
+}
+
+.lab-bar-gold {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.lab-body {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  min-height: 0;
+}
+
+.lab-side {
+  display: none;
+}
+
+.lab-stage-wrap {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.lab-stage {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+/* The floor: the hall's picture (art/labyrinth/board-floor.png, Piekielny's
+   its own) over the System's cold glow on dark stone, as tall as the
+   screen, taller where its lanes would be too narrow. */
+.lab-floor {
+  --w: clamp(66px, 22vw, 96px);
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: calc((var(--lanes) + 0.8) * 68px);
+  background:
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.55)),
+    url('/art/labyrinth/board-floor.png') center / cover no-repeat,
+    radial-gradient(ellipse at 50% 30%, rgba(143, 227, 239, 0.12), transparent 60%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 32px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 32px),
+    #0b1216;
+  image-rendering: pixelated;
+}
+
+.lab-board--hell .lab-floor {
+  background:
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.6)),
+    url('/art/labyrinth/board-floor-hell.png') center / cover no-repeat,
+    radial-gradient(ellipse at 50% 30%, rgba(214, 69, 97, 0.16), transparent 60%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 32px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 32px),
+    #160809;
+}
+
+.lab-roads {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.lab-road {
+  fill: none;
+  stroke: rgba(143, 227, 239, 0.32);
+  stroke-dasharray: 2 7;
+  stroke-linecap: round;
+  stroke-width: 3;
+}
+
+.lab-road--past {
+  stroke: rgba(143, 227, 239, 0.1);
+}
+
+.lab-road--walked {
+  stroke: rgba(214, 246, 250, 0.85);
+  stroke-dasharray: none;
+  stroke-width: 3;
+}
+
+.lab-road--open {
+  stroke: var(--system);
+  stroke-dasharray: 4 7;
+  stroke-width: 4;
+  animation: lab-march 0.9s linear infinite;
+}
+
+.lab-board--hell .lab-road {
+  stroke: rgba(240, 138, 156, 0.3);
+}
+
+.lab-board--hell .lab-road--past {
+  stroke: rgba(240, 138, 156, 0.1);
+}
+
+.lab-board--hell .lab-road--walked {
+  stroke: rgba(255, 214, 220, 0.85);
+}
+
+.lab-board--hell .lab-road--open {
+  stroke: #ff9fb0;
+}
+
+@keyframes lab-march {
+  to {
+    stroke-dashoffset: -22;
+  }
+}
+
+.calm .lab-road--open {
+  animation: none;
+}
+
+/* The way in at the bottom of the board. */
+.lab-entrance {
+  position: absolute;
+  width: calc(var(--w) * 0.9);
+  height: calc(var(--w) * 0.34);
+  border: 2px solid rgba(143, 227, 239, 0.65);
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(143, 227, 239, 0.35), rgba(143, 227, 239, 0.05) 70%);
+  box-shadow: 0 0 16px rgba(143, 227, 239, 0.35);
+  transform: translate(-50%, -50%);
+}
+
+/* A room on its platform: the platform below (art/labyrinth/board-tile.png,
+   the guardian's its own), what waits there standing on it, its name under
+   it when the party may go in. */
+.lab-tile {
+  --tile-scale: 1;
+  --tw: calc(var(--w) * var(--tile-scale));
+  position: absolute;
+  z-index: 1;
+  width: var(--tw);
+  height: calc(var(--tw) * 1.15);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  transform: translate(-50%, -71%);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.lab-tile-base {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 66%;
+  background:
+    url('/art/labyrinth/board-tile.png') center / contain no-repeat,
+    radial-gradient(ellipse at 50% 45%, #3b4c55 0 46%, #1c262c 47% 62%, transparent 63%);
+  image-rendering: pixelated;
+}
+
+.lab-tile--guardian .lab-tile-base {
+  background:
+    url('/art/labyrinth/board-guardian-tile.png') center / contain no-repeat,
+    radial-gradient(ellipse at 50% 45%, #3a2228 0 46%, #1d1013 47% 62%, transparent 63%);
+}
+
+.lab-tile-piece {
+  position: absolute;
+  bottom: calc(var(--tw) * 0.37);
+  left: 50%;
+  display: grid;
+  place-items: end center;
+  width: calc(var(--tw) * 0.7);
+  height: calc(var(--tw) * 0.7);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.lab-tile-piece > img,
+.lab-tile-piece .labyrinth-art,
+.lab-tile-piece .labyrinth-art img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+  object-position: 50% 100%;
+  image-rendering: pixelated;
+}
+
+.lab-tile-piece .room-placeholder {
+  margin-bottom: 8px;
+}
+
+/* A room's own piece (art/labyrinth/piece-<type>.png, 64 × 64). */
+.lab-tile-piece--art {
+  bottom: calc(var(--tw) * 0.34);
+  width: calc(var(--tw) * 0.78);
+  height: calc(var(--tw) * 0.78);
+}
+
+.lab-tile-piece > img {
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.55));
+}
+
+.lab-tile--elite .lab-tile-piece > img {
+  filter: drop-shadow(0 0 3px rgba(255, 88, 88, 0.95)) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.55));
+}
+
+.lab-tile--guardian .lab-tile-piece > img {
+  filter: drop-shadow(0 0 4px rgba(255, 70, 110, 0.9)) drop-shadow(0 2px 0 rgba(0, 0, 0, 0.6));
+}
+
+.lab-tile-count,
+.lab-tile-mark {
+  position: absolute;
+  top: 34%;
+  right: 2%;
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: rgba(6, 12, 15, 0.9);
+  border: 1px solid var(--system-line);
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 11px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.lab-tile-mark {
+  top: 6%;
+  right: auto;
+  left: 8%;
+  border-color: rgba(255, 88, 88, 0.8);
+  color: #ff9a9a;
+}
+
+/* The danger of a fight room still ahead (899 A): a ring over the
+   platform's inlay in the colour of how its creatures stand against the
+   party now. The box is the platform's (.lab-tile-base), the ring on its
+   top face; outside the base, so the Piekielny's hue turn leaves it be. */
+.lab-tile-ring {
+  --ring: var(--lab-easy);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 66%;
+  pointer-events: none;
+}
+
+.lab-tile-ring::before {
+  content: '';
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  width: 80%;
+  height: 41%;
+  border: 2px solid var(--ring);
+  border-radius: 50%;
+  box-shadow:
+    0 0 6px var(--ring),
+    inset 0 0 5px var(--ring);
+  transform: translate(-50%, -50%);
+}
+
+.lab-tile--guardian .lab-tile-ring::before {
+  top: 51%;
+  width: 62%;
+  height: 27%;
+}
+
+.lab-tile-ring--even {
+  --ring: var(--lab-even);
+}
+
+.lab-tile-ring--deadly {
+  --ring: var(--lab-deadly);
+}
+
+:root {
+  --lab-easy: #6ee07a;
+  --lab-even: #f5cf4e;
+  --lab-deadly: #ff5b52;
+}
+
+/* The Odłamki of an elite or a treasure not taken yet. */
+.lab-tile-shards {
+  position: absolute;
+  top: 6%;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 18px;
+  padding: 0 6px 0 3px;
+  border: 1px solid var(--system-line);
+  border-radius: 9px;
+  background: rgba(6, 12, 15, 0.9);
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 11px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.lab-tile-shards .labyrinth-art,
+.lab-tile-shards .labyrinth-art img {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+/* The danger in a room's sheet and the rings in the legend. */
+.lab-danger {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.lab-danger-dot,
+.lab-danger-swatch {
+  flex: none;
+  width: 14px;
+  height: 9px;
+  margin-top: 0.3em;
+  border: 2px solid var(--lab-easy);
+  border-radius: 50%;
+  box-shadow: 0 0 4px var(--lab-easy);
+}
+
+.lab-danger--even .lab-danger-dot,
+.lab-danger-swatch--even {
+  border-color: var(--lab-even);
+  box-shadow: 0 0 4px var(--lab-even);
+}
+
+.lab-danger--deadly .lab-danger-dot,
+.lab-danger-swatch--deadly {
+  border-color: var(--lab-deadly);
+  box-shadow: 0 0 4px var(--lab-deadly);
+}
+
+.lab-danger-swatches {
+  display: inline-flex;
+  flex: none;
+  gap: 3px;
+  width: 32px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.lab-danger-swatches .lab-danger-swatch {
+  margin-top: 0;
+}
+
+.lab-tile-name {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  max-width: calc(var(--tw) * 1.3);
+  overflow: hidden;
+  padding: 1px 7px;
+  border: 1px solid var(--system);
+  border-radius: 999px;
+  background: rgba(6, 16, 19, 0.92);
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 11px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.lab-tile-check {
+  position: absolute;
+  bottom: 14%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(143, 227, 239, 0.85);
+  color: #06171b;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.lab-tile--open {
+  z-index: 2;
+}
+
+.lab-tile--open .lab-tile-base {
+  filter: drop-shadow(0 0 5px var(--system)) brightness(1.15);
+  animation: lab-tile-glow 1.6s ease-in-out infinite;
+}
+
+.lab-tile--open .lab-tile-piece {
+  animation: lab-bob 1.6s ease-in-out infinite;
+}
+
+.lab-board--hell .lab-tile:not(.lab-tile--guardian) .lab-tile-base {
+  filter: hue-rotate(160deg) saturate(1.4) brightness(0.85);
+}
+
+.lab-board--hell .lab-tile--open:not(.lab-tile--guardian) .lab-tile-base {
+  filter: hue-rotate(160deg) saturate(1.4) drop-shadow(0 0 5px #ff9fb0) brightness(1.1);
+  animation: none;
+}
+
+.lab-tile--done .lab-tile-base {
+  filter: brightness(0.8);
+}
+
+.lab-tile--past {
+  opacity: 0.38;
+  filter: grayscale(0.8);
+}
+
+.lab-tile:focus-visible {
+  outline: none;
+}
+
+.lab-tile:focus-visible .lab-tile-base {
+  outline: 2px solid var(--system);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+@keyframes lab-tile-glow {
+  50% {
+    filter: drop-shadow(0 0 10px var(--system)) brightness(1.3);
+  }
+}
+
+@keyframes lab-bob {
+  50% {
+    translate: 0 -4px;
+  }
+}
+
+.calm .lab-tile--open .lab-tile-base,
+.calm .lab-tile--open .lab-tile-piece {
+  animation: none;
+}
+
+/* The party's figure: the character walking in its look (its walk's sheet,
+   eight frames), the companions behind it, standing on the platform it is
+   in. */
+.lab-party {
+  --pw: calc(var(--w) * 0.95);
+  position: absolute;
+  z-index: 3;
+  width: var(--pw);
+  height: var(--pw);
+  background: 0 0 / 800% 100% no-repeat;
+  image-rendering: pixelated;
+  transform: translate(-50%, -86%);
+  pointer-events: none;
+}
+
+.lab-party--face {
+  display: grid;
+  place-items: center;
+}
+
+.lab-party--face > * {
+  width: 56%;
+  height: 56%;
+  overflow: hidden;
+  border: 2px solid var(--system);
+  border-radius: 50%;
+}
+
+.lab-party-mate {
+  position: absolute;
+  bottom: 6%;
+  z-index: -1;
+  width: 66%;
+  height: 66%;
+  background: 0 0 / 800% 100% no-repeat;
+  image-rendering: pixelated;
+  opacity: 0.92;
+}
+
+.lab-party-mate--1 {
+  left: -26%;
+}
+
+.lab-party-mate--2 {
+  right: -26%;
+}
+
+.lab-party--walking,
+.lab-party--walking .lab-party-mate {
+  animation: lab-walk 0.65s steps(8) infinite;
+}
+
+.lab-party--left {
+  scale: -1 1;
+}
+
+@keyframes lab-walk {
+  to {
+    background-position-x: -800%;
+  }
+}
+
+/* What to do now, over the bottom of the board. */
+.lab-hint,
+.lab-prompt {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  z-index: 4;
+  max-width: calc(100% - 24px);
+  margin: 0;
+  transform: translateX(-50%);
+}
+
+.lab-hint {
+  padding: 4px 12px;
+  border: 1px solid var(--system-line);
+  border-radius: 999px;
+  background: rgba(6, 14, 17, 0.88);
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 12px;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.lab-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+}
+
+.lab-prompt--over {
+  padding: 10px 14px;
+  border: 1px solid var(--system-line);
+  border-radius: 10px;
+  background: rgba(6, 14, 17, 0.94);
+  text-align: center;
+}
+
+.lab-prompt--over p {
+  margin: 0;
+  color: var(--system-text);
+  font-size: 14px;
+}
+
+.lab-prompt-choice {
+  box-shadow: 0 0 18px rgba(143, 227, 239, 0.45);
+  animation: labyrinth-glow 1.8s ease-in-out infinite;
+}
+
+.calm .lab-prompt-choice {
+  animation: none;
+}
+
+/* The phone's bottom bar. */
+.lab-dock {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding: 8px max(12px, env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
+  border-top: 1px solid var(--system-line);
+  background: linear-gradient(rgba(6, 12, 15, 0.9), rgba(6, 12, 15, 0.99));
+}
+
+.lab-dock-party {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.lab-dock-party .labyrinth-fighters {
+  gap: 6px;
+}
+
+.lab-dock-party .labyrinth-fighter {
+  width: 42px;
+}
+
+.lab-dock-party .labyrinth-fighter-face {
+  width: 36px;
+  height: 36px;
+}
+
+.lab-dock-buttons {
+  display: flex;
+  flex: none;
+  gap: 6px;
+}
+
+.lab-dock-button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid var(--system-line);
+  border-radius: 10px;
+  background: rgba(143, 227, 239, 0.07);
+  color: var(--system-text);
+  cursor: pointer;
+}
+
+.lab-dock-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.lab-dock-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: var(--gold);
+  color: #1a1408;
+  font-family: var(--font-system);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+/* The panels beside the board on a computer; the bottom bar gives way. */
+.lab-side-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lab-side-card .section-title {
+  margin: 0;
+}
+
+.lab-side .labyrinth-gains-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.lab-blessing-list,
+.lab-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lab-blessing-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 14px;
+}
+
+.lab-legend li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.lab-legend li > .labyrinth-art {
+  flex: none;
+}
+
+@media (max-width: 359px) {
+  .lab-bar-gold {
+    display: none;
+  }
+}
+
+@media (min-width: 900px) and (min-height: 560px) {
+  .lab-body {
+    gap: 16px;
+    padding: 12px max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px));
+  }
+
+  .lab-side {
+    display: flex;
+    flex: 0 1 300px;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 220px;
+    max-width: 320px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  .lab-side .card {
+    margin: 0;
+  }
+
+  .lab-stage-wrap {
+    max-width: 560px;
+    overflow: hidden;
+    border: 1px solid var(--system-line);
+    border-radius: 12px;
+    box-shadow: 0 0 40px rgba(143, 227, 239, 0.08);
+  }
+
+  .lab-board--hell .lab-stage-wrap {
+    border-color: rgba(214, 69, 97, 0.55);
+  }
+
+  .lab-floor {
+    --w: 100px;
+  }
+
+  .lab-dock {
+    display: none;
+  }
+}

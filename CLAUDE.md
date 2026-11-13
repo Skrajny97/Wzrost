@@ -27,6 +27,7 @@
 - Autor pracuje wyłącznie z telefonu. Każdą czynność po jego stronie opisz krok po kroku dla przeglądarki mobilnej.
 - Propozycje i pytania dawaj autorowi pozycja po pozycji: przedmiot po przedmiocie, z grafiką, nazwą i opisem, z numerem do odpowiedzi. Te z grafikami albo wariantami do wyboru idą na stronę ocen (wyżej), a nie w osobne dokumenty, bo autor nie chce przeskakiwać między okienkami ani przewijać wielu wiadomości. Dotyczy to też ewolucji klas i wszystkich kolejnych tematów. Makiety i grafiki numeruj osobno od pytań o decyzję, żeby jeden numer nie znaczył dwóch rzeczy. Autor: „616 sie powtarza ale nie tak jak powinno bo dwie rozne kwestie” (5.11.2026).
 - Treść gry (zdarzenia, przedmioty, potwory, NPC, teksty) trafia do `data/`, nigdy do logiki.
+- Teksty gry pisz prostą, naturalną polszczyzną i zwracaj się w nich do gracza („Twoja drużyna”), bez sztywnych wtrąceń w rodzaju „drużyna, jaka jest teraz”. Autor: „Łatwa walka: Twoja drużyna powinna poradzić sobie bez problemu.” i „Strasznie czasem kaleczysz ten język polski” (13.11.2026).
 - W tekstach gry wygrana niczym nie „płaci”: pisz „Za wygraną zgarniesz…”. Autor: „Nigdy "wygrana płaci czymś" a "Za wygraną zgarniesz xxx"” (7.11.2026).
 - `src/engine/` to czyste, deterministyczne funkcje, bez `Date.now()`, `Math.random()` i wejścia-wyjścia. Czas i ziarno losowości podaje serwer.
 - Gra działa na planie Workers Paid: do 30 s CPU na żądanie, a 30 mln ms CPU miesięcznie jest w cenie. Żądania i tak mają być szybkie.

@@ -43,8 +43,10 @@ import {
   merchantPrices,
   newLabyrinth,
   reachableRooms,
+  roomDanger,
   roomRefusal,
   roomRules,
+  roomsAhead,
 } from '../engine/index.js';
 import { say } from '../engine/text.js';
 import { atomically, sameVersion } from './atomic.js';
@@ -136,34 +138,56 @@ function foesOf(state, row, room, type) {
 }
 
 // The Labirynt for its page: the day and the levels (cleared, open), the
-// level's map with the party's position and the rooms it may enter (with
-// the creatures of each), the fighters with their HP, the blessings taken,
-// a choice waiting (with the merchant's prices), the day's rewards and the
-// words of the rooms.
-function labyrinthView(player, state) {
+// level's map with the party's position, the creatures of every room, the
+// danger of the fights still ahead (899 A) and the Odłamki of the elites and
+// treasures, the rooms it may enter, the fighters with their HP, the
+// blessings taken, a choice waiting (with the merchant's prices), the day's
+// rewards and the words of the rooms.
+function labyrinthView(player, state, now) {
   const map = labyrinthMap(state.day, state.level, content());
   const reachable = state.over || state.pending ? [] : reachableRooms(map, state.row, state.room);
   const character = engineCharacter(player.row);
-  const fighters = labyrinthFighters(state, { character, equipped: equippedItems(player), name: player.row.name, companions: teamOf(player, state) }, content());
+  const equipped = equippedItems(player);
+  const companions = teamOf(player, state);
+  const fighters = labyrinthFighters(state, { character, equipped, name: player.row.name, companions }, content());
   const counts = {};
   for (const id of state.blessings) counts[id] = (counts[id] ?? 0) + 1;
   const prices = merchantPrices(state.charLevel, content());
   const pending = state.pending;
+  const level = labyrinthLevel(state.level, content());
+  const foes = map.rows.map((rooms, row) => rooms.map((room, index) => foesOf(state, row, index, room.type)));
+  // The danger of the fights the party can still reach, against the party
+  // as it is now, with the trophies for every creature of the map.
+  const ahead = state.over ? new Set() : roomsAhead(map, state.row, state.room);
+  const monsterIds = [...new Set(foes.flat().flatMap((list) => (list ?? []).map((foe) => foe.monsterId)))];
+  const party = { character, equipped, name: player.row.name, companions, trophies: monsterIds.length > 0 ? trophiesFor(player, now, monsterIds) : {}, week: weekNow(now) };
+  const dangerSeed = `danger:${state.day}:${player.row.id}`;
+  const dangerOf = (row, index, type) => (ahead.has(`${row}:${index}`) ? roomDanger({ state, type, row, room: index, party, seed: dangerSeed }, content()) : null);
   return {
     day: state.day,
     level: state.level,
     charLevel: state.charLevel,
-    levels: labyrinthLevels(content()).map((level, index) => ({
+    levels: labyrinthLevels(content()).map((one, index) => ({
       number: index + 1,
-      id: level.id,
-      name: level.name,
-      hell: Boolean(level.hell),
+      id: one.id,
+      name: one.name,
+      hell: Boolean(one.hell),
       cleared: state.cleared >= index + 1,
       open: index + 1 <= state.level,
     })),
     over: state.over,
     started: Boolean(storedState(player.row, state.day)),
-    map: map.rows.map((rooms, row) => rooms.map((room, index) => ({ type: room.type, links: room.links, foes: reachable.includes(index) && row === state.row + 1 ? foesOf(state, row, index, room.type) : null }))),
+    // Every room's creatures, which the board shows on its platforms (the
+    // board of 13.11.2026: the party sees what waits ahead and picks its way).
+    map: map.rows.map((rooms, row) =>
+      rooms.map((room, index) => ({
+        type: room.type,
+        links: room.links,
+        foes: foes[row][index],
+        danger: dangerOf(row, index, room.type),
+        shards: level.shards?.[room.type] ?? null,
+      })),
+    ),
     row: state.row,
     room: state.room,
     path: state.path,
@@ -192,13 +216,13 @@ function labyrinthView(player, state) {
 export async function getLabyrinth(context) {
   const { player } = await requirePlayer(context);
   requireLabyrinth(player.row);
-  return json({ labyrinth: labyrinthView(player, todayOf(player, context.now)) });
+  return json({ labyrinth: labyrinthView(player, todayOf(player, context.now), context.now) });
 }
 
 // The page after a change: the Labirynt and the character as saved.
 async function answer(context, session, extra = {}) {
   const after = await loadPlayer(context.env.DB, session.userId);
-  return json({ ...extra, labyrinth: labyrinthView(after, todayOf(after, context.now)), character: characterView(after, context.now) });
+  return json({ ...extra, labyrinth: labyrinthView(after, todayOf(after, context.now), context.now), character: characterView(after, context.now) });
 }
 
 // A request names the room it enters as the page saw it: the level, the

@@ -7,7 +7,8 @@
 // guardians' Artefakty by the levels' rarities, their sizes and elements;
 // the sockets; the numbers of the traits with the upgrades and the gem;
 // the costs of the upgrades, the Odłamki of a break and of a dissolved
-// Artefakt; the resonance; and the Rdzeń in the stats and the fights.
+// Artefakt; the resonance; the Rdzeń in the stats and the fights; and the
+// danger of the rooms ahead on the board (899 A).
 
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
@@ -42,6 +43,8 @@ import {
   newLabyrinth,
   playerCombatant,
   reachableRooms,
+  roomDanger,
+  roomsAhead,
   simulateFight,
   traitValue,
   upgradedArtifact,
@@ -255,6 +258,46 @@ describe('a day of the Labirynt', () => {
     const breath = enterRoom(fresh({ blessings: ['breath'] }), { row: 0, room: 0 }, party, 'seed', content);
     const without = enterRoom(fresh(), { row: 0, room: 0 }, party, 'seed', content);
     assert.equal(breath.state.hp.me, Math.min(1, Math.round((without.state.hp.me + 0.1) * 10000) / 10000));
+  });
+});
+
+describe('the danger of the rooms on the board (899 A)', () => {
+  const { character, equipped } = strongClimber();
+  const strong = { character, equipped, name: 'Wspinacz', companions: [] };
+  const weak = { character: newCharacter('mage', { level: 60, classLevel: 50 }), equipped: [], name: 'Słaby', companions: [] };
+  const day = '2026-11-12';
+  const fresh = (fields = {}) => ({ ...newLabyrinth({ day, charLevel: 30, companions: [], seed: 'test' }), ...fields });
+
+  test('the rooms ahead: every room of the level from the entrance, then only those the roads lead to, never the rows behind', () => {
+    const map = labyrinthMap(day, 1, content);
+    const all = map.rows.flatMap((rooms, row) => rooms.map((_, index) => `${row}:${index}`));
+    assert.deepEqual([...roomsAhead(map, -1, null)].sort(), [...all].sort());
+    const ahead = roomsAhead(map, 0, 0);
+    for (const next of map.rows[0][0].links) assert.ok(ahead.has(`1:${next}`));
+    assert.ok([...ahead].every((key) => Number(key.split(':')[0]) >= 1));
+    assert.ok(ahead.has(`${map.rows.length - 1}:0`));
+    // From a room of the second row only what its roads reach in the third.
+    const second = roomsAhead(map, 1, 0);
+    assert.deepEqual([...second].filter((key) => key.startsWith('2:')).sort(), map.rows[1][0].links.map((next) => `2:${next}`).sort());
+    assert.equal(roomsAhead(map, map.rows.length - 1, 0).size, 0);
+  });
+
+  test('a fight against the party as it is: easy for the strong, deadly for the weak in Piekielny; the same answer every time; none for a room without a fight', () => {
+    const map = labyrinthMap(day, 1, content);
+    const easy = roomDanger({ state: fresh(), type: 'fight', row: 0, room: 0, party: strong, seed: 'danger' }, content);
+    assert.equal(easy, 'easy');
+    assert.equal(roomDanger({ state: fresh(), type: 'fight', row: 0, room: 0, party: strong, seed: 'danger' }, content), easy);
+    const hell = fresh({ level: 4, charLevel: 60 });
+    assert.equal(roomDanger({ state: hell, type: 'fight', row: 0, room: 0, party: weak, seed: 'danger' }, content), 'deadly');
+    assert.equal(roomDanger({ state: hell, type: 'guardian', row: map.rows.length - 1, room: 0, party: weak, seed: 'danger' }, content), 'deadly');
+    for (const type of ['treasure', 'spring', 'altar', 'merchant']) assert.equal(roomDanger({ state: fresh(), type, row: 1, room: 0, party: strong, seed: 'danger' }, content), null);
+  });
+
+  test('a character who fell can only be in danger; the samples never change the day\'s state', () => {
+    const state = fresh({ hp: { me: 0 } });
+    const before = JSON.stringify(state);
+    assert.equal(roomDanger({ state, type: 'fight', row: 0, room: 0, party: strong, seed: 'danger' }, content), 'deadly');
+    assert.equal(JSON.stringify(state), before);
   });
 });
 

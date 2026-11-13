@@ -775,6 +775,11 @@
       "id": "0.3.3",
       "title": "Wersja 0.3.3",
       "body": "- Walki mają nowe animacje ciosów: cios spada na cel z impetem, trafiony odskakuje, krytyk błyska napisem „KRYTYK!”, a ostatni cios walki zwalnia. Tak wygląda każda walka w grze. Przy wyłączonych Animacjach (Ustawienia) nic się nie trzęsie ani nie zwalnia.\n- Gra w karty w Salonie Gier ma animacje: karty wylatują i odwracają się na stole, ciosy idą po kolei z iskrami, zbite karty pękają, a koniec partii to scena ze Szczęsnym i monetami lecącymi do złota. Dotknięcie stołu kończy animację rundy."
+    },
+    {
+      "id": "0.3.5",
+      "title": "Wersja 0.3.5",
+      "body": "- Labirynt ma własną planszę: drzwi w Sali prób otwierają ją na cały ekran. Widać na niej wszystkie komnaty poziomu, drogi między nimi i drużynę, która idzie do wybranej komnaty.\n- Płyty z walką mają kolorową obwódkę: zielona to łatwa walka, żółta wyrównana, a czerwona groźna. Kolor zmienia się razem z drużyną, więc rany i błogosławieństwa też się liczą.\n- Elita i skarb pokazują, ile Odłamków Rdzenia dają."
     }
   ]
 }
