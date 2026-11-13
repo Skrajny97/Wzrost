@@ -572,14 +572,16 @@ export async function translateChat(context) {
   const most = content().chat.rules.translations;
   const day = questPeriod('daily', now, content()).key;
   // One more of the day's, only while some are left; SQLite reads the old
-  // day in all assignments.
+  // day in all assignments. A count of a later day (a request begun before
+  // midnight, done after one of the new day) is the day's limit used, and
+  // stays as it is: the day never goes back (the code review of 13.11.2026).
   const counted = await db
     .prepare(
       `UPDATE users SET translations_used = CASE WHEN translations_day = ? THEN translations_used + 1 ELSE 1 END,
          translations_returned = CASE WHEN translations_day = ? THEN translations_returned ELSE 0 END, translations_day = ?
-       WHERE id = ? AND (translations_day IS NOT ? OR translations_used < ?)`,
+       WHERE id = ? AND (translations_day IS NULL OR translations_day < ? OR (translations_day = ? AND translations_used < ?))`,
     )
-    .bind(day, day, day, session.userId, day, most)
+    .bind(day, day, day, session.userId, day, day, most)
     .run();
   if (counted.meta.changes !== 1) throw new ApiError(429, 'translations_used', `Dzisiejsze tłumaczenia (${most}) są już wykorzystane. Nowe od północy.`);
   const translated = await translateText(env, text, source, target);
