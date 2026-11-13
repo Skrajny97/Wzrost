@@ -12,6 +12,7 @@
 // on the Bestia and the creatures beaten in the Labirynt.
 
 import assert from 'node:assert/strict';
+import { createHmac } from 'node:crypto';
 import { beforeEach, describe, test } from 'node:test';
 
 import {
@@ -29,6 +30,7 @@ import {
   labyrinthFoes,
   lowerLandCards,
   lowerLandNames,
+  packCards,
   newLabyrinth,
   portalArea,
   questPeriod,
@@ -169,6 +171,34 @@ describe('Talia Systemu through the API', () => {
     await set('card_game = ?, gold = 1', JSON.stringify({ ...game, day: '2020-01-01' }));
     assert.equal((await tab()).pack.bought, false);
     assert.equal((await call('POST', '/api/cards/pack', { cookie })).data.error.code, 'no_gold');
+  });
+
+  // The author's 920 B (13.11.2026): the pack is drawn with a key of the
+  // server's own (server_settings 'card_seed', made once at the first draw),
+  // folded with the day and the character, so nobody can work it out from
+  // the public code; the same key, day and character, the same cards.
+  test("the day's pack is drawn with the server's key, made once and kept", async () => {
+    await set('level = 64, class_level = 64, gold = 100000');
+    await call('POST', '/api/cards/starter', { cookie });
+    const database = await db();
+    const key = async () => (await database.prepare("SELECT value FROM server_settings WHERE key = 'card_seed'").first())?.value ?? null;
+    assert.equal(await key(), null);
+    const bought = await call('POST', '/api/cards/pack', { cookie });
+    assert.equal(bought.status, 200, JSON.stringify(bought.data));
+    const made = await key();
+    assert.match(made, /^[0-9a-f]{64}$/);
+    // What the server drew is the draw of its keyed seed.
+    const { id } = await row();
+    const day = casinoDay(Date.now(), content).key;
+    const land = areaLand(portalArea(64, content).id, content);
+    const seed = createHmac('sha256', made).update(`${day}:${id}`).digest('hex');
+    const ids = bought.data.pack.map((card) => card.id);
+    assert.deepEqual(ids, packCards({ land, owned: starterDeck(content), maxed: [], seed, count: rules.pack.cards }, content));
+    // A second draw keeps the key.
+    const game = JSON.parse((await row()).card_game);
+    await set('card_game = ?', JSON.stringify({ ...game, day: '2020-01-01' }));
+    assert.equal((await call('POST', '/api/cards/pack', { cookie })).status, 200);
+    assert.equal(await key(), made);
   });
 
   test('a deck is twelve different cards of the collection', async () => {
@@ -460,9 +490,12 @@ describe('Talia Systemu: the cards of the professions, the Gildia and the Labiry
     const guildId = (await call('GET', '/api/guild', { cookie })).data.guild.id;
     const week = questPeriod('weekly', Date.now(), content).key;
     // A trial finished by hand, its id one whose roll comes or not (a
-    // Próba's card is drawn from `${character}:trial:${trial}:cards`).
+    // Próba's card is drawn from `${character}:trial:${trial}:cards` with
+    // the server's key, 920 B; the test sets the key).
+    await run("INSERT INTO server_settings (key, value) VALUES ('card_seed', 'klucz-testowy') ON CONFLICT (key) DO UPDATE SET value = excluded.value");
+    const keyed = (parts) => createHmac('sha256', 'klucz-testowy').update(parts).digest('hex');
     const trialWhere = (comes, from) => {
-      for (let trial = from; ; trial += 1) if (cardComes(createRng(`${id}:trial:${trial}:cards`), content.cards.drops.guild) === comes) return trial;
+      for (let trial = from; ; trial += 1) if (cardComes(createRng(keyed(`${id}:trial:${trial}:cards`)), content.cards.drops.guild) === comes) return trial;
     };
     const finished = (trial, index) =>
       run("INSERT INTO guild_trials (id, guild_id, week, character_id, trial, kind, count, progress, state, taken_at, done_at) VALUES (?, ?, ?, ?, ?, 'explore', 1, 1, 'done', 0, 0)", trial, guildId, week, id, index);

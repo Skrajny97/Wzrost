@@ -427,11 +427,35 @@ export async function saveDeck(context) {
   return respond(context, session, { saved: true });
 }
 
+// The server's own key for the card draws whose seed would otherwise come
+// only from numbers anyone can read in the public code (the day, the
+// character's id, a trial's id): Szczęsny's pack and the Próby Gildii's
+// cards (the author's 920 B, 13.11.2026). Made by the first draw that needs
+// it and kept in the database (server_settings, 'card_seed'); when two calls
+// meet, the key saved first stays, as with the push keys (push.js).
+async function cardSeedKey(db) {
+  const read = () => db.prepare("SELECT value FROM server_settings WHERE key = 'card_seed'").first('value');
+  let stored = await read();
+  if (stored === null) {
+    await db.prepare("INSERT INTO server_settings (key, value) VALUES ('card_seed', ?) ON CONFLICT (key) DO NOTHING").bind(toHex(crypto.getRandomValues(new Uint8Array(32)))).run();
+    stored = await read();
+  }
+  return stored;
+}
+
+// The seed of a draw from its public parts and the server's key (HMAC-SHA256,
+// in hex): the same parts give the same draw on every try, as before, and
+// nobody without the key can work it out from the code.
+export async function keyedSeed(db, parts) {
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(await cardSeedKey(db)), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  return toHex(new Uint8Array(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(parts))));
+}
+
 // POST /api/cards/pack: the day's pack at Szczęsny's (902 C), once a day:
 // three cards of the creatures of the lands lower than the character's own,
 // those it has not got first (packCards), for the gold of an hour of
-// exploring at its level. Drawn from the day's seed, so asking again draws
-// the same; saved only over the character as read and while it has the
+// exploring at its level. Drawn from the day's seed with the server's key
+// (keyedSeed, 920 B), so asking again draws the same; saved only over the character as read and while it has the
 // gold. Answers with the cards as they are now in the collection.
 export async function buyPack(context) {
   const { session, player } = await requirePlayer(context);
@@ -445,7 +469,7 @@ export async function buyPack(context) {
   if (game.pack) throw new ApiError(409, 'pack_bought', 'Pakiet na dziś już kupiony. Następny jutro.');
   const collection = await cardCollection(db, row.id);
   const land = characterLand(row);
-  const cards = packCards({ land, owned: collection.keys(), maxed: maxedCards(collection), seed: `${day}:${row.id}`, count: rules().pack.cards }, content());
+  const cards = packCards({ land, owned: collection.keys(), maxed: maxedCards(collection), seed: await keyedSeed(db, `${day}:${row.id}`), count: rules().pack.cards }, content());
   if (cards.length === 0) throw new ApiError(409, 'pack_empty', lowerLandCards(land, content()).length === 0 ? 'W pierwszej krainie nie ma krain niższych, więc nie ma pakietu.' : 'Masz już wszystkie karty z niższych krain na najwyższym poziomie.');
   const price = explorationGold(rules().pack.goldMinutes, row.level);
   if (row.gold < price) throw new ApiError(409, 'no_gold', t('Brakuje złota: potrzeba {price}.', { price }));
