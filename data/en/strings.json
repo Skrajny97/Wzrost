@@ -2965,6 +2965,7 @@
   "W plecaku: {have} · wystarczy na {times}": "In your bag: {have} · enough for {times}",
   "W plecaku: {have} · potrzeba co najmniej {cost}": "In your bag: {have} · at least {cost} needed",
   "Ile przemian": "How many transmutations",
+  "Podaj, ile przemian.": "Enter how many transmutations.",
   "Przemień": "Transmute",
   "Przemień w {gem}": "Transmute into {gem}",
   "Przemiana dzieje się od razu.": "The transmutation happens at once.",

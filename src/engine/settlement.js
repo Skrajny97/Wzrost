@@ -600,12 +600,6 @@ export function deliverBlock(board, orderId, stocks, content) {
   return null;
 }
 
-// Delivering an order (deliverBlock first): what it takes, what it gives (the
-// gold, the brotherhood's reputation, the relation with the resident who
-// posts the orders and, for every
-// systemPoints.every delivered order and for the week's, Punkty Systemu,
-// question 91 A) and the board after, whose slot waits refillMinutes for the
-// next order (question 88 A).
 // What an order pays now: its own gold, and for herbs, potions and
 // materials at least overScrap times what the scrapper pays the character
 // for them, with the camp's Skup bonus (`sellBonus`, question 236 A).
@@ -620,8 +614,13 @@ export function orderGold(order, sellBonus, content) {
   return Math.max(order.gold, Math.ceil(scrap * content.settlement.orders.overScrap));
 }
 
-// The brotherhood's reputation with the week's share of reputation (`week`,
-// the week of the delivery, weeks.js), made whole fairly.
+// Delivering an order (deliverBlock first): what it takes, what it gives (the
+// gold, orderGold; the brotherhood's reputation, with the week's share of
+// reputation, `week`, the week of the delivery, weeks.js, made whole
+// fairly; the relation with the resident who posts the orders; and, for
+// every systemPoints.every delivered order and for the week's, Punkty
+// Systemu, question 91 A) and the board after, whose slot waits
+// refillMinutes for the next order (question 88 A).
 /**
  * @param {Record<string, any>} board
  * @param {string} orderId
@@ -861,13 +860,13 @@ export function drawRumor({ character, seed }, now, content) {
   return { day: day.key, areaId: area.id, monsterId, line: rng.int(0, rumor.lines.length - 1), used: false };
 }
 
-// Today's rumor as kept in the Osada, or null after the day it was told.
+// Today's rumor as kept in the Osada, or null after the day it was told. A
+// rumor of a later day counts as today's (laterPeriod in quests.js).
 /**
  * @param {Record<string, any> | null | undefined} stored
  * @param {number} now
  * @param {Content} content
  */
-// A rumor of a later day counts as today's (laterPeriod in quests.js).
 export const rumorToday = (stored, now, content) => (samePeriod(stored?.day, questPeriod('daily', now, content).key) ? stored : null);
 
 // The rumor's odds for an exploration of an inner region: rumor.factor

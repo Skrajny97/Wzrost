@@ -91,6 +91,9 @@ test("the checker finds the code's texts: t() keys, plural forms, errors' messag
   assert.deepEqual(found.plurals.map((key) => key.text), ['postać|postacie|postaci']);
   assert.deepEqual(found.texts.map((text) => text.text), ['Walka', 'Podaj poprawny adres e-mail.', 'Spróbuj ponownie za {} min.']);
   assert.ok(looksLikeText('Nie znaleziono.'));
+  // A sentence of no Polish letter and none of the short words but "ile"
+  // (the engine's przemiana, jewelcraft.js), which went without English.
+  assert.ok(looksLikeText('Podaj, ile przemian.'));
   assert.ok(!looksLikeText('status-row status-row--name'));
   assert.ok(!looksLikeText('#/osada'));
   const html = htmlTexts('<p class="a" data-i18n>Hasło</p><div aria-label="Wybierz formularz" data-i18n-attr="aria-label"></div><button data-busy-label="Łączenie…" data-i18n>Zaloguj się</button>');

@@ -22,7 +22,7 @@ const haveOf = (id) => (state.character?.minerals ?? []).find((mineral) => miner
 // The steps of przemiana, by the gems in rarity order: each known gem and the
 // gem one rarity up, while that one is known too; the first hidden one ends
 // the list as a shadow ({ from, to: null, hint }).
-export function transmuteSteps() {
+function transmuteSteps() {
   const gems = jeweller()?.gems ?? [];
   const steps = [];
   for (let index = 0; index + 1 < gems.length; index += 1) {

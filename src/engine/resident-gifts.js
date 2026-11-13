@@ -146,15 +146,15 @@ export function giftGoods(kind, held, content) {
 }
 
 // Whether the character gave the resident a gift on the narrator's day of
-// `now` (`gifts` as the Osada keeps them).
+// `now` (`gifts` as the Osada keeps them). A gift of a later day counts as
+// today's (laterPeriod in quests.js): a request still of the day gone gives
+// no other one and writes no day back.
 /**
  * @param {Gifts} gifts
  * @param {string} residentId
  * @param {number} now
  * @param {Content} content
  */
-// A gift of a later day counts as today's (laterPeriod in quests.js): a
-// request still of the day gone gives no other one and writes no day back.
 export const givenToday = (gifts, residentId, now, content) => samePeriod(gifts?.given?.[residentId], questPeriod('daily', now, content).key);
 
 // The gifts as kept after one to the resident on the day of `now`.

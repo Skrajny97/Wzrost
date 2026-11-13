@@ -250,7 +250,7 @@ function technical(text) {
 // Short Polish words that English never writes alone.
 const POLISH_WORDS = new Set(
   `nie się jest są na do od po za już tylko albo lub oraz jak gdy czy jeszcze przez przy dla bez ten ta to tej tego twój twoja twoje ci cię go ją je ich
-  mu jej co kto który która które w z ze że poziom poziomu złota zł brak teraz dziś jutro`.split(/\s+/),
+  mu jej co kto który która które w z ze że poziom poziomu złota zł brak teraz dziś jutro ile`.split(/\s+/),
 );
 
 // A text in Polish, by its look: Polish letters or words; in the page's

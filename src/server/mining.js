@@ -12,7 +12,7 @@ import { cardSummary, cardUpserts, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { raced } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
-import { addTo, requireProfessions, takeFromBag, workClaim, workClaimFailed, workGains } from './professions.js';
+import { addTo, alreadyClaimed, requireProfessions, takeFromBag, workClaim, workClaimFailed, workGains } from './professions.js';
 import { workFamePoints } from './fame.js';
 import { mineralsOf } from './professions-view.js';
 import { trimReports } from './reports.js';
@@ -132,7 +132,7 @@ export async function finishMining(db, player, now, { avatar = false } = {}) {
       db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at),
     ]);
   } catch (error) {
-    if (String(error?.message).includes('UNIQUE')) throw new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
+    if (String(error?.message).includes('UNIQUE')) throw alreadyClaimed();
     if (raced(error)) throw await workClaimFailed(db, row, table, activity);
     throw error;
   }

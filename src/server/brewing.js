@@ -39,7 +39,7 @@ import { toHex } from './encoding.js';
 import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
-import { addTo, insertWork, requireProfessions, takeFromBag, workClaim, workClaimFailed, workGains } from './professions.js';
+import { addTo, alreadyClaimed, insertWork, requireProfessions, takeFromBag, workClaim, workClaimFailed, workGains } from './professions.js';
 import { workFamePoints } from './fame.js';
 import { herbsOf, potionKnown, potionsOf, settlementPointsOf } from './professions-view.js';
 import { perkOf } from './perks.js';
@@ -173,7 +173,7 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
           .bind(...herbsBack.binds, ...catalystsBack.binds, row.id, row.id, activity.started_at),
         end,
       ],
-      alreadyDone,
+      alreadyClaimed,
     );
     return null;
   }
@@ -234,16 +234,11 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
       end,
     ]);
   } catch (error) {
-    if (String(error?.message).includes('UNIQUE')) throw alreadyDone();
+    if (String(error?.message).includes('UNIQUE')) throw alreadyClaimed();
     if (raced(error)) throw await workClaimFailed(db, row, table, activity);
     throw error;
   }
   return { id: results[1].meta.last_row_id, report };
-}
-
-// A work claimed or called back by another request a moment ago.
-function alreadyDone() {
-  return new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
 }
 
 // How many of a potion the request names: a whole number from 1 to what the

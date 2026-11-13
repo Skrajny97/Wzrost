@@ -133,11 +133,11 @@ function withMinerals(row, items) {
 }
 
 // Minerals as the page lists them: name and count.
-export const mineralList = (minerals) => Object.entries(minerals ?? {}).map(([id, count]) => ({ id, name: content().mineralsById[id].name, count }));
+const mineralList = (minerals) => Object.entries(minerals ?? {}).map(([id, count]) => ({ id, name: content().mineralsById[id].name, count }));
 
 // The gems that fell out of items as the page names them (757 B): one for
 // each item, with its id.
-export const gemList = (gems) => gems.map((id) => ({ id, name: content().mineralsById[id].name }));
+const gemList = (gems) => gems.map((id) => ({ id, name: content().mineralsById[id].name }));
 
 // The scrapper buys `count` pieces of a stack of materials ({ key, count }),
 // for their price with the camp's Skup złomu (proposal 1: "Skup złomu
