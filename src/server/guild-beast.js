@@ -16,7 +16,9 @@
 // who made it and when. No XP, gold or loot for an attack: whoever hit the
 // beast in a week opens a Skrzynia Bestii once for that week (the best of
 // the beasts it hit then), as soon as its beast fell and through the whole
-// next week whatever came of it. Each save holds only while what was read
+// next week whatever came of it. Where Talia Systemu is on, an attack may
+// leave a card (903, cards.js), which moves the character's version with
+// its collection. Each save holds only while what was read
 // still holds (atomic.js). A character removed and its id given again (the
 // characters' ids are not AUTOINCREMENT) takes nothing of the one before:
 // only what was written since the character was made counts.
@@ -38,6 +40,7 @@ import {
   trialDay,
 } from '../engine/index.js';
 import { assertion, atomically, sameVersion } from './atomic.js';
+import { cardGains, guildCard } from './cards.js';
 import { attackBlocked, bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requireNotExploring, requirePlayer, trophiesFor } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
@@ -248,6 +251,8 @@ export async function attackGuildBeast(context) {
   const trophies = trophiesFor(player, now, [beast.monster_id]);
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const fight = guildBeastFight({ character: engineCharacter(row), equipped: equippedItems(player), name: row.name, beast: engineBeast(beast), seed, trophies }, content());
+  // A card the attack may leave (903, cards.js), from the attack's seed.
+  const card = await guildCard(db, row, seed);
   const [, , , before, , , after] = await atomically(
     db,
     [
@@ -268,6 +273,8 @@ export async function attackGuildBeast(context) {
       db.prepare('SELECT hp FROM guild_beasts WHERE id = ?').bind(beast.id),
       // The attack's Punkty Sławy (fame.js).
       ...sourceFamePoints(db, row.id, 'beast', 1, now),
+      // The card it left, a copy (cards.js).
+      ...(card ? cardGains(db, row, card.ids, now) : []),
     ],
     () => new ApiError(409, 'raced', errors().raced),
   );
@@ -281,6 +288,8 @@ export async function attackGuildBeast(context) {
       log: fight.log,
       fight: fight.replay,
     },
+    // The card the attack left, with its words for the page's toast.
+    ...(card && { cards: card.cards }),
     ...(await beastView(db, row, now, player.activity)),
   });
 }

@@ -25,7 +25,7 @@
 
 import { challengeAt, combatantView, exploreStrength, monsterCombatant, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
-import { cardBonusLine, cardDrop, cardDropText } from './cards.js';
+import { areaLand, cardBonusLine, cardDrop, cardDropText, cardFrom, lowerLandCards } from './cards.js';
 import { addCounts, materialDrops, materialView, materialsText } from './crafting.js';
 import { canUse, itemName, itemRank, itemView, randomItem } from './items.js';
 import { TIMED_KINDS, fightPotions } from './potions.js';
@@ -650,11 +650,13 @@ function settingOut(one, week, area, id, content) {
 // the fights; on a Drużyna's trip every member's is the same, as they set
 // out at once. `cards`: Talia Systemu's cards (cards.js), where the game has
 // it on (the server's CARDS): { maxed: the creatures whose card the
-// character has at its top level, xp and gold: the collection's shares more
-// of the XP and gold (card-collection.js, cardExplorationBonus; 884 A) };
-// each creature beaten may leave its card (874 A), drawn from a seed of its
-// own, so the rest of the exploration goes as it would without it. Null: no
-// cards.
+// character has at its top level, owned: those whose card it has at all,
+// xp and gold: the collection's shares more of the XP and gold
+// (card-collection.js, cardExplorationBonus; 884 A) }; each creature beaten
+// may leave its card (874 A), and each fight won, but the wanted's, may give
+// a card of a creature of a land lower than the place's (902 B), one the
+// character has not got first; all drawn from a seed of their own, so the
+// rest of the exploration goes as it would without them. Null: no cards.
 /**
  * @param {Record<string, any>} options
  * @param {Content} content
@@ -837,6 +839,8 @@ export function simulateHunt(
   const cardRng = cards && content.cards ? createRng(`${lootSeed ?? seed}:cards`) : null;
   /** @type {string[]} */
   const cardsFound = [];
+  // The cards of the creatures of the lands below the place's (902 B).
+  const lowerCards = cardRng ? lowerLandCards(areaLand(area.id, content), content) : [];
   const told = (/** @type {string} */ text) => (sought ? gendered(text, sought.female ? 'female' : 'male') : text);
 
   for (const [step, event] of timeline.entries()) {
@@ -976,6 +980,14 @@ export function simulateHunt(
           cardsFound.push(card);
         }
       }
+      // And once for the fight, but the wanted's, a card of a creature of a
+      // lower land (902 B): one the character has not got first, none at its
+      // top level, none it found on this exploration.
+      const lower = cardRng && !meeting ? cardFrom(lowerCards, cardRng, { chance: content.cards.drops.lower, owned: cards.owned ?? [], maxed: cards.maxed ?? [], found: cardsFound }) : null;
+      if (lower) {
+        summary.cards.push(lower);
+        cardsFound.push(lower);
+      }
       materials = addCounts(materials, summary.materials);
       // A character without a weapon, and with none found yet, finds a chest
       // with one of its class right after its first won fight (randomItem
@@ -1017,7 +1029,7 @@ export function simulateHunt(
       if (Object.keys(summary.materials).length > 0) {
         lines.push(say(texts, 'materials', step, { materials: materialsText(summary.materials, content) }));
       }
-      for (const card of summary.cards ?? []) lines.push(cardDropText(card, step, content));
+      for (const card of summary.cards ?? []) lines.push(cardDropText(card, step, content, card === lower ? 'lower' : 'drop'));
       for (const [item, text] of chests) lines.push(text ? say(texts, text, step, { item: itemName(item, content) }) : say(rules.texts, 'loot', step, { item: itemName(item, content) }));
       if (trophy) {
         summary.materials = addCounts(summary.materials, trophy);

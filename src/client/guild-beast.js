@@ -76,7 +76,9 @@ export function mountGuildBeast(container) {
       );
       dialog.addEventListener('close', () => arena.stop(), { once: true });
     }
-    if (answer.attack.fell) toast(answer.texts.fell);
+    // The beast's fall and a card of Talia Systemu the attack left (903).
+    const said = [answer.attack.fell && answer.texts.fell, ...(answer.cards ?? []).map((card) => card.text)].filter(Boolean);
+    if (said.length > 0) toast(said.join(' '));
   }
 
   async function claim(week) {

@@ -34,6 +34,7 @@ import {
 } from '../engine/index.js';
 import { content } from './content.js';
 import { bagItems, buffsOf, characterView, currentHp, loadPlayer, questsNow, requireIdle, requirePlayer, requireWorker, workOf } from './characters.js';
+import { cardSummary, cardUpserts, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
@@ -182,12 +183,15 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
   const taken = bagItems(player).length + bagStacks(herbs, content()) + bagStacks(potionsOf(row), content());
   const { stored, lost } = storeStacks(potionsOf(row), { [potion.id]: made.count }, capacity - taken, content());
   const { character, after, xp, work, sets } = workGains(player, profession, before, worked, avatar, now);
+  // A card the work may leave, by the time it lasted (903, cards.js).
+  const card = await workCard(db, row, activity, worked);
   const report = {
     ...brewingReport(
       { potion, minutes: worked, startedAt: activity.started_at, endsAt: stop ? now : activity.ends_at, seed: activity.seed, made, stored, lost, stopped: stop, before, after, character, xp, work, settlement: settlementPointsOf(row) },
       content(),
     ),
     ...(avatar && { avatar: true }),
+    ...(card && { cards: card.cards }),
   };
   const summary = {
     placeName: report.placeName,
@@ -200,6 +204,7 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
     levelAfter: work.level,
     system: report.system,
     ...(avatar && { avatar: true }),
+    ...(card && { cards: cardSummary(card.cards) }),
   };
   const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { potions: { [potion.id]: made.count } }));
   const potions = addTo('potions', stored);
@@ -224,6 +229,8 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
       ...trialProgress(db, row.id, { potions: { [potion.id]: made.count } }, now, takenBefore(options.begun)),
       // The Punkty Sławy of the work (fame.js), the Awatar's a quarter.
       ...workFamePoints(db, row.id, worked, avatar, now),
+      // The card the work left, a copy (cards.js).
+      ...cardUpserts(db, row.id, card?.ids ?? [], now),
       end,
     ]);
   } catch (error) {

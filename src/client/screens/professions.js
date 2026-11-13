@@ -16,6 +16,7 @@
 // in this deployment, the tab says so as before.
 
 import { goldArt, herbSprite, itemSprite, mineralSprite, placeArt, potionSprite, professionSprite, scrollArt } from '../art.js';
+import { droppedCardsSection } from '../cards.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatDecimal, formatMinutes, formatNumber, timeFormat } from '../format.js';
@@ -2239,6 +2240,8 @@ export function herbsReport(report, heading) {
       workSummary(report),
     ),
     report.system.length > 0 && systemPanel(...report.system),
+    // A card of Talia Systemu the work left (903).
+    droppedCardsSection(report.cards),
     h('a', { class: 'button button--system', href: HASHES.herbalism, text: t('Do Zagajnika') }),
   ];
 }
@@ -2272,6 +2275,8 @@ export function potionsReport(report, heading) {
       workSummary(report),
     ),
     report.system.length > 0 && systemPanel(...report.system),
+    // A card of Talia Systemu the work left (903).
+    droppedCardsSection(report.cards),
     h('a', { class: 'button button--system', href: HASHES.alchemy, text: t('Do Pracowni') }),
   ];
 }
@@ -2303,6 +2308,8 @@ export function itemsReport(report, heading, findSheet) {
       workSummary(report),
     ),
     report.system.length > 0 && systemPanel(...report.system),
+    // A card of Talia Systemu the work left (903).
+    droppedCardsSection(report.cards),
     h('a', { class: 'button button--system', href: HASHES.crafting, text: t('Do Warsztatu') }),
   ];
 }
@@ -2334,6 +2341,8 @@ export function mineralsReport(report, heading) {
       workSummary(report),
     ),
     report.system.length > 0 && systemPanel(...report.system),
+    // A card of Talia Systemu the work left (903).
+    droppedCardsSection(report.cards),
     h('a', { class: 'button button--system', href: HASHES.mining, text: t('Do Kopalni') }),
   ];
 }
@@ -2363,6 +2372,8 @@ export function jewelsReport(report, heading, findSheet) {
       workSummary(report),
     ),
     report.system.length > 0 && systemPanel(...report.system),
+    // A card of Talia Systemu the work left (903).
+    droppedCardsSection(report.cards),
     h('a', { class: 'button button--system', href: HASHES.jewelcrafting, text: t('Do Szlifierni') }),
   ];
 }

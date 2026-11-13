@@ -22,6 +22,7 @@ import {
   artifactView,
   blessingRules,
   buyAtMerchant,
+  cardDropText,
   chooseBlessing,
   companionReady,
   companionsGoingMost,
@@ -50,6 +51,7 @@ import {
 } from '../engine/index.js';
 import { say } from '../engine/text.js';
 import { atomically, sameVersion } from './atomic.js';
+import { cardCollection, cardsHere, cardSummary, cardUpserts, droppedCards, maxedCards } from './cards.js';
 import { characterView, coreOf, engineCharacter, equippedItems, loadPlayer, questsNow, requireNotExploring, requirePlayer, trophiesFor } from './characters.js';
 import { content } from './content.js';
 import { artifactData } from './core.js';
@@ -262,7 +264,12 @@ export async function enterLabyrinth(context) {
   const trophies = foes.length > 0 ? trophiesFor(player, now, foes.map((foe) => foe.monsterId)) : {};
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const week = weekNow(now);
-  const done = enterRoom(state, target, { character, equipped, name: row.name, companions, trophies, week }, seed, content());
+  // Talia Systemu (cards.js), where the game has it on: the creatures beaten
+  // may leave their cards (903), none at its top level. The collection as
+  // read, for a fight only; the room's save holds only while the character
+  // is as read, and every change of the collection changes it too.
+  const collection = foes.length > 0 && cardsHere() ? await cardCollection(db, row.id) : null;
+  const done = enterRoom(state, target, { character, equipped, name: row.name, companions, trophies, week, cards: collection && { maxed: maxedCards(collection) } }, seed, content());
   const { hunt, gains, artifact } = done;
   const next = done.state;
   const texts = rules().texts;
@@ -274,6 +281,9 @@ export async function enterLabyrinth(context) {
   if (gains.shards > 0 && type !== 'treasure') lines.push(say(texts, 'shards', 0, { shards: gains.shards }));
   if (type === 'elite' && hunt?.labyrinth.won) lines.push(say(texts, 'gold', 0, { gold: gains.gold - hunt.gold }));
   if (artifact) lines.push(say(texts, 'artifact', 0, { artifact: artifactView(artifact, content()).name }));
+  // The cards the creatures left (903), each in a line of its own.
+  const cardsWon = collection ? (hunt?.cards ?? []) : [];
+  cardsWon.forEach((id, index) => lines.push(cardDropText(id, target.row * 3 + target.room + index, content())));
   if (type === 'guardian' && hunt?.labyrinth.won) {
     lines.push(say(texts, 'levelCleared', 0, { level: labyrinthLevel(state.level, content()).name }));
     if (next.over === 'done') lines.push(say(texts, 'dayDone', 0));
@@ -303,6 +313,8 @@ export async function enterLabyrinth(context) {
         companions: hunt.labyrinth.companions,
         ...(artifact && { artifact: artifactView(artifact, content()) }),
       },
+      // Talia Systemu's cards the creatures left, at their levels now.
+      ...(cardsWon.length > 0 && { cards: droppedCards(cardsWon, collection) }),
     };
   }
   const summary = report && {
@@ -320,6 +332,7 @@ export async function enterLabyrinth(context) {
     materials: [],
     timePoints: report.summary.timePoints,
     bestFind: null,
+    ...(report.cards && { cards: cardSummary(report.cards) }),
     levelAfter: applied.level,
     system: report.system,
   };
@@ -359,6 +372,8 @@ export async function enterLabyrinth(context) {
       ),
     ...(Object.keys(kills).length > 0 ? trialProgress(db, row.id, { kills }, now) : []),
     ...(artifact ? [db.prepare('INSERT INTO core_artifacts (character_id, data, created_at) VALUES (?, ?, ?)').bind(row.id, artifactData(artifact), now)] : []),
+    // The cards the creatures left, a copy each (cards.js).
+    ...cardUpserts(db, row.id, cardsWon, now),
   ];
   // The report last, its id from its own statement.
   const reportAt = statements.length;

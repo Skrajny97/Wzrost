@@ -8,6 +8,7 @@
 import { addQuestProgress, campBonus, campLevels, mineMinerals, miningMinutes, miningReport, professionOpen, professionState, professionUnlockLevel, saleGold, weekFactor } from '../engine/index.js';
 import { content } from './content.js';
 import { characterView, currentHp, loadPlayer, questsNow, requirePlayer, requireWorker, workOf } from './characters.js';
+import { cardSummary, cardUpserts, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { raced } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
@@ -86,9 +87,12 @@ export async function finishMining(db, player, now, { avatar = false } = {}) {
   // The week it began in: its share of the minerals (weeks.js).
   const mined = mineMinerals({ minutes: activity.minutes, level: before.level, characterLevel: options.level ?? row.level, seed: activity.seed, week: weekFactor(keptWeek(options), 'minerals') }, content());
   const { character, after, xp, work, sets } = workGains(player, profession, before, activity.minutes, avatar, now);
+  // A card the work may leave (903, cards.js).
+  const card = await workCard(db, row, activity, activity.minutes);
   const report = {
     ...miningReport({ minutes: activity.minutes, startedAt: activity.started_at, endsAt: activity.ends_at, seed: activity.seed, mined, before, after, character, xp, work }, content()),
     ...(avatar && { avatar: true }),
+    ...(card && { cards: card.cards }),
   };
   const summary = {
     placeName: report.placeName,
@@ -101,6 +105,7 @@ export async function finishMining(db, player, now, { avatar = false } = {}) {
     levelAfter: work.level,
     system: report.system,
     ...(avatar && { avatar: true }),
+    ...(card && { cards: cardSummary(card.cards) }),
   };
   const minerals = addTo('minerals', mined.found);
   // Every piece dug moves the quests of digging (mineAny), the Awatar's too,
@@ -122,6 +127,8 @@ export async function finishMining(db, player, now, { avatar = false } = {}) {
         .bind(mined.gold, row.quests, quests, ...sets.binds, ...minerals.binds, row.id),
       // The Punkty Sławy of the work (fame.js), the Awatar's a quarter.
       ...workFamePoints(db, row.id, activity.minutes, avatar, now),
+      // The card the work left, a copy (cards.js).
+      ...cardUpserts(db, row.id, card?.ids ?? [], now),
       db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at),
     ]);
   } catch (error) {
