@@ -496,7 +496,8 @@ export const withoutDuel = (handler) => async (context) => {
 // `binds`; characters.js, accounts.js): a match of theirs going on ends as
 // theirs lost, the other taking what a win gives; their challenges lapse;
 // and their rows keep them by a negative id, as the database gives a
-// removed character's id again.
+// removed character's id again: who challenged, who was challenged and who
+// won.
 export function duelRemoval(db, which, binds) {
   const keep = 1 - (live()?.systemCut ?? 0);
   const theirs = `(from_id ${which} OR to_id ${which})`;
@@ -521,5 +522,6 @@ export function duelRemoval(db, which, binds) {
     db.prepare(`UPDATE card_duels SET state = 'expired', version = version + 1 WHERE state = 'proposed' AND ${theirs}`).bind(...binds, ...binds),
     db.prepare(`UPDATE card_duels SET from_id = -from_id WHERE from_id ${which}`).bind(...binds),
     db.prepare(`UPDATE card_duels SET to_id = -to_id WHERE to_id ${which}`).bind(...binds),
+    db.prepare(`UPDATE card_duels SET winner = -winner WHERE winner ${which}`).bind(...binds),
   ];
 }
