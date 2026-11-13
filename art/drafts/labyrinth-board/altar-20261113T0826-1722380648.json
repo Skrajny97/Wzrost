@@ -1,0 +1,14 @@
+{
+  "id": "altar",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art game piece seen from the front and slightly above: a small ancient grey stone altar block with carved runes, a glowing golden rune symbol floating above it and giving a soft golden light, a single isolated object, centred, no background, no text",
+  "style": "src/client/art/monsters/aurochs.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 16
+}

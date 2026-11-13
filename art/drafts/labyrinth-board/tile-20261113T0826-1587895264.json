@@ -1,0 +1,14 @@
+{
+  "id": "tile",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art game board space seen from the front and slightly above: a round flat dais of hewn dark grey-blue stone, its top an empty flat oval surface, a thin ring of faint ice-blue glowing runes carved around the rim, chipped worn edges, a single isolated object, centred, no background, no text",
+  "style": "src/client/art/monsters/aurochs.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 9
+}

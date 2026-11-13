@@ -1,0 +1,14 @@
+{
+  "id": "guardian-tile",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art game board space seen from the front and slightly above: a large round dais of black stone, its top an empty flat oval surface, jagged dark horn-like spikes rising around its back rim, a ring of glowing red runes carved around the rim, a single isolated object, centred, no background, no text",
+  "style": "src/client/art/monsters/aurochs.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

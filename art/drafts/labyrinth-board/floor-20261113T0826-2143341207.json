@@ -1,0 +1,14 @@
+{
+  "id": "floor",
+  "tool": "pixellab generate-image-v2",
+  "description": "top-down pixel art game board background seen from above at a slight angle: the floor of a vast dark underground labyrinth hall, worn dark slate-blue stone flagstones with cracks and moss in the seams, faint thin ice-blue glowing rune lines etched into the floor, a dark stone archway in the middle of the top edge, worn stone steps leading in at the middle of the bottom edge, dark broken pillars and stone walls along the left and right edges fading into black shadow, a wide empty open floor in the middle, muted dark palette of slate blue, teal and charcoal, low contrast so game pieces placed on top stand out, no characters, no creatures, no text",
+  "style": "src/client/art/places/trial-hall.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.115
+  },
+  "images": 1
+}
