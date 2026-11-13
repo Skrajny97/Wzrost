@@ -4172,6 +4172,48 @@ summary {
   font-size: 10px;
 }
 
+/* The kind of a fight on its tab (993): a small sign over the number, in
+   the colour of its chip under the fight's title. */
+.fight-tab-kind {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  width: 9px;
+  height: 9px;
+}
+
+.fight-tab-kind--champion {
+  background: #e8414d;
+  clip-path: polygon(0 100%, 0 30%, 25% 60%, 50% 0, 75% 60%, 100% 30%, 100% 100%);
+}
+
+.fight-tab-kind--elite {
+  background: #e0a03c;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+.fight-tab-kind--tough {
+  background: var(--text-muted);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.fight-tab-kind--event {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--system);
+}
+
+/* With a kind's sign the tab is framed in its colour too. */
+.fight-tab:has(.fight-tab-kind--champion) {
+  border-color: rgba(179, 18, 31, 0.9);
+  background: rgba(120, 8, 18, 0.3);
+}
+
+.fight-tab:has(.fight-tab-kind--elite) {
+  border-color: rgba(224, 160, 60, 0.7);
+}
+
 .fight-header {
   display: flex;
   flex-direction: column;

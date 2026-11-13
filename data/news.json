@@ -865,6 +865,11 @@
       "id": "0.3.22",
       "title": "Wersja 0.3.22",
       "body": "- Walka: lista krain jest krótsza. Otwarte krainy mają swoje karty, a kraina na Twój poziom ma znaczek „Twój poziom”. Krainy, które jeszcze się nie otworzyły, są zwinięte w „Kolejne krainy”.\n- Karty na telefonie: stuknij pustą linię, a wysunie się Twoja rezerwa i wybierzesz kartę na tę linię. „Walcz” jest zawsze na dole ekranu, a „Poddaj” pod stołem.\n- Targowisko: przedmiot, który się nie sprzeda albo który wycofasz, wraca do Ciebie taki, jaki był. Twoje znalezisko nie staje się już przedmiotem zdobytym od innych graczy.\n- Kółko czatu nie zasłania już ostatniego przycisku na ekranie."
+    },
+    {
+      "id": "0.3.23",
+      "title": "Wersja 0.3.23",
+      "body": "- Labirynt jest łatwiejszy: stwory mają poziom po środku między poziomem Twojej postaci a poziomem klasy, a każdy poziom Labiryntu jest słabszy. Poziom 1 ma być łatwy.\n- Raport wyprawy: na numerach walk widać ich rodzaj: koronę czempiona, romb elity, trójkąt walki wymagającej i kropkę zdarzenia."
     }
   ]
 }

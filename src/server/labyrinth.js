@@ -92,7 +92,7 @@ function storedState(row, day) {
 }
 
 // Today's Labirynt: the one kept, or a new one with the companions going now
-// and the higher of the character's and its class's level (not saved until
+// and the level halfway between the character's and its class's (not saved until
 // a room is entered). A request
 // of a day already gone for the character (laterPeriod) changes nothing.
 function todayOf(player, now) {

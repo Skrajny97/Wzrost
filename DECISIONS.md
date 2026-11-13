@@ -3216,7 +3216,7 @@ Autor: „W idle gierkach gdzie sie ma drużynę są często tak zwane labirynty
     - Rezonans liczy tylko najwyższy próg i klejnot go nie podnosi.
     - Oprawa klejnotu, wchłanianie, rozpuszczanie i ulepszanie wchłoniętego Artefaktu czekają do końca eksploracji. Tego samego klejnotu nie oprawia się drugi raz.
     - Zdolności rosną z pierwiastkiem budżetu rzadkości, żeby boska nie leczyła ponad 50%.
-21. **Poziom stworów: wyższy z poziomów postaci i klasy (autor, 12.11.2026, 0.2.90).** Autor po pierwszym dniu Labiryntu w grze: „Labirynt jest za łatwy na 63 poz postaci i 73 klasy. Niech bierze pod uwage wyzszy poziom przy skalowaniu trudnosci, bo zwykle ludzie maja wyzszy klasy niz postaci”. Labirynt dnia liczy się od wyższego z poziomów postaci i klasy z chwili wejścia do pierwszej komnaty (`labyrinthCharLevel` w `src/engine/labyrinth.js`). Na tym poziomie są stwory, z krain do tego poziomu (krainy i tak otwierają się z poziomem klasy), tak silne jak na najnowszym miejscu tego poziomu. Tym samym poziomem mierzy się złoto walk, elit i skarbów oraz ceny kupca, a XP rośnie razem z poziomem stworów (ok. +18% przy 10 poziomach więcej). Brakujące szczegóły:
+21. **Poziom stworów: wyższy z poziomów postaci i klasy (autor, 12.11.2026, 0.2.90).** *Zmienione w 0.3.23: stwory stoją po środku między poziomem postaci a poziomem klasy (punkt 25).* Autor po pierwszym dniu Labiryntu w grze: „Labirynt jest za łatwy na 63 poz postaci i 73 klasy. Niech bierze pod uwage wyzszy poziom przy skalowaniu trudnosci, bo zwykle ludzie maja wyzszy klasy niz postaci”. Labirynt dnia liczy się od wyższego z poziomów postaci i klasy z chwili wejścia do pierwszej komnaty (`labyrinthCharLevel` w `src/engine/labyrinth.js`). Na tym poziomie są stwory, z krain do tego poziomu (krainy i tak otwierają się z poziomem klasy), tak silne jak na najnowszym miejscu tego poziomu. Tym samym poziomem mierzy się złoto walk, elit i skarbów oraz ceny kupca, a XP rośnie razem z poziomem stworów (ok. +18% przy 10 poziomach więcej). Brakujące szczegóły:
     - Labirynt rozpoczęty przed wdrożeniem zostaje do północy na dawnym poziomie, a nowy dzień liczy się już po nowemu. Labirynt, do którego postać jeszcze nie weszła, od razu liczy się po nowemu.
     - Odblokowanie zostaje bez zmian: od 30. poziomu postaci.
     - Eksploracje, Portale, Wieże i Sala prób zostają przy swoich zasadach; autor mówił tylko o Labiryncie.
@@ -3237,6 +3237,10 @@ Autor: „W idle gierkach gdzie sie ma drużynę są często tak zwane labirynty
     - poziom 3 średnio 46% dni, od 25% do 70% (było 21–54%): trudny;
     - Piekielny 0–3% dni: bardzo trudny.
     Złoto całego dnia Labiryntu to teraz średnio 87–147 minut eksploracji, więc opłata za reset (150 minut, punkt 23) dalej jest wyższa niż złoto drugiego podejścia.
+25. **Łatwiej, a stwory po środku między postacią a klasą (autor, 13.11.2026, 0.3.23).** Autor: „Obniż jeszcze troche poziom trudności Labiryntu, bo dalej jest za trudny, nawet pierwszy poziom ciężko przejść” i „Niech w Labiryncie daje przeciwników z poziomem równo miedzy klasą a postacią”. Zmienia punkt 21 i siłę z punktu 24:
+    - Poziom stworów to średnia poziomu postaci i poziomu klasy z chwili wejścia do pierwszej komnaty, zaokrąglona w dół (`labyrinthCharLevel`). Brakujący szczegół, zaokrąglenie: w dół, bo ma być łatwiej. Tym samym poziomem dalej mierzą się złoto walk, elit i skarbów, ceny kupca, opłata za reset i XP.
+    - Siła poziomów (`levels[].strength`): poziom 1 ×0,65 (było ×0,8), poziom 2 ×0,95 (było ×1,1), poziom 3 ×1,35 (było ×1,5), Piekielny ×2,7 (było ×3,0), wciąż dwa razy trzeci (854 A).
+    - Pomiar `tools/labyrinth-sim.mjs` (pięć klas, po 30 dni na 35., 50., 80., 120. i 200. poziomie, z dwoma towarzyszami). Słabiej wyposażona postać (model „low”): poziom 1 97–100% dni (było 59–98%), poziom 2 35–97%, poziom 3 3–57%, Piekielny 0–1%. Dobrze wyposażona („realistic”): poziom 1 100%, poziom 2 89–100%, poziom 3 42–96%, Piekielny 1–18%. Według autora dotychczasowy poziom 1 był trudny nawet dla niego, więc gracze są bliżej modelu „low” i to jego wyniki są celem: poziom 1 łatwy, 2 średni, 3 trudny, Piekielny bardzo trudny.
 
 ### Rozdział narratora o Labiryncie (878, 12.11.2026)
 
@@ -3247,6 +3251,12 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 3. **Kwestia Sali prób** o próbach (645) przychodzi, jak dotąd, przy pierwszym spojrzeniu na Salę prób, ale dopiero po rozdziale Labiryntu, bo żadna kwestia miejsca nie przychodzi, gdy czeka rozdział.
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
+
+## Wersja 0.3.23 (13.11.2026): łatwiejszy Labirynt ze stworami po środku między postacią a klasą, rodzaj walki na kartach raportu (931)
+
+1. **Labirynt (autor, 13.11.2026):** stwory na poziomie po środku między poziomem postaci a poziomem klasy, zaokrąglonym w dół, i niższa siła poziomów (×0,65, ×0,95, ×1,35, Piekielny ×2,7). Szczegóły i pomiar: „Labirynt Systemu i Rdzeń: zasady”, punkt 25.
+2. **Rodzaj walki na kartach raportu (931, makieta przyjęta 13.11.2026):** zakładka walki w raporcie ma w rogu mały znak w kolorze znaczka pod tytułem walki: koronę czempiona (z czerwoną ramką), romb elity (ze złotą ramką), trójkąt walki wymagającej i kropkę zdarzenia.
+3. **Wdrożenie 0.3.21 i 0.3.22:** błąd Cloudflare z 15:19 i 15:23 UTC (kod 10013) to była awaria po stronie Cloudflare, incydent „Workers API availability” (od ok. 15:30 do 15:42 UTC). 0.3.22 weszła do gry o 16:01 UTC razem z 0.3.21. Zasada na przyszłość: gdy wdrożenie odpada na Cloudflare, najpierw sprawdzić stronę statusu Cloudflare i nie wypychać kolejnej wersji, dopóki przyczyna nie jest jasna.
 
 ## Wersja 0.3.22 (13.11.2026): krótsza lista krain na Walce (929), stół kart na telefonie (930) i towary wracające z Targowiska (923 A)
 

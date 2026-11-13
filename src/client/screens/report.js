@@ -264,6 +264,8 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     if (report.system.length > 0 && firstPlayback) playSound('system');
   }
 
+  const fightKind = (fight) => (fight.champion ? 'champion' : fight.elite ? 'elite' : fight.event ? 'event' : fight.tough ? 'tough' : null);
+
   function renderTabs() {
     const count = report.fights?.length ?? 0;
     fill(
@@ -285,6 +287,9 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
           },
           h('span', { text: index + 1 }),
           isKey && h('span', { class: 'fight-tab-key', 'aria-hidden': 'true', text: '★' }),
+          // What kind of fight it was, at a glance (993): the champion, an
+          // elite, a demanding one or the exploration's event.
+          fightKind(fight) && h('span', { class: `fight-tab-kind fight-tab-kind--${fightKind(fight)}`, 'aria-hidden': 'true' }),
         );
       }),
     );

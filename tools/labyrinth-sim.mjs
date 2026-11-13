@@ -59,8 +59,8 @@ export function coreFor(level, content, { rarity, upgrade, gem } = {}) {
 }
 
 // One day of the Labirynt for a player: the levels it clears. The
-// creatures stand at the higher of the character's and the class's level
-// (labyrinthCharLevel, the author 12.11.2026).
+// creatures stand halfway between the character's and the class's level
+// (labyrinthCharLevel, the author 13.11.2026).
 function playDay({ player, companions, day, seed }, content) {
   let state = engine.newLabyrinth({ day, charLevel: engine.labyrinthCharLevel(player.character), companions, seed });
   const rng = engine.createRng(`${seed}:choices`);
