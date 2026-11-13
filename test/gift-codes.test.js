@@ -219,6 +219,38 @@ describe('a code\'s rewards moved by the scheduled run', () => {
     assert.deepEqual(await usedCodes(database, two), [personal.id]);
   });
 
+  // The code review of 13.11.2026: "Usuń konto" took its codes' records
+  // with it, so a code for one character was free again for a new character
+  // of that name on another account. The records stay, detached (the
+  // account's id made negative, as its purchases'), so a new account given
+  // the same id takes the codes for all as any account, and an account
+  // with that id deleted again goes too.
+  test('a code for one character stays taken after the account that took it is deleted; a code for all does not follow its id', async () => {
+    const personal = content.giftCodes.find((gift) => gift.for);
+    const open = content.giftCodes.find((gift) => !gift.for);
+    const database = await db();
+    const idOf = async (login) => (await database.prepare('SELECT id FROM users WHERE login = ?').bind(login).first()).id;
+    const first = await signUp('konto-do-usuniecia');
+    const gone = await idOf('konto-do-usuniecia');
+    for (const gift of [personal, open]) {
+      await database.prepare('INSERT INTO gift_codes_used (user_id, gift_id, character_id, used_at) VALUES (?, ?, 0, ?)').bind(gone, gift.id, minute).run();
+    }
+    assert.equal((await call('DELETE', '/api/me', { cookie: first.cookie, body: { login: 'konto-do-usuniecia' } })).status, 200);
+    const next = await signUp('konto-po-usunieciu');
+    const after = await idOf('konto-po-usunieciu');
+    // The highest id is given again (users.id is no AUTOINCREMENT).
+    assert.equal(after, gone);
+    // The code for one character is taken for every account still; the
+    // code for all is not taken by the new account, whatever its id.
+    assert.deepEqual(await usedCodes(database, after), [personal.id]);
+    // The new account takes the code for all, and its deletion goes through
+    // also beside the record of the account deleted before with its id.
+    await database.prepare('INSERT INTO gift_codes_used (user_id, gift_id, character_id, used_at) VALUES (?, ?, 0, ?)').bind(after, open.id, minute).run();
+    assert.equal((await call('DELETE', '/api/me', { cookie: next.cookie, body: { login: 'konto-po-usunieciu' } })).status, 200);
+    assert.equal((await database.prepare('SELECT COUNT(*) AS count FROM gift_codes_used WHERE user_id > 0').first()).count, 0);
+    assert.deepEqual(await usedCodes(database, 12345), [personal.id]);
+  });
+
   test('a giver with fewer points than the move keeps none, never below none', async () => {
     const { cookie } = await signUp('przenosiny2');
     assert.equal((await call('POST', '/api/character', { cookie, body: { name: 'Wydawca', classId: 'archer', appearance: 'male' } })).status, 201);

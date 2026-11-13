@@ -1,6 +1,7 @@
 // The Wymiana with another player's character (src/server/trades.js),
 // proposed on its sheet (profile.js) or in a row of the Znajomi while both
-// players are online and both characters at home. The other accepts the
+// players are online, at home or away (the bags stay at hand on an
+// exploration and at a profession's work). The other accepts the
 // proposal, both put their offers together (gold, items, herbs, potions,
 // materials, the minerals of Górnictwo and the camp's resources), and the
 // first confirmation freezes both: the other side then only accepts the
