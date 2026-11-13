@@ -78,30 +78,6 @@ export function explorationGold(level, content) {
  */
 export const veinGoldPerHour = (level, content) => content.mining.veins.share * explorationGold(level, content);
 
-// What a digging of `minutes` should bring: of each mineral known, the
-// expected count with the lowest and highest the spread allows, and the
-// veins of gold with their gold, at the character's level.
-/**
- * @param {number} minutes
- * @param {number} level
- * @param {number} characterLevel
- * @param {Content} content
- */
-export function expectedMining(minutes, level, characterLevel, content) {
-  const { spread, veins } = content.mining;
-  const hours = minutes / 60;
-  return {
-    minerals: Object.fromEntries(
-      knownMinerals(level, content).map((mineral) => {
-        const expected = mineralsPerHour(mineral, level, content) * hours;
-        return [mineral.id, { expected, low: Math.floor(expected * (1 - spread)), high: Math.ceil(expected * (1 + spread)) }];
-      }),
-    ),
-    veins: veins.perHour * hours,
-    gold: veinGoldPerHour(characterLevel, content) * hours,
-  };
-}
-
 // What a digging finds, from the seed: of each mineral known its expected
 // count ± the spread, made whole, and at least one piece of the commonest,
 // as a gathering always brings a herb; then the veins of gold, as many as

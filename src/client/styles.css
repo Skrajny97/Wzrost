@@ -12355,18 +12355,6 @@ a.profession-square:active {
   font-family: var(--font-system);
 }
 
-.settlement-pick-art {
-  flex: none;
-  display: inline-flex;
-  width: 28px;
-  height: 28px;
-}
-
-.settlement-pick-art .sprite {
-  width: 28px;
-  height: 28px;
-}
-
 .settlement-result-title {
   margin: 0;
   color: var(--system);

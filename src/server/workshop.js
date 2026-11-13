@@ -22,9 +22,7 @@ import {
   partExchangeBlock,
   partSource,
   potionsDone,
-  professionOpen,
   professionState,
-  professionUnlockLevel,
   scrollCost,
   scrollOrderMinutes,
   settleCrafting,
@@ -38,15 +36,12 @@ import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { craftingOn } from './features.js';
+import { requireOpen } from './mining.js';
 import { perkOf } from './perks.js';
-import { addTo, insertWork, requireProfessions, workClaim, workClaimFailed, workGains } from './professions.js';
+import { addTo, alreadyClaimed, insertWork, requireProfessions, shareOf, workClaim, workClaimFailed, workGains } from './professions.js';
 import { workFamePoints } from './fame.js';
 import { trimReports } from './reports.js';
 import { say } from '../engine/text.js';
-
-// A share of what an order took, by id: for `of` items out of `count`.
-const shareOf = (amounts, of, count) =>
-  Object.fromEntries(Object.entries(amounts ?? {}).map(([id, amount]) => [id, Math.round((amount * of) / Math.max(1, count))]));
 
 // An order of `count` items of a known pattern and rarity, or with `scroll`
 // of `count` Zwoje ochronne, from now on, by the character or by its Awatar
@@ -60,10 +55,7 @@ export async function startCrafting(context) {
   requireProfessions(player);
   if (!craftingOn()) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
   const { workshop } = content();
-  const crafting = content().professionsById[workshop.profession];
-  if (!professionOpen(crafting, player.row.level, content())) {
-    throw new ApiError(403, 'locked', `${crafting.name} odblokujesz na poziomie postaci ${professionUnlockLevel(crafting, content())}.`);
-  }
+  requireOpen(player, content().professionsById[workshop.profession]);
   const { level } = professionState(JSON.parse(player.row.professions ?? '{}'), workshop.profession);
   // As many as the parts and the resources allow (checked below).
   if (!Number.isSafeInteger(body.count) || body.count < 1) throw new ApiError(400, 'invalid_count', 'Wybierz co najmniej 1 sztukę.');
@@ -125,10 +117,7 @@ export async function exchangeParts(context) {
   const { session, player } = await requirePlayer(context);
   requireProfessions(player);
   if (!craftingOn()) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
-  const crafting = content().professionsById[content().workshop.profession];
-  if (!professionOpen(crafting, player.row.level, content())) {
-    throw new ApiError(403, 'locked', `${crafting.name} odblokujesz na poziomie postaci ${professionUnlockLevel(crafting, content())}.`);
-  }
+  requireOpen(player, content().professionsById[content().workshop.profession]);
   const now = context.now;
   const table = settleCrafting(craftingState(player.row), now);
   const { partId, count } = body;
@@ -186,9 +175,6 @@ function scrollOrder(row, level, count, steady = false) {
 // item, it only gives everything back and makes no report (null). With
 // `avatar`, the order of the Awatar Systemu (avatar.js), whose work brings
 // the items and its share of the XP and of the levels (workGains).
-// A work claimed or called back by another request a moment ago.
-const alreadyDone = () => new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
-
 export async function finishCrafting(db, player, now, { stop = false, avatar = false } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
@@ -231,7 +217,7 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
         .prepare(`UPDATE characters SET version = version + 1${back.map((each) => each.sql).join('')} WHERE id = ? AND ${ongoing}`)
         .bind(...back.flatMap((each) => each.binds), row.id, row.id, activity.started_at),
       end,
-    ], alreadyDone);
+    ], alreadyClaimed);
     return null;
   }
 
@@ -306,7 +292,7 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
       end,
     ]);
   } catch (error) {
-    if (String(error?.message).includes('UNIQUE')) throw alreadyDone();
+    if (String(error?.message).includes('UNIQUE')) throw alreadyClaimed();
     if (raced(error)) throw await workClaimFailed(db, row, table, activity);
     throw error;
   }
