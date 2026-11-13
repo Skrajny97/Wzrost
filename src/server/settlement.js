@@ -21,10 +21,13 @@ import {
   createRng,
   deliverBlock,
   bondBonus,
+  companionClassName,
   companionCombatant,
+  companionForm,
   companionStanding,
   companionGift,
   companionSkillLevel,
+  companionSkills,
   companionStays,
   companionsGoingMost,
   companionsSetToGo,
@@ -626,9 +629,10 @@ function tavernView(row, stored, now) {
 }
 
 // A companion or a candidate as the Karczma shows it (companions.js): its
-// class and level, its numbers in a fight, its traits in its own form, its
-// skills at its level, the gear it wears, its profession and story, and
-// how long it is still wounded. With `upgradeCap` (the Kowadło's level,
+// class and level (its form's name once it has evolved, 896 A, with the
+// class's beside it), its numbers in a fight, its traits in its own form
+// (and its form's trait after them), its skills at its level, the gear it
+// wears, its profession and story, and how long it is still wounded. With `upgradeCap` (the Kowadło's level,
 // for a hired one) each item it wears has the Kowadło's part of its card,
 // paid from the character's `materials` too, and `roll`, the seed of its
 // last try on the Kowadło, which the next try names (upgradeCompanionItem);
@@ -637,22 +641,28 @@ function companionView(companion, { upgradeCap, materials, anvilDiscount = 0, an
   const unit = companionCombatant(companion, {}, content());
   const female = companion.appearance === 'female';
   const { traits, professions, stories } = content().settlement.companions;
+  const form = companionForm(companion, content());
+  const named = companionClassName(companion, content());
   return {
     id: companion.id,
     name: companion.name,
     appearance: companion.appearance,
     classId: companion.classId,
-    className: content().classesById[companion.classId].name,
+    className: named.name,
+    ...(named.base && { baseClassName: named.base }),
     level: companion.level,
     xp: companion.xp ?? 0,
     xpToNext: xpToNext(companion.level, content()),
     maxHp: unit.maxHp,
     armor: unit.armor,
-    traits: companion.traits.map((id) => {
-      const trait = traits.find((one) => one.id === id);
-      return { name: trait.names[female ? 0 : 1], text: trait.text };
-    }),
-    skills: companion.skills.map((id) => ({ name: content().skillsById[id].name, level: companionSkillLevel(id, companion.level, content()) })),
+    traits: [
+      ...companion.traits.map((id) => {
+        const trait = traits.find((one) => one.id === id);
+        return { name: trait.names[female ? 0 : 1], text: trait.text };
+      }),
+      ...(form ? [{ name: form.trait.name, text: form.trait.text }] : []),
+    ],
+    skills: companionSkills(companion, content()).map((id) => ({ name: content().skillsById[id].name, level: companionSkillLevel(id, companion.level, content()) })),
     gear: companion.gear.map((item) => itemName(item, content())),
     // What it wears in each of its places (question 108 A), and whether
     // the item came from the character's bag.

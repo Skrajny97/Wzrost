@@ -608,6 +608,10 @@
     "0.3.1": {
       "title": "Version 0.3.1",
       "body": "- The Druid's Ent and the Archdruid's Ancient Oak have their own figures in fights.\n- \"Set out again\" on a report stays above the bottom tabs, like \"Set out\" on a place's screen.\n- A report with a level up lets you spend your free points at once: \"Spend by class\" or \"Spend by hand\".\n- When creating a character, \"Begin\" is always at hand, with what is still missing beside it. On a computer the classes stand in two columns.\n- Marketplace: when listing an item, tap it to unfold its full card with a comparison to the one you wear."
+    },
+    "0.3.2": {
+      "title": "Version 0.3.2",
+      "body": "- Companions evolve: at their 50th, 100th and 200th level they take the form of the path of the first skill on their card by themselves, with its name, trait and two skills. A hired Cleric with Prayer for Health becomes a Healer and heals the whole party with Renewal. Their look stays their own, and those already at level 50 have evolved at once.\n- The Storeroom in the Workshop and the Gem Workshop: the marked item shows a comparison with what the character wears in that place."
     }
   }
 }

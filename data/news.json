@@ -765,6 +765,11 @@
       "id": "0.3.1",
       "title": "Wersja 0.3.1",
       "body": "- Ent Druida i Prastary dąb Arcydruida mają w walkach własne postacie.\n- „Wyrusz ponownie” w raporcie trzyma się nad dolnymi zakładkami, tak jak „Wyrusz” na ekranie miejsca.\n- Raport z awansem pozwala od razu rozdać wolne punkty: „Rozdaj według klasy” albo „Rozdaj ręcznie”.\n- Przy tworzeniu postaci „Rozpocznij” jest zawsze pod ręką, a obok widać, czego jeszcze brakuje. Na komputerze klasy stoją w dwóch kolumnach.\n- Targowisko: przy wystawianiu stuknij w przedmiot, a rozwinie się jego pełna karta z porównaniem do noszonego."
+    },
+    {
+      "id": "0.3.2",
+      "title": "Wersja 0.3.2",
+      "body": "- Towarzysze ewoluują: na swoim 50., 100. i 200. poziomie sami przechodzą w formę ścieżki pierwszej umiejętności ze swojej karty, z jej nazwą, cechą i dwiema umiejętnościami. Najęty Kleryk z Modlitwą o zdrowie zostaje Uzdrowicielem i leczy całą drużynę Odnową. Wygląd zostaje ich własny, a ci, którzy mają już 50. poziom, ewoluowali od razu.\n- Przechowalnia w Warsztacie i w Szlifierni: pod zaznaczonym przedmiotem stoi porównanie z tym, co postać nosi w tym miejscu."
     }
   ]
 }

@@ -9,6 +9,9 @@
 // character, faster while it is below it. Without wages (question 110).
 // Fainted in a fight, it is wounded until the character has rested to full
 // HP (the author: "Niech rany towarzyszy goją się wraz z ranami postaci").
+// At its 50th, 100th and 200th level it evolves by itself along the path of
+// the first skill on its card (896 A, companionForm): the form's name,
+// trait, growth and two skills, its own look.
 //
 // Stored in the Osada: { id, name, appearance, classId, level, xp, traits,
 // skills, profession, story, gear: [items], wounded, giftWeek, stays,
@@ -17,6 +20,7 @@
 // `trained` counts the day's trainings ({ day, count }, companionTraining).
 
 import { playerCombatant } from './combatant.js';
+import { evolutionName, evolutionOf, nextFormOf } from './evolutions.js';
 import { baseClassLevel, canUse, generateItem } from './items.js';
 import { explorationGold } from './mining.js';
 import { gainXp, xpToNext } from './progression.js';
@@ -39,7 +43,8 @@ import { weekCount, weekFactor } from './weeks.js';
  */
 const tuning = (content) => content.settlement.companions;
 
-// The skills of a class a companion can learn: its own, not an evolution's.
+// The skills of a class a candidate comes with: its own, not an
+// evolution's (a form's come with the form, companionForm).
 /**
  * @param {string} classId
  * @param {Content} content
@@ -48,7 +53,11 @@ const tuning = (content) => content.settlement.companions;
 const classSkills = (classId, content) => content.skills.filter((/** @type {Record<string, any>} */ skill) => skill.classId === classId);
 
 // A skill's level at the companion's level: the first at the skill's class
-// level, one more every skillStep levels, up to the skills' top level.
+// level, one more every skillStep levels, up to the skills' top level. A
+// form's skill (896 A) counts its levels from the class's first skill
+// level, as the points of the class's skills come back for the form's at a
+// character's evolution, so the companion's skills do not fall back to the
+// first level when it evolves.
 /**
  * @param {string} skillId
  * @param {number} level
@@ -58,7 +67,71 @@ const classSkills = (classId, content) => content.skills.filter((/** @type {Reco
 export function companionSkillLevel(skillId, level, content) {
   const skill = content.skillsById[skillId];
   if (!skill || level < skill.classLevel) return 0;
-  return Math.min(topLevel(skill, content), 1 + Math.floor((level - skill.classLevel) / tuning(content).skillStep));
+  const from = skill.evolution ? content.balance.skills.unlockClassLevel : skill.classLevel;
+  return Math.min(topLevel(skill, content), 1 + Math.floor((level - from) / tuning(content).skillStep));
+}
+
+// The form a companion has grown into (896 A; the author, 13.11.2026:
+// "sam, bez wyboru, ścieżką pierwszej umiejętności ze swojej karty"): from
+// the first evolution level (50) the first evolution of its class whose
+// path is the first of its skills (else the second's), and at each later
+// evolution level (100, 200) the form that grows out of the one before,
+// where the deployment has it. Null below the first evolution level or
+// with the evolutions off. Its look stays its own (companionCombatant).
+/**
+ * @param {Companion} companion
+ * @param {Content} content
+ * @returns {Record<string, any> | null}
+ */
+export function companionForm(companion, content) {
+  const levels = content.balance.progression.classEvolutionLevels;
+  if (companion.level < levels[0]) return null;
+  const firsts = content.evolutions.filter((/** @type {Record<string, any>} */ evolution) => evolution.classId === companion.classId && !evolution.from);
+  /** @type {Record<string, any> | null} */
+  let form = companion.skills.map((/** @type {string} */ id) => firsts.find((/** @type {Record<string, any>} */ evolution) => evolution.path === id)).find(Boolean) ?? null;
+  for (let stage = 1; form && stage < levels.length && companion.level >= levels[stage]; stage++) {
+    const next = nextFormOf(form, content);
+    if (!next) break;
+    form = next;
+  }
+  return form;
+}
+
+// The skills a companion fights with: its form's two once it has evolved,
+// else the two of its class it came with.
+/**
+ * @param {Companion} companion
+ * @param {Content} content
+ * @returns {string[]}
+ */
+export const companionSkills = (companion, content) => companionForm(companion, content)?.skills ?? companion.skills;
+
+// The name a companion's class goes by: its form's (a woman's where it has
+// one), else its class's; and the class's name beside a form's.
+/**
+ * @param {Companion} companion
+ * @param {Content} content
+ * @returns {{ name: string, base: string | null }}
+ */
+export function companionClassName(companion, content) {
+  const form = companionForm(companion, content);
+  const own = content.classesById[companion.classId]?.name ?? companion.classId;
+  return form ? { name: evolutionName(form, companion.appearance), base: own } : { name: own, base: null };
+}
+
+// How many more materials from creatures a tracker's trait (the Łowca's
+// Tropiciel and its later forms) brings on a trip: the most of the
+// character's form and its companions' forms (896 A: a companion's form's
+// trait works as a character's), counted once.
+/**
+ * @param {Record<string, any>} character
+ * @param {Companion[]} companions
+ * @param {Content} content
+ * @returns {number}
+ */
+export function trackerMaterials(character, companions, content) {
+  const traits = [evolutionOf(character, content)?.trait, ...companions.map((companion) => companionForm(companion, content)?.trait)];
+  return Math.max(0, ...traits.filter((trait) => trait?.kind === 'tracker').map((trait) => trait.params.materials));
 }
 
 // The gear a candidate comes with (question 108 B for the start; the
@@ -171,7 +244,9 @@ export function hireCost(companion, content, points = 0) {
 
 // The companion as the engine's character: its points spread by its class
 // (the design: "automatyczny rozdział punktów według klasy"), its skills at
-// its level, its class's place in the line.
+// its level, its class's place in the line, and its form once it has
+// evolved (896 A), whose growth, trait and skills it takes as a
+// character's evolution would.
 /**
  * @param {Companion} companion
  * @param {Content} content
@@ -179,11 +254,12 @@ export function hireCost(companion, content, points = 0) {
  */
 export function companionCharacter(companion, content) {
   const cls = content.classesById[companion.classId];
+  const form = companionForm(companion, content);
   const base = { classId: companion.classId, level: companion.level, classLevel: companion.level, points: {}, professions: {}, appearance: companion.appearance };
   /** @type {[string, number][]} */
-  const levels = companion.skills.map((/** @type {string} */ id) => [id, companionSkillLevel(id, companion.level, content)]);
+  const levels = (form?.skills ?? companion.skills).map((/** @type {string} */ id) => [id, companionSkillLevel(id, companion.level, content)]);
   const skills = Object.fromEntries(levels.filter(([, level]) => level > 0));
-  return { ...base, points: autoDistribute(base, content), skills, position: cls.position };
+  return { ...base, points: autoDistribute(base, content), skills, position: cls.position, ...(form && { evolution: form.id }) };
 }
 
 // The traits' changes, summed: { damage, armor, hp, dodge, crit, speed, will }.
@@ -344,7 +420,8 @@ export function companionAfterErrand(companion, { relation, errand }, content) {
  * @param {Content} content
  */
 export function companionCombatant(companion, { hp, area, id = 'a1' } = {}, content) {
-  const unit = playerCombatant({ character: companionCharacter(companion, content), equipped: companion.gear, hp, name: companion.name, area, id }, content);
+  // Its form's portrait stays off: a companion keeps its own look (896 A).
+  const { evolution: _form, ...unit } = playerCombatant({ character: companionCharacter(companion, content), equipped: companion.gear, hp, name: companion.name, area, id }, content);
   const bonus = traitBonuses(companion, content);
   const bond = bondBonus(companion, content);
   const maxHp = Math.max(1, Math.round(unit.maxHp * (1 + (bonus.hp ?? 0) + bond)));
