@@ -845,6 +845,11 @@
       "id": "0.3.18",
       "title": "Wersja 0.3.18",
       "body": "- Na Arenie jest nowa zakładka „Karty”. Od 25. poziomu grasz w niej w karty z taliami innych graczy, 5 partii dziennie. Gdy Ciebie nie ma, Twoja talia z Salonu Gier broni się sama.\n- Za nieobecnego rywala gra System: wykłada jego karty jawnie, a raz na partię używa umiejętności jego karty bohatera.\n- Ocena kart jest osobna od oceny pojedynków. W „Tabeli tygodnia” przełączysz się na tabelę kart, a za miejsce w niej zgarniesz złoto i Punkty Systemu, o połowę mniej niż za pojedynki."
+    },
+    {
+      "id": "0.3.19",
+      "title": "Wersja 0.3.19",
+      "body": "- Partie kart na żywo: w karcie postaci innego gracza, który jest w grze, wyzwiesz go na partię Talii Systemu, bez stawki albo o złoto. Ruchy robicie na zmianę, 30 sekund na ruch, a za wygraną zgarniesz obie stawki bez 5%."
     }
   ]
 }

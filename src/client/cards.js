@@ -34,6 +34,7 @@
 // own table: elsewhere the panel says where it waits.
 
 import { areaArtUrl, monsterSprite, placeArt, portraitSprite, residentBust } from './art.js';
+import { mountDuel } from './card-duel.js';
 import { createCardsFx, fxDroppedCards } from './cards-fx.js';
 import { h, icon } from './dom.js';
 import { countOf, formatNumber } from './format.js';
@@ -141,10 +142,15 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
   const fx = createCardsFx(holder);
   let deferred = false;
 
+  // A live match with another player (901 B, card-duel.js) takes the table
+  // while it runs; once its end is seen, Szczęsny's tab comes back. Only the
+  // Salon's table has it: a resident's table in the Osada (904 B) never
+  // shows a live match.
+  const duel = resident ? { on: () => false, unmount: () => {} } : mountDuel(holder, { cardFace, onLayout: () => onLayout(), onEnd: () => load() });
   // Whether a match is this table's: a resident's at its own, Szczęsny's in
   // the Salon. Another table's waits there.
   const own = (match) => Boolean(match) && (resident ? match.resident === resident : !match.resident);
-  const playing = () => own(view?.match) && !building;
+  const playing = () => duel.on() || (own(view?.match) && !building);
   // A resident's table as the view brings it (the residents' tables, 904 B).
   const tableOf = (id) => view?.residents?.find((one) => one.id === id) ?? null;
   // Who sits across a match or its end: Szczęsny with his tier, or a
@@ -1143,6 +1149,8 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
   // --- The tab -------------------------------------------------------------
 
   function render() {
+    // The live match draws the tab itself (card-duel.js).
+    if (duel.on()) return;
     // While the table's motion plays, the redraw waits for its end.
     if (fx.holding()) {
       deferred = true;
@@ -1196,6 +1204,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
       gone = true;
       clearTimeout(timer);
       fx.stop();
+      duel.unmount();
     },
   };
 }

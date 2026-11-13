@@ -672,6 +672,10 @@
     "0.3.18": {
       "title": "Version 0.3.18",
       "body": "- The Arena has a new tab, \"Cards\". From level 25 you play cards there against other players' decks, 5 matches a day. While you are away, your deck from the Games Parlour defends itself.\n- The System plays for an absent rival: it lays their cards face up and uses their hero card's skill once a match.\n- The card rating is separate from the duel rating. Under \"Week's table\" you can switch to the card table, and your place there brings you gold and System Points, half of what the duels give."
+    },
+    "0.3.19": {
+      "title": "Version 0.3.19",
+      "body": "- Live card matches: on the card of another player who is in the game, you can challenge them to a System Deck match, without a stake or for gold. You take turns, 30 seconds a move, and a win gets you both stakes minus 5%."
     }
   }
 }
