@@ -3252,6 +3252,10 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.27 (14.11.2026): kolejny kod za kawę
+
+Autor 14.11.2026 poprosił o jednorazowy kod KAWA100 na 100 Punktów Systemu dla jednego gracza. Kod działa tylko dla jednej postaci (w danych skrót SHA-256 jej imienia zamiast imienia, bo repozytorium jest publiczne; `coffee-2026-11-d`), raz, do 14.12.2026 włącznie (brakujący szczegół: miesiąc, jak przy poprzednich kodach za kawę). Wcześniejszy kod KAWA100 innej postaci działa dalej osobno. Kod nie trafia do „Co nowego?”, bo jest dla jednej postaci; autor przekazuje go sam.
+
 ## Wersja 0.3.26 (13.11.2026): lista graczy online (937)
 
 Autor w czacie 13.11.2026: „Dodaj opcje otwierania listy graczy online pod zieloną kropka ilu graczy online jest”, a po makietach 937.1 i 937.2: „937 accept”.

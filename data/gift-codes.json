@@ -99,6 +99,13 @@
       "for": "bab0b06ff825c848fe81efa6c314c97148bcfa6928141c12f11f8663ff9b1c7d",
       "until": "2026-12-11T00:00:00+01:00",
       "rewards": { "systemPoints": 100 }
+    },
+    {
+      "id": "coffee-2026-11-d",
+      "code": "KAWA100",
+      "for": "8acfc20dd12de57a4ec6f2608e3d490172b8f259243b62a6f691822422bb968d",
+      "until": "2026-12-15T00:00:00+01:00",
+      "rewards": { "systemPoints": 100 }
     }
   ],
   "moves": [
