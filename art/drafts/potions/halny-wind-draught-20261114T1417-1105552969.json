@@ -1,0 +1,14 @@
+{
+  "id": "halny-wind-draught",
+  "tool": "pixellab generate-image-v2",
+  "description": "a round flask of clear glass filled with swirling glowing pale turquoise mist like a mountain wind, a small white cloud wisp curling out from under the cork, single inventory item icon, bold clean outline",
+  "style": "src/client/art/potions/strength-brew.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

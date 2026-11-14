@@ -1,0 +1,14 @@
+{
+  "id": "henbane-oil",
+  "tool": "pixellab generate-image-v2",
+  "description": "a small dark green glass vial with a black wax seal, filled with thick oily sickly yellow-green liquid, a little henbane flower, pale yellow with purple veins, tied to its neck, single inventory item icon, bold clean outline",
+  "style": "src/client/art/potions/strength-brew.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

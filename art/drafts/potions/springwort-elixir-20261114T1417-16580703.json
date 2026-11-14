@@ -1,0 +1,14 @@
+{
+  "id": "springwort-elixir",
+  "tool": "pixellab generate-image-v2",
+  "description": "a round flask of clear glass bound by a cracked iron band, filled with glowing silver-blue liquid full of tiny white sparks, cork, single inventory item icon, bold clean outline",
+  "style": "src/client/art/potions/strength-brew.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

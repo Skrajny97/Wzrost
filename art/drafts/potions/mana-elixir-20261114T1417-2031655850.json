@@ -1,0 +1,14 @@
+{
+  "id": "mana-elixir",
+  "tool": "pixellab generate-image-v2",
+  "description": "a tall round flask of clear glass with a cork, filled with glowing deep sapphire blue liquid with tiny silver stars swirling inside, single inventory item icon, bold clean outline",
+  "style": "src/client/art/potions/strength-brew.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

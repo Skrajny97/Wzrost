@@ -1,0 +1,14 @@
+{
+  "id": "great-healing-balm",
+  "tool": "pixellab generate-image-v2",
+  "description": "a large round flask of clear glass with a cork sealed in gold wax, filled with glowing bright crimson balm with a golden shimmer, a tiny golden heart charm hanging on a string, single inventory item icon, bold clean outline",
+  "style": "src/client/art/potions/strength-brew.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

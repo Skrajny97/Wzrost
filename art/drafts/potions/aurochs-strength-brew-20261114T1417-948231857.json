@@ -1,0 +1,14 @@
+{
+  "id": "aurochs-strength-brew",
+  "tool": "pixellab generate-image-v2",
+  "description": "a round flask of thick glass with a small curved black aurochs horn tied to its neck with a leather thong, filled with glowing blood-red brew, cork, single inventory item icon, bold clean outline",
+  "style": "src/client/art/potions/strength-brew.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

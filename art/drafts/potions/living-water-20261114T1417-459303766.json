@@ -1,0 +1,14 @@
+{
+  "id": "living-water",
+  "tool": "pixellab generate-image-v2",
+  "description": "a round flask of crystal clear glass filled with sparkling shining water glowing white and pale blue, a tiny green leaf floating inside, cork, single inventory item icon, bold clean outline",
+  "style": "src/client/art/potions/strength-brew.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

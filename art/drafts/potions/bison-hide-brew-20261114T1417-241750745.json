@@ -1,0 +1,14 @@
+{
+  "id": "bison-hide-brew",
+  "tool": "pixellab generate-image-v2",
+  "description": "a squat round flask of thick glass wrapped in a strip of shaggy dark brown bison fur, filled with thick glowing amber-brown brew, cork, single inventory item icon, bold clean outline",
+  "style": "src/client/art/potions/strength-brew.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}
