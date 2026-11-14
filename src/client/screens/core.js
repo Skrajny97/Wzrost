@@ -54,7 +54,7 @@ export function mountCore(container, options) {
         howItWorks(t('Artefakty z Labiryntu Systemu wchłaniasz do Rdzenia na stałe. Każdy daje postaci cechy swojego żywiołu.'), [
           t('Gniazda: Rdzeń ma jedno gniazdo na każde {per} poziomów postaci.', { per: view.perSockets }),
           t('Wielkość: mały Artefakt zajmuje 1 gniazdo i ma 1 cechę. Średni zajmuje 2 gniazda i ma 2 cechy. Duży zajmuje 3 gniazda i ma 2 cechy oraz zdolność.'),
-          t('Ulepszanie: Odłamki ulepszają Artefakt aż do +10 i zawsze się udaje. Każdy stopień to +10% do jego liczb. Odłamki zdobędziesz, rozbijając Artefakt ze Skrytki.'),
+          t('Ulepszanie: Odłamki ulepszają Artefakt aż do +10 i to zawsze się udaje. Każdy stopień to +10% do jego liczb. Odłamki zdobędziesz z Labiryntu lub dodatkowe – rozbijając Artefakt ze Skrytki.'),
           t('Rezonans: 2, 4 i 6 Artefaktów tego samego żywiołu dają coraz większą premię tego żywiołu.'),
           t('Klejnot: klejnot oprawiony w Rdzeń w Szlifierni podnosi liczby wszystkich Artefaktów w Rdzeniu.'),
           t('Rozpuszczanie: Artefakt zostaje w Rdzeniu, dopóki go nie rozpuścisz. Wtedy znika, a Ty odzyskujesz połowę Odłamków włożonych w jego ulepszanie.'),

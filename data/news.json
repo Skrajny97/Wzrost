@@ -945,6 +945,11 @@
       "id": "0.3.45",
       "title": "Wersja 0.3.45",
       "body": "- Krótszy pierwszy punkt opisu Rdzenia: jedno gniazdo na każde 10 poziomów postaci."
+    },
+    {
+      "id": "0.3.46",
+      "title": "Wersja 0.3.46",
+      "body": "- Punkt „Ulepszanie” w opisie Rdzenia mówi teraz, skąd są Odłamki: z Labiryntu, a dodatkowe z rozbijania Artefaktów ze Skrytki."
     }
   ]
 }

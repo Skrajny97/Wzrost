@@ -752,6 +752,10 @@
     "0.3.45": {
       "title": "Version 0.3.45",
       "body": "- A shorter first point in the Core's explanation: one socket for every 10 character levels."
+    },
+    "0.3.46": {
+      "title": "Version 0.3.46",
+      "body": "- The Core's “Upgrades” point now says where Shards come from: the Labyrinth, and extra ones from breaking Artifacts from the Cache."
     }
   }
 }
