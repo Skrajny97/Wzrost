@@ -728,6 +728,10 @@
     "0.3.39": {
       "title": "Version 0.3.39",
       "body": "- In fights, close-combat characters now strike with the weapon they have equipped: a sword cuts in an arc, an axe chops with a big swing and a dagger thrusts. This goes for the Warrior, the Shadow, their evolutions and companions.\n- Backstab and other strikes from the shadows drive the dagger into the target from the side."
+    },
+    "0.3.40": {
+      "title": "Version 0.3.40",
+      "body": "- From class level 150, 22 new Tier VIII items await, from the Self-Swinging Sword to the Alatyr Stone. They drop on explorations from the Burnt Forest on, and you also find them in the weekly chest, at the wandering trader, in the Games Parlour, in the Towers, in Guild Beast chests, on the Guild Expedition and in the guild war chest.\n- The Encyclopedia has a Tier VIII section with six sets. Tier VIII patterns open at level 150 of Crafting and Jewelcrafting.\n- An Encyclopedia chest gives at most 100 System Points. A full Tier VII or Tier VIII set gives 100 System Points."
     }
   }
 }

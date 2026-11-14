@@ -207,6 +207,9 @@ export const SPRITES = {
       // The seventh bases, from class level 125 (814, the author's picks 813).
       'coronation-sword', 'nadziak', 'baselard', 'persian-bow', 'archmage-staff', 'pacifical', 'royal-shield', 'crown-quiver', 'rondel', 'hourglass',
       'magnate-cap', 'armet', 'czamara', 'maximilian-armor', 'szuba', 'prophet-crown', 'pallium', 'hetman-gloves', 'safian-boots', 'pectoral', 'ancestors-ring', 'grzywna',
+      // The eighth bases, from class level 150 (949, the author's picks 950).
+      'self-swinging-sword', 'executioner-axe', 'khanjar', 'devana-bow', 'merlin-staff', 'holy-grail', 'aegis', 'bottomless-quiver', 'nocnitsa-blade', 'twardowski-mirror',
+      'cap-of-invisibility', 'svetovid-helm', 'bekesha', 'zawisza-armor', 'mokosh-robe', 'papal-tiara', 'rationale', 'svarog-gauntlets', 'seven-league-boots', 'ryngraf', 'solomon-ring', 'alatyr',
     ],
   },
   // Materials left by creatures, the parts the Stół rozbiórki makes and
