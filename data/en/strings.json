@@ -3285,5 +3285,6 @@
   "Nazwij": "Name",
   "Nazwij talię: {name}": "Name the deck: {name}",
   "Nazwa talii to tekst.": "A deck name is text.",
-  "Nazwa": "Name"
+  "Nazwa": "Name",
+  "Talia {slot}": "Deck {slot}"
 }
