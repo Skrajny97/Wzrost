@@ -39,6 +39,8 @@ export const SPRITES = {
       'bandit-chief', 'poacher', 'horse-thief', 'smuggler', 'arsonist', 'highwaywoman', 'grave-robber',
       // The mimic of the party event „Zakopana skrzynia” (848.5, 849 A).
       'mimic',
+      // The foes of the events of 951 (14.11.2026).
+      'robber-knight', 'snake-king', 'viper-knot',
       // Czarne Bagno (101–125) from 3.11.2026.
       'pond-turtle', 'mink', 'dragonfly', 'pike', 'water-spider', 'black-tern', 'wooden-idol', 'veles-serpent', 'pagan-priest', 'bog-demon', 'tick', 'night-heron', 'bies', 'black-goat', 'klobuk', 'mamuna', 'rokita',
       // Sosnowe Wydmy (126–150) from 3.11.2026.
@@ -447,7 +449,11 @@ export const SPRITES = {
   events: {
     width: 96,
     height: 128,
-    ids: ['wounded-woman', 'fern-flower', 'blue-mushroom', 'wandering-beggar', 'wayside-shrine', 'stuck-merchant', 'leshy', 'lost-child', 'forest-wedding', 'treasure-hunter', 'bog-herbalist', 'star-iron', 'ferryman', 'fireside-dice', 'refugees', 'old-soldier'],
+    ids: [
+      'wounded-woman', 'fern-flower', 'blue-mushroom', 'wandering-beggar', 'wayside-shrine', 'stuck-merchant', 'leshy', 'lost-child', 'forest-wedding', 'treasure-hunter', 'bog-herbalist', 'star-iron', 'ferryman', 'fireside-dice', 'refugees', 'old-soldier',
+      // The events of 951 (14.11.2026), the author's picks 957.
+      'bounty-hunters', 'robber-knight', 'skarbnik', 'snake-king', 'ghost-caravan', 'white-stag', 'forefathers-eve', 'boruta',
+    ],
   },
   'event-scenes': {
     width: 192,

@@ -511,9 +511,14 @@ export function resolveEvent(
   // the Osada (`relation`, points by resident), and for a companion's errand
   // the companion's relation (`companion.relation`: points, or "next", its
   // next standing at once) and its errand settled (`companion.errand`).
+  // A won fight may also leave a blessing or a curse for the next fights
+  // (`buff`) and free stat points (`points`), as a reward does (951.2: the
+  // knight-errant's blessing, 951.7: the souls' thanks).
   const ties = (/** @type {Record<string, any> | undefined} */ gives) => ({
     ...(gives?.relation && { relation: gives.relation }),
     ...(gives?.companion && mate && { companion: { id: mate.id, ...gives.companion } }),
+    ...(gives?.buff && { buff: gives.buff }),
+    ...(gives?.points && { points: gives.points }),
   });
   const goldOf = (/** @type {number} */ times) => Math.round(content.balance.rewards.goldPerLevel * character.level * times * rng.float(0.75, 1.25));
   const itemOf = (/** @type {Record<string, number>} */ rarities) => {
