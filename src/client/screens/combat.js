@@ -53,8 +53,14 @@ import { weekLine } from '../weeks.js';
 // Shown through t(), as the page loads its English after this module.
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
 const CHOICE_KEY = 'wzrost.hunt-choice';
-// The potions to take along and the healing mark: { potions: { [id]: count }, healBelow }.
+// The potions to take along and the healing mark: { potions: { [id]: count },
+// picks: { heal, mana }, strengths: { heal, mana }, counts: { heal, mana },
+// healBelow } (picks, their strengths and counts since 959, for the kinds
+// chosen from a list).
 const POTION_KEY = 'wzrost.potion-choice';
+// The kinds of potions taken as one choice from a list (959 B), with the
+// name of the row.
+const POTION_GROUPS = { heal: 'Leczenie', mana: 'Mana' };
 const HOME = '#/walka';
 // How long a party leader's box "Z drużyną" stands before it is asked again.
 const PARTY_FRESH_MS = 20000;
@@ -336,10 +342,11 @@ export function mountCombat(container, { params, navigate }) {
     return state.character?.hardHunt && hardHuntOn() ? '&hard=1' : '';
   }
 
-  // The healing potions taken along, for the threat: "&heal=2&below=0.4".
+  // The healing potions taken along, for the threat: "&heal=2&below=0.4",
+  // with the kind chosen from the list (959).
   function healingQuery() {
     const healing = potions?.healing();
-    return healing && healing.count > 0 ? `&heal=${healing.count}&below=${healing.below}` : '';
+    return healing && healing.count > 0 ? `&heal=${healing.count}&below=${healing.below}${healing.kind ? `&kind=${encodeURIComponent(healing.kind)}` : ''}` : '';
   }
 
   function render() {
@@ -1335,17 +1342,25 @@ export function mountCombat(container, { params, navigate }) {
     return h('section', { class: 'hunt-options', 'aria-label': t('Opcje wyprawy') }, toggle, body);
   }
 
-  // The potions to take along, each kind with −/+ up to one for each fight
-  // of the length (a fern brew one at all: its `carry`), and the healing
-  // mark, both remembered in this browser.
+  // The potions to take along, up to one for each fight of the length, and
+  // the healing mark, all remembered in this browser. Of healing and of mana
+  // the kind is picked from a list and how many with −/+, the weaker ones of
+  // the kind making up for what the bag lacks (959 B, the author: "biorę
+  // tylko jeden dostępny rodzaj lub jeśli nie mam tyle zapasów uzupełniam
+  // wtedy tymi słabszymi"); the cures and the revivals each with −/+ (a
+  // revival one at all: its `carry`).
   // The wish is kept apart from what a shorter length allows, so it comes
   // back with a longer one. A change asks for the threat again.
   function potionPicker(carried, use) {
     const stored = loadChoice(POTION_KEY);
     const wanted = { ...stored.potions };
+    const picks = { ...stored.picks };
+    // How strong the kind picked is, for when the bag runs out of it.
+    const strengths = { ...stored.strengths };
+    const counts = { ...stored.counts };
     let below = use.healBelowChoices.includes(stored.healBelow) ? stored.healBelow : use.healBelow;
     let fights = 1;
-    const save = () => saveChoice({ potions: wanted, healBelow: below }, POTION_KEY);
+    const save = () => saveChoice({ potions: wanted, picks, strengths, counts, healBelow: below }, POTION_KEY);
     const changed = () => {
       save();
       loadOptions();
@@ -1356,35 +1371,139 @@ export function mountCombat(container, { params, navigate }) {
       const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('{name}: więcej', { name: label }), text: '+', onClick: () => onStep(1) });
       return { less, more };
     };
-    const rows = carried.map((potion) => {
-      const limit = () => Math.min(potion.count, fights, potion.carry ?? Infinity);
-      const count = () => Math.min(wanted[potion.id] ?? 0, limit());
+    const art = (potion) => potionSprite(potion.id) ?? icon('flask', { size: 20 });
+    // The cures and the revivals one by one, as before.
+    const rows = carried
+      .filter((potion) => !POTION_GROUPS[potion.fight])
+      .map((potion) => {
+        const limit = () => Math.min(potion.count, fights, potion.carry ?? Infinity);
+        const count = () => Math.min(wanted[potion.id] ?? 0, limit());
+        const value = h('output', { class: 'potion-pick-value' });
+        const { less, more } = stepper(potion.name, (sign) => {
+          wanted[potion.id] = Math.max(0, Math.min(limit(), count() + sign));
+          show();
+          changed();
+        });
+        const show = () => {
+          value.textContent = t('{count} z {all}', { count: count(), all: limit() });
+          less.disabled = count() === 0;
+          more.disabled = count() >= limit();
+        };
+        const element = h('div', { class: 'potion-pick' }, h('span', { class: 'potion-pick-art' }, art(potion)), h('span', { class: 'potion-pick-name', text: potion.name }), less, value, more);
+        return { taken: () => ({ [potion.id]: count() }), show, element };
+      });
+    // Healing and mana: the kind chosen from a list and how many, the weaker
+    // ones of the kind making up for what the bag lacks, the strongest of
+    // them first.
+    const groups = Object.entries(POTION_GROUPS).flatMap(([kind, title]) => {
+      const kinds = carried.filter((potion) => potion.fight === kind).sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0));
+      if (kinds.length === 0) return [];
+      // A kind picked that the bag has run out of gives way to the strongest
+      // of those weaker than it (the stronger ones stay home), or to the
+      // weakest there is. A choice kept from the list of single potions:
+      // the strongest of them wished for, and as many as all of them together.
+      if (!kinds.some((potion) => potion.id === picks[kind])) {
+        const weaker = Number.isFinite(strengths[kind]) ? (kinds.find((potion) => (potion.amount ?? 0) < strengths[kind]) ?? kinds.at(-1)) : null;
+        picks[kind] = (weaker ?? kinds.find((potion) => (wanted[potion.id] ?? 0) > 0) ?? kinds[0]).id;
+        counts[kind] ??= kinds.reduce((sum, potion) => sum + (wanted[potion.id] ?? 0), 0);
+      }
+      const chosen = () => kinds.find((potion) => potion.id === picks[kind]) ?? kinds[0];
+      strengths[kind] = chosen().amount;
+      const line = () => kinds.slice(kinds.indexOf(chosen()));
+      const limit = () => Math.min(fights, line().reduce((sum, potion) => sum + potion.count, 0));
+      const count = () => Math.min(counts[kind] ?? 0, limit());
+      const taken = () => {
+        let left = count();
+        /** @type {Record<string, number>} */
+        const out = {};
+        for (const potion of line()) {
+          const take = Math.min(left, potion.count);
+          if (take > 0) out[potion.id] = take;
+          left -= take;
+        }
+        return out;
+      };
+      const strength = (potion) => t(kind === 'heal' ? '+{amount}% HP' : '+{amount}% many', { amount: Math.round((potion.amount ?? 0) * 100) });
+      const label = t(title);
+      const headArt = h('span', { class: 'potion-pick-art' });
       const value = h('output', { class: 'potion-pick-value' });
-      const { less, more } = stepper(potion.name, (sign) => {
-        wanted[potion.id] = Math.max(0, Math.min(limit(), count() + sign));
+      const { less, more } = stepper(label, (sign) => {
+        counts[kind] = Math.max(0, Math.min(limit(), count() + sign));
         show();
         changed();
       });
+      const note = h('p', { class: 'potion-group-note muted', hidden: true });
+      const choose = (id) => {
+        picks[kind] = id;
+        strengths[kind] = chosen().amount;
+        show();
+        changed();
+      };
+      // The list unfolds under the row, with the potions' pictures, their
+      // strength and how many the bag holds (959 B).
+      const shown = h('span', { class: 'potion-kind-current' });
+      const options = h('ul', { class: 'potion-kind-options', hidden: true, role: 'listbox', 'aria-label': label });
+      const toggle = h('button', { type: 'button', class: 'potion-kind', 'aria-expanded': 'false', 'aria-label': t('{name}: rodzaj', { name: label }), onClick: () => setOpen(options.hidden) }, shown, h('span', { class: 'potion-kind-caret', 'aria-hidden': 'true', text: '▾' }));
+      const setOpen = (open) => {
+        options.hidden = !open;
+        toggle.setAttribute('aria-expanded', String(open));
+      };
+      const showChooser = () => {
+        const potion = chosen();
+        shown.replaceChildren(
+          h('span', { class: 'potion-pick-art' }, art(potion)),
+          h('span', { class: 'potion-kind-name', text: potion.name }),
+          h('span', { class: 'potion-kind-meta', text: `${strength(potion)} · ${t('masz {count}', { count: potion.count })}` }),
+        );
+        options.replaceChildren(
+          ...kinds.map((one) =>
+            h(
+              'li',
+              {},
+              h(
+                'button',
+                {
+                  type: 'button',
+                  role: 'option',
+                  class: 'potion-kind-option',
+                  'aria-selected': String(one.id === potion.id),
+                  onClick: () => {
+                    setOpen(false);
+                    choose(one.id);
+                  },
+                },
+                h('span', { class: 'potion-pick-art' }, art(one)),
+                h('span', { class: 'potion-kind-name', text: one.name }),
+                h('span', { class: 'potion-kind-meta', text: `${strength(one)} · ${t('masz {count}', { count: one.count })}` }),
+              ),
+            ),
+          ),
+        );
+      };
+      const chooser = h('div', { class: 'potion-kind-box' }, toggle, options);
       const show = () => {
+        headArt.replaceChildren(art(chosen()));
         value.textContent = t('{count} z {all}', { count: count(), all: limit() });
         less.disabled = count() === 0;
         more.disabled = count() >= limit();
+        showChooser();
+        const parts = Object.entries(taken());
+        note.hidden = parts.length < 2;
+        note.textContent = t('Weźmiesz: {potions}.', { potions: parts.map(([id, many]) => `${many} × ${kinds.find((potion) => potion.id === id)?.name}`).join(', ') });
       };
       const element = h(
         'div',
-        { class: 'potion-pick' },
-        h('span', { class: 'potion-pick-art' }, potionSprite(potion.id) ?? icon('flask', { size: 20 })),
-        h('span', { class: 'potion-pick-name', text: potion.name }),
-        less,
-        value,
-        more,
+        { class: 'potion-group' },
+        h('div', { class: 'potion-pick' }, headArt, h('span', { class: 'potion-pick-name potion-group-title', text: label }), less, value, more),
+        chooser,
+        note,
       );
-      return { potion, count, show, element };
+      return [{ kind, taken, show, element, count }];
     });
-    const healRow = rows.find((row) => row.potion.fight === 'heal');
+    const heal = groups.find((group) => group.kind === 'heal');
     // Jagna's burn brew (667) is named only when the character carries it:
     // until she teaches the recipe, it has never heard of it.
-    const burnCure = rows.some((row) => row.potion.cures === 'burning');
+    const burnCure = carried.some((potion) => potion.cures === 'burning');
     const markValue = h('output', { class: 'potion-pick-value' });
     const mark = stepper(t('Próg leczenia'), (sign) => {
       const choices = use.healBelowChoices;
@@ -1398,12 +1517,15 @@ export function mountCombat(container, { params, navigate }) {
       mark.more.disabled = below === use.healBelowChoices.at(-1);
     };
     showMark();
+    const all = [...groups, ...rows];
     const element = h(
       'section',
       { class: 'potion-picks', 'aria-label': t('Mikstury na wyprawę') },
       h('p', { class: 'duration-title', text: t('Mikstury na wyprawę') }),
+      heal?.element,
+      heal && h('div', { class: 'potion-pick' }, h('span', { class: 'potion-pick-name', text: t('Lecz poniżej') }), mark.less, markValue, mark.more),
+      groups.filter((group) => group !== heal).map((group) => group.element),
       rows.map((row) => row.element),
-      healRow && h('div', { class: 'potion-pick' }, h('span', { class: 'potion-pick-name', text: t('Lecz poniżej') }), mark.less, markValue, mark.more),
       h('p', {
         class: 'muted',
         text: t(
@@ -1416,12 +1538,12 @@ export function mountCombat(container, { params, navigate }) {
       element,
       update(minutes) {
         fights = fightsFor(use, minutes);
-        for (const row of rows) row.show();
+        for (const one of all) one.show();
       },
-      taken: () => Object.fromEntries(rows.map((row) => [row.potion.id, row.count()]).filter(([, count]) => count > 0)),
+      taken: () => Object.fromEntries(all.flatMap((one) => Object.entries(one.taken())).filter(([, count]) => count > 0)),
       // The healing potions wished for, whatever the length: the server
       // takes one for each fight of every length.
-      healing: () => healRow && { count: Math.min(wanted[healRow.potion.id] ?? 0, healRow.potion.count), below },
+      healing: () => heal && { count: counts.heal ?? 0, below, kind: picks.heal },
       below: () => below,
     };
   }

@@ -950,6 +950,11 @@
       "id": "0.3.46",
       "title": "Wersja 0.3.46",
       "body": "- Punkt „Ulepszanie” w opisie Rdzenia mówi teraz, skąd są Odłamki: z Labiryntu, a dodatkowe z rozbijania Artefaktów ze Skrytki."
+    },
+    {
+      "id": "0.3.47",
+      "title": "Wersja 0.3.47",
+      "body": "- Mikstury na wyprawę: leczenie i manę wybierasz teraz z listy, z obrazkami, mocą i liczbą w plecaku. Wybierasz jeden rodzaj i liczbę sztuk, a gdy go zabraknie, resztę uzupełnią słabsze mikstury. Mocniejsze zostają w plecaku na trudniejszą wyprawę.\n- Pod listą widać, co dokładnie zabierzesz, a zagrożenie wyprawy liczy właśnie te mikstury."
     }
   ]
 }

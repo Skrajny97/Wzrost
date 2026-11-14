@@ -38,7 +38,7 @@ import {
   durationsUpTo,
   estimateThreat,
   fightKind,
-  fightPotions,
+  kindLine,
   higherThreat,
   hpAfterHunt,
   huntDurations,
@@ -181,17 +181,18 @@ function cachedSamples(player, character, equipped, areaId, now, hard = false) {
   return samples;
 }
 
-// The healing potions of ?heal=…&below=… for the threat (potions.js): as
-// many as asked of the first kind the character carries, drunk below the
-// mark asked, or null.
+// The healing potions of ?heal=…&below=…&kind=… for the threat
+// (potions.js): as many as asked of the kind chosen and, where the bag has
+// fewer of it, of the weaker ones after it (kindLine, 959), the strongest
+// carried without a kind, drunk below the mark asked, or null.
 function healingFor(player, params) {
   const count = Number(params.get('heal') ?? 0);
   if (!Number.isInteger(count) || count <= 0) return null;
   const { healBelow, healBelowChoices } = content().potionUse;
-  const below = Number(params.get('below') ?? healBelow);
-  const have = knownPotionsOf(player.row);
-  const kit = fightPotions(have, healBelowChoices.includes(below) ? below : healBelow, content()).heal;
-  return kit ? { count: Math.min(count, have[kit.id]), amount: kit.amount, below: kit.below } : null;
+  const asked = Number(params.get('below') ?? healBelow);
+  const below = healBelowChoices.includes(asked) ? asked : healBelow;
+  const amounts = kindLine(knownPotionsOf(player.row), 'heal', params.get('kind'), count, content()).flatMap((one) => Array.from({ length: one.count }, () => one.amount));
+  return amounts.length > 0 ? { count: amounts.length, amount: amounts[0], amounts, below } : null;
 }
 
 // The potions an exploration of `minutes` takes along (potions.js): known

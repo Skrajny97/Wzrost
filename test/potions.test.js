@@ -17,6 +17,7 @@ import {
   faintChances,
   fightPotions,
   fightsText,
+  kindLine,
   monsterCombatant,
   playerCombatant,
   potionsPerKind,
@@ -292,6 +293,44 @@ describe('potions in fights', () => {
     for (const minutes of Object.keys(plain)) assert.ok(healed[minutes] <= plain[minutes] + 1e-12, `${minutes} min`);
     assert.ok(healed[60] < plain[60] * 0.8, `${healed[60]} vs ${plain[60]}`);
   });
+
+  // 959: a kind chosen from a list, the weaker ones of the kind making up
+  // for what the bag lacks, the stronger ones staying home.
+  test('the kind chosen and the weaker ones after it go along, the strongest first', () => {
+    const have = { 'great-healing-balm': 3, 'greater-healing': 4, healing: 12, 'lesser-healing': 2, 'greater-mana': 6 };
+    assert.deepEqual(kindLine(have, 'heal', 'great-healing-balm', 5, content), [
+      { id: 'great-healing-balm', amount: 0.85, count: 3 },
+      { id: 'greater-healing', amount: 0.5, count: 2 },
+    ]);
+    assert.deepEqual(kindLine(have, 'heal', 'greater-healing', 3, content), [{ id: 'greater-healing', amount: 0.5, count: 3 }]);
+    assert.deepEqual(
+      kindLine(have, 'heal', 'healing', 20, content).map((one) => [one.id, one.count]),
+      [
+        ['healing', 12],
+        ['lesser-healing', 2],
+      ],
+    );
+    // No kind, or one not carried: from the strongest carried.
+    assert.deepEqual(kindLine(have, 'heal', null, 4, content)[0], { id: 'great-healing-balm', amount: 0.85, count: 3 });
+    assert.deepEqual(kindLine(have, 'heal', 'jagna-balm', 1, content), [{ id: 'great-healing-balm', amount: 0.85, count: 1 }]);
+    assert.deepEqual(kindLine(have, 'mana', 'greater-mana', 2, content), [{ id: 'greater-mana', amount: 0.6, count: 2 }]);
+    assert.deepEqual(kindLine(have, 'heal', 'healing', 0, content), []);
+  });
+
+  test('the threat counts potions of several strengths, the strongest drunk first', () => {
+    const { character, equipped } = typicalCharacter('shadow', 20, content);
+    const input = { character, equipped, hp: 9999, areaId: 'mossy-boulders' };
+    const samples = threatSamples(input, calm);
+    const weak = faintChances({ ...input, healing: { count: 4, amount: 0.2, below: 0.4 } }, calm, samples);
+    const same = faintChances({ ...input, healing: { count: 4, amount: 0.2, below: 0.4, amounts: [0.2, 0.2, 0.2, 0.2] } }, calm, samples);
+    const mixed = faintChances({ ...input, healing: { count: 4, amount: 0.5, below: 0.4, amounts: [0.5, 0.5, 0.2, 0.2] } }, calm, samples);
+    const strong = faintChances({ ...input, healing: { count: 4, amount: 0.5, below: 0.4 } }, calm, samples);
+    assert.deepEqual(same, weak);
+    for (const minutes of Object.keys(weak)) {
+      assert.ok(mixed[minutes] <= weak[minutes] + 1e-12, `${minutes} min: ${mixed[minutes]} vs ${weak[minutes]}`);
+      assert.ok(strong[minutes] <= mixed[minutes] + 1e-12, `${minutes} min: ${strong[minutes]} vs ${mixed[minutes]}`);
+    }
+  });
 });
 
 describe('potions through the API', () => {
@@ -335,6 +374,12 @@ describe('potions through the API', () => {
     const threat = await call('GET', '/api/hunts/options?area=fox-ravines&heal=3&below=0.5', { cookie });
     assert.equal(threat.status, 200);
     assert.ok(threat.data.areas[0].threat[30]);
+    // The kind chosen from the list (959), and one the bag lacks.
+    for (const kind of ['lesser-healing', 'great-healing-balm']) {
+      const chosen = await call('GET', `/api/hunts/options?area=fox-ravines&heal=3&below=0.5&kind=${kind}`, { cookie });
+      assert.equal(chosen.status, 200);
+      assert.ok(chosen.data.areas[0].threat[30]);
+    }
 
     // At a third of the HP the first blow taken calls for the potion.
     const { maxHp } = await character();

@@ -41,7 +41,7 @@ import { durationsUpTo } from './unlocks.js';
  */
 /**
  * @typedef {{ character: Record<string, any>, equipped: Record<string, any>[], hp: number, areaId: string, avoidRare?: boolean, seekRare?: boolean,
- *   catchUp?: any, healing?: { count: number, amount: number, below: number } | null, hard?: boolean }} ThreatInput
+ *   catchUp?: any, healing?: { count: number, amount: number, below: number, amounts?: number[] } | null, hard?: boolean }} ThreatInput
  */
 
 // Sample fights per kind of encounter: each encounter of the inner region and the
@@ -171,7 +171,9 @@ export function threatSamples({ character, equipped, areaId, companions = [], ha
 
 // Chance of fainting for every exploration length, between 0 and 1.
 // `healing`: the healing potions taken ({ count, amount, below }), at most
-// one for each fight of a length.
+// one for each fight of a length; with `amounts` (strongest first) potions
+// of several strengths, drunk the strongest first (959: a kind and the
+// weaker ones that make up for it).
 /**
  * @param {ThreatInput} input
  * @param {Content} content
@@ -183,7 +185,7 @@ export function faintChances({ character, equipped, hp, areaId, avoidRare = fals
   const start = Math.round((Math.min(hp, maxHp) / maxHp) * STEPS);
   // A healing potion, in steps: what it heals, and the HP below which it is
   // drunk. The chances are kept for each number of potions left.
-  const potionSteps = healing ? Math.round(healing.amount * STEPS) : 0;
+  const amounts = healing ? (healing.amounts ?? Array.from({ length: healing.count }, () => healing.amount)) : [];
   const mark = healing ? healing.below * STEPS : 0;
   /** @param {number} count */
   const layers = (count) => Array.from({ length: count + 1 }, () => new Float64Array(STEPS + 1));
@@ -192,8 +194,9 @@ export function faintChances({ character, equipped, hp, areaId, avoidRare = fals
   const shares = new Float64Array(LOST + 1);
   const faintFrom = new Float64Array(STEPS + 1);
   // The same with a potion at hand: a fight that would take up to its heal
-  // more than the HP left is survived.
-  const faintWithPotion = new Float64Array(STEPS + 1);
+  // more than the HP left is survived. One table for each strength.
+  const strengths = [...new Set(amounts.map((amount) => Math.round(amount * STEPS)))];
+  const faintWithPotion = new Map(strengths.map((steps) => [steps, new Float64Array(STEPS + 1)]));
 
   /** @type {Record<string, number>} */
   const result = {};
@@ -229,11 +232,13 @@ export function faintChances({ character, equipped, hp, areaId, avoidRare = fals
       tail += fainting(steps);
       faintFrom[steps] = tail;
     }
-    for (let steps = 0; steps <= STEPS; steps++) {
-      faintWithPotion[steps] = steps + potionSteps <= STEPS ? faintFrom[steps + potionSteps] : fainting(LOST);
+    for (const [potionSteps, table] of faintWithPotion) {
+      for (let steps = 0; steps <= STEPS; steps++) {
+        table[steps] = steps + potionSteps <= STEPS ? faintFrom[steps + potionSteps] : fainting(LOST);
+      }
     }
 
-    const potions = healing ? Math.min(healing.count, pace.fights) : 0;
+    const potions = Math.min(amounts.length, pace.fights);
     let chances = layers(potions);
     let next = layers(potions);
     chances[potions][start] = 1;
@@ -253,8 +258,10 @@ export function faintChances({ character, equipped, hp, areaId, avoidRare = fals
             }
             continue;
           }
-          // With a potion: drunk once HP falls below the mark.
-          fainted += chance * faintWithPotion[step];
+          // With a potion: drunk once HP falls below the mark, the
+          // strongest left first.
+          const potionSteps = Math.round(amounts[potions - left] * STEPS);
+          fainted += chance * /** @type {Float64Array} */ (faintWithPotion.get(potionSteps))[step];
           for (const loss of losses) {
             if (loss >= step + potionSteps) break;
             const after = step - loss;

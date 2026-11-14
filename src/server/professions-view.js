@@ -167,6 +167,8 @@ export function bagPotions(row, sellBonus) {
       count: potions[potion.id],
       price: potionPrice(potion, content()) * (1 + sellBonus),
       fight: fightKind(potion),
+      // How strong it is in a fight: the share of HP or mana it gives back.
+      amount: fightKind(potion) ? potion.effect[/** @type {string} */ (fightKind(potion))] : null,
       cures: potion.cures ?? null,
       carry: carryLimit(potion, null),
       drink: Boolean(potion.effect.heal || timedKind(potion)),
