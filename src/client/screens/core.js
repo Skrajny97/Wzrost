@@ -47,13 +47,18 @@ export function mountCore(container, options) {
       h(
         'section',
         { class: 'card towers-intro' },
-        howItWorks(
-          t('Artefakty z Labiryntu Systemu wchłania się do Rdzenia na stałe. Dają postaci cechy swojego żywiołu.'),
-          t(
-            'Gniazd Rdzenia przybywa z poziomem postaci: jedno na każde {per} poziomów, co najmniej trzy. Mały Artefakt zajmuje jedno gniazdo i ma jedną cechę, średni dwa gniazda i dwie cechy, a duży trzy gniazda, dwie cechy i zdolność. Wchłonięty Artefakt zostaje, dopóki go nie rozpuścisz: znika wtedy, a wraca połowa Odłamków włożonych w jego ulepszanie. Artefakt ze Skrytki można rozbić na Odłamki. Odłamki ulepszają Artefakt do +10, bez ryzyka porażki: każdy stopień to +10% jego liczb. Dwa, cztery i sześć Artefaktów jednego żywiołu dają rezonans: rosnącą premię tego żywiołu. Klejnot oprawiony w Rdzeniu w Szlifierni podnosi liczby wszystkich wchłoniętych Artefaktów. Artefakty i Odłamki należą tylko do tej postaci.',
-            { per: view.perSockets },
-          ),
-        ),
+        // The explanation in short points, one thing each (the author,
+        // 14.11.2026: „ten opis jest niezrozumiały, pierwsze zdanie pod Jak to
+        // działa w ogóle jakies kalekie”).
+        howItWorks(t('Artefakty z Labiryntu Systemu wchłaniasz do Rdzenia na stałe. Każdy daje postaci cechy swojego żywiołu.'), [
+          t('Gniazda: na każde {per} poziomów postaci Rdzeń ma jedno gniazdo, ale nigdy mniej niż trzy.', { per: view.perSockets }),
+          t('Wielkość: mały Artefakt zajmuje 1 gniazdo i ma 1 cechę. Średni zajmuje 2 gniazda i ma 2 cechy. Duży zajmuje 3 gniazda i ma 2 cechy oraz zdolność.'),
+          t('Ulepszanie: Odłamki ulepszają Artefakt aż do +10 i zawsze się udaje. Każdy stopień to +10% do jego liczb. Odłamki zdobędziesz, rozbijając Artefakt ze Skrytki.'),
+          t('Rezonans: 2, 4 i 6 Artefaktów tego samego żywiołu dają coraz większą premię tego żywiołu.'),
+          t('Klejnot: klejnot oprawiony w Rdzeń w Szlifierni podnosi liczby wszystkich Artefaktów w Rdzeniu.'),
+          t('Rozpuszczanie: Artefakt zostaje w Rdzeniu, dopóki go nie rozpuścisz. Wtedy znika, a Ty odzyskujesz połowę Odłamków włożonych w jego ulepszanie.'),
+          t('Artefakty i Odłamki należą tylko do tej postaci.'),
+        ]),
       ),
     );
   }

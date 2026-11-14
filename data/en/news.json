@@ -740,6 +740,10 @@
     "0.3.42": {
       "title": "Version 0.3.42",
       "body": "- Eight new events on explorations: Bounty Hunters from level 40, the Robber Knight from 60, Skarbnik from 76, and in the highest lands the Snake King, the Ghost Caravan, the White Stag, Forefathers’ Eve and the Devil’s Pact.\n- Some choices belong to one class only: a Shadow slips under the bridge, a Mage outwits the devil and a Cleric crosses themselves.\n- Three new foes: the Robber Knight, the Snake King and the Viper Knot."
+    },
+    "0.3.43": {
+      "title": "Version 0.3.43",
+      "body": "- New skill animations for the Mage, the Archer and the Warrior. The Fireball grows in the hand, flies in an arc and explodes. Frost Gust freezes the foes, and Mana Shield wraps the card in a shield of hexagons.\n- Aimed Shot locks a sight on its target, Arrow Rain falls as a volley from the sky, and the Pinning Shot's arrow stays stuck at the foe's feet.\n- Power Strike cracks the ground, Wide Sweep cuts through the row of foes with a crescent, and a golden shield comes down with Unyielding. The evolution skills that grow from them look the same.\n- The Core's “How does it work?” is now in short points."
     }
   }
 }
