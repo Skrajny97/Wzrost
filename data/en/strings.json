@@ -3276,5 +3276,14 @@
   "Talia {slot} zapisana.": "Deck {slot} saved.",
   "Nie ma takiego miejsca na talię.": "There is no such deck slot.",
   "Talia {slot} jest pusta. Ułóż ją w Salonie Gier.": "Deck {slot} is empty. Build it in the Games Parlour.",
-  "Talia {slot} nie jest już cała. Ułóż ją od nowa w Salonie Gier.": "Deck {slot} is no longer complete. Build it again in the Games Parlour."
+  "Talia {slot} nie jest już cała. Ułóż ją od nowa w Salonie Gier.": "Deck {slot} is no longer complete. Build it again in the Games Parlour.",
+  "{slot} „{name}”": "{slot} “{name}”",
+  "Grasz talią „{name}”.": "You play “{name}” now.",
+  "Nazwa talii {slot}": "Deck {slot} name",
+  "Zapisano nazwę talii.": "Deck name saved.",
+  "Do {count} znaków. Bez nazwy talia ma sam numer.": "Up to {count} characters. Without a name, the deck shows only its number.",
+  "Nazwij": "Name",
+  "Nazwij talię: {name}": "Name the deck: {name}",
+  "Nazwa talii to tekst.": "A deck name is text.",
+  "Nazwa": "Name"
 }

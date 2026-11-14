@@ -13195,6 +13195,57 @@ a.profession-square:active {
   white-space: nowrap;
 }
 
+/* A deck's name (939) in place of its strength: two lines at most. */
+.deck-slot-note--name {
+  white-space: normal;
+}
+
+.deck-slot-note-text {
+  min-width: 0;
+}
+
+.deck-slot-note--name .deck-slot-note-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-align: center;
+  overflow-wrap: break-word;
+  line-height: 13px;
+}
+
+/* On the narrowest phones a name gets the tile's whole width and a smaller
+   letter, so a word of eight letters stays whole. */
+@media (max-width: 359px) {
+  .deck-slot {
+    padding-inline: 0;
+  }
+
+  .deck-slot-note--name {
+    font-size: 10px;
+    letter-spacing: -0.02em;
+  }
+}
+
+/* „Ułóż talię N” and „Nazwij” side by side, „Nazwij” narrower. */
+.cards-deck-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.cards-deck-actions > .button {
+  width: auto;
+  min-width: 0;
+}
+
+.cards-deck-actions > .button--world {
+  flex: 1 1 auto;
+}
+
+.cards-deck-actions > .button--system {
+  flex: 0 0 auto;
+}
+
 .deck-slot--active {
   border-color: var(--system-line);
   background: rgba(143, 227, 239, 0.12);
@@ -13215,8 +13266,18 @@ a.profession-square:active {
   color: var(--system-text);
 }
 
-.deck-slot-check {
-  flex: none;
+.deck-slot-tick {
+  position: absolute;
+  top: -5px;
+  right: -8px;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--system);
+  color: var(--bg-deep);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
 .deck-slot--empty .deck-slot-pile {

@@ -269,6 +269,26 @@ describe('Talia Systemu through the API', () => {
     assert.deepEqual([alone.status, alone.data.decks.active, alone.data.decks.slots.length], [200, 1, rules.savedDecks]);
   });
 
+  test('a saved deck gets its name (939): cleaned, cut to its length, none for an empty field; an empty slot has no deck to name', async () => {
+    await call('POST', '/api/cards/starter', { cookie });
+    const name = (slot, value) => call('POST', '/api/cards/decks/name', { cookie, body: { slot, name: value } });
+    const named = await name(1, '  Moja\u200b   talia\n ');
+    assert.equal(named.status, 200);
+    assert.equal(named.data.named, 1);
+    assert.equal(named.data.cards.decks.slots[0].name, 'Moja talia');
+    assert.equal(named.data.cards.decks.nameLength, rules.deckNameLength);
+    assert.equal((await name(1, 'Ż'.repeat(rules.deckNameLength + 5))).data.cards.decks.slots[0].name, 'Ż'.repeat(rules.deckNameLength));
+    // Laid again, the deck keeps its name; an empty field takes it away.
+    await name(1, 'Siłacze');
+    const ids = starterDeck(content);
+    assert.equal((await call('POST', '/api/cards/deck', { cookie, body: { cards: ids, slot: 1 } })).data.cards.decks.slots[0].name, 'Siłacze');
+    assert.equal((await name(1, '   ')).data.cards.decks.slots[0].name, null);
+    // No deck in the slot, no number, no text: refused.
+    assert.deepEqual([(await name(2, 'Nowa')).status, (await name(2, 'Nowa')).data.error.code], [409, 'empty_slot']);
+    assert.equal((await name(9, 'X')).status, 400);
+    assert.equal((await name(1, 42)).status, 400);
+  });
+
   test('a deck laid before the saved decks is the slot in play, kept when another one is laid or played', async () => {
     await call('POST', '/api/cards/starter', { cookie });
     await (await db()).prepare("INSERT INTO cards (character_id, monster_id, copies, created_at) SELECT id, 'boar', 1, 1 FROM characters").run();

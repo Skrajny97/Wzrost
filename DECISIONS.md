@@ -3266,6 +3266,7 @@ Autor 14.11.2026: „opcje zapisania kilku różnych talii kart do użytku za je
 - W Salonie Gier („Twoja talia”) widać wszystkie pięć miejsc. Stuknięcie innej gotowej talii od razu nią gra. Stuknięcie pustego miejsca (albo talii, w której brakuje już karty) otwiera układanie talii w tym miejscu, przy pustym miejscu bez wybranych kart. „Ułóż talię N” zmienia talię, którą gracz gra.
 - Na Arenie („Karty”), przy stole mieszkańca i w oknach wyzwań na żywo (wysłanie i odpowiedź) widać tylko gotowe talie i tylko wtedy, gdy są co najmniej dwie. Stuknięcie zmienia talię; okno wyzwania z odliczaniem zostaje, a czas biegnie dalej.
 - Talii nie da się usunąć: miejsce zmienia się, układając w nim inną talię.
+- Nazwy talii (939, makiety 939.1–939.4 czekają na stronie ocen): gracz nadaje nazwę talii, którą gra („Nazwij” obok „Ułóż talię N”), najwyżej `cards.deckNameLength` znaków (16), bez znaków sterujących i niewidocznych; puste pole przywraca sam numer. Nazwę widzi tylko gracz, więc nie przechodzi przez filtr imion. Stoi pod stosem talii zamiast siły, w dwóch linijkach; talię w grze znaczy wtedy znaczek ✓ na rogu stosu. Nowa talia ułożona w tym samym miejscu zachowuje nazwę.
 
 ## Wersja 0.3.27 (14.11.2026): kolejny kod za kawę
 

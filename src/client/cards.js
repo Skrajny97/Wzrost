@@ -42,7 +42,7 @@
 import { areaArtUrl, monsterSprite, placeArt, portraitSprite, residentBust } from './art.js';
 import { liveMatch, mountDuel, onLiveMatch } from './card-duel.js';
 import { createCardsFx, fxDroppedCards } from './cards-fx.js';
-import { deckSlotsRow } from './deck-slots.js';
+import { deckSlotsRow, deckTitle, nameDeckSheet } from './deck-slots.js';
 import { h, icon } from './dom.js';
 import { countOf, formatNumber } from './format.js';
 import { t } from './i18n.js';
@@ -390,6 +390,8 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     const byId = new Map(view.collection.map((card) => [card.id, card]));
     const cards = (view.deck ?? []).map((id) => byId.get(id)).filter(Boolean);
     const active = view.decks?.active ?? 1;
+    // The deck in play, which „Nazwij” names (939).
+    const playing = view.decks?.slots.find((one) => one.slot === active && one.cards);
     return h(
       'section',
       { class: 'card stack cards-deck', 'data-guide': 'cards-deck' },
@@ -404,12 +406,24 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
       cards.length > 0
         ? h('div', { class: 'tcard-grid tcard-grid--deck' }, cards.map((card) => face(card, { compact: true })))
         : h('p', { class: 'muted', text: t('Talia nie jest ułożona. Wybierz {count} kart z kolekcji.', { count: view.deckSize }) }),
-      h('button', {
-        type: 'button',
-        class: 'button button--world',
-        text: view.decks ? t('Ułóż talię {slot}', { slot: active }) : t('Ułóż talię'),
-        onClick: () => layDeck(active),
-      }),
+      h(
+        'div',
+        { class: 'cards-deck-actions' },
+        h('button', {
+          type: 'button',
+          class: 'button button--world',
+          text: view.decks ? t('Ułóż talię {slot}', { slot: active }) : t('Ułóż talię'),
+          onClick: () => layDeck(active),
+        }),
+        playing &&
+          h('button', {
+            type: 'button',
+            class: 'button button--system',
+            text: t('Nazwij'),
+            'aria-label': t('Nazwij talię: {name}', { name: deckTitle(playing) }),
+            onClick: () => nameDeckSheet(playing, view.decks.nameLength, apply),
+          }),
+      ),
     );
   }
 

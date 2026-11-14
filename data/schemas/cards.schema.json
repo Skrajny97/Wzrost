@@ -3,7 +3,7 @@
   "title": "Talia Systemu",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "deckSize", "savedDecks", "hand", "roundCap", "lines", "types", "typeBonus", "stats", "drops", "starter", "heroes", "stakes", "pack", "live", "host", "residents", "bonuses", "texts"],
+  "required": ["name", "deckSize", "savedDecks", "deckNameLength", "hand", "roundCap", "lines", "types", "typeBonus", "stats", "drops", "starter", "heroes", "stakes", "pack", "live", "host", "residents", "bonuses", "texts"],
   "definitions": {
     "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
     "chance": { "type": "number", "minimum": 0, "maximum": 1 },
@@ -35,6 +35,7 @@
     "name": { "type": "string", "minLength": 1 },
     "deckSize": { "type": "integer", "minimum": 3, "description": "Kart w talii." },
     "savedDecks": { "type": "integer", "minimum": 1, "maximum": 9, "description": "Najwięcej zapisanych talii postaci (938), każda w swoim ponumerowanym miejscu." },
+    "deckNameLength": { "type": "integer", "minimum": 4, "maximum": 40, "description": "Najwięcej znaków w nazwie zapisanej talii (939)." },
     "hand": { "type": "integer", "minimum": 1, "description": "Kart w rezerwie, dobieranych z talii." },
     "roundCap": { "type": "integer", "minimum": 1, "description": "Najwięcej rund partii." },
     "lines": {
