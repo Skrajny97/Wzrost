@@ -3252,6 +3252,20 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.51 (14.11.2026): animacje umiejętności klas wyewoluowanych Łucznika (961)
+
+1. Autor ocenił po kolei filmy 961.1–961.18 („super”, „okey”, „spoko”, na koniec „wszystko super”). Wszystkie 18 umiejętności linii Łucznika mają własny wygląd:
+   - Łowca: Grot z zadziorem zostaje w boku wroga, który krwawi; Sokół spada z nieba na róg karty łowcy, a przy atakach pikuje na wroga i zostawia rysy pazurów.
+   - Mistrz Łowów: Harpun leci na linie i przyciąga trafionego wroga; Wilk wyskakuje z gąszczu na skraju areny, a przy atakach skacze na wroga i zatrzaskuje kły, gdy ląduje.
+   - Mistrz Łuku: Mistrzowski strzał z linią celowania przez kolejnych wrogów i płonącą strzałą, która przebija cel i leci dalej; Spokojna ręka przyciemnia arenę wokół łucznika, z kręgiem oddechu i celownikiem przy głowie.
+   - Snajper: Przebijający strzał przebija cel na wylot i ta sama strzała trafia wroga za nim (bez drugiego celowania i drugiej nazwy); Strzał z ukrycia bez celownika, z karty w cieniu liści i ciemną strzałą widoczną dopiero przy celu.
+   - Strzelec Burzy: Burza strzał z burzowym niebem i naelektryzowanymi strzałami; Chmura burzowa nadciąga nad wrogów i co ruch uderza piorunem w każdego (zamiast złotych słupów jak u Kleryka).
+   - Strzelec Wyborowy: Strzał w serce z bijącym sercem, które pęka, i strzałą przebijającą cel (strzała jest teraz strzałą, a nie świecącym kwadratem); Namierzenie z linią celowania i czerwonym celownikiem, który się zaciska.
+   - Władca Piorunów: Grom z nieba z rozwidlonym piorunem na każdego wroga; Kula piorunów nad ramieniem, z której przy atakach strzela piorun.
+   - Władca Puszczy: Przewodnik watahy wyłania się z mgły i wyje, a od wycia rozbłyskują karty drużyny; Szpon orła: orzeł spada szponami na wroga i oślepia go cieniem.
+   - Wybraniec Peruna: Gniew Peruna z dwoma piorunami na każdego wroga i błyskawicą przeskakującą między wrogami; Znak gromu: sześciopłatkowa rozeta kreślona nad kartą, z piorunami do kart drużyny.
+2. Sprawdzone: wszystkie 18 dochodzą do końca walki bez błędów, „Pomiń” w trakcie efektu nic nie zostawia, przy wyłączonych animacjach są proste wersje, na 1366 i 1920 px nic nie wychodzi poza arenę; Znak gromu i wycie basiora sprawdzone także z dwoma towarzyszami.
+
 ## Wersja 0.3.50 (14.11.2026): nieobecny lider oddaje gildię zastępcy
 
 1. Autor: „Spraw by 4-dniowa nieobecność Lidera Gildii przekazywała dowodzenie jednemu z zastępców, a samemu Liderowi nadawała rolę Zastępcy”. Lider, który nie zagląda do gry swoją postacią przez 4 dni (`data/guilds.json`, `leaderAway.days`), oddaje gildię zastępcy, który grał ostatnio w tych 4 dniach, i sam zostaje zastępcą. Na kanale gildii System pisze: „{lider} nie zagląda do gry od 4 dni, więc gildię prowadzi teraz {zastępca}. {lider} zostaje zastępcą.” (w każdym języku kont członków gildii, po polsku i po angielsku).

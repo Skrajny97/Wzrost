@@ -772,6 +772,10 @@
     "0.3.50": {
       "title": "Version 0.3.50",
       "body": "- Guilds: when the leader does not play for 4 days, the deputy who played most recently takes over the guild and the leader becomes a deputy. The System announces it in the guild channel."
+    },
+    "0.3.51": {
+      "title": "Version 0.3.51",
+      "body": "- New animations for every skill of the Archer's evolutions: the falcon and the eagle dive from the sky, the wolf and the white wolf leap out of the thicket and the mist, the harpoon pulls the foe in on its rope, arrows pierce right through foes, and the Storm Archer, the Thunder Lord and the Chosen of Perun fight with storms and lightning.\n- Ambush Shot comes out of the shadows, Heart Shot has a beating heart, Target Lock and Steady Hand have their sights, and Thunder Sign draws a glowing rosette over the hero."
     }
   }
 }
