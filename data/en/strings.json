@@ -2891,7 +2891,7 @@
   "Skrytka Rdzenia": "Core Cache",
   "Skrytka jest pusta. Artefakty zostawiają strażnicy Labiryntu Systemu i czempioni Wież.": "The Cache is empty. Artifacts are left by the guardians of the System Labyrinth and the champions of the Towers.",
   "Artefakty z Labiryntu Systemu wchłaniasz do Rdzenia na stałe. Każdy daje postaci cechy swojego żywiołu.": "You absorb Artifacts from the System Labyrinth into the Core for good. Each gives your character the traits of its element.",
-  "Gniazda: na każde {per} poziomów postaci Rdzeń ma jedno gniazdo, ale nigdy mniej niż trzy.": "Sockets: the Core has one socket for every {per} character levels, but never fewer than three.",
+  "Gniazda: Rdzeń ma jedno gniazdo na każde {per} poziomów postaci.": "Sockets: the Core has one socket for every {per} character levels.",
   "Wielkość: mały Artefakt zajmuje 1 gniazdo i ma 1 cechę. Średni zajmuje 2 gniazda i ma 2 cechy. Duży zajmuje 3 gniazda i ma 2 cechy oraz zdolność.": "Size: a small Artifact takes 1 socket and has 1 trait. A medium one takes 2 sockets and has 2 traits. A large one takes 3 sockets and has 2 traits and an ability.",
   "Ulepszanie: Odłamki ulepszają Artefakt aż do +10 i zawsze się udaje. Każdy stopień to +10% do jego liczb. Odłamki zdobędziesz, rozbijając Artefakt ze Skrytki.": "Upgrades: Shards upgrade an Artifact up to +10, and it always works. Each level adds +10% to its numbers. You get Shards by breaking an Artifact from the Cache.",
   "Rezonans: 2, 4 i 6 Artefaktów tego samego żywiołu dają coraz większą premię tego żywiołu.": "Resonance: 2, 4 and 6 Artifacts of the same element give a growing bonus of that element.",
