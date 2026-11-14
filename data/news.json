@@ -960,6 +960,11 @@
       "id": "0.3.48",
       "title": "Wersja 0.3.48",
       "body": "- Nowe animacje umiejętności Kleryka: Modlitwa o zdrowie (snop światła i krzyż), Egzorcyzm (krąg run i słup światła pod każdym wrogiem), Błogosławieństwo (aureola i opadające pióra).\n- Nowe animacje umiejętności Cienia: Cios w plecy (atak z dymu, zza pleców celu), Zatrute ostrze (jad spływa po sztylecie), Taniec cieni (wirujące cienie i kopie postaci)."
+    },
+    {
+      "id": "0.3.49",
+      "title": "Wersja 0.3.49",
+      "body": "- Nowe animacje wszystkich umiejętności ewolucji Maga: przywołania wychodzą z kręgów (dąb z pękającej ziemi, żubr szarżą, Ent jak drzewko, niedźwiedź z gąszczu, Żywiołak z wiru), z nieba spadają płonące meteory, Kataklizm łączy błyskawice, ogień i lód, Lodowy grobowiec zamyka wroga w lodzie, a Lodowa włócznia i Lodowa gwiazda lecą prosto we wroga.\n- Swój wygląd mają też Lustro many, Tarcza żywiołów, Lodowa zbroja, Harmonia żywiołów, Promień Żywiołów, Ognisty wybuch, Lodowa nawałnica i Zamieć."
     }
   ]
 }
