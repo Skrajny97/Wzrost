@@ -22,7 +22,7 @@ const pack = (id) => packOf(rules, id);
 
 describe('payments in the engine', () => {
   test('a pack by its id; nothing for another', () => {
-    assert.deepEqual(pack('ps-250'), { id: 'ps-250', points: 250, price: 499 });
+    assert.deepEqual(pack('ps-250'), { id: 'ps-250', points: 250, price: 499, playId: 'ps_250' });
     assert.equal(pack('ps-7'), null);
     assert.equal(pack(250), null);
   });

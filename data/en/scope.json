@@ -1199,6 +1199,7 @@
     "Enter",
     "M{} {}H{}V{}H{}Z",
     "path(evenodd, 'M0 0H{}V{}H0Z{}')",
-    "muted small"
+    "muted small",
+    "Total"
   ]
 }

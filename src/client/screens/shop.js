@@ -17,6 +17,7 @@ import { fill, h, icon } from '../dom.js';
 import { formatNumber } from '../format.js';
 import { t } from '../i18n.js';
 import { SYSTEM_POINTS_ICON } from '../icons.js';
+import { playBilling } from '../play-billing.js';
 import { systemPoints } from '../quests.js';
 import { call, state } from '../state.js';
 import { confirmAction, howItWorks, pageHeading, toast, withButton } from '../ui.js';
@@ -45,8 +46,10 @@ export function mountShop(container, { params }) {
   if (params.tab === 'punkty') return mountShopPoints(container);
   let tab = TABS.find((each) => each.id === params.tab) ?? TABS[0];
   if (paymentsOpen === null) {
+    // Through Google Play only in the app from the Sklep Play (867 A): a
+    // browser has nothing to buy with (play-billing.js).
     call('GET', '/api/payments')
-      .then(() => true, () => false)
+      .then(async (shop) => shop.provider !== 'google-play' || (await playBilling()) !== null, () => false)
       .then((open) => {
         paymentsOpen = open;
         if (open && container.isConnected) render();

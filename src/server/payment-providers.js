@@ -25,6 +25,7 @@
 // to "test" by mistake credits nobody.
 
 import { toHex } from './encoding.js';
+import { googlePlayGateway } from './google-play.js';
 import { ApiError, json, readBody } from './http.js';
 
 async function hmacHex(secret, text) {
@@ -264,7 +265,9 @@ export const autopayGateway = {
   },
 };
 
-const GATEWAYS = { test: testGateway, autopay: autopayGateway };
+// "google-play": Google Play Billing in the app from the Sklep Play (867 A;
+// google-play.js), the one the game sells through.
+const GATEWAYS = { test: testGateway, autopay: autopayGateway, 'google-play': googlePlayGateway };
 
 // The gateway of `name` where this deployment has what it needs, or null.
 export const providerFor = (name, env = {}) => {

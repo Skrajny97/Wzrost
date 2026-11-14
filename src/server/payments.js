@@ -40,6 +40,17 @@
 // after it credits nobody and waits for the author. A second payment of an
 // order already paid (another number of the gateway's) credits nothing
 // either: it is kept (purchase_extras) for the author to give back.
+//
+// The game sells through Google Play Billing (867 A; google-play.js): the
+// app buys the order's product in Google Play and gives the server the
+// purchase's token (confirmPlayPurchase), and the server credits the order
+// only after Google's own word on that purchase, then consumes it (which
+// confirms it). A token credits once, whichever order it is given to. A
+// purchase Google keeps pending, or whose consumption Google did not take,
+// is read again by the cron (playMaintenance), which also takes back the
+// points of the purchases Google voided. A licence tester's purchase
+// (sandbox) gives its points but counts neither to the limits nor to the
+// quarter's revenue.
 
 import rules from '../../data/payments.json' with { type: 'json' };
 import { orderBlock, packOf, quarterAt, quarterBlock, quarterFits, spentLately, withdrawalBlock } from '../engine/index.js';
@@ -47,6 +58,7 @@ import { isAuthor } from './author.js';
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { toHex } from './encoding.js';
 import { paymentsOnlyForAuthors, paymentsProvider } from './features.js';
+import { consumePurchase, packOfProduct, productOf, productPurchase, voidedPurchases, voidedStatus } from './google-play.js';
 import { ApiError, json, readJson } from './http.js';
 import { providerFor } from './payment-providers.js';
 import { requireSession } from './sessions.js';
@@ -87,6 +99,8 @@ async function requireBuyer(context) {
 }
 
 const purchaseOf = (row) => ({ status: row.status, price: row.price, points: row.points, createdAt: row.created_at, paidAt: row.paid_at });
+// The purchases the limits count: not a licence tester's (sandbox).
+const counted = (row) => !row.sandbox;
 const purchaseView = (row) => ({
   id: row.public_id,
   packId: row.pack_id,
@@ -97,6 +111,7 @@ const purchaseView = (row) => ({
   createdAt: row.created_at,
   paidAt: row.paid_at,
   closedAt: row.closed_at,
+  sandbox: Boolean(row.sandbox),
 });
 
 async function accountPurchases(db, userId) {
@@ -117,7 +132,7 @@ const expireOrders = (db, userId, now) =>
 // waits): the purchases paid in it and kept or being given back, and the
 // orders made in it that can still be paid (waiting, or a try failed).
 const TAKEN = `SELECT COALESCE(SUM(price), 0) FROM purchases
-  WHERE (status IN ('paid', 'refunding') AND paid_at >= ?) OR (status IN ('pending', 'failed') AND created_at >= ? AND created_at > ?)`;
+  WHERE sandbox = 0 AND ((status IN ('paid', 'refunding') AND paid_at >= ?) OR (status IN ('pending', 'failed') AND created_at >= ? AND created_at > ?))`;
 const takenValues = (quarter, now) => [quarter.startsAt, quarter.startsAt, now - rules.pendingHours * HOUR];
 
 // What an account paid lately, as SQL with its three values (the account,
@@ -125,7 +140,7 @@ const takenValues = (quarter, now) => [quarter.startsAt, quarter.startsAt, now -
 // longer waits): its paid purchases and its orders that can still be
 // paid, as the engine's spentLately counts them.
 const SPENT = `SELECT COALESCE(SUM(price), 0) FROM purchases
-  WHERE user_id = ? AND created_at > ? AND (status = 'paid' OR (status IN ('pending', 'failed') AND created_at > ?))`;
+  WHERE user_id = ? AND sandbox = 0 AND created_at > ? AND (status = 'paid' OR (status IN ('pending', 'failed') AND created_at > ?))`;
 const spentValues = (userId, now) => [userId, now - rules.limitDays * DAY, now - rules.pendingHours * HOUR];
 
 // The character a purchase's points go to, as SQL with the purchase's id
@@ -157,14 +172,15 @@ export async function getPayments(context) {
     db.prepare('SELECT purchases_blocked FROM users WHERE id = ?').bind(session.userId).first(),
     quarterTaken(db, quarter, context.now),
   ]);
-  const packs = rules.packs.map(({ id, points, price }) => ({ id, points, price, available: quarterFits(rules, taken, { price }) }));
+  const packs = rules.packs.map(({ id, points, price, playId }) => ({ id, points, price, playId, available: quarterFits(rules, taken, { price }) }));
   return json({
+    provider: paymentsProvider(),
     currency: rules.currency,
     packs,
     resumesAt: packs.every((pack) => pack.available) ? null : quarter.endsAt,
     monthlyLimit: rules.monthlyLimit,
     limitDays: rules.limitDays,
-    spent: spentLately(rows.map(purchaseOf), context.now, rules),
+    spent: spentLately(rows.filter(counted).map(purchaseOf), context.now, rules),
     withdrawalDays: rules.withdrawalDays,
     adultOnly: rules.adultOnly,
     termsVersion: rules.termsVersion,
@@ -194,7 +210,7 @@ export async function orderPoints(context) {
     rules,
     pack,
     consents: { terms: body.terms, adult: body.adult },
-    spent: spentLately(rows.map(purchaseOf), context.now, rules),
+    spent: spentLately(rows.filter(counted).map(purchaseOf), context.now, rules),
     blocked: Boolean(user?.purchases_blocked),
     taken,
     quarter,
@@ -238,7 +254,7 @@ export async function orderPoints(context) {
     // Another order took the room meanwhile: the account's limit or the
     // quarter's, whichever it now is.
     const [now, takenNow] = await Promise.all([accountPurchases(db, session.userId), quarterTaken(db, quarter, context.now)]);
-    const spent = spentLately(now.map(purchaseOf), context.now, rules);
+    const spent = spentLately(now.filter(counted).map(purchaseOf), context.now, rules);
     throw refuse(orderBlock({ rules, pack, consents: { terms: true, adult: true }, spent, blocked: false, taken: takenNow, quarter }) ?? quarterBlock(rules, quarter));
   }
   // The gateway's payment, valid as long as the order waits; one the gateway
@@ -248,6 +264,7 @@ export async function orderPoints(context) {
     payment = await gateway.create({
       env: context.env,
       orderId,
+      packId: pack.id,
       amount: pack.price,
       currency: rules.currency,
       points: pack.points,
@@ -262,7 +279,8 @@ export async function orderPoints(context) {
     throw error;
   }
   if (payment.ref) await db.prepare('UPDATE purchases SET provider_ref = ? WHERE public_id = ?').bind(payment.ref, orderId).run();
-  return json({ orderId, url: payment.url ?? null }, 201);
+  // `sku`: the product the app buys in Google Play for it (google-play.js).
+  return json({ orderId, url: payment.url ?? null, sku: payment.sku ?? null }, 201);
 }
 
 // A payment the gateway confirmed: the purchase paid (also one closed as
@@ -394,6 +412,182 @@ export function paymentReturn() {
 export const paymentNoticeAddress = () =>
   new Response('OK', { status: 200, headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } });
 
+// --- Google Play (867 A) -----------------------------------------------------
+
+// The gateway where the game sells through Google Play, or "not found".
+function requirePlay(env) {
+  if (paymentsProvider() !== 'google-play') throw notFound();
+  return requireGateway(env);
+}
+
+const playDown = () => new ApiError(502, 'gateway_error', 'Google Play nie odpowiada. Spróbuj za chwilę.');
+
+// A purchase with Google's token settled by Google's word on it: bought
+// (purchaseState 0), the order paid and its points credited once (markPaid),
+// then the purchase consumed, which confirms it, once Google takes it;
+// pending (2), left waiting; canceled (1), the order closed unpaid. Returns
+// the state: 'paid', 'pending', 'canceled' or 'unknown' (Google does not
+// know the token). `bought`: Google's purchase when already read.
+async function settlePlay(env, db, row, now, bought = null) {
+  if (row.status === 'paid' && row.consumed_at) return 'paid';
+  const productId = productOf(row.pack_id);
+  const purchase = bought ?? (await productPurchase(env, productId, row.provider_token));
+  if (!purchase) return 'unknown';
+  if (purchase.purchaseState === 1) {
+    await db.prepare("UPDATE purchases SET status = 'expired', closed_at = ? WHERE id = ? AND status IN ('pending', 'failed')").bind(now, row.id).run();
+    return 'canceled';
+  }
+  if (purchase.purchaseState !== 0) return 'pending';
+  if (Number(purchase.quantity ?? 1) > 1) console.error(`google play: the purchase of ${row.public_id} is of ${purchase.quantity} pieces; one is credited`);
+  if (['pending', 'failed', 'expired'].includes(row.status)) {
+    const result = await markPaid(db, row, { ref: purchase.orderId || null, amount: row.price, currency: row.currency }, now);
+    if (result === 'mismatch') return 'unknown';
+  }
+  if (purchase.consumptionState === 1) {
+    await db.prepare('UPDATE purchases SET consumed_at = COALESCE(consumed_at, ?) WHERE id = ?').bind(now, row.id).run();
+  } else if (await consumePurchase(env, productId, row.provider_token)) {
+    await db.prepare('UPDATE purchases SET consumed_at = ? WHERE id = ?').bind(now, row.id).run();
+  } else console.error(`google play: the purchase of ${row.public_id} was not consumed; the cron tries again`);
+  return 'paid';
+}
+
+// POST /api/payments/play { orderId, token, sku }: a purchase the app made in
+// Google Play, credited once Google says it is bought. Its order is the one
+// the app names, of this account and not yet given a token; else (the app
+// lost it, closed in the middle of paying) the account's latest order of the
+// same product without one; else, as Google has the money already, a new
+// order for the character, outside the limits. A token already in the
+// ledger answers with its own purchase, so it credits once. Answers the
+// state, the purchase and the character; 'pending' while Google waits for
+// the money (the cron credits it then).
+const PLAY_TOKEN = /^[\w.:-]{8,1024}$/;
+export async function confirmPlayPurchase(context) {
+  const env = context.env;
+  requirePlay(env);
+  const { session, player } = await requireBuyer(context);
+  const body = await readJson(context.request);
+  const token = typeof body.token === 'string' ? body.token : '';
+  if (!PLAY_TOKEN.test(token)) throw new ApiError(400, 'invalid_token', 'Nie ma takiego zakupu.');
+  const db = env.DB;
+  const now = context.now;
+  const answer = async (row, state) => {
+    if (state === 'unknown') throw new ApiError(400, 'invalid_purchase', 'Google Play nie zna tego zakupu.');
+    if (state === 'canceled') throw new ApiError(409, 'canceled', 'Ten zakup anulowano w Google Play.');
+    const after = await db.prepare('SELECT * FROM purchases WHERE id = ?').bind(row.id).first();
+    return json({ state, purchase: purchaseView(after), character: characterView(await loadPlayer(db, session.userId), now) });
+  };
+  const ownToken = async () => {
+    const known = await db.prepare('SELECT * FROM purchases WHERE provider_token = ?').bind(token).first();
+    if (known && known.user_id !== session.userId) throw new ApiError(409, 'not_yours', 'Ten zakup jest na innym koncie.');
+    return known;
+  };
+  try {
+    const known = await ownToken();
+    if (known) return await answer(known, await settlePlay(env, db, known, now));
+    let row =
+      typeof body.orderId === 'string' && body.orderId
+        ? await db.prepare("SELECT * FROM purchases WHERE public_id = ? AND user_id = ? AND provider = 'google-play' AND provider_token IS NULL").bind(body.orderId, session.userId).first()
+        : null;
+    const pack = row ? packOf(rules, row.pack_id) : packOfProduct(String(body.sku ?? ''));
+    if (!pack) throw new ApiError(400, 'invalid_pack', 'Nie ma takiego pakietu.');
+    const purchase = await productPurchase(env, pack.playId, token);
+    if (!purchase) throw new ApiError(400, 'invalid_purchase', 'Google Play nie zna tego zakupu.');
+    row ??= await db
+      .prepare(
+        "SELECT * FROM purchases WHERE user_id = ? AND provider = 'google-play' AND provider_token IS NULL AND pack_id = ? AND status IN ('pending', 'failed', 'expired') ORDER BY created_at DESC LIMIT 1",
+      )
+      .bind(session.userId, pack.id)
+      .first();
+    if (!row && purchase.purchaseState !== 1) {
+      const orderId = newToken();
+      const consents = JSON.stringify({ terms: rules.termsVersion, adult: true, at: now, recovered: true });
+      await db
+        .prepare(
+          `INSERT INTO purchases (public_id, user_id, character_id, pack_id, points, price, currency, provider, status, consents, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, 'google-play', 'pending', ?, ?)`,
+        )
+        .bind(orderId, session.userId, player.row.id, pack.id, pack.points, pack.price, rules.currency, consents, now)
+        .run();
+      row = await db.prepare('SELECT * FROM purchases WHERE public_id = ?').bind(orderId).first();
+      console.error(`google play: a purchase of ${pack.id} without its order; a new order ${orderId} for it`);
+    }
+    if (!row) throw new ApiError(409, 'canceled', 'Ten zakup anulowano w Google Play.');
+    // The token claimed for the order: the unique index lets one request
+    // have it, and the other finds it in the ledger.
+    try {
+      const claimed = await db
+        .prepare('UPDATE purchases SET provider_token = ?, sandbox = ?, country = COALESCE(?, country) WHERE id = ? AND provider_token IS NULL')
+        .bind(token, purchase.purchaseType === 0 ? 1 : 0, typeof purchase.regionCode === 'string' ? purchase.regionCode : null, row.id)
+        .run();
+      if (claimed.meta.changes !== 1) throw new Error('the order has its token');
+    } catch {
+      const known = await ownToken();
+      if (known) return await answer(known, await settlePlay(env, db, known, now));
+      throw new ApiError(409, 'busy', 'Ten zakup jest już sprawdzany. Spróbuj za chwilę.');
+    }
+    const claimedRow = await db.prepare('SELECT * FROM purchases WHERE id = ?').bind(row.id).first();
+    return await answer(claimedRow, await settlePlay(env, db, claimedRow, now, purchase));
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    console.error(`google play: ${error?.message ?? error}`);
+    throw playDown();
+  }
+}
+
+// POST /api/payments/cancel { orderId }: an order the player left in Google
+// Play's window without paying, closed at once, so it holds no limit. A
+// payment that comes for it after all still credits it (markPaid).
+export async function cancelOrder(context) {
+  requireGateway(context.env);
+  const { session } = await requireBuyer(context);
+  const body = await readJson(context.request);
+  await context.env.DB
+    .prepare("UPDATE purchases SET status = 'expired', closed_at = ? WHERE public_id = ? AND user_id = ? AND status = 'pending' AND provider_token IS NULL")
+    .bind(context.now, String(body.orderId ?? ''), session.userId)
+    .run();
+  return json({ ok: true });
+}
+
+// The cron (index.js) where the game sells through Google Play, every ten
+// minutes: the purchases with a token not yet settled (Google kept them
+// pending, or did not take their consumption) read again and settled, and
+// the points of the purchases Google voided since the last look taken back
+// (a refund or a chargeback; Google keeps them 30 days).
+export async function playMaintenance(env, now) {
+  if (paymentsProvider() !== 'google-play' || !providerFor('google-play', env)) return;
+  if (Math.floor(now / 60000) % 10 !== 0) return;
+  const db = env.DB;
+  const { results } = await db
+    .prepare(
+      `SELECT * FROM purchases WHERE provider = 'google-play' AND provider_token IS NOT NULL
+         AND ((status IN ('pending', 'failed', 'expired') AND created_at > ?) OR (status = 'paid' AND consumed_at IS NULL))
+       ORDER BY created_at LIMIT 50`,
+    )
+    .bind(now - 7 * DAY)
+    .all();
+  for (const row of results) {
+    try {
+      await settlePlay(env, db, row, now);
+    } catch (error) {
+      console.error(`google play: ${row.public_id} not settled: ${error?.message ?? error}`);
+    }
+  }
+  const last = Number(await db.prepare("SELECT value FROM server_settings WHERE key = 'play_voided_at'").first('value')) || 0;
+  const start = Math.max(last - HOUR, now - 30 * DAY);
+  let page = null;
+  let pages = 0;
+  do {
+    const { voided, next } = await voidedPurchases(env, start, page);
+    for (const one of voided) {
+      const row = await db.prepare('SELECT * FROM purchases WHERE provider_token = ?').bind(String(one.purchaseToken ?? '')).first();
+      if (row) await takeBack(db, row, voidedStatus(one.voidedReason), now);
+    }
+    page = next;
+    pages += 1;
+  } while (page && pages < 10);
+  await db.prepare("INSERT INTO server_settings (key, value) VALUES ('play_voided_at', ?) ON CONFLICT (key) DO UPDATE SET value = excluded.value").bind(String(now)).run();
+}
+
 // POST /api/payments/withdraw { orderId }: one of the account's purchases
 // given back within the days, its points still unspent: they go at once,
 // the money back through the gateway.
@@ -467,13 +661,13 @@ export async function authorPayments(context) {
     .prepare(
       `SELECT COALESCE(SUM(CASE WHEN status IN ('paid', 'refunding') AND paid_at >= ? THEN price ELSE 0 END), 0) AS paid,
               COALESCE(SUM(CASE WHEN status IN ('pending', 'failed') AND created_at >= ? AND created_at > ? THEN price ELSE 0 END), 0) AS waiting
-       FROM purchases`,
+       FROM purchases WHERE sandbox = 0`,
     )
     .bind(...takenValues(quarter, context.now))
     .first();
   const { results } = await db
     .prepare(
-      `SELECT p.public_id, p.pack_id, p.points, p.price, p.currency, p.country, p.provider, p.status, p.refund_state, p.created_at, p.paid_at, p.closed_at,
+      `SELECT p.public_id, p.pack_id, p.points, p.price, p.currency, p.country, p.provider, p.status, p.refund_state, p.sandbox, p.created_at, p.paid_at, p.closed_at,
               (SELECT COUNT(*) FROM characters c WHERE c.id = p.character_id) AS character_kept
        FROM purchases p WHERE p.created_at >= ? OR p.status = 'refunding' ORDER BY p.created_at DESC LIMIT 1000`,
     )
@@ -482,6 +676,8 @@ export async function authorPayments(context) {
   const days = new Map();
   const day = (key) => days.get(key) ?? days.set(key, { date: key, sales: 0, gross: 0, refunds: 0, refunded: 0 }).get(key);
   for (const row of results) {
+    // A licence tester's purchase is no sale (sandbox).
+    if (row.sandbox) continue;
     if (row.paid_at) {
       const one = day(polishDay(row.paid_at));
       one.sales += 1;

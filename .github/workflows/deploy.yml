@@ -190,6 +190,16 @@ jobs:
           AUTOPAY_SERVICE_ID: ${{ secrets.AUTOPAY_SERVICE_ID }}
           AUTOPAY_SHARED_KEY: ${{ secrets.AUTOPAY_SHARED_KEY }}
         run: node tools/worker-secrets.mjs "$RUNNER_TEMP/worker-secrets.json" AUTOPAY_SERVICE_ID AUTOPAY_SHARED_KEY
+      # The service account through which the game reads and confirms the
+      # purchases made in Google Play (867 A; src/server/google-play.js): the
+      # JSON key from Google Cloud, whole, in the GitHub secret
+      # GOOGLE_PLAY_SERVICE_ACCOUNT. The payments stay off until PAYMENTS in
+      # wrangler.jsonc is "google-play".
+      - name: Konto usługi Google Play
+        shell: bash
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
+        run: node tools/worker-secrets.mjs "$RUNNER_TEMP/worker-secrets.json" GOOGLE_PLAY_SERVICE_ACCOUNT
       - name: Wdrożenie Workera
         shell: bash
         run: |

@@ -9,11 +9,19 @@
 // every few seconds, for a while, until the gateway's news credits it.
 // Only where the payments are on for the account (the server answers "not
 // found" elsewhere, and the page says so).
+//
+// Through Google Play (867 A; play-billing.js) the page shows Google's
+// prices, buys a pack in Google Play's window and gives the server the
+// purchase's token, which credits it; an order left in the window is
+// closed at once, and a purchase not finished before (the app closed in the
+// middle) is given to the server when the page opens. Outside the app, in a
+// browser, it says the points are bought in the app.
 
 import { fill, h, icon } from '../dom.js';
 import { dateTimeFormat, formatMoney, formatNumber } from '../format.js';
 import { t } from '../i18n.js';
 import { SYSTEM_POINTS_ICON } from '../icons.js';
+import { buyInPlay, playBilling, playPrices, playPurchases } from '../play-billing.js';
 import { systemPoints } from '../quests.js';
 import { call, state } from '../state.js';
 import { confirmAction, pageHeading, toast, withButton } from '../ui.js';
@@ -59,6 +67,27 @@ const STATUS = {
 };
 
 const DAY = 24 * 60 * 60 * 1000;
+
+// The order bought in Google Play's window, kept until the server credits it
+// (the app may close in the middle): its id and product.
+const PLAY_KEY = 'insight-play-order';
+const keepPlayOrder = (order) => {
+  try {
+    localStorage.setItem(PLAY_KEY, JSON.stringify(order));
+  } catch {}
+};
+const playOrder = () => {
+  try {
+    return JSON.parse(localStorage.getItem(PLAY_KEY) ?? 'null');
+  } catch {
+    return null;
+  }
+};
+const forgetPlayOrder = () => {
+  try {
+    localStorage.removeItem(PLAY_KEY);
+  } catch {}
+};
 // The day a quarter begins, on the Polish clock its limit counts by (a phone
 // elsewhere would show the evening before).
 const quarterDate = (ms) => new Intl.DateTimeFormat('pl-PL', { timeZone: 'Europe/Warsaw', day: 'numeric', month: '2-digit', year: 'numeric' }).format(new Date(ms));
@@ -71,17 +100,52 @@ export function mountShopPoints(container) {
   let adult = false;
   let poll = null;
   let pollUntil = 0;
+  // Google Play (867 A): whether the page is in the app, and Google's
+  // prices by product.
+  let play = false;
+  let prices = new Map();
+  const throughPlay = () => shop?.provider === 'google-play';
 
   async function load() {
     try {
       shop = await call('GET', '/api/payments');
       off = false;
+      if (throughPlay()) {
+        play = (await playBilling()) !== null;
+        if (play) prices = await playPrices(shop.packs.map((pack) => pack.playId));
+      }
     } catch {
       shop = null;
       off = true;
     }
     if (container.isConnected) render();
     watch();
+  }
+
+  // The purchases Google has that the server did not credit yet (the app
+  // closed in the middle of one): given to the server, which credits each
+  // once; the order kept for its product goes with it.
+  async function finishPlay() {
+    const kept = playOrder();
+    let credited = 0;
+    for (const purchase of await playPurchases()) {
+      try {
+        const { state: done } = await call('POST', '/api/payments/play', { token: purchase.purchaseToken, sku: purchase.itemId, orderId: kept?.sku === purchase.itemId ? kept.orderId : undefined });
+        if (done === 'paid') credited += 1;
+      } catch {}
+    }
+    if (credited > 0) {
+      forgetPlayOrder();
+      await call('GET', '/api/character').catch(() => {});
+      await load();
+    }
+  }
+
+  // A pack's price: Google's in the app, else the game's own.
+  function priceOf(pack) {
+    const google = throughPlay() ? prices.get(pack.playId) : null;
+    const value = Number(google?.value);
+    return google && Number.isFinite(value) ? formatMoney(Math.round(value * 100), google.currency) : formatMoney(pack.price, shop.currency);
   }
 
   // An order waiting for its payment, made in the last minutes: asked about
@@ -116,7 +180,9 @@ export function mountShopPoints(container) {
   }
 
   function body() {
-    const waiting = shop.purchases.find((purchase) => purchase.status === 'pending');
+    // Through Google Play, outside the app there is nothing to buy (867 A).
+    if (throughPlay() && !play) return [h('p', { class: 'card points-note', text: t('Punkty Systemu kupisz w aplikacji Insight ze Sklepu Play.') }), history()];
+    const waiting = shop.purchases.find((purchase) => purchase.status === 'pending' && !(throughPlay() && purchase.id === playOrder()?.orderId));
     return [
       waiting && waitingCard(waiting),
       shop.blocked
@@ -156,7 +222,7 @@ export function mountShopPoints(container) {
           icon(SYSTEM_POINTS_ICON, { size: 28 }),
           h('span', { class: 'points-pack-amount', text: formatNumber(pack.points) }),
           h('span', { class: 'points-pack-unit', text: t('Punktów Systemu') }),
-          h('span', { class: 'points-pack-price', text: formatMoney(pack.price, shop.currency) }),
+          h('span', { class: 'points-pack-price', text: priceOf(pack) }),
           !pack.available && shop.resumesAt && h('span', { class: 'points-pack-note', text: t('Od {date}', { date: quarterDate(shop.resumesAt) }) }),
         ),
       ),
@@ -196,12 +262,13 @@ export function mountShopPoints(container) {
       type: 'button',
       class: 'button button--system points-buy',
       disabled: !ready,
-      text: pack ? t('Kupuję i płacę {price}', { price: formatMoney(pack.price, shop.currency) }) : t('Wybierz pakiet'),
+      text: pack ? t('Kupuję i płacę {price}', { price: priceOf(pack) }) : t('Wybierz pakiet'),
       onClick: (event) => buy(event.currentTarget, pack),
     });
   }
 
   async function buy(button, pack) {
+    if (throughPlay()) return buyThroughPlay(button, pack);
     await withButton(button, async () => {
       const { orderId, url } = await call('POST', '/api/payments/order', { packId: pack.id, terms: true, adult: true });
       remember(orderId);
@@ -214,12 +281,47 @@ export function mountShopPoints(container) {
     });
   }
 
+  // The order written, then Google Play's window: the purchase's token to
+  // the server, which credits it after Google's word; the window closed
+  // without paying closes the order (it holds no limit then).
+  async function buyThroughPlay(button, pack) {
+    await withButton(button, async () => {
+      const { orderId, sku } = await call('POST', '/api/payments/order', { packId: pack.id, terms: true, adult: true });
+      keepPlayOrder({ orderId, sku });
+      let response;
+      try {
+        response = await buyInPlay(sku);
+      } catch {
+        forgetPlayOrder();
+        await call('POST', '/api/payments/cancel', { orderId }).catch(() => {});
+        await load();
+        return;
+      }
+      const token = response.details?.purchaseToken;
+      try {
+        const done = await call('POST', '/api/payments/play', { orderId, token, sku });
+        await response.complete('success').catch(() => {});
+        forgetPlayOrder();
+        if (done.state === 'paid') toast(t('Dodano {points}.', { points: systemPoints(pack.points) }));
+        else toast(t('Płatność czeka na potwierdzenie Google Play. Punkty dojdą same.'));
+        await call('GET', '/api/character').catch(() => {});
+      } catch (error) {
+        // Paid in Google Play, not yet credited: kept, and given to the server
+        // again when the page opens (finishPlay).
+        await response.complete('fail').catch(() => {});
+        toast(t('Zakup jest w Google Play, ale gra jeszcze go nie potwierdziła. Punkty dojdą, gdy otworzysz tę stronę ponownie.'));
+        console.error(error);
+      }
+      await load();
+    });
+  }
+
   function rules() {
     const left = Math.max(0, shop.monthlyLimit - shop.spent);
     return h(
       'ul',
       { class: 'points-rules muted' },
-      h('li', { text: t('Płacisz BLIK-iem albo przelewem na stronie Autopay.') }),
+      h('li', { text: throughPlay() ? t('Płacisz przez Google Play.') : t('Płacisz BLIK-iem albo przelewem na stronie Autopay.') }),
       h('li', { text: t('Punkty trafiają do tej postaci zaraz po potwierdzeniu płatności.') }),
       h('li', { text: t('W Sklepie Systemu najpierw wydajesz punkty zdobyte w grze. Kupione, których nie wydasz, możesz zwrócić przez {days} dni od zapłaty.', { days: shop.withdrawalDays }) }),
       h('li', { text: t('Limit zakupów: {limit} na {days} dni. Zostało: {left}.', { limit: formatMoney(shop.monthlyLimit, shop.currency), days: shop.limitDays, left: formatMoney(left, shop.currency) }) }),
@@ -264,19 +366,21 @@ export function mountShopPoints(container) {
   async function withdraw(button, purchase) {
     const sure = await confirmAction({
       title: t('Odstąpić od umowy?'),
-      text: t('{points} zniknie od razu, a {price} wróci na Twoje konto przez Autopay, zwykle w kilka dni.', { points: systemPoints(purchase.points), price: formatMoney(purchase.price, purchase.currency) }),
+      text: throughPlay()
+        ? t('{points} zniknie od razu, a {price} wróci przez Google Play, zwykle w kilka dni.', { points: systemPoints(purchase.points), price: formatMoney(purchase.price, purchase.currency) })
+        : t('{points} zniknie od razu, a {price} wróci na Twoje konto przez Autopay, zwykle w kilka dni.', { points: systemPoints(purchase.points), price: formatMoney(purchase.price, purchase.currency) }),
       confirmLabel: t('Odstępuję od umowy'),
     });
     if (!sure) return;
     await withButton(button, async () => {
       await call('POST', '/api/payments/withdraw', { orderId: purchase.id });
-      toast(t('Zakup zwrócony. Pieniądze wrócą przez Autopay.'));
+      toast(throughPlay() ? t('Zakup zwrócony. Pieniądze wrócą przez Google Play.') : t('Zakup zwrócony. Pieniądze wrócą przez Autopay.'));
       await load();
     });
   }
 
   render();
-  load();
+  load().then(() => throughPlay() && play && finishPlay());
   return {
     update: () => {
       if (container.isConnected) render();
