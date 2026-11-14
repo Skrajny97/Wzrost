@@ -704,6 +704,10 @@
     "0.3.26": {
       "title": "Version 0.3.26",
       "body": "- Players online: tap the green dot with the number of players, and \"List\" appears under it. You will see who is playing now, and tapping a name opens their character card."
+    },
+    "0.3.28": {
+      "title": "Version 0.3.28",
+      "body": "- System Deck: you can save up to five decks. In the Games Parlour, under “Your deck”, tap a deck’s number to play it, or an empty slot to build a new one.\n- You can switch your saved deck with one tap in the Arena (“Cards”), at the Settlement residents’ tables and in the live match challenge window too."
     }
   }
 }
