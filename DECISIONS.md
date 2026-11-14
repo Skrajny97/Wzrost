@@ -3252,6 +3252,10 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.44 (14.11.2026): Okruchy kryształu zamiast drugich Odłamków
+
+1. Autor: „Zmień nazwę albo Odłamków we Rdzeniu albo Odłamków w sensie Części, bo oba noszą te sama nazwe”. Zmieniona część Warsztatu: „Odłamki” to teraz „Okruchy kryształu” (po angielsku „Crystal Splinters” zamiast „Shards”). Odłamki Rdzenia zostają, bo ich nazwa pada w nagraniach narratora o Labiryncie i w wielu tekstach. Zapasy graczy i zlecenia zostają, bo to ta sama część (to samo id).
+
 ## Wersja 0.3.43 (14.11.2026): nowe animacje umiejętności Maga, Łucznika i Wojownika (956), prostszy opis Rdzenia
 
 1. **Animacje 956.1–956.9** (autor: „Sprawdź te od umiejętności zaczynając od podstawowych”, potem „świetne nowe animacje niech zostają”, „super umiejetnosci Łucznika”, „akceptuję nowe skille”). Kula ognia rośnie w dłoni Maga, leci łukiem z ogonem iskier i wybucha ogniem, iskrami i dymem. Mroźny podmuch to stożek śniegu, wiatr nad wrogami i szron na ich kartach. Osłona many to ściana heksagonów na karcie. Celny strzał zaciska celownik na celu i przebija go smugą. Grad strzał to salwa w niebo i deszcz strzał z kurzem. Przy Przyszpileniu strzała drży wbita u stóp celu, a wokół zaciska się lina. Potężny cios kruszy ziemię falą i odłamkami. Szeroki zamach to półksiężyc wielkiego ostrza nad rzędem wrogów. Przy Nieugiętym spada złota tarcza z krzyżem. Filmy obecna/nowa autor ocenił w MP4 z telefonu.

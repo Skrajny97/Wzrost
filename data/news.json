@@ -935,6 +935,11 @@
       "id": "0.3.43",
       "title": "Wersja 0.3.43",
       "body": "- Nowe animacje umiejętności Maga, Łucznika i Wojownika. Kula ognia rośnie w dłoni, leci łukiem i wybucha. Mroźny podmuch zamraża wrogów, a Osłona many otula kartę tarczą z heksagonów.\n- Celny strzał namierza cel celownikiem, Grad strzał spada salwą z nieba, a strzała Przyszpilenia zostaje wbita u stóp wroga.\n- Potężny cios kruszy ziemię, Szeroki zamach przecina rząd wrogów półksiężycem, a przy Nieugiętym spada złota tarcza. Tak samo wyglądają umiejętności z ewolucji, które z nich wyrastają.\n- Opis Rdzenia w „Jak to działa?” jest teraz w krótkich punktach."
+    },
+    {
+      "id": "0.3.44",
+      "title": "Wersja 0.3.44",
+      "body": "- Część z Warsztatu, która dotąd nazywała się „Odłamki”, to teraz „Okruchy kryształu”. Nie myli się już z Odłamkami Rdzenia. Twoje zapasy zostały bez zmian."
     }
   ]
 }

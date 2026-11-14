@@ -749,7 +749,7 @@ describe('the Warsztat, step 2, through the API', () => {
 
     await set(`professions = '{"crafting":{"level":25,"xp":0}}'`);
     const { scroll } = (await character()).professions.workshop;
-    assert.deepEqual([scroll.part.name, scroll.parts, scroll.minutes], ['Odłamki', 2, 45.6]);
+    assert.deepEqual([scroll.part.name, scroll.parts, scroll.minutes], ['Okruchy kryształu', 2, 45.6]);
     const started = await craft({ scroll: true, count: 3 });
     assert.equal(started.status, 201);
     const { activity } = started.data.character;
@@ -822,7 +822,7 @@ describe('the Warsztat, step 2, through the API', () => {
 
   test('parts go for one of the next rarity at once, also while the character works, with the table\'s parts done by now', async () => {
     const exchange = (partId, count) => call('POST', '/api/professions/exchange', { cookie, body: { partId, count } });
-    // Ścinki, Rzemienie and Odłamki.
+    // Ścinki, Rzemienie and Okruchy kryształu.
     const owned = (view) => ['scraps', 'straps', 'shards'].map((id) => view.crafting.parts.find((part) => part.id === id).count);
     const card = (await character()).professions.workshop.exchange;
     assert.deepEqual([card.title, card.rate, card.counts], ['Wymiana części', 10, [1, 10]]);
