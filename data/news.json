@@ -900,6 +900,11 @@
       "id": "0.3.33",
       "title": "Wersja 0.3.33",
       "body": "- Insight jest w zamkniętym teście w Sklepie Play. Jeśli logujesz się do gry przez Google, Twój adres jest już na liście testerów.\n- Jak dołączyć: na telefonie z Androidem, zalogowanym na to samo konto Google, otwórz play.google.com/apps/testing/com.insightrpg.app, stuknij „Zostań testerem”, a potem zainstaluj Insight ze Sklepu Play. Grasz na tym samym koncie i postęp zostaje.\n- Prośba: nie wypisuj się z testu przez 14 dni. Google wymaga tego, zanim gra trafi do Sklepu Play dla wszystkich.\n- Logujesz się hasłem, a chcesz testować? Napisz do administratora prywatną wiadomość na czacie z adresem Gmail, którego używasz w Sklepie Play.\n- Wiadomości na czacie mogą mieć teraz do 500 znaków."
+    },
+    {
+      "id": "0.3.34",
+      "title": "Wersja 0.3.34",
+      "body": "- Labirynt mówi teraz wprost, gdzie są zdobyte nagrody. Dostajesz je od razu, po każdej zdobytej komnacie: PD i złoto trafiają do postaci, a Odłamki do Rdzenia.\n- Artefakty ze strażników czekają w Skrytce Rdzenia. Przycisk „Odbierz Artefakty” w Labiryncie otwiera Rdzeń od razu przy Skrytce, gdzie je wchłoniesz.\n- Po przegranej walce nic nie przepada: zdobyte nagrody już masz."
     }
   ]
 }

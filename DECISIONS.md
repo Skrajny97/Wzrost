@@ -3252,6 +3252,14 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.34 (14.11.2026): odbiór nagród w Labiryncie (940)
+
+Gracz (poz. 44) po przegranej z Piekielnym pytał, czy nagrody pokazane pod planszą da się jeszcze odebrać, a autor dodał: „powinna być opcja odbioru nagród” (14.11.2026). Makiety 940.1–940.4 autor przyjął 14.11.2026 ok. 08:31 UTC („940 akcept”). Nagrody Labiryntu przychodzą od razu, po każdej zdobytej komnacie: PD i złoto do postaci, Odłamki do Rdzenia, a Artefakty ze strażników do Skrytki Rdzenia, gdzie czekają na „Wchłoń”. Rozstrzygnięte najprościej, bez osobnego odbioru:
+1. Lista nagród nazywa się „Zdobyte dziś” (przy wejściu, w bocznej karcie i w okienku na telefonie), a napis pod nią mówi, gdzie są: „PD, złoto i Odłamki już masz. Artefakty czekają w Skrytce Rdzenia.” albo „Wszystko już masz…”. Przed pierwszą komnatą: „Nagrody przychodzą od razu, po każdej zdobytej komnacie.”
+2. Gdy Rdzeń jest otwarty, a w Skrytce czekają Artefakty, Labirynt pokazuje „Odbierz Artefakty: N” zamiast „Do Rdzenia”, także w okienku po przegranej obok „Wyjdź”. Przycisk otwiera Rdzeń przy Skrytce (`#/postac/rdzen/skrytka`).
+3. Po przegranej: „Walka przegrana. Labirynt na dziś się skończył. Zdobyte nagrody już masz.” Opis zasad mówi, że nic nie przepada.
+4. Serwer podaje w widoku Labiryntu liczbę Artefaktów w Skrytce (`waiting`), przy zamkniętym Rdzeniu 0. `tools/layout-check.cjs` sprawdza też `#/postac/rdzen/skrytka`.
+
 ## Wersja 0.3.33 (14.11.2026): dłuższe wiadomości na czacie i wpis o teście w Sklepie Play
 
 Autor 14.11.2026: „Zwiększ liczbę znaków na czacie do 500 dla wszystkich i 1000 z pozycji admina, bo to mocno ogranicza takie ruchy”. Wiadomość gracza ma najwyżej 500 widocznych znaków (`chat.rules.maxLength`), a admina 1000 (`adminMaxLength`, podpisy linków zamiast adresów). Cała wiadomość admina razem z adresami linków ma najwyżej 2000 znaków (`linkMaxLength`). Szkic „Co nowego?” 0.3.33 (PL i EN) opisuje zamknięty test w Sklepie Play: link dla testerów, „Zostań testerem”, 14 dni i prośbę do graczy logujących się hasłem o adres Gmail w prywatnej wiadomości do administratora. Autor publikuje go w Panelu autora.

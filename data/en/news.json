@@ -716,6 +716,10 @@
     "0.3.33": {
       "title": "Version 0.3.33",
       "body": "- Insight is in a closed test on Google Play. If you sign in to the game with Google, your address is already on the testers’ list.\n- How to join: on an Android phone signed in to the same Google account, open play.google.com/apps/testing/com.insightrpg.app, tap “Become a tester”, then install Insight from Google Play. You play on the same account and your progress stays.\n- Please stay in the test for 14 days. Google requires this before the game reaches everyone on Google Play.\n- Signing in with a password and want to test? Send the admin a private message on the chat with the Gmail address you use on Google Play.\n- Chat messages can now be up to 500 characters long."
+    },
+    "0.3.34": {
+      "title": "Version 0.3.34",
+      "body": "- The Labyrinth now says plainly where the rewards you gained are. You get them at once, after every chamber won: XP and gold go to your character, and Shards to the Core.\n- Artifacts from guardians wait in the Core Cache. The \"Claim Artifacts\" button in the Labyrinth opens the Core right at the Cache, where you absorb them.\n- Nothing is lost after a fight lost: the rewards you gained are already yours."
     }
   }
 }
