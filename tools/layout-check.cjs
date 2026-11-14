@@ -202,7 +202,7 @@ const SHEETS = {
   // A card of the starter deck in the Encyklopedia's "Karty": its sheet.
   '#/encyklopedia/cards': [{ name: 'karta', tap: '[data-guide="encyclopedia-card"]', ready: '.encyclopedia-card-sheet', words: true }],
   // "Co nowego?" under the scroll in the top bar, with its long address.
-  '#/postac/statystyki': [{ name: 'Co nowego?', tap: '.topbar .news-button', ready: '.news-entries .news-link' }],
+  '#/postac/statystyki': [{ name: 'Co nowego?', tap: '.topbar .news-button', ready: '.news-entries > .news-entry:first-child .news-text .news-link' }],
   '#/postac': [
     { name: 'Ustawienia', tap: '.topbar .settings-button', ready: `h2.sheet-title:text-is("${said('Ustawienia')}")`, words: true },
     { name: 'Zgłoś błąd', tap: `#sheet button:text-is("${said('Zgłoś błąd')}")`, ready: `h2.sheet-title:text-is("${said('Zgłoś błąd')}")`, words: true },
