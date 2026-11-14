@@ -2409,7 +2409,7 @@ describe('Stół rozbiórki', () => {
     assert.equal(parts(await character(), 'scraps'), 50);
   });
 
-  test('the Runy made before the rename become Odłamki, kept and on the table', async () => {
+  test('the Runy made before the rename become Odłamki (now Okruchy kryształu), kept and on the table', async () => {
     const database = await db();
     const order = { id: 'a1', kind: 'item', name: 'Miecz', rarity: 'epic', partId: 'runes', parts: 2, startsAt: 0, endsAt: Date.now() + 3600000 };
     await database.prepare('UPDATE characters SET parts = ?, crafting = ?').bind(JSON.stringify({ runes: 3, scraps: 1 }), JSON.stringify([order])).run();
@@ -2421,7 +2421,7 @@ describe('Stół rozbiórki', () => {
     await database.batch(migration.map((statement) => database.prepare(statement)));
     assert.deepEqual(JSON.parse((await database.prepare('SELECT parts FROM characters').first()).parts), { scraps: 1, shards: 3 });
     const view = await character();
-    assert.deepEqual([parts(view, 'shards'), parts(view, 'scraps'), view.crafting.queue[0].part], [3, 1, 'Odłamki']);
+    assert.deepEqual([parts(view, 'shards'), parts(view, 'scraps'), view.crafting.queue[0].part], [3, 1, 'Okruchy kryształu']);
   });
 
   test('as many pieces of a stack as chosen go on the table, and the rest stays', async () => {

@@ -161,7 +161,7 @@
     { "id": "scraps", "name": "Ścinki", "gender": "pl", "rarity": "common", "description": "Skrawki skóry, kości i piór, oczyszczone i przycięte." },
     { "id": "straps", "name": "Rzemienie", "gender": "pl", "rarity": "rare", "description": "Mocne paski wyprawionej skóry." },
     { "id": "fittings", "name": "Okucia", "gender": "pl", "rarity": "unique", "description": "Klamry, nity i blaszki do łączenia części." },
-    { "id": "shards", "name": "Odłamki", "gender": "pl", "rarity": "epic", "description": "Ostre okruchy kryształu, twardsze od stali." },
+    { "id": "shards", "name": "Okruchy kryształu", "gender": "pl", "rarity": "epic", "description": "Ostre jak szkło i twardsze od stali." },
     { "id": "amber", "name": "Bursztyn", "gender": "m", "rarity": "legendary", "description": "Ciepła bryłka żywicy sprzed wieków." },
     { "id": "bloodstone", "name": "Krwawnik", "gender": "m", "rarity": "mythic", "description": "Ciemnoczerwony kamień z żyłkami jak krew." },
     { "id": "star-shard", "name": "Gwiezdny odprysk", "gender": "m", "rarity": "divine", "description": "Okruch, który spadł z nieba i wciąż lekko świeci." }
