@@ -25,10 +25,11 @@
     "rules": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["maxLength", "linkMaxLength", "everySeconds", "keep", "privateKeep", "items", "stacks", "conversations", "page", "hideAfterReports", "pollSeconds", "translations"],
+      "required": ["maxLength", "adminMaxLength", "linkMaxLength", "everySeconds", "keep", "privateKeep", "items", "stacks", "conversations", "page", "hideAfterReports", "pollSeconds", "translations"],
       "properties": {
         "maxLength": { "type": "integer", "minimum": 1 },
-        "linkMaxLength": { "type": "integer", "minimum": 1, "description": "Najwięcej znaków wiadomości admina z linkami, razem z adresami (do maxLength liczy się tylko to, co widać: podpis zamiast adresu)." },
+        "adminMaxLength": { "type": "integer", "minimum": 1, "description": "Najwięcej widocznych znaków wiadomości admina (autora), z podpisami linków zamiast adresów." },
+        "linkMaxLength": { "type": "integer", "minimum": 1, "description": "Najwięcej znaków wiadomości admina z linkami, razem z adresami (do adminMaxLength liczy się tylko to, co widać: podpis zamiast adresu)." },
         "everySeconds": { "type": "integer", "minimum": 0 },
         "keep": { "type": "integer", "minimum": 1 },
         "privateKeep": { "type": "integer", "minimum": 1 },

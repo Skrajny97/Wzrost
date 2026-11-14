@@ -3252,6 +3252,10 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.33 (14.11.2026): dłuższe wiadomości na czacie i wpis o teście w Sklepie Play
+
+Autor 14.11.2026: „Zwiększ liczbę znaków na czacie do 500 dla wszystkich i 1000 z pozycji admina, bo to mocno ogranicza takie ruchy”. Wiadomość gracza ma najwyżej 500 widocznych znaków (`chat.rules.maxLength`), a admina 1000 (`adminMaxLength`, podpisy linków zamiast adresów). Cała wiadomość admina razem z adresami linków ma najwyżej 2000 znaków (`linkMaxLength`). Szkic „Co nowego?” 0.3.33 (PL i EN) opisuje zamknięty test w Sklepie Play: link dla testerów, „Zostań testerem”, 14 dni i prośbę do graczy logujących się hasłem o adres Gmail w prywatnej wiadomości do administratora. Autor publikuje go w Panelu autora.
+
 ## Wersja 0.3.32 (14.11.2026): na liście testerów tylko konta z Google
 
 Autor 14.11.2026: „ale daj tylko tych co sie logowali przez Google”. Przycisk w Panelu autora nazywa się „Kopiuj adresy z Google (N)” i kopiuje tylko adresy kont, które logują się przez Google (adres potwierdzony przez Google, każdy raz). Polityka prywatności (PL i EN) mówi o adresie z konta Google, przez które gracz loguje się do gry.

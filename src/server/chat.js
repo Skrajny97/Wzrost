@@ -149,9 +149,12 @@ export function cleanText(raw, { admin = false } = {}) {
   if (typeof raw !== 'string') throw new ApiError(400, 'empty', 'Napisz wiadomość.');
   const text = raw.normalize('NFC').replace(INVISIBLE, '').replace(CONTROL, ' ').replace(/\s+/g, ' ').trim();
   if (!text) throw new ApiError(400, 'empty', 'Napisz wiadomość.');
-  const { maxLength, linkMaxLength } = content().chat.rules;
+  // The admin writes longer (the author, 14.11.2026: "500 dla wszystkich i
+  // 1000 z pozycji admina").
+  const { maxLength, adminMaxLength, linkMaxLength } = content().chat.rules;
+  const limit = admin ? adminMaxLength : maxLength;
   const shown = admin ? text.replace(ADMIN_LINK, (whole, label) => label ?? whole) : text;
-  if ([...shown].length > maxLength || [...text].length > linkMaxLength) throw new ApiError(400, 'too_long', `Wiadomość może mieć najwyżej ${maxLength} znaków.`);
+  if ([...shown].length > limit || [...text].length > linkMaxLength) throw new ApiError(400, 'too_long', `Wiadomość może mieć najwyżej ${limit} znaków.`);
   const words = [...content().chat.words, ...(content().chat.wordsEn ?? [])];
   const masked = (part) => part.replace(WORD, (word) => (words.some((bad) => word.toLowerCase().includes(bad)) ? '*'.repeat([...word].length) : word));
   if (!admin) {
