@@ -955,6 +955,11 @@
       "id": "0.3.47",
       "title": "Wersja 0.3.47",
       "body": "- Mikstury na wyprawę: leczenie i manę wybierasz teraz z listy, z obrazkami, mocą i liczbą w plecaku. Wybierasz jeden rodzaj i liczbę sztuk, a gdy go zabraknie, resztę uzupełnią słabsze mikstury. Mocniejsze zostają w plecaku na trudniejszą wyprawę.\n- Pod listą widać, co dokładnie zabierzesz, a zagrożenie wyprawy liczy właśnie te mikstury."
+    },
+    {
+      "id": "0.3.48",
+      "title": "Wersja 0.3.48",
+      "body": "- Nowe animacje umiejętności Kleryka: Modlitwa o zdrowie (snop światła i krzyż), Egzorcyzm (krąg run i słup światła pod każdym wrogiem), Błogosławieństwo (aureola i opadające pióra).\n- Nowe animacje umiejętności Cienia: Cios w plecy (atak z dymu, zza pleców celu), Zatrute ostrze (jad spływa po sztylecie), Taniec cieni (wirujące cienie i kopie postaci)."
     }
   ]
 }

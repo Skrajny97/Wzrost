@@ -760,6 +760,10 @@
     "0.3.47": {
       "title": "Version 0.3.47",
       "body": "- Potions to take: you now pick healing and mana potions from a list with their pictures, strength and how many you have. Choose one kind and how many; if you run short, weaker potions make up the rest. Stronger ones stay in your bag for a harder exploration.\n- Under the list you see exactly what you will take, and the exploration's threat counts those very potions."
+    },
+    "0.3.48": {
+      "title": "Version 0.3.48",
+      "body": "- New Cleric skill animations: Prayer for Health (a beam of light and a cross), Exorcism (a circle of runes and a pillar of light under every foe), Blessing (a halo and falling feathers).\n- New Shadow skill animations: Backstab (a strike out of smoke, from behind the target), Poisoned Blade (venom running down the dagger), Shadow Dance (whirling shadows and copies of the figure)."
     }
   }
 }

@@ -23211,3 +23211,210 @@ a.discord-button {
     margin-left: 32px;
   }
 }
+
+/* 956.10–956.15, the Kleryk's and the Cień's skills (skill-fx.js): a
+   beam of light on a healed ally, circles of runes and pillars of light
+   under the foes, a halo with feathers, shadow smoke and a violet cut,
+   venom on a blade and a whirl of shadows. */
+.fx-lightfall {
+  position: absolute;
+  pointer-events: none;
+  transform-origin: 50% 0;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0) 0 6px, rgba(255, 255, 236, 0.24) 6px 8px, rgba(255, 255, 255, 0) 8px 13px),
+    linear-gradient(180deg, rgba(255, 250, 225, 0) 0%, rgba(255, 250, 225, 0.34) 32%, rgba(222, 242, 186, 0.36) 78%, rgba(190, 225, 150, 0.12) 100%);
+  clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 24%, #000 76%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 24%, #000 76%, transparent);
+  mix-blend-mode: screen;
+}
+
+.fx-groundring {
+  position: absolute;
+  aspect-ratio: 3 / 1;
+  border: 2px solid var(--fx);
+  border-radius: 50%;
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--fx) 40%, transparent), transparent 70%);
+  box-shadow: 0 0 10px var(--fx), inset 0 0 8px var(--fx);
+  pointer-events: none;
+}
+
+.fx-holycross,
+.fx-runes,
+.fx-halo,
+.fx-glint,
+.fx-shadowslash {
+  position: absolute;
+  width: var(--size, 40px);
+  color: var(--fx);
+  pointer-events: none;
+}
+
+.fx-holycross {
+  aspect-ratio: 1;
+  color: #8fdc6e;
+  filter: drop-shadow(0 0 1px #2f4a1c) drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 9px var(--fx));
+}
+
+.fx-runes {
+  aspect-ratio: 1;
+  filter: drop-shadow(0 0 3px var(--fx)) drop-shadow(0 0 6px var(--fx));
+}
+
+.fx-halo {
+  aspect-ratio: 3 / 1;
+  filter: drop-shadow(0 0 3px var(--fx)) drop-shadow(0 0 8px var(--fx));
+}
+
+.fx-glint {
+  aspect-ratio: 1;
+  filter: drop-shadow(0 0 4px var(--fx));
+}
+
+/* The cut from behind runs over "KRYTYK!" and the number of a critical
+   blow (z-index 6): they come at once, and the cut is gone in a moment. */
+.fx-shadowslash {
+  aspect-ratio: 1;
+  z-index: 7;
+  filter: drop-shadow(0 0 3px var(--fx)) drop-shadow(0 0 7px #4b3a73);
+}
+
+.fx-holycross svg,
+.fx-runes svg,
+.fx-halo svg,
+.fx-glint svg,
+.fx-shadowslash svg,
+.fx-wisp svg,
+.fx-feather svg,
+.fx-swirl svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fx-pillar {
+  position: absolute;
+  pointer-events: none;
+  transform-origin: 50% 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0) 36%, rgba(255, 255, 255, 0.92) 50%, rgba(255, 255, 255, 0) 64%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0) 0 5px, rgba(255, 249, 220, 0.32) 5px 6px, rgba(255, 255, 255, 0) 6px 11px),
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--fx) 45%, transparent) 24%, color-mix(in srgb, var(--fx) 50%, transparent) 50%, color-mix(in srgb, var(--fx) 45%, transparent) 76%, transparent);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 30%, #000 90%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 30%, #000 90%, transparent);
+  mix-blend-mode: screen;
+}
+
+.fx-wisp {
+  position: absolute;
+  width: 15px;
+  height: 46px;
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px #7b5fc7);
+}
+
+.fx-aureole {
+  position: absolute;
+  width: var(--size, 90px);
+  height: var(--size, 90px);
+  border-radius: 50%;
+  pointer-events: none;
+  background: repeating-conic-gradient(color-mix(in srgb, var(--fx) 70%, #ffffff) 0deg 5deg, rgba(255, 255, 255, 0) 5deg 20deg);
+  -webkit-mask-image: radial-gradient(circle, transparent 16%, #000 26%, rgba(0, 0, 0, 0.45) 50%, transparent 70%);
+  mask-image: radial-gradient(circle, transparent 16%, #000 26%, rgba(0, 0, 0, 0.45) 50%, transparent 70%);
+  mix-blend-mode: screen;
+}
+
+.fx-feather {
+  position: absolute;
+  width: 11px;
+  height: 27px;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 0 rgba(40, 28, 8, 0.9)) drop-shadow(0 0 2px color-mix(in srgb, var(--fx) 45%, transparent));
+}
+
+.fx-smoke {
+  position: absolute;
+  width: var(--size, 80px);
+  height: var(--size, 80px);
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 56%, rgba(30, 22, 48, 0.9) 0, rgba(42, 31, 66, 0.6) 22%, transparent 40%),
+    radial-gradient(circle at 30% 60%, rgba(52, 38, 84, 0.75) 0, rgba(70, 54, 112, 0.35) 16%, transparent 27%),
+    radial-gradient(circle at 70% 58%, rgba(52, 38, 84, 0.75) 0, rgba(70, 54, 112, 0.35) 17%, transparent 28%),
+    radial-gradient(circle at 42% 34%, rgba(62, 46, 98, 0.7) 0, rgba(90, 70, 140, 0.3) 15%, transparent 25%),
+    radial-gradient(circle at 62% 30%, rgba(62, 46, 98, 0.6) 0, rgba(90, 70, 140, 0.28) 12%, transparent 21%),
+    radial-gradient(circle at 50% 50%, rgba(166, 144, 232, 0.22) 0, transparent 48%);
+  filter: blur(2px);
+}
+
+.fx-shade {
+  position: absolute;
+  margin: 0;
+  pointer-events: none;
+  filter: brightness(0.2) sepia(1) hue-rotate(215deg) saturate(4) drop-shadow(0 0 2px #c9b7ff) drop-shadow(0 0 6px #7b5fc7);
+}
+
+/* The Taniec cieni's copies of the figure: a lighter violet, so they read
+   over the dark card. */
+.fx-shade--dance {
+  filter: grayscale(1) brightness(0.55) sepia(1) hue-rotate(215deg) saturate(3.5) drop-shadow(0 0 1px #efe8ff) drop-shadow(0 0 5px #a690e8);
+}
+
+.fx-venom {
+  position: absolute;
+  width: var(--size, 72px);
+  height: var(--size, 72px);
+  pointer-events: none;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 6px color-mix(in srgb, var(--fx) 70%, transparent));
+}
+
+.fx-venom-steel,
+.fx-venom-coat,
+.fx-venom-shine {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  image-rendering: pixelated;
+}
+
+.fx-venom-coat {
+  filter: sepia(1) saturate(5) hue-rotate(38deg) brightness(1.05);
+  clip-path: polygon(-100% -72%, 200% 228%, 200% 228%, -100% -72%);
+}
+
+.fx-venom-shine {
+  background: linear-gradient(45deg, rgba(244, 255, 214, 0) 40%, rgba(244, 255, 214, 0.95) 50%, rgba(244, 255, 214, 0) 60%) 100% 0% / 300% 300% no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  opacity: 0;
+}
+
+.fx-drop {
+  position: absolute;
+  width: 7px;
+  height: 9px;
+  border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+  background: radial-gradient(circle at 38% 40%, #f2ffd6, #9ccc65 45%, #4f7a22);
+  box-shadow: 0 0 6px #9ccc65;
+  pointer-events: none;
+}
+
+.fx-swirl {
+  position: absolute;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px var(--fx));
+}
+
+.fx-dashline {
+  position: absolute;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--fx) 60%, #ffffff) 55%, transparent);
+  box-shadow: 0 0 6px var(--fx);
+  pointer-events: none;
+}
