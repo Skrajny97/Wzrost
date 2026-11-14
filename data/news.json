@@ -890,6 +890,11 @@
       "id": "0.3.28",
       "title": "Wersja 0.3.28",
       "body": "- Talia Systemu: możesz zapisać do pięciu talii. W Salonie Gier, w „Twojej talii”, stuknij numer talii, żeby nią grać, albo puste miejsce, żeby ułożyć nową.\n- Zapisaną talię zmienisz jednym stuknięciem także na Arenie („Karty”), przy stołach mieszkańców Osady i w oknie wyzwania na partię na żywo."
+    },
+    {
+      "id": "0.3.29",
+      "title": "Wersja 0.3.29",
+      "body": "- Talia Systemu: zapisane talie możesz nazwać. W Salonie Gier stuknij „Nazwij” obok „Ułóż talię”.\n- Nazwa stoi pod stosem talii, także na Arenie, przy stołach mieszkańców i w oknie wyzwania. Talię, którą grasz, znaczy ✓ na rogu stosu."
     }
   ]
 }

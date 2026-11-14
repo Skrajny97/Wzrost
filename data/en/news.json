@@ -708,6 +708,10 @@
     "0.3.28": {
       "title": "Version 0.3.28",
       "body": "- System Deck: you can save up to five decks. In the Games Parlour, under “Your deck”, tap a deck’s number to play it, or an empty slot to build a new one.\n- You can switch your saved deck with one tap in the Arena (“Cards”), at the Settlement residents’ tables and in the live match challenge window too."
+    },
+    "0.3.29": {
+      "title": "Version 0.3.29",
+      "body": "- System Deck: you can name your saved decks. In the Games Parlour, tap “Name” next to “Build deck”.\n- The name shows under the deck’s pile, also in the Arena, at the residents’ tables and in the challenge window. The deck you play has a ✓ on the pile’s corner."
     }
   }
 }
