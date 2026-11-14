@@ -3252,6 +3252,10 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.46 (14.11.2026): punkt „Ulepszanie” w opisie Rdzenia według autora
+
+1. Tekst autora (z poprawioną literówką „Labirytnu”): „Ulepszanie: Odłamki ulepszają Artefakt aż do +10 i to zawsze się udaje. Każdy stopień to +10% do jego liczb. Odłamki zdobędziesz z Labiryntu lub dodatkowe – rozbijając Artefakt ze Skrytki.” Pozostałe punkty autor zostawił, jak są.
+
 ## Wersja 0.3.45 (14.11.2026): krótszy punkt o gniazdach Rdzenia
 
 1. Autor: „po co pisac nigdy mniej niż 3, skoro Rdzeń odblokowuje sie na 30tym? wtedy to wynika samo przez się”. Punkt brzmi teraz: „Gniazda: Rdzeń ma jedno gniazdo na każde 10 poziomów postaci.” Zasada w grze się nie zmienia.
