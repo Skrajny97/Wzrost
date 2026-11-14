@@ -3256,6 +3256,8 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 
 Autor 14.11.2026 poprosił o jednorazowy kod KAWA100 na 100 Punktów Systemu dla jednego gracza. Kod działa tylko dla jednej postaci (w danych skrót SHA-256 jej imienia zamiast imienia, bo repozytorium jest publiczne; `coffee-2026-11-d`), raz, do 14.12.2026 włącznie (brakujący szczegół: miesiąc, jak przy poprzednich kodach za kawę). Wcześniejszy kod KAWA100 innej postaci działa dalej osobno. Kod nie trafia do „Co nowego?”, bo jest dla jednej postaci; autor przekazuje go sam.
 
+Pierwsze wdrożenie 0.3.27 zatrzymał test listów gończych (`test/wanted.test.js`), który zależał od daty: postać testowa szła do walki z HP nowej postaci (77), a cel wylosowany 14.11.2026 (Przemytnik) zdążył je zbić. Test daje teraz postaci pełne HP; gra się nie zmienia.
+
 ## Wersja 0.3.26 (13.11.2026): lista graczy online (937)
 
 Autor w czacie 13.11.2026: „Dodaj opcje otwierania listy graczy online pod zieloną kropka ilu graczy online jest”, a po makietach 937.1 i 937.2: „937 accept”.
