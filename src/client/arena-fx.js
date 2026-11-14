@@ -34,6 +34,7 @@
 import { itemSprite } from './art.js';
 import { h } from './dom.js';
 import { t } from './i18n.js';
+import { ICE_LANCE, ICE_STAR } from './skill-fx.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 // At most so many specks at once in an arena, so a phone keeps up.
@@ -103,6 +104,8 @@ const clamp = (value, low, high) => Math.min(Math.max(value, low), high);
 // element; a spell without one is the System's light, anything else a
 // plain blow of a blade, a claw or an arrow.
 function kindOf(actor, look) {
+  // 960: a look that names its own light.
+  if (look?.kind && KINDS[look.kind]) return look.kind;
   if (look?.impact === 'fire') return 'fire';
   if (look?.impact === 'shadow' || look?.teleport) return 'shadow';
   if (look?.cast === 'holy') return 'sacred';
@@ -878,7 +881,8 @@ export function createFx(kit) {
     }
     // A skill with its own impact (skill-fx.js) keeps it; any other spell
     // bursts in its element.
-    if (!blow.melee && kind !== 'physical' && !look?.impact) elementBurst(blow, point, card);
+    // (960: a sweep whose cast has already struck each foe only lights them.)
+    if (!blow.melee && kind !== 'physical' && !look?.impact && !look?.struck) elementBurst(blow, point, card);
     if (strong) critStamp(card, point);
     // The camera: in and staying for the fight's last blow, a short zoom for
     // a critical blow, a felling one or a skill's own.
@@ -1374,6 +1378,17 @@ export function createFx(kit) {
       await later(300);
       return;
     }
+    // 960: a star of ice spinning (Lodowa gwiazda) or a lance
+    // of ice flying straight (Lodowa włócznia), formed at the caster
+    // (skill-fx.js forge()).
+    if ((style.orb === 'ice-star' || style.orb === 'ice-lance') && motion()) {
+      await (style.orb === 'ice-star' ? iceStar(a, b) : iceLance(a, b));
+      if (id !== run()) return;
+      onImpact();
+      await settle();
+      await later(300);
+      return;
+    }
     const tail = motion();
     const bolt = h('span', {
       class: ['projectile', `projectile--${magic ? 'magic' : 'arrow'}`, style.big && 'projectile--big', style.glow && 'projectile--glow', tail && 'projectile--tail'].filter(Boolean).join(' '),
@@ -1447,6 +1462,58 @@ export function createFx(kit) {
     await animate(orb, frames, { duration: flight, easing: 'linear' });
     orb.remove();
     await Promise.all(sheds);
+  }
+
+  // 960: a star of ice flying from `a` to `b`, spinning, shedding frost.
+  async function iceStar(a, b) {
+    const distance = Math.hypot(b.x - a.x, b.y - a.y);
+    const size = Math.round(Math.min(40, Math.max(24, distance * 0.14)));
+    const star = h('span', { class: 'fx-icestar' });
+    star.innerHTML = ICE_STAR;
+    star.style.setProperty('--size', `${size}px`);
+    fx.append(star);
+    // It takes the place of the one formed at the caster.
+    for (const formed of fx.querySelectorAll('.fx-forged')) formed.remove();
+    const flight = 380;
+    const frames = [0, 0.25, 0.5, 0.75, 1].map((share) => ({
+      transform: `translate(${(a.x + (b.x - a.x) * share).toFixed(1)}px, ${(a.y + (b.y - a.y) * share).toFixed(1)}px) translate(-50%, -50%) rotate(${Math.round(share * 720)}deg) scale(${(0.8 + share * 0.3).toFixed(2)})`,
+    }));
+    specks.trail({ from: a, to: b, duration: flight, colors: ['#ffffff', '#cfefff', '#8fd3ff'], rate: 120, sizes: [1.2, 2.6], life: [240, 460], shape: 'mote' });
+    await animate(star, frames, { duration: flight, easing: 'cubic-bezier(0.45, 0, 0.8, 0.55)' });
+    star.remove();
+  }
+
+  // 960: a lance of ice flying straight from `a` (its tail there) until its
+  // point reaches `b`, with a frosty trail.
+  async function iceLance(a, b) {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const distance = Math.hypot(dx, dy) || 1;
+    const angle = Math.atan2(dy, dx);
+    const length = Math.round(Math.min(110, Math.max(60, distance * 0.42)));
+    const lance = h('span', { class: 'fx-lance' });
+    lance.innerHTML = ICE_LANCE;
+    lance.style.width = `${length}px`;
+    fx.append(lance);
+    for (const formed of fx.querySelectorAll('.fx-forged')) formed.remove();
+    const start = { x: a.x + (dx / distance) * length, y: a.y + (dy / distance) * length };
+    const point = (at) => `translate(${at.x.toFixed(1)}px, ${at.y.toFixed(1)}px) rotate(${angle.toFixed(4)}rad) translate(-100%, -50%)`;
+    const flight = 240;
+    const streak = mark('fx-trail fx-trail--magic', start, { '--fx': '#bfe8ff' });
+    streak.style.width = `${Math.round(Math.max(0, distance - length))}px`;
+    const along = `translate(0px, -50%) rotate(${((angle * 180) / Math.PI).toFixed(1)}deg)`;
+    animate(
+      streak,
+      [
+        { transform: `${along} scaleX(0)`, opacity: 0.85, easing: 'ease-in' },
+        { transform: `${along} scaleX(1)`, opacity: 0.85, offset: flight / (flight + 300), easing: 'ease-out' },
+        { transform: `${along} scaleX(1)`, opacity: 0 },
+      ],
+      { duration: flight + 300 },
+    ).then(() => streak.remove());
+    specks.trail({ from: start, to: b, duration: flight, colors: ['#ffffff', '#dff4ff', '#8fd3ff'], rate: 90, sizes: [1.2, 2.4], life: [220, 420], shape: 'mote' });
+    await animate(lance, [{ transform: point(start), opacity: 1 }, { transform: point(b), opacity: 1 }], { duration: flight, easing: 'cubic-bezier(0.5, 0, 0.9, 0.5)' });
+    lance.remove();
   }
 
   // Before a skill's own blow, its light gathers on its user.
