@@ -748,6 +748,10 @@
     "0.3.44": {
       "title": "Version 0.3.44",
       "body": "- The Workshop part that used to be called “Shards” is now “Crystal Splinters”, so it is no longer confused with the Core's Shards. Your stock stays as it was."
+    },
+    "0.3.45": {
+      "title": "Version 0.3.45",
+      "body": "- A shorter first point in the Core's explanation: one socket for every 10 character levels."
     }
   }
 }

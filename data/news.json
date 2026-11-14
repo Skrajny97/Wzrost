@@ -940,6 +940,11 @@
       "id": "0.3.44",
       "title": "Wersja 0.3.44",
       "body": "- Część z Warsztatu, która dotąd nazywała się „Odłamki”, to teraz „Okruchy kryształu”. Nie myli się już z Odłamkami Rdzenia. Twoje zapasy zostały bez zmian."
+    },
+    {
+      "id": "0.3.45",
+      "title": "Wersja 0.3.45",
+      "body": "- Krótszy pierwszy punkt opisu Rdzenia: jedno gniazdo na każde 10 poziomów postaci."
     }
   ]
 }

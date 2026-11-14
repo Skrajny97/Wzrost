@@ -49,9 +49,10 @@ export function mountCore(container, options) {
         { class: 'card towers-intro' },
         // The explanation in short points, one thing each (the author,
         // 14.11.2026: „ten opis jest niezrozumiały, pierwsze zdanie pod Jak to
-        // działa w ogóle jakies kalekie”).
+        // działa w ogóle jakies kalekie”; „po co pisac nigdy mniej niż 3, skoro
+        // Rdzeń odblokowuje sie na 30tym?”).
         howItWorks(t('Artefakty z Labiryntu Systemu wchłaniasz do Rdzenia na stałe. Każdy daje postaci cechy swojego żywiołu.'), [
-          t('Gniazda: na każde {per} poziomów postaci Rdzeń ma jedno gniazdo, ale nigdy mniej niż trzy.', { per: view.perSockets }),
+          t('Gniazda: Rdzeń ma jedno gniazdo na każde {per} poziomów postaci.', { per: view.perSockets }),
           t('Wielkość: mały Artefakt zajmuje 1 gniazdo i ma 1 cechę. Średni zajmuje 2 gniazda i ma 2 cechy. Duży zajmuje 3 gniazda i ma 2 cechy oraz zdolność.'),
           t('Ulepszanie: Odłamki ulepszają Artefakt aż do +10 i zawsze się udaje. Każdy stopień to +10% do jego liczb. Odłamki zdobędziesz, rozbijając Artefakt ze Skrytki.'),
           t('Rezonans: 2, 4 i 6 Artefaktów tego samego żywiołu dają coraz większą premię tego żywiołu.'),
