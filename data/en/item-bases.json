@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/item-bases.json, by the base's id (src/engine/overlay.js): every base, Tiers I–VII, with the attack of a weapon.",
+  "$comment": "English texts of data/item-bases.json, by the base's id (src/engine/overlay.js): every base, Tiers I–VIII, with the attack of a weapon.",
   "sword": {
     "name": "Sword",
     "attackName": "Slash"
@@ -26,6 +26,10 @@
   },
   "coronation-sword": {
     "name": "Coronation Sword",
+    "attackName": "Slash"
+  },
+  "self-swinging-sword": {
+    "name": "Self-Swinging Sword",
     "attackName": "Slash"
   },
   "axe": {
@@ -56,6 +60,10 @@
     "name": "War Pick",
     "attackName": "Chop"
   },
+  "executioner-axe": {
+    "name": "Executioner's Axe",
+    "attackName": "Chop"
+  },
   "dagger": {
     "name": "Dagger",
     "attackName": "Stab"
@@ -82,6 +90,10 @@
   },
   "baselard": {
     "name": "Baselard",
+    "attackName": "Stab"
+  },
+  "khanjar": {
+    "name": "Khanjar",
     "attackName": "Stab"
   },
   "bow": {
@@ -112,6 +124,10 @@
     "name": "Persian Bow",
     "attackName": "Shot"
   },
+  "devana-bow": {
+    "name": "Devana's Bow",
+    "attackName": "Shot"
+  },
   "staff": {
     "name": "Staff",
     "attackName": "Elemental Bolt"
@@ -138,6 +154,10 @@
   },
   "archmage-staff": {
     "name": "Archmage's Staff",
+    "attackName": "Elemental Bolt"
+  },
+  "merlin-staff": {
+    "name": "Merlin's Staff",
     "attackName": "Elemental Bolt"
   },
   "aspergillum": {
@@ -168,6 +188,10 @@
     "name": "Reliquary Cross",
     "attackName": "Sacred Bolt"
   },
+  "holy-grail": {
+    "name": "Holy Grail",
+    "attackName": "Sacred Bolt"
+  },
   "shield": {
     "name": "Shield"
   },
@@ -188,6 +212,9 @@
   },
   "royal-shield": {
     "name": "Royal Shield"
+  },
+  "aegis": {
+    "name": "Aegis"
   },
   "quiver": {
     "name": "Quiver"
@@ -210,6 +237,9 @@
   "crown-quiver": {
     "name": "Crown Quiver"
   },
+  "bottomless-quiver": {
+    "name": "Bottomless Quiver"
+  },
   "misericorde": {
     "name": "Misericorde"
   },
@@ -230,6 +260,9 @@
   },
   "rondel": {
     "name": "Rondel Dagger"
+  },
+  "nocnitsa-blade": {
+    "name": "Nocnitsa's Blade"
   },
   "focus": {
     "name": "Focus"
@@ -252,6 +285,9 @@
   "hourglass": {
     "name": "Hourglass"
   },
+  "twardowski-mirror": {
+    "name": "Twardowski's Mirror"
+  },
   "hood": {
     "name": "Hood"
   },
@@ -272,6 +308,9 @@
   },
   "magnate-cap": {
     "name": "Magnate's Cap"
+  },
+  "cap-of-invisibility": {
+    "name": "Cap of Invisibility"
   },
   "helmet": {
     "name": "Helmet"
@@ -294,6 +333,9 @@
   "armet": {
     "name": "Armet"
   },
+  "svetovid-helm": {
+    "name": "Svetovid's Helm"
+  },
   "tunic": {
     "name": "Tunic"
   },
@@ -314,6 +356,9 @@
   },
   "czamara": {
     "name": "Braided Coat"
+  },
+  "bekesha": {
+    "name": "Pelisse"
   },
   "chainmail": {
     "name": "Chainmail"
@@ -336,6 +381,9 @@
   "maximilian-armor": {
     "name": "Maximilian Armour"
   },
+  "zawisza-armor": {
+    "name": "Zawisza's Armour"
+  },
   "robe": {
     "name": "Robe"
   },
@@ -356,6 +404,9 @@
   },
   "szuba": {
     "name": "Sable Robe"
+  },
+  "mokosh-robe": {
+    "name": "Mokosh's Robe"
   },
   "cowl": {
     "name": "Cowl"
@@ -378,6 +429,9 @@
   "prophet-crown": {
     "name": "Prophet's Crown"
   },
+  "papal-tiara": {
+    "name": "Papal Tiara"
+  },
   "surplice": {
     "name": "Surplice"
   },
@@ -398,6 +452,9 @@
   },
   "pallium": {
     "name": "Pallium"
+  },
+  "rationale": {
+    "name": "Rationale"
   },
   "gloves": {
     "name": "Gloves"
@@ -420,6 +477,9 @@
   "hetman-gloves": {
     "name": "Hetman's Gloves"
   },
+  "svarog-gauntlets": {
+    "name": "Svarog's Gauntlets"
+  },
   "boots": {
     "name": "Boots"
   },
@@ -440,6 +500,9 @@
   },
   "safian-boots": {
     "name": "Saffian Boots"
+  },
+  "seven-league-boots": {
+    "name": "Seven-League Boots"
   },
   "amulet": {
     "name": "Amulet"
@@ -462,6 +525,9 @@
   "pectoral": {
     "name": "Pectoral"
   },
+  "ryngraf": {
+    "name": "Gorget"
+  },
   "ring": {
     "name": "Ring"
   },
@@ -483,6 +549,9 @@
   "ancestors-ring": {
     "name": "Ancestral Ring"
   },
+  "solomon-ring": {
+    "name": "Solomon's Ring"
+  },
   "talisman": {
     "name": "Talisman"
   },
@@ -503,5 +572,8 @@
   },
   "grzywna": {
     "name": "Torc"
+  },
+  "alatyr": {
+    "name": "Alatyr Stone"
   }
 }

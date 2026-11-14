@@ -211,6 +211,7 @@ describe('Górnictwo in the engine', () => {
       ['Kolia', 'Tier V', 'Dodatki', 'Szlifiernia: wzór od 75. poziomu Jubilerstwa.'],
       ['Kamea', 'Tier VI', 'Dodatki', 'Szlifiernia: wzór od 100. poziomu Jubilerstwa.'],
       ['Pektorał', 'Tier VII', 'Dodatki', 'Szlifiernia: wzór od 125. poziomu Jubilerstwa.'],
+      ['Ryngraf', 'Tier VIII', 'Dodatki', 'Szlifiernia: wzór od 150. poziomu Jubilerstwa.'],
       ['Pierścień', 'Tier I', 'Dodatki', 'Szlifiernia: wzór od 1. poziomu Jubilerstwa.'],
       ['Sygnet', 'Tier II', 'Dodatki', 'Szlifiernia: wzór od 10. poziomu Jubilerstwa.'],
       ['Obrączka', 'Tier III', 'Dodatki', 'Szlifiernia: wzór od 25. poziomu Jubilerstwa.'],
@@ -218,6 +219,7 @@ describe('Górnictwo in the engine', () => {
       ['Pierścień koronny', 'Tier V', 'Dodatki', 'Szlifiernia: wzór od 75. poziomu Jubilerstwa.'],
       ['Pierścień wieczności', 'Tier VI', 'Dodatki', 'Szlifiernia: wzór od 100. poziomu Jubilerstwa.'],
       ['Pierścień przodków', 'Tier VII', 'Dodatki', 'Szlifiernia: wzór od 125. poziomu Jubilerstwa.'],
+      ['Pierścień Salomona', 'Tier VIII', 'Dodatki', 'Szlifiernia: wzór od 150. poziomu Jubilerstwa.'],
       ['Talizman', 'Tier I', 'Dodatki', 'Szlifiernia: wzór od 1. poziomu Jubilerstwa.'],
       ['Otoczak', 'Tier II', 'Dodatki', 'Szlifiernia: wzór od 10. poziomu Jubilerstwa.'],
       ['Kieł', 'Tier III', 'Dodatki', 'Szlifiernia: wzór od 25. poziomu Jubilerstwa.'],
@@ -225,6 +227,7 @@ describe('Górnictwo in the engine', () => {
       ['Róg tura', 'Tier V', 'Dodatki', 'Szlifiernia: wzór od 75. poziomu Jubilerstwa.'],
       ['Lunula', 'Tier VI', 'Dodatki', 'Szlifiernia: wzór od 100. poziomu Jubilerstwa.'],
       ['Grzywna', 'Tier VII', 'Dodatki', 'Szlifiernia: wzór od 125. poziomu Jubilerstwa.'],
+      ['Kamień Alatyr', 'Tier VIII', 'Dodatki', 'Szlifiernia: wzór od 150. poziomu Jubilerstwa.'],
     ]);
     // A jewel's card names the same Tier, and no Warsztat base says Szlifiernia.
     for (const base of jewelBases(content)) {
@@ -273,7 +276,7 @@ describe('Górnictwo in the engine', () => {
 });
 
 describe('Jubilerstwo in the engine', () => {
-  test('rings, amulets and talismans, the first of each family at once and the later ones from 10, 25, 50, 75, 100 and 125; the Warsztat makes none of them', () => {
+  test('rings, amulets and talismans, the first of each family at once and the later ones from 10, 25, 50, 75, 100, 125 and 150; the Warsztat makes none of them', () => {
     assert.deepEqual(knownJewelPatterns(1, [], content).map((base) => base.id), ['amulet', 'ring', 'talisman']);
     assert.equal(knownJewelPatterns(10, [], content).length, 6);
     assert.ok(knownJewelPatterns(25, [], content).some((base) => base.id === 'band-ring'));
@@ -310,7 +313,11 @@ describe('Jubilerstwo in the engine', () => {
     const at125 = knownJewelPatterns(125, [], content).map((base) => base.id);
     assert.deepEqual([at125.length, ['pectoral', 'ancestors-ring', 'grzywna'].every((id) => at125.includes(id))], [21, true]);
     assert.equal(content.professionsById[content.jewelcrafting.profession].maxLevel, 200);
-    assert.equal(knownJewelPatterns(200, [], content).length, 21);
+    // Tier VIII (949) at the 150th.
+    assert.equal(knownJewelPatterns(149, [], content).length, 21);
+    const at150 = knownJewelPatterns(150, [], content).map((base) => base.id);
+    assert.deepEqual([at150.length, ['ryngraf', 'solomon-ring', 'alatyr'].every((id) => at150.includes(id))], [24, true]);
+    assert.equal(knownJewelPatterns(200, [], content).length, 24);
     const seventh = jewelReport({ ...reportOf, before: { level: 124, xp: 0 }, after: { level: 125, xp: 0 } }, content);
     assert.deepEqual(seventh.revealed, ['pectoral', 'ancestors-ring', 'grzywna']);
     assert.ok(seventh.system.includes('Osiągnięto poziom Jubilerstwa: 125'), seventh.system.join(' | '));

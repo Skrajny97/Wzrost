@@ -375,10 +375,10 @@ describe('items', () => {
       const before = content.bases
         .filter((other) => (other.family ?? other.id) === base.family && (other.classLevel ?? 1) < base.classLevel)
         .reduce((best, other) => ((other.classLevel ?? 1) > (best.classLevel ?? 1) ? other : best));
-      assert.ok([10, 25, 50, 75, 100, 125].includes(base.classLevel), base.id);
-      // At most 30% above the first base's (Tier VII: x1.30, rounded up to
+      assert.ok([10, 25, 50, 75, 100, 125, 150].includes(base.classLevel), base.id);
+      // At most 35% above the first base's (Tier VIII: x1.35, rounded up to
       // hundredths).
-      assert.ok(base[key[base.kind]] > before[key[base.kind]] && base[key[base.kind]] <= Math.ceil(first[key[base.kind]] * 130 - 1e-9) / 100, base.id);
+      assert.ok(base[key[base.kind]] > before[key[base.kind]] && base[key[base.kind]] <= Math.ceil(first[key[base.kind]] * 135 - 1e-9) / 100, base.id);
       for (const cls of content.classes) {
         assert.equal(canUse(base.id, cls.id, content), canUse(first.id, cls.id, content), `${base.id} for ${cls.id}`);
       }
@@ -392,11 +392,11 @@ describe('items', () => {
     }
   });
 
-  test('every category has bases from class levels 10, 25, 50, 75, 100 and 125, dropping from those levels', () => {
+  test('every category has bases from class levels 10, 25, 50, 75, 100, 125 and 150, dropping from those levels', () => {
     const firsts = content.bases.filter((base) => !base.family);
     for (const first of firsts) {
       const levels = content.bases.filter((base) => base.family === first.id).map((base) => base.classLevel);
-      assert.deepEqual(levels, [10, 25, 50, 75, 100, 125], first.id);
+      assert.deepEqual(levels, [10, 25, 50, 75, 100, 125, 150], first.id);
     }
     assert.equal(canUse('saber', 'warrior', content, 24), false);
     assert.equal(canUse('saber', 'warrior', content, 25), true);
@@ -414,6 +414,10 @@ describe('items', () => {
     assert.equal(canUse('coronation-sword', 'warrior', content, 124), false);
     assert.equal(canUse('coronation-sword', 'warrior', content, 125), true);
     assert.equal(canUse('coronation-sword', 'mage', content, 125), false);
+    // Tier VIII (949): the Miecz samosiek from class level 150.
+    assert.equal(canUse('self-swinging-sword', 'warrior', content, 149), false);
+    assert.equal(canUse('self-swinging-sword', 'warrior', content, 150), true);
+    assert.equal(canUse('self-swinging-sword', 'mage', content, 150), false);
     const rng = createRng('trzecie-bazy');
     const swords = (maxClassLevel) => {
       const found = new Set();
@@ -435,6 +439,10 @@ describe('items', () => {
     // place of Czarne Bagno, reaches it).
     assert.deepEqual(swords(124), ['broadsword', 'estoc', 'flamberge', 'karabela', 'saber']);
     assert.deepEqual(swords(125), ['broadsword', 'coronation-sword', 'estoc', 'flamberge', 'karabela', 'saber']);
+    // The Miecz samosiek from 150 (Pogorzelisko, 146–150, the last place
+    // of Sosnowe Wydmy, reaches it).
+    assert.deepEqual(swords(149), ['broadsword', 'coronation-sword', 'estoc', 'flamberge', 'karabela', 'saber']);
+    assert.deepEqual(swords(150), ['broadsword', 'coronation-sword', 'estoc', 'flamberge', 'karabela', 'saber', 'self-swinging-sword']);
   });
 
   // The author's 570 A and 665: Tier VI from class level 100, one base in
@@ -532,6 +540,48 @@ describe('items', () => {
     }
   });
 
+  // The author's 949: Tier VIII from class level 150, one base in each
+  // family, by the rule of Tier VII with x1.35: the bonus from one above
+  // Tier VII's best up to half again it, a half rounded down (DECISIONS.md,
+  // "Tier VIII przedmiotów").
+  test('Tier VIII follows the Tier rule: the first base\'s factor x1.35 rounded up to hundredths, the bonus from one above Tier VII\'s best up to half again it, rounded down', () => {
+    const key = { weapon: 'damageFactor', armor: 'armorFactor', implicit: 'statFactor' };
+    const eighth = content.bases.filter((base) => base.classLevel === 150);
+    assert.deepEqual(
+      eighth.map((base) => base.name),
+      ['Miecz samosiek', 'Topór katowski', 'Handżar', 'Łuk Dziewanny', 'Laska Merlina', 'Święty Graal', 'Egida', 'Kołczan bez dna', 'Ostrze Nocnicy', 'Lustro Twardowskiego', 'Czapka niewidka', 'Hełm Światowida', 'Bekiesza', 'Zbroja Zawiszy', 'Szata Mokoszy', 'Tiara', 'Racjonał', 'Rękawice Swaroga', 'Buty siedmiomilowe', 'Ryngraf', 'Pierścień Salomona', 'Kamień Alatyr'],
+    );
+    const seventhOf = (base) => content.bases.find((one) => one.family === base.family && one.classLevel === 125);
+    for (const base of eighth) {
+      const first = content.basesById[base.family];
+      const seventh = seventhOf(base);
+      assert.equal(base[key[base.kind]], Math.ceil(first[key[base.kind]] * 135 - 1e-9) / 100, base.id);
+      assert.deepEqual(base.bonus, { min: seventh.bonus.max + 1, max: Math.floor(seventh.bonus.max * 1.5) }, base.id);
+      // All else as the family's Tier VII base has it.
+      const own = new Set(['id', 'name', 'gender', 'classLevel', 'bonus', key[base.kind]]);
+      const rest = (one) => Object.fromEntries(Object.entries(one).filter(([field]) => !own.has(field)));
+      assert.deepEqual(rest(base), rest(seventh), base.id);
+    }
+    // The Miecz samosiek 1.2 x 1.35 = 1.62 and 122–181 (the Miecz koronacyjny's
+    // 121); the Handżar 0.85 x 1.35 = 1.1475, so 1.15, and 88–130 (the
+    // Baselard's 87, half again 130.5).
+    assert.deepEqual([content.basesById['self-swinging-sword'].damageFactor, content.basesById['self-swinging-sword'].bonus], [1.62, { min: 122, max: 181 }]);
+    assert.deepEqual([content.basesById['khanjar'].damageFactor, content.basesById['khanjar'].bonus], [1.15, { min: 88, max: 130 }]);
+    // The weakest Tier VIII piece beats the best of Tier VII at the levels it
+    // drops at, and well past them.
+    const number = (item) => (item.damage ? (item.damage.min + item.damage.max) / 2 : item.armor ?? item.implicit.value);
+    const rng = createRng('osmy-tier');
+    const rolls = (baseId, level) => Array.from({ length: 24 }, () => number(generateItem({ baseId, level }, rng, content)));
+    for (const base of eighth) {
+      const seventh = seventhOf(base);
+      for (const level of [150, 200, 300]) {
+        const weakest = Math.min(...rolls(base.id, level));
+        const best = Math.max(...rolls(seventh.id, level));
+        assert.ok(weakest > best, `${base.id} at level ${level}: ${weakest} against ${seventh.id} ${best}`);
+      }
+    }
+  });
+
   // The author's 814: wherever an item goes by the character's class level,
   // Tier VII comes from 125 and not before, as Tier VI from 100. The Wieże:
   // test/towers.test.js.
@@ -561,6 +611,36 @@ describe('items', () => {
           .filter((item) => seventh.has(item.base)).length;
       assert.equal(found(124), 0, `${name} at class level 124`);
       assert.ok(found(125) > 0, `${name} at class level 125`);
+    }
+  });
+
+  // The author's 949: Tier VIII the same way from 150.
+  test('Tier VIII from class level 150 in the weekly chest, from the wandering trader, in the Salon Gier and in the chests of the Bestia, the Wyprawa and the war of the guilds', () => {
+    const eighth = new Set(content.bases.filter((base) => base.classLevel === 150).map((base) => base.id));
+    const beast = guildBeast({ seed: 'osmy', levels: [160] }, content);
+    const route = guildExpedition({ levels: [160] }, content);
+    const stage = content.guilds.expedition.guardians.findIndex((tuning) => tuning.item) + 1;
+    const guardian = expeditionGuardian({ stage, level: route.level, members: 2, guardians: route.guardians }, content);
+    const day = { key: 'osmy', startsAt: 0, endsAt: 1 };
+    const warrior = (classLevel, seed) => ({ level: 160, classId: 'warrior', classLevel, seed });
+    const sources = {
+      weekly: (classLevel, seed) => [chestItem(warrior(classLevel), [], createRng(seed), content)],
+      trader: (classLevel, seed) => wandererGoods(warrior(classLevel, seed), 0, content, day).goods.map((good) => good.item),
+      salon: (classLevel, seed) =>
+        wheelPrizes({ ...warrior(classLevel), sellBonus: 0, tanneryPremium: 0 }, seed, day.key, content)
+          .filter((prize) => prize.kind === 'item')
+          .map((prize) => prize.item),
+      beast: (classLevel, seed) => [beastChest({ ...warrior(classLevel, seed), wornSlots: ['weapon'], beast, tier: beastChestTier({ hp: 0, maxHp: 1 }, content) }, content).item],
+      expedition: (classLevel, seed) => [expeditionChest({ ...warrior(classLevel, seed), stage, wornSlots: ['weapon'], guardian }, content).item],
+      war: (classLevel, seed) => warChest({ fighters: [warrior(classLevel)], teams: 2, seed }, content),
+    };
+    for (const [name, draw] of Object.entries(sources)) {
+      const found = (classLevel) =>
+        Array.from({ length: 60 }, (_, index) => draw(classLevel, `${name}${index}`))
+          .flat()
+          .filter((item) => eighth.has(item.base)).length;
+      assert.equal(found(149), 0, `${name} at class level 149`);
+      assert.ok(found(150) > 0, `${name} at class level 150`);
     }
   });
 

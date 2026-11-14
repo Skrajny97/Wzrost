@@ -79,7 +79,11 @@ describe('the Warsztat in the engine', () => {
     const at125 = knownPatterns(125, [], content).map((pattern) => pattern.id);
     assert.ok(at125.length === 133 && at125.includes('coronation-sword') && at125.includes('safian-boots') && !at125.includes('pectoral'));
     assert.equal(content.professionsById[content.workshop.profession].maxLevel, 200);
-    assert.equal(knownPatterns(200, [], content).length, 133);
+    // Tier VIII (949) at the 150th.
+    assert.equal(knownPatterns(149, [], content).length, 133);
+    const at150 = knownPatterns(150, [], content).map((pattern) => pattern.id);
+    assert.ok(at150.length === 152 && at150.includes('self-swinging-sword') && at150.includes('seven-league-boots') && !at150.includes('ryngraf'));
+    assert.equal(knownPatterns(200, [], content).length, 152);
     // Taking one apart teaches it earlier.
     assert.ok(knownPatterns(10, ['estoc'], content).some((pattern) => pattern.id === 'estoc'));
     assert.ok(knownPatterns(50, ['gothic-armor'], content).some((pattern) => pattern.id === 'gothic-armor'));

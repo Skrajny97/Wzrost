@@ -10,6 +10,9 @@
       "styles": {
         "drought-husk": "src/client/art/monsters/kikimora.png",
         "bandit-chief": "src/client/art/monsters/bandit-thug.png",
+        "robber-knight": "src/client/art/monsters/bandit-chief.png",
+        "snake-king": "src/client/art/monsters/zmij.png",
+        "viper-knot": "src/client/art/monsters/viper.png",
         "poacher": "src/client/art/monsters/bandit-crossbow.png",
         "horse-thief": "src/client/art/monsters/bandit-knifer.png",
         "smuggler": "src/client/art/monsters/bandit-knifer.png",
@@ -192,7 +195,10 @@
       "koltun": "Koltun, a rolling ball of matted tangled black hair, strands lashing out like grasping tendrils, two glowing yellow eyes staring out of the tangle, an abstract creature, menacing, full body",
       "bebok": "Bebok, a Silesian bogeyman, a shaggy hunched black figure with very long arms and grasping claws, a big patched sack on its back, eyes glowing in the dark, a broad silhouette filling the whole picture, eerie and menacing, full body, three-quarter view",
       "plague-maiden": "Morowa Dziewica, the Slavic plague maiden, a tall gaunt woman in a long grey shroud, her face veiled by a blood-red kerchief whose long end streams out in the wind, one bony arm outstretched, a sickly green plague mist trailing from the kerchief, withered grass at her feet, eerie and menacing, the whole figure inside the picture, full body, three-quarter view",
-      "moon-eater": "Ksiezycozerca, the legendary Moon-Eater, a colossal majestic beast of pure darkness with blurred shifting edges like black smoke lit by cold starlight, its huge open maw full of glittering stars, a gnawed pale crescent of the moon caught between its fangs, cold glowing eyes, icy frost mist swirling around it, regal and terrifying, the whole creature inside the picture, full body, three-quarter view"
+      "moon-eater": "Ksiezycozerca, the legendary Moon-Eater, a colossal majestic beast of pure darkness with blurred shifting edges like black smoke lit by cold starlight, its huge open maw full of glittering stars, a gnawed pale crescent of the moon caught between its fangs, cold glowing eyes, icy frost mist swirling around it, regal and terrifying, the whole creature inside the picture, full body, three-quarter view",
+      "robber-knight": "a robber knight in dented dark plate armour without any coat of arms, a plain grey shield and a battered longsword raised to strike, a tattered dark red cloak, visor down, menacing, the whole figure inside the picture, full body, three-quarter view",
+      "snake-king": "the snake king of Slavic legend, a large grey-green serpent rearing up to strike, a small golden crown on its head, glittering cruel eyes, forked tongue out, the whole creature inside the picture, full body, three-quarter view",
+      "viper-knot": "a writhing knot of small grey-black vipers with dark zigzag patterns, several heads raised and hissing with open fangs, the whole swarm inside the picture, full body, three-quarter view"
     }
   },
   "portraits": {
@@ -1140,8 +1146,14 @@
       "cranberry": "a small sprig of bog cranberry with shiny bright red round berries and tiny dark green leaves, single inventory item icon",
       "aconite": "a tall stem of aconite with hooded deep violet-blue flowers, single inventory item icon",
       "mistletoe": "a round green sprig of mistletoe, forked green stems with many pairs of oval leathery green leaves and clusters of small round white berries in the forks, single inventory item icon",
-      "fern-blossom": "a glowing magical fern flower, a fiery red and gold blossom shining with light above small green fern fronds, single inventory item icon"
-    }
+      "fern-blossom": "a glowing magical fern flower, a fiery red and gold blossom shining with light above small green fern fronds, single inventory item icon",
+      "adders-tongue": "an adder's-tongue fern, a single broad oval pale green leaf clasping a thin stem and a slender upright green spore spike rising above it like a little forked tongue, a few thin roots, single inventory item icon",
+      "mandrake": "a mandrake plant pulled from the earth, its pale brown forked root shaped like a tiny gnarled screaming man with arms and legs, a rosette of broad dark green crinkled leaves on its head with two small orange berries, single inventory item icon",
+      "henbane": "a sprig of black henbane, sticky hairy grey-green toothed leaves and two bell-shaped pale cream-yellow flowers with dense dark purple veins and a black-purple throat, single inventory item icon",
+      "springwort": "a magical springwort, a tuft of thin silver-blue grass blades glowing with a cold light, tiny white sparks crackling along the blades, a small broken iron chain link lying at its roots, single inventory item icon",
+      "golden-root": "a golden root, a thick knobbly glowing golden-yellow root topped with a rosette of fleshy blue-green leaves and a flat cluster of small bright yellow flowers, single inventory item icon"
+    },
+    "pixellab": {"style": "src/client/art/herbs/st-johns-wort.png"}
   },
   "potions": {
     "$comment": "Mikstury, 32 × 32. Pierwsze osiem narysował Retro Diffusion (style), sześć rzadkich receptur Jagny (667, 6.11.2026) PixelLab (pixellab, rodzaj potions-pixellab): wspólny kształt „flaszek Jagny”, przysadzista flaszka z grubego szkła, korek zalany czerwonym woskiem, lniany sznurek na szyjce.",
@@ -1163,7 +1175,16 @@
       "wolf-strength-brew": "a squat round flask of thick bubbly glass, its cork sealed under dripping red wax, a linen string wound round the neck, filled with glowing blood-orange liquid, a white wolf fang hanging from the string, single inventory item icon, bold clean outline",
       "burn-brew": "a squat round flask of thick bubbly glass, its cork sealed under dripping red wax, a linen string wound round the neck, filled with pale icy blue liquid with a swirl of white mist inside, frost on the glass, a sprig of red cranberries tied under the string, single inventory item icon, bold clean outline",
       "evil-eye-brew": "a squat round flask of thick bubbly glass, its cork sealed under dripping red wax, a linen string wound round the neck, filled with glowing milky white-green liquid, a red ribbon tied round the neck with a sprig of St John's wort with small yellow flowers, single inventory item icon, bold clean outline",
-      "jagna-balm": "a squat round flask of thick bubbly glass, its cork sealed under dripping red wax, a linen string wound round the neck, filled with glowing ruby red balm with a faint golden shimmer, a tiny fiery red fern flower tied under the string, single inventory item icon, bold clean outline"
+      "jagna-balm": "a squat round flask of thick bubbly glass, its cork sealed under dripping red wax, a linen string wound round the neck, filled with glowing ruby red balm with a faint golden shimmer, a tiny fiery red fern flower tied under the string, single inventory item icon, bold clean outline",
+      "mana-elixir": "a tall round flask of clear glass with a cork, filled with glowing deep sapphire blue liquid with tiny silver stars swirling inside, single inventory item icon, bold clean outline",
+      "great-healing-balm": "a large round flask of clear glass with a cork sealed in gold wax, filled with glowing bright crimson balm with a golden shimmer, a tiny golden heart charm hanging on a string, single inventory item icon, bold clean outline",
+      "bison-hide-brew": "a squat round flask of thick glass wrapped in a strip of shaggy dark brown bison fur, filled with thick glowing amber-brown brew, cork, single inventory item icon, bold clean outline",
+      "aurochs-strength-brew": "a round flask of thick glass with a small curved black aurochs horn tied to its neck with a leather thong, filled with glowing blood-red brew, cork, single inventory item icon, bold clean outline",
+      "falcon-eye-draught": "a slim round flask of clear glass with a brown-and-white falcon feather tied to its neck, filled with glowing pale gold liquid, cork, single inventory item icon, bold clean outline",
+      "halny-wind-draught": "a round flask of clear glass filled with swirling glowing pale turquoise mist like a mountain wind, a small white cloud wisp curling out from under the cork, single inventory item icon, bold clean outline",
+      "henbane-oil": "a small dark green glass vial with a black wax seal, filled with thick oily sickly yellow-green liquid, a little henbane flower, pale yellow with purple veins, tied to its neck, single inventory item icon, bold clean outline",
+      "springwort-elixir": "a round flask of clear glass bound by a cracked iron band, filled with glowing silver-blue liquid full of tiny white sparks, cork, single inventory item icon, bold clean outline",
+      "living-water": "a round flask of crystal clear glass filled with sparkling shining water glowing white and pale blue, a tiny green leaf floating inside, cork, single inventory item icon, bold clean outline"
     },
     "pixellab": {"style": "src/client/art/potions/strength-brew.png"}
   },
@@ -1341,7 +1362,15 @@
       "ferryman": "an old ferryman with a long grey beard and a wide-brimmed hat, a patched dark coat, standing in a small wooden river boat and leaning on a long punting pole, a little dark river water around the boat, the whole boat and pole inside the image, three-quarter view, isolated figure on a plain background, muted forest colours",
       "fireside-dice": "a mysterious stranger in a black hooded cloak sitting cross-legged beside a small campfire, the face hidden in shadow except a sly grin, shaking a wooden cup of dice in one hand, a few bone dice on a flat stone before him, full body, three-quarter view, isolated figure on a plain background, muted forest colours",
       "refugees": "a poor peasant family of refugees at the roadside: a father with a cloth bundle on his back, a mother holding a small child in her arms and an older child beside them, ragged grey and brown clothes smeared with soot, tired sad faces, all four figures whole and close together, full body, three-quarter view, isolated figure on a plain background, muted forest colours",
-      "old-soldier": "a grey-haired old soldier with a long scar across his whole face and a short grey beard, a worn padded gambeson and an old leather belt with a brass buckle, sitting on a stone with an old notched sword across his knees, calm and tough, full body, three-quarter view, isolated figure on a plain background, muted forest colours"
+      "old-soldier": "a grey-haired old soldier with a long scar across his whole face and a short grey beard, a worn padded gambeson and an old leather belt with a brass buckle, sitting on a stone with an old notched sword across his knees, calm and tough, full body, three-quarter view, isolated figure on a plain background, muted forest colours",
+      "bounty-hunters": "three bounty hunters on a forest road: a grizzled older hunter in front holding up a wanted poster with a drawn face on it, a lean woman with a crossbow and a burly man with a cudgel behind him, worn leather coats and wide-brimmed hats, all three figures whole and close together, full body, three-quarter view, isolated figure on a plain background, muted forest colours",
+      "robber-knight": "a robber knight in dented dark plate armour without any coat of arms, a plain grey shield on his arm and a battered longsword resting point-down before him, a tattered dark red cloak, visor raised showing a scarred stern face with a black moustache, proud and threatening, full body, three-quarter view, isolated figure on a plain background, muted forest colours",
+      "skarbnik": "Skarbnik, the old spirit of the mines from Silesian legend, looking like a grey-bearded old miner in a black miner's uniform with brass buttons and a black miner's cap with a feather plume, holding up a small glowing oil lamp, a pile of silver ore nuggets at his feet, kindly but mysterious eyes with a faint glow, full body, three-quarter view, isolated figure on a plain background, muted dark colours",
+      "snake-king": "the snake king of Slavic legend, a large coiled grey-green serpent wearing a small golden crown on its head, basking on a mossy stone with many small vipers coiled around the stone, glittering wise eyes, full body, three-quarter view, isolated figure on a plain background, muted swamp colours",
+      "ghost-caravan": "a ghostly caravan merchant from the dunes, a pale translucent old trader in a hooded sand-coloured cloak who casts no shadow, lifting the canvas cover of a wooden cart with no wheels heaped with old swords, jewels and trinkets, a faint blue ghostly glow and wisps of mist around the cart, full body, three-quarter view, isolated figure on a plain background, muted sandy colours",
+      "white-stag": "a majestic white stag with golden antlers, glowing softly with a faint golden light around its antlers, calm wise eyes looking at the viewer, standing proud, full body, three-quarter view, isolated figure on a plain background, muted forest colours",
+      "forefathers-eve": "an old Slavic folk priest of the Forefathers' Eve rite, a man with a long white beard in a long white homespun coat with a red sash, holding a burning bundle of herbs and a round loaf of bread, a small bonfire beside him and two pale translucent ghostly peasant souls reaching out for the bread, full body, three-quarter view, isolated figure on a plain background, muted dark colours",
+      "boruta": "Boruta, the devil of Polish legend disguised as a Polish nobleman: a green kontusz coat with a red sash, a fur cap with a pheasant feather, a curled black moustache, small horns peeking from under the cap, a sly grin, one leg ending in a black goat hoof instead of a boot, holding out a rolled parchment contract and a quill, full body, three-quarter view, isolated figure on a plain background, muted dark colours"
     }
   },
   "icons": {

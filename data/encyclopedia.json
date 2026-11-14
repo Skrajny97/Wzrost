@@ -17,7 +17,8 @@
     { "name": "Tier IV", "classLevel": 50, "upTo": 100 },
     { "name": "Tier V", "classLevel": 75, "upTo": 125 },
     { "name": "Tier VI", "classLevel": 100, "upTo": 150 },
-    { "name": "Tier VII", "classLevel": 125, "upTo": 175 }
+    { "name": "Tier VII", "classLevel": 125, "upTo": 175 },
+    { "name": "Tier VIII", "classLevel": 150, "upTo": 200 }
   ],
   "chests": [
     { "gold": 50, "timePoints": 5, "systemPoints": 2 },
@@ -26,7 +27,8 @@
     { "gold": 1000, "timePoints": 40, "systemPoints": 16 },
     { "gold": 2500, "timePoints": 80, "systemPoints": 32 },
     { "gold": 6250, "timePoints": 160, "systemPoints": 64 },
-    { "gold": 15625, "timePoints": 320, "systemPoints": 128 }
+    { "gold": 15625, "timePoints": 320, "systemPoints": 100 },
+    { "gold": 39063, "timePoints": 640, "systemPoints": 100 }
   ],
   "milestones": {
     "potions": [4, 8, 12, 16],
