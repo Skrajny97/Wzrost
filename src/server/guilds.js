@@ -17,7 +17,7 @@
 // week says so on its page (guild-fame.js).
 
 import { alphabetOf, alphabetsOf, blockedName, isUnlocked, joinShare, nameLook, questPeriod, trialDay } from '../engine/index.js';
-import { assertion, atomically, sameVersion } from './atomic.js';
+import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { nameColorOf } from './cosmetics.js';
@@ -25,7 +25,7 @@ import { chestReleased, chestsGone, lastLeavesEmpty, lastLeavesEmptyError } from
 import { offersReturned, settleOffers } from './guild-exchange.js';
 import { championFrom, championOf, championStatement } from './guild-fame.js';
 import { ApiError, json, readJson } from './http.js';
-import { t } from './i18n.js';
+import { runInLanguage, t } from './i18n.js';
 import { joinGuildTrials } from './guild-trials.js';
 import { beastJoin } from './guild-beast.js';
 import { OWN_CHARACTERS } from './roles.js';
@@ -119,6 +119,8 @@ export async function guildView(db, characterId, now) {
       tag: guild.tag,
       size,
       role: guild.role,
+      // After how many days away a leader hands the guild to a deputy.
+      leaderAwayDays: rules().leaderAway.days,
       champion: championFrom(best.results[0])?.id === guild.id,
       members: members.results.map((row) => ({
         id: row.id,
@@ -142,6 +144,61 @@ export async function guildView(db, characterId, now) {
 
 const answer = async (db, characterId, now, extra = {}) => json({ ...(await guildView(db, characterId, now)), ...extra });
 
+const DAY = 24 * 60 * 60 * 1000;
+
+// A leader away for the days of the rules (no play as that character:
+// characters.seen_at, chat.js) hands the guild to the deputy seen last
+// within those days, and becomes a deputy (the author, 14.11.2026: "Spraw by
+// 4-dniowa nieobecność Lidera Gildii przekazywała dowodzenie jednemu z
+// zastępców, a samemu Liderowi nadawała rolę Zastępcy"). Without a deputy
+// seen within them nothing changes. The guild's channel gets the System's
+// word of it, once in each language of its members' accounts. Of two looks
+// at once, one hands over; the other finds the guild changed and lets it be.
+export async function awayLeaderHandover(db, guildId, now) {
+  const away = rules().leaderAway.days * DAY;
+  const { results } = await db
+    .prepare(
+      `SELECT m.character_id, m.role, m.joined_at, c.name, c.seen_at FROM guild_members m JOIN characters c ON c.id = m.character_id
+       WHERE m.guild_id = ? AND m.role IN ('leader', 'deputy')`,
+    )
+    .bind(guildId)
+    .all();
+  const leader = results.find((row) => row.role === 'leader');
+  if (!leader || !(now - (leader.seen_at ?? now) >= away)) return false;
+  const [heir] = results
+    .filter((row) => row.role === 'deputy' && now - (row.seen_at ?? 0) < away)
+    .sort((a, b) => b.seen_at - a.seen_at || a.joined_at - b.joined_at || a.character_id - b.character_id);
+  if (!heir) return false;
+  const { results: languages } = await db
+    .prepare("SELECT DISTINCT COALESCE(u.language, 'pl') AS language FROM guild_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id WHERE m.guild_id = ? ORDER BY language DESC")
+    .bind(guildId)
+    .all();
+  const words = { old: leader.name, heir: heir.name, days: rules().leaderAway.days };
+  const said = languages.map(({ language }) => runInLanguage(language, () => t('{old} nie zagląda do gry od {days} dni, więc gildię prowadzi teraz {heir}. {old} zostaje zastępcą.', words)));
+  try {
+    await db.batch([
+      stillAsRead(db, guildId, [
+        [leader.character_id, ['leader']],
+        [heir.character_id, ['deputy']],
+      ]),
+      db.prepare("UPDATE guild_members SET role = 'deputy' WHERE guild_id = ? AND character_id = ? AND role = 'leader'").bind(guildId, leader.character_id),
+      db.prepare("UPDATE guild_members SET role = 'leader' WHERE guild_id = ? AND character_id = ? AND role = 'deputy'").bind(guildId, heir.character_id),
+      ...said.map((text) =>
+        db
+          .prepare(
+            `INSERT INTO chat_messages (channel, user_id, character_id, name, level, class_id, text, created_at, system)
+             SELECT ?, user_id, id, name, level, class_id, ?, ?, 1 FROM characters WHERE id = ?`,
+          )
+          .bind(`guild:${guildId}`, text, now, heir.character_id),
+      ),
+    ]);
+  } catch (error) {
+    if (raced(error)) return false;
+    throw error;
+  }
+  return true;
+}
+
 // GET /api/guild: the character's offers in the Wymiana whose time is up
 // give their pieces back first (guild-exchange.js), and the character comes
 // with the answer when they did. The first look of a new week freezes the
@@ -150,6 +207,8 @@ export async function getGuild(context) {
   const { session, player } = await requireGuildPlayer(context);
   const db = context.env.DB;
   await championOf(db, context.now);
+  const own = await guildOf(db, player.row.id);
+  if (own) await awayLeaderHandover(db, own.id, context.now);
   const settled = await settleOffers(db, player.row.id, context.now);
   return answer(db, player.row.id, context.now, settled ? { character: characterView(await loadPlayer(db, session.userId), context.now) } : {});
 }

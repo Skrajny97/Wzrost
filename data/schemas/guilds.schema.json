@@ -18,11 +18,27 @@
     "chest",
     "war",
     "fame",
-    "members"
+    "members",
+    "leaderAway"
   ],
   "properties": {
     "$comment": {
       "type": "string"
+    },
+    "leaderAway": {
+      "description": "Nieobecność lidera: po tylu dniach bez gry jego postacią gildię przejmuje zastępca, który grał ostatnio (guilds.js).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["days"],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "days": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
     },
     "place": {
       "description": "Obrazek z art/places za nagłówkiem strony Gildii (autor: 353 C, warowny dwór gildii na wzgórzu).",

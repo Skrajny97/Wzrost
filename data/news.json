@@ -965,6 +965,11 @@
       "id": "0.3.49",
       "title": "Wersja 0.3.49",
       "body": "- Nowe animacje wszystkich umiejętności ewolucji Maga: przywołania wychodzą z kręgów (dąb z pękającej ziemi, żubr szarżą, Ent jak drzewko, niedźwiedź z gąszczu, Żywiołak z wiru), z nieba spadają płonące meteory, Kataklizm łączy błyskawice, ogień i lód, Lodowy grobowiec zamyka wroga w lodzie, a Lodowa włócznia i Lodowa gwiazda lecą prosto we wroga.\n- Swój wygląd mają też Lustro many, Tarcza żywiołów, Lodowa zbroja, Harmonia żywiołów, Promień Żywiołów, Ognisty wybuch, Lodowa nawałnica i Zamieć."
+    },
+    {
+      "id": "0.3.50",
+      "title": "Wersja 0.3.50",
+      "body": "- Gildia: gdy lider nie zagląda do gry przez 4 dni, gildię przejmuje zastępca, który grał ostatnio, a lider zostaje zastępcą. System ogłasza to na kanale gildii."
     }
   ]
 }

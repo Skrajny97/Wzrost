@@ -768,6 +768,10 @@
     "0.3.49": {
       "title": "Version 0.3.49",
       "body": "- New animations for every skill of the Mage's evolutions: summons come out of circles (the oak from cracking ground, the bison at a charge, the Ent growing like a sapling, the bear out of a thicket, the Elemental out of a whirl), burning meteors fall from the sky, Cataclysm brings lightning, fire and ice together, Ice Tomb locks the foe in ice, and Ice Lance and Ice Star fly straight at the foe.\n- Mana Mirror, Elemental Shield, Ice Armour, Elemental Harmony, Elemental Ray, Fire Burst, Ice Storm and Blizzard have their own looks too."
+    },
+    "0.3.50": {
+      "title": "Version 0.3.50",
+      "body": "- Guilds: when the leader does not play for 4 days, the deputy who played most recently takes over the guild and the leader becomes a deputy. The System announces it in the guild channel."
     }
   }
 }

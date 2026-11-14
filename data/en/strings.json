@@ -3314,5 +3314,7 @@
   "{name}: rodzaj": "{name}: kind",
   "+{amount}% HP": "+{amount}% HP",
   "+{amount}% many": "+{amount}% mana",
-  "Weźmiesz: {potions}.": "You will take: {potions}."
+  "Weźmiesz: {potions}.": "You will take: {potions}.",
+  "{old} nie zagląda do gry od {days} dni, więc gildię prowadzi teraz {heir}. {old} zostaje zastępcą.": "{old} hasn't played for {days} days, so {heir} now leads the guild. {old} stays on as a deputy.",
+  "Gdy lider nie zagląda do gry przez {days} dni, gildię przejmuje zastępca, który grał ostatnio, a lider zostaje zastępcą.": "When the leader does not play for {days} days, the deputy who played most recently takes over the guild and the leader becomes a deputy."
 }

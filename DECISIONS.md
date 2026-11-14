@@ -3252,6 +3252,16 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.50 (14.11.2026): nieobecny lider oddaje gildię zastępcy
+
+1. Autor: „Spraw by 4-dniowa nieobecność Lidera Gildii przekazywała dowodzenie jednemu z zastępców, a samemu Liderowi nadawała rolę Zastępcy”. Lider, który nie zagląda do gry swoją postacią przez 4 dni (`data/guilds.json`, `leaderAway.days`), oddaje gildię zastępcy, który grał ostatnio w tych 4 dniach, i sam zostaje zastępcą. Na kanale gildii System pisze: „{lider} nie zagląda do gry od 4 dni, więc gildię prowadzi teraz {zastępca}. {lider} zostaje zastępcą.” (w każdym języku kont członków gildii, po polsku i po angielsku).
+2. Rozstrzygnięcia najprostszym sposobem:
+   - „Nieobecność” liczy się dla postaci, nie konta: gra zapisuje teraz, kiedy postać była ostatnio w grze (`characters.seen_at`, obok `users.seen_at` przy odświeżaniu czatu). Gracz, który gra inną postacią z tego samego konta, jest dla gildii lidera nieobecny.
+   - Zastępca musi sam grać w tych 4 dniach; z kilku wybrany jest ten, który grał ostatnio (przy remisie: dłużej w gildii). Gdy żaden zastępca nie gra, gildia zostaje bez zmian (autor mówił o zastępcach, więc członkowie nie przejmują gildii sami).
+   - Gra sprawdza to, gdy ktoś z gildii otworzy jej stronę.
+   - Licznik rusza od tej wersji: postacie, które nie są teraz w grze, liczą 4 dni od wdrożenia, a postać w grze od ostatniej wizyty jej konta.
+3. Pod listą członków gildii stoi zasada: „Gdy lider nie zagląda do gry przez 4 dni, gildię przejmuje zastępca, który grał ostatnio, a lider zostaje zastępcą.”
+
 ## Wersja 0.3.49 (14.11.2026): animacje umiejętności klas wyewoluowanych Maga (960)
 
 1. Autor: „960.1 - 960.7 okey”, „960.8 Tarcza żywiołów super”, „960.9 i 960.10 super”, „960.11 superanckie”, „960.12 akcept / 960.13 akcept”, „960.14 - 960.18 Wszystko super”. Wszystkie 18 umiejętności linii Maga mają własny wygląd:

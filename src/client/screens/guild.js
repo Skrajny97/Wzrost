@@ -319,6 +319,8 @@ function mountGuild(container) {
           { class: 'friends-list' },
           guild.members.map((member) => h('li', { class: 'friend' }, who(member, member.role !== 'member' && h('span', { class: 'party-leader', text: member.role === 'leader' ? t('Lider') : t('Zastępca') })), actions(member))),
         ),
+        // The rule of a leader away (the author, 14.11.2026).
+        guild.leaderAwayDays && h('p', { class: 'muted', text: t('Gdy lider nie zagląda do gry przez {days} dni, gildię przejmuje zastępca, który grał ostatnio, a lider zostaje zastępcą.', { days: guild.leaderAwayDays }) }),
       ),
       h('p', { class: 'muted', text: t('Kanał gildii czeka w Czacie, w zakładce „Gildia”.') }),
     );
