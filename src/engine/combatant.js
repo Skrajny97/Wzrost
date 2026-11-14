@@ -149,6 +149,10 @@ function itemWeapon(worn, content) {
   const item = upgradedItem(worn, content);
   const base = content.basesById[item.base];
   return {
+    // The item's base and its family: the weapon the playback shows in a
+    // blade's blow and how it swings (arena-fx.js).
+    base: item.base,
+    family: base.family ?? base.id,
     attackName: base.attackName,
     category: base.category,
     strike: strikeOf(base.strike, base.category),
@@ -376,6 +380,8 @@ export function combatantView(unit, opponentLevel, content) {
     hp: unit.hp,
     attack: unit.weapon.attackName,
     strike: unit.weapon.strike,
+    // The weapon's base and family, whose picture swings in a blade's blow.
+    ...(unit.weapon.base && { weapon: unit.weapon.base, weaponFamily: unit.weapon.family }),
     // The kind of hit sound (data/sounds.json).
     sound: unit.weapon.sound ?? null,
     element: unit.weapon.element ?? null,

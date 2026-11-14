@@ -447,6 +447,27 @@ describe('findings: the stats screen', () => {
 });
 
 describe('sound', () => {
+  test('the fight view names the weapon a character strikes with and its family, for the playback (953 C); bare fists and a creature have none', () => {
+    const rng = createRng('weapon-view');
+    const hero = (classId, level, equipped) => {
+      const character = { classId, level, xp: 0, classLevel: level, classXp: 0, points: {}, position: content.classesById[classId].position, appearance: 'female', skills: {}, professions: {} };
+      character.points = autoDistribute(character, content);
+      return combatantView(playerCombatant({ character, equipped, name: 'Próba', id: 'a0' }, content), level, content);
+    };
+    for (const [classId, baseId, family] of [
+      ['warrior', 'saber', 'sword'],
+      ['warrior', 'bearded-axe', 'axe'],
+      ['shadow', 'kindjal', 'dagger'],
+      ['warrior', 'sword', 'sword'],
+      ['archer', 'longbow', 'bow'],
+    ]) {
+      const view = hero(classId, 30, [generateItem({ baseId, level: 30 }, rng, content)]);
+      assert.deepEqual([view.weapon, view.weaponFamily], [baseId, family], baseId);
+    }
+    assert.equal('weapon' in hero('warrior', 5, []), false);
+    assert.equal('weapon' in combatantView(monsterCombatant({ monsterId: 'skeleton', level: 20, id: 'e0' }, content), 20, content), false);
+  });
+
   test('every combatant\'s numbers are finite and not below zero, for every class, evolution, level and gear', () => {
     const bad = [];
     for (let index = 0; index < 600; index++) {

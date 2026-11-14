@@ -2,8 +2,13 @@
 // the three a prototype showed: 892 C „Kinowe” (13.11.2026; the author:
 // „Potrzebujemy też ładniejszych animacji ciosów wszelkiego rodzaju”).
 //   The blows: a blade's blow takes a short wind-up, lunges and follows
-//     through; an archer or a mage draws back and lets go, and the arrow or
-//     the spell flies with a glowing trail. The hit lights its target in the
+//     through, with the striker's own weapon swung big (953 C „Z rozmachem”,
+//     14.11.2026, a player's wish through the author: the close-combat
+//     classes „uderzają zdjęciem”): a sword cuts in an arc, an axe winds up
+//     longer and stops on its target, a dagger thrusts, each with its trail
+//     and the afterimages of a swing; out of the shadows a dagger thrusts
+//     from its target's side. An archer or a mage draws back and lets go, and
+//     the arrow or the spell flies with a glowing trail. The hit lights its target in the
 //     colour of its kind (a blade, fire, frost, lightning, poison, holy
 //     light, shadow) and stops the moment for a few frames; the target is
 //     thrown back, sparks and dust fly off it, a blade draws its arc across
@@ -26,6 +31,7 @@
 // moves (a short lunge, an arrow or a spell flying, the cards lit in the
 // blow's colour).
 
+import { itemSprite } from './art.js';
 import { h } from './dom.js';
 import { t } from './i18n.js';
 
@@ -54,6 +60,41 @@ const KINDS = {
 };
 const DUST = ['#b9ab92', '#8d806b', '#6f6453'];
 const HEAL = ['#e3f5a8', '#b6e388', '#7fd36b'];
+
+// Older reports name no weapon: a warrior's sword, a Cień's dagger.
+const CLASS_WEAPONS = { warrior: 'sword', shadow: 'dagger' };
+// How a family swings: the blade's angle in degrees from the way to the
+// target, toward the striker's right (as it shows, raised in the wind-up,
+// at the impact, at the follow-through's end), and the wind-up's and the
+// lunge's length in ms. A sword cuts across; an axe winds up longer, comes
+// down hard and stops on its target; a dagger thrusts.
+const SWINGS = {
+  sword: { rest: -40, raised: -125, impact: 0, end: 60, windup: 130, lunge: 150 },
+  axe: { rest: -50, raised: -150, impact: 0, end: 10, windup: 190, lunge: 120 },
+  dagger: { thrust: true, windup: 110, lunge: 100 },
+};
+// The item icons' blades point up and to the right (−45°); the hand holds
+// them here (a share of the icon from its left and from its top).
+const ICON_AXIS = -45;
+const GRIP = [0.25, 0.75];
+const EASE_WINDUP = 'cubic-bezier(0.3, 0, 0.4, 1)';
+const EASE_LUNGE = 'cubic-bezier(0.55, 0, 0.9, 0.45)';
+
+// A CSS cubic-bézier easing as a function, for the afterimages' moments.
+function bezier(x1, y1, x2, y2) {
+  const at = (a, b, t) => 3 * a * t * (1 - t) ** 2 + 3 * b * t * t * (1 - t) + t ** 3;
+  return (x) => {
+    let low = 0;
+    let high = 1;
+    for (let step = 0; step < 24; step++) {
+      const middle = (low + high) / 2;
+      if (at(x1, x2, middle) < x) low = middle;
+      else high = middle;
+    }
+    return at(y1, y2, (low + high) / 2);
+  };
+}
+const lungeCurve = bezier(0.55, 0, 0.9, 0.45);
 
 const between = ([low, high]) => low + Math.random() * (high - low);
 const clamp = (value, low, high) => Math.min(Math.max(value, low), high);
@@ -505,11 +546,12 @@ export function createFx(kit) {
 
   // A blade's arc drawn across the target, across the blow's way: one for a
   // blow, two parallel ones for a critical blow.
-  function slashArc(point, angle, color, strong, card) {
+  function slashArc(point, angle, color, strong, card, along = null) {
     const size = reachOf(card) * 1.25;
     const art = svg('fx-slash', point, size);
     art.style.setProperty('--fx', color);
-    const turn = (angle * 180) / Math.PI + 90 + (Math.random() < 0.5 ? -26 : 26);
+    // Along a weapon's swing (953), else across the blow's way.
+    const turn = along ?? (angle * 180) / Math.PI + 90 + (Math.random() < 0.5 ? -26 : 26);
     const cuts = strong ? [-8, 8] : [0];
     for (const [index, offset] of cuts.entries()) {
       const d = `M -42 ${offset - 4} Q 0 ${offset + 20} 42 ${offset - 4}`;
@@ -535,6 +577,38 @@ export function createFx(kit) {
       ],
       { duration: 460, easing: 'ease-out' },
     ).then(() => art.remove());
+  }
+
+  // A dagger's thrust (953): a short bright line along it through the target
+  // and a flash where it went in (two lines for a critical blow).
+  function pierce(point, along, color, strong, card) {
+    const size = reachOf(card) * 1.1;
+    const art = svg('fx-slash', point, size);
+    art.style.setProperty('--fx', color);
+    for (const [index, offset] of (strong ? [-5, 5] : [0]).entries()) {
+      for (const [className, width] of [
+        ['fx-slash-glow', strong ? 9 : 7],
+        ['fx-slash-core', strong ? 3 : 2.4],
+      ]) {
+        const line = path(`M -30 ${offset} L 26 ${offset}`, className, width);
+        line.setAttribute('stroke-dasharray', '100 100');
+        line.setAttribute('stroke-dashoffset', '100');
+        art.append(line);
+        animate(line, [{ strokeDashoffset: 100 }, { strokeDashoffset: 0 }], { duration: 90, delay: index * 45, easing: 'cubic-bezier(0.2, 0.8, 0.3, 1)', fill: 'both' });
+      }
+    }
+    fx.append(art);
+    const at = `translate(-50%, -50%) rotate(${along.toFixed(1)}deg)`;
+    animate(
+      art,
+      [
+        { transform: `${at} scale(0.9)`, opacity: 1 },
+        { transform: `${at} scale(1)`, opacity: 1, offset: 0.45 },
+        { transform: `${at} scale(1.05)`, opacity: 0 },
+      ],
+      { duration: 380, easing: 'ease-out' },
+    ).then(() => art.remove());
+    flare(point, color, reachOf(card) * 0.45, 260);
   }
 
   // A flash of light (a burst) and a ring of it, around a point.
@@ -798,8 +872,9 @@ export function createFx(kit) {
     rim(card, strong ? '#ffe08a' : glow);
     if (strong) blink(card);
     if (blow.melee) {
-      if (motion()) slashArc(point, angle, glow, strong, card);
-      else cut(point, glow, strong);
+      if (!motion()) cut(point, glow, strong);
+      else if (blow.swing?.thrust) pierce(point, blow.swing.along, glow, strong, card);
+      else slashArc(point, angle, glow, strong, card, blow.swing?.along ?? null);
     }
     // A skill with its own impact (skill-fx.js) keeps it; any other spell
     // bursts in its element.
@@ -894,6 +969,280 @@ export function createFx(kit) {
     }
   }
 
+  // 953: the weapon a unit strikes with, its base (the picture) and family
+  // (the swing); none for a creature, a summon or bare fists.
+  function weaponOf(unit) {
+    if (!unit || unit.summon || unit.monsterId) return null;
+    if (!unit.weapon && unit.sound === 'fist') return null;
+    const base = unit.weapon ?? CLASS_WEAPONS[unit.classId];
+    if (!base) return null;
+    const family = unit.weaponFamily ?? CLASS_WEAPONS[unit.classId] ?? 'sword';
+    return { base, family: SWINGS[family] ? family : 'sword' };
+  }
+
+  // A weapon's picture in a box: the box stands at the hand (and moves with
+  // its card), the picture turns about its grip in it.
+  function blade(base, size) {
+    const picture = itemSprite({ base });
+    if (!picture) return null;
+    const box = h('div', { class: 'fx-blade', 'aria-hidden': 'true' });
+    picture.className = 'fx-blade-weapon';
+    picture.removeAttribute('width');
+    picture.removeAttribute('height');
+    picture.style.width = `${size}px`;
+    picture.style.height = `${size}px`;
+    picture.style.transformOrigin = `${(GRIP[0] * size).toFixed(1)}px ${(GRIP[1] * size).toFixed(1)}px`;
+    box.append(picture);
+    fx.append(box);
+    return { box, picture };
+  }
+
+  // The picture held with its grip at the box's corner, its blade along
+  // `angle` (degrees on the screen), at `scale`, pushed `push` along it;
+  // `mirror` flips it about its blade (a swing the other way round keeps the
+  // axe's edge in front).
+  function wielded(size, angle, scale = 1, push = 0, mirror = false) {
+    const along = (angle * Math.PI) / 180;
+    const x = -GRIP[0] * size + Math.cos(along) * push;
+    const y = -GRIP[1] * size + Math.sin(along) * push;
+    const axis = mirror ? -180 - ICON_AXIS : ICON_AXIS;
+    return `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${(angle - axis).toFixed(1)}deg) scale(${mirror ? -scale : scale}, ${scale})`;
+  }
+
+  // The blade's trail: a crescent behind it over the last `sweep` degrees of
+  // its swing (for a thrust, streaks behind its point), fading toward its
+  // tail. It turns with the blade, so it shows only while the blade moves
+  // fast; drawn in the box under the picture.
+  let trails = 0;
+  function trailOf(box, { radius, width, sweep, color, thrust }) {
+    const extent = Math.ceil(radius * 1.35 + width);
+    const art = document.createElementNS(SVG_NS, 'svg');
+    art.setAttribute('class', 'fx-blade-trail');
+    art.setAttribute('viewBox', `${-extent} ${-extent} ${2 * extent} ${2 * extent}`);
+    art.setAttribute('width', String(2 * extent));
+    art.setAttribute('height', String(2 * extent));
+    art.setAttribute('aria-hidden', 'true');
+    art.style.left = `${-extent}px`;
+    art.style.top = `${-extent}px`;
+    art.style.transformOrigin = `${extent}px ${extent}px`;
+    art.style.setProperty('--fx', color);
+    const id = `fx-trail-${++trails}`;
+    const defs = document.createElementNS(SVG_NS, 'defs');
+    const fade = document.createElementNS(SVG_NS, 'linearGradient');
+    fade.setAttribute('id', id);
+    fade.setAttribute('gradientUnits', 'userSpaceOnUse');
+    const tail = thrust ? { x: radius * 0.1, y: 0 } : { x: radius * Math.cos((-sweep * Math.PI) / 180), y: radius * Math.sin((-sweep * Math.PI) / 180) };
+    const head = thrust ? { x: radius * 1.05, y: 0 } : { x: radius, y: 0 };
+    fade.setAttribute('x1', tail.x.toFixed(1));
+    fade.setAttribute('y1', tail.y.toFixed(1));
+    fade.setAttribute('x2', head.x.toFixed(1));
+    fade.setAttribute('y2', head.y.toFixed(1));
+    for (const [offset, opacity] of [
+      [0, 0],
+      [0.55, 0.28],
+      [1, 0.85],
+    ]) {
+      const stop = document.createElementNS(SVG_NS, 'stop');
+      stop.setAttribute('offset', String(offset));
+      stop.setAttribute('stop-color', color);
+      stop.setAttribute('stop-opacity', String(opacity));
+      fade.append(stop);
+    }
+    defs.append(fade);
+    art.append(defs);
+    const shape = document.createElementNS(SVG_NS, 'path');
+    if (thrust) {
+      // Streaks behind the point, along the blade.
+      const lines = [-0.5, 0, 0.5].map((side, index) => {
+        const y = (side * width).toFixed(1);
+        const from = (radius * (index === 1 ? 0.05 : 0.3)).toFixed(1);
+        return `M ${from} ${y} L ${(radius * 1.02).toFixed(1)} ${y}`;
+      });
+      shape.setAttribute('d', lines.join(' '));
+      shape.setAttribute('class', 'fx-blade-streaks');
+      shape.setAttribute('stroke', `url(#${id})`);
+      shape.setAttribute('stroke-width', String(Math.max(1.5, width * 0.22)));
+    } else {
+      // The crescent: its outer edge at the blade's point, thickest at the
+      // blade, thinning to nothing at its tail.
+      const steps = 14;
+      const outer = [];
+      const inner = [];
+      for (let step = 0; step <= steps; step++) {
+        const share = step / steps;
+        const angle = (-sweep * (1 - share) * Math.PI) / 180;
+        const thick = width * share ** 0.75;
+        outer.push(`${(radius * Math.cos(angle)).toFixed(1)} ${(radius * Math.sin(angle)).toFixed(1)}`);
+        inner.unshift(`${((radius - thick) * Math.cos(angle)).toFixed(1)} ${((radius - thick) * Math.sin(angle)).toFixed(1)}`);
+      }
+      shape.setAttribute('d', `M ${outer.join(' L ')} L ${inner.join(' L ')} Z`);
+      shape.setAttribute('class', 'fx-blade-crescent');
+      shape.setAttribute('fill', `url(#${id})`);
+    }
+    art.append(shape);
+    box.prepend(art);
+    return art;
+  }
+
+  // 953 C: the weapon swung big in a blade's blow, in time with its card's
+  // wind-up and lunge (strike() below), with its trail and afterimages.
+  // `behind`: a strike out of the shadows, a thrust by its target from its
+  // side. Returns the cut's line for the impact and the follow-through.
+  function swing({ weapon, from, to, a, b, ux, uy, back, hit, windup, lunge, color, behind = false }) {
+    const over = behind;
+    const move = SWINGS[weapon.family];
+    const thrust = Boolean(move.thrust) || behind;
+    // From the target's side toward the arena's middle and a little from
+    // behind it (so the blade stays inside the arena): the thrust's way
+    // points back at the target.
+    let wx = ux;
+    let wy = uy;
+    if (behind) {
+      const side = b.x < stage.clientWidth / 2 ? 1 : -1;
+      const fromX = side + ux * 0.4;
+      const fromY = uy * 0.4;
+      const length = Math.hypot(fromX, fromY) || 1;
+      wx = -fromX / length;
+      wy = -fromY / length;
+    }
+    const theta = (Math.atan2(wy, wx) * 180) / Math.PI;
+    const share = windup / (windup + lunge);
+    const total = (windup + lunge) / pace();
+    const size = Math.round(reachOf(over ? to : from) * (over ? 1.05 : 1.35));
+    const made = blade(weapon.base, size);
+    if (!made) return null;
+    const { box, picture } = made;
+    const run0 = [];
+    const keep = (animation) => {
+      run0.push(track(animation));
+      return animation;
+    };
+    // The box: at the striker's hand, toward its target, moving with its
+    // card; for a strike out of the shadows, by the target.
+    let hand = { x: 0, y: 0 };
+    let points;
+    if (over) {
+      const gap = size * 1.05;
+      const pivot = { x: b.x - wx * gap, y: b.y - wy * gap };
+      points = [pivot, pivot, pivot];
+    } else {
+      const rise = from.offsetHeight * 0.12;
+      hand = { x: ux * rise, y: uy * rise };
+      points = [
+        { x: a.x + hand.x, y: a.y + hand.y },
+        { x: a.x + back.x + hand.x, y: a.y + back.y + hand.y },
+        { x: a.x + hit.x + hand.x, y: a.y + hit.y + hand.y },
+      ];
+    }
+    const at = (point) => `translate(${point.x.toFixed(1)}px, ${point.y.toFixed(1)}px)`;
+    box.style.transform = at(points[0]);
+    keep(box.animate([{ transform: at(points[0]), easing: EASE_WINDUP }, { transform: at(points[1]), offset: share, easing: EASE_LUNGE }, { transform: at(points[2]) }], { duration: total, fill: 'forwards' }));
+    const angles = thrust ? null : move;
+    // The swing goes the other way round when its raised blade would point
+    // to the arena's nearer edge, so it stays in sight.
+    let mirror = false;
+    if (!thrust) {
+      const raised = ((theta + angles.raised) * Math.PI) / 180;
+      mirror = Math.cos(raised) * (a.x < stage.clientWidth / 2 ? 1 : -1) < 0;
+    }
+    const sign = mirror ? -1 : 1;
+    const pose = (part) => (thrust ? theta : theta + sign * angles[part]);
+    const reachBack = thrust ? -size * (over ? 0.25 : 0.22) : 0;
+    const reachIn = thrust ? size * (over ? 0.22 : 0.3) : 0;
+    picture.style.transform = wielded(size, pose('rest'), 0.85, 0, mirror);
+    keep(
+      picture.animate(
+        [
+          { transform: wielded(size, pose('rest'), 0.85, 0, mirror), opacity: 0, easing: EASE_WINDUP },
+          { transform: wielded(size, pose('raised'), 1, reachBack, mirror), opacity: 1, offset: share, easing: EASE_LUNGE },
+          { transform: wielded(size, pose('impact'), 1.04, reachIn, mirror), opacity: 1 },
+        ],
+        { duration: total, fill: 'forwards' },
+      ),
+    );
+    // The trail turns (and for a thrust moves) with the blade, showing only
+    // in the lunge.
+    const trail = trailOf(box, {
+      radius: size * 0.97,
+      width: size * (thrust ? 0.16 : 0.4),
+      sweep: 105,
+      color,
+      thrust,
+    });
+    const along = (angle, push = 0) => `rotate(${angle.toFixed(1)}deg) translateX(${push.toFixed(1)}px) scaleY(${sign})`;
+    trail.style.transform = along(pose('rest'));
+    trail.style.opacity = '0';
+    keep(
+      trail.animate(
+        [
+          { transform: along(pose('rest')), opacity: 0, easing: EASE_WINDUP },
+          { transform: along(pose('raised'), reachBack), opacity: 0, offset: share, easing: EASE_LUNGE },
+          { transform: along(pose('raised') + (pose('impact') - pose('raised')) * 0.45, reachBack + (reachIn - reachBack) * 0.45), opacity: 0.9, offset: share + (1 - share) * 0.55, easing: EASE_LUNGE },
+          { transform: along(pose('impact'), reachIn), opacity: 1 },
+        ],
+        { duration: total, fill: 'forwards' },
+      ),
+    );
+    // Afterimages of the weapon along the swing, each fading fast.
+    if (!thrust) {
+      for (const part of [0.5, 0.7, 0.86]) {
+        const ghost = picture.cloneNode();
+        ghost.classList.add('fx-blade-ghost');
+        const angle = pose('raised') + (pose('impact') - pose('raised')) * lungeCurve(part);
+        ghost.style.transform = wielded(size, angle, 1, 0, mirror);
+        ghost.style.opacity = '0';
+        box.insertBefore(ghost, picture);
+        const moment = share + part * (1 - share);
+        keep(
+          ghost.animate(
+            [
+              { opacity: 0 },
+              { opacity: 0, offset: moment - 0.001 },
+              { opacity: 0.42, offset: moment },
+              { opacity: 0, offset: Math.min(1, moment + 0.2) },
+              { opacity: 0 },
+            ],
+            { duration: total, fill: 'forwards' },
+          ),
+        );
+      }
+    }
+    return {
+      thrust,
+      // The cut's line on the target: along the blade's way at the impact.
+      along: thrust ? theta : pose('impact') + 90,
+      async follow(through) {
+        const rest = over ? points[2] : { x: a.x + hand.x, y: a.y + hand.y };
+        const past = over ? points[2] : { x: a.x + through.x + hand.x, y: a.y + through.y + hand.y };
+        const end = thrust ? wielded(size, pose('impact'), 1, reachIn * 0.3, mirror) : wielded(size, pose('end'), 1, 0, mirror);
+        animate(
+          trail,
+          [
+            { transform: along(pose('impact'), reachIn), opacity: 1, easing: 'ease-out' },
+            { transform: thrust ? along(pose('impact'), reachIn * 0.3) : along(pose('end')), opacity: 0, offset: 0.4 },
+            { transform: thrust ? along(pose('impact'), reachIn * 0.3) : along(pose('end')), opacity: 0 },
+          ],
+          { duration: 380, fill: 'forwards' },
+        );
+        await Promise.all([
+          animate(box, [{ transform: at(points[2]), easing: 'ease-out' }, { transform: at(past), offset: 0.18 }, { transform: at(rest) }], { duration: 380, fill: 'forwards' }),
+          animate(
+            picture,
+            [
+              { transform: wielded(size, pose('impact'), 1.04, reachIn, mirror), opacity: 1, easing: 'cubic-bezier(0.2, 0.7, 0.3, 1)' },
+              { transform: end, opacity: 1, offset: 0.3 },
+              { transform: end, opacity: 0, offset: 0.62 },
+              { transform: end, opacity: 0 },
+            ],
+            { duration: 380, fill: 'forwards' },
+          ),
+        ]);
+        for (const animation of run0) animation.cancel();
+        box.remove();
+      },
+    };
+  }
+
   // The attacker reaches the target: a blow with a wind-up, the lunge and
   // its follow-through; an arrow or a spell drawn back, let go and flying
   // with its trail. A strike cut short (Pomiń, Powtórz) lands nowhere.
@@ -909,10 +1258,18 @@ export function createFx(kit) {
     };
     if (style.teleport && motion()) {
       playSound('swing');
+      // 953: out of the shadows, the weapon thrusts by the target.
+      const weapon = weaponOf(actor);
+      const length = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+      const way = { x: (b.x - a.x) / length, y: (b.y - a.y) / length };
+      const still = { x: 0, y: 0 };
+      const sneak = weapon ? swing({ weapon, from, to, a, b, ux: way.x, uy: way.y, back: still, hit: still, windup: 120, lunge: 100, color: style.color ?? '#a690e8', behind: true }) : null;
       await animate(from, [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0.12, transform: 'scale(0.94)' }], { duration: 220 });
       if (id !== run()) return;
+      if (sneak && style.blow) style.blow.swing = sneak;
       onImpact();
       await settle();
+      sneak?.follow({ x: 0, y: 0 });
       await animate(from, [{ opacity: 0.12, transform: 'scale(0.94)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 260 });
       await later(200);
       return;
@@ -924,13 +1281,17 @@ export function createFx(kit) {
     const uy = dy / distance;
     if (actor.strike === 'melee') {
       const quiet = !motion();
-      const reach = quiet ? 0.3 : 0.62;
+      // 953: the weapon swung with the blow; the card lunges less, as the
+      // weapon reaches the target.
+      const weapon = quiet ? null : weaponOf(actor);
+      const move = weapon ? SWINGS[weapon.family] : null;
+      const reach = quiet ? 0.3 : weapon ? 0.5 : 0.62;
       const hit = { x: dx * reach, y: dy * reach };
       const back = quiet ? { x: 0, y: 0 } : { x: -ux * 9, y: -uy * 9 };
       const lean = quiet ? 0 : ux >= 0 ? 3 : -3;
       const pose = (point, scale, turn) => `translate(${point.x.toFixed(1)}px, ${point.y.toFixed(1)}px) scale(${scale}) rotate(${turn}deg)`;
-      const windup = quiet ? 0 : 130;
-      const lunge = quiet ? 190 : 150;
+      const windup = quiet ? 0 : (move?.windup ?? 130);
+      const lunge = quiet ? 190 : (move?.lunge ?? 150);
       from.classList.add('unit--acting');
       playSound('swing');
       const out = track(
@@ -945,13 +1306,17 @@ export function createFx(kit) {
           { duration: (windup + lunge) / pace(), easing: quiet ? 'cubic-bezier(0.5, 0, 0.75, 0.4)' : 'linear', fill: 'forwards' },
         ),
       );
+      const steel = style.blow && style.blow.kind !== 'physical' ? style.blow.glow : '#f1e6cc';
+      const swung = weapon ? swing({ weapon, from, to, a, b, ux, uy, back, hit, windup, lunge, color: steel }) : null;
       await out.finished.catch(() => {});
       if (id !== run()) return;
+      if (swung && style.blow) style.blow.swing = swung;
       onImpact();
       await settle();
       if (id !== run()) return;
       const through = { x: hit.x + ux * 7, y: hit.y + uy * 7 };
       await Promise.all([
+        swung?.follow(through),
         animate(
           from,
           quiet
