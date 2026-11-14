@@ -187,7 +187,9 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
     return null;
   }
 
-  const made = brewPotions({ count: done, seed: activity.seed, extraChance: catalystChance(catalyst?.key, content()) }, content());
+  // The Alchemia of the claim decides the extra potions, as Zielarstwo's
+  // the herbs: past its mastery more of them (952.3 A, brewChance).
+  const made = brewPotions({ count: done, seed: activity.seed, extraChance: catalystChance(catalyst?.key, content()), level: before.level }, content());
   const taken = bagItems(player).length + bagStacks(herbs, content()) + bagStacks(potionsOf(row), content());
   const { stored, lost } = storeStacks(potionsOf(row), { [potion.id]: made.count }, capacity - taken, content());
   const { character, after, xp, work, sets } = workGains(player, profession, before, worked, avatar, now);

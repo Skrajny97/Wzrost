@@ -163,7 +163,8 @@ describe("Jagna's rare recipes in the engine", () => {
 
   test('the Encyklopedia counts the rare recipes and tells where each comes from', () => {
     const view = encyclopediaView({ discovered: {}, claimed: [], met: [] }, content);
-    assert.equal(view.potions.all, 22);
+    // 22, and the nine recipes of Alchemia's mastery (952.2).
+    assert.equal(view.potions.all, 31);
     const entries = view.potions.tiers.flatMap((tier) => tier.entries);
     assert.deepEqual(entries.find((entry) => entry.id === 'owl-draught').sources, [
       'Alchemia: przepis od 40. poziomu.',

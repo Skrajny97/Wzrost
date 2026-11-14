@@ -10,7 +10,7 @@
 // character's level (532 A: half). Minerals take no room in the bag, as
 // materials do, and the scrapper buys them (533 A).
 
-import { countList, professionLevelLines, professionProgress } from './professions.js';
+import { countList, luckyPieces, masteryChance, professionLevelLines, professionProgress } from './professions.js';
 import { countEvents, createRng } from './rng.js';
 import { say } from './text.js';
 
@@ -83,11 +83,14 @@ export const veinGoldPerHour = (level, content) => content.mining.veins.share * 
 // as a gathering always brings a herb; then the veins of gold, as many as
 // come on average, each with its share of the hour's gold ± its spread.
 // `week`: the factor of the week the digging began in (minerals, weeks.js),
-// for the minerals, not the veins' gold.
+// for the minerals, not the veins' gold. Past the mastery's level (952.4 A)
+// each piece dug has the mastery's chance of one more (masteryChance),
+// drawn after the rest, so the minerals and the veins come out as without
+// it: `found` has them all, `lucky` those the mastery added.
 /**
  * @param {{ minutes: number, level: number, characterLevel: number, seed: unknown, week?: number }} digging
  * @param {Content} content
- * @returns {{ found: Record<string, number>, veins: number, gold: number }}
+ * @returns {{ found: Record<string, number>, lucky: Record<string, number>, veins: number, gold: number }}
  */
 export function mineMinerals({ minutes, level, characterLevel, seed, week = 1 }, content) {
   const rng = createRng(seed);
@@ -107,13 +110,15 @@ export function mineMinerals({ minutes, level, characterLevel, seed, week = 1 },
   const each = veinGoldPerHour(characterLevel, content) / veins.perHour;
   let gold = 0;
   for (let index = 0; index < count; index += 1) gold += Math.max(1, Math.round(each * rng.float(1 - veins.spread, 1 + veins.spread)));
-  return { found, veins: count, gold };
+  const lucky = luckyPieces(found, masteryChance(content.mining, level), rng);
+  for (const [id, extra] of Object.entries(lucky)) found[id] += extra;
+  return { found, lucky, veins: count, gold };
 }
 
 // The report of a digging: a line about the mine from the seed, the minerals
-// found, the veins of gold with their gold, the profession's new levels with
-// their stats and the minerals the System revealed with them, and the
-// character's XP.
+// found and the mastery's among them (`lucky`, mineMinerals), the veins of
+// gold with their gold, the profession's new levels with their stats and the
+// minerals the System revealed with them, and the character's XP.
 /**
  * @param {Record<string, any>} digging
  * @param {Content} content
@@ -133,6 +138,7 @@ export function miningReport({ minutes, startedAt, endsAt, seed, mined, before, 
     line: say(texts, 'report', createRng(`${seed}:line`).int(0, texts.report.length - 1)),
     minerals: Object.entries(/** @type {Record<string, number>} */ (mined.found)).map(([id, count]) => ({ id, name: content.mineralsById[id].name, count })),
     found: say(texts, 'found', 0, { minerals: countList(mined.found, content.mineralsById) }),
+    lucky: Object.keys(mined.lucky ?? {}).length > 0 ? say(texts, 'lucky', 0, { minerals: countList(mined.lucky, content.mineralsById) }) : null,
     veins: mined.veins,
     gold: mined.gold,
     veinsText: mined.veins > 0 ? say(texts, 'veins', 0, { count: mined.veins, gold: mined.gold }) : say(texts, 'noVeins', 0),

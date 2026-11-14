@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/professions.json (src/engine/overlay.js): Herbalism, Alchemy and Crafting with their places, herbs, potions, reports and messages, the System Avatar, and how potions are drunk on explorations. Mining and Jewelcrafting (stage 4): the System Mine and the System Gem Workshop, stones and ores (Jewelcrafting speaks of stones, as the glossary's Stone, not of gems); a mineral's `genitive` is its plain name too. Herbs and potions are names, in Title Case wherever they appear (the bag, recipes, quests, reports). A herb's or a profession's `genitive` is its plain name: the quests say \"Gather 12 pieces of Comfrey\" and a report \"Herbalism level reached: 5\". A potion's `counted` is its name after a number, [one, other, other] for the Polish [one, few, many] (src/engine/text.js, countedForm): \"Brew 3 Healing Potions\"; its first form also stands alone in the fight lines (\"Mira drinks Healing Potion: +40 HP\"). potionUse.fightForms make {fights}: \"for 2 fights\". The Polish kinds of potion keep their own words: mikstura Potion, wywar Brew, napar Draught, eliksir Elixir, olejek Oil, balsam Balm. The places: Systemowy Zagajnik System Grove, Systemowa Pracownia System Laboratory, Systemowy Warsztat System Workshop.",
+  "$comment": "English texts of data/professions.json (src/engine/overlay.js): Herbalism, Alchemy and Crafting with their places, herbs, potions, reports and messages, the System Avatar, and how potions are drunk on explorations. Mining and Jewelcrafting (stage 4): the System Mine and the System Gem Workshop, stones and ores (Jewelcrafting speaks of stones, as the glossary's Stone, not of gems); a mineral's `genitive` is its plain name too. Herbs and potions are names, in Title Case wherever they appear (the bag, recipes, quests, reports). A herb's or a profession's `genitive` is its plain name: the quests say \"Gather 12 pieces of Comfrey\" and a report \"Herbalism level reached: 5\". A potion's `counted` is its name after a number, [one, other, other] for the Polish [one, few, many] (src/engine/text.js, countedForm): \"Brew 3 Healing Potions\"; its first form also stands alone in the fight lines (\"Mira drinks Healing Potion: +40 HP\"). potionUse.fightForms make {fights}: \"for 2 fights\". The Polish kinds of potion keep their own words: mikstura Potion, wywar Brew, napar Draught, eliksir Elixir, olejek Oil, balsam Balm, and the one woda Water (Woda żywa, Living Water). A name of more words takes no hyphens, as Wolf Strength Brew and Bison Hide Brew; Halny, the Tatra wind, keeps its name. The places: Systemowy Zagajnik System Grove, Systemowa Pracownia System Laboratory, Systemowy Warsztat System Workshop.",
   "intro": "While working, the character does not set out on explorations, and their wounds heal. Each profession level strengthens two stats. You can develop every profession, but you work in only one at a time.",
   "avatar": {
     "name": "System Avatar",
@@ -183,6 +183,12 @@
       ],
       "found": [
         "Mined: {minerals}."
+      ],
+      "lucky": [
+        "Lucky haul, extra: {minerals}."
+      ],
+      "mastery": [
+        "Each mineral dug up has a {chance}% chance of one extra."
       ],
       "veins": [
         "Gold veins: {count}, in all +{gold} gold."
@@ -415,7 +421,7 @@
         "Focus was active in {fights} of {all} fights."
       ],
       "poisonFights": [
-        "Aconite Oil was active in {fights} of {all} fights."
+        "Poisoned Weapon was active in {fights} of {all} fights."
       ],
       "wardFights": [
         "Magic Ward was active in {fights} of {all} fights."
@@ -493,6 +499,31 @@
       "name": "Fern Flower",
       "genitive": "Fern Flower",
       "description": "It blooms once a year, on the shortest night. Few have ever seen it."
+    },
+    "adders-tongue": {
+      "name": "Adder's-tongue",
+      "genitive": "Adder's-tongue",
+      "description": "A whispering fern with a single leaf. When it is picked, a quiet whisper can be heard."
+    },
+    "mandrake": {
+      "name": "Mandrake",
+      "genitive": "Mandrake",
+      "description": "A root shaped like a man. It screams when it is pulled out of the ground."
+    },
+    "henbane": {
+      "name": "Henbane",
+      "genitive": "Henbane",
+      "description": "The witches' herb, with sticky leaves. Its scent alone makes the head spin."
+    },
+    "springwort": {
+      "name": "Springwort",
+      "genitive": "Springwort",
+      "description": "The grass of legends that bursts iron. A horse that treads on it loses its shoes."
+    },
+    "golden-root": {
+      "name": "Golden Root",
+      "genitive": "Golden Root",
+      "description": "It grows on bare rock, where nothing else can hold on. It smells of roses."
     }
   },
   "potions": {
@@ -694,6 +725,88 @@
         "Fern Flower Draughts"
       ],
       "description": "A golden draught of Fern Flower. Works on its own: once per exploration it saves the character from defeat, bringing them back up with 30% HP."
+    },
+    "mana-elixir": {
+      "name": "Mana Elixir",
+      "counted": [
+        "Mana Elixir",
+        "Mana Elixirs",
+        "Mana Elixirs"
+      ],
+      "description": "A gleaming sapphire elixir of Mugwort and Adder's-tongue. It wakes dormant power: restores 80% of max mana."
+    },
+    "great-healing-balm": {
+      "name": "Great Healing Balm",
+      "counted": [
+        "Great Healing Balm",
+        "Great Healing Balms",
+        "Great Healing Balms"
+      ],
+      "description": "A thick, crimson balm of Comfrey and Adder's-tongue. It knits even the deepest wounds: heals 85% of max HP."
+    },
+    "bison-hide-brew": {
+      "name": "Bison Hide Brew",
+      "counted": [
+        "Bison Hide Brew",
+        "Bison Hide Brews",
+        "Bison Hide Brews"
+      ],
+      "description": "A dark brown brew of Arnica and Adder's-tongue. Drunk from the bag, it strengthens the character's armour by 45% for 2 fights. Each further one adds 2 more fights."
+    },
+    "aurochs-strength-brew": {
+      "name": "Aurochs Strength Brew",
+      "counted": [
+        "Aurochs Strength Brew",
+        "Aurochs Strength Brews",
+        "Aurochs Strength Brews"
+      ],
+      "description": "A blood-red brew of Wormwood and Mandrake. Drunk from the bag, it raises the character's damage by 30% for 2 fights. Each further one adds 2 more fights."
+    },
+    "falcon-eye-draught": {
+      "name": "Falcon Eye Draught",
+      "counted": [
+        "Falcon Eye Draught",
+        "Falcon Eye Draughts",
+        "Falcon Eye Draughts"
+      ],
+      "description": "A light violet draught of Valerian and Mandrake. Drunk from the bag, it raises the character's Intellect and Wisdom by 30% for 2 fights. Each further one adds 2 more fights."
+    },
+    "halny-wind-draught": {
+      "name": "Halny Wind Draught",
+      "counted": [
+        "Halny Wind Draught",
+        "Halny Wind Draughts",
+        "Halny Wind Draughts"
+      ],
+      "description": "An emerald draught of Nettle and Henbane. Drunk from the bag, it raises the character's speed in fights by 45% for 2 fights. Each further one adds 2 more fights."
+    },
+    "henbane-oil": {
+      "name": "Henbane Oil",
+      "counted": [
+        "Henbane Oil",
+        "Henbane Oils",
+        "Henbane Oils"
+      ],
+      "verb": "Apply",
+      "description": "A thick black oil of Henbane and Aconite for the blade. Applied from the bag, for 2 fights it gives each of the character's blows a 75% chance of a stronger Poison. Each further one adds 2 more fights."
+    },
+    "springwort-elixir": {
+      "name": "Springwort Elixir",
+      "counted": [
+        "Springwort Elixir",
+        "Springwort Elixirs",
+        "Springwort Elixirs"
+      ],
+      "description": "A steel-grey elixir of Mistletoe and Springwort. Drunk from the bag, it reduces the damage from magic by 50% for 2 fights. Each further one adds 2 more fights."
+    },
+    "living-water": {
+      "name": "Living Water",
+      "counted": [
+        "Living Water",
+        "Living Waters",
+        "Living Waters"
+      ],
+      "description": "Clear, shimmering water of Fern Flower and Golden Root. Works on its own: once per exploration it saves the character from defeat, bringing them back up with 50% HP."
     }
   },
   "texts": {
@@ -704,6 +817,12 @@
     ],
     "gathered": [
       "Gathered: {herbs}."
+    ],
+    "lucky": [
+      "Lucky harvest, extra: {herbs}."
+    ],
+    "mastery": [
+      "Each herb gathered has a {chance}% chance of one extra."
     ],
     "lost": [
       "The bag was full. No room for: {herbs}."

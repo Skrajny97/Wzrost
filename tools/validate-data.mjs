@@ -1184,6 +1184,19 @@ function checkPartyEvents(data, { monsters }) {
   return errors;
 }
 
+// The chance a profession's mastery gives (952.3 A, 952.4 A, `mastery`):
+// rising from its `from` level to a later `to` the profession reaches, and
+// with the chance the work has anyway (`base`, the brewing's bonusChance)
+// never above 1.
+function checkMastery(errors, name, table, profession, base = 0) {
+  const { mastery } = table;
+  if (!mastery || !profession) return;
+  if (mastery.to <= mastery.from || mastery.to > profession.maxLevel) {
+    errors.push(`professions.json: ${name}.mastery musi rosnąć od from do późniejszego to, najwyżej do ${profession.maxLevel}. poziomu profesji`);
+  }
+  if (base + mastery.chance > 1) errors.push(`professions.json: ${name}.mastery.chance razem z szansą bazową przekracza 1`);
+}
+
 // Professions: stats that exist, the mastery within the levels, a gathering
 // profession that gathers, herbs known within its levels, the herbs at once
 // from level 1 on and growing, and a slider that reaches its longest time in
@@ -1212,6 +1225,7 @@ function checkProfessions(data, { stats }) {
     for (const herb of herbs) {
       if (herb.level > gatherer.maxLevel) errors.push(`professions.json: zioło ${herb.id} wymaga poziomu ${herb.level}, a profesja kończy się na ${gatherer.maxLevel}`);
     }
+    checkMastery(errors, 'gathering', gathering, gatherer);
   }
   if (!herbs.some((herb) => herb.level === 1)) errors.push('professions.json: żadnego zioła nie zna się od 1. poziomu');
   const { slots, minutes } = gathering;
@@ -1249,6 +1263,7 @@ function checkMinerals(data, ids) {
   uniqueIds(errors, 'professions (minerały)', minerals);
   const miner = professions.find((profession) => profession.id === mining.profession);
   if (!miner || miner.kind !== 'gathering') errors.push(`professions.json: mining.profession "${mining.profession}" nie jest profesją zbieracką`);
+  checkMastery(errors, 'mining', mining, miner);
   const jeweller = professions.find((profession) => profession.id === jewelcrafting.profession);
   if (!jeweller || jeweller.kind !== 'crafting') errors.push(`professions.json: jewelcrafting.profession "${jewelcrafting.profession}" nie jest profesją wytwórczą`);
   const { minutes, veins } = mining;
@@ -1389,6 +1404,7 @@ function checkBrewing(data, ids, effects, materialIds) {
     errors.push(`professions.json: brewing.profession "${brewing.profession}" nie jest profesją wytwórczą`);
   }
   if (!potions.some((potion) => potion.level === 1)) errors.push('professions.json: żadnego przepisu nie zna się od 1. poziomu');
+  checkMastery(errors, 'brewing', brewing, brewer, brewing.bonusChance);
   const herbIds = new Set(herbs.map((herb) => herb.id));
   for (const potion of potions) {
     if (brewer && potion.level > brewer.maxLevel) errors.push(`professions.json: mikstura ${potion.id} wymaga poziomu ${potion.level}, a profesja kończy się na ${brewer.maxLevel}`);
@@ -1542,11 +1558,15 @@ function checkSettlement(data, { rarities }) {
   if (discounts.some((discount, index) => index > 0 && discount < discounts[index - 1])) errors.push('settlement.json: relationDiscount nie może maleć ze stopniem');
   // Jagna's herbs for sale: a few at first and more with each standing (the
   // author: "Niech ma na początku 3 podstawowe zioła, a w miarę zwiekszania
-  // znajomości coraz więcej"), never more than there are herbs.
+  // znajomości coraz więcej"), never more than there are herbs she sells:
+  // those below Zielarstwo's masteryLevel (the herbs from it on are only
+  // gathered, tradedHerbs in src/engine/market.js).
   const { stock } = data.settlement.herbalist.sell;
   if (stock.length > standings.length) errors.push('settlement.json: herbalist.sell.stock ma więcej liczb niż stopni');
   if (stock.some((count, index) => index > 0 && count < stock[index - 1])) errors.push('settlement.json: herbalist.sell.stock nie może maleć ze stopniem');
-  if (Math.max(...stock) > data.professions.herbs.length) errors.push('settlement.json: herbalist.sell.stock podaje więcej ziół, niż jest w grze');
+  const gatherer = data.professions.professions.find((profession) => profession.id === data.professions.gathering.profession);
+  const traded = data.professions.herbs.filter((herb) => herb.level < (gatherer?.masteryLevel ?? Infinity)).length;
+  if (Math.max(...stock) > traded) errors.push(`settlement.json: herbalist.sell.stock podaje więcej ziół, niż jest ich przed poziomem opanowania Zielarstwa (${traded})`);
   // The rare recipes of Alchemia she teaches (121 A, `taught` in
   // professions.json): each from a standing that exists, reached in a
   // relation with a resident or a reputation with a brotherhood that exist

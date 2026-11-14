@@ -372,7 +372,11 @@ export const SPRITES = {
   // The herbs of Zielarstwo, 32×32, filled in as they are approved.
   herbs: {
     size: 32,
-    ids: ['comfrey', 'mugwort', 'nettle', 'plantain', 'st-johns-wort', 'calamus', 'arnica', 'wormwood', 'valerian', 'cranberry', 'aconite', 'mistletoe', 'fern-blossom'],
+    ids: [
+      'comfrey', 'mugwort', 'nettle', 'plantain', 'st-johns-wort', 'calamus', 'arnica', 'wormwood', 'valerian', 'cranberry', 'aconite', 'mistletoe', 'fern-blossom',
+      // From the 100th level of Zielarstwo (952.1), the author's picks 955.
+      'adders-tongue', 'mandrake', 'henbane', 'springwort', 'golden-root',
+    ],
   },
   // The potions of Alchemia, 32×32, filled in as they are approved, Jagna's
   // six rare recipes (121 A) with the author's picks among the drafts (670).
@@ -382,6 +386,8 @@ export const SPRITES = {
       'lesser-healing', 'lesser-mana', 'lesser-speed', 'healing', 'mana', 'antidote', 'speed', 'stoneskin-brew', 'strength-brew', 'focus-draught',
       'greater-healing', 'greater-mana', 'greater-speed', 'aconite-oil', 'mistletoe-elixir', 'fern-brew',
       'owl-draught', 'bearskin-brew', 'wolf-strength-brew', 'burn-brew', 'evil-eye-brew', 'jagna-balm',
+      // From the 100th level of Alchemia (952.2), the author's picks 954.
+      'mana-elixir', 'great-healing-balm', 'bison-hide-brew', 'aurochs-strength-brew', 'falcon-eye-draught', 'halny-wind-draught', 'henbane-oil', 'springwort-elixir', 'living-water',
     ],
   },
   // The camp's resources (data/resources.json), 32×32, shown at the size of

@@ -169,11 +169,24 @@ export function buyCeiling({ kind, key }, content) {
   return orders.partGold * content.raritiesById[content.partsById[key].rarity].sell * orders.pay.part * weekly;
 }
 
+// The herbs the residents sell (the merchant and Jagna): those below
+// Zielarstwo's masteryLevel. The herbs of the mastery (952.1, from the 100th
+// level) are only gathered, so no character gets a herb of the 180th level
+// long before its Zielarstwo knows it.
+/**
+ * @param {Content} content
+ * @returns {Record<string, any>[]}
+ */
+export function tradedHerbs(content) {
+  const mastery = content.professionsById[content.gathering?.profession]?.masteryLevel ?? Infinity;
+  return content.herbs.filter((/** @type {Record<string, any>} */ herb) => herb.level < mastery);
+}
+
 // The merchant's goods of the day (242 A), the same for everyone: a few
-// herbs, rarer materials and parts, each with the day's price, `margin`
-// above the most anyone pays for it, a part never cheaper than the camp's
-// counter at its first level, and swinging by the day; `stock` pieces of
-// each a character may buy that day.
+// herbs (tradedHerbs), rarer materials and parts, each with the day's
+// price, `margin` above the most anyone pays for it, a part never cheaper
+// than the camp's counter at its first level, and swinging by the day;
+// `stock` pieces of each a character may buy that day.
 /**
  * @param {number} now
  * @param {Content} content
@@ -195,7 +208,7 @@ export function merchantStock(now, content) {
     return picked;
   };
   const goods = [
-    ...pick(content.herbs, merchant.goods.herb).map((herb) => ({ kind: 'herb', key: herb.id })),
+    ...pick(tradedHerbs(content), merchant.goods.herb).map((herb) => ({ kind: 'herb', key: herb.id })),
     ...pick(
       content.materials.filter((/** @type {Record<string, any>} */ material) => merchant.materialRarities.includes(material.rarity)),
       merchant.goods.material,
@@ -232,7 +245,8 @@ export function merchantPrice(good, points, content) {
 // The herbs Jagna sells at the standing of the relation with her (the
 // author: "Niech ma na początku 3 podstawowe zioła, a w miarę zwiekszania
 // znajomości coraz więcej"): the first `stock` herbs by their Zielarstwo
-// level, each `margin` above the most anyone pays for it ("Kup oczywiście
+// level, of those she sells at all (tradedHerbs, all of them to a friend),
+// each `margin` above the most anyone pays for it ("Kup oczywiście
 // zawsze drożej"), less the standing's discount (287 A). `next` names the
 // standing that adds more, with them.
 /**
@@ -244,7 +258,7 @@ export function herbalistStock(points, content) {
   const standing = standingOf(points, content);
   /** @param {number} index */
   const countAt = (index) => stock[Math.min(index, stock.length - 1)];
-  const herbs = [...content.herbs].sort((a, b) => a.level - b.level || a.price - b.price);
+  const herbs = [...tradedHerbs(content)].sort((a, b) => a.level - b.level || a.price - b.price);
   const count = countAt(standing.index);
   const more = standing.next ? herbs.slice(count, countAt(standing.index + 1)) : [];
   return {

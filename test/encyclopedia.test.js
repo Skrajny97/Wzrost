@@ -270,12 +270,13 @@ describe('the Encyklopedia in the engine', () => {
     assert.deepEqual(currentOf(view.materials.tiers), [1]);
     assert.deepEqual(currentOf(encyclopediaView({ discovered: {}, claimed: [], met: [], levels: { level: 1, classLevel: 1, professions: {} } }, content).potions.tiers), [0]);
     assert.deepEqual(currentOf(encyclopediaView({ discovered: {}, claimed: [], met: [] }, content).items.tiers), []);
-    // A profession past the 100th (825) is in the last tier with entries, Tier IV, not unfolding Tier I.
+    // A profession past the 100th (825) is in its own tier, now that the herbs and potions of the mastery (952) fill
+    // Tiers V–VIII, or in the last tier with entries, as the minerals' Tier IV, not unfolding Tier I.
     const masters = { level: 130, classLevel: 130, professions: { alchemy: { level: 150, xp: 0 }, herbalism: { level: 200, xp: 0 }, mining: { level: 101, xp: 0 } } };
     const late = encyclopediaView({ discovered: {}, claimed: [], met: [], levels: masters }, content);
     assert.deepEqual([late.potions, late.herbs, late.minerals].map((tab) => [tab.tiers.at(-1).index, currentOf(tab.tiers)]), [
-      [3, [3]],
-      [3, [3]],
+      [7, [5]],
+      [7, [7]],
       [3, [3]],
     ]);
     assert.deepEqual(currentOf(late.items.tiers), [6]);

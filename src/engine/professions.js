@@ -3,7 +3,8 @@
 // stats each level gives, and the first one, Zielarstwo. The character
 // gathers herbs in the Systemowy Zagajnik, with no fights and no risk: the
 // slider sets the time, the profession's level the herbs the System shows and
-// how many of them at once, and the seed saved at the start the herbs found.
+// how many of them at once, and the seed saved at the start the herbs found,
+// past the mastery's level a herb gathered sometimes twice (masteryChance).
 // Herbs stack in the bag, rules.stack to a place, and what does not fit is
 // lost. The work gives the character a little XP (rules.characterXpShare of
 // what an hour of exploring gives) and no class XP.
@@ -113,6 +114,43 @@ export function highestProfession(professions, content) {
   return best;
 }
 
+// The chance a profession's mastery gives at its level (952.3 A, 952.4 A;
+// `mastery` of the gathering, the brewing or the mining): 0 up to its
+// `from` level, then evenly more with each level up to `chance` at its `to`
+// level, and no more past it. 0 for a work without one.
+/**
+ * @param {{ mastery?: { from: number, to: number, chance: number } } | null | undefined} table
+ * @param {number} level
+ * @returns {number}
+ */
+export function masteryChance(table, level) {
+  const mastery = table?.mastery;
+  if (!mastery || level <= mastery.from) return 0;
+  return mastery.chance * Math.min(1, (level - mastery.from) / (mastery.to - mastery.from));
+}
+
+// The pieces a mastery's luck adds to those `found` (by id), as a brewing's
+// extra potions: each piece has `chance` of one more, drawn by `rng` in the
+// order found. No draw at all without a chance, so the rng's later draws
+// stay as they were.
+/**
+ * @param {Record<string, number>} found
+ * @param {number} chance
+ * @param {import('./rng.js').Rng} rng
+ * @returns {Record<string, number>}
+ */
+export function luckyPieces(found, chance, rng) {
+  /** @type {Record<string, number>} */
+  const lucky = {};
+  if (chance <= 0) return lucky;
+  for (const [id, count] of Object.entries(found)) {
+    let extra = 0;
+    for (let index = 0; index < count; index += 1) if (rng.chance(chance)) extra += 1;
+    if (extra > 0) lucky[id] = extra;
+  }
+  return lucky;
+}
+
 // The herbs the System shows at a level of the gathering profession.
 /**
  * @param {number} level
@@ -170,23 +208,38 @@ export function expectedHerbs(herbIds, minutes, level, content, more = 0, week =
   );
 }
 
-// The herbs found, by id: each herb's expected count, ± the spread, made
-// whole with the seed. A gathering always brings at least one herb. `more`:
-// the Bractwo Zielarzy's share more, kept with the gathering when it began;
-// `week`, the factor of the week it began in (herbs, weeks.js).
+// A gathering's herbs, by id: each herb's expected count, ± the spread,
+// made whole with the seed. A gathering always brings at least one herb.
+// `more`: the Bractwo Zielarzy's share more, kept with the gathering when it
+// began; `week`, the factor of the week it began in (herbs, weeks.js).
+// Past the mastery's level (952.3 A) each herb gathered has the mastery's
+// chance of one more (masteryChance), drawn by the same seed after the rest,
+// so the herbs before it come out as without it: `found` has them all,
+// `lucky` those the mastery added.
+/**
+ * @param {{ herbIds: string[], minutes: number, level: number, seed: string, more?: number, week?: number }} gathering
+ * @param {Content} content
+ * @returns {{ found: Record<string, number>, lucky: Record<string, number> }}
+ */
+export function herbHarvest({ herbIds, minutes, level, seed, more = 0, week = 1 }, content) {
+  const rng = createRng(seed);
+  const { spread } = content.gathering;
+  const expected = expectedHerbs(herbIds, minutes, level, content, more, week);
+  /** @type {Record<string, number>} */
+  const found = Object.fromEntries(herbIds.map((id) => [id, countEvents(expected[id].expected * rng.float(1 - spread, 1 + spread), rng)]));
+  if (Object.values(found).every((count) => count === 0)) found[herbIds[0]] = 1;
+  const lucky = luckyPieces(found, masteryChance(content.gathering, level), rng);
+  for (const [id, count] of Object.entries(lucky)) found[id] += count;
+  return { found, lucky };
+}
+
+// The herbs found, by id, the mastery's among them (herbHarvest).
 /**
  * @param {{ herbIds: string[], minutes: number, level: number, seed: string, more?: number, week?: number }} gathering
  * @param {Content} content
  * @returns {Record<string, number>}
  */
-export function gatherHerbs({ herbIds, minutes, level, seed, more = 0, week = 1 }, content) {
-  const rng = createRng(seed);
-  const { spread } = content.gathering;
-  const expected = expectedHerbs(herbIds, minutes, level, content, more, week);
-  const found = Object.fromEntries(herbIds.map((id) => [id, countEvents(expected[id].expected * rng.float(1 - spread, 1 + spread), rng)]));
-  if (Object.values(found).every((count) => count === 0)) found[herbIds[0]] = 1;
-  return found;
-}
+export const gatherHerbs = (gathering, content) => herbHarvest(gathering, content).found;
 
 // The places in the bag that herbs or potions take, by id: each kind apart,
 // a stack of rules.stack to a place.
@@ -306,8 +359,9 @@ export const professionProgress = (profession, before, after, minutes) => ({
 });
 
 // The report of a gathering: a line about the grove from the seed, the herbs
-// found and those the full bag lost, the profession's new levels with their
-// stats and the herbs the System revealed with them, and the character's XP.
+// found, the mastery's among them (`lucky`, herbHarvest) and those the full
+// bag lost, the profession's new levels with their stats and the herbs the
+// System revealed with them, and the character's XP.
 /**
  * @typedef {object} GatheringWork A finished gathering, as the server hands it over.
  * @property {number} minutes
@@ -315,6 +369,7 @@ export const professionProgress = (profession, before, after, minutes) => ({
  * @property {number} endsAt
  * @property {string} seed
  * @property {Record<string, number>} found
+ * @property {Record<string, number>} [lucky]
  * @property {Record<string, number>} stored
  * @property {Record<string, number>} lost
  * @property {{ level: number }} before The profession before the work.
@@ -327,7 +382,7 @@ export const professionProgress = (profession, before, after, minutes) => ({
  * @param {GatheringWork} done
  * @param {Content} content
  */
-export function gatheringReport({ minutes, startedAt, endsAt, seed, found, stored, lost, before, after, character, xp, work }, content) {
+export function gatheringReport({ minutes, startedAt, endsAt, seed, found, lucky = {}, stored, lost, before, after, character, xp, work }, content) {
   const texts = content.professionTexts;
   const profession = content.professionsById[content.gathering.profession];
   /** @type {Herb[]} */
@@ -341,6 +396,7 @@ export function gatheringReport({ minutes, startedAt, endsAt, seed, found, store
     line: say(texts, 'report', createRng(`${seed}:line`).int(0, texts.report.length - 1)),
     herbs: Object.entries(found).map(([id, count]) => ({ id, name: content.herbsById[id].name, count, stored: stored[id] ?? 0, lost: lost[id] ?? 0 })),
     gathered: say(texts, 'gathered', 0, { herbs: countList(found, content.herbsById) }),
+    lucky: Object.keys(lucky).length > 0 ? say(texts, 'lucky', 0, { herbs: countList(lucky, content.herbsById) }) : null,
     lost: Object.keys(lost).length > 0 ? say(texts, 'lost', 0, { herbs: countList(lost, content.herbsById) }) : null,
     profession: professionProgress(profession, before, after, minutes),
     revealed: revealed.map((herb) => herb.id),

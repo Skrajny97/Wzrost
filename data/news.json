@@ -920,6 +920,11 @@
       "id": "0.3.40",
       "title": "Wersja 0.3.40",
       "body": "- Od 150. poziomu klasy czekają 22 nowe przedmioty Tieru VIII, od Miecza samosieka po Kamień Alatyr. Wypadają na wyprawach od Pogorzeliska, a znajdziesz je też w skrzyni tygodniowej, u wędrownego handlarza, w Salonie Gier, w Wieżach, w skrzyniach Bestii Gildii, na Wyprawie Gildii i w skrzyni wojny gildii.\n- Encyklopedia ma dział Tier VIII z sześcioma zestawami. Wzory Tieru VIII odsłaniają się na 150. poziomie Rzemieślnictwa i Jubilerstwa.\n- Skrzynia Encyklopedii daje najwyżej 100 Punktów Systemu. Za pełny zestaw Tieru VII i Tieru VIII dostaniesz po 100 Punktów Systemu."
+    },
+    {
+      "id": "0.3.41",
+      "title": "Wersja 0.3.41",
+      "body": "- Zielarstwo od 100. poziomu: pięć nowych ziół. Nasięźrzał od 100., Mandragora od 120., Lulek czarny od 140., Rozryw od 160. i Złoty korzeń od 180. poziomu.\n- Alchemia od 100. poziomu: dziewięć nowych przepisów, mocniejsze wersje znanych mikstur. Między innymi Eliksir many, Wielki balsam leczenia, Napar halnego wiatru, Olejek z lulka i Woda żywa, która raz na wyprawę chroni przed porażką.\n- Mistrzostwo od 100. poziomu: Alchemia daje coraz większą szansę na dodatkową miksturę (do 15% na 200. poziomie), a Zielarstwo i Górnictwo szansę na podwójny zbiór i urobek (do 10%)."
     }
   ]
 }

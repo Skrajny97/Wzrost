@@ -8,7 +8,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { buyCeiling, herbalistPremium, herbalistStock, saleGold, tradePoints, tradeView } from '../src/engine/index.js';
+import { buyCeiling, herbalistPremium, herbalistStock, saleGold, tradePoints, tradeView, tradedHerbs } from '../src/engine/index.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -81,7 +81,15 @@ describe('the Chata zielarki in the engine', () => {
     );
     assert.deepEqual(stocks[0].next, { standing: standings[1].name, herbs: byLevel.slice(3, stocks[1].herbs.length).map((herb) => herb.id) });
     for (let i = 1; i < stocks.length; i++) assert.ok(stocks[i].herbs.length > stocks[i - 1].herbs.length, standings[i].id);
-    assert.equal(stocks.at(-1).herbs.length, content.herbs.length);
+    // All but the herbs of Zielarstwo's mastery (952.1), which are only
+    // gathered: up to Kwiat paproci, none of the 100th level or later.
+    const mastery = content.professionsById.herbalism.masteryLevel;
+    assert.deepEqual(
+      stocks.at(-1).herbs.map((herb) => herb.id),
+      byLevel.filter((herb) => herb.level < mastery).map((herb) => herb.id),
+    );
+    assert.deepEqual(tradedHerbs(content).map((herb) => herb.id).at(-1), 'fern-blossom');
+    assert.ok(content.herbs.some((herb) => herb.level >= mastery));
     assert.equal(stocks.at(-1).next, null);
   });
 
@@ -99,7 +107,10 @@ describe('the Chata zielarki in the engine', () => {
 
   test('a potion brewed from her herbs brings no more than the herbs cost', () => {
     const prices = Object.fromEntries(herbalistStock(standings.at(-1).points, content).herbs.map((herb) => [herb.id, herb.price]));
-    for (const potion of content.potions) {
+    // Those of the mastery's herbs (952.2) take a herb she never sells.
+    const fromHers = content.potions.filter((potion) => Object.keys(potion.herbs).every((id) => Object.hasOwn(prices, id)));
+    assert.ok(fromHers.length > 0 && fromHers.length < content.potions.length);
+    for (const potion of fromHers) {
       const cost = Object.entries(potion.herbs).reduce((sum, [id, count]) => sum + prices[id] * count, 0);
       assert.ok(cost >= buyCeiling({ kind: 'potion', key: potion.id }, content) - 1e-9, potion.id);
     }
@@ -185,7 +196,9 @@ describe('the Chata zielarki through the API', () => {
   test('she sells only what she has at the relation, for gold the character has, while the bag has places', async () => {
     await (await db()).prepare('UPDATE characters SET gold = 50, herbs = ?').bind('{}').run();
     const buy = (body) => call('POST', '/api/settlement/herbalist/buy', { cookie, body });
-    const top = [...content.herbs].sort((a, b) => b.level - a.level)[0];
+    // The rarest herb she sells, and one of Zielarstwo's mastery, which she never sells (952.1).
+    const top = [...tradedHerbs(content)].sort((a, b) => b.level - a.level)[0];
+    const mastered = [...content.herbs].sort((a, b) => b.level - a.level)[0];
     assert.equal((await buy({ id: top.id, count: 1 })).data.error.code, 'no_goods');
     assert.equal((await buy({ id: herb.id, count: 0 })).data.error.code, 'invalid_count');
     assert.equal((await buy({ id: herb.id, count: 1000 })).data.error.code, 'not_enough_gold');
@@ -195,12 +208,13 @@ describe('the Chata zielarki through the API', () => {
     assert.equal((await buy({ id: herb.id, count: fits + 1 })).data.error.code, 'bag_full');
     assert.equal((await buy({ id: herb.id, count: fits })).status, 200);
     assert.equal((await buy({ id: herb.id, count: 1 })).data.error.code, 'bag_full');
-    // A friend of hers gets every herb, the rarest too.
+    // A friend of hers gets every herb she sells, the rarest too, but none of the mastery's.
     const friend = content.settlement.standings.at(-1).points;
     await (await db()).prepare('UPDATE characters SET herbs = ?, settlement = ?').bind('{}', JSON.stringify({ relations: { [tuning.resident]: friend } })).run();
     const all = (await call('GET', '/api/settlement', { cookie })).data.settlement.herbalist.shop;
-    assert.equal(all.goods.length, content.herbs.length);
+    assert.equal(all.goods.length, tradedHerbs(content).length);
     assert.equal(all.next, null);
     assert.equal((await buy({ id: top.id, count: 1 })).status, 200);
+    assert.equal((await buy({ id: mastered.id, count: 1 })).data.error.code, 'no_goods');
   });
 });

@@ -248,6 +248,17 @@
               }
             }
           }
+        },
+        "mastery": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["from", "to", "chance"],
+          "description": "Szansa po opanowaniu profesji (952.3 A, 952.4 A): od 0 na poziomie from rośnie równo do chance na poziomie to i dalej już nie rośnie. Każde zebrane zioło ma tyle szans na jedno dodatkowe.",
+          "properties": {
+            "from": { "type": "integer", "minimum": 1, "description": "Poziom profesji, na którym szansa wynosi jeszcze 0." },
+            "to": { "type": "integer", "minimum": 2, "description": "Poziom profesji, na którym szansa sięga chance." },
+            "chance": { "type": "number", "minimum": 0, "maximum": 1, "description": "Szansa na poziomie to." }
+          }
         }
       }
     },
@@ -322,6 +333,17 @@
           "minimum": 0,
           "maximum": 1,
           "description": "Szansa każdej uwarzonej mikstury na jedną dodatkową."
+        },
+        "mastery": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["from", "to", "chance"],
+          "description": "Szansa po opanowaniu profesji (952.3 A, 952.4 A): od 0 na poziomie from rośnie równo do chance na poziomie to i dalej już nie rośnie. Dodaje się do bonusChance każdej uwarzonej mikstury.",
+          "properties": {
+            "from": { "type": "integer", "minimum": 1, "description": "Poziom profesji, na którym szansa wynosi jeszcze 0." },
+            "to": { "type": "integer", "minimum": 2, "description": "Poziom profesji, na którym szansa sięga chance." },
+            "chance": { "type": "number", "minimum": 0, "maximum": 1, "description": "Szansa na poziomie to." }
+          }
         },
         "catalystStep": {
           "type": "number",
@@ -940,6 +962,17 @@
           "maximum": 1,
           "description": "Losowość urobku: ± tyle części."
         },
+        "mastery": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["from", "to", "chance"],
+          "description": "Szansa po opanowaniu profesji (952.3 A, 952.4 A): od 0 na poziomie from rośnie równo do chance na poziomie to i dalej już nie rośnie. Każdy wydobyty minerał ma tyle szans na jeden dodatkowy.",
+          "properties": {
+            "from": { "type": "integer", "minimum": 1, "description": "Poziom profesji, na którym szansa wynosi jeszcze 0." },
+            "to": { "type": "integer", "minimum": 2, "description": "Poziom profesji, na którym szansa sięga chance." },
+            "chance": { "type": "number", "minimum": 0, "maximum": 1, "description": "Szansa na poziomie to." }
+          }
+        },
         "veins": {
           "type": "object",
           "additionalProperties": false,
@@ -997,6 +1030,8 @@
           "required": [
             "report",
             "found",
+            "lucky",
+            "mastery",
             "veins",
             "noVeins",
             "revealed",
@@ -1019,6 +1054,24 @@
             "found": {
               "type": "array",
               "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "lucky": {
+              "type": "array",
+              "minItems": 1,
+              "description": "Zdanie raportu o dodatkowych minerałach mistrzostwa ({minerals}).",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "mastery": {
+              "type": "array",
+              "minItems": 1,
+              "description": "Zdanie formularza Kopalni o szansie mistrzostwa ({chance} w procentach), gdy przekroczy 0.",
               "items": {
                 "type": "string",
                 "minLength": 1
@@ -2058,6 +2111,8 @@
       "required": [
         "report",
         "gathered",
+        "lucky",
+        "mastery",
         "lost",
         "levelUp",
         "statGained",
@@ -2080,6 +2135,24 @@
         "gathered": {
           "type": "array",
           "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "lucky": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Zdanie raportu o dodatkowych ziołach mistrzostwa ({herbs}).",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "mastery": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Zdanie formularza Zagajnika o szansie mistrzostwa ({chance} w procentach), gdy przekroczy 0.",
           "items": {
             "type": "string",
             "minLength": 1
