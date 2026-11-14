@@ -32,6 +32,15 @@ const elsewhere = new Set([
   'refugees',
   'old-soldier',
   'companion-errand',
+  // 951 (test/events-951.test.js).
+  'bounty-hunters',
+  'robber-knight',
+  'skarbnik',
+  'snake-king',
+  'ghost-caravan',
+  'white-stag',
+  'forefathers-eve',
+  'boruta',
 ]);
 const placed = (list) => list.filter((event) => !elsewhere.has(event.id));
 
@@ -469,8 +478,9 @@ describe('events (API)', () => {
           cases: content.eventsById[id].cases.map(({ id: caseId, name }) => ({ id: caseId, name })),
           endings: [],
         })),
-        // The events of 817 that come anywhere (those of the Osada only where it is open).
-        ...['ferryman', 'fireside-dice', 'old-soldier', 'companion-errand'].map((id) => {
+        // The events of 817 that come anywhere (those of the Osada only where
+        // it is open), then those of 951.
+        ...['ferryman', 'fireside-dice', 'old-soldier', 'companion-errand', 'bounty-hunters', 'robber-knight', 'skarbnik', 'snake-king', 'ghost-caravan', 'white-stag', 'forefathers-eve', 'boruta'].map((id) => {
           const event = content.eventsById[id];
           const endings = new Map(eventOutcomes(event).filter((outcome) => outcome?.id).map((outcome) => [outcome.id, outcome]));
           return {

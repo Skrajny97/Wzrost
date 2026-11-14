@@ -34,12 +34,14 @@
           "type": "object",
           "additionalProperties": false,
           "minProperties": 1,
-          "description": "Co zostaje po wygranej walce oprócz łupu przeciwników: złoto (gold, jak w nagrodzie) albo przedmiot (itemRarities, ze zdaniem text z {item}), relacja z mieszkańcami (relation) i sprawa towarzysza (companion), jak w nagrodzie, ze zdaniem text.",
+          "description": "Co zostaje po wygranej walce oprócz łupu przeciwników: złoto (gold, jak w nagrodzie) albo przedmiot (itemRarities, ze zdaniem text z {item}), relacja z mieszkańcami (relation), sprawa towarzysza (companion), wzmocnienie albo klątwa (buff) i Wolne Punkty Statystyk (points), jak w nagrodzie, ze zdaniem text.",
           "properties": {
             "gold": { "type": "number", "exclusiveMinimum": 0 },
             "itemRarities": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "exclusiveMinimum": 0 } },
             "relation": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "integer", "minimum": 1 }, "description": "Relacja z mieszkańcami Osady, po id mieszkańca (818.3: pomoc ją podnosi, odmowa nigdy nie obniża); tylko w zdarzeniu Osady." },
             "companion": { "type": "object", "additionalProperties": false, "required": ["relation", "errand"], "description": "Sprawa towarzysza (817.7): relacja z towarzyszem, z którym przyszła (punkty albo \"next\": od razu kolejny stopień, 818.4), i jak się skończyła (errand: together albo alone), żeby nie wróciła.", "properties": { "relation": { "oneOf": [{ "type": "integer", "minimum": 1 }, { "const": "next" }] }, "errand": { "enum": ["together", "alone"] } } },
+            "buff": { "type": "object", "additionalProperties": false, "required": ["kind", "bonus", "fights"], "description": "Wzmocnienie albo klątwa po wygranej, jak w nagrodzie (951.2: błogosławieństwo błędnego rycerza).", "properties": { "kind": { "enum": ["speed", "armor", "damage", "focus", "curse", "wounds"] }, "bonus": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }, "fights": { "type": "integer", "minimum": 1 } } },
+            "points": { "type": "integer", "minimum": 1, "description": "Wolne Punkty Statystyk po wygranej, jak w nagrodzie (951.7: podziękowanie dusz)." },
             "text": { "type": "string", "minLength": 1 }
           }
         },

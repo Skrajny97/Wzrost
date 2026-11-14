@@ -3252,6 +3252,11 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.42 (14.11.2026): osiem nowych zdarzeń (951)
+
+1. **Zdarzenia 951.1–951.8** według przyjętych propozycji, po polsku i angielsku: Łowcy nagród (od 40.), Rycerz rozbójnik (od 60.), Skarbnik (od 76.), Wężowy król (od Czarnego Bagna), Karawana widm (od Sosnowych Wydm), Biały jeleń (od Głuchej Kniei), Dziady i Cyrograf (Ostępy Nowiu). Postacie według wyborów autora 957 (C, B, D, C, C, B, C, C), przeciwnicy 958: Rycerz rozbójnik A, Wężowy król C, Kłąb żmij D.
+2. **Brakujące szczegóły, rozstrzygnięte najprościej:** żmije wężowego króla walczą jako jeden przeciwnik „Kłąb żmij”. Chciwość u Skarbnika zabiera połowę sakiewki, ale najwyżej 100 złota za poziom postaci, bo inne straty zdarzeń też mają górną granicę. Wygrana walka może dać wzmocnienie albo Wolny Punkt Statystyk, tak jak nagroda: błędny rycerz błogosławi (skupienie +15% na 3 walki), a dusze dziękują punktem także po pokonaniu głodnego upiora. Opcje tylko dla klasy: pod mostem Cień, przechytrzenie diabła Mag, przeżegnanie się Kleryk; inne klasy widzą je wyszarzone. Ceny: okup łowcom 3 złota za poziom postaci, kupno w karawanie 8, dar w Dziady 3. Dziady i Cyrograf przychodzą w całych Ostępach Nowiu, więc ich teksty nie nazywają jednego miejsca.
+
 ## Wersja 0.3.41 (14.11.2026): profesje po 100. poziomie (952)
 
 1. **Zioła od 100. poziomu Zielarstwa (952.1):** Nasięźrzał od 100. (0,5 sztuki na godzinę, 80 złota), Mandragora od 120. (0,4, 100), Lulek czarny od 140. (0,35, 130), Rozryw od 160. (0,3, 170) i Złoty korzeń od 180. (0,25, 220). Ikony według wyborów autora 955: C, C, C, D, B.

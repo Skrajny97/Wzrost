@@ -736,6 +736,10 @@
     "0.3.41": {
       "title": "Version 0.3.41",
       "body": "- Herbalism from level 100: five new herbs. Adder's-tongue from level 100, Mandrake from 120, Henbane from 140, Springwort from 160 and Golden Root from 180.\n- Alchemy from level 100: nine new recipes, stronger versions of the potions you know. Among them the Mana Elixir, the Great Healing Balm, the Halny Wind Draught, Henbane Oil and Living Water, which saves you from defeat once per exploration.\n- Mastery from level 100: Alchemy gives a growing chance of an extra potion (up to 15% at level 200), and Herbalism and Mining a chance of a double harvest and haul (up to 10%)."
+    },
+    "0.3.42": {
+      "title": "Version 0.3.42",
+      "body": "- Eight new events on explorations: Bounty Hunters from level 40, the Robber Knight from 60, Skarbnik from 76, and in the highest lands the Snake King, the Ghost Caravan, the White Stag, Forefathers’ Eve and the Devil’s Pact.\n- Some choices belong to one class only: a Shadow slips under the bridge, a Mage outwits the devil and a Cleric crosses themselves.\n- Three new foes: the Robber Knight, the Snake King and the Viper Knot."
     }
   }
 }

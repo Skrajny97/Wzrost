@@ -2066,6 +2066,638 @@
           }
         }
       ]
+    },
+    {
+      "id": "bounty-hunters",
+      "minLevel": 40,
+      "title": "Łowcy nagród",
+      "art": "bounty-hunters",
+      "scene": "land",
+      "figure": {
+        "left": 34,
+        "bottom": 2,
+        "height": 66
+      },
+      "text": "Na trakcie zastępuje ci drogę trzech łowców nagród. Najstarszy, z blizną przez pół twarzy, rozwija list gończy i patrzy to na portret, to na ciebie: „To ty! Gęba jak z obrazka. Pójdziesz z nami po dobroci czy po złości?”",
+      "options": [
+        {
+          "id": "explain",
+          "label": "Wytłumacz, że to pomyłka"
+        },
+        {
+          "id": "pay",
+          "label": "Zapłać, żeby dali ci spokój",
+          "goldPerLevel": 3
+        },
+        {
+          "id": "draw",
+          "label": "Uderz, zanim sięgną po broń"
+        }
+      ],
+      "cases": [
+        {
+          "id": "hunters",
+          "name": "Łowcy nagród",
+          "weight": 2,
+          "outcomes": {
+            "explain": {
+              "kind": "reward",
+              "rumor": true,
+              "text": "Najstarszy jeszcze raz porównuje portret z twoją twarzą i klnie pod nosem: „Nie ten nos. Wybacz”. Na przeprosiny zdradza, czego sami szukają: „{area}. Widziano tam dziś {creature}. Za taką zdobycz płacą lepiej niż za ciebie”.",
+              "noRumorText": "Najstarszy jeszcze raz porównuje portret z twoją twarzą i w końcu macha ręką: „Nie ten nos. Idź swoją drogą”."
+            },
+            "pay": {
+              "kind": "none",
+              "text": "Rzucasz najstarszemu sakiewkę (−{cost} złota). Łowca waży ją w dłoni, chowa list za pazuchę i ustępuje z drogi: „Widać mi się przywidziało”."
+            },
+            "draw": {
+              "kind": "fight",
+              "text": "Nie czekasz, aż sięgną po kajdany. Najstarszy nie zdąży nawet zwinąć listu, a broń masz już w dłoni.",
+              "foes": ["bandit-thug", "bandit-knifer", "bandit-crossbow"],
+              "speedBonus": 0.25,
+              "itemChance": 0.35,
+              "win": {
+                "gold": 2,
+                "text": "W sakiewkach łowców brzęczy zaliczka za czyjąś głowę."
+              },
+              "start": "Uderzasz, zanim łowcy się zorientują: {enemies}."
+            }
+          }
+        },
+        {
+          "id": "disguised",
+          "name": "Przebrani zbóje",
+          "weight": 1,
+          "outcomes": {
+            "explain": {
+              "kind": "fight",
+              "text": "Zaczynasz tłumaczyć, ale najstarszy wcale nie słucha. Gwiżdże przez palce, a jego kompani dobywają noży. To żadni łowcy nagród, tylko przebrani zbóje!",
+              "foes": ["bandit-thug", "bandit-knifer", "bandit-crossbow"],
+              "ambush": true,
+              "itemChance": 0.35,
+              "start": "Zbóje atakują pierwsi: {enemies}."
+            },
+            "pay": {
+              "kind": "fight",
+              "text": "Rzucasz najstarszemu sakiewkę (−{cost} złota). Ten chowa ją za pazuchę i wybucha śmiechem: „Dzięki za zaliczkę!”. Jego kompani już dobywają noży: to przebrani zbóje!",
+              "foes": ["bandit-thug", "bandit-knifer", "bandit-crossbow"],
+              "ambush": true,
+              "itemChance": 0.35,
+              "start": "Zbóje atakują pierwsi: {enemies}."
+            },
+            "draw": {
+              "kind": "fight",
+              "text": "Nie czekasz, aż sięgną po kajdany. Najstarszy klnie, a spod płaszczy jego kompanów błyskają zbójeckie noże: to przebrani zbóje!",
+              "foes": ["bandit-thug", "bandit-knifer", "bandit-crossbow"],
+              "speedBonus": 0.25,
+              "itemChance": 0.35,
+              "win": {
+                "gold": 2
+              },
+              "start": "Uderzasz, zanim zbóje się zorientują: {enemies}."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "robber-knight",
+      "minLevel": 60,
+      "title": "Rycerz rozbójnik",
+      "art": "robber-knight",
+      "scene": "land",
+      "figure": {
+        "left": 40,
+        "bottom": 2,
+        "height": 70
+      },
+      "text": "Na wąskim moście stoi rycerz w poobijanej zbroi, z tarczą bez herbu. Opiera się na mieczu i ani myśli zejść z drogi: „Kto chce przejść, musi mnie pokonać”.",
+      "options": [
+        {
+          "id": "fight",
+          "label": "Stań do walki"
+        },
+        {
+          "id": "bridge",
+          "label": "Przemknij pod mostem",
+          "classes": ["shadow"]
+        },
+        {
+          "id": "back",
+          "label": "Zawróć",
+          "outcome": {
+            "kind": "none",
+            "text": "Zawracasz i szukasz innej drogi. Rycerz długo patrzy za tobą zza przyłbicy."
+          }
+        }
+      ],
+      "cases": [
+        {
+          "id": "robber",
+          "name": "Rycerz rozbójnik",
+          "weight": 2,
+          "outcomes": {
+            "fight": {
+              "kind": "fight",
+              "text": "Dobywasz broni. Rycerz opuszcza przyłbicę i rusza na ciebie z mieczem.",
+              "foes": ["robber-knight"],
+              "win": {
+                "itemRarities": {
+                  "unique": 60,
+                  "epic": 35,
+                  "legendary": 5
+                },
+                "text": "W jukach rycerza leży łup z niejednego napadu: {item}."
+              },
+              "start": "{enemies} staje do walki."
+            },
+            "bridge": {
+              "kind": "reward",
+              "gold": 3,
+              "text": "Schodzisz cicho nad wodę i przemykasz pod mostem po belkach, tuż pod butami rycerza. Po drodze odcinasz mu sakiewkę od pasa (+{gold} złota). Z drugiego brzegu słychać jeszcze, jak woła: „Kto chce przejść…”."
+            }
+          }
+        },
+        {
+          "id": "errant",
+          "name": "Błędny rycerz",
+          "weight": 1,
+          "outcomes": {
+            "fight": {
+              "kind": "fight",
+              "text": "Dobywasz broni. Rycerz salutuje mieczem jak na turnieju i dopiero wtedy opuszcza przyłbicę.",
+              "foes": ["robber-knight"],
+              "win": {
+                "itemRarities": {
+                  "epic": 70,
+                  "legendary": 30
+                },
+                "buff": {
+                  "kind": "focus",
+                  "bonus": 0.15,
+                  "fights": 3
+                },
+                "text": "Pokonany rycerz klęka i zdejmuje hełm: „Ślubowałem nie ustąpić nikomu, kto nie jest godny. Ty jesteś”. Oddaje ci to, co ma najcenniejszego: {item}, i błogosławi cię na drogę (skupienie: Intelekt i Mądrość +15% przez 3 walki)."
+              },
+              "start": "{enemies} staje do walki."
+            },
+            "bridge": {
+              "kind": "reward",
+              "gold": 5,
+              "text": "Schodzisz cicho nad wodę i przemykasz pod mostem. Nad głową słyszysz śmiech: „Sprytnie!”. Rycerz sam rzuca ci sakiewkę przez barierkę (+{gold} złota): „Za spryt też należy się nagroda”."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "skarbnik",
+      "minLevel": 76,
+      "title": "Skarbnik",
+      "art": "skarbnik",
+      "scene": "land",
+      "figure": {
+        "left": 40,
+        "bottom": 2,
+        "height": 60
+      },
+      "text": "W starym wyrobisku, przy kagańcu, siedzi siwy górnik nad kupką srebrnych bryłek. Patrzy na ciebie spod krzaczastych brwi: „Pomożesz wynieść urobek na górę? Dostaniesz uczciwą działkę”. Dziwne, bo nikt tu nie kopie od lat.",
+      "options": [
+        {
+          "id": "help",
+          "label": "Pomóż za darmo",
+          "outcome": {
+            "kind": "reward",
+            "itemRarities": {
+              "rare": 40,
+              "unique": 45,
+              "epic": 15
+            },
+            "text": "Dźwigasz kosze z urobkiem, aż bolą cię plecy, i nie bierzesz ani grudki. Na górze górnik się uśmiecha, a kaganek rozbłyska mu w dłoni jak gwiazda. To Skarbnik, duch kopalń! „Uczciwych ludzi coraz mniej” — mówi i daje ci prezent: {item}."
+          }
+        },
+        {
+          "id": "share",
+          "label": "Weź uczciwą działkę",
+          "outcome": {
+            "kind": "reward",
+            "gold": 2,
+            "text": "Wynosicie urobek razem. Górnik odlicza ci działkę co do bryłki (+{gold} złota). Kiedy się oglądasz, nie ma już ani jego, ani wyrobiska, tylko lita skała."
+          }
+        },
+        {
+          "id": "more",
+          "label": "Dobierz więcej, gdy się odwróci",
+          "outcome": [
+            {
+              "id": "rich",
+              "name": "Udało się",
+              "weight": 50,
+              "kind": "reward",
+              "gold": 6,
+              "text": "Kiedy górnik się odwraca, garściami chowasz bryłki po kieszeniach. Wychodzisz na górę z kieszeniami pełnymi srebra (+{gold} złota)."
+            },
+            {
+              "id": "caught",
+              "name": "Skarbnik widzi",
+              "weight": 50,
+              "kind": "loss",
+              "goldShare": 0.5,
+              "goldCapPerLevel": 100,
+              "text": "Sięgasz po bryłki, gdy górnik się odwraca, ale on ma oczy dookoła głowy. Kaganek rozbłyska mu w dłoni: to Skarbnik, duch kopalń! „Chciwym zabieram” — mówi i znika w skale.",
+              "lossText": "Twoja sakiewka chudnie w oczach (−{gold} złota)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "snake-king",
+      "minLevel": 101,
+      "title": "Wężowy król",
+      "art": "snake-king",
+      "scene": "land",
+      "figure": {
+        "left": 40,
+        "bottom": 2,
+        "height": 52
+      },
+      "text": "Na omszałym kamieniu wygrzewa się wąż w złotej koronie, a wokół kłębią się setki żmij. Stara opowieść mówi, że kto rozłoży przed wężowym królem białą chustę, temu król zostawi na niej koronę.",
+      "options": [
+        {
+          "id": "cloth",
+          "label": "Rozłóż białą chustę",
+          "outcome": {
+            "kind": "choice",
+            "text": "Rozkładasz chustę na trawie. Żmije syczą, ale wężowy król zsuwa się z kamienia, składa koronę na płótnie i patrzy na ciebie złotymi oczami.",
+            "options": [
+              {
+                "id": "flee",
+                "label": "Chwyć koronę i uciekaj",
+                "outcome": [
+                  {
+                    "id": "crown",
+                    "name": "Ucieczka z koroną",
+                    "weight": 70,
+                    "kind": "reward",
+                    "itemRarities": {
+                      "epic": 70,
+                      "legendary": 30
+                    },
+                    "text": "Chwytasz koronę razem z chustą i biegniesz, ile sił w nogach. Syk zostaje w tyle. Korona mieni się w twoich rękach i zmienia kształt, aż staje się czymś, co ci się przyda: {item}."
+                  },
+                  {
+                    "id": "vipers",
+                    "name": "Żmije doganiają",
+                    "weight": 30,
+                    "kind": "fight",
+                    "text": "Chwytasz koronę i biegniesz, ale żmije są szybsze. Kłębią się wokół twoich nóg i nie dają zrobić kroku.",
+                    "foes": ["viper-knot", "viper-knot"],
+                    "ambush": true,
+                    "itemChance": 0.35,
+                    "win": {
+                      "itemRarities": {
+                        "epic": 70,
+                        "legendary": 30
+                      },
+                      "text": "Ostatnie żmije znikają w trawie, a korona wciąż leży na chuście. Mieni się w twoich rękach i zmienia kształt, aż staje się czymś, co ci się przyda: {item}."
+                    },
+                    "start": "Żmije atakują pierwsze: {enemies}."
+                  }
+                ]
+              },
+              {
+                "id": "stay",
+                "label": "Odłóż koronę na kamień",
+                "outcome": {
+                  "kind": "reward",
+                  "buff": {
+                    "kind": "speed",
+                    "bonus": 0.2,
+                    "fights": 3
+                  },
+                  "text": "Odkładasz koronę z powrotem na kamień. Wężowy król kłania się nisko i odpełza, a żmije rozstępują się przed tobą. Długo potem idzie ci się lekko jak nigdy (szybkość: ruchy w walkach +20% przez 3 walki)."
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "attack",
+          "label": "Zaatakuj króla",
+          "outcome": {
+            "kind": "fight",
+            "text": "Dobywasz broni. Żmije podnoszą łby, a wężowy król syczy tak, że cierpnie skóra.",
+            "foes": ["snake-king", "viper-knot"],
+            "itemChance": 0.35,
+            "win": {
+              "gold": 4,
+              "text": "Złota korona toczy się po kamieniu i pęka jak skorupka. W środku jest złoty pył, i to niemało."
+            },
+            "start": "{enemies} bronią swojego kamienia."
+          }
+        },
+        {
+          "id": "leave",
+          "label": "Odejdź",
+          "outcome": {
+            "kind": "none",
+            "text": "Odchodzisz ostrożnie, krok po kroku. Syk żmij cichnie dopiero daleko za tobą."
+          }
+        }
+      ]
+    },
+    {
+      "id": "ghost-caravan",
+      "minLevel": 126,
+      "title": "Karawana widm",
+      "art": "ghost-caravan",
+      "scene": "land",
+      "figure": {
+        "left": 32,
+        "bottom": 2,
+        "height": 64
+      },
+      "text": "Z mgły nad lotnym piaskiem wyłania się karawana. Wozy suną bez kół, konie nie zostawiają śladów, a woźnica nie rzuca cienia. Kupiec w wytartym kaftanie uchyla płachtę: „Rzeczy po tych, których wydma pochłonęła. Każda za garść złota”.",
+      "options": [
+        {
+          "id": "buy",
+          "label": "Kup coś od kupca",
+          "goldPerLevel": 8
+        },
+        {
+          "id": "ask",
+          "label": "Zapytaj o drogę",
+          "outcome": {
+            "kind": "reward",
+            "rumor": true,
+            "text": "Kupiec wskazuje kościstym palcem w głąb wydm: „{area}. Nasi woźnice widzieli tam {creature}. Omijamy to miejsce”. Zanim zdążysz podziękować, karawana rozpływa się we mgle.",
+            "noRumorText": "Kupiec bez słowa wskazuje drogę kościstym palcem. Zanim zdążysz podziękować, karawana rozpływa się we mgle."
+          }
+        },
+        {
+          "id": "leave",
+          "label": "Odejdź",
+          "outcome": {
+            "kind": "none",
+            "text": "Odchodzisz. Kiedy się oglądasz, karawany już nie ma, a na piasku nie została ani jedna koleina."
+          }
+        }
+      ],
+      "cases": [
+        {
+          "id": "merchant",
+          "name": "Kupiec",
+          "weight": 2,
+          "outcomes": {
+            "buy": {
+              "kind": "reward",
+              "itemRarities": {
+                "unique": 60,
+                "epic": 35,
+                "legendary": 5
+              },
+              "text": "Płacisz kupcowi (−{cost} złota), a on wyjmuje spod płachty zawiniątko oprószone piaskiem: {item}. „Niech służy lepiej niż poprzedniemu właścicielowi” — mówi, a karawana rozpływa się we mgle."
+            }
+          }
+        },
+        {
+          "id": "wraith",
+          "name": "Upiór",
+          "weight": 1,
+          "outcomes": {
+            "buy": {
+              "kind": "fight",
+              "text": "Płacisz kupcowi (−{cost} złota), ale towar rozsypuje ci się w dłoniach w suchy piach. Kupiec śmieje się bez głosu, a z wozów wyskakują upiory!",
+              "foes": ["upior", "upior"],
+              "ambush": true,
+              "itemChance": 0.35,
+              "start": "Upiory atakują pierwsze: {enemies}."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "white-stag",
+      "minLevel": 151,
+      "title": "Biały jeleń",
+      "art": "white-stag",
+      "scene": "land",
+      "figure": {
+        "left": 40,
+        "bottom": 2,
+        "height": 66
+      },
+      "text": "Między świerkami stoi biały jeleń ze złotym porożem. Patrzy prosto na ciebie, a potem wolno rusza w głąb kniei, jakby czekał, czy pójdziesz za nim.",
+      "options": [
+        {
+          "id": "follow",
+          "label": "Idź za jeleniem",
+          "outcome": [
+            {
+              "id": "spring",
+              "name": "Ukryte źródło",
+              "weight": 70,
+              "kind": "reward",
+              "buff": {
+                "kind": "focus",
+                "bonus": 0.2,
+                "fights": 3
+              },
+              "herbsKnown": {
+                "count": 4,
+                "gold": 3,
+                "goldText": "Jeleń prowadzi cię przez gąszcz aż do ukrytego źródła. Na dnie, wśród kamieni, połyskują stare monety (+{gold} złota). Woda jest lodowata i czysta, a po łyku wszystko widać wyraźniej (skupienie: Intelekt i Mądrość +20% przez 3 walki)."
+              },
+              "text": "Jeleń prowadzi cię przez gąszcz aż do ukrytego źródła. Wokół rosną zioła, jakich nie widać nigdzie indziej: {herbs}. Woda jest lodowata i czysta, a po łyku wszystko widać wyraźniej (skupienie: Intelekt i Mądrość +20% przez 3 walki)."
+            },
+            {
+              "id": "lost",
+              "name": "Zabłądzenie",
+              "weight": 30,
+              "kind": "loss",
+              "resourcesShare": 0.3,
+              "text": "Idziesz za jeleniem coraz głębiej, aż znika między drzewami. Wszystkie świerki wyglądają tak samo, a ścieżki nigdzie nie widać. Błądzisz do zmroku.",
+              "lossText": "Po drodze gubisz część zebranych zasobów ({resources})."
+            }
+          ]
+        },
+        {
+          "id": "hunt",
+          "label": "Zapoluj na jelenia",
+          "outcome": [
+            {
+              "id": "hit",
+              "name": "Trafienie",
+              "weight": 20,
+              "kind": "reward",
+              "itemRarities": {
+                "epic": 70,
+                "legendary": 30
+              },
+              "buff": {
+                "kind": "curse",
+                "bonus": 0.1,
+                "fights": 4
+              },
+              "text": "Trafiasz. Jeleń pada, a jego złote poroże kruszy się w twoich dłoniach. Zostaje z niego {item}. Knieja nagle cichnie i czujesz na plecach jej gniewne spojrzenie (klątwa: obrażenia −10% przez 4 walki)."
+            },
+            {
+              "id": "miss",
+              "name": "Pudło",
+              "weight": 80,
+              "kind": "none",
+              "text": "Zanim zdążysz zaatakować, jeleń skacze w gąszcz i znika. Po nim zostaje tylko złoty błysk między gałęziami."
+            }
+          ]
+        },
+        {
+          "id": "bow",
+          "label": "Pokłoń się i odejdź",
+          "outcome": {
+            "kind": "reward",
+            "buff": {
+              "kind": "speed",
+              "bonus": 0.15,
+              "fights": 3
+            },
+            "text": "Kłaniasz się jeleniowi. Ten pochyla złote poroże, jakby odpowiadał na ukłon, i znika we mgle. Wracasz lekkim krokiem (szybkość: ruchy w walkach +15% przez 3 walki)."
+          }
+        }
+      ]
+    },
+    {
+      "id": "forefathers-eve",
+      "minLevel": 176,
+      "title": "Dziady",
+      "art": "forefathers-eve",
+      "scene": "land",
+      "figure": {
+        "left": 38,
+        "bottom": 2,
+        "height": 66
+      },
+      "text": "Na starym cmentarzysku płoną ogniska, a guślarz w białej sukmanie przyzywa dusze zmarłych. Mgła gęstnieje w ludzkie kształty. Guślarz odwraca się do ciebie: „Kto ma chleb, niech się podzieli z umarłymi”.",
+      "options": [
+        {
+          "id": "share",
+          "label": "Podziel się chlebem i złotem",
+          "goldPerLevel": 3
+        },
+        {
+          "id": "chase",
+          "label": "Przegoń guślarza i dusze",
+          "outcome": {
+            "kind": "fight",
+            "text": "Kopiesz w ognisko, aż iskry lecą pod niebo. Guślarz ucieka, a mgła zbija się w upiory.",
+            "foes": ["upior", "upior"],
+            "itemChance": 0.35,
+            "win": {
+              "gold": 3
+            },
+            "start": "Upiory rzucają się na ciebie: {enemies}."
+          }
+        },
+        {
+          "id": "leave",
+          "label": "Odejdź w milczeniu",
+          "outcome": {
+            "kind": "none",
+            "text": "Odchodzisz w milczeniu. Za plecami guślarz zaczyna śpiewać, a mgła wokół ognisk gęstnieje."
+          }
+        }
+      ],
+      "cases": [
+        {
+          "id": "souls",
+          "name": "Dusze",
+          "weight": 2,
+          "outcomes": {
+            "share": {
+              "kind": "reward",
+              "points": 1,
+              "text": "Kładziesz przy ognisku chleb i kilka monet (−{cost} złota). Dusze pochylają się nad darami, a jedna z nich, stara kobieta w chuście, dotyka twojego czoła zimną dłonią. Czujesz w sobie nową siłę (+1 Wolny Punkt Statystyk)."
+            }
+          }
+        },
+        {
+          "id": "hungry",
+          "name": "Głodny upiór",
+          "weight": 1,
+          "outcomes": {
+            "share": {
+              "kind": "fight",
+              "text": "Kładziesz przy ognisku chleb i kilka monet (−{cost} złota). Dusze pochylają się nad darami, ale jedna rośnie i ciemnieje: głodny upiór chce więcej!",
+              "foes": ["upior"],
+              "ambush": true,
+              "itemChance": 0.35,
+              "win": {
+                "points": 1,
+                "text": "Upiór rozwiewa się w mgle. Pozostałe dusze dziękują ci szeptem, a stara kobieta w chuście dotyka twojego czoła zimną dłonią (+1 Wolny Punkt Statystyk)."
+              },
+              "start": "Głodny upiór atakuje pierwszy: {enemies}."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "boruta",
+      "minLevel": 176,
+      "title": "Cyrograf",
+      "art": "boruta",
+      "scene": "land",
+      "figure": {
+        "left": 40,
+        "bottom": 2,
+        "height": 70
+      },
+      "text": "Na rozstajach czeka szlachcic w zielonym kontuszu, z czaplim piórem przy kołpaku. Spod kontusza wystaje mu kopyto zamiast buta. To diabeł Boruta! Rozwija pergamin i podaje ci pióro: „Podpisz krwią, a dam ci siłę dziesięciu chłopa”.",
+      "options": [
+        {
+          "id": "sign",
+          "label": "Podpisz cyrograf",
+          "outcome": {
+            "kind": "reward",
+            "points": 1,
+            "buff": {
+              "kind": "curse",
+              "bonus": 0.1,
+              "fights": 10
+            },
+            "text": "Kłujesz palec i podpisujesz. Boruta zwija pergamin i chowa go za pazuchę z szerokim uśmiechem. Czujesz, jak rośnie w tobie siła (+1 Wolny Punkt Statystyk), ale diabeł bierze swoje: ręce drżą ci jeszcze długo (klątwa: obrażenia −10% przez 10 walk)."
+          }
+        },
+        {
+          "id": "outwit",
+          "label": "Przechytrz diabła",
+          "classes": ["mage"],
+          "outcome": {
+            "kind": "reward",
+            "gold": 5,
+            "text": "Proponujesz zakład, jak niegdyś pan Twardowski: podpiszesz, jeśli Boruta do świtu zbierze wszystkie ziarnka maku z pobliskiego pola. Diabeł zbiera, liczy i klnie, aż pieje pierwszy kogut. Wściekły rzuca ci sakiewkę (+{gold} złota) i znika w obłoku siarki."
+          }
+        },
+        {
+          "id": "cross",
+          "label": "Przeżegnaj się",
+          "classes": ["cleric"],
+          "outcome": {
+            "kind": "reward",
+            "gold": 4,
+            "text": "Kreślisz w powietrzu znak krzyża. Boruta syczy, kurczy się i znika w kłębie siarkowego dymu. Na ziemi zostaje jego sakiewka pełna starych dukatów (+{gold} złota)."
+          }
+        },
+        {
+          "id": "leave",
+          "label": "Odejdź",
+          "outcome": {
+            "kind": "none",
+            "text": "Kręcisz głową i odchodzisz. Za plecami słychać westchnienie Boruty: „Jeszcze się spotkamy”."
+          }
+        }
+      ]
     }
   ],
   "foes": [
@@ -2265,6 +2897,153 @@
       "hpFactor": 2.6,
       "armorFactor": 0.6,
       "reward": { "xp": 3, "gold": 4 }
+    },
+    {
+      "id": "robber-knight",
+      "name": "Rycerz rozbójnik",
+      "counted": ["rycerza rozbójnika", "rycerze rozbójnicy", "rycerzy rozbójników"],
+      "family": "human",
+      "position": "front",
+      "stats": {
+        "base": {
+          "strength": 9,
+          "dexterity": 4,
+          "vitality": 8,
+          "endurance": 8,
+          "intellect": 2,
+          "wisdom": 2,
+          "perception": 3,
+          "will": 6
+        },
+        "growth": {
+          "strength": 2.8,
+          "dexterity": 0.6,
+          "vitality": 3.4,
+          "endurance": 2.6,
+          "perception": 0.5,
+          "will": 1.5
+        }
+      },
+      "attack": {
+        "name": "Cios mieczem",
+        "sound": "blade",
+        "category": "physical",
+        "scaling": "strength",
+        "damageFactor": 0.62,
+        "variance": 0.2
+      },
+      "hpFactor": 1.8,
+      "armorFactor": 0.8,
+      "reward": {
+        "xp": 2,
+        "gold": 2
+      }
+    },
+    {
+      "id": "snake-king",
+      "name": "Wężowy król",
+      "counted": ["wężowego króla", "wężowi królowie", "wężowych królów"],
+      "family": "snake",
+      "position": "front",
+      "stats": {
+        "base": {
+          "strength": 7,
+          "dexterity": 6,
+          "vitality": 7,
+          "endurance": 5,
+          "intellect": 4,
+          "wisdom": 4,
+          "perception": 6,
+          "will": 6
+        },
+        "growth": {
+          "strength": 2.4,
+          "dexterity": 1.6,
+          "vitality": 3,
+          "endurance": 2,
+          "perception": 1,
+          "will": 1.4
+        }
+      },
+      "attack": {
+        "name": "Jadowite ukąszenie",
+        "sound": "bite",
+        "category": "physical",
+        "scaling": "strength",
+        "damageFactor": 0.55,
+        "variance": 0.25,
+        "dot": {
+          "effect": "poisoned",
+          "chance": 0.5,
+          "power": 0.35,
+          "ticks": 3
+        }
+      },
+      "hpFactor": 1.4,
+      "armorFactor": 0.5,
+      "resistances": {
+        "poison": {
+          "base": 30,
+          "perLevel": 4
+        }
+      },
+      "reward": {
+        "xp": 2,
+        "gold": 2
+      }
+    },
+    {
+      "id": "viper-knot",
+      "name": "Kłąb żmij",
+      "counted": ["kłąb żmij", "kłęby żmij", "kłębów żmij"],
+      "family": "snake",
+      "position": "middle",
+      "stats": {
+        "base": {
+          "strength": 4,
+          "dexterity": 7,
+          "vitality": 3,
+          "endurance": 2,
+          "intellect": 1,
+          "wisdom": 1,
+          "perception": 4,
+          "will": 2
+        },
+        "growth": {
+          "strength": 1.6,
+          "dexterity": 2,
+          "vitality": 2.2,
+          "endurance": 1,
+          "perception": 1,
+          "will": 0.5
+        }
+      },
+      "attack": {
+        "name": "Ukąszenia",
+        "sound": "bite",
+        "category": "physical",
+        "scaling": "dexterity",
+        "damageFactor": 0.45,
+        "variance": 0.2,
+        "dot": {
+          "effect": "poisoned",
+          "chance": 0.45,
+          "power": 0.35,
+          "ticks": 3
+        }
+      },
+      "hpFactor": 0.6,
+      "armorFactor": 0.2,
+      "resistances": {
+        "poison": {
+          "base": 10,
+          "perLevel": 3
+        }
+      },
+      "reward": {
+        "xp": 1,
+        "gold": 0.6
+      }
     }
   ]
 }

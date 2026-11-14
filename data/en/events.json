@@ -1184,6 +1184,351 @@
           }
         }
       }
+    },
+    "bounty-hunters": {
+      "title": "Bounty Hunters",
+      "text": "Three bounty hunters block your way on the road. The eldest, with a scar across half his face, unrolls a wanted poster and looks from the portrait to you and back: “It’s you! The spitting image. Coming quietly, or the hard way?”",
+      "options": {
+        "explain": {
+          "label": "Explain it’s a mistake"
+        },
+        "pay": {
+          "label": "Pay them to leave you alone"
+        },
+        "draw": {
+          "label": "Strike before they draw"
+        }
+      },
+      "cases": {
+        "hunters": {
+          "name": "Bounty hunters",
+          "outcomes": {
+            "explain": {
+              "text": "The eldest compares the portrait with your face once more and curses under his breath: “Wrong nose. Forgive me.” To make amends he tells you what they are after themselves: “{area}. They say {creature} was seen there today. A catch like that pays better than you do.”",
+              "noRumorText": "The eldest compares the portrait with your face once more and finally waves his hand: “Wrong nose. Go your way.”"
+            },
+            "pay": {
+              "text": "You toss the eldest a purse (−{cost} gold). He weighs it in his hand, tucks the poster away and steps aside: “Must have been seeing things.”"
+            },
+            "draw": {
+              "text": "You don’t wait for them to reach for the shackles. Before the eldest can even roll up the poster, your weapon is already in your hand.",
+              "win": {
+                "text": "The hunters’ purses jingle with an advance paid for somebody’s head."
+              },
+              "start": "You strike before the hunters know what’s happening: {enemies}."
+            }
+          }
+        },
+        "disguised": {
+          "name": "Robbers in disguise",
+          "outcomes": {
+            "explain": {
+              "text": "You start to explain, but the eldest isn’t listening at all. He whistles through his fingers, and his friends draw knives. These are no bounty hunters, just robbers in disguise!",
+              "start": "The robbers strike first: {enemies}."
+            },
+            "pay": {
+              "text": "You toss the eldest a purse (−{cost} gold). He tucks it away and bursts out laughing: “Thanks for the advance!” His friends are already drawing knives: robbers in disguise!",
+              "start": "The robbers strike first: {enemies}."
+            },
+            "draw": {
+              "text": "You don’t wait for them to reach for the shackles. The eldest curses, and robbers’ knives flash from under his friends’ cloaks: robbers in disguise!",
+              "start": "You strike before the robbers know what’s happening: {enemies}."
+            }
+          }
+        }
+      }
+    },
+    "robber-knight": {
+      "title": "The Robber Knight",
+      "text": "On a narrow bridge stands a knight in battered armour, with a shield that bears no arms. He leans on his sword and has no intention of stepping aside: “Whoever wants to cross must defeat me.”",
+      "options": {
+        "fight": {
+          "label": "Fight him"
+        },
+        "bridge": {
+          "label": "Slip under the bridge"
+        },
+        "back": {
+          "label": "Turn back",
+          "outcome": {
+            "text": "You turn back and look for another way. The knight watches you go from behind his visor for a long time."
+          }
+        }
+      },
+      "cases": {
+        "robber": {
+          "name": "Robber knight",
+          "outcomes": {
+            "fight": {
+              "text": "You draw your weapon. The knight lowers his visor and comes at you with his sword.",
+              "win": {
+                "text": "In the knight’s saddlebags lies the loot of many a raid: {item}."
+              },
+              "start": "{enemies} takes up the fight."
+            },
+            "bridge": {
+              "text": "You climb quietly down to the water and slip under the bridge along the beams, right beneath the knight’s boots. On the way you cut the purse from his belt (+{gold} gold). From the far bank you can still hear him calling: “Whoever wants to cross…”"
+            }
+          }
+        },
+        "errant": {
+          "name": "Knight-errant",
+          "outcomes": {
+            "fight": {
+              "text": "You draw your weapon. The knight salutes with his sword as if at a tournament, and only then lowers his visor.",
+              "win": {
+                "text": "The defeated knight kneels and takes off his helmet: “I swore to yield to no one unworthy. You are worthy.” He gives you the most precious thing he has: {item}, and blesses you for the road (focus: Intellect and Wisdom +15% for 3 fights)."
+              },
+              "start": "{enemies} takes up the fight."
+            },
+            "bridge": {
+              "text": "You climb quietly down to the water and slip under the bridge. Above your head you hear laughter: “Clever!” The knight himself tosses you a purse over the railing (+{gold} gold): “Cleverness deserves a reward too.”"
+            }
+          }
+        }
+      }
+    },
+    "skarbnik": {
+      "title": "Hoardkeeper",
+      "text": "In an old mine working, by an oil lamp, sits a grey-haired miner over a heap of silver nuggets. He eyes you from under bushy brows: “Will you help me carry the ore up? You’ll get a fair share.” Strange, since no one has dug here for years.",
+      "options": {
+        "help": {
+          "label": "Help for free",
+          "outcome": {
+            "text": "You haul baskets of ore until your back aches, and you don’t take a single nugget. At the top the miner smiles, and the lamp in his hand flares like a star. It’s the Hoardkeeper, the spirit of the mines! “Honest folk are getting rare,” he says, and gives you a gift: {item}."
+          }
+        },
+        "share": {
+          "label": "Take a fair share",
+          "outcome": {
+            "text": "You carry the ore up together. The miner counts out your share down to the last nugget (+{gold} gold). When you look back, there is no miner and no mine, only solid rock."
+          }
+        },
+        "more": {
+          "label": "Grab more when he turns away",
+          "outcome": {
+            "rich": {
+              "name": "Got away with it",
+              "text": "When the miner turns away, you stuff your pockets with nuggets by the handful. You come up with your pockets full of silver (+{gold} gold)."
+            },
+            "caught": {
+              "name": "The Hoardkeeper sees",
+              "text": "You reach for the nuggets as the miner turns away, but he has eyes in the back of his head. The lamp flares in his hand: it’s the Hoardkeeper, the spirit of the mines! “From the greedy, I take,” he says, and vanishes into the rock.",
+              "lossText": "Your purse grows thin before your eyes (−{gold} gold)."
+            }
+          }
+        }
+      }
+    },
+    "snake-king": {
+      "title": "The Snake King",
+      "text": "On a mossy stone a snake in a golden crown basks in the sun, and hundreds of vipers writhe around it. An old tale says that whoever spreads a white cloth before the snake king will find the king’s crown left on it.",
+      "options": {
+        "cloth": {
+          "label": "Spread a white cloth",
+          "outcome": {
+            "text": "You spread the cloth on the grass. The vipers hiss, but the snake king slides down from the stone, lays its crown on the linen and looks at you with golden eyes.",
+            "options": {
+              "flee": {
+                "label": "Grab the crown and run",
+                "outcome": {
+                  "crown": {
+                    "name": "Escape with the crown",
+                    "text": "You grab the crown, cloth and all, and run as fast as your legs will carry you. The hissing falls behind. The crown shimmers in your hands and changes shape until it becomes something you can use: {item}."
+                  },
+                  "vipers": {
+                    "name": "The vipers catch up",
+                    "text": "You grab the crown and run, but the vipers are faster. They coil around your legs and won’t let you take a step.",
+                    "win": {
+                      "text": "The last vipers vanish into the grass, and the crown still lies on the cloth. It shimmers in your hands and changes shape until it becomes something you can use: {item}."
+                    },
+                    "start": "The vipers strike first: {enemies}."
+                  }
+                }
+              },
+              "stay": {
+                "label": "Put the crown back on the stone",
+                "outcome": {
+                  "text": "You put the crown back on the stone. The snake king bows low and slithers away, and the vipers part before you. For a long while afterwards you walk lighter than ever (swiftness: speed in fights +20% for 3 fights)."
+                }
+              }
+            }
+          }
+        },
+        "attack": {
+          "label": "Attack the king",
+          "outcome": {
+            "text": "You draw your weapon. The vipers raise their heads, and the snake king hisses so that your skin crawls.",
+            "win": {
+              "text": "The golden crown rolls across the stone and cracks like an eggshell. Inside is golden dust, and plenty of it."
+            },
+            "start": "{enemies} defend their stone."
+          }
+        },
+        "leave": {
+          "label": "Walk away",
+          "outcome": {
+            "text": "You back away carefully, step by step. The hissing of the vipers fades only far behind you."
+          }
+        }
+      }
+    },
+    "ghost-caravan": {
+      "title": "The Ghost Caravan",
+      "text": "A caravan emerges from the mist over the drifting sand. The wagons glide without wheels, the horses leave no tracks, and the driver casts no shadow. A merchant in a threadbare coat lifts the canvas: “Things left by those the dune swallowed. Each for a handful of gold.”",
+      "options": {
+        "buy": {
+          "label": "Buy something from the merchant"
+        },
+        "ask": {
+          "label": "Ask the way",
+          "outcome": {
+            "text": "The merchant points a bony finger deep into the dunes: “{area}. Our drivers saw {creature} there. We steer clear of the place.” Before you can thank him, the caravan melts into the mist.",
+            "noRumorText": "Without a word the merchant points the way with a bony finger. Before you can thank him, the caravan melts into the mist."
+          }
+        },
+        "leave": {
+          "label": "Walk away",
+          "outcome": {
+            "text": "You walk away. When you look back, the caravan is gone, and not a single rut is left in the sand."
+          }
+        }
+      },
+      "cases": {
+        "merchant": {
+          "name": "Merchant",
+          "outcomes": {
+            "buy": {
+              "text": "You pay the merchant (−{cost} gold), and he draws a sand-dusted bundle from under the canvas: {item}. “May it serve you better than its last owner,” he says, and the caravan melts into the mist."
+            }
+          }
+        },
+        "wraith": {
+          "name": "Revenant",
+          "outcomes": {
+            "buy": {
+              "text": "You pay the merchant (−{cost} gold), but the goods crumble into dry sand in your hands. The merchant laughs without a sound, and revenants leap out of the wagons!",
+              "start": "The revenants strike first: {enemies}."
+            }
+          }
+        }
+      }
+    },
+    "white-stag": {
+      "title": "The White Stag",
+      "text": "Among the spruces stands a white stag with golden antlers. It looks straight at you, then slowly walks deeper into the wilds, as if waiting to see whether you will follow.",
+      "options": {
+        "follow": {
+          "label": "Follow the stag",
+          "outcome": {
+            "spring": {
+              "name": "Hidden spring",
+              "herbsKnown": {
+                "goldText": "The stag leads you through the thicket to a hidden spring. Old coins glint among the stones at the bottom (+{gold} gold). The water is icy and clear, and after a sip everything looks sharper (focus: Intellect and Wisdom +20% for 3 fights)."
+              },
+              "text": "The stag leads you through the thicket to a hidden spring. Herbs grow around it like nowhere else: {herbs}. The water is icy and clear, and after a sip everything looks sharper (focus: Intellect and Wisdom +20% for 3 fights)."
+            },
+            "lost": {
+              "name": "Lost",
+              "text": "You follow the stag deeper and deeper until it vanishes among the trees. Every spruce looks the same, and there is no path anywhere. You wander until dusk.",
+              "lossText": "On the way you lose some of the resources you gathered ({resources})."
+            }
+          }
+        },
+        "hunt": {
+          "label": "Hunt the stag",
+          "outcome": {
+            "hit": {
+              "name": "A hit",
+              "text": "You strike true. The stag falls, and its golden antlers crumble in your hands. What remains of them is {item}. The wilds fall silent at once, and you feel their angry gaze on your back (curse: damage −10% for 4 fights)."
+            },
+            "miss": {
+              "name": "A miss",
+              "text": "Before you can strike, the stag leaps into the thicket and is gone. All that remains is a golden glint among the branches."
+            }
+          }
+        },
+        "bow": {
+          "label": "Bow and walk away",
+          "outcome": {
+            "text": "You bow to the stag. It lowers its golden antlers as if returning the bow, and vanishes into the mist. You walk on with a light step (swiftness: speed in fights +15% for 3 fights)."
+          }
+        }
+      }
+    },
+    "forefathers-eve": {
+      "title": "Forefathers’ Eve",
+      "text": "Fires burn in an old graveyard, and a rite-master in a white coat calls up the souls of the dead. The mist thickens into human shapes. The rite-master turns to you: “Whoever has bread, let them share it with the dead.”",
+      "options": {
+        "share": {
+          "label": "Share bread and gold"
+        },
+        "chase": {
+          "label": "Drive off the rite-master and the souls",
+          "outcome": {
+            "text": "You kick the fire until sparks fly into the sky. The rite-master flees, and the mist gathers into revenants.",
+            "start": "The revenants throw themselves at you: {enemies}."
+          }
+        },
+        "leave": {
+          "label": "Walk away in silence",
+          "outcome": {
+            "text": "You walk away in silence. Behind you the rite-master begins to sing, and the mist around the fires thickens."
+          }
+        }
+      },
+      "cases": {
+        "souls": {
+          "name": "Souls",
+          "outcomes": {
+            "share": {
+              "text": "You lay bread and a few coins by the fire (−{cost} gold). The souls bend over the gifts, and one of them, an old woman in a headscarf, touches your forehead with a cold hand. You feel new strength within you (+1 free stat point)."
+            }
+          }
+        },
+        "hungry": {
+          "name": "Hungry revenant",
+          "outcomes": {
+            "share": {
+              "text": "You lay bread and a few coins by the fire (−{cost} gold). The souls bend over the gifts, but one of them grows and darkens: a hungry revenant wants more!",
+              "win": {
+                "text": "The revenant dissolves into the mist. The other souls thank you in a whisper, and the old woman in the headscarf touches your forehead with a cold hand (+1 free stat point)."
+              },
+              "start": "The hungry revenant strikes first: {enemies}."
+            }
+          }
+        }
+      }
+    },
+    "boruta": {
+      "title": "The Devil’s Pact",
+      "text": "At the crossroads waits a nobleman in a green kontusz coat, with a heron feather on his fur cap. A hoof sticks out from under his coat instead of a boot. It’s the devil Boruta! He unrolls a parchment and hands you a quill: “Sign in blood, and I’ll give you the strength of ten men.”",
+      "options": {
+        "sign": {
+          "label": "Sign the pact",
+          "outcome": {
+            "text": "You prick your finger and sign. Boruta rolls up the parchment and tucks it inside his coat with a broad grin. You feel strength growing within you (+1 free stat point), but the devil takes his due: your hands keep trembling for a long time (curse: damage −10% for 10 fights)."
+          }
+        },
+        "outwit": {
+          "label": "Outwit the devil",
+          "outcome": {
+            "text": "You propose a wager, as Master Twardowski once did: you will sign if Boruta gathers every poppy seed from the nearby field by dawn. The devil gathers, counts and curses until the first cock crows. Furious, he throws you a purse (+{gold} gold) and vanishes in a cloud of sulphur."
+          }
+        },
+        "cross": {
+          "label": "Cross yourself",
+          "outcome": {
+            "text": "You trace the sign of the cross in the air. Boruta hisses, shrinks and vanishes in a puff of sulphurous smoke. His purse lies on the ground, full of old ducats (+{gold} gold)."
+          }
+        },
+        "leave": {
+          "label": "Walk away",
+          "outcome": {
+            "text": "You shake your head and walk away. Behind you, Boruta sighs: “We’ll meet again.”"
+          }
+        }
+      }
     }
   },
   "foes": {
@@ -1319,6 +1664,9 @@
       "attack": {
         "name": "Spade Blow"
       }
-    }
+    },
+    "robber-knight": { "name": "Robber Knight", "counted": ["Robber Knight", "Robber Knights", "Robber Knights"], "attack": { "name": "Sword Blow" } },
+    "snake-king": { "name": "Snake King", "counted": ["Snake King", "Snake Kings", "Snake Kings"], "attack": { "name": "Venomous Bite" } },
+    "viper-knot": { "name": "Viper Knot", "counted": ["Viper Knot", "Viper Knots", "Viper Knots"], "attack": { "name": "Bites" } }
   }
 }
