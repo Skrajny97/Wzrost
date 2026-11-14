@@ -1,0 +1,14 @@
+{
+  "id": "bounty-hunters",
+  "tool": "pixellab generate-image-v2",
+  "description": "three bounty hunters on a forest road: a grizzled older hunter in front holding up a wanted poster with a drawn face on it, a lean woman with a crossbow and a burly man with a cudgel behind him, worn leather coats and wide-brimmed hats, all three figures whole and close together, full body, three-quarter view, isolated figure on a plain background, muted forest colours",
+  "style": "src/client/art/events/treasure-hunter.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

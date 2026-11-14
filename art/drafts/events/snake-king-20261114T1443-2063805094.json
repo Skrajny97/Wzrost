@@ -1,0 +1,14 @@
+{
+  "id": "snake-king",
+  "tool": "pixellab generate-image-v2",
+  "description": "the snake king of Slavic legend, a large coiled grey-green serpent wearing a small golden crown on its head, basking on a mossy stone with many small vipers coiled around the stone, glittering wise eyes, full body, three-quarter view, isolated figure on a plain background, muted swamp colours",
+  "style": "src/client/art/events/treasure-hunter.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

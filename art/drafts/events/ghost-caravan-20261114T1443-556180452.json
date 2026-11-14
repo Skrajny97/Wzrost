@@ -1,0 +1,14 @@
+{
+  "id": "ghost-caravan",
+  "tool": "pixellab generate-image-v2",
+  "description": "a ghostly caravan merchant from the dunes, a pale translucent old trader in a hooded sand-coloured cloak who casts no shadow, lifting the canvas cover of a wooden cart with no wheels heaped with old swords, jewels and trinkets, a faint blue ghostly glow and wisps of mist around the cart, full body, three-quarter view, isolated figure on a plain background, muted sandy colours",
+  "style": "src/client/art/events/treasure-hunter.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

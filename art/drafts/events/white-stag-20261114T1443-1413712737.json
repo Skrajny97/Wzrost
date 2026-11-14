@@ -1,0 +1,14 @@
+{
+  "id": "white-stag",
+  "tool": "pixellab generate-image-v2",
+  "description": "a majestic white stag with golden antlers, glowing softly with a faint golden light around its antlers, calm wise eyes looking at the viewer, standing proud, full body, three-quarter view, isolated figure on a plain background, muted forest colours",
+  "style": "src/client/art/events/treasure-hunter.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

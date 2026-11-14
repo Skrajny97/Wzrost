@@ -1,0 +1,14 @@
+{
+  "id": "skarbnik",
+  "tool": "pixellab generate-image-v2",
+  "description": "Skarbnik, the old spirit of the mines from Silesian legend, looking like a grey-bearded old miner in a black miner's uniform with brass buttons and a black miner's cap with a feather plume, holding up a small glowing oil lamp, a pile of silver ore nuggets at his feet, kindly but mysterious eyes with a faint glow, full body, three-quarter view, isolated figure on a plain background, muted dark colours",
+  "style": "src/client/art/events/treasure-hunter.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

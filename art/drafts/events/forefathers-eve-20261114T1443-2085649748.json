@@ -1,0 +1,14 @@
+{
+  "id": "forefathers-eve",
+  "tool": "pixellab generate-image-v2",
+  "description": "an old Slavic folk priest of the Forefathers' Eve rite, a man with a long white beard in a long white homespun coat with a red sash, holding a burning bundle of herbs and a round loaf of bread, a small bonfire beside him and two pale translucent ghostly peasant souls reaching out for the bread, full body, three-quarter view, isolated figure on a plain background, muted dark colours",
+  "style": "src/client/art/events/treasure-hunter.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

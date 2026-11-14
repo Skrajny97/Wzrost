@@ -1,0 +1,14 @@
+{
+  "id": "robber-knight",
+  "tool": "pixellab generate-image-v2",
+  "description": "a robber knight in dented dark plate armour without any coat of arms, a plain grey shield on his arm and a battered longsword resting point-down before him, a tattered dark red cloak, visor raised showing a scarred stern face with a black moustache, proud and threatening, full body, three-quarter view, isolated figure on a plain background, muted forest colours",
+  "style": "src/client/art/events/treasure-hunter.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
