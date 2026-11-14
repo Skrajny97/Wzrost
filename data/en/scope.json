@@ -1146,6 +1146,7 @@
     "src/engine/card-residents.js",
     "src/server/cards.js",
     "src/client/cards.js",
+    "src/client/deck-slots.js",
     "src/client/cards-fx.js",
     "src/engine/card-duel.js",
     "src/server/card-duel.js",
