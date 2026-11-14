@@ -87,8 +87,9 @@ const ROUTES = [
   { pattern: /^#\/postac\/statystyki$/, nav: 'character', tab: 'stats', mount: mountStats },
   { pattern: /^#\/postac\/umiejetnosci$/, nav: 'character', tab: 'skills', music: 'skills', mount: mountSkills },
   { pattern: /^#\/postac\/ewolucja$/, nav: 'character', tab: 'evolution', music: 'skills', mount: mountEvolution },
-  // The Rdzeń (screens/core.js), its locked words until it opens.
-  { pattern: /^#\/postac\/rdzen$/, nav: 'character', tab: 'core', mount: mountCore },
+  // The Rdzeń (screens/core.js), its locked words until it opens; from the
+  // Labirynt's "Odbierz Artefakty" (940), at its Skrytka.
+  { pattern: /^#\/postac\/rdzen(?:\/(?<part>skrytka))?$/, nav: 'character', tab: 'core', mount: mountCore },
   // Profesje, or one profession's screen (Zielarstwo).
   { pattern: /^#\/profesje(?:\/(?<profession>[a-z]+))?$/, nav: 'main', tab: 'profesje', part: ({ profession }) => profession, music: 'professions', mount: mountProfessions },
   // The Osada's board, or one of its places, the Karczma at one of its

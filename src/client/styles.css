@@ -21389,6 +21389,23 @@ a.discord-button {
   }
 }
 
+/* Where the day's rewards are, and the Artefakty of the Skrytka Rdzenia to
+   take there (940); beside a computer's wide card the button keeps its own
+   width. */
+.labyrinth-gains-note {
+  margin: 0;
+}
+
+@media (min-width: 700px) {
+  .labyrinth-entry > .system-action {
+    justify-self: start;
+  }
+}
+
+.labyrinth-claim {
+  box-shadow: 0 0 14px rgba(143, 227, 239, 0.35);
+}
+
 .labyrinth-over {
   margin: 0;
   color: var(--system-text);
@@ -21584,6 +21601,13 @@ a.discord-button {
   line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* In the phone's sheet of the day's rewards a long name goes onto a second
+   line instead of losing its end ("Odłamki Rdze…", 940). */
+.sheet .labyrinth-gain-label {
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 /* The board (labyrinth.js, #/labirynt): a screen over the whole page, its
@@ -22249,6 +22273,20 @@ a.discord-button {
   margin: 0;
   color: var(--system-text);
   font-size: 14px;
+}
+
+/* After the day's last fight: the Artefakty to take to the Rdzeń (940)
+   beside the way out. */
+.lab-prompt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.lab-prompt-actions > .button {
+  width: auto;
+  margin: 0;
 }
 
 .lab-prompt-choice {

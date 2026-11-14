@@ -148,16 +148,16 @@ function mountView(container, { navigate, board }) {
   function entryCard() {
     return h(
       'section',
-      { class: 'card labyrinth-entry', 'aria-label': t('Drużyna i nagrody dnia') },
+      { class: 'card labyrinth-entry', 'aria-label': t('Drużyna i zdobyte nagrody') },
       h('div', { class: 'labyrinth-entry-party', 'data-guide': 'labyrinth-party' }, h('h3', { class: 'labyrinth-subtitle', text: t('Drużyna') }), fighterRow()),
-      h('div', { class: 'labyrinth-entry-gains', 'data-guide': 'labyrinth-gains' }, h('h3', { class: 'labyrinth-subtitle', text: t('Nagrody dnia') }), gainsRow(true)),
-      coreLine(),
+      h('div', { class: 'labyrinth-entry-gains', 'data-guide': 'labyrinth-gains' }, h('h3', { class: 'labyrinth-subtitle', text: t('Zdobyte dziś') }), gainsRow(true)),
+      gainsNote(),
     );
   }
 
   function overLine() {
     if (!view.over) return null;
-    return [h('p', { class: 'labyrinth-over', text: view.over === 'done' ? t('Labirynt na dziś zdobyty do końca. Nowy o północy.') : t('Walka przegrana. Labirynt na dziś się skończył, a zdobyte nagrody zostają. Nowy o północy.') }), resetPart()];
+    return [h('p', { class: 'labyrinth-over', text: view.over === 'done' ? t('Labirynt na dziś zdobyty do końca. Nowy o północy.') : t('Walka przegrana. Labirynt na dziś się skończył. Zdobyte nagrody już masz. Nowy o północy.') }), resetPart()];
   }
 
   // After a fight lost: the Labirynt from its first level again, once a day
@@ -232,6 +232,29 @@ function mountView(container, { navigate, board }) {
 
   const coreLine = () => (isUnlocked('core') ? systemLink('#/postac/rdzen', t('Do Rdzenia')) : h('p', { class: 'muted small', text: t('Rdzeń otworzy się, gdy postać pokona pierwszego strażnika Labiryntu.') }));
 
+  // Where the day's rewards are (940, the author, 14.11.2026: "powinna być
+  // opcja odbioru nagród"; a player asked whether the rewards shown after
+  // the Piekielny lost could still be taken): they come at once, room by
+  // room, and only the Artefakty wait, in the Skrytka Rdzenia, to be
+  // absorbed; the button takes the player there.
+  function gainsNote() {
+    const { xp, gold, shards, artifacts } = view.gains;
+    const text =
+      xp + gold + shards + artifacts === 0
+        ? t('Nagrody przychodzą od razu, po każdej zdobytej komnacie.')
+        : view.waiting > 0
+          ? t('PD, złoto i Odłamki już masz. Artefakty czekają w Skrytce Rdzenia.')
+          : t('Wszystko już masz: PD i złoto u postaci, a Odłamki i Artefakty w Rdzeniu.');
+    return [h('p', { class: 'muted small labyrinth-gains-note', text }), view.waiting > 0 ? claimLink() : coreLine()];
+  }
+
+  // The Artefakty of the Skrytka Rdzenia, the Rdzeń opened at them.
+  const claimLink = () => {
+    const link = systemLink('#/postac/rdzen/skrytka', t('Odbierz Artefakty: {count}', { count: formatNumber(view.waiting) }));
+    link.classList.add('labyrinth-claim');
+    return link;
+  };
+
   function aboutCard() {
     return h('section', { class: 'card towers-intro' }, about());
   }
@@ -240,7 +263,7 @@ function mountView(container, { navigate, board }) {
     howItWorks(
       t('Codziennie nowy Labirynt: trzy poziomy, a po trzecim tego samego dnia Piekielny. Mapa jest ta sama dla wszystkich.'),
       t(
-        'Wchodzi postać i do dwóch towarzyszy z Kwater, jak na wyprawę, o każdej porze, także w czasie wyprawy i pracy w profesji. Poziom to sześć rzędów komnat i strażnik na końcu; z komnaty prowadzą drogi do dwóch albo trzech komnat następnego rzędu. HP przechodzi z walki do walki, bez mikstur. Walka nie wygrana kończy Labirynt na dziś, a zdobyte nagrody zostają. Za zwykłą walkę zgarniesz PD i złoto, za elitę i skarb Odłamki Rdzenia i złoto, a za strażnika Artefakt do Rdzenia. Po elicie, strażniku i na ołtarzu wybierasz jedno z trzech błogosławieństw, które działa do końca dnia. Postęp przepada o północy.',
+        'Wchodzi postać i do dwóch towarzyszy z Kwater, jak na wyprawę, o każdej porze, także w czasie wyprawy i pracy w profesji. Poziom to sześć rzędów komnat i strażnik na końcu; z komnaty prowadzą drogi do dwóch albo trzech komnat następnego rzędu. HP przechodzi z walki do walki, bez mikstur. Walka nie wygrana kończy Labirynt na dziś. Nagrody przychodzą od razu, po każdej zdobytej komnacie, więc nic nie przepada. Za zwykłą walkę zgarniesz PD i złoto, za elitę i skarb Odłamki Rdzenia i złoto, a za strażnika Artefakt do Rdzenia. Po elicie, strażniku i na ołtarzu wybierasz jedno z trzech błogosławieństw, które działa do końca dnia. Postęp przepada o północy.',
       ),
     );
 
@@ -441,9 +464,14 @@ function mountView(container, { navigate, board }) {
       return h(
         'div',
         { class: 'lab-prompt lab-prompt--over' },
-        h('p', { text: view.over === 'done' ? t('Labirynt na dziś zdobyty do końca. Nowy o północy.') : t('Walka przegrana. Labirynt na dziś się skończył, a zdobyte nagrody zostają.') }),
+        h('p', { text: view.over === 'done' ? t('Labirynt na dziś zdobyty do końca. Nowy o północy.') : t('Walka przegrana. Labirynt na dziś się skończył. Zdobyte nagrody już masz.') }),
         resetPart(),
-        h('button', { type: 'button', class: 'button button--system button--small', text: t('Wyjdź'), onClick: () => navigate(LABYRINTH_ENTRANCE) }),
+        h(
+          'div',
+          { class: 'lab-prompt-actions' },
+          view.waiting > 0 && claimLink(),
+          h('button', { type: 'button', class: 'button button--system button--small', text: t('Wyjdź'), onClick: () => navigate(LABYRINTH_ENTRANCE) }),
+        ),
       );
     }
     if (view.pending) {
@@ -480,7 +508,7 @@ function mountView(container, { navigate, board }) {
       'aside',
       { class: 'lab-side lab-side--right' },
       h('section', { class: 'card lab-side-card' }, h('h2', { class: 'section-title', text: t('Poziomy dnia') }), levelSteps(), h('p', { class: 'muted small', text: t('Stwory na poziomie {level}. Nowy Labirynt o północy.', { level: view.charLevel }) })),
-      h('section', { class: 'card lab-side-card' }, h('h2', { class: 'section-title', text: t('Nagrody dnia') }), gainsRow(), coreLine()),
+      h('section', { class: 'card lab-side-card' }, h('h2', { class: 'section-title', text: t('Zdobyte dziś') }), gainsRow(), gainsNote()),
       h('section', { class: 'card lab-side-card' }, legend(), about()),
     );
   }
@@ -529,7 +557,7 @@ function mountView(container, { navigate, board }) {
 
   const partySheet = () => openSheet(partyParts());
   const blessingsSheet = () => openSheet(blessingParts());
-  const gainsSheet = () => openSheet(h('h2', { class: 'sheet-title', text: t('Nagrody dnia') }), gainsRow(), coreLine());
+  const gainsSheet = () => openSheet(h('h2', { class: 'sheet-title', text: t('Zdobyte dziś') }), gainsRow(), gainsNote());
   const rulesSheet = () => openSheet(h('h2', { class: 'sheet-title', text: t('Zasady Labiryntu') }), legend(), about());
 
   // ---- The sheets ---------------------------------------------------------
