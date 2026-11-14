@@ -3308,5 +3308,11 @@
   "Google Play nie zna tego zakupu.": "Google Play does not know this purchase.",
   "Ten zakup anulowano w Google Play.": "This purchase was canceled in Google Play.",
   "Ten zakup jest na innym koncie.": "This purchase belongs to another account.",
-  "Ten zakup jest już sprawdzany. Spróbuj za chwilę.": "This purchase is already being checked. Try again in a moment."
+  "Ten zakup jest już sprawdzany. Spróbuj za chwilę.": "This purchase is already being checked. Try again in a moment.",
+  "Leczenie": "Healing",
+  "Mana": "Mana",
+  "{name}: rodzaj": "{name}: kind",
+  "+{amount}% HP": "+{amount}% HP",
+  "+{amount}% many": "+{amount}% mana",
+  "Weźmiesz: {potions}.": "You will take: {potions}."
 }

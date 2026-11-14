@@ -756,6 +756,10 @@
     "0.3.46": {
       "title": "Version 0.3.46",
       "body": "- The Core's “Upgrades” point now says where Shards come from: the Labyrinth, and extra ones from breaking Artifacts from the Cache."
+    },
+    "0.3.47": {
+      "title": "Version 0.3.47",
+      "body": "- Potions to take: you now pick healing and mana potions from a list with their pictures, strength and how many you have. Choose one kind and how many; if you run short, weaker potions make up the rest. Stronger ones stay in your bag for a harder exploration.\n- Under the list you see exactly what you will take, and the exploration's threat counts those very potions."
     }
   }
 }

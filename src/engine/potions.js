@@ -76,6 +76,38 @@ export function fightPotions(left, healBelow, content) {
   return kit;
 }
 
+// The potions of one fight kind (heal, mana) taken along when the player
+// picks the kind `chosen` and wants `count` of them (959, the author:
+// "biorę tylko jeden dostępny rodzaj lub jeśli nie mam tyle zapasów
+// uzupełniam wtedy tymi słabszymi"): the chosen first, then the weaker ones
+// of the kind, the strongest of them first, each as many as `have` holds.
+// Without `chosen`, or with one not carried, from the strongest carried.
+// The stronger ones than the chosen stay home.
+/**
+ * @param {Record<string, number>} have
+ * @param {string} kind
+ * @param {string | null | undefined} chosen
+ * @param {number} count
+ * @param {Content} content
+ * @returns {{ id: string, amount: number, count: number }[]}
+ */
+export function kindLine(have, kind, chosen, count, content) {
+  const carried = /** @type {Potion[]} */ (content.potions)
+    .filter((potion) => fightKind(potion) === kind && (have[potion.id] ?? 0) > 0)
+    .sort((a, b) => b.effect[kind] - a.effect[kind]);
+  const from = Math.max(0, carried.findIndex((potion) => potion.id === chosen));
+  /** @type {{ id: string, amount: number, count: number }[]} */
+  const line = [];
+  let left = count;
+  for (const potion of carried.slice(from)) {
+    if (left <= 0) break;
+    const take = Math.min(left, have[potion.id]);
+    line.push({ id: potion.id, amount: potion.effect[kind], count: take });
+    left -= take;
+  }
+  return line;
+}
+
 // The oil on the blade for a poison buff of `bonus` (a blow's chance of
 // Zatrucie): of the potions with poison the strongest whose chance the buff
 // has, as a buff keeps the stronger of two oils drunk (addBuff), so the

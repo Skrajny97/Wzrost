@@ -23107,3 +23107,107 @@ a.discord-button {
   width: 100%;
   height: 100%;
 }
+
+/* Healing and mana on the road (959): the kind from a list and how many. */
+.potion-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.potion-group-title {
+  font-weight: 700;
+}
+
+.potion-group-note {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.potion-kind-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.potion-kind,
+.potion-kind-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.25));
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.potion-kind-current {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.potion-kind-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.potion-kind-meta {
+  flex: none;
+  font-size: 0.85rem;
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+.potion-kind-caret {
+  flex: none;
+}
+
+.potion-kind[aria-expanded='true'] .potion-kind-caret {
+  transform: rotate(180deg);
+}
+
+.potion-kind-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.potion-kind-option[aria-selected='true'] {
+  border-color: var(--gold, #e0b04a);
+  box-shadow: inset 0 0 0 1px var(--gold, #e0b04a);
+}
+
+/* On the narrowest phones the row's name keeps its room (the picture is in
+   the list under it anyway); below 390 px the strength goes under the
+   potion's name, which would take three lines beside it. */
+@media (max-width: 359px) {
+  .potion-group > .potion-pick > .potion-pick-art {
+    display: none;
+  }
+}
+
+@media (max-width: 389px) {
+  .potion-kind-current,
+  .potion-kind-option {
+    flex-wrap: wrap;
+  }
+
+  .potion-kind-name {
+    flex-basis: calc(100% - 40px);
+  }
+
+  .potion-kind-meta {
+    margin-left: 32px;
+  }
+}
