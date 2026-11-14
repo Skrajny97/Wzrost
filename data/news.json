@@ -975,6 +975,11 @@
       "id": "0.3.51",
       "title": "Wersja 0.3.51",
       "body": "- Nowe animacje wszystkich umiejętności ewolucji Łucznika: sokół i orzeł pikują z nieba, wilk i basior wyskakują z gąszczu i mgły, harpun przyciąga wroga na linie, strzały przebijają wrogów na wylot, a Strzelec Burzy, Władca Piorunów i Wybraniec Peruna walczą burzą i piorunami.\n- Strzał z ukrycia leci z cienia, Strzał w serce ma bijące serce, Namierzenie i Spokojna ręka mają celowniki, a Znak gromu kreśli nad postacią świecącą rozetę."
+    },
+    {
+      "id": "0.3.52",
+      "title": "Wersja 0.3.52",
+      "body": "- Napisy nad kartami w walce, np. „pancerz +255%”, nie są już ucinane przy krawędzi areny."
     }
   ]
 }
