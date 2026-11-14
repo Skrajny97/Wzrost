@@ -432,7 +432,10 @@ export function createFx(kit) {
     shown.add(bubble);
     if (color) bubble.style.color = color;
     fx.append(bubble);
-    const half = bubble.offsetWidth / 2;
+    // The pop grows the bubble for a moment (×1.28, a crit ×1.5), so it is kept
+    // inside the arena at that size, not only at its resting one.
+    const grow = motion() ? (kind === 'crit' ? 1.5 : 1.28) : 1;
+    const half = (bubble.offsetWidth / 2) * grow;
     const x = inside(box.x + box.width / 2, half);
     const y = box.y + box.height * 0.4 + slot * 24;
     bubble.style.left = `${x}px`;

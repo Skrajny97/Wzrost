@@ -3252,6 +3252,10 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.52 (15.11.2026): napisy nad kartami w całości przy krawędzi areny
+
+1. Liczba albo napis nad kartą w walce (obrażenia, leczenie, „pancerz +255%”) na chwilę rośnie, zanim się ustawi. Gra trzymała napis w granicach areny według jego zwykłej szerokości, więc przy karcie na skraju areny w tej chwili ucinało pierwsze litery („ancerz +255%”). Teraz napis mieści się na arenie także wtedy, gdy jest największy. Błąd wyszedł przy filmach animacji Wojownika (962), w starej i nowej wersji.
+
 ## Wersja 0.3.51 (14.11.2026): animacje umiejętności klas wyewoluowanych Łucznika (961)
 
 1. Autor ocenił po kolei filmy 961.1–961.18 („super”, „okey”, „spoko”, na koniec „wszystko super”). Wszystkie 18 umiejętności linii Łucznika mają własny wygląd:
