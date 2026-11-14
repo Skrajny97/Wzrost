@@ -11,7 +11,7 @@ import { createArena } from '../arena.js';
 import { fill, h, icon } from '../dom.js';
 import { dateTimeFormat, formatNumber } from '../format.js';
 import { call, state } from '../state.js';
-import { confirmAction, systemPanel, withButton } from '../ui.js';
+import { confirmAction, systemPanel, toast, withButton } from '../ui.js';
 
 export function mountAuthor(container, { backHash = '#/walka' }) {
   if (!state.user?.author) {
@@ -208,7 +208,7 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
         h('div', { class: 'page-heading-text' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Panel autora' }), h('p', { class: 'page-subtitle', text: 'Zgłoszenia błędów, konta i postacie' })),
         h('a', { class: 'button button--system back-button', href: backHash }, icon('back', { size: 20 }), 'Powrót'),
       ),
-      error ? systemPanel(error) : panel === null ? h('p', { class: 'muted', text: 'Wczytywanie…' }) : [newsToggle(), newsPart(), skillsToggle(), skillsPreview(), counts(panel.counts), bugs(panel.bugs), accounts(panel.accounts)],
+      error ? systemPanel(error) : panel === null ? h('p', { class: 'muted', text: 'Wczytywanie…' }) : [newsToggle(), newsPart(), skillsToggle(), skillsPreview(), counts(panel.counts), mails(panel.emails), bugs(panel.bugs), accounts(panel.accounts)],
       h('button', {
         type: 'button',
         class: 'button button--world',
@@ -227,6 +227,36 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
       tile('Konta', numbers.accounts, `nowe w 24 h: ${formatNumber(numbers.newAccounts)}`),
       tile('Postacie', numbers.characters, `nowe w 24 h: ${formatNumber(numbers.newCharacters)}`),
       tile('Z Google', numbers.google),
+    );
+  }
+
+  // Every account's confirmed e-mail in one go, separated by commas, for the
+  // list of testers of the Google Play test (the author, 14.11.2026): copied
+  // with the tap itself, or shown selected where the phone will not copy.
+  function mails(list) {
+    if (!list?.length) return null;
+    const text = list.join(', ');
+    const shown = h('div', { class: 'author-mails-shown' });
+    const show = () => {
+      const box = h('textarea', { class: 'author-mails-box', rows: '6', readonly: true, 'aria-label': 'Adresy e-mail' });
+      box.value = text;
+      fill(shown, h('p', { class: 'muted small', text: 'Telefon nie pozwolił skopiować: przytrzymaj tekst i wybierz „Kopiuj”.' }), box);
+      box.focus();
+      box.select();
+    };
+    const copy = () => {
+      try {
+        navigator.clipboard.writeText(text).then(() => toast(`Skopiowano adresy: ${formatNumber(list.length)}.`), show);
+      } catch {
+        show();
+      }
+    };
+    return h(
+      'section',
+      { class: 'card stack author-mails', 'aria-label': 'Adresy e-mail' },
+      h('button', { type: 'button', class: 'button button--system button--small', text: `Kopiuj adresy e-mail (${formatNumber(list.length)})`, onClick: copy }),
+      h('p', { class: 'muted small', text: 'Potwierdzone adresy wszystkich kont, oddzielone przecinkami. Wklej je w Play Console: Test zamknięty → Testerzy → lista e-maili.' }),
+      shown,
     );
   }
 

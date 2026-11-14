@@ -7228,6 +7228,22 @@ a.camp-level-button {
 
 /* The author's panel (screens/author.js): the counts in tiles, then every
    account as a card, newest first. */
+/* Every account's confirmed e-mail, to copy for the Google Play test's
+   testers (author.js). */
+.author-mails > .button {
+  align-self: flex-start;
+  width: auto;
+}
+
+.author-mails p {
+  margin: 0;
+}
+
+.author-mails-box {
+  width: 100%;
+  font-size: 16px;
+}
+
 .author-counts {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

@@ -28,7 +28,7 @@ export async function authorPanel(context) {
   if (!isAuthor(context.env, session.user)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
   const db = context.env.DB;
   const since = context.now - DAY;
-  const [counts, rows, bugs] = await db.batch([
+  const [counts, rows, bugs, mails] = await db.batch([
     db
       .prepare(
         `SELECT
@@ -57,6 +57,16 @@ export async function authorPanel(context) {
        ORDER BY b.resolved_at IS NOT NULL, b.created_at DESC, b.id DESC
        LIMIT 200`,
     ),
+    // Every account's confirmed e-mail, once, for the list of testers of
+    // the Google Play test (the author, 14.11.2026: "zgarnij liste
+    // mailingową dostępną ze strony Panelu Autora", "wklepię wszystkich jako
+    // testerów"): one an account confirmed by the link or by Google, never
+    // an unconfirmed one, which may be anyone's.
+    db.prepare(
+      `SELECT DISTINCT lower(trim(email)) AS email FROM users
+       WHERE email IS NOT NULL AND trim(email) != '' AND (google_sub IS NOT NULL OR email_confirmed_at IS NOT NULL)
+       ORDER BY 1`,
+    ),
   ]);
   const total = counts.results[0];
   return json({
@@ -69,6 +79,7 @@ export async function authorPanel(context) {
       characters: total.characters,
       newCharacters: total.new_characters,
     },
+    emails: mails.results.map((row) => row.email),
     accounts: rows.results.map((row) => ({
       login: row.login,
       email: row.email,

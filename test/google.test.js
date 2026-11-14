@@ -335,6 +335,9 @@ describe('Google sign-in', () => {
       ],
     );
     assert.deepEqual(panel.accounts[1].character, { ...panel.accounts[1].character, className: 'Mag', level: 1, classLevel: 1 });
+    // The confirmed e-mails alone, once each, for the Google Play test's
+    // testers: an unconfirmed one may be anyone's.
+    assert.deepEqual(panel.emails, ['google-szef@gmail.com', 'nowy-gracz@gmail.com']);
   });
 
   test('a return without the flow cookie, with another state or a refusal signs nobody in', async () => {

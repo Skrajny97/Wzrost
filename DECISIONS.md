@@ -3252,6 +3252,10 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.31 (14.11.2026): adresy e-mail dla testerów Sklepu Play
+
+Autor 14.11.2026: „zgarnij liste mailingową dostępną ze strony Panelu Autora”, „wklepię wszystkich jako testerów i wrzucę info na Czat”. Panel autora ma przycisk „Kopiuj adresy e-mail (N)”: kopiuje naraz potwierdzone adresy wszystkich kont (potwierdzone linkiem albo przez Google), każdy raz, małymi literami i oddzielone przecinkami, do wklejenia w Play Console (Test zamknięty → Testerzy). Adres niepotwierdzony może należeć do kogokolwiek, więc go nie ma. Gdy telefon nie pozwoli skopiować, adresy pokazują się zaznaczone w polu tekstowym. Polityka prywatności (PL i EN) wymienia teraz Google Play jako odbiorcę tych adresów, z podstawą w prawnie uzasadnionym interesie i prawem do wypisania się z listy przez adres kontaktowy.
+
 ## Wersja 0.3.30 (14.11.2026): aplikacja Sklepu Play bez paska adresu
 
 Gra podaje plik `/.well-known/assetlinks.json` (Digital Asset Links) z nazwą pakietu `com.insightrpg.app` i dwoma odciskami SHA-256 z Play Console, jakie autor przysłał 14.11.2026: certyfikatu klucza podpisywania aplikacji (Google) i certyfikatu klucza przesyłania (paczka z PWABuilder). Dzięki temu aplikacja ze Sklepu Play otwiera grę jak aplikację, bez paska adresu przeglądarki. Odciski to publiczne skróty certyfikatów, nie klucze; sam plik klucza i jego hasła nigdy nie trafiają do repozytorium.
