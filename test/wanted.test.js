@@ -220,7 +220,10 @@ describe('the wanted posters through the API', () => {
   // legendary item in every slot its class can fill.
   async function arm() {
     const shape = newCharacter('warrior', { level: 120, classLevel: 30 });
-    await set('level = 120, points = ?', JSON.stringify(autoDistribute(shape, content)));
+    // Whole HP (the game caps it at the character's most): a new character's
+    // few HP of level 1 lost to some days' targets (the outlaw drawn on
+    // 14.11.2026 hit 77 HP away before falling).
+    await set('level = 120, points = ?, hp = 100000, hp_at = ?', JSON.stringify(autoDistribute(shape, content)), Date.now());
     const rng = createRng('arms');
     for (const { id: slot } of content.slots) {
       const base = content.bases.find((one) => one.slot === slot && !one.family && canUse(one.id, 'warrior', content));
