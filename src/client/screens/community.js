@@ -70,6 +70,7 @@ import { language, t } from '../i18n.js';
 import { CLASS_ICONS } from '../icons.js';
 import { GOODS_KINDS, goodsArt, goodsHeading, goodsKindName, ownedCount, ownedGoods } from '../goods.js';
 import { appendMention, matchingPeople, taggedParts, typedMention, withMention } from '../mentions.js';
+import { linkedText } from '../links.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, serverNow, state } from '../state.js';
 import { closeSheet, framedName, guildTag, openSheet, pageHeading, toast, withButton } from '../ui.js';
@@ -81,30 +82,7 @@ import { lockedScreen } from './locked.js';
 import { mountRanking } from './ranking.js';
 import { tradeBanner } from './trade.js';
 
-// The admin's links in a message (src/server/chat.js, ADMIN_LINK): a label
-// in square brackets with its address in round ones shows as the label, a
-// bare address as itself, each opening in a new card; only http(s).
-const LINKED = /\[([^[\]]{1,80})\]\((https?:\/\/[^\s()]{1,500})\)|(https?:\/\/[^\s()]{1,500})/giu;
-function linkedText(text) {
-  const parts = [];
-  let at = 0;
-  for (const found of text.matchAll(LINKED)) {
-    const [whole, label, labelled, bare] = found;
-    const address = labelled ?? bare;
-    let safe = null;
-    try {
-      const url = new URL(address);
-      if (url.protocol === 'https:' || url.protocol === 'http:') safe = url.href;
-    } catch {
-      safe = null;
-    }
-    if (found.index > at) parts.push(text.slice(at, found.index));
-    parts.push(safe ? h('a', { class: 'chat-link', href: safe, target: '_blank', rel: 'noopener noreferrer', text: label ?? bare }) : whole);
-    at = found.index + whole.length;
-  }
-  if (at < text.length) parts.push(text.slice(at));
-  return parts;
-}
+// The admin's links in a message (links.js).
 const hasLink = (message) => message.role === 'admin' && /https?:\/\//i.test(message.text);
 
 // The most messages the page keeps; older ones leave from the top.

@@ -3252,6 +3252,10 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.35 (14.11.2026): adres w „Co nowego?” zostaje w ramce i daje się stuknąć
+
+Autor 14.11.2026, ze zrzutem wpisu „TESTY”: „wyjezdza link poza obrys”. Adres bez spacji nie łamał się i wychodził poza kartę wpisu. Karta wpisu łamie teraz długie słowa w dowolnym miejscu (`overflow-wrap: anywhere`), a adres http(s) w treści wpisu jest linkiem otwieranym w nowej karcie, tak jak linki admina na czacie: sam adres pokazuje adres, a [podpis](adres) pokazuje podpis (`src/client/links.js`, wspólne z czatem). `tools/layout-check.cjs` otwiera okienko „Co nowego?” z wpisem o długim adresie na wszystkich rozmiarach ekranu.
+
 ## Wersja 0.3.34 (14.11.2026): odbiór nagród w Labiryncie (940)
 
 Gracz (poz. 44) po przegranej z Piekielnym pytał, czy nagrody pokazane pod planszą da się jeszcze odebrać, a autor dodał: „powinna być opcja odbioru nagród” (14.11.2026). Makiety 940.1–940.4 autor przyjął 14.11.2026 ok. 08:31 UTC („940 akcept”). Nagrody Labiryntu przychodzą od razu, po każdej zdobytej komnacie: PD i złoto do postaci, Odłamki do Rdzenia, a Artefakty ze strażników do Skrytki Rdzenia, gdzie czekają na „Wchłoń”. Rozstrzygnięte najprościej, bez osobnego odbioru:
