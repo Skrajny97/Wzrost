@@ -17,6 +17,7 @@ import {
   abilityValue,
   artifactName,
   artifactUpgradeCost,
+  artifactView,
   blessingChoices,
   blessingEffects,
   breakShards,
@@ -393,6 +394,19 @@ describe('the Artefakty', () => {
     assert.equal(dissolveShards(artifact, content), Math.floor(spent / 2));
     assert.equal(breakShards({ ...artifact, upgrade: 0, spent: 0 }, content), rules.core.break.rare * 3);
     assert.equal(breakShards(artifact, content), rules.core.break.rare * 3 + Math.floor(spent / 2));
+  });
+
+  test('every level of upgrade shows in the numbers, small ones too (the author, 14.11.2026: a Mały Artefakt trucizny +4 still read 0,2%)', () => {
+    const poison = { element: 'poison', size: 'small', rarity: 'common', traits: ['lifesteal'], ability: null, upgrade: 0, spent: 0 };
+    const kwarc = 0.05;
+    const texts = Array.from({ length: 11 }, (_, upgrade) => artifactView({ ...poison, upgrade }, content, kwarc).traits[0].text);
+    assert.equal(texts[0], '0,16% zadanych obrażeń wraca jako HP');
+    assert.equal(texts[4], '0,22% zadanych obrażeń wraca jako HP');
+    assert.ok(texts.every((text, index) => index === 0 || text !== texts[index - 1]), texts.join(' | '));
+    assert.equal(texts[3], '0,20% zadanych obrażeń wraca jako HP');
+    // Below 1% two decimals, from 1% one, as before.
+    assert.equal(artifactView({ element: 'fire', size: 'small', rarity: 'rare', traits: ['damage'], ability: null, upgrade: 2 }, content).traits[0].text, '+0,81% obrażeń');
+    assert.equal(artifactView({ element: 'fire', size: 'large', rarity: 'divine', traits: ['damage'], ability: null, upgrade: 0 }, content).traits[0].text, '+2,5% obrażeń');
   });
 
   test('resonance: 2, 4 and 6 of one element give its growing bonus (861 A)', () => {

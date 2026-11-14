@@ -720,6 +720,10 @@
     "0.3.34": {
       "title": "Version 0.3.34",
       "body": "- The Labyrinth now says plainly where the rewards you gained are. You get them at once, after every chamber won: XP and gold go to your character, and Shards to the Core.\n- Artifacts from guardians wait in the Core Cache. The \"Claim Artifacts\" button in the Labyrinth opens the Core right at the Cache, where you absorb them.\n- Nothing is lost after a fight lost: the rewards you gained are already yours."
+    },
+    "0.3.38": {
+      "title": "Version 0.3.38",
+      "body": "- Up to character level 15 you find four times as many item chests on explorations. From level 15 to 25 there are fewer and fewer of them, until at level 25 as many drop as before.\n- The finds give no less gold, resources or time shards: the extra chests come on top of them.\n- The Core shows small Artifact numbers with two decimals, so every upgrade shows, e.g. 0.16% and 0.22% instead of 0.2% twice."
     }
   }
 }

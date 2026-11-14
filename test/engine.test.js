@@ -121,6 +121,7 @@ import {
   salvageYield,
   settleCrafting,
   simulateHunt,
+  youngChestFactor,
   statShares,
   extraValues,
   combatValues,
@@ -170,6 +171,10 @@ import {
 } from '../src/engine/index.js';
 import { simulateMany, typicalCharacter } from '../tools/simulate.mjs';
 import { content, newCharacter } from './helpers/content.js';
+
+// The game's rules without a young character's extra chests
+// (rewards.youngChests): the finds as they come from character level 25 on.
+const plainChests = { ...content, balance: { ...content.balance, rewards: { ...content.balance.rewards, youngChests: undefined } } };
 
 // The newest place's stronger creatures (balance.monsters.huntCurve,
 // hunt-strength.test.js) and the harder explorations from the 10th level
@@ -779,10 +784,10 @@ describe('combat', () => {
 
 describe('hunts', () => {
   const warrior = typicalCharacter('warrior', 3, content);
-  const hunt = (overrides = {}) =>
+  const hunt = (overrides = {}, rules = content) =>
     simulateHunt(
       { ...warrior, hp: 9999, name: 'Mira', areaId: 'windfalls-edge', minutes: 60, seed: 'polowanie', ...overrides },
-      content,
+      rules,
     );
 
   test('from character level 15 some of the items found are for other classes', () => {
@@ -968,10 +973,16 @@ describe('hunts', () => {
   test('a character without a weapon finds one of its class first', () => {
     const naked = typicalCharacter('mage', 1, content);
     assert.equal(naked.equipped.length, 0);
-    const result = simulateHunt({ ...naked, hp: 9999, name: 'Mira', areaId: 'windfalls-edge', minutes: 30, seed: 'pierwsza' }, content);
-    assert.equal(result.result, 'success');
+    for (const rules of [content, plainChests]) {
+      const result = simulateHunt({ ...naked, hp: 9999, name: 'Mira', areaId: 'windfalls-edge', minutes: 30, seed: 'pierwsza' }, rules);
+      assert.equal(result.result, 'success');
+      assert.equal(result.items[0].slot, 'weapon');
+      assert.ok(content.classesById.mage.weapons.includes(result.items[0].base), result.items[0].base);
+    }
+    // Further loot favours the other empty slots, so one hunt with the
+    // chests of character level 25 and up brings no second weapon.
+    const result = simulateHunt({ ...naked, hp: 9999, name: 'Mira', areaId: 'windfalls-edge', minutes: 30, seed: 'pierwsza' }, plainChests);
     assert.equal(result.items[0].base, 'staff');
-    // Further loot favours the other empty slots, so one hunt brings no second weapon.
     assert.ok(result.items.slice(1).every((item) => item.slot !== 'weapon'));
   });
 
@@ -1027,13 +1038,14 @@ describe('hunts', () => {
   });
 
   test('finds are rarer and sometimes empty', () => {
-    const result = hunt({ minutes: 240, seed: 'puste' });
+    // The finds as they come from character level 25 (youngChests aside).
+    const result = hunt({ minutes: 240, seed: 'puste' }, plainChests);
     const finds = result.entries.filter((entry) => entry.type === 'find');
     assert.ok(finds.length >= 6 && finds.length <= 18, `${finds.length} finds`);
     let empty = 0;
     let items = 0;
     for (let i = 0; i < 50; i++) {
-      const long = hunt({ minutes: 240, seed: `puste:${i}` });
+      const long = hunt({ minutes: 240, seed: `puste:${i}` }, plainChests);
       empty += long.entries.filter((entry) => entry.type === 'find' && entry.item === undefined && !/złota/.test(entry.text)).length;
       items += long.items.length;
     }
@@ -2391,16 +2403,51 @@ describe('materials and chests', () => {
   });
 
   test('treasure chests are a rare find: about three in four hours, and two on a half-hour trip are luck', () => {
+    // The chests as they come from character level 25 (youngChests aside).
     const character = geared('warrior', 8);
     let items = 0;
     for (let i = 0; i < 200; i++) {
-      items += simulateHunt({ ...character, hp: 99999, name: 'Mira', areaId: 'fox-ravines', minutes: 60, seed: `skrzynie:${i}` }, content).items.length;
+      items += simulateHunt({ ...character, hp: 99999, name: 'Mira', areaId: 'fox-ravines', minutes: 60, seed: `skrzynie:${i}` }, plainChests).items.length;
     }
     assert.ok(items / 200 > 0.55 && items / 200 < 1, `${items / 200} an hour`);
     const five = geared('archer', 5);
-    const trips = Array.from({ length: 600 }, (_, i) => simulateHunt({ ...five, hp: 99999, name: 'Mira', areaId: 'windfalls-edge', minutes: 30, seed: `pół:${i}` }, content));
+    const trips = Array.from({ length: 600 }, (_, i) => simulateHunt({ ...five, hp: 99999, name: 'Mira', areaId: 'windfalls-edge', minutes: 30, seed: `pół:${i}` }, plainChests));
     const lucky = trips.filter((hunt) => hunt.items.length >= 2).length / trips.length;
     assert.ok(lucky > 0 && lucky < 0.06, `${lucky} of half-hour trips bring two chests`);
+  });
+
+  test('a young character finds four times the chests to level 15, fewer up to 25, beside the gold and resources (youngChests)', () => {
+    const young = content.balance.rewards.youngChests;
+    assert.deepEqual(
+      [1, young.fullTo, 20, young.until - 1, young.until, 60].map((level) => Math.round(youngChestFactor(level, content) * 100) / 100),
+      [young.factor, young.factor, 1 + ((young.factor - 1) * (young.until - 20)) / (young.until - young.fullTo), 1 + (young.factor - 1) / (young.until - young.fullTo), 1, 1].map((value) => Math.round(value * 100) / 100),
+    );
+    // Items an exploration brings, with the young chests and without, and
+    // the rest of the exploration the same either way: its fights, gold,
+    // XP, resources, shards of time and materials.
+    const items = (classId, level, areaId) => {
+      const character = geared(classId, level);
+      let now = 0;
+      let before = 0;
+      for (let i = 0; i < 150; i++) {
+        const options = { ...character, hp: 99999, name: 'Mira', areaId, minutes: 60, seed: `młode:${level}:${i}` };
+        const withYoung = simulateHunt(options, content);
+        const without = simulateHunt(options, plainChests);
+        for (const key of ['result', 'xp', 'gold', 'resources', 'timePoints', 'materials']) assert.deepEqual(withYoung[key], without[key], `${level} ${i} ${key}`);
+        assert.deepEqual(withYoung.fights.map((fight) => fight.won), without.fights.map((fight) => fight.won));
+        now += withYoung.items.length;
+        before += without.items.length;
+      }
+      return now / before;
+    };
+    const eight = items('warrior', 8, 'fox-ravines');
+    assert.ok(eight > 3.2 && eight < 4.8, `${eight} times the items at level 8`);
+    const twenty = items('archer', 20, 'raven-hollows');
+    assert.ok(twenty > 1.9 && twenty < 3.1, `${twenty} times the items at level 20`);
+    // From level 25 the exploration is the same as without them.
+    const older = geared('cleric', young.until);
+    const options = { ...older, hp: 99999, name: 'Mira', areaId: 'mossy-boulders', minutes: 120, seed: 'młode:25' };
+    assert.deepEqual(simulateHunt(options, content), simulateHunt(options, plainChests));
   });
 
   test("a character's very first exploration goes one way: one plain weapon of its class and nothing else to wear", () => {

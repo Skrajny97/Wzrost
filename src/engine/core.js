@@ -351,8 +351,8 @@ export function knownArtifact(artifact, content) {
   );
 }
 
-// A share as the page shows it: "1,5" or "12" (percent), in the content's
-// language.
+// A share as the page shows it: "0,15", "0,20", "1,5" or "12" (percent), in the
+// content's language.
 /**
  * @param {number} share
  * @param {Content} content
@@ -360,7 +360,11 @@ export function knownArtifact(artifact, content) {
  */
 function percent(share, content) {
   const value = share * 100;
-  const text = String(value >= 10 ? Math.round(value) : Math.round(value * 10) / 10);
+  // Below 1% two decimals, so an upgrade of a small number shows (the
+  // author, 14.11.2026, of a Mały Artefakt trucizny +4: „ulepszone na +4 a
+  // nic sie nie zmienilo - nie powinno tak byc”; its 0,16% and 0,22% both
+  // read 0,2%).
+  const text = value >= 10 ? String(Math.round(value)) : value >= 1 ? String(Math.round(value * 10) / 10) : value.toFixed(2);
   return content.language === 'en' ? text : text.replace('.', ',');
 }
 
