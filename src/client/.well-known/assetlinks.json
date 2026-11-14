@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.insightrpg.app",
+      "sha256_cert_fingerprints": [
+        "76:D6:FA:26:4D:56:88:8A:0A:8F:C5:C8:EF:92:62:CC:E8:7E:3C:20:30:BB:3F:9F:6B:8F:63:47:E8:65:AB:1E",
+        "F4:C7:13:20:D7:B5:1B:C0:FA:5B:EC:BF:AA:CE:FA:FA:9B:04:34:83:36:C4:ED:52:CF:97:CA:6B:7A:AF:D9:0D"
+      ]
+    }
+  }
+]

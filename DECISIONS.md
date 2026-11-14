@@ -3252,6 +3252,10 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.30 (14.11.2026): aplikacja Sklepu Play bez paska adresu
+
+Gra podaje plik `/.well-known/assetlinks.json` (Digital Asset Links) z nazwą pakietu `com.insightrpg.app` i dwoma odciskami SHA-256 z Play Console, jakie autor przysłał 14.11.2026: certyfikatu klucza podpisywania aplikacji (Google) i certyfikatu klucza przesyłania (paczka z PWABuilder). Dzięki temu aplikacja ze Sklepu Play otwiera grę jak aplikację, bez paska adresu przeglądarki. Odciski to publiczne skróty certyfikatów, nie klucze; sam plik klucza i jego hasła nigdy nie trafiają do repozytorium.
+
 ## Wersja 0.3.29 (14.11.2026): nazwy talii (939)
 
 Zapisane talie mają nazwy nadawane przyciskiem „Nazwij” obok „Ułóż talię N” w Salonie Gier, do 16 znaków. Nazwa stoi pod stosem talii zamiast siły, w Salonie, na Arenie, przy stołach mieszkańców i w oknach wyzwań, a talię w grze znaczy ✓ na rogu stosu (zob. niżej, „Zapisane talie kart”). Makiety 939.1–939.4 autor przyjął 14.11 ok. 06:43 UTC. Migracja 0133.
