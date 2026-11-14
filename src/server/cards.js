@@ -42,6 +42,8 @@ import {
   casinoDay,
   createRng,
   deckBlock,
+  deckStrength,
+  deckTypeCounts,
   expectedExploration,
   firstWinCard,
   heroSkill,
@@ -214,6 +216,82 @@ export async function deckOf(db, characterId, collection) {
   return deckBlock(ids, new Set(collection.keys()), content()) ? null : ids;
 }
 
+// The saved decks (938, the author, 14.11.2026: „opcje zapisania kilku
+// różnych talii kart do użytku za jednym kliknieciem w wiekszosci
+// miejsc”): up to savedDecks of them, each in its numbered slot
+// (card_deck_slots). The deck in play (card_decks) is always the deck of the
+// slot it names, and it plays everywhere: at Szczęsny's, at the residents'
+// tables, in the Arena, where it also defends, and in the live matches, each
+// of which takes it as it starts and keeps its own copy to the end.
+
+// A slot as asked for: 1 to savedDecks.
+function slotOf(value) {
+  if (!Number.isInteger(value) || value < 1 || value > rules().savedDecks) throw new ApiError(400, 'invalid_slot', 'Nie ma takiego miejsca na talię.');
+  return value;
+}
+
+// The card ids a deck keeps as JSON, or null.
+function idsOf(text) {
+  try {
+    const ids = JSON.parse(text);
+    return Array.isArray(ids) ? ids : null;
+  } catch {
+    return null;
+  }
+}
+
+// The statement that keeps the deck in play in its own slot as it is, before
+// another deck takes its place: a deck laid before the slots, or by a page
+// of before them, is not in its slot's row yet.
+const keepInPlay = (db, characterId) =>
+  db
+    .prepare(
+      `INSERT INTO card_deck_slots (character_id, slot, cards, updated_at) SELECT character_id, slot, cards, updated_at FROM card_decks WHERE character_id = ?
+       ON CONFLICT (character_id, slot) DO UPDATE SET cards = excluded.cards, updated_at = excluded.updated_at`,
+    )
+    .bind(characterId);
+
+// The statement that plays the deck `cards` (its JSON) of `slot` from now on.
+const playDeck = (db, characterId, slot, cards, now) =>
+  db
+    .prepare('INSERT INTO card_decks (character_id, cards, slot, updated_at) VALUES (?, ?, ?, ?) ON CONFLICT (character_id) DO UPDATE SET cards = excluded.cards, slot = excluded.slot, updated_at = excluded.updated_at')
+    .bind(characterId, cards, slot, now);
+
+// The saved decks for the page: each slot with the cards of it the
+// character has (null when it is empty), whether they are a whole deck still
+// (deckBlock), and then its strength and its types as the Arena counts them
+// (900 A); `active`, the slot in play (null before any deck).
+export async function deckSlots(db, characterId, collection) {
+  const [saved, inPlay] = await db.batch([
+    db.prepare('SELECT slot, cards FROM card_deck_slots WHERE character_id = ?').bind(characterId),
+    db.prepare('SELECT slot, cards FROM card_decks WHERE character_id = ?').bind(characterId),
+  ]);
+  const bySlot = new Map(saved.results.map((one) => [one.slot, idsOf(one.cards)]));
+  const playing = inPlay.results[0] ?? null;
+  // The deck in play is its slot's, whatever that slot's row still says.
+  if (playing) bySlot.set(playing.slot, idsOf(playing.cards));
+  const owned = new Set(collection.keys());
+  return {
+    max: rules().savedDecks,
+    active: playing?.slot ?? null,
+    slots: Array.from({ length: rules().savedDecks }, (_, index) => {
+      const slot = index + 1;
+      const ids = bySlot.get(slot);
+      if (!ids) return { slot, cards: null, whole: false };
+      const cards = [...new Set(ids.filter((id) => typeof id === 'string' && owned.has(id)))];
+      if (deckBlock(ids, owned, content())) return { slot, cards, whole: false };
+      const leveled = ids.map((id) => ({ id, level: cardLevel(collection.get(id), content()) }));
+      return {
+        slot,
+        cards,
+        whole: true,
+        strength: deckStrength(leveled, content()),
+        types: deckTypeCounts(leveled, content()).map(({ id, name, count }) => ({ id, name, count })),
+      };
+    }),
+  };
+}
+
 const runningMatch = (db, characterId) => db.prepare('SELECT * FROM card_matches WHERE character_id = ? AND result IS NULL').bind(characterId).first();
 
 // The character's hero (872 A): its class and its evolution's stage (0
@@ -327,7 +405,10 @@ async function cardsView(db, player, now) {
     runningMatch(db, row.id),
     db.prepare('SELECT * FROM card_matches WHERE character_id = ? AND result IS NOT NULL ORDER BY id DESC LIMIT 1').bind(row.id).first(),
   ]);
-  const deck = await deckOf(db, row.id, collection);
+  // The deck in play: its slot's, when whole (deckSlots).
+  const decks = await deckSlots(db, row.id, collection);
+  const playing = decks.slots[decks.active - 1];
+  const deck = playing?.whole ? playing.cards : null;
   const data = rules();
   const rarity = (id) => {
     const found = content().raritiesById[id];
@@ -346,6 +427,7 @@ async function cardsView(db, player, now) {
     starter: game.starter,
     collection: [...collection].map(([id, copies]) => cardView(id, copies, content(), { copies, inDeck: Boolean(deck?.includes(id)) })),
     deck,
+    decks,
     hero: heroView(row),
     tiers: hostTiers(content()).map((tier, index) => {
       const number = index + 1;
@@ -405,26 +487,69 @@ export async function takeStarter(context) {
     db.prepare('UPDATE characters SET card_game = ?, version = version + 1 WHERE id = ?').bind(JSON.stringify({ ...game, starter: true }), row.id),
     ...cardUpserts(db, row.id, ids, context.now),
     db.prepare('INSERT INTO card_decks (character_id, cards, updated_at) VALUES (?, ?, ?) ON CONFLICT (character_id) DO NOTHING').bind(row.id, JSON.stringify(ids), context.now),
+    // The deck in play, the first saved deck (938).
+    keepInPlay(db, row.id),
   ]);
   return respond(context, session, { starter: true });
 }
 
-// POST /api/cards/deck { cards: [ids] }: the deck, twelve different cards of
-// the collection.
+// POST /api/cards/deck { cards: [ids], slot }: the deck, twelve different
+// cards of the collection, laid in its slot (938; in the slot in play when
+// none is named, as a page of before the slots asks) and played from now
+// on.
 export async function saveDeck(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireCards(row);
   const body = await readJson(context.request);
   const db = context.env.DB;
-  const collection = await cardCollection(db, row.id);
+  const [collection, playing] = await Promise.all([cardCollection(db, row.id), db.prepare('SELECT slot FROM card_decks WHERE character_id = ?').bind(row.id).first('slot')]);
+  const slot = body?.slot == null ? (playing ?? 1) : slotOf(body.slot);
   const block = deckBlock(body?.cards, new Set(collection.keys()), content());
   if (block) throw new ApiError(400, block.code, block.message);
-  await db
-    .prepare('INSERT INTO card_decks (character_id, cards, updated_at) VALUES (?, ?, ?) ON CONFLICT (character_id) DO UPDATE SET cards = excluded.cards, updated_at = excluded.updated_at')
-    .bind(row.id, JSON.stringify(body.cards), context.now)
-    .run();
-  return respond(context, session, { saved: true });
+  const cards = JSON.stringify(body.cards);
+  await db.batch([
+    keepInPlay(db, row.id),
+    db
+      .prepare('INSERT INTO card_deck_slots (character_id, slot, cards, updated_at) VALUES (?, ?, ?, ?) ON CONFLICT (character_id, slot) DO UPDATE SET cards = excluded.cards, updated_at = excluded.updated_at')
+      .bind(row.id, slot, cards, context.now),
+    playDeck(db, row.id, slot, cards, context.now),
+  ]);
+  return respond(context, session, { saved: true, slot });
+}
+
+// POST /api/cards/decks/use { slot }: the saved deck of the slot plays from
+// now on (938), a whole one only; one tap wherever the saved decks show
+// (the Salon's tab, a resident's table, the Arena's Karty, the live
+// matches' sheets). Its answer is the Salon's tab, as it is then.
+export async function useDeck(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireCards(row);
+  const body = await readJson(context.request);
+  const slot = slotOf(body?.slot);
+  const db = context.env.DB;
+  const [collection, saved, playing] = await Promise.all([
+    cardCollection(db, row.id),
+    db.prepare('SELECT cards FROM card_deck_slots WHERE character_id = ? AND slot = ?').bind(row.id, slot).first('cards'),
+    db.prepare('SELECT slot, cards FROM card_decks WHERE character_id = ?').bind(row.id).first(),
+  ]);
+  // The deck in play is its slot's (deckSlots).
+  const cards = playing?.slot === slot ? playing.cards : saved;
+  if (!cards) throw new ApiError(409, 'empty_slot', t('Talia {slot} jest pusta. Ułóż ją w Salonie Gier.', { slot }));
+  if (deckBlock(idsOf(cards), new Set(collection.keys()), content())) throw new ApiError(409, 'invalid_deck', t('Talia {slot} nie jest już cała. Ułóż ją od nowa w Salonie Gier.', { slot }));
+  await db.batch([keepInPlay(db, row.id), playDeck(db, row.id, slot, cards, context.now)]);
+  return respond(context, session, { used: slot });
+}
+
+// GET /api/cards/decks: the saved decks alone (deckSlots), for the live
+// matches' sheets (card-duel.js in the page).
+export async function getDecks(context) {
+  const { player } = await requirePlayer(context);
+  const { row } = player;
+  requireCards(row);
+  const db = context.env.DB;
+  return json({ decks: await deckSlots(db, row.id, await cardCollection(db, row.id)) });
 }
 
 // The server's own key for the card draws whose seed would otherwise come
@@ -662,4 +787,4 @@ export async function surrenderCards(context) {
 // The rows of the cards of the characters `which` (SQL after
 // `character_id`, with `binds`), removed with them (characters.js,
 // accounts.js).
-export const cardRemoval = (db, which, binds) => ['cards', 'card_decks', 'card_matches'].map((table) => db.prepare(`DELETE FROM ${table} WHERE character_id ${which}`).bind(...binds));
+export const cardRemoval = (db, which, binds) => ['cards', 'card_decks', 'card_deck_slots', 'card_matches'].map((table) => db.prepare(`DELETE FROM ${table} WHERE character_id ${which}`).bind(...binds));

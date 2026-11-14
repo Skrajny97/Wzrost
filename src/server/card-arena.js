@@ -54,7 +54,7 @@ import {
   turnBlock,
 } from '../engine/index.js';
 import { assertion, atomically } from './atomic.js';
-import { cardGameOf, heroOf, heroView } from './cards.js';
+import { cardCollection, cardGameOf, deckSlots, heroOf, heroView } from './cards.js';
 import { characterView, engineCharacter, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
@@ -286,7 +286,8 @@ function runningView(match) {
 
 // The Karty for the page: the character's card rating and place on this
 // week's table, the matches left today, its deck (its strength, its types,
-// whether it has taken Szczęsny's starter deck) and hero card, the rivals
+// whether it has taken Szczęsny's starter deck), its saved decks (938) and
+// hero card, the rivals
 // offered and the draws of others left today, its deck's last defences (at
 // a look), this week's table (the first table.size and its own place), the
 // rewards of the places and those waiting for "Odbierz", the season's end,
@@ -297,7 +298,7 @@ async function cardArenaView(db, player, record, rivals, now, defences = null) {
   const data = rules();
   const cards = content().cards;
   const week = arenaWeek(now, content());
-  const [[table, own, due], running, decks] = await Promise.all([
+  const [[table, own, due], running, decks, saved] = await Promise.all([
     db.batch([
       db
         .prepare(
@@ -312,6 +313,8 @@ async function cardArenaView(db, player, record, rivals, now, defences = null) {
     ]),
     runningMatch(db, row.id),
     decksOf(db, [row.id]),
+    // The saved decks, one played with a tap (938).
+    cardCollection(db, row.id).then((collection) => deckSlots(db, row.id, collection)),
   ]);
   const place = record.week === week.key ? own.results[0].place : null;
   const deck = decks.get(row.id) ?? null;
@@ -320,6 +323,7 @@ async function cardArenaView(db, player, record, rivals, now, defences = null) {
     place,
     matches: { left: cardMatchesLeft(record, now, content()), perDay: data.matchesPerDay, endsAt: arenaDay(now, content()).endsAt },
     deck: deck && { strength: deckStrength(deck, content()), types: deckTypeCounts(deck, content()) },
+    decks: saved,
     starter: cardGameOf(row, arenaDay(now, content()).key).starter,
     hero: heroView(row),
     rivals: rivals.map((rival) => rivalView(rival, record.rating)),

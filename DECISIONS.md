@@ -3252,6 +3252,21 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.28 (14.11.2026): zapisane talie kart (938)
+
+Do pięciu zapisanych talii na postać, wybieranych jednym stuknięciem w Salonie Gier, na Arenie („Karty”), przy stołach mieszkańców i w oknach wyzwań na żywo (zob. niżej, „Zapisane talie kart”). Migracja 0132. Nazywanie talii przyjdzie osobno, po makietach 939.
+
+## Zapisane talie kart (938, 14.11.2026)
+
+Autor 14.11.2026: „opcje zapisania kilku różnych talii kart do użytku za jednym kliknieciem w wiekszosci miejsc” i „działaj z taliami”. Makiety 938.1–938.6 autor przyjął 14.11 ok. 05:52 UTC (w grze od 0.3.28) i dodał: „przydałoby się dać opcję nazywania swoich talii” (makiety 939). Rozstrzygnięte najprościej:
+
+- Do pięciu talii na postać (`cards.savedDecks` w data/cards.json), każda w ponumerowanym miejscu (tabela `card_deck_slots`, migracja 0132). Bez nazw talii: numer, a pod nim siła talii, tak jak liczy ją Arena.
+- Talia w grze (`card_decks`) to zawsze talia jednego miejsca (`card_decks.slot`). Gra nią wszędzie: u Szczęsnego, przy stołach mieszkańców, na Arenie (ta talia też broni pod nieobecność gracza) i w partiach na żywo. Partia, która już trwa, gra talią z chwili swojego początku; partia na żywo bierze talię z chwili przyjęcia wyzwania.
+- Talia startowa od Szczęsnego jest pierwszą zapisaną talią; dotychczasowa talia każdej postaci przechodzi do miejsca 1.
+- W Salonie Gier („Twoja talia”) widać wszystkie pięć miejsc. Stuknięcie innej gotowej talii od razu nią gra. Stuknięcie pustego miejsca (albo talii, w której brakuje już karty) otwiera układanie talii w tym miejscu, przy pustym miejscu bez wybranych kart. „Ułóż talię N” zmienia talię, którą gracz gra.
+- Na Arenie („Karty”), przy stole mieszkańca i w oknach wyzwań na żywo (wysłanie i odpowiedź) widać tylko gotowe talie i tylko wtedy, gdy są co najmniej dwie. Stuknięcie zmienia talię; okno wyzwania z odliczaniem zostaje, a czas biegnie dalej.
+- Talii nie da się usunąć: miejsce zmienia się, układając w nim inną talię.
+
 ## Wersja 0.3.27 (14.11.2026): kolejny kod za kawę
 
 Autor 14.11.2026 poprosił o jednorazowy kod KAWA100 na 100 Punktów Systemu dla jednego gracza. Kod działa tylko dla jednej postaci (w danych skrót SHA-256 jej imienia zamiast imienia, bo repozytorium jest publiczne; `coffee-2026-11-d`), raz, do 14.12.2026 włącznie (brakujący szczegół: miesiąc, jak przy poprzednich kodach za kawę). Wcześniejszy kod KAWA100 innej postaci działa dalej osobno. Kod nie trafia do „Co nowego?”, bo jest dla jednej postaci; autor przekazuje go sam.
