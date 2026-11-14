@@ -109,13 +109,16 @@ describe('Czat', () => {
     // The label counts as what the chat shows, the whole message within
     // linkMaxLength signs.
     await age();
-    const { maxLength, linkMaxLength } = content.chat.rules;
+    // The admin writes up to adminMaxLength signs, a player maxLength.
+    const { maxLength, adminMaxLength, linkMaxLength } = content.chat.rules;
     const longAddress = `https://insightrpg.com/${'a'.repeat(400)}`;
-    assert.equal((await send(author, `${'b'.repeat(maxLength - 5)} [link](${longAddress})`)).status, 201);
+    assert.equal((await send(author, `${'b'.repeat(adminMaxLength - 5)} [link](${longAddress})`)).status, 201);
     await age();
-    assert.equal((await send(author, `${'b'.repeat(maxLength - 3)} [link](${longAddress})`)).data.error.code, 'too_long');
-    assert.equal((await send(author, `[link](https://insightrpg.com/${'a'.repeat(490)}) [link](https://insightrpg.com/${'a'.repeat(490)})`)).data.error.code, 'too_long');
-    assert.ok(linkMaxLength > maxLength);
+    assert.equal((await send(author, `${'b'.repeat(adminMaxLength - 3)} [link](${longAddress})`)).data.error.code, 'too_long');
+    const address = `https://insightrpg.com/${'a'.repeat(Math.ceil(linkMaxLength / 2))}`;
+    assert.equal((await send(author, `[link](${address}) [link](${address})`)).data.error.code, 'too_long');
+    assert.ok(linkMaxLength > adminMaxLength && adminMaxLength > maxLength);
+    assert.deepEqual([maxLength, adminMaxLength], [500, 1000]);
     // Rude words go to stars around the links and in the labels, the
     // addresses keep their letters.
     const masked = await send(author, 'KURWA [KURWA](https://insightrpg.com/kurwa)');
