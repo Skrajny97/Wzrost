@@ -257,32 +257,37 @@ const playDeck = (db, characterId, slot, cards, now) =>
     .prepare('INSERT INTO card_decks (character_id, cards, slot, updated_at) VALUES (?, ?, ?, ?) ON CONFLICT (character_id) DO UPDATE SET cards = excluded.cards, slot = excluded.slot, updated_at = excluded.updated_at')
     .bind(characterId, cards, slot, now);
 
-// The saved decks for the page: each slot with the cards of it the
-// character has (null when it is empty), whether they are a whole deck still
-// (deckBlock), and then its strength and its types as the Arena counts them
-// (900 A); `active`, the slot in play (null before any deck).
+// The saved decks for the page: each slot with its name (939; null without
+// one), the cards of it the character has (null when it is empty), whether
+// they are a whole deck still (deckBlock), and then its strength and its
+// types as the Arena counts them (900 A); `active`, the slot in play (null
+// before any deck).
 export async function deckSlots(db, characterId, collection) {
   const [saved, inPlay] = await db.batch([
-    db.prepare('SELECT slot, cards FROM card_deck_slots WHERE character_id = ?').bind(characterId),
+    db.prepare('SELECT slot, cards, name FROM card_deck_slots WHERE character_id = ?').bind(characterId),
     db.prepare('SELECT slot, cards FROM card_decks WHERE character_id = ?').bind(characterId),
   ]);
   const bySlot = new Map(saved.results.map((one) => [one.slot, idsOf(one.cards)]));
+  const names = new Map(saved.results.map((one) => [one.slot, one.name ?? null]));
   const playing = inPlay.results[0] ?? null;
   // The deck in play is its slot's, whatever that slot's row still says.
   if (playing) bySlot.set(playing.slot, idsOf(playing.cards));
   const owned = new Set(collection.keys());
   return {
     max: rules().savedDecks,
+    nameLength: rules().deckNameLength,
     active: playing?.slot ?? null,
     slots: Array.from({ length: rules().savedDecks }, (_, index) => {
       const slot = index + 1;
       const ids = bySlot.get(slot);
-      if (!ids) return { slot, cards: null, whole: false };
+      const name = names.get(slot) ?? null;
+      if (!ids) return { slot, name, cards: null, whole: false };
       const cards = [...new Set(ids.filter((id) => typeof id === 'string' && owned.has(id)))];
-      if (deckBlock(ids, owned, content())) return { slot, cards, whole: false };
+      if (deckBlock(ids, owned, content())) return { slot, name, cards, whole: false };
       const leveled = ids.map((id) => ({ id, level: cardLevel(collection.get(id), content()) }));
       return {
         slot,
+        name,
         cards,
         whole: true,
         strength: deckStrength(leveled, content()),
@@ -540,6 +545,40 @@ export async function useDeck(context) {
   if (deckBlock(idsOf(cards), new Set(collection.keys()), content())) throw new ApiError(409, 'invalid_deck', t('Talia {slot} nie jest już cała. Ułóż ją od nowa w Salonie Gier.', { slot }));
   await db.batch([keepInPlay(db, row.id), playDeck(db, row.id, slot, cards, context.now)]);
   return respond(context, session, { used: slot });
+}
+
+// A deck's name as its player typed it (939): without control and invisible
+// characters or extra spaces, cut to the length the data allows; null for
+// none, and the deck shows its number again.
+function deckName(value) {
+  if (value == null) return null;
+  if (typeof value !== 'string') throw new ApiError(400, 'invalid_name', 'Nazwa talii to tekst.');
+  const clean = value
+    .normalize('NFC')
+    .replace(/[\u0000-\u001f\u007f-\u009f\u00ad\u200b-\u200f\u2028-\u202e\u2060-\u206f\ufeff]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return [...clean].slice(0, rules().deckNameLength).join('').trim() || null;
+}
+
+// POST /api/cards/decks/name { slot, name }: the saved deck of the slot gets
+// its name (939), or loses it for an empty one; a slot without a deck has
+// none to name. The deck in play is kept in its slot first (keepInPlay), so
+// a deck laid before the slots can be named too.
+export async function nameDeck(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireCards(row);
+  const body = await readJson(context.request);
+  const slot = slotOf(body?.slot);
+  const name = deckName(body?.name);
+  const db = context.env.DB;
+  const [, named] = await db.batch([
+    keepInPlay(db, row.id),
+    db.prepare('UPDATE card_deck_slots SET name = ? WHERE character_id = ? AND slot = ?').bind(name, row.id, slot),
+  ]);
+  if (named.meta.changes !== 1) throw new ApiError(409, 'empty_slot', t('Talia {slot} jest pusta. Ułóż ją w Salonie Gier.', { slot }));
+  return respond(context, session, { named: slot });
 }
 
 // GET /api/cards/decks: the saved decks alone (deckSlots), for the live
