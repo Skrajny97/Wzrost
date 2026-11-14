@@ -31,10 +31,10 @@
 // moves (a short lunge, an arrow or a spell flying, the cards lit in the
 // blow's colour).
 
-import { itemSprite } from './art.js';
+import { itemSprite, monsterSprite } from './art.js';
 import { h } from './dom.js';
 import { t } from './i18n.js';
-import { ICE_LANCE, ICE_STAR } from './skill-fx.js';
+import { birdFrames, boltArt, curve, FANGS, FLICKER, HARPOON, ICE_LANCE, ICE_STAR, ORB_ARCS } from './skill-fx.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 // At most so many specks at once in an arena, so a phone keeps up.
@@ -58,7 +58,12 @@ const KINDS = {
   sacred: { glow: '#f2d675', specks: ['#fffbe0', '#f8e7a0', '#f2d675'] },
   shadow: { glow: '#a690e8', specks: ['#d9ccff', '#a690e8', '#5d4a8f'] },
   arcane: { glow: '#8fe3ef', specks: ['#ffffff', '#c8f4fa', '#8fe3ef'] },
+  // 961: the violet lightning of the Strzelec Burzy's line (skill-fx.js).
+  storm: { glow: '#c9b7ff', specks: ['#ffffff', '#ece6ff', '#b9a8ff'] },
 };
+// 961: the shots that go on through their target into the next
+// (Przebijający strzał, Strzał w serce, Mistrzowski strzał).
+const THROUGH = new Set(['pierce', 'heart', 'master']);
 const DUST = ['#b9ab92', '#8d806b', '#6f6453'];
 const HEAL = ['#e3f5a8', '#b6e388', '#7fd36b'];
 
@@ -186,7 +191,7 @@ function createSpecks(canvas, host, pace) {
     const left = clamp(1 - speck.age / speck.life, 0, 1);
     const { x, y } = speck;
     context.globalAlpha = Math.min(1, left * 1.6);
-    context.globalCompositeOperation = speck.shape === 'dust' || speck.shape === 'bubble' ? 'source-over' : 'lighter';
+    context.globalCompositeOperation = speck.shape === 'dust' || speck.shape === 'bubble' || speck.shape === 'drop' ? 'source-over' : 'lighter';
     context.fillStyle = speck.color;
     context.strokeStyle = speck.color;
     switch (speck.shape) {
@@ -241,6 +246,14 @@ function createSpecks(canvas, host, pace) {
         context.moveTo(x, y - s);
         context.lineTo(x, y + s);
         context.stroke();
+        break;
+      }
+      case 'drop': {
+        // 961: a drop of blood, round and solid.
+        context.globalAlpha = Math.min(1, left * 2.2);
+        context.beginPath();
+        context.arc(x, y, speck.size, 0, Math.PI * 2);
+        context.fill();
         break;
       }
       case 'mote': {
@@ -901,7 +914,9 @@ export function createFx(kit) {
       if (look?.impact && motion()) {
         specks.burst({ x: point.x, y: point.y, count: 10, colors: [look.color, '#ffffff'], angle, spread: 1.4, speed: [90, 210], life: [300, 560], size: [1.2, 2.4], shape: kind === 'fire' ? 'ember' : 'spark', drag: 3, gravity: kind === 'fire' ? -60 : 120 });
       }
-      knock(card, angle, strong ? 14 : heavy ? 10 : 6);
+      // 961: a harpoon's hit yanks its target toward the archer instead.
+      if (blow.yank && motion()) blow.yank(card);
+      else knock(card, angle, strong ? 14 : heavy ? 10 : 6);
       if (heavy) quake(strong || blow.killing ? 7 : 4);
     };
     if (blow.stop) later(blow.stop).then(react);
@@ -1260,6 +1275,18 @@ export function createFx(kit) {
     const settle = async () => {
       if (stop) await later(stop);
     };
+    // 961: a wolf leaps at its foe and bites; a bird dives at it out of the
+    // sky; the ball of lightning over the archer strikes; a shot that went
+    // on through its last target flies on into this one.
+    if (motion()) {
+      if (style.orb === 'bite') return bite(from, to, a, b, onImpact, settle, id);
+      if (style.orb === 'falcon' || style.orb === 'eagle') {
+        const picture = monsterSprite(style.orb);
+        if (picture) return dive(style.orb, picture, from, to, a, onImpact, settle, id);
+      }
+      if (style.orb === 'thunder-orb') return zap(from, b, style.color, onImpact, settle, id);
+      if (THROUGH.has(style.orb) && style.blow?.event?.pierced) return onward(actor, a, b, style, onImpact, settle, id);
+    }
     if (style.teleport && motion()) {
       playSound('swing');
       // 953: out of the shadows, the weapon thrusts by the target.
@@ -1345,14 +1372,16 @@ export function createFx(kit) {
       // Drawn back (a bow's string, a spell gathering), then let go: the
       // card's recoil plays on while the projectile flies.
       if (magic) tint(from, color, 0.45, 300);
+      // (961: the Mistrzowski strzał draws its bowstring to the ear.)
+      const long = style.orb === 'master';
       await animate(
         from,
         [
           { transform: 'translate(0px, 0px) scale(1)', easing: 'ease-out' },
-          { transform: `translate(${(-ux * 5).toFixed(1)}px, ${(-uy * 5).toFixed(1)}px) scale(1.06)`, offset: 0.72, easing: 'ease-in' },
+          { transform: `translate(${(-ux * (long ? 10 : 5)).toFixed(1)}px, ${(-uy * (long ? 10 : 5)).toFixed(1)}px) scale(${long ? 1.1 : 1.06})`, offset: long ? 0.85 : 0.72, easing: 'ease-in' },
           { transform: `translate(${(ux * 3).toFixed(1)}px, ${(uy * 3).toFixed(1)}px) scale(1.02)` },
         ],
-        { duration: 200 },
+        { duration: long ? 460 : 200 },
       );
       if (id !== run()) return;
       animate(
@@ -1367,6 +1396,29 @@ export function createFx(kit) {
     } else {
       await animate(from, [{ transform: 'scale(1)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }], { duration: 160 });
       if (id !== run()) return;
+    }
+    // 961: a harpoon on its rope; the Mistrzowski strzał's blazing arrow;
+    // the Strzał z ukrycia's arrow out of hiding.
+    if (style.orb === 'harpoon' && motion()) {
+      const line = await harpoonShot(a, b, from, to, style.color ?? '#b07d4f');
+      if (id !== run()) return;
+      const hit = Boolean(style.blow) && !style.blow.missed;
+      if (hit) style.blow.yank = line.yank;
+      onImpact();
+      if (!hit) line.drop();
+      await settle();
+      await later(300);
+      if (!line.used) line.drop();
+      return;
+    }
+    if ((style.orb === 'master' || style.orb === 'ambush') && motion()) {
+      await (style.orb === 'master' ? masterArrow(a, b, color) : shadeArrow(a, b));
+      if (id !== run()) return;
+      if (style.orb === 'master') shotFrom = { actor: actor.id, point: b };
+      onImpact();
+      await settle();
+      await later(300);
+      return;
     }
     // A fireball (the Mag's Kula ognia and the skills drawn like it, 956):
     // a burning orb in an arc.
@@ -1391,7 +1443,8 @@ export function createFx(kit) {
     }
     const tail = motion();
     const bolt = h('span', {
-      class: ['projectile', `projectile--${magic ? 'magic' : 'arrow'}`, style.big && 'projectile--big', style.glow && 'projectile--glow', tail && 'projectile--tail'].filter(Boolean).join(' '),
+      // (961: a shot that goes through its target stays an arrow, big or not.)
+      class: ['projectile', `projectile--${magic ? 'magic' : 'arrow'}`, style.big && !THROUGH.has(style.orb) && 'projectile--big', style.glow && 'projectile--glow', tail && 'projectile--tail'].filter(Boolean).join(' '),
     });
     if (magic || style.color) bolt.style.setProperty('--fx', color);
     fx.append(bolt);
@@ -1425,6 +1478,7 @@ export function createFx(kit) {
     );
     bolt.remove();
     if (id !== run()) return;
+    if (THROUGH.has(style.orb)) shotFrom = { actor: actor.id, point: b };
     onImpact();
     await settle();
     await later(300);
@@ -1514,6 +1568,355 @@ export function createFx(kit) {
     specks.trail({ from: start, to: b, duration: flight, colors: ['#ffffff', '#dff4ff', '#8fd3ff'], rate: 90, sizes: [1.2, 2.4], life: [220, 420], shape: 'mote' });
     await animate(lance, [{ transform: point(start), opacity: 1 }, { transform: point(b), opacity: 1 }], { duration: flight, easing: 'cubic-bezier(0.5, 0, 0.9, 0.5)' });
     lance.remove();
+  }
+
+  // ——— 961: the evolved Łucznik's blows ———
+
+  // Where the last shot that goes on through its targets went in: the next
+  // blow of its pierce flies on from there.
+  let shotFrom = null; // { actor, point }
+
+  // The box of a card's picture (its upper half when it has none).
+  function pictureOf(card) {
+    const art = card.querySelector('.unit-art');
+    if (art) return boxOf(art);
+    const box = boxOf(card);
+    return { x: box.x, y: box.y, width: box.width, height: box.height * 0.5 };
+  }
+
+  // A wolf (a summon's card) crouches and leaps at its foe, its jaws
+  // snapping shut on it as it lands, and springs back.
+  async function bite(from, to, a, b, onImpact, settle, id) {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const distance = Math.hypot(dx, dy) || 1;
+    const ux = dx / distance;
+    const uy = dy / distance;
+    const hit = { x: dx * 0.5, y: dy * 0.5 };
+    const crouch = { x: -ux * 7, y: -uy * 7 };
+    const pose = (point, scale) => `translate(${point.x.toFixed(1)}px, ${point.y.toFixed(1)}px) scale(${scale})`;
+    from.classList.add('unit--acting');
+    playSound('swing');
+    const leap = 240;
+    const out = track(
+      from.animate(
+        [
+          { transform: pose({ x: 0, y: 0 }, 1), easing: EASE_WINDUP },
+          { transform: pose(crouch, 0.95), offset: 0.38, easing: 'cubic-bezier(0.45, 0, 0.75, 0.7)' },
+          { transform: pose(hit, 1.06) },
+        ],
+        { duration: leap / pace(), easing: 'linear', fill: 'forwards' },
+      ),
+    );
+    // The jaws open over the foe as the wolf flies at it, and shut as it
+    // lands.
+    later(leap - 105).then(() => {
+      if (id !== run()) return;
+      const art = pictureOf(to);
+      jaws({ x: art.x + art.width / 2, y: art.y + art.height * 0.55 }, to);
+    });
+    await out.finished.catch(() => {});
+    if (id !== run()) {
+      out.cancel();
+      return;
+    }
+    onImpact();
+    await settle();
+    if (id !== run()) {
+      out.cancel();
+      return;
+    }
+    await animate(
+      from,
+      [
+        { transform: pose(hit, 1.06), easing: 'ease-out' },
+        { transform: pose({ x: hit.x + ux * 5, y: hit.y + uy * 5 }, 1.04), offset: 0.18 },
+        { transform: pose({ x: 0, y: 0 }, 1) },
+      ],
+      { duration: 320 },
+    ).then(() => out.cancel());
+    if (id === run()) from.classList.remove('unit--acting');
+    await later(160);
+  }
+
+  // A wolf's jaws over a point: open, then shut.
+  function jaws(point, card) {
+    const size = Math.round(reachOf(card) * 0.8);
+    const art = mark('fx-bite', point, { '--size': `${size}px` });
+    art.innerHTML = FANGS;
+    const [upper, lower] = art.querySelectorAll('.fx-jaw');
+    animate(upper, [{ transform: 'translate(0px, -16px)' }, { transform: 'translate(0px, -16px)', offset: 0.4 }, { transform: 'translate(0px, 0px)' }], { duration: 115, easing: 'cubic-bezier(0.5, 0, 0.9, 0.5)', fill: 'both' });
+    animate(lower, [{ transform: 'translate(0px, 16px)' }, { transform: 'translate(0px, 16px)', offset: 0.4 }, { transform: 'translate(0px, 0px)' }], { duration: 115, easing: 'cubic-bezier(0.5, 0, 0.9, 0.5)', fill: 'both' });
+    animate(
+      art,
+      [
+        { transform: 'translate(-50%, -50%) scale(1.15)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.08 },
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.6 },
+        { transform: 'translate(-50%, -50%) scale(1.06)', opacity: 0 },
+      ],
+      { duration: 560, easing: 'ease-out' },
+    ).then(() => art.remove());
+    later(115).then(() => {
+      if (art.isConnected) flare(point, '#fff1dc', size * 0.45, 240);
+    });
+  }
+
+  // A bird (the Sokół's falcon, the Szpon orła's eagle) dives out of the
+  // sky at its target's head, talons first, and flies off after the blow.
+  async function dive(kind, picture, from, to, a, onImpact, settle, id) {
+    const eagle = kind === 'eagle';
+    const art = pictureOf(to);
+    const figure = Math.min(art.width, art.height);
+    const size = Math.round(figure * (eagle ? 0.95 : 0.66));
+    const head = { x: art.x + art.width / 2, y: art.y + art.height * (eagle ? 0.4 : 0.3) };
+    const width = stage.clientWidth;
+    // From the sky on the archer's side.
+    const side = a.x >= head.x ? 1 : -1;
+    const reach = Math.min(width * 0.45, figure * (eagle ? 2.3 : 1.9));
+    const start = { x: head.x + side * reach, y: -size * 0.7 };
+    const bend = { x: head.x + side * reach * 0.3, y: head.y - figure * 0.95 };
+    const gone = { x: head.x - side * reach * 0.85, y: -size * 0.7 };
+    const rise = { x: head.x - side * figure * 0.45, y: head.y - figure * 0.15 };
+    const bird = mark('fx-bird', { x: 0, y: 0 }, { '--size': `${size}px` });
+    bird.append(picture);
+    playSound('swing');
+    const steps = 12;
+    const down = Array.from({ length: steps + 1 }, (_, step) => curve(start, bend, head, (step / steps) ** 1.3));
+    await animate(bird, birdFrames(down, down.map((_, step) => 0.8 + (step / steps) * 0.26)), { duration: eagle ? 400 : 330, easing: 'linear' });
+    if (id !== run()) return;
+    onImpact();
+    await settle();
+    if (id !== run()) return;
+    const up = Array.from({ length: steps + 1 }, (_, step) => curve(head, rise, gone, step / steps));
+    await animate(bird, birdFrames(up, up.map((_, step) => 1.06 - (step / steps) * 0.24)), { duration: eagle ? 440 : 380, easing: 'cubic-bezier(0.3, 0, 0.6, 1)' });
+    bird.remove();
+    await later(120);
+  }
+
+  // The Kula piorunów strikes: the ball of lightning flares up over the
+  // archer's head (where skill-fx.js orbAt() hangs it) and a bolt leaps
+  // from it to the target.
+  async function zap(from, b, color, onImpact, settle, id) {
+    const box = boxOf(from);
+    const art = pictureOf(from);
+    const figure = Math.min(art.width, art.height);
+    const inward = box.x + box.width / 2 < stage.clientWidth / 2 ? 1 : -1;
+    const point = { x: art.x + art.width / 2 + inward * figure * 0.34, y: art.y + figure * 0.27 };
+    const size = Math.round(Math.max(16, figure * 0.3));
+    const ball = mark('fx-thunderorb', point, { '--fx': color, '--size': `${size}px` });
+    ball.innerHTML = ORB_ARCS;
+    playSound('magic');
+    const at = (scale) => `translate(-50%, -50%) scale(${scale})`;
+    animate(
+      ball,
+      [
+        { transform: at(0.2), opacity: 0 },
+        { transform: at(1.1), opacity: 1, offset: 0.24 },
+        { transform: at(1), opacity: 1, offset: 0.33 },
+        { transform: at(1.35), opacity: 1, offset: 0.4 },
+        { transform: at(0.95), opacity: 1, offset: 0.62 },
+        { transform: at(0.4), opacity: 0 },
+      ],
+      { duration: 720, easing: 'ease-out' },
+    ).then(() => ball.remove());
+    specks.burst({ x: point.x, y: point.y, count: 6, colors: KINDS.storm.specks, speed: [40, 120], life: [200, 360], size: [1, 1.8], shape: 'spark', drag: 3 });
+    await later(280);
+    if (id !== run()) return;
+    const made = boltArt(point, b, { jag: 1, forks: 1 });
+    const bolt = mark('fx-zap', { x: made.x, y: made.y }, { '--fx': color });
+    bolt.innerHTML = made.html;
+    animate(bolt, FLICKER, { duration: 400 }).then(() => bolt.remove());
+    onImpact();
+    await settle();
+    await later(260);
+  }
+
+  // A shot that went through its last target flies on into this one, from
+  // where that target stood, without the bow drawn again.
+  async function onward(actor, a, b, style, onImpact, settle, id) {
+    const start = shotFrom?.actor === actor.id ? shotFrom.point : a;
+    const dx = b.x - start.x;
+    const dy = b.y - start.y;
+    const distance = Math.hypot(dx, dy) || 1;
+    const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+    const master = style.orb === 'master';
+    const arrow = h('span', { class: master ? 'fx-masterarrow' : 'projectile projectile--arrow projectile--glow projectile--tail', 'aria-hidden': 'true' });
+    arrow.style.setProperty('--fx', style.color);
+    fx.append(arrow);
+    const flight = Math.round(Math.max(110, Math.min(200, distance * 0.6)));
+    const streak = mark(`fx-trail${master ? ' fx-trail--master' : ''}`, start, { '--fx': style.color });
+    streak.style.width = `${Math.round(distance)}px`;
+    const along = `translate(0px, -50%) rotate(${angle.toFixed(1)}deg)`;
+    animate(
+      streak,
+      [
+        { transform: `${along} scaleX(0)`, opacity: 0.85 },
+        { transform: `${along} scaleX(1)`, opacity: 0.85, offset: flight / (flight + 300) },
+        { transform: `${along} scaleX(1)`, opacity: 0 },
+      ],
+      { duration: flight + 300 },
+    ).then(() => streak.remove());
+    await animate(
+      arrow,
+      [
+        { transform: `translate(${start.x}px, ${start.y}px) rotate(${angle}deg)`, opacity: 1 },
+        { transform: `translate(${b.x}px, ${b.y}px) rotate(${angle}deg)`, opacity: 1 },
+      ],
+      { duration: flight, easing: 'linear' },
+    );
+    arrow.remove();
+    if (id !== run()) return;
+    shotFrom = { actor: actor.id, point: b };
+    onImpact();
+    await settle();
+    await later(220);
+  }
+
+  // The Mistrzowski strzał's arrow: long and blazing, fast, leaving a wide
+  // trail of light and sparks.
+  async function masterArrow(a, b, color) {
+    const distance = Math.hypot(b.x - a.x, b.y - a.y);
+    const angle = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
+    const arrow = h('span', { class: 'fx-masterarrow', 'aria-hidden': 'true' });
+    arrow.style.setProperty('--fx', color);
+    fx.append(arrow);
+    const flight = 180;
+    const streak = mark('fx-trail fx-trail--master', a, { '--fx': color });
+    streak.style.width = `${Math.round(distance)}px`;
+    const along = `translate(0px, -50%) rotate(${angle.toFixed(1)}deg)`;
+    animate(
+      streak,
+      [
+        { transform: `${along} scaleX(0)`, opacity: 0.95, easing: 'ease-in' },
+        { transform: `${along} scaleX(1)`, opacity: 0.95, offset: flight / (flight + 460), easing: 'ease-out' },
+        { transform: `${along} scaleX(1)`, opacity: 0 },
+      ],
+      { duration: flight + 460 },
+    ).then(() => streak.remove());
+    specks.trail({ from: a, to: b, duration: flight, colors: [color, '#fff1c9', '#ffffff'], rate: 140, sizes: [1.2, 2.6], life: [200, 420], shape: 'spark' });
+    await animate(
+      arrow,
+      [
+        { transform: `translate(${a.x}px, ${a.y}px) rotate(${angle}deg) scale(0.7)`, opacity: 0 },
+        { opacity: 1, offset: 0.12 },
+        { transform: `translate(${b.x}px, ${b.y}px) rotate(${angle}deg) scale(1)`, opacity: 1 },
+      ],
+      { duration: flight, easing: 'ease-in' },
+    );
+    arrow.remove();
+  }
+
+  // The Strzał z ukrycia's arrow: dark, unseen along its way until it is
+  // almost on its target.
+  async function shadeArrow(a, b) {
+    const angle = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
+    const arrow = h('span', { class: 'projectile projectile--arrow projectile--shade', 'aria-hidden': 'true' });
+    fx.append(arrow);
+    await animate(
+      arrow,
+      [
+        { transform: `translate(${a.x}px, ${a.y}px) rotate(${angle}deg) scale(0.9)`, opacity: 0 },
+        { opacity: 0, offset: 0.5 },
+        { opacity: 1, offset: 0.8 },
+        { transform: `translate(${b.x}px, ${b.y}px) rotate(${angle}deg) scale(1)`, opacity: 1 },
+      ],
+      { duration: 260, easing: 'ease-in' },
+    );
+    arrow.remove();
+  }
+
+  // The Harpun: the harpoon flies on its rope, paid out behind it from the
+  // edge of the archer's card (so it never crosses its picture), and lodges
+  // in its target. A hit yanks the target toward the archer along the rope
+  // (yank, from the blow's hit()); a miss lets it fall (drop).
+  async function harpoonShot(a, b, from, to, color) {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const distance = Math.hypot(dx, dy) || 1;
+    const ux = dx / distance;
+    const uy = dy / distance;
+    const deg = (Math.atan2(dy, dx) * 180) / Math.PI;
+    const length = Math.round(Math.min(80, Math.max(50, distance * 0.32)));
+    // Its point stops a little short of the target's middle, in its body.
+    const sink = Math.min(12, to.offsetWidth * 0.1);
+    const tip = { x: b.x - ux * sink, y: b.y - uy * sink };
+    const edge = Math.min(from.offsetWidth / 2 / Math.max(Math.abs(ux), 0.001), from.offsetHeight / 2 / Math.max(Math.abs(uy), 0.001)) + 2;
+    const exit = { x: a.x + ux * edge, y: a.y + uy * edge };
+    // The rope's length with the harpoon in its target.
+    const full = Math.max(1, distance - sink - length - edge);
+    const harpoon = mark('fx-harpoon', { x: 0, y: 0 }, { '--fx': color });
+    harpoon.innerHTML = HARPOON;
+    harpoon.style.width = `${length}px`;
+    const rope = mark('fx-harpoon-rope', exit);
+    rope.style.width = `${full.toFixed(1)}px`;
+    // The harpoon by its point, `back` along the rope from its stop.
+    const held = (back = 0, drop = 0, turn = 0) => `translate(${(tip.x - ux * back).toFixed(1)}px, ${(tip.y - uy * back + drop).toFixed(1)}px) rotate(${(deg + turn).toFixed(2)}deg) translate(-100%, -50%)`;
+    const roped = (shorter = 0, turn = 0, thick = 1) => `rotate(${(deg + turn).toFixed(2)}deg) scale(${Math.max(0, (full - shorter) / full).toFixed(4)}, ${thick})`;
+    // In flight: its point from a harpoon's length ahead of the archer's
+    // middle to its stop, speeding up, the rope's end at its tail.
+    const travel = distance - sink - length;
+    const steps = 10;
+    const flight = 300;
+    const frames = [];
+    const ropeFrames = [];
+    for (let step = 0; step <= steps; step++) {
+      const along = length + travel * (step / steps) ** 1.6;
+      frames.push({ transform: held(length + travel - along) });
+      ropeFrames.push({ transform: roped(full - Math.max(0, along - length - edge)) });
+    }
+    playSound('shot');
+    animate(rope, ropeFrames, { duration: flight, easing: 'linear', fill: 'forwards' });
+    await animate(harpoon, frames, { duration: flight, easing: 'linear', fill: 'forwards' });
+    const line = {
+      used: false,
+      yank(card) {
+        if (line.used) return;
+        line.used = true;
+        const box = boxOf(card);
+        // Along the rope, as far as the stage lets it.
+        let pull = 20;
+        if (ux > 0) pull = Math.min(pull, (box.x - 2) / ux);
+        if (ux < 0) pull = Math.min(pull, (stage.clientWidth - 2 - box.x - box.width) / -ux);
+        if (uy > 0) pull = Math.min(pull, (box.y - 2) / uy);
+        if (uy < 0) pull = Math.min(pull, (stage.clientHeight - 2 - box.y - box.height) / -uy);
+        pull = Math.max(0, pull);
+        const px = -ux * pull;
+        const py = -uy * pull;
+        const moves = [0, 1, 0.88, 0];
+        const offsets = [0, 0.14, 0.42, 1];
+        animate(
+          card,
+          moves.map((share, index) => ({ transform: `translate(${(px * share).toFixed(1)}px, ${(py * share).toFixed(1)}px)`, offset: offsets[index] })),
+          { duration: 640, easing: 'ease-in-out' },
+        );
+        animate(
+          harpoon,
+          [...moves.map((share, index) => ({ transform: held(pull * share), opacity: 1, offset: offsets[index] * 0.8 })), { transform: held(0), opacity: 0, offset: 1 }],
+          { duration: 800, easing: 'ease-in-out', fill: 'forwards' },
+        ).then(() => harpoon.remove());
+        animate(
+          rope,
+          [
+            { transform: roped(0), opacity: 1 },
+            { transform: roped(pull, 0, 1.7), opacity: 1, offset: 0.11 },
+            { transform: roped(pull, 0, 1), opacity: 1, offset: 0.2 },
+            { transform: roped(pull * 0.88), opacity: 1, offset: 0.34 },
+            { transform: roped(0, 6), opacity: 0 },
+          ],
+          { duration: 800, easing: 'ease-in-out', fill: 'forwards' },
+        ).then(() => rope.remove());
+        // The archer leans back as it pulls.
+        animate(from, [{ transform: 'translate(0px, 0px)' }, { transform: `translate(${(-ux * 7).toFixed(1)}px, ${(-uy * 7).toFixed(1)}px) rotate(${ux > 0 ? -2 : 2}deg)`, offset: 0.18 }, { transform: 'translate(0px, 0px)' }], { duration: 520, easing: 'ease-out' });
+      },
+      drop() {
+        if (line.used) return;
+        line.used = true;
+        animate(harpoon, [{ transform: held(0), opacity: 1 }, { transform: held(-16, 22, 28), opacity: 0 }], { duration: 460, easing: 'ease-in', fill: 'forwards' }).then(() => harpoon.remove());
+        animate(rope, [{ transform: roped(0), opacity: 1 }, { transform: roped(full * 0.08, 7), opacity: 0 }], { duration: 420, easing: 'ease-in', fill: 'forwards' }).then(() => rope.remove());
+      },
+    };
+    return line;
   }
 
   // Before a skill's own blow, its light gathers on its user.
@@ -1619,6 +2022,7 @@ export function createFx(kit) {
   }
 
   function cancel() {
+    shotFrom = null;
     specks.clear();
     lastNumber.clear();
     showing.clear();

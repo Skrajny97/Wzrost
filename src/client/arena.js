@@ -613,7 +613,9 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
         return;
       }
       if (event.counter) skills.callout(actor.id, t('Kontra'), '#a690e8');
-      if (look) {
+      // (961: a shot that goes on through its target into the next is not
+      // aimed again there.)
+      if (look && !(event.pierced && look.through)) {
         skills.before(acting);
         fxs.charge(actor.id, look.color);
       }
