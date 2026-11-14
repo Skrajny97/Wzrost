@@ -224,6 +224,23 @@ describe('Społeczność: Ranking, Znajomi i Upominek', () => {
     assert.equal(await listOf(ala), max);
   });
 
+  // The author, 14.11.2026: „Niech nie da się dodawać do znajomych kogoś
+  // kto ma pełną listę”.
+  test('no invitation goes to a character whose list of friends is full', async () => {
+    const { max } = content.community.friends;
+    const ola = await idOf('Ola');
+    const filler = await others(max);
+    for (const id of filler) await friendRow(ola, id, 0);
+    const refused = await call('POST', '/api/friends/invite', { cookie: players.ala, body: { name: 'Ola' } });
+    assert.equal(refused.status, 409);
+    assert.equal(refused.data.error.code, 'full');
+    assert.equal(refused.data.error.message, `Ola ma już ${max} znajomych.`);
+    assert.deepEqual((await friends(players.ola)).incoming, []);
+    // A place free on her list: the invitation goes.
+    await (await db()).prepare('DELETE FROM friends WHERE character_id = ? AND friend_id = ?').bind(ola, filler[0]).run();
+    assert.equal((await call('POST', '/api/friends/invite', { cookie: players.ala, body: { name: 'Ola' } })).status, 200);
+  });
+
   test('invitations accepted at the same moment never take a list past the cap; one accepted twice is accepted', async () => {
     const { max } = content.community.friends;
     const database = await db();
