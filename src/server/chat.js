@@ -318,8 +318,13 @@ export async function requireChatter(context) {
     throw new ApiError(403, 'locked', `Społeczność odblokujesz na poziomie postaci ${content().unlocksById.community.level}.`);
   }
   const account = accounts.results[0];
+  // The account and the character in play are seen (the character's own
+  // time: a guild's leader away for days hands the guild over, guilds.js).
   if (!(context.now - (account.seen_at ?? 0) < SEEN_EVERY)) {
-    await db.prepare('UPDATE users SET seen_at = ? WHERE id = ?').bind(context.now, session.userId).run();
+    await db.batch([
+      db.prepare('UPDATE users SET seen_at = ? WHERE id = ?').bind(context.now, session.userId),
+      db.prepare('UPDATE characters SET seen_at = ? WHERE id = ?').bind(context.now, character.id),
+    ]);
   }
   return { session, character, account, role: chatRole(context.env, account), db };
 }

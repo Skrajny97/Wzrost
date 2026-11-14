@@ -213,6 +213,74 @@ describe('the Gildia through the API', () => {
     assert.equal((await as('druh', 'POST', '/api/guild/invite', { name: 'Trzeci' })).data.error.code, 'full');
   });
 
+  // The author, 14.11.2026: "Spraw by 4-dniowa nieobecność Lidera Gildii
+  // przekazywała dowodzenie jednemu z zastępców, a samemu Liderowi nadawała
+  // rolę Zastępcy".
+  test('a leader away for days hands the guild to the deputy seen last and becomes a deputy', async () => {
+    await player('trzeci', 'Trzeci');
+    await as('mistrz', 'POST', '/api/guild/found', { name: 'Leśni Bracia', tag: 'LB' });
+    const guildId = (await as('mistrz', 'GET', '/api/guild')).data.guild.id;
+    for (const [login, name] of [
+      ['druh', 'Druh'],
+      ['trzeci', 'Trzeci'],
+    ]) {
+      await as('mistrz', 'POST', '/api/guild/invite', { name });
+      await as(login, 'POST', '/api/guild/accept', { guildId });
+    }
+    const database = await db();
+    const day = 24 * 60 * 60 * 1000;
+    const { days } = content.guilds.leaderAway;
+    const seen = (name, ago) => database.prepare('UPDATE characters SET seen_at = ? WHERE name = ?').bind(Date.now() - ago, name).run();
+    const roles = async (login) => (await as(login, 'GET', '/api/guild')).data.guild.members.map((member) => [member.name, member.role]);
+    const said = async () => (await database.prepare('SELECT text FROM chat_messages WHERE channel = ? AND system = 1 ORDER BY id').bind(`guild:${guildId}`).all()).results.map((row) => row.text);
+    // Without a deputy nothing changes, however long the leader is away.
+    await seen('Mistrz', (days + 6) * day);
+    assert.deepEqual(await roles('druh'), [
+      ['Mistrz', 'leader'],
+      ['Druh', 'member'],
+      ['Trzeci', 'member'],
+    ]);
+    await seen('Mistrz', 0);
+    for (const name of ['Druh', 'Trzeci']) await as('mistrz', 'POST', '/api/guild/role', { characterId: await idOf(name), role: 'deputy' });
+    // Away for less than the days: still the leader.
+    await seen('Mistrz', (days - 1) * day);
+    assert.equal((await roles('druh'))[0][0], 'Mistrz');
+    // Away for the days: the deputy seen last within them leads, not the
+    // one away as long as the leader.
+    await database.prepare("UPDATE users SET language = 'en' WHERE login = 'druh'").run();
+    await seen('Mistrz', days * day + 1000);
+    await seen('Druh', (days + 1) * day);
+    await seen('Trzeci', day);
+    const viewed = await as('druh', 'GET', '/api/guild');
+    assert.equal(viewed.data.guild.leaderAwayDays, days);
+    assert.deepEqual(
+      viewed.data.guild.members.map((member) => [member.name, member.role]),
+      [
+        ['Trzeci', 'leader'],
+        ['Mistrz', 'deputy'],
+        ['Druh', 'deputy'],
+      ],
+    );
+    // The System says so in the guild's channel, in each language of its
+    // members, once.
+    assert.deepEqual(await said(), [
+      `Mistrz nie zagląda do gry od ${days} dni, więc gildię prowadzi teraz Trzeci. Mistrz zostaje zastępcą.`,
+      `Mistrz hasn't played for ${days} days, so Trzeci now leads the guild. Mistrz stays on as a deputy.`,
+    ]);
+    await as('mistrz', 'GET', '/api/guild');
+    assert.equal((await said()).length, 2);
+    // A leader away with every deputy away too: nothing changes.
+    await seen('Trzeci', (days + 2) * day);
+    await seen('Mistrz', (days + 3) * day);
+    assert.equal((await roles('druh'))[0][0], 'Trzeci');
+    // Playing the character marks it seen (the chat's poll).
+    await as('druh', 'POST', '/api/chat/rules');
+    await database.prepare("UPDATE users SET seen_at = 0 WHERE login = 'druh'").run();
+    await as('druh', 'GET', '/api/chat?channel=guild');
+    const { seen_at: at } = await database.prepare("SELECT seen_at FROM characters WHERE name = 'Druh'").first();
+    assert.ok(Date.now() - at < 60000, `${at}`);
+  });
+
   test('the guild\'s channel: its members read and write there, nobody else', async () => {
     await as('mistrz', 'POST', '/api/guild/found', { name: 'Leśni Bracia', tag: 'LB' });
     const guildId = (await as('mistrz', 'GET', '/api/guild')).data.guild.id;

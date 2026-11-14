@@ -776,5 +776,9 @@
     "howWar": "Wojna gildii: {warWon} za wygraną wojnę, po równo dla wszystkich, którzy w niej walczyli.",
     "earlier": "Wcześniejsze wpłaty, zanim gra zaczęła zapisywać, kto wpłacił: {amounts}.",
     "list": { "comma": ", ", "and": " i " }
+  },
+  "leaderAway": {
+    "$comment": "Lider, który nie zagląda do gry swoją postacią przez tyle dni, oddaje gildię zastępcy, który grał ostatnio w tych dniach, i sam zostaje zastępcą (autor, 14.11.2026: „Spraw by 4-dniowa nieobecność Lidera Gildii przekazywała dowodzenie jednemu z zastępców, a samemu Liderowi nadawała rolę Zastępcy”). Sprawdzane, gdy ktoś z gildii otworzy jej stronę; bez obecnego zastępcy nic się nie zmienia.",
+    "days": 4
   }
 }
