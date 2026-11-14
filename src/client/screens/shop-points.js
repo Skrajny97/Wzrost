@@ -291,9 +291,12 @@ export function mountShopPoints(container) {
       let response;
       try {
         response = await buyInPlay(sku);
-      } catch {
+      } catch (error) {
         forgetPlayOrder();
         await call('POST', '/api/payments/cancel', { orderId }).catch(() => {});
+        // The player's own closing of the window says nothing; any other
+        // refusal (the window did not open) asks for another tap.
+        if (/** @type {any} */ (error)?.name !== 'AbortError') toast(t('Okno zakupu Google Play się nie otworzyło. Spróbuj jeszcze raz.'));
         await load();
         return;
       }

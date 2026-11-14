@@ -8,10 +8,17 @@
 
 export const PLAY_METHOD = 'https://play.google.com/billing';
 
-// The Digital Goods service, or null outside the app (asked once).
+// The Digital Goods service, or null outside the app (asked once). Asking
+// for it throws where it is not there, so a throw is a null too.
 let service = null;
 export function playBilling() {
-  service ??= typeof window.getDigitalGoodsService === 'function' ? window.getDigitalGoodsService(PLAY_METHOD).catch(() => null) : Promise.resolve(null);
+  if (!service) {
+    try {
+      service = typeof window.getDigitalGoodsService === 'function' ? Promise.resolve(window.getDigitalGoodsService(PLAY_METHOD)).catch(() => null) : Promise.resolve(null);
+    } catch {
+      service = Promise.resolve(null);
+    }
+  }
   return service;
 }
 
@@ -32,7 +39,8 @@ export async function playPurchases() {
 }
 
 // Google Play's window for a product: its answer, whose details hold the
-// purchase's token; rejected when the player closes it.
+// purchase's token (details.purchaseToken; details.token is the old name);
+// rejected with an AbortError when the player closes it.
 export function buyInPlay(sku) {
   // A total the Payment Request API needs; Google's window shows its own.
   const total = { label: 'Total', amount: { currency: 'PLN', value: '0' } };
