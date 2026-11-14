@@ -10,9 +10,9 @@ import {
   bagCapacity,
   campBonus,
   campLevels,
-  gatherHerbs,
   gatheringMinutes,
   gatheringReport,
+  herbHarvest,
   herbSlots,
   isUnlocked,
   playerCombatant,
@@ -222,9 +222,10 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
   // Herbs the data no longer has are left out.
   const herbIds = (JSON.parse(activity.options ?? '{}').herbs ?? []).filter((id) => content().herbsById[id]);
   const more = JSON.parse(activity.options ?? '{}').more ?? 0;
-  // The week it began in: its share of the herbs (weeks.js).
+  // The week it began in: its share of the herbs (weeks.js). Past
+  // Zielarstwo's mastery some come twice (952.3 A, `lucky`, herbHarvest).
   const week = weekFactor(keptWeek(activity.options), 'herbs');
-  const found = herbIds.length > 0 ? gatherHerbs({ herbIds, minutes: activity.minutes, level: before.level, seed: activity.seed, more, week }, content()) : {};
+  const { found, lucky } = herbIds.length > 0 ? herbHarvest({ herbIds, minutes: activity.minutes, level: before.level, seed: activity.seed, more, week }, content()) : { found: {}, lucky: {} };
   const capacity = bagCapacity(campLevels(player.buildings, now, content()), content());
   const { stored, lost } = storeStacks(herbsOf(row), found, capacity - bagPlaces(player), content());
   const { character, after, xp, work, sets } = workGains(player, profession, before, activity.minutes, avatar, now);
@@ -232,7 +233,7 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
   const card = await workCard(db, row, activity, activity.minutes);
   const report = {
     ...gatheringReport(
-      { minutes: activity.minutes, startedAt: activity.started_at, endsAt: activity.ends_at, seed: activity.seed, found, stored, lost, before, after, character, xp, work },
+      { minutes: activity.minutes, startedAt: activity.started_at, endsAt: activity.ends_at, seed: activity.seed, found, lucky, stored, lost, before, after, character, xp, work },
       content(),
     ),
     ...(avatar && { avatar: true }),

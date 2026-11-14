@@ -28,7 +28,7 @@ import { simulateFight } from './combat.js';
 import { areaLand, cardBonusLine, cardDrop, cardDropText, cardFrom, lowerLandCards } from './cards.js';
 import { addCounts, materialDrops, materialView, materialsText } from './crafting.js';
 import { canUse, itemName, itemRank, itemView, randomItem } from './items.js';
-import { TIMED_KINDS, fightPotions } from './potions.js';
+import { TIMED_KINDS, bladeOil, fightPotions } from './potions.js';
 import {
   classXpToNext,
   faintPenalty,
@@ -554,15 +554,16 @@ export function championItemRarity(level, rng, content) {
 // A player as it fights now, on the way or in an event's fight (events.js):
 // its strengthening potions still working (`on`, each kind's bonus), the
 // potions it carries (`kit`, fightPotions) and its trophies. Focus raises
-// Intelekt and Mądrość, which the character's numbers grow from; the
-// aconite oil coats a blade that has no coat of its own yet.
+// Intelekt and Mądrość, which the character's numbers grow from; the oil
+// of the poison buff (bladeOil) coats a blade that has no coat of its own
+// yet.
 /**
  * @param {{ unit: Record<string, any>, character: Character, equipped: Item[], name: string, area: Area, hp: number, on?: any, kit?: any, trophies: any }} options
  * @param {Content} content
  */
 export function fightingPlayer({ unit, character, equipped, name, area, hp, on = {}, kit = {}, trophies = {} }, content) {
   const base = on.focus ? playerCombatant({ character, equipped, hp, name, area, id: unit.id, statBoost: { intellect: on.focus, wisdom: on.focus } }, content) : unit;
-  const oil = on.poison ? content.potions.find((/** @type {Record<string, any>} */ potion) => potion.effect.poison)?.dot : null;
+  const oil = on.poison ? bladeOil(on.poison, content)?.dot : null;
   return {
     ...base,
     hp,

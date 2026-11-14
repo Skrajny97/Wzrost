@@ -11,7 +11,7 @@
 // (professions.js).
 
 import { gradeSteps } from './crafting.js';
-import { countList, professionLevelLines, professionProgress } from './professions.js';
+import { countList, masteryChance, professionLevelLines, professionProgress } from './professions.js';
 import { createRng } from './rng.js';
 import { say } from './text.js';
 
@@ -128,18 +128,31 @@ export const potionHerbs = (potion, count) => Object.fromEntries(Object.entries(
  */
 export const potionsDone = (count, minutes, elapsed) => Math.min(count, Math.max(0, Math.floor((count * elapsed) / (minutes * 60000))));
 
-// The potions of `count` brewed: each has bonusChance of one more, drawn by
-// the seed in order, so a brewing stopped early keeps the draws of the
-// potions it made.
+// The chance of every potion brewed at a level of Alchemia to come out
+// twice: bonusChance, and past the mastery's level (952.3 A) what the
+// mastery adds to it (masteryChance), 5% at the 100th level and 15% at the
+// 200th.
 /**
- * @param {{ count: number, seed: unknown, extraChance?: number }} brewing
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number}
+ */
+export const brewChance = (level, content) => content.brewing.bonusChance + masteryChance(content.brewing, level);
+
+// The potions of `count` brewed at a `level` of Alchemia: each has its
+// chance of one more (brewChance, and `extraChance` with a rarer catalyst),
+// drawn by the seed in order, so a brewing stopped early keeps the draws of
+// the potions it made.
+/**
+ * @param {{ count: number, seed: unknown, extraChance?: number, level?: number }} brewing
  * @param {Content} content
  */
-export function brewPotions({ count, seed, extraChance = 0 }, content) {
+export function brewPotions({ count, seed, extraChance = 0, level = 1 }, content) {
   const rng = createRng(seed);
+  const chance = Math.min(1, brewChance(level, content) + extraChance);
   let bonus = 0;
   for (let index = 0; index < count; index += 1) {
-    if (rng.chance(Math.min(1, content.brewing.bonusChance + extraChance))) bonus += 1;
+    if (rng.chance(chance)) bonus += 1;
   }
   return { count: count + bonus, bonus };
 }

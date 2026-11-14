@@ -190,7 +190,8 @@ describe('brewing through the API', () => {
     const jagna = { 40: 'Zaufany', 44: 'Zaufany', 50: 'Zaufany', 60: 'Przyjaciel', 70: 'Przyjaciel', 75: 'Przyjaciel' };
     assert.deepEqual(
       hidden.map((recipe) => recipe.hint),
-      [3, 5, 10, 14, 18, 24, 26, 32, 36, 40, 44, 45, 48, 50, 52, 55, 60, 65, 70, 75, 90].map((level) =>
+      // The recipes of the mastery too (952.2), from the 100th level on.
+      [3, 5, 10, 14, 18, 24, 26, 32, 36, 40, 44, 45, 48, 50, 52, 55, 60, 65, 70, 75, 90, 100, 105, 110, 120, 130, 140, 150, 165, 180].map((level) =>
         jagna[level]
           ? `Rzadki przepis Jagny: od stopnia ${jagna[level]} w relacji z Jagną albo w reputacji Bractwa Zielarzy, i od ${level}. poziomu Alchemii.`
           : `Ukryte przez System do ${level}. poziomu Alchemii.`,

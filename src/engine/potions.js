@@ -76,6 +76,21 @@ export function fightPotions(left, healBelow, content) {
   return kit;
 }
 
+// The oil on the blade for a poison buff of `bonus` (a blow's chance of
+// Zatrucie): of the potions with poison the strongest whose chance the buff
+// has, as a buff keeps the stronger of two oils drunk (addBuff), so the
+// henbane oil's stronger Zatrucie comes with its chance; else the weakest.
+// Its `dot` is what a blow lays on the foe.
+/**
+ * @param {number} bonus
+ * @param {Content} content
+ * @returns {Record<string, any> | null}
+ */
+export function bladeOil(bonus, content) {
+  const oils = /** @type {Record<string, any>[]} */ (content.potions).filter((potion) => potion.effect.poison).sort((a, b) => a.effect.poison - b.effect.poison);
+  return oils.findLast((potion) => potion.effect.poison <= bonus + 1e-9) ?? oils[0] ?? null;
+}
+
 // "2 walki", "1 walkę", "5 walk": a number of fights after "na" or "przez".
 /**
  * @param {number} count

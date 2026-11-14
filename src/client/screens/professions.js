@@ -878,6 +878,8 @@ export function mountProfessions(container, { params, navigate }) {
         h('p', { class: 'duration-scale', 'aria-hidden': 'true' }, h('span', { text: formatMinutes(allowed[0]) }), h('span', { text: formatMinutes(allowed.at(-1)) })),
       ),
       estimate,
+      // Past Zielarstwo's mastery, its chance of a herb twice (952.3 A).
+      gathering.mastery && h('p', { class: 'muted', text: gathering.mastery }),
       room,
       start,
     );
@@ -1763,6 +1765,8 @@ export function mountProfessions(container, { params, navigate }) {
       h('p', { class: 'duration-title', text: t('Spodziewany urobek') }),
       yields,
       gold,
+      // Past Górnictwo's mastery, its chance of a mineral twice (952.4 A).
+      mining.mastery && h('p', { class: 'muted', text: mining.mastery }),
       shadows(
         mining.minerals.filter((mineral) => mineral.hidden),
         mineralIcon,
@@ -2347,6 +2351,8 @@ export function herbsReport(report, heading) {
           ),
         ),
       ),
+      // The herbs the mastery added (952.3 A); an older report has none.
+      report.lucky && h('p', { class: 'herb-room herb-room--lucky', text: report.lucky }),
       report.lost && h('p', { class: 'herb-room herb-room--full', text: report.lost }),
       workSummary(report),
     ),
@@ -2448,6 +2454,8 @@ export function mineralsReport(report, heading) {
           ),
         ),
       ),
+      // The minerals the mastery added (952.4 A); an older report has none.
+      report.lucky && h('p', { class: 'herb-room herb-room--lucky', text: report.lucky }),
       h('p', { class: `herb-estimate mine-gold${report.gold > 0 ? ' herb-room--lucky' : ''}` }, report.gold > 0 && goldArt(20), report.gold > 0 ? ` ${report.veinsText}` : report.veinsText),
       workSummary(report),
     ),

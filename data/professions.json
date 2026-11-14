@@ -1,5 +1,5 @@
 {
-  "$comment": "Profesje (src/engine/professions.js). Każda ma maxLevel poziomów, od 0.2.65 po 200 (autor 11.11.2026: „Profesje zyskują sufit na 200 poziomie.”; wcześniej 100): awans z poziomu L wymaga L × levelMinutes minut pracy. Każdy awans daje statPerLevel do obu statystyk profesji (stats), więc 1. poziom daje 0, a poziom masteryLevel dodaje jeszcze maxLevelBonus: nagrodę za opanowanie profesji (3 × 99 + 153 = 450 na 100. poziomie; od 0.1.61 trzy razy tyle co wcześniej, autor 5.11.2026: „Zwiększmy też bonus ze statystyk z Profesji x3”, „Niech to motywuje do działania poza wyprawami”). Nagroda została na 100. poziomie, ostatnim przed 0.2.65, więc nikt nie stracił statystyk, a dalsze poziomy dodają dalej po statPerLevel (3 × 149 + 153 = 600 na 150., 3 × 199 + 153 = 750 na 200.). Praca daje postaci characterXpShare tego XP, co godzina wyprawy na jej poziomie, i nie daje XP klasy. soon: profesja widoczna w zakładce, ale jeszcze bez pracy. unlockLevel: poziom postaci, od którego profesja się otwiera, gdy później niż zakładka Profesje. intro: słowa Systemu na górze zakładki Profesje. Zbieractwo (gathering): postać zbiera zioła w jednym stałym miejscu (place), przez minutes.min–max minut co step. Na godzinę zbiera perHour sztuk zioła, a każdy poziom dodaje yieldPerLevel; losowość to ± spread. slots: od którego poziomu ile ziół naraz, a zbiór dzieli się po równo między wybrane zioła. Zioło zna się od swojego poziomu (level). stack: ile sztuk zioła mieści jedno miejsce plecaka; co się nie zmieści, przepada. price: tyle płaci złomiarz za sztukę (z premią Skupu złomu). genitive: nazwa w dopełniaczu, zioła do zadań narratora, a profesji do komunikatu o jej poziomie. texts: zdania raportu (report: jedno z wariantów) i komunikaty. Warzenie (brewing): postać warzy mikstury w jednym stałym miejscu (place), jeden przepis naraz. Mikstura trwa potionMinutes minut, każdy poziom profesji skraca ją o speedPerLevel, ale nie bardziej niż do fastest tego czasu; całe warzenie trwa najwyżej maxMinutes. Każda uwarzona mikstura ma bonusChance szans na jedną dodatkową. Złomiarz płaci za miksturę priceFactor razy tyle, co za jej zioła. potions: przepisy, każdy znany od swojego poziomu (level), z ziołami na jedną miksturę (herbs) i działaniem (effect: heal i mana to część maks. HP i many, speed to dodatek do szybkości ruchów). taught: rzadki przepis zielarki (121 A: „zaufanym zdradza rzadkie receptury”), znany dopiero od tego stopnia (id z settlement.standings) w relacji z nią albo w reputacji Bractwa Zielarzy, co przyjdzie pierwsze (682 A i C; co się liczy, podaje settlement.herbalist.teaching), a do tego czasu nieznany nigdzie w grze, choćby postać miała jego poziom (recipeTaught w src/engine/brewing.js); Pracownia pokazuje wtedy cień z herbalistHidden. Uwarzyć i wypić go można dalej dopiero od jego poziomu. cures: efekt (id z effects.json), który mikstura z cure zdejmuje w walce; postać bierze i pije osobną taką miksturę na każdy efekt (Odtrutkę na Zatrucie, Wywar od oparzeń na Oparzenie). counted: nazwa po liczbie (1, 2–4, 5 i więcej) do zadań narratora. Mikstury też układają się w plecaku po stack sztuk. fights: przez tyle walk wypraw działa mikstura wypita z plecaka (szybkość i inne wzmocnienia; autor: „te trwające 0,5h niech dają bonus na 2 walki”), a każda kolejna dodaje tyle samo walk. potionUse: jak postać pije mikstury. Na wyprawę zabiera ich tyle, ile wybierze gracz, każdego rodzaju najwyżej tyle, ile walk ma wyprawa, i w walce pije każdego rodzaju najwyżej jedną (mikstur z cure jedną na każdy efekt): leczenia, gdy HP spadnie poniżej progu (healBelow, gracz wybiera z healBelowChoices), a many, gdy zabraknie jej na umiejętność. fightForms: walka po liczbie w bierniku (1, 2–4, 5 i więcej) do tekstów {fights}. minutesPerFight: tyle minut dawnego czasu działania to jedna walka, do przeliczenia wzmocnień zapisanych jeszcze w minutach. texts: wpisy w walce i raporcie, {potion} w bierniku (counted[0]), {fights} to liczba walk z rzeczownikiem („2 walki”), a {effect} nazwa efektu, który zdjęła mikstura z cure. Wyrób (workshop): postać wykonuje przedmioty w jednym stałym miejscu (place), jeden wzór i jedną rzadkość naraz, tyle sztuk, ile pozwolą części i zasoby, bez limitu sztuk i czasu (autor 12.11.2026: „Zrób warsztat i szlifiernie zalezna od czesci i materialow po prostu”, „bez ograniczeń czasowych”; wcześniej najwyżej 5 sztuk, czyli 2,5 h na 1. poziomie). Gotowe przedmioty czekają w Przechowalni, poza plecakiem i bez limitu miejsc, aż postać włoży je do plecaka, sprzeda złomiarzowi albo rozbierze na Stole rozbiórki (842, autor 12.11.2026: „Niech w warsztacie będzie przechowalnia niech to nie trafia od razu do plecaka”); stored: zdanie raportu o tym. Wzór to baza przedmiotu ze slotu, który ma parts: pierwszą bazę rodziny zna się od 1. poziomu, a późniejszą (classLevel w item-bases.json) od laterPatternLevel, ale nie wcześniej niż od jej poziomu klasy (baza od 25. poziomu klasy od 25. poziomu profesji). parts: ile części rzadkości przedmiotu bierze jedna sztuka w danym slocie. resources: na każdą część i każdy stopień rzadkości (pospolity 1, rzadki 2 i dalej) stone kamienia oraz extra drewna albo rudy żelaza dla rodzin z families. Przedmiot trwa itemMinutes minut, każda rzadkość wyżej rarityTime razy dłużej, a każdy poziom profesji skraca go o speedPerLevel czasu z 1. poziomu, ale nie bardziej niż do fastest. rarities: od którego poziomu jaka rzadkość i z jaką szansą powodzenia (chance); każdy poziom po 1. dodaje chancePerLevel, najwyżej do maxChance, a szansa 1 zostaje 1. Nieudany przedmiot zabiera swoje części, a zasoby wracają. texts: zdania raportu i komunikaty. exchange: wymiana części od ręki, bez pracy postaci: rate części jednej rzadkości za 1 część następnej (rzadkości z rarities.json, części z materials.json), counts sztuk jedną wymianą. Awatar Systemu (avatar): kupiony raz na zawsze za price złota wykonuje jedną pracę naraz obok postaci, z jej poziomami profesji, ziołami, przepisami i wzorami, tak samo wydajnie jak ona. Od 10.11.2026 jego odebrana praca daje postaci share (ćwierć) XP postaci i XP profesji (minut pracy), które dałaby jej ta sama praca, z tym, co one przynoszą: poziomami postaci z HP i Punktami Czasu oraz poziomami profesji z ich statystykami (autor: „Awatar niech od teraz daje 1/4 tego co zdobyłaby postać - XPa i wpływ na level Profesji w podobnej ilości - tak jakby gracz robił te czynności. Tak, pamiętam pierwotne założenia, ale wszystko ewoluuje.”); wcześniej nie dawał XP, poziomów profesji ani statystyk. Opis (description) podaje ten udział słowami. Nie daje XP, poziomów profesji ani statystyk. description: opis na karcie zakupu; texts: komunikaty Awatara. rows: rzędy kwadratów zakładki Profesje, od góry, zbierackie nad wytwórczymi. Górnictwo (mining, src/engine/mining.js): postać kopie w jednym stałym miejscu (place), przez minutes.min–max minut co step, i wydobywa naraz wszystkie minerały (minerals), które już zna: każdy z perHour sztuk na godzinę, a każdy poziom dodaje yieldPerLevel; losowość to ± spread, a kopanie daje co najmniej jedną sztukę. veins: żyły złota, średnio perHour na godzinę, każda warta (złoto z godziny ± spread) / perHour, a złoto z godziny to share złota, które daje godzina wyprawy na poziomie postaci z początku kopania (explorationGold: [poziom postaci, złoto na godzinę] z tools/difficulty-sim.mjs, gracz realistyczny, wyprawy godzinne; między poziomami liniowo, za ostatnim w proporcji do poziomu). about: opis pod „Jak to działa?” ({yield} i {share} w procentach). minerals: kamienie (kind gem), po jednym na rzadkość (rarity), i kruszce (kind ore) na oprawy biżuterii rzadkości z for; level to poziom Górnictwa, od którego się je kopie, i poziom Jubilerstwa, od którego się je szlifuje i oprawia; price płaci złomiarz za sztukę (z premią Skupu złomu); setBonus: o tyle kamień oprawiony w przedmiot podnosi wszystkie jego liczby, każdą co najmniej o 1. Minerały nie zajmują miejsca w plecaku. Jubilerstwo (jewelcrafting, src/engine/jewelcraft.js): wyrób biżuterii jak w Warsztacie, z bazami slotów z ores (tyle kruszcu bierze jedna sztuka), jedną rzadkość i jeden wzór naraz, tyle sztuk, ile pozwolą kamienie i kruszec, bez limitu sztuk i czasu (jak w Warsztacie, od 12.11.2026), a gotowa biżuteria czeka we wspólnej z Warsztatem Przechowalni (stored). Rzadkość wyznacza kamień tej rzadkości (jeden na sztukę), a kruszec ten, którego for ją obejmuje. Czas, wzory i szanse (chances) jak w Warsztacie, a rozebrana biżuteria odsłania swój wzór także przed jego poziomem, jak przedmioty Warsztatu. Nieudana sztuka zabiera swój kamień, a kruszec wraca. setting: oprawianie jednego kamienia w przedmiot postaci trwa minutes minut przy Kwarcu, każda rzadkość wyżej rarityTime razy dłużej, w tempie poziomu Jubilerstwa; nowy kamień niszczy poprzedni. about.craft i about.set: opisy pod „Jak to działa?”.",
+  "$comment": "Profesje (src/engine/professions.js). Każda ma maxLevel poziomów, od 0.2.65 po 200 (autor 11.11.2026: „Profesje zyskują sufit na 200 poziomie.”; wcześniej 100): awans z poziomu L wymaga L × levelMinutes minut pracy. Każdy awans daje statPerLevel do obu statystyk profesji (stats), więc 1. poziom daje 0, a poziom masteryLevel dodaje jeszcze maxLevelBonus: nagrodę za opanowanie profesji (3 × 99 + 153 = 450 na 100. poziomie; od 0.1.61 trzy razy tyle co wcześniej, autor 5.11.2026: „Zwiększmy też bonus ze statystyk z Profesji x3”, „Niech to motywuje do działania poza wyprawami”). Nagroda została na 100. poziomie, ostatnim przed 0.2.65, więc nikt nie stracił statystyk, a dalsze poziomy dodają dalej po statPerLevel (3 × 149 + 153 = 600 na 150., 3 × 199 + 153 = 750 na 200.). Praca daje postaci characterXpShare tego XP, co godzina wyprawy na jej poziomie, i nie daje XP klasy. soon: profesja widoczna w zakładce, ale jeszcze bez pracy. unlockLevel: poziom postaci, od którego profesja się otwiera, gdy później niż zakładka Profesje. intro: słowa Systemu na górze zakładki Profesje. Zbieractwo (gathering): postać zbiera zioła w jednym stałym miejscu (place), przez minutes.min–max minut co step. Na godzinę zbiera perHour sztuk zioła, a każdy poziom dodaje yieldPerLevel; losowość to ± spread. slots: od którego poziomu ile ziół naraz, a zbiór dzieli się po równo między wybrane zioła. Zioło zna się od swojego poziomu (level). mastery: szansa po opanowaniu profesji (952.3 A, 952.4 A), od 0 na poziomie from rośnie równo do chance na poziomie to; w Zbieractwie i Górnictwie każda zebrana albo wydobyta sztuka ma tyle szans na jedną dodatkową (texts.lucky w raporcie, texts.mastery na stronie, gdy szansa przekroczy 0), a w Warzeniu dodaje się do bonusChance (5% na 100. poziomie, 15% na 200.). Zioła od masteryLevel profesji zbiera się tylko w Zagajniku: Jagna i kupiec ich nie sprzedają. stack: ile sztuk zioła mieści jedno miejsce plecaka; co się nie zmieści, przepada. price: tyle płaci złomiarz za sztukę (z premią Skupu złomu). genitive: nazwa w dopełniaczu, zioła do zadań narratora, a profesji do komunikatu o jej poziomie. texts: zdania raportu (report: jedno z wariantów) i komunikaty. Warzenie (brewing): postać warzy mikstury w jednym stałym miejscu (place), jeden przepis naraz. Mikstura trwa potionMinutes minut, każdy poziom profesji skraca ją o speedPerLevel, ale nie bardziej niż do fastest tego czasu; całe warzenie trwa najwyżej maxMinutes. Każda uwarzona mikstura ma bonusChance szans na jedną dodatkową. Złomiarz płaci za miksturę priceFactor razy tyle, co za jej zioła. potions: przepisy, każdy znany od swojego poziomu (level), z ziołami na jedną miksturę (herbs) i działaniem (effect: heal i mana to część maks. HP i many, speed to dodatek do szybkości ruchów). taught: rzadki przepis zielarki (121 A: „zaufanym zdradza rzadkie receptury”), znany dopiero od tego stopnia (id z settlement.standings) w relacji z nią albo w reputacji Bractwa Zielarzy, co przyjdzie pierwsze (682 A i C; co się liczy, podaje settlement.herbalist.teaching), a do tego czasu nieznany nigdzie w grze, choćby postać miała jego poziom (recipeTaught w src/engine/brewing.js); Pracownia pokazuje wtedy cień z herbalistHidden. Uwarzyć i wypić go można dalej dopiero od jego poziomu. cures: efekt (id z effects.json), który mikstura z cure zdejmuje w walce; postać bierze i pije osobną taką miksturę na każdy efekt (Odtrutkę na Zatrucie, Wywar od oparzeń na Oparzenie). counted: nazwa po liczbie (1, 2–4, 5 i więcej) do zadań narratora. Mikstury też układają się w plecaku po stack sztuk. fights: przez tyle walk wypraw działa mikstura wypita z plecaka (szybkość i inne wzmocnienia; autor: „te trwające 0,5h niech dają bonus na 2 walki”), a każda kolejna dodaje tyle samo walk. potionUse: jak postać pije mikstury. Na wyprawę zabiera ich tyle, ile wybierze gracz, każdego rodzaju najwyżej tyle, ile walk ma wyprawa, i w walce pije każdego rodzaju najwyżej jedną (mikstur z cure jedną na każdy efekt): leczenia, gdy HP spadnie poniżej progu (healBelow, gracz wybiera z healBelowChoices), a many, gdy zabraknie jej na umiejętność. fightForms: walka po liczbie w bierniku (1, 2–4, 5 i więcej) do tekstów {fights}. minutesPerFight: tyle minut dawnego czasu działania to jedna walka, do przeliczenia wzmocnień zapisanych jeszcze w minutach. texts: wpisy w walce i raporcie, {potion} w bierniku (counted[0]), {fights} to liczba walk z rzeczownikiem („2 walki”), a {effect} nazwa efektu, który zdjęła mikstura z cure. Wyrób (workshop): postać wykonuje przedmioty w jednym stałym miejscu (place), jeden wzór i jedną rzadkość naraz, tyle sztuk, ile pozwolą części i zasoby, bez limitu sztuk i czasu (autor 12.11.2026: „Zrób warsztat i szlifiernie zalezna od czesci i materialow po prostu”, „bez ograniczeń czasowych”; wcześniej najwyżej 5 sztuk, czyli 2,5 h na 1. poziomie). Gotowe przedmioty czekają w Przechowalni, poza plecakiem i bez limitu miejsc, aż postać włoży je do plecaka, sprzeda złomiarzowi albo rozbierze na Stole rozbiórki (842, autor 12.11.2026: „Niech w warsztacie będzie przechowalnia niech to nie trafia od razu do plecaka”); stored: zdanie raportu o tym. Wzór to baza przedmiotu ze slotu, który ma parts: pierwszą bazę rodziny zna się od 1. poziomu, a późniejszą (classLevel w item-bases.json) od laterPatternLevel, ale nie wcześniej niż od jej poziomu klasy (baza od 25. poziomu klasy od 25. poziomu profesji). parts: ile części rzadkości przedmiotu bierze jedna sztuka w danym slocie. resources: na każdą część i każdy stopień rzadkości (pospolity 1, rzadki 2 i dalej) stone kamienia oraz extra drewna albo rudy żelaza dla rodzin z families. Przedmiot trwa itemMinutes minut, każda rzadkość wyżej rarityTime razy dłużej, a każdy poziom profesji skraca go o speedPerLevel czasu z 1. poziomu, ale nie bardziej niż do fastest. rarities: od którego poziomu jaka rzadkość i z jaką szansą powodzenia (chance); każdy poziom po 1. dodaje chancePerLevel, najwyżej do maxChance, a szansa 1 zostaje 1. Nieudany przedmiot zabiera swoje części, a zasoby wracają. texts: zdania raportu i komunikaty. exchange: wymiana części od ręki, bez pracy postaci: rate części jednej rzadkości za 1 część następnej (rzadkości z rarities.json, części z materials.json), counts sztuk jedną wymianą. Awatar Systemu (avatar): kupiony raz na zawsze za price złota wykonuje jedną pracę naraz obok postaci, z jej poziomami profesji, ziołami, przepisami i wzorami, tak samo wydajnie jak ona. Od 10.11.2026 jego odebrana praca daje postaci share (ćwierć) XP postaci i XP profesji (minut pracy), które dałaby jej ta sama praca, z tym, co one przynoszą: poziomami postaci z HP i Punktami Czasu oraz poziomami profesji z ich statystykami (autor: „Awatar niech od teraz daje 1/4 tego co zdobyłaby postać - XPa i wpływ na level Profesji w podobnej ilości - tak jakby gracz robił te czynności. Tak, pamiętam pierwotne założenia, ale wszystko ewoluuje.”); wcześniej nie dawał XP, poziomów profesji ani statystyk. Opis (description) podaje ten udział słowami. Nie daje XP, poziomów profesji ani statystyk. description: opis na karcie zakupu; texts: komunikaty Awatara. rows: rzędy kwadratów zakładki Profesje, od góry, zbierackie nad wytwórczymi. Górnictwo (mining, src/engine/mining.js): postać kopie w jednym stałym miejscu (place), przez minutes.min–max minut co step, i wydobywa naraz wszystkie minerały (minerals), które już zna: każdy z perHour sztuk na godzinę, a każdy poziom dodaje yieldPerLevel; losowość to ± spread, a kopanie daje co najmniej jedną sztukę. veins: żyły złota, średnio perHour na godzinę, każda warta (złoto z godziny ± spread) / perHour, a złoto z godziny to share złota, które daje godzina wyprawy na poziomie postaci z początku kopania (explorationGold: [poziom postaci, złoto na godzinę] z tools/difficulty-sim.mjs, gracz realistyczny, wyprawy godzinne; między poziomami liniowo, za ostatnim w proporcji do poziomu). about: opis pod „Jak to działa?” ({yield} i {share} w procentach). minerals: kamienie (kind gem), po jednym na rzadkość (rarity), i kruszce (kind ore) na oprawy biżuterii rzadkości z for; level to poziom Górnictwa, od którego się je kopie, i poziom Jubilerstwa, od którego się je szlifuje i oprawia; price płaci złomiarz za sztukę (z premią Skupu złomu); setBonus: o tyle kamień oprawiony w przedmiot podnosi wszystkie jego liczby, każdą co najmniej o 1. Minerały nie zajmują miejsca w plecaku. Jubilerstwo (jewelcrafting, src/engine/jewelcraft.js): wyrób biżuterii jak w Warsztacie, z bazami slotów z ores (tyle kruszcu bierze jedna sztuka), jedną rzadkość i jeden wzór naraz, tyle sztuk, ile pozwolą kamienie i kruszec, bez limitu sztuk i czasu (jak w Warsztacie, od 12.11.2026), a gotowa biżuteria czeka we wspólnej z Warsztatem Przechowalni (stored). Rzadkość wyznacza kamień tej rzadkości (jeden na sztukę), a kruszec ten, którego for ją obejmuje. Czas, wzory i szanse (chances) jak w Warsztacie, a rozebrana biżuteria odsłania swój wzór także przed jego poziomem, jak przedmioty Warsztatu. Nieudana sztuka zabiera swój kamień, a kruszec wraca. setting: oprawianie jednego kamienia w przedmiot postaci trwa minutes minut przy Kwarcu, każda rzadkość wyżej rarityTime razy dłużej, w tempie poziomu Jubilerstwa; nowy kamień niszczy poprzedni. about.craft i about.set: opisy pod „Jak to działa?”.",
   "rules": {
     "characterXpShare": 0.025,
     "stack": 20
@@ -103,7 +103,8 @@
       { "level": 10, "herbs": 2 },
       { "level": 25, "herbs": 3 },
       { "level": 50, "herbs": 4 }
-    ]
+    ],
+    "mastery": { "from": 100, "to": 200, "chance": 0.1 }
   },
   "brewing": {
     "profession": "alchemy",
@@ -117,6 +118,7 @@
     "fastest": 0.5,
     "maxMinutes": 480,
     "bonusChance": 0.05,
+    "mastery": { "from": 100, "to": 200, "chance": 0.1 },
     "catalystStep": 0.15,
     "priceFactor": 1.5,
     "texts": {
@@ -235,6 +237,7 @@
     "minutes": { "min": 10, "step": 10, "max": 480 },
     "yieldPerLevel": 0.02,
     "spread": 0.15,
+    "mastery": { "from": 100, "to": 200, "chance": 0.1 },
     "veins": {
       "share": 0.5,
       "perHour": 2,
@@ -253,6 +256,8 @@
         "Błękitne linie Systemu prowadzą każde uderzenie kilofa."
       ],
       "found": ["Wydobyto: {minerals}."],
+      "lucky": ["Szczęśliwy urobek, dodatkowo: {minerals}."],
+      "mastery": ["Każdy wydobyty minerał ma {chance}% szans na jeden dodatkowy."],
       "veins": ["Żyły złota: {count}, razem +{gold} złota."],
       "noVeins": ["Tym razem bez żył złota."],
       "revealed": ["System odsłania nowy kamień: {mineral}"],
@@ -366,7 +371,7 @@
       "armorFights": ["Twarda skóra działała w walkach: {fights} z {all}."],
       "damageFights": ["Siła działała w walkach: {fights} z {all}."],
       "focusFights": ["Skupienie działało w walkach: {fights} z {all}."],
-      "poisonFights": ["Olejek z tojadu działał w walkach: {fights} z {all}."],
+      "poisonFights": ["Trucizna na broni działała w walkach: {fights} z {all}."],
       "wardFights": ["Osłona przed magią działała w walkach: {fights} z {all}."],
       "curseFights": ["Klątwa osłabiała ciosy w walkach: {fights} z {all}."],
       "woundsFights": ["Rany osłabiały ciosy w walkach: {fights} z {all}."]
@@ -489,6 +494,51 @@
       "perHour": 0.5,
       "price": 60,
       "description": "Kwitnie raz w roku, w najkrótszą noc. Mało kto go widział."
+    },
+    {
+      "id": "adders-tongue",
+      "name": "Nasięźrzał",
+      "genitive": "Nasięźrzału",
+      "level": 100,
+      "perHour": 0.5,
+      "price": 80,
+      "description": "Paproć szeptuch o jednym liściu. Przy zrywaniu słychać cichy szept."
+    },
+    {
+      "id": "mandrake",
+      "name": "Mandragora",
+      "genitive": "Mandragory",
+      "level": 120,
+      "perHour": 0.4,
+      "price": 100,
+      "description": "Korzeń podobny do człowieka. Krzyczy, gdy wyrywa się go z ziemi."
+    },
+    {
+      "id": "henbane",
+      "name": "Lulek czarny",
+      "genitive": "Lulka czarnego",
+      "level": 140,
+      "perHour": 0.35,
+      "price": 130,
+      "description": "Ziele czarownic o lepkich liściach. Odurza samym zapachem."
+    },
+    {
+      "id": "springwort",
+      "name": "Rozryw",
+      "genitive": "Rozrywu",
+      "level": 160,
+      "perHour": 0.3,
+      "price": 170,
+      "description": "Trawa z legend, która rozrywa żelazo. Koń, który na nią nadepnie, gubi podkowy."
+    },
+    {
+      "id": "golden-root",
+      "name": "Złoty korzeń",
+      "genitive": "Złotego korzenia",
+      "level": 180,
+      "perHour": 0.25,
+      "price": 220,
+      "description": "Rośnie na gołej skale, gdzie nic innego się nie utrzyma. Pachnie różą."
     }
   ],
   "potions": [
@@ -723,6 +773,101 @@
       "herbs": { "fern-blossom": 1, "comfrey": 5 },
       "effect": { "revive": 0.3 },
       "description": "Złoty napar z Kwiatu paproci. Działa sam: raz na wyprawę chroni przed porażką i postać wstaje z 30% HP."
+    },
+    {
+      "id": "mana-elixir",
+      "name": "Eliksir many",
+      "counted": ["Eliksir many", "Eliksiry many", "Eliksirów many"],
+      "level": 100,
+      "herbs": { "mugwort": 3, "adders-tongue": 2 },
+      "effect": { "mana": 0.8 },
+      "description": "Lśniący, szafirowy eliksir z Bylicy i Nasięźrzału. Budzi uśpioną moc: oddaje 80% maks. many."
+    },
+    {
+      "id": "great-healing-balm",
+      "name": "Wielki balsam leczenia",
+      "counted": ["Wielki balsam leczenia", "Wielkie balsamy leczenia", "Wielkich balsamów leczenia"],
+      "level": 105,
+      "herbs": { "comfrey": 3, "adders-tongue": 2 },
+      "effect": { "heal": 0.85 },
+      "description": "Gęsty, purpurowy balsam z Żywokostu i Nasięźrzału. Zrasta nawet najgłębsze rany: leczy 85% maks. HP."
+    },
+    {
+      "id": "bison-hide-brew",
+      "name": "Wywar żubrzej skóry",
+      "counted": ["Wywar żubrzej skóry", "Wywary żubrzej skóry", "Wywarów żubrzej skóry"],
+      "level": 110,
+      "herbs": { "arnica": 3, "adders-tongue": 1 },
+      "catalyst": "turtle-shell",
+      "effect": { "armor": 0.45 },
+      "fights": 2,
+      "description": "Ciemnobrunatny wywar z Arniki i Nasięźrzału. Wypity z plecaka wzmacnia pancerz postaci o 45% na 2 walki. Każdy kolejny dodaje następne 2 walki."
+    },
+    {
+      "id": "aurochs-strength-brew",
+      "name": "Wywar turzej siły",
+      "counted": ["Wywar turzej siły", "Wywary turzej siły", "Wywarów turzej siły"],
+      "level": 120,
+      "herbs": { "wormwood": 3, "mandrake": 1 },
+      "catalyst": "bies-horn",
+      "effect": { "damage": 0.3 },
+      "fights": 2,
+      "description": "Krwistoczerwony wywar z Piołunu i Mandragory. Wypity z plecaka zwiększa obrażenia postaci o 30% na 2 walki. Każdy kolejny dodaje następne 2 walki."
+    },
+    {
+      "id": "falcon-eye-draught",
+      "name": "Napar sokolego oka",
+      "counted": ["Napar sokolego oka", "Napary sokolego oka", "Naparów sokolego oka"],
+      "level": 130,
+      "herbs": { "valerian": 3, "mandrake": 1 },
+      "catalyst": "rarog-feather",
+      "effect": { "focus": 0.3 },
+      "fights": 2,
+      "description": "Jasnofioletowy napar z Kozłka i Mandragory. Wypity z plecaka zwiększa Intelekt i Mądrość postaci o 30% na 2 walki. Każdy kolejny dodaje następne 2 walki."
+    },
+    {
+      "id": "halny-wind-draught",
+      "name": "Napar halnego wiatru",
+      "counted": ["Napar halnego wiatru", "Napary halnego wiatru", "Naparów halnego wiatru"],
+      "level": 140,
+      "herbs": { "nettle": 3, "henbane": 1 },
+      "catalyst": "latawiec-membrane",
+      "effect": { "speed": 0.45 },
+      "fights": 2,
+      "description": "Szmaragdowy napar z Pokrzywy i Lulka czarnego. Wypity z plecaka przyspiesza ruchy postaci w walkach o 45% na 2 walki. Każdy kolejny dodaje następne 2 walki."
+    },
+    {
+      "id": "henbane-oil",
+      "name": "Olejek z lulka",
+      "counted": ["Olejek z lulka", "Olejki z lulka", "Olejków z lulka"],
+      "level": 150,
+      "herbs": { "henbane": 2, "aconite": 1 },
+      "catalyst": "moth-dust",
+      "effect": { "poison": 0.75 },
+      "fights": 2,
+      "verb": "Nałóż",
+      "dot": { "effect": "poisoned", "power": 0.25, "ticks": 3 },
+      "description": "Gęsty, czarny olejek z Lulka czarnego i Tojadu na ostrze. Nałożony z plecaka na 2 walki daje każdemu ciosowi postaci 75% szans na silniejsze Zatrucie. Każdy kolejny dodaje następne 2 walki."
+    },
+    {
+      "id": "springwort-elixir",
+      "name": "Eliksir z rozrywu",
+      "counted": ["Eliksir z rozrywu", "Eliksiry z rozrywu", "Eliksirów z rozrywu"],
+      "level": 165,
+      "herbs": { "mistletoe": 3, "springwort": 1 },
+      "catalyst": "bell-clapper",
+      "effect": { "ward": 0.5 },
+      "fights": 2,
+      "description": "Stalowoszary eliksir z Jemioły i Rozrywu. Wypity z plecaka zmniejsza obrażenia od magii o 50% na 2 walki. Każdy kolejny dodaje następne 2 walki."
+    },
+    {
+      "id": "living-water",
+      "name": "Woda żywa",
+      "counted": ["Wodę żywą", "Wody żywe", "Wód żywych"],
+      "level": 180,
+      "herbs": { "comfrey": 3, "fern-blossom": 1, "golden-root": 1 },
+      "effect": { "revive": 0.5 },
+      "description": "Lśniąca, przejrzysta woda z Kwiatu paproci i Złotego korzenia. Działa sama: raz na wyprawę chroni przed porażką i postać wstaje z 50% HP."
     }
   ],
   "texts": {
@@ -732,6 +877,8 @@
       "Nad kępami ziół migocze błękitne światło Systemu."
     ],
     "gathered": ["Zebrano: {herbs}."],
+    "lucky": ["Szczęśliwy zbiór, dodatkowo: {herbs}."],
+    "mastery": ["Każde zebrane zioło ma {chance}% szans na jedno dodatkowe."],
     "lost": ["Plecak był pełny. Nie zmieściło się: {herbs}."],
     "levelUp": ["Osiągnięto poziom {profession}: {level}"],
     "statGained": ["Zdobyto {stat}: +{bonus}"],

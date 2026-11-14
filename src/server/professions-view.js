@@ -4,6 +4,7 @@
 
 import {
   baseClasses,
+  brewChance,
   carryLimit,
   catalystChance,
   craftChance,
@@ -22,6 +23,7 @@ import {
   jewelChance,
   jewelMinutes,
   jewelPatternLevel,
+  masteryChance,
   materialView,
   mineralsPerHour,
   miningMinutes,
@@ -48,7 +50,7 @@ import { content } from './content.js';
 import { craftingOn, professionsOn } from './features.js';
 import { t } from './i18n.js';
 import { perkOf } from './perks.js';
-import { say } from '../engine/text.js';
+import { decimalText, say } from '../engine/text.js';
 
 // The herbs and the potions the character carries, by id, as the row keeps
 // them.
@@ -92,8 +94,9 @@ export function bagMinerals(row, sellBonus) {
 
 // A recipe's catalyst (proposal 3: "Wybrane mikstury biorą jeden materiał
 // stwora"): the material, and the grades of it the character has, each with
-// its chance of an extra potion, the commonest first.
-function catalystView(potion, materials) {
+// its chance of an extra potion, the commonest first. `chance`: a potion's
+// chance at the character's Alchemia, its mastery's with it (brewChance).
+function catalystView(potion, materials, chance) {
   if (!potion.catalyst) return null;
   const material = content().materialsById[potion.catalyst];
   const index = (id) => content().rarities.findIndex((rarity) => rarity.id === id);
@@ -102,9 +105,17 @@ function catalystView(potion, materials) {
     name: material.name,
     stacks: Object.entries(materials)
       .filter(([key]) => parseStack(key).materialId === material.id)
-      .map(([key, count]) => ({ ...materialView(key, count, content()), chance: content().brewing.bonusChance + catalystChance(key, content()) }))
+      .map(([key, count]) => ({ ...materialView(key, count, content()), chance: chance + catalystChance(key, content()) }))
       .sort((a, b) => index(a.rarity) - index(b.rarity)),
   };
+}
+
+// What a work's form says of its mastery's chance (952.3 A, 952.4 A): a
+// herb's or a mineral's of one more (`texts.mastery`, {chance} in percent),
+// or null while it is still 0, before the mastery's level.
+function masteryText(table, texts, level) {
+  const chance = masteryChance(table, level);
+  return chance > 0 ? say(texts, 'mastery', 0, { chance: decimalText(chance * 100, content()) }) : null;
 }
 
 // Whether the character knows the recipe of a potion: only then may it use
@@ -175,10 +186,11 @@ function recipeHint(potion, settlement) {
 }
 
 // The Profesje tab: the System's words at its top, each profession with its
-// level and the stats it gave;
-// the gathering of Zielarstwo: its place, the slider, how many herbs at
-// once, and each herb, known or hidden by the System; and the brewing of
-// Alchemia: its place, a potion's minutes and each recipe, known (with its
+// level and the stats it gave; the gathering of Zielarstwo: its place, the
+// slider, how many herbs at once, past its mastery the chance of a herb
+// twice (masteryText), and each herb, known or hidden by the System; and the
+// brewing of Alchemia: its place, a potion's minutes, the chance of an extra
+// potion (with its mastery's, brewChance) and each recipe, known (with its
 // herbs and the most potions at once) or hidden (a rare one of the
 // herbalist's also until she teaches it, recipeHint); and the Warsztat of
 // Rzemieślnictwo: its place, the slots with their patterns, known (with what
@@ -197,6 +209,9 @@ export function professionsView(row) {
   const crafter = professionState(professions, workshop.profession);
   const hidden = content().professionTexts.hidden;
   const settlement = settlementPointsOf(row);
+  // A potion's chance of an extra one, with the mastery's share past the
+  // 100th level of Alchemia (952.3 A).
+  const potionChance = brewChance(brewer.level, content());
   return {
     // The System's words at the top of the tab.
     intro: content().professionsIntro,
@@ -228,6 +243,8 @@ export function professionsView(row) {
       slots: herbSlots(gatherer.level, content()),
       slotLevels: gathering.slots,
       stack: content().professionRules.stack,
+      // Past Zielarstwo's mastery, its chance of a herb twice (952.3 A).
+      mastery: masteryText(gathering, content().professionTexts, gatherer.level),
       herbs: content().herbs.map((herb) =>
         herb.level <= gatherer.level
           ? {
@@ -255,7 +272,7 @@ export function professionsView(row) {
       // rounded up to a whole minute (brewMinutes).
       potionMinutes: potionMinutes(brewer.level, content(), perkOf(row, 'brewFaster')),
       maxMinutes: brewing.maxMinutes,
-      bonusChance: brewing.bonusChance,
+      bonusChance: potionChance,
       // A rare recipe of the herbalist's not taught yet is a shadow that
       // says at which standing with her and from which level it comes.
       recipes: content().potions.map((potion) =>
@@ -266,7 +283,7 @@ export function professionsView(row) {
               description: potion.description,
               level: potion.level,
               herbs: Object.entries(potion.herbs).map(([id, need]) => ({ id, name: content().herbsById[id].name, need, have: herbs[id] ?? 0 })),
-              catalyst: catalystView(potion, materials),
+              catalyst: catalystView(potion, materials, potionChance),
               count: potions[potion.id] ?? 0,
               most: mostPotions(potion, brewer.level, herbs, content(), perkOf(row, 'brewFaster')),
             }
@@ -288,8 +305,9 @@ export function professionsView(row) {
 
 // The Systemowa Kopalnia at a level of Górnictwo: its place, the slider, the
 // gold of the veins an hour at the character's level, the words under "Jak
-// to działa?", and each mineral, known (with how many an hour and in the
-// bag) or hidden by the System.
+// to działa?", past its mastery the chance of a mineral twice, and each
+// mineral, known (with how many an hour and in the bag) or hidden by the
+// System.
 function miningView(level, row) {
   const { mining } = content();
   const minerals = mineralsOf(row);
@@ -302,6 +320,8 @@ function miningView(level, row) {
     veinsPerHour: mining.veins.perHour,
     goldPerHour: veinGoldPerHour(row.level, content()),
     about: mining.about.map((_, index) => say(mining, 'about', index, { yield: percent(mining.yieldPerLevel), share: percent(mining.veins.share) })),
+    // Past Górnictwo's mastery, its chance of a mineral twice (952.4 A).
+    mastery: masteryText(mining, mining.texts, level),
     minerals: content().minerals.map((mineral) =>
       mineral.level <= level
         ? {

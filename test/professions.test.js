@@ -277,7 +277,8 @@ describe('herbalism through the API', () => {
     assert.equal(gathering.slots, 1);
     assert.deepEqual(gathering.herbs.map((herb) => herb.name ?? herb.hint), [
       'Żywokost',
-      ...[3, 5, 8, 12, 16, 22, 28, 34, 40, 50, 65, 90].map((level) => `Ukryte przez System do ${level}. poziomu Zielarstwa.`),
+      // The herbs of the mastery too (952.1), from the 100th level on.
+      ...[3, 5, 8, 12, 16, 22, 28, 34, 40, 50, 65, 90, 100, 120, 140, 160, 180].map((level) => `Ukryte przez System do ${level}. poziomu Zielarstwa.`),
     ]);
   });
 

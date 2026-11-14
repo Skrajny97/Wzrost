@@ -103,7 +103,8 @@ export function greenhouseSection(greenhouse, ticks) {
           'aria-pressed': herb.id === current?.herb,
           onClick: tapped(() => (herb.id === current?.herb ? null : chooseHerb(herb, current))),
         },
-        herbSprite(herb.id),
+        // A herb not drawn yet (those of the mastery, 952.1) has the leaf.
+        herbSprite(herb.id) ?? icon('leaf', { size: 24 }),
         h('span', { text: herb.name }),
       ),
     ),
@@ -144,7 +145,7 @@ export function greenhouseSection(greenhouse, ticks) {
     h(
       'div',
       { class: 'store' },
-      h('p', { class: 'store-head' }, herbSprite(current.herb), h('span', { text: t('{name}: {count} na dobę', { name: current.name, count: formatNumber(Math.floor(current.perDay)) }) }), amount),
+      h('p', { class: 'store-head' }, herbSprite(current.herb) ?? icon('leaf', { size: 24 }), h('span', { text: t('{name}: {count} na dobę', { name: current.name, count: formatNumber(Math.floor(current.perDay)) }) }), amount),
       h('div', { class: 'bar' }, fill),
       hint,
       collect,
