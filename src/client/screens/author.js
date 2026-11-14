@@ -230,9 +230,10 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
     );
   }
 
-  // Every account's confirmed e-mail in one go, separated by commas, for the
-  // list of testers of the Google Play test (the author, 14.11.2026): copied
-  // with the tap itself, or shown selected where the phone will not copy.
+  // The e-mails of the accounts that sign in with Google in one go,
+  // separated by commas, for the list of testers of the Google Play test
+  // (the author, 14.11.2026): copied with the tap itself, or shown selected
+  // where the phone will not copy.
   function mails(list) {
     if (!list?.length) return null;
     const text = list.join(', ');
@@ -254,8 +255,8 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
     return h(
       'section',
       { class: 'card stack author-mails', 'aria-label': 'Adresy e-mail' },
-      h('button', { type: 'button', class: 'button button--system button--small', text: `Kopiuj adresy e-mail (${formatNumber(list.length)})`, onClick: copy }),
-      h('p', { class: 'muted small', text: 'Potwierdzone adresy wszystkich kont, oddzielone przecinkami. Wklej je w Play Console: Test zamknięty → Testerzy → lista e-maili.' }),
+      h('button', { type: 'button', class: 'button button--system button--small', text: `Kopiuj adresy z Google (${formatNumber(list.length)})`, onClick: copy }),
+      h('p', { class: 'muted small', text: 'Adresy kont, które logują się przez Google, oddzielone przecinkami. Wklej je w Play Console: Test zamknięty → Testerzy → lista e-maili.' }),
       shown,
     );
   }
