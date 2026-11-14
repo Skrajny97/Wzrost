@@ -1,0 +1,14 @@
+{
+  "id": "robber-knight",
+  "tool": "pixellab generate-image-v2",
+  "description": "a robber knight in dented dark plate armour without any coat of arms, a plain grey shield and a battered longsword raised to strike, a tattered dark red cloak, visor down, menacing, the whole figure inside the picture, full body, three-quarter view",
+  "style": "src/client/art/monsters/bandit-chief.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

@@ -1,0 +1,14 @@
+{
+  "id": "snake-king",
+  "tool": "pixellab generate-image-v2",
+  "description": "the snake king of Slavic legend, a large grey-green serpent rearing up to strike, a small golden crown on its head, glittering cruel eyes, forked tongue out, the whole creature inside the picture, full body, three-quarter view",
+  "style": "src/client/art/monsters/zmij.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

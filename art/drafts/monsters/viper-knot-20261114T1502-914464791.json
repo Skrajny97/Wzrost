@@ -1,0 +1,14 @@
+{
+  "id": "viper-knot",
+  "tool": "pixellab generate-image-v2",
+  "description": "a writhing knot of small grey-black vipers with dark zigzag patterns, several heads raised and hissing with open fangs, the whole swarm inside the picture, full body, three-quarter view",
+  "style": "src/client/art/monsters/viper.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}
