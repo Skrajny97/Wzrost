@@ -905,6 +905,11 @@
       "id": "0.3.34",
       "title": "Wersja 0.3.34",
       "body": "- Labirynt mówi teraz wprost, gdzie są zdobyte nagrody. Dostajesz je od razu, po każdej zdobytej komnacie: PD i złoto trafiają do postaci, a Odłamki do Rdzenia.\n- Artefakty ze strażników czekają w Skrytce Rdzenia. Przycisk „Odbierz Artefakty” w Labiryncie otwiera Rdzeń od razu przy Skrytce, gdzie je wchłoniesz.\n- Po przegranej walce nic nie przepada: zdobyte nagrody już masz."
+    },
+    {
+      "id": "0.3.38",
+      "title": "Wersja 0.3.38",
+      "body": "- Do 15. poziomu postaci znajdziesz na wyprawach cztery razy więcej skrzyń z przedmiotami. Od 15. do 25. poziomu skrzyń jest coraz mniej, aż na 25. poziomie wypada ich tyle, ile wcześniej.\n- Złota, zasobów i odłamków czasu ze znalezisk nie ubywa: dodatkowe skrzynie przychodzą obok nich.\n- Rdzeń pokazuje małe liczby Artefaktów z dwoma miejscami po przecinku, więc widać każde ulepszenie, np. 0,16% i 0,22% zamiast dwa razy 0,2%.\n- Kod podarunkowy ZATESTY: 1000 złota, 100 Punktów Czasu i 50 Punktów Systemu. Działa do końca niedzieli 15 listopada. Wpisz go w Ustawieniach, w „Kod podarunkowy”."
     }
   ]
 }

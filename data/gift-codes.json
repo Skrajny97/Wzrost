@@ -39,6 +39,12 @@
       "rewards": { "systemPoints": 100, "timePoints": 100, "gold": 1000, "resources": { "wood": 100, "stone": 100, "iron-ore": 100 } }
     },
     {
+      "id": "for-the-tests-2026-11",
+      "code": "ZATESTY",
+      "until": "2026-11-16T00:00:00+01:00",
+      "rewards": { "systemPoints": 50, "timePoints": 100, "gold": 1000 }
+    },
+    {
       "id": "tiger-2026-11",
       "code": "TIGER",
       "until": "2026-11-17T00:00:00+01:00",

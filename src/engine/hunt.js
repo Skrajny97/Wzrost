@@ -107,6 +107,25 @@ export function explorationPace(minutes, content, level = 0) {
   };
 }
 
+// How many times the chests among the finds come for a character of `level`
+// (rewards.youngChests; the author, 14.11.2026: „Na wyprawach do 15.
+// poziomu postaci (odblokowanie Rzemieślnictwa) trzeba zwiększyć drop
+// itemów. Znacznie zwiększyć” and „od 15 do 25 poziomu też niech bedzie
+// zwiekszony drop ale w tych zakresach niech sie wypłaszcza osiagajac na 25
+// poziomie aktualny stan”): `factor` up to `fullTo`, falling in a straight
+// line to 1 at `until`, 1 from there on.
+/**
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number}
+ */
+export function youngChestFactor(level, content) {
+  const young = content.balance.rewards.youngChests;
+  if (!young || level >= young.until) return 1;
+  if (level <= young.fullTo) return young.factor;
+  return 1 + ((young.factor - 1) * (young.until - level)) / (young.until - young.fullTo);
+}
+
 // What `minutes` of an exploration in `area` at `level` bring on average,
 // as an exploration pays them: the gold of the fights and of the finds, the
 // camp's resources gathered and found (all kinds together), the materials
@@ -843,18 +862,30 @@ export function simulateHunt(
   const lowerCards = cardRng ? lowerLandCards(areaLand(area.id, content), content) : [];
   const told = (/** @type {string} */ text) => (sought ? gendered(text, sought.female ? 'female' : 'male') : text);
 
+  // The find's outcomes: the week's share more (or less) of the chance of a
+  // chest (items); none on the first exploration.
+  const outcomes = raisedOutcome(
+    Object.entries(rewards.findOutcomes).filter(([kind]) => !(first && kind === 'chest')),
+    'chest',
+    weekFactor(week, 'items'),
+  );
+  // A young character's finds hold more chests (youngChestFactor), beside
+  // what they hold, so no gold, resources or shards of time go: each find
+  // brings so many more of them on average that the chests come that many
+  // times as often. Drawn from a seed of their own, the member's on a trip,
+  // and told at the find's time, so the rest of the exploration, and a
+  // trip's fights, go as they would without them.
+  const outcomesTotal = outcomes.reduce((sum, [, weight]) => sum + weight, 0);
+  const chestShare = outcomesTotal > 0 ? (outcomes.find(([kind]) => kind === 'chest')?.[1] ?? 0) / outcomesTotal : 0;
+  const youngChests = chestShare * (youngChestFactor(character.level, content) - 1);
+  const youngRng = youngChests > 0 ? createRng(`${lootSeed ?? seed}:young`) : null;
+
   for (const [step, event] of timeline.entries()) {
     if (event.type === 'find') {
       // A find is gold, a treasure chest with an item of the place's level,
       // resources for the camp, nothing of interest or, rarely, a shard of
       // time (Time Points).
       const findLevel = areaLevel(area, lootRng, content);
-      // The week's share more (or less) of the chance of a chest (items).
-      const outcomes = raisedOutcome(
-        Object.entries(rewards.findOutcomes).filter(([kind]) => !(first && kind === 'chest')),
-        'chest',
-        weekFactor(week, 'items'),
-      );
       const outcome = lootRng.weighted(outcomes, ([, weight]) => weight)[0];
       if (outcome === 'gold') {
         const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * lootRng.float(0.5, 1.5) * blessedBy('gold', fights.length) * seatGold * cardsGold * hardGold));
@@ -874,6 +905,13 @@ export function simulateHunt(
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findTime', step, { time: amount }) });
       } else {
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findNothing', step) });
+      }
+      if (youngRng) {
+        const more = countEvents(youngChests, youngRng);
+        for (let extra = 1; extra <= more; extra++) {
+          const item = randomItem(areaLevel(area, youngRng, content), youngRng, content, blessedLoot(loot, fights.length));
+          entries.push({ t: event.t, type: 'find', item: take(item), text: say(texts, 'findChest', step + extra, { item: itemName(item, content) }) });
+        }
       }
       continue;
     }

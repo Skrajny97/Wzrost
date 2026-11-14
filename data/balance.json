@@ -131,6 +131,7 @@
     ],
     "toughDropMultiplier": 1.5,
     "findOutcomes": { "gold": 0.35, "chest": 0.2, "resource": 0.3, "nothing": 0.05, "time": 0.05 },
+    "youngChests": { "factor": 4, "fullTo": 15, "until": 25 },
     "findGoldPerLevel": 4,
     "findResourcePerLevel": 4,
     "gatherPerLevelHour": 2,

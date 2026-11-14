@@ -821,6 +821,30 @@
             }
           }
         },
+        "youngChests": {
+          "type": "object",
+          "description": "Więcej skrzyń z przedmiotami na wyprawach młodej postaci (autor 14.11.2026: „Na wyprawach do 15. poziomu postaci (odblokowanie Rzemieślnictwa) trzeba zwiększyć drop itemów. Znacznie zwiększyć” i „od 15 do 25 poziomu też niech bedzie zwiekszony drop ale w tych zakresach niech sie wypłaszcza osiagajac na 25 poziomie aktualny stan”). Do poziomu postaci `fullTo` skrzyń wśród znalezisk jest `factor` razy tyle, od `fullTo` do `until` coraz mniej w linii prostej, od `until` tyle, ile daje findOutcomes. Dodatkowe skrzynie nie zabierają złota, zasobów ani odłamków czasu: przychodzą obok znalezisk.",
+          "additionalProperties": false,
+          "required": [
+            "factor",
+            "fullTo",
+            "until"
+          ],
+          "properties": {
+            "factor": {
+              "type": "number",
+              "minimum": 1
+            },
+            "fullTo": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "until": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
         "findGoldPerLevel": {
           "type": "number",
           "minimum": 0
