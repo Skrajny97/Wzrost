@@ -246,6 +246,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     wait: later,
     setHp,
     float,
+    specks: fxs.specks,
   });
 
   // A line of the log. A blow of a weapon with a zaklęcie żywiołu says,
@@ -600,7 +601,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     // A skill's blow shows its look; a sweep's blows land at once, as its
     // wave has already crossed the foes.
     const look = event.skill ? lookOf(event) : null;
-    const style = look ? { color: look.color, big: look.big, glow: look.glow, teleport: look.teleport } : {};
+    const style = look ? { color: look.color, big: look.big, glow: look.glow, teleport: look.teleport, orb: look.orb } : {};
     // The blow: its kind, whether it fells its target and whether it ends
     // the fight (that one plays in slow motion).
     const blow = MOVES.has(event.kind) && target ? fxs.blow(event, actor, target, look, endingOf(event)) : null;

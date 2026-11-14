@@ -1364,6 +1364,16 @@ export function createFx(kit) {
       await animate(from, [{ transform: 'scale(1)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }], { duration: 160 });
       if (id !== run()) return;
     }
+    // A fireball (the Mag's Kula ognia and the skills drawn like it, 956):
+    // a burning orb in an arc.
+    if (style.orb === 'fire' && motion()) {
+      await fireball(a, b, id);
+      if (id !== run()) return;
+      onImpact();
+      await settle();
+      await later(300);
+      return;
+    }
     const tail = motion();
     const bolt = h('span', {
       class: ['projectile', `projectile--${magic ? 'magic' : 'arrow'}`, style.big && 'projectile--big', style.glow && 'projectile--glow', tail && 'projectile--tail'].filter(Boolean).join(' '),
@@ -1403,6 +1413,40 @@ export function createFx(kit) {
     onImpact();
     await settle();
     await later(300);
+  }
+
+  // A fireball flying from `a` to `b` in an arc, spinning and flickering,
+  // shedding embers and wisps of smoke on its way.
+  async function fireball(a, b, id) {
+    const distance = Math.hypot(b.x - a.x, b.y - a.y);
+    const size = Math.round(Math.min(46, Math.max(28, distance * 0.16)));
+    const lift = Math.min(70, distance * 0.24);
+    const control = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 - lift * 2 };
+    const at = (t) => ({
+      x: (1 - t) * (1 - t) * a.x + 2 * (1 - t) * t * control.x + t * t * b.x,
+      y: (1 - t) * (1 - t) * a.y + 2 * (1 - t) * t * control.y + t * t * b.y,
+    });
+    const steps = 12;
+    const flight = 470;
+    const points = Array.from({ length: steps + 1 }, (_, index) => at(Math.pow(index / steps, 1.25)));
+    const orb = h('span', { class: 'fx-fireball' });
+    orb.style.setProperty('--size', `${size}px`);
+    fx.append(orb);
+    const frames = points.map((point, index) => ({
+      transform: `translate(${point.x.toFixed(1)}px, ${point.y.toFixed(1)}px) translate(-50%, -50%) rotate(${index * 38}deg) scale(${(0.75 + (index / steps) * 0.35).toFixed(2)})`,
+      opacity: index === 0 ? 0.4 : 1,
+    }));
+    const FIRE = ['#fff1c1', '#ffd27a', '#ff8a3d', '#ff5a1f'];
+    const sheds = points.slice(0, -1).map((point, index) =>
+      later((index * flight) / steps).then(() => {
+        if (id !== run()) return;
+        specks.trail({ from: point, to: points[index + 1], duration: flight / steps, colors: FIRE, rate: 220, sizes: [2, 4.4], life: [200, 440], shape: 'ember' });
+        if (index % 3 === 1) specks.burst({ x: point.x, y: point.y, count: 1, colors: ['#4a3d35', '#5d4c40'], speed: [8, 20], life: [520, 760], size: [5, 8], shape: 'dust', gravity: -24, drag: 1.5 });
+      }),
+    );
+    await animate(orb, frames, { duration: flight, easing: 'linear' });
+    orb.remove();
+    await Promise.all(sheds);
   }
 
   // Before a skill's own blow, its light gathers on its user.
@@ -1518,5 +1562,5 @@ export function createFx(kit) {
     kit.setDilation(1);
   }
 
-  return { boxOf, centerOf, number, blow, hit, dodge, strike, charge, heal, glint, tick, cast, fall, slowMotion, cancel };
+  return { boxOf, centerOf, number, blow, hit, dodge, strike, charge, heal, glint, tick, cast, fall, slowMotion, cancel, specks };
 }

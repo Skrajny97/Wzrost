@@ -22885,3 +22885,225 @@ a.discord-button {
   fill: none;
   stroke-linecap: round;
 }
+
+/* The new looks of the skills (956, skill-fx.js). */
+.fx-fireball {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--size, 34px);
+  height: var(--size, 34px);
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle at 42% 40%, #fffbe6 0 14%, #ffe08a 26%, #ff9a3c 48%, #ff5a1f 66%, rgba(200, 40, 10, 0.55) 78%, rgba(200, 40, 10, 0) 100%);
+  box-shadow: 0 0 calc(var(--size, 34px) * 0.5) calc(var(--size, 34px) * 0.15) rgba(255, 120, 40, 0.65), 0 0 calc(var(--size, 34px) * 1.1) rgba(255, 90, 20, 0.35);
+  mix-blend-mode: screen;
+  z-index: 3;
+}
+
+.fx-fireball::after {
+  content: '';
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  background: conic-gradient(rgba(255, 210, 120, 0) 0deg, rgba(255, 160, 60, 0.8) 40deg, rgba(255, 210, 120, 0) 90deg, rgba(255, 120, 40, 0.65) 170deg, rgba(255, 210, 120, 0) 230deg, rgba(255, 160, 60, 0.75) 300deg, rgba(255, 210, 120, 0) 360deg);
+  -webkit-mask: radial-gradient(circle, transparent 40%, #000 46%, #000 62%, transparent 70%);
+  mask: radial-gradient(circle, transparent 40%, #000 46%, #000 62%, transparent 70%);
+  animation: fx-flicker 120ms steps(2) infinite;
+}
+
+@keyframes fx-flicker {
+  50% {
+    opacity: 0.6;
+    transform: scale(1.08);
+  }
+}
+
+.fx-explosion {
+  position: absolute;
+  width: var(--size, 90px);
+  height: var(--size, 90px);
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, #fffbe6 0 12%, #ffd27a 26%, #ff8a3d 46%, rgba(255, 70, 20, 0.6) 64%, rgba(120, 30, 10, 0) 76%);
+  mix-blend-mode: screen;
+  z-index: 3;
+}
+
+.fx-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 45%, var(--fx), transparent 75%);
+  opacity: 0;
+  z-index: 2;
+}
+
+.fx-windline {
+  position: absolute;
+  left: 0;
+  width: 70%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, rgba(232, 248, 255, 0.95), transparent);
+  pointer-events: none;
+}
+
+.fx-crystal {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+  background: linear-gradient(120deg, transparent 45%, #e8f8ff 45% 55%, transparent 55%);
+  filter: drop-shadow(0 0 4px #bfe8ff);
+}
+
+.fx-crystal::before,
+.fx-crystal::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  margin-left: -1px;
+  background: linear-gradient(#ffffff, #9fd8ff);
+}
+
+.fx-crystal::after {
+  transform: rotate(60deg);
+}
+
+.unit--frosted {
+  box-shadow: inset 0 0 0 2px rgba(232, 248, 255, 0.9), inset 0 0 16px rgba(143, 211, 255, 0.85), 0 0 12px rgba(143, 211, 255, 0.6);
+  filter: saturate(0.55) brightness(1.12);
+  transition: box-shadow 0.6s, filter 0.6s;
+}
+
+.fx-hexdome {
+  position: absolute;
+  width: var(--size, 120px);
+  height: var(--size, 120px);
+  color: var(--fx);
+  pointer-events: none;
+  filter: drop-shadow(0 0 6px var(--fx));
+}
+
+.fx-hexdome svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fx-hexwall {
+  position: absolute;
+  border-radius: 10px;
+  border: 2px solid var(--fx);
+  background-color: rgba(111, 182, 255, 0.14);
+  background-size: auto;
+  box-shadow: 0 0 14px var(--fx), inset 0 0 18px rgba(111, 182, 255, 0.45);
+  pointer-events: none;
+}
+
+.fx-cone {
+  position: absolute;
+  transform-origin: 0 50%;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(240, 250, 255, 0.75), rgba(160, 220, 255, 0.35) 55%, rgba(143, 211, 255, 0));
+  clip-path: polygon(0 44%, 100% 0, 100% 100%, 0 56%);
+  filter: blur(1.5px);
+}
+
+.fx-hexwall svg {
+  display: block;
+  border-radius: inherit;
+}
+
+.fx-reticle {
+  position: absolute;
+  width: var(--size, 80px);
+  height: var(--size, 80px);
+  color: var(--fx);
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px var(--fx));
+}
+
+.fx-reticle svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fx-pierce {
+  position: absolute;
+  height: 3px;
+  border-radius: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, #ffffff 30%, var(--fx) 70%, transparent);
+  box-shadow: 0 0 8px var(--fx);
+  transform-origin: 50% 50%;
+}
+
+.fx-rope {
+  position: absolute;
+  height: 14px;
+  border: 3px solid #b8935a;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(40, 26, 10, 0.6), 0 0 8px var(--fx);
+  pointer-events: none;
+}
+
+.fx-cracks {
+  position: absolute;
+  aspect-ratio: 5 / 2;
+  color: #f6ecd6;
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px var(--fx)) drop-shadow(0 1px 0 rgba(0, 0, 0, 0.8));
+}
+
+.fx-cracks svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fx-shockwave {
+  position: absolute;
+  aspect-ratio: 3 / 1;
+  border: 3px solid var(--fx);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--fx);
+  pointer-events: none;
+}
+
+.fx-crescent {
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  aspect-ratio: 200 / 80;
+  color: var(--fx);
+  pointer-events: none;
+  transform-origin: 50% 170%;
+  filter: drop-shadow(0 0 6px var(--fx));
+}
+
+.fx-crescent svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fx-emblem {
+  position: absolute;
+  width: var(--size, 60px);
+  aspect-ratio: 60 / 72;
+  color: var(--fx);
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px var(--fx));
+}
+
+.fx-emblem svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
