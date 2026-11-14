@@ -259,14 +259,22 @@ export async function inviteFriend(context) {
   // The friends and invitations are counted in the write itself, so two
   // invitations sent at the same moment never go past the cap (the code
   // review: both were counted before either was written). One sent twice at
-  // once goes once, and the second tap hears it waits.
+  // once goes once, and the second tap hears it waits. Nor does one go to a
+  // character whose list is full, which could not accept it (the author,
+  // 14.11.2026: „Niech nie da się dodawać do znajomych kogoś kto ma pełną
+  // listę”).
   const sent = await db
-    .prepare(`INSERT OR IGNORE INTO friends (character_id, friend_id, created_at) SELECT ?, ?, ? WHERE ${FRIENDS} + ${SENT} < ?`)
-    .bind(character.id, target.id, context.now, character.id, character.id, character.id, max)
+    .prepare(`INSERT OR IGNORE INTO friends (character_id, friend_id, created_at) SELECT ?, ?, ? WHERE ${FRIENDS} + ${SENT} < ? AND ${FRIENDS} < ?`)
+    .bind(character.id, target.id, context.now, character.id, character.id, character.id, max, target.id, target.id, max)
     .run();
   if (sent.meta.changes !== 1) {
     const waiting = await db.prepare('SELECT 1 AS waiting FROM friends WHERE character_id = ? AND friend_id = ?').bind(character.id, target.id).first();
     if (waiting) throw new ApiError(409, 'invited', `Zaproszenie dla postaci ${target.name} już czeka.`);
+    const [own, theirs] = await Promise.all([
+      db.prepare(`SELECT ${FRIENDS} + ${SENT} AS count`).bind(character.id, character.id, character.id).first(),
+      friendCount(db, target.id),
+    ]);
+    if (own.count < max && theirs.count >= max) throw new ApiError(409, 'full', `${target.name} ma już ${max} znajomych.`);
     throw new ApiError(409, 'full', `Masz już ${max} znajomych i zaproszeń. Usuń kogoś, żeby zaprosić nową postać.`);
   }
   return json({ ...(await friendsOf(db, character.id, context.now)), text: t('Zaproszenie wysłane. {name} przyjmie je w Znajomych.', { name: target.name }) });
