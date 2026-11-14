@@ -1,0 +1,14 @@
+{
+  "id": "mokosh-robe",
+  "tool": "pixellab generate-image-v2",
+  "description": "the robe of mokosh, slavic goddess of weaving: a long flowing robe of deep red cloth embroidered with white and golden slavic folk patterns, woven sun symbols and ears of wheat, a woven belt with tassels, an empty robe with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/szuba.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

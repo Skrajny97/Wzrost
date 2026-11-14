@@ -1,0 +1,14 @@
+{
+  "id": "svetovid-helm",
+  "tool": "pixellab generate-image-v2",
+  "description": "the helm of svetovid, the four-faced slavic god: a tall pointed steel helmet with a golden band, small stern golden faces looking out on its sides, a gilded nose guard and a mail aventail, an empty helmet with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/armet.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

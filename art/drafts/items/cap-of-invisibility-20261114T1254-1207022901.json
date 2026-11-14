@@ -1,0 +1,14 @@
+{
+  "id": "cap-of-invisibility",
+  "tool": "pixellab generate-image-v2",
+  "description": "a cap of invisibility from slavic fairy tales: a soft pointed cap of grey-blue cloth with a turned up grey fur brim, its top half fading into see-through shimmering sparkles, an empty cap with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/magnate-cap.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

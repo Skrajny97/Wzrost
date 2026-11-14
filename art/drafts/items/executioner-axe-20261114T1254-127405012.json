@@ -1,0 +1,14 @@
+{
+  "id": "executioner-axe",
+  "tool": "pixellab generate-image-v2",
+  "description": "an executioner's axe: a huge broad crescent-shaped dark steel blade with a polished silver cutting edge, a long straight black wooden haft bound with iron rings, a heavy iron spike at the butt end, diagonal, single inventory item icon",
+  "style": "src/client/art/items/nadziak.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

@@ -1,0 +1,14 @@
+{
+  "id": "papal-tiara",
+  "tool": "pixellab generate-image-v2",
+  "description": "a papal tiara: a tall white beehive-shaped crown ringed with three golden crowns one above another, set with small jewels, a small golden orb with a cross on top, two red bands hanging at the back, single inventory item icon",
+  "style": "src/client/art/items/prophet-crown.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

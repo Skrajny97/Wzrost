@@ -1,0 +1,14 @@
+{
+  "id": "khanjar",
+  "tool": "pixellab generate-image-v2",
+  "description": "a khanjar dagger: a strongly curved double-edged steel blade with a raised central ridge, a hilt of white ivory, a golden crossguard and a golden pommel set with a red ruby, diagonal, single inventory item icon",
+  "style": "src/client/art/items/baselard.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

@@ -1,0 +1,14 @@
+{
+  "id": "devana-bow",
+  "tool": "pixellab generate-image-v2",
+  "description": "the bow of devana, slavic goddess of the hunt: an elegant recurve bow of pale silver birch wood carved with leaves, a small silver moon crescent in the middle of the grip, green leafy vines wound around the limbs, a glowing silver bowstring, upright, single inventory item icon",
+  "style": "src/client/art/items/persian-bow.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

@@ -1,0 +1,14 @@
+{
+  "id": "merlin-staff",
+  "tool": "pixellab generate-image-v2",
+  "description": "merlin's staff: a tall gnarled staff of dark oak with twisting roots at the top holding a large glowing white crystal orb, small silver stars and moon charms hanging on threads below it, faint blue magic sparkles, upright, single inventory item icon",
+  "style": "src/client/art/items/archmage-staff.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

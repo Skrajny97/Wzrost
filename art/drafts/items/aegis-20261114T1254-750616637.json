@@ -1,0 +1,14 @@
+{
+  "id": "aegis",
+  "tool": "pixellab generate-image-v2",
+  "description": "the aegis: a round shield of polished bronze and gold with a raised rim, a gorgon head with snake hair embossed in the middle, small golden scales around it, a soft divine glow, single inventory item icon",
+  "style": "src/client/art/items/royal-shield.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

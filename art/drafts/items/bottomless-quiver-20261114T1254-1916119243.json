@@ -1,0 +1,14 @@
+{
+  "id": "bottomless-quiver",
+  "tool": "pixellab generate-image-v2",
+  "description": "a bottomless quiver: a tall quiver of dark blue leather whose open mouth shows a deep starry night sky inside, many arrows with white feathers rising out of it, silver fittings and a strap, faint magic sparkles, single inventory item icon",
+  "style": "src/client/art/items/crown-quiver.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

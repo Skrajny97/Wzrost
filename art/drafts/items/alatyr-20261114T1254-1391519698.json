@@ -1,0 +1,14 @@
+{
+  "id": "alatyr",
+  "tool": "pixellab generate-image-v2",
+  "description": "the alatyr stone, the sacred white stone of slavic legends: a smooth glowing white stone carved with a radiant golden eight-pointed star cross, hanging on a leather cord, soft warm light, single inventory item icon",
+  "style": "src/client/art/items/grzywna.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

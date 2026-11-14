@@ -1,0 +1,14 @@
+{
+  "id": "solomon-ring",
+  "tool": "pixellab generate-image-v2",
+  "description": "the ring of solomon: a heavy golden ring with a large flat round seal engraved with a glowing star sigil inside a circle, a faint blue magic glow, single inventory item icon",
+  "style": "src/client/art/items/ancestors-ring.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

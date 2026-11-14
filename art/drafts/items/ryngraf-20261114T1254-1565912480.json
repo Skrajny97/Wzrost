@@ -1,0 +1,14 @@
+{
+  "id": "ryngraf",
+  "tool": "pixellab generate-image-v2",
+  "description": "a polish ryngraf: a gilded brass breast plate shaped like a wide crescent hanging on a heavy golden chain, a small silver crowned eagle embossed in the middle, small rivets along the edge, single inventory item icon",
+  "style": "src/client/art/items/pectoral.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

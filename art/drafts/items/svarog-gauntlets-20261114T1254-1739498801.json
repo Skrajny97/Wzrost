@@ -1,0 +1,14 @@
+{
+  "id": "svarog-gauntlets",
+  "tool": "pixellab generate-image-v2",
+  "description": "the gauntlets of svarog, the slavic smith god: a pair of heavy dark iron plate gauntlets with glowing orange-hot seams like fresh forged metal, small embers and sparks around them, golden knuckle plates, single inventory item icon",
+  "style": "src/client/art/items/hetman-gloves.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

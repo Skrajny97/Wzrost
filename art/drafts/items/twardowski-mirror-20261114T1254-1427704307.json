@@ -1,0 +1,14 @@
+{
+  "id": "twardowski-mirror",
+  "tool": "pixellab generate-image-v2",
+  "description": "the magic mirror of the sorcerer twardowski: an oval hand mirror in a black and gold frame carved with occult symbols, the glass dark with swirling misty blue light and a small glowing star in the middle, single inventory item icon",
+  "style": "src/client/art/items/hourglass.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

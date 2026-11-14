@@ -1,0 +1,14 @@
+{
+  "id": "bekesha",
+  "tool": "pixellab generate-image-v2",
+  "description": "a polish bekiesza coat: a knee-length dark green woollen coat with a wide grey wolf fur collar and fur trim on the cuffs and hem, rows of black braided frog fastenings across the chest, an empty coat with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/czamara.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

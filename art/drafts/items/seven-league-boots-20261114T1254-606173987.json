@@ -1,0 +1,14 @@
+{
+  "id": "seven-league-boots",
+  "tool": "pixellab generate-image-v2",
+  "description": "a pair of seven-league boots from fairy tales: tall brown leather boots with small white feathered wings at the heels, golden buckles, faint wind swirls around them, single inventory item icon",
+  "style": "src/client/art/items/safian-boots.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

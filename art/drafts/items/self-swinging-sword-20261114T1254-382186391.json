@@ -1,0 +1,14 @@
+{
+  "id": "self-swinging-sword",
+  "tool": "pixellab generate-image-v2",
+  "description": "a legendary self-swinging sword from slavic fairy tales: a long straight double-edged silver blade glowing pale blue with flowing runes, faint swirling wind lines around the blade, a silver crossguard shaped like spread wings, a dark leather grip, a round silver pommel with a glowing blue gem, diagonal, single inventory item icon",
+  "style": "src/client/art/items/coronation-sword.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

@@ -1,0 +1,14 @@
+{
+  "id": "holy-grail",
+  "tool": "pixellab generate-image-v2",
+  "description": "the holy grail: a golden chalice with a wide cup on a slender stem and a round foot, set with red rubies and white pearls, glowing with a soft golden holy light, rays of light rising from the cup, single inventory item icon",
+  "style": "src/client/art/items/pacifical.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

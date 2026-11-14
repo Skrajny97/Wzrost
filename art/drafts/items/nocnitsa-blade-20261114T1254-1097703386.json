@@ -1,0 +1,14 @@
+{
+  "id": "nocnitsa-blade",
+  "tool": "pixellab generate-image-v2",
+  "description": "the blade of the nocnitsa, a slavic night demon: a thin slightly curved black dagger with a smoky violet glow along its edge, a crossguard shaped like bat wings, a dark grip, a pale moonstone pommel, wisps of dark mist, diagonal, single inventory item icon",
+  "style": "src/client/art/items/rondel.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

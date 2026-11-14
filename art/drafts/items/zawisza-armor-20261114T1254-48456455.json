@@ -1,0 +1,14 @@
+{
+  "id": "zawisza-armor",
+  "tool": "pixellab generate-image-v2",
+  "description": "the armour of zawisza the black, a legendary polish knight: a full black plate armour breastplate with round black pauldrons and a short skirt of black steel lames, thin gold trim on every edge, a small golden half-eagle emblem on the chest, an empty armor with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/maximilian-armor.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

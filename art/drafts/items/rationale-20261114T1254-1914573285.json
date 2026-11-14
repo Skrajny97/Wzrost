@@ -1,0 +1,14 @@
+{
+  "id": "rationale",
+  "tool": "pixellab generate-image-v2",
+  "description": "a rationale, a bishop's shoulder vestment: a wide collar of white silk richly embroidered with gold thread, with a square panel hanging on the chest, decorated with pearls and small coloured gems, lying over a white vestment, an empty vestment with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/pallium.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}
