@@ -4,10 +4,28 @@
   "description": "Pakiety Punktów Systemu za pieniądze i zasady zakupu (src/engine/payments.js, src/server/payments.js; DECISIONS.md, „Płatności za Punkty Systemu: podwaliny”). Kwoty w groszach, brutto.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["currency", "packs", "monthlyLimit", "limitDays", "withdrawalDays", "adultOnly", "termsVersion", "pendingHours", "timeZone", "quarterLimit"],
+  "required": [
+    "currency",
+    "play",
+    "packs",
+    "monthlyLimit",
+    "limitDays",
+    "withdrawalDays",
+    "adultOnly",
+    "termsVersion",
+    "pendingHours",
+    "timeZone",
+    "quarterLimit"
+  ],
   "properties": {
-    "$comment": { "type": "string" },
-    "currency": { "description": "Waluta cen (ISO 4217).", "type": "string", "pattern": "^[A-Z]{3}$" },
+    "$comment": {
+      "type": "string"
+    },
+    "currency": {
+      "description": "Waluta cen (ISO 4217).",
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
     "packs": {
       "description": "Pakiety w kolejności sklepu, od najmniejszego.",
       "type": "array",
@@ -15,21 +33,89 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "points", "price"],
+        "required": [
+          "id",
+          "points",
+          "price",
+          "playId"
+        ],
         "properties": {
-          "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
-          "points": { "description": "Ile Punktów Systemu daje pakiet.", "type": "integer", "minimum": 1 },
-          "price": { "description": "Cena brutto w groszach.", "type": "integer", "minimum": 100 }
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "points": {
+            "description": "Ile Punktów Systemu daje pakiet.",
+            "type": "integer",
+            "minimum": 1
+          },
+          "price": {
+            "description": "Cena brutto w groszach.",
+            "type": "integer",
+            "minimum": 100
+          },
+          "playId": {
+            "description": "Id produktu jednorazowego w Play Console.",
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9_.]*$"
+          }
         }
       }
     },
-    "monthlyLimit": { "description": "Najwięcej, ile konto płaci w ostatnich limitDays dniach, w groszach.", "type": "integer", "minimum": 100 },
-    "limitDays": { "type": "integer", "minimum": 1 },
-    "withdrawalDays": { "description": "Dni od zapłaty, w których niewydane kupione punkty można zwrócić.", "type": "integer", "minimum": 0 },
-    "adultOnly": { "description": "Kupują tylko osoby, które potwierdzą pełnoletność.", "type": "boolean" },
-    "termsVersion": { "description": "Wersja regulaminu, którą przyjmuje kupujący.", "type": "string", "minLength": 1 },
-    "pendingHours": { "description": "Ile godzin zamówienie czeka na zapłatę.", "type": "integer", "minimum": 1 },
-    "timeZone": { "description": "Strefa czasu, w której liczą się kwartały (limit działalności nierejestrowanej) i dni zestawienia sprzedaży.", "type": "string", "minLength": 1 },
-    "quarterLimit": { "description": "Najwięcej, ile gra przyjmie w kwartale, w groszach: limit przychodu działalności nierejestrowanej (804 A). null: bez limitu (firma).", "type": ["integer", "null"], "minimum": 100 }
+    "monthlyLimit": {
+      "description": "Najwięcej, ile konto płaci w ostatnich limitDays dniach, w groszach.",
+      "type": "integer",
+      "minimum": 100
+    },
+    "limitDays": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "withdrawalDays": {
+      "description": "Dni od zapłaty, w których niewydane kupione punkty można zwrócić.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "adultOnly": {
+      "description": "Kupują tylko osoby, które potwierdzą pełnoletność.",
+      "type": "boolean"
+    },
+    "termsVersion": {
+      "description": "Wersja regulaminu, którą przyjmuje kupujący.",
+      "type": "string",
+      "minLength": 1
+    },
+    "pendingHours": {
+      "description": "Ile godzin zamówienie czeka na zapłatę.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "timeZone": {
+      "description": "Strefa czasu, w której liczą się kwartały (limit działalności nierejestrowanej) i dni zestawienia sprzedaży.",
+      "type": "string",
+      "minLength": 1
+    },
+    "quarterLimit": {
+      "description": "Najwięcej, ile gra przyjmie w kwartale, w groszach: limit przychodu działalności nierejestrowanej (804 A). null: bez limitu (firma).",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 100
+    },
+    "play": {
+      "description": "Aplikacja w Sklepie Play (867 A): nazwa pakietu.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "package"
+      ],
+      "properties": {
+        "package": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+        }
+      }
+    }
   }
 }

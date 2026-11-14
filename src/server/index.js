@@ -47,7 +47,7 @@ import { getGuildRanking } from './guild-members.js';
 import { claimFame, getFame } from './fame.js';
 import { cancelOrders, craftMaterials, moveOrder, salvageItem, salvageItems, sellMaterials, skipCrafting } from './crafting.js';
 import { buyCosmetic, setNameColor, wearCosmetic } from './cosmetics.js';
-import { authorPaymentAction, authorPayments, getPayments, orderPoints, paymentNotice, paymentNoticeAddress, paymentReturn, withdrawPurchase } from './payments.js';
+import { authorPaymentAction, authorPayments, cancelOrder, confirmPlayPurchase, getPayments, orderPoints, paymentNotice, paymentNoticeAddress, paymentReturn, playMaintenance, withdrawPurchase } from './payments.js';
 import { confirmEmail, requestLink } from './email.js';
 import {
   autoPoints,
@@ -213,6 +213,10 @@ const routes = [
   ['GET', '/api/payments', getPayments],
   ['POST', '/api/payments/order', orderPoints],
   ['POST', '/api/payments/withdraw', withdrawPurchase],
+  // A purchase the app made in Google Play, and an order left there unpaid
+  // (867 A; payments.js).
+  ['POST', '/api/payments/play', confirmPlayPurchase],
+  ['POST', '/api/payments/cancel', cancelOrder],
   ['POST', '/api/payments/notify/:provider', paymentNotice],
   ['GET', '/api/payments/notify/:provider', paymentNoticeAddress],
   // Where the gateway sends the player back after paying: the shop's page of
@@ -586,6 +590,9 @@ export default {
       // their `auto` option, the results not given to every member yet
       // given, and the old ones dropped (party-events.js).
       () => settlePartyEvents(env.DB, controller.scheduledTime),
+      // The Google Play purchases not yet settled, and the ones Google voided
+      // (payments.js), where the game sells through Google Play.
+      () => playMaintenance(env, controller.scheduledTime),
     ];
     for (const job of jobs) {
       try {

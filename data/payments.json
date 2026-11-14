@@ -1,11 +1,34 @@
 {
-  "$comment": "Payments for Punkty Systemu (src/server/payments.js, src/engine/payments.js; DECISIONS.md, the payments foundations and the author's answers of 11.11.2026: 804 A an unregistered activity to start, 805 D the Autopay gateway, 806 A adults only, 807 A unspent bought points given back within the days, 808 A 100 PS for 2 PLN). `price`: gross, in grosze, in `currency`. `monthlyLimit`: the most an account pays in the last `limitDays` days, in grosze. `withdrawalDays`: the days after a payment in which unspent bought points can be given back. `adultOnly`: buying only by those who declare they are of age. `termsVersion`: the version of the terms a purchase is accepted under; a new one when the terms change. `pendingHours`: how long an unpaid order waits for its payment before it is closed. `quarterLimit`: the most the game takes in a quarter of the year on the clock of `timeZone`, in grosze: an unregistered activity's revenue limit (225% of the minimum wage a quarter, 10 813.50 PLN in 2026; the minimum wage only grows, so the year's old value stays safe until it is raised); the packs that would cross it are not sold until the next quarter. null: no limit (a registered business).",
+  "$comment": "Payments for Punkty Systemu (src/server/payments.js, src/engine/payments.js; DECISIONS.md, the payments foundations and the author's answers of 11.11.2026: 804 A an unregistered activity to start, 805 D the Autopay gateway, 806 A adults only, 807 A unspent bought points given back within the days, 808 A 100 PS for 2 PLN; 867 A, 12.11.2026: bought only in the app from the Sklep Play, through Google Play Billing). `price`: gross, in grosze, in `currency`. `monthlyLimit`: the most an account pays in the last `limitDays` days, in grosze. `withdrawalDays`: the days after a payment in which unspent bought points can be given back. `adultOnly`: buying only by those who declare they are of age. `termsVersion`: the version of the terms a purchase is accepted under; a new one when the terms change. `pendingHours`: how long an unpaid order waits for its payment before it is closed. `quarterLimit`: the most the game takes in a quarter of the year on the clock of `timeZone`, in grosze: an unregistered activity's revenue limit (225% of the minimum wage a quarter, 10 813.50 PLN in 2026; the minimum wage only grows, so the year's old value stays safe until it is raised); the packs that would cross it are not sold until the next quarter. null: no limit (a registered business). `play`: the app's package in the Sklep Play and, in each pack, `playId`, the id of its one-time product in Play Console (lowercase letters, digits, `_` and `.`), the same in both.",
   "currency": "PLN",
+  "play": {
+    "package": "com.insightrpg.app"
+  },
   "packs": [
-    { "id": "ps-250", "points": 250, "price": 499 },
-    { "id": "ps-500", "points": 500, "price": 999 },
-    { "id": "ps-1000", "points": 1000, "price": 1999 },
-    { "id": "ps-2500", "points": 2500, "price": 4999 }
+    {
+      "id": "ps-250",
+      "points": 250,
+      "price": 499,
+      "playId": "ps_250"
+    },
+    {
+      "id": "ps-500",
+      "points": 500,
+      "price": 999,
+      "playId": "ps_500"
+    },
+    {
+      "id": "ps-1000",
+      "points": 1000,
+      "price": 1999,
+      "playId": "ps_1000"
+    },
+    {
+      "id": "ps-2500",
+      "points": 2500,
+      "price": 4999,
+      "playId": "ps_2500"
+    }
   ],
   "monthlyLimit": 40000,
   "limitDays": 30,

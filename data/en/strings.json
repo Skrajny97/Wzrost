@@ -3290,5 +3290,16 @@
   "Nagrody przychodzą od razu, po każdej zdobytej komnacie.": "Rewards come at once, after every chamber won.",
   "PD, złoto i Odłamki już masz. Artefakty czekają w Skrytce Rdzenia.": "You already have the XP, gold and Shards. The Artifacts wait in the Core Cache.",
   "Wszystko już masz: PD i złoto u postaci, a Odłamki i Artefakty w Rdzeniu.": "You already have it all: the XP and gold on your character, the Shards and Artifacts in the Core.",
-  "Odbierz Artefakty: {count}": "Claim Artifacts: {count}"
+  "Odbierz Artefakty: {count}": "Claim Artifacts: {count}",
+  "Punkty Systemu kupisz w aplikacji Insight ze Sklepu Play.": "You can buy System Points in the Insight app from Google Play.",
+  "Płatność czeka na potwierdzenie Google Play. Punkty dojdą same.": "The payment is waiting for Google Play to confirm it. The points will arrive on their own.",
+  "Zakup jest w Google Play, ale gra jeszcze go nie potwierdziła. Punkty dojdą, gdy otworzysz tę stronę ponownie.": "The purchase is in Google Play, but the game has not confirmed it yet. The points will arrive when you open this page again.",
+  "Płacisz przez Google Play.": "You pay through Google Play.",
+  "{points} zniknie od razu, a {price} wróci przez Google Play, zwykle w kilka dni.": "{points} will be removed at once, and {price} will come back through Google Play, usually within a few days.",
+  "Zakup zwrócony. Pieniądze wrócą przez Google Play.": "Purchase returned. The money will come back through Google Play.",
+  "Google Play nie odpowiada. Spróbuj za chwilę.": "Google Play is not answering. Try again in a moment.",
+  "Google Play nie zna tego zakupu.": "Google Play does not know this purchase.",
+  "Ten zakup anulowano w Google Play.": "This purchase was canceled in Google Play.",
+  "Ten zakup jest na innym koncie.": "This purchase belongs to another account.",
+  "Ten zakup jest już sprawdzany. Spróbuj za chwilę.": "This purchase is already being checked. Try again in a moment."
 }

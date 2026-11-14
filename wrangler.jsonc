@@ -107,16 +107,18 @@
     // the mock-ups 881, the cards' look 885–888 and the Encyklopedia's 889.
     "CARDS": "on",
     // The gateway of the payments for Punkty Systemu (src/server/payments.js,
-    // src/server/payment-providers.js): "autopay" (805 D), or empty: off. Its
-    // keys, AUTOPAY_SERVICE_ID and AUTOPAY_SHARED_KEY, are Worker secrets the
-    // deploy workflow sets from the GitHub secrets; without them the
-    // purchases stay off ("not found").
-    "PAYMENTS": "autopay",
-    // "authors": the purchases only for the author's accounts, while the
-    // first real purchase is tried (the author, 11.11.2026: no test
-    // environment); empty: for every player, once the purchase screen is
-    // accepted and the terms name the seller and Autopay.
-    "PAYMENTS_FOR": "authors",
+    // src/server/payment-providers.js): "google-play", Google Play Billing in
+    // the app from the Sklep Play (867 A; google-play.js), or empty: off.
+    // Off until the day the game is in the Sklep Play for everyone: the
+    // author, 14.11.2026, „platnosci wdrożymy rownoczesnie wszystkim na raz
+    // jak juz Sklep Play bedzie funkcjonalny”. Its key, the service account
+    // GOOGLE_PLAY_SERVICE_ACCOUNT, is a Worker secret the deploy workflow
+    // sets from the GitHub secret; without it the purchases stay off ("not
+    // found"). ("autopay", 805 D, is in the code, unused.)
+    "PAYMENTS": "",
+    // "authors": the purchases only for the author's accounts; empty: for
+    // every player (the author: everyone at once, no stage before).
+    "PAYMENTS_FOR": "",
     // Autopay's gateway: the real one in the game.
     "AUTOPAY_HOST": "https://pay.autopay.eu"
   },
@@ -191,10 +193,9 @@
         "LABYRINTH": "on",
         // Talia Systemu, the Salon Gier's card game, as in the game (871–889).
         "CARDS": "on",
-        // The payments for Punkty Systemu: off until the Autopay test
-        // account's keys are in the GitHub secrets (AUTOPAY_TEST_SERVICE_ID,
-        // AUTOPAY_TEST_SHARED_KEY), then "autopay" with Autopay's test
-        // gateway, where no money moves.
+        // The payments for Punkty Systemu: off here. The app from the Sklep
+        // Play opens the game's own address, not this one, so Google Play
+        // Billing has nothing to buy on the test version.
         "PAYMENTS": "",
         "AUTOPAY_HOST": "https://testpay.autopay.eu"
       },
