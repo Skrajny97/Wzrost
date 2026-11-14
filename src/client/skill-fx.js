@@ -6,7 +6,7 @@
 // a shield or a dance of shadows wraps the character in its aura. Each skill
 // has a look below, by its id in data/skills.json.
 
-import { artChain } from './art.js';
+import { artChain, itemSprite } from './art.js';
 import { h } from './dom.js';
 import { t } from './i18n.js';
 import { playSkill } from './sound.js';
@@ -160,6 +160,19 @@ for (const look of Object.values(SKILL_LOOKS)) {
 }
 for (const id of ['arrow-rain', 'arrow-storm', 'sky-thunder']) SKILL_LOOKS[id].volley = true;
 for (const id of ['power-strike', 'crushing-blow', 'shattering-blow']) SKILL_LOOKS[id].quake = true;
+// The Kleryk's and the Cień's basic skills (956.10–956.15, the author: "wszystkie
+// nowe super"): a beam of light on the healed ally, circles of runes and
+// pillars of light under the foes, a golden halo with falling feathers, a
+// strike out of shadow smoke, venom coating the blade and a dance of shadow
+// afterimages. The evolved classes' skills of the same kinds keep their
+// looks until their own turn (the author: animations of the evolved
+// classes after the basic ones).
+SKILL_LOOKS['prayer-of-health'].lightfall = true;
+SKILL_LOOKS.exorcism.runes = true;
+SKILL_LOOKS.blessing.halo = true;
+SKILL_LOOKS.backstab.smoke = true;
+SKILL_LOOKS['poisoned-blade'].venom = true;
+SKILL_LOOKS['shadow-dance'].afterimages = true;
 
 const DUST = ['#b9a98f', '#8f816b', '#d8cbb0'];
 const STONE = ['#8a8274', '#6f675b', '#a39a89'];
@@ -185,6 +198,86 @@ const EMBLEM =
 const FIRE = ['#fff1c1', '#ffd27a', '#ff8a3d', '#ff5a1f'];
 const SMOKE = ['#4a3d35', '#5d4c40', '#3a312b'];
 const ICE = ['#ffffff', '#e4f6ff', '#bfe8ff', '#8fd3ff'];
+const LIFE = ['#ffffff', '#e3f5a8', '#b6e388', '#7fd36b'];
+const HOLY = ['#ffffff', '#fff6cf', '#f2d675'];
+const GOLD = ['#fff6cf', '#ffe08a', '#f2d675', '#e8c76a'];
+const SHADE = ['#2a2040', '#3a2c58', '#1e1730'];
+const SHADE_SPARKS = ['#efe8ff', '#c9b7ff', '#a690e8'];
+const VENOM = ['#eaffc0', '#c5f08a', '#9ccc65', '#6f9a3a'];
+// The venom's band on a blade's icon (the Zatrute ostrze's look): between
+// the guard's line and a line across the blade that moves to the point.
+const VENOM_FROM = 'polygon(-100% -72%, 200% 228%, 200% 228%, -100% -72%)';
+const VENOM_TO = 'polygon(-100% -72%, 200% 228%, 200% 100%, -100% -200%)';
+
+// A cross of light (the Modlitwa o zdrowie's look).
+const CROSS =
+  '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M15 3h10v12h12v10H25v12H15V25H3V15h12z" fill="currentColor" stroke="#ffffff" stroke-width="2.4" stroke-linejoin="round"/>' +
+  '<path d="M20 8v24M8 20h24" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" opacity="0.75"/></svg>';
+
+// A circle of runes on the ground (the Egzorcyzm's look): two rings, runes
+// between them and an eight-pointed star inside.
+const RUNES = (() => {
+  const glyphs = ['M-2.5 -3.5V3.5M-2.5 -3.5L2.5 -1L-2.5 1.5', 'M-2.5 3.5L0 -3.5L2.5 3.5M-1.3 0.6H1.3', 'M0 -3.5V3.5M-2.5 -1.5L2.5 1.5', 'M-2.5 -3.5L2.5 3.5M2.5 -3.5L0 0', 'M2.5 -3.5H-2.5V3.5H2.5', 'M-2.5 3.5V-3.5L2.5 3.5V-3.5'];
+  const runes = Array.from({ length: 12 }, (_, k) => `<path d="${glyphs[k % glyphs.length]}" transform="rotate(${k * 30}) translate(0 -38.5)"/>`).join('');
+  const square = (turn) =>
+    Array.from({ length: 4 }, (_, k) => {
+      const angle = ((k * 90 + turn) * Math.PI) / 180;
+      return `${(Math.cos(angle) * 29).toFixed(1)},${(Math.sin(angle) * 29).toFixed(1)}`;
+    }).join(' ');
+  return (
+    '<svg viewBox="-50 -50 100 100" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">' +
+    '<circle r="46" stroke-width="3.2"/><circle r="31" stroke-width="2"/>' +
+    `<g stroke-width="2.2">${runes}</g>` +
+    `<polygon points="${square(0)}" stroke-width="1.8"/><polygon points="${square(45)}" stroke-width="1.8"/>` +
+    '<circle r="7" stroke-width="1.8"/></g></svg>'
+  );
+})();
+
+// A dark wisp torn out of a foe (the Egzorcyzm's look).
+const WISP =
+  '<svg viewBox="0 0 20 60" aria-hidden="true"><defs><linearGradient id="fx-wisp-fade" x1="0" y1="1" x2="0" y2="0">' +
+  '<stop offset="0" stop-color="#1b1429" stop-opacity="0"/><stop offset="0.35" stop-color="#1b1429"/><stop offset="0.75" stop-color="#2e2347"/><stop offset="1" stop-color="#2e2347" stop-opacity="0"/></linearGradient>' +
+  '<linearGradient id="fx-wisp-edge" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#b9a6f0" stop-opacity="0"/><stop offset="0.4" stop-color="#b9a6f0"/><stop offset="1" stop-color="#b9a6f0" stop-opacity="0"/></linearGradient></defs>' +
+  '<path d="M10 58C2 47 17 39 10 28C4 19 15 11 10 2" fill="none" stroke="url(#fx-wisp-fade)" stroke-width="7" stroke-linecap="round"/>' +
+  '<path d="M10 58C2 47 17 39 10 28C4 19 15 11 10 2" fill="none" stroke="url(#fx-wisp-edge)" stroke-width="1.8" stroke-linecap="round"/></svg>';
+
+// A halo (the Błogosławieństwo's look).
+const HALO =
+  '<svg viewBox="0 0 60 20" aria-hidden="true"><ellipse cx="30" cy="10" rx="26" ry="6.5" fill="none" stroke="#fff6cf" stroke-width="4.4"/>' +
+  '<ellipse cx="30" cy="10" rx="26" ry="6.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+
+// A white feather with a golden quill, its vane a little bent.
+const FEATHER =
+  '<svg viewBox="0 0 12 30" aria-hidden="true"><path d="M6.4 1.5C9.6 5 10.6 11 9.4 17C8.6 21 7.4 24 6.6 27L5.8 27C4.4 23 2.2 19 2 14C1.8 8.6 3.6 4.4 6.4 1.5Z" fill="#fffdf6" stroke="#b8902f" stroke-width="0.8"/>' +
+  '<path d="M6.2 8L9.4 6.4M6.2 11L9.8 9.2M6.2 14L9.8 12.4M6.1 17L9.2 15.6M6.2 8L2.8 5.8M6.2 11L2.3 9M6.2 14L2.1 12.2M6.1 17L2.5 15.4" stroke="#d9c38a" stroke-width="0.55"/>' +
+  '<path d="M6.4 3C6.6 11 6.4 19 6 29" fill="none" stroke="#b8862a" stroke-width="1.2" stroke-linecap="round"/></svg>';
+
+// A four-pointed glint of light.
+const GLINT = '<svg viewBox="-10 -10 20 20" aria-hidden="true"><path d="M0 -10L1.8 -1.8L10 0L1.8 1.8L0 10L-1.8 1.8L-10 0L-1.8 -1.8Z" fill="currentColor"/><circle r="2.2" fill="#ffffff"/></svg>';
+
+// A violet cut from behind (the Cios w plecy's look), with a thin echo
+// along it: parallel, never a cross (that is the mark of a fallen unit).
+const SHADOW_SLASH =
+  '<svg viewBox="-50 -50 100 100" aria-hidden="true"><path d="M-49 -23Q-4 -13 49 26Q-10 2 -49 -23Z" fill="#241a38"/>' +
+  '<path d="M-46 -21Q-4 -12 46 23Q-8 0 -46 -21Z" fill="currentColor"/>' +
+  '<path d="M-42 -18Q-3 -9 42 20" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round"/>' +
+  '<path d="M-38 -5Q0 5 38 30" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity="0.8"/></svg>';
+
+// Three spiral arms of a whirl of shadows (the Taniec cieni's look), drawn
+// on a circle that the card's box stretches.
+const SWIRL = (() => {
+  const arm = (turn, width, color) => {
+    const points = Array.from({ length: 17 }, (_, step) => {
+      const share = step / 16;
+      const angle = ((turn + share * 160) * Math.PI) / 180;
+      const radius = 47 - share * 25;
+      return `${(Math.cos(angle) * radius).toFixed(1)} ${(Math.sin(angle) * radius).toFixed(1)}`;
+    });
+    return `<path d="M${points.join('L')}" stroke="${color}" stroke-width="${width}" vector-effect="non-scaling-stroke"/>`;
+  };
+  const arms = [0, 120, 240].map((turn) => arm(turn, 6, '#241a38') + arm(turn + 4, 1.8, '#c9b7ff')).join('');
+  return `<svg viewBox="-50 -50 100 100" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-linejoin="round">${arms}</g></svg>`;
+})();
 
 // Hexagons in the skill's colour over the Osłona many's wall (its new
 // look), as an inline SVG pattern (the page's rules allow no image made of
@@ -870,6 +963,591 @@ export function skillEffects(kit) {
     ]);
   }
 
+  // A step of an effect after a pause, left out when the fight was cut short
+  // meanwhile: Pomiń and Powtórz clear the stage, `element` with it, so a
+  // late step neither flashes over the replay nor sets an HP over the end.
+  const after = (ms, element, step) => wait(ms).then(() => (element.isConnected ? step() : null));
+
+  // The stage's size, and a middle kept inside it for a thing `half` wide.
+  const stageWidth = () => kit.arena.clientWidth;
+  const stageHeight = () => kit.arena.clientHeight;
+  const inside = (value, half, size) => Math.min(Math.max(value, half + 2), Math.max(half + 2, size - half - 2));
+  // The box of a card's picture (its upper part when it has none).
+  function artOf(card) {
+    const art = card.querySelector('.unit-art');
+    if (art) return boxOf(art);
+    const box = boxOf(card);
+    return { x: box.x, y: box.y, width: box.width, height: box.height * 0.5 };
+  }
+  // The size of the figure in a card's picture, which keeps its size when a
+  // computer's card is wider: the looks round a figure follow it.
+  const figureOf = (art) => Math.min(art.width, art.height);
+
+  // A four-pointed glint that flares and turns.
+  function twinkle(point, color, size = 16, delay = 0) {
+    const star = spark('fx-glint', point, { '--fx': color, '--size': `${Math.round(size)}px` });
+    star.innerHTML = GLINT;
+    return animate(
+      star,
+      [
+        { transform: 'translate(-50%, -50%) scale(0) rotate(0deg)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1.25) rotate(45deg)', opacity: 1, offset: 0.35 },
+        { transform: 'translate(-50%, -50%) scale(0) rotate(90deg)', opacity: 0 },
+      ],
+      { duration: 440, delay, easing: 'ease-out', fill: 'backwards' },
+    ).then(() => star.remove());
+  }
+
+  // A ring of light opening on the ground at a card's foot.
+  function groundRing(id, color, { delay = 0, scale = 1, duration = 820 } = {}) {
+    const entry = cards.get(id);
+    if (!entry) return Promise.resolve();
+    const box = boxOf(entry.card);
+    const mark = spark('fx-groundring', { x: box.x + box.width / 2, y: box.y + box.height - 9 }, { '--fx': color });
+    mark.style.width = `${Math.round(Math.min(box.width * 0.96, figureOf(artOf(entry.card)) * 1.4) * scale)}px`;
+    return animate(
+      mark,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.25)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(0.85)', opacity: 1, offset: 0.35 },
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 0 },
+      ],
+      { duration, delay, easing: 'ease-out', fill: 'backwards' },
+    ).then(() => mark.remove());
+  }
+
+  // The Modlitwa o zdrowie's new look: a soft beam of light comes down on the
+  // healed ally, rings of light open at its feet, and a cross of light forms
+  // over it and breaks into small crosses as the HP comes back.
+  async function lightfall(event, color) {
+    const entry = cards.get(event.target);
+    const landed = () => {
+      kit.setHp(event.target, event.hp);
+      kit.float(event.target, `+${event.amount}`, 'heal');
+    };
+    if (!entry) {
+      landed();
+      return;
+    }
+    const box = boxOf(entry.card);
+    const x = box.x + box.width / 2;
+    const top = Math.max(0, box.y - box.height * 0.8);
+    const foot = box.y + box.height - 6;
+    const span = Math.min(box.width * 0.84, figureOf(artOf(entry.card)) * 1.2);
+    const beam = spark('fx-lightfall', { x, y: top }, { '--fx': color });
+    beam.style.width = `${Math.round(span)}px`;
+    beam.style.height = `${Math.round(foot - top)}px`;
+    animate(
+      beam,
+      [
+        { transform: 'translate(-50%, 0) scaleY(0)', opacity: 0 },
+        { transform: 'translate(-50%, 0) scaleY(1)', opacity: 1, offset: 0.2 },
+        { transform: 'translate(-50%, 0) scale(1.06, 1)', opacity: 0.9, offset: 0.65 },
+        { transform: 'translate(-50%, 0) scale(0.55, 1)', opacity: 0 },
+      ],
+      { duration: 1300, easing: 'ease-out' },
+    ).then(() => beam.remove());
+    // Light falling down the beam.
+    for (let wave = 0; wave < 4; wave++) {
+      after(wave * 110, beam, () =>
+        particles.burst({ x, y: top + 4, area: { width: span * 0.55, height: 10 }, count: 4, colors: ['#ffffff', '#fff6cf', '#e3f5a8'], angle: Math.PI / 2, spread: 0.05, speed: [280, 400], life: [240, 380], size: [0.9, 1.5], shape: 'spark', drag: 1 }),
+      );
+    }
+    await wait(240);
+    if (!beam.isConnected) return;
+    // The light lands: the card brightens, motes rise from its feet and a
+    // cross of light forms over it, then breaks into small crosses as the
+    // HP comes back.
+    animate(entry.card, [{ filter: 'brightness(1.35) saturate(1.1)' }, { filter: 'brightness(1)' }], { duration: 700, easing: 'ease-out' });
+    particles.burst({ x, y: foot - 4, area: { width: span * 0.95, height: 6 }, count: 10, colors: LIFE, angle: -Math.PI / 2, spread: 0.35, speed: [40, 90], rise: 20, gravity: -30, drag: 0.8, life: [800, 1200], size: [1.2, 2.2], shape: 'mote' });
+    const crossAt = { x, y: box.y + box.height * 0.36 };
+    const cross = spark('fx-holycross', crossAt, { '--fx': color, '--size': `${Math.round(Math.min(box.width, box.height) * 0.42)}px` });
+    cross.innerHTML = CROSS;
+    const lift = animate(
+      cross,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.3)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1.15)', opacity: 1, offset: 0.2 },
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.34 },
+        { transform: 'translate(-50%, -50%) scale(1.02)', opacity: 1, offset: 0.66 },
+        { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0 },
+      ],
+      { duration: 460, easing: 'ease-out' },
+    ).then(() => cross.remove());
+    after(320, beam, () => {
+      particles.burst({ x, y: crossAt.y, count: 10, colors: LIFE, angle: -Math.PI / 2, spread: 1.3, speed: [50, 130], gravity: -20, drag: 1.8, life: [700, 1100], size: [1.6, 2.6], shape: 'plus' });
+      landed();
+    });
+    await Promise.all([groundRing(event.target, color), groundRing(event.target, '#fff6cf', { delay: 160, scale: 0.8 }), lift, aura(event.target, color, 1), wait(820)]);
+  }
+
+  // The Egzorcyzm's new look: a circle of runes opens under each foe, a
+  // pillar of light comes down on it and tears dark wisps out of it, the
+  // arena lit up. Resolves when the light has struck the last foe.
+  async function exorcise(color, targets) {
+    if (reduced() || !particles) {
+      await beams(color, targets);
+      return;
+    }
+    await Promise.all(targets.map((id, index) => purge(id, color, index * 90, index === 0)));
+  }
+
+  // One foe of the Egzorcyzm: its circle at the creature's feet (under its
+  // picture, so its HP stays in sight), the pillar down to it, the strike.
+  async function purge(id, color, delay, first) {
+    const entry = cards.get(id);
+    if (!entry) return;
+    const box = boxOf(entry.card);
+    const art = artOf(entry.card);
+    const figure = figureOf(art);
+    const width = stageWidth();
+    const x = art.x + art.width / 2;
+    const foot = art.y + art.height - 6;
+    const size = Math.round(Math.min(box.width, figure * 1.3, (Math.min(x, width - x) - 2) * 2));
+    const circle = spark('fx-runes', { x, y: foot }, { '--fx': color, '--size': `${size}px` });
+    circle.innerHTML = RUNES;
+    const flat = 'translate(-50%, -50%) scale(1, 0.38)';
+    animate(
+      circle,
+      [
+        { transform: `${flat} rotate(-50deg) scale(0.3)`, opacity: 0 },
+        { transform: `${flat} rotate(0deg) scale(1)`, opacity: 1, offset: 0.26 },
+        { transform: `${flat} rotate(45deg) scale(1)`, opacity: 1, offset: 0.66 },
+        { transform: `${flat} rotate(68deg) scale(1.1)`, opacity: 0 },
+      ],
+      { duration: 1150, delay, fill: 'backwards' },
+    ).then(() => circle.remove());
+    after(delay, circle, () => particles.burst({ x, y: foot, area: { width: size * 0.8, height: size * 0.22 }, count: 6, colors: HOLY, angle: -Math.PI / 2, spread: 0.3, speed: [20, 60], rise: 10, gravity: -40, drag: 1, life: [600, 900], size: [1, 1.8], shape: 'mote' }));
+    await wait(delay + 220);
+    if (!circle.isConnected) return;
+    // The pillar: from above the foe (never above the stage) to its circle.
+    const top = Math.max(0, box.y - box.height * 0.55);
+    const pillar = spark('fx-pillar', { x, y: top }, { '--fx': color });
+    pillar.style.width = `${Math.round(figure * 0.72)}px`;
+    pillar.style.height = `${Math.round(foot - top + 6)}px`;
+    animate(
+      pillar,
+      [
+        { transform: 'translate(-50%, 0) scaleY(0)', opacity: 1 },
+        { transform: 'translate(-50%, 0) scaleY(1)', opacity: 1, offset: 0.16 },
+        { transform: 'translate(-50%, 0) scale(1.3, 1)', opacity: 1, offset: 0.3 },
+        { transform: 'translate(-50%, 0) scale(1, 1)', opacity: 0.8, offset: 0.6 },
+        { transform: 'translate(-50%, 0) scale(0.2, 1)', opacity: 0 },
+      ],
+      { duration: 1000, easing: 'ease-out' },
+    ).then(() => pillar.remove());
+    await wait(165);
+    if (!pillar.isConnected) return;
+    // The light strikes: a bloom on the circle, the foe blazes and dark
+    // wisps are torn out of it; the first strike lights the arena up.
+    if (first) flash('#fff3c4', 0.16, 420);
+    const bloom = spark('fx-burst', { x, y: foot }, { '--fx': color, '--size': `${Math.round(size * 0.8)}px` });
+    animate(
+      bloom,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.3, 0.12)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1, 0.45)', opacity: 1, offset: 0.3 },
+        { transform: 'translate(-50%, -50%) scale(1.3, 0.55)', opacity: 0 },
+      ],
+      { duration: 480, easing: 'ease-out' },
+    ).then(() => bloom.remove());
+    animate(entry.card, [{ filter: 'brightness(1.9) saturate(0.7)' }, { filter: 'brightness(1)' }], { duration: 560, easing: 'ease-out' });
+    particles.burst({ x, y: foot, area: { width: size * 0.7, height: 6 }, count: 10, colors: HOLY, angle: -Math.PI / 2, spread: 1.2, speed: [60, 160], drag: 2.5, life: [300, 560], size: [1.1, 2], shape: 'spark' });
+    tear({ x: x - figure / 2, y: art.y, width: figure, height: art.height });
+  }
+
+  // Dark wisps and smoke torn out of a foe's picture, rising into the light.
+  function tear(box) {
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height * 0.6;
+    particles.burst({ x, y, area: { width: box.width * 0.55, height: box.height * 0.3 }, count: 8, colors: SHADE, angle: -Math.PI / 2, spread: 0.5, speed: [40, 110], gravity: -60, drag: 1.4, life: [600, 950], size: [3.5, 6], shape: 'dust' });
+    particles.burst({ x, y, area: { width: box.width * 0.5, height: box.height * 0.3 }, count: 8, colors: ['#c9b7ff', '#7b5fc7', '#fff6cf'], angle: -Math.PI / 2, spread: 0.6, speed: [60, 160], gravity: -40, drag: 2, life: [400, 700], size: [1.2, 2.2], shape: 'ember' });
+    [-0.22, 0.04, 0.25].forEach((dx, index) => {
+      const wisp = spark('fx-wisp', { x: x + dx * box.width, y: y + (index % 2) * 10 });
+      wisp.innerHTML = WISP;
+      const lean = dx * 40;
+      animate(
+        wisp,
+        [
+          { transform: 'translate(-50%, -30%) scale(0.6, 0.4)', opacity: 0 },
+          { transform: `translate(-50%, -60%) rotate(${(lean * 0.3).toFixed(1)}deg) scale(1, 1)`, opacity: 0.95, offset: 0.3 },
+          { transform: `translate(calc(-50% + ${(lean * 0.4).toFixed(1)}px), -130%) rotate(${lean.toFixed(1)}deg) scale(0.7, 1.4)`, opacity: 0 },
+        ],
+        { duration: 700, delay: index * 60, easing: 'ease-out', fill: 'backwards' },
+      ).then(() => wisp.remove());
+    });
+  }
+
+  // The Błogosławieństwo's new look: rays of light open behind the Kleryk's
+  // head, a golden halo settles over it, golden feathers and sparks drift
+  // down and a warm light fills the card.
+  async function halo(id, color) {
+    const entry = cards.get(id);
+    if (!entry) return;
+    if (reduced() || !particles) {
+      await Promise.all([ring(id, color, 130, 760), aura(id, color, 2)]);
+      return;
+    }
+    const box = boxOf(entry.card);
+    const art = artOf(entry.card);
+    const x = art.x + art.width / 2;
+    const face = Math.min(art.width, art.height, 72);
+    // The halo over the crown of the head, below the skill's name over the
+    // card.
+    const crown = art.y + face * 0.17;
+    // The rays behind the head.
+    const glory = spark('fx-aureole', { x, y: art.y + face * 0.4 }, { '--fx': color, '--size': `${Math.round(Math.min(box.width * 0.98, box.height * 0.9))}px` });
+    animate(
+      glory,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.5) rotate(0deg)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1) rotate(12deg)', opacity: 0.9, offset: 0.25 },
+        { transform: 'translate(-50%, -50%) scale(1.02) rotate(36deg)', opacity: 0.75, offset: 0.75 },
+        { transform: 'translate(-50%, -50%) scale(1.08) rotate(48deg)', opacity: 0 },
+      ],
+      { duration: 1500, easing: 'ease-out' },
+    ).then(() => glory.remove());
+    // The warm light over the card.
+    const warmth = h('span', { class: 'fx-tint' });
+    warmth.style.setProperty('--fx', color);
+    entry.card.append(warmth);
+    animate(warmth, [{ opacity: 0 }, { opacity: 0.42, offset: 0.3 }, { opacity: 0.3, offset: 0.7 }, { opacity: 0 }], { duration: 1400, easing: 'ease-out' }).then(() => warmth.remove());
+    // The halo comes down and settles over the head.
+    const ringWidth = Math.round(face * 0.56);
+    const crownMark = spark('fx-halo', { x, y: crown }, { '--fx': color, '--size': `${ringWidth}px` });
+    crownMark.innerHTML = HALO;
+    animate(
+      crownMark,
+      [
+        { transform: 'translate(-50%, calc(-50% - 18px)) scale(1.3)', opacity: 0 },
+        { transform: 'translate(-50%, calc(-50% + 2px)) scale(0.96)', opacity: 1, offset: 0.24 },
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.34 },
+        { transform: 'translate(-50%, calc(-50% - 1px)) scale(1.02)', opacity: 1, offset: 0.8 },
+        { transform: 'translate(-50%, calc(-50% - 5px)) scale(1.06)', opacity: 0 },
+      ],
+      { duration: 1450, easing: 'ease-out' },
+    ).then(() => crownMark.remove());
+    after(360, crownMark, () => {
+      twinkle({ x: x - ringWidth * 0.46, y: crown }, '#fff6cf', 14);
+      twinkle({ x: x + ringWidth * 0.46, y: crown }, '#fff6cf', 12, 90);
+      particles.burst({ x, y: crown, area: { width: ringWidth, height: 6 }, count: 8, colors: GOLD, angle: -Math.PI / 2, spread: Math.PI, speed: [30, 90], drag: 2, life: [400, 700], size: [1, 1.8], shape: 'spark' });
+    });
+    // Golden feathers and sparks drifting down over the card, round the
+    // figure.
+    const spread = Math.min(box.width, figureOf(art) * 1.45);
+    const left = box.x + (box.width - spread) / 2;
+    particles.burst({ x: box.x + box.width / 2, y: box.y + 6, area: { width: spread * 0.85, height: 14 }, count: 12, colors: GOLD, angle: Math.PI / 2, spread: 0.5, speed: [12, 40], gravity: 34, drag: 0.8, life: [900, 1400], size: [1.1, 2], shape: 'mote' });
+    // (They and the halo keep fading while the fight goes on.)
+    [0.16, 0.84, 0.36, 0.64, 0.26, 0.74].forEach((share, index) => {
+      const feather = spark('fx-feather', { x: left + spread * share, y: box.y - 8 + (index % 3) * 12 }, { '--fx': color });
+      feather.innerHTML = FEATHER;
+      const fall = box.height * (0.5 + (index % 3) * 0.1);
+      const sway = (index % 2 ? 1 : -1) * Math.min(9, spread * 0.08);
+      const frames = Array.from({ length: 6 }, (_, step) => {
+        const share0 = step / 5;
+        const swing = Math.sin(share0 * Math.PI * 2.2 + index) * sway;
+        return {
+          transform: `translate(calc(-50% + ${swing.toFixed(1)}px), calc(-50% + ${(fall * share0).toFixed(1)}px)) rotate(${(swing * 3.6 + (index % 2 ? 18 : -18)).toFixed(1)}deg)`,
+          opacity: step === 0 || step === 5 ? 0 : 1,
+        };
+      });
+      animate(feather, frames, { duration: 1500 + (index % 3) * 180, delay: 60 + index * 70, easing: 'linear', fill: 'backwards' }).then(() => feather.remove());
+    });
+    await Promise.all([groundRing(id, color, { delay: 280 }), aura(id, color, 2), wait(1150)]);
+  }
+
+  // A puff of shadow smoke at a point: a dark cloud that swells and thins,
+  // smoke and violet sparks.
+  function puff(point, size) {
+    const cloud = spark('fx-smoke', point, { '--size': `${Math.round(size)}px` });
+    particles.burst({ x: point.x, y: point.y, count: 9, colors: SHADE, speed: [20, 70], life: [600, 950], size: [size * 0.06, size * 0.1], shape: 'dust', gravity: -30, drag: 2.2, area: { width: size * 0.5, height: size * 0.4 } });
+    particles.burst({ x: point.x, y: point.y, count: 8, colors: SHADE_SPARKS, speed: [60, 150], life: [300, 560], size: [1.2, 2.2], shape: 'ember', drag: 3 });
+    animate(
+      cloud,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.35)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(0.9)', opacity: 0.95, offset: 0.25 },
+        { transform: 'translate(-50%, -50%) scale(1.15)', opacity: 0 },
+      ],
+      { duration: 640, easing: 'ease-out' },
+    ).then(() => cloud.remove());
+    return cloud;
+  }
+
+  // The Cios w plecy's new look, as its blow starts (arena-fx.js strike()
+  // fades the Cień out and thrusts its dagger by the target): the Cień
+  // vanishes in a puff of shadow smoke and comes out of another behind its
+  // target, as a shadow of itself that melts away after the blow; a last
+  // puff as it is back in its place.
+  function vanish(event) {
+    const actor = cards.get(event.actor);
+    const target = cards.get(event.target);
+    if (!actor || !target || reduced() || !particles) return;
+    const from = boxOf(actor.card);
+    const to = boxOf(target.card);
+    const width = stageWidth();
+    const art = artOf(actor.card);
+    const smoke = figureOf(art) * 1.3;
+    const home = puff({ x: from.x + from.width / 2, y: from.y + from.height * 0.42 }, smoke);
+    // Behind the target: on its side toward the arena's middle, where the
+    // dagger comes from.
+    const side = to.x + to.width / 2 < width / 2 ? 1 : -1;
+    const half = figureOf(art) / 2;
+    const x = inside(side > 0 ? to.x + to.width + half - 8 : to.x - half + 8, half, width);
+    const y = inside(to.y + (art.y - from.y) + art.height / 2, art.height / 2, stageHeight());
+    const shade = actor.card.querySelector('.unit-art')?.cloneNode(true) ?? null;
+    after(20, home, () => puff({ x, y }, smoke * 0.85));
+    if (shade) {
+      shade.querySelector('.unit-level')?.remove();
+      shade.classList.add('fx-shade');
+      shade.setAttribute('aria-hidden', 'true');
+      shade.style.left = `${x - art.width / 2}px`;
+      shade.style.top = `${y - art.height / 2}px`;
+      shade.style.width = `${art.width}px`;
+      shade.style.height = `${art.height}px`;
+      fx.append(shade);
+      animate(
+        shade,
+        [
+          { transform: `translate(${side * 6}px, 4px) scale(0.9)`, opacity: 0 },
+          { transform: 'translate(0, 0) scale(1)', opacity: 0.92, offset: 0.15 },
+          { transform: 'translate(0, 0) scale(1)', opacity: 0.92, offset: 0.62 },
+          { transform: `translate(${-side * 4}px, -8px) scale(1.05)`, opacity: 0 },
+        ],
+        { duration: 720, delay: 25, easing: 'ease-out', fill: 'backwards' },
+      ).then(() => shade.remove());
+      after(450, shade, () => puff({ x, y: y + 4 }, smoke * 0.75));
+    }
+    after(320, home, () => puff({ x: from.x + from.width / 2, y: from.y + from.height * 0.42 }, smoke * 0.75));
+  }
+
+  // The Cios w plecy's blow: a violet cut across the target from behind,
+  // shadow smoke and violet shards.
+  function shadowCut(event, color) {
+    const entry = cards.get(event.target);
+    if (!entry) return;
+    const box = boxOf(entry.card);
+    const width = stageWidth();
+    const { x, y } = centerOf(entry.card);
+    const side = x < width / 2 ? 1 : -1;
+    const size = Math.round(Math.min(Math.min(box.width, box.height * 1.15) * 1.3, (Math.min(x, width - x) - 2) * 2));
+    const cut = spark('fx-shadowslash', { x, y }, { '--fx': color, '--size': `${size}px` });
+    cut.innerHTML = SHADOW_SLASH;
+    // Drawn from the Cień's side across to the other.
+    const at = `translate(-50%, -50%) scaleX(${-side})`;
+    animate(
+      cut,
+      [
+        { transform: `${at} scale(0.92)`, clipPath: 'inset(0 100% 0 0)', opacity: 1 },
+        { transform: `${at} scale(1)`, clipPath: 'inset(0 0% 0 0)', opacity: 1, offset: 0.2 },
+        { transform: `${at} scale(1.02)`, clipPath: 'inset(0 0% 0 0)', opacity: 1, offset: 0.6 },
+        { transform: `${at} scale(1.08)`, clipPath: 'inset(0 0% 0 0)', opacity: 0 },
+      ],
+      { duration: 600, easing: 'ease-out' },
+    ).then(() => cut.remove());
+    particles.burst({ x, y, count: 14, colors: SHADE_SPARKS, angle: side > 0 ? Math.PI * 0.82 : Math.PI * 0.18, spread: 0.45, speed: [150, 320], life: [260, 480], size: [1.4, 2.6], shape: 'shard', drag: 3, gravity: 120 });
+    puff({ x: x + side * box.width * 0.1, y }, figureOf(artOf(entry.card)) * 1.05);
+    burst(event.target, '#7b5fc7', 80);
+  }
+
+  // The Zatrute ostrze's new look: the Cień's own blade over its card, point
+  // down, venom running down it from the guard to the point, bubbling and
+  // dripping from the point, a toxic glint along it and a green haze at the
+  // card's foot.
+  async function venom(id, color) {
+    const entry = cards.get(id);
+    if (!entry) return;
+    const base = entry.unit.weapon ?? (entry.unit.classId === 'shadow' ? 'dagger' : null);
+    const steel = base && !reduced() && particles ? itemSprite({ base }) : null;
+    if (!steel) {
+      await Promise.all([specks(id, color, { rise: false }), aura(id, color, 1)]);
+      return;
+    }
+    const box = boxOf(entry.card);
+    const art = artOf(entry.card);
+    const size = Math.round(Math.min(art.width, art.height, 72) * 1.08);
+    const x = art.x + art.width / 2;
+    const y = art.y + art.height * 0.52;
+    // Where the point is, the blade turned point down (the item icons'
+    // blades point up and to the right).
+    const tip = { x, y: y + size * 0.47 };
+    const blade = spark('fx-venom', { x, y }, { '--fx': color, '--size': `${size}px` });
+    steel.removeAttribute('width');
+    steel.removeAttribute('height');
+    steel.className = 'fx-venom-steel';
+    const coat = steel.cloneNode();
+    coat.className = 'fx-venom-coat';
+    const shine = h('span', { class: 'fx-venom-shine' });
+    const picture = `url("${steel.getAttribute('src')}")`;
+    shine.style.setProperty('-webkit-mask-image', picture);
+    shine.style.setProperty('mask-image', picture);
+    blade.append(steel, coat, shine);
+    const held = 'translate(-50%, -50%) rotate(135deg)';
+    animate(
+      blade,
+      [
+        { transform: `translate(-50%, calc(-50% - 12px)) rotate(135deg) scale(0.7)`, opacity: 0 },
+        { transform: `${held} scale(1)`, opacity: 1, offset: 0.13 },
+        { transform: `${held} scale(1)`, opacity: 1, offset: 0.84 },
+        { transform: `translate(-50%, calc(-50% + 4px)) rotate(135deg) scale(0.94)`, opacity: 0 },
+      ],
+      { duration: 1550, easing: 'ease-out' },
+    ).then(() => blade.remove());
+    // The venom runs down the blade from the crossguard to the point: a band
+    // across the blade (in the icon, from its guard's line, x − y = −0.28,
+    // toward its point, up and to the right) that grows.
+    animate(coat, [{ clipPath: VENOM_FROM }, { clipPath: VENOM_TO }], { duration: 560, delay: 160, easing: 'ease-in-out', fill: 'both' });
+    for (const [delay, count] of [
+      [260, 5],
+      [620, 6],
+      [980, 5],
+    ]) {
+      after(delay, blade, () => particles.burst({ x, y: y + size * 0.1, area: { width: size * 0.16, height: size * 0.6 }, count, colors: ['#eaffc0', '#9ccc65'], angle: -Math.PI / 2, spread: 0.6, speed: [8, 26], rise: 14, life: [600, 1000], size: [1.4, 2.6], shape: 'bubble', drag: 1 }));
+    }
+    // Drops gather on the point and fall.
+    for (const [index, delay] of [560, 960].entries()) {
+      after(delay, blade, () => drop(tip, box, index));
+    }
+    for (let step = 0; step < 6; step++) {
+      after(640 + step * 110, blade, () => particles.burst({ x: tip.x, y: tip.y, count: 1, colors: VENOM, angle: Math.PI / 2, spread: 0.15, speed: [10, 30], gravity: 420, life: [360, 480], size: [1.6, 2.4], shape: 'ember', drag: 0.6 }));
+    }
+    // The toxic glint along the blade, a flash on its point.
+    animate(shine, [{ backgroundPosition: '100% 0%', opacity: 1 }, { backgroundPosition: '0% 100%', opacity: 1 }], { duration: 440, delay: 740, easing: 'ease-in-out', fill: 'both' });
+    twinkle({ x: tip.x, y: tip.y - size * 0.08 }, '#eaffc0', 18, 1060);
+    // A green haze and bubbles at the card's feet, its frame lit green.
+    after(420, blade, () => {
+      particles.burst({ x: box.x + box.width / 2, y: box.y + box.height - 10, area: { width: size * 1.1, height: 6 }, count: 4, colors: ['#6f9a3a', '#4f7a22'], angle: -Math.PI / 2, spread: 0.8, speed: [6, 18], gravity: -10, drag: 1.5, life: [700, 1000], size: [2.5, 4], shape: 'dust' });
+      particles.burst({ x: box.x + box.width / 2, y: box.y + box.height - 12, area: { width: size * 1.0, height: 8 }, count: 7, colors: ['#d7f5a8', '#9ccc65'], angle: -Math.PI / 2, spread: 0.5, speed: [10, 30], rise: 16, life: [600, 950], size: [1.4, 2.4], shape: 'bubble', drag: 1 });
+      aura(id, color, 1);
+    });
+    // The blade fades while the fight goes on.
+    await wait(1250);
+  }
+
+  // A drop of venom gathering on the blade's point and falling, splashing
+  // at the card's foot.
+  function drop(tip, box, index) {
+    const bead = spark('fx-drop', tip);
+    const fall = Math.max(12, box.y + box.height - 14 - tip.y);
+    return animate(
+      bead,
+      [
+        { transform: 'translate(-50%, -20%) scale(0.2)', opacity: 0 },
+        { transform: 'translate(-50%, 0%) scale(1)', opacity: 1, offset: 0.55, easing: 'ease-in' },
+        { transform: `translate(-50%, ${fall.toFixed(1)}px) scale(0.9, 1.15)`, opacity: 1 },
+      ],
+      { duration: 520 + index * 40, easing: 'ease-out' },
+    ).then(() => {
+      bead.remove();
+      particles.burst({ x: tip.x, y: tip.y + fall + 4, count: 5, colors: VENOM, angle: -Math.PI / 2, spread: 0.9, speed: [40, 90], gravity: 300, drag: 1, life: [260, 420], size: [1.1, 1.8], shape: 'ember' });
+    });
+  }
+
+  // The Taniec cieni's new look: shadows whirl round the Cień, its figure
+  // dims in its card while dark violet copies of it dash from side to side
+  // round it, and it comes back in a burst of violet light.
+  async function dance(id, color) {
+    const entry = cards.get(id);
+    const source = entry?.card.querySelector('.unit-art');
+    if (!entry || !source || reduced() || !particles) {
+      await ghosts(id, color);
+      return;
+    }
+    const box = boxOf(entry.card);
+    const art = boxOf(source);
+    const width = stageWidth();
+    // The whirl: the card's height, as wide as the card at most (round the
+    // figure on a computer's wide card), a little more, kept on the stage.
+    const across = Math.min(box.width, box.height);
+    const from = box.x + (box.width - across) / 2;
+    const margin = Math.max(0, Math.min(6, from - 1, width - from - across - 1, box.y - 1));
+    const swirl = spark('fx-swirl', { x: from - margin, y: box.y - margin }, { '--fx': color });
+    swirl.style.width = `${Math.round(across + margin * 2)}px`;
+    swirl.style.height = `${Math.round(box.height + margin * 2)}px`;
+    swirl.innerHTML = SWIRL;
+    animate(swirl.querySelector('g'), [{ transform: 'rotate(0deg)' }, { transform: 'rotate(300deg)' }], { duration: 1000, easing: 'cubic-bezier(0.3, 0.1, 0.4, 1)' });
+    const whirl = animate(
+      swirl,
+      [
+        { transform: 'scale(1.08)', opacity: 0 },
+        { transform: 'scale(1)', opacity: 0.95, offset: 0.18 },
+        { transform: 'scale(0.96)', opacity: 0.85, offset: 0.7 },
+        { transform: 'scale(0.86)', opacity: 0 },
+      ],
+      { duration: 1000, easing: 'ease-out' },
+    ).then(() => swirl.remove());
+    particles.burst({ x: box.x + box.width / 2, y: box.y + box.height - 10, area: { width: across * 0.8, height: 8 }, count: 6, colors: SHADE, angle: -Math.PI / 2, spread: 0.7, speed: [10, 40], gravity: -20, drag: 1.5, life: [700, 1100], size: [3, 5], shape: 'dust' });
+    // The figure dims in its card while its shadows dance.
+    const figure = source.querySelector('img, svg, .unit-icon') ?? source;
+    animate(figure, [{ opacity: 1 }, { opacity: 0.2, offset: 0.1 }, { opacity: 0.2, offset: 0.78 }, { opacity: 1 }], { duration: 720 });
+    // Where the copies stand round the figure (by its middle), kept on the
+    // stage: left, right, up left, up right, and back in the middle.
+    const reach = Math.min(figureOf(art) * 0.44, 32);
+    const fit = (dx) => Math.min(Math.max(dx, 2 - art.x), width - 2 - art.x - art.width);
+    const spots = [
+      [-1, 0.06],
+      [1, -0.04],
+      [-0.75, -0.2],
+      [0.8, -0.12],
+      [0, 0],
+    ].map(([sideways, up]) => ({ x: fit(sideways * reach), y: up * art.height * 0.5 }));
+    spots.forEach((at, step) => {
+      const last = step === spots.length - 1;
+      after(step * 105, swirl, () => {
+        const before = spots[step - 1] ?? { x: 0, y: 0 };
+        shadowCopy(source, art, at, Math.sign(at.x - before.x) || 1, last);
+        if (step > 0) dashLine(art, before.x, at.x, color);
+      });
+    });
+    await wait(spots.length * 105 + 40);
+    if (!swirl.isConnected) return;
+    // Back in its place, wrapped in violet light.
+    particles.burst({ x: art.x + art.width / 2, y: art.y + art.height / 2, area: { width: figureOf(art) * 0.7, height: art.height * 0.6 }, count: 14, colors: SHADE_SPARKS, speed: [60, 150], drag: 3, life: [300, 600], size: [1.2, 2.2], shape: 'spark' });
+    animate(entry.card, [{ filter: 'brightness(0.6) saturate(1.4)' }, { filter: 'brightness(1)' }], { duration: 420, easing: 'ease-out' });
+    await Promise.all([whirl, aura(id, color, 1)]);
+  }
+
+  // A dark violet copy of a card's figure at `at` from it, fading as it
+  // drifts back against its dash (the last one comes back into the figure).
+  function shadowCopy(source, art, at, way, last) {
+    const copy = source.cloneNode(true);
+    copy.querySelector('.unit-level')?.remove();
+    copy.classList.add('fx-shade', 'fx-shade--dance');
+    copy.setAttribute('aria-hidden', 'true');
+    copy.style.left = `${art.x + at.x}px`;
+    copy.style.top = `${art.y + at.y}px`;
+    copy.style.width = `${art.width}px`;
+    copy.style.height = `${art.height}px`;
+    fx.append(copy);
+    const frames = last
+      ? [
+          { transform: 'scale(1.12)', opacity: 0.85 },
+          { transform: 'scale(1)', opacity: 0 },
+        ]
+      : [
+          { transform: `translateX(${-way * 4}px) skewX(${-way * 8}deg)`, opacity: 0.95 },
+          { transform: 'translateX(0) skewX(0deg)', opacity: 0.8, offset: 0.25 },
+          { transform: `translateX(${-way * 7}px) skewX(0deg)`, opacity: 0 },
+        ];
+    return animate(copy, frames, { duration: last ? 320 : 420, easing: 'ease-out' }).then(() => copy.remove());
+  }
+
+  // A streak of a dash, across a figure's middle.
+  function dashLine(box, from, to, color) {
+    const line = spark('fx-dashline', { x: box.x + box.width / 2 + (from + to) / 2, y: box.y + box.height * (0.4 + Math.random() * 0.3) }, { '--fx': color });
+    line.style.width = `${Math.round(Math.max(24, Math.abs(to - from) + figureOf(box) * 0.6))}px`;
+    const way = Math.sign(to - from) || 1;
+    return animate(
+      line,
+      [
+        { transform: `translate(-50%, -50%) translateX(${-way * 10}px) scaleX(0.3)`, opacity: 0 },
+        { transform: 'translate(-50%, -50%) scaleX(1)', opacity: 0.9, offset: 0.35 },
+        { transform: `translate(-50%, -50%) translateX(${way * 12}px) scaleX(0.5)`, opacity: 0 },
+      ],
+      { duration: 260, easing: 'ease-out' },
+    ).then(() => line.remove());
+  }
+
   // What plays when a skill wakes (a 'skill' event), or when a sweep starts:
   // the skill's own sound, or a plain one while it has none.
   async function cast(event) {
@@ -885,22 +1563,22 @@ export function skillEffects(kit) {
         await (look.blizzard ? blizzard(event, look.color, targets) : gust(look.color, targets));
         break;
       case 'holy':
-        await beams(look.color, targets);
+        await (look.runes ? exorcise(look.color, targets) : beams(look.color, targets));
         break;
       case 'rain':
         await (look.volley ? volley(event, look.color, targets) : rain(look.color, targets));
         break;
       case 'bless':
-        await Promise.all([ring(event.actor, look.color, 130, 760), aura(event.actor, look.color, 2)]);
+        await (look.halo ? halo(event.actor, look.color) : Promise.all([ring(event.actor, look.color, 130, 760), aura(event.actor, look.color, 2)]));
         break;
       case 'poison':
-        await Promise.all([specks(event.actor, look.color, { rise: false }), aura(event.actor, look.color, 1)]);
+        await (look.venom ? venom(event.actor, look.color) : Promise.all([specks(event.actor, look.color, { rise: false }), aura(event.actor, look.color, 1)]));
         break;
       case 'shield':
         await (look.hexwall ? hexShield(event.actor, look.color) : bubble(event.actor, look.color));
         break;
       case 'dance':
-        await ghosts(event.actor, look.color);
+        await (look.afterimages ? dance(event.actor, look.color) : ghosts(event.actor, look.color));
         break;
       default:
         await aura(event.actor, look.color, 1);
@@ -916,6 +1594,12 @@ export function skillEffects(kit) {
     if (!event.quiet) {
       playSkill(artChain(event.skill), 'effect');
       callout(event.actor, event.skillName, look.color);
+    }
+    // The Modlitwa o zdrowie's new look brings the HP back as its light
+    // lands.
+    if (look.lightfall && !reduced() && particles) {
+      await lightfall(event, look.color);
+      return;
     }
     kit.setHp(event.target, event.hp);
     kit.float(event.target, `+${event.amount}`, 'heal');
@@ -936,6 +1620,7 @@ export function skillEffects(kit) {
     if (look.reticle) reticle(event.target, look.color);
     else if (look.impact === 'aim') ring(event.target, look.color, 70, 420);
     if (look.orb === 'fire') gather(event.actor);
+    if (look.smoke) vanish(event);
   }
 
   // When a skill's own blow lands, on top of the plain hit.
@@ -958,6 +1643,8 @@ export function skillEffects(kit) {
     } else if (look.impact === 'fire') {
       burst(event.target, look.color, 100);
       specks(event.target, look.color, { count: 6 });
+    } else if (look.smoke && !reduced() && particles) {
+      shadowCut(event, look.color);
     } else if (look.impact === 'shadow') {
       burst(event.target, look.color, 80);
     } else {
