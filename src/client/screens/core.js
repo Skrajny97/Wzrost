@@ -132,7 +132,7 @@ export function mountCore(container, options) {
   function listCard(title, artifacts, absorbed, empty) {
     return h(
       'section',
-      { class: 'card core-list', 'aria-label': title },
+      { class: `card core-list${absorbed ? '' : ' core-list--stash'}`, 'aria-label': title },
       h('h2', { class: 'section-title', text: artifacts.length > 0 ? `${title} (${formatNumber(artifacts.length)})` : title }),
       artifacts.length === 0 ? h('p', { class: 'muted', text: empty }) : h('ul', { class: 'core-artifacts' }, artifacts.map((artifact) => artifactCard(artifact, absorbed))),
     );
@@ -231,11 +231,23 @@ export function mountCore(container, options) {
     show();
   }
 
+  // From the Labirynt's "Odbierz Artefakty" (940, labyrinth.js), the Skrytka
+  // in sight under the top bar, once the Rdzeń is shown.
+  let toStash = options?.params?.part === 'skrytka';
+  function stashInSight() {
+    const stash = toStash && container.querySelector('.core-list--stash');
+    toStash = false;
+    if (!stash) return;
+    const covered = document.querySelector('.topbar')?.getBoundingClientRect().bottom ?? 0;
+    window.scrollTo({ top: Math.max(0, window.scrollY + stash.getBoundingClientRect().top - Math.max(0, covered) - 8) });
+  }
+
   fill(container, heading(), h('p', { class: 'muted', text: t('Wczytywanie…') }));
   call('GET', '/api/core')
     .then(({ core }) => {
       view = core;
       show();
+      stashInSight();
     })
     .catch((error) => show(error.message ?? t('Nie udało się wczytać Rdzenia.')));
 

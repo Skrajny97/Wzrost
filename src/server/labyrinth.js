@@ -131,8 +131,9 @@ function foesOf(state, row, room, type) {
 // danger of the fights still ahead (899 A) and the Odłamki of the elites and
 // treasures, the rooms it may enter, the fighters with their HP, the
 // blessings taken, a choice waiting (with the merchant's prices), the day's
-// rewards and the words of the rooms.
-function labyrinthView(player, state, now) {
+// rewards, the Artefakty waiting in the Skrytka Rdzenia (`waiting`) and the
+// words of the rooms.
+function labyrinthView(player, state, now, waiting = 0) {
   const map = labyrinthMap(state.day, state.level, content());
   const reachable = state.over || state.pending ? [] : reachableRooms(map, state.row, state.room);
   const character = engineCharacter(player.row);
@@ -198,22 +199,37 @@ function labyrinthView(player, state, now) {
       ...(pending.kind === 'merchant' && { heal: pending.heal, blessing: pending.blessing, prices, healShare: rules().merchant.heal }),
     },
     gains: state.gains,
+    // The Artefakty in the Skrytka Rdzenia, not absorbed yet (940): the page
+    // offers to take them there.
+    waiting,
     // After a fight lost: the gold of starting again and the tries left today.
     reset: state.over === 'fainted' ? { price: resetPrice(state.charLevel, content()), left: resetsLeft(state, content()) } : null,
     rooms: rules().rooms.map((room) => roomView(room.id)),
   };
 }
 
+// The Artefakty waiting in the character's Skrytka Rdzenia (core.js), once
+// the Rdzeń is open: the Labirynt's rewards come at once, room by room, and
+// only these wait for the player, to be absorbed in the Rdzeń (940, the
+// author, 14.11.2026: "powinna być opcja odbioru nagród").
+async function waitingArtifacts(db, row) {
+  if (!coreOf(row).open) return 0;
+  const found = await db.prepare('SELECT COUNT(*) AS count FROM core_artifacts WHERE character_id = ?').bind(row.id).first();
+  return found?.count ?? 0;
+}
+
 export async function getLabyrinth(context) {
   const { player } = await requirePlayer(context);
   requireLabyrinth(player.row);
-  return json({ labyrinth: labyrinthView(player, todayOf(player, context.now), context.now) });
+  const state = todayOf(player, context.now);
+  return json({ labyrinth: labyrinthView(player, state, context.now, await waitingArtifacts(context.env.DB, player.row)) });
 }
 
 // The page after a change: the Labirynt and the character as saved.
 async function answer(context, session, extra = {}) {
   const after = await loadPlayer(context.env.DB, session.userId);
-  return json({ ...extra, labyrinth: labyrinthView(after, todayOf(after, context.now), context.now), character: characterView(after, context.now) });
+  const waiting = await waitingArtifacts(context.env.DB, after.row);
+  return json({ ...extra, labyrinth: labyrinthView(after, todayOf(after, context.now), context.now, waiting), character: characterView(after, context.now) });
 }
 
 // A request names the room it enters as the page saw it: the level, the

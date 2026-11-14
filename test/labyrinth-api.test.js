@@ -214,6 +214,8 @@ describe('the Labirynt Systemu through the API', () => {
 
   test('the guardian: an Artefakt into the Skrytka, the Rdzeń open, a choice of three blessings, then the next level', async () => {
     await makeClimber(await db(), (await (await db()).prepare('SELECT id FROM characters').first()).id);
+    // Nothing waits in the Skrytka while the Rdzeń is shut (940).
+    assert.equal((await get()).waiting, 0);
     const last = content.labyrinth.map.rows;
     const map = labyrinthMap(today(), 1, content);
     await set('labyrinth = ?', JSON.stringify(stateOf({ row: last - 1, room: 0, path: Array(last).fill(0), charLevel: 30 })));
@@ -236,6 +238,13 @@ describe('the Labirynt Systemu through the API', () => {
     assert.ok(won.character.features.includes('core'));
     const rows = await (await db()).prepare('SELECT data FROM core_artifacts').all();
     assert.equal(rows.results.length, 1);
+    // The Artefakt waits in the Skrytka, and the page says so (940); absorbed
+    // in the Rdzeń, it waits no more.
+    assert.equal(won.labyrinth.waiting, 1);
+    assert.equal((await get()).waiting, 1);
+    const stored = (await call('GET', '/api/core', { cookie })).data.core.stored[0];
+    assert.equal((await call('POST', '/api/core/absorb', { cookie, body: { id: stored.id } })).status, 200);
+    assert.equal((await get()).waiting, 0);
     // No room before the choice; then the blessing is the day's.
     assert.equal((await enter({ level: 2, row: 0, room: 0 })).data.error.code, 'choice_waiting');
     assert.equal((await call('POST', '/api/labyrinth/blessing', { cookie, body: { id: 'none' } })).data.error.code, 'no_blessing');
