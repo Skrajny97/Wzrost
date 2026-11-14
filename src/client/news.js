@@ -6,6 +6,7 @@
 
 import { h } from './dom.js';
 import { language, t } from './i18n.js';
+import { linkedText } from './links.js';
 import { call, state } from './state.js';
 import { closeSheet, openSheet } from './ui.js';
 
@@ -14,7 +15,9 @@ import { closeSheet, openSheet } from './ui.js';
 const dateFormat = { format: (date) => new Intl.DateTimeFormat(language() === 'en' ? 'en-GB' : 'pl-PL', { day: 'numeric', month: 'numeric', year: 'numeric' }).format(date) };
 
 // The entry's text: a line beginning with "- " is a point of a list, any
-// other line a paragraph of its own.
+// other line a paragraph of its own. An address in it is a link, and
+// [label](address) shows the label, as in the admin's chat messages (the
+// author, 14.11.2026: the testers' link went out of the frame).
 function textOf(body) {
   const blocks = [];
   let list = null;
@@ -27,10 +30,10 @@ function textOf(body) {
         list = h('ul', { class: 'news-points' });
         blocks.push(list);
       }
-      list.append(h('li', { text: text.slice(2) }));
+      list.append(h('li', {}, linkedText(text.slice(2), 'news-link')));
     } else {
       list = null;
-      blocks.push(h('p', { class: 'news-text', text }));
+      blocks.push(h('p', { class: 'news-text' }, linkedText(text, 'news-link')));
     }
   }
   return blocks;

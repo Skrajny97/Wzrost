@@ -201,6 +201,8 @@ const SHEETS = {
   '#/walka': [{ name: 'Tygodnie', tap: '.week-line', ready: '.week-card--now', words: true }],
   // A card of the starter deck in the Encyklopedia's "Karty": its sheet.
   '#/encyklopedia/cards': [{ name: 'karta', tap: '[data-guide="encyclopedia-card"]', ready: '.encyclopedia-card-sheet', words: true }],
+  // "Co nowego?" under the scroll in the top bar, with its long address.
+  '#/postac/statystyki': [{ name: 'Co nowego?', tap: '.topbar .news-button', ready: '.news-entries .news-link' }],
   '#/postac': [
     { name: 'Ustawienia', tap: '.topbar .settings-button', ready: `h2.sheet-title:text-is("${said('Ustawienia')}")`, words: true },
     { name: 'Zgłoś błąd', tap: `#sheet button:text-is("${said('Zgłoś błąd')}")`, ready: `h2.sheet-title:text-is("${said('Zgłoś błąd')}")`, words: true },
@@ -312,6 +314,13 @@ async function main() {
   if ((await api('POST', '/api/character', { name, classId: 'warrior', appearance: 'female' })) >= 400) throw new Error('Nie powstała postać.');
   sql(`UPDATE characters SET level = 146, class_level = 99, gold = 987654, system_points = 12345, time_points = 9876, tutorial = NULL WHERE name = '${name}'`);
   sql(`UPDATE characters SET resources = '${JSON.stringify({ wood: 123456, stone: 98765, 'iron-ore': 54321 })}' WHERE name = '${name}'`);
+  // A "Co nowego?" entry with a long address, the newest (the author,
+  // 14.11.2026: the testers' link went out of the frame).
+  const longLink = 'https://play.google.com/apps/testing/com.insightrpg.app?sprawdzenie-ukladu-bardzo-dlugi-adres-bez-spacji=1';
+  // Made anew on each run, so that it has the highest number (the game
+  // shows the entries newest number first).
+  sql(`DELETE FROM news WHERE title = 'Sprawdzenie układu'`);
+  sql(`INSERT INTO news (title, body, published_at) VALUES ('Sprawdzenie układu', 'Dołącz przez link: ${longLink}\n- Albo tu: [Zostań testerem](${longLink})', ${Date.now()})`);
   // The Portale high up, and one entry for the Dziennik's row.
   sql(`UPDATE characters SET portals = '${JSON.stringify({ best: { gold: 100, wood: 99, materials: 95, parts: 12 } })}' WHERE name = '${name}'`);
   if ((await api('POST', '/api/portals/enter', { portal: 'materials' })) >= 400) throw new Error('Nie udało się wejść do Portalu.');

@@ -7875,9 +7875,11 @@ a.camp-level-button {
   box-shadow: 0 0 0 1px var(--system);
 }
 
-/* The admin's links in a message: its label underlined in the System's
-   colour; the window "Dodaj link" with its two fields. */
-.chat-link {
+/* The admin's links in a message and in "Co nowego?": the label (or the
+   address, broken anywhere) underlined in the System's colour; the window
+   "Dodaj link" with its two fields. */
+.chat-link,
+.news-link {
   color: var(--system);
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -17610,6 +17612,7 @@ button.tcard-slot {
 
 .news-entry {
   padding: 14px 16px;
+  overflow-wrap: anywhere;
 }
 
 .news-title {
