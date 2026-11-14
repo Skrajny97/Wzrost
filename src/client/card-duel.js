@@ -9,6 +9,9 @@
 //   908.3: the challenge at the other player, in a sheet over whatever the
 //     game shows (like a Wymiana, screens/trade.js), with the time left to
 //     answer, „Przyjmij” and „Odrzuć”.
+//   Both sheets show the saved decks once there are two (938,
+//     deck-slots.js): a tap plays another, and the deck in play when the
+//     challenge is accepted plays the match.
 //   908.4: the table in the Salon Gier's „Karty” tab, as Szczęsny's
 //     (cards.js mounts it, with its card faces): the other player's bust,
 //     „Twój ruch” with the 30 seconds left, the leader's cards marked
@@ -24,6 +27,7 @@
 
 import { portraitSprite } from './art.js';
 import { createCardsFx } from './cards-fx.js';
+import { deckSlotsRow, loadDecks } from './deck-slots.js';
 import { h, icon } from './dom.js';
 import { formatCountdown, formatNumber } from './format.js';
 import { t } from './i18n.js';
@@ -171,7 +175,10 @@ export function duelButton(profile) {
 // The challenge's sheet (908.2): the other, the stakes with what a win
 // gives, the rules in short; „Wyzwij” sends it.
 async function openChallenge(person) {
-  const answer = await call('GET', `/api/cards/duel/offer?id=${person.id}`);
+  // The saved decks too (938): the one in play when the challenge is
+  // accepted plays.
+  const [answer, saved] = await Promise.all([call('GET', `/api/cards/duel/offer?id=${person.id}`), loadDecks()]);
+  let decks = saved;
   take(answer);
   const { offer } = answer;
   const { texts } = table;
@@ -251,6 +258,13 @@ async function openChallenge(person) {
               button(t('Wycofaj'), 'system', withdraw),
             )
           : offer.block && h('p', { class: 'region-warning', role: 'status', text: offer.block }),
+        deckSlotsRow(decks, {
+          label: t('Twoja talia'),
+          onPlay: (played) => {
+            decks = played.cards?.decks ?? decks;
+            render();
+          },
+        }),
         h(
           'div',
           { class: 'duel-actions' },
@@ -318,7 +332,7 @@ function offerChallenge() {
 }
 
 async function showChallenge(id) {
-  const answer = await call('GET', '/api/cards/duel');
+  const [answer, decks] = await Promise.all([call('GET', '/api/cards/duel'), loadDecks()]);
   take(answer);
   const duel = answer.duel;
   if (!duel || duel.id !== id || duel.state !== 'proposed' || duel.mine) return;
@@ -357,6 +371,14 @@ async function showChallenge(id) {
       } else if (pressed.isConnected) pressed.disabled = false;
     }
   };
+  // The saved decks (938), one played with a tap before „Przyjmij”: drawn
+  // anew in their place, so the clock runs on.
+  const decksHolder = h('div', { class: 'duel-decks' });
+  const showDecks = (shown) => {
+    const row = deckSlotsRow(shown, { label: t('Twoja talia'), onPlay: (played) => showDecks(played.cards?.decks ?? shown) });
+    decksHolder.replaceChildren(...(row ? [row] : []));
+  };
+  showDecks(decks);
   // „Sulisław (Mag, poz. 66) wyzywa Cię…”: the name stands out.
   const [before, after = ''] = texts.incoming.split('{name}').map((part) => filled(part, { className: other.className, level: other.level }));
   openSheet(
@@ -373,6 +395,7 @@ async function showChallenge(id) {
       h('p', { text: duel.stake > 0 ? filled(texts.incomingStake, { stake: formatNumber(duel.stake), pot: formatNumber(duel.pot) }) : texts.incomingFree }),
       h('div', { class: 'duel-turn', role: 'timer' }, h('div', { class: 'duel-turn-head' }, h('span', { text: t('Na odpowiedź') }), clock), h('span', { class: 'duel-bar' }, fill)),
       duel.stake > 0 && h('p', { class: 'muted', text: filled(texts.incomingGold, { gold: formatNumber(state.character?.gold ?? 0), used: table.used, limit: table.limit }) }),
+      decksHolder,
       h(
         'div',
         { class: 'duel-actions' },

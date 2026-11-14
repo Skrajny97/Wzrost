@@ -7,7 +7,8 @@
 // zgarniesz podwójną stawkę, the tier's reward of the day once a day and its
 // card at the first win, a draw's stake back, a surrender lost; the cards
 // the creatures of an exploration leave in the report and the collection;
-// the cards gone with the character and the account; and the cards of the
+// the saved decks (938), one played with a tap; the cards gone with the
+// character and the account; and the cards of the
 // sources of 903: a profession's work, a Próba Gildii finished, an attack
 // on the Bestia and the creatures beaten in the Labirynt.
 
@@ -215,6 +216,84 @@ describe('Talia Systemu through the API', () => {
     assert.equal(saved.data.cards.collection.find((card) => card.id === 'boar').level, 2);
   });
 
+  test('saved decks (938): up to five in their slots, one played from now on with a tap, a whole one only', async () => {
+    const starter = await (await call('POST', '/api/cards/starter', { cookie })).data.cards;
+    // The starter deck is the first saved deck, in play.
+    assert.equal(starter.decks.max, rules.savedDecks);
+    assert.equal(starter.decks.active, 1);
+    assert.equal(starter.decks.slots.length, rules.savedDecks);
+    const first = starter.decks.slots[0];
+    assert.deepEqual([first.slot, first.whole, [...first.cards].sort()], [1, true, [...starterDeck(content)].sort()]);
+    assert.ok(first.strength > 0);
+    assert.deepEqual(
+      first.types.map((type) => type.count),
+      rules.types.map(() => rules.deckSize / rules.types.length),
+    );
+    assert.ok(starter.decks.slots.slice(1).every((one) => one.cards === null && one.whole === false));
+    // A second deck laid in its slot plays from then on; the first stays.
+    await (await db()).prepare("INSERT INTO cards (character_id, monster_id, copies, created_at) SELECT id, 'boar', 2, 1 FROM characters").run();
+    const ids = starterDeck(content);
+    const second = [...ids.slice(1), 'boar'];
+    const laid = await call('POST', '/api/cards/deck', { cookie, body: { cards: second, slot: 2 } });
+    assert.equal(laid.status, 200);
+    assert.equal(laid.data.slot, 2);
+    assert.equal(laid.data.cards.decks.active, 2);
+    assert.ok(laid.data.cards.deck.includes('boar'));
+    assert.deepEqual([...laid.data.cards.decks.slots[0].cards].sort(), [...ids].sort());
+    assert.ok(laid.data.cards.decks.slots[1].whole);
+    // A tap plays the first again, and a match then plays it.
+    const use = (slot) => call('POST', '/api/cards/decks/use', { cookie, body: { slot } });
+    const back = await use(1);
+    assert.equal(back.status, 200);
+    assert.equal(back.data.used, 1);
+    assert.equal(back.data.cards.decks.active, 1);
+    assert.deepEqual([...back.data.cards.deck].sort(), [...ids].sort());
+    assert.ok(back.data.cards.collection.find((card) => card.id === ids[0]).inDeck);
+    assert.ok(!back.data.cards.collection.find((card) => card.id === 'boar').inDeck);
+    await use(2);
+    assert.equal((await start(1, false)).status, 200);
+    assert.ok((await state()).me.cards.some((card) => card.id === 'boar'));
+    // An empty slot, one past the last and no number at all are refused.
+    assert.deepEqual([(await use(3)).status, (await use(3)).data.error.code], [409, 'empty_slot']);
+    for (const slot of [0, rules.savedDecks + 1, '2', null]) assert.deepEqual([(await use(slot)).status, (await use(slot)).data.error.code], [400, 'invalid_slot'], String(slot));
+    assert.equal((await call('POST', '/api/cards/deck', { cookie, body: { cards: second, slot: 9 } })).status, 400);
+    // A deck no longer whole (a card gone from the collection) is not played.
+    await (await db()).prepare("DELETE FROM cards WHERE monster_id = 'boar'").run();
+    const broken = await tab();
+    assert.deepEqual([broken.decks.slots[1].whole, broken.decks.slots[1].cards.length, broken.deck], [false, rules.deckSize - 1, null]);
+    await call('POST', '/api/cards/surrender', { cookie });
+    assert.deepEqual([(await use(2)).status, (await use(2)).data.error.code], [409, 'invalid_deck']);
+    assert.equal((await use(1)).status, 200);
+    // The saved decks alone, for the live matches' sheets.
+    const alone = await call('GET', '/api/cards/decks', { cookie });
+    assert.deepEqual([alone.status, alone.data.decks.active, alone.data.decks.slots.length], [200, 1, rules.savedDecks]);
+  });
+
+  test('a deck laid before the saved decks is the slot in play, kept when another one is laid or played', async () => {
+    await call('POST', '/api/cards/starter', { cookie });
+    await (await db()).prepare("INSERT INTO cards (character_id, monster_id, copies, created_at) SELECT id, 'boar', 1, 1 FROM characters").run();
+    const ids = starterDeck(content);
+    // As a page of before the slots lays it, and as the migration leaves a
+    // deck: in card_decks, its slot's row not written.
+    await (await db()).prepare('DELETE FROM card_deck_slots').run();
+    const older = [...ids.slice(1), 'boar'];
+    await (await db()).prepare('UPDATE card_decks SET cards = ?').bind(JSON.stringify(older)).run();
+    const view = await tab();
+    assert.deepEqual([view.decks.active, view.decks.slots[0].whole], [1, true]);
+    assert.ok(view.decks.slots[0].cards.includes('boar'));
+    // A page of before the slots saves into the slot in play.
+    const saved = await call('POST', '/api/cards/deck', { cookie, body: { cards: older } });
+    assert.deepEqual([saved.status, saved.data.slot], [200, 1]);
+    await (await db()).prepare('DELETE FROM card_deck_slots').run();
+    // Another deck laid: the one in play stays in its slot.
+    const laid = await call('POST', '/api/cards/deck', { cookie, body: { cards: ids, slot: 3 } });
+    assert.equal(laid.data.cards.decks.active, 3);
+    assert.ok(laid.data.cards.decks.slots[0].cards.includes('boar'));
+    assert.equal((await call('POST', '/api/cards/decks/use', { cookie, body: { slot: 1 } })).data.cards.deck.includes('boar'), true);
+    const rows = await (await db()).prepare('SELECT slot FROM card_deck_slots ORDER BY slot').all();
+    assert.deepEqual(rows.results.map((one) => one.slot), [1, 3]);
+  });
+
   test('a training match played turn by turn on the server, its seed and decks never shown, two taps one turn', async () => {
     await call('POST', '/api/cards/starter', { cookie });
     const started = await start(1, false);
@@ -409,20 +488,20 @@ describe('Talia Systemu through the API', () => {
     await start(1, false);
     const count = async () => {
       const database = await db();
-      const [cards, decks, matches] = await Promise.all(['cards', 'card_decks', 'card_matches'].map((table) => database.prepare(`SELECT COUNT(*) AS n FROM ${table}`).first()));
-      return [cards.n, decks.n, matches.n];
+      const [cards, decks, slots, matches] = await Promise.all(['cards', 'card_decks', 'card_deck_slots', 'card_matches'].map((table) => database.prepare(`SELECT COUNT(*) AS n FROM ${table}`).first()));
+      return [cards.n, decks.n, slots.n, matches.n];
     };
-    assert.deepEqual(await count(), [12, 1, 1]);
+    assert.deepEqual(await count(), [12, 1, 1, 1]);
     assert.equal((await call('DELETE', '/api/character', { cookie })).status, 200);
-    assert.deepEqual(await count(), [0, 0, 0]);
+    assert.deepEqual(await count(), [0, 0, 0, 0]);
     // A new character of the account, and the account removed with it.
     await call('POST', '/api/character', { cookie, body: { name: 'Karciarz', classId: 'mage', appearance: 'male' } });
     await set('level = 30, class_level = 30, gold = 100000');
     await call('POST', '/api/cards/starter', { cookie });
     await start(1, false);
-    assert.deepEqual(await count(), [12, 1, 1]);
+    assert.deepEqual(await count(), [12, 1, 1, 1]);
     assert.equal((await call('DELETE', '/api/me', { cookie, body: { login: 'karciarz' } })).status, 200);
-    assert.deepEqual(await count(), [0, 0, 0]);
+    assert.deepEqual(await count(), [0, 0, 0, 0]);
   });
 });
 

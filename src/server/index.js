@@ -111,7 +111,7 @@ import {
 } from './testing.js';
 import { buyScrolls, raiseAtForge } from './forge.js';
 import { buyTicket, drawLotteries, getCasino, spinCasinoWheel } from './casino.js';
-import { buyPack, getCards, playCardTurn, saveDeck, startMatch, surrenderCards, takeStarter } from './cards.js';
+import { buyPack, getCards, getDecks, playCardTurn, saveDeck, startMatch, surrenderCards, takeStarter, useDeck } from './cards.js';
 import { answerDuel, challengeDuel, duelOffer, duelTurn, readDuel, surrenderDuelMatch, withdrawDuel, withoutDuel } from './card-duel.js';
 import { enterTrialHall } from './trial-hall.js';
 import { arenaFight, claimArenaReward, getArena, getArenaDefence, rerollArenaRivals } from './pvp-arena.js';
@@ -355,6 +355,9 @@ const routes = [
   ['GET', '/api/cards', getCards],
   ['POST', '/api/cards/starter', takeStarter],
   ['POST', '/api/cards/deck', saveDeck],
+  // The saved decks (938): one played from now on, with a tap.
+  ['GET', '/api/cards/decks', getDecks],
+  ['POST', '/api/cards/decks/use', useDeck],
   // Szczęsny's match waits while a live one runs (card-duel.js).
   ['POST', '/api/cards/match', withoutDuel(startMatch)],
   ['POST', '/api/cards/turn', playCardTurn],

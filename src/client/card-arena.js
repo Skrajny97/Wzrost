@@ -6,7 +6,8 @@
 // "play", the tab "Karty" (907.1): the card rating on its plaque with the
 // place in the week's table and the day's matches as card backs, on the
 // Arena's picture; the player's deck, which defends it while it is away,
-// with its strength, its types and the hero card, and "Ułóż talię" leading
+// with its strength, the saved decks to play another with a tap (938), its
+// types and the hero card, and "Ułóż talię" leading
 // to the Salon Gier; the deck's last defences, folded (open while some are
 // new), each in words with when it was; the three rivals, each with its
 // bust, class, level and card rating, its deck's strength, what a win
@@ -35,6 +36,7 @@
 import { placeArt, portraitSprite } from './art.js';
 import { cardFace } from './cards.js';
 import { createCardsFx } from './cards-fx.js';
+import { deckSlotsRow } from './deck-slots.js';
 import { h, icon } from './dom.js';
 import { countOf, dateTimeFormat, formatHours, formatNumber, timeFormat } from './format.js';
 import { chestContents } from './guild-trials.js';
@@ -247,6 +249,8 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
       'section',
       { class: 'card stack card-arena-deck', 'data-guide': 'card-arena-deck' },
       h('div', { class: 'cards-section-head' }, h('h3', { class: 'section-title', text: texts.deck }), deck && h('span', { class: 'muted', text: say(texts.strength, { strength: deck.strength }) })),
+      // The saved decks, one played with a tap (938); the Karty come anew.
+      deckSlotsRow(view.decks, { onPlay: () => load() }),
       heroRow(view.hero),
       deck
         ? h(

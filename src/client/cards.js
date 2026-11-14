@@ -25,6 +25,12 @@
 // and the cards won come in. With the game's animations off ("Animacje",
 // motion.js) every change shows at once.
 //
+// The saved decks (938): up to five, in numbered slots over the deck in the
+// tab, each a small pile with its strength; a tap on one plays it from now
+// on, a tap on an empty slot lays a deck there in the builder
+// (deck-slots.js). At a resident's table they stand over its buttons once
+// there are two.
+//
 // The residents of the Osada play at their own places (904 B, mock-ups
 // 910.1 and 910.2): mounted with `resident`, the same panel is that
 // resident's table under its bust ("Karty z Jagną"): the day's staked
@@ -36,6 +42,7 @@
 import { areaArtUrl, monsterSprite, placeArt, portraitSprite, residentBust } from './art.js';
 import { liveMatch, mountDuel, onLiveMatch } from './card-duel.js';
 import { createCardsFx, fxDroppedCards } from './cards-fx.js';
+import { deckSlotsRow } from './deck-slots.js';
 import { h, icon } from './dom.js';
 import { countOf, formatNumber } from './format.js';
 import { t } from './i18n.js';
@@ -123,6 +130,8 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
   let timer = null;
   // The deck builder open, with the cards chosen and the type shown.
   let building = false;
+  // The saved deck's slot the builder lays (938).
+  let buildingSlot = 1;
   let chosen = new Set();
   let shown = 'all';
   // The turn being laid: its round, the player's lines, the hero's skill,
@@ -364,11 +373,23 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     return card;
   }
 
-  // The player's deck: its twelve cards small, and the collection's size.
+  // The builder for the saved deck of `slot` (938): its cards chosen at
+  // first, none for an empty slot.
+  function layDeck(slot) {
+    building = true;
+    buildingSlot = slot;
+    chosen = new Set(view.decks?.slots.find((one) => one.slot === slot)?.cards ?? []);
+    render();
+    showTab();
+  }
+
+  // The player's deck: the saved decks to choose from with a tap (938), the
+  // twelve cards of the one in play small, and the collection's size.
   function deckCard() {
     if (!view.starter) return null;
     const byId = new Map(view.collection.map((card) => [card.id, card]));
     const cards = (view.deck ?? []).map((id) => byId.get(id)).filter(Boolean);
+    const active = view.decks?.active ?? 1;
     return h(
       'section',
       { class: 'card stack cards-deck', 'data-guide': 'cards-deck' },
@@ -378,19 +399,16 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
         h('h3', { class: 'section-title', text: t('Twoja talia') }),
         h('span', { class: 'muted', text: t('Kolekcja: {count}', { count: formatNumber(view.collection.length) }) }),
       ),
+      deckSlotsRow(view.decks, { onPlay: apply, onLay: layDeck }),
+      view.decks && h('p', { class: 'muted deck-slots-hint', text: t('Stuknij talię, żeby nią grać. W pustym miejscu ułożysz nową.') }),
       cards.length > 0
         ? h('div', { class: 'tcard-grid tcard-grid--deck' }, cards.map((card) => face(card, { compact: true })))
         : h('p', { class: 'muted', text: t('Talia nie jest ułożona. Wybierz {count} kart z kolekcji.', { count: view.deckSize }) }),
       h('button', {
         type: 'button',
         class: 'button button--world',
-        text: t('Ułóż talię'),
-        onClick: () => {
-          building = true;
-          chosen = new Set(view.deck ?? []);
-          render();
-          showTab();
-        },
+        text: view.decks ? t('Ułóż talię {slot}', { slot: active }) : t('Ułóż talię'),
+        onClick: () => layDeck(active),
       }),
     );
   }
@@ -729,6 +747,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
         !view.starter && h('p', { class: 'region-warning', text: t('Najpierw weź talię od Szczęsnego w Salonie Gier.') }),
         view.starter && !view.deck && h('p', { class: 'region-warning', text: t('Najpierw ułóż talię z {count} kart.', { count: view.deckSize }) }),
         ready && limit && h('p', { class: 'muted', text: t('Na dziś to już wszystkie partie o stawkę. Trening jest bez limitu.') }),
+        ready && !busy && deckSlotsRow(view.decks, { onPlay: apply, label: t('Twoja talia') }),
         ready
           ? h(
               'div',
@@ -759,10 +778,10 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     const ready = count === view.deckSize;
     const save = (event) =>
       withButton(event.currentTarget, async () => {
-        const answer = await call('POST', '/api/cards/deck', { cards: [...chosen] });
+        const answer = await call('POST', '/api/cards/deck', { cards: [...chosen], slot: buildingSlot });
         building = false;
         apply(answer);
-        toast(t('Talia zapisana.'));
+        toast(view.decks ? t('Talia {slot} zapisana.', { slot: buildingSlot }) : t('Talia zapisana.'));
       });
     const filter = (id, label) =>
       h(
@@ -798,7 +817,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     return h(
       'section',
       { class: 'card stack cards-builder', 'data-guide': 'cards-builder' },
-      h('h3', { class: 'section-title', text: t('Ułóż talię') }),
+      h('h3', { class: 'section-title', text: view.decks ? t('Ułóż talię {slot}', { slot: buildingSlot }) : t('Ułóż talię') }),
       h('p', { class: 'muted', text: t('Wybierz {size} kart z kolekcji. Najlepiej po kilka każdego typu: Siła bije Zręczność, Zręczność Magię, a Magia Siłę.', { size: view.deckSize }) }),
       bar(),
       h('div', { class: 'chat-tabs market-tabs cards-filter', role: 'tablist', 'aria-label': t('Typ karty') }, filter('all', t('Wszystkie')), view.types.map((type) => filter(type.id, type.name))),

@@ -3260,5 +3260,21 @@
   "Twój poziom": "Your level",
   "Karta na linię: {line}": "Card for the line: {line}",
   "Stuknij kartę z rezerwy.": "Tap a card from your reserve.",
-  "Masz już wszystkie karty tej rzadkości na {level}. poziomie, więc zamiast karty zgarniasz {gold} zł.": "You already have every card of this rarity at level {level}, so you get {gold} gold instead."
+  "Masz już wszystkie karty tej rzadkości na {level}. poziomie, więc zamiast karty zgarniasz {gold} zł.": "You already have every card of this rarity at level {level}, so you get {gold} gold instead.",
+  "Talia {slot}, w grze: {types}, siła {strength}": "Deck {slot}, in play: {types}, strength {strength}",
+  "Talia {slot}: {types}, siła {strength}": "Deck {slot}: {types}, strength {strength}",
+  "Talia {slot}, w grze: niepełna": "Deck {slot}, in play: incomplete",
+  "Talia {slot}: niepełna": "Deck {slot}: incomplete",
+  "Talia {slot}: pusta": "Deck {slot}: empty",
+  "{count} × {type}": "{count} × {type}",
+  "niepełna": "incomplete",
+  "pusta": "empty",
+  "Grasz talią {slot}.": "You play deck {slot} now.",
+  "Zapisane talie": "Saved decks",
+  "Stuknij talię, żeby nią grać. W pustym miejscu ułożysz nową.": "Tap a deck to play it. Tap an empty slot to build a new one.",
+  "Ułóż talię {slot}": "Build deck {slot}",
+  "Talia {slot} zapisana.": "Deck {slot} saved.",
+  "Nie ma takiego miejsca na talię.": "There is no such deck slot.",
+  "Talia {slot} jest pusta. Ułóż ją w Salonie Gier.": "Deck {slot} is empty. Build it in the Games Parlour.",
+  "Talia {slot} nie jest już cała. Ułóż ją od nowa w Salonie Gier.": "Deck {slot} is no longer complete. Build it again in the Games Parlour."
 }

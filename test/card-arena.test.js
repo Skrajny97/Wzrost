@@ -364,6 +364,9 @@ describe('the Karty of the Arena through the API', () => {
     assert.deepEqual([view.matches.left, view.matches.perDay], [5, 5]);
     assert.equal(view.deck.strength, deckStrength(starter(), content));
     assert.deepEqual(view.deck.types.map((type) => type.count), [4, 4, 4]);
+    // The saved decks (938): the starter deck the first, in play, with the
+    // same strength.
+    assert.deepEqual([view.decks.active, view.decks.slots[0].strength, view.decks.slots[1].cards], [1, view.deck.strength, null]);
     assert.equal(view.hero.skill.name, heroSkill('warrior', 0, content).name);
     assert.equal(view.match, null);
     assert.ok(view.texts.intro && view.texts.rules.length >= 4);

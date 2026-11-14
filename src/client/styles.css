@@ -13097,6 +13097,161 @@ a.profession-square:active {
   margin: 0;
 }
 
+/* The saved decks (938, deck-slots.js): small piles of card backs side by
+   side, each with its number on the back's heart and its deck's strength
+   under it; the deck in play lit in the System's colour; an empty slot a
+   dashed outline with a plus, one no longer whole a faded back. All five in
+   one row, from a 320 px phone up; a little bigger on a computer. */
+.deck-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.deck-slots-label,
+.deck-slots-hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.deck-slots-row {
+  display: flex;
+  gap: 6px;
+}
+
+.deck-slot {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 2px 5px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.deck-slot:hover {
+  border-color: var(--bark-line);
+}
+
+.deck-slot:focus-visible {
+  outline: 2px solid var(--system);
+  outline-offset: 2px;
+}
+
+.deck-slot-pile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 30px;
+  height: 43px;
+}
+
+.deck-slot-back {
+  position: absolute;
+  inset: 0;
+  background: url('/art/cards/back.png') center / 100% 100% no-repeat;
+  image-rendering: pixelated;
+  /* The cards under the top one: a small pile. */
+  filter: drop-shadow(2px 2px 0 var(--bark-line)) drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.8));
+}
+
+.deck-slot-number {
+  position: relative;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  background: rgba(13, 17, 11, 0.85);
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+
+.deck-slot-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 11px;
+  line-height: 14px;
+  white-space: nowrap;
+}
+
+.deck-slot--active {
+  border-color: var(--system-line);
+  background: rgba(143, 227, 239, 0.12);
+  box-shadow: 0 0 10px rgba(143, 227, 239, 0.22);
+  cursor: default;
+}
+
+.deck-slot--active .deck-slot-back {
+  filter: drop-shadow(2px 2px 0 var(--bark-line)) drop-shadow(0 0 4px rgba(143, 227, 239, 0.75));
+}
+
+.deck-slot--active .deck-slot-number {
+  border-color: var(--system);
+  color: var(--system-text);
+}
+
+.deck-slot--active .deck-slot-note {
+  color: var(--system-text);
+}
+
+.deck-slot-check {
+  flex: none;
+}
+
+.deck-slot--empty .deck-slot-pile {
+  border: 1px dashed var(--bark-line);
+  border-radius: 3px;
+  color: var(--text-muted);
+}
+
+.deck-slot--empty .deck-slot-number {
+  border-color: var(--bark-line);
+  color: var(--text-muted);
+}
+
+.deck-slot--broken .deck-slot-back {
+  opacity: 0.45;
+  filter: grayscale(0.8);
+}
+
+.deck-slot--broken .deck-slot-note {
+  color: var(--danger);
+}
+
+:root[data-layout='desktop'] .deck-slot {
+  max-width: 76px;
+}
+
+:root[data-layout='desktop'] .deck-slot-pile {
+  width: 36px;
+  height: 51px;
+}
+
+.duel-decks:empty {
+  display: none;
+}
+
 /* A card (885 C, 886 D, 887 and 888, 12.11.2026): one size everywhere, on
    the table, in the reserve, in the deck and the collection, 80 px wide on a
    320 px phone (three in a row), growing with the screen to 112 px on the
