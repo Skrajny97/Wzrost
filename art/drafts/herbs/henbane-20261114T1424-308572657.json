@@ -1,0 +1,14 @@
+{
+  "id": "henbane",
+  "tool": "pixellab generate-image-v2",
+  "description": "a sprig of black henbane, sticky hairy grey-green toothed leaves and two bell-shaped pale cream-yellow flowers with dense dark purple veins and a black-purple throat, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

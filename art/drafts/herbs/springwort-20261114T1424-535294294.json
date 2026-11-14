@@ -1,0 +1,14 @@
+{
+  "id": "springwort",
+  "tool": "pixellab generate-image-v2",
+  "description": "a magical springwort, a tuft of thin silver-blue grass blades glowing with a cold light, tiny white sparks crackling along the blades, a small broken iron chain link lying at its roots, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

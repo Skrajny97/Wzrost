@@ -1,0 +1,14 @@
+{
+  "id": "golden-root",
+  "tool": "pixellab generate-image-v2",
+  "description": "a golden root, a thick knobbly glowing golden-yellow root topped with a rosette of fleshy blue-green leaves and a flat cluster of small bright yellow flowers, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

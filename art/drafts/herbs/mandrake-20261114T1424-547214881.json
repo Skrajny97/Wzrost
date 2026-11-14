@@ -1,0 +1,14 @@
+{
+  "id": "mandrake",
+  "tool": "pixellab generate-image-v2",
+  "description": "a mandrake plant pulled from the earth, its pale brown forked root shaped like a tiny gnarled screaming man with arms and legs, a rosette of broad dark green crinkled leaves on its head with two small orange berries, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}
