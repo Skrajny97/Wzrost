@@ -980,6 +980,11 @@
       "id": "0.3.52",
       "title": "Wersja 0.3.52",
       "body": "- Napisy nad kartami w walce, np. „pancerz +255%”, nie są już ucinane przy krawędzi areny."
+    },
+    {
+      "id": "0.3.53",
+      "title": "Wersja 0.3.53",
+      "body": "- Nowe animacje wszystkich umiejętności ewolucji Wojownika, Kleryka i Cienia.\n- Wojownik: ciosy wbijają wroga w ziemię i kruszą zbroje, Gladiator wiruje w stalowym kręgu, Legenda Areny rozpętuje huragan mieczy, a Kolos zmienia się w kamień i trzęsie ziemią.\n- Kleryk: leczenie wyrasta z ziemi pędami i kolumnami światła, z nieba spadają święty miecz i słup światła, pod wrogami płonie stos, a nad drużyną rozpościera się złota kopuła.\n- Cień: Egzekucja wychodzi z kałuży cienia, Cios ostateczny zatrzymuje czas, Nekromanta i Licz wskrzeszają szkielety, a Władca Cieni zasłania słońce.\n- Liczby obrażeń przy krawędzi areny nie tracą już ostatniego znaku, gdy mocny cios trzęsie areną."
     }
   ]
 }

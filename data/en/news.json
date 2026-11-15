@@ -780,6 +780,10 @@
     "0.3.52": {
       "title": "Version 0.3.52",
       "body": "- Floating text over the cards in fights, such as \"armour +255%\", is no longer cut off at the edge of the arena."
+    },
+    "0.3.53": {
+      "title": "Version 0.3.53",
+      "body": "- New animations for every skill of the Warrior's, the Cleric's and the Shadow's evolutions.\n- Warrior: blows drive foes into the ground and shatter their armour, the Gladiator spins in a ring of steel, the Arena Legend unleashes a hurricane of swords, and the Colossus turns to stone and shakes the earth.\n- Cleric: heals grow out of the ground as sprouts and columns of light, a holy sword and a pillar of light fall from the sky, a pyre burns under the foes, and a golden dome spreads over the party.\n- Shadow: Execution comes out of a pool of shadow, Deathblow stops time, the Necromancer and the Lich raise skeletons, and the Shadow Lord blots out the sun.\n- Damage numbers at the edge of the arena no longer lose their last character when a heavy blow shakes the arena."
     }
   }
 }
