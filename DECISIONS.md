@@ -3331,6 +3331,10 @@ Gracz zapytał autora: „czemu na nekromancie pokazuje ze intelekt nic nie daje
    - Przy statystyce liczonej raz wszystkie formy mieszczą się w progu (Arcydruid 26%). Pytanie 987 na stronie ocen.
 6. **Test** „druga forma wyraźnie mocniejsza od pierwszej” (`test/second-evolution.test.js`) liczy 100 wypraw zamiast 40. Przy 40 bliska para Wielki Inkwizytor i Inkwizytor przechylała się przypadkiem (5 omdleń wobec 3), a przy 200 wyprawach Wielki Inkwizytor ma 43 omdlenia wobec 56.
 
+## Powtórka walki ze strażnikiem i elitą Labiryntu (15.11.2026, od 0.3.60)
+
+Gracz: „na każdym poziomie nie mogę obejrzeć walki [ze strażnikiem] tylko wybrać błogosławieństwo po wygranej z nim”; autor: „chyba słuszna uwaga i błąd”. Po wygranej ze strażnikiem albo elitą okno wyniku pokazywało najpierw trzy błogosławieństwa, a „Obejrzyj walkę” dopiero pod nimi. Po wyborze błogosławieństwa okno się zamykało i walki nie dało się już obejrzeć. Teraz „Obejrzyj walkę” stoi nad wyborem, a po wyborze wraca wynik walki z „Obejrzyj walkę” i „Dalej” (`src/client/labyrinth.js`, `resultSheet` i `act`).
+
 ## Główna statystyka klasy w opisie Artefaktu (15.11.2026, od 0.3.60)
 
 Gracz: „Mam artefakt który daje 1% do głównej statystyki klasy, tylko jak sprawdzić która to jest główna?”; autor: „zasadne pytanie”. W Rdzeniu cecha „Główna statystyka” podaje teraz nazwę statystyki klasy postaci, np. „+1% głównej statystyki klasy (Zręczność)”. Główna statystyka to ta, w którą „Rozdaj według klasy” daje najwięcej (`mainStatOf` w `src/engine/core.js`): Wojownik Siła, Łucznik i Cień Zręczność, Mag i Kleryk Intelekt.
@@ -3372,6 +3376,7 @@ Autor: „Niech oznaczanie na czacie będzie możliwe też po nazwie konta”.
 
 1. Statystyka ewolucji liczy się podwójnie w jej umiejętnościach (986 B), poza Areną i wojnami gildii. Zob. „Statystyka ewolucji w jej umiejętnościach”.
 2. Cecha Artefaktu „Główna statystyka” podaje nazwę statystyki klasy. Zob. „Główna statystyka klasy w opisie Artefaktu”.
+3. Labirynt: „Obejrzyj walkę” po wygranej ze strażnikiem i elitą stoi nad wyborem błogosławieństwa i zostaje po nim. Zob. „Powtórka walki ze strażnikiem i elitą Labiryntu”.
 
 ## Wersja 0.3.59 (15.11.2026): polecenie gry z linku
 
