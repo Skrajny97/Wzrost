@@ -155,7 +155,8 @@
     "perLevel": 2,
     "perClassLevel": 1,
     "find": 5,
-    "generateMinutes": 30
+    "generateMinutes": 30,
+    "play": { "minutes": 1, "daily": 60, "gapSeconds": 50, "idleMinutes": 10 }
   },
   "bestiary": {
     "gold": 30,

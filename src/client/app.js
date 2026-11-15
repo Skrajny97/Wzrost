@@ -4,6 +4,7 @@
 // Polish and shown in the page's language (t(), i18n.js).
 
 import { ApiError, request } from './api.js';
+import { watchPlayTime } from './play-time.js';
 import { forgetReferral, referralCode, showInvite, takeReferral } from './referral-invite.js';
 import { $, $$, clear, fill, h, icon } from './dom.js';
 import { legalLinks, mustConfirmAge, renderAge } from './age.js';
@@ -434,6 +435,8 @@ function openGame() {
     offerNameNotice();
     // A new week of the year, named once (weeks.js).
     offerWeekNotice();
+    // A minute with the game on the screen (993 A, play-time.js).
+    watchPlayTime();
   }, 1000);
   checkChat({ now: true });
 }

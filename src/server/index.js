@@ -127,6 +127,7 @@ import { buyMount } from './stable.js';
 import { salvageStored, sellStored, takeStored } from './storage.js';
 import { answerTrade, blockTrades, cancelTrade, confirmTrade, proposeTrade, readTrade, setOffer, setTradeSettings, tradeSettings } from './trades.js';
 import { seeTutorial, setTutorialSettings } from './tutorial.js';
+import { countPlayMinute } from './play-time.js';
 import { exchangeParts, startCrafting } from './workshop.js';
 
 const routes = [
@@ -498,6 +499,8 @@ const routes = [
   ['GET', '/api/reports', listReports],
   ['GET', '/api/reports/:id', getReport],
   ['POST', '/api/time/skip', skipWithTimePoints],
+  // A minute with the game on the screen (993 A).
+  ['POST', '/api/play', countPlayMinute],
   ['POST', '/api/tutorial', seeTutorial],
   ['POST', '/api/tutorial/settings', setTutorialSettings],
   ['GET', '/api/push/key', pushKey],

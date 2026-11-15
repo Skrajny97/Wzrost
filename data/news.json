@@ -1060,6 +1060,11 @@
       "id": "0.3.68",
       "title": "Wersja 0.3.68",
       "body": "- Nekromanta i Licz noszą też zbroję Maga: kaptury i szaty. Wielki Inkwizytor i Pogromca Demonów noszą hełmy i kolczugi Wojownika, a w drugiej ręce tarczę. Noszona zbroja i fokus same zmieniły się w nowy rodzaj, z tą samą rzadkością, poziomem, ulepszeniem i afiksami.\n- Męski Strzelec Wyborowy ma na portrecie nową twarz, z oczami."
+    },
+    {
+      "id": "0.3.69",
+      "title": "Wersja 0.3.69",
+      "body": "- Czas w grze daje Punkty Czasu: każda minuta z grą na ekranie to 1 Punkt Czasu, do 60 dziennie. Liczy się też samo oglądanie, a po 10 minutach bez dotknięcia liczenie czeka na następne dotknięcie.\n- Dzisiejszy stan widać w portfelu pod złotem, przy Punktach Czasu: „Za czas w grze: 23 z 60 dziś”."
     }
   ]
 }

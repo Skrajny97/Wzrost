@@ -221,13 +221,15 @@ describe('Czat', () => {
     await database.prepare('UPDATE characters SET class_level = 10, skills = ? WHERE id = ?').bind(JSON.stringify({ [skill.id]: 3 }), ala.id).run();
     await database
       .prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, ?, ?, 0)')
-      .bind(ala.id, 'head', JSON.stringify({ base: 'helmet', slot: 'head', level: 1, rarity: 'common', affixes: [], armor: 6, upgrade: 2 }))
+      // A hood, which a Mag wears: worn gear of another class's kind is made
+      // into the class's own at the next look (991 A, regearItem).
+      .bind(ala.id, 'head', JSON.stringify({ base: 'hood', slot: 'head', level: 1, rarity: 'common', affixes: [], armor: 6, upgrade: 2 }))
       .run();
     const { profile } = (await call('GET', `/api/profile/${encodeURIComponent('ala')}`, { cookie: players.ola })).data;
     assert.deepEqual([profile.name, profile.className, profile.level, profile.classLevel, profile.role], ['Ala', 'Mag', 5, 10, null]);
     assert.equal(profile.equipment.length, content.slots.length);
     const head = profile.equipment.find((entry) => entry.slot === 'head').item;
-    assert.deepEqual([head.base, head.upgrade, head.rarity], ['helmet', 2, 'common']);
+    assert.deepEqual([head.base, head.upgrade, head.rarity], ['hood', 2, 'common']);
     assert.ok(head.properties.length > 0);
     assert.equal(head.price, undefined);
     assert.equal(profile.equipment.find((entry) => entry.slot === 'weapon').item, null);

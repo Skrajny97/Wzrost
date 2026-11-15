@@ -3477,6 +3477,15 @@ Autor: „Niech oznaczanie na czacie będzie możliwe też po nazwie konta”.
 2. Postać oznaczona w jednej wiadomości i nazwą konta, i imieniem liczy się raz.
 3. Podpowiedzi pod polem wiadomości pokazują też nazwy kont piszących.
 
+## Czas w grze (993 A, 994; 15.11.2026, od 0.3.69)
+
+Autor: „Chcemy też dodać funkcję liczenia czasu aktywności w grze i nagradzania gracza Punktami Czasu za sam czas spędzony w grze jako takiej, nawet na oglądaniu ekranu i klikaniu.” Autor wybrał 993 A i przyjął makietę 994.
+
+1. **Tempo:** każda minuta w grze to 1 Punkt Czasu, do 60 na dobę narratora (ta sama doba co limit Punktów Czasu u Pustelnika). Liczby są w `data/balance.json`, `timePoints.play`.
+2. **Co się liczy:** minuta, gdy gra jest na ekranie, także na samym oglądaniu i w trakcie wyprawy. Po 10 minutach bez dotknięcia (stuknięcie, klik, klawisz, kółko myszy) strona przestaje liczyć do następnego dotknięcia, żeby nie liczyła się gra zostawiona włączona na noc (`idleMinutes`).
+3. **Kto liczy:** strona zlicza sekundy na ekranie i po każdej pełnej minucie wysyła `POST /api/play` (`src/client/play-time.js`, w zegarze gry co sekundę). Serwer liczy minutę najwyżej raz na 50 sekund (`gapSeconds`), więc dwie karty albo dwa urządzenia naraz liczą raz. Zapis zmienia tylko `characters.play_time` (`{ day, minutes, at }`, `migrations/0139_play_time.sql`) i Punkty Czasu, bez nowej wersji postaci, więc akcja wysłana w tej samej chwili się nie gubi (`src/server/play-time.js`, `src/engine/play-time.js`).
+4. **Na ekranie (994):** w portfelu pod złotem, przy Punktach Czasu, pod „+1 za …” jest linia „Za czas w grze: 23 z 60 dziś”, a na komputerze to samo w podpowiedzi przy klepsydrze. Nowy punkt wpada do portfela od razu, bez osobnego komunikatu.
+
 ## Twarz Strzelca Wyborowego (990.1 B; 15.11.2026, od 0.3.68)
 
 Autor: „twarz w portrecie męskiego Strzelca Wyborowego jest brzydka i powinna podlegac poprawkom, wyglada jakby nie miał oczu i miał zniekształconą twarz”. Autor wybrał 990.1 B.
@@ -3485,6 +3494,11 @@ Autor: „twarz w portrecie męskiego Strzelca Wyborowego jest brzydka i powinna
 2. **Odcienie skóry:** osiem odcieni ma nową twarz. Twarz ma ciemniejsze cienie niż reszta skóry, więc w `tools/evolution-tones.json` jest osobną grupą z własną skalą (`groups` w `tools/evolution-tones.py`). Dzięki temu poza twarzą żaden piksel odcieni się nie zmienił.
 3. **Pasek czoła:** autor zauważył na ciemnym odcieniu jasny pasek skóry pod opaską: pole skóry tego portretu zaczynało się wiersz za nisko i od początku go pomijało. Grupa twarzy obejmuje teraz czoło, cień przy uchu i cień pod brodą, a sprawdzenie wszystkich ośmiu odcieni nie znajduje na głowie żadnego koloru skóry sprzed przebarwienia.
 4. **Inne portrety:** ten sam skan znalazł podobne jasne piksele przy skórze w innych portretach (np. pasek przy obojczyku Czempiona Areny i linia na nodze Berserkerki w ciemnym odcieniu). To osobne zadanie.
+
+## Wersja 0.3.69 (15.11.2026): czas w grze za Punkty Czasu
+
+1. Każda minuta z grą na ekranie to 1 Punkt Czasu, do 60 dziennie, z linią w portfelu (993 A, 994). Zob. „Czas w grze”.
+2. W tej wersji weszła też 0.3.68, której wdrożenie zatrzymał jeden test: dawał Magowi hełm, a od 0.3.68 noszona zbroja innej klasy sama zmienia się w zbroję klasy postaci. Test zakłada teraz Magowi kaptur.
 
 ## Wersja 0.3.68 (15.11.2026): zbroja jak na portretach i nowa twarz Strzelca Wyborowego
 
