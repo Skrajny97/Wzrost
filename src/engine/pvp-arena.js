@@ -129,8 +129,13 @@ export function duelist({ character, equipped, name }, id, side, { factor, armor
   // The evolution's stat counts once here, not twice (987 B: the Arena's
   // third forms stay in 25–75% of their duels; combatant.js).
   const unit = playerCombatant(/** @type {any} */ ({ character, equipped, name, id, side, skillStatWeight: content.balance.skills.duelSkillStatWeight ?? 0 }), content);
-  const maxHp = Math.max(1, Math.round(unit.maxHp * factor));
-  return { ...unit, maxHp, hp: maxHp, armor: Math.round(unit.armor * armor), reflectShare: armor };
+  // The form's own strength in the players' duels (992 A: the second forms
+  // the Arena's numbers left outside 25–75% of their duels): its blows'
+  // share (evolutions.json `duelPower`) and its HP's (`duelHp`), of that
+  // form alone, not its next forms.
+  const form = content.evolutionsById?.[character.evolution];
+  const maxHp = Math.max(1, Math.round(unit.maxHp * factor * (form?.duelHp ?? 1)));
+  return { ...unit, maxHp, hp: maxHp, armor: Math.round(unit.armor * armor), reflectShare: armor, damageScale: unit.damageScale * (form?.duelPower ?? 1) };
 }
 
 // A duel of the attacker's character (`attacker`: { character, equipped,

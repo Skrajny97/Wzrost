@@ -16,6 +16,7 @@ import {
   classNameOf,
   computeStats,
   createRng,
+  duelist,
   evolutionArt,
   evolutionBlock,
   evolutionChanges,
@@ -39,6 +40,7 @@ import {
   skillsView,
 } from '../src/engine/index.js';
 import { evolvedSkills as simulatedSkills } from '../tools/evolution-sim.mjs';
+import { measure } from '../tools/pvp-arena-sim.mjs';
 import { areaForLevel, typicalCharacter } from '../tools/simulate.mjs';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -240,6 +242,34 @@ describe('the second evolution in the engine', () => {
     } finally {
       state.content = before;
     }
+  });
+});
+
+describe('the second forms in the Arena (992 A)', () => {
+  // As the third forms at level 200 (third-evolution.test.js): at level 100
+  // each second form wins 25–75% of its duels against the other paths. Six
+  // of them have their own strength in the players' duels for it
+  // (evolutions.json duelPower and duelHp): the Wielki Inkwizytor (1% of
+  // its duels before), the Druid (9%), the Widmo (21% once those two were
+  // stronger), the Władca Piorunów (78%), the Mistrz Łowów (77%) and the
+  // Bastion (79%).
+  test('at level 100 each second form wins 25–75% of its duels against the other paths', () => {
+    const result = measure({ level: 100, seeds: 1, model: 'realistic', paths: true }, content);
+    const second = content.evolutions.filter((form) => content.evolutionsById[form.from] && !content.evolutionsById[form.from].from).map((form) => form.id);
+    assert.deepEqual(Object.keys(result.paths).sort(), [...second].sort());
+    for (const [id, share] of Object.entries(result.paths)) assert.ok(share >= 0.25 && share <= 0.75, `${id} wins ${share}`);
+  });
+
+  test('the strength is the form\'s own: in duels only, and not its third form\'s', () => {
+    const inquisitor = content.evolutionsById['grand-inquisitor'];
+    assert.deepEqual([inquisitor.duelPower, content.evolutionsById['demon-slayer'].duelPower], [2, undefined]);
+    const { character, equipped } = typicalCharacter('cleric', 100, content);
+    const fighter = { character: { ...character, classLevel: 120, evolution: 'grand-inquisitor' }, equipped, name: 'Inkwizytor' };
+    const plain = playerCombatant(fighter, content);
+    const duel = duelist(fighter, 'a0', 'ally', { factor: 1, armor: 1 }, content);
+    assert.ok(Math.abs(duel.damageScale - 2 * plain.damageScale) < 1e-9);
+    const bastion = { character: { ...typicalCharacter('warrior', 100, content).character, classLevel: 120, evolution: 'bastion' }, equipped: typicalCharacter('warrior', 100, content).equipped, name: 'Bastion' };
+    assert.equal(duelist(bastion, 'a0', 'ally', { factor: 1, armor: 1 }, content).maxHp, Math.round(playerCombatant(bastion, content).maxHp * 0.8));
   });
 });
 

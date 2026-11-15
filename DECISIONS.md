@@ -3477,6 +3477,21 @@ Autor: „Niech oznaczanie na czacie będzie możliwe też po nazwie konta”.
 2. Postać oznaczona w jednej wiadomości i nazwą konta, i imieniem liczy się raz.
 3. Podpowiedzi pod polem wiadomości pokazują też nazwy kont piszących.
 
+## Drugie formy na Arenie (992 A; 15.11.2026, od 0.3.70)
+
+Przy przeglądzie klas wyszło, że na Arenie na 100. poziomie Wielki Inkwizytor wygrywał 1% pojedynków, a Druid 9% (przed 0.3.64: 4% i 7%), Bastion 79%, a Władca Piorunów 78%. Trzecie formy pilnuje test progu 25–75% od początku, drugich nikt nie pilnował. Autor wybrał 992 A: wyrównać je tylko w pojedynkach graczy i dopisać test.
+
+1. **Jak:** forma może mieć w `data/evolutions.json` własny mnożnik obrażeń w pojedynkach (`duelPower`) i HP (`duelHp`). Działa tylko w pojedynkach graczy, na Arenie i w wojnach gildii (`duelist` w `src/engine/pvp-arena.js`), i tylko dla tej formy, bez jej trzeciej formy. Wyprawy, wieże, Labirynt i walki z potworami się nie zmieniają.
+2. **Liczby** (`tools/pvp-arena-sim.mjs --levels 100 --paths all`, opcja `--power` do prób):
+   - Wielki Inkwizytor: obrażenia ×2, z 1% na 31% wygranych.
+   - Druid: obrażenia ×1,9, z 9% na 36%.
+   - Widmo: obrażenia ×1,2, z 28% na 33%. Bez tego, po wzmocnieniu Inkwizytora i Druida, spadłoby do 21%.
+   - Władca Piorunów: obrażenia ×0,9, z 78% na 66%.
+   - Mistrz Łowów: obrażenia ×0,9, z 75–77% na 68%.
+   - Bastion: HP ×0,8, z 79% na 70%. Słabsze ciosy prawie go nie ruszały, bo wygrywa wytrzymałością.
+   - Wszystkie drugie formy mieszczą się w 31–70%. Trzecie formy na 200. poziomie bez zmian.
+3. **Test:** `test/second-evolution.test.js` pilnuje, by każda druga forma na 100. poziomie wygrywała 25–75% pojedynków, jak trzecie formy na 200.
+
 ## Czas w grze (993 A, 994; 15.11.2026, od 0.3.69)
 
 Autor: „Chcemy też dodać funkcję liczenia czasu aktywności w grze i nagradzania gracza Punktami Czasu za sam czas spędzony w grze jako takiej, nawet na oglądaniu ekranu i klikaniu.” Autor wybrał 993 A i przyjął makietę 994.
@@ -3494,6 +3509,10 @@ Autor: „twarz w portrecie męskiego Strzelca Wyborowego jest brzydka i powinna
 2. **Odcienie skóry:** osiem odcieni ma nową twarz. Twarz ma ciemniejsze cienie niż reszta skóry, więc w `tools/evolution-tones.json` jest osobną grupą z własną skalą (`groups` w `tools/evolution-tones.py`). Dzięki temu poza twarzą żaden piksel odcieni się nie zmienił.
 3. **Pasek czoła:** autor zauważył na ciemnym odcieniu jasny pasek skóry pod opaską: pole skóry tego portretu zaczynało się wiersz za nisko i od początku go pomijało. Grupa twarzy obejmuje teraz czoło, cień przy uchu i cień pod brodą, a sprawdzenie wszystkich ośmiu odcieni nie znajduje na głowie żadnego koloru skóry sprzed przebarwienia.
 4. **Inne portrety:** ten sam skan znalazł podobne jasne piksele przy skórze w innych portretach (np. pasek przy obojczyku Czempiona Areny i linia na nodze Berserkerki w ciemnym odcieniu). To osobne zadanie.
+
+## Wersja 0.3.70 (15.11.2026): drugie formy na Arenie wyrównane
+
+1. Wielki Inkwizytor, Druid i Widmo mocniejsi, a Władca Piorunów, Mistrz Łowów i Bastion słabsi, tylko w pojedynkach graczy; każda druga forma wygrywa 31–70% pojedynków na 100. poziomie (992 A). Zob. „Drugie formy na Arenie”.
 
 ## Wersja 0.3.69 (15.11.2026): czas w grze za Punkty Czasu
 
