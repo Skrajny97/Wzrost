@@ -21,7 +21,7 @@ import { narratorIdle } from '../narrator.js';
 import { playSound } from '../sound.js';
 import { call, serverNow, state, walletEntries } from '../state.js';
 import { closeSheet, confirmAction, openSheet, pageHeading, toast, withButton } from '../ui.js';
-import { gemFold, itemSummary, itemTitle, materialTitle, propertyLines } from './character.js';
+import { classFits, gemFold, itemSummary, itemTitle, materialTitle, propertyLines } from './character.js';
 
 const HASH = '#/wymiana';
 const EVERY_MS = 2000;
@@ -284,7 +284,7 @@ export function mountTrade(container, { backHash }) {
     const notes = mine
       ? []
       : [
-          item.classIds && !item.classIds.includes(character.classId) && t('Twoja klasa nie może go używać.'),
+          !classFits(item, character) && t('Twoja klasa nie może go używać.'),
           // From its own level of the class on, as one from a Wymiana is.
           character.classLevel < (item.classLevel ?? 1) && t('Założysz go od poziomu klasy {level}.', { level: item.classLevel }),
         ].filter(Boolean);

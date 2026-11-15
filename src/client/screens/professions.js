@@ -32,7 +32,7 @@ import { closeSheet, confirmAction, howItWorks, openSheet, splitLead, systemPane
 import { transmuteForm } from '../transmute.js';
 import { characterLook, portraitLayers } from '../cosmetics.js';
 import { SLOT_ICONS } from '../icons.js';
-import { compareTable, findMark, itemSummary, itemTitle, salvagedText } from './character.js';
+import { classFits, compareTable, findMark, itemSummary, itemTitle, salvagedText } from './character.js';
 import { lockedScreen } from './locked.js';
 
 const HOME = '#/profesje';
@@ -1491,7 +1491,7 @@ export function mountProfessions(container, { params, navigate }) {
   // A marked item of the Przechowalnia beside the one worn in its place,
   // or that nothing is worn there; nothing for an item of another class.
   function storageComparison(character, item) {
-    if (item.classIds && !item.classIds.includes(character.classId)) return null;
+    if (!classFits(item, character)) return null;
     const worn = character.equipment?.[item.slot] ?? null;
     return worn ? compareTable(item, worn) : h('p', { class: 'muted', text: t('W miejscu „{slot}” postać nic teraz nie nosi.', { slot: item.slotName }) });
   }

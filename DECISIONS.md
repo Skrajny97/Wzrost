@@ -3373,6 +3373,10 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
 11. **Testy:**
     - `test/evolution-gear.test.js`.
     - Test „druga forma wyraźnie mocniejsza” zakłada przy porównaniu drugich form z pierwszymi 0,02 HP zapasu. Inkwizytor, najmocniejsza pierwsza forma, stracił Siłę w umiejętnościach i kończy wyprawy z 0,78 HP zamiast 0,81, więc pierwsze formy zbliżyły się do siebie, a drugie są wyrównane jak przedtem.
+12. **Co strony mówią o przedmiotach** (od 0.3.66). Autor: „I powinno byc ze Nekromanta nie moze juz nosic tych przedmiotów sztyletowych itp. które ma Cień. Albo w sumie niech może, ale niech gra jakoś informuje ze nie oplaca sie juz ich nosić”.
+    - Zostaje pierwsze: forma nie zakłada broni, której nie używa. Karta sztyletu w plecaku Nekromanty mówi „Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.”, a „Załóż” jest wyszarzone.
+    - Do 0.3.65 plecak, Targowisko, Wymiana i Przechowalnia liczyły to po klasie sprzed ewolucji: Nekromanta widział kostur jako „nie dla Twojej klasy”, a sztylet z aktywnym „Załóż”, którego serwer odmawiał.
+    - Teraz postać przychodzi z rodzajami broni, drugiej ręki i zbroi swojej formy (`gear`), a przedmiot ze swoim rodzajem (`family`), i strony porównują jedno z drugim (`classFits` w `src/client/screens/character.js`).
 
 ## Zwój Niepamięci (989; 15.11.2026, od 0.3.64)
 
@@ -3466,6 +3470,10 @@ Autor: „Niech oznaczanie na czacie będzie możliwe też po nazwie konta”.
 1. „@” i nazwa konta oznacza postać, którą to konto teraz gra, na tych samych zasadach co imię postaci: tylko ten, kto czyta kanał, nigdy własne konto ani ktoś, kto ukrył piszącego, najwyżej 5 oznaczeń w wiadomości. Wielkość liter bez znaczenia (`src/server/mentions.js`).
 2. Postać oznaczona w jednej wiadomości i nazwą konta, i imieniem liczy się raz.
 3. Podpowiedzi pod polem wiadomości pokazują też nazwy kont piszących.
+
+## Wersja 0.3.66 (15.11.2026): przedmioty „dla Twojej klasy” według broni ewolucji
+
+1. Plecak, Targowisko, Wymiana i Przechowalnia mówią, czy postać może założyć przedmiot, według broni jej formy, a nie klasy sprzed ewolucji. Zob. „Ewolucje, które zmieniają broń”, punkt 12.
 
 ## Wersja 0.3.65 (15.11.2026): Zwój Niepamięci po każdej ewolucji i u Sambora
 

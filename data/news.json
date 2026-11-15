@@ -1045,6 +1045,11 @@
       "id": "0.3.65",
       "title": "Wersja 0.3.65",
       "body": "- Każda ewolucja daje Zwój Niepamięci od Systemu: pierwsza, druga i trzecia, a także zmiana ewolucji u Sambora. Darmowe zerowanie zaraz po pierwszej ewolucji zostaje i nie zużywa zwoju.\n- Sambor sprzedaje Zwój Niepamięci zamiast zerować statystyki, za tyle samo złota co dotąd. Sprzedaje jeden, gdy nie masz żadnego.\n- Po zmianie ewolucji u Sambora broń i druga ręka same zmieniają się w broń nowej formy, więc postać nie zostaje bez broni."
+    },
+    {
+      "id": "0.3.66",
+      "title": "Wersja 0.3.66",
+      "body": "- Nekromanta, Licz, Wielki Inkwizytor i Pogromca Demonów widzą w plecaku, na Targowisku, w Wymianie i w Przechowalni, co mogą założyć. Kostury i fokusy, a u Inkwizytorów miecze i topory, są dla nich. Przy sztyletach i kropidłach stoi, że ich klasa nie może ich używać. Wcześniej strona liczyła to po klasie sprzed ewolucji."
     }
   ]
 }
