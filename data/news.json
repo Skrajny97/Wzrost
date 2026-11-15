@@ -1005,6 +1005,11 @@
       "id": "0.3.57",
       "title": "Wersja 0.3.57",
       "body": "- Pakiet kart u Szczęsnego losuje teraz karty stworów ze wszystkich krain, także z wyższych niż Twoja, według rzadkości: zwykle pospolite i rzadkie, czasem epickie, a z rzadka nawet legendarne, mityczne i boskie. Ostatnia karta w pakiecie jest co najmniej unikalna.\n- Pakiet kupisz już w pierwszej krainie, raz dziennie, za złoto 4 godzin wyprawy na Twoim poziomie. Dobra relacja ze Szczęsnym obniża cenę nawet o 40%, a każdy kupiony pakiet tę relację podnosi.\n- Szanse każdej rzadkości widać na karcie pakietu w zakładce Karty."
+    },
+    {
+      "id": "0.3.58",
+      "title": "Wersja 0.3.58",
+      "body": "- Pakiet kart u Szczęsnego otwiera się teraz jak booster: pakiet rozrywa się na stole, a karty odwracają się po kolei, im rzadsza, tym jaśniej błyszczy. Legendarne, mityczne i boskie karty mają własną oprawę. Dotknięcie pomija animację, a przy wyłączonych Animacjach (Ustawienia) karty pokazują się od razu.\n- Na czacie oznaczysz gracza także po nazwie konta: „@” i nazwa konta oznacza postać, którą ten gracz teraz gra."
     }
   ]
 }

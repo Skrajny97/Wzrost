@@ -176,6 +176,27 @@ describe('Oznaczanie na czacie', () => {
     assert.deepEqual([news.mentions.global, news.mentions.trade], [0, 0]);
   });
 
+  // The author, 15.11.2026: „Niech oznaczanie na czacie będzie możliwe też
+  // po nazwie konta”.
+  test('an account\'s name tags the character it plays now, whatever the case; with its character\'s name too, once', async () => {
+    await (await db()).prepare("UPDATE users SET account_name = 'Wędrowiec', account_name_key = 'wędrowiec' WHERE login = 'ola'").run();
+    const sent = await send(players.ala, 'Hej @wędrowiec, co słychać?');
+    assert.equal(sent.status, 201);
+    assert.deepEqual(sent.data.message.mentions, ['wędrowiec']);
+    assert.deepEqual(await tags(), [{ written: 'wędrowiec', push: 1, name: 'Ola' }]);
+    assert.equal((await read(players.ola)).messages[0].mentioned, true);
+    assert.equal((await read(players.ewa)).messages[0].mentioned, undefined);
+    // By the account's name and the character's name in one message: one tag.
+    await age();
+    const both = await send(players.ewa, '@Wędrowiec albo @Ola, zagramy?');
+    assert.deepEqual(both.data.message.mentions, ['Wędrowiec']);
+    assert.equal((await tags()).length, 2);
+    // An account's name never tags its own writer.
+    await age();
+    const own = await send(players.ola, 'To ja, @Wędrowiec');
+    assert.deepEqual([own.data.message.mentions, (await tags()).length], [undefined, 2]);
+  });
+
   test('only those who read the channel: the guild\'s members, the two of a private conversation, characters with the Społeczność', async () => {
     const database = await db();
     await database.prepare("UPDATE characters SET level = 30, gold = 5000 WHERE name = 'Ala'").run();

@@ -76,7 +76,7 @@ const now = () => performance.now();
 
 // One sequence of motion (a round, a deal), which a tap ends at once: its
 // animations finished, its waits over, nothing new started.
-function createRun() {
+export function createRun() {
   let skipped = false;
   const animations = new Set();
   const timers = new Map();
@@ -232,7 +232,7 @@ function cloneCard(element) {
 
 // The sparks: one canvas over the table, drawn while any fly, on the page's
 // clock (performance.now).
-function createSparks(layer) {
+export function createSparks(layer) {
   const canvas = h('canvas', { class: 'cfx-sparks', 'aria-hidden': 'true' });
   layer.append(canvas);
   const context = canvas.getContext('2d');

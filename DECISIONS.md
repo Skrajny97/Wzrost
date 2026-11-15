@@ -3309,6 +3309,28 @@ Autor zapytał, czemu część graczy nie ma pakietu trzech kart u Szczęsnego (
 5. **Przy okazji:** zasady kart mówiły „najwyżej +15% za wszystkie 156 kart”, a od Łysogór kart jest 207, więc teraz: „najwyżej +15%, od 150 kart”.
 6. **Dalej:** animacja otwierania pakietu. Obrazek pakietu w PixelLab i makieta animacji (MP4 z telefonu) idą na stronę ocen, a do gry po akceptacji.
 
+## Animacja otwierania pakietu kart (983 A, 984; 15.11.2026, od 0.3.58)
+
+Autor przyjął obrazek pakietu 983 A i animację otwierania 984, bez uwag.
+
+1. **Scena** (`src/client/pack-fx.js`): po „Kup pakiet”, przy włączonych Animacjach, na tle Salonu Gier pakiet spada na stół i drży. Potem górny szew rozrywa się z błyskiem i iskrami, a trzy karty wychodzą z pakietu i rozkładają się w rzędzie. Karty odwracają się po kolei, każda z błyskiem, pierścieniem i iskrami w kolorze swojej rzadkości, tym więcej, im rzadsza. Ostatnia karta czeka chwilę dłużej. Karta legendarna, mityczna albo boska najpierw drży i świeci, odwraca się z promieniami i zostaje z poświatą. Pod kartą „nowa” albo „+1 poziom”, a na końcu podsumowanie i „Dalej”.
+2. **Pominięcie:** dotknięcie (albo Enter, spacja, Escape) kończy animację od razu. Przy wyłączonych Animacjach karty pokazują się od razu pod kartą bohatera, jak dotąd.
+3. **Obrazek** pakietu z PixelLab (`art/prompts.json`, kind cards, prompt pack, wersja A): `src/client/art/cards/pack.png`.
+4. **Dźwięki** są te, które gra już ma: rozerwanie jak skrzynia, odwrócenie karty pospolitej, rzadkiej i unikalnej jak zakładka, epickiej jak magia, a legendarnej i lepszych jak wygrana w Salonie.
+
+## Oznaczanie na czacie po nazwie konta (15.11.2026, od 0.3.58)
+
+Autor: „Niech oznaczanie na czacie będzie możliwe też po nazwie konta”.
+
+1. „@” i nazwa konta oznacza postać, którą to konto teraz gra, na tych samych zasadach co imię postaci: tylko ten, kto czyta kanał, nigdy własne konto ani ktoś, kto ukrył piszącego, najwyżej 5 oznaczeń w wiadomości. Wielkość liter bez znaczenia (`src/server/mentions.js`).
+2. Postać oznaczona w jednej wiadomości i nazwą konta, i imieniem liczy się raz.
+3. Podpowiedzi pod polem wiadomości pokazują też nazwy kont piszących.
+
+## Wersja 0.3.58 (15.11.2026): animacja otwierania pakietu kart i oznaczanie po nazwie konta
+
+1. Pakiet kart otwiera się jak booster (983 A, 984). Zob. „Animacja otwierania pakietu kart”.
+2. Oznaczanie na czacie także po nazwie konta. Zob. „Oznaczanie na czacie po nazwie konta”.
+
 ## Wersja 0.3.57 (15.11.2026): pakiet kart u Szczęsnego jak booster
 
 1. Pakiet kart losuje ze wszystkich krain według rzadkości, ostatnia karta co najmniej unikalna, także w pierwszej krainie (981). Cena: 4 godziny wyprawy, do 40% mniej za relację ze Szczęsnym. Zob. „Pakiet Szczęsnego jak booster”.
