@@ -1,0 +1,14 @@
+{
+  "id": "stone-rooster",
+  "tool": "pixellab generate-image-v2",
+  "description": "Kamienny Kogut, a large rooster turned to grey stone, cracked quartzite body with lichen patches, a stone comb and wattles, a sharp stone beak, faint glowing amber eyes, crowing with its head thrown back, small stone chips falling off it, menacing, full body, three-quarter view, the whole bird inside the picture, standing on both feet",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

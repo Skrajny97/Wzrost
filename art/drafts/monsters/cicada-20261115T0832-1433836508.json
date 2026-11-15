@@ -1,0 +1,14 @@
+{
+  "id": "cicada",
+  "tool": "pixellab generate-image-v2",
+  "description": "a giant cicada the size of a dog, a broad dark olive-brown body with green veins, big clear veined wings, bulging red eyes, a sharp beak, its body vibrating with a loud piercing song shown as ripples, sitting on a hot grey stone, menacing, full body, three-quarter view, the whole insect inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

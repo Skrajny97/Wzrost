@@ -1,0 +1,14 @@
+{
+  "id": "roller",
+  "tool": "pixellab generate-image-v2",
+  "description": "a European roller bird diving down with wings half open, bright turquoise-blue head and wings with darker violet-blue flight feathers, a chestnut-brown back, a strong black hooked beak open to strike, fierce eyes, full body, three-quarter view, the whole bird inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

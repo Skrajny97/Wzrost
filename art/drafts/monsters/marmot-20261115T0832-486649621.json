@@ -1,0 +1,14 @@
+{
+  "id": "marmot",
+  "tool": "pixellab generate-image-v2",
+  "description": "a huge fat grey-brown mountain marmot standing up on its hind legs on a pile of grey stones, small round ears, long sharp yellow front teeth bared, angry eyes, mouth open in a shrill whistle, menacing, full body, three-quarter view, the whole animal inside the picture, nothing cut off at the edges",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

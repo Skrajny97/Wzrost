@@ -1,0 +1,14 @@
+{
+  "id": "vulture",
+  "tool": "pixellab generate-image-v2",
+  "description": "a griffon vulture, a huge brown carrion bird with a bare pale head and long neck, a ruff of white down at its neck, a heavy hooked yellowish beak, broad wings half spread, menacing, full body, three-quarter view, the whole bird inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

@@ -1,0 +1,14 @@
+{
+  "id": "stone-knight",
+  "tool": "pixellab generate-image-v2",
+  "description": "Kamienny Rycerz, a sleeping knight of old legends turned to grey stone, a full stone plate armour covered in moss and lichen, a stone helmet with a closed visor and two glowing amber eye slits, a great stone sword held in both hands, cracks across the armour, waking up, menacing, standing on both feet, full body, three-quarter view, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

@@ -1,0 +1,14 @@
+{
+  "id": "wolverine",
+  "tool": "pixellab generate-image-v2",
+  "description": "a wolverine, a stocky muscular dark brown predator with a pale tan stripe along its sides, a broad head with small ears, bared fangs and long curved claws, snarling furiously, ready to pounce, full body, three-quarter view, the whole animal inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

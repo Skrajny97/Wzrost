@@ -1,0 +1,14 @@
+{
+  "id": "shrike",
+  "tool": "pixellab generate-image-v2",
+  "description": "a great grey shrike, a pale grey bird with a bold black mask over its eyes, black wings with white patches and a long black tail, a strong hooked beak like a small dagger, perched on a thorny branch with a beetle impaled on a thorn, menacing, full body, three-quarter view, the whole bird and branch inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

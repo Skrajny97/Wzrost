@@ -1,0 +1,14 @@
+{
+  "id": "wallcreeper",
+  "tool": "pixellab generate-image-v2",
+  "description": "a wallcreeper bird clinging to a grey rock face, ash-grey body, broad rounded wings flashing bright crimson-red patches with white spots, a long thin curved black beak pointed forward to peck, full body, three-quarter view, the whole bird and its rock inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

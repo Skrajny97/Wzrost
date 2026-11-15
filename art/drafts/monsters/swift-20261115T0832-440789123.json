@@ -1,0 +1,14 @@
+{
+  "id": "swift",
+  "tool": "pixellab generate-image-v2",
+  "description": "a common swift, a sooty black-brown bird with very long narrow sickle-shaped wings swept back, a short forked tail and a small pale throat, screaming in a fast dive, the wings edged like blades, menacing, full body, three-quarter view, the whole bird inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

@@ -1,0 +1,14 @@
+{
+  "id": "bee-eater",
+  "tool": "pixellab generate-image-v2",
+  "description": "a European bee-eater bird, rainbow-coloured: chestnut crown, golden-yellow throat with a black band, turquoise-blue belly and green tail, a long thin slightly curved black beak, a black eye stripe, darting forward like an arrow, full body, three-quarter view, the whole bird inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

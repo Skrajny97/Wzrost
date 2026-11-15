@@ -1,0 +1,14 @@
+{
+  "id": "hoopoe",
+  "tool": "pixellab generate-image-v2",
+  "description": "a hoopoe bird, pinkish-orange body, a tall orange crest with black tips raised like a crown, bold black and white striped wings, a long thin curved beak, a small cloud of foul greenish smell around it, menacing, full body, three-quarter view, the whole bird inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

@@ -1,0 +1,14 @@
+{
+  "id": "chamois",
+  "tool": "pixellab generate-image-v2",
+  "description": "a chamois, a slim agile mountain goat with a dark brown winter coat, a pale face with a black stripe through each eye and short black horns hooked backwards at the tips, leaping down from a rock, charging, full body, three-quarter view, the whole animal inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

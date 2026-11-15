@@ -1,0 +1,14 @@
+{
+  "id": "dormouse",
+  "tool": "pixellab generate-image-v2",
+  "description": "a fat edible dormouse the size of a dog, soft ash-grey fur, a long bushy grey tail, big round black eyes with dark rings, small round ears, bared sharp little teeth, crouching on a grey stone, menacing, full body, three-quarter view, the whole animal inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

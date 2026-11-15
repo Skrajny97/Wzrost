@@ -1,0 +1,14 @@
+{
+  "id": "echo",
+  "tool": "pixellab generate-image-v2",
+  "description": "Poglos, a mountain echo spirit, a pale grey translucent ghostly shape made of rippling sound waves and drifting stone dust, a huge wide-open shouting mouth with rings of sound bursting out of it, hollow white glowing eyes, wisps trailing over grey quartz rocks, eerie and menacing, full body, three-quarter view, isolated figure on a plain background, no scenery",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}
