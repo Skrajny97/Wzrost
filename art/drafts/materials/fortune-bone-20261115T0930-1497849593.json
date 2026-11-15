@@ -1,0 +1,14 @@
+{
+  "id": "fortune-bone",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small bone carved with runic signs, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02287811177825928
+  },
+  "images": 1
+}

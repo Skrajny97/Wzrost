@@ -1,0 +1,14 @@
+{
+  "id": "marmot-fat",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small clay pot filled with thick white fat, a wooden lid leaning on it, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022917245630052357
+  },
+  "images": 1
+}

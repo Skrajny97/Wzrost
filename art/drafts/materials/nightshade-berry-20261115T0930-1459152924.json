@@ -1,0 +1,14 @@
+{
+  "id": "nightshade-berry",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a few shiny black belladonna berries on a stem with green leaves, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022902290205849545
+  },
+  "images": 1
+}

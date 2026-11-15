@@ -1,0 +1,14 @@
+{
+  "id": "swift-nest",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small cup-shaped bird nest of dark feathers and dry straws glued together, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022912661776436704
+  },
+  "images": 1
+}

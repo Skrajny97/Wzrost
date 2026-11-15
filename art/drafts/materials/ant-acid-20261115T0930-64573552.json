@@ -1,0 +1,14 @@
+{
+  "id": "ant-acid",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small corked glass vial of bubbling amber acid with a tiny red ant on it, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02292827102385627
+  },
+  "images": 1
+}

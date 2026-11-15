@@ -1,0 +1,14 @@
+{
+  "id": "leech-root",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a sticky twisted pale green rootlet ending in a round red sucker, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022900905240800646
+  },
+  "images": 1
+}

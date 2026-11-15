@@ -1,0 +1,14 @@
+{
+  "id": "stone-comb",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a rooster's comb carved from grey stone with small patches of yellow lichen, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022911985992219715
+  },
+  "images": 1
+}

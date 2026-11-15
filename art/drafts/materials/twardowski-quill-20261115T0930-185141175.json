@@ -1,0 +1,14 @@
+{
+  "id": "twardowski-quill",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a white goose quill pen with a drop of red blood at its tip, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02290734014129639
+  },
+  "images": 1
+}

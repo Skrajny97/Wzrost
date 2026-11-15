@@ -1,0 +1,14 @@
+{
+  "id": "thread-of-fate",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small wooden spindle wound with a thin glowing golden thread, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02288679108979967
+  },
+  "images": 1
+}

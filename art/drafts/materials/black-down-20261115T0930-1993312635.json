@@ -1,0 +1,14 @@
+{
+  "id": "black-down",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a fluffy pile of black down feathers, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022864969148000083
+  },
+  "images": 1
+}

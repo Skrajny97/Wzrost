@@ -1,0 +1,14 @@
+{
+  "id": "changeling-rattle",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "an old wooden baby rattle with dark carvings, slightly sinister, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022895885946909587
+  },
+  "images": 1
+}

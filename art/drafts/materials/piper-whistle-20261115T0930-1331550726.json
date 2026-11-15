@@ -1,0 +1,14 @@
+{
+  "id": "piper-whistle",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a wooden shepherd's pipe with finger holes and a faint dark aura, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022908261963950263
+  },
+  "images": 1
+}

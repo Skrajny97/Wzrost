@@ -1,0 +1,14 @@
+{
+  "id": "burning-spoke",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a wooden wheel spoke burning with flames at one end, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02288631373129951
+  },
+  "images": 1
+}

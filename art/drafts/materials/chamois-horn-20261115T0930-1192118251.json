@@ -1,0 +1,14 @@
+{
+  "id": "chamois-horn",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a single short black chamois horn curved backwards into a hook at the tip, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022913702809439766
+  },
+  "images": 1
+}

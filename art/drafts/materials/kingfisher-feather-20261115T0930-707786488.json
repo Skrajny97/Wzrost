@@ -1,0 +1,14 @@
+{
+  "id": "kingfisher-feather",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a single bright electric-blue feather with an orange base, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022884386223051285
+  },
+  "images": 1
+}

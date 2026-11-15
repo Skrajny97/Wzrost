@@ -1,0 +1,14 @@
+{
+  "id": "hoopoe-crest",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a fan-shaped crest of orange feathers with black tips, faint green stink wisps, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0229160240527259
+  },
+  "images": 1
+}

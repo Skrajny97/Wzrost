@@ -1,0 +1,14 @@
+{
+  "id": "stone-blade-shard",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a broken shard of a grey stone sword blade covered in green moss, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02289770868343777
+  },
+  "images": 1
+}

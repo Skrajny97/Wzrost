@@ -1,0 +1,14 @@
+{
+  "id": "jay-acorn",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a single acorn with its cap and a small blue-and-black striped feather beside it, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02292278257518345
+  },
+  "images": 1
+}

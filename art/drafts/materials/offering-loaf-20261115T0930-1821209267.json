@@ -1,0 +1,14 @@
+{
+  "id": "offering-loaf",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a round braided ritual bread loaf, burnt black on one side, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02288890802637736
+  },
+  "images": 1
+}

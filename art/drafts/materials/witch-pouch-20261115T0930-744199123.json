@@ -1,0 +1,14 @@
+{
+  "id": "witch-pouch",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small leather pouch tied with a cord, herbs and a small bone sticking out of it, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02292976974105835
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "wallcreeper-wing",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small grey bird wing with a bright crimson-red patch and white spots, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022903974129782786
+  },
+  "images": 1
+}

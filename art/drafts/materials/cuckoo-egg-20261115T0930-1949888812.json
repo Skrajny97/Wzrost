@@ -1,0 +1,14 @@
+{
+  "id": "cuckoo-egg",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a speckled grey-blue egg on a little bit of straw, a faint eerie glow, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022926757216347588
+  },
+  "images": 1
+}

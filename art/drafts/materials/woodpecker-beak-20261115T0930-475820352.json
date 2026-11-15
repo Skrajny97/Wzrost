@@ -1,0 +1,14 @@
+{
+  "id": "woodpecker-beak",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a long straight pale ivory bird beak, sharp like a chisel, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02290366694068909
+  },
+  "images": 1
+}

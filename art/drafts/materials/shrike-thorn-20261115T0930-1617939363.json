@@ -1,0 +1,14 @@
+{
+  "id": "shrike-thorn",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a long sharp black thorn on a short twig with a small beetle impaled on it, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022921231494903566
+  },
+  "images": 1
+}

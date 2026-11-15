@@ -1,0 +1,14 @@
+{
+  "id": "wax-lump",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a lump of yellow candle wax with a fingerprint pressed into it, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02289176377762689
+  },
+  "images": 1
+}

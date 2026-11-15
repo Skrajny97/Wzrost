@@ -1,0 +1,14 @@
+{
+  "id": "wolverine-fur",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a folded pelt of thick dark brown fur with a pale tan stripe, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02290679096582201
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "slug-slime",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a glob of thick glistening grey-green slime, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022883327618069122
+  },
+  "images": 1
+}

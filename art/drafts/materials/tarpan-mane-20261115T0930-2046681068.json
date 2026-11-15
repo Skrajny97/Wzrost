@@ -1,0 +1,14 @@
+{
+  "id": "tarpan-mane",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a coarse tuft of black horse mane hair tied with a leather cord, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022893372246848214
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "iron-tooth",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a large pointed iron tooth, rusty at the root, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02288310920015971
+  },
+  "images": 1
+}

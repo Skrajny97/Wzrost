@@ -1,0 +1,14 @@
+{
+  "id": "griffin-feather",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a large golden feather glowing faintly, majestic, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022884746985329524
+  },
+  "images": 1
+}

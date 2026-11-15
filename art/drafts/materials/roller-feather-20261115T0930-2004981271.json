@@ -1,0 +1,14 @@
+{
+  "id": "roller-feather",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a single turquoise-blue feather with a violet-blue edge, shimmering, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022889703841103448
+  },
+  "images": 1
+}

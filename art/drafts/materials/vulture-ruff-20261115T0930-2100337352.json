@@ -1,0 +1,14 @@
+{
+  "id": "vulture-ruff",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a fluffy ring of white down feathers, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022867137432522246
+  },
+  "images": 1
+}

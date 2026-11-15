@@ -1,0 +1,14 @@
+{
+  "id": "pestle",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a heavy grey stone pestle stained red at its tip, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022889652033276028
+  },
+  "images": 1
+}

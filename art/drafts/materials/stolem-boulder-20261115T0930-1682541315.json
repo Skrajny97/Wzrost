@@ -1,0 +1,14 @@
+{
+  "id": "stolem-boulder",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a rough grey boulder with the deep print of a giant hand pressed into it, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022917578727298313
+  },
+  "images": 1
+}

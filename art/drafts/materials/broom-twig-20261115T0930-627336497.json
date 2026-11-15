@@ -1,0 +1,14 @@
+{
+  "id": "broom-twig",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small bundle of thin birch twigs tied with string, hovering, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022909290599187216
+  },
+  "images": 1
+}

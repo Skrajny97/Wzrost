@@ -1,0 +1,14 @@
+{
+  "id": "dormouse-fur",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a soft round tuft of fluffy ash-grey fur, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02287626439666748
+  },
+  "images": 1
+}

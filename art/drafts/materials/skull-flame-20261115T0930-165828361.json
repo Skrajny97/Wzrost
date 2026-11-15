@@ -1,0 +1,14 @@
+{
+  "id": "skull-flame",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small orange flame burning above a broken piece of a skull, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02288967565472921
+  },
+  "images": 1
+}

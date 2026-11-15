@@ -1,0 +1,14 @@
+{
+  "id": "gilded-frame",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a broken corner of an ornate gilded picture frame with a painted eye on a scrap of canvas, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022926622580846153
+  },
+  "images": 1
+}

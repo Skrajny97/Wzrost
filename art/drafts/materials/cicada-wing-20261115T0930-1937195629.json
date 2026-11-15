@@ -1,0 +1,14 @@
+{
+  "id": "cicada-wing",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a single clear glassy cicada wing with green veins, glinting, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02290850349150764
+  },
+  "images": 1
+}

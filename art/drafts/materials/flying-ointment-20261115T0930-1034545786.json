@@ -1,0 +1,14 @@
+{
+  "id": "flying-ointment",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small clay jar of greenish ointment with a cork, a faint glow, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022924640049828426
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "hare-foot",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a brown hare's foot on a string, a lucky charm, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022891874006483293
+  },
+  "images": 1
+}

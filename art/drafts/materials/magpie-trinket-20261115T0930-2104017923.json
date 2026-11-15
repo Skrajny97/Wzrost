@@ -1,0 +1,14 @@
+{
+  "id": "magpie-trinket",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a shiny gold ring with a small red gem, glinting, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022896665734608967
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "red-ribbon",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a long red ribbon tied in a loop with a few small field flowers, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022897544457541573
+  },
+  "images": 1
+}
