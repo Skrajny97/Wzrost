@@ -34,7 +34,7 @@
 import { itemSprite, monsterSprite } from './art.js';
 import { h } from './dom.js';
 import { t } from './i18n.js';
-import { birdFrames, boltArt, curve, FANGS, FLICKER, HARPOON, ICE_LANCE, ICE_STAR, ORB_ARCS } from './skill-fx.js';
+import { birdFrames, boltArt, BONE_HAND, curve, FANGS, FLICKER, HARPOON, HOLY_SPEAR, ICE_LANCE, ICE_STAR, ORB_ARCS, SENTENCE_SWORD } from './skill-fx.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 // At most so many specks at once in an arena, so a phone keeps up.
@@ -43,6 +43,10 @@ const MAX_SPECKS = 140;
 // fall at the second.
 const SLOW_MOTION = 0.4;
 const SLOW_FALL = 0.65;
+// The strongest shake of the arena (a heavy critical or felling blow): how
+// many pixels it swings the stage, and how much each of them zooms it.
+const QUAKE = 7;
+const QUAKE_ZOOM = 0.004;
 
 // The light of a blow by its kind: `glow` for its flash and trails, the
 // specks that fly off it.
@@ -401,8 +405,19 @@ export function createFx(kit) {
   // wide card does not get a burst as wide as itself.
   const reachOf = (card) => Math.min(card.offsetWidth, card.offsetHeight * 1.15);
 
-  // Inside the arena by its edges, for something `half` as wide.
-  const inside = (x, half) => clamp(x, half + 3, Math.max(half + 3, stage.clientWidth - half - 3));
+  // Where the words over a card (a blow's number, "KRYTYK!") may stand, for
+  // ones `half` as wide at their biggest: inside the arena by its edges and,
+  // with the animations on, also by the room of the strongest shake
+  // (quake()). A heavy blow shakes the stage just as its number pops, and
+  // the shake's swing and zoom (from the stage's top left corner) carried a
+  // number by the right edge past it for a moment (a crit's "−3880!" lost
+  // its "!").
+  function wordsRoom(half) {
+    const shake = motion() ? QUAKE : 0;
+    const from = half + 3 + shake;
+    const to = (stage.clientWidth - 3 - shake) / (1 + shake * QUAKE_ZOOM) - half;
+    return [from, Math.max(from, to)];
+  }
 
   // The numbers over a card: they pop, then drift up and aside and fade;
   // two at once on one card stand one under the other, and a number still
@@ -436,14 +451,15 @@ export function createFx(kit) {
     // inside the arena at that size, not only at its resting one.
     const grow = motion() ? (kind === 'crit' ? 1.5 : 1.28) : 1;
     const half = (bubble.offsetWidth / 2) * grow;
-    const x = inside(box.x + box.width / 2, half);
+    const [from, to] = wordsRoom(half);
+    const x = clamp(box.x + box.width / 2, from, to);
     const y = box.y + box.height * 0.4 + slot * 24;
     bubble.style.left = `${x}px`;
     bubble.style.top = `${y}px`;
     const big = kind === 'crit';
     side = -side;
     const drift = big ? 0 : side * 9;
-    const dx = clamp(drift, half + 3 - x, stage.clientWidth - half - 3 - x);
+    const dx = clamp(drift, from - x, to - x);
     const keyframes = motion()
       ? [
           { transform: 'translate(-50%, -50%) scale(0.25)', opacity: 0, easing: 'cubic-bezier(0.2, 0.9, 0.35, 1.3)' },
@@ -521,7 +537,7 @@ export function createFx(kit) {
       const left = 1 - index / steps;
       const x = (index % 2 ? 1 : -1) * power * left;
       const y = ((index % 3) - 1) * power * 0.6 * left;
-      return { transform: `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${(1 + power * 0.004).toFixed(3)})` };
+      return { transform: `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${(1 + power * QUAKE_ZOOM).toFixed(3)})` };
     });
     animate(stage, frames, { duration: 320, composite: 'add' });
   }
@@ -772,7 +788,7 @@ export function createFx(kit) {
     fx.append(label);
     const half = label.offsetWidth / 2;
     const top = Math.max(label.offsetHeight / 2 + 2, point.y - card.offsetHeight / 2 + 4);
-    label.style.left = `${inside(point.x, half)}px`;
+    label.style.left = `${clamp(point.x, ...wordsRoom(half))}px`;
     label.style.top = `${top}px`;
     const keyframes = motion()
       ? [
@@ -920,7 +936,7 @@ export function createFx(kit) {
       // 961: a harpoon's hit yanks its target toward the archer instead.
       if (blow.yank && motion()) blow.yank(card);
       else knock(card, angle, strong ? 14 : heavy ? 10 : 6);
-      if (heavy) quake(strong || blow.killing ? 7 : 4);
+      if (heavy) quake(strong || blow.killing ? QUAKE : 4);
     };
     if (blow.stop) later(blow.stop).then(react);
     else react();
@@ -1268,6 +1284,241 @@ export function createFx(kit) {
   // The attacker reaches the target: a blow with a wind-up, the lunge and
   // its follow-through; an arrow or a spell drawn back, let go and flying
   // with its trail. A strike cut short (Pomiń, Powtórz) lands nowhere.
+  // 964: a dagger of the Taniec ostrzy thrown spinning at its foe: the
+  // Nocny Tancerz's own weapon's picture (a dagger without one).
+  async function thrownDagger(actor, a, b) {
+    const picture = itemSprite({ base: weaponOf(actor)?.base ?? 'dagger' });
+    const art = pictureOf(cards.get(actor.id).card);
+    const size = Math.round(Math.min(art.width, art.height) * 0.55);
+    const box = h('div', { class: 'fx-thrown', 'aria-hidden': 'true' });
+    box.style.setProperty('--size', `${size}px`);
+    if (picture) {
+      picture.removeAttribute('width');
+      picture.removeAttribute('height');
+      picture.className = 'fx-thrown-weapon';
+      box.append(picture);
+    }
+    fx.append(box);
+    const flight = 330;
+    specks.trail({ from: a, to: b, duration: flight, colors: ['#efe8ff', '#d9ccff', '#a690e8'], rate: 120, sizes: [1.2, 2.4], life: [200, 380], shape: 'spark' });
+    const spin = Math.sign(b.x - a.x || 1) * 900;
+    await animate(
+      box,
+      [
+        { transform: `translate(${a.x.toFixed(1)}px, ${a.y.toFixed(1)}px) translate(-50%, -50%) rotate(0deg) scale(0.7)`, opacity: 0 },
+        { opacity: 1, offset: 0.15 },
+        { transform: `translate(${b.x.toFixed(1)}px, ${b.y.toFixed(1)}px) translate(-50%, -50%) rotate(${spin}deg) scale(1)`, opacity: 1 },
+      ],
+      { duration: flight, easing: 'cubic-bezier(0.4, 0, 0.8, 0.6)' },
+    );
+    box.remove();
+  }
+  async function thrown(actor, a, b, onImpact, settle, id) {
+    playSound('swing');
+    await thrownDagger(actor, a, b);
+    if (id !== run()) return;
+    onImpact();
+    await settle();
+    await later(220);
+  }
+
+  // 964: the Cień-sobowtór's blow: its Widmo's shadow steps out of its
+  // side (where it stands, skill-fx.js doubleRise()), dashes at the foe
+  // and strikes, then melts away; the Widmo's card stays where it is.
+  async function shadowDash(from, a, b) {
+    const source = from.querySelector('.unit-art');
+    if (!source) return;
+    const art = pictureOf(from);
+    const figure = Math.min(art.width, art.height);
+    const copy = source.cloneNode(true);
+    copy.querySelector('.unit-level')?.remove();
+    copy.classList.add('fx-shade', 'fx-shade--double');
+    copy.setAttribute('aria-hidden', 'true');
+    copy.style.left = `${art.x.toFixed(1)}px`;
+    copy.style.top = `${art.y.toFixed(1)}px`;
+    copy.style.width = `${art.width.toFixed(1)}px`;
+    copy.style.height = `${art.height.toFixed(1)}px`;
+    fx.append(copy);
+    const middle = { x: art.x + art.width / 2, y: art.y + art.height / 2 };
+    const dx = b.x - middle.x;
+    const dy = b.y - middle.y;
+    const length = Math.hypot(dx, dy) || 1;
+    const reach = Math.max(0, length - figure * 0.55);
+    const to = { x: (dx / length) * reach, y: (dy / length) * reach };
+    const side = -figure * 0.18;
+    await animate(
+      copy,
+      [
+        { transform: `translate(${side.toFixed(1)}px, 0px) scale(0.92)`, opacity: 0 },
+        { transform: `translate(${side.toFixed(1)}px, 0px) scale(1)`, opacity: 0.9, offset: 0.3 },
+        { transform: `translate(${to.x.toFixed(1)}px, ${to.y.toFixed(1)}px) scale(1.04)`, opacity: 0.95 },
+      ],
+      { duration: 300, easing: 'cubic-bezier(0.5, 0, 0.9, 0.6)' },
+    );
+    if (!copy.isConnected) return;
+    animate(
+      copy,
+      [
+        { transform: `translate(${to.x.toFixed(1)}px, ${to.y.toFixed(1)}px) scale(1.04)`, opacity: 0.95 },
+        { transform: `translate(${(to.x * 0.9).toFixed(1)}px, ${(to.y * 0.9 - 6).toFixed(1)}px) scale(1.08)`, opacity: 0 },
+      ],
+      { duration: 380, easing: 'ease-out' },
+    ).then(() => copy.remove());
+  }
+  async function doubled(from, a, b, onImpact, settle, id) {
+    playSound('swing');
+    await shadowDash(from, a, b);
+    if (id !== run()) return;
+    onImpact();
+    await settle();
+    await later(300);
+  }
+
+  // 964: the Dotyk śmierci: a hand of bone comes down over the foe, its
+  // fingers spread, and closes on it; the blow lands as it grips, and it
+  // lets go a moment after (skill-fx.js deathTouch() draws the rest).
+  async function boneTouch(to, color) {
+    const art = pictureOf(to);
+    const figure = Math.min(art.width, art.height);
+    const hand = h('div', { class: 'fx-bonehand', 'aria-hidden': 'true' });
+    hand.style.setProperty('--size', `${Math.round(figure * 0.74)}px`);
+    hand.style.setProperty('--fx', color);
+    hand.style.left = `${(art.x + art.width / 2).toFixed(1)}px`;
+    hand.style.top = `${(art.y + art.height * 0.3).toFixed(1)}px`;
+    hand.innerHTML = BONE_HAND;
+    fx.append(hand);
+    const fall = Math.round(figure * 0.35);
+    await animate(
+      hand,
+      [
+        { transform: `translate(-50%, -50%) translateY(${-fall}px) scale(0.85)`, opacity: 0 },
+        { transform: `translate(-50%, -50%) translateY(${Math.round(-fall * 0.4)}px) scale(1)`, opacity: 1, offset: 0.45 },
+        { transform: 'translate(-50%, -50%) translateY(0px) scale(1)', opacity: 1 },
+      ],
+      { duration: 420, easing: 'ease-in' },
+    );
+    if (!hand.isConnected) return;
+    animate(hand.querySelector('.fx-hand-open'), [{ opacity: 1 }, { opacity: 0 }], { duration: 90, fill: 'forwards' });
+    animate(hand.querySelector('.fx-hand-closed'), [{ opacity: 0 }, { opacity: 1 }], { duration: 90, fill: 'forwards' });
+    animate(
+      hand,
+      [
+        { transform: 'translate(-50%, -50%) translateY(0px) scale(1)', opacity: 1 },
+        { transform: 'translate(-50%, -50%) translateY(2px) scale(0.96)', opacity: 1, offset: 0.15 },
+        { transform: 'translate(-50%, -50%) translateY(2px) scale(0.96)', opacity: 1, offset: 0.6 },
+        { transform: 'translate(-50%, -50%) translateY(-6px) scale(0.92)', opacity: 0 },
+      ],
+      { duration: 720, easing: 'ease-in-out' },
+    ).then(() => hand.remove());
+    await later(90);
+  }
+  async function touched(to, color, onImpact, settle, id) {
+    playSound('magic');
+    await boneTouch(to, color);
+    if (id !== run()) return;
+    onImpact();
+    await settle();
+    await later(320);
+  }
+
+  // 964: the Ścięcie: one cut across the field. The Królobójca crouches
+  // and flickers, and a thin line of light shoots from it straight through
+  // its foe and a little past it; the blow lands as the line crosses the
+  // foe (skill-fx.js marks where the cut falls and opens it).
+  async function crossCut(from, a, b, color, onImpact, settle, id) {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const length = Math.hypot(dx, dy) || 1;
+    const ux = dx / length;
+    const uy = dy / length;
+    // A little past the foe, kept on the stage.
+    const room = (value, way, size) => (way > 0.001 ? (size - 4 - value) / way : way < -0.001 ? (value - 4) / -way : Infinity);
+    const beyond = Math.max(0, Math.min(36, room(b.x, ux, arena.clientWidth), room(b.y, uy, arena.clientHeight)));
+    playSound('swing');
+    await animate(from, [{ transform: 'translateY(0px) scale(1)' }, { transform: 'translateY(2px) scale(0.94)' }], { duration: 170, easing: 'ease-in' });
+    if (id !== run()) return;
+    const line = h('div', { class: 'fx-crosscut', 'aria-hidden': 'true' });
+    line.style.setProperty('--fx', color);
+    line.style.left = `${a.x.toFixed(1)}px`;
+    line.style.top = `${a.y.toFixed(1)}px`;
+    line.style.width = `${(length + beyond).toFixed(1)}px`;
+    fx.append(line);
+    const turn = `rotate(${Math.atan2(dy, dx).toFixed(4)}rad)`;
+    const reached = (length / (length + beyond)).toFixed(3);
+    animate(
+      from,
+      [
+        { transform: 'translateY(2px) scale(0.94)', opacity: 1 },
+        { transform: `translate(${(ux * 8).toFixed(1)}px, ${(uy * 8).toFixed(1)}px) scale(1)`, opacity: 0.25, offset: 0.25 },
+        { transform: 'translateY(0px) scale(1)', opacity: 1 },
+      ],
+      { duration: 420, easing: 'ease-out' },
+    );
+    await animate(line, [{ transform: `${turn} scaleX(0)` }, { transform: `${turn} scaleX(${reached})` }], { duration: 110, easing: 'cubic-bezier(0.2, 0, 0.6, 1)' });
+    if (id !== run() || !line.isConnected) {
+      line.remove();
+      return;
+    }
+    onImpact();
+    animate(
+      line,
+      [
+        { transform: `${turn} scaleX(${reached})`, opacity: 1 },
+        { transform: `${turn} scaleX(1)`, opacity: 0.9, offset: 0.25 },
+        { transform: `${turn} scaleX(1) scaleY(0.2)`, opacity: 0 },
+      ],
+      { duration: 460, easing: 'ease-out' },
+    ).then(() => line.remove());
+    await settle();
+    await later(340);
+  }
+
+  // 964: the Cios ostateczny: while time stands still (skill-fx.js
+  // stillTime()), the Bogobójca crosses the field in frozen steps: still
+  // grey copies of it show one after another along its way to the foe,
+  // and the blow lands at the last one (skill-fx.js finalCleave()).
+  async function timeWalk(from, b, onImpact, settle, id) {
+    const source = from.querySelector('.unit-art');
+    const art = pictureOf(from);
+    const figure = Math.min(art.width, art.height);
+    const dx = b.x - (art.x + art.width / 2);
+    const dy = b.y - (art.y + art.height / 2);
+    const length = Math.hypot(dx, dy) || 1;
+    const reach = Math.max(0, length - figure * 0.75);
+    playSound('swing');
+    await later(200);
+    if (id !== run()) return;
+    animate(from, [{ opacity: 1 }, { opacity: 0.15, offset: 0.12 }, { opacity: 0.15, offset: 0.8 }, { opacity: 1 }], { duration: 1000 });
+    if (source) {
+      [0.3, 0.62, 0.94].forEach((share, index) => {
+        const copy = source.cloneNode(true);
+        copy.querySelector('.unit-level')?.remove();
+        copy.classList.add('fx-shade', 'fx-shade--frozen');
+        copy.setAttribute('aria-hidden', 'true');
+        copy.style.left = `${(art.x + (dx / length) * reach * share).toFixed(1)}px`;
+        copy.style.top = `${(art.y + (dy / length) * reach * share).toFixed(1)}px`;
+        copy.style.width = `${art.width.toFixed(1)}px`;
+        copy.style.height = `${art.height.toFixed(1)}px`;
+        fx.append(copy);
+        animate(
+          copy,
+          [
+            { opacity: 0 },
+            { opacity: 0.9, offset: 0.06 },
+            { opacity: 0.8, offset: 0.65 },
+            { opacity: 0 },
+          ],
+          { duration: 940 - index * 140, delay: index * 140, fill: 'backwards' },
+        ).then(() => copy.remove());
+      });
+    }
+    await later(400);
+    if (id !== run()) return;
+    onImpact();
+    await settle();
+    await later(460);
+  }
+
   async function strike(actor, target, onImpact, style = {}) {
     const id = run();
     const from = cards.get(actor.id).card;
@@ -1289,6 +1540,19 @@ export function createFx(kit) {
       }
       if (style.orb === 'thunder-orb') return zap(from, b, style.color, onImpact, settle, id);
       if (THROUGH.has(style.orb) && style.blow?.event?.pierced) return onward(actor, a, b, style, onImpact, settle, id);
+      // 962: the Miażdżący cios's force goes on through its target into
+      // the one behind.
+      if (style.orb === 'smash' && style.blow?.event?.pierced) return smashOn(actor, a, b, style, onImpact, settle, id);
+      // 964: a dagger of the Taniec ostrzy thrown at its foe; the
+      // Cień-sobowtór's shadow dashing out at it; the Dotyk śmierci's hand
+      // of bone closing on it.
+      if (style.orb === 'thrown') return thrown(actor, a, b, onImpact, settle, id);
+      if (style.orb === 'double') return doubled(from, a, b, onImpact, settle, id);
+      if (style.orb === 'touch') return touched(to, style.color ?? '#7fbf3f', onImpact, settle, id);
+      // 964: the Ścięcie's cut across the field; the Cios ostateczny's
+      // steps through stopped time.
+      if (style.orb === 'crosscut') return crossCut(from, a, b, style.color ?? '#b9a3f0', onImpact, settle, id);
+      if (style.orb === 'timewalk') return timeWalk(from, b, onImpact, settle, id);
     }
     if (style.teleport && motion()) {
       playSound('swing');
@@ -1313,7 +1577,8 @@ export function createFx(kit) {
     const distance = Math.hypot(dx, dy) || 1;
     const ux = dx / distance;
     const uy = dy / distance;
-    if (actor.strike === 'melee') {
+    // (964: the risen dead lunge at their foes like fighters.)
+    if (actor.strike === 'melee' || (style.orb === 'lunge' && motion())) {
       const quiet = !motion();
       // 953: the weapon swung with the blow; the card lunges less, as the
       // weapon reaches the target.
@@ -1345,6 +1610,8 @@ export function createFx(kit) {
       await out.finished.catch(() => {});
       if (id !== run()) return;
       if (swung && style.blow) style.blow.swing = swung;
+      // (962: where the Miażdżący cios's force goes on from.)
+      if (style.orb === 'smash') shotFrom = { actor: actor.id, point: b };
       onImpact();
       await settle();
       if (id !== run()) return;
@@ -1418,6 +1685,19 @@ export function createFx(kit) {
       await (style.orb === 'master' ? masterArrow(a, b, color) : shadeArrow(a, b));
       if (id !== run()) return;
       if (style.orb === 'master') shotFrom = { actor: actor.id, point: b };
+      onImpact();
+      await settle();
+      await later(300);
+      return;
+    }
+    // 963: the Wyrok's sword comes down on its foe; the Ostateczny wyrok's
+    // spear of holy fire flies at it; the Sąd ostateczny's light comes down
+    // from the sky opened over it (skill-fx.js) a moment after its call.
+    if ((style.orb === 'sentence' || style.orb === 'holy-spear' || style.orb === 'heavens') && motion()) {
+      if (style.orb === 'sentence') await sentence(to, style.color ?? '#f2d675');
+      else if (style.orb === 'holy-spear') await holySpear(a, b);
+      else await later(460);
+      if (id !== run()) return;
       onImpact();
       await settle();
       await later(300);
@@ -1571,6 +1851,79 @@ export function createFx(kit) {
     specks.trail({ from: start, to: b, duration: flight, colors: ['#ffffff', '#dff4ff', '#8fd3ff'], rate: 90, sizes: [1.2, 2.4], life: [220, 420], shape: 'mote' });
     await animate(lance, [{ transform: point(start), opacity: 1 }, { transform: point(b), opacity: 1 }], { duration: flight, easing: 'cubic-bezier(0.5, 0, 0.9, 0.5)' });
     lance.remove();
+  }
+
+  // 963: the Wyrok's sword of the sentence: it appears over its foe's head,
+  // point down, and comes down on it (skill-fx.js sentenceHit() lands it).
+  async function sentence(to, color) {
+    const art = pictureOf(to);
+    const figure = Math.min(art.width, art.height);
+    const height = Math.round(figure * 1.02);
+    const sword = mark('fx-sentence', { x: art.x + art.width / 2, y: 0 }, { '--fx': color, '--size': `${height}px` });
+    sword.innerHTML = SENTENCE_SWORD;
+    // Its point (at 98% of its height) ends at the foe's middle.
+    const end = art.y + art.height * 0.55 - height * 0.48;
+    const start = Math.min(end - 6, Math.max(height * 0.5 + 2, end - figure * 0.55));
+    const at = (y, scale = 1) => `translate(-50%, ${(y - height / 2).toFixed(1)}px) scale(${scale})`;
+    await animate(
+      sword,
+      [
+        { transform: at(start, 0.85), opacity: 0 },
+        { transform: at(start), opacity: 1, offset: 0.4, easing: 'ease-out' },
+        { transform: at(start), opacity: 1, offset: 0.58, easing: 'cubic-bezier(0.6, 0, 0.9, 0.5)' },
+        { transform: at(end), opacity: 1 },
+      ],
+      { duration: 360 },
+    );
+    animate(
+      sword,
+      [
+        { transform: at(end), opacity: 1 },
+        { transform: at(end), opacity: 1, offset: 0.5 },
+        { transform: at(end - 8), opacity: 0 },
+      ],
+      { duration: 380, easing: 'ease-out' },
+    ).then(() => sword.remove());
+  }
+
+  // 963: the Ostateczny wyrok's spear of holy fire, thrown straight at its
+  // foe with a trail of embers.
+  async function holySpear(a, b) {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const distance = Math.hypot(dx, dy) || 1;
+    const angle = Math.atan2(dy, dx);
+    const length = Math.round(Math.min(120, Math.max(64, distance * 0.45)));
+    const spear = h('span', { class: 'fx-holyspear' });
+    spear.innerHTML = HOLY_SPEAR;
+    spear.style.width = `${length}px`;
+    fx.append(spear);
+    const start = { x: a.x + (dx / distance) * length * 0.6, y: a.y + (dy / distance) * length * 0.6 };
+    const point = (at) => `translate(${at.x.toFixed(1)}px, ${at.y.toFixed(1)}px) rotate(${angle.toFixed(4)}rad) translate(-100%, -50%)`;
+    const flight = 220;
+    const streak = mark('fx-trail fx-trail--magic', start, { '--fx': '#ffd27a' });
+    streak.style.width = `${Math.round(Math.max(0, distance - length * 0.6))}px`;
+    const along = `translate(0px, -50%) rotate(${((angle * 180) / Math.PI).toFixed(1)}deg)`;
+    animate(
+      streak,
+      [
+        { transform: `${along} scaleX(0)`, opacity: 0.9, easing: 'ease-in' },
+        { transform: `${along} scaleX(1)`, opacity: 0.9, offset: flight / (flight + 320), easing: 'ease-out' },
+        { transform: `${along} scaleX(1)`, opacity: 0 },
+      ],
+      { duration: flight + 320 },
+    ).then(() => streak.remove());
+    specks.trail({ from: start, to: b, duration: flight, colors: ['#ffffff', '#fff1c1', '#ffd27a', '#ffb347'], rate: 110, sizes: [1.2, 2.6], life: [260, 480], shape: 'ember' });
+    await animate(
+      spear,
+      [
+        { transform: point(start), opacity: 0 },
+        { transform: point(start), opacity: 1, offset: 0.12 },
+        { transform: point(b), opacity: 1 },
+      ],
+      { duration: flight, easing: 'cubic-bezier(0.5, 0, 0.9, 0.5)' },
+    );
+    spear.remove();
   }
 
   // ——— 961: the evolved Łucznik's blows ———
@@ -1770,6 +2123,51 @@ export function createFx(kit) {
     );
     arrow.remove();
     if (id !== run()) return;
+    shotFrom = { actor: actor.id, point: b };
+    onImpact();
+    await settle();
+    await later(220);
+  }
+
+  // 962: the Miażdżący cios's force carried on from its target into the
+  // one behind it: a wave of dust and rubble rolling over the ground
+  // between them, which strikes that one (no second swing, no blade's arc
+  // on it).
+  async function smashOn(actor, a, b, style, onImpact, settle, id) {
+    const start = shotFrom?.actor === actor.id ? shotFrom.point : a;
+    const dx = b.x - start.x;
+    const dy = b.y - start.y;
+    const distance = Math.hypot(dx, dy) || 1;
+    const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+    const travel = Math.round(Math.max(150, Math.min(260, distance * 0.75)));
+    const size = Math.round(reachOf(cards.get(actor.id)?.card ?? stage) * 0.55);
+    const streak = mark('fx-trail fx-trail--smash', start, { '--fx': '#fff1c9' });
+    streak.style.width = `${Math.round(distance)}px`;
+    const along = `translate(0px, -50%) rotate(${angle.toFixed(1)}deg)`;
+    animate(
+      streak,
+      [
+        { transform: `${along} scaleX(0)`, opacity: 0.9 },
+        { transform: `${along} scaleX(1)`, opacity: 0.9, offset: travel / (travel + 360) },
+        { transform: `${along} scaleX(1)`, opacity: 0 },
+      ],
+      { duration: travel + 360 },
+    ).then(() => streak.remove());
+    specks.trail({ from: start, to: b, duration: travel, colors: DUST, rate: 80, sizes: [3, 6], life: [420, 720], shape: 'dust' });
+    specks.trail({ from: start, to: b, duration: travel, colors: ['#8a8274', '#6f675b', '#a39a89'], rate: 60, sizes: [1.4, 2.4], life: [240, 420], shape: 'shard' });
+    const wave = mark('fx-burst', start, { '--fx': '#d8cbb0', '--size': `${size}px` });
+    playSound('swing');
+    await animate(
+      wave,
+      [
+        { transform: `translate(-50%, -50%) translate(0px, 0px) scale(0.7)`, opacity: 0.95 },
+        { transform: `translate(-50%, -50%) translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(1.1)`, opacity: 0.9 },
+      ],
+      { duration: travel, easing: 'cubic-bezier(0.3, 0, 0.6, 1)' },
+    );
+    wave.remove();
+    if (id !== run()) return;
+    if (style.blow) style.blow.melee = false;
     shotFrom = { actor: actor.id, point: b };
     onImpact();
     await settle();

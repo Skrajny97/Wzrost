@@ -24018,3 +24018,1311 @@ a.discord-button {
   background: radial-gradient(ellipse at 50% 55%, rgba(236, 244, 255, 0.85), rgba(200, 220, 245, 0.45) 45%, rgba(200, 220, 245, 0) 72%);
   filter: blur(2px);
 }
+
+/* 962: the evolved Wojownik's skills (skill-fx.js, arena-fx.js): the heavy
+   blows' impact and the plates of armour, a stunned foe's
+   stars, the Młyn's blade and ring, the Wir stali's flash, a storm of
+   swords, the Riposta's parry, the guards' spikes, golden seams and stone,
+   a challenge's "!", a roar's waves, the duel's spotlight and swords, a
+   wall of shields, the crowd's garland, coins and flowers, and the crack
+   of an earthquake. */
+.fx-impact,
+.fx-dazestar,
+.fx-parry,
+.fx-cut,
+.fx-plate,
+.fx-ragewave,
+.fx-steelswirl,
+.fx-steelblur,
+.fx-duelsign,
+.fx-seam,
+.fx-wallshield,
+.fx-hblade,
+.fx-rock {
+  position: absolute;
+  width: var(--size, 40px);
+  pointer-events: none;
+}
+
+.fx-impact svg,
+.fx-dazestar svg,
+.fx-millring svg,
+.fx-millarm-sword svg,
+.fx-parry svg,
+.fx-cut svg,
+.fx-plate svg,
+.fx-ragewave svg,
+.fx-steelswirl svg,
+.fx-duelsign svg,
+.fx-seam svg,
+.fx-wallshield svg,
+.fx-hblade svg,
+.fx-rock svg,
+.fx-gale svg,
+.fx-coin svg,
+.fx-flower svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.fx-impact,
+.fx-dazestar,
+.fx-parry,
+.fx-cut,
+.fx-ragewave,
+.fx-steelswirl,
+.fx-steelblur,
+.fx-duelsign {
+  aspect-ratio: 1;
+}
+
+.fx-impact {
+  filter: drop-shadow(0 0 4px rgba(255, 196, 120, 0.85));
+}
+
+.fx-dazestar {
+  filter: drop-shadow(0 0 3px rgba(255, 224, 138, 0.9));
+}
+
+/* The Młyn: the Gladiator's blade circling it (held at its grip at the
+   box's corner) and the ring of steel turning round it and going out. */
+.fx-millarm {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.fx-millarm-weapon {
+  position: absolute;
+  max-width: none;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 5px rgba(240, 246, 255, 0.95)) brightness(1.25);
+}
+
+.fx-millarm-trail {
+  position: absolute;
+  overflow: visible;
+  filter: blur(1px) drop-shadow(0 0 3px rgba(220, 232, 245, 0.9));
+}
+
+.fx-millarm-sword {
+  position: absolute;
+  left: 0;
+  top: 0;
+  aspect-ratio: 60 / 14;
+  transform: translate(-12%, -50%);
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 4px rgba(230, 240, 255, 0.85));
+}
+
+.fx-millring {
+  position: absolute;
+  aspect-ratio: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 4px rgba(220, 230, 240, 0.7));
+}
+
+/* A gleam of light running over a blade (the Riposta's guard) or a
+   polished plate (the Nieugięty). */
+.fx-gleam {
+  position: absolute;
+  width: var(--size, 80px);
+  height: 7px;
+  border-radius: 4px;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.95) 45%, #ffffff 50%, rgba(255, 255, 255, 0.95) 55%, rgba(255, 255, 255, 0));
+  box-shadow: 0 0 10px rgba(255, 246, 207, 0.9);
+  mix-blend-mode: screen;
+}
+
+.fx-gleam--steel {
+  height: 12px;
+  box-shadow: 0 0 12px rgba(200, 225, 255, 0.95);
+}
+
+.fx-parry {
+  color: var(--fx);
+  filter: drop-shadow(0 0 4px var(--fx));
+}
+
+/* A blade's thin cut, drawn along its line. */
+.fx-cut {
+  filter: drop-shadow(0 0 3px var(--fx));
+}
+
+.fx-cut-glow {
+  stroke: var(--fx);
+  opacity: 0.6;
+}
+
+.fx-cut-core {
+  stroke: #ffffff;
+}
+
+.fx-thorns {
+  position: absolute;
+  color: var(--fx);
+  pointer-events: none;
+  filter: drop-shadow(0 0 1px rgba(40, 26, 6, 0.95)) drop-shadow(0 0 5px var(--fx));
+}
+
+.fx-thorns svg {
+  display: block;
+}
+
+/* A foe answering the Wyzwanie: a red "!" by its head, and the red line
+   from it to the Strażnik, its dashes running on to it. */
+.fx-alert {
+  position: absolute;
+  width: var(--size, 11px);
+  aspect-ratio: 12 / 28;
+  pointer-events: none;
+  filter: drop-shadow(0 0 5px rgba(255, 90, 58, 0.9));
+}
+
+.fx-alert svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fx-aggro {
+  position: absolute;
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px var(--fx));
+}
+
+.fx-aggro svg {
+  display: block;
+  overflow: visible;
+}
+
+.fx-aggro path {
+  fill: none;
+  stroke: color-mix(in srgb, var(--fx) 80%, #ffffff);
+  stroke-width: 2.2;
+  stroke-dasharray: 7 5;
+  stroke-linecap: round;
+}
+
+/* The cracks of a foe's armour red-hot (the Kruszący cios), of the
+   Kolos's stone golden (the Nieprzełamany). */
+.fx-hotcrack {
+  color: #ffd2a0;
+  filter: drop-shadow(0 0 1px #7a1424) drop-shadow(0 0 4px #ff5a1f);
+}
+
+.fx-hotcrack path,
+.fx-goldcrack path {
+  stroke-width: 2.3px;
+}
+
+.fx-goldcrack {
+  color: #fff3c4;
+  filter: drop-shadow(0 0 1px #5a3a00) drop-shadow(0 0 5px #f2c14e);
+}
+
+.fx-plate {
+  aspect-ratio: 21 / 18;
+  filter: drop-shadow(0 0 2px rgba(255, 140, 80, 0.8));
+}
+
+.fx-ragewave {
+  color: var(--fx);
+  filter: drop-shadow(0 0 4px var(--fx));
+}
+
+.fx-steelswirl {
+  color: var(--fx);
+  filter: drop-shadow(0 0 4px var(--fx));
+}
+
+/* The Wir stali's steel blurred into one disc of light, and the lines of
+   its flash out to every foe. */
+.fx-steelblur {
+  border-radius: 50%;
+  background:
+    conic-gradient(from 0deg, rgba(255, 255, 255, 0) 0deg, rgba(255, 255, 255, 0.75) 50deg, rgba(255, 255, 255, 0) 110deg, rgba(255, 255, 255, 0) 120deg, rgba(255, 255, 255, 0.75) 170deg, rgba(255, 255, 255, 0) 230deg, rgba(255, 255, 255, 0) 240deg, rgba(255, 255, 255, 0.75) 290deg, rgba(255, 255, 255, 0) 350deg);
+  -webkit-mask-image: radial-gradient(circle, transparent 0 22%, #000 40%, #000 62%, transparent 71%);
+  mask-image: radial-gradient(circle, transparent 0 22%, #000 40%, #000 62%, transparent 71%);
+  filter: blur(1px) drop-shadow(0 0 6px rgba(230, 240, 255, 0.9));
+  mix-blend-mode: screen;
+}
+
+.fx-flashline {
+  position: absolute;
+  height: 3px;
+  margin-top: -1.5px;
+  transform-origin: 0 50%;
+  border-radius: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.4), #ffffff 30%, #ffffff 80%, rgba(255, 255, 255, 0.6));
+  box-shadow: 0 0 8px rgba(230, 240, 255, 0.95);
+}
+
+/* The Pojedynek: the arena dimmed but for the two duelists, the golden
+   line between them and the crossed swords. */
+.fx-duelspot {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  background: rgba(6, 8, 5, 0.6);
+  -webkit-mask-image:
+    radial-gradient(circle at var(--ax) var(--ay), transparent var(--r), #000 calc(var(--r) * 1.7)),
+    radial-gradient(circle at var(--bx) var(--by), transparent var(--r), #000 calc(var(--r) * 1.7));
+  -webkit-mask-composite: source-in;
+  mask-image:
+    radial-gradient(circle at var(--ax) var(--ay), transparent var(--r), #000 calc(var(--r) * 1.7)),
+    radial-gradient(circle at var(--bx) var(--by), transparent var(--r), #000 calc(var(--r) * 1.7));
+  mask-composite: intersect;
+}
+
+.fx-duelline {
+  position: absolute;
+  height: 3px;
+  margin-top: -1.5px;
+  transform-origin: 0 50%;
+  border-radius: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--fx) 70%, #ffffff), #fff6cf 50%, color-mix(in srgb, var(--fx) 70%, #ffffff));
+  box-shadow: 0 0 8px var(--fx);
+}
+
+.fx-duelsign {
+  z-index: 4;
+  color: var(--fx);
+  filter: drop-shadow(0 0 1px rgba(30, 20, 4, 0.95)) drop-shadow(0 0 6px var(--fx));
+}
+
+.fx-duel-blade {
+  transform-origin: 0 0;
+}
+
+/* A wound sealing with gold (the Nieugięty): red, then gold. */
+.fx-seam {
+  aspect-ratio: 5 / 1;
+  color: #e8462f;
+  filter: drop-shadow(0 0 3px currentColor);
+}
+
+.fx-seam-glow {
+  stroke: currentColor;
+  opacity: 0.55;
+}
+
+.fx-seam-core {
+  stroke: currentColor;
+}
+
+.fx-wallshield {
+  aspect-ratio: 40 / 48;
+  transform-origin: 50% 100%;
+  color: var(--fx);
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.6)) drop-shadow(0 0 3px rgba(242, 214, 117, 0.6));
+}
+
+/* The gleam running along the wall of shields. */
+.fx-wallgleam {
+  position: absolute;
+  height: var(--size, 40px);
+  transform: translateY(-50%);
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 0 40%, rgba(255, 255, 255, 0.85) 50%, transparent 60% 100%) no-repeat;
+  background-size: 40% 100%;
+  mix-blend-mode: screen;
+}
+
+/* The Miażdżący cios: its blast, red at the edge, and its force out of
+   the foe's back. */
+.fx-explosion--smash {
+  background: radial-gradient(circle, #fffbe6 0 10%, #ffd27a 22%, #ff8a3d 40%, rgba(200, 40, 30, 0.7) 58%, rgba(90, 10, 10, 0) 74%);
+}
+
+.fx-smashcone {
+  position: absolute;
+  height: var(--size, 60px);
+  transform-origin: 0 50%;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(255, 240, 210, 0.85), rgba(255, 160, 80, 0.5) 45%, rgba(160, 120, 80, 0));
+  clip-path: polygon(0 40%, 100% 0, 100% 100%, 0 60%);
+  filter: blur(1.5px);
+}
+
+.fx-trail--smash {
+  height: 6px;
+  background: linear-gradient(90deg, rgba(185, 169, 143, 0), rgba(216, 203, 176, 0.75) 40%, var(--fx));
+  box-shadow: 0 0 8px rgba(216, 203, 176, 0.8);
+}
+
+.fx-hblade {
+  aspect-ratio: 60 / 14;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 5px rgba(230, 240, 255, 0.95));
+}
+
+.fx-gale {
+  position: absolute;
+  color: var(--fx);
+  pointer-events: none;
+}
+
+/* The Wiwaty: a garland of pennants over the party (swinging from its
+   top), coins and flowers. */
+.fx-garland {
+  position: absolute;
+  pointer-events: none;
+  transform-origin: 50% 0;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.6));
+}
+
+.fx-garland svg {
+  display: block;
+  transform-origin: 50% 0;
+}
+
+.fx-coin,
+.fx-flower {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 13px;
+  height: 13px;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.6));
+}
+
+.fx-flower {
+  width: 15px;
+  height: 15px;
+}
+
+/* The Kolos's figure turned to stone: a grey copy of it over it (a
+   bust fading out at the bottom as the card's own does). */
+.fx-stoneskin {
+  position: absolute;
+  z-index: 2;
+  margin: 0;
+  max-width: none;
+  pointer-events: none;
+  filter: grayscale(1) sepia(0.42) contrast(1.55) brightness(0.84);
+}
+
+.fx-stoneskin.sprite--bust {
+  -webkit-mask-image: linear-gradient(#000 72%, transparent);
+  mask-image: linear-gradient(#000 72%, transparent);
+}
+
+/* The ground under the cards (the Trzęsienie ziemi's crack). */
+.fx-ground {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.fx-quakecrack {
+  position: absolute;
+  pointer-events: none;
+}
+
+.fx-quakecrack svg {
+  display: block;
+  overflow: visible;
+}
+
+.fx-quake-glow {
+  stroke: #ffae5c;
+  opacity: 0.8;
+  filter: blur(1.5px);
+}
+
+.fx-quake-core {
+  stroke: #1c120a;
+}
+
+.fx-rock {
+  aspect-ratio: 30 / 40;
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7));
+}
+
+/* 963: the evolved Kleryk's skills (skill-fx.js, arena-fx.js): the Odnowa's
+   sprouts, the Wielka odnowa's rising light, the Cudowne uzdrowienie's orb
+   and ribbons, the Cud's shaft and wings, the Wielkie błogosławieństwo's
+   ribbons and wind, the Psalm's notes, the Aura życia's warm light, the
+   Chór's singers and their voices, the Hymn's horns and laurels, the
+   Wizja's eye, the Boska ochrona's dome, the Sąd's lash, brands and chains,
+   the Wyrok's sword, the Ostateczny wyrok's spear and holy fire, the Sąd
+   ostateczny's opened sky and beam, the Pieczęć świętości's seal, the
+   Święte światło's sun and beams, and the Stos's logs and flames. */
+.fx-sprout {
+  position: absolute;
+  width: calc(var(--size, 50px) * 44 / 64);
+  height: var(--size, 50px);
+  transform: translate(-50%, -96.9%);
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px rgba(159, 211, 107, 0.8));
+}
+
+.fx-sprout svg,
+.fx-wing svg,
+.fx-note svg,
+.fx-spirit svg,
+.fx-voice svg,
+.fx-laurel svg,
+.fx-horn svg,
+.fx-eye svg,
+.fx-brand svg,
+.fx-chains svg,
+.fx-sentence svg,
+.fx-flame svg,
+.fx-holyspear svg,
+.fx-seal svg,
+.fx-sun svg,
+.fx-logs svg,
+.fx-anoint svg,
+.fx-dome svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* A column of golden light rising up a card from its foot. */
+.fx-rise {
+  position: absolute;
+  pointer-events: none;
+  transform-origin: 50% 100%;
+  border-radius: 40% 40% 4px 4px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0) 70%),
+    linear-gradient(0deg, rgba(255, 224, 138, 0.75), rgba(255, 246, 207, 0.45) 55%, rgba(255, 246, 207, 0));
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
+  mix-blend-mode: screen;
+}
+
+/* The Cudowne uzdrowienie's orb of white light, and its ribbons. */
+.fx-radiant {
+  position: absolute;
+  width: var(--size, 40px);
+  height: var(--size, 40px);
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, #ffffff 0 24%, #fffdf2 34%, rgba(255, 246, 207, 0.75) 50%, rgba(227, 245, 176, 0) 70%);
+  box-shadow: 0 0 16px 6px rgba(255, 253, 242, 0.55);
+}
+
+.fx-ribbon,
+.fx-lash {
+  position: absolute;
+  pointer-events: none;
+}
+
+.fx-ribbon svg,
+.fx-lash svg {
+  display: block;
+  overflow: visible;
+}
+
+.fx-ribbon path,
+.fx-lash path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fx-ribbon {
+  filter: drop-shadow(0 0 4px #fff6cf);
+}
+
+.fx-ribbon-glow {
+  stroke: #fff3c4;
+  stroke-width: 7;
+  opacity: 0.55;
+}
+
+.fx-ribbon-core {
+  stroke: #ffffff;
+  stroke-width: 2.6;
+}
+
+/* The Cud's shaft of golden light and its white wings (turning on their
+   roots). */
+.fx-shaft {
+  position: absolute;
+  pointer-events: none;
+  transform-origin: 50% 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0) 62%),
+    linear-gradient(180deg, rgba(255, 246, 207, 0) 0%, rgba(255, 236, 170, 0.45) 30%, rgba(242, 193, 78, 0.4) 80%, rgba(242, 193, 78, 0.1) 100%);
+  clip-path: polygon(32% 0, 68% 0, 100% 100%, 0 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent);
+  mix-blend-mode: screen;
+}
+
+.fx-wing {
+  position: absolute;
+  width: var(--size, 50px);
+  aspect-ratio: 1;
+  pointer-events: none;
+  transform-origin: 11.4% 91.4%;
+  filter: drop-shadow(0 0 1px rgba(90, 64, 16, 0.9)) drop-shadow(0 0 6px rgba(255, 246, 207, 0.9));
+}
+
+/* The Wielkie błogosławieństwo's golden ribbon winding up a card, and the
+   wind at its feet. */
+.fx-anoint {
+  position: absolute;
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px #ffe08a);
+}
+
+.fx-anoint path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.fx-anoint-glow {
+  stroke: #f2c14e;
+  stroke-width: 6;
+  opacity: 0.5;
+}
+
+.fx-anoint-core {
+  stroke: #fff6cf;
+  stroke-width: 2.2;
+}
+
+.fx-anoint-back {
+  stroke: #d9b45a;
+  stroke-width: 1.6;
+  opacity: 0.45;
+}
+
+.fx-gust-streak {
+  position: absolute;
+  height: 2px;
+  border-radius: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(255, 246, 207, 0), #fff6cf 45%, rgba(255, 224, 138, 0));
+  box-shadow: 0 0 4px #ffe08a;
+}
+
+/* The Psalm's notes. */
+.fx-note {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--size, 18px);
+  height: var(--size, 18px);
+  color: #f2c14e;
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px #ffe08a);
+}
+
+/* The Psalm's golden stave. */
+.fx-stave {
+  position: absolute;
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px #ffe08a);
+}
+
+.fx-stave svg {
+  display: block;
+  overflow: visible;
+}
+
+.fx-stave path {
+  fill: none;
+  stroke: #f2d675;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+
+/* The Aura życia's warm light. */
+.fx-lifeaura {
+  position: absolute;
+  width: var(--size, 120px);
+  height: var(--size, 120px);
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 241, 201, 0.55) 0, rgba(255, 207, 122, 0.36) 38%, rgba(217, 240, 163, 0.18) 58%, rgba(217, 240, 163, 0) 70%);
+  mix-blend-mode: screen;
+}
+
+/* Over the whole party, brightest at the Cudotwórca (--x, --y). */
+.fx-lifeaura--party {
+  border-radius: 24px;
+  transform-origin: var(--x) var(--y);
+  background: radial-gradient(farthest-corner at var(--x) var(--y), rgba(255, 241, 201, 0.6) 0, rgba(255, 207, 122, 0.4) 30%, rgba(217, 240, 163, 0.22) 65%, rgba(217, 240, 163, 0.08) 100%);
+  -webkit-mask-image: radial-gradient(closest-side, #000 70%, transparent);
+  mask-image: radial-gradient(closest-side, #000 70%, transparent);
+}
+
+/* The Chór's singers and the arcs of their voices (also the Hymn's horns'
+   blast). */
+.fx-spirit {
+  position: absolute;
+  width: var(--size, 30px);
+  aspect-ratio: 40 / 44;
+  pointer-events: none;
+  filter: drop-shadow(0 0 5px #fff3c4) drop-shadow(0 0 2px #ffffff);
+}
+
+.fx-spirit svg {
+  opacity: 0.85;
+}
+
+.fx-voice {
+  position: absolute;
+  width: var(--size, 30px);
+  aspect-ratio: 1;
+  color: var(--fx);
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px var(--fx));
+}
+
+/* The Hymn's laurel wreath and its herald's horn (turning on its
+   mouthpiece). */
+.fx-laurel {
+  position: absolute;
+  width: var(--size, 40px);
+  aspect-ratio: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 0 rgba(40, 26, 6, 0.8)) drop-shadow(0 0 4px #ffe08a);
+}
+
+.fx-horn {
+  position: absolute;
+  width: var(--size, 50px);
+  aspect-ratio: 80 / 34;
+  pointer-events: none;
+  transform-origin: 0 50%;
+  filter: drop-shadow(0 1px 0 rgba(40, 26, 6, 0.8)) drop-shadow(0 0 4px #ffe08a);
+}
+
+/* The Wizja's eye and the party's foreseen steps. */
+.fx-eye {
+  position: absolute;
+  width: var(--size, 50px);
+  aspect-ratio: 100 / 60;
+  color: var(--fx);
+  pointer-events: none;
+  filter: drop-shadow(0 0 2px rgba(20, 28, 48, 0.9)) drop-shadow(0 0 8px var(--fx));
+}
+
+.fx-foreseen {
+  position: absolute;
+  margin: 0;
+  pointer-events: none;
+  filter: saturate(0.3) brightness(1.4) drop-shadow(0 0 6px #d8e9ff);
+}
+
+/* The Boska ochrona's golden dome over the party, ribbed like a globe. */
+.fx-dome {
+  position: absolute;
+  pointer-events: none;
+  filter: drop-shadow(0 0 6px var(--fx));
+}
+
+.fx-dome path,
+.fx-dome ellipse {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.fx-dome-fill {
+  fill: rgba(242, 214, 117, 0.16) !important;
+}
+
+.fx-dome-lines {
+  stroke: rgba(255, 240, 190, 0.75);
+  stroke-width: 1.6;
+}
+
+.fx-dome-edge {
+  stroke: var(--fx);
+  stroke-width: 3;
+}
+
+.fx-dome-shine {
+  stroke: #ffffff;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+/* The Sąd's lash, its brand and the chains of its paralysis. */
+.fx-lash {
+  filter: drop-shadow(0 0 4px var(--fx));
+}
+
+.fx-lash-glow {
+  stroke: var(--fx);
+  stroke-width: 7;
+  opacity: 0.55;
+}
+
+.fx-lash-core {
+  stroke: #fffdf2;
+  stroke-width: 2.6;
+}
+
+.fx-brand {
+  position: absolute;
+  width: var(--size, 30px);
+  aspect-ratio: 1;
+  color: var(--fx);
+  pointer-events: none;
+  filter: drop-shadow(0 0 2px #7a4a10) drop-shadow(0 0 6px #ffb347);
+}
+
+.fx-chains {
+  position: absolute;
+  width: var(--size, 90px);
+  aspect-ratio: 104 / 40;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px #ffe08a);
+}
+
+/* The Wyrok's sword and its cut of light. */
+.fx-sentence {
+  position: absolute;
+  width: calc(var(--size, 60px) * 0.28);
+  height: var(--size, 60px);
+  pointer-events: none;
+  filter: drop-shadow(0 0 1px rgba(40, 26, 6, 0.9)) drop-shadow(0 0 6px #ffe08a);
+}
+
+.fx-verdictcut {
+  position: absolute;
+  width: 6px;
+  border-radius: 3px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), #ffffff 20%, #ffe08a 50%, #ffffff 80%, rgba(255, 255, 255, 0));
+  box-shadow: 0 0 10px #ffe08a;
+}
+
+/* Holy fire's and the pyre's tongues of flame (rising from their foot),
+   the spear of holy fire and the pyre's logs. */
+.fx-flame {
+  position: absolute;
+  z-index: 2;
+  width: calc(var(--size, 40px) * 20 / 28);
+  height: var(--size, 40px);
+  pointer-events: none;
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 0 4px rgba(255, 140, 50, 0.85));
+}
+
+.fx-flame--holy {
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.9)) drop-shadow(0 0 6px rgba(255, 236, 170, 0.95));
+}
+
+.fx-holyspear {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 12px;
+  pointer-events: none;
+  transform-origin: 0 0;
+  filter: drop-shadow(0 0 4px #ffd27a) drop-shadow(0 0 2px #ffffff);
+}
+
+.fx-logs {
+  position: absolute;
+  width: var(--size, 60px);
+  aspect-ratio: 64 / 24;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7));
+}
+
+/* The Sąd ostateczny's darkened sky, its opening and its beam. */
+.fx-sky--judgment {
+  background: linear-gradient(180deg, rgba(18, 14, 8, 0.86), rgba(36, 28, 14, 0.5) 55%, rgba(36, 28, 14, 0));
+}
+
+.fx-heavens {
+  position: absolute;
+  width: var(--size, 80px);
+  aspect-ratio: 2 / 1;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(ellipse, #ffffff 0, #fff6cf 30%, rgba(242, 214, 117, 0.6) 52%, rgba(242, 214, 117, 0) 70%);
+  mix-blend-mode: screen;
+}
+
+.fx-judgment {
+  position: absolute;
+  pointer-events: none;
+  transform-origin: 50% 0;
+  background: linear-gradient(90deg, rgba(255, 246, 207, 0), rgba(255, 246, 207, 0.8) 18%, #ffffff 40%, #ffffff 60%, rgba(255, 246, 207, 0.8) 82%, rgba(255, 246, 207, 0));
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.3), #000 25%);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.3), #000 25%);
+  mix-blend-mode: screen;
+}
+
+/* The Pieczęć świętości's seal and the crimson ring that binds its foe. */
+.fx-seal {
+  position: absolute;
+  width: var(--size, 30px);
+  aspect-ratio: 1;
+  color: #ffcf6a;
+  pointer-events: none;
+  filter: drop-shadow(0 0 2px #7a1424) drop-shadow(0 0 6px #ff8a3d);
+}
+
+.fx-bind {
+  position: absolute;
+  width: var(--size, 90px);
+  aspect-ratio: 2.4 / 1;
+  border: 3px solid #e8462f;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 10px #b3263b, inset 0 0 8px #b3263b;
+}
+
+/* The Święte światło's sun and its beams. */
+.fx-sun {
+  position: absolute;
+  width: var(--size, 90px);
+  aspect-ratio: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px #ffe08a);
+}
+
+.fx-sunbeam {
+  position: absolute;
+  height: 4px;
+  margin-top: -2px;
+  transform-origin: 0 50%;
+  border-radius: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, #ffffff, #fff3b0 60%, rgba(255, 243, 176, 0.5));
+  box-shadow: 0 0 10px #ffe08a;
+}
+
+.fx-sunbeam--warm {
+  height: 3px;
+  background: linear-gradient(90deg, #fffdf2, rgba(227, 245, 176, 0.8) 60%, rgba(227, 245, 176, 0.3));
+  box-shadow: 0 0 8px #e3f5b0;
+}
+
+/* 964: the evolved Cień's looks (skill-fx.js, arena-fx.js). */
+
+/* A pool of shadow on the ground (the Egzekucja). */
+.fx-pool {
+  position: absolute;
+  width: var(--size, 60px);
+  aspect-ratio: 3 / 1;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(10, 6, 20, 0.95) 0 45%, rgba(42, 31, 66, 0.78) 70%, rgba(123, 95, 199, 0.4) 88%, transparent 100%);
+  box-shadow: 0 0 8px rgba(123, 95, 199, 0.5);
+}
+
+/* The Czarny jad's black venom spreading where it falls. */
+.fx-pool--venom {
+  background: radial-gradient(closest-side, rgba(8, 12, 4, 0.95) 0 45%, rgba(29, 42, 20, 0.85) 70%, rgba(127, 163, 74, 0.4) 90%, transparent 100%);
+  box-shadow: 0 0 6px rgba(127, 163, 74, 0.5);
+}
+
+/* The Ścięcie's line where its cut will fall, and the part of its foe's
+   picture above the cut, sliding along it (in the card). */
+.fx-cutline {
+  position: absolute;
+  height: 2px;
+  border-radius: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, #ffffff 15%, #e8deff 50%, #ffffff 85%, transparent);
+  box-shadow: 0 0 4px #b9a3f0, 0 0 8px rgba(185, 163, 240, 0.7);
+}
+
+.fx-severed {
+  position: absolute;
+  z-index: 1;
+  max-width: none;
+  margin: 0;
+  pointer-events: none;
+}
+
+/* The Ścięcie's cut across the field. */
+.fx-crosscut {
+  position: absolute;
+  z-index: 3;
+  height: 3px;
+  margin-top: -1.5px;
+  transform-origin: 0 50%;
+  border-radius: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), #ffffff 18%, #ffffff 82%, rgba(255, 255, 255, 0.3));
+  box-shadow: 0 0 5px var(--fx), 0 0 12px var(--fx);
+}
+
+/* The Cios ostateczny's still copies of the Bogobójca in stopped time. */
+.fx-shade--frozen {
+  z-index: 2;
+  filter: grayscale(1) brightness(1.45) drop-shadow(0 0 1px #ffffff) drop-shadow(0 0 4px #d6c2ff);
+}
+
+/* The Cios ostateczny: time stops, the arena grey behind a veil; then its
+   crescent cleave, under the numbers, which stay readable. */
+.fx-timestop {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  background: rgba(40, 36, 56, 0.22);
+  -webkit-backdrop-filter: grayscale(1) brightness(0.85);
+  backdrop-filter: grayscale(1) brightness(0.85);
+}
+
+.fx-cleave {
+  position: absolute;
+  z-index: 4;
+  width: var(--size, 90px);
+  aspect-ratio: 1;
+  color: var(--fx);
+  pointer-events: none;
+  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 8px var(--fx));
+}
+
+/* The Znak śmierci's hourglass, its sand draining from the top into the
+   bottom. */
+.fx-hourglass {
+  position: absolute;
+  height: var(--size, 40px);
+  aspect-ratio: 2 / 3;
+  color: var(--fx);
+  pointer-events: none;
+  filter: drop-shadow(0 0 2px #efe8ff) drop-shadow(0 0 6px var(--fx));
+}
+
+.fx-sand-top,
+.fx-sand-bottom {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+/* The Czarny jad's vial and its black stream. */
+.fx-vial {
+  position: absolute;
+  width: var(--size, 30px);
+  aspect-ratio: 40 / 48;
+  pointer-events: none;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 4px rgba(127, 163, 74, 0.7));
+}
+
+.fx-blackstream {
+  position: absolute;
+  width: 4px;
+  border-radius: 2px;
+  transform-origin: 50% 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, #0f1609, #1d2a14 70%, rgba(29, 42, 20, 0.6));
+  box-shadow: 0 0 3px rgba(127, 163, 74, 0.6);
+}
+
+/* The Trujący Szlam's puddle, its glob of venom and the splat it leaves. */
+.fx-puddle {
+  position: absolute;
+  width: var(--size, 60px);
+  aspect-ratio: 3 / 1;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(197, 240, 138, 0.9) 0, rgba(156, 204, 101, 0.85) 40%, rgba(95, 143, 46, 0.7) 70%, transparent 100%);
+  box-shadow: 0 0 6px rgba(156, 204, 101, 0.6);
+}
+
+.fx-glob {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--size, 12px);
+  aspect-ratio: 1;
+  border-radius: 50% 50% 46% 54%;
+  pointer-events: none;
+  background: radial-gradient(circle at 35% 35%, #f4ffe0 0 12%, #c5f08a 30%, #9ccc65 60%, #5f8f2e 100%);
+  box-shadow: 0 0 5px rgba(156, 204, 101, 0.8);
+}
+
+.fx-splat {
+  position: absolute;
+  width: var(--size, 36px);
+  aspect-ratio: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(197, 240, 138, 0.95) 0 22%, transparent 24%),
+    radial-gradient(circle at 22% 30%, rgba(156, 204, 101, 0.9) 0 9%, transparent 10%),
+    radial-gradient(circle at 78% 26%, rgba(156, 204, 101, 0.9) 0 8%, transparent 9%),
+    radial-gradient(circle at 74% 74%, rgba(156, 204, 101, 0.9) 0 10%, transparent 11%),
+    radial-gradient(circle at 26% 76%, rgba(156, 204, 101, 0.9) 0 7%, transparent 8%),
+    radial-gradient(circle at 50% 12%, rgba(156, 204, 101, 0.85) 0 6%, transparent 7%),
+    radial-gradient(circle at 88% 52%, rgba(156, 204, 101, 0.85) 0 6%, transparent 7%),
+    radial-gradient(circle at 12% 52%, rgba(156, 204, 101, 0.85) 0 6%, transparent 7%);
+  filter: drop-shadow(0 0 3px rgba(156, 204, 101, 0.7));
+}
+
+/* The Taniec ostrzy's daggers: the Nocny Tancerz's own weapon. */
+.fx-thrown {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--size, 24px);
+  height: var(--size, 24px);
+  pointer-events: none;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 4px #a690e8);
+}
+
+.fx-thrown-weapon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  image-rendering: pixelated;
+}
+
+/* A shadow's dash between two foes (the Wir cieni). */
+.fx-dashstreak {
+  position: absolute;
+  height: 4px;
+  margin-top: -2px;
+  transform-origin: 0 50%;
+  border-radius: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(36, 26, 56, 0), rgba(36, 26, 56, 0.9) 30%, var(--fx) 80%, #ffffff);
+  box-shadow: 0 0 6px var(--fx);
+}
+
+/* The Burza ostrzy's blades: silver steel. */
+.fx-hblade--steel {
+  filter: grayscale(1) brightness(1.35) drop-shadow(0 0 1px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 5px rgba(230, 240, 255, 0.95));
+}
+
+/* The Nawałnica cieni's shadows of the Władca: black, big, rimmed in
+   dark violet. */
+.fx-shade--lord {
+  filter: brightness(0) drop-shadow(0 0 1px #d0b8ff) drop-shadow(0 0 5px #7b5fc7);
+}
+
+/* The arena gone dark (the Nawałnica cieni). */
+.fx-flash--dark {
+  background: radial-gradient(circle at 50% 45%, rgba(20, 12, 36, 0.5), rgba(8, 5, 16, 0.8) 80%);
+}
+
+/* The shadow of the Cień-sobowtór: black, rimmed in violet. */
+.fx-shade--double {
+  filter: brightness(0) drop-shadow(0 0 1px #c9b7ff) drop-shadow(0 0 5px #7b5fc7);
+}
+
+
+/* The Zniknięcie: the figure a faint shadow in its card while the stance
+   holds, and two eyes in the dark. */
+.unit--vanished .unit-art > img,
+.unit--vanished .unit-art > svg {
+  opacity: 0.28;
+  filter: grayscale(0.5) brightness(0.55) sepia(0.6) hue-rotate(215deg);
+}
+
+.fx-eyes {
+  position: absolute;
+  width: var(--size, 24px);
+  aspect-ratio: 4 / 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 16% 42% at 28% 50%, #ffffff 0, #d9ccff 45%, rgba(166, 144, 232, 0) 100%),
+    radial-gradient(ellipse 16% 42% at 72% 50%, #ffffff 0, #d9ccff 45%, rgba(166, 144, 232, 0) 100%);
+  filter: drop-shadow(0 0 3px #a690e8);
+}
+
+/* The Cień-sobowtór: the shadow beside its Widmo while the stance holds,
+   and black water rippling at its feet. */
+.unit--doubled .unit-art > img,
+.unit--doubled .unit-art > svg {
+  filter: drop-shadow(-7px 0 0 rgba(58, 40, 104, 0.9)) drop-shadow(0 0 2px rgba(166, 144, 232, 0.7));
+}
+
+.fx-ripple {
+  position: absolute;
+  width: var(--size, 60px);
+  aspect-ratio: 3 / 1;
+  box-sizing: border-box;
+  border: 2px solid rgba(166, 144, 232, 0.85);
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 6px rgba(123, 95, 199, 0.6);
+}
+
+/* The Zaćmienie: the arena dark round the sun put out, its corona. */
+.fx-eclipse-veil {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--x) var(--y), rgba(12, 8, 26, 0.2) 0, rgba(12, 8, 26, 0.62) 22%, rgba(6, 4, 14, 0.74) 60%);
+}
+
+.fx-eclipse {
+  position: absolute;
+  z-index: 2;
+  width: var(--size, 56px);
+  aspect-ratio: 1;
+  pointer-events: none;
+}
+
+.fx-eclipse-sun,
+.fx-eclipse-corona,
+.fx-eclipse-moon {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+.fx-eclipse-sun {
+  background: radial-gradient(circle closest-side, #fffbe6 0 40%, #ffe28a 62%, #ffb347 100%);
+  box-shadow: 0 0 10px 4px rgba(255, 210, 120, 0.8), 0 0 24px 8px rgba(255, 170, 60, 0.4);
+}
+
+.fx-eclipse-corona {
+  inset: -14%;
+  background: radial-gradient(circle closest-side, transparent 0 74%, rgba(255, 255, 255, 0.95) 78%, rgba(217, 204, 255, 0.7) 84%, rgba(166, 144, 232, 0.3) 92%, transparent 100%);
+}
+
+.fx-eclipse-moon {
+  inset: -3%;
+  background: radial-gradient(circle at 40% 40%, #1e1730, #0a0712 70%);
+}
+
+/* The Klątwa rozkładu: its whispers, and the rot creeping up a cursed
+   card. */
+.fx-whispers {
+  position: absolute;
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px #6b8f3a);
+}
+
+.fx-whispers svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.fx-whisper-glow {
+  stroke: #3e5a1e;
+  stroke-width: 3;
+  opacity: 0.7;
+}
+
+.fx-whisper-core {
+  stroke: #c5e38f;
+  stroke-width: 1.2;
+}
+
+.fx-rot {
+  position: absolute;
+  inset: -1px;
+  z-index: 2;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 86%, rgba(150, 172, 74, 0.8) 0, rgba(124, 146, 56, 0.5) 1.9%, transparent 3.2%),
+    radial-gradient(circle at 34% 74%, rgba(150, 172, 74, 0.8) 0, rgba(124, 146, 56, 0.5) 1.4%, transparent 2.4%),
+    radial-gradient(circle at 58% 82%, rgba(150, 172, 74, 0.8) 0, rgba(124, 146, 56, 0.5) 2.0%, transparent 3.4%),
+    radial-gradient(circle at 76% 68%, rgba(150, 172, 74, 0.8) 0, rgba(124, 146, 56, 0.5) 1.3%, transparent 2.2%),
+    radial-gradient(circle at 26% 58%, rgba(150, 172, 74, 0.8) 0, rgba(124, 146, 56, 0.5) 1.2%, transparent 2.0%),
+    radial-gradient(circle at 64% 52%, rgba(150, 172, 74, 0.8) 0, rgba(124, 146, 56, 0.5) 1.4%, transparent 2.4%),
+    radial-gradient(circle at 86% 86%, rgba(150, 172, 74, 0.8) 0, rgba(124, 146, 56, 0.5) 1.6%, transparent 2.6%),
+    radial-gradient(circle at 46% 64%, rgba(150, 172, 74, 0.8) 0, rgba(124, 146, 56, 0.5) 1.1%, transparent 1.8%),
+    radial-gradient(circle at 10% 70%, rgba(150, 172, 74, 0.8) 0, rgba(124, 146, 56, 0.5) 1.2%, transparent 2.0%),
+    radial-gradient(circle at 72% 38%, rgba(150, 172, 74, 0.8) 0, rgba(124, 146, 56, 0.5) 1.0%, transparent 1.6%),
+    radial-gradient(circle at 40% 44%, rgba(150, 172, 74, 0.8) 0, rgba(124, 146, 56, 0.5) 0.8%, transparent 1.4%),
+    radial-gradient(circle at 88% 56%, rgba(150, 172, 74, 0.8) 0, rgba(124, 146, 56, 0.5) 1.1%, transparent 1.8%),
+    linear-gradient(0deg, rgba(52, 66, 20, 0.72), rgba(70, 88, 28, 0.38) 50%, rgba(70, 88, 28, 0) 90%);
+}
+
+/* The Krwawy znak's rune of blood; the Dotyk śmierci's hand of bone. */
+.fx-bloodrune {
+  position: absolute;
+  width: var(--size, 40px);
+  aspect-ratio: 1;
+  color: var(--fx);
+  pointer-events: none;
+  filter: drop-shadow(0 0 2px #ffd2c4) drop-shadow(0 0 6px #b3263b);
+}
+
+.fx-bonehand {
+  position: absolute;
+  width: var(--size, 50px);
+  aspect-ratio: 60 / 76;
+  pointer-events: none;
+  filter: drop-shadow(0 0 1px #24301a) drop-shadow(0 0 6px var(--fx));
+}
+
+.fx-cleave svg,
+.fx-hourglass svg,
+.fx-vial svg,
+.fx-bloodrune svg,
+.fx-bonehand svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* The Armia umarłych: its gravestone cracking in two over the open grave,
+   the knight's rusted sword and the arc of its blow. */
+.fx-gravestone {
+  position: absolute;
+  height: var(--size, 50px);
+  aspect-ratio: 40 / 54;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.6));
+}
+
+.fx-stone-left {
+  transform-box: fill-box;
+  transform-origin: 0% 100%;
+}
+
+.fx-stone-right {
+  transform-box: fill-box;
+  transform-origin: 100% 100%;
+}
+
+.fx-pit {
+  position: absolute;
+  width: var(--size, 60px);
+  aspect-ratio: 3 / 1;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(closest-side, #0b0806 0 50%, rgba(42, 31, 22, 0.9) 75%, rgba(90, 70, 50, 0.4) 90%, transparent 100%);
+}
+
+.fx-rustblade {
+  position: absolute;
+  width: var(--size, 60px);
+  aspect-ratio: 60 / 16;
+  transform-origin: 5% 50%;
+  pointer-events: none;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 4px rgba(200, 128, 58, 0.7));
+}
+
+/* (Over the whole stage, the arc drawn round the sword's hilt.) */
+.fx-rustarc {
+  position: absolute;
+  pointer-events: none;
+}
+
+.fx-gravestone svg,
+.fx-rustblade svg,
+.fx-rustarc svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}

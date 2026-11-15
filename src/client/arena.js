@@ -29,6 +29,9 @@ const FIELDS = [
 const RESULTS = { true: 'Zwycięstwo', false: 'Porażka', null: 'Odwrót', draw: 'Remis' };
 // The events of a unit's own move, as its actor (a counter is not one).
 const MOVES = new Set(['hit', 'crit', 'dodge']);
+// 964: the marks a stance leaves on its card while it holds (skill-fx.js
+// `stance`: the Zniknięcie's faint figure, the Cień-sobowtór's shadow).
+const STANCE_MARKS = ['unit--vanished', 'unit--doubled'];
 const SPEED_KEY = 'wzrost.fight-speed';
 // The fight's tempo, one tap to the next and back to the first; 4× since
 // 0.2.98 (a player, poz. 45, 12.11.2026: „Czy możemy wprowadzić tempo walk
@@ -426,11 +429,14 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     return byId.get(event.actor);
   }
 
-  // A stance or a guard that ends takes its name off the card.
+  // A stance or a guard that ends takes its name off the card (964: and
+  // its mark, skill-fx.js `stance`).
   function stanceDown(event) {
     guardDown(event);
     const entry = cards.get(event.target);
     if (entry && entry.status.textContent === event.skillName) entry.status.textContent = '';
+    const mark = event.skill ? lookOf(event).stance : null;
+    if (entry && mark) entry.card.classList.remove(mark);
   }
 
   // A fallen unit keeps no status: no burn, pin or shield on its card, and
@@ -444,7 +450,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     summonRemove(id, quiet);
     entry.status.textContent = '';
     entry.shieldBar.hidden = true;
-    entry.card.classList.remove('unit--shielded');
+    entry.card.classList.remove('unit--shielded', ...STANCE_MARKS);
   }
 
   // An effect over time leaves the card with its last tick, or with an
@@ -470,7 +476,8 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       // A skill wakes: a sweep's wave over the foes, or an aura on its user.
       if (!event.targets) skills.status(event.actor, event.skillName);
       if (event.shield !== undefined) shieldUp(event);
-      const casting = skills.cast(acting);
+      // (962: a sweep's look knows the foes its blows reach and its turn.)
+      const casting = skills.cast(event.targets ? { ...acting, ...sweepOf(event) } : acting);
       const look = lookOf(acting);
       fxs.cast(acting, look);
       if (!event.targets) fxs.glint(acting.actor, look.color);
@@ -483,7 +490,8 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       const look = lookOf(event);
       if (look.cast === 'guard') fxs.glint(event.target, look.color);
       else fxs.heal(event.target);
-      await skills.heal(event);
+      // (963: a party heal's look knows its party and its place in it.)
+      await skills.heal(event.quiet ? event : { ...event, ...healOf(event) });
       line();
       return;
     }
@@ -503,6 +511,9 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     }
     if (event.kind === 'fade') {
       stanceDown(event);
+      // (964: the Zniknięcie's figure coming back, the Cień-sobowtór's
+      // shadow sinking.)
+      skills.stanceOver(event);
       line();
       await later(200);
       return;
@@ -511,6 +522,8 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       hold(event.target, event.label ?? t('przyszpilony'));
       float(event.target, t('traci ruch'), 'effect');
       line();
+      // (962: a foe a heavy blow stunned sees stars, skill-fx.js daze().)
+      skills.daze(event);
       await flash(event.target, '#c49a6c', 'rgba(196, 154, 108, 0.3)');
       return;
     }
@@ -608,6 +621,14 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     if (blow) style.blow = blow;
     const land = async (onImpact) => {
       if (event.sweep) {
+        // (964: the Znak śmierci's hourglass comes back over its foe before
+        // the wounds it counted open again.)
+        if (look?.echo) {
+          const id = run;
+          skills.before(acting);
+          await later(300);
+          if (id !== run) return;
+        }
         onImpact();
         await later(240);
         return;
@@ -633,7 +654,9 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
         if (strong || Math.random() < 0.5) playVoice(voiceOf(target), 'hurt');
         setHp(target.id, event.hp);
         fxs.hit(blow);
-        if (look && !event.sweep) skills.impact(event);
+        // (964: the Znak śmierci's wounds given back come as a sweep's blow
+        // with a look of their own.)
+        if (look && (!event.sweep || look.echo)) skills.impact(event);
         float(target.id, strong ? `−${event.damage}!` : `−${event.damage}`, strong ? 'crit' : 'hit');
         // The part of the blow from the weapon's element, in its colour,
         // under the damage (914).
@@ -707,6 +730,54 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     line();
   }
 
+  // 962: what a sweep's look needs of its moment: the foes its blows reach
+  // (not those that dodge or block them, or whose summon takes them), and
+  // which of its turns it is (Huragan stali turns twice). 964: its blows in
+  // the order they land, the dodged ones too (`blows`), and the foes its
+  // effect takes hold of (`affected`, the Klątwa rozkładu's).
+  function sweepOf(event) {
+    const at = fight.events.indexOf(event);
+    const struck = [];
+    const blows = [];
+    const affected = [];
+    for (let next = at + 1; next < fight.events.length; next++) {
+      const coming = fight.events[next];
+      if (coming.t !== event.t || coming.kind === 'skill') break;
+      const own = coming.sweep && coming.actor === event.actor;
+      if (own && (coming.kind === 'hit' || coming.kind === 'crit')) struck.push(coming.target);
+      if (own && (coming.kind === 'hit' || coming.kind === 'crit' || coming.kind === 'dodge')) blows.push({ target: coming.target, hit: coming.kind !== 'dodge' });
+      if (coming.kind === 'effect' && coming.actor === event.actor) affected.push(coming.target);
+    }
+    let turn = 1;
+    for (let back = at - 1; back >= 0 && fight.events[back].t === event.t; back--) {
+      const earlier = fight.events[back];
+      if (earlier.kind === 'skill' && earlier.actor === event.actor && earlier.skill === event.skill) turn += 1;
+    }
+    return { struck, turn, blows, affected };
+  }
+
+  // 963: what a party heal's look needs of its moment: the members its
+  // heals reach, in order (one heal each, a cleanse between them), and
+  // which of them this heal is.
+  function healOf(event) {
+    const at = fight.events.indexOf(event);
+    const same = (other) => other.kind === 'heal' && other.t === event.t && other.actor === event.actor && other.skill === event.skill && !other.quiet;
+    const step = (from, way) => {
+      let index = from + way;
+      while (fight.events[index]?.kind === 'cleanse' && fight.events[index].t === event.t) index += way;
+      return index;
+    };
+    let first = at;
+    for (let index = step(at, -1); index >= 0 && same(fight.events[index]); index = step(index, -1)) first = index;
+    const party = [];
+    let place = 0;
+    for (let index = first; index < fight.events.length && same(fight.events[index]); index = step(index, 1)) {
+      if (index === at) place = party.length;
+      party.push(fight.events[index].target);
+    }
+    return { party, place };
+  }
+
   // Whether a blow fells its target (its kill follows in the same moment)
   // and whether it is the fight's last blow (no move and no kill after it).
   function endingOf(event) {
@@ -732,6 +803,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     }
     if (event.kind === 'skill' && !event.targets) cards.get(event.actor).status.textContent = event.skillName;
     if (event.kind === 'skill' && !event.targets && lookOf(event).cast === 'shield') cards.get(event.actor).card.classList.add('unit--shielded');
+    if (event.kind === 'skill' && !event.targets && lookOf(event).stance) cards.get(event.actor).card.classList.add(lookOf(event).stance);
     if (event.kind === 'skill' && event.shield !== undefined) shieldUp(event);
     if (event.kind === 'hit' || event.kind === 'crit' || event.kind === 'tick') shieldLeft(event.target, event.shield);
     if (event.kind === 'tick' || event.kind === 'cleanse' || (event.kind === 'potion' && event.effect === 'cure')) effectOver(event);
@@ -767,7 +839,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       setDown(unit.id, unit.hp <= 0);
       cards.get(unit.id).status.textContent = '';
       cards.get(unit.id).shieldBar.hidden = true;
-      cards.get(unit.id).card.classList.remove('unit--shielded');
+      cards.get(unit.id).card.classList.remove('unit--shielded', ...STANCE_MARKS);
     }
   }
 
