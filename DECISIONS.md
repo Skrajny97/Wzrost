@@ -3349,7 +3349,7 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
    - `autoPoints` to rozkład „Rozdaj według klasy”, a jego największa część to główna statystyka.
    - `weaponDamage` to część obrażeń broni w rękach tej formy.
    - Sprawdzanie, co postać może założyć, łup, Koło Fortuny, Targowisko i skrzynie idą według formy (`gearKey`).
-2. **Nekromanta i Licz** (988.1 A): kostury i fokusy Maga, zbroja Cienia.
+2. **Nekromanta i Licz** (988.1 A): kostury i fokusy Maga, zbroja Cienia; od 0.3.68 także zbroja Maga, kaptury i szaty, jak na portretach (991 A).
    - Każdy punkt Zręczności liczy się jako Intelekt, więc pierścienie i zbroje z Zręcznością dalej działają.
    - We wzroście Nekromanty +4 Intelektu (zamiast +3 Zręczności i +1 Intelektu), Licza tak samo. „Rozdaj według klasy” daje Intelekt.
    - Kostur bije u nich 80% tego, co u Maga. Bez tego byli wyraźnie mocniejsi niż dziś (Licz 80% pojedynków na Arenie), bo zostaje im szybkość, unik i HP Cienia, a kostur bije magią, bez uniku.
@@ -3357,12 +3357,12 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
 4. **Strzelec Burzy, Władca Piorunów i Wybraniec Peruna** (988.3 A): łuki biją Intelektem, każdy punkt Zręczności liczy się jako Intelekt. We wzroście Intelekt zamiast Zręczności (+3, +5 i +6). „Rozdaj według klasy” daje Intelekt.
 5. **Łowca, Mistrz Łowów i Władca Puszczy** (988.4 A): łuki biją Siłą, każdy punkt Zręczności liczy się jako Siła. We wzroście Siła zamiast Zręczności (+3, +4 i +5). „Rozdaj według klasy” daje Siłę.
 6. **Inkwizytor** (988.5 A): kropidła i kadzielnice. Jego +1 Siły na poziom klasy to teraz +1 Intelektu.
-7. **Wielki Inkwizytor i Pogromca Demonów** (988.5 A): miecze i topory Wojownika, tarcza i fokus zostają.
+7. **Wielki Inkwizytor i Pogromca Demonów** (988.5 A): miecze i topory Wojownika, tarcza i fokus zostają; od 0.3.68 hełmy i kolczugi Wojownika, a w drugiej ręce tylko tarcza, jak na portretach (991 A).
    - Każdy punkt Intelektu liczy się jako Siła. We wzroście Siła zamiast Intelektu (+4 i +4). „Rozdaj według klasy” daje Siłę.
    - Miecze i topory biją u nich Sakrum, jak kropidła (`gear.element`). Bez tego Żarliwość i Święty ogień przestałyby działać na ich ciosy. Na portretach mają młot i miecz w świętym ogniu.
    - Biją 80% (Wielki Inkwizytor) i 75% (Pogromca Demonów) swoich obrażeń, bo miecze i topory są mocniejsze od kropideł.
 8. **Noszona broń** (988.6 A):
-   - Broń i druga ręka, których forma nie używa, zmieniają się w przedmiot jej rodzaju. Dzieje się to raz, przy pierwszym wczytaniu postaci po zmianie i po każdej ewolucji w taką formę (`regearItem`).
+   - Broń i druga ręka, których forma nie używa, zmieniają się w przedmiot jej rodzaju. Dzieje się to raz, przy pierwszym wczytaniu postaci po zmianie i po każdej ewolucji w taką formę (`regearItem`). Od 0.3.68 tak samo zbroja: kaftan Nekromanty staje się szatą, komża i kapuza Inkwizytora kolczugą i hełmem, a jego fokus tarczą (991 A).
    - Nowy przedmiot ma to samo miejsce w rodzinie (ten sam poziom klasy), rzadkość, poziom, ulepszenie, kamień, zaklęcie i afiksy, a wylosowany dodatek bazy jako tę samą część jej zakresu. Sztylet staje się kosturem, mizerykordia fokusem, kropidło mieczem.
    - Rzeczy w plecaku zostają, jakie były.
    - Działa też w drugą stronę (od 0.3.65): po zmianie ewolucji u Pustelnika na formę z bronią swojej klasy (np. z Nekromanty na Królobójcę) kostur i fokus wracają do sztyletu i mizerykordii z tymi samymi cechami. Autor: „Przy ewolucji w te odmienione formy też broń i druga ręka powinny sie przekształcać automatycznie, żeby postać nie zostawała bez broni”. Przy samej ewolucji broń zmienia się od razu, już w odpowiedzi na wybór ewolucji (`test/evolution-gear.test.js`).
@@ -3378,10 +3378,11 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Do 0.3.65 plecak, Targowisko, Wymiana i Przechowalnia liczyły to po klasie sprzed ewolucji: Nekromanta widział kostur jako „nie dla Twojej klasy”, a sztylet z aktywnym „Załóż”, którego serwer odmawiał.
     - Teraz postać przychodzi z rodzajami broni, drugiej ręki i zbroi swojej formy (`gear`), a przedmiot ze swoim rodzajem (`family`), i strony porównują jedno z drugim (`classFits` w `src/client/screens/character.js`).
 13. **Kto nosi jaki przedmiot** (od 0.3.67). Autor: „niech Nekromanta czy jego dalsze ewolucje mogą nosić tylko to co Mag za broń i w ogóle tak logicznie to przemyśl żeby sie zgadzalo wszystko u każdej ewolucji i klasy”.
-    - Przegląd wszystkich klas i form. Każda forma nosi broń, drugą rękę i zbroję swojej klasy, z dwoma wyjątkami. Nekromanta i Licz noszą broń i drugą rękę Maga (kostury i fokusy, jak na portretach) i zbroję Cienia. Wielki Inkwizytor i Pogromca Demonów noszą broń Wojownika (miecze i topory; młot z portretu to topór, jak Czekan czy Nadziak), a drugą rękę i zbroję Kleryka. Strzelec Burzy i Łowca zostają przy łukach, bije nimi tylko inna statystyka.
+    - Przegląd wszystkich klas i form. Każda forma nosi broń, drugą rękę i zbroję swojej klasy, z dwoma wyjątkami. Nekromanta i Licz noszą cały ekwipunek Maga: kostury, fokusy, kaptury i szaty, jak na portretach. Wielki Inkwizytor i Pogromca Demonów noszą broń i zbroję Wojownika: miecze i topory (młot z portretu to topór, jak Czekan czy Nadziak), hełmy, kolczugi i tarcze. Zbroja jest taka od 0.3.68 (991 A); do 0.3.67 była Cienia i Kleryka. Strzelec Burzy i Łowca zostają przy łukach, bije nimi tylko inna statystyka.
     - Karty przedmiotów mówią to samo: „Dla klas: Mag, Nekromanta, Licz” przy kosturze i fokusie, „Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów” przy mieczu i toporze, a przy sztylecie i mizerykordii „Dla klasy: Cień” z drugą linią „Nie dla: Nekromanta, Licz” (przy kropidle: „Nie dla: Wielki Inkwizytor, Pogromca Demonów”). Tak samo w Encyklopedii i na liście wzorów Warsztatu (`gearWearers` w `src/engine/gear.js`).
     - Warsztat podsuwa najpierw wzór broni formy, np. Nekromancie kostur, a nie sztylet Cienia.
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
+    - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
 ## Zwój Niepamięci (989; 15.11.2026, od 0.3.64)
 
@@ -3475,6 +3476,20 @@ Autor: „Niech oznaczanie na czacie będzie możliwe też po nazwie konta”.
 1. „@” i nazwa konta oznacza postać, którą to konto teraz gra, na tych samych zasadach co imię postaci: tylko ten, kto czyta kanał, nigdy własne konto ani ktoś, kto ukrył piszącego, najwyżej 5 oznaczeń w wiadomości. Wielkość liter bez znaczenia (`src/server/mentions.js`).
 2. Postać oznaczona w jednej wiadomości i nazwą konta, i imieniem liczy się raz.
 3. Podpowiedzi pod polem wiadomości pokazują też nazwy kont piszących.
+
+## Twarz Strzelca Wyborowego (990.1 B; 15.11.2026, od 0.3.68)
+
+Autor: „twarz w portrecie męskiego Strzelca Wyborowego jest brzydka i powinna podlegac poprawkom, wyglada jakby nie miał oczu i miał zniekształconą twarz”. Autor wybrał 990.1 B.
+
+1. **Jak:** PixelLab przerysował samą twarz: brwi, oczy, nos i usta (`marksman-male-face`, maska 13 × 10 pikseli, `art/inputs/portraits/`). Opaska, włosy, podbródek i strój są co do piksela takie same. Z czterech wersji dwie miały czyste oczy; autor wybrał B. Jeden szary piksel na obrysie prawego policzka dostał kolor obrysu.
+2. **Odcienie skóry:** osiem odcieni ma nową twarz. Twarz ma ciemniejsze cienie niż reszta skóry, więc w `tools/evolution-tones.json` jest osobną grupą z własną skalą (`groups` w `tools/evolution-tones.py`). Dzięki temu poza twarzą żaden piksel odcieni się nie zmienił.
+3. **Pasek czoła:** autor zauważył na ciemnym odcieniu jasny pasek skóry pod opaską: pole skóry tego portretu zaczynało się wiersz za nisko i od początku go pomijało. Grupa twarzy obejmuje teraz czoło, cień przy uchu i cień pod brodą, a sprawdzenie wszystkich ośmiu odcieni nie znajduje na głowie żadnego koloru skóry sprzed przebarwienia.
+4. **Inne portrety:** ten sam skan znalazł podobne jasne piksele przy skórze w innych portretach (np. pasek przy obojczyku Czempiona Areny i linia na nodze Berserkerki w ciemnym odcieniu). To osobne zadanie.
+
+## Wersja 0.3.68 (15.11.2026): zbroja jak na portretach i nowa twarz Strzelca Wyborowego
+
+1. Nekromanta i Licz noszą zbroję Maga, a Wielki Inkwizytor i Pogromca Demonów zbroję i tarcze Wojownika; noszona zbroja i fokus zmieniły się same (991 A). Zob. „Ewolucje, które zmieniają broń”, punkty 2, 7, 8 i 13.
+2. Nowa twarz męskiego Strzelca Wyborowego, z ośmioma odcieniami skóry (990.1 B). Zob. „Twarz Strzelca Wyborowego”.
 
 ## Wersja 0.3.67 (15.11.2026): kto nosi jaki przedmiot, razem z ewolucjami
 

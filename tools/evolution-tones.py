@@ -12,9 +12,15 @@
 #                    is skin, the dark outline is not. "hue", "sat",
 #                    "satmax" and "val" (here or on one outline) say what
 #                    warm is, so hair, robes and fire stay out;
-#   not_boxes, not_pixels, pixels   what the rules above get wrong.
+#   not_boxes, not_pixels, pixels   what the rules above get wrong;
+#   groups           skin recoloured on its own, between its own darkest and
+#                    lightest colour (each group: a palette and boxes as
+#                    above), e.g. a face redrawn later with darker shadows
+#                    than the rest of the skin (marksman-male, 990.1 B), so
+#                    the rest keeps its colours in every tone.
 # Each skin colour keeps its place between the darkest and the lightest skin
-# colour of the portrait, on the tone's ramp from shadow to light.
+# colour of the portrait (or of its group), on the tone's ramp from shadow to
+# light.
 #
 # A portrait drawn in another skin than the plain one (the Widmo-mężczyzna's
 # grey: DECISIONS.md, "Kosmetyki i pary portretów: odpowiedzi autora
@@ -90,15 +96,23 @@ def main():
         source = os.path.join(ROOT, cfg['source']) if 'source' in cfg else os.path.join(PORTRAITS, name + '.png')
         im = Image.open(source).convert('RGBA')
         skin = skin_of(im, cfg)
-        colours = {im.getpixel(p)[:3] for p in skin}
-        low, high = min(map(lum, colours)), max(map(lum, colours))
+        groups = [skin_of(im, group) for group in cfg.get('groups', [])]
+        for group in groups:
+            skin -= group
+        # Each part of the skin with the range of its own colours.
+        parts = []
+        for pixels in [skin, *groups]:
+            colours = {im.getpixel(p)[:3] for p in pixels}
+            if colours:
+                parts.append((pixels, min(map(lum, colours)), max(map(lum, colours))))
 
         def recoloured(ramp):
             out = im.copy()
             px = out.load()
-            for x, y in skin:
-                c = px[x, y]
-                px[x, y] = (*on_ramp(ramp, (lum(c[:3]) - low) / (high - low or 1)), c[3])
+            for pixels, low, high in parts:
+                for x, y in pixels:
+                    c = px[x, y]
+                    px[x, y] = (*on_ramp(ramp, (lum(c[:3]) - low) / (high - low or 1)), c[3])
             return out
 
         for tone in tones:
@@ -107,10 +121,10 @@ def main():
             recoloured([rgb(c) for c in cfg['drawnRamp']]).save(os.path.join(PORTRAITS, name + '.png'), optimize=True)
         if mask_dir:
             view = im.copy()
-            for p in skin:
+            for p in skin.union(*groups):
                 view.putpixel(p, (255, 0, 255, 255))
             view.save(os.path.join(mask_dir, name + '-mask.png'))
-        print(name, len(skin), 'pixels')
+        print(name, len(skin) + sum(map(len, groups)), 'pixels')
 
 
 if __name__ == '__main__':
