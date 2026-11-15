@@ -816,6 +816,10 @@
     "0.3.61": {
       "title": "Version 0.3.61",
       "body": "- In the Arena and in guild wars, Intellect and Strength now strengthen the skills of those 11 evolutions too, but less than on expeditions, so the duels stay even."
+    },
+    "0.3.62": {
+      "title": "Version 0.3.62",
+      "body": "- On a computer, the chat's tabs no longer hide past the edge of the column: they wrap into more rows, so you see every conversation and the dots of new messages."
     }
   }
 }

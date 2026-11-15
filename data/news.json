@@ -1025,6 +1025,11 @@
       "id": "0.3.61",
       "title": "Wersja 0.3.61",
       "body": "- Na Arenie i w wojnach gildii Intelekt i Siła też wzmacniają umiejętności tych 11 ewolucji, ale słabiej niż na wyprawach, żeby pojedynki zostały wyrównane."
+    },
+    {
+      "id": "0.3.62",
+      "title": "Wersja 0.3.62",
+      "body": "- Na komputerze zakładki czatu nie chowają się już za brzegiem kolumny: przechodzą do kolejnych rzędów, więc widać wszystkie rozmowy i kropki nowych wiadomości."
     }
   ]
 }
