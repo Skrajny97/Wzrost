@@ -1,0 +1,14 @@
+{
+  "id": "bear-strength",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a huge brown bear paw with long sharp claws glowing with red power, raised to strike, sparks of strength around it, the illustration alone, no ground, no background, the whole of it inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02337663723988003
+  },
+  "images": 1
+}

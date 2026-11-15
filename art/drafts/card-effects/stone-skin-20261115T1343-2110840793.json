@@ -1,0 +1,14 @@
+{
+  "id": "stone-skin",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a muscular arm covered with thick grey stone plates like armour, small cracks glowing pale orange, a few pebbles falling, the illustration alone, no ground, no background, the whole of it inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023017580705642703
+  },
+  "images": 1
+}
