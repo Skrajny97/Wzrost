@@ -3377,6 +3377,11 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Zostaje pierwsze: forma nie zakłada broni, której nie używa. Karta sztyletu w plecaku Nekromanty mówi „Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.”, a „Załóż” jest wyszarzone.
     - Do 0.3.65 plecak, Targowisko, Wymiana i Przechowalnia liczyły to po klasie sprzed ewolucji: Nekromanta widział kostur jako „nie dla Twojej klasy”, a sztylet z aktywnym „Załóż”, którego serwer odmawiał.
     - Teraz postać przychodzi z rodzajami broni, drugiej ręki i zbroi swojej formy (`gear`), a przedmiot ze swoim rodzajem (`family`), i strony porównują jedno z drugim (`classFits` w `src/client/screens/character.js`).
+13. **Kto nosi jaki przedmiot** (od 0.3.67). Autor: „niech Nekromanta czy jego dalsze ewolucje mogą nosić tylko to co Mag za broń i w ogóle tak logicznie to przemyśl żeby sie zgadzalo wszystko u każdej ewolucji i klasy”.
+    - Przegląd wszystkich klas i form. Każda forma nosi broń, drugą rękę i zbroję swojej klasy, z dwoma wyjątkami. Nekromanta i Licz noszą broń i drugą rękę Maga (kostury i fokusy, jak na portretach) i zbroję Cienia. Wielki Inkwizytor i Pogromca Demonów noszą broń Wojownika (miecze i topory; młot z portretu to topór, jak Czekan czy Nadziak), a drugą rękę i zbroję Kleryka. Strzelec Burzy i Łowca zostają przy łukach, bije nimi tylko inna statystyka.
+    - Karty przedmiotów mówią to samo: „Dla klas: Mag, Nekromanta, Licz” przy kosturze i fokusie, „Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów” przy mieczu i toporze, a przy sztylecie i mizerykordii „Dla klasy: Cień” z drugą linią „Nie dla: Nekromanta, Licz” (przy kropidle: „Nie dla: Wielki Inkwizytor, Pogromca Demonów”). Tak samo w Encyklopedii i na liście wzorów Warsztatu (`gearWearers` w `src/engine/gear.js`).
+    - Warsztat podsuwa najpierw wzór broni formy, np. Nekromancie kostur, a nie sztylet Cienia.
+    - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
 
 ## Zwój Niepamięci (989; 15.11.2026, od 0.3.64)
 
@@ -3470,6 +3475,10 @@ Autor: „Niech oznaczanie na czacie będzie możliwe też po nazwie konta”.
 1. „@” i nazwa konta oznacza postać, którą to konto teraz gra, na tych samych zasadach co imię postaci: tylko ten, kto czyta kanał, nigdy własne konto ani ktoś, kto ukrył piszącego, najwyżej 5 oznaczeń w wiadomości. Wielkość liter bez znaczenia (`src/server/mentions.js`).
 2. Postać oznaczona w jednej wiadomości i nazwą konta, i imieniem liczy się raz.
 3. Podpowiedzi pod polem wiadomości pokazują też nazwy kont piszących.
+
+## Wersja 0.3.67 (15.11.2026): kto nosi jaki przedmiot, razem z ewolucjami
+
+1. Karty przedmiotów, Encyklopedia i Warsztat mówią, które klasy i ewolucje noszą dany rodzaj, a Warsztat podsuwa najpierw wzór broni formy. Zob. „Ewolucje, które zmieniają broń”, punkt 13.
 
 ## Wersja 0.3.66 (15.11.2026): przedmioty „dla Twojej klasy” według broni ewolucji
 

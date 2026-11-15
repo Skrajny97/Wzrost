@@ -69,6 +69,42 @@ export function gearLists(key, content) {
   return { weapons: gear?.weapons ?? cls.weapons, offhands: gear?.offhands ?? cls.offhands, armor: gear?.armor ?? cls.armor };
 }
 
+// Who wears a kind of gear (a base's family) beside the classes whose own
+// gear it is, for the cards (the author, 15.11.2026: „niech Nekromanta czy
+// jego dalsze ewolucje mogą nosić tylko to co Mag za broń i w ogóle tak
+// logicznie to przemyśl żeby sie zgadzalo wszystko u każdej ewolucji i
+// klasy”): `forms`, the forms that take it with their line's own gear (the
+// Mag's kostury and fokusy for the Nekromanta and the Licz), and `without`,
+// the forms of the classes whose gear it is that no longer wear it (the
+// Cień's sztylety and mizerykordie, not theirs); in the evolutions' order.
+/** @type {WeakMap<Content, Map<string, { forms: string[], without: string[] }>>} */
+const wearersCache = new WeakMap();
+/**
+ * @param {string} family
+ * @param {Content} content
+ * @returns {{ forms: string[], without: string[] }}
+ */
+export function gearWearers(family, content) {
+  let known = wearersCache.get(content);
+  if (!known) wearersCache.set(content, (known = new Map()));
+  const cached = known.get(family);
+  if (cached) return cached;
+  /** @param {{ weapons: string[], offhands: string[], armor: string[] }} lists */
+  const has = (lists) => lists.weapons.includes(family) || lists.offhands.includes(family) || lists.armor.includes(family);
+  /** @type {{ forms: string[], without: string[] }} */
+  const found = { forms: [], without: [] };
+  for (const form of content.evolutions ?? []) {
+    const key = gearKey(form.classId, form.id, content);
+    if (key === form.classId) continue;
+    const own = has(gearLists(key, content));
+    const theirs = has(gearLists(form.classId, content));
+    if (own && !theirs) found.forms.push(form.id);
+    if (theirs && !own) found.without.push(form.id);
+  }
+  known.set(family, found);
+  return found;
+}
+
 // The spread of "Rozdaj według klasy" of a gear key: its line's own, else
 // its class's.
 /**

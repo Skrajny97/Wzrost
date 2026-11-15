@@ -4,6 +4,7 @@
 
 import {
   baseClasses,
+  baseFamily,
   brewChance,
   carryLimit,
   catalystChance,
@@ -14,6 +15,7 @@ import {
   craftableBases,
   fightKind,
   gatheringMinutes,
+  gearWearers,
   gemOf,
   herbSlots,
   herbsPerHour,
@@ -456,13 +458,20 @@ function workshopView(level, row) {
             if (from > level && !taught) return { id: base.id, level: from, hidden: true, hint: hint(from) };
             const one = craftCost(base, 'common', 1, row.level, content());
             const classIds = baseClasses(base.id, content());
+            const wearers = classIds ? gearWearers(baseFamily(base), content()) : null;
             return {
               id: base.id,
               name: base.name,
+              // Its kind, for the pattern the character's own gear takes
+              // first (988: a Nekromanta's kostur), and the forms that wear
+              // it beside its classes.
+              family: baseFamily(base),
+              classIds,
               level: from,
               parts: Object.values(one.parts)[0],
               resources: Object.entries(one.resources).map(([id, amount]) => ({ id, name: content().resourcesById[id].name, amount })),
               classNames: classIds && classIds.map((id) => content().classesById[id].name),
+              ...(wearers?.forms.length ? { formNames: wearers.forms.map((id) => content().evolutionsById[id].name) } : {}),
               classLevel: base.classLevel ?? null,
               ...(taught && { learned: true }),
             };

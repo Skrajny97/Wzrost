@@ -10,7 +10,7 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 
-import { autoDistribute, autoPointsOf, canUse, computeStats, createRng, gearKey, gearLists, generateItem, playerCombatant, randomItem, regearItem, upgradedItem } from '../src/engine/index.js';
+import { autoDistribute, autoPointsOf, canUse, computeStats, createRng, gearKey, gearLists, gearWearers, generateItem, itemView, playerCombatant, randomItem, regearItem, upgradedItem } from '../src/engine/index.js';
 import { playerOf } from '../tools/difficulty-sim.mjs';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -85,6 +85,37 @@ describe('Ewolucje, które zmieniają broń (988)', () => {
     const held = upgradedItem(equipped.find((item) => item.slot === 'weapon'), content);
     assert.equal(necromancer.weaponDamage, 0.8);
     assert.deepEqual([unit.weapon.min, unit.weapon.max], [Math.round(held.damage.min * 0.8), Math.round(held.damage.max * 0.8)]);
+  });
+});
+
+describe('Kto nosi jaką broń (988; the author, 15.11.2026: „tak logicznie to przemyśl żeby sie zgadzalo wszystko u każdej ewolucji i klasy”)', () => {
+  test('every form wears its class\'s gear but the Nekromanta and the Licz, with the Mag\'s weapons and off-hands, and the Wielki Inkwizytor and the Pogromca Demonów, with the Wojownik\'s weapons', () => {
+    const mage = content.classesById.mage;
+    const warrior = content.classesById.warrior;
+    for (const form of content.evolutions) {
+      const lists = gearLists(gearKey(form.classId, form.id, content), content);
+      const own = content.classesById[form.classId];
+      if (['necromancer', 'lich'].includes(form.id)) assert.deepEqual(lists, { weapons: mage.weapons, offhands: mage.offhands, armor: own.armor }, form.id);
+      else if (['grand-inquisitor', 'demon-slayer'].includes(form.id)) assert.deepEqual(lists, { weapons: warrior.weapons, offhands: own.offhands, armor: own.armor }, form.id);
+      else assert.deepEqual(lists, { weapons: own.weapons, offhands: own.offhands, armor: own.armor }, form.id);
+    }
+  });
+
+  test('who else wears a kind, and who of its classes does not: on the cards, in the Warsztat and the Encyklopedia', () => {
+    assert.deepEqual(gearWearers('staff', content), { forms: ['necromancer', 'lich'], without: [] });
+    assert.deepEqual(gearWearers('focus', content), { forms: ['necromancer', 'lich'], without: [] });
+    assert.deepEqual(gearWearers('dagger', content), { forms: [], without: ['necromancer', 'lich'] });
+    assert.deepEqual(gearWearers('misericorde', content), { forms: [], without: ['necromancer', 'lich'] });
+    assert.deepEqual(gearWearers('sword', content), { forms: ['grand-inquisitor', 'demon-slayer'], without: [] });
+    assert.deepEqual(gearWearers('aspergillum', content), { forms: [], without: ['grand-inquisitor', 'demon-slayer'] });
+    for (const family of ['shield', 'bow', 'quiver', 'tunic', 'robe', 'hood']) assert.deepEqual(gearWearers(family, content), { forms: [], without: [] }, family);
+    const card = (baseId) => itemView(generateItem({ baseId, level: 30 }, createRng(baseId), content), content);
+    const staff = card('staff');
+    assert.deepEqual([staff.family, staff.classNames, staff.formNames, staff.exceptNames], ['staff', ['Mag'], ['Nekromanta', 'Licz'], undefined]);
+    const dagger = card('dagger');
+    assert.deepEqual([dagger.family, dagger.classNames, dagger.formNames, dagger.exceptNames], ['dagger', ['Cień'], undefined, ['Nekromanta', 'Licz']]);
+    const ring = card('ring');
+    assert.deepEqual([ring.classIds, ring.formNames, ring.exceptNames], [null, undefined, undefined]);
   });
 });
 

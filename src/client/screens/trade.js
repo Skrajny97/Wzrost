@@ -21,7 +21,7 @@ import { narratorIdle } from '../narrator.js';
 import { playSound } from '../sound.js';
 import { call, serverNow, state, walletEntries } from '../state.js';
 import { closeSheet, confirmAction, openSheet, pageHeading, toast, withButton } from '../ui.js';
-import { classFits, gemFold, itemSummary, itemTitle, materialTitle, propertyLines } from './character.js';
+import { classFits, classLines, gemFold, itemSummary, itemTitle, materialTitle, propertyLines } from './character.js';
 
 const HASH = '#/wymiana';
 const EVERY_MS = 2000;
@@ -300,11 +300,7 @@ export function mountTrade(container, { backHash }) {
           // with a gem, each number without it and with it (906 B).
           propertyLines(item),
           item.gem && gemFold(item.gem),
-          item.classNames &&
-            h('li', {
-              class: 'item-classes',
-              text: item.classNames.length > 1 ? t('Dla klas: {classes}', { classes: item.classNames.join(', ') }) : t('Dla klasy: {classes}', { classes: item.classNames.join(', ') }),
-            }),
+          classLines(item),
           item.price !== undefined && h('li', { class: 'item-price', text: t('U złomiarza: {gold} złota', { gold: formatNumber(item.price) }) }),
         ),
       ),

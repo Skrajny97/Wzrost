@@ -21,7 +21,7 @@ import { t } from './i18n.js';
 import { SLOT_ICONS } from './icons.js';
 import { call, isUnlocked, state } from './state.js';
 import { closeSheet, confirmAction, framedName, guildTag, openSheet, toast, withButton } from './ui.js';
-import { gemFold, itemSummary, propertyLines } from './screens/character.js';
+import { classLines, gemFold, itemSummary, propertyLines } from './screens/character.js';
 import { proposeTrade } from './screens/trade.js';
 import { duelButton } from './card-duel.js';
 
@@ -70,7 +70,7 @@ export async function openProfile(name, { onChange, mention } = {}) {
                   // card: with a gem, each number without it and with it.
                   propertyLines(item),
                   item.gem && gemFold(item.gem),
-                  item.classNames && h('li', { class: 'item-classes', text: t(item.classNames.length > 1 ? 'Dla klas: {classes}' : 'Dla klasy: {classes}', { classes: item.classNames.join(', ') }) }),
+                  classLines(item),
                 ),
               )
             : h('p', { class: 'profile-empty' }, icon(SLOT_ICONS[slot] ?? 'unknown', { size: 20 }), h('span', { text: t('{slot}: pusto', { slot: slotName }) })),

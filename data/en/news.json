@@ -836,6 +836,10 @@
     "0.3.66": {
       "title": "Version 0.3.66",
       "body": "- The Necromancer, the Lich, the Grand Inquisitor and the Demon Slayer see in the Bag, on the Marketplace, in a Trade and in the Storeroom what they can wear. Staves and foci, and swords and axes for the Inquisitors, are theirs. Daggers and aspergilla say their class cannot use them. Before, the page went by the class from before the evolution."
+    },
+    "0.3.67": {
+      "title": "Version 0.3.67",
+      "body": "- Item cards say who wears them, evolutions included. A staff says “Classes: Mage, Necromancer, Lich”, and a dagger “Class: Shadow” and “Not for: Necromancer, Lich”. The same in the Encyclopedia.\n- The Workshop first offers a pattern of the weapon your evolution wears, e.g. a staff for a Necromancer."
     }
   }
 }

@@ -80,6 +80,9 @@
     "itemAnyClass": [
       "For every class."
     ],
+    "itemNotFor": [
+      "Not for: {classes}."
+    ],
     "itemOtherClasses": [
       "Other classes' items drop from character level {level}."
     ],

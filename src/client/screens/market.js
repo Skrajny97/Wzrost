@@ -23,7 +23,7 @@ import { countOf, dateTimeFormat, formatDecimal, formatNumber, tradePace } from 
 import { t } from '../i18n.js';
 import { call, serverNow, state } from '../state.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, systemPanel, toast, withButton } from '../ui.js';
-import { classFits, compareTable, gemFold, itemSummary, propertyLines } from './character.js';
+import { classFits, classLines, compareTable, gemFold, itemSummary, propertyLines } from './character.js';
 
 // The tabs and the names of kinds and reasons below are Polish, shown
 // through t(). The Rejestr of the character's trade (the author,
@@ -230,11 +230,7 @@ export function itemEntry(item, key, opened, { notes: noted = true, wearers = nu
         // a gem, each number without it and with it (906 B).
         propertyLines(item),
         item.gem && gemFold(item.gem),
-        item.classNames &&
-          h('li', {
-            class: 'item-classes',
-            text: item.classNames.length > 1 ? t('Dla klas: {classes}', { classes: item.classNames.join(', ') }) : t('Dla klasy: {classes}', { classes: item.classNames.join(', ') }),
-          }),
+        classLines(item),
         // Raised by the Kowal, once per item: a buyer sees it before buying
         // (the author, 12.11.2026).
         item.raised && h('li', { class: 'item-classes', text: t('Kowal już przekuł go na wyższą rzadkość: drugi raz się nie da.') }),
