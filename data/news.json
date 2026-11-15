@@ -1030,6 +1030,11 @@
       "id": "0.3.62",
       "title": "Wersja 0.3.62",
       "body": "- Na komputerze zakładki czatu nie chowają się już za brzegiem kolumny: przechodzą do kolejnych rzędów, więc widać wszystkie rozmowy i kropki nowych wiadomości."
+    },
+    {
+      "id": "0.3.63",
+      "title": "Wersja 0.3.63",
+      "body": "- Talia Systemu: karty efektów. Stoją obok 12 stworów talii, w dwóch miejscach, a w partii wzmacniają Twoje karty albo osłabiają karty rywala: najwyżej jedna na rundę, każda raz na partię. Wybierzesz je w „Ułóż talię”, w zakładce „Karty efektów”.\n- Zdobędziesz je z pakietów u Szczęsnego, za pierwszą wygraną o stawkę na każdym jego stopniu (także na już pokonanym), a rzadko także z wypraw i od strażników Labiryntu.\n- Szczęsny od III stopnia, większość mieszkańców Osady i talie broniące się na Arenie też nimi grają. Kartę efektu rywala widzisz przed swoim ruchem."
     }
   ]
 }
