@@ -46,14 +46,17 @@ import { say } from './text.js';
 /** @typedef {import('./rng.js').Rng} Rng */
 /** @typedef {'me' | 'foe'} Seat A side of a match: the player, or its rival. */
 /** @typedef {{ level: number, area: string, land: number, landName: string, regionId: string }} Home A creature's first home: the lowest place it lives in (its level and id, whose picture is the card's background), and its land (0 for the first). */
-/** @typedef {{ key: number, id: string, level: number, type: string, attack: number, life: number, max: number, shifted?: true }} MatchCard A card in a match: its place in its deck (`key`), creature, level, type (a Mag's skill may change it), Atak, Życie left and full. */
+/** @typedef {{ key: number, id: string, level: number, type: string, attack: number, life: number, max: number, shifted?: true, cursed?: number }} MatchCard A card in a match: its place in its deck (`key`), creature, level, type (a Mag's skill may change it), Atak, Życie left and full, and the share its blows are weaker by for the rest of the match (Klątwa słabości). */
+/** @typedef {{ key: number, id: string, level: number, used: boolean }} EffectCard A side's effect card in a match (976, 977): its place among the side's effects, its id and level, and whether it is played. */
+/** @typedef {{ key: number, target?: number }} EffectUse An effect card played in a round: its key, and the side's own card it works on (target own: the card's key) or the other side's line (target rival). */
+/** @typedef {EffectUse & { id: string, kind: string, power: number, misses?: number }} EffectLog An effect card as a round's account tells it: its id, kind and strength, and how many blows Mgła made miss. */
 /** @typedef {{ classId: string, stage: number, used: boolean }} Hero A side's hero: its class, its evolution's stage (0 for none) and whether its skill is used. */
 /** @typedef {{ card: number, target?: number, type?: string, swap?: number }} SkillUse A hero's skill as a turn uses it: the player's card it works on, and the rival's line aimed at (aim), the new type (shift) or the reserve's card swapped in (swap). */
 /** @typedef {SkillUse & { kind: string }} RivalPlan The rival's hero's skill in this round (rivalSkill, 900 A): its kind, the rival's card it works on, and the player's line aimed at (aim), the new type (shift) or the reserve's card swapped in (swap). */
-/** @typedef {{ cards: MatchCard[], deck: number[], hand: number[], lines: (number | null)[], out: number[], hero: Hero | null, smart: number, plan?: RivalPlan }} Side A side of a match: its cards, those still in its deck (in draw order), in its reserve, on its three lines, and beaten; the rival's hero's skill of this round. */
-/** @typedef {{ round: number, lines: (number | null)[], skill?: SkillUse | null }} Turn The player's turn: the round it is for, its cards on its three lines after it, and its hero's skill. */
-/** @typedef {{ side: Seat, line: number, key: number, target: { line: number, key: number }, damage: number, advantage: boolean, boosted: boolean }} Hit A card's blow in a round. */
-/** @typedef {{ round: number, hits: Hit[], beaten: { me: number[], foe: number[] }, revived: number | null, skill: (SkillUse & { kind: string }) | null, placed: number[], rivalSkill?: RivalPlan, rivalRevived?: number | null }} RoundLog What a round did: its blows, the cards beaten, the card a Kleryk brought back, the skill used and the rival's lines filled for the next round; the rival's hero's skill used in it and the card its Wskrzeszenie brought back. */
+/** @typedef {{ cards: MatchCard[], deck: number[], hand: number[], lines: (number | null)[], out: number[], hero: Hero | null, smart: number, plan?: RivalPlan, effects?: EffectCard[], effectPlan?: EffectUse | null }} Side A side of a match: its cards, those still in its deck (in draw order), in its reserve, on its three lines, and beaten; the rival's hero's skill of this round; its effect cards and the rival's effect card of this round. */
+/** @typedef {{ round: number, lines: (number | null)[], skill?: SkillUse | null, effect?: EffectUse | null }} Turn The player's turn: the round it is for, its cards on its three lines after it, its hero's skill and its effect card. */
+/** @typedef {{ side: Seat, line: number, key: number, target: { line: number, key: number }, damage: number, advantage: boolean, boosted: boolean, missed?: true }} Hit A card's blow in a round (`missed`: lost in Mgła). */
+/** @typedef {{ round: number, hits: Hit[], beaten: { me: number[], foe: number[] }, revived: number | null, skill: (SkillUse & { kind: string }) | null, placed: number[], rivalSkill?: RivalPlan, rivalRevived?: number | null, effect?: EffectLog | null, rivalEffect?: EffectLog | null }} RoundLog What a round did: its blows, the cards beaten, the card a Kleryk brought back, the skill used and the rival's lines filled for the next round; the rival's hero's skill used in it and the card its Wskrzeszenie brought back. */
 /**
  * A match as the server keeps it: its seed (never shown), the round to be
  * played, the two sides, the last round's account, the result once it is
@@ -576,6 +579,280 @@ export function heroSkill(classId, stage, content) {
 export const cardBlow = (card, target, extra, content) =>
   Math.max(1, Math.round(card.attack * (1 + (typeBeats(card.type, target.type, content) ? cardRules(content).typeBonus : 0)) * (1 + extra)));
 
+// --- Karty efektów (976, 977) ------------------------------------------------
+
+// The effect cards' rules (cards.json effects), or null where the data has none.
+/** @param {Content} content */
+export const effectRules = (content) => cardRules(content).effects ?? null;
+
+// An effect card's rule by its id, or null.
+/**
+ * @param {string} id
+ * @param {Content} content
+ * @returns {Record<string, any> | null}
+ */
+export const effectById = (id, content) => effectRules(content)?.cards.find((/** @type {{ id: string }} */ one) => one.id === id) ?? null;
+
+/**
+ * @param {unknown} id
+ * @param {Content} content
+ */
+export const isEffect = (id, content) => typeof id === 'string' && effectById(id, content) !== null;
+
+// An effect card's strength at a level: its power and perLevel for each
+// level over the first, never over `most` (Pęta: 100% at the 5th level).
+/**
+ * @param {string} id
+ * @param {number} level
+ * @param {Content} content
+ */
+export function effectPower(id, level, content) {
+  const effect = effectById(id, content);
+  if (!effect) return 0;
+  return Math.min(effect.most ?? 1, Math.round((effect.power + effect.perLevel * (cardLevel(level, content) - 1)) * 1000) / 1000);
+}
+
+// An effect card as the page shows it: its name, kind, target, rarity with
+// its colour and form for a card, level, strength and words with it.
+/**
+ * @param {string} id
+ * @param {number} level
+ * @param {Content} content
+ * @param {Record<string, any>} [extra]
+ */
+export function effectView(id, level, content, extra = {}) {
+  const effect = /** @type {Record<string, any>} */ (effectById(id, content));
+  const rarity = content.raritiesById[effect.rarity];
+  const power = effectPower(id, level, content);
+  return {
+    id,
+    effect: true,
+    name: effect.name,
+    kind: effect.kind,
+    target: effect.target,
+    rarity: rarity.id,
+    rarityName: rarity.forms?.f ?? rarity.name,
+    color: rarity.color,
+    level: cardLevel(level, content),
+    power,
+    short: effect.short.replace('{power}', String(Math.round(power * 100))),
+    text: effect.text.replace('{power}', String(Math.round(power * 100))),
+    ...extra,
+  };
+}
+
+// Why a deck's effect cards cannot be saved, or null: at most `slots` of
+// them, each once, each an effect card the character has (`owned`, the ids).
+/**
+ * @param {unknown} ids
+ * @param {Iterable<string>} owned
+ * @param {Content} content
+ * @returns {{ code: string, message: string } | null}
+ */
+export function effectDeckBlock(ids, owned, content) {
+  const rules = effectRules(content);
+  if (ids === undefined || ids === null) return null;
+  if (!Array.isArray(ids) || !rules || ids.length > rules.slots || ids.some((id) => !isEffect(id, content)) || new Set(ids).size !== ids.length) {
+    return { code: 'invalid_effects', message: 'Za dużo kart efektów w talii albo dwie takie same.' };
+  }
+  const mine = new Set(owned);
+  if (ids.some((id) => !mine.has(id))) return { code: 'effect_missing', message: 'Nie masz tej karty efektu.' };
+  return null;
+}
+
+// An effect card of a rarity for the character (first wins on Szczęsny's
+// tiers, 977.3 B): one it has not got first, never one at its top level, of
+// the rarity asked; null when none is left.
+/**
+ * @param {string} rarity
+ * @param {{ owned: Iterable<string>, maxed: Iterable<string> }} have
+ * @param {string} seed
+ * @param {Content} content
+ * @returns {string | null}
+ */
+export function effectOfRarity(rarity, { owned, maxed }, seed, content) {
+  const pool = (effectRules(content)?.cards ?? []).filter((/** @type {{ rarity: string }} */ one) => one.rarity === rarity).map((/** @type {{ id: string }} */ one) => one.id);
+  return pickCard(pool, createRng(`${seed}:effect`), { owned, maxed });
+}
+
+// An effect card drawn by `rng` with the chance `chance`: one of a rarity
+// drawn by the effects' weights, then one of that rarity, all alike; never
+// one at its top level (`maxed`). Null for none.
+/**
+ * @param {{ next: () => number }} rng
+ * @param {number} chance
+ * @param {Iterable<string>} maxed
+ * @param {Record<string, any>} rules
+ * @returns {string | null}
+ */
+function drawEffect(rng, chance, maxed, rules) {
+  const comes = rng.next() < chance;
+  const rarityRoll = rng.next();
+  const cardRoll = rng.next();
+  if (!comes) return null;
+  const out = new Set(maxed);
+  const left = (/** @type {string} */ rarity) => rules.cards.filter((/** @type {{ id: string, rarity: string }} */ one) => one.rarity === rarity && !out.has(one.id)).map((/** @type {{ id: string }} */ one) => one.id);
+  const open = Object.keys(rules.weights).filter((rarity) => rules.weights[rarity] > 0 && left(rarity).length > 0);
+  if (open.length === 0) return null;
+  const total = open.reduce((sum, rarity) => sum + rules.weights[rarity], 0);
+  let mark = rarityRoll * total;
+  const rarity = open.find((one) => (mark -= rules.weights[one]) < 0) ?? /** @type {string} */ (open.at(-1));
+  const pool = left(rarity);
+  return pool[Math.min(pool.length - 1, Math.floor(cardRoll * pool.length))];
+}
+
+// An effect card in the day's pack (977.3 B), with the chance packChance
+// (drawEffect). Null for none.
+/**
+ * @param {{ maxed: Iterable<string>, seed: string }} draw
+ * @param {Content} content
+ * @returns {string | null}
+ */
+export function packEffect({ maxed, seed }, content) {
+  const rules = effectRules(content);
+  if (!rules) return null;
+  return drawEffect(createRng(`${seed}:pack-effect`), rules.packChance, maxed, rules);
+}
+
+// A rare effect card of an exploration or of a Labyrinth guardian beaten
+// (977.3 B), with the chance `chance` (effects.drops; drawEffect). Null for
+// none.
+/**
+ * @param {{ maxed: Iterable<string>, seed: string, chance: number }} draw
+ * @param {Content} content
+ * @returns {string | null}
+ */
+export function effectDrop({ maxed, seed, chance }, content) {
+  const rules = effectRules(content);
+  if (!rules || !(chance > 0)) return null;
+  return drawEffect(createRng(`${seed}:effect-drop`), Math.min(1, chance), maxed, rules);
+}
+
+// What a side's effect card of the round does to the blows (roundHits):
+// its own cards' blows stronger (boost: one card, rally: all), its own
+// cards' blows taken weaker (shield), the other side's card's blows weaker
+// (bind) and the other side's blows at its cards missing (mist, a chance).
+// Heal, bolt and curse work on the cards themselves (applyEffect).
+/**
+ * @param {Side} side
+ * @param {EffectUse | null | undefined} use
+ * @param {Side} other
+ * @param {Content} content
+ * @returns {{ boost: Record<number, number>, rally: number, guard: Record<number, number>, bind: Record<number, number>, mist: number }}
+ */
+function effectMods(side, use, other, content) {
+  /** @type {{ boost: Record<number, number>, rally: number, guard: Record<number, number>, bind: Record<number, number>, mist: number }} */
+  const mods = { boost: {}, rally: 0, guard: {}, bind: {}, mist: 0 };
+  const played = use ? (side.effects ?? []).find((one) => one.key === use.key) : null;
+  const effect = played ? effectById(played.id, content) : null;
+  if (!played || !effect) return mods;
+  const power = effectPower(played.id, played.level, content);
+  if (effect.kind === 'boost' && Number.isInteger(use?.target)) mods.boost[/** @type {number} */ (use?.target)] = power;
+  if (effect.kind === 'shield' && Number.isInteger(use?.target)) mods.guard[/** @type {number} */ (use?.target)] = power;
+  if (effect.kind === 'rally') mods.rally = power;
+  if (effect.kind === 'mist') mods.mist = power;
+  if (effect.kind === 'bind' && Number.isInteger(use?.target)) {
+    const key = other.lines[/** @type {number} */ (use?.target)];
+    if (key !== null && key !== undefined) mods.bind[key] = power;
+  }
+  return mods;
+}
+
+// A side's effect card played on the cards themselves, at the start of the
+// round, before its blows: Żywa woda heals its card, Piorun Peruna takes a
+// share of the other side's card's Życie (never all of it), Klątwa słabości
+// weakens it for the rest of the match. The card is played: `used`.
+// Returns the round's account of it, or null.
+/**
+ * @param {Side} side
+ * @param {EffectUse | null | undefined} use
+ * @param {Side} other
+ * @param {Content} content
+ * @returns {EffectLog | null}
+ */
+function applyEffect(side, use, other, content) {
+  const played = use ? (side.effects ?? []).find((one) => one.key === use.key && !one.used) : null;
+  const effect = played ? effectById(played.id, content) : null;
+  if (!use || !played || !effect) return null;
+  played.used = true;
+  const power = effectPower(played.id, played.level, content);
+  const rivalCard = effect.target === 'rival' && Number.isInteger(use.target) ? other.lines[/** @type {number} */ (use.target)] : null;
+  if (effect.kind === 'heal' && Number.isInteger(use.target)) {
+    const card = side.cards[/** @type {number} */ (use.target)];
+    if (card) card.life = Math.min(card.max, card.life + Math.max(1, Math.round(card.max * power)));
+  }
+  if (effect.kind === 'bolt' && rivalCard !== null && rivalCard !== undefined) {
+    const card = other.cards[rivalCard];
+    card.life = Math.max(1, card.life - Math.max(1, Math.round(card.life * power)));
+  }
+  if (effect.kind === 'curse' && rivalCard !== null && rivalCard !== undefined) {
+    const card = other.cards[rivalCard];
+    card.cursed = Math.max(card.cursed ?? 0, power);
+  }
+  return { key: use.key, ...(use.target !== undefined && { target: use.target }), id: played.id, kind: effect.kind, power };
+}
+
+// The rival's effect card for the round (977.4 A), chosen once its cards are
+// laid, so the player sees it before answering: of its effect cards not
+// played, the one and its target that most change the round as it stands
+// against the player's cards on the table, the Życie taken on each side
+// and a card beaten worth twice its Atak more, as autoTurn counts it; none
+// unless it gains at least a tenth of the rival's Atak on the table, so it
+// keeps its cards for a round that needs them. Mgła counts the blows it
+// takes off by its chance. Null for none.
+/**
+ * @param {Match} match
+ * @param {Content} content
+ * @returns {EffectUse | null}
+ */
+export function rivalEffect(match, content) {
+  const { foe, me } = match;
+  const left = (foe.effects ?? []).filter((one) => !one.used);
+  if (left.length === 0 || me.lines.every((key) => key === null)) return null;
+  // The round as it stands for the rival, its effect applied to a copy.
+  /** @param {EffectUse | null} use */
+  const score = (use) => {
+    const trial = clone(match);
+    trial.foe.effectPlan = use;
+    if (use) applyEffect(trial.foe, use, trial.me, content);
+    const mist = use ? effectMods(trial.foe, use, trial.me, content).mist : 0;
+    // What a heal or a bolt did before the blows.
+    let total = lifeLeft(trial.foe) - lifeLeft(match.foe) + (lifeLeft(match.me) - lifeLeft(trial.me));
+    for (const hit of roundHits(trial, content)) {
+      const side = trial[hit.side === 'me' ? 'foe' : 'me'];
+      const target = side.cards[hit.target.key];
+      const damage = hit.side === 'me' ? hit.damage * (1 - mist) : hit.damage;
+      const dealt = Math.min(damage, target.life);
+      const sign = hit.side === 'foe' ? 1 : -1;
+      total += sign * (dealt + (dealt >= target.life ? 2 * target.attack : 0));
+      target.life -= dealt;
+    }
+    return total;
+  };
+  const base = score(null);
+  const attack = foe.lines.filter((key) => key !== null).reduce((sum, key) => sum + foe.cards[/** @type {number} */ (key)].attack, 0);
+  /** @type {EffectUse | null} */
+  let best = null;
+  let bestGain = Math.max(1, attack * 0.1);
+  for (const played of left) {
+    const effect = effectById(played.id, content);
+    if (!effect) continue;
+    /** @type {(number | undefined)[]} */
+    const targets =
+      effect.target === 'own' ? foe.lines.filter((key) => key !== null).map((key) => /** @type {number} */ (key)) : effect.target === 'rival' ? [0, 1, 2].filter((line) => me.lines[line] !== null) : [undefined];
+    for (const target of targets) {
+      /** @type {EffectUse} */
+      const use = target === undefined ? { key: played.key } : { key: played.key, target };
+      const gain = score(use) - base;
+      if (gain > bestGain) {
+        bestGain = gain;
+        best = use;
+      }
+    }
+  }
+  return best;
+}
+
 // The rival's hero, where it has one (the Arena's players' decks, played by
 // the server for an absent player with its hero card, 900 A; Szczęsny has
 // none): its skill once a match, chosen at the start of a round once the
@@ -702,6 +979,8 @@ function rivalMods(match, content) {
 function rivalRound(match, content) {
   const placed = rivalSetup(match, content);
   const laid = rivalSkill(match, content);
+  // Its effect card of the round, once its cards stand (977.4 A).
+  match.foe.effectPlan = rivalEffect(match, content);
   return laid === null || placed.includes(laid) ? placed : [...placed, laid].sort((a, b) => a - b);
 }
 
@@ -824,14 +1103,14 @@ function rivalSetup(match, content) {
 // deck that defends on the Arena (915 B, card-arena.js), as the page
 // shows its cards.
 /**
- * @param {{ seed: string, me: { cards: { id: string, level: number }[], hero?: { classId: string, stage: number } | null, boost?: number }, foe: { cards: { id: string, level: number }[], hero?: { classId: string, stage: number } | null, smart?: number, boost?: number } }} setup
+ * @param {{ seed: string, me: { cards: { id: string, level: number }[], hero?: { classId: string, stage: number } | null, boost?: number, effects?: { id: string, level: number }[] }, foe: { cards: { id: string, level: number }[], hero?: { classId: string, stage: number } | null, smart?: number, boost?: number, effects?: { id: string, level: number }[] } }} setup
  * @param {Content} content
  * @returns {Match}
  */
 export function newMatch({ seed, me, foe }, content) {
   /**
    * @param {Seat} who
-   * @param {{ cards: { id: string, level: number }[], hero?: { classId: string, stage: number } | null, smart?: number, boost?: number }} spec
+   * @param {{ cards: { id: string, level: number }[], hero?: { classId: string, stage: number } | null, smart?: number, boost?: number, effects?: { id: string, level: number }[] }} spec
    * @returns {Side}
    */
   const side = (who, spec) => {
@@ -851,6 +1130,11 @@ export function newMatch({ seed, me, foe }, content) {
       out: [],
       hero: spec.hero ? { classId: spec.hero.classId, stage: spec.hero.stage, used: false } : null,
       smart: spec.smart ?? 0,
+      // Its effect cards (976, 977), at most the deck's slots, each once.
+      effects: (spec.effects ?? [])
+        .filter((one) => isEffect(one.id, content))
+        .slice(0, effectRules(content)?.slots ?? 0)
+        .map((one, key) => ({ key, id: one.id, level: cardLevel(one.level, content), used: false })),
     };
   };
   /** @type {Match} */
@@ -935,6 +1219,20 @@ export function turnBlock(match, turn, content) {
   if (lines.filter((key, line) => me.lines[line] === null && key !== null).length < Math.min(empty, reserve)) {
     return { code: 'lines_empty', message: 'Dołóż karty z rezerwy na puste linie.' };
   }
+  // The effect card (976, 977): one of the side's not played, on its own
+  // card standing on a line after the turn, or on the rival's card on a
+  // line, as its target asks.
+  const effect = asked.effect ?? null;
+  if (effect !== null) {
+    const owned = typeof effect === 'object' ? (me.effects ?? []).find((one) => one.key === effect.key) : null;
+    const rule = owned ? effectById(owned.id, content) : null;
+    if (!owned || !rule) return { code: 'invalid_effect', message: 'Nie masz takiej karty efektu.' };
+    if (owned.used) return { code: 'effect_used', message: 'Ta karta efektu jest już zagrana.' };
+    if (rule.target === 'own' && !(Number.isInteger(effect.target) && lines.includes(effect.target))) return { code: 'invalid_effect', message: 'Wskaż swoją kartę, która stoi w linii.' };
+    if (rule.target === 'rival' && !(Number.isInteger(effect.target) && LINES.includes(effect.target) && foe.lines[effect.target] !== null)) {
+      return { code: 'invalid_effect', message: 'Wskaż kartę rywala, która stoi w linii.' };
+    }
+  }
   if (skill !== null && hero) {
     const where = lines.indexOf(skill.card);
     if (hero.kind !== 'swap' && where < 0) return { code: 'invalid_skill', message: 'Wybierz kartę, która stoi w linii.' };
@@ -958,12 +1256,15 @@ export function turnBlock(match, turn, content) {
 /**
  * @param {Match} match
  * @param {Content} content
- * @param {{ boost?: Record<number, number>, aim?: { key: number, line: number } | null }} [mods]
+ * @param {{ boost?: Record<number, number>, aim?: { key: number, line: number } | null, effect?: EffectUse | null }} [mods]
  * @returns {Hit[]}
  */
-export function roundHits(match, content, { boost = {}, aim = null } = {}) {
+export function roundHits(match, content, { boost = {}, aim = null, effect = null } = {}) {
   // The rival's hero's skill of this round (900 A), as the player's.
   const rival = rivalMods(match, content);
+  // The effect cards of the round (976, 977): the player's as given, the
+  // rival's as it chose (rivalEffect).
+  const played = { me: effectMods(match.me, effect, match.foe, content), foe: effectMods(match.foe, match.foe.effectPlan, match.me, content) };
   /** @type {Hit[]} */
   const hits = [];
   for (const who of /** @type {Seat[]} */ (['me', 'foe'])) {
@@ -978,8 +1279,13 @@ export function roundHits(match, content, { boost = {}, aim = null } = {}) {
       if (at === null) continue;
       const target = /** @type {MatchCard} */ (onLine(other, at));
       const advantage = typeBeats(card.type, target.type, content);
-      const extra = mods.boost[card.key] ?? 0;
-      const damage = cardBlow(card, target, extra, content);
+      const mine = played[who];
+      const theirs = played[who === 'me' ? 'foe' : 'me'];
+      const extra = (mods.boost[card.key] ?? 0) + (mine.boost[card.key] ?? 0) + mine.rally;
+      // Weaker by a curse on the card, by the other side's Pęta on it and by
+      // the other side's Kamienna skóra on its target.
+      const cut = 1 - (1 - (card.cursed ?? 0)) * (1 - (theirs.bind[card.key] ?? 0)) * (1 - (theirs.guard[target.key] ?? 0));
+      const damage = cut >= 1 ? 0 : cut > 0 ? Math.max(1, Math.round(cardBlow(card, target, extra, content) * (1 - cut))) : cardBlow(card, target, extra, content);
       hits.push({ side: who, line, key: card.key, target: { line: at, key: target.key }, damage, advantage, boosted: extra > 0 || aimed !== null });
     }
   }
@@ -1026,7 +1332,26 @@ export function playTurn(current, turn, content) {
     if (hero.kind === 'swap' && hero.power > 0) boost[/** @type {number} */ (skill.swap)] = hero.power;
     if (hero.kind === 'revive') revive = skill.card;
   }
-  const hits = roundHits(match, content, { boost, aim });
+  // The effect cards of the round (976, 977), the player's and the
+  // rival's: what works on the cards themselves first (applyEffect), the
+  // rest in the blows (roundHits), and Mgła's misses from the match's seed.
+  const effect = turn.effect ?? null;
+  const rivalUse = foe.effectPlan ?? null;
+  const myEffect = applyEffect(me, effect, foe, content);
+  const theirEffect = applyEffect(foe, rivalUse, me, content);
+  const hits = roundHits(match, content, { boost, aim, effect: myEffect ? effect : null });
+  const mist = { me: effectMods(me, myEffect ? effect : null, foe, content).mist, foe: effectMods(foe, theirEffect ? rivalUse : null, me, content).mist };
+  const misses = createRng(`${match.seed}:mist:${match.round}`);
+  for (const hit of hits) {
+    // A blow at a side whose Mgła is on.
+    const shrouded = mist[hit.side === 'me' ? 'foe' : 'me'];
+    if (shrouded > 0 && misses.next() < shrouded) {
+      hit.damage = 0;
+      hit.missed = true;
+      const log = hit.side === 'me' ? theirEffect : myEffect;
+      if (log) log.misses = (log.misses ?? 0) + 1;
+    }
+  }
   for (const hit of hits) {
     const side = match[hit.side === 'me' ? 'foe' : 'me'];
     const card = side.cards[hit.target.key];
@@ -1060,8 +1385,19 @@ export function playTurn(current, turn, content) {
       beaten[who].push(card.key);
     }
   }
-  match.last = { round: match.round, hits, beaten, revived, skill: hero && skill ? { ...skill, kind: hero.kind } : null, placed: [], ...(rivalPlan && { rivalSkill: rivalPlan, rivalRevived }) };
+  match.last = {
+    round: match.round,
+    hits,
+    beaten,
+    revived,
+    skill: hero && skill ? { ...skill, kind: hero.kind } : null,
+    placed: [],
+    ...(rivalPlan && { rivalSkill: rivalPlan, rivalRevived }),
+    ...(myEffect && { effect: myEffect }),
+    ...(theirEffect && { rivalEffect: theirEffect }),
+  };
   delete foe.plan;
+  foe.effectPlan = null;
   const mine = cardsLeft(me);
   const theirs = cardsLeft(foe);
   if (mine === 0 || theirs === 0) {
@@ -1157,7 +1493,29 @@ export function autoTurn(match, content) {
  */
 export function matchView(match, content) {
   /** @param {MatchCard} card */
-  const card = (card) => ({ ...cardView(card.id, card.level, content), key: card.key, ...typeView(card.type, content), attack: card.attack, life: card.life, max: card.max, ...(card.shifted && { shifted: true }) });
+  const card = (card) => ({
+    ...cardView(card.id, card.level, content),
+    key: card.key,
+    ...typeView(card.type, content),
+    attack: card.attack,
+    life: card.life,
+    max: card.max,
+    ...(card.shifted && { shifted: true }),
+    ...(card.cursed && { cursed: card.cursed }),
+  });
+  // A side's effect cards (976, 977), played or not.
+  /** @param {Side} side */
+  const effects = (side) => (side.effects ?? []).map((one) => effectView(one.id, one.level, content, { key: one.key, used: one.used }));
+  // An effect card as a round played it (or the rival will), with its
+  // name: `at`, what it was played on (its side's own card's key, or the
+  // other side's line), and Mgła's blows missed.
+  /** @param {EffectLog | EffectUse | null | undefined} log @param {Side} side */
+  const effectLog = (log, side) => {
+    const played = log ? (side.effects ?? []).find((one) => one.key === log.key) : null;
+    if (!log || !played) return null;
+    const misses = /** @type {EffectLog} */ (log).misses;
+    return { ...effectView(played.id, played.level, content), key: log.key, at: log.target ?? null, ...(misses !== undefined && { misses }) };
+  };
   /** @param {Hero | null} hero */
   const heroOf = (hero) => hero && { classId: hero.classId, stage: hero.stage, used: hero.used, skill: heroSkill(hero.classId, hero.stage, content) };
   /** @param {Side} side */
@@ -1167,14 +1525,28 @@ export function matchView(match, content) {
     cap: cardRules(content).roundCap,
     result: match.result,
     end: match.end,
-    me: { lines: lines(match.me), hand: match.me.hand.map((key) => card(match.me.cards[key])), deck: match.me.deck.length, out: match.me.out.length, left: cardsLeft(match.me), hero: heroOf(match.me.hero) },
+    me: { lines: lines(match.me), hand: match.me.hand.map((key) => card(match.me.cards[key])), deck: match.me.deck.length, out: match.me.out.length, left: cardsLeft(match.me), hero: heroOf(match.me.hero), effects: effects(match.me) },
     // The rival's hero's skill of this round (900 A), shown before the
     // player answers it.
-    foe: { lines: lines(match.foe), hand: match.foe.hand.length, deck: match.foe.deck.length, out: match.foe.out.length, left: cardsLeft(match.foe), hero: heroOf(match.foe.hero), ...(match.foe.plan && { plan: match.foe.plan }) },
+    // Its effect cards and its effect card of this round (977.4 A), shown
+    // the same way.
+    foe: {
+      lines: lines(match.foe),
+      hand: match.foe.hand.length,
+      deck: match.foe.deck.length,
+      out: match.foe.out.length,
+      left: cardsLeft(match.foe),
+      hero: heroOf(match.foe.hero),
+      ...(match.foe.plan && { plan: match.foe.plan }),
+      effects: effects(match.foe),
+      ...(match.foe.effectPlan && { effectPlan: effectLog(match.foe.effectPlan, match.foe) }),
+    },
     // The cards beaten last round, with their names, for its account.
     last: match.last && {
       ...match.last,
       beatenCards: { me: match.last.beaten.me.map((key) => card(match.me.cards[key])), foe: match.last.beaten.foe.map((key) => card(match.foe.cards[key])) },
+      ...(match.last.effect && { effect: effectLog(match.last.effect, match.me) }),
+      ...(match.last.rivalEffect && { rivalEffect: effectLog(match.last.rivalEffect, match.foe) }),
     },
   };
 }

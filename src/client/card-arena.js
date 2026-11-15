@@ -34,6 +34,7 @@
 // survives the Arena's redraws and tabs.
 
 import { placeArt, portraitSprite } from './art.js';
+import { effectBlow, effectHint, effectMarks, effectsSection, rivalEffectLine, roundEffects } from './card-effects.js';
 import { cardFace } from './cards.js';
 import { createCardsFx } from './cards-fx.js';
 import { deckSlotsRow } from './deck-slots.js';
@@ -120,6 +121,8 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
   let plan = null;
   let picked = null;
   let aiming = null;
+  // An effect card picked, waiting for its target (979.4).
+  let effectAim = null;
   // A match just ended, shown until "Dalej".
   let ended = null;
   // The newest answer's number, so an older one never draws over it.
@@ -139,6 +142,7 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
       plan = null;
       picked = null;
       aiming = null;
+      effectAim = null;
     }
   }
 
@@ -568,7 +572,7 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
 
   // The turn being laid, at first the lines as they stand.
   function planOf(match) {
-    if (!plan || plan.round !== match.round) plan = { round: match.round, lines: match.me.lines.map((card) => card?.key ?? null), skill: null };
+    if (!plan || plan.round !== match.round) plan = { round: match.round, lines: match.me.lines.map((card) => card?.key ?? null), skill: null, effect: null };
     return plan;
   }
 
@@ -605,24 +609,27 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
       }),
       foe: match.foe.lines,
     };
+    // The effect cards of the round (976, 977): the player's being laid
+    // and the rival's, the cards as they will stand after them.
+    const effects = roundEffects(match, plan.effect, lines);
     const taken = { me: [0, 0, 0], foe: [0, 0, 0] };
     const strong = { me: [false, false, false], foe: [false, false, false] };
     for (const side of ['me', 'foe']) {
       const other = side === 'me' ? 'foe' : 'me';
       const own = side === 'me' ? skill : rival;
-      lines[side].forEach((card, line) => {
+      effects.cards[side].forEach((card, line) => {
         if (!card) return;
         const aimed = own?.kind === 'aim' && own.card === card.key && lines[other][own.target] ? own.target : null;
         const at = aimed ?? (lines[other][line] ? line : lines[other].findIndex(Boolean));
         if (at === null || at < 0) return;
-        const target = lines[other][at];
+        const target = effects.cards[other][at];
         const advantage = beats(card.type, target.type);
-        const extra = boostOf(own, power[side], card);
-        taken[other][at] += Math.max(1, Math.round(card.attack * (1 + (advantage ? view.typeBonus : 0)) * (1 + extra)));
+        const extra = boostOf(own, power[side], card) + (effects[side].boost[card.key] ?? 0) + effects[side].rally;
+        taken[other][at] += effectBlow(card, target, { advantage, typeBonus: view.typeBonus, extra, theirs: effects[other] });
         if (advantage) strong[other][at] = true;
       });
     }
-    return { taken, strong };
+    return { taken, strong, cards: effects.cards, marks: effectMarks(match, plan.effect, effects.cards) };
   }
 
   // The hero's skill: its steps, as its kind asks.
@@ -638,7 +645,28 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
   }
   function startAiming() {
     aiming = { step: 'card' };
+    effectAim = null;
     picked = null;
+    render();
+  }
+
+  // An effect card tapped (979.4): Zew watahy and Mgła are set at once, the
+  // others wait for their target; the hero's skill's steps give way.
+  function pickEffect(card) {
+    aiming = null;
+    picked = null;
+    if (card.target === 'all') {
+      plan.effect = { key: card.key };
+      effectAim = null;
+    } else {
+      plan.effect = null;
+      effectAim = { key: card.key, target: card.target };
+    }
+    render();
+  }
+  function cancelEffect() {
+    plan.effect = null;
+    effectAim = null;
     render();
   }
   function cancelSkill() {
@@ -698,6 +726,14 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
   // taken back, or a card chosen for the hero's skill.
   function tapMine(line) {
     const key = plan.lines[line];
+    if (effectAim) {
+      if (key !== null && effectAim.target === 'own') {
+        plan.effect = { key: effectAim.key, target: key };
+        effectAim = null;
+        render();
+      }
+      return;
+    }
     if (aiming) {
       if (key !== null && aiming.step === 'card') chooseOwn(key);
       return;
@@ -713,11 +749,18 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
     } else if (key !== standingKey && plan.skill?.swap !== key) {
       plan.lines[line] = null;
       if (plan.skill?.card === key) plan.skill = null;
+      if (plan.effect && plan.effect.target === key && view.match.me.effects?.find((one) => one.key === plan.effect.key)?.target === 'own') plan.effect = null;
     } else return;
     renderLaid();
   }
 
   function tapFoe(line) {
+    if (effectAim?.target === 'rival' && view.match.foe.lines[line]) {
+      plan.effect = { key: effectAim.key, target: line };
+      effectAim = null;
+      render();
+      return;
+    }
     if (aiming?.step !== 'target' || !view.match.foe.lines[line]) return;
     plan.skill = { kind: 'aim', card: aiming.card, target: line };
     aiming = null;
@@ -744,7 +787,9 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
       'div',
       { class: `cards-lines cards-lines--${side}` },
       view.lines.map((name, line) => {
-        const card = side === 'foe' ? match.foe.lines[line] : plan.lines[line] === null ? null : mine.get(plan.lines[line]);
+        const laid = side === 'foe' ? match.foe.lines[line] : plan.lines[line] === null ? null : mine.get(plan.lines[line]);
+        // Its Życie as the round's effect cards leave it (Żywa woda, Piorun Peruna).
+        const card = laid && { ...laid, life: blowsNow.cards[side][line]?.life ?? laid.life };
         const shownCard = side === 'me' && card && plan.skill?.kind === 'shift' && plan.skill.card === card.key ? { ...card, type: plan.skill.type, shifted: true } : card;
         const fresh = side === 'foe' ? placed.includes(line) : card && card.key !== standingKeys(match)[line];
         let skillMark = null;
@@ -752,12 +797,16 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
         else if (side === 'foe' && card && rival && (rival.kind === 'swap' ? rival.swap === card.key : rival.card === card.key)) skillMark = rivalSkill;
         else if (side === 'foe' && plan.skill?.kind === 'aim' && plan.skill.target === line) skillMark = t('cel');
         else if (side === 'me' && card && rival?.kind === 'aim' && rival.target === line) skillMark = t('cel');
-        const target = side === 'foe' ? aiming?.step === 'target' && card : aiming?.step === 'card' && card;
+        // What an effect card of the round does to it, or the curse on it.
+        const effectMark = blowsNow.marks[side][line] ?? (laid?.cursed ? t('−{power}% ciosu', { power: Math.round(laid.cursed * 100) }) : null);
+        const mark = [skillMark, effectMark].filter(Boolean).join(' · ') || null;
+        const effectTarget = Boolean(card) && effectAim?.target === (side === 'foe' ? 'rival' : 'own');
+        const target = effectTarget || (side === 'foe' ? aiming?.step === 'target' && card : aiming?.step === 'card' && card);
         const content = shownCard
           ? withKey(
               face(shownCard, {
-                marks: { blow: blowsNow.taken[side][line], advantage: blowsNow.strong[side][line], fresh, skill: skillMark, target },
-                onClick: side === 'foe' ? (aiming?.step === 'target' ? () => tapFoe(line) : null) : () => tapMine(line),
+                marks: { blow: blowsNow.taken[side][line], advantage: blowsNow.strong[side][line], fresh, skill: mark, target },
+                onClick: side === 'foe' ? (aiming?.step === 'target' || effectAim?.target === 'rival' ? () => tapFoe(line) : null) : () => tapMine(line),
               }),
               side,
               shownCard.key,
@@ -783,8 +832,20 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
       const other = hit.side === 'me' ? 'foe' : 'me';
       const who = known[hit.side].get(hit.key) ?? '?';
       const whom = known[other].get(hit.target.key) ?? '?';
-      return h('li', { class: `cards-hit cards-hit--${hit.side}` }, t('{who} → {whom}: {damage}', { who, whom, damage: hit.damage }), hit.advantage && h('span', { class: 'cards-hit-note', text: t(' (przewaga typu)') }));
+      return h(
+        'li',
+        { class: `cards-hit cards-hit--${hit.side}` },
+        t('{who} → {whom}: {damage}', { who, whom, damage: hit.damage }),
+        hit.advantage && h('span', { class: 'cards-hit-note', text: t(' (przewaga typu)') }),
+        hit.missed && h('span', { class: 'cards-hit-note', text: ` (${view.effects?.texts.missed ?? ''})` }),
+      );
     });
+    // The effect cards of the round (976, 977): the player's and the rival's.
+    const played = [
+      last.effect && t('Twoja karta efektu: {name} ({short})', { name: last.effect.name, short: last.effect.short }),
+      last.rivalEffect && t('Karta efektu rywala: {name} ({short})', { name: last.rivalEffect.name, short: last.rivalEffect.short }),
+    ].filter(Boolean);
+    lines.unshift(...played.map((text) => h('li', { class: 'cards-hit cards-hit--effect', text })));
     const beaten = [...last.beatenCards.foe.map((card) => card.name), ...last.beatenCards.me.map((card) => card.name)];
     const rivalSkill = last.rivalSkill && match.foe.hero?.skill?.name;
     return h(
@@ -869,12 +930,13 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
       ),
       match.foe.plan && rivalHero?.skill && h('p', { class: 'card-arena-rival-now', role: 'status', text: say(texts.rivalSkillNow, { skill: rivalHero.skill.name }) }),
       linesRow('foe', match, blowsNow),
+      view.effects && rivalEffectLine(match, view.effects.texts),
       h('div', { class: 'cards-divider', 'aria-hidden': 'true' }, h('span', { text: say(texts.divider, { win: match.stakes.win, loss: Math.abs(match.stakes.loss) }) })),
       linesRow('me', match, blowsNow),
       h('p', { class: 'muted cards-table-count cards-table-count--me' }, match.me.deck > 0 && backs(1), h('span', { text: t('Twoja talia {deck} · zbite {out}', { deck: match.me.deck, out: match.me.out }) })),
     );
     if (art) table.style.setProperty('--place-art', `url("${art}")`);
-    const hint = aimHint() ?? (picked !== null ? t('Wskaż pustą linię dla tej karty.') : !ready ? t('Dołóż karty z rezerwy na puste linie.') : null);
+    const hint = effectHint(effectAim, view.effects?.texts ?? {}) ?? aimHint() ?? (picked !== null ? t('Wskaż pustą linię dla tej karty.') : !ready ? t('Dołóż karty z rezerwy na puste linie.') : null);
     return h(
       'div',
       { class: 'stack cards-match', 'data-guide': 'card-arena-match' },
@@ -928,6 +990,8 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
                 ? h('button', { type: 'button', class: 'button button--system', text: t('Anuluj'), onClick: cancelSkill })
                 : h('button', { type: 'button', class: 'button button--system', text: t('Użyj: {skill}', { skill: skill?.name ?? '' }), onClick: startAiming }),
         ),
+      // The effect cards under the hero's card (979.4).
+      view.effects && effectsSection({ match, use: plan.effect, aim: effectAim, texts: view.effects.texts, face, onPick: pickEffect, onCancel: cancelEffect }),
       h(
         'div',
         { class: 'cards-actions' },
@@ -936,7 +1000,7 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
           class: 'button button--world cards-fight',
           'data-guide': 'card-arena-fight',
           text: t('Walcz'),
-          disabled: !ready || Boolean(aiming),
+          disabled: !ready || Boolean(aiming) || Boolean(effectAim),
           onClick: (event) =>
             withButton(event.currentTarget, () =>
               orAgain(async () => {
@@ -944,6 +1008,7 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
                   round: plan.round,
                   lines: plan.lines,
                   skill: plan.skill ? { card: plan.skill.card, target: plan.skill.target, type: plan.skill.type, swap: plan.skill.swap } : null,
+                  effect: plan.effect ? { key: plan.effect.key, ...(plan.effect.target !== undefined && { target: plan.effect.target }) } : null,
                 });
                 playSound('swing');
                 if (fx.on() && !gone) {

@@ -44,6 +44,12 @@ import {
   deckBlock,
   deckStrength,
   deckTypeCounts,
+  effectDeckBlock,
+  effectDrop,
+  effectOfRarity,
+  effectRules,
+  effectView,
+  isEffect,
   expectedExploration,
   firstWinCard,
   heroSkill,
@@ -54,6 +60,7 @@ import {
   matchView,
   newMatch,
   packCards,
+  packEffect,
   packOdds,
   pickCard,
   playTurn,
@@ -122,6 +129,9 @@ export function cardGameOf(row, day) {
     // The day's pack bought at Szczęsny's (902 C).
     pack: today && stored.pack === true,
     residents: Array.isArray(stored?.residents) ? stored.residents.filter((id) => typeof id === 'string') : [],
+    // The tiers whose first win gave its effect card (977.3 B), also on a
+    // tier beaten before the effect cards came.
+    effectTiers: Array.isArray(stored?.effectTiers) ? stored.effectTiers.filter((number) => Number.isInteger(number)) : [],
   };
 }
 
@@ -142,6 +152,66 @@ export const cardUpserts = (db, characterId, ids, now) =>
       .prepare('INSERT INTO cards (character_id, monster_id, copies, created_at) VALUES (?, ?, 1, ?) ON CONFLICT (character_id, monster_id) DO UPDATE SET copies = copies + 1')
       .bind(characterId, id, now),
   );
+
+// The character's effect cards (976, 977): the copies of each, of those the
+// game knows.
+export async function effectCollection(db, characterId) {
+  const rows = await db.prepare('SELECT effect_id, copies FROM card_effects WHERE character_id = ?').bind(characterId).all();
+  return new Map(rows.results.filter((row) => isEffect(row.effect_id, content())).map((row) => [row.effect_id, row.copies]));
+}
+
+// The effect cards at their top level already, of an effect collection.
+export const maxedEffects = (effects) => [...effects].filter(([, copies]) => copies >= rules().stats.maxLevel).map(([id]) => id);
+
+// A rare effect card (977.3 B, effects.drops) for the character, with the
+// chance `chance` from `seed`: its id and its view at the level it has now,
+// or null. The effect collection is read only when one comes.
+export async function droppedEffect(db, characterId, seed, chance) {
+  if (!effectDrop({ maxed: [], seed, chance }, content())) return null;
+  const effects = await effectCollection(db, characterId);
+  const id = effectDrop({ maxed: maxedEffects(effects), seed, chance }, content());
+  return id ? { id, view: effectView(id, (effects.get(id) ?? 0) + 1, content(), { fresh: !effects.has(id) }) } : null;
+}
+
+// The line of a report with an effect card found (`view`, effectView).
+export const effectFoundLine = (view) => effectRules(content()).texts.found.replace('{card}', view.name);
+
+// The chance of an effect card for `minutes` of an exploration without a
+// faint, or for a Labyrinth guardian beaten (effects.drops).
+export const effectChance = (where, minutes = 0) => {
+  const drops = effectRules(content())?.drops;
+  if (!drops) return 0;
+  return where === 'guardian' ? drops.guardian : (drops.explorationHour * minutes) / 60;
+};
+
+// The statements that give effect cards: one copy more of each.
+export const effectUpserts = (db, characterId, ids, now) =>
+  ids.map((id) =>
+    db
+      .prepare('INSERT INTO card_effects (character_id, effect_id, copies, created_at) VALUES (?, ?, 1, ?) ON CONFLICT (character_id, effect_id) DO UPDATE SET copies = copies + 1')
+      .bind(characterId, id, now),
+  );
+
+// The effect cards of decks as a match plays them, by character (`ids`):
+// each deck in play's effect cards the character has, at their levels.
+export async function effectDecksOf(db, ids) {
+  const found = new Map();
+  if (ids.length === 0) return found;
+  const marks = ids.map(() => '?').join(', ');
+  const [decks, owned] = await db.batch([
+    db.prepare(`SELECT character_id, effects FROM card_decks WHERE character_id IN (${marks})`).bind(...ids),
+    db.prepare(`SELECT character_id, effect_id, copies FROM card_effects WHERE character_id IN (${marks})`).bind(...ids),
+  ]);
+  const copies = new Map(owned.results.map((one) => [`${one.character_id}:${one.effect_id}`, one.copies]));
+  for (const deck of decks.results) {
+    const chosen = (idsOf(deck.effects ?? '[]') ?? []).filter((id) => isEffect(id, content()) && copies.has(`${deck.character_id}:${id}`));
+    found.set(
+      deck.character_id,
+      chosen.slice(0, effectRules(content())?.slots ?? 0).map((id) => ({ id, level: cardLevel(copies.get(`${deck.character_id}:${id}`), content()) })),
+    );
+  }
+  return found;
+}
 
 // The cards an exploration left as its report shows them, each at the level
 // it has now (`collection`: as it was before them), new or not.
@@ -246,16 +316,19 @@ function idsOf(text) {
 const keepInPlay = (db, characterId) =>
   db
     .prepare(
-      `INSERT INTO card_deck_slots (character_id, slot, cards, updated_at) SELECT character_id, slot, cards, updated_at FROM card_decks WHERE character_id = ?
-       ON CONFLICT (character_id, slot) DO UPDATE SET cards = excluded.cards, updated_at = excluded.updated_at`,
+      `INSERT INTO card_deck_slots (character_id, slot, cards, effects, updated_at) SELECT character_id, slot, cards, effects, updated_at FROM card_decks WHERE character_id = ?
+       ON CONFLICT (character_id, slot) DO UPDATE SET cards = excluded.cards, effects = excluded.effects, updated_at = excluded.updated_at`,
     )
     .bind(characterId);
 
-// The statement that plays the deck `cards` (its JSON) of `slot` from now on.
-const playDeck = (db, characterId, slot, cards, now) =>
+// The statement that plays the deck `cards` (its JSON) of `slot`, with its
+// effect cards (`effects`, their JSON), from now on.
+const playDeck = (db, characterId, slot, cards, now, effects = '[]') =>
   db
-    .prepare('INSERT INTO card_decks (character_id, cards, slot, updated_at) VALUES (?, ?, ?, ?) ON CONFLICT (character_id) DO UPDATE SET cards = excluded.cards, slot = excluded.slot, updated_at = excluded.updated_at')
-    .bind(characterId, cards, slot, now);
+    .prepare(
+      'INSERT INTO card_decks (character_id, cards, slot, effects, updated_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT (character_id) DO UPDATE SET cards = excluded.cards, slot = excluded.slot, effects = excluded.effects, updated_at = excluded.updated_at',
+    )
+    .bind(characterId, cards, slot, effects, now);
 
 // The saved decks for the page: each slot with its name (939; null without
 // one), the cards of it the character has (null when it is empty), whether
@@ -264,14 +337,19 @@ const playDeck = (db, characterId, slot, cards, now) =>
 // before any deck).
 export async function deckSlots(db, characterId, collection) {
   const [saved, inPlay] = await db.batch([
-    db.prepare('SELECT slot, cards, name FROM card_deck_slots WHERE character_id = ?').bind(characterId),
-    db.prepare('SELECT slot, cards FROM card_decks WHERE character_id = ?').bind(characterId),
+    db.prepare('SELECT slot, cards, name, effects FROM card_deck_slots WHERE character_id = ?').bind(characterId),
+    db.prepare('SELECT slot, cards, effects FROM card_decks WHERE character_id = ?').bind(characterId),
   ]);
   const bySlot = new Map(saved.results.map((one) => [one.slot, idsOf(one.cards)]));
   const names = new Map(saved.results.map((one) => [one.slot, one.name ?? null]));
+  // Each slot's effect cards (976, 977), the ids saved.
+  const effectsBySlot = new Map(saved.results.map((one) => [one.slot, (idsOf(one.effects ?? '[]') ?? []).filter((id) => isEffect(id, content()))]));
   const playing = inPlay.results[0] ?? null;
   // The deck in play is its slot's, whatever that slot's row still says.
-  if (playing) bySlot.set(playing.slot, idsOf(playing.cards));
+  if (playing) {
+    bySlot.set(playing.slot, idsOf(playing.cards));
+    effectsBySlot.set(playing.slot, (idsOf(playing.effects ?? '[]') ?? []).filter((id) => isEffect(id, content())));
+  }
   const owned = new Set(collection.keys());
   return {
     max: rules().savedDecks,
@@ -281,14 +359,16 @@ export async function deckSlots(db, characterId, collection) {
       const slot = index + 1;
       const ids = bySlot.get(slot);
       const name = names.get(slot) ?? null;
-      if (!ids) return { slot, name, cards: null, whole: false };
+      const effects = effectsBySlot.get(slot) ?? [];
+      if (!ids) return { slot, name, cards: null, whole: false, effects };
       const cards = [...new Set(ids.filter((id) => typeof id === 'string' && owned.has(id)))];
-      if (deckBlock(ids, owned, content())) return { slot, name, cards, whole: false };
+      if (deckBlock(ids, owned, content())) return { slot, name, cards, whole: false, effects };
       const leveled = ids.map((id) => ({ id, level: cardLevel(collection.get(id), content()) }));
       return {
         slot,
         name,
         cards,
+        effects,
         whole: true,
         strength: deckStrength(leveled, content()),
         types: deckTypeCounts(leveled, content()).map(({ id, name, count }) => ({ id, name, count })),
@@ -403,8 +483,14 @@ function packView(row, game, collection) {
     odds: packOdds(content()).map((odds) => ({ ...odds, name: rarity(odds.rarity).forms?.f ?? rarity(odds.rarity).name, color: rarity(odds.rarity).color })),
     missing: ids.filter((id) => !collection.has(id)).length,
     empty: ids.every((id) => (collection.get(id) ?? 0) >= stats.maxLevel),
+    // The chance of an effect card in place of a creature (977.3 B).
+    effectChance: effectRules(content())?.packChance ?? 0,
   };
 }
+
+// The rarity of the effect card a tier's first staked win still gives
+// (977.3 B: once a tier, since the effect cards came), or null.
+const effectFirst = (number, game) => (game.effectTiers.includes(number) ? null : (effectRules(content())?.firstWin[number - 1] ?? null));
 
 // The Salon's third tab for the page: the words and rules, the collection
 // with the deck marked, the hero, Szczęsny's tiers with their stakes and the
@@ -415,10 +501,11 @@ async function cardsView(db, player, now) {
   const { row } = player;
   const day = casinoDay(now, content());
   const game = cardGameOf(row, day.key);
-  const [collection, running, last] = await Promise.all([
+  const [collection, running, last, effects] = await Promise.all([
     cardCollection(db, row.id),
     runningMatch(db, row.id),
     db.prepare('SELECT * FROM card_matches WHERE character_id = ? AND result IS NOT NULL ORDER BY id DESC LIMIT 1').bind(row.id).first(),
+    effectCollection(db, row.id),
   ]);
   // The deck in play: its slot's, when whole (deckSlots).
   const decks = await deckSlots(db, row.id, collection);
@@ -443,6 +530,14 @@ async function cardsView(db, player, now) {
     collection: [...collection].map(([id, copies]) => cardView(id, copies, content(), { copies, inDeck: Boolean(deck?.includes(id)) })),
     deck,
     decks,
+    // The effect cards (976, 977): those the character has, with their
+    // levels, the deck in play's, the slots and the words.
+    effects: {
+      slots: effectRules(content())?.slots ?? 0,
+      owned: [...effects].map(([id, copies]) => effectView(id, copies, content(), { copies, inDeck: Boolean(playing?.effects?.includes(id)) })),
+      deck: (playing?.effects ?? []).filter((id) => effects.has(id)),
+      texts: effectRules(content())?.texts ?? {},
+    },
     hero: heroView(row),
     tiers: hostTiers(content()).map((tier, index) => {
       const number = index + 1;
@@ -458,6 +553,11 @@ async function cardsView(db, player, now) {
         rewarded: game.rewarded.includes(number),
         beaten: game.beaten.includes(number),
         firstWin: rarity(tier.firstWin.rarity),
+        // The effect card of its first staked win since the effect cards
+        // came (977.3 B), while it waits; and whether its deck plays effect
+        // cards (977.4 A).
+        effectWin: effectFirst(number, game) ? rarity(effectFirst(number, game)) : null,
+        effects: (tier.effects ?? []).length > 0,
         levels: [Math.min(...tier.cards.map((card) => card.level)), Math.max(...tier.cards.map((card) => card.level))],
       };
     }),
@@ -508,27 +608,36 @@ export async function takeStarter(context) {
   return respond(context, session, { starter: true });
 }
 
-// POST /api/cards/deck { cards: [ids], slot }: the deck, twelve different
-// cards of the collection, laid in its slot (938; in the slot in play when
-// none is named, as a page of before the slots asks) and played from now
-// on.
+// POST /api/cards/deck { cards: [ids], slot, effects }: the deck, twelve
+// different cards of the collection, laid in its slot (938; in the slot in
+// play when none is named, as a page of before the slots asks) with its
+// effect cards (976, 977: `effects`, at most two of the character's; kept
+// as they were without them) and played from now on.
 export async function saveDeck(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireCards(row);
   const body = await readJson(context.request);
   const db = context.env.DB;
-  const [collection, playing] = await Promise.all([cardCollection(db, row.id), db.prepare('SELECT slot FROM card_decks WHERE character_id = ?').bind(row.id).first('slot')]);
+  const [collection, playing, effects] = await Promise.all([cardCollection(db, row.id), db.prepare('SELECT slot FROM card_decks WHERE character_id = ?').bind(row.id).first('slot'), effectCollection(db, row.id)]);
   const slot = body?.slot == null ? (playing ?? 1) : slotOf(body.slot);
   const block = deckBlock(body?.cards, new Set(collection.keys()), content());
   if (block) throw new ApiError(400, block.code, block.message);
+  // Its effect cards (976, 977): at most the slots, each the character's;
+  // without them in the request, the slot's as they were.
+  const effectBlock = effectDeckBlock(body?.effects, effects.keys(), content());
+  if (effectBlock) throw new ApiError(400, effectBlock.code, effectBlock.message);
+  const kept = body?.effects == null ? await db.prepare('SELECT effects FROM card_deck_slots WHERE character_id = ? AND slot = ?').bind(row.id, slot).first('effects') : null;
+  const chosen = JSON.stringify(body?.effects ?? (idsOf(kept ?? '[]') ?? []).filter((id) => effects.has(id)));
   const cards = JSON.stringify(body.cards);
   await db.batch([
     keepInPlay(db, row.id),
     db
-      .prepare('INSERT INTO card_deck_slots (character_id, slot, cards, updated_at) VALUES (?, ?, ?, ?) ON CONFLICT (character_id, slot) DO UPDATE SET cards = excluded.cards, updated_at = excluded.updated_at')
-      .bind(row.id, slot, cards, context.now),
-    playDeck(db, row.id, slot, cards, context.now),
+      .prepare(
+        'INSERT INTO card_deck_slots (character_id, slot, cards, effects, updated_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT (character_id, slot) DO UPDATE SET cards = excluded.cards, effects = excluded.effects, updated_at = excluded.updated_at',
+      )
+      .bind(row.id, slot, cards, chosen, context.now),
+    playDeck(db, row.id, slot, cards, context.now, chosen),
   ]);
   return respond(context, session, { saved: true, slot });
 }
@@ -546,14 +655,15 @@ export async function useDeck(context) {
   const db = context.env.DB;
   const [collection, saved, playing] = await Promise.all([
     cardCollection(db, row.id),
-    db.prepare('SELECT cards FROM card_deck_slots WHERE character_id = ? AND slot = ?').bind(row.id, slot).first('cards'),
-    db.prepare('SELECT slot, cards FROM card_decks WHERE character_id = ?').bind(row.id).first(),
+    db.prepare('SELECT cards, effects FROM card_deck_slots WHERE character_id = ? AND slot = ?').bind(row.id, slot).first(),
+    db.prepare('SELECT slot, cards, effects FROM card_decks WHERE character_id = ?').bind(row.id).first(),
   ]);
   // The deck in play is its slot's (deckSlots).
-  const cards = playing?.slot === slot ? playing.cards : saved;
+  const cards = playing?.slot === slot ? playing.cards : saved?.cards;
+  const effects = (playing?.slot === slot ? playing.effects : saved?.effects) ?? '[]';
   if (!cards) throw new ApiError(409, 'empty_slot', t('Talia {slot} jest pusta. Ułóż ją w Salonie Gier.', { slot }));
   if (deckBlock(idsOf(cards), new Set(collection.keys()), content())) throw new ApiError(409, 'invalid_deck', t('Talia {slot} nie jest już cała. Ułóż ją od nowa w Salonie Gier.', { slot }));
-  await db.batch([keepInPlay(db, row.id), playDeck(db, row.id, slot, cards, context.now)]);
+  await db.batch([keepInPlay(db, row.id), playDeck(db, row.id, slot, cards, context.now, effects)]);
   return respond(context, session, { used: slot });
 }
 
@@ -644,8 +754,13 @@ export async function buyPack(context) {
   if (!game.starter) throw new ApiError(409, 'no_starter', 'Najpierw weź talię od Szczęsnego.');
   if (game.pack) throw new ApiError(409, 'pack_bought', 'Pakiet na dziś już kupiony. Następny jutro.');
   const collection = await cardCollection(db, row.id);
-  const cards = packCards({ maxed: maxedCards(collection), seed: await keyedSeed(db, `${day}:${row.id}`), count: rules().pack.cards }, content());
-  if (cards.length === 0) throw new ApiError(409, 'pack_empty', 'Masz już wszystkie karty na najwyższym poziomie.');
+  const seed = await keyedSeed(db, `${day}:${row.id}`);
+  const effects = await effectCollection(db, row.id);
+  // An effect card in place of the first creature, by its chance (977.3 B).
+  const effect = packEffect({ maxed: maxedEffects(effects), seed }, content());
+  const drawn = packCards({ maxed: maxedCards(collection), seed, count: rules().pack.cards }, content());
+  if (drawn.length === 0) throw new ApiError(409, 'pack_empty', 'Masz już wszystkie karty na najwyższym poziomie.');
+  const cards = effect ? drawn.slice(1) : drawn;
   const stored = settlementOf(row);
   const { price } = packPrice(row, stored);
   if (row.gold < price) throw new ApiError(409, 'no_gold', t('Brakuje złota: potrzeba {price}.', { price }));
@@ -657,10 +772,14 @@ export async function buyPack(context) {
       assertion(db, '(SELECT version FROM characters WHERE id = ?) = ? AND (SELECT gold FROM characters WHERE id = ?) >= ?', [row.id, row.version, row.id, price]),
       db.prepare('UPDATE characters SET gold = gold - ?, card_game = ?, settlement = ?, version = version + 1 WHERE id = ?').bind(price, JSON.stringify({ ...game, pack: true }), JSON.stringify({ ...stored, relations }), row.id),
       ...cardUpserts(db, row.id, cards, now),
+      ...(effect ? effectUpserts(db, row.id, [effect], now) : []),
     ],
     characterChanged,
   );
-  const opened = cards.map((id) => cardView(id, (collection.get(id) ?? 0) + 1, content(), { fresh: !collection.has(id) }));
+  const opened = [
+    ...(effect ? [effectView(effect, (effects.get(effect) ?? 0) + 1, content(), { fresh: !effects.has(effect) })] : []),
+    ...cards.map((id) => cardView(id, (collection.get(id) ?? 0) + 1, content(), { fresh: !collection.has(id) })),
+  ];
   return respond(context, session, { pack: opened });
 }
 
@@ -684,7 +803,7 @@ export async function startMatch(context) {
   if (asksResident && !table) throw new ApiError(400, 'invalid_resident', 'Ten mieszkaniec nie gra w karty.');
   const tier = table ? null : hostTier(body?.tier, content());
   const rival = table ?? tier;
-  const [collection, running] = await Promise.all([cardCollection(db, row.id), runningMatch(db, row.id)]);
+  const [collection, running, effectDecks] = await Promise.all([cardCollection(db, row.id), runningMatch(db, row.id), effectDecksOf(db, [row.id])]);
   const deck = await deckOf(db, row.id, collection);
   const stake = staked && rival ? (table ? residentStake(table, row.level, content()) : tierStake(tier, row.level, content())) : 0;
   const block = startBlock({ tier: rival, staked, hasDeck: Boolean(deck), running: Boolean(running), stakedToday: game.staked, gold: row.gold, stake }, content());
@@ -692,8 +811,9 @@ export async function startMatch(context) {
   const state = newMatch(
     {
       seed: newSeed(),
-      me: { cards: deck.map((id) => ({ id, level: cardLevel(collection.get(id), content()) })), hero: heroOf(row) },
-      foe: { cards: rival.cards.map((card) => ({ id: card.monster, level: card.level })), smart: rival.smart },
+      me: { cards: deck.map((id) => ({ id, level: cardLevel(collection.get(id), content()) })), hero: heroOf(row), effects: effectDecks.get(row.id) ?? [] },
+      // Szczęsny's higher tiers and the residents play effect cards too (977.4 A).
+      foe: { cards: rival.cards.map((card) => ({ id: card.monster, level: card.level })), smart: rival.smart, effects: rival.effects ?? [] },
     },
     content(),
   );
@@ -737,6 +857,12 @@ async function endStatements(db, player, match, state, now) {
   const firstTier = Boolean(tier) && won && !game.beaten.includes(number);
   const firstResident = Boolean(table) && won && !game.residents.includes(table.id);
   const collection = firstTier || (table && won) ? await cardCollection(db, row.id) : new Map();
+  // The tier's effect card at its first staked win since the effect cards
+  // came (977.3 B), of the rarity effects.firstWin gives the tier.
+  const effectTier = Boolean(tier) && won && !game.effectTiers.includes(number);
+  const effects = effectTier ? await effectCollection(db, row.id) : new Map();
+  const effectRarity = effectTier ? effectFirst(number, game) : null;
+  const effectCard = effectRarity ? effectOfRarity(effectRarity, { owned: effects.keys(), maxed: maxedEffects(effects) }, state.seed, content()) : null;
   // The tier's card at its first win; when every card of its rarity is at
   // its top level already, it would be lost, so the tier's stake comes once
   // more instead (the author's 919 B, 13.11.2026: nothing else in the game
@@ -762,6 +888,7 @@ async function endStatements(db, player, match, state, now) {
     gold: payout.gold,
     daily: payout.daily,
     card: card ? cardView(card, (collection.get(card) ?? 0) + 1, content(), { fresh: !collection.has(card) }) : null,
+    ...(effectCard && { effectCard: effectView(effectCard, (effects.get(effectCard) ?? 0) + 1, content(), { fresh: !effects.has(effectCard) }) }),
     // The gold in place of a first win's card already at its top level (919 B).
     ...(cardGold > 0 && { cardGold, maxLevel: rules().stats.maxLevel }),
     tierName: tier?.name ?? null,
@@ -780,15 +907,17 @@ async function endStatements(db, player, match, state, now) {
       rewarded: tier && won && !game.rewarded.includes(number) ? [...game.rewarded, number] : game.rewarded,
       beaten: tier && won && !game.beaten.includes(number) ? [...game.beaten, number] : game.beaten,
       residents: firstResident ? [...game.residents, table.id] : game.residents,
+      effectTiers: effectTier ? [...game.effectTiers, number] : game.effectTiers,
     };
     statements.unshift(assertion(db, '(SELECT version FROM characters WHERE id = ?) = ?', [row.id, row.version]));
     statements.push(db.prepare('UPDATE characters SET gold = gold + ?, card_game = ?, version = version + 1 WHERE id = ?').bind(payout.gold + payout.daily + cardGold, JSON.stringify(next), row.id));
     if (card) statements.push(...cardUpserts(db, row.id, [card], now));
+    if (effectCard) statements.push(...effectUpserts(db, row.id, [effectCard], now));
   }
   return { statements, summary };
 }
 
-// POST /api/cards/turn { round, lines, skill }: the player's turn of the
+// POST /api/cards/turn { round, lines, skill, effect }: the player's turn of the
 // running match (turnBlock, playTurn), the rival's lines for the next round
 // laid by the engine; at the match's end what it pays. Only over the match
 // as read (its version), and a staked one's end only over the character as
@@ -804,7 +933,7 @@ export async function playCardTurn(context) {
   const state = JSON.parse(match.state);
   const block = turnBlock(state, body, content());
   if (block) throw new ApiError(block.status ?? 400, block.code, block.message);
-  const next = playTurn(state, { round: body.round, lines: body.lines, skill: body.skill ?? null }, content());
+  const next = playTurn(state, { round: body.round, lines: body.lines, skill: body.skill ?? null, effect: body.effect ?? null }, content());
   const ended = next.result ? await endStatements(db, player, match, next, context.now) : null;
   const statements = ended
     ? [assertion(db, '(SELECT version FROM card_matches WHERE id = ?) = ?', [match.id, match.version]), ...ended.statements]
@@ -840,4 +969,5 @@ export async function surrenderCards(context) {
 // The rows of the cards of the characters `which` (SQL after
 // `character_id`, with `binds`), removed with them (characters.js,
 // accounts.js).
-export const cardRemoval = (db, which, binds) => ['cards', 'card_decks', 'card_deck_slots', 'card_matches'].map((table) => db.prepare(`DELETE FROM ${table} WHERE character_id ${which}`).bind(...binds));
+export const cardRemoval = (db, which, binds) =>
+  ['cards', 'card_effects', 'card_decks', 'card_deck_slots', 'card_matches'].map((table) => db.prepare(`DELETE FROM ${table} WHERE character_id ${which}`).bind(...binds));

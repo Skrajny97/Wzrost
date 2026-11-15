@@ -3298,6 +3298,36 @@ Autor: „trzeba by dodać jeszcze jakieś karty efektów coś wzmacniającego s
 2. **Zasady (977):** 977.1 B: karty efektów stoją osobno, obok 12 stworów talii są 2 miejsca na karty efektów; 977.2 A: najwyżej jedna karta efektu na rundę, zagrywana przed „Walcz”, jak umiejętność bohatera; 977.3 B: karty efektów wypadają z paczek kart w Salonie Gier i za pierwsze pokonanie stopni Szczęsnego, a do tego rzadko z wypraw i z Labiryntu; 977.4 A: grają nimi także Szczęsny (od wyższych stopni) i mieszkańcy Osady przy swoich stołach.
 3. **Dalej:** obrazki ośmiu kart w PixelLab (po cztery wersje) i makiety stołu z kartami efektów (telefon, 1366 i 1920 px) na stronę ocen, a liczby (szanse wypadania, stopnie i talie rywali) z symulacji partii.
 
+## Karty efektów w grze (978, 979; 15.11.2026, od 0.3.63)
+
+Obrazki przyjęte: 978.1 D, 978.2 B, 978.3 C, 978.4 B, 978.5 C, 978.6 D, 978.7 D, 978.8 D, tło 978.9 D. Makiety 979.1–979.4 przyjęte bez uwag. Zasady z 976 i 977 wyżej.
+
+1. **Kolekcja:** karty efektów postaci (tabela `card_effects`), każda z liczbą sztuk; poziom to liczba sztuk, najwyżej 5. Siła rośnie o `perLevel` za każdy poziom ponad pierwszy, a Pęta najwyżej do 100%. Na karcie w miejscu Ataku i Życia stoi to, co daje (`short` w `data/cards.json`, np. „+40% ciosu”), w miejscu typu gwiazdka, za obrazkiem wspólne tło kart efektów.
+2. **Talia:** obok 12 stworów 2 miejsca na karty efektów (977.1 B). Wybiera się je przy „Ułóż talię” w zakładce „Karty efektów” (979.2), a każde zapisane miejsce talii (938) pamięta swoje. Talia pokazuje je pod stworami (979.1).
+3. **Partia** (979.3, 979.4): pod kartą bohatera sekcja „Karty efektów”. Stuknięcie karty, potem celu: swojej karty na stole albo karty rywala. Zew watahy i Mgła działają bez celu. Najwyżej jedna na rundę, każda raz na partię (977.2 A), sprawdzane na serwerze. Karta, na którą działa, ma znaczek z tym, co daje, a podgląd ciosów liczy ją tak jak serwer.
+   - Najpierw działa to, co zmienia same karty: Żywa woda, Piorun Peruna (nigdy nie zbija karty) i Klątwa słabości, najpierw gracza, potem rywala. Reszta działa w ciosach rundy.
+   - Mgła losuje chybienia z ziarna partii. Przebieg rundy wymienia zagrane karty efektów i chybione ciosy.
+4. **Skąd się biorą** (977.3 B):
+   - **Pakiet u Szczęsnego:** z szansą 25% karta efektu zamiast pierwszego stwora pakietu. Jej rzadkość losuje się według wag: pospolita 32, rzadka 30, unikatowa 22, epicka 12.
+   - **Pierwsza wygrana o stawkę na każdym stopniu Szczęsnego,** także na stopniu pokonanym przed kartami efektów: karta pospolita, rzadka, unikatowa, epicka i epicka na stopniach I–V. Najpierw taka, której postać nie ma.
+   - **Wyprawa bez omdlenia:** szansa 1% za każdą godzinę.
+   - **Strażnik Labiryntu:** szansa 3% za każdego pokonanego.
+   - Karty na 5. poziomie nigdy nie wypadają. Liczby są w `data/cards.json` (`effects`).
+5. **Rywale** (977.4 A):
+   - Szczęsny od III stopnia gra Niedźwiedzią siłą i Kamienną skórą (poziom 1), na IV Klątwą słabości i Żywą wodą (2), na V Pętami i Piorunem Peruna (3).
+   - Przy stołach mieszkańców grają nimi wszyscy poza Zbylutem i stajennym (`residents.tables[].effects`).
+   - Na Arenie talia, która się broni, gra kartami efektów swojego właściciela.
+   - Rywal zagrywa kartę, gdy daje mu ona co najmniej dziesiątą część jego Ataku na stole. Gracz widzi ją przed swoim ruchem, pod kartami rywala.
+6. **Brakujące szczegóły, rozstrzygnięte najprościej:**
+   - Partie na żywo z innymi graczami są na razie bez kart efektów. Dojdą w kolejnej wersji, bo mają własny silnik ruchów (`src/engine/card-duel.js`).
+   - Kart efektów nie ma w Encyklopedii ani w handlu i znikają razem z postacią.
+7. **Pliki:**
+   - silnik: `src/engine/cards.js` (`effectView`, `effectDeckBlock`, `applyEffect`, `rivalEffect`, `packEffect`, `effectDrop`);
+   - serwer: `src/server/cards.js`, `card-arena.js`, `hunts.js`, `labyrinth.js`;
+   - strona: `src/client/card-effects.js`, `cards.js`, `card-arena.js`;
+   - baza: `migrations/0137_card_effects.sql`;
+   - grafika: `src/client/art/cards/effects/`.
+
 ## Pakiet Szczęsnego jak booster (981; 15.11.2026, od 0.3.57)
 
 Autor zapytał, czemu część graczy nie ma pakietu trzech kart u Szczęsnego (pakiet losował z krain niższych niż kraina postaci, więc w pierwszej krainie, do 50. poziomu, go nie było) i wybrał 981 B: „w Skraju Puszczy pakiet losuje karty z tej samej krainy”. Zaraz potem napisał: „no i te 3 karty Szczęsnego niech losuje całkowicie nie że słabsze, moga sie trafic tez lepsze ale niech pakiet bedzie drogi, tańszy dzieki relacji ze Szczesnym” i „niech to bedzie cos ala boostery w Pokemonach i tez trzeba zrobic jakas animacje ich otwierania”. Ta wiadomość zastępuje 981 B: pakiet losuje ze wszystkich krain, więc jest też w pierwszej.
@@ -3379,6 +3409,10 @@ Autor: „Niech oznaczanie na czacie będzie możliwe też po nazwie konta”.
 1. „@” i nazwa konta oznacza postać, którą to konto teraz gra, na tych samych zasadach co imię postaci: tylko ten, kto czyta kanał, nigdy własne konto ani ktoś, kto ukrył piszącego, najwyżej 5 oznaczeń w wiadomości. Wielkość liter bez znaczenia (`src/server/mentions.js`).
 2. Postać oznaczona w jednej wiadomości i nazwą konta, i imieniem liczy się raz.
 3. Podpowiedzi pod polem wiadomości pokazują też nazwy kont piszących.
+
+## Wersja 0.3.63 (15.11.2026): karty efektów w Talii Systemu
+
+1. Osiem kart efektów w talii, w partiach u Szczęsnego, przy stołach mieszkańców i na Arenie, z pakietów, za pierwsze wygrane na stopniach Szczęsnego, rzadko z wypraw i od strażników Labiryntu. Zob. „Karty efektów w grze”.
 
 ## Wersja 0.3.62 (15.11.2026): zakładki czatu na komputerze w rzędach
 

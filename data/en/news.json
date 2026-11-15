@@ -820,6 +820,10 @@
     "0.3.62": {
       "title": "Version 0.3.62",
       "body": "- On a computer, the chat's tabs no longer hide past the edge of the column: they wrap into more rows, so you see every conversation and the dots of new messages."
+    },
+    "0.3.63": {
+      "title": "Version 0.3.63",
+      "body": "- System Deck: effect cards. They stand beside the 12 creatures of your deck, in two slots, and in a match strengthen your cards or weaken the rival's: at most one a round, each once a match. You choose them in \"Build deck\", on the \"Effect cards\" tab.\n- You get them from Szczęsny's packs, for the first staked win on each of his tiers (also one you've already beaten), and rarely from explorations and the Labyrinth's guardians.\n- Szczęsny from his tier III, most of the Settlement's residents and the decks defending in the Arena play them too. You see the rival's effect card before your move."
     }
   }
 }

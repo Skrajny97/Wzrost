@@ -112,6 +112,40 @@
       }
     }
   },
+  "effects": {
+    "cards": {
+      "bear-strength": { "name": "Bear Strength", "short": "+{power}% damage", "text": "Your chosen card hits {power}% harder this round." },
+      "stone-skin": { "name": "Stone Skin", "short": "−{power}% damage taken", "text": "Your chosen card takes {power}% weaker hits this round." },
+      "living-water": { "name": "Living Water", "short": "+{power}% Life", "text": "Your chosen card regains {power}% of its Life, at most up to what it had at the start of the match." },
+      "weakness-curse": { "name": "Curse of Weakness", "short": "−{power}% damage", "text": "The chosen rival's card hits {power}% weaker for the rest of the match." },
+      "wolf-call": { "name": "Call of the Pack", "short": "+{power}% all damage", "text": "All your cards hit {power}% harder this round." },
+      "mist": { "name": "Mist", "short": "{power}% misses", "text": "This round, each of the rival's blows at your cards misses with a {power}% chance." },
+      "shackles": { "name": "Shackles", "short": "−{power}% damage", "text": "The chosen rival's card hits {power}% weaker this round." },
+      "perun-lightning": { "name": "Perun's Lightning", "short": "−{power}% Life", "text": "The chosen rival's card loses {power}% of its Life at once, before the round's blows." }
+    },
+    "texts": {
+      "tab": "Effect cards",
+      "slots": "Effect cards in the deck: {used} of {slots}",
+      "rule": "Effect cards stand beside the 12 creatures of your deck. In a match you play at most one a round, before \"Fight\", and each one once a match.",
+      "empty": "You have no effect cards yet. They come from Szczęsny's packs, from the first win on each of his tiers, and rarely from explorations and the Labyrinth's guardians.",
+      "none": "No effect cards",
+      "pick": "Play an effect card: at most one a round, each once a match.",
+      "once": "You play each effect card once a match, at most one a round.",
+      "packChance": "With a {chance}% chance, one of the cards in the pack is an effect card.",
+      "builder": "Effect cards: {count} of {slots} chosen. Tap a card to add it or take it off.",
+      "inDeckNone": "No effect cards in this deck. You can add them in \"Build deck\".",
+      "targetOwn": "Point at your card on the table.",
+      "targetRival": "Point at the rival's card on the table.",
+      "used": "played",
+      "chosen": "you play it this round",
+      "rival": "The rival's effect cards",
+      "rivalPlays": "The rival plays an effect card: {name}.",
+      "firstWin": "For the first win on this tier you also get an effect card: {card}.",
+      "inPack": "The pack held an effect card: {card}.",
+      "missed": "misses",
+      "found": "Among the spoils gleams an effect card: {card}."
+    }
+  },
   "texts": {
     "intro": "Szczęsny shuffles a deck of cards with creatures of the Bestiary. \"Twelve cards, three lines, as in a real battle. Build your deck and take a seat.\"",
     "starterOffer": "\"For a good start I'll give you a deck: twelve cards, four of each type. The rest you'll win on your explorations.\"",
