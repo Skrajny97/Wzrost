@@ -852,6 +852,10 @@
     "0.3.70": {
       "title": "Version 0.3.70",
       "body": "- The Arena and guild wars: the second forms are evened out. The Grand Inquisitor, the Druid and the Phantom strike harder, the Thunder Lord and the Huntmaster softer, and the Bastion has less HP, in players' duels only. Before, at level 100 the Grand Inquisitor won 1% of its duels and the Druid 9%. Now every second form wins from 31% to 70%.\n- Explorations, towers, the Labyrinth and fights with creatures do not change."
+    },
+    "0.3.72": {
+      "title": "Version 0.3.72",
+      "body": "- Skin tones on portraits: on 71 portraits of forms, outfits and starting classes, part of the skin did not change colour with the chosen tone. On dark skin, for example, a light strip of forehead or a light edge of a hand stayed. Now all the skin has the chosen tone, and hair, armour and outfits stay as they were."
     }
   }
 }
