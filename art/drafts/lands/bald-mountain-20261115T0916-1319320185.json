@@ -1,0 +1,14 @@
+{
+  "id": "bald-mountain",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, a bald mountain top above dark fir forests on the night of a witches' sabbath, an old stone wall around the summit, small fires burning on the top, tiny witches on brooms flying across a huge pale moon, wide panorama for a dim background behind text, low contrast, very dark muted palette of night blues, fir greens and ember oranges, no text, no border, no people in front, no animals in front",
+  "style": "src/client/art/lands/black-bog.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}

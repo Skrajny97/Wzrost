@@ -1,0 +1,14 @@
+{
+  "id": "fir-forest",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, an ancient forest of tall dark silver firs on mountain slopes, deep blue shadows between the trunks, thin smoke rising from a hidden hut, mist in the valleys, wide panorama for a dim background behind text, low contrast, muted dark palette of deep fir greens, blue-greys and mist whites, no text, no border, no people, no animals in front",
+  "style": "src/client/art/lands/black-bog.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}

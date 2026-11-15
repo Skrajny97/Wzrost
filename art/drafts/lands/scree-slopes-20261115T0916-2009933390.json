@@ -1,0 +1,14 @@
+{
+  "id": "scree-slopes",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, vast grey stone rivers of quartzite boulders on the slopes of old low mountains, no trees on the scree, dark fir forests at the edges, a lone griffin circling high above, a pale cold sky with racing clouds, wide panorama for a dim background behind text, low contrast, muted palette of stone greys, fir greens and pale blues, no text, no border, no people, no animals in front",
+  "style": "src/client/art/lands/black-bog.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
