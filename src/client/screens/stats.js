@@ -23,6 +23,8 @@ const SOURCES = [
 // percentage points, shown simply as "%".
 const EFFECTS = [
   { key: 'damage', label: 'obrażenia', format: (v) => `+${formatDecimal(v * 100)}%` },
+  // The evolution's skills, from its stat (986 B).
+  { key: 'skillPower', label: 'umiejętności ewolucji', format: (v) => `+${formatDecimal(v * 100)}%` },
   { key: 'maxHp', label: 'maks. HP', format: (v) => `+${formatNumber(v)}` },
   { key: 'regen', label: 'regeneracja', format: (v) => `+${formatPrecise(v)} HP/min` },
   { key: 'reduction', label: 'redukcja obrażeń', format: percentPoints },

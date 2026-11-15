@@ -241,6 +241,21 @@ export function coreResonance(absorbed, content) {
   });
 }
 
+// The class's main stat, which an Artefakt's "Główna statystyka" raises:
+// the stat of the class's biggest share of autoPoints, the one "Rozdaj
+// według klasy" gives the most (Siła of a Wojownik, Zręczność of a Łucznik
+// and a Cień, Intelekt of a Mag and a Kleryk).
+/**
+ * @param {string} classId
+ * @param {Content} content
+ * @returns {string}
+ */
+export function mainStatOf(classId, content) {
+  /** @type {Record<string, number>} */
+  const autoPoints = content.classesById[classId]?.autoPoints ?? {};
+  return Object.entries(autoPoints).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'vitality';
+}
+
 // Everything a Rdzeń gives (CoreEffects): each absorbed Artefakt's traits
 // and ability with the gem's bonus, and the resonance of its elements. A
 // stat trait of the class's main stat ("main") goes to the class's biggest
@@ -256,9 +271,7 @@ export function coreEffects(core, classId, content) {
   if (absorbed.length === 0 || !content.labyrinth) return null;
   const gem = coreGemBonus(core?.gem, content);
   const effects = noEffects();
-  /** @type {Record<string, number>} */
-  const autoPoints = content.classesById[classId]?.autoPoints ?? {};
-  const main = Object.entries(autoPoints).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'vitality';
+  const main = mainStatOf(classId, content);
   /**
    * @param {string} traitId
    * @param {number} value
@@ -395,12 +408,15 @@ export function artifactName(artifact, content) {
 // size and sockets, rarity with its colour, its traits and ability with
 // their numbers (with the gem of the Rdzeń: `gemBonus`), its upgrade, the
 // Odłamki its next level costs, and what breaking and dissolving it give.
+// For a character of `classId` the trait of the class's main stat names
+// that stat (a player: „jak sprawdzić która to jest główna?”, 15.11.2026).
 /**
  * @param {Artifact} artifact
  * @param {Content} content
  * @param {number} [gemBonus]
+ * @param {string | null} [classId]
  */
-export function artifactView(artifact, content, gemBonus = 0) {
+export function artifactView(artifact, content, gemBonus = 0, classId = null) {
   const size = artifactSize(artifact.size, content);
   const rarity = content.raritiesById[artifact.rarity];
   const element = content.elementsById[artifact.element];
@@ -418,7 +434,11 @@ export function artifactView(artifact, content, gemBonus = 0) {
     rarity: artifact.rarity,
     rarityName: rarity?.forms?.m ?? rarity?.name ?? artifact.rarity,
     rarityColor: rarity?.color ?? '#9b9b9b',
-    traits: artifact.traits.map((id) => ({ id, name: traitOf(id, content)?.name ?? id, text: traitText(id, traitValue(artifact, id, gemBonus, content), content) })),
+    traits: artifact.traits.map((id) => {
+      const text = traitText(id, traitValue(artifact, id, gemBonus, content), content);
+      const main = classId && traitOf(id, content)?.stat === 'main' ? content.statsById[mainStatOf(classId, content)]?.name : null;
+      return { id, name: traitOf(id, content)?.name ?? id, text: main ? `${text} (${main})` : text };
+    }),
     ability: ability
       ? {
           id: ability.id,

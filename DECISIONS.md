@@ -3309,6 +3309,32 @@ Autor zapytał, czemu część graczy nie ma pakietu trzech kart u Szczęsnego (
 5. **Przy okazji:** zasady kart mówiły „najwyżej +15% za wszystkie 156 kart”, a od Łysogór kart jest 207, więc teraz: „najwyżej +15%, od 150 kart”.
 6. **Dalej:** animacja otwierania pakietu. Obrazek pakietu w PixelLab i makieta animacji (MP4 z telefonu) idą na stronę ocen, a do gry po akceptacji.
 
+## Statystyka ewolucji w jej umiejętnościach (980 B, 986 B; 15.11.2026, od 0.3.60)
+
+Gracz zapytał autora: „czemu na nekromancie pokazuje ze intelekt nic nie daje?”. Autor wybrał 980 B (Intelekt i Siła zaczynają działać u tych ewolucji na ich umiejętności), a z liczb pytania 986 wersję B (statystyka liczy się podwójnie).
+
+1. **Które ewolucje:** 11 ewolucji ma w `data/evolutions.json` pole `skillStat`.
+   - Intelekt: Truciciel, Nekromanta, Licz, Strzelec Burzy, Władca Piorunów, Wybraniec Peruna.
+   - Siła: Łowca, Mistrz Łowów, Władca Puszczy, Inkwizytor, Wielki Inkwizytor.
+   - To statystyka, którą daje wzrost tych ewolucji, a broń ich klasy jej nie używa.
+2. **Zasada** (`src/engine/combatant.js`): umiejętności ewolucji tych postaci liczą się od `damageScale(statystyka broni + 2 × statystyka ewolucji)`, a nie od samej statystyki broni (`balance.json` `skills.skillStatWeight` = 2).
+   - Rosną ich ciosy (`power`, `single`), trucizny i krwawienia (`dotPower`), łańcuchy piorunów (`chainPower`) oraz siła przywołańców, chmur i znaków (`power`).
+   - Bez zmian zostają zwykłe ciosy bronią, czas działania, HP przywołańców i pozostałe liczby.
+3. **Podgląd statystyk** pokazuje przy tej statystyce „umiejętności ewolucji +X%” (`skillPower` w `src/engine/preview.js`).
+4. **Symulacje** (postacie jak u graczy, poziomy 75, 150 i 250):
+   - XP z wypraw bez zmian (różnice do 2%, w granicach losowości).
+   - Umiejętności mocniejsze o 2–17%, zwykle o 6–9%.
+   - Wygrane w pojedynkę z elitą i czempionem najnowszego miejsca rosną o 0–16 punktów procentowych.
+5. **Pojedynki graczy** (Arena, wojny gildii; `duelist` w `src/engine/pvp-arena.js`) na razie bez tej zasady.
+   - Na Arenie na 200. poziomie Licz wygrywałby 72% pojedynków zamiast 64%, Władca Puszczy 70% zamiast 65%, a Arcydruid 24% zamiast 27%.
+   - To poniżej progu 25–75%, którego pilnuje test trzecich form.
+   - Przy statystyce liczonej raz wszystkie formy mieszczą się w progu (Arcydruid 26%). Pytanie 987 na stronie ocen.
+6. **Test** „druga forma wyraźnie mocniejsza od pierwszej” (`test/second-evolution.test.js`) liczy 100 wypraw zamiast 40. Przy 40 bliska para Wielki Inkwizytor i Inkwizytor przechylała się przypadkiem (5 omdleń wobec 3), a przy 200 wyprawach Wielki Inkwizytor ma 43 omdlenia wobec 56.
+
+## Główna statystyka klasy w opisie Artefaktu (15.11.2026, od 0.3.60)
+
+Gracz: „Mam artefakt który daje 1% do głównej statystyki klasy, tylko jak sprawdzić która to jest główna?”; autor: „zasadne pytanie”. W Rdzeniu cecha „Główna statystyka” podaje teraz nazwę statystyki klasy postaci, np. „+1% głównej statystyki klasy (Zręczność)”. Główna statystyka to ta, w którą „Rozdaj według klasy” daje najwięcej (`mainStatOf` w `src/engine/core.js`): Wojownik Siła, Łucznik i Cień Zręczność, Mag i Kleryk Intelekt.
+
 ## Polecenie gry z linku (982 A z dopiskiem, 985; 15.11.2026, od 0.3.59)
 
 Autor: „kolejna opcja do dodania - ktoś rejestruje się z polecenia, konkretnego linku, a druga osoba za to zgarnia nagrodę (ta co poleca)”. Wybór 982 A z dopiskiem: „dodatkowe 300 Punktów Systemu za 30 poziom i 100 punktów dla grającego”. Makiety 985.1–985.3 przyjęte bez uwag.
@@ -3341,6 +3367,11 @@ Autor: „Niech oznaczanie na czacie będzie możliwe też po nazwie konta”.
 1. „@” i nazwa konta oznacza postać, którą to konto teraz gra, na tych samych zasadach co imię postaci: tylko ten, kto czyta kanał, nigdy własne konto ani ktoś, kto ukrył piszącego, najwyżej 5 oznaczeń w wiadomości. Wielkość liter bez znaczenia (`src/server/mentions.js`).
 2. Postać oznaczona w jednej wiadomości i nazwą konta, i imieniem liczy się raz.
 3. Podpowiedzi pod polem wiadomości pokazują też nazwy kont piszących.
+
+## Wersja 0.3.60 (15.11.2026): Intelekt i Siła w umiejętnościach 11 ewolucji, główna statystyka w opisie Artefaktu
+
+1. Statystyka ewolucji liczy się podwójnie w jej umiejętnościach (986 B), poza Areną i wojnami gildii. Zob. „Statystyka ewolucji w jej umiejętnościach”.
+2. Cecha Artefaktu „Główna statystyka” podaje nazwę statystyki klasy. Zob. „Główna statystyka klasy w opisie Artefaktu”.
 
 ## Wersja 0.3.59 (15.11.2026): polecenie gry z linku
 

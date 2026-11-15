@@ -32,10 +32,10 @@ export const challengeAt = (level, content) => (level >= content.balance.challen
 // raises or lowers a stat (`weekStats`, weekFighter in weeks.js) has those
 // shares too.
 /**
- * @param {{ character: Character, equipped: Item[], hp?: number | null, name: string, area?: Area | null, id?: string, side?: string, statBoost?: Record<string, number> | null }} fighter
+ * @param {{ character: Character, equipped: Item[], hp?: number | null, name: string, area?: Area | null, id?: string, side?: string, statBoost?: Record<string, number> | null, skillStat?: boolean }} fighter
  * @param {Content} content
  */
-export function playerCombatant({ character, equipped, hp, name, area, id = 'a0', side = 'ally', statBoost = null }, content) {
+export function playerCombatant({ character, equipped, hp, name, area, id = 'a0', side = 'ally', statBoost = null, skillStat: withSkillStat = true }, content) {
   const balance = content.balance;
   const { totals: stats, bonuses } = computeStats(character, equipped, content);
   const week = character.weekStats ?? null;
@@ -62,6 +62,12 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
   const evolution = evolutionOf(character, content);
   const feat = evolution ? { kind: evolution.trait.kind, name: evolution.trait.name, ...evolution.trait.params } : null;
   const manaMax = maxMana(totals.wisdom, character.classLevel, perClassLevel, balance);
+  // Not in the players' duels (the Arena, the guild wars: duelist in
+  // pvp-arena.js), whose balance the author has yet to decide on.
+  const skillStat = withSkillStat ? evolution?.skillStat : null;
+  const skillWeight = balance.skills.skillStatWeight ?? 0;
+  const skillPower =
+    skillStat && skillWeight > 0 ? damageScale(totals[weapon.scaling] + skillWeight * (totals[skillStat] ?? 0), character.level, balance) / damageScale(totals[weapon.scaling], character.level, balance) : 1;
   const resist = { ...bonuses.resist };
   if (feat?.kind === 'bulwark') {
     armor *= 1 + feat.armor;
@@ -110,7 +116,16 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     wisdom: totals.wisdom,
     // A skill priced in a share of the maximum mana costs that share of it
     // (the Arkanista's summons, 934 A and 935 A).
-    skills: learnedSkills(character, content).map((skill) => (skill.manaShare ? { ...skill, mana: Math.max(1, Math.round(manaFull * skill.manaShare)) } : skill)),
+    // The evolution's skills of an evolution whose growth gives a stat its
+    // weapon does not use (986 B, evolutions.json skillStat): they scale with
+    // the weapon's stat and that stat (balance.skills.skillStatWeight times
+    // it) together, so the stat strengthens their blows, poisons, bleeding,
+    // curses, summons and lightning. `skillPower`: their multiplier.
+    skillPower,
+    skills: learnedSkills(character, content).map((skill) => {
+      const priced = skill.manaShare ? { ...skill, mana: Math.max(1, Math.round(manaFull * skill.manaShare)) } : skill;
+      return skillPower !== 1 && content.skillsById[skill.id]?.evolution ? { ...priced, params: poweredParams(priced.params, skillPower) } : priced;
+    }),
     ...(feat && { feat }),
     // The share of the missing HP back after a won fight on an exploration:
     // less from the challenge's level (628 B).
@@ -141,6 +156,18 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
  * @returns {string}
  */
 const strikeOf = (strike, category) => strike ?? (category === 'magical' ? 'magic' : 'melee');
+
+// The numbers of a skill's blows (its power, its single target's, its
+// poison's or bleeding's and its chain's) times `power` (986 B).
+/**
+ * @param {Record<string, any>} params
+ * @param {number} power
+ */
+function poweredParams(params, power) {
+  const out = { ...params };
+  for (const key of ['power', 'single', 'dotPower', 'chainPower']) if (typeof out[key] === 'number') out[key] *= power;
+  return out;
+}
 
 /**
  * @param {Item} worn

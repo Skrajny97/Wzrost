@@ -15,9 +15,9 @@ import { computeStats } from './stats.js';
 /** @typedef {Record<string, any>} Item An item, as items.js makes it. */
 /**
  * @typedef {{ damageMin: number, damageMax: number, damage: number, reduction: number, dodge: number, crit: number, effectResist: number,
- *   speed: number, maxHp: number, mana: number, regen: number, recovery: number, resist: Record<string, number> }} CombatValues
+ *   speed: number, maxHp: number, mana: number, regen: number, recovery: number, skillPower: number, resist: Record<string, number> }} CombatValues
  */
-/** @typedef {'damage' | 'reduction' | 'dodge' | 'crit' | 'effectResist' | 'speed' | 'maxHp' | 'mana' | 'regen' | 'recovery'} ValueKey */
+/** @typedef {'damage' | 'skillPower' | 'reduction' | 'dodge' | 'crit' | 'effectResist' | 'speed' | 'maxHp' | 'mana' | 'regen' | 'recovery'} ValueKey */
 
 /**
  * @param {Character} character
@@ -47,6 +47,8 @@ export function combatValues(character, equipped, content) {
     mana: unit.maxMana,
     regen: regenPerMinute(unit.maxHp, totals.vitality, content),
     recovery: unit.recovery,
+    // The evolution skills' strength from the evolution's stat (986 B).
+    skillPower: unit.skillPower ?? 1,
     // Each element's resistance as the share of its damage it takes away.
     resist: Object.fromEntries(content.elements.map((/** @type {{ id: string }} */ { id }) => [id, reduction(unit.resist[id] ?? 0, level, balance)])),
   };
@@ -122,7 +124,7 @@ export function statShares(character, equipped, content) {
   const now = combatValues(character, equipped, content);
   const { totals, sources } = computeStats(character, equipped, content);
   /** @type {ValueKey[]} */
-  const keys = ['damage', 'reduction', 'dodge', 'crit', 'effectResist', 'speed', 'maxHp', 'mana', 'regen', 'recovery'];
+  const keys = ['damage', 'skillPower', 'reduction', 'dodge', 'crit', 'effectResist', 'speed', 'maxHp', 'mana', 'regen', 'recovery'];
   return Object.fromEntries(
     content.statIds.map((/** @type {string} */ stat) => {
       // The Rdzeń's share of a stat goes with the stat's other points.
@@ -131,7 +133,7 @@ export function statShares(character, equipped, content) {
       /** @type {Partial<Record<ValueKey, number>>} */
       const shares = {};
       for (const key of keys) {
-        const share = key === 'damage' ? now.damage / without.damage - 1 : now[key] - without[key];
+        const share = key === 'damage' || key === 'skillPower' ? now[key] / without[key] - 1 : now[key] - without[key];
         if (Math.abs(share) > 1e-9) shares[key] = share;
       }
       return [stat, shares];

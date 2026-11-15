@@ -396,6 +396,24 @@ describe('the Artefakty', () => {
     assert.equal(breakShards(artifact, content), rules.core.break.rare * 3 + Math.floor(spent / 2));
   });
 
+  // A player, 15.11.2026: „Mam artefakt który daje 1% do głównej statystyki
+  // klasy, tylko jak sprawdzić która to jest główna?”.
+  test('the trait of the class\'s main stat names that stat for the character\'s class; without a class as before', () => {
+    const artifact = { element: 'fire', size: 'small', rarity: 'rare', traits: ['main-stat'], ability: null, upgrade: 0 };
+    const plain = artifactView(artifact, content).traits[0].text;
+    assert.match(plain, /głównej statystyki klasy$/);
+    const named = Object.fromEntries(['warrior', 'archer', 'mage', 'cleric', 'shadow'].map((classId) => [classId, artifactView(artifact, content, 0, classId).traits[0].text]));
+    assert.deepEqual(named, {
+      warrior: `${plain} (Siła)`,
+      archer: `${plain} (Zręczność)`,
+      mage: `${plain} (Intelekt)`,
+      cleric: `${plain} (Intelekt)`,
+      shadow: `${plain} (Zręczność)`,
+    });
+    // Another trait stays as it is.
+    assert.equal(artifactView({ ...artifact, traits: ['damage'] }, content, 0, 'archer').traits[0].text, artifactView({ ...artifact, traits: ['damage'] }, content).traits[0].text);
+  });
+
   test('every level of upgrade shows in the numbers, small ones too (the author, 14.11.2026: a Mały Artefakt trucizny +4 still read 0,2%)', () => {
     const poison = { element: 'poison', size: 'small', rarity: 'common', traits: ['lifesteal'], ability: null, upgrade: 0, spent: 0 };
     const kwarc = 0.05;

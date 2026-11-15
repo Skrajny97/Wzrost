@@ -808,6 +808,10 @@
     "0.3.59": {
       "title": "Version 0.3.59",
       "body": "- Recommend the game to your friends: in Community → Friends you have your own link to the game. For every new player from your link you get 100 System Points once they confirm their e-mail and reach level 10, and 300 more once they reach level 30.\n- A new player from a link gets 20 System Points at the start and 100 at level 30. You collect the rewards with \"Collect\", at most 10 a month."
+    },
+    "0.3.60": {
+      "title": "Version 0.3.60",
+      "body": "- Intellect and Strength now work for 11 evolutions they did nothing for before. Poisoner, Necromancer, Lich, Storm Archer, Thunder Lord and Chosen of Perun get stronger evolution skills from Intellect, and Hunter, Huntmaster, Ruler of the Wilds, Inquisitor and Grand Inquisitor from Strength. The stats preview shows how much. In the Arena and in guild wars nothing changes for now.\n- In the Core, the \"Main stat\" trait names your class's stat."
     }
   }
 }
