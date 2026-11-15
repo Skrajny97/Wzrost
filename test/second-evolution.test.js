@@ -504,6 +504,7 @@ describe('the second forms in fights', () => {
     // typical character, without companions or upgrades, faints on every
     // such exploration with either form, so the comparison keeps them.
     const level = 90;
+    const RUNS = 100;
     const area = areaForLevel(level + 8, content);
     const { lateGame, endGame } = content.balance.monsters;
     const monsters = { ...content.balance.monsters, lateGame: { ...lateGame, damage: 0.25, hp: 0.25 }, endGame: { ...endGame, damage: 0, hp: 0 } };
@@ -517,10 +518,14 @@ describe('the second forms in fights', () => {
       const maxHp = playerCombatant({ character, equipped: base.equipped, name: 'Próba', area }, local).maxHp;
       let faints = 0;
       let endHp = 0;
-      for (let i = 0; i < 40; i++) {
+      // 100 explorations, so a small change elsewhere (986 B, 15.11.2026:
+      // the evolution's stat in its skills) does not tip a close pair by
+      // chance: with 40 the Wielki Inkwizytor drew 5 faints against 3,
+      // with 200 it has 43 against the Inkwizytor's 56.
+      for (let i = 0; i < RUNS; i++) {
         const hunt = simulateHunt({ character, equipped: base.equipped, hp: maxHp, name: 'Próba', areaId: area.id, minutes: 240, seed: `druga:${evolution.id}:${i}` }, local);
         if (hunt.result === 'fainted') faints += 1;
-        endHp += hunt.hpEnd / hunt.maxHp / 40;
+        endHp += hunt.hpEnd / hunt.maxHp / RUNS;
       }
       return { faints, endHp };
     };

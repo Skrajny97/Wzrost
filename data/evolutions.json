@@ -44,6 +44,7 @@
     },
     {
       "id": "storm-archer",
+      "skillStat": "intellect",
       "classId": "archer",
       "path": "arrow-rain",
       "name": "Strzelec Burzy",
@@ -53,6 +54,7 @@
     },
     {
       "id": "hunter",
+      "skillStat": "strength",
       "classId": "archer",
       "path": "pinning-shot",
       "name": "Łowca",
@@ -99,6 +101,7 @@
     },
     {
       "id": "inquisitor",
+      "skillStat": "strength",
       "classId": "cleric",
       "path": "exorcism",
       "name": "Inkwizytor",
@@ -126,6 +129,7 @@
     },
     {
       "id": "poisoner",
+      "skillStat": "intellect",
       "classId": "shadow",
       "path": "poisoned-blade",
       "name": "Truciciel",
@@ -187,6 +191,7 @@
     },
     {
       "id": "thunder-lord",
+      "skillStat": "intellect",
       "classId": "archer",
       "from": "storm-archer",
       "name": "Władca Piorunów",
@@ -198,6 +203,7 @@
     },
     {
       "id": "master-hunter",
+      "skillStat": "strength",
       "classId": "archer",
       "from": "hunter",
       "name": "Mistrz Łowów",
@@ -254,6 +260,7 @@
     },
     {
       "id": "grand-inquisitor",
+      "skillStat": "strength",
       "classId": "cleric",
       "from": "inquisitor",
       "name": "Wielki Inkwizytor",
@@ -287,6 +294,7 @@
     },
     {
       "id": "necromancer",
+      "skillStat": "intellect",
       "classId": "shadow",
       "from": "poisoner",
       "name": "Nekromanta",
@@ -350,6 +358,7 @@
     },
     {
       "id": "perun-chosen",
+      "skillStat": "intellect",
       "classId": "archer",
       "from": "thunder-lord",
       "name": "Wybraniec Peruna",
@@ -361,6 +370,7 @@
     },
     {
       "id": "wild-lord",
+      "skillStat": "strength",
       "classId": "archer",
       "from": "master-hunter",
       "name": "Władca Puszczy",
@@ -449,6 +459,7 @@
     },
     {
       "id": "lich",
+      "skillStat": "intellect",
       "classId": "shadow",
       "from": "necromancer",
       "name": "Licz",

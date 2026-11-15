@@ -53,8 +53,9 @@ export function coreView(row, stored) {
     perSockets: content().labyrinth.core.sockets.per,
     shards: core.shards,
     gem: gemView(core.gem, content()),
-    absorbed: core.absorbed.map((artifact) => artifactView(artifact, content(), gem)),
-    stored: stored.map((artifact) => artifactView(artifact, content())),
+    // The trait of the class's main stat names it (core.js artifactView).
+    absorbed: core.absorbed.map((artifact) => artifactView(artifact, content(), gem, row.class_id)),
+    stored: stored.map((artifact) => artifactView(artifact, content(), 0, row.class_id)),
     resonance: resonanceView(core.absorbed, content()),
     resonanceCounts: content().labyrinth.core.resonance.counts,
     effects: coreEffectLines(effects, content()),

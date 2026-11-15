@@ -32,7 +32,8 @@
     "pointsPerClassLevel": 1,
     "paths": 2,
     "secondClassLevel": 11,
-    "lastPointClassLevel": 49
+    "lastPointClassLevel": 49,
+    "skillStatWeight": 2
   },
   "monsters": {
     "hpBase": 2,

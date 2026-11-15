@@ -53,6 +53,7 @@
           "nameFemale": { "type": "string", "minLength": 1, "description": "Nazwa dla postaci kobiecej (brak: jak name)." },
           "description": { "type": "string", "minLength": 1, "description": "Opis pod nazwą na karcie ewolucji." },
           "growth": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 }, "description": "Przyrost statystyk na poziom klasy po ewolucji, zamiast przyrostu klasy." },
+          "skillStat": { "type": "string", "enum": ["strength", "dexterity", "intellect", "wisdom", "vitality", "endurance", "perception", "will"], "description": "986 B: statystyka, którą wzrost ewolucji daje, a broń jej klasy nie używa; umiejętności ewolucji liczą się od statystyki broni razem z nią (balance.json skills.skillStatWeight razy)." },
           "perClassLevel": {
             "type": "object",
             "additionalProperties": false,

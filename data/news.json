@@ -1015,6 +1015,11 @@
       "id": "0.3.59",
       "title": "Wersja 0.3.59",
       "body": "- Poleć grę znajomym: w Społeczność → Znajomi masz swój link do gry. Za każdego nowego gracza z Twojego linku zgarniesz 100 Punktów Systemu, gdy potwierdzi e-mail i dojdzie do 10. poziomu, i jeszcze 300, gdy dojdzie do 30. poziomu.\n- Nowy gracz z linku dostaje 20 Punktów Systemu na start i 100 na 30. poziomie. Nagrody odbierasz przyciskiem „Odbierz”, najwyżej 10 w miesiącu."
+    },
+    {
+      "id": "0.3.60",
+      "title": "Wersja 0.3.60",
+      "body": "- Intelekt i Siła działają teraz u 11 ewolucji, którym wcześniej nic nie dawały. Truciciel, Nekromanta, Licz, Strzelec Burzy, Władca Piorunów i Wybraniec Peruna mają dzięki Intelektowi mocniejsze umiejętności ewolucji, a Łowca, Mistrz Łowów, Władca Puszczy, Inkwizytor i Wielki Inkwizytor dzięki Sile. Ile to daje, widać w podglądzie statystyk. Na Arenie i w wojnach gildii na razie bez zmian.\n- W Rdzeniu cecha „Główna statystyka” podaje nazwę statystyki Twojej klasy.\n- Labirynt: po wygranej ze strażnikiem albo z elitą „Obejrzyj walkę” stoi nad wyborem błogosławieństwa i zostaje także po wyborze."
     }
   ]
 }

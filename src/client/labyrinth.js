@@ -76,6 +76,9 @@ function mountView(container, { navigate, board }) {
   // The platform the party's figure stood on before the last room was
   // entered, as [x %, y %] of the board, for its walk to the new one.
   let walkFrom = null;
+  // The fight's result under a blessing's choice (resultSheet), shown again
+  // once the blessing is chosen.
+  let afterChoice = null;
   let clock = null;
 
   function show(message) {
@@ -725,6 +728,23 @@ function mountView(container, { navigate, board }) {
       return;
     }
     const choosing = view.pending?.kind === 'blessing' && view.pending.choices.length > 0;
+    // The fight under a blessing's choice comes back once the blessing is
+    // chosen (act), with "Obejrzyj walkę" still there (a player, 15.11.2026:
+    // after a won guardian only the blessings showed, and once one was
+    // chosen the fight could not be watched).
+    afterChoice = choosing ? { room, report } : null;
+    const watch =
+      report &&
+      h('button', {
+        type: 'button',
+        class: 'button button--world',
+        text: t('Obejrzyj walkę'),
+        onClick: () => {
+          state.freshReport = String(report.id);
+          closeSheet();
+          navigate(`#/raport/${report.id}`);
+        },
+      });
     openSheet(
       h('h2', { class: 'sheet-title sheet-title--art' }, roomArt(room.type), title),
       // An ordinary fight's XP and gold; an elite's and a guardian's gains
@@ -732,24 +752,12 @@ function mountView(container, { navigate, board }) {
       room.type === 'fight' && room.won && h('p', { class: 'sheet-text', text: t('+{xp} XP, +{gold} złota.', { xp: formatNumber(room.gains.xp), gold: formatNumber(room.gains.gold) }) }),
       lines.map((line) => h('p', { class: 'sheet-text', text: line })),
       room.artifact && artifactLine(room.artifact),
+      // With a blessing to choose, the fight to watch first, above the
+      // choice; the blessing waits on the board meanwhile.
+      choosing && watch && h('div', { class: 'sheet-actions' }, watch),
       choosing && blessingPrompt(),
       choosing && blessingChoices(view.pending.choices),
-      h(
-        'div',
-        { class: 'sheet-actions' },
-        report &&
-          h('button', {
-            type: 'button',
-            class: 'button button--world',
-            text: t('Obejrzyj walkę'),
-            onClick: () => {
-              state.freshReport = String(report.id);
-              closeSheet();
-              navigate(`#/raport/${report.id}`);
-            },
-          }),
-        !choosing && h('button', { type: 'button', class: 'button button--system', text: t('Dalej'), onClick: closeSheet }),
-      ),
+      !choosing && h('div', { class: 'sheet-actions' }, watch, h('button', { type: 'button', class: 'button button--system', text: t('Dalej'), onClick: closeSheet })),
     );
   }
 
@@ -769,7 +777,13 @@ function mountView(container, { navigate, board }) {
     const result = await fresh(() => call('POST', path, body));
     view = result.labyrinth;
     show();
-    if (document.querySelector('#sheet[open]')) choiceSheet();
+    if (!document.querySelector('#sheet[open]')) return;
+    // A blessing chosen under a fight's result: the result again, with
+    // "Obejrzyj walkę" and "Dalej".
+    if (!view.pending && afterChoice) {
+      const { room, report } = afterChoice;
+      resultSheet(room, report);
+    } else choiceSheet();
   }
 
   if (!isUnlocked('labyrinth')) {

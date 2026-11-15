@@ -126,7 +126,9 @@ export function duelArmorShare(levelA, levelB, content) {
 export function duelist({ character, equipped, name }, id, side, { factor, armor }, content) {
   // combatant.js is not checked yet: its options are typed by their
   // defaults alone (hp, area).
-  const unit = playerCombatant(/** @type {any} */ ({ character, equipped, name, id, side }), content);
+  // The evolution's stat stays out of its skills here (986 B, the Arena's
+  // balance kept until the author decides; combatant.js).
+  const unit = playerCombatant(/** @type {any} */ ({ character, equipped, name, id, side, skillStat: false }), content);
   const maxHp = Math.max(1, Math.round(unit.maxHp * factor));
   return { ...unit, maxHp, hp: maxHp, armor: Math.round(unit.armor * armor), reflectShare: armor };
 }
