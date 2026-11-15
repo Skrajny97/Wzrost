@@ -1,0 +1,14 @@
+{
+  "id": "witches-path",
+  "tool": "pixellab generate-image-v2",
+  "description": "a narrow winding path through a dark fir forest, bundles of dried herbs and small bone charms hanging from the branches, a huge red wood ant hill beside the path, black nightshade berries on the bushes, an empty wooden cradle under a tree, centered composition for a round medallion frame, pixel art scene, muted dark palette of fir greens, earthy reds and dusky purples, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

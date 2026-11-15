@@ -1,0 +1,14 @@
+{
+  "id": "devils-stones",
+  "tool": "pixellab generate-image-v2",
+  "description": "a strange heap of huge grey boulders on a mountain slope as if dropped from the sky, deep claw marks scratched into the stones, a rooster turned to stone standing on the biggest boulder, heat shimmer over the stones at dusk, centered composition for a round medallion frame, pixel art scene, muted palette of warm stone greys, ochres and dusk oranges, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

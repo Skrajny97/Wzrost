@@ -1,0 +1,14 @@
+{
+  "id": "windy-ridge",
+  "tool": "pixellab generate-image-v2",
+  "description": "a narrow rocky mountain ridge under a cold windy sky with torn clouds racing past, bent dwarf pines clinging to the rocks, a chamois leaping between the rocks, black swifts slicing through the air, centered composition for a round medallion frame, pixel art scene, muted palette of slate greys, cold blues and dark greens, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

@@ -1,0 +1,14 @@
+{
+  "id": "cursed-manor",
+  "tool": "pixellab generate-image-v2",
+  "description": "an abandoned old Polish manor house hidden in a fir forest at night, a white columned porch overgrown with ivy, broken windows with a faint candle glow, an empty suit of armour standing by the door, centered composition for a round medallion frame, pixel art scene, muted dark palette of night blues, pale plaster whites and candle golds, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

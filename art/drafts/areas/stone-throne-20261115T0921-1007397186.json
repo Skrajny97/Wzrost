@@ -1,0 +1,14 @@
+{
+  "id": "stone-throne",
+  "tool": "pixellab generate-image-v2",
+  "description": "a giant throne carved from grey rock on the summit of a scree slope with huge stone steps, a moss-covered stone knight sleeping seated at its foot with a stone sword across his knees, giant boulders scattered around as if thrown, centered composition for a round medallion frame, pixel art scene, muted palette of stone greys, moss greens and cold dusk violets, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

@@ -1,0 +1,14 @@
+{
+  "id": "witch-glade",
+  "tool": "pixellab generate-image-v2",
+  "description": "a hidden glade among dark firs, a big black iron cauldron steaming green over a fire, brooms leaning against a crooked wooden hut, herbs drying on strings, a ring of toadstools in the grass, centered composition for a round medallion frame, pixel art scene, muted dark palette of fir greens, firelight oranges and poison greens, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

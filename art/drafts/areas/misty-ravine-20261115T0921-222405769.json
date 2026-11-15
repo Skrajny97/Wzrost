@@ -1,0 +1,14 @@
+{
+  "id": "misty-ravine",
+  "tool": "pixellab generate-image-v2",
+  "description": "a deep misty ravine with a cold stream between mossy boulders and fallen firs, clumps of mistletoe hanging from the branches, a huge grey slug on a mossy stone, a blue kingfisher flashing over the water, centered composition for a round medallion frame, pixel art scene, muted dark palette of mist greys, moss greens and teal blues, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

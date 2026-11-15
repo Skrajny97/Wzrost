@@ -1,0 +1,14 @@
+{
+  "id": "fir-slope",
+  "tool": "pixellab generate-image-v2",
+  "description": "a steep mountain slope covered with tall dark silver firs in deep shade, a wild grey-dun horse standing among the trunks, a jay on a low branch, a big woodpecker hole in a dead fir, centered composition for a round medallion frame, pixel art scene, muted dark palette of deep fir greens, bark browns and cold blue shadows, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

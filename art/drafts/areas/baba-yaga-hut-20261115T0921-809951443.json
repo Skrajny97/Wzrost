@@ -1,0 +1,14 @@
+{
+  "id": "baba-yaga-hut",
+  "tool": "pixellab generate-image-v2",
+  "description": "a crooked wooden hut standing on two giant chicken legs in a dark clearing, a fence of bones topped with skulls with glowing eyes, black geese in the yard, a big stone mortar by the door, centered composition for a round medallion frame, pixel art scene, muted dark palette of night blues, bone whites and fiery oranges, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

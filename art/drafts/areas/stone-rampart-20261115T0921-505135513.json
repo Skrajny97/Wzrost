@@ -1,0 +1,14 @@
+{
+  "id": "stone-rampart",
+  "tool": "pixellab generate-image-v2",
+  "description": "an ancient ring wall of piled grey stones on a bald mountain top at night, a burning wheel rolling down the slope trailing sparks, crooked dwarf pines, a pale moon behind clouds, centered composition for a round medallion frame, pixel art scene, muted dark palette of stone greys, night blues and fire oranges, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

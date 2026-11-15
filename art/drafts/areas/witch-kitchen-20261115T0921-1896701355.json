@@ -1,0 +1,14 @@
+{
+  "id": "witch-kitchen",
+  "tool": "pixellab generate-image-v2",
+  "description": "an open-air witch kitchen on a mountain top at night, a huge stone mortar with a pestle, bubbling clay pots over small fires, a hare sitting by the fire, broomsticks stuck in the ground, centered composition for a round medallion frame, pixel art scene, muted dark palette of night blues, ember reds and herb greens, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

@@ -1,0 +1,14 @@
+{
+  "id": "dance-circle",
+  "tool": "pixellab generate-image-v2",
+  "description": "a circle of trampled grass on a bald mountain top under a full moon, pale ghostly dancing figures with flower wreaths whirling in a ring, a magpie on a stone, the dark silhouette of a piper playing at the edge, centered composition for a round medallion frame, pixel art scene, muted dark palette of moonlit silvers, night blues and pale greens, soft light, no text, no border",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

@@ -1,0 +1,14 @@
+{
+  "id": "vulture-crags",
+  "tool": "pixellab generate-image-v2",
+  "description": "steep jagged rock towers above a misty abyss, a big untidy nest of sticks and bones on a ledge, vultures circling in a pale sky, a thorny bush with small prey impaled on its thorns, centered composition for a round medallion frame, pixel art scene, muted palette of grey-browns, bone whites and pale blues, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
