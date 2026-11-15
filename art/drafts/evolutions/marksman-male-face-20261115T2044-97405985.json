@@ -1,0 +1,14 @@
+{
+  "id": "marksman-male-face",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art face of a young man in three-quarter view facing right, under a silver circlet, two clearly visible eyes of the same size with white and dark brown irises and a tiny highlight, both looking the same way, straight dark eyebrows above them, a small straight nose, closed lips, clean-shaven, warm light skin, a calm focused expression, a well-proportioned handsome face",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": "art/inputs/portraits/marksman-male.png",
+  "mask": "art/inputs/portraits/marksman-male-face-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08046738950411479
+  },
+  "images": 1
+}
