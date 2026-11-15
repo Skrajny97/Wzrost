@@ -1,0 +1,14 @@
+{
+  "id": "pack",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art, a sealed pack of playing cards in portrait orientation seen straight from the front, a wrapper of dark brown tree bark paper like the back of the cards, the top and the bottom edge crimped in a small zigzag seam, a thin gold border line with small gold filigree curls in the corners, in the centre one glowing pale ice-blue faceted crystal with soft blue light around it, a small red wax seal on the top seam, symmetrical, no text, no numbers, the pack fills the whole image",
+  "style": "src/client/art/cards/back.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
