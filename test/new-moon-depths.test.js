@@ -87,8 +87,9 @@ describe('Ostępy Nowiu', () => {
     assert.deepEqual(which((monster) => monster.attack.dot?.effect === 'chilled'), ['bell-ringer', 'deadman', 'lichen-beard', 'moon-eater']);
     assert.deepEqual(which((monster) => monster.attack.dot?.all), ['plague-maiden']);
     assert.equal(content.monstersById['plague-maiden'].attack.dot.effect, 'poisoned');
-    // The only blow at the whole line in the game.
-    assert.deepEqual(Object.values(content.monstersById).filter((monster) => monster.attack.cleave).map((monster) => monster.id), ['moon-eater']);
+    // The first blow at the whole line in the game; since the Łysogóry also
+    // the Stolem's, the Kostucha's and Baba Jaga's (test/bald-mountains.test.js).
+    assert.deepEqual(Object.values(content.monstersById).filter((monster) => monster.attack.cleave).map((monster) => monster.id), ['moon-eater', 'stolem', 'kostucha', 'baba-yaga']);
   });
 
   test('Przymrozek makes a chill last one move longer, for the creatures and the characters', () => {
@@ -162,11 +163,12 @@ describe('Cios w cały szyk (666)', () => {
     assert.ok(blowsByMoment(alone, 'e0').every((blows) => blows.length === 1));
   });
 
-  test('in the Wieże the Księżycożerca waits on its champion floor, the 200th; the same seed, the same fight', () => {
-    // Every 25th floor: with 40 places the 200th is Zaćmiona Polana's.
+  test('in the Wieże the Księżycożerca waits on its champion floor, the 150th; the same seed, the same fight', () => {
+    // Every 25th floor: with 55 places (since the Łysogóry; with 40 the
+    // 200th) the 150th is Zaćmiona Polana's.
     const { championEvery } = content.towers.floors;
     const floor = Array.from({ length: 400 }, (_, index) => index + 1).find((one) => one % championEvery === 0 && towerArea(one, content).id === 'eclipsed-glade');
-    assert.equal(floor, 200);
+    assert.equal(floor, 150);
     assert.equal(towerFloor(floor, 'any', content).encounter.members[0].monsterId, 'moon-eater');
     const climber = newCharacter('warrior', { level: 200, classLevel: 200 });
     const entry = towerFight({ character: { ...climber, points: autoDistribute(climber, content) }, equipped: [], name: 'Wspinacz', floor, seed: 'nów' }, content);

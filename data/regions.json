@@ -1016,5 +1016,371 @@
         "champion": "moon-eater"
       }
     ]
+  },
+  {
+    "id": "scree-slopes",
+    "land": "Łysogóry",
+    "name": "Gołoborza",
+    "minLevel": 201,
+    "maxLevel": 225,
+    "safe": false,
+    "description": "Szare rumowiska na zboczach Łysogórów, gdzie nic nie rośnie, a wiatr gwiżdże między głazami. Ludzie mówią, że to kamienie, które diabły niosły na Łysą Górę i upuściły, gdy zapiał kogut.",
+    "trait": {
+      "name": "Rumowisko",
+      "description": "Ugrzęźnięcie opóźnia następny ruch o połowę dłużej, u stworów i u postaci.",
+      "slowLonger": { "mired": 0.5 }
+    },
+    "elite": "griffin",
+    "resources": { "wood": 2, "stone": 6, "iron-ore": 2 },
+    "fightBoard": "board-scree-slopes",
+    "areas": [
+      {
+        "id": "grey-scree",
+        "name": "Szare Gołoborze",
+        "minLevel": 201,
+        "maxLevel": 205,
+        "description": "Morze szarych głazów porośniętych porostem. Między kamieniami gwiżdżą świstaki, a każdy krzyk wraca stokrotnym echem.",
+        "encounters": [
+          { "weight": 18, "monsters": ["marmot"] },
+          { "weight": 14, "monsters": ["roller"] },
+          { "weight": 14, "monsters": ["echo", "echo"] },
+          { "weight": 12, "monsters": ["marmot", "echo"] },
+          { "weight": 12, "monsters": ["roller", "roller"] },
+          { "weight": 10, "monsters": ["marmot", "roller"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["marmot", "roller", "echo"] },
+          { "weight": 6, "monsters": ["marmot", "marmot"] },
+          { "weight": 6, "monsters": ["roller", "echo", "echo"] }
+        ]
+      },
+      {
+        "id": "windy-ridge",
+        "name": "Wietrzna Grań",
+        "minLevel": 206,
+        "maxLevel": 210,
+        "description": "Wąska grań, na której wiatr zrywa z nóg. Kozice skaczą po skałach, a nad nimi z piskiem śmigają jerzyki.",
+        "encounters": [
+          { "weight": 18, "monsters": ["chamois"] },
+          { "weight": 14, "monsters": ["wallcreeper"] },
+          { "weight": 14, "monsters": ["swift", "swift"] },
+          { "weight": 12, "monsters": ["chamois", "swift"] },
+          { "weight": 10, "monsters": ["wallcreeper", "wallcreeper"] },
+          { "weight": 10, "monsters": ["chamois", "wallcreeper"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["chamois", "wallcreeper", "swift"] },
+          { "weight": 6, "monsters": ["chamois", "chamois"] },
+          { "weight": 6, "monsters": ["wallcreeper", "swift", "swift"] }
+        ]
+      },
+      {
+        "id": "devils-stones",
+        "name": "Diabelskie Kamienie",
+        "minLevel": 211,
+        "maxLevel": 215,
+        "description": "Wielkie głazy z odciskami diabelskich łap. Pośrodku stoi kamienny kogut, który zapiał, zanim diabły doniosły kamienie na szczyt.",
+        "encounters": [
+          { "weight": 18, "monsters": ["stone-rooster"] },
+          { "weight": 14, "monsters": ["cicada"] },
+          { "weight": 14, "monsters": ["hoopoe"] },
+          { "weight": 12, "monsters": ["stone-rooster", "hoopoe"] },
+          { "weight": 10, "monsters": ["cicada", "hoopoe"] },
+          { "weight": 10, "monsters": ["stone-rooster", "cicada"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["stone-rooster", "cicada", "hoopoe"] },
+          { "weight": 6, "monsters": ["stone-rooster", "stone-rooster", "hoopoe"] },
+          { "weight": 6, "monsters": ["cicada", "hoopoe", "hoopoe"] }
+        ]
+      },
+      {
+        "id": "vulture-crags",
+        "name": "Sępie Turnie",
+        "minLevel": 216,
+        "maxLevel": 220,
+        "description": "Skalne turnie nad przepaścią, z gniazdami sępów. Ziemia pod nimi jest biała od kości, a na cierniach wiszą zdobycze dzierzby.",
+        "encounters": [
+          { "weight": 18, "monsters": ["wolverine"] },
+          { "weight": 14, "monsters": ["vulture"] },
+          { "weight": 14, "monsters": ["shrike"] },
+          { "weight": 12, "monsters": ["wolverine", "shrike"] },
+          { "weight": 10, "monsters": ["vulture", "vulture"] },
+          { "weight": 10, "monsters": ["wolverine", "vulture"] },
+          { "weight": 8, "monsters": ["vulture", "shrike"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["wolverine", "vulture", "shrike"] },
+          { "weight": 6, "monsters": ["wolverine", "wolverine"] },
+          { "weight": 6, "monsters": ["vulture", "shrike", "shrike"] }
+        ]
+      },
+      {
+        "id": "stone-throne",
+        "name": "Kamienny Tron",
+        "minLevel": 221,
+        "maxLevel": 225,
+        "description": "Na szczycie gołoborza głazy ułożyły się w tron. Wokół śpią zaklęci w kamień rycerze, w szczelinach mieszkają popielice i żołny, a na tronie siedzi Stolem.",
+        "encounters": [
+          { "weight": 18, "monsters": ["stone-knight"] },
+          { "weight": 14, "monsters": ["dormouse"] },
+          { "weight": 14, "monsters": ["bee-eater"] },
+          { "weight": 12, "monsters": ["stone-knight", "bee-eater"] },
+          { "weight": 10, "monsters": ["dormouse", "dormouse"] },
+          { "weight": 10, "monsters": ["dormouse", "bee-eater"] },
+          { "weight": 8, "monsters": ["stone-knight", "dormouse"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["stone-knight", "dormouse", "bee-eater"] },
+          { "weight": 6, "monsters": ["stone-knight", "stone-knight"] },
+          { "weight": 6, "monsters": ["dormouse", "bee-eater", "bee-eater"] }
+        ],
+        "champion": "stolem"
+      }
+    ]
+  },
+  {
+    "id": "fir-forest",
+    "land": "Łysogóry",
+    "name": "Jodłowa Puszcza",
+    "minLevel": 226,
+    "maxLevel": 250,
+    "safe": false,
+    "description": "Ciemna puszcza jodłowa na stokach Łysogórów. Ścieżkami między jodłami chodzą czarownice na sabat, a kto z nich zboczy, ten już nie wraca.",
+    "trait": {
+      "name": "Jodłowy cień",
+      "description": "Postać ze środka szyku ma o 5% więcej uniku, bo kryje się w cieniu jodeł.",
+      "middleDodgeBonus": 0.05
+    },
+    "elite": "cuckoo",
+    "resources": { "wood": 6, "stone": 2, "iron-ore": 2 },
+    "fightBoard": "board-fir-forest",
+    "areas": [
+      {
+        "id": "fir-slope",
+        "name": "Jodłowy Stok",
+        "minLevel": 226,
+        "maxLevel": 230,
+        "description": "Strome zbocze porośnięte starymi jodłami, pod którymi zawsze panuje półmrok. Między pniami pasą się dzikie tarpany, a sójki wrzaskiem ostrzegają puszczę.",
+        "encounters": [
+          { "weight": 18, "monsters": ["tarpan"] },
+          { "weight": 14, "monsters": ["jay"] },
+          { "weight": 14, "monsters": ["black-woodpecker", "black-woodpecker"] },
+          { "weight": 12, "monsters": ["tarpan", "black-woodpecker"] },
+          { "weight": 12, "monsters": ["jay", "jay"] },
+          { "weight": 10, "monsters": ["tarpan", "jay"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["tarpan", "jay", "black-woodpecker"] },
+          { "weight": 6, "monsters": ["tarpan", "tarpan"] },
+          { "weight": 6, "monsters": ["jay", "black-woodpecker", "black-woodpecker"] }
+        ]
+      },
+      {
+        "id": "witches-path",
+        "name": "Ścieżka Czarownic",
+        "minLevel": 231,
+        "maxLevel": 235,
+        "description": "Wydeptana ścieżka, którą czarownice chodzą na sabat. Wzdłuż niej stoją mrowiska wielkie jak stogi, a w krzakach pokrzyku coś chichocze.",
+        "encounters": [
+          { "weight": 18, "monsters": ["wood-ant"] },
+          { "weight": 14, "monsters": ["changeling"] },
+          { "weight": 14, "monsters": ["nightshade", "nightshade"] },
+          { "weight": 12, "monsters": ["wood-ant", "nightshade"] },
+          { "weight": 10, "monsters": ["changeling", "changeling"] },
+          { "weight": 10, "monsters": ["wood-ant", "changeling"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["wood-ant", "changeling", "nightshade"] },
+          { "weight": 6, "monsters": ["wood-ant", "wood-ant"] },
+          { "weight": 6, "monsters": ["changeling", "nightshade", "nightshade"] }
+        ]
+      },
+      {
+        "id": "misty-ravine",
+        "name": "Mglisty Jar",
+        "minLevel": 236,
+        "maxLevel": 240,
+        "description": "Głęboki, wilgotny jar z potokiem na dnie, w którym nawet w południe jest szaro od mgły. Po kamieniach pełzną pomrowy, z gałęzi zwisa jemioła, a nad wodą śmigają zimorodki.",
+        "encounters": [
+          { "weight": 18, "monsters": ["great-slug"] },
+          { "weight": 14, "monsters": ["mistletoe-leech"] },
+          { "weight": 14, "monsters": ["kingfisher"] },
+          { "weight": 12, "monsters": ["great-slug", "kingfisher"] },
+          { "weight": 10, "monsters": ["mistletoe-leech", "kingfisher"] },
+          { "weight": 10, "monsters": ["great-slug", "mistletoe-leech"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["great-slug", "mistletoe-leech", "kingfisher"] },
+          { "weight": 6, "monsters": ["great-slug", "great-slug", "kingfisher"] },
+          { "weight": 6, "monsters": ["mistletoe-leech", "kingfisher", "kingfisher"] }
+        ]
+      },
+      {
+        "id": "witch-glade",
+        "name": "Wiedźmia Polana",
+        "minLevel": 241,
+        "maxLevel": 245,
+        "description": "Polana w sercu puszczy, gdzie czarownice warzą ziela. Kocioł sam bulgocze na ogniu, miotła sama zamiata, a wiedźma pilnuje jednego i drugiego.",
+        "encounters": [
+          { "weight": 18, "monsters": ["witch-cauldron"] },
+          { "weight": 14, "monsters": ["witch-broom"] },
+          { "weight": 14, "monsters": ["hedge-witch"] },
+          { "weight": 12, "monsters": ["witch-cauldron", "hedge-witch"] },
+          { "weight": 10, "monsters": ["witch-broom", "witch-broom"] },
+          { "weight": 10, "monsters": ["witch-cauldron", "witch-broom"] },
+          { "weight": 8, "monsters": ["witch-broom", "hedge-witch"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["witch-cauldron", "witch-broom", "hedge-witch"] },
+          { "weight": 6, "monsters": ["witch-cauldron", "witch-cauldron"] },
+          { "weight": 6, "monsters": ["witch-broom", "hedge-witch", "hedge-witch"] }
+        ]
+      },
+      {
+        "id": "cursed-manor",
+        "name": "Zaklęty Dwór",
+        "minLevel": 246,
+        "maxLevel": 250,
+        "description": "Stary dwór w głębi puszczy, w którym co noc pali się światło, choć nikt tam nie mieszka. Gospodarzem jest Pan Twardowski.",
+        "encounters": [
+          { "weight": 18, "monsters": ["empty-armor"] },
+          { "weight": 14, "monsters": ["haunted-portrait"] },
+          { "weight": 14, "monsters": ["black-grimoire"] },
+          { "weight": 12, "monsters": ["empty-armor", "black-grimoire"] },
+          { "weight": 10, "monsters": ["haunted-portrait", "haunted-portrait"] },
+          { "weight": 10, "monsters": ["haunted-portrait", "black-grimoire"] },
+          { "weight": 8, "monsters": ["empty-armor", "haunted-portrait"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["empty-armor", "haunted-portrait", "black-grimoire"] },
+          { "weight": 6, "monsters": ["empty-armor", "empty-armor"] },
+          { "weight": 6, "monsters": ["haunted-portrait", "black-grimoire", "black-grimoire"] }
+        ],
+        "champion": "twardowski"
+      }
+    ]
+  },
+  {
+    "id": "bald-mountain",
+    "land": "Łysogóry",
+    "name": "Łysa Góra",
+    "minLevel": 251,
+    "maxLevel": 275,
+    "safe": false,
+    "description": "Nagi, wietrzny szczyt Łysogórów z prastarym kamiennym wałem na grzbiecie. W noc sabatu zlatują się tu czarownice z całej krainy, a na ich czele staje Baba Jaga.",
+    "trait": {
+      "name": "Noc sabatu",
+      "description": "Zatrucie, oparzenie, wychłodzenie i krwawienie trwają o jeden ruch dłużej, u stworów i u postaci.",
+      "effectTicks": { "poisoned": 1, "burning": 1, "chilled": 1, "bleeding": 1 }
+    },
+    "elite": "kostucha",
+    "resources": { "wood": 3, "stone": 4, "iron-ore": 3 },
+    "fightBoard": "board-bald-mountain",
+    "areas": [
+      {
+        "id": "stone-rampart",
+        "name": "Kamienny Wał",
+        "minLevel": 251,
+        "maxLevel": 255,
+        "description": "Prastary wał z kamieni wokół szczytu, usypany przez ludzi, którzy czcili tu dawnych bogów. W noc sabatu toczą się z niego płonące koła, na wale wróży wieszczka, a w szczelinach orzechówki chowają orzechy.",
+        "encounters": [
+          { "weight": 18, "monsters": ["fire-wheel"] },
+          { "weight": 14, "monsters": ["nutcracker"] },
+          { "weight": 14, "monsters": ["seeress", "seeress"] },
+          { "weight": 12, "monsters": ["fire-wheel", "seeress"] },
+          { "weight": 12, "monsters": ["nutcracker", "nutcracker"] },
+          { "weight": 10, "monsters": ["fire-wheel", "nutcracker"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["fire-wheel", "nutcracker", "seeress"] },
+          { "weight": 6, "monsters": ["fire-wheel", "fire-wheel"] },
+          { "weight": 6, "monsters": ["nutcracker", "seeress", "seeress"] }
+        ]
+      },
+      {
+        "id": "witch-kitchen",
+        "name": "Wiedźmia Kuchnia",
+        "minLevel": 256,
+        "maxLevel": 260,
+        "description": "Kamienne kotły na zboczu, w których czarownice warzą wywary na sabat. W moździerzach same tłuką się ziela, a między kotłami kica zając, który wcale nie jest zającem.",
+        "encounters": [
+          { "weight": 18, "monsters": ["mortar"] },
+          { "weight": 14, "monsters": ["witch-hare"] },
+          { "weight": 14, "monsters": ["broom-witch", "broom-witch"] },
+          { "weight": 12, "monsters": ["mortar", "broom-witch"] },
+          { "weight": 10, "monsters": ["witch-hare", "witch-hare"] },
+          { "weight": 10, "monsters": ["mortar", "witch-hare"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["mortar", "witch-hare", "broom-witch"] },
+          { "weight": 6, "monsters": ["mortar", "mortar"] },
+          { "weight": 6, "monsters": ["witch-hare", "broom-witch", "broom-witch"] }
+        ]
+      },
+      {
+        "id": "dance-circle",
+        "name": "Taneczny Krąg",
+        "minLevel": 261,
+        "maxLevel": 265,
+        "description": "Ubite koło trawy, na którym czarownice tańczą do świtu. Przeklęty grajek gra tu bez końca, sroki kradną błyskotki, a kto wejdzie w krąg, musi tańczyć do upadłego.",
+        "encounters": [
+          { "weight": 18, "monsters": ["dance-frenzy"] },
+          { "weight": 14, "monsters": ["magpie"] },
+          { "weight": 14, "monsters": ["cursed-piper"] },
+          { "weight": 12, "monsters": ["dance-frenzy", "cursed-piper"] },
+          { "weight": 10, "monsters": ["magpie", "cursed-piper"] },
+          { "weight": 10, "monsters": ["dance-frenzy", "magpie"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["dance-frenzy", "magpie", "cursed-piper"] },
+          { "weight": 6, "monsters": ["dance-frenzy", "dance-frenzy", "cursed-piper"] },
+          { "weight": 6, "monsters": ["magpie", "cursed-piper", "cursed-piper"] }
+        ]
+      },
+      {
+        "id": "stone-altars",
+        "name": "Kamienne Ołtarze",
+        "minLevel": 266,
+        "maxLevel": 270,
+        "description": "Płaskie głazy, na których dawni kapłani palili ofiary. W noc sabatu znów płonie tu ofiarny piec, na kamieniach leżą woskowe laleczki, a przy ogniu siedzi prządka losu.",
+        "encounters": [
+          { "weight": 18, "monsters": ["offering-oven"] },
+          { "weight": 14, "monsters": ["wax-doll"] },
+          { "weight": 14, "monsters": ["fate-spinner"] },
+          { "weight": 12, "monsters": ["offering-oven", "fate-spinner"] },
+          { "weight": 10, "monsters": ["wax-doll", "wax-doll"] },
+          { "weight": 10, "monsters": ["offering-oven", "wax-doll"] },
+          { "weight": 8, "monsters": ["wax-doll", "fate-spinner"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["offering-oven", "wax-doll", "fate-spinner"] },
+          { "weight": 6, "monsters": ["offering-oven", "offering-oven"] },
+          { "weight": 6, "monsters": ["wax-doll", "fate-spinner", "fate-spinner"] }
+        ]
+      },
+      {
+        "id": "baba-yaga-hut",
+        "name": "Chata Baby Jagi",
+        "minLevel": 271,
+        "maxLevel": 275,
+        "description": "Na samym szczycie, za płotem z kości, stoi chata na kurzej łapce. Na płocie płoną czaszki, po podwórzu chodzą czarne gęsi, a w środku czeka Baba Jaga.",
+        "encounters": [
+          { "weight": 18, "monsters": ["hen-leg-hut"] },
+          { "weight": 14, "monsters": ["black-goose"] },
+          { "weight": 14, "monsters": ["burning-skull"] },
+          { "weight": 12, "monsters": ["hen-leg-hut", "burning-skull"] },
+          { "weight": 10, "monsters": ["black-goose", "black-goose"] },
+          { "weight": 10, "monsters": ["black-goose", "burning-skull"] },
+          { "weight": 8, "monsters": ["hen-leg-hut", "black-goose"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["hen-leg-hut", "black-goose", "burning-skull"] },
+          { "weight": 6, "monsters": ["hen-leg-hut", "hen-leg-hut"] },
+          { "weight": 6, "monsters": ["black-goose", "burning-skull", "burning-skull"] }
+        ],
+        "champion": "baba-yaga"
+      }
+    ]
   }
 ]

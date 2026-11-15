@@ -15,7 +15,11 @@
 // man-and-woman pair so both wear the same (or as pixellab.usage says), or
 // {path, usage} with its own words, e.g. the approved portrait for the look
 // and the grey mannequin of the walk for the pose (kind walk-starts, the start
-// frames of the walks). One call gives four versions. A prompt
+// frames of the walks). One call gives four versions of a picture of 86 to
+// 170 px, but 25 of 48 × 48 and 64 of 32 × 32, so a small one is drawn by Pro
+// Flash, one picture a call ({prompt, tool: 'flash'}), or after examples padded
+// to 96 × 96 ({prompt, tool: 'style', styles}): never more than four versions
+// of one thing at a time (the author, 15.11.2026). A prompt
 // {tool: 'inpaint', input, mask, prompt} redraws only the white of its mask
 // in its input picture instead (inpaint-v3), e.g. the Warownia's board (kind
 // fortress-board). Run by the
@@ -64,7 +68,7 @@ const ids = values.ids.split(',').map((id) => id.trim()).filter(Boolean);
 if (!ids.length) fail('Podaj --ids.');
 const unknown = ids.filter((id) => !kind.prompts[id]);
 if (unknown.length) fail(`Brak opisów w art/prompts.json (${values.kind}): ${unknown.join(', ')}.`);
-const calls = Math.max(1, Math.min(3, Number(values.calls) || 1));
+const calls = Math.max(1, Math.min(4, Number(values.calls) || 1));
 const maxCost = Number(values['max-cost']);
 if (!(maxCost > 0)) fail('--max-cost musi być dodatnią kwotą w dolarach.');
 const maxCalls = Math.floor(maxCost / CALL_USD);
@@ -132,13 +136,44 @@ async function draw(id, seed) {
   const refs = settings.references?.[id] ?? [];
   const style = styleOf(id);
   const entry = kind.prompts[id];
-  const inpaint = entry?.tool === 'inpaint';
+  const tool = (typeof entry === 'object' && entry.tool) || settings.tool;
+  const inpaint = tool === 'inpaint';
+  const size = { width: entry?.width ?? width, height: entry?.height ?? height };
+  // At most four versions of one thing at a time (the author, 15.11.2026):
+  // a Pro call gives 25 of 48 × 48, so a small picture goes either to Pro
+  // Flash, one native picture a call (`flash`, called up to four times), or
+  // to generate-with-style-v2 (`style`), whose canvas is that of its style
+  // images: a sprite padded to 96 × 96 gives four versions at the sprite's
+  // own scale (entry.styles: up to four such pictures, else the style image).
+  if (tool === 'flash') {
+    const body = {
+      description: promptOf(id),
+      image_size: size,
+      seed,
+      no_background: entry?.transparent ?? kind.removeBackground !== false,
+      ...(style && {
+        style_image: reference(style),
+        style_options: { color_palette: false, outline: true, detail: true, shading: true },
+      }),
+    };
+    return poll(await submit('/create-image-pro-flash', body), refs, '/create-image-pro-flash');
+  }
+  if (tool === 'style') {
+    const body = {
+      description: promptOf(id),
+      style_images: (entry.styles ?? [style]).slice(0, 4).map((path) => ({ image: png(path), ...sizeOf(path) })),
+      ...(entry.styleDescription && { style_description: entry.styleDescription }),
+      seed,
+      no_background: entry?.transparent ?? kind.removeBackground !== false,
+    };
+    return poll(await submit('/generate-with-style-v2', body), entry.styles ?? [], '/generate-with-style-v2');
+  }
   const path = inpaint ? '/inpaint-v3' : '/generate-image-v2';
   const body = inpaint ? inpainting(entry, seed) : {
     description: promptOf(id),
     // A prompt may have its own size ({prompt, width, height}), e.g. the
     // pieces of the Warownia's walls beside the board's inpaintings.
-    image_size: { width: entry?.width ?? width, height: entry?.height ?? height },
+    image_size: size,
     seed,
     // A kind drawn with its background (removeBackground: false, e.g. the
     // places' circles and the lands) keeps it; every other is transparent,
@@ -155,16 +190,23 @@ async function draw(id, seed) {
       }),
     }),
   };
-  let job;
+  return poll(await submit(path, body), refs, path);
+}
+
+// Sent; a full queue of jobs (429) waits and tries again.
+async function submit(path, body) {
   for (let attempt = 0; ; attempt++) {
     try {
-      job = await request('POST', path, body);
-      break;
+      return await request('POST', path, body);
     } catch (error) {
       if (error.status !== 429 || attempt >= 20) throw error;
       await wait(30000);
     }
   }
+}
+
+// Polled until PixelLab has drawn its versions.
+async function poll(job, refs, path) {
   for (let attempt = 0; attempt < POLL_LIMIT; attempt++) {
     await wait(POLL_MS);
     const state = await request('GET', `/background-jobs/${job.background_job_id}`);
@@ -173,6 +215,24 @@ async function draw(id, seed) {
   }
   throw new Error(`rysowanie trwa zbyt długo (zadanie ${job.background_job_id})`);
 }
+
+// The pictures of a finished job: `images`, `image`, or any {base64} found
+// deeper in the answer (Pro Flash gives its own shape).
+function picturesOf(result) {
+  if (result.images) return result.images;
+  if (result.image) return [result.image];
+  const found = [];
+  (function walk(value) {
+    if (!value || typeof value !== 'object') return;
+    if (typeof value.base64 === 'string') return found.push(value);
+    Object.values(value).forEach(walk);
+  })(result);
+  return found;
+}
+
+// The answer without its pictures, for the draft's notes.
+const shapeOf = (value) =>
+  JSON.parse(JSON.stringify(value ?? {}, (key, item) => (typeof item === 'string' && item.length > 120 ? `${item.slice(0, 40)}… (${item.length})` : item)));
 
 const outDir = `art/drafts/${values.kind}`;
 mkdirSync(outDir, { recursive: true });
@@ -199,12 +259,12 @@ if (values['dry-run']) {
       try {
         const { state, refs, path } = await draw(id, seed);
         const result = state.last_response ?? {};
-        const images = result.images ?? (result.image ? [result.image] : []);
+        const images = picturesOf(result);
         // A picture may come as a data address (data:image/png;base64,…).
         images.forEach((image, index) => writeFileSync(`${outDir}/${id}-${stamp}-${seed}-${index}.png`, Buffer.from(image.base64.replace(/^data:[^,]*,/, ''), 'base64')));
         writeFileSync(
           `${outDir}/${id}-${stamp}-${seed}.json`,
-          `${JSON.stringify({ id, tool: `pixellab ${path.slice(1)}`, description: promptOf(id), style: styleOf(id), input: kind.prompts[id].input ?? null, mask: kind.prompts[id].mask ?? null, references: refs, usage: state.usage ?? null, images: images.length }, null, 2)}\n`,
+          `${JSON.stringify({ id, tool: `pixellab ${path.slice(1)}`, description: promptOf(id), style: styleOf(id), input: kind.prompts[id].input ?? null, mask: kind.prompts[id].mask ?? null, references: refs, usage: state.usage ?? null, images: images.length, ...(!images.length && { answer: shapeOf(result) }) }, null, 2)}\n`,
         );
         const usage = state.usage ? (state.usage.type === 'usd' ? `${Number(state.usage.usd).toFixed(3)} USD` : JSON.stringify(state.usage)) : '';
         lines.push(`| ${id} | ${images.length} obrazki ${usage} |`);

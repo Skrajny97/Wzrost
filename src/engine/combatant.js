@@ -45,8 +45,9 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
   const weapon = weaponItem ? itemWeapon(weaponItem, content) : unarmed(character.level, content);
   let armor = bonuses.armor + totals.endurance * balance.combat.armorPerEndurance;
   if (area?.trait.frontArmorBonus && character.position === 'front') armor *= 1 + area.trait.frontArmorBonus;
-  // Szuwary: the back of the line hides in the reeds.
-  const dodgeBonus = character.position === 'back' ? (area?.trait.backDodgeBonus ?? 0) : 0;
+  // Szuwary: the back of the line hides in the reeds; Jodłowy cień: the
+  // middle in the shade of the firs.
+  const dodgeBonus = (character.position === 'back' ? area?.trait.backDodgeBonus : character.position === 'middle' ? area?.trait.middleDodgeBonus : 0) ?? 0;
   const cls = content.classesById[character.classId];
   const perClassLevel = perClassLevelOf(character, content);
   // The Rdzeń's Artefakty (core.js): the character's own, never a

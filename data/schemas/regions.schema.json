@@ -86,10 +86,21 @@
             "minimum": 0,
             "maximum": 0.2
           },
+          "middleDodgeBonus": {
+            "type": "number",
+            "description": "O tyle więcej uniku dla postaci ze środka szyku (Jodłowy cień).",
+            "minimum": 0,
+            "maximum": 0.2
+          },
           "effectTicks": {
             "type": "object",
             "description": "O ile ruchów dłużej trwa efekt (effects.json), u stworów i u postaci.",
             "additionalProperties": { "type": "integer", "minimum": 1, "maximum": 5 }
+          },
+          "slowLonger": {
+            "type": "object",
+            "description": "O jaką część dłużej spowolnienie (effects.json, np. Ugrzęźnięcie) odsuwa następny ruch, u stworów i u postaci (Rumowisko).",
+            "additionalProperties": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
           },
           "healBonus": {
             "type": "number",

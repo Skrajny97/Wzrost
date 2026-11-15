@@ -624,6 +624,210 @@
     "moon-bite": {
       "name": "Moon Morsel",
       "description": "A pale, cold crumb bitten off the moon. It shines even on the darkest night."
+    },
+    "marmot-fat": {
+      "name": "Marmot Fat",
+      "description": "Thick white fat that highlanders rub on aching knees."
+    },
+    "roller-feather": {
+      "name": "Roller Feather",
+      "description": "A turquoise feather with a violet edge that shimmers in the sun."
+    },
+    "echo-pebble": {
+      "name": "Echo Pebble",
+      "description": "A grey pebble that repeats every word spoken near it."
+    },
+    "chamois-horn": {
+      "name": "Chamois Horn",
+      "description": "A black horn hooked at the tip."
+    },
+    "wallcreeper-wing": {
+      "name": "Wallcreeper Wing",
+      "description": "A grey wing with a crimson patch like a drop of blood."
+    },
+    "swift-nest": {
+      "name": "Swift Nest",
+      "description": "A nest of feathers and straws glued with spit, hard as clay."
+    },
+    "stone-comb": {
+      "name": "Stone Comb",
+      "description": "A rooster's comb turned to stone. They say it keeps devils away."
+    },
+    "cicada-wing": {
+      "name": "Cicada Wing",
+      "description": "A clear little wing that buzzes when shaken."
+    },
+    "hoopoe-crest": {
+      "name": "Hoopoe Crest",
+      "description": "An orange crest with black tips. It smells a bit."
+    },
+    "wolverine-fur": {
+      "name": "Wolverine Fur",
+      "description": "Thick brown fur that frost never settles on."
+    },
+    "vulture-ruff": {
+      "name": "Vulture Ruff",
+      "description": "White down from a vulture's neck, soft as snow."
+    },
+    "shrike-thorn": {
+      "name": "Shrike Thorn",
+      "description": "A long thorn on which the shrike impales its prey."
+    },
+    "stone-blade-shard": {
+      "name": "Stone Blade Shard",
+      "description": "A shard of a great stone sword, overgrown with moss."
+    },
+    "dormouse-fur": {
+      "name": "Dormouse Fur",
+      "description": "Soft ash-grey fur. The dormouse sleeps half the year in it."
+    },
+    "bee-eater-feather": {
+      "name": "Bee-eater Feather",
+      "description": "A feather shimmering with every colour of the rainbow."
+    },
+    "stolem-boulder": {
+      "name": "Giant's Boulder",
+      "description": "A rock the Stone Giant hurled at churches. It bears the print of a giant hand."
+    },
+    "griffin-feather": {
+      "name": "Griffin Feather",
+      "description": "A golden feather as long as a sword. Whoever carries it fears no height."
+    },
+    "tarpan-mane": {
+      "name": "Tarpan Mane",
+      "description": "The coarse black mane of a wild horse."
+    },
+    "jay-acorn": {
+      "name": "Jay's Acorn",
+      "description": "An acorn a jay buried and forgot. They say a magic oak grows from it."
+    },
+    "woodpecker-beak": {
+      "name": "Woodpecker Beak",
+      "description": "A hard, straight beak that cuts into bark like a chisel."
+    },
+    "ant-acid": {
+      "name": "Ant Acid",
+      "description": "A vial of stinging acid that ants spray at their foes."
+    },
+    "changeling-rattle": {
+      "name": "Changeling Rattle",
+      "description": "A wooden rattle that rattles by itself when no one is looking."
+    },
+    "nightshade-berry": {
+      "name": "Nightshade Berry",
+      "description": "A shiny black berry. One is enough to fall asleep forever."
+    },
+    "slug-slime": {
+      "name": "Slug Slime",
+      "description": "Thick, sticky slime that does not dry for years."
+    },
+    "leech-root": {
+      "name": "Mistletoe Sucker",
+      "description": "A sticky rootlet the mistletoe leech uses to suck sap from trees, and sometimes from people."
+    },
+    "kingfisher-feather": {
+      "name": "Kingfisher Feather",
+      "description": "A blue feather that glitters like water in the sun."
+    },
+    "cauldron-ladle": {
+      "name": "Cauldron Ladle",
+      "description": "A sooty ladle. Whatever you stir with it starts to bubble."
+    },
+    "broom-twig": {
+      "name": "Broom Twig",
+      "description": "A birch twig that keeps trying to fly off on its own."
+    },
+    "witch-pouch": {
+      "name": "Witch's Pouch",
+      "description": "A leather pouch of herbs, bones and something that moves."
+    },
+    "armor-plate": {
+      "name": "Armour Plate",
+      "description": "A plate from the empty armour. It trembles when someone comes near."
+    },
+    "gilded-frame": {
+      "name": "Gilded Frame",
+      "description": "A piece of a gilded frame. Someone in it is watching you."
+    },
+    "black-page": {
+      "name": "Black Page",
+      "description": "A page torn from the black book. Its letters rearrange themselves."
+    },
+    "twardowski-quill": {
+      "name": "Twardowski's Quill",
+      "description": "The goose quill Twardowski signed his pact with. A drop of blood still clings to its tip."
+    },
+    "cuckoo-egg": {
+      "name": "Cuckoo Egg",
+      "description": "A speckled egg slipped into another bird's nest. Something will hatch from it, but no one knows what."
+    },
+    "burning-spoke": {
+      "name": "Burning Spoke",
+      "description": "A spoke from a wheel of fire. It smoulders and never goes out."
+    },
+    "pine-nut": {
+      "name": "Stone Pine Nut",
+      "description": "A nut the nutcracker hid for winter. Hard as stone."
+    },
+    "fortune-bone": {
+      "name": "Fortune Bone",
+      "description": "A bone carved with signs that always lands the same side up."
+    },
+    "pestle": {
+      "name": "Pestle",
+      "description": "A stone pestle, stained with something red."
+    },
+    "hare-foot": {
+      "name": "Hare's Foot",
+      "description": "A hare's foot. Some say it belonged to a witch."
+    },
+    "flying-ointment": {
+      "name": "Witch's Ointment",
+      "description": "A jar of the ointment witches rub on before flying to the sabbath."
+    },
+    "red-ribbon": {
+      "name": "Red Ribbon",
+      "description": "A ribbon from the wreath of a girl who danced until she dropped."
+    },
+    "magpie-trinket": {
+      "name": "Magpie's Trinket",
+      "description": "Something shiny a magpie stole from someone. A ring, perhaps?"
+    },
+    "piper-whistle": {
+      "name": "Piper's Whistle",
+      "description": "A wooden whistle. Whoever plays it cannot stop."
+    },
+    "offering-loaf": {
+      "name": "Offering Loaf",
+      "description": "A ritual loaf from the offering oven, burnt on one side."
+    },
+    "wax-lump": {
+      "name": "Lump of Wax",
+      "description": "A lump of wax with someone's fingerprint in it."
+    },
+    "thread-of-fate": {
+      "name": "Thread of Fate",
+      "description": "A thin golden thread. Better not to cut it."
+    },
+    "hut-claw": {
+      "name": "Hut Claw",
+      "description": "A sickle-sized claw from the leg of Baba Yaga's hut."
+    },
+    "black-down": {
+      "name": "Black Down",
+      "description": "Soft black down. You sleep well on it, but you dream nightmares."
+    },
+    "skull-flame": {
+      "name": "Skull Flame",
+      "description": "A flame from the eye socket of a skull on Baba Yaga's fence. It does not go out, even in water."
+    },
+    "iron-tooth": {
+      "name": "Iron Tooth",
+      "description": "An iron tooth pulled from Baba Yaga herself. It still wants to bite."
+    },
+    "scythe-tip": {
+      "name": "Scythe Tip",
+      "description": "The snapped tip of Lady Death's scythe. Cold as the grave."
     }
   },
   "parts": {

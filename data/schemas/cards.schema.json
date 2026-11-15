@@ -77,6 +77,7 @@
         "life": { "type": "number", "exclusiveMinimum": 0 },
         "shapeExponent": { "type": "number", "minimum": 0, "maximum": 1 },
         "shapeRange": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number", "exclusiveMinimum": 0 } },
+        "shapeMedian": { "type": "number", "exclusiveMinimum": 0, "description": "Stała mediana stosunku ciosu do zdrowia, względem której liczy się kształt karty: ta ze 156 kart sprzed Łysogór, żeby nowe krainy nie zmieniały Ataku i Życia kart, które już są (15.11.2026). Bez niej mediana wszystkich kart gry." },
         "landStep": { "type": "number", "minimum": 0 },
         "levelStep": { "type": "number", "minimum": 0 },
         "maxLevel": { "type": "integer", "minimum": 1 },

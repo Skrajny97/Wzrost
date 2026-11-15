@@ -1115,6 +1115,351 @@
         "pl": "Eclipsed"
       },
       "suffix": "of the Moon-Eater"
+    },
+    "marmot": {
+      "prefix": {
+        "m": "Marmot",
+        "f": "Marmot",
+        "n": "Marmot",
+        "pl": "Marmot"
+      },
+      "suffix": "of the Marmot"
+    },
+    "roller": {
+      "prefix": {
+        "m": "Turquoise",
+        "f": "Turquoise",
+        "n": "Turquoise",
+        "pl": "Turquoise"
+      },
+      "suffix": "of the Roller"
+    },
+    "echo": {
+      "prefix": {
+        "m": "Thundering",
+        "f": "Thundering",
+        "n": "Thundering",
+        "pl": "Thundering"
+      },
+      "suffix": "of the Echo"
+    },
+    "chamois": {
+      "prefix": {
+        "m": "Crag",
+        "f": "Crag",
+        "n": "Crag",
+        "pl": "Crag"
+      },
+      "suffix": "of the Chamois"
+    },
+    "wallcreeper": {
+      "suffix": "of the Wallcreeper"
+    },
+    "swift": {
+      "prefix": {
+        "m": "Sickle",
+        "f": "Sickle",
+        "n": "Sickle",
+        "pl": "Sickle"
+      },
+      "suffix": "of the Swift"
+    },
+    "stone-rooster": {
+      "prefix": {
+        "m": "Rooster",
+        "f": "Rooster",
+        "n": "Rooster",
+        "pl": "Rooster"
+      },
+      "suffix": "of the Stone Rooster"
+    },
+    "cicada": {
+      "suffix": "of the Cicada"
+    },
+    "hoopoe": {
+      "suffix": "of the Hoopoe"
+    },
+    "wolverine": {
+      "prefix": {
+        "m": "Wolverine",
+        "f": "Wolverine",
+        "n": "Wolverine",
+        "pl": "Wolverine"
+      },
+      "suffix": "of the Wolverine"
+    },
+    "vulture": {
+      "prefix": {
+        "m": "Vulture",
+        "f": "Vulture",
+        "n": "Vulture",
+        "pl": "Vulture"
+      },
+      "suffix": "of the Vulture"
+    },
+    "shrike": {
+      "suffix": "of the Shrike"
+    },
+    "stone-knight": {
+      "prefix": {
+        "m": "Knightly",
+        "f": "Knightly",
+        "n": "Knightly",
+        "pl": "Knightly"
+      },
+      "suffix": "of the Stone Knight"
+    },
+    "dormouse": {
+      "suffix": "of the Dormouse"
+    },
+    "bee-eater": {
+      "prefix": {
+        "m": "Rainbow",
+        "f": "Rainbow",
+        "n": "Rainbow",
+        "pl": "Rainbow"
+      },
+      "suffix": "of the Bee-eater"
+    },
+    "griffin": {
+      "prefix": {
+        "m": "Griffin",
+        "f": "Griffin",
+        "n": "Griffin",
+        "pl": "Griffin"
+      },
+      "suffix": "of the Griffin"
+    },
+    "stolem": {
+      "prefix": {
+        "m": "Giant",
+        "f": "Giant",
+        "n": "Giant",
+        "pl": "Giant"
+      },
+      "suffix": "of the Stone Giant"
+    },
+    "tarpan": {
+      "prefix": {
+        "m": "Wild",
+        "f": "Wild",
+        "n": "Wild",
+        "pl": "Wild"
+      },
+      "suffix": "of the Tarpan"
+    },
+    "jay": {
+      "prefix": {
+        "m": "Jay",
+        "f": "Jay",
+        "n": "Jay",
+        "pl": "Jay"
+      },
+      "suffix": "of the Jay"
+    },
+    "black-woodpecker": {
+      "suffix": "of the Black Woodpecker"
+    },
+    "wood-ant": {
+      "prefix": {
+        "m": "Ant",
+        "f": "Ant",
+        "n": "Ant",
+        "pl": "Ant"
+      },
+      "suffix": "of the Wood Ant"
+    },
+    "changeling": {
+      "suffix": "of the Changeling"
+    },
+    "nightshade": {
+      "suffix": "of the Nightshade"
+    },
+    "great-slug": {
+      "prefix": {
+        "m": "Slimy",
+        "f": "Slimy",
+        "n": "Slimy",
+        "pl": "Slimy"
+      },
+      "suffix": "of the Great Slug"
+    },
+    "mistletoe-leech": {
+      "suffix": "of the Mistletoe Leech"
+    },
+    "kingfisher": {
+      "prefix": {
+        "m": "Azure",
+        "f": "Azure",
+        "n": "Azure",
+        "pl": "Azure"
+      },
+      "suffix": "of the Kingfisher"
+    },
+    "witch-cauldron": {
+      "suffix": "of the Cauldron"
+    },
+    "witch-broom": {
+      "suffix": "of the Broom"
+    },
+    "hedge-witch": {
+      "prefix": {
+        "m": "Witch",
+        "f": "Witch",
+        "n": "Witch",
+        "pl": "Witch"
+      },
+      "suffix": "of the Hedge Witch"
+    },
+    "empty-armor": {
+      "prefix": {
+        "m": "Enchanted",
+        "f": "Enchanted",
+        "n": "Enchanted",
+        "pl": "Enchanted"
+      },
+      "suffix": "of the Empty Armour"
+    },
+    "haunted-portrait": {
+      "suffix": "of the Portrait"
+    },
+    "black-grimoire": {
+      "prefix": {
+        "m": "Sorcerous",
+        "f": "Sorcerous",
+        "n": "Sorcerous",
+        "pl": "Sorcerous"
+      },
+      "suffix": "of the Black Grimoire"
+    },
+    "cuckoo": {
+      "prefix": {
+        "m": "Cuckoo",
+        "f": "Cuckoo",
+        "n": "Cuckoo",
+        "pl": "Cuckoo"
+      },
+      "suffix": "of the Cuckoo"
+    },
+    "twardowski": {
+      "suffix": "of Twardowski"
+    },
+    "fire-wheel": {
+      "prefix": {
+        "m": "Midsummer",
+        "f": "Midsummer",
+        "n": "Midsummer",
+        "pl": "Midsummer"
+      },
+      "suffix": "of the Fire Wheel"
+    },
+    "nutcracker": {
+      "suffix": "of the Nutcracker"
+    },
+    "seeress": {
+      "prefix": {
+        "m": "Prophetic",
+        "f": "Prophetic",
+        "n": "Prophetic",
+        "pl": "Prophetic"
+      },
+      "suffix": "of the Seeress"
+    },
+    "mortar": {
+      "suffix": "of the Mortar"
+    },
+    "witch-hare": {
+      "prefix": {
+        "m": "Hare",
+        "f": "Hare",
+        "n": "Hare",
+        "pl": "Hare"
+      },
+      "suffix": "of the Witch Hare"
+    },
+    "broom-witch": {
+      "prefix": {
+        "m": "Sabbath",
+        "f": "Sabbath",
+        "n": "Sabbath",
+        "pl": "Sabbath"
+      },
+      "suffix": "of the Witch"
+    },
+    "dance-frenzy": {
+      "prefix": {
+        "m": "Dancing",
+        "f": "Dancing",
+        "n": "Dancing",
+        "pl": "Dancing"
+      },
+      "suffix": "of the Dance Wraith"
+    },
+    "magpie": {
+      "prefix": {
+        "m": "Magpie",
+        "f": "Magpie",
+        "n": "Magpie",
+        "pl": "Magpie"
+      },
+      "suffix": "of the Magpie"
+    },
+    "cursed-piper": {
+      "suffix": "of the Piper"
+    },
+    "offering-oven": {
+      "prefix": {
+        "m": "Offering",
+        "f": "Offering",
+        "n": "Offering",
+        "pl": "Offering"
+      },
+      "suffix": "of the Oven"
+    },
+    "wax-doll": {
+      "prefix": {
+        "m": "Wax",
+        "f": "Wax",
+        "n": "Wax",
+        "pl": "Wax"
+      },
+      "suffix": "of the Wax Doll"
+    },
+    "fate-spinner": {
+      "suffix": "of the Spinner"
+    },
+    "hen-leg-hut": {
+      "prefix": {
+        "m": "Hen",
+        "f": "Hen",
+        "n": "Hen",
+        "pl": "Hen"
+      },
+      "suffix": "of the Hut on Chicken Legs"
+    },
+    "black-goose": {
+      "prefix": {
+        "m": "Goose",
+        "f": "Goose",
+        "n": "Goose",
+        "pl": "Goose"
+      },
+      "suffix": "of the Black Goose"
+    },
+    "burning-skull": {
+      "suffix": "of the Burning Skull"
+    },
+    "kostucha": {
+      "prefix": {
+        "m": "Deathly",
+        "f": "Deathly",
+        "n": "Deathly",
+        "pl": "Deathly"
+      },
+      "suffix": "of Lady Death"
+    },
+    "baba-yaga": {
+      "suffix": "of Baba Yaga"
     }
   }
 }

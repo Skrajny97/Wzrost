@@ -788,6 +788,10 @@
     "0.3.54": {
       "title": "Version 0.3.54",
       "body": "- Damage numbers and the \"CRIT!\" label at the edge of the arena now stay whole even when a skill shakes the arena as well."
+    },
+    "0.3.55": {
+      "title": "Version 0.3.55",
+      "body": "- New lands for levels 201–275: the Bald Mountains, with the Scree Fields, the Fir Forest and Bald Mountain. Fifteen places and 51 new creatures, among them the elites Griffin, Cuckoo and Lady Death and the champions Stone Giant, Master Twardowski and Baba Yaga.\n- The Stone Giant, Lady Death and Baba Yaga strike the whole line at once.\n- The lands' traits: on the Scree Fields mire delays a move half as long again, in the Fir Forest a character in the middle of the line has 5% more dodge, and on Bald Mountain poison, burning, chill and bleeding last one turn longer.\n- The headman now puts up wanted posters for the creatures of the Bald Mountains too."
     }
   }
 }

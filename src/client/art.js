@@ -50,6 +50,12 @@ export const SPRITES = {
       'strangler', 'bone-gnawer', 'carcass', 'smoke-hound', 'nightingale-robber', 'night-huntsman', 'lichen-beard', 'hollow-dweller',
       'murmur-wraith', 'rotwood', 'puffball', 'earwig', 'headless', 'chochol', 'smetek', 'deadman', 'burying-beetle', 'bell-ringer', 'abomination',
       'koltun', 'bebok', 'plague-maiden', 'moon-eater',
+      // Łysogóry (201–275) from 15.11.2026.
+      'marmot', 'roller', 'echo', 'chamois', 'wallcreeper', 'swift', 'stone-rooster', 'cicada', 'hoopoe', 'wolverine', 'vulture', 'shrike',
+      'stone-knight', 'dormouse', 'bee-eater', 'griffin', 'stolem', 'tarpan', 'jay', 'black-woodpecker', 'wood-ant', 'changeling', 'nightshade', 'great-slug',
+      'mistletoe-leech', 'kingfisher', 'witch-cauldron', 'witch-broom', 'hedge-witch', 'empty-armor', 'haunted-portrait', 'black-grimoire', 'cuckoo', 'twardowski', 'fire-wheel', 'nutcracker',
+      'seeress', 'mortar', 'witch-hare', 'broom-witch', 'dance-frenzy', 'magpie', 'cursed-piper', 'offering-oven', 'wax-doll', 'fate-spinner', 'hen-leg-hut', 'black-goose',
+      'burning-skull', 'kostucha', 'baba-yaga',
     ],
   },
   // <class>-<look>, 96×128 (3:4), filled in as the portraits are approved,
@@ -245,6 +251,12 @@ export const SPRITES = {
       'tangled-root', 'congealed-murk', 'black-rope', 'gnawed-bone', 'rotten-pelt', 'broken-leash', 'whistling-feather', 'hunting-horn',
       'grey-beard', 'bony-finger', 'murmuring-cone', 'glowing-rot', 'spore-pouch', 'earwig-pincers', 'rusty-spur', 'chochol-straw', 'cold-candle',
       'deadman-shroud', 'beetle-antenna', 'bell-clapper', 'abomination-tooth', 'matted-tangle', 'bebok-sack', 'plague-kerchief', 'moon-bite',
+      // Łysogóry (201–275) from 15.11.2026.
+      'marmot-fat', 'roller-feather', 'echo-pebble', 'chamois-horn', 'wallcreeper-wing', 'swift-nest', 'stone-comb', 'cicada-wing', 'hoopoe-crest', 'wolverine-fur', 'vulture-ruff', 'shrike-thorn',
+      'stone-blade-shard', 'dormouse-fur', 'bee-eater-feather', 'stolem-boulder', 'griffin-feather', 'tarpan-mane', 'jay-acorn', 'woodpecker-beak', 'ant-acid', 'changeling-rattle', 'nightshade-berry', 'slug-slime',
+      'leech-root', 'kingfisher-feather', 'cauldron-ladle', 'broom-twig', 'witch-pouch', 'armor-plate', 'gilded-frame', 'black-page', 'twardowski-quill', 'cuckoo-egg', 'burning-spoke', 'pine-nut',
+      'fortune-bone', 'pestle', 'hare-foot', 'flying-ointment', 'red-ribbon', 'magpie-trinket', 'piper-whistle', 'offering-loaf', 'wax-lump', 'thread-of-fate', 'hut-claw', 'black-down',
+      'skull-flame', 'iron-tooth', 'scythe-tip',
     ],
   },
   // The skills of the classes (data/skills.json), 48×48.
@@ -315,13 +327,16 @@ export const SPRITES = {
       'heather-dunes', 'resin-pinewood', 'drifting-sands', 'tar-pits', 'burnt-forest',
       'spruce-dusk', 'fern-thicket', 'forgotten-track', 'mossy-dell', 'wild-den', 'creaking-pines', 'rotting-logs', 'devils-crossroads',
       'plague-graves', 'eclipsed-glade',
+      'grey-scree', 'windy-ridge', 'devils-stones', 'vulture-crags', 'stone-throne',
+      'fir-slope', 'witches-path', 'misty-ravine', 'witch-glade', 'cursed-manor',
+      'stone-rampart', 'witch-kitchen', 'dance-circle', 'stone-altars', 'baba-yaga-hut',
     ],
   },
   // The lands' wide scenes, dim behind the text of their cards, 192×96.
   lands: {
     width: 192,
     height: 96,
-    ids: ['windfalls', 'stone-glade', 'backwaters', 'peat-bogs', 'black-bog', 'pine-dunes', 'silent-wilds', 'new-moon-depths'],
+    ids: ['windfalls', 'stone-glade', 'backwaters', 'peat-bogs', 'black-bog', 'pine-dunes', 'silent-wilds', 'new-moon-depths', 'scree-slopes', 'fir-forest', 'bald-mountain'],
   },
   // The camp's buildings, <building>-<look> for the looks of levels 1–3, 4–7
   // and 8–10 (8–19 for the resource buildings, whose fourth look is the
@@ -432,7 +447,7 @@ export const SPRITES = {
   boards: {
     width: 192,
     height: 160,
-    ids: ['arena-board', 'board-windfalls', 'board-stone-glade', 'board-backwaters', 'board-peat-bogs', 'board-black-bog', 'board-pine-dunes', 'board-silent-wilds', 'board-new-moon-depths'],
+    ids: ['arena-board', 'board-windfalls', 'board-stone-glade', 'board-backwaters', 'board-peat-bogs', 'board-black-bog', 'board-pine-dunes', 'board-silent-wilds', 'board-new-moon-depths', 'board-scree-slopes', 'board-fir-forest', 'board-bald-mountain'],
   },
   // The buildings of the Siedziba Gildii (data/guilds.json, seat), by the
   // building's id, 128×96 on a transparent ground: the first look the

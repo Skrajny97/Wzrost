@@ -22,6 +22,7 @@
     "life": 24,
     "shapeExponent": 0.4,
     "shapeRange": [0.35, 3],
+    "shapeMedian": 0.10735014475471782,
     "landStep": 0.06,
     "levelStep": 0.1,
     "maxLevel": 5,
