@@ -1,0 +1,14 @@
+{
+  "id": "baba-yaga",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Baba Jaga, the oldest witch of Slavic tales, a hunched ancient crone with a long iron nose, wild grey hair, one leg of bare bone, a ragged dark brown shawl, leaning on a crooked staff topped with a small skull, a poisonous green curse swirling from her raised hand, glowing eyes, cackling, menacing, standing on both feet, full body, three-quarter view, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02327137951681349
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "wood-ant",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant red wood ant the size of a fox, a reddish-brown and black shiny body, big mandibles wide open, antennae raised, spraying a jet of yellow acid from its abdomen, menacing, full body, three-quarter view, the whole insect inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02308626150915358
+  },
+  "images": 1
+}

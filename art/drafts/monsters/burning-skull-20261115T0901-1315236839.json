@@ -1,0 +1,14 @@
+{
+  "id": "burning-skull",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Plonaca Czaszka, a floating human skull from Baba Yaga's fence, its eye sockets blazing with orange fire, flames streaming out of the eyes and mouth like a lantern, eerie and menacing, full body, three-quarter view, the whole skull and flames inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023099967964384294
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "magpie",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a magpie, a black and white bird with a long glossy green-blue tail and iridescent blue wings, a shiny stolen ring in its beak, glowing witch-green eyes, wings half open, menacing, full body, three-quarter view, the whole bird inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023097041808658177
+  },
+  "images": 1
+}

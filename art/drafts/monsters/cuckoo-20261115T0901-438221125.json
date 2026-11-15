@@ -1,0 +1,14 @@
+{
+  "id": "cuckoo",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant cuckoo, a grey bird with a barred white and grey belly, yellow eyes and yellow legs, a long tail, its beak open in a loud call, wings half spread, eerie and menacing, full body, three-quarter view, the whole bird inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023088947127024334
+  },
+  "images": 1
+}

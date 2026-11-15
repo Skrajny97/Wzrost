@@ -1,0 +1,14 @@
+{
+  "id": "mortar",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Mozdzierz, a living heavy iron mortar and pestle hopping on its own, a wide black iron bowl with a grinning face, a big iron pestle swinging above it like a club, crushed herbs and sparks flying, menacing, full body, three-quarter view, the whole mortar and pestle inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023131969003041587
+  },
+  "images": 1
+}

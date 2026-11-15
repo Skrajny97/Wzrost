@@ -1,0 +1,14 @@
+{
+  "id": "dance-frenzy",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Plasawica, a spirit of dancing frenzy, a wild whirling woman made of ribbons and flickering ghostly light, many arms reaching out to drag you into the dance, a mad laughing face, her skirt spinning into a whirlwind, eerie and menacing, full body, three-quarter view, isolated figure on a plain background, no scenery",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023153455004586116
+  },
+  "images": 1
+}

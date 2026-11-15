@@ -1,0 +1,14 @@
+{
+  "id": "witch-hare",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Zajeczyca, a witch turned into a big brown hare, long ears, glowing yellow witch eyes, a wicked grin with long sharp teeth, a drop of stolen milk on its mouth, leaping, eerie and menacing, full body, three-quarter view, the whole animal inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023113759526570642
+  },
+  "images": 1
+}

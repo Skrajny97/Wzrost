@@ -1,0 +1,14 @@
+{
+  "id": "cursed-piper",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Grajek, a cursed village bagpiper doomed to play forever, a gaunt pale man in a torn white peasant shirt and a felt hat, playing old Polish goat-skin bagpipes with a carved goat head, ghostly music notes flying out like blades, hollow glowing eyes, eerie and menacing, standing on both feet, full body, three-quarter view, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02387116474405925
+  },
+  "images": 1
+}

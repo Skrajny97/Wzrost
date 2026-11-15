@@ -1,0 +1,14 @@
+{
+  "id": "nightshade",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Pokrzyk, a living deadly nightshade bush, a twisted shrub of dark green leaves and purple bell-shaped flowers, glossy black poisonous berries hanging like eyes, a gaping mouth among the branches, roots for legs, throwing black berries, eerie and menacing, full body, three-quarter view, the whole plant inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02313720291815864
+  },
+  "images": 1
+}

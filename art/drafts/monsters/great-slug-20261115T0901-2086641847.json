@@ -1,0 +1,14 @@
+{
+  "id": "great-slug",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a huge great grey slug as big as a calf, a slimy mottled grey-black body without a shell, long eye stalks, a trail of glistening slime behind it, rearing up its front, menacing, full body, three-quarter view, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02310229891289605
+  },
+  "images": 1
+}

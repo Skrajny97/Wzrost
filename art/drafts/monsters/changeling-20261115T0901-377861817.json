@@ -1,0 +1,14 @@
+{
+  "id": "changeling",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Odmieniec, the changeling child of Slavic legends, a small ugly creature in a dirty linen shirt, a big bald head with a wrinkled old face, huge hungry black eyes and a wide mouth full of sharp teeth, long thin arms with clawed fingers, crouching ready to bite, eerie and menacing, full body, three-quarter view, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024480988509284127
+  },
+  "images": 1
+}

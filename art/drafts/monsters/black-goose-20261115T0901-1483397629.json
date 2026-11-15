@@ -1,0 +1,14 @@
+{
+  "id": "black-goose",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Czarna Ges, a big black goose of Baba Yaga with glowing red eyes, a black beak with a jagged edge of teeth, wings spread wide, hissing with its neck stretched forward, menacing, full body, three-quarter view, the whole bird inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023632857736375596
+  },
+  "images": 1
+}

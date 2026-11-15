@@ -1,0 +1,14 @@
+{
+  "id": "offering-oven",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Piec, a living ancient stone offering oven, a squat round dome of soot-black stones with a glowing mouth of red-hot fire like a gaping maw, two burning eyes above it, smoke pouring from its top, embers flying, menacing, full body, three-quarter view, the whole oven inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02312864492670695
+  },
+  "images": 1
+}

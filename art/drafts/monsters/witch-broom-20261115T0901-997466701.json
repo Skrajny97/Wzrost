@@ -1,0 +1,14 @@
+{
+  "id": "witch-broom",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Miotla, a living witch's broom flying on its own, an old twisted wooden handle with a knotted face and glowing eyes near the top, a wild bundle of birch twigs whipping around, sparks and dust flying, menacing, full body, three-quarter view, the whole broom inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023117342040167917
+  },
+  "images": 1
+}

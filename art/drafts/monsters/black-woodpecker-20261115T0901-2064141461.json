@@ -1,0 +1,14 @@
+{
+  "id": "black-woodpecker",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a black woodpecker, a big all-black woodpecker with a bright red crown and pale eyes, a long strong chisel-like pale beak, clinging to a fir trunk and hammering, menacing, full body, three-quarter view, the whole bird and trunk inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023108624131308663
+  },
+  "images": 1
+}

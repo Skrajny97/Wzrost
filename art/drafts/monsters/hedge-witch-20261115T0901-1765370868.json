@@ -1,0 +1,14 @@
+{
+  "id": "hedge-witch",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Wiedzma, an old Slavic forest witch, a hunched crone in a patched dark green shawl and headscarf, a long crooked nose, wild grey hair, a gnarled staff in one hand and a bundle of poisonous herbs in the other, green magic glowing from her fingers, menacing, standing on both feet, full body, three-quarter view, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02408355167961121
+  },
+  "images": 1
+}

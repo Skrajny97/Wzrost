@@ -1,0 +1,14 @@
+{
+  "id": "nutcracker",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a spotted nutcracker bird, chocolate-brown plumage covered in white spots, a dark cap, a strong pointed black beak like a chisel, a hazelnut in its beak, wings half open, full body, three-quarter view, the whole bird inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023097063928604125
+  },
+  "images": 1
+}

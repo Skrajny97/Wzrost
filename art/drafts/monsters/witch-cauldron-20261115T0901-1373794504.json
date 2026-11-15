@@ -1,0 +1,14 @@
+{
+  "id": "witch-cauldron",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Kociol, a living black iron witch cauldron walking on three short iron legs, a bubbling poisonous green brew boiling over its rim with green fumes, two glowing eyes and a grinning mouth on its round belly, a bony ladle sticking out, menacing, full body, three-quarter view, the whole cauldron inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0231642241513994
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "seeress",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Wieszczka, a pagan seeress of the old Slavic gods, a gaunt woman in a long white linen robe with red embroidery, long loose grey hair with a wreath of dried herbs, blind milky eyes, holding a clay bowl of burning fire in both hands, visions of smoke rising from it, eerie and menacing, standing on both feet, full body, three-quarter view, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02416294656054179
+  },
+  "images": 1
+}

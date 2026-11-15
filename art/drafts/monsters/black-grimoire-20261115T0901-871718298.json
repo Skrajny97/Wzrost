@@ -1,0 +1,14 @@
+{
+  "id": "black-grimoire",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Czarna Ksiega, a flying black leather grimoire with iron clasps and a silver pentacle on its cover, its pages flapping open like wings, glowing fiery runes rising from the pages, a single eye on the cover, menacing, full body, three-quarter view, the whole book inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02312973086187575
+  },
+  "images": 1
+}

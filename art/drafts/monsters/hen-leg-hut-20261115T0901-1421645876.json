@@ -1,0 +1,14 @@
+{
+  "id": "hen-leg-hut",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Kurza Chata, Baba Yaga's small old wooden log hut standing on a single giant scaly chicken leg, a thatched roof with a crooked chimney smoking, glowing windows like eyes, the door like a mouth, the hut kicking forward with its clawed chicken foot, menacing, full body, three-quarter view, the whole hut and leg inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024229730875651043
+  },
+  "images": 1
+}

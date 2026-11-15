@@ -1,0 +1,14 @@
+{
+  "id": "fate-spinner",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Przadka, a spinner of fate from old Slavic beliefs, an ageless woman in a long grey hooded robe sitting at a spinning distaff, spinning a glowing golden thread of life, holding big iron shears ready to cut it, glowing pale eyes in the hood, eerie and menacing, full body, three-quarter view, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02318247378815545
+  },
+  "images": 1
+}

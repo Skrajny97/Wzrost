@@ -1,0 +1,14 @@
+{
+  "id": "griffin",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a griffin, half eagle half lion, the head, wings and front talons of a golden-brown eagle with a hooked beak and fierce yellow eyes, the body, hind legs and tufted tail of a tawny lion, wings spread wide, rearing up on a grey rock, majestic and menacing, full body, three-quarter view, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023858811587651574
+  },
+  "images": 1
+}

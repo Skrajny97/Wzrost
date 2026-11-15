@@ -1,0 +1,14 @@
+{
+  "id": "kingfisher",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a common kingfisher diving like an arrow, a brilliant electric-blue back and wings, an orange-chestnut breast, a white throat patch, a long dagger-like black beak pointing forward, full body, three-quarter view, the whole bird inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023078611318164403
+  },
+  "images": 1
+}

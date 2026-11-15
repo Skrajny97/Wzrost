@@ -1,0 +1,14 @@
+{
+  "id": "fire-wheel",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Ogniste Kolo, a big burning wooden cart wheel rolling on its own, wrapped in straw and blazing with orange flames, sparks and embers trailing behind it, a fierce face of fire in its hub, menacing, full body, three-quarter view, the whole wheel and flames inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023739494359122384
+  },
+  "images": 1
+}

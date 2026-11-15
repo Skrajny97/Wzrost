@@ -1,0 +1,14 @@
+{
+  "id": "kostucha",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Kostucha, Death of Slavic folklore, a tall gaunt skeletal woman in a long white tattered shroud with a hood, a pale skull face, bony hands holding a long scythe raised over her shoulder, a cold mist at her feet, eerie and menacing, standing on both feet, full body, three-quarter view, the whole figure and scythe inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023211612602233887
+  },
+  "images": 1
+}

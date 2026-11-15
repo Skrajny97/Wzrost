@@ -1,0 +1,14 @@
+{
+  "id": "wax-doll",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Woskowa Lalka, a witch's yellowish wax voodoo doll as big as a child, a crude wax body with stitched cloth scraps and a lock of hair, black button eyes, long iron pins stuck in it, moving on its own, eerie and menacing, standing on both feet, full body, three-quarter view, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024140545920689902
+  },
+  "images": 1
+}

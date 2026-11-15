@@ -1,0 +1,14 @@
+{
+  "id": "stolem",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Stolem, a colossal ancient giant from Kashubian legends, a huge craggy grey-skinned body like weathered quartzite, a long tangled grey beard full of moss, a crude fur loincloth, lifting a big boulder over his head to throw it, deep-set glowing eyes, menacing, standing on both feet, full body, three-quarter view, the whole figure and boulder inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024027403274536133
+  },
+  "images": 1
+}

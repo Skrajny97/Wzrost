@@ -1,0 +1,14 @@
+{
+  "id": "broom-witch",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Czarownica, a Slavic witch flying on a broom to the sabbath, long wild black hair streaming, a ragged dark red dress, a pale face with a wicked grin and glowing green eyes, one hand throwing a curse of green fire, menacing, full body, three-quarter view, the whole witch and broom inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024010446719487512
+  },
+  "images": 1
+}

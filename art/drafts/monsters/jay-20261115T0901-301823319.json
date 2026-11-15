@@ -1,0 +1,14 @@
+{
+  "id": "jay",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a Eurasian jay, a pinkish-brown bird with a bright blue and black barred patch on its wing, a black moustache stripe, a white rump and black tail, its crest raised, screeching with its beak wide open, full body, three-quarter view, the whole bird inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023136304502911043
+  },
+  "images": 1
+}

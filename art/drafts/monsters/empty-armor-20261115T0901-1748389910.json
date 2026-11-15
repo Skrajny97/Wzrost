@@ -1,0 +1,14 @@
+{
+  "id": "empty-armor",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Pusta Zbroja, an empty suit of old Polish plate armour moving on its own, a winged hussar-style breastplate and a helmet with nothing inside but darkness and two faint violet glowing eyes, a long sword raised, chains and dust, eerie and menacing, standing on both feet, full body, three-quarter view, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024085032353295222
+  },
+  "images": 1
+}

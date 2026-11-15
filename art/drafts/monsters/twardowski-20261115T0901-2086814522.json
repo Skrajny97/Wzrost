@@ -1,0 +1,14 @@
+{
+  "id": "twardowski",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Pan Twardowski, the legendary Polish sorcerer, a tall nobleman in a long dark red kontusz robe with a black fur-trimmed cloak and a fur cap, a long black moustache and goatee, holding an open black magic book in one hand with fire rising from it, the other hand raised casting a spell, glowing eyes, menacing, standing on both feet, full body, three-quarter view, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024677031705008613
+  },
+  "images": 1
+}

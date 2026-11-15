@@ -1,0 +1,14 @@
+{
+  "id": "mistletoe-leech",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Jemiolak, a living ball of mistletoe, a round tangled bunch of forked yellow-green twigs and paired leaves full of sticky white berries, sucking tendrils reaching out like leeches, two small glowing green eyes inside the bunch, hovering, eerie and menacing, full body, three-quarter view, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023183327440049913
+  },
+  "images": 1
+}

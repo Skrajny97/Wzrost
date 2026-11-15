@@ -1,0 +1,14 @@
+{
+  "id": "haunted-portrait",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Portret, a haunted oil portrait of an old Polish nobleman with a long moustache and a fur cap in a heavy gilded frame, his painted eyes glowing and following you, a ghostly cold blue mist seeping out of the frame, the frame floating in the air, eerie and menacing, full body, the whole frame inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02316525411966112
+  },
+  "images": 1
+}
