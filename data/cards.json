@@ -82,11 +82,12 @@
     "relationDiscount": [0, 0.1, 0.2, 0.3, 0.4]
   },
   "effects": {
-    "$comment": "Karty efektów (976, 977, 978; 15.11.2026; src/engine/cards.js, src/server/cards.js, src/client/cards.js): karty, które nie są stworami, tylko wzmacniają karty gracza albo osłabiają karty rywala. Stoją osobno od 12 stworów talii, w slots miejscach (977.1 B). W partii gracz zagrywa najwyżej jedną kartę efektu na rundę, przed „Walcz”, jak umiejętność bohatera, a każdą raz na partię (977.2 A). Poziom karty efektu to liczba zdobytych sztuk, najwyżej stats.maxLevel, a power rośnie o perLevel za każdy poziom ponad pierwszy (do most, jeśli jest). kind mówi, co karta robi: boost (wybrana własna karta bije w tej rundzie o power mocniej), shield (wybrana własna karta dostaje w tej rundzie o power słabsze ciosy), heal (wybrana własna karta odzyskuje power swojego Życia z początku partii, najwyżej do niego), curse (wybrana karta rywala do końca partii bije o power słabiej), rally (wszystkie własne karty biją w tej rundzie o power mocniej), mist (każdy cios rywala we własną kartę w tej rundzie chybia z szansą power), bind (wybrana karta rywala bije w tej rundzie o power słabiej) i bolt (wybrana karta rywala od razu traci power swojego Życia, przed ciosami rundy). target: own (własna karta na linii), rival (karta rywala na linii) albo all (bez wyboru). Skąd się biorą (977.3 B): pakiet u Szczęsnego z szansą packChance ma zamiast pierwszego stwora kartę efektu o rzadkości losowanej według weights; pierwsza wygrana na każdym stopniu Szczęsnego (także na stopniu pokonanym przed kartami efektów) daje kartę efektu o rzadkości firstWin[stopień - 1]; zawsze najpierw taką, której postać nie ma, i nigdy na najwyższym poziomie. Szczęsny od wyższych stopni i mieszkańcy Osady grają swoimi kartami efektów (host.tiers[].effects, residents.tables[].effects; 977.4 A), tak samo talia, która broni się na Arenie. Partie na żywo z innymi graczami na razie bez kart efektów. texts: słowa gry; {…} wypełnia gra.",
+    "$comment": "Karty efektów (976, 977, 978; 15.11.2026; src/engine/cards.js, src/server/cards.js, src/client/cards.js): karty, które nie są stworami, tylko wzmacniają karty gracza albo osłabiają karty rywala. Stoją osobno od 12 stworów talii, w slots miejscach (977.1 B). W partii gracz zagrywa najwyżej jedną kartę efektu na rundę, przed „Walcz”, jak umiejętność bohatera, a każdą raz na partię (977.2 A). Poziom karty efektu to liczba zdobytych sztuk, najwyżej stats.maxLevel, a power rośnie o perLevel za każdy poziom ponad pierwszy (do most, jeśli jest). kind mówi, co karta robi: boost (wybrana własna karta bije w tej rundzie o power mocniej), shield (wybrana własna karta dostaje w tej rundzie o power słabsze ciosy), heal (wybrana własna karta odzyskuje power swojego Życia z początku partii, najwyżej do niego), curse (wybrana karta rywala do końca partii bije o power słabiej), rally (wszystkie własne karty biją w tej rundzie o power mocniej), mist (każdy cios rywala we własną kartę w tej rundzie chybia z szansą power), bind (wybrana karta rywala bije w tej rundzie o power słabiej) i bolt (wybrana karta rywala od razu traci power swojego Życia, przed ciosami rundy). target: own (własna karta na linii), rival (karta rywala na linii) albo all (bez wyboru). Skąd się biorą (977.3 B): pakiet u Szczęsnego z szansą packChance ma zamiast pierwszego stwora kartę efektu o rzadkości losowanej według weights; pierwsza wygrana na każdym stopniu Szczęsnego (także na stopniu pokonanym przed kartami efektów) daje kartę efektu o rzadkości firstWin[stopień - 1]; zawsze najpierw taką, której postać nie ma, i nigdy na najwyższym poziomie. Rzadko wypada też z wypraw (drops.explorationHour: szansa za każdą godzinę wyprawy bez omdlenia) i od strażników Labiryntu (drops.guardian: szansa za każdego pokonanego), o rzadkości według weights. Szczęsny od wyższych stopni i mieszkańcy Osady grają swoimi kartami efektów (host.tiers[].effects, residents.tables[].effects; 977.4 A), tak samo talia, która broni się na Arenie. Partie na żywo z innymi graczami na razie bez kart efektów. texts: słowa gry; {…} wypełnia gra.",
     "slots": 2,
     "packChance": 0.25,
     "weights": { "common": 32, "rare": 30, "unique": 22, "epic": 12 },
     "firstWin": ["common", "rare", "unique", "epic", "epic"],
+    "drops": { "explorationHour": 0.01, "guardian": 0.03 },
     "cards": [
       { "id": "bear-strength", "name": "Niedźwiedzia siła", "rarity": "common", "kind": "boost", "target": "own", "power": 0.4, "perLevel": 0.1, "text": "Wybrana Twoja karta bije w tej rundzie o {power}% mocniej." },
       { "id": "stone-skin", "name": "Kamienna skóra", "rarity": "common", "kind": "shield", "target": "own", "power": 0.4, "perLevel": 0.1, "text": "Wybrana Twoja karta dostaje w tej rundzie o {power}% słabsze ciosy." },
@@ -101,7 +102,7 @@
       "tab": "Karty efektów",
       "slots": "Karty efektów w talii: {used} z {slots}",
       "rule": "Karty efektów stoją obok 12 stworów talii. W partii zagrasz najwyżej jedną na rundę, przed „Walcz”, a każdą raz na partię.",
-      "empty": "Nie masz jeszcze kart efektów. Wypadają z pakietów u Szczęsnego i za pierwszą wygraną na każdym jego stopniu.",
+      "empty": "Nie masz jeszcze kart efektów. Wypadają z pakietów u Szczęsnego, za pierwszą wygraną na każdym jego stopniu, a rzadko także z wypraw i od strażników Labiryntu.",
       "none": "Bez kart efektów",
       "pick": "Zagraj kartę efektu: najwyżej jedną na rundę, każdą raz na partię.",
       "targetOwn": "Wskaż swoją kartę na stole.",
@@ -112,7 +113,8 @@
       "rivalPlays": "Rywal zagrywa kartę efektu: {name}.",
       "firstWin": "Za pierwszą wygraną na tym stopniu zgarniasz też kartę efektu: {card}.",
       "inPack": "W pakiecie trafiła się karta efektu: {card}.",
-      "missed": "chybia"
+      "missed": "chybia",
+      "found": "Wśród łupów błyszczy karta efektu: {card}."
     }
   },
   "live": {

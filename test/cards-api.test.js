@@ -30,6 +30,7 @@ import {
   labyrinthDay,
   labyrinthFoes,
   packCards,
+  packEffect,
   newLabyrinth,
   portalArea,
   questPeriod,
@@ -167,15 +168,18 @@ describe('Talia Systemu through the API', () => {
     assert.equal(bought.status, 200, JSON.stringify(bought.data));
     const ids = bought.data.pack.map((card) => card.id);
     assert.equal(new Set(ids).size, rules.pack.cards);
-    assert.ok(ids.every((id) => cardHomes(content).has(id)));
+    // An effect card may stand in place of the first creature (977.3 B).
+    const creatures = bought.data.pack.filter((card) => !card.effect);
+    assert.ok(creatures.length >= rules.pack.cards - 1);
+    assert.ok(creatures.every((card) => cardHomes(content).has(card.id)));
     // A card of the starter deck goes a level up; a new one comes at the first.
     assert.ok(bought.data.pack.every((card) => card.fresh === !starter.includes(card.id) && card.level === (card.fresh ? 1 : 2)));
     assert.equal((await row()).gold, before - offer.price);
     const relation = () => row().then((one) => JSON.parse(one.settlement ?? '{}').relations?.[rules.host.resident] ?? 0);
     assert.equal(await relation(), content.settlement.casino.relationGain);
-    const fresh = bought.data.pack.filter((card) => card.fresh).length;
+    const fresh = creatures.filter((card) => card.fresh).length;
     assert.deepEqual([bought.data.cards.pack.bought, bought.data.cards.pack.missing], [true, offer.missing - fresh]);
-    assert.ok(ids.every((id) => bought.data.cards.collection.some((card) => card.id === id)));
+    assert.ok(creatures.every(({ id }) => bought.data.cards.collection.some((card) => card.id === id)));
     assert.equal((await call('POST', '/api/cards/pack', { cookie })).data.error.code, 'pack_bought');
     // A new day, at the standing of Zaufany: the price less its discount.
     const game = JSON.parse((await row()).card_game);
@@ -221,7 +225,10 @@ describe('Talia Systemu through the API', () => {
     const day = casinoDay(Date.now(), content).key;
     const seed = createHmac('sha256', made).update(`${day}:${id}`).digest('hex');
     const ids = bought.data.pack.map((card) => card.id);
-    assert.deepEqual(ids, packCards({ maxed: [], seed, count: rules.pack.cards }, content));
+    // With an effect card in place of the first creature, by its chance (977.3 B).
+    const drawn = packCards({ maxed: [], seed, count: rules.pack.cards }, content);
+    const effect = packEffect({ maxed: [], seed }, content);
+    assert.deepEqual(ids, effect ? [effect, ...drawn.slice(1)] : drawn);
     // A second draw keeps the key.
     const game = JSON.parse((await row()).card_game);
     await set('card_game = ?', JSON.stringify({ ...game, day: '2020-01-01' }));
@@ -514,11 +521,12 @@ describe('Talia Systemu through the API', () => {
       await (await db()).prepare('UPDATE activities SET seed = ?, hp_at_start = 99999, started_at = started_at - ?, ends_at = ends_at - ?').bind(`karty:${attempt}`, 240 * 60000, 240 * 60000).run();
       const claimed = await call('POST', '/api/hunts/claim', { cookie });
       assert.equal(claimed.status, 200, JSON.stringify(claimed.data));
-      if (claimed.data.report.cards?.length > 0) found = claimed.data.report;
+      // A creature's card (an effect card may come too, 977.3 B).
+      if (claimed.data.report.cards?.some((one) => !one.effect)) found = claimed.data.report;
       await set('hp = 99999');
     }
     assert.ok(found, 'w 30 wyprawach wypadła karta');
-    const card = found.cards[0];
+    const card = found.cards.find((one) => !one.effect);
     assert.equal(card.fresh, true);
     assert.equal(card.level, 1);
     const stored = await (await db()).prepare('SELECT * FROM cards WHERE monster_id = ?').bind(card.id).first();

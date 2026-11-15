@@ -51,7 +51,7 @@ import {
 } from '../engine/index.js';
 import { say } from '../engine/text.js';
 import { atomically, sameVersion } from './atomic.js';
-import { cardCollection, cardsHere, cardSummary, cardUpserts, droppedCards, maxedCards } from './cards.js';
+import { cardCollection, cardsHere, cardSummary, cardUpserts, droppedCards, droppedEffect, effectChance, effectFoundLine, effectUpserts, maxedCards } from './cards.js';
 import { characterView, coreOf, engineCharacter, equippedItems, loadPlayer, questsNow, requirePlayer, trophiesFor } from './characters.js';
 import { content } from './content.js';
 import { artifactData } from './core.js';
@@ -289,6 +289,10 @@ export async function enterLabyrinth(context) {
   // The cards the creatures left (903), each in a line of its own.
   const cardsWon = collection ? (hunt?.cards ?? []) : [];
   cardsWon.forEach((id, index) => lines.push(cardDropText(id, target.row * 3 + target.room + index, content())));
+  // A rare effect card from a guardian beaten (977.3 B), with its line.
+  const effectWon = collection && type === 'guardian' && hunt?.labyrinth.won ? await droppedEffect(db, row.id, seed, effectChance('guardian')) : null;
+  if (effectWon) lines.push(effectFoundLine(effectWon.view));
+  const cardsShown = [...(cardsWon.length > 0 ? droppedCards(cardsWon, collection) : []), ...(effectWon ? [effectWon.view] : [])];
   if (type === 'guardian' && hunt?.labyrinth.won) {
     lines.push(say(texts, 'levelCleared', 0, { level: labyrinthLevel(state.level, content()).name }));
     if (next.over === 'done') lines.push(say(texts, 'dayDone', 0));
@@ -322,7 +326,7 @@ export async function enterLabyrinth(context) {
         ...(artifact && { artifact: artifactView(artifact, content()) }),
       },
       // Talia Systemu's cards the creatures left, at their levels now.
-      ...(cardsWon.length > 0 && { cards: droppedCards(cardsWon, collection) }),
+      ...(cardsShown.length > 0 && { cards: cardsShown }),
     };
   }
   const summary = report && {
@@ -380,6 +384,7 @@ export async function enterLabyrinth(context) {
     ...(artifact ? [db.prepare('INSERT INTO core_artifacts (character_id, data, created_at) VALUES (?, ?, ?)').bind(row.id, artifactData(artifact), now)] : []),
     // The cards the creatures left, a copy each (cards.js).
     ...cardUpserts(db, row.id, cardsWon, now),
+    ...(effectWon ? effectUpserts(db, row.id, [effectWon.id], now) : []),
   ];
   // The report last, its id from its own statement.
   const reportAt = statements.length;

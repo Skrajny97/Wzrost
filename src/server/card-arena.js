@@ -54,7 +54,7 @@ import {
   turnBlock,
 } from '../engine/index.js';
 import { assertion, atomically } from './atomic.js';
-import { cardCollection, cardGameOf, deckSlots, heroOf, heroView } from './cards.js';
+import { cardCollection, cardGameOf, deckSlots, effectDecksOf, heroOf, heroView } from './cards.js';
 import { characterView, engineCharacter, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
@@ -409,7 +409,7 @@ export async function startCardArenaMatch(context) {
   if (await runningMatch(db, row.id)) throw new ApiError(409, 'match_running', texts().running);
   if (cardMatchesLeft(record, now, content()) <= 0) throw new ApiError(409, 'used', texts().used);
   if (!Number.isInteger(rivalId) || !JSON.parse(record.rivals).includes(rivalId)) throw new ApiError(409, 'gone', texts().gone);
-  const decks = await decksOf(db, [row.id, rivalId]);
+  const [decks, effects] = await Promise.all([decksOf(db, [row.id, rivalId]), effectDecksOf(db, [row.id, rivalId])]);
   const mine = decks.get(row.id);
   if (!mine) throw new ApiError(409, 'no_deck', texts().noDeckPlay);
   const rival = await db
@@ -419,7 +419,15 @@ export async function startCardArenaMatch(context) {
   const theirs = decks.get(rivalId);
   if (!rival || !fairRival(rival, row) || !theirs) throw new ApiError(409, 'gone', texts().gone);
   const stakes = cardRatingStakes(record.rating, rival.card_rating, content());
-  const state = newMatch({ seed: newSeed(), me: { cards: mine, hero: heroOf(row) }, foe: { cards: theirs, hero: heroOf(rival), smart: rules().smart, boost: rules().defenceBonus } }, content());
+  // Both decks' effect cards (976, 977), the rival's played by the game.
+  const state = newMatch(
+    {
+      seed: newSeed(),
+      me: { cards: mine, hero: heroOf(row), effects: effects.get(row.id) ?? [] },
+      foe: { cards: theirs, hero: heroOf(rival), smart: rules().smart, boost: rules().defenceBonus, effects: effects.get(rivalId) ?? [] },
+    },
+    content(),
+  );
   const today = arenaDay(now, content()).key;
   try {
     await atomically(
@@ -519,7 +527,7 @@ export async function playCardArenaTurn(context) {
   const state = JSON.parse(match.state);
   const block = turnBlock(state, body, content());
   if (block) throw new ApiError(block.status ?? 400, block.code, block.message);
-  const next = playTurn(state, { round: body.round, lines: body.lines, skill: body.skill ?? null }, content());
+  const next = playTurn(state, { round: body.round, lines: body.lines, skill: body.skill ?? null, effect: body.effect ?? null }, content());
   if (next.result) return finish(db, player, match, next, now);
   await atomically(
     db,

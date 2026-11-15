@@ -674,19 +674,18 @@ export function effectOfRarity(rarity, { owned, maxed }, seed, content) {
   return pickCard(pool, createRng(`${seed}:effect`), { owned, maxed });
 }
 
-// An effect card in the day's pack (977.3 B): with the chance packChance,
-// one of a rarity drawn by the effects' weights, then one of that rarity,
-// all alike; never one at its top level. Null for none.
+// An effect card drawn by `rng` with the chance `chance`: one of a rarity
+// drawn by the effects' weights, then one of that rarity, all alike; never
+// one at its top level (`maxed`). Null for none.
 /**
- * @param {{ maxed: Iterable<string>, seed: string }} draw
- * @param {Content} content
+ * @param {{ next: () => number }} rng
+ * @param {number} chance
+ * @param {Iterable<string>} maxed
+ * @param {Record<string, any>} rules
  * @returns {string | null}
  */
-export function packEffect({ maxed, seed }, content) {
-  const rules = effectRules(content);
-  if (!rules) return null;
-  const rng = createRng(`${seed}:pack-effect`);
-  const comes = rng.next() < rules.packChance;
+function drawEffect(rng, chance, maxed, rules) {
+  const comes = rng.next() < chance;
   const rarityRoll = rng.next();
   const cardRoll = rng.next();
   if (!comes) return null;
@@ -699,6 +698,33 @@ export function packEffect({ maxed, seed }, content) {
   const rarity = open.find((one) => (mark -= rules.weights[one]) < 0) ?? /** @type {string} */ (open.at(-1));
   const pool = left(rarity);
   return pool[Math.min(pool.length - 1, Math.floor(cardRoll * pool.length))];
+}
+
+// An effect card in the day's pack (977.3 B), with the chance packChance
+// (drawEffect). Null for none.
+/**
+ * @param {{ maxed: Iterable<string>, seed: string }} draw
+ * @param {Content} content
+ * @returns {string | null}
+ */
+export function packEffect({ maxed, seed }, content) {
+  const rules = effectRules(content);
+  if (!rules) return null;
+  return drawEffect(createRng(`${seed}:pack-effect`), rules.packChance, maxed, rules);
+}
+
+// A rare effect card of an exploration or of a Labyrinth guardian beaten
+// (977.3 B), with the chance `chance` (effects.drops; drawEffect). Null for
+// none.
+/**
+ * @param {{ maxed: Iterable<string>, seed: string, chance: number }} draw
+ * @param {Content} content
+ * @returns {string | null}
+ */
+export function effectDrop({ maxed, seed, chance }, content) {
+  const rules = effectRules(content);
+  if (!rules || !(chance > 0)) return null;
+  return drawEffect(createRng(`${seed}:effect-drop`), Math.min(1, chance), maxed, rules);
 }
 
 // What a side's effect card of the round does to the blows (roundHits):

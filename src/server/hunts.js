@@ -99,7 +99,7 @@ import { assertion, atomically, characterChanged, raced, sameVersion } from './a
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { cardsOn, eventDraftsOn, eventsOn, fortressOn, settlementOn } from './features.js';
-import { cardCollection, cardUpserts, droppedCards, maxedCards } from './cards.js';
+import { cardCollection, cardUpserts, droppedCards, droppedEffect, effectChance, effectFoundLine, effectUpserts, maxedCards } from './cards.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { expeditionMinutes } from './guild-expedition.js';
 import { huntFamePoints } from './fame.js';
@@ -1012,6 +1012,13 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
   // after a faint (faintForfeit).
   const cardsWon = collection ? (hunt.cards ?? []) : [];
   if (cardsWon.length > 0) report.cards = droppedCards(cardsWon, collection);
+  // A rare effect card (977.3 B): its chance by the exploration's minutes,
+  // none after a faint; beside the cards in the report, with its line.
+  const effectWon = collection && !hunt.forfeit ? await droppedEffect(db, row.id, `${activity.seed}:${activity.started_at}`, effectChance('exploration', activity.minutes)) : null;
+  if (effectWon) {
+    report.cards = [...(report.cards ?? []), effectWon.view];
+    report.system = [...report.system, effectFoundLine(effectWon.view)];
+  }
   // The gems of the bag's items the scrapper bought fall out and go back to
   // the minerals (the author's 757 B, 10.11.2026: „kamień wypada i wraca do
   // Twoich minerałów”), and the report says so.
@@ -1179,6 +1186,7 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
       ),
       // The cards the creatures left, a copy each (cards.js).
       ...cardUpserts(db, row.id, cardsWon, now),
+      ...(effectWon ? effectUpserts(db, row.id, [effectWon.id], now) : []),
       db.prepare('DELETE FROM activities WHERE character_id = ? AND started_at = ?').bind(row.id, activity.started_at),
     ]);
   } catch (error) {
