@@ -3063,13 +3063,13 @@ Punkt 814 ze strony ocen: zasady i nazwy Tieru VII przyjęte przez autora (zob. 
 
 ## Uwagi gracza o Targowisku i towarzyszach, przekazane przez autora (11.11.2026): na później
 
-Autor przekazał zrzuty z czatu z uwagami gracza (poz. 47): „same mądre uwagi dał chłop”. Gracz pisze „najemnicy” o towarzyszach z Kwater. Do zrobienia po bieżącym etapie (trzecia ewolucja, zdarzenia 817 i relacje 818), z makietami dla każdej zmiany wyglądu i pytaniami tam, gdzie zmieniają się ustalone zasady:
+*Wszystkie pięć zrobione (827, 828 B, 829 B; w grze od 0.2.66).* Autor przekazał zrzuty z czatu z uwagami gracza (poz. 47): „same mądre uwagi dał chłop”. Gracz pisze „najemnicy” o towarzyszach z Kwater. Do zrobienia po bieżącym etapie (trzecia ewolucja, zdarzenia 817 i relacje 818), z makietami dla każdej zmiany wyglądu i pytaniami tam, gdzie zmieniają się ustalone zasady:
 
 1. **Targowisko łatwiejsze do przeszukania**, bo „za chwilę każdy będzie wystawiał coś i strasznie ciężko będzie coś znaleźć”: wybór dowolnej klasy (gracz szuka przedmiotów dla towarzyszy innych klas), filtr rzadkości i osobne zakładki na mikstury, zioła i materiały.
 2. **Porównanie przedmiotu z Targowiska z tym, co nosi towarzysz**, tak jak dziś z tym, co nosi postać.
 3. **Sortowanie Targowiska od najtańszych i od najdroższych.**
-4. **Towarzysze sami zostają w Kwaterach, gdy postać idzie w Drużynie.** Dziś trzeba ich zostawić ręcznie (zasada autora z 2.11.2026: „nie może być w drużynie, dopóki nie kliknie na nim [Zostań w kwaterze]”), więc to zmiana zasady: pytanie do autora.
-5. **„Dokupienie” poziomów towarzyszowi**, który został w tyle za postacią, żeby nie wymieniać go na nowego i nie przekładać całego sprzętu: pytanie do autora o cenę i zasady.
+4. **Towarzysze sami zostają w Kwaterach, gdy postać idzie w Drużynie.** Dziś trzeba ich zostawić ręcznie (zasada autora z 2.11.2026: „nie może być w drużynie, dopóki nie kliknie na nim [Zostań w kwaterze]”), więc to zmiana zasady: pytanie do autora. *Zrobione: 828 B, w grze od 0.2.66.*
+5. **„Dokupienie” poziomów towarzyszowi**, który został w tyle za postacią, żeby nie wymieniać go na nowego i nie przekładać całego sprzętu: pytanie do autora o cenę i zasady. *Zrobione jako trening towarzyszy w Kwaterach: 829 B, w grze od 0.2.66 (zob. „Wersja 0.2.66”, punkt 3).*
 
 ## Targowisko: wyszukiwanie i porównanie z towarzyszem (makiety 827, 11.11.2026, w grze od 0.2.66)
 
@@ -3251,6 +3251,12 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 3. **Kwestia Sali prób** o próbach (645) przychodzi, jak dotąd, przy pierwszym spojrzeniu na Salę prób, ale dopiero po rozdziale Labiryntu, bo żadna kwestia miejsca nie przychodzi, gdy czeka rozdział.
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
+
+## Wersja 0.3.54 (15.11.2026): liczby nad kartą w całości także przy drżeniu areny od umiejętności
+
+1. Poprawka do punktu 3 wersji 0.3.53, który nie wystarczył na telefonie. Przy sprawdzaniu 0.3.53 klatka po klatce (390 px) „−3880!” Ciosu ostatecznego dalej tracił na dwie klatki „!”. Na arenę działały naraz trzy ruchy: przybliżenie kamery, wstrząs mocnego ciosu (do 7 px) i drżenie z wyglądu samej umiejętności (`shake()` w `src/client/skill-fx.js`, najwyżej 6,5 px, z takim samym powiększeniem). Zapas od krawędzi liczy teraz oba wstrząsy naraz (`LOOK_SHAKE` w `src/client/arena-fx.js`).
+2. „KRYTYK!” wskakuje na kartę z rozmiaru ×2,3, a gra mieściła go na arenie według zwykłej szerokości, więc przy karcie na skraju był w pierwszych widocznych klatkach ucięty z boku (do 10 px). Teraz mieści się na arenie od chwili, gdy go widać (od ok. ×1,6).
+3. Brakujący szczegół: liczba ciosu krytycznego i „KRYTYK!” nad kartą przy krawędzi stoją przez to bliżej środka areny (na telefonie o 15–40 px), ale dalej nad kartą. Zwykłe liczby nad kartą z prawej strony zostają nad nią.
 
 ## Wersja 0.3.53 (15.11.2026): animacje umiejętności klas wyewoluowanych Wojownika, Kleryka i Cienia (962–964)
 
