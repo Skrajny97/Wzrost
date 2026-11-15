@@ -28,6 +28,7 @@ import {
   challengeAt,
   createRng,
   faintShare,
+  gearKey,
   scoutChances,
   scoutedCreature,
   scouting,
@@ -959,7 +960,7 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
   const potionsChanged = drunk.length > 0 || Object.keys(reservedPotions).length > 0;
   const potionsLeft = potionsBack(row, reservedPotions, hunt.potionsUsed);
   // A find for a slot with nothing in it is worn at once.
-  const autoEquipped = autoEquip(equippedItems(player), hunt.items, content(), row.class_id, row.class_level);
+  const autoEquipped = autoEquip(equippedItems(player), hunt.items, content(), gearKey(row.class_id, row.evolution, content()), row.class_level);
   // The rest goes to the bag. When it does not fit, the scrapper buys the
   // weakest items, old or new, at the camp's price. Herbs keep the places
   // their stacks take, and an event's herbs (the Kwiat paproci) take theirs
@@ -984,7 +985,7 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
   const candidates = [...bag, ...toBag.map((index) => hunt.items[index])];
   // The favourites stay (favorites.js): the weakest of the others go. The
   // claim holds only while the character is as read, its stars too.
-  const sold = bagOverflow(candidates, capacity, row.class_id, content(), favoriteIds(row));
+  const sold = bagOverflow(candidates, capacity, gearKey(row.class_id, row.evolution, content()), content(), favoriteIds(row));
   const storedSold = sold.filter((index) => index < bag.length).map((index) => bag[index]);
   const soldStored = storedSold.map((item) => item.id);
   const soldFound = sold.filter((index) => index >= bag.length).map((index) => toBag[index - bag.length]);

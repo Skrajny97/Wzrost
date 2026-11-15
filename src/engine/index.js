@@ -33,6 +33,7 @@ export { countEvents, createRng } from './rng.js';
 export * from './formulas.js';
 export * from './stats.js';
 export * from './items.js';
+export * from './gear.js';
 export * from './progression.js';
 export * from './combatant.js';
 export { sharedBonus, simulateFight } from './combat.js';

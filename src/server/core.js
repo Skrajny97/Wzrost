@@ -13,7 +13,7 @@
 // Skrzynia Konta takes them. Everything is saved in one batch only while
 // the character is as read (atomic.js).
 
-import { artifactUpgradeCost, artifactView, breakShards, coreEffectLines, coreEffects, coreGemBonus, coreSockets, dissolveShards, freeSockets, gemView, knownArtifact, resonanceView, upgradedArtifact } from '../engine/index.js';
+import { artifactUpgradeCost, artifactView, breakShards, coreEffectLines, coreEffects, coreGemBonus, coreSockets, dissolveShards, freeSockets, gearKey, gemView, knownArtifact, resonanceView, upgradedArtifact } from '../engine/index.js';
 import { assertion, atomically, sameVersion } from './atomic.js';
 import { characterView, coreOf, loadPlayer, requireNotExploring, requirePlayer } from './characters.js';
 import { content } from './content.js';
@@ -45,7 +45,7 @@ export const artifactData = (artifact) => {
 export function coreView(row, stored) {
   const core = coreOf(row);
   const gem = coreGemBonus(core.gem, content());
-  const effects = coreEffects(core, row.class_id, content());
+  const effects = coreEffects(core, gearKey(row.class_id, row.evolution, content()), content());
   return {
     open: core.open,
     sockets: coreSockets(row.level, content()),
@@ -54,8 +54,8 @@ export function coreView(row, stored) {
     shards: core.shards,
     gem: gemView(core.gem, content()),
     // The trait of the class's main stat names it (core.js artifactView).
-    absorbed: core.absorbed.map((artifact) => artifactView(artifact, content(), gem, row.class_id)),
-    stored: stored.map((artifact) => artifactView(artifact, content(), 0, row.class_id)),
+    absorbed: core.absorbed.map((artifact) => artifactView(artifact, content(), gem, gearKey(row.class_id, row.evolution, content()))),
+    stored: stored.map((artifact) => artifactView(artifact, content(), 0, gearKey(row.class_id, row.evolution, content()))),
     resonance: resonanceView(core.absorbed, content()),
     resonanceCounts: content().labyrinth.core.resonance.counts,
     effects: coreEffectLines(effects, content()),

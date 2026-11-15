@@ -294,13 +294,15 @@
     },
     {
       "id": "necromancer",
-      "skillStat": "intellect",
       "classId": "shadow",
       "from": "poisoner",
       "name": "Nekromanta",
       "nameFemale": "Nekromantka",
       "description": "Trucizna to był tylko początek. Nekromanta nabywa cech nekrotycznych.",
       "growth": { "dexterity": 3, "perception": 1, "intellect": 1, "will": 1, "vitality": 1 },
+      "gear": { "weapons": ["staff"], "offhands": ["focus"], "damage": 0.8 },
+      "as": { "dexterity": "intellect" },
+      "autoPoints": { "intellect": 4, "perception": 2, "vitality": 2 },
       "trait": { "name": "Żniwo", "text": "Zatrucie zadaje o 40% więcej i trwa 2 ruchy dłużej. Wróg zabity przez Zatrucie wstaje jako szkielet i walczy po stronie postaci do końca walki.", "kind": "toxins", "params": { "damage": 0.4, "ticks": 2, "raise": true, "raiseHp": 0.3, "raisePower": 0.5, "raiseName": "Szkielet" } },
       "skills": ["raise-dead", "curse-of-decay"]
     },
@@ -459,7 +461,6 @@
     },
     {
       "id": "lich",
-      "skillStat": "intellect",
       "classId": "shadow",
       "from": "necromancer",
       "name": "Licz",

@@ -8,6 +8,7 @@ import {
   combatValues,
   createRng,
   equipBlock,
+  gearKey,
   gearSetIds,
   valueChanges,
   gearVerdict,
@@ -146,7 +147,7 @@ export async function equipItem(context) {
   // Targowiska działają w oparciu o Tiery a nie poziomy samej broni").
   // The rules are equipBlock's in the engine, which the Targowisko's "Dla
   // mnie" and the slot's list of items to wear ask too.
-  const block = equipBlock(item, player.row.class_id, player.row.class_level, content());
+  const block = equipBlock(item, gearKey(player.row.class_id, player.row.evolution, content()), player.row.class_level, content());
   if (block === 'slot_locked') throw new ApiError(403, 'slot_locked', 'Ten slot jest jeszcze zablokowany.');
   if (block === 'wrong_class') throw new ApiError(403, 'wrong_class', 'Twoja klasa nie może używać tego przedmiotu.');
   if (block === 'class_level') throw new ApiError(403, 'class_level', `Ten przedmiot założysz od poziomu klasy ${baseClassLevel(item.base, content())}.`);

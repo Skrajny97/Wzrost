@@ -42,7 +42,7 @@
 // still in the chest, so two taps at once move an item once, and none is
 // lost or doubled; a batch that fails on them changes nothing.
 
-import { bagCapacity, campLevels, canUse, countedForm, itemName, itemView, wearersOf } from '../engine/index.js';
+import { bagCapacity, campLevels, canUse, countedForm, gearKey, itemName, itemView, wearersOf } from '../engine/index.js';
 import { assertion, raced, sameVersion } from './atomic.js';
 import { bagPlaces, characterView, loadPlayer, requireOffRack } from './characters.js';
 import { content } from './content.js';
@@ -152,7 +152,7 @@ export async function chestView(db, player, guild) {
       putAt: stored.put_at,
       canTake: stored.for_member === null || forYou || mine,
       // Its class can wear it, and from which level of the class.
-      usable: canUse(item.base, row.class_id, content()),
+      usable: canUse(item.base, gearKey(row.class_id, row.evolution, content()), content()),
       wornFrom: view.classLevel,
       wearers: wearersOf(item, team, content()),
     };

@@ -19,6 +19,7 @@ import {
   campLevels,
   casinoDay,
   dayStakes,
+  gearKey,
   gendered,
   itemName,
   itemView,
@@ -74,7 +75,9 @@ const seedOf = (row) => `${row.id}:casino`;
 // The character's Wheel of the day: the one kept in its Osada, or a new one
 // from the character as it is now.
 function wheelOf(player, stored, now) {
-  const { level, classId, classLevel } = engineCharacter(player.row);
+  const { level, classLevel } = engineCharacter(player.row);
+  // The Wheel's item is of the character's own gear (gear.js, 988).
+  const classId = gearKey(player.row.class_id, player.row.evolution, content());
   return wheelDay(stored.casino, { level, classId, classLevel, ...bonusesOf(player, stored, now) }, now, content());
 }
 

@@ -5,6 +5,7 @@
 
 import { playerCombatant } from './combatant.js';
 import { evolutionOf } from './evolutions.js';
+import { autoPointsOf, gearKey } from './gear.js';
 import { cappedChance, reduction } from './formulas.js';
 import { upgradedItem } from './items.js';
 import { regenPerMinute } from './progression.js';
@@ -199,7 +200,7 @@ export function valueChanges(now, after) {
  * @param {Content} content
  * @returns {Record<string, number>}
  */
-const pathWeights = (classId, content) => content.classesById[classId]?.autoPoints ?? {};
+const pathWeights = (classId, content) => autoPointsOf(classId, content);
 
 // An item for the verdict: its numbers final (its upgrade and gem in them),
 // without its attributes, and with `pathScore`, their sum weighted by the
@@ -234,7 +235,7 @@ export function bareItem(item, classId, content) {
  * @param {Content} content
  * @returns {Item[]}
  */
-export const pathGear = (character, equipped, content) => equipped.map((item) => bareItem(item, character.classId, content));
+export const pathGear = (character, equipped, content) => equipped.map((item) => bareItem(item, gearKey(character.classId, character.evolution, content), content));
 
 /** @param {Item[]} items */
 const scoreOf = (items) => items.reduce((sum, item) => sum + item.pathScore, 0);
@@ -280,7 +281,7 @@ export function gearVerdict(character, before, after, content) {
 export function equipVerdict(character, item, content, pathWorn, pathNow = combatValues(character, pathWorn, content)) {
   const others = pathWorn.filter((candidate) => candidate.slot !== item.slot);
   const leaving = scoreOf(pathWorn.filter((candidate) => candidate.slot === item.slot));
-  const coming = bareItem(item, character.classId, content);
+  const coming = bareItem(item, gearKey(character.classId, character.evolution, content), content);
   return verdictOf(coming.pathScore - leaving, valueChanges(pathNow, combatValues(character, [...others, coming], content)).changes);
 }
 

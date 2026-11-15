@@ -29,6 +29,7 @@ import {
   beastChestTier,
   beastJoinHp,
   campLevels,
+  gearKey,
   guildBeast,
   guildBeastFight,
   isUnlocked,
@@ -317,7 +318,7 @@ export async function claimGuildBeastChest(context) {
   const { item, materials } = beastChest(
     {
       level: row.level,
-      classId: row.class_id,
+      classId: gearKey(row.class_id, row.evolution, content()),
       classLevel: row.class_level,
       wornSlots: equippedItems(player).map((worn) => worn.slot),
       beast: engineBeast(chest.beast),

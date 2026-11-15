@@ -45,6 +45,7 @@ import { evolutionBlock, skillPoints } from './skills.js';
 import { companionCombatant, gendered, trackerMaterials } from './companions.js';
 import { wantedEncounter, wantedLootRarity, wantedOf, wantedStrength } from './wanted.js';
 import { raisedOutcome, weekChance, weekFactor, weekFighter, weekLine } from './weeks.js';
+import { gearKey } from './gear.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {Record<string, any>} Character A character, as the engine takes it. */
@@ -791,7 +792,7 @@ export function simulateHunt(
   const cardsXp = 1 + (cards?.xp ?? 0);
   const cardsGold = 1 + (cards?.gold ?? 0);
   const seatRarity = 1 + (seat?.rarity ?? 0);
-  const loot = { filled, classId: character.classId, maxClassLevel: area.maxLevel, area, otherClassShare, uniqueBonus, ...(seatRarity !== 1 && { rarityBonus: seatRarity }) };
+  const loot = { filled, classId: gearKey(character.classId, character.evolution, content), maxClassLevel: area.maxLevel, area, otherClassShare, uniqueBonus, ...(seatRarity !== 1 && { rarityBonus: seatRarity }) };
   const hpStart = me.hp;
   let result = 'success';
   let endedAt = durationMs; // a faint or an escape ends the exploration early
@@ -825,7 +826,7 @@ export function simulateHunt(
   // Not on a trip, whose fights stay the same for every member.
   const take = (/** @type {Item} */ item) => {
     items.push(item);
-    if (!roster && item.slot === 'weapon' && !me.worn.some((/** @type {Item} */ held) => held.slot === 'weapon') && canUse(item.base, character.classId, content, character.classLevel)) {
+    if (!roster && item.slot === 'weapon' && !me.worn.some((/** @type {Item} */ held) => held.slot === 'weapon') && canUse(item.base, gearKey(character.classId, character.evolution, content), content, character.classLevel)) {
       me.worn = [...me.worn, item];
       me.unit = playerCombatant({ character: me.character, equipped: me.worn, hp: me.hp, name, area }, content);
     }

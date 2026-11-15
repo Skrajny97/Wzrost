@@ -29,6 +29,7 @@ import {
   campLevels,
   companionReady,
   companionStays,
+  gearKey,
   hpAfterHunt,
   huntKills,
   huntReport,
@@ -246,7 +247,7 @@ export async function enterTower(context) {
   // The chest's item: in an empty slot it is worn at once, else it goes to
   // the bag, and what does not fit there the scrapper buys, the weakest
   // first (as after an exploration).
-  const autoEquipped = autoEquip(equipped, hunt.items, content(), row.class_id, row.class_level);
+  const autoEquipped = autoEquip(equipped, hunt.items, content(), gearKey(row.class_id, row.evolution, content()), row.class_level);
   const levels = campLevels(player.buildings, now, content());
   const bag = bagItems(player);
   const capacity = bagCapacity(levels, content()) - (bagPlaces(player) - bag.length);
@@ -254,7 +255,7 @@ export async function enterTower(context) {
   const toBag = hunt.items.map((_, index) => index).filter((index) => !autoEquipped.includes(index));
   const candidates = [...bag, ...toBag.map((index) => hunt.items[index])];
   // The favourites stay, as after an exploration (favorites.js).
-  const sold = toBag.length > 0 ? bagOverflow(candidates, capacity, row.class_id, content(), favoriteIds(row)) : [];
+  const sold = toBag.length > 0 ? bagOverflow(candidates, capacity, gearKey(row.class_id, row.evolution, content()), content(), favoriteIds(row)) : [];
   const storedSold = sold.filter((index) => index < bag.length).map((index) => bag[index]);
   const soldFound = sold.filter((index) => index >= bag.length).map((index) => toBag[index - bag.length]);
   const soldFoundGold = soldFound.reduce((sum, index) => sum + sellPrice(hunt.items[index], content(), sellBonus), 0);

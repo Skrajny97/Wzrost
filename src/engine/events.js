@@ -35,6 +35,7 @@ import { monsterXp } from './progression.js';
 import { createRng } from './rng.js';
 import { say, word } from './text.js';
 import { weekChance, weekFactor, weekFighter } from './weeks.js';
+import { gearKey } from './gear.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {Record<string, any>} GameEvent An event of data/events.json. */
@@ -379,7 +380,7 @@ function listOutcome(list, { endingId, drafts }, rng) {
 function lootRules(character, equipped, area, content) {
   const { otherClass } = content.balance.items;
   const otherClassShare = character.level >= otherClass.fromLevel ? otherClass.share : 0;
-  return { filled: new Set(equipped.map((item) => item.slot)), classId: character.classId, maxClassLevel: area.maxLevel, area, otherClassShare };
+  return { filled: new Set(equipped.map((item) => item.slot)), classId: gearKey(character.classId, character.evolution, content), maxClassLevel: area.maxLevel, area, otherClassShare };
 }
 
 // Herbs the character's Zielarstwo knows, once it is open, or none.

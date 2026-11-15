@@ -34,6 +34,7 @@ import { lowLevelMultiplier, monsterXp } from './progression.js';
 import { createRng } from './rng.js';
 import { say, word } from './text.js';
 import { weekChance, weekFactor, weekFighter } from './weeks.js';
+import { gearKey } from './gear.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {{ id: string, champion?: string, elite?: string, encounters: { monsters: string[], weight?: number }[] } & Record<string, any>} Area An inner region (data/areas.json). */
@@ -269,7 +270,7 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
     materials = addCounts(materials, towerMaterials(floor, enemies, rng, content, moreMaterials));
     // items.js is not checked yet: its options are typed by their defaults
     // alone (classId, rarityId and area have none).
-    const classItem = () => randomItem(plan.level, rng, content, /** @type {any} */ ({ classId: character.classId, maxClassLevel: character.classLevel, rarityId: championItemRarity(plan.level, rng, content), area }));
+    const classItem = () => randomItem(plan.level, rng, content, /** @type {any} */ ({ classId: gearKey(character.classId, character.evolution, content), maxClassLevel: character.classLevel, rarityId: championItemRarity(plan.level, rng, content), area }));
     // The loot's item drawn first, so the chest changes nothing else.
     const lucky = rng.chance(weekChance(content.towers.loot.itemChance, week, 'items'));
     if (chest) items.push(classItem());

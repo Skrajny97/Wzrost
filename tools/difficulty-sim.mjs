@@ -156,8 +156,9 @@ export function bestBase(family, classLevel, content) {
   return bases.reduce((best, base) => (engine.baseClassLevel(base.id, content) > engine.baseClassLevel(best.id, content) ? base : best));
 }
 
-// The class's main stat (its biggest share of autoPoints).
-const mainStatOf = (classId, content) => Object.entries(content.classesById[classId].autoPoints).sort((a, b) => b[1] - a[1])[0][0];
+// The class's main stat (its biggest share of autoPoints), or a gear key's
+// (src/engine/gear.js: a form with its own spread, 988).
+const mainStatOf = (classId, content) => Object.entries(engine.autoPointsOf(classId, content)).sort((a, b) => b[1] - a[1])[0][0];
 
 // An item as a player keeps it: the affixes the game rolls, and one of them
 // the class's main stat (kept among the finds, or rolled again by the
@@ -178,14 +179,15 @@ export function keptItem({ baseId, level, rarityId, mainStat }, rng, content) {
 // The gear of a realistic player: the bases, rarities and upgrades of its
 // plan; `set` picks one of several draws of the affixes, so a measurement
 // over many explorations takes in luck with the finds.
-function realisticGear(classId, level, classLevel, plan, content, set = 0) {
-  const cls = content.classesById[classId];
+function realisticGear(classId, level, classLevel, plan, content, set = 0, key = classId) {
   const rng = engine.createRng(`realistic-gear:${classId}:${level}:${plan.variant}:${set}`);
   const itemLevel = Math.max(1, Math.min(level - 1, engine.gearLevel(level, content)));
-  const families = { weapon: cls.weapons[0], ...KIT[classId], ...OTHER_BASES };
+  // The gear of the form where its line takes another class's (gear.js, 988).
+  const lists = engine.gearLists(key, content);
+  const families = { weapon: lists.weapons[0], ...KIT[classId], ...(key !== classId && { offhand: lists.offhands[0] }), ...OTHER_BASES };
   // The slots the typical character has filled by now, and extraSlots more.
   const count = level === 1 ? 0 : Math.min(SLOT_ORDER.length, 1 + Math.floor(0.75 * itemsPerHour(content) * hoursToReach(level, content)) + plan.extraSlots);
-  const mainStat = mainStatOf(classId, content);
+  const mainStat = mainStatOf(key, content);
   return SLOT_ORDER.slice(0, count).map((slot) => {
     const base = plan.tiers ? bestBase(families[slot], Math.min(classLevel, itemLevel), content) : content.basesById[families[slot]];
     const rarityId = plan.rarity[slot] ?? plan.rarity.other;
@@ -236,7 +238,8 @@ export function playerOf(model, classId, level, content, set = 0, path = null) {
     character = { ...base, points: {}, evolution: evolution.id, skills: evolvedSkills(evolution, base.classLevel, content) };
     character.points = engine.autoDistribute(character, content);
   }
-  return { character, equipped: realisticGear(classId, level, base.classLevel, plan, content, set), plan };
+  const key = engine.gearKey(classId, character.evolution, content);
+  return { character, equipped: realisticGear(classId, level, base.classLevel, plan, content, set, key), plan };
 }
 
 // The players of a model, one for each draw of the gear (the typical
