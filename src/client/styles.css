@@ -11105,6 +11105,16 @@ a.profession-square:active {
   height: 20px;
 }
 
+/* The professions to pick under "Poziom Profesji" (975 B): "Najwyższa" and
+   each profession, in a list to open as on the Targowisko. */
+.ranking-professions[hidden] {
+  display: none;
+}
+
+.ranking-profession-list {
+  max-width: 320px;
+}
+
 /* The Znajomi (screens/friends.js): the Upominki to collect, and rows of
    characters with what can be done with each. */
 .friends {

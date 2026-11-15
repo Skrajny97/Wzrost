@@ -179,7 +179,8 @@ const TABS = {
     ARENA.texts.tabTable,
     { name: `${ARENA.texts.tabTable} › ${ARENA.cards.texts.boardCards}`, tap: '[data-guide="arena-board-cards"]', wait: 1000 },
   ],
-  '#/spolecznosc/ranking': [GUILDS_TAB],
+  // "Poziom Profesji" with its list of professions (975 B), then the guilds.
+  '#/spolecznosc/ranking': [said('Poziom Profesji'), GUILDS_TAB],
   '#/gildia': [MEMBERS.views.donations, MEMBERS.periods.all],
   '#/gildia/war': [WAR_TEAMS],
 };

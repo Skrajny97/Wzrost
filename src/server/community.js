@@ -25,9 +25,11 @@ const today = (now) => questPeriod('daily', now, content()).key;
 // first day kept was gone an hour early (the code review).
 export const firstKept = (now) => questPeriod('daily', zoneMidnight(now, content().quests.timeZone, 1 - content().community.gift.keepDays), content()).key;
 
-// The highest level of the character's professions (characters.professions,
-// {"herbalism": {"level": 3, ...}}), 0 before its first work.
-const levels = content().professions.map(({ id }) => `coalesce(json_extract(c.professions, '$.${id}.level'), 0)`);
+// The level of one of the character's professions (characters.professions,
+// {"herbalism": {"level": 3, ...}}), 0 before its first work, and the
+// highest of them.
+const professionLevel = (id) => `coalesce(json_extract(c.professions, '$.${id}.level'), 0)`;
+const levels = content().professions.map(({ id }) => professionLevel(id));
 const PROFESSION_LEVEL = levels.length > 1 ? `max(${levels.join(', ')})` : levels[0];
 
 // The Ranking's orders: by the character's level, by its class's, or by its
@@ -38,9 +40,16 @@ const ORDERS = {
   profession: { order: `${PROFESSION_LEVEL} DESC, c.level DESC, c.xp DESC, c.id`, where: ` AND ${PROFESSION_LEVEL} > 0` },
 };
 
-// GET /api/ranking?by=level|class|profession&offset=…&limit=…: one page of
-// the characters highest by the level of the character, of its class or of
-// its highest profession (the author, 10.11.2026: „Ranking max 50 postaci +
+// One profession's order (by=profession&profession=<id>, the author,
+// 15.11.2026: „by można było wybrac podkategorie czyli konkretne Profesje”):
+// the characters that have worked in it, by its level. The id comes from
+// the game's professions only, never as the player wrote it.
+const professionOrder = (id) => ({ order: `${professionLevel(id)} DESC, c.level DESC, c.xp DESC, c.id`, where: ` AND ${professionLevel(id)} > 0` });
+
+// GET /api/ranking?by=level|class|profession[&profession=<id>]&offset=…&limit=…:
+// one page of the characters highest by the level of the character, of its
+// class, of its highest profession or of the one profession given, with the
+// professions to pick from in the answer (the author, 10.11.2026: „Ranking max 50 postaci +
 // przewijanie listy na dalsze pozycje strona po stronie”), at most
 // ranking.page of them from `offset` (ranking-pages.js), each with these
 // levels and its place; how many characters the order has in all, and the
@@ -48,9 +57,12 @@ const ORDERS = {
 // end, as when the list got shorter meanwhile, comes as the last one.
 export async function ranking(context) {
   const { character, db } = await requireChatter(context);
-  const asked = new URL(context.request.url).searchParams.get('by');
+  const params = new URL(context.request.url).searchParams;
+  const asked = params.get('by');
   const by = Object.hasOwn(ORDERS, asked) ? asked : 'level';
-  const { order, where } = ORDERS[by];
+  const wanted = by === 'profession' ? params.get('profession') : null;
+  const one = wanted && content().professionsById[wanted] ? wanted : null;
+  const { order, where } = one ? professionOrder(one) : ORDERS[by];
   const page = askedPage(context.request.url);
   const rowsFrom = (offset) =>
     db
@@ -77,6 +89,10 @@ export async function ranking(context) {
   }
   return json({
     by,
+    profession: one,
+    // The professions to pick from under "Poziom Profesji", in the language
+    // of the request.
+    ...(by === 'profession' && { professions: content().professions.map(({ id, name }) => ({ id, name })) }),
     offset,
     limit: page.limit,
     total,
@@ -90,7 +106,7 @@ export async function ranking(context) {
       className: content().classesById[row.class_id] ? classNameOf({ classId: row.class_id, evolution: row.evolution, appearance: row.appearance }, content()) : row.class_id,
       level: row.level,
       classLevel: row.class_level,
-      profession: highestProfession(JSON.parse(row.professions ?? '{}'), content()),
+      profession: one ? { id: one, level: JSON.parse(row.professions ?? '{}')[one]?.level ?? 0 } : highestProfession(JSON.parse(row.professions ?? '{}'), content()),
       role: chatRole(context.env, row),
       own: row.id === character.id,
     })),
