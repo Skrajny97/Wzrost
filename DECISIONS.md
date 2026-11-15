@@ -3063,13 +3063,13 @@ Punkt 814 ze strony ocen: zasady i nazwy Tieru VII przyjęte przez autora (zob. 
 
 ## Uwagi gracza o Targowisku i towarzyszach, przekazane przez autora (11.11.2026): na później
 
-Autor przekazał zrzuty z czatu z uwagami gracza (poz. 47): „same mądre uwagi dał chłop”. Gracz pisze „najemnicy” o towarzyszach z Kwater. Do zrobienia po bieżącym etapie (trzecia ewolucja, zdarzenia 817 i relacje 818), z makietami dla każdej zmiany wyglądu i pytaniami tam, gdzie zmieniają się ustalone zasady:
+*Wszystkie pięć zrobione (827, 828 B, 829 B; w grze od 0.2.66).* Autor przekazał zrzuty z czatu z uwagami gracza (poz. 47): „same mądre uwagi dał chłop”. Gracz pisze „najemnicy” o towarzyszach z Kwater. Do zrobienia po bieżącym etapie (trzecia ewolucja, zdarzenia 817 i relacje 818), z makietami dla każdej zmiany wyglądu i pytaniami tam, gdzie zmieniają się ustalone zasady:
 
 1. **Targowisko łatwiejsze do przeszukania**, bo „za chwilę każdy będzie wystawiał coś i strasznie ciężko będzie coś znaleźć”: wybór dowolnej klasy (gracz szuka przedmiotów dla towarzyszy innych klas), filtr rzadkości i osobne zakładki na mikstury, zioła i materiały.
 2. **Porównanie przedmiotu z Targowiska z tym, co nosi towarzysz**, tak jak dziś z tym, co nosi postać.
 3. **Sortowanie Targowiska od najtańszych i od najdroższych.**
-4. **Towarzysze sami zostają w Kwaterach, gdy postać idzie w Drużynie.** Dziś trzeba ich zostawić ręcznie (zasada autora z 2.11.2026: „nie może być w drużynie, dopóki nie kliknie na nim [Zostań w kwaterze]”), więc to zmiana zasady: pytanie do autora.
-5. **„Dokupienie” poziomów towarzyszowi**, który został w tyle za postacią, żeby nie wymieniać go na nowego i nie przekładać całego sprzętu: pytanie do autora o cenę i zasady.
+4. **Towarzysze sami zostają w Kwaterach, gdy postać idzie w Drużynie.** Dziś trzeba ich zostawić ręcznie (zasada autora z 2.11.2026: „nie może być w drużynie, dopóki nie kliknie na nim [Zostań w kwaterze]”), więc to zmiana zasady: pytanie do autora. *Zrobione: 828 B, w grze od 0.2.66.*
+5. **„Dokupienie” poziomów towarzyszowi**, który został w tyle za postacią, żeby nie wymieniać go na nowego i nie przekładać całego sprzętu: pytanie do autora o cenę i zasady. *Zrobione jako trening towarzyszy w Kwaterach: 829 B, w grze od 0.2.66 (zob. „Wersja 0.2.66”, punkt 3).*
 
 ## Targowisko: wyszukiwanie i porównanie z towarzyszem (makiety 827, 11.11.2026, w grze od 0.2.66)
 
