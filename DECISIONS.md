@@ -3309,7 +3309,7 @@ Autor zapytał, czemu część graczy nie ma pakietu trzech kart u Szczęsnego (
 5. **Przy okazji:** zasady kart mówiły „najwyżej +15% za wszystkie 156 kart”, a od Łysogór kart jest 207, więc teraz: „najwyżej +15%, od 150 kart”.
 6. **Dalej:** animacja otwierania pakietu. Obrazek pakietu w PixelLab i makieta animacji (MP4 z telefonu) idą na stronę ocen, a do gry po akceptacji.
 
-## Statystyka ewolucji w jej umiejętnościach (980 B, 986 B; 15.11.2026, od 0.3.60)
+## Statystyka ewolucji w jej umiejętnościach (980 B, 986 B, 987 B; 15.11.2026, od 0.3.60)
 
 Gracz zapytał autora: „czemu na nekromancie pokazuje ze intelekt nic nie daje?”. Autor wybrał 980 B (Intelekt i Siła zaczynają działać u tych ewolucji na ich umiejętności), a z liczb pytania 986 wersję B (statystyka liczy się podwójnie).
 
@@ -3325,10 +3325,10 @@ Gracz zapytał autora: „czemu na nekromancie pokazuje ze intelekt nic nie daje
    - XP z wypraw bez zmian (różnice do 2%, w granicach losowości).
    - Umiejętności mocniejsze o 2–17%, zwykle o 6–9%.
    - Wygrane w pojedynkę z elitą i czempionem najnowszego miejsca rosną o 0–16 punktów procentowych.
-5. **Pojedynki graczy** (Arena, wojny gildii; `duelist` w `src/engine/pvp-arena.js`) na razie bez tej zasady.
-   - Na Arenie na 200. poziomie Licz wygrywałby 72% pojedynków zamiast 64%, Władca Puszczy 70% zamiast 65%, a Arcydruid 24% zamiast 27%.
-   - To poniżej progu 25–75%, którego pilnuje test trzecich form.
-   - Przy statystyce liczonej raz wszystkie formy mieszczą się w progu (Arcydruid 26%). Pytanie 987 na stronie ocen.
+5. **Pojedynki graczy** (Arena, wojny gildii; `duelist` w `src/engine/pvp-arena.js`): statystyka ewolucji liczy się w nich raz (987 B, od 0.3.61; `balance.json` `skills.duelSkillStatWeight` = 1).
+   - Przy podwójnej Licz wygrywałby na Arenie na 200. poziomie 72% pojedynków zamiast 64%, a Arcydruid 24% zamiast 27%, poniżej progu 25–75%, którego pilnuje test trzecich form.
+   - Liczona raz: Licz 68%, Władca Puszczy 67%, Wybraniec Peruna 55%, Arcydruid 26%. Wszystkie formy mieszczą się w progu.
+   - W 0.3.60 pojedynki były bez tej zasady.
 6. **Test** „druga forma wyraźnie mocniejsza od pierwszej” (`test/second-evolution.test.js`) liczy 100 wypraw zamiast 40. Przy 40 bliska para Wielki Inkwizytor i Inkwizytor przechylała się przypadkiem (5 omdleń wobec 3), a przy 200 wyprawach Wielki Inkwizytor ma 43 omdlenia wobec 56.
 
 ## Powtórka walki ze strażnikiem i elitą Labiryntu (15.11.2026, od 0.3.60)
@@ -3371,6 +3371,10 @@ Autor: „Niech oznaczanie na czacie będzie możliwe też po nazwie konta”.
 1. „@” i nazwa konta oznacza postać, którą to konto teraz gra, na tych samych zasadach co imię postaci: tylko ten, kto czyta kanał, nigdy własne konto ani ktoś, kto ukrył piszącego, najwyżej 5 oznaczeń w wiadomości. Wielkość liter bez znaczenia (`src/server/mentions.js`).
 2. Postać oznaczona w jednej wiadomości i nazwą konta, i imieniem liczy się raz.
 3. Podpowiedzi pod polem wiadomości pokazują też nazwy kont piszących.
+
+## Wersja 0.3.61 (15.11.2026): statystyka ewolucji raz na Arenie i w wojnach gildii
+
+1. W pojedynkach graczy statystyka ewolucji liczy się w jej umiejętnościach raz (987 B). Zob. „Statystyka ewolucji w jej umiejętnościach”.
 
 ## Wersja 0.3.60 (15.11.2026): Intelekt i Siła w umiejętnościach 11 ewolucji, główna statystyka w opisie Artefaktu
 

@@ -51,15 +51,18 @@ describe('Statystyka ewolucji w jej umiejętnościach (986 B)', () => {
     }
   });
 
-  // The players' duels keep their balance until the author decides (the
-  // Arena's third forms: the Licz from 64% to 72% of its duels and the
-  // Arcydruid from 27% to 24% with it).
-  test('not in the players\' duels: the Arena and the guild wars build their fighters without it', () => {
+  // In the players' duels the stat counts once (987 B: twice, the Licz won
+  // 72% of the Arena's third-form duels and the Arcydruid 24%).
+  test('once in the players\' duels: the Arena and the guild wars build their fighters with duelSkillStatWeight', () => {
     const { character, equipped } = playerOf('realistic', 'shadow', 150, content, 0, 'poisoned-blade');
+    assert.equal(content.balance.skills.duelSkillStatWeight, 1);
     const fighter = duelist({ character, equipped, name: 'Mira' }, 'a0', 'ally', { factor: 1, armor: 1 }, content);
-    assert.equal(fighter.skillPower, 1);
-    const flat = playerCombatant({ character, equipped, name: 'Mira' }, withWeight(0));
-    for (const skill of fighter.skills) assert.deepEqual(skill.params, flat.skills.find((one) => one.id === skill.id).params, skill.id);
+    const { totals } = computeStats(character, equipped, content);
+    const once = damageScale(totals.dexterity + totals.intellect, character.level, content.balance) / damageScale(totals.dexterity, character.level, content.balance);
+    assert.ok(Math.abs(fighter.skillPower - once) < 1e-9, `${fighter.skillPower} ${once}`);
+    assert.ok(fighter.skillPower > 1 && fighter.skillPower < playerCombatant({ character, equipped, name: 'Mira' }, content).skillPower);
+    const single = playerCombatant({ character, equipped, name: 'Mira' }, withWeight(1));
+    for (const skill of fighter.skills) assert.deepEqual(skill.params, single.skills.find((one) => one.id === skill.id).params, skill.id);
   });
 
   test('the stats\' preview: Intelekt gives a Nekromanta\'s evolution skills, a Mag\'s Intelekt its blows as before', () => {

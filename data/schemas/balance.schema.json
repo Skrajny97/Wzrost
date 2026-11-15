@@ -202,7 +202,7 @@
     "skills": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Umiejętności: od unlockClassLevel postać wybiera jedną z trzech umiejętności klasy, swoją główną ścieżkę. Od secondClassLevel może dobrać drugą za Punkt Umiejętności, a wtedy pozostała ścieżka się zamyka: razem najwyżej paths. Każdy poziom klasy od unlockClassLevel do lastPointClassLevel daje pointsPerClassLevel Punktów Umiejętności, a punkt poznaje umiejętność albo podnosi poznaną o poziom, najwyżej do maxLevel. skillStatWeight (986 B): ile razy statystyka ewolucji (evolutions.json skillStat) dodaje się do statystyki broni w umiejętnościach tej ewolucji; 0 to bez tego.",
+      "description": "Umiejętności: od unlockClassLevel postać wybiera jedną z trzech umiejętności klasy, swoją główną ścieżkę. Od secondClassLevel może dobrać drugą za Punkt Umiejętności, a wtedy pozostała ścieżka się zamyka: razem najwyżej paths. Każdy poziom klasy od unlockClassLevel do lastPointClassLevel daje pointsPerClassLevel Punktów Umiejętności, a punkt poznaje umiejętność albo podnosi poznaną o poziom, najwyżej do maxLevel. skillStatWeight (986 B): ile razy statystyka ewolucji (evolutions.json skillStat) dodaje się do statystyki broni w umiejętnościach tej ewolucji; 0 to bez tego. duelSkillStatWeight (987 B): to samo w pojedynkach graczy (Arena, wojny gildii).",
       "required": [
         "unlockClassLevel",
         "maxLevel",
@@ -235,6 +235,10 @@
           "description": "Poziom klasy, od którego można dobrać kolejną umiejętność progu."
         },
         "skillStatWeight": {
+          "type": "number",
+          "minimum": 0
+        },
+        "duelSkillStatWeight": {
           "type": "number",
           "minimum": 0
         },
