@@ -3339,6 +3339,51 @@ Autor zapytał, czemu część graczy nie ma pakietu trzech kart u Szczęsnego (
 5. **Przy okazji:** zasady kart mówiły „najwyżej +15% za wszystkie 156 kart”, a od Łysogór kart jest 207, więc teraz: „najwyżej +15%, od 150 kart”.
 6. **Dalej:** animacja otwierania pakietu. Obrazek pakietu w PixelLab i makieta animacji (MP4 z telefonu) idą na stronę ocen, a do gry po akceptacji.
 
+## Ewolucje, które zmieniają broń (988; 15.11.2026, od 0.3.64)
+
+Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac innych broni niz ich poprzednie klasy. Licz i Nekromanta nagle powinien bronie magów typu kostury używać… pełne skalowanie od Intelektu tak jakby się inną klasą stawał i po to to zerowanie statystyk przy ewolucji jest przeciez”. Przejrzane wszystkie 11 ewolucji, którym wzrost dawał statystykę, której ich broń nie używała (986 B). Autor wybrał 988.1–988.6 A.
+
+1. **Zasada** (`src/engine/gear.js`, pola form w `data/evolutions.json`; kolejne formy dziedziczą to, czego nie zmienią same):
+   - `gear` to broń i druga ręka innej klasy, a `scaling` to statystyka, którą biją bronie klasy.
+   - `as`: każdy punkt jednej statystyki liczy się jako innej, z poziomów klasy, z punktów, z profesji i z przedmiotów. Statystyka na miejscu Zręczności daje też szybkość i unik.
+   - `autoPoints` to rozkład „Rozdaj według klasy”, a jego największa część to główna statystyka.
+   - `weaponDamage` to część obrażeń broni w rękach tej formy.
+   - Sprawdzanie, co postać może założyć, łup, Koło Fortuny, Targowisko i skrzynie idą według formy (`gearKey`).
+2. **Nekromanta i Licz** (988.1 A): kostury i fokusy Maga, zbroja Cienia.
+   - Każdy punkt Zręczności liczy się jako Intelekt, więc pierścienie i zbroje z Zręcznością dalej działają.
+   - We wzroście Nekromanty +4 Intelektu (zamiast +3 Zręczności i +1 Intelektu), Licza tak samo. „Rozdaj według klasy” daje Intelekt.
+   - Kostur bije u nich 80% tego, co u Maga. Bez tego byli wyraźnie mocniejsi niż dziś (Licz 80% pojedynków na Arenie), bo zostaje im szybkość, unik i HP Cienia, a kostur bije magią, bez uniku.
+3. **Truciciel** (988.2 A): sztylety. Jego +1 Intelektu na poziom klasy to teraz +1 Zręczności.
+4. **Strzelec Burzy, Władca Piorunów i Wybraniec Peruna** (988.3 A): łuki biją Intelektem, każdy punkt Zręczności liczy się jako Intelekt. We wzroście Intelekt zamiast Zręczności (+3, +5 i +6). „Rozdaj według klasy” daje Intelekt.
+5. **Łowca, Mistrz Łowów i Władca Puszczy** (988.4 A): łuki biją Siłą, każdy punkt Zręczności liczy się jako Siła. We wzroście Siła zamiast Zręczności (+3, +4 i +5). „Rozdaj według klasy” daje Siłę.
+6. **Inkwizytor** (988.5 A): kropidła i kadzielnice. Jego +1 Siły na poziom klasy to teraz +1 Intelektu.
+7. **Wielki Inkwizytor i Pogromca Demonów** (988.5 A): miecze i topory Wojownika, tarcza i fokus zostają.
+   - Każdy punkt Intelektu liczy się jako Siła. We wzroście Siła zamiast Intelektu (+4 i +4). „Rozdaj według klasy” daje Siłę.
+   - Miecze i topory biją u nich Sakrum, jak kropidła (`gear.element`). Bez tego Żarliwość i Święty ogień przestałyby działać na ich ciosy. Na portretach mają młot i miecz w świętym ogniu.
+   - Biją 80% (Wielki Inkwizytor) i 75% (Pogromca Demonów) swoich obrażeń, bo miecze i topory są mocniejsze od kropideł.
+8. **Noszona broń** (988.6 A):
+   - Broń i druga ręka, których forma nie używa, zmieniają się w przedmiot jej rodzaju. Dzieje się to raz, przy pierwszym wczytaniu postaci po zmianie i po każdej ewolucji w taką formę (`regearItem`).
+   - Nowy przedmiot ma to samo miejsce w rodzinie (ten sam poziom klasy), rzadkość, poziom, ulepszenie, kamień, zaklęcie i afiksy, a wylosowany dodatek bazy jako tę samą część jej zakresu. Sztylet staje się kosturem, mizerykordia fokusem, kropidło mieczem.
+   - Rzeczy w plecaku zostają, jakie były.
+9. **Liczby z symulacji** (`tools/class-balance-sim.mjs`, `tools/pvp-arena-sim.mjs`, przed i po):
+   - Arena, trzecie formy na 200. poziomie: Licz 68% → 64%, Wybraniec Peruna 55% → 62%, Władca Puszczy 66% → 72%, Pogromca Demonów 33% → 28%, Arcydruid 26% → 27%; wszystkie w progu 25–75%.
+   - Wyprawy, zabijanie: Truciciel bez zmian, Nekromanta i Licz od −3% do +4%, linia Strzelca Burzy od −3% do 0%, linia Łowcy od 0% do +3%, Wielki Inkwizytor +3%, Pogromca Demonów +11%.
+10. **986 B i 987 B:** żadna ewolucja nie ma już `skillStat`, bo ich broń bije tą statystyką. Zasada zostaje w kodzie (`test/evolution-skill-stat.test.js` sprawdza ją na Królobójcy z Percepcją).
+11. **Testy:**
+    - `test/evolution-gear.test.js`.
+    - Test „druga forma wyraźnie mocniejsza” zakłada przy porównaniu drugich form z pierwszymi 0,02 HP zapasu. Inkwizytor, najmocniejsza pierwsza forma, stracił Siłę w umiejętnościach i kończy wyprawy z 0,78 HP zamiast 0,81, więc pierwsze formy zbliżyły się do siebie, a drugie są wyrównane jak przedtem.
+
+## Zwój Niepamięci (989; 15.11.2026, od 0.3.64)
+
+Autor: „daj każdemu graczowi jednorazowy przedmiot zerujący statystyki (najpierw go wygeneruj). Będzie on nam też potrzebny awaryjnie przy innych takich fuckupach”. Przyjęte: grafika 989.1 A (PixelLab Pro Flash, wzorem Zwój ochronny) i makieta 989.2.
+
+1. **Działanie:** zwój zeruje wszystkie rozdane punkty statystyk postaci. Punkty wracają do puli i rozdaje się je od nowa, za darmo, a zwój przepada. Do 20. poziomu zerowanie jest darmowe jak dotąd i zwój zostaje.
+2. **Na stronie:**
+   - W Plecaku zwój stoi w linii zwojów („Zwoje: niepamięci 1”).
+   - W Statystykach, póki postać ma zwój, jest „Wyzeruj punkty” z linią „Masz Zwój Niepamięci (1): wyzerujesz nim punkty za darmo.”, a pytanie przed zerowaniem mówi, że zużyje zwój.
+3. **Rozdanie:** każda postać, która była w grze przy wdrożeniu 0.3.64, dostała jeden (`migrations/0138_oblivion_scrolls.sql`). Gra może je dawać znowu, gdy zmiana zasad zepsuje komuś rozdane punkty: dodaje się je w migracji, tak samo.
+4. **Pliki:** `characters.oblivion_scrolls`, `resetPoints` w `src/server/characters.js`, `src/client/screens/stats.js`, `src/client/art/icons/oblivion-scroll.png`.
+
 ## Zakładki czatu na komputerze (15.11.2026, od 0.3.62)
 
 Gracz (poz. 49) na komputerze: „da się jakoś przewijać zakładki czatu w przeglądarce na pc? nie wszystkie są widoczne i nie widać też przez to powiadomień o wiadomości”.
@@ -3368,6 +3413,7 @@ Gracz zapytał autora: „czemu na nekromancie pokazuje ze intelekt nic nie daje
    - Liczona raz: Licz 68%, Władca Puszczy 67%, Wybraniec Peruna 55%, Arcydruid 26%. Wszystkie formy mieszczą się w progu.
    - W 0.3.60 pojedynki były bez tej zasady.
 6. **Test** „druga forma wyraźnie mocniejsza od pierwszej” (`test/second-evolution.test.js`) liczy 100 wypraw zamiast 40. Przy 40 bliska para Wielki Inkwizytor i Inkwizytor przechylała się przypadkiem (5 omdleń wobec 3), a przy 200 wyprawach Wielki Inkwizytor ma 43 omdlenia wobec 56.
+7. **Od 0.3.64** (988) żadna ewolucja nie ma już `skillStat`: ich broń bije tą statystyką. Zob. „Ewolucje, które zmieniają broń”.
 
 ## Powtórka walki ze strażnikiem i elitą Labiryntu (15.11.2026, od 0.3.60)
 
@@ -3409,6 +3455,11 @@ Autor: „Niech oznaczanie na czacie będzie możliwe też po nazwie konta”.
 1. „@” i nazwa konta oznacza postać, którą to konto teraz gra, na tych samych zasadach co imię postaci: tylko ten, kto czyta kanał, nigdy własne konto ani ktoś, kto ukrył piszącego, najwyżej 5 oznaczeń w wiadomości. Wielkość liter bez znaczenia (`src/server/mentions.js`).
 2. Postać oznaczona w jednej wiadomości i nazwą konta, i imieniem liczy się raz.
 3. Podpowiedzi pod polem wiadomości pokazują też nazwy kont piszących.
+
+## Wersja 0.3.64 (15.11.2026): ewolucje, które zmieniają broń, i Zwój Niepamięci
+
+1. Nekromanta i Licz z kosturami Maga, linia Strzelca Burzy z łukami bijącymi Intelektem, linia Łowcy Siłą, Wielki Inkwizytor i Pogromca Demonów z mieczami i toporami bijącymi Sakrum (988 A). Zob. „Ewolucje, które zmieniają broń”.
+2. Zwój Niepamięci dla każdej postaci (989 A). Zob. „Zwój Niepamięci”.
 
 ## Wersja 0.3.63 (15.11.2026): karty efektów w Talii Systemu
 

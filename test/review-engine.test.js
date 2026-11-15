@@ -596,7 +596,12 @@ describe('sound', () => {
       if (weapon) {
         const unit = playerCombatant({ character, equipped, name: 'Próbny' }, content);
         const worn = upgradedItem(weapon, content);
-        if (unit.weapon.min !== worn.damage.min || unit.weapon.max !== worn.damage.max) wrong.push(`weapon ${weapon.base}: card ${worn.damage.min}–${worn.damage.max}, fight ${unit.weapon.min}–${unit.weapon.max}`);
+        // A form that hits by a share of its weapons' damage (988,
+        // weaponDamage: the Nekromanta's kostury by 0.8) counts it in the
+        // fight; the stats screen shows the damage as the fight does.
+        const share = engine.gearDamageOf(engine.gearKey(character.classId, character.evolution, content), content);
+        const [min, max] = share === 1 ? [worn.damage.min, worn.damage.max] : [Math.max(1, Math.round(worn.damage.min * share)), Math.max(1, Math.round(worn.damage.max * share))];
+        if (unit.weapon.min !== min || unit.weapon.max !== max) wrong.push(`weapon ${weapon.base}: card ${worn.damage.min}–${worn.damage.max}, fight ${unit.weapon.min}–${unit.weapon.max}`);
       }
     }
     assert.deepEqual(wrong.slice(0, 5), []);

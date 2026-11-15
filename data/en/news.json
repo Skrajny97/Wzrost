@@ -824,6 +824,10 @@
     "0.3.63": {
       "title": "Version 0.3.63",
       "body": "- System Deck: effect cards. They stand beside the 12 creatures of your deck, in two slots, and in a match strengthen your cards or weaken the rival's: at most one a round, each once a match. You choose them in \"Build deck\", on the \"Effect cards\" tab.\n- You get them from Szczęsny's packs, for the first staked win on each of his tiers (also one you've already beaten), and rarely from explorations and the Labyrinth's guardians.\n- Szczęsny from his tier III, most of the Settlement's residents and the decks defending in the Arena play them too. You see the rival's effect card before your move."
+    },
+    "0.3.64": {
+      "title": "Version 0.3.64",
+      "body": "- Evolutions that change their weapon. The Necromancer and the Lich fight with the Mage's staves and foci, and all their Dexterity counts as Intellect. The Storm Archer, the Thunder Lord and the Chosen of Perun shoot with Intellect, and the Hunter, the Huntmaster and the Ruler of the Wilds with Strength. The Grand Inquisitor and the Demon Slayer fight with the Warrior's swords and axes, which strike with Sacred, and their Intellect counts as Strength.\n- The Poisoner gets Dexterity instead of Intellect with each class level, and the Inquisitor Intellect instead of Strength.\n- The weapon these characters wear has changed by itself into the new kind, of the same rarity, level and upgrade, with the same affixes. Rings and armour still work.\n- Every character got a Scroll of Oblivion: in Stats it resets the points you have given out, so you give them out anew, for free."
     }
   }
 }
