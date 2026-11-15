@@ -55,7 +55,11 @@ BOXES = {
 # skin-like colour drop out. PATCHES are bits of skin cut off from the rest,
 # such as a heel between straps: the skin colours in their box and the shades
 # named for it. PIXELS and NOT_PIXELS are single pixels the colours get
-# wrong: skin between strands of a fringe, the iris of an eye. Next to the
+# wrong: skin between strands of a fringe, the iris of an eye, and the skin
+# just past the mask's edges in its own colours, which stayed light on a dark
+# tone (15.11.2026, the author: „Przejrzyj te portrety jeśli chodzi o braki w
+# maskowaniu odcienia skóry”; checked pixel by pixel, hair, collars, wraps
+# and bows left out). Next to the
 # skin of the limbs, a dark, warm outline takes a darker shade of the tone,
 # so no brown or maroon rim is left around a grey arm (rim_pixels).
 GROW = {
@@ -77,7 +81,16 @@ PATCHES = {
     'warrior-male': [((53, 114, 56, 119), []), ((61, 115, 64, 118), ['#af713f'])],
 }
 PIXELS = {
-    'shadow-female': [(46, 17), (47, 16), (48, 15), (48, 16), (53, 21), (67, 75), (67, 76), (66, 77), (66, 76), (65, 76)],
+    'archer-female': [(57, 24), (64, 59), (65, 59), (66, 59)],
+    'archer-male': [(42, 72), (43, 72), (42, 73)],
+    'cleric-female': [(50, 14), (56, 15), (48, 16), (53, 36), (60, 53), (61, 53), (62, 53), (32, 55), (33, 55), (43, 55), (44, 55), (63, 55), (32, 56), (33, 56), (43, 56), (44, 56), (63, 56), (47, 57), (36, 58), (37, 58), (46, 58), (38, 59), (48, 59), (49, 59), (50, 59), (48, 60), (49, 60), (50, 60), (51, 60), (48, 61), (49, 61), (50, 61), (51, 61), (43, 62), (44, 62), (47, 62), (48, 62), (49, 62), (50, 62), (51, 62), (49, 63), (50, 63), (51, 63), (41, 111), (38, 112), (38, 113), (39, 113), (51, 118), (52, 118), (51, 119), (52, 119), (53, 120)],
+    'cleric-male': [(56, 18), (54, 35), (55, 36), (53, 39), (50, 41), (60, 63), (60, 64), (40, 72), (41, 72), (40, 73), (41, 73), (41, 74), (67, 79), (39, 105), (40, 105), (44, 105), (38, 106)],
+    'mage-female': [(57, 14), (57, 24), (56, 25), (56, 26)],
+    'mage-male': [(54, 23), (54, 24), (55, 24), (56, 28), (43, 35), (51, 43), (38, 66), (39, 66), (38, 67), (38, 71), (37, 72), (38, 72), (38, 73), (37, 77), (39, 110)],
+    'shadow-female': [(46, 17), (47, 16), (48, 15), (48, 16), (53, 21), (67, 75), (67, 76), (66, 77), (66, 76), (65, 76), (28, 80), (64, 117), (32, 119)],
+    'shadow-male': [(34, 70), (40, 73), (40, 74), (40, 75), (40, 76), (35, 80), (59, 116), (60, 116), (41, 120), (35, 121), (37, 121), (42, 122)],
+    'warrior-female': [(68, 75)],
+    'warrior-male': [(55, 21), (55, 22), (46, 25), (48, 27), (49, 27), (51, 27), (48, 28), (49, 28), (51, 28), (45, 29), (50, 29), (65, 57), (65, 58), (66, 75)],
 }
 NOT_PIXELS = {
     'shadow-female': [(50, 13), (47, 21), (48, 21), (47, 22), (48, 22), (52, 21)],

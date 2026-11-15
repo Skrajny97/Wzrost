@@ -273,6 +273,13 @@ describe('the guild wars through the API', () => {
   }
 
   const place = (login, body) => as(login, 'POST', '/api/guild/war/place', body);
+  // On a Monday before its battles, the set-up's own requests draw the week
+  // at once, with the guilds made so far (16.11.2026: the deploy stopped on
+  // a Monday night): the tests that draw by the cron take that draw back.
+  const undrawn = async () => {
+    await run('DELETE FROM guild_wars');
+    await run('DELETE FROM guild_war_weeks');
+  };
   const slotOf = async (characterId) => first('SELECT team, slot FROM guild_war_slots WHERE character_id = ?', characterId);
 
   beforeEach(() => {
@@ -422,6 +429,7 @@ describe('the guild wars through the API', () => {
     await clone(ids.gamma, 'Gammi', third);
     await clone(ids.gamma, 'Gammo', third);
     const days = week().battles;
+    await undrawn();
     await cron(week().startsAt + 60000);
     const wars = await all('SELECT * FROM guild_wars WHERE week = ?', week().key);
     assert.equal(wars.length, 1);
@@ -506,6 +514,7 @@ describe('the guild wars through the API', () => {
     await makeClimber(await db(), ids.alfa);
     await guild('alfa', 'Mocarze', 'MOC');
     const weak = await guild('beta', 'Słabi', 'SŁ');
+    await undrawn();
     await cron(week().startsAt + 60000);
     assert.equal((await all('SELECT * FROM guild_wars WHERE week = ?', week().key)).length, 1);
     await clone(ids.alfa, 'Bliźniak', weak);
@@ -525,6 +534,7 @@ describe('the guild wars through the API', () => {
     await makeClimber(await db(), ids.alfa);
     await guild('alfa', 'Mocarze', 'MOC');
     await guild('beta', 'Słabi', 'SŁ');
+    await undrawn();
     await cron(week().startsAt + 60000);
     await cron(week().battles[0]);
     const [battle] = await all('SELECT id, at FROM guild_war_battles');
@@ -573,6 +583,7 @@ describe('the guild wars through the API', () => {
     await player('beta', 'Beta');
     const one = await guild('alfa', 'Pierwsi', 'PIE');
     const other = await guild('beta', 'Drudzy', 'DRU');
+    await undrawn();
     // Too late: past Monday's battles, no draw for the week.
     await cron(week().battles[0] + 60000);
     assert.equal((await all('SELECT * FROM guild_war_weeks')).length, 0);

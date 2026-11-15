@@ -1070,6 +1070,11 @@
       "id": "0.3.70",
       "title": "Wersja 0.3.70",
       "body": "- Arena i wojny gildii: drugie formy są wyrównane. Wielki Inkwizytor, Druid i Widmo biją mocniej, a Władca Piorunów i Mistrz Łowów słabiej, a Bastion ma mniej HP, tylko w pojedynkach graczy. Wcześniej Wielki Inkwizytor na 100. poziomie wygrywał 1% pojedynków, a Druid 9%. Teraz każda druga forma wygrywa od 31% do 70%.\n- Wyprawy, wieże, Labirynt i walki ze stworami się nie zmieniają."
+    },
+    {
+      "id": "0.3.72",
+      "title": "Wersja 0.3.72",
+      "body": "- Odcienie skóry na portretach: w 71 portretach form, strojów i klas startowych część skóry nie zmieniała koloru razem z wybranym odcieniem. Na przykład na ciemnej skórze zostawał jasny pasek czoła albo jasna krawędź dłoni. Teraz cała skóra ma wybrany odcień, a włosy, zbroje i stroje zostały jak były."
     }
   ]
 }

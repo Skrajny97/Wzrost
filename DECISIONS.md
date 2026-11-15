@@ -3508,7 +3508,25 @@ Autor: „twarz w portrecie męskiego Strzelca Wyborowego jest brzydka i powinna
 1. **Jak:** PixelLab przerysował samą twarz: brwi, oczy, nos i usta (`marksman-male-face`, maska 13 × 10 pikseli, `art/inputs/portraits/`). Opaska, włosy, podbródek i strój są co do piksela takie same. Z czterech wersji dwie miały czyste oczy; autor wybrał B. Jeden szary piksel na obrysie prawego policzka dostał kolor obrysu.
 2. **Odcienie skóry:** osiem odcieni ma nową twarz. Twarz ma ciemniejsze cienie niż reszta skóry, więc w `tools/evolution-tones.json` jest osobną grupą z własną skalą (`groups` w `tools/evolution-tones.py`). Dzięki temu poza twarzą żaden piksel odcieni się nie zmienił.
 3. **Pasek czoła:** autor zauważył na ciemnym odcieniu jasny pasek skóry pod opaską: pole skóry tego portretu zaczynało się wiersz za nisko i od początku go pomijało. Grupa twarzy obejmuje teraz czoło, cień przy uchu i cień pod brodą, a sprawdzenie wszystkich ośmiu odcieni nie znajduje na głowie żadnego koloru skóry sprzed przebarwienia.
-4. **Inne portrety:** ten sam skan znalazł podobne jasne piksele przy skórze w innych portretach (np. pasek przy obojczyku Czempiona Areny i linia na nodze Berserkerki w ciemnym odcieniu). To osobne zadanie.
+4. **Inne portrety:** ten sam skan znalazł podobne jasne piksele przy skórze w innych portretach (np. pasek przy obojczyku Czempiona Areny i linia na nodze Berserkerki w ciemnym odcieniu). To osobne zadanie. *Zrobione: zob. „Maski odcieni skóry w 71 portretach”.*
+
+## Maski odcieni skóry w 71 portretach (995; 16.11.2026, od 0.3.72)
+
+Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skóry” (15.11.2026), po jasnym pasku czoła Strzelca Wyborowego na ciemnym odcieniu.
+
+1. **Przegląd.** Skan wypisał w każdym portrecie piksele w barwach skóry i jej cieni tuż przy masce odcienia, które nie zmieniały koloru. Wszystkie 98 portretów form i strojów oraz 10 portretów startowych przeszło przegląd w powiększeniu, skupisko po skupisku.
+2. **Co doszło do maski:**
+    - 801 pikseli w 61 portretach form i strojów (`pixels` w `tools/evolution-tones.json`) i 125 pikseli w 10 portretach startowych (`PIXELS` w `tools/skin-tones.py`).
+    - To krawędzie twarzy, czoła, podbródki, szyje, ramiona, dłonie i stopy, które na ciemnej skórze zostawały jasne.
+    - Odrzucone, bo to nie skóra: brzegi hełmów, nagolenniki, paski sandałów, włosy, szaty, drzewca kosturów, ogień i owijki stóp.
+3. **Kontur.** W 5 portretach startowych ciemny, ciepły kontur przy nowej skórze rąk i stóp dostaje, jak reszta konturu, ciemny odcień wybranej skóry (26 pikseli).
+4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
+5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
+
+## Wersja 0.3.72 (16.11.2026): maski skóry w 71 portretach
+
+1. Maski odcieni skóry w 71 portretach (995). Zob. „Maski odcieni skóry w 71 portretach”.
+2. Zawiera też 0.3.71 (kod CIASTKA). Jego wdrożenie zatrzymały cztery testy wojen gildii, które padały w poniedziałek od północy do 20:00 czasu polskiego. Zapytania z przygotowania testu, z prawdziwym czasem, losowały wtedy wojny tygodnia od razu, tylko z gildiami założonymi do tej chwili. Testy cofają teraz takie losowanie przed własnym. Gra się nie zmienia.
 
 ## Wersja 0.3.71 (15.11.2026): kod CIASTKA
 
