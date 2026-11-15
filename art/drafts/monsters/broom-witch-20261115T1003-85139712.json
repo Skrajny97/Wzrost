@@ -1,0 +1,14 @@
+{
+  "id": "broom-witch",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Czarownica, a Slavic witch flying on a broomstick seen from the side, a clear readable pale green face with a hooked nose, glowing eyes and a wicked grin, long black hair streaming back, a dark red dress, one hand stretched out casting a glowing green hex, clear solid shapes, bold black outline, menacing, full body, three-quarter view, the witch alone, no background",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02373999377399021
+  },
+  "images": 1
+}
