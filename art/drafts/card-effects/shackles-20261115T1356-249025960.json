@@ -1,0 +1,14 @@
+{
+  "id": "shackles",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a pair of heavy rusty iron shackles joined by a short chain, slightly open, a dull iron glint, the illustration alone, no ground, no background, the whole of it inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02330393110529582
+  },
+  "images": 1
+}

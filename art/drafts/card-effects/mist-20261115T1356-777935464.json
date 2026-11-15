@@ -1,0 +1,14 @@
+{
+  "id": "mist",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a swirling cloud of grey-white mist with two faint glowing pale eyes inside it, soft wispy edges, the illustration alone, no ground, no background, the whole of it inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023190463799794517
+  },
+  "images": 1
+}

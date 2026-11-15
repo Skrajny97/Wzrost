@@ -1,0 +1,14 @@
+{
+  "id": "perun-lightning",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a bright yellow-white lightning bolt striking down from a small dark storm cloud, crackling sparks and a blue glow, the illustration alone, no ground, no background, the whole of it inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023329170440461903
+  },
+  "images": 1
+}

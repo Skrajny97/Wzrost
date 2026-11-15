@@ -1,0 +1,14 @@
+{
+  "id": "wolf-call",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the head of a grey wolf howling upward, silver fur, a small pale crescent moon behind it, a few notes of sound in the air, the illustration alone, no ground, no background, the whole of it inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0234088310002221
+  },
+  "images": 1
+}

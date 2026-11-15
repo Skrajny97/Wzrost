@@ -1,0 +1,14 @@
+{
+  "id": "weakness-curse",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a cracked bronze sword wrapped in a coil of purple cursed smoke, a faint ghostly skull in the smoke, the illustration alone, no ground, no background, the whole of it inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.022998895443174575
+  },
+  "images": 1
+}
