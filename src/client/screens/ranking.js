@@ -1,7 +1,8 @@
 // The Ranking in the Społeczność, in two tabs (the author: "381 A"):
 // "Postacie", the Ranking postaci (src/server/community.js): the characters
 // highest by their own level, by their class's or by their highest
-// profession's, the levels in their columns (the profession's with its
+// profession's, or by one profession picked from a list under "Poziom
+// Profesji" (975 B), the levels in their columns (the profession's with its
 // icon, in its own order), and the player's own place among all of them; a
 // tap on a name shows that character (profile.js). "Gildie"
 // (src/server/guild-fame.js): the guilds by their Sława of this week or
@@ -192,6 +193,10 @@ function pagedList({ ask, key, draw, board }) {
 
 function mountCharacterRanking(container) {
   let by = 'level';
+  // Under "Poziom Profesji": one profession's ranking, or null for the
+  // highest of each character's (the author, 15.11.2026: „by można było
+  // wybrac podkategorie czyli konkretne Profesje”; the list of 975 B).
+  let profession = null;
   const switcher = h(
     'div',
     { class: 'segmented ranking-by', role: 'group', 'aria-label': t('Kolejność rankingu') },
@@ -210,16 +215,50 @@ function mountCharacterRanking(container) {
       }),
     ),
   );
+  const choice = h('div', { class: 'ranking-professions', hidden: true });
   const place = h('div', { class: 'ranking-place-box' });
   const board = h('div', { class: 'card ranking' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
-  fill(container, switcher, place, board);
+  fill(container, switcher, choice, place, board);
   const pressed = () => {
     for (const option of switcher.children) option.setAttribute('aria-pressed', String(option.dataset.by === by));
   };
-  const list = pagedList({ ask: (offset) => `/api/ranking?by=${by}&offset=${offset}`, key: () => by, draw: show, board });
+  const asked = () => (by === 'profession' && profession ? `by=profession&profession=${profession}` : `by=${by}`);
+  const list = pagedList({ ask: (offset) => `/api/ranking?${asked()}&offset=${offset}`, key: asked, draw: show, board });
+
+  // The professions to pick under "Poziom Profesji", from the answer in the
+  // page's language: "Najwyższa" (the highest of each character's, as
+  // before) or one of them, in a list to open as on the Targowisko.
+  function drawChoice(professions) {
+    choice.hidden = by !== 'profession' || !professions;
+    if (choice.hidden) return fill(choice);
+    const options = [{ id: null, name: t('Najwyższa') }, ...professions];
+    return fill(
+      choice,
+      h(
+        'div',
+        { class: 'market-choice ranking-profession-list' },
+        h('label', { class: 'bag-sort-label', for: 'ranking-profession', text: t('Profesja') }),
+        h(
+          'select',
+          {
+            id: 'ranking-profession',
+            class: 'anvil-material market-choice-list',
+            onChange: (event) => {
+              const id = event.currentTarget.value || null;
+              if (id === profession) return;
+              profession = id;
+              list.load(0);
+            },
+          },
+          options.map((option) => h('option', { value: option.id ?? '', selected: option.id === profession, text: option.name })),
+        ),
+      ),
+    );
+  }
 
   function show(answer) {
     const { rows, place: own } = answer;
+    drawChoice(answer.professions);
     fill(place, placeLine(own ? t('Twoje miejsce: {place}.', { place: formatNumber(own) }) : '', answer, t('Moje miejsce'), list.go));
     const sorted = (id) => (id === by ? 'ranking-sorted' : undefined);
     // A column of its own order shows only there.

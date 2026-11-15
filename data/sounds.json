@@ -647,7 +647,8 @@
       "death": { "files": ["audio/sfx/moon-eater-death-1.mp3", "audio/sfx/moon-eater-death-2.mp3"], "gain": 0.7 }
     },
     "marmot": {
-      "hurt": { "files": ["audio/sfx/marmot-hurt-1.mp3", "audio/sfx/marmot-hurt-2.mp3"], "gain": 0.6 }
+      "hurt": { "files": ["audio/sfx/marmot-hurt-1.mp3", "audio/sfx/marmot-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/marmot-death-1.mp3", "audio/sfx/marmot-death-2.mp3"], "gain": 0.7 }
     },
     "roller": {
       "hurt": { "files": ["audio/sfx/roller-hurt-1.mp3", "audio/sfx/roller-hurt-2.mp3"], "gain": 0.6 },
@@ -666,7 +667,7 @@
       "death": { "files": ["audio/sfx/wallcreeper-death-1.mp3", "audio/sfx/wallcreeper-death-2.mp3"], "gain": 0.7 }
     },
     "swift": {
-      "hurt": { "files": ["audio/sfx/swift-hurt-1.mp3"], "gain": 0.6 },
+      "hurt": { "files": ["audio/sfx/swift-hurt-1.mp3", "audio/sfx/swift-hurt-2.mp3"], "gain": 0.6 },
       "death": { "files": ["audio/sfx/swift-death-1.mp3", "audio/sfx/swift-death-2.mp3"], "gain": 0.7 }
     },
     "stone-rooster": {
@@ -727,7 +728,7 @@
     },
     "wood-ant": {
       "hurt": { "files": ["audio/sfx/wood-ant-hurt-1.mp3", "audio/sfx/wood-ant-hurt-2.mp3"], "gain": 0.6 },
-      "death": { "files": ["audio/sfx/wood-ant-death-1.mp3"], "gain": 0.7 }
+      "death": { "files": ["audio/sfx/wood-ant-death-1.mp3", "audio/sfx/wood-ant-death-2.mp3"], "gain": 0.7 }
     },
     "changeling": {
       "hurt": { "files": ["audio/sfx/changeling-hurt-1.mp3", "audio/sfx/changeling-hurt-2.mp3"], "gain": 0.6 },
@@ -834,7 +835,8 @@
       "death": { "files": ["audio/sfx/hen-leg-hut-death-1.mp3", "audio/sfx/hen-leg-hut-death-2.mp3"], "gain": 0.7 }
     },
     "black-goose": {
-      "hurt": { "files": ["audio/sfx/black-goose-hurt-1.mp3"], "gain": 0.6 }
+      "hurt": { "files": ["audio/sfx/black-goose-hurt-1.mp3", "audio/sfx/black-goose-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/black-goose-death-1.mp3", "audio/sfx/black-goose-death-2.mp3"], "gain": 0.7 }
     },
     "burning-skull": {
       "hurt": { "files": ["audio/sfx/burning-skull-hurt-1.mp3", "audio/sfx/burning-skull-hurt-2.mp3"], "gain": 0.6 },
