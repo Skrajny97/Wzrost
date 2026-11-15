@@ -1,0 +1,13 @@
+{
+  "id": "black-goose-hurt",
+  "payload": {
+    "text": "an angry black goose hisses sharply through its open beak and beats its wings, a breathy rough hiss with a short throaty cackle, not a honk, nothing like a car horn, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/black-goose-hurt-20261115T1049-0.mp3",
+    "audio/drafts/voices/black-goose-hurt-20261115T1049-1.mp3"
+  ],
+  "credits": 20
+}

@@ -1,0 +1,13 @@
+{
+  "id": "black-goose-death",
+  "payload": {
+    "text": "a big black goose gives a hoarse broken cackle that fades into a weak breathy hiss as it falls with a flutter of wings, not a honk, nothing like a car horn, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/black-goose-death-20261115T1049-0.mp3",
+    "audio/drafts/voices/black-goose-death-20261115T1049-1.mp3"
+  ],
+  "credits": 48
+}

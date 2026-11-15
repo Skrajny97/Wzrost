@@ -1,0 +1,13 @@
+{
+  "id": "wood-ant-death",
+  "payload": {
+    "text": "a giant ant gives low dry rattling clicks of its mandibles that slow down and stop as its legs curl up, low pitched, not squeaky, clean recording with no hiss and no background noise, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wood-ant-death-20261115T1049-0.mp3",
+    "audio/drafts/voices/wood-ant-death-20261115T1049-1.mp3"
+  ],
+  "credits": 48
+}
