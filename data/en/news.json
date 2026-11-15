@@ -812,6 +812,10 @@
     "0.3.60": {
       "title": "Version 0.3.60",
       "body": "- Intellect and Strength now work for 11 evolutions they did nothing for before. Poisoner, Necromancer, Lich, Storm Archer, Thunder Lord and Chosen of Perun get stronger evolution skills from Intellect, and Hunter, Huntmaster, Ruler of the Wilds, Inquisitor and Grand Inquisitor from Strength. The stats preview shows how much. In the Arena and in guild wars nothing changes for now.\n- In the Core, the \"Main stat\" trait names your class's stat.\n- Labyrinth: after beating a guardian or an elite, \"Watch the fight\" stands above the blessing choice and stays after you choose."
+    },
+    "0.3.61": {
+      "title": "Version 0.3.61",
+      "body": "- In the Arena and in guild wars, Intellect and Strength now strengthen the skills of those 11 evolutions too, but less than on expeditions, so the duels stay even."
     }
   }
 }

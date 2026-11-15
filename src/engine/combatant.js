@@ -32,10 +32,10 @@ export const challengeAt = (level, content) => (level >= content.balance.challen
 // raises or lowers a stat (`weekStats`, weekFighter in weeks.js) has those
 // shares too.
 /**
- * @param {{ character: Character, equipped: Item[], hp?: number | null, name: string, area?: Area | null, id?: string, side?: string, statBoost?: Record<string, number> | null, skillStat?: boolean }} fighter
+ * @param {{ character: Character, equipped: Item[], hp?: number | null, name: string, area?: Area | null, id?: string, side?: string, statBoost?: Record<string, number> | null, skillStatWeight?: number | null }} fighter
  * @param {Content} content
  */
-export function playerCombatant({ character, equipped, hp, name, area, id = 'a0', side = 'ally', statBoost = null, skillStat: withSkillStat = true }, content) {
+export function playerCombatant({ character, equipped, hp, name, area, id = 'a0', side = 'ally', statBoost = null, skillStatWeight = null }, content) {
   const balance = content.balance;
   const { totals: stats, bonuses } = computeStats(character, equipped, content);
   const week = character.weekStats ?? null;
@@ -64,8 +64,10 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
   const manaMax = maxMana(totals.wisdom, character.classLevel, perClassLevel, balance);
   // Not in the players' duels (the Arena, the guild wars: duelist in
   // pvp-arena.js), whose balance the author has yet to decide on.
-  const skillStat = withSkillStat ? evolution?.skillStat : null;
-  const skillWeight = balance.skills.skillStatWeight ?? 0;
+  const skillStat = evolution?.skillStat ?? null;
+  // The weight asked for (the players' duels: duelSkillStatWeight, 987 B),
+  // else the game's.
+  const skillWeight = skillStatWeight ?? balance.skills.skillStatWeight ?? 0;
   const skillPower =
     skillStat && skillWeight > 0 ? damageScale(totals[weapon.scaling] + skillWeight * (totals[skillStat] ?? 0), character.level, balance) / damageScale(totals[weapon.scaling], character.level, balance) : 1;
   const resist = { ...bonuses.resist };
