@@ -847,6 +847,9 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap, materials =
   return {
     name: itemName(item, content),
     base: item.base,
+    // Its kind (the base's family), which a form's gear names (gearLists,
+    // 988), for what the pages say the character can wear.
+    family: baseFamily(content.basesById[item.base]),
     slot: item.slot,
     slotName: content.slotsById[item.slot].name,
     level: item.level,

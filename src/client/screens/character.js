@@ -843,6 +843,14 @@ function equipBlockText(item) {
   return t('Ten slot jest jeszcze zablokowany.');
 }
 
+// Whether the character's gear takes an item's kind, as "Załóż" asks: its
+// class's, or its form's own (988: a Nekromanta takes the Mag's kostury and
+// no longer the Cień's sztylety; the author, 15.11.2026: „Nekromanta nie
+// moze juz nosic tych przedmiotów sztyletowych”), by the kinds sent with the
+// character (`gear`); by the class alone where they are not there.
+export const classFits = (item, character) =>
+  !item.classIds || (character.gear && item.family ? character.gear.includes(item.family) : item.classIds.includes(character.classId));
+
 // An equipment slot under a tap (the author, 10.11.2026: "Niech klikanie w
 // slot ekwipunku wyświetla zakładkę z możliwymi do założenia z plecaka
 // przedmiotami na to miejsce. Z porównywarką itp."): the item worn there on
@@ -982,7 +990,7 @@ function itemCard(item, { equipped, anvil = false, preview: withPreview = true, 
   // wait, and an item worn is changed at home or at a profession's work
   // (inventory.js).
   const busy = onExploration(character);
-  const usable = !item.classIds || item.classIds.includes(character.classId);
+  const usable = classFits(item, character);
   // A later base of its kind waits for its class level (a Metin2-like tier),
   // an item from another player too, whatever its own level (inventory.js).
   const early = usable && item.classLevel !== null && character.classLevel < item.classLevel;

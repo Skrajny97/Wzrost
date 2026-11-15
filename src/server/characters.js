@@ -15,6 +15,7 @@ import {
   addBonuses,
   blessingPlan,
   gearKey,
+  gearLists,
   gearSetCount,
   gearSetIds,
   greenhouseHours,
@@ -1717,6 +1718,10 @@ export function characterView(player, now) {
         return [slot.id, item ? toItem(item) : null];
       }),
     ),
+    // The kinds of weapons, off-hands and armour its gear takes, its class's
+    // or its form's own (gearLists, 988: the Nekromanta's kostury), for what
+    // the pages say it can wear (classFits in the client).
+    gear: Object.values(gearLists(gearKey(row.class_id, row.evolution, content()), content())).flat(),
     // With why the character cannot wear one now, if it cannot, as "Załóż"
     // refuses it (equipBlock in the engine): for the list of a slot's items.
     bag: bagItems(player)

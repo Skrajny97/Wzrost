@@ -832,6 +832,10 @@
     "0.3.65": {
       "title": "Version 0.3.65",
       "body": "- Every evolution brings a Scroll of Oblivion from the System: the first, the second and the third, and a change of evolution at Sambor's too. The free reset right after the first evolution stays and does not use up the scroll.\n- Sambor sells a Scroll of Oblivion instead of resetting your stats, for the same gold as before. He sells one when you have none.\n- After a change of evolution at Sambor's, your weapon and off-hand change by themselves into the new form's weapons, so your character is never left without a weapon."
+    },
+    "0.3.66": {
+      "title": "Version 0.3.66",
+      "body": "- The Necromancer, the Lich, the Grand Inquisitor and the Demon Slayer see in the Bag, on the Marketplace, in a Trade and in the Storeroom what they can wear. Staves and foci, and swords and axes for the Inquisitors, are theirs. Daggers and aspergilla say their class cannot use them. Before, the page went by the class from before the evolution."
     }
   }
 }

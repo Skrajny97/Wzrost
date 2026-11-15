@@ -109,6 +109,19 @@ describe('Ewolucje, które zmieniają broń (988) through the API', () => {
     assert.equal(JSON.parse(bag.data).base, 'kris');
     const refused = await call('POST', `/api/items/${bag.id}/equip`, { cookie });
     assert.equal(refused.data?.error?.code, 'wrong_class', JSON.stringify(refused.data));
+    // The page is told so: the kinds its gear takes, and the sztylet's kind
+    // and why it cannot be worn (the author, 15.11.2026: „Nekromanta nie
+    // moze juz nosic tych przedmiotów sztyletowych… niech gra jakoś
+    // informuje”).
+    const view = seen.data.character;
+    assert.ok(view.gear.includes('staff') && view.gear.includes('focus') && !view.gear.includes('dagger') && !view.gear.includes('misericorde'), JSON.stringify(view.gear));
+    const shown = view.bag.find((item) => item.id === bag.id);
+    assert.deepEqual([shown.family, shown.classIds.includes('shadow'), shown.equipBlock], ['dagger', true, 'wrong_class']);
+    assert.equal(view.equipment.weapon.family, 'staff');
+    // A Cień's gear is its class's.
+    await database.prepare("UPDATE characters SET evolution = 'poisoner' WHERE id = ?").bind(id).run();
+    const shadow = (await call('GET', '/api/character', { cookie })).data.character;
+    assert.deepEqual([...shadow.gear].sort(), Object.values(gearLists('shadow', content)).flat().sort());
   });
 });
 
