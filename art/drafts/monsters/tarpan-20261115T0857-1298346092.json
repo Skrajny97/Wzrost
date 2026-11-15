@@ -1,0 +1,14 @@
+{
+  "id": "tarpan",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a tarpan, a wild grey-dun forest horse of old Poland with a dark dorsal stripe, a short upright black mane, dark legs and a dark tail, rearing up on its hind legs and kicking with its front hooves, wild eyes, menacing, full body, three-quarter view, the whole horse inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02314320880614387
+  },
+  "images": 1
+}
