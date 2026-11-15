@@ -201,8 +201,12 @@ function cardShapes(content) {
     const blow = ((unit.weapon.min + unit.weapon.max) / 2) * unit.damageScale;
     return [id, blow / Math.max(1, unit.maxHp)];
   });
+  // A fixed median where the rules give one (that of the 156 cards before
+  // the Łysogóry, 15.11.2026): a new land's creatures then leave the Atak and
+  // Życie of the cards already in the game as they were. Without it, the
+  // median of all the cards of the game.
   const sorted = ratios.map(([, ratio]) => ratio).sort((a, b) => a - b);
-  const median = sorted[Math.floor(sorted.length / 2)] || 1;
+  const median = cardRules(content).stats.shapeMedian ?? (sorted[Math.floor(sorted.length / 2)] || 1);
   const [least, most] = shapeRange;
   const shapes = new Map(ratios.map(([id, ratio]) => [id, Math.min(most, Math.max(least, ratio / median)) ** shapeExponent]));
   shapesBuilt.set(content, shapes);
