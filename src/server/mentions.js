@@ -1,7 +1,8 @@
 // Mentions in the chat (DECISIONS.md, "Oznaczanie na czacie (634 A)"; the
 // author: "Potrzebujemy tez funkcji oznaczania na czacie"): "@" and a
-// character's whole name in a message tag that character (mentionPlaces in
-// the engine) when it reads the message's channel: any character with the
+// character's whole name, or its account's name (15.11.2026), in a message
+// tag that character (mentionPlaces in the engine) when it reads the
+// message's channel: any character with the
 // Społeczność in the Globalny, the Wymiana and the English channel (where
 // English is on), a member of the guild in
 // the guild's channel, the other one in a private conversation. Never a
@@ -43,14 +44,19 @@ export async function findMentions(db, text, { userId, channel, recipientId = nu
   const places = mentionPlaces(text);
   if (places.length === 0) return [];
   const keys = [...new Set(places.flatMap((place) => place.names.map((name) => name.key)))].slice(0, MOST_NAMES);
-  const found = await db
-    .prepare(
-      `SELECT c.id, c.user_id, c.name_key, c.level, (SELECT g.guild_id FROM guild_members g WHERE g.character_id = c.id) AS guild_id,
-              EXISTS (SELECT 1 FROM chat_blocks b WHERE b.user_id = c.user_id AND b.blocked_id = ?) AS hiding
-       FROM characters c WHERE c.name_key IN (${keys.map(() => '?').join(', ')}) AND c.${OWN_CHARACTERS}`,
-    )
-    .bind(userId, ...keys)
-    .all();
+  const marks = keys.map(() => '?').join(', ');
+  const columns = `c.id, c.user_id, c.level, (SELECT g.guild_id FROM guild_members g WHERE g.character_id = c.id) AS guild_id,
+              EXISTS (SELECT 1 FROM chat_blocks b WHERE b.user_id = c.user_id AND b.blocked_id = ?) AS hiding`;
+  // A character's name, and an account's name (the author, 15.11.2026:
+  // „Niech oznaczanie na czacie będzie możliwe też po nazwie konta”),
+  // which tags the character that account plays now. No account's name is
+  // another player's character's name (names.js), and where a player's own
+  // name and character's name are the same, either tags that character.
+  const [characters, accounts] = await db.batch([
+    db.prepare(`SELECT c.name_key, ${columns} FROM characters c WHERE c.name_key IN (${marks}) AND c.${OWN_CHARACTERS}`).bind(userId, ...keys),
+    db.prepare(`SELECT u.account_name_key AS name_key, ${columns} FROM users u JOIN characters c ON c.user_id = u.id AND c.role = 'player' WHERE u.account_name_key IN (${marks})`).bind(userId, ...keys),
+  ]);
+  const found = { results: [...accounts.results, ...characters.results] };
   const reads = (row) =>
     row.user_id !== userId &&
     !row.hiding &&
@@ -60,6 +66,8 @@ export async function findMentions(db, text, { userId, channel, recipientId = nu
   // whether that character may be tagged (pickMentions).
   const tagged = pickMentions(places, new Map(found.results.map((row) => [row.name_key, row])))
     .filter(({ character }) => reads(character))
+    // A character tagged by its name and by its account's name: once.
+    .filter((one, index, all) => all.findIndex((other) => other.character.id === one.character.id) === index)
     .slice(0, tuning().perMessage);
   if (tagged.length === 0) return [];
   // The characters this writer's tags already sent a notification to lately.

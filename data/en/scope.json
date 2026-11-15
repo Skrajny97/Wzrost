@@ -1163,6 +1163,7 @@
     "src/client/cards.js",
     "src/client/deck-slots.js",
     "src/client/cards-fx.js",
+    "src/client/pack-fx.js",
     "src/engine/card-duel.js",
     "src/server/card-duel.js",
     "src/client/card-duel.js",

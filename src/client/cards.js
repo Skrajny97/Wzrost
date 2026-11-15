@@ -42,6 +42,8 @@
 import { areaArtUrl, monsterSprite, placeArt, portraitSprite, residentBust } from './art.js';
 import { liveMatch, mountDuel, onLiveMatch } from './card-duel.js';
 import { createCardsFx, fxDroppedCards } from './cards-fx.js';
+import { motionOn } from './motion.js';
+import { openPack } from './pack-fx.js';
 import { deckSlotsRow, deckTitle, nameDeckSheet } from './deck-slots.js';
 import { h, icon } from './dom.js';
 import { countOf, formatDecimal, formatNumber } from './format.js';
@@ -500,9 +502,24 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
                   withButton(event.currentTarget, () =>
                     orAgain(async () => {
                       const answer = await call('POST', '/api/cards/pack');
-                      playSound('chest');
-                      opened = answer.pack;
+                      // With the animations on, the pack opens as a
+                      // booster's (984), its cards turning one by one, and
+                      // the page under it keeps them back; with them off
+                      // they show at once under the hero's card.
+                      opened = motionOn() ? null : answer.pack;
                       apply(answer);
+                      if (motionOn()) {
+                        const cards = answer.pack;
+                        const fresh = cards.filter((card) => card.fresh).map((card) => card.name);
+                        const higher = cards.filter((card) => !card.fresh).map((card) => card.name);
+                        const left = view.pack?.missing ?? 0;
+                        openPack(cards, {
+                          face: (card) => face(card),
+                          words: view.texts.pack.opened,
+                          summary: [fresh.length > 0 && t('Nowe w kolekcji: {cards}.', { cards: listOf(fresh) }), higher.length > 0 && t('Na wyższy poziom wchodzą: {cards}.', { cards: listOf(higher) }), left > 0 ? t('W kolekcji brakuje Ci jeszcze {cards}.', { cards: countOf(left, 'karty', 'kart', 'kart') }) : t('Masz już wszystkie karty.')].filter(Boolean).join(' '),
+                          onClose: () => render(),
+                        });
+                      } else playSound('chest');
                     }),
                   ),
               }),

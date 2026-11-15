@@ -404,10 +404,12 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   function taggable() {
     if (talk) return [{ name: talk.name, classId: conversations.find((entry) => entry.id === talk.id)?.classId }];
     if (channel.id === GUILD.id) return people?.guild ?? [];
+    // A writer by its character's name and by its account's name, which
+    // tags it too (15.11.2026).
     const writers = messages
       .filter((message) => !message.own && !message.system)
       .reverse()
-      .map((message) => ({ name: message.name, classId: message.classId }));
+      .flatMap((message) => [{ name: message.name, classId: message.classId }, ...(message.account ? [{ name: message.account, classId: message.classId }] : [])]);
     return [...writers, ...(people?.friends ?? []), ...(people?.guild ?? [])];
   }
   function closeSuggestions() {

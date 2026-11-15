@@ -800,6 +800,10 @@
     "0.3.57": {
       "title": "Version 0.3.57",
       "body": "- Szczęsny's card pack now draws cards of creatures from every land, also from lands higher than yours, by rarity: mostly common and rare, sometimes epic, and once in a while even legendary, mythic or divine. The last card of the pack is at least unique.\n- You can buy the pack already in the first land, once a day, for the gold of 4 hours of exploring at your level. A good relation with Szczęsny cuts the price by up to 40%, and every pack you buy improves that relation.\n- The odds of each rarity are shown on the pack in the Cards tab."
+    },
+    "0.3.58": {
+      "title": "Version 0.3.58",
+      "body": "- Szczęsny's card pack now opens like a booster: the pack tears open on the table and the cards turn one by one, the rarer, the brighter they shine. Legendary, mythic and divine cards get a show of their own. A tap skips the animation, and with Animations off (Settings) the cards show at once.\n- In the chat you can tag a player by their account name too: \"@\" and the account name tags the character that player plays now."
     }
   }
 }
