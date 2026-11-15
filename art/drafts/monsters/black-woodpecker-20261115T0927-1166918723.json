@@ -1,0 +1,14 @@
+{
+  "id": "black-woodpecker",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a black woodpecker, a big all-black woodpecker with a bright red crown and pale eyes, a long strong chisel-like pale beak, flying at you with wings spread to strike with its beak, menacing, full body, three-quarter view, the bird alone, no tree, no trunk, no background, the whole bird inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023872580029593575
+  },
+  "images": 1
+}

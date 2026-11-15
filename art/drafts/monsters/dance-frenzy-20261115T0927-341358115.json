@@ -1,0 +1,14 @@
+{
+  "id": "dance-frenzy",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Plasawica, a ghost of a village girl cursed to dance forever, a pale translucent young woman in a long white linen dress with red embroidery and a wreath of flowers on her loose hair, wild mad eyes and a grinning mouth, spinning in a frenzied dance with her arms flung out and her skirt flaring, clear solid shapes, eerie and menacing, full body, three-quarter view, the figure alone, no background",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02325328906525506
+  },
+  "images": 1
+}

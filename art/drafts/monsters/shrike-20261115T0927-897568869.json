@@ -1,0 +1,14 @@
+{
+  "id": "shrike",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a great grey shrike, a pale grey bird with a bold black mask over its eyes, black wings with white patches spread wide and a long black tail, a strong hooked beak like a small dagger, swooping down with its talons out, menacing, full body, three-quarter view, the bird alone, no branch, no ground, no background, the whole bird inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02320590014606052
+  },
+  "images": 1
+}

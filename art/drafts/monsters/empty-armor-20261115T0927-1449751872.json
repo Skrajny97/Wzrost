@@ -1,0 +1,14 @@
+{
+  "id": "empty-armor",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Pusta Zbroja, an empty suit of old dark steel plate armour standing on its own, a closed helmet with nothing inside but darkness and two faint violet glowing eyes in the visor slit, a red sash across the breastplate, a long sword raised in one gauntlet, clear solid shapes, eerie and menacing, standing on both feet, full body, three-quarter view, the armour alone, no dust, no chains, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023292667807896936
+  },
+  "images": 1
+}

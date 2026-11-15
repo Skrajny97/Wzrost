@@ -1,0 +1,14 @@
+{
+  "id": "wallcreeper",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a wallcreeper bird in flight, ash-grey body, broad rounded wings spread wide flashing bright crimson-red patches with white spots, a long thin curved black beak pointed forward to peck, menacing, full body, three-quarter view, the bird alone, no rocks, no ground, no background, the whole bird inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023151585290061102
+  },
+  "images": 1
+}
