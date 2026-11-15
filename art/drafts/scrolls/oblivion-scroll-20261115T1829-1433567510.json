@@ -1,0 +1,14 @@
+{
+  "id": "oblivion-scroll",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a rolled parchment scroll tied with a silver ribbon, sealed with a round violet wax seal stamped with a glowing pale lilac rune of a closed eye, thin wisps of silver mist curling from the ends of the scroll, the scroll alone, no background, single inventory item icon, bold clean outline",
+  "style": "src/client/art/icons/ward-scroll.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02356934555308024
+  },
+  "images": 1
+}
