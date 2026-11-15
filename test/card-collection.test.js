@@ -61,7 +61,8 @@ describe('Talia Systemu: the collection in the engine', () => {
     const view = cardCollectionView(collectionOf(31), off);
     assert.deepEqual(view.bonus, []);
     assert.equal(view.threshold, null);
-    assert.equal(view.summary, 'Kolekcja: 31 z 156');
+    // 207 cards since the Łysogóry (156 before, 15.11.2026).
+    assert.equal(view.summary, 'Kolekcja: 31 z 207');
   });
 
   describe('an exploration with the bonus', () => {
@@ -97,8 +98,8 @@ describe('Talia Systemu: the collection in the engine', () => {
   test('the Encyklopedia\'s "Karty": the count, the bonus now and its next threshold, every land with its count', () => {
     const view = cardCollectionView(collectionOf(31), content);
     assert.equal(view.found, 31);
-    assert.equal(view.all, 156);
-    assert.equal(view.summary, 'Kolekcja: 31 z 156');
+    assert.equal(view.all, 207);
+    assert.equal(view.summary, 'Kolekcja: 31 z 207');
     assert.deepEqual(view.bonus, [
       'Premia kolekcji: +3% XP i +3% złota z wypraw, na stałe.',
       'Następny próg: 40 różnych kart. Brakuje 9 kart.',
@@ -111,7 +112,7 @@ describe('Talia Systemu: the collection in the engine', () => {
     assert.equal(view.lands.reduce((sum, land) => sum + land.found, 0), 31);
     // One card missing for the next threshold, and none at the top.
     assert.equal(cardCollectionView(collectionOf(39), content).bonus[1], 'Następny próg: 40 różnych kart. Brakuje 1 karty.');
-    const full = cardCollectionView(collectionOf(156), content);
+    const full = cardCollectionView(collectionOf(207), content);
     assert.deepEqual(full.bonus.slice(0, 2), ['Premia kolekcji: +15% XP i +15% złota z wypraw, na stałe.', 'To najwyższa premia kolekcji.']);
     assert.equal(full.threshold, null);
     assert.equal(cardCollectionView(new Map(), content).bonus[1], 'Następny próg: 10 różnych kart. Brakuje 10 kart.');
@@ -184,8 +185,8 @@ describe('Talia Systemu\'s collection through the API', () => {
     assert.deepEqual(book.tabs.at(-1), { id: 'cards', name: 'Karty' });
     const { cards } = book;
     assert.equal(cards.found, 12);
-    assert.equal(cards.all, 156);
-    assert.equal(cards.lands.flatMap((land) => land.cards).length, 156);
+    assert.equal(cards.all, 207);
+    assert.equal(cards.lands.flatMap((land) => land.cards).length, 207);
     assert.deepEqual(cards.bonus.slice(0, 2), ['Premia kolekcji: +1% XP i +1% złota z wypraw, na stałe.', 'Następny próg: 20 różnych kart. Brakuje 8 kart.']);
     const wolf = cards.lands[0].cards.find((card) => card.id === 'wolf');
     assert.equal(wolf.copies, 1);
