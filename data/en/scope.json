@@ -392,6 +392,7 @@
     "!animations:walk.moments",
     "regions:windfalls",
     "!regions:windfalls.fightBoard",
+    "!cards:pack.lastAtLeast",
     "regions:stone-glade.land",
     "resources",
     "skills",

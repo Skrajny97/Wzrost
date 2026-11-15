@@ -134,13 +134,17 @@
       }
     },
     "pack": {
-      "description": "Pakiet u Szczęsnego (902 C): raz dziennie `cards` kart stworów z krain niższych niż kraina postaci, za złoto `goldMinutes` minut wyprawy na poziomie postaci.",
+      "description": "Pakiet u Szczęsnego (902 C), jak booster (15.11.2026): raz dziennie `cards` kart stworów ze wszystkich krain, każda o rzadkości losowanej według `weights` (ostatnia od `lastAtLeast` w górę), za złoto `goldMinutes` minut wyprawy na poziomie postaci, mniej `relationDiscount` za stopień relacji ze Szczęsnym.",
       "type": "object",
       "additionalProperties": false,
-      "required": ["cards", "goldMinutes"],
+      "required": ["cards", "goldMinutes", "weights", "lastAtLeast", "relationDiscount"],
       "properties": {
+        "$comment": { "type": "string" },
         "cards": { "type": "integer", "minimum": 1 },
-        "goldMinutes": { "type": "integer", "minimum": 1 }
+        "goldMinutes": { "type": "integer", "minimum": 1 },
+        "weights": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "minimum": 0 } },
+        "lastAtLeast": { "$ref": "#/definitions/id" },
+        "relationDiscount": { "type": "array", "minItems": 1, "items": { "type": "number", "minimum": 0, "maximum": 0.9 } }
       }
     },
     "live": {
@@ -261,8 +265,14 @@
         "pack": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["offer", "opened"],
-          "properties": { "offer": { "type": "string", "minLength": 1 }, "opened": { "type": "string", "minLength": 1 } }
+          "required": ["offer", "opened", "odds", "relation", "noDiscount"],
+          "properties": {
+            "offer": { "type": "string", "minLength": 1 },
+            "opened": { "type": "string", "minLength": 1 },
+            "odds": { "type": "string", "minLength": 1 },
+            "relation": { "type": "string", "minLength": 1 },
+            "noDiscount": { "type": "string", "minLength": 1 }
+          }
         },
         "live": {
           "type": "object",
