@@ -1,0 +1,13 @@
+{
+  "id": "mortar-death",
+  "payload": {
+    "text": "a living stone mortar gives a long grinding groan and cracks apart with a heavy thud, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/mortar-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/mortar-death-20261115T1004-1.mp3"
+  ],
+  "credits": 52
+}

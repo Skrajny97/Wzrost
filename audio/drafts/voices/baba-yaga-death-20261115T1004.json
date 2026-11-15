@@ -1,0 +1,13 @@
+{
+  "id": "baba-yaga-death",
+  "payload": {
+    "text": "an ancient witch gives a long cracked shriek that fades away as if flying off in a mortar with a whoosh of wind, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/baba-yaga-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/baba-yaga-death-20261115T1004-1.mp3"
+  ],
+  "credits": 64
+}

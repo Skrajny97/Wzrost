@@ -1,0 +1,13 @@
+{
+  "id": "kingfisher-death",
+  "payload": {
+    "text": "a kingfisher gives a long thin shrill whistle that fades with a small splash, no words, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/kingfisher-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/kingfisher-death-20261115T1004-1.mp3"
+  ],
+  "credits": 40
+}

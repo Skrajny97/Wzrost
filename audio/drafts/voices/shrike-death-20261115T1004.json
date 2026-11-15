@@ -1,0 +1,13 @@
+{
+  "id": "shrike-death",
+  "payload": {
+    "text": "a shrike gives a harsh grating cry that weakens into a faint chatter, no words, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/shrike-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/shrike-death-20261115T1004-1.mp3"
+  ],
+  "credits": 40
+}

@@ -1,0 +1,13 @@
+{
+  "id": "witch-hare-hurt",
+  "payload": {
+    "text": "a hare that is really a witch gives a shrill human-like scream of pain mixed with a squeal, eerie, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/witch-hare-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/witch-hare-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 20
+}

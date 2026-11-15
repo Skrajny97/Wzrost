@@ -1,0 +1,13 @@
+{
+  "id": "hoopoe-hurt",
+  "payload": {
+    "text": "a hoopoe bird gives a hollow hoarse hoop cry of pain with a ruffle of feathers, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/hoopoe-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/hoopoe-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 20
+}

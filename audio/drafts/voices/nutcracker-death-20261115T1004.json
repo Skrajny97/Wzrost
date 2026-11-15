@@ -1,0 +1,13 @@
+{
+  "id": "nutcracker-death",
+  "payload": {
+    "text": "a nutcracker bird gives a long harsh rasping cry that fades with a nut dropping on stone, no words, close up, dry, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/nutcracker-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/nutcracker-death-20261115T1004-1.mp3"
+  ],
+  "credits": 44
+}

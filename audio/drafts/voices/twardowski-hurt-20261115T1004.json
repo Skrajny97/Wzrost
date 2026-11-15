@@ -1,0 +1,13 @@
+{
+  "id": "twardowski-hurt",
+  "payload": {
+    "text": "a sorcerer nobleman gives an angry grunt of pain with a crackle of magic fire, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/twardowski-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/twardowski-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 28
+}

@@ -1,0 +1,13 @@
+{
+  "id": "cuckoo-death",
+  "payload": {
+    "text": "a huge cuckoo gives a slow distorted cuck-oo call that repeats slower and slower like a broken clock until it stops, eerie, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/cuckoo-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/cuckoo-death-20261115T1004-1.mp3"
+  ],
+  "credits": 64
+}

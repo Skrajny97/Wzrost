@@ -1,0 +1,13 @@
+{
+  "id": "wallcreeper-death",
+  "payload": {
+    "text": "a small bird gives a thin descending piping cry and a last soft flutter of wings, no words, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wallcreeper-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/wallcreeper-death-20261115T1004-1.mp3"
+  ],
+  "credits": 40
+}

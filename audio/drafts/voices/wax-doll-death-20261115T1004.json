@@ -1,0 +1,13 @@
+{
+  "id": "wax-doll-death",
+  "payload": {
+    "text": "a wax doll gives a long thin fading whimper as it melts with a soft sizzle, eerie, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wax-doll-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/wax-doll-death-20261115T1004-1.mp3"
+  ],
+  "credits": 48
+}

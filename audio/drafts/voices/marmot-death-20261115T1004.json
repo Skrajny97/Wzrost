@@ -1,0 +1,13 @@
+{
+  "id": "marmot-death",
+  "payload": {
+    "text": "a huge marmot gives a long fading shrill whistle that breaks into a weak squeak, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/marmot-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/marmot-death-20261115T1004-1.mp3"
+  ],
+  "credits": 48
+}

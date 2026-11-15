@@ -1,0 +1,13 @@
+{
+  "id": "mistletoe-leech-hurt",
+  "payload": {
+    "text": "a living ball of twigs hisses and squeaks in pain with a dry rustle of leaves, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/mistletoe-leech-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/mistletoe-leech-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 20
+}

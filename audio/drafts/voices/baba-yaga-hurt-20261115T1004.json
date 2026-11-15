@@ -1,0 +1,13 @@
+{
+  "id": "baba-yaga-hurt",
+  "payload": {
+    "text": "an ancient witch gives a furious cackling shriek of pain with a clack of iron teeth, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/baba-yaga-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/baba-yaga-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 28
+}

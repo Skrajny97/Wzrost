@@ -1,0 +1,13 @@
+{
+  "id": "broom-witch-death",
+  "payload": {
+    "text": "a witch gives a long falling shriek that fades away as her broom whooshes down and crashes, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/broom-witch-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/broom-witch-death-20261115T1004-1.mp3"
+  ],
+  "credits": 56
+}

@@ -1,0 +1,13 @@
+{
+  "id": "broom-witch-hurt",
+  "payload": {
+    "text": "a witch shrieks in pain with a crackling cackle and a whoosh of a broom, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/broom-witch-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/broom-witch-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 24
+}

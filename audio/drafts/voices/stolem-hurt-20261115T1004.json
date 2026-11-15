@@ -1,0 +1,13 @@
+{
+  "id": "stolem-hurt",
+  "payload": {
+    "text": "a colossal stone giant gives a deep booming roar of pain like rocks grinding, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/stolem-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/stolem-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 28
+}

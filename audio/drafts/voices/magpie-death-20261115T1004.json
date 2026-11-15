@@ -1,0 +1,13 @@
+{
+  "id": "magpie-death",
+  "payload": {
+    "text": "a magpie gives a long harsh chattering cry that weakens as a small shiny ring drops with a tinkle, no words, close up, dry, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/magpie-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/magpie-death-20261115T1004-1.mp3"
+  ],
+  "credits": 44
+}

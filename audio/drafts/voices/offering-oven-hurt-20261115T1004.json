@@ -1,0 +1,13 @@
+{
+  "id": "offering-oven-hurt",
+  "payload": {
+    "text": "a living stone oven roars with a burst of fire and a deep rumbling growl, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/offering-oven-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/offering-oven-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 24
+}

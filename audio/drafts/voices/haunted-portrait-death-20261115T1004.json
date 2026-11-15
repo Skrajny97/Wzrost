@@ -1,0 +1,13 @@
+{
+  "id": "haunted-portrait-death",
+  "payload": {
+    "text": "a haunted portrait gives a long fading ghostly moan as its canvas tears and the frame cracks, eerie, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/haunted-portrait-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/haunted-portrait-death-20261115T1004-1.mp3"
+  ],
+  "credits": 56
+}

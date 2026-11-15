@@ -1,0 +1,13 @@
+{
+  "id": "witch-broom-death",
+  "payload": {
+    "text": "a living broom gives a long creaking groan and snaps in half with a dry crack and falling twigs, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/witch-broom-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/witch-broom-death-20261115T1004-1.mp3"
+  ],
+  "credits": 48
+}

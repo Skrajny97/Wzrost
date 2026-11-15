@@ -1,0 +1,13 @@
+{
+  "id": "griffin-hurt",
+  "payload": {
+    "text": "a mighty griffin gives a piercing eagle screech mixed with a lion's roar of pain, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/griffin-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/griffin-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 28
+}

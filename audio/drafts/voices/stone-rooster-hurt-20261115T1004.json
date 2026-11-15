@@ -1,0 +1,13 @@
+{
+  "id": "stone-rooster-hurt",
+  "payload": {
+    "text": "a rooster made of stone gives a short hoarse crow of pain with a grinding of stone and small pebbles falling, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/stone-rooster-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/stone-rooster-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 24
+}

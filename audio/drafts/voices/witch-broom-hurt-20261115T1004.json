@@ -1,0 +1,13 @@
+{
+  "id": "witch-broom-hurt",
+  "payload": {
+    "text": "a living broom creaks and swishes angrily with a wooden squeal of pain, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/witch-broom-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/witch-broom-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 20
+}

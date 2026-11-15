@@ -1,0 +1,13 @@
+{
+  "id": "fire-wheel-hurt",
+  "payload": {
+    "text": "a burning wheel crackles and roars with a burst of flame and a wooden creak, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/fire-wheel-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/fire-wheel-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 24
+}

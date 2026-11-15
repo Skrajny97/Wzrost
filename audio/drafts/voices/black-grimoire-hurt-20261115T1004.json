@@ -1,0 +1,13 @@
+{
+  "id": "black-grimoire-hurt",
+  "payload": {
+    "text": "a cursed black book snaps shut with a leathery thud and a demonic hiss of pain, pages fluttering, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/black-grimoire-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/black-grimoire-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 24
+}

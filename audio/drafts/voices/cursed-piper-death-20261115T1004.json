@@ -1,0 +1,13 @@
+{
+  "id": "cursed-piper-death",
+  "payload": {
+    "text": "a cursed piper's bagpipes let out a long dying wail that deflates into silence, no words, close up, dry, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/cursed-piper-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/cursed-piper-death-20261115T1004-1.mp3"
+  ],
+  "credits": 60
+}

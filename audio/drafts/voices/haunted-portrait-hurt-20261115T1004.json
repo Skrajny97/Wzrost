@@ -1,0 +1,13 @@
+{
+  "id": "haunted-portrait-hurt",
+  "payload": {
+    "text": "a haunted portrait gives a ghostly gasp of pain with a creak of an old wooden frame, eerie, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/haunted-portrait-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/haunted-portrait-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 24
+}

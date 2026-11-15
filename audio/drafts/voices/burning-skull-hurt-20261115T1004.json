@@ -1,0 +1,13 @@
+{
+  "id": "burning-skull-hurt",
+  "payload": {
+    "text": "a flaming skull gives a hollow shriek of pain with a whoosh of fire, eerie, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/burning-skull-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/burning-skull-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 20
+}

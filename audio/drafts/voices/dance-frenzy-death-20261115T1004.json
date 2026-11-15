@@ -1,0 +1,13 @@
+{
+  "id": "dance-frenzy-death",
+  "payload": {
+    "text": "a ghostly dancing girl gives a long fading laugh that slows down and turns into a sigh, eerie, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/dance-frenzy-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/dance-frenzy-death-20261115T1004-1.mp3"
+  ],
+  "credits": 56
+}

@@ -1,0 +1,13 @@
+{
+  "id": "burning-skull-death",
+  "payload": {
+    "text": "a flaming skull gives a long hollow wail as its fire hisses out and the skull cracks, eerie, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/burning-skull-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/burning-skull-death-20261115T1004-1.mp3"
+  ],
+  "credits": 52
+}

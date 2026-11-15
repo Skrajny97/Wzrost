@@ -1,0 +1,13 @@
+{
+  "id": "fate-spinner-hurt",
+  "payload": {
+    "text": "an old spinner of fate hisses in pain with a creak of a spinning wheel, eerie, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/fate-spinner-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/fate-spinner-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 24
+}

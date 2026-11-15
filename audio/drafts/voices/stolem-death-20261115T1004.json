@@ -1,0 +1,13 @@
+{
+  "id": "stolem-death",
+  "payload": {
+    "text": "a colossal giant gives a long deep thundering groan and falls with a huge rumbling crash of rocks, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/stolem-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/stolem-death-20261115T1004-1.mp3"
+  ],
+  "credits": 64
+}

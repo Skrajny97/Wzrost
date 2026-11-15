@@ -1,0 +1,13 @@
+{
+  "id": "mistletoe-leech-death",
+  "payload": {
+    "text": "a living ball of twigs gives a long fading wheeze and falls apart with a dry rustle, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/mistletoe-leech-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/mistletoe-leech-death-20261115T1004-1.mp3"
+  ],
+  "credits": 48
+}

@@ -1,0 +1,13 @@
+{
+  "id": "witch-cauldron-death",
+  "payload": {
+    "text": "a living iron cauldron gives a long bubbling groan and tips over with a heavy metallic clang and a splash, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/witch-cauldron-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/witch-cauldron-death-20261115T1004-1.mp3"
+  ],
+  "credits": 56
+}

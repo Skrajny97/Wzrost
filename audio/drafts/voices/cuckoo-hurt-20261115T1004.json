@@ -1,0 +1,13 @@
+{
+  "id": "cuckoo-hurt",
+  "payload": {
+    "text": "a huge cuckoo gives a distorted broken cuck-oo call of pain, eerie, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/cuckoo-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/cuckoo-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 28
+}

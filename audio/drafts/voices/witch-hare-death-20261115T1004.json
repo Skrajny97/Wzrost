@@ -1,0 +1,13 @@
+{
+  "id": "witch-hare-death",
+  "payload": {
+    "text": "a witch hare gives a long eerie scream that turns from an animal squeal into a woman's cackle and fades, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/witch-hare-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/witch-hare-death-20261115T1004-1.mp3"
+  ],
+  "credits": 52
+}

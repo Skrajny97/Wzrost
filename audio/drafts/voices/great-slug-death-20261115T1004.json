@@ -1,0 +1,13 @@
+{
+  "id": "great-slug-death",
+  "payload": {
+    "text": "a giant slug gives a long wet gurgling sigh and collapses with a slimy squelch, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/great-slug-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/great-slug-death-20261115T1004-1.mp3"
+  ],
+  "credits": 52
+}

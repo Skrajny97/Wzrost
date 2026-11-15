@@ -1,0 +1,13 @@
+{
+  "id": "jay-death",
+  "payload": {
+    "text": "a jay gives a long harsh screech that weakens into a croak, no words, close up, dry, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/jay-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/jay-death-20261115T1004-1.mp3"
+  ],
+  "credits": 40
+}

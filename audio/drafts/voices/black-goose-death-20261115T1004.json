@@ -1,0 +1,13 @@
+{
+  "id": "black-goose-death",
+  "payload": {
+    "text": "a black goose gives a long weakening honk and a last hiss as it falls with a flap of wings, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/black-goose-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/black-goose-death-20261115T1004-1.mp3"
+  ],
+  "credits": 48
+}

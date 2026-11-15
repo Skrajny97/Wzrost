@@ -1,0 +1,13 @@
+{
+  "id": "hoopoe-death",
+  "payload": {
+    "text": "a hoopoe bird gives three weakening hollow hoop hoop hoop calls that fade away, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/hoopoe-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/hoopoe-death-20261115T1004-1.mp3"
+  ],
+  "credits": 52
+}

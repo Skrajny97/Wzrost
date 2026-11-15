@@ -1,0 +1,13 @@
+{
+  "id": "wolverine-death",
+  "payload": {
+    "text": "a wolverine gives a long savage growl that weakens into a rattling breath, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wolverine-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/wolverine-death-20261115T1004-1.mp3"
+  ],
+  "credits": 52
+}

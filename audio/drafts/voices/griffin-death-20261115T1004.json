@@ -1,0 +1,13 @@
+{
+  "id": "griffin-death",
+  "payload": {
+    "text": "a mighty griffin gives a long screeching roar that fades as huge wings beat for the last time, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/griffin-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/griffin-death-20261115T1004-1.mp3"
+  ],
+  "credits": 64
+}

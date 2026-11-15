@@ -1,0 +1,13 @@
+{
+  "id": "hen-leg-hut-death",
+  "payload": {
+    "text": "a wooden hut on chicken legs gives a long creaking squawk and collapses with a crash of logs, no words, close up, dry, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/hen-leg-hut-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/hen-leg-hut-death-20261115T1004-1.mp3"
+  ],
+  "credits": 60
+}

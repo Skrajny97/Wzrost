@@ -1,0 +1,13 @@
+{
+  "id": "stone-knight-death",
+  "payload": {
+    "text": "a stone knight gives a long deep hollow groan as his stone armour cracks and collapses into a pile of heavy rocks, no words, close up, dry, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/stone-knight-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/stone-knight-death-20261115T1004-1.mp3"
+  ],
+  "credits": 60
+}

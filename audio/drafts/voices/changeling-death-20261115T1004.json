@@ -1,0 +1,13 @@
+{
+  "id": "changeling-death",
+  "payload": {
+    "text": "a creepy changeling gives a long eerie wailing cry like a baby that fades into a hiss, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/changeling-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/changeling-death-20261115T1004-1.mp3"
+  ],
+  "credits": 56
+}

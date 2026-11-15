@@ -1,0 +1,13 @@
+{
+  "id": "twardowski-death",
+  "payload": {
+    "text": "a sorcerer gives a long cry that fades upward into the distance as if carried away to the moon, with a crackle of dying magic fire, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/twardowski-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/twardowski-death-20261115T1004-1.mp3"
+  ],
+  "credits": 64
+}

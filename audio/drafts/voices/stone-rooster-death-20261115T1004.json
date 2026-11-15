@@ -1,0 +1,13 @@
+{
+  "id": "stone-rooster-death",
+  "payload": {
+    "text": "a stone rooster gives a last broken crow that ends as its body cracks and crumbles into falling rocks, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/stone-rooster-death-20261115T1004-0.mp3",
+    "audio/drafts/voices/stone-rooster-death-20261115T1004-1.mp3"
+  ],
+  "credits": 56
+}

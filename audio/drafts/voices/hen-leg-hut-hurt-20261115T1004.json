@@ -1,0 +1,13 @@
+{
+  "id": "hen-leg-hut-hurt",
+  "payload": {
+    "text": "a wooden hut on giant chicken legs creaks loudly and gives an angry hen's squawk, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/hen-leg-hut-hurt-20261115T1004-0.mp3",
+    "audio/drafts/voices/hen-leg-hut-hurt-20261115T1004-1.mp3"
+  ],
+  "credits": 24
+}
