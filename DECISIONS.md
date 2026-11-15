@@ -3510,6 +3510,10 @@ Autor: „twarz w portrecie męskiego Strzelca Wyborowego jest brzydka i powinna
 3. **Pasek czoła:** autor zauważył na ciemnym odcieniu jasny pasek skóry pod opaską: pole skóry tego portretu zaczynało się wiersz za nisko i od początku go pomijało. Grupa twarzy obejmuje teraz czoło, cień przy uchu i cień pod brodą, a sprawdzenie wszystkich ośmiu odcieni nie znajduje na głowie żadnego koloru skóry sprzed przebarwienia.
 4. **Inne portrety:** ten sam skan znalazł podobne jasne piksele przy skórze w innych portretach (np. pasek przy obojczyku Czempiona Areny i linia na nodze Berserkerki w ciemnym odcieniu). To osobne zadanie.
 
+## Wersja 0.3.71 (15.11.2026): kod CIASTKA
+
+Autor 15.11.2026 poprosił o kod CIASTKA dla jednego gracza: 100 Punktów Czasu, 2000 złota i 100 Punktów Systemu. Kod działa tylko dla jednej postaci (w danych skrót SHA-256 jej imienia zamiast imienia, bo repozytorium jest publiczne; `cookies-2026-11`), raz, do 15.12.2026 włącznie (brakujący szczegół: miesiąc, jak przy kodach za kawę). Kod nie trafia do „Co nowego?”, bo jest dla jednej postaci; autor przekazuje go sam.
+
 ## Wersja 0.3.70 (15.11.2026): drugie formy na Arenie wyrównane
 
 1. Wielki Inkwizytor, Druid i Widmo mocniejsi, a Władca Piorunów, Mistrz Łowów i Bastion słabsi, tylko w pojedynkach graczy; każda druga forma wygrywa 31–70% pojedynków na 100. poziomie (992 A). Zob. „Drugie formy na Arenie”.

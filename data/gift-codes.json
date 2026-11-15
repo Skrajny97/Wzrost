@@ -112,6 +112,13 @@
       "for": "8acfc20dd12de57a4ec6f2608e3d490172b8f259243b62a6f691822422bb968d",
       "until": "2026-12-15T00:00:00+01:00",
       "rewards": { "systemPoints": 100 }
+    },
+    {
+      "id": "cookies-2026-11",
+      "code": "CIASTKA",
+      "for": "6831403db36798becd143cf21c4db63f05c9b187b3c96188562a31ac0d0e3782",
+      "until": "2026-12-16T00:00:00+01:00",
+      "rewards": { "systemPoints": 100, "timePoints": 100, "gold": 2000 }
     }
   ],
   "moves": [

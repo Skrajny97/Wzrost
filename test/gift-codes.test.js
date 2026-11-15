@@ -126,6 +126,20 @@ describe('gift codes in the engine', () => {
     }
   });
 
+  test('CIASTKA gives 100 Punktów Systemu, 100 Punktów Czasu and 2000 złota once, to one character only, until the end of 15 December in Warsaw', () => {
+    // The author, 15.11.2026: a code for one player; the data keeps the
+    // name's key only.
+    const gift = content.giftCodes.find((each) => each.id === 'cookies-2026-11');
+    assert.equal(gift.code, 'CIASTKA');
+    assert.match(gift.for, /^[0-9a-f]{64}$/);
+    assert.deepEqual(gift.rewards, { systemPoints: 100, timePoints: 100, gold: 2000 });
+    assert.equal(giftRewardsText(gift.rewards, content), 'Punkty Systemu +100, Punkty Czasu +100, złoto +2000');
+    assert.equal(giftCodeOf('ciastka', Date.parse('2026-12-15T23:59:00+01:00'), [], content, gift.for).gift, gift);
+    assert.equal(giftCodeOf('CIASTKA', Date.parse('2026-12-16T00:00:00+01:00'), [], content, gift.for).reason, 'expired');
+    assert.equal(giftCodeOf('CIASTKA', Date.parse('2026-11-16T12:00:00+01:00'), ['cookies-2026-11'], content, gift.for).reason, 'used');
+    assert.equal(giftCodeOf('CIASTKA', Date.parse('2026-11-16T12:00:00+01:00'), [], content, key('Kodowiec')).reason, 'unknown');
+  });
+
   test('the rewards in words, and the resources added to what the character has', () => {
     assert.equal(giftRewardsText(tester.rewards, content), 'Punkty Systemu +100, Punkty Czasu +100, złoto +1000, drewno +100, kamień +100, ruda żelaza +100');
     assert.deepEqual(withGiftResources({ wood: 5 }, tester.rewards), { wood: 105, stone: 100, 'iron-ore': 100 });
