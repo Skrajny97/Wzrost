@@ -2,6 +2,7 @@
 // points (chosen here, sent together with "Zatwierdź") and combat values,
 // with the Parametry dodatkowe window behind them.
 
+import { scrollArt } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { formatDecimal, formatHours, formatNumber, formatPrecise, plural } from '../format.js';
 import { t } from '../i18n.js';
@@ -244,9 +245,12 @@ export function mountStats(container) {
           text: t('Wyzeruj punkty'),
           onClick: async (event) => {
             const button = event.currentTarget;
+            // Past the free reset's level a Zwój Niepamięci goes with it (989).
             const sure = await confirmAction({
               title: t('Wyzerować punkty?'),
-              text: t('Wszystkie rozdane punkty wrócą do puli. Do poziomu {level} zerowanie jest darmowe.', { level: state.content.freeResetMaxLevel }),
+              text: character.resetWithScroll
+                ? t('Wszystkie rozdane punkty wrócą do puli i rozdasz je od nowa. Zużyjesz na to Zwój Niepamięci (masz {count}).', { count: formatNumber(character.oblivionScrolls) })
+                : t('Wszystkie rozdane punkty wrócą do puli. Do poziomu {level} zerowanie jest darmowe.', { level: state.content.freeResetMaxLevel }),
               confirmLabel: t('Wyzeruj'),
             });
             if (sure) {
@@ -259,7 +263,17 @@ export function mountStats(container) {
         })
       : null;
     if (character.freePoints === 0 && !reset && pendingTotal === 0) return null;
-    return h('div', { class: 'stat-actions' }, auto, manual, reset);
+    return [
+      h('div', { class: 'stat-actions' }, auto, manual, reset),
+      // The Zwój Niepamięci the character holds (989, mock-up 989.2).
+      character.resetWithScroll &&
+        h(
+          'p',
+          { class: 'muted stat-scroll' },
+          scrollArt('oblivion-scroll', 32),
+          h('span', { text: t('Masz Zwój Niepamięci ({count}): wyzerujesz nim punkty za darmo.', { count: formatNumber(character.oblivionScrolls) }) }),
+        ),
+    ];
   }
 
   // The free points by sliders: one for each stat, from the points chosen

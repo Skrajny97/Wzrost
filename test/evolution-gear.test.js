@@ -111,3 +111,36 @@ describe('Ewolucje, które zmieniają broń (988) through the API', () => {
     assert.equal(refused.data?.error?.code, 'wrong_class', JSON.stringify(refused.data));
   });
 });
+
+describe('Zwój Niepamięci (989)', () => {
+  const { call, db, signUp } = useServer();
+
+  test('past the free reset\'s level a Zwój Niepamięci resets the points once, and goes', async () => {
+    const { cookie } = await signUp('niepamiec');
+    await call('POST', '/api/character', { cookie, body: { name: 'Niepamiec', classId: 'mage', appearance: 'female' } });
+    const database = await db();
+    const set = (sql, ...binds) => database.prepare(`UPDATE characters SET ${sql} WHERE name = 'Niepamiec'`).bind(...binds).run();
+    await set('level = 40, class_level = 40');
+    await call('POST', '/api/character/points/auto', { cookie });
+    let view = (await call('GET', '/api/character', { cookie })).data.character;
+    assert.deepEqual([view.canResetPoints, view.oblivionScrolls, view.resetWithScroll], [false, 0, false]);
+    assert.equal((await call('POST', '/api/character/points/reset', { cookie })).data.error.code, 'reset_locked');
+    // One scroll, as every character got one.
+    await set('oblivion_scrolls = 1');
+    view = (await call('GET', '/api/character', { cookie })).data.character;
+    assert.deepEqual([view.canResetPoints, view.oblivionScrolls, view.resetWithScroll], [true, 1, true]);
+    const reset = await call('POST', '/api/character/points/reset', { cookie });
+    assert.equal(reset.status, 200, JSON.stringify(reset.data));
+    assert.deepEqual([reset.data.character.oblivionScrolls, reset.data.character.canResetPoints], [0, false]);
+    const row = await database.prepare("SELECT points, oblivion_scrolls FROM characters WHERE name = 'Niepamiec'").first();
+    assert.deepEqual([JSON.parse(row.points), row.oblivion_scrolls], [{}, 0]);
+    // Once.
+    await call('POST', '/api/character/points/auto', { cookie });
+    assert.equal((await call('POST', '/api/character/points/reset', { cookie })).data.error.code, 'reset_locked');
+    // Up to the free reset's level the scroll stays.
+    await set('level = 10, class_level = 10, oblivion_scrolls = 1');
+    await call('POST', '/api/character/points/auto', { cookie });
+    const free = await call('POST', '/api/character/points/reset', { cookie });
+    assert.deepEqual([free.status, free.data.character.oblivionScrolls], [200, 1]);
+  });
+});

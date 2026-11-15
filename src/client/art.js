@@ -420,7 +420,7 @@ export const SPRITES = {
   // scrolls, the Zwój ochronny and the Zwój utrwalenia (598 C).
   icons: {
     size: 32,
-    ids: ['gold', 'time-points', 'encyclopedia', 'ward-scroll', 'steady-scroll'],
+    ids: ['gold', 'time-points', 'encyclopedia', 'ward-scroll', 'steady-scroll', 'oblivion-scroll'],
   },
   // The professions' squares on the Profesje tab, 48×48.
   professions: {
@@ -700,7 +700,8 @@ function iconArt(id, size, fallback) {
 export const goldArt = (size) => iconArt('gold', size, 'coin');
 export const timePointsArt = (size) => iconArt('time-points', size, 'hourglass');
 export const encyclopediaArt = (size) => iconArt('encyclopedia', size, 'book');
-// A scroll of the Kowadło by its id (ward-scroll, steady-scroll).
+// A scroll by its id: the Kowadło's (ward-scroll, steady-scroll) and the
+// Zwój Niepamięci (oblivion-scroll, 989).
 export const scrollArt = (id, size) => iconArt(id, size, 'scroll');
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
 // The pictures of the Labirynt Systemu and the Rdzeń (art/labyrinth/, 850–866,

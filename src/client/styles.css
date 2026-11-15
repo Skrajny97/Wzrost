@@ -2645,6 +2645,14 @@ a.segmented-option {
   gap: 10px;
 }
 
+/* The Zwój Niepamięci under the buttons (989, mock-up 989.2). */
+.stat-scroll {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
 .legend {
   display: flex;
   flex-wrap: wrap;

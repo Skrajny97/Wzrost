@@ -1682,7 +1682,12 @@ export function characterView(player, now) {
     // has not decided: all the points there will be to give out again, from
     // the character's levels, the class's levels and events.
     evolutionReset: row.evolution_reset && spent > 0 ? pointSources(character, content()) : null,
-    canResetPoints: row.level <= content().balance.progression.freeResetMaxLevel && spent > 0,
+    canResetPoints: (row.level <= content().balance.progression.freeResetMaxLevel || (row.oblivion_scrolls ?? 0) > 0) && spent > 0,
+    // The Zwoje Niepamięci it holds (989): each resets the points once, free,
+    // past the level of the free reset; `resetWithScroll`, whether "Wyzeruj
+    // punkty" takes one now.
+    oblivionScrolls: row.oblivion_scrolls ?? 0,
+    resetWithScroll: row.level > content().balance.progression.freeResetMaxLevel && (row.oblivion_scrolls ?? 0) > 0,
     stats: content().stats.map((stat) => ({
       id: stat.id,
       name: stat.name,
@@ -2274,16 +2279,20 @@ export function characterRemoval(db, id, now) {
   ];
 }
 
-async function savePoints(context, player, points) {
+// `scroll`: a Zwój Niepamięci goes with it (989), only while there is one.
+async function savePoints(context, player, points, { scroll = false } = {}) {
   const result = await context.env.DB.prepare(
-    'UPDATE characters SET points = ?, version = version + 1 WHERE id = ? AND version = ?',
+    `UPDATE characters SET points = ?, ${scroll ? 'oblivion_scrolls = oblivion_scrolls - 1, ' : ''}version = version + 1 WHERE id = ? AND version = ?${scroll ? ' AND oblivion_scrolls > 0' : ''}`,
   )
     .bind(JSON.stringify(points), player.row.id, player.row.version)
     .run();
   if (result.meta.changes !== 1) {
     throw new ApiError(409, 'conflict', 'Postać zmieniła się w międzyczasie. Spróbuj ponownie.');
   }
-  const updated = { ...player, row: { ...player.row, points: JSON.stringify(points), version: player.row.version + 1 } };
+  const updated = {
+    ...player,
+    row: { ...player.row, points: JSON.stringify(points), version: player.row.version + 1, ...(scroll && { oblivion_scrolls: player.row.oblivion_scrolls - 1 }) },
+  };
   return json({ character: characterView(updated, context.now) });
 }
 
@@ -2318,14 +2327,17 @@ export async function autoPoints(context) {
   return savePoints(context, player, autoDistribute(character, content()));
 }
 
+// POST /api/character/points/reset: every point given out back in the pool,
+// free up to freeResetMaxLevel, and past it for a Zwój Niepamięci (989).
 export async function resetPoints(context) {
   const { player } = await requireBuildPlayer(context);
-  if (player.row.level > content().balance.progression.freeResetMaxLevel) {
+  const free = player.row.level <= content().balance.progression.freeResetMaxLevel;
+  if (!free && (player.row.oblivion_scrolls ?? 0) <= 0) {
     throw new ApiError(
       403,
       'reset_locked',
       `Darmowe zerowanie punktów jest dostępne do poziomu ${content().balance.progression.freeResetMaxLevel}.`,
     );
   }
-  return savePoints(context, player, {});
+  return savePoints(context, player, {}, { scroll: !free });
 }

@@ -3339,5 +3339,8 @@
   "Nie masz takiej karty efektu.": "You don't have such an effect card.",
   "Ta karta efektu jest już zagrana.": "This effect card has already been played.",
   "Wskaż swoją kartę, która stoi w linii.": "Point at your card standing in a line.",
-  "Wskaż kartę rywala, która stoi w linii.": "Point at the rival's card standing in a line."
+  "Wskaż kartę rywala, która stoi w linii.": "Point at the rival's card standing in a line.",
+  "Masz Zwój Niepamięci ({count}): wyzerujesz nim punkty za darmo.": "You have a Scroll of Oblivion ({count}): it resets your points for free.",
+  "Wszystkie rozdane punkty wrócą do puli i rozdasz je od nowa. Zużyjesz na to Zwój Niepamięci (masz {count}).": "All the points you have given out go back to the pool and you give them out anew. It uses up a Scroll of Oblivion (you have {count}).",
+  "niepamięci": "oblivion"
 }
