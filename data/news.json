@@ -1040,6 +1040,11 @@
       "id": "0.3.64",
       "title": "Wersja 0.3.64",
       "body": "- Ewolucje, które zmieniają broń. Nekromanta i Licz walczą kosturami i fokusami Maga, a cała ich Zręczność liczy się jako Intelekt. Strzelec Burzy, Władca Piorunów i Wybraniec Peruna biją z łuku Intelektem, a Łowca, Mistrz Łowów i Władca Puszczy Siłą. Wielki Inkwizytor i Pogromca Demonów walczą mieczami i toporami Wojownika, które biją Sakrum, a ich Intelekt liczy się jako Siła.\n- Truciciel dostaje co poziom klasy Zręczność zamiast Intelektu, a Inkwizytor Intelekt zamiast Siły.\n- Broń, którą te postacie noszą, sama zmieniła się w nowy rodzaj tej samej rzadkości, poziomu i ulepszenia, z tymi samymi afiksami. Pierścienie i zbroje dalej działają.\n- Każda postać dostała Zwój Niepamięci: w Statystykach wyzerujesz nim rozdane punkty i rozdasz je od nowa, za darmo."
+    },
+    {
+      "id": "0.3.65",
+      "title": "Wersja 0.3.65",
+      "body": "- Każda ewolucja daje Zwój Niepamięci od Systemu: pierwsza, druga i trzecia, a także zmiana ewolucji u Sambora. Darmowe zerowanie zaraz po pierwszej ewolucji zostaje i nie zużywa zwoju.\n- Sambor sprzedaje Zwój Niepamięci zamiast zerować statystyki, za tyle samo złota co dotąd. Sprzedaje jeden, gdy nie masz żadnego.\n- Po zmianie ewolucji u Sambora broń i druga ręka same zmieniają się w broń nowej formy, więc postać nie zostaje bez broni."
     }
   ]
 }

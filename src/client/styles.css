@@ -8507,6 +8507,20 @@ button.skill-row {
   font-size: 26px;
 }
 
+/* The Zwój Niepamięci every evolution brings, under its trait. */
+.evolution-scroll {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  text-align: left;
+}
+
+.evolution-scroll > :first-child {
+  flex: none;
+}
+
 /* The transformation at an evolution (evolution.js): the old form in the
    System's spring, light gathering on it, a white flash and the new form in
    its place; then the ceremony's sheet over the new form, dimming it less.

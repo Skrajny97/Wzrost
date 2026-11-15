@@ -9,7 +9,7 @@
 // class, or the next form of the one the character has, at any level and
 // can undo the test.
 
-import { placeArt, portraitSprite } from './art.js';
+import { placeArt, portraitSprite, scrollArt } from './art.js';
 import { h } from './dom.js';
 import { formatNumber } from './format.js';
 import { t } from './i18n.js';
@@ -80,7 +80,7 @@ export async function chooseEvolution(button, evolution, { test = false } = {}) 
   const from = state.character?.evolution?.current?.id ?? null;
   await withButton(button, async () => {
     const result = await call('POST', '/api/evolution', { evolutionId: evolution.id, test });
-    ceremony(result.evolution, { from });
+    ceremony(result.evolution, { from, scroll: result.oblivionScroll === true });
   });
 }
 
@@ -149,8 +149,9 @@ function transformation(fromId, toId) {
 
 // The ceremony: the change in light, then the System's words over the
 // evolution's music, which gives way to the tab's own once the sheet closes.
-// `from`: the form the character had (its last form's id, or null).
-export async function ceremony(evolution, { from = null } = {}) {
+// `from`: the form the character had (its last form's id, or null);
+// `scroll`: the Zwój Niepamięci the evolution brought (none in a test).
+export async function ceremony(evolution, { from = null, scroll = false } = {}) {
   const words = texts();
   setMusicPlace(['evolution']);
   const change = transformation(from, evolution.id);
@@ -163,6 +164,9 @@ export async function ceremony(evolution, { from = null } = {}) {
       h('h2', { class: 'sheet-title evolution-ceremony-title', text: filled(words.ceremony, { name: evolution.name }) }),
       h('p', { class: 'sheet-text', text: filled(words.ceremonyLine, { name: evolution.name }) }),
       traitLine(evolution.trait),
+      // The author, 15.11.2026: „Niech zwój niepamięci przysługuje darmo od
+      // systemu każdemu po każdej ewolucji postaci”.
+      scroll && h('p', { class: 'sheet-text evolution-scroll' }, scrollArt('oblivion-scroll', 48), h('span', { text: words.scrollGift })),
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--system', onClick: closeSheet, text: t('Dalej') })),
     ),
   );

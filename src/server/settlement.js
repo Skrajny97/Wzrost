@@ -377,10 +377,12 @@ export function settlementView(player, stored, board, now) {
     forge: forgeView(player, stored, now),
     tannery: tanneryView(player, stored, now),
     imbue: imbueView(player),
-    // After an evolution the paths change with it, so no path reset.
+    // After an evolution the paths change with it, so no path reset. The
+    // Zwój Niepamięci at its price, past the free reset's level, and
+    // whether the character holds one already (hermitService).
     hermit: {
       path: player.row.evolution ? null : pathResetCost(player.row.level, content()),
-      stats: statResetCost(player.row.level, content()),
+      scroll: scrollView(player.row),
       evolution: evolutionChangeView(player.row, stored),
       time: timePointsView(stored, now),
     },
@@ -1629,14 +1631,28 @@ export async function chooseReforged(context) {
   return json({ item: saved, result: reforgeResult(beforeReforge(pending), saved, pending.affix), character: characterView(after, context.now) });
 }
 
-// { service: "path" | "stats" | "evolution", evolutionId }: the Pustelnik's
-// services for gold. "path" gives back the Skill Points of the class's
-// skills, so the paths can be chosen anew (question 122 A), not after an
-// evolution, whose paths change with it; "stats" gives back the stat points
-// above the free reset's level (question 124 A); "evolution" changes the
+// The Zwój Niepamięci at the Pustelnik's for the page: its price past the
+// free reset's level (null below it, where the reset is free in the
+// Statystyki) and the scrolls the character holds, as he sells one only to
+// a character without one.
+function scrollView(row) {
+  const gold = statResetCost(row.level, content());
+  return gold === null ? null : { gold, owned: row.oblivion_scrolls ?? 0 };
+}
+
+// { service: "path" | "scroll" | "evolution", evolutionId }: the
+// Pustelnik's services for gold. "path" gives back the Skill Points of the
+// class's skills, so the paths can be chosen anew (question 122 A), not
+// after an evolution, whose paths change with it; "scroll" sells a Zwój
+// Niepamięci, which resets the stat points in the Statystyki, at the price
+// his reset of them had (question 124 A; the author, 15.11.2026: „niech
+// sprzedaje go Sambor (tak jakby to robi, ale nadajmy temu taką formę)”),
+// past the free reset's level and only to a character without one, so no
+// scrolls are laid up at a low level's price; "evolution" changes the
 // evolution for another of the class (question 123 A), with its skills from
-// the start and the free reset of the stat points as after the first one.
-// At home only, like the stat points and the skills.
+// the start, the free reset of the stat points as after the first one and a
+// Zwój Niepamięci, as every evolution brings. At home only, like the stat
+// points and the skills.
 export async function hermitService(context) {
   const body = await readJson(context.request);
   if (body.service === 'time') return buyTimePoints(context, body);
@@ -1646,21 +1662,22 @@ export async function hermitService(context) {
   const character = engineCharacter(row);
   if (body.service === 'evolution') return changeEvolution(context, session, player, body);
   let gold;
-  let set;
-  let value;
+  // What the service changes, with its value if it has one.
+  let change;
+  let binds = [];
   if (body.service === 'path') {
     if (character.evolution) throw new ApiError(409, 'evolved', 'Po ewolucji ścieżki zmieniają się razem z nią.');
     const skills = Object.fromEntries(Object.entries(character.skills).filter(([id]) => content().skillsById[id]?.evolution));
     if (Object.keys(skills).length === Object.keys(character.skills).length) throw new ApiError(409, 'nothing_to_reset', 'Nie masz jeszcze żadnej ścieżki do wyzerowania.');
     gold = pathResetCost(row.level, content());
-    set = 'skills';
-    value = skills;
-  } else if (body.service === 'stats') {
-    gold = statResetCost(row.level, content());
-    if (gold === null) throw new ApiError(409, 'free_reset', 'Do tego poziomu punkty wyzerujesz za darmo w Statystykach.');
-    if (Object.keys(character.points).length === 0) throw new ApiError(409, 'nothing_to_reset', 'Nie masz rozdanych punktów do wyzerowania.');
-    set = 'points';
-    value = {};
+    change = 'skills = ?';
+    binds = [JSON.stringify(skills)];
+  } else if (body.service === 'scroll') {
+    const offer = scrollView(row);
+    if (!offer) throw new ApiError(409, 'free_reset', 'Do tego poziomu punkty wyzerujesz za darmo w Statystykach.');
+    if (offer.owned > 0) throw new ApiError(409, 'scroll_owned', 'Masz już Zwój Niepamięci. Pustelnik sprzeda Ci kolejny, gdy go zużyjesz.');
+    gold = offer.gold;
+    change = 'oblivion_scrolls = oblivion_scrolls + 1';
   } else {
     throw new ApiError(400, 'invalid_service', 'Pustelnik tego nie robi.');
   }
@@ -1669,8 +1686,8 @@ export async function hermitService(context) {
   const relations = grow(stored.relations, content().settlement.hermit);
   const db = context.env.DB;
   const result = await db
-    .prepare(`UPDATE characters SET gold = gold - ?, ${set} = ?, settlement = ?, version = version + 1 WHERE id = ? AND version = ? AND gold >= ?`)
-    .bind(gold, JSON.stringify(value), JSON.stringify({ ...stored, relations }), row.id, row.version, gold)
+    .prepare(`UPDATE characters SET gold = gold - ?, ${change}, settlement = ?, version = version + 1 WHERE id = ? AND version = ? AND gold >= ?`)
+    .bind(gold, ...binds, JSON.stringify({ ...stored, relations }), row.id, row.version, gold)
     .run();
   if (result.meta.changes !== 1) throw changed();
   return json({ gold, character: characterView(await loadPlayer(db, session.userId), context.now) });
@@ -1721,13 +1738,13 @@ async function changeEvolution(context, session, player, body) {
   const db = context.env.DB;
   const result = await db
     .prepare(
-      `UPDATE characters SET gold = gold - ?, evolution = ?, skills = ?, evolution_reset = ?, settlement = ?, version = version + 1
+      `UPDATE characters SET gold = gold - ?, evolution = ?, skills = ?, evolution_reset = ?, oblivion_scrolls = oblivion_scrolls + 1, settlement = ?, version = version + 1
        WHERE id = ? AND version = ? AND gold >= ? AND evolution IS NOT NULL`,
     )
     .bind(offer.price, body.evolutionId, JSON.stringify(evolvedSkills(body.evolutionId, content())), spentPoints(engineCharacter(row)) > 0 ? 1 : 0, JSON.stringify(next), row.id, row.version, offer.price)
     .run();
   if (result.meta.changes !== 1) throw changed();
-  return json({ gold: offer.price, character: characterView(await loadPlayer(db, session.userId), context.now) });
+  return json({ gold: offer.price, oblivionScroll: true, character: characterView(await loadPlayer(db, session.userId), context.now) });
 }
 
 // "Testuj Osadę" on the test version, for the accounts with test mode

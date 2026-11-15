@@ -34,7 +34,10 @@ function requireTests(context, session) {
 // evolution's free reset waits for the player's decision; a later form
 // keeps the points as they are (a reset still waiting stays). A test keeps
 // the skills from before the first test, so "Cofnij ewolucję" goes back to
-// them.
+// them. Every evolution taken for good, the first, the second and the
+// third, brings a Zwój Niepamięci from the System (the author, 15.11.2026:
+// „Niech zwój niepamięci przysługuje darmo od systemu każdemu po każdej
+// ewolucji postaci”); a test, which can be undone, brings none.
 export async function takeEvolution(context) {
   requireEvolutions();
   const { session, player } = await requireBuildPlayer(context);
@@ -51,14 +54,14 @@ export async function takeEvolution(context) {
   const result = await db
     .prepare(
       `UPDATE characters SET evolution = ?, skills = ?, evolution_undo = CASE WHEN ? THEN COALESCE(evolution_undo, skills) ELSE evolution_undo END,
-         evolution_reset = ?, version = version + 1
+         evolution_reset = ?, oblivion_scrolls = oblivion_scrolls + ?, version = version + 1
        WHERE id = ? AND version = ? AND evolution IS ?`,
     )
-    .bind(evolutionId, JSON.stringify(evolvedSkills(evolutionId, content())), test ? 1 : 0, reset, player.row.id, player.row.version, target.from ?? null)
+    .bind(evolutionId, JSON.stringify(evolvedSkills(evolutionId, content())), test ? 1 : 0, reset, test ? 0 : 1, player.row.id, player.row.version, target.from ?? null)
     .run();
   if (result.meta.changes !== 1) throw conflict();
   const fresh = await loadPlayer(db, session.userId);
-  return json({ evolution: evolutionView(target, content(), character), character: characterView(fresh, context.now) });
+  return json({ evolution: evolutionView(target, content(), character), oblivionScroll: !test, character: characterView(fresh, context.now) });
 }
 
 // GET /api/evolution/test: every evolution of the class to try, or the

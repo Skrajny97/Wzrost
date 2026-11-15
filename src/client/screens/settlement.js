@@ -737,22 +737,35 @@ export function mountSettlement(container, { params = {} } = {}) {
     }
   }
 
-  // A Pustelnik's reset, after the player says yes.
-  const hermitButton = (service, label, text) =>
+  // A Pustelnik's reset, or his Zwój Niepamięci (`sale`: its question's
+  // title, its button and what the toast says), after the player says yes.
+  const hermitButton = (service, label, text, sale = null) =>
     h('button', {
       type: 'button',
       class: 'button button--world button--small',
       text: label,
       onClick: async (event) => {
         const button = event.currentTarget;
-        if (!(await confirmAction({ title: t('Zerowanie u Pustelnika'), text, confirmLabel: t('Zeruj') }))) return;
+        if (!(await confirmAction({ title: sale?.title ?? t('Zerowanie u Pustelnika'), text, confirmLabel: sale?.confirmLabel ?? t('Zeruj') }))) return;
         withButton(button, async () => {
           const answer = await call('POST', '/api/settlement/hermit', { service });
-          toast(t('Pustelnik wziął {gold} złota. Gotowe.', { gold: formatNumber(answer.gold) }));
+          const gold = formatNumber(answer.gold);
+          toast(sale ? sale.done(gold) : t('Pustelnik wziął {gold} złota. Gotowe.', { gold }));
           load();
         });
       },
     });
+
+  // The Zwój Niepamięci at the Pustelnik's (the author, 15.11.2026: „niech
+  // sprzedaje go Sambor”), one while the character holds none.
+  const scrollButton = (offer) =>
+    offer.owned > 0
+      ? h('button', { type: 'button', class: 'button button--world button--small', disabled: true, text: t('Zwój Niepamięci: masz już jeden') })
+      : hermitButton('scroll', t('Kup Zwój Niepamięci ({gold} zł.)', { gold: formatNumber(offer.gold) }), t('Zwojem wyzerujesz rozdane punkty statystyk w Statystykach, kiedy zechcesz.'), {
+          title: t('Zwój Niepamięci od Pustelnika'),
+          confirmLabel: t('Kupuję'),
+          done: (gold) => t('Pustelnik sprzedał Ci Zwój Niepamięci za {gold} złota.', { gold }),
+        });
 
   // The affixes a reforging drew, waiting in the Osada for the one the
   // player keeps: the sheet picks up there.
@@ -793,7 +806,8 @@ export function mountSettlement(container, { params = {} } = {}) {
                 withButton(button, async () => {
                   await call('POST', '/api/settlement/hermit', { service: 'evolution', evolutionId: choice.id });
                   closeSheet();
-                  toast(t('Nowa ewolucja: {name}.', { name: choice.name }));
+                  // With the Zwój Niepamięci every evolution brings.
+                  toast(t('Nowa ewolucja: {name}. System daje Ci Zwój Niepamięci.', { name: choice.name }));
                   load();
                 });
               },
@@ -1398,8 +1412,7 @@ export function mountSettlement(container, { params = {} } = {}) {
           t('Wyzeruj ścieżkę ({gold} zł.)', { gold: formatNumber(data.hermit.path) }),
           t('Umiejętności klasy wrócą jako Punkty Umiejętności, a ścieżki wybierzesz od nowa.'),
         ),
-      data.hermit.stats !== null &&
-        hermitButton('stats', t('Wyzeruj statystyki ({gold} zł.)', { gold: formatNumber(data.hermit.stats) }), t('Wszystkie rozdane punkty statystyk wrócą do rozdania.')),
+      data.hermit.scroll && scrollButton(data.hermit.scroll),
       data.hermit.evolution &&
         h('button', {
           type: 'button',
