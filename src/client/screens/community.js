@@ -747,7 +747,8 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   const hidden = h('div', { class: 'chat-hidden' });
   const room = h('div', { class: 'chat-room' }, empty, list, footer);
 
-  const tabs = h('div', { class: 'chat-tabs', role: 'tablist', 'aria-label': t('Rozmowy') });
+  // On a computer the tabs wrap into rows (styles.css, .chat-tabs--rooms).
+  const tabs = h('div', { class: 'chat-tabs chat-tabs--rooms', role: 'tablist', 'aria-label': t('Rozmowy') });
   fill(bar, tabs);
   fill(container, notices, hidden, room);
 

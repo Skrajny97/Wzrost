@@ -3309,6 +3309,14 @@ Autor zapytał, czemu część graczy nie ma pakietu trzech kart u Szczęsnego (
 5. **Przy okazji:** zasady kart mówiły „najwyżej +15% za wszystkie 156 kart”, a od Łysogór kart jest 207, więc teraz: „najwyżej +15%, od 150 kart”.
 6. **Dalej:** animacja otwierania pakietu. Obrazek pakietu w PixelLab i makieta animacji (MP4 z telefonu) idą na stronę ocen, a do gry po akceptacji.
 
+## Zakładki czatu na komputerze (15.11.2026, od 0.3.62)
+
+Gracz (poz. 49) na komputerze: „da się jakoś przewijać zakładki czatu w przeglądarce na pc? nie wszystkie są widoczne i nie widać też przez to powiadomień o wiadomości”.
+
+1. **Przyczyna:** zakładki czatu (kanały i prywatne rozmowy) stały w jednym rzędzie, przewijanym w bok z ukrytym paskiem. Na telefonie przesuwa się go palcem, ale myszą nie da się go przewinąć. W wąskiej kolumnie czatu na komputerze (side.js) mieszczą się trzy, cztery zakładki, a reszta, także z kropką nowej wiadomości, była niewidoczna.
+2. **Teraz:** w układzie komputerowym zakładki czatu przechodzą do kolejnych rzędów, więc widać wszystkie i ich kropki. Zakładki są tam nieco niższe (34 px), żeby rzędy zabierały mniej miejsca (`.chat-tabs--rooms` w `src/client/styles.css`).
+3. Na telefonie bez zmian: jeden rząd przesuwany palcem.
+
 ## Statystyka ewolucji w jej umiejętnościach (980 B, 986 B, 987 B; 15.11.2026, od 0.3.60)
 
 Gracz zapytał autora: „czemu na nekromancie pokazuje ze intelekt nic nie daje?”. Autor wybrał 980 B (Intelekt i Siła zaczynają działać u tych ewolucji na ich umiejętności), a z liczb pytania 986 wersję B (statystyka liczy się podwójnie).
@@ -3371,6 +3379,10 @@ Autor: „Niech oznaczanie na czacie będzie możliwe też po nazwie konta”.
 1. „@” i nazwa konta oznacza postać, którą to konto teraz gra, na tych samych zasadach co imię postaci: tylko ten, kto czyta kanał, nigdy własne konto ani ktoś, kto ukrył piszącego, najwyżej 5 oznaczeń w wiadomości. Wielkość liter bez znaczenia (`src/server/mentions.js`).
 2. Postać oznaczona w jednej wiadomości i nazwą konta, i imieniem liczy się raz.
 3. Podpowiedzi pod polem wiadomości pokazują też nazwy kont piszących.
+
+## Wersja 0.3.62 (15.11.2026): zakładki czatu na komputerze w rzędach
+
+1. Na komputerze zakładki czatu przechodzą do kolejnych rzędów. Zob. „Zakładki czatu na komputerze”.
 
 ## Wersja 0.3.61 (15.11.2026): statystyka ewolucji raz na Arenie i w wojnach gildii
 

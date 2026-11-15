@@ -11423,6 +11423,20 @@ a.profession-square:active {
   display: none;
 }
 
+/* The chat's rooms and conversations on a computer: in rows, all of them in
+   sight with their lights, as a mouse cannot swipe the row sideways (a
+   player on a computer, 15.11.2026: „nie wszystkie są widoczne i nie widać
+   też przez to powiadomień o wiadomości”). */
+:root[data-layout='desktop'] .chat-tabs--rooms {
+  flex-wrap: wrap;
+  overflow: visible;
+}
+
+:root[data-layout='desktop'] .chat-tabs--rooms .chat-tab {
+  min-height: 34px;
+  padding-block: 2px;
+}
+
 .chat-tab {
   flex: none;
   display: inline-flex;
