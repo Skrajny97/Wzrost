@@ -3,10 +3,21 @@
   "title": "Talia Systemu",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "deckSize", "savedDecks", "deckNameLength", "hand", "roundCap", "lines", "types", "typeBonus", "stats", "drops", "starter", "heroes", "stakes", "pack", "live", "host", "residents", "bonuses", "texts"],
+  "required": ["name", "deckSize", "savedDecks", "deckNameLength", "hand", "roundCap", "lines", "types", "typeBonus", "stats", "drops", "starter", "heroes", "stakes", "pack", "effects", "live", "host", "residents", "bonuses", "texts"],
   "definitions": {
     "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
     "chance": { "type": "number", "minimum": 0, "maximum": 1 },
+    "effectDeck": {
+      "type": "array",
+      "maxItems": 2,
+      "description": "Karty efektów rywala (977.4 A): id karty z effects.cards i jej poziom.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "level"],
+        "properties": { "id": { "$ref": "#/definitions/id" }, "level": { "type": "integer", "minimum": 1 } }
+      }
+    },
     "texts": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
     "endTexts": {
       "type": "object",
@@ -147,6 +158,40 @@
         "relationDiscount": { "type": "array", "minItems": 1, "items": { "type": "number", "minimum": 0, "maximum": 0.9 } }
       }
     },
+    "effects": {
+      "description": "Karty efektów (976, 977): miejsca w talii, szansa w pakiecie, wagi rzadkości, rzadkość za pierwszą wygraną na stopniach, karty i słowa.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slots", "packChance", "weights", "firstWin", "cards", "texts"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "slots": { "type": "integer", "minimum": 1, "maximum": 4 },
+        "packChance": { "$ref": "#/definitions/chance" },
+        "weights": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "minimum": 0 } },
+        "firstWin": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/id" } },
+        "cards": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "name", "rarity", "kind", "target", "power", "perLevel", "text"],
+            "properties": {
+              "id": { "$ref": "#/definitions/id" },
+              "name": { "type": "string", "minLength": 1 },
+              "rarity": { "$ref": "#/definitions/id" },
+              "kind": { "type": "string", "enum": ["boost", "shield", "heal", "curse", "rally", "mist", "bind", "bolt"] },
+              "target": { "type": "string", "enum": ["own", "rival", "all"] },
+              "power": { "type": "number", "minimum": 0, "maximum": 1 },
+              "perLevel": { "type": "number", "minimum": 0 },
+              "most": { "type": "number", "minimum": 0, "maximum": 1 },
+              "text": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "texts": { "type": "object", "additionalProperties": { "type": "string", "minLength": 1 } }
+      }
+    },
     "live": {
       "description": "Partie na żywo z innymi graczami (901 B, src/engine/card-duel.js): wyzwanie czeka acceptSeconds sekund, pierwszy ruch rundy firstMoveSeconds sekund, odpowiedź turnSeconds sekund (i graceSeconds zapasu), missedRounds rund z rzędu bez ruchu to przegrana; zwycięzca zgarnia obie stawki bez udziału systemCut; o złoto od minLevel poziomu obu postaci, najwyżej perDay partii o złoto dziennie; wyzwanie odrzucone, przeterminowane albo wycofane do tej samej postaci znów po repeatSeconds sekundach.",
       "type": "object",
@@ -191,6 +236,7 @@
                 "properties": { "rarity": { "$ref": "#/definitions/id" } }
               },
               "smart": { "type": "integer", "minimum": 0, "maximum": 2 },
+              "effects": { "$ref": "#/definitions/effectDeck" },
               "cards": { "type": "array", "items": { "$ref": "#/definitions/card" } }
             }
           }
@@ -218,6 +264,7 @@
               "after": { "type": "integer", "minimum": 1, "description": "Stopień Szczęsnego, od którego talia jest mocniejsza; liczba stopni: mocniejsza od wszystkich." },
               "stake": { "type": "number", "exclusiveMinimum": 0, "description": "Stawka razy stawka podstawowa, między stawkami sąsiednich stopni." },
               "smart": { "type": "integer", "minimum": 0, "maximum": 2, "description": "Sposób gry, jak u Szczęsnego." },
+              "effects": { "$ref": "#/definitions/effectDeck" },
               "icon": { "$ref": "#/definitions/id", "description": "Ikona talii (src/client/icons.js)." },
               "gender": { "enum": ["f", "m"], "description": "Rodzaj mieszkańca w słowach gry." },
               "with": { "type": "string", "minLength": 1, "description": "„z Jagną”: w tytule „Karty z Jagną”." },
