@@ -1,0 +1,14 @@
+{
+  "id": "living-water",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small round clay flask with a cork, glowing blue-green living water spilling from it in a sparkling swirl, the illustration alone, no ground, no background, the whole of it inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023214501099480523
+  },
+  "images": 1
+}
