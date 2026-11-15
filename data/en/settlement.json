@@ -971,6 +971,51 @@
       },
       "bebok": {
         "name": "Bogeyman the Snatcher"
+      },
+      "marmot": {
+        "name": "Sentinel Marmot"
+      },
+      "chamois": {
+        "name": "Black-Horned Chamois"
+      },
+      "stone-rooster": {
+        "name": "Golden-Eyed Rooster"
+      },
+      "vulture": {
+        "name": "Hoary Vulture"
+      },
+      "stone-knight": {
+        "name": "Knight of the Throne"
+      },
+      "tarpan": {
+        "name": "Lead Tarpan"
+      },
+      "changeling": {
+        "name": "Wailing Changeling"
+      },
+      "kingfisher": {
+        "name": "Azure Kingfisher"
+      },
+      "hedge-witch": {
+        "name": "Herb Witch"
+      },
+      "empty-armor": {
+        "name": "Hetman's Armour"
+      },
+      "seeress": {
+        "name": "Blind Seeress"
+      },
+      "broom-witch": {
+        "name": "Witch Cook"
+      },
+      "cursed-piper": {
+        "name": "Infernal Piper"
+      },
+      "fate-spinner": {
+        "name": "Eldest Spinner"
+      },
+      "black-goose": {
+        "name": "Guardian Goose"
       }
     },
     "texts": {

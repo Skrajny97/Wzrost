@@ -1715,5 +1715,566 @@
     "attack": {
       "name": "Eclipse"
     }
+  },
+  "marmot": {
+    "name": "Marmot",
+    "counted": [
+      "Marmot",
+      "Marmots",
+      "Marmots"
+    ],
+    "attack": {
+      "name": "Sharp Incisors"
+    }
+  },
+  "roller": {
+    "name": "Roller",
+    "counted": [
+      "Roller",
+      "Rollers",
+      "Rollers"
+    ],
+    "attack": {
+      "name": "Dive"
+    }
+  },
+  "echo": {
+    "name": "Echo",
+    "counted": [
+      "Echo",
+      "Echoes",
+      "Echoes"
+    ],
+    "attack": {
+      "name": "Thundering Cry"
+    }
+  },
+  "chamois": {
+    "name": "Chamois",
+    "counted": [
+      "Chamois",
+      "Chamois",
+      "Chamois"
+    ],
+    "attack": {
+      "name": "Downhill Charge"
+    }
+  },
+  "wallcreeper": {
+    "name": "Wallcreeper",
+    "counted": [
+      "Wallcreeper",
+      "Wallcreepers",
+      "Wallcreepers"
+    ],
+    "attack": {
+      "name": "Cliff Peck"
+    }
+  },
+  "swift": {
+    "name": "Swift",
+    "counted": [
+      "Swift",
+      "Swifts",
+      "Swifts"
+    ],
+    "attack": {
+      "name": "Sickle Wings"
+    }
+  },
+  "stone-rooster": {
+    "name": "Stone Rooster",
+    "counted": [
+      "Stone Rooster",
+      "Stone Roosters",
+      "Stone Roosters"
+    ],
+    "attack": {
+      "name": "Stone Beak"
+    }
+  },
+  "cicada": {
+    "name": "Cicada",
+    "counted": [
+      "Cicada",
+      "Cicadas",
+      "Cicadas"
+    ],
+    "attack": {
+      "name": "Piercing Chirr"
+    }
+  },
+  "hoopoe": {
+    "name": "Hoopoe",
+    "counted": [
+      "Hoopoe",
+      "Hoopoes",
+      "Hoopoes"
+    ],
+    "attack": {
+      "name": "Stinking Beak"
+    }
+  },
+  "wolverine": {
+    "name": "Wolverine",
+    "counted": [
+      "Wolverine",
+      "Wolverines",
+      "Wolverines"
+    ],
+    "attack": {
+      "name": "Wolverine Claws"
+    }
+  },
+  "vulture": {
+    "name": "Vulture",
+    "counted": [
+      "Vulture",
+      "Vultures",
+      "Vultures"
+    ],
+    "attack": {
+      "name": "Rend"
+    }
+  },
+  "shrike": {
+    "name": "Shrike",
+    "counted": [
+      "Shrike",
+      "Shrikes",
+      "Shrikes"
+    ],
+    "attack": {
+      "name": "Dagger Beak"
+    }
+  },
+  "stone-knight": {
+    "name": "Stone Knight",
+    "counted": [
+      "Stone Knight",
+      "Stone Knights",
+      "Stone Knights"
+    ],
+    "attack": {
+      "name": "Stone Sword"
+    }
+  },
+  "dormouse": {
+    "name": "Dormouse",
+    "counted": [
+      "Dormouse",
+      "Dormice",
+      "Dormice"
+    ],
+    "attack": {
+      "name": "Night Bite"
+    }
+  },
+  "bee-eater": {
+    "name": "Bee-eater",
+    "counted": [
+      "Bee-eater",
+      "Bee-eaters",
+      "Bee-eaters"
+    ],
+    "attack": {
+      "name": "Arrow Flight"
+    }
+  },
+  "griffin": {
+    "name": "Griffin",
+    "counted": [
+      "Griffin",
+      "Griffins",
+      "Griffins"
+    ],
+    "attack": {
+      "name": "Griffin Talons"
+    }
+  },
+  "stolem": {
+    "name": "Stone Giant",
+    "counted": [
+      "Stone Giant",
+      "Stone Giants",
+      "Stone Giants"
+    ],
+    "attack": {
+      "name": "Boulder Throw"
+    }
+  },
+  "tarpan": {
+    "name": "Tarpan",
+    "counted": [
+      "Tarpan",
+      "Tarpans",
+      "Tarpans"
+    ],
+    "attack": {
+      "name": "Tarpan Hooves"
+    }
+  },
+  "jay": {
+    "name": "Jay",
+    "counted": [
+      "Jay",
+      "Jays",
+      "Jays"
+    ],
+    "attack": {
+      "name": "Jay's Screech"
+    }
+  },
+  "black-woodpecker": {
+    "name": "Black Woodpecker",
+    "counted": [
+      "Black Woodpecker",
+      "Black Woodpeckers",
+      "Black Woodpeckers"
+    ],
+    "attack": {
+      "name": "Woodpecker Chisel"
+    }
+  },
+  "wood-ant": {
+    "name": "Wood Ant",
+    "counted": [
+      "Wood Ant",
+      "Wood Ants",
+      "Wood Ants"
+    ],
+    "attack": {
+      "name": "Burning Acid"
+    }
+  },
+  "changeling": {
+    "name": "Changeling",
+    "counted": [
+      "Changeling",
+      "Changelings",
+      "Changelings"
+    ],
+    "attack": {
+      "name": "Hungry Bite"
+    }
+  },
+  "nightshade": {
+    "name": "Nightshade",
+    "counted": [
+      "Nightshade",
+      "Nightshades",
+      "Nightshades"
+    ],
+    "attack": {
+      "name": "Poison Berries"
+    }
+  },
+  "great-slug": {
+    "name": "Great Slug",
+    "counted": [
+      "Great Slug",
+      "Great Slugs",
+      "Great Slugs"
+    ],
+    "attack": {
+      "name": "Sticky Slime"
+    }
+  },
+  "mistletoe-leech": {
+    "name": "Mistletoe Leech",
+    "counted": [
+      "Mistletoe Leech",
+      "Mistletoe Leeches",
+      "Mistletoe Leeches"
+    ],
+    "attack": {
+      "name": "Latch On"
+    }
+  },
+  "kingfisher": {
+    "name": "Kingfisher",
+    "counted": [
+      "Kingfisher",
+      "Kingfishers",
+      "Kingfishers"
+    ],
+    "attack": {
+      "name": "Blue Dart"
+    }
+  },
+  "witch-cauldron": {
+    "name": "Cauldron",
+    "counted": [
+      "Cauldron",
+      "Cauldrons",
+      "Cauldrons"
+    ],
+    "attack": {
+      "name": "Poison Brew"
+    }
+  },
+  "witch-broom": {
+    "name": "Broom",
+    "counted": [
+      "Broom",
+      "Brooms",
+      "Brooms"
+    ],
+    "attack": {
+      "name": "Twig Lash"
+    }
+  },
+  "hedge-witch": {
+    "name": "Hedge Witch",
+    "counted": [
+      "Hedge Witch",
+      "Hedge Witches",
+      "Hedge Witches"
+    ],
+    "attack": {
+      "name": "Hex"
+    }
+  },
+  "empty-armor": {
+    "name": "Empty Armour",
+    "counted": [
+      "Empty Armour",
+      "Empty Armours",
+      "Empty Armours"
+    ],
+    "attack": {
+      "name": "Bewitched Sword"
+    }
+  },
+  "haunted-portrait": {
+    "name": "Portrait",
+    "counted": [
+      "Portrait",
+      "Portraits",
+      "Portraits"
+    ],
+    "attack": {
+      "name": "Freezing Gaze"
+    }
+  },
+  "black-grimoire": {
+    "name": "Black Grimoire",
+    "counted": [
+      "Black Grimoire",
+      "Black Grimoires",
+      "Black Grimoires"
+    ],
+    "attack": {
+      "name": "Fire Spell"
+    }
+  },
+  "cuckoo": {
+    "name": "Cuckoo",
+    "counted": [
+      "Cuckoo",
+      "Cuckoos",
+      "Cuckoos"
+    ],
+    "attack": {
+      "name": "Cuckoo's Count"
+    }
+  },
+  "twardowski": {
+    "name": "Master Twardowski",
+    "counted": [
+      "Master Twardowski",
+      "Master Twardowskis",
+      "Master Twardowskis"
+    ],
+    "attack": {
+      "name": "Black Magic"
+    }
+  },
+  "fire-wheel": {
+    "name": "Fire Wheel",
+    "counted": [
+      "Fire Wheel",
+      "Fire Wheels",
+      "Fire Wheels"
+    ],
+    "attack": {
+      "name": "Fiery Roll"
+    }
+  },
+  "nutcracker": {
+    "name": "Nutcracker",
+    "counted": [
+      "Nutcracker",
+      "Nutcrackers",
+      "Nutcrackers"
+    ],
+    "attack": {
+      "name": "Hard Beak"
+    }
+  },
+  "seeress": {
+    "name": "Seeress",
+    "counted": [
+      "Seeress",
+      "Seeresses",
+      "Seeresses"
+    ],
+    "attack": {
+      "name": "Ill Omen"
+    }
+  },
+  "mortar": {
+    "name": "Mortar",
+    "counted": [
+      "Mortar",
+      "Mortars",
+      "Mortars"
+    ],
+    "attack": {
+      "name": "Pestle Pound"
+    }
+  },
+  "witch-hare": {
+    "name": "Witch Hare",
+    "counted": [
+      "Witch Hare",
+      "Witch Hares",
+      "Witch Hares"
+    ],
+    "attack": {
+      "name": "Hare Fangs"
+    }
+  },
+  "broom-witch": {
+    "name": "Witch",
+    "counted": [
+      "Witch",
+      "Witches",
+      "Witches"
+    ],
+    "attack": {
+      "name": "Broomstick Hex"
+    }
+  },
+  "dance-frenzy": {
+    "name": "Dance Wraith",
+    "counted": [
+      "Dance Wraith",
+      "Dance Wraiths",
+      "Dance Wraiths"
+    ],
+    "attack": {
+      "name": "Dance Frenzy"
+    }
+  },
+  "magpie": {
+    "name": "Magpie",
+    "counted": [
+      "Magpie",
+      "Magpies",
+      "Magpies"
+    ],
+    "attack": {
+      "name": "Magpie Peck"
+    }
+  },
+  "cursed-piper": {
+    "name": "Cursed Piper",
+    "counted": [
+      "Cursed Piper",
+      "Cursed Pipers",
+      "Cursed Pipers"
+    ],
+    "attack": {
+      "name": "Cursed Tune"
+    }
+  },
+  "offering-oven": {
+    "name": "Offering Oven",
+    "counted": [
+      "Offering Oven",
+      "Offering Ovens",
+      "Offering Ovens"
+    ],
+    "attack": {
+      "name": "Ember Breath"
+    }
+  },
+  "wax-doll": {
+    "name": "Wax Doll",
+    "counted": [
+      "Wax Doll",
+      "Wax Dolls",
+      "Wax Dolls"
+    ],
+    "attack": {
+      "name": "Pins"
+    }
+  },
+  "fate-spinner": {
+    "name": "Fate Spinner",
+    "counted": [
+      "Fate Spinner",
+      "Fate Spinners",
+      "Fate Spinners"
+    ],
+    "attack": {
+      "name": "Cut Thread"
+    }
+  },
+  "hen-leg-hut": {
+    "name": "Hut on Chicken Legs",
+    "counted": [
+      "Hut on Chicken Legs",
+      "Huts on Chicken Legs",
+      "Huts on Chicken Legs"
+    ],
+    "attack": {
+      "name": "Chicken Kick"
+    }
+  },
+  "black-goose": {
+    "name": "Black Goose",
+    "counted": [
+      "Black Goose",
+      "Black Geese",
+      "Black Geese"
+    ],
+    "attack": {
+      "name": "Pinch"
+    }
+  },
+  "burning-skull": {
+    "name": "Burning Skull",
+    "counted": [
+      "Burning Skull",
+      "Burning Skulls",
+      "Burning Skulls"
+    ],
+    "attack": {
+      "name": "Burning Gaze"
+    }
+  },
+  "kostucha": {
+    "name": "Lady Death",
+    "counted": [
+      "Lady Death",
+      "Lady Deaths",
+      "Lady Deaths"
+    ],
+    "attack": {
+      "name": "Scythe Sweep"
+    }
+  },
+  "baba-yaga": {
+    "name": "Baba Yaga",
+    "counted": [
+      "Baba Yaga",
+      "Baba Yagas",
+      "Baba Yagas"
+    ],
+    "attack": {
+      "name": "Baba Yaga's Curse"
+    }
   }
 }

@@ -247,5 +247,98 @@
         "description": "A glade over which the moon never rises. Abominations crawl along its edge, Tanglelocks roll through the grass, and a Bogeyman waits with a sack for whoever falls behind. Here lives the Moon-Eater."
       }
     }
+  },
+  "scree-slopes": {
+    "land": "Bald Mountains",
+    "name": "Scree Fields",
+    "description": "Grey rivers of rock on the slopes of the Bald Mountains, where nothing grows and the wind whistles between the boulders. People say these are the stones the devils were carrying to Bald Mountain and dropped when the rooster crowed.",
+    "trait": {
+      "name": "Rubble",
+      "description": "Mire delays the next move half as long again, for creatures and characters alike."
+    },
+    "areas": {
+      "grey-scree": {
+        "name": "Grey Scree",
+        "description": "A sea of grey boulders overgrown with lichen. Marmots whistle among the stones, and every shout comes back a hundredfold as an echo."
+      },
+      "windy-ridge": {
+        "name": "Windy Ridge",
+        "description": "A narrow ridge where the wind sweeps you off your feet. Chamois leap across the rocks, and swifts dart screeching above them."
+      },
+      "devils-stones": {
+        "name": "Devil's Stones",
+        "description": "Huge boulders bearing the prints of devils' paws. In the middle stands a stone rooster that crowed before the devils could carry the stones to the summit."
+      },
+      "vulture-crags": {
+        "name": "Vulture Crags",
+        "description": "Rock towers over an abyss, with vultures' nests on them. The ground below is white with bones, and the shrike's prey hangs on the thorns."
+      },
+      "stone-throne": {
+        "name": "Stone Throne",
+        "description": "At the top of the scree the boulders have settled into a throne. Around it sleep knights turned to stone, dormice and bee-eaters live in the cracks, and on the throne sits the Stone Giant."
+      }
+    }
+  },
+  "fir-forest": {
+    "land": "Bald Mountains",
+    "name": "Fir Forest",
+    "description": "A dark fir forest on the slopes of the Bald Mountains. Witches walk its paths to the sabbath, and whoever strays from them never comes back.",
+    "trait": {
+      "name": "Fir Shade",
+      "description": "A character in the middle of the line has 5% more dodge, hidden in the shade of the firs."
+    },
+    "areas": {
+      "fir-slope": {
+        "name": "Fir Slope",
+        "description": "A steep slope of old firs, always in twilight. Wild tarpans graze among the trunks, and jays warn the forest with their screeching."
+      },
+      "witches-path": {
+        "name": "Witches' Path",
+        "description": "A trodden path the witches take to the sabbath. Anthills as big as haystacks line it, and something giggles in the nightshade bushes."
+      },
+      "misty-ravine": {
+        "name": "Misty Ravine",
+        "description": "A deep, damp ravine with a stream at the bottom, grey with mist even at noon. Slugs crawl over the stones, mistletoe hangs from the branches, and kingfishers dart over the water."
+      },
+      "witch-glade": {
+        "name": "Witch's Glade",
+        "description": "A glade in the heart of the forest where witches brew their herbs. The cauldron bubbles on the fire by itself, the broom sweeps by itself, and the witch keeps an eye on both."
+      },
+      "cursed-manor": {
+        "name": "Cursed Manor",
+        "description": "An old manor deep in the forest where a light burns every night, though no one lives there. Its master is Twardowski."
+      }
+    }
+  },
+  "bald-mountain": {
+    "land": "Bald Mountains",
+    "name": "Bald Mountain",
+    "description": "The bare, windy summit of the Bald Mountains with an ancient stone rampart along its ridge. On the night of the sabbath witches flock here from all over the land, led by Baba Yaga.",
+    "trait": {
+      "name": "Sabbath Night",
+      "description": "Poison, burning, chill and bleeding last one turn longer, for creatures and characters alike."
+    },
+    "areas": {
+      "stone-rampart": {
+        "name": "Stone Rampart",
+        "description": "An ancient rampart of stones around the summit, raised by people who worshipped the old gods here. On the night of the sabbath burning wheels roll down from it, a seeress tells fortunes on the wall, and nutcrackers hide nuts in the cracks."
+      },
+      "witch-kitchen": {
+        "name": "Witch's Kitchen",
+        "description": "Stone cauldrons on the slope where witches brew their potions for the sabbath. Herbs pound themselves in the mortars, and between the cauldrons hops a hare that is not a hare at all."
+      },
+      "dance-circle": {
+        "name": "Dancing Circle",
+        "description": "A trampled ring of grass where witches dance till dawn. A cursed piper plays here without end, magpies steal trinkets, and whoever steps into the circle must dance until they drop."
+      },
+      "stone-altars": {
+        "name": "Stone Altars",
+        "description": "Flat boulders where priests of old burned offerings. On the night of the sabbath the offering oven burns again, wax dolls lie on the stones, and the spinner of fate sits by the fire."
+      },
+      "baba-yaga-hut": {
+        "name": "Baba Yaga's Hut",
+        "description": "At the very top, behind a fence of bones, stands a hut on a hen's leg. Skulls burn on the fence, black geese walk the yard, and inside waits Baba Yaga."
+      }
+    }
   }
 }

@@ -2589,5 +2589,807 @@
     "resistances": { "frost": { "base": 40, "perLevel": 5 } },
     "weaknesses": { "fire": 0.4, "sacred": 0.4 },
     "reward": { "xp": 1.0, "gold": 1.0 }
+  },
+  {
+    "id": "marmot",
+    "name": "Świstak",
+    "counted": ["świstaka", "świstaki", "świstaków"],
+    "family": "beast",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 9, "dexterity": 4, "vitality": 9, "endurance": 7, "intellect": 1, "wisdom": 1, "perception": 4, "will": 6 },
+      "growth": { "strength": 3.1, "dexterity": 1, "vitality": 3.6, "endurance": 2.6, "perception": 0.8, "will": 1.4 }
+    },
+    "attack": { "name": "Ostre siekacze", "sound": "bite", "category": "physical", "scaling": "strength", "damageFactor": 0.45, "variance": 0.3 },
+    "hpFactor": 0.95,
+    "armorFactor": 0.65,
+    "reward": { "xp": 1.034, "gold": 0.778 }
+  },
+  {
+    "id": "roller",
+    "name": "Kraska",
+    "counted": ["kraskę", "kraski", "krasek"],
+    "family": "bird",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 6, "vitality": 6, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 5, "will": 5 },
+      "growth": { "strength": 1.8, "dexterity": 2, "vitality": 2.8, "endurance": 1, "perception": 1.4, "will": 1.2 }
+    },
+    "attack": { "name": "Lot nurkowy", "sound": "peck", "category": "physical", "scaling": "dexterity", "damageFactor": 0.41, "variance": 0.25, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } },
+    "hpFactor": 0.7,
+    "armorFactor": 0.25,
+    "reward": { "xp": 0.907, "gold": 0.68 }
+  },
+  {
+    "id": "echo",
+    "name": "Pogłos",
+    "counted": ["pogłos", "pogłosy", "pogłosów"],
+    "family": "spirit",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 2, "dexterity": 5, "vitality": 4, "endurance": 2, "intellect": 8, "wisdom": 5, "perception": 5, "will": 6 },
+      "growth": { "strength": 0.5, "dexterity": 1.6, "vitality": 2.2, "endurance": 0.7, "intellect": 2.8, "wisdom": 1.2, "will": 1.4 }
+    },
+    "attack": { "name": "Grzmiący krzyk", "sound": "magic", "category": "magical", "element": "earth", "scaling": "intellect", "damageFactor": 0.45, "variance": 0.25, "target": "back", "slow": { "effect": "mired", "chance": 0.3, "slow": 0.35 } },
+    "hpFactor": 0.5,
+    "armorFactor": 0.15,
+    "resistances": { "earth": { "base": 30, "perLevel": 4 } },
+    "reward": { "xp": 0.858, "gold": 0.65 }
+  },
+  {
+    "id": "chamois",
+    "name": "Kozica",
+    "counted": ["kozicę", "kozice", "kozic"],
+    "family": "beast",
+    "position": "front",
+    "ambush": true,
+    "stats": {
+      "base": { "strength": 9, "dexterity": 4, "vitality": 9, "endurance": 7, "intellect": 1, "wisdom": 1, "perception": 4, "will": 6 },
+      "growth": { "strength": 3.1, "dexterity": 1, "vitality": 3.6, "endurance": 2.6, "perception": 0.8, "will": 1.4 }
+    },
+    "attack": { "name": "Szarża z góry", "sound": "charge", "category": "physical", "scaling": "strength", "damageFactor": 0.45, "variance": 0.3 },
+    "hpFactor": 0.95,
+    "armorFactor": 0.65,
+    "reward": { "xp": 1.039, "gold": 0.79 }
+  },
+  {
+    "id": "wallcreeper",
+    "name": "Pomurnik",
+    "counted": ["pomurnika", "pomurniki", "pomurników"],
+    "family": "bird",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 6, "vitality": 6, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 5, "will": 5 },
+      "growth": { "strength": 1.8, "dexterity": 2, "vitality": 2.8, "endurance": 1, "perception": 1.4, "will": 1.2 }
+    },
+    "attack": { "name": "Dziób z urwiska", "sound": "peck", "category": "physical", "scaling": "dexterity", "damageFactor": 0.41, "variance": 0.25 },
+    "hpFactor": 0.7,
+    "armorFactor": 0.25,
+    "reward": { "xp": 0.911, "gold": 0.69 }
+  },
+  {
+    "id": "swift",
+    "name": "Jerzyk",
+    "counted": ["jerzyka", "jerzyki", "jerzyków"],
+    "family": "bird",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 8, "vitality": 4, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 7, "will": 3 },
+      "growth": { "strength": 1.8, "dexterity": 2.4, "vitality": 2, "endurance": 0.8, "perception": 2, "will": 0.7 }
+    },
+    "attack": { "name": "Sierpowe skrzydła", "sound": "claw", "category": "physical", "scaling": "dexterity", "damageFactor": 0.42, "variance": 0.25, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } },
+    "hpFactor": 0.48,
+    "armorFactor": 0.2,
+    "reward": { "xp": 0.833, "gold": 0.62 }
+  },
+  {
+    "id": "stone-rooster",
+    "name": "Kamienny Kogut",
+    "counted": ["kamiennego koguta", "kamienne koguty", "kamiennych kogutów"],
+    "family": "stone",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 8, "dexterity": 2, "vitality": 9, "endurance": 9, "intellect": 1, "wisdom": 1, "perception": 2, "will": 5 },
+      "growth": { "strength": 2.6, "dexterity": 0.4, "vitality": 3.3, "endurance": 3.4, "perception": 0.4, "will": 1.2 }
+    },
+    "attack": { "name": "Kamienny dziób", "sound": "peck", "category": "physical", "scaling": "strength", "damageFactor": 0.47, "variance": 0.25 },
+    "hpFactor": 0.95,
+    "armorFactor": 1.0,
+    "resistances": { "earth": { "base": 30, "perLevel": 4 } },
+    "reward": { "xp": 1.068, "gold": 0.804 }
+  },
+  {
+    "id": "cicada",
+    "name": "Piewik",
+    "counted": ["piewika", "piewiki", "piewików"],
+    "family": "insect",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 3, "dexterity": 5, "vitality": 6, "endurance": 3, "intellect": 8, "wisdom": 5, "perception": 4, "will": 6 },
+      "growth": { "strength": 0.8, "dexterity": 1.5, "vitality": 2.8, "endurance": 1.2, "intellect": 2.7, "wisdom": 1.2, "will": 1.4 }
+    },
+    "attack": { "name": "Przeszywające cykanie", "sound": "magic", "category": "magical", "element": "lightning", "scaling": "intellect", "damageFactor": 0.42, "variance": 0.2 },
+    "hpFactor": 0.65,
+    "armorFactor": 0.3,
+    "weaknesses": { "frost": 0.4 },
+    "reward": { "xp": 0.948, "gold": 0.703 }
+  },
+  {
+    "id": "hoopoe",
+    "name": "Dudek",
+    "counted": ["dudka", "dudki", "dudków"],
+    "family": "bird",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 8, "vitality": 4, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 7, "will": 3 },
+      "growth": { "strength": 1.8, "dexterity": 2.4, "vitality": 2, "endurance": 0.8, "perception": 2, "will": 0.7 }
+    },
+    "attack": { "name": "Smrodliwy dziób", "sound": "peck", "category": "physical", "scaling": "dexterity", "damageFactor": 0.42, "variance": 0.25, "dot": { "effect": "poisoned", "chance": 0.3, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 0.48,
+    "armorFactor": 0.2,
+    "reward": { "xp": 0.857, "gold": 0.623 }
+  },
+  {
+    "id": "wolverine",
+    "name": "Rosomak",
+    "counted": ["rosomaka", "rosomaki", "rosomaków"],
+    "family": "beast",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 9, "dexterity": 4, "vitality": 9, "endurance": 7, "intellect": 1, "wisdom": 1, "perception": 4, "will": 6 },
+      "growth": { "strength": 3.1, "dexterity": 1, "vitality": 3.6, "endurance": 2.6, "perception": 0.8, "will": 1.4 }
+    },
+    "attack": { "name": "Szpony rosomaka", "sound": "claw", "category": "physical", "scaling": "strength", "damageFactor": 0.45, "variance": 0.3, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } },
+    "hpFactor": 0.95,
+    "armorFactor": 0.65,
+    "reward": { "xp": 1.06, "gold": 0.79 }
+  },
+  {
+    "id": "vulture",
+    "name": "Sęp",
+    "counted": ["sępa", "sępy", "sępów"],
+    "family": "bird",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 6, "dexterity": 5, "vitality": 6, "endurance": 5, "intellect": 1, "wisdom": 1, "perception": 4, "will": 4 },
+      "growth": { "strength": 2, "dexterity": 1.5, "vitality": 2.6, "endurance": 1.8, "perception": 1, "will": 1 }
+    },
+    "attack": { "name": "Rozszarpanie", "sound": "peck", "category": "physical", "scaling": "strength", "damageFactor": 0.37, "variance": 0.25, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } },
+    "hpFactor": 0.65,
+    "armorFactor": 0.45,
+    "reward": { "xp": 0.95, "gold": 0.7 }
+  },
+  {
+    "id": "shrike",
+    "name": "Dzierzba",
+    "counted": ["dzierzbę", "dzierzby", "dzierzb"],
+    "family": "bird",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 8, "vitality": 4, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 7, "will": 3 },
+      "growth": { "strength": 1.8, "dexterity": 2.4, "vitality": 2, "endurance": 0.8, "perception": 2, "will": 0.7 }
+    },
+    "attack": { "name": "Dziób jak sztylet", "sound": "peck", "category": "physical", "scaling": "dexterity", "damageFactor": 0.42, "variance": 0.25, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } },
+    "hpFactor": 0.48,
+    "armorFactor": 0.2,
+    "reward": { "xp": 0.85, "gold": 0.62 }
+  },
+  {
+    "id": "stone-knight",
+    "name": "Kamienny Rycerz",
+    "counted": ["kamiennego rycerza", "kamiennych rycerzy", "kamiennych rycerzy"],
+    "family": "stone",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 8, "dexterity": 2, "vitality": 9, "endurance": 9, "intellect": 1, "wisdom": 1, "perception": 2, "will": 5 },
+      "growth": { "strength": 2.6, "dexterity": 0.4, "vitality": 3.3, "endurance": 3.4, "perception": 0.4, "will": 1.2 }
+    },
+    "attack": { "name": "Kamienny miecz", "sound": "blade", "category": "physical", "scaling": "strength", "damageFactor": 0.47, "variance": 0.25 },
+    "hpFactor": 0.95,
+    "armorFactor": 1.0,
+    "resistances": { "earth": { "base": 30, "perLevel": 4 } },
+    "reward": { "xp": 1.06, "gold": 0.8 }
+  },
+  {
+    "id": "dormouse",
+    "name": "Popielica",
+    "counted": ["popielicę", "popielice", "popielic"],
+    "family": "beast",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 6, "vitality": 6, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 5, "will": 5 },
+      "growth": { "strength": 1.8, "dexterity": 2, "vitality": 2.8, "endurance": 1, "perception": 1.4, "will": 1.2 }
+    },
+    "attack": { "name": "Nocne ugryzienie", "sound": "bite", "category": "physical", "scaling": "dexterity", "damageFactor": 0.41, "variance": 0.25 },
+    "hpFactor": 0.7,
+    "armorFactor": 0.25,
+    "reward": { "xp": 0.93, "gold": 0.69 }
+  },
+  {
+    "id": "bee-eater",
+    "name": "Żołna",
+    "counted": ["żołnę", "żołny", "żołn"],
+    "family": "bird",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 8, "vitality": 4, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 7, "will": 3 },
+      "growth": { "strength": 1.8, "dexterity": 2.4, "vitality": 2, "endurance": 0.8, "perception": 2, "will": 0.7 }
+    },
+    "attack": { "name": "Lot jak strzała", "sound": "peck", "category": "physical", "scaling": "dexterity", "damageFactor": 0.42, "variance": 0.25 },
+    "hpFactor": 0.48,
+    "armorFactor": 0.2,
+    "reward": { "xp": 0.85, "gold": 0.62 }
+  },
+  {
+    "id": "griffin",
+    "name": "Gryf",
+    "counted": ["gryfa", "gryfy", "gryfów"],
+    "family": "bird",
+    "position": "middle",
+    "elite": true,
+    "stats": {
+      "base": { "strength": 10, "dexterity": 7, "vitality": 9, "endurance": 5, "intellect": 1, "wisdom": 2, "perception": 7, "will": 7 },
+      "growth": { "strength": 3, "dexterity": 1.8, "vitality": 3.6, "endurance": 2, "perception": 1.6, "will": 1.5 }
+    },
+    "attack": { "name": "Szpony gryfa", "sound": "claw", "category": "physical", "scaling": "strength", "damageFactor": 0.968, "variance": 0.25, "target": "back", "dot": { "effect": "bleeding", "chance": 0.35, "power": 0.25, "ticks": 3 } },
+    "hpFactor": 1.045,
+    "armorFactor": 0.35,
+    "reward": { "xp": 1.0, "gold": 1.0 }
+  },
+  {
+    "id": "stolem",
+    "name": "Stolem",
+    "counted": ["stolema", "stolemy", "stolemów"],
+    "family": "stone",
+    "position": "front",
+    "champion": true,
+    "stats": {
+      "base": { "strength": 11, "dexterity": 3, "vitality": 11, "endurance": 9, "intellect": 1, "wisdom": 2, "perception": 4, "will": 8 },
+      "growth": { "strength": 3.2, "dexterity": 0.8, "vitality": 4.4, "endurance": 3, "perception": 0.8, "will": 2 }
+    },
+    "attack": { "name": "Rzut skałą", "sound": "fist", "category": "physical", "scaling": "strength", "damageFactor": 0.63, "variance": 0.25, "cleave": 0.6 },
+    "hpFactor": 1.98,
+    "armorFactor": 0.8,
+    "resistances": { "earth": { "base": 40, "perLevel": 5 } },
+    "reward": { "xp": 1.0, "gold": 1.0 }
+  },
+  {
+    "id": "tarpan",
+    "name": "Tarpan",
+    "counted": ["tarpana", "tarpany", "tarpanów"],
+    "family": "beast",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 9, "dexterity": 4, "vitality": 9, "endurance": 7, "intellect": 1, "wisdom": 1, "perception": 4, "will": 6 },
+      "growth": { "strength": 3.1, "dexterity": 1, "vitality": 3.6, "endurance": 2.6, "perception": 0.8, "will": 1.4 }
+    },
+    "attack": { "name": "Kopyta tarpana", "sound": "charge", "category": "physical", "scaling": "strength", "damageFactor": 0.45, "variance": 0.3 },
+    "hpFactor": 0.95,
+    "armorFactor": 0.65,
+    "reward": { "xp": 1.037, "gold": 0.782 }
+  },
+  {
+    "id": "jay",
+    "name": "Sójka",
+    "counted": ["sójkę", "sójki", "sójek"],
+    "family": "bird",
+    "position": "middle",
+    "ambush": true,
+    "stats": {
+      "base": { "strength": 5, "dexterity": 6, "vitality": 6, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 5, "will": 5 },
+      "growth": { "strength": 1.8, "dexterity": 2, "vitality": 2.8, "endurance": 1, "perception": 1.4, "will": 1.2 }
+    },
+    "attack": { "name": "Wrzask sójki", "sound": "peck", "category": "physical", "scaling": "dexterity", "damageFactor": 0.41, "variance": 0.25 },
+    "hpFactor": 0.7,
+    "armorFactor": 0.25,
+    "reward": { "xp": 0.91, "gold": 0.683 }
+  },
+  {
+    "id": "black-woodpecker",
+    "name": "Dzięcioł czarny",
+    "counted": ["dzięcioła czarnego", "dzięcioły czarne", "dzięciołów czarnych"],
+    "family": "bird",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 8, "vitality": 4, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 7, "will": 3 },
+      "growth": { "strength": 1.8, "dexterity": 2.4, "vitality": 2, "endurance": 0.8, "perception": 2, "will": 0.7 }
+    },
+    "attack": { "name": "Dłuto dzięcioła", "sound": "peck", "category": "physical", "scaling": "dexterity", "damageFactor": 0.42, "variance": 0.25 },
+    "hpFactor": 0.48,
+    "armorFactor": 0.2,
+    "reward": { "xp": 0.831, "gold": 0.614 }
+  },
+  {
+    "id": "wood-ant",
+    "name": "Rudnica",
+    "counted": ["rudnicę", "rudnice", "rudnic"],
+    "family": "insect",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 9, "dexterity": 4, "vitality": 9, "endurance": 7, "intellect": 1, "wisdom": 1, "perception": 4, "will": 6 },
+      "growth": { "strength": 3.1, "dexterity": 1, "vitality": 3.6, "endurance": 2.6, "perception": 0.8, "will": 1.4 }
+    },
+    "attack": { "name": "Żrący kwas", "sound": "bite", "category": "physical", "scaling": "strength", "damageFactor": 0.393, "variance": 0.3, "dot": { "effect": "poisoned", "chance": 0.3, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 0.95,
+    "armorFactor": 0.65,
+    "resistances": { "poison": { "base": 30, "perLevel": 4 } },
+    "reward": { "xp": 1.023, "gold": 0.778 }
+  },
+  {
+    "id": "changeling",
+    "name": "Odmieniec",
+    "counted": ["odmieńca", "odmieńce", "odmieńców"],
+    "family": "spirit",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 6, "vitality": 6, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 5, "will": 5 },
+      "growth": { "strength": 1.8, "dexterity": 2, "vitality": 2.8, "endurance": 1, "perception": 1.4, "will": 1.2 }
+    },
+    "attack": { "name": "Głodne ugryzienie", "sound": "bite", "category": "physical", "scaling": "dexterity", "damageFactor": 0.358, "variance": 0.25, "drain": 0.4 },
+    "hpFactor": 0.7,
+    "armorFactor": 0.25,
+    "reward": { "xp": 0.897, "gold": 0.68 }
+  },
+  {
+    "id": "nightshade",
+    "name": "Pokrzyk",
+    "counted": ["pokrzyk", "pokrzyki", "pokrzyków"],
+    "family": "spirit",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 2, "dexterity": 5, "vitality": 4, "endurance": 2, "intellect": 8, "wisdom": 5, "perception": 5, "will": 6 },
+      "growth": { "strength": 0.5, "dexterity": 1.6, "vitality": 2.2, "endurance": 0.7, "intellect": 2.8, "wisdom": 1.2, "will": 1.4 }
+    },
+    "attack": { "name": "Trujące jagody", "sound": "magic", "category": "magical", "element": "poison", "scaling": "intellect", "damageFactor": 0.393, "variance": 0.25, "dot": { "effect": "poisoned", "chance": 0.3, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 0.5,
+    "armorFactor": 0.15,
+    "resistances": { "poison": { "base": 30, "perLevel": 4 } },
+    "weaknesses": { "fire": 0.4 },
+    "reward": { "xp": 0.849, "gold": 0.65 }
+  },
+  {
+    "id": "great-slug",
+    "name": "Pomrów",
+    "counted": ["pomrowa", "pomrowy", "pomrowów"],
+    "family": "insect",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 9, "dexterity": 4, "vitality": 9, "endurance": 7, "intellect": 1, "wisdom": 1, "perception": 4, "will": 6 },
+      "growth": { "strength": 3.1, "dexterity": 1, "vitality": 3.6, "endurance": 2.6, "perception": 0.8, "will": 1.4 }
+    },
+    "attack": { "name": "Lepki śluz", "sound": "bite", "category": "physical", "scaling": "strength", "damageFactor": 0.436, "variance": 0.3, "slow": { "effect": "mired", "chance": 0.35, "slow": 0.4 } },
+    "hpFactor": 0.95,
+    "armorFactor": 0.65,
+    "weaknesses": { "fire": 0.4 },
+    "reward": { "xp": 1.074, "gold": 0.798 }
+  },
+  {
+    "id": "mistletoe-leech",
+    "name": "Jemiołak",
+    "counted": ["jemiołaka", "jemiołaki", "jemiołaków"],
+    "family": "spirit",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 6, "vitality": 6, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 5, "will": 5 },
+      "growth": { "strength": 1.8, "dexterity": 2, "vitality": 2.8, "endurance": 1, "perception": 1.4, "will": 1.2 }
+    },
+    "attack": { "name": "Przyssanie", "sound": "bite", "category": "physical", "scaling": "dexterity", "damageFactor": 0.398, "variance": 0.25, "drain": 0.5 },
+    "hpFactor": 0.7,
+    "armorFactor": 0.25,
+    "weaknesses": { "fire": 0.4 },
+    "reward": { "xp": 0.942, "gold": 0.697 }
+  },
+  {
+    "id": "kingfisher",
+    "name": "Zimorodek",
+    "counted": ["zimorodka", "zimorodki", "zimorodków"],
+    "family": "bird",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 8, "vitality": 4, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 7, "will": 3 },
+      "growth": { "strength": 1.8, "dexterity": 2.4, "vitality": 2, "endurance": 0.8, "perception": 2, "will": 0.7 }
+    },
+    "attack": { "name": "Błękitna strzała", "sound": "peck", "category": "physical", "scaling": "dexterity", "damageFactor": 0.407, "variance": 0.25, "target": "back" },
+    "hpFactor": 0.48,
+    "armorFactor": 0.2,
+    "reward": { "xp": 0.861, "gold": 0.626 }
+  },
+  {
+    "id": "witch-cauldron",
+    "name": "Kocioł",
+    "counted": ["kocioł", "kotły", "kotłów"],
+    "family": "stone",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 6, "dexterity": 3, "vitality": 9, "endurance": 6, "intellect": 8, "wisdom": 3, "perception": 4, "will": 6 },
+      "growth": { "strength": 1.6, "dexterity": 0.8, "vitality": 3.4, "endurance": 2.2, "intellect": 2.6, "wisdom": 0.8, "will": 1.4 }
+    },
+    "attack": { "name": "Trujący wywar", "sound": "magic", "category": "magical", "element": "poison", "scaling": "intellect", "damageFactor": 0.31, "variance": 0.25, "dot": { "effect": "poisoned", "chance": 0.3, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 0.85,
+    "armorFactor": 0.5,
+    "resistances": { "poison": { "base": 30, "perLevel": 4 } },
+    "reward": { "xp": 1.085, "gold": 0.816 }
+  },
+  {
+    "id": "witch-broom",
+    "name": "Miotła",
+    "counted": ["miotłę", "miotły", "mioteł"],
+    "family": "spirit",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 6, "vitality": 6, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 5, "will": 5 },
+      "growth": { "strength": 1.8, "dexterity": 2, "vitality": 2.8, "endurance": 1, "perception": 1.4, "will": 1.2 }
+    },
+    "attack": { "name": "Smaganie witkami", "sound": "claw", "category": "physical", "scaling": "dexterity", "damageFactor": 0.398, "variance": 0.25, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } },
+    "hpFactor": 0.7,
+    "armorFactor": 0.25,
+    "weaknesses": { "fire": 0.4 },
+    "reward": { "xp": 0.925, "gold": 0.687 }
+  },
+  {
+    "id": "hedge-witch",
+    "name": "Wiedźma",
+    "counted": ["wiedźmę", "wiedźmy", "wiedźm"],
+    "family": "spirit",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 2, "dexterity": 5, "vitality": 4, "endurance": 2, "intellect": 8, "wisdom": 5, "perception": 5, "will": 6 },
+      "growth": { "strength": 0.5, "dexterity": 1.6, "vitality": 2.2, "endurance": 0.7, "intellect": 2.8, "wisdom": 1.2, "will": 1.4 }
+    },
+    "attack": { "name": "Urok", "sound": "magic", "category": "magical", "element": "poison", "scaling": "intellect", "damageFactor": 0.436, "variance": 0.25, "dot": { "effect": "poisoned", "chance": 0.3, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 0.5,
+    "armorFactor": 0.15,
+    "reward": { "xp": 0.876, "gold": 0.657 }
+  },
+  {
+    "id": "empty-armor",
+    "name": "Pusta Zbroja",
+    "counted": ["pustą zbroję", "puste zbroje", "pustych zbroi"],
+    "family": "stone",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 8, "dexterity": 2, "vitality": 9, "endurance": 9, "intellect": 1, "wisdom": 1, "perception": 2, "will": 5 },
+      "growth": { "strength": 2.6, "dexterity": 0.4, "vitality": 3.3, "endurance": 3.4, "perception": 0.4, "will": 1.2 }
+    },
+    "attack": { "name": "Zaklęty miecz", "sound": "blade", "category": "physical", "scaling": "strength", "damageFactor": 0.378, "variance": 0.25 },
+    "hpFactor": 0.95,
+    "armorFactor": 1.0,
+    "weaknesses": { "lightning": 0.4 },
+    "reward": { "xp": 1.049, "gold": 0.788 }
+  },
+  {
+    "id": "haunted-portrait",
+    "name": "Portret",
+    "counted": ["portret", "portrety", "portretów"],
+    "family": "spirit",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 3, "dexterity": 5, "vitality": 6, "endurance": 3, "intellect": 8, "wisdom": 5, "perception": 4, "will": 6 },
+      "growth": { "strength": 0.8, "dexterity": 1.5, "vitality": 2.8, "endurance": 1.2, "intellect": 2.7, "wisdom": 1.2, "will": 1.4 }
+    },
+    "attack": { "name": "Mroźne spojrzenie", "sound": "magic", "category": "magical", "element": "frost", "scaling": "intellect", "damageFactor": 0.338, "variance": 0.2, "dot": { "effect": "chilled", "chance": 0.3, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 0.65,
+    "armorFactor": 0.3,
+    "resistances": { "frost": { "base": 30, "perLevel": 4 } },
+    "reward": { "xp": 0.931, "gold": 0.69 }
+  },
+  {
+    "id": "black-grimoire",
+    "name": "Czarna Księga",
+    "counted": ["czarną księgę", "czarne księgi", "czarnych ksiąg"],
+    "family": "spirit",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 2, "dexterity": 5, "vitality": 4, "endurance": 2, "intellect": 8, "wisdom": 5, "perception": 5, "will": 6 },
+      "growth": { "strength": 0.5, "dexterity": 1.6, "vitality": 2.2, "endurance": 0.7, "intellect": 2.8, "wisdom": 1.2, "will": 1.4 }
+    },
+    "attack": { "name": "Ogniste zaklęcie", "sound": "magic", "category": "magical", "element": "fire", "scaling": "intellect", "damageFactor": 0.362, "variance": 0.25, "dot": { "effect": "burning", "chance": 0.3, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 0.5,
+    "armorFactor": 0.15,
+    "resistances": { "fire": { "base": 30, "perLevel": 4 } },
+    "reward": { "xp": 0.871, "gold": 0.65 }
+  },
+  {
+    "id": "cuckoo",
+    "name": "Kukułka",
+    "counted": ["kukułkę", "kukułki", "kukułek"],
+    "family": "bird",
+    "position": "middle",
+    "elite": true,
+    "stats": {
+      "base": { "strength": 3, "dexterity": 5, "vitality": 7, "endurance": 4, "intellect": 10, "wisdom": 6, "perception": 5, "will": 7 },
+      "growth": { "strength": 1, "dexterity": 1.4, "vitality": 3.6, "endurance": 2, "intellect": 3, "wisdom": 1, "will": 1.5 }
+    },
+    "attack": { "name": "Kukanie", "sound": "magic", "category": "magical", "element": "nature", "scaling": "intellect", "damageFactor": 0.752, "variance": 0.2, "target": "back", "slow": { "effect": "mired", "chance": 0.3, "slow": 0.35 }, "drain": 0.3 },
+    "hpFactor": 0.99,
+    "armorFactor": 0.3,
+    "reward": { "xp": 1.0, "gold": 1.0 }
+  },
+  {
+    "id": "twardowski",
+    "name": "Pan Twardowski",
+    "counted": ["pana Twardowskiego", "panów Twardowskich", "panów Twardowskich"],
+    "family": "spirit",
+    "position": "back",
+    "champion": true,
+    "stats": {
+      "base": { "strength": 6, "dexterity": 6, "vitality": 11, "endurance": 7, "intellect": 10, "wisdom": 6, "perception": 7, "will": 8 },
+      "growth": { "strength": 1.8, "dexterity": 1.4, "vitality": 4.4, "endurance": 2.8, "intellect": 2.3, "wisdom": 1, "will": 2 }
+    },
+    "attack": { "name": "Czarna magia", "sound": "magic", "category": "magical", "element": "fire", "scaling": "intellect", "damageFactor": 0.6, "variance": 0.25, "dot": { "effect": "burning", "chance": 0.3, "power": 0.3, "ticks": 3 }, "drain": 0.4 },
+    "hpFactor": 1.65,
+    "armorFactor": 0.6,
+    "resistances": { "fire": { "base": 40, "perLevel": 5 } },
+    "weaknesses": { "sacred": 0.4 },
+    "reward": { "xp": 1.0, "gold": 1.0 }
+  },
+  {
+    "id": "fire-wheel",
+    "name": "Ogniste Koło",
+    "counted": ["ogniste koło", "ogniste koła", "ognistych kół"],
+    "family": "spirit",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 9, "dexterity": 4, "vitality": 9, "endurance": 7, "intellect": 1, "wisdom": 1, "perception": 4, "will": 6 },
+      "growth": { "strength": 3.1, "dexterity": 1, "vitality": 3.6, "endurance": 2.6, "perception": 0.8, "will": 1.4 }
+    },
+    "attack": { "name": "Ogniste toczenie", "sound": "charge", "category": "physical", "scaling": "strength", "damageFactor": 0.348, "variance": 0.3, "dot": { "effect": "burning", "chance": 0.3, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 0.95,
+    "armorFactor": 0.65,
+    "resistances": { "fire": { "base": 40, "perLevel": 5 } },
+    "weaknesses": { "water": 0.4 },
+    "reward": { "xp": 1.018, "gold": 0.77 }
+  },
+  {
+    "id": "nutcracker",
+    "name": "Orzechówka",
+    "counted": ["orzechówkę", "orzechówki", "orzechówek"],
+    "family": "bird",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 6, "vitality": 6, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 5, "will": 5 },
+      "growth": { "strength": 1.8, "dexterity": 2, "vitality": 2.8, "endurance": 1, "perception": 1.4, "will": 1.2 }
+    },
+    "attack": { "name": "Twardy dziób", "sound": "peck", "category": "physical", "scaling": "dexterity", "damageFactor": 0.317, "variance": 0.25 },
+    "hpFactor": 0.7,
+    "armorFactor": 0.25,
+    "reward": { "xp": 0.893, "gold": 0.673 }
+  },
+  {
+    "id": "seeress",
+    "name": "Wieszczka",
+    "counted": ["wieszczkę", "wieszczki", "wieszczek"],
+    "family": "spirit",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 2, "dexterity": 5, "vitality": 4, "endurance": 2, "intellect": 8, "wisdom": 5, "perception": 5, "will": 6 },
+      "growth": { "strength": 0.5, "dexterity": 1.6, "vitality": 2.2, "endurance": 0.7, "intellect": 2.8, "wisdom": 1.2, "will": 1.4 }
+    },
+    "attack": { "name": "Zła wróżba", "sound": "magic", "category": "magical", "element": "fire", "scaling": "intellect", "damageFactor": 0.348, "variance": 0.25, "slow": { "effect": "mired", "chance": 0.3, "slow": 0.35 } },
+    "hpFactor": 0.5,
+    "armorFactor": 0.15,
+    "reward": { "xp": 0.845, "gold": 0.643 }
+  },
+  {
+    "id": "mortar",
+    "name": "Moździerz",
+    "counted": ["moździerz", "moździerze", "moździerzy"],
+    "family": "stone",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 8, "dexterity": 2, "vitality": 9, "endurance": 9, "intellect": 1, "wisdom": 1, "perception": 2, "will": 5 },
+      "growth": { "strength": 2.6, "dexterity": 0.4, "vitality": 3.3, "endurance": 3.4, "perception": 0.4, "will": 1.2 }
+    },
+    "attack": { "name": "Tłuczek", "sound": "fist", "category": "physical", "scaling": "strength", "damageFactor": 0.456, "variance": 0.25 },
+    "hpFactor": 0.95,
+    "armorFactor": 1.0,
+    "weaknesses": { "lightning": 0.4 },
+    "reward": { "xp": 1.026, "gold": 0.78 }
+  },
+  {
+    "id": "witch-hare",
+    "name": "Zajęczyca",
+    "counted": ["zajęczycę", "zajęczyce", "zajęczyc"],
+    "family": "beast",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 6, "vitality": 6, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 5, "will": 5 },
+      "growth": { "strength": 1.8, "dexterity": 2, "vitality": 2.8, "endurance": 1, "perception": 1.4, "will": 1.2 }
+    },
+    "attack": { "name": "Zajęcze zęby", "sound": "bite", "category": "physical", "scaling": "dexterity", "damageFactor": 0.398, "variance": 0.25, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } },
+    "hpFactor": 0.7,
+    "armorFactor": 0.25,
+    "reward": { "xp": 0.9, "gold": 0.673 }
+  },
+  {
+    "id": "broom-witch",
+    "name": "Czarownica",
+    "counted": ["czarownicę", "czarownice", "czarownic"],
+    "family": "spirit",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 2, "dexterity": 5, "vitality": 4, "endurance": 2, "intellect": 8, "wisdom": 5, "perception": 5, "will": 6 },
+      "growth": { "strength": 0.5, "dexterity": 1.6, "vitality": 2.2, "endurance": 0.7, "intellect": 2.8, "wisdom": 1.2, "will": 1.4 }
+    },
+    "attack": { "name": "Urok z miotły", "sound": "magic", "category": "magical", "element": "poison", "scaling": "intellect", "damageFactor": 0.436, "variance": 0.25, "target": "back", "dot": { "effect": "poisoned", "chance": 0.3, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 0.5,
+    "armorFactor": 0.15,
+    "reward": { "xp": 0.852, "gold": 0.643 }
+  },
+  {
+    "id": "dance-frenzy",
+    "name": "Pląsawica",
+    "counted": ["pląsawicę", "pląsawice", "pląsawic"],
+    "family": "spirit",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 9, "dexterity": 4, "vitality": 9, "endurance": 7, "intellect": 1, "wisdom": 1, "perception": 4, "will": 6 },
+      "growth": { "strength": 3.1, "dexterity": 1, "vitality": 3.6, "endurance": 2.6, "perception": 0.8, "will": 1.4 }
+    },
+    "attack": { "name": "Taneczny szał", "sound": "claw", "category": "physical", "scaling": "strength", "damageFactor": 0.45, "variance": 0.3, "slow": { "effect": "mired", "chance": 0.35, "slow": 0.4 } },
+    "hpFactor": 0.95,
+    "armorFactor": 0.65,
+    "reward": { "xp": 1.06, "gold": 0.79 }
+  },
+  {
+    "id": "magpie",
+    "name": "Sroka",
+    "counted": ["srokę", "sroki", "srok"],
+    "family": "bird",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 6, "vitality": 6, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 5, "will": 5 },
+      "growth": { "strength": 1.8, "dexterity": 2, "vitality": 2.8, "endurance": 1, "perception": 1.4, "will": 1.2 }
+    },
+    "attack": { "name": "Sroczy dziób", "sound": "peck", "category": "physical", "scaling": "dexterity", "damageFactor": 0.41, "variance": 0.25, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } },
+    "hpFactor": 0.7,
+    "armorFactor": 0.25,
+    "reward": { "xp": 0.93, "gold": 0.69 }
+  },
+  {
+    "id": "cursed-piper",
+    "name": "Grajek",
+    "counted": ["grajka", "grajków", "grajków"],
+    "family": "spirit",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 2, "dexterity": 5, "vitality": 4, "endurance": 2, "intellect": 8, "wisdom": 5, "perception": 5, "will": 6 },
+      "growth": { "strength": 0.5, "dexterity": 1.6, "vitality": 2.2, "endurance": 0.7, "intellect": 2.8, "wisdom": 1.2, "will": 1.4 }
+    },
+    "attack": { "name": "Przeklęta melodia", "sound": "magic", "category": "magical", "element": "lightning", "scaling": "intellect", "damageFactor": 0.45, "variance": 0.25 },
+    "hpFactor": 0.5,
+    "armorFactor": 0.15,
+    "reward": { "xp": 0.88, "gold": 0.66 }
+  },
+  {
+    "id": "offering-oven",
+    "name": "Piec",
+    "counted": ["piec", "piece", "pieców"],
+    "family": "stone",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 6, "dexterity": 3, "vitality": 9, "endurance": 6, "intellect": 8, "wisdom": 3, "perception": 4, "will": 6 },
+      "growth": { "strength": 1.6, "dexterity": 0.8, "vitality": 3.4, "endurance": 2.2, "intellect": 2.6, "wisdom": 0.8, "will": 1.4 }
+    },
+    "attack": { "name": "Żar z paszczy", "sound": "magic", "category": "magical", "element": "fire", "scaling": "intellect", "damageFactor": 0.31, "variance": 0.25, "dot": { "effect": "burning", "chance": 0.3, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 0.85,
+    "armorFactor": 0.5,
+    "resistances": { "fire": { "base": 40, "perLevel": 5 } },
+    "weaknesses": { "water": 0.4 },
+    "reward": { "xp": 1.085, "gold": 0.816 }
+  },
+  {
+    "id": "wax-doll",
+    "name": "Woskowa Lalka",
+    "counted": ["woskową lalkę", "woskowe lalki", "woskowych lalek"],
+    "family": "spirit",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 6, "vitality": 6, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 5, "will": 5 },
+      "growth": { "strength": 1.8, "dexterity": 2, "vitality": 2.8, "endurance": 1, "perception": 1.4, "will": 1.2 }
+    },
+    "attack": { "name": "Szpilki", "sound": "blade", "category": "physical", "scaling": "dexterity", "damageFactor": 0.398, "variance": 0.25, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } },
+    "hpFactor": 0.7,
+    "armorFactor": 0.25,
+    "weaknesses": { "fire": 0.5 },
+    "reward": { "xp": 0.925, "gold": 0.687 }
+  },
+  {
+    "id": "fate-spinner",
+    "name": "Prządka",
+    "counted": ["prządkę", "prządki", "prządek"],
+    "family": "spirit",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 2, "dexterity": 5, "vitality": 4, "endurance": 2, "intellect": 8, "wisdom": 5, "perception": 5, "will": 6 },
+      "growth": { "strength": 0.5, "dexterity": 1.6, "vitality": 2.2, "endurance": 0.7, "intellect": 2.8, "wisdom": 1.2, "will": 1.4 }
+    },
+    "attack": { "name": "Przecięta nić", "sound": "magic", "category": "magical", "element": "frost", "scaling": "intellect", "damageFactor": 0.436, "variance": 0.25 },
+    "hpFactor": 0.5,
+    "armorFactor": 0.15,
+    "reward": { "xp": 0.876, "gold": 0.657 }
+  },
+  {
+    "id": "hen-leg-hut",
+    "name": "Kurza Chata",
+    "counted": ["kurzą chatę", "kurze chaty", "kurzych chat"],
+    "family": "stone",
+    "position": "front",
+    "stats": {
+      "base": { "strength": 9, "dexterity": 4, "vitality": 9, "endurance": 7, "intellect": 1, "wisdom": 1, "perception": 4, "will": 6 },
+      "growth": { "strength": 3.1, "dexterity": 1, "vitality": 3.6, "endurance": 2.6, "perception": 0.8, "will": 1.4 }
+    },
+    "attack": { "name": "Kurza łapa", "sound": "charge", "category": "physical", "scaling": "strength", "damageFactor": 0.342, "variance": 0.3 },
+    "hpFactor": 0.95,
+    "armorFactor": 0.65,
+    "weaknesses": { "fire": 0.4 },
+    "reward": { "xp": 1.049, "gold": 0.782 }
+  },
+  {
+    "id": "black-goose",
+    "name": "Czarna Gęś",
+    "counted": ["czarną gęś", "czarne gęsi", "czarnych gęsi"],
+    "family": "bird",
+    "position": "middle",
+    "stats": {
+      "base": { "strength": 5, "dexterity": 6, "vitality": 6, "endurance": 3, "intellect": 1, "wisdom": 1, "perception": 5, "will": 5 },
+      "growth": { "strength": 1.8, "dexterity": 2, "vitality": 2.8, "endurance": 1, "perception": 1.4, "will": 1.2 }
+    },
+    "attack": { "name": "Szczypanie", "sound": "bite", "category": "physical", "scaling": "dexterity", "damageFactor": 0.312, "variance": 0.25, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } },
+    "hpFactor": 0.7,
+    "armorFactor": 0.25,
+    "reward": { "xp": 0.921, "gold": 0.683 }
+  },
+  {
+    "id": "burning-skull",
+    "name": "Płonąca Czaszka",
+    "counted": ["płonącą czaszkę", "płonące czaszki", "płonących czaszek"],
+    "family": "spirit",
+    "position": "back",
+    "stats": {
+      "base": { "strength": 2, "dexterity": 5, "vitality": 4, "endurance": 2, "intellect": 8, "wisdom": 5, "perception": 5, "will": 6 },
+      "growth": { "strength": 0.5, "dexterity": 1.6, "vitality": 2.2, "endurance": 0.7, "intellect": 2.8, "wisdom": 1.2, "will": 1.4 }
+    },
+    "attack": { "name": "Płonące spojrzenie", "sound": "magic", "category": "magical", "element": "fire", "scaling": "intellect", "damageFactor": 0.342, "variance": 0.25, "dot": { "effect": "burning", "chance": 0.3, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 0.5,
+    "armorFactor": 0.15,
+    "resistances": { "fire": { "base": 40, "perLevel": 5 } },
+    "weaknesses": { "water": 0.4 },
+    "reward": { "xp": 0.871, "gold": 0.653 }
+  },
+  {
+    "id": "kostucha",
+    "name": "Kostucha",
+    "counted": ["kostuchę", "kostuchy", "kostuch"],
+    "family": "spirit",
+    "position": "middle",
+    "elite": true,
+    "stats": {
+      "base": { "strength": 10, "dexterity": 7, "vitality": 9, "endurance": 5, "intellect": 1, "wisdom": 2, "perception": 7, "will": 7 },
+      "growth": { "strength": 3, "dexterity": 1.8, "vitality": 3.6, "endurance": 2, "perception": 1.6, "will": 1.5 }
+    },
+    "attack": { "name": "Zamach kosą", "sound": "blade", "category": "physical", "scaling": "strength", "damageFactor": 0.765, "variance": 0.25, "cleave": 0.5, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } },
+    "hpFactor": 1.298,
+    "armorFactor": 0.35,
+    "weaknesses": { "sacred": 0.4 },
+    "reward": { "xp": 1.0, "gold": 1.0 }
+  },
+  {
+    "id": "baba-yaga",
+    "name": "Baba Jaga",
+    "counted": ["Babę Jagę", "Baby Jagi", "Bab Jag"],
+    "family": "spirit",
+    "position": "middle",
+    "champion": true,
+    "stats": {
+      "base": { "strength": 6, "dexterity": 6, "vitality": 11, "endurance": 7, "intellect": 10, "wisdom": 6, "perception": 7, "will": 8 },
+      "growth": { "strength": 1.8, "dexterity": 1.4, "vitality": 4.4, "endurance": 2.8, "intellect": 2.3, "wisdom": 1, "will": 2 }
+    },
+    "attack": { "name": "Klątwa Baby Jagi", "sound": "magic", "category": "magical", "element": "poison", "scaling": "intellect", "damageFactor": 0.4, "variance": 0.25, "cleave": 0.6, "dot": { "effect": "poisoned", "chance": 0.3, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 1.666,
+    "armorFactor": 0.6,
+    "resistances": { "poison": { "base": 40, "perLevel": 5 } },
+    "weaknesses": { "sacred": 0.4 },
+    "reward": { "xp": 1.0, "gold": 1.0 }
   }
 ]

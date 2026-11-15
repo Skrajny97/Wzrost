@@ -900,7 +900,22 @@
       { "area": "rotting-logs", "monster": "puffball", "name": "Purchawiec Siewca" },
       { "area": "devils-crossroads", "monster": "chochol", "name": "Chochoł Weselny" },
       { "area": "plague-graves", "monster": "bell-ringer", "name": "Stary Dzwonnik" },
-      { "area": "eclipsed-glade", "monster": "bebok", "name": "Bebok Porywacz" }
+      { "area": "eclipsed-glade", "monster": "bebok", "name": "Bebok Porywacz" },
+      { "area": "grey-scree", "monster": "marmot", "name": "Świstak Wartownik" },
+      { "area": "windy-ridge", "monster": "chamois", "name": "Czarnoroga Kozica", "female": true },
+      { "area": "devils-stones", "monster": "stone-rooster", "name": "Złotooki Kogut" },
+      { "area": "vulture-crags", "monster": "vulture", "name": "Siwy Sęp" },
+      { "area": "stone-throne", "monster": "stone-knight", "name": "Rycerz Tronu" },
+      { "area": "fir-slope", "monster": "tarpan", "name": "Tarpan Przewodnik" },
+      { "area": "witches-path", "monster": "changeling", "name": "Odmieniec Płaczek" },
+      { "area": "misty-ravine", "monster": "kingfisher", "name": "Lazurowy Zimorodek" },
+      { "area": "witch-glade", "monster": "hedge-witch", "name": "Wiedźma Zielarka", "female": true },
+      { "area": "cursed-manor", "monster": "empty-armor", "name": "Zbroja Hetmańska", "female": true },
+      { "area": "stone-rampart", "monster": "seeress", "name": "Ślepa Wieszczka", "female": true },
+      { "area": "witch-kitchen", "monster": "broom-witch", "name": "Czarownica Kucharka", "female": true },
+      { "area": "dance-circle", "monster": "cursed-piper", "name": "Grajek Piekielny" },
+      { "area": "stone-altars", "monster": "fate-spinner", "name": "Najstarsza Prządka", "female": true },
+      { "area": "baba-yaga-hut", "monster": "black-goose", "name": "Gęś Strażniczka", "female": true }
     ],
     "outlaws": ["bandit-chief", "poacher", "horse-thief", "smuggler", "arsonist", "highwaywoman", "grave-robber"],
     "texts": {

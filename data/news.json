@@ -990,6 +990,11 @@
       "id": "0.3.54",
       "title": "Wersja 0.3.54",
       "body": "- Liczby obrażeń i napis „KRYTYK!” przy krawędzi areny są teraz całe także wtedy, gdy umiejętność dodatkowo trzęsie areną."
+    },
+    {
+      "id": "0.3.55",
+      "title": "Wersja 0.3.55",
+      "body": "- Nowe krainy dla poziomów 201–275: Łysogóry, czyli Gołoborza, Jodłowa Puszcza i Łysa Góra. Piętnaście miejsc i 51 nowych stworów, w tym elity Gryf, Kukułka i Kostucha oraz czempioni Stolem, Pan Twardowski i Baba Jaga.\n- Stolem, Kostucha i Baba Jaga uderzają w cały szyk naraz.\n- Cechy krain: na Gołoborzach ugrzęźnięcie opóźnia ruch o połowę dłużej, w Jodłowej Puszczy postać ze środka szyku ma 5% więcej uniku, a na Łysej Górze zatrucie, oparzenie, wychłodzenie i krwawienie trwają o jeden ruch dłużej.\n- Sołtys wywiesza listy gończe także za stworami Łysogór."
     }
   ]
 }
