@@ -22,7 +22,7 @@ describe('Ewolucje, które zmieniają broń (988)', () => {
     assert.equal(gearKey('shadow', null, content), 'shadow');
     assert.equal(gearKey('shadow', 'poisoner', content), 'shadow');
     assert.equal(gearKey('shadow', 'necromancer', content), 'shadow:necromancer');
-    assert.equal(gearKey('shadow', 'lich', content), 'shadow:necromancer');
+    assert.equal(gearKey('shadow', 'lich', content), 'shadow:lich');
     assert.deepEqual(gearLists('shadow:necromancer', content), { weapons: ['staff'], offhands: ['focus'], armor: content.classesById.shadow.armor });
     const key = gearKey('shadow', 'lich', content);
     for (const [base, usable] of [['staff', true], ['merlin-staff', true], ['grimoire', true], ['dagger', false], ['misericorde', false], ['tunic', true], ['robe', false], ['boots', true], ['ring', true]]) {
@@ -81,9 +81,9 @@ describe('Ewolucje, które zmieniają broń (988)', () => {
     assert.equal(playerCombatant({ character: poisoner, equipped: dagger, name: 'Mira' }, content).weapon.scaling, 'dexterity');
     // The speed from Intelekt, as a Cień's from its Zręczność.
     assert.ok(unit.speed > 1.5, String(unit.speed));
-    // The kostur hits by gear.damage of its numbers, its upgrade in them.
+    // The kostur hits by weaponDamage of its numbers, its upgrade in them.
     const held = upgradedItem(equipped.find((item) => item.slot === 'weapon'), content);
-    assert.equal(necromancer.gear.damage, 0.8);
+    assert.equal(necromancer.weaponDamage, 0.8);
     assert.deepEqual([unit.weapon.min, unit.weapon.max], [Math.round(held.damage.min * 0.8), Math.round(held.damage.max * 0.8)]);
   });
 });

@@ -542,8 +542,12 @@ describe('the second forms in fights', () => {
       const healthier = second.faints <= first.faints && second.endHp >= first.endHp + 0.03;
       assert.ok(safer || healthier, told);
     });
+    // The second forms as even as the first evolutions, within 0.02 of HP:
+    // since 988 (15.11.2026) the Inkwizytor, the firsts' best, has no
+    // Siła in its skills (986 B) and ends with 0.78 of its HP instead of
+    // 0.81, so the firsts came closer while the seconds stayed as even.
     const spread = (list) => Math.max(...list) - Math.min(...list);
-    assert.ok(spread(pairs.map(([, second]) => second.endHp)) <= spread(pairs.map(([first]) => first.endHp)));
+    assert.ok(spread(pairs.map(([, second]) => second.endHp)) <= spread(pairs.map(([first]) => first.endHp)) + 0.02);
   });
 });
 

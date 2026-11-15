@@ -5,7 +5,7 @@
 import { coreEffects } from './core.js';
 import { evolutionOf, perClassLevelOf } from './evolutions.js';
 import { budget, cappedChance, damageScale, maxHp, maxMana, speed, weaponDamage } from './formulas.js';
-import { gearDamageOf, gearKey, statAsOf, weaponScalingOf } from './gear.js';
+import { gearDamageOf, gearElementOf, gearKey, statAsOf, weaponScalingOf } from './gear.js';
 import { upgradedItem } from './items.js';
 import { gearLevel, midGameShare } from './progression.js';
 import { learnedSkills } from './skills.js';
@@ -53,9 +53,15 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
   // hands (gear.damage: the Nekromanta's kostury, as its class keeps a
   // Cień's HP and speed).
   const share = gearDamageOf(key, content);
+  const element = gearElementOf(key, content);
   const held = weaponItem ? itemWeapon(weaponItem, content) : null;
   const weapon = held
-    ? { ...held, ...(scalingOf && { scaling: scalingOf }), ...(share !== 1 && { min: Math.max(1, Math.round(held.min * share)), max: Math.max(1, Math.round(held.max * share)) }) }
+    ? {
+        ...held,
+        ...(scalingOf && { scaling: scalingOf }),
+        ...(element && !held.element && { element }),
+        ...(share !== 1 && { min: Math.max(1, Math.round(held.min * share)), max: Math.max(1, Math.round(held.max * share)) }),
+      }
     : unarmed(character.level, content);
   let armor = bonuses.armor + totals.endurance * balance.combat.armorPerEndurance;
   if (area?.trait.frontArmorBonus && character.position === 'front') armor *= 1 + area.trait.frontArmorBonus;

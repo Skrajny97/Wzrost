@@ -10,10 +10,14 @@
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 
+// What a form changes (988): the fields of evolutions.json that make it
+// another class's kind.
+const CHANGES = ['gear', 'scaling', 'as', 'autoPoints', 'weaponDamage'];
+
 // The key of a character's gear and build: its class's id, or `class:form`
-// for the nearest form of its line that changes them (gear, scaling or
-// autoPoints). What a character can use, the gear it finds, its weapon's
-// stat and its points' spread all go by it.
+// (its own form) when a form of its line changes them. What a character can
+// use, the gear it finds, its weapon's stat and damage, its stats and its
+// points' spread all go by it.
 /**
  * @param {string} classId
  * @param {string | null | undefined} evolutionId
@@ -21,21 +25,29 @@
  * @returns {string}
  */
 export function gearKey(classId, evolutionId, content) {
-  let form = evolutionId ? (content.evolutionsById?.[evolutionId] ?? null) : null;
-  while (form && !form.gear && !form.scaling && !form.autoPoints && !form.as) form = form.from ? (content.evolutionsById[form.from] ?? null) : null;
-  return form ? `${classId}:${form.id}` : classId;
+  const own = evolutionId ? (content.evolutionsById?.[evolutionId] ?? null) : null;
+  let form = own;
+  while (form && !CHANGES.some((field) => form[field] !== undefined)) form = form.from ? (content.evolutionsById[form.from] ?? null) : null;
+  return form && own ? `${classId}:${own.id}` : classId;
 }
 
-// The form of a gear key, or null for a class's own.
+// A field of a gear key's form, else of the forms before it in its line
+// (the next forms keep what a form changed unless they change it again).
 /**
  * @param {string} key
+ * @param {string} field
  * @param {Content} content
- * @returns {Record<string, any> | null}
+ * @returns {any}
  */
-const formOf = (key, content) => {
+function fieldOf(key, field, content) {
   const formId = key.split(':')[1];
-  return formId ? (content.evolutionsById[formId] ?? null) : null;
-};
+  let form = formId ? (content.evolutionsById[formId] ?? null) : null;
+  while (form) {
+    if (form[field] !== undefined) return form[field];
+    form = form.from ? (content.evolutionsById[form.from] ?? null) : null;
+  }
+  return undefined;
+}
 
 // The class of a gear key.
 /**
@@ -45,7 +57,7 @@ const formOf = (key, content) => {
 export const keyClass = (key) => key.split(':')[0];
 
 // The weapons, off-hands and armour (by family) of a gear key: its class's,
-// with the form's own.
+// with its line's own.
 /**
  * @param {string} key
  * @param {Content} content
@@ -53,18 +65,18 @@ export const keyClass = (key) => key.split(':')[0];
  */
 export function gearLists(key, content) {
   const cls = content.classesById[keyClass(key)];
-  const gear = formOf(key, content)?.gear;
+  const gear = fieldOf(key, 'gear', content);
   return { weapons: gear?.weapons ?? cls.weapons, offhands: gear?.offhands ?? cls.offhands, armor: gear?.armor ?? cls.armor };
 }
 
-// The spread of "Rozdaj według klasy" of a gear key: the form's own, else
+// The spread of "Rozdaj według klasy" of a gear key: its line's own, else
 // its class's.
 /**
  * @param {string} key
  * @param {Content} content
  * @returns {Record<string, number>}
  */
-export const autoPointsOf = (key, content) => formOf(key, content)?.autoPoints ?? content.classesById[keyClass(key)]?.autoPoints ?? {};
+export const autoPointsOf = (key, content) => fieldOf(key, 'autoPoints', content) ?? content.classesById[keyClass(key)]?.autoPoints ?? {};
 
 // The stat the weapons of a gear key hit with instead of their own, or null.
 /**
@@ -72,22 +84,33 @@ export const autoPointsOf = (key, content) => formOf(key, content)?.autoPoints ?
  * @param {Content} content
  * @returns {string | null}
  */
-export const weaponScalingOf = (key, content) => formOf(key, content)?.scaling ?? null;
+export const weaponScalingOf = (key, content) => fieldOf(key, 'scaling', content) ?? null;
 
-// The stats a form counts as others (`as`: { dexterity: 'intellect' }: every
-// point of Zręczność is one of Intelekt), or none.
+// The stats a gear key counts as others (`as`: { dexterity: 'intellect' }:
+// every point of Zręczność is one of Intelekt), or none.
 /**
  * @param {string} key
  * @param {Content} content
  * @returns {Record<string, string>}
  */
-export const statAsOf = (key, content) => formOf(key, content)?.as ?? {};
+export const statAsOf = (key, content) => fieldOf(key, 'as', content) ?? {};
 
-// The share of their damage a form's own weapons hit with (gear.damage), 1
-// for a class's own gear.
+// The element a gear key's weapons hit in when they have none of their own
+// (gear.element: the Wielki Inkwizytor's swords and axes hit with Sakrum,
+// as its kropidła did, for its Żarliwość), or null.
+/**
+ * @param {string} key
+ * @param {Content} content
+ * @returns {string | null}
+ */
+export const gearElementOf = (key, content) => fieldOf(key, 'gear', content)?.element ?? null;
+
+// The share of their damage a gear key's weapons hit with (`weaponDamage`:
+// the Nekromanta's kostury hit by 0.8 of a Mag's, as it keeps a Cień's
+// speed, dodge and HP), 1 for a class's own.
 /**
  * @param {string} key
  * @param {Content} content
  * @returns {number}
  */
-export const gearDamageOf = (key, content) => formOf(key, content)?.gear?.damage ?? 1;
+export const gearDamageOf = (key, content) => fieldOf(key, 'weaponDamage', content) ?? 1;
