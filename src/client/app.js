@@ -4,6 +4,7 @@
 // Polish and shown in the page's language (t(), i18n.js).
 
 import { ApiError, request } from './api.js';
+import { forgetReferral, referralCode, showInvite, takeReferral } from './referral-invite.js';
 import { $, $$, clear, fill, h, icon } from './dom.js';
 import { legalLinks, mustConfirmAge, renderAge } from './age.js';
 import { emailRow, hideInvite, inviteToConfirm, mustConfirm, renderConfirm, takeEmailResult } from './email.js';
@@ -210,6 +211,10 @@ function takeGoogleResult() {
 
 async function start() {
   const googleResult = takeGoogleResult();
+  // A player's link (Poleć grę): its code kept for the sign-up.
+  takeReferral();
+  // An account made with Google from such a link has it.
+  if (googleResult === 'created') forgetReferral();
   // The version this page runs, to notice a newer one later, and the page's
   // language (i18n.js): whether the server offers English, and the English
   // of the page's texts.
@@ -1737,6 +1742,8 @@ function enterAuth(note = null, { ok = false } = {}) {
   setMusicPlace([]);
   drawInstall();
   show('auth');
+  // Who invites, over the new account's form (referral-invite.js).
+  showInvite(() => setAuthMode('register'));
   request('GET', '/api/health')
     .then((health) => {
       for (const element of $$('[data-version]')) element.textContent = health.version;
@@ -1874,8 +1881,9 @@ bindForm($('#login-form'), (data) => request('POST', '/api/auth/login', data));
 $('#forgot-password').addEventListener('click', () => openForgotPassword($('#login-identifier').value.trim()));
 bindForm($('#register-form'), async (data) => {
   // "Mam co najmniej 16 lat" (age.js).
-  const answer = await request('POST', '/api/auth/register', { ...data, adult: data.adult === 'on' });
+  const answer = await request('POST', '/api/auth/register', { ...data, adult: data.adult === 'on', ...(referralCode() && { ref: referralCode() }) });
   emailUnsent = answer.emailSent === false;
+  forgetReferral();
   return answer;
 });
 

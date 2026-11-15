@@ -1010,6 +1010,11 @@
       "id": "0.3.58",
       "title": "Wersja 0.3.58",
       "body": "- Pakiet kart u Szczęsnego otwiera się teraz jak booster: pakiet rozrywa się na stole, a karty odwracają się po kolei, im rzadsza, tym jaśniej błyszczy. Legendarne, mityczne i boskie karty mają własną oprawę. Dotknięcie pomija animację, a przy wyłączonych Animacjach (Ustawienia) karty pokazują się od razu.\n- Na czacie oznaczysz gracza także po nazwie konta: „@” i nazwa konta oznacza postać, którą ten gracz teraz gra."
+    },
+    {
+      "id": "0.3.59",
+      "title": "Wersja 0.3.59",
+      "body": "- Poleć grę znajomym: w Społeczność → Znajomi masz swój link do gry. Za każdego nowego gracza z Twojego linku zgarniesz 100 Punktów Systemu, gdy potwierdzi e-mail i dojdzie do 10. poziomu, i jeszcze 300, gdy dojdzie do 30. poziomu.\n- Nowy gracz z linku dostaje 20 Punktów Systemu na start i 100 na 30. poziomie. Nagrody odbierasz przyciskiem „Odbierz”, najwyżej 10 w miesiącu."
     }
   ]
 }

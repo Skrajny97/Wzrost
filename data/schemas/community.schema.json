@@ -4,7 +4,7 @@
   "description": "Działy listy rozwijanej Społeczności, Ranking postaci, Znajomi, codzienny Upominek (src/server/community.js) i link zaproszenia na serwer Discord (src/client/discord.js).",
   "type": "object",
   "additionalProperties": false,
-  "required": ["sections", "ranking", "friends", "gift", "trade", "discord"],
+  "required": ["sections", "ranking", "friends", "gift", "trade", "referral", "discord"],
   "properties": {
     "$comment": { "type": "string" },
     "sections": {
@@ -59,6 +59,34 @@
         "pauseMinutes": { "type": "integer", "minimum": 1 },
         "maxItems": { "type": "integer", "minimum": 1 },
         "minLevel": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "referral": {
+      "description": "Poleć grę (982 A, 985): kod linku, Punkty Systemu na start, progi z nagrodami polecającego i nowego gracza, limit nagród w miesiącu i słowa.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["codeLength", "start", "milestones", "perMonth", "texts"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "codeLength": { "type": "integer", "minimum": 5, "maximum": 12 },
+        "start": { "type": "integer", "minimum": 0 },
+        "milestones": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["level", "referrer", "newcomer"],
+            "properties": { "level": { "type": "integer", "minimum": 1 }, "referrer": { "type": "integer", "minimum": 0 }, "newcomer": { "type": "integer", "minimum": 0 } }
+          }
+        },
+        "perMonth": { "type": "integer", "minimum": 1 },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["title", "rules", "copy", "copied", "share", "shareText", "month", "players", "given", "waiting", "claim", "unconfirmed", "noCharacter", "invited", "invitedDone", "claimed", "limit", "inviteTitle", "invite"],
+          "patternProperties": { "^[a-zA-Z]+$": { "type": "string", "minLength": 1 } }
+        }
       }
     },
     "discord": {

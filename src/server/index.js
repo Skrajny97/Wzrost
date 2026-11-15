@@ -25,6 +25,7 @@ import {
 } from './fortress.js';
 import { acceptChatRules, blockInChat, chatPeople, chatReports, closeChat, latestChat, markChatSeen, moderateChat, readChat, reportChat, sendChat, setModerator, translateChat, unblockInChat, unmuteInChat } from './chat.js';
 import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendAllGifts, sendGift } from './community.js';
+import { claimReferral, inviterView, referralView } from './referrals.js';
 import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, inviteToParty, kickFromParty, leaveParty, partyHunt } from './parties.js';
 import { settlePartyEvents } from './party-events.js';
 import { enterTower, getTowers } from './towers.js';
@@ -394,6 +395,9 @@ const routes = [
   ['POST', '/api/trade/settings', setTradeSettings],
   ['POST', '/api/trade/block', blockTrades],
   ['GET', '/api/friends', friendsView],
+  ['GET', '/api/referral', inviterView],
+  ['GET', '/api/referrals', referralView],
+  ['POST', '/api/referrals/claim', claimReferral],
   ['POST', '/api/friends/invite', inviteFriend],
   ['POST', '/api/friends/accept', acceptFriend],
   ['POST', '/api/friends/remove', removeFriend],

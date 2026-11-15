@@ -25646,3 +25646,104 @@ a.discord-button {
 .pfx--end .pfx-slot--shiny .pfx-charge {
   opacity: 0.55;
 }
+
+/* „Poleć grę” in the Znajomi and the invitation on the sign-up (982 A,
+   mock-ups 985; screens/friends.js, referral-invite.js). */
+.referral-link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line, #3a3a2e);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.referral-url {
+  flex: 1 1 12rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--font-system, monospace);
+  font-size: 0.95rem;
+  color: var(--system, #7fd6c8);
+  user-select: all;
+}
+
+.referral-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.referral-subtitle {
+  margin: 4px 0 0;
+  font-size: 1rem;
+}
+
+.referral-player {
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+
+.referral-rewards {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.referral-reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 1px solid var(--line, #3a3a2e);
+  border-radius: 999px;
+  color: var(--muted, #b9b09c);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.referral-reward--given {
+  border-color: rgba(127, 214, 140, 0.5);
+  color: #9fe0a8;
+}
+
+.referral-reward--wait {
+  border-style: dashed;
+}
+
+.referral-invited {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid rgba(242, 193, 78, 0.45);
+  border-radius: 8px;
+  background: rgba(242, 193, 78, 0.07);
+}
+
+.referral-invited p {
+  margin: 0;
+}
+
+.referral-invite {
+  display: grid;
+  gap: 4px;
+  margin: 12px 0 4px;
+  padding: 12px 14px;
+  border: 1px solid rgba(242, 193, 78, 0.55);
+  border-radius: 10px;
+  background: rgba(242, 193, 78, 0.08);
+}
+
+.referral-invite p {
+  margin: 0;
+}
+
+.referral-invite-title {
+  color: #f2c14e;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}

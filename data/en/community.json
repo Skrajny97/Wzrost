@@ -20,6 +20,29 @@
   "gift": {
     "name": "Gift"
   },
+  "referral": {
+    "texts": {
+      "title": "Recommend the game",
+      "rules": "Invite someone new to the game with your link. For every player who comes by your link you get {first} once they confirm their e-mail and reach level {firstLevel}, and {second} more once they reach level {secondLevel}. The new player gets {start} at the start and {later} at level {laterLevel}.",
+      "copy": "Copy link",
+      "copied": "Link copied.",
+      "share": "Share",
+      "shareText": "Play Insight with me!",
+      "month": "Rewards this month: {given} of {limit}. A reward over the limit waits for the next month.",
+      "players": "Players from your link ({count})",
+      "given": "Lv. {level}: +{points}",
+      "waiting": "Lv. {level}: {points}",
+      "claim": "Collect {points}",
+      "unconfirmed": "e-mail not confirmed",
+      "noCharacter": "no character",
+      "invited": "The character {name} invited you to the game. Once your character reaches level {level}, you get {points}.",
+      "invitedDone": "The character {name} invited you to the game.",
+      "claimed": "Collected {points}.",
+      "limit": "You have already collected {limit} referral rewards this month. More from the first day of next month.",
+      "inviteTitle": "An invitation to the game",
+      "invite": "{name} (lv. {level}) invites you. Create an account with this invitation: you get {start} System Points at the start, and {later} more once your character reaches level {laterLevel}."
+    }
+  },
   "discord": {
     "texts": {
       "join": "Join the Discord server"
