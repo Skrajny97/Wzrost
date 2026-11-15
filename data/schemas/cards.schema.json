@@ -184,7 +184,7 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["id", "name", "rarity", "kind", "target", "power", "perLevel", "text"],
+            "required": ["id", "name", "rarity", "kind", "target", "power", "perLevel", "short", "text"],
             "properties": {
               "id": { "$ref": "#/definitions/id" },
               "name": { "type": "string", "minLength": 1 },
@@ -194,6 +194,7 @@
               "power": { "type": "number", "minimum": 0, "maximum": 1 },
               "perLevel": { "type": "number", "minimum": 0 },
               "most": { "type": "number", "minimum": 0, "maximum": 1 },
+              "short": { "type": "string", "minLength": 1 },
               "text": { "type": "string", "minLength": 1 }
             }
           }

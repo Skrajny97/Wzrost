@@ -40,6 +40,7 @@
 // own table: elsewhere the panel says where it waits.
 
 import { areaArtUrl, monsterSprite, placeArt, portraitSprite, residentBust } from './art.js';
+import { effectBlow, effectHint, effectMarks, effectsSection, rivalEffectLine, roundEffects } from './card-effects.js';
 import { liveMatch, mountDuel, onLiveMatch } from './card-duel.js';
 import { createCardsFx, fxDroppedCards } from './cards-fx.js';
 import { motionOn } from './motion.js';
@@ -78,6 +79,7 @@ const typeBadge = (id, size, type) => h('span', { class: `tcard-type tcard-type-
 // engine gives them). Every card of the game is shown through it: the
 // Salon's tab, the report's cards and the Encyklopedia's "Karty".
 export function cardFace(card, { compact = false, marks = {}, onClick = null, label = null, types = [] } = {}) {
+  if (card.effect) return effectFace(card, { compact, marks, onClick, label });
   const type = typeInfo(card, types);
   const hurt = card.max && card.life < card.max;
   const body = [
@@ -120,6 +122,37 @@ export function cardFace(card, { compact = false, marks = {}, onClick = null, la
     : h('span', { class: className, vars, role: 'img', 'aria-label': ariaLabel }, body);
 }
 
+// An effect card's face (976–979, mock-up 979.1): the frame of its rarity,
+// its picture on the effects' background (styles.css, .tcard--effect), its
+// name and, in place of Atak and Życie, what it does at its level ("+40%
+// ciosu"); a star in place of the type, the level in its corner. `marks`
+// as a creature card's, and `played`: the chip of an effect card played in
+// the match.
+export function effectFace(card, { compact = false, marks = {}, onClick = null, label = null } = {}) {
+  const body = [
+    h(
+      'span',
+      { class: 'tcard-top' },
+      h('span', { class: 'tcard-type tcard-type--effect', title: t('Karta efektu') }, icon('star', { size: compact ? 12 : 14 })),
+      h('span', { class: 'tcard-level', title: t('Poziom karty'), text: String(card.level) }),
+    ),
+    h('span', { class: 'tcard-art' }, h('img', { class: 'sprite', src: `/art/cards/effects/${card.id}.png`, alt: '', decoding: 'async', draggable: 'false' })),
+    cardName(card.name),
+    h('span', { class: 'tcard-stats tcard-stats--effect' }, h('span', { class: 'tcard-effect-line', text: card.short })),
+    marks.fresh && h('span', { class: 'tcard-chip', text: t('nowa') }),
+    marks.played && h('span', { class: 'tcard-chip tcard-chip--played', text: marks.played }),
+    marks.chosen && h('span', { class: 'tcard-check' }, icon('check', { size: 14 })),
+  ];
+  const className = ['tcard', 'tcard--effect', `tcard--${card.rarity}`, compact && 'tcard--compact', marks.picked && 'tcard--picked', marks.chosen && 'tcard--chosen', marks.dim && 'tcard--dim']
+    .filter(Boolean)
+    .join(' ');
+  const ariaLabel = label ?? t('{name}, karta efektu, poziom {level}: {text}', { name: card.name, level: card.level, text: card.text });
+  const vars = { '--rarity': card.color };
+  return onClick
+    ? h('button', { type: 'button', class: className, vars, 'aria-label': ariaLabel, onClick }, body)
+    : h('span', { class: className, vars, role: 'img', 'aria-label': ariaLabel }, body);
+}
+
 // Szczęsny's words after a match, or a resident's, one of the data's.
 const oneOf = (lines) => lines[Math.floor(Math.random() * lines.length)];
 
@@ -135,6 +168,8 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
   // The saved deck's slot the builder lays (938).
   let buildingSlot = 1;
   let chosen = new Set();
+  // The effect cards chosen for the deck being laid (976, 977).
+  let chosenEffects = new Set();
   let shown = 'all';
   // The turn being laid: its round, the player's lines, the hero's skill,
   // and the reserve's card picked to lay.
@@ -142,6 +177,9 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
   let picked = null;
   // The hero's skill being set: its step and what is chosen so far.
   let aiming = null;
+  // An effect card picked, waiting for its target (979.4): its key and
+  // whose card it asks for ('own' or 'rival').
+  let effectAim = null;
   // A match just ended, shown until "Dalej".
   let ended = null;
   // The pack just bought at Szczęsny's (902 C): its cards on the table
@@ -199,6 +237,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
       plan = null;
       picked = null;
       aiming = null;
+      effectAim = null;
     }
   }
 
@@ -381,6 +420,8 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     building = true;
     buildingSlot = slot;
     chosen = new Set(view.decks?.slots.find((one) => one.slot === slot)?.cards ?? []);
+    const owned = new Set((view.effects?.owned ?? []).map((card) => card.id));
+    chosenEffects = new Set((view.decks?.slots.find((one) => one.slot === slot)?.effects ?? []).filter((id) => owned.has(id)));
     render();
     showTab();
   }
@@ -408,6 +449,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
       cards.length > 0
         ? h('div', { class: 'tcard-grid tcard-grid--deck' }, cards.map((card) => face(card, { compact: true })))
         : h('p', { class: 'muted', text: t('Talia nie jest ułożona. Wybierz {count} kart z kolekcji.', { count: view.deckSize }) }),
+      effectsInDeck(),
       h(
         'div',
         { class: 'cards-deck-actions' },
@@ -429,6 +471,22 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     );
   }
 
+  // The deck's effect cards (976, 977, mock-up 979.1), under its twelve
+  // creatures: those of the slot in play, or why there are none.
+  function effectsInDeck() {
+    const effects = view.effects;
+    if (!effects || effects.slots === 0) return null;
+    const words = effects.texts;
+    const laid = effects.deck.map((id) => effects.owned.find((one) => one.id === id)).filter(Boolean);
+    return h(
+      'div',
+      { class: 'stack cards-deck-effects', 'data-guide': 'cards-deck-effects' },
+      h('div', { class: 'cards-section-head' }, h('h3', { class: 'section-title', text: words.tab }), h('span', { class: 'muted', text: t('{used} z {slots}', { used: laid.length, slots: effects.slots }) })),
+      h('p', { class: 'muted', text: effects.owned.length === 0 ? words.empty : laid.length === 0 ? words.inDeckNone : words.rule }),
+      laid.length > 0 && h('div', { class: 'tcard-grid tcard-grid--deck' }, laid.map((card) => face(card, { compact: true }))),
+    );
+  }
+
   // Names one after another: „A, B i C”.
   const listOf = (words) => (words.length > 1 ? `${words.slice(0, -1).join(', ')}${t(' i ')}${words.at(-1)}` : (words[0] ?? ''));
   // A text of the data with its {…} filled (as card-duel.js does).
@@ -446,8 +504,9 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     const head = (state) => h('div', { class: 'cards-section-head' }, h('h3', { class: 'section-title', text: t('Pakiet kart') }), h('span', { class: 'muted', text: state }));
     const missing = pack.missing > 0 ? t('W kolekcji brakuje Ci jeszcze {cards}.', { cards: countOf(pack.missing, 'karty', 'kart', 'kart') }) : t('Masz już wszystkie karty.');
     if (opened) {
-      const fresh = opened.filter((card) => card.fresh).map((card) => card.name);
-      const higher = opened.filter((card) => !card.fresh).map((card) => card.name);
+      const fresh = opened.filter((card) => card.fresh && !card.effect).map((card) => card.name);
+      const higher = opened.filter((card) => !card.fresh && !card.effect).map((card) => card.name);
+      const effect = opened.find((card) => card.effect);
       return h(
         'section',
         { class: 'card stack cards-pack', 'data-guide': 'cards-pack' },
@@ -456,7 +515,14 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
         h('div', { class: 'tcard-grid tcard-grid--reserve' }, opened.map((card) => face(card, { marks: { fresh: card.fresh } }))),
         h('p', {
           class: 'muted',
-          text: [fresh.length > 0 && t('Nowe w kolekcji: {cards}.', { cards: listOf(fresh) }), higher.length > 0 && t('Na wyższy poziom wchodzą: {cards}.', { cards: listOf(higher) }), missing].filter(Boolean).join(' '),
+          text: [
+            effect && filled(view.effects?.texts.inPack, { card: effect.name }),
+            fresh.length > 0 && t('Nowe w kolekcji: {cards}.', { cards: listOf(fresh) }),
+            higher.length > 0 && t('Na wyższy poziom wchodzą: {cards}.', { cards: listOf(higher) }),
+            missing,
+          ]
+            .filter(Boolean)
+            .join(' '),
         }),
         h('p', { class: 'muted', text: t('Następny pakiet jutro.') }),
         h('button', {
@@ -484,6 +550,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
       head(pack.bought ? t('kupiony') : t('raz dziennie')),
       h('div', { class: 'cards-pack-row' }, h('span', { class: 'cards-pack-backs', 'aria-hidden': 'true' }, Array.from({ length: pack.count }, () => h('span', { class: 'cards-back' }))), h('p', { text: words.offer })),
       h('p', { class: 'muted small', text: filled(words.odds, { odds: odds('any'), last: odds('last') }) }),
+      pack.effectChance > 0 && view.effects && h('p', { class: 'muted small', text: filled(view.effects.texts.packChance, { chance: Math.round(pack.effectChance * 100) }) }),
       h('p', {
         class: 'muted',
         text: [pack.discount > 0 ? filled(words.relation, { standing: pack.standing, discount: Math.round(pack.discount * 100) }) : filled(words.noDiscount, { most: Math.round(pack.most * 100) }), missing].join(' '),
@@ -510,13 +577,14 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
                       apply(answer);
                       if (motionOn()) {
                         const cards = answer.pack;
-                        const fresh = cards.filter((card) => card.fresh).map((card) => card.name);
-                        const higher = cards.filter((card) => !card.fresh).map((card) => card.name);
+                        const fresh = cards.filter((card) => card.fresh && !card.effect).map((card) => card.name);
+                        const higher = cards.filter((card) => !card.fresh && !card.effect).map((card) => card.name);
+                        const effect = cards.find((card) => card.effect);
                         const left = view.pack?.missing ?? 0;
                         openPack(cards, {
                           face: (card) => face(card),
                           words: view.texts.pack.opened,
-                          summary: [fresh.length > 0 && t('Nowe w kolekcji: {cards}.', { cards: listOf(fresh) }), higher.length > 0 && t('Na wyższy poziom wchodzą: {cards}.', { cards: listOf(higher) }), left > 0 ? t('W kolekcji brakuje Ci jeszcze {cards}.', { cards: countOf(left, 'karty', 'kart', 'kart') }) : t('Masz już wszystkie karty.')].filter(Boolean).join(' '),
+                          summary: [effect && filled(view.effects?.texts.inPack, { card: effect.name }), fresh.length > 0 && t('Nowe w kolekcji: {cards}.', { cards: listOf(fresh) }), higher.length > 0 && t('Na wyższy poziom wchodzą: {cards}.', { cards: listOf(higher) }), left > 0 ? t('W kolekcji brakuje Ci jeszcze {cards}.', { cards: countOf(left, 'karty', 'kart', 'kart') }) : t('Masz już wszystkie karty.')].filter(Boolean).join(' '),
                           onClose: () => render(),
                         });
                       } else playSound('chest');
@@ -600,7 +668,11 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
             tier.beaten
               ? h('span', { class: 'cards-tier-done' }, icon('check', { size: 14 }), t('Stopień pokonany'))
               : h('span', {}, t('Pierwsza wygrana'), ' ', h('strong', { class: 'cards-rarity', vars: { '--rarity': tier.firstWin.color }, text: t('karta: {rarity}', { rarity: tier.firstWin.name }) })),
+            // The effect card of its first staked win since they came (977.3 B).
+            tier.effectWin &&
+              h('span', {}, t('Wygrana o stawkę'), ' ', h('strong', { class: 'cards-rarity', vars: { '--rarity': tier.effectWin.color }, text: t('karta efektu: {rarity}', { rarity: tier.effectWin.name }) })),
           ),
+          tier.effects && h('p', { class: 'muted small', text: t('Szczęsny gra tu też kartami efektów.') }),
           h(
             'div',
             { class: 'cards-tier-actions' },
@@ -651,6 +723,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
       words && h('p', { class: 'settlement-greeting', text: words }),
       h('dl', { class: 'status-list' }, rows.map(([label, value]) => h('div', { class: 'status-row' }, h('dt', { text: label }), h('dd', { text: value })))),
       ended.card && h('div', { class: 'cards-reward' }, h('p', { class: 'cards-reward-text', text: reward }), face(ended.card)),
+      ended.effectCard && h('div', { class: 'cards-reward' }, h('p', { class: 'cards-reward-text', text: filled(view.effects?.texts.firstWin, { card: ended.effectCard.name }) }), face(ended.effectCard)),
       // The first win's card already at its top level: its gold instead (919 B).
       ended.cardGold > 0 &&
         h('p', {
@@ -804,6 +877,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
   function builder() {
     const order = { strength: 0, dexterity: 1, intellect: 2 };
     const rarityOrder = (id) => state.content.rarities.findIndex((rarity) => rarity.id === id);
+    const effects = view.effects ?? { slots: 0, owned: [], texts: {} };
     const cards = [...view.collection]
       .filter((card) => shown === 'all' || card.type === shown)
       .sort((a, b) => (order[a.type] ?? 9) - (order[b.type] ?? 9) || rarityOrder(b.rarity) - rarityOrder(a.rarity) || b.level - a.level || a.name.localeCompare(b.name));
@@ -811,7 +885,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     const ready = count === view.deckSize;
     const save = (event) =>
       withButton(event.currentTarget, async () => {
-        const answer = await call('POST', '/api/cards/deck', { cards: [...chosen], slot: buildingSlot });
+        const answer = await call('POST', '/api/cards/deck', { cards: [...chosen], slot: buildingSlot, ...(effects.slots > 0 && { effects: [...chosenEffects] }) });
         building = false;
         apply(answer);
         toast(view.decks ? t('Talia {slot} zapisana.', { slot: buildingSlot }) : t('Talia zapisana.'));
@@ -829,7 +903,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
             render();
           },
         },
-        id !== 'all' && typeIcon(id, 14),
+        id === 'effects' ? h('span', { class: 'tcard-type tcard-type--effect cards-filter-badge' }, icon('star', { size: 14 })) : id !== 'all' && typeIcon(id, 14),
         h('span', { class: 'chat-tab-name', text: label }),
       );
     const bar = () =>
@@ -853,8 +927,14 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
       h('h3', { class: 'section-title', text: view.decks ? t('Ułóż talię {slot}', { slot: buildingSlot }) : t('Ułóż talię') }),
       h('p', { class: 'muted', text: t('Wybierz {size} kart z kolekcji. Najlepiej po kilka każdego typu: Siła bije Zręczność, Zręczność Magię, a Magia Siłę.', { size: view.deckSize }) }),
       bar(),
-      h('div', { class: 'chat-tabs market-tabs cards-filter', role: 'tablist', 'aria-label': t('Typ karty') }, filter('all', t('Wszystkie')), view.types.map((type) => filter(type.id, type.name))),
       h(
+        'div',
+        { class: 'chat-tabs market-tabs cards-filter', role: 'tablist', 'aria-label': t('Typ karty') },
+        filter('all', t('Wszystkie')),
+        view.types.map((type) => filter(type.id, type.name)),
+        effects.slots > 0 && filter('effects', effects.texts.tab),
+      ),
+      shown === 'effects' ? effectsToChoose(effects) : h(
         'div',
         { class: 'tcard-grid tcard-grid--collection' },
         cards.map((card) =>
@@ -874,11 +954,39 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     );
   }
 
+  // The builder's effect cards (979.2): all the character has, those chosen
+  // ticked, at most the deck's slots; a tap adds or takes one off.
+  function effectsToChoose(effects) {
+    const full = chosenEffects.size >= effects.slots;
+    return h(
+      'div',
+      { class: 'stack' },
+      h('p', { class: 'muted', text: effects.owned.length === 0 ? effects.texts.empty : filled(effects.texts.builder, { count: chosenEffects.size, slots: effects.slots }) }),
+      effects.owned.length > 0 &&
+        h(
+          'div',
+          { class: 'tcard-grid tcard-grid--collection' },
+          effects.owned.map((card) =>
+            face(card, {
+              marks: { chosen: chosenEffects.has(card.id), dim: !chosenEffects.has(card.id) && full },
+              label: t('{name}, poziom {level}: {state}', { name: card.name, level: card.level, state: chosenEffects.has(card.id) ? t('w talii') : t('poza talią') }),
+              onClick: () => {
+                if (chosenEffects.has(card.id)) chosenEffects.delete(card.id);
+                else if (!full) chosenEffects.add(card.id);
+                else toast(t('W talii stoją już {cards}. Najpierw zdejmij którąś.', { cards: countOf(effects.slots, 'karta efektu', 'karty efektów', 'kart efektów') }));
+                render();
+              },
+            }),
+          ),
+        ),
+    );
+  }
+
   // --- The match -----------------------------------------------------------
 
   // The turn being laid, at first the lines as they stand.
   function planOf(match) {
-    if (!plan || plan.round !== match.round) plan = { round: match.round, lines: match.me.lines.map((card) => card?.key ?? null), skill: null };
+    if (!plan || plan.round !== match.round) plan = { round: match.round, lines: match.me.lines.map((card) => card?.key ?? null), skill: null, effect: null };
     return plan;
   }
 
@@ -912,23 +1020,26 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
       if (skill.kind === 'swap' && skill.swap === card.key) return power;
       return 0;
     };
+    // The effect cards of the round (976, 977): the player's being laid
+    // and the rival's, the cards as they will stand after them.
+    const effects = roundEffects(match, plan.effect, lines);
     const taken = { me: [0, 0, 0], foe: [0, 0, 0] };
     const strong = { me: [false, false, false], foe: [false, false, false] };
     for (const side of ['me', 'foe']) {
       const other = side === 'me' ? 'foe' : 'me';
-      lines[side].forEach((card, line) => {
+      effects.cards[side].forEach((card, line) => {
         if (!card) return;
         const aimed = side === 'me' && skill?.kind === 'aim' && skill.card === card.key && lines.foe[skill.target] ? skill.target : null;
         const at = aimed ?? (lines[other][line] ? line : lines[other].findIndex(Boolean));
         if (at === null || at < 0) return;
-        const target = lines[other][at];
+        const target = effects.cards[other][at];
         const advantage = beats(card.type, target.type);
-        const extra = side === 'me' ? boost(card) : 0;
-        taken[other][at] += Math.max(1, Math.round(card.attack * (1 + (advantage ? view.typeBonus : 0)) * (1 + extra)));
+        const extra = (side === 'me' ? boost(card) : 0) + (effects[side].boost[card.key] ?? 0) + effects[side].rally;
+        taken[other][at] += effectBlow(card, target, { advantage, typeBonus: view.typeBonus, extra, theirs: effects[other] });
         if (advantage) strong[other][at] = true;
       });
     }
-    return { taken, strong, lines };
+    return { taken, strong, lines, cards: effects.cards, marks: effectMarks(match, plan.effect, effects.cards) };
   }
 
   // The hero's skill: its steps, as its kind asks.
@@ -947,7 +1058,28 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
   }
   function startAiming() {
     aiming = { step: 'card' };
+    effectAim = null;
     picked = null;
+    render();
+  }
+
+  // An effect card tapped (979.4): Zew watahy and Mgła are set at once, the
+  // others wait for their target; the hero's skill's steps give way.
+  function pickEffect(card) {
+    aiming = null;
+    picked = null;
+    if (card.target === 'all') {
+      plan.effect = { key: card.key };
+      effectAim = null;
+    } else {
+      plan.effect = null;
+      effectAim = { key: card.key, target: card.target };
+    }
+    render();
+  }
+  function cancelEffect() {
+    plan.effect = null;
+    effectAim = null;
     render();
   }
   function cancelSkill() {
@@ -1007,6 +1139,14 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
   // taken back, or a card chosen for the hero's skill.
   function tapMine(line) {
     const key = plan.lines[line];
+    if (effectAim) {
+      if (key !== null && effectAim.target === 'own') {
+        plan.effect = { key: effectAim.key, target: key };
+        effectAim = null;
+        render();
+      }
+      return;
+    }
     if (aiming) {
       if (key !== null && aiming.step === 'card') chooseOwn(key);
       return;
@@ -1026,9 +1166,11 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
       plan.lines[line] = picked;
       picked = null;
     } else if (key !== standing && plan.skill?.swap !== key) {
-      // Laid this turn: back to the reserve (and a skill on it undone).
+      // Laid this turn: back to the reserve (and a skill or an effect card
+      // on it undone).
       plan.lines[line] = null;
       if (plan.skill?.card === key) plan.skill = null;
+      if (plan.effect && plan.effect.target === key && view.match.me.effects?.find((one) => one.key === plan.effect.key)?.target === 'own') plan.effect = null;
     } else return;
     renderLaid();
   }
@@ -1066,6 +1208,12 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
   }
 
   function tapFoe(line) {
+    if (effectAim?.target === 'rival' && view.match.foe.lines[line]) {
+      plan.effect = { key: effectAim.key, target: line };
+      effectAim = null;
+      render();
+      return;
+    }
     if (aiming?.step !== 'target' || !view.match.foe.lines[line]) return;
     plan.skill = { kind: 'aim', card: aiming.card, target: line };
     aiming = null;
@@ -1088,18 +1236,24 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
       'div',
       { class: `cards-lines cards-lines--${side}` },
       names.map((name, line) => {
-        const card = side === 'foe' ? match.foe.lines[line] : plan.lines[line] === null ? null : mine.get(plan.lines[line]);
+        const laid = side === 'foe' ? match.foe.lines[line] : plan.lines[line] === null ? null : mine.get(plan.lines[line]);
+        // Its Życie as the round's effect cards leave it (Żywa woda, Piorun Peruna).
+        const card = laid && { ...laid, life: blowsNow.cards[side][line]?.life ?? laid.life };
         const shownCard = side === 'me' && card && plan.skill?.kind === 'shift' && plan.skill.card === card.key ? { ...card, type: plan.skill.type, shifted: true } : card;
         const blow = blowsNow.taken[side][line];
         const fresh = side === 'foe' ? placed.includes(line) : card && card.key !== standingKeys(match)[line];
         const skillMark = side === 'me' && card && (plan.skill?.card === card.key || plan.skill?.swap === card.key) ? match.me.hero?.skill?.name : null;
-        const target = side === 'foe' ? aiming?.step === 'target' && card : aiming?.step === 'card' && card;
         const aimedAt = side === 'foe' && plan.skill?.kind === 'aim' && plan.skill.target === line;
+        // What an effect card of the round does to it, or the curse on it.
+        const effectMark = blowsNow.marks[side][line] ?? (laid?.cursed ? t('−{power}% ciosu', { power: Math.round(laid.cursed * 100) }) : null);
+        const mark = [skillMark ?? (aimedAt ? t('cel') : null), effectMark].filter(Boolean).join(' · ') || null;
+        const effectTarget = Boolean(card) && effectAim?.target === (side === 'foe' ? 'rival' : 'own');
+        const target = effectTarget || (side === 'foe' ? aiming?.step === 'target' && card : aiming?.step === 'card' && card);
         const content = shownCard
           ? withKey(
               face(shownCard, {
-                marks: { blow, advantage: blowsNow.strong[side][line], fresh, skill: skillMark ?? (aimedAt ? t('cel') : null), target },
-                onClick: side === 'foe' ? (aiming?.step === 'target' ? () => tapFoe(line) : null) : () => tapMine(line),
+                marks: { blow, advantage: blowsNow.strong[side][line], fresh, skill: mark, target },
+                onClick: side === 'foe' ? (aiming?.step === 'target' || effectAim?.target === 'rival' ? () => tapFoe(line) : null) : () => tapMine(line),
               }),
               side,
               shownCard.key,
@@ -1124,8 +1278,20 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
       const other = hit.side === 'me' ? 'foe' : 'me';
       const who = known[hit.side].get(hit.key) ?? '?';
       const whom = known[other].get(hit.target.key) ?? '?';
-      return h('li', { class: `cards-hit cards-hit--${hit.side}` }, t('{who} → {whom}: {damage}', { who, whom, damage: hit.damage }), hit.advantage && h('span', { class: 'cards-hit-note', text: t(' (przewaga typu)') }));
+      return h(
+        'li',
+        { class: `cards-hit cards-hit--${hit.side}` },
+        t('{who} → {whom}: {damage}', { who, whom, damage: hit.damage }),
+        hit.advantage && h('span', { class: 'cards-hit-note', text: t(' (przewaga typu)') }),
+        hit.missed && h('span', { class: 'cards-hit-note', text: ` (${view.effects?.texts.missed ?? ''})` }),
+      );
     });
+    // The effect cards of the round (976, 977): the player's and the rival's.
+    const played = [
+      last.effect && t('Twoja karta efektu: {name} ({short})', { name: last.effect.name, short: last.effect.short }),
+      last.rivalEffect && t('Karta efektu rywala: {name} ({short})', { name: last.rivalEffect.name, short: last.rivalEffect.short }),
+    ].filter(Boolean);
+    lines.unshift(...played.map((text) => h('li', { class: 'cards-hit cards-hit--effect', text })));
     const beaten = [...last.beatenCards.foe.map((card) => card.name), ...last.beatenCards.me.map((card) => card.name)];
     return h(
       'details',
@@ -1165,12 +1331,13 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
         h('span', { class: 'cards-round', text: t('Runda {round}/{cap}', { round: match.round, cap: match.cap }) }),
       ),
       linesRow('foe', match, blowsNow),
+      view.effects && rivalEffectLine(match, view.effects.texts),
       h('div', { class: 'cards-divider', 'aria-hidden': 'true' }, h('span', { text: match.mode === 'staked' ? t('Stawka: {gold} zł', { gold: formatNumber(match.stake) }) : t('Trening') })),
       linesRow('me', match, blowsNow),
       h('p', { class: 'muted cards-table-count cards-table-count--me' }, match.me.deck > 0 && backs(1), h('span', { text: t('Twoja talia {deck} · zbite {out}', { deck: match.me.deck, out: match.me.out }) })),
     );
     if (art) table.style.setProperty('--place-art', `url("${art}")`);
-    const hint = aimHint() ?? (picked !== null ? t('Wskaż pustą linię dla tej karty.') : !ready ? t('Dołóż karty z rezerwy na puste linie.') : null);
+    const hint = effectHint(effectAim, view.effects?.texts ?? {}) ?? aimHint() ?? (picked !== null ? t('Wskaż pustą linię dla tej karty.') : !ready ? t('Dołóż karty z rezerwy na puste linie.') : null);
     const giveUp = () =>
       h('button', {
         type: 'button',
@@ -1253,6 +1420,8 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
                 ? h('button', { type: 'button', class: 'button button--system', text: t('Anuluj'), onClick: cancelSkill })
                 : h('button', { type: 'button', class: 'button button--system', text: t('Użyj: {skill}', { skill: skill?.name ?? '' }), onClick: startAiming }),
         ),
+      // The effect cards under the hero's card (979.4).
+      view.effects && effectsSection({ match, use: plan.effect, aim: effectAim, texts: view.effects.texts, face, onPick: pickEffect, onCancel: cancelEffect }),
       h(
         'div',
         { class: 'cards-actions' },
@@ -1261,12 +1430,17 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
           class: 'button button--world cards-fight',
           'data-guide': 'cards-fight',
           text: t('Walcz'),
-          disabled: !ready || Boolean(aiming),
+          disabled: !ready || Boolean(aiming) || Boolean(effectAim),
           onClick: (event) =>
             withButton(event.currentTarget, () =>
               orAgain(async () => {
                 const goldBefore = state.character.gold;
-                const answer = await call('POST', '/api/cards/turn', { round: plan.round, lines: plan.lines, skill: plan.skill ? { card: plan.skill.card, target: plan.skill.target, type: plan.skill.type, swap: plan.skill.swap } : null });
+                const answer = await call('POST', '/api/cards/turn', {
+                  round: plan.round,
+                  lines: plan.lines,
+                  skill: plan.skill ? { card: plan.skill.card, target: plan.skill.target, type: plan.skill.type, swap: plan.skill.swap } : null,
+                  effect: plan.effect ? { key: plan.effect.key, ...(plan.effect.target !== undefined && { target: plan.effect.target }) } : null,
+                });
                 playSound('swing');
                 if (fx.on() && !gone) {
                   await foughtWithFx(answer, goldBefore);

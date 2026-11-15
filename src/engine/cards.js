@@ -635,6 +635,7 @@ export function effectView(id, level, content, extra = {}) {
     color: rarity.color,
     level: cardLevel(level, content),
     power,
+    short: effect.short.replace('{power}', String(Math.round(power * 100))),
     text: effect.text.replace('{power}', String(Math.round(power * 100))),
     ...extra,
   };
@@ -652,7 +653,7 @@ export function effectDeckBlock(ids, owned, content) {
   const rules = effectRules(content);
   if (ids === undefined || ids === null) return null;
   if (!Array.isArray(ids) || !rules || ids.length > rules.slots || ids.some((id) => !isEffect(id, content)) || new Set(ids).size !== ids.length) {
-    return { code: 'invalid_effects', message: `W talii stoją najwyżej ${rules?.slots ?? 0} różne karty efektów.` };
+    return { code: 'invalid_effects', message: 'Za dużo kart efektów w talii albo dwie takie same.' };
   }
   const mine = new Set(owned);
   if (ids.some((id) => !mine.has(id))) return { code: 'effect_missing', message: 'Nie masz tej karty efektu.' };
@@ -1505,11 +1506,15 @@ export function matchView(match, content) {
   // A side's effect cards (976, 977), played or not.
   /** @param {Side} side */
   const effects = (side) => (side.effects ?? []).map((one) => effectView(one.id, one.level, content, { key: one.key, used: one.used }));
-  // An effect card as a round played it, with its name.
+  // An effect card as a round played it (or the rival will), with its
+  // name: `at`, what it was played on (its side's own card's key, or the
+  // other side's line), and Mgła's blows missed.
   /** @param {EffectLog | EffectUse | null | undefined} log @param {Side} side */
   const effectLog = (log, side) => {
     const played = log ? (side.effects ?? []).find((one) => one.key === log.key) : null;
-    return log && played ? { ...log, ...effectView(played.id, played.level, content) } : null;
+    if (!log || !played) return null;
+    const misses = /** @type {EffectLog} */ (log).misses;
+    return { ...effectView(played.id, played.level, content), key: log.key, at: log.target ?? null, ...(misses !== undefined && { misses }) };
   };
   /** @param {Hero | null} hero */
   const heroOf = (hero) => hero && { classId: hero.classId, stage: hero.stage, used: hero.used, skill: heroSkill(hero.classId, hero.stage, content) };

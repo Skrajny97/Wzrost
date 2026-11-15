@@ -326,6 +326,8 @@ async function cardArenaView(db, player, record, rivals, now, defences = null) {
     decks: saved,
     starter: cardGameOf(row, arenaDay(now, content()).key).starter,
     hero: heroView(row),
+    // The effect cards' words (976, 977), for the table.
+    effects: content().cards.effects ? { texts: content().cards.effects.texts } : null,
     rivals: rivals.map((rival) => rivalView(rival, record.rating)),
     rerolls: { left: cardRerollsLeft(record, now, content()), perDay: data.rivals.rerollsPerDay },
     defences,
