@@ -79,6 +79,17 @@ describe('Google sign-in', () => {
     assert.equal((await call('GET', '/api/health')).data.google, true);
   });
 
+  // Poleć grę (referrals.js): the code of a player's link rides in the
+  // flow's cookie to the account made; a code of no shape is dropped.
+  test('start keeps the code of a player\'s link in the flow', async () => {
+    const response = await fetchRaw('/api/auth/google/start?ref=K7M2QX');
+    const state = new URL(response.headers.get('Location')).searchParams.get('state');
+    assert.match(response.headers.getSetCookie()[0], new RegExp(`^__Host-google=${state}\\.[A-Za-z0-9_-]{43}\\.login\\.K7M2QX; `));
+    const odd = await fetchRaw('/api/auth/google/start?ref=a.b');
+    const oddState = new URL(odd.headers.get('Location')).searchParams.get('state');
+    assert.match(odd.headers.getSetCookie()[0], new RegExp(`^__Host-google=${oddState}\\.[A-Za-z0-9_-]{43}\\.login; `));
+  });
+
   test('start sends the browser to Google with PKCE and keeps the flow in a short cookie', async () => {
     const response = await fetchRaw('/api/auth/google/start');
     assert.equal(response.status, 302);

@@ -3309,6 +3309,22 @@ Autor zapytał, czemu część graczy nie ma pakietu trzech kart u Szczęsnego (
 5. **Przy okazji:** zasady kart mówiły „najwyżej +15% za wszystkie 156 kart”, a od Łysogór kart jest 207, więc teraz: „najwyżej +15%, od 150 kart”.
 6. **Dalej:** animacja otwierania pakietu. Obrazek pakietu w PixelLab i makieta animacji (MP4 z telefonu) idą na stronę ocen, a do gry po akceptacji.
 
+## Polecenie gry z linku (982 A z dopiskiem, 985; 15.11.2026, od 0.3.59)
+
+Autor: „kolejna opcja do dodania - ktoś rejestruje się z polecenia, konkretnego linku, a druga osoba za to zgarnia nagrodę (ta co poleca)”. Wybór 982 A z dopiskiem: „dodatkowe 300 Punktów Systemu za 30 poziom i 100 punktów dla grającego”. Makiety 985.1–985.3 przyjęte bez uwag.
+
+1. **Link:** każde konto ma swój link do gry, `/?p=<kod>`, z losowym kodem z 6 znaków (litery i cyfry bez 0, O, 1 i I), zrobionym przy pierwszym otwarciu karty. Kod to nie login. Link stoi w Społeczność → Znajomi, w karcie „Poleć grę” pod „Zaproś postać”, z „Kopiuj link”, a na telefonie także „Udostępnij”.
+2. **Zaproszenie:** kto wejdzie z linku, ma kod zapamiętany na tym urządzeniu przez 30 dni, a adres strony go traci. Ekran logowania pokazuje zaproszenie: postać, którą gra polecający, i jej poziom, i od razu otwiera „Nowe konto”. Kod idzie z rejestracją hasłem i z logowaniem przez Google (w ciasteczku drogi do Google). Konto zapamiętuje polecającego raz, przy założeniu (`users.referred_by`). Kod nikogo nic nie daje.
+3. **Nagrody** (`data/community.json`, `referral`):
+   - Nowy gracz dostaje 20 Punktów Systemu na start, na pierwszą postać.
+   - Polecający dostaje 100 PS, gdy konto z jego linku ma potwierdzony e-mail (albo jest kontem Google) i postać na 10. poziomie.
+   - Polecający dostaje jeszcze 300 PS na 30. poziomie, a nowy gracz wtedy 100 PS.
+   - Poziom to najwyższy poziom postaci konta.
+4. **Odbiór:** każdą nagrodę odbiera się raz, przyciskiem „Odbierz” w karcie „Poleć grę”, i trafia ona do postaci, którą konto gra. Polecający odbiera najwyżej 10 nagród w miesiącu (czasu polskiego). Kolejne czekają do następnego miesiąca; karta pokazuje „Nagrody w tym miesiącu: N z 10”.
+5. **Karta:** przy każdym graczu z linku jego nagrody: odebrana (z ptaszkiem), „Odbierz” albo czekająca na poziom, a przy niepotwierdzonym e-mailu „e-mail niepotwierdzony”. Gracz z zaproszenia widzi na górze karty, kto go zaprosił, i swoją nagrodę.
+6. **Usunięcie konta** zabiera jego nagrody z polecenia, a konta z jego linku przestają być z nim związane.
+7. **Brakujące szczegóły:** nagrody się odbiera, a nie przychodzą same, żeby limit miesiąca nie zabierał niczego. Konto bez postaci w Społeczności nie ma karty, bo Znajomi otwierają się z poziomem Społeczności. Pliki: `src/server/referrals.js`, `src/client/referral-invite.js`, `src/client/screens/friends.js`, `migrations/0136_referrals.sql`.
+
 ## Animacja otwierania pakietu kart (983 A, 984; 15.11.2026, od 0.3.58)
 
 Autor przyjął obrazek pakietu 983 A i animację otwierania 984, bez uwag.
@@ -3325,6 +3341,10 @@ Autor: „Niech oznaczanie na czacie będzie możliwe też po nazwie konta”.
 1. „@” i nazwa konta oznacza postać, którą to konto teraz gra, na tych samych zasadach co imię postaci: tylko ten, kto czyta kanał, nigdy własne konto ani ktoś, kto ukrył piszącego, najwyżej 5 oznaczeń w wiadomości. Wielkość liter bez znaczenia (`src/server/mentions.js`).
 2. Postać oznaczona w jednej wiadomości i nazwą konta, i imieniem liczy się raz.
 3. Podpowiedzi pod polem wiadomości pokazują też nazwy kont piszących.
+
+## Wersja 0.3.59 (15.11.2026): polecenie gry z linku
+
+1. Karta „Poleć grę” w Znajomych, zaproszenie przy zakładaniu konta i nagrody w Punktach Systemu (982 A z dopiskiem, makiety 985). Zob. „Polecenie gry z linku”.
 
 ## Wersja 0.3.58 (15.11.2026): animacja otwierania pakietu kart i oznaczanie po nazwie konta
 

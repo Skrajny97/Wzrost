@@ -30,6 +30,7 @@ import {
   userView,
 } from './sessions.js';
 import { clearLoginFailures, clientOf, takeLoginAttempt, takeRegistration } from './throttle.js';
+import { referralRemoval, referredStatements, referrerOf } from './referrals.js';
 
 const LOGIN_PATTERN = /^[A-Za-z0-9_.-]{3,24}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -126,6 +127,10 @@ export async function register({ request, env, now }) {
     throw error;
   }
 
+  // Made from a player's link (Poleć grę, referrals.js): tied to that
+  // account, with the start Punkty Systemu waiting for its first character.
+  const referred = referredStatements(db, userId, await referrerOf(db, body.ref));
+  if (referred.length > 0) await db.batch(referred);
   const session = await createSession(db, userId, now);
   // The account is made even when the mail fails: the page offers to send it again.
   let emailSent = true;
@@ -293,6 +298,8 @@ async function removeAccount(db, session, now) {
       .bind(id),
     // The Loteria draws its characters won, detached the same way.
     ...detachedRows(db, `IN (${characters})`, [id]),
+    // Its referrals both ways (referrals.js).
+    ...referralRemoval(db, id),
     db.prepare('DELETE FROM characters WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM sessions WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM email_links WHERE user_id = ?').bind(id),

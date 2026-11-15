@@ -804,6 +804,10 @@
     "0.3.58": {
       "title": "Version 0.3.58",
       "body": "- Szczęsny's card pack now opens like a booster: the pack tears open on the table and the cards turn one by one, the rarer, the brighter they shine. Legendary, mythic and divine cards get a show of their own. A tap skips the animation, and with Animations off (Settings) the cards show at once.\n- In the chat you can tag a player by their account name too: \"@\" and the account name tags the character that player plays now."
+    },
+    "0.3.59": {
+      "title": "Version 0.3.59",
+      "body": "- Recommend the game to your friends: in Community → Friends you have your own link to the game. For every new player from your link you get 100 System Points once they confirm their e-mail and reach level 10, and 300 more once they reach level 30.\n- A new player from a link gets 20 System Points at the start and 100 at level 30. You collect the rewards with \"Collect\", at most 10 a month."
     }
   }
 }

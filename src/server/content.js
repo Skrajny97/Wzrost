@@ -461,6 +461,9 @@ export function publicContent() {
       // The game's Discord server: its invite link and the page's words
       // (src/client/discord.js).
       discord: { invite: game.community.discord.invite, texts: game.community.discord.texts },
+      // Poleć grę (referrals.js): the start points and the milestones for
+      // the invitation on the sign-up, and the words of the card.
+      referral: { start: game.community.referral.start, milestones: game.community.referral.milestones, texts: game.community.referral.texts },
     },
   };
 }

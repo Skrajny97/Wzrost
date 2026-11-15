@@ -21,6 +21,7 @@ import { fromBase64Url, toBase64Url } from './encoding.js';
 import { registrationOpen } from './features.js';
 import { language } from './i18n.js';
 import { createSession, deleteSession, getSession, readCookie, sessionCookie } from './sessions.js';
+import { codePattern, referredStatements, referrerOf } from './referrals.js';
 import { testModeFor } from './test-mode.js';
 
 const AUTHORIZE_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -48,6 +49,9 @@ export async function startGoogle({ request, env }) {
     return redirect(`https://${hosts[0]}${url.pathname}${url.search}`);
   }
   const mode = url.searchParams.get('mode') === 'link' ? 'link' : 'login';
+  // A player's link (Poleć grę, referrals.js) the new account came by.
+  const ref = url.searchParams.get('ref') ?? '';
+  const kept = codePattern().test(ref) ? ref : '';
   const state = randomToken();
   const verifier = randomToken();
   const challenge = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
@@ -63,7 +67,7 @@ export async function startGoogle({ request, env }) {
     // The player picks the account, also when the phone has only one.
     prompt: 'select_account',
   });
-  return redirect(target.href, flowCookie(`${state}.${verifier}.${mode}`, FLOW_SECONDS));
+  return redirect(target.href, flowCookie(`${state}.${verifier}.${mode}${kept ? `.${kept}` : ''}`, FLOW_SECONDS));
 }
 
 export async function googleCallback({ request, env, now }) {
@@ -108,6 +112,9 @@ export async function googleCallback({ request, env, now }) {
         ]);
       }
       user = await createGoogleUser(db, identity, now);
+      // Made from a player's link: tied to that account (referrals.js).
+      const referred = referredStatements(db, user.id, await referrerOf(db, flow.ref));
+      if (referred.length > 0) await db.batch(referred);
     }
     if (session) await deleteSession(db, session.id);
     await db.prepare('DELETE FROM sessions WHERE expires_at <= ?').bind(now).run();
@@ -257,9 +264,9 @@ function registeredHosts(env) {
 }
 
 function readFlow(request) {
-  const [state = '', verifier = '', mode] = (readCookie(request, FLOW_COOKIE) ?? '').split('.');
+  const [state = '', verifier = '', mode, ref = ''] = (readCookie(request, FLOW_COOKIE) ?? '').split('.');
   if (!TOKEN_PATTERN.test(state) || !TOKEN_PATTERN.test(verifier) || !MODES.includes(mode)) return null;
-  return { state, verifier, mode };
+  return { state, verifier, mode, ref: codePattern().test(ref) ? ref : null };
 }
 
 // SameSite=Lax, so that the cookie comes back with the browser from Google.

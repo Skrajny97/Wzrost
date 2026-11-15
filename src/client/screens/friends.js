@@ -46,6 +46,8 @@ export const giftText = (reward) =>
 export function mountFriends(container) {
   const { gift } = state.content.community;
   let view = null;
+  // The card „Poleć grę” (/api/referrals), asked for beside the Znajomi.
+  let referral = null;
   let gone = false;
   const body = h('div', { class: 'friends' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
 
@@ -85,7 +87,7 @@ export function mountFriends(container) {
     if (gone) return;
     view = next;
     friendsSeen(view);
-    fill(body, giftsCard(), incomingCard(), friendsCard(), inviteCard(), outgoingCard());
+    fill(body, giftsCard(), incomingCard(), friendsCard(), inviteCard(), referralCard(), outgoingCard());
   }
 
   // An action answered with the Znajomi anew, its words in a toast.
@@ -252,6 +254,93 @@ export function mountFriends(container) {
   const inviteCard = () =>
     h('section', { class: 'card', 'aria-labelledby': 'friends-invite-title' }, h('h2', { class: 'card-title', id: 'friends-invite-title', text: t('Zaproś postać') }), inviteForm);
 
+  // „Poleć grę” (982 A with the author's note, 15.11.2026; mock-ups 985;
+  // src/server/referrals.js): the player's own link to the game with
+  // „Kopiuj link” (and „Udostępnij” where the phone shares), the rewards
+  // taken this month, the players who came by the link with their rewards
+  // (given, „Odbierz”, or waiting for their level or a confirmed e-mail),
+  // and, for one who came by another's link, who invited it with its own
+  // reward.
+  function referralCard() {
+    if (!referral) return null;
+    const words = state.content.community.referral.texts;
+    const filled = (text, vars) => String(text ?? '').replace(/\{(\w+)\}/g, (_, key) => String(vars[key] ?? ''));
+    const points = (count) => t('{count} PS', { count: formatNumber(count) });
+    const [first, second] = referral.rules.milestones;
+    const later = referral.rules.milestones.find((milestone) => milestone.newcomer > 0);
+    const take = (body) => async () => {
+      const answer = await call('POST', '/api/referrals/claim', body);
+      referral = answer.referral;
+      playSound('chest');
+      if (view) show(view);
+      if (answer.text) toast(answer.text);
+    };
+    const copyLink = async (event) => {
+      const box = event.currentTarget.closest('.referral-link')?.querySelector('.referral-url');
+      try {
+        await navigator.clipboard.writeText(referral.link);
+        toast(words.copied);
+      } catch {
+        // Where the phone refuses the clipboard, the link is selected for a
+        // long press to copy it.
+        if (box) getSelection().selectAllChildren(box);
+      }
+    };
+    const share = () => navigator.share?.({ title: 'Insight', text: words.shareText, url: referral.link }).catch(() => {});
+    // A reward of a player who came by the link.
+    const reward = (person, one) =>
+      one.state === 'given'
+        ? h('span', { class: 'referral-reward referral-reward--given' }, icon('check', { size: 14 }), filled(words.given, { level: one.level, points: points(one.points) }))
+        : one.state === 'ready'
+          ? button(filled(words.claim, { points: points(one.points) }), take({ account: person.account, level: one.level }))
+          : h('span', { class: 'referral-reward', text: filled(words.waiting, { level: one.level, points: points(one.points) }) });
+    const invited = referral.invitedBy;
+    return h(
+      'section',
+      { class: 'card referral-card', 'aria-labelledby': 'friends-referral-title' },
+      h('h2', { class: 'card-title', id: 'friends-referral-title', text: words.title }),
+      invited &&
+        h(
+          'div',
+          { class: 'referral-invited' },
+          h('p', { text: invited.state && invited.state !== 'given' ? filled(words.invited, { name: invited.name, level: invited.level, points: points(invited.points) }) : filled(words.invitedDone, { name: invited.name }) }),
+          invited.state === 'ready' && button(filled(words.claim, { points: points(invited.points) }), take({ level: invited.level })),
+        ),
+      h('p', {
+        text: filled(words.rules, {
+          first: points(first?.referrer ?? 0),
+          firstLevel: first?.level ?? 0,
+          second: points(second?.referrer ?? 0),
+          secondLevel: second?.level ?? 0,
+          start: points(referral.rules.start),
+          later: points(later?.newcomer ?? 0),
+          laterLevel: later?.level ?? 0,
+        }),
+      }),
+      h(
+        'div',
+        { class: 'referral-link' },
+        h('span', { class: 'referral-url', text: referral.link.replace(/^https?:\/\//, '') }),
+        h('div', { class: 'referral-actions' }, button(words.copy, copyLink, 'system'), typeof navigator.share === 'function' && button(words.share, share, 'system')),
+      ),
+      h('p', { class: 'muted small', text: filled(words.month, { given: referral.month.given, limit: referral.month.limit }) }),
+      referral.players.length > 0 && h('h3', { class: 'referral-subtitle', text: filled(words.players, { count: formatNumber(referral.players.length) }) }),
+      referral.players.length > 0 &&
+        h(
+          'ul',
+          { class: 'friends-list referral-list' },
+          referral.players.map((person) =>
+            h(
+              'li',
+              { class: 'friend referral-player' },
+              person.name ? who(person) : h('div', { class: 'friend-who' }, h('span', { class: 'chat-level', text: words.noCharacter })),
+              h('div', { class: 'referral-rewards' }, person.emailConfirmed ? null : h('span', { class: 'referral-reward referral-reward--wait', text: words.unconfirmed }), person.rewards.map((one) => reward(person, one))),
+            ),
+          ),
+        ),
+    );
+  }
+
   function outgoingCard() {
     if (view.outgoing.length === 0) return null;
     return h(
@@ -268,6 +357,13 @@ export function mountFriends(container) {
     );
   }
 
+  call('GET', '/api/referrals').then(
+    (answer) => {
+      referral = answer.referral;
+      if (view && !gone) show(view);
+    },
+    () => {},
+  );
   call('GET', '/api/friends').then(show, (error) => {
     if (!gone) fill(body, h('p', { class: 'chat-error', role: 'status', text: error.message }));
   });
