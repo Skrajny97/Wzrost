@@ -172,6 +172,7 @@
     },
     {
       "id": "bastion",
+      "duelHp": 0.8,
       "classId": "warrior",
       "from": "guardian",
       "name": "Bastion",
@@ -193,6 +194,7 @@
     },
     {
       "id": "thunder-lord",
+      "duelPower": 0.9,
       "classId": "archer",
       "from": "storm-archer",
       "name": "Władca Piorunów",
@@ -204,6 +206,7 @@
     },
     {
       "id": "master-hunter",
+      "duelPower": 0.9,
       "classId": "archer",
       "from": "hunter",
       "name": "Mistrz Łowów",
@@ -237,6 +240,7 @@
     },
     {
       "id": "druid",
+      "duelPower": 1.9,
       "classId": "mage",
       "from": "arcanist",
       "name": "Druid",
@@ -260,6 +264,7 @@
     },
     {
       "id": "grand-inquisitor",
+      "duelPower": 2,
       "classId": "cleric",
       "from": "inquisitor",
       "name": "Wielki Inkwizytor",
@@ -312,6 +317,7 @@
     },
     {
       "id": "phantom",
+      "duelPower": 1.2,
       "classId": "shadow",
       "from": "night-dancer",
       "name": "Widmo",

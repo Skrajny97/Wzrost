@@ -1065,6 +1065,11 @@
       "id": "0.3.69",
       "title": "Wersja 0.3.69",
       "body": "- Czas w grze daje Punkty Czasu: każda minuta z grą na ekranie to 1 Punkt Czasu, do 60 dziennie. Liczy się też samo oglądanie, a po 10 minutach bez dotknięcia liczenie czeka na następne dotknięcie.\n- Dzisiejszy stan widać w portfelu pod złotem, przy Punktach Czasu: „Za czas w grze: 23 z 60 dziś”."
+    },
+    {
+      "id": "0.3.70",
+      "title": "Wersja 0.3.70",
+      "body": "- Arena i wojny gildii: drugie formy są wyrównane. Wielki Inkwizytor, Druid i Widmo biją mocniej, a Władca Piorunów i Mistrz Łowów słabiej, a Bastion ma mniej HP, tylko w pojedynkach graczy. Wcześniej Wielki Inkwizytor na 100. poziomie wygrywał 1% pojedynków, a Druid 9%. Teraz każda druga forma wygrywa od 31% do 70%.\n- Wyprawy, wieże, Labirynt i walki ze stworami się nie zmieniają."
     }
   ]
 }
