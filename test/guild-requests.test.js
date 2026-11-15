@@ -239,11 +239,14 @@ describe('the Prośby Gildii through the API', () => {
     assert.equal((await as('mistrz', 'POST', '/api/guild/leave')).status, 200);
     assert.deepEqual((await as('druh', 'GET', '/api/guild/requests')).data.requests, []);
     assert.equal((await give('druh', mine.id, 1)).data.error.code, 'closed');
-    // A request filled a fortnight ago, with its gift.
+    // A request filled three weeks ago, with its gift: before last week at
+    // any hour of the week. (A fortnight and an hour back fell on last
+    // week's Monday when the test ran on a Sunday after 23:00 in Warsaw,
+    // 15.11.2026, and the request stayed.)
     const druh = (await first("SELECT id FROM characters WHERE name = 'Druh'")).id;
     const mistrz = (await first("SELECT id FROM characters WHERE name = 'Mistrz'")).id;
     const guild = (await first('SELECT guild_id FROM guild_members WHERE character_id = ?', druh)).guild_id;
-    const old = Date.now() - 14 * 24 * HOUR;
+    const old = Date.now() - 21 * 24 * HOUR;
     const { meta } = await run(
       "INSERT INTO guild_requests (guild_id, character_id, kind, good, count, given, state, created_at, ends_at, closed_at) VALUES (?, ?, 'herb', 'comfrey', 1, 1, 'filled', ?, ?, ?)",
       guild,

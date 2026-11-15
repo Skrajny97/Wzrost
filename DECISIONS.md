@@ -3513,6 +3513,7 @@ Autor: „twarz w portrecie męskiego Strzelca Wyborowego jest brzydka i powinna
 ## Wersja 0.3.70 (15.11.2026): drugie formy na Arenie wyrównane
 
 1. Wielki Inkwizytor, Druid i Widmo mocniejsi, a Władca Piorunów, Mistrz Łowów i Bastion słabsi, tylko w pojedynkach graczy; każda druga forma wygrywa 31–70% pojedynków na 100. poziomie (992 A). Zob. „Drugie formy na Arenie”.
+2. W tej wersji weszły też 0.3.68 i 0.3.69. Wdrożenie 0.3.69 zatrzymał test Próśb Gildii zależny od godziny: prośba zamknięta dwa tygodnie i godzinę temu wypadała w niedzielę po 23:00 czasu polskiego w poniedziałek zeszłego tygodnia i nie znikała. Test bierze teraz prośbę sprzed trzech tygodni (`test/guild-requests.test.js`). Gra działała dobrze.
 
 ## Wersja 0.3.69 (15.11.2026): czas w grze za Punkty Czasu
 
