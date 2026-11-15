@@ -1,0 +1,14 @@
+{
+  "id": "scene",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art scene, a deep dark violet and midnight blue magical swirl of the System, a faint circle of glowing pale blue runes, tiny star specks, soft glow in the middle, evenly filling the whole picture, no objects, no creatures, no text, no border",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
