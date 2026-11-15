@@ -14,12 +14,14 @@ import {
   classLevelRate,
   addBonuses,
   blessingPlan,
+  gearKey,
   gearSetCount,
   gearSetIds,
   greenhouseHours,
   greenhouseStore,
   knownHerbs,
   professionState,
+  regearItem,
   trainingPlan,
   trainingXp,
   familyDiscoveries,
@@ -183,6 +185,26 @@ export async function loadCharacter(db, id) {
   return row ? playerOf(db, row) : null;
 }
 
+// The worn weapon and off-hand of a family the character's gear does not
+// use (988: a form that takes another class's gear, e.g. the Nekromanta's
+// kostury and fokusy), made once into the gear's own (regearItem in the
+// engine) and kept so; the bag's items stay as they are.
+async function regearWorn(db, row, items) {
+  const key = gearKey(row.class_id, row.evolution, content());
+  if (!key.includes(':')) return items;
+  const statements = [];
+  const next = items.map((item) => {
+    if (!item.equippedSlot) return item;
+    const { id, equippedSlot, ...data } = item;
+    const made = regearItem(data, key, content());
+    if (!made) return item;
+    statements.push(db.prepare('UPDATE items SET data = ? WHERE id = ? AND character_id = ?').bind(JSON.stringify(made), id, row.id));
+    return { id, equippedSlot, ...made };
+  });
+  if (statements.length > 0) await db.batch(statements);
+  return next;
+}
+
 // A character's row with its items, activities and camp buildings.
 async function playerOf(db, row) {
   const [items, activities, avatarActivities, buildings, parcels, stored] = await db.batch([
@@ -207,7 +229,7 @@ async function playerOf(db, row) {
   return {
     row,
     // equippedSlot is where the item is worn (null in the bag); item.slot is where it can go.
-    items: items.results.map((item) => ({ id: item.id, equippedSlot: item.slot, ...JSON.parse(item.data) })),
+    items: await regearWorn(db, row, items.results.map((item) => ({ id: item.id, equippedSlot: item.slot, ...JSON.parse(item.data) }))),
     // The items of the Przechowalnia, the oldest first, each with its own id
     // there (not an item's of the bag).
     stored: stored.results.map((item) => ({ id: item.id, ...JSON.parse(item.data) })),
@@ -1546,7 +1568,7 @@ export function characterView(player, now) {
   const pathWorn = pathGear(character, equipped, content());
   const pathNow = combatValues(character, pathWorn, content());
   const verdict = (item) =>
-    canUse(item.base, row.class_id, content()) && !content().slotsById[item.slot].locked ? equipVerdict(character, item, content(), pathWorn, pathNow) : null;
+    canUse(item.base, gearKey(row.class_id, row.evolution, content()), content()) && !content().slotsById[item.slot].locked ? equipVerdict(character, item, content(), pathWorn, pathNow) : null;
   const { gold, ...resources } = walletOf(row);
   const weapon = combatant.weapon;
   const cosmetics = JSON.parse(row.cosmetics ?? '{}');
@@ -1660,7 +1682,12 @@ export function characterView(player, now) {
     // has not decided: all the points there will be to give out again, from
     // the character's levels, the class's levels and events.
     evolutionReset: row.evolution_reset && spent > 0 ? pointSources(character, content()) : null,
-    canResetPoints: row.level <= content().balance.progression.freeResetMaxLevel && spent > 0,
+    canResetPoints: (row.level <= content().balance.progression.freeResetMaxLevel || (row.oblivion_scrolls ?? 0) > 0) && spent > 0,
+    // The Zwoje Niepamięci it holds (989): each resets the points once, free,
+    // past the level of the free reset; `resetWithScroll`, whether "Wyzeruj
+    // punkty" takes one now.
+    oblivionScrolls: row.oblivion_scrolls ?? 0,
+    resetWithScroll: row.level > content().balance.progression.freeResetMaxLevel && (row.oblivion_scrolls ?? 0) > 0,
     stats: content().stats.map((stat) => ({
       id: stat.id,
       name: stat.name,
@@ -1694,7 +1721,7 @@ export function characterView(player, now) {
     bag: bagItems(player)
       .reverse()
       .map((item) => {
-        const block = equipBlock(item, row.class_id, row.class_level, content());
+        const block = equipBlock(item, gearKey(row.class_id, row.evolution, content()), row.class_level, content());
         return { ...toItem(item), verdict: verdict(item), ...(block && { equipBlock: block }) };
       }),
     // The herbs and the potions in the bag, which take its places by the stack.
@@ -2252,16 +2279,20 @@ export function characterRemoval(db, id, now) {
   ];
 }
 
-async function savePoints(context, player, points) {
+// `scroll`: a Zwój Niepamięci goes with it (989), only while there is one.
+async function savePoints(context, player, points, { scroll = false } = {}) {
   const result = await context.env.DB.prepare(
-    'UPDATE characters SET points = ?, version = version + 1 WHERE id = ? AND version = ?',
+    `UPDATE characters SET points = ?, ${scroll ? 'oblivion_scrolls = oblivion_scrolls - 1, ' : ''}version = version + 1 WHERE id = ? AND version = ?${scroll ? ' AND oblivion_scrolls > 0' : ''}`,
   )
     .bind(JSON.stringify(points), player.row.id, player.row.version)
     .run();
   if (result.meta.changes !== 1) {
     throw new ApiError(409, 'conflict', 'Postać zmieniła się w międzyczasie. Spróbuj ponownie.');
   }
-  const updated = { ...player, row: { ...player.row, points: JSON.stringify(points), version: player.row.version + 1 } };
+  const updated = {
+    ...player,
+    row: { ...player.row, points: JSON.stringify(points), version: player.row.version + 1, ...(scroll && { oblivion_scrolls: player.row.oblivion_scrolls - 1 }) },
+  };
   return json({ character: characterView(updated, context.now) });
 }
 
@@ -2296,14 +2327,17 @@ export async function autoPoints(context) {
   return savePoints(context, player, autoDistribute(character, content()));
 }
 
+// POST /api/character/points/reset: every point given out back in the pool,
+// free up to freeResetMaxLevel, and past it for a Zwój Niepamięci (989).
 export async function resetPoints(context) {
   const { player } = await requireBuildPlayer(context);
-  if (player.row.level > content().balance.progression.freeResetMaxLevel) {
+  const free = player.row.level <= content().balance.progression.freeResetMaxLevel;
+  if (!free && (player.row.oblivion_scrolls ?? 0) <= 0) {
     throw new ApiError(
       403,
       'reset_locked',
       `Darmowe zerowanie punktów jest dostępne do poziomu ${content().balance.progression.freeResetMaxLevel}.`,
     );
   }
-  return savePoints(context, player, {});
+  return savePoints(context, player, {}, { scroll: !free });
 }

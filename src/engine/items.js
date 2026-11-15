@@ -9,6 +9,7 @@
 // upgrades an item from +1 to +10, which raises all of its numbers.
 
 import { rarityNeedView } from './crafting.js';
+import { gearLists } from './gear.js';
 import { budget, weaponDamage } from './formulas.js';
 import { say, word } from './text.js';
 
@@ -177,8 +178,8 @@ export function baseClasses(baseId, content) {
  */
 export const baseClassLevel = (baseId, content) => content.basesById[baseId].classLevel ?? 1;
 
-// Whether a class can use a base: by its class, and, when the class level is
-// given, by the level the base asks for.
+// Whether a class (or a gear key, gearKey) can use a base: by its gear, and,
+// when the class level is given, by the level the base asks for.
 /**
  * @param {string} baseId
  * @param {string} classId
@@ -186,8 +187,80 @@ export const baseClassLevel = (baseId, content) => content.basesById[baseId].cla
  * @param {number} [classLevel]
  * @returns {boolean}
  */
-export const canUse = (baseId, classId, content, classLevel) =>
-  (baseClasses(baseId, content)?.includes(classId) ?? true) && (classLevel === undefined || classLevel >= baseClassLevel(baseId, content));
+export const canUse = (baseId, classId, content, classLevel) => fitsGear(baseId, classId, content) && (classLevel === undefined || classLevel >= baseClassLevel(baseId, content));
+
+// Whether a base is of the gear of a class or a gear key; what no class
+// uses fits anyone.
+/**
+ * @param {string} baseId
+ * @param {string} key
+ * @param {Content} content
+ * @returns {boolean}
+ */
+function fitsGear(baseId, key, content) {
+  const anyone = baseClasses(baseId, content);
+  if (!anyone) return true;
+  if (!key.includes(':')) return anyone.includes(key);
+  const lists = gearLists(key, content);
+  const family = baseFamily(content.basesById[baseId]);
+  return GEAR.some((list) => lists[/** @type {'weapons' | 'offhands' | 'armor'} */ (list)].includes(family));
+}
+
+// A worn weapon or off-hand of a family its wearer's gear does not use, made
+// into the gear's own (988: a form taking another class's gear, e.g. the
+// Nekromanta's kostury): a weapon into the gear's first weapon family, an
+// off-hand into its first off-hand family, at the same place in the family
+// (the same class level), with its rarity, level, upgrade, gem, affixes and
+// imbue kept, and its draw of the base's bonus kept as a share of the
+// bonus's range. `regeared` keeps the base it was. Null when it fits, or
+// when it is neither a weapon nor an off-hand.
+/**
+ * @param {Item} item
+ * @param {string} key
+ * @param {Content} content
+ * @returns {Item | null}
+ */
+export function regearItem(item, key, content) {
+  if ((item.slot !== 'weapon' && item.slot !== 'offhand') || canUse(item.base, key, content)) return null;
+  const lists = gearLists(key, content);
+  const family = (item.slot === 'weapon' ? lists.weapons : lists.offhands)[0];
+  const old = content.basesById[item.base];
+  if (!family || !old) return null;
+  /** @param {string} id */
+  const ladder = (id) =>
+    content.bases.filter((/** @type {Record<string, any>} */ base) => baseFamily(base) === id).sort((/** @type {Record<string, any>} */ a, /** @type {Record<string, any>} */ b) => (a.classLevel ?? 1) - (b.classLevel ?? 1));
+  const from = ladder(baseFamily(old));
+  const to = ladder(family);
+  const base = to[Math.min(to.length - 1, Math.max(0, from.findIndex((/** @type {Record<string, any>} */ one) => one.id === old.id)))];
+  if (!base || base.slot !== item.slot) return null;
+  /** @param {Record<string, any>} one @param {number} drawn */
+  const shareOf = (one, drawn) => (one.bonus && one.bonus.max > one.bonus.min ? Math.max(0, Math.min(1, (drawn - one.bonus.min) / (one.bonus.max - one.bonus.min))) : 0);
+  /** @param {Record<string, any>} one @param {number} share */
+  const bonusAt = (one, share) => (one.bonus ? Math.round(one.bonus.min + share * (one.bonus.max - one.bonus.min)) : 0);
+  const tuning = content.balance.items;
+  const baseShare = budget(item.level, content.rarities[0].budget, content.balance);
+  /** @param {Record<string, any>} one */
+  const numbers = (one) => {
+    if (one.kind === 'weapon') {
+      const average = weaponDamage(baseShare, one.damageFactor, content.balance);
+      return { min: Math.max(1, Math.round(average * (1 - one.variance))), max: Math.round(average * (1 + one.variance)) };
+    }
+    if (one.kind === 'armor') return { min: Math.max(1, Math.round(baseShare * tuning.armorPerBudget * one.armorFactor)), max: 0 };
+    return { min: Math.max(1, Math.round(baseShare * tuning.statPerBudget * one.statFactor)), max: 0 };
+  };
+  const drawn = (old.kind === 'weapon' ? (item.damage?.min ?? 0) : old.kind === 'armor' ? (item.armor ?? 0) : (item.implicit?.value ?? 0)) - numbers(old).min;
+  const bonus = bonusAt(base, shareOf(old, drawn));
+  const { damage, armor, implicit, element, ...kept } = item;
+  /** @type {Item} */
+  const next = { ...kept, base: base.id, regeared: { from: old.id } };
+  const made = numbers(base);
+  if (base.kind === 'weapon') {
+    next.damage = { min: made.min + bonus, max: Math.max(made.min, made.max) + bonus };
+    if (base.elements) next.element = base.elements.includes(element) ? element : base.elements[(item.level ?? 0) % base.elements.length];
+  } else if (base.kind === 'armor') next.armor = made.min + bonus;
+  else next.implicit = { stat: base.stat, value: made.min + bonus };
+  return next;
+}
 
 // Why a character of `classId` at `classLevel` cannot wear `item` now, as
 // the Postać's "Załóż" refuses it (src/server/inventory.js): its slot is
@@ -234,7 +307,7 @@ export function randomItem(level, rng, content, { rarityBonus = 1, uniqueBonus =
   let family;
   let own = true;
   if (filled && classId && !filled.has('weapon')) {
-    family = rng.pick(content.classesById[classId].weapons);
+    family = rng.pick(gearLists(classId, content).weapons);
   } else if (classId && otherClassShare > 0 && rng.chance(otherClassShare)) {
     family = otherClassFamily(classId, rng, content);
     own = false;
@@ -262,6 +335,8 @@ export function randomItem(level, rng, content, { rarityBonus = 1, uniqueBonus =
  * @returns {string}
  */
 function otherClassFamily(classId, rng, content) {
+  // A form with another class's gear (gearKey) has its own class's gear for
+  // another class's too.
   const other = rng.pick(content.classes.filter((/** @type {{ id: string }} */ cls) => cls.id !== classId)).id;
   /** @type {Record<string, any>[]} */
   const firsts = content.bases.filter((/** @type {Record<string, any>} */ base) => baseFamily(base) === base.id && canUse(base.id, other, content));

@@ -27,6 +27,7 @@ import {
   companionPlace,
   createRng,
   equipBlock,
+  gearKey,
   itemName,
   itemView,
   laterPeriod,
@@ -145,14 +146,14 @@ function offerView(row, wearer, team = teamOf(wearer)) {
     leading: row.bidder_id === wearer.id,
     own: row.seller_id === wearer.id,
     myBid: row.my_bid ?? null,
-    ...(item && { equipBlock: equipBlock(item, wearer.class_id, wearer.class_level, content()), wearers: wearersOf(item, team, content()) }),
+    ...(item && { equipBlock: equipBlock(item, gearKey(wearer.class_id, wearer.evolution, content()), wearer.class_level, content()), wearers: wearersOf(item, team, content()) }),
   };
 }
 
 // The character and its hired companions, for who can put an item on (also
 // the Skrzynia Gildii's cards, guild-chest.js).
 export function teamOf(row) {
-  return { classId: row.class_id, classLevel: row.class_level, companions: settlementOf(row).companions ?? [] };
+  return { classId: gearKey(row.class_id, row.evolution, content()), classLevel: row.class_level, companions: settlementOf(row).companions ?? [] };
 }
 
 // The companions for the cards' comparisons: each with its class and level
@@ -321,7 +322,7 @@ function sellable(player, now) {
 function wandererFor(row, stored, now) {
   const today = questPeriod('daily', now, content());
   const called = stored.market?.wandererCalled === today.key ? today : undefined;
-  return wandererGoods({ level: row.level, classId: row.class_id, classLevel: row.class_level, seed: row.id }, now, content(), called, brotherhoodPerk('wandererItems', stored.reputation, content()));
+  return wandererGoods({ level: row.level, classId: gearKey(row.class_id, row.evolution, content()), classLevel: row.class_level, seed: row.id }, now, content(), called, brotherhoodPerk('wandererItems', stored.reputation, content()));
 }
 
 // The residents' offers (242 A): the merchant's goods of the day with what
@@ -898,7 +899,7 @@ export async function testMarket(db, player, stored, action, now) {
     return stored;
   }
   const rng = createRng(`market:test:${row.id}:${now}`);
-  const item = randomItem(row.level, rng, content(), { classId: row.class_id, maxClassLevel: row.class_level ?? 1, rarityId: 'rare' });
+  const item = randomItem(row.level, rng, content(), { classId: gearKey(row.class_id, row.evolution, content()), maxClassLevel: row.class_level ?? 1, rarityId: 'rare' });
   const herb = rng.pick(content().herbs);
   const material = rng.pick(content().materials.filter((one) => one.rarity === 'rare'));
   const herbs = 5;

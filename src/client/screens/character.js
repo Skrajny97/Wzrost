@@ -405,6 +405,8 @@ export function mountCharacter(container, { switchCharacter } = {}) {
     const kinds = [
       ['ward-scroll', 'ochronne', state.character.scrolls ?? 0],
       ['steady-scroll', 'utrwalenia', state.character.steadyScrolls ?? 0],
+      // The Zwój Niepamięci (989), used in the Statystyki.
+      ['oblivion-scroll', 'niepamięci', state.character.oblivionScrolls ?? 0],
     ].filter(([, , count]) => count > 0);
     if (kinds.length === 0) return null;
     return h(

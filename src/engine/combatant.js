@@ -5,6 +5,7 @@
 import { coreEffects } from './core.js';
 import { evolutionOf, perClassLevelOf } from './evolutions.js';
 import { budget, cappedChance, damageScale, maxHp, maxMana, speed, weaponDamage } from './formulas.js';
+import { gearDamageOf, gearElementOf, gearKey, statAsOf, weaponScalingOf } from './gear.js';
 import { upgradedItem } from './items.js';
 import { gearLevel, midGameShare } from './progression.js';
 import { learnedSkills } from './skills.js';
@@ -42,7 +43,26 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
   const shares = week && statBoost ? Object.fromEntries([...new Set([...Object.keys(week), ...Object.keys(statBoost)])].map((stat) => [stat, (week[stat] ?? 0) + (statBoost[stat] ?? 0)])) : (week ?? statBoost);
   const totals = shares ? Object.fromEntries(Object.entries(stats).map(([stat, value]) => [stat, Math.round(value * (1 + (shares[stat] ?? 0)))])) : stats;
   const weaponItem = equipped.find((item) => item.slot === 'weapon');
-  const weapon = weaponItem ? itemWeapon(weaponItem, content) : unarmed(character.level, content);
+  // A form whose class's weapons hit with another stat (gear.js, 988), and
+  // a form that takes another class's kind, whose stat in Zręczność's place
+  // gives its speed and dodge too (`as`: the Nekromanta's Intelekt).
+  const key = gearKey(character.classId, character.evolution, content);
+  const scalingOf = weaponScalingOf(key, content);
+  const agile = statAsOf(key, content).dexterity ?? 'dexterity';
+  // A form's own weapons may hit by a share less than in their own class's
+  // hands (gear.damage: the Nekromanta's kostury, as its class keeps a
+  // Cień's HP and speed).
+  const share = gearDamageOf(key, content);
+  const element = gearElementOf(key, content);
+  const held = weaponItem ? itemWeapon(weaponItem, content) : null;
+  const weapon = held
+    ? {
+        ...held,
+        ...(scalingOf && { scaling: scalingOf }),
+        ...(element && !held.element && { element }),
+        ...(share !== 1 && { min: Math.max(1, Math.round(held.min * share)), max: Math.max(1, Math.round(held.max * share)) }),
+      }
+    : unarmed(character.level, content);
   let armor = bonuses.armor + totals.endurance * balance.combat.armorPerEndurance;
   if (area?.trait.frontArmorBonus && character.position === 'front') armor *= 1 + area.trait.frontArmorBonus;
   // Szuwary: the back of the line hides in the reeds; Jodłowy cień: the
@@ -108,10 +128,10 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     armor: Math.round(armor),
     resist,
     ...(shelter && { shelter: { [shelter]: feat.resist } }),
-    dodgeRating: totals.dexterity * balance.combat.dodgePerDexterity * (1 + dodgeBonus) * (1 + (core?.dodge ?? 0)),
+    dodgeRating: totals[agile] * balance.combat.dodgePerDexterity * (1 + dodgeBonus) * (1 + (core?.dodge ?? 0)),
     critRating: totals.perception * balance.combat.critPerPerception * (1 + (core?.crit ?? 0)),
     willRating: totals.will * balance.combat.willPerPoint * (1 + (core?.will ?? 0)),
-    speed: speed(totals.dexterity, character.level, balance) * (feat?.kind === 'shadowStep' ? 1 + feat.speed : 1) * (1 + (core?.speed ?? 0)),
+    speed: speed(totals[agile], character.level, balance) * (feat?.kind === 'shadowStep' ? 1 + feat.speed : 1) * (1 + (core?.speed ?? 0)),
     // Skills and the mana they spend, full at the start of every fight;
     // Wisdom also strengthens healing.
     maxMana: manaFull,

@@ -31,6 +31,7 @@ import {
   expeditionProgress,
   expeditionStageMinutes,
   expeditionStages,
+  gearKey,
   guildBeastFight,
   guildExpedition,
   isUnlocked,
@@ -435,7 +436,7 @@ export async function claimGuildExpeditionChest(context) {
     {
       stage,
       level: row.level,
-      classId: row.class_id,
+      classId: gearKey(row.class_id, row.evolution, content()),
       classLevel: row.class_level,
       wornSlots: equippedItems(player).map((worn) => worn.slot),
       guardian: chest.guardian,

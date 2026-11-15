@@ -4,7 +4,7 @@
 // its quests are. Each saves only if the character is as read (its version),
 // so two taps give one reward.
 
-import { QUEST_PERIODS, bagCapacity, campLevels, chestGold, chestItem, chestReady, createRng, itemName, questDone, rerolledQuests, withChest, withClaimed } from '../engine/index.js';
+import { QUEST_PERIODS, bagCapacity, campLevels, chestGold, chestItem, chestReady, createRng, gearKey, itemName, questDone, rerolledQuests, withChest, withClaimed } from '../engine/index.js';
 import { content } from './content.js';
 import { bagPlaces, characterView, equippedItems, loadPlayer, questContext, questsNow, requirePlayer } from './characters.js';
 import { atomically, sameVersion } from './atomic.js';
@@ -113,7 +113,7 @@ export async function openChest(context) {
     }
     // The same week's chest holds the same item, whenever it is opened.
     const rng = createRng(`${row.id}:${periodId}:${period.period}:chest`);
-    item = chestItem({ level: row.level, classId: row.class_id, classLevel: row.class_level }, equippedItems(player).map((worn) => worn.slot), rng, content());
+    item = chestItem({ level: row.level, classId: gearKey(row.class_id, row.evolution, content()), classLevel: row.class_level }, equippedItems(player).map((worn) => worn.slot), rng, content());
   }
   const gold = chestGold(chest, row.level);
   const after = withChest(quests, periodId);

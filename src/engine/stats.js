@@ -4,6 +4,7 @@
 
 import { coreEffects } from './core.js';
 import { classSpans, levelsIn } from './evolutions.js';
+import { autoPointsOf, gearKey, statAsOf } from './gear.js';
 import { upgradedItem } from './items.js';
 import { professionStats } from './professions.js';
 
@@ -55,9 +56,23 @@ export function computeStats(character, equipped, content) {
     }
   }
 
+  // A form that becomes another class's kind (gear.js, 988: „tak jakby się
+  // inną klasą stawał”) counts every point of a stat as another's, from the
+  // class, the character, the professions and the gear alike (`as`: the
+  // Nekromanta's and the Licz's Zręczność is their Intelekt).
+  for (const [from, to] of Object.entries(statAsOf(gearKey(character.classId, character.evolution, content), content))) {
+    const moved = sources[from];
+    const into = sources[to];
+    if (!moved || !into) continue;
+    for (const part of /** @type {(keyof Source)[]} */ (['class', 'character', 'professions', 'equipment'])) {
+      into[part] += moved[part];
+      moved[part] = 0;
+    }
+  }
+
   // The Rdzeń's Artefakty (core.js) raise a stat by a share of its points
   // from the class, the character, the professions and the gear.
-  const core = character.core ? coreEffects(character.core, character.classId, content) : null;
+  const core = character.core ? coreEffects(character.core, gearKey(character.classId, character.evolution, content), content) : null;
   for (const [stat, share] of Object.entries(core?.stats ?? {})) {
     const s = sources[stat];
     if (s) s.core = Math.round(Math.max(0, s.class + s.character + s.professions + s.equipment) * share);
@@ -125,7 +140,8 @@ export function freePoints(character, content) {
 export function autoDistribute(character, content) {
   const free = freePoints(character, content);
   /** @type {Record<string, number>} */
-  const weights = content.classesById[character.classId].autoPoints;
+  // The form's own spread where its line changes it (gear.js, 988).
+  const weights = autoPointsOf(gearKey(character.classId, character.evolution, content), content);
   const totalWeight = Object.values(weights).reduce((sum, value) => sum + value, 0);
   const shares = /** @type {string[]} */ (content.statIds)
     .filter((stat) => weights[stat] > 0)

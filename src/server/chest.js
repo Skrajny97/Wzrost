@@ -17,7 +17,7 @@
 // another character come as got from others (foreign_stacks), as a
 // Wymiana's (account-chest.js in the engine).
 
-import { CHEST_GOODS, bagCapacity, campLevels, canUse, chestTakes, itemView, knownStack, materialView, tradedLeaving } from '../engine/index.js';
+import { CHEST_GOODS, bagCapacity, campLevels, canUse, chestTakes, gearKey, itemView, knownStack, materialView, tradedLeaving } from '../engine/index.js';
 import { assertion, atomically } from './atomic.js';
 import { bagPlaces, characterView, chestLock, loadPlayer, requireOffRack, requirePlayer } from './characters.js';
 import { content } from './content.js';
@@ -96,7 +96,7 @@ async function chestView(db, player) {
         from: row.name ?? null,
         own,
         // Its class can wear it, and from which level of the class.
-        usable: canUse(item.base, player.row.class_id, content()),
+        usable: canUse(item.base, gearKey(player.row.class_id, player.row.evolution, content()), content()),
         wornFrom: view.classLevel,
       };
     }),

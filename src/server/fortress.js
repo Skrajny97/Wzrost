@@ -15,6 +15,7 @@ import {
   blessingPlan,
   campLevels,
   canUse,
+  gearKey,
   gearSetCount,
   gearSetPlan,
   greenhouseHours,
@@ -238,7 +239,7 @@ export async function wearGearSet(context) {
   const { row } = player;
   const plan = gearSetPlan(sets, index, player.items);
   // Only what the character may wear now (as equipItem asks).
-  const wear = plan.wear.filter((item) => !content().slotsById[item.slot].locked && canUse(item.base, row.class_id, content(), row.class_level));
+  const wear = plan.wear.filter((item) => !content().slotsById[item.slot].locked && canUse(item.base, gearKey(row.class_id, row.evolution, content()), content(), row.class_level));
   if (wear.length === 0) throw new ApiError(409, 'empty_set', 'W tym zestawie nie ma niczego do założenia.');
   if (plan.toBag.length > 0 && plan.toBag.length > room) throw new ApiError(409, 'bag_full', 'Plecak nie zmieści zdejmowanych rzeczy.');
   const db = context.env.DB;

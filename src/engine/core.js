@@ -23,6 +23,8 @@
 // Artefakty and the Odłamki are bound to the character (865 A). Pure: the
 // server keeps them and gives the seeds.
 
+import { autoPointsOf } from './gear.js';
+
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {import('./rng.js').Rng} Rng */
 /**
@@ -251,8 +253,9 @@ export function coreResonance(absorbed, content) {
  * @returns {string}
  */
 export function mainStatOf(classId, content) {
+  // A gear key (gear.js) has its form's spread.
   /** @type {Record<string, number>} */
-  const autoPoints = content.classesById[classId]?.autoPoints ?? {};
+  const autoPoints = autoPointsOf(classId, content);
   return Object.entries(autoPoints).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'vitality';
 }
 

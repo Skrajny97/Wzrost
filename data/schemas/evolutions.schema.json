@@ -53,6 +53,21 @@
           "nameFemale": { "type": "string", "minLength": 1, "description": "Nazwa dla postaci kobiecej (brak: jak name)." },
           "description": { "type": "string", "minLength": 1, "description": "Opis pod nazwą na karcie ewolucji." },
           "growth": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 }, "description": "Przyrost statystyk na poziom klasy po ewolucji, zamiast przyrostu klasy." },
+          "gear": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "weapons": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+              "offhands": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+              "armor": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+              "element": { "type": "string", "description": "Żywioł ciosów broni tej formy, która nie ma własnego (np. Sakrum mieczy i toporów Wielkiego Inkwizytora, dla jego Żarliwości)." }
+            },
+            "description": "988: broń, druga ręka i zbroja (rodziny z item-bases.json), których ta forma i jej następne formy używają zamiast klasowych, np. kostury i fokusy Maga u Nekromanty i Licza (src/engine/gear.js)."
+          },
+          "weaponDamage": { "type": "number", "exclusiveMinimum": 0, "maximum": 2, "description": "988: część obrażeń, którą bronie tej formy i jej następnych form biją u niej (np. 0,8: kostury Nekromanty biją o 20% słabiej niż u Maga, bo zostaje mu szybkość, unik i HP Cienia)." },
+          "scaling": { "type": "string", "enum": ["strength", "dexterity", "intellect", "wisdom"], "description": "988: statystyka, którą biją bronie tej formy i jej następnych form zamiast swojej." },
+          "as": { "type": "object", "additionalProperties": { "type": "string", "enum": ["strength", "dexterity", "intellect", "wisdom", "vitality", "endurance", "perception", "will"] }, "description": "988: każdy punkt jednej statystyki tej formy i jej następnych form liczy się jako innej, z klasy, z punktów, z profesji i z przedmiotów (np. Zręczność Nekromanty jako Intelekt), a statystyka, która przejmuje jej miejsce, daje też szybkość i unik." },
+          "autoPoints": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 }, "description": "988: rozkład „Rozdaj według klasy” tej formy i jej następnych form zamiast klasowego; jego największa część to główna statystyka (Rdzeń)." },
           "skillStat": { "type": "string", "enum": ["strength", "dexterity", "intellect", "wisdom", "vitality", "endurance", "perception", "will"], "description": "986 B: statystyka, którą wzrost ewolucji daje, a broń jej klasy nie używa; umiejętności ewolucji liczą się od statystyki broni razem z nią (balance.json skills.skillStatWeight razy)." },
           "perClassLevel": {
             "type": "object",
