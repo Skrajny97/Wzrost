@@ -186,12 +186,13 @@ export async function loadCharacter(db, id) {
 }
 
 // The worn weapon and off-hand of a family the character's gear does not
-// use (988: a form that takes another class's gear, e.g. the Nekromanta's
-// kostury and fokusy), made once into the gear's own (regearItem in the
-// engine) and kept so; the bag's items stay as they are.
+// use, made once into the gear's own (regearItem in the engine) and kept
+// so, at the first look after an evolution into a form with another
+// class's gear (988: the Nekromanta's kostury and fokusy) and back after a
+// change of evolution at the Pustelnik's (the author, 15.11.2026: „żeby
+// postać nie zostawała bez broni”); the bag's items stay as they are.
 async function regearWorn(db, row, items) {
   const key = gearKey(row.class_id, row.evolution, content());
-  if (!key.includes(':')) return items;
   const statements = [];
   const next = items.map((item) => {
     if (!item.equippedSlot) return item;

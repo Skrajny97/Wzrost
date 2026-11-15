@@ -112,6 +112,48 @@ describe('Ewolucje, które zmieniają broń (988) through the API', () => {
   });
 });
 
+describe('The gear made anew at an evolution and at a change of evolution', () => {
+  const { call, db, signUp } = useServer();
+
+  // The author, 15.11.2026: „Przy ewolucji w te odmienione formy też broń i
+  // druga ręka powinny sie przekształcać automatycznie, żeby postać nie
+  // zostawała bez broni”.
+  test("a Truciciel evolving into a Nekromanta has its sztylet and mizerykordia made into a kostur and a fokus in the evolution's answer; a change of evolution away from it makes them a sztylet and a mizerykordia again", async () => {
+    const { cookie } = await signUp('truciciel');
+    await call('POST', '/api/character', { cookie, body: { name: 'Truciciel', classId: 'shadow', appearance: 'female' } });
+    const database = await db();
+    const { id } = await database.prepare("SELECT id FROM characters WHERE name = 'Truciciel'").first();
+    const skills = Object.fromEntries(content.evolutionsById.poisoner.skills.map((skill) => [skill, 45]));
+    await database.prepare("UPDATE characters SET level = 80, class_level = 100, evolution = 'poisoner', skills = ? WHERE id = ?").bind(JSON.stringify(skills), id).run();
+    const dagger = generateItem({ baseId: 'kindjal', level: 70, rarityId: 'unique' }, createRng('evolve-dagger'), content);
+    const parry = generateItem({ baseId: 'parrying-dagger', level: 70, rarityId: 'rare' }, createRng('evolve-parry'), content);
+    await database.prepare("DELETE FROM items WHERE character_id = ? AND slot IN ('weapon', 'offhand')").bind(id).run();
+    await database
+      .prepare("INSERT INTO items (character_id, slot, data, created_at) VALUES (?, 'weapon', ?, 0), (?, 'offhand', ?, 0)")
+      .bind(id, JSON.stringify(dagger), id, JSON.stringify(parry))
+      .run();
+    const worn = async () =>
+      Object.fromEntries((await database.prepare("SELECT slot, data FROM items WHERE character_id = ? AND slot IN ('weapon', 'offhand')").bind(id).all()).results.map((row) => [row.slot, JSON.parse(row.data)]));
+    const evolved = await call('POST', '/api/evolution', { cookie, body: { evolutionId: 'necromancer' } });
+    assert.equal(evolved.status, 200, JSON.stringify(evolved.data));
+    // A second form brings a Zwój Niepamięci too.
+    assert.deepEqual([evolved.data.oblivionScroll, evolved.data.character.oblivionScrolls], [true, 1]);
+    let now = await worn();
+    assert.deepEqual([now.weapon.base, now.offhand.base], ['posokh', 'quartz-crystal']);
+    assert.deepEqual([now.weapon.rarity, now.weapon.level, now.offhand.implicit.stat], ['unique', 70, 'intellect']);
+    // The answer itself shows them.
+    const shown = evolved.data.character.equipment ?? evolved.data.character.equipped ?? evolved.data.character.items;
+    assert.ok(JSON.stringify(shown ?? evolved.data.character).includes('posokh'), 'the kostur in the answer');
+    // A change of evolution at the Pustelnik's to the Królobójca, as it
+    // saves it: back to a sztylet and a mizerykordia at the next look.
+    await database.prepare("UPDATE characters SET evolution = 'kingslayer' WHERE id = ?").bind(id).run();
+    assert.equal((await call('GET', '/api/character', { cookie })).status, 200);
+    now = await worn();
+    assert.deepEqual([now.weapon.base, now.offhand.base], ['kindjal', 'parrying-dagger']);
+    assert.equal(now.offhand.implicit.stat, 'dexterity');
+  });
+});
+
 describe('Zwój Niepamięci (989)', () => {
   const { call, db, signUp } = useServer();
 

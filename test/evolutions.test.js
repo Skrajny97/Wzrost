@@ -288,6 +288,8 @@ describe('class evolutions through the API', () => {
     assert.equal(taken.status, 200, JSON.stringify(taken.data));
     const after = taken.data.character;
     assert.equal(after.className, 'Barbarzyńca');
+    // The Zwój Niepamięci every evolution brings (the author, 15.11.2026).
+    assert.deepEqual([taken.data.oblivionScroll, after.oblivionScrolls], [true, 1]);
     assert.equal(after.baseClassName, 'Wojownik');
     assert.equal(after.evolution.current.trait.name, 'Furia');
     assert.equal(after.skills.points, 41);
@@ -316,6 +318,8 @@ describe('class evolutions through the API', () => {
     assert.equal(taken.status, 200, JSON.stringify(taken.data));
     assert.equal(taken.data.character.className, 'Strażnik');
     assert.equal(taken.data.character.evolutionUndo, true);
+    // A test, which can be undone, brings no Zwój Niepamięci.
+    assert.deepEqual([taken.data.oblivionScroll, taken.data.character.oblivionScrolls], [false, 0]);
     // A test evolution below class level 50 opens its tab as well.
     assert.equal(taken.data.character.features.includes('evolution'), true);
     const undone = await call('POST', '/api/evolution/undo', { cookie });

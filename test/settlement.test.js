@@ -785,7 +785,7 @@ describe('the Osada through the API', () => {
     assert.equal((await call('POST', '/api/test/settlement', { cookie, body: { action: 'nothing' } })).status, 400);
   });
 
-  test('the Pustelnik resets the paths and, above the free reset\'s level, the stats for gold', async () => {
+  test('the Pustelnik resets the paths and, past the free reset\'s level, sells a Zwój Niepamięci, one while the character holds none', async () => {
     const { hermit } = content.settlement;
     const skill = content.skills.find((one) => one.classId === 'warrior');
     await set('skills = ?, points = ?', JSON.stringify({ [skill.id]: 3 }), JSON.stringify({ strength: 5 }));
@@ -796,13 +796,29 @@ describe('the Osada through the API', () => {
     assert.deepEqual(JSON.parse(row.skills), {});
     assert.equal(row.gold, 100000 - path.data.gold);
     assert.equal((await call('POST', '/api/settlement/hermit', { cookie, body: { service: 'path' } })).data.error.code, 'nothing_to_reset');
-    // At level 20 the stats reset is the free one in Statystyki.
-    assert.equal((await call('POST', '/api/settlement/hermit', { cookie, body: { service: 'stats' } })).data.error.code, 'free_reset');
+    // At level 20 the stats reset is the free one in Statystyki: no scroll.
+    assert.equal((await view()).hermit.scroll, null);
+    const scroll = () => call('POST', '/api/settlement/hermit', { cookie, body: { service: 'scroll' } });
+    assert.equal((await scroll()).data.error.code, 'free_reset');
     await set('level = ?', hermit.statsFromLevel);
-    const stats = await call('POST', '/api/settlement/hermit', { cookie, body: { service: 'stats' } });
-    assert.equal(stats.status, 200);
-    row = await (await db()).prepare('SELECT points FROM characters').first();
-    assert.deepEqual(JSON.parse(row.points), {});
+    const price = hermit.statsFromLevel * hermit.statsGoldPerLevel;
+    assert.deepEqual((await view()).hermit.scroll, { gold: price, owned: 0 });
+    const bought = await scroll();
+    assert.equal(bought.status, 200, JSON.stringify(bought.data));
+    assert.deepEqual([bought.data.gold, bought.data.character.oblivionScrolls, bought.data.character.resetWithScroll], [price, 1, true]);
+    // The points stay as they are till the scroll resets them.
+    row = await (await db()).prepare('SELECT points, gold, oblivion_scrolls FROM characters').first();
+    assert.deepEqual([JSON.parse(row.points), row.gold, row.oblivion_scrolls], [{ strength: 5 }, 100000 - path.data.gold - price, 1]);
+    // One at a time: no scrolls laid up at a low level's price.
+    assert.deepEqual((await view()).hermit.scroll, { gold: price, owned: 1 });
+    assert.equal((await scroll()).data.error.code, 'scroll_owned');
+    // Used in the Statystyki, it is gone, and he sells another.
+    const reset = await call('POST', '/api/character/points/reset', { cookie });
+    assert.equal(reset.status, 200, JSON.stringify(reset.data));
+    assert.equal(reset.data.character.oblivionScrolls, 0);
+    assert.equal((await scroll()).status, 200);
+    // His reset of the stats themselves is gone with it.
+    assert.equal((await call('POST', '/api/settlement/hermit', { cookie, body: { service: 'stats' } })).data.error.code, 'invalid_service');
   });
 
   test('the Pustelnik sells Punkty Czasu for gold, up to the day\'s limit, also during an exploration', async () => {
@@ -915,15 +931,19 @@ describe('the Osada through the API', () => {
     const free = await call('POST', '/api/settlement/hermit', { cookie, body: { service: 'evolution', evolutionId: 'gladiator' } });
     assert.equal(free.status, 200);
     assert.equal(free.data.gold, 0);
-    let row = await (await db()).prepare('SELECT evolution, skills, gold FROM characters').first();
+    // A Zwój Niepamięci with each change, as with every evolution.
+    assert.equal(free.data.oblivionScroll, true);
+    let row = await (await db()).prepare('SELECT evolution, skills, gold, oblivion_scrolls FROM characters').first();
     assert.equal(row.evolution, 'gladiator');
     assert.deepEqual(JSON.parse(row.skills), Object.fromEntries(content.evolutionsById.gladiator.skills.map((id) => [id, 0])));
     assert.equal(row.gold, 100000);
+    assert.equal(row.oblivion_scrolls, 1);
     const paid = await call('POST', '/api/settlement/hermit', { cookie, body: { service: 'evolution', evolutionId: 'guardian' } });
     assert.equal(paid.data.gold, content.settlement.hermit.evolutionGold);
-    row = await (await db()).prepare('SELECT evolution, gold FROM characters').first();
+    row = await (await db()).prepare('SELECT evolution, gold, oblivion_scrolls FROM characters').first();
     assert.equal(row.evolution, 'guardian');
     assert.equal(row.gold, 100000 - content.settlement.hermit.evolutionGold);
+    assert.equal(row.oblivion_scrolls, 2);
     assert.equal((await call('POST', '/api/settlement/hermit', { cookie, body: { service: 'evolution', evolutionId: 'gladiator' } })).data.error.code, 'not_enough_gold');
   });
 

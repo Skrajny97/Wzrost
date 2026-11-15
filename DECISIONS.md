@@ -3365,6 +3365,7 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
    - Broń i druga ręka, których forma nie używa, zmieniają się w przedmiot jej rodzaju. Dzieje się to raz, przy pierwszym wczytaniu postaci po zmianie i po każdej ewolucji w taką formę (`regearItem`).
    - Nowy przedmiot ma to samo miejsce w rodzinie (ten sam poziom klasy), rzadkość, poziom, ulepszenie, kamień, zaklęcie i afiksy, a wylosowany dodatek bazy jako tę samą część jej zakresu. Sztylet staje się kosturem, mizerykordia fokusem, kropidło mieczem.
    - Rzeczy w plecaku zostają, jakie były.
+   - Działa też w drugą stronę (od 0.3.65): po zmianie ewolucji u Pustelnika na formę z bronią swojej klasy (np. z Nekromanty na Królobójcę) kostur i fokus wracają do sztyletu i mizerykordii z tymi samymi cechami. Autor: „Przy ewolucji w te odmienione formy też broń i druga ręka powinny sie przekształcać automatycznie, żeby postać nie zostawała bez broni”. Przy samej ewolucji broń zmienia się od razu, już w odpowiedzi na wybór ewolucji (`test/evolution-gear.test.js`).
 9. **Liczby z symulacji** (`tools/class-balance-sim.mjs`, `tools/pvp-arena-sim.mjs`, przed i po):
    - Arena, trzecie formy na 200. poziomie: Licz 68% → 64%, Wybraniec Peruna 55% → 62%, Władca Puszczy 66% → 72%, Pogromca Demonów 33% → 28%, Arcydruid 26% → 27%; wszystkie w progu 25–75%.
    - Wyprawy, zabijanie: Truciciel bez zmian, Nekromanta i Licz od −3% do +4%, linia Strzelca Burzy od −3% do 0%, linia Łowcy od 0% do +3%, Wielki Inkwizytor +3%, Pogromca Demonów +11%.
@@ -3382,7 +3383,17 @@ Autor: „daj każdemu graczowi jednorazowy przedmiot zerujący statystyki (najp
    - W Plecaku zwój stoi w linii zwojów („Zwoje: niepamięci 1”).
    - W Statystykach, póki postać ma zwój, jest „Wyzeruj punkty” z linią „Masz Zwój Niepamięci (1): wyzerujesz nim punkty za darmo.”, a pytanie przed zerowaniem mówi, że zużyje zwój.
 3. **Rozdanie:** każda postać, która była w grze przy wdrożeniu 0.3.64, dostała jeden (`migrations/0138_oblivion_scrolls.sql`). Gra może je dawać znowu, gdy zmiana zasad zepsuje komuś rozdane punkty: dodaje się je w migracji, tak samo.
-4. **Pliki:** `characters.oblivion_scrolls`, `resetPoints` w `src/server/characters.js`, `src/client/screens/stats.js`, `src/client/art/icons/oblivion-scroll.png`.
+4. **Pliki:** `characters.oblivion_scrolls`, `resetPoints` w `src/server/characters.js`, `src/client/screens/stats.js`, `src/client/art/icons/oblivion-scroll.png`; od 0.3.65 też `takeEvolution` w `src/server/evolutions.js`, `hermitService` i `changeEvolution` w `src/server/settlement.js`, okno ewolucji w `src/client/evolution.js` i przycisk Pustelnika w `src/client/screens/settlement.js`.
+5. **Po każdej ewolucji** (od 0.3.65). Autor: „Niech zwój niepamięci przysługuje darmo od systemu każdemu po każdej ewolucji postaci”.
+   - Każda ewolucja wybrana na stałe (pierwsza, druga i trzecia forma) i każda zmiana ewolucji u Pustelnika daje jeden zwój.
+   - Okno ewolucji mówi o tym linią ze zwojem: „System daje Ci Zwój Niepamięci. Wyzerujesz nim rozdane punkty statystyk w Statystykach, kiedy zechcesz.” Zmiana u Pustelnika mówi to w komunikacie.
+   - Ewolucja z testu (wersja testowa) zwoju nie daje, bo da się ją cofnąć.
+   - Darmowe zerowanie zaraz po pierwszej ewolucji i po zmianie u Pustelnika (okno „Wyzerować statystyki?” z „zalecane”) zostaje, jak było, i nie zużywa zwoju. Jego ostrzeżenie mówi to wprost.
+6. **U Sambora** (od 0.3.65). Autor: „niech sprzedaje go Sambor (tak jakby to robi, ale nadajmy temu taką formę)”.
+   - Zamiast zerowania statystyk Pustelnik sprzedaje Zwój Niepamięci, za tyle, ile kosztowało zerowanie: od 21. poziomu, 100 złota za poziom postaci. Niżej zerowanie w Statystykach jest darmowe, więc zwoju nie sprzedaje.
+   - Sprzedaje jeden, gdy postać nie ma żadnego, żeby nie dało się nakupić zwojów tanio na niskim poziomie i zużyć ich wyżej.
+   - Przycisk „Kup Zwój Niepamięci (X zł.)”, a gdy postać ma zwój, nieaktywny „Zwój Niepamięci: masz już jeden”.
+   - Nagrana kwestia narratora o Samborze („Za złoto wyzeruje ścieżkę umiejętności albo rozdane statystyki.”) zostaje bez zmian: zwój od niego daje to samo zerowanie.
 
 ## Zakładki czatu na komputerze (15.11.2026, od 0.3.62)
 
@@ -3455,6 +3466,12 @@ Autor: „Niech oznaczanie na czacie będzie możliwe też po nazwie konta”.
 1. „@” i nazwa konta oznacza postać, którą to konto teraz gra, na tych samych zasadach co imię postaci: tylko ten, kto czyta kanał, nigdy własne konto ani ktoś, kto ukrył piszącego, najwyżej 5 oznaczeń w wiadomości. Wielkość liter bez znaczenia (`src/server/mentions.js`).
 2. Postać oznaczona w jednej wiadomości i nazwą konta, i imieniem liczy się raz.
 3. Podpowiedzi pod polem wiadomości pokazują też nazwy kont piszących.
+
+## Wersja 0.3.65 (15.11.2026): Zwój Niepamięci po każdej ewolucji i u Sambora
+
+1. Każda ewolucja i każda zmiana ewolucji u Pustelnika daje Zwój Niepamięci, a Sambor sprzedaje zwój zamiast zerowania statystyk. Zob. „Zwój Niepamięci”, punkty 5 i 6.
+2. Po zmianie ewolucji u Pustelnika na formę z bronią swojej klasy broń i druga ręka wracają do tej broni. Zob. „Ewolucje, które zmieniają broń”, punkt 8.
+3. Usunięty podwójny wpis angielskiego tłumaczenia „Ta nagroda jest już odebrana.”, o którym ostrzegało wdrożenie.
 
 ## Wersja 0.3.64 (15.11.2026): ewolucje, które zmieniają broń, i Zwój Niepamięci
 

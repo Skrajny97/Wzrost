@@ -828,6 +828,10 @@
     "0.3.64": {
       "title": "Version 0.3.64",
       "body": "- Evolutions that change their weapon. The Necromancer and the Lich fight with the Mage's staves and foci, and all their Dexterity counts as Intellect. The Storm Archer, the Thunder Lord and the Chosen of Perun shoot with Intellect, and the Hunter, the Huntmaster and the Ruler of the Wilds with Strength. The Grand Inquisitor and the Demon Slayer fight with the Warrior's swords and axes, which strike with Sacred, and their Intellect counts as Strength.\n- The Poisoner gets Dexterity instead of Intellect with each class level, and the Inquisitor Intellect instead of Strength.\n- The weapon these characters wear has changed by itself into the new kind, of the same rarity, level and upgrade, with the same affixes. Rings and armour still work.\n- Every character got a Scroll of Oblivion: in Stats it resets the points you have given out, so you give them out anew, for free."
+    },
+    "0.3.65": {
+      "title": "Version 0.3.65",
+      "body": "- Every evolution brings a Scroll of Oblivion from the System: the first, the second and the third, and a change of evolution at Sambor's too. The free reset right after the first evolution stays and does not use up the scroll.\n- Sambor sells a Scroll of Oblivion instead of resetting your stats, for the same gold as before. He sells one when you have none.\n- After a change of evolution at Sambor's, your weapon and off-hand change by themselves into the new form's weapons, so your character is never left without a weapon."
     }
   }
 }
