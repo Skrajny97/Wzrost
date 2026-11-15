@@ -48,6 +48,7 @@
     "itemClasses": ["Dla klas: {classes}."],
     "itemClass": ["Dla klasy: {classes}."],
     "itemAnyClass": ["Dla każdej klasy."],
+    "itemNotFor": ["Nie dla: {classes}."],
     "itemOtherClasses": ["Przedmioty innych klas wypadają od {level}. poziomu postaci."],
     "itemWear": ["Założysz od {level}. poziomu klasy."],
     "itemPattern": ["Warsztat: wzór od {level}. poziomu Rzemieślnictwa."],

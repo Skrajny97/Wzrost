@@ -184,7 +184,9 @@ function realisticGear(classId, level, classLevel, plan, content, set = 0, key =
   const itemLevel = Math.max(1, Math.min(level - 1, engine.gearLevel(level, content)));
   // The gear of the form where its line takes another class's (gear.js, 988).
   const lists = engine.gearLists(key, content);
-  const families = { weapon: lists.weapons[0], ...KIT[classId], ...(key !== classId && { offhand: lists.offhands[0] }), ...OTHER_BASES };
+  // Its armour too, by the slot of each kind, where its line has its own.
+  const armor = Object.fromEntries(lists.armor.map((family) => [content.basesById[family].slot, family]));
+  const families = { weapon: lists.weapons[0], ...KIT[classId], ...(key !== classId && { offhand: lists.offhands[0], ...armor }), ...OTHER_BASES };
   // The slots the typical character has filled by now, and extraSlots more.
   const count = level === 1 ? 0 : Math.min(SLOT_ORDER.length, 1 + Math.floor(0.75 * itemsPerHour(content) * hoursToReach(level, content)) + plan.extraSlots);
   const mainStat = mainStatOf(key, content);

@@ -380,7 +380,11 @@ describe('the Warsztat through the API', () => {
         { id: 'stone', name: 'Kamień', amount: 18 },
         { id: 'iron-ore', name: 'Ruda żelaza', amount: 6 },
       ],
+      // Its kind and classes, with the forms that wear it too (988).
+      family: 'sword',
+      classIds: ['warrior'],
       classNames: ['Wojownik'],
+      formNames: ['Wielki Inkwizytor', 'Pogromca Demonów'],
       classLevel: null,
     });
     assert.deepEqual(broadsword, { id: 'broadsword', level: 10, hidden: true, hint: 'Ukryte przez System do 10. poziomu Rzemieślnictwa.' });

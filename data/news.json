@@ -1050,6 +1050,11 @@
       "id": "0.3.66",
       "title": "Wersja 0.3.66",
       "body": "- Nekromanta, Licz, Wielki Inkwizytor i Pogromca Demonów widzą w plecaku, na Targowisku, w Wymianie i w Przechowalni, co mogą założyć. Kostury i fokusy, a u Inkwizytorów miecze i topory, są dla nich. Przy sztyletach i kropidłach stoi, że ich klasa nie może ich używać. Wcześniej strona liczyła to po klasie sprzed ewolucji."
+    },
+    {
+      "id": "0.3.67",
+      "title": "Wersja 0.3.67",
+      "body": "- Karty przedmiotów mówią, kto je nosi, razem z ewolucjami. Przy kosturze stoi „Dla klas: Mag, Nekromanta, Licz”, a przy sztylecie „Dla klasy: Cień” i „Nie dla: Nekromanta, Licz”. Tak samo w Encyklopedii.\n- Warsztat podsuwa najpierw wzór broni, którą nosi Twoja ewolucja, np. Nekromancie kostur."
     }
   ]
 }

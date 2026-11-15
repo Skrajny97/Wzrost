@@ -1764,6 +1764,21 @@ export function itemSummary(item, { stats = false, tier = false } = {}) {
   return art ? h('span', { class: 'item-summary-art' }, art, text) : text;
 }
 
+// Who wears an item, as its card says (the author, 15.11.2026: „tak
+// logicznie to przemyśl żeby sie zgadzalo wszystko u każdej ewolucji i
+// klasy”): the classes and the forms that take its kind with their own gear
+// ("Dla klas: Mag, Nekromanta, Licz"), and the forms of those classes that
+// no longer wear it ("Nie dla: Nekromanta, Licz"); nothing for an item any
+// class wears.
+export function classLines(item) {
+  if (!item.classNames) return null;
+  const names = [...item.classNames, ...(item.formNames ?? [])];
+  return [
+    h('li', { class: 'item-classes', text: t(names.length > 1 ? 'Dla klas: {classes}' : 'Dla klasy: {classes}', { classes: names.join(', ') }) }),
+    item.exceptNames && h('li', { class: 'item-classes', text: t('Nie dla: {classes}', { classes: item.exceptNames.join(', ') }) }),
+  ];
+}
+
 // The lines of an item's numbers on its card. With a gem set in it, each
 // number as it is without the gem, and beside it in brackets, in the gem's
 // colour, as it is with it (906 B, the author: „Niech pokazują itemki bazowe
@@ -1807,7 +1822,7 @@ export function itemDetails(item, { small = false } = {}) {
       { class: 'item-properties' },
       propertyLines(item),
       item.gem && gemFold(item.gem),
-      item.classNames && h('li', { class: 'item-classes', text: t(item.classNames.length > 1 ? 'Dla klas: {classes}' : 'Dla klasy: {classes}', { classes: item.classNames.join(', ') }) }),
+      classLines(item),
       item.classLevel && h('li', { class: 'item-classes', text: t('Od poziomu klasy {level}', { level: item.classLevel }) }),
       // Raised by the Kowal, once per item (the author, 12.11.2026).
       item.raised && h('li', { class: 'item-classes', text: t('Kowal już przekuł go na wyższą rzadkość: drugi raz się nie da.') }),

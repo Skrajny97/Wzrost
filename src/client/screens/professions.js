@@ -1097,11 +1097,10 @@ export function mountProfessions(container, { params, navigate }) {
   function craftForm(character, workshop) {
     const who = workerPicker(character);
     const known = (slot) => slot.patterns.filter((pattern) => !pattern.hidden);
-    // A slot's pattern for the character's class comes first. The patterns
-    // name the classes themselves, so an evolved character goes by its
-    // class (baseClassName), not by its evolution's name (className).
-    const firstFor = (slot) =>
-      known(slot).find((pattern) => !pattern.classNames || pattern.classNames.includes(character.baseClassName ?? character.className)) ?? known(slot)[0];
+    // A slot's pattern for the character's gear comes first: its class's, or
+    // its form's own (988: a Nekromanta's kostur, not the Cień's sztylet),
+    // by the pattern's kind (classFits).
+    const firstFor = (slot) => known(slot).find((pattern) => classFits(pattern, character)) ?? known(slot)[0];
     const rarities = workshop.rarities.filter((rarity) => !rarity.hidden);
     const next = workshop.rarities.find((rarity) => rarity.hidden);
     let slot = workshop.slots.find((candidate) => candidate.id === craftChoice.slot) ?? workshop.slots[0];
@@ -1143,7 +1142,11 @@ export function mountProfessions(container, { params, navigate }) {
     // For whom a pattern is, from which class level, and whether it came from
     // an item taken apart.
     const forWhom = (each) =>
-      [each.classNames ? each.classNames.join(', ') : t('każda klasa'), each.classLevel && t('od poz. klasy {level}', { level: each.classLevel }), each.learned && t('z rozbiórki')]
+      [
+        each.classNames ? [...each.classNames, ...(each.formNames ?? [])].join(', ') : t('każda klasa'),
+        each.classLevel && t('od poz. klasy {level}', { level: each.classLevel }),
+        each.learned && t('z rozbiórki'),
+      ]
         .filter(Boolean)
         .join(' · ');
 

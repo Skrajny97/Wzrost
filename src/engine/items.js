@@ -9,7 +9,7 @@
 // upgrades an item from +1 to +10, which raises all of its numbers.
 
 import { rarityNeedView } from './crafting.js';
-import { gearLists } from './gear.js';
+import { gearLists, gearWearers } from './gear.js';
 import { budget, weaponDamage } from './formulas.js';
 import { say, word } from './text.js';
 
@@ -838,6 +838,8 @@ export function autoEquip(equipped, items, content, classId, classLevel) {
 export function itemView(item, content, { sellBonus = 0, upgradeCap, materials = null, anvilDiscount = 0, anvilWeek = 1 } = {}) {
   const rarity = content.raritiesById[item.rarity];
   const classIds = baseClasses(item.base, content);
+  const family = baseFamily(content.basesById[item.base]);
+  const wearers = classIds ? gearWearers(family, content) : null;
   const classLevel = baseClassLevel(item.base, content);
   // Its Tier, as the Encyklopedia sorts the bases (encyclopedia.json:
   // "Tier III" from class level 25), on the card (the author: "Mozesz
@@ -849,7 +851,7 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap, materials =
     base: item.base,
     // Its kind (the base's family), which a form's gear names (gearLists,
     // 988), for what the pages say the character can wear.
-    family: baseFamily(content.basesById[item.base]),
+    family,
     slot: item.slot,
     slotName: content.slotsById[item.slot].name,
     level: item.level,
@@ -863,6 +865,11 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap, materials =
     // null: any class can use it.
     classIds,
     classNames: classIds && classIds.map((id) => content.classesById[id].name),
+    // The forms that wear its kind beside those classes, and the forms of
+    // those classes that no longer do (gearWearers, 988), for its card's
+    // "Dla klas" and "Nie dla".
+    ...(wearers?.forms.length ? { formNames: wearers.forms.map((id) => content.evolutionsById[id].name) } : {}),
+    ...(wearers?.without.length ? { exceptNames: wearers.without.map((id) => content.evolutionsById[id].name) } : {}),
     // The class level it is worn from by its Tier, wherever it came from, or
     // null when it asks for none.
     classLevel: classLevel > 1 ? classLevel : null,

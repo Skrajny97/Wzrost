@@ -14,7 +14,8 @@
 import { recipeStanding } from './brewing.js';
 import { knownStack } from './crafting.js';
 import { areaDangers } from './hunt.js';
-import { baseClasses, baseClassLevel } from './items.js';
+import { gearWearers } from './gear.js';
+import { baseClasses, baseClassLevel, baseFamily } from './items.js';
 import { jewelBases, jewelPatternLevel } from './jewelcraft.js';
 import { professionState } from './professions.js';
 import { shopLevelFor } from './shop.js';
@@ -384,7 +385,13 @@ function itemEntry(base, discovered, content, patterns, jewels) {
   const classes = baseClasses(base.id, content);
   const classLevel = baseClassLevel(base.id, content);
   const area = classLevel > 1 ? firstAreaTo(classLevel, content) : null;
-  const names = classes?.map((/** @type {string} */ id) => content.classesById[id].name).join(', ');
+  // The classes and the forms that wear its kind, and the forms of those
+  // classes that no longer do (gearWearers, 988), as on the item's card.
+  const wearers = classes ? gearWearers(baseFamily(base), content) : { forms: [], without: [] };
+  /** @type {string[]} */
+  const wearing = [...(classes?.map((/** @type {string} */ id) => content.classesById[id].name) ?? []), ...wearers.forms.map((id) => content.evolutionsById[id].name)];
+  const names = wearing.join(', ');
+  const notFor = wearers.without.map((id) => content.evolutionsById[id].name).join(', ');
   return {
     id: base.id,
     found: best > 0,
@@ -394,7 +401,8 @@ function itemEntry(base, discovered, content, patterns, jewels) {
     rarity: best > 0 ? content.rarities[best - 1].id : null,
     sources: [
       area ? text(content, 'itemDrop', { area: area.name, levels: levels(area.minLevel, area.maxLevel) }) : text(content, 'itemDropAny'),
-      classes ? text(content, classes.length > 1 ? 'itemClasses' : 'itemClass', { classes: names }) : text(content, 'itemAnyClass'),
+      classes ? text(content, wearing.length > 1 ? 'itemClasses' : 'itemClass', { classes: names }) : text(content, 'itemAnyClass'),
+      notFor && text(content, 'itemNotFor', { classes: notFor }),
       classLevel > 1 && text(content, 'itemWear', { level: classLevel }),
       patterns.has(base.id) && text(content, 'itemPattern', { level: patternLevel(base, content) }),
       jewels.has(base.id) && text(content, 'itemJewelPattern', { level: jewelPatternLevel(base, content) }),

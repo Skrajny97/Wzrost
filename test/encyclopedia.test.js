@@ -103,7 +103,7 @@ describe('the Encyklopedia in the engine', () => {
     // from level 100 of their professions.
     assert.deepEqual(sixth.entries.find((entry) => entry.id === 'flamberge').sources, [
       'Wyprawy: wypada od regionu Stare Wyrobisko (poz. 96–100).',
-      'Dla klasy: Wojownik.',
+      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów.',
       'Założysz od 100. poziomu klasy.',
       'Warsztat: wzór od 100. poziomu Rzemieślnictwa.',
     ]);
@@ -153,11 +153,16 @@ describe('the Encyklopedia in the engine', () => {
     // and the Szlifiernia's patterns from level 125 of their professions.
     assert.deepEqual(seventh.entries.find((entry) => entry.id === 'coronation-sword').sources, [
       'Wyprawy: wypada od regionu Rokitowe Bezdno (poz. 121–125).',
-      'Dla klasy: Wojownik.',
+      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów.',
       'Założysz od 125. poziomu klasy.',
       'Warsztat: wzór od 125. poziomu Rzemieślnictwa.',
     ]);
     assert.ok(seventh.entries.find((entry) => entry.id === 'pectoral').sources.includes('Szlifiernia: wzór od 125. poziomu Jubilerstwa.'));
+    // A Cień's sztylet, which the Nekromanta and the Licz no longer wear
+    // (988), and the Mag's kostur, which they do.
+    const baselard = seventh.entries.find((entry) => entry.id === 'baselard').sources;
+    assert.ok(baselard.includes('Dla klasy: Cień.') && baselard.includes('Nie dla: Nekromanta, Licz.'), JSON.stringify(baselard));
+    assert.ok(seventh.entries.find((entry) => entry.id === 'archmage-staff').sources.includes('Dla klas: Mag, Nekromanta, Licz.'));
     // Materials of creatures of levels 151–175 in Tier VII: Głucha Knieja's
     // and those of Sosnowe Wydmy that come a level or two above its 150 (the
     // Południca, the Raróg and Pogorzelisko's). Ostępy Nowiu's go on to Tier
@@ -206,7 +211,7 @@ describe('the Encyklopedia in the engine', () => {
     // the Szlifiernia's patterns from level 150 of their professions.
     assert.deepEqual(eighth.entries.find((entry) => entry.id === 'self-swinging-sword').sources, [
       'Wyprawy: wypada od regionu Pogorzelisko (poz. 146–150).',
-      'Dla klasy: Wojownik.',
+      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów.',
       'Założysz od 150. poziomu klasy.',
       'Warsztat: wzór od 150. poziomu Rzemieślnictwa.',
     ]);
