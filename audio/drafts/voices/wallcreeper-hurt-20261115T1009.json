@@ -1,0 +1,13 @@
+{
+  "id": "wallcreeper-hurt",
+  "payload": {
+    "text": "a small bird gives a sharp high piping chirp of pain with a flutter of wings, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wallcreeper-hurt-20261115T1009-0.mp3",
+    "audio/drafts/voices/wallcreeper-hurt-20261115T1009-1.mp3"
+  ],
+  "credits": 20
+}
