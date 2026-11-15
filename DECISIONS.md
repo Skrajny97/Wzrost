@@ -3252,6 +3252,12 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.54 (15.11.2026): liczby nad kartą w całości także przy drżeniu areny od umiejętności
+
+1. Poprawka do punktu 3 wersji 0.3.53, który nie wystarczył na telefonie. Przy sprawdzaniu 0.3.53 klatka po klatce (390 px) „−3880!” Ciosu ostatecznego dalej tracił na dwie klatki „!”. Na arenę działały naraz trzy ruchy: przybliżenie kamery, wstrząs mocnego ciosu (do 7 px) i drżenie z wyglądu samej umiejętności (`shake()` w `src/client/skill-fx.js`, najwyżej 6,5 px, z takim samym powiększeniem). Zapas od krawędzi liczy teraz oba wstrząsy naraz (`LOOK_SHAKE` w `src/client/arena-fx.js`).
+2. „KRYTYK!” wskakuje na kartę z rozmiaru ×2,3, a gra mieściła go na arenie według zwykłej szerokości, więc przy karcie na skraju był w pierwszych widocznych klatkach ucięty z boku (do 10 px). Teraz mieści się na arenie od chwili, gdy go widać (od ok. ×1,6).
+3. Brakujący szczegół: liczba ciosu krytycznego i „KRYTYK!” nad kartą przy krawędzi stoją przez to bliżej środka areny (na telefonie o 15–40 px), ale dalej nad kartą. Zwykłe liczby nad kartą z prawej strony zostają nad nią.
+
 ## Wersja 0.3.53 (15.11.2026): animacje umiejętności klas wyewoluowanych Wojownika, Kleryka i Cienia (962–964)
 
 1. Autor zlecił na noc: „W nocy przygotuj animacje wszystkich innych ewolucji klas i zbierz je w jednym page'u z Akceptuj/Odrzuć”. Rano: „Wszystkie animacje zaakceptowane” (na stronie ocen 54 razy „Akceptuj”, bez uwag). Wszystkie 18 umiejętności każdej z trzech linii mają własny wygląd:

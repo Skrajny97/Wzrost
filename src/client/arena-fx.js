@@ -47,6 +47,9 @@ const SLOW_FALL = 0.65;
 // many pixels it swings the stage, and how much each of them zooms it.
 const QUAKE = 7;
 const QUAKE_ZOOM = 0.004;
+// The strongest shake a skill's look adds to it at the same moment (skill-fx.js
+// shake(), the same swing and zoom per pixel).
+const LOOK_SHAKE = 6.5;
 
 // The light of a blow by its kind: `glow` for its flash and trails, the
 // specks that fly off it.
@@ -407,13 +410,13 @@ export function createFx(kit) {
 
   // Where the words over a card (a blow's number, "KRYTYK!") may stand, for
   // ones `half` as wide at their biggest: inside the arena by its edges and,
-  // with the animations on, also by the room of the strongest shake
-  // (quake()). A heavy blow shakes the stage just as its number pops, and
-  // the shake's swing and zoom (from the stage's top left corner) carried a
-  // number by the right edge past it for a moment (a crit's "−3880!" lost
-  // its "!").
+  // with the animations on, also by the room of the strongest shakes
+  // (quake() and a skill's look's own, which can come together). A heavy
+  // blow shakes the stage just as its number pops, and the shakes' swing and
+  // zoom (from the stage's top left corner) carried a number by the right
+  // edge past it for a moment (a crit's "−3880!" lost its "!").
   function wordsRoom(half) {
-    const shake = motion() ? QUAKE : 0;
+    const shake = motion() ? QUAKE + LOOK_SHAKE : 0;
     const from = half + 3 + shake;
     const to = (stage.clientWidth - 3 - shake) / (1 + shake * QUAKE_ZOOM) - half;
     return [from, Math.max(from, to)];
@@ -786,7 +789,9 @@ export function createFx(kit) {
   function critStamp(card, point) {
     const label = h('span', { class: 'fx-crit', text: t('KRYTYK!'), 'aria-hidden': 'true' });
     fx.append(label);
-    const half = label.offsetWidth / 2;
+    // It stamps in from ×2.3 and is in sight from about ×1.6 on, so it is
+    // kept inside the arena at that size.
+    const half = (label.offsetWidth / 2) * (motion() ? 1.6 : 1);
     const top = Math.max(label.offsetHeight / 2 + 2, point.y - card.offsetHeight / 2 + 4);
     label.style.left = `${clamp(point.x, ...wordsRoom(half))}px`;
     label.style.top = `${top}px`;
