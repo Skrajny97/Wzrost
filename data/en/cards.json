@@ -125,8 +125,8 @@
       "A match for a stake: win and you take twice the stake, a draw gives the stake back. You play for a stake at most 10 times a day. The first win of the day at each tier also gives the day's reward, and the first win over a tier a rare card. Training is without a stake and without rewards.",
       "New cards are rarely left by creatures you beat on explorations and in the Labyrinth, more often by elites, champions and guardians. The same card won again raises its level, up to level 5: each level means more Attack and Life.",
       "Every fight you win on an exploration may also give a card of a creature from a lower land. Now and then a card drops for work in a profession, for an attack on the Beast or a Guild Expedition guardian and for a completed Guild Trial: a card of a creature from the lands at your level or lower. From these sources, the cards you do not have yet come first.",
-      "Once a day Szczęsny sells a pack of three cards of creatures from lands lower than yours, for as much gold as an hour of exploring brings at your level. Cards you do not have yet come first.",
-      "Your collection gives a lasting bonus: every 10 different cards add +1% XP and +1% gold from explorations, up to +15% for all 156 cards. It works from the moment you win a card. You can see your collection and its bonus in the Encyclopedia, under \"Cards\".",
+      "Once a day Szczęsny sells a pack of three random cards of creatures from every land. Each card has its rarity, from common to divine, and the last card of the pack is at least unique. The pack costs as much gold as 4 hours of exploring bring at your level. A good relation with Szczęsny cuts the price by up to 40%, and every pack you buy, every Lottery ticket and every gift improves it.",
+      "Your collection gives a lasting bonus: every 10 different cards add +1% XP and +1% gold from explorations, up to +15%, from 150 cards. It works from the moment you win a card. You can see your collection and its bonus in the Encyclopedia, under \"Cards\".",
       "In the Settlement you can also play the residents: each plays at their own place, with their own deck. Their decks fill the gaps between Szczęsny's tiers, and the hermit Sambor's deck is stronger even than tier V. Matches for a stake with the residents count towards the same 10 a day. Your first win for a stake against a resident gives a card from their deck that you don't have, and every later one a 10% chance of a card from their deck.",
       "Live matches: on the card of another player who is in the game now, you can challenge them to a card match, without a stake or for gold (from level 20 of both characters, at most 10 a day). You take turns, 30 seconds a move. Win and you take both stakes without the 5% the System takes."
     ],
@@ -138,8 +138,11 @@
     "guild": ["You got a card: {card}."],
     "trial": ["A completed Guild Trial brought you a card: {card}."],
     "pack": {
-      "offer": "Three random cards of creatures from lands lower than yours. Cards you do not have yet come first.",
-      "opened": "Szczęsny lays three cards on the table."
+      "offer": "Three random cards of creatures from every land, from common to divine. The last card is at least unique.",
+      "opened": "Szczęsny tears the pack open and lays the cards on the table.",
+      "odds": "Odds of each card: {odds}. Of the last one: {last}.",
+      "relation": "Your relation with Szczęsny: {standing}, price −{discount}%.",
+      "noDiscount": "With a better relation with Szczęsny you pay less, up to {most}%."
     },
     "live": {
       "challengeTitle": "A card match with: {name}",

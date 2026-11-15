@@ -376,37 +376,68 @@ export function cardFrom(pool, rng, { chance, ...have }) {
   return comes ? card : null;
 }
 
-// The pack of the day at Szczęsny's (902 C): `count` cards of the
-// creatures of the lands lower than the character's own (lowerLandCards),
-// each drawn as every source draws (pickCard: one the character has not
-// got first, never one at its top level, never one twice in a pack), from
-// the day's seed. Fewer when fewer are left; none in the first land.
+// The pack of the day at Szczęsny's, like a booster (902 C; the author,
+// 15.11.2026: "niech losuje całkowicie nie że słabsze, mogą się trafić też
+// lepsze", "coś à la boostery w Pokémonach"): `count` cards of all the
+// game's creatures, of every land. Each card first draws its rarity by the
+// pack's weights (cards.json pack.weights), the last one only among the
+// rarities from pack.lastAtLeast up, then one card of that rarity, all
+// alike; never one at its top level (`maxed`), never one twice in a pack. A
+// rarity with no card left to draw is skipped (its weight shared by the
+// others), and the last card takes any rarity once none from its floor up
+// is left. From the day's seed; fewer cards when fewer are left.
 /**
- * @param {{ land: number, owned: Iterable<string>, maxed: Iterable<string>, seed: string, count: number }} draw
+ * @param {{ maxed: Iterable<string>, seed: string, count: number }} draw
  * @param {Content} content
  * @returns {string[]}
  */
-export function packCards({ land, owned, maxed, seed, count }, content) {
-  const pool = lowerLandCards(land, content);
+export function packCards({ maxed, seed, count }, content) {
+  const { weights, lastAtLeast } = cardRules(content).pack;
   const rng = createRng(`${seed}:pack`);
-  const have = { owned: [...owned], maxed: [...maxed] };
+  const out = new Set(maxed);
+  /** @type {Map<string, string[]>} */
+  const byRarity = new Map();
+  for (const id of cardHomes(content).keys()) byRarity.set(cardRarity(id, content), [...(byRarity.get(cardRarity(id, content)) ?? []), id]);
+  const floor = content.rarities.findIndex((/** @type {Record<string, any>} */ rarity) => rarity.id === lastAtLeast);
   /** @type {string[]} */
   const cards = [];
   for (let index = 0; index < count; index += 1) {
-    const card = pickCard(pool, rng, { ...have, found: cards });
-    if (!card) break;
-    cards.push(card);
+    // Always both draws, so the next card never hangs on what this one gave.
+    const rarityRoll = rng.next();
+    const cardRoll = rng.next();
+    const left = (/** @type {string} */ rarity) => (byRarity.get(rarity) ?? []).filter((id) => !out.has(id) && !cards.includes(id));
+    const open = content.rarities.filter((/** @type {Record<string, any>} */ rarity) => (weights[rarity.id] ?? 0) > 0 && left(rarity.id).length > 0);
+    const last = index === count - 1 && floor > 0 ? open.filter((/** @type {Record<string, any>} */ rarity) => content.rarities.indexOf(rarity) >= floor) : [];
+    const from = last.length > 0 ? last : open;
+    if (from.length === 0) break;
+    const total = from.reduce((/** @type {number} */ sum, /** @type {Record<string, any>} */ rarity) => sum + weights[rarity.id], 0);
+    let mark = rarityRoll * total;
+    const rarity = from.find((/** @type {Record<string, any>} */ one) => (mark -= weights[one.id]) < 0) ?? from.at(-1);
+    const pool = left(rarity.id);
+    cards.push(pool[Math.min(pool.length - 1, Math.floor(cardRoll * pool.length))]);
   }
   return cards;
 }
 
-// The lands lower than `land`, by their names, in their order (902 C).
+// The pack's odds of each rarity (902 C, as a booster's): the share of every
+// card but the last and of the last, from pack.lastAtLeast up, by the
+// weights as written (before any rarity runs out of cards).
 /**
- * @param {number} land
  * @param {Content} content
- * @returns {string[]}
+ * @returns {{ rarity: string, any: number, last: number }[]}
  */
-export const lowerLandNames = (land, content) => landsInOrder(content).slice(0, Math.max(0, land));
+export function packOdds(content) {
+  const { weights, lastAtLeast } = cardRules(content).pack;
+  const floor = Math.max(0, content.rarities.findIndex((/** @type {Record<string, any>} */ rarity) => rarity.id === lastAtLeast));
+  const weighed = content.rarities.filter((/** @type {Record<string, any>} */ rarity) => (weights[rarity.id] ?? 0) > 0);
+  const total = weighed.reduce((/** @type {number} */ sum, /** @type {Record<string, any>} */ rarity) => sum + weights[rarity.id], 0);
+  const upper = weighed.filter((/** @type {Record<string, any>} */ rarity) => content.rarities.indexOf(rarity) >= floor).reduce((/** @type {number} */ sum, /** @type {Record<string, any>} */ rarity) => sum + weights[rarity.id], 0);
+  return weighed.map((/** @type {Record<string, any>} */ rarity) => ({
+    rarity: rarity.id,
+    any: weights[rarity.id] / total,
+    last: content.rarities.indexOf(rarity) >= floor ? weights[rarity.id] / upper : 0,
+  }));
+}
 
 // The chance of a card for a profession's work of `minutes` (903): its
 // share for each hour of the work, up to the most.

@@ -796,6 +796,10 @@
     "0.3.56": {
       "title": "Version 0.3.56",
       "body": "- Character ranking: under \"Prof. level\" you can now pick one profession from a list and see the ranking by it. \"Highest\" shows the ranking as before, by each character's highest profession.\n- Every creature of the Bald Mountains now has its full set of cries, the Marmot and the Black Goose too."
+    },
+    "0.3.57": {
+      "title": "Version 0.3.57",
+      "body": "- Szczęsny's card pack now draws cards of creatures from every land, also from lands higher than yours, by rarity: mostly common and rare, sometimes epic, and once in a while even legendary, mythic or divine. The last card of the pack is at least unique.\n- You can buy the pack already in the first land, once a day, for the gold of 4 hours of exploring at your level. A good relation with Szczęsny cuts the price by up to 40%, and every pack you buy improves that relation.\n- The odds of each rarity are shown on the pack in the Cards tab."
     }
   }
 }

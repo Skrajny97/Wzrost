@@ -44,7 +44,7 @@ import { liveMatch, mountDuel, onLiveMatch } from './card-duel.js';
 import { createCardsFx, fxDroppedCards } from './cards-fx.js';
 import { deckSlotsRow, deckTitle, nameDeckSheet } from './deck-slots.js';
 import { h, icon } from './dom.js';
-import { countOf, formatNumber } from './format.js';
+import { countOf, formatDecimal, formatNumber } from './format.js';
 import { t } from './i18n.js';
 import { playSound } from './sound.js';
 import { call, serverNow, state } from './state.js';
@@ -429,16 +429,20 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
 
   // Names one after another: „A, B i C”.
   const listOf = (words) => (words.length > 1 ? `${words.slice(0, -1).join(', ')}${t(' i ')}${words.at(-1)}` : (words[0] ?? ''));
+  // A text of the data with its {…} filled (as card-duel.js does).
+  const filled = (text, vars = {}) => String(text ?? '').replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 
-  // The day's pack at Szczęsny's (902 C), under the hero's card: three
-  // cards of the creatures of the lands lower than the character's own,
-  // those it misses first, for the gold of an hour of exploring; once
-  // bought, its cards on the table until „Dalej”.
+  // The day's pack at Szczęsny's (902 C), under the hero's card, like a
+  // booster (15.11.2026): three cards of every land, each of a rarity drawn
+  // by the pack's odds, the last at least unique, for its price at the
+  // relation with Szczęsny; once bought, its cards on the table until
+  // „Dalej”.
   function packCard() {
     const pack = view.pack;
     if (!pack) return null;
-    const head = (state) =>
-      h('div', { class: 'cards-section-head' }, h('h3', { class: 'section-title', text: t('Pakiet z niższych krain') }), h('span', { class: 'muted', text: state }));
+    const words = view.texts.pack;
+    const head = (state) => h('div', { class: 'cards-section-head' }, h('h3', { class: 'section-title', text: t('Pakiet kart') }), h('span', { class: 'muted', text: state }));
+    const missing = pack.missing > 0 ? t('W kolekcji brakuje Ci jeszcze {cards}.', { cards: countOf(pack.missing, 'karty', 'kart', 'kart') }) : t('Masz już wszystkie karty.');
     if (opened) {
       const fresh = opened.filter((card) => card.fresh).map((card) => card.name);
       const higher = opened.filter((card) => !card.fresh).map((card) => card.name);
@@ -446,17 +450,11 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
         'section',
         { class: 'card stack cards-pack', 'data-guide': 'cards-pack' },
         head(t('kupiony')),
-        h('p', { text: view.texts.pack.opened }),
+        h('p', { text: words.opened }),
         h('div', { class: 'tcard-grid tcard-grid--reserve' }, opened.map((card) => face(card, { marks: { fresh: card.fresh } }))),
         h('p', {
           class: 'muted',
-          text: [
-            fresh.length > 0 && t('Nowe w kolekcji: {cards}.', { cards: listOf(fresh) }),
-            higher.length > 0 && t('Na wyższy poziom wchodzą: {cards}.', { cards: listOf(higher) }),
-            pack.missing > 0 ? t('W niższych krainach brakuje Ci jeszcze {cards}.', { cards: countOf(pack.missing, 'karty', 'kart', 'kart') }) : t('Masz już wszystkie karty z niższych krain.'),
-          ]
-            .filter(Boolean)
-            .join(' '),
+          text: [fresh.length > 0 && t('Nowe w kolekcji: {cards}.', { cards: listOf(fresh) }), higher.length > 0 && t('Na wyższy poziom wchodzą: {cards}.', { cards: listOf(higher) }), missing].filter(Boolean).join(' '),
         }),
         h('p', { class: 'muted', text: t('Następny pakiet jutro.') }),
         h('button', {
@@ -472,22 +470,26 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     }
     const gold = state.character?.gold ?? 0;
     const missingGold = pack.price - gold;
+    // The odds of the rarities, as „pospolita 32%, rzadka 30%…”.
+    const odds = (key) =>
+      pack.odds
+        .filter((one) => one[key] > 0)
+        .map((one) => `${one.name} ${formatDecimal(Math.round(one[key] * 1000) / 10)}%`)
+        .join(', ');
     return h(
       'section',
       { class: 'card stack cards-pack', 'data-guide': 'cards-pack' },
       head(pack.bought ? t('kupiony') : t('raz dziennie')),
-      h('div', { class: 'cards-pack-row' }, h('span', { class: 'cards-pack-backs', 'aria-hidden': 'true' }, Array.from({ length: pack.count }, () => h('span', { class: 'cards-back' }))), h('p', { text: view.texts.pack.offer })),
+      h('div', { class: 'cards-pack-row' }, h('span', { class: 'cards-pack-backs', 'aria-hidden': 'true' }, Array.from({ length: pack.count }, () => h('span', { class: 'cards-back' }))), h('p', { text: words.offer })),
+      h('p', { class: 'muted small', text: filled(words.odds, { odds: odds('any'), last: odds('last') }) }),
       h('p', {
         class: 'muted',
-        text: [
-          t('Krainy niższe niż Twoja: {lands}.', { lands: listOf(pack.lands) }),
-          pack.missing > 0 ? t('Brakuje Ci tam jeszcze {cards}.', { cards: countOf(pack.missing, 'karty', 'kart', 'kart') }) : t('Masz już wszystkie karty z tych krain.'),
-        ].join(' '),
+        text: [pack.discount > 0 ? filled(words.relation, { standing: pack.standing, discount: Math.round(pack.discount * 100) }) : filled(words.noDiscount, { most: Math.round(pack.most * 100) }), missing].join(' '),
       }),
       pack.bought
         ? h('p', { class: 'muted', text: t('Pakiet na dziś już kupiony. Następny jutro.') })
         : pack.empty
-          ? h('p', { class: 'muted', text: t('Masz już wszystkie karty z niższych krain na najwyższym poziomie.') })
+          ? h('p', { class: 'muted', text: t('Masz już wszystkie karty na najwyższym poziomie.') })
           : [
               h('button', {
                 type: 'button',

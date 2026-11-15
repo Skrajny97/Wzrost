@@ -17,12 +17,13 @@ import {
   cardFrom,
   cardHomes,
   cardKind,
+  cardRarity,
   cardsUpTo,
   createRng,
   labyrinthFight,
   lowerLandCards,
-  lowerLandNames,
   packCards,
+  packOdds,
   newLabyrinth,
   pickCard,
   simulateHunt,
@@ -136,26 +137,71 @@ describe('Talia Systemu: the pickers of the cards from more sources (902 B, 903)
   });
 });
 
-describe('Talia Systemu: the pack of the day at Szczęsny\'s (902 C)', () => {
-  test('three different cards of the lands lower than the character\'s, the same for the same seed, those not got first, never one at its top level; none in the first land', () => {
-    const land = 2;
-    const pool = lowerLandCards(land, content);
-    const pack = packCards({ land, owned: [], maxed: [], seed: 'pack-1', count: 3 }, content);
+// The author, 15.11.2026: "niech losuje całkowicie nie że słabsze, mogą się
+// trafić też lepsze", "coś à la boostery w Pokemonach".
+describe('Talia Systemu: the pack of the day at Szczęsny\'s, like a booster (902 C)', () => {
+  const rarityOf = (id) => cardRarity(id, content);
+  const order = content.rarities.map((rarity) => rarity.id);
+  const floor = order.indexOf(rules.pack.lastAtLeast);
+
+  test('three different cards of all the lands, the same for the same seed, the last at least of the pack\'s floor', () => {
+    const lands = new Set();
+    const rarities = new Set();
+    for (let day = 0; day < 400; day += 1) {
+      const pack = packCards({ maxed: [], seed: `pack-${day}`, count: 3 }, content);
+      assert.equal(pack.length, 3);
+      assert.equal(new Set(pack).size, 3);
+      assert.ok(pack.every((id) => homes.has(id)));
+      assert.ok(order.indexOf(rarityOf(pack[2])) >= floor, pack[2]);
+      for (const id of pack) {
+        lands.add(homes.get(id).land);
+        rarities.add(rarityOf(id));
+      }
+    }
+    assert.deepEqual(packCards({ maxed: [], seed: 'pack-1', count: 3 }, content), packCards({ maxed: [], seed: 'pack-1', count: 3 }, content));
+    // Every land comes, the higher ones too, and every rarity.
+    assert.equal(lands.size, new Set([...homes.values()].map((home) => home.land)).size);
+    assert.deepEqual([...rarities].sort(), Object.keys(rules.pack.weights).sort());
+  });
+
+  test('the rarities come by the odds: common the most often, divine the most rarely, the last card from the floor up', () => {
+    const odds = new Map(packOdds(content).map((one) => [one.rarity, one]));
+    const counts = { any: Object.fromEntries(order.map((id) => [id, 0])), last: Object.fromEntries(order.map((id) => [id, 0])) };
+    const packs = 4000;
+    for (let day = 0; day < packs; day += 1) {
+      const [first, second, last] = packCards({ maxed: [], seed: `odds-${day}`, count: 3 }, content);
+      counts.any[rarityOf(first)] += 1;
+      counts.any[rarityOf(second)] += 1;
+      counts.last[rarityOf(last)] += 1;
+    }
+    for (const id of order) {
+      assert.ok(Math.abs(counts.any[id] / (packs * 2) - odds.get(id).any) < 0.02, `${id}: ${counts.any[id]}`);
+      assert.ok(Math.abs(counts.last[id] / packs - odds.get(id).last) < 0.03, `${id}: ${counts.last[id]}`);
+    }
+    assert.ok(counts.any.common > counts.any.epic && counts.any.epic > counts.any.divine);
+  });
+
+  test('never a card at its top level; a rarity with none left gives way to the others; nothing when all are at the top', () => {
+    const all = [...homes.keys()];
+    const left = all.filter((id) => rarityOf(id) === 'common').slice(0, 2);
+    // All but two common cards at the top: only those two, then nothing more.
+    const maxed = all.filter((id) => !left.includes(id));
+    assert.deepEqual(packCards({ maxed, seed: 'pack-3', count: 3 }, content).sort(), [...left].sort());
+    assert.deepEqual(packCards({ maxed: all, seed: 'pack-4', count: 3 }, content), []);
+    // Every card of the floor and above at the top: the last card takes any rarity.
+    const upper = all.filter((id) => order.indexOf(rarityOf(id)) >= floor);
+    const pack = packCards({ maxed: upper, seed: 'pack-5', count: 3 }, content);
     assert.equal(pack.length, 3);
-    assert.equal(new Set(pack).size, 3);
-    assert.ok(pack.every((id) => pool.includes(id)));
-    assert.deepEqual(packCards({ land, owned: [], maxed: [], seed: 'pack-1', count: 3 }, content), pack);
-    // Two cards missing: both come, the third is one got already.
-    const missing = pool.slice(0, 2);
-    const owned = pool.slice(2);
-    const some = packCards({ land, owned, maxed: [], seed: 'pack-2', count: 3 }, content);
-    assert.ok(missing.every((id) => some.includes(id)));
-    assert.equal(some.length, 3);
-    // Every card but one at its top level: only that one.
-    assert.deepEqual(packCards({ land, owned: pool, maxed: pool.slice(1), seed: 'pack-3', count: 3 }, content), [pool[0]]);
-    assert.deepEqual(packCards({ land: 0, owned: [], maxed: [], seed: 'pack-4', count: 3 }, content), []);
-    assert.deepEqual(lowerLandNames(0, content), []);
-    assert.equal(lowerLandNames(land, content).length, 2);
+    assert.ok(pack.every((id) => order.indexOf(rarityOf(id)) < floor));
+  });
+
+  test('the odds as the tab shows them: every card by the weights, the last from the floor up, each summing to one', () => {
+    const odds = packOdds(content);
+    const sum = (key) => odds.reduce((total, one) => total + one[key], 0);
+    assert.ok(Math.abs(sum('any') - 1) < 1e-9);
+    assert.ok(Math.abs(sum('last') - 1) < 1e-9);
+    assert.ok(odds.every((one) => (order.indexOf(one.rarity) < floor ? one.last === 0 : one.last > one.any)));
+    assert.equal(odds.find((one) => one.rarity === 'common').any, rules.pack.weights.common / Object.values(rules.pack.weights).reduce((total, weight) => total + weight, 0));
   });
 });
 

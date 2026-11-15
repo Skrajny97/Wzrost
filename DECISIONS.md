@@ -3298,6 +3298,22 @@ Autor: „trzeba by dodać jeszcze jakieś karty efektów coś wzmacniającego s
 2. **Zasady (977):** 977.1 B: karty efektów stoją osobno, obok 12 stworów talii są 2 miejsca na karty efektów; 977.2 A: najwyżej jedna karta efektu na rundę, zagrywana przed „Walcz”, jak umiejętność bohatera; 977.3 B: karty efektów wypadają z paczek kart w Salonie Gier i za pierwsze pokonanie stopni Szczęsnego, a do tego rzadko z wypraw i z Labiryntu; 977.4 A: grają nimi także Szczęsny (od wyższych stopni) i mieszkańcy Osady przy swoich stołach.
 3. **Dalej:** obrazki ośmiu kart w PixelLab (po cztery wersje) i makiety stołu z kartami efektów (telefon, 1366 i 1920 px) na stronę ocen, a liczby (szanse wypadania, stopnie i talie rywali) z symulacji partii.
 
+## Pakiet Szczęsnego jak booster (981; 15.11.2026, od 0.3.57)
+
+Autor zapytał, czemu część graczy nie ma pakietu trzech kart u Szczęsnego (pakiet losował z krain niższych niż kraina postaci, więc w pierwszej krainie, do 50. poziomu, go nie było) i wybrał 981 B: „w Skraju Puszczy pakiet losuje karty z tej samej krainy”. Zaraz potem napisał: „no i te 3 karty Szczęsnego niech losuje całkowicie nie że słabsze, moga sie trafic tez lepsze ale niech pakiet bedzie drogi, tańszy dzieki relacji ze Szczesnym” i „niech to bedzie cos ala boostery w Pokemonach i tez trzeba zrobic jakas animacje ich otwierania”. Ta wiadomość zastępuje 981 B: pakiet losuje ze wszystkich krain, więc jest też w pierwszej.
+
+1. **Losowanie** (`packCards` w `src/engine/cards.js`): trzy karty stworów ze wszystkich krain (dziś 207). Każda karta najpierw losuje rzadkość: pospolita 32%, rzadka 30%, unikalna 22%, epicka 12%, legendarna 2,5%, mityczna 1%, boska 0,5%. Ostatnia karta, jak rzadka karta w boosterze, losuje tylko spośród rzadkości od unikalnej w górę: unikalna 57,9%, epicka 31,6%, legendarna 6,6%, mityczna 2,6%, boska 1,3%. Potem jedna karta tej rzadkości, wszystkie po równo. Zostaje: nigdy karta na najwyższym poziomie i nigdy dwa razy ta sama w jednym pakiecie. Odpada „najpierw karty, których postać nie ma” (902 C), bo autor chce losowania całkowicie. Rzadkość, której wszystkie karty są już na najwyższym poziomie, oddaje swoją szansę pozostałym.
+2. **Cena:** złoto 4 godzin wyprawy na poziomie postaci (dotąd 1 godziny), mniej zniżka za relację ze Szczęsnym: Obcy 0%, Znajomy 10%, Stały klient 20%, Zaufany 30%, Przyjaciel 40%, w górę do pełnego złota. Kupiony pakiet podnosi relację ze Szczęsnym o 10, tyle co los na Loterię. Podnoszą ją też podarunki.
+3. **Karta pakietu** w zakładce Karty pokazuje szanse każdej rzadkości (każdej karty i ostatniej) i relację ze Szczęsnym ze zniżką. Tytuł: „Pakiet kart”.
+4. **Brakujące szczegóły:** pakiet zostaje raz dziennie (902 C), bo autor o tym nie pisał. Liczby (4 godziny, wagi rzadkości, zniżki) są w `data/cards.json` (`pack`). Paczki dadzą później też karty efektów (977.3 B).
+5. **Przy okazji:** zasady kart mówiły „najwyżej +15% za wszystkie 156 kart”, a od Łysogór kart jest 207, więc teraz: „najwyżej +15%, od 150 kart”.
+6. **Dalej:** animacja otwierania pakietu. Obrazek pakietu w PixelLab i makieta animacji (MP4 z telefonu) idą na stronę ocen, a do gry po akceptacji.
+
+## Wersja 0.3.57 (15.11.2026): pakiet kart u Szczęsnego jak booster
+
+1. Pakiet kart losuje ze wszystkich krain według rzadkości, ostatnia karta co najmniej unikalna, także w pierwszej krainie (981). Cena: 4 godziny wyprawy, do 40% mniej za relację ze Szczęsnym. Zob. „Pakiet Szczęsnego jak booster”.
+2. Zasady kart: premia za kolekcję „najwyżej +15%, od 150 kart”.
+
 ## Wersja 0.3.56 (15.11.2026): ranking według jednej Profesji i okrzyki Łysogór w komplecie
 
 1. Ranking postaci: pod „Poziom Profesji” lista „Profesja” z „Najwyższa” i pięcioma profesjami (975 B). Zob. „Ranking postaci według jednej Profesji”.

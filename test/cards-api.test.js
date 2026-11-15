@@ -29,8 +29,6 @@ import {
   hostTier,
   labyrinthDay,
   labyrinthFoes,
-  lowerLandCards,
-  lowerLandNames,
   packCards,
   newLabyrinth,
   portalArea,
@@ -145,33 +143,63 @@ describe('Talia Systemu through the API', () => {
     assert.equal(copies.copies, 12);
   });
 
-  test('the day\'s pack at Szczęsny\'s (902 C): three cards of the lower lands, those not got first, for the gold of an hour of exploring, once a day', async () => {
-    await set('level = 64, class_level = 64, gold = 100000');
+  // Like a booster (the author, 15.11.2026): cards of every land, even in
+  // the first one (981), dear, and cheaper with the relation with Szczęsny.
+  test('the day\'s pack at Szczęsny\'s (902 C): three cards of every land, also in the first one, for its price at the relation with Szczęsny, which it raises, once a day', async () => {
+    // Level 30: the first land (Skraj Puszczy), which had no pack before (981).
+    await set('level = 30, class_level = 30, gold = 100000');
+    assert.equal(areaLand(portalArea(30, content).id, content), 0);
     assert.equal((await tab()).pack, null);
     assert.equal((await call('POST', '/api/cards/pack', { cookie })).data.error.code, 'no_starter');
     await call('POST', '/api/cards/starter', { cookie });
-    const land = areaLand(portalArea(64, content).id, content);
-    const pool = lowerLandCards(land, content);
+    const starter = starterDeck(content);
     const offer = (await tab()).pack;
-    assert.equal(offer.price, explorationGold(rules.pack.goldMinutes, 64));
-    assert.deepEqual([offer.bought, offer.count, offer.empty], [false, rules.pack.cards, false]);
-    assert.deepEqual(offer.lands, lowerLandNames(land, content));
+    const full = explorationGold(rules.pack.goldMinutes, 30);
+    assert.deepEqual([offer.full, offer.price, offer.discount, offer.standing], [full, full, 0, content.settlement.standings[0].name]);
+    assert.deepEqual([offer.bought, offer.count, offer.empty, offer.most], [false, rules.pack.cards, false, Math.max(...rules.pack.relationDiscount)]);
+    assert.equal(offer.missing, cardHomes(content).size - starter.length);
+    assert.deepEqual(
+      offer.odds.map((one) => one.rarity),
+      Object.keys(rules.pack.weights),
+    );
     const before = (await row()).gold;
     const bought = await call('POST', '/api/cards/pack', { cookie });
-    assert.equal(bought.status, 200);
+    assert.equal(bought.status, 200, JSON.stringify(bought.data));
     const ids = bought.data.pack.map((card) => card.id);
     assert.equal(new Set(ids).size, rules.pack.cards);
-    assert.ok(ids.every((id) => pool.includes(id)));
-    assert.ok(bought.data.pack.every((card) => card.fresh && card.level === 1));
+    assert.ok(ids.every((id) => cardHomes(content).has(id)));
+    // A card of the starter deck goes a level up; a new one comes at the first.
+    assert.ok(bought.data.pack.every((card) => card.fresh === !starter.includes(card.id) && card.level === (card.fresh ? 1 : 2)));
     assert.equal((await row()).gold, before - offer.price);
-    assert.deepEqual([bought.data.cards.pack.bought, bought.data.cards.pack.missing], [true, offer.missing - rules.pack.cards]);
+    const relation = () => row().then((one) => JSON.parse(one.settlement ?? '{}').relations?.[rules.host.resident] ?? 0);
+    assert.equal(await relation(), content.settlement.casino.relationGain);
+    const fresh = bought.data.pack.filter((card) => card.fresh).length;
+    assert.deepEqual([bought.data.cards.pack.bought, bought.data.cards.pack.missing], [true, offer.missing - fresh]);
     assert.ok(ids.every((id) => bought.data.cards.collection.some((card) => card.id === id)));
     assert.equal((await call('POST', '/api/cards/pack', { cookie })).data.error.code, 'pack_bought');
-    // A new day, a new pack, for the gold the character has.
+    // A new day, at the standing of Zaufany: the price less its discount.
     const game = JSON.parse((await row()).card_game);
-    await set('card_game = ?, gold = 1', JSON.stringify({ ...game, day: '2020-01-01' }));
-    assert.equal((await tab()).pack.bought, false);
+    const trusted = content.settlement.standings.findIndex((standing) => standing.id === 'trusted');
+    await set('card_game = ?, settlement = ?', JSON.stringify({ ...game, day: '2020-01-01' }), JSON.stringify({ relations: { [rules.host.resident]: content.settlement.standings[trusted].points } }));
+    const cheaper = (await tab()).pack;
+    assert.deepEqual([cheaper.bought, cheaper.discount, cheaper.standing], [false, rules.pack.relationDiscount[trusted], content.settlement.standings[trusted].name]);
+    assert.equal(cheaper.price, Math.ceil(full * (1 - rules.pack.relationDiscount[trusted])));
+    assert.ok(cheaper.price < full);
+    // Without the gold for it, nothing.
+    await set('gold = 1');
     assert.equal((await call('POST', '/api/cards/pack', { cookie })).data.error.code, 'no_gold');
+  });
+
+  test('the pack with every card at its top level: nothing to buy', async () => {
+    await set('level = 64, class_level = 64, gold = 100000');
+    await call('POST', '/api/cards/starter', { cookie });
+    const database = await db();
+    const { id } = await row();
+    for (const card of cardHomes(content).keys()) {
+      await database.prepare('INSERT INTO cards (character_id, monster_id, copies, created_at) VALUES (?, ?, ?, 1) ON CONFLICT (character_id, monster_id) DO UPDATE SET copies = excluded.copies').bind(id, card, rules.stats.maxLevel).run();
+    }
+    assert.equal((await tab()).pack.empty, true);
+    assert.equal((await call('POST', '/api/cards/pack', { cookie })).data.error.code, 'pack_empty');
   });
 
   // The author's 920 B (13.11.2026): the pack is drawn with a key of the
@@ -191,10 +219,9 @@ describe('Talia Systemu through the API', () => {
     // What the server drew is the draw of its keyed seed.
     const { id } = await row();
     const day = casinoDay(Date.now(), content).key;
-    const land = areaLand(portalArea(64, content).id, content);
     const seed = createHmac('sha256', made).update(`${day}:${id}`).digest('hex');
     const ids = bought.data.pack.map((card) => card.id);
-    assert.deepEqual(ids, packCards({ land, owned: starterDeck(content), maxed: [], seed, count: rules.pack.cards }, content));
+    assert.deepEqual(ids, packCards({ maxed: [], seed, count: rules.pack.cards }, content));
     // A second draw keeps the key.
     const game = JSON.parse((await row()).card_game);
     await set('card_game = ?', JSON.stringify({ ...game, day: '2020-01-01' }));

@@ -1000,6 +1000,11 @@
       "id": "0.3.56",
       "title": "Wersja 0.3.56",
       "body": "- Ranking postaci: pod „Poziom Profesji” wybierzesz z listy jedną profesję i zobaczysz ranking według niej. „Najwyższa” pokazuje ranking jak dotąd, według najwyższej profesji każdej postaci.\n- Wszystkie stwory Łysogór mają już komplet okrzyków, także Świstak i Czarna Gęś."
+    },
+    {
+      "id": "0.3.57",
+      "title": "Wersja 0.3.57",
+      "body": "- Pakiet kart u Szczęsnego losuje teraz karty stworów ze wszystkich krain, także z wyższych niż Twoja, według rzadkości: zwykle pospolite i rzadkie, czasem epickie, a z rzadka nawet legendarne, mityczne i boskie. Ostatnia karta w pakiecie jest co najmniej unikalna.\n- Pakiet kupisz już w pierwszej krainie, raz dziennie, za złoto 4 godzin wyprawy na Twoim poziomie. Dobra relacja ze Szczęsnym obniża cenę nawet o 40%, a każdy kupiony pakiet tę relację podnosi.\n- Szanse każdej rzadkości widać na karcie pakietu w zakładce Karty."
     }
   ]
 }

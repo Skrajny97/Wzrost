@@ -73,7 +73,14 @@
     }
   ],
   "stakes": { "step": 100, "levelsPerStep": 40, "perDay": 10 },
-  "pack": { "cards": 3, "goldMinutes": 60 },
+  "pack": {
+    "$comment": "Pakiet u Szczęsnego (902 C), jak booster (autor 15.11.2026: „niech losuje całkowicie nie że słabsze, mogą się trafić też lepsze ale niech pakiet będzie drogi, tańszy dzięki relacji ze Szczęsnym”, „coś à la boostery w Pokemonach”; src/engine/cards.js packCards): raz dziennie cards kart stworów ze wszystkich krain. Każda karta losuje najpierw rzadkość według weights (wagi, nie muszą sumować się do 100), ostatnia tylko spośród rzadkości od lastAtLeast w górę, a potem jedną kartę tej rzadkości, wszystkie po równo; nigdy karty na najwyższym poziomie ani dwa razy tej samej w jednym pakiecie. Cena: złoto goldMinutes minut wyprawy na poziomie postaci, mniej relationDiscount za stopień relacji ze Szczęsnym (po jednej liczbie na stopień: Obcy, Znajomy, Stały klient, Zaufany, Przyjaciel; 0.1 to 10%), w górę do pełnego złota. Kupiony pakiet podnosi relację ze Szczęsnym o tyle, co los na Loterię (settlement.json casino.relationGain).",
+    "cards": 3,
+    "goldMinutes": 240,
+    "weights": { "common": 32, "rare": 30, "unique": 22, "epic": 12, "legendary": 2.5, "mythic": 1, "divine": 0.5 },
+    "lastAtLeast": "unique",
+    "relationDiscount": [0, 0.1, 0.2, 0.3, 0.4]
+  },
   "live": {
     "$comment": "Partie na żywo z innymi graczami (901 B; src/engine/card-duel.js, src/server/card-duel.js, src/client/card-duel.js). Wyzwanie czeka acceptSeconds sekund na przyjęcie. Ruchy na zmianę: kto pierwszy, zmienia się co rundę; na pierwszy ruch rundy jest firstMoveSeconds sekund, bo poprzednia runda jeszcze się wtedy rozgrywa na ekranie (918 B), na odpowiedź turnSeconds sekund, a do obu graceSeconds sekund zapasu na drogę do serwera; ruch nie zrobiony robi gra (najmocniejsze karty z rezerwy), a missedRounds rund z rzędu bez ruchu to przegrana. Obaj płacą stawkę na początku; za wygraną zgarnia się obie stawki bez systemCut (udział, 0.05 to 5%), w dół do pełnego złota, a remis zwraca stawki. Stawka najwyżej taka jak stawka najwyższego stopnia Szczęsnego przy niższym z poziomów obu postaci; o złoto od minLevel poziomu obu postaci, najwyżej perDay partii o złoto dziennie na postać (dzień Salonu Gier). Wyzwanie odrzucone, przeterminowane albo wycofane (917 A) do tej samej postaci można powtórzyć po repeatSeconds sekundach, do innej od razu. texts.live: słowa partii; {…} wypełnia gra, [a|b] to forma dla kobiety i dla mężczyzny.",
     "acceptSeconds": 120,
@@ -475,7 +482,7 @@
     ]
   },
   "bonuses": {
-    "$comment": "Premia za kolekcję (884 A): co every różnych kart +xp XP i +gold złota z wypraw, z ich walk i znalezisk, najwyżej max (udziały: 0.01 to 1%; 156 kart daje +15%). Działa od chwili zdobycia karty, przy każdym odbiorze raportu. Przy xp i gold równych 0 jest wyłączona.",
+    "$comment": "Premia za kolekcję (884 A): co every różnych kart +xp XP i +gold złota z wypraw, z ich walk i znalezisk, najwyżej max (udziały: 0.01 to 1%; 150 kart daje +15%). Działa od chwili zdobycia karty, przy każdym odbiorze raportu. Przy xp i gold równych 0 jest wyłączona.",
     "collection": { "every": 10, "xp": 0.01, "gold": 0.01, "max": 0.15 }
   },
   "texts": {
@@ -491,8 +498,8 @@
       "Partia o stawkę: za wygraną zgarniesz podwójną stawkę, a remis zwraca stawkę. Dziennie zagrasz o stawkę najwyżej 10 razy. Pierwsza wygrana dnia na każdym stopniu daje też nagrodę dnia, a pierwsze pokonanie stopnia rzadką kartę. Trening jest bez stawki i bez nagród.",
       "Nowe karty wypadają rzadko z pokonanych stworów na wyprawach i w Labiryncie, częściej z elit, czempionów i strażników. Ta sama karta zdobyta drugi raz podnosi swój poziom, najwyżej do 5.: każdy poziom to więcej Ataku i Życia.",
       "Każda wygrana walka na wyprawie może też dać kartę stwora z niższej krainy. Czasem karta wpada za pracę w profesji, za atak na Bestię albo strażnika Wyprawy Gildii i za ukończoną Próbę Gildii: to karta stwora z krain na Twoim poziomie albo niższych. Z tych źródeł wpadają najpierw karty, których jeszcze nie masz.",
-      "Raz dziennie Szczęsny sprzedaje pakiet trzech kart stworów z krain niższych niż Twoja, za tyle złota, ile daje godzina wyprawy na Twoim poziomie. Najpierw wypadają karty, których jeszcze nie masz.",
-      "Kolekcja daje premię na stałe: co 10 różnych kart +1% XP i +1% złota z wypraw, najwyżej +15% za wszystkie 156 kart. Działa od chwili zdobycia karty. Kolekcję i premię widać w Encyklopedii, w rubryce „Karty”.",
+      "Raz dziennie Szczęsny sprzedaje pakiet trzech losowych kart stworów ze wszystkich krain. Każda karta ma swoją rzadkość, od pospolitej po boską, a ostatnia karta w pakiecie jest co najmniej unikalna. Pakiet kosztuje tyle złota, ile dają 4 godziny wyprawy na Twoim poziomie. Dobra relacja ze Szczęsnym obniża cenę nawet o 40%, a podnosi ją każdy kupiony pakiet, los na Loterię i podarunek.",
+      "Kolekcja daje premię na stałe: co 10 różnych kart +1% XP i +1% złota z wypraw, najwyżej +15%, od 150 kart. Działa od chwili zdobycia karty. Kolekcję i premię widać w Encyklopedii, w rubryce „Karty”.",
       "W Osadzie zagrasz też z mieszkańcami: każdy gra u siebie, własną talią. Ich talie wypełniają przerwy między stopniami Szczęsnego, a talia pustelnika Sambora jest mocniejsza nawet od V stopnia. Partie o stawkę z mieszkańcami liczą się do tych samych 10 dziennie. Pierwsza wygrana o stawkę z mieszkańcem daje kartę z jego talii, której nie masz, a każda następna 10% szansy na kartę z jego talii.",
       "Partie na żywo: w karcie postaci innego gracza, który jest teraz w grze, wyzwiesz go na partię kart, bez stawki albo o złoto (od 20. poziomu obu postaci, najwyżej 10 dziennie). Ruchy robicie na zmianę, 30 sekund na ruch. Za wygraną zgarniesz obie stawki bez 5%, które zabiera System."
     ],
@@ -504,8 +511,11 @@
     "guild": ["Wpadła karta: {card}."],
     "trial": ["Za ukończoną Próbę Gildii wpadła karta: {card}."],
     "pack": {
-      "offer": "Trzy losowe karty stworów z krain niższych niż Twoja. Najpierw wypadają te, których jeszcze nie masz.",
-      "opened": "Szczęsny rozkłada na stole trzy karty."
+      "offer": "Trzy losowe karty stworów ze wszystkich krain, od pospolitych po boskie. Ostatnia karta jest co najmniej unikalna.",
+      "opened": "Szczęsny rozrywa pakiet i rozkłada karty na stole.",
+      "odds": "Szanse każdej karty: {odds}. Ostatniej: {last}.",
+      "relation": "Relacja ze Szczęsnym: {standing}, cena −{discount}%.",
+      "noDiscount": "Z lepszą relacją ze Szczęsnym zapłacisz mniej, nawet o {most}%."
     },
     "live": {
       "challengeTitle": "Partia kart z: {name}",

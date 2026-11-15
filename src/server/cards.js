@@ -33,8 +33,8 @@
 
 import {
   aboveTiers,
-  areaLand,
   cardComes,
+  cardHomes,
   cardLevel,
   cardsLeft,
   cardsUpTo,
@@ -50,12 +50,11 @@ import {
   hostTier,
   hostTiers,
   isCard,
-  lowerLandCards,
-  lowerLandNames,
   matchPayout,
   matchView,
   newMatch,
   packCards,
+  packOdds,
   pickCard,
   playTurn,
   portalArea,
@@ -65,6 +64,7 @@ import {
   residentTables,
   residentWinCard,
   samePeriod,
+  standingOf,
   startBlock,
   starterDeck,
   surrenderMatch,
@@ -80,7 +80,7 @@ import { toHex } from './encoding.js';
 import { cardsOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
-import { requireOpen } from './settlement.js';
+import { requireOpen, settlementOf } from './settlement.js';
 
 const rules = () => content().cards;
 const newSeed = () => toHex(crypto.getRandomValues(new Uint8Array(16)));
@@ -373,26 +373,36 @@ function summaryOf(row) {
   }
 }
 
-// The character's own land (902 C): the land of the place at the higher of
-// its level and its class level, as for the cards of the professions (903).
-const characterLand = (row) => areaLand(portalArea(Math.max(row.level, row.class_level ?? row.level), content()).id, content());
+// The pack's price at Szczęsny's (902 C; the author, 15.11.2026: "niech
+// pakiet będzie drogi, tańszy dzięki relacji ze Szczęsnym"): the gold of
+// pack.goldMinutes of exploring at the character's level (`full`), less the
+// discount of the standing of its relation with him (pack.relationDiscount,
+// one a standing, the last for the higher ones), rounded up.
+function packPrice(row, stored = settlementOf(row)) {
+  const { pack } = rules();
+  const full = explorationGold(pack.goldMinutes, row.level);
+  const standing = standingOf(stored.relations[rules().host.resident] ?? 0, content());
+  const discount = pack.relationDiscount[Math.min(standing.index, pack.relationDiscount.length - 1)];
+  return { full, discount, standing: standing.name, price: Math.max(1, Math.ceil(full * (1 - discount))) };
+}
 
-// The day's pack at Szczęsny's (902 C), for the tab: its price (the gold of
-// an hour of exploring at the character's level), whether it is bought, the
-// lower lands it draws from and the cards of them the character still
-// misses; null in the first land, which has none lower.
+// The day's pack at Szczęsny's (902 C), for the tab: its price with the
+// relation's discount, whether it is bought, the odds of each rarity (of
+// every card and of the last), the cards of the game the character still
+// misses and whether any is left to draw (none once all are at their top
+// level).
 function packView(row, game, collection) {
-  const land = characterLand(row);
-  const pool = lowerLandCards(land, content());
-  if (pool.length === 0) return null;
+  const { pack, stats } = rules();
+  const ids = [...cardHomes(content()).keys()];
+  const rarity = (id) => content().raritiesById[id];
   return {
-    price: explorationGold(rules().pack.goldMinutes, row.level),
-    count: rules().pack.cards,
+    ...packPrice(row),
+    most: Math.max(...pack.relationDiscount),
+    count: pack.cards,
     bought: game.pack,
-    lands: lowerLandNames(land, content()),
-    missing: pool.filter((id) => !collection.has(id)).length,
-    // Nothing left to draw: every card of the lower lands at its top level.
-    empty: pool.every((id) => (collection.get(id) ?? 0) >= rules().stats.maxLevel),
+    odds: packOdds(content()).map((odds) => ({ ...odds, name: rarity(odds.rarity).forms?.f ?? rarity(odds.rarity).name, color: rarity(odds.rarity).color })),
+    missing: ids.filter((id) => !collection.has(id)).length,
+    empty: ids.every((id) => (collection.get(id) ?? 0) >= stats.maxLevel),
   };
 }
 
@@ -615,12 +625,14 @@ export async function keyedSeed(db, parts) {
   return toHex(new Uint8Array(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(parts))));
 }
 
-// POST /api/cards/pack: the day's pack at Szczęsny's (902 C), once a day:
-// three cards of the creatures of the lands lower than the character's own,
-// those it has not got first (packCards), for the gold of an hour of
-// exploring at its level. Drawn from the day's seed with the server's key
-// (keyedSeed, 920 B), so asking again draws the same; saved only over the character as read and while it has the
-// gold. Answers with the cards as they are now in the collection.
+// POST /api/cards/pack: the day's pack at Szczęsny's (902 C), once a day,
+// like a booster: three cards of all the game's creatures, each of a rarity
+// drawn by the pack's weights (packCards), for its price at the relation
+// with Szczęsny (packPrice), which the pack raises as a ticket of the
+// Loteria does (casino.relationGain). Drawn from the day's seed with the
+// server's key (keyedSeed, 920 B), so asking again draws the same; saved
+// only over the character as read and while it has the gold. Answers with
+// the cards as they are now in the collection.
 export async function buyPack(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -632,16 +644,18 @@ export async function buyPack(context) {
   if (!game.starter) throw new ApiError(409, 'no_starter', 'Najpierw weź talię od Szczęsnego.');
   if (game.pack) throw new ApiError(409, 'pack_bought', 'Pakiet na dziś już kupiony. Następny jutro.');
   const collection = await cardCollection(db, row.id);
-  const land = characterLand(row);
-  const cards = packCards({ land, owned: collection.keys(), maxed: maxedCards(collection), seed: await keyedSeed(db, `${day}:${row.id}`), count: rules().pack.cards }, content());
-  if (cards.length === 0) throw new ApiError(409, 'pack_empty', lowerLandCards(land, content()).length === 0 ? 'W pierwszej krainie nie ma krain niższych, więc nie ma pakietu.' : 'Masz już wszystkie karty z niższych krain na najwyższym poziomie.');
-  const price = explorationGold(rules().pack.goldMinutes, row.level);
+  const cards = packCards({ maxed: maxedCards(collection), seed: await keyedSeed(db, `${day}:${row.id}`), count: rules().pack.cards }, content());
+  if (cards.length === 0) throw new ApiError(409, 'pack_empty', 'Masz już wszystkie karty na najwyższym poziomie.');
+  const stored = settlementOf(row);
+  const { price } = packPrice(row, stored);
   if (row.gold < price) throw new ApiError(409, 'no_gold', t('Brakuje złota: potrzeba {price}.', { price }));
+  const resident = rules().host.resident;
+  const relations = { ...stored.relations, [resident]: (stored.relations[resident] ?? 0) + content().settlement.casino.relationGain };
   await atomically(
     db,
     [
       assertion(db, '(SELECT version FROM characters WHERE id = ?) = ? AND (SELECT gold FROM characters WHERE id = ?) >= ?', [row.id, row.version, row.id, price]),
-      db.prepare('UPDATE characters SET gold = gold - ?, card_game = ?, version = version + 1 WHERE id = ?').bind(price, JSON.stringify({ ...game, pack: true }), row.id),
+      db.prepare('UPDATE characters SET gold = gold - ?, card_game = ?, settlement = ?, version = version + 1 WHERE id = ?').bind(price, JSON.stringify({ ...game, pack: true }), JSON.stringify({ ...stored, relations }), row.id),
       ...cardUpserts(db, row.id, cards, now),
     ],
     characterChanged,
