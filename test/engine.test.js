@@ -860,6 +860,32 @@ describe('combat', () => {
     const front = playerCombatant({ character: { ...character, position: 'front' }, equipped, name: 'Mira', area: reeds }, content).dodgeRating;
     assert.ok(Math.abs(front / back(content.areasById['glade-heart']) - 1) < 1e-9);
   });
+
+  // Gołoborza and Jodłowa Puszcza (966): Rumowisko and Jodłowy cień.
+  test('Rumowisko puts a mired move off by half as long again, and Jodłowy cień hides the middle of the line', () => {
+    const actions = new Set(['hit', 'crit', 'dodge', 'skill']);
+    // The warrior's move that the first mire puts off, the delay longer by
+    // `share`; a slow Rosiczka, so that the warrior moves before it mires again.
+    const after = (share) => {
+      const { character, equipped } = typicalCharacter('warrior', 88, content);
+      const player = { ...playerCombatant({ character, equipped, name: 'Mira' }, content), willRating: 0 };
+      const enemy = monsterCombatant({ monsterId: 'sundew', level: 88, id: 'e0' }, content);
+      const weapon = { ...enemy.weapon, slow: { ...enemy.weapon.slow, chance: 1 } };
+      const trait = share ? { name: 'Rumowisko', description: '', slowLonger: { mired: share } } : null;
+      const fight = simulateFight({ allies: [player], enemies: [{ ...enemy, weapon, speed: enemy.speed / 10, maxHp: 50000, hp: 50000 }], rng: createRng('rumowisko'), content, record: true, trait });
+      const mired = fight.events.findIndex((event) => event.kind === 'slow' && event.effect === 'Ugrzęźnięcie');
+      return fight.events.slice(mired).find((event) => event.actor === 'a0' && actions.has(event.kind)).t;
+    };
+    const plain = after(0);
+    assert.ok(after(0.5) > plain);
+    assert.ok(Math.abs(after(0.5) - plain - (after(1) - plain) / 2) <= 1);
+    const { character, equipped } = typicalCharacter('mage', 53, content);
+    const dodge = (position, trait) => playerCombatant({ character: { ...character, position }, equipped, name: 'Mira', area: { trait } }, content).dodgeRating;
+    const firs = { name: 'Jodłowy cień', description: '', middleDodgeBonus: 0.05 };
+    assert.ok(Math.abs(dodge('middle', firs) / dodge('middle', {}) - 1.05) < 1e-9);
+    assert.ok(Math.abs(dodge('back', firs) / dodge('back', {}) - 1) < 1e-9);
+    assert.ok(Math.abs(dodge('front', firs) / dodge('front', {}) - 1) < 1e-9);
+  });
 });
 
 describe('hunts', () => {

@@ -778,12 +778,13 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
 
   // A blow that mires (Ugrzęźnięcie): the target's Will may keep it off, as
   // with an effect over time; otherwise its next move comes later, 1 / (1 -
-  // slow) times as late, as after a skill's slow.
+  // slow) times as late, as after a skill's slow. The place's trait may put
+  // it off by a share longer (`slowLonger`: Rumowisko), on both sides.
   const applySlow = (/** @type {Unit} */ actor, /** @type {Unit} */ target, /** @type {Record<string, any>} */ slow, /** @type {number} */ t, /** @type {Vars} */ vars) => {
     const resisted = cappedChance(target.willRating, actor.level, tuning.willCap, balance);
     if (!rng.chance(slow.chance * (1 - resisted))) return;
     const effect = content.effectsById[slow.effect];
-    target.next += (slow.slow / (1 - slow.slow)) * target.interval;
+    target.next += (slow.slow / (1 - slow.slow)) * target.interval * (1 + (trait?.slowLonger?.[effect.id] ?? 0));
     log(() => ({ t, kind: 'slow', actor: actor.id, targets: [target.id], effect: effect.name, element: effect.element, text: say(texts, 'mired', actions, { ...vars, effect: effect.name }) }));
   };
 
