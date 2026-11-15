@@ -1055,6 +1055,11 @@
       "id": "0.3.67",
       "title": "Wersja 0.3.67",
       "body": "- Karty przedmiotów mówią, kto je nosi, razem z ewolucjami. Przy kosturze stoi „Dla klas: Mag, Nekromanta, Licz”, a przy sztylecie „Dla klasy: Cień” i „Nie dla: Nekromanta, Licz”. Tak samo w Encyklopedii.\n- Warsztat podsuwa najpierw wzór broni, którą nosi Twoja ewolucja, np. Nekromancie kostur."
+    },
+    {
+      "id": "0.3.68",
+      "title": "Wersja 0.3.68",
+      "body": "- Nekromanta i Licz noszą też zbroję Maga: kaptury i szaty. Wielki Inkwizytor i Pogromca Demonów noszą hełmy i kolczugi Wojownika, a w drugiej ręce tarczę. Noszona zbroja i fokus same zmieniły się w nowy rodzaj, z tą samą rzadkością, poziomem, ulepszeniem i afiksami.\n- Męski Strzelec Wyborowy ma na portrecie nową twarz, z oczami."
     }
   ]
 }

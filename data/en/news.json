@@ -840,6 +840,10 @@
     "0.3.67": {
       "title": "Version 0.3.67",
       "body": "- Item cards say who wears them, evolutions included. A staff says “Classes: Mage, Necromancer, Lich”, and a dagger “Class: Shadow” and “Not for: Necromancer, Lich”. The same in the Encyclopedia.\n- The Workshop first offers a pattern of the weapon your evolution wears, e.g. a staff for a Necromancer."
+    },
+    "0.3.68": {
+      "title": "Version 0.3.68",
+      "body": "- The Necromancer and the Lich wear the Mage's armour too: hoods and robes. The Grand Inquisitor and the Demon Slayer wear the Warrior's helmets and chainmail, and a shield in the off-hand. The armour and focus they wear have changed by themselves into the new kind, with the same rarity, level, upgrade and affixes.\n- The male Sharpshooter has a new face on his portrait, with eyes."
     }
   }
 }

@@ -18,14 +18,14 @@ import { useServer } from './helpers/server.js';
 const necromancer = content.evolutionsById.necromancer;
 
 describe('Ewolucje, które zmieniają broń (988)', () => {
-  test('the gear key: the Nekromanta and the Licz have the Mag\'s weapons and off-hands, the Cień\'s armour; the Truciciel and the Cień their own', () => {
+  test('the gear key: the Nekromanta and the Licz have the Mag\'s weapons, off-hands and armour (991 A); the Truciciel and the Cień their own', () => {
     assert.equal(gearKey('shadow', null, content), 'shadow');
     assert.equal(gearKey('shadow', 'poisoner', content), 'shadow');
     assert.equal(gearKey('shadow', 'necromancer', content), 'shadow:necromancer');
     assert.equal(gearKey('shadow', 'lich', content), 'shadow:lich');
-    assert.deepEqual(gearLists('shadow:necromancer', content), { weapons: ['staff'], offhands: ['focus'], armor: content.classesById.shadow.armor });
+    assert.deepEqual(gearLists('shadow:necromancer', content), { weapons: ['staff'], offhands: ['focus'], armor: content.classesById.mage.armor });
     const key = gearKey('shadow', 'lich', content);
-    for (const [base, usable] of [['staff', true], ['merlin-staff', true], ['grimoire', true], ['dagger', false], ['misericorde', false], ['tunic', true], ['robe', false], ['boots', true], ['ring', true]]) {
+    for (const [base, usable] of [['staff', true], ['merlin-staff', true], ['grimoire', true], ['dagger', false], ['misericorde', false], ['tunic', false], ['robe', true], ['hood', true], ['boots', true], ['ring', true]]) {
       assert.equal(canUse(base, key, content), usable, base);
     }
     assert.equal(canUse('dagger', 'shadow', content), true);
@@ -57,10 +57,32 @@ describe('Ewolucje, które zmieniają broń (988)', () => {
     assert.equal(focus.implicit.stat, 'intellect');
     // The same tier's numbers: the same statFactor and bonus range.
     assert.equal(focus.implicit.value, parry.implicit.value);
+    // Its kaftan a szata of the same place in the family (991 A), its hood a
+    // hood still.
+    const caftan = { ...generateItem({ baseId: 'caftan', level: 90, rarityId: 'rare' }, createRng('caftan'), content), upgrade: 2 };
+    const robe = regearItem(caftan, key, content);
+    assert.deepEqual([robe.base, robe.slot, robe.rarity, robe.upgrade, robe.affixes, robe.regeared], ['rune-cloak', 'chest', 'rare', 2, caftan.affixes, { from: 'caftan' }]);
+    assert.ok(robe.armor > 0);
     // What fits stays.
     assert.equal(regearItem(staff, key, content), null);
     assert.equal(regearItem(dagger, 'shadow', content), null);
-    assert.equal(regearItem(generateItem({ baseId: 'tunic', level: 90 }, createRng('tunic'), content), key, content), null);
+    assert.equal(regearItem(generateItem({ baseId: 'hood', level: 90 }, createRng('hood'), content), key, content), null);
+    assert.equal(regearItem(generateItem({ baseId: 'boots', level: 90 }, createRng('boots'), content), key, content), null);
+  });
+
+  test('991 A: the Wielki Inkwizytor\'s komża, kapuza and fokus made into a kolczuga, a hełm and a tarcza; back at a change of evolution', () => {
+    const key = gearKey('cleric', 'grand-inquisitor', content);
+    assert.equal(gearKey('cleric', 'demon-slayer', content), 'cleric:demon-slayer');
+    const made = (baseId) => regearItem(generateItem({ baseId, level: 120, rarityId: 'epic' }, createRng(baseId), content), key, content);
+    assert.deepEqual(['cassock', 'halo', 'astrolabe', 'processional-cross'].map((baseId) => made(baseId)?.base), ['gothic-armor', 'great-helm', 'jousting-shield', 'flamberge']);
+    // A tarcza is the Wojownik's too: it stays.
+    assert.equal(made('jousting-shield'), null);
+    // A change to the Arcykapłan, of the Kleryk's gear: the kolczuga and the
+    // hełm back to a komża and a kapuza, the tarcza stays.
+    const back = gearKey('cleric', 'high-priest', content);
+    const mail = made('cassock');
+    assert.equal(regearItem(mail, back, content).base, 'cassock');
+    assert.equal(regearItem(generateItem({ baseId: 'jousting-shield', level: 120 }, createRng('shield'), content), back, content), null);
   });
 
   test('every point of Zręczność is Intelekt, which hits with the kostur by its share and gives the speed and dodge', () => {
@@ -89,26 +111,30 @@ describe('Ewolucje, które zmieniają broń (988)', () => {
 });
 
 describe('Kto nosi jaką broń (988; the author, 15.11.2026: „tak logicznie to przemyśl żeby sie zgadzalo wszystko u każdej ewolucji i klasy”)', () => {
-  test('every form wears its class\'s gear but the Nekromanta and the Licz, with the Mag\'s weapons and off-hands, and the Wielki Inkwizytor and the Pogromca Demonów, with the Wojownik\'s weapons', () => {
+  test('every form wears its class\'s gear but the Nekromanta and the Licz, with the Mag\'s, and the Wielki Inkwizytor and the Pogromca Demonów, with the Wojownik\'s (991 A)', () => {
     const mage = content.classesById.mage;
     const warrior = content.classesById.warrior;
     for (const form of content.evolutions) {
       const lists = gearLists(gearKey(form.classId, form.id, content), content);
       const own = content.classesById[form.classId];
-      if (['necromancer', 'lich'].includes(form.id)) assert.deepEqual(lists, { weapons: mage.weapons, offhands: mage.offhands, armor: own.armor }, form.id);
-      else if (['grand-inquisitor', 'demon-slayer'].includes(form.id)) assert.deepEqual(lists, { weapons: warrior.weapons, offhands: own.offhands, armor: own.armor }, form.id);
+      if (['necromancer', 'lich'].includes(form.id)) assert.deepEqual(lists, { weapons: mage.weapons, offhands: mage.offhands, armor: mage.armor }, form.id);
+      else if (['grand-inquisitor', 'demon-slayer'].includes(form.id)) assert.deepEqual(lists, { weapons: warrior.weapons, offhands: warrior.offhands, armor: warrior.armor }, form.id);
       else assert.deepEqual(lists, { weapons: own.weapons, offhands: own.offhands, armor: own.armor }, form.id);
     }
   });
 
   test('who else wears a kind, and who of its classes does not: on the cards, in the Warsztat and the Encyklopedia', () => {
     assert.deepEqual(gearWearers('staff', content), { forms: ['necromancer', 'lich'], without: [] });
-    assert.deepEqual(gearWearers('focus', content), { forms: ['necromancer', 'lich'], without: [] });
+    assert.deepEqual(gearWearers('focus', content), { forms: ['necromancer', 'lich'], without: ['grand-inquisitor', 'demon-slayer'] });
     assert.deepEqual(gearWearers('dagger', content), { forms: [], without: ['necromancer', 'lich'] });
     assert.deepEqual(gearWearers('misericorde', content), { forms: [], without: ['necromancer', 'lich'] });
     assert.deepEqual(gearWearers('sword', content), { forms: ['grand-inquisitor', 'demon-slayer'], without: [] });
     assert.deepEqual(gearWearers('aspergillum', content), { forms: [], without: ['grand-inquisitor', 'demon-slayer'] });
-    for (const family of ['shield', 'bow', 'quiver', 'tunic', 'robe', 'hood']) assert.deepEqual(gearWearers(family, content), { forms: [], without: [] }, family);
+    assert.deepEqual(gearWearers('robe', content), { forms: ['necromancer', 'lich'], without: [] });
+    assert.deepEqual(gearWearers('tunic', content), { forms: [], without: ['necromancer', 'lich'] });
+    for (const family of ['helmet', 'chainmail']) assert.deepEqual(gearWearers(family, content), { forms: ['grand-inquisitor', 'demon-slayer'], without: [] }, family);
+    for (const family of ['cowl', 'surplice']) assert.deepEqual(gearWearers(family, content), { forms: [], without: ['grand-inquisitor', 'demon-slayer'] }, family);
+    for (const family of ['shield', 'bow', 'quiver', 'hood']) assert.deepEqual(gearWearers(family, content), { forms: [], without: [] }, family);
     const card = (baseId) => itemView(generateItem({ baseId, level: 30 }, createRng(baseId), content), content);
     const staff = card('staff');
     assert.deepEqual([staff.family, staff.classNames, staff.formNames, staff.exceptNames], ['staff', ['Mag'], ['Nekromanta', 'Licz'], undefined]);

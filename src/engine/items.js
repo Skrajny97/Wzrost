@@ -206,14 +206,15 @@ function fitsGear(baseId, key, content) {
   return GEAR.some((list) => lists[/** @type {'weapons' | 'offhands' | 'armor'} */ (list)].includes(family));
 }
 
-// A worn weapon or off-hand of a family its wearer's gear does not use, made
-// into the gear's own (988: a form taking another class's gear, e.g. the
-// Nekromanta's kostury): a weapon into the gear's first weapon family, an
-// off-hand into its first off-hand family, at the same place in the family
-// (the same class level), with its rarity, level, upgrade, gem, affixes and
-// imbue kept, and its draw of the base's bonus kept as a share of the
-// bonus's range. `regeared` keeps the base it was. Null when it fits, or
-// when it is neither a weapon nor an off-hand.
+// A worn weapon, off-hand or armour of a family its wearer's gear does not
+// use, made into the gear's own (988: a form taking another class's gear,
+// e.g. the Nekromanta's kostury; 991 A: its szaty too): a weapon into the
+// gear's first weapon family, an off-hand into its first off-hand family,
+// armour into the gear's armour of the same slot, at the same place in the
+// family (the same class level), with its rarity, level, upgrade, gem,
+// affixes and imbue kept, and its draw of the base's bonus kept as a share
+// of the bonus's range. `regeared` keeps the base it was. Null when it fits,
+// or when the gear has nothing of its slot.
 /**
  * @param {Item} item
  * @param {string} key
@@ -221,9 +222,13 @@ function fitsGear(baseId, key, content) {
  * @returns {Item | null}
  */
 export function regearItem(item, key, content) {
-  if ((item.slot !== 'weapon' && item.slot !== 'offhand') || canUse(item.base, key, content)) return null;
+  if (canUse(item.base, key, content)) return null;
   const lists = gearLists(key, content);
-  const family = (item.slot === 'weapon' ? lists.weapons : lists.offhands)[0];
+  // A weapon or an off-hand into the gear's first of its kind, armour into
+  // the gear's armour of its slot (991 A: a Nekromanta's kaftan into a
+  // szata, an Inkwizytor's komża into a kolczuga).
+  const family =
+    item.slot === 'weapon' ? lists.weapons[0] : item.slot === 'offhand' ? lists.offhands[0] : lists.armor.find((one) => content.basesById[one]?.slot === item.slot);
   const old = content.basesById[item.base];
   if (!family || !old) return null;
   /** @param {string} id */
