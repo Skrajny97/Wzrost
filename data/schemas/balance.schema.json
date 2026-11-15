@@ -970,6 +970,18 @@
           "type": "integer",
           "minimum": 1,
           "description": "Co tyle minut przybywa 1 punkt, sam z siebie, także gdy gracz nie gra. Bez górnej granicy."
+        },
+        "play": {
+          "type": "object",
+          "description": "Czas w grze (993 A): minuty, gdy gra jest na ekranie, liczone przez serwer najwyżej raz na gapSeconds. Co minutes takich minut przybywa 1 punkt, najwyżej daily punktów na dobę narratora. Strona przestaje liczyć po idleMinutes minutach bez dotknięcia.",
+          "additionalProperties": false,
+          "required": ["minutes", "daily", "gapSeconds", "idleMinutes"],
+          "properties": {
+            "minutes": { "type": "integer", "minimum": 1 },
+            "daily": { "type": "integer", "minimum": 0 },
+            "gapSeconds": { "type": "integer", "minimum": 1, "maximum": 60 },
+            "idleMinutes": { "type": "integer", "minimum": 1 }
+          }
         }
       }
     },

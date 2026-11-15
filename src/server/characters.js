@@ -21,6 +21,7 @@ import {
   greenhouseHours,
   greenhouseStore,
   knownHerbs,
+  playView,
   professionState,
   regearItem,
   trainingPlan,
@@ -127,6 +128,7 @@ import {
 import { mountView } from '../engine/stable.js';
 import { say } from '../engine/text.js';
 import { cardRemoval } from './cards.js';
+import { storedPlay } from './play-time.js';
 import { duelOpen, duelRemoval } from './card-duel.js';
 import { chatRole } from './chat.js';
 import { relationTo } from './community.js';
@@ -1612,6 +1614,9 @@ export function characterView(player, now) {
     // comes every `minutes` from `since`; the page counts them up the same way.
     timePoints: row.time_points,
     timePointsGain: { since: row.time_points_at, minutes: content().balance.timePoints.generateMinutes },
+    // Today's time in the game and the Punkty Czasu it gave (993 A,
+    // play-time.js), under the Punkty Czasu in the wallet (994).
+    play: playView(storedPlay(row), now, content()),
     resources,
     position: row.position,
     hp,

@@ -81,8 +81,10 @@ export function buildTopbar(onSettings) {
   // Gold over Punkty Systemu, like the levels on the other side, so the
   // narrator's face fits between them; a tap shows the materials under them.
   const wallet = h('ul', { class: 'wallet-list', id: 'wallet-list', hidden: true });
-  // When the next Punkt Czasu comes, under its row.
+  // When the next Punkt Czasu comes, under its row, and under it today's
+  // points for the time in the game (993 A, mock-up 994).
   const timeNote = h('span', { class: 'wallet-note' });
+  const playNote = h('span', { class: 'wallet-note' });
   // The Encyklopedia by the current activity, where the pouch of parts was
   // (the parts have their tab in the backpack); a dot when a chest waits
   // there or in a Bestiariusz.
@@ -194,6 +196,7 @@ export function buildTopbar(onSettings) {
     goldButton,
     wallet,
     timeNote,
+    playNote,
     encyclopedia,
     camp,
     campLabel,
@@ -227,10 +230,14 @@ function walletRows(timePoints) {
   return [
     row(goldArt(WALLET_ICON), gold.name, gold.amount, 'gold'),
     row(icon(SYSTEM_POINTS_ICON, { size: WALLET_ICON }), t('Punkty Systemu'), state.character.systemPoints, 'system'),
-    row(timePointsArt(WALLET_ICON), t('Punkty Czasu'), timePoints, 'time', topbar.timeNote),
+    row(timePointsArt(WALLET_ICON), t('Punkty Czasu'), timePoints, 'time', [topbar.timeNote, topbar.playNote]),
     ...materials.map((entry, index) => row(resourceArt(entry.id, WALLET_ICON), entry.name, entry.amount, index === 0 && 'materials')),
   ];
 }
+
+// Today's Punkty Czasu for the time in the game, of the day's limit (993 A),
+// or nothing before the server tells it.
+const playLine = (character) => (character?.play ? t('Za czas w grze: {points} z {daily} dziś', { points: formatNumber(character.play.points), daily: formatNumber(character.play.daily) }) : '');
 
 // Opens or closes the list of resources under the gold.
 export function showWallet(open) {
@@ -246,6 +253,8 @@ export function showWallet(open) {
 function refreshWallet(now = serverNow()) {
   const { points, nextAt } = timePointsNow(state.character, now);
   topbar.timeNote.textContent = t('+1 za {time}', { time: formatCountdown(nextAt - now) });
+  topbar.playNote.textContent = playLine(state.character);
+  topbar.playNote.hidden = !state.character.play;
   const key = JSON.stringify([state.character.systemPoints, points, ...walletEntries().map((entry) => entry.amount)]);
   if (key === topbar.walletKey) return;
   topbar.walletKey = key;
@@ -297,7 +306,10 @@ export function updateTopbar(now = serverNow()) {
   const stocked = topbar.stock.map((entry) => {
     const amount = entry.id === 'time' ? time.points : (character.resources[entry.id] ?? 0);
     entry.value.textContent = formatShort(amount);
-    if (entry.id === 'time') entry.element.title = t('{name}: +1 za {time}', { name: entry.name, time: formatCountdown(time.nextAt - now) });
+    if (entry.id === 'time') {
+      const play = playLine(character);
+      entry.element.title = t('{name}: +1 za {time}', { name: entry.name, time: formatCountdown(time.nextAt - now) }) + (play ? `\n${play}` : '');
+    }
     return `, ${entry.name}: ${formatNumber(amount)}`;
   });
   topbar.goldButton.setAttribute(

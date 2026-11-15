@@ -983,6 +983,7 @@
   "Na razie nie ma tu wpisów.": "No entries here yet.",
   "Ustawienia, nowe zgłoszenia błędów: {count}": "Settings, new bug reports: {count}",
   "+1 za {time}": "+1 in {time}",
+  "Za czas w grze: {points} z {daily} dziś": "For time in the game: {points} of {daily} today",
   "{name}: +1 za {time}": "{name}: +1 in {time}",
   "POZ. {level}": "LVL {level}",
   "{name}, jeszcze {fights}": "{name}, {fights} left",
