@@ -344,18 +344,17 @@ export function mountGuildWar(container) {
   }
 
   // A match of the next evening: its rival, its duels and trio fights, and
-  // the trios short of members.
+  // the walkovers of the guild with fewer trios.
   function matchLine(match) {
     const words = texts();
-    const missing = view.teams.next === null ? 0 : view.teams.next - view.teams.members;
     return h(
       'div',
       { class: 'war-match' },
       h('p', { class: 'war-match-rival' }, h('span', { class: 'war-match-label', text: words.rivalLabel }), tagOf(match.rival, true), h('span', { class: 'war-match-name', text: match.rival.name })),
       h('p', { class: 'war-clock-note', text: filled(words.duelsLine, { count: counted(match.duels, words.duelForms) }) }),
       h('p', { class: 'war-clock-note', text: filled(words.triosLine, { count: counted(match.trioFights, words.fightForms) }) }),
-      match.short.ours && missing > 0 && h('p', { class: 'war-warn', text: filled(words.shortOurs, { missing: counted(missing, words.missingForms) }) }),
-      match.short.theirs && h('p', { class: 'muted', text: words.shortTheirs }),
+      match.walkovers.ours > 0 && h('p', { class: 'war-warn', text: filled(words.walkoversOurs, { count: counted(match.walkovers.ours, words.fightForms) }) }),
+      match.walkovers.theirs > 0 && h('p', { class: 'muted', text: filled(words.walkoversTheirs, { count: counted(match.walkovers.theirs, words.fightForms) }) }),
     );
   }
 

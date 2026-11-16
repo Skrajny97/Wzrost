@@ -1225,6 +1225,11 @@
       "id": "0.4.4",
       "title": "Wersja 0.4.4",
       "body": "- Nagroda za kolejne dni gry: każda postać ma teraz własną serię i własną nagrodę dnia."
+    },
+    {
+      "id": "0.4.5",
+      "title": "Wersja 0.4.5",
+      "body": "- Liga wojen gildii, 3v3: każda trójka walczy z każdą trójką rywala, także niepełna, w mniejszym składzie. Gildia, która ma mniej trójek, oddaje walkowerem po jednej walce za każdą brakującą trójkę. Przykład: 18 członków to 6 trójek, 29 członków to 10 trójek, więc jest 60 walk 3v3, a mniejsza gildia oddaje walkowerem 4. Tak walczy już dzisiejsza powtórka o 23:00."
     }
   ]
 }

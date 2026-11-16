@@ -2498,10 +2498,10 @@
             "fightForms",
             "duelsLine",
             "triosLine",
-            "shortOurs",
-            "shortTheirs",
             "yourDuels",
             "shortTeam",
+            "walkoversOurs",
+            "walkoversTheirs",
             "evenings",
             "eveningsLine",
             "matchLine",
@@ -3006,14 +3006,6 @@
               "type": "string",
               "pattern": "\\{count\\}"
             },
-            "shortOurs": {
-              "type": "string",
-              "pattern": "\\{missing\\}"
-            },
-            "shortTheirs": {
-              "type": "string",
-              "minLength": 1
-            },
             "yourDuels": {
               "type": "string",
               "minLength": 1
@@ -3021,6 +3013,14 @@
             "shortTeam": {
               "type": "string",
               "minLength": 1
+            },
+            "walkoversOurs": {
+              "type": "string",
+              "pattern": "\\{count\\}"
+            },
+            "walkoversTheirs": {
+              "type": "string",
+              "pattern": "\\{count\\}"
             },
             "evenings": {
               "type": "string",

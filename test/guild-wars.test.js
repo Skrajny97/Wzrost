@@ -86,7 +86,10 @@ describe("the guild wars' rules", () => {
     assert.deepEqual(warDrawnTeams([4], 'x', content).lineups, [[4]]);
   });
 
-  test('a match: every member duels every member of the rival (1v1), every trio fights every trio (3v3), a trio short of members loses by walkover', () => {
+  // The author, 16.11.2026: „ci co jest ich 18 dzielą się na 6 drużyn i
+  // walczą z 10 drużynami renegatów, więc 4 walki są oddane walkowerem ale ze
+  // strony Pierwotnych”.
+  test('a match: every member duels every member of the rival (1v1), every trio fights every trio (3v3), a short trio too; the guild with fewer trios gives a walkover for each it lacks', () => {
     const fights = matchFights({ duelsA: 4, duelsB: 3, triosA: [[1, 2, 3], [4]], triosB: [[5, 6, 7]] }, content);
     const duels = fights.filter((fight) => fight.format === '1v1');
     assert.equal(duels.length, 12);
@@ -96,13 +99,34 @@ describe("the guild wars' rules", () => {
       fights.filter((fight) => fight.format === '3v3').map((fight) => [fight.a, fight.b, fight.walkover]),
       [
         [0, 0, null],
-        [1, 0, 'a'],
+        [1, 0, null],
+        [-1, -1, 'b'],
       ],
     );
-    // Two short trios: both lose.
+    // Two short trios fight each other.
     assert.deepEqual(
       matchFights({ duelsA: 1, duelsB: 1, triosA: [[1]], triosB: [[2, 3]] }, content).map((fight) => fight.walkover),
-      [null, 'both'],
+      [null, null],
+    );
+    // 18 members against 29: six trios against ten, the last one of two;
+    // 60 fights, and 4 walkovers given by the guild of six.
+    const trios = (members) => Array.from({ length: Math.ceil(members / 3) }, (_, index) => Array.from({ length: Math.min(3, members - index * 3) }, (__, one) => index * 3 + one));
+    const big = matchFights({ duelsA: 18, duelsB: 29, triosA: trios(18), triosB: trios(29) }, content).filter((fight) => fight.format === '3v3');
+    assert.equal(big.filter((fight) => fight.walkover === null).length, 60);
+    assert.deepEqual(
+      big.filter((fight) => fight.walkover !== null).map((fight) => fight.walkover),
+      ['a', 'a', 'a', 'a'],
+    );
+    // A trio with none able to fight is no trio.
+    assert.deepEqual(
+      matchFights({ duelsA: 1, duelsB: 1, triosA: [[1, 2, 3], []], triosB: [[4, 5, 6], [7, 8, 9]] }, content)
+        .filter((fight) => fight.format === '3v3')
+        .map((fight) => [fight.a, fight.b, fight.walkover]),
+      [
+        [0, 0, null],
+        [0, 1, null],
+        [-1, -1, 'a'],
+      ],
     );
   });
 
@@ -392,8 +416,8 @@ describe('the guild wars through the API', () => {
     assert.equal(view.league.next.day, 0);
     assert.equal(view.league.next.at, league.battles[0]);
     const [match] = view.league.next.matches;
-    // Two members against one: 2 × 1 duels and one trio against one, both short of members.
-    assert.deepEqual([match.rival.tag, match.rival.name, match.duels, match.trioFights, match.short], ['WR', 'Wrogowie', 2, 1, { ours: true, theirs: true }]);
+    // Two members against one: 2 × 1 duels and one trio against one, both short of members and fighting with fewer.
+    assert.deepEqual([match.rival.tag, match.rival.name, match.rival.trios, match.duels, match.trioFights, match.walkovers], ['WR', 'Wrogowie', 1, 2, 1, { ours: 0, theirs: 0 }]);
     assert.equal(view.league.days.length, 7);
     assert.deepEqual(
       view.league.days.map((day) => [day.matches.length, day.free]),
@@ -461,8 +485,8 @@ describe('the guild wars through the API', () => {
     assert.equal((await all('SELECT * FROM guild_war_battles')).length, mondayFights);
     // Alfa's first match (Monday's or, when Alfa is free on Monday,
     // Tuesday's): one 1v1 against each member of the rival and its trio of
-    // one, short, losing by walkover; gold for each fight won and Punkty
-    // Systemu for the match won.
+    // one, short, against the rival's trio; gold for each fight won and
+    // Punkty Systemu for the match won.
     const alfaMatches = matches.filter((row) => row.guild_a === strong || row.guild_b === strong);
     assert.equal(alfaMatches.length, 2);
     const alfaDay = alfaMatches[0].day;
@@ -478,9 +502,9 @@ describe('the guild wars through the API', () => {
     const alfaFights = fights.filter((row) => row.war_id === alfaMonday.id);
     assert.equal(alfaFights.filter((row) => row.format === '1v1').length, rivalMembers);
     const alfaTrios = alfaFights.filter((row) => row.format === '3v3');
-    assert.equal(alfaTrios.length, 0, 'a trio of one fights nobody');
-    const walkovers = alfaSide === 'a' ? alfaMonday.walkovers_a : alfaMonday.walkovers_b;
-    assert.equal(walkovers, 1);
+    assert.equal(alfaTrios.length, 1, 'a trio of one fights too');
+    assert.deepEqual(JSON.parse(alfaTrios[0].fighters)[alfaSide].map((fighter) => fighter.name), ['Alfa']);
+    assert.deepEqual([alfaMonday.walkovers_a, alfaMonday.walkovers_b], [0, 0]);
     // Alfa fights at level 200 (makeClimber).
     const reward = warReward(200, content);
     const won = alfaFights.filter((row) => row.result === alfaSide).length;
@@ -500,16 +524,16 @@ describe('the guild wars through the API', () => {
     const evening = view.league.days[alfaDay].matches[0];
     assert.deepEqual(evening.score, [ownWon, ownLost]);
     assert.equal(evening.duels.won + evening.duels.lost + evening.duels.drawn, rivalMembers);
-    assert.equal(evening.trios.walkoversLost, 1);
+    assert.deepEqual([evening.trios.walkoversWon, evening.trios.walkoversLost], [0, 0]);
     assert.equal(view.league.next.day, alfaMatches[1].day);
     const free = [0, 1, 2].find((day) => !alfaMatches.some((match) => match.day === day));
     assert.deepEqual(
       view.league.days.map((day) => day.free),
       [0, 1, 2, 3, 4, 5, 6].map((day) => day === free),
     );
-    assert.equal(view.league.battles.length, rivalMembers);
-    const line = view.league.battles[0];
-    assert.equal(line.format, '1v1');
+    assert.equal(view.league.battles.length, rivalMembers + 1);
+    assert.deepEqual(view.league.battles.map((one) => one.format).sort(), [...Array.from({ length: rivalMembers }, () => '1v1'), '3v3']);
+    const line = view.league.battles.find((one) => one.format === '1v1');
     assert.equal(line.fought, true);
     assert.deepEqual(line.reward, line.result === 'win' ? { gold: reward.gold } : null);
     const seen = (await as('alfa', 'GET', `/api/guild/war/battles/${line.id}`)).data.battle;
@@ -626,7 +650,7 @@ describe('the guild wars through the API', () => {
 
   // The trios of an evening fixed at the first run of its day, from
   // midnight (the author's 1037.1 A, 16.11.2026): one who joins later fights
-  // only the 1v1, one who leaves leaves its trio short (a walkover).
+  // only the 1v1, one who leaves leaves its trio short (it fights with fewer).
   test('the trios of an evening are fixed from midnight: one who joins fights only the 1v1, one who leaves leaves its trio short', async () => {
     await player('alfa', 'Alfa', { level: 60 });
     await player('beta', 'Beta', { level: 30, classId: 'mage' });
@@ -657,9 +681,9 @@ describe('the guild wars through the API', () => {
     const fights = await all('SELECT format, fighters FROM guild_war_battles WHERE war_id = ?', match.id);
     const ours = (format) => [...new Set(fights.filter((one) => one.format === format).flatMap((one) => JSON.parse(one.fighters)[side].map((fighter) => fighter.name)))].sort();
     assert.deepEqual(ours('1v1'), ['Alfa', 'Gamma', 'Omega']);
-    // The trio short of Delta lost its fight by walkover.
-    assert.deepEqual(ours('3v3'), []);
-    assert.equal(side === 'a' ? match.walkovers_a : match.walkovers_b, 1);
+    // The trio short of Delta fought with two.
+    assert.deepEqual(ours('3v3'), ['Alfa', 'Gamma']);
+    assert.deepEqual([match.walkovers_a, match.walkovers_b], [0, 0]);
   });
 
   // Every fight of a match to watch, not only the character's own (the
@@ -786,12 +810,13 @@ describe('the guild wars through the API', () => {
     assert.equal(redrawn.data.league.firstDay, 2);
     assert.equal(redrawn.data.test.fight, 2);
     const before = await first('SELECT gold FROM characters WHERE id = ?', ids.lider);
-    // Two guilds: the one match, and with it the league's end.
+    // Two guilds: the one match (a duel and the fight of the two trios of
+    // one), and with it the league's end.
     const view = (await as('lider', 'POST', '/api/test/guild-war', { action: 'fight' })).data;
     assert.equal(view.league.days[2].matches[0].fought, true);
     assert.equal(view.test.fight, null);
     const rows = await all('SELECT b.result, w.guild_a FROM guild_war_battles b JOIN guild_wars w ON w.id = b.war_id');
-    assert.equal(rows.length, 1);
+    assert.equal(rows.length, 2);
     const won = rows.filter((row) => (row.guild_a === view.guild.id ? row.result === 'a' : row.result === 'b')).length;
     const after = await first('SELECT gold FROM characters WHERE id = ?', ids.lider);
     assert.equal(after.gold - before.gold, won * warReward(50, content).gold);

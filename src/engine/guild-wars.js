@@ -256,32 +256,33 @@ export function leaguePrizes(table, content) {
   });
 }
 
-// A match's fights (the author: „walczy każdy z każdym”, „walkower jak
-// brakuje członków do obsadzenia wszystkich drużyn liczony jako porażka”):
-// in the 1v1 every one of `duelsA` against every one of `duelsB`, and in the
-// 3v3 every trio of `triosA` against every trio of `triosB`; a trio short of
-// members (fewer than teamSize) does not fight but loses by walkover, both
-// such trios both losing. Each fight: its format, the places of its sides
-// in their lists (from 0) and, for a walkover, who loses it ('a', 'b' or
-// 'both').
-/** @typedef {{ format: '1v1' | '3v3', a: number, b: number, walkover: 'a' | 'b' | 'both' | null }} MatchFight A fight of a match. */
+// The fights of a match (the author, 16.11.2026: „walczy każdy z każdym”,
+// and after its first evening: „ci co jest ich 18 dzielą się na 6 drużyn i
+// walczą z 10 drużynami renegatów, więc 4 walki są oddane walkowerem ale ze
+// strony Pierwotnych”): in the 1v1 every one of `duelsA` against every one
+// of `duelsB`, and in the 3v3 every trio of `triosA` against every trio of
+// `triosB`, a trio short of members too (it fights with fewer; one left
+// with nobody is no trio). The guild with fewer trios gives a walkover for
+// each one it lacks. Each fight: its format, the places of its sides in
+// their lists (from 0; -1 for a walkover's trio that is not there) and,
+// for a walkover, who loses it ('a' or 'b').
+/** @typedef {{ format: '1v1' | '3v3', a: number, b: number, walkover: 'a' | 'b' | null }} MatchFight A fight of a match. */
 /**
- * @param {{ duelsA: number, duelsB: number, triosA: number[][], triosB: number[][] }} sides
- * @param {Content} content
+ * @param {{ duelsA: number, duelsB: number, triosA: unknown[][], triosB: unknown[][] }} sides
+ * @param {Content} _content
  * @returns {MatchFight[]}
  */
-export function matchFights({ duelsA, duelsB, triosA, triosB }, content) {
-  const { teamSize } = warRules(content);
+export function matchFights({ duelsA, duelsB, triosA, triosB }, _content) {
   /** @type {MatchFight[]} */
   const fights = [];
   for (let a = 0; a < duelsA; a++) for (let b = 0; b < duelsB; b++) fights.push({ format: '1v1', a, b, walkover: null });
-  for (const [a, trioA] of triosA.entries()) {
-    for (const [b, trioB] of triosB.entries()) {
-      const shortA = trioA.length < teamSize;
-      const shortB = trioB.length < teamSize;
-      fights.push({ format: '3v3', a, b, walkover: shortA && shortB ? 'both' : shortA ? 'a' : shortB ? 'b' : null });
-    }
-  }
+  /** @param {unknown[][]} trios */
+  const places = (trios) => trios.flatMap((trio, index) => (trio.length > 0 ? [index] : []));
+  const teamsA = places(triosA);
+  const teamsB = places(triosB);
+  for (const a of teamsA) for (const b of teamsB) fights.push({ format: '3v3', a, b, walkover: null });
+  for (let left = teamsA.length; left < teamsB.length; left++) fights.push({ format: '3v3', a: -1, b: -1, walkover: 'a' });
+  for (let left = teamsB.length; left < teamsA.length; left++) fights.push({ format: '3v3', a: -1, b: -1, walkover: 'b' });
   return fights;
 }
 
