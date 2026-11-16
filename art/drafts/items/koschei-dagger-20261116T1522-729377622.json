@@ -1,0 +1,14 @@
+{
+  "id": "koschei-dagger",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the dagger of koschei the deathless: a long thin dagger with a pale bone-white blade like a needle, a crossguard of black iron twisted like thorns, a black grip, a pommel shaped like a small skull with green glowing eyes, wisps of green mist, diagonal, single inventory item icon",
+  "style": "src/client/art/items/khanjar.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023858869059244794
+  },
+  "images": 1
+}

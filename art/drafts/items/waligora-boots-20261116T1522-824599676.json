@@ -1,0 +1,14 @@
+{
+  "id": "waligora-boots",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the boots of waligora, the strongman who toppled mountains: a pair of huge heavy brown leather boots with iron-shod toes and thick soles, small pebbles and dust around them, wide golden buckles, single inventory item icon",
+  "style": "src/client/art/items/seven-league-boots.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023302457805633545
+  },
+  "images": 1
+}

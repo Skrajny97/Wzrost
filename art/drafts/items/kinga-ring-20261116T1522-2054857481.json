@@ -1,0 +1,14 @@
+{
+  "id": "kinga-ring",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the ring of saint kinga, found in a block of salt: a golden ring set with a large clear sparkling gem like a salt crystal, small white salt crystals around it, a soft white glow, single inventory item icon",
+  "style": "src/client/art/items/solomon-ring.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023250700830247672
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "stribog-quiver",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the quiver of stribog, the slavic god of the winds: a tall quiver of pale grey-blue leather with silver fittings, arrows with white feathers rising out of it, white wind gusts curling around it, a strap, single inventory item icon",
+  "style": "src/client/art/items/bottomless-quiver.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02351687944984436
+  },
+  "images": 1
+}

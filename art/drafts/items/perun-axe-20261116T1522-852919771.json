@@ -1,0 +1,14 @@
+{
+  "id": "perun-axe",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the axe of perun, the slavic god of thunder: a heavy double-headed battle axe of dark steel engraved with a glowing six-petalled thunder rose, crackling blue lightning along its edges, a long oak haft bound with golden bands, diagonal, single inventory item icon",
+  "style": "src/client/art/items/executioner-axe.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023308850445641415
+  },
+  "images": 1
+}

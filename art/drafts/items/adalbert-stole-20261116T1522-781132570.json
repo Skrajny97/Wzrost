@@ -1,0 +1,14 @@
+{
+  "id": "adalbert-stole",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the stole of saint adalbert, the patron of poland: a long narrow red silk stole embroidered with golden crosses, its ends fringed with gold, draped in a v shape, an empty vestment with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/rationale.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024105590905507405
+  },
+  "images": 1
+}

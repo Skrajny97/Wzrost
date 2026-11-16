@@ -1,0 +1,14 @@
+{
+  "id": "sendivogius-book",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the alchemical book of michael sendivogius: a thick old book bound in dark red leather with golden corner plates, a glowing golden alchemical sign of a circle inside a triangle on the cover, a small golden clasp, faint golden sparkles, single inventory item icon",
+  "style": "src/client/art/items/twardowski-mirror.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02401070772955153
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "piast-sukmana",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the sukmana coat of piast the wheelwright: a long simple brown woollen peasant coat with a wide collar, red embroidered trim along the edges, a woven red belt, an empty coat with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/bekesha.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02408122947099474
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "dazhbog-bow",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the bow of dazhbog, the slavic sun god: an elegant recurve bow of golden wood carved with sun rays, a small blazing sun disc in the middle of the grip, a glowing golden bowstring, a warm sunlight glow, upright, single inventory item icon",
+  "style": "src/client/art/items/devana-bow.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023431567304823136
+  },
+  "images": 1
+}

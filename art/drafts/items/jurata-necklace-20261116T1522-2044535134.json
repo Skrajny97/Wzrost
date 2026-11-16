@@ -1,0 +1,14 @@
+{
+  "id": "jurata-necklace",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the necklace of jurata, the queen of the amber palace under the baltic sea: a golden chain of round honey-coloured amber beads with a large glowing amber pendant shaped like a sea shell, small pearls between the beads, a faint watery glow, single inventory item icon",
+  "style": "src/client/art/items/ryngraf.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023333134631474815
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "krakus-helmet",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the helmet of krakus, the legendary founder of cracow: a conical steel helmet with a golden band and a nose guard, a small golden dragon crest on the front, a mail aventail hanging at the back, an empty helmet with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/svetovid-helm.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02340387631246779
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "szczerbiec",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "szczerbiec, the coronation sword of the polish kings: a long straight double-edged steel blade with a small notch near the tip, a short golden crossguard engraved with tiny letters, a grip wrapped in gold wire, a golden pommel set with dark blue and red gems, a soft golden glow, diagonal, single inventory item icon",
+  "style": "src/client/art/items/self-swinging-sword.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023382987529330785
+  },
+  "images": 1
+}

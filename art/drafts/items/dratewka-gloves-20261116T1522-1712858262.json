@@ -1,0 +1,14 @@
+{
+  "id": "dratewka-gloves",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the gloves of dratewka, the cobbler who beat the wawel dragon: a pair of sturdy brown leather work gloves with thick stitched seams, a small iron awl tucked at one cuff, a few yellow sulphur specks, single inventory item icon",
+  "style": "src/client/art/items/svarog-gauntlets.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02343901151805454
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "golden-horn",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the golden horn of the polish legend: a curved golden hunting horn with ornamented bands and a mouthpiece, a red and white cord hanging from it, a soft golden glow, single inventory item icon",
+  "style": "src/client/art/items/alatyr.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02329953403091431
+  },
+  "images": 1
+}

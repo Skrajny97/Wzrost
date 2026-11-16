@@ -1,0 +1,14 @@
+{
+  "id": "chrobry-armor",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the armour of boleslaw the brave, the first polish king: a long shining chain mail hauberk with a gilded steel breastplate over it, a small white eagle on a red shield on the chest, golden trim, an empty armor with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/zawisza-armor.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02324700339571635
+  },
+  "images": 1
+}

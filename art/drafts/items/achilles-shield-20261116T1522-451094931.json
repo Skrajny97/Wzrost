@@ -1,0 +1,14 @@
+{
+  "id": "achilles-shield",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the shield of achilles forged by hephaestus: a large round shield of bronze and gold with rings of tiny embossed figures, a golden sun in the middle, a polished raised rim, a soft divine glow, single inventory item icon",
+  "style": "src/client/art/items/aegis.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02416684790441725
+  },
+  "images": 1
+}

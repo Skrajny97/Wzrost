@@ -1,0 +1,14 @@
+{
+  "id": "triglav-staff",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the staff of triglav, the three-headed slavic god: a tall dark wooden staff topped with three small carved golden heads looking three ways, a glowing blue gem below them, silver bands on the shaft, faint blue magic sparkles, upright, single inventory item icon",
+  "style": "src/client/art/items/merlin-staff.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024214056215710114
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "maurice-spear",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the holy spear of saint maurice: a short spear with a long leaf-shaped steel spearhead bound in the middle with a golden sleeve, a small golden cross on the blade, a dark wooden shaft, a soft golden holy light, diagonal, single inventory item icon",
+  "style": "src/client/art/items/holy-grail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023223408184475373
+  },
+  "images": 1
+}

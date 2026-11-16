@@ -1,0 +1,14 @@
+{
+  "id": "zhiva-cloak",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the cloak of zhiva, the slavic goddess of life: a long flowing cloak of fresh spring green cloth embroidered with white blossoms and golden ears of wheat, small flowers and leaves growing along its hem, a soft green glow, an empty cloak with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/mokosh-robe.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023320642108281456
+  },
+  "images": 1
+}

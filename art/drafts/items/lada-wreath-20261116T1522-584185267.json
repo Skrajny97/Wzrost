@@ -1,0 +1,14 @@
+{
+  "id": "lada-wreath",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the wreath of lada, the slavic goddess of love and harmony: a round wreath of green leaves, red poppies, blue cornflowers and white daisies, long colourful ribbons hanging from the back, a soft warm glow, single inventory item icon",
+  "style": "src/client/art/items/papal-tiara.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02327685570335388
+  },
+  "images": 1
+}

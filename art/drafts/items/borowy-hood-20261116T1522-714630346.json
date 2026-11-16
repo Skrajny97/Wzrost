@@ -1,0 +1,14 @@
+{
+  "id": "borowy-hood",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the hood of borowy, the slavic forest spirit: a deep green cloth hood with a long pointed tip, its edge overgrown with moss and small leaves, two small glowing green eyes of light in the shadow inside, an empty hood with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/cap-of-invisibility.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023286350584454007
+  },
+  "images": 1
+}

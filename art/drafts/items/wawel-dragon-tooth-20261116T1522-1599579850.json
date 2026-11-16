@@ -1,0 +1,14 @@
+{
+  "id": "wawel-dragon-tooth",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a dagger made from a tooth of the wawel dragon: a long slightly curved ivory-white dragon fang as the blade with a sharp point, a hilt wrapped in green dragon scale leather, a small golden crossguard, a faint fiery glow at the tip, diagonal, single inventory item icon",
+  "style": "src/client/art/items/nocnitsa-blade.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02359561142116123
+  },
+  "images": 1
+}
