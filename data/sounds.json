@@ -942,6 +942,8 @@
     "casino-spin": { "files": ["audio/sfx/casino-spin-1.mp3"], "gain": 0.6 },
     "casino-win": { "files": ["audio/sfx/casino-win-1.mp3"], "gain": 0.7 },
     "casino-lose": { "files": ["audio/sfx/casino-lose-1.mp3"], "gain": 0.7 },
+    "minigame-hit": { "files": ["audio/sfx/minigame-hit-1.mp3"], "gain": 0.6 },
+    "minigame-miss": { "files": ["audio/sfx/minigame-miss-1.mp3"], "gain": 0.6 },
     "casino-ticket": { "files": ["audio/sfx/casino-ticket-1.mp3"], "gain": 0.8 }
   }
 }

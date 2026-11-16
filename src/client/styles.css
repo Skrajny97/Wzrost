@@ -7339,6 +7339,8 @@ a.camp-level-button {
    sliding stop; the fight playback stays, in a calmer form (see arena.js).
    Last in the file, so it wins over the rules it calms. */
 .calm .activity--done,
+.calm .minigame-marker--hit::before,
+.calm .minigame-marker--miss,
 .calm .camp-bubble--full,
 .calm .camp-collector-art,
 .calm .camp-collector-flyer,
@@ -10017,12 +10019,6 @@ a.profession-square:active {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .minigame-marker--hit::before,
-  .minigame-marker--miss {
-    animation: none;
-  }
-}
 
 .minigame-gauge--heat .minigame-marker::before {
   border-color: #3a1a10;

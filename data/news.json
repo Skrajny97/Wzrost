@@ -1170,6 +1170,11 @@
       "id": "0.3.92",
       "title": "Wersja 0.3.92",
       "body": "- Liczniki czasu na górnym pasku, w zakładkach i na ekranach nie drgają już co sekundę, także przy pogrubionej czcionce w telefonie.\n- Nazwa umiejętności nad postacią w walce nie ucina się już przy prawej krawędzi na wąskim telefonie."
+    },
+    {
+      "id": "0.3.93",
+      "title": "Wersja 0.3.93",
+      "body": "- Tier IX przedmiotów: 22 nowe przedmioty od 175. poziomu klasy, po jednym w każdej rodzinie, z nazwami z polskich legend i od słowiańskich bogów (m.in. Szczerbiec, Topór Peruna, Tarcza Achillesa i Złoty róg). Wypadają od Matecznika (poz. 171–175), a Warsztat i Szlifiernia odsłaniają ich wzory na 175. poziomie profesji.\n- Encyklopedia ma Tier IX z własną skrzynią, a materiały stworów powyżej 200. poziomu stoją w Tierze IX.\n- Minigra przy raporcie profesji: po każdym stuknięciu znacznik na chwilę się zatrzymuje. Trafienie świeci na zielono, pudło na czerwono, a każde ma swój dźwięk. Na Androidzie telefon krótko wibruje."
     }
   ]
 }

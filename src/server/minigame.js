@@ -57,7 +57,7 @@ export function minigameOutcome(activity, played, now) {
   const taps = played.taps;
   const at = JSON.parse(activity.options ?? '{}').minigame?.at;
   if (typeof at !== 'number') return null;
-  // A page from 0.3.92 on stands the marker still after each tap (1022)
+  // A page from 0.3.93 on stands the marker still after each tap (1022)
   // and says so; one from before does not.
   const pause = played.pause === content().minigame.pause ? content().minigame.pause : 0;
   const hits = minigameHits(taps, minigameChallenge(activity.seed, content()), now - at, content(), pause);
