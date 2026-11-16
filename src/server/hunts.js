@@ -109,6 +109,7 @@ import { cardCollection, cardUpserts, droppedCards, droppedEffect, effectChance,
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { expeditionMinutes } from './guild-expedition.js';
 import { huntFamePoints } from './fame.js';
+import { featGains } from './achievements.js';
 import { favoriteIds } from './favorites.js';
 import { fallenGems, gemNamed, gemsBackSql, soldGold } from './inventory.js';
 import { perkOf } from './perks.js';
@@ -252,6 +253,20 @@ function potionsBack(row, back, drunk) {
 // Inner regions open with the class level (areaUnlockLevel).
 const areaLocked = (area) =>
   new ApiError(403, 'area_locked', `To miejsce odblokujesz na poziomie klasy ${areaUnlockLevel(area, content())}.`);
+
+// What an exploration adds to the achievements' counts (achievements.js):
+// the creatures beaten (`kills`, as the quests count them), the champions
+// and wanted beaten, and its gold; nothing for one lost (forfeit).
+function huntFeats(hunt, kills) {
+  if (hunt.forfeit) return {};
+  const won = hunt.fights.filter((fight) => fight.won === true);
+  return {
+    monsters: Object.values(kills).reduce((sum, count) => sum + count, 0),
+    champions: won.filter((fight) => fight.champion).length,
+    wanted: won.filter((fight) => fight.wanted).length,
+    gold: Math.max(0, Math.round(hunt.gold ?? 0)),
+  };
+}
 
 // ?area=… asks for one inner region, which keeps each request within the CPU
 // limit. Without it the answer covers the inner region of each region that fits
@@ -1256,6 +1271,9 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
       // The Punkty Sławy of the exploration, a Drużyna's trip too (fame.js):
       // its minutes and the elites and champions beaten, none for a lost one.
       ...huntFamePoints(db, row.id, hunt, activity.minutes, now),
+      // The achievements' counts (achievements.js): the creatures, champions
+      // and wanted beaten, and the exploration's gold; none for a lost one.
+      ...featGains(db, row.id, huntFeats(hunt, progress.kills)),
       // Bag items the scrapper bought: paid for above, while they were still there.
       ...(soldStored.length > 0
         ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${soldStored.map(() => '?').join(', ')})`).bind(row.id, ...soldStored)]

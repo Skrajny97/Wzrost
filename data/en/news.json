@@ -980,6 +980,10 @@
     "0.4.5": {
       "title": "Version 0.4.5",
       "body": "- Guild war league, 3v3: every trio fights every trio of the rival, a short one too, with fewer members. The guild with fewer trios gives one fight by walkover for each trio it lacks. For example: 18 members make 6 trios and 29 members make 10, so there are 60 trio fights and the smaller guild gives 4 by walkover. Today's rerun at 23:00 already fights this way."
+    },
+    "0.4.6": {
+      "title": "Version 0.4.6",
+      "body": "- Achievements: on the Character tab, under the portrait, there is an “Achievements” button. 24 goals in 9 groups wait there. Each gives a title and Time Points, and some System Points too. The reward comes to you when you look into the achievements window. You can wear a title you have earned: it shows in your profile and in the Ranking. Creatures, champions and wanted beaten, the gold of explorations, duels, league fights, Labyrinth runs and deals count from today.\n- Familiar: Will-o'-the-Wisp now costs 600 System Points, like the other familiars. Those who bought it for 800 got 200 System Points back."
     }
   }
 }

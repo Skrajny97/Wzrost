@@ -121,7 +121,7 @@
       "kind": "pet",
       "name": "Chowaniec: Błędny ognik",
       "description": "Oswojony błędny ognik unosi się za postacią w scenie Walki, a na portrecie świeci błękitnym światłem przy jej ramieniu.",
-      "price": 800,
+      "price": 600,
       "pet": {
         "walk": { "file": "art/pets/wisp.png", "size": 64, "frames": 8, "fps": 8 },
         "foot": { "edge": "back", "x": -26, "top": 2, "behind": true },

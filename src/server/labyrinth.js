@@ -52,6 +52,7 @@ import {
 } from '../engine/index.js';
 import { say } from '../engine/text.js';
 import { atomically, sameVersion } from './atomic.js';
+import { featGains } from './achievements.js';
 import { cardCollection, cardsHere, cardSummary, cardUpserts, droppedCards, droppedEffect, effectChance, effectFoundLine, effectUpserts, maxedCards, packGains, packViews } from './cards.js';
 import { characterView, coreOf, engineCharacter, equippedItems, loadPlayer, questsNow, requirePlayer, trophiesFor } from './characters.js';
 import { content } from './content.js';
@@ -402,6 +403,9 @@ export async function enterLabyrinth(context) {
       trimReports(db, row.id, 'labyrinth'),
     );
   }
+  // The Labirynt cleared, its 3rd level's guardian beaten, counts for the
+  // achievements (achievements.js).
+  if (type === 'guardian' && hunt?.labyrinth.won && state.level === 3) statements.push(...featGains(db, row.id, { labyrinths: 1 }));
   const results = await atomically(db, statements);
   const saved = report ? results[reportAt].meta.last_row_id : null;
   return answer(context, session, {

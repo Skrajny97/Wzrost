@@ -1,0 +1,510 @@
+{
+  "$comment": "Osiągnięcia z tytułami (1030; lista 1036.1 i okno 1036.2 przyjęte 16.11.2026, tytuł tylko w profilu i Rankingu: 1036.3 B; src/engine/achievements.js, src/server/achievements.js, src/client/achievements.js). groups: grupy w oknie, każda z listą osiągnięć: name, goal (cel słowami), count (co się liczy: monsters, champions i wanted to stwory, czempioni i stwory z listów gończych pokonane na wyprawach, gold złoto z wypraw, arenaWins pojedynki wygrane na Arenie, leagueWins walki wygrane w lidze wojen gildii, labyrinths strażnicy 3. poziomu Labiryntu pokonani, deals transakcje na Targowisku: te liczą się od wersji, która je wprowadziła; reszta od razu z tego, co postać ma: landPlaces miejsca krainy land otwarte poziomem postaci, landReached dotarcie do krainy land (poziom postaci jej pierwszego miejsca), level poziom postaci, thirdForm trzecia forma klasy, professionTop najwyższy poziom profesji, professionsAt50 i professionsAt100 profesje z takim poziomem, cards różne karty, landCards wszystkie karty jednej krainy, arenaRating ocena na Arenie, guildWeeks pełne tygodnie w obecnej gildii, towerFloor najwyższe piętro Wieży, friends znajomi, streaks ukończone serie nagrody za kolejne dni), target (ile trzeba), title (tytuł postaci mężczyzny i kobiety), reward (Punkty Czasu i Punkty Systemu, dane raz, gdy osiągnięcie jest zdobyte, przy pierwszym spojrzeniu na okno) i art (obrazek z gry: monster, item, profession albo icon). since: liczniki, które gra prowadzi od wersji 0.4.6; texts.since mówi o tym w oknie.",
+  "since": [
+    "arenaWins",
+    "champions",
+    "deals",
+    "gold",
+    "labyrinths",
+    "leagueWins",
+    "monsters",
+    "wanted"
+  ],
+  "texts": {
+    "since": "Pokonane stwory, czempioni, listy gończe, złoto z wypraw, pojedynki, walki ligi, przejścia Labiryntu i transakcje liczą się od 16.11.2026."
+  },
+  "groups": [
+    {
+      "id": "combat",
+      "name": "Walka",
+      "list": [
+        {
+          "id": "first-blood",
+          "name": "Pierwsza krew",
+          "goal": "Pokonaj 100 stworów na wyprawach.",
+          "count": "monsters",
+          "target": 100,
+          "title": [
+            "Łowca",
+            "Łowczyni"
+          ],
+          "reward": {
+            "timePoints": 25
+          },
+          "art": [
+            "monster",
+            "wolf"
+          ]
+        },
+        {
+          "id": "beast-slayer",
+          "name": "Pogromca bestii",
+          "goal": "Pokonaj 1000 stworów na wyprawach.",
+          "count": "monsters",
+          "target": 1000,
+          "title": [
+            "Pogromca Bestii",
+            "Pogromczyni Bestii"
+          ],
+          "reward": {
+            "timePoints": 50
+          },
+          "art": [
+            "monster",
+            "bear"
+          ]
+        },
+        {
+          "id": "forest-legend",
+          "name": "Legenda puszczy",
+          "goal": "Pokonaj 10 000 stworów na wyprawach.",
+          "count": "monsters",
+          "target": 10000,
+          "title": [
+            "Legenda Puszczy",
+            "Legenda Puszczy"
+          ],
+          "reward": {
+            "timePoints": 100,
+            "systemPoints": 10
+          },
+          "art": [
+            "monster",
+            "likho"
+          ]
+        },
+        {
+          "id": "champion-slayer",
+          "name": "Na czempionów",
+          "goal": "Pokonaj 25 czempionów na wyprawach.",
+          "count": "champions",
+          "target": 25,
+          "title": [
+            "Zabójca Czempionów",
+            "Zabójczyni Czempionów"
+          ],
+          "reward": {
+            "timePoints": 50
+          },
+          "art": [
+            "monster",
+            "alpha-wolf"
+          ]
+        },
+        {
+          "id": "bounty-hunter",
+          "name": "Łowca nagród",
+          "goal": "Pokonaj 50 stworów z listów gończych.",
+          "count": "wanted",
+          "target": 50,
+          "title": [
+            "Łowca Nagród",
+            "Łowczyni Nagród"
+          ],
+          "reward": {
+            "timePoints": 50
+          },
+          "art": [
+            "icon",
+            "scroll"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lands",
+      "name": "Krainy",
+      "list": [
+        {
+          "id": "wanderer",
+          "name": "Wędrowiec",
+          "goal": "Otwórz wszystkie miejsca Skraju Puszczy.",
+          "count": "landPlaces",
+          "land": "Skraj Puszczy",
+          "target": 10,
+          "title": [
+            "Wędrowiec",
+            "Wędrowniczka"
+          ],
+          "reward": {
+            "timePoints": 25
+          },
+          "art": [
+            "icon",
+            "tent"
+          ]
+        },
+        {
+          "id": "bald-explorer",
+          "name": "Odkrywca Łysogór",
+          "goal": "Dotrzyj do Łysogór (201. poziom postaci).",
+          "count": "landReached",
+          "land": "Łysogóry",
+          "target": 1,
+          "title": [
+            "Odkrywca Łysogór",
+            "Odkrywczyni Łysogór"
+          ],
+          "reward": {
+            "timePoints": 100,
+            "systemPoints": 10
+          },
+          "art": [
+            "icon",
+            "star"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "character",
+      "name": "Postać",
+      "list": [
+        {
+          "id": "veteran",
+          "name": "Weteran",
+          "goal": "Zdobądź 100. poziom postaci.",
+          "count": "level",
+          "target": 100,
+          "title": [
+            "Weteran",
+            "Weteranka"
+          ],
+          "reward": {
+            "timePoints": 50
+          },
+          "art": [
+            "icon",
+            "trophy"
+          ]
+        },
+        {
+          "id": "awakening",
+          "name": "Przebudzenie",
+          "goal": "Zdobądź trzecią formę klasy.",
+          "count": "thirdForm",
+          "target": 1,
+          "title": [
+            "Przebudzony",
+            "Przebudzona"
+          ],
+          "reward": {
+            "timePoints": 50
+          },
+          "art": [
+            "icon",
+            "evolution"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "professions",
+      "name": "Profesje",
+      "list": [
+        {
+          "id": "master-craft",
+          "name": "Mistrz rzemiosła",
+          "goal": "Zdobądź 100. poziom dowolnej profesji.",
+          "count": "professionTop",
+          "target": 100,
+          "title": [
+            "Mistrz",
+            "Mistrzyni"
+          ],
+          "reward": {
+            "timePoints": 50
+          },
+          "art": [
+            "profession",
+            "crafting"
+          ]
+        },
+        {
+          "id": "handy",
+          "name": "Złota rączka",
+          "goal": "Zdobądź 50. poziom w 4 profesjach.",
+          "count": "professionsAt50",
+          "target": 4,
+          "title": [
+            "Złota Rączka",
+            "Złota Rączka"
+          ],
+          "reward": {
+            "timePoints": 50
+          },
+          "art": [
+            "profession",
+            "alchemy"
+          ]
+        },
+        {
+          "id": "versatile",
+          "name": "Wszechstronność",
+          "goal": "Zdobądź 100. poziom we wszystkich 8 profesjach.",
+          "count": "professionsAt100",
+          "target": 8,
+          "title": [
+            "Wszechstronny",
+            "Wszechstronna"
+          ],
+          "reward": {
+            "timePoints": 100,
+            "systemPoints": 10
+          },
+          "art": [
+            "profession",
+            "jewelcrafting"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cards",
+      "name": "Karty",
+      "list": [
+        {
+          "id": "collector",
+          "name": "Kolekcjoner",
+          "goal": "Zbierz 50 różnych kart.",
+          "count": "cards",
+          "target": 50,
+          "title": [
+            "Kolekcjoner",
+            "Kolekcjonerka"
+          ],
+          "reward": {
+            "timePoints": 25
+          },
+          "art": [
+            "icon",
+            "book"
+          ]
+        },
+        {
+          "id": "card-sage",
+          "name": "Znawca kart",
+          "goal": "Zbierz wszystkie karty jednej krainy.",
+          "count": "landCards",
+          "target": 1,
+          "title": [
+            "Znawca Kart",
+            "Znawczyni Kart"
+          ],
+          "reward": {
+            "timePoints": 50
+          },
+          "art": [
+            "icon",
+            "star"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "arena",
+      "name": "Arena",
+      "list": [
+        {
+          "id": "gladiator",
+          "name": "Gladiator",
+          "goal": "Wygraj 100 pojedynków na Arenie.",
+          "count": "arenaWins",
+          "target": 100,
+          "title": [
+            "Gladiator",
+            "Gladiatorka"
+          ],
+          "reward": {
+            "timePoints": 50
+          },
+          "art": [
+            "item",
+            "sword"
+          ]
+        },
+        {
+          "id": "arena-master",
+          "name": "Mistrz Areny",
+          "goal": "Zdobądź ocenę 1500 na Arenie.",
+          "count": "arenaRating",
+          "target": 1500,
+          "title": [
+            "Mistrz Areny",
+            "Mistrzyni Areny"
+          ],
+          "reward": {
+            "timePoints": 100
+          },
+          "art": [
+            "icon",
+            "trophy"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "guild",
+      "name": "Gildia",
+      "list": [
+        {
+          "id": "loyal",
+          "name": "Wierność",
+          "goal": "Bądź 8 tygodni w jednej gildii.",
+          "count": "guildWeeks",
+          "target": 8,
+          "title": [
+            "Wierny",
+            "Wierna"
+          ],
+          "reward": {
+            "timePoints": 25
+          },
+          "art": [
+            "icon",
+            "banner"
+          ]
+        },
+        {
+          "id": "league-warrior",
+          "name": "Wojownik ligi",
+          "goal": "Wygraj 25 walk w lidze wojen gildii.",
+          "count": "leagueWins",
+          "target": 25,
+          "title": [
+            "Wojownik Ligi",
+            "Wojowniczka Ligi"
+          ],
+          "reward": {
+            "timePoints": 50
+          },
+          "art": [
+            "icon",
+            "swords"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "towers",
+      "name": "Wieże i Labirynt",
+      "list": [
+        {
+          "id": "tower-lord",
+          "name": "Władca wież",
+          "goal": "Zdobądź 50. piętro dowolnej Wieży.",
+          "count": "towerFloor",
+          "target": 50,
+          "title": [
+            "Władca Wież",
+            "Władczyni Wież"
+          ],
+          "reward": {
+            "timePoints": 50
+          },
+          "art": [
+            "icon",
+            "keep"
+          ]
+        },
+        {
+          "id": "labyrinth-slayer",
+          "name": "Pogromca labiryntu",
+          "goal": "Przejdź Labirynt 10 razy: pokonaj strażnika jego 3. poziomu.",
+          "count": "labyrinths",
+          "target": 10,
+          "title": [
+            "Pogromca Labiryntu",
+            "Pogromczyni Labiryntu"
+          ],
+          "reward": {
+            "timePoints": 50
+          },
+          "art": [
+            "icon",
+            "core"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "social",
+      "name": "Handel i społeczność",
+      "list": [
+        {
+          "id": "merchant",
+          "name": "Handlarz",
+          "goal": "Zawrzyj 100 transakcji na Targowisku.",
+          "count": "deals",
+          "target": 100,
+          "title": [
+            "Handlarz",
+            "Handlarka"
+          ],
+          "reward": {
+            "timePoints": 25
+          },
+          "art": [
+            "icon",
+            "coin"
+          ]
+        },
+        {
+          "id": "rich",
+          "name": "Bogacz",
+          "goal": "Zarób 1 000 000 złota na wyprawach.",
+          "count": "gold",
+          "target": 1000000,
+          "title": [
+            "Bogacz",
+            "Bogaczka"
+          ],
+          "reward": {
+            "timePoints": 50
+          },
+          "art": [
+            "icon",
+            "coffer"
+          ]
+        },
+        {
+          "id": "socialite",
+          "name": "Dusza towarzystwa",
+          "goal": "Miej 10 znajomych.",
+          "count": "friends",
+          "target": 10,
+          "title": [
+            "Dusza Towarzystwa",
+            "Dusza Towarzystwa"
+          ],
+          "reward": {
+            "timePoints": 25
+          },
+          "art": [
+            "icon",
+            "people"
+          ]
+        },
+        {
+          "id": "steadfast",
+          "name": "Wytrwałość",
+          "goal": "Ukończ 4 pełne serie nagrody za kolejne dni.",
+          "count": "streaks",
+          "target": 4,
+          "title": [
+            "Wytrwały",
+            "Wytrwała"
+          ],
+          "reward": {
+            "timePoints": 50,
+            "systemPoints": 5
+          },
+          "art": [
+            "icon",
+            "calendar"
+          ]
+        }
+      ]
+    }
+  ]
+}

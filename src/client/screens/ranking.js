@@ -309,6 +309,8 @@ function mountCharacterRanking(container) {
                       ),
                       guildTag(row.guildTag),
                       row.role && h('span', { class: `chat-role chat-role--${row.role}`, text: `(${row.role})` }),
+                      // The title of an achievement it wears (1036.3 B).
+                      row.title && h('span', { class: 'ranking-title', text: row.title }),
                     ),
                   ),
                   h('td', { class: sorted('level'), text: formatNumber(row.level) }),

@@ -51,6 +51,7 @@ import cards from '../../data/cards.json' with { type: 'json' };
 import guilds from '../../data/guilds.json' with { type: 'json' };
 import cosmetics from '../../data/cosmetics.json' with { type: 'json' };
 import weeks from '../../data/weeks.json' with { type: 'json' };
+import achievements from '../../data/achievements.json' with { type: 'json' };
 import fame from '../../data/fame.json' with { type: 'json' };
 // The English texts (data/en/), by the data file they translate. A file
 // added there is named here too (tools/i18n-check.mjs checks it).
@@ -95,6 +96,7 @@ import enCards from '../../data/en/cards.json' with { type: 'json' };
 import enTutorial from '../../data/en/tutorial.json' with { type: 'json' };
 import enUnlocks from '../../data/en/unlocks.json' with { type: 'json' };
 import enWeeks from '../../data/en/weeks.json' with { type: 'json' };
+import enAchievements from '../../data/en/achievements.json' with { type: 'json' };
 
 // The data files by their names, as data/en/ names its translations.
 const polishData = {
@@ -140,6 +142,7 @@ const polishData = {
   sounds,
   animations,
   weeks,
+  achievements,
 };
 
 export const OVERLAYS = {
@@ -186,6 +189,7 @@ export const OVERLAYS = {
     cards: enCards,
     unlocks: enUnlocks,
     weeks: enWeeks,
+    achievements: enAchievements,
   },
 };
 

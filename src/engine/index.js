@@ -104,3 +104,4 @@ export * from './weeks.js';
 export * from './fame.js';
 export * from './account-chest.js';
 export * from './party-events.js';
+export * from './achievements.js';

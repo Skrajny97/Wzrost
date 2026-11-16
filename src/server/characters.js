@@ -136,6 +136,7 @@ import { chatRole } from './chat.js';
 import { isAuthor } from './author.js';
 import { relationTo } from './community.js';
 import { content, contentIn } from './content.js';
+import { titleText } from './achievements.js';
 import { favoriteIds } from './favorites.js';
 import { buildingOn, craftingOn, fortressOn, labyrinthOn, professionsOn, settlementOn, weeksOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
@@ -1899,6 +1900,8 @@ export async function characterProfile(context) {
     profile: {
       id: found.id,
       name: view.name,
+      // The title of an achievement it wears (achievements.js, 1036.3 B).
+      title: titleText(found),
       classId: view.classId,
       className: view.className,
       appearance: view.appearance,

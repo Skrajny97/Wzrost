@@ -1,0 +1,245 @@
+{
+  "$comment": "English texts of data/achievements.json (src/engine/achievements.js): each group's name, and each achievement's name, goal and title (a man's and a woman's).",
+  "texts": {
+    "since": "Creatures, champions and wanted beaten, the explorations' gold, duels, league fights, Labyrinth clears and deals count from 16.11.2026."
+  },
+  "groups": {
+    "combat": {
+      "name": "Combat",
+      "list": {
+        "first-blood": {
+          "name": "First Blood",
+          "goal": "Defeat 100 creatures on explorations.",
+          "title": [
+            "Hunter",
+            "Huntress"
+          ]
+        },
+        "beast-slayer": {
+          "name": "Beast Slayer",
+          "goal": "Defeat 1000 creatures on explorations.",
+          "title": [
+            "Beast Slayer",
+            "Beast Slayer"
+          ]
+        },
+        "forest-legend": {
+          "name": "Legend of the Forest",
+          "goal": "Defeat 10,000 creatures on explorations.",
+          "title": [
+            "Legend of the Forest",
+            "Legend of the Forest"
+          ]
+        },
+        "champion-slayer": {
+          "name": "Champion Hunt",
+          "goal": "Defeat 25 champions on explorations.",
+          "title": [
+            "Champion Slayer",
+            "Champion Slayer"
+          ]
+        },
+        "bounty-hunter": {
+          "name": "Bounty Hunter",
+          "goal": "Defeat 50 creatures from wanted posters.",
+          "title": [
+            "Bounty Hunter",
+            "Bounty Hunter"
+          ]
+        }
+      }
+    },
+    "lands": {
+      "name": "Lands",
+      "list": {
+        "wanderer": {
+          "name": "Wanderer",
+          "goal": "Open every place of the Forest's Edge.",
+          "title": [
+            "Wanderer",
+            "Wanderer"
+          ]
+        },
+        "bald-explorer": {
+          "name": "Explorer of the Bald Mountains",
+          "goal": "Reach the Bald Mountains (character level 201).",
+          "title": [
+            "Explorer of the Bald Mountains",
+            "Explorer of the Bald Mountains"
+          ]
+        }
+      }
+    },
+    "character": {
+      "name": "Character",
+      "list": {
+        "veteran": {
+          "name": "Veteran",
+          "goal": "Reach character level 100.",
+          "title": [
+            "Veteran",
+            "Veteran"
+          ]
+        },
+        "awakening": {
+          "name": "Awakening",
+          "goal": "Reach the third form of your class.",
+          "title": [
+            "Awakened",
+            "Awakened"
+          ]
+        }
+      }
+    },
+    "professions": {
+      "name": "Professions",
+      "list": {
+        "master-craft": {
+          "name": "Master of a Craft",
+          "goal": "Reach level 100 in any profession.",
+          "title": [
+            "Master",
+            "Master"
+          ]
+        },
+        "handy": {
+          "name": "Jack of All Trades",
+          "goal": "Reach level 50 in 4 professions.",
+          "title": [
+            "Jack of All Trades",
+            "Jack of All Trades"
+          ]
+        },
+        "versatile": {
+          "name": "Versatility",
+          "goal": "Reach level 100 in all 8 professions.",
+          "title": [
+            "Versatile",
+            "Versatile"
+          ]
+        }
+      }
+    },
+    "cards": {
+      "name": "Cards",
+      "list": {
+        "collector": {
+          "name": "Collector",
+          "goal": "Collect 50 different cards.",
+          "title": [
+            "Collector",
+            "Collector"
+          ]
+        },
+        "card-sage": {
+          "name": "Card Sage",
+          "goal": "Collect every card of one land.",
+          "title": [
+            "Card Sage",
+            "Card Sage"
+          ]
+        }
+      }
+    },
+    "arena": {
+      "name": "Arena",
+      "list": {
+        "gladiator": {
+          "name": "Gladiator",
+          "goal": "Win 100 duels in the Arena.",
+          "title": [
+            "Gladiator",
+            "Gladiator"
+          ]
+        },
+        "arena-master": {
+          "name": "Arena Master",
+          "goal": "Reach a rating of 1500 in the Arena.",
+          "title": [
+            "Arena Master",
+            "Arena Master"
+          ]
+        }
+      }
+    },
+    "guild": {
+      "name": "Guild",
+      "list": {
+        "loyal": {
+          "name": "Loyalty",
+          "goal": "Stay 8 weeks in one guild.",
+          "title": [
+            "Loyal",
+            "Loyal"
+          ]
+        },
+        "league-warrior": {
+          "name": "League Warrior",
+          "goal": "Win 25 fights in the guild war league.",
+          "title": [
+            "League Warrior",
+            "League Warrior"
+          ]
+        }
+      }
+    },
+    "towers": {
+      "name": "Towers and Labyrinth",
+      "list": {
+        "tower-lord": {
+          "name": "Lord of the Towers",
+          "goal": "Reach floor 50 of any Tower.",
+          "title": [
+            "Lord of the Towers",
+            "Lady of the Towers"
+          ]
+        },
+        "labyrinth-slayer": {
+          "name": "Labyrinth Slayer",
+          "goal": "Clear the Labyrinth 10 times: defeat the guardian of its 3rd level.",
+          "title": [
+            "Labyrinth Slayer",
+            "Labyrinth Slayer"
+          ]
+        }
+      }
+    },
+    "social": {
+      "name": "Trade and community",
+      "list": {
+        "merchant": {
+          "name": "Merchant",
+          "goal": "Close 100 deals at the Marketplace.",
+          "title": [
+            "Merchant",
+            "Merchant"
+          ]
+        },
+        "rich": {
+          "name": "Tycoon",
+          "goal": "Earn 1,000,000 gold on explorations.",
+          "title": [
+            "Tycoon",
+            "Tycoon"
+          ]
+        },
+        "socialite": {
+          "name": "Life of the Party",
+          "goal": "Have 10 friends.",
+          "title": [
+            "Life of the Party",
+            "Life of the Party"
+          ]
+        },
+        "steadfast": {
+          "name": "Perseverance",
+          "goal": "Complete 4 full series of the reward for days in a row.",
+          "title": [
+            "Steadfast",
+            "Steadfast"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -27151,3 +27151,127 @@ a.discord-button {
 .tutorials-replay {
   margin-top: 10px;
 }
+
+/* Osiągnięcia (1030, achievements.js): one card a goal, its picture on the
+   left; a bar while under way, a tick and "Noś ten tytuł" once reached. */
+.achievements {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.achievement-group {
+  margin: 14px 0 6px;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.achievement {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  background: rgba(13, 17, 11, 0.55);
+}
+
+.achievement--done {
+  border-color: var(--gold);
+}
+
+.achievement-art {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+}
+
+.achievement-art > * {
+  max-width: 44px;
+  max-height: 44px;
+}
+
+.achievement-body {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.achievement-body p {
+  margin: 0;
+}
+
+.achievement-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.achievement-check {
+  display: inline-flex;
+  color: var(--gold);
+}
+
+.achievement-goal,
+.achievement-count,
+.achievement-reward,
+.achievement-worn {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.achievement-reward {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+}
+
+.achievement-worn {
+  color: var(--gold);
+}
+
+.achievement-bar {
+  height: 6px;
+}
+
+.achievement-title-now {
+  margin: 0 0 4px;
+}
+
+.achievement-title-now strong {
+  color: var(--gold);
+}
+
+
+/* "Osiągnięcia" under the portrait on the Postać tab (1036.2). */
+.character-achievements {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* The title of an achievement worn (1036.3 B): in gold under the name in
+   the profile, small after it in the Ranking. */
+.profile-worn-title {
+  margin: 2px 0 0;
+  color: var(--gold);
+  font-size: 15px;
+}
+
+.ranking-title {
+  display: block;
+  color: var(--gold);
+  font-size: 12px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}

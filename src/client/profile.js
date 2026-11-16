@@ -46,6 +46,8 @@ export async function openProfile(name, { onChange, mention } = {}) {
           profile.guild && [' ', guildTag(profile.guild.tag)],
           profile.role && h('span', { class: `chat-role chat-role--${profile.role}`, text: ` (${profile.role})` }),
         ),
+        // The title of an achievement it wears (achievements.js, 1036.3 B).
+        profile.title && h('p', { class: 'profile-worn-title', text: `„${profile.title}”` }),
         h('p', { class: 'profile-levels', text: t('{className} · poziom {level} · klasa {classLevel}', { className: profile.className, level: profile.level, classLevel: profile.classLevel }) }),
         profile.guild && h('p', { class: 'profile-levels', text: t('Gildia: {name} [{tag}]', { name: profile.guild.name, tag: profile.guild.tag }) }),
       ),

@@ -3580,6 +3580,17 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.4.6 (16.11.2026): osiągnięcia z tytułami, Błędny ognik za 600 PS
+
+1. **Osiągnięcia (1030; lista 1036.1 i okno 1036.2 przyjęte, tytuł tylko w profilu i Rankingu: 1036.3 B).**
+   - 24 osiągnięcia w 9 grupach (`data/achievements.json`, angielskie w `data/en/achievements.json`). Każde ma cel, tytuł w dwóch formach (mężczyzna, kobieta), nagrodę w Punktach Czasu, przy kilku także w Punktach Systemu, i obrazek, który gra już ma (stwór, przedmiot, profesja), więc bez nowych ikon.
+   - Okno otwiera przycisk „Osiągnięcia” na zakładce Postać, pod portretem (`src/client/achievements.js`). Zdobyte mają znaczek i „Noś ten tytuł”, niezdobyte pasek postępu. Przy kartach krainy pasek pokazuje krainę, w której postać ma najwięcej kart.
+   - Nagroda trafia do postaci przy pierwszym spojrzeniu na okno po zdobyciu osiągnięcia, raz (`GET /api/achievements`, zapis tylko przy niezmienionej postaci). Okno mówi wtedy w komunikacie, co doszło.
+   - Postać nosi jeden tytuł albo żaden (`POST /api/achievements/title`, kolumna `characters.title`). Tytuł widać w profilu i w Rankingu, czat zostaje bez zmian (1036.3 B).
+   - Cele z poziomu, trzeciej formy, profesji, kart, krain, Areny (ocena), gildii, Wież, znajomych i serii dni liczą się od razu z tego, co postać już ma. Stworów, czempionów i listów gończych pokonanych na wyprawach, złota z wypraw, pojedynków wygranych na Arenie, walk wygranych w lidze, przejść Labiryntu (strażnik 3. poziomu) i transakcji na Targowisku gra wcześniej nie liczyła, więc te liczą się od tej wersji (`characters.feats`, migracja 0152; okno mówi o tym jednym zdaniem). Transakcja liczy się kupującemu i sprzedającemu.
+   - Testy w `test/achievements.test.js`.
+2. **Chowaniec: Błędny ognik za 600 PS.** Autor: „Chowaniec: Błędny ognik również powinien kosztować 600 Punktów Systemu jak reszta Chowańców” (wcześniej 800 PS, 415 A). Każda postać, która go kupiła, dostaje zwrot 200 PS (migracja 0153). Błędnego ognika nikt nie dostał inaczej niż przez zakup w Sklepie Systemu, więc zwrot trafia tylko do kupujących.
+
 ## Wersja 0.4.5 (16.11.2026): 3v3 każda trójka z każdą, walkowery za brakujące trójki
 
 Autor po pierwszym wieczorze ligi: „Renegaci mają 29 członków, Pierwotni 18 i to Renegaci mają oddawać walkowera? … ci co jest ich 18 dzielą się na 6 drużyn i walczą z 10 drużynami renegatów, więc 4 walki są oddane walkowerem ale ze strony Pierwotnych”. Do 0.4.4 niepełna ostatnia trójka przegrywała walkowerem wszystkie swoje walki, więc większa gildia z niepełną trójką oddawała ich najwięcej.
