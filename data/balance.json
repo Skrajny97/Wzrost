@@ -197,7 +197,6 @@
   "account": {
     "emailSystemPoints": 10,
     "characters": 5,
-    "chestSlots": 5,
     "chestLevel": 20
   },
   "quickHunt": {

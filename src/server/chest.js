@@ -26,7 +26,10 @@ import { ApiError, json, readJson } from './http.js';
 import { counted, foreign, takenOff } from './market.js';
 import { SCROLL_COLUMNS, scrollGoods, scrollHeld } from './scroll-goods.js';
 
-const slots = () => content().balance.account.chestSlots;
+// The chest holds as many items as the bag of the character played, with
+// its camp's upgrades of the bag (the author, 16.11.2026: „Zwiększ
+// pojemność skrzyni konta na taką jaka aktualnie ma plecak”).
+const slots = (player, now) => bagCapacity(campLevels(player.buildings, now, content()), content());
 
 // The column of the characters row each kind of goods is kept in, and the
 // kinds that take the bag's places, a place to a stack (bagPlaces).
@@ -74,7 +77,7 @@ function goodsOf(rows) {
 // The chest as the character played sees it: each item with the name of
 // the character that put it in, and whether it comes back to this one as
 // its own; and the goods.
-async function chestView(db, player) {
+async function chestView(db, player, now) {
   const [items, goods] = await db.batch([
     db
       .prepare('SELECT c.id, c.character_id, c.data, o.name FROM chest_items c LEFT JOIN characters o ON o.id = c.character_id WHERE c.user_id = ? ORDER BY c.id')
@@ -84,7 +87,7 @@ async function chestView(db, player) {
       .bind(player.row.id, player.row.user_id),
   ]);
   return {
-    slots: slots(),
+    slots: slots(player, now),
     items: items.results.map((row) => {
       const item = JSON.parse(row.data);
       const own = row.character_id === player.row.id;
@@ -116,7 +119,7 @@ function requireOpen(row) {
 export async function getChest(context) {
   const { player } = await requirePlayer(context);
   const lock = chestLock(player.row);
-  return json({ chest: lock ? { locked: lock } : await chestView(context.env.DB, player) });
+  return json({ chest: lock ? { locked: lock } : await chestView(context.env.DB, player, context.now) });
 }
 
 // POST /api/chest/put { itemId }: an item from the bag into the chest, while
@@ -132,7 +135,7 @@ export async function putInChest(context) {
   if (item.equippedSlot) throw new ApiError(409, 'equipped', 'Najpierw zdejmij ten przedmiot.');
   requireOffRack(player, item);
   const db = context.env.DB;
-  const full = () => new ApiError(409, 'chest_full', `Skrzynia Konta mieści ${slots()} przedmiotów. Wyjmij coś, żeby włożyć nowy.`);
+  const full = () => new ApiError(409, 'chest_full', `Skrzynia Konta mieści ${slots(player, context.now)} przedmiotów. Wyjmij coś, żeby włożyć nowy.`);
   const now = context.now;
   const [put] = await db.batch([
     db
@@ -141,7 +144,7 @@ export async function putInChest(context) {
          SELECT ?, character_id, id, data, created_at, ? FROM items
          WHERE id = ? AND character_id = ? AND slot IS NULL AND (SELECT COUNT(*) FROM chest_items WHERE user_id = ?) < ?`,
       )
-      .bind(session.userId, now, item.id, player.row.id, session.userId, slots()),
+      .bind(session.userId, now, item.id, player.row.id, session.userId, slots(player, now)),
     db
       .prepare('DELETE FROM items WHERE id = ? AND character_id = ? AND slot IS NULL AND EXISTS (SELECT 1 FROM chest_items WHERE user_id = ? AND item_id = ? AND put_at = ?)')
       .bind(item.id, player.row.id, session.userId, item.id, now),
@@ -301,5 +304,5 @@ export async function takeGoodsFromChest(context) {
 
 async function answer(context, session) {
   const player = await loadPlayer(context.env.DB, session.userId);
-  return json({ chest: await chestView(context.env.DB, player), character: characterView(player, context.now) });
+  return json({ chest: await chestView(context.env.DB, player, context.now), character: characterView(player, context.now) });
 }
