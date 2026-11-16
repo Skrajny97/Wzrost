@@ -658,8 +658,9 @@ async function leagueView(db, guild, ours, league, week, viewer, now) {
                 rival: { ...rival, members, trios },
                 duels: ours.members.length * members,
                 trioFights: ourTrios * trios,
-                // The walkovers of the trios one guild has fewer of (matchFights).
-                walkovers: { ours: Math.max(0, trios - ourTrios), theirs: Math.max(0, ourTrios - trios) },
+                // The walkovers of the trios one guild has fewer of, each
+                // against every trio of the rival (matchFights).
+                walkovers: { ours: Math.max(0, trios - ourTrios) * trios, theirs: Math.max(0, ourTrios - trios) * ourTrios },
               };
             }),
         };
