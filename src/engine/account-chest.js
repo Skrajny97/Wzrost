@@ -14,9 +14,12 @@
 
 // The kinds of goods, in the order the chest shows them (as the screen
 // shows the character's own: the camp's resources, potions, herbs,
-// materials, minerals, the scrolls and the Spiżarnia's fish, crops and
-// dishes). Gold stays with the character.
-export const CHEST_GOODS = ['resource', 'potion', 'herb', 'material', 'mineral', 'scroll', 'pantry'];
+// materials, the Stół rozbiórki's parts, minerals, the scrolls and the
+// Spiżarnia's fish, crops and dishes). Gold stays with the character. The
+// parts since 0.3.90 (a player, poz. 48, through the author, 16.11.2026:
+// „będzie możliwość wkładnia do skrzyni konta części potrzebnych do
+// wytwarzania ekwipunku?”; the author: „Raczej tak”).
+export const CHEST_GOODS = ['resource', 'potion', 'herb', 'material', 'part', 'mineral', 'scroll', 'pantry'];
 
 // Of `count` pieces leaving a stack of `held`, `traded` of which were got
 // from others, how many are such: the own pieces go first, as when an order

@@ -4,8 +4,8 @@
 // slotów na przedmioty."), and since the mock-ups 843 (the author,
 // 12.11.2026: „Skrzynia Konta powinna pozwalać przekładać też mikstury,
 // rośliny, wszystko, nawet zasoby, ale miec kłódkę i być zablokowana do 20
-// poziomu postaci”) any number of goods: potions, herbs, materials, minerals
-// and the camp's resources. Gold stays with its character. A character
+// poziomu postaci”) any number of goods: potions, herbs, materials, the Stół
+// rozbiórki's parts (0.3.90), minerals and the camp's resources. Gold stays with its character. A character
 // below the chest's level (chestLock in characters.js) neither puts
 // anything in nor takes anything out. A character puts and takes also
 // while away, as every change of the bag (DECISIONS.md, "Plecak poza
@@ -33,7 +33,7 @@ const slots = (player, now) => bagCapacity(campLevels(player.buildings, now, con
 
 // The column of the characters row each kind of goods is kept in, and the
 // kinds that take the bag's places, a place to a stack (bagPlaces).
-const COLUMNS = { resource: 'resources', potion: 'potions', herb: 'herbs', material: 'materials', mineral: 'minerals', pantry: 'pantry' };
+const COLUMNS = { resource: 'resources', potion: 'potions', herb: 'herbs', material: 'materials', part: 'parts', mineral: 'minerals', pantry: 'pantry' };
 const IN_BAG = new Set(['herb', 'potion']);
 const jsonPath = (key) => `$."${key}"`;
 // A batch of goods that failed on its assertion: the character or the
@@ -42,7 +42,8 @@ const changed = () => new ApiError(409, 'character_changed', 'Coś zmieniło si�
 
 // The data's list of a kind of goods; materials are stacks of a material
 // and a rarity instead (knownStack).
-const listOf = (kind) => ({ resource: content().resources, potion: content().potions, herb: content().herbs, mineral: content().minerals, scroll: scrollGoods(), pantry: content().pantry })[kind] ?? [];
+const listOf = (kind) =>
+  ({ resource: content().resources, potion: content().potions, herb: content().herbs, part: content().parts, mineral: content().minerals, scroll: scrollGoods(), pantry: content().pantry })[kind] ?? [];
 
 // A good as the chest shows it, or null for one the data does not know: its
 // name in the request's language, as the character's own lists name it (a

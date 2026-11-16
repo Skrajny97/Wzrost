@@ -22,6 +22,7 @@ const HERB = content.herbs[0].id;
 const OTHER_HERB = content.herbs[1].id;
 const MINERAL = content.minerals[0].id;
 const PELT = 'wolf-pelt:rare';
+const PART = content.parts[0].id;
 
 describe('which pieces leave the chest (the engine)', () => {
   test("a stack's own pieces go first, so what came from others leaves last", () => {
@@ -216,6 +217,39 @@ describe('the goods of the Skrzynia Konta', () => {
     assert.deepEqual([back.herbs[OTHER_HERB], back.foreign_stacks[`herb:${OTHER_HERB}`]], [5, 2]);
   });
 
+  // A player (poz. 48) through the author, 16.11.2026: „będzie możliwość
+  // wkładnia do skrzyni konta części potrzebnych do wytwarzania
+  // ekwipunku?”; the author: „Raczej tak”.
+  test("the Stół rozbiórki's parts go in and come back, after the materials; another character's come as got from others", async () => {
+    await create('Mira');
+    await run('UPDATE characters SET parts = ?, materials = ? WHERE name = ?', JSON.stringify({ [PART]: 7 }), JSON.stringify({ [PELT]: 2 }), 'Mira');
+    let answer = await put('part', PART, 5);
+    assert.equal(answer.status, 200, JSON.stringify(answer.data));
+    assert.equal((await put('material', PELT, 1)).status, 200);
+    answer = await chest();
+    assert.deepEqual(
+      answer.goods.map(({ kind, id, count, own }) => ({ kind, id, count, own })),
+      [
+        { kind: 'material', id: PELT, count: 1, own: 1 },
+        { kind: 'part', id: PART, count: 5, own: 5 },
+      ],
+    );
+    assert.equal(answer.goods[1].name, content.partsById[PART].name);
+    assert.equal((await holdings('Mira')).foreign_stacks[`part:${PART}`], undefined);
+    assert.equal((await put('part', PART, 3)).data.error.code, 'not_enough');
+    const english = await inEnglish('GET', '/api/chest');
+    assert.notEqual(english.data.chest.goods.find((good) => good.kind === 'part').name, content.partsById[PART].name);
+
+    // Another character of the account takes them as got from others.
+    await create('Druga');
+    answer = await take('part', PART, 4);
+    assert.equal(answer.status, 200, JSON.stringify(answer.data));
+    assert.equal(answer.data.character.crafting.parts.find((part) => part.id === PART).count, 4);
+    const druga = await first('SELECT parts, foreign_stacks FROM characters WHERE name = ?', 'Druga');
+    assert.deepEqual([JSON.parse(druga.parts)[PART], JSON.parse(druga.foreign_stacks)[`part:${PART}`]], [4, 4]);
+    assert.deepEqual(goodsOf(answer).find((good) => good.kind === 'part'), { kind: 'part', id: PART, count: 1, own: 0 });
+  });
+
   test('below the chest level the chest is shut, for items and goods alike', async () => {
     await create('Mira', LEVEL - 1);
     await run('UPDATE characters SET herbs = ? WHERE name = ?', JSON.stringify({ [HERB]: 3 }), 'Mira');
@@ -284,7 +318,9 @@ describe('the goods of the Skrzynia Konta', () => {
     await create('Mira');
     await run('UPDATE characters SET herbs = ? WHERE name = ?', JSON.stringify({ [HERB]: 3 }), 'Mira');
     for (const [body, code] of [
-      [{ kind: 'part', id: content.parts[0].id, count: 1 }, 'invalid_kind'],
+      // Parts since 0.3.90, but only those the data knows.
+      [{ kind: 'part', id: 'no-such-part', count: 1 }, 'invalid_goods'],
+      [{ kind: 'gold', id: 'gold', count: 1 }, 'invalid_kind'],
       [{ kind: 'item', id: HERB, count: 1 }, 'invalid_kind'],
       [{ id: HERB, count: 1 }, 'invalid_kind'],
       [{ kind: 'herb', id: 'no-such-herb', count: 1 }, 'invalid_goods'],
