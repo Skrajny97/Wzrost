@@ -15,7 +15,7 @@
 // The Osada's place screen mounts the panel once and keeps it while it
 // redraws itself, so a redraw never asks the server again.
 
-import { herbSprite, mineralSprite, potionSprite } from '../art.js';
+import { herbSprite, mineralSprite, potionSprite, scrollArt } from '../art.js';
 import { ALL, BIDDING, FOR_ME, categoriesOf, goodsCategory, inCategory, shownCategory } from '../categories.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
@@ -48,9 +48,9 @@ const NO_OFFERS = {
   [FOR_ME]: 'Nikt nie wystawia teraz przedmiotu, który możesz założyć.',
   [BIDDING]: 'Nie licytujesz teraz żadnej oferty.',
 };
-const KIND_NAMES = { herb: 'zioło', potion: 'mikstura', material: 'materiał', part: 'część', mineral: 'minerał' };
+const KIND_NAMES = { herb: 'zioło', potion: 'mikstura', material: 'materiał', part: 'część', mineral: 'minerał', scroll: 'zwój' };
 // The same kinds as the filters name them, in their order.
-const KIND_GROUPS = { herb: 'Zioła', potion: 'Mikstury', material: 'Materiały', part: 'Części', mineral: 'Minerały' };
+const KIND_GROUPS = { herb: 'Zioła', potion: 'Mikstury', material: 'Materiały', part: 'Części', mineral: 'Minerały', scroll: 'Zwoje' };
 // The kinds of goods as tabs of their own under "Wszystko", items first (a
 // player's remark, 11.11.2026: "osobne zakładki na mikstury, zioła i
 // materiały"), each with what it holds when it holds nothing.
@@ -61,6 +61,8 @@ const KIND_TABS = [
   ['material', 'Materiały'],
   ['mineral', 'Minerały'],
   ['part', 'Części'],
+  // The scrolls (1061): the Kowadło's two and the Zwój Niepamięci.
+  ['scroll', 'Zwoje'],
 ];
 const NO_KIND = {
   item: 'Nikt nie wystawia teraz przedmiotów.',
@@ -69,6 +71,7 @@ const NO_KIND = {
   material: 'Nikt nie wystawia teraz materiałów.',
   mineral: 'Nikt nie wystawia teraz minerałów.',
   part: 'Nikt nie wystawia teraz części.',
+  scroll: 'Nikt nie wystawia teraz zwojów.',
 };
 // The order of the offers (a player's remark, 11.11.2026: "od najtańszych i
 // od najdroższych"): the soonest to end first, as before, or by the price
@@ -115,6 +118,7 @@ export function stackArt(goods, size = 24) {
   if (goods.kind === 'material') return materialIcon(goods.material.materialId, size);
   if (goods.kind === 'part') return materialIcon(goods.key, size);
   if (goods.kind === 'mineral') return mineralSprite(goods.key) ?? icon('ore', { size });
+  if (goods.kind === 'scroll') return scrollArt(goods.key, size);
   return icon('coin', { size });
 }
 
@@ -144,6 +148,7 @@ function owned(goods) {
   if (goods.kind === 'material') return character.crafting?.materials.find((one) => one.key === goods.key)?.count ?? 0;
   if (goods.kind === 'part') return character.crafting?.parts.find((one) => one.id === goods.key)?.count ?? 0;
   if (goods.kind === 'mineral') return character.minerals?.find((one) => one.id === goods.key)?.count ?? 0;
+  if (goods.kind === 'scroll') return character.scrollGoods?.find((one) => one.id === goods.key)?.count ?? 0;
   return 0;
 }
 

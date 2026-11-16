@@ -13,7 +13,7 @@
 // piece. A chest the character cannot open yet (`chest.locked`, its level)
 // shows only when it opens.
 
-import { herbSprite, materialSprite, mineralSprite, potionSprite, resourceArt } from '../art.js';
+import { herbSprite, materialSprite, mineralSprite, potionSprite, resourceArt, scrollArt } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
@@ -60,6 +60,9 @@ function goodArt(good, size = 24) {
       return mineralSprite(good.id) ?? icon('ore', { size });
     case 'herb':
       return herbSprite(good.id) ?? icon('leaf', { size });
+    // The scrolls (1061).
+    case 'scroll':
+      return scrollArt(good.id, size);
     default:
       return potionSprite(good.id) ?? icon('flask', { size });
   }
@@ -88,6 +91,7 @@ function ownGoods(character) {
     [t('Zioła'), of('herb', character.herbs ?? [])],
     [t('Materiały'), of('material', (character.crafting?.materials ?? []).map((material) => ({ id: material.key, name: materialTitle(material), count: material.count, materialId: material.materialId })))],
     [t('Minerały'), of('mineral', character.minerals ?? [])],
+    [t('Zwoje'), of('scroll', character.scrollGoods ?? [])],
   ].filter(([, entries]) => entries.length > 0);
 }
 

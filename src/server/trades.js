@@ -27,6 +27,7 @@ import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { OWN_CHARACTERS } from './roles.js';
 import { herbsOf, mineralsOf, potionKnown, potionsOf } from './professions-view.js';
+import { scrollAdds, scrollById, scrollsEnough, scrollsOf } from './scroll-goods.js';
 
 const LIVE = ['proposed', 'open', 'locked'];
 // An ended trade stays a day, for its screen and the pause after proposals
@@ -40,7 +41,10 @@ const playedOnline = (row, now) => row?.role === 'player' && (row.seen_at ?? 0) 
 // Materials (keys "materialId:rarityId"), minerals and the camp's resources
 // (wood, stone, ore: the author's "Konieczne", 4.11.2026) take no places in
 // the bag.
-const emptyOffer = () => ({ gold: 0, items: [], herbs: {}, potions: {}, materials: {}, minerals: {}, resources: {} });
+// The scrolls (`scrolls`, by id: the Kowadło's two and the Zwój Niepamięci,
+// 1061) take none either; each is kept in a number column of its own
+// (scroll-goods.js), so they are no STACKS.
+const emptyOffer = () => ({ gold: 0, items: [], herbs: {}, potions: {}, materials: {}, minerals: {}, resources: {}, scrolls: {} });
 // The stacks an offer holds, each kept in the characters' column of its name.
 const STACKS = ['herbs', 'potions', 'materials', 'minerals', 'resources'];
 // A stack's key in the Encyklopedia's record of goods got in a trade; the
@@ -152,6 +156,9 @@ async function tradeView(db, trade, character, now) {
     resources: Object.entries(offer.resources)
       .filter(([id]) => Object.hasOwn(content().resourcesById, id))
       .map(([id, count]) => ({ id, name: content().resourcesById[id].name, count })),
+    scrolls: Object.entries(offer.scrolls)
+      .filter(([id]) => scrollById(id))
+      .map(([id, count]) => ({ id, name: scrollById(id).name, count })),
   });
   const { proposalSeconds, idleMinutes } = rules();
   return {
@@ -281,6 +288,7 @@ function cleanOffer(raw, player) {
     ['materials', JSON.parse(player.row.materials ?? '{}'), (key) => (knownStack(key, content()) ? materialView(key, 0, content()).label : null)],
     ['minerals', mineralsOf(player.row), named(content().mineralsById)],
     ['resources', JSON.parse(player.row.resources ?? '{}'), named(content().resourcesById)],
+    ['scrolls', scrollsOf(player.row), (id) => scrollById(id)?.name ?? null],
   ]) {
     const asked = raw[kind] ?? {};
     if (!asked || typeof asked !== 'object' || Array.isArray(asked)) throw new ApiError(400, 'invalid_offer', 'Nieprawidłowa oferta.');
@@ -294,7 +302,7 @@ function cleanOffer(raw, player) {
   return offer;
 }
 
-const isEmpty = (offer) => offer.gold === 0 && offer.items.length === 0 && STACKS.every((kind) => Object.keys(offer[kind]).length === 0);
+const isEmpty = (offer) => offer.gold === 0 && offer.items.length === 0 && [...STACKS, 'scrolls'].every((kind) => Object.keys(offer[kind]).length === 0);
 
 // POST /api/trade/offer {id, offer}: the character's offer, while neither
 // has confirmed the trade.
@@ -383,6 +391,12 @@ function exchange(db, trade, now, sides) {
       conditions.push(`NOT EXISTS (SELECT 1 FROM json_each(?) AS s WHERE COALESCE((SELECT json_extract(${kind}, ${keyPath('s')}) FROM characters WHERE id = ?), 0) < s.value)`);
       binds.push(JSON.stringify(offer[kind]), id);
     }
+    // The scrolls offered, each in its own column (1061).
+    const scrolls = scrollsEnough(id, offer.scrolls);
+    if (scrolls.binds.length > 0) {
+      conditions.push(scrolls.sql);
+      binds.push(...scrolls.binds);
+    }
   }
   const [one, two] = sides;
   const moves = [];
@@ -411,14 +425,18 @@ function exchange(db, trade, now, sides) {
       STACKS.filter((one) => FOREIGN[one]).flatMap((kind) => Object.entries(taker.offer[kind]).map(([stack, count]) => [`${FOREIGN[kind]}:${stack}`, count])),
     );
     const foreign = Object.keys(got).length > 0 ? { sql: addedStacks('foreign_stacks'), values: [JSON.stringify(got)] } : { sql: 'foreign_stacks', values: [] };
+    // The scrolls got less those given, each column by itself (1061); in
+    // no Encyklopedia.
+    const scrollIds = new Set([...Object.keys(giver.offer.scrolls ?? {}), ...Object.keys(taker.offer.scrolls ?? {})]);
+    const scrolls = scrollAdds(Object.fromEntries([...scrollIds].map((one) => [one, (taker.offer.scrolls?.[one] ?? 0) - (giver.offer.scrolls?.[one] ?? 0)])));
     // The items given keep their ids, so they come off the giver's
     // favourites: one that comes back is no favourite (favorites.js).
     moves.push(
       db
         .prepare(
-          `UPDATE characters SET gold = gold + ?, ${changes.map(([kind, { sql }]) => `${kind} = ${sql}`).join(', ')}, foreign_stacks = ${foreign.sql}, favorites = ${withoutFavorites}, version = version + 1 WHERE id = ?`,
+          `UPDATE characters SET gold = gold + ?, ${changes.map(([kind, { sql }]) => `${kind} = ${sql}`).join(', ')}${scrolls.sql}, foreign_stacks = ${foreign.sql}, favorites = ${withoutFavorites}, version = version + 1 WHERE id = ?`,
         )
-        .bind(taker.offer.gold - giver.offer.gold, ...changes.flatMap(([, { values }]) => values), ...foreign.values, JSON.stringify(giver.offer.items), giver.id),
+        .bind(taker.offer.gold - giver.offer.gold, ...changes.flatMap(([, { values }]) => values), ...scrolls.binds, ...foreign.values, JSON.stringify(giver.offer.items), giver.id),
     );
   }
   const emptied = (kind) => `(SELECT COALESCE(json_group_object(key, value), '{}') FROM json_each(characters.${kind}) WHERE value > 0)`;

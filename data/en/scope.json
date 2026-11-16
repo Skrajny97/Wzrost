@@ -1079,6 +1079,7 @@
     "src/server/forge.js",
     "src/server/jewelcraft.js",
     "src/server/mining.js",
+    "src/server/scroll-goods.js",
     "src/server/wanted.js",
     "src/server/trial-hall.js",
     "src/server/pvp-arena.js",

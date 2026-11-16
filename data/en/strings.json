@@ -3372,5 +3372,8 @@
   "Kanał lidera i zastępców. Członkowie gildii go nie widzą.": "The channel of the leader and the deputies. The guild's members do not see it.",
   "Typ": "Type",
   "Kolejność kart": "Card order",
-  "Kolejność towarów": "Order of the goods"
+  "Kolejność towarów": "Order of the goods",
+  "Zwoje": "Scrolls",
+  "zwój": "scroll",
+  "Nikt nie wystawia teraz zwojów.": "Nobody is offering scrolls right now."
 }
