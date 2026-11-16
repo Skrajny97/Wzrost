@@ -872,6 +872,10 @@
     "0.3.76": {
       "title": "Version 0.3.76",
       "body": "- The Account Chest takes minerals and shows their proper icons."
+    },
+    "0.3.77": {
+      "title": "Version 0.3.77",
+      "body": "- In the Account Chest you can sort what you put in: the items of your bag as in the Bag, and the goods by order, amount or name."
     }
   }
 }
