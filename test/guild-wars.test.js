@@ -624,6 +624,44 @@ describe('the guild wars through the API', () => {
     assert.ok(battles.every((battle) => battle.at === later));
   });
 
+  // The trios of an evening fixed at the first run of its day, from
+  // midnight (the author's 1037.1 A, 16.11.2026): one who joins later fights
+  // only the 1v1, one who leaves leaves its trio short (a walkover).
+  test('the trios of an evening are fixed from midnight: one who joins fights only the 1v1, one who leaves leaves its trio short', async () => {
+    await player('alfa', 'Alfa', { level: 60 });
+    await player('beta', 'Beta', { level: 30, classId: 'mage' });
+    await player('gamma', 'Gamma', { level: 30 });
+    await player('delta', 'Delta', { level: 30 });
+    await player('omega', 'Omega', { level: 30 });
+    const strong = await guild('alfa', 'Mocarze', 'MOC', ['gamma', 'delta']);
+    const weak = await guild('beta', 'Słabi', 'SŁ');
+    await clone(ids.beta, 'Betka', weak);
+    await clone(ids.beta, 'Betko', weak);
+    // Monday after midnight: the league drawn and the trios of its evening kept.
+    await cron(league.startsAt + 60000);
+    const kept = await first('SELECT lineups FROM guild_war_lineups WHERE week = ? AND day = 0 AND guild_id = ?', league.key, strong);
+    assert.deepEqual(JSON.parse(kept.lineups).flat().sort(), [ids.alfa, ids.gamma, ids.delta].sort());
+    // During the day Omega joins and Delta leaves.
+    clock = league.startsAt + 3600000;
+    await as('alfa', 'POST', '/api/guild/invite', { name: 'omega' });
+    assert.equal((await as('omega', 'POST', '/api/guild/accept', { guildId: strong })).status, 200);
+    await run('DELETE FROM guild_members WHERE character_id = ?', ids.delta);
+    await cron(clock + 60000);
+    assert.equal((await first('SELECT lineups FROM guild_war_lineups WHERE week = ? AND day = 0 AND guild_id = ?', league.key, strong)).lineups, kept.lineups);
+    const view = (await as('omega', 'GET', '/api/guild/war')).data;
+    assert.equal(view.me.team, null);
+    assert.deepEqual(view.teams.lineups, [[ids.alfa, ids.gamma].sort((a, b) => JSON.parse(kept.lineups)[0].indexOf(a) - JSON.parse(kept.lineups)[0].indexOf(b))]);
+    await cron(league.battles[0]);
+    const match = await first('SELECT * FROM guild_wars WHERE week = ? AND day = 0', league.key);
+    const side = match.guild_a === strong ? 'a' : 'b';
+    const fights = await all('SELECT format, fighters FROM guild_war_battles WHERE war_id = ?', match.id);
+    const ours = (format) => [...new Set(fights.filter((one) => one.format === format).flatMap((one) => JSON.parse(one.fighters)[side].map((fighter) => fighter.name)))].sort();
+    assert.deepEqual(ours('1v1'), ['Alfa', 'Gamma', 'Omega']);
+    // The trio short of Delta lost its fight by walkover.
+    assert.deepEqual(ours('3v3'), []);
+    assert.equal(side === 'a' ? match.walkovers_a : match.walkovers_b, 1);
+  });
+
   // Every fight of a match to watch, not only the character's own (the
   // author, 16.11.2026): for the members of both guilds, from each side.
   test("every fight of a match, from either guild's side; for no one else", async () => {
