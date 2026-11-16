@@ -208,12 +208,14 @@ describe('Rolnictwo through the API', () => {
     assert.deepEqual(pantry(after), Object.fromEntries(report.crops.map((one) => [one.id, one.count])));
     // The crops take no room in the bag.
     assert.equal(after.bagUsed, 0);
-    // 480 minutes of work: 30 + 60 + 90 + 120 + 150 to level 6, and the
-    // peas and the millet revealed on the way.
-    assert.equal(report.profession.levelAfter, 6);
-    assert.deepEqual(report.revealed, ['peas', 'millet']);
-    assert.equal(after.stats.find((stat) => stat.id === 'strength').sources.professions, 5 * content.professionsById.farming.statPerLevel);
-    assert.equal(after.stats.find((stat) => stat.id === 'endurance').sources.professions, 5 * content.professionsById.farming.statPerLevel);
+    // 480 minutes of work: L × levelMinutes a level (10 since 0.3.87:
+    // 10 + 20 + … + 90 to level 10), and the crops of the levels passed
+    // revealed on the way.
+    const { level } = workProfession(content.professionsById.farming, { level: 1, xp: 0 }, 480);
+    assert.equal(report.profession.levelAfter, level);
+    assert.deepEqual(report.revealed, content.crops.filter((one) => one.level > 1 && one.level <= level).map((one) => one.id));
+    assert.equal(after.stats.find((stat) => stat.id === 'strength').sources.professions, (level - 1) * content.professionsById.farming.statPerLevel);
+    assert.equal(after.stats.find((stat) => stat.id === 'endurance').sources.professions, (level - 1) * content.professionsById.farming.statPerLevel);
     const { data } = await call('GET', '/api/reports', { cookie });
     assert.equal(data.reports[0].kind, 'crops');
     assert.equal((await claim()).status, 409);

@@ -2,8 +2,9 @@
 // src/server/professions.js, workGains; 10.11.2026, the author: „Awatar
 // niech od teraz daje 1/4 tego co zdobyłaby postać - XPa i wpływ na level
 // Profesji w podobnej ilości - tak jakby gracz robił te czynności”): its
-// claimed work brings the character a quarter of the character's XP and of
-// the profession's XP the same work of the character would, with the levels,
+// claimed work brings the character a quarter of the character's XP and,
+// since 0.3.87 (1020.1: „Awatar z pełnym doświadczeniem”), all of the
+// profession's XP the same work of the character would, with the levels,
 // HP, Time Points and stats they bring. Its claim, as the character's own,
 // saves them only while the character is as read, so neither undoes a
 // change made meanwhile.
@@ -15,8 +16,19 @@ import { professionStatBonus, workXp, xpToNext } from '../src/engine/index.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
-const { share } = content.avatar;
+const { share, professionShare } = content.avatar;
 const herbalism = content.professionsById.herbalism;
+// The profession's level and XP after `minutes` of work from `level` and
+// `xp`: L × levelMinutes a level (10 since 0.3.87, 1020.3).
+const afterWork = (minutes, level = 1, xp = 0) => {
+  let left = xp + minutes;
+  let at = level;
+  while (left >= at * herbalism.levelMinutes) {
+    left -= at * herbalism.levelMinutes;
+    at += 1;
+  }
+  return [at, left];
+};
 
 describe('the Awatar Systemu\'s share', () => {
   const { call, db, signUp } = useServer({ PROFESSIONS: 'on', CRAFTING: 'on' });
@@ -35,17 +47,17 @@ describe('the Awatar Systemu\'s share', () => {
     assert.equal((await call('POST', '/api/avatar/buy', { cookie })).status, 200);
   });
 
-  test('a quarter, in the data', () => {
-    assert.equal(share, 0.25);
+  test('a quarter of the XP and all of the profession, in the data', () => {
+    assert.deepEqual([share, professionShare], [0.25, 1]);
   });
 
-  test('its gathering brings a quarter of the XP and of the profession\'s progress the character\'s own brings', async () => {
+  test('its gathering brings a quarter of the XP and all of the profession\'s progress the character\'s own brings', async () => {
     // The character's own hour.
     assert.equal((await gather()).status, 201);
     await age('activities', 60);
     const own = (await call('POST', '/api/hunts/claim', { cookie })).data.report;
     assert.equal(own.summary.xp, workXp(10, 60, content));
-    assert.deepEqual([own.profession.levelBefore, own.profession.levelAfter, own.profession.xp, own.profession.xpAfter], [1, 2, 60, 60 - 30]);
+    assert.deepEqual([own.profession.levelBefore, own.profession.levelAfter, own.profession.xp, own.profession.xpAfter], [1, ...afterWork(60)].slice(0, 2).concat([60, afterWork(60)[1]]));
     // The Awatar's hour, from the same start.
     await set(`xp = 0, professions = '{}'`);
     assert.equal((await gather({ avatar: true })).status, 201);
@@ -56,10 +68,11 @@ describe('the Awatar Systemu\'s share', () => {
     assert.equal(report.avatar, true);
     assert.equal(report.summary.xp, Math.round(own.summary.xp * share));
     assert.equal(character.xp, report.summary.xp);
-    // The report's XP of the profession is the Awatar's quarter, as gained,
-    // not the minutes the character's own work would have given.
-    assert.deepEqual([report.profession.levelBefore, report.profession.levelAfter, report.profession.xp, report.profession.xpAfter], [1, 1, Math.round(60 * share), Math.round(60 * share)]);
-    assert.deepEqual(JSON.parse((await row()).professions).herbalism, { level: 1, xp: Math.round(60 * share) });
+    // The report's XP of the profession is the Awatar's share, as gained:
+    // all of it since 0.3.87, as the character's own work would give.
+    const [level, xp] = afterWork(Math.round(60 * professionShare));
+    assert.deepEqual([report.profession.levelBefore, report.profession.levelAfter, report.profession.xp, report.profession.xpAfter], [1, level, Math.round(60 * professionShare), xp]);
+    assert.deepEqual(JSON.parse((await row()).professions).herbalism, { level, xp });
   });
 
   test('a level from its work heals fully, gives its Time Points and says so', async () => {
@@ -82,12 +95,13 @@ describe('the Awatar Systemu\'s share', () => {
     await gather({ avatar: true });
     await age('avatar_activities', 60);
     const { report, character } = (await call('POST', '/api/avatar/claim', { cookie })).data;
-    assert.deepEqual([report.profession.levelBefore, report.profession.levelAfter], [1, 2]);
-    assert.ok(report.system.some((line) => line.includes('2')), JSON.stringify(report.system));
+    const [level, xp] = afterWork(Math.round(60 * professionShare), 1, 20);
+    assert.deepEqual([report.profession.levelBefore, report.profession.levelAfter], [1, level]);
+    assert.ok(report.system.some((line) => line.includes(String(level))), JSON.stringify(report.system));
     const listed = character.professions.list.find((one) => one.id === 'herbalism');
-    assert.deepEqual([listed.level, listed.xp], [2, 20 + Math.round(60 * share) - 30]);
-    assert.ok(professionStatBonus(herbalism, 2) > 0);
-    assert.ok(listed.stats.every((stat) => stat.bonus === professionStatBonus(herbalism, 2)), JSON.stringify(listed.stats));
+    assert.deepEqual([listed.level, listed.xp], [level, xp]);
+    assert.ok(professionStatBonus(herbalism, level) > 0);
+    assert.ok(listed.stats.every((stat) => stat.bonus === professionStatBonus(herbalism, level)), JSON.stringify(listed.stats));
   });
 
   // A change of the character landing between a claim's read and its

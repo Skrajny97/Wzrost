@@ -40,6 +40,7 @@ import {
   shopDay,
   shopLeft,
   shopOffer,
+  workProfession,
   workshopReport,
 } from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
@@ -481,14 +482,16 @@ describe('the Warsztat through the API', () => {
     assert.ok(report.items.every((item) => item.base === 'axe' && item.level === 15 && ['common', 'rare', 'unique'].includes(item.rarity)));
     assert.equal(report.failed, 0);
     assert.equal(report.made, 'Wykonano: 2 × Topór.');
-    assert.equal(report.profession.levelAfter, 2);
+    // An hour of work: L × levelMinutes a level (10 + 20 + 30 to the 4th since 0.3.87).
+    const crafted = workProfession(content.professionsById.crafting, { level: 1, xp: 0 }, 60);
+    assert.equal(report.profession.levelAfter, crafted.level);
     assert.ok(report.summary.xp > 0);
     assert.equal(after.activity, null);
     assert.equal(report.stored, 'Gotowe przedmioty czekają w Przechowalni, poza plecakiem.');
     assert.equal(after.bag.filter((item) => item.base === 'axe').length, 0);
     assert.equal(after.professions.storage.items.filter((item) => item.base === 'axe').length, 2);
-    assert.equal(after.professions.list[2].level, 2);
-    assert.equal(after.stats.find((stat) => stat.id === 'strength').sources.professions, content.professionsById[content.workshop.profession].statPerLevel);
+    assert.equal(after.professions.list[2].level, crafted.level);
+    assert.equal(after.stats.find((stat) => stat.id === 'strength').sources.professions, (crafted.level - 1) * content.professionsById[content.workshop.profession].statPerLevel);
     // Nothing comes back from an order made in full.
     assert.deepEqual(parts(after), { scraps: 16 });
     assert.deepEqual(after.resources, { wood: 50, stone: 164, 'iron-ore': 28 });

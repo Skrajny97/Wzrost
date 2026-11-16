@@ -1140,6 +1140,11 @@
       "id": "0.3.86",
       "title": "Wersja 0.3.86",
       "body": "- Rangi w gildii: R4 lider, R3 zastępcy, R2 członkowie i R1 nowicjusze. Znaczek rangi stoi przy imieniu na liście członków.\n- Nowa postać w gildii przez pierwsze 3 dni jest nowicjuszem: ze Skrzyni Gildii bierze tylko przedmioty zostawione dla niej. Lider i zastępcy mogą ją awansować wcześniej przyciskiem „Na członka”.\n- Członkowie, którzy już są w gildiach, od razu są R2."
+    },
+    {
+      "id": "0.3.87",
+      "title": "Wersja 0.3.87",
+      "body": "- Profesje rosną 3 razy szybciej: poziom wymaga 10 minut pracy razy poziom zamiast 30. Zdobyte poziomy zostają, a pasek postępu stoi tam, gdzie stał.\n- Awatar Systemu daje teraz cały postęp profesji ze swojej pracy (doświadczenie postaci dalej ćwierć). Twoja postać chodzi na wyprawy, a Awatar w tym czasie rozwija profesję tak szybko jak ona."
     }
   ]
 }

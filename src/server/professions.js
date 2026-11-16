@@ -70,9 +70,13 @@ export function addTo(column, amounts) {
 export function workGains(player, profession, before, minutes, avatar, now) {
   const { row } = player;
   const character = engineCharacter(row);
+  // The Awatar's share of the character's XP, and since 0.3.87 its whole
+  // share of the profession's (avatar.professionShare, 1020.1: „Awatar z
+  // pełnym doświadczeniem”).
   const share = avatar ? content().avatar.share : 1;
+  const professionShare = avatar ? (content().avatar.professionShare ?? share) : 1;
   const week = weekFactor(keptWeek(workOf(player, avatar).activity?.options), 'profession-xp');
-  const worked = Math.round(minutes * share);
+  const worked = Math.round(minutes * professionShare);
   const progress = workProfession(profession, before, worked, week);
   // The report's XP of the profession (professionProgress) is what the work
   // gave: the Awatar's share too, not the minutes the report counts.

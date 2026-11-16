@@ -624,10 +624,12 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
     assert.deepEqual(minerals(after), Object.fromEntries(report.minerals.map((mineral) => [mineral.id, mineral.count])));
     // Minerals take no room in the bag.
     assert.equal(after.bagUsed, 0);
-    // 480 minutes of work: 30 + 60 + 90 + 120 + 150 to level 6.
-    assert.equal(report.profession.levelAfter, 6);
-    assert.equal(after.stats.find((stat) => stat.id === 'vitality').sources.professions, 5 * content.professionsById.mining.statPerLevel);
-    assert.equal(after.stats.find((stat) => stat.id === 'endurance').sources.professions, 5 * content.professionsById.mining.statPerLevel);
+    // 480 minutes of work: L × levelMinutes a level (10 since 0.3.87:
+    // 10 + 20 + … + 90 to level 10).
+    const { level } = workProfession(content.professionsById.mining, { level: 1, xp: 0 }, 480);
+    assert.equal(report.profession.levelAfter, level);
+    assert.equal(after.stats.find((stat) => stat.id === 'vitality').sources.professions, (level - 1) * content.professionsById.mining.statPerLevel);
+    assert.equal(after.stats.find((stat) => stat.id === 'endurance').sources.professions, (level - 1) * content.professionsById.mining.statPerLevel);
     assert.ok(after.hp > 1);
     const { data } = await call('GET', '/api/reports', { cookie });
     assert.equal(data.reports[0].kind, 'minerals');
@@ -942,7 +944,8 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
     assert.equal(report.avatar, true);
     assert.equal(report.summary.xp, Math.round(workXp(25, 120, content) * content.avatar.share));
     assert.equal(after.gold, report.gold);
-    assert.equal(after.professions.list.find((profession) => profession.id === 'mining').level, workProfession(content.professionsById.mining, { level: 1, xp: 0 }, Math.round(120 * content.avatar.share)).level);
+    // All of the profession's progress since 0.3.87 (1020.1), a quarter of the XP.
+    assert.equal(after.professions.list.find((profession) => profession.id === 'mining').level, workProfession(content.professionsById.mining, { level: 1, xp: 0 }, Math.round(120 * content.avatar.professionShare)).level);
     assert.ok(after.minerals.length > 0);
   });
 });

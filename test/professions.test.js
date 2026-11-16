@@ -46,23 +46,25 @@ function hoursTo(level) {
 }
 
 describe('herbalism in the engine', () => {
-  test('a level takes half an hour more of work than the one before, up to 200 (825)', () => {
+  // Ten minutes more since 0.3.87 (1020.3: the levels three times faster);
+  // half an hour more before.
+  test('a level takes ten minutes more of work than the one before, up to 200 (825)', () => {
     // Every profession goes on to the 200th (the author: „Profesje zyskują sufit na 200 poziomie.”), the mastery staying at the 100th.
     assert.deepEqual(
       content.professions.map((profession) => [profession.maxLevel, profession.masteryLevel]),
       content.professions.map(() => [200, 100]),
     );
-    assert.equal(professionXpToNext(herbalism, 1), 30);
-    assert.equal(professionXpToNext(herbalism, 9), 270);
-    assert.equal(professionXpToNext(herbalism, 150), 4500);
-    assert.equal(hoursTo(3), 1.5);
-    assert.equal(hoursTo(5), 5);
-    assert.equal(hoursTo(10), 22.5);
-    assert.equal(hoursTo(100), 2475);
-    assert.equal(hoursTo(200), 9950);
+    assert.equal(professionXpToNext(herbalism, 1), 10);
+    assert.equal(professionXpToNext(herbalism, 9), 90);
+    assert.equal(professionXpToNext(herbalism, 150), 1500);
+    assert.equal(hoursTo(3) * 60, 30);
+    assert.equal(hoursTo(5) * 60, 100);
+    assert.equal(hoursTo(10) * 60, 450);
+    assert.equal(hoursTo(100), 825);
+    assert.equal(hoursTo(200) * 60, 199000);
     // The 100th is no longer the top: its work counts towards the 101st.
     assert.deepEqual(workProfession(herbalism, { level: 100, xp: 0 }, 600), { level: 100, xp: 600, levels: 0 });
-    assert.deepEqual(workProfession(herbalism, { level: 100, xp: 2900 }, 600), { level: 101, xp: 500, levels: 1 });
+    assert.deepEqual(workProfession(herbalism, { level: 100, xp: 900 }, 600), { level: 101, xp: 500, levels: 1 });
     const top = workProfession(herbalism, { level: 200, xp: 0 }, 600);
     assert.deepEqual(top, { level: 200, xp: 0, levels: 0 });
     assert.deepEqual(workProfession(herbalism, { level: 199, xp: 0 }, 6000), { level: 200, xp: 0, levels: 1 });
@@ -159,7 +161,8 @@ describe('herbalism in the engine', () => {
   test('the report: a line of the grove, what was found and lost, levels and the herbs revealed', () => {
     const character = newCharacter('mage', { level: 12, xp: 0 });
     const before = { level: 2, xp: 0 };
-    const after = workProfession(herbalism, before, 90);
+    // One level's work: from the 2nd to the 3rd.
+    const after = workProfession(herbalism, before, 2 * herbalism.levelMinutes);
     const work = applyWork(character, 10, content);
     const report = gatheringReport(
       {
@@ -189,7 +192,7 @@ describe('herbalism in the engine', () => {
     // The 100th level brings the master's bonus with it; the next ones their statPerLevel alone, up to the 200th (825).
     const top = { level: 99, xp: 0 };
     const mastered = gatheringReport(
-      { minutes: 480, startedAt: 0, endsAt: 1, seed: 'm', found: { comfrey: 1 }, stored: { comfrey: 1 }, lost: {}, before: top, after: workProfession(herbalism, top, 99 * 30), character, xp: 0, work },
+      { minutes: 480, startedAt: 0, endsAt: 1, seed: 'm', found: { comfrey: 1 }, stored: { comfrey: 1 }, lost: {}, before: top, after: workProfession(herbalism, top, 99 * herbalism.levelMinutes), character, xp: 0, work },
       content,
     );
     const last = herbalism.statPerLevel + herbalism.maxLevelBonus;
@@ -197,7 +200,7 @@ describe('herbalism in the engine', () => {
     assert.ok(mastered.profession.xpToNext > 0);
     const past = (before) =>
       gatheringReport(
-        { minutes: 480, startedAt: 0, endsAt: 1, seed: 'm', found: { comfrey: 1 }, stored: { comfrey: 1 }, lost: {}, before, after: workProfession(herbalism, before, before.level * 30), character, xp: 0, work },
+        { minutes: 480, startedAt: 0, endsAt: 1, seed: 'm', found: { comfrey: 1 }, stored: { comfrey: 1 }, lost: {}, before, after: workProfession(herbalism, before, before.level * herbalism.levelMinutes), character, xp: 0, work },
         content,
       );
     const per = herbalism.statPerLevel;
@@ -376,14 +379,16 @@ describe('herbalism through the API', () => {
     assert.equal(report.kind, 'herbs');
     const comfrey = report.herbs[0].count;
     assert.ok(comfrey >= 12 && comfrey <= 18, String(comfrey));
-    assert.equal(report.profession.levelAfter, 3);
-    assert.deepEqual(report.revealed, ['mugwort']);
+    // 150 minutes of work: L × levelMinutes a level (10 + 20 + 30 + 40 + 50 to the 6th since 0.3.87).
+    const { level } = workProfession(herbalism, { level: 1, xp: 0 }, 150);
+    assert.equal(report.profession.levelAfter, level);
+    assert.deepEqual(report.revealed, content.herbs.filter((herb) => herb.level > 1 && herb.level <= level).map((herb) => herb.id));
     assert.ok(report.summary.xp > 0);
     assert.equal(after.activity, null);
     assert.deepEqual(after.herbs.map((herb) => [herb.name, herb.count]), [['Żywokost', comfrey]]);
     assert.equal(after.bagUsed, Math.ceil(comfrey / 20));
-    assert.equal(after.professions.list[0].level, 3);
-    assert.equal(after.stats.find((stat) => stat.id === 'wisdom').sources.professions, 2 * herbalism.statPerLevel);
+    assert.equal(after.professions.list[0].level, level);
+    assert.equal(after.stats.find((stat) => stat.id === 'wisdom').sources.professions, (level - 1) * herbalism.statPerLevel);
     assert.ok(after.hp > 1);
     // The journal lists it with its summary.
     const { data } = await call('GET', '/api/reports', { cookie });
