@@ -180,14 +180,16 @@ export function mountGuildWar(container) {
   // Whether any match of the league has been fought: till then, no places.
   const started = () => view.league.table.some((row) => row.played > 0);
 
-  // Busts in a row, the character's own lit (792.1 v2).
+  // Busts in a row, the character's own lit (792.1 v2), each with its name
+  // under it (the author, 16.11.2026: „brakuje nicków graczy w drużynie
+  // gildii”).
   const busts = (ids, few = false) =>
     h(
       'div',
-      { class: `war-busts${few ? ' war-busts--few' : ''}` },
+      { class: `war-busts war-busts--named${few ? ' war-busts--few' : ''}` },
       ids.map((id) => {
         const person = member(id);
-        return h('span', { class: `war-bust${own(id) ? ' war-bust--own' : ''}`, title: person.name }, portrait(person));
+        return h('span', { class: `war-bust${own(id) ? ' war-bust--own' : ''}`, title: person.name }, portrait(person), h('span', { class: 'war-bust-name', text: person.name }));
       }),
     );
 
@@ -583,8 +585,9 @@ export function mountGuildWar(container) {
       { class: 'card war-recent' },
       foldPart(
         { key: 'guild-war-recent', title: words.recent, line, open: false },
+        // With no fights the line under the title says it, once.
         battles.length === 0
-          ? h('p', { class: 'muted', text: words.noBattles })
+          ? null
           : h(
               'ul',
               { class: 'war-fights' },

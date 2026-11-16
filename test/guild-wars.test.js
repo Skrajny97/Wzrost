@@ -12,7 +12,7 @@
 // once a week for every guild there is, each evening's matches fought once
 // by the cron at 20:00 with their rewards given once, each battle to watch
 // from either side, the league's end with its places, Sława and war chests,
-// an account on both sides of a match, "Test ligi" of the test version,
+// an account on both sides of a match (it fights on both), "Test ligi" of the test version,
 // and nothing of the wars where GUILD_WARS is off.
 
 import assert from 'node:assert/strict';
@@ -576,11 +576,11 @@ describe('the guild wars through the API', () => {
     assert.ok(end.days.every((day) => day.matches.every((match) => match.fought)));
   });
 
-  // A character of an account that has one in the rival guild too (made or
-  // moved there after the draw) fights on neither side, so nobody fights
-  // itself and takes the reward for free (11.11.2026); a side left with
-  // nobody makes the match void.
-  test('an account with characters on both sides of a match fights on neither; a side left with nobody makes it void', async () => {
+  // Characters of one account on both sides of a match fight each other too
+  // (the author, 16.11.2026: „jeśli ktoś ma postać w gildii przeciwnej to
+  // niech walczą ze sobą”; till then such an account fought on neither side
+  // and its trios lost by walkover).
+  test('an account with characters on both sides of a match fights on both, against itself too', async () => {
     await player('alfa', 'Alfa', { level: 60 });
     await player('beta', 'Beta', { level: 30, classId: 'mage' });
     await makeClimber(await db(), ids.alfa);
@@ -589,19 +589,15 @@ describe('the guild wars through the API', () => {
     await cron(league.startsAt + 60000);
     assert.equal((await all('SELECT * FROM guild_wars WHERE week = ?', league.key)).length, 1);
     await clone(ids.alfa, 'Bliźniak', weak);
-    const before = await first('SELECT gold, system_points FROM characters WHERE id = ?', ids.alfa);
     await cron(league.battles[0]);
     const match = await first('SELECT days_done, result FROM guild_wars WHERE week = ? AND day = 0', league.key);
-    assert.deepEqual([match.days_done, match.result], [1, 'void']);
-    assert.equal((await all('SELECT * FROM guild_war_battles')).length, 0);
-    assert.deepEqual(await first('SELECT gold, system_points FROM characters WHERE id = ?', ids.alfa), before);
-    clock = league.battles[0] + 3600000;
-    const view = (await as('alfa', 'GET', '/api/guild/war')).data.league;
-    assert.deepEqual(
-      view.table.map((row) => row.played),
-      [0, 0],
-    );
-    assert.equal(view.days[0].matches[0].result, 'void');
+    assert.equal(match.days_done, 1);
+    assert.notEqual(match.result, 'void');
+    const duels = (await all("SELECT fighters FROM guild_war_battles WHERE format = '1v1'")).map((row) => {
+      const fighters = JSON.parse(row.fighters);
+      return [fighters.a[0].name, fighters.b[0].name].sort().join(' – ');
+    });
+    assert.deepEqual(duels.sort(), ['Alfa – Beta', 'Alfa – Bliźniak']);
   });
 
   // The database gives the highest id of a removed character again: a

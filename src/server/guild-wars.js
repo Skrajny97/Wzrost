@@ -182,11 +182,12 @@ function fightRows(db, matchId, day, at, fights) {
 // fight from the match's seed, its log in Polish and, where English is on,
 // in English too (the same fight: its texts take no draws). Every fight won
 // brings its fighters gold, and every character who fought for the guild
-// that won the match its Punkty Systemu, once (799 A). A character whose
-// account has one on the other side too fights on neither, so nobody
-// fights itself and takes the
-// reward for free (11.11.2026): its trio is short; a side left with nobody
-// so makes the match void, counted for neither. A guild that is gone loses
+// that won the match its Punkty Systemu, once (799 A). Characters of one
+// account on both sides fight each other too (the author, 16.11.2026:
+// „jeśli ktoś ma postać w gildii przeciwnej to niech walczą ze sobą”; till
+// then such an account fought on neither side, and its trios, short, lost
+// their fights by walkover). A side with nobody makes the match void,
+// counted for neither. A guild that is gone loses
 // its matches left, and two gone draw. The match's result by the balance of
 // its fights won and lost, walkovers too. In one batch that holds only
 // while the match is unfought. Gives whether it was this run that fought it.
@@ -203,9 +204,7 @@ async function fightMatch(db, league, match, at, now) {
   if (!a || !b) result = a ? 'a' : b ? 'b' : 'draw';
   else {
     const fighters = new Map([...(await fightersOf(db, a.members)), ...(await fightersOf(db, b.members))]);
-    const accounts = (side) => new Set(side.members.map((row) => row.user_id));
-    const both = new Set([...accounts(a)].filter((user) => accounts(b).has(user)));
-    const able = (ids) => ids.map((id) => fighters.get(id)).filter((one) => one && !both.has(one.row.user_id));
+    const able = (ids) => ids.map((id) => fighters.get(id)).filter(Boolean);
     const duelsA = able(a.members.map((row) => row.id));
     const duelsB = able(b.members.map((row) => row.id));
     const triosA = a.lineups.map(able);
