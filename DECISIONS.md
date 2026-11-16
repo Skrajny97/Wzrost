@@ -3580,6 +3580,23 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.89 (16.11.2026): pasek pracy Awatara obok paska postaci, zadania na zlecenia do zrobienia
+
+1. **Pasek Awatara (1021 B).** Prośba gracza, którą przekazał autor: „chodziło też o dodatkowy pasek tak jak jest eksploracja albo profesja gracza tutaj”. Przyjęty wariant 1021.2 B (krótki pasek w tym samym rzędzie), odrzucony 1021.1 A (drugi pasek pod paskiem postaci).
+    - Gdy Awatar Systemu pracuje, obok paska postaci stoi krótki pasek „AWATAR 1:47:32” (`src/client/layout.js`). Po końcu pracy pokazuje „AWATAR RAPORT” i pulsuje jak pasek postaci z gotowym raportem. Stuknięcie prowadzi do ekranu profesji, w której Awatar pracuje. Gdy Awatar nie pracuje, paska nie ma.
+    - Czas Awatara ma stałą szerokość, równą czasowi z samych zer (zero to najszersza cyfra), więc paski nie drgają co sekundę. Czcionka nie ma cyfr o równej szerokości, jak przy 0.3.84.
+2. **Ciasny rząd na telefonie (brakujący szczegół).** Gdy działa też mikstura, w rzędzie są cztery kafelki.
+    - Na telefonie do 400 px kafelek mikstury pokazuje samą liczbę walk („124” zamiast „124 walki”), a do 340 px samą kolbę. Stuknięcie dalej rozwija listę bonusów.
+    - Pasek postaci węższy niż 90 px pokazuje sam czas, bez słów.
+    - Gdy brakuje miejsca nawet na czas postaci (np. „PEŁNE HP ZA 1 H 20 MIN” na 320 px), czas skraca się z „…”, a nie wychodzi z ramki.
+3. Sprawdzone na 320, 360, 375, 390, 412 i 430 px oraz na 1366 i 1920 px: w trakcie pracy, z gotowym raportem, przy odpoczynku i z miksturą.
+4. **Zadania na zlecenia w Osadzie (błąd).** Gracz (poz. 48): „czasami dzienne jak sie przelosuje to dostaje się wykonanie zadań w osadzie gdzie już na dany dzień były wykonane i nie ma możliwości tego zrobić”. Zadanie „Wykonaj N zleceń w Osadzie” losowało się każdemu z otwartą Osadą, bez patrzenia na Tablicę zleceń. Tablica ma 3 zlecenia, a nowe przychodzi 12 godzin po oddanym albo odrzuconym, więc kto rano oddał zlecenia, a potem wylosował albo przelosował to zadanie, nie mógł go zrobić do północy.
+    - Gra liczy, ile zleceń Tablica da jeszcze do końca okresu zadania (`ordersBefore` w `src/engine/settlement.js`): zlecenie, które wisi, od razu, potem co 12 godzin, i duże zlecenie tygodnia, póki nie jest oddane. Zadanie na zlecenia losuje się (także przy przelosowaniu) tylko wtedy, gdy tylu zleceń, ile prosi, starczy.
+    - Zadanie dzienne na zlecenia, którego już nie da się zrobić do północy, gra sama wymienia na inne, a reszta zadań zostaje z postępem. Tak jak zadania na stwory, do których postać nie ma dostępu (zob. wpis o przelosowaniu zadań z potworami). Przelosowanie dnia przy tym się nie zużywa.
+    - Zadania tygodniowe i miesięczne na zlecenia się nie wymieniają, bo zabraknąć zleceń może w nich tylko po dniach bez oddawania zleceń.
+5. **Przelosowanie pojedynczego zadania** (druga prośba tego gracza) idzie osobno, jako 1023 na stronę ocen.
+6. **Zakładki plecaka na komputerze i tablecie (błąd od 0.3.81, znaleziony przez `tools/layout-check.cjs`).** Pięć zakładek (ze Spiżarnią) stało w jednym rzędzie od 640 px szerokości ekranu, ale na komputerze i tablecie plecak stoi w wąskiej kolumnie obok postaci (310–410 px), więc „Przedmioty” wychodziły z ramki, a „Minerały” i „Spiżarnia” się ucinały. Teraz o jednym rzędzie decyduje szerokość samego plecaka (od 560 px, `@container bag`), a węższy plecak ma zakładki w dwóch rzędach (trzy nad dwoma), jak na telefonie.
+
 ## Wersja 0.3.88 (16.11.2026): minigra liczy stuknięcie w chwili dotknięcia
 
 1. **Opóźnienie w minigrze.** Gracz (poz. 26): „Mam wrażenie że ta minigra na zbieranie ziół ma lekkie opóźnienie od kliknięcia”. Miał rację: przycisk liczył stuknięcie dopiero przy oderwaniu palca (zdarzenie `click`), około 0,1 s po dotknięciu. Znacznik przebiega pasek w 0,7 s, więc w tym czasie przesuwał się o około 14% paska, a to więcej niż najwęższe pole.

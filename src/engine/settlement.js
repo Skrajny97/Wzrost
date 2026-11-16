@@ -410,6 +410,35 @@ export function drawOrder({ character, reputation = {}, seed, weekly = false }, 
 // An empty board: every slot waiting for its first order now.
 export const emptyBoard = () => ({ slots: [], weekly: null, delivered: 0, turn: 0 });
 
+// How many orders the board can still give before `end`, each handed in the
+// moment it comes: a slot's order now, or the one it waits for, then one
+// every refillMinutes; and the week's big order while not delivered (an
+// order's term only puts a new one in its place). The narrator's quests ask
+// for no more orders than that (questOptions in quests.js).
+/**
+ * @param {Record<string, any> | null | undefined} stored
+ * @param {number} end
+ * @param {number} now
+ * @param {Content} content
+ * @returns {number}
+ */
+export function ordersBefore(stored, end, now, content) {
+  const { orders } = content.settlement;
+  const refill = orders.refillMinutes * 60000;
+  /** @type {Record<string, any>} */
+  const board = { ...emptyBoard(), ...stored };
+  let count = 0;
+  for (let index = 0; index < orders.open; index += 1) {
+    const slot = board.slots[index] ?? { readyAt: now };
+    const from = slot.order ? now : Math.max(slot.readyAt ?? now, now);
+    if (from < end) count += Math.ceil((end - from) / refill);
+  }
+  const { key } = questPeriod('weekly', now, content);
+  const week = board.weekly?.period === key ? board.weekly : null;
+  if (!week || (!week.done && week.order)) count += 1;
+  return count;
+}
+
 // The board at `now`: each slot without an order gets one once its moment
 // has come, and an order left for expireDays after it came goes, with a
 // new one in its place at once (question 93: "B, ale terminy tygodniowe").

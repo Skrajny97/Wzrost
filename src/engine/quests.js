@@ -38,7 +38,7 @@ export const QUEST_PERIODS = ['daily', 'weekly', 'monthly'];
 /** @typedef {Record<string, Kept>} Quests The quests of each period, by its id. */
 /** @typedef {{ key: string, startsAt: number, endsAt: number }} Period A period: the date it starts on, its start and its end. */
 /** @typedef {{ kind: Record<string, any>, weight: number, target?: string, perFight?: number, most?: number }} Option What can be drawn. */
-/** @typedef {{ character: Character, hasTable?: boolean, hasProfessions?: boolean, hasCrafting?: boolean, hasSettlement?: boolean, openProfessions?: string[], seed?: string }} Draw What the drawing of quests knows of the character. */
+/** @typedef {{ character: Character, hasTable?: boolean, hasProfessions?: boolean, hasCrafting?: boolean, hasSettlement?: boolean, openProfessions?: string[], ordersLeft?: Record<string, number>, seed?: string }} Draw What the drawing of quests knows of the character; `ordersLeft`: how many orders the Osada's board can still give before each period ends (ordersBefore in settlement.js). */
 /** @typedef {import('./rng.js').Rng} Rng */
 
 // The zone's wall clock. Intl knows the zone's rules (summer time), so the
@@ -335,7 +335,7 @@ const questPotions = (character, content) =>
  * @param {Content} content
  * @returns {Option[]}
  */
-function questOptions(periodId, { character, hasTable, hasProfessions = false, hasCrafting = false, hasSettlement = false, openProfessions = [] }, content) {
+function questOptions(periodId, { character, hasTable, hasProfessions = false, hasCrafting = false, hasSettlement = false, openProfessions = [], ordersLeft }, content, share = 1) {
   const areas = questAreas(periodId, character, content);
   // Each creature of those places, as often as a fight of its place brings it.
   /** @type {Map<string, number>} */
@@ -347,6 +347,12 @@ function questOptions(periodId, { character, hasTable, hasProfessions = false, h
     // Jubilerstwo from character level 25).
     if (kind.profession && !openProfessions.includes(kind.profession)) return [];
     if ((kind.id === 'kill' || kind.id === 'killAny') && areas.length === 0) return [];
+    // Orders in the Osada only as many as its board can still give before
+    // the period ends: it holds a few, and a new one comes hours after one
+    // is handed in (a player, poz. 48, 16.11.2026: „czasami dzienne jak sie
+    // przelosuje to dostaje się wykonanie zadań w osadzie gdzie już na dany
+    // dzień były wykonane i nie ma możliwości tego zrobić”).
+    if (kind.id === 'orders' && ordersLeft?.[periodId] !== undefined && ordersLeft[periodId] < leastCount(kind, periodId, share, content)) return [];
     // Regions to open: only for a new character, no more than open within
     // reach of its class level, and fewer as the class grows (`most`).
     const ahead = kind.id === 'unlock' ? areasOpened(character.classLevel, character.classLevel + kind[periodId].reach, content) : 0;
@@ -400,6 +406,18 @@ function questCount({ kind, perFight, most = Infinity }, periodId, rng, share = 
   const count = shareCount(Math.min(most, min + step * rng.int(0, Math.floor((max - min) / step))), tuning, share);
   return factor === 1 ? count : Math.min(most, Math.max(step, Math.round((count * factor) / step) * step));
 }
+
+// The least count a kind's quest of a period asks for at `share` (questCount
+// with every draw at its lowest).
+/**
+ * @param {Record<string, any>} kind
+ * @param {string} periodId
+ * @param {number} share
+ * @param {Content} content
+ * @returns {number}
+ */
+const leastCount = (kind, periodId, share, content) =>
+  questCount({ kind, weight: 0, perFight: 1 }, periodId, /** @type {Rng} */ (/** @type {unknown} */ ({ int: (/** @type {number} */ low) => low })), share, content.quests.periods[periodId].targetFactor ?? 1);
 
 // A count cut to its `share`: to the kind's step, at least one step.
 /**
@@ -479,10 +497,10 @@ const newQuest = (option, periodId, character, rng, content, share = 1) => {
  * @param {Content} content
  * @returns {Quest[]}
  */
-export function drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed, days = 7, share: given }, content) {
+export function drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, ordersLeft, seed, days = 7, share: given }, content) {
   const rng = createRng(seed);
   const share = given ?? (periodId === 'weekly' ? weekShare(character.level, days, content) : 1);
-  let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions }, content);
+  let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, ordersLeft }, content, share);
   /** @type {Option[]} */
   const drawn = [];
   while (drawn.length < content.quests.periods[periodId].count && options.length > 0) {
@@ -516,12 +534,19 @@ const reachable = (monsterId, character, content) =>
  * @param {string} periodId
  * @param {Character} character
  * @param {Content} content
+ * @param {Record<string, number>} [ordersLeft]
  * @returns {boolean}
  */
-const lostQuest = (quest, periodId, character, content) =>
+const lostQuest = (quest, periodId, character, content, ordersLeft = undefined) =>
   !quest.claimed &&
   !questDone(quest) &&
-  (!content.quests.kinds.some((/** @type {Record<string, any>} */ kind) => kind.id === quest.kind && kind[periodId]) || (quest.kind === 'kill' && !reachable(quest.target, character, content)));
+  (!content.quests.kinds.some((/** @type {Record<string, any>} */ kind) => kind.id === quest.kind && kind[periodId]) ||
+    (quest.kind === 'kill' && !reachable(quest.target, character, content)) ||
+    // A day's orders more than the Osada's board can still give before
+    // midnight (questOptions): drawn before 0.3.90, or by orders handed in
+    // or turned down since. A week's and a month's stay, for their numbers
+    // run short only of orders left undone for days.
+    (periodId === 'daily' && quest.kind === 'orders' && ordersLeft?.daily !== undefined && ordersLeft.daily < quest.count - quest.progress));
 
 // A kept period with each lost quest drawn anew in its place, among what the
 // character may get now and the period does not ask for yet, a week's to
@@ -536,12 +561,13 @@ const lostQuest = (quest, periodId, character, content) =>
  * @param {Content} content
  * @returns {Kept}
  */
-function healedPeriod(period, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed }, now, content) {
-  const lost = (/** @type {Quest} */ quest) => lostQuest(quest, periodId, character, content);
+function healedPeriod(period, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, ordersLeft, seed }, now, content) {
+  const lost = (/** @type {Quest} */ quest) => lostQuest(quest, periodId, character, content, ordersLeft);
   if (!period.quests.some(lost)) return period;
   const gone = (/** @type {Quest} */ quest) => !content.quests.kinds.some((/** @type {Record<string, any>} */ kind) => kind.id === quest.kind && kind[periodId]);
   const asked = (/** @type {Option} */ option) => period.quests.some((/** @type {Quest} */ quest) => !lost(quest) && quest.kind === option.kind.id && quest.target === option.target);
-  let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions }, content).filter((option) => !asked(option));
+  const share = periodShare(periodId, character.level, now, content);
+  let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, ordersLeft }, content, share).filter((option) => !asked(option));
   return {
     ...period,
     quests: period.quests.flatMap((/** @type {Quest} */ quest, /** @type {number} */ index) => {
@@ -550,7 +576,7 @@ function healedPeriod(period, periodId, { character, hasTable, hasProfessions, h
       const rng = createRng(`${seed}:${periodId}:${period.period}:${index}`);
       const option = rng.weighted(options);
       options = options.filter((other) => other !== option);
-      return [newQuest(option, periodId, character, rng, content, periodShare(periodId, character.level, now, content))];
+      return [newQuest(option, periodId, character, rng, content, share)];
     }),
   };
 }
@@ -566,8 +592,8 @@ function healedPeriod(period, periodId, { character, hasTable, hasProfessions, h
  * @param {Content} content
  * @returns {Quests}
  */
-export function currentQuests(stored, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed, createdAt }, now, content) {
-  const context = { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed };
+export function currentQuests(stored, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, ordersLeft, seed, createdAt }, now, content) {
+  const context = { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, ordersLeft, seed };
   return Object.fromEntries(
     QUEST_PERIODS.map((periodId) => {
       const { key, startsAt } = questPeriod(periodId, now, content);
@@ -670,19 +696,19 @@ export function drawnShare(period, periodId, level, content) {
  * @param {Content} content
  * @returns {Quests | null}
  */
-export function rerolledQuests(quests, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed }, now, content) {
+export function rerolledQuests(quests, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, ordersLeft, seed }, now, content) {
   const period = quests[periodId];
   if (period.rerolled || period.chest) return null;
   const replaced = (/** @type {Quest} */ quest) => !quest.claimed && !questDone(quest);
   const count = period.quests.filter(replaced).length;
   if (count === 0) return null;
   const same = (/** @type {Option} */ option, /** @type {Quest} */ quest) => quest.kind === option.kind.id && quest.target === option.target;
-  const options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions }, content).filter(
+  const share = drawnShare(period, periodId, character.level, content);
+  const options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, ordersLeft }, content, share).filter(
     (option) => !period.quests.some((/** @type {Quest} */ quest) => !replaced(quest) && same(option, quest)),
   );
   const fresh = options.filter((option) => !period.quests.some((/** @type {Quest} */ quest) => replaced(quest) && same(option, quest)));
   let pool = fresh.length >= count ? fresh : options;
-  const share = drawnShare(period, periodId, character.level, content);
   const rng = createRng(`${seed}:${periodId}:${period.period}:reroll`);
   return {
     ...quests,

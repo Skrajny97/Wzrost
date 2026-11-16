@@ -916,6 +916,10 @@
     "0.3.88": {
       "title": "Version 0.3.88",
       "body": "- The mini-game at a profession's report counts a tap the moment you touch the button, not when you lift your finger, so the marker stops exactly where you see it.\n- After the last try, \"Claim report\" claims it with the first tap."
+    },
+    "0.3.89": {
+      "title": "Version 0.3.89",
+      "body": "- Beside your character's strip there is a short \"AVATAR\" strip with the System Avatar's work time. When the Avatar's report waits, the strip shows \"REPORT\". A tap leads to its profession.\n- On a narrow phone with a potion at work, the potion's tile shows only the number of fights, so everything fits in one row.\n- The quest \"Complete orders in the Settlement\" comes only when the Order Board can fill it. If you have such a quest today that can no longer be done before midnight, the game swaps it for another, and you keep your reroll.\n- On a computer and a tablet the bag's tabs stand in two rows and no longer spill out of their frames."
     }
   }
 }
