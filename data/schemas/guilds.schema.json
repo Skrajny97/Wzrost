@@ -2510,7 +2510,14 @@
             "free",
             "doneAll",
             "versusDuel",
-            "versusTrio"
+            "versusTrio",
+            "allFights",
+            "allFightsTitle",
+            "triosTitle",
+            "duelsTitle",
+            "duelWith",
+            "backToList",
+            "noFights"
           ],
           "properties": {
             "title": {
@@ -3092,7 +3099,14 @@
                   "pattern": "\\{team\\}"
                 }
               ]
-            }
+            },
+            "allFights": { "type": "string", "minLength": 1, "description": "The button under a match fought in „Wyniki wieczorów”: its every fight (1038)." },
+            "allFightsTitle": { "type": "string", "pattern": "\\{when\\}", "description": "The title of the sheet of a match's fights; {when}: its day." },
+            "triosTitle": { "type": "string", "minLength": 1 },
+            "duelsTitle": { "type": "string", "minLength": 1 },
+            "duelWith": { "type": "string", "pattern": "\\{name\\}", "description": "A duel in the group of the guild's member; {name}: the rival's." },
+            "backToList": { "type": "string", "minLength": 1, "description": "Over a fight watched from the list of a match's fights: back to it." },
+            "noFights": { "type": "string", "minLength": 1 }
           }
         }
       }

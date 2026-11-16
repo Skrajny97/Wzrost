@@ -21995,6 +21995,78 @@ a.discord-button {
   padding: 6px 10px;
 }
 
+/* Every fight of a match (1038), in a sheet: the trios' fights by the
+   guild's trio and the duels by its member, folded, the character's own
+   group first and in gold; a way back from a fight's playback. */
+.war-groups-part .card-title {
+  margin: 0 0 8px;
+}
+
+.war-groups {
+  display: grid;
+  gap: 8px;
+}
+
+.war-group {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.45);
+}
+
+.war-group-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 10px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.war-group-summary::-webkit-details-marker {
+  display: none;
+}
+
+.war-group-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.war-group--own > .war-group-summary .war-group-title {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.war-group-score {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.war-group[open] > .war-group-summary .fold-part-marker::before {
+  content: '▴';
+}
+
+.war-group > .war-fights {
+  margin: 0;
+  padding: 0 8px 8px;
+}
+
+.war-fight--own {
+  border-color: rgba(217, 180, 90, 0.55);
+}
+
+.war-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+  width: auto;
+}
+
 /* The teams the game drew for the evening, folded. */
 .war-teams-body {
   display: grid;

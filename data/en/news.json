@@ -959,7 +959,7 @@
     },
     "0.4.0": {
       "title": "Version 0.4.0",
-      "body": "- Guild war league: Monday's evening of the league will be fought again, today at 23:00 (Polish time). The fights from 20:00 are gone, and their gold and System Points go back to what they were before them. The trios and the fights are drawn anew, with the characters of one account on both sides.\n- The War tab loads faster."
+      "body": "- Guild war league: Monday's evening of the league will be fought again, today at 23:00 (Polish time). The fights from 20:00 are gone, and their gold and System Points go back to what they were before them. The trios and the fights are drawn anew, with the characters of one account on both sides.\n- Under each match in “The evenings' results” there is an “All fights” button: every fight of the match, not only yours, grouped by your guild’s trios and members. You can watch any of them.\n- The War tab loads faster."
     }
   }
 }

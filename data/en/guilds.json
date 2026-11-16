@@ -589,7 +589,14 @@
       "free": "off",
       "doneAll": "Your guild has played all its matches. The league ends on Sunday at {hour}.",
       "versusDuel": "1v1 with: {names}",
-      "versusTrio": "3v3, Trio {team} against: {names}"
+      "versusTrio": "3v3, Trio {team} against: {names}",
+      "allFights": "All fights",
+      "allFightsTitle": "All fights · {when}",
+      "triosTitle": "3v3 · trio fights",
+      "duelsTitle": "1v1 · duels",
+      "duelWith": "vs {name}",
+      "backToList": "Back to the fights",
+      "noFights": "This match had no fights: walkovers only."
     }
   },
   "fame": {

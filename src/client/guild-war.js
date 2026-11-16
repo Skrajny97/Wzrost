@@ -36,6 +36,8 @@ const ZONE = 'Europe/Warsaw';
 // again at 23:00 on 16.11.2026), and their fights bear it.
 const HOUR = new Intl.DateTimeFormat('pl-PL', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: ZONE });
 const hourAt = (at) => HOUR.format(new Date(at));
+// The sheet (ui.js's openSheet), which scrolls as a whole.
+const scroller = () => document.getElementById('sheet');
 
 // A noun after a number in its form ([one, few, many]; English gives
 // [one, other, other]), the number as the game writes it.
@@ -568,6 +570,14 @@ export function mountGuildWar(container) {
                       (match.trios.walkoversWon > 0 || match.trios.walkoversLost > 0) && h('p', { class: 'muted', text: filled(words.walkoversLine, { won: match.trios.walkoversWon, lost: match.trios.walkoversLost }) }),
                     ],
               ),
+              // A match of walkovers only (a rival gone) has no fights.
+              match.duels.won + match.duels.lost + match.duels.drawn + match.trios.won + match.trios.lost + match.trios.drawn > 0 &&
+                h(
+                  'button',
+                  { type: 'button', class: 'button button--world button--small war-watch', onClick: (event) => withButton(event.currentTarget, () => allFights(match)) },
+                  icon('eye', { size: 18 }),
+                  h('span', { text: words.allFights }),
+                ),
             ),
           ),
         ),
@@ -634,7 +644,7 @@ export function mountGuildWar(container) {
 
   // A battle played back in a sheet: its result over the playback, who
   // stayed on their feet and what the character got (792.4 v2).
-  async function watch(line) {
+  async function watch(line, back = null) {
     const { battle } = await call('GET', `/api/guild/war/battles/${line.id}`);
     if (gone) return;
     const words = texts();
@@ -647,11 +657,29 @@ export function mountGuildWar(container) {
     watching?.stop();
     const playback = createArena(battle.fight, { autoplay: 'now', board: view.fightBoard });
     watching = playback;
+    const stop = () => {
+      playback.stop();
+      if (watching === playback) watching = null;
+    };
     openSheet(
       h('h2', { class: 'sheet-title', text: filled(words.battleTitle, { when: dayName(battle.day).toLocaleLowerCase(locale()), hour: hourAt(battle.at) }) }),
       h(
         'div',
         { class: 'war-sheet' },
+        back &&
+          h(
+            'button',
+            {
+              type: 'button',
+              class: 'button button--world button--small war-back',
+              onClick: () => {
+                stop();
+                back();
+              },
+            },
+            icon('back', { size: 18 }),
+            h('span', { text: words.backToList }),
+          ),
         h(
           'section',
           { class: `card war-result war-result--${battle.result}` },
@@ -675,10 +703,114 @@ export function mountGuildWar(container) {
         playback.element,
       ),
     );
-    afterSheet(() => {
-      playback.stop();
-      if (watching === playback) watching = null;
-    });
+    // The sheet scrolls as a whole: a fight watched from the list starts
+    // at its top.
+    scroller().scrollTop = 0;
+    afterSheet(stop);
+  }
+
+  // Every fight of a match, not only the character's own (the author,
+  // 16.11.2026: „Wszystkie walki mają być możliwe do obejrzenia, każda nie
+  // tylko własna”), in a sheet under the match's result: the trios' fights
+  // by the guild's trio, the duels by its member, each group with its
+  // fights won and lost, the character's own first and open (1038). Each
+  // fight to watch, and from it back to the list as it was.
+  async function allFights(match) {
+    const { battles } = await call('GET', `/api/guild/war/matches/${match.id}/battles`);
+    if (gone) return;
+    const words = texts();
+    const fight = (line, text) =>
+      h(
+        'li',
+        { class: `war-fight${line.fought ? ' war-fight--own' : ''}` },
+        h('span', { class: `pvp-arena-badge pvp-arena-badge--${line.result}`, text: words.results[line.result] }),
+        h('p', { class: 'war-fight-text', text }),
+        line.replay &&
+          h(
+            'button',
+            {
+              type: 'button',
+              class: 'button button--world button--small war-fight-watch',
+              'aria-label': `${words.watch}: ${text}`,
+              title: words.watch,
+              onClick: (event) =>
+                withButton(event.currentTarget, () => {
+                  const at = scroller().scrollTop;
+                  return watch(line, () => show(at));
+                }),
+            },
+            icon('eye', { size: 18 }),
+          ),
+      );
+    // The fights of a format in groups (by `keyOf`), in the order they
+    // came, the character's own group first.
+    const groups = (format, keyOf, titleOf, textOf) => {
+      const byKey = new Map();
+      for (const line of battles.filter((one) => one.format === format)) byKey.set(keyOf(line), [...(byKey.get(keyOf(line)) ?? []), line]);
+      const list = [...byKey.values()].sort((a, b) => Number(b.some((one) => one.fought)) - Number(a.some((one) => one.fought)));
+      return list.map((lines) => {
+        const own = lines.some((one) => one.fought);
+        const won = lines.filter((one) => one.result === 'win').length;
+        const lost = lines.filter((one) => one.result === 'loss').length;
+        return h(
+          'details',
+          { class: `war-group${own ? ' war-group--own' : ''}`, open: own },
+          h(
+            'summary',
+            { class: 'war-group-summary' },
+            h('span', { class: 'war-group-title', text: titleOf(lines[0]) }),
+            h('span', { class: 'war-group-score', text: `${formatNumber(won)}:${formatNumber(lost)}` }),
+            h('span', { class: 'fold-part-marker', 'aria-hidden': 'true' }),
+          ),
+          h(
+            'ul',
+            { class: 'war-fights' },
+            lines.map((line) => fight(line, textOf(line))),
+          ),
+        );
+      });
+    };
+    const team = (number, names) => `${teamText(words.teamName, number)}: ${names.join(', ')}`;
+    const trios = groups(
+      '3v3',
+      (line) => line.ourTeam,
+      (line) => team(line.ourTeam, line.ours),
+      (line) => team(line.theirTeam, line.theirs),
+    );
+    const duels = groups(
+      '1v1',
+      (line) => line.ours[0],
+      (line) => line.ours[0],
+      (line) => filled(words.duelWith, { name: line.theirs[0] }),
+    );
+    const part = (title, list) => list.length > 0 && h('section', { class: 'card war-groups-part' }, h('h3', { class: 'card-title', text: title }), h('div', { class: 'war-groups' }, list));
+    const content = [
+      h('h2', { class: 'sheet-title', text: filled(words.allFightsTitle, { when: dayName(match.day).toLocaleLowerCase(locale()) }) }),
+      h(
+        'div',
+        { class: 'war-sheet' },
+        h(
+          'section',
+          { class: `card war-result war-result--${match.result}` },
+          h(
+            'div',
+            { class: 'war-result-head' },
+            h('span', { class: `pvp-arena-badge pvp-arena-badge--${match.result}`, text: words.results[match.result] }),
+            h('p', { class: 'war-result-teams' }, tagOf(match.rival, true), ` ${match.rival.name} · ${formatNumber(match.score[0])}:${formatNumber(match.score[1])}`),
+          ),
+          h('p', { class: 'muted', text: filled(words.matchLine, { duelsWon: match.duels.won, duelsLost: match.duels.lost, triosWon: match.trios.won, triosLost: match.trios.lost }) }),
+          (match.trios.walkoversWon > 0 || match.trios.walkoversLost > 0) && h('p', { class: 'muted', text: filled(words.walkoversLine, { won: match.trios.walkoversWon, lost: match.trios.walkoversLost }) }),
+        ),
+        battles.length === 0 ? h('p', { class: 'muted', text: words.noFights }) : [part(words.triosTitle, trios), part(words.duelsTitle, duels)],
+      ),
+    ];
+    // Back from a fight, the list as it was: its groups open or folded and
+    // where it was scrolled to.
+    function show(at = 0) {
+      openSheet(...content);
+      scroller().scrollTop = at;
+    }
+    show();
   }
 
   // "Test ligi" on the test version: the next evening of the whole league
