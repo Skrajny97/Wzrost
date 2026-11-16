@@ -78,6 +78,9 @@ import { discardItem, equipItem, previewItem, sellItem, sellItems, unequipItem, 
 import { markFavorite } from './favorites.js';
 import { discardHerbs, sellHerbs, startGathering } from './professions.js';
 import { discardMinerals, sellMinerals, startMining } from './mining.js';
+import { discardPantry, sellPantry, startFishing } from './fishing.js';
+import { startFarming } from './farming.js';
+import { startCooking } from './cooking.js';
 import { startJewelcraft, transmuteGemsNow } from './jewelcraft.js';
 import { pushKey, sendNotifications, subscribePush, testPush, unsubscribePush } from './push.js';
 import { claimAllQuests, claimQuest, openChest, rerollQuests } from './quests.js';
@@ -262,10 +265,15 @@ const routes = [
   ['POST', '/api/professions/storage/sell', sellStored],
   ['POST', '/api/professions/storage/salvage', salvageStored],
   ['POST', '/api/professions/mine', startMining],
+  ['POST', '/api/professions/fish', startFishing],
+  ['POST', '/api/professions/farm', startFarming],
+  ['POST', '/api/professions/cook', startCooking],
   ['POST', '/api/professions/jewel', startJewelcraft],
   ['POST', '/api/professions/transmute', transmuteGemsNow],
   ['POST', '/api/minerals/sell', sellMinerals],
   ['POST', '/api/minerals/discard', discardMinerals],
+  ['POST', '/api/pantry/sell', sellPantry],
+  ['POST', '/api/pantry/discard', discardPantry],
   ['POST', '/api/avatar/buy', buyAvatar],
   ['POST', '/api/avatar/claim', claimAvatar],
   ['POST', '/api/avatar/cancel', cancelAvatar],

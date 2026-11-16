@@ -126,18 +126,33 @@ export function affixValue(stat, share, tuning) {
 
 // `bonus` raises every rarity with affixes (the elite's chest), `unique`
 // those from balance.hunt.uniqueLengthFrom up, unique and rarer, on a long
-// exploration (482 B: "max +10%").
+// exploration (482 B: "max +10%"). `points`: the share of the rarities with
+// affixes together comes out that much higher, in percentage points (a
+// meal's, 999.4: „większa szansa na rzadszy przedmiot: od +2 do +8 pkt
+// proc.”), their weights raised alike; nothing changes without it.
 /**
  * @param {Rng} rng
  * @param {Content} content
  * @param {number} [bonus]
  * @param {number} [unique]
+ * @param {number} [points]
  * @returns {string}
  */
-export function rollRarity(rng, content, bonus = 1, unique = 1) {
+export function rollRarity(rng, content, bonus = 1, unique = 1, points = 0) {
   const from = content.rarities.findIndex((/** @type {{ id: string }} */ rarity) => rarity.id === content.balance.hunt.uniqueLengthFrom);
   const raised = new Set(unique !== 1 && from >= 0 ? content.rarities.slice(from).map((/** @type {{ id: string }} */ rarity) => rarity.id) : []);
-  return rng.weighted(content.rarities, (rarity) => rarity.dropWeight * (rarity.affixes > 0 ? bonus : 1) * (raised.has(rarity.id) ? unique : 1)).id;
+  const weight = (/** @type {Record<string, any>} */ rarity) => rarity.dropWeight * (rarity.affixes > 0 ? bonus : 1) * (raised.has(rarity.id) ? unique : 1);
+  let lift = 1;
+  if (points > 0) {
+    const all = content.rarities.reduce((/** @type {number} */ sum, /** @type {Record<string, any>} */ rarity) => sum + weight(rarity), 0);
+    const affixed = content.rarities.reduce((/** @type {number} */ sum, /** @type {Record<string, any>} */ rarity) => sum + (rarity.affixes > 0 ? weight(rarity) : 0), 0);
+    const share = all > 0 ? affixed / all : 0;
+    if (share > 0 && share < 1) {
+      const target = Math.min(0.999, share + points);
+      lift = (target * (1 - share)) / (share * (1 - target));
+    }
+  }
+  return rng.weighted(content.rarities, (rarity) => weight(rarity) * (rarity.affixes > 0 ? lift : 1)).id;
 }
 
 // A family holds the bases of one kind of item, a category in the game, as
@@ -304,10 +319,10 @@ export function equipBlock(item, classId, classLevel, content) {
  * @param {number} level
  * @param {Rng} rng
  * @param {Content} content
- * @param {{ rarityBonus?: number, uniqueBonus?: number, filled?: Set<string>, classId?: string, maxClassLevel?: number, rarityId?: string, area?: Record<string, any> | null, otherClassShare?: number }} [options]
+ * @param {{ rarityBonus?: number, uniqueBonus?: number, rarityPoints?: number, filled?: Set<string>, classId?: string, maxClassLevel?: number, rarityId?: string, area?: Record<string, any> | null, otherClassShare?: number }} [options]
  * @returns {Item}
  */
-export function randomItem(level, rng, content, { rarityBonus = 1, uniqueBonus = 1, filled, classId, maxClassLevel = 1, rarityId, area, otherClassShare = 0 } = {}) {
+export function randomItem(level, rng, content, { rarityBonus = 1, uniqueBonus = 1, rarityPoints = 0, filled, classId, maxClassLevel = 1, rarityId, area, otherClassShare = 0 } = {}) {
   /** @type {string} */
   let family;
   let own = true;
@@ -327,7 +342,7 @@ export function randomItem(level, rng, content, { rarityBonus = 1, uniqueBonus =
   // Only a real choice draws, so loot without one stays as it was.
   const base = bases.length === 1 ? bases[0] : rng.pick(bases);
   if (own) filled?.add(base.slot);
-  return generateItem({ baseId: base.id, level, rarityId: rarityId ?? rollRarity(rng, content, rarityBonus, uniqueBonus), area }, rng, content);
+  return generateItem({ baseId: base.id, level, rarityId: rarityId ?? rollRarity(rng, content, rarityBonus, uniqueBonus, rarityPoints), area }, rng, content);
 }
 
 // The family of an item for another class than `classId`: one of the other

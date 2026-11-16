@@ -3,7 +3,7 @@
 // The item card also upgrades the item on the camp's Kowadło and takes a bag
 // item apart on the Stół rozbiórki.
 
-import { herbSprite, itemSprite, materialSprite, mineralSprite, potionSprite, resourceArt, scrollArt } from '../art.js';
+import { herbSprite, itemSprite, materialSprite, mineralSprite, pantrySprite, potionSprite, resourceArt, scrollArt } from '../art.js';
 import { bonusList } from '../bonuses.js';
 import { characterLook, portraitLayers } from '../cosmetics.js';
 import { MATERIALS_HINT, materialIcon, materialSheet, materialTitle } from '../craft-table.js';
@@ -407,12 +407,21 @@ export function mountCharacter(container, { switchCharacter } = {}) {
     const minerals = state.character.minerals ?? [];
     const mineralCount = minerals.reduce((sum, mineral) => sum + mineral.count, 0);
     const showMinerals = mineralCount > 0 || Boolean(state.character.professions?.mining);
+    // The Spiżarnia: the fish of Rybołówstwo (1057) and the crops of
+    // Rolnictwo (1058), its own tab once either opens, or while the
+    // character has some.
+    const pantry = state.character.pantry ?? [];
+    const pantryCount = pantry.reduce((sum, good) => sum + good.count, 0);
+    const showPantry = pantryCount > 0 || Boolean(state.character.professions?.fishing) || Boolean(state.character.professions?.farming) || Boolean(state.character.professions?.cooking);
+    const tabCount = 3 + (showMinerals ? 1 : 0) + (showPantry ? 1 : 0);
     const grids = {
       items: () => [scrollsLine(), bag.length > 1 && sortRow('items'), itemsGrid(sortBag('items', bag))],
       materials: () => [materials.length > 1 && sortRow('materials'), materialsGrid(sortBag('materials', materials))],
       parts: () => partsGrid(parts),
       minerals: () => mineralsGrid(minerals),
+      pantry: () => pantryGrid(pantry),
     };
+    const hiddenTab = (bagTab === 'minerals' && !showMinerals) || (bagTab === 'pantry' && !showPantry);
     return h(
       'section',
       { class: 'bag', 'aria-labelledby': 'bag-title' },
@@ -424,13 +433,14 @@ export function mountCharacter(container, { switchCharacter } = {}) {
       bagActions(bag),
       h(
         'div',
-        { class: `segmented bag-tabs${showMinerals ? ' bag-tabs--four' : ''}`, role: 'group', 'aria-label': t('Zawartość plecaka') },
+        { class: `segmented bag-tabs${tabCount === 4 ? ' bag-tabs--four' : tabCount === 5 ? ' bag-tabs--five' : ''}`, role: 'group', 'aria-label': t('Zawartość plecaka') },
         tab('items', t('Przedmioty')),
         tab('materials', stacked > 0 ? t('Materiały ({count})', { count: formatNumber(stacked) }) : t('Materiały')),
         tab('parts', partCount > 0 ? t('Części ({count})', { count: formatNumber(partCount) }) : t('Części')),
         showMinerals && tab('minerals', mineralCount > 0 ? t('Minerały ({count})', { count: formatNumber(mineralCount) }) : t('Minerały')),
+        showPantry && tab('pantry', pantryCount > 0 ? t('Spiżarnia ({count})', { count: formatNumber(pantryCount) }) : t('Spiżarnia')),
       ),
-      (grids[bagTab === 'minerals' && !showMinerals ? 'items' : bagTab] ?? grids.items)(),
+      (grids[hiddenTab ? 'items' : bagTab] ?? grids.items)(),
     );
   }
 
@@ -623,6 +633,118 @@ export function mountCharacter(container, { switchCharacter } = {}) {
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: t('Wyrzuć') }), sell),
       // The przemiana of this gem into the next one (913 B), under selling.
       transmutePart(mineral, { onDone: closeSheet }),
+    );
+  }
+
+  // The Spiżarnia (1057): the fish of Rybołówstwo and the crops of
+  // Rolnictwo, a slot for each, outside the bag's room too, as the minerals.
+  function pantryGrid(pantry) {
+    // The meal at work (cooking.js), with the time of explorations it still works for.
+    const meal = state.character.meal;
+    const mealNote = meal && h('p', { class: 'bag-note cook-bonus', text: t('Posiłek: {dish}, {bonus}. Jeszcze {time} wypraw.', { dish: meal.name, bonus: meal.bonus, time: formatMinutes(meal.left) }) });
+    if (pantry.length === 0) return [mealNote, h('p', { class: 'muted', text: t('Spiżarnia jest pusta. Ryby złowisz w Rybołówstwie, a plony zbierzesz w Rolnictwie.') })];
+    return [
+      mealNote,
+      h('p', { class: 'bag-note', text: t('Spiżarnia nie zajmuje miejsca w plecaku.') }),
+      h(
+        'ul',
+        { class: 'bag-grid' },
+        pantry.map((good) =>
+          h(
+            'li',
+            {},
+            h(
+              'button',
+              {
+                type: 'button',
+                class: 'slot slot--bag slot--pantry',
+                'aria-label': t('{name}, {count} szt.', { name: good.name, count: formatNumber(good.count) }),
+                onClick: () => pantrySheet(good),
+              },
+              pantrySprite(good.id) ?? icon('fish', { size: 24 }),
+              h('span', { class: 'slot-level', text: formatNumber(good.count) }),
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
+
+  // A good of the Spiżarnia's card: what it is, and selling as many as
+  // chosen to the innkeeper Zbylut or throwing them away, once the player
+  // confirms, as for minerals.
+  function pantrySheet(good) {
+    let count = 1;
+    const price = (amount) => saleGold(good.price, amount);
+    const value = h('output', { class: 'herb-count-value' });
+    const sell = h('button', { type: 'button', class: 'button button--system' });
+    const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('Mniej'), text: '−', onClick: () => set(count - 1) });
+    const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('Więcej'), text: '+', onClick: () => set(count + 1) });
+    const all = h('button', { type: 'button', class: 'link-button', text: t('wszystkie'), onClick: () => set(good.count) });
+    function set(next) {
+      count = Math.min(good.count, Math.max(1, next));
+      value.textContent = t('{count} szt.', { count: formatNumber(count) });
+      sell.textContent = t('Sprzedaj za {gold} złota', { gold: formatNumber(price(count)) });
+      less.disabled = count === 1;
+      more.disabled = count === good.count;
+    }
+    set(count);
+    const act = (path, done) => async (event) =>
+      withButton(event.currentTarget, async () => {
+        const result = await call('POST', `/api/pantry/${path}`, { id: good.id, count });
+        closeSheet();
+        done?.(result);
+      });
+    sell.addEventListener('click', async (event) => {
+      const button = event.currentTarget;
+      const sure = await confirmAction({
+        title: t('Sprzedać karczmarzowi?'),
+        text: t('Zbylut kupi: {name} ×{count} za {gold} złota.', { name: good.name, count: formatNumber(count), gold: formatNumber(price(count)) }),
+        confirmLabel: t('Sprzedaj'),
+      });
+      if (!sure) return;
+      await act('sell', ({ sold }) => {
+        playSound('coin');
+        toast(t('Zbylut kupił {count} szt. za {gold} złota.', { count: formatNumber(sold.count), gold: formatNumber(sold.gold) }));
+      })({ currentTarget: button });
+    });
+    const discard = async (event) => {
+      const button = event.currentTarget;
+      const sure = await confirmAction({
+        title: t('Wyrzucić ze Spiżarni?'),
+        text: t('{name}: {count} szt. zniknie na zawsze.', { name: good.name, count: formatNumber(count) }),
+        confirmLabel: t('Wyrzuć'),
+        danger: true,
+      });
+      if (sure) await act('discard')({ currentTarget: button });
+    };
+    const art = pantrySprite(good.id);
+    // A fish leads to Rybołówstwo, a crop to Rolnictwo (1058), a dish to
+    // Gotowanie (1059), and says what its meal does.
+    const crop = good.group === 'crop';
+    const dish = good.group === 'dish';
+    const title = h('h2', { class: 'item-title', text: good.name });
+    const meta = h('p', { class: 'item-meta', text: t('{kind} · {count} szt.', { kind: dish ? t('Potrawa') : crop ? t('Plon') : t('Ryba'), count: formatNumber(good.count) }) });
+    const meal = dish && [
+      h('p', { class: 'sheet-text cook-bonus', text: t('Posiłek: {bonus} przez 4 godziny wypraw.', { bonus: good.bonus }) }),
+      h('p', { class: 'sheet-text muted', text: t('Potrawę wybierzesz przy wyruszaniu na wyprawę, w opcjach wyprawy.') }),
+    ];
+    openSheet(
+      h(
+        'div',
+        { class: 'item-details' },
+        art ? h('div', { class: 'item-head' }, h('span', { class: 'item-art' }, art), h('div', {}, title, meta)) : [title, meta],
+        h('p', { class: 'sheet-text', text: good.description }),
+        meal,
+        h('p', { class: 'sheet-text', text: t('Karczmarz Zbylut płaci {price} złota za sztukę.', { price: formatDecimal(good.price) }) }),
+      ),
+      h('div', { class: 'herb-count' }, less, value, more, all),
+      dish
+        ? state.character.professions?.cooking && h('a', { class: 'button button--world', href: '#/profesje/gotowanie', onClick: closeSheet, text: t('Do Gotowania') })
+        : crop
+          ? state.character.professions?.farming && h('a', { class: 'button button--world', href: '#/profesje/rolnictwo', onClick: closeSheet, text: t('Do Rolnictwa') })
+          : state.character.professions?.fishing && h('a', { class: 'button button--world', href: '#/profesje/rybolowstwo', onClick: closeSheet, text: t('Do Rybołówstwa') }),
+      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: t('Wyrzuć') }), sell),
     );
   }
 

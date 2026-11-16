@@ -44,6 +44,21 @@
       "name": "Jewelcrafting",
       "genitive": "Jewelcrafting",
       "description": "Making jewellery and setting stones in the System Gem Workshop."
+    },
+    "fishing": {
+      "name": "Fishing",
+      "genitive": "Fishing",
+      "description": "Catching fish in the System Pond, with no fights and no risk."
+    },
+    "farming": {
+      "name": "Farming",
+      "genitive": "Farming",
+      "description": "Growing crops in the System Field, plot by plot."
+    },
+    "cooking": {
+      "name": "Cooking",
+      "genitive": "Cooking",
+      "description": "Cooking dishes of fish, crops and herbs in the System Kitchen."
     }
   },
   "gathering": {
@@ -219,6 +234,174 @@
       ]
     }
   },
+  "fishing": {
+    "place": {
+      "name": "System Pond",
+      "description": "The water here is so still that the sky shows in it. The System reveals fish only when it judges that you can catch them."
+    },
+    "about": [
+      "You choose the fish and the time of the fishing, from 10 minutes to 8 hours. With each Fishing level the System reveals new fish and lets you catch several kinds at once.",
+      "Fish take no room in the bag: you keep them in the Pantry. Zbylut the innkeeper will buy them, and soon they will be useful in Cooking too."
+    ],
+    "texts": {
+      "report": [
+        "The float bobs on the water, and the basket fills with fish.",
+        "Mist hangs over the Pond, and the fish bite one after another.",
+        "The System's blue lines lead the line to where the fish wait."
+      ],
+      "caught": [
+        "Caught: {fish}."
+      ],
+      "lucky": [
+        "Lucky catch, extra: {fish}."
+      ],
+      "mastery": [
+        "Each fish caught has a {chance}% chance of one extra."
+      ],
+      "revealed": [
+        "The System reveals a new fish: {fish}"
+      ],
+      "hidden": [
+        "Hidden by the System until Fishing level {level}."
+      ],
+      "busy": [
+        "The character is fishing. Wait until the fishing ends."
+      ],
+      "claimFirst": [
+        "The fishing is over. Claim the report first."
+      ],
+      "pushTitle": [
+        "Fishing over"
+      ],
+      "pushBody": [
+        "Fishing finished: {place}. Your report is waiting."
+      ]
+    }
+  },
+  "farming": {
+    "place": {
+      "name": "System Field",
+      "description": "The earth gives to those who understand it. The System shows new crops when it judges that you can grow them."
+    },
+    "about": [
+      "You tap a plot and choose what will grow on it: each plot can have a different crop. Then you choose how long to farm, from 10 minutes to 8 hours. The time is shared evenly among the sown plots.",
+      "With each Farming level the System reveals new crops and gives more plots. The harvest goes to the Pantry: Zbylut the innkeeper buys it, and soon it will be useful in Cooking."
+    ],
+    "texts": {
+      "report": [
+        "The crops ripened in the sun, and the plots smell of fresh earth.",
+        "The wind swayed the ears, and the System watched over every plot.",
+        "The scarecrow drove the birds away, and the harvest stayed whole."
+      ],
+      "harvested": [
+        "Harvested: {crops}."
+      ],
+      "lucky": [
+        "A bumper crop, besides: {crops}."
+      ],
+      "mastery": [
+        "Each crop harvested has a {chance}% chance of one more."
+      ],
+      "revealed": [
+        "The System reveals a new crop: {crop}"
+      ],
+      "hidden": [
+        "Hidden by the System until Farming level {level}."
+      ],
+      "busy": [
+        "The character is farming. Wait for the end of the farming."
+      ],
+      "claimFirst": [
+        "The farming is over. Claim the report first."
+      ],
+      "pushTitle": [
+        "Farming over"
+      ],
+      "pushBody": [
+        "The harvest is ready: {place}. The report is waiting."
+      ],
+      "stages": [
+        "seeds with sprouts",
+        "seedlings",
+        "young plants",
+        "ripe plants"
+      ]
+    }
+  },
+  "cooking": {
+    "place": {
+      "name": "System Kitchen",
+      "description": "Fire burns here without wood, and the pots hang over the hearth by themselves. The System reveals recipes only when it judges that you can cook them."
+    },
+    "bonuses": {
+      "xp": "+{value}% XP from the exploration",
+      "materials": "+{value}% materials from creatures",
+      "rare": "+{value} pp chance of a rarer item",
+      "gold": "+{value}% gold from the exploration",
+      "cards": "+{value}% chance of cards and card packs",
+      "resources": "+{value}% resources for the camp",
+      "chests": "+{value}% chance of a chest among the finds"
+    },
+    "about": [
+      "You choose a recipe and how many dishes. The fish and crops come from the Pantry, and some recipes also need herbs from the bag. With each Cooking level the System reveals new recipes, and the work goes faster.",
+      "The dishes go to the Pantry. As you set out on an exploration you choose one: the character eats it, and its bonus works for 4 hours of explorations. A 4-hour exploration uses it all, shorter ones use it up in turn. You eat a new dish once the last one is over."
+    ],
+    "texts": {
+      "report": [
+        "In the Kitchen the pot bubbles, and the oven smells of fresh bread.",
+        "The System's blue lines measure out a pinch of salt and the cooking time.",
+        "The fire under the pot burns evenly, and the dishes come out one after another."
+      ],
+      "cooked": [
+        "Cooked: {dishes}."
+      ],
+      "lucky": [
+        "Lucky cooking, extra: {dishes}."
+      ],
+      "stopped": [
+        "Cooking stopped. The ingredients for the rest of the dishes went back where they were."
+      ],
+      "bagFull": [
+        "The herbs for the rest of the cooking will not fit in the bag. Make room in it."
+      ],
+      "mastery": [
+        "Each dish cooked has a {chance}% chance of one more."
+      ],
+      "revealed": [
+        "The System reveals a new recipe: {dish}"
+      ],
+      "hidden": [
+        "Hidden by the System until Cooking level {level}."
+      ],
+      "busy": [
+        "The character is cooking. Wait for the end of the cooking."
+      ],
+      "claimFirst": [
+        "The cooking is over. Claim the report first."
+      ],
+      "pushTitle": [
+        "Cooking over"
+      ],
+      "pushBody": [
+        "The dishes are ready: {place}. The report is waiting."
+      ],
+      "eaten": [
+        "The character eats: {dish}. {bonus} for 4 hours of explorations."
+      ],
+      "mealLine": [
+        "The meal ({dish}) worked for {time} of this exploration: {bonus}."
+      ],
+      "mealOver": [
+        "The meal is over. You will choose a new dish on the next exploration."
+      ],
+      "mealActive": [
+        "The meal is still working: {dish}, {time} of explorations left."
+      ],
+      "noDish": [
+        "You have no such dish in the Pantry."
+      ]
+    }
+  },
   "jewelcrafting": {
     "place": {
       "name": "System Gem Workshop",
@@ -350,6 +533,272 @@
       "name": "Star Ore",
       "genitive": "Star Ore",
       "description": "Ore from shards of stars, for the settings of mythic and divine jewellery."
+    }
+  },
+  "fish": {
+    "roach": {
+      "name": "Roach",
+      "genitive": "Roach",
+      "description": "A silver small fry with red eyes. It bites at anything."
+    },
+    "perch": {
+      "name": "Perch",
+      "genitive": "Perch",
+      "description": "A striped predator with a spiny fin. Mind your fingers."
+    },
+    "crucian": {
+      "name": "Crucian Carp",
+      "genitive": "Crucian Carp",
+      "description": "Golden and stocky. It survives even in a muddy pond."
+    },
+    "bream": {
+      "name": "Bream",
+      "genitive": "Bream",
+      "description": "Flat and slimy. It swims in shoals near the bottom."
+    },
+    "tench": {
+      "name": "Tench",
+      "genitive": "Tench",
+      "description": "Green and gold, with tiny scales. It loves overgrown coves."
+    },
+    "carp": {
+      "name": "Carp",
+      "genitive": "Carp",
+      "description": "Fat and wary. It takes a long fight."
+    },
+    "eel": {
+      "name": "Eel",
+      "genitive": "Eel",
+      "description": "It wriggles like a snake and crosses wet meadows at night."
+    },
+    "pike": {
+      "name": "Pike",
+      "genitive": "Pike",
+      "description": "A water wolf with a mouth full of teeth. It waits in the reeds."
+    },
+    "zander": {
+      "name": "Zander",
+      "genitive": "Zander",
+      "description": "A glassy-eyed hunter of the deep. It hunts at dusk."
+    },
+    "trout": {
+      "name": "Trout",
+      "genitive": "Trout",
+      "description": "Spotted, from cold streams. It flees from every shadow."
+    },
+    "catfish": {
+      "name": "Catfish",
+      "genitive": "Catfish",
+      "description": "A whiskered giant of the bottom. They say it swallows ducks."
+    },
+    "sturgeon": {
+      "name": "Sturgeon",
+      "genitive": "Sturgeon",
+      "description": "Armoured like a fish of old times. It lives a hundred years."
+    },
+    "salmon": {
+      "name": "Salmon",
+      "genitive": "Salmon",
+      "description": "It swims upstream to the river where it was born."
+    },
+    "golden-carp": {
+      "name": "Golden-Scaled Carp",
+      "genitive": "Golden-Scaled Carp",
+      "description": "Whoever keeps its scale in their purse never lacks a penny."
+    },
+    "water-catfish": {
+      "name": "Nix's Catfish",
+      "genitive": "Nix's Catfish",
+      "description": "The Nix keeps it in his pond like a dog. Better not come back to the water after dark."
+    },
+    "silverfish": {
+      "name": "Świteź Silverfish",
+      "genitive": "Świteź Silverfish",
+      "description": "It swims above a town sunk at the bottom of the lake. At full moon it shines like silver."
+    },
+    "drowned-pike": {
+      "name": "Drowned Man's Pike",
+      "genitive": "Drowned Man's Pike",
+      "description": "Black and old as a mill. They say a drowned man's soul lives in it."
+    },
+    "golden-fish": {
+      "name": "Golden Fish",
+      "genitive": "Golden Fish",
+      "description": "It speaks with a human voice and promises a wish if you let it go."
+    }
+  },
+  "crops": {
+    "turnip": {
+      "name": "Turnip",
+      "genitive": "Turnip",
+      "description": "White and purple and hard. It grows even for the lazy."
+    },
+    "peas": {
+      "name": "Peas",
+      "genitive": "Peas",
+      "description": "Pods full of green beads. There is no pea soup without them."
+    },
+    "millet": {
+      "name": "Millet",
+      "genitive": "Millet",
+      "description": "Tiny golden grain. Millet groats are cooked from it."
+    },
+    "oats": {
+      "name": "Oats",
+      "genitive": "Oats",
+      "description": "Slender ears in the wind. Horses would do anything for them."
+    },
+    "cabbage": {
+      "name": "Cabbage",
+      "genitive": "Cabbage",
+      "description": "A heavy head of leaves. Pickled, it lasts the whole winter."
+    },
+    "onion": {
+      "name": "Onion",
+      "genitive": "Onion",
+      "description": "Golden skin and a sharp smell. It brings tears even to the tough."
+    },
+    "carrot": {
+      "name": "Carrot",
+      "genitive": "Carrot",
+      "description": "Orange and sweet. They say it sharpens the eyes."
+    },
+    "rye": {
+      "name": "Rye",
+      "genitive": "Rye",
+      "description": "Tall ears with long whiskers. Rye gives bread and sour soup."
+    },
+    "broad-bean": {
+      "name": "Broad Bean",
+      "genitive": "Broad Bean",
+      "description": "Thick pods and fat beans. Best with butter and dill."
+    },
+    "beet": {
+      "name": "Beet",
+      "genitive": "Beet",
+      "description": "A dark red root. It colours the soup and the hands."
+    },
+    "wheat": {
+      "name": "Wheat",
+      "genitive": "Wheat",
+      "description": "Golden ears for the finest flour. A field of wheat is wealth."
+    },
+    "buckwheat": {
+      "name": "Buckwheat",
+      "genitive": "Buckwheat",
+      "description": "It blooms white and smells of honey. It gives buckwheat groats."
+    },
+    "pumpkin": {
+      "name": "Pumpkin",
+      "genitive": "Pumpkin",
+      "description": "Huge and orange. One is enough for soup for the whole party."
+    },
+    "poppy": {
+      "name": "Poppy",
+      "genitive": "Poppy",
+      "description": "Red flowers and heads full of seeds. It was scattered against wraiths."
+    },
+    "garlic": {
+      "name": "Garlic",
+      "genitive": "Garlic",
+      "description": "A white head with a strong smell. It keeps wraiths and vampires away."
+    },
+    "giant-turnip": {
+      "name": "Giant Turnip",
+      "genitive": "Giant Turnip",
+      "description": "So big that the whole village pulled it out of the ground."
+    },
+    "golden-ear": {
+      "name": "Golden Ear",
+      "genitive": "Golden Ear",
+      "description": "The last ear of the harvest, where the spirit of the field lives. It brings luck."
+    },
+    "mokosh-grain": {
+      "name": "Mokosh Grain",
+      "genitive": "Mokosh Grain",
+      "description": "A grain of the earth goddess. Where it falls, nobody goes hungry for a year."
+    }
+  },
+  "dishes": {
+    "baked-turnip": {
+      "name": "Baked Turnip",
+      "description": "Baked in the campfire's ashes. Simple, but filling."
+    },
+    "pea-soup": {
+      "name": "Pea Soup",
+      "description": "Thick and warming. Best from a big cauldron."
+    },
+    "fried-roach": {
+      "name": "Fried Roach",
+      "description": "Crunchy, eaten bones and all."
+    },
+    "millet-crucian": {
+      "name": "Millet with Crucian",
+      "description": "Golden millet and a golden crucian. For luck."
+    },
+    "oat-kissel": {
+      "name": "Oat Kissel",
+      "description": "A thick grey kissel of oats. The old Slavs ate it already."
+    },
+    "fish-cabbage": {
+      "name": "Fish Stewed in Cabbage",
+      "description": "Tench and bream under cabbage leaves, stewed until soft."
+    },
+    "fried-carp": {
+      "name": "Fried Carp with Onion",
+      "description": "A golden crust, and keep a scale in your purse."
+    },
+    "zurek": {
+      "name": "Żurek",
+      "description": "A sour rye soup on a sourdough starter. It puts you back on your feet."
+    },
+    "eel-beans": {
+      "name": "Eel with Broad Beans",
+      "description": "Fat eel and young broad beans. A feast by the river."
+    },
+    "borscht": {
+      "name": "Red Borscht",
+      "description": "Ruby red and clear as a potion."
+    },
+    "pike-pierogi": {
+      "name": "Pike Pierogi",
+      "description": "Made by the whole cottage. Each one comes out different."
+    },
+    "buckwheat-zander": {
+      "name": "Buckwheat with Zander",
+      "description": "Dark, fragrant groats. They give strength to woodcutters and warriors."
+    },
+    "campfire-trout": {
+      "name": "Campfire Trout",
+      "description": "Roasted on a stick over the fire. It smells of smoke and the stream."
+    },
+    "pumpkin-soup": {
+      "name": "Pumpkin Soup",
+      "description": "Thick and orange. One pumpkin fills a whole cauldron."
+    },
+    "fisherman-feast": {
+      "name": "Fisherman's Feast",
+      "description": "Two giants from the bottom on one platter. A dish for the rich."
+    },
+    "kutia": {
+      "name": "Kutia",
+      "description": "Wheat with poppy seeds. A dish for the living and for the spirits of the ancestors."
+    },
+    "garlic-salmon": {
+      "name": "Salmon in Garlic",
+      "description": "Roasted pink salmon. Ghouls keep far away from this kitchen."
+    },
+    "golden-carp-herbs": {
+      "name": "Golden Carp in Herbs",
+      "description": "The golden scales crunch like coins."
+    },
+    "switez-soup": {
+      "name": "Świteź Soup",
+      "description": "Three fish from the deepest waters. The soup glows in the bowl like the moon over the lake."
+    },
+    "mokosh-feast": {
+      "name": "Mokosh's Feast",
+      "description": "Bread of the goddess's grain and the golden fish. The System's finest feast."
     }
   },
   "potionUse": {

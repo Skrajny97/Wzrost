@@ -3580,6 +3580,62 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.81 (16.11.2026): Rybołówstwo, Rolnictwo i Gotowanie
+
+1. Trzy nowe profesje od 25. poziomu postaci: Rybołówstwo (1057, ekran 1011), Rolnictwo z planszą pól (1058, ekran 1013) i Gotowanie z posiłkiem na wyprawę (1059, ekran 1014, premie 1015), wszystkie przyjęte przez autora. Zob. „Rybołówstwo w grze”, „Rolnictwo w grze” i „Gotowanie i posiłek”.
+2. Ryby, plony i potrawy leżą w Spiżarni, nowej zakładce plecaka (migracja 0142), a posiłek w działaniu w `characters.meal` (migracja 0143).
+3. Kwadraty Profesji w rzędach: Zielarstwo i Górnictwo, Alchemia i Jubilerstwo, Rybołówstwo i Rolnictwo, Gotowanie i Rzemieślnictwo (1014.6).
+4. Skrzynia Konta mieści tyle przedmiotów, ile plecak postaci, która ją otwiera, z rozbudową obozu (dotąd 5). Autor, 16.11.2026: „Zwiększ pojemnosc skrzyni konta na taką jaka aktualnie ma plecak”. Liczba `account.chestSlots` z `data/balance.json` zniknęła.
+
+## Rybołówstwo w grze (1057; 16.11.2026)
+
+Zasady 999.1 („łowienie ryb w Systemowym Stawie, bez walk, jak zbieranie ziół”), ryby z 1001, Staw i ikona z 1007, klatka 1008 A, animacja 1010.1 B, makiety 1011.1–1011.4. Autor: „Niech te nowe profesje odblokowują się tak jak Górnictwo i Jubilerstwo na tym samym poziomie” (16.11.2026).
+
+1. **Odblokowanie.** Od 25. poziomu postaci, jak Górnictwo i Jubilerstwo; kwadrat stoi obok Rzemieślnictwa. Każdy poziom daje Zręczność i Wolę, do 200. poziomu. Mistrzostwo od 100. poziomu: szansa na dodatkową rybę rośnie do 10% na 200. poziomie.
+2. **Połów.** Działa jak zbieranie ziół:
+    - wybór ryb: 1 rodzaj, 2 od 10. poziomu, 3 od 25., 4 od 50.;
+    - czas od 10 minut do 8 godzin, każdy poziom łowi o 2% więcej, rozrzut ±15%, zawsze co najmniej jedna ryba;
+    - postać w tym czasie odpoczywa, przerwany połów nie daje nic, a łowić może też Awatar Systemu.
+3. **Ryby.** 18 ryb, od płotki (1. poziom) do złotej rybki (180.). Ile na godzinę i za ile, tak jak zioła tego samego poziomu.
+4. **Spiżarnia.** Nowa zakładka plecaka. Ryby nie zajmują w nim miejsca, jak minerały. Można je sprzedać karczmarzowi Zbylutowi, wyrzucić albo włożyć do Skrzyni Konta. Potem trafią tu też plony i potrawy.
+5. **Brakujące szczegóły (najprościej):**
+    - Zbylut płaci cenę ryby bez premii Skupu złomu, bo ta podnosi tylko ceny złomiarza.
+    - Raport ma w Dzienniku swój znaczek („połów”), a powiadomienie o końcu połowu prowadzi do ekranu Rybołówstwa.
+6. **Animacja.** Pętla 20 klatek zrobiona z samej przyjętej klatki 1008 A, bo PixelLab dwa razy przesuwał cały obrazek i gubił spławik. Postać unosi głowę, lekko opuszcza wędkę i wraca, a spławik delikatnie się kołysze. Reszta obrazka stoi.
+7. **Kod.** `src/engine/fishing.js`, `src/server/fishing.js` (`POST /api/professions/fish`, `/api/pantry/sell`, `/api/pantry/discard`), aktywność i raport rodzaju `fish`, testy w `test/fishing.test.js`.
+
+## Rolnictwo w grze (1058; 16.11.2026)
+
+Zasady 999.2 („uprawa roślin na Systemowym Polu”), uwaga autora do 999: „do Rolnictwa pewnie planszę jakąś z polami, żeby to nie było takie automatyczne, tylko sobie oznaczać co gdzie hodować i jakies animacje i stadia rozwoju generować” (16.11.2026). Plony z 1002, plansza i stadia z 1005 (makiety 1005.1–1005.3 przyjęte, łąka 1005.4 B, grządka 1005.5 B, stadia 1005.6–1005.9 A), Pole i ikona z 1007, animacja 1010.2 B, ekran w grze 1013.
+
+1. **Odblokowanie.** Od 25. poziomu postaci, jak Górnictwo, Jubilerstwo i Rybołówstwo; kwadrat stoi obok Rybołówstwa, a Rzemieślnictwo rząd niżej. Każdy poziom daje Siłę i Wytrzymałość, do 200. poziomu. Mistrzostwo od 100. poziomu: szansa na dodatkowy plon rośnie do 10% na 200. poziomie.
+2. **Pole.** Plansza z grządkami: 4 na 1. poziomie Rolnictwa, 6 na 10., 9 na 25., 12 na 50. i 16 na 100. Kolejne grządki stoją na planszy zamknięte, z poziomem, który je otworzy. Każda grządka może mieć inną roślinę albo zostać pusta; „Obsiej puste” sieje ostatnio wybraną roślinę na wszystkich pustych, „Wyczyść pole” opróżnia całe pole. Pole zapamiętuje się na urządzeniu.
+3. **Uprawa.** Czas od 10 minut do 8 godzin, dzielony po równo między obsiane grządki, tak jak czas zbierania między wybrane zioła. Dlatego pole obsiane w całości jedną rośliną daje tyle, co jedna grządka tej rośliny, a więcej grządek daje więcej różnych roślin naraz. Każdy poziom daje o 2% więcej, rozrzut ±15% na każdej grządce, zawsze co najmniej jeden plon. Postać w tym czasie odpoczywa, przerwana uprawa nie daje nic, a uprawiać może też Awatar Systemu.
+4. **Stadia.** W czasie uprawy rośliny na planszy rosną w czterech stadiach, wspólnych dla wszystkich roślin (ziarna z kiełkami, siewki, młode rośliny, dojrzałe rośliny), każde przez ćwierć czasu, i kołyszą się na wietrze (bez kołysania, gdy animacje są wyłączone). Ikona rośliny stoi w rogu grządki.
+5. **Plony.** 18 roślin, od rzepy (1. poziom) do Ziarna Mokoszy (180.). Ile na godzinę i za ile, tak jak zioła tego samego poziomu. Raport podaje plon z każdej grządki i razem. Plony trafiają do Spiżarni obok ryb; kupi je karczmarz Zbylut, a potem przydadzą się w Gotowaniu.
+6. **Brakujące szczegóły (najprościej):**
+    - Przy wyborze rośliny „ok. N szt. na godzinę” liczy plon z tej grządki przy obecnym polu (z tą grządką obsianą).
+    - Arkusz wyboru pokazuje trzy najbliższe ukryte rośliny, jak na makiecie 1005.2.
+    - Raport ma w Dzienniku znaczek „uprawa”, a powiadomienie o końcu uprawy prowadzi do ekranu Rolnictwa.
+7. **Animacja.** Wersja B z 1010.2: postać podlewa grządkę konewką, woda leci cały czas, a tło ze strachem na wróble stoi.
+8. **Kod.** `src/engine/farming.js`, `src/server/farming.js` (`POST /api/professions/farm` z `plots`: roślina każdej grządki albo null), aktywność i raport rodzaju `crops`, testy w `test/farming.test.js`.
+
+## Gotowanie i posiłek (1059; 16.11.2026)
+
+Zasady 999.3 („gotowanie potraw z ryb, plonów i ziół w Systemowej Kuchni, tak jak warzy się mikstury”), 999.4 (premie potraw), 999.5 v2 („Potrawa działa przez 4 godziny wypraw: wyprawa 4-godzinna zużywa ją całą, a krótsze wyprawy zużywają jej czas po kolei, aż minie 4 godziny”), potrawy z 1003, Kuchnia i ikona z 1007, animacja 1009.3 B, ekran w grze 1014. Autor o premiach (16.11.2026): „Trzeba troche lepsze te bonusy dać i niech się łączą w lepszych potrawach większą roznorodnosc tez trzeba” (1015). Autor o końcu posiłku: „Jeśli bonus z gotowania sie kończy na przykład ktos zjadl i poszedł na 2 wyprawy po 3h, to niech ten bonus tę drugą wyprawę tez obejmuje na te godzine”.
+
+1. **Odblokowanie.** Od 25. poziomu postaci, jak pozostałe nowe profesje; kwadrat stoi obok Rzemieślnictwa. Każdy poziom daje Witalność i Intelekt, do 200. poziomu. Mistrzostwo od 100. poziomu: szansa na dodatkową potrawę rośnie do 10% na 200. poziomie.
+2. **Gotowanie.** Jak warzenie mikstur: przepis i liczba potraw, 10 minut na potrawę na 1. poziomie, każdy poziom o 1% krócej, do połowy; najwyżej 8 godzin naraz. Ryby i plony bierze ze Spiżarni, zioła z plecaka, wszystko przy starcie. Przerwane gotowanie zostawia gotowe potrawy, a składniki na resztę wracają. Gotować może też Awatar Systemu.
+3. **Potrawy.** 20 potraw, od Pieczonej rzepy (1. poziom) do Uczty Mokoszy (180.). Każda ryba i każdy plon trafia do jakiejś potrawy. Potrawy leżą w Spiżarni; karczmarz Zbylut płaci za potrawę półtorej ceny jej składników.
+4. **Premie (1015).** Siedem rodzajów: więcej XP z wyprawy, więcej złota z wyprawy, więcej materiałów ze stworów, punkty procentowe szansy na rzadszy przedmiot, większa szansa na karty i pakiety kart, więcej surowców do obozu i większa szansa na skrzynię wśród znalezisk (wtedy trochę rzadziej złoto i surowce, jak w Tygodniu skrzyń). Potrawy do 12. poziomu mają jedną premię, od 16. dwie, od 120. trzy, a Uczta Mokoszy cztery. Wartości w `data/professions.json`.
+5. **Posiłek.** Potrawę wybiera się w „Opcjach wyprawy” i postać zjada ją przy wyruszaniu. Premia działa przez 4 godziny wypraw: każda wyprawa zużywa swój czas, a wyprawa dłuższa niż to, co zostało, dostaje premię za tę część czasu (np. 1 h z 3 h: jedna trzecia premii na całą wyprawę). Nową potrawę zjada się dopiero po końcu poprzedniej; do tego czasu posiłek działa sam na kolejnych wyprawach. Działa też na Szybkim i Błyskawicznym polowaniu i na wyprawie Drużyny (każdy swój posiłek). Odwołana wyprawa nic nie kosztuje: posiłek i potrawa wracają.
+6. **Gdzie widać posiłek.** W „Aktywnych bonusach” nad wyprawą i nad postacią, na górze Spiżarni, w linii Systemu raportu wyprawy („Posiłek (Żurek) działał przez 1 h tej wyprawy: …”) i w zdaniu, że się skończył.
+7. **Brakujące szczegóły (najprościej):**
+    - Szansa na rzadszy przedmiot w punktach procentowych podnosi wspólną szansę rzadkości z afiksami o tyle punktów, a ich wagi rosną po równo.
+    - Premia do kart mnoży szansę na kartę stwora, kartę z niższej krainy i pakiet.
+    - Wyprawa Drużyny: posiłek członka nie zmienia wspólnych walk, tylko jego własne łupy, XP i złoto.
+8. **Kod.** `src/engine/cooking.js`, `src/server/cooking.js` (`POST /api/professions/cook`), posiłek w `characters.meal` (migracja 0143) i `mealAtStart` w `src/server/hunts.js`, premie w `simulateHunt`; aktywność i raport rodzaju `dishes`, testy w `test/cooking.test.js`.
+
 ## Wersja 0.3.80 (16.11.2026): drużyna i chowaniec mieszczą się w scenie wyprawy
 
 1. W scenie wyprawy Drużyny, z najemnikiem albo z towarzyszami gra po ułożeniu postaci mierzy całą kolumnę z wierzchowcami i chowańcami (i znowu, gdy zmieni się szerokość ekranu). Gdy kolumna nie mieści się w kadrze, odstępy między postaciami maleją, a potem cała kolumna staje na środku kadru. Autor, 16.11.2026: „źle ustawione są postaci w wyprawie - chowańca ucina” (zrzut: dwie postacie piesze, prowadzący na koniu i lis ucięty przy prawej krawędzi).

@@ -1110,6 +1110,11 @@
       "id": "0.3.80",
       "title": "Wersja 0.3.80",
       "body": "- W scenie wyprawy z drużyną cała kolumna, z wierzchowcami i chowańcami, mieści się teraz w kadrze. Chowaniec prowadzącego nie znika już za krawędzią."
+    },
+    {
+      "id": "0.3.81",
+      "title": "Wersja 0.3.81",
+      "body": "- Trzy nowe profesje od 25. poziomu postaci: Rybołówstwo, Rolnictwo i Gotowanie.\n- Rybołówstwo: w Systemowym Stawie łowisz ryby, od płotki po złotą rybkę, a z poziomem więcej rodzajów naraz.\n- Rolnictwo: na Systemowym Polu obsiewasz grządki, każdą inną rośliną, i patrzysz, jak rośliny rosną. Z poziomem przybywa grządek i nowych roślin.\n- Gotowanie: w Systemowej Kuchni gotujesz potrawy z ryb, plonów i ziół. Potrawę wybierasz w „Opcjach wyprawy”, a jej premie działają przez 4 godziny wypraw: więcej XP, złota, materiałów, surowców, kart, skrzyń albo rzadszych przedmiotów. Lepsze potrawy łączą kilka premii.\n- Ryby, plony i potrawy trafiają do Spiżarni, nowej zakładki Plecaka. Nie zajmują w nim miejsca, a kupi je karczmarz Zbylut.\n- Skrzynia Konta mieści teraz tyle przedmiotów, ile Twój plecak."
     }
   ]
 }

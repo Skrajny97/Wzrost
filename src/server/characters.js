@@ -149,7 +149,7 @@ import { companionsKey, woundedWaiting } from './hunts.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { partyOf, partyRemoval } from './parties.js';
 import { anvilDiscountOf } from './perks.js';
-import { bagHerbs, bagMinerals, bagPotions, herbsOf, potionsOf, professionsView, settlementPointsOf } from './professions-view.js';
+import { bagHerbs, bagMinerals, bagPantry, bagPotions, herbsOf, mealView, potionsOf, professionsView, settlementPointsOf } from './professions-view.js';
 import { scrollById, scrollsOf } from './scroll-goods.js';
 import { OWN_CHARACTERS } from './roles.js';
 import { requirePlayable } from './sessions.js';
@@ -352,11 +352,12 @@ export const buildQueue = (row) => JSON.parse(row.build_queue ?? '[]');
 
 const path = (id) => `$."${id}"`;
 
-// Gathering herbs, brewing potions, making items, digging and the work of
-// the Szlifiernia are no fights: the character rests meanwhile, as at home.
+// Gathering herbs, brewing potions, making items, digging, the work of the
+// Szlifiernia, fishing, farming and cooking are no fights: the character
+// rests meanwhile, as at home.
 // A mercenary waiting in the Karczma or serving rests too (mercenaries.js):
 // its HP is its own, the exploration's fights are another's.
-export const restsDuring = (activity) => !activity || ['herbs', 'potions', 'items', 'minerals', 'jewels', 'mercenary'].includes(activity.kind);
+export const restsDuring = (activity) => !activity || ['herbs', 'potions', 'items', 'minerals', 'jewels', 'fish', 'crops', 'dishes', 'mercenary'].includes(activity.kind);
 
 // A character's buffs in fights (storedBuffs in potions.js): those kept in
 // time before 0.1.26 count as the fights of their minutes.
@@ -792,7 +793,7 @@ export function requireIdle(player, now) {
   const texts =
     activity.kind === 'mercenary'
       ? mercenaryBusy(activity)
-      : { herbs: content().professionTexts, potions: content().brewing?.texts, items: content().workshop?.texts, minerals: content().mining?.texts, jewels: content().jewelcrafting?.texts }[activity.kind];
+      : { herbs: content().professionTexts, potions: content().brewing?.texts, items: content().workshop?.texts, minerals: content().mining?.texts, jewels: content().jewelcrafting?.texts, fish: content().fishing?.texts, crops: content().farming?.texts, dishes: content().cooking?.texts }[activity.kind];
   throw activity.ends_at <= now
     ? new ApiError(409, 'claim_first', texts ? texts.claimFirst[0] : 'Wyprawa się skończyła. Najpierw odbierz raport.')
     : new ApiError(409, 'busy', texts ? texts.busy[0] : 'Postać jest na wyprawie. Poczekaj na jej koniec.');
@@ -1385,6 +1386,27 @@ function activityPlace(activity, level) {
     };
   }
   if (activity.kind === 'minerals') return { profession: content().mining.profession, placeName: content().mining.place.name };
+  // A fishing, its place and the fish chosen (1057).
+  if (activity.kind === 'fish') {
+    const fish = (JSON.parse(activity.options ?? '{}').fish ?? []).filter((id) => content().fishById[id]);
+    return { profession: content().fishing.profession, placeName: content().fishing.place.name, fish: fish.map((id) => ({ id, name: content().fishById[id].name })) };
+  }
+  // A farming, its place and the crop of each plot, null for one left empty
+  // (1058).
+  if (activity.kind === 'crops') {
+    const plots = (JSON.parse(activity.options ?? '{}').plots ?? []).map((id) => (typeof id === 'string' && content().cropsById[id] ? id : null));
+    return {
+      profession: content().farming.profession,
+      placeName: content().farming.place.name,
+      plots: plots.map((id) => (id ? { id, name: content().cropsById[id].name } : null)),
+    };
+  }
+  // A cooking, its place, the dish and how many (1059).
+  if (activity.kind === 'dishes') {
+    const { recipe, count } = JSON.parse(activity.options ?? '{}');
+    const dish = content().dishesById[recipe];
+    return { profession: content().cooking.profession, placeName: content().cooking.place.name, dish: dish ? { id: dish.id, name: dish.name } : null, count: count ?? 0 };
+  }
   // A mercenary's offer or service in the Karczma (mercenaries.js).
   if (activity.kind === 'mercenary') return mercenaryPlace(activity);
   if (activity.kind === 'jewels') {
@@ -1744,6 +1766,11 @@ export function characterView(player, now) {
     potions: bagPotions(row, sellBonus),
     // The gems and ores of Górnictwo, which take no room in it.
     minerals: bagMinerals(row, sellBonus),
+    // The fish of Rybołówstwo, the crops of Rolnictwo and the dishes of
+    // Gotowanie in the Spiżarnia, which take no room in it either (1057,
+    // 1058, 1059), and the meal at work (cooking.js), or null.
+    pantry: bagPantry(row),
+    meal: mealView(row),
     herbStack: content().professionRules.stack,
     bagUsed: bagPlaces(player),
     bagCapacity: bagCapacity(levels, content()),

@@ -23,8 +23,11 @@ import { finishGathering, requireProfessions } from './professions.js';
 import { finishCrafting } from './workshop.js';
 import { finishJewels } from './jewelcraft.js';
 import { finishMining } from './mining.js';
+import { finishFishing } from './fishing.js';
+import { finishFarming } from './farming.js';
+import { finishCooking } from './cooking.js';
 
-const FINISH = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting, minerals: finishMining, jewels: finishJewels };
+const FINISH = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting, minerals: finishMining, jewels: finishJewels, fish: finishFishing, crops: finishFarming, dishes: finishCooking };
 
 // The purchase, only once and only with the gold for it, so two taps at
 // once pay once.
@@ -73,7 +76,7 @@ export async function cancelAvatar(context) {
   const activity = avatarWork(player);
   if (activity.ends_at <= now) throw new ApiError(409, 'claim_first', content().avatar.texts.claimFirst[0]);
   const db = context.env.DB;
-  const stop = { potions: finishBrewing, items: finishCrafting, jewels: finishJewels }[activity.kind];
+  const stop = { potions: finishBrewing, items: finishCrafting, jewels: finishJewels, dishes: finishCooking }[activity.kind];
   const stopped = stop ? await stop(db, player, now, { stop: true, avatar: true }) : null;
   if (!stop) await db.prepare('DELETE FROM avatar_activities WHERE character_id = ? AND started_at = ?').bind(player.row.id, activity.started_at).run();
   return json({

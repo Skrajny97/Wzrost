@@ -20,7 +20,7 @@ import { scrapperSheet } from '../scrapper.js';
 import { findMark, itemDetails, itemSheet, itemSummary, ownedCopy, storedCopy } from './character.js';
 import { partyFree, partyWent, skipLines } from './party.js';
 import { fightPortal } from './portals.js';
-import { herbsReport, itemsReport, jewelsReport, mineralsReport, potionsReport } from './professions.js';
+import { cropsReport, dishesReport, fishReport, herbsReport, itemsReport, jewelsReport, mineralsReport, potionsReport } from './professions.js';
 
 // "skóra wilka ×2, rzadkie pióro kruka": what beaten creatures left.
 const materialsText = (materials) => materials.map((material) => (material.count > 1 ? `${material.label} ×${material.count}` : material.label)).join(', ');
@@ -162,9 +162,9 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       return;
     }
     // A gathering of herbs, a brewing of potions, an order in the Warsztat,
-    // a digging or a work of the Szlifiernia has no fights: its own short
-    // report.
-    const work = { herbs: herbsReport, potions: potionsReport, items: itemsReport, minerals: mineralsReport, jewels: jewelsReport }[report.kind];
+    // a digging, a work of the Szlifiernia, a fishing, a farming or a
+    // cooking has no fights: its own short report.
+    const work = { herbs: herbsReport, potions: potionsReport, items: itemsReport, minerals: mineralsReport, jewels: jewelsReport, fish: fishReport, crops: cropsReport, dishes: dishesReport }[report.kind];
     if (work) {
       fill(container, ...work(report, heading, findSheet));
       // The cauldron bubbles once over a finished brewing, and the hammer

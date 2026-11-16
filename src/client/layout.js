@@ -31,6 +31,9 @@ const WORK_SCREENS = {
   items: { href: '#/profesje/rzemieslnictwo', label: 'RZEMIEŚLNICTWO', profession: 'crafting' },
   minerals: { href: '#/profesje/gornictwo', label: 'GÓRNICTWO', profession: 'mining' },
   jewels: { href: '#/profesje/jubilerstwo', label: 'JUBILERSTWO', profession: 'jewelcrafting' },
+  fish: { href: '#/profesje/rybolowstwo', label: 'RYBOŁÓWSTWO', profession: 'fishing' },
+  crops: { href: '#/profesje/rolnictwo', label: 'ROLNICTWO', profession: 'farming' },
+  dishes: { href: '#/profesje/gotowanie', label: 'GOTOWANIE', profession: 'cooking' },
 };
 
 const MAIN_TABS = [
@@ -483,7 +486,7 @@ function navButton(tab, active, onBack) {
 // not open yet waits for; it is no link then, as its tab on the screen
 // cannot be pressed either. `ready` lights it with the gold dot its main
 // tab has for it (a report, news), as Statystyki under Postać.
-const PROFESSION_ICONS = { herbalism: 'leaf', alchemy: 'flask', crafting: 'hammer', mining: 'ore', jewelcrafting: 'ring' };
+const PROFESSION_ICONS = { herbalism: 'leaf', alchemy: 'flask', crafting: 'hammer', mining: 'ore', jewelcrafting: 'ring', fishing: 'fish', farming: 'sprout', cooking: 'pot' };
 const PLACE_ICONS = { board: 'check', enchanter: 'skills', hermitage: 'hood', stable: 'beast', tavern: 'chat', market: 'coin', tannery: 'pouch', herbalist: 'leaf', forge: 'hammer', casino: 'dice', arena: 'swords' };
 const PARTS = {
   // Eksploracja, Portale and Wieże, as over the Walka (screens/towers.js).

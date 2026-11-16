@@ -13,7 +13,7 @@
 // piece. A chest the character cannot open yet (`chest.locked`, its level)
 // shows only when it opens.
 
-import { herbSprite, materialSprite, mineralSprite, potionSprite, resourceArt, scrollArt } from '../art.js';
+import { herbSprite, materialSprite, mineralSprite, pantrySprite, potionSprite, resourceArt, scrollArt } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
@@ -63,6 +63,9 @@ function goodArt(good, size = 24) {
     // The scrolls (1061).
     case 'scroll':
       return scrollArt(good.id, size);
+    // The Spiżarnia's fish and crops (1057, 1058).
+    case 'pantry':
+      return pantrySprite(good.id) ?? icon('fish', { size });
     default:
       return potionSprite(good.id) ?? icon('flask', { size });
   }
@@ -92,6 +95,7 @@ function ownGoods(character) {
     [t('Materiały'), of('material', (character.crafting?.materials ?? []).map((material) => ({ id: material.key, name: materialTitle(material), count: material.count, materialId: material.materialId })))],
     [t('Minerały'), of('mineral', character.minerals ?? [])],
     [t('Zwoje'), of('scroll', character.scrollGoods ?? [])],
+    [t('Spiżarnia'), of('pantry', character.pantry ?? [])],
   ].filter(([, entries]) => entries.length > 0);
 }
 

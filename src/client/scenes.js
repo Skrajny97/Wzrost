@@ -8,7 +8,7 @@
 // the way the character's aura lights it, its trail glows behind it and its
 // pet goes with it (the Sklep Systemu).
 
-import { companionWalkerSheet, herbSprite, itemSprite, monsterSprite, placeArt, potionSprite, riderFile, riderLook, walkerSheet } from './art.js';
+import { companionWalkerSheet, dishSprite, herbSprite, itemSprite, monsterSprite, placeArt, potionSprite, riderFile, riderLook, walkerSheet } from './art.js';
 import { cosmeticOf } from './cosmetics.js';
 import { h } from './dom.js';
 import { motionOn } from './motion.js';
@@ -368,6 +368,8 @@ function workShelf(activity) {
   const art = (i) => {
     if (herbs) return activity.herbs.length > 0 ? herbSprite(activity.herbs[i % activity.herbs.length].id) : null;
     if (activity.kind === 'potions') return activity.potion ? potionSprite(activity.potion.id) : null;
+    // A cooking's dishes (1059).
+    if (activity.kind === 'dishes') return activity.dish ? dishSprite(activity.dish.id) : null;
     return activity.base ? itemSprite({ base: activity.base.id }) : null;
   };
   let shown = -1;

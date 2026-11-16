@@ -5,6 +5,10 @@ import {
   addBuff,
   addQuestProgress,
   applyHunt,
+  freshMeal,
+  mealOf,
+  mealTime,
+  mealUse,
   boonLines,
   faintForfeit,
   areaDangers,
@@ -109,12 +113,15 @@ import { favoriteIds } from './favorites.js';
 import { fallenGems, gemNamed, gemsBackSql, soldGold } from './inventory.js';
 import { perkOf } from './perks.js';
 import { finishGathering } from './professions.js';
-import { herbsOf, knownPotionsOf, potionKnown, potionsOf } from './professions-view.js';
+import { herbsOf, knownPotionsOf, pantryOf, potionKnown, potionsOf } from './professions-view.js';
+import { finishCooking } from './cooking.js';
 import { trimReports } from './reports.js';
 import { leaveTrip, tripOf } from './trips.js';
 import { finishCrafting } from './workshop.js';
 import { finishJewels } from './jewelcraft.js';
 import { finishMining } from './mining.js';
+import { finishFishing } from './fishing.js';
+import { finishFarming } from './farming.js';
 import { applyPartyEvent, checkedChoice, leaderView, resolveAuto, resolvePartyRow, tripEvent, tripLine } from './party-events.js';
 import { wantedAfterHunt, wantedGoing, wantedOnTrip } from './wanted.js';
 import { keptWeek, weekNow } from './weeks.js';
@@ -377,7 +384,7 @@ export async function startHunt(context) {
 export async function beginHunt(
   db,
   player,
-  { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow, scout = null, hard = false, mercenary = null } = {},
+  { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow, scout = null, hard = false, mercenary = null, meal = null } = {},
   now,
   { quick = false, flash = false, party: crew = null, partners = [], mount = null, haste = 0, follower = false, also = [], check = false } = {},
 ) {
@@ -411,6 +418,11 @@ export async function beginHunt(
     throw new ApiError(400, 'invalid_heal_below', 'Wybierz próg mikstury leczenia.');
   }
   const taken = takenPotions(player, potions, minutes);
+  // The meal (cooking.js; 999.5 v2): a dish of the Spiżarnia chosen as it
+  // sets out (`meal`, its id) is eaten now, while no meal works; the meal at
+  // work covers this exploration's time, as much as it has left, and what
+  // is left waits for the next one. On a Drużyna's trip each member's own.
+  const fed = mealAtStart(player, meal, minutes);
   // The strengthening potions drunk before cover the exploration's first
   // fights, as many as theirs; they are used up only when its report is
   // claimed (the author: "bonusy wszelkie za picie mikstur itp. nie zużywają
@@ -545,6 +557,9 @@ export async function beginHunt(
     ...(sought && { wanted: sought }),
     ...(hard && { hard: true }),
     ...(hire && { partners: [hire.partner], mercenary: hire.view }),
+    // The meal's bonus for this exploration, and the meal as it was before,
+    // for a call back, which costs nothing (cancelHunt).
+    ...(fed && { meal: fed.bonus, mealBack: fed.back }),
     ...(!crew && own),
     ...(quick && { quick }),
     ...(flash && { flash }),
@@ -582,7 +597,7 @@ export async function beginHunt(
       // The HP rested so far is saved now, so it is not counted again later.
       db
         .prepare(
-          `UPDATE characters SET hp = ?, hp_at = ?${settlement ? ', settlement = ?' : ''}${reserving ? ', potions = ?' : ''}${hire ? ', gold = gold - ?' : ''}, version = version + 1 WHERE id = ?`,
+          `UPDATE characters SET hp = ?, hp_at = ?${settlement ? ', settlement = ?' : ''}${reserving ? ', potions = ?' : ''}${hire ? ', gold = gold - ?' : ''}${fed ? fed.sets.sql : ''}, version = version + 1 WHERE id = ?`,
         )
         .bind(
           hp,
@@ -590,6 +605,7 @@ export async function beginHunt(
           ...(settlement ? [settlement] : []),
           ...(reserving ? [JSON.stringify(bagPotions)] : []),
           ...(hire ? [hire.fee] : []),
+          ...(fed ? fed.sets.binds : []),
           player.row.id,
         ),
       // What goes with this start alone (`also`): a Szybkie Polowanie's count.
@@ -605,6 +621,39 @@ export async function beginHunt(
   // What it set out with, for the roster of a Drużyna's trip (parties.js),
   // and what it keeps should its leader go alone after all (`own`).
   return { windows, trophies, taken, healBelow: healBelow ?? content().potionUse.healBelow, tracked, unknown, rumor, rareMore, avoidRare, seekRare, wanted: sought, own };
+}
+
+// The meal an exploration of `minutes` sets out with (cooking.js): the dish
+// chosen (`dishId`, or null) eaten now, or the meal still at work; null
+// without either, or where the game has no Gotowanie. `bonus`: what it does
+// on this exploration (simulateHunt); `back`: the meal before, and the dish
+// eaten, for a call back; `sets`: the row's changes, the meal after and the
+// dish taken from the Spiżarnia.
+function mealAtStart(player, dishId, minutes) {
+  const { cooking } = content();
+  if (!cooking) return null;
+  const before = mealOf(player.row.meal, content());
+  let eaten = null;
+  if (dishId !== null && dishId !== undefined) {
+    const dish = typeof dishId === 'string' ? content().dishesById[dishId] : undefined;
+    if (!dish) throw new ApiError(400, 'unknown_dish', 'Nie ma takiej potrawy.');
+    if (before) {
+      throw new ApiError(409, 'meal_active', say(cooking.texts, 'mealActive', 0, { dish: content().dishesById[before.dish].name, time: mealTime(before.left) }));
+    }
+    if (!((pantryOf(player.row)[dish.id] ?? 0) >= 1)) throw new ApiError(409, 'no_dish', say(cooking.texts, 'noDish', 0));
+    eaten = dish.id;
+  }
+  const { bonus, after } = mealUse(eaten ? freshMeal(eaten, content()) : before, minutes, content());
+  if (!bonus) return null;
+  const path = eaten && `$."${eaten}"`;
+  return {
+    bonus,
+    back: { before, ...(eaten && { eaten }) },
+    sets: {
+      sql: `, meal = ?${eaten ? ', pantry = json_set(pantry, ?, json_extract(pantry, ?) - 1)' : ''}`,
+      binds: [after ? JSON.stringify(after) : null, ...(eaten ? [path, path] : [])],
+    },
+  };
 }
 
 // Calling the character back early gives nothing and costs nothing. A
@@ -624,7 +673,7 @@ export async function cancelHunt(context) {
   const db = context.env.DB;
   // A brewing, an order in the Warsztat or a work of the Szlifiernia keeps
   // what is done.
-  const stop = { potions: finishBrewing, items: finishCrafting, jewels: finishJewels }[activity.kind];
+  const stop = { potions: finishBrewing, items: finishCrafting, jewels: finishJewels, dishes: finishCooking }[activity.kind];
   if (stop) {
     const stopped = await stop(db, player, context.now, { stop: true });
     return json({
@@ -636,6 +685,10 @@ export async function cancelHunt(context) {
   const options = JSON.parse(activity.options ?? '{}');
   const back = options.reserved ? options.potions ?? {} : {};
   const returning = Object.keys(back).length > 0;
+  // The meal as it was before the start, and the dish eaten back in the
+  // Spiżarnia (mealAtStart).
+  const mealBack = options.mealBack ?? null;
+  const dishBack = mealBack?.eaten && content().dishesById[mealBack.eaten] ? `$."${mealBack.eaten}"` : null;
   // The potions written back are computed from the row read: the call holds
   // only while the row is as read and the exploration still goes on, so a
   // claim or a sale meanwhile is not undone (atomic.js). One called back
@@ -651,6 +704,13 @@ export async function cancelHunt(context) {
     db.prepare('DELETE FROM activities WHERE character_id = ? AND started_at = ?').bind(player.row.id, activity.started_at),
     ...(returning
       ? [db.prepare('UPDATE characters SET potions = ?, version = version + 1 WHERE id = ?').bind(JSON.stringify(potionsBack(player.row, back, {})), player.row.id)]
+      : []),
+    ...(mealBack
+      ? [
+          db
+            .prepare(`UPDATE characters SET meal = ?${dishBack ? ', pantry = json_set(pantry, ?, COALESCE(json_extract(pantry, ?), 0) + 1)' : ''}, version = version + 1 WHERE id = ?`)
+            .bind(mealBack.before ? JSON.stringify(mealBack.before) : null, ...(dishBack ? [dishBack, dishBack] : []), player.row.id),
+        ]
       : []),
     ...(trip ? [leaveTrip(db, trip, player.row)] : []),
     // The mercenary taken along has served: its pay waits (mercenaries.js).
@@ -690,7 +750,7 @@ export async function claimHunt(context) {
 // the option chosen in the event at its end, if one came). Also the claim
 // of a Drużyna's member as its party sets out (parties.js, `forTrip`).
 export function finishActivity(db, player, now, { choice, forTrip = false } = {}) {
-  const finish = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting, minerals: finishMining, jewels: finishJewels }[player.activity?.kind];
+  const finish = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting, minerals: finishMining, jewels: finishJewels, fish: finishFishing, crops: finishFarming, dishes: finishCooking }[player.activity?.kind];
   return finish && player.activity.ends_at <= now ? finish(db, player, now) : finishHunt(db, player, now, { choice, forTrip });
 }
 
@@ -848,6 +908,8 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
       hard: !trip && options.hard === true,
       // The week it set out in (weeks.js), none before the weeks.
       week: keptWeek(options),
+      // The meal eaten as it set out (cooking.js): its own, so on a trip too.
+      meal: options.meal ?? null,
       cards: collection && { maxed: maxedCards(collection), owned: [...collection.keys()], ...cardExplorationBonus(collection.size, content()) },
     },
     content(),

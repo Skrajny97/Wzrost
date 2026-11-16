@@ -3077,6 +3077,9 @@ describe('Profesje', () => {
       ['crafting', false, true],
       ['mining', false, true],
       ['jewelcrafting', false, true],
+      ['fishing', false, true],
+      ['farming', false, true],
+      ['cooking', false, true],
     ]);
     assert.equal(professions.workshop, null);
   });

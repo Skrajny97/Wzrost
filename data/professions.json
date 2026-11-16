@@ -85,9 +85,51 @@
       "statPerLevel": 3,
       "maxLevelBonus": 153,
       "description": "Wyrób biżuterii i oprawianie kamieni w Systemowej Szlifierni."
+    },
+    {
+      "id": "fishing",
+      "name": "Rybołówstwo",
+      "genitive": "Rybołówstwa",
+      "kind": "gathering",
+      "unlockLevel": 25,
+      "stats": ["dexterity", "will"],
+      "maxLevel": 200,
+      "masteryLevel": 100,
+      "levelMinutes": 30,
+      "statPerLevel": 3,
+      "maxLevelBonus": 153,
+      "description": "Łowienie ryb w Systemowym Stawie, bez walk i bez ryzyka."
+    },
+    {
+      "id": "farming",
+      "name": "Rolnictwo",
+      "genitive": "Rolnictwa",
+      "kind": "gathering",
+      "unlockLevel": 25,
+      "stats": ["strength", "endurance"],
+      "maxLevel": 200,
+      "masteryLevel": 100,
+      "levelMinutes": 30,
+      "statPerLevel": 3,
+      "maxLevelBonus": 153,
+      "description": "Uprawa roślin na Systemowym Polu, grządka po grządce."
+    },
+    {
+      "id": "cooking",
+      "name": "Gotowanie",
+      "genitive": "Gotowania",
+      "kind": "crafting",
+      "unlockLevel": 25,
+      "stats": ["vitality", "intellect"],
+      "maxLevel": 200,
+      "masteryLevel": 100,
+      "levelMinutes": 30,
+      "statPerLevel": 3,
+      "maxLevelBonus": 153,
+      "description": "Gotowanie potraw z ryb, plonów i ziół w Systemowej Kuchni."
     }
   ],
-  "rows": [["herbalism", "mining"], ["alchemy", "jewelcrafting"], ["crafting"]],
+  "rows": [["herbalism", "mining"], ["alchemy", "jewelcrafting"], ["fishing", "farming"], ["cooking", "crafting"]],
   "gathering": {
     "profession": "herbalism",
     "place": {
@@ -269,6 +311,40 @@
       "pushBody": ["Kopanie zakończone: {place}. Raport czeka na odbiór."]
     }
   },
+  "fishing": {
+    "profession": "fishing",
+    "place": {
+      "id": "system-pond",
+      "name": "Systemowy Staw",
+      "description": "Woda jest tu tak spokojna, że widać w niej niebo. System odsłania ryby dopiero wtedy, gdy uzna, że umiesz je złowić."
+    },
+    "minutes": { "min": 10, "step": 10, "max": 480 },
+    "yieldPerLevel": 0.02,
+    "spread": 0.15,
+    "slots": [
+      { "level": 1, "fish": 1 },
+      { "level": 10, "fish": 2 },
+      { "level": 25, "fish": 3 },
+      { "level": 50, "fish": 4 }
+    ],
+    "mastery": { "from": 100, "to": 200, "chance": 0.1 },
+    "about": [
+      "Wybierasz ryby i czas połowu, od 10 minut do 8 godzin. Z poziomem Rybołówstwa System odsłania nowe ryby i pozwala łowić kilka rodzajów naraz.",
+      "Ryby nie zajmują miejsca w plecaku: trzymasz je w Spiżarni. Kupi je karczmarz Zbylut, a wkrótce przydadzą się też w Gotowaniu."
+    ],
+    "texts": {
+      "report": ["Spławik kołysze się na wodzie, a w koszu przybywa ryb.", "Nad Stawem unosi się mgła, a ryby biorą jedna po drugiej.", "Błękitne linie Systemu prowadzą żyłkę tam, gdzie czekają ryby."],
+      "caught": ["Złowiono: {fish}."],
+      "lucky": ["Szczęśliwy połów, dodatkowo: {fish}."],
+      "mastery": ["Każda złowiona ryba ma {chance}% szans na jedną dodatkową."],
+      "revealed": ["System odsłania nową rybę: {fish}"],
+      "hidden": ["Ukryte przez System do {level}. poziomu Rybołówstwa."],
+      "busy": ["Postać łowi ryby. Poczekaj na koniec połowu."],
+      "claimFirst": ["Połów się skończył. Najpierw odbierz raport."],
+      "pushTitle": ["Koniec połowu"],
+      "pushBody": ["Połów zakończony: {place}. Raport czeka na odbiór."]
+    }
+  },
   "jewelcrafting": {
     "profession": "jewelcrafting",
     "place": {
@@ -337,6 +413,207 @@
     { "id": "silver-ore", "kind": "ore", "name": "Srebrny kruszec", "genitive": "Srebrnego kruszcu", "for": ["common", "rare", "unique"], "level": 1, "perHour": 5, "price": 2, "description": "Ruda srebra na oprawy biżuterii pospolitej, rzadkiej i unikalnej." },
     { "id": "gold-ore", "kind": "ore", "name": "Złoty kruszec", "genitive": "Złotego kruszcu", "for": ["epic", "legendary"], "level": 25, "perHour": 2.5, "price": 4, "description": "Ruda złota na oprawy biżuterii epickiej i legendarnej." },
     { "id": "star-ore", "kind": "ore", "name": "Gwiezdny kruszec", "genitive": "Gwiezdnego kruszcu", "for": ["mythic", "divine"], "level": 60, "perHour": 1.25, "price": 8, "description": "Ruda z odłamków gwiazd na oprawy biżuterii mitycznej i boskiej." }
+  ],
+  "farming": {
+    "profession": "farming",
+    "place": {
+      "id": "system-field",
+      "name": "Systemowe Pole",
+      "description": "Ziemia daje temu, kto ją rozumie. System pokazuje nowe rośliny, gdy uzna, że umiesz je uprawiać."
+    },
+    "minutes": {
+      "min": 10,
+      "step": 10,
+      "max": 480
+    },
+    "yieldPerLevel": 0.02,
+    "spread": 0.15,
+    "plots": [
+      {
+        "level": 1,
+        "plots": 4
+      },
+      {
+        "level": 10,
+        "plots": 6
+      },
+      {
+        "level": 25,
+        "plots": 9
+      },
+      {
+        "level": 50,
+        "plots": 12
+      },
+      {
+        "level": 100,
+        "plots": 16
+      }
+    ],
+    "stages": 4,
+    "mastery": {
+      "from": 100,
+      "to": 200,
+      "chance": 0.1
+    },
+    "about": [
+      "Stukasz grządkę i wybierasz, co na niej wyrośnie: każda grządka może mieć inną roślinę. Potem wybierasz czas uprawy, od 10 minut do 8 godzin. Czas dzieli się po równo między obsiane grządki.",
+      "Z poziomem Rolnictwa System odsłania nowe rośliny i daje więcej grządek. Plony trafiają do Spiżarni: kupi je karczmarz Zbylut, a wkrótce przydadzą się w Gotowaniu."
+    ],
+    "texts": {
+      "report": [
+        "Rośliny dojrzały w słońcu, a grządki pachną świeżą ziemią.",
+        "Wiatr kołysał kłosami, a System pilnował każdej grządki.",
+        "Strach na wróble odegnał ptaki i plony zostały całe."
+      ],
+      "harvested": [
+        "Zebrano: {crops}."
+      ],
+      "lucky": [
+        "Urodzaj, dodatkowo: {crops}."
+      ],
+      "mastery": [
+        "Każdy zebrany plon ma {chance}% szans na jeden dodatkowy."
+      ],
+      "revealed": [
+        "System odsłania nową roślinę: {crop}"
+      ],
+      "hidden": [
+        "Ukryte przez System do {level}. poziomu Rolnictwa."
+      ],
+      "busy": [
+        "Postać uprawia pole. Poczekaj na koniec uprawy."
+      ],
+      "claimFirst": [
+        "Uprawa się skończyła. Najpierw odbierz raport."
+      ],
+      "pushTitle": [
+        "Koniec uprawy"
+      ],
+      "pushBody": [
+        "Plony gotowe: {place}. Raport czeka na odbiór."
+      ],
+      "stages": [
+        "ziarna z kiełkami",
+        "siewki",
+        "młode rośliny",
+        "dojrzałe rośliny"
+      ]
+    }
+  },
+  "cooking": {
+    "profession": "cooking",
+    "place": {
+      "id": "system-kitchen",
+      "name": "Systemowa Kuchnia",
+      "description": "Ogień płonie tu bez drewna, a kociołki same wiszą nad paleniskiem. System odsłania przepisy dopiero wtedy, gdy uzna, że umiesz je ugotować."
+    },
+    "dishMinutes": 10,
+    "speedPerLevel": 0.01,
+    "fastest": 0.5,
+    "maxMinutes": 480,
+    "bonusChance": 0,
+    "mastery": { "from": 100, "to": 200, "chance": 0.1 },
+    "priceFactor": 1.5,
+    "meal": { "minutes": 240 },
+    "bonuses": {
+      "xp": "+{value}% XP z wyprawy",
+      "materials": "+{value}% materiałów ze stworów",
+      "rare": "+{value} pkt proc. szansy na rzadszy przedmiot",
+      "gold": "+{value}% złota z wyprawy",
+      "cards": "+{value}% szansy na karty i pakiety kart",
+      "resources": "+{value}% surowców do obozu",
+      "chests": "+{value}% szansy na skrzynię wśród znalezisk"
+    },
+    "about": [
+      "Wybierasz przepis i liczbę potraw. Ryby i plony bierzesz ze Spiżarni, a niektóre przepisy potrzebują też ziół z plecaka. Z poziomem Gotowania System odsłania nowe przepisy, a praca idzie szybciej.",
+      "Potrawy trafiają do Spiżarni. Przy wyruszaniu na wyprawę wybierasz jedną: postać ją zjada, a premia działa przez 4 godziny wypraw. Wyprawa 4-godzinna zużywa ją całą, krótsze po kolei. Nową potrawę zjesz, gdy poprzednia się skończy."
+    ],
+    "texts": {
+      "report": [
+        "W Kuchni bulgocze kociołek, a z pieca pachnie świeżym chlebem.",
+        "Błękitne linie Systemu odmierzają szczyptę soli i czas gotowania.",
+        "Ogień pod kociołkiem płonie równo, a potrawy wychodzą jedna po drugiej."
+      ],
+      "cooked": ["Ugotowano: {dishes}."],
+      "lucky": ["Udane gotowanie, dodatkowo: {dishes}."],
+      "stopped": ["Gotowanie przerwane. Składniki na resztę potraw wróciły na swoje miejsce."],
+      "bagFull": ["Zioła na resztę gotowania nie zmieszczą się w plecaku. Zrób w nim miejsce."],
+      "mastery": ["Każda ugotowana potrawa ma {chance}% szans na jedną dodatkową."],
+      "revealed": ["System odsłania nowy przepis: {dish}"],
+      "hidden": ["Ukryte przez System do {level}. poziomu Gotowania."],
+      "busy": ["Postać gotuje. Poczekaj na koniec gotowania."],
+      "claimFirst": ["Gotowanie się skończyło. Najpierw odbierz raport."],
+      "pushTitle": ["Koniec gotowania"],
+      "pushBody": ["Potrawy gotowe: {place}. Raport czeka na odbiór."],
+      "eaten": ["Postać zjada: {dish}. {bonus} przez 4 godziny wypraw."],
+      "mealLine": ["Posiłek ({dish}) działał przez {time} tej wyprawy: {bonus}."],
+      "mealOver": ["Posiłek się skończył. Nową potrawę wybierzesz przy następnej wyprawie."],
+      "mealActive": ["Posiłek jeszcze działa: {dish}, zostało {time} wypraw."],
+      "noDish": ["Nie masz tej potrawy w Spiżarni."]
+    }
+  },
+  "fish": [
+    { "id": "roach", "name": "Płotka", "genitive": "Płotki", "level": 1, "perHour": 6, "price": 2, "description": "Srebrna drobnica o czerwonych oczach. Bierze na wszystko." },
+    { "id": "perch", "name": "Okoń", "genitive": "Okonia", "level": 3, "perHour": 5, "price": 3, "description": "Pręgowany drapieżnik z kolczastą płetwą. Uważaj na palce." },
+    { "id": "crucian", "name": "Karaś", "genitive": "Karasia", "level": 5, "perHour": 4, "price": 4, "description": "Złocisty i krępy. Przeżyje nawet w mulistym stawie." },
+    { "id": "bream", "name": "Leszcz", "genitive": "Leszcza", "level": 8, "perHour": 4, "price": 5, "description": "Płaski i oślizgły. Pływa stadami przy samym dnie." },
+    { "id": "tench", "name": "Lin", "genitive": "Lina", "level": 12, "perHour": 4, "price": 6, "description": "Zielonozłoty, o drobnych łuskach. Lubi zarośnięte zatoczki." },
+    { "id": "carp", "name": "Karp", "genitive": "Karpia", "level": 16, "perHour": 3, "price": 7, "description": "Gruby i ostrożny. Długo się z nim walczy." },
+    { "id": "eel", "name": "Węgorz", "genitive": "Węgorza", "level": 22, "perHour": 3, "price": 8, "description": "Wije się jak wąż, a nocą wychodzi na mokre łąki." },
+    { "id": "pike", "name": "Szczupak", "genitive": "Szczupaka", "level": 28, "perHour": 3, "price": 10, "description": "Wodny wilk z paszczą pełną zębów. Czeka w trzcinach." },
+    { "id": "zander", "name": "Sandacz", "genitive": "Sandacza", "level": 34, "perHour": 2, "price": 12, "description": "Szklistooki łowca z głębin. Poluje o zmierzchu." },
+    { "id": "trout", "name": "Pstrąg", "genitive": "Pstrąga", "level": 40, "perHour": 2, "price": 14, "description": "Kropkowany, z zimnych potoków. Ucieka przed każdym cieniem." },
+    { "id": "catfish", "name": "Sum", "genitive": "Suma", "level": 50, "perHour": 2, "price": 18, "description": "Wąsaty olbrzym z dna. Podobno połyka kaczki." },
+    { "id": "sturgeon", "name": "Jesiotr", "genitive": "Jesiotra", "level": 65, "perHour": 1, "price": 24, "description": "Pancerny jak ryba z dawnych czasów. Żyje sto lat." },
+    { "id": "salmon", "name": "Łosoś", "genitive": "Łososia", "level": 90, "perHour": 0.5, "price": 60, "description": "Płynie pod prąd do rzeki, w której się urodził." },
+    { "id": "golden-carp", "name": "Złotołuski karp", "genitive": "Złotołuskiego karpia", "level": 100, "perHour": 0.5, "price": 80, "description": "Kto nosi w sakiewce jego łuskę, temu nie brakuje grosza." },
+    { "id": "water-catfish", "name": "Sum wodnika", "genitive": "Suma wodnika", "level": 120, "perHour": 0.4, "price": 100, "description": "Wodnik trzyma go w swoim stawie jak psa. Po zmroku lepiej nie wracać nad wodę." },
+    { "id": "silverfish", "name": "Srebrnica ze Świtezi", "genitive": "Srebrnicy ze Świtezi", "level": 140, "perHour": 0.35, "price": 130, "description": "Pływa nad zatopionym grodem na dnie jeziora. W pełni księżyca świeci jak srebro." },
+    { "id": "drowned-pike", "name": "Szczupak topielca", "genitive": "Szczupaka topielca", "level": 160, "perHour": 0.3, "price": 170, "description": "Czarny i stary jak młyn. Mówią, że mieszka w nim dusza topielca." },
+    { "id": "golden-fish", "name": "Złota rybka", "genitive": "Złotej rybki", "level": 180, "perHour": 0.25, "price": 220, "description": "Mówi ludzkim głosem i obiecuje spełnić życzenie, jeśli ją wypuścisz." }
+  ],
+  "crops": [
+    {"id": "turnip", "name": "Rzepa", "genitive": "Rzepy", "level": 1, "perHour": 6, "price": 2, "description": "Biało-fioletowa i twarda. Wyrośnie nawet u leniwego."},
+    {"id": "peas", "name": "Groch", "genitive": "Grochu", "level": 3, "perHour": 5, "price": 3, "description": "Strąki pełne zielonych kulek. Bez niego nie ma grochówki."},
+    {"id": "millet", "name": "Proso", "genitive": "Prosa", "level": 5, "perHour": 4, "price": 4, "description": "Drobne złote ziarno. Gotuje się z niego kaszę jaglaną."},
+    {"id": "oats", "name": "Owies", "genitive": "Owsa", "level": 8, "perHour": 4, "price": 5, "description": "Wiotkie kłosy na wietrze. Konie dałyby się za niego pokroić."},
+    {"id": "cabbage", "name": "Kapusta", "genitive": "Kapusty", "level": 12, "perHour": 4, "price": 6, "description": "Ciężka główka liści. Kiszona starczy na całą zimę."},
+    {"id": "onion", "name": "Cebula", "genitive": "Cebuli", "level": 16, "perHour": 3, "price": 7, "description": "Złota łuska i ostry zapach. Wyciska łzy nawet twardzielom."},
+    {"id": "carrot", "name": "Marchew", "genitive": "Marchwi", "level": 22, "perHour": 3, "price": 8, "description": "Pomarańczowa i słodka. Podobno wyostrza wzrok."},
+    {"id": "rye", "name": "Żyto", "genitive": "Żyta", "level": 28, "perHour": 3, "price": 10, "description": "Wysokie kłosy z długimi wąsami. Z żyta jest chleb i żur."},
+    {"id": "broad-bean", "name": "Bób", "genitive": "Bobu", "level": 34, "perHour": 2, "price": 12, "description": "Grube strąki i tłuste ziarna. Najlepszy z masłem i koperkiem."},
+    {"id": "beet", "name": "Burak", "genitive": "Buraka", "level": 40, "perHour": 2, "price": 14, "description": "Ciemnoczerwony korzeń. Barwi zupę i ręce."},
+    {"id": "wheat", "name": "Pszenica", "genitive": "Pszenicy", "level": 50, "perHour": 2, "price": 18, "description": "Złote kłosy na najlepszą mąkę. Pole pszenicy to bogactwo."},
+    {"id": "buckwheat", "name": "Gryka", "genitive": "Gryki", "level": 65, "perHour": 1, "price": 24, "description": "Kwitnie na biało i pachnie miodem. Daje kaszę gryczaną."},
+    {"id": "pumpkin", "name": "Dynia", "genitive": "Dyni", "level": 90, "perHour": 0.5, "price": 60, "description": "Wielka i pomarańczowa. Jedna starczy na zupę dla całej drużyny."},
+    {"id": "poppy", "name": "Mak", "genitive": "Maku", "level": 100, "perHour": 0.5, "price": 80, "description": "Czerwone kwiaty i makówki pełne ziaren. Sypano go przeciw upiorom."},
+    {"id": "garlic", "name": "Czosnek", "genitive": "Czosnku", "level": 120, "perHour": 0.4, "price": 100, "description": "Biała główka o mocnym zapachu. Odstrasza upiory i wampiry."},
+    {"id": "giant-turnip", "name": "Rzepka olbrzymka", "genitive": "Rzepki olbrzymki", "level": 140, "perHour": 0.35, "price": 130, "description": "Tak wielka, że cała wieś ciągnęła ją z ziemi."},
+    {"id": "golden-ear", "name": "Złoty kłos", "genitive": "Złotego kłosa", "level": 160, "perHour": 0.3, "price": 170, "description": "Ostatni kłos żniw, w którym mieszka duch pola. Przynosi szczęście."},
+    {"id": "mokosh-grain", "name": "Ziarno Mokoszy", "genitive": "Ziarna Mokoszy", "level": 180, "perHour": 0.25, "price": 220, "description": "Ziarno bogini ziemi. Gdzie upadnie, tam przez rok nie ma głodu."}
+  ],
+  "dishes": [
+    {"id": "baked-turnip", "name": "Pieczona rzepa", "level": 1, "ingredients": {"turnip": 3}, "bonuses": [{"kind": "materials", "value": 15}], "description": "Upieczona w popiele ogniska. Prosta, ale syta."},
+    {"id": "pea-soup", "name": "Grochówka", "level": 3, "ingredients": {"peas": 2, "turnip": 1}, "bonuses": [{"kind": "gold", "value": 8}], "description": "Gęsta i rozgrzewająca. Najlepsza z wielkiego kotła."},
+    {"id": "fried-roach", "name": "Smażone płotki", "level": 5, "ingredients": {"roach": 2, "perch": 1}, "bonuses": [{"kind": "xp", "value": 8}], "description": "Chrupiące, jada się je razem z ośćmi."},
+    {"id": "millet-crucian", "name": "Kasza jaglana z karasiem", "level": 8, "ingredients": {"millet": 2, "crucian": 1}, "bonuses": [{"kind": "rare", "value": 3}], "description": "Złota kasza i złoty karaś. Na szczęście."},
+    {"id": "oat-kissel", "name": "Kisiel owsiany", "level": 12, "ingredients": {"oats": 3}, "bonuses": [{"kind": "cards", "value": 25}], "description": "Gęsty, szary kisiel z owsa. Jadali go już dawni Słowianie."},
+    {"id": "fish-cabbage", "name": "Ryby duszone w kapuście", "level": 16, "ingredients": {"tench": 1, "bream": 1, "cabbage": 2}, "bonuses": [{"kind": "materials", "value": 25}, {"kind": "resources", "value": 15}], "description": "Lin i leszcz pod kapuścianymi liśćmi, duszone, aż zmiękną."},
+    {"id": "fried-carp", "name": "Smażony karp z cebulą", "level": 22, "ingredients": {"carp": 1, "onion": 1}, "bonuses": [{"kind": "gold", "value": 12}, {"kind": "rare", "value": 3}], "description": "Złota skórka, a łuskę schowaj do sakiewki."},
+    {"id": "zurek", "name": "Żurek", "level": 28, "ingredients": {"rye": 2, "carrot": 1}, "bonuses": [{"kind": "xp", "value": 12}, {"kind": "chests", "value": 10}], "description": "Kwaśny żur na zakwasie z żyta. Stawia na nogi."},
+    {"id": "eel-beans", "name": "Węgorz z bobem", "level": 34, "ingredients": {"eel": 1, "broad-bean": 2}, "bonuses": [{"kind": "rare", "value": 4}, {"kind": "materials", "value": 15}], "description": "Tłusty węgorz i młody bób. Uczta nad rzeką."},
+    {"id": "borscht", "name": "Barszcz czerwony", "level": 40, "ingredients": {"beet": 2, "onion": 1}, "bonuses": [{"kind": "cards", "value": 40}, {"kind": "xp", "value": 8}], "description": "Rubinowy i klarowny jak mikstura."},
+    {"id": "pike-pierogi", "name": "Pierogi ze szczupakiem", "level": 50, "ingredients": {"wheat": 2, "pike": 1}, "bonuses": [{"kind": "xp", "value": 18}, {"kind": "gold", "value": 12}], "description": "Lepione w całej chacie. Każdy wychodzi inny."},
+    {"id": "buckwheat-zander", "name": "Kasza gryczana z sandaczem", "level": 65, "ingredients": {"buckwheat": 2, "zander": 1}, "bonuses": [{"kind": "materials", "value": 35}, {"kind": "resources", "value": 25}], "description": "Ciemna, pachnąca kasza. Daje siłę drwalom i wojom."},
+    {"id": "campfire-trout", "name": "Pstrąg z ogniska", "level": 80, "ingredients": {"trout": 1, "carrot": 2}, "bonuses": [{"kind": "rare", "value": 6}, {"kind": "chests", "value": 15}], "description": "Pieczony na kiju nad ogniskiem. Pachnie dymem i potokiem."},
+    {"id": "pumpkin-soup", "name": "Zupa dyniowa", "level": 90, "ingredients": {"pumpkin": 1, "onion": 1}, "bonuses": [{"kind": "cards", "value": 60}, {"kind": "resources", "value": 25}], "description": "Gęsta i pomarańczowa. Jedna dynia starcza na cały kocioł."},
+    {"id": "fisherman-feast", "name": "Uczta rybaka", "level": 110, "ingredients": {"catfish": 1, "sturgeon": 1, "onion": 1}, "bonuses": [{"kind": "gold", "value": 18}, {"kind": "chests", "value": 15}], "description": "Dwa olbrzymy z dna na jednym półmisku. Potrawa dla bogaczy."},
+    {"id": "kutia", "name": "Kutia", "level": 120, "ingredients": {"wheat": 2, "poppy": 2}, "bonuses": [{"kind": "xp", "value": 25}, {"kind": "cards", "value": 60}, {"kind": "rare", "value": 6}], "description": "Pszenica z makiem. Potrawa dla żywych i dla duchów przodków."},
+    {"id": "garlic-salmon", "name": "Łosoś w czosnku", "level": 130, "ingredients": {"salmon": 1, "garlic": 2}, "bonuses": [{"kind": "materials", "value": 50}, {"kind": "xp", "value": 18}, {"kind": "chests", "value": 20}], "description": "Pieczony różowy łosoś. Upiory omijają tę kuchnię z daleka."},
+    {"id": "golden-carp-herbs", "name": "Złoty karp w ziołach", "level": 145, "ingredients": {"golden-carp": 1, "giant-turnip": 1, "st-johns-wort": 2}, "bonuses": [{"kind": "gold", "value": 25}, {"kind": "chests", "value": 20}, {"kind": "rare", "value": 6}], "description": "Złote łuski chrupią jak monety."},
+    {"id": "switez-soup", "name": "Zupa ze Świtezi", "level": 165, "ingredients": {"silverfish": 1, "water-catfish": 1, "drowned-pike": 1}, "bonuses": [{"kind": "rare", "value": 8}, {"kind": "cards", "value": 60}, {"kind": "resources", "value": 35}], "description": "Trzy ryby z najgłębszych wód. Zupa świeci w misce jak księżyc nad jeziorem."},
+    {"id": "mokosh-feast", "name": "Uczta Mokoszy", "level": 180, "ingredients": {"mokosh-grain": 1, "golden-ear": 1, "golden-fish": 1}, "bonuses": [{"kind": "cards", "value": 80}, {"kind": "xp", "value": 18}, {"kind": "gold", "value": 18}, {"kind": "materials", "value": 35}], "description": "Chleb z ziarna bogini i złota rybka. Najwspanialsza uczta Systemu."}
   ],
   "potionUse": {
     "fightForms": ["walkę", "walki", "walk"],

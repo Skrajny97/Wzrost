@@ -33,7 +33,7 @@ const slots = (player, now) => bagCapacity(campLevels(player.buildings, now, con
 
 // The column of the characters row each kind of goods is kept in, and the
 // kinds that take the bag's places, a place to a stack (bagPlaces).
-const COLUMNS = { resource: 'resources', potion: 'potions', herb: 'herbs', material: 'materials', mineral: 'minerals' };
+const COLUMNS = { resource: 'resources', potion: 'potions', herb: 'herbs', material: 'materials', mineral: 'minerals', pantry: 'pantry' };
 const IN_BAG = new Set(['herb', 'potion']);
 const jsonPath = (key) => `$."${key}"`;
 // A batch of goods that failed on its assertion: the character or the
@@ -42,7 +42,7 @@ const changed = () => new ApiError(409, 'character_changed', 'Coś zmieniło si�
 
 // The data's list of a kind of goods; materials are stacks of a material
 // and a rarity instead (knownStack).
-const listOf = (kind) => ({ resource: content().resources, potion: content().potions, herb: content().herbs, mineral: content().minerals, scroll: scrollGoods() })[kind] ?? [];
+const listOf = (kind) => ({ resource: content().resources, potion: content().potions, herb: content().herbs, mineral: content().minerals, scroll: scrollGoods(), pantry: content().pantry })[kind] ?? [];
 
 // A good as the chest shows it, or null for one the data does not know: its
 // name in the request's language, as the character's own lists name it (a
