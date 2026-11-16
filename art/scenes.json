@@ -53,6 +53,16 @@
       "description": "a small hooded figure with a glowing ice-blue face hoeing a bed of soil in a field",
       "action": "hoeing the soil in a smooth seamless loop: raising the hoe and bringing it down into the bed, small clods of dark soil fly at each stroke, the grass moves a little in the breeze, the fence and the scarecrow stay still"
     },
+    "fishing-2": {
+      "start": "art/references/scenes/fishing-hd.png",
+      "description": "a small hooded figure with a glowing ice-blue face sitting on a wooden pier at a misty pond and fishing",
+      "action": "sitting still and holding the fishing rod steady in a smooth seamless loop: the figure slowly raises its head a little to look up, lowers the rod tip slightly toward the water, then lifts its head and the rod back to the starting pose, no swinging or waving of the rod, the line hangs straight down to the red and white float which bobs gently with small ripples, the pier, the basket, the willow, the trees and the pond stay completely still"
+    },
+    "farming-water": {
+      "start": "art/references/scenes/farming-water.png",
+      "description": "a small hooded figure with a glowing ice-blue face watering a bed of seedlings with a watering can in a field",
+      "action": "watering the seedlings in a smooth seamless loop: the figure tilts the watering can forward and back a little, a thin stream of water drops pours from the spout onto the seedlings in every frame and small splashes rise from the soil, the figure's feet stay in place, the fence, the trees, the sky and the scarecrow stay completely still"
+    },
     "cooking": {
       "start": "art/references/scenes/cooking-hd.png",
       "description": "a small hooded figure with a glowing ice-blue face stirring soup in a black cauldron in a village kitchen",
