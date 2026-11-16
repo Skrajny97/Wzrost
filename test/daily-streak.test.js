@@ -1,6 +1,7 @@
 // The reward for days in a row (1029, mock-ups 1034 accepted, 1034.4 B):
-// one series for the account, a day from midnight Polish time, each day
-// once; a day missed starts it anew, and after the seventh a new one starts.
+// each character its own series (the author, 16.11.2026: „powinna działać na
+// wszystkich postaciach”), a day from midnight Polish time, each day once; a
+// day missed starts it anew, and after the seventh a new one starts.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -18,7 +19,7 @@ describe('the reward for days in a row (1029)', () => {
   // Noon of a day, Polish time, `offset` days after the first.
   const start = questPeriod('daily', Date.now() + 10 * DAY, content).startsAt + 12 * 3600000;
   const noon = (offset) => start + offset * DAY;
-  const row = async () => (await db()).prepare('SELECT c.gold, c.time_points, c.system_points, c.card_packs, c.level, u.streak_day, u.streak_done FROM characters c JOIN users u ON u.id = c.user_id WHERE c.name = ?').bind('Wytrwała').first();
+  const row = async () => (await db()).prepare('SELECT gold, time_points, system_points, card_packs, level, streak_day, streak_done FROM characters WHERE name = ?').bind('Wytrwała').first();
   const look = async (offset) => (await call('GET', '/api/streak', { cookie, now: noon(offset) })).data.streak;
   const take = (offset) => call('POST', '/api/streak', { cookie, now: noon(offset) });
 
@@ -73,16 +74,17 @@ describe('the reward for days in a row (1029)', () => {
     assert.equal((await take(3)).data.streak.day, 1);
   });
 
-  test('one series for the account: another character of it finds the day taken', async () => {
+  test('each character its own series: another character of the account takes its own day', async () => {
     await take(0);
     const database = await db();
     const { id: _, ...character } = await database.prepare("SELECT * FROM characters WHERE name = 'Wytrwała'").first();
-    const other = { ...character, name: 'Druga', name_key: 'druga', role: 'player' };
+    const other = { ...character, name: 'Druga', name_key: 'druga', role: 'player', streak_day: 0, streak_at: null, streak_done: 0 };
     await database.prepare("UPDATE characters SET role = 'aside' WHERE name = 'Wytrwała'").run();
     const columns = Object.keys(other);
     await database.prepare(`INSERT INTO characters (${columns.join(', ')}) VALUES (${columns.map(() => '?').join(', ')})`).bind(...columns.map((column) => other[column])).run();
     const seen = await look(0);
-    assert.deepEqual([seen.day, seen.taken], [1, true]);
+    assert.deepEqual([seen.day, seen.taken], [1, false]);
+    assert.equal((await take(0)).status, 200);
     assert.equal((await take(0)).status, 409);
     assert.equal((await look(1)).day, 2);
   });
