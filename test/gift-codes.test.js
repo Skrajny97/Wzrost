@@ -154,6 +154,21 @@ describe('gift codes in the engine', () => {
     assert.equal(giftCodeOf('KAWA1000', Date.parse('2026-11-16T18:00:00+01:00'), [], content, key('Kodowiec')).reason, 'unknown');
   });
 
+  test('DISCORD100 gives 100 Punktów Systemu and 100 Punktów Czasu once, to the winner of the first Discord draw only, until the end of 17 December in Warsaw', () => {
+    // The author, 16.11.2026: the draw ends on 17 November at 18:16 and the
+    // winner's name comes then; until it does, the key is nobody's name, so
+    // the code works for no character.
+    const gift = content.giftCodes.find((each) => each.id === 'discord-2026-11');
+    assert.equal(gift.code, 'DISCORD100');
+    assert.match(gift.for, /^[0-9a-f]{64}$/);
+    assert.deepEqual(gift.rewards, { systemPoints: 100, timePoints: 100 });
+    assert.equal(giftRewardsText(gift.rewards, content), 'Punkty Systemu +100, Punkty Czasu +100');
+    assert.equal(giftCodeOf('discord100', Date.parse('2026-12-17T23:59:00+01:00'), [], content, gift.for).gift, gift);
+    assert.equal(giftCodeOf('DISCORD100', Date.parse('2026-12-18T00:00:00+01:00'), [], content, gift.for).reason, 'expired');
+    assert.equal(giftCodeOf('DISCORD100', Date.parse('2026-11-17T19:00:00+01:00'), ['discord-2026-11'], content, gift.for).reason, 'used');
+    assert.equal(giftCodeOf('DISCORD100', Date.parse('2026-11-17T19:00:00+01:00'), [], content, key('Kodowiec')).reason, 'unknown');
+  });
+
   test('the rewards in words, and the resources added to what the character has', () => {
     assert.equal(giftRewardsText(tester.rewards, content), 'Punkty Systemu +100, Punkty Czasu +100, złoto +1000, drewno +100, kamień +100, ruda żelaza +100');
     assert.deepEqual(withGiftResources({ wood: 5 }, tester.rewards), { wood: 105, stone: 100, 'iron-ore': 100 });

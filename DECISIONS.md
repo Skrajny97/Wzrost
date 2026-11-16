@@ -3580,6 +3580,14 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Kod DISCORD100 (16.11.2026, czeka na imię zwycięzcy)
+
+Autor 16.11.2026: „Przygotuj też kod DISCORD100 na jutro gdzie tylko uzupełnimy nazwę gracza później”, ze zrzutem losowania na Discordzie: „100 Punktów Systemu i 100 Punktów Czasu”, koniec 17.11.2026 o 18:16, jeden zwycięzca.
+
+1. Kod `DISCORD100` (`discord-2026-11` w `data/gift-codes.json`) daje 100 Punktów Systemu i 100 Punktów Czasu, raz, tylko jednej postaci, do 17.12.2026 włącznie (brakujący szczegół: miesiąc, jak przy kodach za kawę).
+2. Do czasu, aż autor poda imię postaci zwycięzcy, w `for` stoi skrót SHA-256 losowych znaków, czyli niczyjego imienia, więc kod nie działa dla nikogo. Po losowaniu wystarczy zamienić go na skrót imienia zwycięzcy i wdrożyć.
+3. Kod nie trafia do „Co nowego?”, bo jest dla jednej postaci; autor przekazuje go sam.
+
 ## Wersja 0.3.95 (16.11.2026): Arena wyrównana na poziomach Łysogór, poświata karty w pakiecie, Warsztat zbadany
 
 Autor 16.11.2026 do listy zadań: „Ad. 4 Zbalansuj zatem Arenę”, „Ad. 6 Zbadaj”, „Ad. 7 rób drobiazgi” i „Ad. 8 domostwo pomijamy i to co dalej”, a o kodzie TIGER: „kodu TIGER nie przedłużamy” (1026 B, kod wygasł 17.11 o północy).
