@@ -25,9 +25,9 @@
 // parts' words come in it from the server.
 
 import { placeArt } from '../art.js';
-import { checkGuildTodo, guildSeen, guildTodoNews, onChatNews } from '../chat-news.js';
+import { channelRead, checkGuildTodo, guildSeen, guildTodoNews, noticeNews, onChatNews } from '../chat-news.js';
 import { $, fill, h, icon } from '../dom.js';
-import { formatNumber } from '../format.js';
+import { dateTimeFormat, formatNumber, timeFormat } from '../format.js';
 import { t } from '../i18n.js';
 import { mountGuildBeast } from '../guild-beast.js';
 import { mountGuildChest } from '../guild-chest.js';
@@ -41,7 +41,7 @@ import { mountGuildWar } from '../guild-war.js';
 import { CLASS_ICONS } from '../icons.js';
 import { narrate } from '../narrator.js';
 import { openProfile } from '../profile.js';
-import { call, isUnlocked, state } from '../state.js';
+import { call, isUnlocked, serverNow, state } from '../state.js';
 import { confirmAction, foldPart, framedName, guildTag, toast, withButton } from '../ui.js';
 import { lockedScreen } from './locked.js';
 
@@ -145,8 +145,8 @@ export function mountGuildPage(container, context) {
           // Something to do in this part: a trial's chest, an attack on the
           // Bestia or on the Wyprawa's guardian or a chest, a gift to thank
           // for, an item waiting in the Skrzynia (chat-news.js,
-          // guild-todo.js).
-          guildTodoNews(tab.id) && h('span', { class: 'community-dot', role: 'img', 'aria-label': t('do zrobienia') }),
+          // guild-todo.js); on the first tab a new announcement (998.1).
+          (guildTodoNews(tab.id) || (tab.id === 'guild' && noticeNews())) && h('span', { class: 'community-dot', role: 'img', 'aria-label': t('do zrobienia') }),
         );
         button.style.setProperty('--guild-span', String(second ? (index < first ? second : first) : 1));
         return button;
@@ -174,6 +174,9 @@ function mountGuild(container) {
   // The Ranking członków (guild-ranking.js, 897 A), under the guild's card:
   // made once for the guild, kept as the cards are drawn anew.
   let ranking = null;
+  // The guild's board of announcements on top (noticeBoard), made once for
+  // the guild too.
+  let board = null;
   const body = h('div', { class: 'friends guild' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
   fill(container, body);
 
@@ -185,7 +188,116 @@ function mountGuild(container) {
       ranking = guildRankingCard();
       ranking.dataset.guild = String(view.guild.id);
     }
-    fill(body, invitesCard(), view.guild ? [guildCard(), ranking, inviteCard(), sentCard(), leaveCard()] : foundCard());
+    if (view.guild && board?.dataset.guild !== String(view.guild.id)) board = noticeBoard(view.guild.id);
+    else board?.redraw();
+    fill(body, invitesCard(), view.guild ? [board, guildCard(), ranking, inviteCard(), sentCard(), leaveCard()] : foundCard());
+  }
+
+  // The guild's board of announcements (998.1, accepted by the author on
+  // 16.11.2026; a player asked for „tablica ogłoszeń”): a channel of the
+  // chat of its own (src/server/chat.js, "notice"), its newest announcement
+  // first and the ones before folded. Its leader and deputies write there;
+  // an announcement of another player may be reported to the moderation, as
+  // any message of the chat. Seen, it puts out the dot of the first tab.
+  function noticeBoard(guildId) {
+    const box = h('section', { class: 'card guild-notices', 'aria-labelledby': 'guild-notices-title' });
+    box.dataset.guild = String(guildId);
+    let messages = null;
+    let failure = null;
+    const most = state.content.chat?.rules?.maxLength ?? 500;
+    const field = h('textarea', { class: 'bug-text guild-notice-field', maxlength: String(most), rows: '3', placeholder: t('Nowe ogłoszenie dla całej gildii'), 'aria-label': t('Nowe ogłoszenie dla całej gildii') });
+    const count = h('p', { class: 'muted guild-notice-count', text: `0 / ${most}` });
+    field.addEventListener('input', () => {
+      count.textContent = `${Array.from(field.value).length} / ${most}`;
+    });
+    const when = (at) => {
+      const time = new Date(at);
+      return (time.toDateString() === new Date(serverNow()).toDateString() ? timeFormat : dateTimeFormat).format(time);
+    };
+    const roleOf = (message) => {
+      const member = view.guild?.members.find((one) => one.id === message.characterId);
+      return member?.role === 'leader' ? t('Lider') : member?.role === 'deputy' ? t('Zastępca') : null;
+    };
+    const notice = (message, old) =>
+      h(
+        'article',
+        { class: `guild-notice${old ? ' guild-notice--old' : ''}` },
+        h('p', { class: 'guild-notice-head' }, h('span', { class: 'chat-name', text: message.name }), roleOf(message) && h('span', { class: 'party-leader', text: roleOf(message) }), h('time', { class: 'chat-time', datetime: new Date(message.createdAt).toISOString(), text: when(message.createdAt) })),
+        h('p', { class: 'guild-notice-text', text: message.text }),
+        !message.own &&
+          h('button', {
+            type: 'button',
+            class: 'guild-notice-report',
+            text: t('Zgłoś'),
+            onClick: (event) =>
+              withButton(event.currentTarget, async () => {
+                if (!(await confirmAction({ title: t('Zgłosić to ogłoszenie?'), text: t('Moderacja przeczyta ogłoszenie i zdecyduje, czy je zdjąć.'), confirmLabel: t('Zgłoś') }))) return;
+                await call('POST', '/api/chat/report', { messageId: message.id });
+                toast(t('Zgłoszone. Dziękujemy.'));
+              }),
+          }),
+      );
+    function redraw() {
+      if (!view?.guild) return;
+      const leads = view.guild.role === 'leader' || view.guild.role === 'deputy';
+      const list = messages ?? [];
+      const [newest, ...before] = [...list].reverse();
+      fill(
+        box,
+        h('h2', { class: 'card-title', id: 'guild-notices-title' }, icon('scroll', { size: 22 }), t('Ogłoszenia')),
+        failure && h('p', { class: 'muted', text: failure }),
+        messages === null && !failure && h('p', { class: 'muted', text: t('Wczytywanie…') }),
+        messages !== null && !newest && h('p', { class: 'muted', text: leads ? t('Nie ma jeszcze ogłoszeń. Napisz pierwsze.') : t('Nie ma jeszcze ogłoszeń.') }),
+        newest && notice(newest, false),
+        before.length > 0 &&
+          h(
+            'details',
+            { class: 'guild-members' },
+            h('summary', { class: 'guild-members-toggle', text: t('Wcześniejsze ogłoszenia ({count})', { count: before.length }) }),
+            h('div', { class: 'guild-notices-old' }, before.map((one) => notice(one, true))),
+          ),
+        leads &&
+          h(
+            'div',
+            { class: 'guild-notice-form' },
+            field,
+            count,
+            h('button', {
+              type: 'button',
+              class: 'button button--system',
+              text: t('Ogłoś'),
+              onClick: (event) =>
+                withButton(event.currentTarget, async () => {
+                  const text = field.value.trim();
+                  if (!text) return;
+                  await call('POST', '/api/chat', { channel: 'notice', text });
+                  field.value = '';
+                  count.textContent = `0 / ${most}`;
+                  toast(t('Ogłoszenie dodane.'));
+                  await load();
+                }),
+            }),
+          ),
+        h('p', { class: 'muted', text: leads ? t('Ogłoszenia piszą lider i zastępcy. Gdy pojawi się nowe, przy zakładce Gildia świeci kropka.') : t('Ogłoszenia piszą lider i zastępcy.') }),
+      );
+    }
+    async function load() {
+      try {
+        const answer = await call('GET', '/api/chat?channel=notice');
+        messages = (answer.messages ?? []).filter((message) => !message.system);
+        failure = null;
+      } catch (error) {
+        failure = error.message ?? t('Nie udało się wczytać ogłoszeń.');
+      }
+      if (gone) return;
+      redraw();
+      const newest = messages?.at(-1);
+      if (newest) channelRead('notice', newest.id);
+    }
+    box.redraw = redraw;
+    redraw();
+    load();
+    return box;
   }
 
   // An action answered with the Gildia anew, its words in a toast.

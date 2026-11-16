@@ -300,13 +300,67 @@ describe('the Gildia through the API', () => {
     assert.equal((await as('obcy', 'POST', '/api/chat/report', { messageId: sent.data.message.id })).data.error.code, 'no_message');
     // The light of the channel, and its mark read.
     const latest = (await as('druh', 'GET', '/api/chat/latest')).data;
-    assert.deepEqual(latest.guild, { name: 'Leśni Bracia', tag: 'LB', latest: sent.data.message.id });
+    assert.deepEqual(latest.guild, { name: 'Leśni Bracia', tag: 'LB', latest: sent.data.message.id, notice: 0 });
     await as('druh', 'POST', '/api/chat/seen', { guild: sent.data.message.id });
     assert.equal((await as('druh', 'GET', '/api/chat/latest')).data.seen.guild, sent.data.message.id);
     // A guild that goes takes its channel along.
     await as('druh', 'POST', '/api/guild/leave');
     await as('mistrz', 'POST', '/api/guild/leave');
     assert.equal((await (await db()).prepare("SELECT COUNT(*) AS count FROM chat_messages WHERE channel LIKE 'guild:%'").first()).count, 0);
+  });
+
+  // 998.1 and 998.2 (16.11.2026; a player asked for „tablica ogłoszeń albo
+  // czat lidera i zastępców”, the author accepted both).
+  test('the guild\'s board: its members read it, its leader and deputies write it; their own channel only they read and write', async () => {
+    await as('mistrz', 'POST', '/api/guild/found', { name: 'Leśni Bracia', tag: 'LB' });
+    const guildId = (await as('mistrz', 'GET', '/api/guild')).data.guild.id;
+    await player('zastepca', 'Zastępca');
+    await player('obcy', 'Obcy');
+    for (const login of ['druh', 'zastepca']) {
+      await as('mistrz', 'POST', '/api/guild/invite', { name: login === 'druh' ? 'Druh' : 'Zastępca' });
+      await as(login, 'POST', '/api/guild/accept', { guildId });
+    }
+    const deputy = (await (await db()).prepare("SELECT id FROM characters WHERE name = 'Zastępca'").first()).id;
+    await as('mistrz', 'POST', '/api/guild/role', { characterId: deputy, role: 'deputy' });
+    for (const login of ['mistrz', 'druh', 'zastepca', 'obcy']) await as(login, 'POST', '/api/chat/rules');
+    // The chat's pause between one's messages, past.
+    const later = async () => (await db()).prepare('UPDATE chat_messages SET created_at = created_at - 10000').run();
+    // The board: a member reads, only the leader and the deputies write.
+    assert.equal((await as('druh', 'POST', '/api/chat', { channel: 'notice', text: 'Ja też' })).data.error.code, 'no_lead');
+    const notice = await as('mistrz', 'POST', '/api/chat', { channel: 'notice', text: 'W czwartek mecz ligi o 20:00, @Druh!' });
+    assert.equal(notice.status, 201, JSON.stringify(notice.data));
+    const board = await as('druh', 'GET', '/api/chat?channel=notice');
+    assert.equal(board.data.channel, 'notice');
+    assert.deepEqual(board.data.messages.map((message) => message.text), ['W czwartek mecz ligi o 20:00, @Druh!']);
+    assert.equal((await as('zastepca', 'POST', '/api/chat', { channel: 'notice', text: 'Bestia czeka.' })).status, 201);
+    // No tags on the board: no notification tells it outside.
+    assert.equal((await (await db()).prepare('SELECT COUNT(*) AS count FROM chat_mentions').first()).count, 0);
+    // Its light for a member, and its mark read; reported by a member, not by one outside.
+    const latest = (await as('druh', 'GET', '/api/chat/latest')).data.guild;
+    assert.equal(latest.notice > notice.data.message.id, true);
+    assert.equal(latest.lead, undefined);
+    await as('druh', 'POST', '/api/chat/seen', { notice: latest.notice });
+    assert.equal((await as('druh', 'GET', '/api/chat/latest')).data.seen.notice, latest.notice);
+    assert.equal((await as('obcy', 'GET', '/api/chat?channel=notice')).data.error.code, 'no_guild');
+    assert.equal((await as('obcy', 'POST', '/api/chat/report', { messageId: notice.data.message.id })).data.error.code, 'no_message');
+    assert.equal((await as('druh', 'POST', '/api/chat/report', { messageId: notice.data.message.id })).status, 200);
+    // The leaders' channel: the leader and the deputy, nobody else.
+    await later();
+    const lead = await as('zastepca', 'POST', '/api/chat', { channel: 'lead', text: 'Kogo bierzemy na zastępcę?' });
+    assert.equal(lead.status, 201, JSON.stringify(lead.data));
+    assert.deepEqual((await as('mistrz', 'GET', '/api/chat?channel=lead')).data.messages.map((message) => message.text), ['Kogo bierzemy na zastępcę?']);
+    assert.equal((await as('mistrz', 'GET', '/api/chat/latest')).data.guild.lead, lead.data.message.id);
+    assert.equal((await as('druh', 'GET', '/api/chat?channel=lead')).data.error.code, 'no_lead');
+    assert.equal((await as('druh', 'POST', '/api/chat', { channel: 'lead', text: 'Hej' })).data.error.code, 'no_lead');
+    assert.equal((await as('druh', 'POST', '/api/chat/report', { messageId: lead.data.message.id })).data.error.code, 'no_message');
+    assert.equal((await as('obcy', 'GET', '/api/chat?channel=lead')).data.error.code, 'no_guild');
+    // A deputy made a member again reads it no more.
+    await as('mistrz', 'POST', '/api/guild/role', { characterId: deputy, role: 'member' });
+    assert.equal((await as('zastepca', 'GET', '/api/chat?channel=lead')).data.error.code, 'no_lead');
+    assert.equal((await as('zastepca', 'GET', '/api/chat/latest')).data.guild.lead, undefined);
+    // A guild that goes takes its board and the leaders' channel along.
+    for (const login of ['druh', 'zastepca', 'mistrz']) await as(login, 'POST', '/api/guild/leave');
+    assert.equal((await (await db()).prepare("SELECT COUNT(*) AS count FROM chat_messages WHERE channel LIKE 'notice:%' OR channel LIKE 'lead:%'").first()).count, 0);
   });
 
   test('a deleted character leaves its guild, and its lead passes on', async () => {

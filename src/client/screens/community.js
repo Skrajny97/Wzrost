@@ -57,8 +57,10 @@ import {
   guildNews,
   guildRead,
   guildTodoNews,
+  leadChannel,
   mentionChannel,
   mentionNews,
+  noticeNews,
   partyNews,
   onChatNews,
   privateRead,
@@ -96,6 +98,14 @@ const GUILD = {
     return t('Gildia');
   },
 };
+// The channel of the guild's leader and deputies beside it, only theirs
+// (998.2, accepted by the author on 16.11.2026).
+const LEAD = {
+  id: 'lead',
+  get name() {
+    return t('Dowództwo');
+  },
+};
 
 // A silence "na stałe" (chat.js).
 const FOREVER = 8.64e15;
@@ -107,7 +117,7 @@ const GUILD_PAGE_SECTION = 'guilds';
 // The parts' icons and lights of news, also for their shortcuts under
 // Społeczność in the computer's menu (layout.js).
 export const SECTION_ICONS = { friends: 'people', ranking: 'trophy', guilds: 'banner', party: 'swords', fame: 'star' };
-export const SECTION_NEWS = { friends: friendNews, party: partyNews, guilds: () => guildNews() || guildTodoNews(), fame: fameNews };
+export const SECTION_NEWS = { friends: friendNews, party: partyNews, guilds: () => guildNews() || guildTodoNews() || noticeNews(), fame: fameNews };
 // The address that opens the tab at a part (app.js), for those shortcuts;
 // the Gildia has its page.
 const SECTION_SLUGS = { friends: 'znajomi', ranking: 'ranking', party: 'druzyna', fame: 'slawa' };
@@ -304,6 +314,8 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   const notices = h('div', { class: 'chat-notices' });
   const list = h('ol', { class: 'chat-list', 'aria-label': t('Wiadomości') });
   const empty = h('p', { class: 'muted chat-empty', text: t('Wczytywanie…') });
+  // Over the leaders' channel, who reads it (998.2).
+  const leadNote = h('p', { class: 'muted chat-lead-note', text: t('Kanał lidera i zastępców. Członkowie gildii go nie widzą.'), hidden: true });
   const placeholder = () => (talk ? t('Do postaci {name}…', { name: talk.name }) : channel.items ? t('Napisz ofertę…') : t('Napisz wiadomość…'));
   // The admin writes links too, their addresses beyond the length shown.
   const admin = Boolean(state.user?.author);
@@ -403,7 +415,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   }
   function taggable() {
     if (talk) return [{ name: talk.name, classId: conversations.find((entry) => entry.id === talk.id)?.classId }];
-    if (channel.id === GUILD.id) return people?.guild ?? [];
+    if (channel.id === GUILD.id || channel.id === LEAD.id) return people?.guild ?? [];
     // A writer by its character's name and by its account's name, which
     // tags it too (15.11.2026).
     const writers = messages
@@ -745,7 +757,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   // The narrator points here at the chat's rules (narrator.js).
   const footer = h('div', { class: 'chat-footer', 'data-guide': 'community-rules' });
   const hidden = h('div', { class: 'chat-hidden' });
-  const room = h('div', { class: 'chat-room' }, empty, list, footer);
+  const room = h('div', { class: 'chat-room' }, leadNote, empty, list, footer);
 
   // On a computer the tabs wrap into rows (styles.css, .chat-tabs--rooms).
   const tabs = h('div', { class: 'chat-tabs chat-tabs--rooms', role: 'tablist', 'aria-label': t('Rozmowy') });
@@ -793,7 +805,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   // tags the player (chat-news.js).
   function renderTabs() {
     const entries = talk && !conversations.some((entry) => entry.id === talk.id) ? [{ ...talk, latest: 0 }, ...conversations] : conversations;
-    const channels = [...chat.channels, ...(guildChannel() ? [GUILD] : [])];
+    const channels = [...chat.channels, ...(guildChannel() ? [GUILD] : []), ...(leadChannel() ? [LEAD] : [])];
     const elsewhere = (entry) => Boolean(talk) || channel.id !== entry.id;
     fill(
       tabs,
@@ -1043,6 +1055,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
           }),
       );
     }
+    leadNote.hidden = Boolean(talk) || channel.id !== LEAD.id;
     empty.hidden = messages.length > 0;
     empty.textContent = !loaded
       ? t('Wczytywanie…')
@@ -1285,8 +1298,9 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
       ask();
       return;
     }
-    // Out of the guild meanwhile: back to the Globalny.
-    if (failure?.code === 'no_guild' && askedChannel === GUILD) {
+    // Out of the guild, or no longer its leader nor a deputy, meanwhile:
+    // back to the Globalny.
+    if ((failure?.code === 'no_guild' && (askedChannel === GUILD || askedChannel === LEAD)) || (failure?.code === 'no_lead' && askedChannel === LEAD)) {
       switchTo(chat.channels[0], null);
       return;
     }

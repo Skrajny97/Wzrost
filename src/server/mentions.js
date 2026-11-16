@@ -41,6 +41,9 @@ const GUILD_PREFIX = 'guild:';
 // `recipientId`), at `now`. Each with the name as written and whether a
 // phone notification goes for it: [{ characterId, written, push }].
 export async function findMentions(db, text, { userId, channel, recipientId = null }, now) {
+  // None on a guild's board nor in its leaders' channel (998): they tag no
+  // one, so no notification tells their words outside them.
+  if (channel.startsWith('notice:') || channel.startsWith('lead:')) return [];
   const places = mentionPlaces(text);
   if (places.length === 0) return [];
   const keys = [...new Set(places.flatMap((place) => place.names.map((name) => name.key)))].slice(0, MOST_NAMES);
