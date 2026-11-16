@@ -694,7 +694,14 @@
       "free": "wolne",
       "doneAll": "Twoja gildia rozegrała już wszystkie mecze. Liga kończy się w niedzielę o {hour}.",
       "versusDuel": "1v1 z: {names}",
-      "versusTrio": "3v3, Trójka {team} przeciw: {names}"
+      "versusTrio": "3v3, Trójka {team} przeciw: {names}",
+      "allFights": "Wszystkie walki",
+      "allFightsTitle": "Wszystkie walki · {when}",
+      "triosTitle": "3v3 · walki trójek",
+      "duelsTitle": "1v1 · pojedynki",
+      "duelWith": "z: {name}",
+      "backToList": "Wróć do listy walk",
+      "noFights": "W tym meczu nie było walk: same walkowery."
     }
   },
   "fame": {

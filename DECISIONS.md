@@ -3580,6 +3580,17 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.4.0 (16.11.2026): pierwszy wieczór ligi jeszcze raz, o 23:00, i wszystkie walki meczu
+
+Autor: „Po wprowadzeniu poprawek i nowości wprowadź reset wojny i o 23 kolejny reroll”. Po 0.3.99 przychodzi 0.4.0 (po 0.0.99 szło 0.1.0, więc tu tak samo).
+
+1. **Reset wieczoru z 16.11** (migracja 0148). Złoto za każdą wygraną walkę i 2 Punkty Systemu za każdy wygrany mecz, w którym postać walczyła, wracają: gra odejmuje je postaciom, które je dostały. Jeśli postać zdążyła je wydać, gra zabiera tylko tyle, ile ma, i nie schodzi poniżej zera. Walki tego wieczoru znikają, a mecze wracają do stanu sprzed walk.
+2. **Ponowne losowanie, nie powtórka.** Mecze tego wieczoru mają nowe ziarno walk, a liga nowe ziarno trójek. Trójki na poniedziałek i na kolejne wieczory losują się więc od nowa („reroll”), a walki nie są kopią tych z 20:00. Walczy się już po zasadzie 0.3.98: postacie jednego konta w obu gildiach walczą po obu stronach, także ze sobą.
+3. **Walki o 23:00 czasu polskiego** (`fight_at`, z 0.3.99). Zakładka pisze „Dziś o 23:00” i odlicza do tej godziny. Kolejne wieczory są jak dotąd o 20:00.
+4. **Dlaczego osobne wdrożenie:** migracje bazy wchodzą przed nową wersją gry, a reset wchodzi, gdy 0.3.99 już działa i czeka na `fight_at`. Inaczej stara wersja mogłaby stoczyć zresetowane mecze od razu, a nie o 23:00.
+5. **Sprawdzenie:** migracja przeszła na kopii lokalnej bazy z rozegranym poniedziałkiem (154 mecze, 1472 walki, 77 postaci z nagrodami). Każdej postaci zabrała dokładnie tyle złota i Punktów Systemu, ile wynika z zapisanych walk, a mecze kolejnych wieczorów zostały nietknięte.
+6. **Wszystkie walki meczu w zakładce (makiety 1038.1–1038.3 przyjęte).** Autor: „Wszystkie walki mają być możliwe do obejrzenia, każda nie tylko własna”. W „Wyniki wieczorów” pod każdym meczem, który miał walki, jest przycisk „Wszystkie walki”. Otwiera okno z wynikiem meczu i jego walkami: najpierw 3v3 pogrupowane po trójkach gildii, potem 1v1 pogrupowane po jej członkach. Każda grupa ma bilans wygranych i przegranych, a trójka i pojedynki postaci, która patrzy, są na górze, rozwinięte i na złoto. Oko przy walce odtwarza ją, a „Wróć do listy walk” nad powtórką przywraca listę z tymi samymi rozwiniętymi grupami i w tym samym miejscu. Serwer daje listę z 0.3.99 (`GET /api/guild/war/matches/:id/battles`).
+
 ## Wersja 0.3.99 (16.11.2026): liga przygotowana na ponowny wieczór o 23:00, wszystkie walki meczu po stronie serwera
 
 Autor: „Po wprowadzeniu poprawek i nowości wprowadź reset wojny i o 23 kolejny reroll” i „Wszystkie walki mają być możliwe do obejrzenia, każda nie tylko własna najlepiej”.

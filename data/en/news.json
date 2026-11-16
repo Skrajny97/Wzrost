@@ -956,6 +956,10 @@
     "0.3.98": {
       "title": "Version 0.3.98",
       "body": "- Guild war league: characters of one account in both guilds now fight on both sides, against each other too. Till now they did not fight at all, and their trios lost by walkover.\n- The characters' names show under the portraits in the trios and the reserve."
+    },
+    "0.4.0": {
+      "title": "Version 0.4.0",
+      "body": "- Guild war league: Monday's evening of the league will be fought again, today at 23:00 (Polish time). The fights from 20:00 are gone, and their gold and System Points go back to what they were before them. The trios and the fights are drawn anew, with the characters of one account on both sides.\n- Under each match in “The evenings' results” there is an “All fights” button: every fight of the match, not only yours, grouped by your guild’s trios and members. You can watch any of them.\n- The War tab loads faster."
     }
   }
 }
