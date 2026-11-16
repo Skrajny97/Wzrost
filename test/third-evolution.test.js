@@ -719,15 +719,31 @@ describe('the third forms against the second forms (tools/class-balance-sim.mjs,
 
   test('in the Arena at level 200 each third form wins 25–75% of its duels against the other paths, and the duels last a few rounds', () => {
     // The Pogromca Demonów wins the fewest: the Inkwizytor's line stays the
-    // weaker one in duels (779 A). The Arcydruid's blows count ×1.1 in the
-    // players' duels (evolutions.json duelPower, 992 A) since the Tier IX
-    // gear (0.3.93): its summons take their HP from its mana, which the new
-    // weapons leave as it was, and it fell from 26% to 24.5% of its duels.
+    // weaker one in duels (779 A). Seven third forms have their own strength
+    // in the players' duels (evolutions.json duelPower, 992 A; 0.3.93 and
+    // 0.3.95): the Tier IX gear and the skills at their full strength (class
+    // level 299) left the Arcydruid, the Pogromca Demonów and the main paths
+    // of the Łucznik, Kleryk and Cień weak, and the Władca Puszczy too strong.
     const result = measure({ level: 200, seeds: 1, model: 'realistic', paths: true }, content);
     assert.deepEqual(Object.keys(result.paths).sort(), [...FORMS].sort());
     for (const [id, share] of Object.entries(result.paths)) assert.ok(share >= 0.25 && share <= 0.75, `${id} wins ${share}`);
     assert.ok(result.median >= 16 && result.median <= 40, `median ${result.median} moves`);
     assert.ok(result.limits <= 0.12, `the judge ended ${result.limits}`);
+  });
+
+  test('in the Łysogóry\'s levels (210–290) each third form wins on average 25–75% of its duels against the other paths, and the duels last a few rounds', () => {
+    // One level's eight draws of the gear move a form's share by up to 15
+    // points, so the levels count together (0.3.95; tools/pvp-arena-sim.mjs).
+    const levels = [210, 230, 250, 270, 290];
+    const shares = {};
+    for (const level of levels) {
+      const result = measure({ level, seeds: 1, model: 'realistic', paths: true }, content);
+      assert.ok(result.median >= 16 && result.median <= 40, `level ${level}: median ${result.median} moves`);
+      assert.ok(result.limits <= 0.12, `level ${level}: the judge ended ${result.limits}`);
+      for (const [id, share] of Object.entries(result.paths)) shares[id] = (shares[id] ?? 0) + share / levels.length;
+    }
+    assert.deepEqual(Object.keys(shares).sort(), [...FORMS].sort());
+    for (const [id, share] of Object.entries(shares)) assert.ok(share >= 0.25 && share <= 0.75, `${id} wins ${share}`);
   });
 });
 

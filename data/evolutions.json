@@ -359,6 +359,7 @@
     },
     {
       "id": "bow-master",
+      "duelPower": 1.12,
       "classId": "archer",
       "from": "marksman",
       "name": "Mistrz Łuku",
@@ -381,6 +382,7 @@
     },
     {
       "id": "wild-lord",
+      "duelPower": 0.9,
       "classId": "archer",
       "from": "master-hunter",
       "name": "Władca Puszczy",
@@ -413,7 +415,7 @@
     },
     {
       "id": "archdruid",
-      "duelPower": 1.1,
+      "duelPower": 1.3,
       "classId": "mage",
       "from": "druid",
       "name": "Arcydruid",
@@ -426,6 +428,7 @@
     },
     {
       "id": "saint",
+      "duelPower": 1.2,
       "classId": "cleric",
       "from": "miracle-worker",
       "name": "Święty",
@@ -437,6 +440,7 @@
     },
     {
       "id": "demon-slayer",
+      "duelPower": 1.2,
       "classId": "cleric",
       "from": "grand-inquisitor",
       "name": "Pogromca Demonów",
@@ -460,6 +464,7 @@
     },
     {
       "id": "godslayer",
+      "duelPower": 1.08,
       "classId": "shadow",
       "from": "kingslayer",
       "name": "Bogobójca",
@@ -481,6 +486,7 @@
     },
     {
       "id": "shadow-lord",
+      "duelPower": 1.05,
       "classId": "shadow",
       "from": "phantom",
       "name": "Władca Cieni",

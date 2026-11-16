@@ -135,7 +135,8 @@ describe("the Arena's rules", () => {
 
   test('over the classes, a duel lasts a few rounds at every level and the judge ends few (tools/pvp-arena-sim.mjs)', () => {
     // The Tier IX gear (0.3.93) made the duels at level 200 shorter (a median
-    // of 15 moves), so the HP factor grows from level 175 on (duel.hpCurve).
+    // of 15 moves), so the HP factor grows from level 175 on (duel.hpCurve;
+    // 3.9 at level 200 since 0.3.95).
     for (const level of [25, 100, 200]) {
       const result = measure({ level, seeds: 1, model: 'realistic' }, content);
       assert.ok(result.median >= 16 && result.median <= 40, `level ${level}: median ${result.median} moves`);
@@ -151,6 +152,19 @@ describe("the Arena's rules", () => {
       const { wins } = measure({ level, seeds: 1, model: 'realistic' }, content);
       for (const [classId, share] of Object.entries(wins)) assert.ok(share >= 0.3 && share <= 0.7, `level ${level}: ${classId} wins ${share}`);
     }
+  });
+
+  test('in the Łysogóry\'s levels (210–290) each class wins on average 30–70% of its duels against the other classes (0.3.95)', () => {
+    // Above level 200 the Wojownik won 71% of them on average and the
+    // Kleryk 36%; one level's draws of the gear move a share by up to 15
+    // points, so the levels count together.
+    const levels = [210, 230, 250, 270, 290];
+    const shares = {};
+    for (const level of levels) {
+      const { wins } = measure({ level, seeds: 1, model: 'realistic' }, content);
+      for (const [classId, share] of Object.entries(wins)) shares[classId] = (shares[classId] ?? 0) + share / levels.length;
+    }
+    for (const [classId, share] of Object.entries(shares)) assert.ok(share >= 0.3 && share <= 0.7, `${classId} wins ${share}`);
   });
 
   test('a win or a loss moves both ratings as in chess, the defender\'s by less', () => {
