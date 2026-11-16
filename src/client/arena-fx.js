@@ -2439,5 +2439,5 @@ export function createFx(kit) {
     kit.setDilation(1);
   }
 
-  return { boxOf, centerOf, number, blow, hit, dodge, strike, charge, heal, glint, tick, cast, fall, slowMotion, cancel, specks };
+  return { boxOf, centerOf, number, blow, hit, dodge, strike, charge, heal, glint, tick, cast, fall, slowMotion, cancel, specks, wordsRoom };
 }

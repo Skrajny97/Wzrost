@@ -250,6 +250,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     setHp,
     float,
     specks: fxs.specks,
+    wordsRoom: fxs.wordsRoom,
   });
 
   // A line of the log. A blow of a weapon with a zaklęcie żywiołu says,

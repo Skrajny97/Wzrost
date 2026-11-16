@@ -1352,8 +1352,13 @@ export function skillEffects(kit) {
     const { x, y } = centerOf(entry.card);
     const label = spark('skill-callout', { x, y: y - entry.card.offsetHeight / 2 }, { '--fx': color });
     label.textContent = text;
-    const half = label.offsetWidth / 2;
-    label.style.left = `${Math.min(Math.max(x, half + 4), kit.arena.clientWidth - half - 4)}px`;
+    // Kept inside the arena at its biggest (×1.08) and by the room of the
+    // stage's shakes, as the blows' numbers are (wordsRoom in arena-fx.js):
+    // on a 360 px phone a back-row caster's „Gniew Peruna” went past the
+    // right edge (the promo reel, 16.11.2026).
+    const half = (label.offsetWidth / 2) * 1.08;
+    const [from, to] = kit.wordsRoom ? kit.wordsRoom(half) : [half + 4, kit.arena.clientWidth - half - 4];
+    label.style.left = `${Math.min(Math.max(x, from), to)}px`;
     return animate(
       label,
       [
