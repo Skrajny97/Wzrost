@@ -303,15 +303,16 @@ export function dropKind(roll, chance, content) {
 /**
  * @param {string} id
  * @param {Rng} rng
- * @param {{ maxed?: string[], guardian?: boolean }} options
+ * @param {{ maxed?: string[], guardian?: boolean, more?: number }} options
  * @param {Content} content
  * @returns {string | null}
  */
-export function cardDrop(id, rng, { maxed = [], guardian = false }, content) {
+export function cardDrop(id, rng, { maxed = [], guardian = false, more = 0 }, content) {
   const roll = rng.next();
   const rules = cardRules(content);
   if (!rules || !isCard(id, content)) return null;
-  const kind = dropKind(roll, guardian ? rules.drops.guardian : rules.drops[cardKind(id, content)], content);
+  // `more`: a meal's share more of the chance (cooking.js, 999.4).
+  const kind = dropKind(roll, (guardian ? rules.drops.guardian : rules.drops[cardKind(id, content)]) * (1 + more), content);
   if (kind === 'pack') return PACK;
   return kind === 'card' && !maxed.includes(id) ? id : null;
 }

@@ -34,6 +34,9 @@ const WORKS = {
   items: { url: '#/profesje/rzemieslnictwo', place: 'workshop' },
   minerals: { url: '#/profesje/gornictwo', place: 'mining' },
   jewels: { url: '#/profesje/jubilerstwo', place: 'jewelcrafting' },
+  fish: { url: '#/profesje/rybolowstwo', place: 'fishing' },
+  crops: { url: '#/profesje/rolnictwo', place: 'farming' },
+  dishes: { url: '#/profesje/gotowanie', place: 'cooking' },
 };
 
 // The notification of a work that ended, the character's or, with

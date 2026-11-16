@@ -240,7 +240,8 @@ describe('the goods of the Skrzynia Konta', () => {
     await run('UPDATE characters SET level = ? WHERE id = ?', LEVEL, id);
     assert.equal((await call('GET', '/api/character', { cookie })).data.character.chestLock, undefined);
     const open = await chest();
-    assert.deepEqual([open.slots, open.items, open.goods], [content.balance.account.chestSlots, [], []]);
+    // As many places as the bag (the author, 16.11.2026).
+    assert.deepEqual([open.slots, open.items, open.goods], [content.balance.items.bagSlots, [], []]);
     assert.equal((await put('herb', HERB, 1)).status, 200);
     assert.equal((await call('POST', '/api/chest/put', { cookie, body: { itemId } })).status, 200);
   });

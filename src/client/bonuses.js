@@ -7,9 +7,9 @@
 // obecne"; "2 mikstury -> 4 walki i tak będziemy to wyświetlać i opisywać,
 // wszędzie").
 
-import { potionSprite } from './art.js';
+import { dishSprite, potionSprite } from './art.js';
 import { h, icon } from './dom.js';
-import { countOf } from './format.js';
+import { countOf, formatMinutes } from './format.js';
 import { t } from './i18n.js';
 
 // The fights a bonus has left: they go when a report is claimed
@@ -25,7 +25,10 @@ const leftText = (fights) => t('jeszcze {fights}', { fights: fightsLeft(fights) 
 // colon and what it does (data/professions.json, buffLabels).
 export function bonusList(character) {
   const buffs = activeBuffs(character);
-  if (buffs.length === 0) return null;
+  // The meal at work (cooking.js; 999.5 v2), with the time of explorations
+  // it still works for.
+  const meal = character?.meal ?? null;
+  if (buffs.length === 0 && !meal) return null;
   return h(
     'section',
     { class: 'bonus-list', 'aria-label': t('Aktywne bonusy') },
@@ -47,6 +50,18 @@ export function bonusList(character) {
           ),
         );
       }),
+      meal &&
+        h(
+          'li',
+          { class: 'bonus-row' },
+          h('span', { class: 'bonus-art', 'aria-hidden': 'true' }, dishSprite(meal.id) ?? icon('pot', { size: 24 })),
+          h(
+            'span',
+            { class: 'bonus-text' },
+            h('span', { class: 'bonus-name' }, h('strong', { text: t('Posiłek: {dish}', { dish: meal.name }) }), `: ${meal.bonus}`),
+            h('span', { class: 'bonus-left', text: t('jeszcze {time} wypraw', { time: formatMinutes(meal.left) }) }),
+          ),
+        ),
     ),
   );
 }

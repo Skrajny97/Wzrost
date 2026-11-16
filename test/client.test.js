@@ -192,8 +192,14 @@ test('every sprite on the list has its file at its size, and every class has its
     professions: data('professions').professions.map((profession) => profession.id),
     // Górnictwo's gems and ores.
     minerals: data('professions').minerals.map((mineral) => mineral.id),
+    // Rybołówstwo's fish.
+    fish: data('professions').fish.map((fish) => fish.id),
+    // Rolnictwo's crops.
+    crops: data('professions').crops.map((crop) => crop.id),
+    // Gotowanie's dishes.
+    dishes: data('professions').dishes.map((dish) => dish.id),
     places: [
-      ...['gathering', 'brewing', 'workshop', 'mining', 'jewelcrafting'].map((work) => data('professions')[work].place.id),
+      ...['gathering', 'brewing', 'workshop', 'mining', 'jewelcrafting', 'fishing', 'farming', 'cooking'].map((work) => data('professions')[work].place.id),
       data('evolutions').place,
       ...data('towers').towers.map((tower) => tower.place),
       ...data('portals').portals.map((portal) => portal.art),

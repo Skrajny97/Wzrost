@@ -5,7 +5,10 @@
     "alchemy": { "file": "art/scenes/alchemy.png", "size": 128, "frames": 14, "fps": 8, "moment": { "kind": "steam", "x": 44, "y": 72 } },
     "crafting": { "file": "art/scenes/crafting.png", "size": 128, "frames": 8, "fps": 8, "moment": { "kind": "sparks", "x": 86, "y": 80 } },
     "mining": { "file": "art/scenes/mining.png", "size": 256, "scale": 1, "frames": 9, "fps": 8 },
-    "jewelcrafting": { "file": "art/scenes/jewelcrafting.png", "size": 256, "scale": 1, "frames": 9, "fps": 8 }
+    "jewelcrafting": { "file": "art/scenes/jewelcrafting.png", "size": 256, "scale": 1, "frames": 9, "fps": 8 },
+    "fishing": { "file": "art/scenes/fishing.png", "size": 256, "scale": 1, "frames": 20, "fps": 8 },
+    "farming": { "file": "art/scenes/farming.png", "size": 256, "scale": 1, "frames": 5, "fps": 6 },
+    "cooking": { "file": "art/scenes/cooking.png", "size": 256, "scale": 1, "frames": 9, "fps": 8 }
   },
   "walk": {
     "figure": { "file": "art/scenes/walker.png", "size": 48, "frames": 4, "fps": 8 },

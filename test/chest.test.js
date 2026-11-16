@@ -60,7 +60,8 @@ describe('Skrzynia Konta', () => {
     await call('GET', '/api/character', { cookie });
     const putIn = await put(given);
     assert.equal(putIn.status, 200, JSON.stringify(putIn.data));
-    assert.equal(putIn.data.chest.slots, 5);
+    // As many places as the bag (the author, 16.11.2026).
+    assert.equal(putIn.data.chest.slots, content.balance.items.bagSlots);
     assert.deepEqual(
       putIn.data.chest.items.map(({ name, own, from, wornFrom }) => ({ name, own, from, wornFrom })),
       [{ name: 'Amulet', own: true, from: 'Mira', wornFrom: null }],
@@ -101,15 +102,18 @@ describe('Skrzynia Konta', () => {
     assert.equal((await call('POST', `/api/items/${item.id}/equip`, { cookie })).status, 200);
   });
 
-  test('five places, also during an exploration; the chest stays when its character goes and leaves with the account', async () => {
+  // The author, 16.11.2026: „Zwiększ pojemnosc skrzyni konta na taką jaka
+  // aktualnie ma plecak”: as many places as the bag of the character played.
+  test('as many places as the bag, also during an exploration; the chest stays when its character goes and leaves with the account', async () => {
     await create('Mira');
+    const places = content.balance.items.bagSlots;
     const ids = [];
-    for (let index = 0; index < 6; index += 1) ids.push(await inBag('Mira', amulet(5 + index)));
-    for (const id of ids.slice(0, 5)) assert.equal((await put(id)).status, 200);
-    const full = await put(ids[5]);
+    for (let index = 0; index <= places; index += 1) ids.push(await inBag('Mira', amulet(5 + (index % 20))));
+    for (const id of ids.slice(0, places)) assert.equal((await put(id)).status, 200);
+    const full = await put(ids[places]);
     assert.equal(full.data.error.code, 'chest_full');
-    assert.equal(full.data.error.message, 'Skrzynia Konta mieści 5 przedmiotów. Wyjmij coś, żeby włożyć nowy.');
-    assert.equal((await chest()).items.length, 5);
+    assert.equal(full.data.error.message, `Skrzynia Konta mieści ${places} przedmiotów. Wyjmij coś, żeby włożyć nowy.`);
+    assert.equal((await chest()).items.length, places);
     // Not an item of another character, nor a worn one.
     assert.equal((await put(999999)).data.error.code, 'item_not_found');
 
@@ -118,12 +122,12 @@ describe('Skrzynia Konta', () => {
     // zbierania ziół itp.").
     assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } })).status, 201);
     assert.equal((await take((await chest()).items[0].id)).status, 200);
-    assert.equal((await put(ids[5])).status, 200);
+    assert.equal((await put(ids[places])).status, 200);
     await call('POST', '/api/hunts/cancel', { cookie });
 
     assert.equal((await call('DELETE', '/api/character', { cookie })).status, 200);
     const count = async () => (await (await db()).prepare('SELECT COUNT(*) AS count FROM chest_items').first()).count;
-    assert.equal(await count(), 5);
+    assert.equal(await count(), places);
     assert.equal((await call('DELETE', '/api/me', { cookie, body: { login: 'skrzynia' } })).status, 200);
     assert.equal(await count(), 0);
   });

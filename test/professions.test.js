@@ -272,6 +272,9 @@ describe('herbalism through the API', () => {
       ['Rzemieślnictwo', 1, true],
       ['Górnictwo', 1, false],
       ['Jubilerstwo', 1, false],
+      ['Rybołówstwo', 1, false],
+      ['Rolnictwo', 1, false],
+      ['Gotowanie', 1, false],
     ]);
     assert.equal(gathering.place.name, 'Systemowy Zagajnik');
     assert.equal(gathering.slots, 1);

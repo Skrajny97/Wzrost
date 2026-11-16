@@ -13,7 +13,13 @@ import {
   craftLuck,
   craftUpgrades,
   craftableBases,
+  cropsPerHour,
+  dishMinutes,
+  farmingMinutes,
   fightKind,
+  fishPerHour,
+  fishSlots,
+  fishingMinutes,
   gatheringMinutes,
   gearWearers,
   gemOf,
@@ -26,14 +32,18 @@ import {
   jewelMinutes,
   jewelPatternLevel,
   masteryChance,
+  mealBonusText,
+  mealOf,
   materialView,
   mineralsPerHour,
   miningMinutes,
+  mostDishes,
   mostPotions,
   oreOf,
   parseStack,
   partSource,
   patternLevel,
+  plotCount,
   potionMinutes,
   potionPrice,
   professionOpen,
@@ -60,6 +70,10 @@ export const herbsOf = (row) => JSON.parse(row.herbs ?? '{}');
 export const potionsOf = (row) => JSON.parse(row.potions ?? '{}');
 // The gems and ores of Górnictwo, by id, which take no room in the bag.
 export const mineralsOf = (row) => JSON.parse(row.minerals ?? '{}');
+// The fish of Rybołówstwo, the crops of Rolnictwo and the dishes of
+// Gotowanie, by id: the Spiżarnia, which takes no room in the bag either
+// (fishing.js).
+export const pantryOf = (row) => JSON.parse(row.pantry ?? '{}');
 // The points of the character's relations with the Osada's residents and of
 // its reputation with the brotherhoods, by id, as the row keeps them
 // ({ relations: { herbalist: 720 }, reputation: { herbalists: 300 } }): the
@@ -92,6 +106,36 @@ export function bagMinerals(row, sellBonus) {
         ? { rarityName: content().raritiesById[mineral.rarity].name, bonus: mineral.setBonus }
         : { rarityNames: mineral.for.map((id) => content().raritiesById[id].name) }),
     }));
+}
+
+// The Spiżarnia's goods, one entry for each, with the innkeeper's price of
+// one: Zbylut pays the price itself, as the camp's Skup złomu raises only
+// the scrapper's (1057); `group`: a fish, a crop or a dish, a dish with
+// its meal's bonus in words.
+export function bagPantry(row) {
+  const pantry = pantryOf(row);
+  return content()
+    .pantry.filter((good) => (pantry[good.id] ?? 0) > 0)
+    .map((good) => ({
+      id: good.id,
+      group: good.group,
+      name: good.name,
+      description: good.description,
+      count: pantry[good.id],
+      price: good.price,
+      ...(good.group === 'dish' && { bonus: mealBonusText(good, content()) }),
+    }));
+}
+
+// The meal at work (cooking.js; 999.5 v2): its dish, its bonus in words and
+// the minutes of explorations it still works for, of how many; null without
+// one, or where the game has no Gotowanie.
+export function mealView(row) {
+  if (!content().cooking) return null;
+  const meal = mealOf(row.meal, content());
+  if (!meal) return null;
+  const dish = content().dishesById[meal.dish];
+  return { id: dish.id, name: dish.name, bonus: mealBonusText(dish, content()), left: meal.left, minutes: content().cooking.meal.minutes };
 }
 
 // A recipe's catalyst (proposal 3: "Wybrane mikstury biorą jeden materiał
@@ -304,6 +348,108 @@ export function professionsView(row) {
     jewelcrafting: professionOpen(content().professionsById[content().jewelcrafting.profession], row.level, content())
       ? jewelView(professionState(professions, content().jewelcrafting.profession).level, row)
       : null,
+    // Rybołówstwo (1057), from its level.
+    fishing: content().fishing && professionOpen(content().professionsById[content().fishing.profession], row.level, content())
+      ? fishingView(professionState(professions, content().fishing.profession).level, row)
+      : null,
+    // Rolnictwo (1058), from its level.
+    farming: content().farming && professionOpen(content().professionsById[content().farming.profession], row.level, content())
+      ? farmingView(professionState(professions, content().farming.profession).level, row)
+      : null,
+    // Gotowanie (1059), from its level.
+    cooking: content().cooking && professionOpen(content().professionsById[content().cooking.profession], row.level, content())
+      ? cookingView(professionState(professions, content().cooking.profession).level, row)
+      : null,
+  };
+}
+
+// The Systemowy Staw at a level of Rybołówstwo, as the Zagajnik at one of
+// Zielarstwo: its place, the slider, how many kinds of fish at once now and
+// from which levels more, the words under "Jak to działa?", past its mastery
+// the chance of a fish twice, and each fish, known (with how many an hour
+// and in the Spiżarnia) or hidden by the System.
+function fishingView(level, row) {
+  const { fishing } = content();
+  const pantry = pantryOf(row);
+  return {
+    professionId: fishing.profession,
+    place: fishing.place,
+    minutes: fishingMinutes(content()),
+    spread: fishing.spread,
+    slots: fishSlots(level, content()),
+    slotLevels: fishing.slots,
+    about: fishing.about.map((_, index) => say(fishing, 'about', index)),
+    mastery: masteryText(fishing, fishing.texts, level),
+    fish: content().fish.map((fish) =>
+      fish.level <= level
+        ? { id: fish.id, name: fish.name, description: fish.description, level: fish.level, perHour: fishPerHour(fish, level, content()), count: pantry[fish.id] ?? 0 }
+        : { id: fish.id, level: fish.level, hidden: true, hint: say(fishing.texts, 'hidden', 0, { level: fish.level }) },
+    ),
+  };
+}
+
+// The Systemowa Kuchnia at a level of Gotowanie, as the Pracownia at one of
+// Alchemia: its place, the minutes of a dish and of the longest cooking,
+// the words under "Jak to działa?", past its mastery the chance of a dish
+// twice, and each recipe, known (its meal's bonus, its ingredients with
+// those at hand, the Spiżarnia's for the fish and crops, the bag's for the
+// herbs, how many are in the Spiżarnia, the most cooked at once and the
+// innkeeper's price) or hidden by the System.
+function cookingView(level, row) {
+  const { cooking } = content();
+  const pantry = pantryOf(row);
+  const stock = { ...pantry, ...herbsOf(row) };
+  const nameOf = (id) => content().herbsById[id]?.name ?? content().pantryById[id]?.name ?? id;
+  return {
+    professionId: cooking.profession,
+    place: cooking.place,
+    dishMinutes: dishMinutes(level, content()),
+    maxMinutes: cooking.maxMinutes,
+    mealMinutes: cooking.meal.minutes,
+    about: cooking.about.map((_, index) => say(cooking, 'about', index)),
+    mastery: masteryText(cooking, cooking.texts, level),
+    dishes: content().dishes.map((dish) =>
+      dish.level <= level
+        ? {
+            id: dish.id,
+            name: dish.name,
+            description: dish.description,
+            level: dish.level,
+            kinds: dish.bonuses.map((bonus) => bonus.kind),
+            bonus: mealBonusText(dish, content()),
+            ingredients: Object.entries(dish.ingredients).map(([id, need]) => ({ id, name: nameOf(id), need, have: stock[id] ?? 0, group: content().herbsById[id] ? 'herb' : content().pantryById[id]?.group })),
+            count: pantry[dish.id] ?? 0,
+            most: mostDishes(dish, level, stock, content()),
+            price: content().pantryById[dish.id]?.price ?? 0,
+          }
+        : { id: dish.id, level: dish.level, hidden: true, hint: say(cooking.texts, 'hidden', 0, { level: dish.level }) },
+    ),
+  };
+}
+
+// The Systemowe Pole at a level of Rolnictwo (1005): its place, the slider,
+// how many plots the field has now and from which levels more, the words
+// under "Jak to działa?", past its mastery the chance of a crop twice, and
+// each crop, known (with how many an hour for a field of it alone and in
+// the Spiżarnia) or hidden by the System.
+function farmingView(level, row) {
+  const { farming } = content();
+  const pantry = pantryOf(row);
+  return {
+    professionId: farming.profession,
+    place: farming.place,
+    minutes: farmingMinutes(content()),
+    spread: farming.spread,
+    plots: plotCount(level, content()),
+    plotLevels: farming.plots,
+    stages: farming.texts.stages,
+    about: farming.about.map((_, index) => say(farming, 'about', index)),
+    mastery: masteryText(farming, farming.texts, level),
+    crops: content().crops.map((crop) =>
+      crop.level <= level
+        ? { id: crop.id, name: crop.name, description: crop.description, level: crop.level, perHour: cropsPerHour(crop, level, content()), count: pantry[crop.id] ?? 0 }
+        : { id: crop.id, level: crop.level, hidden: true, hint: say(farming.texts, 'hidden', 0, { level: crop.level }) },
+    ),
   };
 }
 

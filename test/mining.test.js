@@ -580,7 +580,7 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
         ['Jubilerstwo', true, 25],
       ],
     );
-    assert.deepEqual(before.professions.rows, [['herbalism', 'mining'], ['alchemy', 'jewelcrafting'], ['crafting']]);
+    assert.deepEqual(before.professions.rows, [['herbalism', 'mining'], ['alchemy', 'jewelcrafting'], ['fishing', 'farming'], ['cooking', 'crafting']]);
     assert.equal(before.professions.mining, null);
     const locked = await mine({ minutes: 60 });
     assert.deepEqual([locked.status, locked.data.error.message], [403, 'Górnictwo odblokujesz na poziomie postaci 25.']);

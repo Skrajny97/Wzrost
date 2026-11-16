@@ -425,7 +425,7 @@ export const SPRITES = {
   // The professions' squares on the Profesje tab, 48×48.
   professions: {
     size: 48,
-    ids: ['herbalism', 'alchemy', 'crafting', 'mining', 'jewelcrafting'],
+    ids: ['herbalism', 'alchemy', 'crafting', 'mining', 'jewelcrafting', 'fishing', 'farming', 'cooking'],
   },
   // The gems and ores of Górnictwo (data/professions.json, minerals), 32×32,
   // drawn in PixelLab (545).
@@ -433,13 +433,34 @@ export const SPRITES = {
     size: 32,
     ids: ['quartz', 'agate', 'amethyst', 'emerald', 'sapphire', 'ruby', 'diamond', 'silver-ore', 'gold-ore', 'star-ore'],
   },
+  // The fish of Rybołówstwo (data/professions.json, fish), 32×32, drawn in
+  // PixelLab (1001, 1057).
+  fish: {
+    size: 32,
+    ids: ['roach', 'perch', 'crucian', 'bream', 'tench', 'carp', 'eel', 'pike', 'zander', 'trout', 'catfish', 'sturgeon', 'salmon', 'golden-carp', 'water-catfish', 'silverfish', 'drowned-pike', 'golden-fish'],
+  },
+  // The crops of Rolnictwo (data/professions.json, crops), 32×32, drawn in
+  // PixelLab (1002, 1058).
+  crops: {
+    size: 32,
+    ids: ['turnip', 'peas', 'millet', 'oats', 'cabbage', 'onion', 'carrot', 'rye', 'broad-bean', 'beet', 'wheat', 'buckwheat', 'pumpkin', 'poppy', 'garlic', 'giant-turnip', 'golden-ear', 'mokosh-grain'],
+  },
+  // The dishes of Gotowanie (data/professions.json, dishes), 32×32, drawn in
+  // PixelLab (1003, 1059).
+  dishes: {
+    size: 32,
+    ids: [
+      'baked-turnip', 'pea-soup', 'fried-roach', 'millet-crucian', 'oat-kissel', 'fish-cabbage', 'fried-carp', 'zurek', 'eel-beans', 'borscht',
+      'pike-pierogi', 'buckwheat-zander', 'campfire-trout', 'pumpkin-soup', 'fisherman-feast', 'kutia', 'garlic-salmon', 'golden-carp-herbs', 'switez-soup', 'mokosh-feast',
+    ],
+  },
   // The places where professions work, dim behind their cards, the
   // Ewolucja tab's spring behind its heading, and the Osada's rooms behind
   // their residents' cards (the Salon Gier's), 192×96.
   places: {
     width: 192,
     height: 96,
-    ids: ['system-grove', 'system-workshop', 'system-workbench', 'system-mine', 'system-lapidary', 'system-spring', 'tower-solo', 'tower-party', 'guild-keep', 'casino-hall', 'trial-hall', 'wanted-board', 'portal-gold', 'portal-wood', 'portal-stone', 'portal-ore', 'portal-materials', 'portal-parts', 'arena'],
+    ids: ['system-grove', 'system-workshop', 'system-workbench', 'system-mine', 'system-lapidary', 'system-pond', 'system-field', 'system-kitchen', 'system-spring', 'tower-solo', 'tower-party', 'guild-keep', 'casino-hall', 'trial-hall', 'wanted-board', 'portal-gold', 'portal-wood', 'portal-stone', 'portal-ore', 'portal-materials', 'portal-parts', 'arena'],
   },
   // The fights' boards under the formation of a fight's playback (arena.js;
   // 790 B, the Arena's sand), 192×160, a place's fightBoard in
@@ -675,6 +696,22 @@ export const herbSprite = (id) => sprite('herbs', id, 'sprite--item');
 export const potionSprite = (id) => sprite('potions', id, 'sprite--item');
 // A gem or an ore of Górnictwo.
 export const mineralSprite = (id) => sprite('minerals', id, 'sprite--item');
+// A fish of Rybołówstwo.
+export const fishSprite = (id) => sprite('fish', id, 'sprite--item');
+// A crop of Rolnictwo.
+export const cropSprite = (id) => sprite('crops', id, 'sprite--item');
+// A dish of Gotowanie.
+export const dishSprite = (id) => sprite('dishes', id, 'sprite--item');
+// A good of the Spiżarnia: a fish, a crop or a dish (their ids differ).
+export const pantrySprite = (id) => fishSprite(id) ?? cropSprite(id) ?? dishSprite(id);
+// The Systemowe Pole's pictures (1005 B, accepted on 16.11.2026): the
+// meadow under the board, 192×160, a plot's tilled ground and the plants'
+// four stages of growth, common to all crops, 48×48.
+export const farmArt = {
+  board: '/art/farm/field-board.png',
+  plot: '/art/farm/plot.png',
+  stage: (stage) => `/art/farm/stage-${stage}.png`,
+};
 export const professionSprite = (id) => sprite('professions', id, 'sprite--profession');
 // Gold or a resource where a line icon stood: the resource's sprite, never
 // under 24 px, where its detail still reads (at 14 px in the camp's bubbles

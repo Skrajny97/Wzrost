@@ -1596,6 +1596,667 @@
         }
       }
     },
+    "fishing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minutes",
+        "place",
+        "profession",
+        "slots",
+        "spread",
+        "texts",
+        "yieldPerLevel"
+      ],
+      "properties": {
+        "profession": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Profesja zbieracka, która łowi ryby."
+        },
+        "place": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "name",
+            "description"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "minutes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "min",
+            "step",
+            "max"
+          ],
+          "properties": {
+            "min": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "step": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "yieldPerLevel": {
+          "type": "number",
+          "minimum": 0
+        },
+        "spread": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.9
+        },
+        "slots": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Od którego poziomu ile rodzajów ryb łowi się naraz; pierwszy wpis od poziomu 1.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "level",
+              "fish"
+            ],
+            "properties": {
+              "level": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "fish": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        },
+        "mastery": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "from",
+            "to",
+            "chance"
+          ],
+          "description": "Szansa po opanowaniu profesji (952.3 A, 952.4 A): od 0 na poziomie from rośnie równo do chance na poziomie to i dalej już nie rośnie. Każde zebrane zioło ma tyle szans na jedno dodatkowe.",
+          "properties": {
+            "from": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Poziom profesji, na którym szansa wynosi jeszcze 0."
+            },
+            "to": {
+              "type": "integer",
+              "minimum": 2,
+              "description": "Poziom profesji, na którym szansa sięga chance."
+            },
+            "chance": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Szansa na poziomie to."
+            }
+          }
+        },
+        "about": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Opis pod „Jak to działa?”."
+        },
+        "texts": {
+          "type": "object",
+          "description": "Zdania raportu (report: jedno z wariantów) i komunikaty połowu.",
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "farming": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minutes",
+        "place",
+        "profession",
+        "plots",
+        "stages",
+        "spread",
+        "texts",
+        "yieldPerLevel"
+      ],
+      "properties": {
+        "profession": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Profesja zbieracka, która uprawia rośliny (Rolnictwo, 999.2)."
+        },
+        "place": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "name",
+            "description"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "minutes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "min",
+            "step",
+            "max"
+          ],
+          "properties": {
+            "min": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "step": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "yieldPerLevel": {
+          "type": "number",
+          "minimum": 0
+        },
+        "spread": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.9
+        },
+        "plots": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Od którego poziomu ile grządek ma Systemowe Pole (1005.1); pierwszy wpis od poziomu 1.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "level",
+              "plots"
+            ],
+            "properties": {
+              "level": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "plots": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        },
+        "stages": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Ile stadiów wzrostu widać na planszy (1005.3)."
+        },
+        "mastery": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "from",
+            "to",
+            "chance"
+          ],
+          "description": "Szansa po opanowaniu profesji (952.3 A, 952.4 A): od 0 na poziomie from rośnie równo do chance na poziomie to i dalej już nie rośnie. Każde zebrane zioło ma tyle szans na jedno dodatkowe.",
+          "properties": {
+            "from": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Poziom profesji, na którym szansa wynosi jeszcze 0."
+            },
+            "to": {
+              "type": "integer",
+              "minimum": 2,
+              "description": "Poziom profesji, na którym szansa sięga chance."
+            },
+            "chance": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Szansa na poziomie to."
+            }
+          }
+        },
+        "about": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Opis pod „Jak to działa?”."
+        },
+        "texts": {
+          "type": "object",
+          "description": "Zdania raportu (report: jedno z wariantów) i komunikaty połowu.",
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "cooking": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profession",
+        "place",
+        "dishMinutes",
+        "speedPerLevel",
+        "fastest",
+        "maxMinutes",
+        "bonusChance",
+        "mastery",
+        "priceFactor",
+        "meal",
+        "bonuses",
+        "about",
+        "texts"
+      ],
+      "properties": {
+        "profession": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Profesja wytwórcza, która gotuje potrawy."
+        },
+        "place": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "name",
+            "description"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "dishMinutes": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Ile minut trwa jedna potrawa na 1. poziomie profesji."
+        },
+        "speedPerLevel": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.1,
+          "description": "O jaką część czasu potrawy skraca ją każdy poziom profesji."
+        },
+        "fastest": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "description": "Najkrótszy czas potrawy, jako część czasu z 1. poziomu."
+        },
+        "maxMinutes": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Najdłuższe gotowanie naraz, w minutach."
+        },
+        "bonusChance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Szansa każdej potrawy na drugą, przed mistrzostwem."
+        },
+        "mastery": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "from",
+            "to",
+            "chance"
+          ],
+          "properties": {
+            "from": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "to": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "chance": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "description": "Mistrzostwo: szansa na dodatkową potrawę rośnie od poziomu from do chance na poziomie to."
+        },
+        "priceFactor": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Ile razy cenę składników płaci karczmarz za potrawę."
+        },
+        "meal": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "minutes"
+          ],
+          "properties": {
+            "minutes": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "description": "Posiłek (999.5 v2): ile minut wypraw działa zjedzona potrawa."
+        },
+        "bonuses": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "xp",
+            "materials",
+            "rare",
+            "gold",
+            "cards",
+            "resources",
+            "chests"
+          ],
+          "properties": {
+            "xp": {
+              "type": "string",
+              "minLength": 1
+            },
+            "materials": {
+              "type": "string",
+              "minLength": 1
+            },
+            "rare": {
+              "type": "string",
+              "minLength": 1
+            },
+            "gold": {
+              "type": "string",
+              "minLength": 1
+            },
+            "cards": {
+              "type": "string",
+              "minLength": 1
+            },
+            "resources": {
+              "type": "string",
+              "minLength": 1
+            },
+            "chests": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "description": "Opis premii każdego rodzaju, z {value}."
+        },
+        "about": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "fish": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "genitive",
+          "level",
+          "perHour",
+          "price",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "genitive": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Nazwa w dopełniaczu."
+          },
+          "level": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Poziom Rybołówstwa, od którego postać zna tę rybę."
+          },
+          "perHour": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "price": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "description": "Ryby Rybołówstwa (999, 1001): w Spiżarni, poza miejscem plecaka; price płaci karczmarz za sztukę."
+    },
+    "crops": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "genitive",
+          "level",
+          "perHour",
+          "price",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "genitive": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Nazwa w dopełniaczu."
+          },
+          "level": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Poziom Rolnictwa, od którego postać zna tę roślinę."
+          },
+          "perHour": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "price": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "description": "Plony Rolnictwa (999, 1002): w Spiżarni, poza miejscem plecaka; price płaci karczmarz za sztukę."
+    },
+    "dishes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "level",
+          "ingredients",
+          "bonuses",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "level": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Poziom Gotowania, od którego postać zna ten przepis."
+          },
+          "ingredients": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Składniki jednej potrawy: ryby i plony ze Spiżarni albo zioła z plecaka, po id."
+          },
+          "bonuses": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "value"
+              ],
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "xp",
+                    "materials",
+                    "rare",
+                    "gold",
+                    "cards",
+                    "resources",
+                    "chests"
+                  ]
+                },
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "description": "Wielkość premii: procent albo punkty procentowe (rare)."
+                }
+              }
+            },
+            "description": "Premie posiłku (999.4, uwaga autora z 16.11: lepsze potrawy łączą kilka premii)."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "description": "Potrawy Gotowania (999, 1003): w Spiżarni; zjedzona przy wyruszaniu daje premię na 4 godziny wypraw."
+    },
     "potionUse": {
       "type": "object",
       "additionalProperties": false,

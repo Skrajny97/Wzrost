@@ -421,6 +421,40 @@ button {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+/* With the Spiżarnia too, five tabs: three over two on a phone, one row
+   from 640 px (1057). */
+.bag-tabs--five {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.bag-tabs--five .segmented-option:nth-child(-n + 3) {
+  grid-column: span 2;
+}
+
+.bag-tabs--five .segmented-option:nth-child(n + 4) {
+  grid-column: span 3;
+  border-top: 1px solid var(--system-line);
+}
+
+.bag-tabs--five .segmented-option:nth-child(4) {
+  border-left: 0;
+}
+
+@media (min-width: 640px) {
+  .bag-tabs--five {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .bag-tabs--five .segmented-option:nth-child(n) {
+    grid-column: auto;
+    border-top: 0;
+  }
+
+  .bag-tabs--five .segmented-option:nth-child(4) {
+    border-left: 1px solid var(--system-line);
+  }
+}
+
 .bag-tabs--four .segmented-option:nth-child(3) {
   border-left: 0;
 }
@@ -9678,6 +9712,256 @@ a.profession-square:active {
 .chip--herbs {
   border-color: rgba(167, 196, 127, 0.6);
   color: var(--leaf);
+}
+
+/* A fishing's chip, in the blue of the Staw's water. */
+.chip--fish {
+  border-color: rgba(120, 170, 220, 0.6);
+  color: #8fc3ef;
+}
+
+/* The meal's picker among the exploration's options (1059): the dish's
+   name over its bonuses, which wrap, in the potions' list's look. */
+.meal-picker .potion-kind-current,
+.meal-picker .potion-kind-option {
+  flex-wrap: nowrap;
+}
+
+.meal-kind-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.meal-picker .potion-kind-name {
+  flex: none;
+}
+
+.meal-picker .potion-kind-meta {
+  margin-left: 0;
+  white-space: normal;
+}
+
+/* A dish's meal and its bonus (1059), in the gold of the bonuses. */
+.cook-bonus {
+  color: var(--gold);
+}
+
+/* A cooking's chip, in the red of a hearth's embers. */
+.chip--dishes {
+  border-color: rgba(220, 120, 90, 0.6);
+  color: #f0a183;
+}
+
+/* A farming's chip, in the gold of ripe grain. */
+.chip--crops {
+  border-color: rgba(214, 186, 96, 0.6);
+  color: #e3c873;
+}
+
+/* Rolnictwo's Systemowe Pole (1005, accepted 16.11.2026): the meadow under
+   the board, three plots in a row, each its tilled ground with the crop
+   chosen, the plants of a stage of growth with the crop's icon in the
+   corner, a "+" to sow or a lock, and its name under it. The report's
+   board has four in a row. */
+.farm-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.farm-board {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 14px 12px 18px;
+  border: 1px solid var(--bark-line);
+  background: var(--farm-board) center / cover no-repeat;
+  image-rendering: pixelated;
+}
+
+.farm-board::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 12, 6, 0.18);
+  pointer-events: none;
+}
+
+.farm-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.farm-board--small .farm-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.farm-plot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+}
+
+button.farm-plot {
+  cursor: pointer;
+}
+
+.farm-plot-ground {
+  position: relative;
+  width: 100%;
+  max-width: 120px;
+  aspect-ratio: 1;
+}
+
+.farm-plot-ground > img,
+.farm-plot-ground > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.farm-plot-ground > .farm-crop {
+  inset: 18%;
+  width: 64%;
+  height: 64%;
+}
+
+.farm-plot-ground > .farm-stage {
+  inset: 4% 8% 14%;
+  width: 84%;
+  height: 82%;
+  transform-origin: 50% 90%;
+  animation: farm-sway 3.2s ease-in-out infinite alternate;
+}
+
+.farm-plot:nth-child(3n + 2) .farm-stage {
+  animation-delay: -1.1s;
+}
+
+.farm-plot:nth-child(3n) .farm-stage {
+  animation-delay: -2.3s;
+}
+
+@keyframes farm-sway {
+  from {
+    transform: rotate(-2.5deg);
+  }
+
+  to {
+    transform: rotate(2.5deg);
+  }
+}
+
+.farm-plot-ground > .farm-badge {
+  inset: auto 2% 2% auto;
+  width: 38%;
+  height: 38%;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7));
+}
+
+.farm-count {
+  position: absolute;
+  top: 2%;
+  left: 2%;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: rgba(8, 10, 6, 0.78);
+  color: var(--gold, #e3c873);
+  font-family: var(--font-system);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.farm-lock {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+}
+
+.farm-plot-name {
+  max-width: 100%;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(8, 10, 6, 0.72);
+  font-size: 12px;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.farm-plot--empty .farm-plot-ground::after {
+  content: '+';
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--system);
+  font: 700 34px/1 var(--font-system);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.7);
+}
+
+.farm-plot--empty .farm-plot-name {
+  color: var(--system);
+}
+
+.farm-plot--fallow .farm-plot-name,
+.farm-plot--locked .farm-plot-name {
+  color: var(--text-muted);
+}
+
+.farm-plot--locked .farm-plot-art {
+  filter: grayscale(1) brightness(0.45);
+}
+
+.farm-legend {
+  margin: 0;
+}
+
+.farm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.farm-actions .button {
+  flex: 1 1 160px;
+}
+
+.farm-stage-note {
+  margin: 0;
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
+.calm .farm-plot-ground > .farm-stage {
+  animation: none;
+}
+
+@media (min-width: 900px) {
+  .farm-board {
+    max-width: 520px;
+  }
 }
 
 .chip--potions,

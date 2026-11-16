@@ -8,7 +8,7 @@
 // page's language (t(), i18n.js).
 
 import { areaArt } from '../area-art.js';
-import { landArt, materialSprite, monsterSprite, potionSprite } from '../art.js';
+import { dishSprite, landArt, materialSprite, monsterSprite, potionSprite } from '../art.js';
 import { bonusList } from '../bonuses.js';
 import { leaveView as leaveHistoryView, openView as openHistoryView } from '../history.js';
 import { fill, h, icon } from '../dom.js';
@@ -58,6 +58,8 @@ const CHOICE_KEY = 'wzrost.hunt-choice';
 // healBelow } (picks, their strengths and counts since 959, for the kinds
 // chosen from a list).
 const POTION_KEY = 'wzrost.potion-choice';
+// The dish last chosen to eat as an exploration sets out (mealPicker).
+const MEAL_KEY = 'wzrost.meal-choice';
 // The kinds of potions taken as one choice from a list (959 B), with the
 // name of the row.
 const POTION_GROUPS = { heal: 'Leczenie', mana: 'Mana' };
@@ -276,6 +278,8 @@ export function mountCombat(container, { params, navigate }) {
   // The potions to take along on the screen (potionPicker), whose healing
   // ones count in the threat.
   let potions = null;
+  // The meal to eat as it sets out (mealPicker), or null.
+  let meal = null;
   let loading = false;
   let loadAgain = false;
   let countdown = null;
@@ -381,6 +385,7 @@ export function mountCombat(container, { params, navigate }) {
     shownArea = null;
     showThreat = null;
     potions = null;
+    meal = null;
 
     // While the character is away, every view shows the exploration. The
     // main view has the week of the year under the top bar (weeks.js).
@@ -494,6 +499,24 @@ export function mountCombat(container, { params, navigate }) {
       return systemPanel(
         activityFinished(activity) ? t('Praca w Szlifierni zakończona. Raport czeka w Jubilerstwie.') : t('Postać pracuje w miejscu: {place}.', { place: activity.placeName }),
         h('a', { class: 'button button--system', href: '#/profesje/jubilerstwo', text: t('Do Jubilerstwa') }),
+      );
+    }
+    if (activity.kind === 'fish') {
+      return systemPanel(
+        activityFinished(activity) ? t('Połów zakończony. Raport czeka w Rybołówstwie.') : t('Postać łowi ryby w miejscu: {place}.', { place: activity.placeName }),
+        h('a', { class: 'button button--system', href: '#/profesje/rybolowstwo', text: t('Do Rybołówstwa') }),
+      );
+    }
+    if (activity.kind === 'dishes') {
+      return systemPanel(
+        activityFinished(activity) ? t('Gotowanie zakończone. Raport czeka w Gotowaniu.') : t('Postać gotuje w miejscu: {place}.', { place: activity.placeName }),
+        h('a', { class: 'button button--system', href: '#/profesje/gotowanie', text: t('Do Gotowania') }),
+      );
+    }
+    if (activity.kind === 'crops') {
+      return systemPanel(
+        activityFinished(activity) ? t('Uprawa zakończona. Raport czeka w Rolnictwie.') : t('Postać uprawia pole w miejscu: {place}.', { place: activity.placeName }),
+        h('a', { class: 'button button--system', href: '#/profesje/rolnictwo', text: t('Do Rolnictwa') }),
       );
     }
     preloadReportMusic();
@@ -939,6 +962,9 @@ export function mountCombat(container, { params, navigate }) {
     // One from a Wymiana stays home until its recipe is known.
     const carried = use && !first ? (character.potions ?? []).filter((potion) => potion.fight && potion.known) : [];
     potions = carried.length > 0 ? potionPicker(carried, use) : null;
+    // A dish of the Spiżarnia to eat as it sets out (cooking.js), while no
+    // meal works; not on the narrator's first exploration.
+    meal = first ? null : mealPicker(character);
     showThreat = () => {
       const known = options[area.id];
       const ratings =
@@ -1101,6 +1127,7 @@ export function mountCombat(container, { params, navigate }) {
               trackQuests: tracking(),
               trackUnknown: tracingUnknown(),
               ...(potions && { potions: potions.taken(), healBelow: potions.below() }),
+              ...(meal?.chosen() && { meal: meal.chosen() }),
               ...(scouted && !along && { scout: scouted }),
               ...(hardOn() && !along && { hard: true }),
               ...(hiring && { mercenary: hiring }),
@@ -1140,6 +1167,7 @@ export function mountCombat(container, { params, navigate }) {
         trackQuests: tracking(),
         trackUnknown: tracingUnknown(),
         ...(potions && { potions: potions.taken(), healBelow: potions.below() }),
+        ...(meal?.chosen() && { meal: meal.chosen() }),
         ...(scouted && { scout: scouted }),
       }));
 
@@ -1181,7 +1209,7 @@ export function mountCombat(container, { params, navigate }) {
         // threat it changes and "Wyrusz" (the author: not scattered over the
         // card). The narrator's first exploration has only its length.
         // Open while a mercenary is chosen, so its fee is in sight.
-        first ? durations : huntOptions(summary, [durations, potions?.element, choices, scoutBox], Boolean(mercenary?.chosen())),
+        first ? durations : huntOptions(summary, [durations, potions?.element, meal?.element, choices, scoutBox], Boolean(mercenary?.chosen())),
         threatLine,
         threatAlone,
         watchLine,
@@ -1361,6 +1389,84 @@ export function mountCombat(container, { params, navigate }) {
       icon('chevron', { size: 18, className: 'hunt-options-chevron' }),
     );
     return h('section', { class: 'hunt-options', 'aria-label': t('Opcje wyprawy') }, toggle, body);
+  }
+
+  // The meal (cooking.js; 999.5 v2): with none at work and dishes in the
+  // Spiżarnia, one to eat as the character sets out, or none, the last
+  // choice remembered in this browser; its bonus works for 4 hours of
+  // explorations. A meal at work shows among "Aktywne bonusy" instead.
+  // { element, chosen(): the dish's id or null }, or null.
+  function mealPicker(character) {
+    const dishes = (character.pantry ?? []).filter((good) => good.group === 'dish');
+    if (character.meal || dishes.length === 0) return null;
+    let stored = null;
+    try {
+      stored = localStorage.getItem(MEAL_KEY);
+    } catch {
+      // Without storage nothing is remembered.
+    }
+    let picked = dishes.find((dish) => dish.id === stored) ?? null;
+    const art = (dish) => (dish && dishSprite(dish.id)) ?? icon('pot', { size: 24 });
+    // The dish's name over its bonuses and how many there are, which wrap.
+    const line = (dish) => [
+      h('span', { class: 'potion-pick-art' }, art(dish)),
+      h(
+        'span',
+        { class: 'meal-kind-text' },
+        h('span', { class: 'potion-kind-name', text: dish ? `${dish.name} · ${t('masz {count}', { count: dish.count })}` : t('Bez posiłku') }),
+        h('span', { class: 'potion-kind-meta cook-bonus', text: dish ? dish.bonus : t('bez premii') }),
+      ),
+    ];
+    const shown = h('span', { class: 'potion-kind-current' });
+    const options = h('ul', { class: 'potion-kind-options', hidden: true, role: 'listbox', 'aria-label': t('Posiłek') });
+    const setOpen = (open) => {
+      options.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+    };
+    const toggle = h('button', { type: 'button', class: 'potion-kind', 'aria-expanded': 'false', 'aria-label': t('Posiłek'), onClick: () => setOpen(options.hidden) }, shown, h('span', { class: 'potion-kind-caret', 'aria-hidden': 'true', text: '▾' }));
+    const show = () => {
+      shown.replaceChildren(...line(picked));
+      options.replaceChildren(
+        ...[null, ...dishes].map((dish) =>
+          h(
+            'li',
+            {},
+            h(
+              'button',
+              {
+                type: 'button',
+                role: 'option',
+                class: 'potion-kind-option',
+                'aria-selected': String((dish?.id ?? null) === (picked?.id ?? null)),
+                onClick: () => {
+                  picked = dish;
+                  try {
+                    if (dish) localStorage.setItem(MEAL_KEY, dish.id);
+                    else localStorage.removeItem(MEAL_KEY);
+                  } catch {
+                    // Without storage nothing is remembered.
+                  }
+                  setOpen(false);
+                  show();
+                },
+              },
+              ...line(dish),
+            ),
+          ),
+        ),
+      );
+    };
+    show();
+    return {
+      element: h(
+        'div',
+        { class: 'stack meal-picker' },
+        h('p', { class: 'duration-title', text: t('Posiłek') }),
+        h('div', { class: 'potion-kind-box' }, toggle, options),
+        h('p', { class: 'muted', text: t('Zjedzona potrawa działa przez 4 godziny wypraw. Nową zjesz, gdy poprzednia się skończy.') }),
+      ),
+      chosen: () => picked?.id ?? null,
+    };
   }
 
   // The potions to take along, up to one for each fight of the length, and

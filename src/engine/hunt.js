@@ -26,6 +26,7 @@
 import { challengeAt, combatantView, exploreStrength, monsterCombatant, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
 import { areaLand, cardBonusLine, cardDrop, cardDropText, cardFrom, lowerLandCards, PACK, packDropText } from './cards.js';
+import { mealEffects, mealLine } from './cooking.js';
 import { addCounts, materialDrops, materialView, materialsText } from './crafting.js';
 import { canUse, itemName, itemRank, itemView, randomItem } from './items.js';
 import { TIMED_KINDS, bladeOil, fightPotions } from './potions.js';
@@ -678,12 +679,15 @@ function settingOut(one, week, area, id, content) {
 // a card of a creature of a land lower than the place's (902 B), one the
 // character has not got first; all drawn from a seed of their own, so the
 // rest of the exploration goes as it would without them. Null: no cards.
+// `meal`: the dish eaten as it set out (cooking.js, 999.4, 999.5 v2): {
+// dish, kind, value, share, minutes }, its bonus for the share of the time
+// it covers, on a trip each member's own; null without one.
 /**
  * @param {Record<string, any>} options
  * @param {Content} content
  */
 export function simulateHunt(
-  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, rareMore = 0, materialsMore = 0, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [], blessing = null, scouted = null, wanted = null, seat = null, hard = false, week = null, cards = null },
+  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, rareMore = 0, materialsMore = 0, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [], blessing = null, scouted = null, wanted = null, seat = null, hard = false, week = null, cards = null, meal = null },
   content,
 ) {
   // A Drużyna's trip (src/server/trips.js) gives `roster`, its players in
@@ -792,7 +796,23 @@ export function simulateHunt(
   const cardsXp = 1 + (cards?.xp ?? 0);
   const cardsGold = 1 + (cards?.gold ?? 0);
   const seatRarity = 1 + (seat?.rarity ?? 0);
-  const loot = { filled, classId: gearKey(character.classId, character.evolution, content), maxClassLevel: area.maxLevel, area, otherClassShare, uniqueBonus, ...(seatRarity !== 1 && { rarityBonus: seatRarity }) };
+  // The meal (cooking.js): its shares more of the XP, the gold, the
+  // materials, the card chances, the resources and the chests among the
+  // finds, and its points more of a rarer item, in every fight and find,
+  // for the share of the time it covers.
+  const fed = mealEffects(meal);
+  const mealXp = 1 + fed.xp;
+  const mealGold = 1 + fed.gold;
+  const loot = {
+    filled,
+    classId: gearKey(character.classId, character.evolution, content),
+    maxClassLevel: area.maxLevel,
+    area,
+    otherClassShare,
+    uniqueBonus,
+    ...(seatRarity !== 1 && { rarityBonus: seatRarity }),
+    ...(fed.rare > 0 && { rarityPoints: fed.rare }),
+  };
   const hpStart = me.hp;
   let result = 'success';
   let endedAt = durationMs; // a faint or an escape ends the exploration early
@@ -813,7 +833,7 @@ export function simulateHunt(
   let materials = {}; // { "wolf-pelt:common": 2, … } from beaten creatures
   // Tropiciel (an evolution's trait, the character's or a companion's form's),
   // and the Bractwo Łowców: more materials from creatures.
-  const moreMaterials = (1 + trackerMaterials(character, companions, content)) * (1 + materialsMore) * weekFactor(week, 'materials');
+  const moreMaterials = (1 + trackerMaterials(character, companions, content)) * (1 + materialsMore) * weekFactor(week, 'materials') * (1 + fed.materials);
   // The week's shares of the fights' XP and gold (weeks.js).
   const weekXp = weekFactor(week, 'xp');
   const weekGold = weekFactor(week, 'gold');
@@ -871,7 +891,7 @@ export function simulateHunt(
   const outcomes = raisedOutcome(
     Object.entries(rewards.findOutcomes).filter(([kind]) => !(first && kind === 'chest')),
     'chest',
-    weekFactor(week, 'items'),
+    weekFactor(week, 'items') * (1 + fed.chests),
   );
   // A young character's finds hold more chests (youngChestFactor), beside
   // what they hold, so no gold, resources or shards of time go: each find
@@ -892,14 +912,14 @@ export function simulateHunt(
       const findLevel = areaLevel(area, lootRng, content);
       const outcome = lootRng.weighted(outcomes, ([, weight]) => weight)[0];
       if (outcome === 'gold') {
-        const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * lootRng.float(0.5, 1.5) * blessedBy('gold', fights.length) * seatGold * cardsGold * hardGold));
+        const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * lootRng.float(0.5, 1.5) * blessedBy('gold', fights.length) * seatGold * cardsGold * mealGold * hardGold));
         gold += amount;
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findGold', step, { gold: amount }) });
       } else if (outcome === 'chest') {
         const item = randomItem(findLevel, lootRng, content, blessedLoot(loot, fights.length));
         entries.push({ t: event.t, type: 'find', item: take(item), text: say(texts, 'findChest', step, { item: itemName(item, content) }) });
       } else if (outcome === 'resource') {
-        const found = resourceBundle(area, rewards.findResourcePerLevel * findLevel * lootRng.float(0.5, 1.5));
+        const found = resourceBundle(area, rewards.findResourcePerLevel * findLevel * lootRng.float(0.5, 1.5) * (1 + fed.resources));
         for (const [id, amount] of found) resources[id] = (resources[id] ?? 0) + amount;
         const list = found.map(([id, amount]) => `${nameInText(content.resourcesById[id].name, content)} +${amount}`).join(', ');
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findResource', step, { resources: list }) });
@@ -1010,13 +1030,13 @@ export function simulateHunt(
         fightXp +=
           monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(reached.level, enemy.level, content);
         const rank = monster.champion ? rewards.championGoldMultiplier : monster.elite ? rewards.eliteGoldMultiplier : 1;
-        const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus) * blessedBy('gold', fights.length - 1) * seatGold * cardsGold * hardGold * weekGold;
+        const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus) * blessedBy('gold', fights.length - 1) * seatGold * cardsGold * mealGold * hardGold * weekGold;
         fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * lootRng.float(0.5, 1.5) * goldFactor;
         const weight = enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1) * moreMaterials;
         summary.materials = addCounts(summary.materials, materialDrops(enemy.monsterId, enemy.level, weight, lootRng, content));
         // A card of the creature (874 A), not of the wanted's target nor
         // twice of one creature in an exploration.
-        const card = cardRng && !meeting ? cardDrop(enemy.monsterId, cardRng, { maxed: [...cards.maxed ?? [], ...cardsFound] }, content) : null;
+        const card = cardRng && !meeting ? cardDrop(enemy.monsterId, cardRng, { maxed: [...cards.maxed ?? [], ...cardsFound], more: fed.cards }, content) : null;
         if (card === PACK) {
           summary.packs = (summary.packs ?? 0) + 1;
           packsFound += 1;
@@ -1028,7 +1048,7 @@ export function simulateHunt(
       // And once for the fight, but the wanted's, a card of a creature of a
       // lower land (902 B): one the character has not got first, none at its
       // top level, none it found on this exploration.
-      const lower = cardRng && !meeting ? cardFrom(lowerCards, cardRng, { chance: content.cards.drops.lower, owned: cards.owned ?? [], maxed: cards.maxed ?? [], found: cardsFound }, content) : null;
+      const lower = cardRng && !meeting ? cardFrom(lowerCards, cardRng, { chance: content.cards.drops.lower * (1 + fed.cards), owned: cards.owned ?? [], maxed: cards.maxed ?? [], found: cardsFound }, content) : null;
       if (lower === PACK) {
         summary.packs = (summary.packs ?? 0) + 1;
         packsFound += 1;
@@ -1061,7 +1081,7 @@ export function simulateHunt(
       const trophy = meeting && own && sought.trophy ? { [sought.trophy]: 1 } : null;
       if (meeting && own) sighting.beaten = true;
       for (const [item] of chests) summary.chests.push(take(item));
-      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus) * partyXp * blessedBy('xp', fights.length - 1) * seatXp * cardsXp * hardXp * weekXp);
+      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus) * partyXp * blessedBy('xp', fights.length - 1) * seatXp * cardsXp * mealXp * hardXp * weekXp);
       summary.gold = Math.round(fightGold) - Math.round(goldBefore);
       xp += summary.xp;
       reached = gainXp(reached.level, reached.xp, summary.xp, (level) => xpToNext(level, content), maxLevel);
@@ -1110,7 +1130,7 @@ export function simulateHunt(
   // On the way the character also gathers a little of the region's resources:
   // a steady amount for the time explored, at the place's middle level, so
   // the camp does not wait for lucky finds.
-  const gatheredTotal = rewards.gatherPerLevelHour * ((area.minLevel + area.maxLevel) / 2) * (endedAt / 3600000);
+  const gatheredTotal = rewards.gatherPerLevelHour * ((area.minLevel + area.maxLevel) / 2) * (endedAt / 3600000) * (1 + fed.resources);
   if (gatheredTotal >= 0.5) {
     const gathered = resourceBundle(area, gatheredTotal);
     for (const [id, amount] of gathered) resources[id] = (resources[id] ?? 0) + amount;
@@ -1134,6 +1154,8 @@ export function simulateHunt(
     // And the packs of cards found instead of a card, with `cards` only.
     ...(packsFound > 0 && { packs: packsFound }),
     ...((cardsXp > 1 || cardsGold > 1) && { cardsBonus: { xp: cards?.xp ?? 0, gold: cards?.gold ?? 0 } }),
+    // The meal's bonus, for the report's line.
+    ...(meal && { meal }),
     hpStart,
     hpEnd: me.hp,
     maxHp: me.unit.maxHp,
@@ -1403,8 +1425,9 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
       ...(overflow && overflow.count > 0 ? [say(content.texts, 'bagOverflow', 0, overflow)] : []),
       // The week it set out in, where its effects changed the result
       // ("Tydzień Kuny: +5% złota z walk.", weeks.js), and Talia Systemu's
-      // collection, where its bonus did (cards.js).
-      ...[weekLine(hunt, content), cardBonusLine(hunt, content)].filter(Boolean),
+      // collection, where its bonus did (cards.js), and the meal eaten
+      // before it set out (cooking.js).
+      ...[weekLine(hunt, content), cardBonusLine(hunt, content), mealLine(hunt, content)].filter(Boolean),
     ],
     items: hunt.items.map((/** @type {Item} */ item, /** @type {number} */ index) => ({ ...itemView(item, content), ...(overflow?.sold.includes(index) && { sold: true }) })),
     fights: hunt.fights.map((/** @type {Record<string, any>} */ fight) => ({

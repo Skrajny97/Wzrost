@@ -348,8 +348,9 @@ describe('the Warsztat through the API', () => {
     const before = await character();
     const square = before.professions.list.find((profession) => profession.id === 'crafting');
     assert.deepEqual([square.locked, square.unlockLevel, square.soon], [true, 15, false]);
-    // Zielarstwo and Alchemia open with the tab; Górnictwo and Jubilerstwo at 25.
-    const open = before.professions.list.filter((profession) => !['crafting', 'mining', 'jewelcrafting'].includes(profession.id));
+    // Zielarstwo and Alchemia open with the tab; Górnictwo, Jubilerstwo,
+    // Rybołówstwo, Rolnictwo and Gotowanie at 25.
+    const open = before.professions.list.filter((profession) => !['crafting', 'mining', 'jewelcrafting', 'fishing', 'farming', 'cooking'].includes(profession.id));
     assert.deepEqual(open.map((profession) => profession.id), ['herbalism', 'alchemy']);
     assert.ok(open.every((profession) => !profession.locked && profession.unlockLevel === 10));
     assert.equal(before.professions.workshop, null);
@@ -562,6 +563,9 @@ describe('the Warsztat switched off', () => {
       ['crafting', true],
       ['mining', false],
       ['jewelcrafting', false],
+      ['fishing', false],
+      ['farming', false],
+      ['cooking', false],
     ]);
     assert.equal(professions.workshop, null);
     const order = await call('POST', '/api/professions/craft', { cookie, body: { baseId: 'sword', rarity: 'common', count: 1 } });

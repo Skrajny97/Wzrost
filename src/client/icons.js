@@ -111,6 +111,12 @@ export const ICONS = {
   weapon: [path('M18 3h3v3L10.5 16.5l-3-3z'), path('M5.5 12.5l6 6'), path('M7 17l-3.5 3.5')],
   offhand: [path('M12 3l7 3v5c0 5-3 8.2-7 10-4-1.8-7-5-7-10V6z')],
   ring: [circle(12, 14, 6), path('M9 6l3-3 3 3-3 3z')],
+  // Rybołówstwo's fish (1057): a body, its tail and an eye.
+  fish: [path('M3 12c2.5-3.6 6.2-5.2 10-4.6 2.3.4 4 1.8 5 4.6-1 2.8-2.7 4.2-5 4.6-3.8.6-7.5-1-10-4.6z'), path('M18 12l3-3.5v7z'), circle(8, 11, 0.9)],
+  // Gotowanie's pot (1059): a pot with its lid and steam over it.
+  pot: [path('M4 11h16v3a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6z'), path('M3 11h18'), path('M10 8h4'), path('M9 4c0 1 1 1 1 2M13 3c0 1 1 1 1 2')],
+  // Rolnictwo's sprout (1058): a stem with two leaves over the ground.
+  sprout: [path('M12 21v-9'), path('M12 12c0-4 2.8-7 7-7 0 4.2-3 7-7 7z'), path('M12 14.5c0-3.2-2.4-5.5-6-5.5 0 3.2 2.4 5.5 6 5.5z'), path('M6 21h12')],
   talisman: [path('M12 21c-5-4-7-9-4-15 1 3 4 4 4 4s3-1 4-4c3 6 1 11-4 15z'), path('M12 10v9')],
 
   // Talia Systemu's cards (cards.js): their Życie by their Atak's sword.

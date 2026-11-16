@@ -18,12 +18,13 @@
 // its own card. Locked, or hidden in this deployment, the tab says so as
 // before.
 
-import { goldArt, herbSprite, itemSprite, mineralSprite, placeArt, potionSprite, professionSprite, scrollArt } from '../art.js';
+import { cropSprite, dishSprite, farmArt, fishSprite, goldArt, herbSprite, itemSprite, mineralSprite, placeArt, potionSprite, professionSprite, scrollArt } from '../art.js';
 import { droppedCardsSection } from '../cards.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatDecimal, formatMinutes, formatNumber, timeFormat } from '../format.js';
-import { t } from '../i18n.js';
+import { language, t } from '../i18n.js';
+import { motionOn } from '../motion.js';
 import { workScene } from '../scenes.js';
 import { playSound } from '../sound.js';
 import { activityFinished, call, reportCache, serverNow, state, testModeOn } from '../state.js';
@@ -37,13 +38,16 @@ import { lockedScreen } from './locked.js';
 
 const HOME = '#/profesje';
 // The addresses of the professions with a screen.
-const SCREENS = { zielarstwo: 'herbalism', alchemia: 'alchemy', rzemieslnictwo: 'crafting', gornictwo: 'mining', jubilerstwo: 'jewelcrafting' };
+const SCREENS = { zielarstwo: 'herbalism', alchemia: 'alchemy', rzemieslnictwo: 'crafting', gornictwo: 'mining', jubilerstwo: 'jewelcrafting', rybolowstwo: 'fishing', rolnictwo: 'farming', gotowanie: 'cooking' };
 const HASHES = {
   herbalism: `${HOME}/zielarstwo`,
   alchemy: `${HOME}/alchemia`,
   crafting: `${HOME}/rzemieslnictwo`,
   mining: `${HOME}/gornictwo`,
   jewelcrafting: `${HOME}/jubilerstwo`,
+  fishing: `${HOME}/rybolowstwo`,
+  farming: `${HOME}/rolnictwo`,
+  cooking: `${HOME}/gotowanie`,
 };
 // The activity of each profession's work, and what its square says meanwhile
 // (in Polish, shown through t(), i18n.js).
@@ -53,16 +57,22 @@ const WORK = {
   crafting: { kind: 'items', busy: 'Wykonuje przedmioty' },
   mining: { kind: 'minerals', busy: 'Kopie' },
   jewelcrafting: { kind: 'jewels', busy: 'Pracuje w Szlifierni' },
+  fishing: { kind: 'fish', busy: 'Łowi ryby' },
+  farming: { kind: 'crops', busy: 'Uprawia pole' },
+  cooking: { kind: 'dishes', busy: 'Gotuje' },
 };
 // What the character or the Awatar Systemu is doing, by the activity's kind (t()).
-const DOING = { herbs: 'zbiera zioła', potions: 'warzy mikstury', items: 'wykonuje przedmioty', minerals: 'kopie w Kopalni', jewels: 'pracuje w Szlifierni', mercenary: 'wykonuje usługę najemną' };
-const FALLBACK_ICONS = { herbalism: 'leaf', alchemy: 'spirit', crafting: 'hammer', mining: 'ore', jewelcrafting: 'ring' };
+const DOING = { herbs: 'zbiera zioła', potions: 'warzy mikstury', items: 'wykonuje przedmioty', minerals: 'kopie w Kopalni', jewels: 'pracuje w Szlifierni', fish: 'łowi ryby', crops: 'uprawia pole', dishes: 'gotuje', mercenary: 'wykonuje usługę najemną' };
+const FALLBACK_ICONS = { herbalism: 'leaf', alchemy: 'spirit', crafting: 'hammer', mining: 'ore', jewelcrafting: 'ring', fishing: 'fish', farming: 'sprout', cooking: 'pot' };
 const HERB_CHOICE = 'wzrost.herb-choice';
 const WORKER_CHOICE = 'wzrost.worker-choice';
 const BREW_CHOICE = 'wzrost.brew-choice';
 const CRAFT_CHOICE = 'wzrost.craft-choice';
 const MINE_CHOICE = 'wzrost.mine-choice';
 const JEWEL_CHOICE = 'wzrost.jewel-choice';
+const FISH_CHOICE = 'wzrost.fish-choice';
+const FARM_CHOICE = 'wzrost.farm-choice';
+const COOK_CHOICE = 'wzrost.cook-choice';
 const SET_CHOICE = 'wzrost.set-choice';
 // The Stół rozbiórki, where parts are made.
 const TABLE = '#/oboz/craft-table';
@@ -87,6 +97,9 @@ const herbIcon = (id) => herbSprite(id) ?? icon('leaf', { size: 24 });
 const potionIcon = (id) => potionSprite(id) ?? icon('flask', { size: 24 });
 const patternIcon = (id) => itemSprite({ base: id }) ?? icon('hammer', { size: 24 });
 const mineralIcon = (id) => mineralSprite(id) ?? icon('ore', { size: 24 });
+const fishIcon = (id) => fishSprite(id) ?? icon('fish', { size: 24 });
+const cropIcon = (id) => cropSprite(id) ?? icon('sprout', { size: 24 });
+const dishIcon = (id) => dishSprite(id) ?? icon('pot', { size: 24 });
 const jewelIcon = (id) => itemSprite({ base: id }) ?? icon('ring', { size: 24 });
 const percentText = (share) => `${formatNumber(Math.round(share * 100))}%`;
 
@@ -190,6 +203,52 @@ function choiceList(label, { multi = false, unknown }) {
   };
 }
 
+// "50. i 100." in Polish, "50 and 100" in English: the levels of
+// Rolnictwo that give the field more plots.
+function levelList(levels) {
+  const english = language() === 'en';
+  const parts = levels.map((level) => (english ? String(level) : `${level}.`));
+  return parts.length > 1 ? `${parts.slice(0, -1).join(', ')} ${english ? 'and' : 'i'} ${parts.at(-1)}` : parts[0];
+}
+
+// The Systemowe Pole's title: its plots, and with the next level's still
+// locked how many the board shows ("Pole · 9 z 12 grządek").
+const fieldTitle = (count, next) =>
+  next ? t('Pole · {count} z {all} grządek', { count: formatNumber(count), all: formatNumber(next.plots) }) : t('Pole · {plots}', { plots: countOf(count, 'grządka', 'grządki', 'grządek') });
+
+// One plot of the Systemowe Pole (1005): its tilled ground and over it, by
+// `kind`, the crop chosen for it ('sown', `crop`; with `stage`, the plants
+// of that stage of growth and the crop's icon in the corner, and with
+// `count` what it brought), a "+" to sow it ('empty'), nothing ('fallow',
+// left empty) or a lock ('locked'); under it `label`. With `onClick` it is
+// a button.
+function farmPlot(kind, { crop = null, stage = 0, count = null, label = '', onClick = null, ariaLabel = null } = {}) {
+  const ground = h('span', { class: 'farm-plot-ground' }, h('img', { class: 'farm-plot-art', src: farmArt.plot, alt: '', width: 48, height: 48, draggable: 'false' }));
+  if (kind === 'sown') {
+    if (stage > 0) ground.append(h('img', { class: 'farm-stage', src: farmArt.stage(stage), alt: '', width: 48, height: 48, draggable: 'false' }));
+    const art = cropIcon(crop.id);
+    art.classList.add(stage > 0 ? 'farm-badge' : 'farm-crop');
+    ground.append(art);
+    if (count !== null) ground.append(h('span', { class: 'farm-count', text: `×${formatNumber(count)}` }));
+  }
+  if (kind === 'locked') ground.append(h('span', { class: 'farm-lock' }, icon('lock', { size: 22 })));
+  const children = [ground, h('span', { class: 'farm-plot-name', text: label })];
+  const className = `farm-plot farm-plot--${kind}`;
+  return onClick ? h('button', { type: 'button', class: className, 'aria-label': ariaLabel ?? label, onClick }, children) : h('div', { class: className }, children);
+}
+
+// The Systemowe Pole's board (1005): the meadow with the field's plots
+// (`cells`) and, while a later level gives more (`next`), the plots still
+// locked with that level. `small`: the report's, four plots in a row.
+function farmBoard(cells, next, { small = false } = {}) {
+  const locked = next ? Array.from({ length: Math.max(0, next.plots - cells.length) }, () => farmPlot('locked', { label: t('poz. {level}', { level: next.level }) })) : [];
+  return h(
+    'div',
+    { class: `farm-board${small ? ' farm-board--small' : ''}`, vars: { '--farm-board': `url("${farmArt.board}")` } },
+    h('div', { class: 'farm-grid' }, cells, locked),
+  );
+}
+
 export function mountProfessions(container, { params, navigate }) {
   const locked = lockedScreen('professions', 'Profesje');
   const professionId = params.profession ? SCREENS[params.profession] : null;
@@ -204,6 +263,9 @@ export function mountProfessions(container, { params, navigate }) {
   const mineChoice = loadChoice(MINE_CHOICE); // { minutes }
   const jewelChoice = loadChoice(JEWEL_CHOICE); // { slot, pattern, rarity, count }
   const setChoice = loadChoice(SET_CHOICE); // { item, gem }
+  const fishChoice = loadChoice(FISH_CHOICE); // { fish: [ids], minutes }
+  const farmChoice = loadChoice(FARM_CHOICE); // { plots: [id or null], crop, minutes }
+  const cookChoice = loadChoice(COOK_CHOICE); // { recipe, count }
   let lockedScreenShown = null;
   let shownState = null;
   // The Warsztat's tab: the workshop itself or its part exchange.
@@ -266,6 +328,36 @@ export function mountProfessions(container, { params, navigate }) {
       }
       if (professionId === 'mining') renderMining(character);
       else renderJewelcraft(character);
+      return;
+    }
+    // Rybołówstwo below its level, or hidden in this deployment, leads back
+    // to the tab.
+    if (professionId === 'fishing') {
+      if (!character.professions.fishing) {
+        location.replace(HOME);
+        return;
+      }
+      renderFishing(character);
+      return;
+    }
+    // Rolnictwo below its level, or hidden in this deployment, leads back
+    // to the tab.
+    if (professionId === 'farming') {
+      if (!character.professions.farming) {
+        location.replace(HOME);
+        return;
+      }
+      renderFarming(character);
+      return;
+    }
+    // Gotowanie below its level, or hidden in this deployment, leads back
+    // to the tab.
+    if (professionId === 'cooking') {
+      if (!character.professions.cooking) {
+        location.replace(HOME);
+        return;
+      }
+      renderCooking(character);
       return;
     }
     // The System's words over the squares, which the narrator points at.
@@ -609,14 +701,16 @@ export function mountProfessions(container, { params, navigate }) {
   // A work under way: its looping scene (scenes.js), what and for how long,
   // the countdown and its bar, the time of the report, "Przewiń" (`label`
   // names the work) and the button that calls the character, or the Awatar,
-  // back.
-  function workUnderWay(activity, what, label, cancel, avatar) {
+  // back; `extra`, what follows them and goes on with the time (the
+  // Systemowe Pole's plants), { element, update(done) }.
+  function workUnderWay(activity, what, label, cancel, avatar, extra = null) {
     const timer = {
       activity,
       countdown: h('p', { class: 'countdown', 'aria-live': 'off' }),
       progress: h('div', { class: 'bar-fill bar-fill--system' }),
       scene: workScene(activity.profession, activity, { avatar }),
       skipper: skipControl(avatar ? 'avatar' : 'activity', (now) => activity.endsAt - now, label),
+      extra,
     };
     timers.push(timer);
     const card = h(
@@ -631,6 +725,7 @@ export function mountProfessions(container, { params, navigate }) {
       ),
       timer.skipper.element,
       cancel,
+      extra?.element,
     );
     showTimer(timer, serverNow());
     return card;
@@ -1803,6 +1898,611 @@ export function mountProfessions(container, { params, navigate }) {
     return workUnderWay(activity, t('Kopanie w toku: {place}, {time}.', { place: activity.placeName, time: formatMinutes(activity.minutes) }), t('Kopanie'), cancel, avatar);
   }
 
+  // Rybołówstwo (1057): the works under way, the Systemowy Staw with how
+  // fishing goes folded under "Jak to działa?", the level and the form.
+  function renderFishing(character) {
+    const { list, fishing } = character.professions;
+    const profession = list.find((candidate) => candidate.id === fishing.professionId);
+    fill(
+      container,
+      backHeading(profession.name, t('poziom {level}', { level: profession.level }), HOME),
+      works(character, 'fish', fishingCard, 'Postać {doing}. Nad Staw wyruszy po powrocie.'),
+      testTools(character, 'fish', t('Tryb testowy: połów skończy się od razu, z tym samym wynikiem.')),
+      placeCard(fishing.place, fishing.about),
+      levelCard(profession, t('łowienia')),
+      anyFree(character) && fishForm(character, fishing),
+    );
+  }
+
+  // The fish to catch, as many kinds at once as the level allows, the time,
+  // what the fishing should bring, past the mastery its chance of a fish
+  // twice, and the start. The fish go to the Spiżarnia, which has no limit.
+  function fishForm(character, fishing) {
+    const who = workerPicker(character);
+    const known = fishing.fish.filter((fish) => !fish.hidden);
+    const slots = fishing.slots;
+    // The last choice, without fish no longer known or too many for now.
+    let chosen = (fishChoice.fish ?? []).filter((id) => known.some((fish) => fish.id === id)).slice(0, slots);
+    if (chosen.length === 0) chosen = [known[0].id];
+    const allowed = fishing.minutes;
+    let start = allowed.indexOf(fishChoice.minutes);
+    if (start === -1) start = Math.max(0, allowed.indexOf(60));
+    let minutes = allowed[start];
+
+    const list = choiceList(t('Ryby'), { multi: slots > 1, unknown: (count) => countOf(count, 'nieznana ryba', 'nieznane ryby', 'nieznanych ryb') });
+    const estimate = h('p', { class: 'herb-estimate' });
+    // How many kinds of fish at once, and the level that adds the next.
+    const next = fishing.slotLevels.find((slot) => slot.fish > slots);
+    const kinds = countOf(slots, 'rodzaj ryb', 'rodzaje ryb', 'rodzajów ryb');
+    const slotsHint = h('p', {
+      class: 'muted',
+      text: next
+        ? t('Obecnie możesz łowić tylko {kinds}. Kolejny rodzaj naraz przy poziomie Rybołówstwa: {level}.', { kinds, level: next.level })
+        : t('Obecnie możesz łowić naraz {kinds}.', { kinds }),
+    });
+    const remember = () => {
+      fishChoice.fish = chosen;
+      fishChoice.minutes = minutes;
+      saveChoice(FISH_CHOICE, fishChoice);
+    };
+
+    function toggle(id) {
+      if (slots === 1) chosen = [id];
+      else if (chosen.includes(id)) chosen = chosen.length > 1 ? chosen.filter((other) => other !== id) : chosen;
+      else if (chosen.length < slots) chosen = [...chosen, id];
+      else {
+        toast(t('Naraz złowisz najwyżej {count}.', { count: kinds }));
+        return;
+      }
+      remember();
+      show();
+    }
+
+    function show() {
+      const picked = chosen.map((id) => known.find((fish) => fish.id === id));
+      list.show(
+        {
+          art: picked.map((fish) => fishIcon(fish.id)),
+          name: picked.map((fish) => fish.name).join(', '),
+          meta: slots > 1 ? t('wybrano {count} z {max}', { count: picked.length, max: slots }) : t('w Spiżarni: {count}', { count: formatNumber(picked[0].count) }),
+        },
+        known.map((fish) => ({ id: fish.id, art: fishIcon(fish.id), name: fish.name, meta: t('w Spiżarni: {count}', { count: formatNumber(fish.count) }), on: chosen.includes(fish.id) })),
+        fishing.fish.filter((fish) => fish.hidden).map((fish) => ({ art: fishIcon(fish.id), level: fish.level, hint: fish.hint })),
+        toggle,
+      );
+      const share = chosen.length;
+      const expected = picked.map((fish) => {
+        const middle = (fish.perHour * minutes) / 60 / share;
+        const low = Math.max(0, Math.floor(middle * (1 - fishing.spread)));
+        const high = Math.ceil(middle * (1 + fishing.spread));
+        return `${fish.name} ${low === high ? formatNumber(low) : `${formatNumber(low)}–${formatNumber(high)}`}`;
+      });
+      estimate.textContent = t('Spodziewany połów: {fish}.', { fish: expected.join(', ') });
+    }
+
+    const picker = minutesPicker(
+      allowed,
+      start,
+      t('Czas połowu'),
+      (chosenMinutes) => {
+        minutes = chosenMinutes;
+        show();
+      },
+      remember,
+    );
+    picker.start();
+    const begin = h('button', {
+      type: 'button',
+      class: 'button button--system',
+      text: t('Wyrusz nad Staw'),
+      onClick: (event) =>
+        withButton(event.currentTarget, async () => {
+          remember();
+          await call('POST', '/api/professions/fish', { fish: chosen, minutes, ...who.body() });
+          window.scrollTo(0, 0);
+        }),
+    });
+    return h(
+      'section',
+      { class: 'card gather-card', 'aria-labelledby': 'fish-title' },
+      h('h2', { class: 'section-title', id: 'fish-title', text: t('Ryby') }),
+      who.element,
+      list.element,
+      slotsHint,
+      picker.element,
+      estimate,
+      fishing.mastery && h('p', { class: 'muted', text: fishing.mastery }),
+      begin,
+    );
+  }
+
+  // The fishing under way, or its report waiting. Called back early, the
+  // character comes back with nothing, as from the Zagajnik.
+  function fishingCard(activity, avatar) {
+    const names = (activity.fish ?? []).map((fish) => fish.name).join(', ');
+    if (activityFinished(activity)) {
+      return systemPanel(t('Połów zakończony: {fish}, {time}.', { fish: names, time: formatMinutes(activity.minutes) }), t('Raport czeka na odbiór.'), claimButton(avatar));
+    }
+    const cancel = h('button', {
+      type: 'button',
+      class: 'button button--world',
+      text: t('Przerwij połów'),
+      onClick: async (event) => {
+        const button = event.currentTarget;
+        const sure = await confirmAction({
+          title: t('Przerwać połów?'),
+          text: avatar ? t('Awatar wróci od razu, bez ryb i bez doświadczenia.') : t('Postać wróci od razu, bez ryb i bez doświadczenia.'),
+          confirmLabel: t('Przerwij'),
+          danger: true,
+        });
+        if (sure) await withButton(button, () => call('POST', cancelPath(avatar)));
+      },
+    });
+    return workUnderWay(activity, t('Połów w toku: {fish}, {time}.', { fish: names, time: formatMinutes(activity.minutes) }), t('Połów'), cancel, avatar);
+  }
+
+  // Rolnictwo (1058): the works under way, the Systemowe Pole with how
+  // farming goes folded under "Jak to działa?", the level and the field.
+  function renderFarming(character) {
+    const { list, farming } = character.professions;
+    const profession = list.find((candidate) => candidate.id === farming.professionId);
+    fill(
+      container,
+      backHeading(profession.name, t('poziom {level}', { level: profession.level }), HOME),
+      works(character, 'crops', (activity, avatar) => farmingCard(activity, avatar, farming), 'Postać {doing}. Na Pole wyjdzie po powrocie.'),
+      testTools(character, 'crops', t('Tryb testowy: uprawa skończy się od razu, z tym samym wynikiem.')),
+      placeCard(farming.place, farming.about),
+      levelCard(profession, t('uprawy')),
+      anyFree(character) && farmForm(character, farming),
+    );
+  }
+
+  // The field before the work (1005.1): a plot for each the level gives,
+  // each plot's crop chosen in its sheet (1005.2), "Obsiej puste" and
+  // "Wyczyść pole", who works, the time, what the field should bring, past
+  // the mastery its chance of a crop twice, and the start. The crops go to
+  // the Spiżarnia, which has no limit.
+  function farmForm(character, farming) {
+    const who = workerPicker(character);
+    const known = farming.crops.filter((crop) => !crop.hidden);
+    const byId = new Map(known.map((crop) => [crop.id, crop]));
+    const count = farming.plots;
+    const next = farming.plotLevels.find((tier) => tier.plots > count) ?? null;
+    // The last field, without crops no longer known, as many plots as the
+    // level gives now (new ones empty); the first time, all of the first
+    // crop. `crop`: the last one chosen, which "Obsiej puste" sows.
+    const saved = Array.isArray(farmChoice.plots) ? farmChoice.plots : null;
+    let plots = Array.from({ length: count }, (_, index) => (saved ? (byId.has(saved[index]) ? saved[index] : null) : known[0].id));
+    let crop = byId.has(farmChoice.crop) ? farmChoice.crop : known[0].id;
+    const allowed = farming.minutes;
+    let start = allowed.indexOf(farmChoice.minutes);
+    if (start === -1) start = Math.max(0, allowed.indexOf(60));
+    let minutes = allowed[start];
+
+    const remember = () => {
+      farmChoice.plots = plots;
+      farmChoice.crop = crop;
+      farmChoice.minutes = minutes;
+      saveChoice(FARM_CHOICE, farmChoice);
+    };
+    const sow = (next) => {
+      plots = next;
+      remember();
+      show();
+    };
+    const board = h('div', { class: 'farm-holder' });
+    const later = farming.plotLevels.filter((tier) => tier.plots > count).map((tier) => tier.level);
+    const legend = h('p', {
+      class: 'muted farm-legend',
+      text: [
+        t('Stuknij grządkę, żeby wybrać, co na niej wyrośnie. Każda grządka może mieć inną roślinę.'),
+        later.length > 0 && t('Więcej grządek odblokujesz na {levels} poziomie Rolnictwa.', { levels: levelList(later) }),
+      ]
+        .filter(Boolean)
+        .join(' '),
+    });
+    const sowEmpty = h('button', { type: 'button', class: 'button button--world button--small', onClick: () => sow(plots.map((id) => id ?? crop)) });
+    const clear = h('button', { type: 'button', class: 'button button--world button--small', text: t('Wyczyść pole'), onClick: () => sow(plots.map(() => null)) });
+    const estimate = h('p', { class: 'herb-estimate' });
+    const begin = h('button', {
+      type: 'button',
+      class: 'button button--system',
+      text: t('Zacznij uprawę'),
+      onClick: (event) =>
+        withButton(event.currentTarget, async () => {
+          remember();
+          await call('POST', '/api/professions/farm', { plots, minutes, ...who.body() });
+          window.scrollTo(0, 0);
+        }),
+    });
+
+    // A plot's sheet (1005.2): the crops known, each with its level and
+    // about how many it brings an hour from this plot, the field as it would
+    // be then (the time is shared evenly among the sown plots); the next
+    // crops the System still hides, as shadows; "Anuluj" and "Obsiej: …".
+    function chooser(index) {
+      let picked = plots[index] ?? crop;
+      const sownAfter = plots.filter((id, other) => id && other !== index).length + 1;
+      const rows = h('ul', { class: 'choice-rows farm-choices', 'aria-label': t('Rośliny') });
+      const confirm = h('button', {
+        type: 'button',
+        class: 'button button--system',
+        onClick: () => {
+          crop = picked;
+          closeSheet();
+          sow(plots.map((id, other) => (other === index ? picked : id)));
+        },
+      });
+      // The soonest of the crops still hidden, one row each (1005.2).
+      const hidden = farming.crops
+        .filter((one) => one.hidden)
+        .slice(0, 3)
+        .map((one) =>
+          h(
+            'li',
+            { class: 'choice-hidden', role: 'img', 'aria-label': one.hint },
+            h('span', { class: 'choice-shadows' }, h('span', { class: 'choice-shadow' }, cropIcon(one.id))),
+            h('span', { class: 'choice-meta', text: one.hint }),
+          ),
+        );
+      function showRows() {
+        fill(
+          rows,
+          known.map((one) =>
+            h(
+              'li',
+              {},
+              h(
+                'button',
+                {
+                  type: 'button',
+                  class: 'choice-row',
+                  'aria-pressed': one.id === picked,
+                  onClick: () => {
+                    picked = one.id;
+                    showRows();
+                  },
+                },
+                h('span', { class: 'choice-art' }, cropIcon(one.id)),
+                h(
+                  'span',
+                  { class: 'choice-text' },
+                  h('span', { class: 'choice-name', text: one.name }),
+                  h('span', { class: 'choice-meta', text: t('od poz. {level} · ok. {count} szt. na godzinę', { level: one.level, count: formatDecimal(one.perHour / sownAfter) }) }),
+                ),
+                one.id === picked && icon('check', { size: 18 }),
+              ),
+            ),
+          ),
+          hidden,
+        );
+        confirm.textContent = t('Obsiej: {crop}', { crop: byId.get(picked).name });
+      }
+      showRows();
+      openSheet(
+        h('h2', { class: 'sheet-title', text: t('Grządka {number}: co tu wyrośnie?', { number: index + 1 }) }),
+        rows,
+        h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }), confirm),
+      );
+    }
+
+    function show() {
+      const sown = plots.filter(Boolean).length;
+      fill(
+        board,
+        farmBoard(
+          plots.map((id, index) =>
+            id
+              ? farmPlot('sown', { crop: byId.get(id), label: byId.get(id).name, ariaLabel: t('Grządka {number}: {crop}', { number: index + 1, crop: byId.get(id).name }), onClick: () => chooser(index) })
+              : farmPlot('empty', { label: t('Obsiej'), ariaLabel: t('Grządka {number}: pusta', { number: index + 1 }), onClick: () => chooser(index) }),
+          ),
+          next,
+        ),
+      );
+      sowEmpty.textContent = t('Obsiej puste: {crop}', { crop: byId.get(crop).name });
+      sowEmpty.disabled = plots.every(Boolean);
+      clear.disabled = sown === 0;
+      begin.disabled = sown === 0;
+      if (sown === 0) {
+        estimate.textContent = t('Obsiej co najmniej jedną grządkę.');
+        return;
+      }
+      // Each crop's share of the time: its plots of those sown.
+      const counts = new Map();
+      for (const id of plots) if (id) counts.set(id, (counts.get(id) ?? 0) + 1);
+      const expected = [...counts].map(([id, many]) => {
+        const middle = (((byId.get(id).perHour * minutes) / 60) * many) / sown;
+        const low = Math.max(0, Math.floor(middle * (1 - farming.spread)));
+        const high = Math.ceil(middle * (1 + farming.spread));
+        return `${byId.get(id).name} ${low === high ? formatNumber(low) : `${formatNumber(low)}–${formatNumber(high)}`}`;
+      });
+      estimate.textContent = t('Spodziewane plony: {crops}.', { crops: expected.join(', ') });
+    }
+
+    const picker = minutesPicker(
+      allowed,
+      start,
+      t('Czas uprawy'),
+      (chosenMinutes) => {
+        minutes = chosenMinutes;
+        show();
+      },
+      remember,
+    );
+    picker.start();
+    return h(
+      'section',
+      { class: 'card farm-card', 'aria-labelledby': 'farm-title' },
+      h('h2', { class: 'section-title', id: 'farm-title', text: fieldTitle(count, next) }),
+      who.element,
+      board,
+      legend,
+      h('div', { class: 'farm-actions' }, sowEmpty, clear),
+      picker.element,
+      estimate,
+      farming.mastery && h('p', { class: 'muted', text: farming.mastery }),
+      begin,
+    );
+  }
+
+  // The field while it grows (1005.3): each sown plot's plants at the stage
+  // the time gone has brought them to (four, the same for all crops), its
+  // crop's icon in the corner, and the stage in words; ripe once the work
+  // has ended. { element, update(done) }, done the share of the time gone.
+  function growingField(activity, farming) {
+    const stages = farming.stages.length;
+    const plots = activity.plots ?? [];
+    const next = farming.plotLevels.find((tier) => tier.plots > plots.length) ?? null;
+    const note = h('p', { class: 'farm-stage-note' });
+    const images = [];
+    const cells = plots.map((one) => {
+      if (!one) return farmPlot('fallow', { label: t('pusta') });
+      const cell = farmPlot('sown', { crop: one, stage: 1, label: one.name });
+      images.push(cell.querySelector('.farm-stage'));
+      return cell;
+    });
+    let shown = 0;
+    function update(done) {
+      const stage = Math.min(stages, Math.max(1, Math.floor(done * stages) + 1));
+      if (stage === shown) return;
+      shown = stage;
+      for (const image of images) image.src = farmArt.stage(stage);
+      note.textContent = [
+        t('Stadium: {stage} ({number} z {all}).', { stage: farming.stages[stage - 1], number: stage, all: stages }),
+        motionOn() && t('Rośliny kołyszą się na wietrze.'),
+      ]
+        .filter(Boolean)
+        .join(' ');
+    }
+    return { element: h('section', { class: 'card farm-card', 'aria-label': t('Pole') }, h('h2', { class: 'section-title', text: fieldTitle(plots.length, next) }), farmBoard(cells, next), note), update };
+  }
+
+  // The farming under way, its field growing, or its report waiting, the
+  // plants ripe. Called back early, the character comes back with nothing,
+  // as from the Zagajnik.
+  function farmingCard(activity, avatar, farming) {
+    const sown = (activity.plots ?? []).filter(Boolean).length;
+    const what = countOf(sown, 'grządka', 'grządki', 'grządek');
+    const field = growingField(activity, farming);
+    if (activityFinished(activity)) {
+      field.update(1);
+      return h(
+        'div',
+        { class: 'stack' },
+        systemPanel(t('Uprawa zakończona: {plots}, {time}.', { plots: what, time: formatMinutes(activity.minutes) }), t('Raport czeka na odbiór.'), claimButton(avatar)),
+        field.element,
+      );
+    }
+    const cancel = h('button', {
+      type: 'button',
+      class: 'button button--world',
+      text: t('Przerwij uprawę'),
+      onClick: async (event) => {
+        const button = event.currentTarget;
+        const sure = await confirmAction({
+          title: t('Przerwać uprawę?'),
+          text: avatar ? t('Awatar wróci od razu, bez plonów i bez doświadczenia.') : t('Postać wróci od razu, bez plonów i bez doświadczenia.'),
+          confirmLabel: t('Przerwij'),
+          danger: true,
+        });
+        if (sure) await withButton(button, () => call('POST', cancelPath(avatar)));
+      },
+    });
+    return workUnderWay(activity, t('Uprawa na Systemowym Polu: {plots}, {time}.', { plots: what, time: formatMinutes(activity.minutes) }), t('Uprawa'), cancel, avatar, field);
+  }
+
+  // Gotowanie (1059): the works under way, the Systemowa Kuchnia with how
+  // cooking and the meal go folded under "Jak to działa?", the level and
+  // the recipes.
+  function renderCooking(character) {
+    const { list, cooking } = character.professions;
+    const profession = list.find((candidate) => candidate.id === cooking.professionId);
+    fill(
+      container,
+      backHeading(profession.name, t('poziom {level}', { level: profession.level }), HOME),
+      works(character, 'dishes', cookingCard, 'Postać {doing}. Gotowanie możliwe po powrocie.'),
+      testTools(character, 'dishes', t('Tryb testowy: gotowanie skończy się od razu, z tym samym wynikiem.')),
+      placeCard(cooking.place, cooking.about),
+      levelCard(profession, t('gotowania')),
+      anyFree(character) && cookForm(character, cooking),
+    );
+  }
+
+  // The recipes, as Alchemia's: the recipe chosen with its meal's bonus and
+  // what one dish takes (the fish and crops from the Spiżarnia, the herbs
+  // from the bag), past the mastery the chance of a dish twice, how many
+  // dishes, their time and what they use up, and the start. The dishes go
+  // to the Spiżarnia, which has no limit.
+  function cookForm(character, cooking) {
+    const who = workerPicker(character);
+    const known = cooking.dishes.filter((dish) => !dish.hidden);
+    let recipe = known.find((candidate) => candidate.id === cookChoice.recipe) ?? known[0];
+    let count = 1;
+    const list = choiceList(t('Przepisy'), { unknown: (many) => countOf(many, 'nieznany przepis', 'nieznane przepisy', 'nieznanych przepisów') });
+    const about = h('p', { class: 'muted' });
+    const bonus = h('p', { class: 'herb-estimate cook-bonus' });
+    const needs = h('p', { class: 'herb-estimate' });
+    const picker = h('div', { class: 'stack' });
+    const remember = () => {
+      cookChoice.recipe = recipe.id;
+      cookChoice.count = count;
+      saveChoice(COOK_CHOICE, cookChoice);
+    };
+    // Where an ingredient is kept, and what it has there.
+    const held = (ingredient) =>
+      ingredient.group === 'herb'
+        ? t('{count} × {name} (w plecaku {have})', { count: ingredient.need, name: ingredient.name, have: formatNumber(ingredient.have) })
+        : t('{count} × {name} (w Spiżarni {have})', { count: ingredient.need, name: ingredient.name, have: formatNumber(ingredient.have) });
+    const recipeMeta = (each) => `${t('w Spiżarni: {count}', { count: formatNumber(each.count) })}${each.most === 0 ? ` · ${t('brak składników')}` : ''}`;
+    // The professions that bring what is missing.
+    const SOURCES = { fish: ['fishing', 'Do Rybołówstwa'], crop: ['farming', 'Do Rolnictwa'], herb: ['herbalism', 'Do Zielarstwa'] };
+
+    function choose(id) {
+      recipe = known.find((candidate) => candidate.id === id);
+      remember();
+      show();
+    }
+
+    function show() {
+      list.show(
+        { art: dishIcon(recipe.id), name: recipe.name, meta: recipeMeta(recipe) },
+        known.map((each) => ({ id: each.id, art: dishIcon(each.id), name: each.name, meta: recipeMeta(each), on: each.id === recipe.id })),
+        cooking.dishes.filter((each) => each.hidden).map((each) => ({ art: dishIcon(each.id), level: each.level, hint: each.hint })),
+        choose,
+      );
+      about.textContent = recipe.description;
+      bonus.textContent = t('Posiłek: {bonus} przez {time} wypraw.', { bonus: recipe.bonus, time: formatMinutes(cooking.mealMinutes) });
+      needs.textContent = t('Na jedną potrawę: {ingredients}.', { ingredients: recipe.ingredients.map(held).join(', ') });
+      if (recipe.most === 0) {
+        const missing = [...new Set(recipe.ingredients.filter((ingredient) => ingredient.have < ingredient.need).map((ingredient) => ingredient.group))].filter((group) => SOURCES[group]);
+        fill(
+          picker,
+          h('p', { class: 'herb-room herb-room--full', text: t('Brakuje składników na tę potrawę.') }),
+          missing.length > 0 && h('div', { class: 'farm-actions' }, missing.map((group) => h('a', { class: 'button button--world', href: HASHES[SOURCES[group][0]], text: t(SOURCES[group][1]) }))),
+        );
+        return;
+      }
+      count = Math.min(recipe.most, Math.max(1, cookChoice.count ?? Math.min(recipe.most, 6)));
+      fill(picker, countPicker());
+    }
+
+    // A slider of the dishes with buttons for one at a time, the time and
+    // what they take, and the start.
+    function countPicker() {
+      const most = recipe.most;
+      const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
+      const estimate = h('p', { class: 'herb-estimate' });
+      const slider = h('input', {
+        type: 'range',
+        class: 'duration-slider',
+        min: 1,
+        max: most,
+        step: 1,
+        value: count,
+        'aria-label': t('Liczba potraw'),
+        onInput: () => set(Number(slider.value)),
+        onChange: () => remember(),
+      });
+      const stepButton = (sign, label) =>
+        h('button', {
+          type: 'button',
+          class: 'button button--world duration-step',
+          'aria-label': label,
+          text: sign < 0 ? '−' : '+',
+          onClick: () => {
+            set(count + sign);
+            remember();
+          },
+        });
+      const less = stepButton(-1, t('Mniej'));
+      const more = stepButton(1, t('Więcej'));
+      function set(next) {
+        count = Math.min(most, Math.max(1, next));
+        const label = countOf(count, 'potrawa', 'potrawy', 'potraw');
+        slider.value = String(count);
+        slider.setAttribute('aria-valuetext', label);
+        slider.style.setProperty('--fill', `${most > 1 ? ((count - 1) / (most - 1)) * 100 : 100}%`);
+        value.textContent = label;
+        less.disabled = count === 1;
+        more.disabled = count === most;
+        const used = recipe.ingredients.map((ingredient) => `${ingredient.need * count} × ${ingredient.name}`).join(', ');
+        estimate.textContent = t('Czas gotowania: {time}. Zużyjesz: {used}.', { time: formatMinutes(workMinutes(count, cooking.dishMinutes)), used });
+      }
+      set(count);
+      const start = h('button', {
+        type: 'button',
+        class: 'button button--system',
+        text: t('Gotuj potrawy'),
+        onClick: (event) =>
+          withButton(event.currentTarget, async () => {
+            remember();
+            await call('POST', '/api/professions/cook', { recipe: recipe.id, count, ...who.body() });
+            window.scrollTo(0, 0);
+          }),
+      });
+      return [
+        h(
+          'div',
+          { class: 'duration-picker' },
+          h('p', { class: 'duration-head' }, h('span', { class: 'duration-title' }, t('Liczba potraw')), value),
+          h('div', { class: 'duration-row' }, less, slider, more),
+          h('p', { class: 'duration-scale', 'aria-hidden': 'true' }, h('span', { text: '1' }), h('span', { text: formatNumber(most) })),
+        ),
+        estimate,
+        h('p', { class: 'muted', text: t('Potrawy trafią do Spiżarni.') }),
+        start,
+      ];
+    }
+
+    show();
+    return h(
+      'section',
+      { class: 'card gather-card', 'aria-labelledby': 'dishes-title' },
+      h('h2', { class: 'section-title', id: 'dishes-title', text: t('Przepisy') }),
+      who.element,
+      list.element,
+      about,
+      bonus,
+      needs,
+      cooking.mastery && h('p', { class: 'muted', text: cooking.mastery }),
+      picker,
+    );
+  }
+
+  // The cooking under way, or its report waiting. Called back early, the
+  // character brings the dishes done, with their report, and the
+  // ingredients for the rest go back.
+  function cookingCard(activity, avatar) {
+    const what = `${activity.count} × ${activity.dish?.name ?? t('potrawa')}`;
+    if (activityFinished(activity)) {
+      return systemPanel(t('Gotowanie zakończone: {what}.', { what }), t('Raport czeka na odbiór.'), claimButton(avatar));
+    }
+    const cancel = h('button', {
+      type: 'button',
+      class: 'button button--world',
+      text: t('Przerwij gotowanie'),
+      onClick: async (event) => {
+        const button = event.currentTarget;
+        const done = Math.min(activity.count, Math.floor((activity.count * (serverNow() - activity.startedAt)) / (activity.endsAt - activity.startedAt)));
+        const sure = await confirmAction({
+          title: t('Przerwać gotowanie?'),
+          text:
+            done > 0
+              ? t('Gotowe potrawy ({count}) trafią do Spiżarni, a składniki na resztę wrócą.', { count: formatNumber(done) })
+              : t('Żadna potrawa nie jest jeszcze gotowa. Składniki wrócą na swoje miejsce.'),
+          confirmLabel: t('Przerwij'),
+          danger: true,
+        });
+        if (!sure) return;
+        await withButton(button, async () => {
+          const { report } = await call('POST', cancelPath(avatar));
+          if (report) openReport(report);
+        });
+      },
+    });
+    return workUnderWay(activity, t('Gotowanie w toku: {what}, {time}.', { what, time: formatMinutes(activity.minutes) }), t('Gotowanie'), cancel, avatar);
+  }
+
   // Jubilerstwo: the works under way, its tabs (the jewellery, the setting
   // of gems, the przemiana and the Przechowalnia), the Systemowa Szlifiernia
   // with how the chosen work goes folded under "Jak to działa?", the level
@@ -2293,12 +2993,13 @@ export function mountProfessions(container, { params, navigate }) {
     for (const timer of timers) showTimer(timer, now);
   }
 
-  function showTimer({ activity, countdown, progress, scene, skipper }, now) {
+  function showTimer({ activity, countdown, progress, scene, skipper, extra }, now) {
     skipper.update(now);
     countdown.textContent = formatCountdown(activity.endsAt - now);
     const done = (now - activity.startedAt) / (activity.endsAt - activity.startedAt);
     progress.style.width = `${Math.min(100, Math.max(0, done * 100))}%`;
     scene?.update(done);
+    extra?.update(done);
   }
 
   render();
@@ -2469,6 +3170,112 @@ export function mineralsReport(report, heading) {
   ];
 }
 
+// The report of a fishing (1057), as of a gathering: the Staw's line, the
+// fish caught and those the mastery added, where they went, the
+// profession's levels, the XP and the System's lines.
+export function fishReport(report, heading) {
+  return [
+    heading(t('Raport z połowu'), `${report.placeName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`),
+    h(
+      'section',
+      { class: 'card report-summary', 'aria-label': t('Podsumowanie') },
+      h('p', { class: 'herb-line', text: report.line }),
+      h(
+        'ul',
+        { class: 'herb-found' },
+        report.fish.map((fish) =>
+          h(
+            'li',
+            { class: 'herb-found-row' },
+            h('span', { class: 'herb-art' }, fishIcon(fish.id)),
+            h('span', { class: 'herb-found-name', text: fish.name }),
+            h('span', { class: 'herb-found-count', text: `×${formatNumber(fish.count)}` }),
+          ),
+        ),
+      ),
+      report.lucky && h('p', { class: 'herb-room herb-room--lucky', text: report.lucky }),
+      h('p', { class: 'muted', text: t('Ryby trafiły do Spiżarni. Znajdziesz ją w plecaku.') }),
+      workSummary(report),
+    ),
+    report.system.length > 0 && systemPanel(...report.system),
+    // A card of Talia Systemu the work left (903).
+    droppedCardsSection(report.cards),
+    h('a', { class: 'button button--system', href: HASHES.fishing, text: t('Nad Staw') }),
+  ];
+}
+
+// The report of a farming (1058): the field's line, the field with what
+// each plot brought, the crops together and those the mastery added, where
+// they went, the profession's levels, the XP and the System's lines.
+export function cropsReport(report, heading) {
+  const cells = (report.plots ?? []).map((one) => (one ? farmPlot('sown', { crop: one, stage: 4, count: one.count, label: one.name }) : farmPlot('fallow', { label: t('pusta') })));
+  return [
+    heading(t('Raport z uprawy'), `${report.placeName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`),
+    h(
+      'section',
+      { class: 'card report-summary', 'aria-label': t('Podsumowanie') },
+      h('p', { class: 'herb-line', text: report.line }),
+      cells.length > 0 && farmBoard(cells, null, { small: true }),
+      h(
+        'ul',
+        { class: 'herb-found' },
+        report.crops.map((crop) =>
+          h(
+            'li',
+            { class: 'herb-found-row' },
+            h('span', { class: 'herb-art' }, cropIcon(crop.id)),
+            h('span', { class: 'herb-found-name', text: crop.name }),
+            h('span', { class: 'herb-found-count', text: `×${formatNumber(crop.count)}` }),
+          ),
+        ),
+      ),
+      report.lucky && h('p', { class: 'herb-room herb-room--lucky', text: report.lucky }),
+      h('p', { class: 'muted', text: t('Plony trafiły do Spiżarni. Znajdziesz ją w plecaku.') }),
+      workSummary(report),
+    ),
+    report.system.length > 0 && systemPanel(...report.system),
+    // A card of Talia Systemu the work left (903).
+    droppedCardsSection(report.cards),
+    h('a', { class: 'button button--system', href: HASHES.farming, text: t('Na Pole') }),
+  ];
+}
+
+// The report of a cooking (1059), as of a brewing: the kitchen's line,
+// whether it was stopped, the dishes made with their meal's bonus and the
+// lucky ones, where they went, the profession's levels, the XP and the
+// System's lines.
+export function dishesReport(report, heading) {
+  const { dish } = report;
+  return [
+    heading(t('Raport z gotowania'), `${report.placeName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`),
+    h(
+      'section',
+      { class: 'card report-summary', 'aria-label': t('Podsumowanie') },
+      h('p', { class: 'herb-line', text: report.line }),
+      report.stopped && h('p', { class: 'muted', text: report.stopped }),
+      h(
+        'ul',
+        { class: 'herb-found' },
+        h(
+          'li',
+          { class: 'herb-found-row' },
+          h('span', { class: 'herb-art' }, dishIcon(dish.id)),
+          h('span', { class: 'herb-found-name', text: dish.name }),
+          h('span', { class: 'herb-found-count', text: `×${formatNumber(dish.count)}` }),
+        ),
+      ),
+      h('p', { class: 'herb-estimate', text: t('Posiłek: {bonus}.', { bonus: dish.meal }) }),
+      report.lucky && h('p', { class: 'herb-room herb-room--lucky', text: report.lucky }),
+      h('p', { class: 'muted', text: t('Potrawy trafiły do Spiżarni. Wybierzesz je przy wyruszaniu na wyprawę.') }),
+      workSummary(report),
+    ),
+    report.system.length > 0 && systemPanel(...report.system),
+    // A card of Talia Systemu the work left (903).
+    droppedCardsSection(report.cards),
+    h('a', { class: 'button button--system', href: HASHES.cooking, text: t('Do Kuchni') }),
+  ];
+}
+
 // The report of a work of the Szlifiernia: the place's line, whether it was
 // stopped, and either the jewels made (each opens like a find, by
 // `findSheet`) and the failed ones, or the gem set with its item and the
@@ -2507,7 +3314,7 @@ export function jewelsReport(report, heading, findSheet) {
 export const workSummaryText = (summary) =>
   (summary.avatar ? `${t('Awatar Systemu')} · ` : '') +
   [
-    ...(summary.herbs ?? summary.potions ?? summary.items ?? summary.minerals ?? []).map((entry) => `${entry.name} ×${formatNumber(entry.count)}`),
+    ...(summary.herbs ?? summary.potions ?? summary.items ?? summary.minerals ?? summary.fish ?? summary.crops ?? summary.dishes ?? []).map((entry) => `${entry.name} ×${formatNumber(entry.count)}`),
     summary.gold > 0 && t('{gold} złota', { gold: formatNumber(summary.gold) }),
     summary.set && (summary.set.item ? `${summary.set.gem} → ${summary.set.item}` : t('{gem} wrócił do plecaka', { gem: summary.set.gem })),
     summary.failed > 0 && t('nieudane: {count}', { count: formatNumber(summary.failed) }),

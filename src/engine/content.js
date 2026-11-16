@@ -13,6 +13,26 @@
  * @returns {Record<string, any>}
  */
 const lookup = (entries) => Object.assign(Object.create(null), Object.fromEntries(entries));
+// The Spiżarnia's goods (characters.pantry): the fish of Rybołówstwo, the
+// crops of Rolnictwo and the dishes of Gotowanie, each with its group; a
+// dish's price, the innkeeper's, is priceFactor times its ingredients'
+// (fish, crops and herbs; cooking.js, dishPrice).
+/**
+ * @param {Record<string, any>} raw
+ * @returns {Record<string, any>[]}
+ */
+function pantryOf(raw) {
+  const professions = raw.professions ?? {};
+  /** @type {Record<string, number>} */
+  const prices = Object.fromEntries([...(professions.fish ?? []), ...(professions.crops ?? []), ...(professions.herbs ?? [])].map((/** @type {Record<string, any>} */ good) => [good.id, good.price]));
+  /** @param {Record<string, number>} ingredients */
+  const cost = (ingredients) => Object.entries(ingredients).reduce((sum, [id, count]) => sum + (prices[id] ?? 0) * count, 0);
+  return [
+    ...(professions.fish ?? []).map((/** @type {Record<string, any>} */ fish) => ({ ...fish, group: 'fish' })),
+    ...(professions.crops ?? []).map((/** @type {Record<string, any>} */ crop) => ({ ...crop, group: 'crop' })),
+    ...(professions.dishes ?? []).map((/** @type {Record<string, any>} */ dish) => ({ ...dish, group: 'dish', price: Math.round((professions.cooking?.priceFactor ?? 1) * cost(dish.ingredients)) })),
+  ];
+}
 /**
  * @param {Entry[]} list
  * @returns {Record<string, any>}
@@ -246,6 +266,23 @@ export function buildContent(raw) {
     // which makes jewellery of them and sets gems (jewelcraft.js), and the
     // rows of the Profesje tab's squares.
     mining: raw.professions?.mining,
+    // Rybołówstwo with its fish (fishing.js; 999.1), and the Spiżarnia: the
+    // goods of the new professions a character keeps outside the bag's room
+    // (characters.pantry), the fish, the crops and the dishes, each with its
+    // group.
+    fishing: raw.professions?.fishing,
+    fish: raw.professions?.fish ?? [],
+    fishById: byId(raw.professions?.fish ?? []),
+    // Rolnictwo with its crops (farming.js; 999.2).
+    farming: raw.professions?.farming,
+    crops: raw.professions?.crops ?? [],
+    cropsById: byId(raw.professions?.crops ?? []),
+    // Gotowanie with its dishes (cooking.js; 999.3-999.5 v2).
+    cooking: raw.professions?.cooking,
+    dishes: raw.professions?.dishes ?? [],
+    dishesById: byId(raw.professions?.dishes ?? []),
+    pantry: pantryOf(raw),
+    pantryById: byId(pantryOf(raw)),
     jewelcrafting: raw.professions?.jewelcrafting,
     minerals: raw.professions?.minerals ?? [],
     mineralsById: byId(raw.professions?.minerals ?? []),
