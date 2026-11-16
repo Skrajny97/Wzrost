@@ -1,0 +1,19 @@
+{
+  "id": "cooking",
+  "tool": "pixellab generate-image-v2",
+  "description": "highly detailed crisp pixel art scene, fine pixel detail: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands, seen from the side facing right, standing at a big black cauldron hanging over a low fire in an old village kitchen and stirring the soup with a long wooden ladle, steam rising, a wooden table with vegetables and a fish beside it, strings of onions and garlic hanging from the beams, warm firelight, the whole figure and the cauldron inside the frame",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/scenes/mining-hd-a.png",
+      "usage": "the same small hooded figure: its dark navy cloak, its glowing ice-blue face and hands, its size in the frame and the fine pixel style; only the work and the place are new"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}

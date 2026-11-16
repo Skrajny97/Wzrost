@@ -1,0 +1,19 @@
+{
+  "id": "farming",
+  "tool": "pixellab generate-image-v2",
+  "description": "highly detailed crisp pixel art scene, fine pixel detail: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands, seen from the side facing right, standing in a small field and hoeing a bed of dark soil with an iron hoe, rows of young green sprouts and a low wooden fence behind, an old scarecrow in the distance, soft morning light, the whole figure and the bed inside the frame",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/scenes/mining-hd-a.png",
+      "usage": "the same small hooded figure: its dark navy cloak, its glowing ice-blue face and hands, its size in the frame and the fine pixel style; only the work and the place are new"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}

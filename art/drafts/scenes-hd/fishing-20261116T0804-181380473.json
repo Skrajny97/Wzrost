@@ -1,0 +1,19 @@
+{
+  "id": "fishing",
+  "tool": "pixellab generate-image-v2",
+  "description": "highly detailed crisp pixel art scene, fine pixel detail: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands, seen from the side facing right, sitting at the end of a small wooden pier and holding a fishing rod over a misty forest pond at dawn, the line going down to a red and white float on the still water, lily pads and reeds, a wicker basket with a fish tail beside the figure, willow branches hanging above, the whole figure and the pier inside the frame",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/scenes/mining-hd-a.png",
+      "usage": "the same small hooded figure: its dark navy cloak, its glowing ice-blue face and hands, its size in the frame and the fine pixel style; only the work and the place are new"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
