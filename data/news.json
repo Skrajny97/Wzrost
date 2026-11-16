@@ -1180,6 +1180,11 @@
       "id": "0.3.94",
       "title": "Wersja 0.3.94",
       "body": "- Odliczanie budowy nad budynkiem na mapie Obozu znowu mieści się w jednej linijce, zamiast łamać się na kilka."
+    },
+    {
+      "id": "0.3.95",
+      "title": "Wersja 0.3.95",
+      "body": "- Arena od 200. poziomu jest wyrównana: w pojedynkach graczy mocniej biją Arcydruid, Pogromca Demonów, Święty, Mistrz Łuku, Bogobójca i Władca Cieni, a słabiej Władca Puszczy. Od 200. poziomu pojedynki mają też więcej HP, więc trwają kilka rund.\n- Przy otwieraniu pakietu kart poświata najrzadszej karty nie dochodzi już do krawędzi ekranu na wąskim telefonie."
     }
   ]
 }

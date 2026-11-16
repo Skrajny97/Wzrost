@@ -3580,6 +3580,36 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.95 (16.11.2026): Arena wyrównana na poziomach Łysogór, poświata karty w pakiecie, Warsztat zbadany
+
+Autor 16.11.2026 do listy zadań: „Ad. 4 Zbalansuj zatem Arenę”, „Ad. 6 Zbadaj”, „Ad. 7 rób drobiazgi” i „Ad. 8 domostwo pomijamy i to co dalej”, a o kodzie TIGER: „kodu TIGER nie przedłużamy” (1026 B, kod wygasł 17.11 o północy).
+
+1. **Arena na poziomach Łysogór.** Testy pilnowały balansu pojedynków do 200. poziomu. Wyżej (`tools/pvp-arena-sim.mjs`, średnio na poziomach 200–300, po 2 ziarna) Wojownik wygrywał 71% pojedynków z innymi klasami, Łucznik 38%, a Kleryk 36%. Z trzecich form Arcydruid wygrywał 26% (na niektórych poziomach 17%), Pogromca Demonów 31% (na 275. poziomie 17%), a Władca Puszczy 73% (do 77%).
+    - Przyczyna: od 299. poziomu klasy umiejętności trzecich form mają pełną siłę. Miażdżący cios Pogromcy Hord ogłusza wtedy na 2 ruchy z szansą 55%, a główne ścieżki Łucznika, Kleryka i Cienia (Mistrz Łuku, Święty, Bogobójca) wypadają słabo. Bez ogłuszenia Wojownik wygrywałby średnio 51%.
+    - Pogromca Hord zostaje bez zmian. Wśród wszystkich form jest pośrodku (55%), a Wojownik wygrywał tak często, bo słabe były główne ścieżki innych klas. Ogłuszenie też zostaje, bo zmiana samej umiejętności zmieniłaby wyprawy (por. 786 v2).
+    - Dźwignia z 992 A, czyli siła formy tylko w pojedynkach graczy (`duelPower` w `data/evolutions.json`; Arena i wojny gildii): Władca Puszczy ×0,9, Arcydruid ×1,3 (od 0.3.93 było ×1,1), Pogromca Demonów ×1,2, Święty ×1,2, Mistrz Łuku ×1,12, Bogobójca ×1,08 i Władca Cieni ×1,05. Pogromca Demonów zostaje jedną z najsłabszych form w pojedynkach (779 A), ale nie spada poniżej 25%.
+    - Mnożnik HP pojedynku: 3,9 na 200. poziomie i 4,15 na 300. (od 0.3.93 było 3,6 i 3,8; `duel.hpCurve` w `data/settlement.json`), bo mocniejsze formy skróciły pojedynki do mediany 16 ruchów. Do 175. poziomu bez zmian.
+    - Wynik, średnio na poziomach 200–300: klasy wygrywają 43–65%, a trzecie formy 35–64%. Na 200. poziomie klasy mają 44–56%, formy 34–70%, a pojedynek trwa zwykle 17 ruchów.
+    - **Testy:** nowe, uśrednione po poziomach 210, 230, 250, 270 i 290. Na jednym poziomie 8 losowań wyposażenia przesuwa udział formy nawet o 15 punktów. Każda klasa ma wygrywać 30–70%, każda trzecia forma 25–75%, a pojedynek ma trwać 16–40 ruchów (`test/pvp-arena.test.js`, `test/third-evolution.test.js`).
+    - Wyprawy, wieże i walki ze stworami się nie zmieniają. Bitwy wojen gildii liczą się jak pojedynki na Arenie, więc te liczby działają też tam.
+2. **Poświata boskiej karty w pakiecie.** Na telefonie 320–360 px ostatnia karta stoi 12–16 px od krawędzi ekranu, a stała poświata (18 px) jej dotykała (znalezione przy nagrywaniu rolki promocyjnej). Zasięg poświaty rośnie teraz z szerokością karty (`.pfx-charge`). Na 320 i 360 px kończy się przed krawędzią, a na komputerze jest o 3 px mniejsza. Wielkość kart bez zmian.
+3. **Sprawdzanie ekranów** (`tools/layout-check.cjs`): postać ma w Obozie trwającą budowę, a każdy licznik ma stać w jednej linijce. Błąd z 0.3.94 (odliczanie łamane na 3 linijki) wyszedłby teraz przed wdrożeniem.
+4. Usunięte 4 nieużywane teksty angielskie (dawne „Przelosuj zadania”).
+5. **Warsztat a tempo poziomów profesji (zbadane, bez zmian).** Godziny pracy w Rzemieślnictwie do wzorów Tieru i godziny wypraw, po których typowa postać dochodzi do poziomu klasy tego Tieru (`tools/simulate.mjs`, `hoursToReach`):
+
+    | Tier | Poziom klasy | Wyprawy | Rzemieślnictwo | Ile razy dłużej |
+    | --- | --- | --- | --- | --- |
+    | III | 50 | 84 h | 204 h | 2,4 |
+    | V | 100 | 404 h | 825 h | 2,0 |
+    | VII | 125 | 596 h | 1292 h | 2,2 |
+    | VIII | 150 | 800 h | 1863 h | 2,3 |
+    | IX | 175 | 1013 h | 2538 h | 2,5 |
+
+    - Wzór Tieru z samego poziomu profesji przychodzi więc 2–2,5 raza później niż postać do tego Tieru. Rozbiórka znalezionego przedmiotu odsłania jednak jego wzór od razu, z każdym poziomem profesji (R14, autor: „rozbiórka pozwoli po prostu łatwiej i szybciej uzyskać dostęp”). Warsztat nadąża więc za postacią, kto rozbiera znaleziska.
+    - Poziom profesji daje szybkość, rzadkości i szanse. Najszybsza praca (połowa czasu) jest od 51. poziomu (212 h pracy), rzadkość mityczna od 60., boska od 80. (527 h). Szansa na udany przedmiot rośnie o 0,5 punktu na poziom, do 95%: boski przedmiot na 100. poziomie wychodzi w 60% prób, legendarny w 85%.
+    - Awatar daje od 0.3.87 cały postęp profesji, więc 100. poziom Rzemieślnictwa to ok. 34 dni pracy Awatara bez przerwy, obok wypraw postaci. Bez zmian, chyba że autor zdecyduje inaczej.
+6. **Pominięte pomysły:** „domostwo” (pomysł gracza: „Skoro pojawiły się uprawy to powinniśmy mieć także jakieś domostwo swoje”) i stwory niższych krain na wyższych poziomach w Lochach. Autor: „domostwo pomijamy i to co dalej”. Nie wracają w propozycjach.
+
 ## Wersja 0.3.94 (16.11.2026): odliczanie budowy w jednej linijce
 
 1. **Odliczanie budowy na mapie Obozu (poprawka 0.3.92).** Autor (zrzut z telefonu): „rozjeżdża się ekran czasu budowy”. Od 0.3.92 każda cyfra licznika stoi w osobnym okienku stałej szerokości, a przeglądarka może przenieść tekst do nowej linii między takimi okienkami. Ramka z klepsydrą nad budowanym budynkiem ma mało miejsca, więc „4:42:12” łamało się na 2–5 linijek (na telefonie 390 px: „4:4 / 2:1 / 2”).
@@ -3604,7 +3634,7 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Arena po Tierze IX (brakujący szczegół).** Pierwsze wdrożenie tej wersji zatrzymały testy Areny: na 200. poziomie gracz realistyczny nosi już Tier IX, więc pojedynki się skróciły (mediana 15 ruchów zamiast co najmniej 16), Mag wygrywał 70,3% pojedynków z innymi klasami (granica 70%), a Arcydruid 24,5% z innymi ścieżkami (granica 25%). Przed Tierem IX: 16 ruchów, 61% i 26%. Poprawki tą samą dźwignią co wcześniej (`tools/pvp-arena-sim.mjs`):
     - Mnożnik HP pojedynku rośnie od 175. poziomu, gdy wchodzi Tier IX: 3,1 na 175. poziomie, 3,6 na 200. i 3,8 na 300. (wcześniej 3,09, 3,13 i 3,25; `duel.hpCurve` w `data/settlement.json`). Do 175. poziomu bez zmian. Tak samo, gdy krzywa pancerza skróciła walki, wzrósł ten mnożnik.
     - Arcydruid bije w pojedynkach graczy mocniej o 10% (`duelPower` 1,1, jak drugie formy w 992 A). Jego przywołańce mają HP z many, a ta nie rośnie razem z nową bronią rywali.
-    - Na 200. poziomie: mediana 17 ruchów, klasy 39–61% wygranych, trzecie formy 28–73% (Arcydruid 28%, Władca Puszczy 73% jak przed Tierem IX). To samo przy trzech ziarnach losowania. Wyprawy, wieże i walki ze stworami się nie zmieniają.
+    - Na 200. poziomie: mediana 17 ruchów, klasy 39–61% wygranych, trzecie formy 28–73% (Arcydruid 28%, Władca Puszczy 73% jak przed Tierem IX). To samo przy trzech ziarnach losowania. Wyprawy, wieże i walki ze stworami się nie zmieniają. *Liczby zmienione w 0.3.95: zob. „Wersja 0.3.95”.*
 5. **Kod KAWA1000.** Autor 16.11.2026 poprosił o jednorazowy kod KAWA1000 na 1000 Punktów Systemu dla jednego gracza. Kod działa tylko dla jednej postaci (w danych skrót SHA-256 jej imienia zamiast imienia, bo repozytorium jest publiczne; `coffee-2026-11-e`), raz, do 16.12.2026 włącznie (brakujący szczegół: miesiąc, jak przy poprzednich kodach za kawę). Kod nie trafia do „Co nowego?”, bo jest dla jednej postaci; autor przekazuje go sam.
 
 ## Wersja 0.3.92 (16.11.2026): liczniki bez drgania, nazwa umiejętności w arenie

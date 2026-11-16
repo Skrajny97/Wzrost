@@ -262,12 +262,16 @@ describe('the second forms in the Arena (992 A)', () => {
 
   test('the strength is the form\'s own: in duels only, and not its third form\'s', () => {
     const inquisitor = content.evolutionsById['grand-inquisitor'];
-    assert.deepEqual([inquisitor.duelPower, content.evolutionsById['demon-slayer'].duelPower], [2, undefined]);
+    // The Pogromca Demonów has its own (×1.2 since 0.3.95), not the
+    // Wielki Inkwizytor's ×2.
+    assert.deepEqual([inquisitor.duelPower, content.evolutionsById['demon-slayer'].duelPower], [2, 1.2]);
     const { character, equipped } = typicalCharacter('cleric', 100, content);
     const fighter = { character: { ...character, classLevel: 120, evolution: 'grand-inquisitor' }, equipped, name: 'Inkwizytor' };
     const plain = playerCombatant(fighter, content);
     const duel = duelist(fighter, 'a0', 'ally', { factor: 1, armor: 1 }, content);
     assert.ok(Math.abs(duel.damageScale - 2 * plain.damageScale) < 1e-9);
+    const slayer = { character: { ...character, classLevel: 200, evolution: 'demon-slayer' }, equipped, name: 'Pogromca' };
+    assert.ok(Math.abs(duelist(slayer, 'a0', 'ally', { factor: 1, armor: 1 }, content).damageScale - 1.2 * playerCombatant(slayer, content).damageScale) < 1e-9);
     const bastion = { character: { ...typicalCharacter('warrior', 100, content).character, classLevel: 120, evolution: 'bastion' }, equipped: typicalCharacter('warrior', 100, content).equipped, name: 'Bastion' };
     assert.equal(duelist(bastion, 'a0', 'ally', { factor: 1, armor: 1 }, content).maxHp, Math.round(playerCombatant(bastion, content).maxHp * 0.8));
   });

@@ -26561,12 +26561,15 @@ a.discord-button {
   visibility: visible;
 }
 
+/* The glow reaches as far as the card is wide allows: on a 320–360 px
+   phone the last card stands 12–16 px from the screen's edge, and a fixed
+   18 px glow touched it (found while recording the promo reel). */
 .pfx-charge {
   position: absolute;
   inset: -6px;
   border-radius: 10px;
   box-shadow:
-    0 0 18px 6px var(--rarity),
+    0 0 calc(var(--tw) * 0.11) calc(var(--tw) * 0.02) var(--rarity),
     0 0 3px 2px var(--rarity);
   opacity: 0;
 }

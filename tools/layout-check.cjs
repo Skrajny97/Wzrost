@@ -2,7 +2,7 @@
 // solidnie gui adaptation na przyszlosc na rozne rozdzielczości”): phones
 // from 320 to 430 px wide, a tablet and computers, with a character of big
 // numbers (level 146, almost a million gold, six-digit camp resources), a
-// long name, orders on the Stół rozbiórki's queue and a guild of its own
+// long name, a build under way in the camp, orders on the Stół rozbiórki's queue and a guild of its own
 // with a long name, and a companion hired in the Kwatery, with its five
 // places for items and amulets of big numbers in the bag for "Załóż z
 // plecaka" (one worn by the companion), on an account with the longest login. On each screen,
@@ -286,6 +286,12 @@ function audit(frame) {
       found.push({ kind: 'edge', where: label(el), text: `${Math.round(box.right - vw)} px za prawą krawędzią${sheet ? ' okienka' : ''}` });
     }
   }
+  // A countdown's digits on one line (setTimer's .timer-run).
+  for (const run of top.querySelectorAll('.timer-run')) {
+    if (!shown(run)) continue;
+    const lines = new Set([...run.querySelectorAll('.timer-digit')].map((digit) => Math.round(digit.getBoundingClientRect().top))).size;
+    if (lines > 1) found.push({ kind: 'spill', where: label(run.parentElement), text: `licznik ${run.textContent} łamie się na ${lines} linijki` });
+  }
   // One line for each element: an element past the edge drags its children.
   const seen = new Set();
   return found.filter((one) => {
@@ -419,6 +425,10 @@ async function main() {
   const { settlement } = await page.evaluate(() => fetch('/api/settlement').then((response) => response.json()));
   const candidate = settlement?.companions?.candidates?.[0];
   if (!candidate || (await api('POST', '/api/settlement/hire', { candidateId: candidate.id })) >= 400) throw new Error('Nie udało się zwerbować towarzysza.');
+  // A build under way, for its countdowns (the camp's map, the top bar, the
+  // construction panel): in 0.3.92–0.3.93 the one on the map broke into
+  // three lines in its narrow frame (0.3.94). The Kamieniołom to level 2.
+  sql(`INSERT OR REPLACE INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'quarry', 2, ${Date.now() - 600000}, ${Date.now() + 16932000} FROM characters WHERE name = '${name}'`);
   // Three amulets of one name and big numbers in the bag, one of them put on
   // the companion, for "Załóż z plecaka" and its comparison.
   for (const affixes of [[{ stat: 'strength', value: 9876 }, { stat: 'vitality', value: 8765 }], [{ stat: 'dexterity', value: 7654 }, { stat: 'perception', value: 6543 }], [{ stat: 'endurance', value: 5432 }]]) {
