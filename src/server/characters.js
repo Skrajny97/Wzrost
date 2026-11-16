@@ -2049,6 +2049,10 @@ export async function listCharacters(context) {
   const session = await requirePlayable(context);
   const db = context.env.DB;
   const own = `SELECT id FROM characters WHERE user_id = ? AND ${OWN_CHARACTERS}`;
+  // The count of every class reads every character of the game, so only the
+  // screens that lead to the creation of a character ask for it (?with=
+  // classes; 1031, the load test: the Postać tab asked it at each visit).
+  const withClasses = new URL(context.request.url).searchParams.get('with') === 'classes';
   const [rows, works, avatarWorks, parked, perClass] = await db.batch([
     db.prepare(`SELECT * FROM characters WHERE user_id = ? AND ${OWN_CHARACTERS} ORDER BY id`).bind(session.userId),
     db.prepare(`SELECT * FROM activities WHERE character_id IN (${own})`).bind(session.userId),
@@ -2059,11 +2063,11 @@ export async function listCharacters(context) {
     // All the game's characters of each class, played or set aside, for the
     // creation screen (the author: "po to by gracz wiedział jakiej klasy może
     // brakować w grze komuś (w przyszlosci) do druzyny, jaka jest popularna").
-    db.prepare(`SELECT class_id, COUNT(*) AS count FROM characters WHERE ${OWN_CHARACTERS} GROUP BY class_id`),
+    ...(withClasses ? [db.prepare(`SELECT class_id, COUNT(*) AS count FROM characters WHERE ${OWN_CHARACTERS} GROUP BY class_id`)] : []),
   ]);
   const activities = new Map(works.results.map((row) => [row.character_id, row]));
   const avatars = new Map(avatarWorks.results.map((row) => [row.character_id, { kind: row.kind, endsAt: row.ends_at }]));
-  const counts = new Map(perClass.results.map((row) => [row.class_id, row.count]));
+  const counts = new Map((perClass?.results ?? []).map((row) => [row.class_id, row.count]));
   return json({
     characters: rows.results.map((row) => ({
       id: row.id,
@@ -2083,7 +2087,7 @@ export async function listCharacters(context) {
     })),
     max: content().balance.account.characters,
     parked: parked.results[0]?.name ?? null,
-    classes: Object.fromEntries(content().classes.map((cls) => [cls.id, counts.get(cls.id) ?? 0])),
+    ...(withClasses && { classes: Object.fromEntries(content().classes.map((cls) => [cls.id, counts.get(cls.id) ?? 0])) }),
   });
 }
 

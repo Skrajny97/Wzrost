@@ -3580,6 +3580,17 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.96 (16.11.2026): próba obciążenia i indeksy bazy
+
+Autor przyjął 1031: „Próba obciążenia serwera przed startem w Sklepie Play”. Liczby z lokalnej gry: czas procesora w Node (ten sam silnik JavaScript co Workers) i wiersze, które czyta lokalna baza D1 (ślady zapytań lokalnego Wranglera, `cloudflare.d1.response.rows_read`). Płatny D1 liczy opłaty od odczytanych wierszy, więc zapytanie, które przy każdym wywołaniu czyta całą tabelę, kosztuje tym więcej, im więcej jest kont i graczy naraz.
+
+1. **Procesor: bez zagrożeń.** Rozliczenie wyprawy trwa 3–8 ms (także 8-godzinnej), pojedynek na Arenie 0,3 ms, walka wojny gildii 1v1 0,5 ms, a 3v3 1,2 ms. Mecz ligi dwóch pełnych gildii (50 na 50 osób, 2500 pojedynków i 100 walk trójek, zapisy po polsku i po angielsku) to ok. 2,7 s, przy limicie 30 s. Wieczór z wieloma dużymi meczami może nie zmieścić się w jednym uruchomieniu o 20:00, ale każdy mecz zapisuje się w całości albo wcale, a reszta rozgrywa się minutę później. Zapisy walk ligi gra kasuje po dwóch tygodniach.
+2. **Baza: dwa brakujące indeksy** (migracja `0146_query_indexes.sql`):
+    - liczba graczy online, o którą każda strona pyta co minutę, czytała wszystkie konta (725 wierszy na wywołanie przy 813 kontach); indeks `users (seen_at)`;
+    - zapytania o postacie konta, grane i odłożone, czytały wszystkie postacie gry, bo jedyny indeks obejmował tylko postać graną teraz; indeks `characters (user_id, role)`. Lista postaci na zakładce Postać czytała ok. 6 tys. wierszy, a Panel autora przy otwarciu ponad 2 mln (teraz 12 tys.).
+3. **Liczba postaci każdej klasy** (ekran tworzenia postaci) liczy się już tylko na ekranach, z których można przejść do tworzenia postaci (`/api/characters?with=classes`), a nie przy każdym wejściu na zakładkę Postać. Lista postaci czyta teraz kilkadziesiąt wierszy.
+4. **Bez zmian, do obserwacji:** czat (najnowsza wiadomość czytana od końca indeksu, 0,01 ms przy 270 tys. wiadomości w kanale), lista rywali na Arenie (ok. 2,4 tys. wierszy na wejście), sprawdzanie imienia przy tworzeniu postaci i lista graczy online po stuknięciu. Rosną z liczbą postaci, ale wywołuje się je rzadko.
+
 ## Kod DISCORD100 (16.11.2026, czeka na imię zwycięzcy)
 
 Autor 16.11.2026: „Przygotuj też kod DISCORD100 na jutro gdzie tylko uzupełnimy nazwę gracza później”, ze zrzutem losowania na Discordzie: „100 Punktów Systemu i 100 Punktów Czasu”, koniec 17.11.2026 o 18:16, jeden zwycięzca.
