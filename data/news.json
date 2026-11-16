@@ -1120,6 +1120,11 @@
       "id": "0.3.82",
       "title": "Wersja 0.3.82",
       "body": "- Przy odbiorze raportu każdej profesji czeka minigra: stuknij, gdy znacznik jest w zielonym polu. Masz trzy próby, a pole z każdą jest węższe.\n- Trafienia dają +5%, +10% albo +20% tego, co przynosi praca, a w Warsztacie i Szlifierni większą szansę na przedmiot o rzadkość wyższy.\n- Minigrę możesz pominąć i wziąć zwykły wynik."
+    },
+    {
+      "id": "0.3.83",
+      "title": "Wersja 0.3.83",
+      "body": "- Poprawka: raport pracy Awatara Systemu znów da się odebrać po minigrze. Praca czekała nietknięta, więc nic nie przepadło."
     }
   ]
 }

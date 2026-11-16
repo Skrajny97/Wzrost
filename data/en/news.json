@@ -892,6 +892,10 @@
     "0.3.82": {
       "title": "Version 0.3.82",
       "body": "- Claiming the report of any profession now starts a mini-game: tap while the marker is in the green zone. You get three tries, and the zone gets narrower with each.\n- Hits give +5%, +10% or +20% of what the work brings, and in the System Workshop and the Gem Workshop a better chance of an item a rarity higher.\n- You can skip the mini-game and take the usual result."
+    },
+    "0.3.83": {
+      "title": "Version 0.3.83",
+      "body": "- Fix: the System Avatar's work report can be claimed after the mini-game again. The work waited untouched, so nothing was lost."
     }
   }
 }

@@ -117,6 +117,30 @@ describe('the mini-game through the API', () => {
     assert.equal(report.fish.find((one) => one.id === 'roach').count, roach(seed, 0, now));
   });
 
+  // A player's report (16.11.2026): the Awatar's brewing after its game
+  // ended in a server error, as its claim read the taps without readJson.
+  test("the Awatar's work: its game begun, played or skipped, and claimed", async () => {
+    await run('UPDATE characters SET gold = 50000');
+    assert.equal((await call('POST', '/api/avatar/buy', { cookie })).status, 200);
+    const work = async () => {
+      assert.equal((await call('POST', '/api/professions/fish', { cookie, body: { fish: ['roach'], minutes: 480, avatar: true } })).status, 201);
+      await run('UPDATE avatar_activities SET started_at = started_at - ?, ends_at = ends_at - ?', 480 * 60000, 480 * 60000);
+    };
+    await work();
+    const begun = await call('POST', '/api/minigame', { cookie, body: { avatar: true } });
+    assert.equal(begun.status, 200, JSON.stringify(begun.data));
+    await run("UPDATE avatar_activities SET options = json_set(options, '$.minigame.at', json_extract(options, '$.minigame.at') - 10000)");
+    const played = await call('POST', '/api/avatar/claim', { cookie, body: { minigame: { taps: hitting(begun.data.minigame) } } });
+    assert.equal(played.status, 200, JSON.stringify(played.data));
+    assert.equal(played.data.report.avatar, true);
+    assert.equal(played.data.report.system[0], 'Minigra: trafienia 3 z 3, +20% ryb.');
+    await work();
+    await call('POST', '/api/minigame', { cookie, body: { avatar: true } });
+    const skipped = await call('POST', '/api/avatar/claim', { cookie, body: { minigame: { skip: true } } });
+    assert.equal(skipped.status, 200, JSON.stringify(skipped.data));
+    assert.equal(skipped.data.report.minigame, undefined);
+  });
+
   test('a work not over yet has no game yet', async () => {
     assert.equal((await call('POST', '/api/professions/fish', { cookie, body: { fish: ['roach'], minutes: 60 } })).status, 201);
     assert.equal((await call('POST', '/api/minigame', { cookie, body: {} })).data.error.code, 'not_finished');

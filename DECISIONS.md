@@ -3580,6 +3580,10 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.83 (16.11.2026): odbiór pracy Awatara Systemu po minidze
+
+1. **Błąd z 0.3.82.** Gracz (poz. 51) przez autora: „Nie mogę odebrać mikstur po warzeniu”, „Wyskakuje mi jakieś mieszkanie i za każdym razem jak to skończę to jak chcę odebrać to jest błąd systemu”. Odbiór pracy Awatara Systemu czytał stuknięcia minigry, ale moduł Awatara nie wczytywał treści żądania (`readJson` w `src/server/avatar.js`), więc każdy odbiór jego pracy po minidze, także po „Pomiń”, kończył się błędem serwera. Praca czekała nietknięta, więc nic nie przepadło: po poprawce raport odbiera się normalnie. Test w `test/minigame.test.js` sprawdza odbiór pracy Awatara po minidze i po „Pomiń”.
+
 ## Wersja 0.3.82 (16.11.2026): minigry przy raporcie profesji
 
 1. Minigra przy odbiorze raportu każdej profesji (1060; makiety 1006, zrzuty z gry 1016), przyjęta przez autora: „1016 ocenione pozytywnie” (16.11.2026). Zob. „Minigry przy raporcie”.
