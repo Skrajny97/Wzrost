@@ -928,6 +928,10 @@
     "0.3.91": {
       "title": "Version 0.3.91",
       "body": "- You reroll the narrator's quests one by one: a die stands beside every quest not done yet. You can reroll each quest once, and the others keep their progress."
+    },
+    "0.3.92": {
+      "title": "Version 0.3.92",
+      "body": "- The time counters in the top bar, the tabs and the screens no longer twitch every second, also with bold text on the phone.\n- A skill's name over a character in a fight no longer gets cut at the right edge on a narrow phone."
     }
   }
 }

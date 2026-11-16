@@ -17,7 +17,7 @@ import { campIcon, goldArt, materialSprite, resourceArt } from '../art.js';
 import { spiritPart, spiritSaleSheet } from '../builder-spirit.js';
 import { BOARD_WIDTH, FORTRESS_HALVES, PLOT_HEIGHT, PLOT_WIDTH, boardArt, boardHeight, buildingTier, campPlots, cornerstoneArt, fortressHalf, plotArt, stretchY } from '../camp-art.js';
 import { craftTableSection, materialIcon } from '../craft-table.js';
-import { fill, h, icon } from '../dom.js';
+import { fill, h, icon, setTimer } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { leaveView, openView } from '../history.js';
 import { t } from '../i18n.js';
@@ -345,7 +345,7 @@ function constructionPanel(running, ticks) {
   const progress = h('div', { class: 'bar-fill bar-fill--system' });
   const skipper = skipControl('build', (now) => running.endsAt - now, levelOf(running.name, running.level));
   ticks.push((now) => {
-    countdown.textContent = formatCountdown(running.endsAt - now);
+    setTimer(countdown, formatCountdown(running.endsAt - now));
     const done = (now - running.startedAt) / (running.endsAt - running.startedAt);
     progress.style.width = `${Math.min(100, Math.max(0, done * 100))}%`;
     skipper.update(now);
@@ -659,7 +659,7 @@ function mountBoard(container, backHash) {
   function timer(running) {
     const time = h('span', {});
     ticks.push((now) => {
-      time.textContent = formatCountdown(running.endsAt - now);
+      setTimer(time, formatCountdown(running.endsAt - now));
     });
     return h('span', { class: 'camp-plot-timer', 'aria-hidden': 'true' }, icon('hourglass', { size: 12 }), time);
   }

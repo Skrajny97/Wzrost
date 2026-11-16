@@ -11,7 +11,7 @@ import { areaArt } from '../area-art.js';
 import { dishSprite, landArt, materialSprite, monsterSprite, potionSprite } from '../art.js';
 import { bonusList } from '../bonuses.js';
 import { leaveView as leaveHistoryView, openView as openHistoryView } from '../history.js';
-import { fill, h, icon } from '../dom.js';
+import { fill, h, icon, setTimer } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { language, t } from '../i18n.js';
 import { preloadReportMusic } from '../music.js';
@@ -1711,7 +1711,7 @@ export function mountCombat(container, { params, navigate }) {
       return;
     }
     if (countdown) {
-      countdown.textContent = formatCountdown(activity.endsAt - now);
+      setTimer(countdown, formatCountdown(activity.endsAt - now));
       const done = (now - activity.startedAt) / (activity.endsAt - activity.startedAt);
       progress.style.width = `${Math.min(100, Math.max(0, done * 100))}%`;
     }

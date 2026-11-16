@@ -3580,6 +3580,14 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.92 (16.11.2026): liczniki bez drgania, nazwa umiejętności w arenie
+
+1. **Liczniki czasu nie drgają (poprawka 0.3.84).** Po 0.3.84 część graczy dalej widziała drganie górnego paska. Autor przekazał: „mówią że to może być grubośc czcionki u niektórych”. Czcionka Systemu (Chakra Petch) nie ma cyfr równej szerokości, a telefon z włączonym pogrubieniem tekstu rysuje je jeszcze szerzej, więc tekst licznika co sekundę zmieniał szerokość i przesuwał się w swojej ramce.
+    - Każda cyfra licznika stoi teraz w okienku szerokości najszerszej cyfry, czyli „0” (`setTimer` w `src/client/dom.js`, `.timer-digit`). Licznik ma więc stałą szerokość i miejsce przy każdej grubości czcionki. Grubsza cyfra najwyżej lekko wychodzi poza swoje okienko, ale okienka stoją.
+    - Dotyczy to liczników na górnym pasku (budowa pod namiotem, praca postaci, pasek Awatara), w zakładkach (Walka, Profesje, Obóz), na ekranach Walka, Profesje i Obóz oraz w zadaniach („Nowe zadania za…”).
+    - Sprawdzone pomiarem co 1/8 sekundy przez 4 sekundy, na telefonie i komputerze, ze zwykłą i z wymuszoną pogrubioną czcionką. Ramki liczników stoją, a tekst zmienia szerokość najwyżej o 0,4 px.
+2. **Nazwa umiejętności nad kartą w walce** (np. „Gniew Peruna” nad postacią w tylnym rzędzie) nie wychodzi już poza prawą krawędź areny na telefonie 360 px. Jej miejsce liczy się z takim samym zapasem na wstrząsy i powiększenie areny jak liczby obrażeń (`wordsRoom` w `src/client/arena-fx.js`). Znalazł to przegląd przy nagrywaniu rolki promocyjnej.
+
 ## Wersja 0.3.91 (16.11.2026): przelosowanie jednego zadania
 
 1. Kostka przy zadaniu (1023, przyjęte 1023.2 B i pytanie 1023.3, odrzucone 1023.1 A). Zob. „Przelosowanie jednego zadania (1023)”.

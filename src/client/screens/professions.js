@@ -21,7 +21,7 @@
 import { cropSprite, dishSprite, farmArt, fishSprite, goldArt, herbSprite, itemSprite, mineralSprite, placeArt, potionSprite, professionSprite, scrollArt } from '../art.js';
 import { droppedCardsSection } from '../cards.js';
 import { materialIcon } from '../craft-table.js';
-import { fill, h, icon } from '../dom.js';
+import { fill, h, icon, setTimer } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatDecimal, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { language, t } from '../i18n.js';
 import { motionOn } from '../motion.js';
@@ -2999,7 +2999,7 @@ export function mountProfessions(container, { params, navigate }) {
 
   function showTimer({ activity, countdown, progress, scene, skipper, extra }, now) {
     skipper.update(now);
-    countdown.textContent = formatCountdown(activity.endsAt - now);
+    setTimer(countdown, formatCountdown(activity.endsAt - now));
     const done = (now - activity.startedAt) / (activity.endsAt - activity.startedAt);
     progress.style.width = `${Math.min(100, Math.max(0, done * 100))}%`;
     scene?.update(done);

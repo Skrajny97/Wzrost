@@ -32,6 +32,18 @@ function setProps(element, props) {
   }
 }
 
+// A countdown's text with each digit in a box of one width (.timer-digit,
+// the font's widest digit), so the text keeps its width and its place as
+// the seconds go, whatever the font draws: the System's font has no digits
+// of one width, and a phone set to bold text draws them wider still (a
+// player, 16.11.2026: „drga interfejs na samej górze jak upływa czas pod
+// ikonką osady”; others, through the author: „mówią że to może być grubość
+// czcionki u niektórych”). Drawn anew only when the text changes.
+export function setTimer(element, text) {
+  if (element.textContent === text && element.firstElementChild) return;
+  element.replaceChildren(...[...text].map((char) => (char >= '0' && char <= '9' ? h('span', { class: 'timer-digit', text: char }) : char)));
+}
+
 export function append(parent, children) {
   for (const child of children.flat(Infinity)) {
     if (child === null || child === undefined || child === false) continue;
