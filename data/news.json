@@ -1090,6 +1090,11 @@
       "id": "0.3.75",
       "title": "Wersja 0.3.75",
       "body": "- Drużyna ma własny czat: gdy jesteś w drużynie, w czacie jest zakładka „Drużyna”, którą czytają i piszą tylko jej członkowie.\n- Przy układaniu talii karty można sortować: po typie, rzadkości, poziomie, ataku, życiu albo nazwie.\n- Karty efektów są do wybrania od razu pod „Wszystkie”, nad kartami stworów, bez przełączania filtra."
+    },
+    {
+      "id": "0.3.76",
+      "title": "Wersja 0.3.76",
+      "body": "- Skrzynia Konta przyjmuje minerały i pokazuje przy nich właściwe ikony."
     }
   ]
 }

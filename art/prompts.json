@@ -1321,7 +1321,10 @@
       "alchemy": "a round glass flask of bubbling glowing red potion beside a small brass alembic, fantasy RPG profession icon, bold readable shape, isolated on a plain flat background",
       "crafting": "a smith hammer crossed with a big sewing needle and red thread, fantasy RPG profession icon, bold readable shape, isolated on a plain flat background",
       "mining": "a miner's pickaxe leaning on a lump of rock with a glinting gemstone and a thin gold vein, fantasy RPG profession icon, bold readable shape, isolated on a plain flat background",
-      "jewelcrafting": "a golden ring set with a cut red gemstone next to a small jeweller's loupe, fantasy RPG profession icon, bold readable shape, isolated on a plain flat background"
+      "jewelcrafting": "a golden ring set with a cut red gemstone next to a small jeweller's loupe, fantasy RPG profession icon, bold readable shape, isolated on a plain flat background",
+      "fishing": {"prompt": "a wooden fishing rod with its line and a red and white float, beside a small wicker basket with a silver fish tail sticking out, fantasy RPG profession icon, bold readable shape, isolated on a plain flat background", "tool": "flash"},
+      "farming": {"prompt": "a small iron hoe leaning against a sheaf of golden wheat, a green sprout in front, fantasy RPG profession icon, bold readable shape, isolated on a plain flat background", "tool": "flash"},
+      "cooking": {"prompt": "a black iron cooking pot of steaming soup with a wooden ladle, a carrot and an onion beside it, fantasy RPG profession icon, bold readable shape, isolated on a plain flat background", "tool": "flash"}
     },
     "pixellab": {"style": "src/client/art/professions/herbalism.png"}
   },
@@ -1371,7 +1374,10 @@
       "board-new-moon-depths": {"width": 192, "height": 160, "prompt": "pixel art, top-down view straight from above of a moonless pine forest floor in the dead of night: grey moss, old rotting pine needles, crooked roots and a few small pale stones, muted very dark palette of grey, black and cold violet, a faint pale strip of trampled ground across the middle dividing two halves, slightly darker edges, soft even dusk light, flat ground seen from above for a dim background behind game cards, very low contrast, no standing trees, no people, no animals, no weapons, no text, no border"},
       "board-scree-slopes": {"width": 192, "height": 160, "prompt": "pixel art, top-down view straight from above of a mountain scree slope: grey quartzite stones and boulders of many sizes packed together, patches of yellow lichen, a few tufts of dry grass, muted palette of stone greys and pale ochres, a faint pale strip of trampled ground across the middle dividing two halves, slightly darker edges, soft even dusk light, flat ground seen from above for a dim background behind game cards, very low contrast, no standing trees, no people, no animals, no weapons, no text, no border"},
       "board-fir-forest": {"width": 192, "height": 160, "prompt": "pixel art, top-down view straight from above of a dark fir forest floor: fallen fir needles and cones, moss, small ferns and blueberry shrubs, twisting roots, muted very dark palette of deep green, brown and blue-grey, a faint pale strip of trampled ground across the middle dividing two halves, slightly darker edges, soft even dusk light, flat ground seen from above for a dim background behind game cards, very low contrast, no standing trees, no people, no animals, no weapons, no text, no border"},
-      "board-bald-mountain": {"width": 192, "height": 160, "prompt": "pixel art, top-down view straight from above of a bald mountain top at night: short trampled grass, bare stony ground, scattered small stones, a faint ring of ash from old fires, muted very dark palette of grey-green, black and cold violet, a faint pale strip of trampled ground across the middle dividing two halves, slightly darker edges, soft even dusk light, flat ground seen from above for a dim background behind game cards, very low contrast, no standing trees, no people, no animals, no weapons, no text, no border"}
+      "board-bald-mountain": {"width": 192, "height": 160, "prompt": "pixel art, top-down view straight from above of a bald mountain top at night: short trampled grass, bare stony ground, scattered small stones, a faint ring of ash from old fires, muted very dark palette of grey-green, black and cold violet, a faint pale strip of trampled ground across the middle dividing two halves, slightly darker edges, soft even dusk light, flat ground seen from above for a dim background behind game cards, very low contrast, no standing trees, no people, no animals, no weapons, no text, no border"},
+      "system-pond": {"prompt": "pixel art landscape, a quiet forest pond at dawn: still dark water with lily pads, reeds along the shore and a small wooden fishing pier with a wicker fish basket, willows leaning over the water, thin ice-blue glowing crystal shards between the reeds and faint luminous blue lines on the water, soft mist, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens and blues with ice-blue accents, no text, no border, no people, no animals", "tool": "flash"},
+      "system-field": {"prompt": "pixel art landscape, a small field at the edge of an old forest: neat rows of young green crops and golden grain, a low wooden fence and an old scarecrow, a small thatched shed, thin ice-blue glowing crystal shards between the furrows and faint luminous blue lines along the field paths, soft morning light, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens and earthy browns with ice-blue accents, no text, no border, no people, no animals", "tool": "flash"},
+      "system-kitchen": {"prompt": "pixel art interior landscape, an old village kitchen: a big clay stove with a low fire and a black cauldron, a wooden table with bread, vegetables and a fish on a board, strings of onions and garlic hanging from the beams, clay pots on shelves, thin ice-blue glowing crystal shards and faint luminous blue lines along the walls, soft warm light, wide panorama for a dim background behind text, low contrast, muted dark palette of deep browns and greens with ice-blue accents, no text, no border, no people, no animals", "tool": "flash"}
     },
     "pixellab": {"style": "src/client/art/places/system-grove.png", "styles": {"labyrinth": "src/client/art/places/tower-solo.png", "labyrinth-hell": "src/client/art/places/tower-solo.png", "casino-hall": "src/client/art/places/system-lapidary.png", "arena": "src/client/art/places/trial-hall.png", "arena-board": "src/client/art/places/trial-hall.png", "board-windfalls": "src/client/art/boards/arena-board.png", "board-stone-glade": "src/client/art/boards/arena-board.png", "board-backwaters": "src/client/art/boards/arena-board.png", "board-peat-bogs": "src/client/art/boards/arena-board.png", "board-black-bog": "src/client/art/boards/arena-board.png", "board-pine-dunes": "src/client/art/boards/arena-board.png", "board-silent-wilds": "src/client/art/boards/arena-board.png", "board-new-moon-depths": "src/client/art/boards/arena-board.png", "board-scree-slopes": "src/client/art/boards/arena-board.png", "board-fir-forest": "src/client/art/boards/arena-board.png", "board-bald-mountain": "src/client/art/boards/arena-board.png"}}
   },
@@ -1999,6 +2005,24 @@
       "golden-carp-herbs": "a whole golden-scaled carp baked with yellow herb flowers on a silver platter, single inventory item icon",
       "switez-soup": "a dark clay bowl of silvery fish soup glowing softly like moonlight, single inventory item icon",
       "mokosh-feast": "a round golden loaf of bread and a small golden fish on an embroidered cloth, glowing amber grains around them, single inventory item icon"
+    }
+  },
+  "farm": {
+    "$comment": "Plansza Rolnictwa (999, 16.11.2026; autor: „do Rolnictwa pewnie planszę jakąś z polami… i jakies animacje i stadia rozwoju generować (choćby każda roślina takie samo)”): łąka pod planszą 192 × 160, grządka i cztery wspólne stadia wzrostu 48 × 48, po cztery wersje z Pro Flash.",
+    "width": 48,
+    "height": 48,
+    "pixellab": {
+      "style": "src/client/art/herbs/st-johns-wort.png",
+      "tool": "flash",
+      "styles": {"field-board": "src/client/art/boards/arena-board.png"}
+    },
+    "prompts": {
+      "field-board": {"width": 192, "height": 160, "transparent": false, "prompt": "pixel art, top-down view straight from above of a sunny meadow beside a farm: short green grass with a few small wild flowers and stones, a worn dirt path along the bottom edge, a low wooden fence along the top edge, soft even light, muted dark palette of greens and earthy browns, flat ground seen from above for a dim background behind game tiles, low contrast, no text, no border, no people, no animals"},
+      "plot": "a square bed of freshly tilled dark brown soil with neat furrows and a thin wooden edging, seen from above at a slight angle, single game tile",
+      "stage-1": "a few seeds and a tiny pale green shoot just breaking through a small mound of dark soil, seen from above at a slight angle, single game sprite",
+      "stage-2": "a small green seedling with four fresh leaves growing from dark soil, seen from above at a slight angle, single game sprite",
+      "stage-3": "a young leafy green plant with many leaves and small buds growing from dark soil, seen from above at a slight angle, single game sprite",
+      "stage-4": "a lush full-grown green plant with broad leaves, ready for harvest, growing from dark soil, seen from above at a slight angle, single game sprite"
     }
   }
 }

@@ -44,7 +44,12 @@ function goodArt(good, size = 24) {
 // The character's own goods that can go into the chest, kind by kind, in
 // the order the sections show them.
 function ownGoods(character) {
-  const of = (kind, entries) => entries.filter((entry) => entry.count > 0).map((entry) => ({ kind, ...entry }));
+  // The chest's kind of the good last: a mineral's entry has its own `kind`
+  // (gem or ore, professions-view.js), which went to the server in its place
+  // (a player, through the author, 16.11.2026: „Skrzynia Konta z
+  // niewyjaśnionego powodu nie przyjmuje minerałów i nie wyświetla
+  // ikonki”).
+  const of = (kind, entries) => entries.filter((entry) => entry.count > 0).map((entry) => ({ ...entry, kind }));
   return [
     [
       t('Zasoby obozu'),

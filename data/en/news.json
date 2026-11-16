@@ -868,6 +868,10 @@
     "0.3.75": {
       "title": "Version 0.3.75",
       "body": "- A party has its own chat: while you are in a party, the chat has a “Party” tab that only its members read and write in.\n- When building a deck you can sort the cards: by type, rarity, level, attack, life or name.\n- Effect cards can be chosen right under “All”, above the creature cards, without switching the filter."
+    },
+    "0.3.76": {
+      "title": "Version 0.3.76",
+      "body": "- The Account Chest takes minerals and shows their proper icons."
     }
   }
 }
