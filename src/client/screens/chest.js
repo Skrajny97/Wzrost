@@ -8,7 +8,7 @@
 // mikstury, rośliny, wszystko, nawet zasoby, ale miec kłódkę i być
 // zablokowana do 20 poziomu postaci” (mock-ups 843). Once the server sends
 // `chest.goods`, the screen has two tabs: Przedmioty as before, and Towary:
-// the potions, herbs, materials, minerals and camp resources in the chest,
+// the potions, herbs, materials, parts, minerals and camp resources in the chest,
 // each taken out by the piece, and the character's own, each put in by the
 // piece. A chest the character cannot open yet (`chest.locked`, its level)
 // shows only when it opens.
@@ -56,6 +56,9 @@ function goodArt(good, size = 24) {
       return resourceArt(good.id, size);
     case 'material':
       return materialIcon(good.materialId, size);
+    // The Stół rozbiórki's parts (0.3.90), as the bag draws them.
+    case 'part':
+      return materialIcon(good.id, size);
     case 'mineral':
       return mineralSprite(good.id) ?? icon('ore', { size });
     case 'herb':
@@ -93,6 +96,7 @@ function ownGoods(character) {
     [t('Mikstury'), of('potion', character.potions ?? [])],
     [t('Zioła'), of('herb', character.herbs ?? [])],
     [t('Materiały'), of('material', (character.crafting?.materials ?? []).map((material) => ({ id: material.key, name: materialTitle(material), count: material.count, materialId: material.materialId })))],
+    [t('Części'), of('part', (character.crafting?.parts ?? []).map((part) => ({ id: part.id, name: part.name, count: part.count })))],
     [t('Minerały'), of('mineral', character.minerals ?? [])],
     [t('Zwoje'), of('scroll', character.scrollGoods ?? [])],
     [t('Spiżarnia'), of('pantry', character.pantry ?? [])],

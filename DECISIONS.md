@@ -3580,6 +3580,13 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.90 (16.11.2026): części do rzemiosła w Skrzyni Konta
+
+1. **Części w Skrzyni Konta.** Gracz (poz. 48): „będzie możliwość wkładnia do skrzyni konta części potrzebnych do wytwarzania ekwipunku?” Autor odpisał graczowi w czacie: „Zapomniałem o tym. Raczej tak.”
+    - Części ze Stołu rozbiórki (ścinki, rzemienie, okruchy kryształu, krwawniki…) wchodzą do Skrzyni Konta jak inne towary, w dowolnej liczbie, w zakładce „Towary”, w sekcji „Części” między materiałami a minerałami (`CHEST_GOODS` w `src/engine/account-chest.js`, kolumna `parts`).
+    - Jak przy materiałach: postać, która włożyła części, wyjmuje je jako swoje, a inna postać konta jako zdobyte od innych (`foreign_stacks`, `part:<id>`).
+    - Części nie zajmują miejsca w plecaku, więc wyjęcie ich nie zależy od wolnych miejsc. Części z gotowych zleceń Stołu rozbiórki liczą się od razu, bo każde żądanie najpierw rozlicza jego kolejkę.
+
 ## Wersja 0.3.89 (16.11.2026): pasek pracy Awatara obok paska postaci, zadania na zlecenia do zrobienia
 
 1. **Pasek Awatara (1021 B).** Prośba gracza, którą przekazał autor: „chodziło też o dodatkowy pasek tak jak jest eksploracja albo profesja gracza tutaj”. Przyjęty wariant 1021.2 B (krótki pasek w tym samym rzędzie), odrzucony 1021.1 A (drugi pasek pod paskiem postaci).

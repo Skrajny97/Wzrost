@@ -920,6 +920,10 @@
     "0.3.89": {
       "title": "Version 0.3.89",
       "body": "- Beside your character's strip there is a short \"AVATAR\" strip with the System Avatar's work time. When the Avatar's report waits, the strip shows \"REPORT\". A tap leads to its profession.\n- On a narrow phone with a potion at work, the potion's tile shows only the number of fights, so everything fits in one row.\n- The quest \"Complete orders in the Settlement\" comes only when the Order Board can fill it. If you have such a quest today that can no longer be done before midnight, the game swaps it for another, and you keep your reroll.\n- On a computer and a tablet the bag's tabs stand in two rows and no longer spill out of their frames."
+    },
+    "0.3.90": {
+      "title": "Version 0.3.90",
+      "body": "- You can also put crafting parts from the Salvage Table (scraps, straps, crystal splinters and more) into the Account Chest. They are on the \"Goods\" tab, between materials and minerals."
     }
   }
 }
