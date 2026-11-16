@@ -908,6 +908,10 @@
     "0.3.86": {
       "title": "Version 0.3.86",
       "body": "- Guild ranks: R4 the leader, R3 deputies, R2 members and R1 novices. The rank badge stands by the name in the members' list.\n- A character new to a guild is a novice for its first 3 days: from the Guild Chest it takes only the items left for it. The leader and the deputies can promote it sooner with \"Make member\".\n- Members already in guilds are R2 right away."
+    },
+    "0.3.87": {
+      "title": "Version 0.3.87",
+      "body": "- Professions grow 3 times faster: a level takes 10 minutes of work times the level instead of 30. Levels you have stay, and the progress bar stands where it stood.\n- The System Avatar now gives all the profession progress from its work (character experience still a quarter). Your character goes on explorations while the Avatar levels a profession as fast as the character would."
     }
   }
 }

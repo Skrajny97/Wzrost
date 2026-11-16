@@ -3580,6 +3580,14 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.87 (16.11.2026): profesje 3 razy szybciej, Awatar z całym postępem profesji
+
+1. **Tempo profesji (1020).** Gracz (poz. 93) policzył, że opanowanie wszystkich ośmiu profesji po 4 godziny dziennie zajęłoby 55 lat (zgadza się: 79 600 godzin pracy). Autor: „może w związku ze wzrostem aktywności trzeba tak zrobić? bo to przesada już chyba”. Przyjęte 1020.1 A i 1020.3 C, odrzucone 1020.2 B (praca w profesji równolegle z wyprawą).
+    - **C:** poziom profesji wymaga L × 10 minut pracy zamiast L × 30 (`levelMinutes` w `data/professions.json`). 100. poziom to 825 godzin pracy zamiast 2475, a 200. to 3317 zamiast 9950.
+    - **A:** Awatar Systemu daje z pracy cały postęp profesji (`avatar.professionShare` 1), a XP postaci dalej ćwierć (`share`). Postać chodzi na wyprawy, a Awatar w tym czasie rozwija profesję tak szybko jak ona.
+    - **Postęp sprzed zmiany (migracja 0145):** zdobyte poziomy zostają, a XP w bieżącym poziomie każdej profesji dzieli się przez 3, więc pasek postępu stoi tam, gdzie stał.
+    - **Statystyki z poziomu profesji** są takie same, tylko przychodzą szybciej. Symulacja trudności (`tools/difficulty-sim.mjs`) nie liczy statystyk z profesji postaci, więc jej wyniki się nie zmieniają.
+
 ## Wersja 0.3.86 (16.11.2026): rangi w gildii
 
 1. Rangi R4–R1 w gildii (1062; makiety 1017, przyjęte z uwagą autora do 1017.2). Zob. „Rangi w gildii”.

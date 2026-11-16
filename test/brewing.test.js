@@ -14,6 +14,7 @@ import {
   drawQuests,
   weekShare,
   knownPotions,
+  workProfession,
   mostPotions,
   notificationsDue,
   potionMinutes,
@@ -236,15 +237,17 @@ describe('brewing through the API', () => {
     assert.equal(report.minutes, 120);
     assert.equal(report.potion.count, 12 + report.potion.bonus);
     assert.equal(report.stopped, null);
-    assert.equal(report.profession.levelAfter, 3);
-    assert.deepEqual(report.revealed, ['lesser-mana']);
+    // Two hours of Alchemia from its first level (L × levelMinutes a level).
+    const alchemy = workProfession(content.professionsById.alchemy, { level: 1, xp: 0 }, 120);
+    assert.equal(report.profession.levelAfter, alchemy.level);
+    assert.deepEqual(report.revealed, knownPotions(alchemy.level, content).map((potion) => potion.id).filter((id) => id !== 'lesser-healing'));
     assert.ok(report.summary.xp > 0);
     assert.equal(after.activity, null);
     assert.deepEqual(after.herbs, []);
     assert.deepEqual(after.potions.map((potion) => [potion.name, potion.count, potion.price]), [['Mniejsza mikstura leczenia', report.potion.count, 9]]);
     assert.equal(after.bagUsed, 1);
-    assert.equal(after.professions.list[1].level, 3);
-    assert.equal(after.stats.find((stat) => stat.id === 'intellect').sources.professions, 2 * content.professionsById[content.brewing.profession].statPerLevel);
+    assert.equal(after.professions.list[1].level, alchemy.level);
+    assert.equal(after.stats.find((stat) => stat.id === 'intellect').sources.professions, (alchemy.level - 1) * content.professionsById[content.brewing.profession].statPerLevel);
     const { data } = await call('GET', '/api/reports', { cookie });
     assert.equal(data.reports[0].kind, 'potions');
     assert.equal((await call('POST', '/api/hunts/claim', { cookie })).status, 409);

@@ -70,12 +70,14 @@ describe('Awatar Systemu', () => {
     assert.equal(report.kind, 'herbs');
     assert.equal(report.avatar, true);
     assert.equal(report.summary.xp, Math.round(workXp(10, 60, content) * content.avatar.share));
-    assert.equal(report.profession.levelAfter, 1);
+    // All of the profession's progress since 0.3.87 (1020.1), a quarter of the XP.
+    const herbs = workProfession(content.professionsById.herbalism, { level: 1, xp: 0 }, Math.round(60 * content.avatar.professionShare));
+    assert.equal(report.profession.levelAfter, herbs.level);
     const found = report.herbs.find((herb) => herb.id === 'comfrey').count;
     assert.ok(found > 0);
     assert.equal(after.herbs.find((herb) => herb.id === 'comfrey').count, found);
     assert.equal(after.xp, report.summary.xp);
-    assert.deepEqual([after.professions.list[0].level, after.professions.list[0].xp], [1, Math.round(60 * content.avatar.share)]);
+    assert.deepEqual([after.professions.list[0].level, after.professions.list[0].xp], [herbs.level, herbs.xp]);
     assert.equal(after.professions.avatar.activity, null);
     assert.equal(after.activity.kind, 'hunt');
     assert.equal((await call('POST', '/api/avatar/claim', { cookie })).status, 409);
@@ -104,7 +106,7 @@ describe('Awatar Systemu', () => {
     assert.equal(report.potion.count, 10 + report.potion.bonus);
     assert.equal(report.summary.xp, Math.round(workXp(10, 100, content) * content.avatar.share));
     assert.equal(after.potions[0].count, report.potion.count);
-    assert.equal(after.professions.list[1].level, 1);
+    assert.equal(after.professions.list[1].level, workProfession(content.professionsById.alchemy, { level: 1, xp: 0 }, Math.round(100 * content.avatar.professionShare)).level);
     assert.equal(after.activity.kind, 'herbs');
   });
 
@@ -146,7 +148,7 @@ describe('Awatar Systemu', () => {
     // The items wait in the Przechowalnia, out of the bag (842).
     assert.equal(after.bag.length, 0);
     assert.equal(after.professions.storage.items.length, report.items.length);
-    assert.equal(after.professions.list[2].level, workProfession(content.professionsById.crafting, { level: 1, xp: 0 }, Math.round(report.minutes * content.avatar.share)).level);
+    assert.equal(after.professions.list[2].level, workProfession(content.professionsById.crafting, { level: 1, xp: 0 }, Math.round(report.minutes * content.avatar.professionShare)).level);
   });
 
   test('the phone hears of the end of its work under its own title', () => {

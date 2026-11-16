@@ -66,7 +66,7 @@ describe('the professions past their mastery in the engine (952)', () => {
     const character = newCharacter('cleric', { level: 120 });
     const work = { level: 120, xp: 0, timePoints: 0, messages: [] };
     const before = { level: 99, xp: 0 };
-    const after = workProfession(content.professionsById.herbalism, before, 99 * 30);
+    const after = workProfession(content.professionsById.herbalism, before, 99 * content.professionsById.herbalism.levelMinutes);
     const report = gatheringReport({ minutes: 480, startedAt: 0, endsAt: 1, seed: 'n', found: { 'fern-blossom': 3 }, stored: { 'fern-blossom': 3 }, lost: {}, before, after, character, xp: 0, work }, content);
     assert.equal(after.level, 100);
     assert.deepEqual(report.revealed, ['adders-tongue']);
