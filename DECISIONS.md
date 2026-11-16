@@ -3580,6 +3580,12 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.94 (16.11.2026): odliczanie budowy w jednej linijce
+
+1. **Odliczanie budowy na mapie Obozu (poprawka 0.3.92).** Autor (zrzut z telefonu): „rozjeżdża się ekran czasu budowy”. Od 0.3.92 każda cyfra licznika stoi w osobnym okienku stałej szerokości, a przeglądarka może przenieść tekst do nowej linii między takimi okienkami. Ramka z klepsydrą nad budowanym budynkiem ma mało miejsca, więc „4:42:12” łamało się na 2–5 linijek (na telefonie 390 px: „4:4 / 2:1 / 2”).
+    - Godzina z cyframi i dwukropkami stoi teraz w jednym nierozdzielnym kawałku (`.timer-run`, `setTimer` w `src/client/dom.js`). Słowa obok, np. „2 dni” w zadaniach, dalej przechodzą do nowej linii jak słowa.
+    - Sprawdzone w lokalnej grze z budową w toku na 320, 360, 390, 430, 1366 i 1920 px: każdy licznik w jednej linijce (ramka nad budynkiem 23 px wysokości, wcześniej do 93 px), bez przewijania na boki.
+
 ## Wersja 0.3.93 (16.11.2026): Tier IX przedmiotów, pauza i dźwięki minigry, podgląd autora, kod KAWA1000
 
 1. **Tier IX przedmiotów (1018, ikony 1024).** Autor przyjął zasady i nazwy 1018.1–1018.23. Jak w Tierach VII i VIII, o 25 poziomów dalej, dla Łysogór (201–275):

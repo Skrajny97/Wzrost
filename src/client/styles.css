@@ -1079,6 +1079,12 @@ button {
   text-align: center;
 }
 
+/* A countdown's run of digits and colons never breaks between the digits'
+   boxes (setTimer). */
+.timer-run {
+  white-space: nowrap;
+}
+
 /* A build's countdown under the tent keeps one width, so the top bar does
    not twitch each second as its digits change (a player, 16.11.2026: „drga
    interfejs na samej górze jak upływa czas pod ikonką osady”): the System's

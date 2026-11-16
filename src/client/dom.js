@@ -38,10 +38,21 @@ function setProps(element, props) {
 // of one width, and a phone set to bold text draws them wider still (a
 // player, 16.11.2026: „drga interfejs na samej górze jak upływa czas pod
 // ikonką osady”; others, through the author: „mówią że to może być grubość
-// czcionki u niektórych”). Drawn anew only when the text changes.
+// czcionki u niektórych”). Drawn anew only when the text changes. Each run
+// of digits and colons ("4:42:12") stands in one unbreakable span
+// (.timer-run): a line may break between the digits' boxes, and a narrow
+// frame broke a build's countdown on the camp's map into three lines (the
+// author, 16.11.2026: „rozjeżdża się ekran czasu budowy”). Words around it
+// ("2 dni") still wrap as words.
 export function setTimer(element, text) {
   if (element.textContent === text && element.firstElementChild) return;
-  element.replaceChildren(...[...text].map((char) => (char >= '0' && char <= '9' ? h('span', { class: 'timer-digit', text: char }) : char)));
+  const digits = (run) => [...run].map((char) => (char >= '0' && char <= '9' ? h('span', { class: 'timer-digit', text: char }) : char));
+  element.replaceChildren(
+    ...text
+      .split(/(\d(?:[\d:]*\d)?)/)
+      .filter(Boolean)
+      .map((part) => (/^\d/.test(part) ? h('span', { class: 'timer-run' }, digits(part)) : part)),
+  );
 }
 
 export function append(parent, children) {

@@ -936,6 +936,10 @@
     "0.3.93": {
       "title": "Version 0.3.93",
       "body": "- Tier IX of the items: 22 new items from class level 175, one in each family, named after Polish legends and Slavic gods (Szczerbiec, Perun's Axe, the Shield of Achilles, the Golden Horn and more). They drop from the Wild Den (lvl 171–175), and their crafting patterns open at profession level 175.\n- The Encyclopedia has a Tier IX with its own chest, and the materials of creatures above level 200 stand in Tier IX.\n- The mini-game at a profession's report: after each tap the marker stops for a moment. A hit glows green, a miss red, each with its own sound. On Android the phone gives a short buzz."
+    },
+    "0.3.94": {
+      "title": "Version 0.3.94",
+      "body": "- A build's countdown over a building on the Camp's map fits on one line again instead of breaking into several."
     }
   }
 }
