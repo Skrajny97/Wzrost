@@ -413,6 +413,7 @@
     },
     {
       "id": "archdruid",
+      "duelPower": 1.1,
       "classId": "mage",
       "from": "druid",
       "name": "Arcydruid",
