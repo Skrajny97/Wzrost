@@ -140,7 +140,7 @@ describe('English where ENGLISH is on (the test version)', () => {
     const latest = async (lang) => (await ask('GET', '/api/chat/latest', { cookie: anna, lang })).data;
     assert.equal((await latest('en')).latest, english.id);
     assert.equal((await latest('pl')).latest, global.id);
-    assert.deepEqual((await latest('en')).seen, { global: 0, trade: 0, english: 0, guild: 0, private: {} });
+    assert.deepEqual((await latest('en')).seen, { global: 0, trade: 0, english: 0, guild: 0, notice: 0, lead: 0, private: {} });
     assert.equal((await ask('POST', '/api/chat/seen', { cookie: anna, lang: 'en', body: { english: english.id } })).status, 200);
     const { seen } = await latest('en');
     assert.deepEqual([seen.english, seen.global], [english.id, 0]);
@@ -223,6 +223,6 @@ describe('the live game, where ENGLISH is off', () => {
     const sent = await ask('POST', '/api/chat', { cookie: anna, lang: 'en', body: { channel: 'global', text: 'What a twat' } });
     assert.equal(sent.data.message.text, 'What a ****');
     await ask('POST', '/api/chat/seen', { cookie: anna, body: { english: sent.data.message.id } });
-    assert.deepEqual((await ask('GET', '/api/chat/latest', { cookie: anna })).data.seen, { global: 0, trade: 0, guild: 0, private: {} });
+    assert.deepEqual((await ask('GET', '/api/chat/latest', { cookie: anna })).data.seen, { global: 0, trade: 0, guild: 0, notice: 0, lead: 0, private: {} });
   });
 });
