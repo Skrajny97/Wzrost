@@ -17,6 +17,7 @@ import { buildTopbar, showWallet, updateNav, updateTopbar } from './layout.js';
 import { desktopLayout, layoutChoice, layoutOffered, onLayoutChange, setLayoutChoice } from './layout-mode.js';
 import { updateSide } from './side.js';
 import { chatBubbleOn, setChatBubbleOn, updateChatBubble } from './chat-bubble.js';
+import { offerStreak } from './daily-streak.js';
 // The computer's keys 1–6 for the main tabs (477 A, 508 A).
 import './keys.js';
 import { showQuests, watchQuests } from './quests.js';
@@ -435,6 +436,8 @@ function openGame() {
     offerNameNotice();
     // A new week of the year, named once (weeks.js).
     offerWeekNotice();
+    // The reward for days in a row, once a visit while it waits (1029).
+    offerStreak();
     // A minute with the game on the screen (993 A, play-time.js).
     watchPlayTime();
   }, 1000);

@@ -3528,5 +3528,16 @@
   "Wybierz ryby do łowienia.": "Choose fish to catch.",
   "Zwoje": "Scrolls",
   "zwój": "scroll",
-  "Nikt nie wystawia teraz zwojów.": "Nobody is offering scrolls right now."
+  "Nikt nie wystawia teraz zwojów.": "Nobody is offering scrolls right now.",
+  "Dzień {day}": "Day {day}",
+  "odebrane": "taken",
+  "Nagroda za kolejne dni": "Reward for days in a row",
+  "Wracaj codziennie: każdy kolejny dzień daje więcej, a 7. dnia czeka pakiet kart. Opuszczony dzień zaczyna serię od nowa.": "Come back every day: each day gives more, and day 7 brings a pack of cards. A missed day starts the series anew.",
+  "Wczoraj zabrakło Cię w grze, więc seria zaczyna się od 1. dnia.": "You were not in the game yesterday, so the series starts again from day 1.",
+  "Dni serii": "Days of the series",
+  "Odebrane. Wróć jutro po dzień {day}.": "Taken. Come back tomorrow for day {day}.",
+  "Seria ukończona. Jutro zaczyna się nowa.": "Series complete. A new one starts tomorrow.",
+  "Odbierz nagrodę dnia {day}": "Take the reward of day {day}",
+  "Nagroda dnia jest już odebrana. Wróć jutro.": "Today's reward is already taken. Come back tomorrow.",
+  "Nagroda dnia zmieniła się w międzyczasie. Spróbuj jeszcze raz.": "Today's reward changed in the meantime. Try again."
 }

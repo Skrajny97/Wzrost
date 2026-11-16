@@ -11,6 +11,7 @@ import { openBestiaryChest } from './bestiary.js';
 import { openEncyclopediaChest, readEncyclopedia } from './encyclopedia.js';
 import { decidePointsReset, takeEvolution, testClassLevel, testEvolutions, undoEvolution } from './evolutions.js';
 import { moveGiftRewards, redeemGiftCode } from './gift-codes.js';
+import { getStreak, takeStreak } from './streak.js';
 import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewing.js';
 import { buyCollector, buyParts, cancelBuilding, collectProduction, exchangeResources, sellToSpirit, startBuilding, tradeAtFire } from './camp.js';
 import {
@@ -211,6 +212,9 @@ const routes = [
   ['POST', '/api/evolution/test-level', testClassLevel],
   ['POST', '/api/evolution/points', decidePointsReset],
   ['POST', '/api/gift-code', redeemGiftCode],
+  // The reward for days in a row (streak.js, 1029).
+  ['GET', '/api/streak', getStreak],
+  ['POST', '/api/streak', takeStreak],
   // The Sklep Systemu (cosmetics.js).
   ['POST', '/api/cosmetics/buy', buyCosmetic],
   ['POST', '/api/cosmetics/wear', wearCosmetic],

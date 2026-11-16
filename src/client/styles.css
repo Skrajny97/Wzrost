@@ -26995,3 +26995,102 @@ a.discord-button {
   font-weight: 700;
   letter-spacing: 0.04em;
 }
+
+/* The reward for days in a row (1029, daily-streak.js): seven tiles, four
+   and three on a phone with the seventh twice as wide, all in one row in a
+   wider window; the days taken with a tick, today's ringed. */
+.streak-days {
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 12px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.streak-day--last {
+  grid-column: span 2;
+}
+
+@media (min-width: 640px) {
+  :root[data-layout='desktop'] .streak-days {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+}
+
+.streak-day {
+  position: relative;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 4px;
+  min-height: 92px;
+  padding: 8px 4px;
+  border: 1px solid var(--line);
+  background: rgba(13, 17, 11, 0.6);
+  text-align: center;
+}
+
+.streak-day--last {
+  border-color: var(--gold-line, var(--gold));
+}
+
+.streak-day--today {
+  border-color: var(--system);
+  box-shadow: 0 0 0 1px var(--system), 0 0 12px rgba(143, 227, 239, 0.25);
+}
+
+.streak-day--taken {
+  opacity: 0.55;
+}
+
+.streak-day--today.streak-day--taken {
+  opacity: 1;
+}
+
+.streak-day-name {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.streak-day--today .streak-day-name {
+  color: var(--system-text);
+}
+
+.streak-day-rewards {
+  display: grid;
+  gap: 3px;
+  justify-items: center;
+}
+
+.streak-reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-system);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.streak-pack {
+  image-rendering: pixelated;
+}
+
+.streak-day-check {
+  display: inline-flex;
+  color: var(--success, var(--system));
+}
+
+.streak-fresh {
+  color: var(--text-muted);
+}
+
+.streak-done {
+  color: var(--system-text);
+  text-align: center;
+}
+

@@ -9,7 +9,8 @@
     "periods",
     "kinds",
     "rewards",
-    "levels"
+    "levels",
+    "streak"
   ],
   "properties": {
     "$comment": {
@@ -228,6 +229,50 @@
             "additionalProperties": {
               "type": "number",
               "exclusiveMinimum": 0
+            }
+          }
+        }
+      }
+    },
+    "streak": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "goldRound",
+        "days"
+      ],
+      "description": "Nagroda za kolejne dni gry (1029): dni serii, każdy raz.",
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "goldRound": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "days": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "goldMinutes": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "timePoints": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "packs": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "systemPoints": {
+                "type": "integer",
+                "minimum": 0
+              }
             }
           }
         }

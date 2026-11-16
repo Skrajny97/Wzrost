@@ -964,6 +964,10 @@
     "0.4.1": {
       "title": "Version 0.4.1",
       "body": "- Guild war league: the game draws the trios for the evening once, at midnight, and they stay for the whole day. One who joins the guild during the day fights only the 1v1 that evening, and one who leaves leaves an empty place in the trio. The trios for today's rerun at 23:00 are already set."
+    },
+    "0.4.2": {
+      "title": "Version 0.4.2",
+      "body": "- Reward for days in a row: at your first visit of the day you take that day's reward. Each next day gives more gold and Time Points, and day 7 brings a pack of cards and 5 System Points. A missed day starts the series anew. One series per account.\n- Guild war league: “How does it work?” now says more exactly how free evenings work and that with more than 8 guilds some evenings have two matches."
     }
   }
 }

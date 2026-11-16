@@ -1210,6 +1210,11 @@
       "id": "0.4.1",
       "title": "Wersja 0.4.1",
       "body": "- Liga wojen gildii: trójki na wieczór gra losuje raz, o północy, i zostają na cały dzień. Kto dołączy do gildii w ciągu dnia, walczy tego wieczoru tylko w 1v1, a kto odejdzie, zostawia w trójce puste miejsce. Trójki na dzisiejszą powtórkę o 23:00 są już ustalone."
+    },
+    {
+      "id": "0.4.2",
+      "title": "Wersja 0.4.2",
+      "body": "- Nagroda za kolejne dni gry: przy pierwszym wejściu w danym dniu odbierzesz nagrodę dnia. Każdy kolejny dzień daje więcej złota i Punktów Czasu, a 7. dnia czeka pakiet kart i 5 Punktów Systemu. Opuszczony dzień zaczyna serię od nowa. Jedna seria na konto.\n- Liga wojen gildii: „Jak to działa?” mówi dokładniej o wolnych wieczorach i o dwóch meczach jednego wieczoru przy więcej niż 8 gildiach."
     }
   ]
 }
