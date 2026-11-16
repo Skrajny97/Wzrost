@@ -306,7 +306,11 @@ export function updateTopbar(now = serverNow()) {
   const stocked = topbar.stock.map((entry) => {
     const amount = entry.id === 'time' ? time.points : (character.resources[entry.id] ?? 0);
     entry.value.textContent = formatShort(amount);
-    if (entry.id === 'time') {
+    // Not while the mouse is over it: a pointer's words changed every second
+    // went out and came back each time (a player, 16.11.2026: „co sekundę
+    // znika stara wartość i się nowa pojawia”); they show the moment the
+    // mouse came, and count on once it leaves.
+    if (entry.id === 'time' && !entry.element.matches(':hover')) {
       const play = playLine(character);
       entry.element.title = t('{name}: +1 za {time}', { name: entry.name, time: formatCountdown(time.nextAt - now) }) + (play ? `\n${play}` : '');
     }
