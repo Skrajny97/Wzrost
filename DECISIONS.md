@@ -3580,6 +3580,10 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.75 (16.11.2026): czat Drużyny, sortowanie talii i karty efektów pod „Wszystkie”
+
+Autor przyjął 1000.1–1000.3 na stronie ocen. W grze: zakładka czatu „Drużyna” dla członków drużyny, rząd „Sortuj:” przy układaniu talii i karty efektów do wybrania od razu pod „Wszystkie” (szczegóły niżej).
+
 ## Czat Drużyny i sortowanie kart w talii (1000; 16.11.2026)
 
 Autor: „Stwórz też czat dla założonej Drużyny”, „dodaj też opcje sortowania kart przy układaniu talii”. Oba zrobione w kopii gry i pokazane na stronie ocen (1000.1–1000.3) przed wdrożeniem.

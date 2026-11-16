@@ -864,6 +864,10 @@
     "0.3.74": {
       "title": "Version 0.3.74",
       "body": "- The guild has a notice board: at the top of the Guild tab the leader and the deputies post announcements for all members. A new announcement lights a dot by the tab.\n- The leader and the deputies have their own chat channel, “Command”, which the guild's members do not see."
+    },
+    "0.3.75": {
+      "title": "Version 0.3.75",
+      "body": "- A party has its own chat: while you are in a party, the chat has a “Party” tab that only its members read and write in.\n- When building a deck you can sort the cards: by type, rarity, level, attack, life or name.\n- Effect cards can be chosen right under “All”, above the creature cards, without switching the filter."
     }
   }
 }

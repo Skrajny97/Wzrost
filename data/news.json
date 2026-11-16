@@ -1085,6 +1085,11 @@
       "id": "0.3.74",
       "title": "Wersja 0.3.74",
       "body": "- Gildia ma tablicę ogłoszeń: na górze zakładki Gildia lider i zastępcy piszą ogłoszenia dla wszystkich członków. Nowe ogłoszenie zapala kropkę przy zakładce.\n- Lider i zastępcy mają w czacie własny kanał „Dowództwo”, którego członkowie gildii nie widzą."
+    },
+    {
+      "id": "0.3.75",
+      "title": "Wersja 0.3.75",
+      "body": "- Drużyna ma własny czat: gdy jesteś w drużynie, w czacie jest zakładka „Drużyna”, którą czytają i piszą tylko jej członkowie.\n- Przy układaniu talii karty można sortować: po typie, rzadkości, poziomie, ataku, życiu albo nazwie.\n- Karty efektów są do wybrania od razu pod „Wszystkie”, nad kartami stworów, bez przełączania filtra."
     }
   ]
 }
