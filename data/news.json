@@ -1075,6 +1075,11 @@
       "id": "0.3.72",
       "title": "Wersja 0.3.72",
       "body": "- Odcienie skóry na portretach: w 71 portretach form, strojów i klas startowych część skóry nie zmieniała koloru razem z wybranym odcieniem. Na przykład na ciemnej skórze zostawał jasny pasek czoła albo jasna krawędź dłoni. Teraz cała skóra ma wybrany odcień, a włosy, zbroje i stroje zostały jak były."
+    },
+    {
+      "id": "0.3.73",
+      "title": "Wersja 0.3.73",
+      "body": "- Wojny gildii to teraz liga każdy z każdym: co wieczór o 20:00 każda gildia gra mecz z inną, aż zmierzy się z każdą, bez względu na liczbę członków. Wojny wylosowane w nocy z niedzieli na poniedziałek zostały wyzerowane, a liga tego tygodnia rusza od najbliższego wieczoru.\n- Mecz to walki 1v1 i 3v3: w 1v1 każdy członek walczy z każdym członkiem gildii rywala, a w 3v3 każda trójka z każdą trójką rywala. Trójki losuje gra przed każdym wieczorem, a trójka, której brakuje członków, przegrywa swoje walki walkowerem.\n- W zakładce Wojna jest tabela ligi z łącznym bilansem walk. W niedzielę 1. miejsce zgarnia 100 punktów Sławy i skrzynię wojenną z 3 przedmiotami czempiona, 2. miejsce 60 punktów Sławy i przedmiot czempiona, a 3. miejsce 30 punktów Sławy.\n- Za każdą wygraną walkę zgarniasz złoto, a za mecz wygrany przez gildię 2 Punkty Systemu."
     }
   ]
 }

@@ -3510,6 +3510,46 @@ Autor: „twarz w portrecie męskiego Strzelca Wyborowego jest brzydka i powinna
 3. **Pasek czoła:** autor zauważył na ciemnym odcieniu jasny pasek skóry pod opaską: pole skóry tego portretu zaczynało się wiersz za nisko i od początku go pomijało. Grupa twarzy obejmuje teraz czoło, cień przy uchu i cień pod brodą, a sprawdzenie wszystkich ośmiu odcieni nie znajduje na głowie żadnego koloru skóry sprzed przebarwienia.
 4. **Inne portrety:** ten sam skan znalazł podobne jasne piksele przy skórze w innych portretach (np. pasek przy obojczyku Czempiona Areny i linia na nodze Berserkerki w ciemnym odcieniu). To osobne zadanie. *Zrobione: zob. „Maski odcieni skóry w 71 portretach”.*
 
+## Liga wojen gildii (996; 16.11.2026)
+
+Gracz (poz. 51) na czacie, przy wojnach wylosowanych w nocy z 15 na 16.11: „pisze że w tym tygodniu nie było gildii o podobnej liczbie”, „Czemu my jako gildia mamy nie walczyć”. Autor:
+- „miało tak nie być miała każda gildia walczyć”;
+- „Nie musi być podobna liczba członków gildii, niech każda walczy z każdą”, „rozlosujesz od zera i zresetujesz wojny gildii”, „Beda sie one odbywac od jutra i niech działają ciekawie”;
+- „drużyny niech losuje samo do wojen gildii nie trzeba ustalać składów też”;
+- „Niech te wojny gildii odbywają sie w formułach 1v1 i 3v3, gdzie drużyny dobierane są automatycznie i walczy każdy z każdym - dużo walk. Jeśli brakuje członków gildii to będzie walkowerem liczone. Liczony łączny bilans wygranych i porażek (w tym walkowerów)”;
+- „ważne zeby w wojnach gildii walczyła też każda druzyna z kazda lub wlasnie walkower jak brakuje czlonkow do obsadzenia wszystkich drużyn liczony jako porażka”.
+
+W pytaniu autor wybrał „Liga: każdy z każdym” i start w poniedziałek 16.11. Zmienia to 797 B (rywal o podobnej liczbie członków), 796 A (miejsca w drużynach zajmowane samemu), 795 B i 798 A (bitwy 5 na 5 drużyn po kolei), 12 (gildia bez rywala bez wojny) oraz wynik wojny i nagrody z 799 A.
+
+1. **Reset.** Migracja `0140_guild_league.sql` usuwa wojny wylosowane w nocy, ich tygodnie i bitwy oraz tabelę miejsc w drużynach (`guild_war_slots`). Pierwsze uruchomienie po wdrożeniu losuje ligę tego tygodnia od nowa.
+2. **Terminarz** (`leagueSchedule`, `leagueRounds` w `src/engine/guild-wars.js`):
+    - Gra losuje go przy pierwszym uruchomieniu w tygodniu, dla wszystkich gildii z członkami, bez względu na ich liczbę.
+    - Rundy idą metodą kołową: każda gildia z każdą, po jednej rundzie na wieczór o 20:00, od pierwszego wieczoru, którego bitwy jeszcze nie minęły.
+    - Gdy wieczorów zostaje, rundy idą od nowa jako rewanże, ze stronami zamienionymi. Przy więcej niż 8 gildiach rund jest więcej niż wieczorów, więc niektóre wieczory mają dwie rundy i każda gildia gra z każdą.
+    - Gildia założona po losowaniu gra od następnego poniedziałku. Liga wylosowana po niedzielnych bitwach nie ma meczów i od razu się kończy.
+3. **Nieparzysta liczba gildii.** Gildia bez rywala w rundzie gra z Lustrzaną Gildią (dawny rywal „Testu wojny”): to jej własni członkowie i trójki, pod imionami z Karczmy. Mecz liczy się w tabeli, a wygrane Lustrzanej Gildii nie dają nikomu nagród.
+4. **Mecz: 1v1 i 3v3, każdy z każdym** (`matchFights`):
+    - W 1v1 każdy członek gildii walczy z każdym członkiem gildii rywala.
+    - W 3v3 gra losuje przed każdym wieczorem trójki z członków (`warDrawnTeams`, ziarno wieczoru gildii, więc zakładka pokazuje je jeszcze przed walkami), a każda trójka walczy z każdą trójką rywala.
+    - Trójek jest tyle, ile trzeba dla wszystkich członków (najwyżej 10). Gdy liczby członków nie da się podzielić na pełne trójki, ostatnia trójka jest niepełna: nie walczy, a jej walki liczą się jako walkower, czyli porażka. Dwie niepełne trójki przegrywają obie.
+    - Walka jak bitwa wojny dotąd: postacie takie, jakie są zapisane, jak na Arenie, bez towarzyszy i najemników, z sędzią po 40 ruchach na walczącego. Nie ma już „Zajmij”, ⇄ ani rezerwy.
+    - Postać, której konto ma postać po drugiej stronie, nie walczy w tym meczu, a jej trójka jest niepełna. Gdy przez to któraś strona nie ma nikogo, mecz jest unieważniony i nie liczy się nikomu. Gildia, która zniknęła, przegrywa swoje pozostałe mecze.
+    - Mecz wygrywa gildia z lepszym bilansem walk (wygrane minus przegrane, z walkowerami).
+5. **Tabela** (`leagueTable`): łączny bilans walk wygranych i przegranych z całego tygodnia, razem z walkowerami; przy równym bilansie wyżej więcej wygranych walk, a na końcu kolejność z losowania.
+6. **Nagrody** (`war.league.prizes`, `fame.war.places`, `war.reward`):
+    - 1. miejsce: 100 punktów Sławy i skrzynia wojenna z 3 przedmiotami w rzadkości czempiona, gdy w lidze grały co najmniej 2 gildie.
+    - 2. miejsce: 60 punktów Sławy i 1 taki przedmiot, od 3 gildii.
+    - 3. miejsce: 30 punktów Sławy, od 4 gildii.
+    - Za każdą wygraną walkę złoto: 6 + 1,2 × poziom postaci (126 na 100. poziomie), dziesiąta część dawnej nagrody za bitwę, bo walk jest wiele razy więcej. Za mecz wygrany przez gildię 2 Punkty Systemu dla każdego, kto w nim walczył, raz.
+    - Miejsca zapisuje `guild_league_places` po niedzielnych meczach, raz. Sława miejsca liczy się w Rankingu gildii, a w Rankingu członków dzieli się po równo między tych, którzy walczyli w meczach gildii.
+7. **Zapis walk.** Każda walka to wiersz w `guild_war_battles` (format, strony, wynik, walczący i przebieg do obejrzenia), dopisywane po 9 w jednym zapytaniu (limit D1). Walkowery nie mają wierszy, tylko liczniki meczu (`losses_*`, `walkovers_*`).
+8. **Zakładka Wojna** (makiety 996.1–996.3 v2):
+    - Na górze sztandary Waszej gildii i najbliższego rywala, a między nimi miejsce w lidze („VS” przed pierwszym wieczorem). Pod nimi kafelki tygodnia z bilansem walk wieczoru i skrótem rywala.
+    - Dalej najbliższy mecz z odliczaniem, liczbą pojedynków 1v1 i walk 3v3 i ostrzeżeniem o niepełnej trójce, Twoja trójka i trójki wylosowane na ten wieczór.
+    - Potem tabela ligi (W, P, bilans), wyniki wieczorów z podziałem na 1v1, 3v3 i walkowery, Twoje walki z ostatniego wieczoru do obejrzenia, karta „Koniec ligi” po niedzieli, pasek pełnych trójek i „Jak to działa?”.
+9. **Test ligi** (tylko wersja testowa): „Rozegraj wieczór” rozgrywa od razu następny wieczór całej ligi, a „Losuj ligę od nowa” losuje ją od dziś.
+10. **Testy na własnym zegarze.** Zapytania testów mogą podać chwilę w nagłówku `X-Test-Now`, ale tylko tam, gdzie test włączy `TEST_CLOCK`; w grze i na wersji testowej go nie ma. Testy ligi nie zależą więc od dnia, w którym idą (zob. wersja 0.3.72).
+
 ## Maski odcieni skóry w 71 portretach (995; 16.11.2026, od 0.3.72)
 
 Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skóry” (15.11.2026), po jasnym pasku czoła Strzelca Wyborowego na ciemnym odcieniu.

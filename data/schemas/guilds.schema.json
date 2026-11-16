@@ -29,7 +29,9 @@
       "description": "Nieobecność lidera: po tylu dniach bez gry jego postacią gildię przejmuje zastępca, który grał ostatnio (guilds.js).",
       "type": "object",
       "additionalProperties": false,
-      "required": ["days"],
+      "required": [
+        "days"
+      ],
       "properties": {
         "$comment": {
           "type": "string"
@@ -1796,11 +1798,24 @@
           "description": "Złoto jako jedna strona oferty (4.11.2026): jego nazwa, dopełniacz w odpowiedziach gry i najwięcej złota po jednej stronie.",
           "type": "object",
           "additionalProperties": false,
-          "required": ["name", "genitive", "most"],
+          "required": [
+            "name",
+            "genitive",
+            "most"
+          ],
           "properties": {
-            "name": { "type": "string", "minLength": 1 },
-            "genitive": { "type": "string", "minLength": 1 },
-            "most": { "type": "integer", "minimum": 1 }
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "genitive": {
+              "type": "string",
+              "minLength": 1
+            },
+            "most": {
+              "type": "integer",
+              "minimum": 1
+            }
           }
         },
         "sameCount": {
@@ -2173,21 +2188,36 @@
             },
             "howWar": {
               "type": "string",
-              "pattern": "\\{warWon\\}"
+              "allOf": [
+                {
+                  "pattern": "\\{warFirst\\}"
+                },
+                {
+                  "pattern": "\\{warSecond\\}"
+                },
+                {
+                  "pattern": "\\{warThird\\}"
+                }
+              ]
             }
           }
         },
         "war": {
-          "description": "Wojna gildii: Sława za wygraną wojnę tygodnia (799 A).",
+          "description": "Liga wojen gildii: Sława za 1., 2. i 3. miejsce w lidze tygodnia.",
           "type": "object",
           "additionalProperties": false,
           "required": [
-            "won"
+            "places"
           ],
           "properties": {
-            "won": {
-              "type": "integer",
-              "minimum": 0
+            "places": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              }
             }
           }
         }
@@ -2201,7 +2231,7 @@
         "teamSize",
         "maxTeams",
         "battleHour",
-        "match",
+        "league",
         "battle",
         "reward",
         "chest",
@@ -2231,18 +2261,36 @@
           "minimum": 0,
           "maximum": 23
         },
-        "match": {
-          "description": "Podobna liczba członków (797 B): mniejsza gildia ma co najmniej minShare członków większej.",
+        "league": {
+          "description": "Liga wojen (Liga wojen gildii, 16.11.2026): nagrody za kolejne miejsca w tabeli, gdy w lidze grało co najmniej least gildii: Sława z fame.war.places i items przedmiotów w rzadkości czempiona w skrzyni wojennej.",
           "type": "object",
           "additionalProperties": false,
           "required": [
-            "minShare"
+            "prizes"
           ],
           "properties": {
-            "minShare": {
-              "type": "number",
-              "exclusiveMinimum": 0,
-              "maximum": 1
+            "prizes": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "least",
+                  "items"
+                ],
+                "properties": {
+                  "least": {
+                    "type": "integer",
+                    "minimum": 2
+                  },
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
             }
           }
         },
@@ -2300,7 +2348,7 @@
           }
         },
         "chest": {
-          "description": "Skrzynia wojenna gildii, która wygrała wojnę (799 A): perTeam przedmiotów na każdą jej drużynę.",
+          "description": "Skrzynia wojenna za miejsce w lidze (799 A, league.prizes): perTeam przedmiotów na każdą drużynę gildii.",
           "type": "object",
           "additionalProperties": false,
           "required": [
@@ -2329,7 +2377,7 @@
           "minLength": 1
         },
         "mirror": {
-          "description": "Lustrzana gildia wersji testowej (Test wojny): nazwa i skrót.",
+          "description": "Lustrzana gildia: rywal gildii bez rywala z ligi w rundzie przy nieparzystej liczbie gildii; nazwa i skrót.",
           "type": "object",
           "additionalProperties": false,
           "required": [
@@ -2353,97 +2401,41 @@
           "required": [
             "title",
             "dates",
-            "wonBattles",
+            "placeOf",
+            "versus",
             "memberForms",
             "dayNames",
             "days",
+            "daysOn",
             "daysLabel",
             "today",
+            "tomorrow",
             "yesterday",
             "lead",
-            "leadForms",
             "todayAt",
             "tomorrowAt",
             "dayAt",
             "clock",
             "clockNow",
-            "once",
-            "times",
-            "everyTeam",
-            "oneTeam",
-            "inTurn",
-            "teamTimes",
-            "battlesToday",
-            "battlesTomorrow",
             "yourTeam",
             "count",
-            "reserveYou",
-            "reserveFills",
-            "reserveWaits",
-            "teams",
             "recent",
-            "recentLine",
             "noBattles",
-            "winForms",
-            "lossForms",
-            "drawForms",
             "battleTitle",
-            "versusOurs",
-            "versusTheirs",
             "results",
             "watch",
             "standing",
             "reward",
             "gold",
             "systemPointForms",
-            "back",
             "teamsTitle",
-            "inTeams",
-            "inTeamsForms",
-            "own",
             "teamName",
-            "shortOne",
-            "shortMany",
-            "fillsOne",
-            "fillsMany",
             "missingForms",
-            "free",
-            "take",
-            "hintLead",
-            "hintSelf",
-            "move",
-            "noTeam",
-            "moveLead",
-            "moveSelf",
-            "swap",
-            "toReserve",
-            "here",
-            "moved",
-            "movedReserve",
-            "swapped",
-            "taken",
-            "yourTeams",
-            "reserve",
-            "reserveForms",
-            "reserveNextOne",
-            "reserveNextMany",
-            "reserveFillOne",
-            "reserveFillMany",
-            "ordinals",
-            "ordinalTitles",
             "nextTitle",
             "membersLabel",
             "nextNeed",
             "groupName",
-            "teamForms",
-            "fewerTitle",
-            "fewer",
-            "moreTitle",
-            "more",
             "endTitle",
-            "endWon",
-            "endLost",
-            "endDraw",
             "fameForms",
             "itemForms",
             "next",
@@ -2453,7 +2445,32 @@
             "how",
             "limitWin",
             "limitDraw",
-            "errors"
+            "errors",
+            "rivalLabel",
+            "mirrorNote",
+            "teamsFor",
+            "drawnNote",
+            "tableTitle",
+            "columns",
+            "tableNote",
+            "endPrize",
+            "endFame",
+            "endPlace",
+            "duelForms",
+            "fightForms",
+            "duelsLine",
+            "triosLine",
+            "shortOurs",
+            "shortTheirs",
+            "yourDuels",
+            "shortTeam",
+            "evenings",
+            "eveningsLine",
+            "matchLine",
+            "walkoversLine",
+            "voidLine",
+            "versusDuel",
+            "versusTrio"
           ],
           "properties": {
             "title": {
@@ -2471,7 +2488,11 @@
                 }
               ]
             },
-            "wonBattles": {
+            "placeOf": {
+              "type": "string",
+              "pattern": "\\{count\\}"
+            },
+            "versus": {
               "type": "string",
               "minLength": 1
             },
@@ -2502,11 +2523,24 @@
                 "minLength": 1
               }
             },
+            "daysOn": {
+              "type": "array",
+              "minItems": 7,
+              "maxItems": 7,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
             "daysLabel": {
               "type": "string",
               "minLength": 1
             },
             "today": {
+              "type": "string",
+              "minLength": 1
+            },
+            "tomorrow": {
               "type": "string",
               "minLength": 1
             },
@@ -2520,12 +2554,11 @@
               "required": [
                 "first",
                 "firstTomorrow",
-                "ahead",
-                "behind",
-                "even",
+                "place",
+                "top",
                 "won",
-                "lost",
-                "draw"
+                "ended",
+                "final"
               ],
               "properties": {
                 "first": {
@@ -2536,39 +2569,33 @@
                   "type": "string",
                   "pattern": "\\{hour\\}"
                 },
-                "ahead": {
+                "place": {
                   "type": "string",
-                  "pattern": "\\{count\\}"
+                  "allOf": [
+                    {
+                      "pattern": "\\{balance\\}"
+                    },
+                    {
+                      "pattern": "\\{place\\}"
+                    }
+                  ]
                 },
-                "behind": {
+                "top": {
                   "type": "string",
-                  "pattern": "\\{count\\}"
-                },
-                "even": {
-                  "type": "string",
-                  "minLength": 1
+                  "pattern": "\\{balance\\}"
                 },
                 "won": {
                   "type": "string",
                   "minLength": 1
                 },
-                "lost": {
+                "ended": {
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\{place\\}"
                 },
-                "draw": {
+                "final": {
                   "type": "string",
-                  "minLength": 1
+                  "pattern": "\\{place\\}"
                 }
-              }
-            },
-            "leadForms": {
-              "type": "array",
-              "minItems": 3,
-              "maxItems": 3,
-              "items": {
-                "type": "string",
-                "minLength": 1
               }
             },
             "todayAt": {
@@ -2598,45 +2625,6 @@
               "type": "string",
               "minLength": 1
             },
-            "once": {
-              "type": "string",
-              "minLength": 1
-            },
-            "times": {
-              "type": "string",
-              "pattern": "\\{count\\}"
-            },
-            "everyTeam": {
-              "type": "string",
-              "pattern": "\\{times\\}"
-            },
-            "oneTeam": {
-              "type": "string",
-              "pattern": "\\{times\\}"
-            },
-            "inTurn": {
-              "type": "string",
-              "pattern": "\\{list\\}"
-            },
-            "teamTimes": {
-              "type": "string",
-              "allOf": [
-                {
-                  "pattern": "\\{team\\}"
-                },
-                {
-                  "pattern": "\\{times\\}"
-                }
-              ]
-            },
-            "battlesToday": {
-              "type": "string",
-              "pattern": "\\{count\\}"
-            },
-            "battlesTomorrow": {
-              "type": "string",
-              "pattern": "\\{count\\}"
-            },
             "yourTeam": {
               "type": "string",
               "pattern": "\\{team\\}"
@@ -2652,86 +2640,24 @@
                 }
               ]
             },
-            "reserveYou": {
-              "type": "string",
-              "minLength": 1
-            },
-            "reserveFills": {
-              "type": "string",
-              "pattern": "\\{team\\}"
-            },
-            "reserveWaits": {
-              "type": "string",
-              "minLength": 1
-            },
-            "teams": {
-              "type": "string",
-              "minLength": 1
-            },
             "recent": {
               "type": "string",
               "minLength": 1
-            },
-            "recentLine": {
-              "type": "string",
-              "allOf": [
-                {
-                  "pattern": "\\{day\\}"
-                },
-                {
-                  "pattern": "\\{results\\}"
-                }
-              ]
             },
             "noBattles": {
               "type": "string",
               "minLength": 1
             },
-            "winForms": {
-              "type": "array",
-              "minItems": 3,
-              "maxItems": 3,
-              "items": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "lossForms": {
-              "type": "array",
-              "minItems": 3,
-              "maxItems": 3,
-              "items": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "drawForms": {
-              "type": "array",
-              "minItems": 3,
-              "maxItems": 3,
-              "items": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
             "battleTitle": {
               "type": "string",
               "allOf": [
                 {
-                  "pattern": "\\{when\\}"
+                  "pattern": "\\{hour\\}"
                 },
                 {
-                  "pattern": "\\{hour\\}"
+                  "pattern": "\\{when\\}"
                 }
               ]
-            },
-            "versusOurs": {
-              "type": "string",
-              "pattern": "\\{team\\}"
-            },
-            "versusTheirs": {
-              "type": "string",
-              "pattern": "\\{team\\}"
             },
             "results": {
               "type": "object",
@@ -2739,7 +2665,8 @@
               "required": [
                 "win",
                 "loss",
-                "draw"
+                "draw",
+                "void"
               ],
               "properties": {
                 "win": {
@@ -2751,6 +2678,10 @@
                   "minLength": 1
                 },
                 "draw": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "void": {
                   "type": "string",
                   "minLength": 1
                 }
@@ -2781,74 +2712,13 @@
                 "minLength": 1
               }
             },
-            "back": {
-              "type": "string",
-              "minLength": 1
-            },
             "teamsTitle": {
-              "type": "string",
-              "minLength": 1
-            },
-            "inTeams": {
-              "type": "string",
-              "allOf": [
-                {
-                  "pattern": "\\{count\\}"
-                },
-                {
-                  "pattern": "\\{members\\}"
-                }
-              ]
-            },
-            "inTeamsForms": {
-              "type": "array",
-              "minItems": 3,
-              "maxItems": 3,
-              "items": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "own": {
               "type": "string",
               "minLength": 1
             },
             "teamName": {
               "type": "string",
               "pattern": "\\{team\\}"
-            },
-            "shortOne": {
-              "type": "string",
-              "allOf": [
-                {
-                  "pattern": "\\{count\\}"
-                },
-                {
-                  "pattern": "\\{size\\}"
-                }
-              ]
-            },
-            "shortMany": {
-              "type": "string",
-              "allOf": [
-                {
-                  "pattern": "\\{missing\\}"
-                },
-                {
-                  "pattern": "\\{count\\}"
-                },
-                {
-                  "pattern": "\\{size\\}"
-                }
-              ]
-            },
-            "fillsOne": {
-              "type": "string",
-              "minLength": 1
-            },
-            "fillsMany": {
-              "type": "string",
-              "pattern": "\\{missing\\}"
             },
             "missingForms": {
               "type": "array",
@@ -2859,134 +2729,9 @@
                 "minLength": 1
               }
             },
-            "free": {
-              "type": "string",
-              "minLength": 1
-            },
-            "take": {
-              "type": "string",
-              "minLength": 1
-            },
-            "hintLead": {
-              "type": "string",
-              "minLength": 1
-            },
-            "hintSelf": {
-              "type": "string",
-              "minLength": 1
-            },
-            "move": {
-              "type": "string",
-              "pattern": "\\{name\\}"
-            },
-            "noTeam": {
-              "type": "string",
-              "pattern": "\\{count\\}"
-            },
-            "moveLead": {
-              "type": "string",
-              "pattern": "\\{name\\}"
-            },
-            "moveSelf": {
-              "type": "string",
-              "minLength": 1
-            },
-            "swap": {
-              "type": "string",
-              "pattern": "\\{name\\}"
-            },
-            "toReserve": {
-              "type": "string",
-              "minLength": 1
-            },
-            "here": {
-              "type": "string",
-              "minLength": 1
-            },
-            "moved": {
-              "type": "string",
-              "allOf": [
-                {
-                  "pattern": "\\{name\\}"
-                },
-                {
-                  "pattern": "\\{team\\}"
-                }
-              ]
-            },
-            "movedReserve": {
-              "type": "string",
-              "pattern": "\\{name\\}"
-            },
-            "swapped": {
-              "type": "string",
-              "allOf": [
-                {
-                  "pattern": "\\{name\\}"
-                },
-                {
-                  "pattern": "\\{other\\}"
-                }
-              ]
-            },
-            "taken": {
-              "type": "string",
-              "pattern": "\\{team\\}"
-            },
-            "yourTeams": {
-              "type": "string",
-              "minLength": 1
-            },
-            "reserve": {
-              "type": "string",
-              "minLength": 1
-            },
-            "reserveForms": {
-              "type": "array",
-              "minItems": 3,
-              "maxItems": 3,
-              "items": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "reserveNextOne": {
-              "type": "string",
-              "pattern": "\\{ordinal\\}"
-            },
-            "reserveNextMany": {
-              "type": "string",
-              "pattern": "\\{ordinal\\}"
-            },
-            "reserveFillOne": {
-              "type": "string",
-              "minLength": 1
-            },
-            "reserveFillMany": {
-              "type": "string",
-              "minLength": 1
-            },
-            "ordinals": {
-              "type": "array",
-              "minItems": 6,
-              "maxItems": 6,
-              "items": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "ordinalTitles": {
-              "type": "array",
-              "minItems": 6,
-              "maxItems": 6,
-              "items": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
             "nextTitle": {
               "type": "string",
-              "pattern": "\\{ordinal\\}"
+              "minLength": 1
             },
             "membersLabel": {
               "type": "string",
@@ -2994,81 +2739,13 @@
             },
             "nextNeed": {
               "type": "string",
-              "allOf": [
-                {
-                  "pattern": "\\{missing\\}"
-                },
-                {
-                  "pattern": "\\{need\\}"
-                },
-                {
-                  "pattern": "\\{ordinal\\}"
-                }
-              ]
+              "pattern": "\\{missing\\}"
             },
             "groupName": {
               "type": "string",
               "pattern": "\\{team\\}"
             },
-            "teamForms": {
-              "type": "array",
-              "minItems": 3,
-              "maxItems": 3,
-              "items": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "fewerTitle": {
-              "type": "string",
-              "minLength": 1
-            },
-            "fewer": {
-              "type": "string",
-              "allOf": [
-                {
-                  "pattern": "\\{theirs\\}"
-                },
-                {
-                  "pattern": "\\{ours\\}"
-                }
-              ]
-            },
-            "moreTitle": {
-              "type": "string",
-              "minLength": 1
-            },
-            "more": {
-              "type": "string",
-              "allOf": [
-                {
-                  "pattern": "\\{ours\\}"
-                },
-                {
-                  "pattern": "\\{theirs\\}"
-                }
-              ]
-            },
             "endTitle": {
-              "type": "string",
-              "minLength": 1
-            },
-            "endWon": {
-              "type": "string",
-              "allOf": [
-                {
-                  "pattern": "\\{fame\\}"
-                },
-                {
-                  "pattern": "\\{items\\}"
-                }
-              ]
-            },
-            "endLost": {
-              "type": "string",
-              "minLength": 1
-            },
-            "endDraw": {
               "type": "string",
               "minLength": 1
             },
@@ -3098,15 +2775,10 @@
               "type": "object",
               "additionalProperties": false,
               "required": [
-                "noRival",
                 "late",
                 "notYet"
               ],
               "properties": {
-                "noRival": {
-                  "type": "string",
-                  "minLength": 1
-                },
                 "late": {
                   "type": "string",
                   "minLength": 1
@@ -3136,17 +2808,19 @@
             "limitWin": {
               "type": "array",
               "minItems": 1,
+              "maxItems": 50,
               "items": {
                 "type": "string",
-                "pattern": "\\{moves\\}"
+                "minLength": 1
               }
             },
             "limitDraw": {
               "type": "array",
               "minItems": 1,
+              "maxItems": 50,
               "items": {
                 "type": "string",
-                "pattern": "\\{moves\\}"
+                "minLength": 1
               }
             },
             "errors": {
@@ -3155,12 +2829,6 @@
               "required": [
                 "locked",
                 "noGuild",
-                "noMember",
-                "noTeam",
-                "full",
-                "notAllowed",
-                "same",
-                "changed",
                 "noBattle"
               ],
               "properties": {
@@ -3172,35 +2840,207 @@
                   "type": "string",
                   "minLength": 1
                 },
-                "noMember": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "noTeam": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "full": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "notAllowed": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "same": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "changed": {
-                  "type": "string",
-                  "minLength": 1
-                },
                 "noBattle": {
                   "type": "string",
                   "minLength": 1
                 }
               }
+            },
+            "rivalLabel": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mirrorNote": {
+              "type": "string",
+              "minLength": 1
+            },
+            "teamsFor": {
+              "type": "string",
+              "pattern": "\\{when\\}"
+            },
+            "drawnNote": {
+              "type": "string",
+              "minLength": 1
+            },
+            "tableTitle": {
+              "type": "string",
+              "minLength": 1
+            },
+            "columns": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "place",
+                "guild",
+                "won",
+                "lost",
+                "balance"
+              ],
+              "properties": {
+                "place": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "guild": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "won": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "lost": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "balance": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "tableNote": {
+              "type": "string",
+              "minLength": 1
+            },
+            "endPrize": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{fame\\}"
+                },
+                {
+                  "pattern": "\\{items\\}"
+                },
+                {
+                  "pattern": "\\{place\\}"
+                }
+              ]
+            },
+            "endFame": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{fame\\}"
+                },
+                {
+                  "pattern": "\\{place\\}"
+                }
+              ]
+            },
+            "endPlace": {
+              "type": "string",
+              "pattern": "\\{place\\}"
+            },
+            "duelForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "fightForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "duelsLine": {
+              "type": "string",
+              "pattern": "\\{count\\}"
+            },
+            "triosLine": {
+              "type": "string",
+              "pattern": "\\{count\\}"
+            },
+            "shortOurs": {
+              "type": "string",
+              "pattern": "\\{missing\\}"
+            },
+            "shortTheirs": {
+              "type": "string",
+              "minLength": 1
+            },
+            "yourDuels": {
+              "type": "string",
+              "minLength": 1
+            },
+            "shortTeam": {
+              "type": "string",
+              "minLength": 1
+            },
+            "evenings": {
+              "type": "string",
+              "minLength": 1
+            },
+            "eveningsLine": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{day\\}"
+                },
+                {
+                  "pattern": "\\{lost\\}"
+                },
+                {
+                  "pattern": "\\{result\\}"
+                },
+                {
+                  "pattern": "\\{won\\}"
+                }
+              ]
+            },
+            "matchLine": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{duelsLost\\}"
+                },
+                {
+                  "pattern": "\\{duelsWon\\}"
+                },
+                {
+                  "pattern": "\\{triosLost\\}"
+                },
+                {
+                  "pattern": "\\{triosWon\\}"
+                }
+              ]
+            },
+            "walkoversLine": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{lost\\}"
+                },
+                {
+                  "pattern": "\\{won\\}"
+                }
+              ]
+            },
+            "voidLine": {
+              "type": "string",
+              "minLength": 1
+            },
+            "versusDuel": {
+              "type": "string",
+              "pattern": "\\{names\\}"
+            },
+            "versusTrio": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{names\\}"
+                },
+                {
+                  "pattern": "\\{team\\}"
+                }
+              ]
             }
           }
         }

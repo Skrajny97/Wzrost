@@ -1,7 +1,8 @@
 // The Ranking członków (src/server/guild-members.js; 897 A): each member's
 // Sława by its parts, counted as the guild's own (the Bestia's percents and
 // last blow, a fallen guardian's points by damage, the Próby, Prośby and
-// Wymiana with their caps, a war won split among its fighters); the
+// Wymiana with their caps, a place in the war league split among the
+// fighters of its matches); the
 // donations to the Siedziba by member, this week and from the start, with
 // those of before the game wrote them in one line; a week gone written
 // once for every guild, the first time the next week asks, also when a
@@ -122,16 +123,18 @@ describe('the Ranking członków through the API', () => {
       );
     }
   }
-  // A war of `week` that guild_a won, with its battles' fighters of each
-  // side (character ids; a fighter of no character as null).
+  // A match of `week`'s war league that guild_a won, with its battles'
+  // fighters of each side (character ids; a fighter of no character as
+  // null), and guild_a first in the league's table, with its Sława.
   async function war(week, a, b, battles) {
     const { meta } = await run(
-      "INSERT INTO guild_wars (week, guild_a, guild_b, name_a, tag_a, members_a, name_b, tag_b, members_b, seed, days_done, wins_a, wins_b, result, created_at) VALUES (?, ?, ?, 'A', 'A', 2, 'B', 'B', 2, 's', 7, ?, 0, 'a', 0)",
+      "INSERT INTO guild_wars (week, day, round, guild_a, guild_b, name_a, tag_a, members_a, name_b, tag_b, members_b, seed, days_done, wins_a, wins_b, result, created_at) VALUES (?, 0, 0, ?, ?, 'A', 'A', 2, 'B', 'B', 2, 's', 1, ?, 0, 'a', 0)",
       week,
       a,
       b,
       battles.length,
     );
+    await run('INSERT INTO guild_league_places (week, guild_id, place, fame, chest_items) VALUES (?, ?, 1, ?, 0)', week, a, fame.war.places[0]);
     const fighter = (id) => (id === null ? { id: null, name: 'Odbicie' } : { id, since: MADE, name: 'X' });
     for (const [index, [ours, theirs]] of battles.entries()) {
       await run(
@@ -168,7 +171,7 @@ describe('the Ranking członków through the API', () => {
     await gift(forest, ids.ala, ids.ola, 5, at);
     await exchanges(forest, ids.ala, ids.ola, fame.exchange.cap + 2, at);
     await exchanges(forest, ids.ola, ids.ala, 1, at);
-    // The war won: two battles, Ala in both, Ola in one, a fighter of no
+    // The league won: two battles, Ala in both, Ola in one, a fighter of no
     // character in another.
     await war(week.key, forest, stone, [
       [[ids.ala, ids.ola], [ids.ewa, ids.iza]],
@@ -176,7 +179,7 @@ describe('the Ranking członków through the API', () => {
     ]);
     const seen = await ranking('ola');
     const rows = named(seen.activity.week);
-    const share = Math.floor(fame.war.won / 2);
+    const share = Math.floor(fame.war.places[0] / 2);
     assert.deepEqual(partsOf(rows.Ala), {
       beast: 65 * fame.beast.perPercent,
       expedition: Math.floor((fame.expedition.perGuardian * 600) / 1000) + fame.expedition.last,

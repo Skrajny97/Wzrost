@@ -1,36 +1,39 @@
-// The guild wars (src/engine/guild-wars.js, src/server/guild-wars.js; the
-// author's 792–800): in the engine, the teams of full fives (12), the
-// reserve taking the free places, the evening's battles of 795 B, the draw
-// of rivals of a similar size and never of one account, a battle of five on
-// five as at the Arena, the war's result, the rewards and the war chest,
-// and the evenings at 20:00 Polish time, also on the day the clocks
-// change; through the API, a place taken by a member, moved by the leader
-// and the deputies and never by a member for another, swapped, the
-// guild's 30 members, the evening's battles fought once by the cron at
-// 20:00 with their rewards given once, each to watch from either side, the
-// war's end with its Sława and war chest, "Test wojny" of the test version,
-// a place gone with its member, and nothing of the wars where GUILD_WARS is
-// off.
+// The guild wars as a league (src/engine/guild-wars.js,
+// src/server/guild-wars.js; the author's 792–800 and, from 16.11.2026,
+// „niech każda gildia walczy z każdą”, „drużyny niech losuje samo”): in the
+// engine, the teams of full fives (12) drawn for an evening, the matches'
+// battles of 795 B, the league's rounds and its schedule, every guild
+// meeting every other, the mirror guild for the one with no rival in a
+// round, the table and the prizes of its best places, a battle of five on
+// five as at the Arena, the rewards and the war chest, and the evenings at
+// 20:00 Polish time, also on the day the clocks change; through the API
+// (on the tests' own clock, so the same any day), the tab, the league drawn
+// once a week for every guild there is, each evening's matches fought once
+// by the cron at 20:00 with their rewards given once, each battle to watch
+// from either side, the league's end with its places, Sława and war chests,
+// an account on both sides of a match, "Test ligi" of the test version,
+// and nothing of the wars where GUILD_WARS is off.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
 import {
   createRng,
-  drawWars,
+  leaguePrizes,
+  leagueRounds,
+  leagueSchedule,
+  leagueTable,
+  matchFights,
   mirrorTeam,
   nextTeamAt,
   questPeriod,
-  teamFights,
   warBattle,
   warChest,
   warDaysDue,
+  warDrawnTeams,
   warFightFor,
-  warLineups,
-  warPairings,
   warResult,
   warReward,
-  warRivals,
   warTeams,
   warWeek,
   zoneClock,
@@ -41,95 +44,190 @@ import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
 const war = content.guilds.war;
+const DAY = 24 * 3600000;
 const fighter = (classId, level, name, set = 0, appearance = 'male') => {
   const { character, equipped } = playerOf('realistic', classId, level, content, set);
   return { character: { ...character, appearance }, equipped, name };
 };
 
 describe("the guild wars' rules", () => {
-  test('a guild holds 30 members: six teams of five, a team for each full five, one below five (793 A, 12)', () => {
+  test('a guild holds 30 members: ten trios for the 3v3, as many as it takes for every member, the last one short of members when they do not divide', () => {
     assert.equal(content.guilds.size, 30);
+    assert.equal(war.teamSize, 3);
     assert.equal(war.teamSize * war.maxTeams, content.guilds.size);
     assert.deepEqual(
       [1, 4, 5, 9, 10, 14, 15, 24, 29, 30].map((members) => warTeams(members, content)),
-      [1, 1, 1, 1, 2, 2, 3, 4, 5, 6],
+      [1, 2, 2, 3, 4, 5, 5, 8, 10, 10],
     );
-    // The members the next team needs, none at six.
-    assert.deepEqual([1, 9, 12, 29, 30].map((members) => nextTeamAt(members, content)), [10, 10, 15, 30, null]);
+    // The members the last trio needs to be full, none when it is.
+    assert.deepEqual([1, 2, 9, 12, 29, 30].map((members) => nextTeamAt(members, content)), [3, 3, null, null, 30, null]);
     // The tab is the last of nine.
     assert.equal(content.guilds.tabs.length, 9);
     assert.equal(content.guilds.tabs.at(-1).id, 'war');
   });
 
-  test('the reserve takes the free places before a battle, in order; a team short of people fights so (800 C)', () => {
-    const members = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-    // Two teams; four placed in I, two in II, one in a team the guild has
-    // no more (III) and a stranger's place left over.
-    const slots = [
-      { characterId: 1, team: 1, slot: 0 },
-      { characterId: 2, team: 1, slot: 3 },
-      { characterId: 3, team: 1, slot: 1 },
-      { characterId: 4, team: 1, slot: 4 },
-      { characterId: 5, team: 2, slot: 0 },
-      { characterId: 6, team: 2, slot: 1 },
-      { characterId: 7, team: 3, slot: 0 },
-      { characterId: 99, team: 2, slot: 2 },
-    ];
-    const teams = warLineups({ members, slots }, content);
-    assert.equal(teams.count, 2);
-    assert.deepEqual(teams.assigned, [
-      [1, 3, 2, 4],
-      [5, 6],
-    ]);
-    assert.deepEqual(teams.reserve, [7, 8, 9, 10, 11, 12]);
-    assert.deepEqual(teams.lineups, [
-      [1, 3, 2, 4, 7],
-      [5, 6, 8, 9, 10],
-    ]);
-    assert.deepEqual(teams.bench, [11, 12]);
-    // Three members: one team of three.
-    const few = warLineups({ members: [1, 2, 3], slots: [{ characterId: 2, team: 1, slot: 4 }] }, content);
-    assert.deepEqual([few.count, few.assigned, few.lineups, few.bench], [1, [[2]], [[2, 1, 3]], []]);
+  test('the game draws the trios of an evening from the members, three to a trio, the last one short when they do not divide', () => {
+    const members = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+    const teams = warDrawnTeams(members, 'evening', content);
+    assert.equal(teams.count, 4);
+    assert.deepEqual(
+      teams.lineups.map((lineup) => lineup.length),
+      [3, 3, 3, 2],
+    );
+    assert.deepEqual(teams.bench, []);
+    assert.deepEqual(teams.lineups.flat().sort((a, b) => a - b), members);
+    // The same members and seed, the same teams, whatever their order.
+    assert.deepEqual(warDrawnTeams([...members].reverse(), 'evening', content), teams);
+    const others = new Set(['a', 'b', 'c', 'd', 'e', 'f'].map((seed) => JSON.stringify(warDrawnTeams(members, seed, content).lineups)));
+    assert.ok(others.size > 1, 'the seed draws the teams');
+    // Three members: one full trio; one member: a trio of one.
+    const few = warDrawnTeams([7, 8, 9], 'x', content);
+    assert.deepEqual([few.count, few.lineups[0].length, few.bench], [1, 3, []]);
+    assert.deepEqual(warDrawnTeams([4], 'x', content).lineups, [[4]]);
   });
 
-  test("an evening has as many battles as the bigger guild has teams, the smaller one's teams fighting in turn (795 B)", () => {
-    const pairs = (a, b) => warPairings(a, b).map((one) => `${one.a}-${one.b}`);
-    assert.deepEqual(pairs(2, 4), ['1-1', '2-2', '1-3', '2-4']);
-    assert.deepEqual(pairs(4, 2), ['1-1', '2-2', '3-1', '4-2']);
-    assert.deepEqual(pairs(6, 6), ['1-1', '2-2', '3-3', '4-4', '5-5', '6-6']);
-    assert.deepEqual(pairs(1, 3), ['1-1', '1-2', '1-3']);
-    assert.deepEqual(warPairings(3, 0), []);
-    assert.deepEqual(teamFights(2, 4), [2, 2]);
-    assert.deepEqual(teamFights(3, 4), [2, 1, 1]);
-    assert.deepEqual(teamFights(4, 2), [1, 1, 1, 1]);
+  test('a match: every member duels every member of the rival (1v1), every trio fights every trio (3v3), a trio short of members loses by walkover', () => {
+    const fights = matchFights({ duelsA: 4, duelsB: 3, triosA: [[1, 2, 3], [4]], triosB: [[5, 6, 7]] }, content);
+    const duels = fights.filter((fight) => fight.format === '1v1');
+    assert.equal(duels.length, 12);
+    assert.deepEqual(new Set(duels.map((fight) => `${fight.a}-${fight.b}`)).size, 12);
+    assert.ok(duels.every((fight) => fight.walkover === null));
+    assert.deepEqual(
+      fights.filter((fight) => fight.format === '3v3').map((fight) => [fight.a, fight.b, fight.walkover]),
+      [
+        [0, 0, null],
+        [1, 0, 'a'],
+      ],
+    );
+    // Two short trios: both lose.
+    assert.deepEqual(
+      matchFights({ duelsA: 1, duelsB: 1, triosA: [[1]], triosB: [[2, 3]] }, content).map((fight) => fight.walkover),
+      [null, 'both'],
+    );
   });
 
-  test('rivals are of a similar size and never of one account; the draw pairs as many as it can, the same for the same seed (797 B)', () => {
-    const guild = (id, members, users = [id * 100]) => ({ id, members, users });
-    assert.ok(warRivals(guild(1, 12), guild(2, 13), content));
-    assert.ok(warRivals(guild(1, 20), guild(2, 30), content));
-    assert.ok(!warRivals(guild(1, 15), guild(2, 30), content));
-    assert.ok(!warRivals(guild(1, 1), guild(2, 2), content));
-    assert.ok(warRivals(guild(1, 1), guild(2, 1), content));
-    assert.ok(!warRivals(guild(1, 12, [7, 8]), guild(2, 12, [9, 8]), content), 'an account in both');
-    // D fits only C: the draw gives D its rival first, and A gets B.
-    const four = [guild(1, 10), guild(2, 13), guild(3, 15), guild(4, 20)];
-    for (const seed of ['a', 'b', 'c', 'd', 'e', 'f']) {
-      const pairs = drawWars(four, seed, content).map((pair) => pair.map((one) => one.id).sort().join('-')).sort();
-      assert.deepEqual(pairs, ['1-2', '3-4'], `seed ${seed}`);
+  test('every guild meets every other in the rounds of a league; with an odd number, the one with no rival meets the mirror guild', () => {
+    for (const count of [2, 3, 4, 5, 6, 7, 8]) {
+      const rounds = leagueRounds(count);
+      assert.equal(rounds.length, count % 2 === 0 ? count - 1 : count, `${count} guilds`);
+      const met = new Map();
+      for (const round of rounds) {
+        const places = round.flat();
+        assert.equal(new Set(places).size, places.length, 'a guild once a round');
+        for (const [a, b] of round) {
+          if (a >= count || b >= count) continue;
+          const key = [a, b].sort().join('-');
+          met.set(key, (met.get(key) ?? 0) + 1);
+        }
+      }
+      assert.equal(met.size, (count * (count - 1)) / 2, `${count} guilds: every pair`);
+      assert.ok([...met.values()].every((times) => times === 1));
     }
-    // A guild without a rival of its size has no war; the same seed, the same draw.
-    const many = [guild(1, 30), guild(2, 28), guild(3, 25), guild(4, 22), guild(5, 3), guild(6, 12), guild(7, 11)];
-    const drawn = drawWars(many, 'week', content);
-    assert.deepEqual(drawWars(many, 'week', content), drawn);
-    assert.ok(drawn.every(([a, b]) => warRivals(a, b, content)));
-    assert.ok(!drawn.some((pair) => pair.some((one) => one.id === 5)));
-    assert.equal(drawn.length, 3);
-    const others = new Set(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((seed) => JSON.stringify(drawWars(many, seed, content).map((pair) => pair.map((one) => one.id)))));
-    assert.ok(others.size > 1, 'the seed draws the rivals');
+    assert.deepEqual(leagueRounds(0), []);
+    assert.deepEqual(leagueRounds(1), [[[0, 1]]]);
   });
 
-  test('the evenings are at 20:00 Polish time, also the Sunday the clocks go back; the war is from Monday', () => {
+  test("the week's schedule: a round an evening from the first to come, again from the first round once they run out; more rounds than evenings share them", () => {
+    // Four guilds: three rounds, played twice over and once more on Sunday.
+    const four = leagueSchedule([10, 20, 30, 40], 'week', 0);
+    assert.deepEqual([...four.order].sort(), [10, 20, 30, 40]);
+    assert.equal(four.matches.length, 14);
+    for (let day = 0; day < 7; day++) {
+      const evening = four.matches.filter((match) => match.day === day);
+      assert.equal(evening.length, 2);
+      assert.deepEqual(evening.flatMap((match) => [match.a, match.b]).sort(), [10, 20, 30, 40], 'every guild fights every evening');
+    }
+    const pairs = new Set(four.matches.slice(0, 6).map((match) => [match.a, match.b].sort().join('-')));
+    assert.equal(pairs.size, 6, 'the first three evenings: every pair once');
+    // A rematch has the other guild as A.
+    const first = four.matches.find((match) => match.round === 0);
+    const again = four.matches.find((match) => match.round === 3 && [match.a, match.b].sort().join() === [first.a, first.b].sort().join());
+    assert.deepEqual([again.a, again.b], [first.b, first.a]);
+    // The same guilds and seed, the same schedule; another seed, another.
+    assert.deepEqual(leagueSchedule([40, 30, 20, 10], 'week', 0), four);
+    assert.ok(new Set(['a', 'b', 'c', 'd'].map((seed) => JSON.stringify(leagueSchedule([10, 20, 30, 40], seed, 0).matches))).size > 1);
+    // Three guilds: every evening one meets the mirror guild.
+    const three = leagueSchedule([1, 2, 3], 'odd', 0);
+    for (let day = 0; day < 7; day++) {
+      const evening = three.matches.filter((match) => match.day === day);
+      assert.equal(evening.filter((match) => match.b === null).length, 1);
+      assert.deepEqual(evening.flatMap((match) => [match.a, match.b]).filter((id) => id !== null).sort(), [1, 2, 3]);
+    }
+    // A league drawn on Thursday: Thursday to Sunday only.
+    const late = leagueSchedule([1, 2, 3, 4], 'late', 3);
+    assert.deepEqual([...new Set(late.matches.map((match) => match.day))], [3, 4, 5, 6]);
+    // Nine guilds: nine rounds on seven evenings, every pair once.
+    const nine = leagueSchedule([1, 2, 3, 4, 5, 6, 7, 8, 9], 'nine', 0);
+    const met = new Set(nine.matches.filter((match) => match.b !== null).map((match) => [match.a, match.b].sort().join('-')));
+    assert.equal(met.size, 36);
+    assert.equal(Math.max(...nine.matches.map((match) => match.round)), 8);
+    // One guild meets the mirror guild every evening; none, nothing.
+    assert.deepEqual(
+      leagueSchedule([5], 'one', 0).matches.map((match) => [match.day, match.a, match.b]),
+      Array.from({ length: 7 }, (_, day) => [day, 5, null]),
+    );
+    assert.deepEqual(leagueSchedule([], 'none', 0).matches, []);
+    assert.deepEqual(leagueSchedule([1, 2], 'over', 7).matches, []);
+  });
+
+  test("the table: the balance of the fights won and lost, walkovers too, then the fights won, then the drawn order; void matches count for nobody", () => {
+    const matches = [
+      { a: 1, b: 2, winsA: 30, winsB: 10, lossesA: 10, lossesB: 30, result: 'a' },
+      { a: 3, b: null, winsA: 5, winsB: 5, lossesA: 5, lossesB: 5, result: 'draw' },
+      { a: 2, b: 3, winsA: 12, winsB: 4, lossesA: 4, lossesB: 14, result: 'a' },
+      { a: 1, b: null, winsA: 2, winsB: 6, lossesA: 6, lossesB: 2, result: 'b' },
+      { a: 3, b: 1, winsA: 0, winsB: 0, lossesA: 0, lossesB: 0, result: 'void' },
+      { a: 2, b: 1, winsA: 0, winsB: 0, lossesA: 0, lossesB: 0, result: null },
+    ];
+    const table = leagueTable([3, 1, 2], matches);
+    assert.deepEqual(
+      table.map((row) => [row.place, row.id, row.played, row.won, row.drawn, row.lost, row.fightsWon, row.fightsLost, row.balance]),
+      [
+        [1, 1, 2, 1, 0, 1, 32, 16, 16],
+        [2, 2, 2, 1, 0, 1, 22, 34, -12],
+        [3, 3, 2, 0, 1, 1, 9, 19, -10],
+      ].sort((x, y) => y[8] - x[8]).map((row, index) => [index + 1, ...row.slice(1)]),
+    );
+    // As good a balance: more fights won, then the drawn order.
+    const even = leagueTable(
+      [7, 8],
+      [
+        { a: 7, b: null, winsA: 1, winsB: 0, lossesA: 0, lossesB: 1, result: 'a' },
+        { a: 8, b: null, winsA: 2, winsB: 1, lossesA: 1, lossesB: 2, result: 'a' },
+      ],
+    );
+    assert.deepEqual(
+      even.map((row) => row.id),
+      [8, 7],
+    );
+    assert.deepEqual(
+      leagueTable([7, 8], []).map((row) => row.id),
+      [7, 8],
+    );
+  });
+
+  test('the best places bring Sława and war chests: the first three items from two guilds, the second one item from three, the third Sława from four', () => {
+    const places = content.guilds.fame.war.places;
+    assert.deepEqual(places, [100, 60, 30]);
+    const row = (id, place) => ({ id, place, played: 0, won: 0, drawn: 0, lost: 0, fightsWon: 0, fightsLost: 0, balance: 0 });
+    const four = [row(1, 1), row(2, 2), row(3, 3), row(4, 4)];
+    assert.deepEqual(leaguePrizes(four, content), [
+      { id: 1, place: 1, fame: 100, items: 3 },
+      { id: 2, place: 2, fame: 60, items: 1 },
+      { id: 3, place: 3, fame: 30, items: 0 },
+    ]);
+    assert.deepEqual(
+      leaguePrizes(four.slice(0, 3), content).map((prize) => prize.place),
+      [1, 2],
+    );
+    assert.deepEqual(
+      leaguePrizes(four.slice(0, 2), content).map((prize) => prize.place),
+      [1],
+    );
+    assert.deepEqual(leaguePrizes(four.slice(0, 1), content), []);
+  });
+
+  test('the evenings are at 20:00 Polish time, also the Sunday the clocks go back; the league is from Monday', () => {
     // The week of 19–25 October 2026: the clocks go back on Sunday.
     const at = Date.UTC(2026, 9, 21, 9);
     const week = warWeek(at, content);
@@ -192,8 +290,8 @@ describe("the guild wars' rules", () => {
     assert.ok(first >= 26 && first <= 54, `side A won ${first} of 80`);
   });
 
-  test("a battle won brings gold by the character's level and Punkty Systemu; the guild that won more battles wins the war (799 A)", () => {
-    assert.deepEqual(warReward(100, content), { gold: war.reward.gold.base + war.reward.gold.perLevel * 100, systemPoints: war.reward.systemPoints });
+  test("a fight won brings gold by the character's level; the guild with the better balance wins the match (799 A)", () => {
+    assert.deepEqual(warReward(100, content), { gold: Math.round(war.reward.gold.base + war.reward.gold.perLevel * 100), systemPoints: war.reward.systemPoints });
     assert.deepEqual([warResult(4, 3), warResult(2, 5), warResult(3, 3), warResult(0, 0)], ['a', 'b', 'draw', 'draw']);
   });
 
@@ -233,15 +331,18 @@ describe("the guild wars' rules", () => {
 });
 
 describe('the guild wars through the API', () => {
-  const { server, call, db, signUp } = useServer({ GUILD_WARS: 'on' });
+  // The tests' own clock (TEST_CLOCK): every request and the cron at the
+  // moments a test sets, in the week after this one, so the same any day.
+  const { server, call, db, signUp } = useServer({ GUILD_WARS: 'on', TEST_CLOCK: 'on' });
   const cookies = {};
   const ids = {};
-  const as = (login, method, path, body) => call(method, path, { cookie: cookies[login], body });
+  const league = warWeek(Date.now() + 7 * DAY, content);
+  let clock = league.startsAt + 3600000;
+  const as = (login, method, path, body) => call(method, path, { cookie: cookies[login], body, now: clock });
   const run = async (sql, ...binds) => (await db()).prepare(sql).bind(...binds).run();
   const first = async (sql, ...binds) => (await db()).prepare(sql).bind(...binds).first();
   const all = async (sql, ...binds) => (await (await db()).prepare(sql).bind(...binds).all()).results;
   const cron = (at) => server.getWorker().scheduled({ cron: '* * * * *', scheduledTime: new Date(at) });
-  const week = () => warWeek(Date.now(), content);
 
   async function player(login, name, { level = 40, classId = 'warrior' } = {}) {
     ({ cookie: cookies[login] } = await signUp(login));
@@ -268,48 +369,60 @@ describe('the guild wars through the API', () => {
     const columns = Object.keys(data);
     await run(`INSERT INTO characters (${columns.join(', ')}) VALUES (${columns.map(() => '?').join(', ')})`, ...columns.map((column) => data[column]));
     const id = (await first('SELECT id FROM characters WHERE name_key = ?', name.toLowerCase())).id;
-    await run("INSERT INTO guild_members (character_id, guild_id, role, joined_at) VALUES (?, ?, 'member', ?)", id, guildId, Date.now());
+    await run("INSERT INTO guild_members (character_id, guild_id, role, joined_at) VALUES (?, ?, 'member', ?)", id, guildId, clock);
     return id;
   }
 
-  const place = (login, body) => as(login, 'POST', '/api/guild/war/place', body);
-  // On a Monday before its battles, the set-up's own requests draw the week
-  // at once, with the guilds made so far (16.11.2026: the deploy stopped on
-  // a Monday night): the tests that draw by the cron take that draw back.
-  const undrawn = async () => {
-    await run('DELETE FROM guild_wars');
-    await run('DELETE FROM guild_war_weeks');
-  };
-  const slotOf = async (characterId) => first('SELECT team, slot FROM guild_war_slots WHERE character_id = ?', characterId);
-
+  // The guilds are made the evening before the league's week, after the
+  // last battles of the week before (whose league a look at them draws
+  // with no matches), so the cron draws the league on its Monday.
   beforeEach(() => {
     for (const key of Object.keys(cookies)) delete cookies[key];
+    clock = league.startsAt - 3600000;
   });
 
-  test('the tab: the teams, the members and the words; a guild may take 30 members', async () => {
+  test('the tab: the teams the game draws, the members, the league and the words; a guild may take 30 members', async () => {
     await player('lider', 'Lider');
     await player('druh', 'Druh');
     const guildId = await guild('lider', 'Leśni Bracia', 'LB', ['druh']);
     const tabs = (await call('GET', '/api/content')).data.guildTabs.map((tab) => tab.id);
     assert.equal(tabs.at(-1), 'war');
+    clock = league.startsAt + 3600000;
     const view = (await as('lider', 'GET', '/api/guild/war')).data;
     assert.equal(view.guild.id, guildId);
-    assert.deepEqual([view.teams.count, view.teams.size, view.teams.max, view.teams.members, view.teams.next], [1, 5, 6, 2, 10]);
-    assert.deepEqual(view.teams.assigned, [[]]);
-    assert.deepEqual(view.teams.reserve, [ids.lider, ids.druh]);
-    assert.deepEqual(view.teams.lineups, [[ids.lider, ids.druh]]);
-    assert.deepEqual([view.me.team, view.me.fights], [null, 1]);
+    assert.deepEqual([view.teams.count, view.teams.size, view.teams.max, view.teams.members, view.teams.next, view.teams.day], [1, 3, 10, 2, 3, 0]);
+    assert.deepEqual([...view.teams.lineups[0]].sort(), [ids.lider, ids.druh].sort());
+    assert.deepEqual(view.teams.bench, []);
+    assert.equal(view.me.team, 1);
     assert.equal(view.members[ids.druh].name, 'Druh');
     assert.equal(view.members[ids.lider].role, 'leader');
-    assert.equal(view.war, null);
+    // The only guild: the league of one, the mirror guild every evening.
+    assert.equal(view.league.guilds, 1);
+    assert.deepEqual(
+      view.league.table.map((row) => [row.place, row.tag, row.balance, row.ours]),
+      [[1, 'LB', 0, true]],
+    );
+    assert.equal(view.league.next.day, 0);
+    assert.equal(view.league.next.at, league.battles[0]);
+    const [mirror] = view.league.next.matches;
+    // Two members: 2 × 2 duels and one trio, short of a member, against its mirror.
+    assert.deepEqual([mirror.rival.mirror, mirror.rival.tag, mirror.duels, mirror.trioFights, mirror.short], [true, war.mirror.tag, 4, 1, { ours: true, theirs: true }]);
+    assert.equal(view.league.days.length, 7);
+    assert.ok(view.league.days.every((day) => day.matches.length === 1 && !day.matches[0].fought));
+    assert.equal(view.none, null);
     assert.equal(view.texts.title, war.texts.title);
     assert.ok(view.texts.how.some((line) => line.includes('20:00')));
+    assert.ok(view.texts.how.some((line) => line.includes(`${content.guilds.fame.war.places[0]} punktów Sławy`)));
     assert.equal(view.texts.errors, undefined);
     // Outside a guild, the words alone.
     await player('obcy', 'Obcy');
     const outside = (await as('obcy', 'GET', '/api/guild/war')).data;
     assert.equal(outside.guild, null);
     assert.equal(outside.texts.noGuild, war.texts.noGuild);
+    // A guild made after the draw waits for the next league.
+    await guild('obcy', 'Spóźnieni', 'SPÓ');
+    const late = (await as('obcy', 'GET', '/api/guild/war')).data;
+    assert.deepEqual([late.league, late.none], [null, 'late']);
     // 30 members: the 21st joins.
     const database = await db();
     await database.batch(Array.from({ length: 18 }, (_, index) => database.prepare("INSERT INTO guild_members (character_id, guild_id, role, joined_at) VALUES (?, ?, 'member', 0)").bind(100000 + index, guildId)));
@@ -318,212 +431,164 @@ describe('the guild wars through the API', () => {
     assert.equal((await as('nowy', 'POST', '/api/guild/accept', { guildId })).status, 200);
   });
 
-  test('a member takes a free place itself; the leader and the deputies move anyone and swap two; a member never moves another (796 A)', async () => {
-    await player('lider', 'Lider');
-    await player('zast', 'Zast');
-    await player('druh', 'Druh');
-    const guildId = await guild('lider', 'Leśni Bracia', 'LB', ['zast', 'druh']);
-    await as('lider', 'POST', '/api/guild/role', { characterId: ids.zast, role: 'deputy' });
-    const taken = await place('druh', { team: 1 });
-    assert.equal(taken.status, 200, JSON.stringify(taken.data));
-    assert.equal(taken.data.text, 'Zajmujesz miejsce w Drużynie I.');
-    assert.deepEqual(taken.data.teams.assigned, [[ids.druh]]);
-    assert.deepEqual(await slotOf(ids.druh), { team: 1, slot: 0 });
-    // Again in the same team: refused.
-    assert.equal((await place('druh', { team: 1 })).data.error.code, 'same');
-    // A member does not move another, nor into a team the guild does not have.
-    assert.deepEqual([(await place('druh', { characterId: ids.zast, team: 1 })).status, (await place('druh', { characterId: ids.zast, team: 1 })).data.error.code], [403, 'not_allowed']);
-    assert.equal((await place('druh', { team: 2 })).data.error.code, 'no_team');
-    // The deputy moves the member to the reserve and the leader back.
-    const reserve = await place('zast', { characterId: ids.druh, team: 0 });
-    assert.equal(reserve.data.text, 'Druh: rezerwa.');
-    assert.equal(await slotOf(ids.druh), null);
-    assert.equal((await place('lider', { characterId: ids.druh, team: 1 })).data.text, 'Druh: Drużyna I.');
-    // A full team takes nobody more: six more of an account fill it.
-    const others = [];
-    for (let index = 0; index < 4; index++) others.push(await clone(ids.druh, `Klon${index}`, guildId));
-    for (const id of others) await place('lider', { characterId: id, team: 1 });
-    assert.equal((await place('zast', { team: 1 })).data.error.code, 'full');
-    // Ten members: two teams; the leader swaps two of them.
-    for (let index = 4; index < 7; index++) others.push(await clone(ids.druh, `Klon${index}`, guildId));
-    const two = (await as('lider', 'GET', '/api/guild/war')).data;
-    assert.equal(two.teams.count, 2);
-    await place('zast', { team: 2 });
-    const before = [await slotOf(ids.druh), await slotOf(ids.zast)];
-    assert.equal((await place('druh', { team: 2, swapWith: ids.zast })).data.error.code, 'not_allowed');
-    const swapped = await place('lider', { characterId: ids.druh, team: 2, swapWith: ids.zast });
-    assert.equal(swapped.status, 200, JSON.stringify(swapped.data));
-    assert.equal(swapped.data.text, 'Druh i Zast zamieniają się miejscami.');
-    assert.deepEqual([await slotOf(ids.druh), await slotOf(ids.zast)], [before[1], before[0]]);
-    // A member who leaves takes its place along.
-    assert.equal((await as('druh', 'POST', '/api/guild/leave')).status, 200);
-    assert.equal(await slotOf(ids.druh), null);
-  });
-
-  // The code review: a deputy demoted while its move was on the way still
-  // moved a member once, as only the role read at the start counted. The
-  // move is called here as the worker calls it, over a database that lets
-  // the leader's demotion in just before the places are saved (a body held
-  // back cannot do it: the server reads the whole body before the role).
-  test('a deputy demoted while its move or swap is on the way moves nobody', async () => {
-    const { placeInWarTeam } = await import('../src/server/guild-wars.js');
-    const { readFeatures } = await import('../src/server/features.js');
-    readFeatures({ GUILD_WARS: 'on' });
-    await player('lider', 'Lider');
-    await player('zast', 'Zast');
-    await player('druh', 'Druh');
-    await guild('lider', 'Leśni Bracia', 'LB', ['zast', 'druh']);
-    const database = await db();
-    const role = (value) => run('UPDATE guild_members SET role = ? WHERE character_id = ?', value, ids.zast);
-    let placing = false;
-    const racing = {
-      prepare(sql) {
-        if (/^\s*(INSERT INTO|DELETE FROM) guild_war_slots/i.test(sql)) placing = true;
-        return database.prepare(sql);
-      },
-      async batch(statements) {
-        if (placing) {
-          placing = false;
-          await role('member');
-        }
-        return database.batch(statements);
-      },
-    };
-    const move = (body) =>
-      placeInWarTeam({
-        request: new Request('https://test.insightrpg.com/api/guild/war/place', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Cookie: cookies.zast },
-          body: JSON.stringify(body),
-        }),
-        env: { DB: racing },
-        now: Date.now(),
-        params: {},
-      });
-    assert.equal((await place('zast', { team: 1 })).status, 200);
-    for (const body of [
-      { characterId: ids.druh, team: 1 },
-      { characterId: ids.druh, team: 1, swapWith: ids.zast },
-    ]) {
-      await role('deputy');
-      await assert.rejects(move(body), (error) => error.status === 409 && error.code === 'war_changed', JSON.stringify(body));
-      assert.deepEqual([await slotOf(ids.druh), await slotOf(ids.zast)], [null, { team: 1, slot: 0 }]);
-      // Asked again, the member is refused for its role.
-      assert.equal((await place('zast', body)).data.error.code, 'not_allowed');
-    }
-    // A member's own move needs no role: one lost meanwhile changes nothing.
-    await role('deputy');
-    assert.equal((await move({ team: 0 })).status, 200);
-    assert.equal(await slotOf(ids.zast), null);
-  });
-
-  test("the cron draws the rivals on Monday and fights each evening's battles once at 20:00, their rewards given once; each battle to watch from either side; the war won brings Sława and the war chest", async () => {
+  test("the league: drawn on Monday for every guild whatever its size; each evening's matches fought once at 20:00, their rewards given once; the table; each battle to watch from either side; the end brings Sława and war chests", async () => {
     await player('alfa', 'Alfa', { level: 60 });
     await player('beta', 'Beta', { level: 30, classId: 'mage' });
     await player('gamma', 'Gamma', { level: 30 });
     await makeClimber(await db(), ids.alfa);
     const strong = await guild('alfa', 'Mocarze', 'MOC');
     const weak = await guild('beta', 'Słabi', 'SŁ');
-    // A guild of three: no rival of its size.
+    // A guild of three, of another size than the others: in the league too.
     const third = await guild('gamma', 'Trzeci', 'TRZ');
     await clone(ids.gamma, 'Gammi', third);
     await clone(ids.gamma, 'Gammo', third);
-    const days = week().battles;
-    await undrawn();
-    await cron(week().startsAt + 60000);
-    const wars = await all('SELECT * FROM guild_wars WHERE week = ?', week().key);
-    assert.equal(wars.length, 1);
-    assert.deepEqual([wars[0].guild_a, wars[0].guild_b].sort(), [strong, weak].sort());
-    assert.ok(await first('SELECT 1 FROM guild_war_weeks WHERE week = ?', week().key));
-    const side = wars[0].guild_a === strong ? 'a' : 'b';
-    // Before 20:00 nothing; at 20:00 Monday's battle, once.
+    const days = league.battles;
+    await cron(league.startsAt + 60000);
+    await cron(league.startsAt + 120000);
+    const drawn = await first('SELECT * FROM guild_war_weeks WHERE week = ?', league.key);
+    assert.deepEqual(JSON.parse(drawn.guilds).map((one) => one.id).sort(), [strong, weak, third].sort());
+    assert.equal(drawn.first_day, 0);
+    const matches = await all('SELECT * FROM guild_wars WHERE week = ? ORDER BY day, round', league.key);
+    // Three guilds: every evening a match between two and one with the mirror guild.
+    assert.equal(matches.length, 14);
+    const versus = (one, other) => matches.filter((match) => [match.guild_a, match.guild_b].sort().join() === [one, other].sort().join());
+    assert.ok(versus(strong, weak).length >= 2 && versus(strong, third).length >= 2 && versus(weak, third).length >= 2);
+    // Before 20:00 nothing; at 20:00 Monday's matches, once.
     await cron(days[0] - 60000);
     assert.equal((await all('SELECT * FROM guild_war_battles')).length, 0);
     const gold = async (id) => first('SELECT gold, system_points FROM characters WHERE id = ?', id);
     const before = await gold(ids.alfa);
-    const weakBefore = await gold(ids.beta);
     await cron(days[0]);
-    const monday = await all('SELECT * FROM guild_war_battles');
-    assert.equal(monday.length, 1);
-    assert.deepEqual([monday[0].day, monday[0].number, monday[0].team_a, monday[0].team_b, monday[0].result, monday[0].at], [0, 0, 1, 1, side, days[0]]);
-    const reward = warReward(200, content);
+    const monday = await all('SELECT * FROM guild_wars WHERE week = ? AND day = 0', league.key);
+    assert.equal(monday.length, 2);
+    assert.ok(monday.every((row) => row.days_done === 1));
+    const fights = await all('SELECT b.* FROM guild_war_battles b JOIN guild_wars w ON w.id = b.war_id WHERE w.week = ? AND w.day = 0', league.key);
     const after = await gold(ids.alfa);
-    assert.deepEqual([after.gold - before.gold, after.system_points - before.system_points], [reward.gold, reward.systemPoints]);
-    assert.deepEqual(await gold(ids.beta), weakBefore);
     await cron(days[0] + 60000);
-    await cron(days[0] + 120000);
-    assert.equal((await all('SELECT * FROM guild_war_battles')).length, 1);
+    assert.equal((await all('SELECT * FROM guild_war_battles')).length, fights.length);
     assert.deepEqual(await gold(ids.alfa), after);
-    const state = await first('SELECT days_done, wins_a, wins_b FROM guild_wars WHERE id = ?', wars[0].id);
-    assert.deepEqual([state.days_done, side === 'a' ? state.wins_a : state.wins_b], [1, 1]);
-    // The battle to watch: from Alfa's side its team at the bottom and what
-    // it got, from Beta's its own, and for nobody else.
-    const seenByAlfa = (await as('alfa', 'GET', `/api/guild/war/battles/${monday[0].id}`)).data.battle;
-    assert.equal(seenByAlfa.result, 'win');
-    assert.deepEqual(seenByAlfa.reward, reward);
-    assert.equal(seenByAlfa.fight.allies[0].name, 'Alfa');
-    assert.equal(seenByAlfa.fight.enemies[0].name, 'Beta');
-    assert.equal(seenByAlfa.fight.won, true);
-    assert.deepEqual([seenByAlfa.ourTag, seenByAlfa.theirTag], ['MOC', 'SŁ']);
-    assert.deepEqual(seenByAlfa.standing.ours, [0]);
-    const seenByBeta = (await as('beta', 'GET', `/api/guild/war/battles/${monday[0].id}`)).data.battle;
-    assert.deepEqual([seenByBeta.result, seenByBeta.reward, seenByBeta.fight.allies[0].name, seenByBeta.fight.won], ['loss', null, 'Beta', false]);
-    assert.equal((await as('gamma', 'GET', `/api/guild/war/battles/${monday[0].id}`)).data.error.code, 'no_battle');
-    assert.equal((await as('gamma', 'GET', '/api/guild/war/battles/abc')).data.error.code, 'no_battle');
-    // Sunday at 20:00 the rest of the week, at once: the war ends, won by
-    // the strong guild, with its war chest and its Sława.
+    // Alfa's match of Monday: one 1v1 against each member of the rival and
+    // its trio of one, short, losing by walkover; gold for each fight won
+    // and Punkty Systemu for the match won.
+    const alfaMonday = monday.find((row) => row.guild_a === strong || row.guild_b === strong);
+    const alfaSide = alfaMonday.guild_a === strong ? 'a' : 'b';
+    const rival = alfaMonday[alfaSide === 'a' ? 'guild_b' : 'guild_a'];
+    const rivalMembers = rival === third ? 3 : 1;
+    const alfaFights = fights.filter((row) => row.war_id === alfaMonday.id);
+    assert.equal(alfaFights.filter((row) => row.format === '1v1').length, rivalMembers);
+    const alfaTrios = alfaFights.filter((row) => row.format === '3v3');
+    assert.equal(alfaTrios.length, 0, 'a trio of one fights nobody');
+    const walkovers = alfaSide === 'a' ? alfaMonday.walkovers_a : alfaMonday.walkovers_b;
+    assert.equal(walkovers, 1);
+    // Alfa fights at level 200 (makeClimber).
+    const reward = warReward(200, content);
+    const won = alfaFights.filter((row) => row.result === alfaSide).length;
+    const matchWon = alfaMonday.result === alfaSide;
+    assert.deepEqual([after.gold - before.gold, after.system_points - before.system_points], [won * reward.gold, matchWon ? reward.systemPoints : 0]);
+    // The tab after Monday: the table, the evening, the fight to watch.
+    clock = days[0] + 3600000;
+    const view = (await as('alfa', 'GET', '/api/guild/war')).data;
+    const ours = view.league.table.find((row) => row.ours);
+    const [ownWon, ownLost] = alfaSide === 'a' ? [alfaMonday.wins_a, alfaMonday.losses_a] : [alfaMonday.wins_b, alfaMonday.losses_b];
+    assert.deepEqual([ours.tag, ours.played, ours.fightsWon, ours.fightsLost, ours.balance], ['MOC', 1, ownWon, ownLost, ownWon - ownLost]);
+    assert.deepEqual(
+      view.league.table.map((row) => row.place),
+      [1, 2, 3],
+    );
+    const evening = view.league.days[0].matches[0];
+    assert.deepEqual(evening.score, [ownWon, ownLost]);
+    assert.equal(evening.duels.won + evening.duels.lost + evening.duels.drawn, rivalMembers);
+    assert.equal(evening.trios.walkoversLost, 1);
+    assert.equal(view.league.next.day, 1);
+    assert.equal(view.league.battles.length, rivalMembers);
+    const line = view.league.battles[0];
+    assert.equal(line.format, '1v1');
+    assert.equal(line.fought, true);
+    assert.deepEqual(line.reward, line.result === 'win' ? { gold: reward.gold } : null);
+    const seen = (await as('alfa', 'GET', `/api/guild/war/battles/${line.id}`)).data.battle;
+    assert.equal(seen.result, line.result);
+    assert.equal(seen.fight.allies[0].name, 'Alfa');
+    assert.equal(seen.ourTag, 'MOC');
+    // From the rival's side, its own result; the mirror guild's tag where it was one.
+    if (rival === null) assert.equal(seen.theirTag, war.mirror.tag);
+    else {
+      const login = rival === weak ? 'beta' : 'gamma';
+      const theirs = (await as(login, 'GET', `/api/guild/war/battles/${line.id}`)).data.battle;
+      assert.equal(theirs.result, { win: 'loss', loss: 'win', draw: 'draw' }[line.result]);
+      assert.notEqual(theirs.fight.allies[0].name, 'Alfa');
+    }
+    // A fight of a match of two other guilds is not the third's to see.
+    const other = fights.find((row) => row.war_id !== alfaMonday.id);
+    if (other) assert.equal((await as('alfa', 'GET', `/api/guild/war/battles/${other.id}`)).data.error.code, 'no_battle');
+    assert.equal((await as('alfa', 'GET', '/api/guild/war/battles/abc')).data.error.code, 'no_battle');
+    // Sunday at 20:00 the rest of the week, at once: the league ends with
+    // its places, the first with its Sława and a war chest of three items,
+    // the second with one item (three guilds), nobody third (four needed).
     await cron(days[6]);
-    const ended = await first('SELECT * FROM guild_wars WHERE id = ?', wars[0].id);
-    assert.deepEqual([ended.days_done, ended.result, ended.chest_items], [7, side, 1]);
-    assert.equal((await all('SELECT * FROM guild_war_battles')).length, 7);
-    const chest = await all('SELECT * FROM guild_chest WHERE guild_id = ?', strong);
-    assert.equal(chest.length, 1);
+    const ended = await first('SELECT ended_at FROM guild_war_weeks WHERE week = ?', league.key);
+    assert.equal(ended.ended_at, days[6]);
+    assert.equal((await first('SELECT COUNT(*) AS n FROM guild_wars WHERE week = ? AND days_done = 0', league.key)).n, 0);
+    const places = await all('SELECT guild_id, place, fame, chest_items FROM guild_league_places WHERE week = ? ORDER BY place', league.key);
+    assert.deepEqual(
+      places.map((row) => [row.place, row.fame, row.chest_items]),
+      [
+        [1, 100, 3],
+        [2, 60, 1],
+        [3, 0, 0],
+      ],
+    );
+    assert.deepEqual(places.map((row) => row.guild_id).sort(), [strong, weak, third].sort());
+    const chest = await all('SELECT * FROM guild_chest WHERE guild_id = ?', places[0].guild_id);
+    assert.equal(chest.length, 3);
     assert.equal(chest[0].source, 'war');
-    assert.equal(JSON.parse(chest[0].data).rarity !== undefined, true);
-    const seenChest = (await as('alfa', 'GET', '/api/guild/chest')).data;
-    assert.equal(seenChest.items[0].from, content.guilds.chest.texts.fromWar);
-    assert.equal(seenChest.log[0].kind, 'war');
-    assert.equal((await all('SELECT * FROM guild_chest WHERE guild_id = ?', weak)).length, 0);
-    assert.equal((await all('SELECT * FROM guild_chest WHERE guild_id = ?', third)).length, 0);
+    assert.equal((await all('SELECT * FROM guild_chest WHERE guild_id = ?', places[1].guild_id)).length, 1);
+    assert.equal((await all('SELECT * FROM guild_chest WHERE guild_id = ?', places[2].guild_id)).length, 0);
     await cron(days[6] + 60000);
-    assert.equal((await all('SELECT * FROM guild_chest')).length, 1);
+    assert.equal((await all('SELECT * FROM guild_chest')).length, 4);
+    // The Sława of the places in the guilds' ranking of the week.
+    clock = days[6] + 3600000;
+    const tags = new Map([
+      [strong, 'MOC'],
+      [weak, 'SŁ'],
+      [third, 'TRZ'],
+    ]);
     const ranking = (await as('alfa', 'GET', '/api/ranking/guilds?period=week')).data;
-    assert.equal(ranking.rows.find((row) => row.tag === 'MOC').fame, content.guilds.fame.war.won);
-    assert.ok(ranking.texts.how.some((line) => line.includes(String(content.guilds.fame.war.won))));
-    // The tab after the war: the score, the days and the result.
-    const view = (await as('beta', 'GET', '/api/guild/war')).data;
-    assert.deepEqual([view.war.score, view.war.result, view.war.next, view.war.end], [[0, 7], 'loss', null, null]);
-    assert.equal(view.war.battles.length, 7);
-    assert.ok(view.war.days.every((day) => day.fought && day.wins[1] === 1));
-    const won = (await as('alfa', 'GET', '/api/guild/war')).data.war;
-    assert.deepEqual([won.result, won.end], ['win', { fame: content.guilds.fame.war.won, items: 1 }]);
-    // No war for the third guild, which had no rival of its size (made
-    // here after the draw, run for a moment gone by: it says so).
-    const none = (await as('gamma', 'GET', '/api/guild/war')).data;
-    const made = await first('SELECT created_at FROM guilds WHERE id = ?', third);
-    const drawn = await first('SELECT drawn_at FROM guild_war_weeks WHERE week = ?', week().key);
-    assert.deepEqual([none.war, none.none], [null, made.created_at > drawn.drawn_at ? 'late' : 'noRival']);
+    assert.equal(ranking.rows.find((row) => row.tag === tags.get(places[0].guild_id)).fame, 100);
+    assert.equal(ranking.rows.find((row) => row.tag === tags.get(places[1].guild_id)).fame, 60);
+    assert.ok(ranking.texts.how.some((line) => line.includes('100 punktów')));
+    // The tab after the league: the place and what it brought.
+    const mine = places.find((row) => row.guild_id === strong);
+    const end = (await as('alfa', 'GET', '/api/guild/war')).data.league;
+    assert.deepEqual([end.next, end.end], [null, { place: mine.place, fame: mine.fame, items: mine.chest_items }]);
+    assert.ok(end.days.every((day) => day.matches.every((match) => match.fought)));
   });
 
   // A character of an account that has one in the rival guild too (made or
   // moved there after the draw) fights on neither side, so nobody fights
-  // itself and takes the reward for free (11.11.2026).
-  test('an account with characters on both sides of a war fights on neither', async () => {
+  // itself and takes the reward for free (11.11.2026); a side left with
+  // nobody makes the match void.
+  test('an account with characters on both sides of a match fights on neither; a side left with nobody makes it void', async () => {
     await player('alfa', 'Alfa', { level: 60 });
     await player('beta', 'Beta', { level: 30, classId: 'mage' });
     await makeClimber(await db(), ids.alfa);
     await guild('alfa', 'Mocarze', 'MOC');
     const weak = await guild('beta', 'Słabi', 'SŁ');
-    await undrawn();
-    await cron(week().startsAt + 60000);
-    assert.equal((await all('SELECT * FROM guild_wars WHERE week = ?', week().key)).length, 1);
+    await cron(league.startsAt + 60000);
+    assert.equal((await all('SELECT * FROM guild_wars WHERE week = ?', league.key)).length, 7);
     await clone(ids.alfa, 'Bliźniak', weak);
     const before = await first('SELECT gold, system_points FROM characters WHERE id = ?', ids.alfa);
-    await cron(week().battles[0]);
-    const war = await first('SELECT days_done FROM guild_wars WHERE week = ?', week().key);
-    assert.equal(war.days_done, 1);
+    await cron(league.battles[0]);
+    const match = await first('SELECT days_done, result FROM guild_wars WHERE week = ? AND day = 0', league.key);
+    assert.deepEqual([match.days_done, match.result], [1, 'void']);
     assert.equal((await all('SELECT * FROM guild_war_battles')).length, 0);
     assert.deepEqual(await first('SELECT gold, system_points FROM characters WHERE id = ?', ids.alfa), before);
+    clock = league.battles[0] + 3600000;
+    const view = (await as('alfa', 'GET', '/api/guild/war')).data.league;
+    assert.deepEqual(
+      view.table.map((row) => row.played),
+      [0, 0],
+    );
+    assert.equal(view.days[0].matches[0].result, 'void');
   });
 
   // The database gives the highest id of a removed character again: a
@@ -534,109 +599,91 @@ describe('the guild wars through the API', () => {
     await makeClimber(await db(), ids.alfa);
     await guild('alfa', 'Mocarze', 'MOC');
     await guild('beta', 'Słabi', 'SŁ');
-    await undrawn();
-    await cron(week().startsAt + 60000);
-    await cron(week().battles[0]);
+    await cron(league.startsAt + 60000);
+    await cron(league.battles[0]);
     const [battle] = await all('SELECT id, at FROM guild_war_battles');
-    const line = async () => (await as('alfa', 'GET', '/api/guild/war')).data.war.battles[0];
-    assert.equal((await line()).fought, true);
+    clock = league.battles[0] + 3600000;
+    const lines = async () => (await as('alfa', 'GET', '/api/guild/war')).data.league.battles;
+    assert.equal((await lines())[0].fought, true);
     await run('UPDATE characters SET created_at = ? WHERE id = ?', battle.at + 1, ids.alfa);
-    assert.deepEqual([(await line()).fought, (await line()).reward], [false, null]);
+    assert.deepEqual(await lines(), []);
     const replay = (await as('alfa', 'GET', `/api/guild/war/battles/${battle.id}`)).data.battle;
     assert.deepEqual([replay.fought, replay.reward], [false, null]);
   });
 
-  // Last week's Sława is frozen once none of its wars is unfinished: a war
-  // that cannot be fought now (here a member's broken row) holds it, and
-  // once fought its win counts (11.11.2026).
-  test("last week's Sława waits for its wars to end, and the war won counts in it", async () => {
+  // Last week's Sława is frozen once its league has ended: a match that
+  // cannot be fought now (here a member's broken row) holds it, and once
+  // fought, the place counts (11.11.2026).
+  test("last week's Sława waits for its league to end, and the place in it counts", async () => {
     await player('alfa', 'Alfa', { level: 60 });
     await player('beta', 'Beta', { level: 30, classId: 'mage' });
     await makeClimber(await db(), ids.alfa);
     const strong = await guild('alfa', 'Mocarze', 'MOC');
     const weak = await guild('beta', 'Słabi', 'SŁ');
     const broken = await clone(ids.alfa, 'Zepsuty', strong);
-    const previous = warWeek(week().startsAt - 1, content).key;
-    await run(
-      "INSERT INTO guild_wars (week, guild_a, guild_b, name_a, tag_a, members_a, name_b, tag_b, members_b, seed, created_at) VALUES (?, ?, ?, 'Mocarze', 'MOC', 2, 'Słabi', 'SŁ', 1, 'ziarno', 0)",
-      previous,
-      strong,
-      weak,
-    );
+    await cron(league.startsAt + 60000);
     await run("UPDATE characters SET points = 'x' WHERE id = ?", broken);
-    // The week not frozen yet, as at its first request (the guilds' pages
-    // above froze it, before the war was there).
+    // The week after the league's: the league's Sunday is long gone.
+    clock = league.endsAt + 3600000;
     await run('DELETE FROM guild_fame');
     const champion = async () => (await as('beta', 'GET', '/api/character')).data.championTag;
     assert.equal(await champion(), null);
-    assert.equal((await first('SELECT COUNT(*) AS n FROM guild_fame WHERE week = ?', previous)).n, 0);
-    assert.equal((await first('SELECT days_done FROM guild_wars WHERE week = ?', previous)).days_done, 0);
+    assert.equal((await first('SELECT COUNT(*) AS n FROM guild_fame WHERE week = ?', league.key)).n, 0);
+    assert.equal((await first('SELECT ended_at FROM guild_war_weeks WHERE week = ?', league.key)).ended_at, null);
     await run("UPDATE characters SET points = '{}' WHERE id = ?", broken);
     assert.equal(await champion(), 'MOC');
-    const war = await first('SELECT days_done, result FROM guild_wars WHERE week = ?', previous);
-    assert.deepEqual([war.days_done, war.result], [7, 'a']);
-    assert.equal((await first('SELECT points FROM guild_fame WHERE week = ? AND guild_id = ?', previous, strong)).points, content.guilds.fame.war.won);
+    assert.notEqual((await first('SELECT ended_at FROM guild_war_weeks WHERE week = ?', league.key)).ended_at, null);
+    assert.equal((await first('SELECT points FROM guild_fame WHERE week = ? AND guild_id = ?', league.key, strong)).points, 100);
+    assert.ok(weak);
   });
 
-  test("a week's rivals are drawn once, and not after its first battles; guilds of one account never meet", async () => {
+  test("a week's league is drawn once, at its first run, from the first evening to come; after Sunday's battles, none", async () => {
     await player('alfa', 'Alfa');
     await player('beta', 'Beta');
-    const one = await guild('alfa', 'Pierwsi', 'PIE');
-    const other = await guild('beta', 'Drudzy', 'DRU');
-    await undrawn();
-    // Too late: past Monday's battles, no draw for the week.
-    await cron(week().battles[0] + 60000);
-    assert.equal((await all('SELECT * FROM guild_war_weeks')).length, 0);
-    // In time, once: the two have their war, and a second run draws nothing more.
-    await cron(week().startsAt + 60000);
-    await cron(week().startsAt + 120000);
-    assert.equal((await all('SELECT * FROM guild_war_weeks')).length, 1);
-    assert.equal((await all('SELECT * FROM guild_wars')).length, 1);
-    // A guild of an account's other character beside one of its own: they never meet.
-    await run('DELETE FROM guild_war_weeks');
+    await guild('alfa', 'Pierwsi', 'PIE');
+    await guild('beta', 'Drudzy', 'DRU');
+    // First run on Wednesday after its battles: Thursday to Sunday.
+    await cron(league.battles[2] + 60000);
+    await cron(league.battles[2] + 120000);
+    assert.equal((await all('SELECT * FROM guild_war_weeks WHERE week = ?', league.key)).length, 1);
+    const late = await all('SELECT day FROM guild_wars WHERE week = ? ORDER BY day', league.key);
+    assert.deepEqual(
+      late.map((one) => one.day),
+      [3, 4, 5, 6],
+    );
+    assert.equal((await first('SELECT first_day FROM guild_war_weeks WHERE week = ?', league.key)).first_day, 3);
+    // First run after Sunday's battles: no matches, the league over at once.
     await run('DELETE FROM guild_wars');
-    await run('DELETE FROM guild_members WHERE guild_id = ?', other);
-    await clone(ids.alfa, 'Bliźniak', other);
-    await cron(week().startsAt + 60000);
-    assert.equal((await all('SELECT * FROM guild_wars')).length, 0);
-    await cron(week().startsAt + 120000);
-    assert.equal((await all('SELECT * FROM guild_war_weeks')).length, 1);
-    assert.ok(one);
+    await run('DELETE FROM guild_war_weeks WHERE week = ?', league.key);
+    await cron(league.battles[6] + 60000);
+    const over = await first('SELECT guilds, ended_at FROM guild_war_weeks WHERE week = ?', league.key);
+    assert.deepEqual([JSON.parse(over.guilds), over.ended_at !== null], [[], true]);
+    assert.equal((await all('SELECT * FROM guild_wars WHERE week = ?', league.key)).length, 0);
   });
 
-  test('"Test wojny" begins a war with the mirror guild at once and fights its evenings at a tap, to the end; only a test war is taken back', async () => {
+  test('"Test ligi" draws the league again from today and fights its evenings at a tap, to the end', async () => {
     await player('lider', 'Lider', { level: 50 });
+    await player('druga', 'Druga', { level: 50, classId: 'mage' });
     await guild('lider', 'Leśni Bracia', 'LB');
-    const start = await as('lider', 'POST', '/api/test/guild-war', { action: 'start', teams: 2 });
-    assert.equal(start.status, 200, JSON.stringify(start.data));
-    const { war: test } = start.data;
-    assert.equal(test.test, true);
-    assert.deepEqual([test.theirs.name, test.theirs.tag, test.theirs.teams], [war.mirror.name, war.mirror.tag, 2]);
-    assert.deepEqual([test.next.day, test.next.battles, test.next.fights], [week().today, 2, [2]]);
-    assert.equal((await as('lider', 'POST', '/api/test/guild-war', { action: 'start' })).data.error.code, 'at_war');
+    await guild('druga', 'Drugie', 'DRG');
+    clock = league.battles[2] + 3600000;
+    const redrawn = await as('lider', 'POST', '/api/test/guild-war', { action: 'redraw' });
+    assert.equal(redrawn.status, 200, JSON.stringify(redrawn.data));
+    assert.equal(redrawn.data.league.firstDay, 2);
+    assert.equal(redrawn.data.test.fight, 2);
     const before = await first('SELECT gold FROM characters WHERE id = ?', ids.lider);
-    const fought = (await as('lider', 'POST', '/api/test/guild-war', { action: 'fight' })).data;
-    assert.equal(fought.war.battles.length, 2);
-    const rows = await all('SELECT * FROM guild_war_battles ORDER BY number');
-    for (const row of rows) {
-      const fighters = JSON.parse(row.fighters);
-      assert.deepEqual(
-        fighters.a.map((one) => one.id),
-        [ids.lider],
-      );
-      assert.ok(fighters.b.every((one) => one.id === null && one.name !== 'Lider'));
-    }
-    const wins = rows.filter((row) => row.result === 'a').length;
+    let view = (await as('lider', 'POST', '/api/test/guild-war', { action: 'fight' })).data;
+    assert.equal(view.league.days[2].matches[0].fought, true);
+    assert.equal(view.test.fight, 3);
+    const rows = await all('SELECT b.result, w.guild_a FROM guild_war_battles b JOIN guild_wars w ON w.id = b.war_id');
+    assert.equal(rows.length, 1);
+    const won = rows.filter((row) => (row.guild_a === view.guild.id ? row.result === 'a' : row.result === 'b')).length;
     const after = await first('SELECT gold FROM characters WHERE id = ?', ids.lider);
-    assert.equal(after.gold - before.gold, wins * warReward(50, content).gold);
+    assert.equal(after.gold - before.gold, won * warReward(50, content).gold);
     // To the end of the week, then nothing more to fight.
-    let view = fought;
-    while (view.war.next) view = (await as('lider', 'POST', '/api/test/guild-war', { action: 'fight' })).data;
-    assert.ok(['win', 'loss', 'draw'].includes(view.war.result));
+    while (view.test.fight !== null) view = (await as('lider', 'POST', '/api/test/guild-war', { action: 'fight' })).data;
+    assert.ok([1, 2].includes(view.league.end.place));
     assert.equal((await as('lider', 'POST', '/api/test/guild-war', { action: 'fight' })).data.error.code, 'no_war');
-    assert.equal((await as('lider', 'POST', '/api/test/guild-war', { action: 'end' })).status, 200);
-    assert.equal((await all('SELECT * FROM guild_wars')).length, 0);
-    assert.equal((await all('SELECT * FROM guild_war_battles')).length, 0);
     assert.equal((await as('lider', 'POST', '/api/test/guild-war', { action: 'nothing' })).data.error.code, 'invalid_action');
   });
 });

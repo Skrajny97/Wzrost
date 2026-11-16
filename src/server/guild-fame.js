@@ -18,7 +18,7 @@
 // best guild of the week before (the most Sława, if any; of two with as
 // much, the older) has its tag in gold the whole week (380 C).
 
-import { WAR_DAYS, questPeriod } from '../engine/index.js';
+import { questPeriod } from '../engine/index.js';
 import { requireChatter } from './chat.js';
 import { content } from './content.js';
 import { guildWarsOn } from './features.js';
@@ -48,10 +48,11 @@ function weeksAround(now) {
 // taker's up to its cap (a taker gone leaves each exchange on its own).
 // Wyprawa: perGuardian for each guardian of its route of that week that
 // fell, and `last` instead for the last of them (638 A: 20 each and 50 for
-// the seventh, up to 170 a week). Wojna: war.won for the war of that week
-// it won (799 A), once its Sunday's battles are fought.
+// the seventh, up to 170 a week). Wojna: the Sława of its place in that
+// week's league of the wars (fame.war.places), once its Sunday's matches
+// are fought and its places written (guild-wars.js).
 function weekFame(week) {
-  const { beast, expedition, trials, requests, exchange, war } = rules();
+  const { beast, expedition, trials, requests, exchange } = rules();
   return {
     sql: `SELECT g.id AS guild_id, COALESCE(b.points, 0) + COALESCE(t.points, 0) + COALESCE(r.points, 0) + COALESCE(x.points, 0) + COALESCE(w.points, 0) + COALESCE(v.points, 0) AS points
       FROM guilds g
@@ -69,8 +70,7 @@ function weekFame(week) {
       LEFT JOIN (SELECT e.guild_id, SUM(CASE WHEN s.stage = ? THEN ? ELSE ? END) AS points
                  FROM guild_expedition_guardians s JOIN guild_expeditions e ON e.id = s.expedition_id
                  WHERE e.week = ? AND s.fallen_at IS NOT NULL GROUP BY e.guild_id) w ON w.guild_id = g.id
-      LEFT JOIN (SELECT CASE result WHEN 'a' THEN guild_a ELSE guild_b END AS guild_id, COUNT(*) * ? AS points
-                 FROM guild_wars WHERE week = ? AND result IN ('a', 'b') GROUP BY 1) v ON v.guild_id = g.id`,
+      LEFT JOIN (SELECT guild_id, fame AS points FROM guild_league_places WHERE week = ?) v ON v.guild_id = g.id`,
     binds: [
       beast.perPercent,
       beast.fell,
@@ -90,7 +90,6 @@ function weekFame(week) {
       expedition.last,
       expedition.perGuardian,
       week.key,
-      war.won,
       week.key,
     ],
   };
@@ -120,19 +119,19 @@ export async function championOf(db, now) {
   const [found, guilds] = await db.batch([bestStatement(db, previous.key), db.prepare('SELECT EXISTS (SELECT 1 FROM guilds) AS any')]);
   let best = found.results[0] ?? null;
   if (!best && guilds.results[0].any) {
-    // The guild wars of that week end first, should the cron have missed
-    // their Sunday's battles (guild-wars.js): the war won counts. Where the
-    // wars are on, the week is frozen only once none of its wars is
-    // unfinished (11.11.2026: else a war still being fought by another run,
-    // or one that failed, lost its Sława for good); until then the next
-    // request tries again.
+    // The league of the wars of that week ends first, should the cron have
+    // missed its Sunday's matches (guild-wars.js): its places count. Where
+    // the wars are on, the week is frozen only once its league has ended
+    // (11.11.2026: else a match still being fought by another run, or one
+    // that failed, lost its Sława for good); until then the next request
+    // tries again.
     const wars = guildWarsOn();
     if (wars) await settleWars(db, now).catch((error) => console.error(error));
     const fame = weekFame(previous);
-    const finished = wars ? ' AND NOT EXISTS (SELECT 1 FROM guild_wars WHERE week = ? AND days_done < ?)' : '';
+    const finished = wars ? ' AND NOT EXISTS (SELECT 1 FROM guild_war_weeks WHERE week = ? AND ended_at IS NULL)' : '';
     await db
       .prepare(`INSERT OR IGNORE INTO guild_fame (guild_id, week, points) SELECT guild_id, ?, points FROM (${fame.sql}) WHERE NOT EXISTS (SELECT 1 FROM guild_fame WHERE week = ?)${finished}`)
-      .bind(previous.key, ...fame.binds, previous.key, ...(wars ? [previous.key, WAR_DAYS] : []))
+      .bind(previous.key, ...fame.binds, previous.key, ...(wars ? [previous.key] : []))
       .run();
     // The members' Sława of that week too (guild-members.js), on its own:
     // should it fail, the members' ranking writes it when next asked, and

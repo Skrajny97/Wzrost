@@ -856,6 +856,10 @@
     "0.3.72": {
       "title": "Version 0.3.72",
       "body": "- Skin tones on portraits: on 71 portraits of forms, outfits and starting classes, part of the skin did not change colour with the chosen tone. On dark skin, for example, a light strip of forehead or a light edge of a hand stayed. Now all the skin has the chosen tone, and hair, armour and outfits stay as they were."
+    },
+    "0.3.73": {
+      "title": "Version 0.3.73",
+      "body": "- Guild wars are now a league, each against each: every evening at 20:00 each guild plays a match against another one until it has met them all, whatever its number of members. The wars drawn on Sunday night were reset, and this week's league starts with the next evening.\n- A match is 1v1 and 3v3 fights: in the 1v1 every member fights every member of the rival guild, and in the 3v3 every trio fights every rival trio. The game draws the trios before every evening, and a trio short of members loses its fights by walkover.\n- The War tab has the league table with the total balance of fights. On Sunday 1st place collects 100 Fame points and a war chest of 3 champion items, 2nd place 60 Fame points and a champion item, and 3rd place 30 Fame points.\n- Every fight you win brings gold, and a match your guild wins brings 2 System Points."
     }
   }
 }
