@@ -1,0 +1,15 @@
+{
+  "id": "fishing",
+  "payload": {
+    "first_frame": "art/references/scenes/fishing-hd.png",
+    "action": "holding the fishing rod over the water in a smooth seamless loop: the rod tip dips a little and the figure gently lifts it, the red and white float bobs on the water with small ripples spreading from it, the willow branches sway a little in the breeze, the pier, the basket and the pond stay still",
+    "frame_count": 8,
+    "seed": 1403800701,
+    "no_background": false
+  },
+  "usage": {
+    "type": "usd",
+    "usd": 0.019114860746595595
+  },
+  "frames": 9
+}

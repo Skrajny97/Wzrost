@@ -1,0 +1,15 @@
+{
+  "id": "farming",
+  "payload": {
+    "first_frame": "art/references/scenes/farming-hd.png",
+    "action": "hoeing the soil in a smooth seamless loop: raising the hoe and bringing it down into the bed, small clods of dark soil fly at each stroke, the grass moves a little in the breeze, the fence and the scarecrow stay still",
+    "frame_count": 8,
+    "seed": 540359698,
+    "no_background": false
+  },
+  "usage": {
+    "type": "usd",
+    "usd": 0.01970431891414854
+  },
+  "frames": 9
+}

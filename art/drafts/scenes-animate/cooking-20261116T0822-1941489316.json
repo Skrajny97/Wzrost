@@ -1,0 +1,15 @@
+{
+  "id": "cooking",
+  "payload": {
+    "first_frame": "art/references/scenes/cooking-hd.png",
+    "action": "stirring the soup with the long wooden ladle in a smooth seamless loop: the ladle circles in the cauldron, the soup bubbles and steam rises from it in every frame, the fire under the cauldron flickers, the table, the hanging onions and the kitchen stay still",
+    "frame_count": 8,
+    "seed": 1941489316,
+    "no_background": false
+  },
+  "usage": {
+    "type": "usd",
+    "usd": 0.019421448528766632
+  },
+  "frames": 9
+}
