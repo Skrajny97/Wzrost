@@ -1205,6 +1205,11 @@
       "id": "0.4.0",
       "title": "Wersja 0.4.0",
       "body": "- Liga wojen gildii: poniedziałkowy wieczór ligi rozegramy jeszcze raz, dziś o 23:00. Walki z 20:00 znikają, a złoto i Punkty Systemu za nie wracają do stanu sprzed walk. Trójki i walki losują się od nowa, już z postaciami jednego konta po obu stronach.\n- W „Wyniki wieczorów” pod każdym meczem jest przycisk „Wszystkie walki”: wszystkie walki meczu, nie tylko Twoje, pogrupowane po trójkach i członkach gildii. Każdą możesz obejrzeć.\n- Zakładka Wojna wczytuje się szybciej."
+    },
+    {
+      "id": "0.4.1",
+      "title": "Wersja 0.4.1",
+      "body": "- Liga wojen gildii: trójki na wieczór gra losuje raz, o północy, i zostają na cały dzień. Kto dołączy do gildii w ciągu dnia, walczy tego wieczoru tylko w 1v1, a kto odejdzie, zostawia w trójce puste miejsce. Trójki na dzisiejszą powtórkę o 23:00 są już ustalone."
     }
   ]
 }

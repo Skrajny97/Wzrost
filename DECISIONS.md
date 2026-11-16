@@ -3580,6 +3580,16 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.4.1 (16.11.2026): trójki ligi ustalane o północy (1037.1 A)
+
+Autor wybrał 1037.1 A: „trójki na dany wieczór losują się raz, o północy, i zostają. Kto odejdzie, zostawia w trójce puste miejsce, a kto dołączy w ciągu dnia, walczy tego wieczoru tylko w 1v1”. Dotąd gra losowała trójki w chwili walk z członków takich, jacy byli wtedy, więc każde dołączenie albo odejście losowało wszystkie trójki od nowa i trójki z zakładki potrafiły się różnić od tych, które walczyły.
+
+1. **Trójki zapisane na cały dzień** (`guild_war_lineups`, migracja 0149). Gra losuje je przy pierwszym uruchomieniu dnia, czyli co minutę od północy (cron, `fixLineups` w `src/server/guild-wars.js`), dla każdej gildii, która ma tego dnia mecz. Walki i zakładka biorą trójki z zapisu (`teamsFor`). Wieczór, którego trójki nie są jeszcze zapisane (dzień, który dopiero przyjdzie), zakładka pokazuje jak dotąd, wylosowany z członków takich, jacy są teraz.
+2. **Kto odejdzie,** znika ze swojej trójki, a ta zostaje niepełna i przegrywa swoje walki walkowerem, jak każda niepełna trójka. **Kto dołączy w ciągu dnia,** nie ma trójki i walczy tego wieczoru tylko w 1v1, z każdym członkiem gildii rywala. Następnego dnia jest już w losowaniu.
+3. **Trójki rywala** w „Następny wieczór” też są z zapisu, gdy już jest.
+4. **Dzisiaj (16.11)** trójki na powtórkę o 23:00 gra zapisała w chwili wdrożenia 0.4.1, a nie o północy, i do 23:00 już się nie zmienią.
+5. Teksty „Trójki losuje gra o północy, na cały dzień.” i zasada w „Jak to działa?” po polsku i po angielsku. Test w `test/guild-wars.test.js`.
+
 ## Wersja 0.4.0 (16.11.2026): pierwszy wieczór ligi jeszcze raz, o 23:00, i wszystkie walki meczu
 
 Autor: „Po wprowadzeniu poprawek i nowości wprowadź reset wojny i o 23 kolejny reroll”. Po 0.3.99 przychodzi 0.4.0 (po 0.0.99 szło 0.1.0, więc tu tak samo).

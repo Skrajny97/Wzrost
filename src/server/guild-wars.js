@@ -109,6 +109,44 @@ async function teamsOf(db, guildId, seed) {
   return { members, ...warDrawnTeams(members.map((row) => row.id), seed, content()) };
 }
 
+// A guild's trios for an evening of a league, fixed at the first run of
+// its day (the author's 1037.1 A, 16.11.2026: trios drawn once, at
+// midnight, and kept): as stored (guild_war_lineups), of the members still
+// in the guild (one gone leaves its place empty: its trio short, losing by
+// walkover), the members who joined since in none (the bench: they fight
+// the 1v1 only). For an evening whose trios are not fixed yet (a day to
+// come), drawn from the members now (teamsOf). Null for a guild gone.
+async function teamsFor(db, league, day, guildId) {
+  if (guildId === null) return null;
+  const row = await db.prepare('SELECT lineups FROM guild_war_lineups WHERE week = ? AND day = ? AND guild_id = ?').bind(league.week, day, guildId).first();
+  if (!row) return teamsOf(db, guildId, teamSeed(league, day, guildId));
+  const members = await membersOf(db, guildId);
+  if (members.length === 0) return null;
+  const here = new Set(members.map((one) => one.id));
+  const lineups = JSON.parse(row.lineups).map((lineup) => lineup.filter((id) => here.has(id)));
+  const placed = new Set(lineups.flat());
+  return { members, count: lineups.length, lineups, bench: members.map((one) => one.id).filter((id) => !placed.has(id)) };
+}
+
+// Today's trios fixed (teamsFor), at the first run of the day: for each
+// guild with a match of the league today still to come and no trios kept,
+// drawn from its members then. The cron runs it every minute, so from
+// midnight; two runs at once keep the first.
+async function fixLineups(db, league, week, now) {
+  const day = week.today;
+  const { results: matches } = await db.prepare('SELECT guild_a, guild_b FROM guild_wars WHERE week = ? AND day = ? AND days_done = 0').bind(league.week, day).all();
+  if (matches.length === 0) return;
+  const { results: kept } = await db.prepare('SELECT guild_id FROM guild_war_lineups WHERE week = ? AND day = ?').bind(league.week, day).all();
+  const fixed = new Set(kept.map((row) => row.guild_id));
+  const guilds = [...new Set(matches.flatMap((match) => [match.guild_a, match.guild_b]))].filter((id) => id !== null && !fixed.has(id));
+  const statements = [];
+  for (const guildId of guilds) {
+    const teams = await teamsOf(db, guildId, teamSeed(league, day, guildId));
+    if (teams) statements.push(db.prepare('INSERT OR IGNORE INTO guild_war_lineups (week, day, guild_id, lineups, drawn_at) VALUES (?, ?, ?, ?, ?)').bind(league.week, day, guildId, JSON.stringify(teams.lineups), now));
+  }
+  if (statements.length > 0) await db.batch(statements);
+}
+
 // The fighters of characters (their rows), each as it is saved: its stats,
 // skills, evolution and the items it wears (as pvp-arena.js's fighterOf).
 async function fightersOf(db, rows) {
@@ -194,8 +232,8 @@ function fightRows(db, matchId, day, at, fights) {
 async function fightMatch(db, league, match, at, now) {
   const polish = contentIn('pl');
   const english = englishOn() ? contentIn('en') : null;
-  const a = await teamsOf(db, match.guild_a, teamSeed(league, match.day, match.guild_a));
-  const b = await teamsOf(db, match.guild_b, teamSeed(league, match.day, match.guild_b));
+  const a = await teamsFor(db, league, match.day, match.guild_a);
+  const b = await teamsFor(db, league, match.day, match.guild_b);
   const fights = [];
   const gold = new Map();
   const fought = { a: new Set(), b: new Set() };
@@ -384,6 +422,7 @@ async function drawLeague(db, week, now, firstDay = null) {
       db.prepare('DELETE FROM guild_war_battles WHERE war_id IN (SELECT id FROM guild_wars WHERE week < ?)').bind(previous),
       db.prepare('DELETE FROM guild_wars WHERE week < ?').bind(previous),
       db.prepare('DELETE FROM guild_league_places WHERE week < ?').bind(previous),
+      db.prepare('DELETE FROM guild_war_lineups WHERE week < ?').bind(previous),
       db.prepare('DELETE FROM guild_war_weeks WHERE week < ?').bind(previous),
     ]);
   } catch (error) {
@@ -413,6 +452,13 @@ export async function settleWars(db, now, { guildId = null } = {}) {
   ]) {
     const league = await leagueOf(db, period.key);
     if (!league || league.ended_at !== null) continue;
+    if (period === week && guildId === null) {
+      try {
+        await fixLineups(db, league, week, now);
+      } catch (error) {
+        failure ??= error;
+      }
+    }
     // A match with its own moment (fight_at) waits for it.
     const { results } = await db
       .prepare(`SELECT * FROM guild_wars WHERE week = ? AND days_done = 0 AND day < ? AND (fight_at IS NULL OR fight_at <= ?)${only} ORDER BY day, round, id`)
@@ -585,6 +631,11 @@ async function leagueView(db, guild, ours, league, week, viewer, now) {
   const coming = mine.filter((match) => match.days_done === 0);
   const nextDay = coming[0]?.day ?? null;
   const short = (lineups) => lineups.some((lineup) => lineup.length < teamSize);
+  // The rivals' trios of the next evening as fixed, once they are
+  // (teamsFor); till then as many as their members make.
+  const { results: kept } =
+    nextDay === null ? { results: [] } : await db.prepare('SELECT guild_id, lineups FROM guild_war_lineups WHERE week = ? AND day = ?').bind(week.key, nextDay).all();
+  const fixedOf = new Map(kept.map((row) => [row.guild_id, JSON.parse(row.lineups)]));
   const next =
     nextDay === null
       ? null
@@ -596,12 +647,13 @@ async function leagueView(db, guild, ours, league, week, viewer, now) {
             .map((match) => {
               const rival = rivalOf(match);
               const members = rival.gone ? 0 : (now_.get(rival.id)?.members ?? 0);
-              const trios = members === 0 ? 0 : Math.ceil(members / teamSize);
+              const fixed = rival.gone ? null : fixedOf.get(rival.id);
+              const trios = fixed ? fixed.length : members === 0 ? 0 : Math.ceil(members / teamSize);
               return {
                 rival: { ...rival, members, trios },
                 duels: ours.members.length * members,
                 trioFights: ours.count * trios,
-                short: { ours: short(ours.lineups), theirs: members % teamSize !== 0 },
+                short: { ours: short(ours.lineups), theirs: fixed ? short(fixed) : members % teamSize !== 0 },
               };
             }),
         };
@@ -654,7 +706,7 @@ async function warView(db, player, guild, now, tester) {
   const league = await leagueOf(db, week.key);
   const next = league ? await db.prepare('SELECT MIN(day) AS day FROM guild_wars WHERE week = ? AND days_done = 0 AND (guild_a = ? OR guild_b = ?)').bind(week.key, guild.id, guild.id).first() : null;
   const day = next?.day ?? week.today;
-  const ours = await teamsOf(db, guild.id, league ? teamSeed(league, day, guild.id) : `${week.key}:${day}:${guild.id}`);
+  const ours = league ? await teamsFor(db, league, day, guild.id) : await teamsOf(db, guild.id, `${week.key}:${day}:${guild.id}`);
   const view = await leagueView(db, guild, ours, league, week, player.row, now);
   const { teamSize, maxTeams } = rules();
   const team = ours.lineups.findIndex((lineup) => lineup.includes(player.row.id));
@@ -786,6 +838,7 @@ export async function testGuildWar(context) {
       db.prepare('DELETE FROM guild_war_battles WHERE war_id IN (SELECT id FROM guild_wars WHERE week = ?)').bind(week.key),
       db.prepare('DELETE FROM guild_wars WHERE week = ?').bind(week.key),
       db.prepare('DELETE FROM guild_league_places WHERE week = ?').bind(week.key),
+      db.prepare('DELETE FROM guild_war_lineups WHERE week = ?').bind(week.key),
       db.prepare('DELETE FROM guild_war_weeks WHERE week = ?').bind(week.key),
     ]);
     await drawLeague(db, week, now, week.today);

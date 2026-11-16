@@ -551,7 +551,7 @@
       "noGuild": "Wars are fought by guilds. Join a guild or found your own.",
       "how": [
         "Every week the guilds play a league, each against each. From Monday, every evening at {hour} your guild plays a match against the next guild until it has played them all. With an odd number of guilds, one has each evening off.",
-        "A match is 1v1 and 3v3 fights: every member of your guild fights every member of the rival guild, and every trio fights every rival trio. The game draws the trios before every evening, and a trio short of members loses its fights by walkover.",
+        "A match is 1v1 and 3v3 fights: every member of your guild fights every member of the rival guild, and every trio fights every rival trio. The game draws the trios at midnight, for the whole day: one who joins during the day fights only the 1v1 that evening, and one who leaves leaves an empty place in the trio. A trio short of members loses its fights by walkover.",
         "Characters fight as they are saved, as in the Arena, without companions or mercenaries.",
         "The table counts the fights won and lost over the whole week, walkovers included.",
         "On Sunday at {hour} the league ends. 1st place collects {first} and {firstItems} of champion rarity for the Guild Chest, 2nd place {second} and {secondItems}, and 3rd place {third}. A place brings its prize only when someone is below it in the table.",
@@ -566,7 +566,7 @@
       },
       "rivalLabel": "Rival:",
       "teamsFor": "Trios for {when}",
-      "drawnNote": "The game draws the trios before every evening.",
+      "drawnNote": "The game draws the trios at midnight, for the whole day.",
       "tableTitle": "League table",
       "columns": { "place": "#", "guild": "Guild", "won": "W", "lost": "L", "balance": "Balance" },
       "tableNote": "W and L are the fights won and lost over the whole week, walkovers included.",
