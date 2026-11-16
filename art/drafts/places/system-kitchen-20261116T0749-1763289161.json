@@ -1,0 +1,14 @@
+{
+  "id": "system-kitchen",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "pixel art interior landscape, an old village kitchen: a big clay stove with a low fire and a black cauldron, a wooden table with bread, vegetables and a fish on a board, strings of onions and garlic hanging from the beams, clay pots on shelves, thin ice-blue glowing crystal shards and faint luminous blue lines along the walls, soft warm light, wide panorama for a dim background behind text, low contrast, muted dark palette of deep browns and greens with ice-blue accents, no text, no border, no people, no animals",
+  "style": "src/client/art/places/system-grove.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.03279420400047302
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "system-pond",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "pixel art landscape, a quiet forest pond at dawn: still dark water with lily pads, reeds along the shore and a small wooden fishing pier with a wicker fish basket, willows leaning over the water, thin ice-blue glowing crystal shards between the reeds and faint luminous blue lines on the water, soft mist, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens and blues with ice-blue accents, no text, no border, no people, no animals",
+  "style": "src/client/art/places/system-grove.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.032631280872133045
+  },
+  "images": 1
+}

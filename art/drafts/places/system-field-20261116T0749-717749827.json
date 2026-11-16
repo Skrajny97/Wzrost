@@ -1,0 +1,14 @@
+{
+  "id": "system-field",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "pixel art landscape, a small field at the edge of an old forest: neat rows of young green crops and golden grain, a low wooden fence and an old scarecrow, a small thatched shed, thin ice-blue glowing crystal shards between the furrows and faint luminous blue lines along the field paths, soft morning light, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens and earthy browns with ice-blue accents, no text, no border, no people, no animals",
+  "style": "src/client/art/places/system-grove.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.032187118434482145
+  },
+  "images": 1
+}
