@@ -27,6 +27,12 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
   let news = null;
   let newsOpen = false;
   let arena = null;
+  // The new players' path (1027): the period shown, in days (0: ever).
+  let funnelDays = 7;
+  // A player by name (1027): the words, the answer, and its error.
+  let words = '';
+  let found = null;
+  let searchError = null;
   // Answers that come after the panel was left are dropped (the code
   // review: a skill's fight played on with sound on the next screen).
   let gone = false;
@@ -40,6 +46,23 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
       state.user.bugReports = panel.counts.bugs;
     } catch (failure) {
       error = failure.message;
+    }
+    if (!gone) render();
+  }
+
+  async function find(text) {
+    words = text.trim();
+    if (words.length < 2) {
+      found = null;
+      searchError = 'Wpisz co najmniej 2 znaki.';
+    } else {
+      try {
+        found = await call('GET', `/api/author/search?q=${encodeURIComponent(words)}`);
+        searchError = null;
+      } catch (failure) {
+        found = null;
+        searchError = failure.message;
+      }
     }
     if (!gone) render();
   }
@@ -208,7 +231,7 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
         h('div', { class: 'page-heading-text' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Panel autora' }), h('p', { class: 'page-subtitle', text: 'Zgłoszenia błędów, konta i postacie' })),
         h('a', { class: 'button button--system back-button', href: backHash }, icon('back', { size: 20 }), 'Powrót'),
       ),
-      error ? systemPanel(error) : panel === null ? h('p', { class: 'muted', text: 'Wczytywanie…' }) : [newsToggle(), newsPart(), skillsToggle(), skillsPreview(), counts(panel.counts), mails(panel.emails), bugs(panel.bugs), accounts(panel.accounts)],
+      error ? systemPanel(error) : panel === null ? h('p', { class: 'muted', text: 'Wczytywanie…' }) : [newsToggle(), newsPart(), skillsToggle(), skillsPreview(), counts(panel.counts), search(), funnel(panel.funnel), mails(panel.emails), bugs(panel.bugs), accounts(panel.accounts)],
       h('button', {
         type: 'button',
         class: 'button button--world',
@@ -227,6 +250,116 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
       tile('Konta', numbers.accounts, `nowe w 24 h: ${formatNumber(numbers.newAccounts)}`),
       tile('Postacie', numbers.characters, `nowe w 24 h: ${formatNumber(numbers.newCharacters)}`),
       tile('Z Google', numbers.google),
+    );
+  }
+
+  // A player by name (1027; the author: „opcje wyszukania konkretnego
+  // gracza po pseudonimie w grze (jakbym chcial jego maila albo
+  // cokolwiek)”): the character's name, the account's name, its login or
+  // its e-mail; each account found with its e-mail, when it was last in
+  // the game and every character it has.
+  function search() {
+    const field = h('input', {
+      id: 'author-search',
+      type: 'search',
+      maxlength: '64',
+      autocomplete: 'off',
+      enterkeyhint: 'search',
+      placeholder: 'Imię postaci, nazwa konta, login, e-mail',
+    });
+    field.value = words;
+    const form = h(
+      'form',
+      { class: 'author-search-form', onSubmit: (event) => { event.preventDefault(); withButton(form.querySelector('button'), () => find(field.value)); } },
+      h('div', { class: 'field author-search-field' }, h('label', { class: 'field-label', for: 'author-search', text: 'Szukaj gracza' }), field),
+      h('button', { type: 'submit', class: 'button button--system', text: 'Szukaj' }),
+    );
+    return h(
+      'section',
+      { class: 'card stack author-search', 'aria-label': 'Szukaj gracza' },
+      form,
+      searchError && h('p', { class: 'muted', text: searchError }),
+      found && (found.accounts.length === 0 ? h('p', { class: 'muted', text: `Nikogo nie znaleziono: „${words}”.` }) : h('ol', { class: 'author-accounts author-found', 'aria-label': 'Znalezieni gracze' }, found.accounts.map(foundCard))),
+      found?.more && h('p', { class: 'muted small', text: 'Pokazano 20 kont, które były w grze najpóźniej. Wpisz więcej liter, żeby zawęzić.' }),
+    );
+  }
+
+  function foundCard(account) {
+    const seen = `Ostatnio w grze: ${account.seenAt ? dateTimeFormat.format(new Date(account.seenAt)) : 'brak zapisu'}`;
+    return h(
+      'li',
+      { class: 'card author-account' },
+      h(
+        'p',
+        { class: 'author-account-head' },
+        h('strong', { text: account.accountName ?? account.login }),
+        account.chatModerator && h('span', { class: 'chat-role chat-role--moderator', text: '(moderator)' }),
+        account.google && h('span', { class: 'author-google', text: 'Google' }),
+      ),
+      account.accountName && h('p', { class: 'author-account-date', text: `Login: ${account.login}` }),
+      h('p', { class: 'author-account-mail', text: account.email ? `${account.email}${account.emailConfirmed ? '' : ' (niepotwierdzony)'}` : 'bez adresu e-mail' }),
+      account.characters.length === 0
+        ? h('p', { class: 'author-account-character', text: 'bez postaci' })
+        : h(
+            'ul',
+            { class: 'author-found-characters' },
+            account.characters.map((one) =>
+              h('li', { class: 'author-account-character', text: `${one.name} · ${one.className}, poziom ${one.level}, klasa ${one.classLevel}${one.playing ? ' · gra nią teraz' : ''}` }),
+            ),
+          ),
+      h('p', { class: 'author-account-date', text: `${seen} · konto od ${dateTimeFormat.format(new Date(account.createdAt))}` }),
+      chatRow(account),
+    );
+  }
+
+  // The new players' path (1027): of the accounts made in the period, how
+  // many made a character, came back from a first expedition (in the middle
+  // of the introduction), read the introduction to its end, and were in the
+  // game again a day and a week
+  // after making the account (of the accounts old enough for it).
+  function funnel(list) {
+    if (!list?.length) return null;
+    const period = list.find((one) => one.days === funnelDays) ?? list[0];
+    const share = (part, whole) => (whole > 0 ? part / whole : 0);
+    const step = (label, part, whole, note) =>
+      h(
+        'li',
+        { class: 'author-funnel-step', vars: { '--share': String(share(part, whole)) } },
+        h('span', { class: 'author-funnel-label', text: label }),
+        h('strong', { class: 'author-funnel-value', text: whole > 0 ? `${formatNumber(part)} · ${Math.round(share(part, whole) * 100)}%` : '–' }),
+        note && h('span', { class: 'author-funnel-note', text: note }),
+      );
+    return h(
+      'section',
+      { class: 'card stack author-funnel', 'aria-label': 'Nowi gracze' },
+      h('h2', { class: 'card-title', text: 'Nowi gracze' }),
+      h(
+        'div',
+        { class: 'segmented segmented--three', role: 'group', 'aria-label': 'Konta założone' },
+        list.map((one) =>
+          h('button', {
+            type: 'button',
+            class: 'segmented-option',
+            'aria-pressed': String(one.days === period.days),
+            text: one.days ? `${one.days} dni` : 'Wszystkie',
+            onClick: () => {
+              funnelDays = one.days;
+              render();
+            },
+          }),
+        ),
+      ),
+      h(
+        'ol',
+        { class: 'author-funnel-steps' },
+        step('Założone konta', period.accounts, period.accounts),
+        step('Utworzyli postać', period.characters, period.accounts),
+        step('Wrócili z pierwszej wyprawy', period.trip, period.accounts),
+        step('Przeszli całe wprowadzenie', period.intro, period.accounts),
+        step('Wrócili po dniu', period.dayBack, period.dayOld, `z ${formatNumber(period.dayOld)} kont starszych niż doba`),
+        step('Wrócili po tygodniu', period.weekBack, period.weekOld, `z ${formatNumber(period.weekOld)} kont starszych niż tydzień`),
+      ),
+      h('p', { class: 'muted small', text: 'Procent z kont założonych w tym okresie. „Wrócili po dniu” i „po tygodniu”: konto było w grze co najmniej dobę albo tydzień po założeniu.' }),
     );
   }
 

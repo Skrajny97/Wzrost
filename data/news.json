@@ -1190,6 +1190,11 @@
       "id": "0.3.96",
       "title": "Wersja 0.3.96",
       "body": "- Gra lżej obciąża serwer: zakładka Postać, licznik graczy online i inne często odświeżane miejsca czytają z bazy dużo mniej, co przyda się, gdy graczy będzie więcej."
+    },
+    {
+      "id": "0.3.97",
+      "title": "Wersja 0.3.97",
+      "body": "- Nad postaciami na górze zakładki Postać widać teraz dwa czasy: pracy postaci i, pod nim, pracy jej Awatara („A”)."
     }
   ]
 }

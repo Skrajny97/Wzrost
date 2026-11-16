@@ -7497,6 +7497,68 @@ a.camp-level-button {
   font-size: 13px;
 }
 
+/* The Panel autora's search (1027): the field and its button in a row,
+   the button under the field on the narrowest phones. */
+.author-search-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.author-search-field {
+  flex: 1000 1 200px;
+  min-width: 0;
+}
+
+/* Beside the field where it fits, across the whole line under it where not. */
+.author-search-form > .button {
+  flex: 1 0 120px;
+  width: auto;
+}
+
+.author-found-characters {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0 0 0 16px;
+}
+
+/* The new players' path (1027): each step a bar as long as its share. */
+.author-funnel-steps {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.author-funnel-step {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  background: linear-gradient(90deg, rgba(143, 227, 239, 0.16) calc(var(--share, 0) * 100%), transparent 0);
+}
+
+.author-funnel-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.author-funnel-value {
+  color: var(--system-text);
+  font-family: var(--font-system);
+  white-space: nowrap;
+}
+
+.author-funnel-note {
+  grid-column: 1 / -1;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
 /* The Społeczność tab's chat (screens/community.js): messages one under
    another, the newest at the bottom, one's own on a lighter ground. The
    room reaches from where it starts (--chat-top) down to the bottom bar, so
@@ -11393,6 +11455,25 @@ button.farm-plot {
 
 .char-switch-time--done {
   color: var(--gold);
+}
+
+/* Under it the Awatar's work: "A" and its time; the line stays empty under
+   a bust whose Awatar rests, so the busts keep one row, and is gone when no
+   Awatar of the account works. */
+.char-switch-time--avatar {
+  display: inline-flex;
+  justify-content: center;
+  gap: 3px;
+}
+
+.char-switch:not(.char-switch--avatars) .char-switch-time--avatar,
+.char-switch-time--idle > * {
+  display: none;
+}
+
+.char-switch-avatar-mark {
+  color: var(--text-muted);
+  font-weight: 700;
 }
 
 .char-switch-bust {

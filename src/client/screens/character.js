@@ -213,18 +213,27 @@ const STACKS = {
 // runs. The camp's builds are not counted. The one played follows its own
 // works as they change; the others, the list asked when the tab opened.
 let switchTicks = [];
+// Over each bust the time left of what the character does now, and under
+// it "A" with the time left of its Awatar Systemu's work (the author,
+// 16.11.2026: „niech nad postaciami wyświetla się też A (jak Awatar) i czas
+// ukończenia pracy przez Awatara”); "Gotowe" in gold once one has ended.
 function switchTimer(one) {
-  const time = h('span', { class: 'char-switch-time', 'aria-hidden': 'true' });
+  const own = h('span', { class: 'char-switch-time', 'aria-hidden': 'true' });
+  const avatarTime = h('span', {});
+  const avatar = h('span', { class: 'char-switch-time char-switch-time--avatar', 'aria-hidden': 'true' }, h('b', { class: 'char-switch-avatar-mark', text: t('A') }), avatarTime);
+  const show = (line, text, work, now) => {
+    const left = work?.endsAt ? work.endsAt - now : null;
+    text.textContent = left === null ? '' : left > 0 ? formatCountdown(left) : t('Gotowe');
+    line.classList.toggle('char-switch-time--done', left !== null && left <= 0);
+    return left !== null;
+  };
   const update = (now) => {
-    const works = one.played ? [state.character.activity, state.character.professions?.avatar?.activity] : [one.activity, one.avatarActivity];
-    const ends = works.filter((work) => work?.endsAt).map((work) => work.endsAt);
-    const left = ends.length > 0 ? Math.min(...ends) - now : null;
-    time.textContent = left === null ? '' : left > 0 ? formatCountdown(left) : t('Gotowe');
-    time.classList.toggle('char-switch-time--done', left !== null && left <= 0);
+    show(own, own, one.played ? state.character.activity : one.activity, now);
+    avatar.classList.toggle('char-switch-time--idle', !show(avatar, avatarTime, one.played ? state.character.professions?.avatar?.activity : one.avatarActivity, now));
   };
   update(serverNow());
   switchTicks.push(update);
-  return time;
+  return [own, avatar];
 }
 
 function characterSwitch(list, switchCharacter) {
@@ -232,7 +241,8 @@ function characterSwitch(list, switchCharacter) {
   if (!list || list.characters.length < 2 || !switchCharacter) return null;
   return h(
     'nav',
-    { class: 'char-switch', 'aria-label': t('Twoje postacie'), 'data-guide': 'char-switch' },
+    // The Awatar's line only when one of the busts has its Awatar at work.
+    { class: `char-switch${list.characters.some((one) => (one.played ? state.character.professions?.avatar?.activity : one.avatarActivity)) ? ' char-switch--avatars' : ''}`, 'aria-label': t('Twoje postacie'), 'data-guide': 'char-switch' },
     list.characters.map((one) =>
       h(
         'button',

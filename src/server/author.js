@@ -10,6 +10,7 @@
 import { skillDemo } from '../engine/index.js';
 import { content } from './content.js';
 import { ApiError, json, readJson } from './http.js';
+import { nameKey } from './names.js';
 import { OWN_CHARACTERS } from './roles.js';
 import { requireSession } from './sessions.js';
 
@@ -23,12 +24,57 @@ export function isAuthor(env, user) {
   return Boolean(user?.google) && logins.includes(String(user.login).toLowerCase());
 }
 
+// The new players' path (1027, the author's „Lejek nowych graczy”): of the
+// accounts made in the last 7 or 30 days, or ever (0), how many made a
+// character, read the introduction to its end (its last card, "ending"; a
+// character without an introduction counts as having read it), came back
+// from a first expedition (any XP), and were in the game again a day and a
+// week after the account was made (users.seen_at, the page's heartbeat in
+// online.js: the last time, so "a day after" means at least a day after).
+// Those two count only the accounts old enough for them.
+const FUNNEL_DAYS = [7, 30, 0];
+const ownOf = (alias) => `${alias}.${OWN_CHARACTERS}`;
+function funnelQuery(db, since, now) {
+  return db
+    .prepare(
+      `SELECT COUNT(*) AS accounts,
+         COALESCE(SUM(has_character), 0) AS characters,
+         COALESCE(SUM(intro), 0) AS intro,
+         COALESCE(SUM(trip), 0) AS trip,
+         COALESCE(SUM(created_at <= ?2), 0) AS day_old,
+         COALESCE(SUM(created_at <= ?2 AND seen_at >= created_at + ?4), 0) AS day_back,
+         COALESCE(SUM(created_at <= ?3), 0) AS week_old,
+         COALESCE(SUM(created_at <= ?3 AND seen_at >= created_at + ?5), 0) AS week_back
+       FROM (
+         SELECT u.created_at, u.seen_at,
+           EXISTS (SELECT 1 FROM characters c WHERE c.user_id = u.id AND ${ownOf('c')}) AS has_character,
+           EXISTS (SELECT 1 FROM characters c WHERE c.user_id = u.id AND ${ownOf('c')}
+             AND (c.tutorial IS NULL OR EXISTS (SELECT 1 FROM json_each(c.tutorial) t WHERE t.value = 'ending'))) AS intro,
+           EXISTS (SELECT 1 FROM characters c WHERE c.user_id = u.id AND ${ownOf('c')} AND (c.level > 1 OR c.xp > 0)) AS trip
+         FROM users u
+         WHERE u.created_at >= ?1
+       )`,
+    )
+    .bind(since, now - DAY, now - 7 * DAY, DAY, 7 * DAY);
+}
+const funnelView = (days, row) => ({
+  days,
+  accounts: row.accounts,
+  characters: row.characters,
+  intro: row.intro,
+  trip: row.trip,
+  dayBack: row.day_back,
+  dayOld: row.day_old,
+  weekBack: row.week_back,
+  weekOld: row.week_old,
+});
+
 export async function authorPanel(context) {
   const session = await requireSession(context);
   if (!isAuthor(context.env, session.user)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
   const db = context.env.DB;
   const since = context.now - DAY;
-  const [counts, rows, bugs, mails] = await db.batch([
+  const [counts, rows, bugs, mails, ...funnels] = await db.batch([
     db
       .prepare(
         `SELECT
@@ -67,6 +113,7 @@ export async function authorPanel(context) {
        WHERE google_sub IS NOT NULL AND email IS NOT NULL AND trim(email) != ''
        ORDER BY 1`,
     ),
+    ...FUNNEL_DAYS.map((days) => funnelQuery(db, days > 0 ? context.now - days * DAY : 0, context.now)),
   ]);
   const total = counts.results[0];
   return json({
@@ -80,6 +127,7 @@ export async function authorPanel(context) {
       newCharacters: total.new_characters,
     },
     emails: mails.results.map((row) => row.email),
+    funnel: FUNNEL_DAYS.map((days, index) => funnelView(days, funnels[index].results[0])),
     accounts: rows.results.map((row) => ({
       login: row.login,
       email: row.email,
@@ -113,6 +161,71 @@ export async function authorPanel(context) {
       createdAt: bug.created_at,
       resolvedAt: bug.resolved_at,
       image: bug.image === 1,
+    })),
+  });
+}
+
+// GET /api/author/search?q=…: a player by name (1027; the author: „dodaj
+// opcje wyszukania konkretnego gracza po pseudonimie w grze (jakbym chcial
+// jego maila albo cokolwiek)”). The accounts whose character's name,
+// account name, login or e-mail holds the words, the latest in the game
+// first, at most SEARCH_MAX, each with every character it has.
+const SEARCH_MAX = 20;
+export async function authorSearch(context) {
+  const session = await requireSession(context);
+  if (!isAuthor(context.env, session.user)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+  const words = (new URL(context.request.url).searchParams.get('q') ?? '').trim();
+  if (words.length < 2 || words.length > 64) throw new ApiError(400, 'invalid_query', 'Wpisz od 2 do 64 znaków.');
+  const like = `%${nameKey(words).replace(/[\\%_]/g, (sign) => `\\${sign}`)}%`;
+  const db = context.env.DB;
+  const found = await db
+    .prepare(
+      `SELECT u.id, u.login, u.account_name, u.email, u.google_sub IS NOT NULL AS google, u.email_confirmed_at IS NOT NULL AS email_confirmed,
+         u.created_at, u.seen_at, u.chat_muted_until, u.chat_moderator
+       FROM users u
+       WHERE lower(u.login) LIKE ?1 ESCAPE '\\' OR COALESCE(u.account_name_key, '') LIKE ?1 ESCAPE '\\' OR lower(COALESCE(u.email, '')) LIKE ?1 ESCAPE '\\'
+         OR EXISTS (SELECT 1 FROM characters c WHERE c.user_id = u.id AND ${ownOf('c')} AND c.name_key LIKE ?1 ESCAPE '\\')
+       ORDER BY u.seen_at IS NULL, u.seen_at DESC, u.id DESC
+       LIMIT ${SEARCH_MAX + 1}`,
+    )
+    .bind(like)
+    .all();
+  const users = found.results.slice(0, SEARCH_MAX);
+  const characters = users.length
+    ? (
+        await db
+          .prepare(
+            `SELECT user_id, name, class_id, level, class_level, role, created_at, seen_at FROM characters
+             WHERE user_id IN (${users.map(() => '?').join(', ')}) AND ${OWN_CHARACTERS}
+             ORDER BY role = 'player' DESC, created_at`,
+          )
+          .bind(...users.map((user) => user.id))
+          .all()
+      ).results
+    : [];
+  return json({
+    more: found.results.length > SEARCH_MAX,
+    accounts: users.map((user) => ({
+      login: user.login,
+      accountName: user.account_name ?? null,
+      email: user.email,
+      google: Boolean(user.google),
+      emailConfirmed: Boolean(user.google) || Boolean(user.email_confirmed),
+      createdAt: user.created_at,
+      seenAt: user.seen_at ?? null,
+      chatMutedUntil: user.chat_muted_until > context.now ? user.chat_muted_until : null,
+      chatModerator: user.chat_moderator === 1,
+      characters: characters
+        .filter((one) => one.user_id === user.id)
+        .map((one) => ({
+          name: one.name,
+          className: content().classesById[one.class_id]?.name ?? one.class_id,
+          level: one.level,
+          classLevel: one.class_level,
+          playing: one.role === 'player',
+          createdAt: one.created_at,
+          seenAt: one.seen_at ?? null,
+        })),
     })),
   });
 }
