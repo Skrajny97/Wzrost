@@ -34,7 +34,7 @@ import {
 } from '../engine/index.js';
 import { content } from './content.js';
 import { bagItems, bagPlaces, buffsOf, characterView, currentHp, loadPlayer, questsNow, requireIdle, requirePlayer, requireWorker, workOf } from './characters.js';
-import { cardSummary, cardUpserts, workCard } from './cards.js';
+import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { atomically, raced, sameVersion } from './atomic.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
@@ -241,6 +241,7 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
       ...workFamePoints(db, row.id, worked, avatar, now),
       // The card the work left, a copy (cards.js).
       ...cardUpserts(db, row.id, card?.ids ?? [], now),
+      ...packGains(db, row.id, card?.packs ?? 0),
       end,
     ]);
   } catch (error) {

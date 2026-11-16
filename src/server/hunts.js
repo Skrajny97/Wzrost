@@ -24,6 +24,7 @@ import {
   companionAfterErrand,
   companionAfterHunt,
   companionGoes,
+  companionStays,
   campLevels,
   challengeAt,
   createRng,
@@ -100,7 +101,7 @@ import { assertion, atomically, characterChanged, raced, sameVersion } from './a
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { cardsOn, eventDraftsOn, eventsOn, fortressOn, settlementOn } from './features.js';
-import { cardCollection, cardUpserts, droppedCards, droppedEffect, effectChance, effectFoundLine, effectUpserts, maxedCards } from './cards.js';
+import { cardCollection, cardUpserts, droppedCards, droppedEffect, effectChance, effectFoundLine, effectUpserts, maxedCards, packGains, packViews } from './cards.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { expeditionMinutes } from './guild-expedition.js';
 import { huntFamePoints } from './fame.js';
@@ -142,6 +143,20 @@ export function restedNow(player, now) {
 export function companionsGoing(player, now, rested = restedNow(player, now)) {
   const hired = JSON.parse(player.row.settlement ?? '{}').companions ?? [];
   return hired.filter((companion) => companionGoes(companion, { rested, inParty: player.inParty })).slice(0, content().balance.parties.size - 1);
+}
+
+// The hired companions who would go on an exploration but wait wounded for
+// the character to rest to full HP (companionReady in the engine), with
+// their names and looks: for the Walka screen, so nobody sets out without
+// them unawares (a player, 16.11.2026: „nie wiesz klikając kolejną wyprawę i
+// idziesz sam bez nich”). None while the character is in a Drużyna, whose
+// explorations go without companions.
+export function woundedWaiting(player, now) {
+  if (!settlementOn() || player.inParty) return null;
+  const hired = JSON.parse(player.row.settlement ?? '{}').companions ?? [];
+  const wounded = hired.filter((companion) => companion.wounded && !companionStays(companion));
+  if (wounded.length === 0 || restedNow(player, now)) return null;
+  return { companions: wounded.map((companion) => ({ name: companion.name, appearance: companion.appearance })) };
 }
 
 // The companions going along as their fights count them: each with its
@@ -1012,7 +1027,10 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
   // The cards the creatures left (cards.js), each at its level now; none
   // after a faint (faintForfeit).
   const cardsWon = collection ? (hunt.cards ?? []) : [];
-  if (cardsWon.length > 0) report.cards = droppedCards(cardsWon, collection);
+  // And the packs of cards found instead of a card (drops.packShare), kept
+  // to be opened in the Salon's tab.
+  const packsWon = collection ? (hunt.packs ?? 0) : 0;
+  if (cardsWon.length > 0 || packsWon > 0) report.cards = [...droppedCards(cardsWon, collection), ...packViews(packsWon)];
   // A rare effect card (977.3 B): its chance by the exploration's minutes,
   // none after a faint; beside the cards in the report, with its line.
   const effectWon = collection && !hunt.forfeit ? await droppedEffect(db, row.id, `${activity.seed}:${activity.started_at}`, effectChance('exploration', activity.minutes)) : null;
@@ -1187,6 +1205,7 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
       ),
       // The cards the creatures left, a copy each (cards.js).
       ...cardUpserts(db, row.id, cardsWon, now),
+      ...packGains(db, row.id, packsWon),
       ...(effectWon ? effectUpserts(db, row.id, [effectWon.id], now) : []),
       db.prepare('DELETE FROM activities WHERE character_id = ? AND started_at = ?').bind(row.id, activity.started_at),
     ]);

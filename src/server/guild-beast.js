@@ -275,7 +275,7 @@ export async function attackGuildBeast(context) {
       // The attack's Punkty Sławy (fame.js).
       ...sourceFamePoints(db, row.id, 'beast', 1, now),
       // The card it left, a copy (cards.js).
-      ...(card ? cardGains(db, row, card.ids, now) : []),
+      ...(card ? cardGains(db, row, card.ids, now, card.packs) : []),
     ],
     () => new ApiError(409, 'raced', errors().raced),
   );

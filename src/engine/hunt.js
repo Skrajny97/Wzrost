@@ -25,7 +25,7 @@
 
 import { challengeAt, combatantView, exploreStrength, monsterCombatant, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
-import { areaLand, cardBonusLine, cardDrop, cardDropText, cardFrom, lowerLandCards } from './cards.js';
+import { areaLand, cardBonusLine, cardDrop, cardDropText, cardFrom, lowerLandCards, PACK, packDropText } from './cards.js';
 import { addCounts, materialDrops, materialView, materialsText } from './crafting.js';
 import { canUse, itemName, itemRank, itemView, randomItem } from './items.js';
 import { TIMED_KINDS, bladeOil, fightPotions } from './potions.js';
@@ -860,6 +860,8 @@ export function simulateHunt(
   const cardRng = cards && content.cards ? createRng(`${lootSeed ?? seed}:cards`) : null;
   /** @type {string[]} */
   const cardsFound = [];
+  // And the packs of cards found instead of a card (drops.packShare).
+  let packsFound = 0;
   // The cards of the creatures of the lands below the place's (902 B).
   const lowerCards = cardRng ? lowerLandCards(areaLand(area.id, content), content) : [];
   const told = (/** @type {string} */ text) => (sought ? gendered(text, sought.female ? 'female' : 'male') : text);
@@ -1015,7 +1017,10 @@ export function simulateHunt(
         // A card of the creature (874 A), not of the wanted's target nor
         // twice of one creature in an exploration.
         const card = cardRng && !meeting ? cardDrop(enemy.monsterId, cardRng, { maxed: [...cards.maxed ?? [], ...cardsFound] }, content) : null;
-        if (card) {
+        if (card === PACK) {
+          summary.packs = (summary.packs ?? 0) + 1;
+          packsFound += 1;
+        } else if (card) {
           summary.cards.push(card);
           cardsFound.push(card);
         }
@@ -1023,8 +1028,11 @@ export function simulateHunt(
       // And once for the fight, but the wanted's, a card of a creature of a
       // lower land (902 B): one the character has not got first, none at its
       // top level, none it found on this exploration.
-      const lower = cardRng && !meeting ? cardFrom(lowerCards, cardRng, { chance: content.cards.drops.lower, owned: cards.owned ?? [], maxed: cards.maxed ?? [], found: cardsFound }) : null;
-      if (lower) {
+      const lower = cardRng && !meeting ? cardFrom(lowerCards, cardRng, { chance: content.cards.drops.lower, owned: cards.owned ?? [], maxed: cards.maxed ?? [], found: cardsFound }, content) : null;
+      if (lower === PACK) {
+        summary.packs = (summary.packs ?? 0) + 1;
+        packsFound += 1;
+      } else if (lower) {
         summary.cards.push(lower);
         cardsFound.push(lower);
       }
@@ -1070,6 +1078,7 @@ export function simulateHunt(
         lines.push(say(texts, 'materials', step, { materials: materialsText(summary.materials, content) }));
       }
       for (const card of summary.cards ?? []) lines.push(cardDropText(card, step, content, card === lower ? 'lower' : 'drop'));
+      for (let pack = 0; pack < (summary.packs ?? 0); pack += 1) lines.push(packDropText(step + pack, content));
       for (const [item, text] of chests) lines.push(text ? say(texts, text, step, { item: itemName(item, content) }) : say(rules.texts, 'loot', step, { item: itemName(item, content) }));
       if (trophy) {
         summary.materials = addCounts(summary.materials, trophy);
@@ -1122,6 +1131,8 @@ export function simulateHunt(
     // Talia Systemu's cards the creatures left (cards.js), with `cards` only,
     // and the collection's bonus, for the report's line.
     ...(cardRng && { cards: cardsFound }),
+    // And the packs of cards found instead of a card, with `cards` only.
+    ...(packsFound > 0 && { packs: packsFound }),
     ...((cardsXp > 1 || cardsGold > 1) && { cardsBonus: { xp: cards?.xp ?? 0, gold: cards?.gold ?? 0 } }),
     hpStart,
     hpEnd: me.hp,
@@ -1173,7 +1184,8 @@ export function faintForfeit(hunt) {
     items: [],
     herbs: {},
     ...(hunt.cards && { cards: [] }),
-    fights: hunt.fights.map((/** @type {Record<string, any>} */ fight) => ({ ...fight, chests: [], ...(fight.cards && { cards: [] }) })),
+    ...(hunt.packs && { packs: 0 }),
+    fights: hunt.fights.map((/** @type {Record<string, any>} */ fight) => ({ ...fight, chests: [], ...(fight.cards && { cards: [] }), ...(fight.packs && { packs: 0 }) })),
     ...(hunt.wanted && { wanted: { ...hunt.wanted, beaten: false } }),
   };
 }

@@ -41,7 +41,7 @@ import {
   trialThresholds,
 } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
-import { cardGameOf, cardsHere, cardUpserts, keyedSeed, sourceCards } from './cards.js';
+import { cardGameOf, cardsHere, cardUpserts, keyedSeed, packGains, sourceCards } from './cards.js';
 import { characterView, engineCharacter, loadPlayer, questContext, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { craftingOn, professionsOn, settlementOn } from './features.js';
@@ -553,12 +553,13 @@ export async function trialCards(db, player, now) {
       sameVersion(db, row),
       db.prepare('UPDATE characters SET card_game = ?, version = version + 1 WHERE id = ?').bind(JSON.stringify(next), row.id),
       ...cardUpserts(db, row.id, found.ids, now),
+      ...packGains(db, row.id, found.packs),
     ]);
   } catch (error) {
     if (error?.code === 'character_changed') return [];
     throw error;
   }
-  return found.cards.map((card) => ({ ...card, text: say(content().cards.texts, 'trial', 0, { card: card.name }) }));
+  return found.cards.map((card) => ({ ...card, text: card.pack ? say(content().cards.texts, 'packTrial', 0, {}) : say(content().cards.texts, 'trial', 0, { card: card.name }) }));
 }
 
 // GET /api/guild/trials, with the cards of the Próby finished since the

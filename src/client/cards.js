@@ -182,8 +182,8 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
   let effectAim = null;
   // A match just ended, shown until "Dalej".
   let ended = null;
-  // The pack just bought at Szczęsny's (902 C): its cards on the table
-  // until „Dalej”.
+  // The pack just bought at Szczęsny's (902 C) or found and opened: its
+  // cards on the table until „Dalej” ({ cards, found }).
   let opened = null;
   // Whether the table took the whole tab last time (onLayout).
   let wasPlaying = false;
@@ -495,36 +495,65 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
   // The day's pack at Szczęsny's (902 C), under the hero's card, like a
   // booster (15.11.2026): three cards of every land, each of a rarity drawn
   // by the pack's odds, the last at least unique, for its price at the
-  // relation with Szczęsny; once bought, its cards on the table until
-  // „Dalej”.
+  // relation with Szczęsny; once bought, a second one the same day for
+  // three times the price (the author, 16.11.2026: „3 razy drożej niż
+  // standardowo opcja drugiego dokupienia pakietu u Szczęsnego”). Above it
+  // the packs found on explorations and at the other activities, to open
+  // for nothing („opcja dropienia boosterów kart zamiast samych kart”). An
+  // opened pack's cards stay on the table until „Dalej”.
   function packCard() {
     const pack = view.pack;
     if (!pack) return null;
     const words = view.texts.pack;
     const head = (state) => h('div', { class: 'cards-section-head' }, h('h3', { class: 'section-title', text: t('Pakiet kart') }), h('span', { class: 'muted', text: state }));
-    const missing = pack.missing > 0 ? t('W kolekcji brakuje Ci jeszcze {cards}.', { cards: countOf(pack.missing, 'karty', 'kart', 'kart') }) : t('Masz już wszystkie karty.');
+    const left = () => view.pack?.missing ?? 0;
+    const missingLine = () => (left() > 0 ? t('W kolekcji brakuje Ci jeszcze {cards}.', { cards: countOf(left(), 'karty', 'kart', 'kart') }) : t('Masz już wszystkie karty.'));
+    // What an opened pack gave: an effect card, cards new in the collection
+    // and cards a level higher.
+    const gave = (cards) => {
+      const fresh = cards.filter((card) => card.fresh && !card.effect).map((card) => card.name);
+      const higher = cards.filter((card) => !card.fresh && !card.effect).map((card) => card.name);
+      const effect = cards.find((card) => card.effect);
+      return [effect && filled(view.effects?.texts.inPack, { card: effect.name }), fresh.length > 0 && t('Nowe w kolekcji: {cards}.', { cards: listOf(fresh) }), higher.length > 0 && t('Na wyższy poziom wchodzą: {cards}.', { cards: listOf(higher) })];
+    };
+    // What can be had next: the found packs left, the day's second pack, or
+    // none till tomorrow.
+    const nextLine = () => {
+      const now = view.pack;
+      if (now.found > 0) return filled(words.found, { count: formatNumber(now.found) });
+      if (!now.bought) return null;
+      return now.second.bought ? t('Następne pakiety jutro.') : t('Drugi pakiet kupisz dziś za {gold} zł.', { gold: formatNumber(now.second.price) });
+    };
+    // A pack bought or found, opened: with the animations on, as a
+    // booster's (984), its cards turning one by one, the page under it
+    // keeping them back; with them off they show at once under the hero's
+    // card.
+    const unpack = (path, found) => (event) =>
+      withButton(event.currentTarget, () =>
+        orAgain(async () => {
+          const answer = await call('POST', path);
+          opened = motionOn() ? null : { cards: answer.pack, found };
+          apply(answer);
+          if (motionOn()) {
+            openPack(answer.pack, {
+              face: (card) => face(card),
+              words: found ? view.texts.pack.openedFound : view.texts.pack.opened,
+              summary: [...gave(answer.pack), missingLine()].filter(Boolean).join(' '),
+              onClose: () => render(),
+            });
+          } else playSound('chest');
+        }),
+      );
+    const bought = (pack.bought ? 1 : 0) + (pack.second.bought ? 1 : 0);
     if (opened) {
-      const fresh = opened.filter((card) => card.fresh && !card.effect).map((card) => card.name);
-      const higher = opened.filter((card) => !card.fresh && !card.effect).map((card) => card.name);
-      const effect = opened.find((card) => card.effect);
       return h(
         'section',
         { class: 'card stack cards-pack', 'data-guide': 'cards-pack' },
-        head(t('kupiony')),
-        h('p', { text: words.opened }),
-        h('div', { class: 'tcard-grid tcard-grid--reserve' }, opened.map((card) => face(card, { marks: { fresh: card.fresh } }))),
-        h('p', {
-          class: 'muted',
-          text: [
-            effect && filled(view.effects?.texts.inPack, { card: effect.name }),
-            fresh.length > 0 && t('Nowe w kolekcji: {cards}.', { cards: listOf(fresh) }),
-            higher.length > 0 && t('Na wyższy poziom wchodzą: {cards}.', { cards: listOf(higher) }),
-            missing,
-          ]
-            .filter(Boolean)
-            .join(' '),
-        }),
-        h('p', { class: 'muted', text: t('Następny pakiet jutro.') }),
+        head(t('kupione dziś: {count} z 2', { count: bought })),
+        h('p', { text: opened.found ? words.openedFound : words.opened }),
+        h('div', { class: 'tcard-grid tcard-grid--reserve' }, opened.cards.map((card) => face(card, { marks: { fresh: card.fresh } }))),
+        h('p', { class: 'muted', text: [...gave(opened.cards), missingLine()].filter(Boolean).join(' ') }),
+        nextLine() && h('p', { class: 'muted', text: nextLine() }),
         h('button', {
           type: 'button',
           class: 'button button--system',
@@ -537,59 +566,45 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
       );
     }
     const gold = state.character?.gold ?? 0;
-    const missingGold = pack.price - gold;
+    const price = pack.bought ? pack.second.price : pack.price;
+    const missingGold = price - gold;
     // The odds of the rarities, as „pospolita 32%, rzadka 30%…”.
     const odds = (key) =>
       pack.odds
         .filter((one) => one[key] > 0)
         .map((one) => `${one.name} ${formatDecimal(Math.round(one[key] * 1000) / 10)}%`)
         .join(', ');
+    const backs = (count) => h('span', { class: 'cards-pack-backs', 'aria-hidden': 'true' }, Array.from({ length: count }, () => h('span', { class: 'cards-back' })));
     return h(
       'section',
       { class: 'card stack cards-pack', 'data-guide': 'cards-pack' },
-      head(pack.bought ? t('kupiony') : t('raz dziennie')),
-      h('div', { class: 'cards-pack-row' }, h('span', { class: 'cards-pack-backs', 'aria-hidden': 'true' }, Array.from({ length: pack.count }, () => h('span', { class: 'cards-back' }))), h('p', { text: words.offer })),
+      head(t('kupione dziś: {count} z 2', { count: bought })),
+      pack.found > 0 && [
+        h('div', { class: 'cards-pack-row cards-pack-found' }, backs(pack.count), h('p', { text: filled(words.found, { count: formatNumber(pack.found) }) })),
+        pack.empty
+          ? h('p', { class: 'muted', text: t('Masz już wszystkie karty na najwyższym poziomie.') })
+          : h('button', { type: 'button', class: 'button button--system', text: t('Otwórz pakiet'), onClick: unpack('/api/cards/pack/open', true) }),
+        h('hr', { class: 'cards-pack-rule' }),
+      ],
+      h('div', { class: 'cards-pack-row' }, backs(pack.count), h('p', { text: words.offer })),
       h('p', { class: 'muted small', text: filled(words.odds, { odds: odds('any'), last: odds('last') }) }),
       pack.effectChance > 0 && view.effects && h('p', { class: 'muted small', text: filled(view.effects.texts.packChance, { chance: Math.round(pack.effectChance * 100) }) }),
       h('p', {
         class: 'muted',
-        text: [pack.discount > 0 ? filled(words.relation, { standing: pack.standing, discount: Math.round(pack.discount * 100) }) : filled(words.noDiscount, { most: Math.round(pack.most * 100) }), missing].join(' '),
+        text: [pack.discount > 0 ? filled(words.relation, { standing: pack.standing, discount: Math.round(pack.discount * 100) }) : filled(words.noDiscount, { most: Math.round(pack.most * 100) }), missingLine()].join(' '),
       }),
-      pack.bought
-        ? h('p', { class: 'muted', text: t('Pakiet na dziś już kupiony. Następny jutro.') })
+      pack.bought && pack.second.bought
+        ? h('p', { class: 'muted', text: t('Dwa pakiety na dziś już kupione. Następne jutro.') })
         : pack.empty
           ? h('p', { class: 'muted', text: t('Masz już wszystkie karty na najwyższym poziomie.') })
           : [
+              pack.bought && h('p', { class: 'muted', text: t('Pakiet na dziś już kupiony. Drugi kosztuje dziś {times} razy tyle.', { times: formatNumber(pack.second.times) }) }),
               h('button', {
                 type: 'button',
                 class: 'button button--world',
                 disabled: missingGold > 0,
-                text: t('Kup pakiet za {gold} zł', { gold: formatNumber(pack.price) }),
-                onClick: (event) =>
-                  withButton(event.currentTarget, () =>
-                    orAgain(async () => {
-                      const answer = await call('POST', '/api/cards/pack');
-                      // With the animations on, the pack opens as a
-                      // booster's (984), its cards turning one by one, and
-                      // the page under it keeps them back; with them off
-                      // they show at once under the hero's card.
-                      opened = motionOn() ? null : answer.pack;
-                      apply(answer);
-                      if (motionOn()) {
-                        const cards = answer.pack;
-                        const fresh = cards.filter((card) => card.fresh && !card.effect).map((card) => card.name);
-                        const higher = cards.filter((card) => !card.fresh && !card.effect).map((card) => card.name);
-                        const effect = cards.find((card) => card.effect);
-                        const left = view.pack?.missing ?? 0;
-                        openPack(cards, {
-                          face: (card) => face(card),
-                          words: view.texts.pack.opened,
-                          summary: [effect && filled(view.effects?.texts.inPack, { card: effect.name }), fresh.length > 0 && t('Nowe w kolekcji: {cards}.', { cards: listOf(fresh) }), higher.length > 0 && t('Na wyższy poziom wchodzą: {cards}.', { cards: listOf(higher) }), left > 0 ? t('W kolekcji brakuje Ci jeszcze {cards}.', { cards: countOf(left, 'karty', 'kart', 'kart') }) : t('Masz już wszystkie karty.')].filter(Boolean).join(' '),
-                          onClose: () => render(),
-                        });
-                      } else playSound('chest');
-                    }),
-                  ),
+                text: pack.bought ? t('Kup drugi pakiet za {gold} zł', { gold: formatNumber(price) }) : t('Kup pakiet za {gold} zł', { gold: formatNumber(price) }),
+                onClick: unpack('/api/cards/pack', false),
               }),
               missingGold > 0 && h('p', { class: 'muted small', text: t('Brakuje: {what}.', { what: t('{gold} złota', { gold: formatNumber(missingGold) }) }) }),
             ],
@@ -1531,10 +1546,18 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
 
 // The cards an exploration, a room of the Labirynt or a profession's work
 // left, in its report (hunts.js, labyrinth.js, the professions' claims):
-// each card's face small, new or with its level now, and the way to the
-// Salon's tab.
+// each card's face small, new or with its level now, each pack of cards
+// found instead (16.11.2026) as its backs, to open in the Salon's tab, and
+// the way there.
 export function droppedCardsSection(cards) {
   if (!cards?.length) return null;
+  const packRow = (pack) =>
+    h(
+      'li',
+      { class: 'cards-dropped-row' },
+      h('span', { class: 'cards-pack-backs cards-dropped-pack', 'aria-hidden': 'true' }, Array.from({ length: pack.cards }, () => h('span', { class: 'cards-back' }))),
+      h('span', { class: 'craft-text' }, h('span', { class: 'item-name', text: pack.name }), h('span', { class: 'item-meta', text: t('{cards} do otwarcia w Salonie Gier', { cards: countOf(pack.cards, 'karta', 'karty', 'kart') }) })),
+    );
   const section = h(
     'section',
     { class: 'report-section', 'aria-labelledby': 'cards-title', 'data-guide': 'report-cards' },
@@ -1543,17 +1566,19 @@ export function droppedCardsSection(cards) {
       'ul',
       { class: 'cards-dropped' },
       cards.map((card) =>
-        h(
-          'li',
-          { class: 'cards-dropped-row' },
-          cardFace(card, { compact: true, label: card.name }),
-          h(
-            'span',
-            { class: 'craft-text' },
-            h('span', { class: 'item-name', vars: { '--rarity': card.color }, text: card.name }),
-            h('span', { class: 'item-meta', text: card.fresh ? t('Nowa karta · {rarity}', { rarity: card.rarityName }) : t('Karta na poziomie {level} · {rarity}', { level: card.level, rarity: card.rarityName }) }),
-          ),
-        ),
+        card.pack
+          ? packRow(card)
+          : h(
+              'li',
+              { class: 'cards-dropped-row' },
+              cardFace(card, { compact: true, label: card.name }),
+              h(
+                'span',
+                { class: 'craft-text' },
+                h('span', { class: 'item-name', vars: { '--rarity': card.color }, text: card.name }),
+                h('span', { class: 'item-meta', text: card.fresh ? t('Nowa karta · {rarity}', { rarity: card.rarityName }) : t('Karta na poziomie {level} · {rarity}', { level: card.level, rarity: card.rarityName }) }),
+              ),
+            ),
       ),
     ),
     h('a', { class: 'button button--world', href: '#/osada/casino/cards', text: t('Talia Systemu w Salonie Gier') }),

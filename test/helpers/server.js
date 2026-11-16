@@ -43,8 +43,10 @@ export function useServer(vars = {}) {
   });
   after(() => server.close());
 
-  async function call(method, path, { body, cookie, origin } = {}) {
+  // `now`: the request's moment, where the test turns TEST_CLOCK on.
+  async function call(method, path, { body, cookie, origin, now } = {}) {
     const headers = {};
+    if (now !== undefined) headers['X-Test-Now'] = String(now);
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     if (cookie) headers.Cookie = cookie;
     if (origin) headers.Origin = origin;

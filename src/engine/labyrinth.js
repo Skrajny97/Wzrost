@@ -26,7 +26,7 @@
 // leave their cards (903, cards.js). Pure: the server keeps the state, the
 // time and the seeds.
 
-import { cardDrop } from './cards.js';
+import { cardDrop, PACK } from './cards.js';
 import { combatantView, exploreStrength, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
 import { companionCombatant } from './companions.js';
@@ -756,14 +756,17 @@ export function labyrinthFight({ state, type, row, room, party, seed }, content)
     gold = Math.round(fightGold * lengthed * weekFactor(/** @type {any} */ (week), 'gold'));
   }
 
-  // The cards the creatures beaten leave (903), from a seed of their own.
+  // The cards the creatures beaten leave (903), from a seed of their own,
+  // and the packs of cards found instead of a card (drops.packShare).
   /** @type {string[]} */
   const found = [];
+  let packs = 0;
   if (won && cards && content.cards) {
     const cardRng = createRng(`${state.seed}:${state.level}:${row}:${room}:cards`);
     for (const enemy of enemies) {
       const card = cardDrop(enemy.monsterId, cardRng, { maxed: [...(cards.maxed ?? []), ...found], guardian: type === 'guardian' }, content);
-      if (card) found.push(card);
+      if (card === PACK) packs += 1;
+      else if (card) found.push(card);
     }
   }
 
@@ -792,6 +795,7 @@ export function labyrinthFight({ state, type, row, room, party, seed }, content)
     materials: {},
     chests: [],
     ...(cards && { cards: found }),
+    ...(packs > 0 && { packs }),
     recovered: 0,
     allies: allies.map((unit) => combatantView(unit, enemies[0].level, content)),
     enemiesView: enemies.map((/** @type {any} */ enemy) => combatantView(enemy, me.unit.level, content)),
@@ -808,8 +812,10 @@ export function labyrinthFight({ state, type, row, room, party, seed }, content)
     materials: {},
     timePoints: 0,
     items: [],
-    // Talia Systemu's cards the creatures left, with `party.cards` only.
+    // Talia Systemu's cards the creatures left, with `party.cards` only, and
+    // the packs of cards.
     ...(cards && { cards: found }),
+    ...(packs > 0 && { packs }),
     hpStart: me.unit.hp,
     hpEnd: hpAfter,
     maxHp: me.unit.maxHp,

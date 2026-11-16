@@ -98,8 +98,8 @@
     "drops": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["ordinary", "elite", "champion", "guardian", "lower", "professionPerHour", "professionMax", "guild"],
-      "description": "Szanse kart: pokonany stwór na wyprawie i w Labiryncie według rodzaju (guardian: strażnik Labiryntu), lower: wygrana walka wyprawy na kartę z niższej krainy (902 B), professionPerHour i professionMax: praca w profesji za godzinę i najwyżej, guild: atak na Bestię, walka ze strażnikiem Wyprawy Gildii i ukończona Próba (903).",
+      "required": ["ordinary", "elite", "champion", "guardian", "lower", "professionPerHour", "professionMax", "guild", "packShare"],
+      "description": "Szanse kart: pokonany stwór na wyprawie i w Labiryncie według rodzaju (guardian: strażnik Labiryntu), lower: wygrana walka wyprawy na kartę z niższej krainy (902 B), professionPerHour i professionMax: praca w profesji za godzinę i najwyżej, guild: atak na Bestię, walka ze strażnikiem Wyprawy Gildii i ukończona Próba (903), packShare: część każdej z tych szans, która daje zamiast karty pakiet kart (16.11.2026).",
       "properties": {
         "ordinary": { "$ref": "#/definitions/chance" },
         "elite": { "$ref": "#/definitions/chance" },
@@ -108,7 +108,8 @@
         "lower": { "$ref": "#/definitions/chance" },
         "professionPerHour": { "$ref": "#/definitions/chance" },
         "professionMax": { "$ref": "#/definitions/chance" },
-        "guild": { "$ref": "#/definitions/chance" }
+        "guild": { "$ref": "#/definitions/chance" },
+        "packShare": { "$ref": "#/definitions/chance" }
       }
     },
     "starter": {
@@ -148,14 +149,15 @@
       "description": "Pakiet u Szczęsnego (902 C), jak booster (15.11.2026): raz dziennie `cards` kart stworów ze wszystkich krain, każda o rzadkości losowanej według `weights` (ostatnia od `lastAtLeast` w górę), za złoto `goldMinutes` minut wyprawy na poziomie postaci, mniej `relationDiscount` za stopień relacji ze Szczęsnym.",
       "type": "object",
       "additionalProperties": false,
-      "required": ["cards", "goldMinutes", "weights", "lastAtLeast", "relationDiscount"],
+      "required": ["cards", "goldMinutes", "weights", "lastAtLeast", "relationDiscount", "second"],
       "properties": {
         "$comment": { "type": "string" },
         "cards": { "type": "integer", "minimum": 1 },
         "goldMinutes": { "type": "integer", "minimum": 1 },
         "weights": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "minimum": 0 } },
         "lastAtLeast": { "$ref": "#/definitions/id" },
-        "relationDiscount": { "type": "array", "minItems": 1, "items": { "type": "number", "minimum": 0, "maximum": 0.9 } }
+        "relationDiscount": { "type": "array", "minItems": 1, "items": { "type": "number", "minimum": 0, "maximum": 0.9 } },
+        "second": { "type": "number", "minimum": 1, "description": "Ile razy droższy jest drugi pakiet tego samego dnia (16.11.2026)." }
       }
     },
     "effects": {
@@ -314,7 +316,7 @@
     "texts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["intro", "starterOffer", "starterTaken", "rules", "win", "loss", "draw", "drop", "lower", "guild", "trial", "pack", "live", "collection"],
+      "required": ["intro", "starterOffer", "starterTaken", "rules", "win", "loss", "draw", "drop", "lower", "guild", "trial", "packName", "packDrop", "packGuild", "packTrial", "pack", "live", "collection"],
       "properties": {
         "intro": { "type": "string", "minLength": 1 },
         "starterOffer": { "type": "string", "minLength": 1 },
@@ -322,13 +324,15 @@
         "pack": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["offer", "opened", "odds", "relation", "noDiscount"],
+          "required": ["offer", "opened", "odds", "relation", "noDiscount", "openedFound", "found"],
           "properties": {
             "offer": { "type": "string", "minLength": 1 },
             "opened": { "type": "string", "minLength": 1 },
             "odds": { "type": "string", "minLength": 1 },
             "relation": { "type": "string", "minLength": 1 },
-            "noDiscount": { "type": "string", "minLength": 1 }
+            "noDiscount": { "type": "string", "minLength": 1 },
+            "openedFound": { "type": "string", "minLength": 1 },
+            "found": { "type": "string", "minLength": 1 }
           }
         },
         "live": {
@@ -358,6 +362,10 @@
         "lower": { "$ref": "#/definitions/texts", "description": "Zdanie raportu wyprawy o karcie z niższej krainy (902 B)." },
         "guild": { "$ref": "#/definitions/texts", "description": "Słowa po ataku na Bestię albo strażnika Wyprawy Gildii, gdy wpadła karta (903)." },
         "trial": { "$ref": "#/definitions/texts", "description": "Słowa przy karcie za ukończoną Próbę Gildii (903)." },
+        "packName": { "type": "string", "minLength": 1, "description": "Nazwa pakietu kart znalezionego przy aktywności, w raportach (16.11.2026)." },
+        "packDrop": { "$ref": "#/definitions/texts", "description": "Słowa raportu wyprawy i Labiryntu przy pakiecie kart." },
+        "packGuild": { "$ref": "#/definitions/texts", "description": "Słowa przy pakiecie kart z ataku na Bestię albo na strażnika Wyprawy Gildii." },
+        "packTrial": { "$ref": "#/definitions/texts", "description": "Słowa przy pakiecie kart za ukończoną Próbę Gildii." },
         "collection": {
           "type": "object",
           "additionalProperties": false,

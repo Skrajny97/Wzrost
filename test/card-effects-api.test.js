@@ -12,6 +12,7 @@ import { createHmac } from 'node:crypto';
 import { beforeEach, describe, test } from 'node:test';
 
 import { casinoDay, effectDrop, packCards, packEffect } from '../src/engine/index.js';
+import { makeClimber } from './helpers/climb.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -222,6 +223,10 @@ describe('Karty efektów through the API', () => {
 
   test('an exploration may leave an effect card, rarely: by its hours, in the report, the Dziennik and the collection; none after a faint', async () => {
     await set('level = 60, class_level = 50, hp = 99999');
+    // A climber in its gear: the seed is the first that gives the effect
+    // card at the moment the test starts the exploration, and a character
+    // with no gear could faint on it (16.11.2026, a run of the tests).
+    await makeClimber(await db(), (await row()).id);
     const started = await call('POST', '/api/hunts', { cookie, body: { areaId: 'boar-thicket', minutes: 240 } });
     assert.equal(started.status, 201, JSON.stringify(started.data));
     const database = await db();

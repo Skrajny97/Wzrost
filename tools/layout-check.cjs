@@ -155,16 +155,19 @@ const TRANSLATED = new Set([
 // English comes from data/en/guilds.json, not from strings.json.
 const GUILDS = JSON.parse(fs.readFileSync(path.join(__dirname, `../data/${LANG === 'en' ? 'en/' : ''}guilds.json`), 'utf8'));
 const GUILDS_TAB = GUILDS.fame.texts.tabs.guilds;
-// The Wojna's "Drużyny" (guild-war.js), which opens the war's teams, so
-// named in data/guilds.json (war.texts) too.
-const WAR_TEAMS = GUILDS.war.texts.teams;
 // The Ranking członków of the Gildia tab (guild-ranking.js, 897 A): its
 // "Wpłaty" from the start, the line of the donations of before under all.
 const MEMBERS = GUILDS.members;
 // Folds opened on a screen after its tabs, all at once: the Portale's
 // cards, each its picture till a tap shows its stage (7.11.2026).
 // The Encyklopedia's "Karty" (where CARDS is on), every land's cards.
-const FOLDS = { '#/portale': '.portal-toggle[aria-expanded="false"]', '#/encyklopedia/cards': 'details.encyclopedia-fold:not([open]) > summary' };
+// The league of the Wojna (996): its trios, the evenings' results and the
+// fights, and "Jak to działa?", all opened.
+const FOLDS = {
+  '#/portale': '.portal-toggle[aria-expanded="false"]',
+  '#/encyklopedia/cards': 'details.encyclopedia-fold:not([open]) > summary',
+  '#/gildia/war': '.war details:not([open]) > summary',
+};
 // The Arena's Karty (card-arena.js, 900 A, where CARDS is on): its tab, the
 // week's table, and on it the switch to the cards' table, named in
 // data/settlement.json; the tab and the switch found by their marks (the
@@ -182,7 +185,6 @@ const TABS = {
   // "Poziom Profesji" with its list of professions (975 B), then the guilds.
   '#/spolecznosc/ranking': [said('Poziom Profesji'), GUILDS_TAB],
   '#/gildia': [MEMBERS.views.donations, MEMBERS.periods.all],
-  '#/gildia/war': [WAR_TEAMS],
 };
 // Sheets opened over a screen after its tabs, each from the one before (a
 // tap on `tap`, or a picture given to the file field `pick`), looked at
@@ -533,8 +535,8 @@ async function main() {
           console.log(`  – ${size.name} ${screen}: brak zakładki „${named}”`);
           continue;
         }
-        // A button in the screen itself (the Wojna's "Drużyny", the Ranking
-        // członków's "Wpłaty" low on the Gildia) may stand under the bars
+        // A button in the screen itself (the Ranking członków's "Wpłaty"
+        // low on the Gildia) may stand under the bars
         // fixed over a short phone's page wherever the browser scrolls it:
         // it is tapped as a script would, when a finger cannot reach it.
         if (await button.evaluate((element) => element.matches('[role="tab"], .segmented-option'))) {
@@ -544,8 +546,13 @@ async function main() {
         await check(`${screen} › ${named}`, null, TRANSLATED.has(screen));
       }
       if (FOLDS[screen]) {
-        // Each one opened leaves the selector, so always the first closed one.
-        for (let left = await view.locator(FOLDS[screen]).count(); left > 0; left -= 1) await view.locator(FOLDS[screen]).first().click();
+        // Each one opened leaves the selector, so always the first closed one;
+        // one under the bars fixed over a short phone's page is tapped as a
+        // script would, as the tabs are.
+        for (let left = await view.locator(FOLDS[screen]).count(); left > 0; left -= 1) {
+          const fold = view.locator(FOLDS[screen]).first();
+          await fold.click({ timeout: 3000 }).catch(() => fold.evaluate((element) => element.click()));
+        }
         await view.waitForTimeout(500);
         await check(`${screen} › otwarte`, null, TRANSLATED.has(screen));
       }

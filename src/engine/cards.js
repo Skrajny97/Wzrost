@@ -36,7 +36,10 @@
 // profession's work, an attack on the Bestia or on a guardian of the
 // Wyprawa Gildii and a Próba finished a card of the lands at the
 // character's level or lower; one picker chooses for all of them (pickCard),
-// first a card the character has not got.
+// first a card the character has not got. A share of every such chance
+// (drops.packShare; the author, 16.11.2026: „Niech z wypraw i wszystkich
+// innych aktywności będzie opcja dropienia boosterów kart zamiast samych
+// kart”) brings a pack of cards instead (PACK), opened as Szczęsny's.
 
 import { monsterCombatant } from './combatant.js';
 import { createRng } from './rng.js';
@@ -270,12 +273,33 @@ export function cardView(id, level, content, extra = {}) {
   };
 }
 
+// A pack of cards found instead of a card (drops.packShare): what the
+// finders below give for it, never a creature's id.
+export const PACK = '+pack';
+
+// What a source's roll of `chance` brings: the lowest share of the chance
+// (drops.packShare) a pack of cards, the rest a card, else nothing; without
+// `content` (a resident's table, whose win gives a card of its deck) never
+// a pack.
+/**
+ * @param {number} roll
+ * @param {number} chance
+ * @param {Content} [content]
+ * @returns {'pack' | 'card' | null}
+ */
+export function dropKind(roll, chance, content) {
+  const share = content ? (cardRules(content)?.drops.packShare ?? 0) : 0;
+  if (roll < chance * share) return 'pack';
+  return roll < chance ? 'card' : null;
+}
+
 // The card a creature beaten on an exploration (874 A) or in the Labirynt
-// (903) leaves, or null: one roll for each creature, so the draws after it
-// never hang on what it is; by its kind's chance (an elite and a champion
-// more often, and theirs are the better cards; the Labirynt's guardian by
-// the guardians', `guardian`), never of a card at its top level (`maxed`)
-// nor of a creature that is no card.
+// (903) leaves, a pack of cards (PACK) or null: one roll for each creature,
+// so the draws after it never hang on what it is; by its kind's chance (an
+// elite and a champion more often, and theirs are the better cards; the
+// Labirynt's guardian by the guardians', `guardian`), never of a card at its
+// top level (`maxed`) nor of a creature that is no card. The pack's share of
+// the chance comes whatever the card's level.
 /**
  * @param {string} id
  * @param {Rng} rng
@@ -286,9 +310,10 @@ export function cardView(id, level, content, extra = {}) {
 export function cardDrop(id, rng, { maxed = [], guardian = false }, content) {
   const roll = rng.next();
   const rules = cardRules(content);
-  if (!rules || !isCard(id, content) || maxed.includes(id)) return null;
-  const chance = guardian ? rules.drops.guardian : rules.drops[cardKind(id, content)];
-  return roll < chance ? id : null;
+  if (!rules || !isCard(id, content)) return null;
+  const kind = dropKind(roll, guardian ? rules.drops.guardian : rules.drops[cardKind(id, content)], content);
+  if (kind === 'pack') return PACK;
+  return kind === 'card' && !maxed.includes(id) ? id : null;
 }
 
 // A report's sentence of a card left (the data's, by its place in the
@@ -301,6 +326,14 @@ export function cardDrop(id, rng, { maxed = [], guardian = false }, content) {
  * @param {'drop' | 'lower'} [key]
  */
 export const cardDropText = (id, step, content, key = 'drop') => say(cardRules(content).texts, key, step, { card: content.monstersById[id].name });
+
+// A report's sentence of a pack of cards found instead of a card
+// (drops.packShare), by its place in the report.
+/**
+ * @param {number} step
+ * @param {Content} content
+ */
+export const packDropText = (step, content) => say(cardRules(content).texts, 'packDrop', step, {});
 
 // --- Cards from the lower lands and the other sources (902 B, 903) ---------
 
@@ -366,17 +399,20 @@ export function pickCard(pool, rng, { owned = [], maxed = [], found = [] } = {})
 }
 
 // A source's roll and its card at once (an exploration's lower lands, 902
-// B): always both draws, so the draws after it never hang on what it gave.
+// B; a resident's table, 904 B): always both draws, so the draws after it
+// never hang on what it gave; with `content`, the pack's share of the
+// chance a pack of cards (PACK).
 /**
  * @param {string[]} pool
  * @param {Rng} rng
  * @param {{ chance: number, owned?: Iterable<string>, maxed?: Iterable<string>, found?: Iterable<string> }} source
+ * @param {Content} [content]
  * @returns {string | null}
  */
-export function cardFrom(pool, rng, { chance, ...have }) {
-  const comes = cardComes(rng, chance);
+export function cardFrom(pool, rng, { chance, ...have }, content) {
+  const kind = dropKind(rng.next(), chance, content);
   const card = pickCard(pool, rng, have);
-  return comes ? card : null;
+  return kind === 'pack' ? PACK : kind === 'card' ? card : null;
 }
 
 // The pack of the day at Szczęsny's, like a booster (902 C; the author,

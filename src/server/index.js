@@ -40,7 +40,7 @@ import { askGuild, cancelGuildRequest, getGuildRequests, giveToGuildRequest, tha
 import { getGuildTodo } from './guild-todo.js';
 import { getGuildExchange, postGuildOffer, takeGuildOffer, withdrawGuildOffer } from './guild-exchange.js';
 import { getGuildChest, putInGuildChest, takeFromGuildChest } from './guild-chest.js';
-import { getGuildWar, getGuildWarBattle, placeInWarTeam, settleWars, testGuildWar } from './guild-wars.js';
+import { getGuildWar, getGuildWarBattle, settleWars, testGuildWar } from './guild-wars.js';
 import { donateToGuildSeat, getGuildSeat, preferGuildSeat } from './guild-seat.js';
 import { changePassword, forgotPassword, resetPassword } from './password.js';
 import { guildRanking } from './guild-fame.js';
@@ -112,7 +112,7 @@ import {
 } from './testing.js';
 import { buyScrolls, raiseAtForge } from './forge.js';
 import { buyTicket, drawLotteries, getCasino, spinCasinoWheel } from './casino.js';
-import { buyPack, getCards, getDecks, nameDeck, playCardTurn, saveDeck, startMatch, surrenderCards, takeStarter, useDeck } from './cards.js';
+import { buyPack, getCards, getDecks, nameDeck, openFoundPack, playCardTurn, saveDeck, startMatch, surrenderCards, takeStarter, useDeck } from './cards.js';
 import { answerDuel, challengeDuel, duelOffer, duelTurn, readDuel, surrenderDuelMatch, withdrawDuel, withoutDuel } from './card-duel.js';
 import { enterTrialHall } from './trial-hall.js';
 import { arenaFight, claimArenaReward, getArena, getArenaDefence, rerollArenaRivals } from './pvp-arena.js';
@@ -371,6 +371,7 @@ const routes = [
   ['POST', '/api/cards/turn', playCardTurn],
   ['POST', '/api/cards/surrender', surrenderCards],
   ['POST', '/api/cards/pack', buyPack],
+  ['POST', '/api/cards/pack/open', openFoundPack],
   // Live matches with other players (card-duel.js; 901 B).
   ['GET', '/api/cards/duel', readDuel],
   ['GET', '/api/cards/duel/offer', duelOffer],
@@ -462,7 +463,6 @@ const routes = [
   // The guild wars (guild-wars.js, 792–800), where GUILD_WARS is on.
   ['GET', '/api/guild/war', getGuildWar],
   ['GET', '/api/guild/war/battles/:id', getGuildWarBattle],
-  ['POST', '/api/guild/war/place', placeInWarTeam],
   ['POST', '/api/test/guild-war', testGuildWar],
   // The guilds' ranking by their Sława (guild-fame.js, 381 A).
   ['GET', '/api/ranking/guilds', guildRanking],
@@ -630,7 +630,11 @@ async function answer(request, env, url) {
     // The server clock is the only source of truth about time: the moment
     // the whole request has come (bodyCome).
     await bodyCome(request);
-    return await found.route.handler({ request, env, now: Date.now(), params: found.params });
+    // The tests' clock (TEST_CLOCK, only where a test turns it on: the
+    // league's tests in guild-wars.test.js): a request may give its moment
+    // in X-Test-Now, so a test of a week runs the same on any day.
+    const now = env.TEST_CLOCK === 'on' && request.headers.has('X-Test-Now') ? Number(request.headers.get('X-Test-Now')) : Date.now();
+    return await found.route.handler({ request, env, now, params: found.params });
   } catch (error) {
     if (error instanceof ApiError) return errorResponse(error);
     console.error(error);

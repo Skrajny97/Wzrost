@@ -2986,6 +2986,18 @@ a.segmented-option {
 }
 
 .region-trait,
+/* The wounded companions above "Wyrusz": a heart beside the words. */
+.wounded-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.wounded-line svg {
+  flex: none;
+  margin-top: 2px;
+}
+
 .region-warning {
   margin: 0;
   font-size: 15px;
@@ -14436,6 +14448,25 @@ button.tcard-slot {
   flex: none;
 }
 
+/* A pack of cards found instead of a card (16.11.2026), in a report: its
+   backs as tall as the small cards beside it. */
+.cards-dropped-pack .cards-back {
+  width: 42px;
+  height: 60px;
+}
+
+.cards-dropped-pack .cards-back + .cards-back {
+  margin-left: -26px;
+}
+
+/* The packs found to open, above the day's pack at Szczęsny's. */
+.cards-pack-rule {
+  width: 100%;
+  margin: 2px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
 /* On a computer the cards are 138 px wide (--tw), the table's lines keep
    together, the reserve and the hero's card take the whole width under the
    table, and the tiers stand two by two. */
@@ -20923,6 +20954,177 @@ a.discord-button {
 
 .war-result-teams .war-their-tag {
   color: var(--danger);
+}
+
+/* The war league (16.11.2026): a rival's tag in red wherever it stands. */
+.war .war-their-tag {
+  color: var(--danger);
+}
+
+/* Under each evening's tile, the tag of its rival. */
+.war-day-rival {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+  line-height: 1.2;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.war-day--today .war-day-rival {
+  color: var(--gold);
+}
+
+/* The next evening's match: "Rywal:" with the rival's tag and name. */
+.war-match {
+  display: grid;
+  gap: 4px;
+}
+
+.war-match-rival {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 6px;
+  font-size: 17px;
+}
+
+.war-match-label {
+  color: var(--text-muted);
+}
+
+.war-match-name {
+  min-width: 0;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+/* The league's table: the place, the guild, its evenings, battles and
+   points; the guild's own row lit in gold, the podium's places marked. */
+.war-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.war-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.war-table th {
+  padding: 4px 6px 6px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 14px;
+  font-weight: 400;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.war-table td {
+  padding: 7px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.war-table .war-table-place {
+  width: 1%;
+  padding-left: 4px;
+  color: var(--text-muted);
+  text-align: left;
+}
+
+.war-table .war-table-guild {
+  width: 100%;
+  max-width: 0;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+}
+
+.war-table-guild .guild-tag {
+  margin-right: 6px;
+}
+
+.war-table-name {
+  color: var(--text);
+}
+
+.war-table .war-table-points {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.war-table-row--ours td {
+  background: rgba(217, 180, 90, 0.12);
+}
+
+.war-table-row--ours .war-table-name,
+.war-table-row--ours .war-table-points {
+  color: var(--gold);
+}
+
+.war-table-row--1 .war-table-place {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.war-table-row--2 .war-table-place,
+.war-table-row--3 .war-table-place {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.war-table-note {
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+/* The character's own fights of the latest evening: one short row each,
+   the result, the rival's fighters and an eye to watch the fight. */
+.war-fights {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.war-fight {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.6);
+}
+
+.war-fight-text {
+  min-width: 0;
+  font-size: 15px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.war-fight-watch {
+  min-width: 44px;
+  min-height: 40px;
+  padding: 6px 10px;
+}
+
+/* The teams the game drew for the evening, folded. */
+.war-teams-body {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
 }
 
 .war-standing {

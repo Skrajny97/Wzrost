@@ -3510,6 +3510,63 @@ Autor: „twarz w portrecie męskiego Strzelca Wyborowego jest brzydka i powinna
 3. **Pasek czoła:** autor zauważył na ciemnym odcieniu jasny pasek skóry pod opaską: pole skóry tego portretu zaczynało się wiersz za nisko i od początku go pomijało. Grupa twarzy obejmuje teraz czoło, cień przy uchu i cień pod brodą, a sprawdzenie wszystkich ośmiu odcieni nie znajduje na głowie żadnego koloru skóry sprzed przebarwienia.
 4. **Inne portrety:** ten sam skan znalazł podobne jasne piksele przy skórze w innych portretach (np. pasek przy obojczyku Czempiona Areny i linia na nodze Berserkerki w ciemnym odcieniu). To osobne zadanie. *Zrobione: zob. „Maski odcieni skóry w 71 portretach”.*
 
+## Pakiety kart z aktywności i drugi pakiet u Szczęsnego (997; 16.11.2026)
+
+Autor: „Niech z wypraw i wszystkich innych aktywności będzie opcja dropienia boosterów kart zamiast samych kart” i „Do tego 3 razy drożej niż standardowo opcja drugiego dokupienia pakietu u Szczęsnego”. Makiety 997.1–997.3.
+
+1. **Pakiet zamiast karty** (`drops.packShare` w `data/cards.json`, `dropKind`, `cardDrop`, `cardFrom` i `PACK` w `src/engine/cards.js`): najniższa część szansy każdego źródła kart daje zamiast karty pakiet kart. `packShare` 0,1, czyli co dziesiąta karta przychodzi jako pakiet. Ten sam rzut co karta, więc pozostałe losowania wyprawy się nie zmieniają.
+    - Źródła: stwór pokonany na wyprawie i w Labiryncie (także karta z niższej krainy), praca w profesji (także Awatara Systemu), atak na Bestię Gildii i na strażnika Wyprawy Gildii oraz ukończona Próba Gildii.
+    - Pakiet wypada także wtedy, gdy karta stwora ma już najwyższy poziom.
+    - Wygrana przy stole mieszkańca daje dalej tylko kartę jego talii, bo pierwsza wygrana zawsze daje kartę.
+    - Omdlenie na wyprawie zabiera pakiety tak jak karty.
+2. **Pakiet to ten sam pakiet co u Szczęsnego**: 3 karty ze wszystkich krain, rzadkość według `pack.weights`, ostatnia co najmniej unikalna, z szansą na kartę efektu. Postać trzyma pakiety (`characters.card_packs`, migracja `0141_card_packs.sql`) i otwiera je za darmo w Salonie Gier, w zakładce Karty („Otwórz pakiet”, `POST /api/cards/pack/open`), jeden naraz, z tą samą animacją co kupiony. Losowanie z wersji postaci i klucza serwera, więc ponowione zapytanie losuje to samo.
+3. **Raporty**: wyprawa, Labirynt i praca w profesji pokazują pakiet obok kart („Pakiet kart · 3 karty do otwarcia w Salonie Gier”) i w Dzienniku; raport wyprawy i Labiryntu ma też zdanie „Wśród łupu leży pakiet kart. Otworzysz go w Salonie Gier, w zakładce Karty.”. Gildia mówi o pakiecie w powiadomieniu.
+4. **Drugi pakiet u Szczęsnego** (`pack.second` 3): po pakiecie dnia można tego samego dnia kupić drugi, za 3 razy tyle co pierwszy (cena już ze zniżką za relację). Drugi ma własne losowanie i też podnosi relację ze Szczęsnym. Potem następne jutro. Nagłówek pakietu mówi „kupione dziś: 0 z 2”.
+
+## Liga wojen gildii (996; 16.11.2026)
+
+Gracz (poz. 51) na czacie, przy wojnach wylosowanych w nocy z 15 na 16.11: „pisze że w tym tygodniu nie było gildii o podobnej liczbie”, „Czemu my jako gildia mamy nie walczyć”. Autor:
+- „miało tak nie być miała każda gildia walczyć”;
+- „Nie musi być podobna liczba członków gildii, niech każda walczy z każdą”, „rozlosujesz od zera i zresetujesz wojny gildii”, „Beda sie one odbywac od jutra i niech działają ciekawie”;
+- „drużyny niech losuje samo do wojen gildii nie trzeba ustalać składów też”;
+- „Niech te wojny gildii odbywają sie w formułach 1v1 i 3v3, gdzie drużyny dobierane są automatycznie i walczy każdy z każdym - dużo walk. Jeśli brakuje członków gildii to będzie walkowerem liczone. Liczony łączny bilans wygranych i porażek (w tym walkowerów)”;
+- „ważne zeby w wojnach gildii walczyła też każda druzyna z kazda lub wlasnie walkower jak brakuje czlonkow do obsadzenia wszystkich drużyn liczony jako porażka”;
+- przy makietach 996 v2 (odrzucone 996.1, 996.3 i 996.4): „Za długi, skomplikowany i pokracznie napisany opis. Nawet nie chce mi sie tego czytać. Więcej o zasadach i żadnych lustrzanych gildii. Po prostu każda z każdą”, „każda z każda gildią 1v1 i 3v3 i tyle”, „Żadnych lustrzanych gildii.”;
+- przy makietach 996 v3 (przyjęte 996.2–996.4): „„Gdy gildii jest nieparzysta ilość” zamiast tak jak napisałeś”, więc zasady i nowości mówią tak, jak napisał autor.
+
+W pytaniu autor wybrał „Liga: każdy z każdym” („Co wieczór o 20:00 każda gildia walczy z inną, aż zmierzy się z każdą”) i start w poniedziałek 16.11. Zmienia to 797 B (rywal o podobnej liczbie członków), 796 A (miejsca w drużynach zajmowane samemu), 795 B i 798 A (bitwy 5 na 5 drużyn po kolei), 12 (gildia bez rywala bez wojny) oraz wynik wojny i nagrody z 799 A.
+
+1. **Reset.** Migracja `0140_guild_league.sql` usuwa wojny wylosowane w nocy, ich tygodnie i bitwy oraz tabelę miejsc w drużynach (`guild_war_slots`). Pierwsze uruchomienie po wdrożeniu losuje ligę tego tygodnia od nowa.
+2. **Terminarz** (`leagueSchedule`, `leagueRounds` w `src/engine/guild-wars.js`):
+    - Gra losuje go przy pierwszym uruchomieniu w tygodniu, dla wszystkich gildii z członkami, bez względu na ich liczbę.
+    - Każda gildia gra z każdą raz, metodą kołową: po jednej rundzie na wieczór o 20:00, od pierwszego wieczoru, którego bitwy jeszcze nie minęły. Rewanżów nie ma („i tyle”), więc przy mniej niż 7 gildiach liga kończy mecze przed niedzielą.
+    - Przy więcej niż 8 gildiach rund jest więcej niż wieczorów, więc niektóre wieczory mają dwie rundy.
+    - Gildia założona po losowaniu gra od następnego poniedziałku. Liga bez meczów (mniej niż dwie gildie albo losowanie po niedzielnych bitwach) od razu się kończy, a zakładka mówi: „W tym tygodniu liga się nie odbywa.”
+3. **Nieparzysta liczba gildii.** W każdej rundzie jedna gildia ma wolny wieczór: nie gra meczu, a jej kafelek tego dnia mówi „wolne”. Lustrzanej Gildii nie ma.
+4. **Mecz: 1v1 i 3v3, każdy z każdym** (`matchFights`):
+    - W 1v1 każdy członek gildii walczy z każdym członkiem gildii rywala.
+    - W 3v3 gra losuje przed każdym wieczorem trójki z członków (`warDrawnTeams`, ziarno wieczoru gildii, więc zakładka pokazuje je jeszcze przed walkami), a każda trójka walczy z każdą trójką rywala.
+    - Trójek jest tyle, ile trzeba dla wszystkich członków (najwyżej 10). Gdy liczby członków nie da się podzielić na pełne trójki, ostatnia trójka jest niepełna: nie walczy, a jej walki liczą się jako walkower, czyli porażka. Dwie niepełne trójki przegrywają obie.
+    - Walka jak bitwa wojny dotąd: postacie takie, jakie są zapisane, jak na Arenie, bez towarzyszy i najemników, z sędzią po 40 ruchach na walczącego. Nie ma już „Zajmij”, ⇄ ani rezerwy.
+    - Postać, której konto ma postać po drugiej stronie, nie walczy w tym meczu, a jej trójka jest niepełna. Gdy przez to któraś strona nie ma nikogo, mecz jest unieważniony i nie liczy się nikomu. Gildia, która zniknęła, przegrywa swoje pozostałe mecze.
+    - Mecz wygrywa gildia z lepszym bilansem walk (wygrane minus przegrane, z walkowerami).
+5. **Tabela** (`leagueTable`): łączny bilans walk wygranych i przegranych z całego tygodnia, razem z walkowerami; przy równym bilansie wyżej więcej wygranych walk, a na końcu kolejność z losowania.
+6. **Nagrody** (`war.league.prizes`, `fame.war.places`, `war.reward`), w niedzielę o 20:00:
+    - 1. miejsce: 100 punktów Sławy i skrzynia wojenna z 3 przedmiotami w rzadkości czempiona, gdy w lidze grały co najmniej 2 gildie.
+    - 2. miejsce: 60 punktów Sławy i 1 taki przedmiot, od 3 gildii.
+    - 3. miejsce: 30 punktów Sławy, od 4 gildii. W „Jak to działa?” to jedno zdanie: nagroda za miejsce jest tylko wtedy, gdy w tabeli ktoś jest niżej.
+    - Za każdą wygraną walkę złoto: 6 + 1,2 × poziom postaci (126 na 100. poziomie), dziesiąta część dawnej nagrody za bitwę, bo walk jest wiele razy więcej. Za mecz wygrany przez gildię 2 Punkty Systemu dla każdego, kto w nim walczył, raz.
+    - Miejsca zapisuje `guild_league_places` raz, po niedzielnych bitwach, także gdy mecze skończyły się wcześniej. Sława miejsca liczy się w Rankingu gildii, a w Rankingu członków dzieli się po równo między tych, którzy walczyli w meczach gildii.
+7. **Zapis walk.** Każda walka to wiersz w `guild_war_battles` (format, strony, wynik, walczący i przebieg do obejrzenia), dopisywane po 9 w jednym zapytaniu (limit D1). Walkowery nie mają wierszy, tylko liczniki meczu (`losses_*`, `walkovers_*`).
+8. **Zakładka Wojna** (makiety 996 v3):
+    - Na górze sztandary Twojej gildii i najbliższego rywala, a między nimi miejsce w lidze („VS” przed pierwszym wieczorem). Pod nimi kafelki tygodnia z bilansem walk wieczoru i skrótem rywala albo „wolne”.
+    - Dalej najbliższy mecz z odliczaniem, liczbą pojedynków 1v1 i walk 3v3 i ostrzeżeniem o niepełnej trójce, Twoja trójka i trójki wylosowane na ten wieczór.
+    - Gdy gildia rozegrała już wszystkie mecze, a liga trwa: „Twoja gildia rozegrała już wszystkie mecze. Liga kończy się w niedzielę o 20:00.”, bez trójek.
+    - Potem tabela ligi (W, P, bilans), wyniki wieczorów z podziałem na 1v1, 3v3 i walkowery, Twoje walki z ostatniego wieczoru do obejrzenia, karta „Koniec ligi” po niedzieli, pasek pełnych trójek i „Jak to działa?”.
+    - „Jak to działa?” to sześć krótkich zdań o zasadach (autor: „Za długi, skomplikowany i pokracznie napisany opis”), a teksty zakładki zwracają się do gracza („Twoja gildia”).
+9. **Test ligi** (tylko wersja testowa): „Rozegraj wieczór” rozgrywa od razu następny wieczór całej ligi, a po ostatnim meczu od razu kończy ligę; „Losuj ligę od nowa” losuje ją od dziś.
+10. **Testy na własnym zegarze.** Zapytania testów mogą podać chwilę w nagłówku `X-Test-Now`, ale tylko tam, gdzie test włączy `TEST_CLOCK`; w grze i na wersji testowej go nie ma. Testy ligi nie zależą więc od dnia, w którym idą (zob. wersja 0.3.72).
+
 ## Maski odcieni skóry w 71 portretach (995; 16.11.2026, od 0.3.72)
 
 Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skóry” (15.11.2026), po jasnym pasku czoła Strzelca Wyborowego na ciemnym odcieniu.
@@ -3522,6 +3579,14 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 3. **Kontur.** W 5 portretach startowych ciemny, ciepły kontur przy nowej skórze rąk i stóp dostaje, jak reszta konturu, ciemny odcień wybranej skóry (26 pikseli).
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
+
+## Wersja 0.3.73 (16.11.2026): liga wojen gildii, pakiety kart z aktywności, ranni towarzysze
+
+- Wojny gildii to liga każda gildia z każdą (zob. „Liga wojen gildii (996; 16.11.2026)”, makiety 996 v3 przyjęte): migracja `0140_guild_league.sql` zeruje wojny wylosowane w nocy, a pierwsze uruchomienie losuje ligę tego tygodnia od dzisiejszego wieczoru.
+- Pakiety kart z wypraw i innych aktywności oraz drugi pakiet u Szczęsnego za 3 razy tyle (zob. „Pakiety kart z aktywności i drugi pakiet u Szczęsnego (997; 16.11.2026)”, makiety 997.1–997.3 przyjęte; migracja `0141_card_packs.sql`).
+- Na ekranie Walki pole odpoczynku pokazuje rannych towarzyszy, którzy czekają, aż postać odpocznie do pełna HP (`woundedWaiting` w `src/server/hunts.js`). Gracz (poz. 51), 16.11.2026: „nie wiesz klikając kolejną wyprawę i idziesz sam bez nich”.
+- Na komputerze podpowiedź przy Punktach Czasu nie miga pod myszą: pasek odświeża ją tylko wtedy, gdy mysz nad nią nie stoi (`src/client/layout.js`).
+- Narzędzia: `tools/layout-check.cjs` ogląda zakładkę Wojna ligi z otwartymi częściami; test karty efektu z wyprawy ma postać w pełnym ekwipunku, bo bez niego bywało omdlenie.
 
 ## Wersja 0.3.72 (16.11.2026): maski skóry w 71 portretach
 

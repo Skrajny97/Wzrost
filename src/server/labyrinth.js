@@ -40,6 +40,7 @@ import {
   leaveMerchant,
   merchantPrices,
   newLabyrinth,
+  packDropText,
   reachableRooms,
   resetLabyrinth,
   resetPrice,
@@ -51,7 +52,7 @@ import {
 } from '../engine/index.js';
 import { say } from '../engine/text.js';
 import { atomically, sameVersion } from './atomic.js';
-import { cardCollection, cardsHere, cardSummary, cardUpserts, droppedCards, droppedEffect, effectChance, effectFoundLine, effectUpserts, maxedCards } from './cards.js';
+import { cardCollection, cardsHere, cardSummary, cardUpserts, droppedCards, droppedEffect, effectChance, effectFoundLine, effectUpserts, maxedCards, packGains, packViews } from './cards.js';
 import { characterView, coreOf, engineCharacter, equippedItems, loadPlayer, questsNow, requirePlayer, trophiesFor } from './characters.js';
 import { content } from './content.js';
 import { artifactData } from './core.js';
@@ -289,10 +290,14 @@ export async function enterLabyrinth(context) {
   // The cards the creatures left (903), each in a line of its own.
   const cardsWon = collection ? (hunt?.cards ?? []) : [];
   cardsWon.forEach((id, index) => lines.push(cardDropText(id, target.row * 3 + target.room + index, content())));
+  // And the packs of cards found instead of a card (drops.packShare), kept
+  // to be opened in the Salon's tab.
+  const packsWon = collection ? (hunt?.packs ?? 0) : 0;
+  for (let pack = 0; pack < packsWon; pack += 1) lines.push(packDropText(target.row * 3 + target.room + cardsWon.length + pack, content()));
   // A rare effect card from a guardian beaten (977.3 B), with its line.
   const effectWon = collection && type === 'guardian' && hunt?.labyrinth.won ? await droppedEffect(db, row.id, seed, effectChance('guardian')) : null;
   if (effectWon) lines.push(effectFoundLine(effectWon.view));
-  const cardsShown = [...(cardsWon.length > 0 ? droppedCards(cardsWon, collection) : []), ...(effectWon ? [effectWon.view] : [])];
+  const cardsShown = [...(cardsWon.length > 0 ? droppedCards(cardsWon, collection) : []), ...packViews(packsWon), ...(effectWon ? [effectWon.view] : [])];
   if (type === 'guardian' && hunt?.labyrinth.won) {
     lines.push(say(texts, 'levelCleared', 0, { level: labyrinthLevel(state.level, content()).name }));
     if (next.over === 'done') lines.push(say(texts, 'dayDone', 0));
@@ -384,6 +389,7 @@ export async function enterLabyrinth(context) {
     ...(artifact ? [db.prepare('INSERT INTO core_artifacts (character_id, data, created_at) VALUES (?, ?, ?)').bind(row.id, artifactData(artifact), now)] : []),
     // The cards the creatures left, a copy each (cards.js).
     ...cardUpserts(db, row.id, cardsWon, now),
+    ...packGains(db, row.id, packsWon),
     ...(effectWon ? effectUpserts(db, row.id, [effectWon.id], now) : []),
   ];
   // The report last, its id from its own statement.

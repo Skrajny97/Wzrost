@@ -104,6 +104,27 @@ const buildKey = (character) =>
     character.companionsKey ?? null,
   ]);
 
+// The companions who wait wounded and will not go along on an exploration
+// till the character has rested to full HP, under the rest's time (a
+// player, 16.11.2026: „nie wiesz klikając kolejną wyprawę i idziesz sam bez
+// nich”).
+function woundedLine(character) {
+  const companions = character.woundedCompanions?.companions ?? [];
+  if (companions.length === 0) return null;
+  const all = companions.map((one) => one.name);
+  const names = all.length === 1 ? all[0] : t('{first} i {last}', { first: all.slice(0, -1).join(', '), last: all.at(-1) });
+  const female = companions.every((one) => one.appearance === 'female');
+  const text =
+    companions.length === 1
+      ? female
+        ? t('{name} jest ranna i nie pójdzie z Tobą na wyprawę, dopóki nie odpoczniesz do pełna HP.', { name: names })
+        : t('{name} jest ranny i nie pójdzie z Tobą na wyprawę, dopóki nie odpoczniesz do pełna HP.', { name: names })
+      : female
+        ? t('{names} są ranne i nie pójdą z Tobą na wyprawę, dopóki nie odpoczniesz do pełna HP.', { names })
+        : t('{names} są ranni i nie pójdą z Tobą na wyprawę, dopóki nie odpoczniesz do pełna HP.', { names });
+  return h('p', { class: 'region-warning wounded-line' }, icon('heart', { size: 18 }), h('span', { text }));
+}
+
 // "bardzo krótka", "krótka"… for a length, from the content.
 const lengthName = (minutes) => (state.content.lengths.find((length) => length.upTo === undefined || minutes <= length.upTo) ?? {}).name ?? '';
 
@@ -1555,7 +1576,7 @@ export function mountCombat(container, { params, navigate }) {
     const left = (now) => ((character.maxHp - currentHp(state.character, now)) / Math.max(1e-9, restRate(state.character))) * 60000;
     const control = skipControl('rest', left, t('Odpoczynek'));
     const text = h('p', { class: 'rest-skip-text' });
-    const panel = h('div', { class: 'rest-skip', 'aria-live': 'off' }, text, control.element);
+    const panel = h('div', { class: 'rest-skip', 'aria-live': 'off' }, text, woundedLine(character), control.element);
     const update = (now = serverNow()) => {
       control.update(now);
       panel.hidden = control.element.hidden;

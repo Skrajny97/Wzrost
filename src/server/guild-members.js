@@ -33,7 +33,7 @@
 // together under the members of "Od początku". Only the guild's members of
 // now are ranked.
 
-import { WAR_DAYS, countedForm, questPeriod } from '../engine/index.js';
+import { countedForm, questPeriod } from '../engine/index.js';
 import { content } from './content.js';
 import { nameColorOf } from './cosmetics.js';
 import { guildWarsOn } from './features.js';
@@ -62,7 +62,7 @@ function weeksAround(now) {
 // guild, of every guild or only of `guildId`'s, with its binds. Statements
 // of their own: D1 takes no more than 5 terms of a compound SELECT.
 export function memberFame(week, guildId = null) {
-  const { beast, expedition, trials, requests, exchange, war } = rules();
+  const { beast, expedition, trials, requests, exchange } = rules();
   const only = (column) => (guildId === null ? '' : ` AND ${column} = ?`);
   const guild = guildId === null ? [] : [guildId];
   return [
@@ -116,29 +116,32 @@ export function memberFame(week, guildId = null) {
             WHERE o.state = 'taken' AND o.closed_at >= ? AND o.closed_at < ?${only('o.guild_id')} GROUP BY o.guild_id, o.taker_id`,
       binds: [exchange.cap, exchange.perExchange, week.startsAt, week.endsAt, ...guild],
     },
-    // A war won: its points split evenly among the guild's fighters of it,
-    // those of its battles on its side (a character removed since among
-    // them, its share no one's).
+    // The Sława of a place in the week's league of the wars: split evenly
+    // among the guild's fighters of its matches, those of their battles on
+    // its side (a character removed since among them, its share no one's).
     {
       part: 'war',
-      sql: `SELECT f.guild_id, f.character_id, CAST(? / f.fighters AS INTEGER) AS points
-            FROM (SELECT war_id, guild_id, character_id, since, COUNT(*) OVER (PARTITION BY war_id) AS fighters
-                  FROM (SELECT DISTINCT w.id AS war_id, CASE w.result WHEN 'a' THEN w.guild_a ELSE w.guild_b END AS guild_id,
-                               json_extract(j.value, '$.id') AS character_id, json_extract(j.value, '$.since') AS since
-                        FROM guild_wars w JOIN guild_war_battles b ON b.war_id = w.id JOIN json_each(b.fighters, '$.' || w.result) j
-                        WHERE w.week = ? AND w.result IN ('a', 'b') AND json_extract(j.value, '$.id') IS NOT NULL)) f
+      sql: `SELECT f.guild_id, f.character_id, CAST(f.fame / f.fighters AS INTEGER) AS points
+            FROM (SELECT guild_id, character_id, since, fame, COUNT(*) OVER (PARTITION BY guild_id) AS fighters
+                  FROM (SELECT DISTINCT p.guild_id, p.fame, json_extract(j.value, '$.id') AS character_id, json_extract(j.value, '$.since') AS since
+                        FROM guild_league_places p
+                        JOIN guild_wars w ON w.week = p.week AND (w.guild_a = p.guild_id OR w.guild_b = p.guild_id)
+                        JOIN guild_war_battles b ON b.war_id = w.id
+                        JOIN json_each(b.fighters, CASE WHEN w.guild_a = p.guild_id THEN '$.a' ELSE '$.b' END) j
+                        WHERE p.week = ? AND p.fame > 0 AND json_extract(j.value, '$.id') IS NOT NULL)) f
               JOIN characters c ON c.id = f.character_id AND c.created_at = COALESCE(f.since, c.created_at)
-            WHERE f.guild_id IS NOT NULL${only('f.guild_id')}`,
-      binds: [war.won, week.key, ...guild],
+            WHERE 1 = 1${only('f.guild_id')}`,
+      binds: [week.key, ...guild],
     },
   ];
 }
 
-// The condition, with its binds, that a week's guild wars are all over,
-// where the wars are on (a war still being fought would lose its Sława).
+// The condition, with its binds, that a week's league of the wars has
+// ended, where the wars are on (a match still being fought would lose its
+// Sława).
 function warsOver(week) {
   if (!guildWarsOn()) return { sql: '', binds: [] };
-  return { sql: ' AND NOT EXISTS (SELECT 1 FROM guild_wars WHERE week = ? AND days_done < ?)', binds: [week.key, WAR_DAYS] };
+  return { sql: ' AND NOT EXISTS (SELECT 1 FROM guild_war_weeks WHERE week = ? AND ended_at IS NULL)', binds: [week.key] };
 }
 
 // The statements that write the members' Sława of `week` (one gone) for
@@ -211,7 +214,9 @@ export function fameNumbers() {
     giftCap: requests.cap,
     perExchange: points(exchange.perExchange),
     exchangeCap: exchange.cap,
-    warWon: points(war.won),
+    warFirst: points(war.places[0]),
+    warSecond: points(war.places[1]),
+    warThird: points(war.places[2]),
   };
 }
 

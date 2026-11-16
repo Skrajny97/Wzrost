@@ -30,7 +30,7 @@ import {
 } from '../engine/index.js';
 import { content } from './content.js';
 import { characterView, craftingState, currentHp, loadPlayer, questsNow, requirePlayer, requireWorker, walletOf, workOf } from './characters.js';
-import { cardSummary, cardUpserts, workCard } from './cards.js';
+import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
@@ -289,6 +289,7 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
       ...made.map((item) => store.bind(row.id, JSON.stringify(item), now)),
       // The card the work left, a copy (cards.js).
       ...cardUpserts(db, row.id, card?.ids ?? [], now),
+      ...packGains(db, row.id, card?.packs ?? 0),
       end,
     ]);
   } catch (error) {

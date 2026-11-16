@@ -20,8 +20,10 @@ import {
   cardRarity,
   cardsUpTo,
   createRng,
+  dropKind,
   labyrinthFight,
   lowerLandCards,
+  PACK,
   packCards,
   packOdds,
   newLabyrinth,
@@ -46,8 +48,9 @@ function fakeRng(...values) {
     },
   };
 }
-// The game's data with other chances of the cards.
-const withDrops = (drops) => ({ ...content, cards: { ...rules, drops: { ...rules.drops, ...drops } } });
+// The game's data with other chances of the cards (no packs unless asked:
+// these tests are of the cards).
+const withDrops = (drops) => ({ ...content, cards: { ...rules, drops: { ...rules.drops, packShare: 0, ...drops } } });
 
 describe('Talia Systemu: the pickers of the cards from more sources (902 B, 903)', () => {
   test('the lands below a place: only cards of lower lands, none below the first', () => {
@@ -121,6 +124,16 @@ describe('Talia Systemu: the pickers of the cards from more sources (902 B, 903)
     const none = fakeRng(0, 0);
     assert.equal(cardFrom(pool, none, { chance: 1, maxed: pool }), null);
     assert.equal(none.drawn, 2);
+    // With the data, the lowest share of the chance (drops.packShare) brings
+    // a pack of cards instead (16.11.2026), still in two draws; without it
+    // (a resident's table) never.
+    const share = rules.drops.packShare;
+    const low = fakeRng(0.01 * share * 0.5, 0.9);
+    assert.equal(cardFrom(pool, low, { chance: 0.01, owned: [] }, content), PACK);
+    assert.equal(low.drawn, 2);
+    assert.equal(cardFrom(pool, fakeRng(0.01 * share * 0.5, 0.9), { chance: 0.01, owned: [] }), 'badger');
+    assert.equal(cardFrom(pool, fakeRng(0.01 * share * 2, 0.9), { chance: 0.01, owned: [] }, content), 'badger');
+    assert.deepEqual([dropKind(0.009, 0.1, content), dropKind(0.04, 0.1, content), dropKind(0.2, 0.1, content), dropKind(0.009, 0.1)], ['pack', 'card', null, 'card']);
   });
 
   test('a profession\'s work: 1% for each hour it lasted, at most 10%', () => {
@@ -274,6 +287,14 @@ describe('Talia Systemu: the creatures beaten in the Labirynt leave their cards 
     // The same day's seed and room, the same draws.
     const odds = (seed) => fight({ data: content, seed, row: 0, room: 1 }).cards;
     assert.deepEqual(odds('jeden'), odds('jeden'));
+  });
+
+  test('with every drop a pack, the creatures beaten leave packs of cards instead, counted apart from the cards', () => {
+    const packs = fight({ data: withDrops({ ordinary: 1, elite: 1, champion: 1, guardian: 1, packShare: 1 }) });
+    assert.deepEqual(packs.cards, []);
+    assert.equal(packs.packs, packs.fights[0].enemies.length);
+    assert.equal(packs.fights[0].packs, packs.packs);
+    assert.equal(fight().packs, undefined);
   });
 
   test('the guardian leaves its card by the guardians\' chance; a lost fight leaves none', () => {

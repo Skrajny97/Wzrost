@@ -1,22 +1,25 @@
 // @ts-check
 // The guild wars (data/guilds.json, war; src/server/guild-wars.js; DECISIONS.md,
-// "Wojny gildii: odpowiedzi autora 792–800" and "Wojny gildii na wersji
-// testowej"). The author: „chcemy też powoli budować wojny gildii”, teams of
-// five on five, „jeśli jest pełna gildia to 6 takich drużyn, a jeśli mniej
-// to mniej i częściej muszą walczyć”. A war lasts a week, Monday to Sunday,
-// with battles every evening at battleHour on the Polish clock (794 A),
-// against a guild of a similar number of members drawn at random (797 B).
-// A guild has a team for each full five of its members, at most maxTeams,
-// and one with fewer than five (12); the members in no team are its
-// reserve, which takes the free places before a battle, and a team still
-// short of people fights so (800 C). An evening has as many battles as the
-// bigger guild has teams, the smaller one's teams fighting in turn, a few
-// times each (795 B). A battle is five on five, the characters as they are
-// saved, as at the Arena, without companions or mercenaries; the side with
-// someone still standing wins (798 A). The guild that won more battles by
-// Sunday wins the war, its Sława and a war chest; every character that
-// fought gets gold and Punkty Systemu for each battle won (799 A). Pure:
-// the seed and the time are the server's.
+// "Wojny gildii: odpowiedzi autora 792–800", "Wojny gildii na wersji
+// testowej" and "Liga wojen gildii"). Since 16.11.2026 a league (the
+// author: „niech każda gildia walczy z każdą”, „drużyny niech losuje samo”,
+// „w formułach 1v1 i 3v3, gdzie drużyny dobierane są automatycznie i walczy
+// każdy z każdym”, „walkower jak brakuje członków do obsadzenia wszystkich
+// drużyn liczony jako porażka”, „Liczony łączny bilans wygranych i porażek
+// (w tym walkowerów)”): a week, Monday to Sunday, with an evening's matches
+// at battleHour on the Polish clock (794 A); every guild meets every other
+// one once, in rounds drawn at random, whatever its number of members, and
+// with an odd number of guilds one has each round's evening free (the
+// author, 16.11.2026: „żadnych lustrzanych gildii”, „każda z każdą gildią
+// 1v1 i 3v3 i tyle”). In a match every member of one
+// guild duels every member of the other (1v1), and every trio of one, drawn
+// by the game, fights every trio of the other (3v3); a trio the guild has
+// too few members to fill loses its fights by walkover. A fight is as at
+// the Arena, the characters as they are saved, without companions or
+// mercenaries; the side with someone still standing wins (798 A). The
+// week's table counts the fights won and lost, walkovers too; its best
+// places on Sunday bring Sława and war chests, and every fight won brings
+// its fighters gold (799 A). Pure: the seed and the time are the server's.
 
 import { simulateFight } from './combat.js';
 import { combatantView } from './combatant.js';
@@ -42,8 +45,9 @@ export const WAR_DAYS = 7;
  */
 export const warRules = (content) => content.guilds?.war ?? null;
 
-// How many teams a guild of `members` has (12): one for each full five,
-// at most maxTeams, and one for a guild of fewer than five.
+// How many trios a guild of `members` has for the 3v3 (teamSize each): as
+// many as it takes for every member, at most maxTeams; the last one short
+// of members when they do not divide by teamSize.
 /**
  * @param {number} members
  * @param {Content} content
@@ -51,10 +55,11 @@ export const warRules = (content) => content.guilds?.war ?? null;
  */
 export function warTeams(members, content) {
   const { teamSize, maxTeams } = warRules(content);
-  return Math.max(1, Math.min(maxTeams, Math.floor(members / teamSize)));
+  return Math.max(1, Math.min(maxTeams, Math.ceil(members / teamSize)));
 }
 
-// The members a guild needs for its next team, or null at maxTeams.
+// The members a guild needs for its last trio to be full, or null when it is
+// (or the guild is).
 /**
  * @param {number} members
  * @param {Content} content
@@ -62,8 +67,8 @@ export function warTeams(members, content) {
  */
 export function nextTeamAt(members, content) {
   const { teamSize, maxTeams } = warRules(content);
-  const teams = warTeams(members, content);
-  return teams >= maxTeams ? null : (teams + 1) * teamSize;
+  if (members % teamSize === 0 || members >= teamSize * maxTeams) return null;
+  return Math.ceil(members / teamSize) * teamSize;
 }
 
 // The week of the wars around `now`: its key (its Monday, as the weekly
@@ -94,124 +99,190 @@ export function warWeek(now, content) {
  */
 export const warDaysDue = (week, now) => week.battles.filter((at) => at <= now).length;
 
-// A guild's teams (12): `members`, the ids of its members in the order they
-// joined, and `slots`, the places they took ({ characterId, team, slot }).
-// `count` teams (warTeams); `assigned`, each team's members in its places,
-// by place; `reserve`, the members in none, also those in a team the guild
-// has no more, in their order; `lineups`, the teams as they fight now, the
-// reserve taking their free places in its order, team by team; `bench`, the
-// reserve left over.
+// A guild's trios for an evening's 3v3, drawn by the game (the author,
+// 16.11.2026: „drużyny niech losuje samo”): `members`, the ids of its
+// members, in an order the seed shuffles, teamSize to a trio; `count`
+// trios (warTeams), the last one short of members when they do not divide;
+// `lineups`, the trios, each by place; `bench`, members beyond the last
+// trio (none in a guild of at most teamSize × maxTeams). The same members
+// and seed, the same trios.
 /**
- * @param {{ members: number[], slots: { characterId: number, team: number, slot: number }[] }} guild
- * @param {Content} content
- * @returns {{ count: number, assigned: number[][], reserve: number[], lineups: number[][], bench: number[] }}
- */
-export function warLineups({ members, slots }, content) {
-  const { teamSize } = warRules(content);
-  const count = warTeams(members.length, content);
-  const inGuild = new Set(members);
-  /** @type {number[][]} */
-  const assigned = Array.from({ length: count }, () => []);
-  /** @type {Set<number>} */
-  const placed = new Set();
-  const ordered = [...slots].sort((a, b) => a.team - b.team || a.slot - b.slot);
-  for (const one of ordered) {
-    if (one.team < 1 || one.team > count || !inGuild.has(one.characterId) || placed.has(one.characterId)) continue;
-    if (assigned[one.team - 1].length >= teamSize) continue;
-    assigned[one.team - 1].push(one.characterId);
-    placed.add(one.characterId);
-  }
-  const reserve = members.filter((id) => !placed.has(id));
-  const waiting = [...reserve];
-  const lineups = assigned.map((team) => {
-    const lineup = [...team];
-    while (lineup.length < teamSize && waiting.length > 0) lineup.push(/** @type {number} */ (waiting.shift()));
-    return lineup;
-  });
-  return { count, assigned, reserve, lineups, bench: waiting };
-}
-
-// An evening's battles (795 B): as many as the bigger of the two guilds has
-// teams, team by team; the smaller one's teams fight in turn, a few times
-// each (2 teams against 4: I–I, II–II, I–III, II–IV). `a` and `b` are the
-// teams (from 1) of the two guilds in each.
-/**
- * @param {number} teamsA
- * @param {number} teamsB
- * @returns {{ number: number, a: number, b: number }[]}
- */
-export function warPairings(teamsA, teamsB) {
-  if (teamsA < 1 || teamsB < 1) return [];
-  return Array.from({ length: Math.max(teamsA, teamsB) }, (_, number) => ({ number, a: (number % teamsA) + 1, b: (number % teamsB) + 1 }));
-}
-
-// How many times each team of a guild of `own` teams fights in an evening
-// against one of `other` teams (warPairings).
-/**
- * @param {number} own
- * @param {number} other
- * @returns {number[]}
- */
-export function teamFights(own, other) {
-  const fights = Array.from({ length: own }, () => 0);
-  for (const pairing of warPairings(own, other)) fights[pairing.a - 1] += 1;
-  return fights;
-}
-
-// Whether two guilds ({ members, users }: their number of members and the
-// accounts that play in them) may be drawn for a war (797 B): of a similar
-// size, the smaller with at least match.minShare of the bigger's members,
-// and with no account playing in both, so no player fights himself.
-/** @typedef {{ id: number, members: number, users: number[] }} WarGuild A guild as the draw of the wars sees it. */
-/**
- * @param {WarGuild} a
- * @param {WarGuild} b
- * @param {Content} content
- * @returns {boolean}
- */
-export function warRivals(a, b, content) {
-  const { minShare } = warRules(content).match;
-  const small = Math.min(a.members, b.members);
-  const big = Math.max(a.members, b.members);
-  if (small < 1 || small < big * minShare) return false;
-  const users = new Set(a.users);
-  return !b.users.some((user) => users.has(user));
-}
-
-// The wars of a week (797 B): pairs of the `guilds` ({ id, members, users },
-// warRivals), drawn with `seed`. The guilds come in an order the seed
-// shuffles; each time, the guild with the fewest rivals left (the first such
-// in that order) gets one of them at random, so as many guilds as can be
-// get a war. A guild left without a rival has no war that week (12).
-/**
- * @template {WarGuild} G
- * @param {G[]} guilds
+ * @param {number[]} members
  * @param {string | number} seed
  * @param {Content} content
- * @returns {[G, G][]}
+ * @returns {{ count: number, lineups: number[][], bench: number[] }}
  */
-export function drawWars(guilds, seed, content) {
-  const rng = createRng(`guild-wars:${seed}`);
-  let left = [...guilds].sort((a, b) => a.id - b.id);
-  for (let index = left.length - 1; index > 0; index--) {
+export function warDrawnTeams(members, seed, content) {
+  const { teamSize } = warRules(content);
+  const count = members.length === 0 ? 0 : warTeams(members.length, content);
+  const rng = createRng(`guild-war-teams:${seed}`);
+  const order = [...members].sort((a, b) => a - b);
+  for (let index = order.length - 1; index > 0; index--) {
     const other = rng.int(0, index);
-    [left[index], left[other]] = [left[other], left[index]];
+    [order[index], order[other]] = [order[other], order[index]];
   }
-  /** @type {[G, G][]} */
-  const pairs = [];
-  while (left.length > 1) {
-    const options = left.map((guild) => left.filter((other) => other !== guild && warRivals(guild, other, content)));
-    let pick = -1;
-    for (let index = 0; index < left.length; index++) {
-      if (options[index].length > 0 && (pick < 0 || options[index].length < options[pick].length)) pick = index;
+  const lineups = Array.from({ length: count }, (_, team) => order.slice(team * teamSize, (team + 1) * teamSize));
+  return { count, lineups, bench: order.slice(count * teamSize) };
+}
+
+// The rounds of a league of `count` guilds, each meeting every other once
+// (the circle method): `count` - 1 rounds, or `count` when it is odd, each
+// a list of pairs of the guilds' places (from 0); in a league of an odd
+// count, the place `count` is nobody's, and the guild drawn with it has
+// the round free.
+/**
+ * @param {number} count
+ * @returns {[number, number][][]}
+ */
+export function leagueRounds(count) {
+  if (count < 1) return [];
+  const places = count % 2 === 0 ? count : count + 1;
+  const order = Array.from({ length: places }, (_, index) => index);
+  /** @type {[number, number][][]} */
+  const rounds = [];
+  for (let round = 0; round < places - 1; round++) {
+    rounds.push(Array.from({ length: places / 2 }, (_, index) => /** @type {[number, number]} */ ([order[index], order[places - 1 - index]])));
+    // Every place but the first moves one on.
+    order.splice(1, 0, /** @type {number} */ (order.pop()));
+  }
+  return rounds;
+}
+
+// The matches of a week's league (the author, 16.11.2026: „niech każda
+// gildia walczy z każdą”, „każda z każdą gildią 1v1 i 3v3 i tyle”): the
+// guilds (`ids`) in an order the seed shuffles, every one meeting every
+// other once, their rounds (leagueRounds) a round an evening from
+// `firstDay`; with more rounds than evenings, the rounds left go to the
+// evenings again from the first. A guild with no rival in a round has that
+// evening free: no match. A match: its evening (`day`, 0 Monday … 6
+// Sunday), its round of the week (from 0) and its guilds. `order`, the
+// guilds in the drawn order, as the table breaks its last ties.
+/**
+ * @param {number[]} ids
+ * @param {string | number} seed
+ * @param {number} firstDay
+ * @returns {{ order: number[], matches: { day: number, round: number, a: number, b: number }[] }}
+ */
+export function leagueSchedule(ids, seed, firstDay) {
+  const rng = createRng(`guild-league:${seed}`);
+  const order = [...ids].sort((a, b) => a - b);
+  for (let index = order.length - 1; index > 0; index--) {
+    const other = rng.int(0, index);
+    [order[index], order[other]] = [order[other], order[index]];
+  }
+  const rounds = leagueRounds(order.length);
+  const evenings = Math.max(0, WAR_DAYS - firstDay);
+  /** @type {{ day: number, round: number, a: number, b: number }[]} */
+  const matches = [];
+  if (evenings === 0) return { order, matches };
+  rounds.forEach((pairs, round) => {
+    const day = firstDay + (round % evenings);
+    for (const [a, b] of pairs) {
+      // The place no guild has: its rival's evening is free.
+      if (order[a] === undefined || order[b] === undefined) continue;
+      matches.push({ day, round, a: order[a], b: order[b] });
     }
-    if (pick < 0) break;
-    const guild = left[pick];
-    const rival = options[pick][rng.int(0, options[pick].length - 1)];
-    pairs.push([guild, rival]);
-    left = left.filter((one) => one !== guild && one !== rival);
+  });
+  matches.sort((x, y) => x.day - y.day || x.round - y.round);
+  return { order, matches };
+}
+
+// The week's table of a league (the author: „Liczony łączny bilans
+// wygranych i porażek (w tym walkowerów)”): each guild of `order` (the drawn
+// order) with its matches played (`matches`: { a, b, winsA, winsB,
+// lossesA, lossesB, result }, those fought), won, drawn and lost, and its
+// fights won and lost in them, walkovers too; the best first: by the
+// balance of the fights, then by the fights won, then in the drawn order.
+// A void match counts for nobody.
+/** @typedef {{ id: number, place: number, played: number, won: number, drawn: number, lost: number, fightsWon: number, fightsLost: number, balance: number }} LeagueRow A guild's row in the table. */
+/**
+ * @param {number[]} order
+ * @param {{ a: number, b: number, winsA: number, winsB: number, lossesA: number, lossesB: number, result: string | null }[]} matches
+ * @returns {LeagueRow[]}
+ */
+export function leagueTable(order, matches) {
+  /** @type {Map<number, LeagueRow>} */
+  const rows = new Map(order.map((id) => [id, { id, place: 0, played: 0, won: 0, drawn: 0, lost: 0, fightsWon: 0, fightsLost: 0, balance: 0 }]));
+  /**
+   * @param {number} id
+   * @param {number} won
+   * @param {number} lost
+   * @param {'win' | 'loss' | 'draw'} outcome
+   */
+  const count = (id, won, lost, outcome) => {
+    const row = rows.get(id);
+    if (!row) return;
+    row.played += 1;
+    row.fightsWon += won;
+    row.fightsLost += lost;
+    row.balance = row.fightsWon - row.fightsLost;
+    if (outcome === 'win') row.won += 1;
+    else if (outcome === 'loss') row.lost += 1;
+    else row.drawn += 1;
+  };
+  for (const match of matches) {
+    // A match not fought yet, or void (one side had nobody to fight for
+    // it), counts for neither guild.
+    if (match.result !== 'a' && match.result !== 'b' && match.result !== 'draw') continue;
+    count(match.a, match.winsA, match.lossesA, match.result === 'a' ? 'win' : match.result === 'b' ? 'loss' : 'draw');
+    count(match.b, match.winsB, match.lossesB, match.result === 'b' ? 'win' : match.result === 'a' ? 'loss' : 'draw');
   }
-  return pairs;
+  const position = new Map(order.map((id, index) => [id, index]));
+  const table = [...rows.values()].sort(
+    (x, y) => y.balance - x.balance || y.fightsWon - x.fightsWon || /** @type {number} */ (position.get(x.id)) - /** @type {number} */ (position.get(y.id)),
+  );
+  table.forEach((row, index) => {
+    row.place = index + 1;
+  });
+  return table;
+}
+
+// What the best places of a finished league bring (league.prizes, the
+// Sława of fame.war.places): for each place with a prize, while the league
+// had at least the prize's `least` guilds, its guild, Sława and the number
+// of the items of its war chest.
+/**
+ * @param {LeagueRow[]} table
+ * @param {Content} content
+ * @returns {{ id: number, place: number, fame: number, items: number }[]}
+ */
+export function leaguePrizes(table, content) {
+  const { league } = warRules(content);
+  const fame = content.guilds.fame.war.places;
+  return league.prizes.flatMap((/** @type {{ least: number, items: number }} */ prize, /** @type {number} */ index) => {
+    const row = table[index];
+    if (!row || table.length < prize.least) return [];
+    return [{ id: row.id, place: row.place, fame: fame[index] ?? 0, items: prize.items }];
+  });
+}
+
+// A match's fights (the author: „walczy każdy z każdym”, „walkower jak
+// brakuje członków do obsadzenia wszystkich drużyn liczony jako porażka”):
+// in the 1v1 every one of `duelsA` against every one of `duelsB`, and in the
+// 3v3 every trio of `triosA` against every trio of `triosB`; a trio short of
+// members (fewer than teamSize) does not fight but loses by walkover, both
+// such trios both losing. Each fight: its format, the places of its sides
+// in their lists (from 0) and, for a walkover, who loses it ('a', 'b' or
+// 'both').
+/** @typedef {{ format: '1v1' | '3v3', a: number, b: number, walkover: 'a' | 'b' | 'both' | null }} MatchFight A fight of a match. */
+/**
+ * @param {{ duelsA: number, duelsB: number, triosA: number[][], triosB: number[][] }} sides
+ * @param {Content} content
+ * @returns {MatchFight[]}
+ */
+export function matchFights({ duelsA, duelsB, triosA, triosB }, content) {
+  const { teamSize } = warRules(content);
+  /** @type {MatchFight[]} */
+  const fights = [];
+  for (let a = 0; a < duelsA; a++) for (let b = 0; b < duelsB; b++) fights.push({ format: '1v1', a, b, walkover: null });
+  for (const [a, trioA] of triosA.entries()) {
+    for (const [b, trioB] of triosB.entries()) {
+      const shortA = trioA.length < teamSize;
+      const shortB = trioB.length < teamSize;
+      fights.push({ format: '3v3', a, b, walkover: shortA && shortB ? 'both' : shortA ? 'a' : shortB ? 'b' : null });
+    }
+  }
+  return fights;
 }
 
 // A battle (798 A): the fighters of two teams ({ character, equipped, name },
@@ -301,8 +372,7 @@ export function warReward(level, content) {
   return { gold: Math.round(gold.base + gold.perLevel * level), systemPoints };
 }
 
-// A war's result by the battles each side won by Sunday: 'a', 'b' or
-// 'draw', in which nobody wins it.
+// A result by the battles each side won: 'a', 'b' or 'draw', in which neither wins.
 /**
  * @param {number} winsA
  * @param {number} winsB
@@ -310,8 +380,8 @@ export function warReward(level, content) {
  */
 export const warResult = (winsA, winsB) => (winsA > winsB ? 'a' : winsB > winsA ? 'b' : 'draw');
 
-// The war chest of the guild that won (799 A), for its Skrzynia: chest.perTeam
-// items for each of its `teams`, each of the class, at the level and for the
+// A war chest for a guild's Skrzynia (799 A, a place in the league's
+// table): chest.perTeam items for each of `teams`, each of the class, at the level and for the
 // class level of one of the characters who fought for it in the war
 // (`fighters`: { classId, level, classLevel }), drawn in turn without one
 // twice while others are left, of a champion's rarity, as the Bestia's and
@@ -338,30 +408,4 @@ export function warChest({ fighters, teams, seed }, content) {
     items.push(randomItem(one.level, rng, content, /** @type {any} */ ({ classId: one.classId, maxClassLevel: one.classLevel, rarityId: championItemRarity(one.level, rng, content) })));
   }
   return items;
-}
-
-// The test version's mirror guild (DECISIONS.md, "Wojny gildii na wersji
-// testowej"): one of its teams fights as one team of the guild it is at war
-// with, its characters as they are saved, each under another name, one of
-// the Karczma's names of its look (settlement.companions.names) that no
-// fighter of the battle has (`taken`), drawn with `seed`.
-/**
- * @template {Fighter} F
- * @param {F[]} fighters
- * @param {string | number} seed
- * @param {string[]} taken
- * @param {Content} content
- * @returns {F[]}
- */
-export function mirrorTeam(fighters, seed, taken, content) {
-  const rng = createRng(`guild-war-mirror:${seed}`);
-  const used = new Set(taken);
-  return fighters.map((fighter) => {
-    /** @type {string[]} */
-    const pool = content.settlement.companions.names[fighter.character.appearance === 'female' ? 'female' : 'male'];
-    const free = pool.filter((name) => !used.has(name));
-    const name = free.length > 0 ? rng.pick(free) : `${fighter.name} II`;
-    used.add(name);
-    return { ...fighter, name };
-  });
 }

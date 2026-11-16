@@ -821,20 +821,18 @@ function checkPayments(data) {
   return errors;
 }
 
-// The guild wars (guilds.json, war; 792–800): the Gildia page has the
-// Wojna tab, last; a full guild holds all its teams (793 A: 30 members, 6
-// teams of 5); the pictures behind the war, under its battles and of the
-// banners are there; the mirror guild's tag is as a guild's.
+// The guild wars (guilds.json, war; 792–800 and the league of 16.11.2026):
+// the Gildia page has the Wojna tab, last; a full guild has a trio for
+// every member (30 members, 10 trios); the pictures behind the war, under
+// its battles and of the banners are there.
 function checkGuildWar(data) {
   const errors = [];
-  const { war, tabs, size, tag } = data.guilds;
+  const { war, tabs, size } = data.guilds;
   if (tabs.at(-1)?.id !== 'war') errors.push('guilds.json: Wojna (war) powinna być ostatnią zakładką strony Gildii');
   if (size > war.teamSize * war.maxTeams) errors.push(`guilds.json: gildia mieści ${size} członków, a drużyn jest najwyżej ${war.maxTeams} po ${war.teamSize}`);
   for (const [folder, id] of [['places', war.backdrop], ['boards', war.fightBoard], ['guild', war.banner]]) {
     if (!existsSync(new URL(`art/${folder}/${id}.png`, CLIENT_DIR))) errors.push(`guilds.json: wojny nie mają obrazka src/client/art/${folder}/${id}.png`);
   }
-  const mirror = [...war.mirror.tag].length;
-  if (mirror < tag.min || mirror > tag.max || !/^[\p{Lu}\p{N}]+$/u.test(war.mirror.tag)) errors.push(`guilds.json: skrót lustrzanej gildii "${war.mirror.tag}" nie jest skrótem gildii`);
   return errors;
 }
 

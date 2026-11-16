@@ -385,7 +385,7 @@ export async function attackGuildGuardian(context) {
         .bind(fight.damage, fight.damage, now, fight.damage, row.id, guardian.id),
       db.prepare('SELECT hp FROM guild_expedition_guardians WHERE id = ?').bind(guardian.id),
       // The card it left, a copy (cards.js).
-      ...(card ? cardGains(db, row, card.ids, now) : []),
+      ...(card ? cardGains(db, row, card.ids, now, card.packs) : []),
     ],
     () => new ApiError(409, 'raced', errors().raced),
   );
