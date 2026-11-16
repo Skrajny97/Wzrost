@@ -3518,7 +3518,8 @@ Gracz (poz. 51) na czacie, przy wojnach wylosowanych w nocy z 15 na 16.11: „pi
 - „drużyny niech losuje samo do wojen gildii nie trzeba ustalać składów też”;
 - „Niech te wojny gildii odbywają sie w formułach 1v1 i 3v3, gdzie drużyny dobierane są automatycznie i walczy każdy z każdym - dużo walk. Jeśli brakuje członków gildii to będzie walkowerem liczone. Liczony łączny bilans wygranych i porażek (w tym walkowerów)”;
 - „ważne zeby w wojnach gildii walczyła też każda druzyna z kazda lub wlasnie walkower jak brakuje czlonkow do obsadzenia wszystkich drużyn liczony jako porażka”;
-- przy makietach 996 v2 (odrzucone 996.1, 996.3 i 996.4): „Za długi, skomplikowany i pokracznie napisany opis. Nawet nie chce mi sie tego czytać. Więcej o zasadach i żadnych lustrzanych gildii. Po prostu każda z każdą”, „każda z każda gildią 1v1 i 3v3 i tyle”, „Żadnych lustrzanych gildii.”
+- przy makietach 996 v2 (odrzucone 996.1, 996.3 i 996.4): „Za długi, skomplikowany i pokracznie napisany opis. Nawet nie chce mi sie tego czytać. Więcej o zasadach i żadnych lustrzanych gildii. Po prostu każda z każdą”, „każda z każda gildią 1v1 i 3v3 i tyle”, „Żadnych lustrzanych gildii.”;
+- przy makietach 996 v3 (przyjęte 996.2–996.4): „„Gdy gildii jest nieparzysta ilość” zamiast tak jak napisałeś”, więc zasady i nowości mówią tak, jak napisał autor.
 
 W pytaniu autor wybrał „Liga: każdy z każdym” („Co wieczór o 20:00 każda gildia walczy z inną, aż zmierzy się z każdą”) i start w poniedziałek 16.11. Zmienia to 797 B (rywal o podobnej liczbie członków), 796 A (miejsca w drużynach zajmowane samemu), 795 B i 798 A (bitwy 5 na 5 drużyn po kolei), 12 (gildia bez rywala bez wojny) oraz wynik wojny i nagrody z 799 A.
 
