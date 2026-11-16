@@ -3580,6 +3580,10 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Do najbliższej wersji: opis wolnego wieczoru ligi
+
+Autor o zdaniu „Gdy gildii jest nieparzysta ilość, co wieczór jedna ma wolne.” z „Jak to działa?”: „jedna gildia ma wolne jak jest nieparzyście - to prawda czy błąd opisu?”. To prawda, ale opis pomijał wyjątek. Przy nieparzystej liczbie gildii w każdej rundzie jedna gildia nie ma rywala, a rund jest tyle, ile gildii, więc każda gildia ma wolne raz w tygodniu. Przy więcej niż 8 gildiach rund jest więcej niż wieczorów i niektóre wieczory mają po dwie rundy (`leagueSchedule`). Wtedy gildia wolna w jednej rundzie gra w drugiej. Nowe zdanie: „Gdy gildii jest nieparzysta ilość, w każdej rundzie jedna ma wolne, każda raz w tygodniu. Przy więcej niż 8 gildiach niektóre wieczory mają po dwa mecze.” (po polsku i po angielsku).
+
 ## Wersja 0.4.1 (16.11.2026): trójki ligi ustalane o północy (1037.1 A)
 
 Autor wybrał 1037.1 A: „trójki na dany wieczór losują się raz, o północy, i zostają. Kto odejdzie, zostawia w trójce puste miejsce, a kto dołączy w ciągu dnia, walczy tego wieczoru tylko w 1v1”. Dotąd gra losowała trójki w chwili walk z członków takich, jacy byli wtedy, więc każde dołączenie albo odejście losowało wszystkie trójki od nowa i trójki z zakładki potrafiły się różnić od tych, które walczyły.

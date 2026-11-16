@@ -655,7 +655,7 @@
       "noneNext": "W poniedziałek o północy gra ułoży terminarz nowej ligi, także dla Twojej gildii.",
       "noGuild": "Wojny toczą gildie. Dołącz do gildii albo załóż własną.",
       "how": [
-        "Co tydzień gildie grają ligę, każda z każdą. Od poniedziałku co wieczór o {hour} Twoja gildia gra mecz z kolejną gildią, aż zagra z każdą. Gdy gildii jest nieparzysta ilość, co wieczór jedna ma wolne.",
+        "Co tydzień gildie grają ligę, każda z każdą. Od poniedziałku co wieczór o {hour} Twoja gildia gra mecz z kolejną gildią, aż zagra z każdą. Gdy gildii jest nieparzysta ilość, w każdej rundzie jedna ma wolne, każda raz w tygodniu. Przy więcej niż 8 gildiach niektóre wieczory mają po dwa mecze.",
         "Mecz to walki 1v1 i 3v3: każdy członek Twojej gildii walczy z każdym członkiem gildii rywala, a każda trójka z każdą trójką rywala. Trójki losuje gra o północy, na cały dzień: kto dołączy w ciągu dnia, walczy tego wieczoru tylko w 1v1, a kto odejdzie, zostawia w trójce puste miejsce. Niepełna trójka przegrywa swoje walki walkowerem.",
         "Walczą postacie takie, jakie są zapisane, jak na Arenie, bez towarzyszy i najemników.",
         "Tabela liczy wygrane i przegrane walki z całego tygodnia, razem z walkowerami.",

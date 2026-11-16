@@ -550,7 +550,7 @@
       "noneNext": "On Monday at midnight the game draws the fixtures of a new league, for your guild too.",
       "noGuild": "Wars are fought by guilds. Join a guild or found your own.",
       "how": [
-        "Every week the guilds play a league, each against each. From Monday, every evening at {hour} your guild plays a match against the next guild until it has played them all. With an odd number of guilds, one has each evening off.",
+        "Every week the guilds play a league, each against each. From Monday, every evening at {hour} your guild plays a match against the next guild until it has played them all. With an odd number of guilds, one has each round off, each guild once a week. With more than 8 guilds, some evenings have two matches.",
         "A match is 1v1 and 3v3 fights: every member of your guild fights every member of the rival guild, and every trio fights every rival trio. The game draws the trios at midnight, for the whole day: one who joins during the day fights only the 1v1 that evening, and one who leaves leaves an empty place in the trio. A trio short of members loses its fights by walkover.",
         "Characters fight as they are saved, as in the Arena, without companions or mercenaries.",
         "The table counts the fights won and lost over the whole week, walkovers included.",
