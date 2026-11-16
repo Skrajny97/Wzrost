@@ -69,8 +69,18 @@ let offered = false;
 let streak = null;
 // After a failed ask, the next a minute later.
 let retryAt = 0;
+// Each character its own series: another character played, asked anew.
+let owner = null;
 export function offerStreak() {
-  if (!state.character || offered) return;
+  if (!state.character) return;
+  if (state.character.name !== owner) {
+    owner = state.character.name;
+    asked = false;
+    offered = false;
+    streak = null;
+    retryAt = 0;
+  }
+  if (offered) return;
   if (!asked) {
     if (Date.now() < retryAt) return;
     asked = true;

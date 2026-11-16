@@ -1,15 +1,14 @@
 // The reward for days in a row (1029, mock-ups 1034 accepted on 16.11.2026,
-// 1034.4 B; data/quests.json, streak): one series for the account, the
-// reward going to the character played, so that several characters do not
-// take it several times; the day counted from midnight Polish time, as the
-// daily quests'. Each day of the series once: the gold of its minutes of
+// 1034.4 B; data/quests.json, streak): each character its own series (the
+// author, 16.11.2026: „powinna działać na wszystkich postaciach”; in 0.4.2
+// one series for the account), the day counted from midnight Polish time,
+// as the daily quests'. Each day of the series once: the gold of its minutes of
 // exploring at the character's level, its Punkty Czasu, and on the last a
 // pack of cards and Punkty Systemu. A day missed starts the series anew from
 // its first day, and after the last a new one starts.
 
 import { explorationGold } from '../engine/mining.js';
 import { questPeriod } from '../engine/quests.js';
-import { assertion, raced, sameVersion } from './atomic.js';
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { ApiError, json } from './http.js';
@@ -43,7 +42,8 @@ export function streakState(account, now) {
   return { day: 1, taken: false, fresh: last !== null && last !== yesterday, key: today.key };
 }
 
-const streakOf = (db, userId) => db.prepare('SELECT streak_day, streak_at FROM users WHERE id = ?').bind(userId).first();
+// The series as the character's row keeps it.
+const streakOf = (row) => ({ streak_day: row.streak_day ?? 0, streak_at: row.streak_at ?? null });
 const viewOf = (account, level, now) => {
   const { day, taken, fresh } = streakState(account, now);
   return { day, taken, fresh, days: streakDays(level) };
@@ -51,35 +51,30 @@ const viewOf = (account, level, now) => {
 
 // GET /api/streak: the series for the window (daily-streak.js).
 export async function getStreak(context) {
-  const { session, player } = await requirePlayer(context);
-  return json({ streak: viewOf(await streakOf(context.env.DB, session.userId), player.row.level, context.now) });
+  const { player } = await requirePlayer(context);
+  return json({ streak: viewOf(streakOf(player.row), player.row.level, context.now) });
 }
 
-// POST /api/streak: today's reward, once, to the character played. In one
-// batch that holds only while the series and the character are as read
-// (two tabs at once give it once).
+// POST /api/streak: today's reward of the character played, once. In one
+// statement that holds only while the character is as read (two tabs at
+// once give it once).
 export async function takeStreak(context) {
   const { session, player } = await requirePlayer(context);
   const db = context.env.DB;
-  const account = await streakOf(db, session.userId);
-  const state = streakState(account, context.now);
+  const state = streakState(streakOf(player.row), context.now);
   if (state.taken) throw new ApiError(409, 'streak_taken', 'Nagroda dnia jest już odebrana. Wróć jutro.');
   const reward = streakDays(player.row.level)[state.day - 1];
   const done = state.day === rules().days.length ? 1 : 0;
   const row = player.row;
-  try {
-    await db.batch([
-      assertion(db, '(SELECT streak_at FROM users WHERE id = ?) IS ?', [session.userId, account.streak_at]),
-      sameVersion(db, row),
-      db.prepare('UPDATE users SET streak_day = ?, streak_at = ?, streak_done = streak_done + ? WHERE id = ?').bind(state.day, state.key, done, session.userId),
-      db
-        .prepare('UPDATE characters SET gold = gold + ?, time_points = time_points + ?, system_points = system_points + ?, card_packs = card_packs + ?, version = version + 1 WHERE id = ?')
-        .bind(reward.gold, reward.timePoints, reward.systemPoints, reward.packs, row.id),
-    ]);
-  } catch (error) {
-    if (raced(error)) throw new ApiError(409, 'streak_changed', 'Nagroda dnia zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
-    throw error;
-  }
+  const { meta } = await db
+    .prepare(
+      `UPDATE characters SET gold = gold + ?, time_points = time_points + ?, system_points = system_points + ?, card_packs = card_packs + ?,
+         streak_day = ?, streak_at = ?, streak_done = streak_done + ?, version = version + 1
+       WHERE id = ? AND version = ? AND streak_at IS ?`,
+    )
+    .bind(reward.gold, reward.timePoints, reward.systemPoints, reward.packs, state.day, state.key, done, row.id, row.version, row.streak_at ?? null)
+    .run();
+  if (meta.changes !== 1) throw new ApiError(409, 'streak_changed', 'Nagroda dnia zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
   const fresh = await loadPlayer(db, session.userId);
-  return json({ streak: viewOf(await streakOf(db, session.userId), fresh.row.level, context.now), reward, character: characterView(fresh, context.now) });
+  return json({ streak: viewOf(streakOf(fresh.row), fresh.row.level, context.now), reward, character: characterView(fresh, context.now) });
 }

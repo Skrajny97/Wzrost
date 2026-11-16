@@ -1220,6 +1220,11 @@
       "id": "0.4.3",
       "title": "Wersja 0.4.3",
       "body": "- „Samouczki” w Ustawieniach: objaśnienia narratora do przeczytania i odsłuchania w każdej chwili. Pod wieloma częściami jest „Objaśnij jeszcze raz”: narrator przejdzie je z Tobą od początku.\n- „Parametry dodatkowe” w Statystykach pokazują, ile dodaje Rdzeń."
+    },
+    {
+      "id": "0.4.4",
+      "title": "Wersja 0.4.4",
+      "body": "- Nagroda za kolejne dni gry: każda postać ma teraz własną serię i własną nagrodę dnia."
     }
   ]
 }

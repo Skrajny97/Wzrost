@@ -3580,6 +3580,14 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.4.4 (16.11.2026): seria dni dla każdej postaci
+
+Autor: „a jak te serie dni sie wybiera na ktorej postaci działa, powinna działac na wszystkich postaciach”. W 0.4.2 seria była jedna na konto, a nagrodę dostawała postać, którą się grało w chwili odbioru, więc inna postać widziała dzień jako odebrany.
+
+1. Każda postać ma własną serię (`characters.streak_day`, `streak_at`, `streak_done`, migracja 0151) i własne okno nagrody dnia. Po zmianie postaci okno pyta od nowa (`offerStreak`).
+2. Dotychczasową serię konta przejęła postać, którą grało się w chwili wdrożenia, czyli ta, która odbierała nagrody. Kolumny `users.streak_*` zostają nieużywane.
+3. Odbiór idzie jednym zapisem postaci, który działa tylko, gdy postać i jej seria są takie, jak je odczytano. Test w `test/daily-streak.test.js`.
+
 ## Wersja 0.4.3 (16.11.2026): Samouczki w Ustawieniach, Rdzeń w Parametrach dodatkowych
 
 1. **Rdzeń w „Parametrach dodatkowych”.** Autor: „statystyki z rdzenia nie sumują się w parametrach dodatkowych postaci”. Liczby okna już liczyły premie Rdzenia (pancerz, oceny uniku, krytyka i woli, szybkość, odporności i odzysk HP: `combatant.js`), ale rozpiska pod nimi go nie wymieniała, więc składniki nie dawały sumy. Teraz przy każdej takiej liczbie stoi „Rdzeń +X%”, a przy odzysku HP „Rdzeń +X pkt proc.” (`extraValues` w `src/engine/preview.js`, `src/client/screens/stats.js`; test w `test/engine.test.js`).
@@ -3596,7 +3604,7 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 
 1. **Nagroda za kolejne dni gry (1029, makiety 1034.1–1034.3 przyjęte, 1034.4 B).** Okno otwiera się samo przy pierwszym wejściu do gry w danym dniu, gdy na ekranie nie ma innego okna ani komunikatu, po wprowadzeniu narratora. Zamknięte bez odbioru wraca przy kolejnym wejściu tego dnia (`offerStreak` w `src/client/daily-streak.js`).
    - Siedem dni: złoto z 30, 45, 60, 75, 90 i 120 minut wyprawy na poziomie postaci (`explorationGold`, zaokrąglone do 5) oraz 10, 10, 15, 15, 20, 25 i 30 Punktów Czasu. 7. dnia zamiast złota pakiet kart i 5 Punktów Systemu (wariant B).
-   - Jedna seria na konto (`users.streak_day`, `streak_at`, migracja 0150), a nagroda trafia do postaci, którą się gra, żeby kilka postaci nie brało jej kilka razy. Dzień liczy się od północy czasu polskiego, jak zadania dzienne.
+   - Jedna seria na konto (`users.streak_day`, `streak_at`, migracja 0150), a nagroda trafia do postaci, którą się gra, żeby kilka postaci nie brało jej kilka razy. Od 0.4.4 każda postać ma własną serię. Dzień liczy się od północy czasu polskiego, jak zadania dzienne.
    - Opuszczony dzień zaczyna serię od 1. dnia, z komunikatem „Wczoraj zabrakło Cię w grze…”. Po 7. dniu zaczyna się nowa seria bez tego komunikatu. `users.streak_done` liczy ukończone serie, pod osiągnięcie „Wytrwałość” (1036).
    - Odbiór (`POST /api/streak`, `src/server/streak.js`) idzie jednym pakietem, który działa tylko, gdy seria i postać są takie, jak je odczytano, więc dwie karty naraz dostaną nagrodę raz. Liczby w `data/quests.json` (`streak`), test `test/daily-streak.test.js`.
 2. **Opis wolnego wieczoru ligi.** Autor o zdaniu „Gdy gildii jest nieparzysta ilość, co wieczór jedna ma wolne.” z „Jak to działa?”: „jedna gildia ma wolne jak jest nieparzyście - to prawda czy błąd opisu?”. To prawda, ale opis pomijał wyjątek. Przy nieparzystej liczbie gildii w każdej rundzie jedna gildia nie ma rywala, a rund jest tyle, ile gildii, więc każda gildia ma wolne raz w tygodniu. Przy więcej niż 8 gildiach rund jest więcej niż wieczorów i niektóre wieczory mają po dwie rundy (`leagueSchedule`). Wtedy gildia wolna w jednej rundzie gra w drugiej. Nowe zdanie: „Gdy gildii jest nieparzysta ilość, w każdej rundzie jedna ma wolne, każda raz w tygodniu. Przy więcej niż 8 gildiach niektóre wieczory mają po dwa mecze.” (po polsku i po angielsku).
