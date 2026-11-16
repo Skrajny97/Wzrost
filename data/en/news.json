@@ -900,6 +900,10 @@
     "0.3.84": {
       "title": "Version 0.3.84",
       "body": "- Fix: the top bar on a phone no longer twitches while a build's time counts down under the Camp's tent."
+    },
+    "0.3.85": {
+      "title": "Version 0.3.85",
+      "body": "- The Professions tab also counts down the System Avatar's work while your character itself is not working in a profession: on a phone in the bottom bar, on a computer in the menu on the left."
     }
   }
 }
