@@ -1911,5 +1911,94 @@
       "dawn-male-new": "young man cleric in the Vestments of Dawn, a handsome friendly face with big clear eyes, a big head like the reference face, short fair blond hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, layered white and gold vestments down to the ankles, a golden sash, holding a staff topped with a small golden sun in one hand and a small book in the other, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
       "dawn-female-new": "young woman cleric in the Vestments of Dawn, a beautiful gentle face with big clear eyes, a big head like the reference face, long straight fair blond hair, a thin golden circlet crown with small rays, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, layered white and gold vestments down to the ankles, a golden sash, holding a staff topped with a small golden sun, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy"
     }
+  },
+  "fish": {
+    "$comment": "Ryby Rybołówstwa (999, 16.11.2026; DECISIONS.md, „Nowe profesje: Rybołówstwo, Rolnictwo i Gotowanie”): ikony 32 × 32 w stylu ziół, po cztery wersje z Pro Flash, na stronę ocen przed wejściem do gry.",
+    "width": 32,
+    "height": 32,
+    "pixellab": {
+      "style": "src/client/art/herbs/st-johns-wort.png",
+      "tool": "flash"
+    },
+    "prompts": {
+      "roach": "a small silver roach fish with red eyes and reddish orange fins, side view, single inventory item icon",
+      "perch": "a green-gold perch fish with dark vertical stripes, a spiny dorsal fin and orange-red lower fins, side view, single inventory item icon",
+      "crucian": "a round deep-bodied golden bronze crucian carp fish, side view, single inventory item icon",
+      "bream": "a tall flat silvery-bronze bream fish with a small head and a slimy sheen, side view, single inventory item icon",
+      "tench": "a thick olive-green tench fish with a golden sheen, tiny scales, small red eyes and rounded fins, side view, single inventory item icon",
+      "carp": "a big golden-brown common carp fish with large shiny scales and short barbels by the mouth, side view, single inventory item icon",
+      "eel": "a long slimy dark olive eel coiled in an S shape, single inventory item icon",
+      "pike": "a long green pike fish with pale yellow spots and a long jaw full of sharp teeth, side view, single inventory item icon",
+      "zander": "a slender grey-green zander fish with dark bands, big glassy eyes and small fangs, side view, single inventory item icon",
+      "trout": "a brown trout fish with red and black spots ringed with pale halos, side view, single inventory item icon",
+      "catfish": "a huge dark wels catfish with a wide flat head and long whiskers, side view, single inventory item icon",
+      "sturgeon": "a grey sturgeon fish with rows of bony armour plates along its body and a long pointed snout, side view, single inventory item icon",
+      "salmon": "a silver salmon fish with a hooked jaw and a pink-red flush along its side, side view, single inventory item icon",
+      "golden-carp": "a carp fish covered with gleaming gold scales like coins, a few sparkles around it, side view, single inventory item icon",
+      "water-catfish": "a dark green catfish with glowing pale green eyes and green water weeds tangled on its long whiskers, side view, single inventory item icon",
+      "silverfish": "a slim fish of pure shining silver glowing softly with pale moonlight, side view, single inventory item icon",
+      "drowned-pike": "an old black pike fish with pale ghostly eyes, ragged fins and a faint cold blue glow, side view, single inventory item icon",
+      "golden-fish": "a small shining golden fish with long flowing veil-like golden fins and a tiny golden crown, a few sparkles around it, side view, single inventory item icon"
+    }
+  },
+  "crops": {
+    "$comment": "Plony Rolnictwa (999, 16.11.2026): ikony 32 × 32 w stylu ziół, po cztery wersje z Pro Flash, na stronę ocen przed wejściem do gry.",
+    "width": 32,
+    "height": 32,
+    "pixellab": {
+      "style": "src/client/art/herbs/st-johns-wort.png",
+      "tool": "flash"
+    },
+    "prompts": {
+      "turnip": "a turnip with a round white and purple root and a tuft of green leaves, single inventory item icon",
+      "peas": "two open green pea pods full of round green peas, single inventory item icon",
+      "millet": "a drooping bunch of golden millet seed heads tied with twine, single inventory item icon",
+      "oats": "a small sheaf of pale golden oat stalks with dangling oat grains, tied with twine, single inventory item icon",
+      "cabbage": "a round green head of cabbage with its outer leaves curling, single inventory item icon",
+      "onion": "a golden brown onion with papery skin and a short green sprout, single inventory item icon",
+      "carrot": "two orange carrots with feathery green tops, single inventory item icon",
+      "rye": "a sheaf of grey-green rye stalks with long bearded ears, tied with straw, single inventory item icon",
+      "broad-bean": "a fat green broad bean pod split open showing big pale green beans, single inventory item icon",
+      "beet": "a dark red beetroot with red-veined green leaves, single inventory item icon",
+      "wheat": "a sheaf of golden wheat ears tied with twine, single inventory item icon",
+      "buckwheat": "buckwheat stalks with small white-pink flowers and dark triangular seeds, single inventory item icon",
+      "pumpkin": "a big round orange pumpkin with a curly green stem, single inventory item icon",
+      "poppy": "a red poppy flower and two green poppy seed heads on stems, single inventory item icon",
+      "garlic": "a white garlic bulb with purple streaks and a few loose cloves, single inventory item icon",
+      "giant-turnip": "a huge round turnip with a big white and purple root and large green leaves, much bigger than a normal turnip, single inventory item icon",
+      "golden-ear": "a single glowing golden ear of grain with sparkles of warm light around it, single inventory item icon",
+      "mokosh-grain": "a small handful of glowing amber grains on a folded embroidered linen cloth, a faint green magical light, single inventory item icon"
+    }
+  },
+  "dishes": {
+    "$comment": "Potrawy Gotowania (999, 16.11.2026): ikony 32 × 32 w stylu ziół, po cztery wersje z Pro Flash, na stronę ocen przed wejściem do gry.",
+    "width": 32,
+    "height": 32,
+    "pixellab": {
+      "style": "src/client/art/herbs/st-johns-wort.png",
+      "tool": "flash"
+    },
+    "prompts": {
+      "baked-turnip": "a roasted turnip split open on a small wooden board, charred skin and a wisp of steam, single inventory item icon",
+      "pea-soup": "a wooden bowl of thick yellow-green pea soup with a wooden spoon, steam rising, single inventory item icon",
+      "fried-roach": "three small fried fish with golden crispy skin on a wooden plate, single inventory item icon",
+      "millet-crucian": "a clay bowl of golden millet porridge with a small fried golden fish on top, single inventory item icon",
+      "oat-kissel": "a clay bowl of thick smooth grey oat jelly pudding with a wooden spoon, single inventory item icon",
+      "fish-cabbage": "a clay pot of fish stewed under green cabbage leaves, steam rising, single inventory item icon",
+      "fried-carp": "a fried carp fillet with golden skin and onion rings on a wooden plate, single inventory item icon",
+      "zurek": "a round bread loaf hollowed into a bowl and filled with white sour rye soup, steam rising, single inventory item icon",
+      "eel-beans": "a piece of smoked eel and green broad beans on a wooden plate, single inventory item icon",
+      "borscht": "a clay bowl of clear ruby red beetroot soup, steam rising, single inventory item icon",
+      "pike-pierogi": "a plate of four half-moon dumplings with golden fried onion on top, single inventory item icon",
+      "buckwheat-zander": "a clay bowl of dark brown buckwheat groats with a piece of white fish fillet on top, single inventory item icon",
+      "campfire-trout": "a whole spotted trout roasted on a wooden stick, with a few carrot slices, single inventory item icon",
+      "pumpkin-soup": "a small hollowed pumpkin used as a bowl, filled with thick orange soup, single inventory item icon",
+      "fisherman-feast": "a large wooden platter with a big roasted catfish and a roasted sturgeon side by side, onions around them, single inventory item icon",
+      "kutia": "a clay bowl of wheat grains mixed with dark poppy seeds, single inventory item icon",
+      "garlic-salmon": "a pink roasted salmon fillet with garlic cloves on a wooden board, single inventory item icon",
+      "golden-carp-herbs": "a whole golden-scaled carp baked with yellow herb flowers on a silver platter, single inventory item icon",
+      "switez-soup": "a dark clay bowl of silvery fish soup glowing softly like moonlight, single inventory item icon",
+      "mokosh-feast": "a round golden loaf of bread and a small golden fish on an embroidered cloth, glowing amber grains around them, single inventory item icon"
+    }
   }
 }

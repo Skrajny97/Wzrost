@@ -3580,6 +3580,18 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.75 (16.11.2026): czat Drużyny, sortowanie talii i karty efektów pod „Wszystkie”
+
+Autor przyjął 1000.1–1000.3 na stronie ocen. W grze: zakładka czatu „Drużyna” dla członków drużyny, rząd „Sortuj:” przy układaniu talii i karty efektów do wybrania od razu pod „Wszystkie” (szczegóły niżej).
+
+## Czat Drużyny i sortowanie kart w talii (1000; 16.11.2026)
+
+Autor: „Stwórz też czat dla założonej Drużyny”, „dodaj też opcje sortowania kart przy układaniu talii”. Oba zrobione w kopii gry i pokazane na stronie ocen (1000.1–1000.3) przed wdrożeniem.
+
+1. **Czat Drużyny** (1000.1): zakładka czatu „Drużyna”, gdy postać jest w drużynie. To kanał `party:<id>` (`src/server/chat.js`): czytają go i piszą w nim tylko członkowie drużyny (inni dostają `no_party`). Nowa wiadomość kogoś innego zapala kropkę przy zakładce i przy okrągłym przycisku czatu, jak kanał gildii (znacznik `party` w `chat_seen`). Obowiązują zwykłe zasady czatu, zgłaszanie i decyzje moderacji. Nikt nie jest tam oznaczany („@”), bo w drużynie są najwyżej trzy osoby. Drużyna, która znika, zabiera wiadomości swojego czatu (`partyRemoval` w `src/server/parties.js`), poza zgłoszonymi i jeszcze nierozstrzygniętymi: te czekają na moderację. Numer drużyny nigdy nie wraca (AUTOINCREMENT), więc nowa drużyna nie widzi wiadomości dawnej.
+2. **Sortowanie kart** (1000.2): w „Ułóż talię” nad kolekcją jest rząd „Sortuj:” w wyglądzie plecaka: Typ (dotychczasowa kolejność: typ, rzadkość, poziom, nazwa), Rzadkość, Poziom, Atak, Życie i Nazwa. Przy równych wartościach decydują kolejne cechy, a na końcu nazwa. Wybór zostaje na urządzeniu (`localStorage`, klucz `insight-deck-sort`). Na telefonie sześć opcji stoi w dwóch rzędach po trzy, od 640 px szerokości w jednym rzędzie. Lista kart efektów nie ma tego rzędu.
+3. **Karty efektów od razu w „Wszystkie”** (1000.3; autor, 16.11.2026: „Niech karty efektów będą do wybrania jeśli są dostępne przy samym budowaniu talii, bo trzeba zaznaczać ich filtr by je dodać”): w „Ułóż talię” pod filtrem „Wszystkie” karty efektów postaci stoją nad kartami stworów, z licznikiem wybranych, i dodaje się je stuknięciem jak w zakładce „Karty efektów”. Gdy postać nie ma kart efektów albo talia nie ma na nie miejsc, ta część się nie pokazuje.
+
 ## Wersja 0.3.74 (16.11.2026): ogłoszenia gildii
 
 - Tablica ogłoszeń na górze zakładki Gildia i kanał „Dowództwo” w czacie dla lidera i zastępców (zob. „Ogłoszenia gildii: tablica i kanał Dowództwo (998; 16.11.2026)”, makiety 998.1 i 998.2 przyjęte). Bez migracji: oba są kanałami czatu gildii.

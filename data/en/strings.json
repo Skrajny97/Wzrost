@@ -3369,5 +3369,7 @@
   "Ogłoszenia piszą lider i zastępcy.": "The leader and the deputies write the announcements.",
   "Nie udało się wczytać ogłoszeń.": "The announcements could not be loaded.",
   "Kanał Dowództwo jest dla lidera i zastępców.": "The Command channel is for the leader and the deputies.",
-  "Kanał lidera i zastępców. Członkowie gildii go nie widzą.": "The channel of the leader and the deputies. The guild's members do not see it."
+  "Kanał lidera i zastępców. Członkowie gildii go nie widzą.": "The channel of the leader and the deputies. The guild's members do not see it.",
+  "Typ": "Type",
+  "Kolejność kart": "Card order"
 }

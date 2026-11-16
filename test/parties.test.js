@@ -320,6 +320,45 @@ describe('Drużyna through the API', () => {
     assert.equal((await (await db()).prepare('SELECT COUNT(*) AS count FROM parties').first()).count, 0);
   });
 
+  test('the party\'s chat: its members read and write it, nobody else, and it goes with the party but for a message reported', async () => {
+    await player('obcy', 'Obcy');
+    for (const login of ['lider', 'druh', 'obcy']) await as(login, 'POST', '/api/chat/rules');
+    // Out of a party there is no such channel.
+    assert.equal((await as('lider', 'GET', '/api/chat?channel=party')).data.error.code, 'no_party');
+    assert.equal((await as('lider', 'GET', '/api/chat/latest')).data.party, null);
+    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    const sent = await as('lider', 'POST', '/api/chat', { channel: 'party', text: 'Ruszamy o 18:00, @Druh?' });
+    assert.equal(sent.status, 201, JSON.stringify(sent.data));
+    const read = await as('druh', 'GET', '/api/chat?channel=party');
+    assert.equal(read.data.channel, 'party');
+    assert.deepEqual(read.data.messages.map((message) => message.text), ['Ruszamy o 18:00, @Druh?']);
+    // Nobody is tagged there: no notification tells it outside.
+    assert.equal((await (await db()).prepare('SELECT COUNT(*) AS count FROM chat_mentions').first()).count, 0);
+    // Its light for the other member, not for the one who wrote, and its mark read.
+    const latest = (await as('druh', 'GET', '/api/chat/latest')).data.party;
+    assert.equal(latest.latest, sent.data.message.id);
+    assert.equal((await as('lider', 'GET', '/api/chat/latest')).data.party.latest, 0);
+    await as('druh', 'POST', '/api/chat/seen', { party: latest.latest });
+    assert.equal((await as('druh', 'GET', '/api/chat/latest')).data.seen.party, latest.latest);
+    // One outside the party reads, writes and reports nothing there.
+    assert.equal((await as('obcy', 'GET', '/api/chat?channel=party')).data.error.code, 'no_party');
+    assert.equal((await as('obcy', 'POST', '/api/chat', { channel: 'party', text: 'Hej' })).data.error.code, 'no_party');
+    assert.equal((await as('obcy', 'POST', '/api/chat/report', { messageId: sent.data.message.id })).data.error.code, 'no_message');
+    // A member's message reported by the other one waits for the moderation
+    // after the party is gone; the rest goes with the party.
+    const reply = await as('druh', 'POST', '/api/chat', { channel: 'party', text: 'Pasuje.' });
+    assert.equal(reply.status, 201, JSON.stringify(reply.data));
+    assert.equal((await as('lider', 'POST', '/api/chat/report', { messageId: reply.data.message.id })).status, 200);
+    await as('druh', 'POST', '/api/party/leave');
+    assert.equal((await as('druh', 'GET', '/api/chat?channel=party')).data.error.code, 'no_party');
+    // The leader alone with no invitation waiting is in no party at its next look.
+    assert.equal((await as('lider', 'GET', '/api/party')).data.party, null);
+    const left = await (await db()).prepare("SELECT text FROM chat_messages WHERE channel LIKE 'party:%'").all();
+    assert.deepEqual(left.results.map((row) => row.text), ['Pasuje.']);
+    assert.equal((await as('lider', 'GET', '/api/chat/latest')).data.party, null);
+  });
+
   test('no own character in the party', async () => {
     await call('POST', '/api/character', { cookie: cookies.lider, body: { name: 'Druga', classId: 'mage', appearance: 'female' } });
     await (await db()).prepare("UPDATE characters SET level = 30, class_level = 30 WHERE name = 'Druga'").run();

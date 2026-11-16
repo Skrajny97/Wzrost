@@ -481,6 +481,18 @@ button {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+/* The deck builder's six orders of the collection (cards.js): two rows of
+   three on a phone, one row where the screen is wider. */
+.bag-sort-options--6 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (min-width: 640px) {
+  .bag-sort-options--6 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
 .bag-sort-options .segmented-option {
   min-height: 34px;
   padding: 0 2px;
