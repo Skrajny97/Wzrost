@@ -1,0 +1,14 @@
+{
+  "id": "fishing",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a wooden fishing rod with its line and a red and white float, beside a small wicker basket with a silver fish tail sticking out, fantasy RPG profession icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/professions/herbalism.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023365580490324233
+  },
+  "images": 1
+}

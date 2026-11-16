@@ -1,0 +1,14 @@
+{
+  "id": "cooking",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a black iron cooking pot of steaming soup with a wooden ladle, a carrot and an onion beside it, fantasy RPG profession icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/professions/herbalism.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023308605750825672
+  },
+  "images": 1
+}

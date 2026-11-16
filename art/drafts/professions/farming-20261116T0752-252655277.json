@@ -1,0 +1,14 @@
+{
+  "id": "farming",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small iron hoe leaning against a sheaf of golden wheat, a green sprout in front, fantasy RPG profession icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/professions/herbalism.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02321246654870775
+  },
+  "images": 1
+}
