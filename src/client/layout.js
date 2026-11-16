@@ -421,13 +421,21 @@ const TIMED = {
   walka: { label: 'Walka', kinds: ['hunt'], doing: 'eksploracja' },
   profesje: { label: 'Profesje', kinds: Object.keys(WORK_SCREENS), doing: 'praca' },
 };
+// Profesje counts down the Awatar's work too while the character's own is
+// not under way (a player, 16.11.2026: „żeby jak np. awatar systemu nam
+// łowi czy tam cokolwiek robi w profesjach to żeby też było widać ten czas
+// na pasku po lewej”, „tak jak wtedy gdy nasza postać to robi”); `byAvatar`
+// says it is the Awatar's.
 function tabTime(id, now = serverNow()) {
   const activity = state.character?.activity;
-  const work = activity && TIMED[id].kinds.includes(activity.kind) ? activity : null;
-  const running = Boolean(work) && !activityFinished(work, now);
-  const avatar = id === 'profesje' && state.character?.professions?.avatar?.activity;
-  const ready = (Boolean(work) && !running) || (Boolean(avatar) && activityFinished(avatar, now));
-  return { work, running, ready };
+  const own = activity && TIMED[id].kinds.includes(activity.kind) ? activity : null;
+  const ownRunning = Boolean(own) && !activityFinished(own, now);
+  const avatar = (id === 'profesje' && state.character?.professions?.avatar?.activity) || null;
+  const avatarRunning = Boolean(avatar) && !activityFinished(avatar, now);
+  const byAvatar = !ownRunning && avatarRunning;
+  const work = byAvatar ? avatar : own;
+  const ready = (Boolean(own) && !ownRunning) || (Boolean(avatar) && !avatarRunning);
+  return { work, running: ownRunning || avatarRunning, ready, byAvatar };
 }
 // The build under way in the camp and whether a production building's
 // store is full and waits: the tent in the top bar shows both on a phone,
@@ -605,11 +613,11 @@ export function updateNavTimers(now = serverNow()) {
     const item = $(`#nav-main > .nav-item[href="#/${id}"]`);
     const label = item && $('.nav-label', item);
     if (!label || item.classList.contains('nav-item--locked')) continue;
-    const { work, running, ready } = tabTime(id, now);
+    const { work, running, ready, byAvatar } = tabTime(id, now);
     item.classList.toggle('nav-item--busy', running);
     item.classList.toggle('nav-item--ready', ready);
     label.textContent = running ? formatCountdown(work.endsAt - now) : t(tab.label);
-    item.setAttribute('aria-label', [t(tab.label), running && `${t(tab.doing)}: ${label.textContent}`, ready && t('raport czeka')].filter(Boolean).join(', '));
+    item.setAttribute('aria-label', [t(tab.label), running && `${byAvatar ? t('praca Awatara') : t(tab.doing)}: ${label.textContent}`, ready && t('raport czeka')].filter(Boolean).join(', '));
   }
   const camp = $(`#nav-main > .nav-item[href="${CAMP_TAB.href}"]`);
   const label = camp && $('.nav-label', camp);
