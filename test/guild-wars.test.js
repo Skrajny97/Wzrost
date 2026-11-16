@@ -600,6 +600,68 @@ describe('the guild wars through the API', () => {
     assert.deepEqual(duels.sort(), ['Alfa – Beta', 'Alfa – Bliźniak']);
   });
 
+  // A match with its own moment (fight_at, the first evening of the league
+  // fought again at 23:00 on 16.11.2026) waits for it, from the cron and
+  // from a look at the tab; its battles bear it, and the tab counts down to it.
+  test('a match with its own moment of fights waits for it, and its battles bear it', async () => {
+    await player('alfa', 'Alfa', { level: 60 });
+    await player('beta', 'Beta', { level: 30, classId: 'mage' });
+    await guild('alfa', 'Mocarze', 'MOC');
+    await guild('beta', 'Słabi', 'SŁ');
+    await cron(league.startsAt + 60000);
+    const later = league.battles[0] + 3 * 3600000;
+    await run('UPDATE guild_wars SET fight_at = ? WHERE week = ? AND day = 0', later, league.key);
+    await cron(league.battles[0]);
+    clock = later - 60000;
+    const view = (await as('alfa', 'GET', '/api/guild/war')).data;
+    assert.equal((await all('SELECT * FROM guild_war_battles')).length, 0);
+    assert.deepEqual([view.league.next.day, view.league.next.at, view.league.days[0].at], [0, later, later]);
+    await cron(later);
+    const match = await first('SELECT days_done FROM guild_wars WHERE week = ? AND day = 0', league.key);
+    assert.equal(match.days_done, 1);
+    const battles = await all('SELECT at FROM guild_war_battles');
+    assert.ok(battles.length > 0);
+    assert.ok(battles.every((battle) => battle.at === later));
+  });
+
+  // Every fight of a match to watch, not only the character's own (the
+  // author, 16.11.2026): for the members of both guilds, from each side.
+  test("every fight of a match, from either guild's side; for no one else", async () => {
+    await player('alfa', 'Alfa', { level: 60 });
+    await player('beta', 'Beta', { level: 30, classId: 'mage' });
+    await player('gamma', 'Gamma', { level: 30 });
+    await player('delta', 'Delta', { level: 30 });
+    const strong = await guild('alfa', 'Mocarze', 'MOC', ['gamma']);
+    const weak = await guild('beta', 'Słabi', 'SŁ');
+    await clone(ids.beta, 'Betka', weak);
+    await guild('delta', 'Obcy', 'OB');
+    await cron(league.startsAt + 60000);
+    const match = await first('SELECT id, guild_a, day FROM guild_wars WHERE week = ? AND ((guild_a = ? AND guild_b = ?) OR (guild_a = ? AND guild_b = ?))', league.key, strong, weak, weak, strong);
+    await cron(league.battles[match.day]);
+    clock = league.battles[match.day] + 60000;
+    const stored = await all('SELECT id FROM guild_war_battles WHERE war_id = ? ORDER BY number', match.id);
+    const ours = (await as('alfa', 'GET', `/api/guild/war/matches/${match.id}/battles`)).data.battles;
+    const theirs = (await as('beta', 'GET', `/api/guild/war/matches/${match.id}/battles`)).data.battles;
+    // Two on two: four duels and the trios' fight; Gamma's duels too, not
+    // only Alfa's own.
+    assert.deepEqual(
+      ours.map((line) => line.id),
+      stored.map((row) => row.id),
+    );
+    assert.equal(ours.filter((line) => line.format === '1v1').length, 4);
+    assert.ok(ours.some((line) => line.format === '1v1' && line.ours[0] === 'Gamma' && !line.fought));
+    assert.ok(ours.some((line) => line.format === '1v1' && line.ours[0] === 'Alfa' && line.fought));
+    for (const [index, line] of ours.entries()) {
+      assert.deepEqual([theirs[index].ours, theirs[index].theirs], [line.theirs, line.ours]);
+      assert.equal(theirs[index].result, { win: 'loss', loss: 'win', draw: 'draw' }[line.result]);
+    }
+    assert.equal((await as('delta', 'GET', `/api/guild/war/matches/${match.id}/battles`)).status, 404);
+    // Any of them to watch, for a member of either guild.
+    const gammaDuel = ours.find((line) => line.ours[0] === 'Gamma');
+    assert.equal((await as('alfa', 'GET', `/api/guild/war/battles/${gammaDuel.id}`)).status, 200);
+    assert.equal((await as('beta', 'GET', `/api/guild/war/battles/${gammaDuel.id}`)).status, 200);
+  });
+
   // The database gives the highest id of a removed character again: a
   // character made after a battle did not fight it, whatever its id.
   test("a battle is a character's own only when it was there to fight it", async () => {

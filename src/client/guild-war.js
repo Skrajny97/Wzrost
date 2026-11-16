@@ -31,6 +31,11 @@ const filled = (text, vars = {}) => text.replace(/\{(\w+)\}/g, (whole, name) => 
 // ("Drużyna\u00a0II").
 const teamText = (template, team) => filled(template.replace(/ \{team\}/g, '\u00a0{team}'), { team: roman(team) });
 const ZONE = 'Europe/Warsaw';
+// The hour of a moment on the Polish clock ("20:00"): an evening's battles
+// may come at another hour than the league's (the first evening, fought
+// again at 23:00 on 16.11.2026), and their fights bear it.
+const HOUR = new Intl.DateTimeFormat('pl-PL', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: ZONE });
+const hourAt = (at) => HOUR.format(new Date(at));
 
 // A noun after a number in its form ([one, few, many]; English gives
 // [one, other, other]), the number as the game writes it.
@@ -258,8 +263,8 @@ export function mountGuildWar(container) {
     const row = ours();
     let line;
     if (league.end) line = { icon: 'trophy', text: league.end.place === 1 ? words.lead.won : filled(words.lead.ended, { place: league.end.place }) };
-    else if (row.played === 0 && league.next?.day === week.today) line = { icon: 'hourglass', text: filled(words.lead.first, { hour: view.hour }) };
-    else if (row.played === 0 && league.next?.day === week.today + 1) line = { icon: 'hourglass', text: filled(words.lead.firstTomorrow, { hour: view.hour }) };
+    else if (row.played === 0 && league.next?.day === week.today) line = { icon: 'hourglass', text: filled(words.lead.first, { hour: hourAt(league.next.at) }) };
+    else if (row.played === 0 && league.next?.day === week.today + 1) line = { icon: 'hourglass', text: filled(words.lead.firstTomorrow, { hour: hourAt(league.next.at) }) };
     else if (row.place === 1 && row.played > 0) line = { icon: 'trophy', text: filled(words.lead.top, { balance: signed(row.balance) }) };
     else line = { icon: 'swords', text: filled(words.lead.place, { place: row.place, balance: signed(row.balance) }) };
     return h('p', { class: 'war-lead' }, icon(line.icon, { size: 18 }), h('span', { text: line.text }));
@@ -299,13 +304,14 @@ export function mountGuildWar(container) {
   }
 
   // When an evening's battles are: "Dziś o 20:00", "Jutro o 20:00", or the
-  // day's name.
+  // day's name; the next evening's at its own hour.
   function eveningName(day) {
     const words = texts();
     const { today } = view.week;
-    if (day === today) return filled(words.todayAt, { hour: view.hour });
-    if (day === today + 1) return filled(words.tomorrowAt, { hour: view.hour });
-    return capital(filled(words.dayAt, { day: words.days[day], hour: view.hour }));
+    const hour = view.league?.next?.day === day ? hourAt(view.league.next.at) : view.hour;
+    if (day === today) return filled(words.todayAt, { hour });
+    if (day === today + 1) return filled(words.tomorrowAt, { hour });
+    return capital(filled(words.dayAt, { day: words.days[day], hour }));
   }
 
   // The same, under the rival's name: "dziś", "jutro" or the day.
@@ -642,7 +648,7 @@ export function mountGuildWar(container) {
     const playback = createArena(battle.fight, { autoplay: 'now', board: view.fightBoard });
     watching = playback;
     openSheet(
-      h('h2', { class: 'sheet-title', text: filled(words.battleTitle, { when: dayName(battle.day).toLocaleLowerCase(locale()), hour: view.hour }) }),
+      h('h2', { class: 'sheet-title', text: filled(words.battleTitle, { when: dayName(battle.day).toLocaleLowerCase(locale()), hour: hourAt(battle.at) }) }),
       h(
         'div',
         { class: 'war-sheet' },

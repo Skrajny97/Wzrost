@@ -413,13 +413,14 @@ export async function settleWars(db, now, { guildId = null } = {}) {
   ]) {
     const league = await leagueOf(db, period.key);
     if (!league || league.ended_at !== null) continue;
+    // A match with its own moment (fight_at) waits for it.
     const { results } = await db
-      .prepare(`SELECT * FROM guild_wars WHERE week = ? AND days_done = 0 AND day < ?${only} ORDER BY day, round, id`)
-      .bind(period.key, due, ...(guildId === null ? [] : [guildId, guildId]))
+      .prepare(`SELECT * FROM guild_wars WHERE week = ? AND days_done = 0 AND day < ? AND (fight_at IS NULL OR fight_at <= ?)${only} ORDER BY day, round, id`)
+      .bind(period.key, due, now, ...(guildId === null ? [] : [guildId, guildId]))
       .all();
     for (const match of results) {
       try {
-        await fightMatch(db, league, match, period.battles[match.day], now);
+        await fightMatch(db, league, match, match.fight_at ?? period.battles[match.day], now);
       } catch (error) {
         failure ??= error;
       }
@@ -570,9 +571,12 @@ async function leagueView(db, guild, ours, league, week, viewer, now) {
   };
   // An evening the league plays and the guild has no match is its free
   // evening (an odd number of guilds).
+  // The moment of an evening's battles: its own for matches fought at
+  // another hour (fight_at), the league's otherwise.
+  const atOf = (day) => mine.find((match) => match.day === day && match.fight_at !== null)?.fight_at ?? week.battles[day];
   const days = Array.from({ length: WAR_DAYS }, (_, day) => ({
     day,
-    at: week.battles[day],
+    at: atOf(day),
     free: matches.some((match) => match.day === day) && !mine.some((match) => match.day === day),
     matches: mine
       .filter((match) => match.day === day)
@@ -586,7 +590,7 @@ async function leagueView(db, guild, ours, league, week, viewer, now) {
       ? null
       : {
           day: nextDay,
-          at: week.battles[nextDay],
+          at: atOf(nextDay),
           matches: coming
             .filter((match) => match.day === nextDay)
             .map((match) => {
@@ -728,6 +732,32 @@ export async function getGuildWarBattle(context) {
       standing: _fighters.standing,
       fight,
     },
+  });
+}
+
+// GET /api/guild/war/matches/:id/battles: every fight of a match of the
+// guild, not only the character's own (the author, 16.11.2026: „Wszystkie
+// walki mają być możliwe do obejrzenia, każda nie tylko własna”), from the
+// guild's side, in their order: each as a line of the league's fights
+// (battleLine), with the names on both sides. Walkovers are no fights.
+export async function getGuildWarMatchBattles(context) {
+  requireWars();
+  const { player, guild, db } = await requireMember(context, errors());
+  const id = Number(context.params.id);
+  const missing = () => new ApiError(404, 'no_battle', errors().noBattle);
+  if (!Number.isSafeInteger(id)) throw missing();
+  const match = await db.prepare('SELECT id, guild_a FROM guild_wars WHERE id = ? AND (guild_a = ? OR guild_b = ?)').bind(id, guild.id, guild.id).first();
+  if (!match) throw missing();
+  const side = match.guild_a === guild.id ? 'a' : 'b';
+  const { results } = await db
+    .prepare('SELECT id, war_id, day, number, format, team_a, team_b, result, at, fighters, log IS NOT NULL AS replay FROM guild_war_battles WHERE war_id = ? ORDER BY number')
+    .bind(id)
+    .all();
+  return json({
+    battles: results.map((row) => {
+      const { _fighters, opponents, reward: _, ...line } = battleLine(row, side, player.row);
+      return { ...line, ours: _fighters.ours.map((one) => one.name), theirs: opponents };
+    }),
   });
 }
 
