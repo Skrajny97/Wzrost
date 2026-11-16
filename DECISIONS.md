@@ -3580,7 +3580,7 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
-## Wersja 0.4.6 (16.11.2026): osiągnięcia z tytułami, Błędny ognik za 600 PS, kolejność kanałów czatu
+## Wersja 0.4.6 (16.11.2026): osiągnięcia z tytułami, walkowery 3v3 za brakujące trójki, zakładka serii dni, Błędny ognik za 600 PS, kolejność kanałów czatu
 
 1. **Osiągnięcia (1030; lista 1036.1 i okno 1036.2 przyjęte, tytuł tylko w profilu i Rankingu: 1036.3 B).**
    - 24 osiągnięcia w 9 grupach (`data/achievements.json`, angielskie w `data/en/achievements.json`). Każde ma cel, tytuł w dwóch formach (mężczyzna, kobieta), nagrodę w Punktach Czasu, przy kilku także w Punktach Systemu, i obrazek, który gra już ma (stwór, przedmiot, profesja), więc bez nowych ikon.
@@ -3591,6 +3591,8 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
    - Testy w `test/achievements.test.js`.
 2. **Chowaniec: Błędny ognik za 600 PS.** Autor: „Chowaniec: Błędny ognik również powinien kosztować 600 Punktów Systemu jak reszta Chowańców” (wcześniej 800 PS, 415 A). Każda postać, która go kupiła, dostaje zwrot 200 PS (migracja 0153). Błędnego ognika nikt nie dostał inaczej niż przez zakup w Sklepie Systemu, więc zwrot trafia tylko do kupujących.
 3. **Kolejność kanałów czatu (1040.1, przyjęte).** Autor o 1039.3: „niech będzie można je po prostu slideować te zakładki na czacie”. Zakładkę kanału przytrzymuje się chwilę, unosi się w złotej ramce i przesuwa palcem albo myszą w nowe miejsce. Kolejność zostaje na urządzeniu (`src/client/chat-order.js`), a pierwszy kanał otwiera się przy wejściu na czat, chyba że w innym czeka oznaczenie @. Krótkie stuknięcie wybiera kanał, a przesunięcie bez przytrzymania przewija pasek. Rozmowy prywatne zostają za kanałami.
+4. **3v3: brakujące trójki przegrywają z każdą trójką rywala.** Autor: „jeśli gildia ma 6 drużyn tylko to walkowerem oddaje 40 walk ze 100 a nie 4” i „taka gildia musi wygrać większość swoich walk żeby prowadzić i tak powinno być - kara za mniejszą ilość członków i ich siłę”. Walk 3v3 jest tyle, jakby obie gildie miały tyle trójek co większa: przy 6 trójkach na 10 jest 100 walk, 60 rozegranych i 40 walkowerów mniejszej gildii (`matchFights` w `src/engine/guild-wars.js`). Pod meczem następnego wieczoru widać tę liczbę, a „Jak to działa?” opisuje zasadę z przykładem. Działa od wieczoru 17.11; powtórka 16.11 o 23:00 szła jeszcze po 0.4.5 (jeden walkower za brakującą trójkę). Czy tak samo mają działać pojedynki 1v1, pytam w 1043.
+5. **Zakładka serii dni (1041.1, przyjęte).** Autor: „Ikonka jakaś albo napis serii dni niech wyświetla się z drugiego boku może jak zakładka graczy online - coś cieniutkiego”. Cienka zakładka przy lewej krawędzi ekranu, naprzeciw graczy online: kalendarz i dzień serii („3/7”), złota i lekko świecąca, gdy nagroda dnia czeka. Stuknięcie otwiera okno serii (`mountStreakTab` w `src/client/daily-streak.js`). Na komputerze stoi przy lewej krawędzi środkowej kolumny, obok menu.
 
 ## Wersja 0.4.5 (16.11.2026): 3v3 każda trójka z każdą, walkowery za brakujące trójki
 

@@ -3560,5 +3560,7 @@
   "bez tytułu": "no title",
   "{count} Punktów Czasu": "{count} Time Points",
   "Osiągnięcie „{name}”: tytuł „{title}” i {reward}.": "Achievement “{name}”: the title “{title}” and {reward}.",
-  "Tego tytułu jeszcze nie masz.": "You don't have this title yet."
+  "Tego tytułu jeszcze nie masz.": "You don't have this title yet.",
+  "Seria dni: dzień {day} z {days}, nagroda odebrana": "Day series: day {day} of {days}, reward taken",
+  "Seria dni: dzień {day} z {days}, nagroda czeka": "Day series: day {day} of {days}, reward waiting"
 }

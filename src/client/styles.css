@@ -12161,6 +12161,61 @@ button.farm-plot {
   cursor: pointer;
 }
 
+/* The series of days (1041, daily-streak.js): a thin tab on the left edge,
+   opposite the players online, at the main column's edge on a computer: the
+   calendar and the day, gold and glowing while today's reward waits. */
+.edge-tabs--left {
+  right: auto;
+  left: calc(var(--menu-width, 0px) + env(safe-area-inset-left, 0px));
+  align-items: flex-start;
+}
+
+.streak-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 24px;
+  min-height: 44px;
+  padding: 7px 3px 6px 2px;
+  border: 1px solid var(--line);
+  border-left: 0;
+  border-radius: 0 10px 10px 0;
+  background: var(--bg-deep);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  color: var(--text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.streak-tab-day {
+  font-family: var(--font-system);
+  font-size: 10px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.streak-tab--waiting {
+  border-color: var(--gold);
+  color: var(--gold);
+  animation: streak-tab-glow 2.4s ease-in-out infinite;
+}
+
+@keyframes streak-tab-glow {
+  0%,
+  100% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 0 4px rgba(201, 161, 74, 0.35);
+  }
+  50% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 0 12px rgba(201, 161, 74, 0.75);
+  }
+}
+
+.calm .streak-tab--waiting {
+  animation: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 0 8px rgba(201, 161, 74, 0.6);
+}
+
 /* The list in its sheet: one player a line, as the chat names its writer;
    a long account's name gives way first, the level stays at the right. */
 .online-players {
