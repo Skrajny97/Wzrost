@@ -1,0 +1,14 @@
+{
+  "id": "golden-carp",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a carp fish covered with gleaming gold scales like coins, a few sparkles around it, side view, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02317719275516934
+  },
+  "images": 1
+}

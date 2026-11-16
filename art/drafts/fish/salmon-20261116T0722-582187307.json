@@ -1,0 +1,14 @@
+{
+  "id": "salmon",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a silver salmon fish with a hooked jaw and a pink-red flush along its side, side view, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023211894357893205
+  },
+  "images": 1
+}

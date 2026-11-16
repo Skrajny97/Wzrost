@@ -1,0 +1,14 @@
+{
+  "id": "bream",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a tall flat silvery-bronze bream fish with a small head and a slimy sheen, side view, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023261977192984687
+  },
+  "images": 1
+}

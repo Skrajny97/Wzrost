@@ -1,0 +1,14 @@
+{
+  "id": "golden-fish",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small shining golden fish with long flowing veil-like golden fins and a tiny golden crown, a few sparkles around it, side view, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024354195955488416
+  },
+  "images": 1
+}

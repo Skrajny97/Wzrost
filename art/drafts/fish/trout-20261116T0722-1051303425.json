@@ -1,0 +1,14 @@
+{
+  "id": "trout",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a brown trout fish with red and black spots ringed with pale halos, side view, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023179113992479114
+  },
+  "images": 1
+}

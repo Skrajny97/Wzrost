@@ -1,0 +1,14 @@
+{
+  "id": "drowned-pike",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "an old black pike fish with pale ghostly eyes, ragged fins and a faint cold blue glow, side view, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023285441784752742
+  },
+  "images": 1
+}

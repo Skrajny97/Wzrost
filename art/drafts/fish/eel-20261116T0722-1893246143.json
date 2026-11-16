@@ -1,0 +1,14 @@
+{
+  "id": "eel",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a long slimy dark olive eel coiled in an S shape, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02313008393436008
+  },
+  "images": 1
+}

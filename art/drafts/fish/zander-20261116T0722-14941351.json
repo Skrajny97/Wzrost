@@ -1,0 +1,14 @@
+{
+  "id": "zander",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a slender grey-green zander fish with dark bands, big glassy eyes and small fangs, side view, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023272553476121692
+  },
+  "images": 1
+}

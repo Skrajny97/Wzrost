@@ -1,0 +1,14 @@
+{
+  "id": "silverfish",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a slim fish of pure shining silver glowing softly with pale moonlight, side view, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023272604495578345
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "water-catfish",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a dark green catfish with glowing pale green eyes and green water weeds tangled on its long whiskers, side view, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02315024502796597
+  },
+  "images": 1
+}

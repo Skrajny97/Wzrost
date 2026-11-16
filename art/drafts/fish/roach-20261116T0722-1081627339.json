@@ -1,0 +1,14 @@
+{
+  "id": "roach",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small silver roach fish with red eyes and reddish orange fins, side view, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02317994041273329
+  },
+  "images": 1
+}

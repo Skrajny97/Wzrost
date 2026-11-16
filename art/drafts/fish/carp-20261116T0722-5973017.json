@@ -1,0 +1,14 @@
+{
+  "id": "carp",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a big golden-brown common carp fish with large shiny scales and short barbels by the mouth, side view, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023237343449486626
+  },
+  "images": 1
+}

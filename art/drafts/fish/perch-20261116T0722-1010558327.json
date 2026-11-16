@@ -1,0 +1,14 @@
+{
+  "id": "perch",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a green-gold perch fish with dark vertical stripes, a spiny dorsal fin and orange-red lower fins, side view, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023216016811158924
+  },
+  "images": 1
+}

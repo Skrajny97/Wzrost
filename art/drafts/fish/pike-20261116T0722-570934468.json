@@ -1,0 +1,14 @@
+{
+  "id": "pike",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a long green pike fish with pale yellow spots and a long jaw full of sharp teeth, side view, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023694985297944813
+  },
+  "images": 1
+}

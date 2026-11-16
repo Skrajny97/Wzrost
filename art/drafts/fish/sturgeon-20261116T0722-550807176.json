@@ -1,0 +1,14 @@
+{
+  "id": "sturgeon",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a grey sturgeon fish with rows of bony armour plates along its body and a long pointed snout, side view, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024157802385118277
+  },
+  "images": 1
+}

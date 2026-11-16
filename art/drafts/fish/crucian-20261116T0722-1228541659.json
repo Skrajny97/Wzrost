@@ -1,0 +1,14 @@
+{
+  "id": "crucian",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a round deep-bodied golden bronze crucian carp fish, side view, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023091010334650674
+  },
+  "images": 1
+}

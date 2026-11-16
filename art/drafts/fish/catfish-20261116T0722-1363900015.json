@@ -1,0 +1,14 @@
+{
+  "id": "catfish",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a huge dark wels catfish with a wide flat head and long whiskers, side view, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02312660281329685
+  },
+  "images": 1
+}
