@@ -58,7 +58,39 @@ export async function playMinigame(activity, avatar) {
       closeSheet();
       resolve(answer);
     };
-    const go = h('button', { type: 'button', class: 'button button--system minigame-go', text: game.button, onClick: () => (taps.length >= game.zones.length ? finish({ taps }) : tap()) });
+    // A tap counts the moment the finger touches the button (pointerdown),
+    // not when it lifts (click): the marker crosses the bar in 0.7 s, so the
+    // tenth of a second between the two moved it some 14% of the bar, more
+    // than the narrowest zone (a player, 16.11.2026: „Mam wrażenie że ta
+    // minigra na zbieranie ziół ma lekkie opóźnienie od kliknięcia”). The
+    // click that ends a touch (detail > 0) is let go; a keyboard's Enter and
+    // Space click with detail 0 and still tap, as every click does where the
+    // browser has no pointer events. "Odbierz raport" after the last try
+    // waits for a new touch, so the click of the last try's own touch, if
+    // it comes, does not claim before the result is seen.
+    const pointer = 'PointerEvent' in window;
+    let touchedAgain = false;
+    const go = h('button', {
+      type: 'button',
+      class: 'button button--system minigame-go',
+      text: game.button,
+      onPointerdown: (event) => {
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        if (taps.length >= game.zones.length) {
+          touchedAgain = true;
+          return;
+        }
+        tap();
+      },
+      onClick: (event) => {
+        const ownClick = !pointer || event.detail === 0;
+        if (taps.length < game.zones.length) {
+          if (ownClick) tap();
+          return;
+        }
+        if (ownClick || touchedAgain) finish({ taps });
+      },
+    });
     const skip = h('button', { type: 'button', class: 'link-button minigame-skip', text: words.skip[0], onClick: () => finish({ skip: true }) });
     const showTry = () => {
       const index = taps.length;

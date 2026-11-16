@@ -1145,6 +1145,11 @@
       "id": "0.3.87",
       "title": "Wersja 0.3.87",
       "body": "- Profesje rosną 3 razy szybciej: poziom wymaga 10 minut pracy razy poziom zamiast 30. Zdobyte poziomy zostają, a pasek postępu stoi tam, gdzie stał.\n- Awatar Systemu daje teraz cały postęp profesji ze swojej pracy (doświadczenie postaci dalej ćwierć). Twoja postać chodzi na wyprawy, a Awatar w tym czasie rozwija profesję tak szybko jak ona."
+    },
+    {
+      "id": "0.3.88",
+      "title": "Wersja 0.3.88",
+      "body": "- Minigra przy raporcie profesji liczy stuknięcie w chwili dotknięcia przycisku, a nie oderwania palca, więc znacznik zatrzymuje się dokładnie tam, gdzie go widzisz.\n- Po ostatniej próbie „Odbierz raport” odbiera raport za pierwszym stuknięciem."
     }
   ]
 }

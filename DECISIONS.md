@@ -3580,6 +3580,15 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.88 (16.11.2026): minigra liczy stuknięcie w chwili dotknięcia
+
+1. **Opóźnienie w minigrze.** Gracz (poz. 26): „Mam wrażenie że ta minigra na zbieranie ziół ma lekkie opóźnienie od kliknięcia”. Miał rację: przycisk liczył stuknięcie dopiero przy oderwaniu palca (zdarzenie `click`), około 0,1 s po dotknięciu. Znacznik przebiega pasek w 0,7 s, więc w tym czasie przesuwał się o około 14% paska, a to więcej niż najwęższe pole.
+    - Stuknięcie liczy się teraz w chwili dotknięcia (`pointerdown` w `src/client/minigame.js`), a `touch-action: manipulation` wyłącza na przycisku przybliżanie podwójnym stuknięciem.
+    - Klawiatura (Enter, spacja) dalej stuka zwykłym kliknięciem.
+    - Po ostatniej próbie przycisk zmienia się w „Odbierz raport” i czeka na nowe dotknięcie. Kliknięcie kończące dotknięcie ostatniej próby nie odbiera jeszcze raportu, więc gracz najpierw widzi wynik, a następne stuknięcie odbiera raport za pierwszym razem (wcześniej trzeba było stuknąć dwa razy).
+    - Przeglądarka bez zdarzeń `pointer` liczy stuknięcia zwykłym kliknięciem, jak dotąd.
+2. **Dźwięk, wibracja i pauza po stuknięciu** (propozycja autora do tego zgłoszenia) idą osobno, jako 1022 na stronę ocen.
+
 ## Wersja 0.3.87 (16.11.2026): profesje 3 razy szybciej, Awatar z całym postępem profesji
 
 1. **Tempo profesji (1020).** Gracz (poz. 93) policzył, że opanowanie wszystkich ośmiu profesji po 4 godziny dziennie zajęłoby 55 lat (zgadza się: 79 600 godzin pracy). Autor: „może w związku ze wzrostem aktywności trzeba tak zrobić? bo to przesada już chyba”. Przyjęte 1020.1 A i 1020.3 C, odrzucone 1020.2 B (praca w profesji równolegle z wyprawą).
