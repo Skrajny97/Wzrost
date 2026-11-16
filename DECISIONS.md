@@ -3580,6 +3580,15 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.4.5 (16.11.2026): 3v3 każda trójka z każdą, walkowery za brakujące trójki
+
+Autor po pierwszym wieczorze ligi: „Renegaci mają 29 członków, Pierwotni 18 i to Renegaci mają oddawać walkowera? … ci co jest ich 18 dzielą się na 6 drużyn i walczą z 10 drużynami renegatów, więc 4 walki są oddane walkowerem ale ze strony Pierwotnych”. Do 0.4.4 niepełna ostatnia trójka przegrywała walkowerem wszystkie swoje walki, więc większa gildia z niepełną trójką oddawała ich najwięcej.
+
+1. Każda trójka walczy z każdą trójką rywala, także niepełna: walczy w mniejszym składzie. Trójka bez nikogo zdolnego do walki nie jest trójką (`matchFights` w `src/engine/guild-wars.js`).
+2. Gildia, która ma mniej trójek, oddaje walkowerem po jednej walce za każdą brakującą trójkę: przy 6 trójkach na 10 jest 60 walk i 4 walkowery mniejszej gildii. Walkower liczy się jak dotąd: walka przegrana dla oddającej, wygrana dla rywala.
+3. Zakładka Wojna pod meczem następnego wieczoru mówi, ile walk odda walkowerem Twoja gildia albo rywal (`walkoversOurs`, `walkoversTheirs`), a przy trójce w niepełnym składzie stoi „niepełna”. „Jak to działa?” opisuje nową zasadę.
+4. Zasada działa od powtórki ligi 16.11 o 23:00. Trójki tej powtórki ustalono wcześniej (0.4.1) i zostają.
+
 ## Wersja 0.4.4 (16.11.2026): seria dni dla każdej postaci
 
 Autor: „a jak te serie dni sie wybiera na ktorej postaci działa, powinna działac na wszystkich postaciach”. W 0.4.2 seria była jedna na konto, a nagrodę dostawała postać, którą się grało w chwili odbioru, więc inna postać widziała dzień jako odebrany.

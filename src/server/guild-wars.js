@@ -578,7 +578,7 @@ function guildLine(id, stored, current) {
 // place and what it got; null when the guild has no part in it.
 async function leagueView(db, guild, ours, league, week, viewer, now) {
   if (!league || !league.guilds.some((one) => one.id === guild.id)) return null;
-  const { teamSize } = rules();
+  const { teamSize, maxTeams } = rules();
   const matches = await matchesOf(db, week.key);
   const { results: current } = await db
     .prepare(
@@ -630,7 +630,6 @@ async function leagueView(db, guild, ours, league, week, viewer, now) {
   }));
   const coming = mine.filter((match) => match.days_done === 0);
   const nextDay = coming[0]?.day ?? null;
-  const short = (lineups) => lineups.some((lineup) => lineup.length < teamSize);
   // The rivals' trios of the next evening as fixed, once they are
   // (teamsFor); till then as many as their members make.
   const { results: kept } =
@@ -648,12 +647,14 @@ async function leagueView(db, guild, ours, league, week, viewer, now) {
               const rival = rivalOf(match);
               const members = rival.gone ? 0 : (now_.get(rival.id)?.members ?? 0);
               const fixed = rival.gone ? null : fixedOf.get(rival.id);
-              const trios = fixed ? fixed.length : members === 0 ? 0 : Math.ceil(members / teamSize);
+              const trios = fixed ? fixed.filter((lineup) => lineup.length > 0).length : members === 0 ? 0 : Math.min(maxTeams, Math.ceil(members / teamSize));
+              const ourTrios = ours.lineups.filter((lineup) => lineup.length > 0).length;
               return {
                 rival: { ...rival, members, trios },
                 duels: ours.members.length * members,
-                trioFights: ours.count * trios,
-                short: { ours: short(ours.lineups), theirs: fixed ? short(fixed) : members % teamSize !== 0 },
+                trioFights: ourTrios * trios,
+                // The walkovers of the trios one guild has fewer of (matchFights).
+                walkovers: { ours: Math.max(0, trios - ourTrios), theirs: Math.max(0, ourTrios - trios) },
               };
             }),
         };
