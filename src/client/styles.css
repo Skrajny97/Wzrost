@@ -9755,6 +9755,162 @@ a.profession-square:active {
   color: #f0a183;
 }
 
+/* The mini-game at a work's report (1006; minigame.js): the place's picture
+   over the work's name, the bar with its green zone and the marker running
+   to and fro, the three tries, a line of the state and "Pomiń". The bar of
+   Alchemia and Gotowanie is a scale of heat, and the hammer's of the
+   Warsztat and Górnictwo has a hammer's head for its marker. */
+.minigame {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.minigame-art {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 128px;
+  margin: -20px calc(-1 * var(--gutter, 16px)) 0;
+  padding: 14px var(--gutter, 16px);
+  border-bottom: 1px solid var(--bark-line);
+  background: linear-gradient(180deg, rgba(10, 14, 9, 0.05), rgba(10, 14, 9, 0.85)), var(--art, none) center / cover no-repeat;
+  image-rendering: pixelated;
+}
+
+.minigame-kicker {
+  margin: 0;
+  color: var(--system);
+  font: 600 12px/1.3 var(--font-system);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.minigame-art .sheet-title {
+  padding-right: 0;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.6);
+}
+
+.minigame-gauge {
+  position: relative;
+  height: 34px;
+  margin: 18px 0 6px;
+  border: 1px solid var(--system-line);
+  border-radius: 4px;
+  background: var(--bg-deep);
+}
+
+.minigame-gauge--heat {
+  background: linear-gradient(90deg, #2c4f6b, #3f6b4a 35%, #a8742f 70%, #8f2e22);
+}
+
+.minigame-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-right: 2px solid var(--leaf);
+  border-left: 2px solid var(--leaf);
+  background: rgba(167, 196, 127, 0.35);
+}
+
+.minigame-zone::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - 1px);
+  width: 2px;
+  background: rgba(231, 220, 194, 0.55);
+}
+
+.minigame-marker {
+  position: absolute;
+  top: -12px;
+  bottom: -6px;
+  width: 4px;
+  margin-left: -2px;
+  background: var(--text);
+  box-shadow: 0 0 6px rgba(143, 227, 239, 0.8);
+}
+
+.minigame-marker::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -9px;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #1a1a1a;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #d6402b 0 50%, #f3eee2 50% 100%);
+}
+
+.minigame-gauge--heat .minigame-marker::before {
+  border-color: #3a1a10;
+  background: radial-gradient(circle at 50% 70%, #ffd36b, #e0602b 60%, #8f2e22);
+}
+
+.minigame-gauge--hammer .minigame-marker::before {
+  border-color: #23272a;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #9aa3a8, #5b6266);
+}
+
+.minigame-tries {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.minigame-tries li {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--system-line);
+  border-radius: 50%;
+}
+
+.minigame-tries li.hit {
+  border-color: var(--leaf);
+  background: var(--leaf);
+}
+
+.minigame-tries li.miss {
+  border-color: var(--danger);
+  background: var(--danger);
+}
+
+.minigame-tries li.now {
+  box-shadow: 0 0 0 3px rgba(143, 227, 239, 0.35);
+}
+
+.minigame-state {
+  margin: 0;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+  text-align: center;
+}
+
+.minigame-go {
+  min-height: 56px;
+  font-size: 18px;
+}
+
+.minigame-skip {
+  align-self: center;
+}
+
+.minigame-result {
+  margin: 0;
+  color: var(--leaf);
+  font: 700 22px/1.3 var(--font-world);
+  text-align: center;
+}
+
 /* A farming's chip, in the gold of ripe grain. */
 .chip--crops {
   border-color: rgba(214, 186, 96, 0.6);

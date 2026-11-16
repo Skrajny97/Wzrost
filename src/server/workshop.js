@@ -42,6 +42,7 @@ import { addTo, alreadyClaimed, insertWork, requireProfessions, shareOf, workCla
 import { workFamePoints } from './fame.js';
 import { trimReports } from './reports.js';
 import { say } from '../engine/text.js';
+import { withMinigame } from './minigame.js';
 
 // An order of `count` items of a known pattern and rarity, or with `scroll`
 // of `count` Zwoje ochronne, from now on, by the character or by its Awatar
@@ -175,7 +176,7 @@ function scrollOrder(row, level, count, steady = false) {
 // item, it only gives everything back and makes no report (null). With
 // `avatar`, the order of the Awatar Systemu (avatar.js), whose work brings
 // the items and its share of the XP and of the levels (workGains).
-export async function finishCrafting(db, player, now, { stop = false, avatar = false } = {}) {
+export async function finishCrafting(db, player, now, { stop = false, avatar = false, minigame = null } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
   const { workshop } = content();
@@ -193,7 +194,7 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
   const worked = stop ? Math.floor(elapsed / 60000) : activity.minutes;
   const results =
     done > 0 && !scroll
-      ? craftItems({ baseId: base.id, rarityId: options.rarity, count: done, level: options.level, professionLevel: before.level, met: JSON.parse(row.met ?? '[]'), seed: activity.seed, luck: options.luck ?? 0 }, content())
+      ? craftItems({ baseId: base.id, rarityId: options.rarity, count: done, level: options.level, professionLevel: before.level, met: JSON.parse(row.met ?? '[]'), seed: activity.seed, luck: (options.luck ?? 0) + (minigame?.luck ?? 0) }, content())
       : [];
   const made = results.filter((result) => result.made).map((result) => result.item);
   // Every scroll done comes out.
@@ -224,7 +225,7 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
   const { character, after, xp, work, sets } = workGains(player, profession, before, worked, avatar, now);
   // A card the work may leave, by the time it lasted (903, cards.js).
   const card = await workCard(db, row, activity, worked);
-  const report = {
+  const report = withMinigame({
     ...workshopReport(
       {
         base,
@@ -247,7 +248,7 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
     ),
     ...(avatar && { avatar: true }),
     ...(card && { cards: card.cards }),
-  };
+  }, minigame);
   const summary = {
     placeName: report.placeName,
     minutes: report.minutes,

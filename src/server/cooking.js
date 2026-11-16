@@ -7,7 +7,7 @@
 // with their report, and the ingredients for the rest go back. The meal a
 // dish makes is eaten as an exploration sets out (hunts.js, mealAtStart).
 
-import { bagCapacity, bagStacks, campLevels, cookDishes, cookMinutes, cookingReport, dishIngredients, dishesDone, mostDishes, professionState } from '../engine/index.js';
+import { bagCapacity, bagStacks, campLevels, cookDishes, cookingReport, cookMinutes, dishesDone, dishIngredients, minigameExtra, mostDishes, professionState } from '../engine/index.js';
 import { content } from './content.js';
 import { bagPlaces, characterView, currentHp, loadPlayer, requireWorker, workOf } from './characters.js';
 import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
@@ -20,6 +20,7 @@ import { herbsOf, pantryOf } from './professions-view.js';
 import { requireOpen } from './mining.js';
 import { trimReports } from './reports.js';
 import { say } from '../engine/text.js';
+import { withMinigame } from './minigame.js';
 
 // The ingredients of `amounts` split by where they are kept: the herbs in
 // the bag, the rest (fish and crops) in the Spiżarnia.
@@ -94,7 +95,7 @@ export async function startCooking(context) {
 // dish, it only gives the ingredients back and makes no report (null). With
 // `avatar`, the cooking of the Awatar Systemu (avatar.js), whose work brings
 // the dishes and its share of the XP and of the levels (workGains).
-export async function finishCooking(db, player, now, { stop = false, avatar = false } = {}) {
+export async function finishCooking(db, player, now, { stop = false, avatar = false, minigame = null } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
   const { cooking } = content();
@@ -144,18 +145,20 @@ export async function finishCooking(db, player, now, { stop = false, avatar = fa
   }
 
   // The Gotowanie of the claim decides the extra dishes, past its mastery.
-  const made = cookDishes({ count: done, seed: activity.seed, level: before.level }, content());
+  const cooked = cookDishes({ count: done, seed: activity.seed, level: before.level }, content());
+  // The mini-game's hits (minigame.js; 1006): their share more of the dishes.
+  const made = { ...cooked, count: cooked.count + (minigameExtra({ [dish.id]: cooked.count }, minigame?.share ?? 0, activity.seed)[dish.id] ?? 0) };
   const { character, after, xp, work, sets } = workGains(player, profession, before, worked, avatar, now);
   // A card the work may leave, by the time it lasted (903, cards.js).
   const card = await workCard(db, row, activity, worked);
-  const report = {
+  const report = withMinigame({
     ...cookingReport(
       { dish, minutes: worked, startedAt: activity.started_at, endsAt: stop ? now : activity.ends_at, seed: activity.seed, made, stopped: stop, before, after, character, xp, work },
       content(),
     ),
     ...(avatar && { avatar: true }),
     ...(card && { cards: card.cards }),
-  };
+  }, minigame);
   const summary = {
     placeName: report.placeName,
     minutes: report.minutes,

@@ -3470,6 +3470,8 @@
   "Brakuje składników na tę potrawę.": "Not enough ingredients for this dish.",
   "Wybierz liczbę potraw od 1 do {}.": "Choose a number of dishes from 1 to {}.",
   "Nie ma takiej potrawy.": "There is no such dish.",
+  "Ta praca nie ma minigry.": "This work has no mini-game.",
+  "Praca jeszcze trwa.": "The work is still going on.",
   "Bez posiłku": "No meal",
   "Czas gotowania: {time}. Zużyjesz: {used}.": "Cooking time: {time}. You will use: {used}.",
   "Do Gotowania": "To Cooking",

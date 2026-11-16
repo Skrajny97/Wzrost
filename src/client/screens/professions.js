@@ -31,6 +31,7 @@ import { activityFinished, call, reportCache, serverNow, state, testModeOn } fro
 import { skipControl } from '../time.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, splitLead, systemPanel, toast, withButton } from '../ui.js';
 import { transmuteForm } from '../transmute.js';
+import { playMinigame } from '../minigame.js';
 import { characterLook, portraitLayers } from '../cosmetics.js';
 import { SLOT_ICONS } from '../icons.js';
 import { classFits, compareTable, findMark, itemSummary, itemTitle, salvagedText } from './character.js';
@@ -673,7 +674,8 @@ export function mountProfessions(container, { params, navigate }) {
   }
 
   // "Odbierz raport" of a work that has ended, the character's or the
-  // Awatar's.
+  // Awatar's: its mini-game first (minigame.js; 1006), whose taps go with
+  // the claim, or none when skipped or for a work without one.
   function claimButton(avatar) {
     return h('button', {
       type: 'button',
@@ -681,7 +683,9 @@ export function mountProfessions(container, { params, navigate }) {
       text: t('Odbierz raport'),
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
-          const { report } = await call('POST', avatar ? '/api/avatar/claim' : '/api/hunts/claim');
+          const work = avatar ? state.character?.professions?.avatar?.activity : state.character?.activity;
+          const played = await playMinigame(work, avatar);
+          const { report } = await call('POST', avatar ? '/api/avatar/claim' : '/api/hunts/claim', played ? { minigame: played } : undefined);
           // A work the game can no longer finish gave back what it took.
           if (report) openReport(report);
           else toast(t('Tej pracy nie da się już dokończyć. Zabrane rzeczy wróciły.'));

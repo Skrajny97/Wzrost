@@ -719,6 +719,101 @@
       "description": "A grain of the earth goddess. Where it falls, nobody goes hungry for a year."
     }
   },
+  "minigame": {
+    "kinds": {
+      "herbs": {
+        "title": "Careful Picking",
+        "kicker": "Herbalism · at the end of the gathering",
+        "text": "Tap “Pick!” while the marker is in the green field. Each hit: +5% herbs, three hits: +20%.",
+        "button": "Pick!",
+        "bonus": "+{value}% herbs"
+      },
+      "potions": {
+        "title": "Stirring",
+        "kicker": "Alchemy · at the end of the brewing",
+        "text": "Tap “Stir!” while the marker is in the green field. Each hit: +5% potions, three hits: +20%.",
+        "button": "Stir!",
+        "bonus": "+{value}% potions"
+      },
+      "items": {
+        "title": "Forging",
+        "kicker": "Crafting · at the end of the order",
+        "text": "Tap “Strike!” while the hammer is in the green field. Each hit: +1 pp chance of a higher rarity, three hits: +4.",
+        "button": "Strike!",
+        "bonus": "+{value} pp chance of a higher rarity"
+      },
+      "minerals": {
+        "title": "Striking the Vein",
+        "kicker": "Mining · at the end of the work",
+        "text": "Tap “Strike!” while the pickaxe is over the vein in the green field. Each hit: +5% gems and ores, three hits: +20%.",
+        "button": "Strike!",
+        "bonus": "+{value}% gems and ores"
+      },
+      "jewels": {
+        "title": "Cutting",
+        "kicker": "Jewelcrafting · at the end of the work",
+        "text": "Tap “Cut!” while the marker is in the green field. Each hit: +1 pp chance of a higher rarity, three hits: +4.",
+        "button": "Cut!",
+        "bonus": "+{value} pp chance of a higher rarity"
+      },
+      "fish": {
+        "title": "The Strike",
+        "kicker": "Fishing · at the end of the catch",
+        "text": "A fish bites! Tap “Strike!” while the float is in the green field. Each hit: +5% fish, three hits: +20%.",
+        "button": "Strike!",
+        "bonus": "+{value}% fish"
+      },
+      "crops": {
+        "title": "The Harvest",
+        "kicker": "Farming · at the end of the farming",
+        "text": "Tap “Reap!” while the sickle is in the green field. Each hit: +5% crops, three hits: +20%.",
+        "button": "Reap!",
+        "bonus": "+{value}% crops"
+      },
+      "dishes": {
+        "title": "Fire under the Pot",
+        "kicker": "Cooking · at the end of the cooking",
+        "text": "Tap “Now!” while the needle is in the green field: not too cold, and nothing burns. Each hit: +5% dishes, three hits: +20%.",
+        "button": "Now!",
+        "bonus": "+{value}% dishes"
+      }
+    },
+    "texts": {
+      "line": [
+        "Mini-game: {hits} of {tries} hits, {bonus}."
+      ],
+      "none": [
+        "Mini-game: no hits."
+      ],
+      "hit": [
+        "A hit!"
+      ],
+      "miss": [
+        "A miss."
+      ],
+      "try": [
+        "Try {try} of {tries}"
+      ],
+      "narrower": [
+        "the field gets narrower"
+      ],
+      "hits": [
+        "Hits: {hits} of {tries}"
+      ],
+      "skip": [
+        "Skip and take the plain result"
+      ],
+      "result": [
+        "Your result: {bonus}"
+      ],
+      "resultNone": [
+        "No bonus this time."
+      ],
+      "claim": [
+        "Claim the report"
+      ]
+    }
+  },
   "dishes": {
     "baked-turnip": {
       "name": "Baked Turnip",

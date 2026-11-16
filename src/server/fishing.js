@@ -5,7 +5,7 @@
 // fish take no room in the bag; the innkeeper Zbylut buys them, or they go
 // away.
 
-import { fishCatch, fishSlots, fishingMinutes, fishingReport, professionState, saleGold, weekFactor } from '../engine/index.js';
+import { fishCatch, fishingMinutes, fishingReport, fishSlots, minigameExtra, professionState, saleGold, weekFactor } from '../engine/index.js';
 import { content } from './content.js';
 import { characterView, currentHp, loadPlayer, requirePlayer, requireWorker, workOf } from './characters.js';
 import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
@@ -18,6 +18,7 @@ import { requireOpen } from './mining.js';
 import { pantryOf } from './professions-view.js';
 import { trimReports } from './reports.js';
 import { keptWeek, weekNow } from './weeks.js';
+import { withMinigame } from './minigame.js';
 
 // A fishing of `minutes` from now on, of the fish chosen (`fish`, as many
 // kinds as the level's slots allow), by the character or by its Awatar
@@ -89,7 +90,7 @@ export async function startFishing(context) {
 // brings the fish and its share of the XP and of the levels (workGains). The
 // Rybołówstwo level of the claim decides the fish, as the Zielarstwo level
 // decides the herbs.
-export async function finishFishing(db, player, now, { avatar = false } = {}) {
+export async function finishFishing(db, player, now, { avatar = false, minigame = null } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
   const { fishing } = content();
@@ -101,14 +102,16 @@ export async function finishFishing(db, player, now, { avatar = false } = {}) {
   const fishIds = (options.fish ?? []).filter((id) => content().fishById[id]);
   const week = weekFactor(keptWeek(options), 'fish');
   const { found, lucky } = fishIds.length > 0 ? fishCatch({ fishIds, minutes: activity.minutes, level: before.level, seed: activity.seed, week }, content()) : { found: {}, lucky: {} };
+  // The mini-game's hits (minigame.js; 1006): their share more of the fish.
+  for (const [id, more] of Object.entries(minigameExtra(found, minigame?.share ?? 0, activity.seed))) found[id] = (found[id] ?? 0) + more;
   const { character, after, xp, work, sets } = workGains(player, profession, before, activity.minutes, avatar, now);
   // A card the work may leave (903, cards.js).
   const card = await workCard(db, row, activity, activity.minutes);
-  const report = {
+  const report = withMinigame({
     ...fishingReport({ minutes: activity.minutes, startedAt: activity.started_at, endsAt: activity.ends_at, seed: activity.seed, found, lucky, before, after, character, xp, work }, content()),
     ...(avatar && { avatar: true }),
     ...(card && { cards: card.cards }),
-  };
+  }, minigame);
   const summary = {
     placeName: report.placeName,
     minutes: report.minutes,

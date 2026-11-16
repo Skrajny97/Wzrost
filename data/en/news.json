@@ -888,6 +888,10 @@
     "0.3.81": {
       "title": "Version 0.3.81",
       "body": "- Three new professions from character level 25: Fishing, Farming and Cooking.\n- Fishing: at the System Pond you catch fish, from the roach to the golden fish, and with each level more kinds at once.\n- Farming: on the System Field you sow the plots, each with a different crop, and watch the plants grow. With each level you get more plots and new crops.\n- Cooking: in the System Kitchen you cook dishes of fish, crops and herbs. You choose a dish in the exploration's options, and its bonuses work for 4 hours of explorations: more XP, gold, materials, resources, cards, chests or rarer items. Better dishes join several bonuses.\n- Fish, crops and dishes go to the Pantry, a new tab of the Bag. They take no room in it, and Zbylut the innkeeper buys them.\n- The Account Chest now holds as many items as your bag."
+    },
+    "0.3.82": {
+      "title": "Version 0.3.82",
+      "body": "- Claiming the report of any profession now starts a mini-game: tap while the marker is in the green zone. You get three tries, and the zone gets narrower with each.\n- Hits give +5%, +10% or +20% of what the work brings, and in the System Workshop and the Gem Workshop a better chance of an item a rarity higher.\n- You can skip the mini-game and take the usual result."
     }
   }
 }

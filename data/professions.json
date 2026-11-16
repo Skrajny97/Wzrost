@@ -553,6 +553,37 @@
       "noDish": ["Nie masz tej potrawy w Spiżarni."]
     }
   },
+  "minigame": {
+    "tries": 3,
+    "zones": [0.26, 0.19, 0.13],
+    "period": 1400,
+    "tolerance": 3000,
+    "shares": [0, 0.05, 0.1, 0.2],
+    "rarity": [0, 0.01, 0.02, 0.04],
+    "kinds": {
+      "herbs": {"title": "Ostrożne zrywanie", "kicker": "Zielarstwo · na koniec zbierania", "text": "Stuknij „Zerwij!”, gdy znacznik jest w zielonym polu. Każde trafienie: +5% ziół, trzy trafienia: +20%.", "button": "Zerwij!", "bonus": "+{value}% ziół", "place": "system-grove", "look": "plain"},
+      "potions": {"title": "Mieszanie", "kicker": "Alchemia · na koniec warzenia", "text": "Stuknij „Zamieszaj!”, gdy znacznik jest w zielonym polu. Każde trafienie: +5% mikstur, trzy trafienia: +20%.", "button": "Zamieszaj!", "bonus": "+{value}% mikstur", "place": "system-workshop", "look": "heat"},
+      "items": {"title": "Kucie", "kicker": "Rzemieślnictwo · na koniec wyrobu", "text": "Stuknij „Uderz!”, gdy młot jest w zielonym polu. Każde trafienie: +1 pkt proc. szansy na wyższą rzadkość, trzy trafienia: +4.", "button": "Uderz!", "bonus": "+{value} pkt proc. szansy na wyższą rzadkość", "place": "system-workbench", "look": "hammer"},
+      "minerals": {"title": "Uderzenie w żyłę", "kicker": "Górnictwo · na koniec pracy", "text": "Stuknij „Uderz!”, gdy kilof jest nad żyłą w zielonym polu. Każde trafienie: +5% kamieni i kruszców, trzy trafienia: +20%.", "button": "Uderz!", "bonus": "+{value}% kamieni i kruszców", "place": "system-mine", "look": "hammer"},
+      "jewels": {"title": "Szlif", "kicker": "Jubilerstwo · na koniec pracy", "text": "Stuknij „Szlifuj!”, gdy znacznik jest w zielonym polu. Każde trafienie: +1 pkt proc. szansy na wyższą rzadkość, trzy trafienia: +4.", "button": "Szlifuj!", "bonus": "+{value} pkt proc. szansy na wyższą rzadkość", "place": "system-lapidary", "look": "plain"},
+      "fish": {"title": "Zacięcie", "kicker": "Rybołówstwo · na koniec połowu", "text": "Ryba bierze! Stuknij „Zatnij!”, gdy spławik jest w zielonym polu. Każde trafienie: +5% ryb, trzy trafienia: +20%.", "button": "Zatnij!", "bonus": "+{value}% ryb", "place": "system-pond", "look": "plain"},
+      "crops": {"title": "Żniwa", "kicker": "Rolnictwo · na koniec uprawy", "text": "Stuknij „Żnij!”, gdy sierp jest w zielonym polu. Każde trafienie: +5% plonów, trzy trafienia: +20%.", "button": "Żnij!", "bonus": "+{value}% plonów", "place": "system-field", "look": "plain"},
+      "dishes": {"title": "Ogień pod kotłem", "kicker": "Gotowanie · na koniec gotowania", "text": "Stuknij „Teraz!”, gdy wskazówka jest w zielonym polu: nie za zimno i nic się nie przypali. Każde trafienie: +5% potraw, trzy trafienia: +20%.", "button": "Teraz!", "bonus": "+{value}% potraw", "place": "system-kitchen", "look": "heat"}
+    },
+    "texts": {
+      "line": ["Minigra: trafienia {hits} z {tries}, {bonus}."],
+      "none": ["Minigra: bez trafień."],
+      "hit": ["Trafione!"],
+      "miss": ["Pudło."],
+      "try": ["Próba {try} z {tries}"],
+      "narrower": ["pole jest coraz węższe"],
+      "hits": ["Trafienia: {hits} z {tries}"],
+      "skip": ["Pomiń i weź zwykły wynik"],
+      "result": ["Twój wynik: {bonus}"],
+      "resultNone": ["Tym razem bez premii."],
+      "claim": ["Odbierz raport"]
+    }
+  },
   "fish": [
     { "id": "roach", "name": "Płotka", "genitive": "Płotki", "level": 1, "perHour": 6, "price": 2, "description": "Srebrna drobnica o czerwonych oczach. Bierze na wszystko." },
     { "id": "perch", "name": "Okoń", "genitive": "Okonia", "level": 3, "perHour": 5, "price": 3, "description": "Pręgowany drapieżnik z kolczastą płetwą. Uważaj na palce." },

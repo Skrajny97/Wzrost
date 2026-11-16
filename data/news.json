@@ -1115,6 +1115,11 @@
       "id": "0.3.81",
       "title": "Wersja 0.3.81",
       "body": "- Trzy nowe profesje od 25. poziomu postaci: Rybołówstwo, Rolnictwo i Gotowanie.\n- Rybołówstwo: w Systemowym Stawie łowisz ryby, od płotki po złotą rybkę, a z poziomem więcej rodzajów naraz.\n- Rolnictwo: na Systemowym Polu obsiewasz grządki, każdą inną rośliną, i patrzysz, jak rośliny rosną. Z poziomem przybywa grządek i nowych roślin.\n- Gotowanie: w Systemowej Kuchni gotujesz potrawy z ryb, plonów i ziół. Potrawę wybierasz w „Opcjach wyprawy”, a jej premie działają przez 4 godziny wypraw: więcej XP, złota, materiałów, surowców, kart, skrzyń albo rzadszych przedmiotów. Lepsze potrawy łączą kilka premii.\n- Ryby, plony i potrawy trafiają do Spiżarni, nowej zakładki Plecaka. Nie zajmują w nim miejsca, a kupi je karczmarz Zbylut.\n- Skrzynia Konta mieści teraz tyle przedmiotów, ile Twój plecak."
+    },
+    {
+      "id": "0.3.82",
+      "title": "Wersja 0.3.82",
+      "body": "- Przy odbiorze raportu każdej profesji czeka minigra: stuknij, gdy znacznik jest w zielonym polu. Masz trzy próby, a pole z każdą jest węższe.\n- Trafienia dają +5%, +10% albo +20% tego, co przynosi praca, a w Warsztacie i Szlifierni większą szansę na przedmiot o rzadkość wyższy.\n- Minigrę możesz pominąć i wziąć zwykły wynik."
     }
   ]
 }

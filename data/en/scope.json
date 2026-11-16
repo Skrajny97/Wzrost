@@ -1138,6 +1138,8 @@
     "src/engine/farming.js",
     "src/server/cooking.js",
     "src/engine/cooking.js",
+    "src/server/minigame.js",
+    "src/engine/minigame.js",
     "src/engine/wanted.js",
     "src/engine/mercenaries.js",
     "src/engine/brotherhood-rewards.js",
