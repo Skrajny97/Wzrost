@@ -43,6 +43,7 @@
 // tags the player shows gilded, and the tab of its channel lights until it
 // is read (chat-news.js, src/server/mentions.js).
 
+import { chatOrder, ordered, setChatOrder } from '../chat-order.js';
 import { $, fill, h, icon } from '../dom.js';
 import { dateTimeFormat, formatNumber, timeFormat } from '../format.js';
 import {
@@ -119,6 +120,110 @@ const PARTY = {
 // A silence "na stałe" (chat.js).
 const FOREVER = 8.64e15;
 const untilText = (until) => (until >= FOREVER ? t('na stałe') : t('do {time}', { time: dateTimeFormat.format(new Date(until)) }));
+
+// The chat's channels the character has, in the order of their tabs: the
+// player's own on this device (chat-order.js, 1039.3), else the game's, with
+// the guild's and the party's among them while the character is in one.
+export function chatTabs() {
+  const chat = state.content.chat;
+  return ordered([...chat.channels, ...(guildChannel() ? [GUILD] : []), ...(leadChannel() ? [LEAD] : []), ...(partyChannel() ? [PARTY] : [])]);
+}
+
+// A channel's tab slides into another place among the channels' tabs
+// (1039.3; the author: „niech będzie można je po prostu slideować te
+// zakładki na czacie”): held still for HOLD ms it lifts and follows the
+// finger (or the mouse), the other tabs making room as it passes their
+// middle; let go, it stays there, and `onDrop` gets the channels' new order
+// (`onCancel` when the slide breaks off). A move before the lift is the
+// bar's own scroll, a short tap chooses the tab as before. While a tab
+// slides, the bar is not drawn anew (renderTabs).
+const HOLD = 350;
+function slideTab(element, bar, onDrop, onCancel) {
+  let start = null;
+  let timer = null;
+  let lifted = false;
+  let grip = null;
+  let dropped = false;
+  const others = () => [...bar.querySelectorAll('.chat-tab[data-channel]')].filter((one) => one !== element);
+  const reset = () => {
+    clearTimeout(timer);
+    timer = null;
+    start = null;
+    if (!lifted) return;
+    lifted = false;
+    element.style.transform = '';
+    element.classList.remove('chat-tab--lifted');
+    bar.classList.remove('chat-tabs--sliding');
+  };
+  element.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0) return;
+    start = { x: event.clientX, y: event.clientY, id: event.pointerId };
+    timer = setTimeout(() => {
+      lifted = true;
+      const box = element.getBoundingClientRect();
+      grip = { x: start.x - box.left, y: start.y - box.top };
+      try {
+        element.setPointerCapture(start.id);
+      } catch {
+        // The finger already gone.
+      }
+      element.classList.add('chat-tab--lifted');
+      bar.classList.add('chat-tabs--sliding');
+      navigator.vibrate?.(15);
+    }, HOLD);
+  });
+  element.addEventListener('pointermove', (event) => {
+    if (!start) return;
+    if (!lifted) {
+      if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > 8) reset();
+      return;
+    }
+    event.preventDefault();
+    element.style.transform = '';
+    const under = others().find((one) => {
+      const box = one.getBoundingClientRect();
+      return event.clientX >= box.left && event.clientX <= box.right && event.clientY >= box.top && event.clientY <= box.bottom;
+    });
+    if (under) {
+      const box = under.getBoundingClientRect();
+      bar.insertBefore(element, event.clientX < box.left + box.width / 2 ? under : under.nextSibling);
+    }
+    const here = element.getBoundingClientRect();
+    element.style.transform = `translate(${event.clientX - grip.x - here.left}px, ${event.clientY - grip.y - here.top}px)`;
+  });
+  // Lifted, the finger moves the tab and not the bar.
+  element.addEventListener(
+    'touchmove',
+    (event) => {
+      if (lifted) event.preventDefault();
+    },
+    { passive: false },
+  );
+  element.addEventListener('pointerup', () => {
+    const was = lifted;
+    reset();
+    if (!was) return;
+    dropped = true;
+    onDrop([...bar.querySelectorAll('.chat-tab[data-channel]')].map((one) => one.dataset.channel));
+  });
+  element.addEventListener('pointercancel', () => {
+    const was = lifted;
+    reset();
+    if (was) onCancel();
+  });
+  element.addEventListener('contextmenu', (event) => event.preventDefault());
+  // The release after a slide chooses nothing.
+  element.addEventListener(
+    'click',
+    (event) => {
+      if (!dropped) return;
+      dropped = false;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    },
+    true,
+  );
+}
 
 const SECTION_KEY = 'insight-community-section';
 // The part whose tab opens the Gildia's own page (screens/guild.js).
@@ -303,7 +408,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   // The channel shown, or the other character of the private conversation
   // shown (null on a channel), and the private conversations for the tabs.
   const tagged = person || mention ? null : mentionChannel();
-  let channel = (tagged === GUILD.id && guildChannel() ? GUILD : chat.channels.find((entry) => entry.id === tagged)) ?? chat.channels[0];
+  let channel = (tagged === GUILD.id && guildChannel() ? GUILD : chat.channels.find((entry) => entry.id === tagged)) ?? chatTabs()[0];
   let talk = person && { id: person.id, name: person.name };
   // The items of the bag the next message in the Wymiana shows, and its
   // goods with the number of pieces of each (goods.js).
@@ -519,7 +624,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   // front, at once or as soon as it shows. A private conversation tags only
   // its other one, so another name goes to the Globalny.
   function tag(name) {
-    if (talk && talk.name.toLowerCase() !== name.toLowerCase()) switchTo(chat.channels[0], null);
+    if (talk && talk.name.toLowerCase() !== name.toLowerCase()) switchTo(chatTabs()[0], null);
     text.value = appendMention(text.value, name);
     closeSuggestions();
     if (!form.isConnected) {
@@ -777,13 +882,20 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
 
   // A tab, its light saying "Oznaczono Cię" when a message there tags the
   // player (`mentioned`).
-  const tab = (label, selected, news, choose, mentioned = false) =>
+  const tab = (label, selected, news, choose, mentioned = false, channelId = null) =>
     h(
       'button',
-      { type: 'button', class: 'chat-tab', role: 'tab', 'aria-selected': String(selected), onClick: choose },
+      { type: 'button', class: 'chat-tab', role: 'tab', 'aria-selected': String(selected), dataset: channelId ? { channel: channelId } : null, onClick: choose },
       h('span', { class: 'chat-tab-name', text: label }),
       news && h('span', { class: 'community-dot', role: 'img', 'aria-label': mentioned ? tagWords.tagged : t('nowe') }),
     );
+  // The channels' order slid into, kept on this device with the places of
+  // the channels the character has not now (the party's out of a Drużyna).
+  const keepOrder = (ids) => {
+    const shown = new Set(ids);
+    setChatOrder([...ids, ...chatOrder().filter((id) => !shown.has(id))]);
+    renderTabs();
+  };
 
   // A private conversation's tab, with the × that closes it.
   const privateTab = (entry) =>
@@ -815,14 +927,17 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   // the guild's and the party's tabs light for their news, every channel's
   // for a message that tags the player (chat-news.js).
   function renderTabs() {
+    if (tabs.classList.contains('chat-tabs--sliding')) return;
     const entries = talk && !conversations.some((entry) => entry.id === talk.id) ? [{ ...talk, latest: 0 }, ...conversations] : conversations;
-    const channels = [...chat.channels, ...(guildChannel() ? [GUILD] : []), ...(leadChannel() ? [LEAD] : []), ...(partyChannel() ? [PARTY] : [])];
+    const channels = chatTabs();
     const elsewhere = (entry) => Boolean(talk) || channel.id !== entry.id;
     fill(
       tabs,
-      channels.map((entry) =>
-        tab(entry.name, !talk && entry.id === channel.id, elsewhere(entry) && channelNews(entry.id), () => switchTo(entry, null), mentionNews(entry.id)),
-      ),
+      channels.map((entry) => {
+        const element = tab(entry.name, !talk && entry.id === channel.id, elsewhere(entry) && channelNews(entry.id), () => switchTo(entry, null), mentionNews(entry.id), entry.id);
+        slideTab(element, tabs, keepOrder, renderTabs);
+        return element;
+      }),
       entries.map(privateTab),
     );
   }
@@ -846,7 +961,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
     render();
     ask();
   }
-  const talkTo = (next) => switchTo(next ? channel : chat.channels[0], next);
+  const talkTo = (next) => switchTo(next ? channel : chatTabs()[0], next);
 
   // The tab's messages asked for anew, as after a new name of the account
   // (../account-name.js): those shown keep the names they came with.
@@ -1316,7 +1431,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
       (failure?.code === 'no_lead' && askedChannel === LEAD) ||
       (failure?.code === 'no_party' && askedChannel === PARTY)
     ) {
-      switchTo(chat.channels[0], null);
+      switchTo(chatTabs()[0], null);
       return;
     }
     if (failure) {

@@ -27275,3 +27275,21 @@ a.discord-button {
   line-height: 1.2;
   overflow-wrap: anywhere;
 }
+
+/* A channel's tab slides into another place (1039.3): held, it lifts above
+   the others, ringed in gold, and follows the finger; no menu or selection
+   from the long press. */
+.chat-tab[data-channel] {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.chat-tab--lifted {
+  position: relative;
+  z-index: 2;
+  border-color: var(--gold);
+  color: var(--text);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+  cursor: grabbing;
+}

@@ -3580,7 +3580,7 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
-## Wersja 0.4.6 (16.11.2026): osiągnięcia z tytułami, Błędny ognik za 600 PS
+## Wersja 0.4.6 (16.11.2026): osiągnięcia z tytułami, Błędny ognik za 600 PS, kolejność kanałów czatu
 
 1. **Osiągnięcia (1030; lista 1036.1 i okno 1036.2 przyjęte, tytuł tylko w profilu i Rankingu: 1036.3 B).**
    - 24 osiągnięcia w 9 grupach (`data/achievements.json`, angielskie w `data/en/achievements.json`). Każde ma cel, tytuł w dwóch formach (mężczyzna, kobieta), nagrodę w Punktach Czasu, przy kilku także w Punktach Systemu, i obrazek, który gra już ma (stwór, przedmiot, profesja), więc bez nowych ikon.
@@ -3590,6 +3590,7 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
    - Cele z poziomu, trzeciej formy, profesji, kart, krain, Areny (ocena), gildii, Wież, znajomych i serii dni liczą się od razu z tego, co postać już ma. Stworów, czempionów i listów gończych pokonanych na wyprawach, złota z wypraw, pojedynków wygranych na Arenie, walk wygranych w lidze, przejść Labiryntu (strażnik 3. poziomu) i transakcji na Targowisku gra wcześniej nie liczyła, więc te liczą się od tej wersji (`characters.feats`, migracja 0152; okno mówi o tym jednym zdaniem). Transakcja liczy się kupującemu i sprzedającemu.
    - Testy w `test/achievements.test.js`.
 2. **Chowaniec: Błędny ognik za 600 PS.** Autor: „Chowaniec: Błędny ognik również powinien kosztować 600 Punktów Systemu jak reszta Chowańców” (wcześniej 800 PS, 415 A). Każda postać, która go kupiła, dostaje zwrot 200 PS (migracja 0153). Błędnego ognika nikt nie dostał inaczej niż przez zakup w Sklepie Systemu, więc zwrot trafia tylko do kupujących.
+3. **Kolejność kanałów czatu (1040.1, przyjęte).** Autor o 1039.3: „niech będzie można je po prostu slideować te zakładki na czacie”. Zakładkę kanału przytrzymuje się chwilę, unosi się w złotej ramce i przesuwa palcem albo myszą w nowe miejsce. Kolejność zostaje na urządzeniu (`src/client/chat-order.js`), a pierwszy kanał otwiera się przy wejściu na czat, chyba że w innym czeka oznaczenie @. Krótkie stuknięcie wybiera kanał, a przesunięcie bez przytrzymania przewija pasek. Rozmowy prywatne zostają za kanałami.
 
 ## Wersja 0.4.5 (16.11.2026): 3v3 każda trójka z każdą, walkowery za brakujące trójki
 
