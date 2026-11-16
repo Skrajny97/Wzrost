@@ -3580,6 +3580,14 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.73 (16.11.2026): liga wojen gildii, pakiety kart z aktywności, ranni towarzysze
+
+- Wojny gildii to liga każda gildia z każdą (zob. „Liga wojen gildii (996; 16.11.2026)”, makiety 996 v3 przyjęte): migracja `0140_guild_league.sql` zeruje wojny wylosowane w nocy, a pierwsze uruchomienie losuje ligę tego tygodnia od dzisiejszego wieczoru.
+- Pakiety kart z wypraw i innych aktywności oraz drugi pakiet u Szczęsnego za 3 razy tyle (zob. „Pakiety kart z aktywności i drugi pakiet u Szczęsnego (997; 16.11.2026)”, makiety 997.1–997.3 przyjęte; migracja `0141_card_packs.sql`).
+- Na ekranie Walki pole odpoczynku pokazuje rannych towarzyszy, którzy czekają, aż postać odpocznie do pełna HP (`woundedWaiting` w `src/server/hunts.js`). Gracz (poz. 51), 16.11.2026: „nie wiesz klikając kolejną wyprawę i idziesz sam bez nich”.
+- Na komputerze podpowiedź przy Punktach Czasu nie miga pod myszą: pasek odświeża ją tylko wtedy, gdy mysz nad nią nie stoi (`src/client/layout.js`).
+- Narzędzia: `tools/layout-check.cjs` ogląda zakładkę Wojna ligi z otwartymi częściami; test karty efektu z wyprawy ma postać w pełnym ekwipunku, bo bez niego bywało omdlenie.
+
 ## Wersja 0.3.72 (16.11.2026): maski skóry w 71 portretach
 
 1. Maski odcieni skóry w 71 portretach (995). Zob. „Maski odcieni skóry w 71 portretach”.
