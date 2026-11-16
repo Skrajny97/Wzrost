@@ -1215,6 +1215,11 @@
       "id": "0.4.2",
       "title": "Wersja 0.4.2",
       "body": "- Nagroda za kolejne dni gry: przy pierwszym wejściu w danym dniu odbierzesz nagrodę dnia. Każdy kolejny dzień daje więcej złota i Punktów Czasu, a 7. dnia czeka pakiet kart i 5 Punktów Systemu. Opuszczony dzień zaczyna serię od nowa. Jedna seria na konto.\n- Liga wojen gildii: „Jak to działa?” mówi dokładniej o wolnych wieczorach i o dwóch meczach jednego wieczoru przy więcej niż 8 gildiach."
+    },
+    {
+      "id": "0.4.3",
+      "title": "Wersja 0.4.3",
+      "body": "- „Samouczki” w Ustawieniach: objaśnienia narratora do przeczytania i odsłuchania w każdej chwili. Pod wieloma częściami jest „Objaśnij jeszcze raz”: narrator przejdzie je z Tobą od początku.\n- „Parametry dodatkowe” w Statystykach pokazują, ile dodaje Rdzeń."
     }
   ]
 }

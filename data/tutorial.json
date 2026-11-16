@@ -16,72 +16,102 @@
     "label": "Pomijaj objaśnienia narratora",
     "hint": "Narrator nie objaśnia nowych zakładek i miejsc, a nowa postać zaczyna bez wprowadzenia. Dotyczy wszystkich postaci na koncie."
   },
+  "introTitle": "Wprowadzenie",
   "chapters": {
     "skills": {
+      "title": "Umiejętności",
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Umiejętności czekają w zakładce Postać."
     },
     "professions": {
+      "title": "Profesje",
+      "replay": true,
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Profesje czekają w zakładce Profesje."
     },
     "community": {
+      "title": "Społeczność",
+      "replay": true,
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Społeczność czeka w zakładce Społeczność."
     },
     "crafting": {
+      "title": "Rzemieślnictwo",
+      "replay": true,
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Rzemieślnictwo czeka w zakładce Profesje."
     },
     "settlement": {
+      "title": "Osada",
+      "replay": true,
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Osada czeka w zakładce Osada."
     },
     "evolution": {
+      "title": "Ewolucja",
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Ewolucja czeka w zakładce Postać."
     },
     "towers": {
+      "title": "Wieże",
+      "replay": true,
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Wieże czekają w zakładce Walka."
     },
     "mining": {
+      "title": "Górnictwo i Jubilerstwo",
+      "replay": true,
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Górnictwo i Jubilerstwo czekają w zakładce Profesje."
     },
     "portals": {
+      "title": "Portale",
+      "replay": true,
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Portale czekają w zakładce Walka."
     },
     "labyrinth": {
+      "title": "Labirynt",
+      "replay": true,
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Labirynt czeka w Osadzie, w Sali prób."
     },
     "guild": {
+      "title": "Gildia",
+      "replay": true,
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Gildia czeka w Społeczności, w zakładce Gildia."
     },
     "fortress": {
+      "title": "Warownia",
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Warownia czeka w zakładce Obóz."
     },
     "party": {
+      "title": "Drużyna",
+      "replay": true,
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Drużyna czeka w Społeczności, w zakładce Drużyna."
     },
     "cornerstone": {
+      "title": "Kamień węgielny",
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Kamień węgielny czeka w zakładce Obóz."
     },
     "hard-hunt": {
+      "title": "Trudna wyprawa",
+      "replay": true,
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Trudna wyprawa czeka w Walce, w opcjach wyprawy."
     },
     "account-chest": {
+      "title": "Skrzynia Konta",
+      "replay": true,
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Skrzynia Konta czeka w zakładce Obóz."
     },
     "faint": {
+      "title": "Porażka",
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Raporty czekają w Dzienniku, na górze ustawień pod zębatką."
     }

@@ -11,7 +11,7 @@
 import { buildingLevel, construction, longestHunt, missingFor, upgradeCost } from '../engine/index.js';
 import { beginBuilding, completeBuilding } from './camp.js';
 import { characterView, loadPlayer, requirePlayer, walletOf } from './characters.js';
-import { content, firstSteps, tutorialChapters, tutorialLines, tutorialPart } from './content.js';
+import { content, firstSteps, replayChapters, tutorialChapters, tutorialLines, tutorialPart } from './content.js';
 import { beginHunt, finishHunt } from './hunts.js';
 import { ApiError, json, readJson } from './http.js';
 import { requireSession } from './sessions.js';
@@ -73,6 +73,25 @@ export async function skipIntroduction(db, userId, now) {
 // POST /api/tutorial/settings {skip}: "Pomijaj objaśnienia narratora" on
 // the account, for all its characters, or off again. It changes nothing
 // read: a part passed stays passed, and those to come show again once off.
+// POST /api/tutorial/replay { chapter }: a chapter of the narrator's told
+// again, from the Samouczki (1039.2 B; the author: „albo i taki restart”):
+// its lines unread, so it comes again at its moment, as at first. Only a
+// chapter whose moment no state of the game has passed (data/tutorial.json,
+// chapters.<id>.replay), for a character with the narrator's introduction.
+export async function replayTutorial(context) {
+  const { session, player } = await requirePlayer(context);
+  const body = await readJson(context.request);
+  if (typeof body.chapter !== 'string' || !replayChapters.has(body.chapter)) throw new ApiError(400, 'invalid_chapter', 'Tej części nie można objaśnić jeszcze raz.');
+  const row = player.row;
+  if (row.tutorial === null) throw new ApiError(409, 'no_tutorial', 'Ta postać nie ma wprowadzenia.');
+  const lines = new Set(tutorialPart(body.chapter));
+  const read = JSON.parse(row.tutorial).filter((id) => !lines.has(id));
+  const db = context.env.DB;
+  const { meta } = await db.prepare('UPDATE characters SET tutorial = ?, version = version + 1 WHERE id = ? AND version = ?').bind(JSON.stringify(read), row.id, row.version).run();
+  if (meta.changes !== 1) throw new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
+  return json({ character: characterView(await loadPlayer(db, session.userId), context.now) });
+}
+
 export async function setTutorialSettings(context) {
   const session = await requireSession(context);
   const body = await readJson(context.request);

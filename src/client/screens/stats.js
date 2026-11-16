@@ -60,11 +60,14 @@ function openExtra(character) {
       notes.filter(Boolean).map((note) => h('dd', { class: 'extra-note', text: note })),
     );
   const rating = (value, stat, cap) => t('ocena {value} ({stat}), najwyżej {cap}', { value: formatNumber(value), stat, cap: percent(cap) });
+  // The Rdzeń's share in a number, where its Artefakty give one (preview.js).
+  const fromCore = (share) => share > 0 && t('Rdzeń +{share}%', { share: formatDecimal(share * 100) });
   const group = (title, ...rows) => [h('h3', { class: 'extra-title', text: title }), h('dl', { class: 'extra-list' }, rows)];
   const armorFrom = [
     t('ekwipunek {armor}', { armor: formatNumber(armor.equipment) }),
     t('Wytrzymałość {armor}', { armor: formatNumber(armor.endurance) }),
     armor.trait && t('cecha {name} +{share}%', { name: armor.trait.name, share: formatDecimal(armor.trait.share * 100) }),
+    fromCore(armor.core),
   ].filter(Boolean);
   openSheet(
     h('h2', { class: 'sheet-title', text: t('Parametry dodatkowe') }),
@@ -75,19 +78,19 @@ function openExtra(character) {
     group(
       t('Obrona'),
       row(t('Pancerz'), formatNumber(armor.total), armorFrom.join(' · '), t('redukcja obrażeń fizycznych {percent}', { percent: percent(armor.reduction) })),
-      row(t('Unik'), percent(dodge.chance), rating(dodge.rating, t('Zręczność'), dodge.cap)),
-      row(t('Odporność na efekty'), percent(effectResist.chance), rating(effectResist.rating, t('Wola'), effectResist.cap)),
+      row(t('Unik'), percent(dodge.chance), rating(dodge.rating, t('Zręczność'), dodge.cap), fromCore(dodge.core)),
+      row(t('Odporność na efekty'), percent(effectResist.chance), rating(effectResist.rating, t('Wola'), effectResist.cap), fromCore(effectResist.core)),
     ),
     group(
       t('Atak'),
-      row(t('Trafienie krytyczne'), percent(crit.chance), rating(crit.rating, t('Percepcja'), crit.cap)),
+      row(t('Trafienie krytyczne'), percent(crit.chance), rating(crit.rating, t('Percepcja'), crit.cap), fromCore(crit.core)),
       row(t('Mnożnik krytyka'), `×${formatPrecise(crit.multiplier)}`, t('tyle razy mocniej uderza cios krytyczny')),
-      row(t('Szybkość'), formatPrecise(extra.speed), t('im wyższa, tym częściej postać rusza się w walce (Zręczność)')),
+      row(t('Szybkość'), formatPrecise(extra.speed), t('im wyższa, tym częściej postać rusza się w walce (Zręczność)'), fromCore(extra.speedCore)),
     ),
     group(
       t('Zdrowie'),
       row(t('Regeneracja'), `${formatPrecise(extra.regen)} HP/min`, t('między wyprawami, z premią Ogniska')),
-      row(t('Odzysk HP po walce'), percent(Math.min(1, extra.recovery)), t('tyle brakującego HP wraca po każdej walce na wyprawie')),
+      row(t('Odzysk HP po walce'), percent(Math.min(1, extra.recovery)), t('tyle brakującego HP wraca po każdej walce na wyprawie'), extra.recoveryCore > 0 && t('Rdzeń +{share} pkt proc.', { share: formatDecimal(extra.recoveryCore * 100) })),
     ),
     group(
       t('Odporności na żywioły'),
@@ -97,6 +100,7 @@ function openExtra(character) {
           percent(element.reduction),
           t('odporność {rating}', { rating: formatNumber(element.rating) }),
           element.shelter > 0 && t('cecha: o {percent}% mniej obrażeń', { percent: formatDecimal(element.shelter * 100) }),
+          fromCore(element.core),
         ),
       ),
     ),

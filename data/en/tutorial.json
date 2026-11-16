@@ -12,72 +12,90 @@
     "label": "Skip the narrator's explanations",
     "hint": "The narrator does not explain new tabs and places, and a new character starts without the introduction. Applies to every character on the account."
   },
+  "introTitle": "Introduction",
   "chapters": {
     "towers": {
+      "title": "Towers",
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Towers wait in the Combat tab."
     },
     "portals": {
+      "title": "Portals",
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Portals wait in the Combat tab."
     },
     "labyrinth": {
+      "title": "Labyrinth",
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Labyrinth waits in the Settlement, in the Trial Hall."
     },
     "guild": {
+      "title": "Guild",
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Guild waits in the Community, in the Guild tab."
     },
     "fortress": {
+      "title": "Stronghold",
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Stronghold waits in the Camp tab."
     },
     "cornerstone": {
+      "title": "Cornerstone",
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Cornerstone waits in the Camp tab."
     },
     "hard-hunt": {
+      "title": "Hard exploration",
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Hard exploration waits in Combat, in the exploration options."
     },
     "account-chest": {
+      "title": "Account Chest",
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Account Chest waits in the Camp tab."
     },
     "faint": {
+      "title": "Defeat",
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. Reports wait in the Journal, at the top of the settings under the cog."
     },
     "skills": {
+      "title": "Skills",
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. Skills wait in the Character tab."
     },
     "evolution": {
+      "title": "Evolution",
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. Evolution waits in the Character tab."
     },
     "party": {
+      "title": "Party",
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Party waits in the Community, in the Party tab."
     },
     "professions": {
+      "title": "Professions",
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Professions wait in the Professions tab."
     },
     "community": {
+      "title": "Community",
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Community waits in the Community tab."
     },
     "crafting": {
+      "title": "Crafting",
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. Crafting waits in the Professions tab."
     },
     "settlement": {
+      "title": "Settlement",
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Settlement waits in the Settlement tab."
     },
     "mining": {
+      "title": "Mining and Jewelcrafting",
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. Mining and Jewelcrafting wait in the Professions tab."
     }

@@ -27094,3 +27094,60 @@ a.discord-button {
   text-align: center;
 }
 
+/* The Samouczki (1039): the narrator's lines by part, folded, each line's
+   words with a button to hear its recording. */
+.tutorials-lead {
+  margin: 0 0 12px;
+}
+
+.tutorials-parts {
+  display: grid;
+  gap: 10px;
+}
+
+.tutorial-entries {
+  display: grid;
+  gap: 10px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tutorial-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.45);
+}
+
+.tutorial-entry-text {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  font-size: 16px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.tutorial-entry-text p {
+  margin: 0;
+}
+
+.tutorial-entry-voice {
+  min-width: 44px;
+  min-height: 40px;
+  padding: 6px 10px;
+}
+
+.tutorial-entry-voice[aria-pressed='true'] {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.tutorials-replay {
+  margin-top: 10px;
+}

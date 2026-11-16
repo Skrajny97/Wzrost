@@ -100,6 +100,11 @@
         }
       }
     },
+    "introTitle": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Nazwa wprowadzenia (kwestii bez chapter) w Samouczkach w Ustawieniach (1039)."
+    },
     "chapters": {
       "type": "object",
       "description": "Części po wprowadzeniu: każda ma swój przycisk pomijania i komunikat po nim. Kwestie należą do części przez chapter.",
@@ -111,6 +116,15 @@
           "skippedText"
         ],
         "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Nazwa części w Samouczkach (1039)."
+          },
+          "replay": {
+            "type": "boolean",
+            "description": "Część, którą narrator może objaśnić jeszcze raz z Samouczków (1039.2 B): jej warunki nie zależą od stanu gry, który trzeba by cofnąć."
+          },
           "skipLabel": {
             "type": "string",
             "minLength": 1,

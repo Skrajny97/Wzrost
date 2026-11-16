@@ -278,6 +278,8 @@ export const tutorialLines = keptLines.map((line) => line.id);
 // chapters after it, such as the Umiejętności.
 export const tutorialPart = (chapter = null) => keptLines.filter((line) => (line.chapter ?? null) === chapter).map((line) => line.id);
 export const tutorialChapters = Object.keys(tutorial.chapters);
+// The chapters the narrator may tell again from the Samouczki (1039.2 B).
+export const replayChapters = new Set(Object.entries(tutorial.chapters).filter(([, chapter]) => chapter.replay).map(([id]) => id));
 
 // The first steps of the introduction, which a skipped one plays for the player.
 export const firstSteps = tutorial.firstSteps;

@@ -1071,6 +1071,10 @@ function told(line) {
   return { ...line, text: female ? own.female.text : own.text, voice };
 }
 const words = (line) => told(line).text.map((text) => text.replaceAll('{points}', String(state.content.tutorial.startTimePoints)));
+// A line's words and recording as told to this character, for the
+// Samouczki, where the narrator's lines wait to be read again (1039).
+export const lineWords = words;
+export const lineVoice = (line) => told(line).voice;
 
 // The line's recording, over quieter music. The next line's recording is
 // fetched meanwhile, so it starts on time. `onStart` learns how long it is.

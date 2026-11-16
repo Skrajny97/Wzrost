@@ -1847,6 +1847,26 @@ describe('Time Points and the narrator', () => {
     assert.equal((await me()).skipTutorials, false);
   });
 
+  // "Objaśnij jeszcze raz" in the Samouczki (1039.2 B): a chapter whose
+  // moment no state of the game has passed comes again, its lines unread;
+  // the others, and a character from before the introduction, cannot.
+  test('a chapter of the narrator told again from the Samouczki: its lines unread, only where the data allows', async () => {
+    await character();
+    const { tutorial } = (await call('GET', '/api/content')).data;
+    // The lines kept once read: cards, pointed places and the "once" leads.
+    const community = tutorial.lines.filter((line) => line.chapter === 'community' && (line.kind === 'card' || line.kind === 'point' || line.once)).map((line) => line.id);
+    const database = await db();
+    await database.prepare('UPDATE characters SET tutorial = ?').bind(JSON.stringify(['ending', ...community, 'skills-welcome'])).run();
+    const replay = (chapter) => call('POST', '/api/tutorial/replay', { cookie, body: { chapter } });
+    const told = await replay('community');
+    assert.equal(told.status, 200);
+    assert.deepEqual(told.data.character.tutorial, ['ending', 'skills-welcome']);
+    assert.equal((await replay('skills')).data.error.code, 'invalid_chapter');
+    assert.equal((await replay('nic')).data.error.code, 'invalid_chapter');
+    await database.prepare('UPDATE characters SET tutorial = NULL').run();
+    assert.equal((await replay('community')).data.error.code, 'no_tutorial');
+  });
+
   test('with "Pomijaj objaśnienia narratora" on, a new character starts as after "Pomiń wprowadzenie"', async () => {
     const { tutorial } = (await call('GET', '/api/content')).data;
     const intro = tutorial.lines.filter((line) => (line.kind === 'card' || line.kind === 'point' || line.once) && !line.chapter).map((line) => line.id);
