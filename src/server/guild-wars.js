@@ -46,6 +46,7 @@ import {
   warWeek,
 } from '../engine/index.js';
 import { assertion, raced } from './atomic.js';
+import { featGains } from './achievements.js';
 import { engineCharacter } from './characters.js';
 import { content, contentIn } from './content.js';
 import { nameColorOf } from './cosmetics.js';
@@ -236,6 +237,8 @@ async function fightMatch(db, league, match, at, now) {
   const b = await teamsFor(db, league, match.day, match.guild_b);
   const fights = [];
   const gold = new Map();
+  // The fights each character won, for the achievements (achievements.js).
+  const wins = new Map();
   const fought = { a: new Set(), b: new Set() };
   const tally = { winsA: 0, winsB: 0, lossesA: 0, lossesB: 0, walkoversA: 0, walkoversB: 0, draws: 0 };
   let result = null;
@@ -280,6 +283,7 @@ async function fightMatch(db, league, match, at, now) {
             if (battle.result !== side) return fighterRecord(one);
             const reward = warReward(one.character.level, polish);
             gold.set(one.row.id, (gold.get(one.row.id) ?? 0) + reward.gold);
+            wins.set(one.row.id, (wins.get(one.row.id) ?? 0) + 1);
             return fighterRecord(one, { gold: reward.gold });
           });
         fights.push({
@@ -305,6 +309,7 @@ async function fightMatch(db, league, match, at, now) {
     assertion(db, '(SELECT days_done FROM guild_wars WHERE id = ?) = 0', [match.id]),
     ...fightRows(db, match.id, match.day, at, fights),
     ...ids.map((id) => db.prepare('UPDATE characters SET gold = gold + ?, system_points = system_points + ? WHERE id = ?').bind(gold.get(id) ?? 0, points.get(id) ?? 0, id)),
+    ...[...wins].flatMap(([id, count]) => featGains(db, id, { leagueWins: count })),
     db
       .prepare('UPDATE guild_wars SET days_done = 1, wins_a = ?, wins_b = ?, losses_a = ?, losses_b = ?, walkovers_a = ?, walkovers_b = ?, draws = ?, result = ?, ended_at = ? WHERE id = ?')
       .bind(tally.winsA, tally.winsB, tally.lossesA, tally.lossesB, tally.walkoversA, tally.walkoversB, tally.draws, result, now, match.id),
@@ -653,8 +658,9 @@ async function leagueView(db, guild, ours, league, week, viewer, now) {
                 rival: { ...rival, members, trios },
                 duels: ours.members.length * members,
                 trioFights: ourTrios * trios,
-                // The walkovers of the trios one guild has fewer of (matchFights).
-                walkovers: { ours: Math.max(0, trios - ourTrios), theirs: Math.max(0, ourTrios - trios) },
+                // The walkovers of the trios one guild has fewer of, each
+                // against every trio of the rival (matchFights).
+                walkovers: { ours: Math.max(0, trios - ourTrios) * trios, theirs: Math.max(0, ourTrios - trios) * ourTrios },
               };
             }),
         };

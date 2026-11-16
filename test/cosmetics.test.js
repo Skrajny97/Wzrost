@@ -32,11 +32,11 @@ describe('the Sklep Systemu in the engine', () => {
         ['aura-system', 'aura', 'Aura Systemu', 500],
         ['aura-ember', 'aura', 'Aura Żaru', 500],
         ['trail-light', 'trail', 'Świetliste ślady', 300],
-        // The pets (413, 414, "415 A"): the fox and the raven for 600 PS,
-        // the will-o'-the-wisp for 800.
+        // The pets (413, 414, "415 A"): each for 600 PS, the
+        // will-o'-the-wisp too from 0.4.6 (till then 800; the author, 16.11.2026).
         ['fox', 'pet', 'Chowaniec: Lis', 600],
         ['raven', 'pet', 'Chowaniec: Kruk', 600],
-        ['wisp', 'pet', 'Chowaniec: Błędny ognik', 800],
+        ['wisp', 'pet', 'Chowaniec: Błędny ognik', 600],
         // The outfits (skórki, 763 A: about 800 PS), the Cień's first.
         ['night-raven', 'outfit', 'Płaszcz Nocnego Kruka', 800],
         ['forest-lord', 'outfit', 'Strój Leśnego Pana', 800],
@@ -120,8 +120,8 @@ describe('the Sklep Systemu in the engine', () => {
     assert.equal(cosmeticsOf({ owned: ['fox'], pet: 'wisp' }, content).pet, null);
     assert.equal(cosmeticsOf({ owned: ['aura-system'], pet: 'aura-system' }, content).pet, null);
     // Bought for its points, without a mount from the Stajnia.
-    assert.equal(cosmeticBlock('wisp', {}, { systemPoints: 800, mount: null }, content), null);
-    assert.equal(cosmeticBlock('wisp', {}, { systemPoints: 799, mount: null }, content).code, 'not_enough_points');
+    assert.equal(cosmeticBlock('wisp', {}, { systemPoints: 600, mount: null }, content), null);
+    assert.equal(cosmeticBlock('wisp', {}, { systemPoints: 599, mount: null }, content).code, 'not_enough_points');
     // Each walks in the Walka scene and sits on the portrait, as the data has them.
     for (const id of ['fox', 'raven', 'wisp']) {
       const { walk, foot, ride, portrait } = item(id).pet;
@@ -283,7 +283,7 @@ describe('the Sklep Systemu through the API', () => {
     assert.deepEqual(fox.data.bought, { id: 'fox', name: 'Chowaniec: Lis', price: 600 });
     assert.equal(fox.data.character.systemPoints, 800);
     assert.equal(fox.data.character.cosmetics.pet, null);
-    assert.equal((await buy('kupiec', 'wisp')).data.character.systemPoints, 0);
+    assert.equal((await buy('kupiec', 'wisp')).data.character.systemPoints, 200);
     assert.equal((await buy('kupiec', 'raven')).data.error.code, 'not_enough_points');
     assert.equal((await wear('kupiec', 'pet', 'raven')).data.error.code, 'not_owned');
     assert.equal((await wear('kupiec', 'aura', 'fox')).status, 400);
@@ -299,7 +299,7 @@ describe('the Sklep Systemu through the API', () => {
     // Off, and the card shows none.
     assert.equal((await wear('kupiec', 'pet', null)).data.character.cosmetics.pet, null);
     assert.equal((await as('sasiad', 'GET', '/api/profile/Kupiec')).data.profile.pet, null);
-    assert.equal((await stored('Kupiec')).system_points, 0);
+    assert.equal((await stored('Kupiec')).system_points, 200);
   });
 
   test('an outfit is bought only by a character of its class, worn, and seen on its card and in the list of characters', async () => {

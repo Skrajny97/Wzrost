@@ -53,6 +53,7 @@ import {
   seasonFactor,
 } from '../engine/index.js';
 import { assertion, atomically } from './atomic.js';
+import { featGains } from './achievements.js';
 import { cardArenaBrief } from './card-arena.js';
 import { attackBlocked, characterView, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireNotExploring, requirePlayer } from './characters.js';
 import { content } from './content.js';
@@ -391,6 +392,8 @@ export async function arenaFight(context) {
            VALUES (?, ?, ?, ?, ?, ?, ${ratingNow}, ${ratingNow}, ?, ?)`,
         )
         .bind(row.id, rivalId, now, duel.result, changes.attacker, changes.defender, row.id, rivalId, seed, JSON.stringify(duel.fight)),
+      // A duel won counts for the achievements (achievements.js).
+      ...featGains(db, row.id, { arenaWins: duel.result === 'win' ? 1 : 0 }),
     ],
     changed,
   );

@@ -87,9 +87,9 @@ describe("the guild wars' rules", () => {
   });
 
   // The author, 16.11.2026: „ci co jest ich 18 dzielą się na 6 drużyn i
-  // walczą z 10 drużynami renegatów, więc 4 walki są oddane walkowerem ale ze
-  // strony Pierwotnych”.
-  test('a match: every member duels every member of the rival (1v1), every trio fights every trio (3v3), a short trio too; the guild with fewer trios gives a walkover for each it lacks', () => {
+  // walczą z 10 drużynami renegatów”, and then: „jeśli gildia ma 6 drużyn
+  // tylko to walkowerem oddaje 40 walk ze 100 a nie 4”.
+  test('a match: every member duels every member of the rival (1v1), every trio fights every trio (3v3), a short trio too; each trio the guild with fewer lacks loses by walkover to every rival trio', () => {
     const fights = matchFights({ duelsA: 4, duelsB: 3, triosA: [[1, 2, 3], [4]], triosB: [[5, 6, 7]] }, content);
     const duels = fights.filter((fight) => fight.format === '1v1');
     assert.equal(duels.length, 12);
@@ -100,7 +100,8 @@ describe("the guild wars' rules", () => {
       [
         [0, 0, null],
         [1, 0, null],
-        [-1, -1, 'b'],
+        [0, -1, 'b'],
+        [1, -1, 'b'],
       ],
     );
     // Two short trios fight each other.
@@ -109,13 +110,15 @@ describe("the guild wars' rules", () => {
       [null, null],
     );
     // 18 members against 29: six trios against ten, the last one of two;
-    // 60 fights, and 4 walkovers given by the guild of six.
+    // 100 fights as if both had ten: 60 fought, and 40 walkovers given by
+    // the guild of six (each of its 4 missing trios to each of the ten).
     const trios = (members) => Array.from({ length: Math.ceil(members / 3) }, (_, index) => Array.from({ length: Math.min(3, members - index * 3) }, (__, one) => index * 3 + one));
     const big = matchFights({ duelsA: 18, duelsB: 29, triosA: trios(18), triosB: trios(29) }, content).filter((fight) => fight.format === '3v3');
     assert.equal(big.filter((fight) => fight.walkover === null).length, 60);
+    assert.equal(big.length, 100);
     assert.deepEqual(
       big.filter((fight) => fight.walkover !== null).map((fight) => fight.walkover),
-      ['a', 'a', 'a', 'a'],
+      Array.from({ length: 40 }, () => 'a'),
     );
     // A trio with none able to fight is no trio.
     assert.deepEqual(
@@ -125,7 +128,8 @@ describe("the guild wars' rules", () => {
       [
         [0, 0, null],
         [0, 1, null],
-        [-1, -1, 'a'],
+        [-1, 0, 'a'],
+        [-1, 1, 'a'],
       ],
     );
   });

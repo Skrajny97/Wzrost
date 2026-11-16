@@ -321,5 +321,7 @@ export function buildContent(raw) {
     // The weeks of the year with their effects (weeks.js), by their number.
     weeks: raw.weeks ?? null,
     weeksByNumber: lookup((raw.weeks?.weeks ?? []).map((/** @type {Entry} */ week) => [week.number, week])),
+    // The achievements with their titles (achievements.js, 1036).
+    achievements: raw.achievements ?? null,
   };
 }

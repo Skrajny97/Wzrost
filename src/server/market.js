@@ -54,6 +54,7 @@ import {
 import { bagItems, bagPlaces, characterView, loadPlayer, requireOffRack, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { assertion, atomically as atomicBatch, raced } from './atomic.js';
+import { featGains } from './achievements.js';
 import { favoriteIds, withoutFavorites } from './favorites.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
@@ -246,6 +247,9 @@ const soldLines = (db, offer, event, buyerId, buyerName, price, now) => [
   ...(offer.seller_id === null
     ? []
     : offerLine(db, offer, offer.seller_id, { event: 'sold', price, name: buyerName, gold: sellerShare(price, content(), offer.fee ?? tuning().fee) }, now)),
+  // A deal for both sides, for the achievements (achievements.js).
+  ...featGains(db, buyerId, { deals: 1 }),
+  ...(offer.seller_id === null ? [] : featGains(db, offer.seller_id, { deals: 1 })),
 ];
 
 // The bids kept for "Licytuję" go once their offer is settled.

@@ -259,13 +259,18 @@ export function leaguePrizes(table, content) {
 // The fights of a match (the author, 16.11.2026: „walczy każdy z każdym”,
 // and after its first evening: „ci co jest ich 18 dzielą się na 6 drużyn i
 // walczą z 10 drużynami renegatów, więc 4 walki są oddane walkowerem ale ze
-// strony Pierwotnych”): in the 1v1 every one of `duelsA` against every one
-// of `duelsB`, and in the 3v3 every trio of `triosA` against every trio of
+// strony Pierwotnych”, and then: „jeśli gildia ma 6 drużyn tylko to
+// walkowerem oddaje 40 walk ze 100 a nie 4”, „taka gildia musi wygrać
+// większość swoich walk żeby prowadzić … kara za mniejszą ilość członków i
+// ich siłę”): in the 1v1 every one of `duelsA` against every one of
+// `duelsB`, and in the 3v3 as many fights as if both guilds had the trios
+// of the one with more: every trio of `triosA` against every trio of
 // `triosB`, a trio short of members too (it fights with fewer; one left
-// with nobody is no trio). The guild with fewer trios gives a walkover for
-// each one it lacks. Each fight: its format, the places of its sides in
-// their lists (from 0; -1 for a walkover's trio that is not there) and,
-// for a walkover, who loses it ('a' or 'b').
+// with nobody is no trio), and each trio the guild with fewer lacks loses
+// by walkover its fight against every trio of the rival (6 trios against
+// 10: 60 fights and 40 walkovers). Each fight: its format, the places of
+// its sides in their lists (from 0; -1 for a walkover's trio that is not
+// there) and, for a walkover, who loses it ('a' or 'b').
 /** @typedef {{ format: '1v1' | '3v3', a: number, b: number, walkover: 'a' | 'b' | null }} MatchFight A fight of a match. */
 /**
  * @param {{ duelsA: number, duelsB: number, triosA: unknown[][], triosB: unknown[][] }} sides
@@ -281,8 +286,8 @@ export function matchFights({ duelsA, duelsB, triosA, triosB }, _content) {
   const teamsA = places(triosA);
   const teamsB = places(triosB);
   for (const a of teamsA) for (const b of teamsB) fights.push({ format: '3v3', a, b, walkover: null });
-  for (let left = teamsA.length; left < teamsB.length; left++) fights.push({ format: '3v3', a: -1, b: -1, walkover: 'a' });
-  for (let left = teamsB.length; left < teamsA.length; left++) fights.push({ format: '3v3', a: -1, b: -1, walkover: 'b' });
+  for (let left = teamsA.length; left < teamsB.length; left++) for (const b of teamsB) fights.push({ format: '3v3', a: -1, b, walkover: 'a' });
+  for (let left = teamsB.length; left < teamsA.length; left++) for (const a of teamsA) fights.push({ format: '3v3', a, b: -1, walkover: 'b' });
   return fights;
 }
 

@@ -5,6 +5,7 @@
 
 import { herbSprite, itemSprite, materialSprite, mineralSprite, pantrySprite, potionSprite, resourceArt, scrollArt } from '../art.js';
 import { bonusList } from '../bonuses.js';
+import { showAchievements } from '../achievements.js';
 import { characterLook, portraitLayers } from '../cosmetics.js';
 import { MATERIALS_HINT, materialIcon, materialSheet, materialTitle } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
@@ -322,6 +323,13 @@ export function mountCharacter(container, { switchCharacter } = {}) {
           // What works on the character now, over its figure (the author).
           bonusList(character),
           h('div', { class: 'portrait-wrap' }, frame),
+          // The achievements and their titles (1036.2).
+          h(
+            'button',
+            { type: 'button', class: 'button button--world button--small character-achievements', onClick: (event) => withButton(event.currentTarget, showAchievements) },
+            icon('trophy', { size: 18 }),
+            h('span', { text: t('Osiągnięcia') }),
+          ),
           systemPanel(...characterMessage(character, busy)),
         ),
         bagSection(character.bag),

@@ -1230,6 +1230,11 @@
       "id": "0.4.5",
       "title": "Wersja 0.4.5",
       "body": "- Liga wojen gildii, 3v3: każda trójka walczy z każdą trójką rywala, także niepełna, w mniejszym składzie. Gildia, która ma mniej trójek, oddaje walkowerem po jednej walce za każdą brakującą trójkę. Przykład: 18 członków to 6 trójek, 29 członków to 10 trójek, więc jest 60 walk 3v3, a mniejsza gildia oddaje walkowerem 4. Tak walczy już dzisiejsza powtórka o 23:00."
+    },
+    {
+      "id": "0.4.6",
+      "title": "Wersja 0.4.6",
+      "body": "- Liga wojen gildii, 3v3: walk jest tyle, jakby obie gildie miały tyle trójek co większa. Każda trójka, której brakuje mniejszej gildii, przegrywa walkowerem z każdą trójką rywala. Przykład: 6 trójek na 10 to 100 walk, z czego 40 mniejsza gildia oddaje walkowerem. Zasada działa od wieczoru 17.11.\n- Seria dni: cienka zakładka z kalendarzem przy lewej krawędzi ekranu pokazuje, który to dzień serii. Złota znaczy, że nagroda dnia czeka. Stuknij ją, żeby zobaczyć postęp.\n- Osiągnięcia: na zakładce Postać, pod portretem, jest przycisk „Osiągnięcia”. Czekają tam 24 cele w 9 grupach. Każdy daje tytuł i Punkty Czasu, a niektóre także Punkty Systemu. Nagroda trafia do Ciebie, gdy zajrzysz do okna osiągnięć. Zdobyty tytuł możesz nosić: widać go w Twoim profilu i w Rankingu. Pokonane stwory, czempioni, listy gończe, złoto z wypraw, pojedynki, walki ligi, przejścia Labiryntu i transakcje liczą się od dziś.\n- Chowaniec: Błędny ognik kosztuje teraz 600 Punktów Systemu, jak pozostałe chowańce. Kto kupił go za 800, dostał zwrot 200 Punktów Systemu.\n- Czat: przytrzymaj zakładkę kanału, a potem przesuń ją w nowe miejsce. Pierwszy kanał otwiera się, gdy wchodzisz na czat. Kolejność zapamiętuje urządzenie."
     }
   ]
 }

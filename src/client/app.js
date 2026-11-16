@@ -17,7 +17,7 @@ import { buildTopbar, showWallet, updateNav, updateTopbar } from './layout.js';
 import { desktopLayout, layoutChoice, layoutOffered, onLayoutChange, setLayoutChoice } from './layout-mode.js';
 import { updateSide } from './side.js';
 import { chatBubbleOn, setChatBubbleOn, updateChatBubble } from './chat-bubble.js';
-import { offerStreak } from './daily-streak.js';
+import { mountStreakTab, offerStreak } from './daily-streak.js';
 // The computer's keys 1–6 for the main tabs (477 A, 508 A).
 import './keys.js';
 import { showQuests, watchQuests } from './quests.js';
@@ -411,6 +411,8 @@ function openGame() {
   // The players online first: the way back to a hidden chat button stands
   // under them (chat-bubble.js), which showing the game already asks for.
   mountOnline($('#view-game'));
+  // The series of days on the left edge (1041).
+  mountStreakTab($('#view-game'));
   show('game');
   buildTopbar(openSettings);
   route();

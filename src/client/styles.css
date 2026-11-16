@@ -12161,6 +12161,61 @@ button.farm-plot {
   cursor: pointer;
 }
 
+/* The series of days (1041, daily-streak.js): a thin tab on the left edge,
+   opposite the players online, at the main column's edge on a computer: the
+   calendar and the day, gold and glowing while today's reward waits. */
+.edge-tabs--left {
+  right: auto;
+  left: calc(var(--menu-width, 0px) + env(safe-area-inset-left, 0px));
+  align-items: flex-start;
+}
+
+.streak-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 24px;
+  min-height: 44px;
+  padding: 7px 3px 6px 2px;
+  border: 1px solid var(--line);
+  border-left: 0;
+  border-radius: 0 10px 10px 0;
+  background: var(--bg-deep);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  color: var(--text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.streak-tab-day {
+  font-family: var(--font-system);
+  font-size: 10px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.streak-tab--waiting {
+  border-color: var(--gold);
+  color: var(--gold);
+  animation: streak-tab-glow 2.4s ease-in-out infinite;
+}
+
+@keyframes streak-tab-glow {
+  0%,
+  100% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 0 4px rgba(201, 161, 74, 0.35);
+  }
+  50% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 0 12px rgba(201, 161, 74, 0.75);
+  }
+}
+
+.calm .streak-tab--waiting {
+  animation: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 0 8px rgba(201, 161, 74, 0.6);
+}
+
 /* The list in its sheet: one player a line, as the chat names its writer;
    a long account's name gives way first, the level stays at the right. */
 .online-players {
@@ -27150,4 +27205,146 @@ a.discord-button {
 
 .tutorials-replay {
   margin-top: 10px;
+}
+
+/* Osiągnięcia (1030, achievements.js): one card a goal, its picture on the
+   left; a bar while under way, a tick and "Noś ten tytuł" once reached. */
+.achievements {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.achievement-group {
+  margin: 14px 0 6px;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.achievement {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  background: rgba(13, 17, 11, 0.55);
+}
+
+.achievement--done {
+  border-color: var(--gold);
+}
+
+.achievement-art {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+}
+
+.achievement-art > * {
+  max-width: 44px;
+  max-height: 44px;
+}
+
+.achievement-body {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.achievement-body p {
+  margin: 0;
+}
+
+.achievement-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.achievement-check {
+  display: inline-flex;
+  color: var(--gold);
+}
+
+.achievement-goal,
+.achievement-count,
+.achievement-reward,
+.achievement-worn {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.achievement-reward {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+}
+
+.achievement-worn {
+  color: var(--gold);
+}
+
+.achievement-bar {
+  height: 6px;
+}
+
+.achievement-title-now {
+  margin: 0 0 4px;
+}
+
+.achievement-title-now strong {
+  color: var(--gold);
+}
+
+
+/* "Osiągnięcia" under the portrait on the Postać tab (1036.2). */
+.character-achievements {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* The title of an achievement worn (1036.3 B): in gold under the name in
+   the profile, small after it in the Ranking. */
+.profile-worn-title {
+  margin: 2px 0 0;
+  color: var(--gold);
+  font-size: 15px;
+}
+
+.ranking-title {
+  display: block;
+  color: var(--gold);
+  font-size: 12px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+/* A channel's tab slides into another place (1039.3): held, it lifts above
+   the others, ringed in gold, and follows the finger; no menu or selection
+   from the long press. */
+.chat-tab[data-channel] {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.chat-tab--lifted {
+  position: relative;
+  z-index: 2;
+  border-color: var(--gold);
+  color: var(--text);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+  cursor: grabbing;
 }

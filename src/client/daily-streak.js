@@ -3,7 +3,10 @@
 // one before, the seventh a pack of cards; a day missed starts the run
 // anew. The window opens by itself at the first visit of the day, once the
 // narrator's introduction is over; closed without taking, it comes back at
-// the next visit that day.
+// the next visit that day. A thin tab on the left edge (1041; the author:
+// „Ikonka jakaś albo napis serii dni niech wyświetla się z drugiego boku
+// może jak zakładka graczy online - coś cieniutkiego”) shows the day of the
+// series, gold while its reward waits, and opens the window at a tap.
 
 import { goldArt, timePointsArt } from './art.js';
 import { h, icon } from './dom.js';
@@ -59,6 +62,49 @@ export function openStreak(view, take) {
   );
 }
 
+// The tab on the left edge (1041): today's day of the series out of all,
+// gold and glowing while today's reward waits; hidden till the series is
+// known. Opposite the players online (online.js), at the main column's edge
+// on a computer.
+let tab = null;
+function showTab() {
+  if (!tab) return;
+  tab.hidden = !streak;
+  if (!streak) return;
+  const days = streak.days.length;
+  tab.classList.toggle('streak-tab--waiting', !streak.taken);
+  tab.querySelector('.streak-tab-day').textContent = `${streak.day}/${days}`;
+  tab.setAttribute('aria-label', streak.taken ? t('Seria dni: dzień {day} z {days}, nagroda odebrana', { day: streak.day, days }) : t('Seria dni: dzień {day} z {days}, nagroda czeka', { day: streak.day, days }));
+}
+
+export function mountStreakTab(view) {
+  if (tab) return;
+  tab = h(
+    'button',
+    { type: 'button', class: 'streak-tab', hidden: true, onClick: (event) => withButton(event.currentTarget, openFromTab) },
+    icon('calendar', { size: 14 }),
+    h('span', { class: 'streak-tab-day' }),
+  );
+  view.append(h('div', { class: 'edge-tabs edge-tabs--left' }, tab));
+}
+
+// Today's reward taken from the window: the window and the tab anew.
+async function take() {
+  const data = await call('POST', '/api/streak');
+  streak = data.streak;
+  showTab();
+  openStreak(streak, take);
+}
+
+// The window from the tab, with the series as it stands now.
+async function openFromTab() {
+  const data = await call('GET', '/api/streak');
+  streak = data.streak;
+  offered = true;
+  showTab();
+  openStreak(streak, take);
+}
+
 // The window offered by itself, once a visit (the page loaded), while
 // today's reward waits: the series asked for once, and the window opened
 // at the first moment with nothing else on the screen (no window, no
@@ -79,6 +125,7 @@ export function offerStreak() {
     offered = false;
     streak = null;
     retryAt = 0;
+    showTab();
   }
   if (offered) return;
   if (!asked) {
@@ -87,6 +134,7 @@ export function offerStreak() {
     call('GET', '/api/streak')
       .then((data) => {
         streak = data.streak;
+        showTab();
       })
       .catch(() => {
         asked = false;
@@ -99,10 +147,5 @@ export function offerStreak() {
   const read = state.character.tutorial;
   if (read !== null && (!read.includes('ending') || !narratorIdle())) return;
   offered = true;
-  const take = async () => {
-    const data = await call('POST', '/api/streak');
-    streak = data.streak;
-    openStreak(streak, take);
-  };
   openStreak(streak, take);
 }

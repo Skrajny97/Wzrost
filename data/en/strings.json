@@ -3550,5 +3550,17 @@
   "Narrator objaśni część „{part}” jeszcze raz.": "The narrator will explain “{part}” again.",
   "Objaśnij jeszcze raz": "Explain again",
   "Objaśnienia narratora do przeczytania w każdej chwili. Części, do których Twoja postać jeszcze nie doszła, pojawią się tu, gdy do nich dojdzie.": "The narrator's explanations, to read at any time. The parts your character has not reached yet will appear here once it gets there.",
-  "Tej części nie można objaśnić jeszcze raz.": "This part cannot be explained again."
+  "Tej części nie można objaśnić jeszcze raz.": "This part cannot be explained again.",
+  "Tytuł: „{title}”": "Title: “{title}”",
+  "Nosisz ten tytuł": "You wear this title",
+  "Noś ten tytuł": "Wear this title",
+  "Osiągnięcia": "Achievements",
+  "Zdobyte: {done} z {all}. Każde daje tytuł, który możesz nosić w profilu i w Rankingu.": "Earned: {done} of {all}. Each gives a title you can wear in your profile and in the Ranking.",
+  "Twój tytuł: ": "Your title: ",
+  "bez tytułu": "no title",
+  "{count} Punktów Czasu": "{count} Time Points",
+  "Osiągnięcie „{name}”: tytuł „{title}” i {reward}.": "Achievement “{name}”: the title “{title}” and {reward}.",
+  "Tego tytułu jeszcze nie masz.": "You don't have this title yet.",
+  "Seria dni: dzień {day} z {days}, nagroda odebrana": "Day series: day {day} of {days}, reward taken",
+  "Seria dni: dzień {day} z {days}, nagroda czeka": "Day series: day {day} of {days}, reward waiting"
 }

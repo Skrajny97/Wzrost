@@ -10,6 +10,7 @@ import { classNameOf, giftLevel, giftReward, highestProfession, isUnlocked, ques
 import { characterView, loadPlayer } from './characters.js';
 import { chatRole, requireChatter } from './chat.js';
 import { content } from './content.js';
+import { titleText } from './achievements.js';
 import { nameColorOf } from './cosmetics.js';
 import { guildTagSql } from './guilds.js';
 import { ApiError, json, readJson } from './http.js';
@@ -68,7 +69,7 @@ export async function ranking(context) {
     db
       .prepare(
         `SELECT c.id, c.name, c.class_id, c.evolution, c.appearance, c.level, c.class_level, c.professions, u.login, u.google_sub, u.chat_moderator,
-                c.cosmetics, ${guildTagSql('c.id')} AS guild_tag
+                c.cosmetics, c.title, c.achievements, ${guildTagSql('c.id')} AS guild_tag
          FROM characters c JOIN users u ON u.id = c.user_id
          WHERE c.${OWN_CHARACTERS}${where} ORDER BY ${order} LIMIT ? OFFSET ?`,
       )
@@ -99,6 +100,8 @@ export async function ranking(context) {
     rows: rows.results.map((row, index) => ({
       place: offset + index + 1,
       name: row.name,
+      // The title of an achievement it wears (achievements.js, 1036.3 B).
+      title: titleText(row),
       guildTag: row.guild_tag ?? null,
       nameColor: nameColorOf(row.cosmetics),
       classId: row.class_id,
