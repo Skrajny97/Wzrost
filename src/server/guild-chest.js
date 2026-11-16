@@ -48,6 +48,7 @@ import { bagPlaces, characterView, loadPlayer, requireOffRack } from './characte
 import { content } from './content.js';
 import { nameColorOf } from './cosmetics.js';
 import { guildPlayer, requireMember } from './guild-trials.js';
+import { noviceDay, noviceIn } from './guilds.js';
 import { withoutFavorites } from './favorites.js';
 import { ApiError, json, readJson } from './http.js';
 import { numberText } from './i18n.js';
@@ -113,8 +114,10 @@ const logKept = (db, guildId) =>
 // (a player's remark, 12.11.2026: „W oknie skrzyni gildii można by również
 // dać możliwość porównania eq swojego i swoich towarzyszy z włożonymi w
 // skrzynię gildii”).
-export async function chestView(db, player, guild) {
+export async function chestView(db, player, guild, now) {
   const { row } = player;
+  // A Nowicjusz (1062) takes only the items for it and its own.
+  const novice = noviceIn(guild, now);
   const team = teamOf(row);
   const [items, log, members] = await db.batch([
     db
@@ -150,7 +153,7 @@ export async function chestView(db, player, guild) {
       forName: stored.for_member === null ? null : stored.for_name,
       forYou,
       putAt: stored.put_at,
-      canTake: stored.for_member === null || forYou || mine,
+      canTake: (stored.for_member === null && !novice) || forYou || mine,
       // Its class can wear it, and from which level of the class.
       usable: canUse(item.base, gearKey(row.class_id, row.evolution, content()), content()),
       wornFrom: view.classLevel,
@@ -163,6 +166,9 @@ export async function chestView(db, player, guild) {
     capacity: rules().capacity,
     // Below the Wymiana's level: no "Włóż", and only its own items to take.
     locked: row.level < minLevel(),
+    // A Nowicjusz's words: till when it takes only the items for it, and
+    // what stands for "Weź" by an item for all.
+    novice: novice ? { note: filled(words().novice, { date: noviceDay(guild.probationUntil) }), take: filled(words().noviceTake, { date: noviceDay(guild.probationUntil) }) } : null,
     count: entries.length,
     waiting: entries.filter((entry) => entry.forYou).length,
     items: entries,
@@ -178,7 +184,7 @@ export async function chestView(db, player, guild) {
   };
 }
 
-const answer = async (db, player, guild, extra = {}) => json({ ...(await chestView(db, player, guild)), ...extra });
+const answer = async (db, player, guild, now, extra = {}) => json({ ...(await chestView(db, player, guild, now)), ...extra });
 
 // Whether an item waits in the guild's chest for this character (`row`),
 // for the yellow dot of the Gildia's "Skrzynia" (guild-todo.js): not below
@@ -194,7 +200,7 @@ export async function chestWaiting(db, row, guildId) {
 export async function getGuildChest(context) {
   const { player, guild, db } = await guildPlayer(context, errors());
   if (!guild) return json({ guild: null, texts: cardTexts() });
-  return answer(db, player, guild);
+  return answer(db, player, guild, context.now);
 }
 
 // Runs a batch of the chest; one that fails on its assertions answers
@@ -281,7 +287,7 @@ export async function putInGuildChest(context) {
     },
   );
   const after = await loadPlayer(db, session.userId);
-  return answer(db, after, guild, { character: characterView(after, now), text: filled(words().putDone, { item: titleOf(item) }) });
+  return answer(db, after, guild, now, { character: characterView(after, now), text: filled(words().putDone, { item: titleOf(item) }) });
 }
 
 // POST /api/guild/chest/take { id }: an item of the guild's chest into the
@@ -305,6 +311,7 @@ export async function takeFromGuildChest(context) {
     throw new ApiError(403, 'not_yours', filled(errors().notYours, { name: stored.for_name }));
   }
   if (stored.put_by !== row.id && row.level < minLevel()) throw new ApiError(403, 'chest_level', cardTexts().level);
+  if (stored.for_member === null && stored.put_by !== row.id && noviceIn(guild, now)) throw new ApiError(403, 'novice', filled(errors().novice, { date: noviceDay(guild.probationUntil) }));
   if (bagPlaces(player) >= bagCapacity(campLevels(player.buildings, now, content()), content())) throw new ApiError(409, 'bag_full', errors().bagFull);
   const item = JSON.parse(stored.data);
   await guarded(
@@ -314,8 +321,9 @@ export async function takeFromGuildChest(context) {
       assertion(
         db,
         `EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND guild_id = ?)
-         AND EXISTS (SELECT 1 FROM guild_chest c WHERE c.id = ? AND c.guild_id = ? AND (c.put_by = ? OR COALESCE(${FOR_MEMBER}, ?) = ?))`,
-        [row.id, guild.id, stored.id, guild.id, row.id, row.id, row.id],
+         AND EXISTS (SELECT 1 FROM guild_chest c WHERE c.id = ? AND c.guild_id = ? AND (c.put_by = ? OR ${FOR_MEMBER} = ?
+           OR (${FOR_MEMBER} IS NULL AND NOT EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND role = 'member' AND probation_until > ?))))`,
+        [row.id, guild.id, stored.id, guild.id, row.id, row.id, row.id, now],
       ),
       db
         .prepare("INSERT INTO guild_chest_log (guild_id, kind, name, for_name, data, created_at) SELECT guild_id, 'take', ?, NULL, data, ? FROM guild_chest WHERE id = ? AND guild_id = ?")
@@ -336,7 +344,7 @@ export async function takeFromGuildChest(context) {
     },
   );
   const after = await loadPlayer(db, session.userId);
-  return answer(db, after, guild, { character: characterView(after, now), text: filled(words().takeDone, { item: titleOf(item) }) });
+  return answer(db, after, guild, now, { character: characterView(after, now), text: filled(words().takeDone, { item: titleOf(item) }) });
 }
 
 // The statements that put a war chest's items (guild-wars.js, 799 A) in the

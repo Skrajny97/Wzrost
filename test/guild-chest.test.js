@@ -60,6 +60,9 @@ describe('Skrzynia Gildii', () => {
     const id = (await as('mistrz', 'GET', '/api/guild')).data.guild.id;
     await as('mistrz', 'POST', '/api/guild/invite', { name });
     assert.equal((await as(login, 'POST', '/api/guild/accept', { guildId: id })).status, 200);
+    // A Nowicjusz (R1) when it joins; its days over at once here, as these
+    // are the members' tests (a Nowicjusz's: guild-ranks.test.js).
+    await run('UPDATE guild_members SET probation_until = NULL WHERE character_id = (SELECT id FROM characters WHERE name = ?)', name);
   }
 
   // The character's bag filled up to `free` places short of its capacity.

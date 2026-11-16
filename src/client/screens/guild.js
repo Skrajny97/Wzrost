@@ -386,6 +386,17 @@ function mountGuild(container) {
     );
   }
 
+  // A member's rank by its name (1062): "R4 Lider" in the leader's gold,
+  // "R3 Zastępca", "R2 Członek", and "R1 Nowicjusz" with the day its days
+  // end. A server of before without ranks: the leader's and deputies' mark.
+  const rankBadge = (member) => {
+    if (!member.rankShort) return member.role !== 'member' && h('span', { class: 'party-leader', text: member.role === 'leader' ? t('Lider') : t('Zastępca') });
+    return [
+      h('span', { class: `guild-rank guild-rank--${member.rank}`, text: `${member.rankShort} ${member.rankName}` }),
+      member.noviceUntilText && h('span', { class: 'guild-rank-until', text: member.noviceUntilText }),
+    ];
+  };
+
   function guildCard() {
     const { guild } = view;
     const own = guild.role;
@@ -403,6 +414,8 @@ function mountGuild(container) {
           }),
         );
       }
+      // A Nowicjusz (R1) made a member (R2) before its days are over (1062).
+      if ((own === 'leader' || own === 'deputy') && member.rank === 'novice') list.unshift(button(t('Na członka'), act('/api/guild/promote', { characterId: member.id })));
       if (own === 'leader' || (own === 'deputy' && member.role === 'member')) {
         list.push(
           button(t('Usuń'), async () => {
@@ -429,8 +442,10 @@ function mountGuild(container) {
         h(
           'ul',
           { class: 'friends-list' },
-          guild.members.map((member) => h('li', { class: 'friend' }, who(member, member.role !== 'member' && h('span', { class: 'party-leader', text: member.role === 'leader' ? t('Lider') : t('Zastępca') })), actions(member))),
+          guild.members.map((member) => h('li', { class: 'friend' }, who(member, rankBadge(member)), actions(member))),
         ),
+        // The ranks R4-R1 and the Nowicjusz's days (1062).
+        guild.ranksRule && h('p', { class: 'muted', text: guild.ranksRule }),
         // The rule of a leader away (the author, 14.11.2026).
         guild.leaderAwayDays && h('p', { class: 'muted', text: t('Gdy lider nie zagląda do gry przez {days} dni, gildię przejmuje zastępca, który grał ostatnio, a lider zostaje zastępcą.', { days: guild.leaderAwayDays }) }),
       ),

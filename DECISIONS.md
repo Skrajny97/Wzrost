@@ -3580,6 +3580,19 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.86 (16.11.2026): rangi w gildii
+
+1. Rangi R4–R1 w gildii (1062; makiety 1017, przyjęte z uwagą autora do 1017.2). Zob. „Rangi w gildii”.
+
+## Rangi w gildii (1062; 16.11.2026)
+
+Propozycja gracza z czatu, którą autor przekazał słowami „kolejna mądra rzecz”: R4 założyciel, R3 zastępcy, R2 stali członkowie, R1 okres próbny. Wydarzenia gildii (Wyprawa, Bestia, Próby, wojny) ruszają same co tydzień, więc „uruchamianie wydarzeń” przez R3 nie ma tu odpowiednika; zastępcy zapraszają i usuwają członków jak dotąd.
+
+1. **Rangi.** R4 to lider, R3 zastępca, R2 członek, a R1 nowicjusz. Znaczek rangi stoi przy imieniu na liście członków („R4 Lider”, „R1 Nowicjusz do 19.11, 14:30”), a pod listą jest zasada rang. Nazwy i znaczki są w `data/guilds.json` (`ranks`). Makiety 1017.1 i 1017.3 przyjęte; 1017.2 z uwagą autora: „niech członek bedzie tak podświetlony a nie nowicjusz”, więc R4 i R3 są złote, R2 niebieski jak System, a R1 spokojny.
+2. **Nowicjusz.** Postać, która dołącza do gildii, jest nowicjuszem przez 3 dni (`ranks.probationDays`), zapisane w `guild_members.probation_until` (migracja 0144). Członkowie sprzed zmiany są od razu R2. Kto opuści gildię i dołączy znowu, znowu jest nowicjuszem.
+3. **Co nowicjuszowi wolno.** Wszystko, co członkowi, poza jednym: ze Skrzyni Gildii bierze tylko przedmioty zostawione dla niego i swoje, a przedmioty „Dla wszystkich” dopiero po awansie. Dzięki temu nowa osoba nie wyniesie wspólnych rzeczy i nie odejdzie. Skrzynia pokazuje nowicjuszowi, od kiedy weźmie przedmioty dla wszystkich.
+4. **Awans.** Lider i zastępcy mogą zrobić nowicjusza członkiem wcześniej („Na członka”, `POST /api/guild/promote`). Mianowanie zastępcą, przywództwo i przejęcie gildii po liderze kończą okres nowicjusza.
+
 ## Wersja 0.3.85 (16.11.2026): czas pracy Awatara na zakładce Profesje
 
 1. **Praca Awatara na zakładce Profesje.** Gracz (poz. 46) przez autora: „a da się dodać żeby jak np. awatar systemu nam łowi czy tam cokolwiek robi w profesjach to żeby też było widać ten czas na pasku po lewej”, „tak jak wtedy gdy nasza postać to robi”. Zakładka Profesje (na telefonie na dolnym pasku, na komputerze w menu po lewej) odlicza teraz czas pracy Awatara, gdy postać sama nie pracuje w profesji, w tym samym wyglądzie co pracę postaci. Gdy pracują oboje, odlicza pracę postaci. Czytnik ekranu mówi „praca Awatara: 1:59:44”. Kropka „raport czeka” działała już dla obu.
