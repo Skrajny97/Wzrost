@@ -2091,5 +2091,108 @@
       "stage-3": "a young leafy green plant with many leaves and small buds growing from dark soil, seen from above at a slight angle, single game sprite",
       "stage-4": "a lush full-grown green plant with broad leaves, ready for harvest, growing from dark soil, seen from above at a slight angle, single game sprite"
     }
+  },
+  "ui": {
+    "$comment": "Trzy propozycje całościowej przebudowy wyglądu (autor 16.11.2026: „3 propozycje jak zrobić całościowy rework UI i GUI by był odległy od stylu stosowanego przez AI … Chodzi o ikonki, panele, kwadraty”): A „Kronika” (rękopis, atrament i pergamin), B „Warownia” (rzeźbione drewno i kute żelazo, ikony jak przedmioty), C „System” (świecące glify Systemu). Te same ikony menu w trzech stylach i ramki paneli. Ikony 32 × 32 rysuje Pro Flash, po jednym obrazku z wywołania; ramki paneli 128 × 128 Pro (cztery wersje).",
+    "width": 32,
+    "height": 32,
+    "pixellab": {
+      "tool": "flash",
+      "style": null,
+      "styles": {
+        "warownia-postac": "src/client/art/materials/rat-tail.png",
+        "warownia-walka": "src/client/art/materials/rat-tail.png",
+        "warownia-osada": "src/client/art/materials/rat-tail.png",
+        "warownia-profesje": "src/client/art/materials/rat-tail.png",
+        "warownia-spolecznosc": "src/client/art/materials/rat-tail.png",
+        "warownia-statystyki": "src/client/art/materials/rat-tail.png",
+        "warownia-umiejetnosci": "src/client/art/materials/rat-tail.png",
+        "warownia-ewolucja": "src/client/art/materials/rat-tail.png",
+        "warownia-rdzen": "src/client/art/materials/rat-tail.png",
+        "warownia-powrot": "src/client/art/materials/rat-tail.png",
+        "warownia-oboz": "src/client/art/materials/rat-tail.png",
+        "warownia-kronika": "src/client/art/materials/rat-tail.png",
+        "warownia-ustawienia": "src/client/art/materials/rat-tail.png",
+        "warownia-czat": "src/client/art/materials/rat-tail.png",
+        "warownia-kalendarz": "src/client/art/materials/rat-tail.png",
+        "warownia-oko": "src/client/art/materials/rat-tail.png",
+        "warownia-sklep": "src/client/art/materials/rat-tail.png"
+      }
+    },
+    "prompts": {
+      "kronika-postac": "a hooded adventurer seen from the chest up, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+      "kronika-walka": "two crossed swords, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+      "kronika-osada": "a small wooden village hut with a pitched roof, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+      "kronika-profesje": "a smith's hammer crossed with a pickaxe, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+      "kronika-spolecznosc": "three small figures standing side by side, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+      "kronika-statystyki": "three vertical bars of rising height, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+      "kronika-umiejetnosci": "a sparkling four-pointed star, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+      "kronika-ewolucja": "two stacked upward chevrons, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+      "kronika-rdzen": "a hexagonal crystal, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+      "kronika-powrot": "an arrow pointing to the left, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+      "kronika-oboz": "a small triangular tent, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+      "kronika-kronika": "a rolled parchment scroll, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+      "kronika-ustawienia": "a cogwheel, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+      "kronika-czat": "a round speech bubble, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+      "kronika-kalendarz": "a calendar sheet with a ring binding on top, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+      "kronika-oko": "an open eye, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+      "kronika-sklep": "a small market stall with a striped awning, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+      "warownia-postac": "a hooded adventurer seen from the chest up, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+      "warownia-walka": "two crossed swords, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+      "warownia-osada": "a small wooden village hut with a pitched roof, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+      "warownia-profesje": "a smith's hammer crossed with a pickaxe, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+      "warownia-spolecznosc": "three small figures standing side by side, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+      "warownia-statystyki": "three vertical bars of rising height, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+      "warownia-umiejetnosci": "a sparkling four-pointed star, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+      "warownia-ewolucja": "two stacked upward chevrons, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+      "warownia-rdzen": "a hexagonal crystal, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+      "warownia-powrot": "an arrow pointing to the left, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+      "warownia-oboz": "a small triangular tent, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+      "warownia-kronika": "a rolled parchment scroll, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+      "warownia-ustawienia": "a cogwheel, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+      "warownia-czat": "a round speech bubble, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+      "warownia-kalendarz": "a calendar sheet with a ring binding on top, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+      "warownia-oko": "an open eye, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+      "warownia-sklep": "a small market stall with a striped awning, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+      "system-postac": "a hooded adventurer seen from the chest up, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+      "system-walka": "two crossed swords, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+      "system-osada": "a small wooden village hut with a pitched roof, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+      "system-profesje": "a smith's hammer crossed with a pickaxe, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+      "system-spolecznosc": "three small figures standing side by side, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+      "system-statystyki": "three vertical bars of rising height, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+      "system-umiejetnosci": "a sparkling four-pointed star, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+      "system-ewolucja": "two stacked upward chevrons, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+      "system-rdzen": "a hexagonal crystal, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+      "system-powrot": "an arrow pointing to the left, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+      "system-oboz": "a small triangular tent, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+      "system-kronika": "a rolled parchment scroll, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+      "system-ustawienia": "a cogwheel, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+      "system-czat": "a round speech bubble, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+      "system-kalendarz": "a calendar sheet with a ring binding on top, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+      "system-oko": "an open eye, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+      "system-sklep": "a small market stall with a striped awning, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+      "kronika-panel": {
+        "prompt": "an empty sheet of aged cream parchment with slightly torn uneven edges and a thin dark sepia ink border line with small vermilion red flourishes in the four corners, seen flat from the front, a game interface panel, the middle empty",
+        "width": 128,
+        "height": 128,
+        "tool": "pro"
+      },
+      "kronika-seal": {
+        "prompt": "a round red wax seal stamped with a small star rune, seen from the front, the seal alone, no background",
+        "width": 48,
+        "height": 48
+      },
+      "warownia-panel": {
+        "prompt": "an empty flat panel of dark carved oak boards with a carved Slavic folk ornament border and forged black iron corner brackets with round rivets, seen flat from the front, a game interface panel, the middle empty",
+        "width": 128,
+        "height": 128,
+        "tool": "pro"
+      },
+      "warownia-slot": {
+        "prompt": "an empty square socket carved into dark oak with a dark iron rim and four small rivets, seen flat from the front, a game inventory slot, the middle empty and dark",
+        "width": 48,
+        "height": 48
+      }
+    }
   }
 }
