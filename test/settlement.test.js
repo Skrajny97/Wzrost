@@ -21,7 +21,10 @@ import {
   drawOrder,
   orderGold,
   drawQuests,
+  currentQuests,
   emptyBoard,
+  ordersBefore,
+  rerolledQuests,
   evolutionChangeCost,
   evolutionChangePrice,
   evolutionChanges,
@@ -1020,5 +1023,52 @@ describe('the Osada in the narrator\'s quests', () => {
     const quest = { kind: 'orders', count: 8, progress: 7, reward: { kind: 'gold', amount: 10 }, claimed: false };
     const moved = addQuestProgress({ weekly: { period: 'x', quests: [quest], chest: false } }, { orders: 3 });
     assert.equal(moved.weekly.quests[0].progress, 8);
+  });
+
+  // A player (poz. 48, 16.11.2026): „czasami dzienne jak sie przelosuje to
+  // dostaje się wykonanie zadań w osadzie gdzie już na dany dzień były
+  // wykonane i nie ma możliwości tego zrobić”.
+  test('no quest asks for more orders than the board can still give before its period ends, and a day\'s that no longer can is drawn anew', () => {
+    const { open, refillMinutes } = content.settlement.orders;
+    const refill = refillMinutes * 60000;
+    const day = questPeriod('daily', NOW, content);
+    const week = questPeriod('weekly', NOW, content);
+    const delivered = { period: week.key, done: true, order: null };
+    // Every slot with an order at 10:00: one now and one each refill after
+    // it before midnight; the week's order delivered.
+    const full = { ...emptyBoard(), slots: Array.from({ length: open }, (_, i) => ({ order: { id: i + 1 } })), weekly: delivered };
+    assert.equal(ordersBefore(full, day.endsAt, NOW, content), open * Math.ceil((day.endsAt - NOW) / refill));
+    // Every order handed in since noon: the next ones come after midnight;
+    // one handed in at 9:00 comes again at 21:00, before it.
+    const emptied = { ...emptyBoard(), slots: Array.from({ length: open }, () => ({ readyAt: day.endsAt + HOUR })), weekly: delivered };
+    assert.equal(ordersBefore(emptied, day.endsAt, NOW, content), 0);
+    const morning = { ...emptied, slots: [{ readyAt: NOW - HOUR + refill }, ...emptied.slots.slice(1)] };
+    assert.equal(ordersBefore(morning, day.endsAt, NOW, content), 1);
+    // The week's big order not delivered yet is one more.
+    assert.equal(ordersBefore({ ...emptied, weekly: { ...delivered, done: false, order: { id: 'weekly' } } }, day.endsAt, NOW, content), 1);
+    // A new board: every slot gets its order now.
+    assert.ok(ordersBefore(null, day.endsAt, NOW, content) >= open);
+
+    const draw = (daily, seed) => ({ character, hasTable: true, hasProfessions: true, hasSettlement: true, ordersLeft: { daily, weekly: 50, monthly: 200 }, seed });
+    const kinds = (daily) => new Set(Array.from({ length: 300 }, (_, i) => drawQuests('daily', draw(daily, `d:${i}`), content)).flat().map((quest) => quest.kind));
+    assert.ok(!kinds(1).has('orders'));
+    assert.ok(kinds(6).has('orders'));
+
+    // A day kept with "Wykonaj 2 zlecenia" and one order left on the board:
+    // drawn anew, the other quests as they were; with one done, it stays.
+    const reward = { kind: 'gold', amount: 10 };
+    const kept = (left, progress) =>
+      currentQuests({ daily: { period: day.key, quests: [{ kind: 'orders', count: 2, progress, reward, claimed: false }, { kind: 'explore', count: 60, progress: 10, reward, claimed: false }], chest: false } }, draw(left, 'k'), NOW, content).daily.quests;
+    assert.notEqual(kept(1, 0)[0].kind, 'orders');
+    assert.deepEqual(kept(1, 0)[1], { kind: 'explore', count: 60, progress: 10, reward, claimed: false });
+    assert.deepEqual(kept(1, 1)[0], { kind: 'orders', count: 2, progress: 1, reward, claimed: false });
+    assert.deepEqual(kept(2, 0)[0], { kind: 'orders', count: 2, progress: 0, reward, claimed: false });
+
+    // "Przelosuj zadania" with the board empty till midnight draws no orders.
+    for (let i = 0; i < 60; i += 1) {
+      const drawn = { daily: { period: day.key, quests: drawQuests('daily', draw(10, `r:${i}`), content), chest: false } };
+      const rerolled = rerolledQuests(drawn, 'daily', draw(0, `r:${i}`), NOW, content);
+      assert.ok(!rerolled.daily.quests.some((quest) => quest.kind === 'orders'));
+    }
   });
 });

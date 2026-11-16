@@ -1150,6 +1150,11 @@
       "id": "0.3.88",
       "title": "Wersja 0.3.88",
       "body": "- Minigra przy raporcie profesji liczy stuknięcie w chwili dotknięcia przycisku, a nie oderwania palca, więc znacznik zatrzymuje się dokładnie tam, gdzie go widzisz.\n- Po ostatniej próbie „Odbierz raport” odbiera raport za pierwszym stuknięciem."
+    },
+    {
+      "id": "0.3.89",
+      "title": "Wersja 0.3.89",
+      "body": "- Obok paska Twojej postaci stoi krótki pasek „AWATAR” z czasem pracy Awatara Systemu. Gdy raport Awatara czeka, pasek pokazuje „RAPORT”. Stuknięcie prowadzi do jego profesji.\n- Na wąskim telefonie, gdy działa mikstura, jej kafelek pokazuje samą liczbę walk, żeby wszystko zmieściło się w jednym rzędzie.\n- Zadanie „Wykonaj zlecenia w Osadzie” pojawia się tylko wtedy, gdy Tablica zleceń da radę je wypełnić. Jeśli masz dziś takie zadanie, którego nie da się już zrobić do północy, gra wymieni je na inne, a przelosowanie Ci zostanie.\n- Na komputerze i tablecie zakładki plecaka stoją w dwóch rzędach i nie wychodzą już z ramek."
     }
   ]
 }

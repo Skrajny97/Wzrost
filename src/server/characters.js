@@ -76,6 +76,8 @@ import {
   playerCombatant,
   production,
   professionOpen,
+  ordersBefore,
+  QUEST_PERIODS,
   questPeriod,
   samePeriod,
   questsStale,
@@ -755,9 +757,18 @@ export function questContext(player, now) {
     hasCrafting: hasProfessions && craftingOn() && professionOpen(crafting, player.row.level, content()),
     openProfessions: hasProfessions ? content().professions.filter((profession) => professionOpen(profession, player.row.level, content())).map((profession) => profession.id) : [],
     hasSettlement: settlementOpen(player.row),
+    // How many orders the Osada's board can still give before each period
+    // ends: no quest asks for more (quests.js, questOptions).
+    ...(settlementOpen(player.row) && { ordersLeft: ordersLeft(player.row, now) }),
     seed: player.row.id,
     createdAt: player.row.created_at,
   };
+}
+
+/** @returns {Record<string, number>} */
+function ordersLeft(row, now) {
+  const { board } = JSON.parse(row.settlement ?? '{}');
+  return Object.fromEntries(QUEST_PERIODS.map((periodId) => [periodId, ordersBefore(board, questPeriod(periodId, now, content()).endsAt, now, content())]));
 }
 
 // The quests of both periods at `now`.

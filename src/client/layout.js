@@ -143,18 +143,29 @@ export function buildTopbar(onSettings) {
   const activityLabel = h('span', { class: 'activity-label' });
   const activityTime = h('span', { class: 'activity-time' });
   const activity = h('a', { class: 'activity', href: '#/walka' }, activityLabel, activityTime);
+  // The Awatar Systemu's work beside the character's, in a short strip of
+  // its own (1021 B; a player through the author, 16.11.2026: „chodziło też
+  // o dodatkowy pasek tak jak jest eksploracja albo profesja gracza tutaj”),
+  // while it works or its report waits; a tap leads to its profession.
+  const avatarTime = h('span', { class: 'activity-time' });
+  const avatarWork = h('a', { class: 'activity activity--avatar', href: '#/profesje', hidden: true }, h('span', { class: 'activity-label', text: t('AWATAR') }), avatarTime);
   // The potions for a time drunk from the bag (potions.js): how long the
   // longest of them still works on explorations. A tap unfolds under the
   // row what the bonuses are, as on Postać (the author: „niech po kliknięciu
   // w kafelek bonusów wyświetla się pod spodem co to za bonusy”).
   const speedTime = h('span', { class: 'speed-chip-time' });
+  // The fights alone, without the word, beside the Awatar's strip on a
+  // phone (1021 B; styles.css, .activity-row--crowded).
+  const speedCount = h('span', { class: 'speed-chip-count' });
   const bonusDrop = h('div', { class: 'bonus-drop', id: 'bonus-drop', hidden: true });
   const speed = h(
     'button',
     { type: 'button', class: 'speed-chip', hidden: true, 'aria-expanded': 'false', 'aria-controls': 'bonus-drop', onClick: () => showBonuses(bonusDrop.hidden) },
     icon('flask', { size: 16 }),
     speedTime,
+    speedCount,
   );
+  const activityRow = h('div', { class: 'activity-row' }, encyclopedia, speed, activity, avatarWork, bonusDrop);
 
   // The settings, with a dot for the author when players' bug reports wait.
   // A class of its own, which the narrator points at: the label changes with
@@ -183,7 +194,7 @@ export function buildTopbar(onSettings) {
     wallet,
     // Two rows: HP over mana, character XP over class XP.
     h('div', { class: 'meters' }, hp.element, xp.element, mana.element, classXp.element),
-    h('div', { class: 'activity-row' }, encyclopedia, speed, activity, bonusDrop),
+    activityRow,
   );
   topbar = {
     settings,
@@ -210,8 +221,12 @@ export function buildTopbar(onSettings) {
     activity,
     activityLabel,
     activityTime,
+    activityRow,
+    avatarWork,
+    avatarTime,
     speed,
     speedTime,
+    speedCount,
     bonusDrop,
   };
   updateTopbar();
@@ -363,6 +378,7 @@ export function updateTopbar(now = serverNow()) {
   topbar.speed.hidden = !(left > 0);
   if (left > 0) {
     topbar.speedTime.textContent = fightsLeft(left);
+    topbar.speedCount.textContent = String(left);
     topbar.speed.setAttribute('aria-label', buffs.map((buff) => t('{name}, jeszcze {fights}', { name: buff.label, fights: fightsLeft(buff.fights) })).join('; '));
   }
   // The open list follows the bonuses: redrawn when one changes, closed
@@ -398,6 +414,23 @@ export function updateTopbar(now = serverNow()) {
         ? t('PEŁNE HP')
         : t('PEŁNE HP ZA {time}', { time: formatMinutes(Math.ceil((character.maxHp - hpNow) / restRate(character))) }).toUpperCase();
   }
+
+  // The Awatar's work (1021 B): how long it still works, or that its report
+  // waits, as the character's strip says it.
+  const avatarActivity = character.professions?.avatar?.activity ?? null;
+  topbar.avatarWork.hidden = !avatarActivity;
+  if (avatarActivity) {
+    const screen = WORK_SCREENS[avatarActivity.kind];
+    const finished = activityFinished(avatarActivity, now);
+    topbar.avatarWork.classList.toggle('activity--done', finished);
+    topbar.avatarWork.setAttribute('href', screen ? screen.href : '#/profesje');
+    topbar.avatarTime.textContent = finished ? t('RAPORT') : formatCountdown(avatarActivity.endsAt - now);
+    const what = [screen && t(screen.label), avatarActivity.placeName].filter(Boolean).join(' · ');
+    topbar.avatarWork.setAttribute('aria-label', `${t('praca Awatara')}: ${what}, ${finished ? t('raport czeka') : topbar.avatarTime.textContent}`);
+  }
+  // A potion's tile and the Awatar's strip both in the row: on a phone the
+  // tile grows shorter (styles.css).
+  topbar.activityRow.classList.toggle('activity-row--crowded', !topbar.speed.hidden && !topbar.avatarWork.hidden);
 }
 
 // Builds a bottom bar; `active` is the id of the highlighted tab.

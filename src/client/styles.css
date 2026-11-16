@@ -421,8 +421,11 @@ button {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-/* With the Spiżarnia too, five tabs: three over two on a phone, one row
-   from 640 px (1057). */
+/* With the Spiżarnia too, five tabs: three over two, and in one row only
+   where the bag itself is 560 px wide or more (1057). By the bag's width,
+   not the screen's: on a computer and a tablet the bag stands in a narrow
+   column beside the character, where five in a row cut "Przedmioty" (the
+   layout check, 0.3.89). */
 .bag-tabs--five {
   grid-template-columns: repeat(6, minmax(0, 1fr));
 }
@@ -440,7 +443,7 @@ button {
   border-left: 0;
 }
 
-@media (min-width: 640px) {
+@container bag (min-width: 560px) {
   .bag-tabs--five {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
@@ -1275,6 +1278,29 @@ button {
   display: none;
 }
 
+/* Beside the Awatar's strip on a phone (1021 B) the tile shows its fights
+   without the word, and on the narrowest only its flask, so the character's
+   strip keeps its time; a tap unfolds the bonuses as always. */
+.speed-chip-count {
+  display: none;
+}
+
+@media (max-width: 400px) {
+  .activity-row--crowded .speed-chip-time {
+    display: none;
+  }
+
+  .activity-row--crowded .speed-chip-count {
+    display: inline;
+  }
+}
+
+@media (max-width: 340px) {
+  .activity-row--crowded .speed-chip-count {
+    display: none;
+  }
+}
+
 .speed-chip[aria-expanded='true'] {
   border-color: var(--leaf);
   background: rgba(167, 196, 127, 0.18);
@@ -1328,11 +1354,49 @@ button {
   white-space: nowrap;
 }
 
+/* The time keeps its width while the words before it give way, and only
+   when they are gone is it cut, rather than out of the frame, on the
+   narrowest phones with every tile in the row (1021 B). */
 .activity-time {
   flex-shrink: 0;
+  max-width: calc(100% - 8px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--system);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+
+/* The Awatar Systemu's work beside the character's (1021 B): as wide as its
+   words, its time as wide as with every digit the widest one (0), so the
+   strips do not twitch each second; Chakra Petch has no tabular digits
+   (as in 0.3.84). */
+.activity--avatar {
+  flex: none;
+  gap: 6px;
+}
+
+/* The character's strip narrower than 90 px (a potion's tile and the
+   Awatar's strip on the narrowest phones): only its time, in the middle,
+   rather than a letter or two of its words. */
+.activity:not(.activity--avatar) {
+  container: activity / inline-size;
+}
+
+@container activity (max-width: 90px) {
+  .activity-label {
+    display: none;
+  }
+
+  .activity-time {
+    margin-inline: auto;
+  }
+}
+
+.activity--avatar .activity-time {
+  min-width: 5.7ch;
+  text-align: right;
 }
 
 .activity--done {
@@ -2253,6 +2317,7 @@ a.segmented-option {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  container: bag / inline-size;
 }
 
 .bag-grid {
