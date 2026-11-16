@@ -9915,6 +9915,8 @@ a.profession-square:active {
 .minigame-go {
   min-height: 56px;
   font-size: 18px;
+  /* No wait for a double tap's zoom: the tap counts at once. */
+  touch-action: manipulation;
 }
 
 .minigame-skip {
