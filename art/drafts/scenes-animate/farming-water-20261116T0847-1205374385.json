@@ -1,0 +1,15 @@
+{
+  "id": "farming-water",
+  "payload": {
+    "first_frame": "art/references/scenes/farming-water.png",
+    "action": "watering the seedlings in a smooth seamless loop: the figure tilts the watering can forward and back a little, a thin stream of water drops pours from the spout onto the seedlings in every frame and small splashes rise from the soil, the figure's feet stay in place, the fence, the trees, the sky and the scarecrow stay completely still",
+    "frame_count": 8,
+    "seed": 1205374385,
+    "no_background": false
+  },
+  "usage": {
+    "type": "usd",
+    "usd": 0.019358547899458144
+  },
+  "frames": 9
+}
