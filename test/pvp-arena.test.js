@@ -134,6 +134,8 @@ describe("the Arena's rules", () => {
   });
 
   test('over the classes, a duel lasts a few rounds at every level and the judge ends few (tools/pvp-arena-sim.mjs)', () => {
+    // The Tier IX gear (0.3.93) made the duels at level 200 shorter (a median
+    // of 15 moves), so the HP factor grows from level 175 on (duel.hpCurve).
     for (const level of [25, 100, 200]) {
       const result = measure({ level, seeds: 1, model: 'realistic' }, content);
       assert.ok(result.median >= 16 && result.median <= 40, `level ${level}: median ${result.median} moves`);

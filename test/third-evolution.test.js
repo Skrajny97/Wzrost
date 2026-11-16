@@ -719,7 +719,10 @@ describe('the third forms against the second forms (tools/class-balance-sim.mjs,
 
   test('in the Arena at level 200 each third form wins 25–75% of its duels against the other paths, and the duels last a few rounds', () => {
     // The Pogromca Demonów wins the fewest: the Inkwizytor's line stays the
-    // weaker one in duels (779 A).
+    // weaker one in duels (779 A). The Arcydruid's blows count ×1.1 in the
+    // players' duels (evolutions.json duelPower, 992 A) since the Tier IX
+    // gear (0.3.93): its summons take their HP from its mana, which the new
+    // weapons leave as it was, and it fell from 26% to 24.5% of its duels.
     const result = measure({ level: 200, seeds: 1, model: 'realistic', paths: true }, content);
     assert.deepEqual(Object.keys(result.paths).sort(), [...FORMS].sort());
     for (const [id, share] of Object.entries(result.paths)) assert.ok(share >= 0.25 && share <= 0.75, `${id} wins ${share}`);
