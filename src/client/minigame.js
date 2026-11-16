@@ -9,6 +9,7 @@
 import { placeArt } from './art.js';
 import { h } from './dom.js';
 import { t } from './i18n.js';
+import { effectsVolume, playSound } from './sound.js';
 import { call, serverNow } from './state.js';
 import { closeSheet, openDecision } from './ui.js';
 
@@ -23,6 +24,19 @@ const markerAt = (ms, period) => {
   const phase = (((ms % period) + period) % period) / period;
   return phase < 0.5 ? phase * 2 : 2 - phase * 2;
 };
+
+// A short buzz of the phone at a tap (1022; the author: „może dac jakiś
+// efekt dźwiękowy, wibracje i chwilową pauzę po trafieniu (lub inny dźwięk
+// przy nietrafieniu)?”): one at a hit, two at a miss. Only where the
+// browser can (not on an iPhone), and not with the game's sounds off.
+function buzz(hit) {
+  if (effectsVolume() === 0) return;
+  try {
+    navigator.vibrate?.(hit ? 35 : [25, 60, 25]);
+  } catch {
+    // A buzz is a nicety.
+  }
+}
 
 // "{value}" of a text filled in.
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (whole, name) => (Object.hasOwn(vars, name) ? String(vars[name]) : whole));
@@ -44,6 +58,13 @@ export async function playMinigame(activity, avatar) {
     let hits = 0;
     let frame = 0;
     let done = false;
+    // The marker stands still `pause` ms after each tap (1022), where the
+    // tap caught it, and goes on from there after: as the server counts it
+    // (minigameHits with the pause). A tap meanwhile does not count.
+    const pause = game.pause ?? 0;
+    let standsUntil = 0;
+    let stoodAt = 0;
+    const standing = () => serverNow() < standsUntil;
     const rarity = game.kind === 'items' || game.kind === 'jewels';
     const zone = h('div', { class: 'minigame-zone' });
     const marker = h('div', { class: 'minigame-marker' });
@@ -76,6 +97,7 @@ export async function playMinigame(activity, avatar) {
       text: game.button,
       onPointerdown: (event) => {
         if (event.pointerType === 'mouse' && event.button !== 0) return;
+        if (standing()) return;
         if (taps.length >= game.zones.length) {
           touchedAgain = true;
           return;
@@ -83,12 +105,13 @@ export async function playMinigame(activity, avatar) {
         tap();
       },
       onClick: (event) => {
+        if (standing()) return;
         const ownClick = !pointer || event.detail === 0;
         if (taps.length < game.zones.length) {
           if (ownClick) tap();
           return;
         }
-        if (ownClick || touchedAgain) finish({ taps });
+        if (ownClick || touchedAgain) finish({ taps, pause });
       },
     });
     const skip = h('button', { type: 'button', class: 'link-button minigame-skip', text: words.skip[0], onClick: () => finish({ skip: true }) });
@@ -105,31 +128,50 @@ export async function playMinigame(activity, avatar) {
       return value > 0 ? game.bonus.replace('{value}', String(value)) : null;
     };
     function tap() {
+      const now = serverNow();
+      if (now < standsUntil) return;
       const index = taps.length;
-      const ms = Math.round(serverNow() - game.at);
+      const ms = Math.round(now - game.at);
+      const place = markerAt(ms - index * pause, game.period);
       taps.push(ms);
       const current = game.zones[index];
-      const hit = Math.abs(markerAt(ms, game.period) - current.center) <= current.width / 2;
+      const hit = Math.abs(place - current.center) <= current.width / 2;
       if (hit) hits += 1;
       tries.children[index].classList.add(hit ? 'hit' : 'miss');
-      if (taps.length < game.zones.length) {
-        showTry();
-        state.textContent = `${hit ? words.hit[0] : words.miss[0]} ${state.textContent}`;
-        return;
-      }
-      // The last try: the result, and "Odbierz raport".
-      cancelAnimationFrame(frame);
-      [...tries.children].forEach((dot) => dot.classList.remove('now'));
-      gauge.hidden = true;
-      const bonus = bonusOf(hits);
-      result.hidden = false;
-      result.textContent = bonus ? filled(words.result[0], { bonus }) : words.resultNone[0];
-      state.textContent = filled(words.hits[0], { hits, tries: game.zones.length });
-      go.textContent = words.claim[0];
-      skip.hidden = true;
+      // The marker stands where the tap caught it, lit up as a hit or a
+      // miss, with its sound and buzz; the next try comes after the pause.
+      stoodAt = place;
+      standsUntil = now + pause;
+      marker.classList.add(hit ? 'minigame-marker--hit' : 'minigame-marker--miss');
+      playSound(hit ? 'minigame-hit' : 'minigame-miss');
+      buzz(hit);
+      const verdict = hit ? words.hit[0] : words.miss[0];
+      state.textContent = verdict;
+      const last = taps.length >= game.zones.length;
+      setTimeout(() => {
+        if (done) return;
+        marker.classList.remove('minigame-marker--hit', 'minigame-marker--miss');
+        if (!last) {
+          showTry();
+          state.textContent = `${verdict} ${state.textContent}`;
+          return;
+        }
+        // The last try: the result, and "Odbierz raport".
+        cancelAnimationFrame(frame);
+        [...tries.children].forEach((dot) => dot.classList.remove('now'));
+        gauge.hidden = true;
+        const bonus = bonusOf(hits);
+        result.hidden = false;
+        result.textContent = bonus ? filled(words.result[0], { bonus }) : words.resultNone[0];
+        state.textContent = filled(words.hits[0], { hits, tries: game.zones.length });
+        go.textContent = words.claim[0];
+        skip.hidden = true;
+      }, pause);
     }
     const move = () => {
-      marker.style.left = `${markerAt(serverNow() - game.at, game.period) * 100}%`;
+      const now = serverNow();
+      const place = now < standsUntil ? stoodAt : markerAt(now - game.at - taps.length * pause, game.period);
+      marker.style.left = `${place * 100}%`;
       frame = requestAnimationFrame(move);
     };
     const art = placeArt(game.place);

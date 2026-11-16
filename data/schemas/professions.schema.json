@@ -2088,6 +2088,7 @@
         "tries",
         "zones",
         "period",
+        "pause",
         "tolerance",
         "shares",
         "rarity",
@@ -2114,6 +2115,12 @@
           "type": "integer",
           "minimum": 200,
           "description": "Ile ms trwa przejście znacznika w tę i z powrotem."
+        },
+        "pause": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000,
+          "description": "Ile ms znacznik stoi po każdym stuknięciu, z dźwiękiem i wibracją trafienia albo pudła (1022). Kolejne stuknięcie liczy się dopiero po pauzie."
         },
         "tolerance": {
           "type": "integer",

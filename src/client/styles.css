@@ -9946,6 +9946,45 @@ a.profession-square:active {
   background: linear-gradient(180deg, #d6402b 0 50%, #f3eee2 50% 100%);
 }
 
+/* The marker standing after a tap (1022): lit up at a hit, shaken red at
+   a miss, for the pause the data gives. */
+.minigame-marker--hit {
+  box-shadow: 0 0 12px 3px rgba(167, 196, 127, 0.95);
+}
+
+.minigame-marker--hit::before {
+  animation: minigame-hit 0.45s ease-out;
+}
+
+.minigame-marker--miss {
+  background: var(--danger);
+  box-shadow: 0 0 10px 2px rgba(214, 64, 43, 0.85);
+  animation: minigame-miss 0.3s ease-in-out;
+}
+
+@keyframes minigame-hit {
+  30% {
+    transform: scale(1.35);
+  }
+}
+
+@keyframes minigame-miss {
+  25% {
+    translate: -3px 0;
+  }
+
+  75% {
+    translate: 3px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .minigame-marker--hit::before,
+  .minigame-marker--miss {
+    animation: none;
+  }
+}
+
 .minigame-gauge--heat .minigame-marker::before {
   border-color: #3a1a10;
   background: radial-gradient(circle at 50% 70%, #ffd36b, #e0602b 60%, #8f2e22);
