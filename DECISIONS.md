@@ -3580,6 +3580,34 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.74 (16.11.2026): ogłoszenia gildii
+
+- Tablica ogłoszeń na górze zakładki Gildia i kanał „Dowództwo” w czacie dla lidera i zastępców (zob. „Ogłoszenia gildii: tablica i kanał Dowództwo (998; 16.11.2026)”, makiety 998.1 i 998.2 przyjęte). Bez migracji: oba są kanałami czatu gildii.
+
+## Ogłoszenia gildii: tablica i kanał Dowództwo (998; 16.11.2026)
+
+Gracz (poz. 51) poprosił o „tablicę ogłoszeń albo czat lidera i zastępców”; autor przyjął oba warianty z makiet 998.1 i 998.2.
+
+1. **Tablica ogłoszeń** (998.1): karta „Ogłoszenia” na górze pierwszej zakładki Gildii. To kanał czatu gildii `notice:<id>` (`src/server/chat.js`): czytają go wszyscy członkowie, a piszą lider i zastępcy (inni dostają `no_lead`). Najnowsze ogłoszenie stoi na górze, wcześniejsze są zwinięte. Nowe ogłoszenie kogoś innego zapala kropkę przy zakładce Gildia i przy Gildii w Społeczności, aż członek je zobaczy (znacznik `notice` w `chat_seen`).
+2. **Kanał Dowództwo** (998.2): zakładka czatu obok „Gildia”, kanał `lead:<id>`, tylko dla lidera i zastępców: czytają i piszą tylko oni, a zastępca zdegradowany do członka traci go od razu.
+3. Oba kanały to zwykłe wiadomości czatu: te same zasady czatu, przerwa między wiadomościami, filtr słów, długość do 500 znaków, zgłaszanie moderacji (na tablicy przycisk „Zgłoś” przy cudzym ogłoszeniu) i decyzje moderacji. Nie oznaczają nikogo („@”), żeby żadne powiadomienie nie niosło ich treści poza gildię. Gildia, która znika, zabiera je razem ze swoim kanałem.
+
+## Nowe profesje: Rybołówstwo, Rolnictwo i Gotowanie (999; 16.11.2026)
+
+Autor: „Kolejnym krokiem będzie zbudowanie Rybołówstwa/Wędkarstwa + Rolnictwa + Gotowania jako Profesji”, „Chciałbym żeby gotowanie dawało bonusy inne od Alchemii np. +do expa do znajdowania materiałów, do znajdowania rzadkich przedmiotów, możesz dać swoje propozycje”. Zasady przyjęte na stronie ocen (999.1–999.4, 999.5 v2); ryby, plony i potrawy z grafikami czekają na następną rundę.
+
+1. **Rybołówstwo** (999.1): łowienie ryb w Systemowym Stawie, bez walk, jak Zielarstwo; wybór ryb i czas od 10 minut do 8 godzin, nowe ryby z poziomem (od płotki i okonia po szczupaka, suma i jesiotra); ryby do Gotowania albo na sprzedaż. Każdy poziom: +Zręczność i +Wola.
+2. **Rolnictwo** (999.2): uprawa na Systemowym Polu (proso, żyto, owies, groch, rzepa, kapusta, cebula, mak…), plony po czasie pracy; z poziomem więcej grządek naraz i nowe rośliny. Każdy poziom: +Siła i +Wytrzymałość.
+3. **Gotowanie** (999.3): potrawy z ryb, plonów i ziół w Systemowej Kuchni, jak warzenie mikstur; nowe przepisy i szybsza praca z poziomem, od mistrzostwa szansa na dodatkową potrawę. Mikstury pomagają w walkach, potrawy dają więcej z wyprawy. Każdy poziom: +Witalność i +Intelekt.
+4. **Premie potraw** (999.4), każda potrawa jedna, mocniejsza z wyższych poziomów: XP z wyprawy +5% do +20%, materiały ze stworów +10% do +40%, szansa na rzadszy przedmiot w skrzyniach i łupie +2 do +8 pkt proc., złoto +5% do +20%, szansa na karty i pakiety kart +20% do +60%.
+5. **Posiłek** (999.5 v2; autor przy 999.5: „jedna potrawa na maksymalna czas wyprawy (4 godziny?)”): potrawa działa przez 4 godziny wypraw, bo tyle trwa najdłuższa wyprawa. Wyprawa 4-godzinna zużywa ją całą, krótsze zużywają jej czas po kolei. Potrawę wybiera się przy wyruszaniu, a nową można zjeść, gdy poprzednia się skończy.
+6. **Animacje, plansza pól i minigry** (autor, 16.11.2026: „Do tego bedzie trzeba animacje zrobić, a do Rolnictwa pewnie planszę jakąś z polami, żeby to nie było takie automatyczne, tylko sobie oznaczać co gdzie hodować i jakies animacje i stadia rozwoju generować (choćby każda roślina takie samo)”, „Na koniec rybołówstwa przy raporcie tez mozna zrobic minigierkę, która może mieć wpływ na ostateczny wynik łowienia i podobnie Gotowanie”):
+    - profesje mają animacje pracy;
+    - Rolnictwo to plansza z polami: gracz sam wybiera, co gdzie sieje, a rośliny rosną w stadiach z grafikami i animacją (stadia mogą być wspólne dla wszystkich roślin);
+    - Rybołówstwo i Gotowanie mają przy raporcie minigrę, która wpływa na wynik połowu i gotowania;
+    - minigry także dla profesji, które już są (Zielarstwo, Alchemia, Rzemieślnictwo, Górnictwo, Jubilerstwo), zwiększające możliwy wynik pracy (autor, 16.11.2026: „Do tego będzie mozna zrobic minigry zwiekszajace mozliwy wynik uprawiania Profesji do juz istniejacych opcji”).
+    Propozycje (plansza, stadia, minigry, animacje) idą na stronę ocen razem z rybami, plonami i potrawami.
+
 ## Wersja 0.3.73 (16.11.2026): liga wojen gildii, pakiety kart z aktywności, ranni towarzysze
 
 - Wojny gildii to liga każda gildia z każdą (zob. „Liga wojen gildii (996; 16.11.2026)”, makiety 996 v3 przyjęte): migracja `0140_guild_league.sql` zeruje wojny wylosowane w nocy, a pierwsze uruchomienie losuje ligę tego tygodnia od dzisiejszego wieczoru.

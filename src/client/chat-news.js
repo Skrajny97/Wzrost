@@ -45,7 +45,9 @@ let channelSeen = {};
 // (src/server/mentions.js): { global, trade, guild, private: { [other]: id } }.
 let tagged = { private: {} };
 // The character's guild (src/server/guilds.js) with the newest message of
-// its channel by someone else, or null, and the newest one read there.
+// its channel by someone else, of its board of announcements (`notice`) and,
+// for its leader and deputies, of their channel (`lead`; 998, 16.11.2026),
+// or null, and the newest one read in its channel.
 let guild = null;
 let guildSeenId = 0;
 // Invitations to guilds waiting.
@@ -109,10 +111,16 @@ export const conversationNews = (id, newest = conversations.find((entry) => entr
 // The guild's channel: messages there light the chat like private ones.
 export const guildChannel = () => (open() ? guild : null);
 export const guildChannelNews = () => Boolean(guildChannel()) && guild.latest > guildSeenId;
-export const chatNews = () => globalNews() || guildChannelNews() || conversations.some((entry) => conversationNews(entry.id, entry.latest)) || anyMentionNews();
-// The light of a channel's tab: the Globalny's and the guild's for any
-// news, the other channels' (the Wymiana) for a tag only.
-export const channelNews = (id) => (id === 'guild' ? guildChannelNews() : id === globalId() ? globalNews() : mentionNews(id));
+// The channel of the guild's leader and deputies (the tab Dowództwo), only
+// theirs, and its news; the guild's board of announcements on the Gildia's
+// page, and a new announcement there by someone else (998).
+export const leadChannel = () => Boolean(guildChannel()) && guild.lead !== undefined;
+export const leadNews = () => leadChannel() && guild.lead > (channelSeen.lead ?? 0);
+export const noticeNews = () => Boolean(guildChannel()) && (guild.notice ?? 0) > (channelSeen.notice ?? 0);
+export const chatNews = () => globalNews() || guildChannelNews() || leadNews() || conversations.some((entry) => conversationNews(entry.id, entry.latest)) || anyMentionNews();
+// The light of a channel's tab: the Globalny's, the guild's and its
+// leaders' for any news, the other channels' (the Wymiana) for a tag only.
+export const channelNews = (id) => (id === 'guild' ? guildChannelNews() : id === 'lead' ? leadNews() : id === globalId() ? globalNews() : mentionNews(id));
 // The channel where the newest tag waits unread, for the chat to open on:
 // its id ('guild' for the guild's), or null; private conversations light
 // their own tabs.
@@ -132,7 +140,7 @@ export const tradeNews = () => Boolean(liveTrade()) && !(trade.state === 'propos
 // A reward of the Punkty Sławy waiting (state.fame, src/server/fame.js),
 // until it is taken in the Sława.
 export const fameNews = () => open() && Boolean(state.fame?.reward);
-export const communityNews = () => friendNews() || partyNews() || guildNews() || guildTodoNews() || tradeNews() || fameNews();
+export const communityNews = () => friendNews() || partyNews() || guildNews() || guildTodoNews() || noticeNews() || tradeNews() || fameNews();
 export const chatMuted = () => muted;
 
 // The tab's light in words, for a screen reader.
@@ -147,6 +155,8 @@ export const communityNewsText = () =>
           ? t('zaproszenie do gildii czeka')
           : guildTodoNews()
             ? t('w gildii czeka coś do zrobienia')
+          : noticeNews()
+            ? t('nowe ogłoszenie w gildii')
           : fameNews()
             ? t('nagroda Sławy czeka')
           : invites > 0
@@ -169,6 +179,8 @@ const lights = () =>
     ...Object.keys(tagged).filter((id) => id !== 'private').map((id) => `${id}:${mentionNews(id)}`),
     ...Object.keys(tagged.private).map((other) => `@${other}:${mentionNews(null, Number(other))}`),
     guildChannelNews(),
+    leadNews(),
+    noticeNews(),
     friendNews(),
     partyNews(),
     guildNews(),
@@ -288,7 +300,7 @@ export function guildRead(id) {
 // the chat's tab, and the invitations waiting.
 export function guildSeen(view) {
   update(() => {
-    guild = view.guild ? { name: view.guild.name, tag: view.guild.tag, latest: guild?.latest ?? 0 } : null;
+    guild = view.guild ? { ...(guild ?? { latest: 0 }), name: view.guild.name, tag: view.guild.tag } : null;
     guildInvites = view.invites?.length ?? 0;
   });
 }

@@ -3352,5 +3352,22 @@
   "Wskaż kartę rywala, która stoi w linii.": "Point at the rival's card standing in a line.",
   "Masz Zwój Niepamięci ({count}): wyzerujesz nim punkty za darmo.": "You have a Scroll of Oblivion ({count}): it resets your points for free.",
   "Wszystkie rozdane punkty wrócą do puli i rozdasz je od nowa. Zużyjesz na to Zwój Niepamięci (masz {count}).": "All the points you have given out go back to the pool and you give them out anew. It uses up a Scroll of Oblivion (you have {count}).",
-  "niepamięci": "oblivion"
+  "niepamięci": "oblivion",
+  "nowe ogłoszenie w gildii": "a new announcement in the guild",
+  "Dowództwo": "Command",
+  "Nowe ogłoszenie dla całej gildii": "A new announcement for the whole guild",
+  "Zgłosić to ogłoszenie?": "Report this announcement?",
+  "Moderacja przeczyta ogłoszenie i zdecyduje, czy je zdjąć.": "The moderation will read the announcement and decide whether to take it down.",
+  "Zgłoszone. Dziękujemy.": "Reported. Thank you.",
+  "Ogłoszenia": "Announcements",
+  "Nie ma jeszcze ogłoszeń. Napisz pierwsze.": "No announcements yet. Write the first one.",
+  "Nie ma jeszcze ogłoszeń.": "No announcements yet.",
+  "Wcześniejsze ogłoszenia ({count})": "Earlier announcements ({count})",
+  "Ogłoś": "Announce",
+  "Ogłoszenie dodane.": "Announcement posted.",
+  "Ogłoszenia piszą lider i zastępcy. Gdy pojawi się nowe, przy zakładce Gildia świeci kropka.": "The leader and the deputies write the announcements. When a new one comes, a dot lights by the Guild tab.",
+  "Ogłoszenia piszą lider i zastępcy.": "The leader and the deputies write the announcements.",
+  "Nie udało się wczytać ogłoszeń.": "The announcements could not be loaded.",
+  "Kanał Dowództwo jest dla lidera i zastępców.": "The Command channel is for the leader and the deputies.",
+  "Kanał lidera i zastępców. Członkowie gildii go nie widzą.": "The channel of the leader and the deputies. The guild's members do not see it."
 }

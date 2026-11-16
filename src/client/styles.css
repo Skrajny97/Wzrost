@@ -8042,6 +8042,92 @@ a.camp-level-button {
 }
 
 /* The guild's members, folded under their count (screens/guild.js). */
+/* Over the chat's channel of a guild's leader and deputies (998.2). */
+.chat-lead-note {
+  margin: 0 0 8px;
+}
+
+/* The guild's board of announcements on top of the Gildia (998.1): the
+   newest announcement framed, the ones before folded under it, and the
+   field of the leader and the deputies. */
+.guild-notices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.guild-notice {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--bark-line);
+  background: var(--bg-deep);
+}
+
+.guild-notice--old {
+  opacity: 0.85;
+}
+
+.guild-notice-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+}
+
+.guild-notice-head .chat-name {
+  font-weight: 600;
+}
+
+.guild-notice-head .chat-time {
+  margin-left: auto;
+}
+
+.guild-notice-text {
+  margin: 0;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.guild-notice-report {
+  align-self: flex-end;
+  min-height: 32px;
+  padding: 4px 8px;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.guild-notices-old {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.guild-notice-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.guild-notice-form .guild-notice-field {
+  min-height: 84px;
+}
+
+.guild-notice-count {
+  align-self: flex-end;
+  margin: -4px 0 0;
+  font-size: 12px;
+}
+
 .guild-members-toggle {
   padding: 6px 0;
   cursor: pointer;

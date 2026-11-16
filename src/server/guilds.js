@@ -473,7 +473,8 @@ export async function cancelGuildInvite(context) {
 // messages, its Siedziba's buildings (guild-seat.js) and its chest. Also
 // for a deleted character or account (characters.js, accounts.js).
 export function guildRemoval(db, characters, binds, now) {
-  const gone = "channel LIKE 'guild:%' AND channel NOT IN (SELECT 'guild:' || guild_id FROM guild_members)";
+  // The channels of a guild gone: its own, its board and its leaders' (998).
+  const gone = "(channel LIKE 'guild:%' OR channel LIKE 'notice:%' OR channel LIKE 'lead:%') AND substr(channel, instr(channel, ':') + 1) NOT IN (SELECT CAST(guild_id AS TEXT) FROM guild_members)";
   return [
     ...offersReturned(db, characters, binds, now),
     ...chestReleased(db, characters, binds),
