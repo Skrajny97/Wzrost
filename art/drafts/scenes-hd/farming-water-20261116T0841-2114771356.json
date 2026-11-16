@@ -1,0 +1,14 @@
+{
+  "id": "farming-water",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art, the same small hooded figure in a dark navy robe now holding a grey metal watering can by its handle with both glowing ice-blue hands in front of itself, the can tilted forward so its long thin spout points down to the right and a thin stream of water drops pours from the spout onto the green seedlings in the dark soil bed, no hoe, the dark soil bed and the seedlings around, the same fine pixel art style, dark outline, colours and shading as the rest of the picture",
+  "style": null,
+  "input": "art/references/scenes/farming-hd.png",
+  "mask": "art/inputs/scenes/farming-water-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
