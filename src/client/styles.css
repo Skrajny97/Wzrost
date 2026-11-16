@@ -8352,6 +8352,45 @@ a.camp-level-button {
   font-size: 16px;
 }
 
+/* The author's look at a player's numbers (1019): label and value in two
+   columns, in the System's colours, as a System panel. */
+.profile-inspect {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--system-line);
+  background: var(--system-fill);
+}
+
+.profile-inspect .profile-section {
+  margin: 0;
+  color: var(--system);
+}
+
+.profile-inspect-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
+.profile-inspect-list dt {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--system-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-inspect-list dd {
+  margin: 0;
+  color: var(--text);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
 .profile-items,
 .profile-skills {
   display: grid;

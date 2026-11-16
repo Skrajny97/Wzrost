@@ -17,6 +17,7 @@ import { skillSprite } from './art.js';
 import { friendsSeen, wantConversation, wantMention } from './chat-news.js';
 import { portraitBox } from './cosmetics.js';
 import { h, icon } from './dom.js';
+import { dateTimeFormat, formatNumber, timeFormat } from './format.js';
 import { t } from './i18n.js';
 import { SLOT_ICONS } from './icons.js';
 import { call, isUnlocked, state } from './state.js';
@@ -50,6 +51,7 @@ export async function openProfile(name, { onChange, mention } = {}) {
       ),
     ),
     profile.relation?.state !== 'self' && friendship(profile, onChange, mention),
+    profile.inspect && inspectPart(profile.inspect),
     h('h3', { class: 'profile-section', text: t('Ekwipunek') }),
     h(
       'ul',
@@ -97,6 +99,35 @@ export async function openProfile(name, { onChange, mention } = {}) {
             ),
           ),
         ),
+  );
+}
+
+// What only the author sees (1019): the character's own numbers as its
+// player sees them, to check what players report. The server sends them to
+// the author alone (characterProfile in src/server/characters.js).
+function inspectPart(inspect) {
+  const { activity } = inspect;
+  const now = activity
+    ? t('{what} do {time}', { what: activity.kind === 'hunt' ? t('Eksploracja: {place}', { place: activity.place ?? '' }) : (activity.place ?? t('praca')), time: timeFormat.format(new Date(activity.endsAt)) })
+    : t('odpoczynek');
+  const rows = [
+    [t('HP'), `${formatNumber(inspect.hp)} / ${formatNumber(inspect.maxHp)}`],
+    [t('Mana'), `${formatNumber(inspect.mana)} / ${formatNumber(inspect.maxMana)}`],
+    [t('Obrażenia'), `${inspect.damage} (${inspect.damageKind})`],
+    [t('Redukcja obrażeń'), `${inspect.reduction}%`],
+    ...inspect.stats.map((stat) => [stat.name, formatNumber(stat.total)]),
+    [t('Wolne punkty'), formatNumber(inspect.freePoints)],
+    [t('Złoto'), formatNumber(inspect.gold)],
+    [t('Punkty Czasu'), formatNumber(inspect.timePoints)],
+    [t('Punkty Systemu'), formatNumber(inspect.systemPoints)],
+    [t('Teraz'), now],
+    [t('Ostatnio w grze'), inspect.seenAt ? dateTimeFormat.format(new Date(inspect.seenAt)) : '—'],
+  ];
+  return h(
+    'section',
+    { class: 'profile-inspect', 'aria-label': t('Podgląd autora') },
+    h('h3', { class: 'profile-section', text: t('Podgląd autora') }),
+    h('dl', { class: 'profile-inspect-list' }, rows.flatMap(([label, value]) => [h('dt', { text: label }), h('dd', { text: value })])),
   );
 }
 

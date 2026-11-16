@@ -133,6 +133,7 @@ import { cardRemoval } from './cards.js';
 import { storedPlay } from './play-time.js';
 import { duelOpen, duelRemoval } from './card-duel.js';
 import { chatRole } from './chat.js';
+import { isAuthor } from './author.js';
 import { relationTo } from './community.js';
 import { content, contentIn } from './content.js';
 import { favoriteIds } from './favorites.js';
@@ -1930,6 +1931,27 @@ export async function characterProfile(context) {
           .filter((skill) => skill.state === 'main' || skill.state === 'second')
           .map(({ id, name: skillName, level, maxLevel, state, effect }) => ({ id, name: skillName, level, maxLevel, path: state, effect })),
       ),
+      // For the author only (1019, the author: „1019 tak”): the character's
+      // own numbers as its player sees them, to check what players report
+      // (as the HP after a new level, 16.11.2026). Anyone else gets none.
+      ...(isAuthor(context.env, session.user) && {
+        inspect: {
+          hp: view.hp,
+          maxHp: view.maxHp,
+          mana: view.mana,
+          maxMana: view.maxMana,
+          damage: view.combat.damage,
+          damageKind: view.combat.damageKind,
+          reduction: view.combat.reduction,
+          stats: view.stats.map((stat) => ({ name: stat.name, total: stat.total })),
+          freePoints: view.freePoints,
+          gold: view.gold,
+          timePoints: view.timePoints,
+          systemPoints: view.systemPoints,
+          activity: view.activity && { kind: view.activity.kind, place: view.activity.areaName ?? view.activity.placeName ?? null, endsAt: view.activity.endsAt },
+          seenAt: found.seen_at ?? null,
+        },
+      }),
     },
   });
 }
