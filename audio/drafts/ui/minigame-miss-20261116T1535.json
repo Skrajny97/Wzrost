@@ -1,0 +1,13 @@
+{
+  "id": "minigame-miss",
+  "payload": {
+    "text": "one short soft disappointed miss, a dull muted wooden thud with a low falling tone, very short, close up, dry, no reverb, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/ui/minigame-miss-20261116T1535-0.mp3",
+    "audio/drafts/ui/minigame-miss-20261116T1535-1.mp3"
+  ],
+  "credits": 20
+}

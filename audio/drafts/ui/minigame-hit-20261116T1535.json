@@ -1,0 +1,13 @@
+{
+  "id": "minigame-hit",
+  "payload": {
+    "text": "one short bright satisfying success pluck, a single clear wooden marimba note with a tiny sparkle on top, very short, close up, dry, no reverb, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/ui/minigame-hit-20261116T1535-0.mp3",
+    "audio/drafts/ui/minigame-hit-20261116T1535-1.mp3"
+  ],
+  "credits": 20
+}
