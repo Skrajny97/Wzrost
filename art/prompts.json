@@ -1911,5 +1911,34 @@
       "dawn-male-new": "young man cleric in the Vestments of Dawn, a handsome friendly face with big clear eyes, a big head like the reference face, short fair blond hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, layered white and gold vestments down to the ankles, a golden sash, holding a staff topped with a small golden sun in one hand and a small book in the other, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
       "dawn-female-new": "young woman cleric in the Vestments of Dawn, a beautiful gentle face with big clear eyes, a big head like the reference face, long straight fair blond hair, a thin golden circlet crown with small rays, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, layered white and gold vestments down to the ankles, a golden sash, holding a staff topped with a small golden sun, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy"
     }
+  },
+  "fish": {
+    "$comment": "Ryby Rybołówstwa (999, 16.11.2026; DECISIONS.md, „Nowe profesje: Rybołówstwo, Rolnictwo i Gotowanie”): ikony 32 × 32 w stylu ziół, po cztery wersje z Pro Flash, na stronę ocen przed wejściem do gry.",
+    "width": 32,
+    "height": 32,
+    "pixellab": {
+      "style": "src/client/art/herbs/st-johns-wort.png",
+      "tool": "flash"
+    },
+    "prompts": {
+      "roach": "a small silver roach fish with red eyes and reddish orange fins, side view, single inventory item icon",
+      "perch": "a green-gold perch fish with dark vertical stripes, a spiny dorsal fin and orange-red lower fins, side view, single inventory item icon",
+      "crucian": "a round deep-bodied golden bronze crucian carp fish, side view, single inventory item icon",
+      "bream": "a tall flat silvery-bronze bream fish with a small head and a slimy sheen, side view, single inventory item icon",
+      "tench": "a thick olive-green tench fish with a golden sheen, tiny scales, small red eyes and rounded fins, side view, single inventory item icon",
+      "carp": "a big golden-brown common carp fish with large shiny scales and short barbels by the mouth, side view, single inventory item icon",
+      "eel": "a long slimy dark olive eel coiled in an S shape, single inventory item icon",
+      "pike": "a long green pike fish with pale yellow spots and a long jaw full of sharp teeth, side view, single inventory item icon",
+      "zander": "a slender grey-green zander fish with dark bands, big glassy eyes and small fangs, side view, single inventory item icon",
+      "trout": "a brown trout fish with red and black spots ringed with pale halos, side view, single inventory item icon",
+      "catfish": "a huge dark wels catfish with a wide flat head and long whiskers, side view, single inventory item icon",
+      "sturgeon": "a grey sturgeon fish with rows of bony armour plates along its body and a long pointed snout, side view, single inventory item icon",
+      "salmon": "a silver salmon fish with a hooked jaw and a pink-red flush along its side, side view, single inventory item icon",
+      "golden-carp": "a carp fish covered with gleaming gold scales like coins, a few sparkles around it, side view, single inventory item icon",
+      "water-catfish": "a dark green catfish with glowing pale green eyes and green water weeds tangled on its long whiskers, side view, single inventory item icon",
+      "silverfish": "a slim fish of pure shining silver glowing softly with pale moonlight, side view, single inventory item icon",
+      "drowned-pike": "an old black pike fish with pale ghostly eyes, ragged fins and a faint cold blue glow, side view, single inventory item icon",
+      "golden-fish": "a small shining golden fish with long flowing veil-like golden fins and a tiny golden crown, a few sparkles around it, side view, single inventory item icon"
+    }
   }
 }
