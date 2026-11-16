@@ -3580,6 +3580,15 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.99 (16.11.2026): liga przygotowana na ponowny wieczór o 23:00, wszystkie walki meczu po stronie serwera
+
+Autor: „Po wprowadzeniu poprawek i nowości wprowadź reset wojny i o 23 kolejny reroll” i „Wszystkie walki mają być możliwe do obejrzenia, każda nie tylko własna najlepiej”.
+
+1. **Mecz może mieć własną godzinę walk** (`guild_wars.fight_at`, migracja 0147). Gra walczy w takim meczu dopiero od tej chwili, a nie o 20:00 jego wieczoru. Dotyczy to i co minutę (cron), i zajrzenia do zakładki. Walki tego meczu mają w zapisie tę godzinę, a zakładka odlicza do niej i pisze „Dziś o 23:00”. Tytuł powtórki walki podaje godzinę tej walki (test `test/guild-wars.test.js`).
+2. **Reset wieczoru idzie osobnym wdrożeniem (0.4.0).** Migracje bazy wchodzą przed nową wersją gry. Gdyby reset wszedł razem z obsługą `fight_at`, stara wersja mogłaby przez kilkadziesiąt sekund między migracją a wdrożeniem stoczyć zresetowane mecze od razu, a nie o 23:00. Gdy 0.3.99 już działa, reset z 0.4.0 czeka na 23:00.
+3. **Wszystkie walki meczu** dla członków obu gildii: `GET /api/guild/war/matches/:id/battles` (`getGuildWarMatchBattles`). Każda walka meczu w kolejności, ze strony gildii tego, kto patrzy: format, miejsca stron, wynik, imiona po obu stronach i czy to walka postaci, która patrzy. Walkowery to nie walki. Każdą z nich można obejrzeć, jak dotąd (`GET /api/guild/war/battles/:id` już pozwalał na każdą walkę meczów gildii). Listę w zakładce pokazują makiety 1038, a do gry wejdzie po ich przyjęciu.
+4. **Indeks walk po meczu** (`guild_war_battles (war_id, number)`, migracja 0147). Liczby walk w zakładce i lista walk meczu czytały dotąd całą tabelę walk.
+
 ## Wersja 0.3.98 (16.11.2026): liga wojen gildii po pierwszym wieczorze
 
 Pierwszy wieczór ligi (16.11, 20:00). Autor: „Gdzie te walki i skad tyle walkowerów jak obie gildie mają sporo członków” i „brakuje nicków graczy w drużynie gildii”, a gracze na czacie pisali, że widzą tylko wynik i swoje walki.
