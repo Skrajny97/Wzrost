@@ -216,5 +216,40 @@
     { "fromLevel": 200, "part": "amber", "chestRarities": { "legendary": 55, "mythic": 35, "divine": 10 } },
     { "fromLevel": 300, "part": "bloodstone", "chestRarities": { "mythic": 70, "divine": 30 } },
     { "fromLevel": 400, "part": "star-shard", "chestRarities": { "mythic": 40, "divine": 60 } }
-  ]
+  ],
+  "streak": {
+    "$comment": "Nagroda za kolejne dni gry (1029, makiety 1034 przyjęte 16.11.2026, 1034.4 B; src/server/streak.js, src/client/daily-streak.js): jedna seria na konto, a nagroda trafia do postaci, którą się gra. Dzień liczy się od północy czasu polskiego, jak zadania dzienne. days: kolejne dni serii, każdy raz: złoto z goldMinutes minut wyprawy na poziomie postaci (explorationGold w src/engine/mining.js), zaokrąglone do goldRound, Punkty Czasu (timePoints), pakiety kart (packs) i Punkty Systemu (systemPoints). Opuszczony dzień zaczyna serię od 1. dnia, a po ostatnim dniu zaczyna się nowa seria. Okno otwiera się samo przy pierwszym wejściu do gry w danym dniu, po wprowadzeniu narratora, i wraca przy kolejnym wejściu, dopóki nagroda dnia nie jest odebrana.",
+    "goldRound": 5,
+    "days": [
+      {
+        "goldMinutes": 30,
+        "timePoints": 10
+      },
+      {
+        "goldMinutes": 45,
+        "timePoints": 10
+      },
+      {
+        "goldMinutes": 60,
+        "timePoints": 15
+      },
+      {
+        "goldMinutes": 75,
+        "timePoints": 15
+      },
+      {
+        "goldMinutes": 90,
+        "timePoints": 20
+      },
+      {
+        "goldMinutes": 120,
+        "timePoints": 25
+      },
+      {
+        "timePoints": 30,
+        "packs": 1,
+        "systemPoints": 5
+      }
+    ]
+  }
 }
