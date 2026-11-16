@@ -5,7 +5,7 @@
 // nothing, as from the Zagajnik. The crops take no room in the bag; the
 // innkeeper Zbylut buys them, as the fish (fishing.js).
 
-import { farmingMinutes, farmingReport, harvest, knownCrops, plotCount, professionState, weekFactor } from '../engine/index.js';
+import { farmingMinutes, farmingReport, harvest, knownCrops, minigameExtra, plotCount, professionState, weekFactor } from '../engine/index.js';
 import { content } from './content.js';
 import { characterView, currentHp, loadPlayer, requireWorker, workOf } from './characters.js';
 import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
@@ -17,6 +17,7 @@ import { workFamePoints } from './fame.js';
 import { requireOpen } from './mining.js';
 import { trimReports } from './reports.js';
 import { keptWeek, weekNow } from './weeks.js';
+import { withMinigame } from './minigame.js';
 
 // A farming of `minutes` from now on, of the field `plots` (the crop of
 // each plot, by id, or null for a plot left empty, as many as the level's
@@ -87,7 +88,7 @@ export async function startFarming(context) {
 // work brings the crops and its share of the XP and of the levels
 // (workGains). The Rolnictwo level of the claim decides the crops, as the
 // Zielarstwo level decides the herbs.
-export async function finishFarming(db, player, now, { avatar = false } = {}) {
+export async function finishFarming(db, player, now, { avatar = false, minigame = null } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
   const { farming } = content();
@@ -101,17 +102,24 @@ export async function finishFarming(db, player, now, { avatar = false } = {}) {
   const week = weekFactor(keptWeek(options), 'crops');
   const sown = plots.some((id) => id !== null);
   const { found, lucky, byPlot } = sown ? harvest({ plots, minutes: activity.minutes, level: before.level, seed: activity.seed, week }, content()) : { found: {}, lucky: {}, byPlot: plots.map(() => null) };
+  // The mini-game's hits (minigame.js; 1006): their share more of the
+  // crops, at the first plot of each, as the mastery's.
+  for (const [id, more] of Object.entries(minigameExtra(found, minigame?.share ?? 0, activity.seed))) {
+    found[id] = (found[id] ?? 0) + more;
+    const first = plots.indexOf(id);
+    byPlot[first] = (byPlot[first] ?? 0) + more;
+  }
   const { character, after, xp, work, sets } = workGains(player, profession, before, activity.minutes, avatar, now);
   // A card the work may leave (903, cards.js).
   const card = await workCard(db, row, activity, activity.minutes);
-  const report = {
+  const report = withMinigame({
     ...farmingReport(
       { minutes: activity.minutes, startedAt: activity.started_at, endsAt: activity.ends_at, seed: activity.seed, plots, byPlot, found, lucky, before, after, character, xp, work },
       content(),
     ),
     ...(avatar && { avatar: true }),
     ...(card && { cards: card.cards }),
-  };
+  }, minigame);
   const summary = {
     placeName: report.placeName,
     minutes: report.minutes,

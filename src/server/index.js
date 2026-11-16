@@ -81,6 +81,7 @@ import { discardMinerals, sellMinerals, startMining } from './mining.js';
 import { discardPantry, sellPantry, startFishing } from './fishing.js';
 import { startFarming } from './farming.js';
 import { startCooking } from './cooking.js';
+import { startMinigame } from './minigame.js';
 import { startJewelcraft, transmuteGemsNow } from './jewelcraft.js';
 import { pushKey, sendNotifications, subscribePush, testPush, unsubscribePush } from './push.js';
 import { claimAllQuests, claimQuest, openChest, rerollQuests } from './quests.js';
@@ -268,6 +269,7 @@ const routes = [
   ['POST', '/api/professions/fish', startFishing],
   ['POST', '/api/professions/farm', startFarming],
   ['POST', '/api/professions/cook', startCooking],
+  ['POST', '/api/minigame', startMinigame],
   ['POST', '/api/professions/jewel', startJewelcraft],
   ['POST', '/api/professions/transmute', transmuteGemsNow],
   ['POST', '/api/minerals/sell', sellMinerals],

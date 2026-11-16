@@ -279,6 +279,8 @@ export function buildContent(raw) {
     cropsById: byId(raw.professions?.crops ?? []),
     // Gotowanie with its dishes (cooking.js; 999.3-999.5 v2).
     cooking: raw.professions?.cooking,
+    // The mini-game at a work's report (minigame.js; 1006).
+    minigame: raw.professions?.minigame,
     dishes: raw.professions?.dishes ?? [],
     dishesById: byId(raw.professions?.dishes ?? []),
     pantry: pantryOf(raw),

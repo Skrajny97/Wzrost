@@ -26,6 +26,7 @@ import { finishMining } from './mining.js';
 import { finishFishing } from './fishing.js';
 import { finishFarming } from './farming.js';
 import { finishCooking } from './cooking.js';
+import { minigameOutcome } from './minigame.js';
 
 const FINISH = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting, minerals: finishMining, jewels: finishJewels, fish: finishFishing, crops: finishFarming, dishes: finishCooking };
 
@@ -60,7 +61,9 @@ export async function claimAvatar(context) {
   const activity = avatarWork(player);
   if (activity.ends_at > now) throw new ApiError(409, 'not_finished', 'Praca Awatara Systemu jeszcze trwa.');
   const db = context.env.DB;
-  const done = await FINISH[activity.kind](db, player, now, { avatar: true });
+  // The taps of its mini-game, if it was begun (minigame.js).
+  const body = (context.request.headers.get('Content-Type') ?? '').startsWith('application/json') ? await readJson(context.request) : {};
+  const done = await FINISH[activity.kind](db, player, now, { avatar: true, minigame: minigameOutcome(activity, body.minigame, now) });
   // A work whose recipe or pattern the game no longer has gave back what it
   // took and made no report (the code review: it answered with an error).
   const character = characterView(await loadPlayer(db, session.userId), now);

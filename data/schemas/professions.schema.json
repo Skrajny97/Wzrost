@@ -2080,6 +2080,495 @@
         }
       }
     },
+    "minigame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tries",
+        "zones",
+        "period",
+        "tolerance",
+        "shares",
+        "rarity",
+        "kinds",
+        "texts"
+      ],
+      "properties": {
+        "tries": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Ile prób, każda ze swoją strefą."
+        },
+        "zones": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 0.6
+          },
+          "description": "Szerokość zielonej strefy każdej próby, jako część paska."
+        },
+        "period": {
+          "type": "integer",
+          "minimum": 200,
+          "description": "Ile ms trwa przejście znacznika w tę i z powrotem."
+        },
+        "tolerance": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "O ile ms stuknięcie może wyprzedzić czas gry na serwerze (zegary)."
+        },
+        "shares": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "description": "Udział więcej z pracy po 0, 1, 2 i 3 trafieniach."
+        },
+        "rarity": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "description": "Punkty procentowe szansy na rzadkość wyżej (Warsztat, Szlifiernia) po 0, 1, 2 i 3 trafieniach."
+        },
+        "kinds": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "herbs",
+            "potions",
+            "items",
+            "minerals",
+            "jewels",
+            "fish",
+            "crops",
+            "dishes"
+          ],
+          "properties": {
+            "herbs": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "title",
+                "kicker",
+                "text",
+                "button",
+                "bonus",
+                "place",
+                "look"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "kicker": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "button": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "bonus": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Premia w słowach, z {value}."
+                },
+                "place": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9-]*$",
+                  "description": "Obrazek miejsca nad paskiem."
+                },
+                "look": {
+                  "type": "string",
+                  "enum": [
+                    "plain",
+                    "heat",
+                    "hammer"
+                  ],
+                  "description": "Wygląd paska i znacznika."
+                }
+              }
+            },
+            "potions": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "title",
+                "kicker",
+                "text",
+                "button",
+                "bonus",
+                "place",
+                "look"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "kicker": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "button": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "bonus": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Premia w słowach, z {value}."
+                },
+                "place": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9-]*$",
+                  "description": "Obrazek miejsca nad paskiem."
+                },
+                "look": {
+                  "type": "string",
+                  "enum": [
+                    "plain",
+                    "heat",
+                    "hammer"
+                  ],
+                  "description": "Wygląd paska i znacznika."
+                }
+              }
+            },
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "title",
+                "kicker",
+                "text",
+                "button",
+                "bonus",
+                "place",
+                "look"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "kicker": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "button": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "bonus": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Premia w słowach, z {value}."
+                },
+                "place": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9-]*$",
+                  "description": "Obrazek miejsca nad paskiem."
+                },
+                "look": {
+                  "type": "string",
+                  "enum": [
+                    "plain",
+                    "heat",
+                    "hammer"
+                  ],
+                  "description": "Wygląd paska i znacznika."
+                }
+              }
+            },
+            "minerals": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "title",
+                "kicker",
+                "text",
+                "button",
+                "bonus",
+                "place",
+                "look"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "kicker": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "button": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "bonus": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Premia w słowach, z {value}."
+                },
+                "place": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9-]*$",
+                  "description": "Obrazek miejsca nad paskiem."
+                },
+                "look": {
+                  "type": "string",
+                  "enum": [
+                    "plain",
+                    "heat",
+                    "hammer"
+                  ],
+                  "description": "Wygląd paska i znacznika."
+                }
+              }
+            },
+            "jewels": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "title",
+                "kicker",
+                "text",
+                "button",
+                "bonus",
+                "place",
+                "look"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "kicker": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "button": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "bonus": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Premia w słowach, z {value}."
+                },
+                "place": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9-]*$",
+                  "description": "Obrazek miejsca nad paskiem."
+                },
+                "look": {
+                  "type": "string",
+                  "enum": [
+                    "plain",
+                    "heat",
+                    "hammer"
+                  ],
+                  "description": "Wygląd paska i znacznika."
+                }
+              }
+            },
+            "fish": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "title",
+                "kicker",
+                "text",
+                "button",
+                "bonus",
+                "place",
+                "look"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "kicker": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "button": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "bonus": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Premia w słowach, z {value}."
+                },
+                "place": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9-]*$",
+                  "description": "Obrazek miejsca nad paskiem."
+                },
+                "look": {
+                  "type": "string",
+                  "enum": [
+                    "plain",
+                    "heat",
+                    "hammer"
+                  ],
+                  "description": "Wygląd paska i znacznika."
+                }
+              }
+            },
+            "crops": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "title",
+                "kicker",
+                "text",
+                "button",
+                "bonus",
+                "place",
+                "look"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "kicker": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "button": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "bonus": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Premia w słowach, z {value}."
+                },
+                "place": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9-]*$",
+                  "description": "Obrazek miejsca nad paskiem."
+                },
+                "look": {
+                  "type": "string",
+                  "enum": [
+                    "plain",
+                    "heat",
+                    "hammer"
+                  ],
+                  "description": "Wygląd paska i znacznika."
+                }
+              }
+            },
+            "dishes": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "title",
+                "kicker",
+                "text",
+                "button",
+                "bonus",
+                "place",
+                "look"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "kicker": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "button": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "bonus": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Premia w słowach, z {value}."
+                },
+                "place": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9-]*$",
+                  "description": "Obrazek miejsca nad paskiem."
+                },
+                "look": {
+                  "type": "string",
+                  "enum": [
+                    "plain",
+                    "heat",
+                    "hammer"
+                  ],
+                  "description": "Wygląd paska i znacznika."
+                }
+              }
+            }
+          }
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      },
+      "description": "Minigra przy raporcie pracy (1006): znacznik na pasku, trzy próby, premia za trafienia."
+    },
     "fish": {
       "type": "array",
       "minItems": 1,

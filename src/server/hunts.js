@@ -115,6 +115,7 @@ import { perkOf } from './perks.js';
 import { finishGathering } from './professions.js';
 import { herbsOf, knownPotionsOf, pantryOf, potionKnown, potionsOf } from './professions-view.js';
 import { finishCooking } from './cooking.js';
+import { minigameOutcome } from './minigame.js';
 import { trimReports } from './reports.js';
 import { leaveTrip, tripOf } from './trips.js';
 import { finishCrafting } from './workshop.js';
@@ -732,7 +733,7 @@ export async function claimHunt(context) {
   if (player.activity?.kind === 'mercenary') requireIdle(player, now);
   // The option chosen in the event at the exploration's end, if one came.
   const body = (context.request.headers.get('Content-Type') ?? '').startsWith('application/json') ? await readJson(context.request) : {};
-  const done = await finishActivity(context.env.DB, player, now, { choice: body.choice });
+  const done = await finishActivity(context.env.DB, player, now, { choice: body.choice, minigame: body.minigame });
   // A work whose recipe or pattern the game no longer has gave back what it
   // took and made no report.
   if (!done) return json({ character: characterView(await loadPlayer(context.env.DB, session.userId), now) });
@@ -749,9 +750,10 @@ export async function claimHunt(context) {
 // profession's work by its own finish, an exploration by finishHunt (with
 // the option chosen in the event at its end, if one came). Also the claim
 // of a Drużyna's member as its party sets out (parties.js, `forTrip`).
-export function finishActivity(db, player, now, { choice, forTrip = false } = {}) {
+export function finishActivity(db, player, now, { choice, forTrip = false, minigame = null } = {}) {
   const finish = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting, minerals: finishMining, jewels: finishJewels, fish: finishFishing, crops: finishFarming, dishes: finishCooking }[player.activity?.kind];
-  return finish && player.activity.ends_at <= now ? finish(db, player, now) : finishHunt(db, player, now, { choice, forTrip });
+  // A work's mini-game, if it was begun, by the taps of the claim (minigame.js).
+  return finish && player.activity.ends_at <= now ? finish(db, player, now, { minigame: minigameOutcome(player.activity, minigame, now) }) : finishHunt(db, player, now, { choice, forTrip });
 }
 
 // The Osada after an exploration of `minutes`: each companion who went

@@ -41,6 +41,7 @@ import { addTo, alreadyClaimed, insertWork, requireProfessions, shareOf, workCla
 import { workFamePoints } from './fame.js';
 import { mineralsOf } from './professions-view.js';
 import { trimReports } from './reports.js';
+import { withMinigame } from './minigame.js';
 
 // An order of jewels: a pattern the character knows, by the level or from a
 // jewel taken apart, a gem it cuts, how many and what they take, at the
@@ -192,7 +193,7 @@ export async function transmuteGemsNow(context) {
 // back and makes no report (null). With `avatar`, the work of the Awatar
 // Systemu (avatar.js), which brings its share of the XP and of the levels
 // since 10.11.2026 (workGains).
-export async function finishJewels(db, player, now, { stop = false, avatar = false } = {}) {
+export async function finishJewels(db, player, now, { stop = false, avatar = false, minigame = null } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
   const { jewelcrafting } = content();
@@ -268,7 +269,7 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
   const worked = stop ? Math.floor(elapsed / 60000) : activity.minutes;
   const results =
     done > 0
-      ? craftJewels({ baseId: base.id, rarityId: options.rarity, count: done, level: options.level, professionLevel: before.level, met: JSON.parse(row.met ?? '[]'), seed: activity.seed }, content())
+      ? craftJewels({ baseId: base.id, rarityId: options.rarity, count: done, level: options.level, professionLevel: before.level, met: JSON.parse(row.met ?? '[]'), seed: activity.seed, luck: minigame?.luck ?? 0 }, content())
       : [];
   const madeCount = results.filter((result) => result.made).length;
   // The gems of the jewels not done come back, and the ore of those and of
@@ -289,7 +290,7 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
     const { character, after, xp, work, sets } = workGains(player, profession, before, minutes, avatar, now);
     // A card the work may leave, by the time it lasted (903, cards.js).
     const card = await workCard(db, row, activity, minutes);
-    const report = {
+    const report = withMinigame({
       ...jewelReport(
         {
           ...made,
@@ -309,7 +310,7 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
       ),
       ...(avatar && { avatar: true }),
       ...(card && { cards: card.cards }),
-    };
+    }, made.set ? null : minigame);
     const summary = {
       placeName: report.placeName,
       minutes: report.minutes,

@@ -5,7 +5,7 @@
 // character brings nothing, as from the Zagajnik. Minerals take no room in
 // the bag; they sell to the scrapper or go away.
 
-import { addQuestProgress, campBonus, campLevels, mineMinerals, miningMinutes, miningReport, professionOpen, professionState, professionUnlockLevel, saleGold, weekFactor } from '../engine/index.js';
+import { addQuestProgress, campBonus, campLevels, mineMinerals, minigameExtra, miningMinutes, miningReport, professionOpen, professionState, professionUnlockLevel, saleGold, weekFactor } from '../engine/index.js';
 import { content } from './content.js';
 import { characterView, currentHp, loadPlayer, questsNow, requirePlayer, requireWorker, workOf } from './characters.js';
 import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
@@ -17,6 +17,7 @@ import { workFamePoints } from './fame.js';
 import { mineralsOf } from './professions-view.js';
 import { trimReports } from './reports.js';
 import { keptWeek, weekNow } from './weeks.js';
+import { withMinigame } from './minigame.js';
 
 // A profession that opens later than the Profesje tab waits for its level.
 export function requireOpen(player, profession) {
@@ -83,7 +84,7 @@ export async function startMining(context) {
 // brings the minerals, the gold and its share of the XP and of the levels
 // (workGains). The Górnictwo level of the claim
 // decides the minerals, as the Zielarstwo level decides the herbs.
-export async function finishMining(db, player, now, { avatar = false } = {}) {
+export async function finishMining(db, player, now, { avatar = false, minigame = null } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
   const { mining } = content();
@@ -92,14 +93,16 @@ export async function finishMining(db, player, now, { avatar = false } = {}) {
   const options = JSON.parse(activity.options ?? '{}');
   // The week it began in: its share of the minerals (weeks.js).
   const mined = mineMinerals({ minutes: activity.minutes, level: before.level, characterLevel: options.level ?? row.level, seed: activity.seed, week: weekFactor(keptWeek(options), 'minerals') }, content());
+  // The mini-game's hits (minigame.js; 1006): their share more of the minerals.
+  for (const [id, more] of Object.entries(minigameExtra(mined.found, minigame?.share ?? 0, activity.seed))) mined.found[id] = (mined.found[id] ?? 0) + more;
   const { character, after, xp, work, sets } = workGains(player, profession, before, activity.minutes, avatar, now);
   // A card the work may leave (903, cards.js).
   const card = await workCard(db, row, activity, activity.minutes);
-  const report = {
+  const report = withMinigame({
     ...miningReport({ minutes: activity.minutes, startedAt: activity.started_at, endsAt: activity.ends_at, seed: activity.seed, mined, before, after, character, xp, work }, content()),
     ...(avatar && { avatar: true }),
     ...(card && { cards: card.cards }),
-  };
+  }, minigame);
   const summary = {
     placeName: report.placeName,
     minutes: report.minutes,

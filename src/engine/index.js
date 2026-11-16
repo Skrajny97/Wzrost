@@ -62,6 +62,7 @@ export * from './mining.js';
 export * from './fishing.js';
 export * from './farming.js';
 export * from './cooking.js';
+export * from './minigame.js';
 export * from './jewelcraft.js';
 export * from './mail.js';
 export * from './gifts.js';

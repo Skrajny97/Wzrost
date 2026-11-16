@@ -27,6 +27,7 @@ import {
   potionHerbs,
   potionPrice,
   potionsDone,
+  minigameExtra,
   professionState,
   storeStacks,
   timedKind,
@@ -46,6 +47,7 @@ import { perkOf } from './perks.js';
 import { trimReports } from './reports.js';
 import { tripOf } from './trips.js';
 import { say } from '../engine/text.js';
+import { withMinigame } from './minigame.js';
 
 // A brewing of `count` potions of the recipe chosen, from now on, by the
 // character or by its Awatar Systemu (`avatar` in the request). The herbs
@@ -129,7 +131,7 @@ export async function startBrewing(context) {
 // it only gives the herbs back and makes no report (null). With `avatar`,
 // the brewing of the Awatar Systemu (avatar.js), whose work brings the
 // potions and its share of the XP and of the levels (workGains).
-export async function finishBrewing(db, player, now, { stop = false, avatar = false } = {}) {
+export async function finishBrewing(db, player, now, { stop = false, avatar = false, minigame = null } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
   const { brewing } = content();
@@ -189,20 +191,22 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
 
   // The Alchemia of the claim decides the extra potions, as Zielarstwo's
   // the herbs: past its mastery more of them (952.3 A, brewChance).
-  const made = brewPotions({ count: done, seed: activity.seed, extraChance: catalystChance(catalyst?.key, content()), level: before.level }, content());
+  const brewed = brewPotions({ count: done, seed: activity.seed, extraChance: catalystChance(catalyst?.key, content()), level: before.level }, content());
+  // The mini-game's hits (minigame.js; 1006): their share more of the potions.
+  const made = { ...brewed, count: brewed.count + (minigameExtra({ [potion.id]: brewed.count }, minigame?.share ?? 0, activity.seed)[potion.id] ?? 0) };
   const taken = bagItems(player).length + bagStacks(herbs, content()) + bagStacks(potionsOf(row), content());
   const { stored, lost } = storeStacks(potionsOf(row), { [potion.id]: made.count }, capacity - taken, content());
   const { character, after, xp, work, sets } = workGains(player, profession, before, worked, avatar, now);
   // A card the work may leave, by the time it lasted (903, cards.js).
   const card = await workCard(db, row, activity, worked);
-  const report = {
+  const report = withMinigame({
     ...brewingReport(
       { potion, minutes: worked, startedAt: activity.started_at, endsAt: stop ? now : activity.ends_at, seed: activity.seed, made, stored, lost, stopped: stop, before, after, character, xp, work, settlement: settlementPointsOf(row) },
       content(),
     ),
     ...(avatar && { avatar: true }),
     ...(card && { cards: card.cards }),
-  };
+  }, minigame);
   const summary = {
     placeName: report.placeName,
     minutes: report.minutes,

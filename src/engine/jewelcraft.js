@@ -178,11 +178,11 @@ export function jewelCost(base, rarityId, count, content) {
 // character's level, with affixes named by the creatures met. An order
 // stopped early keeps the draws of the jewels it made.
 /**
- * @param {{ baseId: string, rarityId: string, count: number, level: number, professionLevel: number, met?: string[], seed: string }} order
+ * @param {{ baseId: string, rarityId: string, count: number, level: number, professionLevel: number, met?: string[], seed: string, luck?: number }} order
  * @param {Content} content
  * @returns {JewelResult[]}
  */
-export function craftJewels({ baseId, rarityId, count, level, professionLevel, met = [], seed }, content) {
+export function craftJewels({ baseId, rarityId, count, level, professionLevel, met = [], seed, luck = 0 }, content) {
   const rng = createRng(seed);
   const chance = jewelChance(rarityId, professionLevel, content);
   const area = metNames(met, content);
@@ -190,7 +190,11 @@ export function craftJewels({ baseId, rarityId, count, level, professionLevel, m
   const results = [];
   for (let index = 0; index < count; index += 1) {
     const made = rng.chance(chance);
-    results.push(made ? { made, item: generateItem({ baseId, level, rarityId, area }, rng, content) } : { made });
+    // The mini-game's luck (minigame.js; 1006): a chance of the rarity
+    // above, drawn only with some, so the jewels without it come as ever.
+    const lucky = made && luck > 0 && rng.chance(luck);
+    const rarity = lucky ? content.rarities[Math.min(content.rarities.length - 1, content.rarities.findIndex((/** @type {{ id: string }} */ one) => one.id === rarityId) + 1)].id : rarityId;
+    results.push(made ? { made, item: generateItem({ baseId, level, rarityId: rarity, area }, rng, content) } : { made });
   }
   return results;
 }

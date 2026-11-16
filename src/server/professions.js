@@ -13,6 +13,7 @@ import {
   gatheringMinutes,
   gatheringReport,
   herbHarvest,
+  minigameExtra,
   herbSlots,
   isUnlocked,
   playerCombatant,
@@ -36,6 +37,7 @@ import { herbsOf } from './professions-view.js';
 import { perkOf } from './perks.js';
 import { trimReports } from './reports.js';
 import { keptWeek, weekNow } from './weeks.js';
+import { withMinigame } from './minigame.js';
 
 // A JSON path for an id with a hyphen.
 const path = (id) => `$."${id}"`;
@@ -213,7 +215,7 @@ export async function startGathering(context) {
 // the character or, with `avatar`, of its Awatar Systemu (avatar.js), whose
 // work brings the herbs and its share of the XP and of the levels
 // (workGains).
-export async function finishGathering(db, player, now, { avatar = false } = {}) {
+export async function finishGathering(db, player, now, { avatar = false, minigame = null } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
   const { gathering } = content();
@@ -226,19 +228,21 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
   // Zielarstwo's mastery some come twice (952.3 A, `lucky`, herbHarvest).
   const week = weekFactor(keptWeek(activity.options), 'herbs');
   const { found, lucky } = herbIds.length > 0 ? herbHarvest({ herbIds, minutes: activity.minutes, level: before.level, seed: activity.seed, more, week }, content()) : { found: {}, lucky: {} };
+  // The mini-game's hits (minigame.js; 1006): their share more of what it brings.
+  for (const [id, more] of Object.entries(minigameExtra(found, minigame?.share ?? 0, activity.seed))) found[id] = (found[id] ?? 0) + more;
   const capacity = bagCapacity(campLevels(player.buildings, now, content()), content());
   const { stored, lost } = storeStacks(herbsOf(row), found, capacity - bagPlaces(player), content());
   const { character, after, xp, work, sets } = workGains(player, profession, before, activity.minutes, avatar, now);
   // A card the work may leave (903, cards.js).
   const card = await workCard(db, row, activity, activity.minutes);
-  const report = {
+  const report = withMinigame({
     ...gatheringReport(
       { minutes: activity.minutes, startedAt: activity.started_at, endsAt: activity.ends_at, seed: activity.seed, found, lucky, stored, lost, before, after, character, xp, work },
       content(),
     ),
     ...(avatar && { avatar: true }),
     ...(card && { cards: card.cards }),
-  };
+  }, minigame);
   const summary = {
     placeName: report.placeName,
     minutes: report.minutes,

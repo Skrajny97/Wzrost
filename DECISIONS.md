@@ -3580,6 +3580,21 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.82 (16.11.2026): minigry przy raporcie profesji
+
+1. Minigra przy odbiorze raportu każdej profesji (1060; makiety 1006, zrzuty z gry 1016), przyjęta przez autora: „1016 ocenione pozytywnie” (16.11.2026). Zob. „Minigry przy raporcie”.
+
+## Minigry przy raporcie (1060; 16.11.2026)
+
+Makiety 1006.1–1006.3 przyjęte, mechanika A z uwagą autora: „niech będzie tak jak tutaj, ale niech szybko leci ten znacznik”. Zrzuty z gry: 1016.
+
+1. **Kiedy.** „Odbierz raport” skończonej pracy w każdej profesji (Zielarstwo, Alchemia, Warsztat, Górnictwo, Jubilerstwo, Rybołówstwo, Rolnictwo, Gotowanie) najpierw otwiera minigrę, także przy pracy Awatara Systemu. Bez minigry zostają zamówienie zwojów w Warsztacie i oprawianie kamienia w Szlifierni, bo nie ma tam czego podnieść.
+2. **Jak.** Znacznik biega po pasku tam i z powrotem, cały ruch w 1,4 s (`minigame.period`). Są trzy próby, a zielone pole z każdą jest węższe (26%, 19% i 13% paska), w miejscu wylosowanym z ziarna pracy. Stuknięcie przycisku, gdy znacznik jest w zielonym polu, to trafienie. „Pomiń i weź zwykły wynik” odbiera raport bez premii.
+3. **Co daje.** Jedno trafienie daje +5%, dwa +10%, a trzy +20% tego, co przynosi praca (`shares`): dodatkowe sztuki z całej części, a reszta losem z ziarna pracy. W Warsztacie i Szlifierni zamiast tego +1, +2 albo +4 pkt proc. szansy na przedmiot o rzadkość wyższy (`rarity`).
+4. **Uczciwość.** Grę zaczyna serwer (`POST /api/minigame`) i raz zapisuje przy pracy jej początek. Strona wysyła z odbiorem tylko czasy stuknięć, a serwer liczy trafienia z ziarna pracy i tych czasów: stuknięcia po kolei i nie później, niż gra mogła trwać (z zapasem 3 s na zegary, `tolerance`). Praca odebrana bez rozpoczętej gry nie dostaje premii.
+5. **Raport.** Pierwsza linia Systemu mówi: „Minigra: trafienia 3 z 3, +20% ryb.” albo „Minigra: bez trafień.”. Dodatkowe sztuki są już w wyniku pracy.
+6. **Wygląd.** Okno czeka na odpowiedź (nie zamyka się stuknięciem obok). U góry obrazek miejsca z nazwą profesji i nazwą gry. Każda praca ma swój tytuł, przycisk i pasek: zwykły, gorący (Alchemia i Kuchnia: pasek od zimnego do gorącego i znacznik z płomieniem) albo młot (Warsztat i Kopalnia: znacznik z głowicą młota). Teksty są w `data/professions.json` (`minigame`).
+
 ## Wersja 0.3.81 (16.11.2026): Rybołówstwo, Rolnictwo i Gotowanie
 
 1. Trzy nowe profesje od 25. poziomu postaci: Rybołówstwo (1057, ekran 1011), Rolnictwo z planszą pól (1058, ekran 1013) i Gotowanie z posiłkiem na wyprawę (1059, ekran 1014, premie 1015), wszystkie przyjęte przez autora. Zob. „Rybołówstwo w grze”, „Rolnictwo w grze” i „Gotowanie i posiłek”.
