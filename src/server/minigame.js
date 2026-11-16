@@ -44,7 +44,7 @@ export async function startMinigame(context) {
     if (typeof stored?.at !== 'number') throw new ApiError(409, 'no_minigame', 'Ta praca nie ma minigry.');
     at = stored.at;
   }
-  return json({ minigame: { kind: activity.kind, at, ...minigameChallenge(activity.seed, content()), ...rules.kinds[activity.kind], shares: rules.shares, rarity: rules.rarity, texts: rules.texts } });
+  return json({ minigame: { kind: activity.kind, at, ...minigameChallenge(activity.seed, content()), pause: rules.pause, ...rules.kinds[activity.kind], shares: rules.shares, rarity: rules.rarity, texts: rules.texts } });
 }
 
 // What the claim's mini-game (`played`: { taps }, ms after the game began
@@ -57,7 +57,10 @@ export function minigameOutcome(activity, played, now) {
   const taps = played.taps;
   const at = JSON.parse(activity.options ?? '{}').minigame?.at;
   if (typeof at !== 'number') return null;
-  const hits = minigameHits(taps, minigameChallenge(activity.seed, content()), now - at, content());
+  // A page from 0.3.93 on stands the marker still after each tap (1022)
+  // and says so; one from before does not.
+  const pause = played.pause === content().minigame.pause ? content().minigame.pause : 0;
+  const hits = minigameHits(taps, minigameChallenge(activity.seed, content()), now - at, content(), pause);
   const result = minigameResult(activity.kind, hits, content());
   return { ...result, line: minigameLine(result, content()) };
 }

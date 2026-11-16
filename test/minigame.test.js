@@ -42,6 +42,23 @@ describe('the mini-game in the engine', () => {
     assert.equal(minigameHits([Number.NaN], game, 5000, content), 0);
   });
 
+  // 1022: the marker stands `pause` ms after each tap; the next tap counts
+  // only after it, and the marker goes on from where it stood.
+  test('with the pause, the marker stands after each tap and goes on from there; a tap in a pause ends the game', () => {
+    const game = minigameChallenge('seed-3', content);
+    const pause = content.minigame.pause;
+    assert.ok(pause > 0);
+    // Taps that hit without the pause hit with it, each a pause later per
+    // tap before it: the marker went on from where it stood.
+    const taps = hitting(game).map((tap, index) => tap + index * pause);
+    assert.equal(minigameHits(taps, game, 99999, content, pause), 3);
+    // A tap within the pause of the one before ends the game there; one
+    // right at its end still counts, as a miss here.
+    assert.equal(minigameHits([taps[0], taps[0] + pause - 1, taps[2]], game, 99999, content, pause), 1);
+    const late = [taps[0], taps[1], taps[2] + game.period / 2];
+    assert.equal(minigameHits(late, game, 99999, content, pause), 2);
+  });
+
   test('what the hits give: 5%, 10% and 20% more, or 1, 2 and 4 points of a rarity higher in the Warsztat and the Szlifiernia', () => {
     assert.deepEqual([0, 1, 2, 3].map((hits) => minigameResult('fish', hits, content).share), [0, 0.05, 0.1, 0.2]);
     assert.deepEqual([0, 1, 2, 3].map((hits) => minigameResult('items', hits, content).luck), [0, 0.01, 0.02, 0.04]);

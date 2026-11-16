@@ -63,23 +63,26 @@ export const tapHits = (ms, zone, challenge) => Math.abs(markerAt(ms, challenge)
 // game having gone on for `elapsed` ms by the claim: a tap counts only in
 // order, after the one before, and not later than the game could have gone
 // on (with the data's tolerance for the clocks); the first one out of that
-// ends the game.
+// ends the game. With `pause` (the data's, 1022), the marker stands that
+// long after each tap: a tap counts only after the pause of the one before,
+// and the marker is where it would be without the pauses gone by.
 /**
  * @param {unknown} taps
  * @param {Challenge} challenge
  * @param {number} elapsed
  * @param {Content} content
+ * @param {number} [pause]
  * @returns {number}
  */
-export function minigameHits(taps, challenge, elapsed, content) {
+export function minigameHits(taps, challenge, elapsed, content, pause = 0) {
   if (!Array.isArray(taps)) return 0;
   const tolerance = content.minigame.tolerance;
   let hits = 0;
-  let last = -1;
+  let last = -Infinity;
   for (const [index, tap] of taps.slice(0, challenge.tries).entries()) {
-    if (typeof tap !== 'number' || !Number.isFinite(tap) || tap <= last || tap < 0 || tap > elapsed + tolerance) break;
+    if (typeof tap !== 'number' || !Number.isFinite(tap) || tap <= last || tap < last + pause || tap < 0 || tap > elapsed + tolerance) break;
     last = tap;
-    if (tapHits(tap, challenge.zones[index], challenge)) hits += 1;
+    if (tapHits(tap - index * pause, challenge.zones[index], challenge)) hits += 1;
   }
   return hits;
 }

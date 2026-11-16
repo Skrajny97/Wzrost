@@ -34,10 +34,10 @@
     },
     "effects": {
       "type": "object",
-      "description": "Nazwa dźwięku z src/client/sound.js (SOUNDS), mikstury (potion, brew), Warsztatu (craft, craft-fail) albo skill-<id umiejętności> → jego nagranie.",
+      "description": "Nazwa dźwięku z src/client/sound.js (SOUNDS), mikstury (potion, brew), Warsztatu (craft, craft-fail), minigry (minigame-hit, minigame-miss: trafienie i pudło, 1022) albo skill-<id umiejętności> → jego nagranie.",
       "propertyNames": {
         "anyOf": [
-          { "enum": ["tap", "tab", "open", "swing", "shot", "magic", "effect", "tick", "victory", "defeat", "system", "build", "collect", "done", "chest", "potion", "brew", "craft", "craft-fail", "evolution-transform", "casino-spin", "casino-win", "casino-lose", "casino-ticket", "jewel", "jewel-fail", "gem-set"] },
+          { "enum": ["tap", "tab", "open", "swing", "shot", "magic", "effect", "tick", "victory", "defeat", "system", "build", "collect", "done", "chest", "potion", "brew", "craft", "craft-fail", "evolution-transform", "casino-spin", "casino-win", "casino-lose", "casino-ticket", "jewel", "jewel-fail", "gem-set", "minigame-hit", "minigame-miss"] },
           { "pattern": "^skill-[a-z][a-z0-9-]*$" }
         ]
       },

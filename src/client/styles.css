@@ -7339,6 +7339,8 @@ a.camp-level-button {
    sliding stop; the fight playback stays, in a calmer form (see arena.js).
    Last in the file, so it wins over the rules it calms. */
 .calm .activity--done,
+.calm .minigame-marker--hit::before,
+.calm .minigame-marker--miss,
 .calm .camp-bubble--full,
 .calm .camp-collector-art,
 .calm .camp-collector-flyer,
@@ -8350,6 +8352,45 @@ a.camp-level-button {
 .profile-section {
   margin: 16px 0 8px;
   font-size: 16px;
+}
+
+/* The author's look at a player's numbers (1019): label and value in two
+   columns, in the System's colours, as a System panel. */
+.profile-inspect {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--system-line);
+  background: var(--system-fill);
+}
+
+.profile-inspect .profile-section {
+  margin: 0;
+  color: var(--system);
+}
+
+.profile-inspect-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
+.profile-inspect-list dt {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--system-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-inspect-list dd {
+  margin: 0;
+  color: var(--text);
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .profile-items,
@@ -9945,6 +9986,39 @@ a.profession-square:active {
   border-radius: 50%;
   background: linear-gradient(180deg, #d6402b 0 50%, #f3eee2 50% 100%);
 }
+
+/* The marker standing after a tap (1022): lit up at a hit, shaken red at
+   a miss, for the pause the data gives. */
+.minigame-marker--hit {
+  box-shadow: 0 0 12px 3px rgba(167, 196, 127, 0.95);
+}
+
+.minigame-marker--hit::before {
+  animation: minigame-hit 0.45s ease-out;
+}
+
+.minigame-marker--miss {
+  background: var(--danger);
+  box-shadow: 0 0 10px 2px rgba(214, 64, 43, 0.85);
+  animation: minigame-miss 0.3s ease-in-out;
+}
+
+@keyframes minigame-hit {
+  30% {
+    transform: scale(1.35);
+  }
+}
+
+@keyframes minigame-miss {
+  25% {
+    translate: -3px 0;
+  }
+
+  75% {
+    translate: 3px 0;
+  }
+}
+
 
 .minigame-gauge--heat .minigame-marker::before {
   border-color: #3a1a10;
