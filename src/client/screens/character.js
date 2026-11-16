@@ -118,7 +118,7 @@ try {
 } catch {
   // Without storage the bag keeps the game's order.
 }
-function sortBag(kind, list) {
+export function sortBag(kind, list) {
   const sort = bagSorts[kind];
   if (!BAG_SORTS[kind].some((one) => one.id === sort) || sort === 'order') return list;
   const rarity = (entry) => state.content.rarities.findIndex((one) => one.id === entry.rarity);
@@ -130,6 +130,42 @@ function sortBag(kind, list) {
     count: (a, b) => b.count - a.count || rarity(b) - rarity(a),
   }[sort];
   return [...list].sort(by);
+}
+
+// "Sortuj:" over a list of the bag's items or materials: the game's own
+// buttons, the choice kept on the device and shared by every list of that
+// kind (the bag's tabs, the Skrzynia Konta's bag); `onChange` draws the
+// list again.
+export function bagSortRow(kind, onChange) {
+  return h(
+    'div',
+    { class: 'bag-sort' },
+    h('span', { class: 'bag-sort-label', text: t('Sortuj:') }),
+    h(
+      'div',
+      { class: `segmented bag-sort-options bag-sort-options--${BAG_SORTS[kind].length}`, role: 'group', 'aria-label': t('Sortowanie plecaka') },
+      BAG_SORTS[kind].map((one) =>
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'segmented-option',
+            'aria-pressed': bagSorts[kind] === one.id,
+            onClick: () => {
+              bagSorts = { ...bagSorts, [kind]: one.id };
+              try {
+                localStorage.setItem(BAG_SORT_KEY, JSON.stringify(bagSorts));
+              } catch {
+                // Kept while the page is open.
+              }
+              onChange();
+            },
+          },
+          t(one.label),
+        ),
+      ),
+    ),
+  );
 }
 
 // A material's name as a title, from the Stół rozbiórki's module (trade.js
@@ -417,39 +453,8 @@ export function mountCharacter(container, { switchCharacter } = {}) {
     );
   }
 
-  // "Sortuj:" over a tab's grid: the game's own buttons, the choice kept on
-  // the device.
-  function sortRow(kind) {
-    return h(
-      'div',
-      { class: 'bag-sort' },
-      h('span', { class: 'bag-sort-label', text: t('Sortuj:') }),
-      h(
-        'div',
-        { class: `segmented bag-sort-options bag-sort-options--${BAG_SORTS[kind].length}`, role: 'group', 'aria-label': t('Sortowanie plecaka') },
-        BAG_SORTS[kind].map((one) =>
-          h(
-            'button',
-            {
-              type: 'button',
-              class: 'segmented-option',
-              'aria-pressed': bagSorts[kind] === one.id,
-              onClick: () => {
-                bagSorts = { ...bagSorts, [kind]: one.id };
-                try {
-                  localStorage.setItem(BAG_SORT_KEY, JSON.stringify(bagSorts));
-                } catch {
-                  // Kept while the page is open.
-                }
-                render();
-              },
-            },
-            t(one.label),
-          ),
-        ),
-      ),
-    );
-  }
+  // "Sortuj:" over a tab's grid (bagSortRow).
+  const sortRow = (kind) => bagSortRow(kind, render);
 
   // Under the bag's title: the scrapper's sale by the handful, without going
   // to the camp (320 A), and taking several items apart on the Stół
