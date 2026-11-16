@@ -94,6 +94,7 @@ export function walkScene(activity) {
   const members = party.map((character, index) => member(walk, character, index, party.length));
   stage.append(...members);
   if (members.some((holder) => holder.querySelector('.scene-ride'))) stage.classList.add('scene-walk--riders');
+  if (members.length > 1) fitLine(stage, members);
   const land = walk.lands[activity.regionId];
   if (land) stage.style.setProperty('--land', `url("/${land}")`);
   stage.style.setProperty('--land-width', `${LAND.width * SCALE}px`);
@@ -105,6 +106,44 @@ export function walkScene(activity) {
   stage.style.setProperty('--path-duration', `${(PATH.width * PATH.scale) / walk.pathSpeed}s`);
   nowAndThen(stage, () => (pick(walk.moments) === 'shadow' ? shadow(stage, activity) : bird(stage)));
   return { element: h('div', { class: 'scene', 'aria-hidden': 'true' }, stage), update: () => {} };
+}
+
+// The line of a Drużyna, a mercenary or the companions kept whole in the
+// scene (the author, 16.11.2026: „źle ustawione są postaci w wyprawie -
+// chowańca ucina”): once the scene has its width, and again when it
+// changes, the line is measured with its mounts and pets; while it is wider
+// than the scene the step between the walkers shrinks, and then the whole
+// line moves so its middle is the scene's.
+const LINE_MARGIN = 6;
+function fitLine(stage, members) {
+  const parts = () => members.flatMap((holder) => [...holder.querySelectorAll('.scene-walker, .scene-ride, .scene-pet')]);
+  const extent = () => {
+    const rects = parts()
+      .map((part) => part.getBoundingClientRect())
+      .filter((rect) => rect.width > 0);
+    return rects.length > 0 ? { left: Math.min(...rects.map((rect) => rect.left)), right: Math.max(...rects.map((rect) => rect.right)) } : null;
+  };
+  const fit = () => {
+    if (!stage.isConnected) return;
+    const box = stage.getBoundingClientRect();
+    if (box.width === 0) return;
+    stage.style.removeProperty('--party-step');
+    stage.style.removeProperty('--party-shift');
+    let line = extent();
+    if (!line) return;
+    const room = box.width - 2 * LINE_MARGIN;
+    if (line.right - line.left > room) {
+      // The holders stand a step apart, so the first two give the step: by
+      // their places on the page, as those on foot beside a rider are drawn
+      // smaller (a transform the places leave out).
+      const step = members[0].offsetLeft - members[1].offsetLeft;
+      const shrink = (line.right - line.left - room) / (members.length - 1);
+      stage.style.setProperty('--party-step', `${Math.max(24, step - shrink)}px`);
+      line = extent() ?? line;
+    }
+    stage.style.setProperty('--party-shift', `${Math.round(box.left + box.width / 2 - (line.left + line.right) / 2)}px`);
+  };
+  if (typeof ResizeObserver === 'function') new ResizeObserver(fit).observe(stage);
 }
 
 // Another member of the trip as the scene draws a character, from its look on

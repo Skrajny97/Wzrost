@@ -10004,7 +10004,7 @@ a.profession-square:active {
   height: 100%;
 }
 .scene-member--party {
-  left: calc(var(--slot) * var(--party-step));
+  left: calc(var(--slot) * var(--party-step) + var(--party-shift, 0px));
 }
 /* A pet on the way (scenes.js companion): its frames beside the figure, at
    the place its data gives against the figure's box; in front of the figure,

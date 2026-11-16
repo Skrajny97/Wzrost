@@ -3580,6 +3580,11 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.80 (16.11.2026): drużyna i chowaniec mieszczą się w scenie wyprawy
+
+1. W scenie wyprawy Drużyny, z najemnikiem albo z towarzyszami gra po ułożeniu postaci mierzy całą kolumnę z wierzchowcami i chowańcami (i znowu, gdy zmieni się szerokość ekranu). Gdy kolumna nie mieści się w kadrze, odstępy między postaciami maleją, a potem cała kolumna staje na środku kadru. Autor, 16.11.2026: „źle ustawione są postaci w wyprawie - chowańca ucina” (zrzut: dwie postacie piesze, prowadzący na koniu i lis ucięty przy prawej krawędzi).
+2. Kod: `fitLine` w `src/client/scenes.js` i `--party-shift` w `.scene-member--party` (`src/client/styles.css`).
+
 ## Wersja 0.3.79 (16.11.2026): zwoje na Targowisku, w Wymianie i w Skrzyni Konta
 
 1. Zwój ochronny, Zwój utrwalenia i Zwój Niepamięci można wystawiać na Targowisku, wymieniać w Wymianie, wkładać do Skrzyni Konta i prosić o nie w Prośbach Gildii (makiety 1012.1–1012.5 przyjęte). Zob. „Zwoje jako towar”.

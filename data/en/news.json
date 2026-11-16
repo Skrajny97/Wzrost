@@ -877,6 +877,13 @@
       "title": "Version 0.3.77",
       "body": "- In the Account Chest you can sort what you put in: the items of your bag as in the Bag, and the goods by order, amount or name."
     },
-    "0.3.79": {"title": "Version 0.3.79", "body": "- Scrolls are goods like the others: you can put the Ward Scroll, the Steady Scroll and the Scroll of Oblivion up at the Marketplace (a new “Scrolls” tab), give them in a Trade, put them in the Account Chest and ask your guild for them."}
+    "0.3.79": {
+      "title": "Version 0.3.79",
+      "body": "- Scrolls are goods like the others: you can put the Ward Scroll, the Steady Scroll and the Scroll of Oblivion up at the Marketplace (a new “Scrolls” tab), give them in a Trade, put them in the Account Chest and ask your guild for them."
+    },
+    "0.3.80": {
+      "title": "Version 0.3.80",
+      "body": "- In the exploration scene with a party, the whole line, mounts and pets included, now fits in the frame. The leader's pet no longer disappears past the edge."
+    }
   }
 }
