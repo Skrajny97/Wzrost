@@ -2,7 +2,7 @@
 // Assets before this code runs; only /api/* and unknown paths reach the Worker.
 
 import { accountNameHintSeen, confirmAge, deleteAccount, login, logout, me, register, setAccountName, setLanguage } from './accounts.js';
-import { authorPanel, authorSkillDemo, authorSkills, bugReportImage, resolveBugReport } from './author.js';
+import { authorPanel, authorSearch, authorSkillDemo, authorSkills, bugReportImage, resolveBugReport } from './author.js';
 import { authorNews, deleteNews, dismissDraft, editNews, listNews, publishNews, seeNews } from './news.js';
 import { BUG_IMAGE, reportBug } from './bugs.js';
 import { getOnline, getOnlinePlayers } from './online.js';
@@ -157,6 +157,7 @@ const routes = [
   // The English of the page's own texts, for a page in English (i18n.js).
   ['GET', '/api/strings', strings],
   ['GET', '/api/author', authorPanel],
+  ['GET', '/api/author/search', authorSearch],
   ['POST', '/api/author/bugs/resolve', resolveBugReport],
   // A report's screenshot, for the author's panel (?id= the report).
   ['GET', '/api/author/bugs/image', bugReportImage],

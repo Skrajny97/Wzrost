@@ -948,6 +948,10 @@
     "0.3.96": {
       "title": "Version 0.3.96",
       "body": "- The game is lighter on the server: the Character tab, the count of players online and other often refreshed places read much less from the database, which will help as more players come."
+    },
+    "0.3.97": {
+      "title": "Version 0.3.97",
+      "body": "- Over the characters at the top of the Character tab there are now two times: the character's work and, under it, its Avatar's work (“A”)."
     }
   }
 }
