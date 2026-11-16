@@ -133,6 +133,13 @@
       "for": "37591569953c54845f1763ed0f13c469e56ff0652bd3d7baccb26a48be1dd979",
       "until": "2026-12-17T00:00:00+01:00",
       "rewards": { "systemPoints": 1000 }
+    },
+    {
+      "id": "discord-2026-11",
+      "code": "DISCORD100",
+      "for": "2a490615f7b35e9901a66ecc3e1e80d01eff8bf2fb28dc0869688105d8a8b547",
+      "until": "2026-12-18T00:00:00+01:00",
+      "rewards": { "systemPoints": 100, "timePoints": 100 }
     }
   ],
   "moves": [

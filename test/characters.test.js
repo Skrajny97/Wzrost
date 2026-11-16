@@ -14,6 +14,8 @@ describe('five characters on one account', () => {
 
   const create = (name, classId = 'warrior', who = cookie) => call('POST', '/api/character', { cookie: who, body: { name, classId, appearance: 'female' } });
   const list = async (who = cookie) => (await call('GET', '/api/characters', { cookie: who })).data;
+  // The count of each class comes only when asked (?with=classes, 1031).
+  const classes = async (who = cookie) => (await call('GET', '/api/characters?with=classes', { cookie: who })).data.classes;
   const played = async (who = cookie) => (await call('GET', '/api/character', { cookie: who })).data.character;
   const idOf = async (name) => (await (await db()).prepare('SELECT id FROM characters WHERE name = ?').bind(name).first()).id;
   const choose = async (name, who = cookie) => call('POST', '/api/characters/choose', { cookie: who, body: { id: await idOf(name) } });
@@ -99,7 +101,8 @@ describe('five characters on one account', () => {
     await create('Druga', 'mage');
     const { cookie: other } = await signUp('inny');
     await create('Obca', 'mage', other);
-    assert.deepEqual((await list()).classes, { warrior: 1, archer: 0, mage: 2, cleric: 0, shadow: 0 });
+    assert.deepEqual(await classes(), { warrior: 1, archer: 0, mage: 2, cleric: 0, shadow: 0 });
+    assert.equal((await list()).classes, undefined);
   });
 
   test('each character keeps its own Punkty Systemu', async () => {
@@ -166,7 +169,7 @@ describe('five characters on one account', () => {
     assert.equal((await list()).parked, 'Druga');
     assert.equal((await create('Testowa')).status, 201);
     // The parked character is not one of the game's characters to count.
-    assert.equal((await list()).classes.warrior, 2);
+    assert.equal((await classes()).warrior, 2);
     assert.equal((await choose('Mira')).data.error.code, 'parked');
     assert.equal((await create('Kolejna')).data.error.code, 'parked');
     assert.equal((await call('POST', '/api/test/back', { cookie })).status, 200);

@@ -296,7 +296,7 @@ async function enterGame({ choose = false } = {}) {
   syncPush();
   try {
     if (choose) {
-      const list = await call('GET', '/api/characters');
+      const list = await call('GET', '/api/characters?with=classes');
       if (list.characters.length > 1 && !list.parked) {
         showChoice(list);
         return;
@@ -315,7 +315,7 @@ async function enterGame({ choose = false } = {}) {
       return;
     }
     if (error instanceof ApiError && error.code === 'no_character') {
-      const list = await call('GET', '/api/characters');
+      const list = await call('GET', '/api/characters?with=classes');
       // The test version's introduction makes a new character while the
       // player's own waits parked (offerBack).
       if (list.characters.length > 0 && !list.parked) showChoice(list);
@@ -375,7 +375,7 @@ async function switchCharacter(id) {
 // "Zmień postać" in the Ustawienia: the game steps back to the choice.
 async function changeCharacter(event) {
   await withButton(event.currentTarget, async () => {
-    const list = await call('GET', '/api/characters');
+    const list = await call('GET', '/api/characters?with=classes');
     closeSheet();
     clearInterval(ticker);
     current?.screen.unmount?.();

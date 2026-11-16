@@ -944,6 +944,10 @@
     "0.3.95": {
       "title": "Version 0.3.95",
       "body": "- The Arena from level 200 up is evened out: in players' duels the Archdruid, the Demon Slayer, the Saint, the Bowmaster, the Godslayer and the Shadow Lord hit harder, and the Ruler of the Wilds less hard. From level 200 duels also have more HP, so they last a few rounds.\n- When you open a card pack, the glow of the rarest card no longer reaches the edge of the screen on a narrow phone."
+    },
+    "0.3.96": {
+      "title": "Version 0.3.96",
+      "body": "- The game is lighter on the server: the Character tab, the count of players online and other often refreshed places read much less from the database, which will help as more players come."
     }
   }
 }
