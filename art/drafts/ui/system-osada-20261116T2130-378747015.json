@@ -1,0 +1,14 @@
+{
+  "id": "system-osada",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small wooden village hut with a pitched roof, as a minimal glowing glyph made of thin bright cyan pixel lines with a soft cyan glow, a holographic interface symbol of a mysterious magic system, the symbol alone, no frame, no background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023127523932351006
+  },
+  "images": 1
+}

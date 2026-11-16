@@ -1,0 +1,14 @@
+{
+  "id": "warownia-kalendarz",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a calendar sheet with a ring binding on top, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023278969485388865
+  },
+  "images": 1
+}

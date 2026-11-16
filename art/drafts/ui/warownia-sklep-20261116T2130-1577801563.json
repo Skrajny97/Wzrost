@@ -1,0 +1,14 @@
+{
+  "id": "warownia-sklep",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small market stall with a striped awning, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023987990921232438
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "warownia-slot",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "an empty square socket carved into dark oak with a dark iron rim and four small rivets, seen flat from the front, a game inventory slot, the middle empty and dark",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023092600939432783
+  },
+  "images": 1
+}

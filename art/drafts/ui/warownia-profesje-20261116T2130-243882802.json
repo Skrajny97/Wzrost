@@ -1,0 +1,14 @@
+{
+  "id": "warownia-profesje",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a smith's hammer crossed with a pickaxe, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023289922938240903
+  },
+  "images": 1
+}

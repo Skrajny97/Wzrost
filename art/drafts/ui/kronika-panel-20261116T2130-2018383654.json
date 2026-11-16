@@ -1,0 +1,14 @@
+{
+  "id": "kronika-panel",
+  "tool": "pixellab generate-image-v2",
+  "description": "an empty sheet of aged cream parchment with slightly torn uneven edges and a thin dark sepia ink border line with small vermilion red flourishes in the four corners, seen flat from the front, a game interface panel, the middle empty",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08098636971579658
+  },
+  "images": 4
+}

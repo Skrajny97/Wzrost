@@ -1,0 +1,14 @@
+{
+  "id": "warownia-powrot",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "an arrow pointing to the left, as a small chunky fantasy game icon of carved dark wood and forged iron with warm brass details, bold dark outline, warm colours, the symbol alone, no frame, no background",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023274163257175025
+  },
+  "images": 1
+}

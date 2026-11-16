@@ -1,0 +1,14 @@
+{
+  "id": "warownia-panel",
+  "tool": "pixellab generate-image-v2",
+  "description": "an empty flat panel of dark carved oak boards with a carved Slavic folk ornament border and forged black iron corner brackets with round rivets, seen flat from the front, a game interface panel, the middle empty",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08105975908703274
+  },
+  "images": 4
+}

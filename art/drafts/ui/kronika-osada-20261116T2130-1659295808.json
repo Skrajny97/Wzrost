@@ -1,0 +1,14 @@
+{
+  "id": "kronika-osada",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small wooden village hut with a pitched roof, drawn as a small medieval woodcut ink illustration in dark sepia-brown ink with one small touch of vermilion red, bold simple readable silhouette, like a marginal drawing in an old manuscript, the symbol alone, no frame, no background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023276983545515273
+  },
+  "images": 1
+}
