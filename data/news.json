@@ -1095,6 +1095,11 @@
       "id": "0.3.76",
       "title": "Wersja 0.3.76",
       "body": "- Skrzynia Konta przyjmuje minerały i pokazuje przy nich właściwe ikony."
+    },
+    {
+      "id": "0.3.77",
+      "title": "Wersja 0.3.77",
+      "body": "- W Skrzyni Konta można sortować to, co wkładasz: przedmioty z plecaka tak jak w Plecaku, a towary po kolejności, liczbie albo nazwie."
     }
   ]
 }

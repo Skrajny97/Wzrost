@@ -20,10 +20,34 @@ import { countOf, formatNumber } from '../format.js';
 import { t } from '../i18n.js';
 import { call, state, walletEntries } from '../state.js';
 import { closeSheet, openSheet, systemPanel, toast, withButton } from '../ui.js';
-import { itemSheet, itemSummary, materialTitle } from './character.js';
+import { bagSortRow, itemSheet, itemSummary, materialTitle, sortBag } from './character.js';
 
 // The tab open last, kept while the game is open.
 let openTab = 'items';
+
+// The order of the character's own goods to put in (the author,
+// 16.11.2026: „Powinna też być opcja sortowania tych przedmiotów przy
+// wybieraniu”), within each kind: the game's, the most pieces first, or by
+// name; kept on the device. The bag's items follow the bag's own "Sortuj:"
+// (screens/character.js).
+const GOOD_SORTS = [
+  { id: 'order', label: 'Kolejność' },
+  { id: 'count', label: 'Liczba' },
+  { id: 'name', label: 'Nazwa' },
+];
+const GOOD_SORT_KEY = 'insight-chest-goods-sort';
+let goodSort = 'order';
+try {
+  const kept = localStorage.getItem(GOOD_SORT_KEY);
+  if (GOOD_SORTS.some((one) => one.id === kept)) goodSort = kept;
+} catch {
+  // Without storage the game's order.
+}
+function sortGoods(goods) {
+  if (goodSort === 'count') return [...goods].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+  if (goodSort === 'name') return [...goods].sort((a, b) => a.name.localeCompare(b.name));
+  return goods;
+}
 
 // The art of a good, by its kind.
 function goodArt(good, size = 24) {
@@ -174,12 +198,13 @@ export function mountChest(container, onBack) {
         'section',
         { class: 'card chest-section', 'aria-label': t('Plecak') },
         h('h2', { class: 'section-title', text: t('Plecak · {items}', { items: countOf(character.bag.length, 'przedmiot', 'przedmioty', 'przedmiotów') }) }),
+        character.bag.length > 1 && bagSortRow('items', render),
         character.bag.length === 0
           ? h('p', { class: 'muted', text: t('W plecaku nie ma przedmiotów.') })
           : h(
               'ul',
               { class: 'chest-list' },
-              character.bag.map((item) =>
+              sortBag('items', character.bag).map((item) =>
                 h(
                   'li',
                   { class: 'chest-row' },
@@ -213,6 +238,38 @@ export function mountChest(container, onBack) {
       button,
     );
 
+  // "Sortuj:" over the character's own goods, in the look of the bag's.
+  const goodSortRow = () =>
+    h(
+      'div',
+      { class: 'bag-sort' },
+      h('span', { class: 'bag-sort-label', text: t('Sortuj:') }),
+      h(
+        'div',
+        { class: 'segmented bag-sort-options bag-sort-options--3', role: 'group', 'aria-label': t('Kolejność towarów') },
+        GOOD_SORTS.map((one) =>
+          h(
+            'button',
+            {
+              type: 'button',
+              class: 'segmented-option',
+              'aria-pressed': goodSort === one.id,
+              onClick: () => {
+                goodSort = one.id;
+                try {
+                  localStorage.setItem(GOOD_SORT_KEY, one.id);
+                } catch {
+                  // Kept while the page is open.
+                }
+                render();
+              },
+            },
+            t(one.label),
+          ),
+        ),
+      ),
+    );
+
   function goodsTab(character) {
     const own = ownGoods(character);
     return [
@@ -238,6 +295,7 @@ export function mountChest(container, onBack) {
         'section',
         { class: 'card chest-section', 'aria-label': t('Twoje towary') },
         h('h2', { class: 'section-title', text: t('Twoje towary') }),
+        own.length > 0 && goodSortRow(),
         own.length === 0
           ? h('p', { class: 'muted', text: t('Postać nie ma teraz żadnych towarów.') })
           : own.map(([title, goods]) => [
@@ -245,7 +303,7 @@ export function mountChest(container, onBack) {
               h(
                 'ul',
                 { class: 'chest-list' },
-                goods.map((good) => goodRow(good, null, h('button', { type: 'button', class: 'button button--world button--small', text: t('Włóż'), onClick: () => amountSheet(good, true) }))),
+                sortGoods(goods).map((good) => goodRow(good, null, h('button', { type: 'button', class: 'button button--world button--small', text: t('Włóż'), onClick: () => amountSheet(good, true) }))),
               ),
             ]),
       ),
