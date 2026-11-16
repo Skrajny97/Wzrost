@@ -699,7 +699,9 @@ export function drawnShare(period, periodId, level, content) {
 export function rerolledQuests(quests, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, ordersLeft, seed }, now, content) {
   const period = quests[periodId];
   if (period.rerolled || period.chest) return null;
-  const replaced = (/** @type {Quest} */ quest) => !quest.claimed && !questDone(quest);
+  // A page from before 0.3.91 asks for the whole period: a quest drawn anew
+  // already on its own (rerolledQuest) stays as it is.
+  const replaced = (/** @type {Quest} */ quest) => !quest.claimed && !questDone(quest) && !quest.rerolled;
   const count = period.quests.filter(replaced).length;
   if (count === 0) return null;
   const same = (/** @type {Option} */ option, /** @type {Quest} */ quest) => quest.kind === option.kind.id && quest.target === option.target;
@@ -723,6 +725,44 @@ export function rerolledQuests(quests, periodId, { character, hasTable, hasProfe
       }),
     },
   };
+}
+
+// One quest not done yet drawn anew, by its index, once a quest (a player,
+// poz. 48, through the author, 16.11.2026: „będzie opcja, żeby przelosować
+// pojedyncze zadanie?”; mock-ups 1023, B and the question 1023.3 accepted):
+// a quest of what the character may get now that the period does not ask
+// for yet, at the share the period was first drawn with (drawnShare),
+// marked `rerolled`, the others as they are, with their progress. Null for a
+// quest done, claimed or drawn anew already, a period whose chest is open or
+// whose quests were drawn anew all at once (before 0.3.91), or nothing to
+// draw.
+/**
+ * @param {Quests} quests
+ * @param {string} periodId
+ * @param {number} index
+ * @param {Draw} draw
+ * @param {number} now
+ * @param {Content} content
+ * @returns {Quests | null}
+ */
+export function rerolledQuest(quests, periodId, index, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, ordersLeft, seed }, now, content) {
+  const period = quests[periodId];
+  const quest = period?.quests[index];
+  if (!quest || period.rerolled || period.chest || quest.rerolled || quest.claimed || questDone(quest)) return null;
+  const same = (/** @type {Option} */ option, /** @type {Quest} */ other) => other.kind === option.kind.id && other.target === option.target;
+  const share = drawnShare(period, periodId, character.level, content);
+  const others = period.quests.filter((/** @type {Quest} */ _, /** @type {number} */ at) => at !== index);
+  const options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, ordersLeft }, content, share).filter(
+    (option) => !others.some((/** @type {Quest} */ other) => same(option, other)),
+  );
+  // Another kind while there is one; for a new character with only as many
+  // as its period asks for, the same quest with numbers drawn anew.
+  const fresh = options.filter((option) => !same(option, quest));
+  const pool = fresh.length > 0 ? fresh : options;
+  if (pool.length === 0) return null;
+  const rng = createRng(`${seed}:${periodId}:${period.period}:reroll:${index}`);
+  const drawn = { ...newQuest(rng.weighted(pool), periodId, character, rng, content, share), rerolled: true };
+  return { ...quests, [periodId]: { ...period, quests: period.quests.map((/** @type {Quest} */ one, /** @type {number} */ at) => (at === index ? drawn : one)) } };
 }
 
 // Whether a period's quests are missing or of an earlier period than
@@ -998,6 +1038,8 @@ export function questsView(quests, now, content, met = null, level = 1) {
                     done: questDone(quest),
                     claimed: quest.claimed,
                     reward: quest.reward,
+                    // Drawn anew already, on its own (rerolledQuest).
+                    rerolled: Boolean(quest.rerolled),
                   },
                 ]
               : [],

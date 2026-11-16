@@ -3580,6 +3580,20 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.91 (16.11.2026): przelosowanie jednego zadania
+
+1. Kostka przy zadaniu (1023, przyjęte 1023.2 B i pytanie 1023.3, odrzucone 1023.1 A). Zob. „Przelosowanie jednego zadania (1023)”.
+
+## Przelosowanie jednego zadania (1023; 16.11.2026)
+
+Gracz (poz. 48): „będzie opcja, żeby przelosować pojedyncze zadanie?” Do tej pory „Przelosuj zadania” wymieniało raz w okresie naraz wszystkie niewykonane zadania i kasowało ich postęp, więc nie dało się wymienić jednego zadania bez straty postępu w innych. Autor przyjął makiety 1023.2 B (kostka obok nagrody) i 1023.3 (pytanie), a odrzucił 1023.1 A (kostka pod obrazkiem zadania).
+
+1. **Kostka.** Przy każdym niewykonanym zadaniu, w prawej kolumnie przed nagrodą, stoi kostka (`rerollButton` w `src/client/quests.js`). Stuknięcie pyta: „Przelosować to zadanie?” i „„…” zmieni się na inne zadanie, a jego postęp przepadnie. Każde zadanie możesz przelosować tylko raz.”, a „Przelosuj” wymienia to jedno zadanie (`POST /api/quests/reroll` z `index`, `rerolledQuest` w `src/engine/quests.js`).
+2. **Raz na zadanie.** Każde zadanie można przelosować raz w jego okresie: dzienne do północy, tygodniowe do końca tygodnia, miesięczne do końca miesiąca. Nowe zadanie ma znacznik `rerolled` i już nie ma kostki. Pozostałe zadania zachowują postęp. Przelosowań jest tyle samo co wcześniej, bo każde miejsce na zadanie dalej przelosowuje się raz, tylko gracz sam wybiera które i kiedy. Wykonanych i odebranych zadań się nie przelosowuje, podobnie jak zadań okresu, którego skrzynia jest już otwarta.
+3. **Jakie zadanie przychodzi.** Losuje się zadanie, o które okres jeszcze nie prosi, z tych, które postać może dostać (tak jak przy dawnym przelosowaniu, z tą samą częścią liczb tygodnia albo miesiąca, `drawnShare`). Nowa postać ma tyle rodzajów zadań, ile jest miejsc (brakujący szczegół). Wtedy kostka losuje to samo zadanie od nowa, z nowymi liczbami i nagrodą, zamiast pokazywać błąd.
+4. **Pod listą** zamiast przycisku „Przelosuj zadania” stoi zdanie: „Kostka przy zadaniu zmienia je na inne. Każde zadanie możesz przelosować raz, a jego postęp przepada.”
+5. **Dzień przelosowany po staremu.** Kto przed tą wersją przelosował dziś (w tym tygodniu, w tym miesiącu) wszystkie zadania naraz, nie ma już kostek w tym okresie, a pod listą widzi dawne zdanie („Dzisiejsze zadania są już przelosowane.”). Strona sprzed tej wersji, która jeszcze prosi o cały okres, wymienia tylko zadania niewykonane i nie przelosowane osobno.
+
 ## Wersja 0.3.90 (16.11.2026): części do rzemiosła w Skrzyni Konta
 
 1. **Części w Skrzyni Konta.** Gracz (poz. 48): „będzie możliwość wkładnia do skrzyni konta części potrzebnych do wytwarzania ekwipunku?” Autor odpisał graczowi w czacie: „Zapomniałem o tym. Raczej tak.”

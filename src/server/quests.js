@@ -4,7 +4,7 @@
 // its quests are. Each saves only if the character is as read (its version),
 // so two taps give one reward.
 
-import { QUEST_PERIODS, bagCapacity, campLevels, chestGold, chestItem, chestReady, createRng, gearKey, itemName, questDone, rerolledQuests, withChest, withClaimed } from '../engine/index.js';
+import { QUEST_PERIODS, bagCapacity, campLevels, chestGold, chestItem, chestReady, createRng, gearKey, itemName, questDone, rerolledQuest, rerolledQuests, withChest, withClaimed } from '../engine/index.js';
 import { content } from './content.js';
 import { bagPlaces, characterView, equippedItems, loadPlayer, questContext, questsNow, requirePlayer } from './characters.js';
 import { atomically, sameVersion } from './atomic.js';
@@ -146,15 +146,26 @@ export async function openChest(context) {
   });
 }
 
-// { period }: the period's quests not done yet drawn anew, once a period:
-// a day, a week or a month (quests.js).
+// { period, index }: one quest not done yet drawn anew, once a quest
+// (1023 B; rerolledQuest in quests.js). { period } alone, as a page from
+// before 0.3.91 asks: the period's quests not done yet drawn anew, once a
+// period: a day, a week or a month.
 export async function rerollQuests(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const periodId = periodOf(body);
   const now = context.now;
   const quests = questsNow(player, now);
-  const next = rerolledQuests(quests, periodId, questContext(player, now), now, content());
+  const one = body.index !== undefined;
+  if (one && !(Number.isInteger(body.index) && quests[periodId].quests[body.index])) throw new ApiError(404, 'no_quest', 'Nie ma takiego zadania.');
+  const next = one ? rerolledQuest(quests, periodId, body.index, questContext(player, now), now, content()) : rerolledQuests(quests, periodId, questContext(player, now), now, content());
+  if (one && !next) {
+    const quest = quests[periodId].quests[body.index];
+    if (quests[periodId].rerolled) throw new ApiError(409, 'rerolled', content().quests.periods[periodId].rerolled);
+    if (quest.rerolled) throw new ApiError(409, 'rerolled', 'To zadanie jest już przelosowane.');
+    if (quest.claimed || questDone(quest)) throw new ApiError(409, 'done', 'Wykonanego zadania nie przelosujesz.');
+    throw new ApiError(409, 'nothing_to_reroll', 'Nie ma zadań do przelosowania.');
+  }
   if (!next) {
     throw quests[periodId].rerolled
       ? new ApiError(409, 'rerolled', content().quests.periods[periodId].rerolled)

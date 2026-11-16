@@ -2982,6 +2982,42 @@ describe('Zadania od narratora', () => {
     assert.equal((await call('POST', '/api/quests/reroll', { cookie, body: { period: 'yearly' } })).data.error.code, 'invalid_period');
   });
 
+  // A player (poz. 48) through the author, 16.11.2026: „będzie opcja, żeby
+  // przelosować pojedyncze zadanie?” (1023 B).
+  test('one quest not done yet is drawn anew by its die, once a quest; the others keep their progress', async () => {
+    await (await db()).prepare('UPDATE characters SET level = 40, class_level = 30').run();
+    const reroll = (period, index) => call('POST', '/api/quests/reroll', { cookie, body: { period, index } });
+    const kept = await stored();
+    kept.daily.quests[1].progress = 1;
+    kept.daily.quests[2].progress = kept.daily.quests[2].count;
+    await store(kept);
+    const before = (await character()).quests.daily.quests;
+    const rolled = await reroll('daily', 0);
+    assert.equal(rolled.status, 200, JSON.stringify(rolled.data));
+    const after = rolled.data.character.quests.daily;
+    assert.equal(after.rerolled, false);
+    assert.equal(after.quests[0].rerolled, true);
+    assert.equal(after.quests[0].progress, 0);
+    assert.ok(!before.slice(1).some((quest) => quest.kind === after.quests[0].kind && quest.monsterId === after.quests[0].monsterId), 'a quest the day does not ask for yet');
+    assert.deepEqual(after.quests.slice(1).map(({ text, progress, rerolled }) => ({ text, progress, rerolled })), before.slice(1).map(({ text, progress }) => ({ text, progress, rerolled: false })));
+    const again = await reroll('daily', 0);
+    assert.deepEqual([again.status, again.data.error.code, again.data.error.message], [409, 'rerolled', 'To zadanie jest już przelosowane.']);
+    assert.equal((await reroll('daily', 2)).data.error.code, 'done');
+    for (const index of [9, -1, '1', 1.5]) assert.equal((await reroll('daily', index)).data.error.code, 'no_quest');
+    assert.equal((await reroll('daily', 1)).status, 200);
+    assert.equal((await reroll('weekly', 0)).status, 200);
+    // A page from before asks for the whole day: the quests drawn anew on
+    // their own and the one done stay, the rest are drawn anew, and no die
+    // is left for the day.
+    const dayBefore = (await character()).quests.daily.quests;
+    const whole = await call('POST', '/api/quests/reroll', { cookie, body: { period: 'daily' } });
+    assert.equal(whole.status, 200, JSON.stringify(whole.data));
+    const day = whole.data.character.quests.daily;
+    assert.equal(day.rerolled, true);
+    assert.deepEqual(day.quests.slice(0, 3).map((quest) => quest.text), dayBefore.slice(0, 3).map((quest) => quest.text));
+    assert.equal((await reroll('daily', 3)).data.error.message, 'Dzisiejsze zadania są już przelosowane.');
+  });
+
   test('the monthly chest holds gold by the level, 480 Punktów Czasu and 100 Punktów Systemu (the author, 761 C)', async () => {
     await (await db()).prepare('UPDATE characters SET level = 40, class_level = 30').run();
     await finishAll('monthly');

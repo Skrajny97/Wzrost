@@ -154,6 +154,7 @@ import {
   questsStale,
   questsView,
   timePointsOffer,
+  rerolledQuest,
   rerolledQuests,
   unknownCreatures,
   weekShare,
@@ -3080,6 +3081,38 @@ describe('quests from the narrator', () => {
     // The chests: the week's 180 Punktów Czasu and 30 Punktów Systemu, the month's 480 and 100.
     assert.deepEqual([content.quests.periods.weekly.chest.timePoints, content.quests.periods.weekly.chest.systemPoints], [180, 30]);
     assert.deepEqual([content.quests.periods.monthly.chest.timePoints, content.quests.periods.monthly.chest.systemPoints], [480, 100]);
+  });
+
+  // 1023 B: one quest drawn anew by its die, once a quest; a new character
+  // with no other kind left gets the same quest with numbers drawn anew.
+  test('one quest is drawn anew by its index, once; with no other kind, the same one anew', () => {
+    const character = newCharacter('cleric', { level: 12, classLevel: 12 });
+    const context = { character, hasTable: true, seed: 9 };
+    const monday = at('2026-10-26T08:00:00Z');
+    const drawn = currentQuests({}, context, monday, content);
+    const key = (quest) => `${quest.kind}:${quest.target ?? ''}`;
+    const next = rerolledQuest(drawn, 'daily', 1, context, monday, content);
+    assert.equal(next.daily.quests[1].rerolled, true);
+    assert.ok(!drawn.daily.quests.some((quest) => key(quest) === key(next.daily.quests[1])));
+    assert.deepEqual([next.daily.quests[0], ...next.daily.quests.slice(2)], [drawn.daily.quests[0], ...drawn.daily.quests.slice(2)]);
+    assert.equal(next.daily.rerolled, undefined);
+    assert.equal(questsView(next, monday, content).daily.quests[1].rerolled, true);
+    assert.equal(rerolledQuest(next, 'daily', 1, context, monday, content), null);
+    assert.equal(rerolledQuest(next, 'daily', 9, context, monday, content), null);
+    // A done quest, an open chest or a day drawn anew all at once keep theirs.
+    const done = { ...drawn, daily: { ...drawn.daily, quests: drawn.daily.quests.map((quest, index) => (index === 0 ? { ...quest, progress: quest.count } : quest)) } };
+    assert.equal(rerolledQuest(done, 'daily', 0, context, monday, content), null);
+    assert.equal(rerolledQuest({ ...drawn, daily: { ...drawn.daily, chest: true } }, 'daily', 2, context, monday, content), null);
+    assert.equal(rerolledQuest({ ...drawn, daily: { ...drawn.daily, rerolled: true } }, 'daily', 2, context, monday, content), null);
+    // A new character in the first place asks for as many kinds as there
+    // are: its die draws the same quest anew.
+    const fresh = newCharacter('warrior');
+    const first = { character: fresh, seed: 3 };
+    const firstDay = currentQuests({}, first, monday, content);
+    const anew = rerolledQuest(firstDay, 'daily', 0, first, monday, content);
+    assert.ok(anew, 'something drawn anew');
+    assert.equal(anew.daily.quests[0].rerolled, true);
+    assert.equal(new Set(anew.daily.quests.map(key)).size, anew.daily.quests.length);
   });
 
   test('the quests not done yet are drawn anew once a period; done and claimed ones stay', () => {
