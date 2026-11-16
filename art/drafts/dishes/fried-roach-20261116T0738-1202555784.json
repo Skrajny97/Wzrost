@@ -1,0 +1,14 @@
+{
+  "id": "fried-roach",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "three small fried fish with golden crispy skin on a wooden plate, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023153158834669327
+  },
+  "images": 1
+}

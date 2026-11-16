@@ -1,0 +1,14 @@
+{
+  "id": "oat-kissel",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a clay bowl of thick smooth grey oat jelly pudding with a wooden spoon, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023476266007317437
+  },
+  "images": 1
+}

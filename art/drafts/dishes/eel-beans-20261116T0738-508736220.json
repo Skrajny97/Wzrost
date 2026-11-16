@@ -1,0 +1,14 @@
+{
+  "id": "eel-beans",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a piece of smoked eel and green broad beans on a wooden plate, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023226843783484566
+  },
+  "images": 1
+}

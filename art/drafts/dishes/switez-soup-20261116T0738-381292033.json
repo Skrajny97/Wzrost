@@ -1,0 +1,14 @@
+{
+  "id": "switez-soup",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a dark clay bowl of silvery fish soup glowing softly like moonlight, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02312276391919454
+  },
+  "images": 1
+}

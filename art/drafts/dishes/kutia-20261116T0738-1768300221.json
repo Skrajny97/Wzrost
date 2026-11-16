@@ -1,0 +1,14 @@
+{
+  "id": "kutia",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a clay bowl of wheat grains mixed with dark poppy seeds, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023105582937028676
+  },
+  "images": 1
+}

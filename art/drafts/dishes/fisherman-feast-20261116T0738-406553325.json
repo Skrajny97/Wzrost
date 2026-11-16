@@ -1,0 +1,14 @@
+{
+  "id": "fisherman-feast",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a large wooden platter with a big roasted catfish and a roasted sturgeon side by side, onions around them, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02336584314282735
+  },
+  "images": 1
+}

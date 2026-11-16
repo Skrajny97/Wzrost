@@ -1,0 +1,14 @@
+{
+  "id": "millet-crucian",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a clay bowl of golden millet porridge with a small fried golden fish on top, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0231967374519772
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "pike-pierogi",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a plate of four half-moon dumplings with golden fried onion on top, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023311631638632882
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "borscht",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a clay bowl of clear ruby red beetroot soup, steam rising, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023253246786753338
+  },
+  "images": 1
+}

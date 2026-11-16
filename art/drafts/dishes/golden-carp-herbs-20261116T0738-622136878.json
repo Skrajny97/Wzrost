@@ -1,0 +1,14 @@
+{
+  "id": "golden-carp-herbs",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a whole golden-scaled carp baked with yellow herb flowers on a silver platter, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023335756419923574
+  },
+  "images": 1
+}

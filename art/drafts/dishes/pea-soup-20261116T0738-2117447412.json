@@ -1,0 +1,14 @@
+{
+  "id": "pea-soup",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a wooden bowl of thick yellow-green pea soup with a wooden spoon, steam rising, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023221289770762127
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "zurek",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a round bread loaf hollowed into a bowl and filled with white sour rye soup, steam rising, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02319051242340936
+  },
+  "images": 1
+}

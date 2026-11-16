@@ -1,0 +1,14 @@
+{
+  "id": "campfire-trout",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a whole spotted trout roasted on a wooden stick, with a few carrot slices, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02311571660190159
+  },
+  "images": 1
+}
