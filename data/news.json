@@ -1165,6 +1165,11 @@
       "id": "0.3.91",
       "title": "Wersja 0.3.91",
       "body": "- Zadania od narratora przelosowujesz pojedynczo: przy każdym niewykonanym zadaniu stoi kostka. Każde zadanie możesz przelosować raz, a pozostałe zachowują postęp."
+    },
+    {
+      "id": "0.3.92",
+      "title": "Wersja 0.3.92",
+      "body": "- Liczniki czasu na górnym pasku, w zakładkach i na ekranach nie drgają już co sekundę, także przy pogrubionej czcionce w telefonie.\n- Nazwa umiejętności nad postacią w walce nie ucina się już przy prawej krawędzi na wąskim telefonie."
     }
   ]
 }

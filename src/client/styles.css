@@ -1069,6 +1069,16 @@ button {
   color: var(--system);
 }
 
+/* A countdown's digit (setTimer in dom.js): a box as wide as the System
+   font's widest digit, the "0" (0.644 em), so a countdown keeps its width
+   and place each second also where a phone draws bold text; a bolder digit
+   only spills over its box's edges, which stay. */
+.timer-digit {
+  display: inline-block;
+  width: 0.66em;
+  text-align: center;
+}
+
 /* A build's countdown under the tent keeps one width, so the top bar does
    not twitch each second as its digits change (a player, 16.11.2026: „drga
    interfejs na samej górze jak upływa czas pod ikonką osady”): the System's

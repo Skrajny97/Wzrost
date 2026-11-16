@@ -11,7 +11,7 @@ import { encyclopediaArt, goldArt, narratorFace, resourceArt, timePointsArt } fr
 import { bestiaryReady } from './bestiary.js';
 import { activeBuffs, bonusList, fightsLeft } from './bonuses.js';
 import { communityNews, communityNewsText } from './chat-news.js';
-import { $, fill, h, icon } from './dom.js';
+import { $, fill, h, icon, setTimer } from './dom.js';
 import { formatCountdown, formatMinutes, formatNumber, formatShort } from './format.js';
 import { SYSTEM_POINTS_ICON } from './icons.js';
 import { MERCENARIES_HASH } from './mercenaries.js';
@@ -363,7 +363,8 @@ export function updateTopbar(now = serverNow()) {
   const camp = campNow(now);
   topbar.camp.classList.toggle('camp-button--busy', camp.busy);
   topbar.camp.classList.toggle('camp-button--ready', camp.ready);
-  topbar.campLabel.textContent = camp.busy ? formatCountdown(camp.building.endsAt - now) : t(CAMP_TAB.label);
+  if (camp.busy) setTimer(topbar.campLabel, formatCountdown(camp.building.endsAt - now));
+  else topbar.campLabel.textContent = t(CAMP_TAB.label);
   topbar.camp.setAttribute('aria-label', camp.said);
   updateNavTimers(now);
   topbar.hp.set(currentHp(character, now), character.maxHp);
@@ -399,13 +400,8 @@ export function updateTopbar(now = serverNow()) {
       : serving
         ? t('USŁUGA NAJEMNA · {place}', { place: activity.placeName })
         : t('EKSPLORACJA · {area}', { area: activity.areaName });
-    activityTime.textContent = activityFinished(activity, now)
-      ? serving
-        ? activity.service?.hired
-          ? t('ZAPŁATA CZEKA')
-          : t('OGŁOSZENIE WYGASŁO')
-        : t('RAPORT GOTOWY')
-      : formatCountdown(activity.endsAt - now);
+    if (!activityFinished(activity, now)) setTimer(activityTime, formatCountdown(activity.endsAt - now));
+    else activityTime.textContent = serving ? (activity.service?.hired ? t('ZAPŁATA CZEKA') : t('OGŁOSZENIE WYGASŁO')) : t('RAPORT GOTOWY');
   } else {
     const hpNow = currentHp(character, now);
     activityLabel.textContent = t('ODPOCZYNEK');
@@ -424,7 +420,8 @@ export function updateTopbar(now = serverNow()) {
     const finished = activityFinished(avatarActivity, now);
     topbar.avatarWork.classList.toggle('activity--done', finished);
     topbar.avatarWork.setAttribute('href', screen ? screen.href : '#/profesje');
-    topbar.avatarTime.textContent = finished ? t('RAPORT') : formatCountdown(avatarActivity.endsAt - now);
+    if (finished) topbar.avatarTime.textContent = t('RAPORT');
+    else setTimer(topbar.avatarTime, formatCountdown(avatarActivity.endsAt - now));
     const what = [screen && t(screen.label), avatarActivity.placeName].filter(Boolean).join(' · ');
     topbar.avatarWork.setAttribute('aria-label', `${t('praca Awatara')}: ${what}, ${finished ? t('raport czeka') : topbar.avatarTime.textContent}`);
   }
@@ -649,7 +646,8 @@ export function updateNavTimers(now = serverNow()) {
     const { work, running, ready, byAvatar } = tabTime(id, now);
     item.classList.toggle('nav-item--busy', running);
     item.classList.toggle('nav-item--ready', ready);
-    label.textContent = running ? formatCountdown(work.endsAt - now) : t(tab.label);
+    if (running) setTimer(label, formatCountdown(work.endsAt - now));
+    else label.textContent = t(tab.label);
     item.setAttribute('aria-label', [t(tab.label), running && `${byAvatar ? t('praca Awatara') : t(tab.doing)}: ${label.textContent}`, ready && t('raport czeka')].filter(Boolean).join(', '));
   }
   const camp = $(`#nav-main > .nav-item[href="${CAMP_TAB.href}"]`);
@@ -658,7 +656,8 @@ export function updateNavTimers(now = serverNow()) {
   const { building, busy, ready, said } = campNow(now);
   camp.classList.toggle('nav-item--busy', busy);
   camp.classList.toggle('nav-item--ready', ready);
-  label.textContent = busy ? formatCountdown(building.endsAt - now) : t(CAMP_TAB.label);
+  if (busy) setTimer(label, formatCountdown(building.endsAt - now));
+  else label.textContent = t(CAMP_TAB.label);
   camp.setAttribute('aria-label', said);
 }
 

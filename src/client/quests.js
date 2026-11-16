@@ -7,7 +7,7 @@
 // quests' own words come from the server in it.
 
 import { materialSprite, monsterSprite, resourceArt } from './art.js';
-import { $, fill, h, icon } from './dom.js';
+import { $, fill, h, icon, setTimer } from './dom.js';
 import { countOf, formatCountdown, formatNumber } from './format.js';
 import { t } from './i18n.js';
 import { rod, roll, stopRoll } from './parchment.js';
@@ -269,7 +269,7 @@ function draw(now = serverNow()) {
 }
 
 function tickPlace(place) {
-  if (place.countdown) place.countdown.textContent = untilNew(place.endsAt - serverNow());
+  if (place.countdown) setTimer(place.countdown, untilNew(place.endsAt - serverNow()));
 }
 
 // Every second the time to the new quests counts down.
