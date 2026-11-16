@@ -2986,6 +2986,18 @@ a.segmented-option {
 }
 
 .region-trait,
+/* The wounded companions above "Wyrusz": a heart beside the words. */
+.wounded-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.wounded-line svg {
+  flex: none;
+  margin-top: 2px;
+}
+
 .region-warning {
   margin: 0;
   font-size: 15px;

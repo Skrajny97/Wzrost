@@ -145,7 +145,7 @@ import { championOf } from './guild-fame.js';
 import { fameNotice } from './fame.js';
 import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
 import { guildSeatSql } from './guild-seat.js';
-import { companionsKey } from './hunts.js';
+import { companionsKey, woundedWaiting } from './hunts.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { partyOf, partyRemoval } from './parties.js';
 import { anvilDiscountOf } from './perks.js';
@@ -1676,6 +1676,9 @@ export function characterView(player, now) {
     // now, for the Walka screen to ask for the threat again when they
     // change (companionsKey in hunts.js), or null for none.
     companionsKey: companionsKey(player, now, !activity && hp >= maxHp),
+    // The companions who wait wounded and would not go along now
+    // (woundedWaiting in hunts.js), or null.
+    woundedCompanions: woundedWaiting(player, now),
     // The wanted poster in hand, for its strip on the Walka screen, or null.
     wanted: wantedInHand(row),
     freePoints: freePoints(character, content()),

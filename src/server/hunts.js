@@ -24,6 +24,7 @@ import {
   companionAfterErrand,
   companionAfterHunt,
   companionGoes,
+  companionStays,
   campLevels,
   challengeAt,
   createRng,
@@ -142,6 +143,20 @@ export function restedNow(player, now) {
 export function companionsGoing(player, now, rested = restedNow(player, now)) {
   const hired = JSON.parse(player.row.settlement ?? '{}').companions ?? [];
   return hired.filter((companion) => companionGoes(companion, { rested, inParty: player.inParty })).slice(0, content().balance.parties.size - 1);
+}
+
+// The hired companions who would go on an exploration but wait wounded for
+// the character to rest to full HP (companionReady in the engine), with
+// their names and looks: for the Walka screen, so nobody sets out without
+// them unawares (a player, 16.11.2026: „nie wiesz klikając kolejną wyprawę i
+// idziesz sam bez nich”). None while the character is in a Drużyna, whose
+// explorations go without companions.
+export function woundedWaiting(player, now) {
+  if (!settlementOn() || player.inParty) return null;
+  const hired = JSON.parse(player.row.settlement ?? '{}').companions ?? [];
+  const wounded = hired.filter((companion) => companion.wounded && !companionStays(companion));
+  if (wounded.length === 0 || restedNow(player, now)) return null;
+  return { companions: wounded.map((companion) => ({ name: companion.name, appearance: companion.appearance })) };
 }
 
 // The companions going along as their fights count them: each with its
