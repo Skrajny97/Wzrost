@@ -924,6 +924,10 @@
     "0.3.90": {
       "title": "Version 0.3.90",
       "body": "- You can also put crafting parts from the Salvage Table (scraps, straps, crystal splinters and more) into the Account Chest. They are on the \"Goods\" tab, between materials and minerals."
+    },
+    "0.3.91": {
+      "title": "Version 0.3.91",
+      "body": "- You reroll the narrator's quests one by one: a die stands beside every quest not done yet. You can reroll each quest once, and the others keep their progress."
     }
   }
 }

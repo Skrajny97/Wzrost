@@ -1160,6 +1160,11 @@
       "id": "0.3.90",
       "title": "Wersja 0.3.90",
       "body": "- Do Skrzyni Konta wkładasz też części do rzemiosła ze Stołu rozbiórki (ścinki, rzemienie, okruchy kryształu i inne). Są w zakładce „Towary”, między materiałami a minerałami."
+    },
+    {
+      "id": "0.3.91",
+      "title": "Wersja 0.3.91",
+      "body": "- Zadania od narratora przelosowujesz pojedynczo: przy każdym niewykonanym zadaniu stoi kostka. Każde zadanie możesz przelosować raz, a pozostałe zachowują postęp."
     }
   ]
 }

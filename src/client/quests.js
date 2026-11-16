@@ -107,7 +107,7 @@ function questWay(quest) {
   return WAYS[quest.kind] ? { href: WAYS[quest.kind], where: null } : null;
 }
 
-function questRow(periodId, quest) {
+function questRow(periodId, quest, period) {
   const share = Math.min(1, quest.progress / quest.count);
   const way = !quest.done && !quest.claimed ? questWay(quest) : null;
   const status = quest.claimed
@@ -141,7 +141,26 @@ function questRow(periodId, quest) {
         h('span', { class: 'quest-count', text: `${formatNumber(quest.progress)}/${formatNumber(quest.count)}` }),
       ),
     ),
-    h('div', { class: 'quest-side' }, rewardChip(quest.reward), status),
+    h('div', { class: 'quest-side' }, h('div', { class: 'quest-side-top' }, rerollButton(periodId, quest, period), rewardChip(quest.reward)), status),
+  );
+}
+
+// The die beside a quest not done yet: it draws that one quest anew, once a
+// quest (1023 B, the question 1023.3; a player, poz. 48, through the author:
+// „będzie opcja, żeby przelosować pojedyncze zadanie?”). None for a quest
+// drawn anew already, nor in a period drawn anew all at once before 0.3.91
+// or whose chest is open.
+function rerollButton(periodId, quest, period) {
+  if (quest.done || quest.claimed || quest.rerolled || period.rerolled || period.chest.opened) return null;
+  return h(
+    'button',
+    {
+      type: 'button',
+      class: 'button quest-reroll',
+      'aria-label': t('Przelosuj zadanie: {quest}', { quest: quest.text }),
+      onClick: (event) => withButton(event.currentTarget, () => reroll(periodId, quest)),
+    },
+    icon('dice', { size: 20 }),
   );
 }
 
@@ -223,7 +242,7 @@ function drawPage(place, now = serverNow()) {
       // A week drawn while it was under way asks for less (quests.json, late).
       period.late && h('p', { class: 'quests-note', text: period.late }),
       period.quests.length > 0
-        ? h('ul', { class: 'quests-list' }, period.quests.map((quest) => questRow(tab, quest)))
+        ? h('ul', { class: 'quests-list' }, period.quests.map((quest) => questRow(tab, quest, period)))
         : h('p', { class: 'quests-empty', text: t('Na razie nie mam dla Ciebie zadań.') }),
       rerollPart(tab, period),
       h('p', { class: 'quests-note', text: period.chest.text }),
@@ -269,25 +288,25 @@ export function watchQuests(now) {
   call('GET', '/api/character').catch((error) => toast(error.message));
 }
 
-// "Przelosuj zadania": the quests not done yet drawn anew, once a period (a
-// day, a week or a month; the author); the words are the period's.
+// Under the quests, what the dice do (1023 B), while a quest has its die;
+// in a period drawn anew all at once before 0.3.91, the period's words.
 function rerollPart(periodId, period) {
   if (period.rerolled) return h('p', { class: 'quests-note', text: period.texts.rerolled });
-  if (period.chest.opened || !period.quests.some((quest) => !quest.done && !quest.claimed)) return null;
-  return h('button', { type: 'button', class: 'button quests-reroll', text: t('Przelosuj zadania'), onClick: (event) => withButton(event.currentTarget, () => reroll(periodId, period)) });
+  if (period.chest.opened || !period.quests.some((quest) => !quest.done && !quest.claimed && !quest.rerolled)) return null;
+  return h('p', { class: 'quests-note', text: t('Kostka przy zadaniu zmienia je na inne. Każde zadanie możesz przelosować raz, a jego postęp przepada.') });
 }
 
-async function reroll(periodId, period) {
-  const when = period.texts.rerollWhen;
+// The question 1023.3, then the one quest drawn anew.
+async function reroll(periodId, quest) {
   const sure = await confirmAction({
-    title: t('Przelosować zadania?'),
-    text: t('Niewykonane zadania zmienią się na inne, a ich postęp przepadnie. Wykonane zostają. Przelosować możesz {when}.', { when }),
+    title: t('Przelosować to zadanie?'),
+    text: t('„{quest}” zmieni się na inne zadanie, a jego postęp przepadnie. Każde zadanie możesz przelosować tylko raz.', { quest: quest.text }),
     confirmLabel: t('Przelosuj'),
   });
   if (!sure) return;
-  await call('POST', '/api/quests/reroll', { period: periodId });
+  await call('POST', '/api/quests/reroll', { period: periodId, index: quest.index });
   playSound('system');
-  toast(t('Narrator ma dla Ciebie nowe zadania.'));
+  toast(t('Narrator ma dla Ciebie nowe zadanie.'));
 }
 
 async function claimReward(periodId, quest) {
