@@ -1,0 +1,14 @@
+{
+  "id": "farming-water-fix",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art, the lower half of a grey metal watering can held in front of a small hooded figure, the can's round bottom closed by a dark outline, the dark navy robe hanging behind and below the can down to the soil, the dark soil bed beside it, the same fine pixel art style, dark outline, colours and shading as the rest of the picture",
+  "style": null,
+  "input": "art/references/scenes/farming-water.png",
+  "mask": "art/inputs/scenes/farming-water-fix-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
