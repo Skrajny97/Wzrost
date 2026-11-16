@@ -44,9 +44,9 @@ describe('the Encyklopedia in the engine', () => {
     assert.deepEqual(mergeDiscoveries({ 'item:sword': 2, 'herb:comfrey': 1 }, held), held);
   });
 
-  test('items come in eight tiers by the class level they are worn from, each with a set for every class and one with the accessories', () => {
+  test('items come in nine tiers by the class level they are worn from, each with a set for every class and one with the accessories', () => {
     const sets = itemSets(content);
-    assert.equal(sets.length, 48);
+    assert.equal(sets.length, 54);
     assert.deepEqual(
       sets.filter((set) => set.tier === 0).map((set) => [set.name, set.bases.length]),
       [
@@ -67,6 +67,8 @@ describe('the Encyklopedia in the engine', () => {
     assert.deepEqual(sets.find((set) => set.id === 'items:7:warrior').bases.slice(0, 3), ['coronation-sword', 'nadziak', 'royal-shield']);
     // Tier VIII (949), from class level 150.
     assert.deepEqual(sets.find((set) => set.id === 'items:8:warrior').bases.slice(0, 3), ['self-swinging-sword', 'executioner-axe', 'aegis']);
+    // Tier IX (1018), from class level 175.
+    assert.deepEqual(sets.find((set) => set.id === 'items:9:warrior').bases.slice(0, 3), ['szczerbiec', 'perun-axe', 'achilles-shield']);
     const covered = new Set(sets.flatMap((set) => set.bases));
     assert.equal(covered.size, content.bases.length);
   });
@@ -166,7 +168,8 @@ describe('the Encyklopedia in the engine', () => {
     // Materials of creatures of levels 151–175 in Tier VII: Głucha Knieja's
     // and those of Sosnowe Wydmy that come a level or two above its 150 (the
     // Południca, the Raróg and Pogorzelisko's). Ostępy Nowiu's go on to Tier
-    // VIII (949).
+    // VIII (949), and its Księżycożerca's, a champion above level 200, to
+    // Tier IX (1018).
     assert.deepEqual(view.materials.tiers.filter((tier) => ['Tier VI', 'Tier VII'].includes(tier.name)).map((tier) => [tier.name, tier.range, tier.current]), [
       ['Tier VI', 'poziomy 126–150', false],
       ['Tier VII', 'poziomy 151–175', true],
@@ -174,7 +177,7 @@ describe('the Encyklopedia in the engine', () => {
     const tierOf = (materialId) => view.materials.tiers.find((tier) => tier.entries.some((entry) => entry.id === materialId)).name;
     assert.deepEqual(
       ['black-needle', 'hunting-horn', 'moon-bite', 'noon-sickle', 'rarog-feather', 'ruin-ash', 'latawiec-membrane', 'glassy-sand'].map(tierOf),
-      ['Tier VII', 'Tier VIII', 'Tier VIII', 'Tier VII', 'Tier VII', 'Tier VII', 'Tier VI', 'Tier VI'],
+      ['Tier VII', 'Tier VIII', 'Tier IX', 'Tier VII', 'Tier VII', 'Tier VII', 'Tier VI', 'Tier VI'],
     );
   });
 
@@ -183,7 +186,7 @@ describe('the Encyklopedia in the engine', () => {
   test('Tier VIII: its items from class level 150 with a set for every class and the accessories, its chest, and the materials of creatures above level 175', () => {
     const levels = { level: 180, classLevel: 150, professions: {} };
     const view = encyclopediaView({ discovered: {}, claimed: [], met: [], levels }, content);
-    const eighth = view.items.tiers.at(-1);
+    const eighth = view.items.tiers.find((tier) => tier.name === 'Tier VIII');
     assert.deepEqual([eighth.name, eighth.range, eighth.current, eighth.entries.length], ['Tier VIII', 'od 150. poziomu klasy', true, 22]);
     assert.deepEqual(
       eighth.sets.map((set) => [set.name, set.bases]),
@@ -199,7 +202,7 @@ describe('the Encyklopedia in the engine', () => {
     // A full set opens the eighth chest: Tier VII's gold x2.5 (rounded up)
     // and points x2, as each Tier's before it.
     for (const set of eighth.sets) assert.deepEqual(set.chest, content.encyclopedia.chests[7], set.name);
-    assert.deepEqual(content.encyclopedia.chests.slice(6), [
+    assert.deepEqual(content.encyclopedia.chests.slice(6, 8), [
       { gold: 15625, timePoints: 320, systemPoints: 100 },
       { gold: 39063, timePoints: 640, systemPoints: 100 },
     ]);
@@ -216,14 +219,48 @@ describe('the Encyklopedia in the engine', () => {
       'Warsztat: wzór od 150. poziomu Rzemieślnictwa.',
     ]);
     assert.ok(eighth.entries.find((entry) => entry.id === 'ryngraf').sources.includes('Szlifiernia: wzór od 150. poziomu Jubilerstwa.'));
-    // Materials of creatures above level 175 in Tier VIII: Ostępy Nowiu's
-    // (above its 200 too, as the last Tier).
-    assert.deepEqual(view.materials.tiers.slice(-2).map((tier) => [tier.name, tier.range, tier.current]), [
+    // Materials of creatures of levels 176–200 in Tier VIII: Ostępy Nowiu's;
+    // those above 200 in Tier IX since it came (1018).
+    assert.deepEqual(view.materials.tiers.filter((tier) => ['Tier VII', 'Tier VIII'].includes(tier.name)).map((tier) => [tier.name, tier.range, tier.current]), [
       ['Tier VII', 'poziomy 151–175', false],
       ['Tier VIII', 'poziomy 176–200', true],
     ]);
     const tierOf = (materialId) => view.materials.tiers.find((tier) => tier.entries.some((entry) => entry.id === materialId)).name;
-    assert.deepEqual(['hunting-horn', 'moon-bite', 'plague-kerchief', 'black-needle'].map(tierOf), ['Tier VIII', 'Tier VIII', 'Tier VIII', 'Tier VII']);
+    assert.deepEqual(['hunting-horn', 'moon-bite', 'plague-kerchief', 'black-needle'].map(tierOf), ['Tier VIII', 'Tier IX', 'Tier IX', 'Tier VII']);
+  });
+
+  // The author's 1018: Tier IX from class level 175, as Tier VIII came from
+  // 150, for Łysogóry (201–275).
+  test('Tier IX: its items from class level 175 with a set for every class and the accessories, its chest, and the materials of creatures above level 200', () => {
+    const levels = { level: 210, classLevel: 175, professions: {} };
+    const view = encyclopediaView({ discovered: {}, claimed: [], met: [], levels }, content);
+    const ninth = view.items.tiers.at(-1);
+    assert.deepEqual([ninth.name, ninth.range, ninth.current, ninth.entries.length], ['Tier IX', 'od 175. poziomu klasy', true, 22]);
+    assert.deepEqual(
+      ninth.sets.map((set) => [set.name, set.bases]),
+      [
+        ['Wojownik', ['szczerbiec', 'perun-axe', 'achilles-shield', 'krakus-helmet', 'chrobry-armor']],
+        ['Łucznik', ['dazhbog-bow', 'stribog-quiver', 'borowy-hood', 'piast-sukmana']],
+        ['Mag', ['triglav-staff', 'sendivogius-book', 'borowy-hood', 'zhiva-cloak']],
+        ['Kleryk', ['maurice-spear', 'achilles-shield', 'sendivogius-book', 'lada-wreath', 'adalbert-stole']],
+        ['Cień', ['koschei-dagger', 'wawel-dragon-tooth', 'borowy-hood', 'piast-sukmana']],
+        ['Dodatki', ['dratewka-gloves', 'waligora-boots', 'jurata-necklace', 'kinga-ring', 'golden-horn']],
+      ],
+    );
+    // Tier VIII's gold x2.5 (rounded up), Punkty Czasu x2, Punkty Systemu
+    // at most 100 (949).
+    for (const set of ninth.sets) assert.deepEqual(set.chest, { gold: 97658, timePoints: 1280, systemPoints: 100 }, set.name);
+    // From Matecznik (171–175), the last place of Głucha Knieja, worn from
+    // class level 175, the patterns from level 175 of the professions.
+    assert.deepEqual(ninth.entries.find((entry) => entry.id === 'szczerbiec').sources, [
+      'Wyprawy: wypada od regionu Matecznik (poz. 171–175).',
+      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów.',
+      'Założysz od 175. poziomu klasy.',
+      'Warsztat: wzór od 175. poziomu Rzemieślnictwa.',
+    ]);
+    assert.ok(ninth.entries.find((entry) => entry.id === 'jurata-necklace').sources.includes('Szlifiernia: wzór od 175. poziomu Jubilerstwa.'));
+    assert.deepEqual(view.materials.tiers.at(-1).name, 'Tier IX');
+    assert.deepEqual([view.materials.tiers.at(-1).range, view.materials.tiers.at(-1).current], ['poziomy 201–275', true]);
   });
 
   test('a full set opens the chest of its tier, a count of discoveries its own chest in turn, each once', () => {
