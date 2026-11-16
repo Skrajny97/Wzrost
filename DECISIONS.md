@@ -3580,6 +3580,10 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.84 (16.11.2026): górny pasek nie drga przy odliczaniu budowy
+
+1. **Drganie górnego paska.** Gracz (poz. 42) przez autora: „Wam też skacze, drga interfejs na samej górze jak upływa czas pod ikonką osady że coś tam buduje?”. Pod namiotem Obozu na telefonie biegnie czas budowy, a cyfry czcionki Systemu mają różną szerokość, więc przy budowie dłuższej niż godzina przycisk co sekundę zmieniał szerokość (38–48 px) i przesuwał resztę paska. Teraz odliczanie ma stałą szerokość, taką jak najszerszy czas „23:48:08”. Na 360–430 px przycisk ma stale 52 px, a na najwęższych telefonach (do 340 px) czasu dalej nie widać, tylko namiot. Sprawdzone na 320, 360, 390 i 430 px dla czasów od „59:59” do „47:08:59”: pasek nie rusza się i nie wychodzi poza ekran.
+
 ## Wersja 0.3.83 (16.11.2026): odbiór pracy Awatara Systemu po minidze
 
 1. **Błąd z 0.3.82.** Gracz (poz. 51) przez autora: „Nie mogę odebrać mikstur po warzeniu”, „Wyskakuje mi jakieś mieszkanie i za każdym razem jak to skończę to jak chcę odebrać to jest błąd systemu”. Odbiór pracy Awatara Systemu czytał stuknięcia minigry, ale moduł Awatara nie wczytywał treści żądania (`readJson` w `src/server/avatar.js`), więc każdy odbiór jego pracy po minidze, także po „Pomiń”, kończył się błędem serwera. Praca czekała nietknięta, więc nic nie przepadło: po poprawce raport odbiera się normalnie. Test w `test/minigame.test.js` sprawdza odbiór pracy Awatara po minidze i po „Pomiń”.

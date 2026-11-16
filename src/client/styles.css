@@ -1066,6 +1066,17 @@ button {
   color: var(--system);
 }
 
+/* A build's countdown under the tent keeps one width, so the top bar does
+   not twitch each second as its digits change (a player, 16.11.2026: „drga
+   interfejs na samej górze jak upływa czas pod ikonką osady”): the System's
+   font has no digits of one width, so the label (a flex item of the tent,
+   so a block) holds the width of the widest countdown, "23:48:08". On the
+   narrowest phones it stays hidden. */
+.camp-button--busy .camp-label {
+  width: 48px;
+  text-align: center;
+}
+
 /* In the camp the tent is lit like the current tab of the bottom bar. */
 .camp-button[aria-current='page'] {
   background: rgba(143, 227, 239, 0.08);
