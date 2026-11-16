@@ -1125,6 +1125,11 @@
       "id": "0.3.83",
       "title": "Wersja 0.3.83",
       "body": "- Poprawka: raport pracy Awatara Systemu znów da się odebrać po minigrze. Praca czekała nietknięta, więc nic nie przepadło."
+    },
+    {
+      "id": "0.3.84",
+      "title": "Wersja 0.3.84",
+      "body": "- Poprawka: górny pasek na telefonie nie drga już, gdy pod namiotem Obozu odlicza się czas budowy."
     }
   ]
 }

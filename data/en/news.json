@@ -896,6 +896,10 @@
     "0.3.83": {
       "title": "Version 0.3.83",
       "body": "- Fix: the System Avatar's work report can be claimed after the mini-game again. The work waited untouched, so nothing was lost."
+    },
+    "0.3.84": {
+      "title": "Version 0.3.84",
+      "body": "- Fix: the top bar on a phone no longer twitches while a build's time counts down under the Camp's tent."
     }
   }
 }
