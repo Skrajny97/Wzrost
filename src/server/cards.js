@@ -33,7 +33,6 @@
 
 import {
   aboveTiers,
-  cardComes,
   cardHomes,
   cardLevel,
   cardsLeft,
@@ -44,6 +43,7 @@ import {
   deckBlock,
   deckStrength,
   deckTypeCounts,
+  dropKind,
   effectDeckBlock,
   effectDrop,
   effectOfRarity,
@@ -126,8 +126,11 @@ export function cardGameOf(row, day) {
     staked: today && Number.isInteger(stored.staked) ? stored.staked : 0,
     rewarded: today && Array.isArray(stored.rewarded) ? stored.rewarded.filter((number) => Number.isInteger(number)) : [],
     trials: Array.isArray(stored?.trials) ? stored.trials.filter((id) => Number.isInteger(id)) : [],
-    // The day's pack bought at Szczęsny's (902 C).
+    // The day's pack bought at Szczęsny's (902 C), and its second one, for
+    // pack.second times its price (the author, 16.11.2026: „3 razy drożej
+    // niż standardowo opcja drugiego dokupienia pakietu u Szczęsnego”).
     pack: today && stored.pack === true,
+    packSecond: today && stored.packSecond === true,
     residents: Array.isArray(stored?.residents) ? stored.residents.filter((id) => typeof id === 'string') : [],
     // The tiers whose first win gave its effect card (977.3 B), also on a
     // tier beaten before the effect cards came.
@@ -229,26 +232,44 @@ export const cardsHere = () => cardsOn() && Boolean(rules());
 const sourceLevel = (row) => Math.max(row.level, row.class_level ?? 0);
 
 // The cards of the sources of 903 for the character of `row`, one roll for
-// each seed of `seeds` with `chance` (cardComes) and, for each that comes,
+// each seed of `seeds` with `chance` (dropKind) and, for each that comes,
 // a creature of the lands at the character's level or lower (pickCard),
-// one it has not got first, none at its top level, none twice; the
-// collection is read only when a roll comes. A seed of the source's own
-// gives the same draw however often it is tried. Returns { ids, cards, seeds }
-// (the ids to add, the cards as a report shows them and the seeds that
-// came), or null for none or where the game has no cards.
+// one it has not got first, none at its top level, none twice, or, for the
+// pack's share of the chance (drops.packShare), a pack of cards; the
+// collection is read only when a card comes. A seed of the source's own
+// gives the same draw however often it is tried. Returns { ids, packs,
+// cards, seeds } (the ids to add, the packs, the cards and the packs as a
+// report shows them and the seeds that came), or null for none or where
+// the game has no cards.
 export async function sourceCards(db, row, seeds, chance) {
   if (!cardsHere()) return null;
-  const rolls = seeds.map((seed) => ({ seed, rng: createRng(seed) })).filter((roll) => cardComes(roll.rng, chance));
+  const rolls = seeds
+    .map((seed) => {
+      const rng = createRng(seed);
+      return { seed, rng, kind: dropKind(rng.next(), chance, content()) };
+    })
+    .filter((roll) => roll.kind !== null);
   if (rolls.length === 0) return null;
-  const collection = await cardCollection(db, row.id);
+  const packs = rolls.filter((roll) => roll.kind === 'pack').length;
+  const drawn = rolls.filter((roll) => roll.kind === 'card');
+  const collection = drawn.length > 0 ? await cardCollection(db, row.id) : new Map();
   const pool = cardsUpTo(sourceLevel(row), content());
   const ids = [];
-  for (const { rng } of rolls) {
+  for (const { rng } of drawn) {
     const id = pickCard(pool, rng, { owned: collection.keys(), maxed: maxedCards(collection), found: ids });
     if (id) ids.push(id);
   }
-  return ids.length > 0 ? { ids, cards: droppedCards(ids, collection), seeds: rolls.map((roll) => roll.seed) } : null;
+  if (ids.length === 0 && packs === 0) return null;
+  return { ids, packs, cards: [...droppedCards(ids, collection), ...packViews(packs)], seeds: rolls.filter((roll) => roll.kind === 'pack' || ids.length > 0).map((roll) => roll.seed) };
 }
+
+// Packs of cards found (drops.packShare) as a report shows them, beside its
+// cards: one a pack, with the cards it holds.
+export const packViews = (count) => Array.from({ length: count }, () => ({ pack: true, name: rules().texts.packName, cards: rules().pack.cards }));
+
+// The statements that keep `count` packs of cards found for the character,
+// to be opened in the Salon's tab (openFoundPack).
+export const packGains = (db, characterId, count) => (count > 0 ? [db.prepare('UPDATE characters SET card_packs = card_packs + ? WHERE id = ?').bind(count, characterId)] : []);
 
 // The card a profession's work leaves as its report is claimed (903): by
 // the hours it lasted (workCardChance), from the work's own seed, so a
@@ -257,20 +278,25 @@ export async function sourceCards(db, row, seeds, chance) {
 export const workCard = (db, row, activity, minutes) => (cardsHere() ? sourceCards(db, row, [`${activity.seed}:cards`], workCardChance(minutes, content())) : null);
 
 // The card an attack of the Gildia leaves (903, drops.guild): on the Bestia
-// and on a guardian of the Wyprawa Gildii, from the attack's own seed. Its
-// cards come with their words for the page's toast.
+// and on a guardian of the Wyprawa Gildii, from the attack's own seed, or a
+// pack of cards. Its cards and packs come with their words for the page's
+// toast.
 export async function guildCard(db, row, seed) {
   const found = cardsHere() ? await sourceCards(db, row, [`${seed}:cards`], rules().drops.guild) : null;
-  return found && { ...found, cards: found.cards.map((card) => ({ ...card, text: say(rules().texts, 'guild', 0, { card: card.name }) })) };
+  return found && { ...found, cards: found.cards.map((card) => ({ ...card, text: card.pack ? say(rules().texts, 'packGuild', 0, {}) : say(rules().texts, 'guild', 0, { card: card.name }) })) };
 }
 
-// The statements that give the cards `ids` of a source that changes nothing
-// else of the character (an attack of the Gildia): a copy of each card, and
-// the character's version moved with its collection, as every claim that
-// reads the collection holds only while the character is as read
-// (hunts.js). In a batch whose head asserts the character as read
-// (sameVersion).
-export const cardGains = (db, row, ids, now) => [db.prepare('UPDATE characters SET version = version + 1 WHERE id = ?').bind(row.id), ...cardUpserts(db, row.id, ids, now)];
+// The statements that give the cards `ids` and the packs `packs` of a source
+// that changes nothing else of the character (an attack of the Gildia): a
+// copy of each card, the packs kept, and the character's version moved with
+// its collection, as every claim that reads the collection holds only while
+// the character is as read (hunts.js). In a batch whose head asserts the
+// character as read (sameVersion).
+export const cardGains = (db, row, ids, now, packs = 0) => [
+  db.prepare('UPDATE characters SET version = version + 1 WHERE id = ?').bind(row.id),
+  ...cardUpserts(db, row.id, ids, now),
+  ...packGains(db, row.id, packs),
+];
 
 // The character's deck: its twelve cards, or null when it has none whole
 // (a card gone from the collection or from the data).
@@ -467,19 +493,23 @@ function packPrice(row, stored = settlementOf(row)) {
 }
 
 // The day's pack at Szczęsny's (902 C), for the tab: its price with the
-// relation's discount, whether it is bought, the odds of each rarity (of
-// every card and of the last), the cards of the game the character still
-// misses and whether any is left to draw (none once all are at their top
-// level).
+// relation's discount, whether it is bought, the day's second pack (its
+// price, pack.second times as much, and whether it is bought), the packs
+// found to open (drops.packShare), the odds of each rarity (of every card
+// and of the last), the cards of the game the character still misses and
+// whether any is left to draw (none once all are at their top level).
 function packView(row, game, collection) {
   const { pack, stats } = rules();
   const ids = [...cardHomes(content()).keys()];
   const rarity = (id) => content().raritiesById[id];
+  const price = packPrice(row);
   return {
-    ...packPrice(row),
+    ...price,
     most: Math.max(...pack.relationDiscount),
     count: pack.cards,
     bought: game.pack,
+    second: { price: price.price * pack.second, times: pack.second, bought: game.packSecond },
+    found: row.card_packs ?? 0,
     odds: packOdds(content()).map((odds) => ({ ...odds, name: rarity(odds.rarity).forms?.f ?? rarity(odds.rarity).name, color: rarity(odds.rarity).color })),
     missing: ids.filter((id) => !collection.has(id)).length,
     empty: ids.every((id) => (collection.get(id) ?? 0) >= stats.maxLevel),
@@ -735,11 +765,32 @@ export async function keyedSeed(db, parts) {
   return toHex(new Uint8Array(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(parts))));
 }
 
-// POST /api/cards/pack: the day's pack at Szczęsny's (902 C), once a day,
-// like a booster: three cards of all the game's creatures, each of a rarity
-// drawn by the pack's weights (packCards), for its price at the relation
-// with Szczęsny (packPrice), which the pack raises as a ticket of the
-// Loteria does (casino.relationGain). Drawn from the day's seed with the
+// A pack's draw from `seed`, as Szczęsny's (902 C): its cards (packCards),
+// an effect card in place of the first creature by its chance (977.3 B),
+// the ids to add and the cards as they will be in the collection; null
+// once every card is at its top level.
+async function packDraw(db, row, seed) {
+  const collection = await cardCollection(db, row.id);
+  const effects = await effectCollection(db, row.id);
+  const effect = packEffect({ maxed: maxedEffects(effects), seed }, content());
+  const drawn = packCards({ maxed: maxedCards(collection), seed, count: rules().pack.cards }, content());
+  if (drawn.length === 0) return null;
+  const cards = effect ? drawn.slice(1) : drawn;
+  const opened = [
+    ...(effect ? [effectView(effect, (effects.get(effect) ?? 0) + 1, content(), { fresh: !effects.has(effect) })] : []),
+    ...cards.map((id) => cardView(id, (collection.get(id) ?? 0) + 1, content(), { fresh: !collection.has(id) })),
+  ];
+  return { cards, effect, opened };
+}
+
+// POST /api/cards/pack: the day's pack at Szczęsny's (902 C), like a
+// booster: three cards of all the game's creatures, each of a rarity drawn
+// by the pack's weights (packCards), for its price at the relation with
+// Szczęsny (packPrice), which the pack raises as a ticket of the Loteria
+// does (casino.relationGain). Once bought, a second one the same day for
+// pack.second times the price (the author, 16.11.2026: „3 razy drożej niż
+// standardowo opcja drugiego dokupienia pakietu u Szczęsnego”), then none
+// till the next day. Drawn from the day's seed (the second's own) with the
 // server's key (keyedSeed, 920 B), so asking again draws the same; saved
 // only over the character as read and while it has the gold. Answers with
 // the cards as they are now in the collection.
@@ -752,17 +803,12 @@ export async function buyPack(context) {
   const day = casinoDay(now, content()).key;
   const game = cardGameOf(row, day);
   if (!game.starter) throw new ApiError(409, 'no_starter', 'Najpierw weź talię od Szczęsnego.');
-  if (game.pack) throw new ApiError(409, 'pack_bought', 'Pakiet na dziś już kupiony. Następny jutro.');
-  const collection = await cardCollection(db, row.id);
-  const seed = await keyedSeed(db, `${day}:${row.id}`);
-  const effects = await effectCollection(db, row.id);
-  // An effect card in place of the first creature, by its chance (977.3 B).
-  const effect = packEffect({ maxed: maxedEffects(effects), seed }, content());
-  const drawn = packCards({ maxed: maxedCards(collection), seed, count: rules().pack.cards }, content());
-  if (drawn.length === 0) throw new ApiError(409, 'pack_empty', 'Masz już wszystkie karty na najwyższym poziomie.');
-  const cards = effect ? drawn.slice(1) : drawn;
+  if (game.pack && game.packSecond) throw new ApiError(409, 'pack_bought', 'Dwa pakiety na dziś już kupione. Następne jutro.');
+  const second = game.pack;
+  const draw = await packDraw(db, row, await keyedSeed(db, `${day}:${row.id}${second ? ':second' : ''}`));
+  if (!draw) throw new ApiError(409, 'pack_empty', 'Masz już wszystkie karty na najwyższym poziomie.');
   const stored = settlementOf(row);
-  const { price } = packPrice(row, stored);
+  const price = packPrice(row, stored).price * (second ? rules().pack.second : 1);
   if (row.gold < price) throw new ApiError(409, 'no_gold', t('Brakuje złota: potrzeba {price}.', { price }));
   const resident = rules().host.resident;
   const relations = { ...stored.relations, [resident]: (stored.relations[resident] ?? 0) + content().settlement.casino.relationGain };
@@ -770,17 +816,44 @@ export async function buyPack(context) {
     db,
     [
       assertion(db, '(SELECT version FROM characters WHERE id = ?) = ? AND (SELECT gold FROM characters WHERE id = ?) >= ?', [row.id, row.version, row.id, price]),
-      db.prepare('UPDATE characters SET gold = gold - ?, card_game = ?, settlement = ?, version = version + 1 WHERE id = ?').bind(price, JSON.stringify({ ...game, pack: true }), JSON.stringify({ ...stored, relations }), row.id),
-      ...cardUpserts(db, row.id, cards, now),
-      ...(effect ? effectUpserts(db, row.id, [effect], now) : []),
+      db
+        .prepare('UPDATE characters SET gold = gold - ?, card_game = ?, settlement = ?, version = version + 1 WHERE id = ?')
+        .bind(price, JSON.stringify(second ? { ...game, packSecond: true } : { ...game, pack: true }), JSON.stringify({ ...stored, relations }), row.id),
+      ...cardUpserts(db, row.id, draw.cards, now),
+      ...(draw.effect ? effectUpserts(db, row.id, [draw.effect], now) : []),
     ],
     characterChanged,
   );
-  const opened = [
-    ...(effect ? [effectView(effect, (effects.get(effect) ?? 0) + 1, content(), { fresh: !effects.has(effect) })] : []),
-    ...cards.map((id) => cardView(id, (collection.get(id) ?? 0) + 1, content(), { fresh: !collection.has(id) })),
-  ];
-  return respond(context, session, { pack: opened });
+  return respond(context, session, { pack: draw.opened });
+}
+
+// POST /api/cards/pack/open: a pack of cards found on an exploration, in the
+// Labirynt, at a profession's work or at the Gildia (drops.packShare; the
+// author, 16.11.2026: „opcja dropienia boosterów kart zamiast samych
+// kart”), opened in the Salon's tab as Szczęsny's pack is (packDraw), for
+// nothing: one pack fewer. Drawn from the character's version with the
+// server's key, so asking again over the same character draws the same;
+// saved only over the character as read. Answers as buyPack.
+export async function openFoundPack(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireCards(row);
+  const db = context.env.DB;
+  const now = context.now;
+  if ((row.card_packs ?? 0) < 1) throw new ApiError(409, 'no_pack', 'Nie masz pakietu do otwarcia.');
+  const draw = await packDraw(db, row, await keyedSeed(db, `${row.id}:found-pack:${row.version}`));
+  if (!draw) throw new ApiError(409, 'pack_empty', 'Masz już wszystkie karty na najwyższym poziomie.');
+  await atomically(
+    db,
+    [
+      assertion(db, '(SELECT version FROM characters WHERE id = ?) = ? AND (SELECT card_packs FROM characters WHERE id = ?) >= 1', [row.id, row.version, row.id]),
+      db.prepare('UPDATE characters SET card_packs = card_packs - 1, version = version + 1 WHERE id = ?').bind(row.id),
+      ...cardUpserts(db, row.id, draw.cards, now),
+      ...(draw.effect ? effectUpserts(db, row.id, [draw.effect], now) : []),
+    ],
+    characterChanged,
+  );
+  return respond(context, session, { pack: draw.opened });
 }
 
 // POST /api/cards/match { tier, staked } or { resident, staked }: a match

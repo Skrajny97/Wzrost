@@ -23,6 +23,7 @@ import {
   cardsLeft,
   createRng,
   deckBlock,
+  faintForfeit,
   firstWinCard,
   heroSkill,
   hostTier,
@@ -31,6 +32,7 @@ import {
   matchPayout,
   matchView,
   newMatch,
+  PACK,
   playTurn,
   roundHits,
   simulateHunt,
@@ -467,6 +469,30 @@ describe('Talia Systemu: cards from the explorations (874 A)', () => {
     // The odds: an elite's card more often than an ordinary creature's.
     const count = (id) => Array.from({ length: 4000 }, (_, index) => cardDrop(id, createRng(`szansa:${index}`), {}, content)).filter(Boolean).length;
     assert.ok(count('planetnik') > 2 * count('wolf'));
+  });
+
+  // The author, 16.11.2026: „Niech z wypraw i wszystkich innych aktywności
+  // będzie opcja dropienia boosterów kart zamiast samych kart”.
+  test('the lowest share of a creature\'s chance brings a pack of cards instead, even for a card at its top level; an exploration counts its packs, tells them, and a faint loses them', () => {
+    const roll = (value) => ({ next: () => value });
+    const half = { ...content, cards: { ...rules, drops: { ...rules.drops, ordinary: 1, elite: 1, champion: 1, guardian: 1, packShare: 0.5 } } };
+    assert.equal(cardDrop('wolf', roll(0.2), {}, half), PACK);
+    assert.equal(cardDrop('wolf', roll(0.2), { maxed: ['wolf'] }, half), PACK);
+    assert.equal(cardDrop('wolf', roll(0.7), {}, half), 'wolf');
+    assert.equal(cardDrop('wolf', roll(0.7), { maxed: ['wolf'] }, half), null);
+    assert.equal(cardDrop('nobody', roll(0.2), {}, half), null);
+    // Every drop a pack: no cards, the packs told in the report.
+    const packs = { ...content, cards: { ...rules, drops: { ...rules.drops, ordinary: 1, elite: 1, champion: 1, guardian: 1, lower: 0, packShare: 1 } } };
+    const all = simulateHunt({ character, equipped, hp: 99999, name: 'Mira', areaId: 'boar-thicket', minutes: 240, seed: 'pakiety', cards: { maxed: [] } }, packs);
+    assert.deepEqual(all.cards, []);
+    assert.ok(all.packs > 0);
+    assert.equal(all.fights.reduce((sum, fight) => sum + (fight.packs ?? 0), 0), all.packs);
+    assert.equal(all.entries.reduce((sum, entry) => sum + entry.text.split(rules.texts.packDrop[0]).length - 1, 0), all.packs);
+    // None without the cards; a faint loses them as the rest.
+    assert.equal(hunt(null, 'pakiety').packs, undefined);
+    const lost = faintForfeit({ ...all, result: 'fainted' });
+    assert.equal(lost.packs, 0);
+    assert.ok(lost.fights.every((fight) => !fight.packs));
   });
 
   test('an exploration\'s cards come from the creatures it beat, from a seed of their own: the rest goes as without them', () => {

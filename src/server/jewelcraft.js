@@ -30,7 +30,7 @@ import {
 import { say } from '../engine/text.js';
 import { content } from './content.js';
 import { characterView, coreOf, currentHp, loadPlayer, questsNow, requireNotExploring, requirePlayer, requireWorker, workOf } from './characters.js';
-import { cardSummary, cardUpserts, workCard } from './cards.js';
+import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
 import { labyrinthOn } from './features.js';
 import { toHex } from './encoding.js';
 import { assertion, atomically, raced, sameVersion } from './atomic.js';
@@ -354,6 +354,7 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
         ...workFamePoints(db, row.id, minutes, avatar, now),
         // The card the work left, a copy (cards.js).
         ...cardUpserts(db, row.id, card?.ids ?? [], now),
+        ...packGains(db, row.id, card?.packs ?? 0),
         end,
       ]);
     } catch (error) {

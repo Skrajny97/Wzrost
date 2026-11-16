@@ -171,12 +171,18 @@
     "lower": ["Among the loot lies a card of a creature from a lower land: {card}."],
     "guild": ["You got a card: {card}."],
     "trial": ["A completed Guild Trial brought you a card: {card}."],
+    "packName": "Card pack",
+    "packDrop": ["Among the loot lies a card pack. You can open it in the Games Parlour, on the Cards tab."],
+    "packGuild": ["You got a card pack. You can open it in the Games Parlour, on the Cards tab."],
+    "packTrial": ["A completed Guild Trial brought you a card pack. You can open it in the Games Parlour, on the Cards tab."],
     "pack": {
       "offer": "Three random cards of creatures from every land, from common to divine. The last card is at least unique.",
       "opened": "Szczęsny tears the pack open and lays the cards on the table.",
       "odds": "Odds of each card: {odds}. Of the last one: {last}.",
       "relation": "Your relation with Szczęsny: {standing}, price −{discount}%.",
-      "noDiscount": "With a better relation with Szczęsny you pay less, up to {most}%."
+      "noDiscount": "With a better relation with Szczęsny you pay less, up to {most}%.",
+      "openedFound": "You tear the pack open and lay the cards on the table.",
+      "found": "Packs from explorations and other activities to open: {count}."
     },
     "live": {
       "challengeTitle": "A card match with: {name}",

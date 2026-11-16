@@ -14448,6 +14448,25 @@ button.tcard-slot {
   flex: none;
 }
 
+/* A pack of cards found instead of a card (16.11.2026), in a report: its
+   backs as tall as the small cards beside it. */
+.cards-dropped-pack .cards-back {
+  width: 42px;
+  height: 60px;
+}
+
+.cards-dropped-pack .cards-back + .cards-back {
+  margin-left: -26px;
+}
+
+/* The packs found to open, above the day's pack at Szczęsny's. */
+.cards-pack-rule {
+  width: 100%;
+  margin: 2px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
 /* On a computer the cards are 138 px wide (--tw), the table's lines keep
    together, the reserve and the hero's card take the whole width under the
    table, and the tiers stand two by two. */

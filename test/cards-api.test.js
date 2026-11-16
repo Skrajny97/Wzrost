@@ -18,13 +18,13 @@ import { beforeEach, describe, test } from 'node:test';
 
 import {
   areaLand,
-  cardComes,
   cardHomes,
   cardKind,
   cardRarity,
   cardsUpTo,
   casinoDay,
   createRng,
+  dropKind,
   expectedExploration,
   hostTier,
   labyrinthDay,
@@ -146,7 +146,7 @@ describe('Talia Systemu through the API', () => {
 
   // Like a booster (the author, 15.11.2026): cards of every land, even in
   // the first one (981), dear, and cheaper with the relation with Szczęsny.
-  test('the day\'s pack at Szczęsny\'s (902 C): three cards of every land, also in the first one, for its price at the relation with Szczęsny, which it raises, once a day', async () => {
+  test('the day\'s pack at Szczęsny\'s (902 C): three cards of every land, also in the first one, for its price at the relation with Szczęsny, which it raises; a second one the same day for three times the price, then none', async () => {
     // Level 30: the first land (Skraj Puszczy), which had no pack before (981).
     await set('level = 30, class_level = 30, gold = 100000');
     assert.equal(areaLand(portalArea(30, content).id, content), 0);
@@ -158,6 +158,8 @@ describe('Talia Systemu through the API', () => {
     const full = explorationGold(rules.pack.goldMinutes, 30);
     assert.deepEqual([offer.full, offer.price, offer.discount, offer.standing], [full, full, 0, content.settlement.standings[0].name]);
     assert.deepEqual([offer.bought, offer.count, offer.empty, offer.most], [false, rules.pack.cards, false, Math.max(...rules.pack.relationDiscount)]);
+    assert.deepEqual(offer.second, { price: full * rules.pack.second, times: rules.pack.second, bought: false });
+    assert.equal(offer.found, 0);
     assert.equal(offer.missing, cardHomes(content).size - starter.length);
     assert.deepEqual(
       offer.odds.map((one) => one.rarity),
@@ -180,6 +182,15 @@ describe('Talia Systemu through the API', () => {
     const fresh = creatures.filter((card) => card.fresh).length;
     assert.deepEqual([bought.data.cards.pack.bought, bought.data.cards.pack.missing], [true, offer.missing - fresh]);
     assert.ok(creatures.every(({ id }) => bought.data.cards.collection.some((card) => card.id === id)));
+    // The second pack of the day (the author, 16.11.2026: „3 razy drożej niż
+    // standardowo opcja drugiego dokupienia pakietu u Szczęsnego”): three
+    // times the price, its own cards, and the relation up again; then none.
+    const second = await call('POST', '/api/cards/pack', { cookie });
+    assert.equal(second.status, 200, JSON.stringify(second.data));
+    assert.equal((await row()).gold, before - offer.price - offer.price * rules.pack.second);
+    assert.equal(await relation(), 2 * content.settlement.casino.relationGain);
+    assert.deepEqual(second.data.cards.pack.second, { price: offer.price * rules.pack.second, times: rules.pack.second, bought: true });
+    assert.notDeepEqual(second.data.pack.map((card) => card.id), ids);
     assert.equal((await call('POST', '/api/cards/pack', { cookie })).data.error.code, 'pack_bought');
     // A new day, at the standing of Zaufany: the price less its discount.
     const game = JSON.parse((await row()).card_game);
@@ -192,6 +203,27 @@ describe('Talia Systemu through the API', () => {
     // Without the gold for it, nothing.
     await set('gold = 1');
     assert.equal((await call('POST', '/api/cards/pack', { cookie })).data.error.code, 'no_gold');
+  });
+
+  // The packs found on explorations and at the other activities (the
+  // author, 16.11.2026: „opcja dropienia boosterów kart zamiast samych
+  // kart”): opened in the Karty tab as Szczęsny's, for nothing, one at a time.
+  test('the packs of cards found open in the Karty tab for nothing, one at a time, as Szczęsny\'s', async () => {
+    await set('level = 30, class_level = 30, gold = 100000, card_packs = 2');
+    await call('POST', '/api/cards/starter', { cookie });
+    assert.equal((await tab()).pack.found, 2);
+    const count = async () => (await (await db()).prepare('SELECT COALESCE(SUM(copies), 0) AS n FROM cards').first()).n;
+    const before = await count();
+    const opened = await call('POST', '/api/cards/pack/open', { cookie });
+    assert.equal(opened.status, 200, JSON.stringify(opened.data));
+    assert.equal(opened.data.pack.length, rules.pack.cards);
+    assert.equal(await count(), before + opened.data.pack.filter((card) => !card.effect).length);
+    assert.deepEqual([(await row()).card_packs, (await row()).gold, opened.data.cards.pack.found], [1, 100000, 1]);
+    // The next pack, from the character as it is now: a draw of its own.
+    const again = await call('POST', '/api/cards/pack/open', { cookie });
+    assert.equal(again.status, 200, JSON.stringify(again.data));
+    assert.deepEqual([(await row()).card_packs, again.data.cards.pack.found], [0, 0]);
+    assert.equal((await call('POST', '/api/cards/pack/open', { cookie })).data.error.code, 'no_pack');
   });
 
   test('the pack with every card at its top level: nothing to buy', async () => {
@@ -521,12 +553,13 @@ describe('Talia Systemu through the API', () => {
       await (await db()).prepare('UPDATE activities SET seed = ?, hp_at_start = 99999, started_at = started_at - ?, ends_at = ends_at - ?').bind(`karty:${attempt}`, 240 * 60000, 240 * 60000).run();
       const claimed = await call('POST', '/api/hunts/claim', { cookie });
       assert.equal(claimed.status, 200, JSON.stringify(claimed.data));
-      // A creature's card (an effect card may come too, 977.3 B).
-      if (claimed.data.report.cards?.some((one) => !one.effect)) found = claimed.data.report;
+      // A creature's card (an effect card or a pack of cards may come too,
+      // 977.3 B, 16.11.2026).
+      if (claimed.data.report.cards?.some((one) => !one.effect && !one.pack)) found = claimed.data.report;
       await set('hp = 99999');
     }
     assert.ok(found, 'w 30 wyprawach wypadła karta');
-    const card = found.cards.find((one) => !one.effect);
+    const card = found.cards.find((one) => !one.effect && !one.pack);
     assert.equal(card.fresh, true);
     assert.equal(card.level, 1);
     const stored = await (await db()).prepare('SELECT * FROM cards WHERE monster_id = ?').bind(card.id).first();
@@ -536,6 +569,31 @@ describe('Talia Systemu through the API', () => {
       JSON.parse(journal.summary).cards.map((one) => one.name),
       found.cards.map((one) => one.name),
     );
+  });
+
+  // The author, 16.11.2026: „Niech z wypraw i wszystkich innych aktywności
+  // będzie opcja dropienia boosterów kart zamiast samych kart”.
+  test('an exploration may leave a pack of cards instead of a card: in the report and the Dziennik, kept to open in the Karty tab', async () => {
+    await set('level = 60, class_level = 50');
+    let found = null;
+    for (let attempt = 0; attempt < 80 && !found; attempt += 1) {
+      const started = await call('POST', '/api/hunts', { cookie, body: { areaId: 'boar-thicket', minutes: 240 } });
+      assert.equal(started.status, 201, JSON.stringify(started.data));
+      await (await db()).prepare('UPDATE activities SET seed = ?, hp_at_start = 99999, started_at = started_at - ?, ends_at = ends_at - ?').bind(`pakiety:${attempt}`, 240 * 60000, 240 * 60000).run();
+      const kept = (await row()).card_packs;
+      const claimed = await call('POST', '/api/hunts/claim', { cookie });
+      assert.equal(claimed.status, 200, JSON.stringify(claimed.data));
+      const packs = (claimed.data.report.cards ?? []).filter((one) => one.pack);
+      assert.equal((await row()).card_packs, kept + packs.length);
+      if (packs.length > 0) found = claimed.data.report;
+      await set('hp = 99999');
+    }
+    assert.ok(found, 'w 80 wyprawach wypadł pakiet kart');
+    const pack = found.cards.find((one) => one.pack);
+    assert.deepEqual(pack, { pack: true, name: rules.texts.packName, cards: rules.pack.cards });
+    assert.ok(found.entries.some((entry) => entry.text.includes(rules.texts.packDrop[0])));
+    const journal = await (await db()).prepare("SELECT summary FROM reports WHERE kind = 'hunt' ORDER BY id DESC LIMIT 1").first();
+    assert.ok(JSON.parse(journal.summary).cards.some((one) => one.name === rules.texts.packName));
   });
 
   test('the cards go with the character, and with the account', async () => {
@@ -567,13 +625,14 @@ describe('Talia Systemu: the cards of the professions, the Gildia and the Labiry
   const run = async (sql, ...binds) => (await db()).prepare(sql).bind(...binds).run();
   const first = async (sql, ...binds) => (await db()).prepare(sql).bind(...binds).first();
   const copies = async () => (await first('SELECT COALESCE(SUM(copies), 0) AS n FROM cards')).n;
-  // The first seed `prefix:N` whose roll comes (or not) with `chance`, as
-  // the server draws a card from it (cards.js, sourceCards: the first draw
-  // of the seed `seedOf(it)` against the chance).
-  function seedWhere(prefix, chance, comes, seedOf = (seed) => seed) {
+  // The first seed `prefix:N` whose roll brings `kind` with `chance`: 'card',
+  // 'pack' (a pack of cards instead, drops.packShare) or null, as the server
+  // draws from it (cards.js, sourceCards: the first draw of the seed
+  // `seedOf(it)` against the chance, dropKind).
+  function seedWhere(prefix, chance, kind, seedOf = (seed) => seed) {
     for (let index = 0; index < 100000; index += 1) {
       const seed = `${prefix}:${index}`;
-      if (cardComes(createRng(seedOf(seed)), chance) === comes) return seed;
+      if (dropKind(createRng(seedOf(seed)).next(), chance, content) === kind) return seed;
     }
     throw new Error('no such seed');
   }
@@ -599,7 +658,7 @@ describe('Talia Systemu: the cards of the professions, the Gildia and the Labiry
   test('a profession\'s work may leave a card by the hours it lasted, from its own seed: one not got yet, of the lands up to the higher of the levels, in the report, the Dziennik and the collection', async () => {
     const chance = workCardChance(60, content);
     const ofWork = (seed) => `${seed}:cards`;
-    const plain = await gathered(seedWhere('praca', chance, false, ofWork));
+    const plain = await gathered(seedWhere('praca', chance, null, ofWork));
     assert.equal(plain.kind, 'herbs');
     assert.equal(plain.cards, undefined);
     assert.equal(await copies(), 0);
@@ -608,7 +667,7 @@ describe('Talia Systemu: the cards of the professions, the Gildia and the Labiry
     const missing = pool.at(-1);
     const owned = pool.filter((card) => card !== missing);
     await run(`INSERT INTO cards (character_id, monster_id, copies, created_at) VALUES ${owned.map(() => '(?, ?, 1, 0)').join(', ')}`, ...owned.flatMap((card) => [id, card]));
-    const report = await gathered(seedWhere('praca', chance, true, ofWork));
+    const report = await gathered(seedWhere('praca', chance, 'card', ofWork));
     assert.equal(report.cards.length, 1);
     const [card] = report.cards;
     assert.deepEqual([card.id, card.fresh, card.level], [missing, true, 1]);
@@ -616,6 +675,19 @@ describe('Talia Systemu: the cards of the professions, the Gildia and the Labiry
     const journal = await first("SELECT summary, data FROM reports WHERE kind = 'herbs' ORDER BY id DESC LIMIT 1");
     assert.deepEqual(JSON.parse(journal.summary).cards.map((one) => one.name), [card.name]);
     assert.equal(JSON.parse(journal.data).cards[0].id, missing);
+  });
+
+  // The author, 16.11.2026: „Niech z wypraw i wszystkich innych aktywności
+  // będzie opcja dropienia boosterów kart zamiast samych kart”.
+  test('a profession\'s work may leave a pack of cards instead: kept to open, in the report and the Dziennik', async () => {
+    const chance = workCardChance(60, content);
+    const report = await gathered(seedWhere('pakiet', chance, 'pack', (seed) => `${seed}:cards`));
+    assert.deepEqual(report.cards, [{ pack: true, name: content.cards.texts.packName, cards: content.cards.pack.cards }]);
+    assert.equal(await copies(), 0);
+    const packs = async () => (await first('SELECT card_packs FROM characters WHERE id = ?', id)).card_packs;
+    assert.equal(await packs(), 1);
+    const journal = await first("SELECT summary FROM reports WHERE kind = 'herbs' ORDER BY id DESC LIMIT 1");
+    assert.deepEqual(JSON.parse(journal.summary).cards.map((one) => one.name), [content.cards.texts.packName]);
   });
 
   test('a Próba finished leaves a card once, at the next look at the Próby or at what waits in the Gildia; an attack on the Bestia may leave one', async () => {
@@ -628,13 +700,13 @@ describe('Talia Systemu: the cards of the professions, the Gildia and the Labiry
     // the server's key, 920 B; the test sets the key).
     await run("INSERT INTO server_settings (key, value) VALUES ('card_seed', 'klucz-testowy') ON CONFLICT (key) DO UPDATE SET value = excluded.value");
     const keyed = (parts) => createHmac('sha256', 'klucz-testowy').update(parts).digest('hex');
-    const trialWhere = (comes, from) => {
-      for (let trial = from; ; trial += 1) if (cardComes(createRng(keyed(`${id}:trial:${trial}:cards`)), content.cards.drops.guild) === comes) return trial;
+    const trialWhere = (kind, from) => {
+      for (let trial = from; ; trial += 1) if (dropKind(createRng(keyed(`${id}:trial:${trial}:cards`)).next(), content.cards.drops.guild, content) === kind) return trial;
     };
     const finished = (trial, index) =>
       run("INSERT INTO guild_trials (id, guild_id, week, character_id, trial, kind, count, progress, state, taken_at, done_at) VALUES (?, ?, ?, ?, ?, 'explore', 1, 1, 'done', 0, 0)", trial, guildId, week, id, index);
-    const miss = trialWhere(false, 5000);
-    const hit = trialWhere(true, 6000);
+    const miss = trialWhere(null, 5000);
+    const hit = trialWhere('card', 6000);
     await finished(miss, 90);
     await finished(hit, 91);
     const seen = await call('GET', '/api/guild/trials', { cookie });
@@ -651,16 +723,25 @@ describe('Talia Systemu: the cards of the professions, the Gildia and the Labiry
     assert.equal((await call('GET', '/api/guild/todo', { cookie })).data.cards, undefined);
     assert.equal(await copies(), 1);
     // Another one comes with what waits in the Gildia.
-    const next = trialWhere(true, hit + 1);
+    const next = trialWhere('card', hit + 1);
     await finished(next, 92);
     const todo = await call('GET', '/api/guild/todo', { cookie });
     assert.equal(todo.data.cards.length, 1);
     assert.equal(await copies(), 2);
     assert.deepEqual((await kept()).sort(), [hit, next].sort());
+    // A trial whose roll brings a pack of cards instead (16.11.2026): kept to
+    // open in the Karty tab, with its own words.
+    const packed = trialWhere('pack', next + 1);
+    await finished(packed, 93);
+    const pack = await call('GET', '/api/guild/trials', { cookie });
+    assert.deepEqual(pack.data.cards.map((one) => [one.pack, one.text]), [[true, content.cards.texts.packTrial[0]]]);
+    assert.equal((await first('SELECT card_packs FROM characters WHERE id = ?', id)).card_packs, 1);
+    assert.equal(await copies(), 2);
+    assert.ok((await kept()).includes(packed));
     // An attack on the Bestia answers with the card it left, if any.
     const attack = await call('POST', '/api/guild/beast/attack', { cookie });
     assert.equal(attack.status, 200, JSON.stringify(attack.data));
-    assert.equal(await copies(), 2 + (attack.data.cards?.length ?? 0));
+    assert.equal(await copies(), 2 + (attack.data.cards ?? []).filter((one) => !one.pack).length);
   });
 
   test('the creatures beaten in a room of the Labirynt leave their cards, from the day\'s seed and the room: in the room\'s lines, its report and the collection', async () => {
@@ -671,7 +752,7 @@ describe('Talia Systemu: the cards of the professions, the Gildia and the Labiry
     // A seed of the day whose first draw for the room gives the first
     // creature's card (labyrinth.js: one draw a creature, from
     // `${seed}:${level}:${row}:${room}:cards`).
-    const seed = seedWhere('dzien', content.cards.drops[cardKind(foes[0], content)], true, (one) => `${one}:1:0:0:cards`);
+    const seed = seedWhere('dzien', content.cards.drops[cardKind(foes[0], content)], 'card', (one) => `${one}:1:0:0:cards`);
     await run('UPDATE characters SET labyrinth = ? WHERE id = ?', JSON.stringify(newLabyrinth({ day, charLevel, companions: [], seed })), id);
     const entered = await call('POST', '/api/labyrinth/room', { cookie, body: { level: 1, row: 0, room: 0 } });
     assert.equal(entered.status, 200, JSON.stringify(entered.data));

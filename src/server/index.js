@@ -112,7 +112,7 @@ import {
 } from './testing.js';
 import { buyScrolls, raiseAtForge } from './forge.js';
 import { buyTicket, drawLotteries, getCasino, spinCasinoWheel } from './casino.js';
-import { buyPack, getCards, getDecks, nameDeck, playCardTurn, saveDeck, startMatch, surrenderCards, takeStarter, useDeck } from './cards.js';
+import { buyPack, getCards, getDecks, nameDeck, openFoundPack, playCardTurn, saveDeck, startMatch, surrenderCards, takeStarter, useDeck } from './cards.js';
 import { answerDuel, challengeDuel, duelOffer, duelTurn, readDuel, surrenderDuelMatch, withdrawDuel, withoutDuel } from './card-duel.js';
 import { enterTrialHall } from './trial-hall.js';
 import { arenaFight, claimArenaReward, getArena, getArenaDefence, rerollArenaRivals } from './pvp-arena.js';
@@ -371,6 +371,7 @@ const routes = [
   ['POST', '/api/cards/turn', playCardTurn],
   ['POST', '/api/cards/surrender', surrenderCards],
   ['POST', '/api/cards/pack', buyPack],
+  ['POST', '/api/cards/pack/open', openFoundPack],
   // Live matches with other players (card-duel.js; 901 B).
   ['GET', '/api/cards/duel', readDuel],
   ['GET', '/api/cards/duel/offer', duelOffer],

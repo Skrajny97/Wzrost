@@ -25,7 +25,7 @@ import {
 } from '../engine/index.js';
 import { content } from './content.js';
 import { bagPlaces, characterView, currentHp, engineCharacter, equippedItems, loadPlayer, questsNow, requirePlayer, requireWorker, workOf } from './characters.js';
-import { cardSummary, cardUpserts, workCard } from './cards.js';
+import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { professionsOn } from './features.js';
 import { assertion, characterChanged, raced, sameVersion } from './atomic.js';
@@ -276,6 +276,7 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
       ...workFamePoints(db, row.id, activity.minutes, avatar, now),
       // The card the work left, a copy (cards.js).
       ...cardUpserts(db, row.id, card?.ids ?? [], now),
+      ...packGains(db, row.id, card?.packs ?? 0),
       db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at),
     ]);
   } catch (error) {

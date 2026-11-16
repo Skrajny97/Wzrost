@@ -8,7 +8,7 @@
 import { addQuestProgress, campBonus, campLevels, mineMinerals, miningMinutes, miningReport, professionOpen, professionState, professionUnlockLevel, saleGold, weekFactor } from '../engine/index.js';
 import { content } from './content.js';
 import { characterView, currentHp, loadPlayer, questsNow, requirePlayer, requireWorker, workOf } from './characters.js';
-import { cardSummary, cardUpserts, workCard } from './cards.js';
+import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { characterChanged, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
@@ -135,6 +135,7 @@ export async function finishMining(db, player, now, { avatar = false } = {}) {
       ...workFamePoints(db, row.id, activity.minutes, avatar, now),
       // The card the work left, a copy (cards.js).
       ...cardUpserts(db, row.id, card?.ids ?? [], now),
+      ...packGains(db, row.id, card?.packs ?? 0),
       db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at),
     ]);
   } catch (error) {

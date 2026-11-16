@@ -3510,6 +3510,19 @@ Autor: „twarz w portrecie męskiego Strzelca Wyborowego jest brzydka i powinna
 3. **Pasek czoła:** autor zauważył na ciemnym odcieniu jasny pasek skóry pod opaską: pole skóry tego portretu zaczynało się wiersz za nisko i od początku go pomijało. Grupa twarzy obejmuje teraz czoło, cień przy uchu i cień pod brodą, a sprawdzenie wszystkich ośmiu odcieni nie znajduje na głowie żadnego koloru skóry sprzed przebarwienia.
 4. **Inne portrety:** ten sam skan znalazł podobne jasne piksele przy skórze w innych portretach (np. pasek przy obojczyku Czempiona Areny i linia na nodze Berserkerki w ciemnym odcieniu). To osobne zadanie. *Zrobione: zob. „Maski odcieni skóry w 71 portretach”.*
 
+## Pakiety kart z aktywności i drugi pakiet u Szczęsnego (997; 16.11.2026)
+
+Autor: „Niech z wypraw i wszystkich innych aktywności będzie opcja dropienia boosterów kart zamiast samych kart” i „Do tego 3 razy drożej niż standardowo opcja drugiego dokupienia pakietu u Szczęsnego”. Makiety 997.1–997.3.
+
+1. **Pakiet zamiast karty** (`drops.packShare` w `data/cards.json`, `dropKind`, `cardDrop`, `cardFrom` i `PACK` w `src/engine/cards.js`): najniższa część szansy każdego źródła kart daje zamiast karty pakiet kart. `packShare` 0,1, czyli co dziesiąta karta przychodzi jako pakiet. Ten sam rzut co karta, więc pozostałe losowania wyprawy się nie zmieniają.
+    - Źródła: stwór pokonany na wyprawie i w Labiryncie (także karta z niższej krainy), praca w profesji (także Awatara Systemu), atak na Bestię Gildii i na strażnika Wyprawy Gildii oraz ukończona Próba Gildii.
+    - Pakiet wypada także wtedy, gdy karta stwora ma już najwyższy poziom.
+    - Wygrana przy stole mieszkańca daje dalej tylko kartę jego talii, bo pierwsza wygrana zawsze daje kartę.
+    - Omdlenie na wyprawie zabiera pakiety tak jak karty.
+2. **Pakiet to ten sam pakiet co u Szczęsnego**: 3 karty ze wszystkich krain, rzadkość według `pack.weights`, ostatnia co najmniej unikalna, z szansą na kartę efektu. Postać trzyma pakiety (`characters.card_packs`, migracja `0141_card_packs.sql`) i otwiera je za darmo w Salonie Gier, w zakładce Karty („Otwórz pakiet”, `POST /api/cards/pack/open`), jeden naraz, z tą samą animacją co kupiony. Losowanie z wersji postaci i klucza serwera, więc ponowione zapytanie losuje to samo.
+3. **Raporty**: wyprawa, Labirynt i praca w profesji pokazują pakiet obok kart („Pakiet kart · 3 karty do otwarcia w Salonie Gier”) i w Dzienniku; raport wyprawy i Labiryntu ma też zdanie „Wśród łupu leży pakiet kart. Otworzysz go w Salonie Gier, w zakładce Karty.”. Gildia mówi o pakiecie w powiadomieniu.
+4. **Drugi pakiet u Szczęsnego** (`pack.second` 3): po pakiecie dnia można tego samego dnia kupić drugi, za 3 razy tyle co pierwszy (cena już ze zniżką za relację). Drugi ma własne losowanie i też podnosi relację ze Szczęsnym. Potem następne jutro. Nagłówek pakietu mówi „kupione dziś: 0 z 2”.
+
 ## Liga wojen gildii (996; 16.11.2026)
 
 Gracz (poz. 51) na czacie, przy wojnach wylosowanych w nocy z 15 na 16.11: „pisze że w tym tygodniu nie było gildii o podobnej liczbie”, „Czemu my jako gildia mamy nie walczyć”. Autor:
