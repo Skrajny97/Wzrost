@@ -1195,6 +1195,11 @@
       "id": "0.3.97",
       "title": "Wersja 0.3.97",
       "body": "- Nad postaciami na górze zakładki Postać widać teraz dwa czasy: pracy postaci i, pod nim, pracy jej Awatara („A”)."
+    },
+    {
+      "id": "0.3.98",
+      "title": "Wersja 0.3.98",
+      "body": "- Liga wojen gildii: postacie jednego konta w obu gildiach walczą teraz po obu stronach, także ze sobą. Dotąd nie walczyły wcale, a ich trójki przegrywały walkowerem.\n- Pod portretami w trójkach i w rezerwie widać imiona postaci."
     }
   ]
 }

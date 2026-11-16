@@ -3580,6 +3580,15 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.98 (16.11.2026): liga wojen gildii po pierwszym wieczorze
+
+Pierwszy wieczór ligi (16.11, 20:00). Autor: „Gdzie te walki i skad tyle walkowerów jak obie gildie mają sporo członków” i „brakuje nicków graczy w drużynie gildii”, a gracze na czacie pisali, że widzą tylko wynik i swoje walki.
+
+1. **Skąd walkowery.** Mecz autora: 239:165, z tego 1v1 212:132, 3v3 12:3 i walkowery 15:30. To pasuje dokładnie do 6 trójek gildii autora, z czego 3 niepełne (3 × 10 = 30 przegranych walkowerem), i 10 trójek rywala, z czego 5 niepełnych (3 × 5 = 15). Trójki gra losowała ze wszystkich członków, a dopiero potem wyłączała postacie kont, które mają postać także w gildii rywala (zasada z 11.11.2026: „nikt nie walczy sam ze sobą”). Trójka z taką postacią zostawała niepełna i przegrywała walkowerem wszystkie swoje walki. Dlatego też takie postacie nie miały żadnych walk („Twoje pierwsze walki jeszcze przed Tobą.”).
+2. **Nowa zasada (autor):** „jeśli ktoś ma postać w gildii przeciwnej to niech walczą ze sobą”. Postacie jednego konta po obu stronach walczą jak wszyscy, także ze sobą (`fightMatch` w `src/server/guild-wars.js`; test `test/guild-wars.test.js`). Wyniki pierwszego wieczoru zostają.
+3. **Imiona pod portretami** w „Walczysz w Trójce”, w „Trójkach na jutro” i w rezerwie, własne na złoto, najwyżej w dwóch linijkach. Portrety z imionami nie nachodzą na siebie, a gdy się nie mieszczą, przechodzą do kolejnego rzędu.
+4. **„Twoje walki” bez walk** pokazują „Twoje pierwsze walki jeszcze przed Tobą.” raz, pod tytułem, a nie dwa razy.
+
 ## Wersja 0.3.97 (16.11.2026): szukaj gracza i nowi gracze w Panelu autora, czas Awatara nad postaciami
 
 1. **Szukaj gracza (1027, makieta 1032.1 przyjęta).** Autor: „dodaj opcje wyszukania konkretnego gracza po pseudonimie w grze (jakbym chcial jego maila albo cokolwiek)”. Na górze Panelu autora, pod liczbami: pole „Szukaj gracza” na imię postaci, nazwę konta, login albo e-mail (wystarczy kawałek, od 2 znaków). Wyniki to konta, które pasują, najpierw te, które były w grze najpóźniej, najwyżej 20. Przy każdym: nazwa konta albo login, e-mail, znaczek Google, wszystkie postacie z klasą i poziomami (i która gra teraz), kiedy było ostatnio w grze, od kiedy jest konto, i przyciski czatu jak na liście kont (`GET /api/author/search`, `authorSearch` w `src/server/author.js`; test `test/author-panel.test.js`). Wyszukiwanie czyta ok. 5 tys. wierszy bazy przy 800 kontach.

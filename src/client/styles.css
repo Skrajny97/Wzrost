@@ -21306,6 +21306,44 @@ a.discord-button {
   z-index: 1;
 }
 
+/* Busts with their names (the author, 16.11.2026: „brakuje nicków graczy w
+   drużynie gildii”): side by side with room for the names, never over each
+   other, in rows when there are more than fit. */
+.war-busts.war-busts--named {
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  margin-inline: 0;
+}
+
+.war-busts.war-busts--named > .war-bust + .war-bust {
+  margin-left: 0;
+}
+
+.war-busts--named > .war-bust {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 4px;
+  width: 72px;
+}
+
+.war-bust-name {
+  display: -webkit-box;
+  max-width: 72px;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.2;
+  text-align: center;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.war-bust--own > .war-bust-name {
+  color: var(--gold);
+}
+
 .war-bust--own > .select-portrait {
   border-color: var(--gold);
   box-shadow: 0 0 0 1px var(--gold), 0 2px 4px rgba(0, 0, 0, 0.5);

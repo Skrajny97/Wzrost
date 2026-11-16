@@ -952,6 +952,10 @@
     "0.3.97": {
       "title": "Version 0.3.97",
       "body": "- Over the characters at the top of the Character tab there are now two times: the character's work and, under it, its Avatar's work (“A”)."
+    },
+    "0.3.98": {
+      "title": "Version 0.3.98",
+      "body": "- Guild war league: characters of one account in both guilds now fight on both sides, against each other too. Till now they did not fight at all, and their trios lost by walkover.\n- The characters' names show under the portraits in the trios and the reserve."
     }
   }
 }
