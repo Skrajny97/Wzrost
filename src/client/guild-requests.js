@@ -12,7 +12,7 @@
 // words go through t() (i18n.js). mountGuildRequests(container) adds
 // the card to the container and gives { unmount() }, which takes it away.
 
-import { herbSprite, mineralSprite, potionSprite } from './art.js';
+import { herbSprite, mineralSprite, potionSprite, scrollArt } from './art.js';
 import { checkGuildTodo } from './chat-news.js';
 import { materialIcon } from './craft-table.js';
 import { fill, h, icon } from './dom.js';
@@ -24,7 +24,7 @@ import { call, state } from './state.js';
 import { closeSheet, confirmAction, foldPart, howItWorks, openSheet, toast, withButton } from './ui.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
-const KINDS = ['material', 'herb', 'potion', 'mineral'];
+const KINDS = ['material', 'herb', 'potion', 'mineral', 'scroll'];
 const rarityOf = (id) => state.content.rarities.find((rarity) => rarity.id === id);
 
 // The picture of goods: a material's, a herb's, a potion's or a mineral's.
@@ -32,6 +32,8 @@ function goodsArt(goods, size = 24) {
   if (goods.kind === 'material') return materialIcon(goods.materialId, size);
   if (goods.kind === 'herb') return herbSprite(goods.key) ?? icon('leaf', { size });
   if (goods.kind === 'mineral') return mineralSprite(goods.key) ?? icon('ore', { size });
+  // A scroll (1061).
+  if (goods.kind === 'scroll') return scrollArt(goods.key, size);
   return potionSprite(goods.key) ?? icon('flask', { size });
 }
 
@@ -63,6 +65,7 @@ function held(goods) {
   if (goods.kind === 'herb') return character.herbs?.find((one) => one.id === goods.key)?.count ?? 0;
   if (goods.kind === 'potion') return character.potions?.find((one) => one.id === goods.key)?.count ?? 0;
   if (goods.kind === 'mineral') return character.minerals?.find((one) => one.id === goods.key)?.count ?? 0;
+  if (goods.kind === 'scroll') return character.scrollGoods?.find((one) => one.id === goods.key)?.count ?? 0;
   return character.crafting?.materials.find((one) => one.key === goods.key)?.count ?? 0;
 }
 

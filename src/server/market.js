@@ -61,6 +61,7 @@ import { herbsOf, mineralsOf, potionsOf } from './professions-view.js';
 import { requireOpen, settlementOf } from './settlement.js';
 import { weekNow } from './weeks.js';
 import { saleFamePoints } from './fame.js';
+import { SCROLL_COLUMNS, scrollAdds, scrollById, scrollHeld, scrollsOf } from './scroll-goods.js';
 
 const COLUMNS = { herb: 'herbs', potion: 'potions', material: 'materials', part: 'parts', mineral: 'minerals' };
 const STACKS = Object.keys(COLUMNS);
@@ -101,6 +102,11 @@ function goodsView(kind, key, count, item) {
   if (kind === 'mineral') {
     const mineral = content().mineralsById[key];
     return { kind, key, count, name: mineral?.name ?? key, rarity: mineral && (mineral.rarity ?? mineral.for[0]), description: mineral?.description, scrap: mineral?.price, mineLevel: mineral?.level };
+  }
+  // A scroll (1061): the scrapper buys none.
+  if (kind === 'scroll') {
+    const scroll = scrollById(key);
+    return { kind, key, count, name: scroll?.name ?? key, description: scroll?.description };
   }
   return { kind: 'gold', count };
 }
@@ -289,6 +295,7 @@ function knownGood(kind, key) {
   if (kind === 'potion') return Boolean(content().potionsById[key]);
   if (kind === 'part') return Boolean(content().partsById[key]);
   if (kind === 'mineral') return Object.hasOwn(content().mineralsById, key);
+  if (kind === 'scroll') return Boolean(scrollById(key));
   if (kind !== 'material') return false;
   const { materialId, rarityId } = parseStack(key);
   return Boolean(content().materialsById[materialId] && content().raritiesById[rarityId]);
@@ -309,11 +316,15 @@ function sellable(player, now) {
   const favorites = favoriteIds(row);
   return {
     items: bagItems(player).map((item) => ({ id: item.id, ...itemView(item, content(), { sellBonus }), ...(favorites.has(item.id) && { favorite: true }) })),
-    stacks: STACKS.flatMap((kind) =>
-      Object.entries(stacks[kind])
-        .filter(([key, count]) => count > 0 && knownGood(kind, key))
-        .map(([key, count]) => withBonus(goodsView(kind, key, count))),
-    ),
+    stacks: [
+      ...STACKS.flatMap((kind) =>
+        Object.entries(stacks[kind])
+          .filter(([key, count]) => count > 0 && knownGood(kind, key))
+          .map(([key, count]) => withBonus(goodsView(kind, key, count))),
+      ),
+      // The scrolls (1061), each in a number column of its own.
+      ...Object.entries(scrollsOf(row)).map(([key, count]) => goodsView('scroll', key, count)),
+    ],
   };
 }
 
@@ -531,7 +542,9 @@ export async function listOffer(context) {
   requireOffRack(player, item);
   const column = COLUMNS[kind];
   const key = typeof body.key === 'string' ? body.key : null;
-  const held = kind === 'item' ? (item ? 1 : 0) : column && key && knownGood(kind, key) ? (JSON.parse(row[column] ?? '{}')[key] ?? 0) : 0;
+  // A scroll is kept in a number column of its own (1061).
+  const scroll = kind === 'scroll' && knownGood(kind, key) ? SCROLL_COLUMNS[key] : null;
+  const held = kind === 'item' ? (item ? 1 : 0) : scroll ? scrollHeld(row, key) : column && key && knownGood(kind, key) ? (JSON.parse(row[column] ?? '{}')[key] ?? 0) : 0;
   const open = (await db.prepare("SELECT COUNT(*) AS open FROM market_offers WHERE seller_id = ? AND state = 'open'").bind(row.id).first()).open;
   const { reputation } = settlementOf(row);
   const limit = offerLimit(reputation, content());
@@ -547,14 +560,16 @@ export async function listOffer(context) {
   // with the offer and come back so if nobody buys it (923 A). The
   // character's own pieces leave first, as wherever stacks leave the bag
   // (settleDiscoveries counts the trade's pieces out of what stays).
-  const foreignHeld = item ? 0 : Math.min(held, JSON.parse(row.foreign_stacks ?? '{}')[`${kind}:${key}`] ?? 0);
+  const foreignHeld = item || scroll ? 0 : Math.min(held, JSON.parse(row.foreign_stacks ?? '{}')[`${kind}:${key}`] ?? 0);
   const foreignCount = item ? 0 : Math.max(0, count - (held - foreignHeld));
   const now = context.now;
   const endsAt = now + hours * 3600000;
   const data = item ? JSON.stringify(Object.fromEntries(Object.entries(item).filter(([field]) => field !== 'id' && field !== 'equippedSlot'))) : null;
   const still = item
     ? ['(SELECT COUNT(*) FROM items WHERE id = ? AND character_id = ? AND slot IS NULL) = 1', [item.id, row.id]]
-    : [`COALESCE((SELECT json_extract(${column}, ?) FROM characters WHERE id = ?), 0) >= ?`, [jsonPath(key), row.id, count]];
+    : scroll
+      ? [`(SELECT ${scroll} FROM characters WHERE id = ?) >= ?`, [row.id, count]]
+      : [`COALESCE((SELECT json_extract(${column}, ?) FROM characters WHERE id = ?), 0) >= ?`, [jsonPath(key), row.id, count]];
   await atomically(db, [
     assertion(db, `(SELECT version FROM characters WHERE id = ?) = ? AND (SELECT COUNT(*) FROM market_offers WHERE seller_id = ? AND state = 'open') < ? AND ${still[0]}`, [
       row.id,
@@ -565,11 +580,13 @@ export async function listOffer(context) {
     ]),
     item
       ? db.prepare('DELETE FROM items WHERE id = ? AND character_id = ? AND slot IS NULL').bind(item.id, row.id)
-      : db
-          .prepare(
-            `UPDATE characters SET ${column} = CASE WHEN json_extract(${column}, ?) > ? THEN json_set(${column}, ?, json_extract(${column}, ?) - ?) ELSE json_remove(${column}, ?) END WHERE id = ?`,
-          )
-          .bind(jsonPath(key), count, jsonPath(key), jsonPath(key), count, jsonPath(key), row.id),
+      : scroll
+        ? db.prepare(`UPDATE characters SET ${scroll} = ${scroll} - ? WHERE id = ?`).bind(count, row.id)
+        : db
+            .prepare(
+              `UPDATE characters SET ${column} = CASE WHEN json_extract(${column}, ?) > ? THEN json_set(${column}, ?, json_extract(${column}, ?) - ?) ELSE json_remove(${column}, ?) END WHERE id = ?`,
+            )
+            .bind(jsonPath(key), count, jsonPath(key), jsonPath(key), count, jsonPath(key), row.id),
     // An item put up is no favourite any more (favorites.js).
     db.prepare(`UPDATE characters SET favorites = ${withoutFavorites}, version = version + 1 WHERE id = ?`).bind(JSON.stringify(item ? [item.id] : []), row.id),
     db
@@ -754,10 +771,11 @@ export async function collectParcels(context) {
   if (parcels.length === 0) throw new ApiError(409, 'nothing', 'Nic tu na Ciebie nie czeka.');
   const free = bagCapacity(campLevels(player.buildings, now, content()), content()) - bagPlaces(player);
   const held = { herb: herbsOf(row), potion: potionsOf(row) };
-  const adds = { herb: {}, potion: {}, material: {}, part: {}, mineral: {} };
+  const adds = { herb: {}, potion: {}, material: {}, part: {}, mineral: {}, scroll: {} };
   // Of those, the pieces got from other players: all of a purchase or a
-  // win, of goods back only what came from others before (923 A).
-  const traded = { herb: {}, potion: {}, material: {}, part: {}, mineral: {} };
+  // win, of goods back only what came from others before (923 A). The
+  // scrolls are in no Encyklopedia, so foreign() leaves them out.
+  const traded = { herb: {}, potion: {}, material: {}, part: {}, mineral: {}, scroll: {} };
   const fromOthers = (parcel) => {
     const count = parcel.reason === 'returned' ? Math.min(parcel.count, parcel.foreign_count ?? 0) : parcel.count;
     if (count > 0) traded[parcel.kind][parcel.good] = (traded[parcel.kind][parcel.good] ?? 0) + count;
@@ -794,6 +812,8 @@ export async function collectParcels(context) {
   if (taken.length === 0) throw new ApiError(409, 'bag_full', 'Plecak jest pełny. Zrób w nim miejsce, żeby odebrać towar.');
   const next = marketReputation(row, settlementOf(row), value, now);
   const changes = Object.fromEntries(STACKS.map((kind) => [kind, counted(COLUMNS[kind], adds[kind])]));
+  // The scrolls to their own number columns (1061).
+  const scrolls = scrollAdds(adds.scroll);
   const others = foreign(traded);
   const list = taken.map(() => '?').join(', ');
   await atomically(db, [
@@ -807,7 +827,7 @@ export async function collectParcels(context) {
     db
       .prepare(
         `UPDATE characters SET gold = gold + ?, herbs = ${changes.herb.sql}, potions = ${changes.potion.sql}, materials = ${changes.material.sql}, parts = ${changes.part.sql},
-           minerals = ${changes.mineral.sql}, foreign_stacks = ${others.sql}, settlement = ?, version = version + 1 WHERE id = ?`,
+           minerals = ${changes.mineral.sql}${scrolls.sql}, foreign_stacks = ${others.sql}, settlement = ?, version = version + 1 WHERE id = ?`,
       )
       .bind(
         gold,
@@ -816,6 +836,7 @@ export async function collectParcels(context) {
         ...changes.material.binds,
         ...changes.part.binds,
         ...changes.mineral.binds,
+        ...scrolls.binds,
         ...others.binds,
         JSON.stringify(next),
         row.id,

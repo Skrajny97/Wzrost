@@ -274,9 +274,9 @@
   "requests": {
     "texts": {
       "title": "Guild Requests",
-      "intro": "Short of a material, herb, potion or mineral? Ask the guild, and others will give from their stores.",
+      "intro": "Short of a material, herb, potion, mineral or scroll? Ask the guild, and others will give from their stores.",
       "how": [
-        "You can have one request up at a time, for up to {most} of one material, herb, potion or mineral. You can add the next one {wait} hours after the previous. You can withdraw a request no one has given anything to yet and add a new one at once.",
+        "You can have one request up at a time, for up to {most} of one material, herb, potion, mineral or scroll. You can add the next one {wait} hours after the previous. You can withdraw a request no one has given anything to yet and add a new one at once.",
         "A request stays up until someone fills it, until you withdraw it, or for {open} hours. The pieces given come to you at once, with the giver's name, and you thank each gift with a single tap.",
         "Herbs and potions go to the bag, so they need room in it. You cannot ask for items or gold. The Encyclopedia will not count the pieces given: only what the character obtains or makes on their own counts.",
         "Giving brings no gold or System rewards. It counts towards the Benefactors of the week ranking and the Guild Trials. Characters of one account do not give each other anything."
@@ -284,7 +284,7 @@
       "ask": "Ask the guild",
       "askLead": "Choose what you lack and how many. The request will go up on the Guild page, under Requests.",
       "askWaiting": "Your request is still up on the Guild page. Withdraw it there to ask for something else.",
-      "kindGroups": { "material": "Materials", "herb": "Herbs", "potion": "Potions", "mineral": "Minerals" },
+      "kindGroups": { "material": "Materials", "herb": "Herbs", "potion": "Potions", "mineral": "Minerals", "scroll": "Scrolls" },
       "goods": "What you lack",
       "count": "How many",
       "send": "Ask",

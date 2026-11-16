@@ -36,6 +36,7 @@ import { content } from './content.js';
 import { guildPlayer, requireMember, trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { counted, foreign } from './market.js';
+import { SCROLL_COLUMNS, scrollById, scrollHeld } from './scroll-goods.js';
 
 const rules = () => content().guilds.requests;
 const words = () => rules().texts;
@@ -55,6 +56,8 @@ function realGood(kind, key) {
   if (!rules().kinds.includes(kind) || typeof key !== 'string') return false;
   if (kind === 'material') return knownStack(key, content());
   if (kind === 'mineral') return Object.hasOwn(content().mineralsById, key);
+  // A scroll (1061): the Kowadło's two and the Zwój Niepamięci.
+  if (kind === 'scroll') return Boolean(scrollById(key));
   return Object.hasOwn(kind === 'herb' ? content().herbsById : content().potionsById, key);
 }
 
@@ -69,15 +72,17 @@ function goodsView(kind, key) {
     const mineral = content().mineralsById[key];
     return { kind, key, name: mineral?.name ?? key, rarity: mineral && (mineral.rarity ?? mineral.for[0]) };
   }
+  if (kind === 'scroll') return { kind, key, name: scrollById(key)?.name ?? key };
   return { kind, key, name: (kind === 'herb' ? content().herbsById[key] : content().potionsById[key])?.name ?? key };
 }
 
-const stockOf = (row, kind, key) => JSON.parse(row[COLUMNS[kind]] ?? '{}')[key] ?? 0;
+// A scroll is kept in a number column of its own (scroll-goods.js).
+const stockOf = (row, kind, key) => (kind === 'scroll' ? scrollHeld(row, key) : (JSON.parse(row[COLUMNS[kind]] ?? '{}')[key] ?? 0));
 
 // How many pieces of the goods the character's bag takes now: materials
 // and minerals take no place; herbs and potions fill the room left in their
 // stack and the free places, a stack to a place (storeStacks in the engine).
-const roomless = (kind) => kind === 'material' || kind === 'mineral';
+const roomless = (kind) => kind === 'material' || kind === 'mineral' || kind === 'scroll';
 function bagRoom(player, kind, key, now) {
   if (roomless(kind)) return Infinity;
   const { stack } = content().professionRules;
@@ -99,7 +104,9 @@ function knownGoods(row) {
     add(entry.slice(0, at), entry.slice(at + 1));
   }
   for (const [kind, column] of Object.entries(COLUMNS)) for (const [key, count] of Object.entries(JSON.parse(row[column] ?? '{}'))) if (count > 0) add(kind, key);
-  const order = Object.keys(COLUMNS);
+  // Every scroll may be asked for, held or not: there are only three.
+  for (const scroll of Object.keys(SCROLL_COLUMNS)) add('scroll', scroll);
+  const order = [...Object.keys(COLUMNS), 'scroll'];
   const rank = (rarity) => content().rarities.findIndex((one) => one.id === rarity);
   return [...pairs.values()]
     .map(([kind, key]) => goodsView(kind, key))
@@ -336,10 +343,13 @@ export async function giveToGuildRequest(context) {
   if (count > have) throw new ApiError(409, 'not_enough', have > 0 ? filled(errors().notEnough, { have }) : errors().notHeld);
   const room = bagRoom(asker, request.kind, request.good, now);
   if (count > room) throw new ApiError(409, 'bag_full', filled(room > 0 ? errors().askerRoom : errors().askerFull, { name: asker.row.name, room }));
-  const column = COLUMNS[request.kind];
+  // A scroll goes from one number column to the other (1061), in no
+  // Encyklopedia.
+  const scroll = request.kind === 'scroll' ? SCROLL_COLUMNS[request.good] : null;
+  const column = scroll ?? COLUMNS[request.kind];
   const key = jsonPath(request.good);
-  const adds = counted(column, { [request.good]: count });
-  const others = foreign({ [request.kind]: { [request.good]: count } });
+  const adds = scroll ? { sql: `${scroll} + ?`, binds: [count] } : counted(column, { [request.good]: count });
+  const others = foreign(scroll ? {} : { [request.kind]: { [request.good]: count } });
   // Herbs and potions only while the asker's bag is as read, with the room.
   const bag = !roomless(request.kind);
   await atomically(
@@ -350,15 +360,17 @@ export async function giveToGuildRequest(context) {
         `EXISTS (SELECT 1 FROM guild_requests WHERE id = ? AND state = 'open' AND ends_at > ? AND given + ? <= count)
          AND EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND guild_id = ?)
          AND EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND guild_id = ?)
-         AND COALESCE((SELECT json_extract(${column}, ?) FROM characters WHERE id = ?), 0) >= ?${bag ? ' AND (SELECT version FROM characters WHERE id = ?) = ?' : ''}`,
-        [request.id, now, count, row.id, guild.id, request.character_id, guild.id, key, row.id, count, ...(bag ? [asker.row.id, asker.row.version] : [])],
+         AND ${scroll ? `(SELECT ${scroll} FROM characters WHERE id = ?)` : `COALESCE((SELECT json_extract(${column}, ?) FROM characters WHERE id = ?), 0)`} >= ?${bag ? ' AND (SELECT version FROM characters WHERE id = ?) = ?' : ''}`,
+        [request.id, now, count, row.id, guild.id, request.character_id, guild.id, ...(scroll ? [] : [key]), row.id, count, ...(bag ? [asker.row.id, asker.row.version] : [])],
       ),
-      db
-        .prepare(
-          `UPDATE characters SET ${column} = CASE WHEN json_extract(${column}, ?) > ? THEN json_set(${column}, ?, json_extract(${column}, ?) - ?) ELSE json_remove(${column}, ?) END,
+      scroll
+        ? db.prepare(`UPDATE characters SET ${scroll} = ${scroll} - ?, version = version + 1 WHERE id = ?`).bind(count, row.id)
+        : db
+            .prepare(
+              `UPDATE characters SET ${column} = CASE WHEN json_extract(${column}, ?) > ? THEN json_set(${column}, ?, json_extract(${column}, ?) - ?) ELSE json_remove(${column}, ?) END,
              version = version + 1 WHERE id = ?`,
-        )
-        .bind(key, count, key, key, count, key, row.id),
+            )
+            .bind(key, count, key, key, count, key, row.id),
       db.prepare(`UPDATE characters SET ${column} = ${adds.sql}, foreign_stacks = ${others.sql}, version = version + 1 WHERE id = ?`).bind(...adds.binds, ...others.binds, request.character_id),
       db
         .prepare(

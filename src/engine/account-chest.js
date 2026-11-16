@@ -15,7 +15,7 @@
 // The kinds of goods, in the order the chest shows them (as the screen
 // shows the character's own: the camp's resources, potions, herbs,
 // materials, minerals). Gold stays with the character.
-export const CHEST_GOODS = ['resource', 'potion', 'herb', 'material', 'mineral'];
+export const CHEST_GOODS = ['resource', 'potion', 'herb', 'material', 'mineral', 'scroll'];
 
 // Of `count` pieces leaving a stack of `held`, `traded` of which were got
 // from others, how many are such: the own pieces go first, as when an order

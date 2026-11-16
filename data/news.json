@@ -1100,6 +1100,7 @@
       "id": "0.3.77",
       "title": "Wersja 0.3.77",
       "body": "- W Skrzyni Konta można sortować to, co wkładasz: przedmioty z plecaka tak jak w Plecaku, a towary po kolejności, liczbie albo nazwie."
-    }
+    },
+    {"id": "0.3.79", "title": "Wersja 0.3.79", "body": "- Zwoje są towarem jak inne: Zwój ochronny, Zwój utrwalenia i Zwój Niepamięci wystawisz na Targowisku (nowa zakładka „Zwoje”), dasz w Wymianie, włożysz do Skrzyni Konta i poprosisz o nie gildię."}
   ]
 }

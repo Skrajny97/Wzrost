@@ -1832,7 +1832,12 @@
     "removeBackground": false,
     "prompts": {
       "mining": "highly detailed crisp pixel art scene, fine pixel detail: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands and feet, seen from the side facing right, swinging a pickaxe into a rough dark rock wall of a mine tunnel with bright gold ore veins and small sparkling gems, sparks flying at the point of impact, a small heap of broken stones at its feet, a lantern hanging from a wooden beam with warm glow, wooden mine supports, dark cave, the whole figure and the wall inside the frame",
-      "jewelcrafting": "highly detailed crisp pixel art scene, fine pixel detail: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands, seen from the side facing right, standing at a small wooden jeweller's workbench and pressing a shining gem against a round grinding wheel, bright sparks flying from the wheel, a gold ring, tools and a few small coloured gems on the bench, dark stone brick wall with an arch behind, the whole figure and the bench inside the frame"
+      "jewelcrafting": "highly detailed crisp pixel art scene, fine pixel detail: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands, seen from the side facing right, standing at a small wooden jeweller's workbench and pressing a shining gem against a round grinding wheel, bright sparks flying from the wheel, a gold ring, tools and a few small coloured gems on the bench, dark stone brick wall with an arch behind, the whole figure and the bench inside the frame",
+      "fishing": "highly detailed crisp pixel art scene, fine pixel detail: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands, seen from the side facing right, sitting at the end of a small wooden pier and holding a fishing rod over a misty forest pond at dawn, the line going down to a red and white float on the still water, lily pads and reeds, a wicker basket with a fish tail beside the figure, willow branches hanging above, the whole figure and the pier inside the frame",
+      "farming": "highly detailed crisp pixel art scene, fine pixel detail: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands, seen from the side facing right, standing in a small field and hoeing a bed of dark soil with an iron hoe, rows of young green sprouts and a low wooden fence behind, an old scarecrow in the distance, soft morning light, the whole figure and the bed inside the frame",
+      "cooking": "highly detailed crisp pixel art scene, fine pixel detail: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands, seen from the side facing right, standing at a big black cauldron hanging over a low fire in an old village kitchen and stirring the soup with a long wooden ladle, steam rising, a wooden table with vegetables and a fish beside it, strings of onions and garlic hanging from the beams, warm firelight, the whole figure and the cauldron inside the frame",
+      "farming-water": {"tool": "inpaint", "input": "art/references/scenes/farming-hd.png", "mask": "art/inputs/scenes/farming-water-mask.png", "prompt": "pixel art, the same small hooded figure in a dark navy robe now holding a grey metal watering can by its handle with both glowing ice-blue hands in front of itself, the can tilted forward so its long thin spout points down to the right and a thin stream of water drops pours from the spout onto the green seedlings in the dark soil bed, no hoe, the dark soil bed and the seedlings around, the same fine pixel art style, dark outline, colours and shading as the rest of the picture"},
+      "farming-water-fix": {"tool": "inpaint", "input": "art/references/scenes/farming-water.png", "mask": "art/inputs/scenes/farming-water-fix-mask.png", "prompt": "pixel art, the lower half of a grey metal watering can held in front of a small hooded figure, the can's round bottom closed by a dark outline, the dark navy robe hanging behind and below the can down to the soil, the dark soil bed beside it, the same fine pixel art style, dark outline, colours and shading as the rest of the picture"}
     },
     "pixellab": {
       "references": {
@@ -1846,6 +1851,24 @@
           {
             "path": "art/references/scenes/jewelcrafting-start-x2.png",
             "usage": "this exact scene redrawn at double resolution: the same composition and camera, the same figure in the same pose and place, the same colours, light and objects; only finer pixel detail"
+          }
+        ],
+        "fishing": [
+          {
+            "path": "art/references/scenes/mining-hd-a.png",
+            "usage": "the same small hooded figure: its dark navy cloak, its glowing ice-blue face and hands, its size in the frame and the fine pixel style; only the work and the place are new"
+          }
+        ],
+        "farming": [
+          {
+            "path": "art/references/scenes/mining-hd-a.png",
+            "usage": "the same small hooded figure: its dark navy cloak, its glowing ice-blue face and hands, its size in the frame and the fine pixel style; only the work and the place are new"
+          }
+        ],
+        "cooking": [
+          {
+            "path": "art/references/scenes/mining-hd-a.png",
+            "usage": "the same small hooded figure: its dark navy cloak, its glowing ice-blue face and hands, its size in the frame and the fine pixel style; only the work and the place are new"
           }
         ]
       }

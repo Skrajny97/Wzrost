@@ -11,7 +11,7 @@
 // sheet wherever the player is, once nothing else is on the screen
 // (offerTrade), and waits in the Społeczność too (tradeBanner).
 
-import { goldArt, herbSprite, mineralSprite, potionSprite, resourceArt } from '../art.js';
+import { goldArt, herbSprite, mineralSprite, potionSprite, resourceArt, scrollArt } from '../art.js';
 import { liveTrade, tradeSeen } from '../chat-news.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
@@ -115,6 +115,8 @@ const stacksOf = (offer) => [
   ...(offer.materials ?? []).map((stack) => ({ ...stack, name: materialTitle(stack), material: true })),
   ...(offer.minerals ?? []).map((stack) => ({ ...stack, mineral: true })),
   ...(offer.resources ?? []).map((stack) => ({ ...stack, resource: true })),
+  // The scrolls (1061).
+  ...(offer.scrolls ?? []).map((stack) => ({ ...stack, scroll: true })),
 ];
 
 // What an offer holds, in words: "120 złota, Amulet Dębu, Żywokost ×5".
@@ -313,6 +315,8 @@ export function mountTrade(container, { backHash }) {
   function stackEntry(stack, mine) {
     const art = stack.material
       ? materialIcon(stack.materialId, 20)
+      : stack.scroll
+        ? scrollArt(stack.id, 20)
       : stack.resource
         ? resourceArt(stack.id, 20)
         : stack.mineral
@@ -324,7 +328,7 @@ export function mountTrade(container, { backHash }) {
       h('span', { class: 'potion-pick-art' }, art),
       h('span', { class: 'trade-stack-name', text: stack.name }),
       h('span', { class: 'trade-stack-count', text: `×${formatNumber(stack.count)}` }),
-      !mine && !stack.herb && !stack.material && !stack.mineral && !stack.resource && !stack.known && h('p', { class: 'region-warning trade-note', text: t('Nie znasz jej receptury, więc jej nie użyjesz.') }),
+      !mine && !stack.herb && !stack.material && !stack.mineral && !stack.resource && !stack.scroll && !stack.known && h('p', { class: 'region-warning trade-note', text: t('Nie znasz jej receptury, więc jej nie użyjesz.') }),
     );
   }
 
@@ -375,6 +379,8 @@ export function mountTrade(container, { backHash }) {
     const owned = (character.crafting?.materials ?? []).map((material) => ({ id: material.key, name: materialTitle(material), count: material.count, materialId: material.materialId }));
     const materials = stackFields(owned, 'material', (entry) => materialIcon(entry.materialId, 20));
     const minerals = stackFields(character.minerals ?? [], 'mineral', (entry) => mineralSprite(entry.id) ?? icon('ore', { size: 20 }));
+    // The scrolls the character holds (1061).
+    const scrolls = stackFields(character.scrollGoods ?? [], 'scroll', (entry) => scrollArt(entry.id, 20));
     // The camp's resources the character has, by gold (state.js).
     const stores = walletEntries(character)
       .filter((entry) => entry.id !== 'gold' && entry.amount > 0)
@@ -411,7 +417,7 @@ export function mountTrade(container, { backHash }) {
       let offer;
       try {
         const kept = (fields) => Object.fromEntries(fields.map((entry) => [entry.id, entry.read()]).filter(([, value]) => value > 0));
-        offer = { gold: gold.read(), resources: kept(resources), items: [...picked], herbs: kept(herbs), potions: kept(potions), materials: kept(materials), minerals: kept(minerals) };
+        offer = { gold: gold.read(), resources: kept(resources), items: [...picked], herbs: kept(herbs), potions: kept(potions), materials: kept(materials), minerals: kept(minerals), scrolls: kept(scrolls) };
       } catch (error) {
         toast(error.message);
         return;
@@ -440,6 +446,7 @@ export function mountTrade(container, { backHash }) {
       potions.length > 0 && section(t('Mikstury'), potions.map((entry) => entry.element)),
       materials.length > 0 && section(t('Materiały'), materials.map((entry) => entry.element)),
       minerals.length > 0 && section(t('Minerały'), minerals.map((entry) => entry.element)),
+      scrolls.length > 0 && section(t('Zwoje'), scrolls.map((entry) => entry.element)),
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }), button(t('Zapisz ofertę'), 'system', save)),
     );
   }

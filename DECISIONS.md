@@ -3580,6 +3580,28 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.79 (16.11.2026): zwoje na Targowisku, w Wymianie i w Skrzyni Konta
+
+1. Zwój ochronny, Zwój utrwalenia i Zwój Niepamięci można wystawiać na Targowisku, wymieniać w Wymianie, wkładać do Skrzyni Konta i prosić o nie w Prośbach Gildii (makiety 1012.1–1012.5 przyjęte). Zob. „Zwoje jako towar”.
+2. Rybołówstwo (1057) jest gotowe, ale czeka na Rolnictwo i Gotowanie. Autor, 16.11.2026: „nie wdrażaj Rybołówstwa bez reszty nowych Profesji”.
+
+## Zwoje jako towar (1061; 16.11.2026)
+
+Autor: „zrób tak żeby zwoje tez można było wystawiać na sprzedaż, wymieniać i wszystko na targowisku i wszędzie” (16.11.2026).
+
+1. **Które zwoje.** Zwój ochronny i Zwój utrwalenia (Kowadło) oraz Zwój Niepamięci (Statystyki). Nazwa i opis Zwoju Niepamięci są teraz w danych (`hermit.scroll` w `data/settlement.json`), obok zwojów Kowadła w `data/professions.json`.
+2. **Gdzie.** Wszędzie tam, gdzie gracze przekazują sobie towary:
+    - na Targowisku: wystawianie, licytacja, „Kup teraz”, zwrot niesprzedanych i odbiór paczek; nowa zakładka rodzaju „Zwoje”;
+    - w Wymianie: osobna część „Zwoje” w ofercie;
+    - w Skrzyni Konta: grupa „Zwoje” w towarach;
+    - w Prośbach Gildii: zakładka „Zwoje”, a w niej wszystkie trzy zwoje, także te, których postać nie ma.
+3. **Brakujące szczegóły (najprościej):**
+    - Złomiarz nie kupuje zwojów, więc przy zwoju nie ma ceny złomiarza.
+    - Zwoje nie zajmują miejsca w plecaku i nie trafiają do Encyklopedii, jak zasoby obozu.
+    - Pustelnik dalej sprzedaje Zwój Niepamięci tylko postaci bez żadnego zwoju; zwój kupiony od innych graczy nie zmienia tej zasady.
+4. **Wygląd.** Na telefonie zakładki rodzajów towaru na Targowisku stoją w dwóch rzędach (4 i 3), na komputerze w jednym rzędzie siedmiu.
+5. **Kod.** Każdy zwój leży w swojej kolumnie liczbowej postaci (`scrolls`, `steady_scrolls`, `oblivion_scrolls`), a nie w kolumnie JSON jak zioła, więc Targowisko, Wymiana, Skrzynia Konta i Prośby Gildii przenoszą go przez `src/server/scroll-goods.js`. Widok postaci ma listę `scrollGoods` z nazwami. Testy: `test/scroll-goods.test.js`.
+
 ## Wersja 0.3.78 (16.11.2026): kod PC dla jeszcze jednej postaci
 
 Autor: „Przygotuj możliwość używania starego kodu PC dla gracza … – jednorazowo” (imię postaci tylko w czacie, bo repozytorium jest publiczne). Kod PC (60 Punktów Czasu za zaangażowanie) działa teraz także dla tej jednej postaci, raz, do 30.11.2026 włącznie (`pc-2026-11-16-a`; w danych skrót SHA-256 imienia małymi literami, jak przy innych kodach dla jednej postaci). Brakujący szczegół, termin: dwa tygodnie, jak przy wcześniejszych kodach PC. Kod nie trafia do „Co nowego?”, bo jest dla jednej postaci; autor przekazuje go sam.

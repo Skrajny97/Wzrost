@@ -242,7 +242,8 @@
     "statsFromLevel": 21,
     "statsGoldPerLevel": 100,
     "relationGain": 10,
-    "timePoints": { "gold": 3000, "daily": 30 }
+    "timePoints": { "gold": 3000, "daily": 30 },
+    "scroll": { "id": "oblivion-scroll", "name": "Zwój Niepamięci", "description": "Zwój Systemu. W Statystykach zeruje rozdane punkty statystyk, by rozdać je od nowa." }
   },
   "stable": {
     "resident": "groom",
@@ -586,7 +587,7 @@
     "brotherhood": "merchants",
     "minRaise": 0.05,
     "maxPrice": 100000000,
-    "kinds": ["item", "herb", "potion", "material", "part", "mineral"],
+    "kinds": ["item", "herb", "potion", "material", "part", "mineral", "scroll"],
     "reputation": { "goldPerPointPerLevel": 5, "daily": 10 },
     "merchant": {
       "goods": { "herb": 2, "material": 2, "part": 2 },

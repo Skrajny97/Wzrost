@@ -150,6 +150,7 @@ import { takenBefore, trialProgress } from './guild-trials.js';
 import { partyOf, partyRemoval } from './parties.js';
 import { anvilDiscountOf } from './perks.js';
 import { bagHerbs, bagMinerals, bagPotions, herbsOf, potionsOf, professionsView, settlementPointsOf } from './professions-view.js';
+import { scrollById, scrollsOf } from './scroll-goods.js';
 import { OWN_CHARACTERS } from './roles.js';
 import { requirePlayable } from './sessions.js';
 import { tradeBlockOf, tradesEnded } from './trades.js';
@@ -1766,6 +1767,9 @@ export function characterView(player, now) {
     // The Zwoje ochronne made in the Warsztat for the Kowadło.
     scrolls: row.scrolls,
     steadyScrolls: row.steady_scrolls ?? 0,
+    // Every scroll it holds as goods (1061): for the Targowisko, the
+    // Wymiana, the Skrzynia Konta and the Prośby Gildii.
+    scrollGoods: Object.entries(scrollsOf(row)).map(([id, count]) => ({ id, name: scrollById(id).name, description: scrollById(id).description, count })),
     // The creatures met in fights, by id: the others are shadows on the
     // lists of an inner region's dangers.
     met: JSON.parse(row.met ?? '[]'),

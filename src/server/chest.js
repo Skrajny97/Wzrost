@@ -24,6 +24,7 @@ import { content } from './content.js';
 import { withoutFavorites } from './favorites.js';
 import { ApiError, json, readJson } from './http.js';
 import { counted, foreign, takenOff } from './market.js';
+import { SCROLL_COLUMNS, scrollGoods, scrollHeld } from './scroll-goods.js';
 
 const slots = () => content().balance.account.chestSlots;
 
@@ -38,7 +39,7 @@ const changed = () => new ApiError(409, 'character_changed', 'Coś zmieniło si�
 
 // The data's list of a kind of goods; materials are stacks of a material
 // and a rarity instead (knownStack).
-const listOf = (kind) => ({ resource: content().resources, potion: content().potions, herb: content().herbs, mineral: content().minerals })[kind] ?? [];
+const listOf = (kind) => ({ resource: content().resources, potion: content().potions, herb: content().herbs, mineral: content().minerals, scroll: scrollGoods() })[kind] ?? [];
 
 // A good as the chest shows it, or null for one the data does not know: its
 // name in the request's language, as the character's own lists name it (a
@@ -195,8 +196,9 @@ function askedGoods(body) {
   return { kind, id, count, column: COLUMNS[kind] };
 }
 
-// The pieces of a good the character holds, as its row keeps them.
-const heldOf = (row, column, id) => JSON.parse(row[column] ?? '{}')[id] ?? 0;
+// The pieces of a good the character holds, as its row keeps them: a
+// scroll in a number column of its own (scroll-goods.js, 1061).
+const heldOf = (row, column, id) => (column ? (JSON.parse(row[column] ?? '{}')[id] ?? 0) : scrollHeld(row, id));
 
 // POST /api/chest/goods/put { kind, id, count }: pieces of the character's
 // goods into the chest, any number of them. Those it had got from others
@@ -210,19 +212,26 @@ export async function putGoodsInChest(context) {
   const { kind, id, count, column } = askedGoods(await readJson(context.request));
   const held = heldOf(row, column, id);
   if (count > held) throw new ApiError(409, 'not_enough', held > 0 ? 'Nie masz tylu.' : 'Nie masz tego towaru.');
-  // The camp's resources are in no Encyklopedia, so none is kept for them.
-  const traded = kind === 'resource' ? 0 : tradedLeaving(JSON.parse(row.foreign_stacks ?? '{}')[`${kind}:${id}`] ?? 0, held, count);
-  const off = takenOff(column, { [id]: count });
+  // The camp's resources and the scrolls are in no Encyklopedia, so none is
+  // kept for them.
+  const traded = kind === 'resource' || kind === 'scroll' ? 0 : tradedLeaving(JSON.parse(row.foreign_stacks ?? '{}')[`${kind}:${id}`] ?? 0, held, count);
   const db = context.env.DB;
+  // A scroll leaves its own number column (1061).
+  const scroll = kind === 'scroll' ? SCROLL_COLUMNS[id] : null;
+  const off = scroll ? null : takenOff(column, { [id]: count });
   await atomically(db, [
-    assertion(db, `(SELECT version FROM characters WHERE id = ?) = ? AND COALESCE((SELECT json_extract(${column}, ?) FROM characters WHERE id = ?), 0) >= ?`, [
-      row.id,
-      row.version,
-      jsonPath(id),
-      row.id,
-      count,
-    ]),
-    db.prepare(`UPDATE characters SET ${column} = ${off.sql}, version = version + 1 WHERE id = ?`).bind(...off.binds, row.id),
+    scroll
+      ? assertion(db, `(SELECT version FROM characters WHERE id = ?) = ? AND (SELECT ${scroll} FROM characters WHERE id = ?) >= ?`, [row.id, row.version, row.id, count])
+      : assertion(db, `(SELECT version FROM characters WHERE id = ?) = ? AND COALESCE((SELECT json_extract(${column}, ?) FROM characters WHERE id = ?), 0) >= ?`, [
+          row.id,
+          row.version,
+          jsonPath(id),
+          row.id,
+          count,
+        ]),
+    scroll
+      ? db.prepare(`UPDATE characters SET ${scroll} = ${scroll} - ?, version = version + 1 WHERE id = ?`).bind(count, row.id)
+      : db.prepare(`UPDATE characters SET ${column} = ${off.sql}, version = version + 1 WHERE id = ?`).bind(...off.binds, row.id),
     db
       .prepare(
         `INSERT INTO chest_goods (user_id, character_id, kind, good, count, traded) VALUES (?, ?, ?, ?, ?, ?)
@@ -269,8 +278,11 @@ export async function takeGoodsFromChest(context) {
     const room = bagRoom(player, column, id, context.now);
     if (count > room) throw new ApiError(409, 'bag_full', room > 0 ? `W plecaku zmieści się jeszcze ${room} szt.` : 'Plecak jest pełny. Zrób w nim miejsce, żeby wyjąć ten towar.');
   }
-  const gain = counted(column, { [id]: count });
-  const others = foreign(plan.foreign > 0 ? { [kind]: { [id]: plan.foreign } } : {});
+  // A scroll comes to its own number column (1061), and is in no
+  // Encyklopedia.
+  const scroll = kind === 'scroll' ? SCROLL_COLUMNS[id] : null;
+  const gain = scroll ? { sql: `${scroll} + ?`, binds: [count] } : counted(column, { [id]: count });
+  const others = foreign(plan.foreign > 0 && !scroll ? { [kind]: { [id]: plan.foreign } } : {});
   await atomically(db, [
     assertion(db, ['(SELECT version FROM characters WHERE id = ?) = ?', ...plan.takes.map(() => 'EXISTS (SELECT 1 FROM chest_goods WHERE id = ? AND user_id = ? AND count = ? AND traded = ?)')].join(' AND '), [
       row.id,
@@ -282,7 +294,7 @@ export async function takeGoodsFromChest(context) {
         ? db.prepare('DELETE FROM chest_goods WHERE id = ?').bind(take.row.id)
         : db.prepare('UPDATE chest_goods SET count = count - ?, traded = traded - ? WHERE id = ?').bind(take.count, take.traded, take.row.id),
     ),
-    db.prepare(`UPDATE characters SET ${column} = ${gain.sql}, foreign_stacks = ${others.sql}, version = version + 1 WHERE id = ?`).bind(...gain.binds, ...others.binds, row.id),
+    db.prepare(`UPDATE characters SET ${scroll ?? column} = ${gain.sql}, foreign_stacks = ${others.sql}, version = version + 1 WHERE id = ?`).bind(...gain.binds, ...others.binds, row.id),
   ], changed);
   return answer(context, session);
 }

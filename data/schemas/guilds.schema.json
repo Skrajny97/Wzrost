@@ -1589,7 +1589,8 @@
               "material",
               "herb",
               "potion",
-              "mineral"
+              "mineral",
+              "scroll"
             ]
           }
         },
@@ -1743,7 +1744,8 @@
                 "material",
                 "herb",
                 "potion",
-                "mineral"
+                "mineral",
+                "scroll"
               ],
               "properties": {
                 "material": {
@@ -1759,6 +1761,10 @@
                   "minLength": 1
                 },
                 "mineral": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "scroll": {
                   "type": "string",
                   "minLength": 1
                 }

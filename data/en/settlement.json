@@ -291,6 +291,9 @@
       }
     ]
   },
+  "hermit": {
+    "scroll": { "name": "Scroll of Oblivion", "description": "A System scroll. In the Stats it resets the stat points spent, to spend them anew." }
+  },
   "stable": {
     "mounts": {
       "pony": {
