@@ -1,0 +1,15 @@
+{
+  "id": "fishing-2",
+  "payload": {
+    "first_frame": "art/references/scenes/fishing-hd.png",
+    "action": "sitting still and holding the fishing rod steady in a smooth seamless loop: the figure slowly raises its head a little to look up, lowers the rod tip slightly toward the water, then lifts its head and the rod back to the starting pose, no swinging or waving of the rod, the line hangs straight down to the red and white float which bobs gently with small ripples, the pier, the basket, the willow, the trees and the pond stay completely still",
+    "frame_count": 8,
+    "seed": 1683765746,
+    "no_background": false
+  },
+  "usage": {
+    "type": "usd",
+    "usd": 0.025028024752934773
+  },
+  "frames": 9
+}
