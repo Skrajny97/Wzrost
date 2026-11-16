@@ -19,6 +19,10 @@ async function signUp(login = 'karol') {
   return cookie;
 }
 
+// A chapter's words of skipping, whatever else it has (its name in the
+// Samouczki, whether it may be told again: 1039).
+const skipWords = ({ skipLabel, skippedText }) => ({ skipLabel, skippedText });
+
 async function newCharacter(cookie, classId = 'warrior', name = 'Mira', appearance = 'female') {
   return call('POST', '/api/character', { cookie, body: { name, classId, appearance } });
 }
@@ -1949,7 +1953,7 @@ describe('Time Points and the narrator', () => {
     assert.deepEqual(chapter, ['skills-welcome', 'skills-intro', 'skills-paths', 'skills-card', 'skills-choice', 'skills-points', 'skills-evolution', 'skills-ending']);
     // The chapter's lines come after the introduction's ending.
     assert.ok(tutorial.lines.findIndex((line) => line.chapter) > tutorial.lines.findIndex((line) => line.id === 'ending'));
-    assert.deepEqual(tutorial.chapters.skills, { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Umiejętności czekają w zakładce Postać.' });
+    assert.deepEqual(skipWords(tutorial.chapters.skills), { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Umiejętności czekają w zakładce Postać.' });
     // Each class has its own words where the narrator speaks of the class.
     for (const id of ['skills-welcome', 'skills-paths']) {
       const line = tutorial.lines.find((candidate) => candidate.id === id);
@@ -1996,7 +2000,7 @@ describe('Time Points and the narrator', () => {
     // Its lines stand after those of the Umiejętności, which come first.
     const at = (id) => tutorial.lines.findIndex((line) => line.id === id);
     assert.ok(at('professions-welcome') > at('skills-ending'));
-    assert.deepEqual(tutorial.chapters.professions, { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Profesje czekają w zakładce Profesje.' });
+    assert.deepEqual(skipWords(tutorial.chapters.professions), { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Profesje czekają w zakładce Profesje.' });
     // The lead to the tab is not kept, and "Pomiń objaśnienie" marks only this chapter.
     await see({ skip: true });
     assert.equal((await see({ card: 'professions-lead' })).data.error.code, 'invalid_card');
@@ -2028,7 +2032,7 @@ describe('Time Points and the narrator', () => {
     assert.deepEqual(chapter, ['crafting-welcome', 'crafting-patterns', 'crafting-ending']);
     const at = (id) => tutorial.lines.findIndex((line) => line.id === id);
     assert.ok(at('crafting-welcome') > at('community-ending'));
-    assert.deepEqual(tutorial.chapters.crafting, { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Rzemieślnictwo czeka w zakładce Profesje.' });
+    assert.deepEqual(skipWords(tutorial.chapters.crafting), { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Rzemieślnictwo czeka w zakładce Profesje.' });
     const see = (body) => call('POST', '/api/tutorial', { cookie, body });
     await see({ skip: true });
     const before = (await see({ skip: true, chapter: 'skills' })).data.character.tutorial;
@@ -2070,7 +2074,7 @@ describe('Time Points and the narrator', () => {
     assert.equal(lines.at(-1).text[0], 'Wejść masz kilkanaście na dzień, nowe od północy. Wieże pomogą Ci też uzupełnić dawne wpisy Bestiariusza.');
     const at = (id) => tutorial.lines.findIndex((line) => line.id === id);
     assert.ok(at('towers-welcome') > at('evolution-ending'));
-    assert.deepEqual(tutorial.chapters.towers, { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Wieże czekają w zakładce Walka.' });
+    assert.deepEqual(skipWords(tutorial.chapters.towers), { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Wieże czekają w zakładce Walka.' });
     const chapter = lines.filter(kept).map((line) => line.id);
     const see = (body) => call('POST', '/api/tutorial', { cookie, body });
     await see({ skip: true });
@@ -2104,7 +2108,7 @@ describe('Time Points and the narrator', () => {
     assert.ok(lines.every((line) => line.voice === `audio/narration/${line.id}.mp3`));
     const at = (id) => tutorial.lines.findIndex((line) => line.id === id);
     assert.ok(at('mining-welcome') > at('towers-ending'));
-    assert.deepEqual(tutorial.chapters.mining, { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Górnictwo i Jubilerstwo czekają w zakładce Profesje.' });
+    assert.deepEqual(skipWords(tutorial.chapters.mining), { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Górnictwo i Jubilerstwo czekają w zakładce Profesje.' });
     const chapter = lines.filter(kept).map((line) => line.id);
     const see = (body) => call('POST', '/api/tutorial', { cookie, body });
     await see({ skip: true });
@@ -2138,7 +2142,7 @@ describe('Time Points and the narrator', () => {
     assert.ok(lines.every((line) => line.voice === `audio/narration/${line.id}.mp3`));
     const at = (id) => tutorial.lines.findIndex((line) => line.id === id);
     assert.ok(at('portals-welcome') > at('mining-ending'));
-    assert.deepEqual(tutorial.chapters.portals, { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Portale czekają w zakładce Walka.' });
+    assert.deepEqual(skipWords(tutorial.chapters.portals), { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Portale czekają w zakładce Walka.' });
     const chapter = lines.filter(kept).map((line) => line.id);
     const see = (body) => call('POST', '/api/tutorial', { cookie, body });
     await see({ skip: true });
@@ -2172,7 +2176,7 @@ describe('Time Points and the narrator', () => {
     assert.ok(lines.every((line) => line.voice === `audio/narration/${line.id}.mp3`));
     const at = (id) => tutorial.lines.findIndex((line) => line.id === id);
     assert.ok(at('labyrinth-welcome') > at('portals-sweep'));
-    assert.deepEqual(tutorial.chapters.labyrinth, { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Labirynt czeka w Osadzie, w Sali prób.' });
+    assert.deepEqual(skipWords(tutorial.chapters.labyrinth), { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Labirynt czeka w Osadzie, w Sali prób.' });
     const chapter = lines.filter(kept).map((line) => line.id);
     const see = (body) => call('POST', '/api/tutorial', { cookie, body });
     await see({ skip: true });
@@ -2239,7 +2243,7 @@ describe('Time Points and the narrator', () => {
     // The Gildia: its tabs first, its Wyprawa last.
     const guild = tutorial.lines.filter((one) => one.chapter === 'guild').map((one) => one.id);
     assert.deepEqual(guild, ['guild-tabs', 'guild-seat', 'guild-beast', 'guild-trials', 'guild-requests', 'guild-exchange', 'guild-expedition']);
-    assert.deepEqual(tutorial.chapters.guild, { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Gildia czeka w Społeczności, w zakładce Gildia.' });
+    assert.deepEqual(skipWords(tutorial.chapters.guild), { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Gildia czeka w Społeczności, w zakładce Gildia.' });
     assert.deepEqual(line('guild-tabs').text, ['Każda zakładka to inna wspólna sprawa gildii. Kropka przy zakładce powie Ci, że coś tam na Ciebie czeka.']);
     assert.deepEqual(line('guild-exchange').text, ['Tu wymienisz zasoby z innymi członkami gildii, także na złoto.']);
     // The other places, each the only line of its part.
