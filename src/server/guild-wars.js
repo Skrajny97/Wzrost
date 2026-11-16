@@ -7,9 +7,11 @@
 // A league lasts a week, from Monday to Sunday (Polish time). Its matches
 // are drawn once a week, at the first run of the cron (or the first look)
 // of the week, for every guild there is then, each meeting every other one
-// (the author, 16.11.2026: „niech każda gildia walczy z każdą”), from the
-// first evening whose battles have not come yet. Every evening at 20:00
-// the cron fights the matches of the evening (settleWars), and a look at
+// once (the author, 16.11.2026: „niech każda gildia walczy z każdą”, „każda
+// z każdą gildią 1v1 i 3v3 i tyle”), from the first evening whose battles
+// have not come yet; with an odd number of guilds one has each round's
+// evening free („żadnych lustrzanych gildii”). Every evening at 20:00 the
+// cron fights the matches of the evening (settleWars), and a look at
 // the tab fights any of its guild's matches owed, should the cron have
 // missed them; each match is one batch that holds only while the match is
 // unfought, so its battles are fought and their rewards given once,
@@ -31,7 +33,6 @@ import {
   leagueSchedule,
   leagueTable,
   matchFights,
-  mirrorTeam,
   nextTeamAt,
   WAR_DAYS,
   warBattle,
@@ -181,10 +182,9 @@ function fightRows(db, matchId, day, at, fights) {
 // fight from the match's seed, its log in Polish and, where English is on,
 // in English too (the same fight: its texts take no draws). Every fight won
 // brings its fighters gold, and every character who fought for the guild
-// that won the match its Punkty Systemu, once (799 A). The mirror guild (no
-// guild B) is guild A's members and trios again, under other names, and
-// its wins give nobody anything. A character whose account has one on the
-// other side too fights on neither, so nobody fights itself and takes the
+// that won the match its Punkty Systemu, once (799 A). A character whose
+// account has one on the other side too fights on neither, so nobody
+// fights itself and takes the
 // reward for free (11.11.2026): its trio is short; a side left with nobody
 // so makes the match void, counted for neither. A guild that is gone loses
 // its matches left, and two gone draw. The match's result by the balance of
@@ -194,22 +194,22 @@ async function fightMatch(db, league, match, at, now) {
   const polish = contentIn('pl');
   const english = englishOn() ? contentIn('en') : null;
   const a = await teamsOf(db, match.guild_a, teamSeed(league, match.day, match.guild_a));
-  const b = match.guild_b === null ? a && { ...a, mirror: true } : await teamsOf(db, match.guild_b, teamSeed(league, match.day, match.guild_b));
+  const b = await teamsOf(db, match.guild_b, teamSeed(league, match.day, match.guild_b));
   const fights = [];
   const gold = new Map();
   const fought = { a: new Set(), b: new Set() };
   const tally = { winsA: 0, winsB: 0, lossesA: 0, lossesB: 0, walkoversA: 0, walkoversB: 0, draws: 0 };
   let result = null;
-  if (!a || !b) result = a ? 'a' : b && !b.mirror ? 'b' : 'draw';
+  if (!a || !b) result = a ? 'a' : b ? 'b' : 'draw';
   else {
-    const fighters = new Map([...(await fightersOf(db, a.members)), ...(b.mirror ? new Map() : await fightersOf(db, b.members))]);
+    const fighters = new Map([...(await fightersOf(db, a.members)), ...(await fightersOf(db, b.members))]);
     const accounts = (side) => new Set(side.members.map((row) => row.user_id));
-    const both = b.mirror ? new Set() : new Set([...accounts(a)].filter((user) => accounts(b).has(user)));
+    const both = new Set([...accounts(a)].filter((user) => accounts(b).has(user)));
     const able = (ids) => ids.map((id) => fighters.get(id)).filter((one) => one && !both.has(one.row.user_id));
     const duelsA = able(a.members.map((row) => row.id));
-    const duelsB = b.mirror ? duelsA : able(b.members.map((row) => row.id));
+    const duelsB = able(b.members.map((row) => row.id));
     const triosA = a.lineups.map(able);
-    const triosB = b.mirror ? triosA : b.lineups.map(able);
+    const triosB = b.lineups.map(able);
     if (duelsA.length === 0 || duelsB.length === 0) result = 'void';
     else {
       for (const [number, fight] of matchFights({ duelsA: duelsA.length, duelsB: duelsB.length, triosA, triosB }, polish).entries()) {
@@ -228,10 +228,7 @@ async function fightMatch(db, league, match, at, now) {
         }
         const seed = `${match.seed}:${fight.format}:${fight.a}:${fight.b}`;
         const sideA = fight.format === '1v1' ? [duelsA[fight.a]] : triosA[fight.a];
-        const ownB = fight.format === '1v1' ? [duelsB[fight.b]] : triosB[fight.b];
-        // The mirror guild's fighters are no characters of their own: no
-        // reward goes to anyone for their wins.
-        const sideB = b.mirror ? mirrorTeam(ownB, seed, sideA.map((one) => one.name), polish).map(({ row: _, ...copy }) => copy) : ownB;
+        const sideB = fight.format === '1v1' ? [duelsB[fight.b]] : triosB[fight.b];
         const battle = warBattle({ sideA, sideB, seed }, polish);
         if (battle.result === 'a') {
           tally.winsA += 1;
@@ -242,8 +239,8 @@ async function fightMatch(db, league, match, at, now) {
         } else tally.draws += 1;
         const record = (side, list) =>
           list.map((one) => {
-            if (one.row) fought[side].add(one.row.id);
-            if (battle.result !== side || !one.row) return fighterRecord(one);
+            fought[side].add(one.row.id);
+            if (battle.result !== side) return fighterRecord(one);
             const reward = warReward(one.character.level, polish);
             gold.set(one.row.id, (gold.get(one.row.id) ?? 0) + reward.gold);
             return fighterRecord(one, { gold: reward.gold });
@@ -380,10 +377,10 @@ async function drawLeague(db, week, now, firstDay = null) {
         .bind(week.key, seed, now, JSON.stringify(guilds), Math.min(from, WAR_DAYS), matches.length === 0 ? now : null),
       ...matches.map((match, index) => {
         const one = byId.get(match.a);
-        const other = match.b === null ? null : byId.get(match.b);
+        const other = byId.get(match.b);
         return db
           .prepare('INSERT INTO guild_wars (week, day, round, guild_a, guild_b, name_a, tag_a, members_a, name_b, tag_b, members_b, seed, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-          .bind(week.key, match.day, match.round, one.id, other?.id ?? null, one.name, one.tag, one.members, other?.name ?? null, other?.tag ?? null, other?.members ?? one.members, `${seed}:${index}`, now);
+          .bind(week.key, match.day, match.round, one.id, other.id, one.name, one.tag, one.members, other.name, other.tag, other.members, `${seed}:${index}`, now);
       }),
       db.prepare('DELETE FROM guild_war_battles WHERE war_id IN (SELECT id FROM guild_wars WHERE week < ?)').bind(previous),
       db.prepare('DELETE FROM guild_wars WHERE week < ?').bind(previous),
@@ -448,18 +445,14 @@ function viewTexts(level = 1) {
   const reward = warReward(level, content());
   const famed = (count) => `${count} ${countedForm(count, texts.fameForms)}`;
   const items = (count) => `${count} ${countedForm(count, texts.itemForms)}`;
-  const [first, second, third] = war.league.prizes;
+  const [first, second] = war.league.prizes;
   const vars = {
-    size: war.teamSize,
-    max: war.maxTeams,
     hour: hourText(),
     first: famed(fame[0]),
     second: famed(fame[1]),
     third: famed(fame[2]),
     firstItems: items(first.items),
     secondItems: items(second.items),
-    secondLeast: second.least,
-    thirdLeast: third.least,
     gold: numberText(reward.gold),
     systemPoints: `${reward.systemPoints} ${countedForm(reward.systemPoints, texts.systemPointForms)}`,
   };
@@ -523,9 +516,8 @@ function battleLine(row, side, viewer) {
 }
 
 // A guild of the league as the tab shows it: its tag and name now (or as
-// drawn, for one gone), and whether it is the mirror guild.
+// drawn, for one gone).
 function guildLine(id, stored, current) {
-  if (id === null) return { id: null, tag: rules().mirror.tag, name: rules().mirror.name, mirror: true };
   const now = current.get(id);
   return { id, tag: now?.tag ?? stored?.tag ?? '', name: now?.name ?? stored?.name ?? '', gone: !now };
 }
@@ -534,10 +526,10 @@ function guildLine(id, stored, current) {
 // (each guild with its place, matches won, drawn and lost, fights won and
 // lost, walkovers too, and their balance), the guild's evenings (each with
 // its matches: the rival, and once fought the fights won and lost, by
-// format, and the result), its next evening (the rival of each match, how
-// many duels and trio fights, and the trios short of members), the fights
-// of the character who looks, and the end with the guild's place and what
-// it got; null when the guild has no part in it.
+// format, and the result; or free), its next evening (the rival of each
+// match, how many duels and trio fights, and the trios short of members),
+// the fights of the character who looks, and the end with the guild's
+// place and what it got; null when the guild has no part in it.
 async function leagueView(db, guild, ours, league, week, viewer, now) {
   if (!league || !league.guilds.some((one) => one.id === guild.id)) return null;
   const { teamSize } = rules();
@@ -577,9 +569,12 @@ async function leagueView(db, guild, ours, league, week, viewer, now) {
     const trios = of('3v3');
     return { score: [won, lost], duels, trios: { ...trios, walkoversWon: Math.max(0, won - duels.won - trios.won), walkoversLost } };
   };
+  // An evening the league plays and the guild has no match is its free
+  // evening (an odd number of guilds).
   const days = Array.from({ length: WAR_DAYS }, (_, day) => ({
     day,
     at: week.battles[day],
+    free: matches.some((match) => match.day === day) && !mine.some((match) => match.day === day),
     matches: mine
       .filter((match) => match.day === day)
       .map((match) => ({ id: match.id, rival: rivalOf(match), fought: match.days_done > 0, result: outcome(match), ...(match.days_done > 0 ? tally(match) : { score: [0, 0] }) })),
@@ -597,13 +592,13 @@ async function leagueView(db, guild, ours, league, week, viewer, now) {
             .filter((match) => match.day === nextDay)
             .map((match) => {
               const rival = rivalOf(match);
-              const members = rival.mirror ? ours.members.length : rival.gone ? 0 : (now_.get(rival.id)?.members ?? 0);
-              const trios = rival.mirror ? ours.count : members === 0 ? 0 : Math.ceil(members / teamSize);
+              const members = rival.gone ? 0 : (now_.get(rival.id)?.members ?? 0);
+              const trios = members === 0 ? 0 : Math.ceil(members / teamSize);
               return {
                 rival: { ...rival, members, trios },
                 duels: ours.members.length * members,
                 trioFights: ours.count * trios,
-                short: { ours: short(ours.lineups), theirs: rival.mirror ? short(ours.lineups) : members % teamSize !== 0 },
+                short: { ours: short(ours.lineups), theirs: members % teamSize !== 0 },
               };
             }),
         };
@@ -642,8 +637,9 @@ async function leagueView(db, guild, ours, league, week, viewer, now) {
 }
 
 // Why the guild has no part in this week's league: the week not drawn yet,
-// or the guild made after the draw.
-const noLeagueReason = (league) => (league ? 'late' : 'notYet');
+// the league with no matches (fewer than two guilds, or drawn after
+// Sunday's battles), or the guild made after the draw.
+const noLeagueReason = (league) => (!league ? 'notYet' : league.guilds.length === 0 ? 'empty' : 'late');
 
 // The tab for a member of `guild`: its trios for its next evening, as the
 // game draws them (each with its members, by place; the members its last
@@ -721,8 +717,7 @@ export async function getGuildWarBattle(context) {
   if (!row?.log) throw missing();
   const side = row.guild_a === guild.id ? 'a' : 'b';
   const { _fighters, ...line } = battleLine(row, side, player.row);
-  const mirror = row.guild_b === null;
-  const tags = { a: row.tag_a, b: mirror ? rules().mirror.tag : row.tag_b };
+  const tags = { a: row.tag_a, b: row.tag_b };
   const fight = warFightFor(await unpack(language() === 'en' && row.log_en ? row.log_en : row.log), side);
   return json({
     battle: {

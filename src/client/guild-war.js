@@ -1,10 +1,11 @@
 // The Wojna tab of the Gildia's page (src/server/guild-wars.js): the
 // week's league of the wars (the author, 16.11.2026: „niech każda gildia
-// walczy z każdą”, „drużyny niech losuje samo”), on the Arena's picture in
-// the look of the mock-ups 792 v2: the guild's banner and its next rival's
-// (the Siedziba's Sztandar, the rival's turned and dyed red) with the
-// guild's place in the league between them, and the evenings of the week,
-// each with its result and its rival's tag; the next evening at 20:00 with
+// walczy z każdą”, „drużyny niech losuje samo”, „każda z każdą gildią 1v1 i
+// 3v3 i tyle”), on the Arena's picture in the look of the mock-ups 996 v3:
+// the guild's banner and its next rival's (the Siedziba's Sztandar, the
+// rival's turned and dyed red) with the guild's place in the league
+// between them, and the evenings of the week, each with its result and its
+// rival's tag, or "wolne"; the next evening at 20:00 with
 // the time left, its rival, how often each team fights and the teams the
 // game drew for it, the character's own lit; the league's table; the
 // battles fought, each to watch as the Arena's fights (arena.js); the end
@@ -263,8 +264,8 @@ export function mountGuildWar(container) {
   }
 
   // The week: a tile for each evening, its result in battles won and lost
-  // and the rival's tag; today's with crossed swords while its battles are
-  // to come.
+  // and the rival's tag, or "wolne" on the guild's free evening; today's
+  // with crossed swords while its battles are to come.
   function weekTiles() {
     const { league, week } = view;
     const words = texts();
@@ -283,7 +284,7 @@ export function mountGuildWar(container) {
           kind = results.every((one) => one === 'win') ? 'win' : results.every((one) => one === 'loss') ? 'loss' : 'even';
           score = signed(balance);
         } else if (day.day === week.today && league.next?.day === day.day) kind = 'today';
-        const rival = match ? day.matches.map((one) => one.rival.tag).join(' ') : '';
+        const rival = match ? day.matches.map((one) => one.rival.tag).join(' ') : day.free ? words.free : '';
         return h(
           'div',
           { class: `war-day war-day--${kind}`, role: 'listitem', 'aria-label': `${words.days[day.day]}: ${rival} ${score}`.trim() },
@@ -332,8 +333,8 @@ export function mountGuildWar(container) {
     ];
   }
 
-  // A match of the next evening: its rival (and the mirror guild's words),
-  // its duels and trio fights, and the trios short of members.
+  // A match of the next evening: its rival, its duels and trio fights, and
+  // the trios short of members.
   function matchLine(match) {
     const words = texts();
     const missing = view.teams.next === null ? 0 : view.teams.next - view.teams.members;
@@ -341,11 +342,10 @@ export function mountGuildWar(container) {
       'div',
       { class: 'war-match' },
       h('p', { class: 'war-match-rival' }, h('span', { class: 'war-match-label', text: words.rivalLabel }), tagOf(match.rival, true), h('span', { class: 'war-match-name', text: match.rival.name })),
-      match.rival.mirror && h('p', { class: 'muted', text: words.mirrorNote }),
       h('p', { class: 'war-clock-note', text: filled(words.duelsLine, { count: counted(match.duels, words.duelForms) }) }),
       h('p', { class: 'war-clock-note', text: filled(words.triosLine, { count: counted(match.trioFights, words.fightForms) }) }),
       match.short.ours && missing > 0 && h('p', { class: 'war-warn', text: filled(words.shortOurs, { missing: counted(missing, words.missingForms) }) }),
-      match.short.theirs && !match.rival.mirror && h('p', { class: 'muted', text: words.shortTheirs }),
+      match.short.theirs && h('p', { class: 'muted', text: words.shortTheirs }),
     );
   }
 
@@ -447,6 +447,21 @@ export function mountGuildWar(container) {
         h('p', { class: 'muted war-table-note', text: words.tableNote }),
       ),
     ];
+  }
+
+  // The guild's matches all played before the league's end on Sunday.
+  function donePart() {
+    return h(
+      'section',
+      { class: 'card war-today' },
+      h(
+        'div',
+        { class: 'pvp-arena-plaque war-plaque' },
+        icon('hourglass', { size: 30, className: 'pvp-arena-plaque-icon' }),
+        // The hour kept on the line of the word before it ("o\u00a020:00").
+        h('div', { class: 'pvp-arena-plaque-text' }, h('p', { class: 'war-clock-note', text: filled(texts().doneAll.replace(/ \{hour\}/g, '\u00a0{hour}'), { hour: view.hour }) })),
+      ),
+    );
   }
 
   // The league's end: the guild's place and what it brought.
@@ -698,8 +713,8 @@ export function mountGuildWar(container) {
     if (!league) return [noLeague(), teamsPart(), nextTeamPart(), howItWorks(null, texts().how), testPart()];
     return [
       hero(),
-      league.next ? eveningPart() : league.end ? endPart() : null,
-      !league.end && teamsPart(),
+      league.next ? eveningPart() : league.end ? endPart() : donePart(),
+      league.next && teamsPart(),
       tablePart(),
       eveningsPart(),
       recentPart(),

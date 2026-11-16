@@ -2238,7 +2238,6 @@
         "backdrop",
         "fightBoard",
         "banner",
-        "mirror",
         "texts"
       ],
       "properties": {
@@ -2376,25 +2375,6 @@
           "type": "string",
           "minLength": 1
         },
-        "mirror": {
-          "description": "Lustrzana gildia: rywal gildii bez rywala z ligi w rundzie przy nieparzystej liczbie gildii; nazwa i skrót.",
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "name",
-            "tag"
-          ],
-          "properties": {
-            "name": {
-              "type": "string",
-              "minLength": 1
-            },
-            "tag": {
-              "type": "string",
-              "minLength": 1
-            }
-          }
-        },
         "texts": {
           "type": "object",
           "additionalProperties": false,
@@ -2447,7 +2427,6 @@
             "limitDraw",
             "errors",
             "rivalLabel",
-            "mirrorNote",
             "teamsFor",
             "drawnNote",
             "tableTitle",
@@ -2469,6 +2448,8 @@
             "matchLine",
             "walkoversLine",
             "voidLine",
+            "free",
+            "doneAll",
             "versusDuel",
             "versusTrio"
           ],
@@ -2776,7 +2757,8 @@
               "additionalProperties": false,
               "required": [
                 "late",
-                "notYet"
+                "notYet",
+                "empty"
               ],
               "properties": {
                 "late": {
@@ -2784,6 +2766,10 @@
                   "minLength": 1
                 },
                 "notYet": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "empty": {
                   "type": "string",
                   "minLength": 1
                 }
@@ -2847,10 +2833,6 @@
               }
             },
             "rivalLabel": {
-              "type": "string",
-              "minLength": 1
-            },
-            "mirrorNote": {
               "type": "string",
               "minLength": 1
             },
@@ -3024,6 +3006,16 @@
               ]
             },
             "voidLine": {
+              "type": "string",
+              "minLength": 1
+            },
+            "free": {
+              "description": "Kafelek wieczoru, w którym gildia nie ma meczu (nieparzysta liczba gildii).",
+              "type": "string",
+              "minLength": 1
+            },
+            "doneAll": {
+              "description": "Gdy gildia rozegrała już wszystkie mecze ligi, a liga jeszcze się nie skończyła; {hour}.",
               "type": "string",
               "minLength": 1
             },

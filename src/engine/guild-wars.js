@@ -8,9 +8,10 @@
 // drużyn liczony jako porażka”, „Liczony łączny bilans wygranych i porażek
 // (w tym walkowerów)”): a week, Monday to Sunday, with an evening's matches
 // at battleHour on the Polish clock (794 A); every guild meets every other
-// one, in rounds drawn at random, again from the first once the rounds run
-// out, whatever its number of members, and the one with no rival of the
-// league in a round meets the mirror guild. In a match every member of one
+// one once, in rounds drawn at random, whatever its number of members, and
+// with an odd number of guilds one has each round's evening free (the
+// author, 16.11.2026: „żadnych lustrzanych gildii”, „każda z każdą gildią
+// 1v1 i 3v3 i tyle”). In a match every member of one
 // guild duels every member of the other (1v1), and every trio of one, drawn
 // by the game, fights every trio of the other (3v3); a trio the guild has
 // too few members to fill loses its fights by walkover. A fight is as at
@@ -127,8 +128,8 @@ export function warDrawnTeams(members, seed, content) {
 // The rounds of a league of `count` guilds, each meeting every other once
 // (the circle method): `count` - 1 rounds, or `count` when it is odd, each
 // a list of pairs of the guilds' places (from 0); in a league of an odd
-// count, the place `count` is nobody's, and the guild drawn with it meets
-// the mirror guild.
+// count, the place `count` is nobody's, and the guild drawn with it has
+// the round free.
 /**
  * @param {number} count
  * @returns {[number, number][][]}
@@ -148,20 +149,19 @@ export function leagueRounds(count) {
 }
 
 // The matches of a week's league (the author, 16.11.2026: „niech każda
-// gildia walczy z każdą”): the guilds (`ids`) in an order the seed
-// shuffles, their rounds (leagueRounds) on the evenings from `firstDay` to
-// Sunday, a round an evening, again from the first round once they run out;
-// with more rounds than evenings, the rounds left go to the evenings again
-// from the first, so every guild meets every other. A match: its evening
-// (`day`, 0 Monday … 6 Sunday), its round of the week (from 0, one for
-// each evening and more for the rounds beyond them), and its guilds, `b`
-// null for the mirror guild. `order`, the guilds in the drawn order, as
-// the table breaks its last ties.
+// gildia walczy z każdą”, „każda z każdą gildią 1v1 i 3v3 i tyle”): the
+// guilds (`ids`) in an order the seed shuffles, every one meeting every
+// other once, their rounds (leagueRounds) a round an evening from
+// `firstDay`; with more rounds than evenings, the rounds left go to the
+// evenings again from the first. A guild with no rival in a round has that
+// evening free: no match. A match: its evening (`day`, 0 Monday … 6
+// Sunday), its round of the week (from 0) and its guilds. `order`, the
+// guilds in the drawn order, as the table breaks its last ties.
 /**
  * @param {number[]} ids
  * @param {string | number} seed
  * @param {number} firstDay
- * @returns {{ order: number[], matches: { day: number, round: number, a: number, b: number | null }[] }}
+ * @returns {{ order: number[], matches: { day: number, round: number, a: number, b: number }[] }}
  */
 export function leagueSchedule(ids, seed, firstDay) {
   const rng = createRng(`guild-league:${seed}`);
@@ -172,23 +172,17 @@ export function leagueSchedule(ids, seed, firstDay) {
   }
   const rounds = leagueRounds(order.length);
   const evenings = Math.max(0, WAR_DAYS - firstDay);
-  /** @type {{ day: number, round: number, a: number, b: number | null }[]} */
+  /** @type {{ day: number, round: number, a: number, b: number }[]} */
   const matches = [];
-  if (rounds.length === 0 || evenings === 0) return { order, matches };
-  const played = Math.max(evenings, rounds.length);
-  for (let round = 0; round < played; round++) {
+  if (evenings === 0) return { order, matches };
+  rounds.forEach((pairs, round) => {
     const day = firstDay + (round % evenings);
-    // A round's pairs swap sides from cycle to cycle, so the rematch has
-    // the other guild at the bottom of its playback.
-    const swap = Math.floor(round / rounds.length) % 2 === 1;
-    for (const [one, other] of rounds[round % rounds.length]) {
-      const [a, b] = swap ? [other, one] : [one, other];
-      const guildA = order[a] ?? null;
-      const guildB = order[b] ?? null;
-      if (guildA === null) matches.push({ day, round, a: /** @type {number} */ (guildB), b: null });
-      else matches.push({ day, round, a: guildA, b: guildB });
+    for (const [a, b] of pairs) {
+      // The place no guild has: its rival's evening is free.
+      if (order[a] === undefined || order[b] === undefined) continue;
+      matches.push({ day, round, a: order[a], b: order[b] });
     }
-  }
+  });
   matches.sort((x, y) => x.day - y.day || x.round - y.round);
   return { order, matches };
 }
@@ -199,24 +193,24 @@ export function leagueSchedule(ids, seed, firstDay) {
 // lossesA, lossesB, result }, those fought), won, drawn and lost, and its
 // fights won and lost in them, walkovers too; the best first: by the
 // balance of the fights, then by the fights won, then in the drawn order.
-// A match with the mirror guild counts as any other; a void one for nobody.
+// A void match counts for nobody.
 /** @typedef {{ id: number, place: number, played: number, won: number, drawn: number, lost: number, fightsWon: number, fightsLost: number, balance: number }} LeagueRow A guild's row in the table. */
 /**
  * @param {number[]} order
- * @param {{ a: number, b: number | null, winsA: number, winsB: number, lossesA: number, lossesB: number, result: string | null }[]} matches
+ * @param {{ a: number, b: number, winsA: number, winsB: number, lossesA: number, lossesB: number, result: string | null }[]} matches
  * @returns {LeagueRow[]}
  */
 export function leagueTable(order, matches) {
   /** @type {Map<number, LeagueRow>} */
   const rows = new Map(order.map((id) => [id, { id, place: 0, played: 0, won: 0, drawn: 0, lost: 0, fightsWon: 0, fightsLost: 0, balance: 0 }]));
   /**
-   * @param {number | null} id
+   * @param {number} id
    * @param {number} won
    * @param {number} lost
    * @param {'win' | 'loss' | 'draw'} outcome
    */
   const count = (id, won, lost, outcome) => {
-    const row = id === null ? undefined : rows.get(id);
+    const row = rows.get(id);
     if (!row) return;
     row.played += 1;
     row.fightsWon += won;
@@ -414,31 +408,4 @@ export function warChest({ fighters, teams, seed }, content) {
     items.push(randomItem(one.level, rng, content, /** @type {any} */ ({ classId: one.classId, maxClassLevel: one.classLevel, rarityId: championItemRarity(one.level, rng, content) })));
   }
   return items;
-}
-
-// The mirror guild (DECISIONS.md, "Wojny gildii na wersji testowej" and
-// "Liga wojen gildii"), the rival of a guild with none in a round of an
-// odd league: one of its teams fights as one team of the guild it meets,
-// its characters as they are saved, each under another name, one of
-// the Karczma's names of its look (settlement.companions.names) that no
-// fighter of the battle has (`taken`), drawn with `seed`.
-/**
- * @template {Fighter} F
- * @param {F[]} fighters
- * @param {string | number} seed
- * @param {string[]} taken
- * @param {Content} content
- * @returns {F[]}
- */
-export function mirrorTeam(fighters, seed, taken, content) {
-  const rng = createRng(`guild-war-mirror:${seed}`);
-  const used = new Set(taken);
-  return fighters.map((fighter) => {
-    /** @type {string[]} */
-    const pool = content.settlement.companions.names[fighter.character.appearance === 'female' ? 'female' : 'male'];
-    const free = pool.filter((name) => !used.has(name));
-    const name = free.length > 0 ? rng.pick(free) : `${fighter.name} II`;
-    used.add(name);
-    return { ...fighter, name };
-  });
 }
