@@ -1014,6 +1014,11 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
         view.types.map((type) => filter(type.id, type.name)),
         effects.slots > 0 && filter('effects', effects.texts.tab),
       ),
+      // The effect cards the character has, to choose under "Wszystkie" too,
+      // over the creatures (the author, 16.11.2026: „Niech karty efektów
+      // będą do wybrania jeśli są dostępne przy samym budowaniu talii, bo
+      // trzeba zaznaczać ich filtr by je dodać”).
+      shown === 'all' && effects.slots > 0 && effects.owned.length > 0 && effectsToChoose(effects),
       shown !== 'effects' && sortRow(),
       shown === 'effects' ? effectsToChoose(effects) : h(
         'div',
