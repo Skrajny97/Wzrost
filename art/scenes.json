@@ -42,6 +42,21 @@
       "start": "art/references/scenes/jewelcrafting-hd-b.png",
       "description": "a small hooded figure with a glowing ice-blue face grinding a gem at a jeweller's bench",
       "action": "pressing the gem against the spinning grinding wheel in a smooth seamless loop: both glowing hands stay on the gem at the wheel the whole time, the wheel turns, bright sparks fly from the wheel in every frame, the figure barely moves, the bench with its ring, tools and gems and the stone wall stay still"
+    },
+    "fishing": {
+      "start": "art/references/scenes/fishing-hd.png",
+      "description": "a small hooded figure with a glowing ice-blue face fishing from a wooden pier at a misty pond",
+      "action": "holding the fishing rod over the water in a smooth seamless loop: the rod tip dips a little and the figure gently lifts it, the red and white float bobs on the water with small ripples spreading from it, the willow branches sway a little in the breeze, the pier, the basket and the pond stay still"
+    },
+    "farming": {
+      "start": "art/references/scenes/farming-hd.png",
+      "description": "a small hooded figure with a glowing ice-blue face hoeing a bed of soil in a field",
+      "action": "hoeing the soil in a smooth seamless loop: raising the hoe and bringing it down into the bed, small clods of dark soil fly at each stroke, the grass moves a little in the breeze, the fence and the scarecrow stay still"
+    },
+    "cooking": {
+      "start": "art/references/scenes/cooking-hd.png",
+      "description": "a small hooded figure with a glowing ice-blue face stirring soup in a black cauldron in a village kitchen",
+      "action": "stirring the soup with the long wooden ladle in a smooth seamless loop: the ladle circles in the cauldron, the soup bubbles and steam rises from it in every frame, the fire under the cauldron flickers, the table, the hanging onions and the kitchen stay still"
     }
   }
 }
