@@ -546,8 +546,13 @@ async function main() {
         await check(`${screen} › ${named}`, null, TRANSLATED.has(screen));
       }
       if (FOLDS[screen]) {
-        // Each one opened leaves the selector, so always the first closed one.
-        for (let left = await view.locator(FOLDS[screen]).count(); left > 0; left -= 1) await view.locator(FOLDS[screen]).first().click();
+        // Each one opened leaves the selector, so always the first closed one;
+        // one under the bars fixed over a short phone's page is tapped as a
+        // script would, as the tabs are.
+        for (let left = await view.locator(FOLDS[screen]).count(); left > 0; left -= 1) {
+          const fold = view.locator(FOLDS[screen]).first();
+          await fold.click({ timeout: 3000 }).catch(() => fold.evaluate((element) => element.click()));
+        }
         await view.waitForTimeout(500);
         await check(`${screen} › otwarte`, null, TRANSLATED.has(screen));
       }
