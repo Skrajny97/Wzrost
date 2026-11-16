@@ -32,7 +32,7 @@ import { enterTower, getTowers } from './towers.js';
 import { enterPortal, getPortals, sweepAllPortals, sweepPortal } from './portals.js';
 import { chooseLabyrinthBlessing, enterLabyrinth, getLabyrinth, labyrinthMerchant, resetLabyrinthDay } from './labyrinth.js';
 import { absorbArtifact, breakArtifact, dissolveArtifact, getCore, upgradeArtifact } from './core.js';
-import { acceptGuildInvite, cancelGuildInvite, declineGuildInvite, foundGuild, getGuild, handGuildLead, inviteToGuild, kickFromGuild, leaveGuild, setGuildRole } from './guilds.js';
+import { acceptGuildInvite, cancelGuildInvite, declineGuildInvite, foundGuild, getGuild, handGuildLead, inviteToGuild, kickFromGuild, leaveGuild, promoteGuildNovice, setGuildRole } from './guilds.js';
 import { attackGuildBeast, claimGuildBeastChest, getGuildBeast } from './guild-beast.js';
 import { attackGuildGuardian, claimGuildExpeditionChest, getGuildExpedition } from './guild-expedition.js';
 import { claimGuildTrialChest, dropGuildTrial, getGuildTrials, openGuildTrials, takeGuildTrial } from './guild-trials.js';
@@ -435,6 +435,7 @@ const routes = [
   ['POST', '/api/guild/leave', leaveGuild],
   ['POST', '/api/guild/kick', kickFromGuild],
   ['POST', '/api/guild/role', setGuildRole],
+  ['POST', '/api/guild/promote', promoteGuildNovice],
   ['POST', '/api/guild/lead', handGuildLead],
   // The Ranking członków of the Gildia tab (guild-members.js, 897 A).
   ['GET', '/api/guild/ranking', getGuildRanking],

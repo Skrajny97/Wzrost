@@ -25,7 +25,7 @@ import { chestReleased, chestsGone, lastLeavesEmpty, lastLeavesEmptyError } from
 import { offersReturned, settleOffers } from './guild-exchange.js';
 import { championFrom, championOf, championStatement } from './guild-fame.js';
 import { ApiError, json, readJson } from './http.js';
-import { runInLanguage, t } from './i18n.js';
+import { language, runInLanguage, t } from './i18n.js';
 import { joinGuildTrials } from './guild-trials.js';
 import { beastJoin } from './guild-beast.js';
 import { OWN_CHARACTERS } from './roles.js';
@@ -51,11 +51,12 @@ async function requireGuildPlayer(context) {
   return found;
 }
 
-// The guild a character is in: its id, name, tag and the character's role,
-// or null. A membership whose guild is gone goes too.
+// The guild a character is in: its id, name, tag, the character's role and
+// till when it is the guild's Nowicjusz (`probationUntil`, ms, or null;
+// noviceIn), or null. A membership whose guild is gone goes too.
 export async function guildOf(db, characterId) {
   const row = await db
-    .prepare('SELECT m.guild_id, m.role, g.name, g.tag FROM guild_members m LEFT JOIN guilds g ON g.id = m.guild_id WHERE m.character_id = ?')
+    .prepare('SELECT m.guild_id, m.role, m.probation_until, g.name, g.tag FROM guild_members m LEFT JOIN guilds g ON g.id = m.guild_id WHERE m.character_id = ?')
     .bind(characterId)
     .first();
   if (!row) return null;
@@ -63,7 +64,30 @@ export async function guildOf(db, characterId) {
     await db.prepare('DELETE FROM guild_members WHERE character_id = ? AND guild_id = ?').bind(characterId, row.guild_id).run();
     return null;
   }
-  return { id: row.guild_id, name: row.name, tag: row.tag, role: row.role };
+  return { id: row.guild_id, name: row.name, tag: row.tag, role: row.role, probationUntil: row.probation_until ?? null };
+}
+
+// The ranks of a guild's members (1062; data/guilds.json `ranks`): R4 the
+// leader, R3 a deputy, R2 a member and R1 a member still a Nowicjusz, for
+// its first days in the guild (`probationDays`) or until the leader or a
+// deputy makes it a member. A Nowicjusz takes from the Skrzynia Gildii only
+// the items left for it and its own (guild-chest.js).
+// (Declared as functions: guild-chest.js, which this module imports, uses
+// them too.)
+export function noviceIn(membership, now) {
+  return membership?.role === 'member' && (membership.probationUntil ?? 0) > now;
+}
+export function rankOf(membership, now) {
+  if (noviceIn(membership, now)) return 'novice';
+  return Object.hasOwn(ROLES, membership.role) ? membership.role : 'member';
+}
+
+// The end of a Nowicjusz's days, Polish time, as the request's language
+// writes it: "19.11, 14:30" (as the end of a silence, chat.js).
+const untilOptions = { timeZone: 'Europe/Warsaw', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' };
+const untilFormats = { pl: new Intl.DateTimeFormat('pl-PL', untilOptions), en: new Intl.DateTimeFormat('en-GB', untilOptions) };
+export function noviceDay(ms) {
+  return (untilFormats[language()] ?? untilFormats.pl).format(new Date(ms));
 }
 
 // The Gildia for the page: the guild with its members (the leader first,
@@ -83,7 +107,7 @@ export async function guildView(db, characterId, now) {
   const [members, sent, invites, friends, best] = await db.batch([
     db
       .prepare(
-        `SELECT c.id, c.name, c.class_id, c.level, c.role AS played, c.cosmetics, m.role, u.seen_at
+        `SELECT c.id, c.name, c.class_id, c.level, c.role AS played, c.cosmetics, m.role, m.probation_until, u.seen_at
          FROM guild_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id
          WHERE m.guild_id = ? ORDER BY CASE m.role WHEN 'leader' THEN 0 WHEN 'deputy' THEN 1 ELSE 2 END, m.joined_at, m.character_id`,
       )
@@ -111,7 +135,11 @@ export async function guildView(db, characterId, now) {
   ]);
   const { onlineSeconds } = content().community.trade;
   const online = (row) => row.played === 'player' && (row.seen_at ?? 0) >= now - onlineSeconds * 1000;
-  const { found, size, name, tag } = rules();
+  const { found, size, name, tag, ranks } = rules();
+  const rankView = (membership) => {
+    const rank = rankOf(membership, now);
+    return { rank, rankShort: ranks.short[rank], rankName: ranks.names[rank], ...(rank === 'novice' && { noviceUntil: membership.probationUntil, noviceUntilText: ranks.until.replace('{date}', noviceDay(membership.probationUntil)) }) };
+  };
   return {
     guild: guild && {
       id: guild.id,
@@ -119,6 +147,9 @@ export async function guildView(db, characterId, now) {
       tag: guild.tag,
       size,
       role: guild.role,
+      // The character's own rank, and the ranks' rule under the members.
+      ...rankView(guild),
+      ranksRule: ranks.rule.replace('{days}', String(ranks.probationDays)),
       // After how many days away a leader hands the guild to a deputy.
       leaderAwayDays: rules().leaderAway.days,
       champion: championFrom(best.results[0])?.id === guild.id,
@@ -131,6 +162,7 @@ export async function guildView(db, characterId, now) {
         level: row.level,
         role: row.role,
         roleName: t(ROLES[row.role] ?? ROLES.member),
+        ...rankView({ role: row.role, probationUntil: row.probation_until }),
         own: row.id === characterId,
         online: online(row),
       })),
@@ -414,10 +446,10 @@ export async function acceptGuildInvite(context) {
     [joined] = await db.batch([
       db
         .prepare(
-          `INSERT INTO guild_members (character_id, guild_id, role, joined_at)
-           SELECT ?, ?, 'member', ? WHERE EXISTS (SELECT 1 FROM guilds WHERE id = ?) AND (SELECT COUNT(*) FROM guild_members WHERE guild_id = ?) < ?`,
+          `INSERT INTO guild_members (character_id, guild_id, role, joined_at, probation_until)
+           SELECT ?, ?, 'member', ?, ? WHERE EXISTS (SELECT 1 FROM guilds WHERE id = ?) AND (SELECT COUNT(*) FROM guild_members WHERE guild_id = ?) < ?`,
         )
-        .bind(player.row.id, invite.guild_id, context.now, invite.guild_id, invite.guild_id, rules().size),
+        .bind(player.row.id, invite.guild_id, context.now, context.now + rules().ranks.probationDays * DAY, invite.guild_id, invite.guild_id, rules().size),
       weekJoin(db, 'guild_trial_boards', invite.guild_id, player.row.id, context.now),
       // The Wyprawa Gildii's route of the week counts it in part too: its
       // next stages take more minutes and its next guardians more HP.
@@ -481,7 +513,7 @@ export function guildRemoval(db, characters, binds, now) {
     db.prepare(`DELETE FROM guild_members WHERE character_id IN (${characters})`).bind(...binds),
     db.prepare(`DELETE FROM guild_invites WHERE character_id IN (${characters}) OR invited_by IN (${characters})`).bind(...binds, ...binds),
     db.prepare(
-      `UPDATE guild_members SET role = 'leader' WHERE character_id IN (
+      `UPDATE guild_members SET role = 'leader', probation_until = NULL WHERE character_id IN (
          SELECT (SELECT n.character_id FROM guild_members n WHERE n.guild_id = g.guild_id
                  ORDER BY CASE n.role WHEN 'deputy' THEN 0 ELSE 1 END, n.joined_at, n.character_id LIMIT 1)
          FROM guild_members g GROUP BY g.guild_id HAVING SUM(g.role = 'leader') = 0)`,
@@ -515,7 +547,7 @@ export async function leaveGuild(context) {
 async function memberOf(db, guild, body) {
   if (!Number.isInteger(body.characterId)) throw new ApiError(400, 'invalid_character', 'Nie ma takiej postaci.');
   const member = await db
-    .prepare('SELECT m.character_id, m.role, c.name FROM guild_members m JOIN characters c ON c.id = m.character_id WHERE m.guild_id = ? AND m.character_id = ?')
+    .prepare('SELECT m.character_id, m.role, m.probation_until, c.name FROM guild_members m JOIN characters c ON c.id = m.character_id WHERE m.guild_id = ? AND m.character_id = ?')
     .bind(guild.id, body.characterId)
     .first();
   if (!member) throw new ApiError(404, 'no_member', 'Tej postaci nie ma w gildii.');
@@ -565,11 +597,32 @@ export async function setGuildRole(context) {
         [player.row.id, ['leader']],
         [member.character_id, [member.role]],
       ]),
-      db.prepare("UPDATE guild_members SET role = ? WHERE guild_id = ? AND character_id = ? AND role != 'leader'").bind(body.role, guild.id, member.character_id),
+      db.prepare("UPDATE guild_members SET role = ?, probation_until = NULL WHERE guild_id = ? AND character_id = ? AND role != 'leader'").bind(body.role, guild.id, member.character_id),
     ],
     guildChanged,
   );
   return answer(db, player.row.id, context.now, { text: body.role === 'deputy' ? t('{name} jest teraz zastępcą.', { name: member.name }) : t('{name} jest teraz członkiem.', { name: member.name }) });
+}
+
+// POST /api/guild/promote { characterId }: the leader or a deputy makes a
+// Nowicjusz (R1) a member (R2) before its days are over (1062).
+export async function promoteGuildNovice(context) {
+  const { player } = await requireGuildPlayer(context);
+  const db = context.env.DB;
+  const body = await readJson(context.request);
+  const guild = await ownGuild(db, player.row.id, ['leader', 'deputy']);
+  const member = await memberOf(db, guild, body);
+  const { ranks } = rules();
+  if (!noviceIn({ role: member.role, probationUntil: member.probation_until }, context.now)) throw new ApiError(409, 'not_novice', ranks.notNovice);
+  await atomically(
+    db,
+    [
+      stillAsRead(db, guild.id, [[player.row.id, [guild.role]]]),
+      db.prepare("UPDATE guild_members SET probation_until = NULL WHERE guild_id = ? AND character_id = ? AND role = 'member'").bind(guild.id, member.character_id),
+    ],
+    guildChanged,
+  );
+  return answer(db, player.row.id, context.now, { text: ranks.promoted.replace('{name}', member.name) });
 }
 
 // POST /api/guild/lead { characterId }: the leader hands the lead over and
@@ -589,7 +642,7 @@ export async function handGuildLead(context) {
       [member.character_id, [member.role]],
     ]),
     db.prepare("UPDATE guild_members SET role = 'deputy' WHERE guild_id = ? AND character_id = ? AND role = 'leader'").bind(guild.id, player.row.id),
-    db.prepare("UPDATE guild_members SET role = 'leader' WHERE guild_id = ? AND character_id = ? AND EXISTS (SELECT 1 FROM guild_members WHERE guild_id = ? AND character_id = ? AND role = 'deputy')").bind(guild.id, member.character_id, guild.id, player.row.id),
+    db.prepare("UPDATE guild_members SET role = 'leader', probation_until = NULL WHERE guild_id = ? AND character_id = ? AND EXISTS (SELECT 1 FROM guild_members WHERE guild_id = ? AND character_id = ? AND role = 'deputy')").bind(guild.id, member.character_id, guild.id, player.row.id),
   ], guildChanged);
   return answer(db, player.row.id, context.now, { text: t('{name} prowadzi teraz gildię.', { name: member.name }) });
 }

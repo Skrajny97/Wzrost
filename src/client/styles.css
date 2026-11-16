@@ -8196,6 +8196,12 @@ a.camp-level-button {
   margin-bottom: 8px;
 }
 
+/* The lines under the members' list (the ranks' rule, the leader away)
+   apart from each other (1062). */
+.guild-members > p {
+  margin: 10px 0 0;
+}
+
 .chat-blocked summary {
   cursor: pointer;
   font-family: var(--font-world);
@@ -11763,6 +11769,7 @@ button.farm-plot {
 
 .friend-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
 }
 
@@ -15548,6 +15555,40 @@ button.tcard-slot {
 .party-invite {
   margin: 0;
   flex: 1 1 auto;
+}
+
+/* A guild member's rank by its name (1062; screens/guild.js): R4 and R3 in
+   the leader's gold, as the party leader's mark, R2 in the System's blue
+   (the author, 1017.2: „niech członek bedzie tak podświetlony a nie
+   nowicjusz”), and R1, the Nowicjusz, quiet, with the day its days end. */
+.guild-rank {
+  flex: none;
+  padding: 1px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.guild-rank--leader,
+.guild-rank--deputy {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.guild-rank--member {
+  border-color: var(--system-line);
+  color: var(--system);
+}
+
+.guild-rank-until {
+  flex: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 .party-leave {

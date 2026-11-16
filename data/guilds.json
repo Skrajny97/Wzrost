@@ -516,7 +516,7 @@
       "intro": "Zostaw przedmiot w skrzyni, a ktoś z gildii weźmie go, gdy zajrzy. Nie musicie grać w tym samym czasie.",
       "how": [
         "Włóż przedmiot z plecaka dla wszystkich albo dla jednej postaci z gildii. Założonego przedmiotu nie włożysz.",
-        "Przedmiot dla wszystkich weźmie każdy członek gildii. Przedmiot dla jednej postaci weźmie tylko ona, a dopóki czeka, możesz go zabrać z powrotem.",
+        "Przedmiot dla wszystkich weźmie każdy członek gildii poza nowicjuszami (R1). Przedmiot dla jednej postaci weźmie tylko ona, a dopóki czeka, możesz go zabrać z powrotem.",
         "Skrzynia mieści {capacity}. Żeby wziąć przedmiot, potrzebujesz miejsca w plecaku.",
         "Wkładać i brać przedmioty można od {level}. poziomu postaci, jak w Wymianie. Swój przedmiot zabierzesz z powrotem także wcześniej.",
         "Przedmiot zachowuje ulepszenie, kamień, rzadkość i Tier. Encyklopedia nie zaliczy przedmiotu od innej postaci.",
@@ -530,6 +530,8 @@
       "empty": "Skrzynia jest pusta. Włóż do niej przedmiot z plecaka.",
       "from": "Od: {name}",
       "forAll": "Dla wszystkich",
+      "novice": "Jako nowicjusz (R1) bierzesz tylko przedmioty zostawione dla Ciebie. Przedmioty dla wszystkich weźmiesz od {date}.",
+      "noviceTake": "Weźmiesz od {date}",
       "forOne": "Dla: {name}",
       "forYou": "Dla Ciebie",
       "take": "Weź",
@@ -567,6 +569,7 @@
         "self": "Przedmiot dla siebie zostaw w plecaku.",
         "gone": "Tego przedmiotu nie ma już w skrzyni.",
         "notYours": "Ten przedmiot czeka na postać {name}.",
+        "novice": "Nowicjusz (R1) bierze ze skrzyni tylko przedmioty zostawione dla niego. Przedmioty dla wszystkich weźmiesz od {date}.",
         "bagFull": "Plecak jest pełny. Zrób w nim miejsce, żeby wziąć przedmiot.",
         "leave": "W Skrzyni Gildii zostały przedmioty. Weź je, zanim wyjdziesz: bez Ciebie gildia zniknie razem ze skrzynią.",
         "changed": "Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz.",
@@ -746,6 +749,17 @@
     "howWar": "Liga wojen gildii: Sława za miejsce gildii w lidze tygodnia, po równo dla wszystkich, którzy walczyli w jej meczach.",
     "earlier": "Wcześniejsze wpłaty, zanim gra zaczęła zapisywać, kto wpłacił: {amounts}.",
     "list": { "comma": ", ", "and": " i " }
+  },
+  "ranks": {
+    "$comment": "Rangi członków gildii (1062; propozycja gracza, którą autor przekazał 16.11.2026 słowami „kolejna mądra rzecz”): R4 to lider, R3 zastępca, R2 członek, a R1 nowicjusz. Postać, która dołącza do gildii, jest nowicjuszem przez probationDays dni albo do awansu przez lidera lub zastępcę. Nowicjusz bierze ze Skrzyni Gildii tylko przedmioty zostawione dla niego i swoje, więc nowa osoba nie wyniesie wspólnych rzeczy i nie odejdzie. short: znaczek rangi przy imieniu; names: nazwa rangi; {days} i {date} wypełnia gra.",
+    "probationDays": 3,
+    "short": { "leader": "R4", "deputy": "R3", "member": "R2", "novice": "R1" },
+    "names": { "leader": "Lider", "deputy": "Zastępca", "member": "Członek", "novice": "Nowicjusz" },
+    "rule": "Rangi: R4 lider, R3 zastępcy, R2 członkowie, R1 nowicjusze. Nowa postać w gildii przez pierwsze {days} dni jest nowicjuszem: ze Skrzyni Gildii bierze tylko przedmioty zostawione dla niej. Lider i zastępcy mogą ją awansować wcześniej.",
+    "until": "do {date}",
+    "promote": "Na członka",
+    "promoted": "{name} jest teraz członkiem.",
+    "notNovice": "Ta postać jest już członkiem."
   },
   "leaderAway": {
     "$comment": "Lider, który nie zagląda do gry swoją postacią przez tyle dni, oddaje gildię zastępcy, który grał ostatnio w tych dniach, i sam zostaje zastępcą (autor, 14.11.2026: „Spraw by 4-dniowa nieobecność Lidera Gildii przekazywała dowodzenie jednemu z zastępców, a samemu Liderowi nadawała rolę Zastępcy”). Sprawdzane, gdy ktoś z gildii otworzy jej stronę; bez obecnego zastępcy nic się nie zmienia.",

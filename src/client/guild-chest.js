@@ -79,7 +79,9 @@ export function mountGuildChest(container) {
   // so too.
   function takePart(item, { closing = false } = {}) {
     const { texts } = view;
-    if (!item.canTake) return h('p', { class: 'guild-stash-waits', text: filled(texts.waitsFor, { name: item.forName }) });
+    // Not this character's to take: the member it waits for, or for a
+    // Nowicjusz (1062) an item for all, from the day its days end.
+    if (!item.canTake) return h('p', { class: 'guild-stash-waits', text: item.forName === null && view.novice ? view.novice.take : filled(texts.waitsFor, { name: item.forName }) });
     return h('button', {
       type: 'button',
       class: 'button button--system button--small',
@@ -130,6 +132,7 @@ export function mountGuildChest(container) {
         waiting > 0 && h('p', { class: 'guild-stash-waiting', text: filled(texts.forMe, { count: formatNumber(waiting) }) }),
         bagFull && h('p', { class: 'muted', text: texts.bagFull }),
         view.locked && h('p', { class: 'muted', text: texts.level }),
+        view.novice && h('p', { class: 'muted', text: view.novice.note }),
       ),
     );
   }

@@ -431,7 +431,7 @@
       "intro": "Leave an item in the chest, and someone from the guild takes it when they look in. You do not have to play at the same time.",
       "how": [
         "Put an item from your bag in for everyone or for one character of the guild. A worn item cannot go in.",
-        "An item for everyone can be taken by any guild member. An item for one character can be taken only by them, and while it waits, you can take it back.",
+        "An item for everyone can be taken by any guild member except novices (R1). An item for one character can be taken only by them, and while it waits, you can take it back.",
         "The chest holds {capacity}. To take an item, you need room in your bag.",
         "Items go in and come out from character level {level}, as in the Exchange. You can take your own item back before that too.",
         "An item keeps its upgrade, gem, rarity and Tier. The Encyclopedia does not count an item from another character.",
@@ -445,6 +445,8 @@
       "empty": "The chest is empty. Put an item from your bag in it.",
       "from": "From: {name}",
       "forAll": "For everyone",
+      "novice": "As a novice (R1) you take only the items left for you. Items for everyone are yours to take from {date}.",
+      "noviceTake": "Yours from {date}",
       "forOne": "For: {name}",
       "forYou": "For you",
       "take": "Take",
@@ -482,6 +484,7 @@
         "self": "Keep an item for yourself in your bag.",
         "gone": "This item is no longer in the chest.",
         "notYours": "This item is waiting for {name}.",
+        "novice": "A novice (R1) takes from the chest only the items left for them. Items for everyone are yours to take from {date}.",
         "bagFull": "The bag is full. Make room in it to take the item.",
         "leave": "There are items left in the Guild Chest. Take them before you leave: without you, the guild disappears along with the chest.",
         "changed": "Something changed in the meantime. Try once more.",
@@ -633,5 +636,14 @@
     "howWar": "Guild war league: Fame for the guild's place in the week's league, shared equally by everyone who fought in its matches.",
     "earlier": "Earlier donations, from before the game recorded who gave them: {amounts}.",
     "list": { "comma": ", ", "and": " and " }
+  },
+  "ranks": {
+    "short": { "leader": "R4", "deputy": "R3", "member": "R2", "novice": "R1" },
+    "names": { "leader": "Leader", "deputy": "Deputy", "member": "Member", "novice": "Novice" },
+    "rule": "Ranks: R4 the leader, R3 deputies, R2 members, R1 novices. A character new to the guild is a novice for its first {days} days: from the Guild Chest it takes only the items left for it. The leader and the deputies can promote it sooner.",
+    "until": "until {date}",
+    "promote": "Make member",
+    "promoted": "{name} is now a member.",
+    "notNovice": "This character is a member already."
   }
 }

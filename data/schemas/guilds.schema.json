@@ -19,11 +19,49 @@
     "war",
     "fame",
     "members",
-    "leaderAway"
+    "leaderAway",
+    "ranks"
   ],
   "properties": {
     "$comment": {
       "type": "string"
+    },
+    "ranks": {
+      "description": "Rangi członków (1062): R4 lider, R3 zastępca, R2 członek, R1 nowicjusz; nowicjusz przez probationDays dni od dołączenia albo do awansu (guilds.js, guild-chest.js).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["probationDays", "short", "names", "rule", "until", "promote", "promoted", "notNovice"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "probationDays": { "type": "integer", "minimum": 1 },
+        "short": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["leader", "deputy", "member", "novice"],
+          "properties": {
+            "leader": { "type": "string", "minLength": 1 },
+            "deputy": { "type": "string", "minLength": 1 },
+            "member": { "type": "string", "minLength": 1 },
+            "novice": { "type": "string", "minLength": 1 }
+          }
+        },
+        "names": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["leader", "deputy", "member", "novice"],
+          "properties": {
+            "leader": { "type": "string", "minLength": 1 },
+            "deputy": { "type": "string", "minLength": 1 },
+            "member": { "type": "string", "minLength": 1 },
+            "novice": { "type": "string", "minLength": 1 }
+          }
+        },
+        "rule": { "type": "string", "minLength": 1 },
+        "until": { "type": "string", "minLength": 1 },
+        "promote": { "type": "string", "minLength": 1 },
+        "promoted": { "type": "string", "minLength": 1 },
+        "notNovice": { "type": "string", "minLength": 1 }
+      }
     },
     "leaderAway": {
       "description": "Nieobecność lidera: po tylu dniach bez gry jego postacią gildię przejmuje zastępca, który grał ostatnio (guilds.js).",
@@ -304,6 +342,8 @@
             "empty",
             "from",
             "forAll",
+            "novice",
+            "noviceTake",
             "forOne",
             "forYou",
             "take",
@@ -385,6 +425,14 @@
               "minLength": 1
             },
             "forAll": {
+              "type": "string",
+              "minLength": 1
+            },
+            "novice": {
+              "type": "string",
+              "minLength": 1
+            },
+            "noviceTake": {
               "type": "string",
               "minLength": 1
             },
@@ -498,6 +546,7 @@
                 "self",
                 "gone",
                 "notYours",
+                "novice",
                 "bagFull",
                 "leave",
                 "changed",
@@ -542,6 +591,10 @@
                   "minLength": 1
                 },
                 "notYours": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "novice": {
                   "type": "string",
                   "minLength": 1
                 },
