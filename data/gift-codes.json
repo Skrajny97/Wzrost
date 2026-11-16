@@ -86,6 +86,13 @@
       "rewards": { "timePoints": 60 }
     },
     {
+      "id": "pc-2026-11-16-a",
+      "code": "PC",
+      "for": "aaec646522c5b8ce57d3928fe358a819ae8ed6ee350c3e0dd2ca5f5995937191",
+      "until": "2026-12-01T00:00:00+01:00",
+      "rewards": { "timePoints": 60 }
+    },
+    {
       "id": "coffee-2026-11-a",
       "code": "KAWA50",
       "for": "8cb1a49cf463b32920ab8b48938b19d73b6d04c18d156f2518a94ef00f6658e4",
