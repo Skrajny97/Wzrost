@@ -1,0 +1,14 @@
+{
+  "id": "poppy",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a red poppy flower and two green poppy seed heads on stems, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023277632733874853
+  },
+  "images": 1
+}

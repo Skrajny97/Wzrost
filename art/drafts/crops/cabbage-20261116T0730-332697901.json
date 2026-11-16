@@ -1,0 +1,14 @@
+{
+  "id": "cabbage",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a round green head of cabbage with its outer leaves curling, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023173217316097682
+  },
+  "images": 1
+}

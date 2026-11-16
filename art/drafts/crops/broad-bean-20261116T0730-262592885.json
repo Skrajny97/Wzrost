@@ -1,0 +1,14 @@
+{
+  "id": "broad-bean",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a fat green broad bean pod split open showing big pale green beans, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023180902351167466
+  },
+  "images": 1
+}

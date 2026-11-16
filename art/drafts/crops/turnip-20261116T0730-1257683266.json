@@ -1,0 +1,14 @@
+{
+  "id": "turnip",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a turnip with a round white and purple root and a tuft of green leaves, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023100534495671593
+  },
+  "images": 1
+}

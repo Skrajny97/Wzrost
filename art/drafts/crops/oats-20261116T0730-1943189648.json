@@ -1,0 +1,14 @@
+{
+  "id": "oats",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small sheaf of pale golden oat stalks with dangling oat grains, tied with twine, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02332211333317227
+  },
+  "images": 1
+}

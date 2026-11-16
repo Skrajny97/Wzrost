@@ -1,0 +1,14 @@
+{
+  "id": "giant-turnip",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a huge round turnip with a big white and purple root and large green leaves, much bigger than a normal turnip, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023200656614727446
+  },
+  "images": 1
+}

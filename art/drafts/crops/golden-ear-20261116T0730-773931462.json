@@ -1,0 +1,14 @@
+{
+  "id": "golden-ear",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a single glowing golden ear of grain with sparkles of warm light around it, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023134513867060346
+  },
+  "images": 1
+}

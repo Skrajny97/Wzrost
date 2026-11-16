@@ -1,0 +1,14 @@
+{
+  "id": "onion",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a golden brown onion with papery skin and a short green sprout, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02316033060752021
+  },
+  "images": 1
+}

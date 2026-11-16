@@ -1,0 +1,14 @@
+{
+  "id": "wheat",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a sheaf of golden wheat ears tied with twine, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02340405010477702
+  },
+  "images": 1
+}

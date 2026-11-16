@@ -1,0 +1,14 @@
+{
+  "id": "pumpkin",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a big round orange pumpkin with a curly green stem, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023186017223358158
+  },
+  "images": 1
+}

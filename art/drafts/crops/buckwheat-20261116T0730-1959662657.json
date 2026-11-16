@@ -1,0 +1,14 @@
+{
+  "id": "buckwheat",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "buckwheat stalks with small white-pink flowers and dark triangular seeds, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023205061659706965
+  },
+  "images": 1
+}

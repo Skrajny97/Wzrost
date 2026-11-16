@@ -1,0 +1,14 @@
+{
+  "id": "rye",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a sheaf of grey-green rye stalks with long bearded ears, tied with straw, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02308322038904826
+  },
+  "images": 1
+}

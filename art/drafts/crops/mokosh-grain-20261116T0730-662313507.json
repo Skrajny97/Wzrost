@@ -1,0 +1,14 @@
+{
+  "id": "mokosh-grain",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small handful of glowing amber grains on a folded embroidered linen cloth, a faint green magical light, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023226790724224518
+  },
+  "images": 1
+}

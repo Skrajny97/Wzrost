@@ -1,0 +1,14 @@
+{
+  "id": "carrot",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "two orange carrots with feathery green tops, single inventory item icon",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02319754884974162
+  },
+  "images": 1
+}
