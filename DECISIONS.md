@@ -3580,6 +3580,18 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.4.3 (16.11.2026): Samouczki w Ustawieniach, Rdzeń w Parametrach dodatkowych
+
+1. **Rdzeń w „Parametrach dodatkowych”.** Autor: „statystyki z rdzenia nie sumują się w parametrach dodatkowych postaci”. Liczby okna już liczyły premie Rdzenia (pancerz, oceny uniku, krytyka i woli, szybkość, odporności i odzysk HP: `combatant.js`), ale rozpiska pod nimi go nie wymieniała, więc składniki nie dawały sumy. Teraz przy każdej takiej liczbie stoi „Rdzeń +X%”, a przy odzysku HP „Rdzeń +X pkt proc.” (`extraValues` w `src/engine/preview.js`, `src/client/screens/stats.js`; test w `test/engine.test.js`).
+2. **Samouczki (1039.1, przyjęte).** Gracz przez autora: „przydałoby się aby można było wrócić do objaśnień narratora w dowolnym momencie”. Autor: „jak dziennik w formie tekstowej … w ustawieniach Samouczki”.
+   - W Ustawieniach pod „Dziennik” jest „Samouczki” (`#/samouczki`, `src/client/screens/tutorials.js`).
+   - To objaśnienia narratora tekstem, po częściach (nazwy w `data/tutorial.json`: `introTitle` i `chapters.<id>.title`). Przy każdej kwestii jest ▶ do odsłuchu jej nagrania. Polecenia w rodzaju „Stuknij…” i pierwsza karta autora są pominięte.
+   - Widać części, do których postać doszła, także pominięte. Postać sprzed wprowadzenia narratora nie słyszała żadnej, więc widzi wszystkie.
+3. **„Objaśnij jeszcze raz” (1039.2 B).** Pod częścią, której warunki nie zależą od stanu gry do cofnięcia (`chapters.<id>.replay`: Profesje, Społeczność, Rzemieślnictwo, Osada, Wieże, Górnictwo i Jubilerstwo, Portale, Labirynt, Gildia, Drużyna, Trudna wyprawa, Skrzynia Konta), po potwierdzeniu jej kwestie stają się nieprzeczytane (`POST /api/tutorial/replay`), a narrator objaśnia ją od początku, gdy przyjdzie jej moment.
+   - Bez przycisku zostają: Umiejętności (wymagałyby zapomnienia wybranych umiejętności), Ewolucja (tylko przed wyborem ewolucji), Warownia i Kamień węgielny (zależą od stanu obozu), Porażka (pierwszy raport z porażki) i Wprowadzenie (nowa postać).
+   - Przycisku nie ma też przy włączonym „Pomijaj objaśnienia narratora” ani dla postaci sprzed wprowadzenia. Test w `test/game.test.js`.
+4. **Kolejność czatu (1039.3) odrzucona.** Autor: „niech będzie można je po prostu slideować te zakładki na czacie”. Zamiast okna w Ustawieniach zakładki czatu będzie się przesuwać palcem w samym czacie, a makiety trafią na stronę ocen.
+
 ## Wersja 0.4.2 (16.11.2026): nagroda za kolejne dni gry, opis wolnego wieczoru ligi
 
 1. **Nagroda za kolejne dni gry (1029, makiety 1034.1–1034.3 przyjęte, 1034.4 B).** Okno otwiera się samo przy pierwszym wejściu do gry w danym dniu, gdy na ekranie nie ma innego okna ani komunikatu, po wprowadzeniu narratora. Zamknięte bez odbioru wraca przy kolejnym wejściu tego dnia (`offerStreak` w `src/client/daily-streak.js`).

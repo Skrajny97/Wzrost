@@ -968,6 +968,10 @@
     "0.4.2": {
       "title": "Version 0.4.2",
       "body": "- Reward for days in a row: at your first visit of the day you take that day's reward. Each next day gives more gold and Time Points, and day 7 brings a pack of cards and 5 System Points. A missed day starts the series anew. One series per account.\n- Guild war league: “How does it work?” now says more exactly how free evenings work and that with more than 8 guilds some evenings have two matches."
+    },
+    "0.4.3": {
+      "title": "Version 0.4.3",
+      "body": "- “Tutorials” in the Settings: the narrator's explanations to read and listen to at any time. Under many parts there is “Explain again”: the narrator goes through them with you from the start.\n- “Additional parameters” in the Stats show what the Core adds."
     }
   }
 }

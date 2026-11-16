@@ -73,6 +73,8 @@ import {
   craftPace,
   craftTable,
   createRng,
+  coreEffects,
+  makeArtifact,
   rollRarity,
   damageScale,
   earnedPoints,
@@ -1535,6 +1537,26 @@ describe('Parametry dodatkowe', () => {
     assert.equal(extra.armor.total, Math.round((plain.armor.equipment + plain.armor.endurance) * 1.1));
     const sniper = extraValues({ ...newCharacter('archer'), evolution: 'sniper' }, kit('archer'), content);
     assert.equal(sniper.crit.multiplier, content.balance.combat.critMultiplier * 1.25);
+  });
+
+  // The author, 16.11.2026: „statystyki z rdzenia nie sumują się w
+  // parametrach dodatkowych postaci”: the Rdzeń's shares stand among the
+  // sources, as the fights take them.
+  test("name the Rdzeń's share in each number it raises", () => {
+    const worn = kit('warrior');
+    const plain = extraValues(newCharacter('warrior'), worn, content);
+    // Artefakty of every element, till each of the Rdzeń's kinds shows.
+    const absorbed = Array.from({ length: 40 }, (_, index) => makeArtifact({ large: 1 }, createRng(`extra-core:${index}`), content));
+    const character = { ...newCharacter('warrior'), core: { absorbed, gem: null } };
+    const core = coreEffects(character.core, character.classId, content);
+    const extra = extraValues(character, worn, content);
+    assert.deepEqual(
+      [extra.armor.core, extra.dodge.core, extra.crit.core, extra.effectResist.core, extra.speedCore, extra.recoveryCore, extra.resist[0].core],
+      [core.armor, core.dodge, core.crit, core.will, core.speed, core.recovery, core.resist],
+    );
+    assert.ok(core.armor > 0);
+    assert.equal(extra.armor.total, Math.round((extra.armor.equipment + extra.armor.endurance) * (1 + core.armor)));
+    assert.equal([plain.armor.core, plain.crit.core].join(), '0,0');
   });
 });
 

@@ -4,6 +4,7 @@
 // opponent of the character's own level.
 
 import { playerCombatant } from './combatant.js';
+import { coreEffects } from './core.js';
 import { evolutionOf } from './evolutions.js';
 import { autoPointsOf, gearKey } from './gear.js';
 import { cappedChance, reduction } from './formulas.js';
@@ -79,6 +80,10 @@ export function extraValues(character, equipped, content, { rest = 0 } = {}) {
   const feat = unit.feat;
   // A feat comes with an evolution (combatant.js).
   const trait = feat?.kind === 'bulwark' ? { name: /** @type {Record<string, any>} */ (evolutionOf(character, content)).trait.name, share: feat.armor } : null;
+  // The Rdzeń's shares in them (core.js, as combatant.js takes them), so the
+  // window's sources add up to its totals (the author, 16.11.2026:
+  // „statystyki z rdzenia nie sumują się w parametrach dodatkowych postaci”).
+  const core = character.core ? coreEffects(character.core, character.classId, content) : null;
   /**
    * @param {number} rating
    * @param {number} cap
@@ -96,17 +101,20 @@ export function extraValues(character, equipped, content, { rest = 0 } = {}) {
       equipment: Math.round(bonuses.armor),
       endurance: Math.round(totals.endurance * tuning.armorPerEndurance),
       trait,
+      core: core?.armor ?? 0,
       reduction: reduction(unit.armor, level, balance),
     },
-    dodge: dodgeOf(chance(unit.dodgeRating, tuning.dodgeCap)),
-    crit: { ...chance(unit.critRating, tuning.critCap), multiplier: tuning.critMultiplier * (1 + (feat?.critDamage ?? 0)) },
-    effectResist: chance(unit.willRating, tuning.willCap),
+    dodge: { ...dodgeOf(chance(unit.dodgeRating, tuning.dodgeCap)), core: core?.dodge ?? 0 },
+    crit: { ...chance(unit.critRating, tuning.critCap), multiplier: tuning.critMultiplier * (1 + (feat?.critDamage ?? 0)), core: core?.crit ?? 0 },
+    effectResist: { ...chance(unit.willRating, tuning.willCap), core: core?.will ?? 0 },
     speed: unit.speed,
+    speedCore: core?.speed ?? 0,
     regen: regenPerMinute(unit.maxHp, totals.vitality, content, rest),
     recovery: unit.recovery,
+    recoveryCore: core?.recovery ?? 0,
     resist: content.elements.map((/** @type {{ id: string, name: string }} */ { id, name }) => {
       const rating = unit.resist[id] ?? 0;
-      return { id, name, rating, reduction: reduction(rating, level, balance), shelter: unit.shelter?.[id] ?? 0 };
+      return { id, name, rating, reduction: reduction(rating, level, balance), shelter: unit.shelter?.[id] ?? 0, core: core?.resist ?? 0 };
     }),
   };
 }

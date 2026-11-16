@@ -131,7 +131,7 @@ import { skipWithTimePoints } from './time.js';
 import { buyMount } from './stable.js';
 import { salvageStored, sellStored, takeStored } from './storage.js';
 import { answerTrade, blockTrades, cancelTrade, confirmTrade, proposeTrade, readTrade, setOffer, setTradeSettings, tradeSettings } from './trades.js';
-import { seeTutorial, setTutorialSettings } from './tutorial.js';
+import { replayTutorial, seeTutorial, setTutorialSettings } from './tutorial.js';
 import { countPlayMinute } from './play-time.js';
 import { exchangeParts, startCrafting } from './workshop.js';
 
@@ -520,6 +520,7 @@ const routes = [
   ['POST', '/api/play', countPlayMinute],
   ['POST', '/api/tutorial', seeTutorial],
   ['POST', '/api/tutorial/settings', setTutorialSettings],
+  ['POST', '/api/tutorial/replay', replayTutorial],
   ['GET', '/api/push/key', pushKey],
   ['POST', '/api/push/subscribe', subscribePush],
   ['POST', '/api/push/unsubscribe', unsubscribePush],

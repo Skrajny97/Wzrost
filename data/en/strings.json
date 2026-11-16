@@ -3539,5 +3539,16 @@
   "Seria ukończona. Jutro zaczyna się nowa.": "Series complete. A new one starts tomorrow.",
   "Odbierz nagrodę dnia {day}": "Take the reward of day {day}",
   "Nagroda dnia jest już odebrana. Wróć jutro.": "Today's reward is already taken. Come back tomorrow.",
-  "Nagroda dnia zmieniła się w międzyczasie. Spróbuj jeszcze raz.": "Today's reward changed in the meantime. Try again."
+  "Nagroda dnia zmieniła się w międzyczasie. Spróbuj jeszcze raz.": "Today's reward changed in the meantime. Try again.",
+  "Rdzeń +{share}%": "Core +{share}%",
+  "Rdzeń +{share} pkt proc.": "Core +{share} pp",
+  "Samouczki": "Tutorials",
+  "Posłuchaj": "Listen",
+  "Objaśnić jeszcze raz?": "Explain it again?",
+  "Narrator objaśni część „{part}” od początku, gdy przyjdzie jej moment, jak za pierwszym razem.": "The narrator will explain “{part}” from the start when its moment comes, as the first time.",
+  "Objaśnij": "Explain",
+  "Narrator objaśni część „{part}” jeszcze raz.": "The narrator will explain “{part}” again.",
+  "Objaśnij jeszcze raz": "Explain again",
+  "Objaśnienia narratora do przeczytania w każdej chwili. Części, do których Twoja postać jeszcze nie doszła, pojawią się tu, gdy do nich dojdzie.": "The narrator's explanations, to read at any time. The parts your character has not reached yet will appear here once it gets there.",
+  "Tej części nie można objaśnić jeszcze raz.": "This part cannot be explained again."
 }

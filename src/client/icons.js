@@ -66,6 +66,7 @@ export const ICONS = {
   // The weeks of the year (weeks.js): a calendar's page with its rings.
   calendar: [path('M4 6.5h16V20H4z'), path('M4 10.5h16'), path('M8.5 4v4M15.5 4v4'), solid('M7.5 13.5h3v3h-3z')],
   chevron: [path('M9 5l7 7-7 7')],
+  play: [path('M8 5.5v13l10.5-6.5z')],
   // The Społeczność's list: the chat, the Ranking, the Gildie, the Upominek
   // and the chat's light muted.
   chat: [path('M4 5h16v11H10l-6 4.5z'), path('M8 9h8M8 12.5h5')],

@@ -43,6 +43,7 @@ import { enableHold } from './hold.js';
 import { renderCreate } from './screens/create.js';
 import { renderSelect } from './screens/select.js';
 import { mountJournal } from './screens/journal.js';
+import { mountTutorials } from './screens/tutorials.js';
 import { mountSettlement } from './screens/settlement.js';
 import { mountLabyrinthBoard } from './labyrinth.js';
 import { mountShop } from './screens/shop.js';
@@ -117,6 +118,7 @@ const ROUTES = [
   // A Wymiana with another player's character, from the Społeczność.
   { pattern: /^#\/wymiana$/, nav: 'main', tab: null, lit: 'spolecznosc', mount: mountTrade },
   { pattern: /^#\/dziennik(?:\/(?<tab>system))?$/, nav: 'main', tab: 'dziennik', mount: mountJournal },
+  { pattern: /^#\/samouczki$/, nav: 'main', tab: 'samouczki', mount: mountTutorials },
   { pattern: /^#\/raport\/(?<id>\d+)$/, nav: 'main', tab: null, mount: mountReport },
   // The camp opens from the top bar (on a computer from its tab in the
   // menu): the board, or one building. The camp is a tab of its own
@@ -990,6 +992,8 @@ function openSettings() {
     // The reports and System messages: the Dziennik has no tab in the bottom
     // bar.
     h('a', { class: 'button button--world settings-journal', href: '#/dziennik', onClick: closeSheet }, icon('book', { size: 20 }), t('Dziennik')),
+    // The narrator's lines to read again (1039).
+    state.character && h('a', { class: 'button button--world settings-journal', href: '#/samouczki', onClick: closeSheet }, icon('scroll', { size: 20 }), t('Samouczki')),
     // "Zmień postać" above "Zgłoś błąd", not at the bottom (the author,
     // 7.11.2026: "Daj przycisk Zmień postać nad Zgłoś błąd zamiast na samym
     // dole").
