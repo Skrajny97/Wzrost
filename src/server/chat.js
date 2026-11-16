@@ -115,6 +115,31 @@ async function guildChannelFor(db, character, kind = GUILD, writing = false) {
   if (kind === NOTICE && writing && !leadsGuild(guild)) throw new ApiError(403, 'no_lead', 'Ogłoszenia piszą lider i zastępcy.');
   return `${kind}:${guild.id}`;
 }
+// The channel of the character's Drużyna (parties.js; the author,
+// 16.11.2026: „Stwórz też czat dla założonej Drużyny”), kept as
+// "party:<id>": only its members read and write in it, and its messages go
+// with the party (partyRemoval).
+const PARTY = 'party';
+const ofParty = (channel) => channel.startsWith(`${PARTY}:`);
+// The channel of the party the character is in, or null. A party's id is
+// never given again (AUTOINCREMENT), so a new party reads none of an old
+// one's messages.
+async function partyChannelOf(db, characterId) {
+  const row = await db.prepare('SELECT m.party_id FROM party_members m JOIN parties p ON p.id = m.party_id WHERE m.character_id = ?').bind(characterId).first();
+  return row ? `${PARTY}:${row.party_id}` : null;
+}
+async function partyChannelFor(db, character) {
+  const channel = await partyChannelOf(db, character.id);
+  if (!channel) throw new ApiError(403, 'no_party', 'Nie jesteś w drużynie.');
+  return channel;
+}
+// The channel of the character's own group a request names: its guild's
+// (GUILD_KINDS) or its party's, or null for another channel.
+function groupChannelFor(db, character, asked, writing = false) {
+  if (GUILD_KINDS.includes(asked)) return guildChannelFor(db, character, asked, writing);
+  if (asked === PARTY) return partyChannelFor(db, character);
+  return null;
+}
 // The messages between two characters, either way (`m` is chat_messages).
 const PAIR = '((m.character_id = ? AND m.recipient_id = ?) OR (m.character_id = ? AND m.recipient_id = ?))';
 const pairOf = (one, other) => [one, other, other, one];
@@ -379,10 +404,11 @@ export async function readChat(context) {
   const withId = whole(url.searchParams.get('with'));
   const other = withId ? await partnerOf(db, character, withId, session.userId) : null;
   const asked = url.searchParams.get('channel') ?? 'global';
-  const guild = !other && GUILD_KINDS.includes(asked) ? await guildChannelFor(db, character, asked) : null;
-  const channel = other || guild ? null : channelOf(asked);
+  // The channel of the character's guild or party, kept with its id.
+  const group = other ? null : await groupChannelFor(db, character, asked);
+  const channel = other || group ? null : channelOf(asked);
   const where = other ? `m.channel = '${PRIVATE}' AND ${PAIR}` : 'm.channel = ?';
-  const binds = other ? pairOf(character.id, other.id) : [guild ?? channel.id];
+  const binds = other ? pairOf(character.id, other.id) : [group ?? channel.id];
   const after = whole(url.searchParams.get('after'));
   const from = whole(url.searchParams.get('from'));
   const { userId } = session;
@@ -402,7 +428,7 @@ export async function readChat(context) {
     conversationsOf(db, userId, character.id),
   ]);
   return json({
-    channel: other ? PRIVATE : guild ? asked : channel.id,
+    channel: other ? PRIVATE : group ? asked : channel.id,
     with: other && { id: other.id, name: other.name },
     messages: messages.results.reverse().map((row) => messageView(row, userId, context.env, character.id)),
     hidden: hidden.results.map((row) => row.id),
@@ -417,9 +443,10 @@ export async function readChat(context) {
 
 // The channels whose reading a character keeps, besides the private
 // conversations: the Globalny, the Wymiana (where tags light it,
-// mentions.js), the English one where English is on, and the guild's,
-// under "guild", its board, "notice", and its leaders', "lead".
-const seenChannels = () => [...chatChannels().map((channel) => channel.id), ...GUILD_KINDS];
+// mentions.js), the English one where English is on, the guild's, under
+// "guild", its board, "notice", and its leaders', "lead", and the party's,
+// under "party".
+const seenChannels = () => [...chatChannels().map((channel) => channel.id), ...GUILD_KINDS, PARTY];
 
 // What a character has read, as POST /api/chat/seen keeps it: the newest
 // message of each channel and of each private conversation, by the other
@@ -451,13 +478,14 @@ function seenOf(text) {
 // (card-duel.js), its deadlines kept as it is read.
 export async function latestChat(context) {
   const { session, character, db } = await requireChatter(context);
-  // The guild's channel and the invitations to guilds (guilds.js).
-  const guild = await guildOf(db, character.id);
+  // The guild's channel and the invitations to guilds (guilds.js), and the
+  // party's channel.
+  const [guild, party] = await Promise.all([guildOf(db, character.id), partyChannelOf(db, character.id)]);
   // The System's messages light it for everyone, the winner too.
   const newest = `SELECT MAX(id) AS id FROM chat_messages
          WHERE channel = ? AND hidden_at IS NULL AND (system = 1 OR (user_id != ? AND user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)))`;
   const leading = leadsGuild(guild);
-  const [row, conversations, friends, trade, read, partyInvites, guildRow, guildInvites, activity, mentions, duel, noticeRow, leadRow] = await Promise.all([
+  const [row, conversations, friends, trade, read, partyInvites, guildRow, guildInvites, activity, mentions, duel, noticeRow, leadRow, partyRow] = await Promise.all([
     db.prepare(newest).bind(chatChannels({ own: true })[0].id, session.userId, session.userId).first(),
     conversationsOf(db, session.userId, character.id).all(),
     friendNews(db, character.id, context.now),
@@ -471,6 +499,7 @@ export async function latestChat(context) {
     duelNews(db, character.id, context.now),
     guild ? db.prepare(newest).bind(`${NOTICE}:${guild.id}`, session.userId, session.userId).first() : null,
     leading ? db.prepare(newest).bind(`${LEAD}:${guild.id}`, session.userId, session.userId).first() : null,
+    party ? db.prepare(newest).bind(party, session.userId, session.userId).first() : null,
   ]);
   return json({
     latest: row.id ?? 0,
@@ -484,13 +513,16 @@ export async function latestChat(context) {
     // channel: the newest message of each by someone else.
     guild: guild && { name: guild.name, tag: guild.tag, latest: guildRow?.id ?? 0, notice: noticeRow?.id ?? 0, ...(leading && { lead: leadRow?.id ?? 0 }) },
     guildInvites,
+    // The party's channel while the character is in one: the newest message
+    // there by someone else.
+    party: party && { latest: partyRow?.id ?? 0 },
     seen: seenOf(read?.chat_seen),
     activityEndsAt: activity?.ends_at ?? null,
   });
 }
 
 // POST /api/chat/seen {global: id}, {trade: id}, {english: id} where
-// English is on, {guild: id}, or {with:
+// English is on, {guild: id}, {notice: id}, {lead: id}, {party: id}, or {with:
 // character id, id}: the character has read a channel, or its private
 // conversation with that character, up to message `id` on one of its
 // devices; the others hear it from /api/chat/latest and put out the light
@@ -562,8 +594,9 @@ export async function sendChat(context) {
   const { session, character, account, db } = await requireChatter(context);
   const body = await readJson(context.request);
   const other = Number.isInteger(body.with) ? await partnerOf(db, character, body.with, session.userId) : null;
-  const guild = !other && GUILD_KINDS.includes(body.channel) ? await guildChannelFor(db, character, body.channel, true) : null;
-  const channel = other || guild ? null : channelOf(body.channel ?? 'global');
+  // The channel of the character's guild or party, kept with its id.
+  const group = other ? null : await groupChannelFor(db, character, body.channel, true);
+  const channel = other || group ? null : channelOf(body.channel ?? 'global');
   const now = context.now;
   const { userId } = session;
   if (!account.chat_rules_at) throw new ApiError(403, 'rules', 'Najpierw zaakceptuj zasady czatu.');
@@ -574,17 +607,17 @@ export async function sendChat(context) {
   const items = offered && JSON.stringify(offered);
   const goods = await offeredStacks(db, channel, character.id, body.stacks);
   const stacks = goods && JSON.stringify(goods);
-  const tags = await findMentions(db, shownText(text), { userId, channel: other ? PRIVATE : (guild ?? channel.id), recipientId: other?.id ?? null }, now);
+  const tags = await findMentions(db, shownText(text), { userId, channel: other ? PRIVATE : (group ?? channel.id), recipientId: other?.id ?? null }, now);
   const { everySeconds, keep, privateKeep } = content().chat.rules;
   const where = other ? `m.channel = '${PRIVATE}' AND ${PAIR}` : 'm.channel = ?';
-  const binds = other ? pairOf(character.id, other.id) : [guild ?? channel.id];
+  const binds = other ? pairOf(character.id, other.id) : [group ?? channel.id];
   const [sent] = await db.batch([
     db
       .prepare(
         `INSERT INTO chat_messages (channel, user_id, character_id, recipient_id, name, level, class_id, text, items, stacks, created_at)
          SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM chat_messages WHERE user_id = ? AND created_at > ? AND system = 0)`,
       )
-      .bind(other ? PRIVATE : (guild ?? channel.id), userId, character.id, other?.id ?? null, character.name, character.level, character.class_id, text, items, stacks, now, userId, now - everySeconds * 1000),
+      .bind(other ? PRIVATE : (group ?? channel.id), userId, character.id, other?.id ?? null, character.name, character.level, character.class_id, text, items, stacks, now, userId, now - everySeconds * 1000),
     db
       .prepare(
         `DELETE FROM chat_messages WHERE id IN (SELECT m.id FROM chat_messages m WHERE ${where}
@@ -625,14 +658,16 @@ export async function sendChat(context) {
 }
 
 // Whether the character reads the message: in a channel of this server, in
-// its guild's, or a private one it wrote or got; never one taken down, the
-// System's, or one of a player it hides.
+// its guild's or its party's, or a private one it wrote or got; never one
+// taken down, the System's, or one of a player it hides.
 async function readable(db, character, userId, row) {
   if (!row || row.hidden_at !== null || row.system) return false;
   if (row.channel === PRIVATE) {
     if (row.character_id !== character.id && row.recipient_id !== character.id) return false;
   } else if (ofGuild(row.channel)) {
     if (!readsGuildChannel(await guildOf(db, character.id), row.channel)) return false;
+  } else if (ofParty(row.channel)) {
+    if (row.channel !== (await partyChannelOf(db, character.id))) return false;
   } else if (!chatChannels().some((channel) => channel.id === row.channel)) return false;
   return !(await db.prepare('SELECT 1 FROM chat_blocks WHERE user_id = ? AND blocked_id = ?').bind(userId, row.user_id).first());
 }
@@ -738,8 +773,12 @@ async function namedMessage(db, body, character = null) {
     : null;
   const unseen = message?.channel === PRIVATE && character && ![message.character_id, message.recipient_id].includes(character.id);
   // A guild's message only its members see (the leaders' channel only its
-  // leader and deputies), and the moderation.
-  const outside = message && ofGuild(message.channel) && character && !readsGuildChannel(await guildOf(db, character.id), message.channel);
+  // leader and deputies), a party's only its members, and the moderation.
+  const outside =
+    message &&
+    character &&
+    ((ofGuild(message.channel) && !readsGuildChannel(await guildOf(db, character.id), message.channel)) ||
+      (ofParty(message.channel) && message.channel !== (await partyChannelOf(db, character.id))));
   if (!message || unseen || outside) throw new ApiError(404, 'no_message', 'Tej wiadomości już nie ma.');
   return message;
 }

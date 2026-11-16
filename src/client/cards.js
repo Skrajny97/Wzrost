@@ -158,6 +158,28 @@ const oneOf = (lines) => lines[Math.floor(Math.random() * lines.length)];
 
 // `resident`: the resident whose table this is (904 B), at its place in the
 // Osada; none for Szczęsny's tab in the Salon Gier.
+// The orders of the deck builder's collection (the author, 16.11.2026:
+// „dodaj też opcje sortowania kart przy układaniu talii”), in the look of
+// the bag's "Sortuj:" (screens/character.js), the choice kept on the
+// device.
+const DECK_SORT_KEY = 'insight-deck-sort';
+const DECK_SORTS = [
+  { id: 'type', label: 'Typ' },
+  { id: 'rarity', label: 'Rzadkość' },
+  { id: 'level', label: 'Poziom' },
+  { id: 'attack', label: 'Atak' },
+  { id: 'life', label: 'Życie' },
+  { id: 'name', label: 'Nazwa' },
+];
+function keptDeckSort() {
+  try {
+    const kept = localStorage.getItem(DECK_SORT_KEY);
+    return DECK_SORTS.some((one) => one.id === kept) ? kept : 'type';
+  } catch {
+    return 'type';
+  }
+}
+
 export function mountCards(holder, { onLayout = () => {}, resident = null } = {}) {
   let view = null;
   let failure = null;
@@ -171,6 +193,8 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
   // The effect cards chosen for the deck being laid (976, 977).
   let chosenEffects = new Set();
   let shown = 'all';
+  // The collection's order in the builder (DECK_SORTS).
+  let deckSort = keptDeckSort();
   // The turn being laid: its round, the player's lines, the hero's skill,
   // and the reserve's card picked to lay.
   let plan = null;
@@ -893,9 +917,50 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     const order = { strength: 0, dexterity: 1, intellect: 2 };
     const rarityOrder = (id) => state.content.rarities.findIndex((rarity) => rarity.id === id);
     const effects = view.effects ?? { slots: 0, owned: [], texts: {} };
-    const cards = [...view.collection]
-      .filter((card) => shown === 'all' || card.type === shown)
-      .sort((a, b) => (order[a.type] ?? 9) - (order[b.type] ?? 9) || rarityOrder(b.rarity) - rarityOrder(a.rarity) || b.level - a.level || a.name.localeCompare(b.name));
+    const byType = (a, b) => (order[a.type] ?? 9) - (order[b.type] ?? 9);
+    const byRarity = (a, b) => rarityOrder(b.rarity) - rarityOrder(a.rarity);
+    const byLevel = (a, b) => b.level - a.level;
+    const byName = (a, b) => a.name.localeCompare(b.name);
+    const sorts = {
+      type: (a, b) => byType(a, b) || byRarity(a, b) || byLevel(a, b) || byName(a, b),
+      rarity: (a, b) => byRarity(a, b) || byLevel(a, b) || byType(a, b) || byName(a, b),
+      level: (a, b) => byLevel(a, b) || byRarity(a, b) || byType(a, b) || byName(a, b),
+      attack: (a, b) => b.attack - a.attack || b.life - a.life || byName(a, b),
+      life: (a, b) => b.life - a.life || b.attack - a.attack || byName(a, b),
+      name: (a, b) => byName(a, b) || byLevel(a, b),
+    };
+    const cards = [...view.collection].filter((card) => shown === 'all' || card.type === shown).sort(sorts[deckSort] ?? sorts.type);
+    // "Sortuj:" over the collection, as over the bag's tabs.
+    const sortRow = () =>
+      h(
+        'div',
+        { class: 'bag-sort cards-sort' },
+        h('span', { class: 'bag-sort-label', text: t('Sortuj:') }),
+        h(
+          'div',
+          { class: 'segmented bag-sort-options bag-sort-options--6', role: 'group', 'aria-label': t('Kolejność kart') },
+          DECK_SORTS.map((one) =>
+            h(
+              'button',
+              {
+                type: 'button',
+                class: 'segmented-option',
+                'aria-pressed': deckSort === one.id,
+                onClick: () => {
+                  deckSort = one.id;
+                  try {
+                    localStorage.setItem(DECK_SORT_KEY, one.id);
+                  } catch {
+                    // Kept while the page is open.
+                  }
+                  render();
+                },
+              },
+              t(one.label),
+            ),
+          ),
+        ),
+      );
     const count = chosen.size;
     const ready = count === view.deckSize;
     const save = (event) =>
@@ -949,6 +1014,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
         view.types.map((type) => filter(type.id, type.name)),
         effects.slots > 0 && filter('effects', effects.texts.tab),
       ),
+      shown !== 'effects' && sortRow(),
       shown === 'effects' ? effectsToChoose(effects) : h(
         'div',
         { class: 'tcard-grid tcard-grid--collection' },

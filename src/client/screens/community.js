@@ -60,6 +60,7 @@ import {
   leadChannel,
   mentionChannel,
   mentionNews,
+  partyChannel,
   noticeNews,
   partyNews,
   onChatNews,
@@ -104,6 +105,14 @@ const LEAD = {
   id: 'lead',
   get name() {
     return t('Dowództwo');
+  },
+};
+// The channel of the character's Drużyna, only its members' (the author,
+// 16.11.2026: „Stwórz też czat dla założonej Drużyny”).
+const PARTY = {
+  id: 'party',
+  get name() {
+    return t('Drużyna');
   },
 };
 
@@ -416,6 +425,8 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   function taggable() {
     if (talk) return [{ name: talk.name, classId: conversations.find((entry) => entry.id === talk.id)?.classId }];
     if (channel.id === GUILD.id || channel.id === LEAD.id) return people?.guild ?? [];
+    // No one is tagged in the party's channel (src/server/mentions.js).
+    if (channel.id === PARTY.id) return [];
     // A writer by its character's name and by its account's name, which
     // tags it too (15.11.2026).
     const writers = messages
@@ -798,14 +809,14 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
       ),
     );
 
-  // The channels first, the guild's among them while the character is in
-  // one, then the conversations, the most recent first; one opened from a
-  // sheet shows before its first message too. The Globalny's and the
-  // guild's tabs light for their news, every channel's for a message that
-  // tags the player (chat-news.js).
+  // The channels first, the guild's and the party's among them while the
+  // character is in one, then the conversations, the most recent first; one
+  // opened from a sheet shows before its first message too. The Globalny's,
+  // the guild's and the party's tabs light for their news, every channel's
+  // for a message that tags the player (chat-news.js).
   function renderTabs() {
     const entries = talk && !conversations.some((entry) => entry.id === talk.id) ? [{ ...talk, latest: 0 }, ...conversations] : conversations;
-    const channels = [...chat.channels, ...(guildChannel() ? [GUILD] : []), ...(leadChannel() ? [LEAD] : [])];
+    const channels = [...chat.channels, ...(guildChannel() ? [GUILD] : []), ...(leadChannel() ? [LEAD] : []), ...(partyChannel() ? [PARTY] : [])];
     const elsewhere = (entry) => Boolean(talk) || channel.id !== entry.id;
     fill(
       tabs,
@@ -1298,9 +1309,13 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
       ask();
       return;
     }
-    // Out of the guild, or no longer its leader nor a deputy, meanwhile:
-    // back to the Globalny.
-    if ((failure?.code === 'no_guild' && (askedChannel === GUILD || askedChannel === LEAD)) || (failure?.code === 'no_lead' && askedChannel === LEAD)) {
+    // Out of the guild, or no longer its leader nor a deputy, or out of the
+    // party, meanwhile: back to the Globalny.
+    if (
+      (failure?.code === 'no_guild' && (askedChannel === GUILD || askedChannel === LEAD)) ||
+      (failure?.code === 'no_lead' && askedChannel === LEAD) ||
+      (failure?.code === 'no_party' && askedChannel === PARTY)
+    ) {
       switchTo(chat.channels[0], null);
       return;
     }

@@ -52,6 +52,10 @@ let guild = null;
 let guildSeenId = 0;
 // Invitations to guilds waiting.
 let guildInvites = 0;
+// The channel of the character's Drużyna (src/server/chat.js, "party"),
+// with the newest message there by someone else, or null outside a party;
+// its mark is kept with the other channels' (`channelSeen.party`).
+let party = null;
 // What waits in the character's guild (src/server/guild-todo.js): {trials,
 // beast, expedition, requests, chest}, each true when there is something to
 // do, or null.
@@ -117,10 +121,18 @@ export const guildChannelNews = () => Boolean(guildChannel()) && guild.latest > 
 export const leadChannel = () => Boolean(guildChannel()) && guild.lead !== undefined;
 export const leadNews = () => leadChannel() && guild.lead > (channelSeen.lead ?? 0);
 export const noticeNews = () => Boolean(guildChannel()) && (guild.notice ?? 0) > (channelSeen.notice ?? 0);
-export const chatNews = () => globalNews() || guildChannelNews() || leadNews() || conversations.some((entry) => conversationNews(entry.id, entry.latest)) || anyMentionNews();
-// The light of a channel's tab: the Globalny's, the guild's and its
-// leaders' for any news, the other channels' (the Wymiana) for a tag only.
-export const channelNews = (id) => (id === 'guild' ? guildChannelNews() : id === 'lead' ? leadNews() : id === globalId() ? globalNews() : mentionNews(id));
+// The party's channel (the tab Drużyna) while the character is in one, and
+// a message there by someone else not read yet: it lights the chat like
+// the guild's.
+export const partyChannel = () => open() && Boolean(party);
+export const partyChatNews = () => partyChannel() && party.latest > (channelSeen.party ?? 0);
+export const chatNews = () =>
+  globalNews() || guildChannelNews() || leadNews() || partyChatNews() || conversations.some((entry) => conversationNews(entry.id, entry.latest)) || anyMentionNews();
+// The light of a channel's tab: the Globalny's, the guild's, its leaders'
+// and the party's for any news, the other channels' (the Wymiana) for a
+// tag only.
+export const channelNews = (id) =>
+  id === 'guild' ? guildChannelNews() : id === 'lead' ? leadNews() : id === 'party' ? partyChatNews() : id === globalId() ? globalNews() : mentionNews(id);
 // The channel where the newest tag waits unread, for the chat to open on:
 // its id ('guild' for the guild's), or null; private conversations light
 // their own tabs.
@@ -181,6 +193,8 @@ const lights = () =>
     guildChannelNews(),
     leadNews(),
     noticeNews(),
+    partyChatNews(),
+    partyChannel(),
     friendNews(),
     partyNews(),
     guildNews(),
@@ -214,6 +228,7 @@ onCharacterChange((character) => {
     guild = null;
     guildTodo = null;
     guildInvites = 0;
+    party = null;
     invites = 0;
     gifts = 0;
     unsent = 0;
@@ -360,10 +375,12 @@ export function friendsSeen(view) {
 }
 
 // The Drużyna as its screen last saw it (screens/party.js): the invitations
-// waiting.
+// waiting, and whether the character is in a party, for the chat's tab
+// Drużyna at once (its newest message comes with the next check).
 export function partySeen(view) {
   update(() => {
     partyInvites = view.invites?.length ?? 0;
+    party = view.party ? (party ?? { latest: 0 }) : null;
   });
 }
 
@@ -392,6 +409,7 @@ export async function checkChat({ now = false } = {}) {
     partyInvites = answer.partyInvites ?? 0;
     guild = answer.guild ?? null;
     guildInvites = answer.guildInvites ?? 0;
+    party = answer.party ?? null;
     trade = answer.trade ?? null;
     tagged = { ...answer.mentions, private: answer.mentions?.private ?? {} };
     // What the character read on its other devices.

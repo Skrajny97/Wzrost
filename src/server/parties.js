@@ -366,10 +366,16 @@ export async function declinePartyInvite(context) {
   return answer(db, player.row.id, context.now);
 }
 
+// The messages of the parties gone, in their chat (chat.js, "party:<id>",
+// read by its index as the channels from "party:" up to "party;"), but
+// those reported and not decided yet, which wait for the moderation.
+const PARTY_GONE = "channel >= 'party:' AND channel < 'party;' AND substr(channel, 7) NOT IN (SELECT CAST(id AS TEXT) FROM parties)";
+const UNREPORTED = 'id NOT IN (SELECT message_id FROM chat_reports WHERE closed_at IS NULL)';
+
 // The statements that take characters out of their parties (`characters`:
 // SQL for their ids, with `binds`): a leader's lead goes to the member who
-// joined first after it, and a party left empty goes with its invitations.
-// Also for a deleted account (accounts.js).
+// joined first after it, and a party left empty goes with its invitations
+// and its chat's messages. Also for a deleted account (accounts.js).
 export function partyRemoval(db, characters, binds) {
   return [
     db.prepare(`DELETE FROM party_members WHERE character_id IN (${characters})`).bind(...binds),
@@ -380,6 +386,9 @@ export function partyRemoval(db, characters, binds) {
     ),
     db.prepare('DELETE FROM party_invites WHERE party_id NOT IN (SELECT party_id FROM party_members)'),
     db.prepare('DELETE FROM parties WHERE id NOT IN (SELECT party_id FROM party_members)'),
+    db.prepare(`DELETE FROM chat_reports WHERE message_id IN (SELECT id FROM chat_messages WHERE ${PARTY_GONE} AND ${UNREPORTED})`),
+    db.prepare(`DELETE FROM chat_mentions WHERE message_id IN (SELECT id FROM chat_messages WHERE ${PARTY_GONE} AND ${UNREPORTED})`),
+    db.prepare(`DELETE FROM chat_messages WHERE ${PARTY_GONE} AND ${UNREPORTED}`),
   ];
 }
 
