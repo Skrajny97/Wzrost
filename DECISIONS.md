@@ -3580,6 +3580,10 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Wersja 0.3.78 (16.11.2026): kod PC dla jeszcze jednej postaci
+
+Autor: „Przygotuj możliwość używania starego kodu PC dla gracza … – jednorazowo” (imię postaci tylko w czacie, bo repozytorium jest publiczne). Kod PC (60 Punktów Czasu za zaangażowanie) działa teraz także dla tej jednej postaci, raz, do 30.11.2026 włącznie (`pc-2026-11-16-a`; w danych skrót SHA-256 imienia małymi literami, jak przy innych kodach dla jednej postaci). Brakujący szczegół, termin: dwa tygodnie, jak przy wcześniejszych kodach PC. Kod nie trafia do „Co nowego?”, bo jest dla jednej postaci; autor przekazuje go sam.
+
 ## Wersja 0.3.77 (16.11.2026): sortowanie w Skrzyni Konta (1004)
 
 Autor: „Powinna też być opcja sortowania tych przedmiotów przy wybieraniu”; makiety 1004.1 i 1004.2 przyjęte na stronie ocen.
