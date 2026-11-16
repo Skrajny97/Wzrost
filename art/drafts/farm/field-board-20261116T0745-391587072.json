@@ -1,0 +1,14 @@
+{
+  "id": "field-board",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "pixel art, top-down view straight from above of a sunny meadow beside a farm: short green grass with a few small wild flowers and stones, a worn dirt path along the bottom edge, a low wooden fence along the top edge, soft even light, muted dark palette of greens and earthy browns, flat ground seen from above for a dim background behind game tiles, low contrast, no text, no border, no people, no animals",
+  "style": "src/client/art/boards/arena-board.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.032199450639724736
+  },
+  "images": 1
+}

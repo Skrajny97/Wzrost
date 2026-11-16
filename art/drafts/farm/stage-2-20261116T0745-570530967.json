@@ -1,0 +1,14 @@
+{
+  "id": "stage-2",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small green seedling with four fresh leaves growing from dark soil, seen from above at a slight angle, single game sprite",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023298891408072578
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "stage-1",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a few seeds and a tiny pale green shoot just breaking through a small mound of dark soil, seen from above at a slight angle, single game sprite",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023447175933414038
+  },
+  "images": 1
+}

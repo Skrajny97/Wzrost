@@ -1,0 +1,14 @@
+{
+  "id": "plot",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a square bed of freshly tilled dark brown soil with neat furrows and a thin wooden edging, seen from above at a slight angle, single game tile",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023223998571395878
+  },
+  "images": 1
+}

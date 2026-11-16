@@ -1,0 +1,14 @@
+{
+  "id": "stage-3",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a young leafy green plant with many leaves and small buds growing from dark soil, seen from above at a slight angle, single game sprite",
+  "style": "src/client/art/herbs/st-johns-wort.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02452307558631897
+  },
+  "images": 1
+}
