@@ -1,0 +1,14 @@
+{
+  "id": "fortress-1-front2-snow",
+  "tool": "pixellab inpaint-v3",
+  "description": "top-down pixel art game map seen from above, a tall snow-covered fir tree standing in front of a grey stone castle wall, the tree is taller than the wall and covers it completely from top to bottom, its pointed snowy top rising above the wall, thick white snow and pale blue hoarfrost on its branches, the same pixel art style as the snowy forest around it, seamless, no people",
+  "style": "src/client/art/camp/campfire-1.png",
+  "input": "art/inputs/winter/fortress-1-front2.png",
+  "mask": "art/inputs/winter/fortress-1-front2-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.15
+  },
+  "images": 1
+}
