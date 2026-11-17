@@ -23923,6 +23923,13 @@ a.discord-button {
   position: static;
 }
 
+/* The gem of a worn item on the Postać tab's slot (1069 A): in the top
+   corner, as the +N of an upgrade keeps the bottom one. */
+.slot > .set-gem.slot-gem {
+  top: -5px;
+  bottom: auto;
+}
+
 .set-chosen {
   display: flex;
   align-items: center;

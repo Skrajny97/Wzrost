@@ -31,6 +31,19 @@ export const itemTitle = (item) => (item.upgrade > 0 ? `${item.name} +${item.upg
 // The number in the corner of a slot: the upgrade level.
 const upgradeBadge = (item) => item.upgrade > 0 && h('span', { class: 'slot-level', text: `+${item.upgrade}` });
 
+// The gem set in a worn item (Jubilerstwo's Oprawianie), on its slot as in
+// the Oprawianie tab: its picture in a ring of its colour, in the slot's top
+// corner, as the +N of an upgrade keeps the bottom one (a player's remark
+// the author passed on, 17.11.2026: „Czy oprawienie przedmiotu może być
+// widoczne jak wejdę w postać przy przedmiocie?”). Only a gem set shows,
+// no empty socket (1069 A).
+const slotGem = (gem) => {
+  if (!gem) return null;
+  const mark = h('span', { class: 'set-gem slot-gem', title: gem.name, 'aria-hidden': 'true' }, mineralSprite(gem.id));
+  if (gem.color) mark.style.setProperty('--gem', gem.color);
+  return mark;
+};
+
 // The star in the other bottom corner of a favourite's tile (favorites.js).
 const favoriteBadge = (item) => item.favorite && h('span', { class: 'slot-favorite', 'aria-hidden': 'true' }, icon('star', { size: 12 }));
 
@@ -383,11 +396,12 @@ export function mountCharacter(container, { switchCharacter } = {}) {
           class: 'slot',
           'data-guide': `slot-${slot.id}`,
           vars: { '--rarity': item.color },
-          'aria-label': `${slot.name}: ${itemTitle(item)}, ${item.rarityName}`,
+          'aria-label': `${slot.name}: ${itemTitle(item)}, ${item.rarityName}${item.gem ? `, ${item.gem.name}` : ''}`,
           onClick: () => slotSheet(slot),
         },
         itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
         upgradeBadge(item),
+        slotGem(item.gem),
       ),
       item,
     );
