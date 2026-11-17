@@ -587,11 +587,17 @@ export const SPRITES = {
   // middle, and its backgrounds behind the figure, 96×128
   // (data/cosmetics.json, by their art). A mount's look has its picture
   // among the mounts.
+  // The decorations of the winter camp from the calendar of Szczodre Gody
+  // (data/winter.json, 1044.3a B and 1044.3b D), 76×76, drawn in PixelLab.
+  winter: {
+    size: 76,
+    ids: ['podlaznniczka', 'snopek'],
+  },
   cosmetics: {
     width: 120,
     height: 160,
     fit: true,
-    ids: ['frame-gold', 'frame-system', 'frame-forest', 'bg-spring', 'bg-tower', 'bg-camp'],
+    ids: ['frame-gold', 'frame-system', 'frame-forest', 'bg-spring', 'bg-tower', 'bg-camp', 'frame-szron', 'bg-szczodre'],
   },
   // The character riding, <class>-<look> or an evolution's
   // <evolution>-<look>: one picture sitting in a saddle that is not drawn

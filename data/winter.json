@@ -1,0 +1,61 @@
+{
+  "$comment": "Szczodre Gody (1044; DECISIONS.md, „Szczodre Gody (1044): decyzje autora 17.11.2026”; src/engine/winter.js, src/server/winter.js, src/client/winter-calendar.js). calendar: od dnia first do dnia last miesiąca month (czas polski, dzień od północy jak zadania dzienne) codziennie jedna nagroda za wejście do gry, każda postać osobno; opuszczony dzień przepada (1044.1a A). days: nagrody kolejnych dni od first: goldMinutes (złoto za tyle minut wypraw na poziomie postaci, zaokrąglone do goldRound), timePoints (Punkty Czasu), systemPoints (Punkty Systemu), packs (pakiety kart), potion i count (mikstury z data/professions.json do plecaka), scroll (zwój: ward-scroll albo steady-scroll), decoration (ozdoba Obozu z decorations) albo cosmetics (zimowy zestaw z 24. dnia, przedmioty z event: winter w data/cosmetics.json, 1044.2 B). camp: od dnia first do dnia last miesiąca month Obóz jest zimowy, a ozdoby z odebranych dni stoją w nim (1044.3). decorations: ozdoby Obozu, art: obrazek w src/client/art/winter (podłaźniczka B i snopek D z 1044.3a i 1044.3b). texts: słowa okna kalendarza i jego zakładki.",
+  "calendar": {
+    "month": 12,
+    "first": 1,
+    "last": 24,
+    "goldRound": 5,
+    "days": [
+      { "goldMinutes": 30, "timePoints": 10 },
+      { "potion": "lesser-speed", "count": 2 },
+      { "timePoints": 15 },
+      { "packs": 1 },
+      { "goldMinutes": 45 },
+      { "scroll": "ward-scroll" },
+      { "systemPoints": 5 },
+      { "timePoints": 20 },
+      { "potion": "strength-brew", "count": 2 },
+      { "packs": 1 },
+      { "goldMinutes": 60 },
+      { "decoration": "podlaznniczka" },
+      { "timePoints": 25 },
+      { "scroll": "steady-scroll" },
+      { "systemPoints": 10 },
+      { "packs": 1 },
+      { "goldMinutes": 90 },
+      { "timePoints": 30 },
+      { "decoration": "snopek" },
+      { "packs": 2 },
+      { "goldMinutes": 120 },
+      { "timePoints": 40 },
+      { "systemPoints": 15 },
+      { "cosmetics": ["frame-szron", "bg-szczodre", "aura-sniezyca"], "packs": 2 }
+    ]
+  },
+  "camp": { "month": 12, "first": 1, "last": 31 },
+  "decorations": {
+    "podlaznniczka": { "name": "Podłaźniczka", "art": "podlaznniczka" },
+    "snopek": { "name": "Snopek", "art": "snopek" }
+  },
+  "texts": {
+    "title": "Szczodre Gody",
+    "lead": "Od 1 do 24 grudnia codziennie jedna nagroda za wejście do gry, a 24. dnia zimowy zestaw. Opuszczony dzień przepada.",
+    "days": "Dni kalendarza",
+    "dayName": "{day} gru",
+    "take": "Odbierz nagrodę z {day} grudnia",
+    "taken": "Odebrane. Wróć jutro po kolejne okienko.",
+    "done": "Kalendarz odebrany do końca. Szczodrych Godów!",
+    "missed": "przepadło",
+    "decoration": "Ozdoba",
+    "set": "Zimowy zestaw",
+    "scroll": "Zwój",
+    "decorationGot": "{name} stanie w Twoim Obozie i postoi tam do końca grudnia.",
+    "setGot": "Zimowy zestaw jest Twój: ramka Szron, tło Szczodre Gody i aura Śnieżyca czekają w Sklepie Systemu, gotowe do założenia.",
+    "closed": "Kalendarz Szczodrych Godów czeka od 1 do 24 grudnia.",
+    "alreadyTaken": "Dzisiejsze okienko jest już otwarte. Wróć jutro.",
+    "bagFull": "Plecak jest pełny. Zrób w nim miejsce na mikstury i odbierz nagrodę.",
+    "changed": "Kalendarz zmienił się w międzyczasie. Spróbuj jeszcze raz.",
+    "tabWaiting": "Kalendarz Szczodrych Godów: nagroda z {day} grudnia czeka",
+    "tabTaken": "Kalendarz Szczodrych Godów: nagroda z {day} grudnia odebrana"
+  }
+}

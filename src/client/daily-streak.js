@@ -117,6 +117,10 @@ let streak = null;
 let retryAt = 0;
 // Each character its own series: another character played, asked anew.
 let owner = null;
+// Whether the series has had its turn this visit: known, and its window
+// shown or today's reward taken. Szczodre Gody's calendar waits for it
+// (winter-calendar.js), so the two windows do not open at once.
+export const streakSettled = () => streak !== null && (streak.taken || offered);
 export function offerStreak() {
   if (!state.character) return;
   if (state.character.name !== owner) {

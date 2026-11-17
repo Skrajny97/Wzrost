@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Szczodre Gody",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["calendar", "camp", "decorations", "texts"],
+  "properties": {
+    "$comment": { "type": "string" },
+    "calendar": {
+      "description": "Kalendarz: od dnia first do dnia last miesiąca month jedna nagroda dziennie, days od first.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["month", "first", "last", "goldRound", "days"],
+      "properties": {
+        "month": { "type": "integer", "minimum": 1, "maximum": 12 },
+        "first": { "type": "integer", "minimum": 1, "maximum": 31 },
+        "last": { "type": "integer", "minimum": 1, "maximum": 31 },
+        "goldRound": { "type": "integer", "minimum": 1 },
+        "days": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "minProperties": 1,
+            "properties": {
+              "goldMinutes": { "type": "integer", "minimum": 1 },
+              "timePoints": { "type": "integer", "minimum": 1 },
+              "systemPoints": { "type": "integer", "minimum": 1 },
+              "packs": { "type": "integer", "minimum": 1 },
+              "potion": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+              "count": { "type": "integer", "minimum": 1 },
+              "scroll": { "enum": ["ward-scroll", "steady-scroll"] },
+              "decoration": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+              "cosmetics": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^[a-z0-9-]+$" } }
+            },
+            "dependencies": { "count": ["potion"], "potion": ["count"] }
+          }
+        }
+      }
+    },
+    "camp": {
+      "description": "Zimowy Obóz: od dnia first do dnia last miesiąca month.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["month", "first", "last"],
+      "properties": {
+        "month": { "type": "integer", "minimum": 1, "maximum": 12 },
+        "first": { "type": "integer", "minimum": 1, "maximum": 31 },
+        "last": { "type": "integer", "minimum": 1, "maximum": 31 }
+      }
+    },
+    "decorations": {
+      "description": "Ozdoby Obozu z kalendarza: nazwa i obrazek w src/client/art/winter (bez .png).",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "art"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "art": { "type": "string", "pattern": "^[a-z0-9-]+$" }
+        }
+      }
+    },
+    "texts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "lead", "days", "dayName", "take", "taken", "done", "missed", "decoration", "set", "scroll", "decorationGot", "setGot", "closed", "alreadyTaken", "bagFull", "changed", "tabWaiting", "tabTaken"],
+      "properties": {
+        "title": { "type": "string" },
+        "lead": { "type": "string" },
+        "days": { "type": "string" },
+        "dayName": { "type": "string", "pattern": "\\{day\\}" },
+        "take": { "type": "string", "pattern": "\\{day\\}" },
+        "taken": { "type": "string" },
+        "done": { "type": "string" },
+        "missed": { "type": "string" },
+        "decoration": { "type": "string" },
+        "set": { "type": "string" },
+        "scroll": { "type": "string" },
+        "decorationGot": { "type": "string", "pattern": "\\{name\\}" },
+        "setGot": { "type": "string" },
+        "closed": { "type": "string" },
+        "alreadyTaken": { "type": "string" },
+        "bagFull": { "type": "string" },
+        "changed": { "type": "string" },
+        "tabWaiting": { "type": "string", "pattern": "\\{day\\}" },
+        "tabTaken": { "type": "string", "pattern": "\\{day\\}" }
+      }
+    }
+  }
+}

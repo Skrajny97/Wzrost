@@ -18,6 +18,7 @@ import { desktopLayout, layoutChoice, layoutOffered, onLayoutChange, setLayoutCh
 import { updateSide } from './side.js';
 import { chatBubbleOn, setChatBubbleOn, updateChatBubble } from './chat-bubble.js';
 import { mountStreakTab, offerStreak } from './daily-streak.js';
+import { mountWinterTab, offerWinter } from './winter-calendar.js';
 // The computer's keys 1–6 for the main tabs (477 A, 508 A).
 import './keys.js';
 import { showQuests, watchQuests } from './quests.js';
@@ -413,6 +414,8 @@ function openGame() {
   mountOnline($('#view-game'));
   // The series of days on the left edge (1041).
   mountStreakTab($('#view-game'));
+  // Szczodre Gody's calendar under it, while the calendar runs (1044).
+  mountWinterTab($('#view-game'));
   show('game');
   buildTopbar(openSettings);
   route();
@@ -442,6 +445,8 @@ function openGame() {
     offerWeekNotice();
     // The reward for days in a row, once a visit while it waits (1029).
     offerStreak();
+    // Szczodre Gody's calendar after it, in its days (1044).
+    offerWinter();
     // A minute with the game on the screen (993 A, play-time.js).
     watchPlayTime();
   }, 1000);

@@ -36,7 +36,9 @@ const TABS = [
 ];
 
 // An item the character can wear: an outfit only for its own class.
-const forCharacter = (item, character) => item.kind !== 'outfit' || item.classId === character.classId;
+// An event's cosmetic (the winter set of Szczodre Gody) is not sold: it shows
+// only where the character has it, to wear it and take it off.
+const forCharacter = (item, character) => (item.kind !== 'outfit' || item.classId === character.classId) && (!item.event || character.cosmetics.owned.includes(item.id));
 
 // Whether this account can buy Punkty Systemu here, asked once a page load:
 // null until the server answers.

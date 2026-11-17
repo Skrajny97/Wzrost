@@ -3580,6 +3580,34 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Szczodre Gody (1044): decyzje autora 17.11.2026
+
+Zimowe wydarzenie na grudzień (1028, przyjęte 16.11.2026: „wszystko super wymyślone od 1028 do 1031”). Oceny ze strony ocen, 17.11.2026:
+
+1. **Kalendarz 1–24.12 (1044.1, przyjęty).** Codziennie jedna nagroda za wejście do gry, w oknie jak seria dni: 24 okienka, dzisiejsze świeci, odebrane mają znaczek. Kalendarz ma każda postać osobno. Nagrody: 1. złoto za 30 min wypraw i 10 PC, 2. 2 mikstury, 3. 15 PC, 4. pakiet kart, 5. złoto za 45 min, 6. Zwój ochronny, 7. 5 PS, 8. 20 PC, 9. 2 mikstury, 10. pakiet, 11. złoto za 60 min, 12. ozdoba Obozu: podłaźniczka, 13. 25 PC, 14. Zwój utrwalenia, 15. 10 PS, 16. pakiet, 17. złoto za 90 min, 18. 30 PC, 19. ozdoba Obozu: snopek, 20. 2 pakiety, 21. złoto za 120 min, 22. 40 PC, 23. 15 PS, 24. zimowy zestaw i 2 pakiety.
+2. **Opuszczony dzień przepada (1044.1a A),** jak w serii dni.
+3. **Nagroda główna: zimowy zestaw (1044.2 B),** bez skórki: ramka „Szron”, tło „Szczodre Gody” i aura „Śnieżyca” (światło i płatki śniegu, bez grafiki). Zestaw jest tylko w kalendarzu.
+4. **Zimowy Obóz (1044.3, przyjęty).** Od 1 do 31.12 Obóz każdej postaci jest pod śniegiem, przy ognisku świecą lampki, a ozdoby z kalendarza stoją w Obozie do 31.12. Wybrane wersje z PixelLab: podłaźniczka B (1044.3a), snopek D (1044.3b).
+5. **Zimowe zadania (1044.4, przyjęte).** W grudniu codziennie 3 zimowe zadania obok zwykłych dziennych: 10 gałązek jodły z wypraw (materiał tylko w grudniu), karp z Rybołówstwa i potrawa z Systemowej Kuchni. Za każde Punkty Czasu i złoto, za wszystkie trzy jednego dnia dodatkowy pakiet kart. Narrator zapowiada wydarzenie 1.12 i chwali za pierwsze zimowe zadanie; jego polskie kwestie autor zatwierdza przed nagraniem, angielskie idą bez zatwierdzania.
+6. **Zestaw i kwestie (1044.5–1044.8, 17.11.2026).** Ramka Szron A, tło Szczodre Gody A, gałązka jodły D. Kwestie narratora 2–4 przyjęte bez zmian, kwestia 1 bez ostatniego zdania (autor: „Bez ostatniego zdania”): „Nad Puszczą zapada najdłuższa noc roku. Nadchodzą Szczodre Gody. Do Wigilii codziennie czeka na Ciebie nowe okienko kalendarza.”
+
+### Szczodre Gody w grze: szczegóły kalendarza (17.11.2026)
+
+Rozstrzygnięte najprostszym rozwiązaniem zgodnym z przyjętymi makietami (1044.1):
+
+1. **Dzień kalendarza** to dzień czasu polskiego od północy, jak zadania dzienne i seria dni. Odebrane dni postać trzyma w `characters.winter` (migracja 0154) razem z rokiem, więc za rok kalendarz zaczyna się od zera (`src/engine/winter.js`, `src/server/winter.js`, `GET` i `POST /api/winter`).
+2. **Okno** otwiera się samo przy pierwszym wejściu w dniu kalendarza, po oknie serii dni (oba nie otwierają się naraz), i wraca przy kolejnym wejściu tego dnia, dopóki nagroda czeka. Opuszczone dni są wyszarzone z napisem „przepadło”. Po odebraniu ozdoby okno mówi, że stanie w Obozie, a po 24. dniu, że zestaw czeka w Sklepie Systemu do założenia.
+3. **Zakładka kalendarza** stoi pod zakładką serii dni przy lewej krawędzi, tylko w dniach kalendarza: płatek śniegu i dzisiejszy dzień, złota, gdy nagroda czeka (1044.9 na stronie ocen).
+4. **Mikstury** trafiają do plecaka jak od innego gracza (Encyklopedia nie liczy ich jako własnego odkrycia). Gdy plecak jest pełny, nagroda czeka, aż zrobi się w nim miejsce, z komunikatem, a dzień nie przepada do północy.
+5. **Zimowy zestaw** to przedmioty Sklepu Systemu z `event: winter` w `data/cosmetics.json`, bez ceny: nie da się ich kupić, a w Sklepie widać je dopiero u postaci, która je ma, żeby mogła je założyć i zdjąć. Aura Śnieżyca to płatki śniegu prószące wokół postaci (`sparks: fall`, 1044.10 na stronie ocen).
+6. **Wersja testowa** (`WINTER: test` w `wrangler.jsonc`) ma kalendarz codziennie: dzień miesiąca jest dniem kalendarza (po 24. jak 24.), żeby dało się go sprawdzić przed grudniem. W grze kalendarz działa tylko 1–24.12.
+
+## Wersja 0.4.7 (17.11.2026): kalendarz Szczodrych Godów (ukryty do 1.12)
+
+1. **Kalendarz Szczodrych Godów (1044.1, okno z przyjętej makiety).** Od 1 do 24 grudnia każda postać codziennie odbiera jedną nagrodę za wejście do gry, opuszczony dzień przepada, a 24. dnia dostaje zimowy zestaw (szczegóły wyżej, w „Szczodre Gody w grze: szczegóły kalendarza”). W grze nic z tego nie widać do 1 grudnia. Wersja testowa ma kalendarz codziennie (`WINTER: test`).
+2. **Zimowy zestaw w Sklepie Systemu.** Ramka Szron (1044.5 A) z mroźnym blaskiem, tło Szczodre Gody (1044.6 A) i aura Śnieżyca (prószący śnieg) są przedmiotami wydarzenia: nie da się ich kupić, a w Sklepie widać je dopiero u postaci, która je ma.
+3. **Do oceny przed 1.12:** zakładka kalendarza (1044.9) i ruch aury z blaskiem ramki (1044.10). Zimowy Obóz z ozdobami i zimowe zadania z kwestiami narratora wejdą w kolejnych wersjach przed 1 grudnia.
+
 ## Wersja 0.4.6 (16.11.2026): osiągnięcia z tytułami, walkowery 3v3 za brakujące trójki, zakładka serii dni, Błędny ognik za 600 PS, kolejność kanałów czatu
 
 1. **Osiągnięcia (1030; lista 1036.1 i okno 1036.2 przyjęte, tytuł tylko w profilu i Rankingu: 1036.3 B).**
@@ -3591,7 +3619,7 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
    - Testy w `test/achievements.test.js`.
 2. **Chowaniec: Błędny ognik za 600 PS.** Autor: „Chowaniec: Błędny ognik również powinien kosztować 600 Punktów Systemu jak reszta Chowańców” (wcześniej 800 PS, 415 A). Każda postać, która go kupiła, dostaje zwrot 200 PS (migracja 0153). Błędnego ognika nikt nie dostał inaczej niż przez zakup w Sklepie Systemu, więc zwrot trafia tylko do kupujących.
 3. **Kolejność kanałów czatu (1040.1, przyjęte).** Autor o 1039.3: „niech będzie można je po prostu slideować te zakładki na czacie”. Zakładkę kanału przytrzymuje się chwilę, unosi się w złotej ramce i przesuwa palcem albo myszą w nowe miejsce. Kolejność zostaje na urządzeniu (`src/client/chat-order.js`), a pierwszy kanał otwiera się przy wejściu na czat, chyba że w innym czeka oznaczenie @. Krótkie stuknięcie wybiera kanał, a przesunięcie bez przytrzymania przewija pasek. Rozmowy prywatne zostają za kanałami.
-4. **3v3: brakujące trójki przegrywają z każdą trójką rywala.** Autor: „jeśli gildia ma 6 drużyn tylko to walkowerem oddaje 40 walk ze 100 a nie 4” i „taka gildia musi wygrać większość swoich walk żeby prowadzić i tak powinno być - kara za mniejszą ilość członków i ich siłę”. Walk 3v3 jest tyle, jakby obie gildie miały tyle trójek co większa: przy 6 trójkach na 10 jest 100 walk, 60 rozegranych i 40 walkowerów mniejszej gildii (`matchFights` w `src/engine/guild-wars.js`). Pod meczem następnego wieczoru widać tę liczbę, a „Jak to działa?” opisuje zasadę z przykładem. Działa od wieczoru 17.11; powtórka 16.11 o 23:00 szła jeszcze po 0.4.5 (jeden walkower za brakującą trójkę). Czy tak samo mają działać pojedynki 1v1, pytam w 1043.
+4. **3v3: brakujące trójki przegrywają z każdą trójką rywala.** Autor: „jeśli gildia ma 6 drużyn tylko to walkowerem oddaje 40 walk ze 100 a nie 4” i „taka gildia musi wygrać większość swoich walk żeby prowadzić i tak powinno być - kara za mniejszą ilość członków i ich siłę”. Walk 3v3 jest tyle, jakby obie gildie miały tyle trójek co większa: przy 6 trójkach na 10 jest 100 walk, 60 rozegranych i 40 walkowerów mniejszej gildii (`matchFights` w `src/engine/guild-wars.js`). Pod meczem następnego wieczoru widać tę liczbę, a „Jak to działa?” opisuje zasadę z przykładem. Działa od wieczoru 17.11; powtórka 16.11 o 23:00 szła jeszcze po 0.4.5 (jeden walkower za brakującą trójkę). Pojedynki 1v1 zostają bez walkowerów: każdy członek walczy z każdym członkiem rywala, a kara za mniejszą liczbę członków jest tylko w 3v3 (1043 A, 16.11.2026; wariant B, walkowery także w 1v1, odrzucony).
 5. **Zakładka serii dni (1041.1, przyjęte).** Autor: „Ikonka jakaś albo napis serii dni niech wyświetla się z drugiego boku może jak zakładka graczy online - coś cieniutkiego”. Cienka zakładka przy lewej krawędzi ekranu, naprzeciw graczy online: kalendarz i dzień serii („3/7”), złota i lekko świecąca, gdy nagroda dnia czeka. Stuknięcie otwiera okno serii (`mountStreakTab` w `src/client/daily-streak.js`). Na komputerze stoi przy lewej krawędzi środkowej kolumny, obok menu.
 
 ## Wersja 0.4.5 (16.11.2026): 3v3 każda trójka z każdą, walkowery za brakujące trójki

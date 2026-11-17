@@ -76,6 +76,9 @@ export const ICONS = {
   star: [path('M12 3.3l2.2 5.9 6.4.3-5 4 1.7 6.1L12 16.1l-5.3 3.5 1.7-6.1-5-4 6.4-.3z')],
   // The Siedziba Gildii: a keep with battlements and an arched gate.
   keep: [path('M4.5 21V6h3v2.5h3V6h3v2.5h3V6h3v15z'), path('M10 21v-4a2 2 0 0 1 4 0v4'), path('M12 11.5V13'), path('M3 21h18')],
+  // A snowflake (Szczodre Gody, winter-calendar.js): three lines through the
+  // middle, each with a fork at both ends.
+  snowflake: [path('M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9'), path('M9.6 4.6 12 7l2.4-2.4M9.6 19.4 12 17l2.4 2.4M4.1 10.4l3.3-.9-.9-3.3M19.9 13.6l-3.3.9.9 3.3M4.1 13.6l3.3.9-.9 3.3M19.9 10.4l-3.3-.9.9-3.3')],
   gift: [['rect', { x: 4, y: 10.5, width: 16, height: 10, rx: 1 }], path('M3 7h18v3.5H3z'), path('M12 7v13.5'), path('M12 7c-1.5-3.5-5.5-4.2-5.5-1.6C6.5 7 10 7 12 7zM12 7c1.5-3.5 5.5-4.2 5.5-1.6C17.5 7 14 7 12 7z')],
   bell: [path('M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z'), path('M10 20.5a2 2 0 0 0 4 0')],
   swap: [path('M4 8h14M14.5 4.5L18 8l-3.5 3.5'), path('M20 16H6M9.5 12.5L6 16l3.5 3.5')],

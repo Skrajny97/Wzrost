@@ -78,7 +78,8 @@ export function portraitBox(look, worn, className) {
 
 // The frame over the portrait, and its light (effect.kind): a band sweeping
 // across the gold now and then, and glints on its rubies as it passes
-// (shine); a pulsing glow and a line of light running down it (pulse);
+// (shine; frost the same in a cold light, the Szron of Szczodre Gody); a
+// pulsing glow and a line of light running down it (pulse);
 // fireflies drifting and blinking about it (fireflies). The band and the
 // line light only the frame's own pixels.
 function frameLayer(item) {
@@ -97,10 +98,11 @@ function frameLayer(item) {
     layer.append(light);
   }
   points.forEach(([x, y], index) => {
-    const spark = h('span', { class: kind === 'shine' ? 'portrait-frame-glint' : 'portrait-frame-firefly' });
+    const glints = kind === 'shine' || kind === 'frost';
+    const spark = h('span', { class: glints ? 'portrait-frame-glint' : 'portrait-frame-firefly' });
     spark.style.left = across(x + 0.5);
     spark.style.top = down(y + 0.5);
-    if (kind === 'shine') {
+    if (glints) {
       // As the band, from the left, reaches the ruby.
       spark.style.animationDelay = `${(0.2 + (x / FRAME.width) * 1.3).toFixed(2)}s`;
     } else {
@@ -118,8 +120,8 @@ function frameLayer(item) {
 
 // An aura (the Sklep Systemu; the author: "416 akcept", "417 akcept"): its
 // light around the figure's outline, a halo behind it that swells and fades,
-// and its motes drifting about the figure (drift) or sparks rising from it
-// (rise). The halo is the figure again, under it, all in the light; the game's
+// and its motes drifting about the figure (drift), sparks rising from it
+// (rise) or snow falling about it (fall, the Śnieżyca of Szczodre Gody). The halo is the figure again, under it, all in the light; the game's
 // switch of animations stills it all (.calm in styles.css).
 export function light(art, figure, { glow, spark, sparks }) {
   art.style.setProperty('--aura-glow', glow);
@@ -129,12 +131,16 @@ export function light(art, figure, { glow, spark, sparks }) {
   halo.classList.replace('aura-figure', 'aura-halo');
   figure.before(halo);
   const motes = h('div', { class: `aura-motes aura-motes--${sparks}` });
-  MOTES.forEach(([x, y, dx, dy], index) => {
+  // Snow falls thicker: the motes twice, the second time mirrored.
+  const spots = sparks === 'fall' ? [...MOTES, ...MOTES.map(([x, y, dx, dy]) => [100 - x, Math.min(96, y + 8), -dx, dy])] : MOTES;
+  spots.forEach(([x, y, dx, dy], index) => {
     const mote = h('span');
+    const fall = sparks === 'fall';
     mote.style.left = `${x}%`;
-    mote.style.top = `${y}%`;
-    mote.style.setProperty('--dx', `${dx}cqw`);
-    mote.style.setProperty('--dy', `${sparks === 'rise' ? -14 - (index % 4) * 4 : dy}cqh`);
+    // Snow starts higher and falls the more the lower it starts.
+    mote.style.top = `${fall ? Math.max(0, y - 24) : y}%`;
+    mote.style.setProperty('--dx', `${fall ? dx / 2 : dx}cqw`);
+    mote.style.setProperty('--dy', `${sparks === 'rise' ? -14 - (index % 4) * 4 : fall ? 16 + (index % 4) * 5 : dy}cqh`);
     mote.style.animationDelay = `${(-index * 0.53).toFixed(2)}s`;
     motes.append(mote);
   });

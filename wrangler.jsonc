@@ -193,6 +193,9 @@
         "LABYRINTH": "on",
         // Talia Systemu, the Salon Gier's card game, as in the game (871–889).
         "CARDS": "on",
+        // Szczodre Gody (src/server/winter.js, 1044): the calendar every day,
+        // a day of a calendar of the month, so it can be tried before December.
+        "WINTER": "test",
         // The payments for Punkty Systemu: off here. The app from the Sklep
         // Play opens the game's own address, not this one, so Google Play
         // Billing has nothing to buy on the test version.
