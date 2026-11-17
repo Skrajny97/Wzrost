@@ -1,0 +1,23 @@
+{
+  "id": "winter-shadow-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "young woman rogue in a festive winter outfit for the old Slavic midwinter feast, tall adult heroine with realistic proportions and a small head, lean, brown hair, standing in the middle of the image, full body figure from the top of the head to the feet, empty space above the head and below the feet, a fitted black leather coat with silver frost embroidery and a white fur collar, a long dark cloak lined with white fur and fastened with a silver snowflake clasp, a dark red scarf pulled up over the nose and mouth, holding two curved daggers with pale blue ice blades, epic and festive, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/winter-shadow-male.png",
+      "usage": "the same coat, fur collar, cloak, red scarf, ice daggers, colours, body proportions and pixel art style as this character; she is a woman"
+    },
+    {
+      "path": "src/client/art/portraits/shadow-female.png",
+      "usage": "the same eyes and brown hair as this character"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08110817951626248
+  },
+  "images": 4
+}

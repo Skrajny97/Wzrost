@@ -1,0 +1,23 @@
+{
+  "id": "winter-warrior-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "young woman warrior in festive winter armour for the old Slavic midwinter feast, tall adult heroine with realistic proportions and a small head, strong, red hair tied in a bun under the helmet, standing in the middle of the image, full body figure from the top of the head to the feet, empty space above the head and below the feet, polished steel plate armour with white fur trim and gold and red folk ornaments, a long red cape lined with white fur over the shoulders, a steel helmet with a white fur rim and a sprig of fir with red berries, holding a long broad sword with frost on the blade and a round steel shield with a golden eight-pointed winter star, epic and festive, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/winter-warrior-male.png",
+      "usage": "the same armour, red cape, fur trim, helmet, frosty sword, shield with the golden star, colours, body proportions and pixel art style as this character; she is a woman"
+    },
+    {
+      "path": "src/client/art/portraits/warrior-female.png",
+      "usage": "the same face and red hair as this character"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08059772764311897
+  },
+  "images": 4
+}

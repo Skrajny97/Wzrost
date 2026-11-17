@@ -1,0 +1,23 @@
+{
+  "id": "winter-archer-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "young woman archer in a festive winter hunting outfit for the old Slavic midwinter feast, tall adult heroine with realistic proportions and a small head, lean, brown hair, standing in the middle of the image, full body figure from the top of the head to the feet, empty space above the head and below the feet, a long green and red leather coat with white fur trim and golden folk embroidery, a white wolf fur mantle over the shoulders, a sprig of fir with red berries pinned to the chest, leather bracers and fur-topped boots, a quiver of white-fletched arrows on the back, holding a tall elegant longbow wound with fir twigs and a red ribbon, epic and festive, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/winter-archer-male.png",
+      "usage": "the same coat, white wolf fur mantle, bow, quiver, colours, body proportions and pixel art style as this character; she is a woman"
+    },
+    {
+      "path": "src/client/art/portraits/archer-female.png",
+      "usage": "the same face and brown hair as this character"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08046207891570198
+  },
+  "images": 4
+}
