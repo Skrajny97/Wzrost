@@ -1,0 +1,19 @@
+{
+  "id": "rider-skin-winter-archer-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the young archer of the reference picture riding: the same face, the same short messy brown hair, bare-headed, the same long green coat with a red panel and gold embroidered trims, the same thick white wolf fur mantle over the shoulders falling behind him, the same brown leather belt with a gold buckle, the same dark grey bracers, brown trousers, a dark grey boot with a white fur top, the same wooden bow wound with fir sprigs and a red ribbon strapped upright on the back behind the shoulder next to the quiver of white-fletched arrows, the whole bow above the waist and behind the body, never in front of the legs, nothing in the hands but the reins; sitting astride a saddle that is not drawn, upright, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the lower leg hanging straight down from the knee, one whole boot at the bottom with the toes pointing right; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the top of the head to the sole of the boot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/winter-archer-male.png",
+      "usage": "the character's look: this same man, his face, hair, green coat, white fur mantle, bow, quiver and colours, drawn the same way; not his standing pose and not the bow in his hand"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0817092653910319
+  },
+  "images": 4
+}
