@@ -374,17 +374,17 @@ export const SPRITES = {
   'board-winter': {
     width: 320,
     height: 480,
-    ids: ['camp-1'],
+    ids: ['camp-1', 'camp-2', 'camp-3'],
   },
   'board-tall-winter': {
     width: 320,
     height: 563,
-    ids: ['camp-1'],
+    ids: ['camp-1', 'camp-2', 'camp-3'],
   },
   'board-fortress-winter': {
     width: 320,
     height: 729,
-    ids: [],
+    ids: ['fortress'],
   },
   // Each building cut to its outline, at most 128 × 96, and the Kamień
   // węgielny Warowni on the board with the Osada. The Warownia's buildings
