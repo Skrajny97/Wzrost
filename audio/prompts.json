@@ -1200,7 +1200,11 @@
       "portals-lead": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses]", "text": "Portale czekają w zakładce Walka. Zajrzyjmy tam."},
       "portals-lands": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses]", "text": "W każdym Portalu przeniesiesz się do innej krainy, która da Ci odpowiednie surowce."},
       "portals-stages": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses]", "text": "Stopnie możesz pokonywać wedle własnego uznania… i możliwości. Najwyżej jednak dojdziesz do swojego poziomu postaci."},
-      "portals-sweep": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses]", "text": "Możesz czyścić również pokonany wcześniej stopień bez walki – pięć razy dziennie, zgarniając niezbędne zasoby."}
+      "portals-sweep": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses]", "text": "Możesz czyścić również pokonany wcześniej stopień bez walki – pięć razy dziennie, zgarniając niezbędne zasoby."},
+      "winter-welcome": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses]", "text": "Nad Puszczą zapada najdłuższa noc roku. Nadchodzą Szczodre Gody. Do Wigilii codziennie czeka na Ciebie nowe okienko kalendarza."},
+      "winter-quests": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses]", "text": "W grudniu dochodzą też trzy zimowe zadania: gałązki jodły z wypraw, karp na Wigilię i coś ciepłego z kuchni. Zrób wszystkie trzy jednego dnia, a dorzucę pakiet kart."},
+      "winter-first-quest": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses]", "text": "Pierwsze zimowe zadanie za Tobą. Puszcza pachnie jodłą i dymem z ognisk. Tak zaczynają się Gody."},
+      "winter-eve": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses]", "text": "Wigilia. Ostatnie okienko kalendarza kryje zimowy zestaw: ramkę Szron, tło Szczodrych Godów i aurę Śnieżycy. Szczodrych Godów!"}
     },
     "allLines": {
       "voice": "Narrator",
@@ -1257,7 +1261,11 @@
       "portals-lands": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "Each Portal takes you to a different land, one that will give you the resources you need."},
       "portals-stages": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "You may take on the stages as you see fit… and as far as you can. But you will go no higher than your character's level."},
       "portals-sweep": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "You can also clear a stage you have already beaten, without a fight – five times a day, gathering the resources you need."},
-      "faint-first": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "After a defeat, nothing from the exploration is kept, and the System takes away part of your experience as well. Before you set out again, check the threat and rest."}
+      "faint-first": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "After a defeat, nothing from the exploration is kept, and the System takes away part of your experience as well. Before you set out again, check the threat and rest."},
+      "winter-welcome": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "Over the wilds falls the longest night of the year. The Generous Feast is coming. Until Christmas Eve, a new window of the calendar waits for you every day."},
+      "winter-quests": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "In December, three winter quests come as well: fir branches from your explorations, a carp for Christmas Eve and something warm from the kitchen. Finish all three in one day, and I will add a card pack."},
+      "winter-first-quest": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "Your first winter quest is done. The wilds smell of fir and campfire smoke. This is how the Feast begins."},
+      "winter-eve": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "Christmas Eve. The last window of the calendar hides the winter set: the Hoarfrost frame, the Generous Feast background and the Snowstorm aura. Happy Generous Feast!"}
     }
   },
   "narrationEnVoices": {
