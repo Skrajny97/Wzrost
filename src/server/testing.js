@@ -37,6 +37,7 @@ export async function skipTime(context) {
       .run();
   };
   if (player.avatarActivity) await end('avatar_activities', player.avatarActivity);
+  if (player.avatar2Activity) await end('avatar2_activities', player.avatar2Activity);
   // A Drużyna's trip ends for all its members, as with "Przewiń" (time.js).
   const trip = activity && tripOf(activity);
   if (trip) {

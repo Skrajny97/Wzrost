@@ -140,7 +140,10 @@ const communityWaiting = (read) => isUnlocked('community') && !read.has('communi
 // Systemu. Till then their chapters wait for it, rather than pass their
 // pointers over on a screen without them (the tutorials' review of
 // 5.11.2026: on an exploration the chapter lost its lines).
-const workerFree = () => !state.character.activity || Boolean(state.character.professions?.avatar?.owned && !state.character.professions.avatar.activity);
+const workerFree = () =>
+  !state.character.activity ||
+  Boolean(state.character.professions?.avatar?.owned && !state.character.professions.avatar.activity) ||
+  Boolean(state.character.professions?.avatar?.second?.owned && !state.character.professions.avatar.second.activity);
 const craftingDue = (hash, read) =>
   Boolean(state.character.professions?.workshop) &&
   workerFree() &&

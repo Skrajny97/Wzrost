@@ -148,7 +148,27 @@ export function buildTopbar(onSettings) {
   // o dodatkowy pasek tak jak jest eksploracja albo profesja gracza tutaj”),
   // while it works or its report waits; a tap leads to its profession.
   const avatarTime = h('span', { class: 'activity-time' });
-  const avatarWork = h('a', { class: 'activity activity--avatar', href: '#/profesje', hidden: true }, h('span', { class: 'activity-label', text: t('AWATAR') }), avatarTime);
+  const avatarLabel = h('span', { class: 'activity-label', text: t('AWATAR') });
+  // With both Awatary at work (1066; 1070.3, the author: „paski mają się
+  // rozwijać po kliknięciu przy dwóch Awatarach jak zakładki”) the strip says
+  // AWATARY with the time of the one that ends first, and a tap unfolds
+  // under the row a tab for each, each leading to its work.
+  const avatarDrop = h('div', { class: 'avatar-drop', id: 'avatar-drop', hidden: true });
+  const avatarWork = h(
+    'a',
+    {
+      class: 'activity activity--avatar',
+      href: '#/profesje',
+      hidden: true,
+      onClick: (event) => {
+        if (avatarWork.dataset.drop !== 'on') return;
+        event.preventDefault();
+        showAvatarDrop(avatarDrop.hidden);
+      },
+    },
+    avatarLabel,
+    avatarTime,
+  );
   // The potions for a time drunk from the bag (potions.js): how long the
   // longest of them still works on explorations. A tap unfolds under the
   // row what the bonuses are, as on Postać (the author: „niech po kliknięciu
@@ -165,7 +185,7 @@ export function buildTopbar(onSettings) {
     speedTime,
     speedCount,
   );
-  const activityRow = h('div', { class: 'activity-row' }, encyclopedia, speed, activity, avatarWork, bonusDrop);
+  const activityRow = h('div', { class: 'activity-row' }, encyclopedia, speed, activity, avatarWork, bonusDrop, avatarDrop);
 
   // The settings, with a dot for the author when players' bug reports wait.
   // A class of its own, which the narrator points at: the label changes with
@@ -224,6 +244,8 @@ export function buildTopbar(onSettings) {
     activityRow,
     avatarWork,
     avatarTime,
+    avatarLabel,
+    avatarDrop,
     speed,
     speedTime,
     speedCount,
@@ -289,6 +311,59 @@ function showBonuses(open) {
   fill(topbar.bonusDrop, list);
 }
 
+// Opens or closes the tabs of both Awatary at work under AWATARY (1070.3).
+function showAvatarDrop(open) {
+  if (!topbar || topbar.avatarDrop.hidden === !open) return;
+  topbar.avatarDrop.hidden = !open;
+  if (topbar.avatarWork.dataset.drop === 'on') {
+    topbar.avatarLabel.textContent = `${t('AWATARY')} ${open ? '▴' : '▾'}`;
+    topbar.avatarWork.setAttribute('aria-expanded', String(open));
+  }
+  if (open) updateTopbar();
+}
+
+// What an Awatar does, in its tab under AWATARY.
+const AVATAR_DOING = {
+  herbs: 'Zbiera zioła w Zagajniku',
+  potions: 'Warzy mikstury',
+  items: 'Wykonuje przedmioty w Warsztacie',
+  minerals: 'Kopie w Kopalni',
+  jewels: 'Pracuje w Szlifierni',
+  fish: 'Łowi ryby',
+  crops: 'Uprawia pole',
+  dishes: 'Gotuje potrawy',
+};
+
+// The tabs of both Awatary (`works`: [work, label], the first's first), each
+// with what it does and its time, or that its report waits; a tap on one
+// leads to its work. Built once per work, the times updated after.
+function avatarTabs(works, now) {
+  const key = JSON.stringify(works.map(([work]) => [work.kind, work.startedAt]));
+  if (key !== topbar.avatarTabsKey) {
+    topbar.avatarTabsKey = key;
+    topbar.avatarTabTimes = [];
+    fill(
+      topbar.avatarDrop,
+      works.map(([work, label]) => {
+        const time = h('span', { class: 'activity-time' });
+        topbar.avatarTabTimes.push([work, time]);
+        return h(
+          'a',
+          { class: 'activity activity--avatar avatar-tab', href: WORK_SCREENS[work.kind]?.href ?? '#/profesje', onClick: () => showAvatarDrop(false) },
+          h('span', { class: 'avatar-tab-head' }, h('span', { class: 'activity-label', text: label }), h('span', { class: 'avatar-tab-what', text: t(AVATAR_DOING[work.kind] ?? 'Pracuje') })),
+          time,
+        );
+      }),
+    );
+  }
+  for (const [work, time] of topbar.avatarTabTimes) {
+    const finished = activityFinished(work, now);
+    time.parentElement.classList.toggle('activity--done', finished);
+    if (finished) time.textContent = t('RAPORT');
+    else setTimer(time, formatCountdown(work.endsAt - now));
+  }
+}
+
 // A tap anywhere else, or Escape, closes the lists.
 document.addEventListener('click', (event) => {
   if (topbar && !topbar.wallet.hidden && !topbar.wallet.contains(event.target) && !topbar.goldButton.contains(event.target)) {
@@ -297,11 +372,15 @@ document.addEventListener('click', (event) => {
   if (topbar && !topbar.bonusDrop.hidden && !topbar.bonusDrop.contains(event.target) && !topbar.speed.contains(event.target)) {
     showBonuses(false);
   }
+  if (topbar && !topbar.avatarDrop.hidden && !topbar.avatarDrop.contains(event.target) && !topbar.avatarWork.contains(event.target)) {
+    showAvatarDrop(false);
+  }
 });
 document.addEventListener('keydown', (event) => {
   if (event.key !== 'Escape' || !topbar) return;
   if (!topbar.wallet.hidden) showWallet(false);
   if (!topbar.bonusDrop.hidden) showBonuses(false);
+  if (!topbar.avatarDrop.hidden) showAvatarDrop(false);
 });
 
 export function updateTopbar(now = serverNow()) {
@@ -412,18 +491,38 @@ export function updateTopbar(now = serverNow()) {
   }
 
   // The Awatar's work (1021 B): how long it still works, or that its report
-  // waits, as the character's strip says it.
-  const avatarActivity = character.professions?.avatar?.activity ?? null;
-  topbar.avatarWork.hidden = !avatarActivity;
-  if (avatarActivity) {
-    const screen = WORK_SCREENS[avatarActivity.kind];
-    const finished = activityFinished(avatarActivity, now);
+  // waits, as the character's strip says it. With the second Awatar (1066)
+  // the one at work alone has the strip as the first one has it ("AWATAR
+  // II"), and both together share it as AWATARY (1070.3, above).
+  const professions = character.professions;
+  const works = [
+    [professions?.avatar?.activity, t('AWATAR')],
+    [professions?.avatar?.second?.activity, t('AWATAR II')],
+  ].filter(([work]) => work);
+  topbar.avatarWork.hidden = works.length === 0;
+  const both = works.length === 2;
+  topbar.avatarWork.dataset.drop = both ? 'on' : 'off';
+  if (!both) showAvatarDrop(false);
+  if (works.length > 0) {
+    // The one that ends first (a report waiting first of all).
+    const [shown, label] = works.length === 1 ? works[0] : [...works].sort(([a], [b]) => a.endsAt - b.endsAt)[0];
+    const screen = WORK_SCREENS[shown.kind];
+    const finished = activityFinished(shown, now);
     topbar.avatarWork.classList.toggle('activity--done', finished);
-    topbar.avatarWork.setAttribute('href', screen ? screen.href : '#/profesje');
+    topbar.avatarWork.setAttribute('href', both ? '#/profesje' : screen ? screen.href : '#/profesje');
+    topbar.avatarLabel.textContent = both ? `${t('AWATARY')} ${topbar.avatarDrop.hidden ? '▾' : '▴'}` : label;
     if (finished) topbar.avatarTime.textContent = t('RAPORT');
-    else setTimer(topbar.avatarTime, formatCountdown(avatarActivity.endsAt - now));
-    const what = [screen && t(screen.label), avatarActivity.placeName].filter(Boolean).join(' · ');
+    else setTimer(topbar.avatarTime, formatCountdown(shown.endsAt - now));
+    const what = [screen && t(screen.label), shown.placeName].filter(Boolean).join(' · ');
     topbar.avatarWork.setAttribute('aria-label', `${t('praca Awatara')}: ${what}, ${finished ? t('raport czeka') : topbar.avatarTime.textContent}`);
+    if (both) {
+      topbar.avatarWork.setAttribute('aria-expanded', String(!topbar.avatarDrop.hidden));
+      topbar.avatarWork.setAttribute('aria-controls', 'avatar-drop');
+      avatarTabs(works, now);
+    } else {
+      topbar.avatarWork.removeAttribute('aria-expanded');
+      topbar.avatarWork.removeAttribute('aria-controls');
+    }
   }
   // A potion's tile and the Awatar's strip both in the row: on a phone the
   // tile grows shorter (styles.css).
@@ -455,16 +554,18 @@ const TIMED = {
 // not under way (a player, 16.11.2026: „żeby jak np. awatar systemu nam
 // łowi czy tam cokolwiek robi w profesjach to żeby też było widać ten czas
 // na pasku po lewej”, „tak jak wtedy gdy nasza postać to robi”); `byAvatar`
-// says it is the Awatar's.
+// says it is the Awatar's. With two Awatary (1066) the one that ends first.
 function tabTime(id, now = serverNow()) {
   const activity = state.character?.activity;
   const own = activity && TIMED[id].kinds.includes(activity.kind) ? activity : null;
   const ownRunning = Boolean(own) && !activityFinished(own, now);
-  const avatar = (id === 'profesje' && state.character?.professions?.avatar?.activity) || null;
-  const avatarRunning = Boolean(avatar) && !activityFinished(avatar, now);
+  const avatars = id === 'profesje' ? [state.character?.professions?.avatar?.activity, state.character?.professions?.avatar?.second?.activity].filter(Boolean) : [];
+  const running = avatars.filter((work) => !activityFinished(work, now)).sort((a, b) => a.endsAt - b.endsAt);
+  const avatar = running[0] ?? null;
+  const avatarRunning = Boolean(avatar);
   const byAvatar = !ownRunning && avatarRunning;
   const work = byAvatar ? avatar : own;
-  const ready = (Boolean(own) && !ownRunning) || (Boolean(avatar) && !avatarRunning);
+  const ready = (Boolean(own) && !ownRunning) || avatars.some((one) => activityFinished(one, now));
   return { work, running: ownRunning || avatarRunning, ready, byAvatar };
 }
 // The build under way in the camp and whether a production building's
@@ -543,7 +644,7 @@ const PARTS = {
     const professions = state.character.professions;
     if (!professions) return [];
     const now = serverNow();
-    const done = [state.character.activity, professions.avatar?.activity].filter((work) => WORK_SCREENS[work?.kind] && activityFinished(work, now));
+    const done = [state.character.activity, professions.avatar?.activity, professions.avatar?.second?.activity].filter((work) => WORK_SCREENS[work?.kind] && activityFinished(work, now));
     return professions.list.map((profession) => {
       const screen = Object.values(WORK_SCREENS).find((one) => one.profession === profession.id);
       return (

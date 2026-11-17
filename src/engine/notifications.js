@@ -40,12 +40,14 @@ const WORKS = {
 };
 
 // The notification of a work that ended, the character's or, with
-// `avatar`, the Awatar's; null for none.
+// `avatar`, the Awatar's (true) or the second Awatar's (2, 1066); null for
+// none.
 /**
  * @param {Activity | null | undefined} activity
  * @param {number} from
  * @param {number} to
  * @param {Content} content
+ * @param {boolean | 2} [avatar]
  * @returns {Notice | null}
  */
 function workNotice(activity, from, to, content, avatar = false) {
@@ -53,27 +55,28 @@ function workNotice(activity, from, to, content, avatar = false) {
   if (!activity || !work || !within(activity.endsAt, from, to)) return null;
   const texts = activity.kind === 'herbs' ? content.professionTexts : content[work.place].texts;
   return {
-    tag: avatar ? `avatar-${activity.kind}` : activity.kind,
+    tag: avatar === 2 ? `avatar2-${activity.kind}` : avatar ? `avatar-${activity.kind}` : activity.kind,
     url: work.url,
     at: activity.endsAt,
-    title: say(avatar ? content.avatar.texts : texts, 'pushTitle', 0),
+    title: say(avatar === 2 ? content.avatar.second.texts : avatar ? content.avatar.texts : texts, 'pushTitle', 0),
     body: say(texts, 'pushBody', 0, { place: content[work.place].place.name }),
   };
 }
 
-// `player`: { level, activity, avatarActivity, buildings, queue, collector }:
-// the activity and the Awatar's work as { kind, areaId, endsAt } (or null),
+// `player`: { level, activity, avatarActivity, avatar2Activity, buildings,
+// queue, collector }: the activity and the Awatars' works as { kind, areaId,
+// endsAt } (or null),
 // the buildings and the build queue as the camp keeps them (camp.js), and
 // whether the character has the Zbieracz Systemu. Gives
 // [{ tag, url, at, title, body }], oldest first.
 /**
- * @param {{ level: number, activity: Activity | null, avatarActivity?: Activity | null, buildings: Record<string, { level: number, endsAt: number }>, queue: QueuedBuild[], collector?: boolean }} player
+ * @param {{ level: number, activity: Activity | null, avatarActivity?: Activity | null, avatar2Activity?: Activity | null, buildings: Record<string, { level: number, endsAt: number }>, queue: QueuedBuild[], collector?: boolean }} player
  * @param {number} from
  * @param {number} to
  * @param {Content} content
  * @returns {Notice[]}
  */
-export function notificationsDue({ level, activity, avatarActivity = null, buildings, queue, collector = false }, from, to, content) {
+export function notificationsDue({ level, activity, avatarActivity = null, avatar2Activity = null, buildings, queue, collector = false }, from, to, content) {
   const { texts } = content;
   /** @type {Notice[]} */
   const due = [];
@@ -91,7 +94,7 @@ export function notificationsDue({ level, activity, avatarActivity = null, build
   // an order of items (workshop.js), a digging (mining.js) and a work in the
   // Szlifiernia (jewelcraft.js), told the same way, and so the work
   // of the Awatar Systemu (avatar.js), under its own title and tag.
-  for (const work of [workNotice(activity, from, to, content), workNotice(avatarActivity, from, to, content, true)]) {
+  for (const work of [workNotice(activity, from, to, content), workNotice(avatarActivity, from, to, content, true), workNotice(avatar2Activity, from, to, content, 2)]) {
     if (work) due.push(work);
   }
 

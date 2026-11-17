@@ -281,7 +281,7 @@ async function removeAccount(db, session, now) {
     db.prepare(`DELETE FROM trades WHERE from_id IN (${characters}) OR to_id IN (${characters})`).bind(id, id),
     db.prepare(`DELETE FROM friends WHERE character_id IN (${characters}) OR friend_id IN (${characters})`).bind(id, id),
     db.prepare(`DELETE FROM gifts WHERE sender_id IN (${characters}) OR receiver_id IN (${characters})`).bind(id, id),
-    ...['reports', 'activities', 'avatar_activities', 'items', 'storage_items', 'core_artifacts', 'buildings', 'lottery_tickets'].map((table) =>
+    ...['reports', 'activities', 'avatar_activities', 'avatar2_activities', 'items', 'storage_items', 'core_artifacts', 'buildings', 'lottery_tickets'].map((table) =>
       db.prepare(`DELETE FROM ${table} WHERE character_id IN (${characters})`).bind(id),
     ),
     // Its characters' live card matches, ended as lost (card-duel.js).

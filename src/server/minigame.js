@@ -6,7 +6,7 @@
 
 import { MINIGAME_KINDS, minigameChallenge, minigameHits, minigameLine, minigameResult } from '../engine/index.js';
 import { content } from './content.js';
-import { requirePlayer } from './characters.js';
+import { avatarAsked, avatarWorkOf, requirePlayer, workTable } from './characters.js';
 import { ApiError, json, readJson } from './http.js';
 
 // Whether a work has a mini-game: the works of MINIGAME_KINDS, but an order
@@ -19,19 +19,20 @@ function hasMinigame(activity) {
 }
 
 // POST /api/minigame { avatar? }: the mini-game of the work that ended, the
-// character's or, with `avatar`, the Awatar's, begun now, or as it began if
+// character's or, with `avatar`, the Awatar's (true) or the second Awatar's
+// (2, 1066), begun now, or as it began if
 // it did already (one game for one work, its zones from the work's seed):
 // the zones, the marker's period, when it began on the server's clock, and
 // its words.
 export async function startMinigame(context) {
   const body = await readJson(context.request);
   const { player } = await requirePlayer(context);
-  const avatar = body.avatar === true;
-  const activity = avatar ? player.avatarActivity : player.activity;
+  const avatar = avatarAsked(body);
+  const activity = avatar ? avatarWorkOf(player, avatar) : player.activity;
   const rules = content().minigame;
   if (!hasMinigame(activity)) throw new ApiError(409, 'no_minigame', 'Ta praca nie ma minigry.');
   if (activity.ends_at > context.now) throw new ApiError(409, 'not_finished', 'Praca jeszcze trwa.');
-  const table = avatar ? 'avatar_activities' : 'activities';
+  const table = workTable(avatar);
   const db = context.env.DB;
   let at = JSON.parse(activity.options ?? '{}').minigame?.at;
   if (typeof at !== 'number') {

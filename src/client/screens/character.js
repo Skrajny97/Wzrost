@@ -232,6 +232,11 @@ let switchTicks = [];
 // it "A" with the time left of its Awatar Systemu's work (the author,
 // 16.11.2026: „niech nad postaciami wyświetla się też A (jak Awatar) i czas
 // ukończenia pracy przez Awatara”); "Gotowe" in gold once one has ended.
+// With two Awatary (1066) the work of the one that ends first.
+const avatarWorkOf = (one) => {
+  const works = (one.played ? [state.character.professions?.avatar?.activity, state.character.professions?.avatar?.second?.activity] : [one.avatarActivity, one.avatar2Activity]).filter(Boolean);
+  return works.sort((a, b) => a.endsAt - b.endsAt)[0] ?? null;
+};
 function switchTimer(one) {
   const own = h('span', { class: 'char-switch-time', 'aria-hidden': 'true' });
   const avatarTime = h('span', {});
@@ -244,7 +249,7 @@ function switchTimer(one) {
   };
   const update = (now) => {
     show(own, own, one.played ? state.character.activity : one.activity, now);
-    avatar.classList.toggle('char-switch-time--idle', !show(avatar, avatarTime, one.played ? state.character.professions?.avatar?.activity : one.avatarActivity, now));
+    avatar.classList.toggle('char-switch-time--idle', !show(avatar, avatarTime, avatarWorkOf(one), now));
   };
   update(serverNow());
   switchTicks.push(update);
@@ -257,7 +262,7 @@ function characterSwitch(list, switchCharacter) {
   return h(
     'nav',
     // The Awatar's line only when one of the busts has its Awatar at work.
-    { class: `char-switch${list.characters.some((one) => (one.played ? state.character.professions?.avatar?.activity : one.avatarActivity)) ? ' char-switch--avatars' : ''}`, 'aria-label': t('Twoje postacie'), 'data-guide': 'char-switch' },
+    { class: `char-switch${list.characters.some((one) => avatarWorkOf(one)) ? ' char-switch--avatars' : ''}`, 'aria-label': t('Twoje postacie'), 'data-guide': 'char-switch' },
     list.characters.map((one) =>
       h(
         'button',

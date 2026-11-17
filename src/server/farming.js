@@ -7,7 +7,7 @@
 
 import { farmingMinutes, farmingReport, harvest, knownCrops, minigameExtra, plotCount, professionState, weekFactor } from '../engine/index.js';
 import { content } from './content.js';
-import { characterView, currentHp, loadPlayer, requireWorker, workOf } from './characters.js';
+import { avatarMark, avatarTexts, characterView, currentHp, loadPlayer, requireWorker, workOf, workTable } from './characters.js';
 import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { characterChanged, raced, sameVersion } from './atomic.js';
@@ -59,7 +59,7 @@ export async function startFarming(context) {
       avatar
         ? [
             db
-              .prepare('INSERT INTO avatar_activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, options) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+              .prepare(`INSERT INTO ${workTable(avatar)} (character_id, kind, region_id, minutes, started_at, ends_at, seed, options) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
               .bind(row.id, 'crops', farming.place.id, body.minutes, now, ends, seed, options),
           ]
         : [
@@ -77,7 +77,7 @@ export async function startFarming(context) {
     );
   } catch (error) {
     if (raced(error)) throw characterChanged();
-    if (String(error?.message).includes('constraint')) throw new ApiError(409, 'busy', avatar ? content().avatar.texts.busy[0] : 'Postać jest już zajęta.');
+    if (String(error?.message).includes('constraint')) throw new ApiError(409, 'busy', avatar ? avatarTexts(avatar).busy[0] : 'Postać jest już zajęta.');
     throw error;
   }
   return json({ character: characterView(await loadPlayer(db, session.userId), now) }, 201);
@@ -117,7 +117,7 @@ export async function finishFarming(db, player, now, { avatar = false, minigame 
       { minutes: activity.minutes, startedAt: activity.started_at, endsAt: activity.ends_at, seed: activity.seed, plots, byPlot, found, lucky, before, after, character, xp, work },
       content(),
     ),
-    ...(avatar && { avatar: true }),
+    ...avatarMark(avatar),
     ...(card && { cards: card.cards }),
   }, minigame);
   const summary = {
@@ -129,7 +129,7 @@ export async function finishFarming(db, player, now, { avatar = false, minigame 
     professionLevel: after.level,
     levelAfter: work.level,
     system: report.system,
-    ...(avatar && { avatar: true }),
+    ...avatarMark(avatar),
     ...(card && { cards: cardSummary(card.cards) }),
   };
   const pantry = addTo('pantry', found);
