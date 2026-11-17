@@ -29,6 +29,8 @@ describe('the Sklep Systemu in the engine', () => {
         ['bg-tower', 'background', 'Wieża', 150],
         ['bg-camp', 'background', 'Obóz nocą', 150],
         ['sabertooth', 'mountSkin', 'Tygrys szablozębny', 1000],
+        // The reindeer (1059 C, 1064): sold only in December (1049 A).
+        ['reindeer', 'mountSkin', 'Renifer', 1000],
         ['aura-system', 'aura', 'Aura Systemu', 500],
         ['aura-ember', 'aura', 'Aura Żaru', 500],
         ['trail-light', 'trail', 'Świetliste ślady', 300],
@@ -72,6 +74,9 @@ describe('the Sklep Systemu in the engine', () => {
     assert.equal(cosmeticBlock('frame-season', {}, { ...rich, season: 'winter' }, withSeason), null);
     assert.equal(cosmeticBlock('frame-season', { owned: ['frame-season'] }, rich, withSeason).code, 'owned');
     assert.equal(cosmeticBlock('frame-gold', {}, { ...rich, season: 'winter' }, withSeason), null);
+    assert.equal(content.cosmeticsById.reindeer.season, 'winter');
+    assert.equal(cosmeticBlock('reindeer', {}, { systemPoints: 5000, mount: { stage: 1 } }, content).code, 'out_of_season');
+    assert.equal(cosmeticBlock('reindeer', {}, { systemPoints: 5000, mount: { stage: 1 }, season: 'winter' }, content), null);
   });
 
   test('the stored state holds only what the data has, owned once, worn only when owned and of its kind', () => {

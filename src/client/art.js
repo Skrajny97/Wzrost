@@ -609,7 +609,7 @@ export const SPRITES = {
     width: 176,
     height: 144,
     fit: true,
-    ids: ['pony', 'horse', 'steed', 'sabertooth'],
+    ids: ['pony', 'horse', 'steed', 'sabertooth', 'reindeer'],
   },
   // The Sklep Systemu's frames of the portrait, 120×160 with a window in the
   // middle, and its backgrounds behind the figure, 96×128
