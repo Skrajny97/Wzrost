@@ -8,10 +8,12 @@
     { "id": "camp-v1", "name": "Obóz", "file": "audio/music/camp-v1.mp3" },
     { "id": "evolution-v1", "name": "Ewolucja klasy", "file": "audio/music/evolution-v1.mp3" },
     { "id": "settlement-v1", "name": "Osada", "file": "audio/music/settlement-v1.mp3" },
-    { "id": "casino-v1", "name": "Salon Gier", "file": "audio/music/casino-v1.mp3" }
+    { "id": "casino-v1", "name": "Salon Gier", "file": "audio/music/casino-v1.mp3" },
+    { "id": "winter-v1", "name": "Szczodre Gody", "file": "audio/music/winter-v1.mp3" }
   ],
   "default": "background-v1",
   "places": { "camp": "camp-v1", "skills": "skills-v1", "professions": "professions-v1", "evolution": "evolution-v1", "settlement": "settlement-v1", "settlement:casino": "casino-v1" },
+  "winter": { "default": "winter-v1", "places": { "professions": "winter-v1" } },
   "reports": { "success": "victory-v1", "fainted": "defeat-v1" },
   "fadeOutSeconds": 5,
   "pauseSeconds": 2.5,

@@ -104,6 +104,12 @@ export function setMusicOn(value) {
   update();
 }
 
+// Whether Szczodre Gody's music plays now (app.js: the character's winter camp).
+let winterOn = () => false;
+export function setMusicWinterCheck(check) {
+  winterOn = check;
+}
+
 export function setMusicConfig(music) {
   config = music;
   wanted ??= music.default;
@@ -128,7 +134,12 @@ export function prefetchMusic() {
 // track goes first.
 export function setMusicPlace(places, report = null) {
   if (!config) return;
-  const track = (report && config.reports[report]) || places.map((place) => config.places[place]).find(Boolean) || config.default;
+  // Szczodre Gody (December, while the winter camp stands): its track in
+  // place of the default and of its places (data/music.json, winter; the
+  // author: „podmianka wtedy za ogólną i tę na karcie profesji”).
+  const winter = winterOn() ? (config.winter ?? null) : null;
+  const placeTrack = (place) => winter?.places?.[place] ?? config.places[place];
+  const track = (report && config.reports[report]) || places.map(placeTrack).find(Boolean) || winter?.default || config.default;
   if (track === wanted) return;
   wanted = track;
   update();

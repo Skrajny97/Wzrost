@@ -55,7 +55,7 @@ import { mountSkills } from './screens/skills.js';
 import { mountStats } from './screens/stats.js';
 import { mountTrade, offerTrade } from './screens/trade.js';
 import { offerDuel } from './card-duel.js';
-import { musicOn, musicVolume, prefetchMusic, setMusicConfig, setMusicOn, setMusicPlace, setMusicVolume, startMusic } from './music.js';
+import { musicOn, musicVolume, prefetchMusic, setMusicConfig, setMusicOn, setMusicPlace, setMusicVolume, setMusicWinterCheck, startMusic } from './music.js';
 import { resetCamera } from './camera.js';
 import { applyMotion } from './motion.js';
 import { ZOOM_MAX, ZOOM_MIN, applyZoom, stepZoom, zoomLevel, zoomOffered } from './zoom.js';
@@ -237,6 +237,8 @@ async function start() {
   languageReady
     .then(() => loadContent())
     .then((content) => {
+      // Szczodre Gody's music while the character's winter camp stands (December).
+      setMusicWinterCheck(() => Boolean(state.character?.winterCamp));
       setMusicConfig(content.music);
       setRecordings(content.sounds);
     })
