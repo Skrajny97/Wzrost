@@ -1,0 +1,14 @@
+{
+  "id": "camp-1-trees",
+  "tool": "pixellab inpaint-v3",
+  "description": "top-down pixel art game map seen from above, a dense winter forest of fir trees and leafy trees around a snowy glade, thick fresh white snow lying on the branches and crowns of the trees, a little snow on the ground between the trees, the same pixel art style as the glade, seamless, no buildings, no people, no paths",
+  "style": "src/client/art/camp/campfire-1.png",
+  "input": "art/inputs/winter/camp-1-snowy.png",
+  "mask": "art/inputs/winter/camp-1-trees-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.15
+  },
+  "images": 1
+}
