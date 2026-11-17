@@ -423,7 +423,7 @@ export const SPRITES = {
   // scrolls, the Zwój ochronny and the Zwój utrwalenia (598 C).
   icons: {
     size: 32,
-    ids: ['gold', 'time-points', 'encyclopedia', 'ward-scroll', 'steady-scroll', 'oblivion-scroll'],
+    ids: ['gold', 'time-points', 'encyclopedia', 'ward-scroll', 'steady-scroll', 'oblivion-scroll', 'fir-branch'],
   },
   // The professions' squares on the Profesje tab, 48×48.
   professions: {
@@ -749,6 +749,8 @@ export const encyclopediaArt = (size) => iconArt('encyclopedia', size, 'book');
 // A scroll by its id: the Kowadło's (ward-scroll, steady-scroll) and the
 // Zwój Niepamięci (oblivion-scroll, 989).
 export const scrollArt = (id, size) => iconArt(id, size, 'scroll');
+// The fir branch of Szczodre Gody's winter quest (1044.7 D).
+export const firBranchArt = (size) => iconArt('fir-branch', size, 'leaf');
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
 // The pictures of the Labirynt Systemu and the Rdzeń (art/labyrinth/, 850–866,
 // accepted in 868 and 869): its rooms (room-<type>), its Artefakty

@@ -127,6 +127,7 @@ import { finishFarming } from './farming.js';
 import { applyPartyEvent, checkedChoice, leaderView, resolveAuto, resolvePartyRow, tripEvent, tripLine } from './party-events.js';
 import { wantedAfterHunt, wantedGoing, wantedOnTrip } from './wanted.js';
 import { keptWeek, weekNow } from './weeks.js';
+import { winterGainSql } from './winter.js';
 
 // A JSON path for a resource id with a hyphen ("iron-ore").
 const resourcePath = (id) => `$."${id}"`;
@@ -1176,6 +1177,9 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
   const opened = areasOpened(character.classLevel, applied.classLevel, content());
   const progress = { kills: hunt.forfeit ? {} : huntKills(hunt, content()), minutes: credited, opened };
   const quests = JSON.stringify(addQuestProgress(questsNow(player, now), progress));
+  // Szczodre Gody's fir branches (winter.js, 1044.4): the minutes explored,
+  // none after a faint.
+  const winterGain = winterGainSql(row, now, { minutes: hunt.forfeit ? 0 : credited });
   const setMaterials = left.length
     ? `, materials = json_set(materials, ${left.map(() => '?, COALESCE(json_extract(materials, ?), 0) + ?').join(', ')})`
     : '';
@@ -1226,7 +1230,7 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
       db
         .prepare(
           `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = MAX(0, gold + ? + ${storedPrice.sql})${setResources}${setMaterials}${setHerbs}${setGems.sql},
-             time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${potionsChanged ? ', potions = ?' : ''}${event ? ', event_test = NULL' : ''}${eventBuffs ? ', buffs = ?' : ''}${eventPoints > 0 ? ', bonus_points = bonus_points + ?' : ''}${settlementAfter ? ', settlement = ?' : ''}${fortressAfter ? ', fortress = ?' : ''},
+             time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${potionsChanged ? ', potions = ?' : ''}${event ? ', event_test = NULL' : ''}${eventBuffs ? ', buffs = ?' : ''}${eventPoints > 0 ? ', bonus_points = bonus_points + ?' : ''}${settlementAfter ? ', settlement = ?' : ''}${fortressAfter ? ', fortress = ?' : ''}${winterGain.sql},
              version = version + 1
            WHERE id = ?`,
         )
@@ -1254,6 +1258,7 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
           ...(eventPoints > 0 ? [eventPoints] : []),
           ...(settlementAfter ? [settlementAfter] : []),
           ...(fortressAfter ? [fortressAfter] : []),
+          ...winterGain.binds,
           row.id,
         ),
       // The Próby Gildii's trial too (guild-trials.js), one taken before the

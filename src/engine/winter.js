@@ -141,3 +141,102 @@ export function winterDecorations(stored, period, content) {
   const taken = winterTaken(stored, period);
   return days.flatMap((/** @type {Record<string, any>} */ rule, /** @type {number} */ index) => (rule.decoration && taken.includes(first + index) ? [rule.decoration] : []));
 }
+
+// The winter quests (1044.4; data/winter.json, quests): on every day of the
+// winter camp three quests by the daily ones, in a tab of the narrator's
+// quests of their own: fir branches from the explorations (one a
+// minutesPerPiece minutes of exploring), a carp from Rybołówstwo (any fish
+// before the carp's level) and a dish from Gotowanie. Each gives its Punkty
+// Czasu and the gold of its minutes of exploring; all of the day's open ones
+// a card pack. A profession's quest is closed until the character has the
+// profession, and the chest waits only for the open ones. Stored with the
+// calendar (characters.winter.quests): {"key": day, "minutes", "fish",
+// "dishes", "claimed": [ids], "chest": true}; another day's count for
+// nothing.
+
+/** @typedef {{ key: string, minutes: number, fish: number, dishes: number, claimed: string[], chest: boolean }} WinterQuests */
+/** @typedef {{ fishingOpen: boolean, cookingOpen: boolean, carpOpen: boolean, fishingLevel: number, cookingLevel: number }} WinterFacts */
+
+/**
+ * @param {unknown} stored
+ * @param {string} key
+ * @returns {WinterQuests}
+ */
+export function winterQuestsOf(stored, key) {
+  const quests = /** @type {Record<string, any> | null} */ (stored && typeof stored === 'object' ? /** @type {Record<string, any>} */ (stored).quests : null);
+  const count = (/** @type {unknown} */ value) => (Number.isInteger(value) && /** @type {number} */ (value) > 0 ? /** @type {number} */ (value) : 0);
+  if (!quests || quests.key !== key) return { key, minutes: 0, fish: 0, dishes: 0, claimed: [], chest: false };
+  return {
+    key,
+    minutes: count(quests.minutes),
+    fish: count(quests.fish),
+    dishes: count(quests.dishes),
+    claimed: Array.isArray(quests.claimed) ? quests.claimed.filter((id) => typeof id === 'string') : [],
+    chest: quests.chest === true,
+  };
+}
+
+// The stored state with the day's gains added: minutes of exploring, fish
+// counted for the fish quest, dishes cooked.
+/**
+ * @param {unknown} stored
+ * @param {string} key
+ * @param {{ minutes?: number, fish?: number, dishes?: number }} gains
+ */
+export function winterQuestsGain(stored, key, { minutes = 0, fish = 0, dishes = 0 }) {
+  const quests = winterQuestsOf(stored, key);
+  const base = stored && typeof stored === 'object' ? stored : {};
+  return { ...base, quests: { ...quests, minutes: quests.minutes + minutes, fish: quests.fish + fish, dishes: quests.dishes + dishes } };
+}
+
+// The day's winter quests of a character of `level`: each with its words'
+// key, its count, progress, whether done, claimed or closed, and its rewards
+// (gold, Punkty Czasu); and the chest, ready once every open quest is done.
+/**
+ * @param {unknown} stored
+ * @param {string} key
+ * @param {WinterFacts} facts
+ * @param {number} level
+ * @param {Content} content
+ */
+export function winterQuestList(stored, key, facts, level, content) {
+  const state = winterQuestsOf(stored, key);
+  const { goldRound } = content.winter.calendar;
+  const gold = (/** @type {number} */ minutes) => (minutes ? Math.max(goldRound, Math.round((explorationGold(level, content) * minutes) / 60 / goldRound) * goldRound) : 0);
+  const quests = content.winter.quests.list.map((/** @type {Record<string, any>} */ rule) => {
+    const closed = (rule.kind === 'fish' && !facts.fishingOpen) || (rule.kind === 'cook' && !facts.cookingOpen);
+    const reached = rule.kind === 'explore' ? Math.floor(state.minutes / rule.minutesPerPiece) : rule.kind === 'fish' ? state.fish : state.dishes;
+    const progress = closed ? 0 : Math.min(rule.count, reached);
+    return {
+      id: rule.id,
+      kind: rule.kind,
+      count: rule.count,
+      progress,
+      done: !closed && progress >= rule.count,
+      claimed: state.claimed.includes(rule.id),
+      closed,
+      // Before the carp's level any fish counts.
+      anyFish: rule.kind === 'fish' && !facts.carpOpen,
+      minutesPerPiece: rule.minutesPerPiece ?? null,
+      gold: gold(rule.goldMinutes),
+      timePoints: rule.timePoints,
+    };
+  });
+  const open = quests.filter((/** @type {{ closed: boolean }} */ quest) => !quest.closed);
+  return {
+    quests,
+    chest: { packs: content.winter.quests.chest.packs, ready: open.length > 0 && open.every((/** @type {{ done: boolean }} */ quest) => quest.done), opened: state.chest },
+  };
+}
+
+// The stored state with a quest's reward or the chest taken.
+/**
+ * @param {unknown} stored
+ * @param {string} key
+ * @param {{ quest?: string, chest?: boolean }} taken
+ */
+export function winterQuestsTaken(stored, key, { quest, chest = false }) {
+  const quests = winterQuestsOf(stored, key);
+  const base = stored && typeof stored === 'object' ? stored : {};
+  return { ...base, quests: { ...quests, claimed: quest ? [...new Set([...quests.claimed, quest])] : quests.claimed, chest: quests.chest || chest } };
+}

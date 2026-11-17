@@ -19,6 +19,7 @@ import { pantryOf } from './professions-view.js';
 import { trimReports } from './reports.js';
 import { keptWeek, weekNow } from './weeks.js';
 import { withMinigame } from './minigame.js';
+import { winterGainSql } from './winter.js';
 
 // A fishing of `minutes` from now on, of the fish chosen (`fish`, as many
 // kinds as the level's slots allow), by the character or by its Awatar
@@ -125,6 +126,8 @@ export async function finishFishing(db, player, now, { avatar = false, minigame 
     ...(card && { cards: cardSummary(card.cards) }),
   };
   const pantry = addTo('pantry', found);
+  // Szczodre Gody's carp (winter.js, 1044.4).
+  const winterGain = winterGainSql(row, now, { fish: found });
   let results;
   try {
     results = await db.batch([
@@ -136,7 +139,7 @@ export async function finishFishing(db, player, now, { avatar = false, minigame 
         .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(row.id, key, 'fish', now, JSON.stringify(summary), JSON.stringify(report)),
       trimReports(db, row.id, 'fish'),
-      db.prepare(`UPDATE characters SET version = version + 1${sets.sql}${pantry.sql} WHERE id = ?`).bind(...sets.binds, ...pantry.binds, row.id),
+      db.prepare(`UPDATE characters SET version = version + 1${sets.sql}${pantry.sql}${winterGain.sql} WHERE id = ?`).bind(...sets.binds, ...pantry.binds, ...winterGain.binds, row.id),
       // The Punkty Sławy of the work (fame.js), the Awatar's a quarter.
       ...workFamePoints(db, row.id, activity.minutes, avatar, now),
       // The card the work left, a copy (cards.js).

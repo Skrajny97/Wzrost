@@ -6,7 +6,7 @@
 // are written in Polish and shown in the page's language (t(), i18n.js); the
 // quests' own words come from the server in it.
 
-import { materialSprite, monsterSprite, resourceArt } from './art.js';
+import { dishSprite, firBranchArt, fishSprite, materialSprite, monsterSprite, resourceArt, timePointsArt } from './art.js';
 import { $, fill, h, icon, setTimer } from './dom.js';
 import { countOf, formatCountdown, formatNumber } from './format.js';
 import { t } from './i18n.js';
@@ -17,6 +17,9 @@ import { timePoints } from './time.js';
 import { confirmAction, toast, withButton } from './ui.js';
 
 const PERIODS = ['daily', 'weekly', 'monthly'];
+// With Szczodre Gody's winter quests in December (winter.js on the server,
+// 1044.4) a fourth tab, "Zimowe".
+const periodsOf = (quests) => [...PERIODS, ...(quests?.winter ? ['winter'] : [])];
 
 let open = null; // { dialog, sheet, page, timer, endsAt, countdown, closing } while the parchment is out
 let tab = 'daily';
@@ -27,7 +30,7 @@ export const systemPoints = (count) => countOf(count, 'Punkt Systemu', 'Punkty S
 export const claimable = (quests, periodId) =>
   quests[periodId].quests.filter((quest) => quest.done && !quest.claimed).length + (quests[periodId].chest.ready && !quests[periodId].chest.opened ? 1 : 0);
 
-export const anyClaimable = (character = state.character) => Boolean(character?.quests) && PERIODS.some((periodId) => claimable(character.quests, periodId) > 0);
+export const anyClaimable = (character = state.character) => Boolean(character?.quests) && periodsOf(character.quests).some((periodId) => claimable(character.quests, periodId) > 0);
 
 // The time to a period's new quests: "5:12:33", with the days of a week in front.
 function untilNew(ms) {
@@ -39,6 +42,7 @@ function untilNew(ms) {
 // A reward as its icon and amount, and as words for a message.
 function rewardName(reward) {
   if (reward.kind === 'gold') return t('Złoto');
+  if (reward.kind === 'timePoints') return t('Punkty Czasu');
   const list = reward.kind === 'resource' ? state.content.resources : state.content.parts;
   return list.find((entry) => entry.id === reward.id)?.name ?? reward.id;
 }
@@ -54,7 +58,9 @@ function rewardChip(reward) {
   const art =
     reward.kind === 'part'
       ? (materialSprite(reward.id) ?? icon('hammer', { size: 20 }))
-      : resourceArt(reward.kind === 'gold' ? 'gold' : reward.id, 18);
+      : reward.kind === 'timePoints'
+        ? timePointsArt(18)
+        : resourceArt(reward.kind === 'gold' ? 'gold' : reward.id, 18);
   return h(
     'span',
     { class: `quest-reward quest-reward--${reward.kind}`, title: rewardName(reward) },
@@ -67,7 +73,11 @@ function rewardChip(reward) {
 // the work is done with.
 const QUEST_ICONS = { explore: 'swords', unlock: 'unlocked', mineAny: 'ore', jewelAny: 'ring' };
 
+// The winter quests' pictures: the fir branch, the carp, the kutia.
+const WINTER_ART = { 'winter-explore': () => firBranchArt(24), 'winter-fish': () => fishSprite('carp'), 'winter-cook': () => dishSprite('kutia') };
+
 function questArt(quest) {
+  if (WINTER_ART[quest.kind]) return h('span', { class: 'quest-art', 'aria-hidden': 'true' }, WINTER_ART[quest.kind]() ?? icon('hammer', { size: 24 }));
   if (quest.kind === 'kill') {
     const known = (state.character.met ?? []).includes(quest.monsterId);
     const sprite = monsterSprite(quest.monsterId);
@@ -94,6 +104,9 @@ const WAYS = {
   mineAny: '#/profesje/gornictwo',
   jewelAny: '#/profesje/jubilerstwo',
   orders: '#/osada/board',
+  'winter-explore': '#/walka',
+  'winter-fish': '#/profesje/rybolowstwo',
+  'winter-cook': '#/profesje/gotowanie',
 };
 
 function questWay(quest) {
@@ -109,7 +122,8 @@ function questWay(quest) {
 
 function questRow(periodId, quest, period) {
   const share = Math.min(1, quest.progress / quest.count);
-  const way = !quest.done && !quest.claimed ? questWay(quest) : null;
+  // A winter quest of a profession not open yet: its level, and no way.
+  const way = !quest.done && !quest.claimed && !quest.closed ? questWay(quest) : null;
   const status = quest.claimed
     ? h('span', { class: 'quest-taken', text: t('Odebrano') })
     : quest.done
@@ -127,13 +141,14 @@ function questRow(periodId, quest, period) {
         });
   return h(
     'li',
-    { class: `quest${quest.done ? ' quest--done' : ''}${quest.claimed ? ' quest--claimed' : ''}` },
+    { class: `quest${quest.done ? ' quest--done' : ''}${quest.claimed ? ' quest--claimed' : ''}${quest.closed ? ' quest--closed' : ''}` },
     questArt(quest),
     h(
       'div',
       { class: 'quest-body' },
       h('p', { class: 'quest-text', text: quest.text }),
       way?.where && h('p', { class: 'quest-where', text: t('Gdzie: {where}', { where: way.where }) }),
+      (quest.closed || quest.hint) && h('p', { class: 'quest-where', text: quest.closed ?? quest.hint }),
       h(
         'div',
         { class: 'quest-progress' },
@@ -141,7 +156,7 @@ function questRow(periodId, quest, period) {
         h('span', { class: 'quest-count', text: `${formatNumber(quest.progress)}/${formatNumber(quest.count)}` }),
       ),
     ),
-    h('div', { class: 'quest-side' }, h('div', { class: 'quest-side-top' }, rerollButton(periodId, quest, period), rewardChip(quest.reward)), status),
+    h('div', { class: 'quest-side' }, h('div', { class: 'quest-side-top' }, rerollButton(periodId, quest, period), (quest.rewards ?? [quest.reward]).map(rewardChip)), status),
   );
 }
 
@@ -151,7 +166,7 @@ function questRow(periodId, quest, period) {
 // drawn anew already, nor in a period drawn anew all at once before 0.3.91
 // or whose chest is open.
 function rerollButton(periodId, quest, period) {
-  if (quest.done || quest.claimed || quest.rerolled || period.rerolled || period.chest.opened) return null;
+  if (period.fixed || quest.done || quest.claimed || quest.rerolled || period.rerolled || period.chest.opened) return null;
   return h(
     'button',
     {
@@ -165,22 +180,26 @@ function rerollButton(periodId, quest, period) {
 }
 
 // What the chest holds, in words.
+const cardPacks = (count) => countOf(count, 'pakiet kart', 'pakiety kart', 'pakietów kart');
+
 function chestText(chest) {
-  return [chest.item && t('przedmiot'), chest.gold > 0 && t('{gold} złota', { gold: formatNumber(chest.gold) }), timePoints(chest.timePoints), systemPoints(chest.systemPoints)]
+  return [chest.item && t('przedmiot'), chest.gold > 0 && t('{gold} złota', { gold: formatNumber(chest.gold) }), chest.timePoints > 0 && timePoints(chest.timePoints), chest.systemPoints > 0 && systemPoints(chest.systemPoints), chest.packs > 0 && cardPacks(chest.packs)]
     .filter(Boolean)
     .join(', ');
 }
 
 function chestButton(periodId, period) {
   const { chest } = period;
-  const done = period.quests.filter((quest) => quest.done).length;
+  // A winter quest still closed does not count (1044.4).
+  const counted = period.quests.filter((quest) => !quest.closed);
+  const done = counted.filter((quest) => quest.done).length;
   const look = chest.opened ? 'opened' : chest.ready ? 'ready' : 'locked';
-  const caption = chest.opened ? t('Otwarta') : chest.ready ? t('Otwórz') : `${done}/${period.quests.length}`;
+  const caption = chest.opened ? t('Otwarta') : chest.ready ? t('Otwórz') : `${done}/${counted.length}`;
   const label = chest.opened
     ? t('Skrzynia otwarta')
     : chest.ready
       ? t('Otwórz skrzynię: {inside}', { inside: chestText(chest) })
-      : t('Skrzynia za wszystkie zadania: {inside}. Wykonane: {done} z {all}', { inside: chestText(chest), done, all: period.quests.length });
+      : t('Skrzynia za wszystkie zadania: {inside}. Wykonane: {done} z {all}', { inside: chestText(chest), done, all: counted.length });
   return h(
     'button',
     {
@@ -232,7 +251,7 @@ function drawPage(place, now = serverNow()) {
     h(
       'div',
       { class: 'quests-head' },
-      h('div', { class: 'quests-tabs', role: 'tablist', 'aria-labelledby': `${id}-label` }, PERIODS.map((periodId) => tabButton(periodId, quests, id))),
+      h('div', { class: `quests-tabs${periodsOf(quests).length > 3 ? ' quests-tabs--four' : ''}`, role: 'tablist', 'aria-labelledby': `${id}-label` }, periodsOf(quests).map((periodId) => tabButton(periodId, quests, id))),
       chestButton(tab, period),
     ),
     h(
@@ -291,6 +310,8 @@ export function watchQuests(now) {
 // Under the quests, what the dice do (1023 B), while a quest has its die;
 // in a period drawn anew all at once before 0.3.91, the period's words.
 function rerollPart(periodId, period) {
+  // The winter quests: no dice, their own words.
+  if (period.fixed) return period.note ? h('p', { class: 'quests-note', text: period.note }) : null;
   if (period.rerolled) return h('p', { class: 'quests-note', text: period.texts.rerolled });
   if (period.chest.opened || !period.quests.some((quest) => !quest.done && !quest.claimed && !quest.rerolled)) return null;
   return h('p', { class: 'quests-note', text: t('Kostka przy zadaniu zmienia je na inne. Każde zadanie możesz przelosować raz, a jego postęp przepada.') });
@@ -310,9 +331,10 @@ async function reroll(periodId, quest) {
 }
 
 async function claimReward(periodId, quest) {
-  const { reward } = await call('POST', '/api/quests/claim', { period: periodId, index: quest.index });
+  const { reward, rewards } = await call('POST', '/api/quests/claim', { period: periodId, index: quest.index });
   playSound('collect');
-  toast(t('Nagroda za zadanie: {reward} +{amount}.', { reward: rewardName(reward), amount: formatNumber(reward.amount) }));
+  if (rewards) toast(t('Nagrody za zadania: {rewards}.', { rewards: rewardsText(rewards) }));
+  else toast(t('Nagroda za zadanie: {reward} +{amount}.', { reward: rewardName(reward), amount: formatNumber(reward.amount) }));
 }
 
 // Every reward of the period's quests done, in one go; the chest opens on its own.
@@ -334,7 +356,7 @@ async function openChest(periodId, period) {
   const { chest } = await call('POST', '/api/quests/chest', { period: periodId });
   // Coins spilling from the chest (data/sounds.json).
   playSound('chest');
-  const inside = [chest.item && chest.item.name, chest.gold > 0 && t('{gold} złota', { gold: formatNumber(chest.gold) }), timePoints(chest.timePoints), systemPoints(chest.systemPoints)];
+  const inside = [chest.item && chest.item.name, chest.gold > 0 && t('{gold} złota', { gold: formatNumber(chest.gold) }), chest.timePoints > 0 && timePoints(chest.timePoints), chest.systemPoints > 0 && systemPoints(chest.systemPoints), chest.packs > 0 && cardPacks(chest.packs)];
   toast(t('Skrzynia otwarta: {inside}.', { inside: inside.filter(Boolean).join(', ') }));
 }
 
@@ -347,7 +369,8 @@ export function showQuests(show = true) {
   }
   if (open || !state.character?.quests) return;
   const quests = state.character.quests;
-  if (claimable(quests, tab) === 0) tab = PERIODS.find((periodId) => claimable(quests, periodId) > 0) ?? tab;
+  if (!quests[tab]) tab = 'daily';
+  if (claimable(quests, tab) === 0) tab = periodsOf(quests).find((periodId) => claimable(quests, periodId) > 0) ?? tab;
   const dialog = h('dialog', { class: 'quests', 'aria-labelledby': 'quests-label' });
   const page = h('div', { class: 'narrator-page quests-page' });
   const sheet = h('div', { class: 'narrator-sheet' }, page);

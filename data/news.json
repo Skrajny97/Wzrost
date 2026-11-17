@@ -1240,6 +1240,11 @@
       "id": "0.4.7",
       "title": "Wersja 0.4.7",
       "body": "- Szczodre Gody: od 1 do 24 grudnia każda postać codziennie odbierze jedną nagrodę za wejście do gry: złoto, Punkty Czasu i Punkty Systemu, pakiety kart, mikstury, zwoje i ozdoby Obozu. 24. dnia czeka zimowy zestaw: ramka Szron, tło Szczodre Gody i aura Śnieżyca, których nie da się kupić. Kalendarz pojawi się 1 grudnia, a opuszczony dzień przepada."
+    },
+    {
+      "id": "0.4.8",
+      "title": "Wersja 0.4.8",
+      "body": "- Szczodre Gody: przez cały grudzień w zadaniach narratora czeka zakładka „Zimowe” z trzema zadaniami na każdy dzień: gałązki jodły z wypraw, karp na Wigilię i potrawa z Systemowej Kuchni. Za każde są Punkty Czasu i złoto, a za wszystkie trzy jednego dnia pakiet kart."
     }
   ]
 }

@@ -3,19 +3,48 @@
   "title": "Szczodre Gody",
   "type": "object",
   "additionalProperties": false,
-  "required": ["calendar", "camp", "decorations", "texts"],
+  "required": [
+    "calendar",
+    "camp",
+    "decorations",
+    "texts",
+    "quests"
+  ],
   "properties": {
-    "$comment": { "type": "string" },
+    "$comment": {
+      "type": "string"
+    },
     "calendar": {
       "description": "Kalendarz: od dnia first do dnia last miesiąca month jedna nagroda dziennie, days od first.",
       "type": "object",
       "additionalProperties": false,
-      "required": ["month", "first", "last", "goldRound", "days"],
+      "required": [
+        "month",
+        "first",
+        "last",
+        "goldRound",
+        "days"
+      ],
       "properties": {
-        "month": { "type": "integer", "minimum": 1, "maximum": 12 },
-        "first": { "type": "integer", "minimum": 1, "maximum": 31 },
-        "last": { "type": "integer", "minimum": 1, "maximum": 31 },
-        "goldRound": { "type": "integer", "minimum": 1 },
+        "month": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "first": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 31
+        },
+        "last": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 31
+        },
+        "goldRound": {
+          "type": "integer",
+          "minimum": 1
+        },
         "days": {
           "type": "array",
           "minItems": 1,
@@ -24,17 +53,57 @@
             "additionalProperties": false,
             "minProperties": 1,
             "properties": {
-              "goldMinutes": { "type": "integer", "minimum": 1 },
-              "timePoints": { "type": "integer", "minimum": 1 },
-              "systemPoints": { "type": "integer", "minimum": 1 },
-              "packs": { "type": "integer", "minimum": 1 },
-              "potion": { "type": "string", "pattern": "^[a-z0-9-]+$" },
-              "count": { "type": "integer", "minimum": 1 },
-              "scroll": { "enum": ["ward-scroll", "steady-scroll"] },
-              "decoration": { "type": "string", "pattern": "^[a-z0-9-]+$" },
-              "cosmetics": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^[a-z0-9-]+$" } }
+              "goldMinutes": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "timePoints": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "systemPoints": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "packs": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "potion": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "scroll": {
+                "enum": [
+                  "ward-scroll",
+                  "steady-scroll"
+                ]
+              },
+              "decoration": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "cosmetics": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9-]+$"
+                }
+              }
             },
-            "dependencies": { "count": ["potion"], "potion": ["count"] }
+            "dependencies": {
+              "count": [
+                "potion"
+              ],
+              "potion": [
+                "count"
+              ]
+            }
           }
         }
       }
@@ -43,11 +112,27 @@
       "description": "Zimowy Obóz: od dnia first do dnia last miesiąca month.",
       "type": "object",
       "additionalProperties": false,
-      "required": ["month", "first", "last"],
+      "required": [
+        "month",
+        "first",
+        "last"
+      ],
       "properties": {
-        "month": { "type": "integer", "minimum": 1, "maximum": 12 },
-        "first": { "type": "integer", "minimum": 1, "maximum": 31 },
-        "last": { "type": "integer", "minimum": 1, "maximum": 31 }
+        "month": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "first": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 31
+        },
+        "last": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 31
+        }
       }
     },
     "decorations": {
@@ -56,37 +141,250 @@
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["name", "art"],
+        "required": [
+          "name",
+          "art"
+        ],
         "properties": {
-          "name": { "type": "string", "minLength": 1 },
-          "art": { "type": "string", "pattern": "^[a-z0-9-]+$" }
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "art": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          }
         }
       }
     },
     "texts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["title", "lead", "days", "dayName", "take", "taken", "done", "missed", "decoration", "set", "scroll", "decorationGot", "setGot", "closed", "alreadyTaken", "bagFull", "changed", "tabWaiting", "tabTaken"],
+      "required": [
+        "title",
+        "lead",
+        "days",
+        "dayName",
+        "take",
+        "taken",
+        "done",
+        "missed",
+        "decoration",
+        "set",
+        "scroll",
+        "decorationGot",
+        "setGot",
+        "closed",
+        "alreadyTaken",
+        "bagFull",
+        "changed",
+        "tabWaiting",
+        "tabTaken",
+        "questsTab",
+        "questFir",
+        "questFirHint",
+        "questCarp",
+        "questFish",
+        "questDish",
+        "questLocked",
+        "questsChest",
+        "questsNote"
+      ],
       "properties": {
-        "title": { "type": "string" },
-        "lead": { "type": "string" },
-        "days": { "type": "string" },
-        "dayName": { "type": "string", "pattern": "\\{day\\}" },
-        "take": { "type": "string", "pattern": "\\{day\\}" },
-        "taken": { "type": "string" },
-        "done": { "type": "string" },
-        "missed": { "type": "string" },
-        "decoration": { "type": "string" },
-        "set": { "type": "string" },
-        "scroll": { "type": "string" },
-        "decorationGot": { "type": "string", "pattern": "\\{name\\}" },
-        "setGot": { "type": "string" },
-        "closed": { "type": "string" },
-        "alreadyTaken": { "type": "string" },
-        "bagFull": { "type": "string" },
-        "changed": { "type": "string" },
-        "tabWaiting": { "type": "string", "pattern": "\\{day\\}" },
-        "tabTaken": { "type": "string", "pattern": "\\{day\\}" }
+        "title": {
+          "type": "string"
+        },
+        "lead": {
+          "type": "string"
+        },
+        "days": {
+          "type": "string"
+        },
+        "dayName": {
+          "type": "string",
+          "pattern": "\\{day\\}"
+        },
+        "take": {
+          "type": "string",
+          "pattern": "\\{day\\}"
+        },
+        "taken": {
+          "type": "string"
+        },
+        "done": {
+          "type": "string"
+        },
+        "missed": {
+          "type": "string"
+        },
+        "decoration": {
+          "type": "string"
+        },
+        "set": {
+          "type": "string"
+        },
+        "scroll": {
+          "type": "string"
+        },
+        "decorationGot": {
+          "type": "string",
+          "pattern": "\\{name\\}"
+        },
+        "setGot": {
+          "type": "string"
+        },
+        "closed": {
+          "type": "string"
+        },
+        "alreadyTaken": {
+          "type": "string"
+        },
+        "bagFull": {
+          "type": "string"
+        },
+        "changed": {
+          "type": "string"
+        },
+        "tabWaiting": {
+          "type": "string",
+          "pattern": "\\{day\\}"
+        },
+        "tabTaken": {
+          "type": "string",
+          "pattern": "\\{day\\}"
+        },
+        "questsTab": {
+          "type": "string"
+        },
+        "questFir": {
+          "type": "string",
+          "pattern": "\\{count\\}"
+        },
+        "questFirHint": {
+          "type": "string",
+          "pattern": "\\{minutes\\}"
+        },
+        "questCarp": {
+          "type": "string"
+        },
+        "questFish": {
+          "type": "string"
+        },
+        "questDish": {
+          "type": "string"
+        },
+        "questLocked": {
+          "type": "string",
+          "pattern": "\\{level\\}"
+        },
+        "questsChest": {
+          "type": "string"
+        },
+        "questsNote": {
+          "type": "string"
+        }
+      }
+    },
+    "quests": {
+      "description": "Zimowe zadania (1044.4): trzy na dzień zimowego Obozu i skrzynia za wszystkie.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "list",
+        "chest"
+      ],
+      "properties": {
+        "list": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "count",
+              "timePoints",
+              "goldMinutes"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "kind": {
+                "enum": [
+                  "explore",
+                  "fish",
+                  "cook"
+                ]
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "minutesPerPiece": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "fish": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "timePoints": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "goldMinutes": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "explore"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "minutesPerPiece"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "fish"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "fish"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "chest": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "packs"
+          ],
+          "properties": {
+            "packs": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
       }
     }
   }

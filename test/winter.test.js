@@ -9,7 +9,7 @@ import { beforeEach, describe, test } from 'node:test';
 
 import { explorationGold } from '../src/engine/mining.js';
 import { questPeriod } from '../src/engine/quests.js';
-import { winterCampPeriod, winterDecorations, winterTakenState, winterToday } from '../src/engine/winter.js';
+import { winterCampPeriod, winterDecorations, winterQuestList, winterTakenState, winterToday } from '../src/engine/winter.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -165,5 +165,69 @@ describe('the calendar where WINTER is "test"', () => {
     const winter = (await call('GET', '/api/winter', { cookie, now })).data.winter;
     assert.equal(winter.today, 17);
     assert.equal((await call('POST', '/api/winter', { cookie, now })).status, 200);
+  });
+});
+
+describe('the winter quests of Szczodre Gody (1044.4)', () => {
+  const { call, db, signUp } = useServer({ TEST_CLOCK: 'on', WINTER: 'test' });
+  let cookie;
+  const character = async () => (await call('GET', '/api/character', { cookie })).data.character;
+  const row = async () => (await db()).prepare("SELECT gold, time_points, card_packs, winter FROM characters WHERE name = 'Zimowa'").first();
+
+  beforeEach(async () => {
+    ({ cookie } = await signUp('zimowa'));
+    await call('POST', '/api/character', { cookie, body: { name: 'Zimowa', classId: 'warrior', appearance: 'female' } });
+  });
+
+  test('below the professions only the fir branches are open, and the chest waits for them alone', () => {
+    const facts = { fishingOpen: false, cookingOpen: false, carpOpen: false, fishingLevel: 1, cookingLevel: 1 };
+    const key = '2026-12-05';
+    const stored = { quests: { key, minutes: 100, fish: 0, dishes: 0, claimed: [], chest: false } };
+    const { quests, chest } = winterQuestList(stored, key, facts, 10, content);
+    assert.deepEqual(
+      quests.map(({ id, progress, done, closed }) => [id, progress, done, closed]),
+      [
+        ['fir', 10, true, false],
+        ['carp', 0, false, true],
+        ['dish', 0, false, true],
+      ],
+    );
+    assert.equal(chest.ready, true);
+    // Another day's count for nothing.
+    assert.equal(winterQuestList(stored, '2026-12-06', facts, 10, content).quests[0].progress, 0);
+  });
+
+  test('an exploration brings a fir branch every ten minutes; rewards once, the chest a card pack', async () => {
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } })).status, 201);
+    await call('POST', '/api/test/skip-time', { cookie });
+    const claimed = await call('POST', '/api/hunts/claim', { cookie });
+    assert.equal(claimed.status, 200, JSON.stringify(claimed.data));
+    const fir = (await character()).quests.winter.quests[0];
+    assert.equal(fir.text, 'Zbierz na wyprawach 10 gałązek jodły');
+    assert.equal(fir.progress, claimed.data.report.result === 'fainted' ? 0 : 3);
+    // A level below the professions: the carp and the dish are closed.
+    const winter = (await character()).quests.winter;
+    assert.deepEqual(
+      winter.quests.map((quest) => quest.closed),
+      [null, 'Od 25. poziomu postaci', 'Od 25. poziomu postaci'],
+    );
+    // The rest of the branches, then the reward and the chest.
+    const database = await db();
+    const today = JSON.parse((await row()).winter).quests.key;
+    await database.prepare("UPDATE characters SET winter = ? WHERE name = 'Zimowa'").bind(JSON.stringify({ quests: { key: today, minutes: 100, fish: 0, dishes: 0, claimed: [], chest: false } })).run();
+    const before = await row();
+    const reward = await call('POST', '/api/quests/claim', { cookie, body: { period: 'winter', index: 0 } });
+    assert.equal(reward.status, 200, JSON.stringify(reward.data));
+    const after = await row();
+    assert.deepEqual(
+      reward.data.rewards.map((one) => one.kind),
+      ['gold', 'timePoints'],
+    );
+    assert.equal(after.gold - before.gold, reward.data.rewards[0].amount);
+    assert.equal((await call('POST', '/api/quests/claim', { cookie, body: { period: 'winter', index: 0 } })).data.error.code, 'claimed');
+    const chest = await call('POST', '/api/quests/chest', { cookie, body: { period: 'winter' } });
+    assert.equal(chest.status, 200, JSON.stringify(chest.data));
+    assert.equal((await row()).card_packs - after.card_packs, 1);
+    assert.equal((await call('POST', '/api/quests/chest', { cookie, body: { period: 'winter' } })).data.error.code, 'opened');
   });
 });

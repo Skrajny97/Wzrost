@@ -1,5 +1,5 @@
 {
-  "$comment": "Szczodre Gody (1044; DECISIONS.md, „Szczodre Gody (1044): decyzje autora 17.11.2026”; src/engine/winter.js, src/server/winter.js, src/client/winter-calendar.js). calendar: od dnia first do dnia last miesiąca month (czas polski, dzień od północy jak zadania dzienne) codziennie jedna nagroda za wejście do gry, każda postać osobno; opuszczony dzień przepada (1044.1a A). days: nagrody kolejnych dni od first: goldMinutes (złoto za tyle minut wypraw na poziomie postaci, zaokrąglone do goldRound), timePoints (Punkty Czasu), systemPoints (Punkty Systemu), packs (pakiety kart), potion i count (mikstury z data/professions.json do plecaka), scroll (zwój: ward-scroll albo steady-scroll), decoration (ozdoba Obozu z decorations) albo cosmetics (zimowy zestaw z 24. dnia, przedmioty z event: winter w data/cosmetics.json, 1044.2 B). camp: od dnia first do dnia last miesiąca month Obóz jest zimowy, a ozdoby z odebranych dni stoją w nim (1044.3). decorations: ozdoby Obozu, art: obrazek w src/client/art/winter (podłaźniczka B i snopek D z 1044.3a i 1044.3b). texts: słowa okna kalendarza i jego zakładki.",
+  "$comment": "Szczodre Gody (1044; DECISIONS.md, „Szczodre Gody (1044): decyzje autora 17.11.2026”; src/engine/winter.js, src/server/winter.js, src/client/winter-calendar.js). calendar: od dnia first do dnia last miesiąca month (czas polski, dzień od północy jak zadania dzienne) codziennie jedna nagroda za wejście do gry, każda postać osobno; opuszczony dzień przepada (1044.1a A). days: nagrody kolejnych dni od first: goldMinutes (złoto za tyle minut wypraw na poziomie postaci, zaokrąglone do goldRound), timePoints (Punkty Czasu), systemPoints (Punkty Systemu), packs (pakiety kart), potion i count (mikstury z data/professions.json do plecaka), scroll (zwój: ward-scroll albo steady-scroll), decoration (ozdoba Obozu z decorations) albo cosmetics (zimowy zestaw z 24. dnia, przedmioty z event: winter w data/cosmetics.json, 1044.2 B). quests: zimowe zadania (1044.4) w dniach zimowego Obozu, w czwartej zakładce zadań narratora: explore (gałązki jodły, jedna co minutesPerPiece minut wyprawy), fish (ryba fish z Rybołówstwa, a przed jej poziomem dowolna ryba) i cook (dowolna potrawa z Gotowania); za każde timePoints i złoto za goldMinutes minut wyprawy, a za wszystkie dostępne zadania dnia chest (packs: pakiety kart). Zadanie profesji, której postać jeszcze nie ma, jest zamknięte i nie liczy się do skrzyni. camp: od dnia first do dnia last miesiąca month Obóz jest zimowy, a ozdoby z odebranych dni stoją w nim (1044.3). decorations: ozdoby Obozu, art: obrazek w src/client/art/winter (podłaźniczka B i snopek D z 1044.3a i 1044.3b). texts: słowa okna kalendarza i jego zakładki.",
   "calendar": {
     "month": 12,
     "first": 1,
@@ -33,6 +33,14 @@
     ]
   },
   "camp": { "month": 12, "first": 1, "last": 31 },
+  "quests": {
+    "list": [
+      { "id": "fir", "kind": "explore", "count": 10, "minutesPerPiece": 10, "timePoints": 15, "goldMinutes": 20 },
+      { "id": "carp", "kind": "fish", "fish": "carp", "count": 1, "timePoints": 15, "goldMinutes": 20 },
+      { "id": "dish", "kind": "cook", "count": 1, "timePoints": 15, "goldMinutes": 20 }
+    ],
+    "chest": { "packs": 1 }
+  },
   "decorations": {
     "podlaznniczka": { "name": "Podłaźniczka", "art": "podlaznniczka" },
     "snopek": { "name": "Snopek", "art": "snopek" }
@@ -56,6 +64,15 @@
     "bagFull": "Plecak jest pełny. Zrób w nim miejsce na mikstury i odbierz nagrodę.",
     "changed": "Kalendarz zmienił się w międzyczasie. Spróbuj jeszcze raz.",
     "tabWaiting": "Kalendarz Szczodrych Godów: nagroda z {day} grudnia czeka",
-    "tabTaken": "Kalendarz Szczodrych Godów: nagroda z {day} grudnia odebrana"
+    "tabTaken": "Kalendarz Szczodrych Godów: nagroda z {day} grudnia odebrana",
+    "questsTab": "Zimowe",
+    "questFir": "Zbierz na wyprawach {count} gałązek jodły",
+    "questFirHint": "Gałązka jodły co {minutes} minut wyprawy.",
+    "questCarp": "Złów karpia na Wigilię",
+    "questFish": "Złów rybę na Wigilię",
+    "questDish": "Przygotuj potrawę w Systemowej Kuchni",
+    "questLocked": "Od {level}. poziomu postaci",
+    "questsChest": "Za wszystkie zimowe zadania dnia czeka pakiet kart.",
+    "questsNote": "Zimowe zadania są codziennie przez cały grudzień i nie da się ich przelosować."
   }
 }

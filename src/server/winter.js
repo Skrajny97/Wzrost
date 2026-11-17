@@ -6,7 +6,23 @@
 // not sell. Where WINTER is "test" (the test version, features.js) every
 // day plays as a day of the calendar, so it can be tried before December.
 
-import { bagCapacity, campLevels, questPeriod, winterCalendar, winterReward, winterTaken, winterTakenState, winterToday } from '../engine/index.js';
+import {
+  bagCapacity,
+  campLevels,
+  professionOpen,
+  professionState,
+  questPeriod,
+  winterCalendar,
+  winterCampPeriod,
+  winterQuestList,
+  winterQuestsGain,
+  winterQuestsTaken,
+  winterReward,
+  winterTaken,
+  winterTakenState,
+  winterToday,
+} from '../engine/index.js';
+import { atomically, sameVersion } from './atomic.js';
 import { bagPlaces, characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { winterTestOn } from './features.js';
@@ -114,4 +130,129 @@ export async function takeWinter(context) {
   const fresh = await loadPlayer(db, session.userId);
   const day = viewOf(fresh.row, context.now)?.days.find((one) => one.day === today.day) ?? null;
   return json({ winter: viewOf(fresh.row, context.now), reward: day, character: characterView(fresh, context.now) });
+}
+
+// The winter quests (1044.4; engine/winter.js): the day's key while the
+// winter camp stands (all of December; on test every day), else null.
+export function winterQuestsKey(now) {
+  const key = questPeriod('daily', now, content()).key;
+  return winterCampPeriod(key, winter().camp, winterTestOn()) ? key : null;
+}
+
+// What closes or changes the quests for the character: Rybołówstwo and
+// Gotowanie open (their character level), and the carp's level of
+// Rybołówstwo reached (before it any fish counts).
+function winterFacts(row) {
+  const professions = JSON.parse(row.professions ?? '{}');
+  const fishing = content().professionsById.fishing;
+  const cooking = content().professionsById.cooking;
+  const carp = content().winter.quests.list.find((rule) => rule.kind === 'fish');
+  const fishingLevel = professionState(professions, 'fishing').level;
+  return {
+    fishingOpen: Boolean(fishing) && professionOpen(fishing, row.level, content()),
+    cookingOpen: Boolean(cooking) && professionOpen(cooking, row.level, content()),
+    carpOpen: fishingLevel >= (content().fishById[carp?.fish]?.level ?? 1),
+    fishingLevel,
+    cookingLevel: professionState(professions, 'cooking').level,
+  };
+}
+
+// The winter quests as a period of the narrator's quests for the page
+// (quests.js on the page draws them in a tab of their own), or null outside
+// the winter camp's days.
+export function winterQuestsPeriod(row, now) {
+  const key = winterQuestsKey(now);
+  if (!key) return null;
+  const facts = winterFacts(row);
+  const { quests, chest } = winterQuestList(storedOf(row), key, facts, row.level, content());
+  const texts = words();
+  const fill = (text, vars) => text.replace(/\{(\w+)\}/g, (whole, name) => (name in vars ? String(vars[name]) : whole));
+  const unlock = (id) => content().professionsById[id]?.unlockLevel ?? content().unlocksById.professions.level;
+  return {
+    name: texts.questsTab,
+    fixed: true,
+    endsAt: questPeriod('daily', now, content()).endsAt,
+    note: texts.questsNote,
+    quests: quests.map((quest, index) => ({
+      index,
+      id: quest.id,
+      kind: `winter-${quest.kind}`,
+      text: quest.kind === 'explore' ? fill(texts.questFir, { count: quest.count }) : quest.kind === 'fish' ? (quest.anyFish ? texts.questFish : texts.questCarp) : texts.questDish,
+      hint: quest.kind === 'explore' ? fill(texts.questFirHint, { minutes: quest.minutesPerPiece }) : null,
+      closed: quest.closed ? fill(texts.questLocked, { level: unlock(quest.kind === 'fish' ? 'fishing' : 'cooking') }) : null,
+      count: quest.count,
+      progress: quest.progress,
+      done: quest.done,
+      claimed: quest.claimed,
+      reward: { kind: 'gold', amount: quest.gold },
+      rewards: [{ kind: 'gold', amount: quest.gold }, { kind: 'timePoints', amount: quest.timePoints }],
+    })),
+    chest: { ready: chest.ready, opened: chest.opened, packs: chest.packs, text: texts.questsChest },
+  };
+}
+
+// The part of an UPDATE of the characters row that adds the winter quests'
+// gains (minutes of exploring, fish, dishes) at `now`: none outside the
+// winter camp's days. Computed from the row as read: the UPDATE it goes
+// into must hold only while the character is as read.
+export function winterGainSql(row, now, { minutes = 0, fish = {}, dishes = 0 }) {
+  const key = winterQuestsKey(now);
+  if (!key) return { sql: '', binds: [] };
+  const facts = winterFacts(row);
+  const rule = content().winter.quests.list.find((one) => one.kind === 'fish');
+  const fishCount = facts.carpOpen ? (fish[rule?.fish] ?? 0) : Object.values(fish).reduce((sum, count) => sum + count, 0);
+  if (minutes <= 0 && fishCount <= 0 && dishes <= 0) return { sql: '', binds: [] };
+  return { sql: ', winter = ?', binds: [JSON.stringify(winterQuestsGain(storedOf(row), key, { minutes: Math.max(0, minutes), fish: fishCount, dishes }))] };
+}
+
+// A winter quest's reward (its gold and Punkty Czasu), or the chest's packs,
+// once; in one statement that holds only while the character is as read.
+async function takeWinterQuests(context, { session, player }, pick) {
+  const row = player.row;
+  const db = context.env.DB;
+  const key = winterQuestsKey(context.now);
+  if (!key) throw new ApiError(404, 'no_quest', 'Nie ma takiego zadania.');
+  const view = winterQuestList(storedOf(row), key, winterFacts(row), row.level, content());
+  const quests = pick.chest ? [] : view.quests.filter((quest) => (pick.all ? quest.done && !quest.claimed : quest.id === pick.id));
+  if (pick.chest) {
+    if (view.chest.opened) throw new ApiError(409, 'opened', 'Ta skrzynia jest już otwarta.');
+    if (!view.chest.ready) throw new ApiError(409, 'not_ready', 'Skrzynia otworzy się po wszystkich zadaniach.');
+  } else {
+    if (quests.length === 0 && !pick.all) throw new ApiError(404, 'no_quest', 'Nie ma takiego zadania.');
+    if (!pick.all && quests[0].claimed) throw new ApiError(409, 'claimed', 'Ta nagroda jest już odebrana.');
+    if (!pick.all && !quests[0].done) throw new ApiError(409, 'not_done', 'To zadanie nie jest jeszcze wykonane.');
+    if (quests.length === 0) throw new ApiError(409, 'not_done', 'Żadne zadanie nie czeka na odebranie.');
+  }
+  const gold = quests.reduce((sum, quest) => sum + quest.gold, 0);
+  const timePoints = quests.reduce((sum, quest) => sum + quest.timePoints, 0);
+  const packs = pick.chest ? view.chest.packs : 0;
+  const stored = quests.reduce((next, quest) => winterQuestsTaken(next, key, { quest: quest.id }), pick.chest ? winterQuestsTaken(storedOf(row), key, { chest: true }) : storedOf(row));
+  const [, result] = await atomically(db, [
+    sameVersion(db, row),
+    db
+      .prepare('UPDATE characters SET gold = gold + ?, time_points = time_points + ?, card_packs = card_packs + ?, winter = ?, version = version + 1 WHERE id = ? AND version = ?')
+      .bind(gold, timePoints, packs, JSON.stringify(stored), row.id, row.version),
+  ]);
+  if (result.meta.changes !== 1) throw new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
+  const rewards = [...(gold > 0 ? [{ kind: 'gold', amount: gold }] : []), ...(timePoints > 0 ? [{ kind: 'timePoints', amount: timePoints }] : [])];
+  return { rewards, packs, character: characterView(await loadPlayer(db, session.userId), context.now) };
+}
+
+// The narrator's quests' routes call these for the period "winter"
+// (quests.js): a quest's reward by its index, all those done, the chest.
+export async function claimWinterQuest(context, index, signed) {
+  const key = winterQuestsKey(context.now);
+  const { row } = signed.player;
+  const quest = key && Number.isInteger(index) ? winterQuestList(storedOf(row), key, winterFacts(row), row.level, content()).quests[index] : undefined;
+  if (!quest) throw new ApiError(404, 'no_quest', 'Nie ma takiego zadania.');
+  const { rewards, character } = await takeWinterQuests(context, signed, { id: quest.id });
+  return json({ reward: rewards[0] ?? null, rewards, character });
+}
+export async function claimAllWinterQuests(context, signed) {
+  const { rewards, character } = await takeWinterQuests(context, signed, { all: true });
+  return json({ rewards, character });
+}
+export async function openWinterChest(context, signed) {
+  const { packs, character } = await takeWinterQuests(context, signed, { chest: true });
+  return json({ chest: { packs }, character });
 }

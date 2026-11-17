@@ -988,6 +988,10 @@
     "0.4.7": {
       "title": "Version 0.4.7",
       "body": "- Generous Feast: from 1 to 24 December each character can take one reward a day for coming into the game: gold, Time Points and System Points, card packs, potions, scrolls and Camp decorations. On the 24th the winter set waits: the Hoarfrost frame, the Generous Feast background and the Snowstorm aura, which cannot be bought. The calendar opens on 1 December, and a day missed is lost."
+    },
+    "0.4.8": {
+      "title": "Version 0.4.8",
+      "body": "- Generous Feast: all December long, the narrator's quests have a Winter tab with three quests every day: fir branches from explorations, a carp for Christmas Eve and a dish from the System Kitchen. Each gives Time Points and gold, and all three in one day give a card pack."
     }
   }
 }
