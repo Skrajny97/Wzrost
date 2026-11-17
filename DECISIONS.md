@@ -3646,6 +3646,16 @@ Autor: „Niech zaklinanie żywiołu będzie możliwe nie tylko zależnie od kon
 2. **Brakujący szczegół: ile części.** 20 Okruchów i 2 Bursztyny są warte tyle samo według Wymiany części w Warsztacie (10 części za 1 następnej rzadkości), a 20 epickich części to kilka rozebranych epickich przedmiotów, czyli „duża ilość”, o którą prosił autor.
 3. **Okno.** Nad żywiołami jest „Płacisz:” z trzema przyciskami: Materiał żywiołu (domyślnie, jak dotąd), Okruchy kryształu ×20 i Bursztyn ×2. Każdy żywioł podaje koszt w wybranej zapłacie i ile postać ma, a „Poproś gildię” zostaje tylko przy materiale. Linijka pancerza mówi teraz „odporność na naturę” (słowa żywiołu z `data/elements.json`), a nie „odporność na natura”.
 
+## Drugi Awatar Systemu (1066, 17.11.2026)
+
+Autor: „A czy jest szansa by można było mieć dwa Awatary Systemu przy czym drugi bardzo drogi - za 200000 złota?”. Po odpowiedzi: robimy (1066). Makiety 1070.1 (karta zakupu), 1070.2 (dwie karty i kafelek) i 1070.4 (trzech wykonawców) przyjęte. Pasek na górze 1070.3 w wersji 3 czeka na autora. Autor: „paski mają się rozwijać po kliknięciu przy dwóch Awatarach jak zakładki”.
+
+1. **Zakup.** „Drugi Awatar Systemu” kosztuje 200 000 złota, jednorazowo i na zawsze (`second` w `avatar` w `data/professions.json`). Karta zakupu stoi pod kartą pierwszego Awatara, dopiero gdy pierwszy jest kupiony, a serwer bez pierwszego odmawia: „Najpierw kup pierwszego Awatara Systemu.”.
+2. **Praca.** Drugi Awatar pracuje jak pierwszy, w tym samym czasie co postać i pierwszy Awatar, w każdej z 8 profesji, za ten sam udział: cały postęp profesji i ćwierć XP postaci. Jego praca leży w osobnej tabeli `avatar2_activities` (migracja 0155). Żądania nazywają go `avatar: 2`: start pracy, odbiór, odwołanie, minigra, a Punkty Czasu `target: avatar2` (`workTable`, `avatarWorkOf`, `avatarAsked` w `src/server/characters.js`). Raport ma `avatar: 2`, a w raporcie stoi „Wykonawca: Drugi Awatar Systemu”. Powiadomienie o końcu pracy ma własny tytuł: „Praca Drugiego Awatara Systemu zakończona”.
+3. **Ekran Profesji.** Pod kartą pierwszego Awatara jest karta drugiego: czeka na pracę albo pokazuje, co robi (1070.2). Kafelek profesji pisze „Pracuje Drugi Awatar” i „Raport Drugiego Awatara”. Wybór „Kto pracuje” ma trzy przyciski: Postać, Awatar, Drugi Awatar (1070.4). Pod nim są uwagi, kto jest zajęty, np. „Awatar kopie w Kopalni.”. Przy jednym Awatarze wybór wygląda jak dotąd.
+4. **Brakujący szczegół: pasek na górze.** Gdy pracuje jeden Awatar, ma swój pasek jak dotąd: „AWATAR” albo „AWATAR II”. Gdy pracują oba, jest jeden pasek „AWATARY ▾” z czasem tego, który skończy pierwszy (raport przed czasem). Stuknięcie rozwija pod nim po zakładce na każdego, z tym, co robi, i z czasem. Stuknięcie w zakładkę prowadzi do jego pracy (1070.3, wersja 3).
+5. **Brakujący szczegół: przełącznik postaci i zakładka Profesje na dole.** Nad popiersiem „A” pokazuje czas tego Awatara, który skończy pierwszy. Zakładka Profesje na dole odlicza tak samo, gdy postać sama nie pracuje.
+
 ## Wodze renifera jako osobna warstwa (17.11.2026, od 0.4.20)
 
 Autor: „jeden sznur wodzy na reniferze wisi w powietrzu”. Wcześniej: „te paski muszą być dostosowane do każdego wierzchowca”.
