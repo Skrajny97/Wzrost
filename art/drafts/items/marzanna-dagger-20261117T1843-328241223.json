@@ -1,0 +1,14 @@
+{
+  "id": "marzanna-dagger",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the dagger of marzanna, the slavic goddess of winter and death: a slender curved blade of pale blue ice, frost crystals on the guard, a handle wrapped in straw and black ribbon, a cold white mist, diagonal, single inventory item icon",
+  "style": "src/client/art/items/koschei-dagger.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023731077579286365
+  },
+  "images": 1
+}

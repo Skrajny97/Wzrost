@@ -1,0 +1,14 @@
+{
+  "id": "lech-shield",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the shield of lech: a large round shield painted deep red with a white eagle spreading its wings, a golden rim with silver studs, a soft glow, single inventory item icon",
+  "style": "src/client/art/items/achilles-shield.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023132273921330774
+  },
+  "images": 1
+}

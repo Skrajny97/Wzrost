@@ -1,0 +1,14 @@
+{
+  "id": "svarozhich-axe",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the axe of svarozhich, the slavic god of fire: a massive battle axe whose head glows like molten iron with small flames along its edge, fire runes, a haft of blackened oak bound with copper, diagonal, single inventory item icon",
+  "style": "src/client/art/items/perun-axe.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023434436689376833
+  },
+  "images": 1
+}

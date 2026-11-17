@@ -1,0 +1,14 @@
+{
+  "id": "stanislaus-crosier",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the crosier of saint stanislaus, bishop of krakow: a tall golden pastoral staff with an ornate spiral crook set with red gems, a holy golden glow, diagonal, single inventory item icon",
+  "style": "src/client/art/items/maurice-spear.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02322263249015808
+  },
+  "images": 1
+}

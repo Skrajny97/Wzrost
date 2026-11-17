@@ -1,0 +1,14 @@
+{
+  "id": "grunwald-sword",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the grunwald sword: one of the two naked swords sent to the polish king before the battle of grunwald, a long plain but masterfully forged steel blade, a simple dark iron crossguard, a grip wrapped in red leather, a heavy round pommel, a faint silver shine, diagonal, single inventory item icon",
+  "style": "src/client/art/items/szczerbiec.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023399697641160754
+  },
+  "images": 1
+}

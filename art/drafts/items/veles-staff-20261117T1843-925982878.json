@@ -1,0 +1,14 @@
+{
+  "id": "veles-staff",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the staff of veles, the slavic god of magic and the underworld: a twisted dark wooden staff crowned with curved ram horns around a glowing green orb, a thin serpent coiled up the shaft, diagonal, single inventory item icon",
+  "style": "src/client/art/items/triglav-staff.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023945504625532365
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "jutrzenka-bow",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the bow of jutrzenka, the morning star: an elegant recurve bow of pale golden wood glowing with the soft pink and gold light of dawn, a small shining star at its grip, a string of light, diagonal, single inventory item icon",
+  "style": "src/client/art/items/dazhbog-bow.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02323239974276225
+  },
+  "images": 1
+}
