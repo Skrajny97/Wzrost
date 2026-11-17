@@ -1,0 +1,14 @@
+{
+  "id": "snopek",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a didukh: a tall sheaf of golden wheat straw tied with a red ribbon, standing upright on its cut stalks, a Slavic winter solstice decoration, game sprite, the object alone, no ground, no background",
+  "style": "src/client/art/camp/campfire-1.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02388512073135376
+  },
+  "images": 1
+}

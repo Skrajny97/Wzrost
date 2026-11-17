@@ -1,0 +1,14 @@
+{
+  "id": "podlaznniczka",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a traditional Polish podłaźniczka: the top of a fir tree hung upside down, decorated with small red apples, straw stars, walnuts and white paper wafer ornaments, a winter solstice decoration, game sprite, the object alone, no ground, no background",
+  "style": "src/client/art/camp/campfire-1.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023833641570832998
+  },
+  "images": 1
+}
