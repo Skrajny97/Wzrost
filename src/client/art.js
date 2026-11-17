@@ -589,6 +589,16 @@ export const SPRITES = {
     height: 768,
     ids: ['settlement'],
   },
+  // The Osada under snow for Szczodre Gody (all of December, as the winter
+  // camp, 1063): the ground ("settlement-winter" among the boards above,
+  // once chosen) and the places with snow on their roofs, their sand
+  // trodden snow. A place without its winter picture keeps its own.
+  'settlement-winter': {
+    width: 192,
+    height: 144,
+    fit: true,
+    ids: [],
+  },
   // The Stajnia's mounts (data/settlement.json, stable.mounts, by id), saddled
   // and seen from the side, cut to their outline, on their cards in the
   // Stajnia, and the look a mount can wear from the Sklep Systemu
@@ -830,8 +840,11 @@ export function companionFigure(classId, appearance) {
 }
 // The Osada's place on its board, a resident's bust and the board's ground,
 // or null while there is none.
-export const settlementPlaceArt = (placeId) =>
-  available.settlement.has(placeId) ? h('img', { src: `/art/settlement/${placeId}.png`, alt: '', class: 'sprite settlement-place-art', decoding: 'async', draggable: 'false' }) : null;
+// `winter`: in December, the place with snow on its roof, where it has one.
+export const settlementPlaceArt = (placeId, winter = false) => {
+  const src = winter && available['settlement-winter'].has(placeId) ? `/art/settlement-winter/${placeId}.png` : available.settlement.has(placeId) ? `/art/settlement/${placeId}.png` : null;
+  return src ? h('img', { src, alt: '', class: 'sprite settlement-place-art', decoding: 'async', draggable: 'false' }) : null;
+};
 // A torch of the Osada's board, burning or, by day, put out.
 export const settlementTorchArt = (lit = true) => {
   const id = lit ? 'torch' : 'torch-off';
@@ -868,7 +881,13 @@ export function companionPortrait(classId, appearance) {
     draggable: 'false',
   });
 }
-export const settlementGround = () => (available['settlement-board'].has('settlement') ? '/art/settlement-board/settlement.png' : null);
+// `winter`: in December, the ground under snow, where it has one.
+export const settlementGround = (winter = false) =>
+  winter && available['settlement-board'].has('settlement-winter')
+    ? '/art/settlement-board/settlement-winter.png'
+    : available['settlement-board'].has('settlement')
+      ? '/art/settlement-board/settlement.png'
+      : null;
 
 // A skin tone other than the one drawn has its own recoloured file
 // (data/skins.json, tools/skin-tones.py).

@@ -1628,7 +1628,8 @@ export function mountSettlement(container, { params = {} } = {}) {
   // when a parcel does, on the Karczma when a mercenary's pay does.
   function placeLink(place) {
     const hash = `${SETTLEMENT}/${place.id}`;
-    const art = settlementPlaceArt(place.id);
+    // Under snow while the winter camp stands (December, 1063).
+    const art = settlementPlaceArt(place.id, Boolean(state.character?.winterCamp));
     const link = h(
       'a',
       {
@@ -1658,7 +1659,7 @@ export function mountSettlement(container, { params = {} } = {}) {
   // camp's (the author: "Ja to bym dał nawet z 2 razy większą tę Osadę"),
   // scrolling with the page, and its places.
   function boardView() {
-    const ground = settlementGround();
+    const ground = settlementGround(Boolean(state.character?.winterCamp));
     const part = dayPart();
     fill(
       container,
