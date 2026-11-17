@@ -1,0 +1,19 @@
+{
+  "id": "rider-skin-winter-warrior-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the red-haired woman warrior of the reference picture riding: the same face, the same dark red hair falling straight down to the shoulders from under the helmet, not blown by the wind, the same pointed steel helmet with a white fur rim and a sprig of holly with red berries on its side, the same polished silver plate armour over a mail skirt, the same thick white fur collar over the shoulders, the same long red cape with white fur trim at its hem hanging behind from the shoulders, brown trousers, a red and white patterned boot with a white fur top and a brown shoe, nothing in the hands but the reins, no shield and no sword; sitting astride a saddle that is not drawn, upright, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the lower leg hanging straight down from the knee, one whole boot at the bottom with the toes pointing right; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the top of the helmet to the sole of the boot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/winter-warrior-female.png",
+      "usage": "the character's look: this same woman, her face, red hair, helmet, armour, fur, cape and colours, drawn the same way; not her standing pose, not the shield and not the sword"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08202457027965122
+  },
+  "images": 4
+}
