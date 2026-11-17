@@ -34,7 +34,7 @@ import {
   saleGold,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { bagItems, bagPlaces, buffsOf, characterView, currentHp, loadPlayer, questsNow, requireIdle, requirePlayer, requireWorker, workOf } from './characters.js';
+import { avatarMark, bagItems, bagPlaces, buffsOf, characterView, currentHp, loadPlayer, questsNow, requireIdle, requirePlayer, requireWorker, workOf, workTable } from './characters.js';
 import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { atomically, raced, sameVersion } from './atomic.js';
@@ -100,7 +100,7 @@ export async function startBrewing(context) {
     db
       .prepare(
         `UPDATE characters SET herbs = ?${catalyst ? ', materials = ?' : ''}${avatar ? '' : ', hp = ?, hp_at = ?'}, version = version + 1
-         WHERE id = ? AND version = ? AND NOT EXISTS (SELECT 1 FROM ${avatar ? 'avatar_activities' : 'activities'} WHERE character_id = ?)`,
+         WHERE id = ? AND version = ? AND NOT EXISTS (SELECT 1 FROM ${workTable(avatar)} WHERE character_id = ?)`,
       )
       .bind(
         JSON.stringify(left),
@@ -204,7 +204,7 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
       { potion, minutes: worked, startedAt: activity.started_at, endsAt: stop ? now : activity.ends_at, seed: activity.seed, made, stored, lost, stopped: stop, before, after, character, xp, work, settlement: settlementPointsOf(row) },
       content(),
     ),
-    ...(avatar && { avatar: true }),
+    ...avatarMark(avatar),
     ...(card && { cards: card.cards }),
   }, minigame);
   const summary = {
@@ -217,7 +217,7 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
     professionLevel: after.level,
     levelAfter: work.level,
     system: report.system,
-    ...(avatar && { avatar: true }),
+    ...avatarMark(avatar),
     ...(card && { cards: cardSummary(card.cards) }),
   };
   const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { potions: { [potion.id]: made.count } }));

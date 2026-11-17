@@ -203,13 +203,14 @@ async function notificationsByUser(db, from, to) {
     db
       .prepare(`SELECT character_id, kind, region_id, ends_at FROM ${table} WHERE ends_at > ? AND ends_at <= ? AND character_id IN (SELECT id FROM characters WHERE ${subscribed})`)
       .bind(from, to);
-  const [characters, activities, avatarActivities, buildings] = await db.batch([
+  const [characters, activities, avatarActivities, avatar2Activities, buildings] = await db.batch([
     // With the Zbieracz Systemu (collector_at) no store stands full. The
     // account's language, for the words.
     db.prepare(`SELECT id, user_id, level, build_queue, collector_at, (SELECT language FROM users WHERE users.id = characters.user_id) AS language FROM characters WHERE ${subscribed}`),
     ending('activities'),
-    // The works of the Awatar Systemu (avatar.js).
+    // The works of the Awatar Systemu (avatar.js) and of the second (1066).
     ending('avatar_activities'),
+    ending('avatar2_activities'),
     // The production buildings for their stores, the others only when a
     // build of theirs ends now.
     db
@@ -223,12 +224,13 @@ async function notificationsByUser(db, from, to) {
   const players = new Map(
     characters.results.map((row) => [
       row.id,
-      { userId: row.user_id, language: accountLanguage(row.language), level: row.level, activity: null, avatarActivity: null, buildings: {}, queue: JSON.parse(row.build_queue ?? '[]'), collector: Boolean(row.collector_at) },
+      { userId: row.user_id, language: accountLanguage(row.language), level: row.level, activity: null, avatarActivity: null, avatar2Activity: null, buildings: {}, queue: JSON.parse(row.build_queue ?? '[]'), collector: Boolean(row.collector_at) },
     ]),
   );
   for (const [rows, key] of [
     [activities.results, 'activity'],
     [avatarActivities.results, 'avatarActivity'],
+    [avatar2Activities.results, 'avatar2Activity'],
   ]) {
     for (const row of rows) {
       const player = players.get(row.character_id);

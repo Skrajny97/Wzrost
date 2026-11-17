@@ -25,7 +25,7 @@ import {
   weekFactor,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { bagPlaces, characterView, currentHp, engineCharacter, equippedItems, loadPlayer, questsNow, requirePlayer, requireWorker, workOf } from './characters.js';
+import { avatarMark, avatarTexts, bagPlaces, characterView, currentHp, engineCharacter, equippedItems, loadPlayer, questsNow, requirePlayer, requireWorker, workOf, workTable } from './characters.js';
 import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { professionsOn } from './features.js';
@@ -136,7 +136,7 @@ export function insertWork(db, avatar, row, { kind, placeId, minutes, now, seed,
   const values = [row.id, kind, placeId, minutes, now, now + minutes * 60000, seed, ...(avatar ? [] : [hp]), JSON.stringify(week ? { ...options, week } : options)];
   return db
     .prepare(
-      `INSERT INTO ${avatar ? 'avatar_activities' : 'activities'} (${columns.join(', ')})
+      `INSERT INTO ${workTable(avatar)} (${columns.join(', ')})
        SELECT ${values.map(() => '?').join(', ')} WHERE EXISTS (SELECT 1 FROM characters WHERE id = ? AND version = ?)`,
     )
     .bind(...values, row.id, row.version + 1);
@@ -189,7 +189,7 @@ export async function startGathering(context) {
       avatar
         ? [
             db
-              .prepare('INSERT INTO avatar_activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, options) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+              .prepare(`INSERT INTO ${workTable(avatar)} (character_id, kind, region_id, minutes, started_at, ends_at, seed, options) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
               .bind(player.row.id, 'herbs', gathering.place.id, body.minutes, now, ends, seed, options),
           ]
         : [
@@ -209,7 +209,7 @@ export async function startGathering(context) {
     );
   } catch (error) {
     if (raced(error)) throw characterChanged();
-    if (String(error?.message).includes('constraint')) throw new ApiError(409, 'busy', avatar ? content().avatar.texts.busy[0] : 'Postać jest już zajęta.');
+    if (String(error?.message).includes('constraint')) throw new ApiError(409, 'busy', avatar ? avatarTexts(avatar).busy[0] : 'Postać jest już zajęta.');
     throw error;
   }
   return json({ character: characterView(await loadPlayer(db, session.userId), now) }, 201);
@@ -244,7 +244,7 @@ export async function finishGathering(db, player, now, { avatar = false, minigam
       { minutes: activity.minutes, startedAt: activity.started_at, endsAt: activity.ends_at, seed: activity.seed, found, lucky, stored, lost, before, after, character, xp, work },
       content(),
     ),
-    ...(avatar && { avatar: true }),
+    ...avatarMark(avatar),
     ...(card && { cards: card.cards }),
   }, minigame);
   const summary = {
@@ -257,7 +257,7 @@ export async function finishGathering(db, player, now, { avatar = false, minigam
     professionLevel: after.level,
     levelAfter: work.level,
     system: report.system,
-    ...(avatar && { avatar: true }),
+    ...avatarMark(avatar),
     ...(card && { cards: cardSummary(card.cards) }),
   };
   const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { herbs: found }));

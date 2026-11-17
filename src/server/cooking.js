@@ -9,7 +9,7 @@
 
 import { bagCapacity, bagStacks, campLevels, cookDishes, cookingReport, cookMinutes, dishesDone, dishIngredients, minigameExtra, mostDishes, professionState } from '../engine/index.js';
 import { content } from './content.js';
-import { bagPlaces, characterView, currentHp, loadPlayer, requireWorker, workOf } from './characters.js';
+import { avatarMark, bagPlaces, characterView, currentHp, loadPlayer, requireWorker, workOf, workTable } from './characters.js';
 import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { atomically, raced, sameVersion } from './atomic.js';
@@ -72,7 +72,7 @@ export async function startCooking(context) {
     db
       .prepare(
         `UPDATE characters SET pantry = ?${herbsTaken ? ', herbs = ?' : ''}${avatar ? '' : ', hp = ?, hp_at = ?'}, version = version + 1
-         WHERE id = ? AND version = ? AND NOT EXISTS (SELECT 1 FROM ${avatar ? 'avatar_activities' : 'activities'} WHERE character_id = ?)`,
+         WHERE id = ? AND version = ? AND NOT EXISTS (SELECT 1 FROM ${workTable(avatar)} WHERE character_id = ?)`,
       )
       .bind(JSON.stringify(left(pantry, taken.pantry)), ...(herbsTaken ? [JSON.stringify(left(herbs, taken.herbs))] : []), ...(avatar ? [] : [hp, now]), row.id, row.version, row.id),
     insertWork(db, avatar, row, {
@@ -157,7 +157,7 @@ export async function finishCooking(db, player, now, { stop = false, avatar = fa
       { dish, minutes: worked, startedAt: activity.started_at, endsAt: stop ? now : activity.ends_at, seed: activity.seed, made, stopped: stop, before, after, character, xp, work },
       content(),
     ),
-    ...(avatar && { avatar: true }),
+    ...avatarMark(avatar),
     ...(card && { cards: card.cards }),
   }, minigame);
   const summary = {
@@ -169,7 +169,7 @@ export async function finishCooking(db, player, now, { stop = false, avatar = fa
     professionLevel: after.level,
     levelAfter: work.level,
     system: report.system,
-    ...(avatar && { avatar: true }),
+    ...avatarMark(avatar),
     ...(card && { cards: cardSummary(card.cards) }),
   };
   // The dishes made and the ingredients for the rest, in the Spiżarnia.

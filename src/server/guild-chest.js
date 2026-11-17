@@ -83,7 +83,7 @@ function cardTexts() {
 // Whether a gem is being set in the item now, by the character or by its
 // Awatar Systemu (jewelcraft.js: a setting's options name its item).
 function inSetting(player, itemId) {
-  return [player.activity, player.avatarActivity].some((work) => {
+  return [player.activity, player.avatarActivity, player.avatar2Activity].some((work) => {
     if (work?.kind !== 'jewels') return false;
     const options = JSON.parse(work.options ?? '{}');
     return options.set === true && options.item === itemId;

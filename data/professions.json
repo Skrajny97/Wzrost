@@ -16,6 +16,18 @@
       "busy": ["Awatar Systemu już pracuje. Poczekaj na koniec jego pracy."],
       "claimFirst": ["Awatar Systemu skończył pracę. Najpierw odbierz jego raport."],
       "pushTitle": ["Praca Awatara Systemu zakończona"]
+    },
+    "second": {
+      "$comment": "Drugi Awatar Systemu (1066; autor: „A czy jest szansa by można było mieć dwa Awatary Systemu przy czym drugi bardzo drogi - za 200000 złota?”): kupiony po pierwszym, pracuje obok postaci i pierwszego Awatara, tak samo jak on (share i professionShare wyżej). Karta zakupu i dwie karty w pracy według makiet 1070.1 i 1070.2.",
+      "name": "Drugi Awatar Systemu",
+      "price": 200000,
+      "description": "Drugie odbicie postaci, które System utka na jej podobieństwo. Pracuje w Profesjach w tym samym czasie co pierwszy Awatar, tak samo wydajnie i za tyle samo: cały postęp profesji i ćwierć doświadczenia postaci.",
+      "texts": {
+        "bought": ["System utkał drugiego Awatara. Czeka na pracę w Profesjach."],
+        "busy": ["Drugi Awatar Systemu już pracuje. Poczekaj na koniec jego pracy."],
+        "claimFirst": ["Drugi Awatar Systemu skończył pracę. Najpierw odbierz jego raport."],
+        "pushTitle": ["Praca Drugiego Awatara Systemu zakończona"]
+      }
     }
   },
   "professions": [

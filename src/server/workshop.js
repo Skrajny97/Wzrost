@@ -29,7 +29,7 @@ import {
   workshopReport,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { characterView, craftingState, currentHp, loadPlayer, questsNow, requirePlayer, requireWorker, walletOf, workOf } from './characters.js';
+import { avatarMark, characterView, craftingState, currentHp, loadPlayer, questsNow, requirePlayer, requireWorker, walletOf, workOf, workTable } from './characters.js';
 import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { assertion, atomically, raced, sameVersion } from './atomic.js';
@@ -90,7 +90,7 @@ export async function startCrafting(context) {
     db
       .prepare(
         `UPDATE characters SET parts = ?, crafting = ?, resources = ?${avatar ? '' : ', hp = ?, hp_at = ?'}, version = version + 1
-         WHERE id = ? AND version = ? AND NOT EXISTS (SELECT 1 FROM ${avatar ? 'avatar_activities' : 'activities'} WHERE character_id = ?)`,
+         WHERE id = ? AND version = ? AND NOT EXISTS (SELECT 1 FROM ${workTable(avatar)} WHERE character_id = ?)`,
       )
       .bind(JSON.stringify(partsLeft), JSON.stringify(table.queue), JSON.stringify(resources), ...(avatar ? [] : [hp, now]), row.id, row.version, row.id),
     insertWork(db, avatar, row, {
@@ -246,7 +246,7 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
       },
       content(),
     ),
-    ...(avatar && { avatar: true }),
+    ...avatarMark(avatar),
     ...(card && { cards: card.cards }),
   }, minigame);
   const summary = {
@@ -259,7 +259,7 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
     professionLevel: after.level,
     levelAfter: work.level,
     system: report.system,
-    ...(avatar && { avatar: true }),
+    ...avatarMark(avatar),
     ...(card && { cards: cardSummary(card.cards) }),
   };
   const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { made: made.length }));

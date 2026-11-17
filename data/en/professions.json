@@ -17,6 +17,24 @@
       "pushTitle": [
         "System Avatar's work complete"
       ]
+    },
+    "second": {
+      "name": "Second System Avatar",
+      "description": "A second reflection of the character that the System will weave in their likeness. It works at the Professions at the same time as the first Avatar, just as efficiently and for the same: all the profession progress and a quarter of the character experience.",
+      "texts": {
+        "bought": [
+          "The System has woven the second Avatar. It waits for work in the Professions."
+        ],
+        "busy": [
+          "The Second System Avatar is already working. Wait until its work is done."
+        ],
+        "claimFirst": [
+          "The Second System Avatar has finished its work. Claim its report first."
+        ],
+        "pushTitle": [
+          "Second System Avatar's work complete"
+        ]
+      }
     }
   },
   "professions": {

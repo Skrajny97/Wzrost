@@ -29,12 +29,12 @@ export async function skipWithTimePoints(context) {
   return json({ spent, character: characterView(await loadSettled(context.env.DB, session.userId, context.now), context.now) });
 }
 
-// Points for the minutes left of a wait (`target`: activity, avatar, rest or
-// build).
+// Points for the minutes left of a wait (`target`: activity, avatar, avatar2
+// (the second Awatar's work, 1066), rest or build).
 // The skipped introduction pays for its first exploration this way too.
 export async function spendTimePoints(db, player, target, now) {
   if (player.row.time_points < 1) throw new ApiError(409, 'no_time_points', 'Nie masz Punktów Czasu.');
-  const plans = { activity: skipActivity, avatar: skipAvatar, rest: skipRest, build: skipBuild };
+  const plans = { activity: skipActivity, avatar: skipAvatar, avatar2: skipAvatar2, rest: skipRest, build: skipBuild };
   if (typeof target !== 'string' || !Object.hasOwn(plans, target)) throw new ApiError(400, 'invalid_target', 'Nie wiadomo, co przewinąć.');
   const { spent, statements } = plans[target](db, player, now);
   // The batch holds only while the character is as read (atomic.js); then
@@ -61,6 +61,8 @@ const skipActivity = (db, player, now) => skipWork(db, player, now, 'activities'
 
 // The work of the Awatar Systemu (avatar.js) moves the same way.
 const skipAvatar = (db, player, now) => skipWork(db, player, now, 'avatar_activities', player.avatarActivity, 'Awatar Systemu teraz nie pracuje.');
+// And of the second Awatar (1066).
+const skipAvatar2 = (db, player, now) => skipWork(db, player, now, 'avatar2_activities', player.avatar2Activity, 'Drugi Awatar Systemu teraz nie pracuje.');
 
 function skipWork(db, player, now, table, activity, none) {
   const { row } = player;

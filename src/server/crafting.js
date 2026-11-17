@@ -415,7 +415,7 @@ export async function cancelOrders(context) {
   // the Awatar's, makes items with a pattern the order would hide: they are
   // made without asking for it again, so the item would come back with the
   // pattern used (the code review, 12.11.2026).
-  const working = [player.activity, player.avatarActivity].filter((work) => work && (work.kind === 'items' || work.kind === 'jewels')).map((work) => JSON.parse(work.options ?? '{}').base);
+  const working = [player.activity, player.avatarActivity, player.avatar2Activity].filter((work) => work && (work.kind === 'items' || work.kind === 'jewels')).map((work) => JSON.parse(work.options ?? '{}').base);
   const inUse = hidden.find((id) => working.includes(id));
   if (inUse) throw new ApiError(409, 'pattern_in_use', filled(errors.patternInUse, { pattern: content().basesById[inUse]?.name ?? inUse }));
   const db = context.env.DB;

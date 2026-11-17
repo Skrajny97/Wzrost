@@ -29,7 +29,7 @@ import {
 } from '../engine/index.js';
 import { say } from '../engine/text.js';
 import { content } from './content.js';
-import { characterView, coreOf, currentHp, loadPlayer, questsNow, requireNotExploring, requirePlayer, requireWorker, workOf } from './characters.js';
+import { avatarMark, characterView, coreOf, currentHp, loadPlayer, questsNow, requireNotExploring, requirePlayer, requireWorker, workOf, workTable } from './characters.js';
 import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
 import { labyrinthOn } from './features.js';
 import { toHex } from './encoding.js';
@@ -75,7 +75,7 @@ function settingOrder(player, level, body, now) {
   const item = player.items.find((candidate) => candidate.id === body.itemId);
   if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz tego przedmiotu.');
   if (item.equippedSlot) requireNotExploring(player, now);
-  const setting = [player.activity, player.avatarActivity].some((work) => {
+  const setting = [player.activity, player.avatarActivity, player.avatar2Activity].some((work) => {
     if (work?.kind !== 'jewels') return false;
     const options = JSON.parse(work.options ?? '{}');
     return options.set === true && options.item === item.id;
@@ -96,7 +96,7 @@ function settingOrder(player, level, body, now) {
 function coreSettingOrder(player, level, body, now) {
   if (!labyrinthOn() || !coreOf(player.row).open) throw new ApiError(404, 'item_not_found', 'Nie masz tego przedmiotu.');
   requireNotExploring(player, now);
-  const setting = [player.activity, player.avatarActivity].some((work) => work?.kind === 'jewels' && JSON.parse(work.options ?? '{}').core === true);
+  const setting = [player.activity, player.avatarActivity, player.avatar2Activity].some((work) => work?.kind === 'jewels' && JSON.parse(work.options ?? '{}').core === true);
   if (setting) throw new ApiError(409, 'setting_under_way', 'W Rdzeniu trwa już oprawianie kamienia.');
   const gem = typeof body.gem === 'string' ? content().mineralsById[body.gem] : undefined;
   if (!gem || gem.kind !== 'gem') throw new ApiError(400, 'unknown_gem', 'Nie ma takiego kamienia.');
@@ -142,7 +142,7 @@ export async function startJewelcraft(context) {
     db
       .prepare(
         `UPDATE characters SET minerals = ?${avatar ? '' : ', hp = ?, hp_at = ?'}, version = version + 1
-         WHERE id = ? AND version = ? AND NOT EXISTS (SELECT 1 FROM ${avatar ? 'avatar_activities' : 'activities'} WHERE character_id = ?)`,
+         WHERE id = ? AND version = ? AND NOT EXISTS (SELECT 1 FROM ${workTable(avatar)} WHERE character_id = ?)`,
       )
       .bind(JSON.stringify(left), ...(avatar ? [] : [hp, now]), row.id, row.version, row.id),
     insertWork(db, avatar, row, {
@@ -308,7 +308,7 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
         },
         content(),
       ),
-      ...(avatar && { avatar: true }),
+      ...avatarMark(avatar),
       ...(card && { cards: card.cards }),
     }, made.set ? null : minigame);
     const summary = {
@@ -322,7 +322,7 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
       professionLevel: after.level,
       levelAfter: work.level,
       system: report.system,
-      ...(avatar && { avatar: true }),
+      ...avatarMark(avatar),
       ...(card && { cards: cardSummary(card.cards) }),
     };
     const minerals = addTo('minerals', returned);

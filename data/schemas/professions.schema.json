@@ -506,6 +506,29 @@
             "claimFirst": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
             "pushTitle": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
           }
+        },
+        "second": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "price", "description", "texts"],
+          "description": "Drugi Awatar Systemu (1066): kupiony po pierwszym za price złota, pracuje obok postaci i pierwszego Awatara, z tym samym share i professionShare; texts jak u pierwszego.",
+          "properties": {
+            "$comment": { "type": "string" },
+            "name": { "type": "string", "minLength": 1 },
+            "price": { "type": "integer", "minimum": 1 },
+            "description": { "type": "string", "minLength": 1 },
+            "texts": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["bought", "busy", "claimFirst", "pushTitle"],
+              "properties": {
+                "bought": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+                "busy": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+                "claimFirst": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+                "pushTitle": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+              }
+            }
+          }
         }
       }
     },

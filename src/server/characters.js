@@ -219,10 +219,11 @@ async function regearWorn(db, row, items) {
 
 // A character's row with its items, activities and camp buildings.
 async function playerOf(db, row) {
-  const [items, activities, avatarActivities, buildings, parcels, stored] = await db.batch([
+  const [items, activities, avatarActivities, avatar2Activities, buildings, parcels, stored] = await db.batch([
     db.prepare('SELECT id, slot, data FROM items WHERE character_id = ? ORDER BY id').bind(row.id),
     db.prepare('SELECT * FROM activities WHERE character_id = ?').bind(row.id),
     db.prepare('SELECT * FROM avatar_activities WHERE character_id = ?').bind(row.id),
+    db.prepare('SELECT * FROM avatar2_activities WHERE character_id = ?').bind(row.id),
     db.prepare('SELECT building_id, level, started_at, ends_at, collected_at, cost FROM buildings WHERE character_id = ?').bind(row.id),
     // With the tag of its guild, for its own name (guilds.js), whether it
     // is in a Drużyna, where its companions stay in the Kwatery (parties.js,
@@ -246,8 +247,10 @@ async function playerOf(db, row) {
     // there (not an item's of the bag).
     stored: stored.results.map((item) => ({ id: item.id, ...JSON.parse(item.data) })),
     activity: activities.results[0] ?? null,
-    // The work of the Awatar Systemu, kept as the character's own (avatar.js).
+    // The work of the Awatar Systemu, kept as the character's own (avatar.js),
+    // and of the second Awatar (1066).
     avatarActivity: avatarActivities.results[0] ?? null,
+    avatar2Activity: avatar2Activities.results[0] ?? null,
     // What waits to be collected at the Targowisko (market.js).
     marketWaiting: parcels.results[0]?.waiting ?? 0,
     guildTag: parcels.results[0]?.guild_tag ?? null,
@@ -851,30 +854,41 @@ export async function requireBuildPlayer(context) {
   return found;
 }
 
+// Who does a work, as the code passes it on: the character (false), its
+// Awatar Systemu (true) or its second Awatar (2, 1066). The tables their
+// works sit in, their texts, the mark their reports carry and their work.
+export const workTable = (avatar) => (avatar === 2 ? 'avatar2_activities' : avatar ? 'avatar_activities' : 'activities');
+export const avatarTexts = (avatar) => (avatar === 2 ? content().avatar.second.texts : content().avatar.texts);
+export const avatarMark = (avatar) => (avatar === 2 ? { avatar: 2 } : avatar ? { avatar: true } : {});
+export const avatarWorkOf = (player, avatar) => (avatar === 2 ? player.avatar2Activity : player.avatarActivity);
+// The Awatar a request names: `avatar: true` the first, `avatar: 2` the
+// second, anything else none.
+export const avatarAsked = (body) => (body?.avatar === 2 ? 2 : body?.avatar === true);
+
 // Who does a profession's work: the character at home, or with `avatar` in
-// the request its Awatar Systemu, bought and free (avatar.js), while the
-// character may be away or at work itself.
+// the request its Awatar Systemu (true) or its second Awatar (2), bought and
+// free (avatar.js), while the character may be away or at work itself.
 export async function requireWorker(context, body) {
-  if (body.avatar !== true) return { ...(await requireIdlePlayer(context)), avatar: false };
+  const avatar = avatarAsked(body);
+  if (!avatar) return { ...(await requireIdlePlayer(context)), avatar: false };
   const found = await requirePlayer(context);
-  const { row, avatarActivity } = found.player;
-  if (!row.avatar_at) throw new ApiError(409, 'no_avatar', 'Nie masz jeszcze Awatara Systemu.');
-  if (avatarActivity) {
-    const { texts } = content().avatar;
-    throw avatarActivity.ends_at <= context.now ? new ApiError(409, 'claim_first', texts.claimFirst[0]) : new ApiError(409, 'busy', texts.busy[0]);
+  const { row } = found.player;
+  if (avatar === 2 ? !row.avatar2_at : !row.avatar_at) throw new ApiError(409, 'no_avatar', avatar === 2 ? 'Nie masz jeszcze drugiego Awatara Systemu.' : 'Nie masz jeszcze Awatara Systemu.');
+  const work = avatarWorkOf(found.player, avatar);
+  if (work) {
+    const texts = avatarTexts(avatar);
+    throw work.ends_at <= context.now ? new ApiError(409, 'claim_first', texts.claimFirst[0]) : new ApiError(409, 'busy', texts.busy[0]);
   }
-  return { ...found, avatar: true };
+  return { ...found, avatar };
 }
 
-// The work of the character or, with `avatar`, of its Awatar Systemu: the
-// table it sits in, the activity and the key of its report.
+// The work of the character or, with `avatar`, of its Awatar Systemu (true)
+// or second Awatar (2): the table it sits in, the activity and the key of
+// its report.
 export function workOf(player, avatar) {
-  const activity = avatar ? player.avatarActivity : player.activity;
-  return {
-    table: avatar ? 'avatar_activities' : 'activities',
-    activity,
-    key: avatar ? `${player.row.id}:avatar:${activity.started_at}` : `${player.row.id}:${activity.started_at}`,
-  };
+  const activity = avatar ? avatarWorkOf(player, avatar) : player.activity;
+  const own = avatar === 2 ? ':avatar2' : avatar ? ':avatar' : '';
+  return { table: workTable(avatar), activity, key: `${player.row.id}${own}:${activity.started_at}` };
 }
 
 // The stat points as stored, only those of known stats in whole numbers, so
@@ -1547,10 +1561,18 @@ function wantedInHand(row) {
 }
 
 // The Awatar Systemu (avatar.js): its price and words until it is bought,
-// then its work under way, or null.
+// then its work under way, or null; and the same of the second Awatar
+// (1066), on sale once the first is bought.
 function avatarView(player, now) {
-  const { name, price, description } = content().avatar;
-  return { name, price, description, owned: Boolean(player.row.avatar_at), activity: activityView(player.avatarActivity, player.row.level, now) };
+  const { name, price, description, second } = content().avatar;
+  return {
+    name,
+    price,
+    description,
+    owned: Boolean(player.row.avatar_at),
+    activity: activityView(player.avatarActivity, player.row.level, now),
+    second: { name: second.name, price: second.price, description: second.description, owned: Boolean(player.row.avatar2_at), activity: activityView(player.avatar2Activity, player.row.level, now) },
+  };
 }
 
 // Szczodre Gody's winter quests (winter.js, 1044.4) as a fourth period of
@@ -2078,12 +2100,14 @@ export async function listCharacters(context) {
   // screens that lead to the creation of a character ask for it (?with=
   // classes; 1031, the load test: the Postać tab asked it at each visit).
   const withClasses = new URL(context.request.url).searchParams.get('with') === 'classes';
-  const [rows, works, avatarWorks, parked, perClass] = await db.batch([
+  const [rows, works, avatarWorks, avatar2Works, parked, perClass] = await db.batch([
     db.prepare(`SELECT * FROM characters WHERE user_id = ? AND ${OWN_CHARACTERS} ORDER BY id`).bind(session.userId),
     db.prepare(`SELECT * FROM activities WHERE character_id IN (${own})`).bind(session.userId),
     // The Awatar Systemu's profession work, for the time over each bust on
     // the Postać tab (screens/character.js, 0.2.27).
     db.prepare(`SELECT character_id, kind, ends_at FROM avatar_activities WHERE character_id IN (${own})`).bind(session.userId),
+    // And the second Awatar's (1066).
+    db.prepare(`SELECT character_id, kind, ends_at FROM avatar2_activities WHERE character_id IN (${own})`).bind(session.userId),
     db.prepare("SELECT name FROM characters WHERE user_id = ? AND role = 'parked'").bind(session.userId),
     // All the game's characters of each class, played or set aside, for the
     // creation screen (the author: "po to by gracz wiedział jakiej klasy może
@@ -2092,6 +2116,7 @@ export async function listCharacters(context) {
   ]);
   const activities = new Map(works.results.map((row) => [row.character_id, row]));
   const avatars = new Map(avatarWorks.results.map((row) => [row.character_id, { kind: row.kind, endsAt: row.ends_at }]));
+  const avatars2 = new Map(avatar2Works.results.map((row) => [row.character_id, { kind: row.kind, endsAt: row.ends_at }]));
   const counts = new Map((perClass?.results ?? []).map((row) => [row.class_id, row.count]));
   return json({
     characters: rows.results.map((row) => ({
@@ -2109,6 +2134,7 @@ export async function listCharacters(context) {
       played: row.role === 'player',
       activity: activityView(activities.get(row.id) ?? null, row.level, context.now),
       avatarActivity: avatars.get(row.id) ?? null,
+      avatar2Activity: avatars2.get(row.id) ?? null,
     })),
     max: content().balance.account.characters,
     parked: parked.results[0]?.name ?? null,
@@ -2359,6 +2385,7 @@ export function characterRemoval(db, id, now) {
     db.prepare('DELETE FROM reports WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM activities WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM avatar_activities WHERE character_id = ?').bind(id),
+    db.prepare('DELETE FROM avatar2_activities WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM items WHERE character_id = ?').bind(id),
     // What waits in its Przechowalnia (storage.js).
     db.prepare('DELETE FROM storage_items WHERE character_id = ?').bind(id),
