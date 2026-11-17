@@ -2217,16 +2217,39 @@
     }
   },
   "winter": {
-    "$comment": "Szczodre Gody (1044, zimowe wydarzenie 1–24.12; 1028 przyjęte 16.11.2026): ozdoby Obozu z kalendarza, podłaźniczka (12.12) i snopek (19.12), w stylu budynków Obozu. Rysuje Pro Flash, po jednym obrazku z wywołania, najwyżej cztery wersje; płótno 76 × 76, bo wzór stylu (ognisko) ma 74 × 70.",
+    "$comment": "Szczodre Gody (1044, zimowe wydarzenie 1–24.12; 1028 przyjęte 16.11.2026): ozdoby Obozu z kalendarza, podłaźniczka (12.12) i snopek (19.12), w stylu budynków Obozu. Rysuje Pro Flash, po jednym obrazku z wywołania, najwyżej cztery wersje; płótno 76 × 76, bo wzór stylu (ognisko) ma 74 × 70. Zestaw z 24. dnia (1044.2 B): ramka „Szron” (120 × 160, w stylu Leśnej ramki), tło „Szczodre Gody” (96 × 128, w stylu tła Obóz nocą) i materiał zimowych zadań: gałązka jodły (32 × 32, w stylu materiałów). Aura „Śnieżyca” jest bez grafiki (światło i płatki śniegu).",
     "width": 76,
     "height": 76,
     "pixellab": {
       "tool": "flash",
-      "style": "src/client/art/camp/campfire-1.png"
+      "style": "src/client/art/camp/campfire-1.png",
+      "styles": {
+        "frame-szron": "src/client/art/cosmetics/frame-forest.png",
+        "bg-szczodre": "src/client/art/cosmetics/bg-camp.png",
+        "galazka": "src/client/art/materials/rat-tail.png"
+      }
     },
     "prompts": {
       "podlaznniczka": "a traditional Polish podłaźniczka: the top of a fir tree hung upside down, decorated with small red apples, straw stars, walnuts and white paper wafer ornaments, a winter solstice decoration, game sprite, the object alone, no ground, no background",
-      "snopek": "a didukh: a tall sheaf of golden wheat straw tied with a red ribbon, standing upright on its cut stalks, a Slavic winter solstice decoration, game sprite, the object alone, no ground, no background"
+      "snopek": "a didukh: a tall sheaf of golden wheat straw tied with a red ribbon, standing upright on its cut stalks, a Slavic winter solstice decoration, game sprite, the object alone, no ground, no background",
+      "frame-szron": {
+        "prompt": "an ornate portrait frame made of frost and ice: pale icy blue and white crystals, small snowflake ornaments in the four corners and short icicles hanging from the top edge, a large empty window in the middle for a portrait, seen flat from the front, pixel art user interface",
+        "width": 120,
+        "height": 160,
+        "tool": "pro"
+      },
+      "bg-szczodre": {
+        "prompt": "a winter night in a small Slavic forest village during the winter solstice feast: snow on the thatched roofs and fir trees, a bonfire with warm light, a few warm lit windows, stars in a deep blue sky, gently falling snow, pixel art scene background",
+        "width": 96,
+        "height": 128,
+        "tool": "pro",
+        "transparent": false
+      },
+      "galazka": {
+        "prompt": "a small fresh fir branch with dark green needles and a little snow on it, single inventory item icon, bold clean outline",
+        "width": 32,
+        "height": 32
+      }
     }
   }
 }
