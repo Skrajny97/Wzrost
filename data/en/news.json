@@ -1040,6 +1040,10 @@
     "0.4.23": {
       "title": "Version 0.4.23",
       "body": "- The Bestiary shows the weak point and resistances of the creatures your character has fought, e.g. “Weak point: sacred +50%” and “Resistance: fire −32%”. It makes it easier to choose which element to enchant your weapon with before an expedition.\n- The resistance percent is counted at your character's level, just as in combat."
+    },
+    "0.4.24": {
+      "title": "Version 0.4.24",
+      "body": "- In December the System Shop's Outfits tab will have winter outfits for every class: Generous Feast Armour, Winter Archer's Garb, Frost Mage's Furs, Star-Bearer's Robes and Winter Night Cloak. Each costs 800 System Points and works with every evolution: on the portrait, on the march and in the saddle. On sale only in December.\n- When your character rides a pony, the companions walking beside it are now bigger and fit the rider better."
     }
   }
 }

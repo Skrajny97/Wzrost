@@ -3672,14 +3672,33 @@ Autor 17.11.2026: „I skąd wiedzieć na co jest podatny stwór?”, potem „1
 2. **Brakujący szczegół: procent odporności.** Odporność stwora rośnie z jego poziomem, a jej skutek zależy od poziomu atakującego (`reduction` w `src/engine/formulas.js`). Bestiariusz bierze odporność ze środka poziomów stwora w danym miejscu, a procent liczy na poziomie postaci, tak jak w walce. Odporność, która wychodzi 0%, nie jest pokazana.
 3. Pod listą jest jedno zdanie, co znaczą obie linijki, gdy na liście jest choć jedna. Dane: `weak` i `resist` przy stworach miejsca (`dangerView` w `src/server/content.js`) i `resistK` w treści gry dla strony.
 
-## Kody podarunkowe w Panelu autora (1080, 17.11.2026, czeka na ocenę)
+## Kody podarunkowe w Panelu autora (1080, 17.11.2026, od 0.4.24)
 
-Autor 17.11.2026: „Musisz mi dodac opcję w Panel Autora generowania takich kodów z pozycji gry, które działają od razu, jeśli jest to możliwe, bo wdrożenia całe na jedną prosta rzecz tego typu to przesada troche”.
+Autor przyjął 1080 na stronie ocen. Autor 17.11.2026: „Musisz mi dodac opcję w Panel Autora generowania takich kodów z pozycji gry, które działają od razu, jeśli jest to możliwe, bo wdrożenia całe na jedną prosta rzecz tego typu to przesada troche”.
 
 1. W Panelu autora przycisk „Kody podarunkowe” otwiera formularz: kod, Punkty Systemu, Punkty Czasu, złoto, ostatni dzień działania i (opcjonalnie) imię postaci. Kod trafia do bazy (`author_gift_codes`, migracja 0156) i działa od razu, obok kodów z `data/gift-codes.json`, tak samo raz na konto (`gift_codes_used`).
 2. Kod z imieniem działa tylko dla tej postaci. Imię jest sprawdzane w grze (wielkość liter bez znaczenia), a w bazie leży też skrót imienia, jak przy kodach z plików. Imię nie trafia do repozytorium.
 3. **Brakujące szczegóły:** kod ma od 3 do 24 liter i cyfr. Nagrody są ograniczone przeciw literówce: do 10 000 Punktów Systemu, 100 000 Punktów Czasu i 10 000 000 złota. Kod działa najwyżej rok naprzód, do końca wybranego dnia w Warszawie. Ten sam tekst nie może działać dwa razy dla tych samych graczy: kod dla wszystkich zajmuje swój tekst sam, a kody dla postaci dzielą tekst tylko z kodami innych postaci.
 4. Lista pokazuje kody z panelu z liczbą użyć i przyciskiem „Zakończ”, który od razu wyłącza kod (to, co dał, zostaje). Niżej, zwinięte, są kody z plików gry z liczbą użyć.
+
+## Piesi obok jeźdźca na kucu w skali 0,85 (1081 B, 17.11.2026, od 0.4.24)
+
+Autor 17.11.2026, ze zrzutem Kleryka na kucu obok dwóch towarzyszy: „za duże sa niektore postaci na kucach nadal w porównaniu do towarzyszy chociażby”. Na stronie ocen przyjął B (piesi 0,85 obok kuca), a odrzucił A (bez zmian) i C (jeździec 0,85 na kucu).
+
+1. Od 0.1.77 (659 B) piesi obok jeźdźca idą w skali 0,7, żeby ich głowa była na wysokości grzbietu konia. Kuc jest dużo niższy od konia, więc przy nim towarzysze wychodzili bardzo mali, a jeździec przy nich duży.
+2. Teraz wierzchowiec może mieć własną skalę pieszych (`afoot` w `walk.mounts` w `data/animations.json`): kuc ma 0,85, reszta zostaje przy 0,7. Gdy w szeregu jadą jeźdźcy na różnych wierzchowcach, liczy się najmniejsza skala (`walkScene` w `src/client/scenes.js`).
+
+## Zimowe stroje w Sklepie Systemu (1049 A, 17.11.2026, od 0.4.24)
+
+1. Pięć zimowych strojów (po jednym na klasę, dla obu płci i przy każdej ewolucji) jest w `data/cosmetics.json`: Zbroja Szczodrych Godów, Strój Zimowego Strzelca, Futro Mroźnego Maga, Szaty Gwiazdora i Płaszcz Zimowej Nocy. Każdy kosztuje 800 Punktów Systemu i ma `season: winter`, więc jest w sprzedaży tylko w grudniu, jak renifer. Kupiony zostaje na zawsze.
+2. Pełna grafika: portrety i chody przyjęte wcześniej (1049–1058), jeźdźcy przyjęci po kolei w czacie (1071–1079), wszystko z ośmioma odcieniami skóry. Kruk i ognik siedzą na zimowych portretach tam, gdzie zwykle (`perches`), bo nie zasłaniają gwiazdy, kryształu ani łuku.
+3. **Zimowa Cień w siodle** (1079: 2): autor wybrał wersję z pustą pięścią, a potem: „1079 dorób wodze i będzie dobrze”. Ma więc w pięści dorysowane dwa cienkie paski w kolorach pasków zimowego Cienia, a wodze renifera idą do ich końców. Zimowy Cień siedzi 4 piksele wyżej niż w pierwszej wersji (autor: „1078 za nisko siedzi w większości przypadków”), z kolanem na wysokości innych zimowych jeźdźców, i tak samo zimowa Cień.
+
+## Wersja 0.4.24 (17.11.2026): zimowe stroje w sklepie od grudnia, kody w Panelu autora, piesi obok kuca
+
+1. **Zimowe stroje** (wyżej): w Sklepie Systemu w grudniu, za 800 Punktów Systemu.
+2. **Kody podarunkowe w Panelu autora** (1080, wyżej): działają od razu, bez nowej wersji.
+3. **Piesi obok kuca w skali 0,85** (1081 B, wyżej).
 
 ## Wersja 0.4.23 (17.11.2026): słabe punkty i odporności stworów w Bestiariuszu
 
