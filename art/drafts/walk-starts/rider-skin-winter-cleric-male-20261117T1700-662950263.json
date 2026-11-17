@@ -1,0 +1,19 @@
+{
+  "id": "rider-skin-winter-cleric-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the young cleric of the reference picture on horseback: the same face, the same short dark curly hair with the same green holly wreath with red berries on the head, the same long dark red cloak with a white fur trim hanging down his back, the same long pale blue tunic with white embroidery, a belt with a red and white sash, dark blue trousers, a brown laced boot with a fur top, no staff, no star and nothing in the hands but the reins; sitting astride a saddle that is not drawn, upright, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the upper leg lying forward and level from the hip to the knee, the lower leg hanging straight down from the knee, one whole boot at the bottom with the toes pointing right, the tunic falling over the upper leg but the lower leg and the boot showing below it; the far leg completely hidden and not drawn at all, no second boot and no second foot; the cloak hanging straight down without blowing; the whole figure from the top of the wreath to the sole of the boot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/winter-cleric-male.png",
+      "usage": "the character's look: this same man, his face, hair, holly wreath, red fur-trimmed cloak, pale blue tunic, sash and colours, drawn the same way; not his standing pose and not the star staff"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08234393503930834
+  },
+  "images": 4
+}
