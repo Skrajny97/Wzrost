@@ -2652,6 +2652,20 @@ describe('Bestiariusz', () => {
     // The whole land's list: every creature of its inner regions, no chances.
     assert.equal(data.regions[0].dangers.length, 23);
     assert.ok(data.regions[0].dangers.every((danger) => danger.chance === undefined && danger.name));
+    // Its weak points and resistances (1074 A): the share of more damage
+    // and the resistance at the middle of its levels; the page turns it into
+    // a percent against the character's level with resistK.
+    const places = data.regions.flatMap((region) => region.areas);
+    const all = places.flatMap((area) => area.dangers);
+    for (const danger of all) {
+      const monster = content.monstersById[danger.monsterId];
+      const middle = Math.round((danger.minLevel + danger.maxLevel) / 2);
+      assert.deepEqual(danger.weak, monster.weaknesses);
+      const resist = monster.resistances && Object.fromEntries(Object.entries(monster.resistances).map(([element, value]) => [element, Math.round(value.base + value.perLevel * (middle - 1))]));
+      assert.deepEqual(danger.resist, resist);
+    }
+    assert.ok(all.some((danger) => danger.weak) && all.some((danger) => danger.resist));
+    assert.deepEqual(data.resistK, { base: content.balance.combat.kBase, perLevel: content.balance.combat.kPerLevel });
     assert.deepEqual((await call('GET', '/api/character', { cookie })).data.character.met, []);
     const { report, character } = await hunt();
     assert.ok(fought(report).length > 0);

@@ -3664,6 +3664,18 @@ Autor: „jeden sznur wodzy na reniferze wisi w powietrzu”. Wcześniej: „te 
 2. **Zimowi łucznicy.** Górny pasek Łucznika schodzi trzema pikselami na wodze. Łuczniczka trzyma dwa paski jak reszta zimowych jeźdźców (obiecane przy 1071), oba kończą się na wodzach renifera. Ich odcienie skóry zrobione od nowa.
 3. **Brakujący szczegół: wodze jako warstwa, nie część renifera.** Wodze renifera nie są już narysowane na jego arkuszu kłusa, tylko są osobną warstwą nad kłusem i pod jeźdźcem (`reins` w `walk.mounts.reindeer` w `data/animations.json`, `tools/reindeer-reins.py`, `ride` w `src/client/scenes.js`). Większość jeźdźców ma te same wodze co w 0.4.19, piksel w piksel. Każdy z 27 jeźdźców z własnymi wodzami ma swój obrazek: pasek od wędzidła do końca każdego z jego pasków, w ich kolorze (u Pani Zimy jasnoniebieski), w każdej klatce tam, gdzie jeździec akurat siedzi. Nowy jeździec z własnymi wodzami dostaje końce swoich pasków w `reins.riders`, a narzędzie rysuje jego warstwę. W Stajni i Sklepie renifer zostaje bez wodzy, bo nikt na nim nie siedzi.
 
+## Słabe punkty i odporności stworów w Bestiariuszu (1074 A, 17.11.2026, od 0.4.23)
+
+Autor 17.11.2026: „I skąd wiedzieć na co jest podatny stwór?”, potem „1074 tak”. Na stronie ocen przyjął wersję A (dwie linijki), a odrzucił B (kolorowe znaczki).
+
+1. Przy każdym poznanym stworze Bestiariusz pokazuje pod jego poziomami dwie linijki: „Słaby punkt: sakrum +50%” (o tyle więcej obrażeń od tego żywiołu) i „Odporność: ogień −32%” (o tyle mniej). Nazwa żywiołu ma jego kolor. Nieznane stwory dalej są „???” bez tych linijek, a stwór bez słabego punktu i odporności nie ma żadnej z nich.
+2. **Brakujący szczegół: procent odporności.** Odporność stwora rośnie z jego poziomem, a jej skutek zależy od poziomu atakującego (`reduction` w `src/engine/formulas.js`). Bestiariusz bierze odporność ze środka poziomów stwora w danym miejscu, a procent liczy na poziomie postaci, tak jak w walce. Odporność, która wychodzi 0%, nie jest pokazana.
+3. Pod listą jest jedno zdanie, co znaczą obie linijki, gdy na liście jest choć jedna. Dane: `weak` i `resist` przy stworach miejsca (`dangerView` w `src/server/content.js`) i `resistK` w treści gry dla strony.
+
+## Wersja 0.4.23 (17.11.2026): słabe punkty i odporności stworów w Bestiariuszu
+
+1. **Bestiariusz** (1074 A, wyżej): przy poznanych stworach słaby punkt i odporności, z procentem na poziomie postaci.
+
 ## Wersja 0.4.22 (17.11.2026): kod DISCORD100 dla zwycięzcy losowania, zimowa Kleryczka w siodle
 
 1. **Kod DISCORD100** (wyżej, „Kod DISCORD100”): działa już dla postaci zwycięzcy losowania na Discordzie.

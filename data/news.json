@@ -1300,6 +1300,11 @@
       "id": "0.4.21",
       "title": "Wersja 0.4.21",
       "body": "- Drugi Awatar Systemu: gdy masz już Awatara, w zakładce Profesje kupisz drugiego za 200 000 złota. Pracuje w tym samym czasie co postać i pierwszy Awatar, tak samo wydajnie i za tyle samo. Przy starcie pracy wybierasz: Postać, Awatar albo Drugi Awatar.\n- Gdy pracują oba Awatary, na górze jest jeden pasek „AWATARY”. Stuknij go, a rozwiną się zakładki obu z czasem do końca pracy."
+    },
+    {
+      "id": "0.4.23",
+      "title": "Wersja 0.4.23",
+      "body": "- Bestiariusz pokazuje przy stworach, z którymi walczyła Twoja postać, ich słaby punkt i odporności, np. „Słaby punkt: sakrum +50%” i „Odporność: ogień −32%”. Łatwiej wybrać, jakim żywiołem zakląć broń przed wyprawą.\n- Procent odporności jest liczony na poziomie Twojej postaci, tak jak w walce."
     }
   ]
 }

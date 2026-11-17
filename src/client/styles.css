@@ -661,6 +661,33 @@ button {
   font-weight: 600;
 }
 
+/* A known creature's weak points and resistances under its levels (1074 A):
+   the label in green for a weak point, each element's name in its colour
+   (--element) and its percent in the text's colour. */
+.danger-elements {
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.danger-elements--weak .danger-elements-label {
+  color: #9fdc7a;
+}
+
+.danger-element {
+  color: var(--element);
+  font-weight: 600;
+}
+
+.danger-element-value {
+  color: var(--text);
+}
+
+.danger-note {
+  font-size: 13px;
+}
+
 /* The lock and its level always under the name, whatever the name's length. */
 .segmented-option .lock-label {
   display: flex;
