@@ -21,7 +21,7 @@
 // "outfit": id, "nameFromFrame": true}.
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
-/** @typedef {{ id: string, kind: string, price: number, classId?: string, nameColor?: string, event?: string }} Cosmetic An entry of data/cosmetics.json. */
+/** @typedef {{ id: string, kind: string, price: number, classId?: string, nameColor?: string, event?: string, season?: string }} Cosmetic An entry of data/cosmetics.json. */
 /** @typedef {{ code: string, message: string }} Block */
 
 // The places a cosmetic is worn in, one of each kind at a time.
