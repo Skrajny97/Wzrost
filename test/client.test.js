@@ -168,7 +168,10 @@ test('every sprite on the list has its file at its size, and every class has its
     'companion-portraits': data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
     // The companions walking beside the character on the Walka scene (648).
     'companion-walkers': data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
-    'settlement-board': ['settlement'],
+    // The Osada's board, and the same under snow for Szczodre Gody (1063 v2).
+    'settlement-board': ['settlement', 'settlement-winter'],
+    // The Osada's places with snow on their roofs (1063 v2).
+    'settlement-winter': data('settlement').places.map((place) => place.id),
     // The inner regions' circles and the lands' cards on the Walka screen.
     areas: data('regions').flatMap((region) => region.areas.map((area) => area.id)),
     lands: data('regions').map((region) => region.id),
