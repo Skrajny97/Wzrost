@@ -3623,6 +3623,11 @@ Rozstrzygnięte najprostszym rozwiązaniem zgodnym z przyjętymi makietami (1044
 
 Symulacje przy sprawdzaniu many (1045) pokazały, że mag na 11.–29. poziomie mdleje na wyprawach w najnowszym miejscu dużo częściej niż inne klasy. Dobrze wyposażony gracz bez towarzyszy, z samą Kulą ognia, mdleje na 15. poziomie w 73% godzinnych wypraw, na 20. w 31%, a na 25. w 13%. Inne klasy mdleją w 0%. Z Osłoną many jest lepiej od 20. poziomu. Autor odrzucił wszystkie warianty (bez zmian, Arkanowa bariera do 29. poziomu, lepsza regeneracja): „nie ulepszamy maga jest określony jako klasa z trudniejszym startem”. Mag zostaje klasą z trudniejszym startem.
 
+## Wersja 0.4.16 (17.11.2026): wymiana w Gildii do 100 000 sztuk zasobu
+
+1. **Wymiana zasobów w Gildii do 100 000 sztuk** zasobu z każdej strony oferty zamiast 1000 (pkt 12 w „Wymiana zasobów w Gildii”).
+2. **Zimowa Wojowniczka w siodle (1062: 2)** jest w grze z odcieniami skóry twarzy, a autor przyjął jazdę zimowego Wojownika (1061). Zimowych strojów dalej nie ma w sklepie: czekają na pozostałych jeźdźców.
+
 ## Wersja 0.4.15 (17.11.2026): renifer i muzyka Szczodrych Godów (ukryte do 1.12)
 
 1. **Renifer (1064)** w Sklepie Systemu za 1000 Punktów Systemu, w sprzedaży tylko w grudniu (pkt 1 w „Szczodre Gody: renifer, zimowa Osada i drugi Awatar”). Poza grudniem w sklepie widać go tylko u postaci, która go ma, a serwer odmawia zakupu (pkt 4 tamże). Na wersji testowej jest w sprzedaży codziennie.
@@ -9649,6 +9654,7 @@ Autor: „Dodatkowa funkcja w Gildii -> wymiana zasobów. Można wystawić, że 
 9. **Okno oferty (brakujący szczegół).** „Wystaw ofertę” otwiera okno gry, bez systemowej listy telefonu. „Dajesz” i „Chcesz” mają po trzy przyciski zasobów z obrazkiem i liczbą posiadanych sztuk, a pod każdym jest pole na liczbę. Zasobu wybranego w „Dajesz” nie da się wybrać w „Chcesz”.
 10. **Potwierdzenie (brakujący szczegół).** „Wymień” i „Wycofaj” pytają o potwierdzenie i mówią, co komu przypada.
 11. **Zamknięte oferty.** Oferty wzięte, wycofane i te, którym minął czas, zostają z godziną zamknięcia i biorącym. Ranking gildii liczy z nich wymiany tygodnia. Oferty zamknięte przed początkiem poprzedniego tygodnia znikają przy kolejnej ofercie.
+12. **Do 100 000 sztuk zasobu (17.11.2026, od 0.4.16).** Autor: „Wymiana zasobów w gildii powinna pozwalać na wymianę większą niż 1000 sztuk surowca”. Każda strona oferty to teraz od 1 do 100 000 sztuk zasobu (`exchange.most` w `data/guilds.json`, wcześniej 1000), tyle co złota. Budowy w Obozie kosztują już po kilka tysięcy sztuk jednego zasobu (Plac treningowy od 3000 drewna), więc 1000 wymagało kilku ofert naraz. Pole na liczbę jest to samo co przy złocie, które już mieściło 100 000.
 12. **Tylko zasoby obozu.** Złoto, przedmioty, materiały, zioła i mikstury zostają poza Wymianą w Gildii. Wymiana nie daje nagród Systemu.
 13. **Teksty** karty i okna oferty to propozycja do poprawy przez autora (`data/guilds.json`, `exchange.texts`).
 14. **Migracja bazy:** 0070 (oferty Wymiany w Gildii).
