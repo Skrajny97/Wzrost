@@ -1,0 +1,14 @@
+{
+  "id": "rzepicha-necklace",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the necklace of rzepicha, the wife of piast: an old slavic necklace of amber beads and silver temple rings with a small golden ear of wheat pendant, single inventory item icon",
+  "style": "src/client/art/items/jurata-necklace.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02318129347949558
+  },
+  "images": 1
+}

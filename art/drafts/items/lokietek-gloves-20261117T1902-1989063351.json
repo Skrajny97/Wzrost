@@ -1,0 +1,14 @@
+{
+  "id": "lokietek-gloves",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the gauntlets of king wladyslaw lokietek: a pair of short sturdy steel gauntlets with golden knuckle plates and a small crowned eagle on each cuff, single inventory item icon",
+  "style": "src/client/art/items/dratewka-gloves.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02326861786142985
+  },
+  "images": 1
+}

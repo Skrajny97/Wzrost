@@ -1,0 +1,14 @@
+{
+  "id": "basilisk-fang",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the fang of the warsaw basilisk: a long curved venomous fang set as a short parrying dagger in a dark green scaled hilt, a drop of poison at the tip, a faint green glow, diagonal, single inventory item icon",
+  "style": "src/client/art/items/wawel-dragon-tooth.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023358378626929393
+  },
+  "images": 1
+}

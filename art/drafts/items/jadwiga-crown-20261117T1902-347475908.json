@@ -1,0 +1,14 @@
+{
+  "id": "jadwiga-crown",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the crown of saint jadwiga, queen of poland: a delicate golden crown with lily shaped points set with pearls and sapphires, a gentle holy glow, single inventory item icon",
+  "style": "src/client/art/items/lada-wreath.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02319574731445313
+  },
+  "images": 1
+}

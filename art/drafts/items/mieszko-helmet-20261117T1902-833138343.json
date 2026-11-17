@@ -1,0 +1,14 @@
+{
+  "id": "mieszko-helmet",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the helmet of mieszko the first: an early medieval conical helmet of polished steel with golden bands, a nose guard, a mail aventail and a small golden cross on the brow, a soft glow, single inventory item icon",
+  "style": "src/client/art/items/krakus-helmet.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023389963153627184
+  },
+  "images": 1
+}

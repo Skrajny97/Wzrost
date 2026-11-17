@@ -1,0 +1,14 @@
+{
+  "id": "wanda-robe",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the robe of wanda, the legendary queen of krakow: a flowing deep blue royal robe embroidered with silver river waves and small white flowers, a golden crown brooch, single inventory item icon",
+  "style": "src/client/art/items/zhiva-cloak.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023308345221837362
+  },
+  "images": 1
+}

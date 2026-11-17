@@ -1,0 +1,14 @@
+{
+  "id": "walgierz-boots",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the boots of walgierz the bold, a legendary knight: tall black leather knight boots with steel greaves, golden spurs and red tassels, single inventory item icon",
+  "style": "src/client/art/items/waligora-boots.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02322333504507277
+  },
+  "images": 1
+}

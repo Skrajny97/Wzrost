@@ -1,0 +1,14 @@
+{
+  "id": "casimir-cope",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the cope of saint casimir: a ceremonial liturgical cape of white and gold brocade with a golden lily pattern and a jewelled clasp, single inventory item icon",
+  "style": "src/client/art/items/adalbert-stole.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02401456433656481
+  },
+  "images": 1
+}

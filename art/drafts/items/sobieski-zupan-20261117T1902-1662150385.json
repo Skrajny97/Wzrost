@@ -1,0 +1,14 @@
+{
+  "id": "sobieski-zupan",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the zupan of king jan sobieski: a long noble polish coat of deep crimson silk with a row of golden buttons, a rich golden sash and a fur trimmed collar, single inventory item icon",
+  "style": "src/client/art/items/piast-sukmana.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023236733835432268
+  },
+  "images": 1
+}

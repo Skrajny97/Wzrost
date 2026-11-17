@@ -1,0 +1,14 @@
+{
+  "id": "copernicus-sphere",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the armillary sphere of copernicus: a small golden armillary sphere of interlocking rings with a bright little sun at its centre and tiny planets, on a short dark wooden handle, a soft magical glow, single inventory item icon",
+  "style": "src/client/art/items/sendivogius-book.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023443303951051504
+  },
+  "images": 1
+}

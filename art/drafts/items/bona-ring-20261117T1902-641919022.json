@@ -1,0 +1,14 @@
+{
+  "id": "bona-ring",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the ring of queen bona: an ornate renaissance golden ring with a large deep green emerald and small diamonds, single inventory item icon",
+  "style": "src/client/art/items/kinga-ring.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023173479447258845
+  },
+  "images": 1
+}

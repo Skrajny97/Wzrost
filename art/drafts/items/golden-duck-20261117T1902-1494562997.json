@@ -1,0 +1,14 @@
+{
+  "id": "golden-duck",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the golden duck from the legend of the warsaw underground: a small duck figure of pure shining gold wearing a tiny crown, single inventory item icon",
+  "style": "src/client/art/items/golden-horn.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02323935881127252
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "jagiello-armor",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the armour of king wladyslaw jagiello: an ornate plate breastplate of dark steel with golden trim and a white eagle embossed on the chest, a red cloak clasp, a soft glow, single inventory item icon",
+  "style": "src/client/art/items/chrobry-armor.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023264770996729536
+  },
+  "images": 1
+}

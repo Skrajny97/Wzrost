@@ -1,0 +1,14 @@
+{
+  "id": "strzygon-hood",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the hood of a strzygon, a slavic vampire demon: a ragged dark hood of black cloth and grey wolf fur with two long fangs hanging from its lower edge, the inside of the hood dark and empty with no eyes, single inventory item icon",
+  "style": "src/client/art/items/borowy-hood.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02346301332834032
+  },
+  "images": 1
+}
