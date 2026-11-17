@@ -2275,6 +2275,30 @@
         "input": "art/inputs/winter/camp-1.png",
         "mask": "art/inputs/winter/camp-1-glade-mask.png",
         "prompt": "top-down pixel art game map seen from above, a forest glade covered with a thick layer of fresh white snow, soft pale blue shadows and small snowdrifts, a few stones and twigs peeking out of the snow, the same pixel art style as the forest around it, seamless, no trees, no buildings, no people, no paths"
+      },
+      "camp-2-snow": {
+        "tool": "inpaint",
+        "input": "art/inputs/winter/camp-2.png",
+        "mask": "art/inputs/winter/camp-2-glade-mask.png",
+        "prompt": "top-down pixel art game map seen from above, a meadow inside a wooden fence covered with a thick layer of fresh white snow, soft pale blue shadows and small snowdrifts, a few stones and twigs peeking out of the snow, the same pixel art style as the surroundings, seamless, no trees, no buildings, no people, no paths"
+      },
+      "camp-3-snow": {
+        "tool": "inpaint",
+        "input": "art/inputs/winter/camp-3.png",
+        "mask": "art/inputs/winter/camp-3-glade-mask.png",
+        "prompt": "top-down pixel art game map seen from above, a meadow inside a wooden palisade covered with a thick layer of fresh white snow, soft pale blue shadows and small snowdrifts, a few stones and twigs peeking out of the snow, the same pixel art style as the surroundings, seamless, no trees, no buildings, no people, no paths"
+      },
+      "fortress-top-snow": {
+        "tool": "inpaint",
+        "input": "art/inputs/winter/fortress-top.png",
+        "mask": "art/inputs/winter/fortress-top-mask.png",
+        "prompt": "top-down pixel art game map seen from above, a castle courtyard inside grey stone walls covered with a thick layer of fresh white snow, soft pale blue shadows and small snowdrifts, a few stones and twigs peeking out of the snow, the same pixel art style as the surroundings, seamless, no trees, no buildings, no people, no paths"
+      },
+      "tall-camp-1-snow": {
+        "tool": "inpaint",
+        "input": "art/inputs/winter/tall-camp-1.png",
+        "mask": "art/inputs/winter/tall-camp-1-mask.png",
+        "prompt": "top-down pixel art game map seen from above, a forest glade covered with a thick layer of fresh white snow, soft pale blue shadows and small snowdrifts, a few stones and twigs peeking out of the snow, the same pixel art style as the surroundings, seamless, no trees, no buildings, no people, no paths"
       }
     }
   }
