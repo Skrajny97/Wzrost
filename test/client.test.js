@@ -331,7 +331,7 @@ test("a mount's reins layer has a picture for the common reins and for every rid
     const scale = trot.scale ?? 1;
     assert.equal(trot.reins.bits.length, trot.frames, `${id}: a bit for each frame`);
     assert.deepEqual(size(trot.reins.file), [trot.width * trot.frames, trot.height], `${id}: ${trot.reins.file}`);
-    for (const look of Object.keys(trot.reins.riders)) {
+    for (const look of [...Object.keys(trot.reins.riders), ...Object.keys(trot.reins.fists ?? {})]) {
       const file = trot.reins.file.replace(/\.png$/, `-${look}.png`);
       assert.ok(existsSync(join(CLIENT, 'art', 'riders', `${look}.png`)), `${id}: no rider ${look}`);
       assert.ok(existsSync(join(CLIENT, file)), `${id}: no ${file}`);
