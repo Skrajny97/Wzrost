@@ -604,6 +604,56 @@
       "start": "art/references/walks/start/prophet-male.png",
       "pose": 2,
       "description": "an old man prophet with long flowing white hair and a long white beard, a golden blindfold over the eyes, a golden circlet with a small sun and a thin golden halo, a flowing white and gold robe with golden sun and star embroidery down to the feet, a long golden stole, no staff, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "skin-winter-warrior-male": {
+      "start": "art/references/walks/start/skin-winter-warrior-male.png",
+      "pose": 2,
+      "description": "a broad-shouldered man with a short dark beard in polished silver steel plate armour with white fur on the shoulders and collar, a long red cape falling behind, a pointed steel helmet with a white fur rim and a sprig of fir with red berries, a chainmail skirt, red and white laced boots with white fur tops, no shield and no sword, both hands empty, the arms swinging naturally and keeping their length"
+    },
+    "skin-winter-warrior-female": {
+      "start": "art/references/walks/start/skin-winter-warrior-female.png",
+      "pose": 2,
+      "description": "a strong young woman with red hair falling to the shoulders from under the helmet, in polished silver steel plate armour with white fur on the shoulders and collar, a long red cape falling behind, a pointed steel helmet with a white fur rim and a sprig of fir with red berries, a chainmail skirt, red and white laced boots with white fur tops, no shield and no sword, both hands empty, the arms swinging naturally and keeping their length"
+    },
+    "skin-winter-archer-male": {
+      "start": "art/references/walks/start/skin-winter-archer-male.png",
+      "pose": 2,
+      "description": "a lean young man with short brown hair in a long green coat with red and gold trims, a white wolf fur mantle over the shoulders, brown boots with white fur tops, a wooden bow wound with fir sprigs and a red ribbon slung across the back with a quiver of white-fletched arrows, both hands empty, the arms swinging naturally and keeping their length"
+    },
+    "skin-winter-archer-female": {
+      "start": "art/references/walks/start/skin-winter-archer-female.png",
+      "pose": 2,
+      "description": "a lean young woman with long brown hair falling down her back in a long green coat with red and gold trims, a white wolf fur mantle over the shoulders, brown boots with white fur tops, a wooden bow strapped upright on the back beside a quiver of white-fletched arrows, both hands empty, the arms swinging naturally and keeping their length"
+    },
+    "skin-winter-shadow-male": {
+      "start": "art/references/walks/start/skin-winter-shadow-male.png",
+      "pose": 2,
+      "description": "a wiry young man with messy black hair, a red scarf over the lower face, a fitted black leather coat with silver frost patterns, a black cloak lined with white fur falling behind, dark trousers and black boots, no daggers, both hands empty, the arms swinging naturally and keeping their length"
+    },
+    "skin-winter-shadow-female": {
+      "start": "art/references/walks/start/skin-winter-shadow-female.png",
+      "pose": 2,
+      "description": "a wiry young woman with long brown hair falling down her back, a red scarf over the lower face, a fitted black leather coat with silver frost patterns, a black cloak lined with white fur falling behind, dark trousers and black boots, no daggers, both hands empty, the arms swinging naturally and keeping their length"
+    },
+    "skin-winter-mage-male": {
+      "start": "art/references/walks/start/skin-winter-mage-male.png",
+      "pose": 2,
+      "description": "a thin young man with short black hair under a tall white fur hat with ear flaps, a long white sheepskin coat down to the ankles with pale blue snowflake embroidery, a pale blue wool scarf, dark fur-topped boots, no staff, both hands empty, the arms swinging naturally and keeping their length"
+    },
+    "skin-winter-mage-female": {
+      "start": "art/references/walks/start/skin-winter-mage-female.png",
+      "pose": 2,
+      "description": "a thin young woman with long brown hair falling down her back from under a tall white fur hat with ear flaps, a long white sheepskin coat down to the ankles with pale blue snowflake embroidery, a pale blue wool scarf, white fur-topped boots, no staff, both hands empty, the arms swinging naturally and keeping their length"
+    },
+    "skin-winter-cleric-male": {
+      "start": "art/references/walks/start/skin-winter-cleric-male.png",
+      "pose": 2,
+      "description": "a calm young man with short dark curly hair crowned with a wreath of fir and red berries, long ice-blue robes with silver frost patterns, a long crimson cloak lined with white fur falling behind, brown boots with white fur tops, no staff, both hands empty, the arms swinging naturally and keeping their length"
+    },
+    "skin-winter-cleric-female": {
+      "start": "art/references/walks/start/skin-winter-cleric-female.png",
+      "pose": 2,
+      "description": "a calm young woman with a long dark braid falling down her back, crowned with a wreath of fir and red berries, long ice-blue robes with silver frost patterns, a long crimson cloak lined with white fur falling behind, dark boots with white fur tops, no staff, both hands empty, the arms swinging naturally and keeping their length"
     }
   }
 }
