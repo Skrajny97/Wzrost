@@ -1275,6 +1275,11 @@
       "id": "0.4.16",
       "title": "Wersja 0.4.16",
       "body": "- W Wymianie w Gildii jedna oferta może mieć do 100 000 sztuk zasobu z każdej strony, a nie jak dotąd do 1000."
+    },
+    {
+      "id": "0.4.17",
+      "title": "Wersja 0.4.17",
+      "body": "- Na Targowisku w „Sortuj:” jest nowa opcja „Najnowsze”: oferty od ostatnio wystawionej."
     }
   ]
 }

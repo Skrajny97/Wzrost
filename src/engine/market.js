@@ -325,11 +325,13 @@ export const itemBuyCeiling = (item, content) => sellPrice(item, content, topSel
 // ("Dla mnie": the character, or one of its companions), the rarity, the
 // category (an item's slot, as before), and the order: the soonest to end
 // first, as before, or by the price of a piece, the cheapest or the
-// dearest first. The server reads the open offers in a light form and asks
+// dearest first, or the newest offers first (a player's remark the author
+// passed on, 17.11.2026: „I w targowisku sortowanie od najnowszych
+// dodanych?”). The server reads the open offers in a light form and asks
 // for the views of the page only, so the filters see every offer, not
 // just the first hundred.
 export const OFFER_SHOWS = ['all', 'for-me', 'bidding'];
-export const OFFER_SORTS = ['ends', 'cheap', 'dear'];
+export const OFFER_SORTS = ['ends', 'cheap', 'dear', 'new'];
 
 // What a piece of an offer's goods costs now: its highest bid, or its
 // starting price, over its count (an item is one piece).
@@ -420,6 +422,8 @@ const ORDERS = {
   ends: (a, b) => a.endsAt - b.endsAt || a.id - b.id,
   cheap: (a, b) => piecePrice(a) - piecePrice(b) || a.endsAt - b.endsAt || a.id - b.id,
   dear: (a, b) => piecePrice(b) - piecePrice(a) || a.endsAt - b.endsAt || a.id - b.id,
+  // The offers' ids grow as they are put up, so the highest is the newest.
+  new: (a, b) => b.id - a.id,
 };
 
 // The offers (`offers`: { id, kind, key, count, item: { base, slot, rarity }

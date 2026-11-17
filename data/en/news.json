@@ -1016,6 +1016,10 @@
     "0.4.16": {
       "title": "Version 0.4.16",
       "body": "- In the guild’s Exchange one offer can now hold up to 100,000 pieces of a resource on each side, instead of up to 1,000."
+    },
+    "0.4.17": {
+      "title": "Version 0.4.17",
+      "body": "- The Marketplace’s “Sort:” has a new option, “Newest”: the most recently listed offers first."
     }
   }
 }
