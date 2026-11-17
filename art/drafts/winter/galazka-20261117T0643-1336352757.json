@@ -1,0 +1,14 @@
+{
+  "id": "galazka",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small fresh fir branch with dark green needles and a little snow on it, single inventory item icon, bold clean outline",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023152059612698027
+  },
+  "images": 1
+}
