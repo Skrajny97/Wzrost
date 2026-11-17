@@ -1,0 +1,14 @@
+{
+  "id": "osada-bottom-a-snow",
+  "tool": "pixellab inpaint-v3",
+  "description": "top-down pixel art game map seen from above, a forest village square in deep winter: the ground covered with fresh white snow with soft pale blue shadows and a few footprints, the fir trees and bushes heavily covered in thick white snow and pale blue hoarfrost, the same pixel art style as the trodden snowy paths, seamless, no buildings, no people",
+  "style": "src/client/art/camp/campfire-1.png",
+  "input": "art/inputs/winter/osada-bottom-a.png",
+  "mask": "art/inputs/winter/osada-bottom-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.15
+  },
+  "images": 1
+}
