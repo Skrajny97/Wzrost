@@ -28,6 +28,6 @@
       "action": "walking at a steady pace in place like a big cat, seen from the side and facing right, the four legs moving in a smooth seamless walk loop, the head and body swaying slightly, the tail swaying, the saddle and bridle stay in place",
       "trot": { "dir": "mounts-skeleton", "draft": "sabertooth-20261102T0919-263498447", "frames": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "seat": [94, 36], "seat_in": "start", "fps": 10, "picture": 1, "graft": [{ "frame": 1, "from": 2, "box": [0, 0, 27, 119], "shift": [0, -3] }] }
     },
-    "reindeer": {"start": "art/references/mounts/reindeer.png", "gait": {"kind": "trot", "template": "horse", "frames": 8}, "description": "a big grey-brown reindeer with large branching antlers, a thick creamy white fur mane on the neck and chest, a black leather saddle with a stirrup on a red saddle cloth with white fur trim, a collar of small golden bells and a dark leather bridle with reins"}
+    "reindeer": {"start": "art/references/mounts/reindeer.png", "gait": {"kind": "trot", "template": "horse", "frames": 8}, "description": "a big grey-brown reindeer with large branching antlers, a thick creamy white fur mane on the neck and chest, a black leather saddle with a stirrup on a red saddle cloth with white fur trim, a collar of small golden bells and a dark leather bridle with reins", "trot": {"dir": "mounts-skeleton", "draft": "reindeer-20261117T1353-1854105594", "frames": [1, 2, 3, 4, 5, 6, 7, 8], "seat": [65, 48], "seat_in": "start", "fps": 8, "picture": 1}}
   }
 }
