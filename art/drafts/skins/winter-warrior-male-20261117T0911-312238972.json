@@ -1,0 +1,19 @@
+{
+  "id": "winter-warrior-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "young man warrior in a winter outfit for the old Slavic midwinter feast, broad-shouldered, short dark hair and a short dark beard, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a thick brown sheepskin coat with white fleece trim and red and green folk embroidery worn over chainmail, a tall grey fur hat, a long red wool scarf, fur-lined leather gloves and fur-topped boots, holding a long broad sword and a round wooden shield painted with a white snowflake star, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "src/client/art/portraits/warrior-male.png",
+      "usage": "the same face, eyes and big head size as this character"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08061342353290982
+  },
+  "images": 4
+}

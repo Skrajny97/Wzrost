@@ -1,0 +1,19 @@
+{
+  "id": "winter-mage-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "young man mage in a winter outfit for the old Slavic midwinter feast, thin, short black hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a long white sheepskin robe down to the ankles with silver and pale blue folk embroidery of snowflakes, a tall white fur hat, a pale blue wool scarf, holding a wooden staff topped with a glowing ice crystal, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "src/client/art/portraits/mage-male.png",
+      "usage": "the same face, eyes and big head size as this character"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08044515869352553
+  },
+  "images": 4
+}
