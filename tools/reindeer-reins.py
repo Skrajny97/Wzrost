@@ -18,10 +18,6 @@
 #   bit, in the colours of that end, drawn on the screen's pixels (the
 #   sheet's size times its scale, the size the scene shows it at) where the
 #   rider stands in each frame, so the straps meet the rider's to the pixel.
-# - the same for each rider in reins.fists, which holds no reins of its own
-#   (an empty fist, the winter shadow woman: the author picked her so, 1079:
-#   2): one strap in the common reins' colours from the bit to the front of
-#   the fist (x, y in its picture), under the fist.
 #
 # Writes the pictures under src/client/; with --check, the trot with the
 # reins and each rider over them, frame by frame, into OUT_DIR.
@@ -92,13 +88,9 @@ def main():
     common.save(out, optimize=True)
     written = [reins['file']]
 
-    # The riders' own reins, and the straps to the empty fists, on the
-    # screen's pixels: each end with its colours (None: the strand's own).
+    # The riders' own reins, on the screen's pixels.
     large = walk['rider'].get('large', {})
-    held = {look: [(x, y, None) for x, y in ends] for look, ends in reins['riders'].items()}
-    for look, (x, y) in reins.get('fists', {}).items():
-        held.setdefault(look, []).append((x, y, [BROWN, DARK]))
-    for look, ends in held.items():
+    for look, ends in reins['riders'].items():
         box = large if look in large.get('ids', []) else walk['rider']
         seat_x, seat_y = box['seat']
         nudge_x, nudge_y = walk['rider'].get('nudge', {}).get(look, {}).get('reindeer', [0, 0])
@@ -111,8 +103,8 @@ def main():
             # The bit: the pixel of the common reins' end as the scene shows it.
             bx, by = reins['bits'][f]
             bit = (int((bx + 0.5) * sx_scale), int((by + 0.5) * sy_scale))
-            for end_x, end_y, fixed in ends:
-                end_top, colours = (end_y, fixed) if fixed else strand_end(rider, end_x, end_y)
+            for end_x, end_y in ends:
+                end_top, colours = strand_end(rider, end_x, end_y)
                 start = (left + end_x, top + end_top)
                 for x, y in line(start[0], start[1], bit[0], bit[1]):
                     if not (0 <= x < ws and 0 <= y < hs - 1):

@@ -329,10 +329,8 @@ function ride(walk, character) {
   // „jeden sznur wodzy na reniferze wisi w powietrzu”; walk.mounts.<id>.reins,
   // tools/reindeer-reins.py) has them over its trot and under the rider: the
   // reins most riders hold, or a rider's own picture of them when it holds
-  // reins of its own, from the bit to their ends, or to its empty fist
-  // (reins.fists).
-  const own = trot.reins?.riders?.[look] || trot.reins?.fists?.[look];
-  const reins = trot.reins && (own ? trot.reins.file.replace(/\.png$/, `-${look}.png`) : trot.reins.file);
+  // reins of its own, from the bit to their ends.
+  const reins = trot.reins && (trot.reins.riders?.[look] ? trot.reins.file.replace(/\.png$/, `-${look}.png`) : trot.reins.file);
   const layer = reins ? h('div', { class: 'scene-ride-mount scene-ride-reins' }) : null;
   layer?.style.setProperty('--sheet', `url("/${reins}")`);
   const element = h(
