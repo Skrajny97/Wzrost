@@ -1,0 +1,14 @@
+{
+  "id": "regle",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, the lower slopes of the tatra mountains: dense dark spruce forests climbing steep slopes, a mountain stream running between grey boulders, a small wooden shepherd's hut, jagged rocky peaks with snow rising above the trees in the distance, wide panorama for a dim background behind text, low contrast, very dark muted palette of spruce greens, slate greys and cold dawn blues, no text, no border, no people in front, no animals in front",
+  "style": "src/client/art/lands/black-bog.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}

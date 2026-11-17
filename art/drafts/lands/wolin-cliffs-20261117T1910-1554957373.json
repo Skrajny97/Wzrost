@@ -1,0 +1,14 @@
+{
+  "id": "wolin-cliffs",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, high clay cliffs of wolin above the stormy baltic sea: pine trees leaning over the cliff edge, waves breaking on a stony beach below, the wreck of an old wooden longship half buried in the sand, small amber glints among the stones, heavy storm clouds, wide panorama for a dim background behind text, low contrast, very dark muted palette of sea greys, storm blues and amber, no text, no border, no people in front, no animals in front",
+  "style": "src/client/art/lands/black-bog.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}

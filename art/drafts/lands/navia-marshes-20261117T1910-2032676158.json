@@ -1,0 +1,14 @@
+{
+  "id": "navia-marshes",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, the misty marshes of nawia, the slavic underworld: still black water between dead willows, pale blue ghost lights floating in thick fog, a rotten wooden footbridge leading to a dark gate woven of roots, wide panorama for a dim background behind text, low contrast, very dark muted palette of ghostly teal, grey fog and deep violet, no text, no border, no people in front, no animals in front",
+  "style": "src/client/art/lands/black-bog.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
