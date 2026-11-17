@@ -1,0 +1,19 @@
+{
+  "id": "rider-skin-winter-shadow-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the young woman rogue of the reference picture on horseback: the same face half hidden: the same dark red scarf pulled up over the nose and the mouth, covering the whole lower half of the face up to just under the eyes, only the eyes, the brows and the forehead showing, the same shoulder-length brown hair, the same thick white and grey fur collar on the shoulders, the same fitted black leather coat with straps, buckles and silver frost patterns, the same black belt, the same long black cloak with ragged grey ends hanging down her back, dark trousers, black gloves, a dark brown knee-high boot, no daggers and nothing in the hands but the reins; sitting astride a saddle that is not drawn, upright, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the upper leg lying forward and level from the hip to the knee, the lower leg hanging straight down from the knee, one whole boot at the bottom with the toes pointing right, the coat falling over the upper leg but the lower leg and the boot showing below it; the far leg completely hidden and not drawn at all, no second boot and no second foot; the hair and the cloak hanging straight down without blowing; the whole figure from the top of the hair to the sole of the boot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/winter-shadow-female.png",
+      "usage": "the character's look: this same woman, her face, the red scarf over her face, her brown hair, the fur collar, the black coat with frost patterns, the cloak and colours, drawn the same way; not her standing pose and not the daggers"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08211282057232328
+  },
+  "images": 4
+}
