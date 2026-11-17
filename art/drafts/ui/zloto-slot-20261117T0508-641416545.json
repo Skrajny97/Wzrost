@@ -1,0 +1,14 @@
+{
+  "id": "zloto-slot",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "an empty square inventory slot with a thin antique gold rim and small gold corner studs, the inside plain very dark green, seen flat from the front, pixel art user interface",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02322070706515842
+  },
+  "images": 1
+}

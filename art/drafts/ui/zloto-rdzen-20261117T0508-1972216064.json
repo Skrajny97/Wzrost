@@ -1,0 +1,14 @@
+{
+  "id": "zloto-rdzen",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a hexagonal crystal, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023067325471666126
+  },
+  "images": 1
+}
