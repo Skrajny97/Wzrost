@@ -1,0 +1,14 @@
+{
+  "id": "bg-szczodre",
+  "tool": "pixellab generate-image-v2",
+  "description": "a winter night in a small Slavic forest village during the winter solstice feast: snow on the thatched roofs and fir trees, a bonfire with warm light, a few warm lit windows, stars in a deep blue sky, gently falling snow, pixel art scene background",
+  "style": "src/client/art/cosmetics/bg-camp.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

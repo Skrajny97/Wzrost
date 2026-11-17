@@ -1,0 +1,14 @@
+{
+  "id": "frame-szron",
+  "tool": "pixellab generate-image-v2",
+  "description": "an ornate portrait frame made of frost and ice: pale icy blue and white crystals, small snowflake ornaments in the four corners and short icicles hanging from the top edge, a large empty window in the middle for a portrait, seen flat from the front, pixel art user interface",
+  "style": "src/client/art/cosmetics/frame-forest.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.11628395764033
+  },
+  "images": 4
+}
