@@ -14,6 +14,7 @@ import {
   questPeriod,
   winterCalendar,
   winterCampPeriod,
+  winterDecorations,
   winterQuestList,
   winterQuestsGain,
   winterQuestsTaken,
@@ -130,6 +131,15 @@ export async function takeWinter(context) {
   const fresh = await loadPlayer(db, session.userId);
   const day = viewOf(fresh.row, context.now)?.days.find((one) => one.day === today.day) ?? null;
   return json({ winter: viewOf(fresh.row, context.now), reward: day, character: characterView(fresh, context.now) });
+}
+
+// The winter camp on the camp's board (1044.3; engine/winter.js): while it
+// stands (all of December; on test every day), the decorations of the
+// calendar's days taken, in the calendar's order, else null.
+export function winterCampView(row, now) {
+  const key = questPeriod('daily', now, content()).key;
+  const period = winterCampPeriod(key, winter().camp, winterTestOn());
+  return period ? { decorations: winterDecorations(storedOf(row), period, content()) } : null;
 }
 
 // The winter quests (1044.4; engine/winter.js): the day's key while the
