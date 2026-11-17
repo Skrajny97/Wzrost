@@ -144,13 +144,47 @@ function chanceText(chance) {
   return `${percent >= 10 ? Math.round(percent) : decimal(percent.toFixed(1))}%`;
 }
 
+// A known creature's weak points or resistances under its levels (1074 A):
+// "Słaby punkt: sakrum +50%", "Odporność: ogień −13%", each element's name
+// in its colour. `entries` are [element, percent text] pairs; none, no line.
+function elementLine(label, kind, entries) {
+  if (!entries.length) return null;
+  return h(
+    'span',
+    { class: `danger-elements danger-elements--${kind}` },
+    h('span', { class: 'danger-elements-label', text: `${label}: ` }),
+    entries.map(([element, percent], index) => [
+      index > 0 && ', ',
+      h('span', { class: 'danger-element', text: element.name, vars: { '--element': element.color } }),
+      h('span', { class: 'danger-element-value', text: ` ${percent}` }),
+    ]),
+  );
+}
+
 // The Bestiariusz: the creatures of an inner region with the levels they
 // come at and the chance of meeting each in a fight, or of a whole land
 // (`land`), all of its inner regions' creatures. One the character has not
 // met in a fight yet is only a shadow with "???"; its levels and chance
-// show from the start.
+// show from the start, its weak points and resistances (1074 A) once met:
+// the share of more damage from an element, and a resistance as the share
+// less against the character's level (reduction in formulas.js); one that
+// comes to 0% is left out.
 function dangersSheet(place, land = false) {
   const met = new Set(state.character.met ?? []);
+  const elements = new Map((state.content.elements ?? []).map((element) => [element.id, element]));
+  const { resistK } = state.content;
+  const k = resistK ? resistK.base + resistK.perLevel * (state.character.level ?? 1) : Infinity;
+  const weakOf = (danger) =>
+    Object.entries(danger.weak ?? {})
+      .filter(([id, share]) => share > 0 && elements.has(id))
+      .map(([id, share]) => [elements.get(id), `+${Math.round(share * 100)}%`]);
+  const resistOf = (danger) =>
+    Object.entries(danger.resist ?? {})
+      .map(([id, value]) => [id, value > 0 ? Math.round((100 * value) / (value + k)) : 0])
+      .filter(([id, percent]) => percent > 0 && elements.has(id))
+      .map(([id, percent]) => [elements.get(id), `−${percent}%`]);
+  const said = (label, entries) => (entries.length ? `, ${label}: ${entries.map(([element, percent]) => `${element.name} ${percent}`).join(', ')}` : '');
+  let explained = false;
   openSheet(
     h('h2', { class: 'sheet-title', text: t('Bestiariusz') }),
     h('p', { class: 'sheet-text', text: place.name }),
@@ -163,11 +197,14 @@ function dangersSheet(place, land = false) {
           danger.minLevel === danger.maxLevel ? t('poz. {level}', { level: danger.minLevel }) : t('poz. {min}–{max}', { min: danger.minLevel, max: danger.maxLevel });
         const rank = danger.champion ? t('czempion') : danger.elite ? t('elita') : null;
         const chance = danger.chance === undefined ? null : chanceText(danger.chance);
+        const weak = known ? weakOf(danger) : [];
+        const resist = known ? resistOf(danger) : [];
+        if (weak.length || resist.length) explained = true;
         return h(
           'li',
           {
             class: `danger-row${known ? '' : ' danger-row--unknown'}`,
-            'aria-label': `${known ? danger.name : t('Nieznany stwór')}, ${levels}${rank ? `, ${rank}` : ''}${chance ? `, ${chance}` : ''}`,
+            'aria-label': `${known ? danger.name : t('Nieznany stwór')}, ${levels}${rank ? `, ${rank}` : ''}${said(t('Słaby punkt'), weak)}${said(t('Odporność'), resist)}${chance ? `, ${chance}` : ''}`,
           },
           h('span', { class: 'danger-art' }, monsterSprite(danger.monsterId) ?? icon(danger.family, { size: 28 })),
           h(
@@ -175,11 +212,15 @@ function dangersSheet(place, land = false) {
             { class: 'danger-text' },
             h('span', { class: 'danger-name', text: known ? danger.name : '???' }),
             h('span', { class: `danger-meta${danger.champion ? ' danger-meta--champion' : ''}`, text: rank ? `${levels} · ${rank}` : levels }),
+            elementLine(t('Słaby punkt'), 'weak', weak),
+            elementLine(t('Odporność'), 'resist', resist),
           ),
           chance && h('span', { class: 'danger-chance', text: chance }),
         );
       }),
     ),
+    // What the two lines mean, under a list that has any.
+    explained && h('p', { class: 'muted danger-note', text: t('Słaby punkt: tym żywiołem zadasz stworowi więcej. Odporność: tym żywiołem zadasz mniej (procent na Twoim poziomie).') }),
     // The author's sentence, in the feminine for a woman, like the narrator's
     // lines (English has one for both).
     h('p', {

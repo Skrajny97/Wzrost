@@ -1036,6 +1036,10 @@
     "0.4.21": {
       "title": "Version 0.4.21",
       "body": "- Second System Avatar: once you have the Avatar, the Professions tab lets you buy a second one for 200,000 gold. It works at the same time as your character and the first Avatar, just as efficiently and for the same rewards. When you start a job, choose Character, Avatar or Second Avatar.\n- When both Avatars are working, the top bar shows one “AVATARS” strip. Tap it to unfold a tab for each with the time left."
+    },
+    "0.4.23": {
+      "title": "Version 0.4.23",
+      "body": "- The Bestiary shows the weak point and resistances of the creatures your character has fought, e.g. “Weak point: sacred +50%” and “Resistance: fire −32%”. It makes it easier to choose which element to enchant your weapon with before an expedition.\n- The resistance percent is counted at your character's level, just as in combat."
     }
   }
 }

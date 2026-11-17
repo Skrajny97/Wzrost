@@ -292,12 +292,24 @@ export const replayChapters = new Set(Object.entries(tutorial.chapters).filter((
 // The first steps of the introduction, which a skipped one plays for the player.
 export const firstSteps = tutorial.firstSteps;
 
-// A creature on a Bestiariusz list, with its name and family for the page.
-const dangerView = (game) => (danger) => ({
-  ...danger,
-  name: game.monstersById[danger.monsterId].name,
-  family: game.monstersById[danger.monsterId].family,
-});
+// A creature on a Bestiariusz list, with its name and family for the page,
+// and its weak points and resistances (1074 A; the author: „I skąd wiedzieć
+// na co jest podatny stwór?”): `weak` the share of more damage from an
+// element, `resist` its resistance at the middle of its levels, which the
+// page turns into a percent at the character's level (resistK).
+const dangerView = (game) => (danger) => {
+  const monster = game.monstersById[danger.monsterId];
+  const level = Math.round((danger.minLevel + danger.maxLevel) / 2);
+  return {
+    ...danger,
+    name: monster.name,
+    family: monster.family,
+    ...(monster.weaknesses && { weak: monster.weaknesses }),
+    ...(monster.resistances && {
+      resist: Object.fromEntries(Object.entries(monster.resistances).map(([element, value]) => [element, Math.round(value.base + value.perLevel * (level - 1))])),
+    }),
+  };
+};
 
 // What the page needs to label things; no balance numbers.
 export function publicContent() {
@@ -427,6 +439,10 @@ export function publicContent() {
     // Punkty Systemu for a confirmed e-mail (email.js).
     emailReward: game.balance.account.emailSystemPoints,
     classEvolutionLevels: game.balance.progression.classEvolutionLevels,
+    // A resistance's percent against an attacker of a level: value / (value
+    // + base + perLevel × level), as reduction in formulas.js; the
+    // Bestiariusz shows it at the character's level (1074 A).
+    resistK: { base: game.balance.combat.kBase, perLevel: game.balance.combat.kPerLevel },
     // Background music: the client plays it on every screen (music.js).
     music: data.music,
     // Recorded combat sounds and voices (sound.js).
