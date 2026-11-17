@@ -1,0 +1,14 @@
+{
+  "id": "zloto-sysframe",
+  "tool": "pixellab generate-image-v2",
+  "description": "an empty game interface window frame of thin glowing cyan pixel lines, small square bracket corners of bright cyan, a faint cyan dotted line along the edges, the inside empty and transparent, seen flat from the front, pixel art user interface of a mysterious magic system",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08105524508158365
+  },
+  "images": 4
+}
