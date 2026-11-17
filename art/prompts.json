@@ -2212,7 +2212,8 @@
       "zloto-sklep": "a small market stall with an awning, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
       "zloto-panel": {"prompt": "an empty game interface panel frame, a thin ornate antique gold border two pixels wide with small gold leaf ornaments in the four corners, the inside plain very dark forest green, seen flat from the front, pixel art user interface, the middle empty and plain", "width": 128, "height": 128, "tool": "pro"},
       "zloto-slot": {"prompt": "an empty square inventory slot with a thin antique gold rim and small gold corner studs, the inside plain very dark green, seen flat from the front, pixel art user interface", "width": 48, "height": 48},
-      "zloto-button": {"prompt": "an empty horizontal button plate of dark bronze with a thin bright gold rim and a small gold stud at each end, seen flat from the front, pixel art user interface, the middle plain", "width": 128, "height": 64, "tool": "pro"}
+      "zloto-button": {"prompt": "an empty horizontal button plate of dark bronze with a thin bright gold rim and a small gold stud at each end, seen flat from the front, pixel art user interface, the middle plain", "width": 128, "height": 64, "tool": "pro"},
+      "zloto-sysframe": {"prompt": "an empty game interface window frame of thin glowing cyan pixel lines, small square bracket corners of bright cyan, a faint cyan dotted line along the edges, the inside empty and transparent, seen flat from the front, pixel art user interface of a mysterious magic system", "width": 128, "height": 128, "tool": "pro"}
     }
   }
 }
