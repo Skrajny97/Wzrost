@@ -46,7 +46,7 @@ describe('the Rejestr and the filters through the API', () => {
     await player('Druga', 'mage');
   });
 
-  test('an auction sold: the seller writes down to whom and for how much, the winner from whom; the outbid nothing', async () => {
+  test('an auction sold: the seller writes down to whom and for how much, the winner from whom, the outbid its lost bid', async () => {
     const empty = await register('Kramarka');
     assert.deepEqual([empty.log, empty.since, empty.limit], [[], tuning.log.since, tuning.log.entries]);
     const itemId = await inBag('Kramarka', item('amulet', 'amulet'));
@@ -74,7 +74,13 @@ describe('the Rejestr and the filters through the API', () => {
     assert.equal(sold[0].gold, sellerShare(111, content));
     assert.equal(sold[0].goods.item.slot, 'amulet');
     assert.deepEqual(lines((await register('Kupiec')).log), [['won', 'item', 111, 'Kramarka']]);
-    assert.deepEqual((await register('Druga')).log, []);
+    // The outbid: the auction lost, its own last bid beside the price that
+    // won and the winner (the author, 17.11.2026: „Niech rejestr pokazuje
+    // też przegrane licytacje”).
+    const lost = (await register('Druga')).log;
+    assert.deepEqual(lines(lost), [['lost', 'item', 111, 'Kupiec']]);
+    assert.equal(lost[0].gold, 105);
+    assert.equal(lost[0].goods.item.slot, 'amulet');
     // The bids go with the offer settled.
     assert.equal((await (await db()).prepare('SELECT COUNT(*) AS n FROM market_bids').first()).n, 0);
   });
@@ -100,6 +106,39 @@ describe('the Rejestr and the filters through the API', () => {
       [1, 2, 3],
     );
     assert.deepEqual(lines((await register('Kupiec')).log), [['bought', 'herb', 40, 'Kramarka']]);
+  });
+
+  test('"Kup teraz" over bids: each bidder but the buyer writes down the auction lost, at the price it went for', async () => {
+    const itemId = await inBag('Kramarka', item('amulet', 'amulet'));
+    await act('Kramarka', 'list', { kind: 'item', itemId, startPrice: 100, buyNow: 500 });
+    const offer = (await market('Kupiec')).offers[0];
+    assert.equal((await act('Druga', 'bid', { offerId: offer.id, amount: 120 })).status, 200);
+    assert.equal((await act('Kupiec', 'bid', { offerId: offer.id, amount: 130 })).status, 200);
+    // Kupiec, who bid too, buys at once: Druga alone has lost.
+    const bought = await act('Kupiec', 'buy', { offerId: offer.id });
+    assert.equal(bought.status, 200, JSON.stringify(bought.data));
+    assert.deepEqual(lines((await register('Kupiec')).log), [['bought', 'item', 500, 'Kramarka']]);
+    const lost = (await register('Druga')).log;
+    assert.deepEqual(lines(lost), [['lost', 'item', 500, 'Kupiec']]);
+    assert.equal(lost[0].gold, 120);
+  });
+
+  test("a lost auction keeps only the bidder's last lines too", async () => {
+    const { id } = await row('Druga');
+    const database = await db();
+    for (let i = 0; i < tuning.log.entries + 3; i += 1) {
+      await database.prepare("INSERT INTO market_log (character_id, event, kind, good, count, created_at) VALUES (?, 'expired', 'herb', ?, 1, ?)").bind(id, content.herbs[0].id, i).run();
+    }
+    const itemId = await inBag('Kramarka', item('amulet', 'amulet'));
+    await act('Kramarka', 'list', { kind: 'item', itemId, startPrice: 100 });
+    const offer = (await market('Kupiec')).offers[0];
+    await act('Druga', 'bid', { offerId: offer.id, amount: 100 });
+    await act('Kupiec', 'bid', { offerId: offer.id, amount: 110 });
+    await endAll();
+    await market('Kramarka');
+    const { n } = await database.prepare('SELECT COUNT(*) AS n FROM market_log WHERE character_id = ?').bind(id).first();
+    assert.equal(n, tuning.log.entries);
+    assert.equal((await register('Druga')).log[0].event, 'lost');
   });
 
   test("the merchant's goods bought are written down too, from Gościwit", async () => {

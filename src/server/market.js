@@ -219,7 +219,7 @@ const goldParcel = (db, offer, price, now) =>
 // line of a character's trade, written in the batch of the trade itself,
 // and its oldest lines past the data's number (market.log.entries) gone,
 // as the design lets nothing run out with time. `event`: sold, bought,
-// won, expired or withdrawn; `other` the other side, a player's character
+// won, lost (lostLines), expired or withdrawn; `other` the other side, a player's character
 // (`name`, as it is called then) or 'merchant', 'wanderer' or 'test' (the
 // test version's own trader), named in the page's language when the
 // Rejestr is shown.
@@ -250,6 +250,29 @@ const soldLines = (db, offer, event, buyerId, buyerName, price, now) => [
   // A deal for both sides, for the achievements (achievements.js).
   ...featGains(db, buyerId, { deals: 1 }),
   ...(offer.seller_id === null ? [] : featGains(db, offer.seller_id, { deals: 1 })),
+];
+
+// The Rejestr's line of every bidder who did not win the offer, sold to
+// `winnerId` (named `winnerName`) for `price` at its end or by "Kup teraz"
+// (the author, 17.11.2026: „Niech rejestr pokazuje też przegrane
+// licytacje”, after a player asked: „Da się jakoś zobaczyć historię
+// licytacji? Które się wygrało, które nie?”): its own last bid (`gold`)
+// beside the price that won (`price`) and the winner. Written from the
+// bids kept for "Licytuję", in the batch that settles the offer, before
+// they go; each of those bidders' oldest lines past the data's number go.
+const lostLines = (db, offer, winnerId, winnerName, price, now) => [
+  db
+    .prepare(
+      `INSERT INTO market_log (character_id, event, other, other_name, kind, good, count, item, price, gold, created_at)
+       SELECT character_id, 'lost', 'player', ?, ?, ?, ?, ?, ?, amount, ? FROM market_bids WHERE offer_id = ? AND character_id != ?`,
+    )
+    .bind(winnerName, offer.kind, offer.good, offer.count, offer.item, price, now, offer.id, winnerId),
+  db
+    .prepare(
+      `DELETE FROM market_log WHERE character_id IN (SELECT character_id FROM market_bids WHERE offer_id = ? AND character_id != ?)
+       AND id NOT IN (SELECT kept.id FROM market_log kept WHERE kept.character_id = market_log.character_id ORDER BY kept.id DESC LIMIT ?)`,
+    )
+    .bind(offer.id, winnerId, tuning().log.entries),
 ];
 
 // The bids kept for "Licytuję" go once their offer is settled.
@@ -285,6 +308,7 @@ export async function settleMarket(db, now) {
         ...goods,
         ...(sold ? goldParcel(db, offer, offer.bid, now) : []),
         ...lines,
+        ...(sold ? lostLines(db, offer, offer.bidder_id, offer.bidder_name, offer.bid, now) : []),
         bidsGone(db, offer),
       ]);
     } catch (error) {
@@ -669,6 +693,7 @@ export async function buyOffer(context) {
     goodsParcel(db, offer, row.id, 'bought', price, now),
     ...goldParcel(db, offer, price, now),
     ...soldLines(db, offer, 'bought', row.id, row.name, price, now),
+    ...lostLines(db, offer, row.id, row.name, price, now),
     bidsGone(db, offer),
   ]);
   return respond(db, session, now, { bought: { price } }, askedView(body.view));

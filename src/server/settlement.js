@@ -399,13 +399,18 @@ export function settlementView(player, stored, board, now) {
 function imbueView(player) {
   const { imbue } = content().settlement;
   const materials = JSON.parse(player.row.materials ?? '{}');
+  const parts = JSON.parse(player.row.parts ?? '{}');
   const items = player.items.filter((item) => imbue.slots.includes(item.slot));
   return {
     elements: imbue.elements.map(({ element, material }) => {
       const { stack, count } = imbueCost({ level: 1, rarity: 'common' }, element, content());
       // `key`: the material's stack, for "Poproś gildię" (guild-requests.js).
-      return { element, name: content().elementsById[element].name, material: content().materialsById[material].name, key: stack, count, have: materials[stack] ?? 0 };
+      // `resistance`: „Odporność na naturę”, the element's own words, for the
+      // body armour's line (not „odporność na natura”).
+      return { element, name: content().elementsById[element].name, resistance: content().elementsById[element].resistance, material: content().materialsById[material].name, key: stack, count, have: materials[stack] ?? 0 };
     }),
+    // The parts that pay in place of the element's material (17.11.2026).
+    parts: (imbue.parts ?? []).map(({ part, count }) => ({ id: part, name: content().partsById[part].name, count, have: parts[part] ?? 0 })),
     items: items.map((item) => ({
       id: item.id,
       name: itemName(item, content()),
@@ -432,13 +437,18 @@ export async function imbueAtEnchantress(context) {
   // An item worn is changed at home; one in the bag also while away.
   requireUnworn(player, item, context.now);
   const materials = JSON.parse(row.materials ?? '{}');
-  const block = imbueBlock(item, body.element, { gold: row.gold, materials }, content());
-  if (block) throw new ApiError(block.code === 'wrong_slot' || block.code === 'invalid_element' ? 400 : 409, block.code, block.message);
-  const cost = imbueCost(item, body.element, content());
+  const parts = JSON.parse(row.parts ?? '{}');
+  // What pays: the element's material, or parts of imbue.parts (`pay`).
+  const pay = typeof body.pay === 'string' ? body.pay : 'material';
+  const block = imbueBlock(item, body.element, { gold: row.gold, materials, parts }, content(), pay);
+  if (block) throw new ApiError(['wrong_slot', 'invalid_element', 'invalid_payment'].includes(block.code) ? 400 : 409, block.code, block.message);
+  const cost = imbueCost(item, body.element, content(), pay);
   const effect = imbueEffect(item, body.element, content());
   const stored = settlementOf(row);
   const next = { ...stored, relations: grow(stored.relations, content().settlement.imbue) };
-  const stack = jsonPath(cost.stack);
+  // The column the payment comes out of, and its key there.
+  const column = cost.part ? 'parts' : 'materials';
+  const stack = jsonPath(cost.part ?? cost.stack);
   const db = context.env.DB;
   // As the reforging: the item changes only if the character is as seen
   // here, and the payment only if the item now holds this element.
@@ -449,9 +459,9 @@ export async function imbueAtEnchantress(context) {
     db
       .prepare(
         `UPDATE characters SET gold = gold - ?, settlement = ?,
-           materials = CASE WHEN json_extract(materials, ?) > ? THEN json_set(materials, ?, json_extract(materials, ?) - ?) ELSE json_remove(materials, ?) END,
+           ${column} = CASE WHEN json_extract(${column}, ?) > ? THEN json_set(${column}, ?, json_extract(${column}, ?) - ?) ELSE json_remove(${column}, ?) END,
            version = version + 1
-         WHERE id = ? AND version = ? AND gold >= ? AND COALESCE(json_extract(materials, ?), 0) >= ?
+         WHERE id = ? AND version = ? AND gold >= ? AND COALESCE(json_extract(${column}, ?), 0) >= ?
            AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.imbue.element') = ?)`,
       )
       .bind(cost.gold, JSON.stringify(next), stack, cost.count, stack, stack, cost.count, stack, row.id, row.version, cost.gold, stack, cost.count, item.id, body.element),

@@ -1148,36 +1148,50 @@ export function imbueEffect(item, element, content) {
 
 // What the zaklęcie costs: goldPerLevel gold for each level of the item
 // times its rarity's sale multiplier, and materialCount pieces of the
-// element's material, in that material's own rarity (`stack`).
+// element's material, in that material's own rarity (`stack`); or, paid
+// with parts (`pay`: the id of a part of imbue.parts; 17.11.2026, the
+// author: „niech da się je jakkolwiek sensownie zdobyć”, „dużych ilości
+// części, na przykład legendarnych albo chociaż epickich”), that many
+// parts (`part`, `count`) in place of the material, for the same gold.
 /**
  * @param {Item} item
  * @param {string} element
  * @param {Content} content
+ * @param {string} [pay] 'material', or the id of a part of imbue.parts
  */
-export function imbueCost(item, element, content) {
-  const { goldPerLevel, materialCount, elements } = content.settlement.imbue;
+export function imbueCost(item, element, content, pay = 'material') {
+  const { goldPerLevel, materialCount, elements, parts = [] } = content.settlement.imbue;
+  const gold = Math.round(goldPerLevel * item.level * content.raritiesById[item.rarity].sell);
+  const byParts = parts.find((/** @type {Record<string, any>} */ one) => one.part === pay);
+  if (byParts) return { gold, pay: byParts.part, part: byParts.part, stack: null, count: byParts.count };
   const material = content.materialsById[elements.find((/** @type {Record<string, any>} */ one) => one.element === element)?.material];
   return {
-    gold: Math.round(goldPerLevel * item.level * content.raritiesById[item.rarity].sell),
+    gold,
+    pay: 'material',
+    part: null,
     stack: material ? stackKey(material.id, material.rarity) : null,
     count: materialCount,
   };
 }
 
-// Why the item cannot take the element now, or null.
+// Why the item cannot take the element now, or null; `pay` as imbueCost's.
 /**
  * @param {Item} item
  * @param {string} element
- * @param {{ gold: number, materials: Record<string, number> }} options2
+ * @param {{ gold: number, materials: Record<string, number>, parts?: Record<string, number> }} options2
  * @param {Content} content
+ * @param {string} [pay]
  */
-export function imbueBlock(item, element, { gold, materials }, content) {
-  const { slots, elements } = content.settlement.imbue;
+export function imbueBlock(item, element, { gold, materials, parts = {} }, content, pay = 'material') {
+  const { slots, elements, parts: payable = [] } = content.settlement.imbue;
   if (!slots.includes(item.slot)) return { code: 'wrong_slot', message: 'Żywioł da się zakląć tylko w broń i w pancerz.' };
   if (!elements.some((/** @type {Record<string, any>} */ one) => one.element === element)) return { code: 'invalid_element', message: 'Wybierz żywioł.' };
+  if (pay !== 'material' && !payable.some((/** @type {Record<string, any>} */ one) => one.part === pay)) return { code: 'invalid_payment', message: 'Wybierz, czym płacisz.' };
   if (item.imbue?.element === element) return { code: 'same_element', message: 'Ten przedmiot ma już ten żywioł.' };
-  const cost = imbueCost(item, element, content);
+  const cost = imbueCost(item, element, content, pay);
   if (gold < cost.gold) return { code: 'not_enough_gold', message: 'Brakuje złota na zaklęcie.' };
-  if ((materials[/** @type {string} */ (cost.stack)] ?? 0) < cost.count) return { code: 'not_enough_materials', message: 'Brakuje materiału żywiołu.' };
+  if (cost.part) {
+    if ((parts[cost.part] ?? 0) < cost.count) return { code: 'not_enough_parts', message: `Brakuje części: ${content.partsById[cost.part].name} (potrzeba ${cost.count}).` };
+  } else if ((materials[/** @type {string} */ (cost.stack)] ?? 0) < cost.count) return { code: 'not_enough_materials', message: 'Brakuje materiału żywiołu.' };
   return null;
 }

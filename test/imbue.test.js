@@ -80,6 +80,27 @@ describe('the zaklęcie żywiołu in the engine', () => {
     const talisman = generateItem({ baseId: content.bases.find((base) => base.slot === 'talisman').id, level: 20 }, createRng('t'), content);
     assert.equal(imbueBlock(talisman, 'fire', enough, content).code, 'wrong_slot');
   });
+
+  // 17.11.2026, the author: „Niech zaklinanie żywiołu będzie możliwe nie
+  // tylko zależnie od konkretnych materiałów”, „dużych ilości części, na
+  // przykład legendarnych albo chociaż epickich”.
+  test('parts pay in place of the material: 20 epic or 2 legendary, for the same gold', () => {
+    assert.deepEqual(tuning.parts.map(({ part }) => content.partsById[part].rarity), ['epic', 'legendary']);
+    const byMaterial = imbueCost(sword, 'nature', content);
+    for (const { part, count } of tuning.parts) {
+      const cost = imbueCost(sword, 'nature', content, part);
+      assert.deepEqual([cost.part, cost.count, cost.gold, cost.stack], [part, count, byMaterial.gold, null]);
+      const enough = { gold: cost.gold, materials: {}, parts: { [part]: count } };
+      assert.equal(imbueBlock(sword, 'nature', enough, content, part), null);
+      assert.equal(imbueBlock(sword, 'nature', { ...enough, parts: { [part]: count - 1 } }, content, part).code, 'not_enough_parts');
+      // Parts do not pay where the material is asked for, nor the other way round.
+      assert.equal(imbueBlock(sword, 'nature', enough, content).code, 'not_enough_materials');
+    }
+    // By the Wymiana części's rate the two cost the same.
+    const [epic, legendary] = tuning.parts;
+    assert.equal(epic.count, legendary.count * content.workshop.exchange.rate);
+    assert.equal(imbueBlock(sword, 'nature', { gold: 1e9, materials: {}, parts: { scraps: 999 } }, content, 'scraps').code, 'invalid_payment');
+  });
 });
 
 describe('the zaklęcie żywiołu through the API', () => {
@@ -111,5 +132,24 @@ describe('the zaklęcie żywiołu through the API', () => {
     const item = JSON.parse((await database.prepare('SELECT data FROM items WHERE id = ?').bind(id).first()).data);
     assert.deepEqual(item.imbue, { element: 'fire', share: tuning.weaponShare });
     assert.equal((await call('POST', '/api/settlement/imbue', { cookie, body: { itemId: id, element: 'fire' } })).data.error.code, 'same_element');
+  });
+  test('the Zaklinaczka takes parts in place of the material when asked', async () => {
+    const database = await db();
+    const { meta } = await database.prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, ?, 0 FROM characters').bind(JSON.stringify(sword)).run();
+    const id = meta.last_row_id;
+    const [epic] = tuning.parts;
+    const cost = imbueCost(sword, 'lightning', content, epic.part);
+    const body = { itemId: id, element: 'lightning', pay: epic.part };
+    assert.equal((await call('POST', '/api/settlement/imbue', { cookie, body })).data.error.code, 'not_enough_parts');
+    await database.prepare('UPDATE characters SET parts = ?').bind(JSON.stringify({ [epic.part]: epic.count + 5, scraps: 3 })).run();
+    const view = (await call('GET', '/api/settlement', { cookie })).data.settlement.imbue;
+    assert.deepEqual(view.parts.find((one) => one.id === epic.part), { id: epic.part, name: content.partsById[epic.part].name, count: epic.count, have: epic.count + 5 });
+    const imbued = await call('POST', '/api/settlement/imbue', { cookie, body });
+    assert.equal(imbued.status, 200);
+    assert.equal(imbued.data.character.gold, 100000 - cost.gold);
+    const row = await database.prepare('SELECT materials, parts FROM characters').first();
+    assert.deepEqual(JSON.parse(row.parts), { [epic.part]: 5, scraps: 3 });
+    assert.equal(JSON.parse((await database.prepare('SELECT data FROM items WHERE id = ?').bind(id).first()).data).imbue.element, 'lightning');
+    assert.equal((await call('POST', '/api/settlement/imbue', { cookie, body: { itemId: id, element: 'fire', pay: 'scraps' } })).data.error.code, 'invalid_payment');
   });
 });
