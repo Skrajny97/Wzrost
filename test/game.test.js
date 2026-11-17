@@ -3012,7 +3012,8 @@ describe('Zadania od narratora', () => {
     await (await db()).prepare('UPDATE characters SET level = 40, class_level = 30').run();
     const reroll = (period, index) => call('POST', '/api/quests/reroll', { cookie, body: { period, index } });
     const kept = await stored();
-    kept.daily.quests[1].progress = 1;
+    // Begun but not done, whatever its count (a day can draw a quest of one).
+    kept.daily.quests[1].progress = kept.daily.quests[1].count - 1;
     kept.daily.quests[2].progress = kept.daily.quests[2].count;
     await store(kept);
     const before = (await character()).quests.daily.quests;
@@ -3028,7 +3029,8 @@ describe('Zadania od narratora', () => {
     assert.deepEqual([again.status, again.data.error.code, again.data.error.message], [409, 'rerolled', 'To zadanie jest już przelosowane.']);
     assert.equal((await reroll('daily', 2)).data.error.code, 'done');
     for (const index of [9, -1, '1', 1.5]) assert.equal((await reroll('daily', index)).data.error.code, 'no_quest');
-    assert.equal((await reroll('daily', 1)).status, 200);
+    const second = await reroll('daily', 1);
+    assert.equal(second.status, 200, JSON.stringify(second.data));
     assert.equal((await reroll('weekly', 0)).status, 200);
     // A page from before asks for the whole day: the quests drawn anew on
     // their own and the one done stay, the rest are drawn anew, and no die
