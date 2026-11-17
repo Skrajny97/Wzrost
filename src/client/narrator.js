@@ -46,6 +46,7 @@ import { activityFinished, call, isUnlocked, reportCache, state } from './state.
 import { desktopLayout } from './layout-mode.js';
 import { language, t } from './i18n.js';
 import { toast } from './ui.js';
+import { winterLastDay } from './winter-calendar.js';
 
 const running = () => Boolean(state.character.activity) && !activityFinished(state.character.activity);
 const finished = () => activityFinished(state.character.activity);
@@ -322,6 +323,9 @@ const noChapterWaits = (read) =>
 // told on the place's first visit, as the Osada's are (641-647): the
 // Gildia's, the Warownia's, and those of 6.11.2026 below.
 const quietDue = (read) => read.has('ending') && noChapterWaits(read);
+// Szczodre Gody's winter quests run (the character has their period).
+const winterRuns = () => Boolean(state.character?.quests?.winter);
+const winterQuestDone = () => Boolean(state.character?.quests?.winter?.quests?.some((quest) => quest.done));
 
 // The Gildia (646, and the author's lines of 6.11.2026), for a member: its
 // page's tabs on the first look at any of them, then each tab's own line on
@@ -678,6 +682,13 @@ const BEATS = {
   // At the top of the report, where it says what the faint took, a moment
   // after the report opens: the player sees it first.
   'faint-first': { place: mark('report-summary'), delay: 2500, when: (hash, read) => faintReport(hash) && quietDue(read) },
+  // Szczodre Gody (1044.8, 1046): on the first visit while the winter
+  // quests run (December), the welcome and the winter quests; the first
+  // winter quest done; and the calendar's last window, Christmas Eve.
+  'winter-welcome': { when: (hash, read) => winterRuns() && !onReport(hash) && quietDue(read) },
+  'winter-quests': { when: (hash, read) => winterRuns() && !onReport(hash) && quietDue(read) },
+  'winter-first-quest': { when: (hash, read) => read.has('winter-quests') && winterQuestDone() && !onReport(hash) && quietDue(read) },
+  'winter-eve': { when: (hash, read) => read.has('winter-quests') && winterLastDay() && !onReport(hash) && quietDue(read) },
 };
 
 let place = '#/walka';

@@ -114,6 +114,11 @@
       "title": "Porażka",
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Raporty czekają w Dzienniku, na górze ustawień pod zębatką."
+    },
+    "winter": {
+      "title": "Szczodre Gody",
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Zimowe zadania czekają w zadaniach narratora, a kalendarz przy lewej krawędzi ekranu."
     }
   },
   "lines": [
@@ -1466,6 +1471,34 @@
         "Po porażce nic z wyprawy nie zostaje, a System odbiera jeszcze część doświadczenia. Zanim znów wyruszysz, sprawdź zagrożenie i odpocznij."
       ],
       "voice": "audio/narration/faint-first.mp3"
+    },
+    {
+      "id": "winter-welcome",
+      "kind": "card",
+      "chapter": "winter",
+      "text": ["Nad Puszczą zapada najdłuższa noc roku. Nadchodzą Szczodre Gody. Do Wigilii codziennie czeka na Ciebie nowe okienko kalendarza."],
+      "voice": "audio/narration/winter-welcome.mp3"
+    },
+    {
+      "id": "winter-quests",
+      "kind": "card",
+      "chapter": "winter",
+      "text": ["W grudniu dochodzą też trzy zimowe zadania: gałązki jodły z wypraw, karp na Wigilię i coś ciepłego z kuchni. Zrób wszystkie trzy jednego dnia, a dorzucę pakiet kart."],
+      "voice": "audio/narration/winter-quests.mp3"
+    },
+    {
+      "id": "winter-first-quest",
+      "kind": "card",
+      "chapter": "winter",
+      "text": ["Pierwsze zimowe zadanie za Tobą. Puszcza pachnie jodłą i dymem z ognisk. Tak zaczynają się Gody."],
+      "voice": "audio/narration/winter-first-quest.mp3"
+    },
+    {
+      "id": "winter-eve",
+      "kind": "card",
+      "chapter": "winter",
+      "text": ["Wigilia. Ostatnie okienko kalendarza kryje zimowy zestaw: ramkę Szron, tło Szczodrych Godów i aurę Śnieżycy. Szczodrych Godów!"],
+      "voice": "audio/narration/winter-eve.mp3"
     }
   ]
 }
