@@ -1,0 +1,14 @@
+{
+  "id": "andrzejki-wax",
+  "tool": "pixellab generate-image-v2",
+  "description": "St Andrew's Eve fortune telling in a Slavic forest cottage at night: a wooden bowl of cold water on a rough table, a lit tallow candle beside it, an old iron key held over the bowl with hot wax dripping through the key's hole into the water and setting into a strange twisted shape, the candle casting the wax shape's big shadow on the log wall behind, warm candle light, dark blue night outside a small window, pixel art scene",
+  "style": "src/client/art/camp/campfire-1.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
