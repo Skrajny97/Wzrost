@@ -2192,7 +2192,27 @@
         "prompt": "an empty square socket carved into dark oak with a dark iron rim and four small rivets, seen flat from the front, a game inventory slot, the middle empty and dark",
         "width": 48,
         "height": 48
-      }
+      },
+      "zloto-postac": "a hooded adventurer seen from the chest up, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+      "zloto-walka": "two crossed swords, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+      "zloto-osada": "a small wooden village hut with a pitched roof, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+      "zloto-profesje": "a smith's hammer crossed with a pickaxe, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+      "zloto-spolecznosc": "three small figures standing side by side, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+      "zloto-statystyki": "three vertical bars of rising height, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+      "zloto-umiejetnosci": "a sparkling four-pointed star, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+      "zloto-ewolucja": "two stacked upward chevrons, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+      "zloto-rdzen": "a hexagonal crystal, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+      "zloto-powrot": "an arrow pointing to the left, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+      "zloto-oboz": "a small triangular tent, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+      "zloto-kronika": "a rolled parchment scroll, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+      "zloto-ustawienia": "a cogwheel, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+      "zloto-czat": "a round speech bubble, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+      "zloto-kalendarz": "a calendar sheet with a ring binding on top, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+      "zloto-oko": "an open eye, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+      "zloto-sklep": "a small market stall with an awning, as a small game icon engraved in polished antique gold with dark bronze shading and a thin dark outline, bold readable silhouette, the symbol alone, no frame, no background",
+      "zloto-panel": {"prompt": "an empty game interface panel frame, a thin ornate antique gold border two pixels wide with small gold leaf ornaments in the four corners, the inside plain very dark forest green, seen flat from the front, pixel art user interface, the middle empty and plain", "width": 128, "height": 128, "tool": "pro"},
+      "zloto-slot": {"prompt": "an empty square inventory slot with a thin antique gold rim and small gold corner studs, the inside plain very dark green, seen flat from the front, pixel art user interface", "width": 48, "height": 48},
+      "zloto-button": {"prompt": "an empty horizontal button plate of dark bronze with a thin bright gold rim and a small gold stud at each end, seen flat from the front, pixel art user interface, the middle plain", "width": 128, "height": 64, "tool": "pro"}
     }
   }
 }
