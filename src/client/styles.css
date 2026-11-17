@@ -5365,7 +5365,8 @@ a.camp-level-button {
 }
 
 /* The winter camp's lights by the campfire (camp-art.js, winterTouches):
-   each bulb glows and dims in its turn; still for less motion. */
+   each bulb glows and dims in its turn; still with the game's calm look
+   (motion.js). */
 .camp-light {
   animation: camp-light-twinkle 2.2s ease-in-out infinite;
 }
@@ -5373,8 +5374,8 @@ a.camp-level-button {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.55; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .camp-light { animation: none; }
+.calm .camp-light {
+  animation: none;
 }
 
 /* The living camp (screens/camp.js). The glade and its buildings take the

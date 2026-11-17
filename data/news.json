@@ -1260,6 +1260,11 @@
       "id": "0.4.11",
       "title": "Wersja 0.4.11",
       "body": "- Portale Systemu sięgają teraz 500. stopnia zamiast 100. Jak dotąd walczysz najwyżej o stopień równy poziomowi Twojej postaci, a im wyższy stopień, tym większy łup."
+    },
+    {
+      "id": "0.4.12",
+      "title": "Wersja 0.4.12",
+      "body": "- Szczodre Gody: w grudniu Obóz przykryje śnieg, nad ogniskiem zaświecą kolorowe lampki, a ozdoby odebrane w kalendarzu staną przy ognisku."
     }
   ]
 }

@@ -585,7 +585,7 @@ function board(level, tall, winter = false) {
 // The winter camp's touches over the board (1044.3, Szczodre Gody), above
 // the buildings so that nothing hides them: a string of lights on two poles
 // over the campfire, twinkling one after another (styles.css, .camp-light;
-// still where the player asks for less motion), and the decorations of the
+// still with the game's calm look, motion.js), and the decorations of the
 // calendar's days taken (data/winter.json, decorations) by the fire: the
 // podłaźniczka hanging from the string, the snopek standing beside the fire.
 // In the board's units, moved down with the plots on the taller boards.

@@ -63,6 +63,17 @@ describe('the calendar of Szczodre Gody (1044)', () => {
     await (await db()).prepare('UPDATE sessions SET expires_at = ?').bind(Date.UTC(2027, 1, 1)).run();
   });
 
+  test('all of December the camp stands under snow with the decorations of the days taken; not before', async () => {
+    const camp = async (day) => (await call('GET', '/api/character', { cookie, now: noon(day) })).data.character.winterCamp;
+    assert.equal(await camp(0), null);
+    assert.deepEqual(await camp(1), { decorations: [] });
+    await (await db()).prepare("UPDATE characters SET winter = '{\"period\":\"2026-12\",\"taken\":[12,19]}' WHERE name = 'Kolędniczka'").run();
+    assert.deepEqual(await camp(20), { decorations: ['podlaznniczka', 'snopek'] });
+    // The camp stays to the 31st, after the calendar's last day.
+    assert.deepEqual(await camp(31), { decorations: ['podlaznniczka', 'snopek'] });
+    assert.equal(await camp(32), null);
+  });
+
   test('outside its days there is no calendar and nothing to take', async () => {
     const before = await call('GET', '/api/winter', { cookie, now: noon(0) });
     assert.equal(before.status, 200, JSON.stringify(before.data));
