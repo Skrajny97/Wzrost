@@ -160,6 +160,7 @@ import { requirePlayable } from './sessions.js';
 import { tradeBlockOf, tradesEnded } from './trades.js';
 import { skipIntroduction } from './tutorial.js';
 import { weekFactorNow, weekOfCharacter } from './weeks.js';
+import { winterQuestsPeriod } from './winter.js';
 
 // A character's name (names.js): 2 to 20 signs, the filter of words, and no
 // two players share one, whatever the letter case; neither does a character
@@ -1549,6 +1550,13 @@ function avatarView(player, now) {
   return { name, price, description, owned: Boolean(player.row.avatar_at), activity: activityView(player.avatarActivity, player.row.level, now) };
 }
 
+// Szczodre Gody's winter quests (winter.js, 1044.4) as a fourth period of
+// the narrator's quests, while the winter camp stands.
+function withWinterQuests(quests, row, now) {
+  const winter = winterQuestsPeriod(row, now);
+  return winter ? { ...quests, winter } : quests;
+}
+
 export function characterView(player, now) {
   const { row, items, activity } = player;
   const character = engineCharacter(row);
@@ -1822,7 +1830,7 @@ export function characterView(player, now) {
     // The potions for a time still working (potions.js).
     buffs: activeBuffs(player, now),
     // The narrator's daily, weekly and monthly quests (quests.js).
-    quests: questsView(questsNow(player, now), now, content(), JSON.parse(row.met ?? '[]'), row.level),
+    quests: withWinterQuests(questsView(questsNow(player, now), now, content(), JSON.parse(row.met ?? '[]'), row.level), row, now),
     // The narrator's cards seen so far, or null for a character made before
     // the introduction (tutorial.js).
     tutorial: row.tutorial === null ? null : JSON.parse(row.tutorial),

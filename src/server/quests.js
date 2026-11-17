@@ -9,6 +9,7 @@ import { content } from './content.js';
 import { bagPlaces, characterView, equippedItems, loadPlayer, questContext, questsNow, requirePlayer } from './characters.js';
 import { atomically, sameVersion } from './atomic.js';
 import { questFamePoints } from './fame.js';
+import { claimAllWinterQuests, claimWinterQuest, openWinterChest } from './winter.js';
 import { ApiError, json, readJson } from './http.js';
 
 // A JSON path for an id with a hyphen ("iron-ore").
@@ -67,6 +68,8 @@ async function saveClaims(context, session, player, quests, periodId, indexes) {
 export async function claimQuest(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
+  // Szczodre Gody's winter quests (winter.js, 1044.4).
+  if (body.period === 'winter') return claimWinterQuest(context, body.index, { session, player });
   const periodId = periodOf(body);
   const now = context.now;
   const quests = questsNow(player, now);
@@ -83,6 +86,7 @@ export async function claimQuest(context) {
 export async function claimAllQuests(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
+  if (body.period === 'winter') return claimAllWinterQuests(context, { session, player });
   const periodId = periodOf(body);
   const quests = questsNow(player, context.now);
   const indexes = quests[periodId].quests.flatMap((quest, index) => (questDone(quest) && !quest.claimed ? [index] : []));
@@ -96,6 +100,7 @@ export async function claimAllQuests(context) {
 export async function openChest(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
+  if (body.period === 'winter') return openWinterChest(context, { session, player });
   const periodId = periodOf(body);
   const now = context.now;
   const quests = questsNow(player, now);

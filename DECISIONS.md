@@ -3601,6 +3601,15 @@ Rozstrzygnięte najprostszym rozwiązaniem zgodnym z przyjętymi makietami (1044
 4. **Mikstury** trafiają do plecaka jak od innego gracza (Encyklopedia nie liczy ich jako własnego odkrycia). Gdy plecak jest pełny, nagroda czeka, aż zrobi się w nim miejsce, z komunikatem, a dzień nie przepada do północy.
 5. **Zimowy zestaw** to przedmioty Sklepu Systemu z `event: winter` w `data/cosmetics.json`, bez ceny: nie da się ich kupić, a w Sklepie widać je dopiero u postaci, która je ma, żeby mogła je założyć i zdjąć. Aura Śnieżyca to płatki śniegu prószące wokół postaci (`sparks: fall`, 1044.10 na stronie ocen).
 6. **Wersja testowa** (`WINTER: test` w `wrangler.jsonc`) ma kalendarz codziennie: dzień miesiąca jest dniem kalendarza (po 24. jak 24.), żeby dało się go sprawdzić przed grudniem. W grze kalendarz działa tylko 1–24.12.
+7. **Zimowe zadania (1044.4)** są w czwartej zakładce pergaminu zadań narratora, „Zimowe”, przez cały grudzień (dni zimowego Obozu). Codziennie te same trzy: 10 gałązek jodły z wypraw, karp z Rybołówstwa i dowolna potrawa z Gotowania. Każde daje 15 Punktów Czasu i złoto za 20 minut wypraw na poziomie postaci, a wszystkie trzy jednego dnia pakiet kart (skrzynia w rogu). Nie da się ich przelosować.
+   - Gałązki jodły nie są przedmiotem w plecaku, tylko licznikiem zadania: jedna gałązka co 10 minut wyprawy, bez wyprawy przegranej. Tak nie trzeba nowego materiału na Targowisku, w Skrzyni Konta i w Encyklopedii.
+   - Przed 16. poziomem Rybołówstwa (poziom karpia) liczy się dowolna ryba („Złów rybę na Wigilię”). Zadanie profesji, której postać jeszcze nie ma (Rybołówstwo i Gotowanie od 25. poziomu postaci), jest zamknięte z napisem „Od 25. poziomu postaci” i skrzynia czeka tylko na otwarte zadania.
+   - Na telefonie cztery zakładki stoją w dwóch rzędach po dwie (1047 na stronie ocen).
+
+## Wersja 0.4.8 (17.11.2026): zimowe zadania Szczodrych Godów (ukryte do 1.12)
+
+1. **Zimowe zadania (1044.4)** w nowej zakładce „Zimowe” zadań narratora, przez cały grudzień: gałązki jodły z wypraw, karp z Rybołówstwa i potrawa z Gotowania, każde za Punkty Czasu i złoto, a wszystkie trzy za pakiet kart (szczegóły wyżej, w „Szczodre Gody w grze”, pkt 7). W grze nic z tego nie widać do 1 grudnia; wersja testowa ma je codziennie.
+2. **Do oceny przed 1.12:** wygląd zakładki „Zimowe” (1047).
 
 ## Wersja 0.4.7 (17.11.2026): kalendarz Szczodrych Godów (ukryty do 1.12)
 

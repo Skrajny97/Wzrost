@@ -23,6 +23,15 @@
     "bagFull": "The bag is full. Make room in it for the potions and take the reward.",
     "changed": "The calendar changed in the meantime. Try again.",
     "tabWaiting": "Generous Feast calendar: the reward of December {day} is waiting",
-    "tabTaken": "Generous Feast calendar: the reward of December {day} is taken"
+    "tabTaken": "Generous Feast calendar: the reward of December {day} is taken",
+    "questsTab": "Winter",
+    "questFir": "Gather {count} fir branches on explorations",
+    "questFirHint": "A fir branch every {minutes} minutes of exploring.",
+    "questCarp": "Catch a carp for Christmas Eve",
+    "questFish": "Catch a fish for Christmas Eve",
+    "questDish": "Cook a dish in the System Kitchen",
+    "questLocked": "From character level {level}",
+    "questsChest": "All the day's winter quests bring a card pack.",
+    "questsNote": "Winter quests come every day in December and cannot be rerolled."
   }
 }

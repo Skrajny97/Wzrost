@@ -27430,3 +27430,34 @@ a.discord-button {
   color: var(--system-text);
   text-align: center;
 }
+
+/* Szczodre Gody's winter quests (1044.4, quests.js): two rewards, gold and
+   Punkty Czasu, one above the other; a quest of a profession not open yet
+   faded, with the level it opens at. */
+.quest-side-top:has(.quest-reward + .quest-reward) {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.quest--closed {
+  opacity: 0.6;
+}
+
+/* With the winter tab four tabs: two rows of two on a phone. */
+:root:not([data-layout='desktop']) .quests-tabs--four {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+:root:not([data-layout='desktop']) .quests-tabs--four .quests-tab + .quests-tab {
+  border-left: 0;
+}
+
+:root:not([data-layout='desktop']) .quests-tabs--four .quests-tab:nth-child(even) {
+  border-left: 1px solid #a88c5c;
+}
+
+:root:not([data-layout='desktop']) .quests-tabs--four .quests-tab:nth-child(n + 3) {
+  border-top: 1px solid #a88c5c;
+}

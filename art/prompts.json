@@ -2249,6 +2249,12 @@
         "prompt": "a small fresh fir branch with dark green needles and a little snow on it, single inventory item icon, bold clean outline",
         "width": 32,
         "height": 32
+      },
+      "camp-1-snow": {
+        "tool": "inpaint",
+        "input": "art/inputs/winter/camp-1.png",
+        "mask": "art/inputs/winter/camp-1-glade-mask.png",
+        "prompt": "top-down pixel art game map seen from above, a forest glade covered with a thick layer of fresh white snow, soft pale blue shadows and small snowdrifts, a few stones and twigs peeking out of the snow, the same pixel art style as the forest around it, seamless, no trees, no buildings, no people, no paths"
       }
     }
   }

@@ -21,6 +21,7 @@ import { requireOpen } from './mining.js';
 import { trimReports } from './reports.js';
 import { say } from '../engine/text.js';
 import { withMinigame } from './minigame.js';
+import { winterGainSql } from './winter.js';
 
 // The ingredients of `amounts` split by where they are kept: the herbs in
 // the bag, the rest (fish and crops) in the Spiżarnia.
@@ -173,6 +174,8 @@ export async function finishCooking(db, player, now, { stop = false, avatar = fa
   };
   // The dishes made and the ingredients for the rest, in the Spiżarnia.
   const pantry = addTo('pantry', { ...back.pantry, [dish.id]: made.count });
+  // Szczodre Gody's dish (winter.js, 1044.4).
+  const winterGain = winterGainSql(row, now, { dishes: made.count });
   let results;
   try {
     results = await db.batch([
@@ -183,8 +186,8 @@ export async function finishCooking(db, player, now, { stop = false, avatar = fa
         .bind(row.id, key, 'dishes', now, JSON.stringify(summary), JSON.stringify(report)),
       trimReports(db, row.id, 'dishes'),
       db
-        .prepare(`UPDATE characters SET version = version + 1${sets.sql}${herbsBack.sql}${pantry.sql} WHERE id = ? AND ${ongoing}`)
-        .bind(...sets.binds, ...herbsBack.binds, ...pantry.binds, row.id, row.id, activity.started_at),
+        .prepare(`UPDATE characters SET version = version + 1${sets.sql}${herbsBack.sql}${pantry.sql}${winterGain.sql} WHERE id = ? AND ${ongoing}`)
+        .bind(...sets.binds, ...herbsBack.binds, ...pantry.binds, ...winterGain.binds, row.id, row.id, activity.started_at),
       // The Punkty Sławy of the work (fame.js), the Awatar's a quarter.
       ...workFamePoints(db, row.id, worked, avatar, now),
       // The card the work left, a copy (cards.js).
