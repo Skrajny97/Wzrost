@@ -27491,3 +27491,16 @@ a.discord-button {
 :root:not([data-layout='desktop']) .quests-tabs--four .quests-tab:nth-child(n + 3) {
   border-top: 1px solid #a88c5c;
 }
+
+/* Szczodre Gody's falling snow (snowfall.js, 1065): over the whole game,
+   under the messages, the narrator and the windows, and every tap passes
+   through it. */
+.snowfall {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 45;
+  image-rendering: pixelated;
+}
