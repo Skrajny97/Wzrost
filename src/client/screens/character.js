@@ -47,10 +47,11 @@ const VERDICTS = {
 
 // The attributes the verdict counts, as "Rozdaj według klasy" spreads the
 // points (the class's path, the main one first; a player's note, the author
-// 12.11.2026: "celna uwaga"), for the note under the card's verdict.
+// 12.11.2026: "celna uwaga"), for the note under the card's verdict: its
+// evolution's (statPath), else its class's.
 function pathNames() {
   const cls = state.content.classes.find((one) => one.id === state.character.classId);
-  const names = (cls?.path ?? []).map((id) => state.content.stats.find((stat) => stat.id === id)?.name).filter(Boolean);
+  const names = (state.character.statPath ?? cls?.path ?? []).map((id) => state.content.stats.find((stat) => stat.id === id)?.name).filter(Boolean);
   return names.length > 0 ? names.join(', ') : null;
 }
 
