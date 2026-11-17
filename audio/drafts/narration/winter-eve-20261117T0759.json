@@ -1,0 +1,17 @@
+{
+  "id": "winter-eve",
+  "payload": {
+    "text": "Wigilia. Ostatnie okienko kalendarza kryje zimowy zestaw: ramkę Szron, tło Szczodrych Godów i aurę Śnieżycy. Szczodrych Godów! [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/winter-eve-20261117T0759-0.mp3",
+    "audio/drafts/narration/winter-eve-20261117T0759-1.mp3"
+  ],
+  "credits": 270
+}

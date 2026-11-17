@@ -1,0 +1,17 @@
+{
+  "id": "winter-first-quest",
+  "payload": {
+    "text": "Pierwsze zimowe zadanie za Tobą. Puszcza pachnie jodłą i dymem z ognisk. Tak zaczynają się Gody. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/winter-first-quest-20261117T0759-0.mp3",
+    "audio/drafts/narration/winter-first-quest-20261117T0759-1.mp3"
+  ],
+  "credits": 210
+}

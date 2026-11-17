@@ -1,0 +1,17 @@
+{
+  "id": "winter-welcome",
+  "payload": {
+    "text": "Nad Puszczą zapada najdłuższa noc roku. Nadchodzą Szczodre Gody. Do Wigilii codziennie czeka na Ciebie nowe okienko kalendarza. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/winter-welcome-20261117T0759-0.mp3",
+    "audio/drafts/narration/winter-welcome-20261117T0759-1.mp3"
+  ],
+  "credits": 272
+}
