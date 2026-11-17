@@ -99,6 +99,7 @@
               "frames": { "type": "integer", "minimum": 1 },
               "fps": { "type": "number", "exclusiveMinimum": 0 },
               "seats": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/point" } },
+              "afoot": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "W jakiej skali idą piesi obok jeźdźca na tym wierzchowcu, gdy nie 0,7 (659 B): przy Kucu 0,85, bo jest dużo niższy od konia (1081 B; autor: „za duże sa niektore postaci na kucach nadal w porównaniu do towarzyszy chociażby”). Przy kilku jeźdźcach liczy się najmniejsza." },
               "reins": {
                 "type": "object",
                 "additionalProperties": false,

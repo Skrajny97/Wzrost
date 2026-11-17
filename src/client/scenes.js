@@ -93,7 +93,14 @@ export function walkScene(activity) {
   ];
   const members = party.map((character, index) => member(walk, character, index, party.length));
   stage.append(...members);
-  if (members.some((holder) => holder.querySelector('.scene-ride'))) stage.classList.add('scene-walk--riders');
+  const rides = members.flatMap((holder) => [...holder.querySelectorAll('.scene-ride')]);
+  if (rides.length > 0) {
+    stage.classList.add('scene-walk--riders');
+    // Those on foot beside the pony walk bigger than beside a horse (1081 B:
+    // walk.mounts.<id>.afoot); beside riders of both, the smallest scale.
+    const afoot = Math.min(...rides.map((element) => Number(element.dataset.afoot) || AFOOT));
+    if (afoot !== AFOOT) stage.style.setProperty('--afoot-scale', String(afoot));
+  }
   if (members.length > 1) fitLine(stage, members);
   const land = walk.lands[activity.regionId];
   if (land) stage.style.setProperty('--land', `url("/${land}")`);
@@ -303,6 +310,10 @@ function companion(figure, { walk, foot, ride: riding }, box) {
 // the mount or the look has no pictures. A mount's look from the Sklep
 // Systemu (the Tygrys szablozębny) trots in its place, by its own key in
 // walk.mounts, once that is drawn; till then the mount itself does.
+// Those on foot beside a rider: at this scale (659 B), or at the mount's
+// own `afoot` (1081 B, the pony).
+const AFOOT = 0.7;
+
 function ride(walk, character) {
   const id = mountLook(walk, character);
   const trot = id && walk.mounts?.[id];
@@ -340,6 +351,7 @@ function ride(walk, character) {
     layer,
     h('img', { src: `/${file}`, alt: '', width: box.width, height: box.height, class: 'scene-ride-rider', draggable: 'false' }),
   );
+  if (trot.afoot) element.dataset.afoot = String(trot.afoot);
   element.style.setProperty('--ride-width', `${width}px`);
   element.style.setProperty('--ride-height', `${height + top}px`);
   element.style.setProperty('--mount-height', `${height}px`);
