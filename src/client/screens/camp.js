@@ -15,7 +15,7 @@
 
 import { campIcon, goldArt, materialSprite, resourceArt } from '../art.js';
 import { spiritPart, spiritSaleSheet } from '../builder-spirit.js';
-import { BOARD_WIDTH, FORTRESS_HALVES, PLOT_HEIGHT, PLOT_WIDTH, boardArt, boardHeight, buildingTier, campPlots, cornerstoneArt, fortressHalf, plotArt, stretchY } from '../camp-art.js';
+import { BOARD_WIDTH, FORTRESS_HALVES, PLOT_HEIGHT, PLOT_WIDTH, boardArt, boardHeight, buildingTier, campPlots, cornerstoneArt, fortressHalf, plotArt, stretchY, winterArt } from '../camp-art.js';
 import { craftTableSection, materialIcon } from '../craft-table.js';
 import { fill, h, icon, setTimer } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
@@ -422,8 +422,9 @@ function mountBoard(container, backHash) {
           role: 'group',
           'aria-label': tall() === 'fortress' ? t('Plansza Warowni') : t('Plansza obozu'),
         },
-        boardArt(campOf().level, tall()),
+        boardArt(campOf().level, tall(), null, Boolean(character.winterCamp)),
         character.camp.buildings.map((building) => plot(building, running)),
+        character.winterCamp && winterArt(tall(), character.winterCamp.decorations),
         chestLink(),
         collectorLink(),
         tall() && cornerstone(),
@@ -437,8 +438,9 @@ function mountBoard(container, backHash) {
         h(
           'div',
           { class: `camp-board camp-board--${dayPart()} camp-board--part`, style: { aspectRatio: `${BOARD_WIDTH} / ${range[1] - range[0]}` } },
-          boardArt(campOf().level, tall(), range),
+          boardArt(campOf().level, tall(), range, Boolean(character.winterCamp)),
           character.camp.buildings.filter((building) => fortressHalf(spotOf(building.id).y) === index).map((building) => plot(building, running, range)),
+          character.winterCamp && winterArt(tall(), character.winterCamp.decorations, range),
           index === fortressHalf(FORTRESS_CHEST_SPOT.y) && [chestLink(range), collectorLink(range)],
           index === fortressHalf(CORNERSTONE_SPOT.y) && cornerstone(range),
           index === 0 && campLevelButton(running),
