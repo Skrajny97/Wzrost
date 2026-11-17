@@ -2330,6 +2330,20 @@
         "tool": "pro",
         "transparent": false
       },
+      "andrzejki-wax": {
+        "prompt": "St Andrew's Eve fortune telling in a Slavic forest cottage at night: a wooden bowl of cold water on a rough table, a lit tallow candle beside it, an old iron key held over the bowl with hot wax dripping through the key's hole into the water and setting into a strange twisted shape, the candle casting the wax shape's big shadow on the log wall behind, warm candle light, dark blue night outside a small window, pixel art scene",
+        "width": 128,
+        "height": 96,
+        "tool": "pro",
+        "transparent": false
+      },
+      "andrzejki-cups": {
+        "prompt": "St Andrew's Eve fortune telling in a Slavic forest cottage at night: three overturned clay cups standing in a row on a rough wooden table, the middle cup lifted showing a small golden ring under it, a lit tallow candle beside them, warm candle light, a log wall behind, dark blue night outside a small window, pixel art scene",
+        "width": 128,
+        "height": 96,
+        "tool": "pro",
+        "transparent": false
+      },
       "galazka": {
         "prompt": "a small fresh fir branch with dark green needles and a little snow on it, single inventory item icon, bold clean outline",
         "width": 32,
