@@ -1,0 +1,14 @@
+{
+  "id": "tall-camp-3-2-snow",
+  "tool": "pixellab inpaint-v3",
+  "description": "top-down pixel art game map seen from above, a meadow inside a wooden palisade covered with a thick layer of fresh white snow, soft pale blue shadows and small snowdrifts, a few stones and twigs peeking out of the snow, the same pixel art style as the surroundings, seamless, no trees, no buildings, no people, no paths",
+  "style": "src/client/art/camp/campfire-1.png",
+  "input": "art/inputs/winter/tall-camp-3-2.png",
+  "mask": "art/inputs/winter/tall-camp-3-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.15
+  },
+  "images": 1
+}
