@@ -1,0 +1,14 @@
+{
+  "id": "camp-3-1-front-snow",
+  "tool": "pixellab inpaint-v3",
+  "description": "top-down pixel art game map seen from above, a snow-covered fir tree and a large frosted bush standing in front of the bottom of a wooden palisade, their snowy crowns reaching up over the lower part of the palisade and covering it, thick white snow and pale blue hoarfrost, the same pixel art style as the snowy forest around it, seamless, no people, no buildings",
+  "style": "src/client/art/camp/campfire-1.png",
+  "input": "art/inputs/winter/camp-3-1-front.png",
+  "mask": "art/inputs/winter/camp-3-1-front-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.15
+  },
+  "images": 1
+}
