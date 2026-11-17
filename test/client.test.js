@@ -229,6 +229,8 @@ test('every sprite on the list has its file at its size, and every class has its
     ],
     // The Sklep Systemu's frames and backgrounds.
     cosmetics: data('cosmetics').items.filter((item) => item.kind !== 'mountSkin').map((item) => item.art),
+    // The winter camp's decorations from the calendar of Szczodre Gody (1044).
+    winter: Object.values(data('winter').decorations).map((decoration) => decoration.art),
     riders: [...data('classes'), ...data('evolutions').evolutions, ...outfits].flatMap((owner) => looks.map((look) => `${owner.id}-${look}`)),
     // The fights' boards of the places (790 B) and of the lands (802).
     boards: [...data('settlement').places.flatMap((place) => place.fightBoard ?? []), ...data('regions').flatMap((region) => region.fightBoard ?? [])],
