@@ -1,0 +1,23 @@
+{
+  "id": "winter-cleric-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "young woman cleric in a winter outfit for the old Slavic midwinter feast, calm, a long dark brown braid, standing in the middle of the image, full body figure from the top of the head to the feet, empty space above the head and below the feet, a long cream sheepskin coat down to the ankles with golden and red folk embroidery, a round white fur hat, a golden wool scarf, holding a staff topped with a small golden sun wreathed in fir branches, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/winter-cleric-male.png",
+      "usage": "the same cream winter coat, golden embroidery, fur hat, golden scarf, sun staff, body proportions and pixel art style as this character"
+    },
+    {
+      "path": "src/client/art/portraits/cleric-female.png",
+      "usage": "the same face and dark brown braid as this character"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0805660871664683
+  },
+  "images": 4
+}

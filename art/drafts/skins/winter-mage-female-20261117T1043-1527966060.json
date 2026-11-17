@@ -1,0 +1,23 @@
+{
+  "id": "winter-mage-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "young woman mage in a winter outfit for the old Slavic midwinter feast, slender, long brown hair falling from under the hat, standing in the middle of the image, full body figure from the top of the head to the feet, empty space above the head and below the feet, a long white sheepskin coat down to the ankles with silver and pale blue folk embroidery of snowflakes, a white fur hat with ear flaps, a pale blue wool scarf, white fur-topped boots, holding a wooden staff topped with a glowing ice crystal, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/winter-mage-male.png",
+      "usage": "the same white winter coat, snowflake embroidery, fur hat, scarf, ice staff, body proportions and pixel art style as this character"
+    },
+    {
+      "path": "src/client/art/portraits/mage-female.png",
+      "usage": "the same face and long brown hair as this character"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08056561562750075
+  },
+  "images": 4
+}
