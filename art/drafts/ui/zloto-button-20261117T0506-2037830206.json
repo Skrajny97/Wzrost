@@ -1,0 +1,14 @@
+{
+  "id": "zloto-button",
+  "tool": "pixellab generate-image-v2",
+  "description": "an empty horizontal button plate of dark bronze with a thin bright gold rim and a small gold stud at each end, seen flat from the front, pixel art user interface, the middle plain",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08094735765457153
+  },
+  "images": 4
+}
