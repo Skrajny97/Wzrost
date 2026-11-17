@@ -3648,7 +3648,7 @@ Autor: „Niech zaklinanie żywiołu będzie możliwe nie tylko zależnie od kon
 
 ## Drugi Awatar Systemu (1066, 17.11.2026)
 
-Autor: „A czy jest szansa by można było mieć dwa Awatary Systemu przy czym drugi bardzo drogi - za 200000 złota?”. Po odpowiedzi: robimy (1066). Makiety 1070.1 (karta zakupu), 1070.2 (dwie karty i kafelek) i 1070.4 (trzech wykonawców) przyjęte. Pasek na górze 1070.3 w wersji 3 czeka na autora. Autor: „paski mają się rozwijać po kliknięciu przy dwóch Awatarach jak zakładki”.
+Autor: „A czy jest szansa by można było mieć dwa Awatary Systemu przy czym drugi bardzo drogi - za 200000 złota?”. Po odpowiedzi: robimy (1066). Makiety 1070.1 (karta zakupu), 1070.2 (dwie karty i kafelek), 1070.3 w wersji 3 (pasek na górze; autor: „paski mają się rozwijać po kliknięciu przy dwóch Awatarach jak zakładki”, potem „1070.3 tak”) i 1070.4 (trzech wykonawców) przyjęte.
 
 1. **Zakup.** „Drugi Awatar Systemu” kosztuje 200 000 złota, jednorazowo i na zawsze (`second` w `avatar` w `data/professions.json`). Karta zakupu stoi pod kartą pierwszego Awatara, dopiero gdy pierwszy jest kupiony, a serwer bez pierwszego odmawia: „Najpierw kup pierwszego Awatara Systemu.”.
 2. **Praca.** Drugi Awatar pracuje jak pierwszy, w tym samym czasie co postać i pierwszy Awatar, w każdej z 8 profesji, za ten sam udział: cały postęp profesji i ćwierć XP postaci. Jego praca leży w osobnej tabeli `avatar2_activities` (migracja 0155). Żądania nazywają go `avatar: 2`: start pracy, odbiór, odwołanie, minigra, a Punkty Czasu `target: avatar2` (`workTable`, `avatarWorkOf`, `avatarAsked` w `src/server/characters.js`). Raport ma `avatar: 2`, a w raporcie stoi „Wykonawca: Drugi Awatar Systemu”. Powiadomienie o końcu pracy ma własny tytuł: „Praca Drugiego Awatara Systemu zakończona”.
@@ -3663,6 +3663,11 @@ Autor: „jeden sznur wodzy na reniferze wisi w powietrzu”. Wcześniej: „te 
 1. **Co wisiało.** Zimowemu Łucznikowi górny z dwóch pasków w pięści kończył się 3 piksele nad wodzami renifera. Wodze renifera zatrzymywały się 3 piksele przed dłonią zimowej Łuczniczki. Tak samo wisiały w powietrzu własne wodze 27 zwykłych jeźdźców (m.in. Święty, Prorok, Pan Zimy, Mistrz Łuku, Skrytobójca, Arcykapłan). Ich paski są rysowane pod konie, a szyja renifera jest niżej i dalej z przodu.
 2. **Zimowi łucznicy.** Górny pasek Łucznika schodzi trzema pikselami na wodze. Łuczniczka trzyma dwa paski jak reszta zimowych jeźdźców (obiecane przy 1071), oba kończą się na wodzach renifera. Ich odcienie skóry zrobione od nowa.
 3. **Brakujący szczegół: wodze jako warstwa, nie część renifera.** Wodze renifera nie są już narysowane na jego arkuszu kłusa, tylko są osobną warstwą nad kłusem i pod jeźdźcem (`reins` w `walk.mounts.reindeer` w `data/animations.json`, `tools/reindeer-reins.py`, `ride` w `src/client/scenes.js`). Większość jeźdźców ma te same wodze co w 0.4.19, piksel w piksel. Każdy z 27 jeźdźców z własnymi wodzami ma swój obrazek: pasek od wędzidła do końca każdego z jego pasków, w ich kolorze (u Pani Zimy jasnoniebieski), w każdej klatce tam, gdzie jeździec akurat siedzi. Nowy jeździec z własnymi wodzami dostaje końce swoich pasków w `reins.riders`, a narzędzie rysuje jego warstwę. W Stajni i Sklepie renifer zostaje bez wodzy, bo nikt na nim nie siedzi.
+
+## Wersja 0.4.21 (17.11.2026): drugi Awatar Systemu, zimowy Mag i Magini w siodle
+
+1. **Drugi Awatar Systemu** (1066, wyżej): kupiony po pierwszym za 200 000 złota, pracuje obok postaci i pierwszego Awatara; przy dwóch Awatarach w pracy pasek „AWATARY” rozwija zakładki (1070.3).
+2. **Zimowy Mag i zimowa Magini w siodle** (1073: 1 i 1075: 2, jazdy przyjęte): w grze z ośmioma odcieniami skóry, a oba paski ich wodzy łączą się z wodzami renifera. PixelLab za pierwszym razem odrzucił opis Magini jako niezgodny z jego zasadami. Po zmianie kilku słów („on horseback” zamiast „riding”, „upper leg” zamiast „thigh”) narysował ją bez kosztu odrzuconej próby. Zimowych strojów dalej nie ma w sklepie: czekają na Kleryka i Cienia.
 
 ## Wersja 0.4.20 (17.11.2026): wodze renifera sięgają do dłoni każdego jeźdźca
 

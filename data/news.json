@@ -1295,6 +1295,11 @@
       "id": "0.4.20",
       "title": "Wersja 0.4.20",
       "body": "- Na reniferze wodze sięgają od pyska do dłoni każdego jeźdźca. Jeźdźcy z własnymi wodzami w dłoni, na przykład Święty, Prorokini czy Pani Zimy, mają je połączone z wodzami renifera, a nie urwane w powietrzu."
+    },
+    {
+      "id": "0.4.21",
+      "title": "Wersja 0.4.21",
+      "body": "- Drugi Awatar Systemu: gdy masz już Awatara, w zakładce Profesje kupisz drugiego za 200 000 złota. Pracuje w tym samym czasie co postać i pierwszy Awatar, tak samo wydajnie i za tyle samo. Przy starcie pracy wybierasz: Postać, Awatar albo Drugi Awatar.\n- Gdy pracują oba Awatary, na górze jest jeden pasek „AWATARY”. Stuknij go, a rozwiną się zakładki obu z czasem do końca pracy."
     }
   ]
 }

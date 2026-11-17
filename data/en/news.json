@@ -1032,6 +1032,10 @@
     "0.4.20": {
       "title": "Version 0.4.20",
       "body": "- On the reindeer the reins run from the mouth to every rider’s hands. Riders who hold reins of their own, such as the Saint, the Prophetess or the Winter Lady, have them joined to the reindeer’s, no longer cut off in the air."
+    },
+    "0.4.21": {
+      "title": "Version 0.4.21",
+      "body": "- Second System Avatar: once you have the Avatar, the Professions tab lets you buy a second one for 200,000 gold. It works at the same time as your character and the first Avatar, just as efficiently and for the same rewards. When you start a job, choose Character, Avatar or Second Avatar.\n- When both Avatars are working, the top bar shows one “AVATARS” strip. Tap it to unfold a tab for each with the time left."
     }
   }
 }
