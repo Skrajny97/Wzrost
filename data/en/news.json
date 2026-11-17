@@ -1000,6 +1000,10 @@
     "0.4.10": {
       "title": "Version 0.4.10",
       "body": "- Skills now cost half their old mana and 3% of your max mana, but never less than before. With a big mana pool skills are no longer almost free. The Skills tab shows what each skill costs your character."
+    },
+    "0.4.11": {
+      "title": "Version 0.4.11",
+      "body": "- The System Portals now go up to stage 500 instead of 100. As before, you fight for stages up to your character's level, and the higher the stage, the bigger the loot."
     }
   }
 }

@@ -12,7 +12,7 @@
       "required": ["perDay"],
       "properties": { "perDay": { "type": "integer", "minimum": 1, "description": "Czyszczenia dziennie w każdym portalu." } }
     },
-    "maxStage": { "type": "integer", "minimum": 1, "description": "Najwyższy stopień portali (autor: na start 100)." },
+    "maxStage": { "type": "integer", "minimum": 1, "description": "Najwyższy stopień portali: najwyższy poziom postaci z balance.json (progression.maxLevel). Na start 100, od 17.11.2026 500 (autor: „Portale trzeba zwiększyć tak daleko jak to możliwe”)." },
     "strength": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number", "minimum": 1 }, "description": "[obrażenia, HP] stworów razy tyle co w Eksploracji." },
     "lootMinutes": { "type": "number", "exclusiveMinimum": 0, "description": "Łup wygranej i czyszczenia: tyle, ile średnio daje tyle minut wyprawy na poziomie stopnia." },
     "firstWinMultiplier": { "type": "number", "minimum": 1 },

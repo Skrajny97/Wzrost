@@ -13,7 +13,9 @@
 // exploration's ("Walka jedna ale z trudniejszymi stworami niż w
 // Eksploracji"). The character fights for the next stage as often as it
 // likes ("nieograniczone co do ilości wejść. Ograniczeniem będzie
-// trudność"), up to its level and to maxStage ("Na start 100 poziomów"),
+// trudność"), up to its level and to maxStage ("Na start 100 poziomów";
+// since 17.11.2026 the highest level a character reaches, "Portale trzeba
+// zwiększyć tak daleko jak to możliwe"; past the last land, its last place),
 // with its companions if it takes them ("Możliwość zabrania towarzyszy,
 // ale w tym przypadku - nie drużyn"), and its first win there pays
 // firstWinMultiplier times a stage's worth; a stage won is swept, its loot

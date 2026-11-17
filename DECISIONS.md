@@ -3608,6 +3608,13 @@ Rozstrzygnięte najprostszym rozwiązaniem zgodnym z przyjętymi makietami (1044
 8. **Kwestie narratora (1044.8, nagrania 1046: kwestia 1 PL B i EN B, 2 PL A i EN A, 3 PL B i EN B, 4 PL B i EN A)** to rozdział „Szczodre Gody” po wprowadzeniu: powitanie i zimowe zadania przy pierwszym wejściu w dniach zimowych zadań, pochwała po pierwszym wykonanym zimowym zadaniu i Wigilia przy ostatnim okienku kalendarza. Każda raz na postać, więc za rok trzeba będzie ją odnowić. W „Testuj samouczki” rozdział ma swój wiersz.
 9. **Zimowy Obóz:** polana w stylu 1048 A.
 
+## Wersja 0.4.11 (17.11.2026): Portale do 500. stopnia
+
+1. **Portale do 500. stopnia.** Autor: „Portale trzeba zwiększyć tak daleko jak to możliwe”, po pytaniu gracza na czacie, czemu portal kończy się na setce. Ostatni stopień każdego portalu to teraz najwyższy poziom postaci, 500 (`maxStage` w `data/portals.json`; wcześniej 100, „Na start 100 poziomów”). Jak dotąd postać walczy najwyżej o stopień równy swojemu poziomowi.
+   - Stopnie do 275. mają stwory krainy swoich poziomów, aż po Łysogóry. Wyższe, dopóki nie przyjdą nowe krainy, mają stwory ostatniego miejsca Łysogór (Chatka Baby Jagi), zawsze na poziomie stopnia. Tak kod robił już dla stopni ponad ostatnią krainą.
+   - Łup rośnie ze stopniem jak dotąd (tyle, co 45 minut wyprawy na poziomie stopnia). Portal Złota daje 978 złota na 100. stopniu, 2026 na 200., 2789 na 275. i 5070 na 500.
+   - Trudność (`tools/difficulty-sim.mjs`): postać realistycznie wyposażona wygrywa sama stopień swojego poziomu na 100., 150., 200., 275., 350. i 500. stopniu (40 z 40 walk), a postać w słabym ekwipunku przegrywa już od 100. stopnia, tak samo jak przed zmianą. Wieże dalej dają za wygraną ponad dwa razy więcej złota niż czyszczenie portalu na tym samym poziomie; test sprawdza teraz także 150. piętro.
+
 ## Wersja 0.4.10 (17.11.2026): koszt umiejętności rośnie z maksymalną maną (1045 B)
 
 1. **Koszt many umiejętności (1045 B).** Autor: „jako Łowca mam ponad 1200 many, a umiejętności kosztują po 1%” i „mam wrażenie że w ogóle mikstur many nikt nie musi używać”; wybór 1045 B. Umiejętność kosztuje połowę swojego kosztu z danych (co najmniej 1) i 3% maksymalnej many postaci, ale nigdy mniej niż koszt z danych (`balance.skills.manaCost`, `skillMana` w `src/engine/skills.js`). Potężny cios (10 many) przy 1200 many kosztuje 41 (5 + 36), a przy 58 many dalej 10. Przywołania Arkanisty i Druida (procent many) i Tarcza many bez zmian. Tak samo płacą towarzysze, najemnicy i postacie na Arenie.

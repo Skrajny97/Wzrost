@@ -33,15 +33,31 @@ describe('the Portale Systemu', () => {
     );
   });
 
-  test('a won stage opens the next, up to the character\'s level and the last stage, 100 for a start', () => {
-    assert.equal(rules.maxStage, 100);
+  test('a won stage opens the next, up to the character\'s level and the last stage, the highest level of a character (the author: "Portale trzeba zwiększyć tak daleko jak to możliwe")', () => {
+    assert.equal(rules.maxStage, content.balance.progression.maxLevel);
+    assert.equal(rules.maxStage, 500);
     assert.equal(portalNext(0, 5, content), 1);
     assert.equal(portalNext(3, 5, content), 4);
     assert.equal(portalNext(4, 5, content), 5);
     assert.equal(portalNext(5, 5, content), null);
     assert.equal(portalNext(9, 5, content), null);
+    // Past the old last stage, 100.
     assert.equal(portalNext(99, 140, content), 100);
-    assert.equal(portalNext(100, 140, content), null);
+    assert.equal(portalNext(100, 140, content), 101);
+    assert.equal(portalNext(140, 140, content), null);
+    assert.equal(portalNext(499, 500, content), 500);
+    assert.equal(portalNext(500, 500, content), null);
+  });
+
+  test('a stage past the last land holds the creatures of its last place, at the stage\'s level, and pays more than the stage below', () => {
+    const last = content.areas.reduce((top, area) => (area.maxLevel > top.maxLevel ? area : top));
+    for (const stage of [last.maxLevel + 1, 400, rules.maxStage]) {
+      assert.equal(portalArea(stage, content).id, last.id);
+      const plan = portalStage(stage, 'far', content);
+      assert.equal(plan.level, stage);
+      plan.encounter.members.forEach((member) => assert.equal(member.level, stage));
+      assert.ok(portalAmount(portalById('gold', content), stage, false, content) > portalAmount(portalById('gold', content), stage - 1, false, content));
+    }
   });
 
   test('a stage\'s creatures are stronger than an exploration\'s of their level (the author: "z trudniejszymi stworami niż w Eksploracji")', () => {
