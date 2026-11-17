@@ -3619,6 +3619,14 @@ Rozstrzygnięte najprostszym rozwiązaniem zgodnym z przyjętymi makietami (1044
 
 Symulacje przy sprawdzaniu many (1045) pokazały, że mag na 11.–29. poziomie mdleje na wyprawach w najnowszym miejscu dużo częściej niż inne klasy. Dobrze wyposażony gracz bez towarzyszy, z samą Kulą ognia, mdleje na 15. poziomie w 73% godzinnych wypraw, na 20. w 31%, a na 25. w 13%. Inne klasy mdleją w 0%. Z Osłoną many jest lepiej od 20. poziomu. Autor odrzucił wszystkie warianty (bez zmian, Arkanowa bariera do 29. poziomu, lepsza regeneracja): „nie ulepszamy maga jest określony jako klasa z trudniejszym startem”. Mag zostaje klasą z trudniejszym startem.
 
+## Wersja 0.4.14 (17.11.2026): zimowy Obóz 8–10 i zimowa Warownia (ukryte do 1.12)
+
+1. **Zimowy Obóz 8–10 i Warownia z drzewami przed płotem i murem (1057.3 v2 i 1057.4 v2, przyjęte).** Autor przy pierwszych wersjach: „uciete drzewa, ktore powinny nachodzić na płot” i „uciete drzewa, które powiny nachodzić na mury, do poprawy”, a przy poprawkach „ucięte, niech przysłania cały płot” i „to samo”.
+   - PixelLab domalował drzewa w stożkach i kopułach sięgających ponad płot i mur (maski w `art/inputs/winter/`), więc korony nie kończą się już równo na płocie ani na murze. Choinka przed płotem Obozu zasłania go na całej wysokości, a czubek wystaje ponad płot.
+   - Ścieżki pod bramami są z ubitego śniegu, bez pomarańczowych resztek piasku.
+   - W grze: `src/client/art/board-winter/camp-3.png`, `board-tall-winter/camp-3.png` i `board-fortress-winter/fortress.png`. Jak cały zimowy Obóz, plansze widać dopiero od 1 grudnia.
+2. **Zimowe stroje: portrety w grze, bez sprzedaży.** Dziesięć zimowych portretów (`skin-winter-<klasa>-<płeć>` w `src/client/art/portraits/`) ma już osiem odcieni skóry. Maski skóry (`tools/evolution-tones.json`, piksel po pikselu) obejmują twarz, uszy i gołe dłonie, bez brwi, wąsów i pasm włosów. Sprawdzone w odcieniu szarym, ciemnym i bladym. Strojów nie ma jeszcze w sklepie: czekają na jeźdźców i odcienie chodów (zasada z CLAUDE.md o pełnej grafice).
+
 ## Wersja 0.4.13 (17.11.2026): zadanie dnia na zlecenia i podpowiedzi według ewolucji
 
 1. **Zadanie dnia „Wykonaj zlecenia w Osadzie” tylko na zlecenia, które czekają.** Autor: „Dalej po przelosowaniu zadań potrafi dać "Wykonaj 2 zlecenia w Osadzie"”.
