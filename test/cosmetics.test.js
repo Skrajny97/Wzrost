@@ -63,6 +63,17 @@ describe('the Sklep Systemu in the engine', () => {
     assert.equal(cosmeticBlock('frame-szron', {}, { systemPoints: 5000, mount: null }, content).code, 'event_only');
   });
 
+  test('a season\u2019s cosmetic is sold only in its season, the winter one in December (1049 A)', () => {
+    const seasonal = { ...item('frame-gold'), id: 'frame-season', season: 'winter' };
+    const withSeason = { ...content, cosmeticsById: { ...content.cosmeticsById, [seasonal.id]: seasonal } };
+    const rich = { systemPoints: 5000, mount: null };
+    assert.deepEqual(cosmeticBlock('frame-season', {}, rich, withSeason), { code: 'out_of_season', message: 'Ten przedmiot jest w sprzedaży tylko w grudniu.' });
+    assert.equal(cosmeticBlock('frame-season', {}, { ...rich, season: null }, withSeason).code, 'out_of_season');
+    assert.equal(cosmeticBlock('frame-season', {}, { ...rich, season: 'winter' }, withSeason), null);
+    assert.equal(cosmeticBlock('frame-season', { owned: ['frame-season'] }, rich, withSeason).code, 'owned');
+    assert.equal(cosmeticBlock('frame-gold', {}, { ...rich, season: 'winter' }, withSeason), null);
+  });
+
   test('the stored state holds only what the data has, owned once, worn only when owned and of its kind', () => {
     assert.deepEqual(cosmeticsOf(null, content), { owned: [], frame: null, background: null, mountSkin: null, aura: null, trail: null, pet: null, outfit: null, nameFromFrame: false });
     assert.deepEqual(cosmeticsOf({}, content), cosmeticsOf(null, content));

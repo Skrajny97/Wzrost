@@ -13,6 +13,7 @@ import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
+import { winterQuestsKey } from './winter.js';
 
 const STATUS = { invalid_cosmetic: 400, invalid_kind: 400, not_owned: 403 };
 
@@ -74,7 +75,9 @@ export async function buyCosmetic(context) {
   const body = await readJson(context.request);
   const stored = cosmeticsOfRow(row);
   const mount = settlementOn() ? mountView(JSON.parse(row.settlement ?? '{}'), content()) : null;
-  const block = cosmeticBlock(body.id, stored, { systemPoints: row.system_points, mount, classId: row.class_id }, content());
+  // A season's cosmetic only in its season: the winter one in December, as the winter camp.
+  const season = winterQuestsKey(context.now) ? 'winter' : null;
+  const block = cosmeticBlock(body.id, stored, { systemPoints: row.system_points, mount, classId: row.class_id, season }, content());
   if (block) throw refuse(block);
   const item = content().cosmeticsById[body.id];
   const after = await save(context, session, row, { ...stored, owned: [...stored.owned, item.id] }, item.price);
