@@ -3675,6 +3675,7 @@ Autor 17.11.2026: „I skąd wiedzieć na co jest podatny stwór?”, potem „1
 ## Wersja 0.4.23 (17.11.2026): słabe punkty i odporności stworów w Bestiariuszu
 
 1. **Bestiariusz** (1074 A, wyżej): przy poznanych stworach słaby punkt i odporności, z procentem na poziomie postaci.
+2. **Zimowy Cień w siodle** (1078: 1): w plikach gry, z ośmioma odcieniami skóry i wodzami renifera. PixelLab za pierwszym razem narysował go z szalem pod brodą, a za drugim stojącego. Dopiero trzecia czwórka, z szalem na twarzy jak na portrecie, siedziała dobrze. Zimowych strojów dalej nie ma w sklepie: czekają na zimową Cień.
 
 ## Wersja 0.4.22 (17.11.2026): kod DISCORD100 dla zwycięzcy losowania, zimowa Kleryczka w siodle
 
