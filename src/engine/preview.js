@@ -6,7 +6,7 @@
 import { playerCombatant } from './combatant.js';
 import { coreEffects } from './core.js';
 import { evolutionOf } from './evolutions.js';
-import { autoPointsOf, gearKey } from './gear.js';
+import { gearKey, statWeightsOf } from './gear.js';
 import { cappedChance, reduction } from './formulas.js';
 import { upgradedItem } from './items.js';
 import { regenPerMinute } from './progression.js';
@@ -83,7 +83,7 @@ export function extraValues(character, equipped, content, { rest = 0 } = {}) {
   // The Rdzeń's shares in them (core.js, as combatant.js takes them), so the
   // window's sources add up to its totals (the author, 16.11.2026:
   // „statystyki z rdzenia nie sumują się w parametrach dodatkowych postaci”).
-  const core = character.core ? coreEffects(character.core, character.classId, content) : null;
+  const core = character.core ? coreEffects(character.core, gearKey(character.classId, character.evolution, content), content) : null;
   /**
    * @param {number} rating
    * @param {number} cap
@@ -201,14 +201,16 @@ export function valueChanges(now, after) {
 // average of their main attributes and an attribute the class puts no
 // points into (the Mądrość of a Wojownik) counts for nothing. Damage, armor
 // and resistances count by the combat values they change, the attributes
-// left out of those (bareItem).
+// left out of those (bareItem). A stat the class's evolution counts as
+// another (`as`) weighs as that one (statWeightsOf): the Nekromanta's
+// Zręczność as its Intelekt.
 
 /**
  * @param {string} classId
  * @param {Content} content
  * @returns {Record<string, number>}
  */
-const pathWeights = (classId, content) => autoPointsOf(classId, content);
+const pathWeights = (classId, content) => statWeightsOf(classId, content);
 
 // An item for the verdict: its numbers final (its upgrade and gem in them),
 // without its attributes, and with `pathScore`, their sum weighted by the

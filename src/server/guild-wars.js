@@ -29,6 +29,7 @@
 import {
   classNameOf,
   countedForm,
+  gearKey,
   leaguePrizes,
   leagueSchedule,
   leagueTable,
@@ -350,7 +351,10 @@ async function leagueFighters(db, weekKey, guildId) {
     .all();
   const latest = new Map();
   for (const row of results) {
-    for (const one of JSON.parse(row.fighters)[row.side]) if (one.id !== null) latest.set(one.id, { classId: one.classId, level: one.level, classLevel: one.classLevel });
+    // Its items for its evolution's weapons and armour (gearKey), as every
+    // other loot of the game draws them: a Nekromanta's kostury, not a Cień's
+    // sztylety.
+    for (const one of JSON.parse(row.fighters)[row.side]) if (one.id !== null) latest.set(one.id, { classId: gearKey(one.classId, one.evolution ?? null, content()), level: one.level, classLevel: one.classLevel });
   }
   return [...latest.values()];
 }

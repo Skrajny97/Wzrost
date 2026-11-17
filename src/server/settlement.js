@@ -43,6 +43,8 @@ import {
   evolutionChanges,
   evolutionName,
   evolvedSkills,
+  gearKey,
+  statWeightsOf,
   goodStock,
   herbalistPremium,
   herbalistRecipes,
@@ -361,7 +363,7 @@ export function settlementView(player, stored, board, now) {
       refillMinutes: content().settlement.orders.refillMinutes,
     },
     reforge: {
-      items: player.items.filter((item) => item.affixes?.length > 0).map((item) => reforgeView(item, stocks.materials, player.row.class_id)),
+      items: player.items.filter((item) => item.affixes?.length > 0).map((item) => reforgeView(item, stocks.materials, gearKey(player.row.class_id, player.row.evolution, content()))),
       choices: choicesOf(stored),
       pending: pendingView(pendingOf(stored, player.items)),
     },
@@ -833,8 +835,9 @@ function bondView(companion, now) {
 // An item the Zaklinaczka can reforge: its affixes as the item card shows
 // them (with the Kowadło's upgrade) and the price, with the pieces of the
 // materials' rarity the character holds in all and those it would take
-// (rarityNeedView), and which affixes matter to its class.
-function reforgeView(item, materials, classId) {
+// (rarityNeedView), and which affixes matter to its class and evolution
+// (`key`, gearKey).
+function reforgeView(item, materials, key) {
   const shown = upgradedItem(item, content());
   const cost = reforgeCost(item, item.reforged ?? 0, content());
   const need = cost.materials;
@@ -844,20 +847,25 @@ function reforgeView(item, materials, classId) {
     rarity: item.rarity,
     equipped: Boolean(item.equippedSlot),
     affixes: shown.affixes.map((affix) => `${propertyName(affix.stat, content())}: +${affix.value}`),
-    hints: affixHints(shown.affixes, classId),
+    hints: affixHints(shown.affixes, key),
     gold: cost.gold,
     materials: need && { ...rarityNeedView(materials, need, content()), rarityName: content().raritiesById[need.rarity].name },
   };
 }
 
 // Which of an item's affixes matter to a class and which is worth
-// reforging (the author: 319 A), by the class's spread of points
-// (autoPoints): a stat it puts much into is important; of the stats, the one
-// it puts least into, the smallest of them on a tie, is worth reforging
-// unless it is important too. Armor and resistances help every class and are
-// neither.
-function affixHints(affixes, classId) {
-  const weights = content().classesById[classId]?.autoPoints ?? {};
+// reforging (the author: 319 A), by the spread of points of the class's
+// evolution, a stat it counts as another weighed as that one (statWeightsOf:
+// the Nekromanta's Zręczność as its Intelekt): a stat it puts much
+// into is important; of the stats, the one it puts least into, the smallest
+// of them on a tie, is worth reforging unless it is important too. Armor and
+// resistances help every class and are neither. The author, 17.11.2026, of a
+// Nekromanta told to reforge Intelekt: „nie zmieniłeś u zaklinaczki warto
+// zakląć, to sie pokazuje nekromancie, a nie powinno i tym wielu innym
+// klasom które miały rework statystyk” and „Zręczność liczy jako Intelekt
+// przecież”.
+export function affixHints(affixes, key) {
+  const weights = statWeightsOf(key, content());
   const top = Math.max(0, ...Object.values(weights));
   const weightOf = (affix) => (content().statIds.includes(affix.stat) ? (weights[affix.stat] ?? 0) : null);
   const stats = affixes.map((affix, index) => ({ index, weight: weightOf(affix), value: affix.value })).filter((one) => one.weight !== null);

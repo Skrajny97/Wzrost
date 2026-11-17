@@ -131,6 +131,23 @@ export const weaponScalingOf = (key, content) => fieldOf(key, 'scaling', content
  */
 export const statAsOf = (key, content) => fieldOf(key, 'as', content) ?? {};
 
+// A gear key's spread of points (autoPointsOf) with each stat it counts as
+// another (`as`) weighed as that one: every point of the Nekromanta's
+// Zręczność is one of its Intelekt, so an item's or an affix's Zręczność is
+// worth as much to it as Intelekt (the author, 17.11.2026, of the
+// Zaklinaczka's hints: „Zręczność liczy jako Intelekt przecież”).
+/**
+ * @param {string} key
+ * @param {Content} content
+ * @returns {Record<string, number>}
+ */
+export function statWeightsOf(key, content) {
+  /** @type {Record<string, number>} */
+  const weights = { ...autoPointsOf(key, content) };
+  for (const [from, to] of Object.entries(statAsOf(key, content))) weights[from] = Math.max(weights[from] ?? 0, weights[to] ?? 0);
+  return weights;
+}
+
 // The element a gear key's weapons hit in when they have none of their own
 // (gear.element: the Wielki Inkwizytor's swords and axes hit with Sakrum,
 // as its kropidła did, for its Żarliwość), or null.

@@ -72,7 +72,7 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
   const perClassLevel = perClassLevelOf(character, content);
   // The Rdzeń's Artefakty (core.js): the character's own, never a
   // companion's (a companion's character has no core).
-  const core = character.core ? coreEffects(character.core, character.classId, content) : null;
+  const core = character.core ? coreEffects(character.core, key, content) : null;
   const hpBase = maxHp(totals.vitality, character.classLevel, perClassLevel, balance);
   const hpMax = core?.hp ? Math.round(hpBase * (1 + core.hp)) : hpBase;
   // The evolution's trait (evolutions.js) works in fights (combat.js); some

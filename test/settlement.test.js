@@ -24,6 +24,8 @@ import {
   currentQuests,
   emptyBoard,
   ordersBefore,
+  ordersReady,
+  rerolledQuest,
   rerolledQuests,
   evolutionChangeCost,
   evolutionChangePrice,
@@ -1070,5 +1072,50 @@ describe('the Osada in the narrator\'s quests', () => {
       const rerolled = rerolledQuests(drawn, 'daily', draw(0, `r:${i}`), NOW, content);
       assert.ok(!rerolled.daily.quests.some((quest) => quest.kind === 'orders'));
     }
+  });
+
+  // The author, 17.11.2026: „Dalej po przelosowaniu zadań potrafi dać
+  // "Wykonaj 2 zlecenia w Osadzie"”: the board emptied in the morning gives
+  // new orders only in the evening, and the week's big order is big.
+  test('a day\'s orders quest is drawn, or drawn anew, only for orders waiting on the board now; one drawn already stays', () => {
+    const { open } = content.settlement.orders;
+    const day = questPeriod('daily', NOW, content);
+    const week = questPeriod('weekly', NOW, content);
+    const notDelivered = { period: week.key, done: false, order: { id: 'weekly' } };
+    // Waiting now: a slot's order and a slot whose moment has come; not one
+    // that comes in an hour, nor the week's order.
+    const board = { ...emptyBoard(), slots: [{ order: { id: 1 } }, { readyAt: NOW - HOUR }, { readyAt: NOW + HOUR }], weekly: notDelivered };
+    assert.equal(ordersReady(board, NOW, content), 2);
+    assert.equal(ordersReady(null, NOW, content), open);
+    const evening = { ...emptyBoard(), slots: Array.from({ length: open }, () => ({ readyAt: NOW + 8 * HOUR })), weekly: notDelivered };
+    assert.equal(ordersReady(evening, NOW, content), 0);
+    assert.ok(ordersBefore(evening, day.endsAt, NOW, content) >= 2);
+
+    const draw = (ready, seed) => ({ character, hasTable: true, hasProfessions: true, hasSettlement: true, ordersLeft: { daily: 6, weekly: 50, monthly: 200 }, ordersReady: ready, seed });
+    const kinds = (ready, periodId) => new Set(Array.from({ length: 300 }, (_, i) => drawQuests(periodId, draw(ready, `o:${i}`), content)).flat().map((quest) => quest.kind));
+    assert.ok(!kinds(0, 'daily').has('orders'));
+    assert.ok(!kinds(1, 'daily').has('orders'));
+    assert.ok(kinds(2, 'daily').has('orders'));
+    // A week's and a month's quests count the orders still to come.
+    assert.ok(kinds(0, 'weekly').has('orders'));
+    assert.ok(kinds(0, 'monthly').has('orders'));
+
+    // One quest drawn anew, and all of them at once, with no orders waiting.
+    for (let i = 0; i < 60; i += 1) {
+      const drawn = { daily: { period: day.key, quests: drawQuests('daily', draw(6, `p:${i}`), content), chest: false } };
+      for (let index = 0; index < drawn.daily.quests.length; index += 1) {
+        const one = rerolledQuest(drawn, 'daily', index, draw(0, `p:${i}`), NOW, content);
+        if (one) assert.notEqual(one.daily.quests[index].kind, 'orders');
+      }
+      const all = rerolledQuests(drawn, 'daily', draw(1, `p:${i}`), NOW, content);
+      assert.ok(!all.daily.quests.some((quest) => quest.kind === 'orders' && quest.progress === 0 && !drawn.daily.quests.some((first) => first === quest)));
+    }
+
+    // "Wykonaj 2 zlecenia" drawn while orders waited, with one handed in and
+    // the board empty till the evening: it stays, for the board can still
+    // give the other one before midnight.
+    const reward = { kind: 'gold', amount: 10 };
+    const kept = currentQuests({ daily: { period: day.key, quests: [{ kind: 'orders', count: 2, progress: 1, reward, claimed: false }], chest: false } }, draw(0, 'k'), NOW, content);
+    assert.deepEqual(kept.daily.quests[0], { kind: 'orders', count: 2, progress: 1, reward, claimed: false });
   });
 });

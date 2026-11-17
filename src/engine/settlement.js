@@ -439,6 +439,28 @@ export function ordersBefore(stored, end, now, content) {
   return count;
 }
 
+// How many orders wait on the board at `now`: a slot's order, or the one
+// whose moment has come (settleBoard puts it there at the next look). A
+// day's quest asks only for orders waiting already, not for those that
+// come later in the day or the week's big order (questOptions in
+// quests.js).
+/**
+ * @param {Record<string, any> | null | undefined} stored
+ * @param {number} now
+ * @param {Content} content
+ * @returns {number}
+ */
+export function ordersReady(stored, now, content) {
+  /** @type {Record<string, any>} */
+  const board = { ...emptyBoard(), ...stored };
+  let count = 0;
+  for (let index = 0; index < content.settlement.orders.open; index += 1) {
+    const slot = board.slots[index] ?? { readyAt: now };
+    if (slot.order || (slot.readyAt ?? now) <= now) count += 1;
+  }
+  return count;
+}
+
 // The board at `now`: each slot without an order gets one once its moment
 // has come, and an order left for expireDays after it came goes, with a
 // new one in its place at once (question 93: "B, ale terminy tygodniowe").

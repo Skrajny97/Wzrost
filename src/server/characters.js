@@ -77,6 +77,8 @@ import {
   production,
   professionOpen,
   ordersBefore,
+  ordersReady,
+  statWeightsOf,
   QUEST_PERIODS,
   questPeriod,
   samePeriod,
@@ -761,8 +763,9 @@ export function questContext(player, now) {
     openProfessions: hasProfessions ? content().professions.filter((profession) => professionOpen(profession, player.row.level, content())).map((profession) => profession.id) : [],
     hasSettlement: settlementOpen(player.row),
     // How many orders the Osada's board can still give before each period
-    // ends: no quest asks for more (quests.js, questOptions).
-    ...(settlementOpen(player.row) && { ordersLeft: ordersLeft(player.row, now) }),
+    // ends: no quest asks for more (quests.js, questOptions); and how many
+    // wait on it now: a day's quest is drawn only for those.
+    ...(settlementOpen(player.row) && { ordersLeft: ordersLeft(player.row, now), ordersReady: ordersReady(JSON.parse(player.row.settlement ?? '{}').board, now, content()) }),
     seed: player.row.id,
     createdAt: player.row.created_at,
   };
@@ -1635,6 +1638,13 @@ export function characterView(player, now) {
     // on the character card.
     className: classNameOf(character, content()),
     baseClassName: content().classesById[row.class_id].name,
+    // The stats the verdict on items counts, the main one first: the spread
+    // of „Rozdaj według klasy” of its evolution, a stat it counts as another
+    // with it (statWeightsOf: the Nekromanta's Zręczność as Intelekt).
+    statPath: Object.entries(statWeightsOf(gearKey(row.class_id, row.evolution, content()), content()))
+      .filter(([, weight]) => weight > 0)
+      .sort((a, b) => b[1] - a[1])
+      .map(([stat]) => stat),
     // The look: the portrait and the voice in fights, and the portrait's
     // skin tone.
     appearance: row.appearance,
