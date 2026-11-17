@@ -1,0 +1,14 @@
+{
+  "id": "reindeer",
+  "tool": "pixellab generate-image-v2",
+  "description": "a large reindeer used as a riding mount for the winter feast, thick grey-brown winter fur with a shaggy white mane on the neck and chest, big branching antlers, a dark leather saddle with stirrups over a red saddle cloth with white fur trim and small golden bells, a leather bridle with reins and a strap of small golden bells, standing calmly, seen exactly from the side in profile facing right, full body from the antlers to the hooves, all four legs visible, the creature alone, no ground, no snow, no background",
+  "style": "art/references/mounts/steed.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.11573340460989211
+  },
+  "images": 4
+}
