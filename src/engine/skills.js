@@ -318,16 +318,47 @@ export function skillText(template, skill, params, content) {
   }).replace('proc..', 'proc.');
 }
 
+// The cost of skills in mana (1045 B, the author: 17.11.2026, after „jako
+// Łowca mam ponad 1200 many, a umiejętności kosztują po 1%”): `base` of the
+// skill's own cost (at least 1) and `share` of the maximum mana, so a big
+// pool of mana no longer makes the skills free; never less than the skill's
+// own cost, so a small pool pays as before (the choice promised „klasy bez
+// mądrości bez zmian”). Without the rule in the data, the skill's own cost.
+/**
+ * @param {Content} content
+ * @returns {{ base: number, share: number } | null}
+ */
+export const manaCostRule = (content) => content.balance?.skills?.manaCost ?? null;
+/**
+ * @param {number} mana
+ * @param {{ base: number, share: number }} rule
+ */
+const baseMana = (mana, rule) => Math.max(1, Math.round(mana * rule.base));
+// What a skill of `mana` costs a character of `maxMana`.
+/**
+ * @param {number} mana
+ * @param {number} maxMana
+ * @param {Content} content
+ */
+export function skillMana(mana, maxMana, content) {
+  const rule = manaCostRule(content);
+  if (!rule || mana <= 0) return mana;
+  return Math.max(mana, baseMana(mana, rule) + Math.round(maxMana * rule.share));
+}
+
 // The line about the cost and how often the skill works; a mana shield
 // costs its share of mana at the skill's level (`params`, skillParams), and
-// a skill marked `once` works once a fight.
+// a skill marked `once` works once a fight. `maxMana`: the character's,
+// for what the skill costs it (skillMana), with the parts of the cost when
+// the share of the maximum mana counts; without it, the skill's own cost.
 /**
  * @param {Skill} skill
  * @param {Content} content
  * @param {Record<string, any>} [params]
+ * @param {number | null} [maxMana]
  * @returns {string}
  */
-export function skillCost(skill, content, params = skill.params) {
+export function skillCost(skill, content, params = skill.params, maxMana = null) {
   if (typeof params.pool === 'number') return content.texts.skillCostPool[0].replace('{pool}', `${Math.round(params.pool * 100)}%`);
   // The Arkanista's line summons out of a share of its maximum mana (934 A,
   // 935 A).
@@ -335,16 +366,26 @@ export function skillCost(skill, content, params = skill.params) {
     return content.texts.skillCostShare[0].replace('{share}', `${Math.round(skill.manaShare * 100)}%`).replace('{cooldown}', String(skill.cooldown ?? 1));
   }
   const key = skill.once ? 'skillCostOnce' : ACTIVE_KINDS.has(skill.kind) || STANCE_KINDS.has(skill.kind) ? 'skillCostActive' : START_KINDS.has(skill.kind) ? 'skillCostStart' : 'skillCostOnce';
-  return content.texts[key][0].replace('{mana}', String(skill.mana)).replace('{cooldown}', String(skill.cooldown ?? 1));
+  // A skill with a cost pays a share of it and a share of the maximum mana
+  // (balance.skills.manaCost, 1045 B; skillMana), never less than its own.
+  const rule = manaCostRule(content);
+  const mana = typeof maxMana === 'number' ? skillMana(skill.mana, maxMana, content) : skill.mana;
+  const parts = rule && mana > skill.mana ? content.texts.skillCostExtra[0].replace('{base}', String(baseMana(skill.mana, rule))).replace('{share}', `${Math.round(rule.share * 100)}%`) : '';
+  return content.texts[key][0]
+    .replace('{mana}', String(mana))
+    .replace('{extra}', parts)
+    .replace('{cooldown}', String(skill.cooldown ?? 1));
 }
 
-// A skill's card: what it does at a level and, below the top, at the next.
+// A skill's card: what it does at a level and, below the top, at the next;
+// its cost for a character of `maxMana` (skillCost).
 /**
  * @param {Skill} skill
  * @param {number} level
  * @param {Content} content
+ * @param {number | null} [maxMana]
  */
-export function skillView(skill, level, content) {
+export function skillView(skill, level, content, maxMana = null) {
   const top = topLevel(skill, content);
   const shown = Math.max(1, level);
   return {
@@ -362,7 +403,7 @@ export function skillView(skill, level, content) {
     maxLevel: top,
     effect: skillText(skill.effect, skill, skillParams(skill, shown, content), content),
     next: level > 0 && level < top ? skillText(skill.effect, skill, skillParams(skill, level + 1, content), content) : null,
-    cost: skillCost(skill, content, skillParams(skill, shown, content)),
+    cost: skillCost(skill, content, skillParams(skill, shown, content), maxMana),
   };
 }
 
@@ -374,12 +415,14 @@ export function skillView(skill, level, content) {
 // milestone's class level is not reached). `ready` is true when there is
 // something to do there: a path to pick or a point to spend. `evolution`:
 // the first evolution's class level and `need`, what the skills still need
-// before it (evolutionBlock's code, or null).
+// before it (evolutionBlock's code, or null). `maxMana`: the character's,
+// for the skills' costs (skillCost).
 /**
  * @param {Character} character
  * @param {Content} content
+ * @param {number | null} [maxMana]
  */
-export function skillsView(character, content) {
+export function skillsView(character, content, maxMana = null) {
   const learned = character.skills ?? {};
   const points = skillPoints(character, content);
   const { paths, secondClassLevel } = content.balance.skills;
@@ -395,7 +438,7 @@ export function skillsView(character, content) {
           open: true,
           evolution: evolution.id,
           chosen: evolution.skills,
-          options: evolution.skills.map((/** @type {string} */ id, /** @type {number} */ index) => ({ ...skillView(content.skillsById[id], learned[id] ?? 0, content), path: evolutionName, state: index === 0 ? 'main' : 'second' })),
+          options: evolution.skills.map((/** @type {string} */ id, /** @type {number} */ index) => ({ ...skillView(content.skillsById[id], learned[id] ?? 0, content, maxMana), path: evolutionName, state: index === 0 ? 'main' : 'second' })),
         },
       ]
     : levels.map((classLevel) => {
@@ -415,7 +458,7 @@ export function skillsView(character, content) {
           classLevel,
           open: character.classLevel >= classLevel,
           chosen: known,
-          options: options.map((skill) => ({ ...skillView(skill, learned[skill.id] ?? 0, content), state: stateOf(skill) })),
+          options: options.map((skill) => ({ ...skillView(skill, learned[skill.id] ?? 0, content, maxMana), state: stateOf(skill) })),
         };
       });
   const raisable = Object.entries(learned).some(([id, level]) => content.skillsById[id] && level < topLevel(content.skillsById[id], content));

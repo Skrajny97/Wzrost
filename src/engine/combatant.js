@@ -8,7 +8,7 @@ import { budget, cappedChance, damageScale, maxHp, maxMana, speed, weaponDamage 
 import { gearDamageOf, gearElementOf, gearKey, statAsOf, weaponScalingOf } from './gear.js';
 import { upgradedItem } from './items.js';
 import { gearLevel, midGameShare } from './progression.js';
-import { learnedSkills } from './skills.js';
+import { learnedSkills, skillMana } from './skills.js';
 import { computeStats } from './stats.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
@@ -145,7 +145,7 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     // curses, summons and lightning. `skillPower`: their multiplier.
     skillPower,
     skills: learnedSkills(character, content).map((skill) => {
-      const priced = skill.manaShare ? { ...skill, mana: Math.max(1, Math.round(manaFull * skill.manaShare)) } : skill;
+      const priced = skill.manaShare ? { ...skill, mana: Math.max(1, Math.round(manaFull * skill.manaShare)) } : { ...skill, mana: skillMana(skill.mana, manaFull, content) };
       return skillPower !== 1 && content.skillsById[skill.id]?.evolution ? { ...priced, params: poweredParams(priced.params, skillPower) } : priced;
     }),
     ...(feat && { feat }),

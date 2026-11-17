@@ -34,7 +34,8 @@
     "secondClassLevel": 11,
     "lastPointClassLevel": 49,
     "skillStatWeight": 2,
-    "duelSkillStatWeight": 1
+    "duelSkillStatWeight": 1,
+    "manaCost": { "base": 0.5, "share": 0.03 }
   },
   "monsters": {
     "hpBase": 2,
