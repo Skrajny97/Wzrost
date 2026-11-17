@@ -1024,6 +1024,10 @@
     "0.4.18": {
       "title": "Version 0.4.18",
       "body": "- On the Character tab an item with a gem set in it shows that gem in the top corner of its tile, as in Jewelcrafting’s Setting."
+    },
+    "0.4.19": {
+      "title": "Version 0.4.19",
+      "body": "- The Marketplace’s log shows auctions lost too: your last bid, the winning price and who won. Such lines are written from this version on."
     }
   }
 }

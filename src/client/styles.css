@@ -20705,7 +20705,8 @@ a.discord-button {
 }
 
 .market-log--expired .market-log-event,
-.market-log--withdrawn .market-log-event {
+.market-log--withdrawn .market-log-event,
+.market-log--lost .market-log-event {
   color: var(--text-muted);
 }
 

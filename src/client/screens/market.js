@@ -1035,10 +1035,20 @@ export function mountMarket(holder) {
       },
       bought: () => t('Kupione za {gold} zł', { gold: gold(line.price) }),
       won: () => t('Wygrana licytacja za {gold} zł', { gold: gold(line.price) }),
+      // A bid that did not win (17.11.2026): its own last bid and the price that won.
+      lost: () => t('Przegrana licytacja: Twoja oferta {mine} zł, wygrała {gold} zł', { mine: gold(line.gold ?? 0), gold: gold(line.price) }),
       expired: () => t('Bez kupca: wróciło do Ciebie'),
       withdrawn: () => t('Wycofane z Targowiska: wróciło do Ciebie'),
     }[line.event];
-    const who = !line.with ? null : line.event === 'sold' ? t('Kupuje: {name}', { name: line.with }) : line.event === 'bought' || line.event === 'won' ? t('Sprzedaje: {name}', { name: line.with }) : null;
+    const who = !line.with
+      ? null
+      : line.event === 'sold'
+        ? t('Kupuje: {name}', { name: line.with })
+        : line.event === 'bought' || line.event === 'won'
+          ? t('Sprzedaje: {name}', { name: line.with })
+          : line.event === 'lost'
+            ? t('Wygrywa: {name}', { name: line.with })
+            : null;
     return h(
       'li',
       { class: `card market-offer market-log market-log--${line.event}` },
@@ -1056,7 +1066,7 @@ export function mountMarket(holder) {
     if (register.log.length === 0) {
       return h('p', {
         class: 'muted',
-        text: t('Rejestr jest pusty. Targowisko zapisuje tu Twój handel od wersji {version}: co sprzedajesz, kupujesz i wygrywasz w licytacjach oraz co wraca do Ciebie bez kupca.', {
+        text: t('Rejestr jest pusty. Targowisko zapisuje tu Twój handel od wersji {version}: co sprzedajesz, kupujesz, wygrywasz i przegrywasz w licytacjach oraz co wraca do Ciebie bez kupca.', {
           version: register.since,
         }),
       });

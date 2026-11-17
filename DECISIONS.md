@@ -3630,6 +3630,18 @@ Autor przekazał dwie uwagi gracza z Panelu autora: „mądre uwagi - kamień wi
 1. **Targowisko: najnowsze oferty najpierw (od 0.4.17).** Gracz: „I w targowisku sortowanie od najnowszych dodanych?”. „Sortuj:” ma czwartą opcję, „Najnowsze”: oferty od ostatnio wystawionej (`new` w `OFFER_SORTS` i `ORDERS` w `src/engine/market.js`; numery ofert rosną z każdą wystawioną). Wybór zostaje na urządzeniu jak pozostałe. Brakujący szczegół: „Najnowsze” stoi na końcu, żeby dotychczasowe opcje zostały na swoich miejscach. Cztery opcje stoją obok „Sortuj:”, gdzie się mieszczą (od ok. 390 px szerokości), pod nim na całą szerokość na węższych telefonach, a na najwęższych (poniżej 360 px) w dwóch rzędach po dwie, żeby żadna nazwa nie była ściśnięta.
 2. **Kamień z oprawy na przedmiocie w karcie postaci.** Gracz: „Czy oprawienie przedmiotu może być widoczne jak wejdę w postać przy przedmiocie?”. Autor: kamień ma być widoczny tak jak przy oprawianiu. To zmiana wyglądu karty postaci, więc najpierw makiety na stronie ocen (telefon, 1366 i 1920 px). Autor wybrał A (1069, od 0.4.18): na zakładce Postać przedmiot z oprawionym kamieniem ma ten kamień w kółku w jego kolorze w górnym rogu kafelka, jak w Jubilerstwie w zakładce „Oprawianie” (`slotGem` w `src/client/screens/character.js`). Ulepszenie („+4”) zostaje w dolnym rogu, a przedmiot bez kamienia wygląda jak dotąd; wersja B z pustymi gniazdami przy reszcie przedmiotów odrzucona. Czytnik ekranu dostaje nazwę kamienia w opisie kafelka.
 
+## Rejestr Targowiska: przegrane licytacje (17.11.2026, od 0.4.19)
+
+Gracz (poz. 36) na czacie: „Da się jakoś zobaczyć historię licytacji? Które się wygrało, które nie?”. Autor: „Niech rejestr pokazuje też przegrane licytacje”.
+
+1. **Wpis „Przegrana licytacja”.** Gdy licytacja kończy się czyjąś wygraną albo ktoś kupuje przedmiot przez „Kup teraz”, każdy inny licytujący dostaje w Rejestrze wpis: „Przegrana licytacja: Twoja oferta 105 zł, wygrała 111 zł”, z towarem i z tym, kto wygrał („Wygrywa: …”), jak przy innych wpisach (`lostLines` w `src/server/market.js`). Kupujący przez „Kup teraz”, który wcześniej też licytował, ma tylko wpis o kupnie.
+2. **Brakujący szczegół: jego oferta to ostatnia.** Rejestr podaje ostatnią, najwyższą ofertę tego licytującego (tę, którą widać w „Licytuję”), a obok cenę, za którą towar poszedł. Wpis ma szary nagłówek, jak towar, który wrócił bez kupca.
+3. Wpisy przegranych liczą się do limitu Rejestru (ostatnie wpisy) tak jak inne. Licytacje zakończone przed 0.4.19 nie mają takich wpisów.
+
+## Wersja 0.4.19 (17.11.2026): przegrane licytacje w Rejestrze
+
+1. **Rejestr Targowiska pokazuje przegrane licytacje** (wyżej, „Rejestr Targowiska: przegrane licytacje”).
+
 ## Wersja 0.4.18 (17.11.2026): kamień z oprawy na karcie postaci
 
 1. **Kamień z oprawy na karcie postaci (1069 A, przyjęte)**: przedmiot z oprawionym kamieniem ma go w górnym rogu kafelka na zakładce Postać, jak w Jubilerstwie w „Oprawianiu” (pkt 2 w „Uwagi gracza (poz. 57) o Targowisku i oprawie przedmiotów”).
