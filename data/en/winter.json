@@ -1,0 +1,28 @@
+{
+  "$comment": "English texts of data/winter.json (src/engine/winter.js): the names of the camp's decorations and the words of the calendar's window and tab.",
+  "decorations": {
+    "podlaznniczka": { "name": "Fir crown" },
+    "snopek": { "name": "Wheat sheaf" }
+  },
+  "texts": {
+    "title": "Generous Feast",
+    "lead": "From 1 to 24 December, one reward a day for coming into the game, and on the 24th the winter set. A day missed is lost.",
+    "days": "Days of the calendar",
+    "dayName": "Dec {day}",
+    "take": "Take the reward of December {day}",
+    "taken": "Taken. Come back tomorrow for the next window.",
+    "done": "The whole calendar is taken. Happy Generous Feast!",
+    "missed": "lost",
+    "decoration": "Decoration",
+    "set": "Winter set",
+    "scroll": "Scroll",
+    "decorationGot": "{name} will stand in your Camp until the end of December.",
+    "setGot": "The winter set is yours: the Hoarfrost frame, the Generous Feast background and the Snowstorm aura wait in the System Shop, ready to wear.",
+    "closed": "The Generous Feast calendar opens from 1 to 24 December.",
+    "alreadyTaken": "Today's window is already open. Come back tomorrow.",
+    "bagFull": "The bag is full. Make room in it for the potions and take the reward.",
+    "changed": "The calendar changed in the meantime. Try again.",
+    "tabWaiting": "Generous Feast calendar: the reward of December {day} is waiting",
+    "tabTaken": "Generous Feast calendar: the reward of December {day} is taken"
+  }
+}

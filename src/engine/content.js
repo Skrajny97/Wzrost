@@ -323,5 +323,7 @@ export function buildContent(raw) {
     weeksByNumber: lookup((raw.weeks?.weeks ?? []).map((/** @type {Entry} */ week) => [week.number, week])),
     // The achievements with their titles (achievements.js, 1036).
     achievements: raw.achievements ?? null,
+    // Szczodre Gody: the calendar, the winter camp and their words (winter.js, 1044).
+    winter: raw.winter ?? null,
   };
 }

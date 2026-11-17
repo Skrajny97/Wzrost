@@ -52,6 +52,7 @@ import guilds from '../../data/guilds.json' with { type: 'json' };
 import cosmetics from '../../data/cosmetics.json' with { type: 'json' };
 import weeks from '../../data/weeks.json' with { type: 'json' };
 import achievements from '../../data/achievements.json' with { type: 'json' };
+import winter from '../../data/winter.json' with { type: 'json' };
 import fame from '../../data/fame.json' with { type: 'json' };
 // The English texts (data/en/), by the data file they translate. A file
 // added there is named here too (tools/i18n-check.mjs checks it).
@@ -97,6 +98,7 @@ import enTutorial from '../../data/en/tutorial.json' with { type: 'json' };
 import enUnlocks from '../../data/en/unlocks.json' with { type: 'json' };
 import enWeeks from '../../data/en/weeks.json' with { type: 'json' };
 import enAchievements from '../../data/en/achievements.json' with { type: 'json' };
+import enWinter from '../../data/en/winter.json' with { type: 'json' };
 
 // The data files by their names, as data/en/ names its translations.
 const polishData = {
@@ -143,6 +145,7 @@ const polishData = {
   animations,
   weeks,
   achievements,
+  winter,
 };
 
 export const OVERLAYS = {
@@ -190,6 +193,7 @@ export const OVERLAYS = {
     unlocks: enUnlocks,
     weeks: enWeeks,
     achievements: enAchievements,
+    winter: enWinter,
   },
 };
 
@@ -345,6 +349,9 @@ export function publicContent() {
     // looks, for the shop and for every portrait and name that wears one,
     // and the words of its page.
     cosmetics: { items: game.cosmetics, texts: game.cosmeticTexts },
+    // Szczodre Gody (winter.js, 1044): the words of the calendar's window and
+    // tab, and the winter camp's decorations.
+    winter: { texts: game.winter.texts, decorations: game.winter.decorations },
     giftTexts: game.giftTexts,
     elements: game.elements.map(({ id, name, resistance, from, color }) => ({ id, name, resistance, from, color })),
     effects: game.effects.map(({ id, name, color }) => ({ id, name, color })),

@@ -15,7 +15,7 @@ export const DATA_FILES = [
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
   'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat', 'community',
   'events', 'encyclopedia', 'evolutions', 'gift-codes', 'settlement', 'towers', 'portals', 'guilds', 'cosmetics', 'news', 'fame',
-  'weeks', 'payments', 'party-events', 'labyrinth', 'cards', 'achievements',
+  'weeks', 'payments', 'party-events', 'labyrinth', 'cards', 'achievements', 'winter',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'evolution', 'professions', 'settlement', 'party', 'towers', 'portals', 'labyrinth', 'core'];
@@ -797,6 +797,7 @@ function checkReferences(data) {
   errors.push(...checkGuildWar(data));
   errors.push(...checkWeeks(data, { stats }));
   errors.push(...checkPayments(data));
+  errors.push(...checkWinter(data));
   return errors;
 }
 
@@ -1931,6 +1932,37 @@ function checkCasino(data) {
 
 // The width and the height of a PNG file of the page (src/client), from its
 // header, or null when there is no such file.
+// Szczodre Gody (winter.json, 1044): one reward for each day of the
+// calendar, inside its month, a potion there is, a decoration with its
+// picture (art/winter, 76 × 76), and the winter set's cosmetics, each of
+// the event; the winter camp in the calendar's month, from its first day.
+function checkWinter(data) {
+  const errors = [];
+  const { calendar, camp, decorations } = data.winter;
+  const potions = new Set((data.professions.potions ?? []).map((potion) => potion.id));
+  const cosmetics = new Map(data.cosmetics.items.map((item) => [item.id, item]));
+  if (calendar.last < calendar.first) errors.push('winter.json: calendar.last przed calendar.first');
+  if (calendar.days.length !== calendar.last - calendar.first + 1) errors.push(`winter.json: calendar.days ma ${calendar.days.length} dni, a od ${calendar.first} do ${calendar.last} jest ${calendar.last - calendar.first + 1}`);
+  if (camp.month !== calendar.month || camp.first > calendar.first || camp.last < calendar.last) errors.push('winter.json: zimowy Obóz nie obejmuje dni kalendarza');
+  calendar.days.forEach((day, index) => {
+    const where = `winter.json: calendar.days[${index}]`;
+    if (day.potion && !potions.has(day.potion)) errors.push(`${where}: nie ma mikstury ${day.potion}`);
+    if (day.decoration && !decorations[day.decoration]) errors.push(`${where}: nie ma ozdoby ${day.decoration}`);
+    for (const id of day.cosmetics ?? []) {
+      if (cosmetics.get(id)?.event !== 'winter') errors.push(`${where}: ${id} to nie przedmiot zimowego zestawu (event: winter w cosmetics.json)`);
+    }
+  });
+  for (const [id, decoration] of Object.entries(decorations)) {
+    const size = pngSize(`art/winter/${decoration.art}.png`);
+    if (!size) errors.push(`winter.json: ${id}: brak obrazka src/client/art/winter/${decoration.art}.png`);
+    else if (size.width !== 76 || size.height !== 76) errors.push(`winter.json: ${id}: obrazek ma ${size.width} × ${size.height}, a nie 76 × 76`);
+  }
+  // Each of the event's cosmetics comes from some day of the calendar.
+  const given = new Set(calendar.days.flatMap((day) => day.cosmetics ?? []));
+  for (const item of data.cosmetics.items) if (item.event === 'winter' && !given.has(item.id)) errors.push(`cosmetics.json: ${item.id}: żaden dzień kalendarza Szczodrych Godów go nie daje`);
+  return errors;
+}
+
 function pngSize(file) {
   const url = new URL(file, CLIENT_DIR);
   if (!existsSync(url)) return null;

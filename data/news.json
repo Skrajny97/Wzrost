@@ -1235,6 +1235,11 @@
       "id": "0.4.6",
       "title": "Wersja 0.4.6",
       "body": "- Liga wojen gildii, 3v3: walk jest tyle, jakby obie gildie miały tyle trójek co większa. Każda trójka, której brakuje mniejszej gildii, przegrywa walkowerem z każdą trójką rywala. Przykład: 6 trójek na 10 to 100 walk, z czego 40 mniejsza gildia oddaje walkowerem. Zasada działa od wieczoru 17.11.\n- Seria dni: cienka zakładka z kalendarzem przy lewej krawędzi ekranu pokazuje, który to dzień serii. Złota znaczy, że nagroda dnia czeka. Stuknij ją, żeby zobaczyć postęp.\n- Osiągnięcia: na zakładce Postać, pod portretem, jest przycisk „Osiągnięcia”. Czekają tam 24 cele w 9 grupach. Każdy daje tytuł i Punkty Czasu, a niektóre także Punkty Systemu. Nagroda trafia do Ciebie, gdy zajrzysz do okna osiągnięć. Zdobyty tytuł możesz nosić: widać go w Twoim profilu i w Rankingu. Pokonane stwory, czempioni, listy gończe, złoto z wypraw, pojedynki, walki ligi, przejścia Labiryntu i transakcje liczą się od dziś.\n- Chowaniec: Błędny ognik kosztuje teraz 600 Punktów Systemu, jak pozostałe chowańce. Kto kupił go za 800, dostał zwrot 200 Punktów Systemu.\n- Czat: przytrzymaj zakładkę kanału, a potem przesuń ją w nowe miejsce. Pierwszy kanał otwiera się, gdy wchodzisz na czat. Kolejność zapamiętuje urządzenie."
+    },
+    {
+      "id": "0.4.7",
+      "title": "Wersja 0.4.7",
+      "body": "- Szczodre Gody: od 1 do 24 grudnia każda postać codziennie odbierze jedną nagrodę za wejście do gry: złoto, Punkty Czasu i Punkty Systemu, pakiety kart, mikstury, zwoje i ozdoby Obozu. 24. dnia czeka zimowy zestaw: ramka Szron, tło Szczodre Gody i aura Śnieżyca, których nie da się kupić. Kalendarz pojawi się 1 grudnia, a opuszczony dzień przepada."
     }
   ]
 }

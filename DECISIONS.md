@@ -3589,6 +3589,24 @@ Zimowe wydarzenie na grudzień (1028, przyjęte 16.11.2026: „wszystko super wy
 3. **Nagroda główna: zimowy zestaw (1044.2 B),** bez skórki: ramka „Szron”, tło „Szczodre Gody” i aura „Śnieżyca” (światło i płatki śniegu, bez grafiki). Zestaw jest tylko w kalendarzu.
 4. **Zimowy Obóz (1044.3, przyjęty).** Od 1 do 31.12 Obóz każdej postaci jest pod śniegiem, przy ognisku świecą lampki, a ozdoby z kalendarza stoją w Obozie do 31.12. Wybrane wersje z PixelLab: podłaźniczka B (1044.3a), snopek D (1044.3b).
 5. **Zimowe zadania (1044.4, przyjęte).** W grudniu codziennie 3 zimowe zadania obok zwykłych dziennych: 10 gałązek jodły z wypraw (materiał tylko w grudniu), karp z Rybołówstwa i potrawa z Systemowej Kuchni. Za każde Punkty Czasu i złoto, za wszystkie trzy jednego dnia dodatkowy pakiet kart. Narrator zapowiada wydarzenie 1.12 i chwali za pierwsze zimowe zadanie; jego polskie kwestie autor zatwierdza przed nagraniem, angielskie idą bez zatwierdzania.
+6. **Zestaw i kwestie (1044.5–1044.8, 17.11.2026).** Ramka Szron A, tło Szczodre Gody A, gałązka jodły D. Kwestie narratora 2–4 przyjęte bez zmian, kwestia 1 bez ostatniego zdania (autor: „Bez ostatniego zdania”): „Nad Puszczą zapada najdłuższa noc roku. Nadchodzą Szczodre Gody. Do Wigilii codziennie czeka na Ciebie nowe okienko kalendarza.”
+
+### Szczodre Gody w grze: szczegóły kalendarza (17.11.2026)
+
+Rozstrzygnięte najprostszym rozwiązaniem zgodnym z przyjętymi makietami (1044.1):
+
+1. **Dzień kalendarza** to dzień czasu polskiego od północy, jak zadania dzienne i seria dni. Odebrane dni postać trzyma w `characters.winter` (migracja 0154) razem z rokiem, więc za rok kalendarz zaczyna się od zera (`src/engine/winter.js`, `src/server/winter.js`, `GET` i `POST /api/winter`).
+2. **Okno** otwiera się samo przy pierwszym wejściu w dniu kalendarza, po oknie serii dni (oba nie otwierają się naraz), i wraca przy kolejnym wejściu tego dnia, dopóki nagroda czeka. Opuszczone dni są wyszarzone z napisem „przepadło”. Po odebraniu ozdoby okno mówi, że stanie w Obozie, a po 24. dniu, że zestaw czeka w Sklepie Systemu do założenia.
+3. **Zakładka kalendarza** stoi pod zakładką serii dni przy lewej krawędzi, tylko w dniach kalendarza: płatek śniegu i dzisiejszy dzień, złota, gdy nagroda czeka (1044.9 na stronie ocen).
+4. **Mikstury** trafiają do plecaka jak od innego gracza (Encyklopedia nie liczy ich jako własnego odkrycia). Gdy plecak jest pełny, nagroda czeka, aż zrobi się w nim miejsce, z komunikatem, a dzień nie przepada do północy.
+5. **Zimowy zestaw** to przedmioty Sklepu Systemu z `event: winter` w `data/cosmetics.json`, bez ceny: nie da się ich kupić, a w Sklepie widać je dopiero u postaci, która je ma, żeby mogła je założyć i zdjąć. Aura Śnieżyca to płatki śniegu prószące wokół postaci (`sparks: fall`, 1044.10 na stronie ocen).
+6. **Wersja testowa** (`WINTER: test` w `wrangler.jsonc`) ma kalendarz codziennie: dzień miesiąca jest dniem kalendarza (po 24. jak 24.), żeby dało się go sprawdzić przed grudniem. W grze kalendarz działa tylko 1–24.12.
+
+## Wersja 0.4.7 (17.11.2026): kalendarz Szczodrych Godów (ukryty do 1.12)
+
+1. **Kalendarz Szczodrych Godów (1044.1, okno z przyjętej makiety).** Od 1 do 24 grudnia każda postać codziennie odbiera jedną nagrodę za wejście do gry, opuszczony dzień przepada, a 24. dnia dostaje zimowy zestaw (szczegóły wyżej, w „Szczodre Gody w grze: szczegóły kalendarza”). W grze nic z tego nie widać do 1 grudnia. Wersja testowa ma kalendarz codziennie (`WINTER: test`).
+2. **Zimowy zestaw w Sklepie Systemu.** Ramka Szron (1044.5 A) z mroźnym blaskiem, tło Szczodre Gody (1044.6 A) i aura Śnieżyca (prószący śnieg) są przedmiotami wydarzenia: nie da się ich kupić, a w Sklepie widać je dopiero u postaci, która je ma.
+3. **Do oceny przed 1.12:** zakładka kalendarza (1044.9) i ruch aury z blaskiem ramki (1044.10). Zimowy Obóz z ozdobami i zimowe zadania z kwestiami narratora wejdą w kolejnych wersjach przed 1 grudnia.
 
 ## Wersja 0.4.6 (16.11.2026): osiągnięcia z tytułami, walkowery 3v3 za brakujące trójki, zakładka serii dni, Błędny ognik za 600 PS, kolejność kanałów czatu
 

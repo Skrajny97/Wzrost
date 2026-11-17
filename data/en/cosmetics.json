@@ -13,6 +13,10 @@
       "name": "Forest Frame",
       "description": "Roots, moss and fly agarics. Flickering fireflies circle the frame."
     },
+    "frame-szron": {
+      "name": "Hoarfrost",
+      "description": "A frame bound in ice, with icicles and snowflakes in the corners. Every few seconds a frosty gleam runs across it. Only from the Generous Feast calendar."
+    },
     "bg-spring": {
       "name": "System Spring",
       "description": "A clearing at night with a spring that shines with the System's light."
@@ -25,6 +29,10 @@
       "name": "Camp at Night",
       "description": "A campfire and a tent in the forest, under a starry sky."
     },
+    "bg-szczodre": {
+      "name": "Generous Feast",
+      "description": "A winter night in a forest village: snow, a bonfire and warm light in the windows. Only from the Generous Feast calendar."
+    },
     "sabertooth": {
       "name": "Sabre-Toothed Tiger",
       "description": "The character rides a sabre-toothed tiger instead of the mount from the Stable."
@@ -36,6 +44,10 @@
     "aura-ember": {
       "name": "Ember Aura",
       "description": "A glow like that of a campfire surrounds the character, and sparks fly upwards."
+    },
+    "aura-sniezyca": {
+      "name": "Snowstorm",
+      "description": "Snow falls around the character, and its outline gleams in frosty blue. Only from the Generous Feast calendar."
     },
     "trail-light": {
       "name": "Luminous Trail",

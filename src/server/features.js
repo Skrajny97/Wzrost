@@ -39,6 +39,7 @@ let payments = '';
 let paymentsForAuthors = false;
 let labyrinth = false;
 let cards = false;
+let winterTest = false;
 
 export function readFeatures(env) {
   professions = env.PROFESSIONS === 'on';
@@ -58,6 +59,7 @@ export function readFeatures(env) {
   paymentsForAuthors = env.PAYMENTS_FOR === 'authors';
   labyrinth = env.LABYRINTH === 'on';
   cards = env.CARDS === 'on';
+  winterTest = env.WINTER === 'test';
 }
 
 export const professionsOn = () => professions;
@@ -112,6 +114,10 @@ export const labyrinthOn = () => labyrinth;
 // the cards the creatures of an exploration leave, the collection's bonus,
 // nor the Encyklopedia's Karty.
 export const cardsOn = () => cards;
+// Szczodre Gody (winter.js, 1044): the calendar and the winter camp come in
+// December everywhere; where WINTER is "test" (the test version) every day,
+// so they can be tried before it.
+export const winterTestOn = () => winterTest;
 // A camp building of the Osada's (Kwatery, `settlement` in buildings.json)
 // stands only where the Osada is on, and one of the Warownia's (`fortress`)
 // only where the Warownia is; the others everywhere.

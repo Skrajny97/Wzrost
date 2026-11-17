@@ -21,8 +21,7 @@
           "id",
           "kind",
           "name",
-          "description",
-          "price"
+          "description"
         ],
         "properties": {
           "id": {
@@ -84,6 +83,7 @@
               "kind": {
                 "enum": [
                   "shine",
+                  "frost",
                   "pulse",
                   "fireflies"
                 ]
@@ -98,7 +98,7 @@
             }
           },
           "aura": {
-            "description": "Światło aury: kolor poświaty (glow), kolor drobinek (spark) i ich ruch (sparks: drift krąży, rise leci w górę).",
+            "description": "Światło aury: kolor poświaty (glow), kolor drobinek (spark) i ich ruch (sparks: drift krąży, rise leci w górę, fall prószy w dół).",
             "type": "object",
             "additionalProperties": false,
             "required": [
@@ -118,7 +118,8 @@
               "sparks": {
                 "enum": [
                   "drift",
-                  "rise"
+                  "rise",
+                  "fall"
                 ]
               }
             }
@@ -239,6 +240,12 @@
             "description": "Skórka: przedrostek grafik, <look>-<płeć> w src/client/art/portraits, walkers i riders.",
             "type": "string",
             "pattern": "^[a-z0-9-]+$"
+          },
+          "event": {
+            "description": "Przedmiot tylko z wydarzenia, bez ceny w sklepie: winter (kalendarz Szczodrych Godów, data/winter.json).",
+            "enum": [
+              "winter"
+            ]
           }
         },
         "allOf": [
@@ -365,6 +372,25 @@
                   "pet"
                 ]
               }
+            }
+          },
+          {
+            "if": {
+              "required": [
+                "event"
+              ]
+            },
+            "then": {
+              "not": {
+                "required": [
+                  "price"
+                ]
+              }
+            },
+            "else": {
+              "required": [
+                "price"
+              ]
             }
           }
         ]

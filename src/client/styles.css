@@ -17843,6 +17843,15 @@ button.tcard-slot {
   animation-timing-function: ease-out;
 }
 
+/* Snow (the Śnieżyca of Szczodre Gody): round flakes falling slowly. */
+.aura-motes--fall span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  animation-duration: 5.4s;
+  animation-timing-function: linear;
+}
+
 @keyframes aura-mote {
   0% {
     opacity: 0;
@@ -17941,6 +17950,21 @@ button.tcard-slot {
   background-position: 100% 0;
   background-size: 250% 100%;
   animation: portrait-frame-sweep 5s ease-in-out infinite;
+}
+
+/* The Szron of Szczodre Gody: the same band and glints in a frosty light. */
+.portrait-frame--frost .portrait-frame-light {
+  background: linear-gradient(110deg, transparent 40%, rgba(222, 244, 255, 0.85) 50%, transparent 60%) no-repeat;
+  background-position: 100% 0;
+  background-size: 250% 100%;
+  animation: portrait-frame-sweep 5s ease-in-out infinite;
+}
+
+.portrait-frame--frost .portrait-frame-glint {
+  background:
+    linear-gradient(90deg, transparent 40%, #eaf8ff 50%, transparent 60%) center / 100% 16% no-repeat,
+    linear-gradient(0deg, transparent 40%, #eaf8ff 50%, transparent 60%) center / 16% 100% no-repeat,
+    radial-gradient(circle, rgba(214, 240, 255, 0.95) 0 10%, transparent 38%);
 }
 
 @keyframes portrait-frame-sweep {
@@ -27347,4 +27371,62 @@ a.discord-button {
   color: var(--text);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
   cursor: grabbing;
+}
+
+/* Szczodre Gody (1044, winter-calendar.js; the window of the mock-ups
+   accepted in 1044.1): 24 days, four in a row on a phone and six on a
+   computer, the days to come dimmed, those missed faded with the word
+   "przepadło", the 24th in gold. Its tab stands under the series' tab. */
+.winter-days .winter-day {
+  min-height: 0;
+  padding: 6px 2px 8px;
+}
+
+.winter-days .streak-reward {
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 2px;
+  white-space: normal;
+}
+
+.winter-days .winter-day--later {
+  opacity: 0.8;
+}
+
+.winter-days .winter-day--missed {
+  opacity: 0.4;
+}
+
+.winter-days .winter-day--last {
+  grid-column: auto;
+  background: rgba(217, 180, 90, 0.08);
+}
+
+@media (min-width: 640px) {
+  :root[data-layout='desktop'] .winter-days {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.winter-days .streak-day-check {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}
+
+/* The day's name clear of the tick, on the narrowest phones too. */
+.winter-days .streak-day--taken .streak-day-name {
+  padding-right: 12px;
+}
+
+.winter-day-missed {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+.winter-note {
+  color: var(--system-text);
+  text-align: center;
 }
