@@ -1,0 +1,14 @@
+{
+  "id": "osada-casino-snow",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art game building seen from above at an angle, a round wooden hall with a wide two-tiered conical thatched roof in deep winter: thick fresh white snow lying on the roof in an even layer with soft pale blue shadows and a rounded snowy edge along the eaves, the same pixel art style and the same light, no people",
+  "style": "src/client/art/camp/campfire-1.png",
+  "input": "art/inputs/winter/casino.png",
+  "mask": "art/inputs/winter/casino-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
