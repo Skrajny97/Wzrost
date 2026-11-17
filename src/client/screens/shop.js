@@ -37,8 +37,15 @@ const TABS = [
 
 // An item the character can wear: an outfit only for its own class.
 // An event's cosmetic (the winter set of Szczodre Gody) is not sold: it shows
-// only where the character has it, to wear it and take it off.
-const forCharacter = (item, character) => (item.kind !== 'outfit' || item.classId === character.classId) && (!item.event || character.cosmetics.owned.includes(item.id));
+// only where the character has it, to wear it and take it off. A season's
+// cosmetic (the winter outfits and the reindeer, 1049 A) shows while its
+// season is on (the winter one in December, while the winter camp stands)
+// and, after it, where the character has it.
+const inSeason = (item, character) => !item.season || (item.season === 'winter' && Boolean(character.winterCamp));
+const forCharacter = (item, character) =>
+  (item.kind !== 'outfit' || item.classId === character.classId) &&
+  (!item.event || character.cosmetics.owned.includes(item.id)) &&
+  (inSeason(item, character) || character.cosmetics.owned.includes(item.id));
 
 // Whether this account can buy Punkty Systemu here, asked once a page load:
 // null until the server answers.

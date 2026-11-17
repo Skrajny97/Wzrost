@@ -698,6 +698,13 @@ function checkReferences(data) {
   for (const [result, track] of Object.entries(data.music.reports)) {
     if (!tracks.has(track)) errors.push(`music.json: raport ${result} ma nieznany utwór ${track}`);
   }
+  // Szczodre Gody's music: a known track in place of the default and of known places.
+  const winterMusic = data.music.winter ?? {};
+  if (winterMusic.default && !tracks.has(winterMusic.default)) errors.push(`music.json: zimowy utwór domyślny ${winterMusic.default} nieznany`);
+  for (const [place, track] of Object.entries(winterMusic.places ?? {})) {
+    if (!places.has(place)) errors.push(`music.json: zimą nieznane miejsce ${place}`);
+    if (!tracks.has(track)) errors.push(`music.json: zimą ${place} ma nieznany utwór ${track}`);
+  }
   // Combat sounds: files that exist, and weapons and attacks with a known kind.
   const sounds = data.sounds;
   const kinds = new Set([...Object.keys(sounds.sounds), ...sounds.synth]);

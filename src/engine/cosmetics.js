@@ -21,7 +21,7 @@
 // "outfit": id, "nameFromFrame": true}.
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
-/** @typedef {{ id: string, kind: string, price: number, classId?: string, nameColor?: string, event?: string }} Cosmetic An entry of data/cosmetics.json. */
+/** @typedef {{ id: string, kind: string, price: number, classId?: string, nameColor?: string, event?: string, season?: string }} Cosmetic An entry of data/cosmetics.json. */
 /** @typedef {{ code: string, message: string }} Block */
 
 // The places a cosmetic is worn in, one of each kind at a time.
@@ -68,20 +68,24 @@ export function cosmeticsOf(stored, content) {
 // none) and its class, cannot buy the cosmetic `id` now, as { code,
 // message }, or null when it can. A mount's look needs a mount to change,
 // and an outfit is for the characters of its class. A cosmetic of an event
-// (`event`: the winter set of Szczodre Gody, 1044.2 B) is not sold.
+// (`event`: the winter set of Szczodre Gody, 1044.2 B) is not sold. A
+// cosmetic of a season (`season`: the winter outfits and the reindeer,
+// 1049 A) is sold only while that season is on (`season` of the
+// character: "winter" in December, as the winter camp, else null).
 /**
  * @param {unknown} id
  * @param {Record<string, any> | null | undefined} stored
- * @param {{ systemPoints: number, mount: unknown, classId: string }} character
+ * @param {{ systemPoints: number, mount: unknown, classId: string, season?: string | null }} character
  * @param {Content} content
  * @returns {Block | null}
  */
-export function cosmeticBlock(id, stored, { systemPoints, mount, classId }, content) {
+export function cosmeticBlock(id, stored, { systemPoints, mount, classId, season = null }, content) {
   const item = itemOf(id, content);
   if (!item) return { code: 'invalid_cosmetic', message: 'Nie ma takiego przedmiotu.' };
   if (cosmeticsOf(stored, content).owned.includes(item.id)) return { code: 'owned', message: 'Masz już ten przedmiot.' };
   // The winter set comes only from the calendar of Szczodre Gody (winter.js).
   if (item.event) return { code: 'event_only', message: 'Tego przedmiotu nie ma w sprzedaży: daje go tylko wydarzenie.' };
+  if (item.season && item.season !== season) return { code: 'out_of_season', message: 'Ten przedmiot jest w sprzedaży tylko w grudniu.' };
   if (item.kind === 'mountSkin' && !mount) return { code: 'no_mount', message: 'Najpierw kup wierzchowca w Stajni.' };
   if (item.kind === 'outfit' && item.classId !== classId) return { code: 'other_class', message: 'Ta skórka jest dla innej klasy.' };
   if (systemPoints < item.price) return { code: 'not_enough_points', message: 'Brakuje Punktów Systemu.' };

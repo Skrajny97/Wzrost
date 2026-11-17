@@ -26,6 +26,15 @@
       "description": "Id miejsca (regionu, regionu wewnętrznego, camp, albo zakładki: skills to Umiejętności, professions to Profesje, settlement to Osada, a settlement:<id> to miejsce Osady, np. settlement:casino to Salon Gier) → id utworu. Region wewnętrzny bez wpisu gra utwór swojego regionu, a miejsce Osady bez wpisu muzykę Osady.",
       "additionalProperties": { "type": "string" }
     },
+    "winter": {
+      "type": "object",
+      "description": "Szczodre Gody (cały grudzień, gdy stoi zimowy Obóz; na wersji testowej codziennie): utwór zamiast domyślnego (default) i zamiast utworów miejsc (places, np. professions to zakładka Profesje). Autor 17.11.2026: muzyka świąteczna „podmianka wtedy za ogólną i tę na karcie profesji”.",
+      "additionalProperties": false,
+      "properties": {
+        "default": { "type": "string" },
+        "places": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    },
     "reports": {
       "type": "object",
       "description": "Wynik wyprawy (success: wygrana, fainted: omdlenie, escaped: ucieczka) → id utworu, który gra raz, gdy raport otwiera się zaraz po odebraniu. Raport otwarty z Dziennika gra zwykłą muzykę. Taki utwór zaczyna się zawsze od początku, a poprzedni wraca w miejscu, w którym ucichł.",

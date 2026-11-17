@@ -55,9 +55,10 @@ import { mountSkills } from './screens/skills.js';
 import { mountStats } from './screens/stats.js';
 import { mountTrade, offerTrade } from './screens/trade.js';
 import { offerDuel } from './card-duel.js';
-import { musicOn, musicVolume, prefetchMusic, setMusicConfig, setMusicOn, setMusicPlace, setMusicVolume, startMusic } from './music.js';
+import { musicOn, musicVolume, prefetchMusic, setMusicConfig, setMusicOn, setMusicPlace, setMusicVolume, setMusicWinterCheck, startMusic } from './music.js';
 import { resetCamera } from './camera.js';
 import { applyMotion } from './motion.js';
+import { setSnow } from './snowfall.js';
 import { ZOOM_MAX, ZOOM_MIN, applyZoom, stepZoom, zoomLevel, zoomOffered } from './zoom.js';
 import { forgetPart, narrate, narrateSoon, passTold } from './narrator.js';
 import { forgetNews, watchNews } from './news.js';
@@ -237,6 +238,8 @@ async function start() {
   languageReady
     .then(() => loadContent())
     .then((content) => {
+      // Szczodre Gody's music while the character's winter camp stands (December).
+      setMusicWinterCheck(() => Boolean(state.character?.winterCamp));
       setMusicConfig(content.music);
       setRecordings(content.sounds);
     })
@@ -589,6 +592,10 @@ function navigate(hash) {
   if (location.hash === hash) route();
   else location.hash = hash;
 }
+
+// Szczodre Gody's falling snow over the whole game while the character's
+// winter camp stands (December), at the density of data/winter.json (snow).
+onCharacterChange((character) => setSnow(character?.winterCamp ? (state.content?.winter?.snow ?? null) : null));
 
 onCharacterChange(() => {
   if (views.game.hidden || !current) return;

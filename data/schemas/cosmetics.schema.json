@@ -246,6 +246,12 @@
             "enum": [
               "winter"
             ]
+          },
+          "season": {
+            "description": "Przedmiot w sprzedaży tylko w swojej porze: winter (grudzień, jak zimowy Obóz; 1049 A). Kupiony zostaje na zawsze.",
+            "enum": [
+              "winter"
+            ]
           }
         },
         "allOf": [
