@@ -510,6 +510,10 @@ export function mountSettlement(container, { params = {} } = {}) {
   // a body armour, then its element, each with what it gives and costs.
   function imbueSheet() {
     const body = h('div', { class: 'settlement-reforge' });
+    // What pays (17.11.2026): the element's material, as before, or parts
+    // in its place (data.imbue.parts), chosen above the elements.
+    const payable = data.imbue.parts ?? [];
+    let pay = 'material';
     const capital = (text) => text.charAt(0).toUpperCase() + text.slice(1);
     openSheet(h('h2', { class: 'sheet-title', text: t('Zaklęcie żywiołu') }), body);
     const chosen = cardItem(data.imbue.items);
@@ -548,22 +552,50 @@ export function mountSettlement(container, { params = {} } = {}) {
         h('button', { type: 'button', class: 'link-button settlement-back', onClick: pickItem }, icon('back', { size: 16 }), t('Inny przedmiot')),
         h('div', { class: 'settlement-reforge-item' }, itemHead(item)),
         now && h('p', { class: 'muted', text: t('Ma już żywioł: {element}. Nowy zastąpi stary.', { element: now.name }) }),
+        payable.length > 0 &&
+          h(
+            'div',
+            { class: 'bag-sort imbue-pay' },
+            h('span', { class: 'bag-sort-label', text: t('Płacisz:') }),
+            h(
+              'div',
+              { class: `segmented bag-sort-options bag-sort-options--${payable.length + 1}`, role: 'group', 'aria-label': t('Czym płacisz') },
+              [{ id: 'material', name: t('Materiał żywiołu') }, ...payable.map((part) => ({ id: part.id, name: `${part.name} ×${part.count}` }))].map(({ id, name }) =>
+                h('button', {
+                  type: 'button',
+                  class: 'segmented-option',
+                  'aria-pressed': String(id === pay),
+                  text: name,
+                  onClick: () => {
+                    if (id === pay) return;
+                    pay = id;
+                    pickElement(itemId);
+                  },
+                }),
+              ),
+            ),
+          ),
         data.imbue.elements.map((element) => {
           const effect = item.effects[element.element];
           const gives = effect.share
             ? t('{percent}% obrażeń jako {element}', { percent: Math.round(effect.share * 100), element: element.name })
-            : t('odporność na {element} +{value}', { element: element.name, value: effect.value });
-          const ready = element.have >= element.count && state.character.gold >= item.gold && item.element !== element.element;
+            : element.resistance
+              ? `${element.resistance.charAt(0).toLowerCase()}${element.resistance.slice(1)} +${effect.value}`
+              : t('odporność na {element} +{value}', { element: element.name, value: effect.value });
+          // The cost in the payment chosen: the element's material, or parts.
+          const part = payable.find((one) => one.id === pay);
+          const cost = part ? { count: part.count, name: part.name, have: part.have } : { count: element.count, name: element.material, have: element.have };
+          const ready = cost.have >= cost.count && state.character.gold >= item.gold && item.element !== element.element;
           return h(
             'div',
             { class: 'settlement-choice' },
             h('p', {}, h('strong', { text: capital(element.name) }), ` · ${gives}`),
             h('p', {
               class: 'muted',
-              text: t('{gold} zł. i {count} × {material} (masz {have})', { gold: formatNumber(item.gold), count: element.count, material: element.material, have: formatNumber(element.have) }),
+              text: t('{gold} zł. i {count} × {material} (masz {have})', { gold: formatNumber(item.gold), count: cost.count, material: cost.name, have: formatNumber(cost.have) }),
             }),
             // The element's material, from the guild (346 A).
-            element.have < element.count && askGuildButton({ kind: 'material', key: element.key, name: element.material, missing: element.count - element.have }),
+            !part && element.have < element.count && askGuildButton({ kind: 'material', key: element.key, name: element.material, missing: element.count - element.have }),
             h('button', {
               type: 'button',
               class: 'button button--world button--small',
@@ -571,7 +603,7 @@ export function mountSettlement(container, { params = {} } = {}) {
               disabled: !ready,
               onClick: (event) =>
                 withButton(event.currentTarget, async () => {
-                  const answer = await call('POST', '/api/settlement/imbue', { itemId: item.id, element: element.element });
+                  const answer = await call('POST', '/api/settlement/imbue', { itemId: item.id, element: element.element, ...(part && { pay: part.id }) });
                   apply(answer);
                   closeSheet();
                   toast(t('Zaklinaczka zaklęła żywioł w przedmiot {item}: {element}.', { item: answer.imbued.item, element: answer.imbued.element }));

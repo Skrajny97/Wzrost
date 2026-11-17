@@ -1027,7 +1027,7 @@
     },
     "0.4.19": {
       "title": "Version 0.4.19",
-      "body": "- The Marketplace’s log shows auctions lost too: your last bid, the winning price and who won. Such lines are written from this version on."
+      "body": "- The Marketplace’s log shows auctions lost too: your last bid, the winning price and who won. Such lines are written from this version on.\n- At the Enchantress you can also imbue an element with parts: 20 Crystal Splinters or 2 Amber instead of the element’s material, for the same gold."
     }
   }
 }

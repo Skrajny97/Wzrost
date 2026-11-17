@@ -3638,9 +3638,18 @@ Gracz (poz. 36) na czacie: „Da się jakoś zobaczyć historię licytacji? Któ
 2. **Brakujący szczegół: jego oferta to ostatnia.** Rejestr podaje ostatnią, najwyższą ofertę tego licytującego (tę, którą widać w „Licytuję”), a obok cenę, za którą towar poszedł. Wpis ma szary nagłówek, jak towar, który wrócił bez kupca.
 3. Wpisy przegranych liczą się do limitu Rejestru (ostatnie wpisy) tak jak inne. Licytacje zakończone przed 0.4.19 nie mają takich wpisów.
 
-## Wersja 0.4.19 (17.11.2026): przegrane licytacje w Rejestrze
+## Zaklęcie żywiołu za części (1072, 17.11.2026, od 0.4.19)
+
+Autor: „Niech zaklinanie żywiołu będzie możliwe nie tylko zależnie od konkretnych materiałów w sensie posiadania ich - niech da się je jakkolwiek sensownie zdobyć, bo nie da się czasem tego żywiołu zakląć wcale”, „szczególnie że to nie leci regularnie” i „ewentualnie dodaj opcje innych materiałów albo dużych ilości części, na przykład legendarnych albo chociaż epickich”. Po makietach: „Akceptuję nowe okno zaklinania”.
+
+1. **Zapłata częściami.** U Zaklinaczki zamiast 3 sztuk materiału żywiołu (Iskra ognika, Skóra węgorza, Rosa rosiczki, które dają tylko pojedyncze stwory) można zapłacić 20 Okruchami kryształu (części epickie) albo 2 Bursztynami (części legendarne), za to samo złoto (`parts` w `imbue` w `data/settlement.json`, `imbueCost` i `imbueBlock` w `src/engine/settlement.js`).
+2. **Brakujący szczegół: ile części.** 20 Okruchów i 2 Bursztyny są warte tyle samo według Wymiany części w Warsztacie (10 części za 1 następnej rzadkości), a 20 epickich części to kilka rozebranych epickich przedmiotów, czyli „duża ilość”, o którą prosił autor.
+3. **Okno.** Nad żywiołami jest „Płacisz:” z trzema przyciskami: Materiał żywiołu (domyślnie, jak dotąd), Okruchy kryształu ×20 i Bursztyn ×2. Każdy żywioł podaje koszt w wybranej zapłacie i ile postać ma, a „Poproś gildię” zostaje tylko przy materiale. Linijka pancerza mówi teraz „odporność na naturę” (słowa żywiołu z `data/elements.json`), a nie „odporność na natura”.
+
+## Wersja 0.4.19 (17.11.2026): przegrane licytacje w Rejestrze i zaklęcie żywiołu za części
 
 1. **Rejestr Targowiska pokazuje przegrane licytacje** (wyżej, „Rejestr Targowiska: przegrane licytacje”).
+2. **Zaklęcie żywiołu za części** (1072, wyżej): 20 Okruchów kryształu albo 2 Bursztyny zamiast materiału żywiołu.
 
 ## Wersja 0.4.18 (17.11.2026): kamień z oprawy na karcie postaci
 
