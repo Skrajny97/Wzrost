@@ -1,0 +1,23 @@
+{
+  "id": "skin-winter-mage-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "a thin young man with short black hair under a tall white fur hat with ear flaps, in a long white sheepskin coat down to the ankles with silver and pale blue folk embroidery of snowflakes, a pale blue wool scarf, white fur-topped boots, no staff and nothing in the hands, seen exactly from the side in a strict profile, facing and walking to the right, the nose pointing right and only one eye showing, the chest, belly and hips turned fully to the right and not towards the viewer, only the near arm showing, hanging relaxed beside the body with an empty open hand, the far arm hidden behind the body, the back and shoulders straight and upright, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the head to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/mage-male.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/winter-mage-male.png",
+      "usage": "the character's look in detail: face, fur hat, white coat with snowflake embroidery, scarf and colours; the hands empty, without the staff"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen exactly from the side in profile, facing right, upright mid-step, not turned towards the viewer; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08081537328826056
+  },
+  "images": 4
+}
