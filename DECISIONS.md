@@ -3630,6 +3630,11 @@ Autor przekazał dwie uwagi gracza z Panelu autora: „mądre uwagi - kamień wi
 1. **Targowisko: najnowsze oferty najpierw (od 0.4.17).** Gracz: „I w targowisku sortowanie od najnowszych dodanych?”. „Sortuj:” ma czwartą opcję, „Najnowsze”: oferty od ostatnio wystawionej (`new` w `OFFER_SORTS` i `ORDERS` w `src/engine/market.js`; numery ofert rosną z każdą wystawioną). Wybór zostaje na urządzeniu jak pozostałe. Brakujący szczegół: „Najnowsze” stoi na końcu, żeby dotychczasowe opcje zostały na swoich miejscach. Cztery opcje stoją obok „Sortuj:”, gdzie się mieszczą (od ok. 390 px szerokości), pod nim na całą szerokość na węższych telefonach, a na najwęższych (poniżej 360 px) w dwóch rzędach po dwie, żeby żadna nazwa nie była ściśnięta.
 2. **Kamień z oprawy na przedmiocie w karcie postaci.** Gracz: „Czy oprawienie przedmiotu może być widoczne jak wejdę w postać przy przedmiocie?”. Autor: kamień ma być widoczny tak jak przy oprawianiu. To zmiana wyglądu karty postaci, więc najpierw makiety na stronie ocen (telefon, 1366 i 1920 px). Autor wybrał A (1069, od 0.4.18): na zakładce Postać przedmiot z oprawionym kamieniem ma ten kamień w kółku w jego kolorze w górnym rogu kafelka, jak w Jubilerstwie w zakładce „Oprawianie” (`slotGem` w `src/client/screens/character.js`). Ulepszenie („+4”) zostaje w dolnym rogu, a przedmiot bez kamienia wygląda jak dotąd; wersja B z pustymi gniazdami przy reszcie przedmiotów odrzucona. Czytnik ekranu dostaje nazwę kamienia w opisie kafelka.
 
+## Wersja 0.4.18 (17.11.2026): kamień z oprawy na karcie postaci
+
+1. **Kamień z oprawy na karcie postaci (1069 A, przyjęte)**: przedmiot z oprawionym kamieniem ma go w górnym rogu kafelka na zakładce Postać, jak w Jubilerstwie w „Oprawianiu” (pkt 2 w „Uwagi gracza (poz. 57) o Targowisku i oprawie przedmiotów”).
+2. **Zimowi jeźdźcy**: Wojowniczka (1062: 2, jazda przyjęta w 1068) i Łucznik (1067: 1, przesunięty o 4 piksele, z wodzami) są w grze z odcieniami skóry. Zimowych strojów dalej nie ma w sklepie: czekają na pozostałych jeźdźców.
+
 ## Wersja 0.4.17 (17.11.2026): zimowa Osada, padający śnieg (ukryte do 1.12) i najnowsze oferty na Targowisku
 
 1. **Zimowa Osada (1063 v2, przyjęta)**: śnieg na ziemi, dachach i placach przez cały grudzień (pkt 2 w „Szczodre Gody: renifer, zimowa Osada i drugi Awatar”). Na wersji testowej widać ją od razu.
