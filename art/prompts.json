@@ -2215,5 +2215,18 @@
       "zloto-button": {"prompt": "an empty horizontal button plate of dark bronze with a thin bright gold rim and a small gold stud at each end, seen flat from the front, pixel art user interface, the middle plain", "width": 128, "height": 64, "tool": "pro"},
       "zloto-sysframe": {"prompt": "an empty game interface window frame of thin glowing cyan pixel lines, small square bracket corners of bright cyan, a faint cyan dotted line along the edges, the inside empty and transparent, seen flat from the front, pixel art user interface of a mysterious magic system", "width": 128, "height": 128, "tool": "pro"}
     }
+  },
+  "winter": {
+    "$comment": "Szczodre Gody (1044, zimowe wydarzenie 1–24.12; 1028 przyjęte 16.11.2026): ozdoby Obozu z kalendarza, podłaźniczka (12.12) i snopek (19.12), w stylu budynków Obozu. Rysuje Pro Flash, po jednym obrazku z wywołania, najwyżej cztery wersje.",
+    "width": 64,
+    "height": 64,
+    "pixellab": {
+      "tool": "flash",
+      "style": "src/client/art/camp/campfire-1.png"
+    },
+    "prompts": {
+      "podlaznniczka": "a traditional Polish podłaźniczka: the top of a fir tree hung upside down, decorated with small red apples, straw stars, walnuts and white paper wafer ornaments, a winter solstice decoration, game sprite, the object alone, no ground, no background",
+      "snopek": "a didukh: a tall sheaf of golden wheat straw tied with a red ribbon, standing upright on its cut stalks, a Slavic winter solstice decoration, game sprite, the object alone, no ground, no background"
+    }
   }
 }
