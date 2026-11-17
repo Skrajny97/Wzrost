@@ -98,7 +98,19 @@
               "scale": { "type": "number", "exclusiveMinimum": 0, "description": "Ile razy większy wierzchowiec stoi w scenie niż na arkuszu, z siodłem w tej samej skali; jeździec zostaje w swojej. Kuc 1,2 (autor 10.11.2026: „kuc jest za mały albo postacie za duże”)." },
               "frames": { "type": "integer", "minimum": 1 },
               "fps": { "type": "number", "exclusiveMinimum": 0 },
-              "seats": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/point" } }
+              "seats": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/point" } },
+              "reins": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["file", "bits", "hands", "riders"],
+                "description": "Wodze jako osobna warstwa nad kłusem i pod jeźdźcem (tools/reindeer-reins.py, scenes.js ride): file to wodze, które trzyma większość jeźdźców, od wędzidła (bits, jedno na klatkę) do miejsca dłoni (siodło przesunięte o hands); riders to jeźdźcy z własnymi wodzami w dłoni, z końcami ich pasków na ich własnym obrazku, i każdy ma obok file swój obrazek <file>-<wygląd>.png. Autor 17.11.2026: „jeden sznur wodzy na reniferze wisi w powietrzu”.",
+                "properties": {
+                  "file": { "type": "string", "pattern": "^art/scenes/.+\\.png$" },
+                  "bits": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/point" } },
+                  "hands": { "$ref": "#/definitions/point" },
+                  "riders": { "type": "object", "propertyNames": { "pattern": "^[a-z]+(-[a-z]+)*$" }, "additionalProperties": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "$ref": "#/definitions/point" } } }
+                }
+              }
             }
           }
         },

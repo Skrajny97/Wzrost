@@ -3646,6 +3646,18 @@ Autor: „Niech zaklinanie żywiołu będzie możliwe nie tylko zależnie od kon
 2. **Brakujący szczegół: ile części.** 20 Okruchów i 2 Bursztyny są warte tyle samo według Wymiany części w Warsztacie (10 części za 1 następnej rzadkości), a 20 epickich części to kilka rozebranych epickich przedmiotów, czyli „duża ilość”, o którą prosił autor.
 3. **Okno.** Nad żywiołami jest „Płacisz:” z trzema przyciskami: Materiał żywiołu (domyślnie, jak dotąd), Okruchy kryształu ×20 i Bursztyn ×2. Każdy żywioł podaje koszt w wybranej zapłacie i ile postać ma, a „Poproś gildię” zostaje tylko przy materiale. Linijka pancerza mówi teraz „odporność na naturę” (słowa żywiołu z `data/elements.json`), a nie „odporność na natura”.
 
+## Wodze renifera jako osobna warstwa (17.11.2026, od 0.4.20)
+
+Autor: „jeden sznur wodzy na reniferze wisi w powietrzu”. Wcześniej: „te paski muszą być dostosowane do każdego wierzchowca”.
+
+1. **Co wisiało.** Zimowemu Łucznikowi górny z dwóch pasków w pięści kończył się 3 piksele nad wodzami renifera. Wodze renifera zatrzymywały się 3 piksele przed dłonią zimowej Łuczniczki. Tak samo wisiały w powietrzu własne wodze 27 zwykłych jeźdźców (m.in. Święty, Prorok, Pan Zimy, Mistrz Łuku, Skrytobójca, Arcykapłan). Ich paski są rysowane pod konie, a szyja renifera jest niżej i dalej z przodu.
+2. **Zimowi łucznicy.** Górny pasek Łucznika schodzi trzema pikselami na wodze. Łuczniczka trzyma dwa paski jak reszta zimowych jeźdźców (obiecane przy 1071), oba kończą się na wodzach renifera. Ich odcienie skóry zrobione od nowa.
+3. **Brakujący szczegół: wodze jako warstwa, nie część renifera.** Wodze renifera nie są już narysowane na jego arkuszu kłusa, tylko są osobną warstwą nad kłusem i pod jeźdźcem (`reins` w `walk.mounts.reindeer` w `data/animations.json`, `tools/reindeer-reins.py`, `ride` w `src/client/scenes.js`). Większość jeźdźców ma te same wodze co w 0.4.19, piksel w piksel. Każdy z 27 jeźdźców z własnymi wodzami ma swój obrazek: pasek od wędzidła do końca każdego z jego pasków, w ich kolorze (u Pani Zimy jasnoniebieski), w każdej klatce tam, gdzie jeździec akurat siedzi. Nowy jeździec z własnymi wodzami dostaje końce swoich pasków w `reins.riders`, a narzędzie rysuje jego warstwę. W Stajni i Sklepie renifer zostaje bez wodzy, bo nikt na nim nie siedzi.
+
+## Wersja 0.4.20 (17.11.2026): wodze renifera sięgają do dłoni każdego jeźdźca
+
+1. **Wodze renifera jako osobna warstwa** (wyżej): 27 jeźdźców z własnymi wodzami w dłoni ma je połączone z wodzami renifera. Zimowi łucznicy (jeszcze niedostępni w sklepie) mają poprawione paski w dłoniach.
+
 ## Wersja 0.4.19 (17.11.2026): przegrane licytacje w Rejestrze i zaklęcie żywiołu za części
 
 1. **Rejestr Targowiska pokazuje przegrane licytacje** (wyżej, „Rejestr Targowiska: przegrane licytacje”).

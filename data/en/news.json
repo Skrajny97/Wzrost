@@ -1028,6 +1028,10 @@
     "0.4.19": {
       "title": "Version 0.4.19",
       "body": "- The Marketplace’s log shows auctions lost too: your last bid, the winning price and who won. Such lines are written from this version on.\n- At the Enchantress you can also imbue an element with parts: 20 Crystal Splinters or 2 Amber instead of the element’s material, for the same gold."
+    },
+    "0.4.20": {
+      "title": "Version 0.4.20",
+      "body": "- On the reindeer the reins run from the mouth to every rider’s hands. Riders who hold reins of their own, such as the Saint, the Prophetess or the Winter Lady, have them joined to the reindeer’s, no longer cut off in the air."
     }
   }
 }

@@ -325,10 +325,19 @@ function ride(walk, character) {
   // the author, „na Tygrysie szablozębnym za nisko i za bardzo w lewo siedzi”).
   const [nudgeX, nudgeY] = walk.rider.nudge?.[look]?.[id] ?? [0, 0];
   const top = Math.max(0, seatY - nudgeY - Math.min(...seats.map((seat) => seat[1])));
+  // A mount whose reins are a layer of their own (the Renifer: the author,
+  // „jeden sznur wodzy na reniferze wisi w powietrzu”; walk.mounts.<id>.reins,
+  // tools/reindeer-reins.py) has them over its trot and under the rider: the
+  // reins most riders hold, or a rider's own picture of them when it holds
+  // reins of its own, from the bit to their ends.
+  const reins = trot.reins && (trot.reins.riders?.[look] ? trot.reins.file.replace(/\.png$/, `-${look}.png`) : trot.reins.file);
+  const layer = reins ? h('div', { class: 'scene-ride-mount scene-ride-reins' }) : null;
+  layer?.style.setProperty('--sheet', `url("/${reins}")`);
   const element = h(
     'div',
     { class: 'scene-ride' },
     h('div', { class: 'scene-ride-mount' }),
+    layer,
     h('img', { src: `/${file}`, alt: '', width: box.width, height: box.height, class: 'scene-ride-rider', draggable: 'false' }),
   );
   element.style.setProperty('--ride-width', `${width}px`);
