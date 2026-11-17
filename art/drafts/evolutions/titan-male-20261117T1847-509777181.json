@@ -1,0 +1,19 @@
+{
+  "id": "titan-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult man titan warrior, enormous like a living fortress, enormous and broad, short dark hair and a short beard, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, full heavy plate armour of stone grey steel carved like castle walls with glowing blue runes, huge pauldrons shaped like towers, a tall helmet crowned with battlements showing the face, holding a giant tower shield carved like a castle gate in one hand and a heavy war hammer of stone and steel in the other hand, the whole shield and hammer inside the image, unshakeable, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/colossus-male.png",
+      "usage": "the same man: the same face, hair and build, drawn the same way; now in a far grander, godlike outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08045081528027853
+  },
+  "images": 4
+}

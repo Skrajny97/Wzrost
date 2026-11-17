@@ -1,0 +1,19 @@
+{
+  "id": "celestial-archer-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "young man celestial archer, lean and tall, black hair tied back, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, a long cloak of deep night blue with shining star constellations, white and silver armour with fine star engravings, a silver circlet with a bright star on the brow, a quiver of glowing white arrows, holding a long white and gold bow with a bowstring of pure light and a glowing arrow nocked, the whole bow inside the image, calm and certain, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/bow-master-male.png",
+      "usage": "the same man: the same face, hair and build, drawn the same way; now in a far grander, godlike outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08072336345248753
+  },
+  "images": 4
+}

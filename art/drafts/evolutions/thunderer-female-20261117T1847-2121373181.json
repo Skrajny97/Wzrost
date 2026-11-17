@@ -1,0 +1,19 @@
+{
+  "id": "thunderer-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "young woman thunderer, an archer wreathed in lightning, athletic, long fair blond hair in a braid, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, crackling blue lightning around the body, eyes glowing bright blue, a winged steel helmet with golden thunder roses showing the face, heavy dark armour with silver lightning engravings, a storm grey cloak torn by the wind, a quiver of arrows with blue feathers, holding a great bow of black oak with lightning running along its string, the whole bow inside the image, small bolts crackling close to the hands, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/perun-chosen-female.png",
+      "usage": "the same woman: the same face, hair and build, drawn the same way; now in a far grander, godlike outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08127838510937162
+  },
+  "images": 4
+}

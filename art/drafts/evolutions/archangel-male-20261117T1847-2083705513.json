@@ -1,0 +1,19 @@
+{
+  "id": "archangel-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult man archangel, gentle, short dark brown hair and a short beard, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, two large white feathered wings spread behind the shoulders, the whole wings inside the image, a radiant golden halo behind the head, shining white and gold plate armour with a golden sun on the chest, a long white mantle with golden trim, holding a tall golden staff topped with a radiant sun cross, the whole staff inside the image, merciful and mighty, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/saint-male.png",
+      "usage": "the same man: the same face, hair and build, drawn the same way; now in a far grander, godlike outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08047406493292915
+  },
+  "images": 4
+}

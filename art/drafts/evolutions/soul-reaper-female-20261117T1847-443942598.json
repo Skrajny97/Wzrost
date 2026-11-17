@@ -1,0 +1,19 @@
+{
+  "id": "soul-reaper-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult woman reaper of souls, an assassin, lean, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, a deep hooded cloak of black shadow with pale ghostly wisps of souls drifting close around, a pale silver mask over the lower face, black armour with carved bone ornaments, a belt of small soul lanterns, holding two long curved daggers shaped like small scythes glowing with pale blue souls, the whole daggers inside the image, silent and deadly, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/godslayer-female.png",
+      "usage": "the same woman: the same face, hair and build, drawn the same way; now in a far grander, godlike outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08070388886663649
+  },
+  "images": 4
+}

@@ -1,0 +1,19 @@
+{
+  "id": "beast-lord-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult woman lady of beasts, a huntress, strong, light brown hair in braids, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, a hooded mantle of a giant white wolf pelt with great elk antlers rising from the wolf's head, leather and bark armour with living green moss and tiny white flowers, a necklace of bear claws and fangs, a quiver of arrows, holding a long bow carved from a single great antler, the whole bow inside the image, a faint spectral white wolf close behind the legs, wild and calm, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/wild-lord-female.png",
+      "usage": "the same woman: the same face, hair and build, drawn the same way; now in a far grander, godlike outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08055308450592889
+  },
+  "images": 4
+}

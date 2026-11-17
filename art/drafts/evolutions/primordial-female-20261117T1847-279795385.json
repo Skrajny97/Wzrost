@@ -1,0 +1,19 @@
+{
+  "id": "primordial-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult woman maker of the elements, an archmage, tall, long dark brown hair, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, four small orbs of fire, water, earth and air floating close around the body, flowing robes divided into four quarters of flame red, ocean blue, stone brown and sky white with golden trim, a crown of four gemstones, glowing runes on the hands, holding a tall ornate staff whose head holds all four elements swirling together in a crystal, the whole staff inside the image, awe-inspiring, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/elemental-avatar-female.png",
+      "usage": "the same woman: the same face, hair and build, drawn the same way; now in a far grander, godlike outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08070355473624335
+  },
+  "images": 4
+}

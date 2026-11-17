@@ -1,0 +1,19 @@
+{
+  "id": "elder-druid-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult woman eldest of the druids, tall, long auburn hair braided with green leaves and small flowers, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, ancient yet mighty, bark-like patterns on the skin of the arms, a crown of antlers overgrown with leaves and small white flowers, long robes of moss green and earth brown woven with living vines, a cape of autumn leaves, holding a tall gnarled living staff sprouting fresh leaves with a glowing green seed at its top, the whole staff inside the image, serene and powerful, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/archdruid-female.png",
+      "usage": "the same woman: the same face, hair and build, drawn the same way; now in a far grander, godlike outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08059834384918213
+  },
+  "images": 4
+}

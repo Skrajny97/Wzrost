@@ -1,0 +1,19 @@
+{
+  "id": "heaven-avenger-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult woman avenger of heaven, a holy knight, strong, dark hair in a long braid, a stern scarred face, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, eyes burning with white holy light, a halo of golden flames behind the head, ornate silver and gold plate armour with glowing holy runes, a long crimson tabard with a golden sun, a white cape, holding a huge two-handed greatsword of white fire with a golden hilt, the blade pointing down and resting in front of the feet, the whole sword inside the image, stern and fearless, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/demon-slayer-female.png",
+      "usage": "the same woman: the same face, hair and build, drawn the same way; now in a far grander, godlike outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08056547647052341
+  },
+  "images": 4
+}
