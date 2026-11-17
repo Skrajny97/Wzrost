@@ -1,0 +1,14 @@
+{
+  "id": "zorza-quiver",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the quiver of zorza, the slavic goddess of dawn: a leather quiver dyed in rose and gold sunrise colours with golden sun ornaments, arrows with glowing pink and gold fletching, single inventory item icon",
+  "style": "src/client/art/items/stribog-quiver.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023731204185909696
+  },
+  "images": 1
+}
