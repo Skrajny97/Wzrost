@@ -1,0 +1,14 @@
+{
+  "id": "tall-camp-2-2-sand-snow",
+  "tool": "pixellab inpaint-v3",
+  "description": "top-down pixel art game map seen from above, the end of a path outside a fence covered with fresh white snow, soft pale blue shadows and a few footprints, the same pixel art style as the snowy ground around it, seamless, no trees, no buildings, no people",
+  "style": "src/client/art/camp/campfire-1.png",
+  "input": "art/inputs/winter/tall-camp-2-2-sand.png",
+  "mask": "art/inputs/winter/tall-camp-2-2-sand-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.15
+  },
+  "images": 1
+}
