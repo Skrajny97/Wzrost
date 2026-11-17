@@ -1,0 +1,19 @@
+{
+  "id": "rider-skin-winter-mage-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the woman mage of the reference picture on horseback: the same face, the same long straight brown hair falling straight down her back under the same tall white fur hat with ear flaps, the same long white sheepskin coat with silver and pale blue folk embroidery of snowflakes, the same pale blue wool scarf, a rope belt, dark trousers, a white fur boot, no staff and nothing in the hands but the reins; sitting astride a saddle that is not drawn, upright, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the upper leg lying forward and level from the hip to the knee, the lower leg hanging straight down from the knee, one whole boot at the bottom with the toes pointing right, the long coat falling over the upper leg but the lower leg and the boot showing below it; the far leg completely hidden and not drawn at all, no second boot and no second foot; the hair lying straight and smooth, without bends; the whole figure from the top of the hat to the sole of the boot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/winter-mage-female.png",
+      "usage": "the character's look: this same woman, her face, long brown hair, fur hat, white coat with snowflake embroidery, scarf and colours, drawn the same way; not her standing pose and not the staff"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08191846815745037
+  },
+  "images": 4
+}
