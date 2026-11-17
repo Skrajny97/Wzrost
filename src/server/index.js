@@ -10,7 +10,7 @@ import { buyAvatar, cancelAvatar, claimAvatar } from './avatar.js';
 import { openBestiaryChest } from './bestiary.js';
 import { openEncyclopediaChest, readEncyclopedia } from './encyclopedia.js';
 import { decidePointsReset, takeEvolution, testClassLevel, testEvolutions, undoEvolution } from './evolutions.js';
-import { moveGiftRewards, redeemGiftCode } from './gift-codes.js';
+import { authorGiftCodes, createGiftCode, endGiftCode, moveGiftRewards, redeemGiftCode } from './gift-codes.js';
 import { getStreak, takeStreak } from './streak.js';
 import { getWinter, takeWinter } from './winter.js';
 import { getAchievements, wearTitle } from './achievements.js';
@@ -162,6 +162,9 @@ const routes = [
   ['GET', '/api/strings', strings],
   ['GET', '/api/author', authorPanel],
   ['GET', '/api/author/search', authorSearch],
+  ['GET', '/api/author/gift-codes', authorGiftCodes],
+  ['POST', '/api/author/gift-codes', createGiftCode],
+  ['POST', '/api/author/gift-codes/end', endGiftCode],
   ['POST', '/api/author/bugs/resolve', resolveBugReport],
   // A report's screenshot, for the author's panel (?id= the report).
   ['GET', '/api/author/bugs/image', bugReportImage],

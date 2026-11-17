@@ -9,7 +9,7 @@
 
 import { createArena } from '../arena.js';
 import { fill, h, icon } from '../dom.js';
-import { dateTimeFormat, formatNumber } from '../format.js';
+import { dateFormat, dateTimeFormat, formatNumber } from '../format.js';
 import { call, state } from '../state.js';
 import { confirmAction, systemPanel, toast, withButton } from '../ui.js';
 
@@ -33,6 +33,13 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
   let words = '';
   let found = null;
   let searchError = null;
+  // Gift codes made here (the author, 17.11.2026: „Musisz mi dodac opcję w
+  // Panel Autora generowania takich kodów z pozycji gry, które działają od
+  // razu”; gift-codes.js): read the first time the part opens. The form
+  // stays the same across renders, so what is typed stays after an error.
+  let gifts = null;
+  let giftsOpen = false;
+  let giftForm = null;
   // Answers that come after the panel was left are dropped (the code
   // review: a skill's fight played on with sound on the next screen).
   let gone = false;
@@ -89,6 +96,122 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
       fill(preview);
     }
     render();
+  }
+
+  async function toggleGifts() {
+    if (!giftsOpen) gifts = await call('GET', '/api/author/gift-codes');
+    giftsOpen = !giftsOpen;
+    render();
+  }
+
+  function giftsToggle() {
+    return h('button', {
+      type: 'button',
+      class: 'button button--system button--small author-gifts-toggle',
+      'aria-expanded': String(giftsOpen),
+      text: giftsOpen ? 'Zwiń kody podarunkowe' : 'Kody podarunkowe',
+      onClick: (event) => withButton(event.currentTarget, toggleGifts),
+    });
+  }
+
+  // A day as the date field writes it, "2026-12-17", in the phone's time.
+  const dayValue = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+  // The new code's form: its text, what it gives, its last day (a month
+  // ahead to start with) and, if it is one character's, the name.
+  function newGiftForm() {
+    const field = (id, label, input, hint) => h('div', { class: 'field' }, h('label', { for: id, text: label }), input, hint && h('p', { class: 'field-hint', text: hint }));
+    const number = (id) => h('input', { id, type: 'number', min: '0', step: '1', inputmode: 'numeric', placeholder: '0' });
+    const code = h('input', { id: 'gift-code', type: 'text', maxlength: '24', autocapitalize: 'characters', autocomplete: 'off', spellcheck: 'false', placeholder: 'np. ZIMA100' });
+    const systemPoints = number('gift-system-points');
+    const timePoints = number('gift-time-points');
+    const gold = number('gift-gold');
+    const until = h('input', { id: 'gift-until', type: 'date', value: dayValue(new Date(Date.now() + 30 * 24 * 3600000)) });
+    const name = h('input', { id: 'gift-name', type: 'text', maxlength: '20', autocomplete: 'off', spellcheck: 'false', placeholder: 'puste: dla wszystkich' });
+    const failure = h('p', { class: 'form-error', role: 'alert', hidden: true });
+    const create = (event) =>
+      withButton(event.currentTarget, async () => {
+        try {
+          gifts = await call('POST', '/api/author/gift-codes', { code: code.value, systemPoints: systemPoints.value, timePoints: timePoints.value, gold: gold.value, until: until.value, name: name.value });
+          failure.hidden = true;
+          toast(`Kod ${gifts.codes[0].code} działa od teraz.`);
+          for (const input of [code, systemPoints, timePoints, gold, name]) input.value = '';
+        } catch (error) {
+          failure.textContent = error.message;
+          failure.hidden = false;
+        }
+        render();
+      });
+    return h(
+      'div',
+      { class: 'author-gift-form' },
+      field('gift-code', 'Kod', code, 'Litery i cyfry, bez polskich znaków. Gracz wpisuje go w Ustawieniach.'),
+      h('div', { class: 'author-gift-rewards' }, field('gift-system-points', 'Punkty Systemu', systemPoints), field('gift-time-points', 'Punkty Czasu', timePoints), field('gift-gold', 'Złoto', gold)),
+      field('gift-until', 'Działa do (włącznie)', until),
+      field('gift-name', 'Tylko dla postaci', name, 'Imię postaci. Puste: kod dla wszystkich, raz na konto.'),
+      failure,
+      h('button', { type: 'button', class: 'button button--system', text: 'Utwórz kod', onClick: create }),
+    );
+  }
+
+  // A code's last day: its end is the midnight after it.
+  const lastDay = (until) => dateFormat.format(new Date(until - 1));
+  const usesText = (uses) => `Użyty: ${formatNumber(uses)} ${uses === 1 ? 'raz' : 'razy'}`;
+
+  function giftCard(gift) {
+    const end = async () => {
+      const sure = await confirmAction({ title: 'Zakończyć kod?', text: `Kod ${gift.code} przestanie działać od razu. To, co już dał, zostaje.`, confirmLabel: 'Zakończ', danger: true });
+      if (!sure) return;
+      gifts = await call('POST', '/api/author/gift-codes/end', { id: gift.id });
+      render();
+    };
+    return h(
+      'li',
+      { class: 'card author-gift' },
+      h(
+        'p',
+        { class: 'author-gift-head' },
+        h('strong', { class: 'author-gift-code', text: gift.code }),
+        h('span', { class: `author-gift-state${gift.open ? ' author-gift-state--open' : ''}`, text: gift.open ? 'działa' : gift.endedAt ? 'zakończony' : 'wygasł' }),
+      ),
+      h('p', { class: 'author-gift-rewards-text', text: gift.rewards }),
+      h('p', { class: 'muted author-gift-meta', text: gift.forName ? `Tylko dla postaci ${gift.forName}` : 'Dla wszystkich, raz na konto' }),
+      h('p', { class: 'muted author-gift-meta', text: gift.endedAt ? `Zakończony ${dateTimeFormat.format(new Date(gift.endedAt))}` : `Działa do ${lastDay(gift.until)} włącznie` }),
+      h('p', { class: 'author-gift-meta', text: usesText(gift.uses) }),
+      gift.open && h('button', { type: 'button', class: 'button button--danger button--small', text: 'Zakończ', onClick: (event) => withButton(event.currentTarget, end) }),
+    );
+  }
+
+  function giftsPart() {
+    if (!giftsOpen || !gifts) return null;
+    giftForm ??= newGiftForm();
+    return h(
+      'section',
+      { class: 'card stack author-gifts', 'aria-label': 'Kody podarunkowe' },
+      h('h2', { class: 'card-title', text: 'Kody podarunkowe' }),
+      h('p', { class: 'muted', text: 'Kod działa od razu po utworzeniu, bez nowej wersji gry. Każde konto użyje go raz.' }),
+      giftForm,
+      h('h3', { class: 'author-news-head', text: gifts.codes.length > 0 ? `Utworzone w panelu: ${gifts.codes.length}` : 'Utworzone w panelu' }),
+      gifts.codes.length === 0 ? h('p', { class: 'muted', text: 'Nie ma jeszcze kodów z panelu.' }) : h('ul', { class: 'author-gift-list' }, gifts.codes.map(giftCard)),
+      h(
+        'details',
+        { class: 'author-news-entry' },
+        h('summary', { text: `Kody z plików gry: ${gifts.files.length}` }),
+        h(
+          'ul',
+          { class: 'author-gift-list' },
+          gifts.files.map((gift) =>
+            h(
+              'li',
+              { class: 'author-gift author-gift--file' },
+              h('p', { class: 'author-gift-head' }, h('strong', { class: 'author-gift-code', text: gift.code }), h('span', { class: `author-gift-state${gift.open ? ' author-gift-state--open' : ''}`, text: gift.open ? 'działa' : 'nie działa' })),
+              h('p', { class: 'author-gift-rewards-text', text: gift.rewards }),
+              h('p', { class: 'muted author-gift-meta', text: `${gift.personal ? 'Dla jednej postaci' : 'Dla wszystkich'} · do ${lastDay(gift.until)} · ${usesText(gift.uses).toLowerCase()}` }),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   async function toggleNews() {
@@ -231,7 +354,7 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
         h('div', { class: 'page-heading-text' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Panel autora' }), h('p', { class: 'page-subtitle', text: 'Zgłoszenia błędów, konta i postacie' })),
         h('a', { class: 'button button--system back-button', href: backHash }, icon('back', { size: 20 }), 'Powrót'),
       ),
-      error ? systemPanel(error) : panel === null ? h('p', { class: 'muted', text: 'Wczytywanie…' }) : [newsToggle(), newsPart(), skillsToggle(), skillsPreview(), counts(panel.counts), search(), funnel(panel.funnel), mails(panel.emails), bugs(panel.bugs), accounts(panel.accounts)],
+      error ? systemPanel(error) : panel === null ? h('p', { class: 'muted', text: 'Wczytywanie…' }) : [newsToggle(), newsPart(), giftsToggle(), giftsPart(), skillsToggle(), skillsPreview(), counts(panel.counts), search(), funnel(panel.funnel), mails(panel.emails), bugs(panel.bugs), accounts(panel.accounts)],
       h('button', {
         type: 'button',
         class: 'button button--world',

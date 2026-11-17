@@ -3672,6 +3672,15 @@ Autor 17.11.2026: „I skąd wiedzieć na co jest podatny stwór?”, potem „1
 2. **Brakujący szczegół: procent odporności.** Odporność stwora rośnie z jego poziomem, a jej skutek zależy od poziomu atakującego (`reduction` w `src/engine/formulas.js`). Bestiariusz bierze odporność ze środka poziomów stwora w danym miejscu, a procent liczy na poziomie postaci, tak jak w walce. Odporność, która wychodzi 0%, nie jest pokazana.
 3. Pod listą jest jedno zdanie, co znaczą obie linijki, gdy na liście jest choć jedna. Dane: `weak` i `resist` przy stworach miejsca (`dangerView` w `src/server/content.js`) i `resistK` w treści gry dla strony.
 
+## Kody podarunkowe w Panelu autora (1080, 17.11.2026, czeka na ocenę)
+
+Autor 17.11.2026: „Musisz mi dodac opcję w Panel Autora generowania takich kodów z pozycji gry, które działają od razu, jeśli jest to możliwe, bo wdrożenia całe na jedną prosta rzecz tego typu to przesada troche”.
+
+1. W Panelu autora przycisk „Kody podarunkowe” otwiera formularz: kod, Punkty Systemu, Punkty Czasu, złoto, ostatni dzień działania i (opcjonalnie) imię postaci. Kod trafia do bazy (`author_gift_codes`, migracja 0156) i działa od razu, obok kodów z `data/gift-codes.json`, tak samo raz na konto (`gift_codes_used`).
+2. Kod z imieniem działa tylko dla tej postaci. Imię jest sprawdzane w grze (wielkość liter bez znaczenia), a w bazie leży też skrót imienia, jak przy kodach z plików. Imię nie trafia do repozytorium.
+3. **Brakujące szczegóły:** kod ma od 3 do 24 liter i cyfr. Nagrody są ograniczone przeciw literówce: do 10 000 Punktów Systemu, 100 000 Punktów Czasu i 10 000 000 złota. Kod działa najwyżej rok naprzód, do końca wybranego dnia w Warszawie. Ten sam tekst nie może działać dwa razy dla tych samych graczy: kod dla wszystkich zajmuje swój tekst sam, a kody dla postaci dzielą tekst tylko z kodami innych postaci.
+4. Lista pokazuje kody z panelu z liczbą użyć i przyciskiem „Zakończ”, który od razu wyłącza kod (to, co dał, zostaje). Niżej, zwinięte, są kody z plików gry z liczbą użyć.
+
 ## Wersja 0.4.23 (17.11.2026): słabe punkty i odporności stworów w Bestiariuszu
 
 1. **Bestiariusz** (1074 A, wyżej): przy poznanych stworach słaby punkt i odporności, z procentem na poziomie postaci.
