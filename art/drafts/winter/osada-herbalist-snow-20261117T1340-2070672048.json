@@ -1,0 +1,14 @@
+{
+  "id": "osada-herbalist-snow",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art game building seen from above at an angle, a small wooden log hut in deep winter: its roof and the ground around it covered with thick fresh white snow with soft pale blue shadows, snow lying on the roof in a thick even layer, the same pixel art style and the same light, no people",
+  "style": "src/client/art/camp/campfire-1.png",
+  "input": "art/inputs/winter/herbalist.png",
+  "mask": "art/inputs/winter/herbalist-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
