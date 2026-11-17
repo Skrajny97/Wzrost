@@ -1290,6 +1290,11 @@
       "id": "0.4.19",
       "title": "Wersja 0.4.19",
       "body": "- Rejestr na Targowisku pokazuje też przegrane licytacje: Twoją ostatnią ofertę, cenę, która wygrała, i kto wygrał. Wpisy przybywają od tej wersji.\n- U Zaklinaczki żywioł zaklniesz też za części: 20 Okruchów kryształu albo 2 Bursztyny zamiast materiału żywiołu, za to samo złoto."
+    },
+    {
+      "id": "0.4.20",
+      "title": "Wersja 0.4.20",
+      "body": "- Na reniferze wodze sięgają od pyska do dłoni każdego jeźdźca. Jeźdźcy z własnymi wodzami w dłoni, na przykład Święty, Prorokini czy Pani Zimy, mają je połączone z wodzami renifera, a nie urwane w powietrzu."
     }
   ]
 }

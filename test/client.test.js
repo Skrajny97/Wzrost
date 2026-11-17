@@ -316,6 +316,30 @@ test("every mount's trot has its sheet, a saddle in each frame and the rider's s
   }
 });
 
+// The Renifer's reins, a layer over its trot (tools/reindeer-reins.py): the
+// common ones on the sheet's own pixels, a rider's own on the screen's (the
+// sheet times its scale), one for every rider that holds reins of its own.
+test("a mount's reins layer has a picture for the common reins and for every rider holding its own", () => {
+  const walk = JSON.parse(readFileSync(new URL('../data/animations.json', import.meta.url), 'utf8')).walk;
+  const size = (file) => {
+    const png = readFileSync(join(CLIENT, file));
+    return [png.readUInt32BE(16), png.readUInt32BE(20)];
+  };
+  const withReins = Object.entries(walk.mounts).filter(([, trot]) => trot.reins);
+  assert.ok(withReins.length > 0);
+  for (const [id, trot] of withReins) {
+    const scale = trot.scale ?? 1;
+    assert.equal(trot.reins.bits.length, trot.frames, `${id}: a bit for each frame`);
+    assert.deepEqual(size(trot.reins.file), [trot.width * trot.frames, trot.height], `${id}: ${trot.reins.file}`);
+    for (const look of Object.keys(trot.reins.riders)) {
+      const file = trot.reins.file.replace(/\.png$/, `-${look}.png`);
+      assert.ok(existsSync(join(CLIENT, 'art', 'riders', `${look}.png`)), `${id}: no rider ${look}`);
+      assert.ok(existsSync(join(CLIENT, file)), `${id}: no ${file}`);
+      assert.deepEqual(size(file), [Math.round(trot.width * scale) * trot.frames, Math.round(trot.height * scale)], `${id}: ${file}`);
+    }
+  }
+});
+
 test('the narrator knows when and where each of its lines shows', () => {
   const tutorial = JSON.parse(readFileSync(new URL('../data/tutorial.json', import.meta.url), 'utf8'));
   const beats = /const BEATS = \{([\s\S]*?)\n\};/.exec(readFileSync(join(CLIENT, 'narrator.js'), 'utf8'))[1];
