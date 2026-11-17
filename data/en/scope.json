@@ -829,6 +829,7 @@
     "cosmetics",
     "!cosmetics:items.sabertooth.kind",
     "!cosmetics:items.reindeer.kind", "!cosmetics:items.reindeer.season",
+    "!cosmetics:items.winter-warrior.season", "!cosmetics:items.winter-archer.season", "!cosmetics:items.winter-mage.season", "!cosmetics:items.winter-cleric.season", "!cosmetics:items.winter-shadow.season",
     "!cosmetics:items.aura-system.aura.sparks",
     "!cosmetics:items.aura-ember.aura.sparks", "!cosmetics:items.frame-szron.event", "!cosmetics:items.bg-szczodre.event", "!cosmetics:items.aura-sniezyca.event", "!cosmetics:items.aura-sniezyca.aura.sparks",
     "guilds",
