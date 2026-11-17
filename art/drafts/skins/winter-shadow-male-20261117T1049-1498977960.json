@@ -1,0 +1,23 @@
+{
+  "id": "winter-shadow-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "heroic young man rogue in a festive winter outfit for the old Slavic midwinter feast, tall adult hero with realistic proportions and a small head, lean, messy black hair, standing in the middle of the image, full body figure from the top of the head to the feet, empty space above the head and below the feet, a fitted black leather coat with silver frost embroidery and a black fur collar, a long dark cloak lined with white fur and fastened with a silver snowflake clasp, a dark red scarf pulled up over the nose and mouth, holding two curved daggers with pale blue ice blades, epic and festive, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "src/client/art/portraits/skin-night-raven-male.png",
+      "usage": "the same body proportions, height, small head size and pixel art style as this character"
+    },
+    {
+      "path": "src/client/art/portraits/shadow-male.png",
+      "usage": "the same face as this character"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08086849580870735
+  },
+  "images": 4
+}
