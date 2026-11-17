@@ -108,6 +108,13 @@
         }
       }
     },
+    "snow": {
+      "description": "Gęstość śniegu padającego nad całą grą w dniach zimowego Obozu (src/client/snowfall.js, 1065): light albo heavy. Bez niej śnieg nie pada.",
+      "enum": [
+        "light",
+        "heavy"
+      ]
+    },
     "camp": {
       "description": "Zimowy Obóz: od dnia first do dnia last miesiąca month.",
       "type": "object",

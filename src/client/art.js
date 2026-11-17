@@ -587,17 +587,17 @@ export const SPRITES = {
   'settlement-board': {
     width: 384,
     height: 768,
-    ids: ['settlement'],
+    ids: ['settlement', 'settlement-winter'],
   },
   // The Osada under snow for Szczodre Gody (all of December, as the winter
-  // camp, 1063): the ground ("settlement-winter" among the boards above,
-  // once chosen) and the places with snow on their roofs, their sand
-  // trodden snow. A place without its winter picture keeps its own.
+  // camp, 1063 v2): the ground ("settlement-winter" among the boards above)
+  // and the places with snow on their roofs, their sand trodden snow. A
+  // place without its winter picture keeps its own.
   'settlement-winter': {
     width: 192,
     height: 144,
     fit: true,
-    ids: [],
+    ids: ['arena', 'board', 'casino', 'enchanter', 'forge', 'herbalist', 'hermitage', 'market', 'stable', 'tannery', 'tavern', 'trial-hall'],
   },
   // The Stajnia's mounts (data/settlement.json, stable.mounts, by id), saddled
   // and seen from the side, cut to their outline, on their cards in the

@@ -75,11 +75,13 @@ const NO_KIND = {
 };
 // The order of the offers (a player's remark, 11.11.2026: "od najtańszych i
 // od najdroższych"): the soonest to end first, as before, or by the price
-// of a piece. The choice stays on the device, as the bag's order.
+// of a piece; and the newest offers first (17.11.2026: „sortowanie od
+// najnowszych dodanych”). The choice stays on the device, as the bag's order.
 const SORTS = [
   ['ends', 'Kończące się'],
   ['cheap', 'Najtańsze'],
   ['dear', 'Najdroższe'],
+  ['new', 'Najnowsze'],
 ];
 const SORT_KEY = 'insight-market-sort';
 function savedSort() {
@@ -957,7 +959,7 @@ export function mountMarket(holder) {
         h('span', { class: 'bag-sort-label', text: t('Sortuj:') }),
         h(
           'div',
-          { class: 'segmented bag-sort-options bag-sort-options--3', role: 'group', 'aria-label': t('Kolejność ofert') },
+          { class: `segmented bag-sort-options bag-sort-options--${SORTS.length}`, role: 'group', 'aria-label': t('Kolejność ofert') },
           SORTS.map(([id, label]) =>
             h('button', {
               type: 'button',

@@ -897,7 +897,7 @@
     "tutorial:lines.crafting-patterns",
     "tutorial:lines.crafting-ending",
     "!chat:channels.english",
-    "weeks", "winter", "!winter:calendar", "!winter:camp", "!winter:quests", "!winter:decorations.podlaznniczka.art", "!winter:decorations.snopek.art",
+    "weeks", "winter", "!winter:calendar", "!winter:camp", "!winter:snow", "!winter:quests", "!winter:decorations.podlaznniczka.art", "!winter:decorations.snopek.art",
     "cards",
     "labyrinth",
     "!labyrinth:map",

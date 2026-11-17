@@ -350,8 +350,9 @@ export function publicContent() {
     // and the words of its page.
     cosmetics: { items: game.cosmetics, texts: game.cosmeticTexts },
     // Szczodre Gody (winter.js, 1044): the words of the calendar's window and
-    // tab, and the winter camp's decorations.
-    winter: { texts: game.winter.texts, decorations: game.winter.decorations },
+    // tab, the winter camp's decorations and the falling snow's density
+    // (snowfall.js, 1065 A).
+    winter: { texts: game.winter.texts, decorations: game.winter.decorations, snow: game.winter.snow ?? null },
     giftTexts: game.giftTexts,
     elements: game.elements.map(({ id, name, resistance, from, color }) => ({ id, name, resistance, from, color })),
     effects: game.effects.map(({ id, name, color }) => ({ id, name, color })),

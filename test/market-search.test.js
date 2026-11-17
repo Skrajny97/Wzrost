@@ -140,6 +140,9 @@ describe('the search over the offers, in the engine', () => {
     // Ten herbs for 40 are cheaper a piece than one for 6.
     assert.deepEqual(search({ show: 'all', kind: 'herb', sort: 'cheap' }).ids, [5, 6]);
     assert.deepEqual(search({ show: 'all', kind: 'herb', sort: 'dear' }).ids, [6, 5]);
+    // The newest offers first (a player: „sortowanie od najnowszych dodanych”): the highest id first.
+    assert.deepEqual(search({ show: 'all', kind: 'item', sort: 'new' }).ids, [4, 3, 2, 1]);
+    assert.deepEqual(search({ show: 'all', kind: 'herb', sort: 'new' }).ids, [6, 5]);
     assert.equal(search({ sort: 'random' }).view.sort, 'ends');
     // At one price, the soonest to end first.
     const same = [offer(1, 'herb', { key: 'comfrey', startPrice: 5, endsAt: 30 }), offer(2, 'herb', { key: 'comfrey', startPrice: 5, endsAt: 20 })];

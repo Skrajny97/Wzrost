@@ -20647,6 +20647,19 @@ a.discord-button {
   margin: 0;
 }
 
+/* The Targowisko's four orders ("Najnowsze" since 17.11.2026): beside
+   "Sortuj:" where they fit, under it, the whole width, where they do not,
+   and in two rows of two on the narrowest phones, so no name is squeezed. */
+.market-sort .bag-sort-options--4 {
+  flex-basis: 300px;
+}
+
+@media (max-width: 359px) {
+  .market-sort .bag-sort-options--4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 /* The offers found, dimmed while the next search is on its way, and how
    many more there are. */
 .market-results {
