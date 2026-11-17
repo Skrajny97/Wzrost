@@ -996,6 +996,10 @@
     "0.4.9": {
       "title": "Version 0.4.9",
       "body": "- Generous Feast: the narrator has new lines for December. He will welcome you at the start of the Feast, tell you about the winter quests and speak again on Christmas Eve."
+    },
+    "0.4.10": {
+      "title": "Version 0.4.10",
+      "body": "- Skills now cost half their old mana and 3% of your max mana, but never less than before. With a big mana pool skills are no longer almost free. The Skills tab shows what each skill costs your character."
     }
   }
 }

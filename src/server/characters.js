@@ -1727,7 +1727,7 @@ export function characterView(player, now) {
     wanted: wantedInHand(row),
     freePoints: freePoints(character, content()),
     // The Umiejętności tab: the choices, the skills learned and the Skill Points.
-    skills: skillsView(character, content()),
+    skills: skillsView(character, content(), values.mana),
     // The evolution taken, or the two to choose from at class level 50.
     evolution: evolutionPanel(character, content()),
     // On the test version, a test evolution can be undone (evolutions.js).

@@ -1250,6 +1250,11 @@
       "id": "0.4.9",
       "title": "Wersja 0.4.9",
       "body": "- Szczodre Gody: narrator ma na grudzień nowe kwestie. Przywita Cię na początku Godów, opowie o zimowych zadaniach i odezwie się w Wigilię."
+    },
+    {
+      "id": "0.4.10",
+      "title": "Wersja 0.4.10",
+      "body": "- Umiejętności kosztują teraz połowę dawnej many i 3% Twojej maksymalnej many, ale nigdy mniej niż dawniej. Przy dużej puli many umiejętności nie są już prawie darmowe. Ile kosztuje każda umiejętność Twojej postaci, zobaczysz w zakładce Umiejętności."
     }
   ]
 }

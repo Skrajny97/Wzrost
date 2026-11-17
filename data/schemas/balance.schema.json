@@ -242,6 +242,16 @@
           "type": "number",
           "minimum": 0
         },
+        "manaCost": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["base", "share"],
+          "description": "Koszt umiejętności w manie (1045 B, autor 17.11.2026): base razy koszt z data/skills.json i evolutions.json (co najmniej 1) i share maksymalnej many postaci, ale nigdy mniej niż koszt z danych. Przywołania Arkanisty (manaShare) i umiejętności bez kosztu bez zmian.",
+          "properties": {
+            "base": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+            "share": { "type": "number", "minimum": 0, "maximum": 0.5 }
+          }
+        },
         "lastPointClassLevel": {
           "type": "integer",
           "minimum": 1,

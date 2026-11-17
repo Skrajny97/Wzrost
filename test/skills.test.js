@@ -13,6 +13,7 @@ import {
   raiseBlock,
   sharedBonus,
   simulateFight,
+  skillMana,
   skillParams,
   skillPoints,
   skillsView,
@@ -415,6 +416,25 @@ describe('skills', () => {
     const stab = result.events.find((event) => event.skill === 'backstab');
     assert.equal(stab.target, 'e1');
     assert.ok(stab.kind === 'crit' || stab.kind === 'dodge');
+  });
+
+  test('a skill costs half its cost and 3% of the maximum mana, never less than its own cost (1045 B)', () => {
+    const strike = content.skillsById['power-strike'];
+    // A small pool pays the skill's own cost, as before.
+    assert.equal(skillMana(strike.mana, 58, content), strike.mana);
+    // A big pool pays half the cost and 3% of it: 1200 mana, 5 + 36.
+    assert.equal(skillMana(10, 1200, content), 41);
+    assert.equal(skillMana(0, 1200, content), 0);
+    // The card says what the skill costs the character, and how when the share counts.
+    assert.equal(skillView(strike, 1, content, 58).cost, 'Koszt: 10 many, najwyżej co 3. ruch.');
+    assert.equal(skillView(strike, 1, content, 1200).cost, 'Koszt: 41 many (5 + 3% maks. many), najwyżej co 3. ruch.');
+    const view = skillsView({ classId: 'warrior', classLevel: 12, skills: { 'power-strike': 1 } }, content, 1200);
+    assert.equal(view.pools[0].options.find((one) => one.id === 'power-strike').cost, 'Koszt: 41 many (5 + 3% maks. many), najwyżej co 3. ruch.');
+    // In a fight the skill costs the same: a wise warrior pays more than its own cost.
+    const { character, equipped } = typicalCharacter('warrior', 60, content);
+    const wise = playerCombatant({ character: { ...character, points: { ...character.points, wisdom: (character.points?.wisdom ?? 0) + 200 }, skills: { 'power-strike': 1 } }, equipped, name: 'Mira' }, content);
+    assert.equal(wise.skills.find((one) => one.id === 'power-strike').mana, skillMana(strike.mana, wise.maxMana, content));
+    assert.ok(wise.skills.find((one) => one.id === 'power-strike').mana > strike.mana);
   });
 
   test('without a skill the fight is the same as before skills', () => {
