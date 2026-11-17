@@ -1221,6 +1221,7 @@ async function openTutorialTests() {
       row(t('Trudna wyprawa'), t('Od 10. poziomu postaci, przy wejściu na miejsce wyprawy.'), repeatHardHuntTour, told && Boolean(state.character.hardHunt)),
       row(t('Skrzynia Konta'), t('Przy wejściu do Skrzyni Konta w obozie.'), repeatAccountChestTour, told),
       row(t('Porażka'), t('Przy pierwszym raporcie z wyprawy zakończonej porażką.'), repeatFaintTour, told),
+      row(t('Szczodre Gody'), t('W grudniu: powitanie i zimowe zadania, pierwsze zimowe zadanie i ostatnie okienko kalendarza.'), repeatWinterTour, told),
     ),
   );
 }
@@ -1646,6 +1647,23 @@ async function repeatAccountChestTour() {
   try {
     await call('POST', '/api/test/account-chest-tour');
     forgetPart('account-chest');
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// Test mode: the narrator's lines of Szczodre Gody from the start (testing.js).
+async function repeatWinterTour() {
+  const sure = await confirmAction({
+    title: t('Szczodre Gody od nowa?'),
+    text: t('Narrator powita Cię Szczodrymi Godami przy następnym wejściu w ich dniach.'),
+    confirmLabel: t('Od nowa'),
+  });
+  if (!sure) return;
+  closeSheet();
+  try {
+    await call('POST', '/api/test/winter-tour');
+    forgetPart('winter');
   } catch (error) {
     toast(error.message);
   }

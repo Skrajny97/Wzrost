@@ -59,6 +59,11 @@
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. Reports wait in the Journal, at the top of the settings under the cog."
     },
+    "winter": {
+      "title": "Generous Feast",
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. The winter quests wait in the narrator's quests, and the calendar at the left edge of the screen."
+    },
     "skills": {
       "title": "Skills",
       "skipLabel": "Skip the explanation",
@@ -1098,6 +1103,30 @@
         "The guardians hold the Artifacts. The first guardian you defeat will open the Core to you."
       ],
       "voice": "audio/narration/en/labyrinth-guardians.mp3"
+    },
+    "winter-welcome": {
+      "text": [
+        "Over the wilds falls the longest night of the year. The Generous Feast is coming. Until Christmas Eve, a new window of the calendar waits for you every day."
+      ],
+      "voice": "audio/narration/en/winter-welcome.mp3"
+    },
+    "winter-quests": {
+      "text": [
+        "In December, three winter quests come as well: fir branches from your explorations, a carp for Christmas Eve and something warm from the kitchen. Finish all three in one day, and I will add a card pack."
+      ],
+      "voice": "audio/narration/en/winter-quests.mp3"
+    },
+    "winter-first-quest": {
+      "text": [
+        "Your first winter quest is done. The wilds smell of fir and campfire smoke. This is how the Feast begins."
+      ],
+      "voice": "audio/narration/en/winter-first-quest.mp3"
+    },
+    "winter-eve": {
+      "text": [
+        "Christmas Eve. The last window of the calendar hides the winter set: the Hoarfrost frame, the Generous Feast background and the Snowstorm aura. Happy Generous Feast!"
+      ],
+      "voice": "audio/narration/en/winter-eve.mp3"
     }
   }
 }

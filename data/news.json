@@ -1245,6 +1245,11 @@
       "id": "0.4.8",
       "title": "Wersja 0.4.8",
       "body": "- Szczodre Gody: przez cały grudzień w zadaniach narratora czeka zakładka „Zimowe” z trzema zadaniami na każdy dzień: gałązki jodły z wypraw, karp na Wigilię i potrawa z Systemowej Kuchni. Za każde są Punkty Czasu i złoto, a za wszystkie trzy jednego dnia pakiet kart."
+    },
+    {
+      "id": "0.4.9",
+      "title": "Wersja 0.4.9",
+      "body": "- Szczodre Gody: narrator ma na grudzień nowe kwestie. Przywita Cię na początku Godów, opowie o zimowych zadaniach i odezwie się w Wigilię."
     }
   ]
 }

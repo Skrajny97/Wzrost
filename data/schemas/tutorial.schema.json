@@ -291,7 +291,11 @@
               "labyrinth-map",
               "labyrinth-wounds",
               "labyrinth-levels",
-              "labyrinth-guardians"
+              "labyrinth-guardians",
+              "winter-welcome",
+              "winter-quests",
+              "winter-first-quest",
+              "winter-eve"
             ]
           },
           "kind": {
@@ -418,7 +422,8 @@
               "cornerstone",
               "hard-hunt",
               "account-chest",
-              "faint"
+              "faint",
+              "winter"
             ],
             "description": "Część po wprowadzeniu, do której należy kwestia (chapters). Jej kwestie przychodzą dopiero po zakończeniu wprowadzenia, w swoim momencie gry."
           },

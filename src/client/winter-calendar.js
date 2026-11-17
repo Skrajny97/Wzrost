@@ -84,6 +84,10 @@ export function openWinter(view, take, note = null) {
   );
 }
 
+// Whether today is the calendar's last day (Christmas Eve): the narrator's
+// line of the last window (narrator.js).
+export const winterLastDay = () => Boolean(calendar && calendar.today === calendar.days[calendar.days.length - 1].day);
+
 // What today's reward gave beyond the window's tick: a decoration for the
 // camp, or the winter set waiting in the Sklep Systemu.
 const noteOf = (reward) => (reward?.decoration ? t(words().decorationGot, { name: reward.decoration.name }) : reward?.cosmetics?.length ? words().setGot : null);

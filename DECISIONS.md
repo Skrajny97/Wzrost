@@ -3605,6 +3605,12 @@ Rozstrzygnięte najprostszym rozwiązaniem zgodnym z przyjętymi makietami (1044
    - Gałązki jodły nie są przedmiotem w plecaku, tylko licznikiem zadania: jedna gałązka co 10 minut wyprawy, bez wyprawy przegranej. Tak nie trzeba nowego materiału na Targowisku, w Skrzyni Konta i w Encyklopedii.
    - Przed 16. poziomem Rybołówstwa (poziom karpia) liczy się dowolna ryba („Złów rybę na Wigilię”). Zadanie profesji, której postać jeszcze nie ma (Rybołówstwo i Gotowanie od 25. poziomu postaci), jest zamknięte z napisem „Od 25. poziomu postaci” i skrzynia czeka tylko na otwarte zadania.
    - Na telefonie cztery zakładki stoją w dwóch rzędach po dwie (1047 na stronie ocen).
+8. **Kwestie narratora (1044.8, nagrania 1046: kwestia 1 PL B i EN B, 2 PL A i EN A, 3 PL B i EN B, 4 PL B i EN A)** to rozdział „Szczodre Gody” po wprowadzeniu: powitanie i zimowe zadania przy pierwszym wejściu w dniach zimowych zadań, pochwała po pierwszym wykonanym zimowym zadaniu i Wigilia przy ostatnim okienku kalendarza. Każda raz na postać, więc za rok trzeba będzie ją odnowić. W „Testuj samouczki” rozdział ma swój wiersz.
+9. **Zimowy Obóz:** polana w stylu 1048 A.
+
+## Wersja 0.4.9 (17.11.2026): kwestie narratora Szczodrych Godów (ukryte do 1.12)
+
+1. **Narrator Szczodrych Godów (1044.8, nagrania 1046).** Cztery kwestie po polsku i angielsku w nowym rozdziale „Szczodre Gody”: powitanie, zimowe zadania, pierwsze zimowe zadanie i Wigilia (szczegóły wyżej, w „Szczodre Gody w grze”, pkt 8). W grze odezwą się w grudniu; na wersji testowej od razu.
 
 ## Wersja 0.4.8 (17.11.2026): zimowe zadania Szczodrych Godów (ukryte do 1.12)
 
