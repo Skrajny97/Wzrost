@@ -1,0 +1,14 @@
+{
+  "id": "tall-camp-2-2-out-snow",
+  "tool": "pixellab inpaint-v3",
+  "description": "top-down pixel art game map seen from above, the land outside a fenced snowy meadow: dense winter forest of fir trees and leafy trees heavily covered in thick white snow and pale blue hoarfrost, frosted bushes, the ground between the trees under deep snow, the same pixel art style as the snowy forest around it, seamless, no buildings, no people, no paths",
+  "style": "src/client/art/camp/campfire-1.png",
+  "input": "art/inputs/winter/tall-camp-2-2-out.png",
+  "mask": "art/inputs/winter/tall-camp-2-2-out-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.15
+  },
+  "images": 1
+}
