@@ -2365,7 +2365,10 @@
         "input": "art/inputs/winter/camp-1-snowy.png",
         "mask": "art/inputs/winter/camp-1-trees-mask.png",
         "prompt": "top-down pixel art game map seen from above, a dense winter forest of fir trees and leafy trees around a snowy glade, thick fresh white snow lying on the branches and crowns of the trees, a little snow on the ground between the trees, the same pixel art style as the glade, seamless, no buildings, no people, no paths"
-      }
+      },
+      "camp-2-out-snow": {"tool": "inpaint", "input": "art/inputs/winter/camp-2-out.png", "mask": "art/inputs/winter/camp-2-out-mask.png", "prompt": "top-down pixel art game map seen from above, the land outside a fenced snowy meadow: dense winter forest of fir trees and leafy trees heavily covered in thick white snow and pale blue hoarfrost, frosted bushes, the ground between the trees under deep snow, the same pixel art style as the snowy ground inside, seamless, no buildings, no people, no paths"},
+      "camp-3-out-snow": {"tool": "inpaint", "input": "art/inputs/winter/camp-3-out.png", "mask": "art/inputs/winter/camp-3-out-mask.png", "prompt": "top-down pixel art game map seen from above, the land outside a snowy meadow inside a wooden palisade: dense winter forest of fir trees and leafy trees heavily covered in thick white snow and pale blue hoarfrost, frosted bushes, the ground between the trees under deep snow, the same pixel art style as the snowy ground inside, seamless, no buildings, no people, no paths"},
+      "fortress-out-top-snow": {"tool": "inpaint", "input": "art/inputs/winter/fortress-out-top.png", "mask": "art/inputs/winter/fortress-out-top-mask.png", "prompt": "top-down pixel art game map seen from above, the land outside a snowy castle courtyard with grey stone walls: dense winter forest of fir trees and leafy trees heavily covered in thick white snow and pale blue hoarfrost, frosted bushes, the ground between the trees under deep snow, the same pixel art style as the snowy ground inside, seamless, no buildings, no people, no paths"}
     }
   }
 }
