@@ -3664,6 +3664,11 @@ Autor: „jeden sznur wodzy na reniferze wisi w powietrzu”. Wcześniej: „te 
 2. **Zimowi łucznicy.** Górny pasek Łucznika schodzi trzema pikselami na wodze. Łuczniczka trzyma dwa paski jak reszta zimowych jeźdźców (obiecane przy 1071), oba kończą się na wodzach renifera. Ich odcienie skóry zrobione od nowa.
 3. **Brakujący szczegół: wodze jako warstwa, nie część renifera.** Wodze renifera nie są już narysowane na jego arkuszu kłusa, tylko są osobną warstwą nad kłusem i pod jeźdźcem (`reins` w `walk.mounts.reindeer` w `data/animations.json`, `tools/reindeer-reins.py`, `ride` w `src/client/scenes.js`). Większość jeźdźców ma te same wodze co w 0.4.19, piksel w piksel. Każdy z 27 jeźdźców z własnymi wodzami ma swój obrazek: pasek od wędzidła do końca każdego z jego pasków, w ich kolorze (u Pani Zimy jasnoniebieski), w każdej klatce tam, gdzie jeździec akurat siedzi. Nowy jeździec z własnymi wodzami dostaje końce swoich pasków w `reins.riders`, a narzędzie rysuje jego warstwę. W Stajni i Sklepie renifer zostaje bez wodzy, bo nikt na nim nie siedzi.
 
+## Wersja 0.4.22 (17.11.2026): kod DISCORD100 dla zwycięzcy losowania, zimowa Kleryczka w siodle
+
+1. **Kod DISCORD100** (wyżej, „Kod DISCORD100”): działa już dla postaci zwycięzcy losowania na Discordzie.
+2. **Zimowy Kleryk i zimowa Kleryczka w siodle** (1076: 1 i 1077: 1, jazdy przyjęte): w grze z ośmioma odcieniami skóry, a ich paski wodzy łączą się z wodzami renifera. Zimowych strojów dalej nie ma w sklepie: czekają na Cienia.
+
 ## Wersja 0.4.21 (17.11.2026): drugi Awatar Systemu, zimowy Mag i Magini w siodle
 
 1. **Drugi Awatar Systemu** (1066, wyżej): kupiony po pierwszym za 200 000 złota, pracuje obok postaci i pierwszego Awatara; przy dwóch Awatarach w pracy pasek „AWATARY” rozwija zakładki (1070.3).
@@ -3875,13 +3880,14 @@ Autor przyjął 1031: „Próba obciążenia serwera przed startem w Sklepie Pla
 3. **Liczba postaci każdej klasy** (ekran tworzenia postaci) liczy się już tylko na ekranach, z których można przejść do tworzenia postaci (`/api/characters?with=classes`), a nie przy każdym wejściu na zakładkę Postać. Lista postaci czyta teraz kilkadziesiąt wierszy.
 4. **Bez zmian, do obserwacji:** czat (najnowsza wiadomość czytana od końca indeksu, 0,01 ms przy 270 tys. wiadomości w kanale), lista rywali na Arenie (ok. 2,4 tys. wierszy na wejście), sprawdzanie imienia przy tworzeniu postaci i lista graczy online po stuknięciu. Rosną z liczbą postaci, ale wywołuje się je rzadko.
 
-## Kod DISCORD100 (16.11.2026, czeka na imię zwycięzcy)
+## Kod DISCORD100 (16.11.2026, zwycięzca od 17.11.2026)
 
 Autor 16.11.2026: „Przygotuj też kod DISCORD100 na jutro gdzie tylko uzupełnimy nazwę gracza później”, ze zrzutem losowania na Discordzie: „100 Punktów Systemu i 100 Punktów Czasu”, koniec 17.11.2026 o 18:16, jeden zwycięzca.
 
 1. Kod `DISCORD100` (`discord-2026-11` w `data/gift-codes.json`) daje 100 Punktów Systemu i 100 Punktów Czasu, raz, tylko jednej postaci, do 17.12.2026 włącznie (brakujący szczegół: miesiąc, jak przy kodach za kawę).
 2. Do czasu, aż autor poda imię postaci zwycięzcy, w `for` stoi skrót SHA-256 losowych znaków, czyli niczyjego imienia, więc kod nie działa dla nikogo. Po losowaniu wystarczy zamienić go na skrót imienia zwycięzcy i wdrożyć.
 3. Kod nie trafia do „Co nowego?”, bo jest dla jednej postaci; autor przekazuje go sam.
+4. 17.11.2026 autor podał zwycięzcę losowania („przyporządkuj go sprawnie do niego”). W `for` stoi skrót SHA-256 imienia jego postaci, a samo imię nie trafia do repozytorium. Kod działa od wersji 0.4.22, tylko dla postaci o tym imieniu (wielkość liter nie ma znaczenia).
 
 ## Wersja 0.3.95 (16.11.2026): Arena wyrównana na poziomach Łysogór, poświata karty w pakiecie, Warsztat zbadany
 

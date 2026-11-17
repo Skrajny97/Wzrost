@@ -137,7 +137,7 @@
     {
       "id": "discord-2026-11",
       "code": "DISCORD100",
-      "for": "2a490615f7b35e9901a66ecc3e1e80d01eff8bf2fb28dc0869688105d8a8b547",
+      "for": "9065c094332fa61d2736c1e94f552170a20483258a4b5353fb8673ae913005e1",
       "until": "2026-12-18T00:00:00+01:00",
       "rewards": { "systemPoints": 100, "timePoints": 100 }
     }
