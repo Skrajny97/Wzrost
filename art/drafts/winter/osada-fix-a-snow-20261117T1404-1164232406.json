@@ -1,0 +1,14 @@
+{
+  "id": "osada-fix-a-snow",
+  "tool": "pixellab inpaint-v3",
+  "description": "top-down pixel art game map seen from above, a village square in deep winter: plain fresh white snow on the ground with soft pale blue shadows and a few footprints, empty vegetable garden beds of dark soil lightly covered with snow, no trees, no bushes, no plants, no vegetables, no rocks, the same pixel art style, seamless",
+  "style": "src/client/art/camp/campfire-1.png",
+  "input": "art/inputs/winter/osada-fix-a.png",
+  "mask": "art/inputs/winter/osada-fix-a-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.15
+  },
+  "images": 1
+}
