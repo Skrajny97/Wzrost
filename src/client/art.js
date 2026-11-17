@@ -99,6 +99,10 @@ export const SPRITES = {
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
       'skin-dawn-female', 'skin-dawn-male', 'skin-eclipse-female', 'skin-eclipse-male',
+      // The winter outfits of Szczodre Gody, sold in December (1044).
+      'skin-winter-warrior-female', 'skin-winter-warrior-male', 'skin-winter-archer-female', 'skin-winter-archer-male',
+      'skin-winter-mage-female', 'skin-winter-mage-male', 'skin-winter-cleric-female', 'skin-winter-cleric-male',
+      'skin-winter-shadow-female', 'skin-winter-shadow-male',
     ],
     faces: {
       'archer-female': 49, 'archer-male': 52, 'cleric-male': 49, 'shadow-male': 51, 'warrior-male': 50,
@@ -119,6 +123,8 @@ export const SPRITES = {
       'skin-night-raven-female': 50, 'skin-night-raven-male': 51, 'skin-forest-lord-female': 51, 'skin-forest-lord-male': 52,
       'skin-perun-female': 49, 'skin-perun-male': 49,
       'skin-dawn-female': 48, 'skin-dawn-male': 52, 'skin-eclipse-female': 50, 'skin-eclipse-male': 50,
+      'skin-winter-warrior-male': 49, 'skin-winter-warrior-female': 50, 'skin-winter-archer-male': 49, 'skin-winter-archer-female': 49, 'skin-winter-mage-male': 51,
+      'skin-winter-mage-female': 51, 'skin-winter-cleric-male': 49, 'skin-winter-cleric-female': 48, 'skin-winter-shadow-male': 49, 'skin-winter-shadow-female': 48,
     },
     perches: {
       'warrior-female': [32, 38], 'warrior-male': [34, 40], 'archer-female': [34, 41], 'archer-male': [35, 36], 'mage-female': [34, 41],
@@ -146,6 +152,9 @@ export const SPRITES = {
       'skin-night-raven-female': [33, 40], 'skin-night-raven-male': [33, 38], 'skin-forest-lord-female': [37, 41], 'skin-forest-lord-male': [38, 40],
       'skin-perun-female': [32, 38], 'skin-perun-male': [34, 40],
       'skin-dawn-female': [36, 40], 'skin-dawn-male': [36, 38], 'skin-eclipse-female': [38, 36], 'skin-eclipse-male': [38, 34],
+      'skin-winter-warrior-male': [34, 31], 'skin-winter-warrior-female': [35, 31], 'skin-winter-archer-male': [35, 34], 'skin-winter-archer-female': [35, 34],
+      'skin-winter-mage-male': [37, 39], 'skin-winter-mage-female': [37, 40], 'skin-winter-cleric-male': [37, 37], 'skin-winter-cleric-female': [36, 38],
+      'skin-winter-shadow-male': [35, 29], 'skin-winter-shadow-female': [34, 29],
     },
     // `petSpots`: a pet's own place on a portrait where its usual one would
     // cover what the figure holds at the shoulder (a falcon, a staff's head,
@@ -191,6 +200,10 @@ export const SPRITES = {
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
       'skin-dawn-female', 'skin-dawn-male', 'skin-eclipse-female', 'skin-eclipse-male',
+      // The winter outfits of Szczodre Gody, sold in December (1044).
+      'skin-winter-warrior-female', 'skin-winter-warrior-male', 'skin-winter-archer-female', 'skin-winter-archer-male',
+      'skin-winter-mage-female', 'skin-winter-mage-male', 'skin-winter-cleric-female', 'skin-winter-cleric-male',
+      'skin-winter-shadow-female', 'skin-winter-shadow-male',
     ],
   },
   items: {
@@ -310,6 +323,10 @@ export const SPRITES = {
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
       'skin-dawn-female', 'skin-dawn-male', 'skin-eclipse-female', 'skin-eclipse-male',
+      // The winter outfits of Szczodre Gody, sold in December (1044).
+      'skin-winter-warrior-female', 'skin-winter-warrior-male', 'skin-winter-archer-female', 'skin-winter-archer-male',
+      'skin-winter-mage-female', 'skin-winter-mage-male', 'skin-winter-cleric-female', 'skin-winter-cleric-male',
+      'skin-winter-shadow-female', 'skin-winter-shadow-male',
     ],
   },
   // The ethereal narrator of the introduction, reading its scroll (narrator.js).
@@ -656,6 +673,10 @@ export const SPRITES = {
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
       'skin-dawn-female', 'skin-dawn-male', 'skin-eclipse-female', 'skin-eclipse-male',
+      // The winter outfits of Szczodre Gody, sold in December (1044).
+      'skin-winter-warrior-female', 'skin-winter-warrior-male', 'skin-winter-archer-female', 'skin-winter-archer-male',
+      'skin-winter-mage-female', 'skin-winter-mage-male', 'skin-winter-cleric-female', 'skin-winter-cleric-male',
+      'skin-winter-shadow-female', 'skin-winter-shadow-male',
     ],
   },
 };

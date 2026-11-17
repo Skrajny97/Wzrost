@@ -88,6 +88,26 @@
     "eclipse": {
       "name": "Robe of the Eclipse",
       "description": "A navy robe with a high collar, a silver crescent and stars, and a staff with a black crystal. The Mage wears it on the portrait, on the march and in the saddle, at every evolution."
+    },
+    "winter-warrior": {
+      "name": "Generous Feast Armour",
+      "description": "Silver armour with white fur, a red cape and a helmet with a sprig of holly. The Warrior wears it on the portrait, on the march and in the saddle, in every evolution. On sale only in December."
+    },
+    "winter-archer": {
+      "name": "Winter Archer's Garb",
+      "description": "A green and red coat with golden embroidery, a white fur cloak and a bow decked with fir. The Archer wears it on the portrait, on the march and in the saddle, in every evolution. On sale only in December."
+    },
+    "winter-mage": {
+      "name": "Frost Mage's Furs",
+      "description": "A white fur coat, a scarf and a fur hat, with an ice crystal on the staff. The Mage wears them on the portrait, on the march and in the saddle, in every evolution. On sale only in December."
+    },
+    "winter-cleric": {
+      "name": "Star-Bearer's Robes",
+      "description": "A crimson fur-lined cloak, ice-coloured robes with silver embroidery, a fir wreath and a staff with a carol star. The Cleric wears them on the portrait, on the march and in the saddle, in every evolution. On sale only in December."
+    },
+    "winter-shadow": {
+      "name": "Winter Night Cloak",
+      "description": "A black cloak with white fur, a red scarf over the face and ice daggers. The Shadow wears it on the portrait, on the march and in the saddle, in every evolution. On sale only in December."
     }
   },
   "texts": {

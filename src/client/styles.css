@@ -18844,6 +18844,84 @@ button.tcard-slot {
   padding: 8px 0;
 }
 
+/* The Panel autora's gift codes (the author, 17.11.2026): the form of a new
+   code, its three rewards side by side where they fit, and the codes made,
+   each with whether it works and how many took it. */
+.author-gifts {
+  gap: 12px;
+}
+
+.author-gift-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.author-gift-rewards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.author-gift-form input[type='date'] {
+  color-scheme: dark;
+}
+
+.author-gift-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.author-gift {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.author-gift--file {
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+
+.author-gift p {
+  margin: 0;
+}
+
+.author-gift-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+
+.author-gift-code {
+  font-family: var(--font-system);
+  font-size: 17px;
+  letter-spacing: 0.06em;
+  overflow-wrap: anywhere;
+}
+
+.author-gift-state {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.author-gift-state--open {
+  color: var(--leaf);
+}
+
+.author-gift-meta {
+  font-size: 14px;
+}
+
 /* The Kowadło's scrolls (598 C): the icon by the title of their cards in the
    Kuźnia and the Warsztat, and by their boxes on the Kowadło. */
 .forge-scroll-title {

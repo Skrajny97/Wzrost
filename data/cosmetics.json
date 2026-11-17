@@ -209,6 +209,56 @@
       "price": 800,
       "classId": "mage",
       "look": "skin-eclipse"
+    },
+    {
+      "id": "winter-warrior",
+      "kind": "outfit",
+      "name": "Zbroja Szczodrych Godów",
+      "description": "Srebrna zbroja z białym futrem, czerwona peleryna i hełm z gałązką ostrokrzewu. Wojownik nosi ją na portrecie, w marszu i w siodle, przy każdej ewolucji. W sprzedaży tylko w grudniu.",
+      "price": 800,
+      "classId": "warrior",
+      "look": "skin-winter-warrior",
+      "season": "winter"
+    },
+    {
+      "id": "winter-archer",
+      "kind": "outfit",
+      "name": "Strój Zimowego Strzelca",
+      "description": "Zielono-czerwony kaftan ze złotym haftem, biały futrzany płaszcz i łuk przybrany jodłą. Łucznik nosi go na portrecie, w marszu i w siodle, przy każdej ewolucji. W sprzedaży tylko w grudniu.",
+      "price": 800,
+      "classId": "archer",
+      "look": "skin-winter-archer",
+      "season": "winter"
+    },
+    {
+      "id": "winter-mage",
+      "kind": "outfit",
+      "name": "Futro Mroźnego Maga",
+      "description": "Biały futrzany płaszcz, szal i uszanka, a na kosturze lodowy kryształ. Mag nosi je na portrecie, w marszu i w siodle, przy każdej ewolucji. W sprzedaży tylko w grudniu.",
+      "price": 800,
+      "classId": "mage",
+      "look": "skin-winter-mage",
+      "season": "winter"
+    },
+    {
+      "id": "winter-cleric",
+      "kind": "outfit",
+      "name": "Szaty Gwiazdora",
+      "description": "Karmazynowy płaszcz podbity futrem, szaty w kolorze lodu ze srebrnym haftem, wieniec z jodły i kij z gwiazdą kolędniczą. Kleryk nosi je na portrecie, w marszu i w siodle, przy każdej ewolucji. W sprzedaży tylko w grudniu.",
+      "price": 800,
+      "classId": "cleric",
+      "look": "skin-winter-cleric",
+      "season": "winter"
+    },
+    {
+      "id": "winter-shadow",
+      "kind": "outfit",
+      "name": "Płaszcz Zimowej Nocy",
+      "description": "Czarny płaszcz z białym futrem, czerwona chusta na twarzy i lodowe sztylety. Cień nosi go na portrecie, w marszu i w siodle, przy każdej ewolucji. W sprzedaży tylko w grudniu.",
+      "price": 800,
+      "classId": "shadow",
+      "look": "skin-winter-shadow",
+      "season": "winter"
     }
   ],
   "texts": {

@@ -45,6 +45,12 @@ describe('the Sklep Systemu in the engine', () => {
         ['perun', 'outfit', 'Pancerz Peruna', 800],
         ['dawn', 'outfit', 'Szaty Świtu', 800],
         ['eclipse', 'outfit', 'Szata Zaćmienia', 800],
+        // The winter outfits of Szczodre Gody (1044), sold only in December.
+        ['winter-warrior', 'outfit', 'Zbroja Szczodrych Godów', 800],
+        ['winter-archer', 'outfit', 'Strój Zimowego Strzelca', 800],
+        ['winter-mage', 'outfit', 'Futro Mroźnego Maga', 800],
+        ['winter-cleric', 'outfit', 'Szaty Gwiazdora', 800],
+        ['winter-shadow', 'outfit', 'Płaszcz Zimowej Nocy', 800],
       ],
     );
     // A name in its frame's colour: gold brighter than the names' own gold.
