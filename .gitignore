@@ -10,3 +10,5 @@ audio/drafts/
 checks/
 # Worktrees of helper sessions.
 .claude/worktrees/
+# Python bytecode from the art tools.
+__pycache__/
