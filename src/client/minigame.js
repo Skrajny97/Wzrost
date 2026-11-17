@@ -41,14 +41,15 @@ function buzz(hit) {
 // "{value}" of a text filled in.
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (whole, name) => (Object.hasOwn(vars, name) ? String(vars[name]) : whole));
 
-// Plays the mini-game of the finished work (`avatar`: the Awatar's) and
+// Plays the mini-game of the finished work (`avatar`: the Awatar's, true, or
+// the second Awatar's, 2) and
 // resolves with what the claim sends: { taps } after the tries, { skip: true }
 // when skipped, or null when the work has none or the game cannot begin.
 export async function playMinigame(activity, avatar) {
   if (!hasMinigame(activity)) return null;
   let game;
   try {
-    ({ minigame: game } = await call('POST', '/api/minigame', avatar ? { avatar: true } : {}));
+    ({ minigame: game } = await call('POST', '/api/minigame', avatar === 2 ? { avatar: 2 } : avatar ? { avatar: true } : {}));
   } catch {
     return null;
   }

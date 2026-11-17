@@ -284,10 +284,11 @@ export function mountProfessions(container, { params, navigate }) {
   // What the screen shows depends on: the work under way (or not) of the
   // character and of the Awatar, whether it has ended, and test mode.
   const stateKey = (character, now = serverNow()) => {
-    const works = [character.activity, character.professions?.avatar?.activity];
+    const works = [character.activity, character.professions?.avatar?.activity, character.professions?.avatar?.second?.activity];
     return JSON.stringify([
       ...works.flatMap((work) => [work?.kind ?? null, work?.startedAt ?? null, activityFinished(work, now)]),
       character.professions?.avatar?.owned ?? false,
+      character.professions?.avatar?.second?.owned ?? false,
       state.user.testMode && testModeOn(),
       // What waits in the Przechowalnia.
       (character.professions?.storage?.items ?? []).map((item) => item.id).join(),
@@ -416,9 +417,13 @@ export function mountProfessions(container, { params, navigate }) {
     const own = work && character.activity?.kind === work.kind ? character.activity : null;
     const avatar = character.professions.avatar.activity;
     const avatarHere = work && avatar?.kind === work.kind ? avatar : null;
+    // The second Awatar's (1066, 1070.2).
+    const second = character.professions.avatar.second?.activity;
+    const secondHere = work && second?.kind === work.kind ? second : null;
     let status = t('poz. {level}', { level: profession.level });
     if (own) status = activityFinished(own) ? t('Raport gotowy') : t(work.busy);
     else if (avatarHere) status = activityFinished(avatarHere) ? t('Raport Awatara') : t('Pracuje Awatar');
+    else if (secondHere) status = activityFinished(secondHere) ? t('Raport Drugiego Awatara') : t('Pracuje Drugi Awatar');
     return h(
       'a',
       { class: 'profession-square', href: HASHES[profession.id] ?? HOME },
@@ -429,10 +434,17 @@ export function mountProfessions(container, { params, navigate }) {
   }
 
   // The Awatar Systemu under the squares: what it is and its price until it
-  // is bought, then what it is doing.
+  // is bought, then what it is doing; and once it is bought, the same of the
+  // second Awatar under it (1066; 1070.1 and 1070.2).
   function avatarPanel(character) {
     const { avatar } = character.professions;
-    const card = h('section', { class: 'card avatar-card', 'aria-labelledby': 'avatar-title' }, h('h2', { class: 'card-title', id: 'avatar-title', text: avatar.name }));
+    return [avatarCard(character, avatar, true), avatar.owned && avatar.second && avatarCard(character, avatar.second, 2)];
+  }
+
+  // One Awatar's card (`which`: true the first, 2 the second).
+  function avatarCard(character, avatar, which) {
+    const id = which === 2 ? 'avatar2-title' : 'avatar-title';
+    const card = h('section', { class: 'card avatar-card', 'aria-labelledby': id }, h('h2', { class: 'card-title', id, text: avatar.name }));
     if (!avatar.owned) {
       const short = avatar.price - character.gold;
       card.append(
@@ -442,7 +454,7 @@ export function mountProfessions(container, { params, navigate }) {
         h('button', {
           type: 'button',
           class: 'button button--system',
-          text: t('Kup Awatara'),
+          text: which === 2 ? t('Kup drugiego Awatara') : t('Kup Awatara'),
           disabled: short > 0,
           onClick: async (event) => {
             const button = event.currentTarget;
@@ -453,7 +465,7 @@ export function mountProfessions(container, { params, navigate }) {
             });
             if (!sure) return;
             await withButton(button, async () => {
-              const { text } = await call('POST', '/api/avatar/buy');
+              const { text } = await call('POST', '/api/avatar/buy', which === 2 ? { avatar: 2 } : undefined);
               toast(text);
             });
           },
@@ -463,7 +475,7 @@ export function mountProfessions(container, { params, navigate }) {
     }
     const work = avatar.activity;
     if (!work) {
-      card.append(h('p', { text: t('Czeka na pracę. Wybierz profesję i przy starcie zaznacz, że pracuje Awatar.') }));
+      card.append(h('p', { text: which === 2 ? t('Czeka na pracę. Wybierz profesję i przy starcie zaznacz, że pracuje Drugi Awatar.') : t('Czeka na pracę. Wybierz profesję i przy starcie zaznacz, że pracuje Awatar.') }));
       return card;
     }
     const done = activityFinished(work);
@@ -550,11 +562,14 @@ export function mountProfessions(container, { params, navigate }) {
   }
 
   // Who is free for a new work: the character at home, and the Awatar
-  // Systemu once bought and not at work.
-  const freeWorkers = (character) => ({ character: !character.activity, avatar: character.professions.avatar.owned && !character.professions.avatar.activity });
+  // Systemu and the second Awatar (1066) once bought and not at work.
+  const freeWorkers = (character) => {
+    const { avatar } = character.professions;
+    return { character: !character.activity, avatar: avatar.owned && !avatar.activity, avatar2: Boolean(avatar.second?.owned && !avatar.second.activity) };
+  };
   const anyFree = (character) => {
     const free = freeWorkers(character);
-    return free.character || free.avatar;
+    return free.character || free.avatar || free.avatar2;
   };
 
   // The works of `kind` here, by `card`: the character's, or what it does
@@ -564,11 +579,17 @@ export function mountProfessions(container, { params, navigate }) {
   function works(character, kind, card, busy) {
     const { avatar } = character.professions;
     const activity = character.activity;
-    const own = activity?.kind === kind ? card(activity, false) : activity && !freeWorkers(character).avatar && busyPanel(activity, busy);
-    const avatarWork = avatar.activity?.kind === kind ? avatar.activity : null;
-    const theirs = avatarWork && h('section', { class: 'stack', 'aria-label': avatar.name }, h('h2', { class: 'section-title', text: avatar.name }), card(avatarWork, true));
-    const avatarFirst = avatarWork && activityFinished(avatarWork) && !(activity?.kind === kind && activityFinished(activity));
-    return avatarFirst ? [theirs, own] : [own, theirs];
+    const free = freeWorkers(character);
+    const own = activity?.kind === kind ? card(activity, false) : activity && !free.avatar && !free.avatar2 && busyPanel(activity, busy);
+    // Each Awatar's (the second's too, 1066) under its name.
+    const theirs = (one, which) => {
+      const work = one?.activity?.kind === kind ? one.activity : null;
+      return work && { finished: activityFinished(work), element: h('section', { class: 'stack', 'aria-label': one.name }, h('h2', { class: 'section-title', text: one.name }), card(work, which)) };
+    };
+    const ownDone = activity?.kind === kind && activityFinished(activity);
+    const all = [{ finished: ownDone, element: own }, theirs(avatar, true), theirs(avatar.second, 2)].filter((one) => one?.element);
+    // A report to claim comes first, the character's before the Awatars'.
+    return [...all.filter((one) => one.finished), ...all.filter((one) => !one.finished)].map((one) => one.element);
   }
 
   // What the character does elsewhere, and when it comes here.
@@ -578,21 +599,25 @@ export function mountProfessions(container, { params, navigate }) {
 
   // Who takes a new work, over its start button: with the Awatar bought,
   // the character or the Awatar when both are free (the last choice is
-  // remembered), otherwise the one that is free. `body` adds the choice to
-  // the start's request.
+  // remembered), otherwise the one that is free; with the second Awatar too
+  // (1066), three: Postać, Awatar and Drugi Awatar (1070.4). `body` adds
+  // the choice to the start's request.
   function workerPicker(character) {
     const { avatar } = character.professions;
     const free = freeWorkers(character);
     if (!avatar.owned) return { element: null, body: () => ({}) };
-    let worker = free.character && free.avatar ? (loadChoice(WORKER_CHOICE).worker === 'avatar' ? 'avatar' : 'character') : free.avatar ? 'avatar' : 'character';
-    const row = h('div', { class: 'segmented', role: 'group', 'aria-label': t('Kto pracuje') });
+    const second = avatar.second?.owned ? avatar.second : null;
+    // With two Awatary the options and the notes name them shortly, as in
+    // 1070.4; with one, by its whole name, as before.
+    const names = second ? { avatar: t('Awatar'), avatar2: t('Drugi Awatar') } : { avatar: avatar.name };
+    const options = [['character', t('Postać')], ['avatar', names.avatar], ...(second ? [['avatar2', names.avatar2]] : [])];
+    const remembered = loadChoice(WORKER_CHOICE).worker;
+    let worker = options.some(([id]) => id === remembered) && free[remembered] ? remembered : options.find(([id]) => free[id])?.[0] ?? 'character';
+    const row = h('div', { class: `segmented${second ? ' segmented--three' : ''}`, role: 'group', 'aria-label': t('Kto pracuje') });
     const show = () =>
       fill(
         row,
-        [
-          ['character', t('Postać')],
-          ['avatar', avatar.name],
-        ].map(([id, name]) =>
+        options.map(([id, name]) =>
           h('button', {
             type: 'button',
             class: 'segmented-option',
@@ -612,18 +637,20 @@ export function mountProfessions(container, { params, navigate }) {
     // are joined here, not in one text of t(): a key of nothing but
     // "{name} {doing}." would match any message the server translates by
     // its shape (translateMessage, src/server/i18n.js).
-    let note = null;
-    if (!free.character) note = t('Postać {doing}, więc pracę wykona {name}.', { doing: t(DOING[character.activity.kind] ?? 'jest na wyprawie'), name: avatar.name });
-    else if (!free.avatar) note = activityFinished(avatar.activity) ? t('{name} czeka na odbiór raportu.', { name: avatar.name }) : `${avatar.name} ${t(DOING[avatar.activity.kind])}.`;
+    const busyNote = (one, name) => (activityFinished(one.activity) ? t('{name} czeka na odbiór raportu.', { name }) : `${name} ${t(DOING[one.activity.kind])}.`);
+    const notes = [];
+    if (!free.character) notes.push(t('Postać {doing}, więc pracę wykona {name}.', { doing: t(DOING[character.activity.kind] ?? 'jest na wyprawie'), name: names[worker] ?? names.avatar }));
+    if (!free.avatar && avatar.activity) notes.push(busyNote(avatar, names.avatar));
+    if (second && !free.avatar2 && second.activity) notes.push(busyNote(second, names.avatar2));
     return {
-      element: h('div', { class: 'stack worker-picker' }, h('p', { class: 'duration-title', text: t('Kto pracuje') }), row, note && h('p', { class: 'muted', text: note })),
-      body: () => (worker === 'avatar' ? { avatar: true } : {}),
+      element: h('div', { class: 'stack worker-picker' }, h('p', { class: 'duration-title', text: t('Kto pracuje') }), row, ...notes.map((note) => h('p', { class: 'muted', text: note }))),
+      body: () => (worker === 'avatar' ? { avatar: true } : worker === 'avatar2' ? { avatar: 2 } : {}),
     };
   }
 
   // Test mode only: one button that ends the work of `kind` at once.
   function testTools(character, kind, text) {
-    const going = [character.activity, character.professions.avatar.activity].some((work) => work?.kind === kind && !activityFinished(work));
+    const going = [character.activity, character.professions.avatar.activity, character.professions.avatar.second?.activity].some((work) => work?.kind === kind && !activityFinished(work));
     if (!state.user.testMode || !testModeOn() || !going) return null;
     return h(
       'div',
@@ -674,8 +701,9 @@ export function mountProfessions(container, { params, navigate }) {
   }
 
   // "Odbierz raport" of a work that has ended, the character's or the
-  // Awatar's: its mini-game first (minigame.js; 1006), whose taps go with
-  // the claim, or none when skipped or for a work without one.
+  // Awatar's (`avatar`: true the first, 2 the second): its mini-game first
+  // (minigame.js; 1006), whose taps go with the claim, or none when skipped
+  // or for a work without one.
   function claimButton(avatar) {
     return h('button', {
       type: 'button',
@@ -683,9 +711,11 @@ export function mountProfessions(container, { params, navigate }) {
       text: t('Odbierz raport'),
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
-          const work = avatar ? state.character?.professions?.avatar?.activity : state.character?.activity;
+          const professions = state.character?.professions;
+          const work = avatar === 2 ? professions?.avatar?.second?.activity : avatar ? professions?.avatar?.activity : state.character?.activity;
           const played = await playMinigame(work, avatar);
-          const { report } = await call('POST', avatar ? '/api/avatar/claim' : '/api/hunts/claim', played ? { minigame: played } : undefined);
+          const body = { ...(avatar === 2 && { avatar: 2 }), ...(played && { minigame: played }) };
+          const { report } = await call('POST', avatar ? '/api/avatar/claim' : '/api/hunts/claim', Object.keys(body).length > 0 ? body : undefined);
           // A work the game can no longer finish gave back what it took.
           if (report) openReport(report);
           else toast(t('Tej pracy nie da się już dokończyć. Zabrane rzeczy wróciły.'));
@@ -693,8 +723,8 @@ export function mountProfessions(container, { params, navigate }) {
     });
   }
 
-  // Calling the character or the Awatar back early.
-  const cancelPath = (avatar) => (avatar ? '/api/avatar/cancel' : '/api/hunts/cancel');
+  // Calling the character or the Awatar (the second: `avatar` 2) back early.
+  const cancelWork = (avatar) => call('POST', avatar ? '/api/avatar/cancel' : '/api/hunts/cancel', avatar === 2 ? { avatar: 2 } : undefined);
 
   function openReport(report) {
     reportCache.set(String(report.id), report);
@@ -713,7 +743,7 @@ export function mountProfessions(container, { params, navigate }) {
       countdown: h('p', { class: 'countdown', 'aria-live': 'off' }),
       progress: h('div', { class: 'bar-fill bar-fill--system' }),
       scene: workScene(activity.profession, activity, { avatar }),
-      skipper: skipControl(avatar ? 'avatar' : 'activity', (now) => activity.endsAt - now, label),
+      skipper: skipControl(avatar === 2 ? 'avatar2' : avatar ? 'avatar' : 'activity', (now) => activity.endsAt - now, label),
       extra,
     };
     timers.push(timer);
@@ -753,7 +783,7 @@ export function mountProfessions(container, { params, navigate }) {
           confirmLabel: t('Przerwij'),
           danger: true,
         });
-        if (sure) await withButton(button, () => call('POST', cancelPath(avatar)));
+        if (sure) await withButton(button, () => cancelWork(avatar));
       },
     });
     return workUnderWay(activity, t('Zbieranie w toku: {herbs}, {time}.', { herbs: names, time: formatMinutes(activity.minutes) }), t('Zbieranie'), cancel, avatar);
@@ -784,7 +814,7 @@ export function mountProfessions(container, { params, navigate }) {
         });
         if (!sure) return;
         await withButton(button, async () => {
-          const { report } = await call('POST', cancelPath(avatar));
+          const { report } = await cancelWork(avatar);
           if (report) openReport(report);
         });
       },
@@ -817,7 +847,7 @@ export function mountProfessions(container, { params, navigate }) {
         });
         if (!sure) return;
         await withButton(button, async () => {
-          const { report } = await call('POST', cancelPath(avatar));
+          const { report } = await cancelWork(avatar);
           if (report) openReport(report);
         });
       },
@@ -1896,7 +1926,7 @@ export function mountProfessions(container, { params, navigate }) {
           confirmLabel: t('Przerwij'),
           danger: true,
         });
-        if (sure) await withButton(button, () => call('POST', cancelPath(avatar)));
+        if (sure) await withButton(button, () => cancelWork(avatar));
       },
     });
     return workUnderWay(activity, t('Kopanie w toku: {place}, {time}.', { place: activity.placeName, time: formatMinutes(activity.minutes) }), t('Kopanie'), cancel, avatar);
@@ -2039,7 +2069,7 @@ export function mountProfessions(container, { params, navigate }) {
           confirmLabel: t('Przerwij'),
           danger: true,
         });
-        if (sure) await withButton(button, () => call('POST', cancelPath(avatar)));
+        if (sure) await withButton(button, () => cancelWork(avatar));
       },
     });
     return workUnderWay(activity, t('Połów w toku: {fish}, {time}.', { fish: names, time: formatMinutes(activity.minutes) }), t('Połów'), cancel, avatar);
@@ -2309,7 +2339,7 @@ export function mountProfessions(container, { params, navigate }) {
           confirmLabel: t('Przerwij'),
           danger: true,
         });
-        if (sure) await withButton(button, () => call('POST', cancelPath(avatar)));
+        if (sure) await withButton(button, () => cancelWork(avatar));
       },
     });
     return workUnderWay(activity, t('Uprawa na Systemowym Polu: {plots}, {time}.', { plots: what, time: formatMinutes(activity.minutes) }), t('Uprawa'), cancel, avatar, field);
@@ -2499,7 +2529,7 @@ export function mountProfessions(container, { params, navigate }) {
         });
         if (!sure) return;
         await withButton(button, async () => {
-          const { report } = await call('POST', cancelPath(avatar));
+          const { report } = await cancelWork(avatar);
           if (report) openReport(report);
         });
       },
@@ -2972,7 +3002,7 @@ export function mountProfessions(container, { params, navigate }) {
         });
         if (!sure) return;
         await withButton(button, async () => {
-          const { report } = await call('POST', cancelPath(avatar));
+          const { report } = await cancelWork(avatar);
           if (report) openReport(report);
         });
       },
@@ -3018,7 +3048,7 @@ function workSummary(report) {
   const { summary, profession } = report;
   const gains = !report.avatar || summary.xp > 0 || profession.levelAfter > profession.levelBefore;
   const rows = [
-    report.avatar && [t('Wykonawca'), t('Awatar Systemu')],
+    report.avatar && [t('Wykonawca'), report.avatar === 2 ? t('Drugi Awatar Systemu') : t('Awatar Systemu')],
     gains && [t('XP postaci'), `+${formatNumber(summary.xp)} XP`],
     gains && [
       profession.name,
@@ -3316,7 +3346,7 @@ export function jewelsReport(report, heading, findSheet) {
 // 170 złota" or "Szmaragd → Wilczy Pierścień", after "Awatar Systemu · " for
 // the Awatar's work.
 export const workSummaryText = (summary) =>
-  (summary.avatar ? `${t('Awatar Systemu')} · ` : '') +
+  (summary.avatar ? `${summary.avatar === 2 ? t('Drugi Awatar Systemu') : t('Awatar Systemu')} · ` : '') +
   [
     ...(summary.herbs ?? summary.potions ?? summary.items ?? summary.minerals ?? summary.fish ?? summary.crops ?? summary.dishes ?? []).map((entry) => `${entry.name} ×${formatNumber(entry.count)}`),
     summary.gold > 0 && t('{gold} złota', { gold: formatNumber(summary.gold) }),
