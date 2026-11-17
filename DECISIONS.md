@@ -3580,6 +3580,16 @@ Autor: „Przejrzyj te portrety jeśli chodzi o braki w maskowaniu odcienia skó
 4. **Co się zmieniło:** 569 plików, czyli 71 portretów w ośmiu odcieniach i sam portret Widma (mężczyzna), którego skóra jest malowana także w pliku bazowym (34 piksele). Zmieniły się tylko przejrzane piksele i ten kontur.
 5. **Ocena autora:** przed i po na stronie ocen (995.1–995.5, po jednym arkuszu na klasę z jej formami i strojami), wszystkie przyjęte 15.11.2026.
 
+## Szczodre Gody (1044): decyzje autora 17.11.2026
+
+Zimowe wydarzenie na grudzień (1028, przyjęte 16.11.2026: „wszystko super wymyślone od 1028 do 1031”). Oceny ze strony ocen, 17.11.2026:
+
+1. **Kalendarz 1–24.12 (1044.1, przyjęty).** Codziennie jedna nagroda za wejście do gry, w oknie jak seria dni: 24 okienka, dzisiejsze świeci, odebrane mają znaczek. Kalendarz ma każda postać osobno. Nagrody: 1. złoto za 30 min wypraw i 10 PC, 2. 2 mikstury, 3. 15 PC, 4. pakiet kart, 5. złoto za 45 min, 6. Zwój ochronny, 7. 5 PS, 8. 20 PC, 9. 2 mikstury, 10. pakiet, 11. złoto za 60 min, 12. ozdoba Obozu: podłaźniczka, 13. 25 PC, 14. Zwój utrwalenia, 15. 10 PS, 16. pakiet, 17. złoto za 90 min, 18. 30 PC, 19. ozdoba Obozu: snopek, 20. 2 pakiety, 21. złoto za 120 min, 22. 40 PC, 23. 15 PS, 24. zimowy zestaw i 2 pakiety.
+2. **Opuszczony dzień przepada (1044.1a A),** jak w serii dni.
+3. **Nagroda główna: zimowy zestaw (1044.2 B),** bez skórki: ramka „Szron”, tło „Szczodre Gody” i aura „Śnieżyca” (światło i płatki śniegu, bez grafiki). Zestaw jest tylko w kalendarzu.
+4. **Zimowy Obóz (1044.3, przyjęty).** Od 1 do 31.12 Obóz każdej postaci jest pod śniegiem, przy ognisku świecą lampki, a ozdoby z kalendarza stoją w Obozie do 31.12. Wybrane wersje z PixelLab: podłaźniczka B (1044.3a), snopek D (1044.3b).
+5. **Zimowe zadania (1044.4, przyjęte).** W grudniu codziennie 3 zimowe zadania obok zwykłych dziennych: 10 gałązek jodły z wypraw (materiał tylko w grudniu), karp z Rybołówstwa i potrawa z Systemowej Kuchni. Za każde Punkty Czasu i złoto, za wszystkie trzy jednego dnia dodatkowy pakiet kart. Narrator zapowiada wydarzenie 1.12 i chwali za pierwsze zimowe zadanie; jego polskie kwestie autor zatwierdza przed nagraniem, angielskie idą bez zatwierdzania.
+
 ## Wersja 0.4.6 (16.11.2026): osiągnięcia z tytułami, walkowery 3v3 za brakujące trójki, zakładka serii dni, Błędny ognik za 600 PS, kolejność kanałów czatu
 
 1. **Osiągnięcia (1030; lista 1036.1 i okno 1036.2 przyjęte, tytuł tylko w profilu i Rankingu: 1036.3 B).**
