@@ -1,0 +1,19 @@
+{
+  "id": "frost-god-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult woman goddess of eternal ice, tall and regal, long white hair, fair natural skin with rosy cheeks and a warm human face, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, frost glittering in the hair, a floating halo of sharp ice crystals behind the head, two great wings of translucent ice shards spread behind the shoulders, the whole wings inside the image, gleaming armour of pale glowing ice over a white and silver robe, a long cape that turns into drifting snow at its hem, holding a long sceptre of ice topped with a radiant frozen star, the whole sceptre inside the image, cold and divine, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/frost-monarch-female.png",
+      "usage": "the same woman: the same face, hair and build, drawn the same way; now in a far grander, godlike outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08070725570784675
+  },
+  "images": 4
+}
