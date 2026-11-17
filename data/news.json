@@ -1270,6 +1270,11 @@
       "id": "0.4.13",
       "title": "Wersja 0.4.13",
       "body": "- Zadanie dnia „Wykonaj zlecenia w Osadzie” trafia się, także po przelosowaniu, tylko wtedy, gdy zlecenia czekają już na Tablicy. Nie liczą się zlecenia, które przyjdą dopiero później, ani duże zlecenie tygodnia.\n- Zaklinaczka podpowiada („★” i „Warto zakląć”), a plecak ocenia przedmioty („lepiej”, „gorzej”) według statystyk Twojej ewolucji. Gdy ewolucja liczy jedną statystykę jako inną, na przykład Zręczność Nekromanty jako Intelekt, obie liczą się tak samo. Dotyczy to linii Strzelca Burzy, Łowcy, Wielkiego Inkwizytora i Nekromanty.\n- Skrzynia wojen gildii daje przedmioty dla ewolucji walczących, na przykład kostury zamiast sztyletów dla Nekromanty."
+    },
+    {
+      "id": "0.4.16",
+      "title": "Wersja 0.4.16",
+      "body": "- W Wymianie w Gildii jedna oferta może mieć do 100 000 sztuk zasobu z każdej strony, a nie jak dotąd do 1000."
     }
   ]
 }
