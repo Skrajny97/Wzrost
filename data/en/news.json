@@ -1004,6 +1004,10 @@
     "0.4.11": {
       "title": "Version 0.4.11",
       "body": "- The System Portals now go up to stage 500 instead of 100. As before, you fight for stages up to your character's level, and the higher the stage, the bigger the loot."
+    },
+    "0.4.12": {
+      "title": "Version 0.4.12",
+      "body": "- Generous Feast: in December snow will cover the Camp, coloured lights will shine over the campfire, and the decorations taken from the calendar will stand by the fire."
     }
   }
 }

@@ -160,7 +160,7 @@ import { requirePlayable } from './sessions.js';
 import { tradeBlockOf, tradesEnded } from './trades.js';
 import { skipIntroduction } from './tutorial.js';
 import { weekFactorNow, weekOfCharacter } from './weeks.js';
-import { winterQuestsPeriod } from './winter.js';
+import { winterCampView, winterQuestsPeriod } from './winter.js';
 
 // A character's name (names.js): 2 to 20 signs, the filter of words, and no
 // two players share one, whatever the letter case; neither does a character
@@ -1807,6 +1807,10 @@ export function characterView(player, now) {
       }),
     },
     camp: campView(player, levels, now),
+    // The winter camp of Szczodre Gody (1044.3): in December the board under
+    // snow, lights by the campfire and the calendar's decorations; null
+    // outside it.
+    winterCamp: winterCampView(row, now),
     // The Skrzynia Konta's padlock while the character is below the level
     // it opens at (chestLock), for the camp's board; absent once it opens.
     ...(chestLock(row) && { chestLock: chestLock(row) }),

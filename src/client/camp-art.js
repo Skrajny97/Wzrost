@@ -4,7 +4,7 @@
 // keep the vector stand-ins below, drawn in the colours of the inner regions'
 // scenes. Fixed markup only: no game data goes into these strings.
 
-import { boardGround, campArt } from './art.js';
+import { boardGround, campArt, winterDecorationArt } from './art.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -544,6 +544,9 @@ ${at(TREES).map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#1017
 // was too bright).
 // A building also takes a little of the forest floor's dark green-brown.
 const GROUND_TONE = { saturation: 0.5, light: 0.7 };
+// Under the winter camp's snow (1044.3) the glade keeps more of its light,
+// so that the snow reads as snow and not as grey.
+const WINTER_GROUND_TONE = { saturation: 0.6, light: 0.82 };
 const BUILDING_TONE = { saturation: 0.5, light: 0.82, floor: 0.12 };
 const FLOOR = [0.16, 0.2, 0.12];
 
@@ -560,21 +563,68 @@ function toneMatrix({ saturation: s, light, floor = 0 }) {
 }
 
 // The glade as a pixel-art picture (art.js), muted and darkened, with the
-// paths worn into it: earthen, soft-edged and partly see-through.
-const pictureBoard = (src, tall) => `<filter id="camp-ground" color-interpolation-filters="sRGB">
-<feColorMatrix type="matrix" values="${toneMatrix(GROUND_TONE)}"></feColorMatrix>
+// paths worn into it: earthen, soft-edged and partly see-through. Under the
+// winter camp's snow (`winter`) a little less dimmed, so that the snow stays
+// white, and the paths trodden into the snow, grey-blue.
+const pictureBoard = (src, tall, winter = false) => `<filter id="camp-ground" color-interpolation-filters="sRGB">
+<feColorMatrix type="matrix" values="${toneMatrix(winter ? WINTER_GROUND_TONE : GROUND_TONE)}"></feColorMatrix>
 </filter>
 <filter id="camp-path"><feGaussianBlur stdDeviation="1.6"></feGaussianBlur></filter>
 <image href="${src}" width="360" height="${boardHeight(tall)}" preserveAspectRatio="xMidYMid slice" filter="url(#camp-ground)"></image>
-${paths('#3a2f1f', '#56462e', ' filter="url(#camp-path)" opacity="0.8"', tall)}`;
+${winter ? paths('#7d8c99', '#a3b2bf', ' filter="url(#camp-path)" opacity="0.75"', tall) : paths('#3a2f1f', '#56462e', ' filter="url(#camp-path)" opacity="0.8"', tall)}`;
 
 // The glade at the camp's level: its palisade grows with the camp as a
 // building does, in three looks, on the taller board with the Osada, and
 // the Warownia's walls once it stands. Without its picture, the vector
 // glade.
-function board(level, tall) {
-  const src = boardGround(buildingTier(level), tall);
-  return src ? pictureBoard(src, tall) : vectorBoard(tall);
+function board(level, tall, winter = false) {
+  const src = boardGround(buildingTier(level), tall, winter);
+  return src ? pictureBoard(src, tall, winter && src.includes('-winter/')) : vectorBoard(tall);
+}
+
+// The winter camp's touches over the board (1044.3, Szczodre Gody), above
+// the buildings so that nothing hides them: a string of lights on two poles
+// over the campfire, twinkling one after another (styles.css, .camp-light;
+// still with the game's calm look, motion.js), and the decorations of the
+// calendar's days taken (data/winter.json, decorations) by the fire: the
+// podłaźniczka hanging from the string, the snopek standing beside the fire.
+// In the board's units, moved down with the plots on the taller boards.
+const LIGHT_COLORS = ['#ffd56b', '#ff7a5c', '#8ee6a8', '#8cc4ff'];
+const WINTER_POLES = { left: 146, right: 222, top: 206, sag: 224, ground: 276 };
+const WINTER_SPOTS = {
+  // Hanging from the string, its top at the string.
+  podlaznniczka: { at: 0.18, size: 28 },
+  // Standing on the snow right of the fire, its middle at x, y.
+  snopek: { x: 214, y: 262, size: 26 },
+};
+function winterTouches(tall, decorations = []) {
+  const y = (value) => stretchY(value, tall);
+  const { left, right, top, sag, ground } = WINTER_POLES;
+  const point = (t) => {
+    const a = 1 - t;
+    return { x: a * a * left + 2 * a * t * ((left + right) / 2) + t * t * right, y: a * a * y(top) + 2 * a * t * y(sag) + t * t * y(top) };
+  };
+  const string = `M${left} ${y(top)} Q${(left + right) / 2} ${y(sag)} ${right} ${y(top)}`;
+  const lights = Array.from({ length: 11 }, (_, index) => {
+    const at = point((index + 1) / 12);
+    const color = LIGHT_COLORS[index % LIGHT_COLORS.length];
+    const cx = at.x.toFixed(1);
+    const cy = (at.y + 1.6).toFixed(1);
+    return `<g class="camp-light" style="animation-delay:${((index * 0.37) % 2.2).toFixed(2)}s"><circle cx="${cx}" cy="${cy}" r="5.5" fill="${color}" opacity="0.22"></circle><circle cx="${cx}" cy="${cy}" r="3" fill="${color}" opacity="0.5"></circle><circle cx="${cx}" cy="${cy}" r="1.7" fill="#fffbe8"></circle></g>`;
+  }).join('');
+  const poles = [left, right].map((x) => `<path d="M${x} ${y(top) - 2} V${y(ground)}" stroke="${WOOD}" stroke-width="2.2" stroke-linecap="round"></path>`).join('');
+  const standing = decorations
+    .map((id) => {
+      const spot = WINTER_SPOTS[id];
+      const src = spot && winterDecorationArt(id);
+      if (!src) return '';
+      const at = typeof spot.at === 'number' ? point(spot.at) : null;
+      const x = at ? at.x - spot.size / 2 : spot.x - spot.size / 2;
+      const top = at ? at.y - 1 : y(spot.y) - spot.size / 2;
+      return `<image href="${src}" x="${x.toFixed(1)}" y="${top.toFixed(1)}" width="${spot.size}" height="${spot.size}"></image>`;
+    })
+    .join('');
+  return { things: `${poles}<path d="${string}" fill="none" stroke="#2c2a24" stroke-width="0.9"></path>${standing}`, lights };
 }
 
 export const campArtIds = Object.keys(BUILDINGS);
@@ -661,8 +711,19 @@ export function plotMarkup(buildingId, { level, building = false, tier: own }) {
 
 // `range` [from, to] shows only that part of the board's height, as the
 // Warownia's two parts side by side on a computer (FORTRESS_HALVES).
-export const boardArt = (level = 1, tall = false, range = null) =>
-  svgElement(range ? `0 ${range[0]} ${BOARD_WIDTH} ${range[1] - range[0]}` : `0 0 ${BOARD_WIDTH} ${boardHeight(tall)}`, 'camp-board-art', board(level, tall));
+// `winter`: the board under the winter camp's snow (Szczodre Gody).
+export const boardArt = (level = 1, tall = false, range = null, winter = false) =>
+  svgElement(range ? `0 ${range[0]} ${BOARD_WIDTH} ${range[1] - range[0]}` : `0 0 ${BOARD_WIDTH} ${boardHeight(tall)}`, 'camp-board-art', board(level, tall, winter));
+
+// The winter camp's lights and decorations (the character's winterCamp),
+// in layers of their own over the buildings of the board or of its part
+// (`range`): the poles and the decorations, which take the light of the
+// hour as the buildings do, and the lights, which keep shining at night.
+export function winterArt(tall, decorations = [], range = null) {
+  const view = range ? `0 ${range[0]} ${BOARD_WIDTH} ${range[1] - range[0]}` : `0 0 ${BOARD_WIDTH} ${boardHeight(tall)}`;
+  const { things, lights } = winterTouches(tall, decorations);
+  return [svgElement(view, 'camp-winter-art', things), svgElement(view, 'camp-winter-art camp-winter-lights', lights)];
+}
 
 // The Warownia's board on a computer (screens/camp.js) in two parts side by
 // side: the camp's and the Osada's, then the Warownia's own bands with the

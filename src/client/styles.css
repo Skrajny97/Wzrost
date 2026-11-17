@@ -5351,20 +5351,50 @@ a.camp-level-button {
   outline-offset: 2px;
 }
 
+/* The winter camp's layer over the buildings (camp-art.js, winterArt):
+   lights by the campfire and the calendar's decorations; taps go through. */
+.camp-winter-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.camp-winter-art image {
+  image-rendering: pixelated;
+}
+
+/* The winter camp's lights by the campfire (camp-art.js, winterTouches):
+   each bulb glows and dims in its turn; still with the game's calm look
+   (motion.js). */
+.camp-light {
+  animation: camp-light-twinkle 2.2s ease-in-out infinite;
+}
+@keyframes camp-light-twinkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.calm .camp-light {
+  animation: none;
+}
+
 /* The living camp (screens/camp.js). The glade and its buildings take the
    light of the hour in Poland, as the scenes do (data/animations.json
    dayParts), and the campfire flickers and smokes over its picture, its
    glow stronger at dusk and at night. */
 .camp-board--dawn .camp-board-art,
-.camp-board--dawn .camp-plot-art {
+.camp-board--dawn .camp-plot-art,
+.camp-board--dawn .camp-winter-art:not(.camp-winter-lights) {
   filter: brightness(1.04) sepia(0.18) saturate(1.1);
 }
 .camp-board--dusk .camp-board-art,
-.camp-board--dusk .camp-plot-art {
+.camp-board--dusk .camp-plot-art,
+.camp-board--dusk .camp-winter-art:not(.camp-winter-lights) {
   filter: brightness(0.82) sepia(0.3) saturate(1.15);
 }
 .camp-board--night .camp-board-art,
-.camp-board--night .camp-plot-art {
+.camp-board--night .camp-plot-art,
+.camp-board--night .camp-winter-art:not(.camp-winter-lights) {
   filter: brightness(0.62) saturate(0.75);
 }
 /* Over the plot's picture; the fire sits lower in a smaller look. */

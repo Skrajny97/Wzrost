@@ -177,6 +177,10 @@ test('every sprite on the list has its file at its size, and every class has its
     'board-tall': ['camp-1', 'camp-2', 'camp-3'],
     // The Warownia's board, with stone walls (606 A).
     'board-fortress': ['fortress'],
+    // The same boards under snow, for the winter camp (1044.3).
+    'board-winter': ['camp-1', 'camp-2', 'camp-3'],
+    'board-tall-winter': ['camp-1', 'camp-2', 'camp-3'],
+    'board-fortress-winter': ['fortress'],
     // The camp's buildings at their three looks, a fourth for those that go
     // on to level 20 in the Warownia (beyond, 618), the Kamień węgielny
     // Warowni and the Zbieracz Systemu's icon (data/camp.json).

@@ -368,6 +368,24 @@ export const SPRITES = {
     height: 729,
     ids: ['fortress'],
   },
+  // The same boards under snow, for the winter camp of Szczodre Gody (all
+  // of December; 1044.3): the glade's snow of 1048 A, painted by PixelLab
+  // into each board. A board without its winter picture keeps its own.
+  'board-winter': {
+    width: 320,
+    height: 480,
+    ids: ['camp-1', 'camp-2', 'camp-3'],
+  },
+  'board-tall-winter': {
+    width: 320,
+    height: 563,
+    ids: ['camp-1', 'camp-2', 'camp-3'],
+  },
+  'board-fortress-winter': {
+    width: 320,
+    height: 729,
+    ids: ['fortress'],
+  },
   // Each building cut to its outline, at most 128 × 96, and the Kamień
   // węgielny Warowni on the board with the Osada. The Warownia's buildings
   // after them (578, 585, 588); the Plac treningowy's looks 2 and 3 were
@@ -687,13 +705,18 @@ export const areaArtUrl = (areaId) => (available.areas.has(areaId) ? `url("/art/
 export const landArt = (regionId) => (available.lands.has(regionId) ? `/art/lands/${regionId}.png` : null);
 // The address of the camp board's ground and of a camp building's picture at
 // a look (1–3), or null while it has none.
-export const boardGround = (tier, tall = false) => {
+// `winter`: the board under snow of the winter camp, where it has one.
+export const boardGround = (tier, tall = false, winter = false) => {
   // The Warownia stands only on a camp at its top level, on the walls' board.
-  if (tall === 'fortress') return available['board-fortress'].has('fortress') ? '/art/board-fortress/fortress.png' : null;
-  const kind = tall ? 'board-tall' : 'board';
-  return available[kind].has(`camp-${tier}`) ? `/art/${kind}/camp-${tier}.png` : null;
+  const kind = tall === 'fortress' ? 'board-fortress' : tall ? 'board-tall' : 'board';
+  const id = tall === 'fortress' ? 'fortress' : `camp-${tier}`;
+  if (winter && available[`${kind}-winter`].has(id)) return `/art/${kind}-winter/${id}.png`;
+  return available[kind].has(id) ? `/art/${kind}/${id}.png` : null;
 };
 export const campArt = (buildingId, tier) => (available.camp.has(`${buildingId}-${tier}`) ? `/art/camp/${buildingId}-${tier}.png` : null);
+// A decoration of the winter camp (data/winter.json, decorations), or null
+// without its picture.
+export const winterDecorationArt = (id) => (available.winter.has(id) ? `/art/winter/${id}.png` : null);
 // The Zbieracz Systemu's icon on the camp board, 32×32 (data/camp.json,
 // collector.art), or null while it has none.
 export const campIcon = (id) =>
