@@ -1255,6 +1255,11 @@
       "id": "0.4.10",
       "title": "Wersja 0.4.10",
       "body": "- Umiejętności kosztują teraz połowę dawnej many i 3% Twojej maksymalnej many, ale nigdy mniej niż dawniej. Przy dużej puli many umiejętności nie są już prawie darmowe. Ile kosztuje każda umiejętność Twojej postaci, zobaczysz w zakładce Umiejętności."
+    },
+    {
+      "id": "0.4.11",
+      "title": "Wersja 0.4.11",
+      "body": "- Portale Systemu sięgają teraz 500. stopnia zamiast 100. Jak dotąd walczysz najwyżej o stopień równy poziomowi Twojej postaci, a im wyższy stopień, tym większy łup."
     }
   ]
 }
