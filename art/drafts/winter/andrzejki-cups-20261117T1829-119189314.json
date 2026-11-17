@@ -1,0 +1,14 @@
+{
+  "id": "andrzejki-cups",
+  "tool": "pixellab generate-image-v2",
+  "description": "St Andrew's Eve fortune telling in a Slavic forest cottage at night: three overturned clay cups standing in a row on a rough wooden table, the middle cup lifted showing a small golden ring under it, a lit tallow candle beside them, warm candle light, a log wall behind, dark blue night outside a small window, pixel art scene",
+  "style": "src/client/art/camp/campfire-1.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
