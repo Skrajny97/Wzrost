@@ -1,0 +1,14 @@
+{
+  "id": "blood-feud",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Wrozda, the spirit of a family's blood feud, a dark red ghostly warrior made of smoke and blood-red mist with a stern face, holding a notched old axe dripping red, burning red eyes, eerie and menacing, standing, full body, three-quarter view, the spirit alone, no ground, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02350921629524231
+  },
+  "images": 1
+}

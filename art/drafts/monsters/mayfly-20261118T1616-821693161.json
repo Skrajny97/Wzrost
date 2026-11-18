@@ -1,0 +1,14 @@
+{
+  "id": "mayfly",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant mayfly, a slender pale yellow-white body, two big delicate veined wings raised, three very long thin tail filaments, large dark eyes, darting forward, menacing, flying, full body, three-quarter view, the insect alone, no water, no background, the whole insect inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023371390458636815
+  },
+  "images": 1
+}

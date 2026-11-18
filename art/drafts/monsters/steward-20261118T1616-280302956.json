@@ -1,0 +1,14 @@
+{
+  "id": "steward",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Stolnik, the ghost of a feast steward in the hall of the underworld god, a gaunt pale ghostly old man in a rich red Polish zupan and a fur-trimmed robe, holding out a golden goblet bubbling with green poison, a sly smile, hollow glowing eyes, eerie and menacing, standing on both feet, full body, three-quarter view, the ghost alone, no table, no ground, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024243459360758467
+  },
+  "images": 1
+}

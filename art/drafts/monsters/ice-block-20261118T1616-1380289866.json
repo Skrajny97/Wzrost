@@ -1,0 +1,14 @@
+{
+  "id": "ice-block",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Lodowiec, a hulking living block of eternal ice shaped like a giant, rough pale blue translucent ice with dark cracks, two small glowing icy eyes, massive icy fists, a frosty breath, menacing, standing, full body, three-quarter view, the creature alone, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023961767296685116
+  },
+  "images": 1
+}

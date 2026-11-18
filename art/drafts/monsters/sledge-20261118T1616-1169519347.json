@@ -1,0 +1,14 @@
+{
+  "id": "sledge",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Sanie, an old wooden funeral sledge moving on its own, dark wood with runners curling up like horns, a ragged black cloth draped over it, a pale ghost light under the cloth, icy frost on the runners, eerie and menacing, full body, three-quarter view, the sledge alone, no snow, no ground, no background, the whole sledge inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024516122453901504
+  },
+  "images": 1
+}

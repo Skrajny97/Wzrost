@@ -1,0 +1,14 @@
+{
+  "id": "stampede",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Tetent, the invisible ghost of a stampeding herd, a rushing swirl of pale green ghostly horse and cattle shapes made of mist and dust, many ghostly hooves and horns in one cloud, glowing hoofprints, eerie and menacing, full body, three-quarter view, the spirit alone, no ground, no background, the whole spirit inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02371885369873047
+  },
+  "images": 1
+}

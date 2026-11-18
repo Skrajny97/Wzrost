@@ -1,0 +1,14 @@
+{
+  "id": "silence",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Cisza, the spirit of silence, a tall pale grey-white featureless figure without a mouth, one long finger raised to where its lips would be, rings of fading sound vanishing around it, a soft pale glow, eerie and menacing, floating, full body, three-quarter view, the spirit alone, no ground, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02341872882461548
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "shackles",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Okowy, living iron shackles forged in the underworld, a tangle of heavy black iron chains and open cuffs crawling like a snake, glowing green runes on the iron, the open cuffs snapping like jaws, eerie and menacing, full body, three-quarter view, the chains alone, no ground, no background, the whole thing inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023871748124652443
+  },
+  "images": 1
+}

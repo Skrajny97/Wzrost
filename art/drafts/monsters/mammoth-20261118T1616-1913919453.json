@@ -1,0 +1,14 @@
+{
+  "id": "mammoth",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a woolly mammoth, a huge body covered in long shaggy dark brown fur with frost on it, long curved tusks, its trunk raised trumpeting, menacing, full body, three-quarter view, the animal alone, no ice, no ground, no background, the whole animal inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023606135103861493
+  },
+  "images": 1
+}

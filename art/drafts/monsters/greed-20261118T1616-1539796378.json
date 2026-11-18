@@ -1,0 +1,14 @@
+{
+  "id": "greed",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Chciwosc, the spirit of greed, a floating figure made of glittering gold coins and gold dust in a golden glow, long greedy golden claws reaching out, a wide hungry grin, glowing yellow eyes, eerie and menacing, floating, full body, three-quarter view, the spirit alone, no ground, no background, the whole spirit inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024149091972139148
+  },
+  "images": 1
+}

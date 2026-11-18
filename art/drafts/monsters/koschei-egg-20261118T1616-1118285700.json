@@ -1,0 +1,14 @@
+{
+  "id": "koschei-egg",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Jajo Koscieja, a big magical egg with a pale bone-white shell, cracks glowing icy blue, frost and ice shards spilling from the cracks, an iron needle glinting inside through a crack, rolling, eerie and menacing, full body, three-quarter view, the egg alone, no nest, no ground, no background, the whole egg inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02339357471084595
+  },
+  "images": 1
+}

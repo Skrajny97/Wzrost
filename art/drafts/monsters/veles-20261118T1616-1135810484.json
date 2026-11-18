@@ -1,0 +1,14 @@
+{
+  "id": "veles",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Weles, the horned Slavic god of the underworld, cattle and magic, a huge old figure with curved ram horns, a long grey beard, a heavy bearskin cloak, a green serpent coiled around his arm, a gnarled staff glowing with green magic, glowing green eyes, majestic and menacing, standing on both feet, full body, three-quarter view, the figure alone, no ground, no background, the whole figure and staff inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024239843584060672
+  },
+  "images": 1
+}

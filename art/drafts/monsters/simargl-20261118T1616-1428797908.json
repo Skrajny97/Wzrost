@@ -1,0 +1,14 @@
+{
+  "id": "simargl",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Simargl, the winged dog of Slavic myths, a large powerful hound with golden-brown fur and two big feathered wings half open, fangs bared, diving to bite, glowing eyes, menacing, flying, full body, three-quarter view, the creature alone, no background, the whole creature and both whole wings inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023340751184251576
+  },
+  "images": 1
+}

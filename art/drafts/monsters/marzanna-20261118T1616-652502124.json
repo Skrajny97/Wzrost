@@ -1,0 +1,14 @@
+{
+  "id": "marzanna",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Marzanna, the Slavic goddess of winter and death, a tall gaunt pale woman like a straw doll come alive, straw-blond hair braided with dried flowers and ribbons, dark hollow eyes, a long white and grey tattered gown, breathing a cold blue frost, menacing, standing on both feet, full body, three-quarter view, the figure alone, no ground, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024144520415623986
+  },
+  "images": 1
+}

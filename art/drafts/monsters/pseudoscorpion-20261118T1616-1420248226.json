@@ -1,0 +1,14 @@
+{
+  "id": "pseudoscorpion",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant pseudoscorpion, a flat dark reddish-brown body without a tail, two huge long pincers like a scorpion's raised and open with venom dripping, eight short legs, menacing, full body, three-quarter view, the creature alone, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024049134388393827
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "black-flame",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Czarny Plomien, a living black flame from the torch of the god of darkness, a tall flickering fire of pure black with dark violet edges and cold blue sparks, a hollow face in the flames, tongues of flame reaching out like claws, eerie and menacing, full body, three-quarter view, the flame alone, no torch, no ground, no background, the whole flame inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024348675841649375
+  },
+  "images": 1
+}

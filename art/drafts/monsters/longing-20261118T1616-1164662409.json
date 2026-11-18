@@ -1,0 +1,14 @@
+{
+  "id": "longing",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Tesknota, the spirit of longing, an abstract floating cloud of grey-blue mist with a sad half-faded face, several thin misty arms reaching out, glowing tears falling, small drifting whispers of light around it, eerie and melancholic, floating, full body, three-quarter view, the spirit alone, no ground, no background, the whole spirit inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02470324841753642
+  },
+  "images": 1
+}

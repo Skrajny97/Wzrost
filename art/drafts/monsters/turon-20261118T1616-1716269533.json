@@ -1,0 +1,14 @@
+{
+  "id": "turon",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Turon, the shaggy horned beast of Polish winter folk customs, a hairy dark brown body covered in long shaggy fur, two curved horns with small red ribbons, a long wooden goat-like jaw clacking open to show wooden teeth, rearing up to charge, menacing, full body, three-quarter view, the creature alone, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02441699978870816
+  },
+  "images": 1
+}

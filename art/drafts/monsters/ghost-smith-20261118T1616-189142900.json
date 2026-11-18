@@ -1,0 +1,14 @@
+{
+  "id": "ghost-smith",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Kowal, the ghost of an underworld blacksmith, a huge muscular translucent pale green ghost in a leather apron with a long braided beard, holding a heavy smith's hammer in both hands in front of him, ready to strike, chains hanging from his belt, glowing green eyes, menacing, standing on both feet, full body, three-quarter view, the ghost alone, no anvil, no ground, no background, the whole figure and the whole hammer inside the picture, with space above the head",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024537517844729954
+  },
+  "images": 1
+}

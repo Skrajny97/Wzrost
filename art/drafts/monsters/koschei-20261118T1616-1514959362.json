@@ -1,0 +1,14 @@
+{
+  "id": "koschei",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Kosciej Niesmiertelny, Koschei the Deathless, a tall skeletal old sorcerer-king with grey skin stretched over his bones, a long thin grey beard, a black iron crown, dark ornate armour and a long black cloak, glowing icy blue eyes, holding a long sword, menacing, standing on both feet, full body, three-quarter view, the figure alone, no ground, no background, the whole figure and sword inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02419383061769274
+  },
+  "images": 1
+}

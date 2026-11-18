@@ -1,0 +1,14 @@
+{
+  "id": "bayun",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Kot Bajun, the giant enchanted black cat of Slavic fairy tales, huge with long black fur, glowing green hypnotic eyes, a sly smile, a long curling tail, sitting up and raising one clawed paw, eerie and menacing, full body, three-quarter view, the cat alone, no pillar, no ground, no background, the whole cat inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02347180076535543
+  },
+  "images": 1
+}

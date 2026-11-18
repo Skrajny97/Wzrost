@@ -1,0 +1,14 @@
+{
+  "id": "bumblebee",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant furry bumblebee, fluffy black and golden yellow bands with a white tail, small translucent wings buzzing, a sharp stinger pointed forward, angry eyes, flying, menacing, full body, three-quarter view, the insect alone, no flowers, no background, the whole insect inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023499394452201
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "rat-king",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Szczurzy Krol, a rat king, a tangled knot of many big grey-black rats joined by their twisted tails, all heads snarling with sharp yellow teeth and red eyes, menacing, full body, three-quarter view, the rats alone, no ground, no background, the whole knot inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024084115868038606
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "ice-princess",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Zakleta Krolewna, a princess enchanted into ice, a young woman of pale blue translucent ice in a frozen royal gown, a small ice crown, long icy hair, empty glowing eyes, icy blades forming in her hands, eerie and sad, standing, full body, three-quarter view, the figure alone, no ground, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023556026393466527
+  },
+  "images": 1
+}

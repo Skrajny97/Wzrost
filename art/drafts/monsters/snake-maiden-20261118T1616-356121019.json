@@ -1,0 +1,14 @@
+{
+  "id": "snake-maiden",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Wezowa Panna, the daughter of the god Veles, a pale green-skinned woman from the waist up with long dark green hair and a small golden crown, from the waist down a long coiling emerald snake tail, snake eyes, fangs bared, holding a small glowing flask of water, eerie and menacing, full body, three-quarter view, the figure alone, no water, no ground, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024339703951305816
+  },
+  "images": 1
+}

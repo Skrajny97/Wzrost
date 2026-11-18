@@ -1,0 +1,14 @@
+{
+  "id": "dead-water",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Martwa Woda, the dead water of Slavic fairy tales come alive, a figure of dark still grey-blue water rising up in a vague human shape, cold pale mist coming off it, two pale glowing eyes, icy droplets falling, eerie and menacing, full body, three-quarter view, the water spirit alone, no ground, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02421216223547194
+  },
+  "images": 1
+}

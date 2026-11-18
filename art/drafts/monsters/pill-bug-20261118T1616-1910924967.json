@@ -1,0 +1,14 @@
+{
+  "id": "pill-bug",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant pill bug as big as a barrel, a grey segmented armoured shell, many small legs, short antennae, half curled up to roll forward like a ball, menacing, full body, three-quarter view, the creature alone, no stones, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023458376629511515
+  },
+  "images": 1
+}

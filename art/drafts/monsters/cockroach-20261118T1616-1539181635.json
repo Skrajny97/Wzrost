@@ -1,0 +1,14 @@
+{
+  "id": "cockroach",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant black cockroach as big as a shield, a glossy hard black armoured body, long twitching antennae, spiny legs, menacing, full body, three-quarter view, the insect alone, no ground, no background, the whole insect inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023365935173458526
+  },
+  "images": 1
+}

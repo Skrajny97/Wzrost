@@ -1,0 +1,14 @@
+{
+  "id": "stick-insect",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant stick insect as long as a spear, a thin brown-green knotted body like a twig, long thin jointed legs, its front legs raised to strike, small eyes, menacing, full body, three-quarter view, the insect alone, no branches, no ground, no background, the whole insect inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02431384801165263
+  },
+  "images": 1
+}

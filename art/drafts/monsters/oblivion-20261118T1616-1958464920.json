@@ -1,0 +1,14 @@
+{
+  "id": "oblivion",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Zapomnienie, the spirit of oblivion, a hooded grey-violet ghostly figure whose body fades into drifting mist and scraps of torn paper, a blank face with closed eyes, long hands pulling out glowing memories like threads, eerie and menacing, floating, full body, three-quarter view, the spirit alone, no ground, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024233883704503377
+  },
+  "images": 1
+}

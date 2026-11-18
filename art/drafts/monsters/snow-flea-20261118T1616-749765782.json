@@ -1,0 +1,14 @@
+{
+  "id": "snow-flea",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant snow flea springtail, a small round dark blue-grey body with short antennae and a forked springing tail tucked under it, crouched ready to leap, tiny black eyes, menacing, full body, three-quarter view, the creature alone, no snow, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02404818055619134
+  },
+  "images": 1
+}
