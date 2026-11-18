@@ -1,0 +1,14 @@
+{
+  "id": "canoe-splinter",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a long splinter of black rotten wood from an old canoe with a faint pale ghost light on it, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023248590545018516
+  },
+  "images": 1
+}

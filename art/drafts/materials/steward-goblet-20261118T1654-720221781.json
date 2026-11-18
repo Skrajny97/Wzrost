@@ -1,0 +1,14 @@
+{
+  "id": "steward-goblet",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "an ornate golden goblet with green poison inside, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023181542459487916
+  },
+  "images": 1
+}

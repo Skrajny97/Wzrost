@@ -1,0 +1,14 @@
+{
+  "id": "eternal-ice",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a shard of clear blue never-melting ice, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023178493986553618
+  },
+  "images": 1
+}

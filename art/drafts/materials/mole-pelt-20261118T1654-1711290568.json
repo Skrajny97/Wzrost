@@ -1,0 +1,14 @@
+{
+  "id": "mole-pelt",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small piece of soft black velvet mole fur, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023127457257800632
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "pseudoscorpion-venom",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a tiny glass flask with a dark red venom drop, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023972920869615347
+  },
+  "images": 1
+}

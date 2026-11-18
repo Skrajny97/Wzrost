@@ -1,0 +1,14 @@
+{
+  "id": "bone-key",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "an old key carved from yellowed bone, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02359447820176019
+  },
+  "images": 1
+}

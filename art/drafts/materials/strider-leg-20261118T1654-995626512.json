@@ -1,0 +1,14 @@
+{
+  "id": "strider-leg",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a long thin jointed dark brown insect leg, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023539698239856296
+  },
+  "images": 1
+}

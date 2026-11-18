@@ -1,0 +1,14 @@
+{
+  "id": "nyja-seal",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a round black stone seal with a glowing pale blue rune, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02324817140197754
+  },
+  "images": 1
+}

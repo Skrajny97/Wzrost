@@ -1,0 +1,14 @@
+{
+  "id": "snuffing-cap",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small brass candle snuffer cone on a thin handle, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023285225834740533
+  },
+  "images": 1
+}

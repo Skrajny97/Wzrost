@@ -1,0 +1,14 @@
+{
+  "id": "forefather-staff",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a short broken piece of an old carved wooden staff, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02314369980642531
+  },
+  "images": 1
+}

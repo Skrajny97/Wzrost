@@ -1,0 +1,14 @@
+{
+  "id": "snow-flea-spring",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a tiny coiled bluish springtail insect tail, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023217987830268013
+  },
+  "images": 1
+}

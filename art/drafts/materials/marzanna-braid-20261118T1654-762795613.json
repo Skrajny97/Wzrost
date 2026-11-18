@@ -1,0 +1,14 @@
+{
+  "id": "marzanna-braid",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a braid of golden straw tied with a red ribbon, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023206543606016372
+  },
+  "images": 1
+}

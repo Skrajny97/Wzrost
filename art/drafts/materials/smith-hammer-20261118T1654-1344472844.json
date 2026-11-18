@@ -1,0 +1,14 @@
+{
+  "id": "smith-hammer",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small pale green ghostly blacksmith hammer, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02314902847014533
+  },
+  "images": 1
+}

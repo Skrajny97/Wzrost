@@ -1,0 +1,14 @@
+{
+  "id": "harvestman-limb",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a very long thin bent brown spider leg curved like a scythe, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02313799385960897
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "simargl-feather",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a large golden-brown feather of a winged dog, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023103785348892212
+  },
+  "images": 1
+}

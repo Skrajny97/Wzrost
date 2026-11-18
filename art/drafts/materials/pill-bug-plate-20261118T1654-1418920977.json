@@ -1,0 +1,14 @@
+{
+  "id": "pill-bug-plate",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a curved grey armour plate of a pill bug, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023203892717785307
+  },
+  "images": 1
+}

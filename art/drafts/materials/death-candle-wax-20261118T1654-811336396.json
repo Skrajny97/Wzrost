@@ -1,0 +1,14 @@
+{
+  "id": "death-candle-wax",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a lump of white candle wax with a burnt black wick, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02343916402223375
+  },
+  "images": 1
+}

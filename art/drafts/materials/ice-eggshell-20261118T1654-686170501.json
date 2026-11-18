@@ -1,0 +1,14 @@
+{
+  "id": "ice-eggshell",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a curved piece of white eggshell covered in blue ice crystals, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023416234292348227
+  },
+  "images": 1
+}

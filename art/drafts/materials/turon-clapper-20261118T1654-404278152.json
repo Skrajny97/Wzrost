@@ -1,0 +1,14 @@
+{
+  "id": "turon-clapper",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a carved wooden animal jaw on a stick, a slavic folk clapper, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023398945105234784
+  },
+  "images": 1
+}

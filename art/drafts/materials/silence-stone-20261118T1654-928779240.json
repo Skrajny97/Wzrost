@@ -1,0 +1,14 @@
+{
+  "id": "silence-stone",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a smooth pale grey stone with a faint mark of a finger on lips, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023227002747217815
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "bayun-whisker",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a single long black cat whisker with a faint green glow, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02322360884920756
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "ice-diadem",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small delicate diadem made of blue ice, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02329732578002082
+  },
+  "images": 1
+}

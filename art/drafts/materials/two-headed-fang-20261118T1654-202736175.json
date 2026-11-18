@@ -1,0 +1,14 @@
+{
+  "id": "two-headed-fang",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a pair of curved green snake fangs dripping venom, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023940526778327097
+  },
+  "images": 1
+}

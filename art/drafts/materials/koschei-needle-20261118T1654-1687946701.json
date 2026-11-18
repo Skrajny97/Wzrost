@@ -1,0 +1,14 @@
+{
+  "id": "koschei-needle",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a long thin silver needle with a glowing icy blue tip, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023138124167548287
+  },
+  "images": 1
+}

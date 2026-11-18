@@ -1,0 +1,14 @@
+{
+  "id": "sledge-runner",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a curved wooden sled runner with an iron edge and frost, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023238007141113282
+  },
+  "images": 1
+}

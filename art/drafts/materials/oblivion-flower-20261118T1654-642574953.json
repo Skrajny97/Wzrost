@@ -1,0 +1,14 @@
+{
+  "id": "oblivion-flower",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a pale grey fading forget-me-not flower, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023174564247555207
+  },
+  "images": 1
+}

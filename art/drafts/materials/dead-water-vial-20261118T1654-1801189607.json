@@ -1,0 +1,14 @@
+{
+  "id": "dead-water-vial",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small glass vial of dark still water with a pale blue glow, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02329855948278639
+  },
+  "images": 1
+}

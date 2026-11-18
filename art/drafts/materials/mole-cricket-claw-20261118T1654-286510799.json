@@ -1,0 +1,14 @@
+{
+  "id": "mole-cricket-claw",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a brown digging claw of a mole cricket shaped like a small shovel, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023183950665156047
+  },
+  "images": 1
+}

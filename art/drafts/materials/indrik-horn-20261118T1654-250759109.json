@@ -1,0 +1,14 @@
+{
+  "id": "indrik-horn",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a single long white spiral horn with a faint blue glow, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023177660511228774
+  },
+  "images": 1
+}

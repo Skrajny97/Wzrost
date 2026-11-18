@@ -1,0 +1,14 @@
+{
+  "id": "cockroach-shell",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a shiny black cockroach wing case, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023162367370817397
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "mammoth-tusk",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a long curved ivory mammoth tusk with frost on it, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023167559078428483
+  },
+  "images": 1
+}

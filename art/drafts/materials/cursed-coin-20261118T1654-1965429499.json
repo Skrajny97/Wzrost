@@ -1,0 +1,14 @@
+{
+  "id": "cursed-coin",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a gold coin with a dark red glowing curse mark, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02318873236062792
+  },
+  "images": 1
+}

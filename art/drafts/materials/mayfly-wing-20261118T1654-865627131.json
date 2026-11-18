@@ -1,0 +1,14 @@
+{
+  "id": "mayfly-wing",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a delicate pale yellow veined insect wing, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023143929261525475
+  },
+  "images": 1
+}

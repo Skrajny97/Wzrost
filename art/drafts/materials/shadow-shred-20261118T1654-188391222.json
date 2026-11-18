@@ -1,0 +1,14 @@
+{
+  "id": "shadow-shred",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a ragged shred of black shadow like dark smoky cloth, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02333860110537211
+  },
+  "images": 1
+}

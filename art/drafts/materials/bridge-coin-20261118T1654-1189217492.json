@@ -1,0 +1,14 @@
+{
+  "id": "bridge-coin",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "an old worn copper coin with a square hole, a toll coin for crossing a bridge, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023197064527299673
+  },
+  "images": 1
+}

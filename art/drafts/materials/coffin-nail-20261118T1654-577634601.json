@@ -1,0 +1,14 @@
+{
+  "id": "coffin-nail",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a long rusty iron coffin nail, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023139448386722144
+  },
+  "images": 1
+}

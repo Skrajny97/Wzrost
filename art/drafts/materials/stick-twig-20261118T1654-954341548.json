@@ -1,0 +1,14 @@
+{
+  "id": "stick-twig",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a thin green-brown knotted twig that looks like an insect leg, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02333008437093099
+  },
+  "images": 1
+}

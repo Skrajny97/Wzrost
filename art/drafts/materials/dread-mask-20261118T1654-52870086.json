@@ -1,0 +1,14 @@
+{
+  "id": "dread-mask",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a featureless pale mask with dark empty eye holes, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02333710490481059
+  },
+  "images": 1
+}

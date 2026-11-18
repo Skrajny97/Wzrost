@@ -1,0 +1,14 @@
+{
+  "id": "tail-knot",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a tangled knot of grey rat tails, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023155348380830554
+  },
+  "images": 1
+}

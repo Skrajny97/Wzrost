@@ -1,0 +1,14 @@
+{
+  "id": "veles-staff",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a short gnarled dark wooden staff head with small horns and a glowing green gem, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02317473024304708
+  },
+  "images": 1
+}
