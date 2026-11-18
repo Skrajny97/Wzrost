@@ -699,6 +699,111 @@
       "start": "art/references/walks/start/thunderer-male.png",
       "pose": 2,
       "description": "a tall man with long golden blond hair flowing down his back, a dark steel helmet with two small silver wings at the sides and the face showing, dark blue-grey steel plate armour with gold trim and thin glowing cyan lines, a round golden boss on the shoulder plate, a brown belt, a long dark grey-blue cloak hanging behind from the shoulders, dark steel greaves and boots, one long black bow strapped upright on the back behind the shoulder, the whole bow above the waist and behind the body, never in front of the legs, beside a quiver of blue-fletched arrows, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "archangel-male": {
+      "start": "art/references/walks/start/archangel-male.png",
+      "pose": 2,
+      "description": "a man archangel with short dark brown hair and a short dark beard, a thin golden halo ring behind the head, two large white feathered angel wings folded close behind the back, ornate white and gold plate armour with a golden sun on the chest, a long white and gold tabard, a long cream mantle hanging behind from the shoulders, white and gold greaves and boots, the wings staying folded close behind the back, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "archangel-female": {
+      "start": "art/references/walks/start/archangel-female.png",
+      "pose": 2,
+      "description": "a young woman archangel with long dark brown hair framed by a white hood, a golden sun-shaped halo behind the head, two large white feathered angel wings folded close behind the back, ornate white and gold armour with a golden sun on the chest, a long white skirt with golden patterns, white and gold greaves and boots, a calm young woman's face in clean profile with one eye, the wings staying folded close behind the back, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "beast-lord-male": {
+      "start": "art/references/walks/start/beast-lord-male.png",
+      "pose": 2,
+      "description": "a strong man lord of the beasts with a short light brown beard, a huge white wolf pelt worn as a hooded mantle with the white wolf's head over his head and two large brown antlers rising from it, brown leather armour overgrown with green moss and small leaves, a necklace of white fangs, fur-trimmed bracers, brown trousers and fur-topped boots, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "beast-lord-female": {
+      "start": "art/references/walks/start/beast-lord-female.png",
+      "pose": 2,
+      "description": "a strong woman lady of the beasts with long light brown hair, a huge white wolf pelt worn as a hooded mantle with the white wolf's head over her head and two large brown antlers rising from it, brown leather armour overgrown with green moss and small white flowers, a necklace of white fangs, fur-trimmed bracers, brown trousers and fur-topped boots, a calm young woman's face in clean profile with one eye, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "dark-prince-male": {
+      "start": "art/references/walks/start/dark-prince-male.png",
+      "pose": 2,
+      "description": "a pale young man dark prince with long straight silver-white hair and pale lilac skin, a black spiked crown, black spiked plate armour with glowing purple lines, sharp spiked pauldrons, a long black tabard with purple trim, a long tattered black cloak hanging behind from the shoulders, black armoured boots, no dark smoke, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "dark-prince-female": {
+      "start": "art/references/walks/start/dark-prince-female.png",
+      "pose": 2,
+      "description": "a pale young woman dark princess with long straight silver-white hair hanging straight down her back at rest, not flying, pale lilac skin, a black spiked crown, black spiked armour with glowing purple lines, sharp spiked pauldrons, a long purple and black cloak hanging behind from the shoulders, black armoured boots, a calm young woman's face in clean profile with one eye, no dark smoke, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "elder-druid-male": {
+      "start": "art/references/walks/start/elder-druid-male.png",
+      "pose": 2,
+      "description": "an old man elder druid with a long white beard and long white hair, a wooden crown with two large branching brown antlers hung with green leaves and vines, shoulder armour of bark and leaves, a long green robe with golden-green patterns and a brown leather belt, a long mantle of orange and golden autumn leaves hanging behind from the shoulders, brown boots, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "elder-druid-female": {
+      "start": "art/references/walks/start/elder-druid-female.png",
+      "pose": 2,
+      "description": "a young woman elder druid with long wavy auburn hair hanging straight down her back at rest, not flying, a wooden circlet with two large branching brown antlers hung with green leaves and vines, a green dress with a brown leather bodice, a belt with small pouches, brown sleeves, a long thick mantle of orange and golden autumn leaves hanging behind from the shoulders, brown boots, a calm young woman's face in clean profile with one eye, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "frost-god-male": {
+      "start": "art/references/walks/start/frost-god-male.png",
+      "pose": 2,
+      "description": "an old man frost god with a long white beard and white hair, a tall crown of pale blue ice crystals, ornate silver and pale blue armour and long robes with sharp ice crystal shards on the shoulders and at the hem, a dark blue mantle lined with ice hanging behind from the shoulders, silver boots, no staff, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "frost-god-female": {
+      "start": "art/references/walks/start/frost-god-female.png",
+      "pose": 2,
+      "description": "a young woman frost goddess with long white hair hanging straight down her back at rest, not flying, a silver crown of ice with a faint ring of white light behind the head, two large translucent pale blue wings of ice folded close behind the back, an ornate silver and white gown with silver knot patterns, a long white mantle hanging behind from the shoulders, a calm young woman's face in clean profile with one eye, the wings staying folded close behind the back, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "heaven-avenger-male": {
+      "start": "art/references/walks/start/heaven-avenger-male.png",
+      "pose": 2,
+      "description": "a strong man heavenly avenger with short dark hair and a stern face, a ring of bright golden fire like a burning halo behind the head, heavy silver and white plate armour with gold trim and large round pauldrons, a long dark red tabard with a golden sun, a brown belt, a long white cloak hanging behind from the shoulders, silver greaves and boots, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "heaven-avenger-female": {
+      "start": "art/references/walks/start/heaven-avenger-female.png",
+      "pose": 2,
+      "description": "a young woman heavenly avenger with long dark hair hanging straight down her back at rest, not flying, a ring of bright golden fire behind the head and two small wings of orange flame folded close behind the back, heavy silver and white plate armour with gold trim and round golden studs on the pauldrons, a long white cloak hanging behind from the shoulders, silver greaves and boots, a calm young woman's face in clean profile with one eye, the wings staying folded close behind the back, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "navia-king-male": {
+      "start": "art/references/walks/start/navia-king-male.png",
+      "pose": 2,
+      "description": "a gaunt undead king of the dead with grey-green skin, a skull-like face with glowing green eyes, a dark crown with two large black branching antlers, a high collar of pale bones and grey feathers on the shoulders, long dark grey and purple robes with glowing green runes, a belt of small skulls and bones, a long tattered dark cloak hanging behind from the shoulders, no green flames, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "navia-king-female": {
+      "start": "art/references/walks/start/navia-king-female.png",
+      "pose": 2,
+      "description": "a pale undead queen of the dead with grey-green skin, glowing green eyes and long straight black hair hanging straight down her back at rest, not flying, a dark crown with two large black branching antlers, a necklace of small skulls, a long dark purple and black gown with glowing green runes, a long tattered black cloak hanging behind from the shoulders, no green flames, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "primordial-male": {
+      "start": "art/references/walks/start/primordial-male.png",
+      "pose": 2,
+      "description": "a tall man primordial archmage with long dark brown hair and a short brown beard, a golden crown with small red gems, a long ornate cream and gold robe over a dark blue under-robe, a rust red mantle with golden trim hanging from the shoulders, a golden belt, brown boots, no staff, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "primordial-female": {
+      "start": "art/references/walks/start/primordial-female.png",
+      "pose": 2,
+      "description": "a tall woman primordial archmage with long brown hair, a golden crown with small gems, a high collar lined with red, a long ornate blue robe with golden patterns, a red mantle with golden trim hanging from the shoulders, a golden belt, brown boots, a calm young woman's face in clean profile with one eye, no staff, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "seer-male": {
+      "start": "art/references/walks/start/seer-male.png",
+      "pose": 2,
+      "description": "an old man seer with long white hair and a long white beard, a silver circlet of leaves, a long dark blue robe sprinkled with small silver stars and silver patterns at the hem, a golden eye symbol on the chest, a grey belt with a brown leather book pouch, a long dark starry cloak hanging behind from the shoulders, brown shoes, no staff, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "seer-female": {
+      "start": "art/references/walks/start/seer-female.png",
+      "pose": 2,
+      "description": "a young woman seer with long wavy golden blond hair hanging straight down her back at rest, not flying, a silver blindfold band over her eyes and a silver circlet, a long dark blue robe sprinkled with small silver stars and silver patterns at the hem, a golden eye symbol on the chest, a grey belt with brown leather pouches, a long dark blue starry cloak hanging behind from the shoulders, a calm young woman's face in clean profile, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "soul-reaper-male": {
+      "start": "art/references/walks/start/soul-reaper-male.png",
+      "pose": 2,
+      "description": "a tall soul reaper in a deep black hood, the face hidden behind a pale silver metal mask with dark eye slits, black leather and dark steel armour with thin gold trim and pale bone-coloured spiked pauldrons, a dark belt, a long tattered black cloak hanging behind from the shoulders, black boots with pale knee guards, no ghostly flames, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "soul-reaper-female": {
+      "start": "art/references/walks/start/soul-reaper-female.png",
+      "pose": 2,
+      "description": "a woman soul reaper in a deep black hood, the lower face hidden behind a pale silver metal mask, dark eyes showing, black leather and dark steel armour with thin gold patterns, a dark belt, a long tattered black cloak hanging behind from the shoulders, black boots, no ghostly flames, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "thunderer-female": {
+      "start": "art/references/walks/start/thunderer-female.png",
+      "pose": 2,
+      "description": "a tall woman with long golden blond hair in two thick braids hanging straight down at rest, both braids lying flat on her back and shoulders, not flying, not sticking out, a dark steel helmet with two small silver wings at the sides and her face showing, a calm young woman's face in clean profile with one eye, dark blue-grey steel plate armour with gold trim and thin glowing cyan lines, no lightning, no sparks around the body, a long dark grey-blue cloak hanging behind from the shoulders, dark steel boots, one long black bow strapped upright on the back behind the shoulder, the whole bow above the waist and behind the body, never in front of the legs, beside a quiver of blue-fletched arrows, the wings staying folded close behind the back, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     }
   }
 }
