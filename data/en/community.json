@@ -47,5 +47,12 @@
     "texts": {
       "join": "Join the Discord server"
     }
+  },
+  "social": {
+    "places": {
+      "facebook": { "label": "Visit us on Facebook" },
+      "tiktok": { "label": "Follow us on TikTok" },
+      "wattpad": { "label": "Read the novel set in the game's world" }
+    }
   }
 }

@@ -70,6 +70,7 @@ import { offerPointsReset, openEvolutionTests } from './evolution.js';
 import { accountNameRow } from './account-name.js';
 import { giftCodeRow } from './gift-code.js';
 import { discordRow } from './discord.js';
+import { socialRows } from './social.js';
 import { closeSheet, confirmAction, initSheet, motionSwitch, openSheet, skinSwatches, switchButton, toast, voiceSwitch, withButton } from './ui.js';
 
 const views = {
@@ -1039,6 +1040,8 @@ function openSettings() {
       googleRow(),
       // The game's Discord server, by its invite link (discord.js).
       discordRow(),
+      // The game's Facebook, TikTok and Wattpad, right below (social.js).
+      socialRows(),
       musicRows(),
       volumeRow('effects-volume', t('Efekty dźwiękowe'), effectsVolume(), setEffectsVolume, () => playSound('system')),
       h('div', { class: 'status-row' }, h('dt', { id: 'voice-label', text: t('Głos narratora') }), h('dd', {}, voiceSwitch('voice-label'))),

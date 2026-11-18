@@ -1116,6 +1116,10 @@
     "0.4.42": {
       "title": "Version 0.4.42",
       "body": "- You can now invite to a Party a character whose class level differs from yours by up to 10, not 5. Only the class level counts.\n- Trading on the Marketplace now gives up to 30 reputation points with the Merchants' Company a day instead of 10."
+    },
+    "0.4.43": {
+      "title": "Version 0.4.43",
+      "body": "- In the Settings, below Discord, there are now buttons to the game's Facebook and TikTok and to the novel set in the game's world on Wattpad."
     }
   }
 }
