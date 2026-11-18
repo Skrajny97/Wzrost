@@ -505,6 +505,30 @@
           ]
         }
       ]
+    },
+    {
+      "id": "events",
+      "name": "Wydarzenia",
+      "list": [
+        {
+          "id": "andrzejki-fortune",
+          "name": "Andrzejkowa wróżba",
+          "goal": "Powróż sobie w oba wieczory Andrzejek.",
+          "count": "andrzejki",
+          "target": 1,
+          "title": [
+            "Wróżbita",
+            "Wróżka"
+          ],
+          "reward": {
+            "timePoints": 25
+          },
+          "art": [
+            "omen",
+            "candle"
+          ]
+        }
+      ]
     }
   ]
 }

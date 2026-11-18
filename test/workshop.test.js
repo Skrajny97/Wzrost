@@ -89,6 +89,10 @@ describe('the Warsztat in the engine', () => {
     const at175 = knownPatterns(175, [], content).map((pattern) => pattern.id);
     assert.ok(at175.length === 171 && at175.includes('szczerbiec') && at175.includes('waligora-boots') && !at175.includes('jurata-necklace'));
     assert.equal(knownPatterns(200, [], content).length, 171);
+    // Tier X (1086) only drops until the lands from level 276 come (1086.0
+    // A): no pattern at any level, and taking one apart teaches none.
+    assert.ok(!knownPatterns(200, ['grunwald-sword'], content).some((pattern) => pattern.id === 'grunwald-sword'));
+    assert.equal(patternFrom({ base: 'grunwald-sword' }, [], content), null);
     // Taking one apart teaches it earlier.
     assert.ok(knownPatterns(10, ['estoc'], content).some((pattern) => pattern.id === 'estoc'));
     assert.ok(knownPatterns(50, ['gothic-armor'], content).some((pattern) => pattern.id === 'gothic-armor'));

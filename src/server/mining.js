@@ -16,7 +16,7 @@ import { addTo, alreadyClaimed, requireProfessions, takeFromBag, workClaim, work
 import { workFamePoints } from './fame.js';
 import { mineralsOf } from './professions-view.js';
 import { trimReports } from './reports.js';
-import { keptWeek, weekNow } from './weeks.js';
+import { keptWeek, weekFor } from './weeks.js';
 import { withMinigame } from './minigame.js';
 
 // A profession that opens later than the Profesje tab waits for its level.
@@ -45,7 +45,7 @@ export async function startMining(context) {
   const { row } = player;
   // The character's level sets the veins' gold; `begun`, when it really
   // began; `week`, the week of the year it begins in (weeks.js).
-  const week = weekNow(now);
+  const week = weekFor(row, now);
   const options = JSON.stringify({ level: row.level, begun: now, ...(week && { week }) });
   const ends = now + body.minutes * 60000;
   try {

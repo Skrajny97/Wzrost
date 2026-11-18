@@ -13,6 +13,7 @@ import { decidePointsReset, takeEvolution, testClassLevel, testEvolutions, undoE
 import { authorGiftCodes, createGiftCode, endGiftCode, moveGiftRewards, redeemGiftCode } from './gift-codes.js';
 import { getStreak, takeStreak } from './streak.js';
 import { getWinter, takeWinter } from './winter.js';
+import { tellFortune } from './andrzejki.js';
 import { getAchievements, wearTitle } from './achievements.js';
 import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewing.js';
 import { buyCollector, buyParts, cancelBuilding, collectProduction, exchangeResources, sellToSpirit, startBuilding, tradeAtFire } from './camp.js';
@@ -224,6 +225,7 @@ const routes = [
   // Szczodre Gody, the calendar of 1–24 December (winter.js, 1044).
   ['GET', '/api/winter', getWinter],
   ['POST', '/api/winter', takeWinter],
+  ['POST', '/api/andrzejki', tellFortune],
   // The achievements and their titles (achievements.js, 1036).
   ['GET', '/api/achievements', getAchievements],
   ['POST', '/api/achievements/title', wearTitle],

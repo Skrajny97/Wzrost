@@ -45,7 +45,7 @@ import { classNameOf } from './evolutions.js';
 import { evolutionBlock, skillPoints } from './skills.js';
 import { companionCombatant, gendered, trackerMaterials } from './companions.js';
 import { wantedEncounter, wantedLootRarity, wantedOf, wantedStrength } from './wanted.js';
-import { raisedOutcome, weekChance, weekFactor, weekFighter, weekLine } from './weeks.js';
+import { omenLines, raisedOutcome, weekChance, weekFactor, weekFighter, weekLine } from './weeks.js';
 import { gearKey } from './gear.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
@@ -1427,7 +1427,7 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
       // ("Tydzień Kuny: +5% złota z walk.", weeks.js), and Talia Systemu's
       // collection, where its bonus did (cards.js), and the meal eaten
       // before it set out (cooking.js).
-      ...[weekLine(hunt, content), cardBonusLine(hunt, content), mealLine(hunt, content)].filter(Boolean),
+      ...[weekLine(hunt, content), ...omenLines(hunt, content), cardBonusLine(hunt, content), mealLine(hunt, content)].filter(Boolean),
     ],
     items: hunt.items.map((/** @type {Item} */ item, /** @type {number} */ index) => ({ ...itemView(item, content), ...(overflow?.sold.includes(index) && { sold: true }) })),
     fights: hunt.fights.map((/** @type {Record<string, any>} */ fight) => ({

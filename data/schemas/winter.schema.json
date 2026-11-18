@@ -393,6 +393,159 @@
           }
         }
       }
+    },
+    "andrzejki": {
+      "type": "object",
+      "description": "Andrzejki: Wieczór wróżb (1082 C, 1083 C, 1084 A i B; src/engine/andrzejki.js).",
+      "additionalProperties": false,
+      "required": [
+        "month",
+        "days",
+        "hours",
+        "value",
+        "goldRound",
+        "cups",
+        "omens",
+        "background",
+        "feat",
+        "texts"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "month": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12,
+          "description": "Miesiąc wieczorów wróżb."
+        },
+        "days": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Wieczory wróżb: dzień miesiąca, godzina otwarcia (czas polski) i rodzaj wróżby.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "day",
+              "from",
+              "kind"
+            ],
+            "properties": {
+              "day": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 31
+              },
+              "from": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 23
+              },
+              "kind": {
+                "enum": [
+                  "wax",
+                  "cups"
+                ]
+              }
+            }
+          }
+        },
+        "hours": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Ile godzin trwa premia wróżby."
+        },
+        "value": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "O ile procent wróżba podnosi swój rodzaj premii."
+        },
+        "goldRound": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Do ilu złotych zaokrągla się złoto nagrody."
+        },
+        "cups": {
+          "type": "integer",
+          "minimum": 2,
+          "description": "Ile kubków stoi na stole."
+        },
+        "omens": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Wróżby: kształt wosku albo figurka spod kubka, rodzaj premii z weeks.json (kinds) i nagroda od razu.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name",
+              "kind",
+              "reward"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "enum": [
+                  "xp",
+                  "gold",
+                  "items",
+                  "materials",
+                  "profession-xp",
+                  "herbs",
+                  "rest",
+                  "reputation"
+                ]
+              },
+              "reward": {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                  "timePoints": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Punkty Czasu od razu."
+                  },
+                  "goldMinutes": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Złoto z tylu minut wyprawy na poziomie postaci."
+                  },
+                  "packs": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Pakiety kart Talii Systemu."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "background": {
+          "type": "string",
+          "description": "Tło portretu (id z cosmetics.json) za wróżby w oba wieczory."
+        },
+        "feat": {
+          "type": "string",
+          "description": "Licznik w feats postaci, z którego liczy się osiągnięcie (achievements.json)."
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
     }
   }
 }

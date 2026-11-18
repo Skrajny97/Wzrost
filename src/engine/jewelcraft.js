@@ -31,7 +31,16 @@ import { metNames } from './workshop.js';
  * @param {Content} content
  * @returns {Base[]}
  */
-export const jewelBases = (content) => content.bases.filter((/** @type {Base} */ base) => content.jewelcrafting.ores[base.slot]);
+export const jewelBases = (content) => content.bases.filter((/** @type {Base} */ base) => content.jewelcrafting.ores[base.slot] && jewelPatternMade(base, content));
+
+// Whether the Szlifiernia makes a jewel's pattern at all, as in the Warsztat
+// (patternMade in workshop.js): not above patternsUpTo.
+/**
+ * @param {Base} base
+ * @param {Content} content
+ * @returns {boolean}
+ */
+export const jewelPatternMade = (base, content) => (base.classLevel ?? 1) <= content.jewelcrafting.patternsUpTo;
 
 // The profession level a base's pattern opens at, as in the Warsztat: the
 // first base of a family at once, a later one from laterPatternLevel, and
@@ -54,7 +63,7 @@ export const jewelPatternLevel = (base, content) => (base.classLevel ? Math.max(
  * @param {string[]} learned
  * @param {Content} content
  */
-export const knowsJewelPattern = (base, level, learned, content) => jewelPatternLevel(base, content) <= level || learned.includes(base.id);
+export const knowsJewelPattern = (base, level, learned, content) => jewelPatternMade(base, content) && (jewelPatternLevel(base, content) <= level || learned.includes(base.id));
 
 // The patterns the character knows at a level of Jubilerstwo.
 /**
@@ -75,7 +84,7 @@ export const knownJewelPatterns = (level, learned, content) => jewelBases(conten
  */
 export function jewelPatternFrom(item, learned, content) {
   const base = content.basesById[item.base];
-  return base && content.jewelcrafting.ores[base.slot] && jewelPatternLevel(base, content) > 1 && !learned.includes(base.id) ? base.id : null;
+  return base && content.jewelcrafting.ores[base.slot] && jewelPatternMade(base, content) && jewelPatternLevel(base, content) > 1 && !learned.includes(base.id) ? base.id : null;
 }
 
 // The gem that gives jewellery a rarity, and the ore its setting takes.

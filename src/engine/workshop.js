@@ -28,12 +28,23 @@ import { say } from './text.js';
 /** @typedef {{ made: boolean, item?: Record<string, any> }} Made An item of an order: made or failed. */
 /** @typedef {import('./rng.js').Rng} Rng */
 
+// Whether the workshop makes a base's pattern at all: not of a class level
+// above patternsUpTo, a Tier that only drops until its lands come (1086.0 A:
+// Tier X from class level 200), which neither the profession's level nor
+// taking such an item apart opens.
+/**
+ * @param {Base} base
+ * @param {Content} content
+ * @returns {boolean}
+ */
+export const patternMade = (base, content) => (base.classLevel ?? 1) <= content.workshop.patternsUpTo;
+
 // The bases of the slots the workshop makes, in the data's order.
 /**
  * @param {Content} content
  * @returns {Base[]}
  */
-export const craftableBases = (content) => content.bases.filter((/** @type {Base} */ base) => content.workshop.parts[base.slot]);
+export const craftableBases = (content) => content.bases.filter((/** @type {Base} */ base) => content.workshop.parts[base.slot] && patternMade(base, content));
 
 // The profession level a base's pattern opens at: the first base of a family
 // at once, a later one from laterPatternLevel, and not before the class level
@@ -54,7 +65,7 @@ export const patternLevel = (base, content) => (base.classLevel ? Math.max(conte
  * @param {Content} content
  * @returns {boolean}
  */
-export const knowsPattern = (base, level, learned, content) => patternLevel(base, content) <= level || learned.includes(base.id);
+export const knowsPattern = (base, level, learned, content) => patternMade(base, content) && (patternLevel(base, content) <= level || learned.includes(base.id));
 
 // The patterns the character knows at a level of the crafting profession.
 /**
@@ -76,7 +87,7 @@ export const knownPatterns = (level, learned, content) => craftableBases(content
  */
 export function patternFrom(item, learned, content) {
   const base = content.basesById[item.base];
-  return base && content.workshop.parts[base.slot] && patternLevel(base, content) > 1 && !learned.includes(base.id) ? base.id : null;
+  return base && content.workshop.parts[base.slot] && patternMade(base, content) && patternLevel(base, content) > 1 && !learned.includes(base.id) ? base.id : null;
 }
 
 // The rarities a level of the profession makes, in order.

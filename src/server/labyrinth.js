@@ -66,7 +66,7 @@ import { t } from './i18n.js';
 // the companions who go there (companionsOf, 850 A).
 import { companionsOf, requireFree } from './portals.js';
 import { trimReports } from './reports.js';
-import { weekNow } from './weeks.js';
+import { weekFor } from './weeks.js';
 
 const rules = () => content().labyrinth;
 
@@ -152,7 +152,7 @@ function labyrinthView(player, state, now, waiting = 0) {
   // as it is now, with the trophies for every creature of the map.
   const ahead = state.over ? new Set() : roomsAhead(map, state.row, state.room);
   const monsterIds = [...new Set(foes.flat().flatMap((list) => (list ?? []).map((foe) => foe.monsterId)))];
-  const party = { character, equipped, name: player.row.name, companions, trophies: monsterIds.length > 0 ? trophiesFor(player, now, monsterIds) : {}, week: weekNow(now) };
+  const party = { character, equipped, name: player.row.name, companions, trophies: monsterIds.length > 0 ? trophiesFor(player, now, monsterIds) : {}, week: weekFor(player.row, now) };
   const dangerSeed = `danger:${state.day}:${player.row.id}`;
   const dangerOf = (row, index, type) => (ahead.has(`${row}:${index}`) ? roomDanger({ state, type, row, room: index, party, seed: dangerSeed }, content()) : null);
   return {
@@ -270,7 +270,7 @@ export async function enterLabyrinth(context) {
   // The Encyklopedia's trophies for the creatures of the room.
   const trophies = foes.length > 0 ? trophiesFor(player, now, foes.map((foe) => foe.monsterId)) : {};
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const week = weekNow(now);
+  const week = weekFor(row, now);
   // Talia Systemu (cards.js), where the game has it on: the creatures beaten
   // may leave their cards (903), none at its top level. The collection as
   // read, for a fight only; the room's save holds only while the character

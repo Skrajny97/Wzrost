@@ -49,6 +49,7 @@ import { BUSY, partyFree, partyWent, skipLines } from './party.js';
 import { mercenaryChoice, servicePanel } from '../mercenaries.js';
 import { combatModes } from './towers.js';
 import { weekLine } from '../weeks.js';
+import { andrzejkiCard, omenLines } from '../andrzejki.js';
 
 // Shown through t(), as the page loads its English after this module.
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
@@ -429,11 +430,15 @@ export function mountCombat(container, { params, navigate }) {
     meal = null;
 
     // While the character is away, every view shows the exploration. The
-    // main view has the week of the year under the top bar (weeks.js).
+    // main view has the week of the year under the top bar (weeks.js), the
+    // Andrzejki omens running under it and, on the fortune evenings, their
+    // card (andrzejki.js, 1082 C).
     if (activity || !region) {
       fill(
         container,
         weekLine(character),
+        omenLines(character),
+        andrzejkiCard(character),
         h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: t('Walka') })),
         modeTabs(),
         testTools(),

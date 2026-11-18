@@ -40,6 +40,7 @@ let paymentsForAuthors = false;
 let labyrinth = false;
 let cards = false;
 let winterTest = false;
+let andrzejkiTest = false;
 
 export function readFeatures(env) {
   professions = env.PROFESSIONS === 'on';
@@ -60,6 +61,7 @@ export function readFeatures(env) {
   labyrinth = env.LABYRINTH === 'on';
   cards = env.CARDS === 'on';
   winterTest = env.WINTER === 'test';
+  andrzejkiTest = env.ANDRZEJKI === 'test';
 }
 
 export const professionsOn = () => professions;
@@ -118,6 +120,10 @@ export const cardsOn = () => cards;
 // December everywhere; where WINTER is "test" (the test version) every day,
 // so they can be tried before it.
 export const winterTestOn = () => winterTest;
+// Andrzejki (andrzejki.js, 1082 C): the fortune evenings come on 29 and 30
+// November everywhere; where ANDRZEJKI is "test" (the test version) every
+// day, an odd one as the wax and an even one as the cups.
+export const andrzejkiTestOn = () => andrzejkiTest;
 // A camp building of the Osada's (Kwatery, `settlement` in buildings.json)
 // stands only where the Osada is on, and one of the Warownia's (`fortress`)
 // only where the Warownia is; the others everywhere.

@@ -28,7 +28,7 @@ import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { takenOff } from './market.js';
 import { pendingOf, requireOpen, settlementOf, settlementView } from './settlement.js';
-import { weekNow } from './weeks.js';
+import { weekFor } from './weeks.js';
 
 const changed = () => new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
 const forge = () => content().settlement.forge;
@@ -96,8 +96,8 @@ export function forgeView(player, stored, now) {
 
 // The relation and the reputation a trade of `gold` grows, as at Jagna's;
 // the reputation with the week's share (weeks.js).
-function grown(stored, gold, level, now) {
-  const { points, reputation: gained, trade } = tradePoints(gold, level, stored.forgeTrade, now, content(), forge().reputation, weekNow(now));
+function grown(stored, gold, level, now, row) {
+  const { points, reputation: gained, trade } = tradePoints(gold, level, stored.forgeTrade, now, content(), forge().reputation, weekFor(row, now));
   const add = (counts, id, gain = points) => ({ ...counts, [id]: (counts?.[id] ?? 0) + gain });
   return { points, next: { ...stored, relations: add(stored.relations, forge().resident), reputation: add(stored.reputation, forge().brotherhood, gained), forgeTrade: trade } };
 }
@@ -118,7 +118,7 @@ export async function buyScrolls(context) {
   const reputation = stored.reputation?.[forge().brotherhood] ?? 0;
   const gold = scrollPrice(reputation, content(), kind) * body.count;
   if (row.gold < gold) throw new ApiError(409, 'no_gold', 'Brakuje złota.');
-  const { points, next } = grown(stored, gold, row.level, context.now);
+  const { points, next } = grown(stored, gold, row.level, context.now, row);
   const day = questPeriod('daily', context.now, content()).key;
   // Today's count of each kind, the other kept as it was.
   const counts = { scrolls: boughtToday(stored, context.now), steady: boughtToday(stored, context.now, true) };
@@ -165,7 +165,7 @@ export async function raiseAtForge(context) {
   if (row.gold < offer.gold) throw new ApiError(409, 'no_gold', 'Brakuje złota.');
   const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const raised = raiseRarity(item, createRng(roll), content());
-  const { points, next } = grown(stored, offer.gold, row.level, context.now);
+  const { points, next } = grown(stored, offer.gold, row.level, context.now, row);
   const pay = takenOff('materials', taken);
   const db = context.env.DB;
   // As at the Zaklinaczka: the item changes only if it and the character are

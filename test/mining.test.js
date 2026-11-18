@@ -325,6 +325,9 @@ describe('Jubilerstwo in the engine', () => {
     const at175 = knownJewelPatterns(175, [], content).map((base) => base.id);
     assert.deepEqual([at175.length, ['jurata-necklace', 'kinga-ring', 'golden-horn'].every((id) => at175.includes(id))], [27, true]);
     assert.equal(knownJewelPatterns(200, [], content).length, 27);
+    // Tier X's jewels (1086) only drop for now (1086.0 A).
+    assert.ok(!knownJewelPatterns(200, ['rzepicha-necklace'], content).some((base) => base.id === 'rzepicha-necklace'));
+    assert.equal(jewelPatternFrom({ base: 'rzepicha-necklace' }, [], content), null);
     const seventh = jewelReport({ ...reportOf, before: { level: 124, xp: 0 }, after: { level: 125, xp: 0 } }, content);
     assert.deepEqual(seventh.revealed, ['pectoral', 'ancestors-ring', 'grzywna']);
     assert.ok(seventh.system.includes('Osiągnięto poziom Jubilerstwa: 125'), seventh.system.join(' | '));

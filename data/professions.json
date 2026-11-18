@@ -217,6 +217,7 @@
     "speedPerLevel": 0.01,
     "fastest": 0.5,
     "laterPatternLevel": 10,
+    "patternsUpTo": 175,
     "partsLevelStep": 10,
     "upgrades": [
       { "upgrade": 1, "level": 10, "chance": 0.1, "perLevel": 0.005, "max": 0.4 },
@@ -371,6 +372,7 @@
     "speedPerLevel": 0.01,
     "fastest": 0.5,
     "laterPatternLevel": 10,
+    "patternsUpTo": 175,
     "chances": { "common": 1, "rare": 0.9, "unique": 0.75, "epic": 0.55, "legendary": 0.35, "mythic": 0.2, "divine": 0.1 },
     "chancePerLevel": 0.005,
     "maxChance": 0.95,

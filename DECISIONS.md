@@ -3710,6 +3710,15 @@ Autor 17.11.2026: „przydałby się drobny event na Andrzejki”. Propozycja �
 3. **Za wróżbę w oba dni osiągnięcie z tytułem i tło portretu (1084 A i B).** Osiągnięcie „Andrzejkowa wróżba” z tytułem „Wróżbita” (dla kobiet „Wróżka”) i tło portretu „Wieczór andrzejkowy” (chata ze świecą), tylko z wydarzenia.
 4. Dalej: grafika tła portretu w PixelLab i makiety (telefon, 1366 i 1920 px) na stronie ocen, a po akceptacji wdrożenie przed 29.11.
 
+5. **Jak zbudowane (18.11.2026, czeka na oceny 1091–1093).** Dane w `data/winter.json` (`andrzejki`), silnik `src/engine/andrzejki.js`, serwer `src/server/andrzejki.js` (`POST /api/andrzejki`), karta `src/client/andrzejki.js` na ekranie Walki pod paskiem tygodnia. Brakujące szczegóły, rozstrzygnięte najprościej:
+    - Wróżbę losuje serwer z postaci, wieczoru i wybranego kubka, więc wybór kubka ją zmienia, a ponowne wejście nie. Ta sama wróżba może wypaść oba wieczory; wtedy obie premie się sumują.
+    - Premia działa jak premia tygodnia, tylko dla tej postaci (`weekFor` w `src/server/weeks.js`): wyprawa, walka albo praca zaczęta w czasie premii trzyma ją do końca, a raport ma osobną linijkę „Wróżba Smok: …”. Szybszy odpoczynek liczy się w tempie odpoczynku od chwili wróżby przez dobę (`weekRest`).
+    - Prezenty: Smok, Gwiazda i Serce 25 Punktów Czasu; Sakiewka, Kruk i Liść złoto z godziny wyprawy na poziomie postaci (jak w kalendarzu Szczodrych Godów); Klucz i Korona pakiet kart.
+    - Osiągnięcie „Andrzejkowa wróżba” w nowej grupie „Wydarzenia”, z 25 Punktami Czasu jak najmniejsze osiągnięcia. Tło „Wieczór andrzejkowy” to przedmiot wydarzenia (`event: andrzejki` w `data/cosmetics.json`): nie da się go kupić.
+    - Figurki wróżb to te same ikony oba wieczory: 29.11 wosk zastyga w figurkę, a jej cień pada na ścianę, 30.11 figurka leży pod kubkiem.
+    - Wersja testowa (`ANDRZEJKI: test`) gra każdy dzień od północy: nieparzysty jak lanie wosku, parzysty jak trzy kubki.
+6. **Oceny 18.11.2026 (1091–1093).** Figurki wróżb: Smok B, Sakiewka A, Klucz C, Kruk B, Gwiazda B (druga runda), Liść B, Serce A, Korona A, świeca osiągnięcia D. Tło portretu „Wieczór andrzejkowy”: D. Makiety lania wosku przed i po wróżbie, trzech kubków po wyborze i osiągnięcia przyjęte. Trzy kubki przed wyborem odrzucone, bo na przyjętym obrazku (wersja 3) ręka już unosi środkowy kubek i widać pod nim pierścionek. Autor: „niech beda trzy kubki jednak w takim razie przykryte”. Dlatego PixelLab domalowuje w miejscu ręki i uniesionego kubka trzeci przykryty kubek (`andrzejki-cups-covered` w `art/prompts.json`, inpainting przyjętego obrazka). Po wyborze kubek znika, a figurka stoi tam, gdzie stał (1093.4).
+
 ## Co przygotować zawczasu: kolejność (1085 A, 18.11.2026)
 
 Najpierw Tier X przedmiotów (potrzebny najlepszej postaci za około dwa tygodnie), potem czwarta ewolucja (około początku stycznia), potem nowe krainy od 276. poziomu (około połowy stycznia).
@@ -3719,13 +3728,15 @@ Najpierw Tier X przedmiotów (potrzebny najlepszej postaci za około dwa tygodni
 1. **Zasady z 1086.0 przyjęte.** 22 przedmioty od 200. poziomu klasy, po jednym w każdej rodzinie, każdy zaraz za przedmiotem Tieru IX. Współczynnik pierwszego przedmiotu rodziny razy 1,45. Premia od najwyższej premii Tieru IX plus 1 do półtora raza tej premii. Wypadają na wyprawach od ostatniego miejsca Ostępów Nowiu (poz. 196–200), a od 200. poziomu klasy dają je też skrzynia tygodniowa, handlarz, Salon Gier, Wieże, Bestia, Wyprawa Gildii i wojna gildii. Skrzynia Encyklopedii za pełny zestaw: 244 145 złota, 2560 Punktów Czasu i 100 Punktów Systemu.
 2. **Materiały do wyrobu z nowych krain (1086.0 A).** Do czasu krain od 276. poziomu Tier X tylko wypada; wzory Warsztatu i Szlifierni dojdą z krainami.
 3. **Wszystkie 22 nazwy przyjęte:** Miecz Grunwaldzki, Topór Swarożyca, Sztylet Marzanny, Łuk Jutrzenki, Kostur Welesa, Pastorał Stanisława, Tarcza Lecha, Kołczan Zorzy, Kieł Bazyliszka, Sfera Kopernika, Kaptur Strzygonia, Hełm Mieszka, Żupan Sobieskiego, Zbroja Jagiełły, Szata Wandy, Korona Jadwigi, Kapa Kazimierza, Rękawice Łokietka, Buty Walgierza, Naszyjnik Rzepichy, Pierścień Bony, Złota kaczka.
-4. **Ikony:** przyjęte po jednej wersji dla 21 przedmiotów. Hełm Mieszka: wszystkie cztery odrzucone (autor: „zbyt podobne do poprzedniego tieru”), więc nowe szkice z innym opisem i innym wzorem stylu niż Hełm Krakusa.
+4. **Ikony:** przyjęte po jednej wersji dla 21 przedmiotów. Hełm Mieszka: wszystkie cztery odrzucone (autor: „zbyt podobne do poprzedniego tieru”), więc nowe szkice z innym opisem i innym wzorem stylu niż Hełm Krakusa (1089). Przyjęta wersja A z drugiej rundy (1089 A).
+5. **Jak zbudowane (18.11.2026).** 22 bazy w `data/item-bases.json` (angielskie nazwy w `data/en/item-bases.json`), Tier X w Encyklopedii (`data/encyclopedia.json`, do 350. poziomu). Warsztat i Szlifiernia znają wzory tylko do 175. poziomu klasy (`patternsUpTo` w `data/professions.json`): wzorów Tieru X nie odsłania ani poziom profesji, ani rozebranie przedmiotu. Gdy przyjdą nowe krainy, wystarczy podnieść tę liczbę do 200. Materiały stworów powyżej 275. poziomu (czempioni Łysogór) przechodzą do Tieru X Encyklopedii, jak przy Tierze IX.
 
 ## Czwarta ewolucja klas (1087, decyzje autora 18.11.2026)
 
 1. **Zasady z 1087.0 przyjęte** i wszystkie 15 par nazw: Burzyciel/Burzycielka, Nieśmiertelny/Nieśmiertelna, Tytan/Tytanida, Niebiański Łucznik/Niebiańska Łuczniczka, Gromowładny/Gromowładna, Pan Zwierząt/Pani Zwierząt, Stwórca Żywiołów/Stwórczyni Żywiołów, Lodowy Bóg/Lodowa Bogini, Pradruid/Pradruidka, Archanioł/Archanielica, Mściciel Niebios/Mścicielka Niebios, Wieszcz/Wieszczka, Żniwiarz Dusz/Żniwiarka Dusz, Król Nawii/Królowa Nawii, Książę Ciemności/Księżna Ciemności.
 2. **Portrety przyjęte dla 27 z 30 postaci**, zapisane jako wzory w `art/references/evolutions/<id>-<płeć>.png`. Do poprawy: Nieśmiertelny i Archanioł (wszystkie szkice odrzucone; nowe szkice w stroju przyjętej kobiety tej formy) oraz Żniwiarka Dusz (autor: „A, ale potrzebuje kos takich jak facet”).
-3. Dalej: cechy i umiejętności z liczbami z symulacji, a potem chody, jazda wierzchem i odcienie skóry. Do gry wejdzie z pełną grafiką.
+3. **Trzy portrety z drugiej rundy przyjęte (1090, 18.11.2026):** Nieśmiertelny A, Archanioł B i Żniwiarka Dusz C (z dużymi kosami jak u Żniwiarza). Wszystkie 30 portretów czwartych form są teraz wzorami w `art/references/evolutions/`.
+4. Dalej: cechy i umiejętności z liczbami z symulacji, a potem chody, jazda wierzchem i odcienie skóry. Do gry wejdzie z pełną grafiką.
 
 ## Nowe krainy 276–350: Nawia (1088 B, 18.11.2026)
 

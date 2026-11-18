@@ -2439,6 +2439,13 @@
         "tool": "pro",
         "transparent": false
       },
+      "andrzejki-cups-covered": {
+        "$comment": "1093.3 (18.11.2026): „niech beda trzy kubki jednak w takim razie przykryte”. Przyjęte kubki (wersja 3) z ręką i uniesionym środkowym kubkiem; PixelLab domalowuje w miejscu ręki i uniesionego kubka trzeci przykryty kubek (maska: biel).",
+        "tool": "inpaint",
+        "input": "art/inputs/andrzejki/cups.png",
+        "mask": "art/inputs/andrzejki/cups-covered-mask.png",
+        "prompt": "St Andrew's Eve fortune telling in a Slavic forest cottage at night, pixel art scene: three overturned copper cups standing upside down in a row on a rough wooden table, all three covered, the middle cup the same as the other two and standing between them on the table, nothing visible under the cups, nothing lying on the table, no hands, no arms and no sleeves anywhere in the picture, a lit tallow candle on the left, bunches of herbs hanging on the dark log wall, a small window with the dark blue night sky, warm candle light"
+      },
       "bg-andrzejki": {"prompt": "inside a small Slavic forest cottage on Saint Andrew's eve at night: a rough wooden table with one tall burning candle, a wooden bowl of water with a twisted shape of hardened wax floating in it, an old iron key lying beside it, a small window showing a crescent moon and stars, warm candlelight and deep blue shadows, cozy and mysterious, pixel art scene background", "width": 96, "height": 128, "tool": "pro", "transparent": false},
       "galazka": {
         "prompt": "a small fresh fir branch with dark green needles and a little snow on it, single inventory item icon, bold clean outline",

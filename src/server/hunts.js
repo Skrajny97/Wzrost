@@ -126,7 +126,7 @@ import { finishFishing } from './fishing.js';
 import { finishFarming } from './farming.js';
 import { applyPartyEvent, checkedChoice, leaderView, resolveAuto, resolvePartyRow, tripEvent, tripLine } from './party-events.js';
 import { wantedAfterHunt, wantedGoing, wantedOnTrip } from './wanted.js';
-import { keptWeek, weekNow } from './weeks.js';
+import { keptWeek, weekFor } from './weeks.js';
 import { winterGainSql } from './winter.js';
 
 // A JSON path for a resource id with a hyphen ("iron-ore").
@@ -485,7 +485,7 @@ export async function beginHunt(
   // The week of the year it sets out in (weeks.js), as the line on the Walka
   // screen shows it: its effects work for the whole exploration, whenever
   // its report is claimed; every member of a Drużyna's trip sets out now.
-  const week = weekNow(now);
+  const week = weekFor(player.row, now);
   // The companions hired in the Osada who do not stay in the Kwatery go
   // along, as they are now (companions.js), so the report comes out the same
   // whenever claimed; a wounded one once the character has rested to full

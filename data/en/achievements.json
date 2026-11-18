@@ -240,6 +240,19 @@
           ]
         }
       }
+    },
+    "events": {
+      "name": "Events",
+      "list": {
+        "andrzejki-fortune": {
+          "name": "St Andrew's Fortune",
+          "goal": "Tell your fortune on both evenings of St Andrew's Eve.",
+          "title": [
+            "Fortune Teller",
+            "Fortune Teller"
+          ]
+        }
+      }
     }
   }
 }

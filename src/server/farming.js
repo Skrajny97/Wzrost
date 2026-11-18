@@ -16,7 +16,7 @@ import { addTo, alreadyClaimed, requireProfessions, workClaim, workClaimFailed, 
 import { workFamePoints } from './fame.js';
 import { requireOpen } from './mining.js';
 import { trimReports } from './reports.js';
-import { keptWeek, weekNow } from './weeks.js';
+import { keptWeek, weekFor } from './weeks.js';
 import { withMinigame } from './minigame.js';
 
 // A farming of `minutes` from now on, of the field `plots` (the crop of
@@ -51,7 +51,7 @@ export async function startFarming(context) {
   // `begun`, when it really began; `week`, the week of the year it begins
   // in (weeks.js).
   const field = Array.from({ length: count }, (_, index) => plots[index] ?? null);
-  const week = weekNow(now);
+  const week = weekFor(row, now);
   const options = JSON.stringify({ plots: field, begun: now, ...(week && { week }) });
   const ends = now + body.minutes * 60000;
   try {

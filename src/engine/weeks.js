@@ -48,7 +48,7 @@ import { decimalText } from './text.js';
 const DAY = 86400000;
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
-/** @typedef {{ kind: string, value: number, stat?: string }} WeekEffect An effect of a week (data/weeks.json). */
+/** @typedef {{ kind: string, value: number, stat?: string, omen?: string }} WeekEffect An effect of a week (data/weeks.json), or of an Andrzejki omen kept with it (`omen`, andrzejki.js). */
 /** @typedef {{ number?: number, effects?: WeekEffect[] } & Record<string, any>} Week A week as an activity keeps it ({ number, effects }). */
 /** @typedef {{ timeZone: string, startsAt: number, endsAt: number, isoYear: number, iso: number }} Span */
 
@@ -267,10 +267,28 @@ const CHANGED = {
  * @returns {string | null}
  */
 export function weekLine(hunt, content) {
-  const changed = effectsOf(hunt.week).filter((effect) => CHANGED[effect.kind]?.(hunt));
+  const changed = effectsOf(hunt.week).filter((effect) => !effect.omen && CHANGED[effect.kind]?.(hunt));
   const name = content.weeksByNumber?.[hunt.week?.number]?.name;
   if (changed.length === 0 || !name) return null;
   return content.weeks.texts.report.replace('{week}', name).replace('{effects}', weekEffectsText(changed, content, true));
+}
+
+// The System's lines of a report on the Andrzejki omens the hunt kept (the
+// effects of `hunt.week` marked with their omen, andrzejki.js, 1083 C): one
+// for each omen that changed the result ("Wróżba Smok: +10% XP z walk.").
+/**
+ * @param {Record<string, any>} hunt
+ * @param {Content} content
+ * @returns {string[]}
+ */
+export function omenLines(hunt, content) {
+  const rules = content.winter?.andrzejki;
+  if (!rules) return [];
+  const changed = effectsOf(hunt.week).filter((effect) => effect.omen && CHANGED[effect.kind]?.(hunt));
+  return [...new Set(changed.map((effect) => effect.omen))].map((id) => {
+    const name = rules.omens.find((/** @type {{ id: string }} */ omen) => omen.id === id)?.name ?? id;
+    return rules.texts.report.replace('{omen}', name).replace('{effects}', weekEffectsText(changed.filter((effect) => effect.omen === id), content, true));
+  });
 }
 
 // The week as the page shows it (the line on the Walka screen and the
@@ -316,24 +334,31 @@ export function weeksContent(content) {
 // before `now` on, a new camp bonus or a new week, so restedHp, the pace of
 // now and the page's count of HP take it as they took the camp's. A rest is
 // over within about an hour, so only a new week and a new camp bonus both
-// within one rest would count it a little off.
+// within one rest would count it a little off. `omens`: the character's
+// Andrzejki omens of rest (andrzejki.js, 1083 C), each `value` percent more
+// from `at` until `until`, added to the week's share while they run; their
+// start and end are changes as a new week is.
 /**
  * @param {{ bonus: number, change?: { at: number, bonus: number } | null }} camp
  * @param {number} since
  * @param {number} now
  * @param {Content} content
+ * @param {{ at: number, until: number, value: number }[]} [omens]
  * @returns {{ bonus: number, change?: { at: number, bonus: number } }}
  */
-export function weekRest(camp, since, now, content) {
+export function weekRest(camp, since, now, content, omens = []) {
   /** @param {number} at */
   const campAt = (at) => (camp.change && at >= camp.change.at ? camp.change.bonus : camp.bonus);
   /** @param {number} at */
   const pace = (at) => {
-    const factor = weekFactor(weekAt(at, content).week, 'rest');
+    const running = omens.filter((omen) => omen.at <= at && at < omen.until).map((omen) => ({ kind: 'rest', value: omen.value }));
+    const week = weekAt(at, content).week;
+    const factor = weekFactor(running.length > 0 ? { ...week, effects: [...effectsOf(week), ...running] } : week, 'rest');
     return factor === 1 ? campAt(at) : (1 + campAt(at)) * factor - 1;
   };
   const { startsAt } = weekAt(now, content);
-  const last = Math.max(camp.change?.at ?? since, startsAt > since ? startsAt : since);
+  const omenChanges = omens.flatMap((omen) => [omen.at, omen.until]).filter((at) => at > since && at <= now);
+  const last = Math.max(camp.change?.at ?? since, startsAt > since ? startsAt : since, ...omenChanges);
   const first = pace(since);
   if (last <= since) return { bonus: first };
   // A new week with the same pace changes nothing.

@@ -161,8 +161,9 @@ import { OWN_CHARACTERS } from './roles.js';
 import { requirePlayable } from './sessions.js';
 import { tradeBlockOf, tradesEnded } from './trades.js';
 import { skipIntroduction } from './tutorial.js';
-import { weekFactorNow, weekOfCharacter } from './weeks.js';
+import { restOmens, weekFactorNow, weekOfCharacter } from './weeks.js';
 import { winterCampView, winterQuestsPeriod } from './winter.js';
+import { andrzejkiView } from './andrzejki.js';
 
 // A character's name (names.js): 2 to 20 signs, the filter of words, and no
 // two players share one, whatever the letter case; neither does a character
@@ -967,7 +968,7 @@ export function currentHp(player, now) {
   const { totals } = computeStats(character, equippedItems(player), content());
   const combatant = playerCombatant({ character, equipped: equippedItems(player), name: player.row.name }, content());
   const camp = restBonus(player.buildings, player.row.hp_at, now, content());
-  const rest = weeksOn() ? weekRest(camp, player.row.hp_at, now, content()) : camp;
+  const rest = weeksOn() ? weekRest(camp, player.row.hp_at, now, content(), restOmens(player.row)) : camp;
   const hp = !restsDuring(player.activity)
     ? player.activity.hp_at_start
     : restedHp(
@@ -1843,6 +1844,10 @@ export function characterView(player, now) {
     // snow, lights by the campfire and the calendar's decorations; null
     // outside it.
     winterCamp: winterCampView(row, now),
+    // Andrzejki's fortune evening and the omens running (andrzejki.js, 1082
+    // C): the card on the Walka screen and the line by the week; null
+    // outside them.
+    andrzejki: andrzejkiView(row, now),
     // The Skrzynia Konta's padlock while the character is below the level
     // it opens at (chestLock), for the camp's board; absent once it opens.
     ...(chestLock(row) && { chestLock: chestLock(row) }),
