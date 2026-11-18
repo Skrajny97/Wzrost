@@ -1072,6 +1072,10 @@
     "0.4.31": {
       "title": "Version 0.4.31",
       "body": "- In a party, your companions from the Quarters skip only the party's explorations. They go with you on your own explorations, into the Labyrinth and the Portals as always, so there is no need to leave the party.\n- A leader who unticks “With the party” sets out with their own companions."
+    },
+    "0.4.32": {
+      "title": "Version 0.4.32",
+      "body": "- A party leader chooses above “Set out”: “With the party” or “With companions”. A party member sees which companions will go with them on their own exploration.\n- The chat has an “Administration” tab for the administration and the moderators."
     }
   }
 }

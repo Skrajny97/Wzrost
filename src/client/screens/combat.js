@@ -107,6 +107,9 @@ const buildKey = (character) =>
     character.companionsKey ?? null,
   ]);
 
+// Names in a sentence: "A", "A i B", "A, B i C".
+const listNames = (all) => (all.length === 1 ? all[0] : t('{first} i {last}', { first: all.slice(0, -1).join(', '), last: all.at(-1) }));
+
 // The companions who wait wounded and will not go along on an exploration
 // till the character has rested to full HP, under the rest's time (a
 // player, 16.11.2026: „nie wiesz klikając kolejną wyprawę i idziesz sam bez
@@ -1296,16 +1299,28 @@ export function mountCombat(container, { params, navigate }) {
     const element = h('div', { class: 'party-choice', hidden: true });
     let free = [];
     let said = null;
-    const show = ({ party }) => {
+    const show = ({ party, ownCompanions = [] }) => {
       // A box of a view drawn over since is left as it is.
       if (!element.isConnected) return;
       const own = party?.members.find((member) => member.own);
       partyLeads = Boolean(own?.leader && party.members.length > 1);
       free = partyFree(party);
+      // The companions who go on the character's own explorations in a
+      // Drużyna too (hunts.js companionsGoing; players and the author,
+      // 18.11.2026: „z drużyną/z towarzyszami”), named.
+      const mates = ownCompanions.length > 0 ? listNames(ownCompanions) : null;
       if (!partyLeads) {
         if (said !== null) onRide(undefined);
-        said = null;
-        element.hidden = true;
+        // A member who does not lead: its own exploration takes them.
+        const line = party && mates ? JSON.stringify(['member', mates]) : null;
+        if (line === said) return;
+        said = line;
+        if (!line) {
+          element.hidden = true;
+          return;
+        }
+        fill(element, h('p', { class: 'muted', text: t('Na Twoją wyprawę pójdą z Tobą towarzysze: {names}. Na wyprawę drużyny wysyła lider.', { names: mates }) }));
+        element.hidden = false;
         return;
       }
       const others = party.members.filter((member) => !member.own);
@@ -1320,38 +1335,76 @@ export function mountCombat(container, { params, navigate }) {
         element.hidden = false;
         return;
       }
-      const box = h('input', {
-        type: 'checkbox',
-        id: 'party-along',
-        class: 'avoid-rare-box',
-        checked: partyTicked,
-        onChange: () => {
-          partyTicked = box.checked;
-          onRide(partyTicked ? party.limits.mount : undefined);
-        },
+      const limits = h('p', {
+        class: 'muted',
+        text: t('Drużyna idzie najwyżej na {time} ({timeBy}) i tylko tam, gdzie wejdzie {levelBy} (poziom klasy {level}).', {
+          time: formatMinutes(party.limits.minutes),
+          timeBy: party.limits.minutesBy,
+          levelBy: party.limits.classLevelBy,
+          level: party.limits.classLevel,
+        }),
       });
-      onRide(partyTicked ? party.limits.mount : undefined);
-      fill(
-        element,
-        h('label', { class: 'avoid-rare', for: 'party-along' }, box, h('span', { text: t('Z drużyną: {names}', { names: free.join(', ') }) })),
+      const stay =
+        busy.length > 0 &&
         h('p', {
           class: 'muted',
-          text: t('Drużyna idzie najwyżej na {time} ({timeBy}) i tylko tam, gdzie wejdzie {levelBy} (poziom klasy {level}).', {
-            time: formatMinutes(party.limits.minutes),
-            timeBy: party.limits.minutesBy,
-            levelBy: party.limits.classLevelBy,
-            level: party.limits.classLevel,
+          text:
+            busy.length === 1
+              ? t('Nie idzie, ale zostaje w drużynie: {names}.', { names: busy.join(', ') })
+              : t('Nie idą, ale zostają w drużynie: {names}.', { names: busy.join(', ') }),
+        });
+      // What goes with the character on the exploration it picks: the
+      // Drużyna, its companions staying in the Kwatery, or its companions.
+      const goes = h('p', { class: 'muted' });
+      const say = () => {
+        goes.textContent = partyTicked
+          ? mates
+            ? t('Towarzysze zostają w Kwaterach: drużyna poluje bez nich.')
+            : ''
+          : mates
+            ? t('Wyprawa będzie tylko Twoja: pójdą z Tobą towarzysze {names}.', { names: mates })
+            : t('Wyprawa będzie tylko Twoja.');
+        goes.hidden = goes.textContent === '';
+        limits.hidden = !partyTicked;
+        if (stay) stay.hidden = !partyTicked;
+      };
+      const pick = (along) => {
+        partyTicked = along;
+        onRide(partyTicked ? party.limits.mount : undefined);
+        say();
+      };
+      onRide(partyTicked ? party.limits.mount : undefined);
+      if (mates) {
+        // "Z drużyną" or "Z towarzyszami", side by side (1099 B, accepted
+        // by the author 18.11.2026); without companions the box as before.
+        const options = [
+          [true, t('Z drużyną')],
+          [false, t('Z towarzyszami')],
+        ].map(([along, label]) =>
+          h('button', {
+            type: 'button',
+            class: 'segmented-option',
+            'aria-pressed': String(partyTicked === along),
+            text: label,
+            onClick: () => {
+              pick(along);
+              for (const [index, button] of options.entries()) button.setAttribute('aria-pressed', String(partyTicked === (index === 0)));
+            },
           }),
-        }),
-        busy.length > 0 &&
-          h('p', {
-            class: 'muted',
-            text:
-              busy.length === 1
-                ? t('Nie idzie, ale zostaje w drużynie: {names}.', { names: busy.join(', ') })
-                : t('Nie idą, ale zostają w drużynie: {names}.', { names: busy.join(', ') }),
-          }),
-      );
+        );
+        const who = h('p', { class: 'party-pick-who', text: t('Drużyna: {party} · Towarzysze: {mates}', { party: free.join(', '), mates }) });
+        fill(element, h('div', { class: 'segmented party-pick', role: 'group', 'aria-label': t('Z kim wyruszasz') }, options), who, goes, limits, stay);
+      } else {
+        const box = h('input', {
+          type: 'checkbox',
+          id: 'party-along',
+          class: 'avoid-rare-box',
+          checked: partyTicked,
+          onChange: () => pick(box.checked),
+        });
+        fill(element, h('label', { class: 'avoid-rare', for: 'party-along' }, box, h('span', { text: t('Z drużyną: {names}', { names: free.join(', ') }) })), limits, stay, goes);
+      }
+      say();
       element.hidden = false;
     };
     const ask = () => {

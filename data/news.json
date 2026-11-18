@@ -1345,6 +1345,11 @@
       "id": "0.4.31",
       "title": "Wersja 0.4.31",
       "body": "- W drużynie Twoi towarzysze z Kwater nie idą tylko na wyprawę drużyny. Na Twoje własne wyprawy, do Labiryntu i Portali idą z Tobą jak zawsze, więc nie trzeba wychodzić z drużyny.\n- Lider, który odznaczy „Z drużyną”, wyrusza ze swoimi towarzyszami."
+    },
+    {
+      "id": "0.4.32",
+      "title": "Wersja 0.4.32",
+      "body": "- Lider drużyny wybiera nad „Wyrusz”: „Z drużyną” albo „Z towarzyszami”. Członek drużyny widzi, którzy towarzysze pójdą z nim na jego wyprawę.\n- Czat ma zakładkę „Administracja” dla administracji i moderatorów."
     }
   ]
 }

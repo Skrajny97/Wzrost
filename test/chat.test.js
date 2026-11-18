@@ -251,9 +251,9 @@ describe('Czat', () => {
     const seen = async () => (await call('GET', '/api/chat/latest', { cookie: players.ala })).data.seen;
     const mark = (body) => call('POST', '/api/chat/seen', { cookie: players.ala, body });
     const { message } = (await send(players.ola, 'Hej!')).data;
-    assert.deepEqual(await seen(), { global: 0, trade: 0, guild: 0, notice: 0, lead: 0, party: 0, private: {} });
+    assert.deepEqual(await seen(), { global: 0, trade: 0, guild: 0, notice: 0, lead: 0, party: 0, staff: 0, private: {} });
     assert.equal((await mark({ global: message.id })).status, 200);
-    assert.deepEqual(await seen(), { global: message.id, trade: 0, guild: 0, notice: 0, lead: 0, party: 0, private: {} });
+    assert.deepEqual(await seen(), { global: message.id, trade: 0, guild: 0, notice: 0, lead: 0, party: 0, staff: 0, private: {} });
     // A mark only goes forward, and only for the character's own reading.
     await mark({ global: 1 });
     assert.equal((await seen()).global, message.id);
@@ -272,6 +272,35 @@ describe('Czat', () => {
     await mark({ with: ola + 1000, id: second });
     await mark({ with: ola, id: message.id + 1000 });
     assert.deepEqual((await seen()).private, { [ola]: second });
+  });
+
+  test("the moderation's channel Administracja: the admin and the moderators read and write it, nobody else, and it tags no one", async () => {
+    const author = await admin();
+    assert.equal((await call('POST', '/api/author/chat/moderator', { cookie: author, body: { login: 'Ola', moderator: true } })).status, 200);
+    const staff = (cookie, text) => call('POST', '/api/chat', { cookie, body: { channel: 'staff', text } });
+    const readStaff = (cookie) => call('GET', '/api/chat?channel=staff', { cookie });
+    const sent = await staff(author, 'Witajcie w kanale moderacji, @Ala nie usłyszy.');
+    assert.equal(sent.status, 201, JSON.stringify(sent.data));
+    await age();
+    assert.equal((await staff(players.ola, 'Dzięki!')).status, 201);
+    const seen = await readStaff(players.ola);
+    assert.equal(seen.status, 200);
+    assert.deepEqual([seen.data.channel, seen.data.messages.map(({ name, role }) => [name, role])], ['staff', [['szef', 'admin'], ['Ola', 'moderator']]]);
+    // A player neither reads nor writes there, nor sees it in the global one.
+    for (const answer of [await readStaff(players.ala), await staff(players.ala, 'A ja?')]) assert.deepEqual([answer.status, answer.data.error.code], [403, 'no_staff']);
+    assert.ok(!(await read(players.ala)).messages.some(({ text }) => text.startsWith('Witajcie')));
+    // Its news reaches the moderation only; the tag above went nowhere.
+    const latest = async (cookie) => (await call('GET', '/api/chat/latest', { cookie })).data;
+    assert.ok((await latest(author)).staff.latest > 0);
+    assert.equal((await latest(players.ala)).staff, null);
+    assert.equal((await (await db()).prepare('SELECT COUNT(*) AS n FROM chat_mentions').first()).n, 0);
+    // Its mark is kept like the other channels'.
+    const mark = (await latest(author)).staff.latest;
+    assert.equal((await call('POST', '/api/chat/seen', { cookie: author, body: { staff: mark } })).status, 200);
+    assert.equal((await latest(author)).seen.staff, mark);
+    // A moderator no more is out of it.
+    await call('POST', '/api/author/chat/moderator', { cookie: author, body: { login: 'Ola', moderator: false } });
+    assert.equal((await readStaff(players.ola)).status, 403);
   });
 
   test('the channel keeps its last messages and the reported ones, and they go with the character', async () => {

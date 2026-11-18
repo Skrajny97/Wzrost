@@ -16002,6 +16002,18 @@ button.tcard-slot {
   gap: 4px;
 }
 
+/* "Z drużyną" or "Z towarzyszami" over "Wyrusz" (combat.js partyChoice),
+   and who goes with each. */
+.party-pick {
+  margin-top: 4px;
+}
+
+.party-pick-who {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
 .report-party {
   margin: 0 0 8px;
   color: var(--text-muted);

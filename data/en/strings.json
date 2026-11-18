@@ -565,6 +565,7 @@
   "Kamień węgielny": "Cornerstone",
   "Po objaśnieniu Osady, przy wejściu do obozu, dopóki obóz nie jest Warownią.": "After the Settlement explanation, on entering the camp, until the camp is a Stronghold.",
   "Drużyna": "Party",
+  "Administracja": "Administration",
   "Od 10. poziomu postaci, przy wejściu do Społeczności.": "From character level 10, on entering the Community.",
   "Trudna wyprawa": "Hard exploration",
   "Od 10. poziomu postaci, przy wejściu na miejsce wyprawy.": "From character level 10, on entering a place to explore.",
@@ -3608,5 +3609,14 @@
   "Wykonuje przedmioty w Warsztacie": "Crafting items in the Workshop",
   "Kopie w Kopalni": "Digging in the Mine",
   "Pracuje": "Working",
-  "Gotuje potrawy": "Cooking dishes"
+  "Gotuje potrawy": "Cooking dishes",
+  "Na Twoją wyprawę pójdą z Tobą towarzysze: {names}. Na wyprawę drużyny wysyła lider.": "Your companions will go with you on your exploration: {names}. The leader sends the party out.",
+  "Towarzysze zostają w Kwaterach: drużyna poluje bez nich.": "Your companions stay in the Quarters: the party hunts without them.",
+  "Wyprawa będzie tylko Twoja: pójdą z Tobą towarzysze {names}.": "The exploration will be yours alone: your companions {names} will go with you.",
+  "Wyprawa będzie tylko Twoja.": "The exploration will be yours alone.",
+  "Z drużyną": "With the party",
+  "Z towarzyszami": "With companions",
+  "Drużyna: {party} · Towarzysze: {mates}": "Party: {party} · Companions: {mates}",
+  "Z kim wyruszasz": "Who you set out with",
+  "Ten kanał jest tylko dla administracji.": "This channel is for the administration only."
 }
