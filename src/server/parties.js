@@ -39,18 +39,19 @@
 // "Musi być wspólny timer").
 //
 // A party hunts without companions (the author: "wtedy nie poluje się z
-// towarzyszem, tylko samemu/z drużyną"): in a party every companion stays in
-// the Kwatery (companionStays in the engine). Since 828 B (11.11.2026) the
-// companions no longer keep a character out of a party: before it makes or
-// joins one the page asks once, naming those who go on the explorations
-// (partyView's `companions`), and they stay by themselves while it is in
-// the party. The player's own setting of each ("Zostań w kwaterze") is not
-// touched, so out of the party, left, sent out or broken up, each goes
-// back to it. Before, a character whose companion still went on the
-// explorations neither made a party nor joined one until it was told to
-// stay, and stayed so after the party too.
+// towarzyszem, tylko samemu/z drużyną"): its trip takes none (beginHunt's
+// `party`). Since 18.11.2026 that is all a party changes for them: the
+// character's own explorations, the Labirynt and the portals take its
+// companions in a party too, and the Walka asks the leader "Z drużyną" or
+// "Z towarzyszami" (players and the author: „z drużyną/z towarzyszami”;
+// partyView's `ownCompanions` names them). Before, from 828 B (11.11.2026),
+// every companion stayed in the Kwatery while the character was in a party,
+// and before that a character whose companion went on the explorations
+// neither made a party nor joined one until it was told to stay. Before it
+// makes or joins one the page still tells it once which of them will not
+// go on the party's trips (partyView's `companions`).
 
-import { areaFor, areaOpenFor, huntDurations, huntWait, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange, partyStayText, tripWanted, wantedTarget } from '../engine/index.js';
+import { areaFor, areaOpenFor, companionsGoingMost, companionStays, huntDurations, huntWait, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange, partyStayText, tripWanted, wantedTarget } from '../engine/index.js';
 import { assertion } from './atomic.js';
 import { characterView, currentHp, earlyAreaOf, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer, settleCharacter } from './characters.js';
 import { content } from './content.js';
@@ -105,8 +106,8 @@ async function requirePartyPlayer(context) {
 }
 
 // The question before a character of `row` makes or joins a party (828 B):
-// the words naming its companions who go on the explorations and will stay
-// in the Kwatery meanwhile, with the title and the button of the question
+// the words naming its companions who go on the explorations and will not
+// go on the party's trips, with the title and the button of the question
 // for making one (the first invitation) and for joining one; null when
 // none goes, or without the Osada.
 function companionsQuestion(row) {
@@ -115,6 +116,17 @@ function companionsQuestion(row) {
   const { texts } = content().settlement.companions;
   return { text, make: { title: texts.partyMakeTitle, confirm: texts.partyMake }, join: { title: texts.partyJoinTitle, confirm: texts.partyJoin } };
 }
+
+// In a party, the names of the companions of a character of `row` who go on
+// its own explorations (those not told to stay, as many as may go): the
+// Walka's "Z towarzyszami" names them. None without the Osada.
+const ownCompanions = (row) =>
+  settlementOn()
+    ? (JSON.parse(row.settlement ?? '{}').companions ?? [])
+        .filter((companion) => !companionStays(companion))
+        .slice(0, companionsGoingMost(content()))
+        .map((companion) => companion.name)
+    : [];
 
 // The party a character is in: its id, leader and members (character ids
 // in the order they joined), or null. The Wieża Drużyn climbs with it
@@ -248,6 +260,8 @@ export async function partyView(db, characterId, now) {
     // Out of a party, the one question before making or joining one, when
     // a companion goes on the explorations (companionsQuestion).
     companions: !party && self.results[0] ? companionsQuestion(self.results[0]) : null,
+    // In a party, the companions of the character's own explorations.
+    ownCompanions: party && self.results[0] ? ownCompanions(self.results[0]) : [],
   };
 }
 

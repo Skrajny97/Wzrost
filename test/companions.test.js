@@ -115,20 +115,21 @@ describe('companions in the engine', () => {
     assert.deepEqual([stays.stays, companionStays(stays), companionGoes(stays, { rested: true })], [true, true, false]);
     // Told to go again, it is as it was.
     assert.deepEqual(staying(stays, false), candidate);
-    // In a Drużyna every companion stays (the author: "wtedy nie poluje się
-    // z towarzyszem, tylko samemu/z drużyną").
+    // A Drużyna's trip takes no companion (the author: "wtedy nie poluje się
+    // z towarzyszem, tylko samemu/z drużyną"): the engine's inParty says so
+    // (the server leaves companions off the trip itself, hunts.js).
     assert.deepEqual([companionStays(candidate, true), companionGoes(candidate, { rested: true, inParty: true })], [true, false]);
     // A wounded one still waits for the character's rest.
     assert.deepEqual([companionGoes({ ...candidate, wounded: true }, { rested: false }), companionGoes({ ...candidate, wounded: true }, { rested: true })], [false, true]);
   });
 
-  test('before a Drużyna, one question names the companions going on explorations, who stay in the Kwatery meanwhile (828 B)', () => {
+  test("before a Drużyna, one question names the companions going on explorations, who skip the party's trips (828 B, 18.11)", () => {
     const [candidate] = drawCandidates({ character, seed: 's' }, NOW, content);
     const she = { ...candidate, name: 'Dobrosława', appearance: 'female' };
     const he = { ...candidate, name: 'Dobrogost', appearance: 'male' };
     const third = { ...candidate, name: 'Milena', appearance: 'female' };
-    const one = 'zostanie w Kwaterach, póki jesteś w drużynie: nie zdobędzie XP ani relacji z wypraw.';
-    const many = 'zostaną w Kwaterach, póki jesteś w drużynie: nie zdobędą XP ani relacji z wypraw.';
+    const one = 'nie pójdzie na wyprawy drużyny: drużyna poluje bez towarzyszy z Kwater. Na Twoje własne wyprawy, do Labiryntu i Portali pójdzie z Tobą jak zawsze.';
+    const many = 'nie pójdą na wyprawy drużyny: drużyna poluje bez towarzyszy z Kwater. Na Twoje własne wyprawy, do Labiryntu i Portali pójdą z Tobą jak zawsze.';
     // None asked when no companion goes: none hired, or all told to stay.
     assert.equal(partyStayText([], content), null);
     assert.equal(partyStayText([staying(she, true), staying(he, true)], content), null);

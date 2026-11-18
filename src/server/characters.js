@@ -256,7 +256,9 @@ async function playerOf(db, row) {
     marketWaiting: parcels.results[0]?.waiting ?? 0,
     guildTag: parcels.results[0]?.guild_tag ?? null,
     // A membership the spread of class levels or a party of one has ended
-    // ends here too (partyOf), so the companions go again at once (828 B).
+    // ends here too (partyOf), as soon as the character is loaded. Since
+    // 18.11.2026 a Drużyna no longer keeps the companions home but from its
+    // own trips (hunts.js companionsGoing), so nothing else asks for it.
     inParty: Boolean(parcels.results[0]?.in_party) && Boolean(await partyOf(db, row.id)),
     // The levels of its guild's Siedziba, by building, all 0 outside a guild
     // (guild-seat.js): the bonuses it has as a member.

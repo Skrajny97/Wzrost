@@ -146,23 +146,26 @@ export function restedNow(player, now) {
 }
 
 // The companions hired in the Osada who would go on an exploration now:
-// those who do not stay in the Kwatery, and none while the character is in
-// a Drużyna (companionGoes in the engine), a wounded one once the character
-// has rested to full HP; with the character, at most parties.size.
+// those who do not stay in the Kwatery, a wounded one once the character
+// has rested to full HP; with the character, at most parties.size. In a
+// Drużyna too: the character's own explorations take them, and only the
+// Drużyna's trip goes without them (beginHunt's `party`; players and the
+// author, 18.11.2026: „z drużyną/z towarzyszami”). Until then a character
+// in a Drużyna went on its own explorations alone (828 B).
 // `rested`: whether it has, when the caller knows it already.
 export function companionsGoing(player, now, rested = restedNow(player, now)) {
   const hired = JSON.parse(player.row.settlement ?? '{}').companions ?? [];
-  return hired.filter((companion) => companionGoes(companion, { rested, inParty: player.inParty })).slice(0, content().balance.parties.size - 1);
+  return hired.filter((companion) => companionGoes(companion, { rested })).slice(0, content().balance.parties.size - 1);
 }
 
 // The hired companions who would go on an exploration but wait wounded for
 // the character to rest to full HP (companionReady in the engine), with
 // their names and looks: for the Walka screen, so nobody sets out without
 // them unawares (a player, 16.11.2026: „nie wiesz klikając kolejną wyprawę i
-// idziesz sam bez nich”). None while the character is in a Drużyna, whose
-// explorations go without companions.
+// idziesz sam bez nich”), in a Drużyna too, whose own explorations take
+// them (companionsGoing).
 export function woundedWaiting(player, now) {
-  if (!settlementOn() || player.inParty) return null;
+  if (!settlementOn()) return null;
   const hired = JSON.parse(player.row.settlement ?? '{}').companions ?? [];
   const wounded = hired.filter((companion) => companion.wounded && !companionStays(companion));
   if (wounded.length === 0 || restedNow(player, now)) return null;
