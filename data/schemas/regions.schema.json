@@ -107,6 +107,24 @@
             "description": "O taką część więcej HP przywraca postaciom leczenie: umiejętności i mikstury (Borowina).",
             "minimum": 0,
             "maximum": 0.2
+          },
+          "missChance": {
+            "type": "number",
+            "description": "Z taką szansą każdy cios chybia, u stworów i u postaci; odpowiedź na cios nie chybia (Mgła zaświatów).",
+            "exclusiveMinimum": 0,
+            "maximum": 0.2
+          },
+          "spellBonus": {
+            "type": "number",
+            "description": "O taką część silniejsze są zaklęcia (ciosy magiczne), u stworów i u postaci (Czary Welesa).",
+            "exclusiveMinimum": 0,
+            "maximum": 0.2
+          },
+          "healMalus": {
+            "type": "number",
+            "description": "O taką część mniej HP przywraca każde leczenie w walce (umiejętności, mikstury, wysysanie, źródło), u stworów i u postaci (Bez słońca).",
+            "exclusiveMinimum": 0,
+            "maximum": 0.2
           }
         }
       },

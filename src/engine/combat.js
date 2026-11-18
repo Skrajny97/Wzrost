@@ -43,6 +43,19 @@
 // the whole line (an attack's `cleave`, Cios w cały szyk: its chosen target
 // at full strength, each other member at that share).
 //
+// Nawia's creatures (levels 276–350) add to these: a blow may stun its target
+// (an attack's `stun`: it loses its next move) or silence it (`silence`: no
+// skill on its next move), both kept off by Will as a mire is; a creature may
+// strike twice in a move (`hits`), trample the whole foremost row of the
+// party (`trample`), lay two effects at once (`dot2`), strike back whoever
+// strikes it (`vengeance`), heal a little at the start of each of its moves
+// (`regen`), rise once a fight with a share of its HP (`rises`) or change its
+// shape, and its blow with it, with each move (`shapes`). The place's trait
+// may make any blow miss in the fog (`missChance`: Mgła zaświatów), spells
+// stronger (`spellBonus`: Czary Welesa) or every heal weaker (`healMalus`:
+// Bez słońca), on both sides. All of them draw random numbers only where they
+// are at work, so fights elsewhere stay as they were.
+//
 // An evolved character (evolutions.js) brings its trait (`feat`) and the
 // evolution's skills. A stance wakes at the start of the character's move,
 // besides its blow, and lasts a few of its own moves (a frenzy, a challenge
@@ -131,7 +144,7 @@ export const RISEN = 'risen';
 const RAGE_AT = 0.1;
 // The miss of a blinded unit (Szpon orła) and of one in an eclipse
 // (Zaćmienie): the words of the miss, logged as a dodge.
-const MISSES = new Set(['blindMiss', 'eclipseMiss', 'foreseen']);
+const MISSES = new Set(['blindMiss', 'eclipseMiss', 'foreseen', 'fogMiss']);
 
 // The texts of a blow: its own words (a summon's, an echo's; one for each
 // kind of blow where the blow may miss), a skill's own blow names the skill,
@@ -159,7 +172,7 @@ const shieldLeft = (/** @type {Unit} */ unit) => (unit.shield ? unit.shield.poin
 export const sharedBonus = (/** @type {number} */ members, crowd = 0) => 1 / (1 + crowd * (members - 1));
 
 // Pieczęć świętości: a sealed unit heals no more.
-function heal(/** @type {Unit} */ unit, /** @type {number} */ amount) {
+function restore(/** @type {Unit} */ unit, /** @type {number} */ amount) {
   if (unit.sealed) return 0;
   const healed = Math.max(0, Math.min(unit.maxHp - unit.hp, Math.round(amount)));
   unit.hp += healed;
@@ -253,6 +266,11 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   const tuning = balance.combat;
   const actionLimit = maxActions ?? tuning.maxActions;
   const texts = content.texts;
+  // Bez słońca (the place's trait `healMalus`): every heal of the fight, on
+  // both sides (skills, potions, drained life, a spring's water), gives back
+  // a share less. Elsewhere the amount stays exactly as it was.
+  const sunless = 1 - (trait?.healMalus ?? 0);
+  const heal = (/** @type {Unit} */ unit, /** @type {number} */ amount) => restore(unit, amount * sunless);
   // An evolved character's trait and skills get their code and state only in
   // a fight with one.
   const evolving = allies.some((/** @type {Unit} */ unit) => unit.feat) || enemies.some((/** @type {Unit} */ unit) => unit.feat);
@@ -469,9 +487,22 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     return false;
   };
 
+  // Kościej Nieśmiertelny (a creature's `rises`): once a fight, what would
+  // kill it leaves it standing again with a share of its HP. Draws no random
+  // numbers.
+  const reborn = (/** @type {Unit} */ unit, /** @type {number} */ t) => {
+    if (!unit.rises || unit.reborn) return false;
+    unit.reborn = true;
+    unit.hp = Math.max(1, Math.round(unit.rises * unit.maxHp));
+    const amount = unit.hp;
+    log(() => ({ t, kind: 'drain', actor: unit.id, target: unit.id, amount, hp: unit.hp, text: say(texts, 'deathless', actions, { actor: unit.name, amount }) }));
+    return true;
+  };
+
   // Nieśmiertelność, a miracle, Cudowne ocalenie or a fern brew the moment
-  // the unit faints: it rises instead.
-  const revived = (/** @type {Unit} */ unit, /** @type {number} */ t) => (evolving && (undying(unit, t) || miracle(unit, t) || rescue(unit, t))) || (Boolean(unit.potions?.revive) && drink(unit, 'revive', t));
+  // the unit faints: it rises instead; Kościej too, once.
+  const revived = (/** @type {Unit} */ unit, /** @type {number} */ t) =>
+    reborn(unit, t) || (evolving && (undying(unit, t) || miracle(unit, t) || rescue(unit, t))) || (Boolean(unit.potions?.revive) && drink(unit, 'revive', t));
 
   // Owacja: every foe that falls heals each living one of the other side
   // with the trait by a share of its HP.
@@ -808,6 +839,25 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     log(() => ({ t, kind: 'slow', actor: actor.id, targets: [target.id], effect: effect.name, element: effect.element, text: say(texts, 'mired', actions, { ...vars, effect: effect.name }) }));
   };
 
+  // Ogłuszenie (a creature's `stun`, Nawia): the target's Will may keep it
+  // off, as with a mire; otherwise it loses its next move.
+  const applyStun = (/** @type {Unit} */ actor, /** @type {Unit} */ target, /** @type {Record<string, any>} */ stun, /** @type {number} */ t, /** @type {Vars} */ vars) => {
+    const resisted = cappedChance(target.willRating, actor.level, tuning.willCap, balance);
+    if (!rng.chance(stun.chance * (1 - resisted))) return;
+    target.next += target.interval;
+    log(() => ({ t, kind: 'stun', target: target.id, label: stun.label, hp: target.hp, text: say(texts, 'stun', actions, vars) }));
+  };
+
+  // Cisza (a creature's `silence`, Nawia): the target's Will may keep it
+  // off; otherwise its next move is its plain blow, without a skill. Shown
+  // on its card until that move, as a mire is.
+  const applySilence = (/** @type {Unit} */ actor, /** @type {Unit} */ target, /** @type {Record<string, any>} */ silence, /** @type {number} */ t, /** @type {Vars} */ vars) => {
+    const resisted = cappedChance(target.willRating, actor.level, tuning.willCap, balance);
+    if (!rng.chance(silence.chance * (1 - resisted))) return;
+    target.silenced = true;
+    log(() => ({ t, kind: 'slow', actor: actor.id, targets: [target.id], effect: silence.label, silence: true, text: say(texts, 'silenced', actions, vars) }));
+  };
+
   const fallenFoes = (/** @type {Unit} */ unit) => units.filter((other) => other.side !== unit.side && other.hp <= 0).length;
   const isChilled = (/** @type {Unit} */ unit) => Boolean(unit.chilled) || unit.dots.some((/** @type {Dot} */ dot) => dot.effect === 'chilled');
   // A stance of a living unit of `side` that answers a blow (`counter`)
@@ -1056,6 +1106,13 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   // armour it ignores, whether it can be dodged or always lands critically,
   // its kind of damage, an effect it carries and whether it pins the target.
   const strike = (/** @type {Unit} */ actor, /** @type {Unit} */ target, /** @type {number} */ t, /** @type {Move} */ move = PLAIN) => {
+    // Mgła zaświatów (the place's trait `missChance`): any blow may miss in
+    // the fog, on both sides (an answer to a blow never does). Draws a
+    // number only where the trait is.
+    if (trait?.missChance && !move.counter && rng.chance(trait.missChance)) {
+      missed(actor, target, t, move, 'fogMiss');
+      return;
+    }
     // Szpon orła blinds a foe, Zaćmienie darkens the field: the blow may
     // miss whoever it was meant for (an answer to a dodge never does).
     // Draws a number only where one of them is at work.
@@ -1204,6 +1261,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         amount = Math.max(1, Math.round(amount * evolved(actor, target, move, category, [element]) * shelter));
       }
     }
+    // Czary Welesa (the place's trait `spellBonus`): a spell, on both sides,
+    // strikes harder by the share.
+    if (category === 'magical' && trait?.spellBonus) amount = Math.max(1, Math.round(amount * (1 + trait.spellBonus)));
     // Naelektryzowane groty: a spark of lightning on top of a blow
     // (Gromowe groty: and the one it struck slows down; Grom Peruna: and it
     // jumps on to another foe).
@@ -1350,12 +1410,17 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     }
 
     if (dot) applyDot(actor, target, dot, raw, t, vars);
+    // A second effect of a creature's blow (`dot2`: Czarny Płomień burns and
+    // chills at once), with its own chance.
+    if (!move.dot && weapon.dot2) applyDot(actor, target, weapon.dot2, raw, t, vars);
     for (const foe of swept) applyDot(actor, foe, dot, raw, t, { ...vars, target: foe.name });
     // Święty ogień: a spirit struck with sacrum burns.
     if (feat?.kind === 'zeal' && feat.burn && target.family === 'spirit' && (spread ?? [element]).includes(feat.element)) {
       applyDot(actor, target, { effect: 'burning', chance: 1, power: feat.burn, ticks: Math.round(feat.burnTicks) }, raw, t, vars);
     }
     if (weapon.slow && !move.counter) applySlow(actor, target, weapon.slow, t, vars);
+    if (weapon.stun && !move.counter) applyStun(actor, target, weapon.stun, t, vars);
+    if (weapon.silence && !move.counter) applySilence(actor, target, weapon.silence, t, vars);
     // Trzęsienie ziemi stuns only the foes in the foremost row (its chance
     // drawn for them alone).
     const front = !move.stunFront || foremost(foesOf(actor)).includes(target);
@@ -1410,6 +1475,11 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     if (target.skills.length > 0) wounded(target, t);
     if (target.potions?.heal) healPotion(target, t);
     if (target.rally) rally(target, t);
+    // Wróżda (a creature's `vengeance`): whoever strikes it is struck back at
+    // once, with that share of its blow (never an answer to an answer).
+    if (target.vengeance && !move.counter && actor.hp > 0 && target.hp > 0) {
+      strike(target, actor, t, { counter: true, power: target.vengeance, words: { hit: 'vengeance', crit: 'vengeanceCrit', dodge: 'dodge' } });
+    }
     // Cień-sobowtór: the shadow repeats the unit's own blow that landed, at
     // the same target, for a share of its power.
     const double = evolving && ownBlow(move) && actor.hp > 0 && target.hp > 0 ? actor.stances.find((/** @type {Stance} */ stance) => stance.mirror) : null;
@@ -1430,8 +1500,26 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   // its own (a dodge, a critical blow and the blow's effect for each), at
   // once as a sweep's blows land. Without it, the same draws as one blow.
   const plainBlow = (/** @type {Unit} */ actor, /** @type {Unit[]} */ opponents, /** @type {number} */ t) => {
+    // Tratowanie (a creature's `trample`, Nawia): every one in the foremost
+    // row of the other side, each at full strength and on its own (a dodge,
+    // a critical blow and the blow's effect for each), at once as a sweep's
+    // blows land; a blow at many, so no other choice of target.
+    if (actor.weapon.trample) {
+      const row = foremost(opponents);
+      for (const [index, unit] of row.entries()) {
+        if (unit.hp > 0 && actor.hp > 0) strike(actor, unit, t, index === 0 ? PLAIN : { sweep: true });
+      }
+      return;
+    }
     const target = intercepted(actor, /** @type {Unit} */ (pickTarget(actor, opponents)), t);
     strike(actor, target, t);
+    // Dwa kęsy (a creature's `hits`, Nawia): more blows in the same move, at
+    // the same target while it stands, else at another chosen as any.
+    for (let blow = 1; blow < (actor.weapon.hits ?? 1); blow++) {
+      const left = opponents.filter((unit) => unit.hp > 0);
+      if (actor.hp <= 0 || left.length === 0) break;
+      strike(actor, target.hp > 0 ? target : /** @type {Unit} */ (pickTarget(actor, left)), t);
+    }
     const share = actor.weapon.cleave;
     if (!share) return;
     for (const other of opponents) {
@@ -2161,6 +2249,23 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
 
     tickEffects(actor, t);
     if (actor.hp <= 0) continue;
+    // Wężowa Panna (a creature's `regen`): her spring heals her a little at
+    // the start of each of her moves.
+    if (actor.regen && actor.hp < actor.maxHp) {
+      const amount = heal(actor, actor.regen * actor.maxHp);
+      if (amount > 0) log(() => ({ t, kind: 'drain', actor: actor.id, target: actor.id, amount, hp: actor.hp, text: say(texts, 'spring', actions, { actor: actor.name, amount }) }));
+    }
+    // Weles (a creature's `shapes`): each move in the next of its shapes, in
+    // turn, with that shape's blow; its first move in the first.
+    if (actor.shapes) {
+      const shape = actor.shapes[(actor.shapeTurn ?? 0) % actor.shapes.length];
+      actor.shapeTurn = (actor.shapeTurn ?? 0) + 1;
+      if (actor.weapon !== shape.weapon) {
+        actor.weapon = shape.weapon;
+        actor.damageScale = shape.damageScale;
+        log(() => ({ t, kind: 'skill', actor: actor.id, skillName: shape.name, text: say(texts, 'shapeshift', actions, { actor: actor.name, form: shape.name }) }));
+      }
+    }
     if (actor.guard && actor.moves >= actor.guard.until) {
       const { skill } = actor.guard;
       actor.armor = Math.round(actor.armor / actor.guard.factor);
@@ -2186,9 +2291,12 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     }
 
     const opponents = alive.filter((unit) => unit.side !== actor.side && unit.hp > 0);
+    // Cisza: a silenced unit uses no skill on this move, only its blow.
+    const hushed = actor.silenced === true;
+    if (hushed) actor.silenced = false;
     if (!skilled) plainBlow(actor, opponents, t);
     else {
-      if (!useSkill(actor, opponents, t)) plainBlow(actor, opponents, t);
+      if (hushed || !useSkill(actor, opponents, t)) plainBlow(actor, opponents, t);
       actor.moves += 1;
       // Ostatni cios: a kill on this move gives the unit one more at once,
       // while foes stand (no more in a row than any unit may make).

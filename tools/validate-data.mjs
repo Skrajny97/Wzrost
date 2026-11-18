@@ -428,15 +428,21 @@ function checkReferences(data) {
   for (const monster of [...data.monsters, ...data.events.foes]) {
     statKeys('monsters', monster.id, monster.stats.base, { all: true });
     statKeys('monsters', monster.id, monster.stats.growth);
-    if (!stats.has(monster.attack.scaling)) errors.push(`monsters.json: ${monster.id} skaluje atak nieznaną statystyką`);
-    if (monster.attack.element && !elements.has(monster.attack.element)) {
-      errors.push(`monsters.json: ${monster.id} ma nieznany żywioł ataku`);
+    // Its own attack and the attacks of its shapes (Weles, Nawia).
+    for (const attack of [monster.attack, ...(monster.shapes ?? []).flatMap((shape) => shape.attack ?? [])]) {
+      if (!stats.has(attack.scaling)) errors.push(`monsters.json: ${monster.id} skaluje atak nieznaną statystyką`);
+      if (attack.element && !elements.has(attack.element)) {
+        errors.push(`monsters.json: ${monster.id} ma nieznany żywioł ataku`);
+      }
+      for (const dot of [attack.dot, attack.dot2]) {
+        if (dot && !effects.has(dot.effect)) errors.push(`monsters.json: ${monster.id} nakłada nieznany efekt "${dot.effect}"`);
+      }
+      if (attack.slow && !effects.has(attack.slow.effect)) {
+        errors.push(`monsters.json: ${monster.id} spowalnia nieznanym efektem "${attack.slow.effect}"`);
+      }
     }
-    if (monster.attack.dot && !effects.has(monster.attack.dot.effect)) {
-      errors.push(`monsters.json: ${monster.id} nakłada nieznany efekt "${monster.attack.dot.effect}"`);
-    }
-    if (monster.attack.slow && !effects.has(monster.attack.slow.effect)) {
-      errors.push(`monsters.json: ${monster.id} spowalnia nieznanym efektem "${monster.attack.slow.effect}"`);
+    if (monster.shapes && new Set(monster.shapes.map((shape) => shape.id)).size !== monster.shapes.length) {
+      errors.push(`monsters.json: ${monster.id} ma dwie postacie o tym samym id`);
     }
     for (const element of Object.keys(monster.resistances ?? {})) {
       if (!elements.has(element)) errors.push(`monsters.json: ${monster.id} ma odporność na nieznany żywioł "${element}"`);
