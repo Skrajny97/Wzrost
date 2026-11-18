@@ -89,5 +89,17 @@
   "skin-winter-warrior-male": { "add_in": [{ "colours": ["ab7251", "936d55", "9e6345", "c78963", "ad8365", "7d4734", "673e2a"], "places": ["hands"] }, { "colours": ["ab7251", "c78963", "9e6345", "936d55", "e0bb9d", "ad8365"], "places": ["head"] }] },
   "skin-winter-warrior-female": { "add_in": [{ "colours": ["907663", "774638"], "places": ["hands"] }] },
   "skin-winter-cleric-male": { "add_in": [{ "colours": ["9e725b", "846352", "724f3f"], "places": ["hands"] }, { "colours": ["846352", "9e725b"], "places": ["head"] }] },
-  "titan-male": { "add": ["85735f", "a59071", "7b6b58", "997f64", "bfa989", "675546"], "only": [[68, 25, 77, 36, "head"]] }
+  "titan-male": { "add": ["85735f", "a59071", "7b6b58", "997f64", "bfa989", "675546"], "only": [[68, 25, 77, 36, "head"]] },
+  "primordial-female": { "add": ["cfa880", "c69d7a", "9f7b59", "7f5243", "aa9475"], "drop": ["946b56"], "only": ["head", "hands"], "not": [[0, 0, 128, 22, "head"], [0, 0, 67, 40, "head"]] },
+  "heaven-avenger-male": { "only": ["head", "hands"] },
+  "beast-lord-male": { "only": ["head", "hands"] },
+  "celestial-archer-male": { "only": ["head", "hands"] },
+  "elder-druid-male": { "only": ["head", "hands"] },
+  "elder-druid-female": { "only": ["head", "hands"] },
+  "thunderer-male": { "only": ["head", "hands"] },
+  "frost-god-male": { "only": ["head", "hands"] },
+  "navia-king-female": { "only": ["head", "hands", "forearms", "upper-arms"] },
+  "soul-reaper-female": { "only": ["head"] },
+  "navia-king-male": { "add": ["9aa69e", "909292", "9d9a8a", "74897e"], "only": ["head", "hands"] },
+  "primordial-male": { "add": ["c09865", "ae875a", "997751", "c9a178", "7e5b41"], "only": ["head", "hands"], "not": [[0, 0, 128, 22, "head"]] }
 }
