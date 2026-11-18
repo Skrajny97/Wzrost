@@ -1355,6 +1355,11 @@
       "id": "0.4.33",
       "title": "Wersja 0.4.33",
       "body": "- Ryby, plony i potrawy wystawisz teraz na Targowisku, w nowej zakładce „Spiżarnia”, i wymienisz z innym graczem w Wymianie.\n- Gra otwarta na czacie sama przeładuje się do nowej wersji, gdy nic nie piszesz."
+    },
+    {
+      "id": "0.4.34",
+      "title": "Wersja 0.4.34",
+      "body": "- W Prośbach Gildii poprosisz też o ryby, plony i potrawy, a członkowie gildii dadzą Ci je ze swojej Spiżarni."
     }
   ]
 }

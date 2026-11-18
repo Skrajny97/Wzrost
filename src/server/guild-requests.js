@@ -43,7 +43,8 @@ const words = () => rules().texts;
 const errors = () => words().errors;
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 const HOUR = 3600000;
-const COLUMNS = { material: 'materials', herb: 'herbs', potion: 'potions', mineral: 'minerals' };
+// The Spiżarnia's fish, crops and dishes too (the author, 18.11.2026).
+const COLUMNS = { material: 'materials', herb: 'herbs', potion: 'potions', mineral: 'minerals', pantry: 'pantry' };
 const jsonPath = (key) => `$."${key}"`;
 const changed = () => new ApiError(409, 'changed', errors().changed);
 const member = (context) => requireMember(context, errors());
@@ -58,6 +59,7 @@ function realGood(kind, key) {
   if (kind === 'mineral') return Object.hasOwn(content().mineralsById, key);
   // A scroll (1061): the Kowadło's two and the Zwój Niepamięci.
   if (kind === 'scroll') return Boolean(scrollById(key));
+  if (kind === 'pantry') return Object.hasOwn(content().pantryById, key);
   return Object.hasOwn(kind === 'herb' ? content().herbsById : content().potionsById, key);
 }
 
@@ -73,6 +75,7 @@ function goodsView(kind, key) {
     return { kind, key, name: mineral?.name ?? key, rarity: mineral && (mineral.rarity ?? mineral.for[0]) };
   }
   if (kind === 'scroll') return { kind, key, name: scrollById(key)?.name ?? key };
+  if (kind === 'pantry') return { kind, key, name: content().pantryById[key]?.name ?? key, group: content().pantryById[key]?.group };
   return { kind, key, name: (kind === 'herb' ? content().herbsById[key] : content().potionsById[key])?.name ?? key };
 }
 
@@ -82,7 +85,7 @@ const stockOf = (row, kind, key) => (kind === 'scroll' ? scrollHeld(row, key) : 
 // How many pieces of the goods the character's bag takes now: materials
 // and minerals take no place; herbs and potions fill the room left in their
 // stack and the free places, a stack to a place (storeStacks in the engine).
-const roomless = (kind) => kind === 'material' || kind === 'mineral' || kind === 'scroll';
+const roomless = (kind) => kind === 'material' || kind === 'mineral' || kind === 'scroll' || kind === 'pantry';
 function bagRoom(player, kind, key, now) {
   if (roomless(kind)) return Infinity;
   const { stack } = content().professionRules;
@@ -106,7 +109,9 @@ function knownGoods(row) {
   for (const [kind, column] of Object.entries(COLUMNS)) for (const [key, count] of Object.entries(JSON.parse(row[column] ?? '{}'))) if (count > 0) add(kind, key);
   // Every scroll may be asked for, held or not: there are only three.
   for (const scroll of Object.keys(SCROLL_COLUMNS)) add('scroll', scroll);
-  const order = [...Object.keys(COLUMNS), 'scroll'];
+  // And every good of the Spiżarnia: it has no Encyklopedia to know it from.
+  for (const good of content().pantry ?? []) add('pantry', good.id);
+  const order = [...Object.keys(COLUMNS).filter((kind) => kind !== 'pantry'), 'scroll', 'pantry'];
   const rank = (rarity) => content().rarities.findIndex((one) => one.id === rarity);
   return [...pairs.values()]
     .map(([kind, key]) => goodsView(kind, key))

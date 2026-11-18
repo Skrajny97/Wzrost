@@ -100,3 +100,38 @@ describe('the Spiżarnia on the Targowisko and in the Wymiana', () => {
     assert.deepEqual(await pantry('Kucharz'), { turnip: 5, perch: 5 });
   });
 });
+
+describe('the Spiżarnia in the Prośby Gildii', () => {
+  const { call, db, signUp } = useServer();
+  const cookies = {};
+  async function player(login, name) {
+    ({ cookie: cookies[login] } = await signUp(login));
+    await call('POST', '/api/character', { cookie: cookies[login], body: { name, classId: 'warrior', appearance: 'female' } });
+    await (await db()).prepare('UPDATE characters SET level = 30, class_level = 25, gold = 5000 WHERE name = ?').bind(name).run();
+  }
+  const as = (login, method, path, body) => call(method, path, { cookie: cookies[login], body });
+  const pantry = async (name) => JSON.parse((await (await db()).prepare('SELECT pantry FROM characters WHERE name = ?').bind(name).first()).pantry ?? '{}');
+
+  beforeEach(async () => {
+    await player('kucharka', 'Kucharka');
+    await player('rybak', 'Rybak');
+    await as('kucharka', 'POST', '/api/guild/found', { name: 'Smakosze', tag: 'SMK' });
+    const guildId = (await as('kucharka', 'GET', '/api/guild')).data.guild.id;
+    await as('kucharka', 'POST', '/api/guild/invite', { name: 'Rybak' });
+    await as('rybak', 'POST', '/api/guild/accept', { guildId });
+  });
+
+  test('a member asks for a fish it never had, and another gives it from its Spiżarnia', async () => {
+    const seen = (await as('kucharka', 'GET', '/api/guild/requests')).data;
+    assert.ok(seen.known.some((goods) => goods.kind === 'pantry' && goods.key === 'roach' && goods.name === 'Płotka'));
+    assert.equal((await as('kucharka', 'POST', '/api/guild/requests', { kind: 'pantry', key: 'boot', count: 1 })).data.error.code, 'invalid_goods');
+    const made = await as('kucharka', 'POST', '/api/guild/requests', { kind: 'pantry', key: 'roach', count: 10 });
+    assert.equal(made.status, 200, JSON.stringify(made.data).slice(0, 300));
+    await (await db()).prepare('UPDATE characters SET pantry = ? WHERE name = ?').bind(JSON.stringify({ roach: 6 }), 'Rybak').run();
+    const requestId = made.data.mine.id;
+    assert.equal((await as('rybak', 'POST', '/api/guild/requests/give', { requestId, count: 7 })).data.error.code, 'not_enough');
+    const given = await as('rybak', 'POST', '/api/guild/requests/give', { requestId, count: 6 });
+    assert.equal(given.status, 200, JSON.stringify(given.data).slice(0, 300));
+    assert.deepEqual([await pantry('Rybak'), await pantry('Kucharka')], [{}, { roach: 6 }]);
+  });
+});
