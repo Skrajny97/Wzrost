@@ -1390,6 +1390,11 @@
       "id": "0.4.40",
       "title": "Wersja 0.4.40",
       "body": "- Skrzynię Bestii dostaje teraz każdy członek gildii, także ten, kto nie atakował. Liczy się każdy, kto był w gildii, gdy przyszła bestia, albo dołączył, zanim padła. Dotyczy to też bestii z tego i poprzedniego tygodnia.\n- Nowe bestie mają dwa razy więcej HP. Bestie, które już stoją w tym tygodniu, zostają takie, jakie są.\n- Leczenie całej drużyny nie pokazuje już „+0” przy postaciach z pełnym zdrowiem."
+    },
+    {
+      "id": "0.4.41",
+      "title": "Wersja 0.4.41",
+      "body": "- Nowe bestie mają cztery razy więcej HP niż przed wersją 0.4.40, a nie dwa razy. Bestie, które już stoją w tym tygodniu, zostają takie, jakie są."
     }
   ]
 }
