@@ -805,8 +805,9 @@
         "seconds": 2.0
       },
       "skill-carnage": {
-        "text": "a berserk warlord carving through a whole crowd: a savage battle roar, a rapid frenzy of heavy axe chops and crunching armour, shields cracking apart, brutal, no music",
-        "seconds": 1.8
+        "text": "an epic cinematic berserker rampage: a furious war cry, then three massive heavy axe impacts crunching through steel armour, the last one a deep booming hit, punchy and clean, no hiss, no background noise, no music",
+        "seconds": 1.8,
+        "influence": 0.7
       },
       "skill-breach": {
         "text": "one colossal axe swing smashing through a line of shields: a huge deep whoosh, a loud splintering crash of wood and metal and two bodies thudding down, brutal, no music",
@@ -829,24 +830,29 @@
         "seconds": 1.5
       },
       "skill-heaven-arrow": {
-        "text": "a glowing arrow loosed from the heavens: a sharp bow twang, a bright rising whistle like a falling star and a piercing streak through several targets with crisp impacts, fantasy, no music",
-        "seconds": 1.6
+        "text": "an epic holy arrow from the heavens: a powerful deep bow twang, a bright divine ringing tone and a huge thunderous impact with a crystal echo, cinematic, punchy, clean, no hiss, no whistle, no music",
+        "seconds": 1.6,
+        "influence": 0.7
       },
       "skill-star-rain": {
-        "text": "a handful of arrows shot into the sky: several quick bow twangs, then many arrows falling with sparkling twinkling whistles and a rapid patter of hits, fantasy, no music",
-        "seconds": 2.0
+        "text": "a meteor shower of falling stars: one deep cinematic boom after another as stars crash into the ground, each impact with a short bright crystal sparkle on top, epic and powerful, clean, no hiss, no whistle, no music",
+        "seconds": 2.0,
+        "influence": 0.7
       },
       "skill-perun-storm": {
-        "text": "a thunderstorm splitting the sky: a deafening thunderclap, lightning bolts leaping from target to target with fast electric zaps and a long rolling thunder, no music",
-        "seconds": 2.0
+        "text": "the thunder god's storm: an enormous deafening thunderclap right overhead, a violent crack of lightning striking the ground with a massive bass boom and crackling electric sparks, epic, cinematic, powerful, clean, no music",
+        "seconds": 2.0,
+        "influence": 0.7
       },
       "skill-ball-lightning": {
-        "text": "a ball of lightning hovering: a low buzzing electric hum, crackling sparks, then a sudden sharp electric discharge, fantasy, no music",
-        "seconds": 1.6
+        "text": "a huge ball of lightning exploding close up: crackling electric arcs building up fast, then a massive punchy electric blast with a deep bass thump, epic, cinematic, close and clean, no hiss, no static noise, no music",
+        "seconds": 1.6,
+        "influence": 0.7
       },
       "skill-pack-chief": {
-        "text": "a great white wolf summoned: a long proud howl, then running paws and a vicious snarling bite, wild, no music",
-        "seconds": 2.0
+        "text": "a mighty wolf pack leader: a deep powerful wolf howl answered by several other wolves, then fierce snarling growls and a heavy bite, wild and epic, natural animal sounds, clean, no music",
+        "seconds": 2.0,
+        "influence": 0.7
       },
       "skill-bear-call": {
         "text": "a huge brown bear stepping out of the thicket: branches snapping, heavy footsteps and a deep thunderous roar as it rises on its hind legs, wild, no music",
@@ -873,44 +879,51 @@
         "seconds": 2.0
       },
       "skill-forest-rebirth": {
-        "text": "a whole forest taking a deep breath: a long soft rush of wind through leaves, birds chirping, a warm magical shimmer and gentle chimes, fantasy, no music",
-        "seconds": 2.0
+        "text": "an ancient forest coming back to life: deep creaking of growing tree trunks, roots cracking up through the earth, a rich warm magical chime and birdsong, epic nature magic, clean, no wind noise, no hiss, no music",
+        "seconds": 2.0,
+        "influence": 0.7
       },
       "skill-divine-healing": {
-        "text": "divine healing falling like rain: a radiant angelic choir swell, soft shimmering chimes like falling drops of light and a gentle warm whoosh, fantasy, no music",
-        "seconds": 2.0
+        "text": "a divine healing spell: a clear bright heavenly bell chime, warm glowing magical tones rising up and a soft powerful sparkle at the end, clean and pure, no hiss, no noise, no music",
+        "seconds": 2.0,
+        "influence": 0.7
       },
       "skill-wings-of-light": {
         "text": "wings of pure light spreading: a great soft rush of feathered wings, a bright shimmering hum and a crackle of holy fire, fantasy, no music",
         "seconds": 1.7
       },
       "skill-day-of-wrath": {
-        "text": "heaven passing its sentence: a deep heavenly bell toll, a roaring holy fire whoosh and a massive echoing impact, fantasy, no music",
-        "seconds": 2.0
+        "text": "the day of judgement: a huge deep heavenly bell toll, a colossal holy fire explosion with a massive cinematic boom and a long powerful rumble, epic, apocalyptic, clean, no hiss, no music",
+        "seconds": 2.0,
+        "influence": 0.7
       },
       "skill-pillar-of-light": {
-        "text": "a pillar of blinding light striking from the sky: a rising bright shimmering tone, a powerful humming beam and a burst of radiant energy, fantasy, no music",
-        "seconds": 1.7
+        "text": "a pillar of holy light slamming down from the sky: a deep powerful rising energy hum, a massive radiant impact with a cinematic bass boom and bright ringing glass, epic, clean, no whistle, no hiss, no music",
+        "seconds": 1.7,
+        "influence": 0.7
       },
       "skill-clairvoyance": {
-        "text": "a seer foreseeing every blow: an ethereal shimmering tone, whispering echoes, a fast soft whoosh of a dodge and a short glassy ring, dreamlike, no music",
-        "seconds": 1.6
+        "text": "a seer's vision of the future: a clear deep mystical gong, crystal bells ringing in echo and a soft magical pulse, mysterious and clean, no hiss, no whisper noise, no music",
+        "seconds": 1.6,
+        "influence": 0.7
       },
       "skill-fate-reversal": {
         "text": "fate turned over like an hourglass: a deep resonant clock tick, flowing sand reversing, a mystical swelling shimmer and a soft chime, fantasy, no music",
         "seconds": 1.8
       },
       "skill-soul-harvest": {
-        "text": "a reaper's scythe harvesting souls: a long sharp whistling scythe swing, a cold slicing hit and ghostly wailing souls fading away, eerie, no music",
-        "seconds": 1.6
+        "text": "a death reaper's heavy steel scythe striking: a loud deep metallic clang and ring, a brutal slicing impact and a deep haunting groan of souls torn out, dark and epic, no whistle, no hiss, no music",
+        "seconds": 1.6,
+        "influence": 0.7
       },
       "skill-scythe-dance": {
         "text": "a scythe whirling in a deadly dance: several fast circling whooshes of a long blade with sharp metallic swishes and cutting hits, dark fantasy, no music",
         "seconds": 1.8
       },
       "skill-navia-legion": {
-        "text": "undead knights rising from cracked earth: the ground splitting, heavy rusty armour clanking, bones rattling, swords drawn and a cold ghostly wind, eerie, no music",
-        "seconds": 2.0
+        "text": "an army of undead knights rising from the underworld: the ground cracking open with a deep rumble, heavy armoured footsteps marching in unison, swords drawn with metallic rings and a deep commanding war horn, dark and epic, no music",
+        "seconds": 2.0,
+        "influence": 0.7
       },
       "skill-navia-mist": {
         "text": "a green poisonous mist of the underworld creeping out of the ground: a low eerie hiss, soft bubbling and distant ghostly whispers, dark, no music",
@@ -921,8 +934,9 @@
         "seconds": 2.0
       },
       "skill-shadow-strike": {
-        "text": "a shadow strike: a soft dark whoosh of vanishing into shadow, a quick rustle behind and a swift sharp dagger stab, stealthy, close up, no music",
-        "seconds": 1.3
+        "text": "an assassin striking from the shadows: a sudden deep dark magical boom, a fast sharp blade slash and a heavy brutal stab impact, punchy and epic, close up, clean, no whoosh, no hiss, no music",
+        "seconds": 1.3,
+        "influence": 0.7
       },
       "potion": {
         "text": "a person drinks from a small glass bottle: two big gulps, the sound of liquid swallowed in the throat, close up, realistic foley, no music",

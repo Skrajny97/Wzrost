@@ -150,7 +150,7 @@
         "Each character attacks {attacks} times a day, separately from the entries to the Towers. New attacks come at midnight.",
         "An attack is one fight with full HP and no potions, with the result at once. It gives no XP, gold or loot. You can attack during an exploration, too.",
         "The beast stays until Sunday midnight. On Monday a new one comes.",
-        "Every character that attacks the beast at least once gets a Beast Chest. If the beast falls, the chest holds an item of the character's class at their level and the beast's materials.",
+        "Every guild member gets a Beast Chest, even without attacking. It counts everyone who was in the guild when the beast came or joined before it fell. If the beast falls, the chest holds an item of the character's class at their level and the beast's materials.",
         "If the beast survives the week, the chest holds only materials: the more of the bar the guild took off, the more of them (from 25, 50 and 75%). Below 25% there is no chest.",
         "You can open the chest from the beast's fall or from the end of the week, until the end of the next week at the latest."
       ],

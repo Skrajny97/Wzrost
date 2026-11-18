@@ -437,6 +437,7 @@ describe('the fourth forms in fights', () => {
     const risen = raised.events.find((event) => event.kind === 'summon' && event.state === 'up' && event.actor === 'a0');
     assert.ok(risen, 'a fallen foe rises');
     assert.match(risen.text, /wstaje jako upiór Nawii/);
+    assert.equal(risen.figure, 'upior');
     const legion = fight('legion', [form('navia-king', { only: ['navia-legion'] })], line());
     const call = legion.events.find((event) => event.skill === 'navia-legion' && event.kind === 'summon');
     const knights = legion.events.filter((event) => event.skill === 'navia-legion' && BLOWS.includes(event.kind) && event.t > call.t);
