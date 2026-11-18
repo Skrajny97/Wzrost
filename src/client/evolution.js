@@ -46,7 +46,9 @@ export function evolutionCard(evolution, { onChoose = null, busy = false } = {})
     evolution.fromName && h('p', { class: 'muted', text: filled(words.fromEvolution, { name: evolution.fromName }) }),
     h('p', { class: 'evolution-growth' }, h('strong', { text: `${words.growth}: ` }), evolution.growth.map((entry) => `${entry.name} +${entry.value}`).join(', ')),
     traitLine(evolution.trait),
-    h('h4', { class: 'evolution-subtitle', text: t('{skills} (na {level}. poziomie)', { skills: words.skills, level: evolution.skillLevel }) }),
+    // The numbers are those of the skills' top level (the author, 18.11.2026:
+    // „na maks. poziomie” instead of the level's number, which misled).
+    h('h4', { class: 'evolution-subtitle', text: t('{skills} (na maks. poziomie)', { skills: words.skills }) }),
     h(
       'ul',
       { class: 'evolution-skills' },

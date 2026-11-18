@@ -408,7 +408,7 @@
   "Ewolucja klasy: wkrótce.": "Class evolution: coming soon.",
   "Ewolucję wybierzesz": "You can choose the evolution",
   "Ścieżka: {path}": "Path: {path}",
-  "{skills} (na {level}. poziomie)": "{skills} (at level {level})",
+  "{skills} (na maks. poziomie)": "{skills} (at the top level)",
   " · z: {name}": " · from: {name}",
   "Dalej": "Next",
   "Ewolucja z testu: {name}.": "Evolution being tested: {name}.",
