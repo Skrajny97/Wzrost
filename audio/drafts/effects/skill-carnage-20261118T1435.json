@@ -1,0 +1,13 @@
+{
+  "id": "skill-carnage",
+  "payload": {
+    "text": "an epic cinematic berserker rampage: a furious war cry, then three massive heavy axe impacts crunching through steel armour, the last one a deep booming hit, punchy and clean, no hiss, no background noise, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-carnage-20261118T1435-0.mp3",
+    "audio/drafts/effects/skill-carnage-20261118T1435-1.mp3"
+  ],
+  "credits": 72
+}

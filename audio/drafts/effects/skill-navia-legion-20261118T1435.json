@@ -1,0 +1,13 @@
+{
+  "id": "skill-navia-legion",
+  "payload": {
+    "text": "an army of undead knights rising from the underworld: the ground cracking open with a deep rumble, heavy armoured footsteps marching in unison, swords drawn with metallic rings and a deep commanding war horn, dark and epic, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-navia-legion-20261118T1435-0.mp3",
+    "audio/drafts/effects/skill-navia-legion-20261118T1435-1.mp3"
+  ],
+  "credits": 80
+}

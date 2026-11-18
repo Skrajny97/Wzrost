@@ -1,0 +1,13 @@
+{
+  "id": "skill-clairvoyance",
+  "payload": {
+    "text": "a seer's vision of the future: a clear deep mystical gong, crystal bells ringing in echo and a soft magical pulse, mysterious and clean, no hiss, no whisper noise, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-clairvoyance-20261118T1435-0.mp3",
+    "audio/drafts/effects/skill-clairvoyance-20261118T1435-1.mp3"
+  ],
+  "credits": 64
+}

@@ -1,0 +1,13 @@
+{
+  "id": "skill-perun-storm",
+  "payload": {
+    "text": "the thunder god's storm: an enormous deafening thunderclap right overhead, a violent crack of lightning striking the ground with a massive bass boom and crackling electric sparks, epic, cinematic, powerful, clean, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-perun-storm-20261118T1435-0.mp3",
+    "audio/drafts/effects/skill-perun-storm-20261118T1435-1.mp3"
+  ],
+  "credits": 80
+}

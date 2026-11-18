@@ -1,0 +1,13 @@
+{
+  "id": "skill-ball-lightning",
+  "payload": {
+    "text": "a huge ball of lightning exploding close up: crackling electric arcs building up fast, then a massive punchy electric blast with a deep bass thump, epic, cinematic, close and clean, no hiss, no static noise, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-ball-lightning-20261118T1435-0.mp3",
+    "audio/drafts/effects/skill-ball-lightning-20261118T1435-1.mp3"
+  ],
+  "credits": 64
+}

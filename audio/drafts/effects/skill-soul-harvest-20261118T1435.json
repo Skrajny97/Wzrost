@@ -1,0 +1,13 @@
+{
+  "id": "skill-soul-harvest",
+  "payload": {
+    "text": "a death reaper's heavy steel scythe striking: a loud deep metallic clang and ring, a brutal slicing impact and a deep haunting groan of souls torn out, dark and epic, no whistle, no hiss, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-soul-harvest-20261118T1435-0.mp3",
+    "audio/drafts/effects/skill-soul-harvest-20261118T1435-1.mp3"
+  ],
+  "credits": 64
+}

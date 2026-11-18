@@ -1,0 +1,13 @@
+{
+  "id": "skill-day-of-wrath",
+  "payload": {
+    "text": "the day of judgement: a huge deep heavenly bell toll, a colossal holy fire explosion with a massive cinematic boom and a long powerful rumble, epic, apocalyptic, clean, no hiss, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-day-of-wrath-20261118T1435-0.mp3",
+    "audio/drafts/effects/skill-day-of-wrath-20261118T1435-1.mp3"
+  ],
+  "credits": 80
+}

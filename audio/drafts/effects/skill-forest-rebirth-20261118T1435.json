@@ -1,0 +1,13 @@
+{
+  "id": "skill-forest-rebirth",
+  "payload": {
+    "text": "an ancient forest coming back to life: deep creaking of growing tree trunks, roots cracking up through the earth, a rich warm magical chime and birdsong, epic nature magic, clean, no wind noise, no hiss, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-forest-rebirth-20261118T1435-0.mp3",
+    "audio/drafts/effects/skill-forest-rebirth-20261118T1435-1.mp3"
+  ],
+  "credits": 80
+}

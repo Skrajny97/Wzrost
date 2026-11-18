@@ -1,0 +1,13 @@
+{
+  "id": "skill-heaven-arrow",
+  "payload": {
+    "text": "an epic holy arrow from the heavens: a powerful deep bow twang, a bright divine ringing tone and a huge thunderous impact with a crystal echo, cinematic, punchy, clean, no hiss, no whistle, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-heaven-arrow-20261118T1435-0.mp3",
+    "audio/drafts/effects/skill-heaven-arrow-20261118T1435-1.mp3"
+  ],
+  "credits": 64
+}

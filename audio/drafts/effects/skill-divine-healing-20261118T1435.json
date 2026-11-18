@@ -1,0 +1,13 @@
+{
+  "id": "skill-divine-healing",
+  "payload": {
+    "text": "a divine healing spell: a clear bright heavenly bell chime, warm glowing magical tones rising up and a soft powerful sparkle at the end, clean and pure, no hiss, no noise, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-divine-healing-20261118T1435-0.mp3",
+    "audio/drafts/effects/skill-divine-healing-20261118T1435-1.mp3"
+  ],
+  "credits": 80
+}

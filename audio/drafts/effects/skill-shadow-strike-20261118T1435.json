@@ -1,0 +1,13 @@
+{
+  "id": "skill-shadow-strike",
+  "payload": {
+    "text": "an assassin striking from the shadows: a sudden deep dark magical boom, a fast sharp blade slash and a heavy brutal stab impact, punchy and epic, close up, clean, no whoosh, no hiss, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-shadow-strike-20261118T1435-0.mp3",
+    "audio/drafts/effects/skill-shadow-strike-20261118T1435-1.mp3"
+  ],
+  "credits": 52
+}

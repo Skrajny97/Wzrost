@@ -1,0 +1,13 @@
+{
+  "id": "skill-pack-chief",
+  "payload": {
+    "text": "a mighty wolf pack leader: a deep powerful wolf howl answered by several other wolves, then fierce snarling growls and a heavy bite, wild and epic, natural animal sounds, clean, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-pack-chief-20261118T1435-0.mp3",
+    "audio/drafts/effects/skill-pack-chief-20261118T1435-1.mp3"
+  ],
+  "credits": 80
+}
