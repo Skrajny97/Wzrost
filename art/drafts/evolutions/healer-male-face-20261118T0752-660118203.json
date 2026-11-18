@@ -1,0 +1,14 @@
+{
+  "id": "healer-male-face",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art face of a young man in three-quarter view facing slightly right, a natural calm and gentle face with even proportions, two clearly visible eyes of the same size and height with white and dark brown irises and a tiny highlight, both looking the same way, straight dark eyebrows above them, a small straight nose, closed relaxed lips, clean-shaven, a soft rounded chin, warm light skin with soft shading, short black hair fringe above the eyebrows, the same pixel art style, outline and colours as the rest of the portrait",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": "art/inputs/portraits/healer-male.png",
+  "mask": "art/inputs/portraits/healer-male-face-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08041032052040101
+  },
+  "images": 1
+}
