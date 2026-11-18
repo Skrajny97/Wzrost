@@ -214,6 +214,20 @@ function goodsSheet(goods, actions = null) {
   );
 }
 
+// A stack whose card unfolds under its line at a tap, as an item's does
+// (itemEntry), everywhere on the Targowisko (the author, 18.11.2026:
+// „Niech tez bedzie pelny opis wszystkiego na targowisku w ten sam
+// sposób”). `opened` keeps the unfolded ones by `key` through the panel's
+// redraws; `under` stands under its name, as what the scrapper pays.
+function stackEntry(goods, key, opened, { under = null } = {}) {
+  return h(
+    'details',
+    { class: 'profile-item', open: opened.has(key), onToggle: (event) => (event.currentTarget.open ? opened.add(key) : opened.delete(key)) },
+    h('summary', {}, under ? h('span', { class: 'market-pick-goods' }, stackLine(goods), h('span', { class: 'muted market-scrap', text: under })) : stackLine(goods)),
+    goodsFacts(goods),
+  );
+}
+
 // A stack in one line that opens its card under a tap (Jagna's herbs too).
 export const stackButton = (goods, options, actions) =>
   h('button', { type: 'button', class: 'market-goods-button', 'aria-label': t('{name}: szczegóły', { name: goods.name }), onClick: () => goodsSheet(goods, actions?.()) }, stackLine(goods, options));
@@ -408,7 +422,7 @@ export function mountMarket(holder) {
   const goodsEntry = (goods, key, wearers = null) =>
     goods.kind === 'item'
       ? itemEntry(goods.item, key, opened, { wearers, team: market?.team ?? [], first: tab === 'offers' && view.show === FOR_ME ? view.who : 'me' })
-      : stackButton(goods);
+      : stackEntry(goods, key, opened);
 
   async function load() {
     const ask = ++asks;
@@ -623,20 +637,14 @@ export function mountMarket(holder) {
           h(
             'ul',
             { class: 'market-picks' },
-            others.map((stack) => {
-              const key = `sell:${stack.kind}:${stack.key}`;
-              return h(
+            others.map((stack) =>
+              h(
                 'li',
                 { class: 'market-pick market-pick--item' },
-                h(
-                  'details',
-                  { class: 'profile-item', open: opened.has(key), onToggle: (event) => (event.currentTarget.open ? opened.add(key) : opened.delete(key)) },
-                  h('summary', {}, pickWithScrap(stackLine(stack), scrapText(stack.scrap, true, stack.kind === 'pantry'))),
-                  goodsFacts(stack),
-                ),
+                stackEntry(stack, `sell:${stack.kind}:${stack.key}`, opened, { under: scrapText(stack.scrap, true, stack.kind === 'pantry') }),
                 choose(stack),
-              );
-            }),
+              ),
+            ),
           ),
       ];
     };
@@ -755,14 +763,22 @@ export function mountMarket(holder) {
               h(
                 'ul',
                 { class: 'market-picks' },
-                market.parcels.map((parcel) =>
-                  h(
+                // Each with its whole card under a tap, as everywhere on the
+                // Targowisko, and why it came back or what it is for under
+                // its name.
+                market.parcels.map((parcel) => {
+                  const reason = REASONS[parcel.reason] ? t(REASONS[parcel.reason]) : null;
+                  const key = `parcel:${parcel.id}`;
+                  return h(
                     'li',
-                    { class: 'market-pick' },
-                    parcel.goods.kind === 'item' ? itemSummary(parcel.goods.item, { tier: true }) : stackLine(parcel.goods),
-                    h('span', { class: 'muted market-reason', text: REASONS[parcel.reason] ? t(REASONS[parcel.reason]) : '' }),
-                  ),
-                ),
+                    { class: 'market-parcel' },
+                    parcel.goods.kind === 'item'
+                      ? itemEntry(parcel.goods.item, key, opened, { notes: false, under: reason })
+                      : parcel.goods.kind === 'gold'
+                        ? h('span', { class: 'market-pick-goods' }, stackLine(parcel.goods), reason && h('span', { class: 'muted market-scrap', text: reason }))
+                        : stackEntry(parcel.goods, key, opened, { under: reason }),
+                  );
+                }),
               ),
               h('button', { type: 'button', class: 'button button--system', text: t('Odbierz wszystko'), onClick: collect }),
             ],
@@ -1096,7 +1112,7 @@ export function mountMarket(holder) {
       'li',
       { class: `card market-offer market-log market-log--${line.event}` },
       h('p', { class: 'market-log-event', text: said ? said() : line.event }),
-      line.goods.kind === 'item' && line.goods.item ? itemEntry(line.goods.item, `log:${line.id}`, opened, { notes: false }) : stackButton(line.goods),
+      line.goods.kind === 'item' && line.goods.item ? itemEntry(line.goods.item, `log:${line.id}`, opened, { notes: false }) : line.goods.kind === 'gold' ? stackLine(line.goods) : stackEntry(line.goods, `log:${line.id}`, opened),
       h('p', { class: 'muted', text: [who, dateTimeFormat.format(new Date(line.at))].filter(Boolean).join(' · ') }),
     );
   }

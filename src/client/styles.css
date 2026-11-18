@@ -15833,6 +15833,11 @@ button.tcard-slot {
   right: 0;
 }
 
+/* A parcel to collect: its card unfolds under a tap across the whole row. */
+.market-parcel {
+  display: block;
+}
+
 /* The goods with what the scrapper pays for them, under their name. */
 .market-pick-goods {
   flex: 1;
