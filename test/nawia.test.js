@@ -10,7 +10,7 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 
-import { createRng, monsterCombatant, playerCombatant, simulateFight } from '../src/engine/index.js';
+import { createRng, monsterCombatant, playerCombatant, simulateFight, towerArea, towerFloor } from '../src/engine/index.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
 import { content } from './helpers/content.js';
 
@@ -177,5 +177,120 @@ describe('the ways of fighting of Nawia’s creatures', () => {
     const changes = own.filter((event) => event.kind === 'skill').map((event) => event.skillName);
     assert.equal(changes[0], 'wąż');
     assert.ok(changes.every((name, index) => name === (index % 2 === 0 ? 'wąż' : 'starzec')));
+  });
+});
+
+const LANDS = [
+  ['navia-marshes', 'Mgliste Bagna Nawii', 276, 300, 'indrik', 'nyja', { missChance: 0.05 }],
+  ['veles-meadows', 'Łąki Welesa', 301, 325, 'turon', 'veles', { spellBonus: 0.05 }],
+  ['sunless-land', 'Kraina bez Słońca', 326, 350, 'marzanna', 'koschei', { healMalus: 0.05 }],
+];
+// Each place with its creatures at the front, in the middle and at the back.
+const PLACES = {
+  'misty-shore': ['Mglisty Brzeg', 276, ['death-boat', 'water-strider', 'nameless']],
+  'viburnum-bridge': ['Kalinowy Most', 281, ['bridge-keeper', 'harvestman', 'death-candle']],
+  'forefathers-isle': ['Wyspa Praszczurów', 286, ['mole-cricket', 'forefather', 'giant-mole']],
+  'crossing-of-the-dead': ['Przeprawa Umarłych', 291, ['coffin', 'two-headed-snake', 'candle-snuffer']],
+  'gate-of-nav': ['Brama Nawii', 296, ['gatekeeper', 'hourglass', 'shade']],
+  'eternal-pastures': ['Wieczne Pastwiska', 301, ['woolly-rhino', 'bumblebee', 'stampede']],
+  'golden-ravines': ['Złote Jary', 306, ['cockroach', 'house-serpent', 'greed']],
+  'serpent-springs': ['Wężowe Źródła', 311, ['pill-bug', 'snake-maiden', 'dead-water']],
+  'veles-oakwood': ['Dąbrowa Welesa', 316, ['stick-insect', 'simargl', 'blood-feud']],
+  'veles-court': ['Dwór Welesa', 321, ['ghost-smith', 'shackles', 'steward']],
+  'frozen-caves': ['Zamarznięte Pieczary', 326, ['mammoth', 'pseudoscorpion', 'silence']],
+  'road-of-the-dead': ['Szlak Umarłych', 331, ['sledge', 'snow-flea', 'oblivion']],
+  'black-lake': ['Czarne Jezioro', 336, ['ice-block', 'mayfly', 'longing']],
+  'chernobog-stronghold': ['Gród Czarnoboga', 341, ['dread', 'rat-king', 'black-flame']],
+  'koschei-castle': ['Zamek Kościeja', 346, ['koschei-egg', 'bayun', 'ice-princess']],
+};
+const OWN = new Set([...Object.values(PLACES).flatMap(([, , roster]) => roster), ...LANDS.flatMap(([, , , , elite, champion]) => [elite, champion])]);
+const region = (id) => content.regionsById[id];
+const which = (test) => [...OWN].filter((id) => test(content.monstersById[id])).sort();
+
+describe('Nawia', () => {
+  test('three lands after the Łysogóry, each of five places of five levels, with its trait, its elite everywhere and its champion in the last place', () => {
+    const after = content.regions.indexOf(region('bald-mountain'));
+    assert.deepEqual(content.regions.slice(after + 1).map((one) => one.id), LANDS.map(([id]) => id));
+    for (const [id, name, from, to, elite, champion, trait] of LANDS) {
+      const land = region(id);
+      assert.deepEqual([land.land, land.name, land.minLevel, land.maxLevel, land.safe, land.fightBoard], ['Nawia', name, from, to, false, `board-${id}`]);
+      const { name: traitName, description, ...rule } = land.trait;
+      assert.ok(traitName && description);
+      assert.deepEqual(rule, trait);
+      assert.ok(land.areas.every((area) => area.elite === elite), id);
+      assert.deepEqual(land.areas.map((area) => area.champion ?? null), [null, null, null, null, champion], id);
+      for (const area of land.areas) {
+        const [placeName, level, roster] = PLACES[area.id];
+        assert.deepEqual([area.name, area.minLevel, area.maxLevel], [placeName, level, level + 4], area.id);
+        const living = new Set([...area.encounters, ...area.tough].flatMap((encounter) => encounter.monsters));
+        assert.deepEqual([...living].sort(), [...roster].sort(), area.id);
+        assert.deepEqual(roster.map((one) => content.monstersById[one].position), ['front', 'middle', 'back'], area.id);
+      }
+    }
+    assert.deepEqual(Object.keys(PLACES), LANDS.flatMap(([id]) => region(id).areas.map((area) => area.id)));
+    assert.equal(OWN.size, 51);
+    // No bird among them (the author, 15.11.2026), and every one drawn by PixelLab under its own id.
+    assert.deepEqual(which((monster) => monster.family === 'bird'), []);
+  });
+
+  test('materials of the rarities of the lands before, a mythic one for each elite and a divine one for each champion, none twice', () => {
+    const rarity = (id) => content.materialsByMonster[id].rarity;
+    const pattern = [
+      ['rare', 'unique', 'common'],
+      ['unique', 'common', 'rare'],
+      ['rare', 'unique', 'epic'],
+      ['common', 'rare', 'unique'],
+      ['epic', 'unique', 'epic'],
+    ];
+    assert.deepEqual(Object.values(PLACES).map(([, , roster]) => roster.map(rarity)), [...pattern, ...pattern, ...pattern]);
+    for (const [, , , , elite, champion] of LANDS) assert.deepEqual([rarity(elite), rarity(champion)], ['mythic', 'divine']);
+    assert.equal(new Set([...OWN].map((id) => content.materialsByMonster[id].id)).size, OWN.size);
+  });
+
+  test('the ways of fighting of 1096', () => {
+    assert.deepEqual(which((monster) => monster.ambush), ['mayfly', 'snow-flea', 'stick-insect', 'water-strider']);
+    assert.deepEqual(which((monster) => monster.attack.target === 'back'), ['giant-mole', 'shade']);
+    assert.deepEqual(which((monster) => monster.attack.cleave), ['indrik', 'marzanna', 'nyja']);
+    assert.deepEqual(which((monster) => monster.attack.trample), ['sledge', 'stampede', 'turon']);
+    assert.deepEqual(which((monster) => monster.attack.hits === 2), ['rat-king', 'two-headed-snake']);
+    assert.deepEqual(which((monster) => monster.attack.stun), ['bayun', 'coffin', 'death-boat', 'dread', 'forefather', 'ghost-smith', 'mammoth', 'oblivion', 'pill-bug']);
+    assert.deepEqual(which((monster) => monster.attack.silence), ['silence']);
+    assert.deepEqual(which((monster) => monster.attack.dot2), ['black-flame']);
+    assert.deepEqual([content.monstersById['black-flame'].attack.dot.effect, content.monstersById['black-flame'].attack.dot2.effect], ['burning', 'chilled']);
+    assert.deepEqual(which((monster) => monster.attack.slow), ['bridge-keeper', 'greed', 'hourglass', 'ice-block', 'indrik', 'shackles', 'veles']);
+    assert.deepEqual([which((monster) => monster.vengeance), which((monster) => monster.regen), which((monster) => monster.rises), which((monster) => monster.shapes)], [['blood-feud'], ['snake-maiden'], ['koschei'], ['veles']]);
+    assert.deepEqual(content.monstersById.veles.shapes.map((shape) => shape.name), ['rogaty starzec', 'wąż', 'niedźwiedź']);
+    // Nyja and Marzanna chill the whole line, each one struck with its own chance.
+    assert.deepEqual(['nyja', 'marzanna'].map((id) => content.monstersById[id].attack.dot.effect), ['chilled', 'chilled']);
+  });
+
+  test('Weles strikes in his shapes in turn, and Kościej rises once, as the data says', () => {
+    const veles = { ...monsterCombatant({ monsterId: 'veles', level: 327, id: 'e0' }, content), maxHp: 1e8, hp: 1e8 };
+    assert.deepEqual(veles.shapes.map((shape) => shape.weapon.attackName), ['Laska Welesa', 'Kieł węża', 'Łapa niedźwiedzia']);
+    const result = fight([member('warrior', 'a0', 325)], [veles], 'weles');
+    const shifts = result.events.filter((event) => event.actor === 'e0' && event.kind === 'skill').map((event) => event.skillName);
+    assert.deepEqual(shifts.slice(0, 4), ['wąż', 'niedźwiedź', 'rogaty starzec', 'wąż']);
+
+    const koschei = monsterCombatant({ monsterId: 'koschei', level: 352, id: 'e0' }, content);
+    const fall = fight([member('warrior', 'a0', 350), member('warrior', 'a1', 350), member('warrior', 'a2', 350)], [koschei], 'kosciej-dane');
+    assert.equal(fall.won, true);
+    assert.deepEqual(fall.events.filter((event) => event.kind === 'drain' && event.actor === 'e0').map((event) => event.amount), [Math.round(koschei.maxHp * 0.5)]);
+  });
+
+  test('a Wanted variant of one of its own creatures waits in every place', () => {
+    const variants = content.settlement.wanted.variants.filter((one) => one.area in PLACES);
+    assert.deepEqual(variants.map((one) => one.area), Object.keys(PLACES));
+    for (const one of variants) assert.ok(PLACES[one.area][2].includes(one.monster), one.area);
+  });
+
+  test('in the Wieże every champion still waits on a floor of its own: Nyja on the 200th, Weles on the 275th, Kościej on the 350th', () => {
+    const { championEvery } = content.towers.floors;
+    const floorOf = (placeId) => Array.from({ length: 2000 }, (_, index) => index + 1).find((one) => one % championEvery === 0 && towerArea(one, content).id === placeId);
+    assert.deepEqual(['gate-of-nav', 'veles-court', 'koschei-castle'].map(floorOf), [200, 275, 350]);
+    for (const [floor, champion] of [[200, 'nyja'], [275, 'veles'], [350, 'koschei']]) {
+      const { encounter } = towerFloor(floor, 'any', content);
+      assert.equal(encounter.champion, true);
+      assert.equal(encounter.members[0].monsterId, champion);
+    }
   });
 });

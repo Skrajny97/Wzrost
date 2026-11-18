@@ -68,7 +68,7 @@ function blowsByMoment(fight, id) {
 describe('Łysogóry', () => {
   test('three lands after Ostępy Nowiu, each of five places of five levels, with its elite everywhere and its champion in the last place', () => {
     const after = content.regions.indexOf(region('new-moon-depths'));
-    assert.deepEqual(content.regions.slice(after + 1).map((one) => one.id), LANDS.map(([id]) => id));
+    assert.deepEqual(content.regions.slice(after + 1, after + 1 + LANDS.length).map((one) => one.id), LANDS.map(([id]) => id));
     for (const [id, name, from, to, elite, champion] of LANDS) {
       const land = region(id);
       assert.deepEqual([land.land, land.name, land.minLevel, land.maxLevel, land.safe, land.fightBoard], ['Łysogóry', name, from, to, false, `board-${id}`]);
@@ -192,11 +192,13 @@ describe('the blows at the whole line of the Łysogóry', () => {
     });
   }
 
-  test('in the Wieże the champions wait on their floors: Twardowski on the 50th, the Stolem on the 100th, Baba Jaga on the 275th', () => {
+  // With Nawia's 70 places (test/nawia.test.js): Twardowski stays on the
+  // 50th floor, Baba Jaga waits on the 125th and the Stolem on the 325th.
+  test('in the Wieże the champions wait on their floors: Twardowski on the 50th, Baba Jaga on the 125th, the Stolem on the 325th', () => {
     const { championEvery } = content.towers.floors;
     const floorOf = (placeId) => Array.from({ length: 1000 }, (_, index) => index + 1).find((one) => one % championEvery === 0 && towerArea(one, content).id === placeId);
-    assert.deepEqual(['cursed-manor', 'stone-throne', 'baba-yaga-hut'].map(floorOf), [50, 100, 275]);
-    for (const [floor, champion] of [[50, 'twardowski'], [100, 'stolem'], [275, 'baba-yaga']]) {
+    assert.deepEqual(['cursed-manor', 'stone-throne', 'baba-yaga-hut'].map(floorOf), [50, 325, 125]);
+    for (const [floor, champion] of [[50, 'twardowski'], [325, 'stolem'], [125, 'baba-yaga']]) {
       const { encounter } = towerFloor(floor, 'any', content);
       assert.equal(encounter.champion, true);
       assert.equal(encounter.members[0].monsterId, champion);
