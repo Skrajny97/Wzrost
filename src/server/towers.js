@@ -70,7 +70,7 @@ import { fallenGems, gemsBackSql, soldGold } from './inventory.js';
 import { gemLines } from './hunts.js';
 import { partyOf } from './parties.js';
 import { trimReports } from './reports.js';
-import { weekNow } from './weeks.js';
+import { weekFor } from './weeks.js';
 import { artifactData } from './core.js';
 import { labyrinthOn } from './features.js';
 import { say } from '../engine/text.js';
@@ -234,7 +234,7 @@ export async function enterTower(context) {
   const trophies = trophiesFor(player, now, areaDangers(area, content()).map((danger) => danger.monsterId));
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   // The week of the year of the entry (weeks.js).
-  const hunt = towerFight({ character, equipped, name: row.name, floor, seed, partners: climbers.partners, companions: climbers.companions, trophies, chest, championTrophy, week: weekNow(now) }, content());
+  const hunt = towerFight({ character, equipped, name: row.name, floor, seed, partners: climbers.partners, companions: climbers.companions, trophies, chest, championTrophy, week: weekFor(row, now) }, content());
   const won = hunt.tower.won;
   const applied = applyHunt(character, hunt, content());
   // The first win of a champion's floor brings an Artefakt for the Rdzeń

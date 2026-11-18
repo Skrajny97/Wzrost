@@ -33,6 +33,10 @@
       "name": "Generous Feast",
       "description": "A winter night in a forest village: snow, a bonfire and warm light in the windows. Only from the Generous Feast calendar."
     },
+    "bg-andrzejki": {
+      "name": "St Andrew's Eve",
+      "description": "A forest cottage on St Andrew's Eve: a candle, a bowl of wax and an old key. Only for fortunes on both evenings of St Andrew's Eve."
+    },
     "sabertooth": {
       "name": "Sabre-Toothed Tiger",
       "description": "The character rides a sabre-toothed tiger instead of the mount from the Stable."

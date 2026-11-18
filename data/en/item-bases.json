@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/item-bases.json, by the base's id (src/engine/overlay.js): every base, Tiers I–IX, with the attack of a weapon.",
+  "$comment": "English texts of data/item-bases.json, by the base's id (src/engine/overlay.js): every base, Tiers I–X, with the attack of a weapon.",
   "sword": {
     "name": "Sword",
     "attackName": "Slash"
@@ -34,6 +34,10 @@
   },
   "szczerbiec": {
     "name": "Szczerbiec",
+    "attackName": "Slash"
+  },
+  "grunwald-sword": {
+    "name": "Grunwald Sword",
     "attackName": "Slash"
   },
   "axe": {
@@ -72,6 +76,10 @@
     "name": "Perun's Axe",
     "attackName": "Chop"
   },
+  "svarozhich-axe": {
+    "name": "Svarozhich's Axe",
+    "attackName": "Chop"
+  },
   "dagger": {
     "name": "Dagger",
     "attackName": "Stab"
@@ -106,6 +114,10 @@
   },
   "koschei-dagger": {
     "name": "Koschei's Dagger",
+    "attackName": "Stab"
+  },
+  "marzanna-dagger": {
+    "name": "Marzanna's Dagger",
     "attackName": "Stab"
   },
   "bow": {
@@ -144,6 +156,10 @@
     "name": "Dazhbog's Bow",
     "attackName": "Shot"
   },
+  "jutrzenka-bow": {
+    "name": "Jutrzenka's Bow",
+    "attackName": "Shot"
+  },
   "staff": {
     "name": "Staff",
     "attackName": "Elemental Bolt"
@@ -178,6 +194,10 @@
   },
   "triglav-staff": {
     "name": "Triglav's Staff",
+    "attackName": "Elemental Bolt"
+  },
+  "veles-staff": {
+    "name": "Veles's Staff",
     "attackName": "Elemental Bolt"
   },
   "aspergillum": {
@@ -216,6 +236,10 @@
     "name": "Spear of Saint Maurice",
     "attackName": "Sacred Bolt"
   },
+  "stanislaus-crosier": {
+    "name": "Stanislaus's Crosier",
+    "attackName": "Sacred Bolt"
+  },
   "shield": {
     "name": "Shield"
   },
@@ -242,6 +266,9 @@
   },
   "achilles-shield": {
     "name": "Shield of Achilles"
+  },
+  "lech-shield": {
+    "name": "Lech's Shield"
   },
   "quiver": {
     "name": "Quiver"
@@ -270,6 +297,9 @@
   "stribog-quiver": {
     "name": "Stribog's Quiver"
   },
+  "zorza-quiver": {
+    "name": "Zorza's Quiver"
+  },
   "misericorde": {
     "name": "Misericorde"
   },
@@ -296,6 +326,9 @@
   },
   "wawel-dragon-tooth": {
     "name": "Tooth of the Wawel Dragon"
+  },
+  "basilisk-fang": {
+    "name": "Basilisk Fang"
   },
   "focus": {
     "name": "Focus"
@@ -324,6 +357,9 @@
   "sendivogius-book": {
     "name": "Sendivogius's Book"
   },
+  "copernicus-sphere": {
+    "name": "Copernicus's Sphere"
+  },
   "hood": {
     "name": "Hood"
   },
@@ -350,6 +386,9 @@
   },
   "borowy-hood": {
     "name": "Hood of the Borowy"
+  },
+  "strzygon-hood": {
+    "name": "Strzygoń's Hood"
   },
   "helmet": {
     "name": "Helmet"
@@ -378,6 +417,9 @@
   "krakus-helmet": {
     "name": "Krakus's Helmet"
   },
+  "mieszko-helmet": {
+    "name": "Mieszko's Helmet"
+  },
   "tunic": {
     "name": "Tunic"
   },
@@ -404,6 +446,9 @@
   },
   "piast-sukmana": {
     "name": "Piast's Sukmana"
+  },
+  "sobieski-zupan": {
+    "name": "Sobieski's Żupan"
   },
   "chainmail": {
     "name": "Chainmail"
@@ -432,6 +477,9 @@
   "chrobry-armor": {
     "name": "Armour of Chrobry"
   },
+  "jagiello-armor": {
+    "name": "Jagiełło's Armour"
+  },
   "robe": {
     "name": "Robe"
   },
@@ -458,6 +506,9 @@
   },
   "zhiva-cloak": {
     "name": "Cloak of Zhiva"
+  },
+  "wanda-robe": {
+    "name": "Wanda's Robe"
   },
   "cowl": {
     "name": "Cowl"
@@ -486,6 +537,9 @@
   "lada-wreath": {
     "name": "Wreath of Lada"
   },
+  "jadwiga-crown": {
+    "name": "Jadwiga's Crown"
+  },
   "surplice": {
     "name": "Surplice"
   },
@@ -512,6 +566,9 @@
   },
   "adalbert-stole": {
     "name": "Stole of Saint Adalbert"
+  },
+  "casimir-cope": {
+    "name": "Casimir's Cope"
   },
   "gloves": {
     "name": "Gloves"
@@ -540,6 +597,9 @@
   "dratewka-gloves": {
     "name": "Dratewka's Gloves"
   },
+  "lokietek-gloves": {
+    "name": "Łokietek's Gloves"
+  },
   "boots": {
     "name": "Boots"
   },
@@ -566,6 +626,9 @@
   },
   "waligora-boots": {
     "name": "Waligóra's Boots"
+  },
+  "walgierz-boots": {
+    "name": "Walgierz's Boots"
   },
   "amulet": {
     "name": "Amulet"
@@ -594,6 +657,9 @@
   "jurata-necklace": {
     "name": "Jurata's Necklace"
   },
+  "rzepicha-necklace": {
+    "name": "Rzepicha's Necklace"
+  },
   "ring": {
     "name": "Ring"
   },
@@ -621,6 +687,9 @@
   "kinga-ring": {
     "name": "Saint Kinga's Ring"
   },
+  "bona-ring": {
+    "name": "Bona's Ring"
+  },
   "talisman": {
     "name": "Talisman"
   },
@@ -647,5 +716,8 @@
   },
   "golden-horn": {
     "name": "The Golden Horn"
+  },
+  "golden-duck": {
+    "name": "Golden Duck"
   }
 }

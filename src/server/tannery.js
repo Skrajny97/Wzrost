@@ -27,7 +27,7 @@ import { content } from './content.js';
 import { ApiError, json, readJson } from './http.js';
 import { counted, foreign } from './market.js';
 import { requireOpen, settlementOf, settlementView } from './settlement.js';
-import { weekNow } from './weeks.js';
+import { weekFor } from './weeks.js';
 
 // A JSON path for a key with a hyphen and a colon ("wolf-pelt:rare").
 const jsonPath = (key) => `$."${key}"`;
@@ -96,7 +96,7 @@ export function tanneryView(player, stored, now) {
 function traded(row, stored, gold, now) {
   const { resident, brotherhood, reputation } = tuning();
   // The brotherhood's reputation with the week's share (weeks.js).
-  const { points, reputation: gained, trade } = tradePoints(gold, row.level, stored.tanneryTrade, now, content(), reputation, weekNow(now));
+  const { points, reputation: gained, trade } = tradePoints(gold, row.level, stored.tanneryTrade, now, content(), reputation, weekFor(row, now));
   const add = (counts, id, gain = points) => ({ ...counts, [id]: (counts[id] ?? 0) + gain });
   return { points, stored: { ...stored, relations: add(stored.relations, resident), reputation: add(stored.reputation, brotherhood, gained), tanneryTrade: trade } };
 }

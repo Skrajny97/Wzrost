@@ -378,10 +378,10 @@ describe('items', () => {
       const before = content.bases
         .filter((other) => (other.family ?? other.id) === base.family && (other.classLevel ?? 1) < base.classLevel)
         .reduce((best, other) => ((other.classLevel ?? 1) > (best.classLevel ?? 1) ? other : best));
-      assert.ok([10, 25, 50, 75, 100, 125, 150, 175].includes(base.classLevel), base.id);
-      // At most 40% above the first base's (Tier IX: x1.40, rounded up to
-      // hundredths; Tier VIII: x1.35).
-      assert.ok(base[key[base.kind]] > before[key[base.kind]] && base[key[base.kind]] <= Math.ceil(first[key[base.kind]] * 140 - 1e-9) / 100, base.id);
+      assert.ok([10, 25, 50, 75, 100, 125, 150, 175, 200].includes(base.classLevel), base.id);
+      // At most 45% above the first base's (Tier X: x1.45, rounded up to
+      // hundredths; Tier IX: x1.40; Tier VIII: x1.35).
+      assert.ok(base[key[base.kind]] > before[key[base.kind]] && base[key[base.kind]] <= Math.ceil(first[key[base.kind]] * 145 - 1e-9) / 100, base.id);
       for (const cls of content.classes) {
         assert.equal(canUse(base.id, cls.id, content), canUse(first.id, cls.id, content), `${base.id} for ${cls.id}`);
       }
@@ -395,11 +395,11 @@ describe('items', () => {
     }
   });
 
-  test('every category has bases from class levels 10, 25, 50, 75, 100, 125, 150 and 175, dropping from those levels', () => {
+  test('every category has bases from class levels 10, 25, 50, 75, 100, 125, 150, 175 and 200, dropping from those levels', () => {
     const firsts = content.bases.filter((base) => !base.family);
     for (const first of firsts) {
       const levels = content.bases.filter((base) => base.family === first.id).map((base) => base.classLevel);
-      assert.deepEqual(levels, [10, 25, 50, 75, 100, 125, 150, 175], first.id);
+      assert.deepEqual(levels, [10, 25, 50, 75, 100, 125, 150, 175, 200], first.id);
     }
     assert.equal(canUse('saber', 'warrior', content, 24), false);
     assert.equal(canUse('saber', 'warrior', content, 25), true);
@@ -424,6 +424,9 @@ describe('items', () => {
     assert.equal(canUse('szczerbiec', 'warrior', content, 174), false);
     assert.equal(canUse('szczerbiec', 'warrior', content, 175), true);
     assert.equal(canUse('szczerbiec', 'mage', content, 175), false);
+    // Tier X (1086): the Miecz Grunwaldzki from class level 200.
+    assert.equal(canUse('grunwald-sword', 'warrior', content, 199), false);
+    assert.equal(canUse('grunwald-sword', 'warrior', content, 200), true);
     assert.equal(canUse('self-swinging-sword', 'mage', content, 150), false);
     const rng = createRng('trzecie-bazy');
     const swords = (maxClassLevel) => {

@@ -546,6 +546,7 @@
         "speedPerLevel",
         "fastest",
         "laterPatternLevel",
+        "patternsUpTo",
         "partsLevelStep",
         "upgrades",
         "scroll",
@@ -654,6 +655,11 @@
           "type": "integer",
           "minimum": 1,
           "description": "Od którego poziomu profesji System odsłania wzory późniejszych baz rodziny (classLevel w item-bases.json)."
+        },
+        "patternsUpTo": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Najwyższy poziom klasy (classLevel w item-bases.json), do którego Warsztat zna wzory. Bazy wyższych tierów tylko wypadają: ich wzorów nie odsłania ani poziom profesji, ani rozebranie przedmiotu (1086.0 A: Tier X od 200. poziomu klasy do czasu nowych krain)."
         },
         "partsLevelStep": {
           "type": "integer",
@@ -1190,6 +1196,7 @@
         "speedPerLevel",
         "fastest",
         "laterPatternLevel",
+        "patternsUpTo",
         "chances",
         "chancePerLevel",
         "maxChance",
@@ -1260,6 +1267,11 @@
         "laterPatternLevel": {
           "type": "integer",
           "minimum": 1
+        },
+        "patternsUpTo": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Jak w Warsztacie: najwyższy poziom klasy, do którego Szlifiernia zna wzory biżuterii."
         },
         "chances": {
           "type": "object",

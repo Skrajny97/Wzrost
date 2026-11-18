@@ -44,9 +44,9 @@ describe('the Encyklopedia in the engine', () => {
     assert.deepEqual(mergeDiscoveries({ 'item:sword': 2, 'herb:comfrey': 1 }, held), held);
   });
 
-  test('items come in nine tiers by the class level they are worn from, each with a set for every class and one with the accessories', () => {
+  test('items come in ten tiers by the class level they are worn from, each with a set for every class and one with the accessories', () => {
     const sets = itemSets(content);
-    assert.equal(sets.length, 54);
+    assert.equal(sets.length, 60);
     assert.deepEqual(
       sets.filter((set) => set.tier === 0).map((set) => [set.name, set.bases.length]),
       [
@@ -69,6 +69,8 @@ describe('the Encyklopedia in the engine', () => {
     assert.deepEqual(sets.find((set) => set.id === 'items:8:warrior').bases.slice(0, 3), ['self-swinging-sword', 'executioner-axe', 'aegis']);
     // Tier IX (1018), from class level 175.
     assert.deepEqual(sets.find((set) => set.id === 'items:9:warrior').bases.slice(0, 3), ['szczerbiec', 'perun-axe', 'achilles-shield']);
+    // Tier X (1086), from class level 200.
+    assert.deepEqual(sets.find((set) => set.id === 'items:10:warrior').bases.slice(0, 3), ['grunwald-sword', 'svarozhich-axe', 'lech-shield']);
     const covered = new Set(sets.flatMap((set) => set.bases));
     assert.equal(covered.size, content.bases.length);
   });
@@ -234,7 +236,7 @@ describe('the Encyklopedia in the engine', () => {
   test('Tier IX: its items from class level 175 with a set for every class and the accessories, its chest, and the materials of creatures above level 200', () => {
     const levels = { level: 210, classLevel: 175, professions: {} };
     const view = encyclopediaView({ discovered: {}, claimed: [], met: [], levels }, content);
-    const ninth = view.items.tiers.at(-1);
+    const ninth = view.items.tiers.find((tier) => tier.name === 'Tier IX');
     assert.deepEqual([ninth.name, ninth.range, ninth.current, ninth.entries.length], ['Tier IX', 'od 175. poziomu klasy', true, 22]);
     assert.deepEqual(
       ninth.sets.map((set) => [set.name, set.bases]),
@@ -259,8 +261,44 @@ describe('the Encyklopedia in the engine', () => {
       'Warsztat: wzór od 175. poziomu Rzemieślnictwa.',
     ]);
     assert.ok(ninth.entries.find((entry) => entry.id === 'jurata-necklace').sources.includes('Szlifiernia: wzór od 175. poziomu Jubilerstwa.'));
-    assert.deepEqual(view.materials.tiers.at(-1).name, 'Tier IX');
-    assert.deepEqual([view.materials.tiers.at(-1).range, view.materials.tiers.at(-1).current], ['poziomy 201–275', true]);
+    const ninthMaterials = view.materials.tiers.find((tier) => tier.name === 'Tier IX');
+    assert.deepEqual([ninthMaterials.range, ninthMaterials.current], ['poziomy 201–275', true]);
+  });
+
+  // The author's 1086: Tier X from class level 200, as Tier IX came from
+  // 175. Until the lands from level 276 come it only drops (1086.0 A): no
+  // pattern in the Warsztat or the Szlifiernia.
+  test('Tier X: its items from class level 200 with a set for every class and the accessories, its chest, dropping only, and the materials of creatures above level 275', () => {
+    const levels = { level: 230, classLevel: 200, professions: {} };
+    const view = encyclopediaView({ discovered: {}, claimed: [], met: [], levels }, content);
+    const tenth = view.items.tiers.at(-1);
+    assert.deepEqual([tenth.name, tenth.range, tenth.current, tenth.entries.length], ['Tier X', 'od 200. poziomu klasy', true, 22]);
+    assert.deepEqual(
+      tenth.sets.map((set) => [set.name, set.bases]),
+      [
+        ['Wojownik', ['grunwald-sword', 'svarozhich-axe', 'lech-shield', 'mieszko-helmet', 'jagiello-armor']],
+        ['Łucznik', ['jutrzenka-bow', 'zorza-quiver', 'strzygon-hood', 'sobieski-zupan']],
+        ['Mag', ['veles-staff', 'copernicus-sphere', 'strzygon-hood', 'wanda-robe']],
+        ['Kleryk', ['stanislaus-crosier', 'lech-shield', 'copernicus-sphere', 'jadwiga-crown', 'casimir-cope']],
+        ['Cień', ['marzanna-dagger', 'basilisk-fang', 'strzygon-hood', 'sobieski-zupan']],
+        ['Dodatki', ['lokietek-gloves', 'walgierz-boots', 'rzepicha-necklace', 'bona-ring', 'golden-duck']],
+      ],
+    );
+    // Tier IX's gold x2.5 (rounded up), Punkty Czasu x2, Punkty Systemu at
+    // most 100.
+    for (const set of tenth.sets) assert.deepEqual(set.chest, { gold: 244145, timePoints: 2560, systemPoints: 100 }, set.name);
+    // From Zaćmiona Polana (196–200), the last place of Ostępy Nowiu, worn
+    // from class level 200, and no pattern yet.
+    assert.deepEqual(tenth.entries.find((entry) => entry.id === 'grunwald-sword').sources, [
+      'Wyprawy: wypada od regionu Zaćmiona Polana (poz. 196–200).',
+      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów.',
+      'Założysz od 200. poziomu klasy.',
+    ]);
+    assert.ok(!tenth.entries.find((entry) => entry.id === 'rzepicha-necklace').sources.some((line) => line.startsWith('Szlifiernia')));
+    // The materials of creatures above level 275 (Łysogóry's champions above
+    // it), as Tier IX took those of Ostępy Nowiu above 200.
+    const tenthMaterials = view.materials.tiers.at(-1);
+    assert.deepEqual([tenthMaterials.name, tenthMaterials.range, tenthMaterials.current], ['Tier X', 'poziomy 276–350', false]);
   });
 
   test('a full set opens the chest of its tier, a count of discoveries its own chest in turn, each once', () => {

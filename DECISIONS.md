@@ -3701,6 +3701,52 @@ Autor przekazał uwagę gracza (poz. 56) z Panelu autora: „Przydałoby się wi
 1. **Na liście członków gildii obok poziomu stoi, kiedy członek był ostatnio w grze**, tak samo jak w Znajomych: „teraz” przy zielonej kropce, a poza tym „5 min temu”, „3 godz. temu”, „wczoraj” albo „12 dni temu” (`lastSeen` w `src/server/guilds.js`, `seenTag` w `src/client/screens/friends.js`). Liczy się ostatnia wizyta konta, jak przy znajomych. Członek, którego konta gra jeszcze nie widziała, nie ma tego dopisku.
 2. **Brakujący szczegół: wygląd jak w Znajomych, bez makiet.** To ten sam dopisek w takiej samej liście, więc nie jest to nowy wygląd ekranu. Sprawdzone na 320, 390, 1366 i 1920 px: wiersz mieści się w ramce, bez przewijania na boki.
 
+## Andrzejki: Wieczór wróżb (1082–1084, decyzje autora 18.11.2026)
+
+Autor 17.11.2026: „przydałby się drobny event na Andrzejki”. Propozycja „Wieczór wróżb” (29.11 od 18:00 do końca 30.11, karta na ekranie Walki pod paskiem tygodnia, raz dziennie na postać) przyjęta w wariantach:
+
+1. **Obie wróżby, po jednej na dzień (1082 C).** 29 listopada lanie wosku, 30 listopada trzy kubki. Sceny z PixelLab: lanie wosku w wersji 2, trzy kubki w wersji 3 (autor: „lanie wosku wersja 2 i kubki wersja 3”).
+2. **Wróżba daje premię na dobę i małą nagrodę od razu (1083 C).** Osiem wróżb, każda z premią +10% na 24 godziny do jednej rzeczy: Smok XP z walk, Sakiewka złoto z walk, Klucz szansa na przedmiot w łupach, Kruk materiały ze stworów, Gwiazda XP profesji, Liść zioła w Zielarstwie, Serce szybszy odpoczynek, Korona reputacja w Osadzie. Do tego mała nagroda od razu: Punkty Czasu, złoto według poziomu postaci albo pakiet kart.
+3. **Za wróżbę w oba dni osiągnięcie z tytułem i tło portretu (1084 A i B).** Osiągnięcie „Andrzejkowa wróżba” z tytułem „Wróżbita” (dla kobiet „Wróżka”) i tło portretu „Wieczór andrzejkowy” (chata ze świecą), tylko z wydarzenia.
+4. Dalej: grafika tła portretu w PixelLab i makiety (telefon, 1366 i 1920 px) na stronie ocen, a po akceptacji wdrożenie przed 29.11.
+
+5. **Jak zbudowane (18.11.2026, czeka na oceny 1091–1093).** Dane w `data/winter.json` (`andrzejki`), silnik `src/engine/andrzejki.js`, serwer `src/server/andrzejki.js` (`POST /api/andrzejki`), karta `src/client/andrzejki.js` na ekranie Walki pod paskiem tygodnia. Brakujące szczegóły, rozstrzygnięte najprościej:
+    - Wróżbę losuje serwer z postaci, wieczoru i wybranego kubka, więc wybór kubka ją zmienia, a ponowne wejście nie. Ta sama wróżba może wypaść oba wieczory; wtedy obie premie się sumują.
+    - Premia działa jak premia tygodnia, tylko dla tej postaci (`weekFor` w `src/server/weeks.js`): wyprawa, walka albo praca zaczęta w czasie premii trzyma ją do końca, a raport ma osobną linijkę „Wróżba Smok: …”. Szybszy odpoczynek liczy się w tempie odpoczynku od chwili wróżby przez dobę (`weekRest`).
+    - Prezenty: Smok, Gwiazda i Serce 25 Punktów Czasu; Sakiewka, Kruk i Liść złoto z godziny wyprawy na poziomie postaci (jak w kalendarzu Szczodrych Godów); Klucz i Korona pakiet kart.
+    - Osiągnięcie „Andrzejkowa wróżba” w nowej grupie „Wydarzenia”, z 25 Punktami Czasu jak najmniejsze osiągnięcia. Tło „Wieczór andrzejkowy” to przedmiot wydarzenia (`event: andrzejki` w `data/cosmetics.json`): nie da się go kupić.
+    - Figurki wróżb to te same ikony oba wieczory: 29.11 wosk zastyga w figurkę, a jej cień pada na ścianę, 30.11 figurka leży pod kubkiem.
+    - Wersja testowa (`ANDRZEJKI: test`) gra każdy dzień od północy: nieparzysty jak lanie wosku, parzysty jak trzy kubki.
+6. **Oceny 18.11.2026 (1091–1093).** Figurki wróżb: Smok B, Sakiewka A, Klucz C, Kruk B, Gwiazda B (druga runda), Liść B, Serce A, Korona A, świeca osiągnięcia D. Tło portretu „Wieczór andrzejkowy”: D. Makiety lania wosku przed i po wróżbie, trzech kubków po wyborze i osiągnięcia przyjęte. Trzy kubki przed wyborem odrzucone, bo na przyjętym obrazku (wersja 3) ręka już unosi środkowy kubek i widać pod nim pierścionek. Autor: „niech beda trzy kubki jednak w takim razie przykryte”. Dlatego PixelLab domalowuje w miejscu ręki i uniesionego kubka trzeci przykryty kubek (`andrzejki-cups-covered` w `art/prompts.json`, inpainting przyjętego obrazka). Po wyborze kubek znika, a figurka stoi tam, gdzie stał (1093.4).
+
+## Co przygotować zawczasu: kolejność (1085 A, 18.11.2026)
+
+Najpierw Tier X przedmiotów (potrzebny najlepszej postaci za około dwa tygodnie), potem czwarta ewolucja (około początku stycznia), potem nowe krainy od 276. poziomu (około połowy stycznia).
+
+## Tier X przedmiotów (1086, decyzje autora 18.11.2026)
+
+1. **Zasady z 1086.0 przyjęte.** 22 przedmioty od 200. poziomu klasy, po jednym w każdej rodzinie, każdy zaraz za przedmiotem Tieru IX. Współczynnik pierwszego przedmiotu rodziny razy 1,45. Premia od najwyższej premii Tieru IX plus 1 do półtora raza tej premii. Wypadają na wyprawach od ostatniego miejsca Ostępów Nowiu (poz. 196–200), a od 200. poziomu klasy dają je też skrzynia tygodniowa, handlarz, Salon Gier, Wieże, Bestia, Wyprawa Gildii i wojna gildii. Skrzynia Encyklopedii za pełny zestaw: 244 145 złota, 2560 Punktów Czasu i 100 Punktów Systemu.
+2. **Materiały do wyrobu z nowych krain (1086.0 A).** Do czasu krain od 276. poziomu Tier X tylko wypada; wzory Warsztatu i Szlifierni dojdą z krainami.
+3. **Wszystkie 22 nazwy przyjęte:** Miecz Grunwaldzki, Topór Swarożyca, Sztylet Marzanny, Łuk Jutrzenki, Kostur Welesa, Pastorał Stanisława, Tarcza Lecha, Kołczan Zorzy, Kieł Bazyliszka, Sfera Kopernika, Kaptur Strzygonia, Hełm Mieszka, Żupan Sobieskiego, Zbroja Jagiełły, Szata Wandy, Korona Jadwigi, Kapa Kazimierza, Rękawice Łokietka, Buty Walgierza, Naszyjnik Rzepichy, Pierścień Bony, Złota kaczka.
+4. **Ikony:** przyjęte po jednej wersji dla 21 przedmiotów. Hełm Mieszka: wszystkie cztery odrzucone (autor: „zbyt podobne do poprzedniego tieru”), więc nowe szkice z innym opisem i innym wzorem stylu niż Hełm Krakusa (1089). Przyjęta wersja A z drugiej rundy (1089 A).
+5. **Jak zbudowane (18.11.2026).** 22 bazy w `data/item-bases.json` (angielskie nazwy w `data/en/item-bases.json`), Tier X w Encyklopedii (`data/encyclopedia.json`, do 350. poziomu). Warsztat i Szlifiernia znają wzory tylko do 175. poziomu klasy (`patternsUpTo` w `data/professions.json`): wzorów Tieru X nie odsłania ani poziom profesji, ani rozebranie przedmiotu. Gdy przyjdą nowe krainy, wystarczy podnieść tę liczbę do 200. Materiały stworów powyżej 275. poziomu (czempioni Łysogór) przechodzą do Tieru X Encyklopedii, jak przy Tierze IX.
+
+## Czwarta ewolucja klas (1087, decyzje autora 18.11.2026)
+
+1. **Zasady z 1087.0 przyjęte** i wszystkie 15 par nazw: Burzyciel/Burzycielka, Nieśmiertelny/Nieśmiertelna, Tytan/Tytanida, Niebiański Łucznik/Niebiańska Łuczniczka, Gromowładny/Gromowładna, Pan Zwierząt/Pani Zwierząt, Stwórca Żywiołów/Stwórczyni Żywiołów, Lodowy Bóg/Lodowa Bogini, Pradruid/Pradruidka, Archanioł/Archanielica, Mściciel Niebios/Mścicielka Niebios, Wieszcz/Wieszczka, Żniwiarz Dusz/Żniwiarka Dusz, Król Nawii/Królowa Nawii, Książę Ciemności/Księżna Ciemności.
+2. **Portrety przyjęte dla 27 z 30 postaci**, zapisane jako wzory w `art/references/evolutions/<id>-<płeć>.png`. Do poprawy: Nieśmiertelny i Archanioł (wszystkie szkice odrzucone; nowe szkice w stroju przyjętej kobiety tej formy) oraz Żniwiarka Dusz (autor: „A, ale potrzebuje kos takich jak facet”).
+3. **Trzy portrety z drugiej rundy przyjęte (1090, 18.11.2026):** Nieśmiertelny A, Archanioł B i Żniwiarka Dusz C (z dużymi kosami jak u Żniwiarza). Wszystkie 30 portretów czwartych form są teraz wzorami w `art/references/evolutions/`.
+4. Dalej: cechy i umiejętności z liczbami z symulacji, a potem chody, jazda wierzchem i odcienie skóry. Do gry wejdzie z pełną grafiką.
+
+## Nowe krainy 276–350: Nawia (1088 B, 18.11.2026)
+
+Motyw B, słowiańskie zaświaty: Mgliste Bagna Nawii (276–300), Łąki Welesa (301–325) i Kraina bez Słońca (326–350). Karta Mglistych Bagien Nawii: szkic D. Dalej: miejsca, stwory, elity i czempioni na stronie ocen (mało ptaków), potem grafiki.
+
+## Wersja 0.4.26 (18.11.2026): Tier X przedmiotów i Andrzejki
+
+1. **Tier X przedmiotów** (1086, wyżej): 22 przedmioty od 200. poziomu klasy, z wypraw od ostatniego miejsca Ostępów Nowiu, a od 200. poziomu klasy też z innych źródeł. Wzorów do wyrobu jeszcze nie ma: dojdą z nowymi krainami.
+2. **Andrzejki: Wieczór wróżb** (1082–1084, wyżej): kod, dane, figurki wróżb (1091), tło portretu D (1092) i osiągnięcie są w grze, ale nic z tego nie widać przed 29.11 o 18:00 poza osiągnięciem na liście. Obrazek trzech kubków przed wyborem czeka na nową wersję z trzema przykrytymi kubkami (1093.3); wejdzie przed 30.11.
+
 ## Wersja 0.4.25 (18.11.2026): kiedy członkowie gildii byli ostatnio w grze
 
 1. **Gildia** (wyżej): przy każdym członku, kiedy był ostatnio w grze, jak w Znajomych.

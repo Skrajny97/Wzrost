@@ -1,8 +1,12 @@
 {
   "$comment": "English texts of data/winter.json (src/engine/winter.js): the names of the camp's decorations and the words of the calendar's window and tab.",
   "decorations": {
-    "podlaznniczka": { "name": "Fir crown" },
-    "snopek": { "name": "Wheat sheaf" }
+    "podlaznniczka": {
+      "name": "Fir crown"
+    },
+    "snopek": {
+      "name": "Wheat sheaf"
+    }
   },
   "texts": {
     "title": "Generous Feast",
@@ -33,5 +37,56 @@
     "questLocked": "From character level {level}",
     "questsChest": "All the day's winter quests bring a card pack.",
     "questsNote": "Winter quests come every day in December and cannot be rerolled."
+  },
+  "andrzejki": {
+    "omens": {
+      "dragon": {
+        "name": "Dragon"
+      },
+      "purse": {
+        "name": "Purse"
+      },
+      "key": {
+        "name": "Key"
+      },
+      "raven": {
+        "name": "Raven"
+      },
+      "star": {
+        "name": "Star"
+      },
+      "leaf": {
+        "name": "Leaf"
+      },
+      "heart": {
+        "name": "Heart"
+      },
+      "crown": {
+        "name": "Crown"
+      }
+    },
+    "texts": {
+      "title": "Fortune Evening",
+      "lead": "St Andrew's Eve: two evenings of fortune-telling. Each evening you tell your fortune once; the omen gives a bonus for a day and a small gift to start with.",
+      "wax": "Wax pouring",
+      "waxAbout": "Wax from the candle drips through the eye of an old key into a bowl of water and sets into a shape. Its shadow on the wall hints at what awaits you.",
+      "waxButton": "Pour the wax",
+      "waxResult": "The wax set into a shape: {omen}.",
+      "cups": "Three cups",
+      "cupsAbout": "Under one of the three cups lies a wax figurine from last night. Pick a cup.",
+      "cup": "Cup {number}",
+      "cupsResult": "Under the cup lay a figurine: {omen}.",
+      "omen": "{omen}: {effect} for {hours} hours.",
+      "reward": "To start with: {reward}.",
+      "toldWax": "This evening's fortune is told. Tomorrow: three cups.",
+      "toldCups": "This year's fortunes are told.",
+      "both": "For fortunes on both evenings: the portrait background “St Andrew's Eve” and the achievement “St Andrew's Fortune”.",
+      "bothGot": "For fortunes on both evenings you get the portrait background “St Andrew's Eve”, and a title waits in Achievements.",
+      "active": "Omen: {omen}",
+      "report": "Omen {omen}: {effects}.",
+      "closed": "The fortune evening is over.",
+      "taken": "This evening's fortune is already told.",
+      "changed": "Something changed in the meantime. Try again."
+    }
   }
 }

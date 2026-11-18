@@ -22,9 +22,10 @@ describe('the achievements (1036)', () => {
     await call('POST', '/api/character', { cookie, body: { name: 'Wytrwała', classId: 'mage', appearance: 'female' } });
   });
 
-  test('24 in their groups, none done at first, with the words of the counts that begin now', async () => {
+  test('25 in their groups, none done at first, with the words of the counts that begin now', async () => {
     const { achievements, fresh } = await look();
-    assert.equal(all(achievements).length, 24);
+    // 24, and Andrzejki's (1084 A).
+    assert.equal(all(achievements).length, 25);
     assert.deepEqual(fresh, []);
     assert.ok(all(achievements).every((one) => !one.done));
     assert.ok(achievements.since.length > 0);

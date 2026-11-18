@@ -242,9 +242,10 @@
             "pattern": "^[a-z0-9-]+$"
           },
           "event": {
-            "description": "Przedmiot tylko z wydarzenia, bez ceny w sklepie: winter (kalendarz Szczodrych Godów, data/winter.json).",
+            "description": "Przedmiot tylko z wydarzenia, bez ceny w sklepie: winter (kalendarz Szczodrych Godów, data/winter.json), andrzejki (wróżby w oba wieczory Andrzejek, winter.json: andrzejki).",
             "enum": [
-              "winter"
+              "winter",
+              "andrzejki"
             ]
           },
           "season": {

@@ -363,8 +363,14 @@ export function publicContent() {
     cosmetics: { items: game.cosmetics, texts: game.cosmeticTexts },
     // Szczodre Gody (winter.js, 1044): the words of the calendar's window and
     // tab, the winter camp's decorations and the falling snow's density
-    // (snowfall.js, 1065 A).
-    winter: { texts: game.winter.texts, decorations: game.winter.decorations, snow: game.winter.snow ?? null },
+    // (snowfall.js, 1065 A). Andrzejki's fortune evening (andrzejki.js, 1082
+    // C): its words and its omens' names.
+    winter: {
+      texts: game.winter.texts,
+      decorations: game.winter.decorations,
+      snow: game.winter.snow ?? null,
+      andrzejki: { texts: game.winter.andrzejki.texts, omens: game.winter.andrzejki.omens.map(({ id, name, kind }) => ({ id, name, kind })) },
+    },
     giftTexts: game.giftTexts,
     elements: game.elements.map(({ id, name, resistance, from, color }) => ({ id, name, resistance, from, color })),
     effects: game.effects.map(({ id, name, color }) => ({ id, name, color })),

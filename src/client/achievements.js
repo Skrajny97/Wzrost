@@ -3,10 +3,10 @@
 // only in the profile and the Ranking: 1036.3 B): long goals in groups, each
 // with a title to wear and a small reward, given at the first look after it
 // is done. Each shows a picture the game already has (a creature, an item,
-// a profession, an icon), so no new icons. The window opens from the Postać
+// a profession, an icon, an Andrzejki omen), so no new icons. The window opens from the Postać
 // tab, under the portrait.
 
-import { itemSprite, monsterSprite, professionSprite, timePointsArt } from './art.js';
+import { itemSprite, monsterSprite, omenSprite, professionSprite, timePointsArt } from './art.js';
 import { h, icon } from './dom.js';
 import { formatNumber } from './format.js';
 import { t } from './i18n.js';
@@ -16,7 +16,8 @@ import { openSheet, toast, withButton } from './ui.js';
 
 function art(one) {
   const [kind, id] = one.art;
-  const sprite = kind === 'monster' ? monsterSprite(id) : kind === 'item' ? itemSprite({ base: id }) : kind === 'profession' ? professionSprite(id) : null;
+  const sprite =
+    kind === 'monster' ? monsterSprite(id) : kind === 'item' ? itemSprite({ base: id }) : kind === 'profession' ? professionSprite(id) : kind === 'omen' ? omenSprite(id) : null;
   return sprite ?? icon(id ?? 'star', { size: 28 });
 }
 

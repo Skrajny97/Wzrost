@@ -59,15 +59,18 @@ describe('the Sklep Systemu in the engine', () => {
       ['#ffd76a', '#8fe3ef', '#7fd36b'],
     );
     // The winter set of Szczodre Gody (1044.2 B): only from the calendar's
-    // 24th day (winter.js), with no price, and not for sale.
+    // 24th day (winter.js), and Andrzejki's background, only for fortunes on
+    // both evenings (andrzejki.js, 1084 B), with no price, and not for sale.
     assert.deepEqual(
       content.cosmetics.filter((one) => one.event).map(({ id, kind, name, price, event }) => [id, kind, name, price, event]),
       [
         ['frame-szron', 'frame', 'Szron', undefined, 'winter'],
         ['bg-szczodre', 'background', 'Szczodre Gody', undefined, 'winter'],
+        ['bg-andrzejki', 'background', 'Wieczór andrzejkowy', undefined, 'andrzejki'],
         ['aura-sniezyca', 'aura', 'Śnieżyca', undefined, 'winter'],
       ],
     );
+    assert.equal(cosmeticBlock('bg-andrzejki', {}, { systemPoints: 5000, mount: null }, content).code, 'event_only');
     assert.equal(cosmeticBlock('frame-szron', {}, { systemPoints: 5000, mount: null }, content).code, 'event_only');
   });
 

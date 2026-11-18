@@ -20,7 +20,7 @@ import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { trimReports } from './reports.js';
-import { weekNow } from './weeks.js';
+import { weekFor } from './weeks.js';
 import { sourceFamePoints } from './fame.js';
 
 const rules = () => content().portals;
@@ -157,7 +157,7 @@ export async function enterPortal(context) {
   const trophies = trophiesFor(player, now, areaDangers(area, content()).map((danger) => danger.monsterId));
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   // The week of the year of the entry (weeks.js).
-  const hunt = portalFight({ character, equipped: equippedItems(player), name: row.name, portalId: portal.id, stage, first: true, seed, trophies, companions, week: weekNow(now) }, content());
+  const hunt = portalFight({ character, equipped: equippedItems(player), name: row.name, portalId: portal.id, stage, first: true, seed, trophies, companions, week: weekFor(row, now) }, content());
   const { won } = hunt.portal;
   const applied = applyHunt(character, hunt, content());
 

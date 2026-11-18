@@ -60,7 +60,7 @@ import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { herbsOf, mineralsOf, potionsOf } from './professions-view.js';
 import { requireOpen, settlementOf } from './settlement.js';
-import { weekNow } from './weeks.js';
+import { weekFor } from './weeks.js';
 import { saleFamePoints } from './fame.js';
 import { SCROLL_COLUMNS, scrollAdds, scrollById, scrollHeld, scrollsOf } from './scroll-goods.js';
 
@@ -764,7 +764,7 @@ export function foreign(adds) {
 // relation with him (question 278 A).
 function marketReputation(row, stored, value, now, { relation = false } = {}) {
   // The reputation with the week's share (weeks.js).
-  const { points, reputation: gained, trade } = tradePoints(value, row.level, stored.marketTrade, now, content(), tuning().reputation, weekNow(now));
+  const { points, reputation: gained, trade } = tradePoints(value, row.level, stored.marketTrade, now, content(), tuning().reputation, weekFor(row, now));
   const { brotherhood, resident } = tuning();
   return {
     ...stored,

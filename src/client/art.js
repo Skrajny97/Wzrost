@@ -234,6 +234,9 @@ export const SPRITES = {
       // The ninth bases, from class level 175 (1018, the author's picks 1024).
       'szczerbiec', 'perun-axe', 'koschei-dagger', 'dazhbog-bow', 'triglav-staff', 'maurice-spear', 'achilles-shield', 'stribog-quiver', 'wawel-dragon-tooth', 'sendivogius-book', 'borowy-hood',
       'krakus-helmet', 'piast-sukmana', 'chrobry-armor', 'zhiva-cloak', 'lada-wreath', 'adalbert-stole', 'dratewka-gloves', 'waligora-boots', 'jurata-necklace', 'kinga-ring', 'golden-horn',
+      // The tenth bases, from class level 200 (1086, the author's picks).
+      'grunwald-sword', 'svarozhich-axe', 'marzanna-dagger', 'jutrzenka-bow', 'veles-staff', 'stanislaus-crosier', 'lech-shield', 'zorza-quiver', 'basilisk-fang', 'copernicus-sphere', 'strzygon-hood',
+      'mieszko-helmet', 'sobieski-zupan', 'jagiello-armor', 'wanda-robe', 'jadwiga-crown', 'casimir-cope', 'lokietek-gloves', 'walgierz-boots', 'rzepicha-necklace', 'bona-ring', 'golden-duck',
     ],
   },
   // Materials left by creatures, the parts the Stół rozbiórki makes and
@@ -638,11 +641,24 @@ export const SPRITES = {
     size: 76,
     ids: ['podlaznniczka', 'snopek'],
   },
+  // Andrzejki's eight omens, wax figurines, and the candle of its
+  // achievement (andrzejki.js, 1082 C), 32×32, drawn in PixelLab.
+  omens: {
+    size: 32,
+    ids: ['dragon', 'purse', 'key', 'raven', 'star', 'leaf', 'heart', 'crown', 'candle'],
+  },
+  // Andrzejki's two evenings, the wax and the three cups (1082 C: the wax's
+  // version 2, the cups' version 3), 128×96, drawn in PixelLab.
+  andrzejki: {
+    width: 128,
+    height: 96,
+    ids: ['wax', 'cups'],
+  },
   cosmetics: {
     width: 120,
     height: 160,
     fit: true,
-    ids: ['frame-gold', 'frame-system', 'frame-forest', 'bg-spring', 'bg-tower', 'bg-camp', 'frame-szron', 'bg-szczodre'],
+    ids: ['frame-gold', 'frame-system', 'frame-forest', 'bg-spring', 'bg-tower', 'bg-camp', 'frame-szron', 'bg-szczodre', 'bg-andrzejki'],
   },
   // The character riding, <class>-<look> or an evolution's
   // <evolution>-<look>: one picture sitting in a saddle that is not drawn
@@ -725,6 +741,8 @@ export function summonSprite(skillId, figure) {
 export const itemSprite = (item) => sprite('items', item.base, 'sprite--item');
 // A material, a part ("scraps") or the chest ("chest").
 export const materialSprite = (id) => sprite('materials', id, 'sprite--item');
+// An Andrzejki omen's wax figurine, or the candle (andrzejki.js).
+export const omenSprite = (id) => sprite('omens', id, 'sprite--item');
 // A skill's icon, a second or third form's skill's stand-in until it has
 // its own.
 export const skillSprite = (id) => firstSprite('skills', artChain(id), 'sprite--skill');

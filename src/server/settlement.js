@@ -142,7 +142,7 @@ import { stableView } from './stable.js';
 import { tanneryView } from './tannery.js';
 import { giftWords, residentGiftsView } from './resident-gifts.js';
 import { say } from '../engine/text.js';
-import { weekFactorNow, weekNow } from './weeks.js';
+import { weekFactorNow, weekFor } from './weeks.js';
 
 // A JSON path for a key with a hyphen or a colon ("iron-ore", "wolf-pelt:rare").
 const jsonPath = (key) => `$."${key}"`;
@@ -570,7 +570,7 @@ export async function sellToHerbalist(context) {
   const gold = saleGold(herbalistPrices(player, stored, context.now).price(body.kind, body.id), body.count);
   const { herbalist } = content().settlement;
   // The brotherhood's reputation with the week's share (weeks.js).
-  const { points, reputation: gained, trade } = tradePoints(gold, row.level, stored.trade, context.now, content(), herbalist.reputation, weekNow(context.now));
+  const { points, reputation: gained, trade } = tradePoints(gold, row.level, stored.trade, context.now, content(), herbalist.reputation, weekFor(row, context.now));
   const add = (counts, id, gain = points) => ({ ...counts, [id]: (counts[id] ?? 0) + gain });
   const next = { ...stored, relations: add(stored.relations, herbalist.resident), reputation: add(stored.reputation, herbalist.brotherhood, gained), trade };
   const key = jsonPath(body.id);
@@ -615,7 +615,7 @@ export async function buyFromHerbalist(context) {
     throw new ApiError(409, 'bag_full', 'Tyle nie zmieści się w plecaku.');
   }
   // The brotherhood's reputation with the week's share (weeks.js).
-  const { points, reputation: gained, trade } = tradePoints(gold, row.level, stored.trade, context.now, content(), herbalist.reputation, weekNow(context.now));
+  const { points, reputation: gained, trade } = tradePoints(gold, row.level, stored.trade, context.now, content(), herbalist.reputation, weekFor(row, context.now));
   const add = (counts, id, gain = points) => ({ ...counts, [id]: (counts[id] ?? 0) + gain });
   const next = { ...stored, relations: add(stored.relations, herbalist.resident), reputation: add(stored.reputation, herbalist.brotherhood, gained), trade };
   const herbs = counted('herbs', { [good.id]: body.count });
@@ -1005,7 +1005,7 @@ export async function deliverSettlementOrder(context) {
   const block = deliverBlock(board, body.orderId, goods, content());
   if (block) throw new ApiError(block.code === 'no_order' ? 404 : 409, block.code, block.message);
   // The brotherhood's reputation with the week's share (weeks.js).
-  const done = deliverOrder(board, body.orderId, context.now, content(), sellBonusOf(player, context.now), weekNow(context.now));
+  const done = deliverOrder(board, body.orderId, context.now, content(), sellBonusOf(player, context.now), weekFor(row, context.now));
   const add = (counts, more) => ({ ...counts, ...Object.fromEntries(Object.entries(more).map(([id, gain]) => [id, (counts[id] ?? 0) + gain])) });
   const next = { ...stored, reputation: add(stored.reputation, done.reputation), relations: add(stored.relations, done.relation), board: done.board };
   // The narrator's quests "Wykonaj N zleceń w Osadzie" (question 95).
@@ -1505,7 +1505,7 @@ export async function talkWithCompanion(context) {
   if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
   if (talkedToday(companion, context.now, content())) throw new ApiError(409, 'talked', 'Na dziś wystarczy. Porozmawiacie jutro.');
   // The relation with the week's share (weeks.js).
-  const { talk, companion: after } = talkWith(companion, { seed: `${row.id}:settlement`, now: context.now, week: weekNow(context.now) }, content());
+  const { talk, companion: after } = talkWith(companion, { seed: `${row.id}:settlement`, now: context.now, week: weekFor(row, context.now) }, content());
   const next = { ...stored, companions: hired.map((one) => (one === companion ? after : one)) };
   const result = await context.env.DB.prepare('UPDATE characters SET settlement = ?, version = version + 1 WHERE id = ? AND version = ?')
     .bind(JSON.stringify(next), row.id, row.version)

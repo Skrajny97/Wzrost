@@ -17,7 +17,7 @@ import { workFamePoints } from './fame.js';
 import { requireOpen } from './mining.js';
 import { pantryOf } from './professions-view.js';
 import { trimReports } from './reports.js';
-import { keptWeek, weekNow } from './weeks.js';
+import { keptWeek, weekFor } from './weeks.js';
 import { withMinigame } from './minigame.js';
 import { winterGainSql } from './winter.js';
 
@@ -54,7 +54,7 @@ export async function startFishing(context) {
   const { row } = player;
   // `begun`, when it really began; `week`, the week of the year it begins
   // in (weeks.js).
-  const week = weekNow(now);
+  const week = weekFor(row, now);
   const options = JSON.stringify({ fish: fishIds, begun: now, ...(week && { week }) });
   const ends = now + body.minutes * 60000;
   try {

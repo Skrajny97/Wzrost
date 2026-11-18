@@ -36,7 +36,7 @@ import { ApiError, json, readJson } from './http.js';
 import { herbsOf } from './professions-view.js';
 import { perkOf } from './perks.js';
 import { trimReports } from './reports.js';
-import { keptWeek, weekNow } from './weeks.js';
+import { keptWeek, weekFor } from './weeks.js';
 import { withMinigame } from './minigame.js';
 
 // A JSON path for an id with a hyphen.
@@ -131,7 +131,7 @@ export const shareOf = (amounts, of, count) =>
 // here is the statement before's own. The work keeps the week of the year
 // it begins in (`week`, weeks.js), whose share of its XP it gets.
 export function insertWork(db, avatar, row, { kind, placeId, minutes, now, seed, hp, options }) {
-  const week = weekNow(now);
+  const week = weekFor(row, now);
   const columns = ['character_id', 'kind', 'region_id', 'minutes', 'started_at', 'ends_at', 'seed', ...(avatar ? [] : ['hp_at_start']), 'options'];
   const values = [row.id, kind, placeId, minutes, now, now + minutes * 60000, seed, ...(avatar ? [] : [hp]), JSON.stringify(week ? { ...options, week } : options)];
   return db
@@ -181,7 +181,7 @@ export async function startGathering(context) {
   // `more`: the Bractwo Zielarzy's share of herbs more (589 A), as now;
   // `week`: the week of the year it begins in (weeks.js).
   const more = perkOf(player.row, 'herbYield');
-  const week = weekNow(now);
+  const week = weekFor(player.row, now);
   const options = JSON.stringify({ herbs: herbIds, begun: now, ...(more > 0 && { more }), ...(week && { week }) });
   const ends = now + body.minutes * 60000;
   try {

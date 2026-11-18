@@ -75,5 +75,116 @@
     "questLocked": "Od {level}. poziomu postaci",
     "questsChest": "Za wszystkie zimowe zadania dnia czeka pakiet kart.",
     "questsNote": "Zimowe zadania są codziennie przez cały grudzień i nie da się ich przelosować."
+  },
+  "andrzejki": {
+    "$comment": "Andrzejki: Wieczór wróżb (1082 C, 1083 C, 1084 A i B; src/engine/andrzejki.js, src/server/andrzejki.js). W miesiącu month: dnia days[].day od godziny from (czas polski) do północy jeden wieczór wróżb danego rodzaju (kind: wax to lanie wosku, cups to trzy kubki); każda postać wróży raz każdego wieczoru. Wróżba to jeden z omens, losowany z ziarna serwera: przez hours godzin dodaje value procent do jednego rodzaju premii tygodni (kind jak w weeks.json: xp, gold, items, materials, profession-xp, herbs, rest, reputation), a od razu daje reward: Punkty Czasu (timePoints), złoto z goldMinutes minut wyprawy na poziomie postaci (zaokrąglone do goldRound) albo pakiety kart (packs). Wróżby w oba wieczory jednego roku dają tło portretu background (z cosmetics.json, tylko z wydarzenia) i dopisują do feats postaci feat, z którego liczy się osiągnięcie z tytułem (achievements.json). Wersja testowa (ANDRZEJKI: test) gra każdy dzień od północy: nieparzysty jak lanie wosku, parzysty jak trzy kubki.",
+    "month": 11,
+    "days": [
+      {
+        "day": 29,
+        "from": 18,
+        "kind": "wax"
+      },
+      {
+        "day": 30,
+        "from": 0,
+        "kind": "cups"
+      }
+    ],
+    "hours": 24,
+    "value": 10,
+    "goldRound": 5,
+    "cups": 3,
+    "omens": [
+      {
+        "id": "dragon",
+        "name": "Smok",
+        "kind": "xp",
+        "reward": {
+          "timePoints": 25
+        }
+      },
+      {
+        "id": "purse",
+        "name": "Sakiewka",
+        "kind": "gold",
+        "reward": {
+          "goldMinutes": 60
+        }
+      },
+      {
+        "id": "key",
+        "name": "Klucz",
+        "kind": "items",
+        "reward": {
+          "packs": 1
+        }
+      },
+      {
+        "id": "raven",
+        "name": "Kruk",
+        "kind": "materials",
+        "reward": {
+          "goldMinutes": 60
+        }
+      },
+      {
+        "id": "star",
+        "name": "Gwiazda",
+        "kind": "profession-xp",
+        "reward": {
+          "timePoints": 25
+        }
+      },
+      {
+        "id": "leaf",
+        "name": "Liść",
+        "kind": "herbs",
+        "reward": {
+          "goldMinutes": 60
+        }
+      },
+      {
+        "id": "heart",
+        "name": "Serce",
+        "kind": "rest",
+        "reward": {
+          "timePoints": 25
+        }
+      },
+      {
+        "id": "crown",
+        "name": "Korona",
+        "kind": "reputation",
+        "reward": {
+          "packs": 1
+        }
+      }
+    ],
+    "background": "bg-andrzejki",
+    "feat": "andrzejki",
+    "texts": {
+      "title": "Wieczór wróżb",
+      "lead": "Andrzejki: dwa wieczory wróżb. Każdego wieczoru wróżysz sobie raz, a wróżba daje premię na dobę i mały prezent na dobry początek.",
+      "wax": "Lanie wosku",
+      "waxAbout": "Wosk ze świecy kapie przez oczko starego klucza do miski z wodą i zastyga w kształt. Jego cień na ścianie podpowie, co Cię czeka.",
+      "waxButton": "Wylej wosk",
+      "waxResult": "Wosk zastygł w kształt: {omen}.",
+      "cups": "Trzy kubki",
+      "cupsAbout": "Pod jednym z trzech kubków leży figurka z wosku z wczorajszego wieczoru. Wybierz kubek.",
+      "cup": "Kubek {number}",
+      "cupsResult": "Pod kubkiem leżała figurka: {omen}.",
+      "omen": "{omen}: {effect} przez {hours} godziny.",
+      "reward": "Na dobry początek: {reward}.",
+      "toldWax": "Ten wieczór już wywróżony. Jutro trzy kubki.",
+      "toldCups": "Tegoroczne wróżby za Tobą.",
+      "both": "Za wróżby w oba wieczory: tło portretu „Wieczór andrzejkowy” i osiągnięcie „Andrzejkowa wróżba”.",
+      "bothGot": "Za wróżby w oba wieczory dostajesz tło portretu „Wieczór andrzejkowy”, a w Osiągnięciach czeka tytuł.",
+      "active": "Wróżba: {omen}",
+      "report": "Wróżba {omen}: {effects}.",
+      "closed": "Wieczór wróżb już minął.",
+      "taken": "Ten wieczór już wywróżony.",
+      "changed": "Coś się zmieniło w międzyczasie. Spróbuj jeszcze raz."
+    }
   }
 }

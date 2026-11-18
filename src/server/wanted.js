@@ -16,7 +16,7 @@ import { sourceFamePoints } from './fame.js';
 import { ApiError, json, readJson } from './http.js';
 import { requireOpen, settlementOf, settlementView } from './settlement.js';
 import { hallRecord } from './trial-hall.js';
-import { weekFactorNow } from './weeks.js';
+import { weekFactorFor } from './weeks.js';
 
 const today = (now) => questPeriod('daily', now, content()).key;
 
@@ -218,7 +218,7 @@ export async function claimWanted(context) {
   if (!taken?.beaten) throw new ApiError(409, 'not_beaten', rules.texts.notBeaten);
   const add = (points, id, gain) => ({ ...points, [id]: (points[id] ?? 0) + gain });
   // The brotherhood's reputation with the week's share (weeks.js).
-  const reputation = weekCount(rules.reputation, weekFactorNow(context.now, 'reputation'), `wanted:${taken.id}`);
+  const reputation = weekCount(rules.reputation, weekFactorFor(row, context.now, 'reputation'), `wanted:${taken.id}`);
   const next = {
     ...stored,
     reputation: add(stored.reputation, rules.brotherhood, reputation),

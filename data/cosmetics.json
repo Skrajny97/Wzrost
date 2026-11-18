@@ -78,6 +78,14 @@
       "art": "bg-szczodre"
     },
     {
+      "id": "bg-andrzejki",
+      "kind": "background",
+      "name": "Wieczór andrzejkowy",
+      "description": "Chata w puszczy w andrzejkowy wieczór: świeca, miska z woskiem i stary klucz. Tylko za wróżby w oba wieczory Andrzejek.",
+      "event": "andrzejki",
+      "art": "bg-andrzejki"
+    },
+    {
       "id": "sabertooth",
       "kind": "mountSkin",
       "name": "Tygrys szablozębny",
