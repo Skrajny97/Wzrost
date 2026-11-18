@@ -418,7 +418,7 @@ Object.assign(SKILL_LOOKS['ball-lightning'], { orb: 'globe', wake: 'globe', kind
 // up, its bites bleeding (Wódz watahy); the brown bear rearing up with a
 // roar, its paw raking three claw marks (Zew niedźwiedzia).
 Object.assign(SKILL_LOOKS['pack-chief'], { arrival: 'alpha-wolf', orb: 'bite', kind: 'physical', chief: true });
-Object.assign(SKILL_LOOKS['bear-call'], { arrival: 'bear', kind: 'physical', grizzly: true, dazed: true });
+Object.assign(SKILL_LOOKS['bear-call'], { arrival: 'bear', orb: 'maul', kind: 'physical', grizzly: true, dazed: true });
 // The Stwórca Żywiołów: fire, ice, lightning and boulders falling at once
 // out of a dark sky (Pierwotny chaos); four orbs of the elements sinking
 // into the elemental, its blows bursting in all four colours (Żywiołak).
@@ -431,7 +431,7 @@ Object.assign(SKILL_LOOKS['ice-heart'], { iceheart: true, stance: 'unit--shielde
 // The Pradruid: the ancient oak with roots under the whole field, its
 // branches lashing and roots twining up its foe (Dąb wieków); the forest
 // breathing in, vines blossoming on every card (Odrodzenie puszczy).
-Object.assign(SKILL_LOOKS['oak-of-ages'], { arrival: 'oak', kind: 'physical', ancient: true });
+Object.assign(SKILL_LOOKS['oak-of-ages'], { arrival: 'oak', orb: 'lash', kind: 'physical', ancient: true });
 SKILL_LOOKS['forest-rebirth'].rebirth = true;
 // The Archanioł: wings of light and a rain of light over the party
 // (Boskie uzdrowienie); wings of light shielding every card (Skrzydła
@@ -10532,8 +10532,13 @@ export function skillEffects(kit) {
     const width = stageWidth();
     const head = { x: art.x + art.width / 2, y: art.y + art.height * 0.3 };
     const size = Math.round(Math.max(30, Math.min(figure * 0.85, 64)));
-    // (The moon over the wolf's card, not over its figure.)
-    const moonAt = { x: inside(box.x + box.width / 2, size / 2 + 2, width), y: Math.max(size / 2 + 2, box.y - size * 0.6) };
+    // (Night falls over the arena a moment, and the moon rises high in its
+    // sky over the wolf's side of the field.)
+    const night = spark('fx-sky fx-sky--night', { x: 0, y: 0 });
+    night.style.width = `${width}px`;
+    night.style.height = `${Math.round(stageHeight() * 0.7)}px`;
+    animate(night, [{ opacity: 0 }, { opacity: 0.85, offset: 0.25 }, { opacity: 0.8, offset: 0.75 }, { opacity: 0 }], { duration: 1500, delay: 150, fill: 'backwards' }).then(() => night.remove());
+    const moonAt = { x: inside(box.x + box.width / 2, size / 2 + 2, width), y: Math.round(Math.max(size * 0.7, stageHeight() * 0.09)) };
     const moon = spark('fx-moon', moonAt, { '--size': `${size}px` });
     animate(
       moon,
@@ -10620,7 +10625,7 @@ export function skillEffects(kit) {
       shake(4, 420);
       flash('#c98a4b', 0.1, 300);
       for (let k = 0; k < 3; k++) {
-        const wave = spark('fx-ragewave', head, { '--fx': color, '--size': `${Math.round(figure * (1 + k * 0.2))}px` });
+        const wave = spark('fx-ragewave', head, { '--fx': '#ffcf8a', '--size': `${Math.round(figure * (1.3 + k * 0.25))}px` });
         wave.innerHTML = RAGE_WAVE;
         animate(
           wave,
