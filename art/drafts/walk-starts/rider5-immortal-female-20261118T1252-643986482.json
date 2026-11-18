@@ -1,0 +1,19 @@
+{
+  "id": "rider5-immortal-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the warrior woman of the reference picture riding: the same long dark hair in one thick braid falling over the shoulder, the same golden laurel wreath on the head, the same golden muscled breastplate with a lion's head, the same winged golden pauldrons, the same dark leather skirt of strips with golden studs over a purple skirt, the same long purple cloak with small stars hanging behind from the shoulders, its edge clean and outlined, golden greaves and brown sandals, nothing in the hands but the reins, no sword and no shield; sitting tall and upright astride a saddle that is not drawn, the back straight, not squatting and not crouching, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the knee bent at a right angle, the lower leg in a golden greave hanging vertically straight down from the knee, one whole foot in a brown sandal at the bottom with the toes pointing right; the braid and the cloak hanging down behind the back, not spread out; the far leg completely hidden and not drawn at all, no second sandal and no second foot; the whole figure from the top of the wreath to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/immortal-female.png",
+      "usage": "the character's look: this same woman, her face, braid, laurel wreath, golden armour with the lion, winged pauldrons, skirt, starry purple cloak and colours, drawn the same way; not her standing pose and not the sword and shield"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08099473132027521
+  },
+  "images": 4
+}
