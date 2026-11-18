@@ -165,6 +165,11 @@ export async function guildView(db, characterId, now) {
         ...rankView({ role: row.role, probationUntil: row.probation_until }),
         own: row.id === characterId,
         online: online(row),
+        // When its player last had the game open, as for a friend in the
+        // Znajomi (a player's wish the author found wise, 18.11.2026:
+        // „Przydałoby się widzieć kiedy ktoś się zalogował w gildii tak jak u
+        // znajomych”): the account's seen_at, null for one never seen.
+        lastSeen: row.seen_at ?? null,
       })),
       invited: sent.results.map((row) => ({ id: row.id, name: row.name })),
       friends: friends.results.map((row) => ({ id: row.id, name: row.name, nameColor: nameColorOf(row.cosmetics), classId: row.class_id, level: row.level, online: online(row) })),

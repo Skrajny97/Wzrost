@@ -3694,6 +3694,17 @@ Autor 17.11.2026, ze zrzutem Kleryka na kucu obok dwóch towarzyszy: „za duże
 2. Pełna grafika: portrety i chody przyjęte wcześniej (1049–1058), jeźdźcy przyjęci po kolei w czacie (1071–1079), wszystko z ośmioma odcieniami skóry. Kruk i ognik siedzą na zimowych portretach tam, gdzie zwykle (`perches`), bo nie zasłaniają gwiazdy, kryształu ani łuku.
 3. **Zimowa Cień w siodle** (1079: 2): autor wybrał wersję z pustą pięścią, a potem: „1079 dorób wodze i będzie dobrze”. Ma więc w pięści dorysowane dwa cienkie paski w kolorach pasków zimowego Cienia, a wodze renifera idą do ich końców. Zimowy Cień siedzi 4 piksele wyżej niż w pierwszej wersji (autor: „1078 za nisko siedzi w większości przypadków”), z kolanem na wysokości innych zimowych jeźdźców, i tak samo zimowa Cień.
 
+## Gildia: kiedy członek był ostatnio w grze (uwaga gracza poz. 56, 18.11.2026, od 0.4.25)
+
+Autor przekazał uwagę gracza (poz. 56) z Panelu autora: „Przydałoby się widzieć kiedy ktoś się zalogował w gildii tak jak u znajomych”. Autor: „mądra uwaga”.
+
+1. **Na liście członków gildii obok poziomu stoi, kiedy członek był ostatnio w grze**, tak samo jak w Znajomych: „teraz” przy zielonej kropce, a poza tym „5 min temu”, „3 godz. temu”, „wczoraj” albo „12 dni temu” (`lastSeen` w `src/server/guilds.js`, `seenTag` w `src/client/screens/friends.js`). Liczy się ostatnia wizyta konta, jak przy znajomych. Członek, którego konta gra jeszcze nie widziała, nie ma tego dopisku.
+2. **Brakujący szczegół: wygląd jak w Znajomych, bez makiet.** To ten sam dopisek w takiej samej liście, więc nie jest to nowy wygląd ekranu. Sprawdzone na 320, 390, 1366 i 1920 px: wiersz mieści się w ramce, bez przewijania na boki.
+
+## Wersja 0.4.25 (18.11.2026): kiedy członkowie gildii byli ostatnio w grze
+
+1. **Gildia** (wyżej): przy każdym członku, kiedy był ostatnio w grze, jak w Znajomych.
+
 ## Wersja 0.4.24 (17.11.2026): zimowe stroje w sklepie od grudnia, kody w Panelu autora, piesi obok kuca
 
 1. **Zimowe stroje** (wyżej): w Sklepie Systemu w grudniu, za 800 Punktów Systemu.

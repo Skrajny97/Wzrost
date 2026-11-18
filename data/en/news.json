@@ -1044,6 +1044,10 @@
     "0.4.24": {
       "title": "Version 0.4.24",
       "body": "- In December the System Shop's Outfits tab will have winter outfits for every class: Generous Feast Armour, Winter Archer's Garb, Frost Mage's Furs, Star-Bearer's Robes and Winter Night Cloak. Each costs 800 System Points and works with every evolution: on the portrait, on the march and in the saddle. On sale only in December.\n- When your character rides a pony, the companions walking beside it are now bigger and fit the rider better."
+    },
+    "0.4.25": {
+      "title": "Version 0.4.25",
+      "body": "- The guild's member list now shows when each member was last in the game, as in Friends: “now”, “3 h ago”, “yesterday” or “12 days ago”."
     }
   }
 }
