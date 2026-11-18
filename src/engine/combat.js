@@ -123,7 +123,8 @@ const SKILL_WORDS = { hit: 'skillHit', crit: 'skillCrit', dodge: 'skillDodge' };
 // to.
 const ELEMENTAL = ['fire', 'frost', 'lightning'];
 // The id the skeleton raised by Żniwo goes under in the account, as a
-// summon's skill (its figure: the creature "skeleton").
+// summon's skill (its figure: the creature "skeleton"; the Władca Nawii's
+// upiór Nawii stands as the creature "upior").
 export const RISEN = 'risen';
 // The share of its HP left at which a blow growing with the user's lost HP
 // (Rzeź's `rage`) is at its strongest, unless the skill names its own.
@@ -667,7 +668,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       skill: RISEN,
       skillName: feat.name,
       summon: name,
-      figure: 'skeleton',
+      figure: feat.raiseAll ? 'upior' : 'skeleton',
       summonHp: hp,
       hp: source.hp,
       text: say(texts, feat.raiseAll ? 'summonRisenWraith' : 'summonRisen', actions, { target: fallen.name, summon: name, hp }),
