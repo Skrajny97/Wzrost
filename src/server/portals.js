@@ -50,13 +50,15 @@ const today = (now) => questPeriod('daily', now, content()).key;
 // who do not stay in the Kwatery, a wounded one too (a portal takes
 // nobody's HP), but never its Drużyna (the author: "Możliwość zabrania
 // towarzyszy, ale w tym przypadku - nie drużyn"); at most as many as go on
-// explorations. While the character is in a Drużyna its companions stay in
-// the Kwatery (828 B), so none comes along, as before, when every one of
-// them had to be told to stay first. The Labirynt takes them the same way
-// (850 A, labyrinth.js).
+// explorations. The Labirynt takes them the same way (850 A, labyrinth.js).
+// A Drużyna keeps them home only from its explorations: the portals and the
+// Labirynt are the character's own, so they come along in a party too
+// (players, 18.11.2026: leaving the party "za każdym razem jak chce się
+// robić labirynt", the author: „labirynt jeśli automat może być”); until
+// then they stayed in the Kwatery there as well (828 B).
 export const companionsOf = (player) =>
   (JSON.parse(player.row.settlement ?? '{}').companions ?? [])
-    .filter((companion) => !companionStays(companion, player.inParty) && companionReady(companion, true))
+    .filter((companion) => !companionStays(companion) && companionReady(companion, true))
     .slice(0, companionsGoingMost(content()));
 // The sweeps of a later day leave none for today (laterPeriod in quests.js):
 // a request still of the day gone sweeps nothing and writes no day back (the

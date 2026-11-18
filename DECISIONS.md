@@ -3761,6 +3761,11 @@ Najpierw Tier X przedmiotów (potrzebny najlepszej postaci za około dwa tygodni
 
 Motyw B, słowiańskie zaświaty: Mgliste Bagna Nawii (276–300), Łąki Welesa (301–325) i Kraina bez Słońca (326–350). Karta Mglistych Bagien Nawii: szkic D. Dalej: miejsca, stwory, elity i czempioni na stronie ocen (mało ptaków), potem grafiki.
 
+## Wersja 0.4.31 (18.11.2026): towarzysze w Labiryncie i Portalach także w Drużynie
+
+1. **Labirynt i Portale z towarzyszami także w Drużynie.** Gracze (poz. 120, 70 i 61): żeby zrobić Labirynt albo coś innego z towarzyszami, trzeba za każdym razem wychodzić z Drużyny. Autor: „mądre uwagi te opcje z drużyną/z towarzyszami oraz labirynt jeśli automat może być”. Labirynt i Portale są zawsze sprawą samej postaci, więc towarzysze z Kwater idą tam z nią także wtedy, gdy jest w Drużynie (wcześniej, od 828 B, zostawali wtedy w Kwaterach). W Portalach dalej działa pole „Zabierz towarzyszy”. Towarzysz, któremu gracz kazał zostać w kwaterze, zostaje jak dotąd. Na wyprawy towarzysze w Drużynie dalej nie chodzą, a karta towarzysza i pytanie przed wejściem do Drużyny mówią teraz o Labiryncie i Portalach. Labirynt dnia założony, gdy postać była w Drużynie, ma swoją ekipę do północy albo do zresetowania.
+2. **Wybór „z drużyną” albo „z towarzyszami” przy wyprawie** czeka na makiety na stronie ocen (zmiana wyglądu ekranu Walki).
+
 ## Wersja 0.4.30 (18.11.2026): chowańce nad ramką postaci
 
 1. **Chowaniec nad ramką.** Gracz (poz. 47): z ramką postaci Chowańca Lisa w ogóle nie widać, bo przykrywa go ramka. Autor: „niech chowańce będą ponad ramką”. Chowaniec stoi dalej w tym samym miejscu okna ramki, ale jest rysowany nad ramką, na Postaci, w podglądach Sklepu Systemu, na karcie gracza i przy oprawianiu kamieni (`portraitLayers` w `src/client/cosmetics.js`). Na Postaci z widocznymi miejscami na przedmioty jest przygaszony jak cała postać.
