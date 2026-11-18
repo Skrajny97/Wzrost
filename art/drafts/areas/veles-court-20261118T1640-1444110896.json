@@ -1,0 +1,14 @@
+{
+  "id": "veles-court",
+  "tool": "pixellab generate-image-v2",
+  "description": "a long hall of black logs in the underworld, piles of gold heaped by its open doors, a cold green fire burning inside, carved horned posts at the entrance, centered composition for a round medallion frame, pixel art scene, muted dark palette of black, deep green and old gold, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

@@ -1,0 +1,14 @@
+{
+  "id": "misty-shore",
+  "tool": "pixellab generate-image-v2",
+  "description": "a grey river shore at the edge of the slavic underworld, fog hanging so low that only pale blue ghost lights glow above the black water, an empty dark dugout canoe drifting by the shore, dead reeds, centered composition for a round medallion frame, pixel art scene, muted dark palette of ghostly teal, fog greys and deep violet, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

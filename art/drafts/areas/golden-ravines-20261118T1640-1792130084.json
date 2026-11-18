@@ -1,0 +1,14 @@
+{
+  "id": "golden-ravines",
+  "tool": "pixellab generate-image-v2",
+  "description": "deep narrow ravines between dark rocks where gold lies on the surface, glittering gold coins and nuggets scattered on the ground, a faint green glow from below, centered composition for a round medallion frame, pixel art scene, muted dark palette of black, dark stone greys and gleaming gold, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

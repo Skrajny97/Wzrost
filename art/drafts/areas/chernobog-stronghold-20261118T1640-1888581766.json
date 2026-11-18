@@ -1,0 +1,14 @@
+{
+  "id": "chernobog-stronghold",
+  "tool": "pixellab generate-image-v2",
+  "description": "a stronghold of black stone on a hill in eternal night, torches burning with black flames that eat the light, a heavy black gate, centered composition for a round medallion frame, pixel art scene, muted dark palette of black, cold violets and dark greys, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

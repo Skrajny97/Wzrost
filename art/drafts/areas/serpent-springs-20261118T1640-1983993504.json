@@ -1,0 +1,14 @@
+{
+  "id": "serpent-springs",
+  "tool": "pixellab generate-image-v2",
+  "description": "springs bubbling up between the giant glowing roots of the world tree, glowing green water in stone pools, roots twisting like serpents, centered composition for a round medallion frame, pixel art scene, muted dark palette of deep greens, black and glowing emerald, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

@@ -1,0 +1,14 @@
+{
+  "id": "black-lake",
+  "tool": "pixellab generate-image-v2",
+  "description": "a still lake black as tar that never reflected the sun, a thin rim of ice at its shores, bare frozen trees, mist over the water, centered composition for a round medallion frame, pixel art scene, muted dark palette of black, icy blues and pale greys, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

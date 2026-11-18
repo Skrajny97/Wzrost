@@ -1,0 +1,14 @@
+{
+  "id": "road-of-the-dead",
+  "tool": "pixellab generate-image-v2",
+  "description": "a snowy trail through dark spruce trees in eternal winter night, old sled runner tracks in the snow, a few wooden grave markers along the way, centered composition for a round medallion frame, pixel art scene, muted dark palette of icy blues, black and snow whites, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

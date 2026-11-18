@@ -1,0 +1,14 @@
+{
+  "id": "koschei-castle",
+  "tool": "pixellab generate-image-v2",
+  "description": "a castle of ice and bone at the very bottom of the underworld, sharp towers of ice with bone ornaments, a cold blue glow in its windows, centered composition for a round medallion frame, pixel art scene, muted dark palette of icy blues, bone whites and black, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

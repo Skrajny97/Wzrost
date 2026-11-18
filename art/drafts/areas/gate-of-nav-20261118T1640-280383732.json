@@ -1,0 +1,14 @@
+{
+  "id": "gate-of-nav",
+  "tool": "pixellab generate-image-v2",
+  "description": "an enormous gate of black wood as tall as pine trees standing alone in the fog, the doors slightly open, a glimpse of a pale green meadow beyond it, centered composition for a round medallion frame, pixel art scene, muted dark palette of ghostly greys, black and pale green, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

@@ -1,0 +1,14 @@
+{
+  "id": "eternal-pastures",
+  "tool": "pixellab generate-image-v2",
+  "description": "an endless underworld meadow of tall grass that never withers, no sun in a starless sky, the grass lit from below by an eerie green glow, a few ancient standing stones, centered composition for a round medallion frame, pixel art scene, muted dark palette of deep greens, black and soft gold, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

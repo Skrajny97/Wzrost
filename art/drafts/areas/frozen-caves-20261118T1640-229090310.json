@@ -1,0 +1,14 @@
+{
+  "id": "frozen-caves",
+  "tool": "pixellab generate-image-v2",
+  "description": "deep ice caves in eternal darkness, thick frost on the walls, huge icicles, dark shapes of ancient beasts frozen inside the ice, centered composition for a round medallion frame, pixel art scene, muted dark palette of icy blues, black and pale violet, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

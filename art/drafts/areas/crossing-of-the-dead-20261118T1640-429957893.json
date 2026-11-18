@@ -1,0 +1,14 @@
+{
+  "id": "crossing-of-the-dead",
+  "tool": "pixellab generate-image-v2",
+  "description": "an old wooden landing pier in the fog where canoes carry the dead to the far shore, a few empty dark canoes tied to the posts, dim lanterns hanging on the pier, centered composition for a round medallion frame, pixel art scene, muted dark palette of ghostly teal, fog greys and lantern yellows, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
