@@ -1,0 +1,14 @@
+{
+  "id": "house-serpent",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Cmok, a big fat golden-brown house serpent of Polish folklore with a crown-like crest on its head, coiled up, a few gold coins glinting in its scales, fangs bared, gleaming eyes, menacing, full body, three-quarter view, the snake alone, no coin pile, no treasure, no ground, no background, the whole snake inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02343898985799154
+  },
+  "images": 1
+}
