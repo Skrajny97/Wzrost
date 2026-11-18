@@ -1104,6 +1104,10 @@
     "0.4.39": {
       "title": "Version 0.4.39",
       "body": "- Generous Feast (1–24 December): the winter set (the Hoarfrost frame, the Generous Feast background and the Snowstorm aura) comes in the 24th window only if you took all 24 windows.\n- From 12 to 24 December you can also buy each piece of the set for System Points, only in the calendar's window."
+    },
+    "0.4.40": {
+      "title": "Version 0.4.40",
+      "body": "- Every guild member now gets a Beast Chest, even without attacking. It counts everyone who was in the guild when the beast came or joined before it fell. This also applies to this week's and last week's beasts.\n- New beasts have twice as much HP. The beasts already standing this week stay as they are.\n- A heal of the whole party no longer shows \"+0\" on characters at full HP."
     }
   }
 }

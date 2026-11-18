@@ -1385,6 +1385,11 @@
       "id": "0.4.39",
       "title": "Wersja 0.4.39",
       "body": "- Szczodre Gody (1–24 grudnia): zimowy zestaw (ramka Szron, tło Szczodre Gody i aura Śnieżyca) dostaniesz w 24. okienku tylko za odebranie wszystkich 24 okienek.\n- Od 12 do 24 grudnia każdy przedmiot zestawu kupisz też za Punkty Systemu, tylko w oknie kalendarza."
+    },
+    {
+      "id": "0.4.40",
+      "title": "Wersja 0.4.40",
+      "body": "- Skrzynię Bestii dostaje teraz każdy członek gildii, także ten, kto nie atakował. Liczy się każdy, kto był w gildii, gdy przyszła bestia, albo dołączył, zanim padła. Dotyczy to też bestii z tego i poprzedniego tygodnia.\n- Nowe bestie mają dwa razy więcej HP. Bestie, które już stoją w tym tygodniu, zostają takie, jakie są.\n- Leczenie całej drużyny nie pokazuje już „+0” przy postaciach z pełnym zdrowiem."
     }
   ]
 }
