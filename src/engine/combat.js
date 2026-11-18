@@ -1647,14 +1647,17 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
           // Odrodzenie puszczy: the summons of the party stand at full HP again.
           if (p.summonsFull) for (const summon of member.summons) summon.hp = Math.max(summon.hp, summon.maxHp);
           const own = member === actor;
-          log(() => ({
-            ...base,
-            kind: 'heal',
-            target: member.id,
-            amount,
-            hp: member.hp,
-            text: own ? say(texts, 'skillHeal', actions, { ...vars, amount }) : say(texts, 'regen', actions, { skill: skill.name, target: member.name, amount }),
-          }));
+          // A companion already at full HP gets no line and no "+0": the
+          // caster's own line stays, as it says the skill was used.
+          if (own || amount > 0)
+            log(() => ({
+              ...base,
+              kind: 'heal',
+              target: member.id,
+              amount,
+              hp: member.hp,
+              text: own ? say(texts, 'skillHeal', actions, { ...vars, amount }) : say(texts, 'regen', actions, { skill: skill.name, target: member.name, amount }),
+            }));
           // Cudowne uzdrowienie takes every bad effect off by itself.
           if (care > 1 || p.cleanse) cleanse(member, actor, t, Boolean(p.cleanse));
         }
