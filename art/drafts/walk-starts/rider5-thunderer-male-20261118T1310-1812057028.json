@@ -1,0 +1,19 @@
+{
+  "id": "rider5-thunderer-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the man of the reference picture riding: a tall man with long golden blond hair flowing down his back, a dark steel helmet with two small silver wings at the sides and the face showing, dark blue-grey steel plate armour with gold trim and thin glowing cyan lines, a round golden boss on the shoulder plate, a long dark grey-blue cloak hanging behind from the shoulders, dark steel boots, one long black bow strapped upright on the back behind the shoulder, the whole bow above the waist and behind the body, never in front of the legs, beside a quiver of blue-fletched arrows, nothing in the hands but the reins; sitting tall and upright astride a saddle that is not drawn, the back straight, not squatting and not crouching, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the knee bent at a right angle, the lower leg hanging vertically straight down from the knee, one whole foot at the bottom with the toes pointing right; the cloak and any long hair hanging down behind the back, not spread out; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the top of the head to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/thunderer-male.png",
+      "usage": "the character's look: this same man, his face, hair, headwear, armour or robes, cloak and colours, drawn the same way; not his standing pose and not the bow in the hands"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08107024523946973
+  },
+  "images": 4
+}

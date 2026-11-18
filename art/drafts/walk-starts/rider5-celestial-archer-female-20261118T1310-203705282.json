@@ -1,0 +1,19 @@
+{
+  "id": "rider5-celestial-archer-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the woman of the reference picture riding: a young woman with warm brown skin and long black hair in a high ponytail falling down her back, a silver tiara with a blue gem, a calm pretty young woman's face in clean profile with one eye, a small straight nose and closed lips, ornate silver and white plate armour with gold trim and a glowing star on the chest, a long dark blue cloak full of stars and purple mist hanging behind from the shoulders, silver boots, one long white and gold bow strapped upright on the back behind the shoulder, the whole bow above the waist and behind the body, never in front of the legs, nothing in the hands but the reins; sitting tall and upright astride a saddle that is not drawn, the back straight, not squatting and not crouching, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the knee bent at a right angle, the lower leg hanging vertically straight down from the knee, one whole foot at the bottom with the toes pointing right; the cloak and any long hair hanging down behind the back, not spread out; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the top of the head to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/celestial-archer-female.png",
+      "usage": "the character's look: this same woman, her face, hair, headwear, armour or robes, cloak and colours, drawn the same way; not her standing pose and not the bow in the hands"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08122235992219713
+  },
+  "images": 4
+}
