@@ -3742,6 +3742,10 @@ Najpierw Tier X przedmiotów (potrzebny najlepszej postaci za około dwa tygodni
 
 Motyw B, słowiańskie zaświaty: Mgliste Bagna Nawii (276–300), Łąki Welesa (301–325) i Kraina bez Słońca (326–350). Karta Mglistych Bagien Nawii: szkic D. Dalej: miejsca, stwory, elity i czempioni na stronie ocen (mało ptaków), potem grafiki.
 
+## Wersja 0.4.27 (18.11.2026): umiejętności ewolucji „na maks. poziomie”
+
+1. **Opis ewolucji** (karta ewolucji w zakładce Ewolucja): nagłówek „Umiejętności (na maks. poziomie)” zamiast „(na 45. poziomie)”, bo liczby w opisie są dla najwyższego poziomu umiejętności, a numer mylił. Autor: „zmień opis Umiejętności (na maks. poziomie) zamiast 45. bo to mylące” (18.11.2026). Po angielsku „(at the top level)”.
+
 ## Wersja 0.4.26 (18.11.2026): Tier X przedmiotów i Andrzejki
 
 1. **Tier X przedmiotów** (1086, wyżej): 22 przedmioty od 200. poziomu klasy, z wypraw od ostatniego miejsca Ostępów Nowiu, a od 200. poziomu klasy też z innych źródeł. Wzorów do wyrobu jeszcze nie ma: dojdą z nowymi krainami.

@@ -1320,6 +1320,11 @@
       "id": "0.4.26",
       "title": "Wersja 0.4.26",
       "body": "- Tier X przedmiotów: 22 nowe przedmioty od 200. poziomu klasy, po jednym w każdej rodzinie, m.in. Miecz Grunwaldzki, Łuk Jutrzenki, Kostur Welesa, Hełm Mieszka i Korona Jadwigi. Wypadają na wyprawach od ostatniego miejsca Ostępów Nowiu (poz. 196–200), a postaci z klasą na 200. poziomie dają je też skrzynia tygodniowa, handlarz, Salon Gier, Wieże, Bestia, Wyprawa Gildii i wojna gildii. Encyklopedia pokazuje je już teraz.\n- Andrzejki: 29 listopada od 18:00 na ekranie Walki czeka Wieczór wróżb. Wylewasz wosk przez oczko starego klucza, a jego kształt to Twoja wróżba. 30 listopada przez cały dzień wybierasz jeden z trzech kubków, a pod nim leży figurka z wosku. Każda wróżba daje na dobę premię, np. więcej XP albo złota z walk, i od razu mały prezent. Za wróżby w oba wieczory zgarniesz tło portretu „Wieczór andrzejkowy” i osiągnięcie „Andrzejkowa wróżba” z tytułem Wróżbita albo Wróżka."
+    },
+    {
+      "id": "0.4.27",
+      "title": "Wersja 0.4.27",
+      "body": "- W opisie ewolucji nagłówek umiejętności mówi teraz „na maks. poziomie” zamiast numeru poziomu. Liczby w opisie zawsze były dla najwyższego poziomu umiejętności, a numer mylił."
     }
   ]
 }
