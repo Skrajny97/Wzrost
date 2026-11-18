@@ -1,0 +1,19 @@
+{
+  "id": "rider5-ravager-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the warrior woman of the reference picture riding: the same long dark red hair with thin braids falling down her back, the same two dark curved horns on her head, the same glowing orange eyes, the same dark spiked armour on the shoulders and arms with glowing orange cracks like embers, the same bare midriff with glowing cracks, the same belt of small skulls, the same torn dark red skirt with glowing cracks, the same long tattered dark red cloak hanging behind from the shoulders, its edge clean and outlined, dark fur-trimmed armoured boots, a slim strong woman, nothing in the hands but the reins, no axe; sitting astride a saddle that is not drawn, upright, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the armoured lower leg hanging straight down from the knee, one whole dark armoured boot at the bottom with the toes pointing right; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the tips of the horns to the sole of the boot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/ravager-female.png",
+      "usage": "the character's look: this same woman, her face, hair, horns, armour with glowing cracks, skull belt, skirt, cloak and colours, drawn the same way; not her standing pose and not the axe on her shoulder"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08104261708259583
+  },
+  "images": 4
+}
