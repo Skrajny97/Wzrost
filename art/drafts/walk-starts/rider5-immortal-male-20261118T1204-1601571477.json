@@ -1,0 +1,19 @@
+{
+  "id": "rider5-immortal-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the hero of the reference picture riding: the same short dark hair and short dark beard, the same golden glowing wreath of light around the head, the same golden muscled breastplate with a lion's head, the same winged golden pauldrons, the same dark leather skirt of strips with golden studs, the same long purple cloak with small stars hanging behind from the shoulders, its edge clean and outlined, golden greaves and brown sandals, nothing in the hands but the reins, no sword and no shield; sitting astride a saddle that is not drawn, upright, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the lower leg in a golden greave hanging straight down from the knee, one whole foot in a brown sandal at the bottom with the toes pointing right; the far leg completely hidden and not drawn at all, no second sandal and no second foot; the whole figure from the top of the glow to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/immortal-male.png",
+      "usage": "the character's look: this same man, his face, hair, beard, wreath of light, golden armour with the lion, winged pauldrons, skirt, starry purple cloak and colours, drawn the same way; not his standing pose and not the sword and shield"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08106246664788988
+  },
+  "images": 4
+}
