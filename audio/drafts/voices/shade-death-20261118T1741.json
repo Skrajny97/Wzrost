@@ -1,0 +1,13 @@
+{
+  "id": "shade-death",
+  "payload": {
+    "text": "a dark shadow gives a long fading whispery hiss that dissolves into silence, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/shade-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/shade-death-20261118T1741-1.mp3"
+  ],
+  "credits": 56
+}

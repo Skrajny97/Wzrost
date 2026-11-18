@@ -1,0 +1,13 @@
+{
+  "id": "death-candle-death",
+  "payload": {
+    "text": "a large candle flame gutters and goes out with a long hiss, a soft puff and a curl of smoke, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/death-candle-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/death-candle-death-20261118T1741-1.mp3"
+  ],
+  "credits": 48
+}

@@ -1,0 +1,13 @@
+{
+  "id": "pseudoscorpion-hurt",
+  "payload": {
+    "text": "a giant pincered arachnid gives a dry clicking chitter of pain with a snap of claws, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/pseudoscorpion-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/pseudoscorpion-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 20
+}

@@ -1,0 +1,13 @@
+{
+  "id": "black-flame-death",
+  "payload": {
+    "text": "a dark magical flame sputters, hisses for a long time and goes out with a deep hollow whoomp, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/black-flame-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/black-flame-death-20261118T1741-1.mp3"
+  ],
+  "credits": 52
+}

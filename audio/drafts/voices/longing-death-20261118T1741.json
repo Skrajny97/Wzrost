@@ -1,0 +1,13 @@
+{
+  "id": "longing-death",
+  "payload": {
+    "text": "a sad ghost gives a long sorrowful sigh that fades into a distant echo, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/longing-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/longing-death-20261118T1741-1.mp3"
+  ],
+  "credits": 56
+}

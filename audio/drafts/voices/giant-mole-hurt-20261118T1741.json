@@ -1,0 +1,13 @@
+{
+  "id": "giant-mole-hurt",
+  "payload": {
+    "text": "a huge blind mole gives a short squealing snort of pain with a scrape of digging claws, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/giant-mole-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/giant-mole-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 20
+}

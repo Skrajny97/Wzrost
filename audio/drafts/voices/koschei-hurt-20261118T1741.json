@@ -1,0 +1,13 @@
+{
+  "id": "koschei-hurt",
+  "payload": {
+    "text": "an ancient skeletal sorcerer gives a raspy furious snarl of pain with a rattle of bones, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/koschei-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/koschei-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 28
+}

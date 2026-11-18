@@ -1,0 +1,13 @@
+{
+  "id": "two-headed-snake-death",
+  "payload": {
+    "text": "a big snake gives a long fading double hiss that dies into a dry rustle of scales, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/two-headed-snake-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/two-headed-snake-death-20261118T1741-1.mp3"
+  ],
+  "credits": 48
+}

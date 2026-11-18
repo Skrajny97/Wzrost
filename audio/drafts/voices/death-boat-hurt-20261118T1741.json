@@ -1,0 +1,13 @@
+{
+  "id": "death-boat-hurt",
+  "payload": {
+    "text": "an old wooden boat creaks and cracks sharply as if struck, with a hollow knock of wet wood, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/death-boat-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/death-boat-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 20
+}

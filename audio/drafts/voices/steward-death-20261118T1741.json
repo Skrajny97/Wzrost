@@ -1,0 +1,13 @@
+{
+  "id": "steward-death",
+  "payload": {
+    "text": "a ghostly servant gives a long wheezing sigh as a tray of dishes crashes to the floor, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/steward-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/steward-death-20261118T1741-1.mp3"
+  ],
+  "credits": 56
+}

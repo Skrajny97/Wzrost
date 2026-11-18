@@ -1,0 +1,13 @@
+{
+  "id": "bumblebee-death",
+  "payload": {
+    "text": "a giant bumblebee buzzes in a long descending drone that sputters out, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/bumblebee-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/bumblebee-death-20261118T1741-1.mp3"
+  ],
+  "credits": 48
+}

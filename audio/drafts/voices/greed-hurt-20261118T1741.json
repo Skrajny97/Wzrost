@@ -1,0 +1,13 @@
+{
+  "id": "greed-hurt",
+  "payload": {
+    "text": "a magical golden glow gives a sharp shimmering chime of pain with a jingle of coins, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/greed-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/greed-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 20
+}

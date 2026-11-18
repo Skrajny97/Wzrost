@@ -1,0 +1,13 @@
+{
+  "id": "veles-death",
+  "payload": {
+    "text": "an ancient horned god gives a long deep dying roar that rumbles away like distant thunder over a meadow, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/veles-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/veles-death-20261118T1741-1.mp3"
+  ],
+  "credits": 64
+}

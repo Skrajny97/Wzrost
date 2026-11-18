@@ -1,0 +1,13 @@
+{
+  "id": "dead-water-death",
+  "payload": {
+    "text": "dark magical water gurgles slowly and drains away with a long fading bubbling, then goes still, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/dead-water-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/dead-water-death-20261118T1741-1.mp3"
+  ],
+  "credits": 56
+}

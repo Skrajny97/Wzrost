@@ -1,0 +1,13 @@
+{
+  "id": "nameless-death",
+  "payload": {
+    "text": "a faceless ghost gives a long hollow sigh that thins into a cold whisper of wind and vanishes, no words, close up, dry, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/nameless-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/nameless-death-20261118T1741-1.mp3"
+  ],
+  "credits": 60
+}

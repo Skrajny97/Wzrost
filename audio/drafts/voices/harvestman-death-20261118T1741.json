@@ -1,0 +1,13 @@
+{
+  "id": "harvestman-death",
+  "payload": {
+    "text": "a giant spider gives a long fading hiss as its many long legs clatter and fold up, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/harvestman-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/harvestman-death-20261118T1741-1.mp3"
+  ],
+  "credits": 48
+}

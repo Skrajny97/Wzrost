@@ -1,0 +1,13 @@
+{
+  "id": "indrik-death",
+  "payload": {
+    "text": "a huge mythical beast gives a long deep dying bellow that sinks into a rumbling of collapsing earth, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/indrik-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/indrik-death-20261118T1741-1.mp3"
+  ],
+  "credits": 64
+}

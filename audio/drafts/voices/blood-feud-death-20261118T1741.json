@@ -1,0 +1,13 @@
+{
+  "id": "blood-feud-death",
+  "payload": {
+    "text": "a vengeful ghost gives a long bitter echoing wail that dies into a cold whisper, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/blood-feud-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/blood-feud-death-20261118T1741-1.mp3"
+  ],
+  "credits": 56
+}

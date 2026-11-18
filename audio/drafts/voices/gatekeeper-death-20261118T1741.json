@@ -1,0 +1,13 @@
+{
+  "id": "gatekeeper-death",
+  "payload": {
+    "text": "a big guard gives a long deep groan and falls with a heavy thud and a scattered rattle of bone keys, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/gatekeeper-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/gatekeeper-death-20261118T1741-1.mp3"
+  ],
+  "credits": 56
+}

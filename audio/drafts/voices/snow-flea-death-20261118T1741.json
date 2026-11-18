@@ -1,0 +1,13 @@
+{
+  "id": "snow-flea-death",
+  "payload": {
+    "text": "a giant snow flea gives a fading high chirp and falls into the snow with a soft crunch, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/snow-flea-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/snow-flea-death-20261118T1741-1.mp3"
+  ],
+  "credits": 48
+}

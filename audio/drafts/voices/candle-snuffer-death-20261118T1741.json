@@ -1,0 +1,13 @@
+{
+  "id": "candle-snuffer-death",
+  "payload": {
+    "text": "a ghost gives one long cold breath that blows out like a candle, fading to a thin whistle of wind, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/candle-snuffer-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/candle-snuffer-death-20261118T1741-1.mp3"
+  ],
+  "credits": 56
+}

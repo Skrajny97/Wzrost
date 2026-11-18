@@ -1,0 +1,13 @@
+{
+  "id": "sledge-hurt",
+  "payload": {
+    "text": "an old wooden sleigh creaks and its runners scrape sharply on ice with a jingle of a bell, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/sledge-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/sledge-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 20
+}

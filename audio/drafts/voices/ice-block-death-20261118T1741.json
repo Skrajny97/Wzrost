@@ -1,0 +1,13 @@
+{
+  "id": "ice-block-death",
+  "payload": {
+    "text": "a huge block of ice cracks, groans and shatters into crashing chunks of ice, no words, close up, dry, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/ice-block-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/ice-block-death-20261118T1741-1.mp3"
+  ],
+  "credits": 60
+}

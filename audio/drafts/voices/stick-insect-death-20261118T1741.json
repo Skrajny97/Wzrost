@@ -1,0 +1,13 @@
+{
+  "id": "stick-insect-death",
+  "payload": {
+    "text": "a giant stick insect gives a long dry creaking rustle and breaks with the snap of dry branches, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/stick-insect-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/stick-insect-death-20261118T1741-1.mp3"
+  ],
+  "credits": 48
+}

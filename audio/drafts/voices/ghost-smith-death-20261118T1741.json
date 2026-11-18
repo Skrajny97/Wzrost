@@ -1,0 +1,13 @@
+{
+  "id": "ghost-smith-death",
+  "payload": {
+    "text": "a ghostly blacksmith gives a long deep groan as his hammer drops with a final ringing clang and the hiss of a dying forge, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/ghost-smith-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/ghost-smith-death-20261118T1741-1.mp3"
+  ],
+  "credits": 56
+}

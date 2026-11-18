@@ -1,0 +1,13 @@
+{
+  "id": "ice-block-hurt",
+  "payload": {
+    "text": "a living block of ice cracks loudly with a deep groaning creak of ice, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/ice-block-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/ice-block-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 24
+}

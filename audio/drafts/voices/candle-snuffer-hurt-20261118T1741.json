@@ -1,0 +1,13 @@
+{
+  "id": "candle-snuffer-hurt",
+  "payload": {
+    "text": "a cold ghost gives a sharp breathy gasp of pain like a puff of wind, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/candle-snuffer-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/candle-snuffer-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 20
+}

@@ -1,0 +1,13 @@
+{
+  "id": "bumblebee-hurt",
+  "payload": {
+    "text": "a giant bumblebee gives a sudden loud angry buzz of pain, deep droning, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/bumblebee-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/bumblebee-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 20
+}

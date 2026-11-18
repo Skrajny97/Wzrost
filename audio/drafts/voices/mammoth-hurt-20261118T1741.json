@@ -1,0 +1,13 @@
+{
+  "id": "mammoth-hurt",
+  "payload": {
+    "text": "a woolly mammoth gives a loud trumpeting bellow of pain, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/mammoth-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/mammoth-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 24
+}

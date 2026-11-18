@@ -1,0 +1,13 @@
+{
+  "id": "greed-death",
+  "payload": {
+    "text": "a magical golden glow fades with a long descending shimmer and a last soft jingle of coins, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/greed-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/greed-death-20261118T1741-1.mp3"
+  ],
+  "credits": 56
+}

@@ -1,0 +1,13 @@
+{
+  "id": "giant-mole-death",
+  "payload": {
+    "text": "a huge mole gives a long wheezing squeal that sinks into a heavy thud and falling earth, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/giant-mole-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/giant-mole-death-20261118T1741-1.mp3"
+  ],
+  "credits": 48
+}

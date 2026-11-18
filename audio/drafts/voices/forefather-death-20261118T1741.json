@@ -1,0 +1,13 @@
+{
+  "id": "forefather-death",
+  "payload": {
+    "text": "an old ancestral ghost gives a long deep echoing sigh that fades like embers dying in a hearth, no words, close up, dry, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/forefather-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/forefather-death-20261118T1741-1.mp3"
+  ],
+  "credits": 60
+}

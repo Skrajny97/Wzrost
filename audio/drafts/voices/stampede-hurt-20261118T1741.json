@@ -1,0 +1,13 @@
+{
+  "id": "stampede-hurt",
+  "payload": {
+    "text": "a ghostly herd gives a sudden snort and a burst of thundering hooves, echoing, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/stampede-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/stampede-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 24
+}

@@ -1,0 +1,13 @@
+{
+  "id": "shackles-death",
+  "payload": {
+    "text": "heavy iron chains rattle for a long time and collapse into a clanking heap of metal, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/shackles-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/shackles-death-20261118T1741-1.mp3"
+  ],
+  "credits": 52
+}

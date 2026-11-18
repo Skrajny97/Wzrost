@@ -1,0 +1,13 @@
+{
+  "id": "snake-maiden-death",
+  "payload": {
+    "text": "a snake woman gives a long sorrowful hissing sigh that fades into the rustle of scales, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/snake-maiden-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/snake-maiden-death-20261118T1741-1.mp3"
+  ],
+  "credits": 56
+}

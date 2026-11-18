@@ -1,0 +1,13 @@
+{
+  "id": "turon-death",
+  "payload": {
+    "text": "a shaggy horned beast gives a long bellowing groan, its wooden jaws clack one last time and it falls with a heavy thud, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/turon-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/turon-death-20261118T1741-1.mp3"
+  ],
+  "credits": 64
+}

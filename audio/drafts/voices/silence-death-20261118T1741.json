@@ -1,0 +1,13 @@
+{
+  "id": "silence-death",
+  "payload": {
+    "text": "a ghost gives a long muffled sigh that fades into deep silence with a faint ringing, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/silence-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/silence-death-20261118T1741-1.mp3"
+  ],
+  "credits": 56
+}

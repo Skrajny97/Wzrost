@@ -1,0 +1,13 @@
+{
+  "id": "mole-cricket-hurt",
+  "payload": {
+    "text": "a dog-sized mole cricket gives a harsh shrill chirring trill of pain with a scratch of digging claws, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/mole-cricket-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/mole-cricket-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 20
+}

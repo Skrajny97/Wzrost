@@ -1,0 +1,13 @@
+{
+  "id": "turon-hurt",
+  "payload": {
+    "text": "a shaggy horned folk beast gives a gruff bellow of pain with a loud clack of wooden jaws, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/turon-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/turon-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 28
+}

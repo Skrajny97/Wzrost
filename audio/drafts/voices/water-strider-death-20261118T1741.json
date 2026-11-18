@@ -1,0 +1,13 @@
+{
+  "id": "water-strider-death",
+  "payload": {
+    "text": "a huge insect gives a fading dry chitter as its thin legs scrape and it sinks with a small splash, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/water-strider-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/water-strider-death-20261118T1741-1.mp3"
+  ],
+  "credits": 48
+}

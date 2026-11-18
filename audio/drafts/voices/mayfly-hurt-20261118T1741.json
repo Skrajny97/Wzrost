@@ -1,0 +1,13 @@
+{
+  "id": "mayfly-hurt",
+  "payload": {
+    "text": "a giant mayfly gives a sharp high buzzing whine of pain with fluttering wings, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/mayfly-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/mayfly-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 20
+}

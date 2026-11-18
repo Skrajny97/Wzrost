@@ -1,0 +1,13 @@
+{
+  "id": "koschei-death",
+  "payload": {
+    "text": "an ancient skeletal sorcerer gives a long raspy dying wail and collapses with a clatter of bones and a cold echo, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/koschei-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/koschei-death-20261118T1741-1.mp3"
+  ],
+  "credits": 64
+}

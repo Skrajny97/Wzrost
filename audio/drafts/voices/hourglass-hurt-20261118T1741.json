@@ -1,0 +1,13 @@
+{
+  "id": "hourglass-hurt",
+  "payload": {
+    "text": "a huge glass hourglass rings with a sharp glassy crack and a hiss of pouring sand, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/hourglass-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/hourglass-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 20
+}

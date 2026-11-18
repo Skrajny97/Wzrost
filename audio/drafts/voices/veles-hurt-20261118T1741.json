@@ -1,0 +1,13 @@
+{
+  "id": "veles-hurt",
+  "payload": {
+    "text": "an ancient horned god gives a deep thunderous bellowing roar of pain, like a bull and a giant together, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/veles-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/veles-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 28
+}

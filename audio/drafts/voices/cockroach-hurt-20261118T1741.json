@@ -1,0 +1,13 @@
+{
+  "id": "cockroach-hurt",
+  "payload": {
+    "text": "a giant cockroach gives a dry harsh hissing chitter of pain with a click of hard wings, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/cockroach-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/cockroach-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 20
+}

@@ -1,0 +1,13 @@
+{
+  "id": "sledge-death",
+  "payload": {
+    "text": "an old wooden sleigh crashes and breaks apart with splintering wood, scraping runners and a last dull jingle of a bell, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/sledge-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/sledge-death-20261118T1741-1.mp3"
+  ],
+  "credits": 56
+}

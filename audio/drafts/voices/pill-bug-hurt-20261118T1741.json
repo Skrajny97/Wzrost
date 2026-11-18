@@ -1,0 +1,13 @@
+{
+  "id": "pill-bug-hurt",
+  "payload": {
+    "text": "a giant armored woodlouse curls up with a hard clack of plates and a squeaky chitter of pain, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/pill-bug-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/pill-bug-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 20
+}

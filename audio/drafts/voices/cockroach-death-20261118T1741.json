@@ -1,0 +1,13 @@
+{
+  "id": "cockroach-death",
+  "payload": {
+    "text": "a giant cockroach gives a long dry fading hiss as its hard legs scrape and twitch, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/cockroach-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/cockroach-death-20261118T1741-1.mp3"
+  ],
+  "credits": 48
+}

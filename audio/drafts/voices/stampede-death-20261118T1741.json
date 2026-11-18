@@ -1,0 +1,13 @@
+{
+  "id": "stampede-death",
+  "payload": {
+    "text": "the thundering of ghostly hooves slows and fades away into the distance with a last echoing snort, no words, close up, dry, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/stampede-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/stampede-death-20261118T1741-1.mp3"
+  ],
+  "credits": 60
+}

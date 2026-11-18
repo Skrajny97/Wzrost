@@ -1,0 +1,13 @@
+{
+  "id": "woolly-rhino-death",
+  "payload": {
+    "text": "a huge woolly rhinoceros gives a long heavy groaning bellow and falls with a deep thud, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/woolly-rhino-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/woolly-rhino-death-20261118T1741-1.mp3"
+  ],
+  "credits": 52
+}

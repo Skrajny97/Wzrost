@@ -1,0 +1,13 @@
+{
+  "id": "indrik-hurt",
+  "payload": {
+    "text": "a huge mythical one-horned beast gives a deep bellowing roar of pain with a rumble of earth beneath it, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/indrik-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/indrik-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 28
+}

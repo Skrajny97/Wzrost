@@ -1,0 +1,13 @@
+{
+  "id": "gatekeeper-hurt",
+  "payload": {
+    "text": "a big gate guard gives a gruff deep grunt of pain with a jangle of a ring of bone keys, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/gatekeeper-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/gatekeeper-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 20
+}

@@ -1,0 +1,13 @@
+{
+  "id": "shackles-hurt",
+  "payload": {
+    "text": "heavy iron shackles rattle and clank sharply with a jangle of chains, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/shackles-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/shackles-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 20
+}

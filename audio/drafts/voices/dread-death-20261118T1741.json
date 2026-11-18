@@ -1,0 +1,13 @@
+{
+  "id": "dread-death",
+  "payload": {
+    "text": "a shapeless horror gives a long deep distorted moan that collapses into an eerie fading rumble, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/dread-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/dread-death-20261118T1741-1.mp3"
+  ],
+  "credits": 56
+}

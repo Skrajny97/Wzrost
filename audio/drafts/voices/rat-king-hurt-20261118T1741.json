@@ -1,0 +1,13 @@
+{
+  "id": "rat-king-hurt",
+  "payload": {
+    "text": "a knot of many rats squeals all at once in a shrill chorus of pain, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/rat-king-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/rat-king-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 20
+}

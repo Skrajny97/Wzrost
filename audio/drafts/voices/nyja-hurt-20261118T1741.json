@@ -1,0 +1,13 @@
+{
+  "id": "nyja-hurt",
+  "payload": {
+    "text": "a dark underworld god gives a deep cold echoing growl of pain like wind in a crypt, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/nyja-hurt-20261118T1741-0.mp3",
+    "audio/drafts/voices/nyja-hurt-20261118T1741-1.mp3"
+  ],
+  "credits": 28
+}

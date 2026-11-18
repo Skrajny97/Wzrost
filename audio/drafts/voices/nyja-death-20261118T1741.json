@@ -1,0 +1,13 @@
+{
+  "id": "nyja-death",
+  "payload": {
+    "text": "a dark underworld god gives a long deep echoing groan that fades into a cold howling wind and the slam of a great gate, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/nyja-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/nyja-death-20261118T1741-1.mp3"
+  ],
+  "credits": 64
+}

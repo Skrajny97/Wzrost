@@ -1,0 +1,13 @@
+{
+  "id": "marzanna-death",
+  "payload": {
+    "text": "a goddess of winter gives a long fading cold shriek that dies into a howling blizzard and the tinkle of ice, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/marzanna-death-20261118T1741-0.mp3",
+    "audio/drafts/voices/marzanna-death-20261118T1741-1.mp3"
+  ],
+  "credits": 64
+}
