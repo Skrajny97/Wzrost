@@ -1108,6 +1108,10 @@
     "0.4.40": {
       "title": "Version 0.4.40",
       "body": "- Every guild member now gets a Beast Chest, even without attacking. It counts everyone who was in the guild when the beast came or joined before it fell. This also applies to this week's and last week's beasts.\n- New beasts have twice as much HP. The beasts already standing this week stay as they are.\n- A heal of the whole party no longer shows \"+0\" on characters at full HP."
+    },
+    "0.4.41": {
+      "title": "Version 0.4.41",
+      "body": "- New beasts have four times as much HP as before version 0.4.40, not twice. The beasts already standing this week stay as they are."
     }
   }
 }
