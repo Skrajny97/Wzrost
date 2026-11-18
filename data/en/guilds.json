@@ -284,7 +284,7 @@
       "ask": "Ask the guild",
       "askLead": "Choose what you lack and how many. The request will go up on the Guild page, under Requests.",
       "askWaiting": "Your request is still up on the Guild page. Withdraw it there to ask for something else.",
-      "kindGroups": { "material": "Materials", "herb": "Herbs", "potion": "Potions", "mineral": "Minerals", "scroll": "Scrolls" },
+      "kindGroups": { "material": "Materials", "herb": "Herbs", "potion": "Potions", "mineral": "Minerals", "scroll": "Scrolls", "pantry": "Pantry" },
       "goods": "What you lack",
       "count": "How many",
       "send": "Ask",
