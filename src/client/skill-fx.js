@@ -10527,26 +10527,28 @@ export function skillEffects(kit) {
       return;
     }
     const art = artOf(entry.card);
+    const box = boxOf(entry.card);
     const figure = figureOf(art);
     const width = stageWidth();
     const head = { x: art.x + art.width / 2, y: art.y + art.height * 0.3 };
     const size = Math.round(Math.max(30, Math.min(figure * 0.85, 64)));
-    const moonAt = { x: inside(head.x + figure * 0.3, size / 2 + 2, width), y: Math.max(size / 2 + 2, art.y - size * 0.05) };
+    // (The moon over the wolf's card, not over its figure.)
+    const moonAt = { x: inside(box.x + box.width / 2, size / 2 + 2, width), y: Math.max(size / 2 + 2, box.y - size * 0.6) };
     const moon = spark('fx-moon', moonAt, { '--size': `${size}px` });
     animate(
       moon,
       [
         { transform: 'translate(-50%, -50%) translateY(14px) scale(0.6)', opacity: 0 },
         { transform: 'translate(-50%, -50%) translateY(0px) scale(1)', opacity: 0.95, offset: 0.3, easing: 'ease-out' },
-        { transform: 'translate(-50%, -50%) translateY(-2px) scale(1.02)', opacity: 0.9, offset: 0.8 },
+        { transform: 'translate(-50%, -50%) translateY(-2px) scale(1.02)', opacity: 0.9, offset: 0.78 },
         { transform: 'translate(-50%, -50%) translateY(-4px) scale(1.04)', opacity: 0 },
       ],
-      { duration: 2000, delay: 300, easing: 'ease-in-out', fill: 'backwards' },
+      { duration: 1350, delay: 200, easing: 'ease-in-out', fill: 'backwards' },
     ).then(() => moon.remove());
-    const mark = anchor(2400);
+    const mark = anchor(1700);
     // The howl: silver waves from the wolf's head, three of them.
     for (let k = 0; k < 3; k++) {
-      after(820 + k * 200, mark, () => {
+      after(650 + k * 180, mark, () => {
         const wave = spark('fx-ragewave', head, { '--fx': '#e8eef8', '--size': `${Math.round(figure * 0.9)}px` });
         wave.innerHTML = RAGE_WAVE;
         animate(
@@ -10562,15 +10564,15 @@ export function skillEffects(kit) {
     // The party fired up by the howl.
     const party = standing(owner.unit.side).filter((member) => member !== entry);
     party.forEach((member, index) => {
-      after(1000 + index * 80, mark, () => {
-        rimGlow(member.card, '#ff7a5c', 800);
+      after(820 + index * 80, mark, () => {
+        rimGlow(member.card, '#ff7a5c', 700);
         tintCard(member.card, '#e8462f', [{ opacity: 0 }, { opacity: 0.3, offset: 0.3 }, { opacity: 0 }], 700);
         const point = figurePoint(member.card, 0.6);
         particles.burst({ x: point.x, y: point.y, area: { width: figureOf(artOf(member.card)) * 0.6, height: 6 }, count: 8, colors: ['#ffffff', '#e8eef8', '#ff7a5c', '#e8462f'], angle: -Math.PI / 2, spread: 0.5, speed: [40, 110], gravity: -30, drag: 1.2, life: [500, 800], size: [1.1, 2.1], shape: 'spark' });
       });
     });
     await calling;
-    await wait(Math.max(0, 1150 + party.length * 80 - 1250));
+    await wait(Math.max(0, 1550 - 1250));
   }
 
   // The white wolf's bite (Wódz watahy): its fangs' marks in red, blood
