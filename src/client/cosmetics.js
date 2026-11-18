@@ -59,14 +59,24 @@ export function portraitLayers(look, { frame = null, background = null, aura = n
   const lit = cosmeticOf(aura)?.aura;
   if (figure && lit) light(art, figure, lit);
   const kept = cosmeticOf(pet)?.pet;
-  if (kept) art.append(petLayer(kept.portrait, look, pet));
+  const petted = kept && petLayer(kept.portrait, look, pet);
   const framed = cosmeticOf(frame);
   const layer = framed && frameLayer(framed);
-  if (!layer) return [art];
+  if (!layer) {
+    if (petted) art.append(petted);
+    return [art];
+  }
   // The window, a pixel of the frame further on each side, so no seam shows.
   const [left, top, right, bottom] = framed.window;
-  Object.assign(art.style, { left: across(left - 1), top: down(top - 1), right: across(FRAME.width - right - 2), bottom: down(FRAME.height - bottom - 2) });
-  return [art, layer];
+  const place = { left: across(left - 1), top: down(top - 1), right: across(FRAME.width - right - 2), bottom: down(FRAME.height - bottom - 2) };
+  Object.assign(art.style, place);
+  if (!petted) return [art, layer];
+  // The pet stands where it stands in the window, but over the frame, so the
+  // frame never hides it (the author: „niech chowańce będą ponad ramką”; a
+  // player's fox at the figure's feet was under the frame's border).
+  const over = h('div', { class: 'portrait-art portrait-art--pet' }, petted);
+  Object.assign(over.style, place);
+  return [art, layer, over];
 }
 
 // A portrait in a box of its own, 3:4, its width from `className`: a

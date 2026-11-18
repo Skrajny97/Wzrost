@@ -3755,10 +3755,16 @@ Najpierw Tier X przedmiotów (potrzebny najlepszej postaci za około dwa tygodni
     - Trzeci obrót Huraganu chwały ma własne słowa („trzeci obrót”), a oślepienie z Ognia niebios nie powtarza komunikatu, gdy Słup światła oślepił już tym samym ciosem.
     - „Kula piorunów” Gromowładnego ma tę samą nazwę co umiejętność Władcy Piorunów, drugiej formy z tej samej linii: wraca mocniejsza, więc nazwa zostaje, jak w 1095 (w danych to dwie umiejętności z osobnymi id, a słowa w walce mają osobny klucz `stanceBallLightning`).
 8. Do zrobienia z grafiką: kilku przywołańców jednej umiejętności (dwaj rycerze Legionu Nawii, kolejne Dęby wieków, upiory Nawii) walka pokazuje dziś jako jedną kartę; upiór Nawii ma wygląd szkieletu.
+9. **Grafika czwartych form (18.11.2026).** Jazda: Burzyciel 2 (`art/references/riders/ravager-male.png`). Chody przyjęte na stronie ocen: Burzyciel i Burzycielka (1098.1, 1098.2), Nieśmiertelny i Nieśmiertelna (1098.3, 1098.4), Tytan i Tytanida (1098.5, 1098.6). Ich arkusze są w `src/client/art/walkers/` po `tools/walk-palette.py`, `tools/walk-outline.py` i `tools/walk-dark-outline.py` (Burzyciel i Burzycielka z `--dark-edges`). Narzędzie czarnego obrysu zaczerniało świecącą aureolę Nieśmiertelnego, więc piksele aureoli (nad barkami) zostały takie, jak w przyjętym chodzie. Odcienie skóry 30 portretów: maski w `tools/evolution-tones.json` (obrysy wokół skóry z progami barwy). Burzyciel (twarz z lawy) i Żniwiarz Dusz (maska) nie pokazują skóry, więc ich pliki odcieni są kopiami portretu, jak u Kolosa. Król Nawii i Mroczny Książę mają szarą i liliową skórę, a odcień gracza zmienia ją jak u Licza i Władcy Cieni, z których wyrastają. Odcienie chodów robi `tools/walk-tones.py`; twarz Tytana w cieniu hełmu ma kolory jak brąz zbroi, więc `tools/walk-tones.json` podaje jej kolory w ramce przy głowie. Gra zacznie używać tych plików, gdy czwarte formy dostaną komplet grafiki (portrety, chody, jazda i odcienie) i trafią do list w `src/client/art.js`.
 
 ## Nowe krainy 276–350: Nawia (1088 B, 18.11.2026)
 
 Motyw B, słowiańskie zaświaty: Mgliste Bagna Nawii (276–300), Łąki Welesa (301–325) i Kraina bez Słońca (326–350). Karta Mglistych Bagien Nawii: szkic D. Dalej: miejsca, stwory, elity i czempioni na stronie ocen (mało ptaków), potem grafiki.
+
+## Wersja 0.4.30 (18.11.2026): chowańce nad ramką postaci
+
+1. **Chowaniec nad ramką.** Gracz (poz. 47): z ramką postaci Chowańca Lisa w ogóle nie widać, bo przykrywa go ramka. Autor: „niech chowańce będą ponad ramką”. Chowaniec stoi dalej w tym samym miejscu okna ramki, ale jest rysowany nad ramką, na Postaci, w podglądach Sklepu Systemu, na karcie gracza i przy oprawianiu kamieni (`portraitLayers` w `src/client/cosmetics.js`). Na Postaci z widocznymi miejscami na przedmioty jest przygaszony jak cała postać.
+2. **Grafika czwartych form w plikach gry** („Czwarta ewolucja klas”, punkt 9): portrety z odcieniami skóry i sześć przyjętych chodów. Gra ich jeszcze nie pokazuje, bo czwarta ewolucja jest wyłączona.
 
 ## Wersja 0.4.29 (18.11.2026): poprawiona twarz Uzdrowiciela, czwarta ewolucja w kodzie
 

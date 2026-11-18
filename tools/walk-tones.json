@@ -88,5 +88,6 @@
   "winter-lord-female": { "only": [[58, 18, 76, 42, "head"], [30, 50, 96, 90]], "add_in": [{ "colours": ["897685", "835558"], "places": [[30, 50, 96, 90]] }] },
   "skin-winter-warrior-male": { "add_in": [{ "colours": ["ab7251", "936d55", "9e6345", "c78963", "ad8365", "7d4734", "673e2a"], "places": ["hands"] }, { "colours": ["ab7251", "c78963", "9e6345", "936d55", "e0bb9d", "ad8365"], "places": ["head"] }] },
   "skin-winter-warrior-female": { "add_in": [{ "colours": ["907663", "774638"], "places": ["hands"] }] },
-  "skin-winter-cleric-male": { "add_in": [{ "colours": ["9e725b", "846352", "724f3f"], "places": ["hands"] }, { "colours": ["846352", "9e725b"], "places": ["head"] }] }
+  "skin-winter-cleric-male": { "add_in": [{ "colours": ["9e725b", "846352", "724f3f"], "places": ["hands"] }, { "colours": ["846352", "9e725b"], "places": ["head"] }] },
+  "titan-male": { "add": ["85735f", "a59071", "7b6b58", "997f64", "bfa989", "675546"], "only": [[68, 25, 77, 36, "head"]] }
 }
