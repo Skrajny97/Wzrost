@@ -16,7 +16,8 @@
 // as in the Prośby (177 A). The camp's resources, and gold on one side of
 // an offer, never both (4.11.2026, the author: "Daj też mozliwość wymiany i
 // wystawiania ofert w Gildii zasoby za złoto"): gold given is set aside and
-// comes back as the pieces do. No items or goods of the bag. Both sides
+// comes back as the pieces do. No items, and of the bag's goods only the
+// Spiżarnia's fish, crops and dishes ("pantry:<id>", 18.11.2026). Both sides
 // exchange from the players' Wymiana's level (community.json
 // trade.minLevel; the author's 826 A: „Wymiana w Gildii od 20. poziomu
 // postaci po obu stronach, jak Wymiana między graczami”): a character
@@ -36,6 +37,7 @@ import { nameColorOf } from './cosmetics.js';
 import { guildPlayer, requireMember } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { numberText } from './i18n.js';
+import { pantryOf } from './professions-view.js';
 
 const rules = () => content().guilds.exchange;
 const words = () => rules().texts;
@@ -47,9 +49,16 @@ const resourceIds = () => content().resources.map((resource) => resource.id);
 // Gold, one side of an offer at most, kept in the characters' `gold`.
 const GOLD = 'gold';
 const isGold = (id) => id === GOLD;
-const goodIds = () => [...resourceIds(), GOLD];
-const goodName = (id) => (isGold(id) ? rules().gold.name : (content().resourcesById[id]?.name ?? id));
-const genitiveOf = (id) => (isGold(id) ? rules().gold.genitive : content().resourcesById[id].genitive);
+// The Spiżarnia's fish, crops and dishes too (the author, 18.11.2026: „O
+// wymianie miedzy graczami i w gildii nie zapomnij”), as "pantry:<id>",
+// kept in the characters' `pantry`, as many pieces as of a resource.
+const PANTRY = 'pantry:';
+const isPantry = (id) => typeof id === 'string' && id.startsWith(PANTRY);
+const pantryKey = (id) => id.slice(PANTRY.length);
+const pantryIds = () => (content().pantry ?? []).map((good) => `${PANTRY}${good.id}`);
+const goodIds = () => [...resourceIds(), GOLD, ...pantryIds()];
+const goodName = (id) => (isGold(id) ? rules().gold.name : isPantry(id) ? (content().pantryById[pantryKey(id)]?.name ?? id) : (content().resourcesById[id]?.name ?? id));
+const genitiveOf = (id) => (isGold(id) ? rules().gold.genitive : isPantry(id) ? filled(errors().goodPieces, { name: goodName(id) }) : content().resourcesById[id].genitive);
 const mostOf = (id) => (isGold(id) ? rules().gold.most : rules().most);
 const changed = () => new ApiError(409, 'changed', errors().changed);
 const member = (context) => requireMember(context, errors());
@@ -77,13 +86,18 @@ function closing(db, where, set) {
   const back = (id) =>
     `(SELECT COALESCE(SUM(give_count), 0) FROM guild_offers WHERE guild_offers.character_id = characters.id AND state = 'open' AND give = '${id}' AND (${where.sql}))`;
   const resources = resourceIds().reduce((sql, id) => `json_set(${sql}, '${path(id)}', COALESCE(json_extract(resources, '${path(id)}'), 0) + ${back(id)})`, 'resources');
+  // The Spiżarnia's goods back, whichever were given, in one patch of the
+  // column: '{}', so nothing, when none were.
+  const pantry = `json_patch(COALESCE(pantry, '{}'), (SELECT COALESCE(json_group_object(g.good, COALESCE(json_extract(characters.pantry, '$."' || g.good || '"'), 0) + g.total), '{}')
+    FROM (SELECT substr(give, ${PANTRY.length + 1}) AS good, SUM(give_count) AS total FROM guild_offers
+          WHERE guild_offers.character_id = characters.id AND state = 'open' AND give LIKE '${PANTRY}%' AND (${where.sql}) GROUP BY give) g))`;
   return [
     db
       .prepare(
-        `UPDATE characters SET resources = ${resources}, gold = gold + ${back(GOLD)}, version = version + 1
+        `UPDATE characters SET resources = ${resources}, gold = gold + ${back(GOLD)}, pantry = ${pantry}, version = version + 1
          WHERE id IN (SELECT character_id FROM guild_offers WHERE state = 'open' AND (${where.sql}))`,
       )
-      .bind(...resourceIds().flatMap(() => where.binds), ...where.binds, ...where.binds),
+      .bind(...resourceIds().flatMap(() => where.binds), ...where.binds, ...where.binds, ...where.binds),
     db.prepare(`UPDATE guild_offers SET ${set.sql} WHERE state = 'open' AND (${where.sql})`).bind(...set.binds, ...where.binds),
   ];
 }
@@ -139,8 +153,9 @@ const resourcesOf = (row) => {
   return resources;
 };
 
-// What the character holds of a side's good: pieces of a resource, or gold.
-const holding = (row, id) => walletOf(row)[id] ?? 0;
+// What the character holds of a side's good: pieces of a resource or of
+// a good of the Spiżarnia, or gold.
+const holding = (row, id) => (isPantry(id) ? (pantryOf(row)[pantryKey(id)] ?? 0) : (walletOf(row)[id] ?? 0));
 
 // The Wymiana for the page: the guild's open offers of posters at the
 // level (each with its poster, what it gives and wants, and whether this
@@ -198,7 +213,16 @@ async function exchangeView(db, player, guild, now) {
     locked: row.level < minLevel(),
     resources,
     gold: row.gold,
-    rules: { most, offers, openHours, sameCount, resources: resourceIds(), gold: { id: GOLD, name: gold.name, most: gold.most } },
+    pantry: pantryOf(row),
+    rules: {
+      most,
+      offers,
+      openHours,
+      sameCount,
+      resources: resourceIds(),
+      gold: { id: GOLD, name: gold.name, most: gold.most },
+      pantry: (content().pantry ?? []).map((good) => ({ id: `${PANTRY}${good.id}`, key: good.id, name: good.name, group: good.group })),
+    },
     texts: cardTexts(),
   };
 }
@@ -235,27 +259,35 @@ function sideOf(value) {
 
 // "Masz tylko 30 drewna." / "Nie masz złota.": the pieces of a resource or
 // the gold held, short of what is needed.
-const heldOnly = (resource, have) =>
-  have > 0 ? filled(errors().notEnough, { have, genitive: genitiveOf(resource) }) : filled(errors().notHeld, { genitive: genitiveOf(resource) });
+const heldOnly = (resource, have) => {
+  if (have > 0) return filled(errors().notEnough, { have, genitive: genitiveOf(resource) });
+  return isPantry(resource) ? filled(errors().notHeldGood, { name: goodName(resource) }) : filled(errors().notHeld, { genitive: genitiveOf(resource) });
+};
 
 // SQL for what a character holds of a good, with its binds: the `gold`
 // column or the resource in `resources`, in the character's own row
 // (`own`), or read by its id (`heldSql`, for an assertion).
-const own = (id) => (isGold(id) ? { sql: 'gold', binds: [] } : { sql: 'COALESCE(json_extract(resources, ?), 0)', binds: [path(id)] });
+const columnOf = (id) => (isPantry(id) ? 'pantry' : 'resources');
+const keyOf = (id) => (isPantry(id) ? pantryKey(id) : id);
+const own = (id) => (isGold(id) ? { sql: 'gold', binds: [] } : { sql: `COALESCE(json_extract(${columnOf(id)}, ?), 0)`, binds: [path(keyOf(id))] });
 const heldSql = (id, characterId) =>
-  isGold(id) ? { sql: '(SELECT gold FROM characters WHERE id = ?)', binds: [characterId] } : { sql: 'COALESCE((SELECT json_extract(resources, ?) FROM characters WHERE id = ?), 0)', binds: [path(id), characterId] };
+  isGold(id)
+    ? { sql: '(SELECT gold FROM characters WHERE id = ?)', binds: [characterId] }
+    : { sql: `COALESCE((SELECT json_extract(${columnOf(id)}, ?) FROM characters WHERE id = ?), 0)`, binds: [path(keyOf(id)), characterId] };
 
 // The SET clause and binds that add each [good, count] of `changes` to a
 // character (a negative count takes): the resources in one json_set, the
 // gold in the column.
 function adding(changes) {
   const gold = changes.filter(([id]) => isGold(id)).reduce((sum, [, count]) => sum + count, 0);
-  const pieces = changes.filter(([id]) => !isGold(id));
   const parts = [];
   const binds = [];
-  if (pieces.length > 0) {
-    parts.push(`resources = json_set(resources, ${pieces.map(() => '?, COALESCE(json_extract(resources, ?), 0) + ?').join(', ')})`);
-    for (const [id, count] of pieces) binds.push(path(id), path(id), count);
+  // The resources in one json_set, the Spiżarnia's goods in another.
+  for (const column of ['resources', 'pantry']) {
+    const pieces = changes.filter(([id]) => !isGold(id) && columnOf(id) === column);
+    if (pieces.length === 0) continue;
+    parts.push(`${column} = json_set(COALESCE(${column}, '{}'), ${pieces.map(() => `?, COALESCE(json_extract(${column}, ?), 0) + ?`).join(', ')})`);
+    for (const [id, count] of pieces) binds.push(path(keyOf(id)), path(keyOf(id)), count);
   }
   if (changes.some(([id]) => isGold(id))) {
     parts.push('gold = gold + ?');

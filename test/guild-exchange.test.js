@@ -94,6 +94,8 @@ describe('the Wymiana in the Gildia through the API', () => {
       sameCount: rules.sameCount,
       resources: content.resources.map(({ id }) => id),
       gold: { id: 'gold', name: 'Złoto', most: rules.gold.most },
+      // The Spiżarnia's goods too, as "pantry:<id>" (test/pantry-goods.test.js).
+      pantry: content.pantry.map((good) => ({ id: `pantry:${good.id}`, key: good.id, name: good.name, group: good.group })),
     });
     assert.equal(seen.gold, 5000);
     assert.ok(seen.texts.how.every((line) => !line.includes('{')));

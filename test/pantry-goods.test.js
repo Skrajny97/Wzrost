@@ -200,3 +200,93 @@ describe('the Spiżarnia in the Skrzynia Gildii', () => {
     );
   });
 });
+
+// The Wymiana in the Gildia (src/server/guild-exchange.js) with the
+// Spiżarnia's goods as "pantry:<id>": set aside at once, swapped whole,
+// given back on a withdrawal and when the time is up.
+describe('the Spiżarnia in the Wymiana in the Gildia', () => {
+  const { call, db, signUp } = useServer();
+  const cookies = {};
+  async function player(login, name) {
+    ({ cookie: cookies[login] } = await signUp(login));
+    await call('POST', '/api/character', { cookie: cookies[login], body: { name, classId: 'warrior', appearance: 'female' } });
+    await (await db()).prepare("UPDATE characters SET level = 30, class_level = 25, gold = 5000, resources = '{}' WHERE name = ?").bind(name).run();
+  }
+  const as = (login, method, path, body) => call(method, path, { cookie: cookies[login], body });
+  const run = async (sql, ...binds) => (await db()).prepare(sql).bind(...binds).run();
+  const row = async (name) => (await db()).prepare('SELECT pantry, resources, gold FROM characters WHERE name = ?').bind(name).first();
+  const pantry = async (name) => JSON.parse((await row(name)).pantry ?? '{}');
+  const resources = async (name) => JSON.parse((await row(name)).resources ?? '{}');
+  const post = (login, give, giveCount, want, wantCount) => as(login, 'POST', '/api/guild/exchange', { give: { resource: give, count: giveCount }, want: { resource: want, count: wantCount } });
+
+  beforeEach(async () => {
+    await player('kucharka', 'Kucharka');
+    await player('rybak', 'Rybak');
+    await player('trzeci', 'Trzeci');
+    await as('kucharka', 'POST', '/api/guild/found', { name: 'Smakosze', tag: 'SMK' });
+    const guildId = (await as('kucharka', 'GET', '/api/guild')).data.guild.id;
+    for (const [login, name] of [['rybak', 'Rybak'], ['trzeci', 'Trzeci']]) {
+      await as('kucharka', 'POST', '/api/guild/invite', { name });
+      await as(login, 'POST', '/api/guild/accept', { guildId });
+    }
+  });
+
+  test('fish for wood: set aside, taken whole, both sides swapped', async () => {
+    await run('UPDATE characters SET pantry = ? WHERE name = ?', JSON.stringify({ roach: 9 }), 'Kucharka');
+    // Not held, too many, or no such good.
+    const none = await post('kucharka', 'pantry:pea-soup', 1, 'wood', 10);
+    assert.equal(none.data.error.message, 'Nie masz w Spiżarni: Grochówka.');
+    const short = await post('kucharka', 'pantry:roach', 10, 'wood', 10);
+    assert.equal(short.data.error.message, 'Masz tylko 9 szt. „Płotka”.');
+    assert.equal((await post('kucharka', 'pantry:nothing', 1, 'wood', 10)).data.error.code, 'invalid_resource');
+    const posted = await post('kucharka', 'pantry:roach', 5, 'wood', 30);
+    assert.equal(posted.status, 200, JSON.stringify(posted.data).slice(0, 300));
+    assert.equal(posted.data.text, 'Oferta wystawiona: Płotka\u00a0×\u00a05 za Drewno\u00a0×\u00a030.');
+    assert.deepEqual(await pantry('Kucharka'), { roach: 4 });
+    assert.equal(posted.data.pantry.roach, 4);
+    assert.ok(posted.data.rules.pantry.some((good) => good.id === 'pantry:roach' && good.name === 'Płotka' && good.group === 'fish'));
+    // Rybak without wood sees what is missing; with it, takes the offer.
+    const seen = (await as('rybak', 'GET', '/api/guild/exchange')).data.offers[0];
+    assert.deepEqual([seen.give.name, seen.want.name, seen.canTake, seen.missing], ['Płotka', 'Drewno', false, 30]);
+    assert.equal((await as('rybak', 'POST', '/api/guild/exchange/take', { offerId: seen.id })).data.error.message, 'Brakuje: 30 drewna.');
+    await run('UPDATE characters SET resources = ? WHERE name = ?', JSON.stringify({ wood: 50 }), 'Rybak');
+    const took = await as('rybak', 'POST', '/api/guild/exchange/take', { offerId: seen.id });
+    assert.equal(took.status, 200, JSON.stringify(took.data).slice(0, 300));
+    assert.deepEqual(await pantry('Rybak'), { roach: 5 });
+    assert.equal((await resources('Rybak')).wood, 20);
+    assert.equal((await resources('Kucharka')).wood, 30);
+    assert.deepEqual(await pantry('Kucharka'), { roach: 4 });
+  });
+
+  test('a dish for gold and fish for a dish: back on a withdrawal and when the time is up', async () => {
+    await run('UPDATE characters SET pantry = ? WHERE name = ?', JSON.stringify({ 'pea-soup': 2, roach: 1 }), 'Kucharka');
+    await run('UPDATE characters SET pantry = ? WHERE name = ?', JSON.stringify({ roach: 7 }), 'Rybak');
+    const goldBefore = (await row('Kucharka')).gold;
+    assert.equal((await post('kucharka', 'pantry:pea-soup', 2, 'gold', 100)).status, 200);
+    assert.deepEqual(await pantry('Kucharka'), { 'pea-soup': 0, roach: 1 });
+    // Gold for the dish: Trzeci pays, gets the soup.
+    const soup = (await as('trzeci', 'GET', '/api/guild/exchange')).data.offers[0];
+    assert.equal((await as('trzeci', 'POST', '/api/guild/exchange/take', { offerId: soup.id })).status, 200);
+    assert.deepEqual(await pantry('Trzeci'), { 'pea-soup': 2 });
+    assert.equal((await row('Kucharka')).gold, goldBefore + 100);
+    assert.equal((await row('Trzeci')).gold, 4900);
+    // Fish for a dish: one wanting soup Kucharka no longer has.
+    assert.equal((await post('rybak', 'pantry:roach', 3, 'pantry:pea-soup', 1)).status, 200);
+    assert.equal((await post('rybak', 'pantry:roach', 2, 'stone', 5)).status, 200);
+    assert.deepEqual(await pantry('Rybak'), { roach: 2 });
+    const [forSoup, forStone] = (await as('kucharka', 'GET', '/api/guild/exchange')).data.offers;
+    assert.equal(forSoup.want.name, 'Grochówka');
+    assert.equal((await as('kucharka', 'POST', '/api/guild/exchange/take', { offerId: forSoup.id })).data.error.message, 'Brakuje: 1 szt. „Grochówka”.');
+    // Withdrawn: the roach back; the other one's time up: back too.
+    assert.equal((await as('rybak', 'POST', '/api/guild/exchange/withdraw', { offerId: forSoup.id })).status, 200);
+    assert.deepEqual(await pantry('Rybak'), { roach: 5 });
+    await run('UPDATE guild_offers SET ends_at = ? WHERE id = ?', Date.now() - 1000, forStone.id);
+    await as('rybak', 'GET', '/api/guild/exchange');
+    assert.deepEqual(await pantry('Rybak'), { roach: 7 });
+    // Leaving the guild gives an open offer's goods back as well.
+    assert.equal((await post('rybak', 'pantry:roach', 4, 'wood', 1)).status, 200);
+    assert.deepEqual(await pantry('Rybak'), { roach: 3 });
+    assert.equal((await as('rybak', 'POST', '/api/guild/leave', {})).status, 200);
+    assert.deepEqual(await pantry('Rybak'), { roach: 7 });
+  });
+});

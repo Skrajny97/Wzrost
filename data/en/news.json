@@ -1088,6 +1088,10 @@
     "0.4.35": {
       "title": "Version 0.4.35",
       "body": "- You can also put fish, crops and dishes in the Guild Chest: “Put in from the Pantry”, for everyone or for one guild member."
+    },
+    "0.4.36": {
+      "title": "Version 0.4.36",
+      "body": "- In the Guild Exchange you can also trade fish, crops and dishes: for resources, for gold or for other goods from the Pantry.\n- When putting something up on the Marketplace, tap a herb, potion, material, mineral, scroll or Pantry good to see its full description."
     }
   }
 }

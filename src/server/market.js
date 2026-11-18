@@ -347,7 +347,8 @@ function sellable(player, now) {
   const { row } = player;
   const sellBonus = campBonus(campLevels(player.buildings, now, content()), 'sellPrice', content());
   const stacks = { herb: herbsOf(row), potion: potionsOf(row), material: JSON.parse(row.materials ?? '{}'), part: JSON.parse(row.parts ?? '{}'), mineral: mineralsOf(row), pantry: pantryOf(row) };
-  const withBonus = (goods) => (typeof goods.scrap === 'number' ? { ...goods, scrap: goods.scrap * (1 + sellBonus) } : goods);
+  // The innkeeper pays the Spiżarnia's goods their own price, without it.
+  const withBonus = (goods) => (typeof goods.scrap === 'number' && goods.kind !== 'pantry' ? { ...goods, scrap: goods.scrap * (1 + sellBonus) } : goods);
   // A favourite may go up too, and is no favourite after it (favorites.js);
   // its star shows on the list.
   const favorites = favoriteIds(row);

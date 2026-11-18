@@ -9,7 +9,9 @@
 // buttons, each with its picture and the pieces held (as the list of
 // "Poproś gildię" does, guild-requests.js), or gold for one side (the
 // author: "Daj też mozliwość wymiany i wystawiania ofert w Gildii zasoby za
-// złoto"), and takes the two counts; with the rules' sameCount the second
+// złoto"), or one of the Spiżarnia's fish, crops and dishes, folded
+// under "Ze Spiżarni" (those held to give, any to want), and takes the
+// two counts; with the rules' sameCount the second
 // one follows the first. Below the players' Wymiana's level (826 A) both
 // "Wystaw ofertę" and "Wymień" only say so in a toast. The words come with
 // the answer (data/guilds.json, exchange.texts), in the page's language;
@@ -17,7 +19,7 @@
 // mountGuildExchange(container) adds the card to the container and gives
 // { unmount() }, which takes it away.
 
-import { goldArt, resourceArt } from './art.js';
+import { goldArt, pantrySprite, resourceArt } from './art.js';
 import { fill, h, icon } from './dom.js';
 import { dateTimeFormat, formatNumber } from './format.js';
 import { t } from './i18n.js';
@@ -28,8 +30,13 @@ import { closeSheet, confirmAction, foldPart, framedName, howItWorks, openSheet,
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 const resourceName = (id) => state.content.resources.find((resource) => resource.id === id)?.name ?? id;
-// A side's picture: the resource's, or the gold coin.
-const goodArt = (id) => (id === 'gold' ? goldArt(24) : resourceArt(id, 24));
+// The Spiżarnia's fish, crops and dishes, as "pantry:<id>" (the author,
+// 18.11.2026: „O wymianie miedzy graczami i w gildii nie zapomnij”).
+const PANTRY = 'pantry:';
+const isPantry = (id) => id.startsWith(PANTRY);
+// A side's picture: the resource's, the gold coin, or the good's.
+const goodArt = (id) => (id === 'gold' ? goldArt(24) : isPantry(id) ? (pantrySprite(id.slice(PANTRY.length)) ?? icon('fish', { size: 24 })) : resourceArt(id, 24));
+const PANTRY_GROUPS = ['fish', 'crop', 'dish'];
 // "Kamień × 50", as the answers name a side of an offer, never broken
 // before the count.
 const sideText = (side) => `${side.name} × ${formatNumber(side.count)}`;
@@ -91,8 +98,11 @@ export function mountGuildExchange(container) {
     const { texts, rules, resources } = view;
     const gold = rules.gold.id;
     const ids = [...rules.resources, gold];
-    const held = (id) => (id === gold ? view.gold : (resources[id] ?? 0));
-    const nameOf = (id) => (id === gold ? rules.gold.name : resourceName(id));
+    // The Spiżarnia's goods: those held to give, any to want.
+    const goods = rules.pantry ?? [];
+    const goodById = Object.fromEntries(goods.map((good) => [good.id, good]));
+    const held = (id) => (id === gold ? view.gold : isPantry(id) ? (view.pantry?.[goodById[id]?.key] ?? 0) : (resources[id] ?? 0));
+    const nameOf = (id) => (id === gold ? rules.gold.name : isPantry(id) ? (goodById[id]?.name ?? id) : resourceName(id));
     const most = (id) => (id === gold ? rules.gold.most : rules.most);
     const range = (id) => `1–${formatNumber(most(id))}`;
     // The resource held most is given first, another one wanted.
@@ -123,6 +133,8 @@ export function mountGuildExchange(container) {
     }
     const givePicker = h('div', { class: 'guild-exchange-picker', role: 'group', 'aria-label': texts.give });
     const wantPicker = h('div', { class: 'guild-exchange-picker', role: 'group', 'aria-label': texts.want });
+    const givePantry = h('div', { class: 'guild-exchange-pantry' });
+    const wantPantry = h('div', { class: 'guild-exchange-pantry' });
     const choice = (id, picked, pick, disabled = false) =>
       h(
         'button',
@@ -131,33 +143,58 @@ export function mountGuildExchange(container) {
         h('span', { class: 'guild-exchange-name', text: nameOf(id) }),
         h('span', { class: 'guild-ask-have', text: filled(texts.have, { have: formatNumber(held(id)) }) }),
       );
+    // The Spiżarnia's goods of a side, folded under "Ze Spiżarni" (open
+    // while one of them is picked), the fish, the crops and the dishes
+    // each under its own heading.
+    const pantryFold = (key, list, picked, pick, disabled) =>
+      foldPart(
+        { key, title: texts.pantry, line: isPantry(picked) ? nameOf(picked) : null, open: false, force: isPantry(picked) },
+        list.length === 0
+          ? h('p', { class: 'muted', text: texts.pantryEmpty })
+          : PANTRY_GROUPS.map((group) => {
+              const some = list.filter((good) => good.group === group);
+              return (
+                some.length > 0 &&
+                h(
+                  'div',
+                  { class: 'guild-exchange-group' },
+                  h('p', { class: 'guild-exchange-group-title', text: texts.pantryGroups[group] }),
+                  h('div', { class: 'guild-exchange-picker', role: 'group', 'aria-label': texts.pantryGroups[group] }, some.map((good) => choice(good.id, picked, pick, good.id === disabled))),
+                )
+              );
+            }),
+      );
     // The good wanted is another than the one given: never gold for gold.
+    const pickGive = (next) => {
+      give = next;
+      if (want === give) want = ids.find((one) => one !== give);
+      draw();
+    };
+    const pickWant = (next) => {
+      want = next;
+      draw();
+    };
     const draw = () => {
       limits();
       fill(
         givePicker,
-        ids.map((id) =>
-          choice(id, give, (next) => {
-            give = next;
-            if (want === give) want = ids.find((one) => one !== give);
-            draw();
-          }),
+        ids.map((id) => choice(id, give, pickGive)),
+      );
+      fill(
+        givePantry,
+        pantryFold(
+          'guild-exchange-give-pantry',
+          goods.filter((good) => held(good.id) > 0),
+          give,
+          pickGive,
+          null,
         ),
       );
       fill(
         wantPicker,
-        ids.map((id) =>
-          choice(
-            id,
-            want,
-            (next) => {
-              want = next;
-              draw();
-            },
-            id === give,
-          ),
-        ),
+        ids.map((id) => choice(id, want, pickWant, id === give)),
       );
+      fill(wantPantry, pantryFold('guild-exchange-want-pantry', goods, want, pickWant, give));
     };
     draw();
     const send = h('button', {
@@ -188,9 +225,11 @@ export function mountGuildExchange(container) {
         h('p', { class: 'sheet-text', text: texts.postLead }),
         h('p', { class: 'field-label', text: texts.give }),
         givePicker,
+        givePantry,
         field(giveCount, giveLabel),
         h('p', { class: 'field-label', text: texts.want }),
         wantPicker,
+        wantPantry,
         field(wantCount, wantLabel),
         h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }), send),
       ),
