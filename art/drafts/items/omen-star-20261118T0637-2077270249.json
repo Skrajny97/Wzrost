@@ -1,0 +1,14 @@
+{
+  "id": "omen-star",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small flat figurine of hardened pale yellow candle wax shaped like a five-pointed star, smooth rounded drips of wax, no wick and no flame, lying still, single inventory item icon",
+  "style": "src/client/art/materials/wax-lump.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02339632914797465
+  },
+  "images": 1
+}
