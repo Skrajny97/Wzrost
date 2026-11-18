@@ -1,0 +1,23 @@
+{
+  "id": "immortal-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult man immortal arena champion, athletic and strong, short dark curly hair and a short dark beard, bareheaded with no helmet and the whole face clearly visible, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, a radiant golden laurel wreath glowing with light, ornate golden armour of a god of the arena with a roaring lion's head on the chest and small wings embossed on the pauldrons, a long royal purple cape with golden stars, golden greaves, faint golden light in old scars, holding a gleaming golden sword and a round golden shield with a rising sun in relief, the whole sword and shield inside the image, triumphant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/arena-legend-male.png",
+      "usage": "the same man: the same face, hair and build, drawn the same way; now in a far grander, godlike outfit and weapon of the same kind, not this outfit"
+    },
+    {
+      "path": "art/references/evolutions/immortal-female.png",
+      "usage": "the same outfit, armour, cape, sword, shield and colours as this woman, worn by the man; not her face, hair or build"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08058709555202061
+  },
+  "images": 4
+}
