@@ -659,6 +659,11 @@
       "start": "art/references/walks/start/ravager-male.png",
       "pose": 2,
       "description": "an enormous warlord man in dark red and black spiked plate armour with glowing orange cracks like embers, a dark horned helmet with two curved horns, a thick dark brown beard and glowing red eyes, a belt of small white skulls, a long dark red cloak hanging behind from the shoulders, dark armoured boots, no axe, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "ravager-female": {
+      "start": "art/references/walks/start/ravager-female.png",
+      "pose": 2,
+      "description": "a tall strong warrior woman with long dark red hair with thin braids falling down her back, two dark curved horns on her head, glowing orange eyes, dark spiked armour on the shoulders and arms with glowing orange cracks like embers, a bare midriff with glowing cracks, a belt of small skulls, a torn dark red skirt with glowing cracks, a long tattered dark red cloak hanging behind from the shoulders, dark fur-trimmed armoured boots, no axe, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     }
   }
 }
