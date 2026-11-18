@@ -1460,6 +1460,375 @@
     },
     "baba-yaga": {
       "suffix": "of Baba Yaga"
+    },
+    "death-boat": {
+      "prefix": {
+        "m": "Mourning",
+        "f": "Mourning",
+        "n": "Mourning",
+        "pl": "Mourning"
+      },
+      "suffix": "of the Death Canoe"
+    },
+    "water-strider": {
+      "suffix": "of the Water Strider"
+    },
+    "nameless": {
+      "prefix": {
+        "m": "Nameless",
+        "f": "Nameless",
+        "n": "Nameless",
+        "pl": "Nameless"
+      },
+      "suffix": "of the Nameless One"
+    },
+    "bridge-keeper": {
+      "prefix": {
+        "m": "Bridge",
+        "f": "Bridge",
+        "n": "Bridge",
+        "pl": "Bridge"
+      },
+      "suffix": "of the Bridge Keeper"
+    },
+    "harvestman": {
+      "suffix": "of the Harvestman"
+    },
+    "death-candle": {
+      "prefix": {
+        "m": "Candlelit",
+        "f": "Candlelit",
+        "n": "Candlelit",
+        "pl": "Candlelit"
+      },
+      "suffix": "of the Death Candle"
+    },
+    "mole-cricket": {
+      "suffix": "of the Mole Cricket"
+    },
+    "forefather": {
+      "prefix": {
+        "m": "Ancestral",
+        "f": "Ancestral",
+        "n": "Ancestral",
+        "pl": "Ancestral"
+      },
+      "suffix": "of the Forefather"
+    },
+    "giant-mole": {
+      "prefix": {
+        "m": "Mole",
+        "f": "Mole",
+        "n": "Mole",
+        "pl": "Mole"
+      },
+      "suffix": "of the Giant Mole"
+    },
+    "coffin": {
+      "prefix": {
+        "m": "Coffin",
+        "f": "Coffin",
+        "n": "Coffin",
+        "pl": "Coffin"
+      },
+      "suffix": "of the Coffin"
+    },
+    "two-headed-snake": {
+      "prefix": {
+        "m": "Two-Headed",
+        "f": "Two-Headed",
+        "n": "Two-Headed",
+        "pl": "Two-Headed"
+      },
+      "suffix": "of the Two-Headed Snake"
+    },
+    "candle-snuffer": {
+      "suffix": "of the Snuffer"
+    },
+    "gatekeeper": {
+      "prefix": {
+        "m": "Warden's",
+        "f": "Warden's",
+        "n": "Warden's",
+        "pl": "Warden's"
+      },
+      "suffix": "of the Gatekeeper"
+    },
+    "hourglass": {
+      "suffix": "of the Hourglass"
+    },
+    "shade": {
+      "prefix": {
+        "m": "Shadowy",
+        "f": "Shadowy",
+        "n": "Shadowy",
+        "pl": "Shadowy"
+      },
+      "suffix": "of the Shadow"
+    },
+    "indrik": {
+      "prefix": {
+        "m": "Indrik",
+        "f": "Indrik",
+        "n": "Indrik",
+        "pl": "Indrik"
+      },
+      "suffix": "of the Indrik"
+    },
+    "nyja": {
+      "suffix": "of Nyja"
+    },
+    "woolly-rhino": {
+      "prefix": {
+        "m": "Woolly",
+        "f": "Woolly",
+        "n": "Woolly",
+        "pl": "Woolly"
+      },
+      "suffix": "of the Woolly Rhino"
+    },
+    "bumblebee": {
+      "prefix": {
+        "m": "Buzzing",
+        "f": "Buzzing",
+        "n": "Buzzing",
+        "pl": "Buzzing"
+      },
+      "suffix": "of the Bumblebee"
+    },
+    "stampede": {
+      "suffix": "of the Stampede"
+    },
+    "cockroach": {
+      "suffix": "of the Cockroach"
+    },
+    "house-serpent": {
+      "prefix": {
+        "m": "Gold-Scaled",
+        "f": "Gold-Scaled",
+        "n": "Gold-Scaled",
+        "pl": "Gold-Scaled"
+      },
+      "suffix": "of the House Serpent"
+    },
+    "greed": {
+      "prefix": {
+        "m": "Greedy",
+        "f": "Greedy",
+        "n": "Greedy",
+        "pl": "Greedy"
+      },
+      "suffix": "of Greed"
+    },
+    "pill-bug": {
+      "suffix": "of the Pill Bug"
+    },
+    "snake-maiden": {
+      "prefix": {
+        "m": "Serpentine",
+        "f": "Serpentine",
+        "n": "Serpentine",
+        "pl": "Serpentine"
+      },
+      "suffix": "of the Snake Maiden"
+    },
+    "dead-water": {
+      "prefix": {
+        "m": "Dead",
+        "f": "Dead",
+        "n": "Dead",
+        "pl": "Dead"
+      },
+      "suffix": "of the Dead Water"
+    },
+    "stick-insect": {
+      "suffix": "of the Stick Insect"
+    },
+    "simargl": {
+      "prefix": {
+        "m": "Winged",
+        "f": "Winged",
+        "n": "Winged",
+        "pl": "Winged"
+      },
+      "suffix": "of Simargl"
+    },
+    "blood-feud": {
+      "prefix": {
+        "m": "Vengeful",
+        "f": "Vengeful",
+        "n": "Vengeful",
+        "pl": "Vengeful"
+      },
+      "suffix": "of the Blood Feud"
+    },
+    "ghost-smith": {
+      "prefix": {
+        "m": "Forged",
+        "f": "Forged",
+        "n": "Forged",
+        "pl": "Forged"
+      },
+      "suffix": "of the Ghost Smith"
+    },
+    "shackles": {
+      "suffix": "of the Shackles"
+    },
+    "steward": {
+      "suffix": "of the Steward"
+    },
+    "turon": {
+      "prefix": {
+        "m": "Shaggy",
+        "f": "Shaggy",
+        "n": "Shaggy",
+        "pl": "Shaggy"
+      },
+      "suffix": "of the Turoń"
+    },
+    "veles": {
+      "prefix": {
+        "m": "Underworld",
+        "f": "Underworld",
+        "n": "Underworld",
+        "pl": "Underworld"
+      },
+      "suffix": "of Veles"
+    },
+    "mammoth": {
+      "prefix": {
+        "m": "Mammoth",
+        "f": "Mammoth",
+        "n": "Mammoth",
+        "pl": "Mammoth"
+      },
+      "suffix": "of the Mammoth"
+    },
+    "pseudoscorpion": {
+      "suffix": "of the Pseudoscorpion"
+    },
+    "silence": {
+      "prefix": {
+        "m": "Silent",
+        "f": "Silent",
+        "n": "Silent",
+        "pl": "Silent"
+      },
+      "suffix": "of Silence"
+    },
+    "sledge": {
+      "suffix": "of the Sledge"
+    },
+    "snow-flea": {
+      "prefix": {
+        "m": "Snowy",
+        "f": "Snowy",
+        "n": "Snowy",
+        "pl": "Snowy"
+      },
+      "suffix": "of the Snow Flea"
+    },
+    "oblivion": {
+      "prefix": {
+        "m": "Forgotten",
+        "f": "Forgotten",
+        "n": "Forgotten",
+        "pl": "Forgotten"
+      },
+      "suffix": "of Oblivion"
+    },
+    "ice-block": {
+      "prefix": {
+        "m": "Glacial",
+        "f": "Glacial",
+        "n": "Glacial",
+        "pl": "Glacial"
+      },
+      "suffix": "of the Glacier"
+    },
+    "mayfly": {
+      "prefix": {
+        "m": "Ephemeral",
+        "f": "Ephemeral",
+        "n": "Ephemeral",
+        "pl": "Ephemeral"
+      },
+      "suffix": "of the Mayfly"
+    },
+    "longing": {
+      "prefix": {
+        "m": "Wistful",
+        "f": "Wistful",
+        "n": "Wistful",
+        "pl": "Wistful"
+      },
+      "suffix": "of Longing"
+    },
+    "dread": {
+      "prefix": {
+        "m": "Dreadful",
+        "f": "Dreadful",
+        "n": "Dreadful",
+        "pl": "Dreadful"
+      },
+      "suffix": "of Dread"
+    },
+    "rat-king": {
+      "prefix": {
+        "m": "Rat",
+        "f": "Rat",
+        "n": "Rat",
+        "pl": "Rat"
+      },
+      "suffix": "of the Rat King"
+    },
+    "black-flame": {
+      "prefix": {
+        "m": "Dark",
+        "f": "Dark",
+        "n": "Dark",
+        "pl": "Dark"
+      },
+      "suffix": "of the Black Flame"
+    },
+    "koschei-egg": {
+      "suffix": "of Koschei's Egg"
+    },
+    "bayun": {
+      "prefix": {
+        "m": "Purring",
+        "f": "Purring",
+        "n": "Purring",
+        "pl": "Purring"
+      },
+      "suffix": "of Bayun the Cat"
+    },
+    "ice-princess": {
+      "prefix": {
+        "m": "Enchanted",
+        "f": "Enchanted",
+        "n": "Enchanted",
+        "pl": "Enchanted"
+      },
+      "suffix": "of the Enchanted Princess"
+    },
+    "marzanna": {
+      "prefix": {
+        "m": "Wintry",
+        "f": "Wintry",
+        "n": "Wintry",
+        "pl": "Wintry"
+      },
+      "suffix": "of Marzanna"
+    },
+    "koschei": {
+      "prefix": {
+        "m": "Deathless",
+        "f": "Deathless",
+        "n": "Deathless",
+        "pl": "Deathless"
+      },
+      "suffix": "of Koschei"
     }
   }
 }

@@ -67,6 +67,14 @@
             "Explorer of the Bald Mountains",
             "Explorer of the Bald Mountains"
           ]
+        },
+        "nav-explorer": {
+          "name": "Explorer of Nav",
+          "goal": "Reach Nav (character level 276).",
+          "title": [
+            "Explorer of Nav",
+            "Explorer of Nav"
+          ]
         }
       }
     },

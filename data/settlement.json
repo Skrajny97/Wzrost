@@ -918,7 +918,22 @@
       { "area": "witch-kitchen", "monster": "broom-witch", "name": "Czarownica Kucharka", "female": true },
       { "area": "dance-circle", "monster": "cursed-piper", "name": "Grajek Piekielny" },
       { "area": "stone-altars", "monster": "fate-spinner", "name": "Najstarsza Prządka", "female": true },
-      { "area": "baba-yaga-hut", "monster": "black-goose", "name": "Gęś Strażniczka", "female": true }
+      { "area": "baba-yaga-hut", "monster": "black-goose", "name": "Gęś Strażniczka", "female": true },
+      { "area": "misty-shore", "monster": "death-boat", "name": "Czarne Czółno" },
+      { "area": "viburnum-bridge", "monster": "bridge-keeper", "name": "Mostnik Poborca" },
+      { "area": "forefathers-isle", "monster": "forefather", "name": "Najstarszy Praszczur" },
+      { "area": "crossing-of-the-dead", "monster": "coffin", "name": "Okuta Trumna", "female": true },
+      { "area": "gate-of-nav", "monster": "gatekeeper", "name": "Stary Odźwierny" },
+      { "area": "eternal-pastures", "monster": "woolly-rhino", "name": "Siwy Nosorożec" },
+      { "area": "golden-ravines", "monster": "house-serpent", "name": "Złoty Ćmok" },
+      { "area": "serpent-springs", "monster": "snake-maiden", "name": "Najmłodsza Wężowa Panna", "female": true },
+      { "area": "veles-oakwood", "monster": "simargl", "name": "Simargł Strażnik" },
+      { "area": "veles-court", "monster": "ghost-smith", "name": "Kowal Kajdan" },
+      { "area": "frozen-caves", "monster": "mammoth", "name": "Prastary Mamut" },
+      { "area": "road-of-the-dead", "monster": "sledge", "name": "Sanie Bez Woźnicy" },
+      { "area": "black-lake", "monster": "ice-block", "name": "Czarny Lodowiec" },
+      { "area": "chernobog-stronghold", "monster": "rat-king", "name": "Szczurzy Król Grodu" },
+      { "area": "koschei-castle", "monster": "bayun", "name": "Kot Bajun Bajarz" }
     ],
     "outlaws": ["bandit-chief", "poacher", "horse-thief", "smuggler", "arsonist", "highwaywoman", "grave-robber"],
     "texts": {

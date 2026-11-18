@@ -1382,5 +1382,365 @@
         "champion": "baba-yaga"
       }
     ]
+  },
+  {
+    "id": "navia-marshes",
+    "land": "Nawia",
+    "name": "Mgliste Bagna Nawii",
+    "minLevel": 276,
+    "maxLevel": 300,
+    "safe": false,
+    "description": "Tu kończy się świat żywych. Nad czarną wodą wisi mgła tak gęsta, że gubią się w niej nawet dusze, a przez bagna płynie rzeka, za którą zaczyna się Nawia.",
+    "trait": {
+      "name": "Mgła zaświatów",
+      "description": "Każdy cios ma 5% szans chybić we mgle, u stworów i u postaci.",
+      "missChance": 0.05
+    },
+    "elite": "indrik",
+    "resources": { "wood": 3, "stone": 2, "iron-ore": 5 },
+    "fightBoard": "board-navia-marshes",
+    "areas": [
+      {
+        "id": "misty-shore",
+        "name": "Mglisty Brzeg",
+        "minLevel": 276,
+        "maxLevel": 280,
+        "description": "Szary brzeg rzeki, za którą zaczyna się Nawia. Mgła wisi tak nisko, że widać tylko własne buty i blade światła na wodzie.",
+        "encounters": [
+          { "weight": 18, "monsters": ["death-boat"] },
+          { "weight": 14, "monsters": ["water-strider"] },
+          { "weight": 14, "monsters": ["nameless", "nameless"] },
+          { "weight": 12, "monsters": ["death-boat", "nameless"] },
+          { "weight": 12, "monsters": ["water-strider", "water-strider"] },
+          { "weight": 10, "monsters": ["death-boat", "water-strider"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["death-boat", "water-strider", "nameless"] },
+          { "weight": 6, "monsters": ["death-boat", "death-boat"] },
+          { "weight": 6, "monsters": ["water-strider", "nameless", "nameless"] }
+        ]
+      },
+      {
+        "id": "viburnum-bridge",
+        "name": "Kalinowy Most",
+        "minLevel": 281,
+        "maxLevel": 285,
+        "description": "Most z gałęzi kaliny nad rzeką umarłych. Czerwone jagody świecą we mgle jak krople krwi, a deski skrzypią pod każdym krokiem.",
+        "encounters": [
+          { "weight": 18, "monsters": ["bridge-keeper"] },
+          { "weight": 14, "monsters": ["harvestman"] },
+          { "weight": 14, "monsters": ["death-candle", "death-candle"] },
+          { "weight": 12, "monsters": ["bridge-keeper", "death-candle"] },
+          { "weight": 12, "monsters": ["harvestman", "harvestman"] },
+          { "weight": 10, "monsters": ["bridge-keeper", "harvestman"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["bridge-keeper", "harvestman", "death-candle"] },
+          { "weight": 6, "monsters": ["bridge-keeper", "bridge-keeper"] },
+          { "weight": 6, "monsters": ["harvestman", "death-candle", "death-candle"] }
+        ]
+      },
+      {
+        "id": "forefathers-isle",
+        "name": "Wyspa Praszczurów",
+        "minLevel": 286,
+        "maxLevel": 290,
+        "description": "Wyspa we mgle, na której spoczywają praojcowie. Ich duchy siedzą przy zimnych ogniskach i czekają na potomków.",
+        "encounters": [
+          { "weight": 18, "monsters": ["mole-cricket"] },
+          { "weight": 14, "monsters": ["forefather"] },
+          { "weight": 14, "monsters": ["giant-mole", "giant-mole"] },
+          { "weight": 12, "monsters": ["mole-cricket", "giant-mole"] },
+          { "weight": 12, "monsters": ["forefather", "forefather"] },
+          { "weight": 10, "monsters": ["mole-cricket", "forefather"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["mole-cricket", "forefather", "giant-mole"] },
+          { "weight": 6, "monsters": ["mole-cricket", "mole-cricket"] },
+          { "weight": 6, "monsters": ["forefather", "giant-mole", "giant-mole"] }
+        ]
+      },
+      {
+        "id": "crossing-of-the-dead",
+        "name": "Przeprawa Umarłych",
+        "minLevel": 291,
+        "maxLevel": 295,
+        "description": "Stara przystań, z której czółna wiozą umarłych na drugi brzeg. Na pomoście czekają dusze, które nie mają czym zapłacić.",
+        "encounters": [
+          { "weight": 18, "monsters": ["coffin"] },
+          { "weight": 14, "monsters": ["two-headed-snake"] },
+          { "weight": 14, "monsters": ["candle-snuffer", "candle-snuffer"] },
+          { "weight": 12, "monsters": ["coffin", "candle-snuffer"] },
+          { "weight": 12, "monsters": ["two-headed-snake", "two-headed-snake"] },
+          { "weight": 10, "monsters": ["coffin", "two-headed-snake"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["coffin", "two-headed-snake", "candle-snuffer"] },
+          { "weight": 6, "monsters": ["coffin", "coffin"] },
+          { "weight": 6, "monsters": ["two-headed-snake", "candle-snuffer", "candle-snuffer"] }
+        ]
+      },
+      {
+        "id": "gate-of-nav",
+        "name": "Brama Nawii",
+        "minLevel": 296,
+        "maxLevel": 300,
+        "description": "Brama z czarnego drewna, wysoka jak sosny. Za nią mgła się kończy, a zaczyna się łąka, której nikt żywy nie widział.",
+        "encounters": [
+          { "weight": 18, "monsters": ["gatekeeper"] },
+          { "weight": 14, "monsters": ["hourglass"] },
+          { "weight": 14, "monsters": ["shade", "shade"] },
+          { "weight": 12, "monsters": ["gatekeeper", "shade"] },
+          { "weight": 12, "monsters": ["hourglass", "hourglass"] },
+          { "weight": 10, "monsters": ["gatekeeper", "hourglass"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["gatekeeper", "hourglass", "shade"] },
+          { "weight": 6, "monsters": ["gatekeeper", "gatekeeper"] },
+          { "weight": 6, "monsters": ["hourglass", "shade", "shade"] }
+        ],
+        "champion": "nyja"
+      }
+    ]
+  },
+  {
+    "id": "veles-meadows",
+    "land": "Nawia",
+    "name": "Łąki Welesa",
+    "minLevel": 301,
+    "maxLevel": 325,
+    "safe": false,
+    "description": "Za bramą Nawii zaczynają się łąki Welesa, pana zaświatów. Trawa nigdy tu nie więdnie, choć słońce nie wschodzi, a łąki oświetla zielony blask spod ziemi. Weles pasie tu swoje stada i strzeże skarbów ukrytych pod korzeniami Drzewa Świata.",
+    "trait": {
+      "name": "Czary Welesa",
+      "description": "Zaklęcia są o 5% silniejsze, u stworów i u postaci.",
+      "spellBonus": 0.05
+    },
+    "elite": "turon",
+    "resources": { "wood": 6, "stone": 2, "iron-ore": 2 },
+    "fightBoard": "board-veles-meadows",
+    "areas": [
+      {
+        "id": "eternal-pastures",
+        "name": "Wieczne Pastwiska",
+        "minLevel": 301,
+        "maxLevel": 305,
+        "description": "Łąka, na której trawa nigdy nie więdnie. Pasą się tu stada Welesa, zwierzęta tak stare, że na ziemi dawno ich nie ma.",
+        "encounters": [
+          { "weight": 18, "monsters": ["woolly-rhino"] },
+          { "weight": 14, "monsters": ["bumblebee"] },
+          { "weight": 14, "monsters": ["stampede", "stampede"] },
+          { "weight": 12, "monsters": ["woolly-rhino", "stampede"] },
+          { "weight": 12, "monsters": ["bumblebee", "bumblebee"] },
+          { "weight": 10, "monsters": ["woolly-rhino", "bumblebee"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["woolly-rhino", "bumblebee", "stampede"] },
+          { "weight": 6, "monsters": ["woolly-rhino", "woolly-rhino"] },
+          { "weight": 6, "monsters": ["bumblebee", "stampede", "stampede"] }
+        ]
+      },
+      {
+        "id": "golden-ravines",
+        "name": "Złote Jary",
+        "minLevel": 306,
+        "maxLevel": 310,
+        "description": "Wąwozy, w których Weles chowa swoje skarby. Złoto leży na wierzchu, ale kto po nie sięgnie, ten zostaje w Nawii na zawsze.",
+        "encounters": [
+          { "weight": 18, "monsters": ["cockroach"] },
+          { "weight": 14, "monsters": ["house-serpent"] },
+          { "weight": 14, "monsters": ["greed", "greed"] },
+          { "weight": 12, "monsters": ["cockroach", "greed"] },
+          { "weight": 12, "monsters": ["house-serpent", "house-serpent"] },
+          { "weight": 10, "monsters": ["cockroach", "house-serpent"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["cockroach", "house-serpent", "greed"] },
+          { "weight": 6, "monsters": ["cockroach", "cockroach"] },
+          { "weight": 6, "monsters": ["house-serpent", "greed", "greed"] }
+        ]
+      },
+      {
+        "id": "serpent-springs",
+        "name": "Wężowe Źródła",
+        "minLevel": 311,
+        "maxLevel": 315,
+        "description": "Źródła spod korzeni Drzewa Świata, przy których Weles w postaci węża wygrzewa się w zielonym blasku. Woda jest tu żywa albo martwa, a nikt nie wie, która jest która.",
+        "encounters": [
+          { "weight": 18, "monsters": ["pill-bug"] },
+          { "weight": 14, "monsters": ["snake-maiden"] },
+          { "weight": 14, "monsters": ["dead-water", "dead-water"] },
+          { "weight": 12, "monsters": ["pill-bug", "dead-water"] },
+          { "weight": 12, "monsters": ["snake-maiden", "snake-maiden"] },
+          { "weight": 10, "monsters": ["pill-bug", "snake-maiden"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["pill-bug", "snake-maiden", "dead-water"] },
+          { "weight": 6, "monsters": ["pill-bug", "pill-bug"] },
+          { "weight": 6, "monsters": ["snake-maiden", "dead-water", "dead-water"] }
+        ]
+      },
+      {
+        "id": "veles-oakwood",
+        "name": "Dąbrowa Welesa",
+        "minLevel": 316,
+        "maxLevel": 320,
+        "description": "Stare dęby, pod którymi składano Welesowi ofiary. Na gałęziach wiszą rogi, a między pniami słychać szum skrzydeł, choć ptaków tu nie ma.",
+        "encounters": [
+          { "weight": 18, "monsters": ["stick-insect"] },
+          { "weight": 14, "monsters": ["simargl"] },
+          { "weight": 14, "monsters": ["blood-feud", "blood-feud"] },
+          { "weight": 12, "monsters": ["stick-insect", "blood-feud"] },
+          { "weight": 12, "monsters": ["simargl", "simargl"] },
+          { "weight": 10, "monsters": ["stick-insect", "simargl"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["stick-insect", "simargl", "blood-feud"] },
+          { "weight": 6, "monsters": ["stick-insect", "stick-insect"] },
+          { "weight": 6, "monsters": ["simargl", "blood-feud", "blood-feud"] }
+        ]
+      },
+      {
+        "id": "veles-court",
+        "name": "Dwór Welesa",
+        "minLevel": 321,
+        "maxLevel": 325,
+        "description": "Dwór z czarnych bali, w którym Weles przyjmuje umarłych na uczcie. Przy wrotach leżą stosy złota, a w środku płonie ogień, który nie grzeje.",
+        "encounters": [
+          { "weight": 18, "monsters": ["ghost-smith"] },
+          { "weight": 14, "monsters": ["shackles"] },
+          { "weight": 14, "monsters": ["steward", "steward"] },
+          { "weight": 12, "monsters": ["ghost-smith", "steward"] },
+          { "weight": 12, "monsters": ["shackles", "shackles"] },
+          { "weight": 10, "monsters": ["ghost-smith", "shackles"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["ghost-smith", "shackles", "steward"] },
+          { "weight": 6, "monsters": ["ghost-smith", "ghost-smith"] },
+          { "weight": 6, "monsters": ["shackles", "steward", "steward"] }
+        ],
+        "champion": "veles"
+      }
+    ]
+  },
+  {
+    "id": "sunless-land",
+    "land": "Nawia",
+    "name": "Kraina bez Słońca",
+    "minLevel": 326,
+    "maxLevel": 350,
+    "safe": false,
+    "description": "Najgłębsza Nawia, do której nigdy nie dotarło słońce. Rządzi tu Czarnobóg, bóg ciemności, a Marzanna rozsiewa wieczną zimę. W zamarzniętych pieczarach śpią stwory starsze niż ludzie, a gdzieś w lodowym zamku Kościej Nieśmiertelny ukrył swoją śmierć.",
+    "trait": {
+      "name": "Bez słońca",
+      "description": "Leczenie przywraca o 5% mniej HP, u stworów i u postaci.",
+      "healMalus": 0.05
+    },
+    "elite": "marzanna",
+    "resources": { "wood": 1, "stone": 5, "iron-ore": 4 },
+    "fightBoard": "board-sunless-land",
+    "areas": [
+      {
+        "id": "frozen-caves",
+        "name": "Zamarznięte Pieczary",
+        "minLevel": 326,
+        "maxLevel": 330,
+        "description": "Lodowe jaskinie, w których od tysięcy lat śpią stwory starsze niż ludzie. Ich oddech osiada szronem na ścianach.",
+        "encounters": [
+          { "weight": 18, "monsters": ["mammoth"] },
+          { "weight": 14, "monsters": ["pseudoscorpion"] },
+          { "weight": 14, "monsters": ["silence", "silence"] },
+          { "weight": 12, "monsters": ["mammoth", "silence"] },
+          { "weight": 12, "monsters": ["pseudoscorpion", "pseudoscorpion"] },
+          { "weight": 10, "monsters": ["mammoth", "pseudoscorpion"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["mammoth", "pseudoscorpion", "silence"] },
+          { "weight": 6, "monsters": ["mammoth", "mammoth"] },
+          { "weight": 6, "monsters": ["pseudoscorpion", "silence", "silence"] }
+        ]
+      },
+      {
+        "id": "road-of-the-dead",
+        "name": "Szlak Umarłych",
+        "minLevel": 331,
+        "maxLevel": 335,
+        "description": "Zaśnieżony szlak, którym od wieków wozi się umarłych. W Krainie bez Słońca zawsze jest zima, więc sanie jeżdżą tu przez cały rok.",
+        "encounters": [
+          { "weight": 18, "monsters": ["sledge"] },
+          { "weight": 14, "monsters": ["snow-flea"] },
+          { "weight": 14, "monsters": ["oblivion", "oblivion"] },
+          { "weight": 12, "monsters": ["sledge", "oblivion"] },
+          { "weight": 12, "monsters": ["snow-flea", "snow-flea"] },
+          { "weight": 10, "monsters": ["sledge", "snow-flea"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["sledge", "snow-flea", "oblivion"] },
+          { "weight": 6, "monsters": ["sledge", "sledge"] },
+          { "weight": 6, "monsters": ["snow-flea", "oblivion", "oblivion"] }
+        ]
+      },
+      {
+        "id": "black-lake",
+        "name": "Czarne Jezioro",
+        "minLevel": 336,
+        "maxLevel": 340,
+        "description": "Jezioro, w którym nigdy nie odbiło się słońce. Woda jest czarna jak smoła i tak zimna, że parzy.",
+        "encounters": [
+          { "weight": 18, "monsters": ["ice-block"] },
+          { "weight": 14, "monsters": ["mayfly"] },
+          { "weight": 14, "monsters": ["longing", "longing"] },
+          { "weight": 12, "monsters": ["ice-block", "longing"] },
+          { "weight": 12, "monsters": ["mayfly", "mayfly"] },
+          { "weight": 10, "monsters": ["ice-block", "mayfly"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["ice-block", "mayfly", "longing"] },
+          { "weight": 6, "monsters": ["ice-block", "ice-block"] },
+          { "weight": 6, "monsters": ["mayfly", "longing", "longing"] }
+        ]
+      },
+      {
+        "id": "chernobog-stronghold",
+        "name": "Gród Czarnoboga",
+        "minLevel": 341,
+        "maxLevel": 345,
+        "description": "Gród z czarnego kamienia, w którym Czarnobóg liczy wszystkie nieszczęścia świata. Pochodnie palą się tu czarnym płomieniem.",
+        "encounters": [
+          { "weight": 18, "monsters": ["dread"] },
+          { "weight": 14, "monsters": ["rat-king"] },
+          { "weight": 14, "monsters": ["black-flame", "black-flame"] },
+          { "weight": 12, "monsters": ["dread", "black-flame"] },
+          { "weight": 12, "monsters": ["rat-king", "rat-king"] },
+          { "weight": 10, "monsters": ["dread", "rat-king"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["dread", "rat-king", "black-flame"] },
+          { "weight": 6, "monsters": ["dread", "dread"] },
+          { "weight": 6, "monsters": ["rat-king", "black-flame", "black-flame"] }
+        ]
+      },
+      {
+        "id": "koschei-castle",
+        "name": "Zamek Kościeja",
+        "minLevel": 346,
+        "maxLevel": 350,
+        "description": "Zamek z lodu i kości na samym dnie Nawii. Gdzieś w nim Kościej ukrył swoją śmierć: w igle, igłę w jajku, jajko w kaczce, kaczkę w zającu, a zająca w skrzyni.",
+        "encounters": [
+          { "weight": 18, "monsters": ["koschei-egg"] },
+          { "weight": 14, "monsters": ["bayun"] },
+          { "weight": 14, "monsters": ["ice-princess", "ice-princess"] },
+          { "weight": 12, "monsters": ["koschei-egg", "ice-princess"] },
+          { "weight": 12, "monsters": ["bayun", "bayun"] },
+          { "weight": 10, "monsters": ["koschei-egg", "bayun"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["koschei-egg", "bayun", "ice-princess"] },
+          { "weight": 6, "monsters": ["koschei-egg", "koschei-egg"] },
+          { "weight": 6, "monsters": ["bayun", "ice-princess", "ice-princess"] }
+        ],
+        "champion": "koschei"
+      }
+    ]
   }
 ]
