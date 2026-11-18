@@ -26,12 +26,16 @@ const STATUS = { online: 'online', busy: 'zajęty, teraz bez wymiany', offline: 
 // When a friend was last online (last-seen.js), in the page's language.
 const SEEN = { now: 'teraz', minutes: '{count} min temu', hours: '{count} godz. temu', yesterday: 'wczoraj', days: '{count} dni temu' };
 
-// A friend's last time online, beside its level: "teraz" while its dot is
-// green or yellow, else how long ago; nothing for one never seen.
-function seenLine(person) {
-  const seen = lastSeen(person.lastSeen, serverNow(), person.status !== 'offline');
+// A character's last time online, beside its level: "teraz" while online,
+// else how long ago; nothing for one never seen. Also beside the Gildia's
+// members (guild.js).
+export function seenTag(seenAt, online) {
+  const seen = lastSeen(seenAt, serverNow(), online);
   return seen && h('span', { class: 'friend-seen', title: t('Ostatnio online'), text: t(SEEN[seen.unit], { count: formatNumber(seen.count) }) });
 }
+
+// A friend's: "teraz" while its dot is green or yellow.
+const seenLine = (person) => seenTag(person.lastSeen, person.status !== 'offline');
 
 // What the Upominki collected held: "Punkty Czasu +3, Złoto +40, Drewno +5".
 export const giftText = (reward) =>

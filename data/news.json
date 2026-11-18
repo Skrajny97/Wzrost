@@ -1310,6 +1310,11 @@
       "id": "0.4.24",
       "title": "Wersja 0.4.24",
       "body": "- W grudniu w Sklepie Systemu, w zakładce Skórki, pojawią się zimowe stroje dla każdej klasy: Zbroja Szczodrych Godów, Strój Zimowego Strzelca, Futro Mroźnego Maga, Szaty Gwiazdora i Płaszcz Zimowej Nocy. Każdy kosztuje 800 Punktów Systemu i działa przy każdej ewolucji: na portrecie, w marszu i w siodle. W sprzedaży tylko w grudniu.\n- Gdy Twoja postać jedzie na kucu, idący obok towarzysze są teraz więksi i lepiej pasują do jeźdźca."
+    },
+    {
+      "id": "0.4.25",
+      "title": "Wersja 0.4.25",
+      "body": "- Na liście członków gildii widać teraz, kiedy każdy z nich był ostatnio w grze, tak jak w Znajomych: „teraz”, „3 godz. temu”, „wczoraj” albo „12 dni temu”."
     }
   ]
 }

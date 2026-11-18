@@ -3,7 +3,8 @@
 // Gildii, ona powinna uruchamiać osobną stronę ... raczej strony z tłem"):
 // its picture behind the heading, the way back to the Społeczność, the
 // invitations waiting for this character; its guild with the members, the
-// leader and the deputies marked, and what its role lets it do (invite a
+// leader and the deputies marked, each with when it was last online as in
+// the Znajomi, and what its role lets it do (invite a
 // friend at a tap or anyone by name, take an invitation back, remove, name
 // a deputy, hand the lead over); the Ranking członków under it
 // (guild-ranking.js, 897 A); "Opuść gildię"; and, outside a guild,
@@ -43,6 +44,7 @@ import { narrate } from '../narrator.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, serverNow, state } from '../state.js';
 import { confirmAction, foldPart, framedName, guildTag, toast, withButton } from '../ui.js';
+import { seenTag } from './friends.js';
 import { lockedScreen } from './locked.js';
 
 const PAGE = '#/gildia';
@@ -319,7 +321,12 @@ function mountGuild(container) {
         h('button', { type: 'button', class: 'chat-name', text: person.name, 'aria-label': t('{name}: zobacz postać', { name: person.name }), onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name)) }),
         person.nameColor,
       ),
-      person.level && h('span', { class: 'chat-level', text: t('poz. {level}', { level: person.level }) }),
+      // A member's level and its last time online on one line, as in the
+      // Znajomi (friends.js).
+      person.level &&
+        (Object.hasOwn(person, 'lastSeen')
+          ? h('span', { class: 'friend-level' }, h('span', { class: 'chat-level', text: t('poz. {level}', { level: person.level }) }), seenTag(person.lastSeen, person.online))
+          : h('span', { class: 'chat-level', text: t('poz. {level}', { level: person.level }) })),
       more,
     );
 
