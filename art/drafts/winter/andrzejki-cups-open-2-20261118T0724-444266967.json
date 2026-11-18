@@ -1,0 +1,14 @@
+{
+  "id": "andrzejki-cups-open-2",
+  "tool": "pixellab inpaint-v3",
+  "description": "St Andrew's Eve fortune telling in a Slavic forest cottage at night, pixel art scene: two overturned copper cups, the left and the right one, stand upside down on a rough wooden table; the cup that stood in the middle has been taken away and the bare wooden table is empty there, the same planks and candle light as around it, nothing lying on it, no cup, no hands, no arms, a lit tallow candle on the left, bunches of herbs hanging on the dark log wall, a small window with the dark blue night sky, warm candle light",
+  "style": "src/client/art/camp/campfire-1.png",
+  "input": "art/inputs/andrzejki/cups-covered.png",
+  "mask": "art/inputs/andrzejki/cups-open-2-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
