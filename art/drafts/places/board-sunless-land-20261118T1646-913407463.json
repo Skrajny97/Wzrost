@@ -1,0 +1,14 @@
+{
+  "id": "board-sunless-land",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art, top-down view straight from above of frozen ground in eternal night: packed snow and patches of black ice, thin frost cracks, scattered small dark stones, muted very dark palette of icy blue, black and pale grey, a faint pale strip of trampled ground across the middle dividing two halves, slightly darker edges, soft even dusk light, flat ground seen from above for a dim background behind game cards, very low contrast, no standing trees, no people, no animals, no weapons, no text, no border",
+  "style": "src/client/art/boards/arena-board.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
