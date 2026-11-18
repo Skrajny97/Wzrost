@@ -229,7 +229,8 @@ export function offerPointsReset() {
 
 // The character at an evolution's class level at once (the author: "nie
 // chce mi się przeklikiwać tego"): the first's, a test evolution undone
-// first, or the next form's (`next`: 100 or 200), the form it has kept.
+// first, or the next form's (`next`: 100, 200 or 300), the form it has
+// kept.
 function testLevelButton({ next = false } = {}) {
   const words = texts();
   const level = String(next ? (state.character.evolution?.nextLevel ?? '') : (unlockInfo('evolution')?.classLevel ?? ''));
@@ -250,7 +251,8 @@ function testLevelButton({ next = false } = {}) {
 // try, or the next form of the one the character has, the way back from
 // the one tried, and the class level of an evolution at once (the next
 // form's while it has one: 100 for a first evolution, 200 for a second
-// form where the third forms are on).
+// form where the third forms are on, 300 for a third form where the
+// fourth forms are on).
 export async function openEvolutionTests() {
   const words = texts();
   const character = state.character;

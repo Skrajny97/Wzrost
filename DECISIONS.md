@@ -3745,6 +3745,15 @@ Najpierw Tier X przedmiotów (potrzebny najlepszej postaci za około dwa tygodni
     - Żniwiarz Dusz: „Żniwo”, „Ścięcie dusz” (z „Ciosu ostatecznego”), „Taniec kosy”. Król Nawii: „Władca Nawii”, „Legion Nawii” (z „Armii umarłych”), „Mgła Nawii”. Książę Ciemności: „Dziecię nocy”, „Wieczna noc” (z „Zaćmienia”), „Cios z cienia”.
     - Pełne opisy z liczbami wstępnymi są na stronie ocen (1095, archiwum); po symulacjach trafią do `data/evolutions.json`.
 5. Dalej: liczby z symulacji, potem chody, jazda wierzchem, odcienie skóry i ikony umiejętności. Do gry wejdzie z pełną grafiką.
+6. **Kod i dane gotowe, czwarta ewolucja wyłączona (18.11.2026).** Zmienna `FOURTH_EVOLUTION` (`on` razem z `THIRD_EVOLUTION`) pokazuje czwarte formy; bez niej trzecia forma czeka na 300. poziomie klasy tylko na rozdanie punktów, jak dotąd. Wersja testowa daje trzeciej formie 300. poziom klasy od razu („?level=300”, błąd `not_third` dla innych). Czwarta forma nosi broń swojej linii: Król Nawii kostury i fokusy Maga, Mściciel Niebios broń Wojownika.
+7. **Rozstrzygnięcia przy liczeniu (18.11.2026):** liczby ustawiły symulacje wypraw (poziom 260, sam bez towarzyszy, 120 wypraw po 4 godziny: każda czwarta forma pada nie częściej niż jej trzecia i kończy z co najmniej takim HP albo zabija wyraźnie szybciej) i Areny (poziomy 250–300: każda forma wygrywa 34–72% pojedynków).
+    - **Jasnowidzenie** unika też czarów: unik działa w grze tylko na ciosy fizyczne, więc Wieszcz bez tego padał na wyprawach od czarownic. Opis: „unika ciosów o X pkt proc. częściej, także czarów”.
+    - **Dar widzenia** daje na start pancerz i odporności +45% i obrażenia +22% (w propozycji +30% i +16%).
+    - **Władca Nawii** podnosi każdego zabitego wroga, nie tylko zabitego trucizną, jak mówi opis, z własnymi słowami („wstaje jako upiór Nawii”).
+    - **Tarcza tytana** trwa 4 ruchy; **Odwrócenie losu** działa poniżej 40% HP.
+    - Siła w pojedynkach (`duelPower`, `duelHp` w `data/evolutions.json`, tylko Arena) dla 14 form (bez Niebiańskiego Łucznika); Tytan, tarcza drużyny, w pojedynku jeden na jednego bije mało (2,3 siły i 1,9 HP).
+    - Trzeci obrót Huraganu chwały ma własne słowa („trzeci obrót”), a oślepienie z Ognia niebios nie powtarza komunikatu, gdy Słup światła oślepił już tym samym ciosem.
+8. Do zrobienia z grafiką: kilku przywołańców jednej umiejętności (dwaj rycerze Legionu Nawii, kolejne Dęby wieków, upiory Nawii) walka pokazuje dziś jako jedną kartę; upiór Nawii ma wygląd szkieletu.
 
 ## Nowe krainy 276–350: Nawia (1088 B, 18.11.2026)
 

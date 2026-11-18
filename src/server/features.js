@@ -29,6 +29,7 @@ let events = false;
 let eventDrafts = false;
 let evolutions = true;
 let thirdEvolution = false;
+let fourthEvolution = false;
 let settlement = false;
 let fortress = false;
 let english = false;
@@ -50,6 +51,7 @@ export function readFeatures(env) {
   eventDrafts = env.EVENTS === 'test';
   evolutions = env.EVOLUTIONS !== 'off';
   thirdEvolution = env.THIRD_EVOLUTION === 'on';
+  fourthEvolution = env.FOURTH_EVOLUTION === 'on';
   settlement = env.SETTLEMENT === 'on';
   fortress = env.FORTRESS === 'on';
   english = env.ENGLISH === 'on';
@@ -77,6 +79,10 @@ export const evolutionsOn = () => evolutions;
 // klas"): only where THIRD_EVOLUTION is "on", and with the evolutions on.
 // Off, the second forms are the last, as before them (content.js).
 export const thirdEvolutionOn = () => evolutions && thirdEvolution;
+// The fourth forms, at class level 300 ("Czwarta ewolucja klas", 1087 and
+// 1095): only where FOURTH_EVOLUTION is "on" too, so they stay hidden
+// until all their graphics are in; off, the third forms are the last.
+export const fourthEvolutionOn = () => thirdEvolutionOn() && fourthEvolution;
 // The Osada (settlement.js), first only where SETTLEMENT is "on".
 export const settlementOn = () => settlement;
 // The Warownia (fortress.js), first only where FORTRESS is "on", like the

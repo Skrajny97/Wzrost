@@ -8,7 +8,7 @@
 // content (skill-demo.js, encyclopedia.js) is kept for each language apart.
 
 import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent, evolutionArt, landBestiaryChest, meetingChances, ordinaryMaterial, overlayTexts, regionDangers, weeksContent } from '../engine/index.js';
-import { arenaOn, buildingOn, craftingOn, evolutionsOn, guildWarsOn, labyrinthOn, placeOn, settlementOn, thirdEvolutionOn } from './features.js';
+import { arenaOn, buildingOn, craftingOn, evolutionsOn, fourthEvolutionOn, guildWarsOn, labyrinthOn, placeOn, settlementOn, thirdEvolutionOn } from './features.js';
 import { language, languageOffered, pageDictionary } from './i18n.js';
 import affixes from '../../data/affixes.json' with { type: 'json' };
 import balance from '../../data/balance.json' with { type: 'json' };
@@ -225,23 +225,29 @@ function prepare(built, lang) {
   // offered and there is no Ewolucja tab (the unlock "evolution"). Their
   // third forms (stage 3, class level 200) only where THIRD_EVOLUTION is on
   // too; without them the second forms are the last ("second"), as before
-  // them: the class waits at 200 only for its Skill Points.
-  const second = built.evolutions.filter((evolution) => evolution.stage < 3);
+  // them: the class waits at 200 only for its Skill Points. Their fourth
+  // forms (stage 4, class level 300) only where FOURTH_EVOLUTION is on as
+  // well; without them the third forms are the last ("third").
+  const upTo = (/** @type {number} */ stage) => {
+    const forms = built.evolutions.filter((evolution) => evolution.stage <= stage);
+    return {
+      evolutions: forms,
+      evolutionsById: Object.assign(Object.create(null), Object.fromEntries(forms.map((evolution) => [evolution.id, evolution]))),
+      evolutionSkills: built.evolutionSkills.filter((skill) => forms.some((evolution) => evolution.id === skill.evolution)),
+      unlocks: built.unlocks,
+    };
+  };
   const evolutionParts = {
     on: { evolutions: built.evolutions, evolutionsById: built.evolutionsById, evolutionSkills: built.evolutionSkills, unlocks: built.unlocks },
-    second: {
-      evolutions: second,
-      evolutionsById: Object.assign(Object.create(null), Object.fromEntries(second.map((evolution) => [evolution.id, evolution]))),
-      evolutionSkills: built.evolutionSkills.filter((skill) => second.some((evolution) => evolution.id === skill.evolution)),
-      unlocks: built.unlocks,
-    },
+    third: upTo(3),
+    second: upTo(2),
     off: { evolutions: [], evolutionsById: {}, evolutionSkills: [], unlocks: built.unlocks.filter((unlock) => unlock.id !== 'evolution') },
   };
   // The Arena's unlock only where the Arena is on, and the Labirynt's only
   // where the Labirynt is (features.js), so their levels show nowhere else.
   const unlocksOf = (parts, without) => parts.unlocks.filter((unlock) => !without.includes(unlock.id));
   const unlocksWithout = {};
-  const state = () => (!evolutionsOn() ? 'off' : thirdEvolutionOn() ? 'on' : 'second');
+  const state = () => (!evolutionsOn() ? 'off' : fourthEvolutionOn() ? 'on' : thirdEvolutionOn() ? 'third' : 'second');
   const unlocksNow = () => {
     const without = [...(arenaOn() ? [] : ['arena']), ...(labyrinthOn() ? [] : ['labyrinth'])];
     const key = `${state()}:${without.join(',')}`;

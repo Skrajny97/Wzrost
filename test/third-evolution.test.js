@@ -64,6 +64,17 @@ const secondOnly = (() => {
   return buildContent(raw);
 })();
 
+// The game's data with the fourth forms taken out: the third forms as they
+// were before the fourth evolution (and as a deployment has them with
+// FOURTH_EVOLUTION "off"): at 300 they wait only for their points.
+const thirdOnly = (() => {
+  const raw = loadData();
+  const fourthIds = new Set(content.evolutions.filter((evolution) => evolution.stage === 4).map((evolution) => evolution.id));
+  raw.evolutions.evolutions = raw.evolutions.evolutions.filter((evolution) => !fourthIds.has(evolution.id));
+  raw.evolutions.skills = raw.evolutions.skills.filter((skill) => !fourthIds.has(skill.evolution));
+  return buildContent(raw);
+})();
+
 // A Berserker at a class level, its skills at their top by default.
 const berserker = (classLevel, skills = { 'shattering-blow': 95, 'berserker-roar': 95 }, extra = {}) => ({
   classId: 'warrior',
@@ -125,14 +136,15 @@ describe('the third evolution in the engine', () => {
     assert.ok(held.classXp > 0);
     assert.ok(held.messages.some((line) => line.includes('u progu ewolucji') && line.includes('w zakładce Ewolucja')));
     // With the form the class grows on, at 300 waits only for points, and
-    // with them spent grows on past it: there is no fourth form.
-    assert.equal(applyHunt(hordeSlayer(200, { 'smashing-blow': 1, slaughter: 0 }), hunt, content).classLevel, 300);
-    assert.deepEqual(evolutionBlock(hordeSlayer(300, { 'smashing-blow': 145, slaughter: 144 }), content), { code: 'skill_points', level: 300 });
-    assert.equal(evolutionBlock(hordeSlayer(300, { 'smashing-blow': 145, slaughter: 145 }), content), null);
-    const waiting = applyHunt(hordeSlayer(300, { 'smashing-blow': 145, slaughter: 140 }), hunt, content);
+    // with them spent grows on past it where there is no fourth form
+    // (FOURTH_EVOLUTION off; with it, test/fourth-evolution.test.js).
+    assert.equal(applyHunt(hordeSlayer(200, { 'smashing-blow': 1, slaughter: 0 }), hunt, thirdOnly).classLevel, 300);
+    assert.deepEqual(evolutionBlock(hordeSlayer(300, { 'smashing-blow': 145, slaughter: 144 }), thirdOnly), { code: 'skill_points', level: 300 });
+    assert.equal(evolutionBlock(hordeSlayer(300, { 'smashing-blow': 145, slaughter: 145 }), thirdOnly), null);
+    const waiting = applyHunt(hordeSlayer(300, { 'smashing-blow': 145, slaughter: 140 }), hunt, thirdOnly);
     assert.equal(waiting.classLevel, 300);
     assert.ok(waiting.messages.some((line) => line.includes('rozdasz Punkty Umiejętności')));
-    assert.ok(applyHunt(hordeSlayer(300, { 'smashing-blow': 145, slaughter: 145 }), hunt, content).classLevel > 300);
+    assert.ok(applyHunt(hordeSlayer(300, { 'smashing-blow': 145, slaughter: 145 }), hunt, thirdOnly).classLevel > 300);
   });
 
   test('without the third forms (THIRD_EVOLUTION off) a second form waits at 200 only for its points, and grows on past it', () => {
@@ -210,7 +222,7 @@ describe('the third evolution in the engine', () => {
     assert.equal(evolutionView(content.evolutionsById.saint, content, { appearance: 'female' }).fromName, 'Cudotwórczyni');
   });
 
-  test('the panel shows the one form to take at 200 once the points are spent, and nothing after it', () => {
+  test('the panel shows the one form to take at 200 once the points are spent, and nothing after it without the fourth forms', () => {
     const before = evolutionPanel(berserker(199), content);
     assert.deepEqual([before.current.id, before.next, before.nextLevel], ['berserker', null, 200]);
     assert.equal(evolutionPanel(berserker(200, { 'shattering-blow': 95, 'berserker-roar': 90 }), content).next, null);
@@ -226,7 +238,7 @@ describe('the third evolution in the engine', () => {
     assert.equal(ready.next.skills[1].from, null);
     assert.deepEqual(ready.next.growth.map((entry) => `${entry.name} ${entry.value}`), ['Siła 5', 'Witalność 4', 'Wytrzymałość 2']);
     assert.equal(ready.next.trait.name, 'Szał bez granic');
-    const after = evolutionPanel(hordeSlayer(200, {}), content);
+    const after = evolutionPanel(hordeSlayer(200, {}), thirdOnly);
     assert.deepEqual([after.current.id, after.next, after.nextLevel], ['horde-slayer', null, null]);
   });
 
@@ -734,10 +746,12 @@ describe('the third forms against the second forms (tools/class-balance-sim.mjs,
   test('in the Łysogóry\'s levels (210–290) each third form wins on average 25–75% of its duels against the other paths, and the duels last a few rounds', () => {
     // One level's eight draws of the gear move a form's share by up to 15
     // points, so the levels count together (0.3.95; tools/pvp-arena-sim.mjs).
+    // The third forms as the game has them without the fourth evolution:
+    // past class level 300 the realistic player would take its fourth form.
     const levels = [210, 230, 250, 270, 290];
     const shares = {};
     for (const level of levels) {
-      const result = measure({ level, seeds: 1, model: 'realistic', paths: true }, content);
+      const result = measure({ level, seeds: 1, model: 'realistic', paths: true }, thirdOnly);
       assert.ok(result.median >= 16 && result.median <= 40, `level ${level}: median ${result.median} moves`);
       assert.ok(result.limits <= 0.12, `level ${level}: the judge ended ${result.limits}`);
       for (const [id, share] of Object.entries(result.paths)) shares[id] = (shares[id] ?? 0) + share / levels.length;

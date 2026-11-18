@@ -378,6 +378,147 @@
         "name": "Shadow Form",
         "text": "+25% speed, and after a dodge the next blow is 120% stronger. Dodge rises by 5 percentage points."
       }
+    },
+    "ravager": {
+      "name": "Ravager",
+      "nameFemale": "Ravager",
+      "description": "Their fury cracks the walls of fortresses. Wherever they pass, the enemy ranks fall apart.",
+      "trait": {
+        "name": "Bottomless Wrath",
+        "text": "The less HP, the more damage, up to +100% at 10% HP; below 40% HP heals by 12% of the damage dealt. Every plain blow also hits the enemy standing behind the target, for 40% damage."
+      }
+    },
+    "immortal": {
+      "name": "Immortal",
+      "nameFemale": "Immortal",
+      "description": "A champion who rises after every fall. The crowds at the arenas chant their name.",
+      "trait": {
+        "name": "Eternal Glory",
+        "text": "+12% damage for every defeated enemy, up to +72%, and 12% of max HP back. Once a fight survives a deadly blow with 1 HP and at once returns to 35% of max HP."
+      }
+    },
+    "titan": {
+      "name": "Titan",
+      "nameFemale": "Titaness",
+      "description": "A living fortress. Behind their shield the whole party stands as if behind a wall.",
+      "trait": {
+        "name": "Living Fortress",
+        "text": "+45% armour and resistances, and takes 50% of the blows aimed at someone else in the party. Reflects 20% of the damage of every blow taken back at the attacker."
+      }
+    },
+    "celestial-archer": {
+      "name": "Celestial Archer",
+      "nameFemale": "Celestial Archer",
+      "description": "They shoot with stars. Their arrow knows neither a miss nor an armour that could stop it.",
+      "trait": {
+        "name": "Star Arrowhead",
+        "text": "Critical hits deal 80% more, and the first five arrows of a fight are always critical. Arrows never miss, and critical hits ignore 40% of armour."
+      }
+    },
+    "thunderer": {
+      "name": "Thunderer",
+      "nameFemale": "Thunderer",
+      "description": "The lord of thunderbolts. When they draw the bow, the sky darkens and lightning leaps from enemy to enemy.",
+      "trait": {
+        "name": "Lord of the Storm",
+        "text": "Every arrow has a 35% chance to add 60% lightning damage, and the target then loses 40% speed. The bolt from the struck arrowhead leaps on to every next enemy in turn, each time 25% weaker."
+      }
+    },
+    "beast-lord": {
+      "name": "Lord of Beasts",
+      "nameFemale": "Lady of Beasts",
+      "description": "The herd fights beside them as beside its leader. Wolf and bear obey a single whistle.",
+      "trait": {
+        "name": "Law of the Herd",
+        "text": "+40% damage against beasts, birds and snakes and 40% more materials from creatures. Two summons at once, each dealing 30% more damage."
+      }
+    },
+    "primordial": {
+      "name": "Creator of Elements",
+      "nameFemale": "Creator of Elements",
+      "description": "The four elements obey them like children. Every spell strikes with what the enemy fears most.",
+      "trait": {
+        "name": "Primal Power",
+        "text": "Fire, frost, lightning and earth spells are 50% stronger, and their effects last 4 turns longer. A plain attack always takes the one of the four elements the target is weakest to."
+      }
+    },
+    "frost-god": {
+      "name": "Frost God",
+      "nameFemale": "Frost Goddess",
+      "description": "Eternal winter follows them step by step. Wherever they stand, the enemies’ breath freezes.",
+      "trait": {
+        "name": "Eternal Winter",
+        "text": "Chilled enemies deal 40% less damage, and each of their turns is lost with a 35% chance. Frost resistance grows by 40%, and every frost spell chills those struck until the end of the fight. From the first turn of the fight all enemies are chilled.",
+        "params": {
+          "freezeLabel": "frozen"
+        }
+      }
+    },
+    "elder-druid": {
+      "name": "Elder Druid",
+      "nameFemale": "Elder Druid",
+      "description": "The oldest of the druids. The forest grows from their wisdom, and its creatures stand by them in battle.",
+      "trait": {
+        "name": "Roots of the World",
+        "text": "+50% mana and three summons at once. 6% of mana comes back every turn, and summons have 40% more HP and deal 40% more damage. Every 20 points of Wisdom give the summons another 1% HP and damage."
+      }
+    },
+    "archangel": {
+      "name": "Archangel",
+      "nameFemale": "Archangel",
+      "description": "The winged guardian of the party. Their light heals wounds before they can hurt.",
+      "trait": {
+        "name": "Angelic Care",
+        "text": "Healing is 70% stronger, and once a fight raises a fallen member of the party: they rise with 60% of max HP. Healing removes all bad effects, and healing beyond full HP turns into a shield, of up to 30% of the healed one’s max HP."
+      }
+    },
+    "heaven-avenger": {
+      "name": "Heaven’s Avenger",
+      "nameFemale": "Heaven’s Avenger",
+      "description": "A light that burns evil. Spirits and demons flee from them before they raise their weapon.",
+      "trait": {
+        "name": "Fire of Heaven",
+        "text": "Sacred is 55% stronger, and 110% against spirits and demons. Struck spirits burn: for 3 turns they lose 30% of the blow’s damage each. Every sacred hit has a 20% chance to blind the enemy: for 2 turns it misses 30% of its blows."
+      }
+    },
+    "seer": {
+      "name": "Seer",
+      "nameFemale": "Seer",
+      "description": "They see what is coming before it happens. The enemy strikes where the party no longer is.",
+      "trait": {
+        "name": "Gift of Sight",
+        "text": "Blessings are 80% stronger and are not shared out in the party, and the party starts the fight blessed: armour and resistances +45%, damage +22%. The first enemy blow at each member of the party always misses."
+      }
+    },
+    "soul-reaper": {
+      "name": "Soul Reaper",
+      "nameFemale": "Soul Reaper",
+      "description": "They gather the souls of the fallen like ears of grain. With every soul their scythe cuts deeper.",
+      "trait": {
+        "name": "Harvest",
+        "text": "Critical hits deal 80% more, and after killing an enemy the character moves once more at once. A poisoned target takes 20% more. Every enemy killed is a soul gathered: each makes the character’s blows 15% stronger until the end of the fight, up to 75%."
+      }
+    },
+    "navia-king": {
+      "name": "King of Navia",
+      "nameFemale": "Queen of Navia",
+      "description": "The lord of the Slavic underworld. With every fight their undead army grows.",
+      "trait": {
+        "name": "Lord of Navia",
+        "text": "Once a fight survives a deadly blow with 1 HP, and Poison deals 80% more and lasts 3 turns longer. Every enemy killed rises as a wraith of Navia and fights on the character’s side until the end of the fight, up to three at once.",
+        "params": {
+          "raiseName": "Wraith of Navia"
+        }
+      }
+    },
+    "dark-prince": {
+      "name": "Prince of Darkness",
+      "nameFemale": "Princess of Darkness",
+      "description": "Night itself. They vanish into the shadow and strike from it before anyone can turn around.",
+      "trait": {
+        "name": "Child of the Night",
+        "text": "+35% speed, and after a dodge the next blow is 160% stronger. Dodge grows by 10 pp. For the first two turns of the fight the character hides in the shadow and no one can hit it."
+      }
     }
   },
   "skills": {
@@ -993,6 +1134,226 @@
       "style": "dodge",
       "description": "The Shadow Lord puts out the sun over the battlefield. In the dark, the enemies strike blindly.",
       "effect": "For {turns} of their own turns every enemy blow has a {eclipse%} chance to miss."
+    },
+    "carnage": {
+      "name": "Carnage",
+      "style": "area",
+      "description": "The Ravager charges into the middle of the ranks and cuts until shields crack. The deeper the wounds, the more terrible the blows.",
+      "effect": "A blow at every enemy for {power%} damage, and at a single enemy for {single%}, ignoring {armorIgnore%} of the armour of those struck. The less HP the character has, the harder it hits: up to {rage%} more at {rageAt%} HP."
+    },
+    "breach": {
+      "name": "Breach",
+      "style": "attack",
+      "description": "One swing and a hole gapes in the enemy ranks. Whoever stood behind the first one falls with it.",
+      "effect": "A blow dealing {power%} damage at the enemy in front, ignoring all its armour. The target and the enemy behind it lose their next turn, and until the end of the fight the target takes {sunder%} more damage from the whole party.",
+      "params": {
+        "stunLabel": "stunned"
+      }
+    },
+    "glory-hurricane": {
+      "name": "Hurricane of Glory",
+      "style": "area",
+      "description": "Three spins, faster than the eye. The stands fall silent, then burst into a roar.",
+      "effect": "Three spins in one turn: each attacks every enemy for {power%} damage, without a miss, and a single enemy for {single%}. Those struck bleed for {dotTicks|turn|turns|turns}, losing {dotPower%} of the blow’s damage each."
+    },
+    "champion-challenge": {
+      "name": "Champion’s Challenge",
+      "style": "control",
+      "description": "The champion points the sword at the strongest enemy. It cannot refuse the duel.",
+      "effect": "A blow dealing {power%} damage at the enemy with the most HP. For {taunt|turn|turns|turns} that enemy strikes only the character and deals it {tauntWeaken%} less damage."
+    },
+    "mountain-wrath": {
+      "name": "Wrath of the Mountain",
+      "style": "area",
+      "description": "The Titan strikes the ground with the shield like an avalanche. The earth cracks under the whole enemy line.",
+      "effect": "A blow of the shield at the ground deals every enemy {power%} damage, without a miss, and a single enemy {single%}. Every enemy struck may lose its next turn ({stunChance%} chance).",
+      "params": {
+        "stunLabel": "stunned"
+      }
+    },
+    "titan-shield": {
+      "name": "Titan’s Shield",
+      "style": "defence",
+      "description": "The Titan raises the shield over the party. Every enemy blow must get past them first.",
+      "effect": "For {turns|turn|turns|turns} the whole party takes {reduction%} less damage, and every enemy blow goes at the character."
+    },
+    "heaven-arrow": {
+      "name": "Arrow from Heaven",
+      "style": "attack",
+      "description": "The arrowhead glows like a falling star. It goes through the whole line and does not fade.",
+      "effect": "A shot dealing {power%} damage that cannot be dodged, always critical. It pierces the target and hits every enemy in the rows behind it, each for {pierce%} damage."
+    },
+    "star-rain": {
+      "name": "Rain of Stars",
+      "style": "area",
+      "description": "The archer looses a handful of arrows into the sky. They fall like stars, each where it should.",
+      "effect": "Rain of stars: {blows} arrows of {power%} damage, each at a random enemy, with a critical chance {critBonus pp} higher."
+    },
+    "perun-storm": {
+      "name": "Perun’s Storm",
+      "style": "area",
+      "description": "The sky splits in two, and bolts leap from enemy to enemy until no one is left untouched.",
+      "effect": "Bolts deal every enemy {power%} lightning damage, and a single enemy {single%}. Everyone struck may lose its next turn ({stunChance%} chance), and every bolt leaps on to another enemy for {chainPower%} damage.",
+      "params": {
+        "stunLabel": "shocked"
+      }
+    },
+    "ball-lightning": {
+      "name": "Ball Lightning",
+      "style": "attack",
+      "description": "A ball of lightning hangs over the battlefield. It crackles and waits for a target.",
+      "effect": "For {turns|turn|turns|turns} a ball of lightning hangs over the battlefield. Every turn of the character it strikes the enemy with the most HP for {power%} lightning damage, and the one struck may lose its next turn ({stunChance%} chance).",
+      "params": {
+        "stunLabel": "shocked"
+      }
+    },
+    "pack-chief": {
+      "name": "Pack Chief",
+      "style": "attack",
+      "description": "The white wolf comes running at the first whistle. Where it bites, blood flows for a long time.",
+      "effect": "Summons the white wolf for {turns|turn|turns|turns}. The wolf stands in front of the character with {hp%} of its max HP and takes the enemies’ blows. Every turn it bites a random enemy for {power%} damage, and the one bitten bleeds for {dotTicks|turn|turns|turns}, losing {dotPower%} of the bite’s damage each. While the wolf stands, its howl gives the whole party {howl%} more damage.",
+      "params": {
+        "summonName": "White wolf"
+      }
+    },
+    "bear-call": {
+      "name": "Call of the Bear",
+      "style": "defence",
+      "description": "A brown bear steps out of the thicket. It rises on its hind legs, and no one gets past.",
+      "effect": "Summons a brown bear for {turns|turn|turns|turns}. The bear stands in front of the character with {hp%} of its max HP and takes the enemies’ blows. Every turn it swipes the enemy in front for {power%} damage, and the one struck may lose its next turn ({stunChance%} chance).",
+      "params": {
+        "summonName": "Brown bear",
+        "stunLabel": "stunned"
+      }
+    },
+    "primal-chaos": {
+      "name": "Primal Chaos",
+      "style": "area",
+      "description": "For a moment the world returns to its beginning. Fire, ice, lightning and rocks fall at once.",
+      "effect": "Fire, ice, lightning and boulders fall at once on all enemies for {power%} damage, and on a single enemy for {single%}, split evenly between fire, frost, lightning and earth. Everyone struck has a {dotChance%} chance of Burn (for {dotTicks|turn|turns|turns} it loses {dotPower%} of the spell’s damage each), is chilled, so it deals {chillWeaken%} less damage, and may lose its next turn ({stunChance%} chance). The boulders stun the enemy in front with a {frontStun%} chance.",
+      "params": {
+        "stunLabel": "shocked"
+      }
+    },
+    "elemental": {
+      "name": "Elemental",
+      "style": "attack",
+      "description": "An elemental rises from fire, ice, lightning and stone. It always strikes with what the enemy cannot bear.",
+      "effect": "Summons an elemental for {turns|turn|turns|turns}. It stands in front of the character with HP equal to {hp%} of its max mana and takes the enemies’ blows. Every turn it strikes a random enemy for {power%} damage with the element that enemy is weakest to.",
+      "params": {
+        "summonName": "Elemental"
+      }
+    },
+    "ice-eternity": {
+      "name": "Ice Eternity",
+      "style": "control",
+      "description": "The ice locks in the two strongest enemies. Under the clear sheet not even an eyelid moves.",
+      "effect": "Locks the two enemies with the most HP in ice and deals each {power%} frost damage. For {stunMoves|turn|turns|turns} the frozen ones do not strike and take {bonus%} more damage.",
+      "params": {
+        "stunLabel": "frozen"
+      }
+    },
+    "ice-heart": {
+      "name": "Heart of Ice",
+      "style": "defence",
+      "description": "When the wound is too deep, the heart turns to ice, and the ice to armour.",
+      "effect": "Once a fight, when HP falls below {below%}, the character closes itself in ice armour: for {turns|turn|turns|turns} it takes {reduction%} less damage, and whoever strikes it freezes with a {freezeChance%} chance and loses its next turn.",
+      "params": {
+        "freezeLabel": "frozen"
+      }
+    },
+    "oak-of-ages": {
+      "name": "Oak of Ages",
+      "style": "defence",
+      "description": "An oak older than human memory rises from the ground. In its shade wounds close by themselves.",
+      "effect": "Summons the Oak of Ages for {turns|turn|turns|turns}. The oak stands in front of the character with HP equal to {hp%} of its max mana and takes the enemies’ blows. Every turn it lashes a random enemy with its branches for {power%} damage and binds it with roots: the one struck slows by {root%}. While it stands, every turn it heals the party by {partyHeal%.1} of max HP.",
+      "params": {
+        "summonName": "Oak of Ages"
+      }
+    },
+    "forest-rebirth": {
+      "name": "Rebirth of the Forest",
+      "style": "healing",
+      "description": "The forest takes a deep breath, and all that lives rises anew.",
+      "effect": "When someone in the party has less than {below%} HP, heals the whole party by {heal%} of max HP and 1 HP for every {wisdomPerHp} points of Wisdom, and restores all summons to full HP."
+    },
+    "divine-healing": {
+      "name": "Divine Healing",
+      "style": "healing",
+      "description": "The Archangel spreads their arms, and light falls on the party like rain.",
+      "effect": "Once a fight, when HP falls below {below%}, heals the whole party by {heal%.1} of max HP and 1 HP for every {wisdomPerHp} points of Wisdom, and removes bad effects from it. Then for {hotTurns|turn|turns|turns} heals each by {hot%} of max HP."
+    },
+    "wings-of-light": {
+      "name": "Wings of Light",
+      "style": "defence",
+      "description": "Wings of pure light cover the party. Whoever strikes them gets burned.",
+      "effect": "For {turns|turn|turns|turns} the wings shield the party: everyone gets a shield of {partyShield%} of their max HP, and an enemy that strikes it burns with sacred for {retort%} of its blow’s damage."
+    },
+    "day-of-wrath": {
+      "name": "Day of Wrath",
+      "style": "attack",
+      "description": "Heaven passes its sentence. When one sinner falls, the judgement goes on.",
+      "effect": "A sacred sentence of {power%} damage at an enemy with less than {below%} HP left. Spirits and demons take {familyBonus%} more. When the target falls, the sentence falls on the next enemy for {onKill%} damage."
+    },
+    "pillar-of-light": {
+      "name": "Pillar of Light",
+      "style": "area",
+      "description": "A pillar of light so bright strikes from the sky that the enemies long see nothing but it.",
+      "effect": "A pillar of light wounds all enemies for {power%} sacred damage, and a single enemy for {single%}. Those struck are blinded for {blindTurns|turn|turns|turns} and miss {blind%} of their blows."
+    },
+    "clairvoyance": {
+      "name": "Clairvoyance",
+      "style": "dodge",
+      "description": "The Seer sees every blow before it falls. The party steps aside and answers.",
+      "effect": "For {turns|turn|turns|turns} the whole party dodges blows {evasion pp} more often, spells too, and whoever dodges a blow at once strikes back for {counter%} damage."
+    },
+    "fate-reversal": {
+      "name": "Reversal of Fate",
+      "style": "control",
+      "description": "When the party’s fate hangs by a thread, the seer turns it over like an hourglass.",
+      "effect": "Once a fight, when someone in the party falls below {below%} HP, the character reverses fate: all enemies lose their next turn, and the whole party recovers {heal%} of max HP.",
+      "params": {
+        "stunLabel": "dazed"
+      }
+    },
+    "soul-harvest": {
+      "name": "Soul Harvest",
+      "style": "attack",
+      "description": "The scythe whistles once and gathers what has ripened. Whoever stood beside feels its chill.",
+      "effect": "A scythe blow dealing {power%} damage, always critical. It kills an enemy with less than {killBelow%} HP at once (except champions) and seeks such one first. The scythe also hits the enemy beside the target, for {cleave%} damage."
+    },
+    "scythe-dance": {
+      "name": "Scythe Dance",
+      "style": "area",
+      "description": "The scythe turns its circles, and with every circle someone stops dancing.",
+      "effect": "The scythe turns two circles: each hits every enemy for {power%} damage. Every enemy killed by this blow at once gives a soul and {killHeal%} of max HP."
+    },
+    "navia-legion": {
+      "name": "Legion of Navia",
+      "style": "poison",
+      "description": "The ground cracks open, and out come knights who long ago forgot how to die.",
+      "effect": "For {turns|turn|turns|turns} two skeleton knights rise. Each stands in front of the character with {hp%} of its max HP and takes the enemies’ blows. Every turn each strikes a random enemy for {power%} damage and poisons it: for {dotTicks|turn|turns|turns} the target loses {dotPower%} of the blow’s damage each.",
+      "params": {
+        "summonName": "Skeleton knight"
+      }
+    },
+    "navia-mist": {
+      "name": "Mist of Navia",
+      "style": "area",
+      "description": "The green mist of the underworld creeps out of the ground. Whoever breathes it gives their life to the lord of Navia.",
+      "effect": "The green mist of the underworld: all enemies take {power%} poison damage and are poisoned for {dotTicks|turn|turns|turns}, losing {dotPower%} of the damage each. The character heals by {drain%} of the damage dealt."
+    },
+    "eternal-night": {
+      "name": "Eternal Night",
+      "style": "dodge",
+      "description": "Night falls in the middle of the day and will not end. A blade answers from the darkness.",
+      "effect": "For {turns|turn|turns|turns} every enemy blow has a {eclipse%} chance to miss, and after every missed blow the character answers with a blow from the shadow for {counter%} damage."
+    },
+    "shadow-strike": {
+      "name": "Shadow Strike",
+      "style": "attack",
+      "description": "The character melts into the shadow and emerges behind the victim. Before it turns, it is all over.",
+      "effect": "The character vanishes into the shadow and emerges behind the enemy with the least HP: a blow dealing {power%} damage, always critical. Until its next turn no one can hit it."
     }
   },
   "texts": {
