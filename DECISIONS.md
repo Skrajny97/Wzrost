@@ -3742,6 +3742,11 @@ Najpierw Tier X przedmiotów (potrzebny najlepszej postaci za około dwa tygodni
 
 Motyw B, słowiańskie zaświaty: Mgliste Bagna Nawii (276–300), Łąki Welesa (301–325) i Kraina bez Słońca (326–350). Karta Mglistych Bagien Nawii: szkic D. Dalej: miejsca, stwory, elity i czempioni na stronie ocen (mało ptaków), potem grafiki.
 
+## Wersja 0.4.26 (18.11.2026): Tier X przedmiotów i Andrzejki
+
+1. **Tier X przedmiotów** (1086, wyżej): 22 przedmioty od 200. poziomu klasy, z wypraw od ostatniego miejsca Ostępów Nowiu, a od 200. poziomu klasy też z innych źródeł. Wzorów do wyrobu jeszcze nie ma: dojdą z nowymi krainami.
+2. **Andrzejki: Wieczór wróżb** (1082–1084, wyżej): kod, dane, figurki wróżb (1091), tło portretu D (1092) i osiągnięcie są w grze, ale nic z tego nie widać przed 29.11 o 18:00 poza osiągnięciem na liście. Obrazek trzech kubków przed wyborem czeka na nową wersję z trzema przykrytymi kubkami (1093.3); wejdzie przed 30.11.
+
 ## Wersja 0.4.25 (18.11.2026): kiedy członkowie gildii byli ostatnio w grze
 
 1. **Gildia** (wyżej): przy każdym członku, kiedy był ostatnio w grze, jak w Znajomych.
