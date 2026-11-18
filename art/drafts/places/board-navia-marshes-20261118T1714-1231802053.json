@@ -1,0 +1,14 @@
+{
+  "id": "board-navia-marshes",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art, top-down view straight from above of a misty marsh floor at the edge of the underworld: small puddles of black still water between grey moss tussocks and broken dead reeds, thin wisps of pale fog, muted very dark palette of grey-teal, black and deep violet, a faint pale strip of trampled ground across the middle dividing two halves, slightly darker edges, soft even dusk light, flat ground seen from above for a dim background behind game cards, very low contrast, no standing trees, no people, no animals, no weapons, no text, no border",
+  "style": "src/client/art/boards/arena-board.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
