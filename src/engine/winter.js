@@ -95,9 +95,25 @@ export function winterReward(rule, level, content) {
   };
 }
 
+// Whether no day of the calendar before today was missed: the winter set
+// goes only to a character that takes all the windows (the author,
+// 18.11.2026: „nagrody ze Szczodrych Godów kosmetyczne należą się tylko za
+// pełne 24 dni”).
+/**
+ * @param {unknown} stored
+ * @param {WinterToday} today
+ * @param {Content} content
+ */
+export function winterFull(stored, today, content) {
+  const taken = winterTaken(stored, today.period);
+  for (let day = content.winter.calendar.first; day < today.day; day += 1) if (!taken.includes(day)) return false;
+  return true;
+}
+
 // The calendar as the window shows it on `today`: today's day, whether its
-// reward is taken, and every day with its reward and how it stands (taken,
-// missed, today or later).
+// reward is taken, whether no day was missed so far (`full`), and every day
+// with its reward and how it stands (taken, missed, today or later); a
+// day's winter set `setLost` once a day was missed.
 /**
  * @param {unknown} stored
  * @param {WinterToday} today
@@ -107,15 +123,57 @@ export function winterReward(rule, level, content) {
 export function winterCalendar(stored, today, level, content) {
   const { days, first } = content.winter.calendar;
   const taken = winterTaken(stored, today.period);
+  const full = winterFull(stored, today, content);
   return {
     today: today.day,
     taken: taken.includes(today.day),
+    full,
     days: days.map((/** @type {Record<string, any>} */ rule, /** @type {number} */ index) => {
       const day = first + index;
       const state = taken.includes(day) ? 'taken' : day < today.day ? 'missed' : day === today.day ? 'today' : 'later';
-      return { day, state, ...winterReward(rule, level, content) };
+      const reward = winterReward(rule, level, content);
+      return { day, state, ...reward, ...(reward.cosmetics.length > 0 && !full && { setLost: true }) };
     }),
   };
+}
+
+// The winter set for Punkty Systemu in the calendar's window (the author,
+// 18.11.2026: „do kupienia za Punkty Systemu tylko w tym okienku też od 12
+// do 24 grudnia włącznie”): from the sale's day to the calendar's last,
+// each piece at its price, with whether the character owns it.
+/**
+ * @param {WinterToday} today
+ * @param {string[]} owned
+ * @param {Content} content
+ */
+export function winterSale(today, owned, content) {
+  const { fromDay, prices } = content.winter.calendar.sale;
+  return {
+    open: today.day >= fromDay,
+    fromDay,
+    items: Object.entries(prices).map(([id, price]) => ({ id, price, owned: owned.includes(id) })),
+  };
+}
+
+// Why a piece of the winter set cannot be bought now, or null: the sale not
+// open yet, not a piece of the set, owned already, or too few Punkty
+// Systemu (its price in `price`).
+/**
+ * @param {WinterToday | null} today
+ * @param {unknown} id
+ * @param {string[]} owned
+ * @param {number} systemPoints
+ * @param {Content} content
+ * @returns {{ code: string, price?: number } | null}
+ */
+export function winterSaleBlock(today, id, owned, systemPoints, content) {
+  const { fromDay, prices } = content.winter.calendar.sale;
+  if (!today || today.day < fromDay) return { code: 'sale_closed' };
+  const price = typeof id === 'string' && Object.hasOwn(prices, id) ? prices[id] : null;
+  if (price === null) return { code: 'sale_unknown' };
+  if (owned.includes(/** @type {string} */ (id))) return { code: 'sale_owned' };
+  if (systemPoints < price) return { code: 'sale_points', price };
+  return null;
 }
 
 // The state stored once today's reward is taken.

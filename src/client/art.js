@@ -95,6 +95,12 @@ export const SPRITES = {
       'elemental-avatar-female', 'elemental-avatar-male', 'frost-monarch-female', 'frost-monarch-male', 'archdruid-female', 'archdruid-male',
       'saint-female', 'saint-male', 'demon-slayer-female', 'demon-slayer-male', 'prophet-female', 'prophet-male', 'godslayer-female', 'godslayer-male',
       'lich-female', 'lich-male', 'shadow-lord-female', 'shadow-lord-male',
+      // The fourth forms at class level 300, shown only where FOURTH_EVOLUTION is on.
+      'ravager-female', 'ravager-male', 'immortal-female', 'immortal-male', 'titan-female', 'titan-male',
+      'celestial-archer-female', 'celestial-archer-male', 'thunderer-female', 'thunderer-male', 'beast-lord-female', 'beast-lord-male',
+      'primordial-female', 'primordial-male', 'frost-god-female', 'frost-god-male', 'elder-druid-female', 'elder-druid-male',
+      'archangel-female', 'archangel-male', 'heaven-avenger-female', 'heaven-avenger-male', 'seer-female', 'seer-male',
+      'soul-reaper-female', 'soul-reaper-male', 'navia-king-female', 'navia-king-male', 'dark-prince-female', 'dark-prince-male',
       // The outfits of the Sklep Systemu (skórki, 763 A), <look>-<appearance>.
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
@@ -125,6 +131,13 @@ export const SPRITES = {
       'skin-dawn-female': 48, 'skin-dawn-male': 52, 'skin-eclipse-female': 50, 'skin-eclipse-male': 50,
       'skin-winter-warrior-male': 49, 'skin-winter-warrior-female': 50, 'skin-winter-archer-male': 49, 'skin-winter-archer-female': 49, 'skin-winter-mage-male': 51,
       'skin-winter-mage-female': 51, 'skin-winter-cleric-male': 49, 'skin-winter-cleric-female': 48, 'skin-winter-shadow-male': 49, 'skin-winter-shadow-female': 48,
+      // The fourth forms (the face's middle, measured on the skin of the head).
+      'ravager-female': 49, 'ravager-male': 50, 'immortal-female': 49, 'immortal-male': 50, 'titan-female': 52,
+      'titan-male': 51, 'celestial-archer-female': 48, 'celestial-archer-male': 51, 'thunderer-female': 50, 'thunderer-male': 49,
+      'beast-lord-female': 49, 'beast-lord-male': 50, 'primordial-female': 53, 'primordial-male': 52, 'frost-god-female': 50,
+      'frost-god-male': 50, 'elder-druid-female': 50, 'elder-druid-male': 50, 'archangel-female': 46, 'archangel-male': 47,
+      'heaven-avenger-female': 49, 'heaven-avenger-male': 50, 'seer-female': 50, 'seer-male': 52, 'soul-reaper-female': 46,
+      'soul-reaper-male': 52, 'navia-king-female': 51, 'navia-king-male': 51, 'dark-prince-female': 49, 'dark-prince-male': 49,
     },
     perches: {
       'warrior-female': [32, 38], 'warrior-male': [34, 40], 'archer-female': [34, 41], 'archer-male': [35, 36], 'mage-female': [34, 41],
@@ -155,6 +168,13 @@ export const SPRITES = {
       'skin-winter-warrior-male': [34, 31], 'skin-winter-warrior-female': [35, 31], 'skin-winter-archer-male': [35, 34], 'skin-winter-archer-female': [35, 34],
       'skin-winter-mage-male': [37, 39], 'skin-winter-mage-female': [37, 40], 'skin-winter-cleric-male': [37, 37], 'skin-winter-cleric-female': [36, 38],
       'skin-winter-shadow-male': [35, 29], 'skin-winter-shadow-female': [34, 29],
+      // The fourth forms (the shoulder left of the face, as on the others).
+      'ravager-female': [34, 26], 'ravager-male': [35, 26], 'immortal-female': [34, 33], 'immortal-male': [35, 39], 'titan-female': [37, 26],
+      'titan-male': [36, 26], 'celestial-archer-female': [33, 48], 'celestial-archer-male': [36, 26], 'thunderer-female': [35, 33], 'thunderer-male': [34, 26],
+      'beast-lord-female': [34, 39], 'beast-lord-male': [35, 30], 'primordial-female': [38, 26], 'primordial-male': [37, 26], 'frost-god-female': [35, 35],
+      'frost-god-male': [35, 26], 'elder-druid-female': [35, 26], 'elder-druid-male': [35, 26], 'archangel-female': [31, 26], 'archangel-male': [32, 26],
+      'heaven-avenger-female': [34, 26], 'heaven-avenger-male': [35, 26], 'seer-female': [35, 43], 'seer-male': [37, 28], 'soul-reaper-female': [37, 37],
+      'soul-reaper-male': [37, 26], 'navia-king-female': [36, 26], 'navia-king-male': [36, 29], 'dark-prince-female': [34, 26], 'dark-prince-male': [34, 26],
     },
     // `petSpots`: a pet's own place on a portrait where its usual one would
     // cover what the figure holds at the shoulder (a falcon, a staff's head,
@@ -197,6 +217,12 @@ export const SPRITES = {
       'elemental-avatar-female', 'elemental-avatar-male', 'frost-monarch-female', 'frost-monarch-male', 'archdruid-female', 'archdruid-male',
       'saint-female', 'saint-male', 'demon-slayer-female', 'demon-slayer-male', 'prophet-female', 'prophet-male', 'godslayer-female', 'godslayer-male',
       'lich-female', 'lich-male', 'shadow-lord-female', 'shadow-lord-male',
+      // The fourth forms at class level 300, shown only where FOURTH_EVOLUTION is on.
+      'ravager-female', 'ravager-male', 'immortal-female', 'immortal-male', 'titan-female', 'titan-male',
+      'celestial-archer-female', 'celestial-archer-male', 'thunderer-female', 'thunderer-male', 'beast-lord-female', 'beast-lord-male',
+      'primordial-female', 'primordial-male', 'frost-god-female', 'frost-god-male', 'elder-druid-female', 'elder-druid-male',
+      'archangel-female', 'archangel-male', 'heaven-avenger-female', 'heaven-avenger-male', 'seer-female', 'seer-male',
+      'soul-reaper-female', 'soul-reaper-male', 'navia-king-female', 'navia-king-male', 'dark-prince-female', 'dark-prince-male',
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
       'skin-dawn-female', 'skin-dawn-male', 'skin-eclipse-female', 'skin-eclipse-male',
@@ -328,6 +354,13 @@ export const SPRITES = {
       'elemental-avatar-female', 'elemental-avatar-male', 'frost-monarch-female', 'frost-monarch-male', 'archdruid-female', 'archdruid-male',
       'saint-female', 'saint-male', 'demon-slayer-female', 'demon-slayer-male', 'prophet-female', 'prophet-male', 'godslayer-female', 'godslayer-male',
       'lich-female', 'lich-male', 'shadow-lord-female', 'shadow-lord-male',
+      // The fourth forms at class level 300 (Lodowa Bogini and Niebiańska Łuczniczka once
+      // their fixes 1108 and 1109 are accepted), shown only where FOURTH_EVOLUTION is on.
+      'ravager-female', 'ravager-male', 'immortal-female', 'immortal-male', 'titan-female', 'titan-male',
+      'celestial-archer-male', 'thunderer-female', 'thunderer-male', 'beast-lord-female', 'beast-lord-male', 'primordial-female',
+      'primordial-male', 'frost-god-male', 'elder-druid-female', 'elder-druid-male', 'archangel-female', 'archangel-male',
+      'heaven-avenger-female', 'heaven-avenger-male', 'seer-female', 'seer-male', 'soul-reaper-female', 'soul-reaper-male',
+      'navia-king-female', 'navia-king-male', 'dark-prince-female', 'dark-prince-male',
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
       'skin-dawn-female', 'skin-dawn-male', 'skin-eclipse-female', 'skin-eclipse-male',
@@ -693,6 +726,12 @@ export const SPRITES = {
       'elemental-avatar-female', 'elemental-avatar-male', 'frost-monarch-female', 'frost-monarch-male', 'archdruid-female', 'archdruid-male',
       'saint-female', 'saint-male', 'demon-slayer-female', 'demon-slayer-male', 'prophet-female', 'prophet-male', 'godslayer-female', 'godslayer-male',
       'lich-female', 'lich-male', 'shadow-lord-female', 'shadow-lord-male',
+      // The fourth forms at class level 300, shown only where FOURTH_EVOLUTION is on.
+      'ravager-female', 'ravager-male', 'immortal-female', 'immortal-male', 'titan-female', 'titan-male',
+      'celestial-archer-female', 'celestial-archer-male', 'thunderer-female', 'thunderer-male', 'beast-lord-female', 'beast-lord-male',
+      'primordial-female', 'primordial-male', 'frost-god-female', 'frost-god-male', 'elder-druid-female', 'elder-druid-male',
+      'archangel-female', 'archangel-male', 'heaven-avenger-female', 'heaven-avenger-male', 'seer-female', 'seer-male',
+      'soul-reaper-female', 'soul-reaper-male', 'navia-king-female', 'navia-king-male', 'dark-prince-female', 'dark-prince-male',
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
       'skin-dawn-female', 'skin-dawn-male', 'skin-eclipse-female', 'skin-eclipse-male',

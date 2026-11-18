@@ -570,6 +570,15 @@ async function main() {
       // are left, and the page loaded anew.
       const trail = [screen];
       try {
+        // A sheet the game opened by itself (the series of days' reward,
+        // the Szczodre Gody calendar) closed first, as a player would: it
+        // covers the buttons that open the sheets checked here.
+        if (SHEETS[screen]) {
+          for (let tries = 0; tries < 3 && (await view.locator('#sheet[open]').count()) > 0; tries += 1) {
+            await view.keyboard.press('Escape');
+            await view.waitForTimeout(400);
+          }
+        }
         for (const step of SHEETS[screen] ?? []) {
           trail.push(step.name);
           if (step.pick) await view.locator(step.pick).setInputFiles(picture, { timeout: 5000 });

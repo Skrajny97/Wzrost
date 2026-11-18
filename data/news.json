@@ -1380,6 +1380,11 @@
       "id": "0.4.38",
       "title": "Wersja 0.4.38",
       "body": "- Karta towaru na Targowisku najpierw mówi, co daje: potrawa swój posiłek, kamień premię po oprawieniu, a zioło, ryba i plon, do jakich mikstur i potraw się nadają."
+    },
+    {
+      "id": "0.4.39",
+      "title": "Wersja 0.4.39",
+      "body": "- Szczodre Gody (1–24 grudnia): zimowy zestaw (ramka Szron, tło Szczodre Gody i aura Śnieżyca) dostaniesz w 24. okienku tylko za odebranie wszystkich 24 okienek.\n- Od 12 do 24 grudnia każdy przedmiot zestawu kupisz też za Punkty Systemu, tylko w oknie kalendarza."
     }
   ]
 }

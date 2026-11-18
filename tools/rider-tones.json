@@ -58,5 +58,16 @@
   "shadow-lord-female": { "add": ["cebbd1", "d8cfdf", "7e7190"], "only": [[46, 31, 55, 40]] },
   "shadow-lord-male": { "add": ["b2acc2", "b1afbc", "a7a5b0", "c1becb", "cdcbd5", "93909e", "7e7d8b", "6f6d7b"], "only": [[36, 9, 45, 21]] },
   "archdruid-female": { "only": [[33, 17, 42, 33], [41, 47, 55, 58]] },
-  "skin-winter-warrior-female": { "only": [[43, 25, 53, 37]] }
+  "skin-winter-warrior-female": { "only": [[43, 25, 53, 37]] },
+  "titan-male": { "add": ["e2b189", "ca9b78", "9f7a65", "865a44"], "only": [[46, 19, 56, 27]] },
+  "primordial-male": { "add": ["d79f75", "a16b49", "94664e", "885538"], "only": [[44, 18, 52, 25], [53, 43, 62, 48]] },
+  "navia-king-male": { "add": ["778775", "8f9d89", "617a63", "688367", "566755"], "only": [[45, 24, 54, 37], [48, 49, 65, 54]] },
+  "elder-druid-male": { "only": [[45, 29, 54, 36], [55, 49, 66, 58]] },
+  "beast-lord-male": { "only": [[49, 28, 55, 39], [56, 46, 68, 57]] },
+  "beast-lord-female": { "only": [[51, 27, 59, 37], [61, 51, 72, 57]] },
+  "navia-king-female": { "only": [[49, 33, 55, 46], [50, 54, 62, 59]] },
+  "celestial-archer-female": { "only": [[47, 28, 57, 39]] },
+  "thunderer-male": { "only": [[50, 30, 54, 36], [60, 50, 64, 57]] },
+  "heaven-avenger-male": { "only": [[45, 27, 53, 37]] },
+  "frost-god-female": { "only": [[48, 29, 54, 44], [56, 52, 63, 56], [64, 89, 68, 91]] }
 }
