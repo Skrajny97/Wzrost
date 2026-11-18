@@ -1,0 +1,14 @@
+{
+  "id": "nyja",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Nyja, the dark god guarding the gates of the Slavic underworld, a tall majestic figure in long black and dark purple robes with silver trim, a pale stern face with a long dark beard, a crown of black iron spikes, a cold blue frost aura around him, holding a tall black staff with a pale moonstone, menacing, standing on both feet, full body, three-quarter view, the figure alone, no ground, no background, the whole figure and staff inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024543253841824004
+  },
+  "images": 1
+}

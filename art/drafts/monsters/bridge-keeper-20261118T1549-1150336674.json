@@ -1,0 +1,14 @@
+{
+  "id": "bridge-keeper",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Mostnik, the troll-like spirit of an old bridge, a squat mossy creature made of grey weathered planks and frayed ropes, a crooked face with a big nose and long hairy ears, holding out one big hand for a toll coin and pushing forward with the other, red guelder rose berries tangled in its moss, menacing, standing on both feet, full body, three-quarter view, the creature alone, no bridge, no ground, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024669884881337485
+  },
+  "images": 1
+}

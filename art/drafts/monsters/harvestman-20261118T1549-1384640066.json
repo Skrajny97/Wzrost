@@ -1,0 +1,14 @@
+{
+  "id": "harvestman",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant harvestman spider with a small round brown body and eight extremely long thin jointed legs sharp as scythe blades, two legs raised to slash, small dark eyes, menacing, full body, three-quarter view, the creature alone, no web, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024826385843912762
+  },
+  "images": 1
+}

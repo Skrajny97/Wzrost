@@ -1,0 +1,14 @@
+{
+  "id": "mole-cricket",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant mole cricket the size of a dog, a velvety brown body, huge flat digging front claws like shovels raised to strike, short folded wings, long antennae, small black eyes, menacing, full body, three-quarter view, the insect alone, no soil, no ground, no background, the whole insect inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024365513434304133
+  },
+  "images": 1
+}

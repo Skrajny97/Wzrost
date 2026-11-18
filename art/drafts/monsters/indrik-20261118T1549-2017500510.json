@@ -1,0 +1,14 @@
+{
+  "id": "indrik",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Indryk, the king of all beasts from Slavic legends, a huge majestic beast like a grey-white horse and bull in one, a single long spiral horn on its forehead, a shaggy mane, stamping its cloven hooves so that springs of water burst up around them, glowing eyes, menacing, standing on four legs, full body, three-quarter view, the beast alone, no ground, no background, the whole beast inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02353985062535604
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "hourglass",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Klepsydra, a living hourglass as tall as a man, an old dark wooden frame carved with runes, glass bulbs full of glowing pale grey sand of the dead pouring down, a face in the sand, two wooden arms swinging, eerie and menacing, full body, three-quarter view, the hourglass alone, no ground, no background, the whole hourglass inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024256921642515396
+  },
+  "images": 1
+}

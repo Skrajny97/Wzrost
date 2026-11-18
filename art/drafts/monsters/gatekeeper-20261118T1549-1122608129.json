@@ -1,0 +1,14 @@
+{
+  "id": "gatekeeper",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Odzwierny, the tall grim gatekeeper of the underworld, a gaunt grey-skinned man in a long black coat and a fur hat, a big ring of white bone keys hanging from his belt, swinging a huge bone key like a mace, cold pale eyes, menacing, standing on both feet, full body, three-quarter view, the figure alone, no gate, no ground, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02475901263915168
+  },
+  "images": 1
+}

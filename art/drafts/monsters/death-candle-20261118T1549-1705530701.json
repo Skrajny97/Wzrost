@@ -1,0 +1,14 @@
+{
+  "id": "death-candle",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Gromnica, a tall thick old church candle of yellowed wax burning on its own, a pale blue-white flame with a ghostly face in it, melted wax dripping down like tears, tongues of flame reaching out like arms, eerie and menacing, full body, three-quarter view, the candle alone, no candlestick, no ground, no background, the whole candle inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02349399133724637
+  },
+  "images": 1
+}

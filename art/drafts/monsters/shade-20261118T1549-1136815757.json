@@ -1,0 +1,14 @@
+{
+  "id": "shade",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Cien, a pure black human-shaped shadow with no features but two pale white eyes, its edges dissolving into dark smoke, long claw-like fingers reaching out, lurking, eerie and menacing, standing, full body, three-quarter view, the shadow alone, no ground, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02350005253304376
+  },
+  "images": 1
+}

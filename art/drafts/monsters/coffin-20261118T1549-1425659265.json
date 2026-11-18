@@ -1,0 +1,14 @@
+{
+  "id": "coffin",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Trumna, a living old wooden coffin standing upright, dark rotten planks with iron nails, its lid hanging open like a jaw with splintered wooden teeth, two pale glowing eyes in the darkness inside, snapping its lid, eerie and menacing, full body, three-quarter view, the coffin alone, no grave, no ground, no background, the whole coffin inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02445734663052029
+  },
+  "images": 1
+}

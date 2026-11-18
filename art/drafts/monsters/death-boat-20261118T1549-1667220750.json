@@ -1,0 +1,14 @@
+{
+  "id": "death-boat",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Czolno, a haunted dugout canoe of black rotten wood sailing on its own without a rower, its prow carved like a ram's skull, pale ghost lights glowing in the hollow, ramming forward with its prow, eerie and menacing, full body, three-quarter view, the canoe alone, no water, no ground, no background, the whole canoe inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024334526465098063
+  },
+  "images": 1
+}

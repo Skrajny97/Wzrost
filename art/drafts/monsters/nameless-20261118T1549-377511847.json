@@ -1,0 +1,14 @@
+{
+  "id": "nameless",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Bezimienny, a nameless lost soul no one mourned, a faint pale grey ghost in a long tattered shroud with no face at all, only a smooth blank oval where the face should be, long thin arms reaching out with cold blue frost on the fingers, eerie and menacing, floating, full body, three-quarter view, the ghost alone, no ground, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023416353464550444
+  },
+  "images": 1
+}

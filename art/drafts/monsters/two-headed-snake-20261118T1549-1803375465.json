@@ -1,0 +1,14 @@
+{
+  "id": "two-headed-snake",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Dwuglowiec, a long snake banded dark green and black with a head at each end of its body, both heads raised with fangs bared and dripping green venom, coiled, menacing, full body, three-quarter view, the snake alone, no ground, no background, the whole snake inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02410505935181512
+  },
+  "images": 1
+}

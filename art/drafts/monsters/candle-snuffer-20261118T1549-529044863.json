@@ -1,0 +1,14 @@
+{
+  "id": "candle-snuffer",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Zgasnik, a small hunched grey ghost in a tattered grey hood with puffed cheeks blowing a cold breath, a long thin hand trailing a wisp of black smoke from a snuffed candle, hollow dark eyes, eerie and menacing, floating, full body, three-quarter view, the ghost alone, no ground, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023414540702395972
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "water-strider",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant water strider as long as a spear, a thin dark brown body, six very long thin legs spread wide, its front legs raised to strike, a sharp beak, small red eyes, fast and menacing, full body, three-quarter view, the insect alone, no water, no ground, no background, the whole insect inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023713288699679907
+  },
+  "images": 1
+}
