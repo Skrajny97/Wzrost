@@ -3760,6 +3760,11 @@ Najpierw Tier X przedmiotów (potrzebny najlepszej postaci za około dwa tygodni
 
 Motyw B, słowiańskie zaświaty: Mgliste Bagna Nawii (276–300), Łąki Welesa (301–325) i Kraina bez Słońca (326–350). Karta Mglistych Bagien Nawii: szkic D. Dalej: miejsca, stwory, elity i czempioni na stronie ocen (mało ptaków), potem grafiki.
 
+## Wersja 0.4.29 (18.11.2026): poprawiona twarz Uzdrowiciela, czwarta ewolucja w kodzie
+
+1. **Twarz Uzdrowiciela (1097 B).** Autor: „twarz Uzdrowiciela wygląda nienaturalne trzeba ją lekko poprawić”. PixelLab narysował od nowa samą twarz portretu mężczyzny (139 pikseli, reszta portretu bez zmian), autor wybrał wersję B. Obrys twarzy w `tools/evolution-tones.json` sięga teraz do x 53 i y 34, więc wszystkie osiem odcieni skóry obejmuje całą nową twarz.
+2. **Czwarta ewolucja jest w kodzie, ale wyłączona** (`FOURTH_EVOLUTION` bez wartości w grze i na wersji testowej, „Czwarta ewolucja klas” wyżej): gracze jej nie widzą, dopóki nie będzie kompletu grafik. Walki form, które już są w grze, działają tak samo.
+
 ## Wersja 0.4.28 (18.11.2026): trzy przykryte kubki na Andrzejki
 
 1. **Andrzejki, wieczór trzech kubków** (1094 A, wyżej): przed wyborem trzy przykryte kubki, po wyborze obrazek bez wybranego kubka i figurka wróżby w jego miejscu.
