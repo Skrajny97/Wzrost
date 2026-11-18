@@ -3456,7 +3456,7 @@
     "hpFactor": 0.95,
     "armorFactor": 0.65,
     "weaknesses": { "sacred": 0.4 },
-    "reward": { "xp": 1.045, "gold": 0.779 }
+    "reward": { "xp": 1.044, "gold": 0.779 }
   },
   {
     "id": "harvestman",
@@ -3471,7 +3471,7 @@
     "attack": { "name": "Nogi jak kosy", "sound": "claw", "category": "physical", "scaling": "dexterity", "damageFactor": 0.33, "variance": 0.25, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } },
     "hpFactor": 0.7,
     "armorFactor": 0.25,
-    "reward": { "xp": 0.916, "gold": 0.679 }
+    "reward": { "xp": 0.915, "gold": 0.679 }
   },
   {
     "id": "death-candle",
@@ -3488,7 +3488,7 @@
     "armorFactor": 0.15,
     "resistances": { "fire": { "base": 40, "perLevel": 5 } },
     "weaknesses": { "water": 0.4 },
-    "reward": { "xp": 0.866, "gold": 0.649 }
+    "reward": { "xp": 0.865, "gold": 0.649 }
   },
   {
     "id": "mole-cricket",
@@ -3504,7 +3504,7 @@
     "hpFactor": 0.95,
     "armorFactor": 0.65,
     "resistances": { "earth": { "base": 30, "perLevel": 4 } },
-    "reward": { "xp": 1.042, "gold": 0.787 }
+    "reward": { "xp": 1.042, "gold": 0.789 }
   },
   {
     "id": "forefather",
@@ -3519,7 +3519,7 @@
     "attack": { "name": "Kostur praojca", "sound": "fist", "category": "physical", "scaling": "strength", "damageFactor": 0.297, "variance": 0.25, "stun": { "chance": 0.2, "label": "ogłuszony" } },
     "hpFactor": 0.65,
     "armorFactor": 0.45,
-    "reward": { "xp": 0.913, "gold": 0.686 }
+    "reward": { "xp": 0.913, "gold": 0.687 }
   },
   {
     "id": "giant-mole",
@@ -3535,7 +3535,7 @@
     "hpFactor": 0.48,
     "armorFactor": 0.2,
     "resistances": { "earth": { "base": 30, "perLevel": 4 } },
-    "reward": { "xp": 0.863, "gold": 0.656 }
+    "reward": { "xp": 0.863, "gold": 0.657 }
   },
   {
     "id": "coffin",
@@ -3551,7 +3551,7 @@
     "hpFactor": 0.95,
     "armorFactor": 1.0,
     "weaknesses": { "fire": 0.4 },
-    "reward": { "xp": 1.043, "gold": 0.784 }
+    "reward": { "xp": 1.043, "gold": 0.786 }
   },
   {
     "id": "two-headed-snake",
@@ -3567,7 +3567,7 @@
     "hpFactor": 0.7,
     "armorFactor": 0.25,
     "resistances": { "poison": { "base": 30, "perLevel": 4 } },
-    "reward": { "xp": 0.914, "gold": 0.683 }
+    "reward": { "xp": 0.914, "gold": 0.685 }
   },
   {
     "id": "candle-snuffer",
@@ -3584,7 +3584,7 @@
     "armorFactor": 0.15,
     "resistances": { "frost": { "base": 30, "perLevel": 4 } },
     "weaknesses": { "sacred": 0.4 },
-    "reward": { "xp": 0.864, "gold": 0.653 }
+    "reward": { "xp": 0.864, "gold": 0.655 }
   },
   {
     "id": "gatekeeper",
@@ -3600,7 +3600,7 @@
     "hpFactor": 0.95,
     "armorFactor": 1.0,
     "weaknesses": { "sacred": 0.4 },
-    "reward": { "xp": 1.021, "gold": 0.769 }
+    "reward": { "xp": 1.02, "gold": 0.765 }
   },
   {
     "id": "hourglass",
@@ -3617,7 +3617,7 @@
     "armorFactor": 0.3,
     "resistances": { "earth": { "base": 30, "perLevel": 4 } },
     "weaknesses": { "lightning": 0.4 },
-    "reward": { "xp": 0.895, "gold": 0.671 }
+    "reward": { "xp": 0.894, "gold": 0.667 }
   },
   {
     "id": "shade",
@@ -3633,7 +3633,7 @@
     "hpFactor": 0.48,
     "armorFactor": 0.2,
     "weaknesses": { "sacred": 0.4 },
-    "reward": { "xp": 0.846, "gold": 0.641 }
+    "reward": { "xp": 0.845, "gold": 0.638 }
   },
   {
     "id": "indrik",
@@ -3684,7 +3684,7 @@
     "hpFactor": 0.95,
     "armorFactor": 0.65,
     "resistances": { "frost": { "base": 30, "perLevel": 4 } },
-    "reward": { "xp": 1.043, "gold": 0.779 }
+    "reward": { "xp": 1.043, "gold": 0.778 }
   },
   {
     "id": "bumblebee",
@@ -3700,7 +3700,7 @@
     "hpFactor": 0.7,
     "armorFactor": 0.25,
     "weaknesses": { "frost": 0.4 },
-    "reward": { "xp": 0.914, "gold": 0.679 }
+    "reward": { "xp": 0.914, "gold": 0.678 }
   },
   {
     "id": "stampede",
@@ -3716,7 +3716,7 @@
     "hpFactor": 0.48,
     "armorFactor": 0.2,
     "weaknesses": { "sacred": 0.4 },
-    "reward": { "xp": 0.864, "gold": 0.649 }
+    "reward": { "xp": 0.864, "gold": 0.648 }
   },
   {
     "id": "cockroach",
@@ -3732,7 +3732,7 @@
     "hpFactor": 0.95,
     "armorFactor": 1.0,
     "resistances": { "poison": { "base": 30, "perLevel": 4 } },
-    "reward": { "xp": 1.042, "gold": 0.779 }
+    "reward": { "xp": 1.041, "gold": 0.778 }
   },
   {
     "id": "house-serpent",
@@ -3748,7 +3748,7 @@
     "hpFactor": 0.7,
     "armorFactor": 0.25,
     "resistances": { "poison": { "base": 30, "perLevel": 4 } },
-    "reward": { "xp": 0.913, "gold": 0.68 }
+    "reward": { "xp": 0.912, "gold": 0.68 }
   },
   {
     "id": "greed",
@@ -3764,7 +3764,7 @@
     "hpFactor": 0.5,
     "armorFactor": 0.15,
     "weaknesses": { "sacred": 0.4 },
-    "reward": { "xp": 0.863, "gold": 0.65 }
+    "reward": { "xp": 0.862, "gold": 0.65 }
   },
   {
     "id": "pill-bug",
@@ -3780,7 +3780,7 @@
     "hpFactor": 0.95,
     "armorFactor": 1.0,
     "resistances": { "earth": { "base": 30, "perLevel": 4 } },
-    "reward": { "xp": 1.038, "gold": 0.778 }
+    "reward": { "xp": 1.038, "gold": 0.777 }
   },
   {
     "id": "snake-maiden",
@@ -3797,7 +3797,7 @@
     "armorFactor": 0.25,
     "resistances": { "poison": { "base": 30, "perLevel": 4 }, "water": { "base": 30, "perLevel": 4 } },
     "regen": 0.04,
-    "reward": { "xp": 0.91, "gold": 0.678 }
+    "reward": { "xp": 0.91, "gold": 0.677 }
   },
   {
     "id": "dead-water",
@@ -3814,7 +3814,7 @@
     "armorFactor": 0.15,
     "resistances": { "water": { "base": 40, "perLevel": 5 } },
     "weaknesses": { "nature": 0.4 },
-    "reward": { "xp": 0.86, "gold": 0.648 }
+    "reward": { "xp": 0.86, "gold": 0.647 }
   },
   {
     "id": "stick-insect",
@@ -3831,7 +3831,7 @@
     "hpFactor": 0.95,
     "armorFactor": 0.65,
     "weaknesses": { "fire": 0.4 },
-    "reward": { "xp": 1.04, "gold": 0.778 }
+    "reward": { "xp": 1.039, "gold": 0.777 }
   },
   {
     "id": "simargl",
@@ -3847,7 +3847,7 @@
     "hpFactor": 0.7,
     "armorFactor": 0.25,
     "resistances": { "nature": { "base": 30, "perLevel": 4 } },
-    "reward": { "xp": 0.911, "gold": 0.678 }
+    "reward": { "xp": 0.911, "gold": 0.677 }
   },
   {
     "id": "blood-feud",
@@ -3864,7 +3864,7 @@
     "armorFactor": 0.2,
     "weaknesses": { "sacred": 0.4 },
     "vengeance": 0.5,
-    "reward": { "xp": 0.861, "gold": 0.648 }
+    "reward": { "xp": 0.861, "gold": 0.647 }
   },
   {
     "id": "ghost-smith",
@@ -3881,7 +3881,7 @@
     "armorFactor": 1.0,
     "resistances": { "fire": { "base": 30, "perLevel": 4 } },
     "weaknesses": { "sacred": 0.4 },
-    "reward": { "xp": 1.029, "gold": 0.771 }
+    "reward": { "xp": 1.026, "gold": 0.765 }
   },
   {
     "id": "shackles",
@@ -3897,7 +3897,7 @@
     "hpFactor": 0.65,
     "armorFactor": 0.45,
     "weaknesses": { "lightning": 0.4 },
-    "reward": { "xp": 0.902, "gold": 0.672 }
+    "reward": { "xp": 0.9, "gold": 0.667 }
   },
   {
     "id": "steward",
@@ -3914,7 +3914,7 @@
     "armorFactor": 0.15,
     "resistances": { "poison": { "base": 30, "perLevel": 4 } },
     "weaknesses": { "sacred": 0.4 },
-    "reward": { "xp": 0.853, "gold": 0.642 }
+    "reward": { "xp": 0.851, "gold": 0.637 }
   },
   {
     "id": "turon",
@@ -3971,7 +3971,7 @@
     "armorFactor": 0.65,
     "resistances": { "frost": { "base": 40, "perLevel": 5 } },
     "weaknesses": { "fire": 0.4 },
-    "reward": { "xp": 1.045, "gold": 0.786 }
+    "reward": { "xp": 1.044, "gold": 0.787 }
   },
   {
     "id": "pseudoscorpion",
@@ -3987,7 +3987,7 @@
     "hpFactor": 0.7,
     "armorFactor": 0.25,
     "resistances": { "poison": { "base": 30, "perLevel": 4 } },
-    "reward": { "xp": 0.916, "gold": 0.685 }
+    "reward": { "xp": 0.915, "gold": 0.686 }
   },
   {
     "id": "silence",
@@ -4003,7 +4003,7 @@
     "hpFactor": 0.5,
     "armorFactor": 0.15,
     "weaknesses": { "lightning": 0.4 },
-    "reward": { "xp": 0.866, "gold": 0.655 }
+    "reward": { "xp": 0.865, "gold": 0.656 }
   },
   {
     "id": "sledge",
@@ -4019,7 +4019,7 @@
     "hpFactor": 0.95,
     "armorFactor": 0.65,
     "weaknesses": { "fire": 0.4 },
-    "reward": { "xp": 1.043, "gold": 0.79 }
+    "reward": { "xp": 1.043, "gold": 0.794 }
   },
   {
     "id": "snow-flea",
@@ -4036,7 +4036,7 @@
     "hpFactor": 0.7,
     "armorFactor": 0.25,
     "resistances": { "frost": { "base": 30, "perLevel": 4 } },
-    "reward": { "xp": 0.914, "gold": 0.689 }
+    "reward": { "xp": 0.914, "gold": 0.693 }
   },
   {
     "id": "oblivion",
@@ -4053,7 +4053,7 @@
     "armorFactor": 0.15,
     "resistances": { "water": { "base": 30, "perLevel": 4 } },
     "weaknesses": { "sacred": 0.4 },
-    "reward": { "xp": 0.864, "gold": 0.658 }
+    "reward": { "xp": 0.864, "gold": 0.661 }
   },
   {
     "id": "ice-block",
@@ -4070,7 +4070,7 @@
     "armorFactor": 1.0,
     "resistances": { "frost": { "base": 40, "perLevel": 5 } },
     "weaknesses": { "fire": 0.4 },
-    "reward": { "xp": 1.048, "gold": 0.785 }
+    "reward": { "xp": 1.048, "gold": 0.787 }
   },
   {
     "id": "mayfly",
@@ -4086,7 +4086,7 @@
     "attack": { "name": "Śmignięcie", "sound": "bite", "category": "physical", "scaling": "dexterity", "damageFactor": 0.314, "variance": 0.25 },
     "hpFactor": 0.7,
     "armorFactor": 0.25,
-    "reward": { "xp": 0.918, "gold": 0.685 }
+    "reward": { "xp": 0.918, "gold": 0.687 }
   },
   {
     "id": "longing",
@@ -4103,7 +4103,7 @@
     "armorFactor": 0.15,
     "resistances": { "frost": { "base": 30, "perLevel": 4 } },
     "weaknesses": { "sacred": 0.4 },
-    "reward": { "xp": 0.869, "gold": 0.654 }
+    "reward": { "xp": 0.869, "gold": 0.656 }
   },
   {
     "id": "dread",
@@ -4120,7 +4120,7 @@
     "armorFactor": 0.5,
     "resistances": { "frost": { "base": 30, "perLevel": 4 } },
     "weaknesses": { "sacred": 0.4 },
-    "reward": { "xp": 1.047, "gold": 0.793 }
+    "reward": { "xp": 1.047, "gold": 0.798 }
   },
   {
     "id": "rat-king",
@@ -4136,7 +4136,7 @@
     "hpFactor": 0.7,
     "armorFactor": 0.25,
     "resistances": { "poison": { "base": 30, "perLevel": 4 } },
-    "reward": { "xp": 0.917, "gold": 0.692 }
+    "reward": { "xp": 0.917, "gold": 0.696 }
   },
   {
     "id": "black-flame",
@@ -4153,7 +4153,7 @@
     "armorFactor": 0.15,
     "resistances": { "fire": { "base": 40, "perLevel": 5 }, "frost": { "base": 30, "perLevel": 4 } },
     "weaknesses": { "sacred": 0.4 },
-    "reward": { "xp": 0.868, "gold": 0.661 }
+    "reward": { "xp": 0.868, "gold": 0.665 }
   },
   {
     "id": "koschei-egg",
@@ -4170,7 +4170,7 @@
     "armorFactor": 1.0,
     "resistances": { "frost": { "base": 40, "perLevel": 5 } },
     "weaknesses": { "fire": 0.4 },
-    "reward": { "xp": 1.021, "gold": 0.769 }
+    "reward": { "xp": 1.021, "gold": 0.765 }
   },
   {
     "id": "bayun",
@@ -4186,7 +4186,7 @@
     "hpFactor": 0.65,
     "armorFactor": 0.3,
     "resistances": { "nature": { "base": 30, "perLevel": 4 } },
-    "reward": { "xp": 0.895, "gold": 0.67 }
+    "reward": { "xp": 0.895, "gold": 0.666 }
   },
   {
     "id": "ice-princess",
@@ -4203,7 +4203,7 @@
     "armorFactor": 0.15,
     "resistances": { "frost": { "base": 40, "perLevel": 5 } },
     "weaknesses": { "fire": 0.4 },
-    "reward": { "xp": 0.846, "gold": 0.64 }
+    "reward": { "xp": 0.846, "gold": 0.637 }
   },
   {
     "id": "marzanna",
