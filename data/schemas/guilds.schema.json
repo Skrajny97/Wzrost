@@ -1914,6 +1914,9 @@
             "hourForms",
             "post",
             "postLead",
+            "pantry",
+            "pantryEmpty",
+            "pantryGroups",
             "give",
             "want",
             "count",
@@ -1969,6 +1972,17 @@
                 "minLength": 1
               }
             },
+            "pantryGroups": {
+              "description": "Nagłówki towarów Spiżarni w oknie oferty: ryby, plony i potrawy.",
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["fish", "crop", "dish"],
+              "properties": {
+                "fish": { "type": "string", "minLength": 1 },
+                "crop": { "type": "string", "minLength": 1 },
+                "dish": { "type": "string", "minLength": 1 }
+              }
+            },
             "states": {
               "type": "object",
               "additionalProperties": false,
@@ -2009,6 +2023,8 @@
                 "sameCount",
                 "notEnough",
                 "notHeld",
+                "notHeldGood",
+                "goodPieces",
                 "noOffer",
                 "notOwn",
                 "own",

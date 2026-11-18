@@ -164,11 +164,32 @@ function owned(goods) {
   return 0;
 }
 
+// What a stack's card tells: its description, a dish's meal, what the
+// scrapper (or the innkeeper, for the Spiżarnia's goods) pays for a piece,
+// the Zielarstwo level that gathers a herb, the Górnictwo level that digs
+// a gem or an ore, and how many the character has.
+function goodsFacts(goods) {
+  return [
+    goods.description && h('p', { class: 'sheet-text', text: goods.description }),
+    h(
+      'ul',
+      { class: 'item-properties' },
+      // The innkeeper Zbylut, not the scrapper, buys the Spiżarnia's goods;
+      // a dish says what its meal does.
+      goods.bonus && h('li', { text: t('Posiłek: {bonus} przez 4 godziny wypraw.', { bonus: goods.bonus }) }),
+      goods.scrap !== undefined &&
+        goods.scrap !== null &&
+        h('li', { class: 'item-price', text: goods.kind === 'pantry' ? t('U karczmarza: {gold} złota za sztukę', { gold: formatDecimal(goods.scrap) }) : t('U złomiarza: {gold} złota za sztukę', { gold: formatDecimal(goods.scrap) }) }),
+      goods.gatherLevel && h('li', { text: t('Do zebrania w Zielarstwie od poziomu {level}.', { level: goods.gatherLevel }) }),
+      goods.mineLevel && h('li', { text: t('Do wydobycia w Górnictwie od poziomu {level}.', { level: goods.mineLevel }) }),
+      h('li', { text: t('Masz: {count} szt.', { count: formatNumber(owned(goods)) }) }),
+    ),
+  ];
+}
+
 // A stack's card (the author: "bym mogl kliknac przedmiot i go sprawdzić u
-// kupca"): its picture, what it is, what the scrapper pays for a piece, the
-// Zielarstwo level that gathers a herb, the Górnictwo level that digs a gem
-// or an ore, and how many the character has;
-// `actions` below, as the merchant's "Kup".
+// kupca"): its picture, what it is and goodsFacts; `actions` below, as the
+// merchant's "Kup".
 function goodsSheet(goods, actions = null) {
   const rarity = rarityOf(goods.rarity);
   const colour = rarity ? { '--rarity': rarity.color } : {};
@@ -187,20 +208,7 @@ function goodsSheet(goods, actions = null) {
           h('p', { class: 'item-meta', text: [goodsKind(goods), rarity?.name].filter(Boolean).join(' · ') }),
         ),
       ),
-      goods.description && h('p', { class: 'sheet-text', text: goods.description }),
-      h(
-        'ul',
-        { class: 'item-properties' },
-        // The innkeeper Zbylut, not the scrapper, buys the Spiżarnia's goods;
-        // a dish says what its meal does.
-        goods.bonus && h('li', { text: t('Posiłek: {bonus} przez 4 godziny wypraw.', { bonus: goods.bonus }) }),
-        goods.scrap !== undefined &&
-          goods.scrap !== null &&
-          h('li', { class: 'item-price', text: goods.kind === 'pantry' ? t('U karczmarza: {gold} złota za sztukę', { gold: formatDecimal(goods.scrap) }) : t('U złomiarza: {gold} złota za sztukę', { gold: formatDecimal(goods.scrap) }) }),
-        goods.gatherLevel && h('li', { text: t('Do zebrania w Zielarstwie od poziomu {level}.', { level: goods.gatherLevel }) }),
-        goods.mineLevel && h('li', { text: t('Do wydobycia w Górnictwie od poziomu {level}.', { level: goods.mineLevel }) }),
-        h('li', { text: t('Masz: {count} szt.', { count: formatNumber(owned(goods)) }) }),
-      ),
+      goodsFacts(goods),
     ),
     actions,
   );
@@ -569,11 +577,14 @@ export function mountMarket(holder) {
   // chooses what to put up (the author: "Niech przy wyborze czegoś do
   // wystawienia na licytacji pokazuje za ile dany przedmiot idzie u
   // złomiarza"); goods he does not buy, as parts, show nothing.
-  const scrapText = (price, each = false) =>
+  // The Spiżarnia's goods go to the innkeeper Zbylut instead (`innkeeper`).
+  const scrapText = (price, each = false, innkeeper = false) =>
     typeof price === 'number'
-      ? each
-        ? t('U złomiarza: {gold} zł za sztukę', { gold: formatDecimal(price) })
-        : t('U złomiarza: {gold} zł', { gold: formatDecimal(price) })
+      ? innkeeper
+        ? t('U karczmarza: {gold} zł za sztukę', { gold: formatDecimal(price) })
+        : each
+          ? t('U złomiarza: {gold} zł za sztukę', { gold: formatDecimal(price) })
+          : t('U złomiarza: {gold} zł', { gold: formatDecimal(price) })
       : null;
   const pickWithScrap = (summary, text) => (text ? h('span', { class: 'market-pick-goods' }, summary, h('span', { class: 'muted market-scrap', text })) : summary);
 
@@ -604,11 +615,28 @@ export function mountMarket(holder) {
               ),
             ),
           ),
+        // A stack's card unfolds under a tap as an item's does (the author,
+        // 18.11.2026: „Przy wystawianiu czegoś na Targowisku niech da się
+        // kliknąć ikonkę danego przedmiotu i niech wyświetla się pełny
+        // opis”): its description, what it gives and what it fetches.
         others.length > 0 &&
           h(
             'ul',
             { class: 'market-picks' },
-            others.map((stack) => h('li', { class: 'market-pick' }, pickWithScrap(stackLine(stack), scrapText(stack.scrap, true)), choose(stack))),
+            others.map((stack) => {
+              const key = `sell:${stack.kind}:${stack.key}`;
+              return h(
+                'li',
+                { class: 'market-pick market-pick--item' },
+                h(
+                  'details',
+                  { class: 'profile-item', open: opened.has(key), onToggle: (event) => (event.currentTarget.open ? opened.add(key) : opened.delete(key)) },
+                  h('summary', {}, pickWithScrap(stackLine(stack), scrapText(stack.scrap, true, stack.kind === 'pantry'))),
+                  goodsFacts(stack),
+                ),
+                choose(stack),
+              );
+            }),
           ),
       ];
     };
@@ -676,7 +704,7 @@ export function mountMarket(holder) {
     const start = numberField('market-start', t('Cena wywoławcza (zł)'), null, 1, maxPrice);
     const now = numberField('market-buy-now', t('„Kup teraz” (zł, może zostać puste)'), null, 1, maxPrice);
     const length = hoursPicker();
-    const scrap = scrapText(goods.scrap, goods.kind !== 'item');
+    const scrap = scrapText(goods.scrap, goods.kind !== 'item', goods.kind === 'pantry');
     openSheet(
       h('h2', { class: 'sheet-title', text: goods.name }),
       scrap && h('p', { class: 'muted market-scrap', text: scrap }),

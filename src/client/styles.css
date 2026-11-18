@@ -17128,6 +17128,33 @@ button.tcard-slot {
   cursor: default;
 }
 
+/* The Spiżarnia's goods under the resources, folded. */
+.guild-exchange-pantry {
+  margin-top: 4px;
+}
+
+.guild-exchange-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+/* In a wide sheet, three goods to a row. */
+@media (min-width: 600px) {
+  .guild-exchange-group .guild-exchange-picker {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.guild-exchange-group-title {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .guild-exchange-name {
   font-size: 15px;
   line-height: 1.2;

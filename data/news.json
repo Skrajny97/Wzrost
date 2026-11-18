@@ -1365,6 +1365,11 @@
       "id": "0.4.35",
       "title": "Wersja 0.4.35",
       "body": "- Do Skrzyni Gildii włożysz też ryby, plony i potrawy: „Włóż ze Spiżarni”, dla wszystkich albo dla jednego członka gildii."
+    },
+    {
+      "id": "0.4.36",
+      "title": "Wersja 0.4.36",
+      "body": "- W Wymianie w Gildii wymienisz też ryby, plony i potrawy: za zasoby, za złoto albo za inne towary ze Spiżarni.\n- Przy wystawianiu na Targowisku stuknij w zioło, miksturę, materiał, minerał, zwój albo towar ze Spiżarni, a zobaczysz jego pełny opis."
     }
   ]
 }
