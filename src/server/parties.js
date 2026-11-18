@@ -12,8 +12,11 @@
 // parties.classSpread (the author: "Rozpiętość poziomu klas w Drużynie maks
 // 5 lvl musi być też by nie było za dużego carrowania", and "niech nie
 // będzie możliwości w ogole bycia w drużynie z kimś o rozpiętości lvli
-// wyzszej niz 5"; engine parties.js): an invitation and a joining keep to
-// it, and one whose level grows out of it leaves the party (partyOf).
+// wyzszej niz 5"; 10 since 18.11.2026, the author: "Rozszerz możliwość
+// zapraszania do drużyny do 10 poziomów klasy"; engine parties.js): an
+// invitation and a joining keep to it, and one whose level grows out of it
+// leaves the party (partyOf). Only class levels count here, never the
+// character levels.
 //
 // The leader invites a character by its name; a party comes with the first
 // invitation. The invited one accepts or declines; a member leaves when it

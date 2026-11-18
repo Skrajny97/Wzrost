@@ -1112,6 +1112,10 @@
     "0.4.41": {
       "title": "Version 0.4.41",
       "body": "- New beasts have four times as much HP as before version 0.4.40, not twice. The beasts already standing this week stay as they are."
+    },
+    "0.4.42": {
+      "title": "Version 0.4.42",
+      "body": "- You can now invite to a Party a character whose class level differs from yours by up to 10, not 5. Only the class level counts."
     }
   }
 }
