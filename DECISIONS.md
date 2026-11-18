@@ -3718,6 +3718,7 @@ Autor 17.11.2026: „przydałby się drobny event na Andrzejki”. Propozycja �
     - Figurki wróżb to te same ikony oba wieczory: 29.11 wosk zastyga w figurkę, a jej cień pada na ścianę, 30.11 figurka leży pod kubkiem.
     - Wersja testowa (`ANDRZEJKI: test`) gra każdy dzień od północy: nieparzysty jak lanie wosku, parzysty jak trzy kubki.
 6. **Oceny 18.11.2026 (1091–1093).** Figurki wróżb: Smok B, Sakiewka A, Klucz C, Kruk B, Gwiazda B (druga runda), Liść B, Serce A, Korona A, świeca osiągnięcia D. Tło portretu „Wieczór andrzejkowy”: D. Makiety lania wosku przed i po wróżbie, trzech kubków po wyborze i osiągnięcia przyjęte. Trzy kubki przed wyborem odrzucone, bo na przyjętym obrazku (wersja 3) ręka już unosi środkowy kubek i widać pod nim pierścionek. Autor: „niech beda trzy kubki jednak w takim razie przykryte”. Dlatego PixelLab domalowuje w miejscu ręki i uniesionego kubka trzeci przykryty kubek (`andrzejki-cups-covered` w `art/prompts.json`, inpainting przyjętego obrazka). Po wyborze kubek znika, a figurka stoi tam, gdzie stał (1093.4).
+7. **Trzy przykryte kubki przyjęte (1094, 18.11.2026):** wersja A domalowana przez PixelLab, a do niej obrazki bez pierwszego, drugiego i trzeciego kubka (`cups-open-1` do `cups-open-3` w `src/client/art/andrzejki/`). Po wyborze karta pokazuje obrazek bez wybranego kubka, a figurka wróżby stoi w jego miejscu. Makiety przed i po wyborze przyjęte.
 
 ## Co przygotować zawczasu: kolejność (1085 A, 18.11.2026)
 
@@ -3736,11 +3737,22 @@ Najpierw Tier X przedmiotów (potrzebny najlepszej postaci za około dwa tygodni
 1. **Zasady z 1087.0 przyjęte** i wszystkie 15 par nazw: Burzyciel/Burzycielka, Nieśmiertelny/Nieśmiertelna, Tytan/Tytanida, Niebiański Łucznik/Niebiańska Łuczniczka, Gromowładny/Gromowładna, Pan Zwierząt/Pani Zwierząt, Stwórca Żywiołów/Stwórczyni Żywiołów, Lodowy Bóg/Lodowa Bogini, Pradruid/Pradruidka, Archanioł/Archanielica, Mściciel Niebios/Mścicielka Niebios, Wieszcz/Wieszczka, Żniwiarz Dusz/Żniwiarka Dusz, Król Nawii/Królowa Nawii, Książę Ciemności/Księżna Ciemności.
 2. **Portrety przyjęte dla 27 z 30 postaci**, zapisane jako wzory w `art/references/evolutions/<id>-<płeć>.png`. Do poprawy: Nieśmiertelny i Archanioł (wszystkie szkice odrzucone; nowe szkice w stroju przyjętej kobiety tej formy) oraz Żniwiarka Dusz (autor: „A, ale potrzebuje kos takich jak facet”).
 3. **Trzy portrety z drugiej rundy przyjęte (1090, 18.11.2026):** Nieśmiertelny A, Archanioł B i Żniwiarka Dusz C (z dużymi kosami jak u Żniwiarza). Wszystkie 30 portretów czwartych form są teraz wzorami w `art/references/evolutions/`.
-4. Dalej: cechy i umiejętności z liczbami z symulacji, a potem chody, jazda wierzchem i odcienie skóry. Do gry wejdzie z pełną grafiką.
+4. **Cechy i umiejętności przyjęte (1095, 18.11.2026)**, wszystkie 15 form, każda cecha i obie umiejętności, oraz zasady liczb: umiejętności rosną do 195. poziomu, ostatni Punkt Umiejętności na 399. poziomie klasy, przyrost statystyk jak u trzeciej formy plus 1 w głównej statystyce i 1 w Witalności. Liczby z propozycji są wstępne: ostateczne ustawią symulacje wypraw, Areny i Wież.
+    - Burzyciel: „Gniew bez dna”, „Pogrom” (z „Rzezi”), „Wyłom”. Nieśmiertelny: „Wieczna chwała”, „Huragan chwały” (z „Huraganu stali”), „Wyzwanie czempiona”. Tytan: „Żywa forteca”, „Gniew góry” (z „Trzęsienia ziemi”), „Tarcza tytana”.
+    - Niebiański Łucznik: „Gwiezdny grot”, „Strzała z niebios” (z „Mistrzowskiego strzału”), „Deszcz gwiazd”. Gromowładny: „Władca burzy”, „Burza Peruna” (z „Gniewu Peruna”), „Kula piorunów”. Pan Zwierząt: „Prawo stada”, „Wódz watahy” (z „Przewodnika watahy”), „Zew niedźwiedzia”.
+    - Stwórca Żywiołów: „Pierwotna moc”, „Pierwotny chaos” (z „Kataklizmu”), „Żywiołak”. Lodowy Bóg: „Wieczna zima”, „Lodowa wieczność” (z „Lodowego grobowca”), „Lodowe serce”. Pradruid: „Korzenie świata”, „Dąb wieków” (z „Przebudzenia dębu”), „Odrodzenie puszczy”.
+    - Archanioł: „Anielska opieka”, „Boskie uzdrowienie” (z „Cudownego uzdrowienia”), „Skrzydła światłości”. Mściciel Niebios: „Ogień niebios”, „Dzień gniewu” (z „Sądu ostatecznego”), „Słup światła”. Wieszcz: „Dar widzenia”, „Jasnowidzenie” (z „Wizji”), „Odwrócenie losu”.
+    - Żniwiarz Dusz: „Żniwo”, „Ścięcie dusz” (z „Ciosu ostatecznego”), „Taniec kosy”. Król Nawii: „Władca Nawii”, „Legion Nawii” (z „Armii umarłych”), „Mgła Nawii”. Książę Ciemności: „Dziecię nocy”, „Wieczna noc” (z „Zaćmienia”), „Cios z cienia”.
+    - Pełne opisy z liczbami wstępnymi są na stronie ocen (1095, archiwum); po symulacjach trafią do `data/evolutions.json`.
+5. Dalej: liczby z symulacji, potem chody, jazda wierzchem, odcienie skóry i ikony umiejętności. Do gry wejdzie z pełną grafiką.
 
 ## Nowe krainy 276–350: Nawia (1088 B, 18.11.2026)
 
 Motyw B, słowiańskie zaświaty: Mgliste Bagna Nawii (276–300), Łąki Welesa (301–325) i Kraina bez Słońca (326–350). Karta Mglistych Bagien Nawii: szkic D. Dalej: miejsca, stwory, elity i czempioni na stronie ocen (mało ptaków), potem grafiki.
+
+## Wersja 0.4.28 (18.11.2026): trzy przykryte kubki na Andrzejki
+
+1. **Andrzejki, wieczór trzech kubków** (1094 A, wyżej): przed wyborem trzy przykryte kubki, po wyborze obrazek bez wybranego kubka i figurka wróżby w jego miejscu.
 
 ## Wersja 0.4.27 (18.11.2026): umiejętności ewolucji „na maks. poziomie”
 

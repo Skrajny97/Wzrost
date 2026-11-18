@@ -1325,6 +1325,11 @@
       "id": "0.4.27",
       "title": "Wersja 0.4.27",
       "body": "- W opisie ewolucji nagłówek umiejętności mówi teraz „na maks. poziomie” zamiast numeru poziomu. Liczby w opisie zawsze były dla najwyższego poziomu umiejętności, a numer mylił."
+    },
+    {
+      "id": "0.4.28",
+      "title": "Wersja 0.4.28",
+      "body": "- Wieczór trzech kubków w Andrzejki (30 listopada) ma nowy obrazek: trzy przykryte kubki, a po wyborze w miejscu kubka stoi figurka z wosku."
     }
   ]
 }

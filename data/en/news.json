@@ -1056,6 +1056,10 @@
     "0.4.27": {
       "title": "Version 0.4.27",
       "body": "- In an evolution's description the skills' heading now says “at the top level” instead of a level's number. The numbers there were always those of the skills' top level, and the number misled."
+    },
+    "0.4.28": {
+      "title": "Version 0.4.28",
+      "body": "- The evening of the three cups on St Andrew's Eve (30 November) has a new picture: three covered cups, and after your choice a wax figurine stands where the cup was."
     }
   }
 }

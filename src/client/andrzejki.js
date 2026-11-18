@@ -67,13 +67,16 @@ function result(evening, texts, fresh) {
 
 // The picture of the evening, with the omen over it once told: the shadow
 // of the shape on the wall and the shape in the bowl (wax), or the
-// figurine where the cup chosen stood (`cup`).
+// figurine where the cup chosen stood (`cup`): the three cups covered
+// before the choice (1093.3), and after it the picture without the cup
+// chosen (cups-open-1 to 3).
 function scene(evening) {
   const omen = evening.told;
+  const art = evening.kind === 'cups' && omen ? `cups-open-${omen.cup ?? 2}` : evening.kind;
   return h(
     'div',
     { class: `andrzejki-scene andrzejki-scene--${evening.kind}${omen ? ' andrzejki-scene--told' : ''}` },
-    h('img', { class: 'andrzejki-scene-art', src: `/art/andrzejki/${evening.kind}.png`, alt: '', width: 128, height: 96, draggable: 'false' }),
+    h('img', { class: 'andrzejki-scene-art', src: `/art/andrzejki/${art}.png`, alt: '', width: 128, height: 96, draggable: 'false' }),
     omen && evening.kind === 'wax' && h('span', { class: 'andrzejki-shadow', 'aria-hidden': 'true' }, omenSprite(omen.id)),
     omen && evening.kind === 'wax' && h('span', { class: 'andrzejki-figure andrzejki-figure--bowl', 'aria-hidden': 'true' }, omenSprite(omen.id)),
     omen && evening.kind === 'cups' && h('span', { class: `andrzejki-figure andrzejki-figure--cup${omen.cup ?? 2}`, 'aria-hidden': 'true' }, omenSprite(omen.id)),

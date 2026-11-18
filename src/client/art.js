@@ -648,11 +648,13 @@ export const SPRITES = {
     ids: ['dragon', 'purse', 'key', 'raven', 'star', 'leaf', 'heart', 'crown', 'candle'],
   },
   // Andrzejki's two evenings, the wax and the three cups (1082 C: the wax's
-  // version 2, the cups' version 3), 128×96, drawn in PixelLab.
+  // version 2, the cups' version 3 with all three covered, 1093.3), and the
+  // cups once one is chosen, without it (cups-open-1 to 3), 128×96, drawn in
+  // PixelLab.
   andrzejki: {
     width: 128,
     height: 96,
-    ids: ['wax', 'cups'],
+    ids: ['wax', 'cups', 'cups-open-1', 'cups-open-2', 'cups-open-3'],
   },
   cosmetics: {
     width: 120,
