@@ -43,7 +43,7 @@ import { claimGuildTrialChest, dropGuildTrial, getGuildTrials, openGuildTrials, 
 import { askGuild, cancelGuildRequest, getGuildRequests, giveToGuildRequest, thankForGuildGift } from './guild-requests.js';
 import { getGuildTodo } from './guild-todo.js';
 import { getGuildExchange, postGuildOffer, takeGuildOffer, withdrawGuildOffer } from './guild-exchange.js';
-import { getGuildChest, putInGuildChest, takeFromGuildChest } from './guild-chest.js';
+import { getGuildChest, putGoodsInGuildChest, putInGuildChest, takeFromGuildChest } from './guild-chest.js';
 import { getGuildWar, getGuildWarBattle, getGuildWarMatchBattles, settleWars, testGuildWar } from './guild-wars.js';
 import { donateToGuildSeat, getGuildSeat, preferGuildSeat } from './guild-seat.js';
 import { changePassword, forgotPassword, resetPassword } from './password.js';
@@ -489,6 +489,7 @@ const routes = [
   // The Skrzynia Gildii (guild-chest.js).
   ['GET', '/api/guild/chest', getGuildChest],
   ['POST', '/api/guild/chest/put', putInGuildChest],
+  ['POST', '/api/guild/chest/put-goods', putGoodsInGuildChest],
   ['POST', '/api/guild/chest/take', takeFromGuildChest],
   // The guild wars (guild-wars.js, 792–800), where GUILD_WARS is on.
   ['GET', '/api/guild/war', getGuildWar],

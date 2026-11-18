@@ -3782,6 +3782,16 @@ Motyw B, słowiańskie zaświaty: Mgliste Bagna Nawii (276–300), Łąki Welesa
    - **Zamek Kościeja (346–350)**: Zamek z lodu i kości na samym dnie Nawii. Gdzieś w nim Kościej ukrył swoją śmierć: w igle, igłę w jajku, jajko w kaczce, kaczkę w zającu, a zająca w skrzyni. Stwory: Jajo Kościeja (przód): jajo, w którym Kościej schował igłę ze swoją śmiercią. Pilnuje się samo: toczy się po zamku, a z pęknięć sypie lodem (wychłodzenie); Kot Bajun (środek): olbrzymi kocur Kościeja, który siedzi na żelaznym słupie i opowiada bajki. Kto zaśnie przy jego mruczeniu, traci najbliższy ruch; Zaklęta Królewna (tył): królewna porwana przez Kościeja i zaklęta w lód. Walczy dla niego, bo nie pamięta, kim była, a jej ciosy mrożą (wychłodzenie).
 5. **Dalej:** grafiki w PixelLab (stwory, materiały, kręgi miejsc, karty krain i plansze walki, po cztery wersje na stronie ocen), okrzyki, liczby z symulacji trudności (`tools/difficulty-sim.mjs`), Poszukiwani w Osadzie i angielskie nazwy. Kolejność prac (1085 A): po czwartej ewolucji.
 
+## Wersja 0.4.35 (18.11.2026): Spiżarnia w Skrzyni Gildii
+
+1. **Skrzynia Gildii (autor 18.11.2026: „Skrzynia Konta, Skrzynia Gildii wszędzie”).** Pod „Włóż z plecaka” jest „Włóż ze Spiżarni”: ryby, plony i potrawy postaci z „Włóż”, które pyta, ile sztuk (−, +, „wszystkie”) i dla kogo, jak przy przedmiocie. Do skrzyni trafia paczka jednego towaru (np. „Płotka ×6”), zajmuje jedno miejsce skrzyni jak przedmiot i wychodzi w całości przez „Weź” (albo „Zabierz” u tego, kto ją włożył), prosto do Spiżarni, bez miejsca w plecaku. Obowiązują zasady przedmiotów: poziom Wymiany, paczka dla jednego członka czeka na niego, Nowicjusz bierze tylko swoje i te dla niego, dziennik pokazuje „Płotka ×6”.
+2. Paczka jest wierszem tabeli `guild_chest` z danymi `{ goods: { kind: 'pantry', key, count } }` zamiast danych przedmiotu, więc wyjście z gildii, zwolnienie paczek odchodzącego i pojemność skrzyni działają bez zmian, bez migracji (`POST /api/guild/chest/put-goods`).
+3. **Wymiana w Gildii** zostaje na razie przy zasobach obozu i złocie; Spiżarnia trafi tam w kolejnym etapie.
+
+## Mnożnik krytyka (1101 A, 18.11.2026)
+
+Pytanie gracza przekazane przez autora: czy poza Łucznikiem i Cieniem mnożnik krytyka zawsze wynosi 1,5. Autor wybrał 1101 A: zostaje jak jest. Krytyk zadaje 1,5 raza tyle co zwykły cios (`balance.combat.critMultiplier`). Percepcja, cecha Rdzenia i bonusy Labiryntu podnoszą tylko szansę na krytyka. Siłę krytyka podnoszą tylko cechy ewolucji Łucznika (Snajper, Strzelec Wyborowy, Mistrz Łuku, Niebiański Łucznik) i Cienia (Skrytobójca, Królobójca, Bogobójca, Żniwiarz Dusz), bo mocny krytyk to ich znak rozpoznawczy. Odrzucone: B (cecha przedmiotów „Siła krytyka” dla każdej klasy) i C (percepcja podnosi też siłę krytyka).
+
 ## Wersja 0.4.34 (18.11.2026): Spiżarnia w Prośbach Gildii
 
 1. **Prośby Gildii (autor 18.11.2026: „O wymianie miedzy graczami i w gildii nie zapomnij”, „Skrzynia Konta, Skrzynia Gildii wszędzie”).** Członek gildii prosi też o rybę, plon albo potrawę (rodzaj `pantry` w `data/guilds.json`, `requests.kinds`, grupa „Spiżarnia”), a inni dają ze swojej Spiżarni. Brakujący szczegół: Spiżarnia nie ma Encyklopedii, więc do wyboru są wszystkie ryby, plony i potrawy gry, jak zwoje. Towary Spiżarni nie zajmują miejsca w plecaku.

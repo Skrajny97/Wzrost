@@ -135,3 +135,68 @@ describe('the Spiżarnia in the Prośby Gildii', () => {
     assert.deepEqual([await pantry('Rybak'), await pantry('Kucharka')], [{}, { roach: 6 }]);
   });
 });
+
+describe('the Spiżarnia in the Skrzynia Gildii', () => {
+  const { call, db, signUp } = useServer();
+  const cookies = {};
+  async function player(login, name) {
+    ({ cookie: cookies[login] } = await signUp(login));
+    await call('POST', '/api/character', { cookie: cookies[login], body: { name, classId: 'warrior', appearance: 'female' } });
+    await (await db()).prepare('UPDATE characters SET level = 30, class_level = 25, gold = 5000 WHERE name = ?').bind(name).run();
+  }
+  const as = (login, method, path, body) => call(method, path, { cookie: cookies[login], body });
+  const pantry = async (name) => JSON.parse((await (await db()).prepare('SELECT pantry FROM characters WHERE name = ?').bind(name).first()).pantry ?? '{}');
+  const id = async (name) => (await (await db()).prepare('SELECT id FROM characters WHERE name = ?').bind(name).first()).id;
+
+  beforeEach(async () => {
+    await player('kucharka', 'Kucharka');
+    await player('rybak', 'Rybak');
+    await player('trzeci', 'Trzeci');
+    await as('kucharka', 'POST', '/api/guild/found', { name: 'Smakosze', tag: 'SMK' });
+    const guildId = (await as('kucharka', 'GET', '/api/guild')).data.guild.id;
+    for (const [login, name] of [['rybak', 'Rybak'], ['trzeci', 'Trzeci']]) {
+      await as('kucharka', 'POST', '/api/guild/invite', { name });
+      await as(login, 'POST', '/api/guild/accept', { guildId });
+    }
+    // Out of the Nowicjusz's days, so items for all are theirs to take.
+    await (await db()).prepare('UPDATE guild_members SET probation_until = 0').run();
+  });
+
+  test('a lot of fish for one member, a dish for all: put, taken whole, the log names them', async () => {
+    await (await db()).prepare('UPDATE characters SET pantry = ? WHERE name = ?').bind(JSON.stringify({ roach: 9, 'pea-soup': 2 }), 'Kucharka').run();
+    assert.equal((await as('kucharka', 'POST', '/api/guild/chest/put-goods', { kind: 'pantry', key: 'roach', count: 10 })).data.error.code, 'not_enough');
+    assert.equal((await as('kucharka', 'POST', '/api/guild/chest/put-goods', { kind: 'herb', key: 'roach', count: 1 })).status, 404);
+    const forRybak = await as('kucharka', 'POST', '/api/guild/chest/put-goods', { kind: 'pantry', key: 'roach', count: 6, forId: await id('Rybak') });
+    assert.equal(forRybak.status, 200, JSON.stringify(forRybak.data).slice(0, 300));
+    const forAll = await as('kucharka', 'POST', '/api/guild/chest/put-goods', { kind: 'pantry', key: 'pea-soup', count: 2 });
+    assert.equal(forAll.status, 200, JSON.stringify(forAll.data).slice(0, 300));
+    assert.deepEqual(await pantry('Kucharka'), { roach: 3 });
+    // Rybak sees both lots, the one for it first; Trzeci may not take Rybak's.
+    const seen = (await as('rybak', 'GET', '/api/guild/chest')).data;
+    assert.deepEqual(
+      seen.items.map((one) => [one.goods.key, one.goods.count, one.goods.name, one.forYou, one.canTake]),
+      [
+        ['roach', 6, 'Płotka', true, true],
+        ['pea-soup', 2, 'Grochówka', false, true],
+      ],
+    );
+    const fishLot = seen.items[0].id;
+    assert.equal((await as('trzeci', 'POST', '/api/guild/chest/take', { id: fishLot })).data.error.code, 'not_yours');
+    const taken = await as('rybak', 'POST', '/api/guild/chest/take', { id: fishLot });
+    assert.equal(taken.status, 200, JSON.stringify(taken.data).slice(0, 300));
+    assert.deepEqual(await pantry('Rybak'), { roach: 6 });
+    // The dish, for all, goes to the first who takes it.
+    assert.equal((await as('trzeci', 'POST', '/api/guild/chest/take', { id: seen.items[1].id })).status, 200);
+    assert.deepEqual(await pantry('Trzeci'), { 'pea-soup': 2 });
+    const log = (await as('kucharka', 'GET', '/api/guild/chest')).data.log;
+    assert.deepEqual(
+      log.map((move) => [move.kind, move.name, move.item.name]),
+      [
+        ['take', 'Trzeci', 'Grochówka ×2'],
+        ['take', 'Rybak', 'Płotka ×6'],
+        ['put', 'Kucharka', 'Grochówka ×2'],
+        ['put', 'Kucharka', 'Płotka ×6'],
+      ],
+    );
+  });
+});
