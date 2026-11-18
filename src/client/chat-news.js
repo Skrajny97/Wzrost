@@ -56,6 +56,10 @@ let guildInvites = 0;
 // with the newest message there by someone else, or null outside a party;
 // its mark is kept with the other channels' (`channelSeen.party`).
 let party = null;
+// The moderation's channel (the tab Administracja, src/server/chat.js
+// "staff") for the admin and the moderators, with its newest message by
+// someone else, or null for everyone else.
+let staff = null;
 // What waits in the character's guild (src/server/guild-todo.js): {trials,
 // beast, expedition, requests, chest}, each true when there is something to
 // do, or null.
@@ -126,13 +130,33 @@ export const noticeNews = () => Boolean(guildChannel()) && (guild.notice ?? 0) >
 // the guild's.
 export const partyChannel = () => open() && Boolean(party);
 export const partyChatNews = () => partyChannel() && party.latest > (channelSeen.party ?? 0);
+// The moderation's channel and a message there not read yet: it lights the
+// chat like the party's.
+export const staffChannel = () => open() && Boolean(staff);
+export const staffChatNews = () => staffChannel() && staff.latest > (channelSeen.staff ?? 0);
 export const chatNews = () =>
-  globalNews() || guildChannelNews() || leadNews() || partyChatNews() || conversations.some((entry) => conversationNews(entry.id, entry.latest)) || anyMentionNews();
+  globalNews() ||
+  guildChannelNews() ||
+  leadNews() ||
+  partyChatNews() ||
+  staffChatNews() ||
+  conversations.some((entry) => conversationNews(entry.id, entry.latest)) ||
+  anyMentionNews();
 // The light of a channel's tab: the Globalny's, the guild's, its leaders'
 // and the party's for any news, the other channels' (the Wymiana) for a
 // tag only.
 export const channelNews = (id) =>
-  id === 'guild' ? guildChannelNews() : id === 'lead' ? leadNews() : id === 'party' ? partyChatNews() : id === globalId() ? globalNews() : mentionNews(id);
+  id === 'guild'
+    ? guildChannelNews()
+    : id === 'lead'
+      ? leadNews()
+      : id === 'party'
+        ? partyChatNews()
+        : id === 'staff'
+          ? staffChatNews()
+          : id === globalId()
+            ? globalNews()
+            : mentionNews(id);
 // The channel where the newest tag waits unread, for the chat to open on:
 // its id ('guild' for the guild's), or null; private conversations light
 // their own tabs.
@@ -195,6 +219,8 @@ const lights = () =>
     noticeNews(),
     partyChatNews(),
     partyChannel(),
+    staffChatNews(),
+    staffChannel(),
     friendNews(),
     partyNews(),
     guildNews(),
@@ -229,6 +255,7 @@ onCharacterChange((character) => {
     guildTodo = null;
     guildInvites = 0;
     party = null;
+    staff = null;
     invites = 0;
     gifts = 0;
     unsent = 0;
@@ -410,6 +437,7 @@ export async function checkChat({ now = false } = {}) {
     guild = answer.guild ?? null;
     guildInvites = answer.guildInvites ?? 0;
     party = answer.party ?? null;
+    staff = answer.staff ?? null;
     trade = answer.trade ?? null;
     tagged = { ...answer.mentions, private: answer.mentions?.private ?? {} };
     // What the character read on its other devices.

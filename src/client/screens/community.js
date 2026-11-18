@@ -62,6 +62,7 @@ import {
   mentionChannel,
   mentionNews,
   partyChannel,
+  staffChannel,
   noticeNews,
   partyNews,
   onChatNews,
@@ -117,16 +118,33 @@ const PARTY = {
   },
 };
 
+// The moderation's channel, only the admin's and the moderators' (the
+// author, 18.11.2026: „dodaj też zakładkę czatu dla administracji (i
+// moderatorów) nazwij go administracja”).
+const STAFF = {
+  id: 'staff',
+  get name() {
+    return t('Administracja');
+  },
+};
+
 // A silence "na stałe" (chat.js).
 const FOREVER = 8.64e15;
 const untilText = (until) => (until >= FOREVER ? t('na stałe') : t('do {time}', { time: dateTimeFormat.format(new Date(until)) }));
 
 // The chat's channels the character has, in the order of their tabs: the
 // player's own on this device (chat-order.js, 1039.3), else the game's, with
-// the guild's and the party's among them while the character is in one.
+// the guild's and the party's among them while the character is in one,
+// and the moderation's for the admin and the moderators.
 export function chatTabs() {
   const chat = state.content.chat;
-  return ordered([...chat.channels, ...(guildChannel() ? [GUILD] : []), ...(leadChannel() ? [LEAD] : []), ...(partyChannel() ? [PARTY] : [])]);
+  return ordered([
+    ...chat.channels,
+    ...(guildChannel() ? [GUILD] : []),
+    ...(leadChannel() ? [LEAD] : []),
+    ...(partyChannel() ? [PARTY] : []),
+    ...(staffChannel() ? [STAFF] : []),
+  ]);
 }
 
 // A channel's tab slides into another place among the channels' tabs
