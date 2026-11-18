@@ -19962,22 +19962,27 @@ button.tcard-slot {
   background: #3a2e22;
 }
 
-.discord-mark {
+.discord-mark,
+.social-mark {
   display: block;
   flex: none;
 }
 
-a.discord-button {
+a.discord-button,
+a.social-button {
   gap: 10px;
 }
 
-.status-row--discord {
+.status-row--discord,
+.status-row--social {
   align-items: center;
 }
 
 /* The button keeps to the right of the label; on a narrow phone its words
-   wrap inside it rather than past the sheet's edge. */
-.status-row--discord dd {
+   wrap inside it rather than past the sheet's edge. Facebook, TikTok and
+   Wattpad (social.js, 18.11.2026) take the same row below Discord's. */
+.status-row--discord dd,
+.status-row--social dd {
   display: flex;
   justify-content: flex-end;
   min-width: 0;

@@ -3810,6 +3810,14 @@ Motyw B, słowiańskie zaświaty: Mgliste Bagna Nawii (276–300), Łąki Welesa
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.43 (18.11.2026): Facebook, TikTok i Wattpad w Ustawieniach
+
+1. **Autor: „podepnij facebooka, tiktoka i wattpada do gry, gdzieś w ustawienia albo społeczność obok discorda z przyciskami”.** W Ustawieniach, zaraz pod wierszem „Discord”, są trzy takie same wiersze: „Facebook” z przyciskiem „Odwiedź nas na Facebooku”, „TikTok” z „Obserwuj nas na TikToku” i „Wattpad” z „Czytaj powieść ze świata gry” (po angielsku „Visit us on Facebook”, „Follow us on TikTok”, „Read the novel set in the game's world”). Przycisk jest przyciskiem gry ze znakiem miejsca, jak przy Discordzie, i otwiera link w nowej karcie albo w aplikacji, jeśli telefon ją ma.
+2. **Brakujący szczegół: Ustawienia, nie tytuł Społeczności.** Przy tytule Społeczności stoi już znak Discorda (48 px); trzy kolejne obok niego nie mieszczą się z tytułem na telefonie 320 px, więc autor dostał wariant „w ustawienia” ze swojej prośby, bez nowego układu ekranu.
+3. **Znaki** są z Simple Icons (CC0), w kolorach marek i bez zmian kształtu: Facebook to białe „f” w niebieskim kole (#0866FF), TikTok biała nuta na czarnym kafelku, Wattpad białe „W” na pomarańczowym (#FF500A), jak na kafelkach ich aplikacji.
+4. **Linki** są te od autora; z linku Wattpada zniknęły tylko dopiski udostępniania (`utm_…`, `wp_page`, `wp_uname`), więc prowadzi prosto do opowiadania: `https://www.wattpad.com/story/419946881`.
+5. Dane są w `data/community.json` (`social.places`), a słowa angielskie w `data/en/community.json`. Schemat pilnuje, żeby link prowadził do swojego miejsca; miejsce z pustym linkiem się nie pokazuje (`src/client/social.js`, `test/social.test.js`).
+
 ## Wersja 0.4.42 (18.11.2026): Drużyna z rozpiętością 10 poziomów klasy, reputacja Kupców do 30 dziennie
 
 1. **Autor: „Rozszerz możliwość zapraszania do drużyny do 10 poziomów klasy. Niech to będzie uzależnione tylko od poziomu klasy (poziom postaci niech nie ma znaczenia)”.** `parties.classSpread` w `data/balance.json` z 5 na 10: poziomy klas w drużynie mogą się różnić najwyżej o 10 przy zaproszeniu, przy dołączeniu i potem (kto przez awans odstanie bardziej, wypada z drużyny, jak dotąd). Zaproszenie liczy tylko poziomy klas, poziom postaci nie ma na nie wpływu.

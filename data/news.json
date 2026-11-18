@@ -1400,6 +1400,11 @@
       "id": "0.4.42",
       "title": "Wersja 0.4.42",
       "body": "- Do Drużyny zaprosisz teraz postać, której poziom klasy różni się od Twojego najwyżej o 10, a nie o 5. Liczy się tylko poziom klasy.\n- Handel na Targowisku daje teraz do 30 punktów reputacji u Kompanii Kupców dziennie zamiast 10."
+    },
+    {
+      "id": "0.4.43",
+      "title": "Wersja 0.4.43",
+      "body": "- W Ustawieniach, pod Discordem, są teraz przyciski do Facebooka i TikToka gry oraz do powieści ze świata gry na Wattpadzie."
     }
   ]
 }
