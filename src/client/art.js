@@ -168,6 +168,13 @@ export const SPRITES = {
       'skin-winter-warrior-male': [34, 31], 'skin-winter-warrior-female': [35, 31], 'skin-winter-archer-male': [35, 34], 'skin-winter-archer-female': [35, 34],
       'skin-winter-mage-male': [37, 39], 'skin-winter-mage-female': [37, 40], 'skin-winter-cleric-male': [37, 37], 'skin-winter-cleric-female': [36, 38],
       'skin-winter-shadow-male': [35, 29], 'skin-winter-shadow-female': [34, 29],
+      // The fourth forms (the shoulder left of the face, as on the others).
+      'ravager-female': [34, 26], 'ravager-male': [35, 26], 'immortal-female': [34, 33], 'immortal-male': [35, 39], 'titan-female': [37, 26],
+      'titan-male': [36, 26], 'celestial-archer-female': [33, 48], 'celestial-archer-male': [36, 26], 'thunderer-female': [35, 33], 'thunderer-male': [34, 26],
+      'beast-lord-female': [34, 39], 'beast-lord-male': [35, 30], 'primordial-female': [38, 26], 'primordial-male': [37, 26], 'frost-god-female': [35, 35],
+      'frost-god-male': [35, 26], 'elder-druid-female': [35, 26], 'elder-druid-male': [35, 26], 'archangel-female': [31, 26], 'archangel-male': [32, 26],
+      'heaven-avenger-female': [34, 26], 'heaven-avenger-male': [35, 26], 'seer-female': [35, 43], 'seer-male': [37, 28], 'soul-reaper-female': [37, 37],
+      'soul-reaper-male': [37, 26], 'navia-king-female': [36, 26], 'navia-king-male': [36, 29], 'dark-prince-female': [34, 26], 'dark-prince-male': [34, 26],
     },
     // `petSpots`: a pet's own place on a portrait where its usual one would
     // cover what the figure holds at the shoulder (a falcon, a staff's head,
