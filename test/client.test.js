@@ -239,9 +239,9 @@ test('every sprite on the list has its file at its size, and every class has its
     // The winter camp's decorations from the calendar of Szczodre Gody (1044).
     winter: Object.values(data('winter').decorations).map((decoration) => decoration.art),
     // Andrzejki's omens with the candle of its achievement, and its two
-    // evenings' pictures (1082 C).
+    // evenings' pictures (1082 C), the cups' also without each cup chosen.
     omens: [...data('winter').andrzejki.omens.map((omen) => omen.id), 'candle'],
-    andrzejki: data('winter').andrzejki.days.map((evening) => evening.kind),
+    andrzejki: [...data('winter').andrzejki.days.map((evening) => evening.kind), ...Array.from({ length: data('winter').andrzejki.cups }, (_, index) => `cups-open-${index + 1}`)],
     riders: [...data('classes'), ...data('evolutions').evolutions, ...outfits].flatMap((owner) => looks.map((look) => `${owner.id}-${look}`)),
     // The fights' boards of the places (790 B) and of the lands (802).
     boards: [...data('settlement').places.flatMap((place) => place.fightBoard ?? []), ...data('regions').flatMap((region) => region.fightBoard ?? [])],
