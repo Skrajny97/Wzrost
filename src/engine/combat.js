@@ -1769,8 +1769,13 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
           ...(p.partyHeal && { partyHeal: p.partyHeal }),
         };
         actor.summons.push(summon);
-        // Legion Nawii: more of the same at once, as many as may stand.
-        for (let more = 1; more < Math.round(p.count ?? 1) && actor.summons.length < summonLimit(actor); more++) actor.summons.push({ ...summon });
+        // Legion Nawii: more of the same at once, as many as may stand (the
+        // event says how many stood, so the playback gives each its card).
+        let called = 1;
+        for (let more = 1; more < Math.round(p.count ?? 1) && actor.summons.length < summonLimit(actor); more++) {
+          actor.summons.push({ ...summon });
+          called += 1;
+        }
         log(() => ({
           ...base,
           kind: 'summon',
@@ -1779,6 +1784,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
           summon: name,
           figure: p.summon,
           summonHp: hp,
+          ...(called > 1 && { count: called }),
           hp: actor.hp,
           text: say(texts, 'summonUp', actions, { ...vars, summon: name, hp }) + (p.howl ? ` ${say(texts, 'summonHowl', actions, { howl: Math.round(p.howl * 100) })}` : ''),
         }));

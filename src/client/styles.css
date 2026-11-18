@@ -26266,6 +26266,157 @@ a.discord-button {
   filter: brightness(1.15) drop-shadow(0 0 6px #ffe08a) drop-shadow(0 0 12px rgba(255, 240, 180, 0.6));
 }
 
+/* The fourth forms' skills, batch 3: the Dzień gniewu's red sky and
+   column of fire, the Słup światła's column and the glare over the foes'
+   eyes, the Jasnowidzenie's eye, the Odwrócenie losu's hourglass and
+   clocks, the Żniwiarz Dusz's scythe and souls, the Legion Nawii's crack
+   and pit, the Mgła Nawii's mist and faces, the Wieczna noc's sky, its
+   black moon and the Książę's card in shadow, the Cios z cienia's red
+   eyes. */
+.fx-sky--doom {
+  background: linear-gradient(180deg, rgba(96, 14, 6, 0.84), rgba(150, 46, 12, 0.42) 55%, rgba(150, 46, 12, 0));
+}
+
+.fx-judgment--wrath {
+  background: linear-gradient(90deg, rgba(255, 90, 31, 0), rgba(255, 106, 42, 0.85) 16%, #ffd27a 36%, #fff1c1 50%, #ffd27a 64%, rgba(255, 106, 42, 0.85) 84%, rgba(255, 90, 31, 0));
+}
+
+.fx-lightpillar {
+  position: absolute;
+  pointer-events: none;
+  transform-origin: 50% 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0.9) 5%, rgba(255, 255, 255, 0) 13%, rgba(255, 255, 255, 0) 87%, rgba(255, 255, 255, 0.9) 95%, rgba(255, 255, 255, 0) 100%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0) 0 9px, rgba(255, 250, 225, 0.4) 9px 11px, rgba(255, 255, 255, 0) 11px 19px),
+    linear-gradient(90deg, rgba(255, 246, 207, 0.25), rgba(255, 246, 207, 0.6) 30%, rgba(255, 255, 255, 0.78) 50%, rgba(255, 246, 207, 0.6) 70%, rgba(255, 246, 207, 0.25));
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.25), #000 22%, #000 92%, transparent);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.25), #000 22%, #000 92%, transparent);
+  mix-blend-mode: screen;
+}
+
+.fx-glare {
+  position: absolute;
+  width: var(--size, 40px);
+  height: calc(var(--size, 40px) * 0.24);
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 50%, #ffffff 0 32%, rgba(255, 246, 207, 0.85) 52%, rgba(255, 246, 207, 0) 72%);
+  filter: drop-shadow(0 0 4px #fff6cf);
+}
+
+.fx-eye--seer {
+  filter: drop-shadow(0 0 2px rgba(20, 16, 48, 0.9)) drop-shadow(0 0 10px var(--fx)) drop-shadow(0 0 3px #ffffff);
+}
+
+.fx-hourglass--fate {
+  filter: drop-shadow(0 0 2px #fff6cf) drop-shadow(0 0 10px #ffe08a);
+}
+
+.fx-clock,
+.fx-scythe,
+.fx-wraith {
+  position: absolute;
+  pointer-events: none;
+}
+
+.fx-clock {
+  width: var(--size, 40px);
+  aspect-ratio: 1;
+  color: var(--fx);
+  filter: drop-shadow(0 0 1px rgba(40, 28, 6, 0.9)) drop-shadow(0 0 6px var(--fx));
+}
+
+.fx-clock svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.fx-scythe {
+  width: var(--size, 50px);
+  aspect-ratio: 1;
+  filter: drop-shadow(0 0 1px rgba(10, 24, 16, 0.9)) drop-shadow(0 0 6px var(--fx));
+}
+
+.fx-scythe svg,
+.fx-wraith svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.fx-soul {
+  position: absolute;
+  width: 12px;
+  height: 16px;
+  border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 40%, #ffffff 0 30%, var(--fx) 60%, rgba(159, 232, 192, 0) 76%);
+  filter: drop-shadow(0 0 4px var(--fx));
+}
+
+.fx-gale--soul {
+  filter: drop-shadow(0 0 4px var(--fx));
+}
+
+.fx-cracks--navia {
+  color: #c8ffd8;
+  filter: drop-shadow(0 0 3px #3dd47a) drop-shadow(0 0 7px #1f8a4c) drop-shadow(0 1px 0 rgba(0, 0, 0, 0.8));
+}
+
+.fx-pit--navia {
+  background: radial-gradient(closest-side, #d9ffe6 0 14%, #3dd47a 34%, rgba(14, 40, 22, 0.95) 62%, rgba(20, 60, 34, 0.5) 85%, transparent 100%);
+  box-shadow: 0 0 12px 3px rgba(61, 212, 122, 0.45);
+}
+
+.fx-naviamist {
+  position: absolute;
+  pointer-events: none;
+  transform-origin: 50% 100%;
+  background:
+    radial-gradient(ellipse 30% 45% at 18% 70%, rgba(120, 230, 150, 0.42), rgba(120, 230, 150, 0) 70%),
+    radial-gradient(ellipse 34% 50% at 52% 76%, rgba(90, 210, 130, 0.48), rgba(90, 210, 130, 0) 70%),
+    radial-gradient(ellipse 28% 42% at 84% 68%, rgba(120, 230, 150, 0.42), rgba(120, 230, 150, 0) 70%),
+    linear-gradient(180deg, rgba(40, 140, 80, 0), rgba(40, 150, 85, 0.34) 42%, rgba(26, 104, 58, 0.55));
+}
+
+.fx-wraith {
+  width: var(--size, 20px);
+  aspect-ratio: 20 / 24;
+  filter: drop-shadow(0 0 4px rgba(150, 255, 190, 0.8));
+}
+
+.fx-sky--midnight {
+  background: linear-gradient(180deg, rgba(6, 4, 18, 0.9), rgba(16, 10, 40, 0.72) 50%, rgba(16, 10, 40, 0.46));
+}
+
+.fx-moon--dark {
+  background: radial-gradient(circle, #07050d 0 62%, #2a0a14 65%, #d0203a 68.5%, rgba(208, 32, 58, 0) 72%);
+  box-shadow: 0 0 calc(var(--size, 40px) * 0.35) calc(var(--size, 40px) * 0.08) rgba(192, 24, 47, 0.55);
+}
+
+/* The Wieczna noc: the Książę Ciemności's card sunk in shadow while the
+   night lasts, its figure dark, rimmed in violet. */
+.unit--night {
+  box-shadow: inset 0 0 22px rgba(10, 6, 26, 0.9), 0 0 0 1px rgba(166, 144, 232, 0.6), 0 0 14px rgba(123, 95, 199, 0.55);
+}
+
+.unit--night .unit-art > img,
+.unit--night .unit-art > svg {
+  filter: brightness(0.62) saturate(0.85) drop-shadow(0 0 3px rgba(166, 144, 232, 0.85));
+}
+
+.fx-eyes--red {
+  background:
+    radial-gradient(ellipse 16% 42% at 28% 50%, #ffffff 0, #ff8a9a 45%, rgba(255, 59, 92, 0) 100%),
+    radial-gradient(ellipse 16% 42% at 72% 50%, #ffffff 0, #ff8a9a 45%, rgba(255, 59, 92, 0) 100%);
+  filter: drop-shadow(0 0 3px #ff3b5c);
+}
+
 .fx-thunderorb--globe {
   background: radial-gradient(circle, #ffffff 0 18%, #fff6d6 30%, var(--fx) 52%, rgba(120, 100, 220, 0) 72%);
   box-shadow: 0 0 20px 7px color-mix(in srgb, var(--fx) 70%, transparent), 0 0 40px 12px color-mix(in srgb, var(--fx) 30%, transparent);
