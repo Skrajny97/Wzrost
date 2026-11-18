@@ -294,6 +294,11 @@ export const SPRITES = {
       'smashing-blow', 'slaughter', 'steel-hurricane', 'cheers', 'unbroken', 'earthquake', 'master-shot', 'steady-hand', 'perun-wrath', 'thunder-sign',
       'pack-leader', 'eagle-talon', 'cataclysm', 'elemental-shield', 'ice-storm', 'ice-tomb', 'oak-awakening', 'bison-call', 'miraculous-healing', 'holy-light',
       'last-judgment', 'holy-seal', 'hymn', 'vision', 'final-blow', 'blood-mark', 'army-of-dead', 'death-touch', 'shadow-storm', 'eclipse',
+      // The fourth forms' skills at class level 300, as the author chose them
+      // (1100).
+      'carnage', 'breach', 'glory-hurricane', 'champion-challenge', 'mountain-wrath', 'titan-shield', 'heaven-arrow', 'star-rain', 'perun-storm', 'ball-lightning',
+      'pack-chief', 'bear-call', 'primal-chaos', 'elemental', 'ice-eternity', 'ice-heart', 'oak-of-ages', 'forest-rebirth', 'divine-healing', 'wings-of-light',
+      'day-of-wrath', 'pillar-of-light', 'clairvoyance', 'fate-reversal', 'soul-harvest', 'scythe-dance', 'navia-legion', 'navia-mist', 'eternal-night', 'shadow-strike',
     ],
   },
   // The character walking in place on the Walka scene, <class>-<look> or an

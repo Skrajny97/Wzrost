@@ -58,13 +58,15 @@ import { featGains } from './achievements.js';
 import { favoriteIds, withoutFavorites } from './favorites.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
-import { herbsOf, mineralsOf, potionsOf } from './professions-view.js';
+import { herbsOf, mineralsOf, pantryOf, potionsOf } from './professions-view.js';
 import { requireOpen, settlementOf } from './settlement.js';
 import { weekFor } from './weeks.js';
 import { saleFamePoints } from './fame.js';
 import { SCROLL_COLUMNS, scrollAdds, scrollById, scrollHeld, scrollsOf } from './scroll-goods.js';
 
-const COLUMNS = { herb: 'herbs', potion: 'potions', material: 'materials', part: 'parts', mineral: 'minerals' };
+// The Spiżarnia's goods (fish, crops and dishes) too (the author, 18.11.2026:
+// „dodanie opcji sprzedaży rzeczy gotowanych i składników”).
+const COLUMNS = { herb: 'herbs', potion: 'potions', material: 'materials', part: 'parts', mineral: 'minerals', pantry: 'pantry' };
 const STACKS = Object.keys(COLUMNS);
 const tuning = () => content().settlement.market;
 const jsonPath = (key) => `$."${key}"`;
@@ -103,6 +105,12 @@ function goodsView(kind, key, count, item) {
   if (kind === 'mineral') {
     const mineral = content().mineralsById[key];
     return { kind, key, count, name: mineral?.name ?? key, rarity: mineral && (mineral.rarity ?? mineral.for[0]), description: mineral?.description, scrap: mineral?.price, mineLevel: mineral?.level };
+  }
+  // A good of the Spiżarnia: a fish, a crop or a dish, which the innkeeper
+  // Zbylut buys at its price.
+  if (kind === 'pantry') {
+    const good = content().pantryById[key];
+    return { kind, key, count, name: good?.name ?? key, group: good?.group, description: good?.description, scrap: good?.price, ...(good?.bonus && { bonus: good.bonus }) };
   }
   // A scroll (1061): the scrapper buys none.
   if (kind === 'scroll') {
@@ -324,6 +332,7 @@ function knownGood(kind, key) {
   if (kind === 'part') return Boolean(content().partsById[key]);
   if (kind === 'mineral') return Object.hasOwn(content().mineralsById, key);
   if (kind === 'scroll') return Boolean(scrollById(key));
+  if (kind === 'pantry') return Boolean(content().pantryById[key]);
   if (kind !== 'material') return false;
   const { materialId, rarityId } = parseStack(key);
   return Boolean(content().materialsById[materialId] && content().raritiesById[rarityId]);
@@ -337,7 +346,7 @@ function knownGood(kind, key) {
 function sellable(player, now) {
   const { row } = player;
   const sellBonus = campBonus(campLevels(player.buildings, now, content()), 'sellPrice', content());
-  const stacks = { herb: herbsOf(row), potion: potionsOf(row), material: JSON.parse(row.materials ?? '{}'), part: JSON.parse(row.parts ?? '{}'), mineral: mineralsOf(row) };
+  const stacks = { herb: herbsOf(row), potion: potionsOf(row), material: JSON.parse(row.materials ?? '{}'), part: JSON.parse(row.parts ?? '{}'), mineral: mineralsOf(row), pantry: pantryOf(row) };
   const withBonus = (goods) => (typeof goods.scrap === 'number' ? { ...goods, scrap: goods.scrap * (1 + sellBonus) } : goods);
   // A favourite may go up too, and is no favourite after it (favorites.js);
   // its star shows on the list.
@@ -800,11 +809,11 @@ export async function collectParcels(context) {
   if (parcels.length === 0) throw new ApiError(409, 'nothing', 'Nic tu na Ciebie nie czeka.');
   const free = bagCapacity(campLevels(player.buildings, now, content()), content()) - bagPlaces(player);
   const held = { herb: herbsOf(row), potion: potionsOf(row) };
-  const adds = { herb: {}, potion: {}, material: {}, part: {}, mineral: {}, scroll: {} };
+  const adds = { herb: {}, potion: {}, material: {}, part: {}, mineral: {}, pantry: {}, scroll: {} };
   // Of those, the pieces got from other players: all of a purchase or a
   // win, of goods back only what came from others before (923 A). The
   // scrolls are in no Encyklopedia, so foreign() leaves them out.
-  const traded = { herb: {}, potion: {}, material: {}, part: {}, mineral: {}, scroll: {} };
+  const traded = { herb: {}, potion: {}, material: {}, part: {}, mineral: {}, pantry: {}, scroll: {} };
   const fromOthers = (parcel) => {
     const count = parcel.reason === 'returned' ? Math.min(parcel.count, parcel.foreign_count ?? 0) : parcel.count;
     if (count > 0) traded[parcel.kind][parcel.good] = (traded[parcel.kind][parcel.good] ?? 0) + count;
@@ -856,7 +865,7 @@ export async function collectParcels(context) {
     db
       .prepare(
         `UPDATE characters SET gold = gold + ?, herbs = ${changes.herb.sql}, potions = ${changes.potion.sql}, materials = ${changes.material.sql}, parts = ${changes.part.sql},
-           minerals = ${changes.mineral.sql}${scrolls.sql}, foreign_stacks = ${others.sql}, settlement = ?, version = version + 1 WHERE id = ?`,
+           minerals = ${changes.mineral.sql}, pantry = ${changes.pantry.sql}${scrolls.sql}, foreign_stacks = ${others.sql}, settlement = ?, version = version + 1 WHERE id = ?`,
       )
       .bind(
         gold,
@@ -865,6 +874,7 @@ export async function collectParcels(context) {
         ...changes.material.binds,
         ...changes.part.binds,
         ...changes.mineral.binds,
+        ...changes.pantry.binds,
         ...scrolls.binds,
         ...others.binds,
         JSON.stringify(next),

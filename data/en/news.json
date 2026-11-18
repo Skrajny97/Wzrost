@@ -1076,6 +1076,10 @@
     "0.4.32": {
       "title": "Version 0.4.32",
       "body": "- A party leader chooses above “Set out”: “With the party” or “With companions”. A party member sees which companions will go with them on their own exploration.\n- The chat has an “Administration” tab for the administration and the moderators."
+    },
+    "0.4.33": {
+      "title": "Version 0.4.33",
+      "body": "- You can now put fish, crops and dishes up on the Marketplace, in the new “Pantry” tab, and trade them with another player in the Exchange.\n- A game left open on the chat reloads to a new version by itself while you are not typing."
     }
   }
 }

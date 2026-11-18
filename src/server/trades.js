@@ -26,7 +26,7 @@ import { withoutFavorites } from './favorites.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { OWN_CHARACTERS } from './roles.js';
-import { herbsOf, mineralsOf, potionKnown, potionsOf } from './professions-view.js';
+import { herbsOf, mineralsOf, pantryOf, potionKnown, potionsOf } from './professions-view.js';
 import { scrollAdds, scrollById, scrollsEnough, scrollsOf } from './scroll-goods.js';
 
 const LIVE = ['proposed', 'open', 'locked'];
@@ -44,9 +44,11 @@ const playedOnline = (row, now) => row?.role === 'player' && (row.seen_at ?? 0) 
 // The scrolls (`scrolls`, by id: the Kowadło's two and the Zwój Niepamięci,
 // 1061) take none either; each is kept in a number column of its own
 // (scroll-goods.js), so they are no STACKS.
-const emptyOffer = () => ({ gold: 0, items: [], herbs: {}, potions: {}, materials: {}, minerals: {}, resources: {}, scrolls: {} });
+// The Spiżarnia's goods (`pantry`: fish, crops and dishes, the author,
+// 18.11.2026) take no places either.
+const emptyOffer = () => ({ gold: 0, items: [], herbs: {}, potions: {}, materials: {}, minerals: {}, resources: {}, pantry: {}, scrolls: {} });
 // The stacks an offer holds, each kept in the characters' column of its name.
-const STACKS = ['herbs', 'potions', 'materials', 'minerals', 'resources'];
+const STACKS = ['herbs', 'potions', 'materials', 'minerals', 'resources', 'pantry'];
 // A stack's key in the Encyklopedia's record of goods got in a trade; the
 // camp's resources are in no Encyklopedia, so none is kept for them.
 const FOREIGN = { herbs: 'herb', potions: 'potion', materials: 'material', minerals: 'mineral' };
@@ -156,6 +158,9 @@ async function tradeView(db, trade, character, now) {
     resources: Object.entries(offer.resources)
       .filter(([id]) => Object.hasOwn(content().resourcesById, id))
       .map(([id, count]) => ({ id, name: content().resourcesById[id].name, count })),
+    pantry: Object.entries(offer.pantry)
+      .filter(([id]) => Object.hasOwn(content().pantryById, id))
+      .map(([id, count]) => ({ id, name: content().pantryById[id].name, group: content().pantryById[id].group, count })),
     scrolls: Object.entries(offer.scrolls)
       .filter(([id]) => scrollById(id))
       .map(([id, count]) => ({ id, name: scrollById(id).name, count })),
@@ -288,6 +293,7 @@ function cleanOffer(raw, player) {
     ['materials', JSON.parse(player.row.materials ?? '{}'), (key) => (knownStack(key, content()) ? materialView(key, 0, content()).label : null)],
     ['minerals', mineralsOf(player.row), named(content().mineralsById)],
     ['resources', JSON.parse(player.row.resources ?? '{}'), named(content().resourcesById)],
+    ['pantry', pantryOf(player.row), named(content().pantryById)],
     ['scrolls', scrollsOf(player.row), (id) => scrollById(id)?.name ?? null],
   ]) {
     const asked = raw[kind] ?? {};
