@@ -1,0 +1,14 @@
+{
+  "id": "forest-rebirth",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a green sprout bursting up into a young tree from a glowing ring of leaves, a swirl of green healing light, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02326797534031338
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "heaven-arrow",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a blazing arrow like a falling star piercing straight through a row of enemies, a long trail of white and gold starlight, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/master-shot.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02329552673594157
+  },
+  "images": 1
+}

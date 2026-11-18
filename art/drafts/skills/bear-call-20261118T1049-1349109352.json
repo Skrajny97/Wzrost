@@ -1,0 +1,14 @@
+{
+  "id": "bear-call",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a huge brown bear standing on its hind legs and roaring, green forest leaves swirling around it, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023334368413713242
+  },
+  "images": 1
+}

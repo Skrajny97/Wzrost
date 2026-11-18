@@ -1,0 +1,14 @@
+{
+  "id": "pack-chief",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a huge white wolf with glowing blue eyes and bared fangs howling at a pale moon, grey wolf silhouettes of its pack behind it, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/pack-leader.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02331487080192566
+  },
+  "images": 1
+}

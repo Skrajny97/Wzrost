@@ -1,0 +1,14 @@
+{
+  "id": "clairvoyance",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a wide open glowing golden eye with a starry blue iris inside a radiant halo, small arrows bending away around it, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/vision.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023851206683476768
+  },
+  "images": 1
+}

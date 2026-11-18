@@ -1,0 +1,14 @@
+{
+  "id": "elemental",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "an elemental creature made of fire, ice, lightning and stone fused into one body, two glowing eyes, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02320329290856256
+  },
+  "images": 1
+}

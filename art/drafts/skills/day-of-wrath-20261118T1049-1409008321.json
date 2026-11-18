@@ -1,0 +1,14 @@
+{
+  "id": "day-of-wrath",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a great golden sword plunging down from a split radiant sky, wreathed in white holy flames, a blazing halo behind it, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/last-judgment.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023259819386164348
+  },
+  "images": 1
+}

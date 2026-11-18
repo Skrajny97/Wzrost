@@ -1,0 +1,14 @@
+{
+  "id": "ice-eternity",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "two dark figures frozen solid inside one huge crystal of clear blue ice, sharp frost spikes around it, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/ice-tomb.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02314904723315769
+  },
+  "images": 1
+}

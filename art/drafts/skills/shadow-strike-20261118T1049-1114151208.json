@@ -1,0 +1,14 @@
+{
+  "id": "shadow-strike",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a dark violet dagger striking out of a swirl of shadow behind a dark silhouette, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023318144505182905
+  },
+  "images": 1
+}

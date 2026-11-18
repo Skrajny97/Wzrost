@@ -1,0 +1,14 @@
+{
+  "id": "navia-legion",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "two armoured skeleton knights with green glowing eyes, rusty shields and swords rising from cracked earth in thick green mist, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/army-of-dead.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024047247852113516
+  },
+  "images": 1
+}

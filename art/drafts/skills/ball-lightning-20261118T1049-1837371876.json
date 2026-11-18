@@ -1,0 +1,14 @@
+{
+  "id": "ball-lightning",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a crackling sphere of blue and white lightning hovering in the air, small bolts arcing out of it, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023272143311394586
+  },
+  "images": 1
+}

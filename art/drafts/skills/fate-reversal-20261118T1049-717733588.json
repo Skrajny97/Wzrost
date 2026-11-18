@@ -1,0 +1,14 @@
+{
+  "id": "fate-reversal",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a golden hourglass turning upside down, its glowing sand flowing upward, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023295092015160456
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "carnage",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a huge blood-stained battle axe with glowing orange cracks cleaving through a broken shield in a wide red arc, splatters of blood and a fiery red rage glow, grander and more brutal, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/slaughter.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024300018785688614
+  },
+  "images": 1
+}

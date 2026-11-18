@@ -1,0 +1,14 @@
+{
+  "id": "pillar-of-light",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a blinding pillar of white and golden light striking down from the sky onto the ground, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0231862733707428
+  },
+  "images": 1
+}

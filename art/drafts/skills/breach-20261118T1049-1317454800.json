@@ -1,0 +1,14 @@
+{
+  "id": "breach",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant battle axe smashing a gaping hole through a wall of shields, shield fragments flying outward, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023341498339335125
+  },
+  "images": 1
+}

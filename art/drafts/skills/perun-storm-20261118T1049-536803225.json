@@ -1,0 +1,14 @@
+{
+  "id": "perun-storm",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a dark storm sky split in half by huge forked lightning bolts leaping from point to point, bright white and blue, a small golden thunder rosette in the cloud, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/perun-wrath.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0233838005027771
+  },
+  "images": 1
+}

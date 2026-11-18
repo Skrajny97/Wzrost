@@ -1,0 +1,14 @@
+{
+  "id": "ice-heart",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a heart of glowing blue ice crystal wrapped in plates of frost armour, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023185295861985953
+  },
+  "images": 1
+}

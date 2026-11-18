@@ -1,0 +1,14 @@
+{
+  "id": "star-rain",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "many glowing arrows falling from a dark starry sky like shooting stars, gold and white trails, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02314665897623698
+  },
+  "images": 1
+}

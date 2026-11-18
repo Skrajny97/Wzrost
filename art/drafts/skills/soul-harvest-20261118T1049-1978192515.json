@@ -1,0 +1,14 @@
+{
+  "id": "soul-harvest",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a huge curved scythe of pale glowing blue sweeping through ghostly white souls, a skull-shaped flash of cold light, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/final-blow.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02333973399946425
+  },
+  "images": 1
+}

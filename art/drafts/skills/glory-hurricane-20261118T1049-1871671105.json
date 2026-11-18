@@ -1,0 +1,14 @@
+{
+  "id": "glory-hurricane",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a golden sword spinning three times inside a triple whirlwind of gold and steel, a radiant golden glow and sparks of glory, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/steel-hurricane.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02355332261657715
+  },
+  "images": 1
+}

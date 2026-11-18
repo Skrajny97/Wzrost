@@ -1,0 +1,14 @@
+{
+  "id": "navia-mist",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a thick green mist of the underworld drifting low over the ground with ghostly skull faces in it, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023264260989718972
+  },
+  "images": 1
+}

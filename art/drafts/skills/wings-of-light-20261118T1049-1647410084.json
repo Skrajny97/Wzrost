@@ -1,0 +1,14 @@
+{
+  "id": "wings-of-light",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "two great wings made of pure white and golden light folding around in a protective circle, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02342862011633979
+  },
+  "images": 1
+}

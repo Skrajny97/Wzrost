@@ -1,0 +1,14 @@
+{
+  "id": "eternal-night",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a black moon fully covering the sun, a dark violet night spreading wide around it, a thin silver blade gleaming out of the darkness, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/eclipse.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02333162708006965
+  },
+  "images": 1
+}

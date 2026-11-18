@@ -1,0 +1,14 @@
+{
+  "id": "mountain-wrath",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a huge tower shield slammed into the ground, a whole mountainside cracking open beneath it with an avalanche of boulders and a dust shockwave, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/earthquake.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023393777620951337
+  },
+  "images": 1
+}

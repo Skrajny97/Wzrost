@@ -1,0 +1,14 @@
+{
+  "id": "oak-of-ages",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "an enormous ancient oak tree with a wise face in its bark and glowing green eyes, a wide crown of golden-green leaves and green healing light beneath it, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/oak-awakening.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024051842216279772
+  },
+  "images": 1
+}

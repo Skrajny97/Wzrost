@@ -1,0 +1,14 @@
+{
+  "id": "divine-healing",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "two open hands raised up with golden light pouring down on them like rain, a glowing green sprout between them and small sparkles of healing, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/miraculous-healing.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023420873477088083
+  },
+  "images": 1
+}
