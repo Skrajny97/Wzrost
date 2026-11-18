@@ -3,8 +3,10 @@
 // levels differ by at most parties.classSpread (the author: "Rozpiętość
 // poziomu klas w Drużynie maks 5 lvl musi być też by nie było za dużego
 // carrowania", and "niech nie będzie możliwości w ogole bycia w drużynie z
-// kimś o rozpiętości lvli wyzszej niz 5"). An invitation and a joining keep
-// to it, and one whose level grows out of it leaves the party.
+// kimś o rozpiętości lvli wyzszej niz 5"); since 18.11.2026 10 (the author:
+// "Rozszerz możliwość zapraszania do drużyny do 10 poziomów klasy. Niech to
+// będzie uzależnione tylko od poziomu klasy"). An invitation and a joining
+// keep to it, and one whose level grows out of it leaves the party.
 
 /** @typedef {Record<string, any>} Content */
 /** @typedef {{ classLevel: number }} Member */

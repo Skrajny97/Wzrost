@@ -1395,6 +1395,11 @@
       "id": "0.4.41",
       "title": "Wersja 0.4.41",
       "body": "- Nowe bestie mają cztery razy więcej HP niż przed wersją 0.4.40, a nie dwa razy. Bestie, które już stoją w tym tygodniu, zostają takie, jakie są."
+    },
+    {
+      "id": "0.4.42",
+      "title": "Wersja 0.4.42",
+      "body": "- Do Drużyny zaprosisz teraz postać, której poziom klasy różni się od Twojego najwyżej o 10, a nie o 5. Liczy się tylko poziom klasy."
     }
   ]
 }

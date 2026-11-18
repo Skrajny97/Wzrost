@@ -3810,6 +3810,12 @@ Motyw B, słowiańskie zaświaty: Mgliste Bagna Nawii (276–300), Łąki Welesa
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.42 (18.11.2026): Drużyna z rozpiętością 10 poziomów klasy
+
+1. **Autor: „Rozszerz możliwość zapraszania do drużyny do 10 poziomów klasy. Niech to będzie uzależnione tylko od poziomu klasy (poziom postaci niech nie ma znaczenia)”.** `parties.classSpread` w `data/balance.json` z 5 na 10: poziomy klas w drużynie mogą się różnić najwyżej o 10 przy zaproszeniu, przy dołączeniu i potem (kto przez awans odstanie bardziej, wypada z drużyny, jak dotąd). Zaproszenie liczy tylko poziomy klas, poziom postaci nie ma na nie wpływu.
+2. **Brakujący szczegół: poziom postaci w Drużynie** zostaje tam, gdzie postawiły go inne decyzje autora: Drużyna otwiera się na 10. poziomie postaci (642 B), a wyprawa drużyny trwa najwyżej tyle, na ile pozwala najniższy poziom postaci w drużynie (zasada Drużyn od początku). To nie są zasady zapraszania, więc zostały bez zmian.
+3. **Kwestia narratora o Drużynie** (`party-intro`) mówiła „najwyżej o pięć”. Tekst mówi teraz „najwyżej o dziesięć” (po angielsku „by ten at most”), a stare nagrania z „pięć” są wyłączone, dopóki autor nie przyjmie nowych na stronie ocen; do tego czasu ta jedna kwestia jest bez głosu.
+
 ## Wersja 0.4.41 (18.11.2026): bestie z cztery razy większym HP
 
 1. **Autor po 0.4.40: „Zrób 4 razy więcej HP, 2 razy to za mało bedzie skoro w trójkę pokonalismy Bestię w jeden dzień”.** `memberAttacks` w `data/guilds.json` z 24 na 48: nowa bestia ma na członka cztery razy więcej HP niż przed 0.4.40, także to, które dochodzi z nowym członkiem. Trzy postacie autora zbiły bestię liczoną na 36 typowych ataków jednym dniem ataków (9), czyli biją mniej więcej cztery razy mocniej od postaci typowej z symulacji, więc przy pełnych atakach gildia potrzebuje teraz około czterech dni.

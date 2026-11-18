@@ -210,7 +210,7 @@
     "minutes": 10,
     "refillHours": 6
   },
-  "parties": { "size": 3, "xpCost": 0.045, "classSpread": 5 },
+  "parties": { "size": 3, "xpCost": 0.045, "classSpread": 10 },
   "journal": { "reports": 50, "towerReports": 50, "portalReports": 40 },
   "challenge": {
     "fromLevel": 10,
