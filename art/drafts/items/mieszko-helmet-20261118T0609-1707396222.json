@@ -1,0 +1,14 @@
+{
+  "id": "mieszko-helmet",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the royal helmet of mieszko the first, the first ruler of poland: a tall rounded helmet of gilded steel covered in engraved golden plates, a band of red gems around the brow, a white eagle with spread wings rising from the front, a long mail aventail of golden rings, a radiant golden glow, an empty helmet with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/chrobry-armor.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02445099119440715
+  },
+  "images": 1
+}
