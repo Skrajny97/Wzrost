@@ -26024,6 +26024,165 @@ a.discord-button {
   filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7));
 }
 
+/* The fourth forms' skills (skill-fx.js, arena-fx.js): the Wyłom's molten
+   rift, its force and the guard it breaks, the Huragan chwały's golden
+   blades, the Tytan's tower shield, rune cracks, rune stones and rampart,
+   the Deszcz gwiazd's night and shooting stars, the Burza Peruna's crack
+   across the sky, and the Kula piorunów's great ball. */
+.fx-rift,
+.fx-sunder,
+.fx-towershield,
+.fx-rampart,
+.fx-skycrack,
+.fx-shootingstar {
+  position: absolute;
+  pointer-events: none;
+}
+
+.fx-rift svg,
+.fx-sunder svg,
+.fx-towershield svg,
+.fx-rampart svg,
+.fx-skycrack svg {
+  display: block;
+  overflow: visible;
+}
+
+.fx-rift svg,
+.fx-sunder svg,
+.fx-towershield svg {
+  width: 100%;
+  height: 100%;
+}
+
+.fx-rift {
+  height: var(--size, 60px);
+  width: calc(var(--size, 60px) * 0.24);
+  filter: drop-shadow(0 0 4px rgba(255, 106, 42, 0.9));
+}
+
+.fx-rift-glow {
+  stroke: #ff6a2a;
+  opacity: 0.85;
+  filter: blur(2.5px);
+}
+
+.fx-rift-core {
+  stroke: #fff1c9;
+}
+
+.fx-smashcone--molten {
+  background: linear-gradient(90deg, rgba(255, 241, 201, 0.9), rgba(255, 138, 61, 0.7) 40%, rgba(200, 40, 30, 0));
+}
+
+.fx-sunder {
+  width: var(--size, 30px);
+  aspect-ratio: 40 / 48;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7)) drop-shadow(0 0 4px rgba(255, 138, 61, 0.7));
+}
+
+.fx-sunder-half {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+}
+
+.fx-sunder-crack {
+  filter: drop-shadow(0 0 2px #ff6a2a);
+}
+
+.fx-steelswirl--gold {
+  filter: drop-shadow(0 0 4px var(--fx)) drop-shadow(0 0 2px #fff1c9);
+}
+
+.fx-gale--gold {
+  filter: drop-shadow(0 0 3px var(--fx));
+}
+
+.fx-hblade--gold {
+  filter: sepia(1) saturate(2.6) hue-rotate(-8deg) brightness(1.05) drop-shadow(0 0 1px rgba(40, 24, 0, 0.95)) drop-shadow(0 0 5px #ffd76a);
+}
+
+.fx-towershield {
+  width: var(--size, 40px);
+  aspect-ratio: 40 / 56;
+  color: var(--fx);
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.6)) drop-shadow(0 0 4px color-mix(in srgb, var(--fx) 70%, transparent));
+}
+
+.fx-tower-runes,
+.fx-rock-rune {
+  filter: drop-shadow(0 0 1.5px currentColor);
+}
+
+/* The Tarcza tytana's shield, made of light. */
+.fx-towershield--light {
+  filter: brightness(1.25) drop-shadow(0 0 5px var(--fx)) drop-shadow(0 0 12px color-mix(in srgb, var(--fx) 60%, transparent));
+}
+
+.fx-quakecrack--rune .fx-quake-glow {
+  stroke: var(--fx);
+  opacity: 0.85;
+  filter: blur(2px);
+}
+
+.fx-quakecrack--rune .fx-quake-core {
+  stroke: #0f3036;
+}
+
+.fx-rock--rune {
+  color: var(--fx);
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7)) drop-shadow(0 0 3px color-mix(in srgb, var(--fx) 80%, transparent));
+}
+
+.fx-rampart {
+  color: var(--fx);
+  filter: drop-shadow(0 0 4px var(--fx));
+}
+
+/* A shooting star: its head at its right end, its tail behind it. */
+.fx-shootingstar {
+  width: var(--size, 40px);
+  height: 3px;
+  margin-left: calc(-1 * var(--size, 40px));
+  margin-top: -1.5px;
+  transform-origin: 100% 50%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), color-mix(in srgb, var(--fx) 70%, transparent) 60%, #ffffff);
+  filter: drop-shadow(0 0 3px var(--fx));
+}
+
+.fx-shootingstar::after {
+  content: '';
+  position: absolute;
+  right: -3px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0 35%, var(--fx) 60%, rgba(255, 255, 255, 0) 72%);
+  box-shadow: 0 0 6px 2px color-mix(in srgb, var(--fx) 80%, transparent);
+}
+
+.fx-sky--night {
+  background: linear-gradient(180deg, rgba(8, 12, 40, 0.86), rgba(24, 34, 84, 0.42) 55%, rgba(24, 34, 84, 0));
+}
+
+.fx-skycrack-glow {
+  stroke: var(--fx);
+  opacity: 0.85;
+  filter: blur(2.5px);
+}
+
+.fx-skycrack-core {
+  stroke: #ffffff;
+}
+
+.fx-thunderorb--globe {
+  background: radial-gradient(circle, #ffffff 0 18%, #fff6d6 30%, var(--fx) 52%, rgba(120, 100, 220, 0) 72%);
+  box-shadow: 0 0 20px 7px color-mix(in srgb, var(--fx) 70%, transparent), 0 0 40px 12px color-mix(in srgb, var(--fx) 30%, transparent);
+}
+
 /* 963: the evolved Kleryk's skills (skill-fx.js, arena-fx.js): the Odnowa's
    sprouts, the Wielka odnowa's rising light, the Cudowne uzdrowienie's orb
    and ribbons, the Cud's shaft and wings, the Wielkie błogosławieństwo's

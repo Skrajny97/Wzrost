@@ -1544,6 +1544,8 @@ export function createFx(kit) {
         if (picture) return dive(style.orb, picture, from, to, a, onImpact, settle, id);
       }
       if (style.orb === 'thunder-orb') return zap(from, b, style.color, onImpact, settle, id);
+      // The Gromowładny's great ball over the battlefield strikes.
+      if (style.orb === 'globe') return globeZap(b, style.color, onImpact, settle, id);
       if (THROUGH.has(style.orb) && style.blow?.event?.pierced) return onward(actor, a, b, style, onImpact, settle, id);
       // 962: the Miażdżący cios's force goes on through its target into
       // the one behind.
@@ -2091,6 +2093,42 @@ export function createFx(kit) {
     onImpact();
     await settle();
     await later(260);
+  }
+
+  // The Gromowładny's Kula piorunów strikes: the great ball of lightning
+  // high over the middle of the battlefield (where skill-fx.js globeAt()
+  // hangs it) flares and a thick, forked bolt strikes from it down at the
+  // target.
+  async function globeZap(b, color, onImpact, settle, id) {
+    const width = stage.clientWidth;
+    const size = Math.round(Math.min(58, width * 0.15));
+    const point = { x: width / 2, y: Math.round(Math.max(size * 0.9, stage.clientHeight * 0.09)) };
+    const ball = mark('fx-thunderorb fx-thunderorb--globe', point, { '--fx': color, '--size': `${size}px` });
+    ball.innerHTML = ORB_ARCS;
+    playSound('magic');
+    const at = (scale) => `translate(-50%, -50%) scale(${scale})`;
+    animate(
+      ball,
+      [
+        { transform: at(0.3), opacity: 0 },
+        { transform: at(1.1), opacity: 1, offset: 0.25 },
+        { transform: at(1), opacity: 1, offset: 0.34 },
+        { transform: at(1.3), opacity: 1, offset: 0.42 },
+        { transform: at(1), opacity: 1, offset: 0.66 },
+        { transform: at(0.5), opacity: 0 },
+      ],
+      { duration: 860, easing: 'ease-out' },
+    ).then(() => ball.remove());
+    specks.burst({ x: point.x, y: point.y, count: 10, colors: KINDS.storm.specks, speed: [50, 140], life: [220, 400], size: [1, 2], shape: 'spark', drag: 3 });
+    await later(320);
+    if (id !== run()) return;
+    const made = boltArt(point, b, { jag: 1.2, forks: 2, width: 1.5 });
+    const bolt = mark('fx-zap', { x: made.x, y: made.y }, { '--fx': color });
+    bolt.innerHTML = made.html;
+    animate(bolt, FLICKER, { duration: 480 }).then(() => bolt.remove());
+    onImpact();
+    await settle();
+    await later(300);
   }
 
   // A shot that went through its last target flies on into this one, from
