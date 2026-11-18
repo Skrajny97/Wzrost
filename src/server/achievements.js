@@ -6,7 +6,7 @@
 // counts the game kept nowhere before go in `feats` (featGains), from the
 // version that brought them (0.4.6).
 
-import { achievementOf, achievementsView, cardHomes, newlyDone, titleOf, wornTitle } from '../engine/index.js';
+import { achievementFact, achievementOf, achievementsView, cardHomes, newlyDone, titleOf, wornTitle } from '../engine/index.js';
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content, contentIn } from './content.js';
 import { ApiError, json, readJson } from './http.js';
@@ -73,9 +73,11 @@ export async function factsOf(db, row, now) {
     streaks: row.streak_done ?? 0,
     shown: { landCards: best },
   };
+  // Each land's own count (achievementFact): the Łysogóry's explorer and
+  // Nawia's count their lands apart.
   for (const one of polish.achievements.groups.flatMap((group) => group.list)) {
-    if (one.count === 'landPlaces') facts.landPlaces = areasOf(one.land).filter((area) => area.minLevel <= row.level).length;
-    if (one.count === 'landReached') facts.landReached = row.level >= Math.min(...areasOf(one.land).map((area) => area.minLevel)) ? 1 : 0;
+    if (one.count === 'landPlaces') facts[achievementFact(one)] = areasOf(one.land).filter((area) => area.minLevel <= row.level).length;
+    if (one.count === 'landReached') facts[achievementFact(one)] = row.level >= Math.min(...areasOf(one.land).map((area) => area.minLevel)) ? 1 : 0;
   }
   return facts;
 }

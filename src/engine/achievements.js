@@ -7,7 +7,7 @@
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {Record<string, any>} Achievement An achievement as the data has it. */
-/** @typedef {Record<string, any>} Facts What counts, by the achievements' `count`; `shown` the count and target a bar shows instead (a land's cards). */
+/** @typedef {Record<string, any>} Facts What counts, by the achievements' `count` (`count:land` for one of a land: achievementFact); `shown` the count and target a bar shows instead (a land's cards). */
 
 /**
  * @param {Content} content
@@ -23,11 +23,21 @@ export const achievementList = (content) => content.achievements.groups.flatMap(
 export const achievementOf = (id, content) => achievementList(content).find((one) => one.id === id) ?? null;
 
 /**
+ * The fact an achievement counts: its `count`, and for one of a land
+ * (landPlaces, landReached) that land's own, `count:land`, so that two of
+ * the same count, the explorers of the Łysogóry and of Nawia, each count
+ * their land.
+ * @param {Achievement} one
+ * @returns {string}
+ */
+export const achievementFact = (one) => (one.land ? `${one.count}:${one.land}` : one.count);
+
+/**
  * An achievement's count, at most its target.
  * @param {Achievement} one
  * @param {Facts} facts
  */
-export const achievementCount = (one, facts) => Math.min(one.target, Math.max(0, Math.floor(Number(facts[one.count]) || 0)));
+export const achievementCount = (one, facts) => Math.min(one.target, Math.max(0, Math.floor(Number(facts[achievementFact(one)]) || 0)));
 
 /**
  * @param {Achievement} one

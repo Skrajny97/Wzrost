@@ -58,6 +58,20 @@ describe('the achievements (1036)', () => {
     assert.equal((await call('GET', '/api/profile/Wytrwała', { cookie })).data.profile.title, null);
   });
 
+  // Two achievements of one count, each of its own land: below the 276th
+  // level the Łysogóry's explorer only, from it Nawia's too.
+  test('the explorers of the Łysogóry and of Nawia each count their own land', async () => {
+    const levelTo = async (level) => (await db()).prepare("UPDATE characters SET level = ? WHERE name = 'Wytrwała'").bind(level).run();
+    const explorers = (view) => ['bald-explorer', 'nav-explorer'].map((id) => [id, find(view.achievements, id).done]);
+    await levelTo(275);
+    assert.deepEqual(explorers(await look()), [['bald-explorer', true], ['nav-explorer', false]]);
+    await levelTo(276);
+    const reached = await look();
+    assert.deepEqual(explorers(reached), [['bald-explorer', true], ['nav-explorer', true]]);
+    assert.deepEqual(reached.fresh.map((one) => one.name), ['Odkrywca Nawii']);
+    assert.equal(find(reached.achievements, 'nav-explorer').title, 'Odkrywczyni Nawii');
+  });
+
   test('the counts kept from now on: creatures, champions, gold and the rest add up', async () => {
     const database = await db();
     const { id } = await database.prepare("SELECT id FROM characters WHERE name = 'Wytrwała'").first();
