@@ -3750,6 +3750,10 @@ Najpierw Tier X przedmiotów (potrzebny najlepszej postaci za około dwa tygodni
 
 Motyw B, słowiańskie zaświaty: Mgliste Bagna Nawii (276–300), Łąki Welesa (301–325) i Kraina bez Słońca (326–350). Karta Mglistych Bagien Nawii: szkic D. Dalej: miejsca, stwory, elity i czempioni na stronie ocen (mało ptaków), potem grafiki.
 
+## Wersja 0.4.28 (18.11.2026): trzy przykryte kubki na Andrzejki
+
+1. **Andrzejki, wieczór trzech kubków** (1094 A, wyżej): przed wyborem trzy przykryte kubki, po wyborze obrazek bez wybranego kubka i figurka wróżby w jego miejscu.
+
 ## Wersja 0.4.27 (18.11.2026): umiejętności ewolucji „na maks. poziomie”
 
 1. **Opis ewolucji** (karta ewolucji w zakładce Ewolucja): nagłówek „Umiejętności (na maks. poziomie)” zamiast „(na 45. poziomie)”, bo liczby w opisie są dla najwyższego poziomu umiejętności, a numer mylił. Autor: „zmień opis Umiejętności (na maks. poziomie) zamiast 45. bo to mylące” (18.11.2026). Po angielsku „(at the top level)”.
