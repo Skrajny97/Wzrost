@@ -137,6 +137,16 @@ export const SKILL_LOOKS = {
   'star-rain': { color: '#d6e4ff', cast: 'rain' },
   'perun-storm': { color: '#fff2a8', cast: 'rain' },
   'ball-lightning': { color: '#d9ccff', impact: 'aim', glow: true },
+  'pack-chief': { color: '#e8eef8', cast: 'bless' },
+  'bear-call': { color: '#c98a4b', cast: 'bless' },
+  'primal-chaos': { color: '#ffb36b', cast: 'rain' },
+  elemental: { color: '#ffd27a', cast: 'bless' },
+  'ice-eternity': { color: '#cdf3ff', impact: 'heavy', big: true, glow: true },
+  'ice-heart': { color: '#9fe3ff', cast: 'shield' },
+  'oak-of-ages': { color: '#9fd36b', cast: 'bless' },
+  'forest-rebirth': { color: '#8fdc6a', cast: 'heal' },
+  'divine-healing': { color: '#ffe9a8', cast: 'heal' },
+  'wings-of-light': { color: '#fff2b0', cast: 'shield' },
   // The skeleton Żniwo raises (combat.js RISEN).
   risen: { color: '#8fbf5a', cast: 'poison' },
 };
@@ -404,6 +414,30 @@ Object.assign(SKILL_LOOKS['star-rain'], { starfall: true, struck: true });
 // crackles (jolt()).
 Object.assign(SKILL_LOOKS['perun-storm'], { skysplit: true, kind: 'storm', struck: true, jolted: true });
 Object.assign(SKILL_LOOKS['ball-lightning'], { orb: 'globe', wake: 'globe', kind: 'storm', impact: 'zap', reticle: false, jolted: true });
+// The Pan Zwierząt: the white wolf howling at a full moon, the party fired
+// up, its bites bleeding (Wódz watahy); the brown bear rearing up with a
+// roar, its paw raking three claw marks (Zew niedźwiedzia).
+Object.assign(SKILL_LOOKS['pack-chief'], { arrival: 'alpha-wolf', orb: 'bite', kind: 'physical', chief: true });
+Object.assign(SKILL_LOOKS['bear-call'], { arrival: 'bear', kind: 'physical', grizzly: true, dazed: true });
+// The Stwórca Żywiołów: fire, ice, lightning and boulders falling at once
+// out of a dark sky (Pierwotny chaos); four orbs of the elements sinking
+// into the elemental, its blows bursting in all four colours (Żywiołak).
+Object.assign(SKILL_LOOKS['primal-chaos'], { chaos: true, struck: true, dazed: true });
+Object.assign(SKILL_LOOKS.elemental, { arrival: 'elemental', prism: true });
+// The Lodowy Bóg: a great crystal of ice growing over its foe (Lodowa
+// wieczność); a heart of ice bursting into armour (Lodowe serce).
+Object.assign(SKILL_LOOKS['ice-eternity'], { orb: 'ice-lance', eternity: true, reticle: false });
+Object.assign(SKILL_LOOKS['ice-heart'], { iceheart: true, stance: 'unit--shielded' });
+// The Pradruid: the ancient oak with roots under the whole field, its
+// branches lashing and roots twining up its foe (Dąb wieków); the forest
+// breathing in, vines blossoming on every card (Odrodzenie puszczy).
+Object.assign(SKILL_LOOKS['oak-of-ages'], { arrival: 'oak', kind: 'physical', ancient: true });
+SKILL_LOOKS['forest-rebirth'].rebirth = true;
+// The Archanioł: wings of light and a rain of light over the party
+// (Boskie uzdrowienie); wings of light shielding every card (Skrzydła
+// światłości).
+SKILL_LOOKS['divine-healing'].divine = true;
+SKILL_LOOKS['wings-of-light'].lightwings = true;
 
 // 960: the summoning circles, drawn flat on the ground. A druid's: two
 // rings, a wreath of leaves between them and a triskele inside; an
@@ -1018,6 +1052,25 @@ const SUNDER_SHIELD =
   '<path d="M8.5 11L14 9.4" stroke="#eef3f8" stroke-width="1.7" stroke-linecap="round" opacity="0.85"/></g>' +
   '<g class="fx-sunder-half"><path d="M20 1.5L38 6.5V21C38 33.5 30 41.5 20 46.5L22 36L18 27L23 18L17 10Z" fill="#666d79" stroke="#1b1e24" stroke-width="2" stroke-linejoin="round"/></g>' +
   '<path class="fx-sunder-crack" d="M20 1.5L17 10L23 18L18 27L22 36L20 46.5" fill="none" stroke="#ffb347" stroke-width="2.6" stroke-linejoin="round"/></svg>';
+
+// The Lodowa wieczność's prison: a cluster of clear ice crystals, the
+// tallest in the middle (stretched over its foe's figure).
+const ICE_PRISON =
+  '<svg viewBox="0 0 40 50" preserveAspectRatio="none" aria-hidden="true">' +
+  '<g fill="#d6f4ff" fill-opacity="0.5" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="round">' +
+  '<path vector-effect="non-scaling-stroke" d="M3 50L1 27L6 16L12 28L11 50Z"/>' +
+  '<path vector-effect="non-scaling-stroke" d="M29 50L29 23L34 12L39 25L37 50Z"/>' +
+  '<path vector-effect="non-scaling-stroke" d="M10 50L11 14L20 1L29 14L30 50Z"/></g>' +
+  '<g fill="none" stroke="#ffffff" stroke-width="0.8" stroke-opacity="0.8">' +
+  '<path vector-effect="non-scaling-stroke" d="M20 1V50M11 14L20 22L29 14M14 36L20 31L26 36"/></g>' +
+  '<path vector-effect="non-scaling-stroke" d="M14 18L17 11" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/></svg>';
+
+// The Lodowe serce: a heart of faceted ice.
+const ICE_HEART =
+  '<svg viewBox="-20 -18 40 36" aria-hidden="true">' +
+  '<path d="M0 16C-13 7 -18 -1 -16 -8C-14 -15 -5 -16 0 -9C5 -16 14 -15 16 -8C18 -1 13 7 0 16Z" fill="#d6f4ff" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/>' +
+  '<path d="M0 -9L-4 0L0 16M-4 0L-14 -6M-4 0L4 2L12 -6M4 2L0 16" fill="none" stroke="#8fd3ff" stroke-width="1.1" stroke-linejoin="round"/>' +
+  '<path d="M-11 -9L-7 -12" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/></svg>';
 
 // The Wyłom's rift: a molten seam opening down a foe from head to feet.
 const RIFT =
@@ -9219,10 +9272,24 @@ export function skillEffects(kit) {
   function stanceOver(event) {
     const look = lookOf(event);
     const entry = cards.get(event.target);
+    // (The Skrzydła światłości's shields leave every card of the party.)
+    if (look.lightwings && entry) {
+      for (const member of standing(entry.unit.side)) {
+        member.card.classList.remove('unit--shielded');
+        if (!reduced()) rimGlow(member.card, look.color, 400);
+      }
+      return;
+    }
     if (!look.stance || !entry || reduced() || !particles) return;
     // (The Tarcza tytana's light leaves the Tytan's card.)
     if (look.rampart) {
       rimGlow(entry.card, look.color, 500);
+      return;
+    }
+    // (The Lodowe serce's armour breaks into a fall of ice.)
+    if (look.iceheart) {
+      const point = figurePoint(entry.card, 0.5);
+      particles.burst({ x: point.x, y: point.y, area: { width: figureOf(artOf(entry.card)) * 0.6, height: 10 }, count: 12, colors: ICE, speed: [40, 120], gravity: 300, drag: 1.4, life: [400, 700], size: [1.1, 2.2], shape: 'shard' });
       return;
     }
     const art = artOf(entry.card);
@@ -10434,6 +10501,684 @@ export function skillEffects(kit) {
     );
   }
 
+  // ——— The fourth forms' skills, batch 2 ———
+
+  // The Stwórca Żywiołów's four elements: fire, ice, lightning and stone.
+  const ELEMENTS4 = [
+    { color: '#ff8a3d', colors: FIRE, shape: 'ember' },
+    { color: '#bfe8ff', colors: ICE, shape: 'shard' },
+    { color: '#d9ccff', colors: STORM, shape: 'spark' },
+    { color: '#a39a89', colors: STONE, shape: 'shard' },
+  ];
+
+  // The card of the creature a summon's blow comes from.
+  const summonOfBlow = (event) => [...cards.values()].find((entry) => entry.unit.summon === event.skill && entry.unit.id.startsWith(`${event.actor}~`)) ?? null;
+
+  // The Wódz watahy: the white wolf comes out of a pale mist (huntCall), a
+  // full moon rises over it, it howls at the moon in silver waves, and its
+  // howl fires up the whole party (their blows hit harder while it
+  // stands): their cards flare red and silver.
+  async function chiefCall(event, look) {
+    const owner = cards.get(event.actor);
+    const calling = huntCall(event, look);
+    const entry = summonedCard(event);
+    if (!owner || !entry || reduced() || !particles) {
+      await calling;
+      return;
+    }
+    const art = artOf(entry.card);
+    const figure = figureOf(art);
+    const width = stageWidth();
+    const head = { x: art.x + art.width / 2, y: art.y + art.height * 0.3 };
+    const size = Math.round(Math.max(30, Math.min(figure * 0.85, 64)));
+    const moonAt = { x: inside(head.x + figure * 0.3, size / 2 + 2, width), y: Math.max(size / 2 + 2, art.y - size * 0.05) };
+    const moon = spark('fx-moon', moonAt, { '--size': `${size}px` });
+    animate(
+      moon,
+      [
+        { transform: 'translate(-50%, -50%) translateY(14px) scale(0.6)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) translateY(0px) scale(1)', opacity: 0.95, offset: 0.3, easing: 'ease-out' },
+        { transform: 'translate(-50%, -50%) translateY(-2px) scale(1.02)', opacity: 0.9, offset: 0.8 },
+        { transform: 'translate(-50%, -50%) translateY(-4px) scale(1.04)', opacity: 0 },
+      ],
+      { duration: 2000, delay: 300, easing: 'ease-in-out', fill: 'backwards' },
+    ).then(() => moon.remove());
+    const mark = anchor(2400);
+    // The howl: silver waves from the wolf's head, three of them.
+    for (let k = 0; k < 3; k++) {
+      after(820 + k * 200, mark, () => {
+        const wave = spark('fx-ragewave', head, { '--fx': '#e8eef8', '--size': `${Math.round(figure * 0.9)}px` });
+        wave.innerHTML = RAGE_WAVE;
+        animate(
+          wave,
+          [
+            { transform: 'translate(-50%, -50%) scale(0.4)', opacity: 0.95 },
+            { transform: `translate(-50%, -50%) translateY(${(-figure * 0.25).toFixed(1)}px) scale(1.6)`, opacity: 0 },
+          ],
+          { duration: 700, easing: 'ease-out' },
+        ).then(() => wave.remove());
+      });
+    }
+    // The party fired up by the howl.
+    const party = standing(owner.unit.side).filter((member) => member !== entry);
+    party.forEach((member, index) => {
+      after(1000 + index * 80, mark, () => {
+        rimGlow(member.card, '#ff7a5c', 800);
+        tintCard(member.card, '#e8462f', [{ opacity: 0 }, { opacity: 0.3, offset: 0.3 }, { opacity: 0 }], 700);
+        const point = figurePoint(member.card, 0.6);
+        particles.burst({ x: point.x, y: point.y, area: { width: figureOf(artOf(member.card)) * 0.6, height: 6 }, count: 8, colors: ['#ffffff', '#e8eef8', '#ff7a5c', '#e8462f'], angle: -Math.PI / 2, spread: 0.5, speed: [40, 110], gravity: -30, drag: 1.2, life: [500, 800], size: [1.1, 2.1], shape: 'spark' });
+      });
+    });
+    await calling;
+    await wait(Math.max(0, 1150 + party.length * 80 - 1250));
+  }
+
+  // The white wolf's bite (Wódz watahy): its fangs' marks in red, blood
+  // spurting and dripping from the wound.
+  function chiefBite(event) {
+    const entry = cards.get(event.target);
+    if (!entry || reduced() || !particles) return;
+    const point = figurePoint(entry.card, 0.45);
+    const figure = figureOf(artOf(entry.card));
+    const biter = summonOfBlow(event) ?? cards.get(event.actor);
+    const from = biter ? centerOf(biter.card) : { x: point.x, y: point.y + 80 };
+    const away = Math.atan2(point.y - from.y, point.x - from.x);
+    const turn = (away * 180) / Math.PI + 90;
+    for (const [k, shift] of [-0.1, 0.1].entries()) {
+      const across = { x: point.x + Math.cos(away) * shift * figure, y: point.y + Math.sin(away) * shift * figure };
+      cutAt(across, turn, figure * 0.55, k ? '#ff8a7a' : '#d9534f', { delay: k * 50, duration: 360, bend: k ? -7 : 7, width: 1.2 });
+    }
+    bleed(entry.card, point, away, { count: 9, drips: 2 });
+    tintCard(entry.card, '#b3263b', [{ opacity: 0 }, { opacity: 0.35, offset: 0.25 }, { opacity: 0 }], 520);
+  }
+
+  // The Zew niedźwiedzia: once the brown bear has burst out of the thicket
+  // (bearOut), it rears up on its hind legs and roars: waves of its roar
+  // roll at the foes, dust flies off the ground and the foes flinch.
+  async function bearRears(event, color) {
+    const entry = summonedCard(event);
+    if (!entry || reduced() || !particles) return;
+    const card = entry.card;
+    const art = artOf(card);
+    const figure = figureOf(art);
+    const box = boxOf(card);
+    const head = { x: art.x + art.width / 2, y: art.y + art.height * 0.3 };
+    animate(
+      card,
+      [
+        { transform: 'translateY(0px) scale(1) rotate(0deg)' },
+        { transform: 'translateY(-9px) scale(1.1) rotate(-2deg)', offset: 0.3, easing: 'ease-out' },
+        { transform: 'translateY(-9px) scale(1.1) rotate(1deg)', offset: 0.6 },
+        { transform: 'translateY(0px) scale(1) rotate(0deg)' },
+      ],
+      { duration: 900, composite: 'add' },
+    );
+    const mark = anchor(1100);
+    after(260, mark, () => {
+      shake(4, 420);
+      flash('#c98a4b', 0.1, 300);
+      for (let k = 0; k < 3; k++) {
+        const wave = spark('fx-ragewave', head, { '--fx': color, '--size': `${Math.round(figure * (1 + k * 0.2))}px` });
+        wave.innerHTML = RAGE_WAVE;
+        animate(
+          wave,
+          [
+            { transform: 'translate(-50%, -50%) scale(0.4)', opacity: 0.95 },
+            { transform: 'translate(-50%, -50%) scale(1.7)', opacity: 0 },
+          ],
+          { duration: 640, delay: k * 120, easing: 'ease-out', fill: 'backwards' },
+        ).then(() => wave.remove());
+      }
+      particles.burst({ x: box.x + box.width / 2, y: box.y + box.height - 8, area: { width: box.width * 0.8, height: 6 }, count: 10, colors: DUST, speed: [30, 90], life: [600, 950], size: [4, 8], shape: 'dust', gravity: -16, drag: 2 });
+      for (const foe of foesOf(entry)) {
+        animate(foe.card, [{ transform: 'translateY(0px)' }, { transform: 'translateY(-4px)', offset: 0.3 }, { transform: 'translateY(0px)' }], { duration: 360, delay: 120, composite: 'add' });
+      }
+    });
+    await wait(900);
+  }
+
+  // The bear's paw (Zew niedźwiedzia): three claw marks rake the foe at
+  // once, dust and stones fly and its card is knocked down.
+  function bearMaul(event, color) {
+    const entry = cards.get(event.target);
+    if (!entry) return;
+    if (reduced() || !particles) {
+      burst(event.target, color, 80);
+      return;
+    }
+    const card = entry.card;
+    const point = figurePoint(card, 0.45);
+    const figure = figureOf(artOf(card));
+    const turn = -62;
+    const radians = (turn * Math.PI) / 180;
+    for (let k = 0; k < 3; k++) {
+      const shift = (k - 1) * figure * 0.16;
+      const across = { x: point.x - Math.sin(radians) * shift, y: point.y + Math.cos(radians) * shift };
+      cutAt(across, turn, figure * 0.95, k === 1 ? '#ffffff' : '#e8462f', { delay: k * 40, duration: 380, bend: 6, width: 1.3 });
+    }
+    particles.burst({ x: point.x, y: point.y, count: 10, colors: ['#ffffff', BLOOD[0], BLOOD[1]], angle: radians + Math.PI / 2, spread: 0.6, speed: [100, 220], life: [220, 420], size: [1.1, 2.2], shape: 'spark', drag: 3 });
+    particles.burst({ x: point.x, y: point.y + figure * 0.3, count: 8, colors: STONE, angle: -Math.PI / 2, spread: 1, speed: [80, 180], life: [320, 560], size: [1.4, 2.6], shape: 'shard', gravity: 520, drag: 1.2 });
+    shake(4.5, 360);
+    animate(card, [{ transform: 'translateY(0px) scale(1)' }, { transform: 'translateY(6px) scale(0.97)', offset: 0.25 }, { transform: 'translateY(0px) scale(1)' }], { duration: 420, easing: 'ease-out', composite: 'add' });
+  }
+
+  // A fall from the sky onto a point: a burning meteor or a falling star of
+  // ice, its tail behind it, or a boulder turning as it drops.
+  function fallOn(kind, from, to, { delay = 0, duration = 340, size = 16 } = {}) {
+    const angle = Math.atan2(to.y - from.y, to.x - from.x);
+    const rock = kind === 'stone';
+    const body = spark(rock ? 'fx-rock fx-rock--falling' : `fx-meteor${kind === 'ice' ? ' fx-meteor--ice' : ''}`, { x: 0, y: 0 }, { '--size': `${size}px` });
+    if (rock) body.innerHTML = ROCK;
+    const at = (point, turn) =>
+      rock
+        ? `translate(${point.x.toFixed(1)}px, ${point.y.toFixed(1)}px) translate(-50%, -50%) rotate(${turn}deg)`
+        : `translate(${(point.x - size / 2).toFixed(1)}px, ${(point.y - size / 2).toFixed(1)}px) rotate(${angle.toFixed(4)}rad)`;
+    return animate(
+      body,
+      [
+        { transform: at(from, 0), opacity: 0 },
+        { opacity: 1, offset: 0.12 },
+        { transform: at(to, 300), opacity: 1 },
+      ],
+      { duration, delay, easing: 'ease-in', fill: 'backwards' },
+    ).then(() => body.remove());
+  }
+
+  // The Pierwotny chaos: the world goes back to its beginning for a moment:
+  // the sky over the arena darkens, the four elements circle high over the
+  // field, and then fire, ice, lightning and boulders fall at once on every
+  // foe, each bursting in its own way.
+  async function primalChaos(event, color, targets) {
+    const caster = cards.get(event.actor);
+    const foes = targets.map((id) => cards.get(id)).filter(Boolean);
+    if (!caster || foes.length === 0 || reduced() || !particles) {
+      await rain(color, targets);
+      return;
+    }
+    const width = stageWidth();
+    const height = stageHeight();
+    const sky = spark('fx-sky fx-sky--chaos', { x: 0, y: 0 });
+    sky.style.width = `${width}px`;
+    sky.style.height = `${Math.round(height * 0.7)}px`;
+    const total = 560 + foes.length * 150 + 900;
+    animate(sky, [{ opacity: 0 }, { opacity: 1, offset: 0.15 }, { opacity: 0.9, offset: 0.8 }, { opacity: 0 }], { duration: total, easing: 'ease-out' }).then(() => sky.remove());
+    // The four elements circling high over the middle of the field.
+    const center = { x: width / 2, y: Math.round(Math.max(30, height * 0.1)) };
+    const radius = Math.min(width * 0.12, 44);
+    const orbs = ELEMENTS4.map((element, k) => {
+      const orb = spark('fx-element-orb', center, { '--fx': element.color, '--size': '14px' });
+      const frames = Array.from({ length: 9 }, (_, step) => {
+        const turn = (k / 4) * Math.PI * 2 + (step / 8) * Math.PI * 2.5;
+        const r = radius * Math.min(1, step / 2);
+        return { transform: `translate(-50%, -50%) translate(${(Math.cos(turn) * r).toFixed(1)}px, ${(Math.sin(turn) * r * 0.5).toFixed(1)}px) scale(${step === 0 ? 0.3 : 1})`, opacity: step === 0 || step === 8 ? 0 : 1 };
+      });
+      return animate(orb, frames, { duration: 700, easing: 'linear' }).then(() => orb.remove());
+    });
+    const mark = anchor(total);
+    after(80, mark, () => {
+      flash('#ffb36b', 0.12, 320);
+      shake(2, 260);
+    });
+    const hit = reached(event, targets);
+    const random = seeded(71 + foes.length);
+    const strikes = [];
+    foes.forEach((foe, index) => {
+      if (!hit.includes(foe.unit.id)) return;
+      const figure = figureOf(artOf(foe.card));
+      const point = figurePoint(foe.card, 0.5);
+      const start = 560 + index * 150;
+      const spots = [
+        { x: point.x - figure * 0.2, y: point.y - figure * 0.08 },
+        { x: point.x + figure * 0.2, y: point.y - figure * 0.04 },
+        { x: point.x, y: point.y },
+        { x: point.x + figure * 0.05, y: point.y + figure * 0.12 },
+      ];
+      const land = (k) => {
+        if (!sky.isConnected) return;
+        const element = ELEMENTS4[k];
+        particles.burst({ x: spots[k].x, y: spots[k].y, count: 10, colors: element.colors, speed: [80, 200], life: [260, 480], size: [1.2, 2.4], shape: element.shape, gravity: k === 3 ? 520 : k === 0 ? -40 : 120, drag: 1.6 });
+        animate(foe.card, [{ filter: `brightness(1.9) drop-shadow(0 0 6px ${element.color})` }, { filter: 'brightness(1)' }], { duration: 300, easing: 'ease-out' });
+      };
+      strikes.push(fallOn('fire', { x: inside(spots[0].x - 70, 8, width), y: -10 }, spots[0], { delay: start, size: 16 }).then(() => land(0)));
+      strikes.push(fallOn('ice', { x: inside(spots[1].x + 70, 8, width), y: -10 }, spots[1], { delay: start + 90, size: 14 }).then(() => land(1)));
+      strikes.push(
+        after(start + 180, mark, () => {
+          lightning({ x: inside(point.x + (random() - 0.5) * 30, 4, width), y: 2 }, spots[2], { color: '#d9ccff', forks: 2, width: 1.2, duration: 420 });
+          stormSparks(spots[2], 8);
+          land(2);
+        }),
+      );
+      strikes.push(
+        fallOn('stone', { x: spots[3].x + 12, y: -20 }, spots[3], { delay: start + 270, size: Math.round(Math.max(16, figure * 0.4)) }).then(() => {
+          land(3);
+          if (sky.isConnected) shake(2.5, 200);
+        }),
+      );
+    });
+    await Promise.all([...orbs, ...strikes]);
+    await wait(160);
+  }
+
+  // The Żywiołak of the Stwórca Żywiołów: as it takes shape
+  // (formElemental), four orbs, of fire, ice, lightning and stone, circle
+  // its card and sink into it one by one, each with a flash of its colour.
+  async function prismForm(event) {
+    const entry = summonedCard(event);
+    if (!entry || reduced() || !particles) return;
+    const art = artOf(entry.card);
+    const figure = figureOf(art);
+    const middle = figurePoint(entry.card, 0.5);
+    const radius = Math.round(Math.min(figure * 0.62, 46));
+    const mark = anchor(1900);
+    ELEMENTS4.forEach((element, k) => {
+      const orb = spark('fx-element-orb', middle, { '--fx': element.color, '--size': `${Math.round(Math.max(10, figure * 0.16))}px` });
+      const frames = Array.from({ length: 13 }, (_, step) => {
+        const share = step / 12;
+        const turn = (k / 4) * Math.PI * 2 + share * Math.PI * 3;
+        const r = radius * (share < 0.15 ? share / 0.15 : share > 0.75 ? Math.max(0, 1 - (share - 0.75) / 0.25) : 1);
+        return { transform: `translate(-50%, -50%) translate(${(Math.cos(turn) * r).toFixed(1)}px, ${(Math.sin(turn) * r * 0.6).toFixed(1)}px)`, opacity: step === 0 || step === 12 ? 0 : 1 };
+      });
+      animate(orb, frames, { duration: 1300, delay: 300 + k * 60, easing: 'linear', fill: 'backwards' }).then(() => orb.remove());
+      after(300 + k * 60 + 1240, mark, () => {
+        particles.burst({ x: middle.x, y: middle.y, count: 8, colors: element.colors, speed: [60, 160], life: [240, 440], size: [1.1, 2.2], shape: element.shape, drag: 2 });
+        rimGlow(entry.card, element.color, 360);
+      });
+    });
+    await wait(1500);
+  }
+
+  // The Żywiołak's blow: it strikes with the element its foe is weakest to,
+  // and the blow bursts round the foe in all four of its colours: embers,
+  // shards of ice, sparks and stones, in rings of each colour.
+  function prismHit(event) {
+    const entry = cards.get(event.target);
+    if (!entry) return;
+    if (reduced() || !particles) {
+      burst(event.target, '#ffd27a', 70);
+      return;
+    }
+    const point = figurePoint(entry.card, 0.5);
+    const figure = figureOf(artOf(entry.card));
+    const mark = anchor(700);
+    ELEMENTS4.forEach((element, k) => {
+      const angle = -Math.PI / 4 + (k * Math.PI) / 2;
+      particles.burst({ x: point.x, y: point.y, count: 9, colors: element.colors, angle, spread: 0.55, speed: [90, 220], life: [240, 460], size: [1.2, 2.4], shape: element.shape, drag: 2, gravity: k === 3 ? 400 : 0 });
+      after(k * 70, mark, () => ring(event.target, element.color, Math.round(figure * (1.1 + k * 0.15)), 380));
+    });
+    burst(event.target, '#ffffff', Math.round(figure * 1.05));
+    shake(2.4, 220);
+  }
+
+  // The Lodowa wieczność: snow closes on the foe and a great crystal of
+  // clear ice grows up over its figure from the ground, glints run up it,
+  // frost mist spills at its foot, and it melts away.
+  function eternityHit(event, color) {
+    const entry = cards.get(event.target);
+    if (!entry) return;
+    if (reduced() || !particles) {
+      burst(event.target, color, 80);
+      return;
+    }
+    const card = entry.card;
+    const box = boxOf(card);
+    const art = artOf(card);
+    const figure = figureOf(art);
+    const x = art.x + art.width / 2;
+    const width = Math.round(Math.min(box.width, figure * 1.45));
+    const height = Math.round(Math.min(box.height + 4, art.height * 1.35));
+    const bottom = box.y + box.height + 2;
+    const prison = spark('fx-iceprison', { x: x - width / 2, y: bottom - height });
+    prison.style.width = `${width}px`;
+    prison.style.height = `${height}px`;
+    prison.innerHTML = ICE_PRISON;
+    animate(
+      prison,
+      [
+        { clipPath: 'inset(100% -6px -6px -6px)', opacity: 1, easing: 'cubic-bezier(0.2, 0.8, 0.3, 1)' },
+        { clipPath: 'inset(0% -6px -6px -6px)', opacity: 1, offset: 0.18 },
+        { clipPath: 'inset(0% -6px -6px -6px)', opacity: 1, offset: 0.78 },
+        { clipPath: 'inset(0% -6px -6px -6px)', opacity: 0 },
+      ],
+      { duration: 1800 },
+    ).then(() => prison.remove());
+    gatherTo(figurePoint(card, 0.5), figure * 0.9, ICE, { count: 16, life: 300 });
+    tintCard(card, '#bfefff', [{ opacity: 0 }, { opacity: 0.45, offset: 0.2 }, { opacity: 0.4, offset: 0.75 }, { opacity: 0 }], 1700);
+    const mark = anchor(1800);
+    after(120, mark, () => {
+      particles.burst({ x, y: bottom - 6, area: { width: width * 0.9, height: 4 }, count: 14, colors: ICE, angle: -Math.PI / 2, spread: 0.6, speed: [80, 200], life: [320, 560], size: [1.2, 2.4], shape: 'shard', gravity: 300, drag: 1.4 });
+      particles.burst({ x, y: bottom - 4, area: { width, height: 4 }, count: 10, colors: ['#ffffff', '#e4f6ff', '#bfe8ff'], speed: [10, 40], life: [800, 1200], size: [4, 8], shape: 'dust', gravity: -10, drag: 2 });
+      shake(4, 360);
+      flash('#e4f6ff', 0.14, 300);
+    });
+    after(520, mark, () => twinkle({ x: x - width * 0.18, y: bottom - height * 0.7 }, '#ffffff', figure * 0.5));
+    after(760, mark, () => twinkle({ x: x + width * 0.2, y: bottom - height * 0.45 }, '#ffffff', figure * 0.4));
+  }
+
+  // The Lodowe serce: a heart of ice kindles over the Lodowy Bóg's chest and
+  // beats twice, then bursts into shards that settle round its card as ice
+  // armour, with frost mist curling at its foot. Its card keeps the ice
+  // rim while the armour holds.
+  async function iceHeart(id, color) {
+    const entry = cards.get(id);
+    if (!entry) return;
+    if (reduced() || !particles) {
+      await bubble(id, color);
+      return;
+    }
+    const card = entry.card;
+    const art = artOf(card);
+    const figure = figureOf(art);
+    const box = boxOf(card);
+    const chest = figurePoint(card, 0.45);
+    const size = Math.round(Math.max(22, figure * 0.42));
+    const heart = spark('fx-iceheart', chest, { '--size': `${size}px` });
+    heart.innerHTML = ICE_HEART;
+    animate(
+      heart,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.2)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.18, easing: 'ease-out' },
+        { transform: 'translate(-50%, -50%) scale(1.25)', opacity: 1, offset: 0.3 },
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.4 },
+        { transform: 'translate(-50%, -50%) scale(1.3)', opacity: 1, offset: 0.52 },
+        { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0, offset: 0.62 },
+        { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0 },
+      ],
+      { duration: 1300 },
+    ).then(() => heart.remove());
+    gatherTo(chest, figure * 0.7, ICE, { count: 12, life: 260 });
+    const mark = anchor(1500);
+    after(800, mark, () => {
+      flash('#bfefff', 0.14, 300);
+      shake(2.5, 240, true);
+      particles.burst({ x: chest.x, y: chest.y, count: 22, colors: ICE, speed: [120, 260], life: [240, 420], size: [1.2, 2.6], shape: 'shard', drag: 3.2 });
+      tintCard(card, '#bfefff', [{ opacity: 0 }, { opacity: 0.5, offset: 0.25 }, { opacity: 0 }], 700);
+      rimGlow(card, color, 900);
+      card.classList.add('unit--shielded');
+      card.style.setProperty('--shield', color);
+      particles.burst({ x: box.x + box.width / 2, y: box.y + box.height - 6, area: { width: box.width * 0.8, height: 4 }, count: 10, colors: ['#ffffff', '#e4f6ff', '#bfe8ff'], speed: [10, 40], life: [800, 1200], size: [4, 7], shape: 'dust', gravity: -12, drag: 2 });
+    });
+    await wait(1250);
+  }
+
+  // Roots curling up from the bottom of a box `width` × `height`.
+  function rootsArt(width, height) {
+    const w = Math.round(width);
+    const tall = Math.round(height);
+    const curl = (x0, lean) => `M${x0.toFixed(1)} ${tall}C${(x0 + lean * 6).toFixed(1)} ${(tall * 0.6).toFixed(1)} ${(x0 - lean * 10).toFixed(1)} ${(tall * 0.35).toFixed(1)} ${(x0 + lean * 4).toFixed(1)} ${(tall * 0.08).toFixed(1)}`;
+    const paths = [curl(w * 0.2, 1), curl(w * 0.5, -1), curl(w * 0.8, 1)];
+    return (
+      `<svg width="${w}" height="${tall}" viewBox="0 0 ${w} ${tall}" aria-hidden="true"><g fill="none" stroke-linecap="round">` +
+      paths.map((d) => `<path class="fx-roots-glow" pathLength="100" d="${d}" stroke-width="6"/>`).join('') +
+      paths.map((d) => `<path class="fx-roots-core" pathLength="100" d="${d}" stroke-width="2.6"/>`).join('') +
+      '</g></svg>'
+    );
+  }
+
+  // Lines drawn out along their length (stroke-dash), from `delay` for
+  // `duration`.
+  function drawLines(element, delay, duration) {
+    for (const line of element.querySelectorAll('path')) {
+      line.setAttribute('stroke-dasharray', '100 100');
+      line.setAttribute('stroke-dashoffset', '100');
+      animate(line, [{ strokeDashoffset: 100 }, { strokeDashoffset: 0 }], { duration, delay, easing: 'ease-out', fill: 'both' });
+    }
+  }
+
+  // The Dąb wieków: as the oak rises out of the ground (riseOak), its roots
+  // run out under the field in glowing green lines to every card of the
+  // party and every foe, leaves come down all over the arena, and the
+  // party's cards glow green (it heals them while it stands).
+  async function ancientOak(event, color) {
+    const entry = summonedCard(event);
+    const owner = cards.get(event.actor);
+    if (!entry || !owner || reduced() || !particles) return;
+    const box = boxOf(entry.card);
+    const width = stageWidth();
+    const height = stageHeight();
+    const root = { x: box.x + box.width / 2, y: box.y + box.height - 4 };
+    const party = standing(owner.unit.side).filter((member) => member !== entry);
+    const ends = [...party, ...foesOf(owner)].map((member) => {
+      const end = boxOf(member.card);
+      return { x: end.x + end.width / 2, y: end.y + end.height - 4 };
+    });
+    const random = seeded(29 + ends.length);
+    const lines = ends.map((to) => {
+      const bend = { x: (root.x + to.x) / 2 + (random() - 0.5) * 40, y: (root.y + to.y) / 2 + (random() - 0.5) * 30 };
+      return `M${root.x.toFixed(1)} ${root.y.toFixed(1)}Q${bend.x.toFixed(1)} ${bend.y.toFixed(1)} ${to.x.toFixed(1)} ${to.y.toFixed(1)}`;
+    });
+    const ground = groundLayer(2300);
+    const roots = h('span', { class: 'fx-roots fx-roots--field' });
+    roots.innerHTML =
+      `<svg width="${Math.round(width)}" height="${Math.round(height)}" viewBox="0 0 ${Math.round(width)} ${Math.round(height)}" aria-hidden="true"><g fill="none" stroke-linecap="round">` +
+      lines.map((d) => `<path class="fx-roots-glow" pathLength="100" d="${d}" stroke-width="7"/>`).join('') +
+      lines.map((d) => `<path class="fx-roots-core" pathLength="100" d="${d}" stroke-width="2.6"/>`).join('') +
+      '</g></svg>';
+    ground.append(roots);
+    drawLines(roots, 560, 700);
+    animate(roots, [{ opacity: 1 }, { opacity: 1, offset: 0.72 }, { opacity: 0 }], { duration: 2200, easing: 'ease-in' }).then(() => roots.remove());
+    for (let k = 0; k < 5; k++) leaves({ x: width * (0.1 + k * 0.2), y: 14 }, { count: 4, reach: 30, delay: 700 + k * 70 });
+    party.forEach((member, index) => {
+      rimGlow(member.card, color, 700, 1000 + index * 80);
+      leaves(figurePoint(member.card, 0.3), { count: 3, reach: 20, delay: 1000 + index * 80 });
+    });
+    await wait(1300);
+  }
+
+  // The Dąb wieków's blow: a branch lashes the foe and roots burst out of
+  // the ground at its feet and twine up it (it is slowed), with leaves and
+  // bark flying.
+  function oakLash(event, color) {
+    const entry = cards.get(event.target);
+    if (!entry) return;
+    if (reduced() || !particles) {
+      burst(event.target, color, 80);
+      return;
+    }
+    const card = entry.card;
+    const art = artOf(card);
+    const box = boxOf(card);
+    const figure = figureOf(art);
+    const point = figurePoint(card, 0.45);
+    cutAt(point, -24, figure * 1.2, '#8b5a2b', { duration: 420, bend: 14, width: 2.2 });
+    cutAt({ x: point.x + figure * 0.08, y: point.y + figure * 0.12 }, -18, figure * 0.9, color, { delay: 60, duration: 380, bend: 10, width: 1.2 });
+    leaves(point, { count: 7, reach: figure * 0.5 });
+    particles.burst({ x: point.x, y: point.y, count: 8, colors: TWIGS, speed: [80, 200], life: [300, 520], size: [1.2, 2.4], shape: 'shard', gravity: 400, drag: 1.4 });
+    // Roots twine up from its feet.
+    const feet = { x: art.x + art.width / 2, y: box.y + box.height - 4 };
+    const span = Math.round(Math.min(box.width * 0.9, figure * 1.2));
+    const tall = Math.round(Math.min(box.height * 0.55, figure * 0.8));
+    const roots = spark('fx-roots', { x: feet.x - span / 2, y: feet.y - tall });
+    roots.innerHTML = rootsArt(span, tall);
+    drawLines(roots, 120, 360);
+    animate(roots, [{ opacity: 1 }, { opacity: 1, offset: 0.7 }, { opacity: 0 }], { duration: 1200, easing: 'ease-in' }).then(() => roots.remove());
+    shake(3, 280);
+  }
+
+  // The Dąb wieków's heal each move: a few leaves drift down on the card,
+  // which glows green, and the HP comes back.
+  async function oakTick(event, color) {
+    const entry = cards.get(event.target);
+    if (!entry || reduced() || !particles) {
+      await plainHeal(event, color);
+      return;
+    }
+    const art = artOf(entry.card);
+    leaves({ x: art.x + art.width / 2, y: art.y + art.height * 0.2 }, { count: 3, reach: figureOf(art) * 0.3 });
+    tintCard(entry.card, '#b6e388', [{ opacity: 0 }, { opacity: 0.25, offset: 0.4 }, { opacity: 0 }], 500);
+    healed(event);
+    await wait(260);
+  }
+
+  // The Odrodzenie puszczy: the forest breathes in: green light floods the
+  // arena and leaves fall all over it; on every card of the party vines
+  // climb up and burst into white and pink blossom, golden pollen rises,
+  // a ring of green opens at its feet and the HP comes back.
+  async function rebirthHeal(event, color) {
+    const entry = cards.get(event.target);
+    if (!entry || reduced() || !particles) {
+      await plainHeal(event, color);
+      return;
+    }
+    const card = entry.card;
+    const art = artOf(card);
+    const box = boxOf(card);
+    const figure = figureOf(art);
+    let lead = 0;
+    if (!event.place) {
+      lead = 260;
+      flash('#b6e388', 0.14, 420);
+      groundRing(event.actor, color, { duration: 900, scale: 1.4 });
+      const width = stageWidth();
+      for (let k = 0; k < 5; k++) leaves({ x: width * (0.1 + k * 0.2), y: 12 }, { count: 4, reach: 34, delay: k * 60 });
+    }
+    const middle = art.x + art.width / 2;
+    sprout(card, { x: middle - figure * 0.36, size: Math.min(figure * 0.9, box.height * 0.6), delay: lead });
+    sprout(card, { x: middle + figure * 0.36, size: Math.min(figure * 0.8, box.height * 0.55), delay: lead + 80 });
+    sprout(card, { x: middle, size: Math.min(figure * 0.6, box.height * 0.42), delay: lead + 160 });
+    const mark = anchor(lead + 1200);
+    after(lead + 380, mark, () => {
+      particles.burst({ x: middle, y: art.y + art.height * 0.55, area: { width: figure * 0.9, height: art.height * 0.5 }, count: 14, colors: ['#ffffff', '#ffd6e8', '#ff9ec4', '#fff6cf'], speed: [30, 90], gravity: 30, drag: 1.4, life: [700, 1000], size: [1.4, 2.6], shape: 'mote' });
+      particles.burst({ x: middle, y: box.y + box.height - 10, area: { width: figure, height: 6 }, count: 10, colors: GOLD, angle: -Math.PI / 2, spread: 0.4, speed: [30, 80], gravity: -30, drag: 1, life: [700, 1000], size: [1, 1.8], shape: 'mote' });
+      healed(event);
+      groundRing(entry.unit.id, color, { duration: 700 });
+      animate(card, [{ filter: 'brightness(1.35) saturate(1.3)' }, { filter: 'brightness(1)' }], { duration: 600, easing: 'ease-out' });
+    });
+    await wait(lead + 640);
+  }
+
+  // Wings of light spread from a card's figure's shoulders (the
+  // Archanioł's), kept on the stage, gold and glowing, for `duration`.
+  function spreadWings(entry, duration, { delay = 0, scale = 1 } = {}) {
+    const art = artOf(entry.card);
+    const figure = figureOf(art);
+    const width = stageWidth();
+    const x = art.x + art.width / 2;
+    const shoulder = art.y + art.height * 0.42;
+    for (const side of [-1, 1]) {
+      const root = { x: x + side * figure * 0.16, y: shoulder };
+      const room = side > 0 ? width - root.x - 2 : root.x - 2;
+      const size = Math.round(Math.max(20, Math.min(figure * 1.1 * scale, room / 0.9, (root.y - 2) / 0.92)));
+      const wing = spark('fx-wing fx-wing--light', root, { '--size': `${size}px` });
+      wing.innerHTML = WING;
+      const flip = side < 0 ? ' scaleX(-1)' : '';
+      animate(
+        wing,
+        [
+          { transform: `translate(-11%, -91%)${flip} rotate(20deg) scale(0.2)`, opacity: 0 },
+          { transform: `translate(-11%, -91%)${flip} rotate(-10deg) scale(1)`, opacity: 1, offset: 0.25, easing: 'ease-out' },
+          { transform: `translate(-11%, -91%)${flip} rotate(4deg) scale(1)`, opacity: 1, offset: 0.5 },
+          { transform: `translate(-11%, -91%)${flip} rotate(-2deg) scale(1)`, opacity: 1, offset: 0.75 },
+          { transform: `translate(-11%, -91%)${flip} rotate(0deg) scale(0.95)`, opacity: 0 },
+        ],
+        { duration, delay, easing: 'ease-in-out', fill: 'backwards' },
+      ).then(() => wing.remove());
+    }
+  }
+
+  // Streaks of golden light raining down on a card.
+  function lightRain(card, { delay = 0, count = 8, duration = 700 } = {}) {
+    const box = boxOf(card);
+    const random = seeded(Math.round(box.x + box.y) + count);
+    for (let k = 0; k < count; k++) {
+      const x = box.x + box.width * (0.1 + random() * 0.8);
+      const length = Math.round(box.height * (0.25 + random() * 0.2));
+      const drop = spark('fx-lightrain', { x, y: Math.max(0, box.y - length * 0.5) }, { '--size': `${length}px` });
+      animate(
+        drop,
+        [
+          { transform: 'translate(-50%, 0) translateY(0px)', opacity: 0 },
+          { opacity: 1, offset: 0.2 },
+          { transform: `translate(-50%, 0) translateY(${Math.round(box.height * 0.8)}px)`, opacity: 0 },
+        ],
+        { duration: duration * (0.7 + random() * 0.4), delay: delay + k * (duration / count) * 0.6, easing: 'ease-in', fill: 'backwards' },
+      ).then(() => drop.remove());
+    }
+  }
+
+  // The Boskie uzdrowienie: the Archanioł spreads its wings of light and
+  // light comes down on the party like rain: streaks of gold fall over
+  // every card, which glows, a column of light rising through it, its bad
+  // effects washed off in white sparks, and the HP comes back.
+  async function divineHeal(event, color) {
+    const entry = cards.get(event.target);
+    if (!entry || reduced() || !particles) {
+      await plainHeal(event, color);
+      return;
+    }
+    const card = entry.card;
+    const art = artOf(card);
+    const figure = figureOf(art);
+    let lead = 0;
+    if (!event.place) {
+      const angel = cards.get(event.actor);
+      if (angel) {
+        spreadWings(angel, 1300);
+        flash('#fff6cf', 0.16, 420);
+        lead = 420;
+      }
+    }
+    lightRain(card, { delay: lead, count: 9, duration: 700 });
+    const mark = anchor(lead + 1100);
+    after(lead + 320, mark, () => {
+      healed(event);
+      rise(card, { width: figure * 0.7, full: 1, duration: 700 });
+      particles.burst({ x: art.x + art.width / 2, y: art.y + art.height * 0.5, area: { width: figure * 0.8, height: art.height * 0.6 }, count: 14, colors: GOLD, angle: -Math.PI / 2, spread: 1, speed: [40, 110], gravity: -30, drag: 1.2, life: [600, 900], size: [1.1, 2.1], shape: 'mote' });
+      particles.burst({ x: art.x + art.width / 2, y: art.y + art.height * 0.4, count: 8, colors: ['#ffffff'], speed: [60, 140], gravity: -60, drag: 2, life: [400, 700], size: [1, 1.8], shape: 'spark' });
+      animate(card, [{ filter: 'brightness(1.5) saturate(0.9)' }, { filter: 'brightness(1)' }], { duration: 600, easing: 'ease-out' });
+    });
+    await wait(lead + 620);
+  }
+
+  // The Boskie uzdrowienie's light over the next moves: a few streaks of
+  // gold fall on the card and the HP comes back.
+  async function divineTick(event, color) {
+    const entry = cards.get(event.target);
+    if (!entry || reduced() || !particles) {
+      await plainHeal(event, color);
+      return;
+    }
+    lightRain(entry.card, { count: 4, duration: 520 });
+    const mark = anchor(600);
+    after(300, mark, () => {
+      healed(event);
+      tintCard(entry.card, '#fff6cf', [{ opacity: 0 }, { opacity: 0.3, offset: 0.4 }, { opacity: 0 }], 500);
+    });
+    await wait(420);
+  }
+
+  // The Skrzydła światłości: great wings of light open behind the
+  // Archanioł and beat; feathers of light drift down over every card of
+  // the party, and each takes a golden glow, its shield, kept while the
+  // wings hold (whoever strikes it burns).
+  async function wingsOfLight(id, color) {
+    const entry = cards.get(id);
+    if (!entry) return;
+    if (reduced() || !particles) {
+      await bubble(id, color);
+      return;
+    }
+    spreadWings(entry, 1500, { scale: 1.15 });
+    const party = standing(entry.unit.side);
+    const mark = anchor(1800);
+    after(380, mark, () => {
+      flash('#fff6cf', 0.16, 380);
+      shake(2, 220, true);
+    });
+    party.forEach((member, index) => {
+      const art = artOf(member.card);
+      const delay = 520 + index * 90;
+      leaves({ x: art.x + art.width / 2, y: art.y + art.height * 0.15 }, { count: 5, reach: figureOf(art) * 0.45, delay, colors: ['#ffffff', '#fffdf6', '#fff3d0', '#ffe08a'] });
+      after(delay + 160, mark, () => {
+        rimGlow(member.card, color, 800);
+        tintCard(member.card, '#fff6cf', [{ opacity: 0 }, { opacity: 0.35, offset: 0.3 }, { opacity: 0 }], 600);
+        member.card.classList.add('unit--shielded');
+        member.card.style.setProperty('--shield', color);
+      });
+    });
+    await wait(1250 + party.length * 90);
+  }
+
   async function cast(event) {
     const look = lookOf(event);
     playSkill(artChain(event.skill), look.cast === 'sweep' ? 'swing' : look.cast === 'rain' ? 'shot' : 'magic');
@@ -10476,7 +11221,7 @@ export function skillEffects(kit) {
     }
     // 963: what a party heal will do for a few moves; the Pieczęć świętości
     // taking hold of its foe; the Stos lit.
-    if (!event.targets && (look.sprout || look.uplift || look.radiance)) {
+    if (!event.targets && (look.sprout || look.uplift || look.radiance || look.divine)) {
       await healSeed(event.actor, look);
       await wait(120);
       return;
@@ -10539,10 +11284,16 @@ export function skillEffects(kit) {
         // The fourth forms: shooting stars, the sky split by Perun.
         else if (look.starfall) await starfall(event, look.color, targets);
         else if (look.skysplit) await skySplit(event, look.color, targets);
+        else if (look.chaos) await primalChaos(event, look.color, targets);
         else await (look.meteors ? meteors(event, look, targets) : look.volley ? volley(event, look.color, targets) : rain(look.color, targets));
         break;
       case 'bless':
-        if (look.arrival && event.kind === 'summon') await (HUNT_CALLS.has(look.arrival) ? huntCall(event, look) : summonCreature(event, look));
+        // The fourth forms' summons.
+        if (look.chief && event.kind === 'summon') await chiefCall(event, look);
+        else if (look.grizzly && event.kind === 'summon') await summonCreature(event, look).then(() => bearRears(event, look.color));
+        else if (look.prism && event.kind === 'summon') await Promise.all([summonCreature(event, look), prismForm(event)]);
+        else if (look.ancient && event.kind === 'summon') await Promise.all([summonCreature(event, look), ancientOak(event, look.color)]);
+        else if (look.arrival && event.kind === 'summon') await (HUNT_CALLS.has(look.arrival) ? huntCall(event, look) : summonCreature(event, look));
         else if (look.harmony) await harmony(event.actor, look.color);
         else if (look.focus) await steady(event.actor, look.color);
         else if (look.rune) await thunderSign(event.actor, look.color);
@@ -10575,6 +11326,8 @@ export function skillEffects(kit) {
         else if (look.icearmor) await iceArmor(event.actor, look.color);
         else if (look.shieldwall) await shieldWall(event.actor, look.color);
         else if (look.rampart) await rampart(event.actor, look.color);
+        else if (look.iceheart) await iceHeart(event.actor, look.color);
+        else if (look.lightwings) await wingsOfLight(event.actor, look.color);
         else if (look.dome) await dome(event.actor, look.color);
         else await (look.hexwall ? hexShield(event.actor, look.color) : bubble(event.actor, look.color));
         break;
@@ -10604,6 +11357,11 @@ export function skillEffects(kit) {
     voices: [null, choirTick],
     laurels: [null, hymnTick],
     sun: [null, sunTick],
+    // The fourth forms' heals: the Dąb wieków's each move, the Odrodzenie
+    // puszczy, the Boskie uzdrowienie and its light over the next moves.
+    ancient: [null, oakTick],
+    rebirth: [rebirthHeal, rebirthHeal],
+    divine: [divineHeal, divineTick],
   };
 
   // A heal: green sparks and the HP that came back. A guard instead flashes
@@ -10612,7 +11370,7 @@ export function skillEffects(kit) {
   async function heal(event) {
     const look = lookOf(event);
     // (963: a party heal's name is called over its first heal only.)
-    const again = event.place > 0 && (look.sprout || look.uplift || look.radiance);
+    const again = event.place > 0 && (look.sprout || look.uplift || look.radiance || look.rebirth || look.divine);
     if (!event.quiet && !again) {
       playSkill(artChain(event.skill), 'effect');
       callout(event.actor, event.skillName, look.color);
@@ -10692,6 +11450,11 @@ export function skillEffects(kit) {
     if (look.challenger) return championStrike(event, look.color);
     if (look.comet) return starHit(event, look);
     if (look.orb === 'globe') return globeStrike(event, look.color);
+    if (look.chief) return chiefBite(event);
+    if (look.grizzly) return bearMaul(event, look.color);
+    if (look.prism) return prismHit(event);
+    if (look.eternity) return eternityHit(event, look.color);
+    if (look.ancient) return oakLash(event, look.color);
     // 963: the evolved Kleryk's blows.
     if (look.sentence) return sentenceHit(event, look.color);
     if (look.holyfire) return holyFire(event, look.color);
