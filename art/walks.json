@@ -684,6 +684,21 @@
       "start": "art/references/walks/start/titan-female.png",
       "pose": 2,
       "description": "a tall strong woman in heavy grey steel plate armour with glowing cyan runes and gold trim, a crown-shaped helmet with battlements, a long dark ponytail, shoulder plates shaped like small castle towers, a long dark blue tabard with glowing runes, no weapons, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "celestial-archer-male": {
+      "start": "art/references/walks/start/celestial-archer-male.png",
+      "pose": 2,
+      "description": "a young dark-skinned man with black hair tied in a high ponytail and a silver diadem, ornate silver and white plate armour with gold trim and a glowing star on the chest, a silver pauldron shaped like a feathered wing, two large white feathered angel wings folded close behind the back, a long dark blue cloak full of small stars hanging behind from the shoulders, dark sleeves, silver greaves and boots, no bow, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "celestial-archer-female": {
+      "start": "art/references/walks/start/celestial-archer-female.png",
+      "pose": 2,
+      "description": "a young woman with warm brown skin and long black hair in a high ponytail falling down her back, a silver tiara with a blue gem, ornate silver and white plate armour with gold trim and a glowing star on the chest, a long dark blue cloak full of stars hanging behind from the shoulders, dark leggings, silver greaves and boots, one long white and gold bow strapped upright on the back behind the shoulder, the whole bow above the waist and behind the body, never in front of the legs, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "thunderer-male": {
+      "start": "art/references/walks/start/thunderer-male.png",
+      "pose": 2,
+      "description": "a tall man with long golden blond hair flowing down his back, a dark steel helmet with two small silver wings at the sides and the face showing, dark blue-grey steel plate armour with gold trim and thin glowing cyan lines, a round golden boss on the shoulder plate, a brown belt, a long dark grey-blue cloak hanging behind from the shoulders, dark steel greaves and boots, one long black bow strapped upright on the back behind the shoulder, the whole bow above the waist and behind the body, never in front of the legs, beside a quiver of blue-fletched arrows, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     }
   }
 }
