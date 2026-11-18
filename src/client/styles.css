@@ -27673,6 +27673,79 @@ a.discord-button {
   text-align: center;
 }
 
+/* The 24th's set crossed out once a day was missed: only for all 24
+   windows (the author, 18.11.2026). */
+.winter-set-lost .winter-set-name {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.winter-set-note {
+  flex-basis: 100%;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 10px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+/* The winter set for Punkty Systemu (12-24 December, in this window only):
+   three pieces in a row, each on the character's own portrait with its
+   price and "Kup". */
+.winter-sale {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.winter-sale-title {
+  margin: 0;
+  font-size: 17px;
+  text-align: center;
+}
+
+.winter-sale-items {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.winter-sale-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  text-align: center;
+}
+
+.winter-sale-preview {
+  width: 100%;
+  max-width: 96px;
+}
+
+.winter-sale-name {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.winter-sale-buy {
+  width: 100%;
+  padding-inline: 4px;
+  white-space: normal;
+}
+
+.winter-sale-soon {
+  color: var(--text-muted);
+  text-align: center;
+}
+
 /* Szczodre Gody's winter quests (1044.4, quests.js): two rewards, gold and
    Punkty Czasu, one above the other; a quest of a profession not open yet
    faded, with the level it opens at. */

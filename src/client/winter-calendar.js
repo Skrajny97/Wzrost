@@ -10,13 +10,15 @@
 // opens the window at a tap.
 
 import { goldArt, scrollArt, timePointsArt } from './art.js';
+import { characterLook, portraitBox } from './cosmetics.js';
 import { streakSettled } from './daily-streak.js';
 import { h, icon } from './dom.js';
 import { formatNumber } from './format.js';
 import { t } from './i18n.js';
 import { SYSTEM_POINTS_ICON } from './icons.js';
+import { systemPoints } from './quests.js';
 import { call, state } from './state.js';
-import { closeSheet, openSheet, withButton } from './ui.js';
+import { closeSheet, confirmAction, openSheet, toast, withButton } from './ui.js';
 
 const ART = 20;
 const words = () => state.content.winter.texts;
@@ -27,7 +29,18 @@ const line = (art, text, title = null) => h('span', { class: 'streak-reward', ti
 // scroll, packs of cards, gold, Punkty Czasu and Punkty Systemu.
 function rewardLines(day) {
   return [
-    day.cosmetics.length > 0 && line(icon('gift', { size: ART }), words().set, day.cosmetics.map((one) => one.name).join(', ')),
+    // The winter set only for all the windows taken (the author,
+    // 18.11.2026): crossed out once a day was missed.
+    day.cosmetics.length > 0 &&
+      (day.setLost
+        ? h(
+            'span',
+            { class: 'streak-reward winter-set-lost', title: words().setOnlyFull },
+            icon('gift', { size: ART }),
+            h('span', { class: 'winter-set-name', text: words().set }),
+            h('span', { class: 'winter-set-note', text: words().setOnlyFull }),
+          )
+        : line(icon('gift', { size: ART }), words().set, day.cosmetics.map((one) => one.name).join(', '))),
     day.decoration && line(picture(`/art/winter/${day.decoration.art}.png`, day.decoration.name), words().decoration, day.decoration.name),
     day.potion && line(picture(`/art/potions/${day.potion.id}.png`, day.potion.name), `×${day.potion.count}`, day.potion.name),
     day.scroll && line(scrollArt(day.scroll.id, ART), words().scroll, day.scroll.name),
@@ -80,8 +93,68 @@ export function openWinter(view, take, note = null) {
     view.taken
       ? h('p', { class: 'sheet-text streak-done', text: view.today === last ? words().done : words().taken })
       : h('button', { type: 'button', class: 'button button--system', text: t(words().take, { day: view.today }), onClick: (event) => withButton(event.currentTarget, take) }),
+    salePart(view),
     view.taken && h('button', { type: 'button', class: 'button button--world', text: t('Zamknij'), onClick: closeSheet }),
   );
+}
+
+// The winter set for Punkty Systemu in this window only (the author,
+// 18.11.2026: „do kupienia za Punkty Systemu tylko w tym okienku też od 12
+// do 24 grudnia włącznie”): each piece on the character's own portrait,
+// as the Sklep Systemu shows it, with "Kup" or "Masz"; before the sale's
+// day, one line saying when it opens.
+function salePart(view) {
+  const { sale } = view;
+  if (!sale || !state.character) return null;
+  if (!sale.open) return h('p', { class: 'sheet-text winter-sale-soon', text: words().saleSoon });
+  const character = state.character;
+  const { frame, background, aura, pet } = character.cosmetics ?? {};
+  const card = (item) => {
+    const short = Math.max(0, item.price - (view.systemPoints ?? 0));
+    return h(
+      'li',
+      { class: 'winter-sale-item' },
+      portraitBox(characterLook(character), { frame, background, aura, pet, [item.kind]: item.id }, 'winter-sale-preview'),
+      h('span', { class: 'winter-sale-name', text: item.name }),
+      item.owned
+        ? h('span', { class: 'chip chip--success', text: words().owned })
+        : h('button', {
+            type: 'button',
+            class: 'button button--system button--small winter-sale-buy',
+            disabled: short > 0,
+            text: short > 0 ? t('Brakuje {count} PS', { count: formatNumber(short) }) : t('Kup ({price} PS)', { price: formatNumber(item.price) }),
+            onClick: (event) => withButton(event.currentTarget, () => buy(item)),
+          }),
+    );
+  };
+  return h(
+    'section',
+    { class: 'winter-sale', 'aria-labelledby': 'winter-sale-title' },
+    h('h3', { class: 'winter-sale-title', id: 'winter-sale-title', text: words().sale }),
+    h('p', { class: 'sheet-text', text: words().saleLead }),
+    h('ul', { class: 'winter-sale-items' }, sale.items.map(card)),
+  );
+}
+
+// A piece of the set bought after the game's own question, the window anew.
+async function buy(item) {
+  const sure = await confirmAction({
+    title: t('Kupić przedmiot?'),
+    text: t('{name} za {price}. Przedmiot zostanie przy tej postaci na stałe.', { name: item.name, price: systemPoints(item.price) }),
+    confirmLabel: t('Kup'),
+  });
+  if (!sure) {
+    if (calendar) openWinter(calendar, take);
+    return;
+  }
+  try {
+    const data = await call('POST', '/api/winter/buy', { id: item.id });
+    calendar = data.winter;
+    showTab();
+    toast(data.text);
+  } finally {
+    if (calendar) openWinter(calendar, take);
+  }
 }
 
 // Whether today is the calendar's last day (Christmas Eve): the narrator's
@@ -90,7 +163,7 @@ export const winterLastDay = () => Boolean(calendar && calendar.today === calend
 
 // What today's reward gave beyond the window's tick: a decoration for the
 // camp, or the winter set waiting in the Sklep Systemu.
-const noteOf = (reward) => (reward?.decoration ? t(words().decorationGot, { name: reward.decoration.name }) : reward?.cosmetics?.length ? words().setGot : null);
+const noteOf = (reward) => (reward?.decoration ? t(words().decorationGot, { name: reward.decoration.name }) : reward?.cosmetics?.length && !reward.setLost ? words().setGot : null);
 
 // The tab on the left edge, under the series of days' (1041): today's day
 // of the calendar, gold and glowing while its reward waits; hidden outside
