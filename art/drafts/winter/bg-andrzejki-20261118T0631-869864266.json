@@ -1,0 +1,14 @@
+{
+  "id": "bg-andrzejki",
+  "tool": "pixellab generate-image-v2",
+  "description": "inside a small Slavic forest cottage on Saint Andrew's eve at night: a rough wooden table with one tall burning candle, a wooden bowl of water with a twisted shape of hardened wax floating in it, an old iron key lying beside it, a small window showing a crescent moon and stars, warm candlelight and deep blue shadows, cozy and mysterious, pixel art scene background",
+  "style": "src/client/art/cosmetics/bg-camp.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
