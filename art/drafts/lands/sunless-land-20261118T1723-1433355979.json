@@ -1,0 +1,14 @@
+{
+  "id": "sunless-land",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, the sunless land, the deepest underworld of slavic myth: a frozen black lake under a starless night, snowy dark spruces, a castle of ice and bone on a far cliff, a black stone stronghold with black flames, wide panorama for a dim background behind text, low contrast, very dark muted palette of icy blue, black and pale violet, no text, no border, no people in front, no animals in front",
+  "style": "src/client/art/lands/black-bog.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
