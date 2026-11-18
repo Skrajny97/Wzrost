@@ -1360,6 +1360,11 @@
       "id": "0.4.34",
       "title": "Wersja 0.4.34",
       "body": "- W Prośbach Gildii poprosisz też o ryby, plony i potrawy, a członkowie gildii dadzą Ci je ze swojej Spiżarni."
+    },
+    {
+      "id": "0.4.35",
+      "title": "Wersja 0.4.35",
+      "body": "- Do Skrzyni Gildii włożysz też ryby, plony i potrawy: „Włóż ze Spiżarni”, dla wszystkich albo dla jednego członka gildii."
     }
   ]
 }

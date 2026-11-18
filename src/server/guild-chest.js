@@ -72,6 +72,19 @@ const titleOf = (item) => {
   return item.upgrade > 0 ? `${name} +${item.upgrade}` : name;
 };
 
+// The Spiżarnia's goods in the chest too (the author, 18.11.2026:
+// „Skrzynia Konta, Skrzynia Gildii wszędzie”): a lot of one fish, crop or
+// dish, kept in a row of its own as an item is, its `data` naming the
+// goods ({ goods: { kind: 'pantry', key, count } }) instead of an item's.
+// A lot goes in and comes out whole, for all or for one member, by the
+// item's rules; it takes no place in the bag, and a place of the chest as
+// an item does. The page's language names it.
+const GOODS = { pantry: 'pantry' };
+const goodsOf = (data) => data?.goods ?? null;
+const goodsName = (goods) => content().pantryById[goods.key]?.name ?? goods.key;
+const goodsTitle = (goods) => `${goodsName(goods)} ×${numberText(goods.count)}`;
+const jsonPath = (key) => `$."${key}"`;
+
 // The card's words, with the rules' numbers filled in (all but the
 // answers' errors).
 function cardTexts() {
@@ -141,9 +154,23 @@ export async function chestView(db, player, guild, now) {
   const rank = (entry) => (entry.forYou ? 0 : entry.forName === null ? 1 : 2);
   const entries = items.results.map((stored) => {
     const item = JSON.parse(stored.data);
-    const view = itemView(item, content());
     const mine = stored.put_by === row.id;
     const forYou = stored.for_member === row.id;
+    const goods = goodsOf(item);
+    if (goods) {
+      const good = content().pantryById[goods.key];
+      return {
+        id: stored.id,
+        goods: { kind: goods.kind, key: goods.key, count: goods.count, name: goodsName(goods), group: good?.group ?? null },
+        from: stored.put_by_now ?? stored.put_by_name,
+        own: mine,
+        forName: stored.for_member === null ? null : stored.for_name,
+        forYou,
+        putAt: stored.put_at,
+        canTake: (stored.for_member === null && !novice) || forYou || mine,
+      };
+    }
+    const view = itemView(item, content());
     return {
       ...view,
       id: stored.id,
@@ -176,6 +203,8 @@ export async function chestView(db, player, guild, now) {
     team: teamView(team),
     log: log.results.map((move) => {
       const item = JSON.parse(move.data);
+      const goods = goodsOf(item);
+      if (goods) return { id: move.id, kind: move.kind, name: move.name, forName: move.for_name, at: move.created_at, item: { name: goodsTitle(goods), color: null, base: null } };
       const rarity = content().raritiesById[item.rarity];
       return { id: move.id, kind: move.kind, name: move.name, forName: move.for_name, at: move.created_at, item: { name: titleOf(item), color: rarity?.color ?? null, base: item.base } };
     }),
@@ -312,8 +341,10 @@ export async function takeFromGuildChest(context) {
   }
   if (stored.put_by !== row.id && row.level < minLevel()) throw new ApiError(403, 'chest_level', cardTexts().level);
   if (stored.for_member === null && stored.put_by !== row.id && noviceIn(guild, now)) throw new ApiError(403, 'novice', filled(errors().novice, { date: noviceDay(guild.probationUntil) }));
-  if (bagPlaces(player) >= bagCapacity(campLevels(player.buildings, now, content()), content())) throw new ApiError(409, 'bag_full', errors().bagFull);
   const item = JSON.parse(stored.data);
+  const goods = goodsOf(item);
+  if (goods) return takeGoods(db, session, player, guild, stored, goods, now);
+  if (bagPlaces(player) >= bagCapacity(campLevels(player.buildings, now, content()), content())) throw new ApiError(409, 'bag_full', errors().bagFull);
   await guarded(
     db,
     [
@@ -345,6 +376,113 @@ export async function takeFromGuildChest(context) {
   );
   const after = await loadPlayer(db, session.userId);
   return answer(db, after, guild, now, { character: characterView(after, now), text: filled(words().takeDone, { item: titleOf(item) }) });
+}
+
+// A lot of the Spiżarnia's goods out of the chest, into the character's
+// Spiżarnia (no bag place needed), by the same rules and assertion as an
+// item's take (takeFromGuildChest checked who may take it).
+async function takeGoods(db, session, player, guild, stored, goods, now) {
+  const { row } = player;
+  const column = GOODS[goods.kind];
+  await guarded(
+    db,
+    [
+      sameVersion(db, row),
+      assertion(
+        db,
+        `EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND guild_id = ?)
+         AND EXISTS (SELECT 1 FROM guild_chest c WHERE c.id = ? AND c.guild_id = ? AND (c.put_by = ? OR ${FOR_MEMBER} = ?
+           OR (${FOR_MEMBER} IS NULL AND NOT EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND role = 'member' AND probation_until > ?))))`,
+        [row.id, guild.id, stored.id, guild.id, row.id, row.id, row.id, now],
+      ),
+      db
+        .prepare("INSERT INTO guild_chest_log (guild_id, kind, name, for_name, data, created_at) SELECT guild_id, 'take', ?, NULL, data, ? FROM guild_chest WHERE id = ? AND guild_id = ?")
+        .bind(row.name, now, stored.id, guild.id),
+      db
+        .prepare(`UPDATE characters SET ${column} = json_set(COALESCE(${column}, '{}'), ?, COALESCE(json_extract(${column}, ?), 0) + ?), version = version + 1 WHERE id = ?`)
+        .bind(jsonPath(goods.key), jsonPath(goods.key), goods.count, row.id),
+      db.prepare('DELETE FROM guild_chest WHERE id = ? AND guild_id = ?').bind(stored.id, guild.id),
+      logKept(db, guild.id),
+    ],
+    async () => {
+      const still = await db.prepare('SELECT 1 AS here FROM guild_chest WHERE id = ? AND guild_id = ?').bind(stored.id, guild.id).first();
+      return still ? changed() : new ApiError(404, 'not_in_chest', errors().gone);
+    },
+  );
+  const after = await loadPlayer(db, session.userId);
+  return answer(db, after, guild, now, { character: characterView(after, now), text: filled(words().takeDone, { item: goodsTitle(goods) }) });
+}
+
+// POST /api/guild/chest/put-goods { kind: 'pantry', key, count, forId }: a
+// lot of a fish, a crop or a dish from the Spiżarnia into the guild's chest,
+// for all or for one other member, by the rules of an item's put
+// (putInGuildChest): the Wymiana's level, the chest's room, the member in
+// the guild; the character still holding the pieces.
+export async function putGoodsInGuildChest(context) {
+  const { session, player, guild, db } = await member(context);
+  const { row } = player;
+  const now = context.now;
+  const body = await readJson(context.request);
+  if (row.level < minLevel()) throw new ApiError(403, 'chest_level', cardTexts().level);
+  const column = GOODS[body.kind];
+  const good = column && typeof body.key === 'string' ? content().pantryById[body.key] : null;
+  if (!good) throw new ApiError(404, 'item_not_found', errors().noItem);
+  const have = JSON.parse(row[column] ?? '{}')[good.id] ?? 0;
+  if (!Number.isInteger(body.count) || body.count < 1 || body.count > have) throw new ApiError(409, 'not_enough', 'Nie masz tylu.');
+  let forMember = null;
+  if (body.forId !== undefined && body.forId !== null) {
+    if (!Number.isInteger(body.forId)) throw new ApiError(400, 'invalid_member', errors().noMember);
+    if (body.forId === row.id) throw new ApiError(400, 'self', errors().self);
+    forMember = await db
+      .prepare('SELECT c.id, c.name, c.level FROM guild_members m JOIN characters c ON c.id = m.character_id WHERE m.guild_id = ? AND m.character_id = ?')
+      .bind(guild.id, body.forId)
+      .first();
+    if (!forMember) throw new ApiError(404, 'no_member', errors().noMember);
+    if (forMember.level < minLevel()) throw new ApiError(409, 'chest_level_other', filled(errors().levelOther, { name: forMember.name, level: minLevel() }));
+  }
+  const { capacity } = rules();
+  const full = () => new ApiError(409, 'chest_full', filled(errors().full, { capacity: capacityText() }));
+  const stored = await db.prepare('SELECT COUNT(*) AS count FROM guild_chest WHERE guild_id = ?').bind(guild.id).first();
+  if (stored.count >= capacity) throw full();
+  const forId = forMember?.id ?? null;
+  const goods = { kind: body.kind, key: good.id, count: body.count };
+  const data = JSON.stringify({ goods });
+  const path = jsonPath(good.id);
+  await guarded(
+    db,
+    [
+      sameVersion(db, row),
+      assertion(
+        db,
+        `EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND guild_id = ?)
+         AND (SELECT COUNT(*) FROM guild_chest WHERE guild_id = ?) < ?
+         AND COALESCE((SELECT json_extract(${column}, ?) FROM characters WHERE id = ?), 0) >= ?
+         AND (? IS NULL OR EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND guild_id = ?))`,
+        [row.id, guild.id, guild.id, capacity, path, row.id, goods.count, forId, forId, guild.id],
+      ),
+      db
+        .prepare('INSERT INTO guild_chest (guild_id, data, created_at, put_by, put_by_name, for_id, put_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+        .bind(guild.id, data, now, row.id, row.name, forId, now),
+      db.prepare("INSERT INTO guild_chest_log (guild_id, kind, name, for_name, data, created_at) VALUES (?, 'put', ?, ?, ?, ?)").bind(guild.id, row.name, forMember?.name ?? null, data, now),
+      db
+        .prepare(
+          `UPDATE characters SET ${column} = CASE WHEN json_extract(${column}, ?) > ? THEN json_set(${column}, ?, json_extract(${column}, ?) - ?) ELSE json_remove(${column}, ?) END, version = version + 1 WHERE id = ?`,
+        )
+        .bind(path, goods.count, path, path, goods.count, path, row.id),
+      logKept(db, guild.id),
+    ],
+    async () => {
+      const [count, still] = await db.batch([
+        db.prepare('SELECT COUNT(*) AS count FROM guild_chest WHERE guild_id = ?').bind(guild.id),
+        db.prepare('SELECT 1 AS here FROM guild_members WHERE character_id = ? AND guild_id = ?').bind(forId ?? 0, guild.id),
+      ]);
+      if (count.results[0].count >= capacity) return full();
+      if (forId !== null && !still.results[0]) return new ApiError(404, 'no_member', errors().noMember);
+      return changed();
+    },
+  );
+  const after = await loadPlayer(db, session.userId);
+  return answer(db, after, guild, now, { character: characterView(after, now), text: filled(words().putDone, { item: goodsTitle(goods) }) });
 }
 
 // The statements that put a war chest's items (guild-wars.js, 799 A) in the

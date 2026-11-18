@@ -20,7 +20,7 @@
 // mountGuildChest(container) adds the card to the container and gives
 // { unmount() }, which takes it away.
 
-import { materialSprite } from './art.js';
+import { materialSprite, pantrySprite } from './art.js';
 import { checkGuildTodo } from './chat-news.js';
 import { fill, h, icon } from './dom.js';
 import { dateTimeFormat, formatNumber } from './format.js';
@@ -65,6 +65,7 @@ export function mountGuildChest(container) {
   function note(item, { list = false } = {}) {
     const { texts } = view;
     const forWhom = item.forYou ? texts.forYou : item.forName ? filled(texts.forOne, { name: item.forName }) : texts.forAll;
+    if (item.goods) return [filled(texts.from, { name: item.from }), forWhom, when(item.putAt)].join(' · ');
     const wear = !item.usable
       ? t('nie dla tej klasy')
       : item.wornFrom && item.wornFrom > state.character.classLevel
@@ -120,7 +121,7 @@ export function mountGuildChest(container) {
   function headPart() {
     const { texts, capacity, count, waiting, items } = view;
     const character = state.character;
-    const bagFull = character.bagUsed >= character.bagCapacity && items.some((item) => item.canTake);
+    const bagFull = character.bagUsed >= character.bagCapacity && items.some((item) => item.canTake && !item.goods);
     return h(
       'div',
       { class: 'guild-stash-head' },
@@ -147,19 +148,35 @@ export function mountGuildChest(container) {
         h(
           'li',
           { class: `chest-row guild-stash-row${item.forYou ? ' guild-stash-row--yours' : ''}` },
-          h('button', { type: 'button', class: 'chest-item chest-item--bag', onClick: () => openItem(item) }, itemSummary(item), h('span', { class: 'chest-note', text: note(item, { list: true }) })),
+          item.goods
+            ? h('div', { class: 'chest-item chest-item--bag' }, goodsSummary(item.goods), h('span', { class: 'chest-note', text: note(item, { list: true }) }))
+            : h('button', { type: 'button', class: 'chest-item chest-item--bag', onClick: () => openItem(item) }, itemSummary(item), h('span', { class: 'chest-note', text: note(item, { list: true }) })),
           takePart(item),
         ),
       ),
     );
   }
 
+  // A lot of the Spiżarnia's goods in one line: its picture, name and how
+  // many (the author, 18.11.2026: „Skrzynia Konta, Skrzynia Gildii
+  // wszędzie”).
+  function goodsSummary(goods) {
+    return h(
+      'span',
+      { class: 'item-summary-art market-goods' },
+      h('span', { class: 'potion-pick-art' }, pantrySprite(goods.key) ?? icon('fish', { size: 24 })),
+      h('span', { class: 'item-summary' }, h('span', { class: 'item-name', text: `${goods.name} ×${formatNumber(goods.count)}` }), h('span', { class: 'item-meta', text: t('Spiżarnia') })),
+    );
+  }
+
   // The sheet of "Włóż": the item, and for whom it stays, "Dla wszystkich"
   // (picked first) or one of the guild's other members, each with its
-  // class and level, in a box that scrolls in a big guild.
-  function openPutSheet(item) {
+  // class and level, in a box that scrolls in a big guild. A good of the
+  // Spiżarnia (`good`) asks how many pieces first.
+  function openPutSheet(item, good = null) {
     const { texts, members } = view;
     let picked = null;
+    let count = good ? good.count : 1;
     const picker = h('div', { class: 'guild-ask-picker guild-stash-picker', role: 'group', 'aria-label': texts.putLead });
     const choice = (id, ...parts) =>
       h(
@@ -194,16 +211,32 @@ export function mountGuildChest(container) {
       text: texts.put,
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
-          await act('/api/guild/chest/put', { itemId: item.id, forId: picked });
+          await act(good ? '/api/guild/chest/put-goods' : '/api/guild/chest/put', good ? { kind: 'pantry', key: good.id, count, forId: picked } : { itemId: item.id, forId: picked });
           closeSheet();
         }),
     });
+    // How many of the good: − and + by one, "wszystkie" for the lot.
+    const amount = good && (() => {
+      const value = h('output', { class: 'herb-count-value' });
+      const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('Mniej'), text: '−', onClick: () => set(count - 1) });
+      const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('Więcej'), text: '+', onClick: () => set(count + 1) });
+      const all = h('button', { type: 'button', class: 'link-button', text: t('wszystkie'), onClick: () => set(good.count) });
+      function set(next) {
+        count = Math.min(good.count, Math.max(1, next));
+        value.textContent = t('{count} szt.', { count: formatNumber(count) });
+        less.disabled = count === 1;
+        more.disabled = count === good.count;
+      }
+      set(count);
+      return h('div', { class: 'herb-count' }, less, value, more, all);
+    })();
     openSheet(
       h('h2', { class: 'sheet-title', text: texts.putTitle }),
       h(
         'div',
         { class: 'guild-ask-sheet guild-stash-put' },
-        itemSummary(item),
+        good ? goodsSummary({ key: good.id, name: good.name, count: good.count }) : itemSummary(item),
+        amount,
         h('p', { class: 'field-label', text: texts.putLead }),
         picker,
         h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }), send),
@@ -254,6 +287,41 @@ export function mountGuildChest(container) {
     );
   }
 
+  // The Spiżarnia's fish, crops and dishes with "Włóż", as the bag's items:
+  // a lot of one good, as many pieces as chosen. Folded at first.
+  function pantryPart() {
+    const { texts, capacity, count } = view;
+    const pantry = state.character.pantry ?? [];
+    const room = capacity - count;
+    if (pantry.length === 0) return null;
+    return h(
+      'div',
+      { class: 'guild-part guild-stash-bag' },
+      foldPart(
+        { key: 'guild-chest-pantry', title: t('Włóż ze Spiżarni'), line: t('{count} rodz.', { count: formatNumber(pantry.length) }), open: false },
+        room <= 0 && h('p', { class: 'muted', text: texts.full }),
+        h(
+          'ul',
+          { class: 'chest-list' },
+          pantry.map((good) =>
+            h(
+              'li',
+              { class: 'chest-row' },
+              h('div', { class: 'chest-item chest-item--bag' }, goodsSummary({ key: good.id, name: good.name, count: good.count })),
+              h('button', {
+                type: 'button',
+                class: 'button button--world button--small',
+                text: texts.put,
+                disabled: room <= 0,
+                onClick: () => (view.locked ? toast(texts.level) : openPutSheet(null, good)),
+              }),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   // The last moves: each item's name in its rarity's colour, who put it in
   // (and for whom) or took it out, or the war chest of a war won
   // (guild-war.js), and when; folded under their number.
@@ -290,7 +358,7 @@ export function mountGuildChest(container) {
       fill(card, title(), h('p', { class: 'muted', text: texts.noGuild }), how);
       return;
     }
-    fill(card, title(), how, headPart(), itemsPart(), bagPart(), logPart());
+    fill(card, title(), how, headPart(), itemsPart(), bagPart(), pantryPart(), logPart());
   }
 
   // The character changed (its bag, as after a report): the card again.

@@ -1084,6 +1084,10 @@
     "0.4.34": {
       "title": "Version 0.4.34",
       "body": "- In the Guild Requests you can also ask for fish, crops and dishes, and your guild mates give them from their Pantry."
+    },
+    "0.4.35": {
+      "title": "Version 0.4.35",
+      "body": "- You can also put fish, crops and dishes in the Guild Chest: “Put in from the Pantry”, for everyone or for one guild member."
     }
   }
 }
