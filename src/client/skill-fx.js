@@ -391,7 +391,8 @@ SKILL_LOOKS['champion-challenge'].challenger = true;
 // stone under every foe (Gniew góry); the tower shield rising over the
 // party as a rampart of light (Tarcza tytana).
 Object.assign(SKILL_LOOKS['mountain-wrath'], { crescent: false, mountain: true, dazed: true });
-Object.assign(SKILL_LOOKS['titan-shield'], { hexwall: false, rampart: true });
+// (The Tytan's card keeps the shield's rim while the Tarcza tytana holds.)
+Object.assign(SKILL_LOOKS['titan-shield'], { hexwall: false, rampart: true, stance: 'unit--shielded' });
 // The Niebiański Łucznik: a star over its bow and an arrow like a falling
 // star through the whole formation (Strzała z niebios); a handful of
 // arrows into a night sky, falling back as shooting stars (Deszcz gwiazd).
@@ -9219,6 +9220,11 @@ export function skillEffects(kit) {
     const look = lookOf(event);
     const entry = cards.get(event.target);
     if (!look.stance || !entry || reduced() || !particles) return;
+    // (The Tarcza tytana's light leaves the Tytan's card.)
+    if (look.rampart) {
+      rimGlow(entry.card, look.color, 500);
+      return;
+    }
     const art = artOf(entry.card);
     const figure = figureOf(art);
     const picture = pictureIn(entry.card);
@@ -9509,11 +9515,13 @@ export function skillEffects(kit) {
     const points = foes.map((foe) => figurePoint(foe.card, 0.5));
     const middle = { x: points.reduce((sum, point) => sum + point.x, 0) / points.length, y: points.reduce((sum, point) => sum + point.y, 0) / points.length };
     const reach = { x: (middle.x - from.x) * 0.14, y: (middle.y - from.y) * 0.14 };
+    // (It gathers itself in place, not back toward the arena's edge, where
+    // its card would be cut.)
     animate(
       entry.card,
       [
         { transform: 'translate(0px, 0px) scale(1)' },
-        { transform: `translate(${(-reach.x * 0.35).toFixed(1)}px, ${(-reach.y * 0.35).toFixed(1)}px) scale(0.95)`, offset: 0.14 },
+        { transform: 'translate(0px, 0px) scale(0.94)', offset: 0.14 },
         { transform: `translate(${reach.x.toFixed(1)}px, ${reach.y.toFixed(1)}px) scale(1.1)`, offset: 0.32 },
         { transform: `translate(${reach.x.toFixed(1)}px, ${reach.y.toFixed(1)}px) scale(1.07)`, offset: 0.72 },
         { transform: 'translate(0px, 0px) scale(1)' },
@@ -9697,7 +9705,7 @@ export function skillEffects(kit) {
           [
             { transform: 'translate(0px, 0px) rotate(0deg)' },
             { transform: 'translate(0px, 0px) rotate(0deg)', offset: 0.44 },
-            { transform: `translate(${way * 7}px, 11px) rotate(${way * 26}deg)` },
+            { transform: `translate(${way * 11}px, 15px) rotate(${way * 34}deg)` },
           ],
           { duration: 1150, delay, easing: 'cubic-bezier(0.5, 0, 0.8, 0.6)', fill: 'both' },
         );
@@ -10343,7 +10351,7 @@ export function skillEffects(kit) {
   function globeAt() {
     const width = stageWidth();
     const size = Math.round(Math.min(58, width * 0.15));
-    return { point: { x: width / 2, y: Math.round(Math.max(size * 0.9, stageHeight() * 0.09)) }, size };
+    return { point: { x: width / 2, y: Math.round(Math.max(size * 1.2, stageHeight() * 0.11)) }, size };
   }
 
   // The Kula piorunów wakes: lightning runs up from the Gromowładny into the
@@ -10368,7 +10376,7 @@ export function skillEffects(kit) {
       [
         { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
         { transform: 'translate(-50%, -50%) scale(0)', opacity: 0, offset: 0.2 },
-        { transform: 'translate(-50%, -50%) scale(1.3)', opacity: 1, offset: 0.3 },
+        { transform: 'translate(-50%, -50%) scale(1.15)', opacity: 1, offset: 0.3 },
         { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.4 },
         { transform: 'translate(-50%, -50%) scale(1.08)', opacity: 1, offset: 0.62 },
         { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.85 },
@@ -10382,7 +10390,9 @@ export function skillEffects(kit) {
       shake(2, 220);
       aura(id, color, 1);
     });
-    for (const delay of [640, 900, 1160]) after(delay, ball, () => crackle(point, size * 1.3, color, 3));
+    // (Its arcs reach no higher than the arena's top edge.)
+    const reach = Math.min(size * 1.3, point.y - 6);
+    for (const delay of [640, 900, 1160]) after(delay, ball, () => crackle(point, reach, color, 3));
     await wait(1400);
   }
 

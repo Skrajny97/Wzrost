@@ -2102,7 +2102,7 @@ export function createFx(kit) {
   async function globeZap(b, color, onImpact, settle, id) {
     const width = stage.clientWidth;
     const size = Math.round(Math.min(58, width * 0.15));
-    const point = { x: width / 2, y: Math.round(Math.max(size * 0.9, stage.clientHeight * 0.09)) };
+    const point = { x: width / 2, y: Math.round(Math.max(size * 1.2, stage.clientHeight * 0.11)) };
     const ball = mark('fx-thunderorb fx-thunderorb--globe', point, { '--fx': color, '--size': `${size}px` });
     ball.innerHTML = ORB_ARCS;
     playSound('magic');
@@ -2113,7 +2113,7 @@ export function createFx(kit) {
         { transform: at(0.3), opacity: 0 },
         { transform: at(1.1), opacity: 1, offset: 0.25 },
         { transform: at(1), opacity: 1, offset: 0.34 },
-        { transform: at(1.3), opacity: 1, offset: 0.42 },
+        { transform: at(1.15), opacity: 1, offset: 0.42 },
         { transform: at(1), opacity: 1, offset: 0.66 },
         { transform: at(0.5), opacity: 0 },
       ],
