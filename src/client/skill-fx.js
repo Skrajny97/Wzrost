@@ -1124,13 +1124,13 @@ const SCYTHE =
   '<path d="M42 6C28 -1 9 3 2 19C13 11 27 10 40 14Z" fill="#dff7e8" stroke="#24342b" stroke-width="1.6" stroke-linejoin="round"/>' +
   '<path d="M38 9C27 5 15 8 7 15" fill="none" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/></svg>';
 
-// The Odwrócenie losu's hourglass: a golden frame, sand in its top bulb.
+// The Odwrócenie losu's hourglass: a golden frame, its sand run out into
+// the bottom bulb (turned over, the sand is on top again).
 const FATE_GLASS =
   '<svg viewBox="-20 -30 40 60" aria-hidden="true">' +
   '<path d="M-12 -24C-12 -8 -3 -4 0 0C3 -4 12 -8 12 -24ZM-12 24C-12 8 -3 4 0 0C3 4 12 8 12 24Z" fill="#e8f4ff" fill-opacity="0.55" stroke="#ffffff" stroke-width="1.4" stroke-linejoin="round"/>' +
-  '<path d="M-9 -20C-8 -11 -3 -7 0 -3C3 -7 8 -11 9 -20Z" fill="#f2c14e"/>' +
-  '<path d="M0 -3V20" stroke="#f2c14e" stroke-width="1.2" stroke-dasharray="2 2"/>' +
-  '<path d="M-7 21C-4 16 4 16 7 21Z" fill="#f2c14e"/>' +
+  '<path d="M-10.5 22C-10 13 -4 9 0 6C4 9 10 13 10.5 22Z" fill="#f2c14e"/>' +
+  '<path d="M-6 21C-3 16 3 16 6 21" fill="none" stroke="#ffe9a8" stroke-width="1" stroke-linecap="round"/>' +
   '<g fill="#c99a2e" stroke="#5c4316" stroke-width="1.2"><rect x="-17" y="-29" width="34" height="5" rx="1.5"/><rect x="-17" y="24" width="34" height="5" rx="1.5"/></g>' +
   '<path d="M-15 -24V24M15 -24V24" stroke="#c99a2e" stroke-width="2"/></svg>';
 
@@ -11725,6 +11725,15 @@ export function skillEffects(kit) {
       const y = (1 - share) * (1 - share) * from.y + 2 * (1 - share) * share * lift.y + share * share * to.y;
       return { transform: `translate(${(x - from.x).toFixed(1)}px, ${(y - from.y).toFixed(1)}px) translate(-50%, -50%) scale(${(0.6 + share * 0.4).toFixed(2)})`, opacity: step === 0 ? 0 : step === 8 ? 0.2 : 1 };
     });
+    // (Pale motes left along its arc.)
+    if (!reduced() && particles) {
+      for (let step = 1; step < 8; step += 1) {
+        const share = step / 8;
+        const x = (1 - share) * (1 - share) * from.x + 2 * (1 - share) * share * lift.x + share * share * to.x;
+        const y = (1 - share) * (1 - share) * from.y + 2 * (1 - share) * share * lift.y + share * share * to.y;
+        after(delay + share * 620, soul, () => particles.burst({ x, y, count: 3, colors: SOUL, speed: [8, 24], drag: 2, life: [300, 520], size: [1, 1.8], shape: 'mote' }));
+      }
+    }
     return animate(soul, frames, { duration: 620, delay, easing: 'ease-in-out', fill: 'backwards' }).then(() => {
       soul.remove();
       if (!reduced() && particles) particles.burst({ x: to.x, y: to.y, count: 8, colors: SOUL, speed: [40, 110], drag: 2.4, life: [300, 500], size: [1, 2], shape: 'mote' });
@@ -11827,18 +11836,26 @@ export function skillEffects(kit) {
     const right = Math.max(...boxes.map((box) => box.x + box.width));
     const top = Math.min(...boxes.map((box) => box.y));
     const bottom = Math.max(...boxes.map((box) => box.y + box.height));
-    const middle = { x: (left + right) / 2, y: top + (bottom - top) * 0.5 };
     const figure = figureOf(artOf(foes[0].card));
     const size = Math.round(Math.max(40, figure * 1.05));
-    // (Its orbit kept on the stage, the turning scythe whole: a flat one
-    // round foes in the top row.)
+    // (Its orbit kept on the stage, the turning scythe whole: round foes in
+    // one column by the stage's edge it swings out over the field, round
+    // foes in the top row it is flat.)
     const room = size * 0.72 + 2;
-    const across = Math.max(figure * 0.3, Math.min((right - left) / 2, Math.min(middle.x, width - middle.x) - room));
-    const deep = Math.max(figure * 0.15, Math.min(Math.max(figure * 0.35, (bottom - top) * 0.4), middle.y - room, stageHeight() - middle.y - room));
+    const height = stageHeight();
+    const wide = Math.max((right - left) / 2, figure * 0.9);
+    const tall = Math.max(figure * 0.35, (bottom - top) * 0.4);
+    const middle = {
+      x: Math.min(Math.max((left + right) / 2, room + wide), Math.max(room + wide, width - room - wide)),
+      y: Math.min(Math.max(top + (bottom - top) * 0.5, room + tall), Math.max(room + tall, height - room - tall)),
+    };
+    const across = Math.max(figure * 0.3, Math.min(wide, middle.x - room, width - middle.x - room));
+    const deep = Math.max(figure * 0.15, Math.min(tall, middle.y - room, height - middle.y - room));
     const duration = turn === 1 ? 900 : 760;
     const gale = spark('fx-gale fx-gale--soul', middle, { '--fx': color });
-    gale.style.width = `${Math.round(Math.min(across * 2.1, (Math.min(middle.x, width - middle.x) * 2) / 1.12))}px`;
-    gale.style.height = `${Math.round(Math.min(deep * 2.1, (Math.min(middle.y, stageHeight() - middle.y) * 2) / 1.12))}px`;
+    const whirl = Math.round(Math.min(Math.min(across, deep) * 2.1, (Math.min(middle.x, width - middle.x, middle.y, height - middle.y) * 2) / 1.12));
+    gale.style.width = `${whirl}px`;
+    gale.style.height = `${whirl}px`;
     gale.innerHTML = GALE;
     animate(
       gale,

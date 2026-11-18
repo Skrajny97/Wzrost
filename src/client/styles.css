@@ -26351,8 +26351,8 @@ a.discord-button {
 
 .fx-soul {
   position: absolute;
-  width: 12px;
-  height: 16px;
+  width: 16px;
+  height: 22px;
   border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
   pointer-events: none;
   background: radial-gradient(ellipse at 50% 40%, #ffffff 0 30%, var(--fx) 60%, rgba(159, 232, 192, 0) 76%);
