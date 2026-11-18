@@ -33,6 +33,17 @@
       },
       "description": "Najwyższy poziom umiejętności i punkty trzeciej ewolucji (200. poziom klasy), jak secondForms drugiej."
     },
+    "fourthForms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skillMaxLevel", "lastPointClassLevel", "pointsPerClassLevel"],
+      "properties": {
+        "skillMaxLevel": { "type": "integer", "minimum": 2 },
+        "lastPointClassLevel": { "type": "integer", "minimum": 1, "description": "Ostatni poziom klasy, który daje Punkt Umiejętności po czwartej ewolucji." },
+        "pointsPerClassLevel": { "type": "integer", "minimum": 1 }
+      },
+      "description": "Najwyższy poziom umiejętności i punkty czwartej ewolucji (300. poziom klasy), jak thirdForms trzeciej. Gra pokazuje czwarte formy tylko tam, gdzie zmienna FOURTH_EVOLUTION ma „on”."
+    },
     "evolutions": {
       "type": "array",
       "minItems": 1,

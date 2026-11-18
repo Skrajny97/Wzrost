@@ -107,7 +107,7 @@ describe('the Encyklopedia in the engine', () => {
     // from level 100 of their professions.
     assert.deepEqual(sixth.entries.find((entry) => entry.id === 'flamberge').sources, [
       'Wyprawy: wypada od regionu Stare Wyrobisko (poz. 96–100).',
-      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów.',
+      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
       'Założysz od 100. poziomu klasy.',
       'Warsztat: wzór od 100. poziomu Rzemieślnictwa.',
     ]);
@@ -157,16 +157,16 @@ describe('the Encyklopedia in the engine', () => {
     // and the Szlifiernia's patterns from level 125 of their professions.
     assert.deepEqual(seventh.entries.find((entry) => entry.id === 'coronation-sword').sources, [
       'Wyprawy: wypada od regionu Rokitowe Bezdno (poz. 121–125).',
-      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów.',
+      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
       'Założysz od 125. poziomu klasy.',
       'Warsztat: wzór od 125. poziomu Rzemieślnictwa.',
     ]);
     assert.ok(seventh.entries.find((entry) => entry.id === 'pectoral').sources.includes('Szlifiernia: wzór od 125. poziomu Jubilerstwa.'));
-    // A Cień's sztylet, which the Nekromanta and the Licz no longer wear
+    // A Cień's sztylet, which the Nekromanta, the Licz and the Król Nawii no longer wear
     // (988), and the Mag's kostur, which they do.
     const baselard = seventh.entries.find((entry) => entry.id === 'baselard').sources;
-    assert.ok(baselard.includes('Dla klasy: Cień.') && baselard.includes('Nie dla: Nekromanta, Licz.'), JSON.stringify(baselard));
-    assert.ok(seventh.entries.find((entry) => entry.id === 'archmage-staff').sources.includes('Dla klas: Mag, Nekromanta, Licz.'));
+    assert.ok(baselard.includes('Dla klasy: Cień.') && baselard.includes('Nie dla: Nekromanta, Licz, Król Nawii.'), JSON.stringify(baselard));
+    assert.ok(seventh.entries.find((entry) => entry.id === 'archmage-staff').sources.includes('Dla klas: Mag, Nekromanta, Licz, Król Nawii.'));
     // Materials of creatures of levels 151–175 in Tier VII: Głucha Knieja's
     // and those of Sosnowe Wydmy that come a level or two above its 150 (the
     // Południca, the Raróg and Pogorzelisko's). Ostępy Nowiu's go on to Tier
@@ -216,7 +216,7 @@ describe('the Encyklopedia in the engine', () => {
     // the Szlifiernia's patterns from level 150 of their professions.
     assert.deepEqual(eighth.entries.find((entry) => entry.id === 'self-swinging-sword').sources, [
       'Wyprawy: wypada od regionu Pogorzelisko (poz. 146–150).',
-      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów.',
+      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
       'Założysz od 150. poziomu klasy.',
       'Warsztat: wzór od 150. poziomu Rzemieślnictwa.',
     ]);
@@ -256,7 +256,7 @@ describe('the Encyklopedia in the engine', () => {
     // class level 175, the patterns from level 175 of the professions.
     assert.deepEqual(ninth.entries.find((entry) => entry.id === 'szczerbiec').sources, [
       'Wyprawy: wypada od regionu Matecznik (poz. 171–175).',
-      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów.',
+      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
       'Założysz od 175. poziomu klasy.',
       'Warsztat: wzór od 175. poziomu Rzemieślnictwa.',
     ]);
@@ -291,7 +291,7 @@ describe('the Encyklopedia in the engine', () => {
     // from class level 200, and no pattern yet.
     assert.deepEqual(tenth.entries.find((entry) => entry.id === 'grunwald-sword').sources, [
       'Wyprawy: wypada od regionu Zaćmiona Polana (poz. 196–200).',
-      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów.',
+      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
       'Założysz od 200. poziomu klasy.',
     ]);
     assert.ok(!tenth.entries.find((entry) => entry.id === 'rzepicha-necklace').sources.some((line) => line.startsWith('Szlifiernia')));

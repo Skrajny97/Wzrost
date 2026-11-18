@@ -60,16 +60,16 @@ function stagedEvolutions(raw) {
 }
 
 // The rules of each stage's skills and points: the first evolution's, then
-// the second forms' and the third forms' (data/evolutions.json, secondForms
-// and thirdForms).
+// the second, third and fourth forms' (data/evolutions.json, secondForms,
+// thirdForms and fourthForms).
 /**
  * @param {Raw} raw
  * @returns {Entry[]}
  */
 function stageRules(raw) {
   if (!raw.evolutions) return [];
-  const { skillMaxLevel, lastPointClassLevel, pointsPerClassLevel, secondForms, thirdForms } = raw.evolutions;
-  return [{ skillMaxLevel, lastPointClassLevel, pointsPerClassLevel }, ...[secondForms, thirdForms].filter(Boolean)];
+  const { skillMaxLevel, lastPointClassLevel, pointsPerClassLevel, secondForms, thirdForms, fourthForms } = raw.evolutions;
+  return [{ skillMaxLevel, lastPointClassLevel, pointsPerClassLevel }, ...[secondForms, thirdForms, fourthForms].filter(Boolean)];
 }
 
 // The evolutions' skills with what they take from their evolution: its class

@@ -110,36 +110,41 @@ describe('Ewolucje, które zmieniają broń (988)', () => {
   });
 });
 
+// The forms of the Mag's gear and of the Wojownik's: the next forms keep
+// what a form changed (the fourth: the Król Nawii, the Mściciel Niebios).
+const MAGES = ['necromancer', 'lich', 'navia-king'];
+const WARRIORS = ['grand-inquisitor', 'demon-slayer', 'heaven-avenger'];
+
 describe('Kto nosi jaką broń (988; the author, 15.11.2026: „tak logicznie to przemyśl żeby sie zgadzalo wszystko u każdej ewolucji i klasy”)', () => {
-  test('every form wears its class\'s gear but the Nekromanta and the Licz, with the Mag\'s, and the Wielki Inkwizytor and the Pogromca Demonów, with the Wojownik\'s (991 A)', () => {
+  test('every form wears its class\'s gear but the Nekromanta, the Licz and the Król Nawii, with the Mag\'s, and the Wielki Inkwizytor, the Pogromca Demonów and the Mściciel Niebios, with the Wojownik\'s (991 A; a fourth form keeps its line\'s gear)', () => {
     const mage = content.classesById.mage;
     const warrior = content.classesById.warrior;
     for (const form of content.evolutions) {
       const lists = gearLists(gearKey(form.classId, form.id, content), content);
       const own = content.classesById[form.classId];
-      if (['necromancer', 'lich'].includes(form.id)) assert.deepEqual(lists, { weapons: mage.weapons, offhands: mage.offhands, armor: mage.armor }, form.id);
-      else if (['grand-inquisitor', 'demon-slayer'].includes(form.id)) assert.deepEqual(lists, { weapons: warrior.weapons, offhands: warrior.offhands, armor: warrior.armor }, form.id);
+      if (MAGES.includes(form.id)) assert.deepEqual(lists, { weapons: mage.weapons, offhands: mage.offhands, armor: mage.armor }, form.id);
+      else if (WARRIORS.includes(form.id)) assert.deepEqual(lists, { weapons: warrior.weapons, offhands: warrior.offhands, armor: warrior.armor }, form.id);
       else assert.deepEqual(lists, { weapons: own.weapons, offhands: own.offhands, armor: own.armor }, form.id);
     }
   });
 
   test('who else wears a kind, and who of its classes does not: on the cards, in the Warsztat and the Encyklopedia', () => {
-    assert.deepEqual(gearWearers('staff', content), { forms: ['necromancer', 'lich'], without: [] });
-    assert.deepEqual(gearWearers('focus', content), { forms: ['necromancer', 'lich'], without: ['grand-inquisitor', 'demon-slayer'] });
-    assert.deepEqual(gearWearers('dagger', content), { forms: [], without: ['necromancer', 'lich'] });
-    assert.deepEqual(gearWearers('misericorde', content), { forms: [], without: ['necromancer', 'lich'] });
-    assert.deepEqual(gearWearers('sword', content), { forms: ['grand-inquisitor', 'demon-slayer'], without: [] });
-    assert.deepEqual(gearWearers('aspergillum', content), { forms: [], without: ['grand-inquisitor', 'demon-slayer'] });
-    assert.deepEqual(gearWearers('robe', content), { forms: ['necromancer', 'lich'], without: [] });
-    assert.deepEqual(gearWearers('tunic', content), { forms: [], without: ['necromancer', 'lich'] });
-    for (const family of ['helmet', 'chainmail']) assert.deepEqual(gearWearers(family, content), { forms: ['grand-inquisitor', 'demon-slayer'], without: [] }, family);
-    for (const family of ['cowl', 'surplice']) assert.deepEqual(gearWearers(family, content), { forms: [], without: ['grand-inquisitor', 'demon-slayer'] }, family);
+    assert.deepEqual(gearWearers('staff', content), { forms: MAGES, without: [] });
+    assert.deepEqual(gearWearers('focus', content), { forms: MAGES, without: WARRIORS });
+    assert.deepEqual(gearWearers('dagger', content), { forms: [], without: MAGES });
+    assert.deepEqual(gearWearers('misericorde', content), { forms: [], without: MAGES });
+    assert.deepEqual(gearWearers('sword', content), { forms: WARRIORS, without: [] });
+    assert.deepEqual(gearWearers('aspergillum', content), { forms: [], without: WARRIORS });
+    assert.deepEqual(gearWearers('robe', content), { forms: MAGES, without: [] });
+    assert.deepEqual(gearWearers('tunic', content), { forms: [], without: MAGES });
+    for (const family of ['helmet', 'chainmail']) assert.deepEqual(gearWearers(family, content), { forms: WARRIORS, without: [] }, family);
+    for (const family of ['cowl', 'surplice']) assert.deepEqual(gearWearers(family, content), { forms: [], without: WARRIORS }, family);
     for (const family of ['shield', 'bow', 'quiver', 'hood']) assert.deepEqual(gearWearers(family, content), { forms: [], without: [] }, family);
     const card = (baseId) => itemView(generateItem({ baseId, level: 30 }, createRng(baseId), content), content);
     const staff = card('staff');
-    assert.deepEqual([staff.family, staff.classNames, staff.formNames, staff.exceptNames], ['staff', ['Mag'], ['Nekromanta', 'Licz'], undefined]);
+    assert.deepEqual([staff.family, staff.classNames, staff.formNames, staff.exceptNames], ['staff', ['Mag'], ['Nekromanta', 'Licz', 'Król Nawii'], undefined]);
     const dagger = card('dagger');
-    assert.deepEqual([dagger.family, dagger.classNames, dagger.formNames, dagger.exceptNames], ['dagger', ['Cień'], undefined, ['Nekromanta', 'Licz']]);
+    assert.deepEqual([dagger.family, dagger.classNames, dagger.formNames, dagger.exceptNames], ['dagger', ['Cień'], undefined, ['Nekromanta', 'Licz', 'Król Nawii']]);
     const ring = card('ring');
     assert.deepEqual([ring.classIds, ring.formNames, ring.exceptNames], [null, undefined, undefined]);
   });

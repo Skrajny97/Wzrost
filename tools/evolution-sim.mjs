@@ -10,6 +10,7 @@
 //   node tools/evolution-sim.mjs --levels 60 --hunts 300 --minutes 60
 //   node tools/evolution-sim.mjs --second                levels 85, 90, 95, 100
 //   node tools/evolution-sim.mjs --third                 levels 170, 180, 190, 200
+//   node tools/evolution-sim.mjs --fourth                levels 250, 260, 270, 280
 //
 // An evolved character takes back the 40 Skill Points of its two skills and
 // gets one more for each class level up to 99, spread evenly over the
@@ -20,6 +21,9 @@
 // `--third` compares each second form, its skills at their top level, with
 // its third form at the same class level (past 200): the third form takes
 // back the 190 points and gets one for each class level from 200 on.
+// `--fourth` compares each third form with its fourth form past 300 in the
+// same way: the fourth form takes back the 290 points and gets one for each
+// class level from 300 on.
 // `--plus 8` measures in the place that many levels above the character
 // (as the second evolution's test does), `--then` against the creatures as
 // they were when the second forms were set (no growth past 100).
@@ -113,7 +117,8 @@ function parseArgs(argv) {
 
 // The rows of one class at one level: the class and its three evolutions,
 // or (stage 2) each first evolution and its second form, or (stage 3) each
-// second form and its third, one pair at a time.
+// second form and its third, or (stage 4) each third form and its fourth,
+// one pair at a time.
 function rowsOf(cls, base, content, stage) {
   const evolved = (evolution) => {
     const character = { ...base.character, evolution: evolution.id, skills: evolvedSkills(evolution, base.character.classLevel, content) };
@@ -122,15 +127,20 @@ function rowsOf(cls, base, content, stage) {
   };
   const firsts = content.evolutions.filter((e) => e.classId === cls.id && !e.from);
   if (stage === 1) return [[{ name: cls.name, character: base.character }, ...firsts.map(evolved)]];
-  const before = stage === 2 ? firsts : firsts.map((first) => engine.nextFormOf(first, content));
+  // The forms of the stage before: the first forms grown on (stage - 2) times.
+  const before = firsts.map((first) => {
+    let form = first;
+    for (let step = 2; step < stage; step++) form = engine.nextFormOf(form, content);
+    return form;
+  });
   return before.map((form) => [evolved(form), evolved(engine.nextFormOf(form, content))]);
 }
 
 function main() {
   const options = parseArgs(process.argv.slice(2));
   let content = engine.buildContent(loadData());
-  const stage = options.third ? 3 : options.second ? 2 : 1;
-  const defaults = { 1: ['50', '60', '70', '80'], 2: ['85', '90', '95', '100'], 3: ['170', '180', '190', '200'] }[stage];
+  const stage = options.fourth ? 4 : options.third ? 3 : options.second ? 2 : 1;
+  const defaults = { 1: ['50', '60', '70', '80'], 2: ['85', '90', '95', '100'], 3: ['170', '180', '190', '200'], 4: ['250', '260', '270', '280'] }[stage];
   const levels = (typeof options.levels === 'string' ? options.levels.split(',') : defaults).map(Number);
   const minutes = Number(options.minutes ?? 60);
   const hunts = Number(options.hunts ?? 200);
