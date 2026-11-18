@@ -654,6 +654,11 @@
       "start": "art/references/walks/start/skin-winter-cleric-female.png",
       "pose": 2,
       "description": "a calm young woman with a long dark braid falling down her back, crowned with a wreath of fir and red berries, long ice-blue robes with silver frost patterns, a long crimson cloak lined with white fur falling behind, dark boots with white fur tops, no staff, both hands empty, the arms swinging naturally and keeping their length"
+    },
+    "ravager-male": {
+      "start": "art/references/walks/start/ravager-male.png",
+      "pose": 2,
+      "description": "an enormous warlord man in dark red and black spiked plate armour with glowing orange cracks like embers, a dark horned helmet with two curved horns, a thick dark brown beard and glowing red eyes, a belt of small white skulls, a long dark red cloak hanging behind from the shoulders, dark armoured boots, no axe, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     }
   }
 }

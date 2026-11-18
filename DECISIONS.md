@@ -3753,6 +3753,7 @@ Najpierw Tier X przedmiotów (potrzebny najlepszej postaci za około dwa tygodni
     - **Tarcza tytana** trwa 4 ruchy; **Odwrócenie losu** działa poniżej 40% HP.
     - Siła w pojedynkach (`duelPower`, `duelHp` w `data/evolutions.json`, tylko Arena) dla 14 form (bez Niebiańskiego Łucznika); Tytan, tarcza drużyny, w pojedynku jeden na jednego bije mało (2,3 siły i 1,9 HP).
     - Trzeci obrót Huraganu chwały ma własne słowa („trzeci obrót”), a oślepienie z Ognia niebios nie powtarza komunikatu, gdy Słup światła oślepił już tym samym ciosem.
+    - „Kula piorunów” Gromowładnego ma tę samą nazwę co umiejętność Władcy Piorunów, drugiej formy z tej samej linii: wraca mocniejsza, więc nazwa zostaje, jak w 1095 (w danych to dwie umiejętności z osobnymi id, a słowa w walce mają osobny klucz `stanceBallLightning`).
 8. Do zrobienia z grafiką: kilku przywołańców jednej umiejętności (dwaj rycerze Legionu Nawii, kolejne Dęby wieków, upiory Nawii) walka pokazuje dziś jako jedną kartę; upiór Nawii ma wygląd szkieletu.
 
 ## Nowe krainy 276–350: Nawia (1088 B, 18.11.2026)
