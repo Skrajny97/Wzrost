@@ -23,7 +23,8 @@
         "first",
         "last",
         "goldRound",
-        "days"
+        "days",
+        "sale"
       ],
       "properties": {
         "month": {
@@ -103,6 +104,30 @@
               "potion": [
                 "count"
               ]
+            }
+          }
+        },
+        "sale": {
+          "description": "Zimowy zestaw za Punkty Systemu w oknie kalendarza od dnia fromDay do ostatniego dnia kalendarza (autor 18.11.2026): prices, cena każdego przedmiotu zestawu (id z data/cosmetics.json).",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fromDay",
+            "prices"
+          ],
+          "properties": {
+            "fromDay": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 31
+            },
+            "prices": {
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 1
+              }
             }
           }
         }
@@ -195,7 +220,18 @@
         "questDish",
         "questLocked",
         "questsChest",
-        "questsNote"
+        "questsNote",
+        "setOnlyFull",
+        "sale",
+        "saleLead",
+        "saleSoon",
+        "buy",
+        "owned",
+        "bought",
+        "saleClosed",
+        "saleOwned",
+        "saleUnknown",
+        "salePoints"
       ],
       "properties": {
         "title": {
@@ -289,6 +325,41 @@
         },
         "questsNote": {
           "type": "string"
+        },
+        "setOnlyFull": {
+          "type": "string"
+        },
+        "sale": {
+          "type": "string"
+        },
+        "saleLead": {
+          "type": "string"
+        },
+        "saleSoon": {
+          "type": "string"
+        },
+        "buy": {
+          "type": "string"
+        },
+        "owned": {
+          "type": "string"
+        },
+        "bought": {
+          "type": "string",
+          "pattern": "\\{name\\}"
+        },
+        "saleClosed": {
+          "type": "string"
+        },
+        "saleOwned": {
+          "type": "string"
+        },
+        "saleUnknown": {
+          "type": "string"
+        },
+        "salePoints": {
+          "type": "string",
+          "pattern": "\\{price\\}"
         }
       }
     },

@@ -3617,6 +3617,7 @@ Autor 18.11.2026: „Niech te nagrody ze Szczodrych Godów kosmetyczne należą 
 2. **Zakup:** od 12 do 24 grudnia włącznie (czasu polskiego) okno kalendarza pokazuje każdy z trzech przedmiotów zestawu, którego postać nie ma, z przyciskiem „Kup” za Punkty Systemu. Tylko w tym oknie i tylko w tych dniach: Sklep Systemu dalej ich nie sprzedaje.
 3. Brakujący szczegół, cena: jak zwykłe przedmioty tego rodzaju w Sklepie Systemu, czyli ramka Szron 300, tło Szczodre Gody 150 i aura Śnieżyca 500 Punktów Systemu (razem 950).
 4. Ozdoby Obozu z 12. i 19. okienka (podłaźniczka i snopek) zostają nagrodą tych dni, bo stoją w Obozie tylko do 31.12.
+5. **Jak zbudowane (18.11.2026, makiety przyjęte w 1104, w grze od 0.4.39).** `calendar.sale` w `data/winter.json` (od którego dnia i ceny), `winterFull`, `winterSale` i `winterSaleBlock` w `src/engine/winter.js`, `POST /api/winter/buy` w `src/server/winter.js`. W 24. okienku zestaw idzie tylko przy `full` (żaden dzień przed dzisiejszym nie przepadł); w przeciwnym razie okienko ma `setLost`, a okno pokazuje zestaw przekreślony z dopiskiem „tylko za wszystkie 24 okienka”. Od 12. dnia pod przyciskiem odbioru jest sekcja „Zimowy zestaw za Punkty Systemu”: każdy przedmiot na portrecie postaci jak w Sklepie Systemu, z „Kup (300 PS)” albo „Masz”; zakup potwierdza to samo pytanie co w Sklepie, a Punkty Systemu schodzą jak w Sklepie (płatne na końcu). Przed 12. dniem w tym miejscu stoi jedna linijka, od kiedy. Na wersji testowej (WINTER test) dzień miesiąca jest dniem kalendarza, więc zakup działa tam od 12. dnia każdego miesiąca.
 
 ## Szczodre Gody: renifer, zimowa Osada i drugi Awatar (17.11.2026)
 
@@ -3790,6 +3791,17 @@ Motyw B, słowiańskie zaświaty: Mgliste Bagna Nawii (276–300), Łąki Welesa
    - **Gród Czarnoboga (341–345)**: Gród z czarnego kamienia, w którym Czarnobóg liczy wszystkie nieszczęścia świata. Pochodnie palą się tu czarnym płomieniem. Stwory: Strach (przód): sam strach, bez twarzy i bez kształtu. Kogo dopadnie, ten ucieka z pola walki na jeden ruch (traci ruch); Szczurzy Król (środek): kłąb szczurów zrośniętych ogonami, który słucha tylko Czarnoboga. Gryzie naraz wieloma pyskami (atakuje dwa razy); Czarny Płomień (tył): płomień z pochodni Czarnoboga, który nie daje światła, tylko je zjada. Parzy zimnem (oparzenie i wychłodzenie).
    - **Zamek Kościeja (346–350)**: Zamek z lodu i kości na samym dnie Nawii. Gdzieś w nim Kościej ukrył swoją śmierć: w igle, igłę w jajku, jajko w kaczce, kaczkę w zającu, a zająca w skrzyni. Stwory: Jajo Kościeja (przód): jajo, w którym Kościej schował igłę ze swoją śmiercią. Pilnuje się samo: toczy się po zamku, a z pęknięć sypie lodem (wychłodzenie); Kot Bajun (środek): olbrzymi kocur Kościeja, który siedzi na żelaznym słupie i opowiada bajki. Kto zaśnie przy jego mruczeniu, traci najbliższy ruch; Zaklęta Królewna (tył): królewna porwana przez Kościeja i zaklęta w lód. Walczy dla niego, bo nie pamięta, kim była, a jej ciosy mrożą (wychłodzenie).
 5. **Dalej:** grafiki w PixelLab (stwory, materiały, kręgi miejsc, karty krain i plansze walki, po cztery wersje na stronie ocen), okrzyki, liczby z symulacji trudności (`tools/difficulty-sim.mjs`), Poszukiwani w Osadzie i angielskie nazwy. Kolejność prac (1085 A): po czwartej ewolucji.
+
+## Jeźdźcy i chody czwartej ewolucji na stronie ocen (18.11.2026)
+
+1. **Autor: „chuj rysuj na raz i wrzucaj na stronę do ocen i później na stronie do ocen tez ewentualne chody jako kolejny krok”.** Jeźdźców czwartych form PixelLab rysuje teraz wszystkich naraz, jedno wywołanie (4 wersje) na postać, z samego portretu (`rider5-<forma>-<płeć>` w `art/prompts.json`). Dwie najlepsze wersje każdej postaci trafiają na stronę ocen jako wybór 1/2 (1105), a nie do czatu. Zasada w CLAUDE.md zmieniona.
+2. Przyjęci wcześniej: Burzyciel 2, Burzycielka 2, Nieśmiertelny 1 (`art/references/riders/`).
+3. **Chody:** klatki startowe 21 postaci wybrane z pierwszego wywołania (4 wersje), chody z PixelLab po dwie wersje, z każdej pary lepsza po przeglądzie klatka po klatce (stabilniejsza peleryna, włosy i aureola, bez kropek), drobinki do 3 pikseli usunięte. 16 chodów na stronie ocen (1106); Wieszcz, Wieszczka, Żniwiarz i Żniwiarka Dusz oraz Gromowładna rysują się jeszcze raz, bo pierwszy przebieg urwał się na Wieszczu.
+
+## Wersja 0.4.39 (18.11.2026): zimowy zestaw za pełne 24 dni albo za Punkty Systemu
+
+1. **Autor przyjął makiety 1104** (okno kalendarza z przekreślonym zestawem i sekcja zakupu od 12. dnia, na telefonie i na komputerze). Do gry wchodzi to, co opisuje „Szczodre Gody: zimowy zestaw tylko za pełne 24 dni albo za Punkty Systemu (18.11.2026)”: zestaw w 24. okienku tylko za wszystkie 24 okienka, a od 12 do 24 grudnia każdy przedmiot zestawu do kupienia za Punkty Systemu w oknie kalendarza (ramka Szron 300, tło Szczodre Gody 150, aura Śnieżyca 500).
+2. Nagrane kwestie narratora o zestawie w ostatnim okienku zostają: mówią o zestawie, a kto opuścił dzień, widzi w okienku przekreślony zestaw z dopiskiem.
 
 ## Wersja 0.4.38 (18.11.2026): co daje towar na Targowisku
 

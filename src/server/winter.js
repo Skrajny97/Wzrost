@@ -12,22 +12,26 @@ import {
   professionOpen,
   professionState,
   questPeriod,
+  cosmeticsOf,
   winterCalendar,
   winterCampPeriod,
   winterDecorations,
+  winterFull,
   winterQuestList,
   winterQuestsGain,
   winterQuestsTaken,
   winterReward,
+  winterSale,
+  winterSaleBlock,
   winterTaken,
   winterTakenState,
   winterToday,
 } from '../engine/index.js';
-import { atomically, sameVersion } from './atomic.js';
+import { atomically, characterChanged, sameVersion } from './atomic.js';
 import { bagPlaces, characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { winterTestOn } from './features.js';
-import { ApiError, json } from './http.js';
+import { ApiError, json, readJson } from './http.js';
 import { foreign } from './market.js';
 import { addTo } from './professions.js';
 import { potionsOf } from './professions-view.js';
@@ -58,12 +62,22 @@ function dayView(day) {
   return { ...day, potion, scroll, decoration, cosmetics };
 }
 
-// The calendar of the character's row at `now`, or null outside it.
+// The cosmetics the character owns (characters.cosmetics).
+const ownedOf = (row) => cosmeticsOf(JSON.parse(row.cosmetics ?? '{}'), content()).owned;
+
+// The calendar of the character's row at `now`, or null outside it, with
+// the winter set's sale (its pieces, prices and those owned, names too).
 function viewOf(row, now) {
   const today = winterNow(now);
   if (!today) return null;
   const calendar = winterCalendar(storedOf(row), today, row.level, content());
-  return { ...calendar, days: calendar.days.map(dayView) };
+  const sale = winterSale(today, ownedOf(row), content());
+  return {
+    ...calendar,
+    days: calendar.days.map(dayView),
+    sale: { ...sale, items: sale.items.map((item) => ({ ...item, name: content().cosmeticsById[item.id]?.name ?? item.id, kind: content().cosmeticsById[item.id]?.kind ?? null })) },
+    systemPoints: row.system_points,
+  };
 }
 
 // GET /api/winter: the calendar for its window (winter-calendar.js), null
@@ -98,6 +112,8 @@ export async function takeWinter(context) {
   if (winterTaken(stored, today.period).includes(today.day)) throw new ApiError(409, 'winter_taken', words().alreadyTaken);
   const { days, first } = winter().calendar;
   const reward = winterReward(days[today.day - first], row.level, content());
+  // The winter set only for all the windows taken (the author, 18.11.2026).
+  if (!winterFull(stored, today, content())) reward.cosmetics = [];
   if (reward.potion && reward.potion.count > potionRoom(player, reward.potion.id, context.now)) throw new ApiError(409, 'bag_full', words().bagFull);
 
   const potions = addTo('potions', reward.potion ? { [reward.potion.id]: reward.potion.count } : {});
@@ -131,6 +147,39 @@ export async function takeWinter(context) {
   const fresh = await loadPlayer(db, session.userId);
   const day = viewOf(fresh.row, context.now)?.days.find((one) => one.day === today.day) ?? null;
   return json({ winter: viewOf(fresh.row, context.now), reward: day, character: characterView(fresh, context.now) });
+}
+
+// POST /api/winter/buy { id }: a piece of the winter set bought for Punkty
+// Systemu in the calendar's window, from its sale's day to its last (the
+// author, 18.11.2026): among the cosmetics owned, the points paid, in one
+// statement that holds only while the character is as read and has the
+// points (the paid ones spent last, as the Sklep Systemu spends them).
+export async function buyWinterSet(context) {
+  const { session, player } = await requirePlayer(context);
+  const db = context.env.DB;
+  const row = player.row;
+  const body = await readJson(context.request);
+  const owned = ownedOf(row);
+  const block = winterSaleBlock(winterNow(context.now), body.id, owned, row.system_points, content());
+  if (block) {
+    const texts = words();
+    const say = { sale_closed: texts.saleClosed, sale_unknown: texts.saleUnknown, sale_owned: texts.saleOwned, sale_points: texts.salePoints.replace('{price}', String(block.price)) };
+    throw new ApiError(block.code === 'sale_unknown' ? 400 : 409, block.code, say[block.code]);
+  }
+  const price = winter().calendar.sale.prices[body.id];
+  const stored = JSON.parse(row.cosmetics ?? '{}');
+  const next = JSON.stringify({ ...stored, owned: [...new Set([...(Array.isArray(stored.owned) ? stored.owned : []), body.id])] });
+  const { meta } = await db
+    .prepare(
+      `UPDATE characters SET system_points = system_points - ?, system_points_paid = MAX(0, MIN(system_points_paid, system_points - ?)), cosmetics = ?, version = version + 1
+       WHERE id = ? AND version = ? AND system_points >= ?`,
+    )
+    .bind(price, price, next, row.id, row.version, price)
+    .run();
+  if (meta.changes !== 1) throw characterChanged();
+  const fresh = await loadPlayer(db, session.userId);
+  const name = content().cosmeticsById[body.id]?.name ?? body.id;
+  return json({ winter: viewOf(fresh.row, context.now), text: words().bought.replace('{name}', name), character: characterView(fresh, context.now) });
 }
 
 // The winter camp on the camp's board (1044.3; engine/winter.js): while it

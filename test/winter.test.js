@@ -145,10 +145,18 @@ describe('the calendar of Szczodre Gody (1044)', () => {
     assert.equal((await take(2)).status, 200);
   });
 
-  test('the 24th gives the winter set, which the shop does not sell and the character can wear', async () => {
+  test('the 24th gives the winter set for all the windows taken, which the shop does not sell and the character can wear', async () => {
     const buy = await call('POST', '/api/cosmetics/buy', { cookie, body: { id: 'frame-szron' } });
     assert.equal(buy.status, 409);
     assert.equal(buy.data.error.code, 'event_only');
+    // The 1st to the 23rd taken (the author, 18.11.2026: the set only for
+    // all 24 days).
+    const period = `2026-12`;
+    await (await db())
+      .prepare("UPDATE characters SET winter = ? WHERE name = 'Kolędniczka'")
+      .bind(JSON.stringify({ period, taken: Array.from({ length: 23 }, (_, index) => index + 1) }))
+      .run();
+    assert.equal((await look(24)).full, true);
     const before = await row();
     const answer = await take(24);
     assert.equal(answer.status, 200, JSON.stringify(answer.data));
@@ -163,6 +171,47 @@ describe('the calendar of Szczodre Gody (1044)', () => {
     assert.equal(worn.data.character.cosmetics.frame, 'frame-szron');
     // Owned once, not again.
     assert.equal((await call('POST', '/api/cosmetics/buy', { cookie, body: { id: 'frame-szron' } })).data.error.code, 'owned');
+  });
+
+  test('a day missed: the 24th gives its packs without the set, which the window sells from the 12th to the 24th', async () => {
+    const buy = (day, id) => call('POST', '/api/winter/buy', { cookie, now: noon(day), body: { id } });
+    await (await db()).prepare("UPDATE characters SET system_points = 900 WHERE name = 'Kolędniczka'").run();
+    // Before the 12th the sale is closed, and the set already lost on the 2nd.
+    const second = await look(2);
+    assert.equal(second.full, false);
+    assert.equal(second.days[23].setLost, true);
+    assert.deepEqual([second.sale.open, second.sale.fromDay], [false, 12]);
+    assert.deepEqual(
+      second.sale.items.map((item) => [item.id, item.price, item.owned, item.kind]),
+      [
+        ['frame-szron', 300, false, 'frame'],
+        ['bg-szczodre', 150, false, 'background'],
+        ['aura-sniezyca', 500, false, 'aura'],
+      ],
+    );
+    assert.equal((await buy(11, 'frame-szron')).data.error.code, 'sale_closed');
+    // From the 12th: bought for its price, once; a piece outside the set, or
+    // too few points, not.
+    const bought = await buy(12, 'aura-sniezyca');
+    assert.equal(bought.status, 200, JSON.stringify(bought.data));
+    assert.equal(bought.data.text, 'Kupione: Śnieżyca. Założysz to w Sklepie Systemu.');
+    assert.equal((await row()).system_points, 400);
+    assert.ok(bought.data.character.cosmetics.owned.includes('aura-sniezyca'));
+    assert.equal(bought.data.winter.sale.items.find((item) => item.id === 'aura-sniezyca').owned, true);
+    assert.equal((await buy(12, 'aura-sniezyca')).data.error.code, 'sale_owned');
+    assert.equal((await buy(12, 'frame-gold')).data.error.code, 'sale_unknown');
+    assert.equal((await buy(13, 'frame-szron')).status, 200);
+    const short = await buy(13, 'bg-szczodre');
+    assert.equal(short.status, 409);
+    assert.equal(short.data.error.message, 'Brakuje Ci Punktów Systemu: potrzeba 150.');
+    // The 24th: two packs, no set, nothing lost from what was bought.
+    const before = await row();
+    const last = await take(24);
+    assert.equal(last.status, 200, JSON.stringify(last.data));
+    assert.equal((await row()).card_packs - before.card_packs, 2);
+    assert.deepEqual(JSON.parse((await row()).cosmetics).owned.sort(), ['aura-sniezyca', 'frame-szron']);
+    // After the calendar, nothing more to buy.
+    assert.equal((await buy(25, 'bg-szczodre')).data.error.code, 'sale_closed');
   });
 });
 
