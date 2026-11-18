@@ -1,0 +1,14 @@
+{
+  "id": "omen-purse",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small figurine of hardened pale yellow candle wax shaped like a coin purse tied with a string, smooth rounded drips of wax, a soft warm candlelight glow, single inventory item icon",
+  "style": "src/client/art/materials/wax-lump.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02350643437957764
+  },
+  "images": 1
+}

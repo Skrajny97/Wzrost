@@ -1,0 +1,14 @@
+{
+  "id": "omen-candle",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a lit tallow candle in a small iron holder, drips of wax running down its side, a warm flame with a soft glow, single inventory item icon",
+  "style": "src/client/art/materials/cold-candle.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023352546999613446
+  },
+  "images": 1
+}
