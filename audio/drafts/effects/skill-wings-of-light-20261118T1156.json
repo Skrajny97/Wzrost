@@ -1,0 +1,13 @@
+{
+  "id": "skill-wings-of-light",
+  "payload": {
+    "text": "wings of pure light spreading: a great soft rush of feathered wings, a bright shimmering hum and a crackle of holy fire, fantasy, no music",
+    "duration_seconds": 1.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-wings-of-light-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-wings-of-light-20261118T1156-1.mp3"
+  ],
+  "credits": 68
+}

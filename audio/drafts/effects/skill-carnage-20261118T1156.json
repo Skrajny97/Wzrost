@@ -1,0 +1,13 @@
+{
+  "id": "skill-carnage",
+  "payload": {
+    "text": "a berserk warlord carving through a whole crowd: a savage battle roar, a rapid frenzy of heavy axe chops and crunching armour, shields cracking apart, brutal, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-carnage-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-carnage-20261118T1156-1.mp3"
+  ],
+  "credits": 72
+}

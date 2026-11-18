@@ -1,0 +1,13 @@
+{
+  "id": "skill-pillar-of-light",
+  "payload": {
+    "text": "a pillar of blinding light striking from the sky: a rising bright shimmering tone, a powerful humming beam and a burst of radiant energy, fantasy, no music",
+    "duration_seconds": 1.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-pillar-of-light-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-pillar-of-light-20261118T1156-1.mp3"
+  ],
+  "credits": 68
+}

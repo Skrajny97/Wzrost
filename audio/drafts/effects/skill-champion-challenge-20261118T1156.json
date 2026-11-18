@@ -1,0 +1,13 @@
+{
+  "id": "skill-champion-challenge",
+  "payload": {
+    "text": "a champion's challenge: a sword drawn with a long bright metallic ring, a single heavy stomp and a short fierce war cry, epic, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-champion-challenge-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-champion-challenge-20261118T1156-1.mp3"
+  ],
+  "credits": 60
+}

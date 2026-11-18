@@ -1,0 +1,13 @@
+{
+  "id": "skill-titan-shield",
+  "payload": {
+    "text": "a huge tower shield raised and planted: a heavy metallic clang, a deep resonant hum of a protective barrier and stone grinding, fantasy, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-titan-shield-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-titan-shield-20261118T1156-1.mp3"
+  ],
+  "credits": 60
+}

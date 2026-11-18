@@ -1,0 +1,13 @@
+{
+  "id": "skill-ball-lightning",
+  "payload": {
+    "text": "a ball of lightning hovering: a low buzzing electric hum, crackling sparks, then a sudden sharp electric discharge, fantasy, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-ball-lightning-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-ball-lightning-20261118T1156-1.mp3"
+  ],
+  "credits": 64
+}

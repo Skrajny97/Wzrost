@@ -1,0 +1,13 @@
+{
+  "id": "skill-glory-hurricane",
+  "payload": {
+    "text": "a sword whirling three times in a blazing spin: three fast swooshing spins with ringing steel and slicing hits, then a distant crowd roaring, fantasy, no music",
+    "duration_seconds": 1.9,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-glory-hurricane-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-glory-hurricane-20261118T1156-1.mp3"
+  ],
+  "credits": 76
+}

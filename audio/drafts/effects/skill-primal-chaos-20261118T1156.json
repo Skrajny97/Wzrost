@@ -1,0 +1,13 @@
+{
+  "id": "skill-primal-chaos",
+  "payload": {
+    "text": "the world returning to its beginning: fire roaring, ice shattering, lightning cracking and rocks crashing all at once into a huge chaotic explosion with a deep rumble, fantasy, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-primal-chaos-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-primal-chaos-20261118T1156-1.mp3"
+  ],
+  "credits": 80
+}

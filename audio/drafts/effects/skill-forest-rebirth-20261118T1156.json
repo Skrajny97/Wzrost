@@ -1,0 +1,13 @@
+{
+  "id": "skill-forest-rebirth",
+  "payload": {
+    "text": "a whole forest taking a deep breath: a long soft rush of wind through leaves, birds chirping, a warm magical shimmer and gentle chimes, fantasy, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-forest-rebirth-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-forest-rebirth-20261118T1156-1.mp3"
+  ],
+  "credits": 80
+}

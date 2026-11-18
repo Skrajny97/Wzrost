@@ -1,0 +1,13 @@
+{
+  "id": "skill-star-rain",
+  "payload": {
+    "text": "a handful of arrows shot into the sky: several quick bow twangs, then many arrows falling with sparkling twinkling whistles and a rapid patter of hits, fantasy, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-star-rain-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-star-rain-20261118T1156-1.mp3"
+  ],
+  "credits": 80
+}

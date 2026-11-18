@@ -1,0 +1,13 @@
+{
+  "id": "skill-breach",
+  "payload": {
+    "text": "one colossal axe swing smashing through a line of shields: a huge deep whoosh, a loud splintering crash of wood and metal and two bodies thudding down, brutal, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-breach-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-breach-20261118T1156-1.mp3"
+  ],
+  "credits": 60
+}

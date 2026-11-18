@@ -1,0 +1,13 @@
+{
+  "id": "skill-navia-mist",
+  "payload": {
+    "text": "a green poisonous mist of the underworld creeping out of the ground: a low eerie hiss, soft bubbling and distant ghostly whispers, dark, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-navia-mist-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-navia-mist-20261118T1156-1.mp3"
+  ],
+  "credits": 72
+}

@@ -1,0 +1,13 @@
+{
+  "id": "skill-soul-harvest",
+  "payload": {
+    "text": "a reaper's scythe harvesting souls: a long sharp whistling scythe swing, a cold slicing hit and ghostly wailing souls fading away, eerie, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-soul-harvest-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-soul-harvest-20261118T1156-1.mp3"
+  ],
+  "credits": 64
+}

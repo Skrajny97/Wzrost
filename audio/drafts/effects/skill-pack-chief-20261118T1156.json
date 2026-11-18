@@ -1,0 +1,13 @@
+{
+  "id": "skill-pack-chief",
+  "payload": {
+    "text": "a great white wolf summoned: a long proud howl, then running paws and a vicious snarling bite, wild, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-pack-chief-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-pack-chief-20261118T1156-1.mp3"
+  ],
+  "credits": 80
+}

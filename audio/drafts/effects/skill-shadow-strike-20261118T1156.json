@@ -1,0 +1,13 @@
+{
+  "id": "skill-shadow-strike",
+  "payload": {
+    "text": "a shadow strike: a soft dark whoosh of vanishing into shadow, a quick rustle behind and a swift sharp dagger stab, stealthy, close up, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-shadow-strike-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-shadow-strike-20261118T1156-1.mp3"
+  ],
+  "credits": 52
+}

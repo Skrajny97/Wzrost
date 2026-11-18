@@ -1,0 +1,13 @@
+{
+  "id": "skill-heaven-arrow",
+  "payload": {
+    "text": "a glowing arrow loosed from the heavens: a sharp bow twang, a bright rising whistle like a falling star and a piercing streak through several targets with crisp impacts, fantasy, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-heaven-arrow-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-heaven-arrow-20261118T1156-1.mp3"
+  ],
+  "credits": 64
+}

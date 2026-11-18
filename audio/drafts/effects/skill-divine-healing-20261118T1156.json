@@ -1,0 +1,13 @@
+{
+  "id": "skill-divine-healing",
+  "payload": {
+    "text": "divine healing falling like rain: a radiant angelic choir swell, soft shimmering chimes like falling drops of light and a gentle warm whoosh, fantasy, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-divine-healing-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-divine-healing-20261118T1156-1.mp3"
+  ],
+  "credits": 80
+}

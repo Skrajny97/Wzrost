@@ -1,0 +1,13 @@
+{
+  "id": "skill-ice-heart",
+  "payload": {
+    "text": "a heart turning to ice: a single deep heartbeat, then a cold crystalline freezing crackle hardening into icy armour with a glassy chime, fantasy, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-ice-heart-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-ice-heart-20261118T1156-1.mp3"
+  ],
+  "credits": 60
+}

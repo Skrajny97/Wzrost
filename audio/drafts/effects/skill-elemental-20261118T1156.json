@@ -1,0 +1,13 @@
+{
+  "id": "skill-elemental",
+  "payload": {
+    "text": "an elemental rising: a whoosh of fire, crackling ice, a spark of lightning and grinding stone merging into a deep magical rumble, fantasy, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-elemental-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-elemental-20261118T1156-1.mp3"
+  ],
+  "credits": 72
+}

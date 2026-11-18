@@ -1,0 +1,13 @@
+{
+  "id": "skill-perun-storm",
+  "payload": {
+    "text": "a thunderstorm splitting the sky: a deafening thunderclap, lightning bolts leaping from target to target with fast electric zaps and a long rolling thunder, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-perun-storm-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-perun-storm-20261118T1156-1.mp3"
+  ],
+  "credits": 80
+}

@@ -1,0 +1,13 @@
+{
+  "id": "skill-bear-call",
+  "payload": {
+    "text": "a huge brown bear stepping out of the thicket: branches snapping, heavy footsteps and a deep thunderous roar as it rises on its hind legs, wild, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-bear-call-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-bear-call-20261118T1156-1.mp3"
+  ],
+  "credits": 80
+}

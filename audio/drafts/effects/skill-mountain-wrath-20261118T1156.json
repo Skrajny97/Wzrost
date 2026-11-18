@@ -1,0 +1,13 @@
+{
+  "id": "skill-mountain-wrath",
+  "payload": {
+    "text": "a giant shield slammed down like an avalanche: a colossal booming impact, the ground splitting with a long cracking rumble, boulders crashing and rolling, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-mountain-wrath-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-mountain-wrath-20261118T1156-1.mp3"
+  ],
+  "credits": 80
+}

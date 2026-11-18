@@ -1,0 +1,13 @@
+{
+  "id": "skill-eternal-night",
+  "payload": {
+    "text": "night falling in the middle of the day: a deep ominous drone swallowing all sound, a cold wind, then a sudden sharp blade slash from the darkness, dark fantasy, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-eternal-night-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-eternal-night-20261118T1156-1.mp3"
+  ],
+  "credits": 80
+}

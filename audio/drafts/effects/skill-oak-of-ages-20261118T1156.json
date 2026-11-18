@@ -1,0 +1,13 @@
+{
+  "id": "skill-oak-of-ages",
+  "payload": {
+    "text": "an ancient giant oak rising from the ground: the earth rumbling, roots tearing out, deep creaking and groaning wood and leaves rustling in the wind, fantasy, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-oak-of-ages-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-oak-of-ages-20261118T1156-1.mp3"
+  ],
+  "credits": 80
+}

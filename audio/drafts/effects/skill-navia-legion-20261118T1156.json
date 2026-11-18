@@ -1,0 +1,13 @@
+{
+  "id": "skill-navia-legion",
+  "payload": {
+    "text": "undead knights rising from cracked earth: the ground splitting, heavy rusty armour clanking, bones rattling, swords drawn and a cold ghostly wind, eerie, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-navia-legion-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-navia-legion-20261118T1156-1.mp3"
+  ],
+  "credits": 80
+}

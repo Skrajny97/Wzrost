@@ -1,0 +1,13 @@
+{
+  "id": "skill-scythe-dance",
+  "payload": {
+    "text": "a scythe whirling in a deadly dance: several fast circling whooshes of a long blade with sharp metallic swishes and cutting hits, dark fantasy, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-scythe-dance-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-scythe-dance-20261118T1156-1.mp3"
+  ],
+  "credits": 72
+}

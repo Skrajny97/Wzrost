@@ -1,0 +1,13 @@
+{
+  "id": "skill-ice-eternity",
+  "payload": {
+    "text": "two bodies locked in eternal ice: a cold rising wind, fast crackling and creaking ice growing, then two hard crystalline crunches ringing like glass, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-ice-eternity-20261118T1156-0.mp3",
+    "audio/drafts/effects/skill-ice-eternity-20261118T1156-1.mp3"
+  ],
+  "credits": 72
+}
