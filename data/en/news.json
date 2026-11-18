@@ -1092,6 +1092,10 @@
     "0.4.36": {
       "title": "Version 0.4.36",
       "body": "- In the Guild Exchange you can also trade fish, crops and dishes: for resources, for gold or for other goods from the Pantry.\n- When putting something up on the Marketplace, tap a herb, potion, material, mineral, scroll or Pantry good to see its full description."
+    },
+    "0.4.37": {
+      "title": "Version 0.4.37",
+      "body": "- All over the Marketplace, tapping a good unfolds its full description: in players' offers, in your offers, in “To collect” and in the Register."
     }
   }
 }
