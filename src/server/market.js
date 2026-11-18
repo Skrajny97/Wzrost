@@ -34,6 +34,7 @@ import {
   listBlock,
   materialPrice,
   materialView,
+  mealBonusText,
   merchantPrice,
   merchantStock,
   minimumBid,
@@ -75,6 +76,27 @@ const changed = () => new ApiError(409, 'character_changed', 'Coś zmieniło si�
 // A batch that fails as a whole unless its assertion holds (atomic.js).
 const atomically = (db, statements) => atomicBatch(db, statements, changed);
 
+// What a good goes into (the author, 18.11.2026: „MIAŁO BYĆ CO DAJE TO A
+// NIE OPIS”): the potions a herb is brewed into and the dishes a herb, a
+// fish or a crop is cooked into, by name.
+const ingredientOf = (key) => [
+  ...content()
+    .potions.filter((potion) => potion.herbs?.[key])
+    .map((potion) => potion.name),
+  ...Object.values(content().dishesById)
+    .filter((dish) => dish.ingredients?.[key])
+    .map((dish) => dish.name),
+];
+const rarityName = (id) => content().raritiesById[id]?.name ?? id;
+// What a gem or an ore of Górnictwo gives: a gem set in an item raises each
+// of its values by its bonus and gives jewellery its rarity; an ore sets
+// the jewellery of its rarities.
+function mineralEffect(mineral) {
+  if (!mineral) return null;
+  if (mineral.kind === 'gem') return t('Oprawiony w przedmiot podnosi o {percent}% każdą jego wartość. Biżuteria z niego ma rzadkość: {rarity}.', { percent: Math.round(mineral.setBonus * 100), rarity: rarityName(mineral.rarity) });
+  return t('Kruszec na oprawy biżuterii: {rarities}.', { rarities: (mineral.for ?? []).map(rarityName).join(', ') });
+}
+
 // A stack's goods by kind and key, as a parcel or an offer shows them, with
 // what its card tells (the author: "bym mogl kliknac przedmiot i go
 // sprawdzić u kupca"): its description, what the scrapper pays for a piece
@@ -96,7 +118,7 @@ function goodsView(kind, key, count, item) {
   }
   if (kind === 'herb') {
     const herb = content().herbsById[key];
-    return { kind, key, count, name: herb?.name ?? key, description: herb?.description, scrap: herb?.price, gatherLevel: herb?.level };
+    return { kind, key, count, name: herb?.name ?? key, description: herb?.description, uses: ingredientOf(key), scrap: herb?.price, gatherLevel: herb?.level };
   }
   if (kind === 'potion') {
     const potion = content().potionsById[key];
@@ -104,13 +126,23 @@ function goodsView(kind, key, count, item) {
   }
   if (kind === 'mineral') {
     const mineral = content().mineralsById[key];
-    return { kind, key, count, name: mineral?.name ?? key, rarity: mineral && (mineral.rarity ?? mineral.for[0]), description: mineral?.description, scrap: mineral?.price, mineLevel: mineral?.level };
+    return { kind, key, count, name: mineral?.name ?? key, rarity: mineral && (mineral.rarity ?? mineral.for[0]), description: mineral?.description, effect: mineralEffect(mineral), scrap: mineral?.price, mineLevel: mineral?.level };
   }
   // A good of the Spiżarnia: a fish, a crop or a dish, which the innkeeper
   // Zbylut buys at its price.
   if (kind === 'pantry') {
     const good = content().pantryById[key];
-    return { kind, key, count, name: good?.name ?? key, group: good?.group, description: good?.description, scrap: good?.price, ...(good?.bonus && { bonus: good.bonus }) };
+    // A dish: what its meal gives; a fish or a crop: the dishes it goes into.
+    return {
+      kind,
+      key,
+      count,
+      name: good?.name ?? key,
+      group: good?.group,
+      description: good?.description,
+      scrap: good?.price,
+      ...(good?.group === 'dish' ? { bonus: mealBonusText(good, content()) } : { uses: ingredientOf(key) }),
+    };
   }
   // A scroll (1061): the scrapper buys none.
   if (kind === 'scroll') {

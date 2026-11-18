@@ -58,6 +58,13 @@ describe('the Spiżarnia on the Targowisko and in the Wymiana', () => {
       browsed.offers.map((one) => [one.goods.kind, one.goods.key, one.goods.name, one.goods.group]),
       [['pantry', 'pea-soup', 'Grochówka', 'dish']],
     );
+    // What it gives: the dish its meal, not only its description (the
+    // author: „MIAŁO BYĆ CO DAJE TO A NIE OPIS”).
+    assert.match(browsed.offers[0].goods.bonus, /^\+\d+% /);
+    const sellable = (await call('GET', '/api/market', { cookie: cookies.Rybaczka })).data.market.sellable.stacks;
+    const roach = sellable.find((one) => one.kind === 'pantry' && one.key === 'roach');
+    assert.ok(roach.uses.length > 0, JSON.stringify(roach));
+    assert.equal(roach.bonus, undefined);
     const bought = await market('Kucharz', 'buy', { offerId: offer.id });
     assert.equal(bought.status, 200, JSON.stringify(bought.data));
     const collected = await market('Kucharz', 'collect', {});

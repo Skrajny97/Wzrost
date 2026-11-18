@@ -174,9 +174,13 @@ function goodsFacts(goods) {
     h(
       'ul',
       { class: 'item-properties' },
-      // The innkeeper Zbylut, not the scrapper, buys the Spiżarnia's goods;
-      // a dish says what its meal does.
-      goods.bonus && h('li', { text: t('Posiłek: {bonus} przez 4 godziny wypraw.', { bonus: goods.bonus }) }),
+      // What it gives first: a dish's meal, a gem's or an ore's use, what a
+      // herb, a fish or a crop goes into (the author, 18.11.2026: „MIAŁO
+      // BYĆ CO DAJE TO A NIE OPIS”). The innkeeper Zbylut, not the
+      // scrapper, buys the Spiżarnia's goods.
+      goods.bonus && h('li', { class: 'goods-gives', text: t('Posiłek: {bonus} przez 4 godziny wypraw.', { bonus: goods.bonus }) }),
+      goods.effect && h('li', { class: 'goods-gives', text: goods.effect }),
+      goods.uses?.length > 0 && h('li', { class: 'goods-gives', text: t('Składnik: {list}.', { list: goods.uses.join(', ') }) }),
       goods.scrap !== undefined &&
         goods.scrap !== null &&
         h('li', { class: 'item-price', text: goods.kind === 'pantry' ? t('U karczmarza: {gold} złota za sztukę', { gold: formatDecimal(goods.scrap) }) : t('U złomiarza: {gold} złota za sztukę', { gold: formatDecimal(goods.scrap) }) }),

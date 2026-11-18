@@ -1375,6 +1375,11 @@
       "id": "0.4.37",
       "title": "Wersja 0.4.37",
       "body": "- Na całym Targowisku stuknięcie w towar rozwija jego pełny opis: w ofertach graczy, w Twoich ofertach, w „Do odebrania” i w Rejestrze."
+    },
+    {
+      "id": "0.4.38",
+      "title": "Wersja 0.4.38",
+      "body": "- Karta towaru na Targowisku najpierw mówi, co daje: potrawa swój posiłek, kamień premię po oprawieniu, a zioło, ryba i plon, do jakich mikstur i potraw się nadają."
     }
   ]
 }
