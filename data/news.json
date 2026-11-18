@@ -1370,6 +1370,11 @@
       "id": "0.4.36",
       "title": "Wersja 0.4.36",
       "body": "- W Wymianie w Gildii wymienisz też ryby, plony i potrawy: za zasoby, za złoto albo za inne towary ze Spiżarni.\n- Przy wystawianiu na Targowisku stuknij w zioło, miksturę, materiał, minerał, zwój albo towar ze Spiżarni, a zobaczysz jego pełny opis."
+    },
+    {
+      "id": "0.4.37",
+      "title": "Wersja 0.4.37",
+      "body": "- Na całym Targowisku stuknięcie w towar rozwija jego pełny opis: w ofertach graczy, w Twoich ofertach, w „Do odebrania” i w Rejestrze."
     }
   ]
 }
