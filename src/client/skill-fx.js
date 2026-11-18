@@ -1068,8 +1068,8 @@ const ICE_PRISON =
 // The Lodowe serce: a heart of faceted ice.
 const ICE_HEART =
   '<svg viewBox="-20 -18 40 36" aria-hidden="true">' +
-  '<path d="M0 16C-13 7 -18 -1 -16 -8C-14 -15 -5 -16 0 -9C5 -16 14 -15 16 -8C18 -1 13 7 0 16Z" fill="#d6f4ff" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/>' +
-  '<path d="M0 -9L-4 0L0 16M-4 0L-14 -6M-4 0L4 2L12 -6M4 2L0 16" fill="none" stroke="#8fd3ff" stroke-width="1.1" stroke-linejoin="round"/>' +
+  '<path d="M0 16C-13 7 -18 -1 -16 -8C-14 -15 -5 -16 0 -9C5 -16 14 -15 16 -8C18 -1 13 7 0 16Z" fill="#8fd8ff" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/>' +
+  '<path d="M0 -9L-4 0L0 16M-4 0L-14 -6M-4 0L4 2L12 -6M4 2L0 16" fill="none" stroke="#2f86c2" stroke-width="1.1" stroke-linejoin="round"/>' +
   '<path d="M-11 -9L-7 -12" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/></svg>';
 
 // The Wyłom's rift: a molten seam opening down a foe from head to feet.
@@ -10876,7 +10876,7 @@ export function skillEffects(kit) {
     const art = artOf(card);
     const figure = figureOf(art);
     const box = boxOf(card);
-    const chest = figurePoint(card, 0.45);
+    const chest = figurePoint(card, 0.62);
     const size = Math.round(Math.max(22, figure * 0.42));
     const heart = spark('fx-iceheart', chest, { '--size': `${size}px` });
     heart.innerHTML = ICE_HEART;
@@ -10964,7 +10964,7 @@ export function skillEffects(kit) {
     ground.append(roots);
     drawLines(roots, 560, 700);
     animate(roots, [{ opacity: 1 }, { opacity: 1, offset: 0.72 }, { opacity: 0 }], { duration: 2200, easing: 'ease-in' }).then(() => roots.remove());
-    for (let k = 0; k < 5; k++) leaves({ x: width * (0.1 + k * 0.2), y: 14 }, { count: 4, reach: 30, delay: 700 + k * 70 });
+    for (let k = 0; k < 5; k++) leaves({ x: width * (0.1 + k * 0.2), y: 34 }, { count: 4, reach: 26, delay: 700 + k * 70 });
     party.forEach((member, index) => {
       rimGlow(member.card, color, 700, 1000 + index * 80);
       leaves(figurePoint(member.card, 0.3), { count: 3, reach: 20, delay: 1000 + index * 80 });
@@ -11037,7 +11037,7 @@ export function skillEffects(kit) {
       flash('#b6e388', 0.14, 420);
       groundRing(event.actor, color, { duration: 900, scale: 1.4 });
       const width = stageWidth();
-      for (let k = 0; k < 5; k++) leaves({ x: width * (0.1 + k * 0.2), y: 12 }, { count: 4, reach: 34, delay: k * 60 });
+      for (let k = 0; k < 5; k++) leaves({ x: width * (0.1 + k * 0.2), y: 34 }, { count: 4, reach: 26, delay: k * 60 });
     }
     const middle = art.x + art.width / 2;
     sprout(card, { x: middle - figure * 0.36, size: Math.min(figure * 0.9, box.height * 0.6), delay: lead });
