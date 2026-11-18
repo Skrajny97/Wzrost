@@ -15,7 +15,7 @@
 // The Osada's place screen mounts the panel once and keeps it while it
 // redraws itself, so a redraw never asks the server again.
 
-import { herbSprite, mineralSprite, potionSprite, scrollArt } from '../art.js';
+import { herbSprite, mineralSprite, pantrySprite, potionSprite, scrollArt } from '../art.js';
 import { ALL, BIDDING, FOR_ME, categoriesOf, goodsCategory, inCategory, shownCategory } from '../categories.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
@@ -49,8 +49,11 @@ const NO_OFFERS = {
   [BIDDING]: 'Nie licytujesz teraz żadnej oferty.',
 };
 const KIND_NAMES = { herb: 'zioło', potion: 'mikstura', material: 'materiał', part: 'część', mineral: 'minerał', scroll: 'zwój' };
+// A good of the Spiżarnia by what it is (the author, 18.11.2026: fish,
+// crops and dishes on the Targowisko too).
+const PANTRY_KINDS = { fish: 'ryba', crop: 'plon', dish: 'potrawa' };
 // The same kinds as the filters name them, in their order.
-const KIND_GROUPS = { herb: 'Zioła', potion: 'Mikstury', material: 'Materiały', part: 'Części', mineral: 'Minerały', scroll: 'Zwoje' };
+const KIND_GROUPS = { herb: 'Zioła', potion: 'Mikstury', material: 'Materiały', part: 'Części', mineral: 'Minerały', scroll: 'Zwoje', pantry: 'Spiżarnia' };
 // The kinds of goods as tabs of their own under "Wszystko", items first (a
 // player's remark, 11.11.2026: "osobne zakładki na mikstury, zioła i
 // materiały"), each with what it holds when it holds nothing.
@@ -63,6 +66,8 @@ const KIND_TABS = [
   ['part', 'Części'],
   // The scrolls (1061): the Kowadło's two and the Zwój Niepamięci.
   ['scroll', 'Zwoje'],
+  // The Spiżarnia's fish, crops and dishes.
+  ['pantry', 'Spiżarnia'],
 ];
 const NO_KIND = {
   item: 'Nikt nie wystawia teraz przedmiotów.',
@@ -72,6 +77,7 @@ const NO_KIND = {
   mineral: 'Nikt nie wystawia teraz minerałów.',
   part: 'Nikt nie wystawia teraz części.',
   scroll: 'Nikt nie wystawia teraz zwojów.',
+  pantry: 'Nikt nie wystawia teraz ryb, plonów ani potraw.',
 };
 // The order of the offers (a player's remark, 11.11.2026: "od najtańszych i
 // od najdroższych"): the soonest to end first, as before, or by the price
@@ -101,6 +107,8 @@ function saveSort(sort) {
 }
 const REASONS = { won: 'wygrana licytacja', bought: 'kupione', returned: 'wraca do Ciebie', sold: 'zapłata za sprzedaż' };
 const kindName = (kind) => (KIND_NAMES[kind] ? t(KIND_NAMES[kind]) : null);
+// What a stack is: its kind, or what a good of the Spiżarnia is.
+const goodsKind = (goods) => (goods.kind === 'pantry' ? t(PANTRY_KINDS[goods.group] ?? 'Spiżarnia') : kindName(goods.kind));
 const rarityOf = (id) => state.content?.rarities?.find((rarity) => rarity.id === id);
 
 // What is left until `at`: "2 dni 5 h", "5 h 12 min", "12 min".
@@ -121,6 +129,7 @@ export function stackArt(goods, size = 24) {
   if (goods.kind === 'part') return materialIcon(goods.key, size);
   if (goods.kind === 'mineral') return mineralSprite(goods.key) ?? icon('ore', { size });
   if (goods.kind === 'scroll') return scrollArt(goods.key, size);
+  if (goods.kind === 'pantry') return pantrySprite(goods.key) ?? icon('fish', { size });
   return icon('coin', { size });
 }
 
@@ -137,7 +146,7 @@ function stackLine(goods, { count = true, meta } = {}) {
       'span',
       { class: 'item-summary' },
       h('span', { class: 'item-name', vars: rarity ? { '--rarity': rarity.color } : {}, text: name }),
-      goods.kind !== 'gold' && h('span', { class: 'item-meta', text: meta ?? [kindName(goods.kind), rarity?.name].filter(Boolean).join(' · ') }),
+      goods.kind !== 'gold' && h('span', { class: 'item-meta', text: meta ?? [goodsKind(goods), rarity?.name].filter(Boolean).join(' · ') }),
     ),
   );
 }
@@ -151,6 +160,7 @@ function owned(goods) {
   if (goods.kind === 'part') return character.crafting?.parts.find((one) => one.id === goods.key)?.count ?? 0;
   if (goods.kind === 'mineral') return character.minerals?.find((one) => one.id === goods.key)?.count ?? 0;
   if (goods.kind === 'scroll') return character.scrollGoods?.find((one) => one.id === goods.key)?.count ?? 0;
+  if (goods.kind === 'pantry') return character.pantry?.find((one) => one.id === goods.key)?.count ?? 0;
   return 0;
 }
 
@@ -174,14 +184,19 @@ function goodsSheet(goods, actions = null) {
           'div',
           {},
           h('h2', { class: 'item-title', vars: colour, text: goods.name }),
-          h('p', { class: 'item-meta', text: [kindName(goods.kind), rarity?.name].filter(Boolean).join(' · ') }),
+          h('p', { class: 'item-meta', text: [goodsKind(goods), rarity?.name].filter(Boolean).join(' · ') }),
         ),
       ),
       goods.description && h('p', { class: 'sheet-text', text: goods.description }),
       h(
         'ul',
         { class: 'item-properties' },
-        goods.scrap !== undefined && goods.scrap !== null && h('li', { class: 'item-price', text: t('U złomiarza: {gold} złota za sztukę', { gold: formatDecimal(goods.scrap) }) }),
+        // The innkeeper Zbylut, not the scrapper, buys the Spiżarnia's goods;
+        // a dish says what its meal does.
+        goods.bonus && h('li', { text: t('Posiłek: {bonus} przez 4 godziny wypraw.', { bonus: goods.bonus }) }),
+        goods.scrap !== undefined &&
+          goods.scrap !== null &&
+          h('li', { class: 'item-price', text: goods.kind === 'pantry' ? t('U karczmarza: {gold} złota za sztukę', { gold: formatDecimal(goods.scrap) }) : t('U złomiarza: {gold} złota za sztukę', { gold: formatDecimal(goods.scrap) }) }),
         goods.gatherLevel && h('li', { text: t('Do zebrania w Zielarstwie od poziomu {level}.', { level: goods.gatherLevel }) }),
         goods.mineLevel && h('li', { text: t('Do wydobycia w Górnictwie od poziomu {level}.', { level: goods.mineLevel }) }),
         h('li', { text: t('Masz: {count} szt.', { count: formatNumber(owned(goods)) }) }),

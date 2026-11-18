@@ -637,6 +637,15 @@ document.addEventListener('visibilitychange', () => {
 window.addEventListener('hashchange', () => {
   if (Date.now() - versionLookedAt > 60000) reloadIfNewer();
 });
+// A page left on the chat all along looks every two minutes too, while
+// nothing is typed there (the author, 18.11.2026: a moderator's phone had no
+// „Administracja” tab an hour after 0.4.32 brought it, its page still the
+// one from before).
+setInterval(() => {
+  if (document.visibilityState !== 'visible' || !/^#\/(czat|spolecznosc)/.test(location.hash)) return;
+  const typing = [...document.querySelectorAll('input[type="text"], input:not([type]), textarea')].some((field) => field.value.trim() !== '');
+  if (!typing) reloadIfNewer();
+}, 120000);
 
 // Coming back to the page (for example after the hunt timer ran out) refreshes
 // the character, so timers and HP follow the server again.

@@ -901,7 +901,7 @@
           "description": "Wyszukiwanie w ofertach graczy (uwagi gracza przekazane przez autora 11.11.2026: „za chwilę każdy będzie wystawiał coś i strasznie ciężko będzie coś znaleźć”): serwer filtruje i układa wszystkie otwarte oferty, a strona dostaje page ofert naraz; „Pokaż kolejne” dokłada następne page, najwyżej do most.",
           "properties": { "page": { "type": "integer", "minimum": 1 }, "most": { "type": "integer", "minimum": 1 } }
         },
-        "kinds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["item", "herb", "potion", "material", "part", "mineral", "scroll"] } },
+        "kinds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["item", "herb", "potion", "material", "part", "mineral", "scroll", "pantry"] } },
         "reputation": { "type": "object", "additionalProperties": false, "required": ["goldPerPointPerLevel", "daily"], "properties": { "goldPerPointPerLevel": { "type": "number", "exclusiveMinimum": 0 }, "daily": { "type": "integer", "minimum": 0 } } },
         "merchant": {
           "type": "object",
