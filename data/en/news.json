@@ -1096,6 +1096,10 @@
     "0.4.37": {
       "title": "Version 0.4.37",
       "body": "- All over the Marketplace, tapping a good unfolds its full description: in players' offers, in your offers, in “To collect” and in the Register."
+    },
+    "0.4.38": {
+      "title": "Version 0.4.38",
+      "body": "- A good's card on the Marketplace first says what it gives: a dish its meal, a gem its bonus once set, and a herb, fish or crop which potions and dishes it goes into."
     }
   }
 }
