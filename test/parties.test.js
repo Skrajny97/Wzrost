@@ -568,7 +568,7 @@ describe('a leader left alone as the party sets out', () => {
 // party, after one question, and go back to their own settings after it;
 // before, they kept the character out of every party until told to stay.
 describe('a Drużyna and the companions from the Kwatery', () => {
-  const { call, db, signUp } = useServer({ PROFESSIONS: 'on', SETTLEMENT: 'on' });
+  const { call, db, signUp } = useServer({ PROFESSIONS: 'on', SETTLEMENT: 'on', LABYRINTH: 'on' });
   const cookies = {};
   async function player(login, name) {
     ({ cookie: cookies[login] } = await signUp(login));
@@ -602,6 +602,7 @@ describe('a Drużyna and the companions from the Kwatery', () => {
     const stored = async (name) => JSON.parse((await (await db()).prepare('SELECT settlement FROM characters WHERE name = ?').bind(name).first()).settlement).companions[0];
     const card = async (login) => (await as(login, 'GET', '/api/settlement')).data.settlement.companions.hired[0];
     const portalCompanions = async (login) => (await as(login, 'GET', '/api/portals')).data.portals.companions;
+    const labyrinthCompanions = async (login) => (await as(login, 'GET', '/api/labyrinth')).data.labyrinth.fighters.filter((one) => one.companion).map((one) => one.name);
     const alone = async (login) => {
       assert.equal((await as(login, 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
       const went = (await hunts()).find((one) => one.name === (login === 'druh' ? 'Druh' : 'Lider')).options.companions?.map((one) => one.id) ?? [];
@@ -612,7 +613,7 @@ describe('a Drużyna and the companions from the Kwatery', () => {
     // the Drużyna screen has its words. None for Lider, whose companion was
     // told to stay.
     const question = {
-      text: `${companion.name} zostanie w Kwaterach, póki jesteś w drużynie: nie zdobędzie XP ani relacji z wypraw.`,
+      text: `${companion.name} zostanie w Kwaterach na czas wypraw, póki jesteś w drużynie: nie zdobędzie z nich XP ani relacji. Do Labiryntu i Portali pójdzie z Tobą jak zawsze.`,
       make: { title: 'Założyć drużynę?', confirm: 'Załóż' },
       join: { title: 'Dołączyć do drużyny?', confirm: 'Dołącz' },
     };
@@ -624,16 +625,20 @@ describe('a Drużyna and the companions from the Kwatery', () => {
     const joined = await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
     assert.equal(joined.status, 200, JSON.stringify(joined.data));
     assert.equal(joined.data.companions, null);
-    // In the party the companion stays in the Kwatery: no exploration, nor
-    // a portal, takes it, and it is not sent out; the card says it goes
-    // again after the party. The player's own setting is as it was.
+    // In the party the companion stays in the Kwatery for the explorations:
+    // no exploration takes it, and it is not sent out; the portals and the
+    // Labirynt, the character's own, take it all the same (players, 18.11:
+    // no leaving the party for them); the card says so, and that it goes on
+    // the explorations again after the party. The player's own setting is
+    // as it was.
     assert.deepEqual(await alone('druh'), []);
-    assert.deepEqual(await portalCompanions('druh'), []);
+    assert.deepEqual(await portalCompanions('druh'), [companion.name]);
+    assert.deepEqual(await labyrinthCompanions('druh'), [companion.name]);
     const back = await stay('druh', companion, false);
     assert.deepEqual([back.status, back.data.error.code], [409, 'in_party']);
     let view = await card('druh');
     assert.deepEqual([view.stay.stays, view.stay.action], [true, null]);
-    assert.match(view.stay.text, /^Póki postać jest w drużynie, towarzysz(ka)? zostaje w kwaterze: drużyna poluje bez towarzyszy z Kwater\. Po wyjściu z drużyny sam(a)? wróci na wyprawy\.$/);
+    assert.match(view.stay.text, /^Póki postać jest w drużynie, towarzysz(ka)? zostaje w kwaterze na czas wypraw: drużyna poluje bez towarzyszy z Kwater\. Do Labiryntu i Portali idzie z postacią jak zawsze, a po wyjściu z drużyny sam(a)? wróci też na wyprawy\.$/);
     assert.equal((await stored('Druh')).stays, undefined);
     // Lider's companion, told to stay, has the words without the return.
     assert.equal((await card('lider')).stay.text.endsWith('drużyna poluje bez towarzyszy z Kwater.'), true);

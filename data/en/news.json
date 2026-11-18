@@ -1068,6 +1068,10 @@
     "0.4.30": {
       "title": "Version 0.4.30",
       "body": "- Your pet now shows above the character frame: the frame no longer hides it."
+    },
+    "0.4.31": {
+      "title": "Version 0.4.31",
+      "body": "- Your companions from the Quarters go with you into the Labyrinth and the Portals even while you are in a party. No more leaving the party for them."
     }
   }
 }
