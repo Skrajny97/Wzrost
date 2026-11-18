@@ -3761,6 +3761,11 @@ Najpierw Tier X przedmiotów (potrzebny najlepszej postaci za około dwa tygodni
 
 Motyw B, słowiańskie zaświaty: Mgliste Bagna Nawii (276–300), Łąki Welesa (301–325) i Kraina bez Słońca (326–350). Karta Mglistych Bagien Nawii: szkic D. Dalej: miejsca, stwory, elity i czempioni na stronie ocen (mało ptaków), potem grafiki.
 
+## Wersja 0.4.30 (18.11.2026): chowańce nad ramką postaci
+
+1. **Chowaniec nad ramką.** Gracz (poz. 47): z ramką postaci Chowańca Lisa w ogóle nie widać, bo przykrywa go ramka. Autor: „niech chowańce będą ponad ramką”. Chowaniec stoi dalej w tym samym miejscu okna ramki, ale jest rysowany nad ramką, na Postaci, w podglądach Sklepu Systemu, na karcie gracza i przy oprawianiu kamieni (`portraitLayers` w `src/client/cosmetics.js`). Na Postaci z widocznymi miejscami na przedmioty jest przygaszony jak cała postać.
+2. **Grafika czwartych form w plikach gry** („Czwarta ewolucja klas”, punkt 9): portrety z odcieniami skóry i sześć przyjętych chodów. Gra ich jeszcze nie pokazuje, bo czwarta ewolucja jest wyłączona.
+
 ## Wersja 0.4.29 (18.11.2026): poprawiona twarz Uzdrowiciela, czwarta ewolucja w kodzie
 
 1. **Twarz Uzdrowiciela (1097 B).** Autor: „twarz Uzdrowiciela wygląda nienaturalne trzeba ją lekko poprawić”. PixelLab narysował od nowa samą twarz portretu mężczyzny (139 pikseli, reszta portretu bez zmian), autor wybrał wersję B. Obrys twarzy w `tools/evolution-tones.json` sięga teraz do x 53 i y 34, więc wszystkie osiem odcieni skóry obejmuje całą nową twarz.

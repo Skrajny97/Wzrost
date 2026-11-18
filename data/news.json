@@ -1335,6 +1335,11 @@
       "id": "0.4.29",
       "title": "Wersja 0.4.29",
       "body": "- Uzdrowiciel (mężczyzna) ma na portrecie poprawioną twarz, we wszystkich odcieniach skóry."
+    },
+    {
+      "id": "0.4.30",
+      "title": "Wersja 0.4.30",
+      "body": "- Chowaniec jest teraz widoczny nad ramką postaci: ramka już go nie zasłania."
     }
   ]
 }

@@ -1064,6 +1064,10 @@
     "0.4.29": {
       "title": "Version 0.4.29",
       "body": "- The Healer (man) has a corrected face on his portrait, in every skin tone."
+    },
+    "0.4.30": {
+      "title": "Version 0.4.30",
+      "body": "- Your pet now shows above the character frame: the frame no longer hides it."
     }
   }
 }
