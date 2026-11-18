@@ -1,0 +1,14 @@
+{
+  "id": "forefather",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Praszczur, the ghost of an ancient forefather, a tall old bearded man in a plain white linen shirt with a woven red belt, a translucent pale blue ghostly body, eyes glowing like embers, holding a heavy gnarled wooden staff diagonally across his body in both hands, ready to strike, stern and menacing, standing on both feet, full body, three-quarter view, the ghost alone, no ground, no background, the whole figure and the whole staff inside the picture, with space above the head",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023594133085038927
+  },
+  "images": 1
+}
