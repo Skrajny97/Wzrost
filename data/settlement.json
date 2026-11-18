@@ -592,7 +592,7 @@
     "minRaise": 0.05,
     "maxPrice": 100000000,
     "kinds": ["item", "herb", "potion", "material", "part", "mineral", "scroll", "pantry"],
-    "reputation": { "goldPerPointPerLevel": 5, "daily": 10 },
+    "reputation": { "goldPerPointPerLevel": 5, "daily": 30 },
     "merchant": {
       "goods": { "herb": 2, "material": 2, "part": 2 },
       "materialRarities": ["rare", "unique", "epic"],

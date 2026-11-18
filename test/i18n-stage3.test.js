@@ -175,7 +175,7 @@ describe('English where ENGLISH is on (the test version)', () => {
 
   test("the Znajomi's and the Drużyna's words, and their errors with names and numbers", async () => {
     const anna = await player('Anna');
-    const basia = await player('Basia', { classLevel: 40 });
+    const basia = await player('Basia', { classLevel: 41 });
     const invited = await ask('POST', '/api/friends/invite', { cookie: anna, lang: 'en', body: { name: 'Basia' } });
     assert.equal(invited.data.text, 'Invitation sent. Basia will accept it in Friends.');
     const { incoming } = (await ask('GET', '/api/friends', { cookie: basia, lang: 'pl' })).data;
@@ -185,13 +185,13 @@ describe('English where ENGLISH is on (the test version)', () => {
     assert.equal(again.data.error.message, 'Basia is already among your friends.');
     // A class level too far from the party's, the other's and one's own.
     const far = await ask('POST', '/api/party/invite', { cookie: anna, lang: 'en', body: { name: 'Basia' } });
-    assert.equal(far.data.error.message, 'Basia has class level 40. Class levels in a party can differ by at most 5, so a character of class level 25 to 35 can join now.');
+    assert.equal(far.data.error.message, 'Basia has class level 41. Class levels in a party can differ by at most 10, so a character of class level 20 to 40 can join now.');
     await (await db()).prepare("UPDATE characters SET class_level = 30 WHERE name = 'Basia'").run();
     const party = await ask('POST', '/api/party/invite', { cookie: anna, lang: 'en', body: { name: 'Basia' } });
     assert.equal(party.data.text, 'Invitation sent. Basia will accept it in the Community, on the Party tab.');
-    await (await db()).prepare("UPDATE characters SET class_level = 24 WHERE name = 'Anna'").run();
+    await (await db()).prepare("UPDATE characters SET class_level = 19 WHERE name = 'Anna'").run();
     const joining = await ask('POST', '/api/party/accept', { cookie: basia, lang: 'en', body: { partyId: party.data.party.id } });
-    assert.equal(joining.data.error.message, 'You have class level 30. Class levels in a party can differ by at most 5, so a character of class level 19 to 29 can join now.');
+    assert.equal(joining.data.error.message, 'You have class level 30. Class levels in a party can differ by at most 10, so a character of class level 9 to 29 can join now.');
     const polish = await ask('POST', '/api/party/invite', { cookie: anna, lang: 'pl', body: { name: 'Anna' } });
     assert.equal(polish.data.error.message, 'Siebie nie zaprosisz.');
   });
