@@ -1071,7 +1071,7 @@
     },
     "0.4.31": {
       "title": "Version 0.4.31",
-      "body": "- Your companions from the Quarters go with you into the Labyrinth and the Portals even while you are in a party. No more leaving the party for them."
+      "body": "- In a party, your companions from the Quarters skip only the party's explorations. They go with you on your own explorations, into the Labyrinth and the Portals as always, so there is no need to leave the party.\n- A leader who unticks “With the party” sets out with their own companions."
     }
   }
 }

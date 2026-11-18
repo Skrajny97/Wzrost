@@ -778,7 +778,7 @@ function companionsView(player, stored, now) {
         away: away ? companionText('away', companion, content()) : null,
         // The line of its item's card: who wears it and who pays.
         wornBy: companionText('wornBy', companion, content()),
-        stay: stayView(companion, hired, player.inParty, away),
+        stay: stayView(companion, hired, away),
         // "Trenuj" (829 B): the next level's price, the trainings left
         // today, the highest level and why not (companionTraining).
         training: companionTraining(companion, row.level, now, content()),
@@ -809,15 +809,14 @@ function requireCompanionHome(player, companion, now) {
 
 // Whether a companion goes on the explorations or stays in the Kwatery (the
 // author: "[Zostań w kwaterze]"), in its words, with the switch to the
-// other (`action`: the label and the `stays` to send). In a Drużyna every
-// companion stays, with no switch; one the player sends out goes again
-// once the character is out of it (828 B), and its card says so. One set
-// to stay while out on an exploration stays from its return on. One who
-// stays while as many as may go already go (`hired`: all the hired) is the
-// reserve of the Kwatery's third bed, with no switch until one of them
-// stays.
-function stayView(companion, hired, inParty, away) {
-  if (inParty) return { stays: true, text: companionText(companionStays(companion) ? 'inParty' : 'inPartyGoing', companion, content()), action: null };
+// other (`action`: the label and the `stays` to send). In a Drużyna as
+// out of one: only the Drużyna's trip goes without the companions (hunts.js
+// companionsGoing; until 18.11.2026 every one stayed while the character
+// was in a Drużyna, with no switch, 828 B). One set to stay while out on an
+// exploration stays from its return on. One who stays while as many as may
+// go already go (`hired`: all the hired) is the reserve of the Kwatery's
+// third bed, with no switch until one of them stays.
+function stayView(companion, hired, away) {
   const stays = companionStays(companion);
   if (stays && companionsSetToGo(hired) >= companionsGoingMost(content())) return { stays: true, reserve: true, text: companionText('reserve', companion, content()), action: null };
   return {
@@ -1397,7 +1396,6 @@ export async function setCompanionStay(context) {
   const companion = hired.find((one) => one.id === body.companionId);
   if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
   if (typeof body.stays !== 'boolean') throw new ApiError(400, 'invalid_stay', companionText('invalidStay', companion, content()));
-  if (!body.stays && player.inParty) throw new ApiError(409, 'in_party', companionText('inParty', companion, content()));
   // At most as many go as a party has places beside the character; the
   // others wait in the Kwatery as reserves.
   if (!body.stays && companionStays(companion) && companionsSetToGo(hired) >= companionsGoingMost(content()))

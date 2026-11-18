@@ -1344,7 +1344,7 @@
     {
       "id": "0.4.31",
       "title": "Wersja 0.4.31",
-      "body": "- Towarzysze z Kwater idą z Tobą do Labiryntu i Portali także wtedy, gdy jesteś w drużynie. Nie trzeba już wychodzić z drużyny."
+      "body": "- W drużynie Twoi towarzysze z Kwater nie idą tylko na wyprawę drużyny. Na Twoje własne wyprawy, do Labiryntu i Portali idą z Tobą jak zawsze, więc nie trzeba wychodzić z drużyny.\n- Lider, który odznaczy „Z drużyną”, wyrusza ze swoimi towarzyszami."
     }
   ]
 }
