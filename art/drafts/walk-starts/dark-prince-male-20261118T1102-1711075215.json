@@ -1,0 +1,23 @@
+{
+  "id": "dark-prince-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "a pale young man dark prince with long straight silver-white hair and pale lilac skin, a black spiked crown, black spiked plate armour with glowing purple lines, sharp spiked pauldrons, a long black tabard with purple trim, a long tattered black cloak hanging behind from the shoulders, black armoured boots, no dark smoke, no blades and nothing in the hands, seen exactly from the side in a strict profile, facing and walking to the right, the nose pointing right and only one eye showing, the chest, belly and hips turned fully to the right and not towards the viewer, only the near arm showing, hanging relaxed beside the body with an empty loosely closed hand, the far arm hidden behind the body, the back and shoulders straight and upright, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the crown to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/shadow-lord-male.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/dark-prince-male.png",
+      "usage": "the character's look in detail: face, hair, headwear, armour, robes, cloak and colours; the hands empty, without the two curved blades and the dark smoke"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen exactly from the side in profile, facing right, upright mid-step, not turned towards the viewer; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08120933763186138
+  },
+  "images": 4
+}

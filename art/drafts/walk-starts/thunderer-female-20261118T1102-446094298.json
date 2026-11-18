@@ -1,0 +1,23 @@
+{
+  "id": "thunderer-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "a tall woman with long golden blond hair in two thick braids hanging straight down at rest, both braids lying flat on her back and shoulders, not flying, not sticking out, a dark steel helmet with two small silver wings at the sides and her face showing, a calm young woman's face in clean profile with one eye, dark blue-grey steel plate armour with gold trim and thin glowing cyan lines, no lightning, no sparks around the body, a long dark grey-blue cloak hanging behind from the shoulders, dark steel boots, one long black bow strapped upright on the back behind the shoulder, the whole bow above the waist and behind the body, never in front of the legs, beside a quiver of blue-fletched arrows, nothing in the hands, seen exactly from the side in a strict profile, facing and walking to the right, the nose pointing right and only one eye showing, the chest, belly and hips turned fully to the right and not towards the viewer, only the near arm showing, hanging relaxed beside the body with an empty loosely closed hand, the far arm hidden behind the body, the back and shoulders straight and upright, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the helmet wings to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/perun-chosen-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/thunderer-female.png",
+      "usage": "the character's look in detail: face, hair, helmet, armour, cloak, quiver and colours; the hands empty, the bow strapped on the back"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen exactly from the side in profile, facing right, upright mid-step, not turned towards the viewer; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0809773256778717
+  },
+  "images": 4
+}
