@@ -2446,6 +2446,27 @@
         "mask": "art/inputs/andrzejki/cups-covered-mask.png",
         "prompt": "St Andrew's Eve fortune telling in a Slavic forest cottage at night, pixel art scene: three overturned copper cups standing upside down in a row on a rough wooden table, all three covered, the middle cup the same as the other two and standing between them on the table, nothing visible under the cups, nothing lying on the table, no hands, no arms and no sleeves anywhere in the picture, a lit tallow candle on the left, bunches of herbs hanging on the dark log wall, a small window with the dark blue night sky, warm candle light"
       },
+      "andrzejki-cups-open-1": {
+        "$comment": "1093.4: po wyborze kubka 1 ten kubek znika z przyjętego obrazka trzech przykrytych kubków, a w jego miejscu staje figurka wróżby (maska: biel).",
+        "tool": "inpaint",
+        "input": "art/inputs/andrzejki/cups-covered.png",
+        "mask": "art/inputs/andrzejki/cups-open-1-mask.png",
+        "prompt": "St Andrew's Eve fortune telling in a Slavic forest cottage at night, pixel art scene: two overturned copper cups, the middle and the right one, stand upside down on a rough wooden table; the cup that stood on the left, next to the candle has been taken away and the bare wooden table is empty there, the same planks and candle light as around it, nothing lying on it, no cup, no hands, no arms, a lit tallow candle on the left, bunches of herbs hanging on the dark log wall, a small window with the dark blue night sky, warm candle light"
+      },
+      "andrzejki-cups-open-2": {
+        "$comment": "1093.4: po wyborze kubka 2 ten kubek znika z przyjętego obrazka trzech przykrytych kubków, a w jego miejscu staje figurka wróżby (maska: biel).",
+        "tool": "inpaint",
+        "input": "art/inputs/andrzejki/cups-covered.png",
+        "mask": "art/inputs/andrzejki/cups-open-2-mask.png",
+        "prompt": "St Andrew's Eve fortune telling in a Slavic forest cottage at night, pixel art scene: two overturned copper cups, the left and the right one, stand upside down on a rough wooden table; the cup that stood in the middle has been taken away and the bare wooden table is empty there, the same planks and candle light as around it, nothing lying on it, no cup, no hands, no arms, a lit tallow candle on the left, bunches of herbs hanging on the dark log wall, a small window with the dark blue night sky, warm candle light"
+      },
+      "andrzejki-cups-open-3": {
+        "$comment": "1093.4: po wyborze kubka 3 ten kubek znika z przyjętego obrazka trzech przykrytych kubków, a w jego miejscu staje figurka wróżby (maska: biel).",
+        "tool": "inpaint",
+        "input": "art/inputs/andrzejki/cups-covered.png",
+        "mask": "art/inputs/andrzejki/cups-open-3-mask.png",
+        "prompt": "St Andrew's Eve fortune telling in a Slavic forest cottage at night, pixel art scene: two overturned copper cups, the left and the middle one, stand upside down on a rough wooden table; the cup that stood on the right has been taken away and the bare wooden table is empty there, the same planks and candle light as around it, nothing lying on it, no cup, no hands, no arms, a lit tallow candle on the left, bunches of herbs hanging on the dark log wall, a small window with the dark blue night sky, warm candle light"
+      },
       "bg-andrzejki": {"prompt": "inside a small Slavic forest cottage on Saint Andrew's eve at night: a rough wooden table with one tall burning candle, a wooden bowl of water with a twisted shape of hardened wax floating in it, an old iron key lying beside it, a small window showing a crescent moon and stars, warm candlelight and deep blue shadows, cozy and mysterious, pixel art scene background", "width": 96, "height": 128, "tool": "pro", "transparent": false},
       "galazka": {
         "prompt": "a small fresh fir branch with dark green needles and a little snow on it, single inventory item icon, bold clean outline",
