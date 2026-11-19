@@ -10290,7 +10290,8 @@ export function skillEffects(kit) {
       const end = Math.min(w - 1, x + step);
       d += `H${middle.toFixed(1)}V1H${end.toFixed(1)}V${notch}`;
     }
-    d += `V${hgt - 1}Z`;
+    // Down to the bottom and closed, as a relative move from the last notch.
+    d += `v${hgt - 1 - notch}z`;
     return (
       `<svg width="${w}" height="${hgt}" viewBox="0 0 ${w} ${hgt}" aria-hidden="true">` +
       `<path d="${d}" fill="currentColor" fill-opacity="0.2" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>` +

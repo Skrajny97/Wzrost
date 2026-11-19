@@ -354,11 +354,11 @@ export const SPRITES = {
       'elemental-avatar-female', 'elemental-avatar-male', 'frost-monarch-female', 'frost-monarch-male', 'archdruid-female', 'archdruid-male',
       'saint-female', 'saint-male', 'demon-slayer-female', 'demon-slayer-male', 'prophet-female', 'prophet-male', 'godslayer-female', 'godslayer-male',
       'lich-female', 'lich-male', 'shadow-lord-female', 'shadow-lord-male',
-      // The fourth forms at class level 300 (Lodowa Bogini and Niebiańska Łuczniczka once
-      // their fixes 1108 and 1109 are accepted), shown only where FOURTH_EVOLUTION is on.
+      // The fourth forms at class level 300 (Lodowa Bogini and Niebiańska Łuczniczka with
+      // their fixes 1108 and 1109, accepted 19.11.2026), shown only where FOURTH_EVOLUTION is on.
       'ravager-female', 'ravager-male', 'immortal-female', 'immortal-male', 'titan-female', 'titan-male',
-      'celestial-archer-male', 'thunderer-female', 'thunderer-male', 'beast-lord-female', 'beast-lord-male', 'primordial-female',
-      'primordial-male', 'frost-god-male', 'elder-druid-female', 'elder-druid-male', 'archangel-female', 'archangel-male',
+      'celestial-archer-female', 'celestial-archer-male', 'thunderer-female', 'thunderer-male', 'beast-lord-female', 'beast-lord-male', 'primordial-female',
+      'primordial-male', 'frost-god-female', 'frost-god-male', 'elder-druid-female', 'elder-druid-male', 'archangel-female', 'archangel-male',
       'heaven-avenger-female', 'heaven-avenger-male', 'seer-female', 'seer-male', 'soul-reaper-female', 'soul-reaper-male',
       'navia-king-female', 'navia-king-male', 'dark-prince-female', 'dark-prince-male',
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
