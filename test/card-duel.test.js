@@ -5,7 +5,8 @@
 // moves checked as a player's are against Szczęsny, each side's hero for its
 // own cards; a move missed made by the game at its deadline and two in a
 // row lost, the same however often the match is read; the end, a draw and a
-// surrender; the stakes the two may play for and what a win gives.
+// surrender; the stakes the two may play for and what a win gives; each
+// player's reserve drawn anew once a match, before its first move.
 
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
@@ -15,6 +16,8 @@ import {
   duelMove,
   duelPayout,
   duelPot,
+  duelRedraw,
+  duelRedrawBlock,
   duelSeen,
   duelStakes,
   duelTurnBlock,
@@ -208,6 +211,46 @@ describe('Partie na żywo: the table and the turns', () => {
     assert.equal(revived.foe.cards[0].life, Math.round(revived.foe.cards[0].max * 0.5));
     assert.equal(duelView(revived, 'foe', content).last.revived, 0);
     assert.equal(duelView(revived, 'me', content).last.revivedFoe, 0);
+  });
+});
+
+describe('Partie na żywo: the reserve drawn anew (19.11.2026)', () => {
+  test('each player draws its reserve anew once, before its first move, the one who answers also while the leader lays; the other sees only its count', () => {
+    const duel = fresh('przelosowanie', 1000);
+    const first = duel.lead;
+    const second = otherSeat(first);
+    for (const seat of ['me', 'foe']) {
+      assert.equal(duelRedrawBlock(duel, seat, content), null);
+      assert.equal(duelView(duel, seat, content).me.redraw, true);
+    }
+    // The one who answers draws anew while the leader lays: the next cards
+    // of its deck, its own at the bottom; the rest of the match as it was.
+    const redrawn = duelRedraw(duel, second, content);
+    assert.deepEqual(redrawn[second].hand, duel[second].deck.slice(0, rules.hand));
+    assert.deepEqual(redrawn[second].deck, [...duel[second].deck.slice(rules.hand), ...duel[second].hand]);
+    assert.deepEqual(redrawn[first], duel[first]);
+    assert.deepEqual([redrawn.round, redrawn.lead, redrawn.step, redrawn.deadline, redrawn.moves, redrawn.missed], [duel.round, duel.lead, duel.step, duel.deadline, duel.moves, duel.missed]);
+    assert.deepEqual(duelRedraw(duel, second, content), redrawn);
+    assert.deepEqual(duelView(redrawn, first, content).foe, duelView(duel, first, content).foe);
+    // Once a match.
+    assert.equal(duelRedrawBlock(redrawn, second, content).code, 'redraw_used');
+    assert.equal(duelView(redrawn, second, content).me.redraw, false);
+    assert.equal(duelRedrawBlock(redrawn, first, content), null);
+    // The leader lays without drawing anew: too late for it then. The one
+    // who answers lays from its new reserve, never from the old one.
+    let played = move(redrawn, first, 5000);
+    assert.equal(duelRedrawBlock(played, first, content).code, 'redraw_late');
+    assert.equal(duelTurnBlock(played, second, { round: 1, lines: duel[second].hand.slice(0, 3) }, content).code, 'not_in_hand');
+    played = move(played, second, 9000, { round: 1, lines: redrawn[second].hand.slice(0, 3) });
+    assert.equal(played.round, 2);
+    for (const seat of ['me', 'foe']) assert.notEqual(duelRedrawBlock(played, seat, content), null);
+    // The one who answers may draw anew after the leader laid, too.
+    assert.equal(duelRedrawBlock(move(duel, first, 5000), second, content), null);
+    // A move the game made for a player who missed it is its first move.
+    const missed = duelCatchUp(duel, 1000 + FIRST + GRACE + 1, content);
+    assert.equal(missed.moves[first].auto, true);
+    assert.equal(duelRedrawBlock(missed, first, content).code, 'redraw_late');
+    assert.equal(duelRedrawBlock(surrenderDuel(duel, first), second, content).code, 'match_over');
   });
 });
 

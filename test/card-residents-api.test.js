@@ -141,6 +141,12 @@ describe('the residents\' card tables through the API (904 B)', () => {
     const kept = await state();
     assert.deepEqual(kept.foe.cards.map((card) => card.id), jagnaDeck);
     assert.equal(kept.foe.smart, jagna.smart);
+    // Her match's reserve drawn anew, as at Szczęsny's (19.11.2026): her
+    // cards as they were.
+    const redrawn = await call('POST', '/api/cards/redraw', { cookie });
+    assert.equal(redrawn.status, 200, JSON.stringify(redrawn.data));
+    assert.deepEqual([redrawn.data.cards.match.resident, redrawn.data.cards.match.me.redraw], ['herbalist', false]);
+    assert.deepEqual((await state()).foe, kept.foe);
     // One match at a time: not at Szczęsny's, not at another resident's.
     assert.equal((await start({ tier: 1, staked: false })).data.error.code, 'match_running');
     assert.equal((await start({ resident: 'smith', staked: true })).data.error.code, 'match_running');

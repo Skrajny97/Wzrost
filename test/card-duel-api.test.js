@@ -7,7 +7,8 @@
 // row lost, kept by the chat's poll too; a draw's stakes back, a surrender;
 // the level for gold, the day's ten, the gold for the stake, one challenge
 // or match at a time and Szczęsny waiting meanwhile; two taps at once; a
-// character removed in a match.
+// character removed in a match; each player's reserve drawn anew once a
+// match, before its first move.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -39,6 +40,7 @@ describe('Partie kart na żywo', () => {
   const answer = (name, id, accept = true) => call('POST', '/api/cards/duel/answer', { cookie: cookies[name], body: { id, accept } });
   const read = async (name) => (await call('GET', '/api/cards/duel', { cookie: cookies[name] })).data.duel;
   const turn = (name, id, body) => call('POST', '/api/cards/duel/turn', { cookie: cookies[name], body: { id, ...body } });
+  const redraw = (name, id) => call('POST', '/api/cards/duel/redraw', { cookie: cookies[name], body: { id } });
   // The reserve on the empty lines, from the front.
   const fill = (match) => {
     const lines = match.me.lines.map((card) => card?.key ?? null);
@@ -179,6 +181,40 @@ describe('Partie kart na żywo', () => {
     assert.equal(stored.day, casinoDay(stored.created_at, content).key);
     // One of each one's matches for gold today.
     assert.equal((await call('GET', '/api/cards/duel', { cookie: cookies.Szuler })).data.used, 1);
+  });
+
+  // As at Szczęsny's table (the author, 19.11.2026).
+  test('each player draws its reserve anew once, before its first move, the one who answers also while the leader lays; the other sees only its count', async () => {
+    const id = await started(0);
+    const leader = await mover(['Karciarka', 'Szuler']);
+    const answerer = leader.name === 'Karciarka' ? 'Szuler' : 'Karciarka';
+    const seat = answerer === 'Karciarka' ? 'me' : 'foe';
+    const waiting = await read(answerer);
+    assert.equal(waiting.match.step, 'foe');
+    assert.equal(waiting.match.me.redraw, true);
+    const table = (await call('GET', '/api/cards/duel', { cookie: cookies[answerer] })).data;
+    assert.deepEqual(table.texts.redraw, content.cards.texts.redraw);
+    // The one who answers draws anew while the leader lays.
+    const before = JSON.parse((await duelRow()).game);
+    const [one, two] = await Promise.all([redraw(answerer, id), redraw(answerer, id)]);
+    assert.deepEqual([one.status, two.status].sort(), [200, 409]);
+    const after = JSON.parse((await duelRow()).game);
+    assert.deepEqual(after[seat].hand, before[seat].deck.slice(0, content.cards.hand));
+    assert.deepEqual(after[seat].deck, [...before[seat].deck.slice(content.cards.hand), ...before[seat].hand]);
+    const other = seat === 'me' ? 'foe' : 'me';
+    assert.deepEqual([after[other], after.step, after.deadline, after.round], [before[other], before.step, before.deadline, before.round]);
+    assert.equal((one.status === 200 ? one : two).data.duel.match.me.redraw, false);
+    assert.equal((await redraw(answerer, id)).data.error.code, 'redraw_used');
+    // The leader sees the same count of the other's reserve.
+    assert.equal((await read(leader.name)).match.foe.hand, leader.duel.match.foe.hand);
+    // The leader lays without drawing anew: then too late for it.
+    assert.equal((await turn(leader.name, id, fill(leader.duel.match))).status, 200);
+    const late = await redraw(leader.name, id);
+    assert.deepEqual([late.status, late.data.error.code], [409, 'redraw_late']);
+    // The one who answers answers from its new reserve.
+    const answering = await read(answerer);
+    assert.deepEqual(answering.match.me.hand.map((card) => card.key), after[seat].hand);
+    assert.equal((await turn(answerer, id, fill(answering.match))).status, 200);
   });
 
   test('a challenge turned down or let go: nothing paid, and the same one again only after a minute', async () => {

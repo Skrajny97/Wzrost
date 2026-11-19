@@ -494,9 +494,11 @@ function endText(duel) {
 
 // The table of a live match in the Salon's „Karty” tab (cards.js mounts it
 // over Szczęsny's while a match of the character's runs). `cardFace`: the
-// cards' faces of cards.js; `onLayout`: the table took the tab or gave it
-// back; `onEnd`: the player is done with the match's end.
-export function mountDuel(holder, { cardFace, onLayout = () => {}, onEnd = () => {} }) {
+// cards' faces of cards.js, and `redrawRow` its „Przelosuj rezerwę” under
+// the reserve (once a match, before this player's first move, also while
+// the leader lays); `onLayout`: the table took the tab or gave it back;
+// `onEnd`: the player is done with the match's end.
+export function mountDuel(holder, { cardFace, redrawRow = null, onLayout = () => {}, onEnd = () => {} }) {
   let duel = null;
   let shown = false;
   let gone = false;
@@ -528,8 +530,10 @@ export function mountDuel(holder, { cardFace, onLayout = () => {}, onEnd = () =>
     onLayout();
   };
 
-  // A match's state, to draw the table anew only when it changed.
-  const stamp = (one) => (one ? JSON.stringify([one.id, one.state, one.match?.round, one.match?.step, one.match?.deadline, one.match?.moves, one.match?.result]) : '');
+  // A match's state, to draw the table anew only when it changed (the
+  // reserve too: drawn anew on another device).
+  const stamp = (one) =>
+    one ? JSON.stringify([one.id, one.state, one.match?.round, one.match?.step, one.match?.deadline, one.match?.moves, one.match?.result, one.match?.me?.hand?.map((card) => card.key), one.match?.me?.redraw]) : '';
 
   function apply(answer, goldBefore = state.character?.gold ?? 0) {
     take(answer);
@@ -828,6 +832,20 @@ export function mountDuel(holder, { cardFace, onLayout = () => {}, onEnd = () =>
   }
   const turnReady = (match) => plan.lines.filter((key) => key === null).length === 0 || reserveLeft(match).length === 0;
 
+  // The reserve drawn anew (once a match, before this player's first move,
+  // its move due or not): the move being laid starts again from the new
+  // reserve, whose cards come from the deck with the animations on.
+  async function redraw() {
+    latest += 1;
+    const answer = await call('POST', '/api/cards/duel/redraw', { id: duel.id });
+    plan = null;
+    picked = null;
+    aiming = null;
+    apply(answer);
+    render();
+    if (fx.on() && !gone && !ended && duel?.match) await fxPlay((run) => fx.redealt(run));
+  }
+
   // The move sent: the leader's cards go on the table for the other to
   // see; the answer plays the round, which moves on the table first.
   async function sendMove() {
@@ -1063,6 +1081,7 @@ export function mountDuel(holder, { cardFace, onLayout = () => {}, onEnd = () =>
               reserve.map((card) => withKey(face(card, { marks: { picked: picked === card.key, target: aiming?.step === 'swap', dim: !mine }, onClick: mine ? () => tapReserve(card) : null }), 'me', card.key)),
             )
           : h('p', { class: 'muted', text: t('Rezerwa pusta.') }),
+        match.me.redraw && texts.redraw && redrawRow?.(texts.redraw, redraw),
         aiming?.step === 'type' &&
           h(
             'div',

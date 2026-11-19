@@ -9,7 +9,8 @@
 // the server (the seed, both decks, the rival's reserve), so a cheat cannot
 // choose what comes. Each turn is one request, checked by the engine
 // (turnBlock) and played by it (playTurn), saved only over the match as
-// read (its version): two taps play one turn. A staked match takes its
+// read (its version): two taps play one turn; so is the reserve drawn anew,
+// once a match before the first turn (redrawCards). A staked match takes its
 // stake at the start and counts in the day's ten (875 A); its end pays,
 // with the character's row as read: twice the stake for a win, the stake
 // back for a draw, the tier's reward of the day at its first win of the day
@@ -65,6 +66,8 @@ import {
   pickCard,
   playTurn,
   portalArea,
+  redrawBlock,
+  redrawReserve,
   residentCardsLeft,
   residentStake,
   residentTable,
@@ -548,7 +551,18 @@ async function cardsView(db, player, now) {
   };
   return {
     name: data.name,
-    texts: { intro: data.texts.intro, starterOffer: data.texts.starterOffer, starterTaken: data.texts.starterTaken, rules: data.texts.rules, win: data.texts.win, loss: data.texts.loss, draw: data.texts.draw, pack: data.texts.pack },
+    texts: {
+      intro: data.texts.intro,
+      starterOffer: data.texts.starterOffer,
+      starterTaken: data.texts.starterTaken,
+      rules: data.texts.rules,
+      win: data.texts.win,
+      loss: data.texts.loss,
+      draw: data.texts.draw,
+      pack: data.texts.pack,
+      // "Przelosuj rezerwę" at the table and its line (the author, 19.11.2026).
+      redraw: data.texts.redraw,
+    },
     types: data.types,
     lines: data.lines,
     typeBonus: data.typeBonus,
@@ -1022,6 +1036,32 @@ export async function playCardTurn(context) {
     session,
     ended ? { end: { result: next.result, ...opponentOf(match), mode: match.mode, stake: match.stake, ...ended.summary }, played: matchView(next, content()) } : {},
   );
+}
+
+// POST /api/cards/redraw: the player's reserve of the running match drawn
+// anew, Szczęsny's or a resident's (redrawBlock, redrawReserve; the author,
+// 19.11.2026: „opcję przelosowania ręki, bo nie raz trafią się 4 jednostki
+// tej samej kategorii”): once a match, before its first turn. Only over the
+// match as read (its version), so two taps draw it anew once.
+export async function redrawCards(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireCards(row);
+  const db = context.env.DB;
+  const match = await runningMatch(db, row.id);
+  if (!match) throw new ApiError(409, 'no_match', 'Nie masz rozpoczętej partii.');
+  const state = JSON.parse(match.state);
+  const block = redrawBlock(state, content());
+  if (block) throw new ApiError(block.status ?? 400, block.code, block.message);
+  await atomically(
+    db,
+    [
+      assertion(db, '(SELECT version FROM card_matches WHERE id = ?) = ?', [match.id, match.version]),
+      db.prepare('UPDATE card_matches SET state = ?, version = version + 1 WHERE id = ? AND version = ?').bind(JSON.stringify(redrawReserve(state, content())), match.id, match.version),
+    ],
+    matchChanged,
+  );
+  return respond(context, session, { redrawn: true });
 }
 
 // POST /api/cards/surrender: the running match given up, lost (a staked

@@ -27,8 +27,10 @@
 // so the server needs no clock of its own and two reads give the same.
 // Both pay the stake at the start; the winner takes both stakes but the
 // System's cut (rounded down), and a draw gives each its own stake back.
+// Each player may draw its reserve anew once a match, before its first
+// move, as against Szczęsny (duelRedraw; the author, 19.11.2026).
 
-import { autoTurn, cardRules, cardsLeft, heroSkill, hostTiers, lifeLeft, matchView, newMatch, refill, roundHits, tierStake, turnBlock } from './cards.js';
+import { autoTurn, cardRules, cardsLeft, heroSkill, hostTiers, lifeLeft, matchView, newMatch, redrawBlock, redrawSide, refill, roundHits, tierStake, turnBlock } from './cards.js';
 import { createRng } from './rng.js';
 
 /** @typedef {import('./cards.js').Content} Content */
@@ -335,6 +337,35 @@ export function duelCatchUp(duel, now, content) {
     next.missed[seat] = missed;
   }
   return next;
+}
+
+// Why `seat` cannot draw its reserve anew now, or null: as a player against
+// Szczęsny (redrawBlock), the match seen from its side: still on, its first
+// round, no card of its laid on a line yet (its first move not made), once
+// a match. Its move need not be due: the one who answers the first round
+// may draw anew while the leader lays.
+/**
+ * @param {Duel} duel
+ * @param {Seat} seat
+ * @param {Content} content
+ * @returns {{ code: string, message: string, status?: number } | null}
+ */
+export const duelRedrawBlock = (duel, seat, content) => redrawBlock(duelSeen(duel, seat), content);
+
+// `seat`'s reserve drawn anew (checked by duelRedrawBlock first): its cards
+// to the bottom of its deck, a whole reserve from the top (redrawSide). The
+// other side sees only the count of its reserve, which stays, and the
+// moves and their deadline stay as they were.
+/**
+ * @param {Duel} current
+ * @param {Seat} seat
+ * @param {Content} content
+ * @returns {Duel}
+ */
+export function duelRedraw(current, seat, content) {
+  const duel = clone(current);
+  redrawSide(duel[seat], content);
+  return duel;
 }
 
 // `seat` gives up: the match lost for it.

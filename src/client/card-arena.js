@@ -16,7 +16,8 @@
 // table as Szczęsny's (cards.js), the rival's bust, class, level, card
 // rating and hero card at its head, the rating at stake on its divider, the
 // rival's cards laid first and its hero's skill marked before the player
-// answers; the reserve, the player's hero card, "Walcz" and "Poddaj
+// answers; the reserve (with "Przelosuj rezerwę" once a match, before the
+// first turn), the player's hero card, "Walcz" and "Poddaj
 // partię". A tap on a reserve's card and then on an empty line lays it
 // there; every blow of the round shows on its target before "Walcz", as the
 // server counts it (roundHits in src/engine/cards.js, with the rival's
@@ -35,7 +36,7 @@
 
 import { placeArt, portraitSprite } from './art.js';
 import { effectBlow, effectHint, effectMarks, effectsSection, rivalEffectLine, roundEffects } from './card-effects.js';
-import { cardFace } from './cards.js';
+import { cardFace, redrawRow } from './cards.js';
 import { createCardsFx } from './cards-fx.js';
 import { deckSlotsRow } from './deck-slots.js';
 import { h, icon } from './dom.js';
@@ -774,6 +775,19 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
     return empty === 0 || reserveLeft(match).length === 0;
   }
 
+  // The reserve drawn anew (once a match, before the first turn), as at the
+  // Salon's table: the turn being laid starts again from the new reserve,
+  // whose cards come from the deck with the animations on.
+  async function redraw() {
+    const answer = await call('POST', '/api/cards/arena/redraw');
+    plan = null;
+    picked = null;
+    aiming = null;
+    effectAim = null;
+    apply(answer);
+    if (fx.on() && !gone && view.match && part === 'play') await fxPlay((run) => fx.redealt(run));
+  }
+
   // One side's three lines: the rival's on top, the player's under them.
   // The rival's cards laid this round are new, and the one its hero's skill
   // works on carries the skill's name; the player's card the rival aims at
@@ -952,6 +966,7 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
               reserve.map((card) => withKey(face(card, { marks: { picked: picked === card.key, target: aiming?.step === 'swap' }, onClick: () => tapReserve(card) }), 'me', card.key)),
             )
           : h('p', { class: 'muted', text: t('Rezerwa pusta.') }),
+        match.me.redraw && texts.redraw && redrawRow(texts.redraw, () => orAgain(redraw)),
         aiming?.step === 'type' &&
           h(
             'div',

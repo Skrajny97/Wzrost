@@ -121,11 +121,11 @@ import {
 } from './testing.js';
 import { buyScrolls, raiseAtForge } from './forge.js';
 import { buyTicket, drawLotteries, getCasino, spinCasinoWheel } from './casino.js';
-import { buyPack, getCards, getDecks, nameDeck, openFoundPack, playCardTurn, saveDeck, startMatch, surrenderCards, takeStarter, useDeck } from './cards.js';
-import { answerDuel, challengeDuel, duelOffer, duelTurn, readDuel, surrenderDuelMatch, withdrawDuel, withoutDuel } from './card-duel.js';
+import { buyPack, getCards, getDecks, nameDeck, openFoundPack, playCardTurn, redrawCards, saveDeck, startMatch, surrenderCards, takeStarter, useDeck } from './cards.js';
+import { answerDuel, challengeDuel, duelOffer, duelRedrawReserve, duelTurn, readDuel, surrenderDuelMatch, withdrawDuel, withoutDuel } from './card-duel.js';
 import { enterTrialHall } from './trial-hall.js';
 import { arenaFight, claimArenaReward, getArena, getArenaDefence, rerollArenaRivals } from './pvp-arena.js';
-import { claimCardArenaReward, getCardArena, playCardArenaTurn, rerollCardArena, startCardArenaMatch, surrenderCardArena } from './card-arena.js';
+import { claimCardArenaReward, getCardArena, playCardArenaTurn, redrawCardArena, rerollCardArena, startCardArenaMatch, surrenderCardArena } from './card-arena.js';
 import { buyFromHerbalist, buyMug, chooseReforged, claimStandingReward, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, redrawCandidates, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, setCompanionStay, settlementTests, takeCompanionGift, testSettlement, trainCompanion, unequipCompanion, upgradeCompanionItem } from './settlement.js';
 import { claimWanted, dropWanted, takeWanted } from './wanted.js';
 import { claimMercenary, listMercenaries, offerMercenary, withdrawMercenary } from './mercenaries.js';
@@ -381,6 +381,8 @@ const routes = [
   // While a live card match runs (901 B), no Arena match starts either.
   ['POST', '/api/cards/arena/match', withoutDuel(startCardArenaMatch)],
   ['POST', '/api/cards/arena/turn', playCardArenaTurn],
+  // The reserve drawn anew, once a match before the first turn (19.11.2026).
+  ['POST', '/api/cards/arena/redraw', redrawCardArena],
   ['POST', '/api/cards/arena/surrender', surrenderCardArena],
   ['POST', '/api/cards/arena/reroll', rerollCardArena],
   ['POST', '/api/cards/arena/claim', claimCardArenaReward],
@@ -399,6 +401,8 @@ const routes = [
   // Szczęsny's match waits while a live one runs (card-duel.js).
   ['POST', '/api/cards/match', withoutDuel(startMatch)],
   ['POST', '/api/cards/turn', playCardTurn],
+  // The reserve drawn anew, once a match before the first turn (19.11.2026).
+  ['POST', '/api/cards/redraw', redrawCards],
   ['POST', '/api/cards/surrender', surrenderCards],
   ['POST', '/api/cards/pack', buyPack],
   ['POST', '/api/cards/pack/open', openFoundPack],
@@ -409,6 +413,7 @@ const routes = [
   ['POST', '/api/cards/duel/answer', answerDuel],
   ['POST', '/api/cards/duel/withdraw', withdrawDuel],
   ['POST', '/api/cards/duel/turn', duelTurn],
+  ['POST', '/api/cards/duel/redraw', duelRedrawReserve],
   ['POST', '/api/cards/duel/surrender', surrenderDuelMatch],
   ['GET', '/api/test/settlement', settlementTests],
   ['POST', '/api/test/settlement', testSettlement],

@@ -11,7 +11,9 @@
 // back); every blow of the round shows on its target before "Walcz", as the
 // server counts it (the engine's roundHits), so the player sees what the
 // round will do; the rival's cards laid this round are marked new. After
-// "Walcz" the round's account, and at the end what the match gave.
+// "Walcz" the round's account, and at the end what the match gave. Once a
+// match, before the first turn, "Przelosuj rezerwę" under the reserve draws
+// it anew (the author, 19.11.2026).
 //
 // The cards are the creatures' sprites of the Bestiariusz in frames of their
 // rarity's colour, with Atak, Życie, the type's icon and the level. Every
@@ -153,6 +155,26 @@ export function effectFace(card, { compact = false, marks = {}, onClick = null, 
     : h('span', { class: className, vars, role: 'img', 'aria-label': ariaLabel }, body);
 }
 
+// "Przelosuj rezerwę" under the reserve while the player may draw it anew
+// (the match's `me.redraw`: once a match, before its first move; the
+// author, 19.11.2026), with the die of the game's other draws ("Losuj
+// innych" in the Arena) and the rule in a line beside it. `texts`: the
+// data's (cards.json texts.redraw); `onRedraw`: the request. Szczęsny's, a
+// resident's, the Arena's and the live tables alike.
+export function redrawRow(texts, onRedraw) {
+  return h(
+    'div',
+    { class: 'cards-redraw' },
+    h(
+      'button',
+      { type: 'button', class: 'button button--world button--small pvp-arena-reroll-button', 'data-guide': 'cards-redraw', onClick: (event) => withButton(event.currentTarget, onRedraw) },
+      icon('dice', { size: 16 }),
+      h('span', { text: texts.button }),
+    ),
+    h('p', { class: 'muted cards-redraw-note', text: texts.note }),
+  );
+}
+
 // Szczęsny's words after a match, or a resident's, one of the data's.
 const oneOf = (lines) => lines[Math.floor(Math.random() * lines.length)];
 
@@ -220,7 +242,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
   // while it runs; once its end is seen, Szczęsny's tab comes back. Only the
   // Salon's table has it: a resident's table in the Osada (904 B) never
   // shows a live match.
-  const duel = resident ? { on: () => false, unmount: () => {} } : mountDuel(holder, { cardFace, onLayout: () => onLayout(), onEnd: () => load() });
+  const duel = resident ? { on: () => false, unmount: () => {} } : mountDuel(holder, { cardFace, redrawRow, onLayout: () => onLayout(), onEnd: () => load() });
   // A live match begun or ended: the buttons that wait for it change.
   const unwatch = onLiveMatch(() => {
     if (!gone && view) render();
@@ -1313,6 +1335,19 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     return empty === 0 || reserveLeft(match).length === 0;
   }
 
+  // The reserve drawn anew (once a match, before the first turn): the turn
+  // being laid starts again from the new reserve, whose cards come from the
+  // deck with the animations on.
+  async function redraw() {
+    const answer = await call('POST', '/api/cards/redraw');
+    plan = null;
+    picked = null;
+    aiming = null;
+    effectAim = null;
+    apply(answer);
+    if (fx.on() && !gone && own(view.match)) await fxPlay((run) => fx.redealt(run));
+  }
+
   // One side's three lines: the rival's on top, the player's under them.
   function linesRow(side, match, blowsNow) {
     const names = view.lines;
@@ -1468,6 +1503,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
               reserve.map((card) => withKey(face(card, { marks: { picked: picked === card.key, target: aiming?.step === 'swap' }, onClick: () => tapReserve(card) }), 'me', card.key)),
             )
           : h('p', { class: 'muted', text: t('Rezerwa pusta.') }),
+        match.me.redraw && view.texts.redraw && redrawRow(view.texts.redraw, () => orAgain(redraw)),
         aiming?.step === 'type' &&
           h(
             'div',
