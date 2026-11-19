@@ -436,6 +436,9 @@ export function publicContent() {
     },
     durations: { min: game.balance.hunt.minMinutes, step: game.balance.hunt.stepMinutes, max: game.balance.hunt.maxMinutes },
     lengths: game.texts.lengths,
+    // The words of the page beyond its screens: the name of "Na górę"
+    // (src/client/back-to-top.js).
+    page: game.texts.page,
     unlocks: game.unlocks.map(({ id, name, level, classLevel, condition, locked }) => ({ id, name, level, classLevel, condition, locked })),
     resources: game.resources.map(({ id, name, genitive, description, system }) => ({ id, name, genitive, description, system: Boolean(system) })),
     buildings: game.buildings.filter(buildingOn).map(({ id, name, description, maxLevel }) => ({ id, name, description, maxLevel })),

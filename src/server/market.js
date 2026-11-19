@@ -64,6 +64,8 @@ import { requireOpen, settlementOf } from './settlement.js';
 import { weekFor } from './weeks.js';
 import { saleFamePoints } from './fame.js';
 import { SCROLL_COLUMNS, scrollAdds, scrollById, scrollHeld, scrollsOf } from './scroll-goods.js';
+import { addCopies, cardBusy, cardDecks, cardNames, faceOf, filled, freeCondition, goodsWords, heldCards, heldCondition, isCardGood, knownCard, leaving, ownedCards, setCopies } from './card-goods.js';
+import { cardCollection, cardsHere, effectCollection } from './cards.js';
 
 // The Spiżarnia's goods (fish, crops and dishes) too (the author, 18.11.2026:
 // „dodanie opcji sprzedaży rzeczy gotowanych i składników”).
@@ -143,6 +145,14 @@ function goodsView(kind, key, count, item) {
       scrap: good?.price,
       ...(good?.group === 'dish' ? { bonus: mealBonusText(good, content()) } : { uses: ingredientOf(key) }),
     };
+  }
+  // A card of Talia Systemu (card-goods.js; the author, 19.11.2026:
+  // „powinno się móc nimi też handlować”): its face at the level these
+  // copies alone give; the scrapper buys none.
+  if (isCardGood(kind)) {
+    if (!knownCard(kind, key)) return { kind, key, count, name: key };
+    const face = faceOf(kind, key, count);
+    return { kind, key, count, name: cardNames(kind, key).cardName, rarity: face.rarity, face };
   }
   // A scroll (1061): the scrapper buys none.
   if (kind === 'scroll') {
@@ -365,6 +375,7 @@ function knownGood(kind, key) {
   if (kind === 'mineral') return Object.hasOwn(content().mineralsById, key);
   if (kind === 'scroll') return Boolean(scrollById(key));
   if (kind === 'pantry') return Boolean(content().pantryById[key]);
+  if (isCardGood(kind)) return knownCard(kind, key);
   if (kind !== 'material') return false;
   const { materialId, rarityId } = parseStack(key);
   return Boolean(content().materialsById[materialId] && content().raritiesById[rarityId]);
@@ -374,8 +385,10 @@ function knownGood(kind, key) {
 // with what the scrapper pays this character for it (`price` of an item,
 // `scrap` of one piece), with the Skup złomu's bonus, as in the bag (the
 // author: "Niech przy wyborze czegoś do wystawienia na licytacji pokazuje za
-// ile dany przedmiot idzie u złomiarza").
-function sellable(player, now) {
+// ile dany przedmiot idzie u złomiarza"); and its cards of Talia Systemu
+// (`cards`, ownedCards in card-goods.js), each with whether a match running
+// now holds it (`busy`).
+function sellable(player, now, cards = []) {
   const { row } = player;
   const sellBonus = campBonus(campLevels(player.buildings, now, content()), 'sellPrice', content());
   const stacks = { herb: herbsOf(row), potion: potionsOf(row), material: JSON.parse(row.materials ?? '{}'), part: JSON.parse(row.parts ?? '{}'), mineral: mineralsOf(row), pantry: pantryOf(row) };
@@ -394,8 +407,21 @@ function sellable(player, now) {
       ),
       // The scrolls (1061), each in a number column of its own.
       ...Object.entries(scrollsOf(row)).map(([key, count]) => goodsView('scroll', key, count)),
+      ...cards.map((card) => ({ ...goodsView(card.kind, card.id, card.copies), ...(card.busy && { busy: true }), decks: card.decks })),
     ],
   };
+}
+
+// The character's cards for the Targowisko, where the game has them: those
+// it can put up (ownedCards, each with the decks it is in), and the copies
+// of each it has (`have`, by "kind:id"), which every card's offer tells it,
+// with the words of the page.
+async function marketCards(db, row) {
+  if (!cardsHere()) return { own: [], view: null };
+  const [collection, effects] = await Promise.all([cardCollection(db, row.id), effectCollection(db, row.id)]);
+  const have = Object.fromEntries([...[...collection].map(([id, copies]) => [`card:${id}`, copies]), ...[...effects].map(([id, copies]) => [`effect-card:${id}`, copies])]);
+  const inDecks = await cardDecks(db, row.id, collection);
+  return { own: await ownedCards(db, row.id, { collection, effects, with: (kind, id) => ({ decks: inDecks(kind, id) }) }), view: { have, texts: goodsWords(), maxLevel: content().cards.stats.maxLevel } };
 }
 
 // The wandering trader for the character: on his day of the week, or today
@@ -499,7 +525,7 @@ async function marketView(db, player, now, asked = {}) {
     db.prepare("SELECT * FROM market_offers WHERE state = 'open' AND seller_id = ? ORDER BY ends_at").bind(row.id),
     db.prepare('SELECT * FROM market_parcels WHERE character_id = ? ORDER BY id').bind(row.id),
   ]);
-  const found = await browsed(db, row, team, asked, light.results);
+  const [found, cards] = await Promise.all([browsed(db, row, team, asked, light.results), marketCards(db, row)]);
   const day = questPeriod('daily', now, content()).key;
   const { minHours, reputation, maxPrice, browse } = tuning();
   return {
@@ -527,7 +553,8 @@ async function marketView(db, player, now, asked = {}) {
     tiers: content().encyclopedia.tiers.map((/** @type {{ name: string, classLevel: number }} */ tier, index) => ({ id: String(index + 1), name: tier.name, classLevel: tier.classLevel })),
     mine: mine.results.map((offer) => offerView(offer, row, team)),
     parcels: parcels.results.map((parcel) => ({ id: parcel.id, reason: parcel.reason, goods: goodsView(parcel.kind, parcel.good, parcel.count, parcel.item) })),
-    sellable: sellable(player, now),
+    sellable: sellable(player, now, cards.own),
+    ...(cards.view && { cards: cards.view }),
     trade: tradeView(stored.marketTrade, row.level, now, content(), reputation),
     ...residentsView(player, stored, now),
   };
@@ -608,6 +635,8 @@ export async function listOffer(context) {
   const { row } = player;
   const body = await readJson(context.request);
   const kind = body.kind;
+  // Copies of a card of Talia Systemu leave the collection (listCard).
+  if (isCardGood(kind)) return listCard(context, session, player, body);
   const item = kind === 'item' ? player.items.find((one) => one.id === Number(body.itemId) && !one.equippedSlot) : null;
   requireOffRack(player, item);
   const column = COLUMNS[kind];
@@ -665,6 +694,65 @@ export async function listOffer(context) {
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(row.id, row.user_id, row.name, kind, item ? null : key, count, data, body.startPrice, buyNow, now, endsAt, fee, foreignCount),
+  ]);
+  return respond(db, session, now, {}, askedView(body.view));
+}
+
+// The auction's length asked for (from minHours to hours, the longest
+// without a choice), and "Kup teraz" (null without one).
+const askedHours = (body) => (body.hours === null || body.hours === undefined ? tuning().hours : body.hours);
+const askedBuyNow = (body) => (body.buyNow === null || body.buyNow === undefined || body.buyNow === '' ? null : body.buyNow);
+
+// "Wystaw" of a card of Talia Systemu (card-goods.js; the author,
+// 19.11.2026: „powinno się móc nimi też handlować”): the copies asked leave
+// the character's collection, those from others first (cardAfter), while
+// it holds them and no match running now plays the card; how many of them
+// came from others goes with the offer, and comes back so if nobody buys it
+// (as goods do, 923 A).
+// The deck it was in keeps its place: with every copy gone it is incomplete
+// until the card comes back.
+async function listCard(context, session, player, body) {
+  const { row } = player;
+  const db = context.env.DB;
+  const { kind } = body;
+  const key = typeof body.key === 'string' ? body.key : null;
+  const known = knownCard(kind, key);
+  const [held, busy, open] = await Promise.all([
+    known ? heldCards(db, row.id, kind, [key]).then((found) => found.get(key)) : { copies: 0, traded: 0 },
+    known ? cardBusy(db, kind, row.id, key) : false,
+    db.prepare("SELECT COUNT(*) AS open FROM market_offers WHERE seller_id = ? AND state = 'open'").bind(row.id).first('open'),
+  ]);
+  const { reputation } = settlementOf(row);
+  const limit = offerLimit(reputation, content());
+  const buyNow = askedBuyNow(body);
+  const hours = askedHours(body);
+  const block = listBlock({ kind, count: body.count, startPrice: body.startPrice, buyNow, hours }, held.copies, open, limit, content(), brotherhoodPerk('auctionHours', reputation, content()));
+  if (block?.code === 'not_enough') throw new ApiError(409, 'not_enough', held.copies > 0 ? filled(goodsWords().fewer, { count: held.copies }) : goodsWords().missing);
+  if (block) throw new ApiError(block.code === 'too_many' ? 409 : 400, block.code, block.message);
+  if (busy) throw new ApiError(409, 'card_in_match', goodsWords().inMatch);
+  const { count } = body;
+  const { after, foreign } = leaving(held, count);
+  const same = heldCondition(kind, row.id, key, held);
+  const free = freeCondition(kind, row.id, key);
+  const now = context.now;
+  await atomically(db, [
+    assertion(db, `(SELECT version FROM characters WHERE id = ?) = ? AND (SELECT COUNT(*) FROM market_offers WHERE seller_id = ? AND state = 'open') < ? AND ${same.sql} AND ${free.sql}`, [
+      row.id,
+      row.version,
+      row.id,
+      limit,
+      ...same.binds,
+      ...free.binds,
+    ]),
+    setCopies(db, kind, row.id, key, after, now),
+    // The version moves with the collection (card-goods.js).
+    db.prepare('UPDATE characters SET version = version + 1 WHERE id = ?').bind(row.id),
+    db
+      .prepare(
+        `INSERT INTO market_offers (seller_id, seller_user_id, seller_name, kind, good, count, item, start_price, buy_now, created_at, ends_at, fee, foreign_count)
+         VALUES (?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, ?, ?)`,
+      )
+      .bind(row.id, row.user_id, row.name, kind, key, count, body.startPrice, buyNow, now, now + hours * 3600000, brotherhoodPerk('marketFee', reputation, content()), foreign),
   ]);
   return respond(db, session, now, {}, askedView(body.view));
 }
@@ -852,6 +940,10 @@ export async function collectParcels(context) {
     if (count > 0) traded[parcel.kind][parcel.good] = (traded[parcel.kind][parcel.good] ?? 0) + count;
   };
   const items = [];
+  // Copies of cards of Talia Systemu (card-goods.js): into the collection, all
+  // of a purchase or a win as from others, of copies back only what came
+  // from others before.
+  const cards = [];
   const taken = [];
   let gold = 0;
   let value = 0;
@@ -872,6 +964,8 @@ export async function collectParcels(context) {
       fromOthers(parcel);
     } else if (parcel.kind === 'gold') {
       gold += parcel.count;
+    } else if (isCardGood(parcel.kind)) {
+      cards.push(addCopies(db, parcel.kind, row.id, parcel.good, parcel.count, parcel.reason === 'returned' ? Math.min(parcel.count, parcel.foreign_count ?? 0) : parcel.count, now));
     } else {
       adds[parcel.kind][parcel.good] = (adds[parcel.kind][parcel.good] ?? 0) + parcel.count;
       fromOthers(parcel);
@@ -914,6 +1008,7 @@ export async function collectParcels(context) {
         row.id,
       ),
     ...items.map((item) => db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, ?)').bind(row.id, JSON.stringify(item), now)),
+    ...cards,
     db.prepare(`DELETE FROM market_parcels WHERE character_id = ? AND id IN (${list})`).bind(row.id, ...taken),
   ]);
   return respond(db, session, now, { collected: { count: taken.length, left: parcels.length - taken.length, gold } }, askedView(body?.view));

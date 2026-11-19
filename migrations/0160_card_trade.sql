@@ -1,0 +1,14 @@
+-- Talia Systemu's cards in trade (DECISIONS.md, "Karty Talii: Skrzynia
+-- Konta, Targowisko i Wymiana (makiety, 19.11.2026)"; the author,
+-- 19.11.2026: „karty z wymiany/targowiska niech nie uzupełniają
+-- encyklopedii jakby coś”): of a character's copies of a creature's card,
+-- `traded` came from others (the Wymiana, the Targowisko, another
+-- character through the Skrzynia Konta). All the copies count for the
+-- card's level; the Encyklopedia's "Karty", the collection's bonus and the
+-- achievements count a card only with a copy of the character's own
+-- (copies > traded), as foreign_stacks leaves goods from others out of the
+-- Encyklopedia. Copies that leave go those from others first, so a
+-- character that found the card keeps it in its Encyklopedia as long as
+-- any of its own is held (cardAfter in src/engine/account-chest.js).
+-- Effect cards are in no Encyklopedia, so none is kept for them.
+ALTER TABLE cards ADD COLUMN traded INTEGER NOT NULL DEFAULT 0 CHECK (traded >= 0 AND traded <= copies);

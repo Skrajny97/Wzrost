@@ -17,8 +17,10 @@
 // exploration took along left the bag for the road (hunts.js), and nothing
 // worn is traded.
 
-import { bagCapacity, bagStacks, campLevels, isUnlocked, itemView, knownStack, materialView } from '../engine/index.js';
-import { characterChanged } from './atomic.js';
+import { bagCapacity, bagStacks, campLevels, cardAfter, isUnlocked, itemView, knownStack, materialView } from '../engine/index.js';
+import { assertion, characterChanged } from './atomic.js';
+import { busyCards, cardNames, faceOf, freeManyCondition, goodsWords, heldCards, heldManyCondition, knownCard, ownedCards, setManyCopies } from './card-goods.js';
+import { cardCollection, cardsHere, effectCollection } from './cards.js';
 import { bagItems, characterView, loadPlayer, requireOffRack } from './characters.js';
 import { requireChatter } from './chat.js';
 import { content } from './content.js';
@@ -46,7 +48,18 @@ const playedOnline = (row, now) => row?.role === 'player' && (row.seen_at ?? 0) 
 // (scroll-goods.js), so they are no STACKS.
 // The Spiżarnia's goods (`pantry`: fish, crops and dishes, the author,
 // 18.11.2026) take no places either.
-const emptyOffer = () => ({ gold: 0, items: [], herbs: {}, potions: {}, materials: {}, minerals: {}, resources: {}, pantry: {}, scrolls: {} });
+// The cards of Talia Systemu (card-goods.js; the author, 19.11.2026:
+// „powinno się móc nimi też handlować i wymieniać miedzy graczami”): copies
+// of creatures' cards (`cards`, by the creature's id) and of effect cards
+// (`effectCards`), from the character's collection to the other's, which
+// takes them as from others (its Encyklopedia leaves them out). They take
+// no places in the bag.
+const emptyOffer = () => ({ gold: 0, items: [], herbs: {}, potions: {}, materials: {}, minerals: {}, resources: {}, pantry: {}, scrolls: {}, cards: {}, effectCards: {} });
+// The offer's fields of cards, by the kind of card (card-goods.js).
+const CARD_FIELDS = [
+  ['cards', 'card'],
+  ['effectCards', 'effect-card'],
+];
 // The stacks an offer holds, each kept in the characters' column of its name.
 const STACKS = ['herbs', 'potions', 'materials', 'minerals', 'resources', 'pantry'];
 // A stack's key in the Encyklopedia's record of goods got in a trade; the
@@ -164,6 +177,12 @@ async function tradeView(db, trade, character, now) {
     scrolls: Object.entries(offer.scrolls)
       .filter(([id]) => scrollById(id))
       .map(([id, count]) => ({ id, name: scrollById(id).name, count })),
+    // Each card with its face at the level these copies alone give.
+    cards: CARD_FIELDS.flatMap(([field, kind]) =>
+      Object.entries(offer[field] ?? {})
+        .filter(([id]) => knownCard(kind, id))
+        .map(([id, count]) => ({ kind, id, count, ...cardNames(kind, id), face: faceOf(kind, id, count) })),
+    ),
   });
   const { proposalSeconds, idleMinutes } = rules();
   return {
@@ -176,7 +195,17 @@ async function tradeView(db, trade, character, now) {
     theirs: offerView(theirs),
     lockedBy: trade.locked_by === null ? null : trade.locked_by === character.id ? 'me' : 'them',
     endsAt: trade.state === 'proposed' ? trade.created_at + proposalSeconds * 1000 : trade.updated_at + idleMinutes * 60000,
+    // The words of the cards, where the game has them, and while the offers
+    // are open the character's cards to offer (ownedCards, each with whether
+    // a match running now holds it).
+    ...(cardsHere() && { cards: trade.state === 'open' ? await offerableCards(db, character.id) : { texts: goodsWords(), own: [] } }),
   };
+}
+
+// The character's cards for its offer in the Wymiana, and their words.
+async function offerableCards(db, characterId) {
+  const [collection, effects] = await Promise.all([cardCollection(db, characterId), effectCollection(db, characterId)]);
+  return { texts: goodsWords(), own: await ownedCards(db, characterId, { collection, effects }) };
 }
 
 // A trade, as the light of the Społeczność tab needs it (chat.js).
@@ -308,7 +337,33 @@ function cleanOffer(raw, player) {
   return offer;
 }
 
-const isEmpty = (offer) => offer.gold === 0 && offer.items.length === 0 && [...STACKS, 'scrolls'].every((kind) => Object.keys(offer[kind]).length === 0);
+// The cards of an offer (card-goods.js): copies of cards the game knows, at
+// most what the character holds of each, none of a card a match running
+// now plays on its side (its copies stay with it till the match ends).
+async function cleanCards(raw, db, characterId) {
+  const cards = { cards: {}, effectCards: {} };
+  for (const [field, kind] of CARD_FIELDS) {
+    const asked = raw?.[field] ?? {};
+    if (!asked || typeof asked !== 'object' || Array.isArray(asked)) throw new ApiError(400, 'invalid_offer', 'Nieprawidłowa oferta.');
+    const entries = Object.entries(asked);
+    if (entries.some(([id, count]) => !knownCard(kind, id) || !Number.isInteger(count) || count < 0)) throw new ApiError(400, 'invalid_offer', 'Nieprawidłowa oferta.');
+    const given = entries.filter(([, count]) => count > 0);
+    if (given.length === 0) continue;
+    const [held, busy] = await Promise.all([heldCards(db, characterId, kind, given.map(([id]) => id)), busyCards(db, characterId)]);
+    for (const [id, count] of given) {
+      if (count > held.get(id).copies) throw new ApiError(409, 'not_enough', `Masz mniej sztuk: ${cardNames(kind, id).cardName}.`);
+      if (busy[kind].has(id)) throw new ApiError(409, 'card_in_match', goodsWords().inMatch);
+      cards[field][id] = count;
+    }
+  }
+  return cards;
+}
+
+const isEmpty = (offer) =>
+  offer.gold === 0 &&
+  offer.items.length === 0 &&
+  [...STACKS, 'scrolls'].every((kind) => Object.keys(offer[kind]).length === 0) &&
+  CARD_FIELDS.every(([field]) => Object.keys(offer[field] ?? {}).length === 0);
 
 // POST /api/trade/offer {id, offer}: the character's offer, while neither
 // has confirmed the trade.
@@ -322,7 +377,7 @@ export async function setOffer(context) {
   if (trade.state === 'locked') throw new ApiError(409, 'locked', 'Wymiana jest już zatwierdzona. Można ją tylko przyjąć albo odrzucić.');
   requireTradeLevel(character);
   const player = await loadPlayer(db, session.userId);
-  const offer = cleanOffer(body.offer, player);
+  const offer = { ...cleanOffer(body.offer, player), ...(await cleanCards(body.offer, db, player.row.id)) };
   // Each offered item as stored now, so the exchange gives exactly this
   // item: not another one that got its number meanwhile, nor this one
   // changed by the Kowadło or the Zaklinaczka after the offer (the code
@@ -371,8 +426,13 @@ const addedStacks = (column) =>
 // offered, both characters are as read (`version`: their bags were
 // counted from them) and the trade is as both saw it. The stacks of a kind
 // go into each statement as one JSON object, so a Wymiana of any number of
-// kinds of goods stays within D1's 100 bound values.
-function exchange(db, trade, now, sides) {
+// kinds of goods stays within D1's 100 bound values. The cards (`cards`:
+// by kind, what each character holds of the cards either offer moves, as
+// read, cardsHeld) have statements of their own, as many: each character's
+// rows of them exactly as read and none of those it gives in a match
+// running now, then each row as it is after the trade (cardAfter: of the
+// copies given, those from others first; those got as from others).
+function exchange(db, trade, now, sides, cards) {
   const conditions = ["t.state = 'locked'", 't.version = ?'];
   const binds = [trade.version];
   for (const { id, offer, version } of sides) {
@@ -446,12 +506,51 @@ function exchange(db, trade, now, sides) {
     );
   }
   const emptied = (kind) => `(SELECT COALESCE(json_group_object(key, value), '{}') FROM json_each(characters.${kind}) WHERE value > 0)`;
+  const cardChecks = [];
+  const cardMoves = [];
+  for (const [field, kind] of CARD_FIELDS) {
+    for (const [side, other] of [
+      [one, two],
+      [two, one],
+    ]) {
+      const held = cards[kind].get(side.id);
+      if (held.size === 0) continue;
+      const same = heldManyCondition(kind, side.id, Object.fromEntries(held));
+      const given = Object.keys(side.offer[field] ?? {});
+      const free = given.length > 0 ? freeManyCondition(kind, side.id, given) : null;
+      cardChecks.push(assertion(db, free ? `${same.sql} AND ${free.sql}` : same.sql, free ? [...same.binds, ...free.binds] : same.binds));
+      const finals = Object.fromEntries(
+        [...held].map(([id, before]) => {
+          const got = other.offer[field]?.[id] ?? 0;
+          return [id, cardAfter(before, side.offer[field]?.[id] ?? 0, got, got)];
+        }),
+      );
+      cardMoves.push(...setManyCopies(db, kind, side.id, finals, now));
+    }
+  }
   return db.batch([
     db.prepare(`SELECT CASE WHEN ${conditions.join(' AND ')} THEN 1 ELSE json(t.state) END AS ok FROM trades t WHERE t.id = ?`).bind(...binds, trade.id),
+    ...cardChecks,
     db.prepare("UPDATE trades SET state = 'done', updated_at = ? WHERE id = ? AND state = 'locked' AND version = ?").bind(now, trade.id, trade.version),
     ...moves,
+    ...cardMoves,
     db.prepare(`UPDATE characters SET ${STACKS.map((kind) => `${kind} = ${emptied(kind)}`).join(', ')} WHERE id IN (?, ?)`).bind(one.id, two.id),
   ]);
+}
+
+// What each character holds of the cards either offer moves, by kind and
+// character (heldCards), for the exchange.
+async function cardsHeld(db, from, to) {
+  const held = {};
+  for (const [field, kind] of CARD_FIELDS) {
+    const ids = [...new Set([...Object.keys(from.offer[field] ?? {}), ...Object.keys(to.offer[field] ?? {})])];
+    const [one, two] = await Promise.all([heldCards(db, from.id, kind, ids), heldCards(db, to.id, kind, ids)]);
+    held[kind] = new Map([
+      [from.id, one],
+      [to.id, two],
+    ]);
+  }
+  return held;
 }
 
 // POST /api/trade/confirm {id, version}: the first to confirm the offers as
@@ -501,6 +600,7 @@ export async function confirmTrade(context) {
   ]) {
     try {
       cleanOffer(offer, player);
+      await cleanCards(offer, db, player.row.id);
     } catch {
       await close(db, trade, 'cancelled', now);
       throw new ApiError(409, 'stale', `${player.row.name} nie ma już wszystkiego, co było w ofercie. Wymiana przepadła.`);
@@ -514,11 +614,13 @@ export async function confirmTrade(context) {
       throw new ApiError(409, 'bag_full', `W plecaku postaci ${player.row.name} zabraknie miejsca. Zwolnijcie miejsce albo odrzućcie wymianę.`);
     }
   }
+  const sides = [
+    { id: trade.from_id, offer: from, version: fromPlayer.row.version },
+    { id: trade.to_id, offer: to, version: toPlayer.row.version },
+  ];
+  const cards = await cardsHeld(db, ...sides);
   try {
-    await exchange(db, trade, now, [
-      { id: trade.from_id, offer: from, version: fromPlayer.row.version },
-      { id: trade.to_id, offer: to, version: toPlayer.row.version },
-    ]);
+    await exchange(db, trade, now, sides, cards);
   } catch {
     // A character changed since it was read, and its bag may hold more by
     // now (the code review: the bags were checked before the exchange, not

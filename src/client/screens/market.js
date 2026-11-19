@@ -14,9 +14,17 @@
 //
 // The Osada's place screen mounts the panel once and keeps it while it
 // redraws itself, so a redraw never asks the server again.
+//
+// Talia Systemu's cards too, where the game has them (`market.cards`;
+// DECISIONS.md, "Karty Talii: Skrzynia Konta, Targowisko i Wymiana"): their
+// copies go up and are bought as goods, with tabs of their own, each offer
+// with the card's small picture and its face under a tap, with the level
+// the buyer has it at. Their words come from the data (cards.json
+// texts.goods), with the Targowisko's answer.
 
 import { herbSprite, mineralSprite, pantrySprite, potionSprite, scrollArt } from '../art.js';
 import { ALL, BIDDING, FOR_ME, categoriesOf, goodsCategory, inCategory, shownCategory } from '../categories.js';
+import { cardFace, cardThumb } from '../cards.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatDecimal, formatNumber, tradePace } from '../format.js';
@@ -106,10 +114,26 @@ function saveSort(sort) {
   }
 }
 const REASONS = { won: 'wygrana licytacja', bought: 'kupione', returned: 'wraca do Ciebie', sold: 'zapłata za sprzedaż' };
-const kindName = (kind) => (KIND_NAMES[kind] ? t(KIND_NAMES[kind]) : null);
+// The cards of Talia Systemu as the Targowisko's last answer brings them:
+// the copies of each the character has (`have`, by "kind:id"), the top
+// level and the words of the data; null where the game has no cards.
+let cards = null;
+const isCardKind = (kind) => kind === 'card' || kind === 'effect-card';
+const cardWord = (key) => cards?.texts?.[key] ?? '';
+const filled = (text, vars) => String(text ?? '').replace(/\{(\w+)\}/g, (whole, name) => (Object.hasOwn(vars, name) ? String(vars[name]) : whole));
+// The cards' tab and filter, effect cards under it too (kindTab in the
+// engine), and the word of each kind of card in a line.
+const cardKinds = () => (cards ? [{ id: 'card', name: cardWord('marketTab'), none: cardWord('marketNone') }] : []);
+const CARD_WORDS = { card: 'kind', 'effect-card': 'effectKind' };
+const kindName = (kind) => (KIND_NAMES[kind] ? t(KIND_NAMES[kind]) : CARD_WORDS[kind] ? cardWord(CARD_WORDS[kind]) : null);
+// A good's category among the goods to put up: an effect card's the cards'.
+const sellCategory = (goods) => (goods.kind === 'effect-card' ? 'card' : goodsCategory(goods));
 // What a stack is: its kind, or what a good of the Spiżarnia is.
 const goodsKind = (goods) => (goods.kind === 'pantry' ? t(PANTRY_KINDS[goods.group] ?? 'Spiżarnia') : kindName(goods.kind));
 const rarityOf = (id) => state.content?.rarities?.find((rarity) => rarity.id === id);
+// A rarity's name for the goods: a card's in its form for a card ("karta
+// mityczna").
+const rarityName = (goods, rarity) => (isCardKind(goods.kind) ? (rarity?.forms?.f ?? rarity?.name) : rarity?.name);
 
 // What is left until `at`: "2 dni 5 h", "5 h 12 min", "12 min".
 function left(at) {
@@ -130,6 +154,7 @@ export function stackArt(goods, size = 24) {
   if (goods.kind === 'mineral') return mineralSprite(goods.key) ?? icon('ore', { size });
   if (goods.kind === 'scroll') return scrollArt(goods.key, size);
   if (goods.kind === 'pantry') return pantrySprite(goods.key) ?? icon('fish', { size });
+  if (isCardKind(goods.kind)) return goods.face ? cardThumb(goods.face) : icon('star', { size });
   return icon('coin', { size });
 }
 
@@ -146,7 +171,7 @@ function stackLine(goods, { count = true, meta } = {}) {
       'span',
       { class: 'item-summary' },
       h('span', { class: 'item-name', vars: rarity ? { '--rarity': rarity.color } : {}, text: name }),
-      goods.kind !== 'gold' && h('span', { class: 'item-meta', text: meta ?? [goodsKind(goods), rarity?.name].filter(Boolean).join(' · ') }),
+      goods.kind !== 'gold' && h('span', { class: 'item-meta', text: meta ?? [goodsKind(goods), rarityName(goods, rarity)].filter(Boolean).join(' · ') }),
     ),
   );
 }
@@ -161,7 +186,23 @@ function owned(goods) {
   if (goods.kind === 'mineral') return character.minerals?.find((one) => one.id === goods.key)?.count ?? 0;
   if (goods.kind === 'scroll') return character.scrollGoods?.find((one) => one.id === goods.key)?.count ?? 0;
   if (goods.kind === 'pantry') return character.pantry?.find((one) => one.id === goods.key)?.count ?? 0;
+  if (isCardKind(goods.kind)) return cards?.have?.[`${goods.kind}:${goods.key}`] ?? 0;
   return 0;
+}
+
+// A card's facts: its face, the level the character has it at, and that
+// copies from others raise its level but fill no Encyklopedia.
+function cardFacts(goods) {
+  const have = owned(goods);
+  return [
+    goods.face && h('div', { class: 'chest-card-show' }, cardFace(goods.face)),
+    h(
+      'ul',
+      { class: 'item-properties' },
+      h('li', { text: have > 0 ? filled(cardWord('marketHave'), { level: Math.min(cards?.maxLevel ?? have, have), count: formatNumber(have) }) : cardWord('marketHaveNone') }),
+      h('li', { class: 'muted', text: cardWord('rule') }),
+    ),
+  ];
 }
 
 // What a stack's card tells: its description, a dish's meal, what the
@@ -169,6 +210,7 @@ function owned(goods) {
 // the Zielarstwo level that gathers a herb, the Górnictwo level that digs
 // a gem or an ore, and how many the character has.
 function goodsFacts(goods) {
+  if (isCardKind(goods.kind)) return cardFacts(goods);
   return [
     goods.description && h('p', { class: 'sheet-text', text: goods.description }),
     h(
@@ -209,7 +251,7 @@ function goodsSheet(goods, actions = null) {
           'div',
           {},
           h('h2', { class: 'item-title', vars: colour, text: goods.name }),
-          h('p', { class: 'item-meta', text: [goodsKind(goods), rarity?.name].filter(Boolean).join(' · ') }),
+          h('p', { class: 'item-meta', text: [goodsKind(goods), rarityName(goods, rarity)].filter(Boolean).join(' · ') }),
         ),
       ),
       goodsFacts(goods),
@@ -308,6 +350,7 @@ export function companionCompare(companion, item) {
 const goodsCategories = () => [
   ...state.content.slots.map(({ id, name }) => ({ id, name })),
   ...Object.entries(KIND_GROUPS).map(([id, name]) => ({ id, name: t(name) })),
+  ...cardKinds().map(({ id, name }) => ({ id, name })),
 ];
 
 // Chips over a long list of goods that show one category of them at a time
@@ -435,6 +478,7 @@ export function mountMarket(holder) {
       const answer = await call('GET', `/api/market?${new URLSearchParams(asked())}`);
       if (ask !== asks) return;
       market = answer.market;
+      cards = market.cards ?? null;
       answered(market.view);
       failure = null;
     } catch (error) {
@@ -484,6 +528,7 @@ export function mountMarket(holder) {
       asks += 1;
       searching = false;
       market = answer.market;
+      cards = market.cards ?? null;
       answered(market.view);
       closeSheet();
       if (done) toast(typeof done === 'function' ? done(answer) : done);
@@ -645,8 +690,10 @@ export function mountMarket(holder) {
               h(
                 'li',
                 { class: 'market-pick market-pick--item' },
-                stackEntry(stack, `sell:${stack.kind}:${stack.key}`, opened, { under: scrapText(stack.scrap, true, stack.kind === 'pantry') }),
-                choose(stack),
+                stackEntry(stack, `sell:${stack.kind}:${stack.key}`, opened, { under: stack.busy ? cardWord('busy') : scrapText(stack.scrap, true, stack.kind === 'pantry') }),
+                stack.busy
+                  ? h('button', { type: 'button', class: 'button button--world button--small', text: t('Wybierz'), 'aria-disabled': 'true', onClick: () => toast(cardWord('inMatch')) })
+                  : choose(stack),
               ),
             ),
           ),
@@ -663,7 +710,7 @@ export function mountMarket(holder) {
       }),
       goods.length === 0
         ? h('p', { class: 'muted', text: t('W plecaku nie ma nic do wystawienia. Założonych przedmiotów się nie wystawia.') })
-        : filtered(goods, goodsCategory, filters.sellable, picks),
+        : filtered(goods, sellCategory, filters.sellable, picks),
     );
   }
 
@@ -717,11 +764,30 @@ export function mountMarket(holder) {
     const now = numberField('market-buy-now', t('„Kup teraz” (zł, może zostać puste)'), null, 1, maxPrice);
     const length = hoursPicker();
     const scrap = scrapText(goods.scrap, goods.kind !== 'item', goods.kind === 'pantry');
+    // A card: its line, its face under a tap (as on the offers), and the
+    // decks its last copies put up leave incomplete (as the Skrzynia Konta
+    // says).
+    const card = isCardKind(goods.kind);
+    const decks = card ? (goods.decks ?? []).map((deck) => (deck.name ? `„${deck.name}”` : String(deck.slot))) : [];
+    const warn =
+      decks.length > 0 &&
+      h('p', {
+        class: 'region-warning chest-card-warn',
+        text: decks.length > 1 ? filled(cardWord('putDecks'), { decks: decks.join(', ') }) : filled(cardWord('putDeck'), { deck: decks[0] }),
+      });
+    if (warn && count) {
+      const input = count.element.querySelector('input');
+      const check = () => (warn.hidden = Number(input.value) !== goods.count);
+      input.addEventListener('input', check);
+      check();
+    }
     openSheet(
       h('h2', { class: 'sheet-title', text: goods.name }),
+      card && h('div', { class: 'market-price-card' }, stackEntry(goods, `price:${goods.kind}:${goods.key}`, opened)),
       scrap && h('p', { class: 'muted market-scrap', text: scrap }),
       count && h('p', { class: 'sheet-text', text: t('Cena dotyczy wszystkich wystawionych sztuk razem.') }),
       count?.element,
+      warn,
       start.element,
       now.element,
       length.element,
@@ -954,7 +1020,7 @@ export function mountMarket(holder) {
     const companion = view.show === FOR_ME ? team.find((one) => one.id === view.who) : null;
     const rarities = (state.content?.rarities ?? []).filter((rarity) => counts.rarities?.[rarity.id] > 0);
     const tiers = (market.tiers ?? []).filter((tier) => counts.tiers?.[tier.id] > 0);
-    const categories = [...state.content.slots.map(({ id, name }) => ({ id, name })), ...Object.entries(KIND_GROUPS).map(([id, name]) => ({ id, name: t(name) }))]
+    const categories = [...state.content.slots.map(({ id, name }) => ({ id, name })), ...Object.entries(KIND_GROUPS).map(([id, name]) => ({ id, name: t(name) })), ...cardKinds().map(({ id, name }) => ({ id, name }))]
       .filter(({ id }) => counts.categories?.[id] > 0)
       .map((category) => ({ ...category, count: counts.categories[category.id] }));
     const lists = [
@@ -994,7 +1060,7 @@ export function mountMarket(holder) {
         switchRow(
           'market-kinds',
           t('Rodzaj towaru'),
-          KIND_TABS.map(([id, name]) => ({ id, name: t(name), count: counts.kinds?.[id] ?? 0 })),
+          [...KIND_TABS.map(([id, name]) => ({ id, name: t(name), count: counts.kinds?.[id] ?? 0 })), ...cardKinds().map(({ id, name }) => ({ id, name, count: counts.kinds?.[id] ?? 0 }))],
           view.kind,
           (kind) => search({ kind, category: ALL, tier: null, rarity: null }),
         ),
@@ -1049,6 +1115,8 @@ export function mountMarket(holder) {
     }
     if (view.show === BIDDING) return t(NO_OFFERS[BIDDING]);
     if (view.classId || view.tier || view.rarity || view.category !== ALL) return t('Nic tu nie pasuje do wybranych filtrów.');
+    const card = cardKinds().find((one) => one.id === view.kind);
+    if (card) return card.none;
     return t(NO_KIND[view.kind] ?? 'Nikt nic teraz nie wystawia.');
   }
 
