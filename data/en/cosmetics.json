@@ -17,6 +17,10 @@
       "name": "Hoarfrost",
       "description": "A frame bound in ice, with icicles and snowflakes in the corners. Every few seconds a frosty gleam runs across it. Only from the Generous Feast calendar."
     },
+    "frame-guild-banner": {
+      "name": "Banner Frame",
+      "description": "A portrait frame with the guild banner. Every few seconds a gleam runs across it. Only from the Guild Stall, for Guild Marks."
+    },
     "bg-spring": {
       "name": "System Spring",
       "description": "A clearing at night with a spring that shines with the System's light."

@@ -11,7 +11,10 @@
 // level, HP bar and "Atakuj" with the attacks left today (for those who
 // added minutes this week), its fight played back in the arena as an
 // attack on the Bestia; and the "Wkład tygodnia", who added how many
-// minutes. The tab asks for the Wyprawa itself and takes its words from the
+// minutes. Over them the Róg zbiórki (1199 A), and on the guardian's card
+// the classes of the day (1197), the podcięcia waiting and "Cios" and
+// "Podcięcie" in place of "Atakuj" (1203; guild-strike.js), as at the
+// Bestia. The tab asks for the Wyprawa itself and takes its words from the
 // answer (data/guilds.json, expedition.texts), in the page's language; its
 // own few words go through t() (i18n.js). mountGuildExpedition
 // (container) adds the cards to the container and gives { unmount() },
@@ -27,6 +30,7 @@ import { language, t } from './i18n.js';
 import { call, state } from './state.js';
 import { foldPart, howItWorks, openSheet, toast, withButton } from './ui.js';
 import { itemSheet } from './screens/character.js';
+import { attackChoice, classDayPart, rallyCard, rallyTurn, undercutsPart } from './guild-strike.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
@@ -94,14 +98,27 @@ export function mountGuildExpedition(container) {
     render();
   }
 
-  async function attack() {
-    const answer = await call('POST', '/api/guild/expedition/attack');
+  // The words of the last attack: what it took off the bar, its bonuses,
+  // what a podcięcie leaves for the others, and the fall.
+  const attackText = (attack, texts, strike) =>
+    [
+      filled(texts.lastAttack, { damage: formatNumber(attack.damage) }),
+      attack.boostsText,
+      attack.kind === 'undercut' && strike?.texts.undercut.undercutDone,
+      attack.fell && (attack.last ? texts.fellLast : texts.fell),
+    ]
+      .filter(Boolean)
+      .join(' ');
+
+  // A Cios or a Podcięcie (`kind`, 1203).
+  async function attack(kind = 'strike') {
+    const answer = await call('POST', '/api/guild/expedition/attack', { kind });
     checkGuildTodo({ now: true });
     last = answer.attack;
     opened = null;
     show(answer);
     const { texts } = answer;
-    const words = [filled(texts.lastAttack, { damage: formatNumber(answer.attack.damage) }), answer.attack.fell && (answer.attack.last ? texts.fellLast : texts.fell)].filter(Boolean).join(' ');
+    const words = attackText(answer.attack, texts, answer.strike);
     // The fight played back at once, as an attack on the Bestia's.
     if (answer.attack.fight) {
       const arena = createArena(answer.attack.fight, { autoplay: 'now' });
@@ -174,7 +191,8 @@ export function mountGuildExpedition(container) {
   // minutes kept at a guardian, and the rules.
   function routeCard() {
     const { expedition: route, texts } = view;
-    const how = howItWorks(texts.lead, texts.how);
+    // With the classes of the day and the podcięcia (1197, 1203).
+    const how = howItWorks(texts.lead, [...texts.how, ...(view.strike?.texts.how ?? [])]);
     return h(
       'section',
       { class: 'card guild-expedition-card', 'aria-labelledby': 'guild-expedition-title', 'data-guide': 'guild-expedition-route' },
@@ -209,7 +227,7 @@ export function mountGuildExpedition(container) {
   // The guardian of the stage now: barring the way with its HP bar and
   // "Atakuj", or ahead with the minutes still to it.
   function guardianCard() {
-    const { expedition: route, attacks, contributor, texts } = view;
+    const { expedition: route, attacks, contributor, texts, strike } = view;
     if (route.done) return null;
     const guardian = route.guardians[route.stage - 1];
     const standing = guardian.state === 'standing';
@@ -229,20 +247,27 @@ export function mountGuildExpedition(container) {
       bar({ label: 'HP', value: guardian.hp, max: guardian.maxHp, text: `${formatNumber(guardian.hp)} / ${formatNumber(guardian.maxHp)}`, kind: 'hp', className: 'guild-beast-hp', name: `${guardian.name}: HP` });
     // "Atakuj" shut, with the words of why, while the character offers
     // itself or serves as a mercenary (attacks.blocked).
+    // The classes of the day and the podcięcia waiting, then "Cios" and
+    // "Podcięcie" (1197, 1203).
+    const disabled = attacks.left === 0 || Boolean(attacks.blocked);
     const actions = standing
       ? contributor
         ? [
+            strike && classDayPart(strike),
+            strike && undercutsPart(strike),
             h('p', { class: 'guild-beast-attacks', text: [filled(texts.attacksLeft, { left: attacks.left, perDay: attacks.perDay }), attacks.left === 0 && texts.newAttacks].filter(Boolean).join('. ') }),
             attacks.blocked && h('p', { class: 'muted', text: attacks.blocked }),
-            h('button', {
-              type: 'button',
-              class: 'button button--system',
-              text: texts.attack,
-              disabled: attacks.left === 0 || Boolean(attacks.blocked),
-              onClick: (event) => withButton(event.currentTarget, attack),
-            }),
+            strike
+              ? attackChoice(strike, { disabled, onAttack: attack })
+              : h('button', {
+                  type: 'button',
+                  class: 'button button--system',
+                  text: texts.attack,
+                  disabled,
+                  onClick: (event) => withButton(event.currentTarget, () => attack()),
+                }),
           ]
-        : h('p', { class: 'muted', text: texts.contributeFirst })
+        : [strike && classDayPart(strike), h('p', { class: 'muted', text: texts.contributeFirst })]
       : null;
     return h(
       'section',
@@ -263,7 +288,7 @@ export function mountGuildExpedition(container) {
     return h(
       'div',
       { class: 'guild-beast-last' },
-      h('p', { text: [filled(texts.lastAttack, { damage: formatNumber(last.damage) }), last.fell && (last.last ? texts.fellLast : texts.fell)].filter(Boolean).join(' ') }),
+      h('p', { text: attackText(last, texts, view.strike) }),
       last.log.length > 0 &&
         h(
           'details',
@@ -391,18 +416,35 @@ export function mountGuildExpedition(container) {
       );
       return;
     }
-    fill(body, routeCard(), chestsCard(), guardianCard(), contributionCard());
+    fill(body, rallyPart(), routeCard(), chestsCard(), guardianCard(), contributionCard());
   }
 
-  call('GET', '/api/guild/expedition')
-    .then(show)
-    .catch((error) => {
-      if (!gone) fill(body, h('section', { class: 'card' }, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać Wyprawy Gildii.') })));
-    });
+  // The Róg zbiórki over the route (1199 A); the tab asks for the Wyprawa
+  // anew when the rally starts or ends, so the bonus shows as it is.
+  let turn = null;
+  function rallyPart() {
+    clearTimeout(turn);
+    turn = null;
+    const rally = view.strike?.rally;
+    if (!rally) return null;
+    const wait = rallyTurn(rally);
+    if (wait !== null && wait < 2 ** 31) turn = setTimeout(refresh, wait);
+    return rallyCard(rally, { onChange: (next) => show({ ...view, strike: { ...view.strike, rally: next } }) });
+  }
+
+  function refresh() {
+    return call('GET', '/api/guild/expedition')
+      .then(show)
+      .catch((error) => {
+        if (!gone) fill(body, h('section', { class: 'card' }, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać Wyprawy Gildii.') })));
+      });
+  }
+  refresh();
 
   return {
     unmount() {
       gone = true;
+      clearTimeout(turn);
       body.remove();
     },
   };

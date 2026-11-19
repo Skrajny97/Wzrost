@@ -188,6 +188,14 @@
             "League Warrior",
             "League Warrior"
           ]
+        },
+        "banner-warden": {
+          "name": "Banner Warden",
+          "goal": "Buy this title in the Guild Stall for Guild Marks.",
+          "title": [
+            "Banner Warden",
+            "Banner Warden"
+          ]
         }
       }
     },

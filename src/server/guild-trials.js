@@ -11,8 +11,9 @@
 // week and threshold for each character that finished a trial in the guild
 // that week, claimed that week or the next. What an action brings to the
 // character's trial is saved in the action's own batch (trialProgress), so
-// it lands only with the action. No line in the guild's chat: the chat has
-// no System lines, as for the Bestia Gildii. Where Talia Systemu is on, each
+// it lands only with the action. A threshold reached is told in the guild's
+// chat by the Kronika (1195 A, guild-chronicle.js, from the guild's dots in
+// guild-todo.js). Where Talia Systemu is on, each
 // trial finished may leave a card, given at the next look (903,
 // trialCards).
 
@@ -22,6 +23,7 @@ import {
   casinoDay,
   countedForm,
   drawTrialBoard,
+  godDomain,
   isUnlocked,
   materialsText,
   materialView,
@@ -46,6 +48,7 @@ import { characterView, engineCharacter, loadPlayer, questContext, requirePlayer
 import { content } from './content.js';
 import { craftingOn, professionsOn, settlementOn } from './features.js';
 import { guildOf } from './guilds.js';
+import { boardPatron, patronOf } from './guild-shrine.js';
 import { ApiError, json, readJson } from './http.js';
 import { counted } from './market.js';
 import { trialFame } from './fame.js';
@@ -214,6 +217,10 @@ async function boardOf(db, guildId, now) {
   const { current, previous } = weeksAround(now);
   let row = await boardRow(db, guildId, current.key).first();
   if (!row) {
+    // The week's patron from the Kącina, counted first: half of its board
+    // comes from the god's domain (guild-shrine.js, 1201 A).
+    const god = await patronOf(db, guildId, now);
+    const patron = god ? { god, domain: godDomain(god, content()) } : null;
     await db.batch([
       db.prepare('DELETE FROM guild_trials WHERE week < ?').bind(previous.key),
       db.prepare('DELETE FROM guild_trial_boards WHERE week < ?').bind(previous.key),
@@ -225,7 +232,7 @@ async function boardOf(db, guildId, now) {
            FROM guild_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id
            WHERE m.guild_id = ? AND u.seen_at >= ?`,
         )
-        .bind(guildId, current.key, JSON.stringify(drawTrialBoard(`${guildId}:${current.key}`, content())), now, guildId, now - rules().activeDays * DAY),
+        .bind(guildId, current.key, JSON.stringify(drawTrialBoard(`${guildId}:${current.key}`, content(), patron)), now, guildId, now - rules().activeDays * DAY),
     ]);
     row = await boardRow(db, guildId, current.key).first();
   }
@@ -468,6 +475,9 @@ export async function trialsView(db, player, guild, now) {
     guild: { name: guild.name, tag: guild.tag },
     week: current.key,
     endsAt: current.endsAt,
+    // The week's patron from the Kącina, whose domain gave half the board
+    // (guild-shrine.js, 1201 A), or null.
+    patron: boardPatron(board.trials),
     trials: board.trials.flatMap((trial, index) => {
       const kind = trialKind(trial.kind, content());
       const one = mine.get(index);
@@ -479,6 +489,8 @@ export async function trialsView(db, player, guild, now) {
         {
           index,
           kind: trial.kind,
+          // Of the domain of the week's patron (1201 A), marked on the board.
+          ...(trial.god && { god: trial.god }),
           text: trialText(trial.kind, count, content()),
           note: trialNote(trial.kind, row.level, content()),
           count,

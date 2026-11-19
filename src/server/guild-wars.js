@@ -54,6 +54,7 @@ import { nameColorOf } from './cosmetics.js';
 import { fromBase64, toBase64, toHex } from './encoding.js';
 import { englishOn, guildWarsOn } from './features.js';
 import { warChestStatements } from './guild-chest.js';
+import { chronicle } from './guild-chronicle.js';
 import { guildPlayer, requireMember } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { language, numberText } from './i18n.js';
@@ -222,8 +223,10 @@ function fightRows(db, matchId, day, at, fights) {
 // fight from the match's seed, its log in Polish and, where English is on,
 // in English too (the same fight: its texts take no draws). Every fight won
 // brings its fighters gold, and every character who fought for the guild
-// that won the match its Punkty Systemu, once (799 A). Characters of one
-// account on both sides fight each other too (the author, 16.11.2026:
+// that won the match its Punkty Systemu, once (799 A). The Kronika tells
+// each guild's chat of the evening's result (1195 A, guild-chronicle.js).
+// Characters of one account on both sides fight each other too (the
+// author, 16.11.2026:
 // „jeśli ktoś ma postać w gildii przeciwnej to niech walczą ze sobą”; till
 // then such an account fought on neither side, and its trios, short, lost
 // their fights by walkover). A side with nobody makes the match void,
@@ -314,6 +317,15 @@ async function fightMatch(db, league, match, at, now) {
     db
       .prepare('UPDATE guild_wars SET days_done = 1, wins_a = ?, wins_b = ?, losses_a = ?, losses_b = ?, walkovers_a = ?, walkovers_b = ?, draws = ?, result = ?, ended_at = ? WHERE id = ?')
       .bind(tally.winsA, tally.winsB, tally.lossesA, tally.lossesB, tally.walkoversA, tally.walkoversB, tally.draws, result, now, match.id),
+    // The Kronika's line in each guild's chat, for a match fought by both.
+    ...(a && b && ['a', 'b', 'draw'].includes(result)
+      ? [
+          [match.guild_a, 'a', match.tag_b, match.name_b, tally.winsA, tally.lossesA],
+          [match.guild_b, 'b', match.tag_a, match.name_a, tally.winsB, tally.lossesB],
+        ].map(([guildId, side, tag, name, won, lost]) =>
+          chronicle(db, guildId, result === 'draw' ? 'warDraw' : result === side ? 'warWon' : 'warLost', { tag, guild: name, won, lost }, now, { once: `war:${match.id}` }),
+        )
+      : []),
   ];
   try {
     await db.batch(statements);

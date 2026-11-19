@@ -28,6 +28,8 @@ import { ApiError, json, readJson } from './http.js';
 import { language, runInLanguage, t } from './i18n.js';
 import { joinGuildTrials } from './guild-trials.js';
 import { beastJoin } from './guild-beast.js';
+import { chronicle } from './guild-chronicle.js';
+import { badgeView, heroesOf } from './guild-heroes.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 const rules = () => content().guilds;
@@ -107,7 +109,7 @@ export async function guildView(db, characterId, now) {
   const [members, sent, invites, friends, best] = await db.batch([
     db
       .prepare(
-        `SELECT c.id, c.name, c.class_id, c.level, c.role AS played, c.cosmetics, m.role, m.probation_until, u.seen_at
+        `SELECT c.id, c.name, c.class_id, c.level, c.role AS played, c.cosmetics, c.appearance, m.role, m.probation_until, u.seen_at
          FROM guild_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id
          WHERE m.guild_id = ? ORDER BY CASE m.role WHEN 'leader' THEN 0 WHEN 'deputy' THEN 1 ELSE 2 END, m.joined_at, m.character_id`,
       )
@@ -135,6 +137,9 @@ export async function guildView(db, characterId, now) {
   ]);
   const { onlineSeconds } = content().community.trade;
   const online = (row) => row.played === 'player' && (row.seen_at ?? 0) >= now - onlineSeconds * 1000;
+  // The badges of the Bohaterowie tygodnia of the week before (1198 A,
+  // guild-heroes.js), by member.
+  const heroes = guild ? await heroesOf(db, guild.id, now) : new Map();
   const { found, size, name, tag, ranks } = rules();
   const rankView = (membership) => {
     const rank = rankOf(membership, now);
@@ -170,6 +175,8 @@ export async function guildView(db, characterId, now) {
         // „Przydałoby się widzieć kiedy ktoś się zalogował w gildii tak jak u
         // znajomych”): the account's seen_at, null for one never seen.
         lastSeen: row.seen_at ?? null,
+        // Its badges of last week's heroes, each with its name and tip.
+        heroes: (heroes.get(row.id) ?? []).map((kind) => badgeView(kind, row.appearance)),
       })),
       invited: sent.results.map((row) => ({ id: row.id, name: row.name })),
       friends: friends.results.map((row) => ({ id: row.id, name: row.name, nameColor: nameColorOf(row.cosmetics), classId: row.class_id, level: row.level, online: online(row) })),
@@ -436,7 +443,8 @@ function weekJoin(db, table, guildId, characterId, now) {
 // week's thresholds of the Próby Gildii by its share of the week left, in
 // the same batch (the author's 615 A), and so the Wyprawa Gildii's route of
 // the week, made already, its stages and guardians to come (621 A); not
-// again for a character the week counts already (weekJoin).
+// again for a character the week counts already (weekJoin). The Kronika
+// tells the guild's chat of its new member (1195 A, guild-chronicle.js).
 export async function acceptGuildInvite(context) {
   const { player } = await requireGuildPlayer(context);
   const db = context.env.DB;
@@ -460,6 +468,12 @@ export async function acceptGuildInvite(context) {
       // next stages take more minutes and its next guardians more HP.
       weekJoin(db, 'guild_expeditions', invite.guild_id, player.row.id, context.now),
       ...beast,
+      // The Kronika's line, once the character is in.
+      chronicle(db, invite.guild_id, 'joined', { name: player.row.name }, context.now, {
+        characterId: player.row.id,
+        once: `member:${player.row.id}:${context.now}`,
+        when: { sql: 'EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND guild_id = ? AND joined_at = ?)', binds: [player.row.id, invite.guild_id, context.now] },
+      }),
     ]);
   } catch {
     throw new ApiError(409, 'in_guild', 'Najpierw opuść swoją gildię.');
@@ -531,6 +545,11 @@ export function guildRemoval(db, characters, binds, now) {
     db.prepare('DELETE FROM guild_seat_donations WHERE guild_id NOT IN (SELECT guild_id FROM guild_members)'),
     // The members' Sława of the weeks gone (guild-members.js).
     db.prepare('DELETE FROM guild_member_fame WHERE guild_id NOT IN (SELECT guild_id FROM guild_members)'),
+    // The helps of its members (guild-help.js, 1196) and the votes and
+    // patrons of its Kącina (guild-shrine.js, 1201 A).
+    db.prepare('DELETE FROM guild_helps WHERE guild_id NOT IN (SELECT guild_id FROM guild_members)'),
+    db.prepare('DELETE FROM guild_shrine_votes WHERE guild_id NOT IN (SELECT guild_id FROM guild_members)'),
+    db.prepare('DELETE FROM guild_patrons WHERE guild_id NOT IN (SELECT guild_id FROM guild_members)'),
     ...chestsGone(db),
     db.prepare('DELETE FROM guilds WHERE id NOT IN (SELECT guild_id FROM guild_members)'),
   ];

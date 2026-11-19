@@ -22,7 +22,11 @@
 // its collection. Each save holds only while what was read
 // still holds (atomic.js). A character removed and its id given again (the
 // characters' ids are not AUTOINCREMENT) takes nothing of the one before:
-// only what was written since the character was made counts.
+// only what was written since the character was made counts. Before each
+// attack the player picks "Cios" or "Podcięcie" (1203), and the classes of
+// the day (1197) and the guild's rally (1199 A) make it hit harder
+// (guild-strike.js); the hit that fells the beast writes the Kronika's line
+// in the guild's chat (1195 A, guild-chronicle.js).
 
 import {
   bagCapacity,
@@ -43,6 +47,8 @@ import {
 } from '../engine/index.js';
 import { assertion, atomically, sameVersion } from './atomic.js';
 import { cardGains, guildCard } from './cards.js';
+import { chronicle } from './guild-chronicle.js';
+import { boostsText, strikeKind, strikePlan, strikeView } from './guild-strike.js';
 import { attackBlocked, bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requireNotExploring, requirePlayer, trophiesFor } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
@@ -229,23 +235,40 @@ export async function beastView(db, row, now, activity = null) {
   };
 }
 
+// The Bestia for its card on the page: beastView, and in a guild the
+// classes of the day, the rally and the podcięcia waiting on the beast
+// (strikeView, guild-strike.js); `strike` null outside a guild. Not for
+// the guild's dots (guild-todo.js), which need beastView alone.
+export async function beastPage(db, row, now, activity = null) {
+  const view = await beastView(db, row, now, activity);
+  const guild = view.beast ? await guildOf(db, row.id) : null;
+  if (!guild) return { ...view, strike: null };
+  const beast = await db.prepare('SELECT id FROM guild_beasts WHERE guild_id = ? AND week = ?').bind(guild.id, view.beast.week).first();
+  return { ...view, strike: await strikeView(db, { guild, row, target: beast && `beast:${beast.id}`, now }) };
+}
+
 // GET /api/guild/beast
 export async function getGuildBeast(context) {
   const { player } = await requireBeastPlayer(context);
-  return json(await beastView(context.env.DB, player.row, context.now, player.activity));
+  return json(await beastPage(context.env.DB, player.row, context.now, player.activity));
 }
 
-// POST /api/guild/beast/attack: one fight on the guild's beast. Saved only
-// while the character is as read, has an attack left today and the beast
-// still stands: the hit, never more than the HP left then, and the HP it
-// takes off the bar, with who felled the beast and when. Answers with the
-// damage, the HP left, whether this hit felled it, the fight's lines, its
-// playback for the arena and the Bestia anew.
+// POST /api/guild/beast/attack { kind }: one fight on the guild's beast, a
+// Cios or a Podcięcie (`kind` "undercut"; 1203), as hard as the class of
+// the day, the rally and a waiting podcięcie make it (strikePlan). Saved
+// only while the character is as read, has an attack left today and the
+// beast still stands (and the podcięcie it uses still waits): the hit,
+// never more than the HP left then, and the HP it takes off the bar, with
+// who felled the beast and when, and then the Kronika's line. Answers with
+// the damage, the HP left, whether this hit felled it, its kind and
+// bonuses, the fight's lines, its playback for the arena and the Bestia
+// anew.
 export async function attackGuildBeast(context) {
   const { player } = await requireBeastPlayer(context);
   const { row } = player;
   const db = context.env.DB;
   const now = context.now;
+  const kind = await strikeKind(context.request);
   // A character offering itself as a mercenary, or serving, does not fight
   // the beast (DECISIONS.md, "Najemnicy w Karczmie", 2).
   if (player.activity?.kind === 'mercenary') requireNotExploring(player, now);
@@ -257,10 +280,12 @@ export async function attackGuildBeast(context) {
   const perDay = rules().attacksPerDay;
   if ((await attacksOn(db, row, day).first()).count >= perDay) throw new ApiError(409, 'no_attacks', errors().noAttacks);
 
+  // The classes of the day, the rally and the podcięcia (guild-strike.js).
+  const plan = await strikePlan(db, { guild, row, target: `beast:${beast.id}`, kind, now });
   // The Encyklopedia's trophy against the beast's creature counts.
   const trophies = trophiesFor(player, now, [beast.monster_id]);
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const fight = guildBeastFight({ character: engineCharacter(row), equipped: equippedItems(player), name: row.name, beast: engineBeast(beast), seed, trophies }, content());
+  const fight = guildBeastFight({ character: engineCharacter(row), equipped: equippedItems(player), name: row.name, beast: engineBeast(beast), seed, trophies, power: plan.power }, content());
   // A card the attack may leave (903, cards.js), from the attack's seed.
   const card = await guildCard(db, row, seed);
   const [, , , before, , , after] = await atomically(
@@ -281,6 +306,14 @@ export async function attackGuildBeast(context) {
         )
         .bind(fight.damage, fight.damage, now, fight.damage, row.id, beast.id),
       db.prepare('SELECT hp FROM guild_beasts WHERE id = ?').bind(beast.id),
+      // The podcięcie it uses or leaves (guild-strike.js).
+      ...plan.statements,
+      // The Kronika's line, when this hit felled the beast (1195 A).
+      chronicle(db, guild.id, 'beastFell', { monster: beast.monster_id, name: row.name }, now, {
+        characterId: row.id,
+        once: `beast:${beast.id}`,
+        when: { sql: '(SELECT hp FROM guild_beasts WHERE id = ?) <= 0 AND (SELECT fallen_by FROM guild_beasts WHERE id = ?) = ? AND (SELECT fallen_at FROM guild_beasts WHERE id = ?) = ?', binds: [beast.id, beast.id, row.id, beast.id, now] },
+      }),
       // The attack's Punkty Sławy (fame.js).
       ...sourceFamePoints(db, row.id, 'beast', 1, now),
       // The card it left, a copy (cards.js).
@@ -297,10 +330,14 @@ export async function attackGuildBeast(context) {
       won: fight.won,
       log: fight.log,
       fight: fight.replay,
+      // A Cios or a podcięcie, and what made it harder or softer.
+      kind,
+      boosts: plan.boosts,
+      boostsText: boostsText(plan.boosts),
     },
     // The card the attack left, with its words for the page's toast.
     ...(card && { cards: card.cards }),
-    ...(await beastView(db, row, now, player.activity)),
+    ...(await beastPage(db, row, now, player.activity)),
   });
 }
 
@@ -370,6 +407,6 @@ export async function claimGuildBeastChest(context) {
       text: filled(rules().texts.opened, { contents }),
     },
     character: characterView(after, now),
-    ...(await beastView(db, after.row, now, after.activity)),
+    ...(await beastPage(db, after.row, now, after.activity)),
   });
 }

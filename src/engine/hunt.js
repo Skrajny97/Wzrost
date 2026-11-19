@@ -711,13 +711,16 @@ function settingOut(one, week, area, id, content) {
 // rest of the exploration goes as it would without them. Null: no cards.
 // `meal`: the dish eaten as it set out (cooking.js, 999.4, 999.5 v2): {
 // dish, kind, value, share, minutes }, its bonus for the share of the time
-// it covers, on a trip each member's own; null without one.
+// it covers, on a trip each member's own; null without one. `banner`: the
+// share more gold and materials from the creatures a banner of the
+// character's guild over the place's land gives (1200 A, guild-lands.js),
+// 0 without one; on a trip each member's own.
 /**
  * @param {Record<string, any>} options
  * @param {Content} content
  */
 export function simulateHunt(
-  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, rareMore = 0, materialsMore = 0, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [], blessing = null, scouted = null, wanted = null, seat = null, hard = false, week = null, cards = null, meal = null },
+  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, rareMore = 0, materialsMore = 0, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [], blessing = null, scouted = null, wanted = null, seat = null, banner = 0, hard = false, week = null, cards = null, meal = null },
   content,
 ) {
   // A Drużyna's trip (src/server/trips.js) gives `roster`, its players in
@@ -844,6 +847,10 @@ export function simulateHunt(
   const fed = mealEffects(meal);
   const mealXp = 1 + fed.xp;
   const mealGold = 1 + fed.gold;
+  // A banner of the character's guild over the land (1200 A, guild-lands.js):
+  // its share more gold and materials from the creatures, on top of the
+  // late class levels' part; on a trip each member's own, from its own loot.
+  const bannerShare = 1 + Math.max(0, banner ?? 0);
   const loot = {
     filled,
     classId: gearKey(character.classId, character.evolution, content),
@@ -1079,9 +1086,9 @@ export function simulateHunt(
         fightXp +=
           monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(reached.level, enemy.level, content);
         const rank = monster.champion ? rewards.championGoldMultiplier : monster.elite ? rewards.eliteGoldMultiplier : 1;
-        const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus) * blessedBy('gold', fights.length - 1) * seatGold * cardsGold * mealGold * hardGold * weekGold * late;
+        const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus) * blessedBy('gold', fights.length - 1) * seatGold * cardsGold * mealGold * hardGold * weekGold * late * bannerShare;
         fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * lootRng.float(0.5, 1.5) * goldFactor;
-        const weight = enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1) * moreMaterials * late;
+        const weight = enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1) * moreMaterials * late * bannerShare;
         summary.materials = addCounts(summary.materials, materialDrops(enemy.monsterId, enemy.level, weight, lootRng, content));
         // A card of the creature (874 A), not of the wanted's target nor
         // twice of one creature in an exploration.

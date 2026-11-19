@@ -14,6 +14,7 @@
 
 import { addCounts, materialDrops, stackKey } from './crafting.js';
 import { beastAttackDamage } from './guild-beast.js';
+import { strikeHpGrowth } from './guild-strike.js';
 import { championItemRarity } from './hunt.js';
 import { randomItem } from './items.js';
 import { lateRewards } from './progression.js';
@@ -132,7 +133,8 @@ export function expeditionStageMinutes(members, content) {
 // The guardian at the end of stage `stage` (1 to 7) for a route of `level`:
 // its creature, its level (the route's, one more for each stage before),
 // and its most HP for the `members` it comes for, as the Bestia's: the
-// stage's attacks of a typical character of its level for each of them.
+// stage's attacks of a typical character of its level for each of them,
+// times strikeHpGrowth (1197, 1203).
 /**
  * @param {{ stage: number, level: number, members: number, guardians: Guardian[] }} route
  * @param {Content} content
@@ -140,7 +142,7 @@ export function expeditionStageMinutes(members, content) {
 export function expeditionGuardian({ stage, level, members, guardians }, content) {
   const tuning = rules(content).guardians[stage - 1];
   const at = level + stage - 1;
-  const maxHp = Math.max(1, Math.round(Math.max(1, members) * tuning.attacks * beastAttackDamage(at, content)));
+  const maxHp = Math.max(1, Math.round(Math.max(1, members) * tuning.attacks * beastAttackDamage(at, content) * strikeHpGrowth(content)));
   return { ...guardians[stage - 1], stage, level: at, maxHp };
 }
 

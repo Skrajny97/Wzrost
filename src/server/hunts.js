@@ -108,6 +108,7 @@ import { cardsOn, eventDraftsOn, eventsOn, fortressOn, settlementOn } from './fe
 import { cardUpserts, dropCollection, droppedCards, droppedEffect, effectChance, effectFoundLine, effectUpserts, maxedCards, ownCardCollection, packGains, packViews } from './cards.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { expeditionMinutes } from './guild-expedition.js';
+import { bannerBonus, landMinutes } from './guild-lands.js';
 import { huntFamePoints } from './fame.js';
 import { featGains } from './achievements.js';
 import { favoriteIds } from './favorites.js';
@@ -513,6 +514,10 @@ export async function beginHunt(
   // (guild-seat.js), on a Drużyna's trip too, each member its own guild's;
   // a character that left its guild sets out without them.
   const seat = seatHuntBonus(player.guildSeat, content());
+  // The banner of the character's guild over the place's land this week
+  // (1200 A, guild-lands.js), as at the start: more gold and materials from
+  // its creatures, on a Drużyna's trip each member its own guild's.
+  const banner = await bannerBonus(db, player.row.id, area.id, now);
   // The week of the year it sets out in (weeks.js), as the line on the Walka
   // screen shows it: its effects work for the whole exploration, whenever
   // its report is claimed; every member of a Drużyna's trip sets out now.
@@ -591,6 +596,7 @@ export async function beginHunt(
     ...(rareMore > 0 && { rareMore }),
     ...(materialsMore > 0 && { materialsMore }),
     ...(seat && { seat }),
+    ...(banner > 0 && { banner }),
     ...(week && { week }),
     ...(party.length > 0 && { companions: party }),
     ...(crew && { party: crew }),
@@ -941,6 +947,8 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
       // The Siedziba Gildii's bonuses the exploration set out with: its own
       // XP, gold and items, so on a trip too.
       seat: options.seat ?? null,
+      // The banner of its guild over the land as it set out (1200 A).
+      banner: options.banner ?? 0,
       // A trip goes without companions; one that set out before 2.11.2026
       // keeps its leader's, so its fights stay the same for everyone.
       companions: (trip ? trip.companions : options.companions) ?? [],
@@ -1314,6 +1322,9 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
       // minutes for the guild the character is in now, as the report is
       // claimed (621 A), whenever the exploration set out.
       ...expeditionMinutes(db, row.id, credited, now),
+      // The Krainy pod sztandarem (guild-lands.js, 1200 A): the same minutes
+      // for the land of the place, counted the same way.
+      ...landMinutes(db, row.id, activity.region_id, credited, now),
       // The Punkty Sławy of the exploration, a Drużyna's trip too (fame.js):
       // its minutes and the elites and champions beaten, none for a lost one.
       ...huntFamePoints(db, row.id, hunt, activity.minutes, now),

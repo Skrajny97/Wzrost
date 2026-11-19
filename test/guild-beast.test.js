@@ -20,6 +20,7 @@ import {
   guildBeast,
   guildBeastFight,
   questPeriod,
+  strikeHpGrowth,
 } from '../src/engine/index.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
 import { content, newCharacter } from './helpers/content.js';
@@ -60,8 +61,10 @@ describe('the Bestia Gildii', () => {
     const five = guildBeast({ seed: 'a', levels: [50, 50, 50, 50, 50] }, content);
     assert.equal(one.members, 1);
     assert.equal(five.members, 5);
-    assert.equal(five.maxHp, 5 * one.maxHp);
-    assert.equal(one.maxHp, Math.round(rules.memberAttacks * beastAttackDamage(50, content)));
+    // memberAttacks typical attacks a member, grown by the classes of the
+    // day and the podcięcia (1197, 1203).
+    assert.equal(one.maxHp, Math.round(rules.memberAttacks * beastAttackDamage(50, content) * strikeHpGrowth(content)));
+    assert.equal(five.maxHp, Math.round(5 * rules.memberAttacks * beastAttackDamage(50, content) * strikeHpGrowth(content)));
     // Between the measured levels on the line; above the last in proportion.
     const [[low, lowDamage], [high, highDamage]] = rules.damage.filter(([level]) => level === 40 || level === 45);
     assert.equal(beastAttackDamage((low + high) / 2, content), (lowDamage + highDamage) / 2);
@@ -69,7 +72,7 @@ describe('the Bestia Gildii', () => {
     assert.equal(beastAttackDamage(last * 2, content), lastDamage * 2);
   });
 
-  test('a member\'s memberAttacks typical attacks take about its share of the bar', () => {
+  test('a member\'s memberAttacks typical attacks take about its share of the bar, before the growth of 1197 and 1203', () => {
     const level = 50;
     let total = 0;
     let fights = 0;
@@ -83,7 +86,7 @@ describe('the Bestia Gildii', () => {
         }
       }
     }
-    const share = (rules.memberAttacks * (total / fights)) / guildBeast({ seed: 'a', levels: [level] }, content).maxHp;
+    const share = ((rules.memberAttacks * (total / fights)) / guildBeast({ seed: 'a', levels: [level] }, content).maxHp) * strikeHpGrowth(content);
     assert.ok(share > 0.7 && share < 1.4, `${share}`);
   });
 

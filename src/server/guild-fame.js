@@ -4,9 +4,11 @@
 // weekly quests), in points: the share of its Bestia's bar it took and the
 // beast's fall, the guardians of its Wyprawa that fell (the author: "638
 // A"), the Próby its members finished, the pieces they gave in the
-// Prośby and the offers they took in the Wymiana, each member's part up to
-// its cap first, then summed for the guild, and the guild war it won that
-// week (guild-wars.js, 799 A). The Ranking's "Gildie" tab
+// Prośby, the offers they took in the Wymiana and the helps they gave with
+// each other's builds and work (guild-help.js, 1196 A and B), each
+// member's part up to its cap first, then summed for the guild, and the
+// guild war it won that week (guild-wars.js, 799 A), and the lands under
+// its banner that week (1200 A, guild-lands.js). The Ranking's "Gildie" tab
 // shows the guilds by this week's Sława or by all of it ("Od początku": the
 // weeks frozen and this one). The first time a new week asks for the
 // ranking, the Gildia page or the best guild of the week before (every
@@ -22,6 +24,8 @@ import { questPeriod } from '../engine/index.js';
 import { requireChatter } from './chat.js';
 import { content } from './content.js';
 import { guildWarsOn } from './features.js';
+import { nameHeroes } from './guild-heroes.js';
+import { raiseBanners } from './guild-lands.js';
 import { fameNumbers, memberFameFreeze } from './guild-members.js';
 import { settleWars } from './guild-wars.js';
 import { json } from './http.js';
@@ -50,11 +54,14 @@ function weeksAround(now) {
 // fell, and `last` instead for the last of them (638 A: 20 each and 50 for
 // the seventh, up to 170 a week). Wojna: the Sława of its place in that
 // week's league of the wars (fame.war.places), once its Sunday's matches
-// are fought and its places written (guild-wars.js).
+// are fought and its places written (guild-wars.js). Krainy: lands.fame for
+// each land whose banner the guild raised for that week (1200 A). Pomoc:
+// perHelp for each help with a member's build or work that week
+// (guild-help.js, 1196 A and B), each helper's up to its cap.
 function weekFame(week) {
-  const { beast, expedition, trials, requests, exchange } = rules();
+  const { beast, expedition, trials, requests, exchange, help } = rules();
   return {
-    sql: `SELECT g.id AS guild_id, COALESCE(b.points, 0) + COALESCE(t.points, 0) + COALESCE(r.points, 0) + COALESCE(x.points, 0) + COALESCE(w.points, 0) + COALESCE(v.points, 0) AS points
+    sql: `SELECT g.id AS guild_id, COALESCE(b.points, 0) + COALESCE(t.points, 0) + COALESCE(r.points, 0) + COALESCE(x.points, 0) + COALESCE(w.points, 0) + COALESCE(v.points, 0) + COALESCE(l.points, 0) + COALESCE(p.points, 0) AS points
       FROM guilds g
       LEFT JOIN (SELECT guild_id, SUM(CAST(MAX(0, max_hp - hp) * 100 / max_hp AS INTEGER) * ? + CASE WHEN fallen_at IS NULL THEN 0 ELSE ? END) AS points
                  FROM guild_beasts WHERE week = ? AND max_hp > 0 GROUP BY guild_id) b ON b.guild_id = g.id
@@ -70,7 +77,11 @@ function weekFame(week) {
       LEFT JOIN (SELECT e.guild_id, SUM(CASE WHEN s.stage = ? THEN ? ELSE ? END) AS points
                  FROM guild_expedition_guardians s JOIN guild_expeditions e ON e.id = s.expedition_id
                  WHERE e.week = ? AND s.fallen_at IS NOT NULL GROUP BY e.guild_id) w ON w.guild_id = g.id
-      LEFT JOIN (SELECT guild_id, fame AS points FROM guild_league_places WHERE week = ?) v ON v.guild_id = g.id`,
+      LEFT JOIN (SELECT guild_id, fame AS points FROM guild_league_places WHERE week = ?) v ON v.guild_id = g.id
+      LEFT JOIN (SELECT guild_id, COUNT(*) * ? AS points FROM guild_land_banners WHERE week = ? GROUP BY guild_id) l ON l.guild_id = g.id
+      LEFT JOIN (SELECT guild_id, SUM(MIN(n, ?)) * ? AS points
+                 FROM (SELECT guild_id, COUNT(*) AS n FROM guild_helps WHERE week = ? GROUP BY guild_id, helper_id)
+                 GROUP BY guild_id) p ON p.guild_id = g.id`,
     binds: [
       beast.perPercent,
       beast.fell,
@@ -90,6 +101,11 @@ function weekFame(week) {
       expedition.last,
       expedition.perGuardian,
       week.key,
+      week.key,
+      content().guilds.lands.fame,
+      week.key,
+      help.cap,
+      help.perHelp,
       week.key,
     ],
   };
@@ -113,10 +129,17 @@ export const championStatement = (db, now) => bestStatement(db, weeksAround(now)
 // once). Of two guilds with as much Sława, the older one. With no guild at
 // all there is nothing to freeze and no best guild, so the week waits for
 // the first one: the freeze leaves no row then, and every character's load
-// ran it again (the code review).
+// ran it again (the code review). The new week also raises the lands'
+// banners (1200 A, guild-lands.js) and, once the members' Sława is written,
+// names the heroes of the week before (1198 A, guild-heroes.js), each once;
+// the cron asks every minute (index.js), so they come at midnight.
 export async function championOf(db, now) {
   const { previous } = weeksAround(now);
-  const [found, guilds] = await db.batch([bestStatement(db, previous.key), db.prepare('SELECT EXISTS (SELECT 1 FROM guilds) AS any')]);
+  const [found, guilds, settled] = await db.batch([
+    bestStatement(db, previous.key),
+    db.prepare('SELECT EXISTS (SELECT 1 FROM guilds) AS any'),
+    db.prepare('SELECT EXISTS (SELECT 1 FROM guild_land_weeks WHERE week = ?) AND EXISTS (SELECT 1 FROM guild_hero_weeks WHERE week = ?) AS done').bind(weeksAround(now).current.key, previous.key),
+  ]);
   let best = found.results[0] ?? null;
   if (!best && guilds.results[0].any) {
     // The league of the wars of that week ends first, should the cron have
@@ -139,6 +162,14 @@ export async function championOf(db, now) {
     await db.batch(memberFameFreeze(db, previous, now)).catch((error) => console.error(error));
     best = await bestStatement(db, previous.key).first();
   }
+  // Each on its own: should one fail, the next look tries again, and the
+  // character still loads.
+  // With no guild at all there is nothing to raise or name, as nothing to
+  // freeze: the first guild's week gets them at the next look.
+  if (guilds.results[0].any && !settled.results[0].done) {
+    await raiseBanners(db, now).catch((error) => console.error(error));
+    await nameHeroes(db, now).catch((error) => console.error(error));
+  }
   return championFrom(best);
 }
 
@@ -148,7 +179,8 @@ function rankingTexts() {
   const texts = words();
   const vars = fameNumbers();
   const { howWar, ...rest } = texts;
-  const how = guildWarsOn() ? [...texts.how.slice(0, -2), howWar, ...texts.how.slice(-2)] : texts.how;
+  const lands = content().guilds.lands.texts.howFame;
+  const how = [...texts.how.slice(0, -2), ...(guildWarsOn() ? [howWar] : []), lands, ...texts.how.slice(-2)];
   return { ...rest, how: how.map((line) => filled(line, vars)) };
 }
 

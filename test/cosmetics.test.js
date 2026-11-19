@@ -65,6 +65,8 @@ describe('the Sklep Systemu in the engine', () => {
       content.cosmetics.filter((one) => one.event).map(({ id, kind, name, price, event }) => [id, kind, name, price, event]),
       [
         ['frame-szron', 'frame', 'Szron', undefined, 'winter'],
+        // The Kram Gildii's frame (1202 A), only for its Znaki Gildii.
+        ['frame-guild-banner', 'frame', 'Ramka Sztandaru', undefined, 'guild'],
         ['bg-szczodre', 'background', 'Szczodre Gody', undefined, 'winter'],
         ['bg-andrzejki', 'background', 'Wieczór andrzejkowy', undefined, 'andrzejki'],
         ['aura-sniezyca', 'aura', 'Śnieżyca', undefined, 'winter'],

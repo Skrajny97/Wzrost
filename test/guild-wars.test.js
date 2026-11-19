@@ -61,9 +61,10 @@ describe("the guild wars' rules", () => {
     );
     // The members the last trio needs to be full, none when it is.
     assert.deepEqual([1, 2, 9, 12, 29, 30].map((members) => nextTeamAt(members, content)), [3, 3, null, null, 30, null]);
-    // The tab is the last of nine.
-    assert.equal(content.guilds.tabs.length, 9);
+    // The tab is the last of ten, after the Kram (1202 A).
+    assert.equal(content.guilds.tabs.length, 10);
     assert.equal(content.guilds.tabs.at(-1).id, 'war');
+    assert.equal(content.guilds.tabs.at(-2).id, 'stall');
   });
 
   test('the game draws the trios of an evening from the members, three to a trio, the last one short when they do not divide', () => {
@@ -825,6 +826,11 @@ describe('the guild wars through the API', () => {
     const after = await first('SELECT gold FROM characters WHERE id = ?', ids.lider);
     assert.equal(after.gold - before.gold, won * warReward(50, content).gold);
     assert.ok([1, 2].includes(view.league.end.place));
+    // The Kronika told each guild's chat of the evening, once (1195 A).
+    const told = await all("SELECT channel, text FROM chat_messages WHERE chronicle_key LIKE 'war:%' ORDER BY channel");
+    assert.equal(told.length, 2);
+    assert.ok(told.every((line) => /^Wieczór ligi: (wygrana|przegrana|remis) z \[(LB|DRG)\] (Leśni Bracia|Drugie), walki \d+:\d+\.$/.test(line.text)), JSON.stringify(told));
+    assert.notEqual(told[0].channel, told[1].channel);
     assert.equal((await as('lider', 'POST', '/api/test/guild-war', { action: 'fight' })).data.error.code, 'no_war');
     assert.equal((await as('lider', 'POST', '/api/test/guild-war', { action: 'nothing' })).data.error.code, 'invalid_action');
   });
@@ -836,7 +842,8 @@ describe('the guild wars where GUILD_WARS is off', () => {
   test('no Wojna tab and no routes', async () => {
     const tabs = (await call('GET', '/api/content')).data.guildTabs.map((tab) => tab.id);
     assert.ok(!tabs.includes('war'));
-    assert.equal(tabs.length, 8);
+    // Nine without it: the Kram (1202 A) is there.
+    assert.equal(tabs.length, 9);
     const { cookie } = await signUp('Gracz');
     await call('POST', '/api/character', { cookie, body: { name: 'Gracz', classId: 'warrior', appearance: 'female' } });
     assert.equal((await call('GET', '/api/guild/war', { cookie })).status, 404);

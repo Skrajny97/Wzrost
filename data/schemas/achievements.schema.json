@@ -105,7 +105,8 @@
                     "streaks",
                     "landPlaces",
                     "landReached",
-                    "andrzejki"
+                    "andrzejki",
+                    "bannerWarden"
                   ]
                 },
                 "target": {

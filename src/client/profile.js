@@ -25,6 +25,7 @@ import { closeSheet, confirmAction, framedName, guildTag, openSheet, toast, with
 import { classLines, gemFold, itemSummary, propertyLines, starsLine } from './screens/character.js';
 import { proposeTrade } from './screens/trade.js';
 import { duelButton } from './card-duel.js';
+import { heroBadges } from './guild-heroes.js';
 
 // Shown in the page's language (t(), i18n.js).
 const PATHS = { main: 'ścieżka główna', second: 'ścieżka poboczna' };
@@ -48,6 +49,8 @@ export async function openProfile(name, { onChange, mention } = {}) {
         ),
         // The title of an achievement it wears (achievements.js, 1036.3 B).
         profile.title && h('p', { class: 'profile-worn-title', text: `„${profile.title}”` }),
+        // Its badges of last week's heroes of its guild (1198 A), named.
+        profile.heroes?.length > 0 && h('p', { class: 'profile-heroes' }, heroBadges(profile.heroes, { size: 20, named: true })),
         h('p', { class: 'profile-levels', text: t('{className} · poziom {level} · klasa {classLevel}', { className: profile.className, level: profile.level, classLevel: profile.classLevel }) }),
         profile.guild && h('p', { class: 'profile-levels', text: t('Gildia: {name} [{tag}]', { name: profile.guild.name, tag: profile.guild.tag }) }),
       ),

@@ -512,10 +512,15 @@ export const SPRITES = {
   // Systemu keep their line icon (the author: "tylko Punkty Systemu będą w
   // takiej wyróżniającej formie jak do tej pory"). The Kowadło's two
   // scrolls, the Zwój ochronny and the Zwój utrwalenia (598 C). The Kulka
-  // Systemu over the Walka scene (data/orbs.json, orbs.js).
+  // Systemu over the Walka scene (data/orbs.json, orbs.js). The Znak Gildii
+  // (1202 A), the badges of the Bohaterowie tygodnia (1198 A) and the banner
+  // over a land (1200 A), drawn in PixelLab, the author's picks.
   icons: {
     size: 32,
-    ids: ['gold', 'time-points', 'encyclopedia', 'ward-scroll', 'steady-scroll', 'oblivion-scroll', 'fir-branch', 'system-orb'],
+    // The Róg zbiórki and the Bestia's "Cios" and "Podcięcie" (1199 A,
+    // 1203), drawn in PixelLab, the author's choice. The help of Pomoc przy
+    // budowach i pracy (1196 A and B).
+    ids: ['gold', 'time-points', 'encyclopedia', 'ward-scroll', 'steady-scroll', 'oblivion-scroll', 'fir-branch', 'system-orb', 'rally-horn', 'beast-strike', 'beast-undercut', 'guild-mark', 'hero-pillar', 'hero-slayer', 'hero-benefactor', 'land-banner', 'guild-help'],
   },
   // The professions' squares on the Profesje tab, 48×48.
   professions: {
@@ -572,7 +577,14 @@ export const SPRITES = {
   guild: {
     width: 128,
     height: 96,
-    ids: ['guild-banner', 'guild-treasury', 'guild-forge', 'scouts-house'],
+    ids: ['guild-banner', 'guild-treasury', 'guild-forge', 'scouts-house', 'guild-shrine'],
+  },
+  // The gods of the Kącina (data/guilds.json, shrine.gods; 1201 A), busts
+  // as the residents', drawn in PixelLab.
+  'guild/gods': {
+    width: 96,
+    height: 128,
+    ids: ['perun', 'weles', 'swarog', 'mokosz'],
   },
   // The events at the end of an exploration (data/events.json): the people
   // met, 96×128, and the scenes behind them, 192×96, filled in as they are
@@ -715,7 +727,7 @@ export const SPRITES = {
     width: 120,
     height: 160,
     fit: true,
-    ids: ['frame-gold', 'frame-system', 'frame-forest', 'bg-spring', 'bg-tower', 'bg-camp', 'frame-szron', 'bg-szczodre', 'bg-andrzejki'],
+    ids: ['frame-gold', 'frame-system', 'frame-forest', 'bg-spring', 'bg-tower', 'bg-camp', 'frame-szron', 'bg-szczodre', 'bg-andrzejki', 'frame-guild-banner'],
   },
   // The character riding, <class>-<look> or an evolution's
   // <evolution>-<look>: one picture sitting in a saddle that is not drawn
@@ -895,6 +907,18 @@ export function orbArt(id, scale) {
   art.height = SPRITES.icons.size * scale;
   return art;
 }
+// The Róg zbiórki (1199 A) and the attacks "Cios" and "Podcięcie" (1203) on
+// the Bestia's and the strażnik's cards.
+export const rallyHornArt = (size) => iconArt('rally-horn', size, 'bell');
+export const beastStrikeArt = (size) => iconArt('beast-strike', size, 'sword');
+export const beastUndercutArt = (size) => iconArt('beast-undercut', size, 'dagger');
+// The Znak Gildii of the Kram (1202 A), a hero's badge of the week (1198 A:
+// pillar, slayer, benefactor) and the banner over a land (1200 A).
+export const guildMarkArt = (size) => iconArt('guild-mark', size, 'coin');
+export const heroArt = (kind, size) => iconArt(`hero-${kind}`, size, 'star');
+export const landBannerArt = (size) => iconArt('land-banner', size, 'banner');
+// The help of Pomoc przy budowach i pracy (1196 A and B), 32×32.
+export const guildHelpArt = (size = 32) => iconArt('guild-help', size, 'hands');
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
 // The pictures of the Labirynt Systemu and the Rdzeń (art/labyrinth/, 850–866,
 // accepted in 868 and 869): its rooms (room-<type>), its Artefakty
@@ -963,6 +987,11 @@ export const settlementTorchArt = (lit = true) => {
 };
 // A picture of the Salon Gier's games, by its name, or null while there is none.
 export const salonArt = (id) => (available.salon.has(id) ? `/art/salon/${id}.png` : available['salon-small'].has(id) ? `/art/salon-small/${id}.png` : null);
+// A god of the Kącina (1201 A) as a bust, or null while it has none.
+export const godBust = (godId) =>
+  available['guild/gods'].has(godId)
+    ? h('img', { src: `/art/guild/gods/${godId}.png`, alt: '', width: 96, height: 128, class: 'sprite god-bust', decoding: 'async', draggable: 'false' })
+    : null;
 export const residentBust = (residentId) =>
   available.residents.has(residentId)
     ? h('img', { src: `/art/residents/${residentId}.png`, alt: '', width: 96, height: 128, class: 'sprite resident-bust', decoding: 'async', draggable: 'false' })
