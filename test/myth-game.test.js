@@ -18,6 +18,7 @@ import { describe, test } from 'node:test';
 import {
   cardHomes,
   cardStats,
+  classLevelFactor,
   fightingClassLevel,
   guildBeast,
   guildBeastFight,
@@ -39,7 +40,10 @@ const withStage = (stage, values, data = content) => ({ ...data, balance: { ...d
 const monsterId = Object.keys(content.monstersById).find((id) => !content.monstersById[id].elite && !content.monstersById[id].champion);
 const monster = (level, extra = {}, data = content) => monsterCombatant({ monsterId, level, id: 'a', ...extra }, data);
 const near = (a, b, within = 1e-9) => Math.abs(a - b) < within;
-const { mythGame, perPlayer, soloGrowth } = content.balance.monsters;
+const { mythGame, perPlayer, soloGrowth, classLevelCurve } = content.balance.monsters;
+// Below class level 250 the creatures grow by the class level too (1207 A,
+// test/class-level-curves.test.js): at 249 twice as strong.
+const ramp249 = classLevelFactor(249, classLevelCurve);
 
 describe('the myth game: at least three times as strong from class level 250', () => {
   test('as it stands: blows and HP ×1.7321 (√3) from class level 250, three times as strong in all; a party\'s player ×1.25 each', () => {
@@ -49,10 +53,10 @@ describe('the myth game: at least three times as strong from class level 250', (
     assert.deepEqual(perPlayer, { fromClassLevel: 250, damage: 0.25, hp: 0.25 });
   });
 
-  test('the same creature, class 249 against class 250: as before, then three times as strong', () => {
+  test('the same creature, class 249 against class 250: twice as strong (1207 A), then three times as strong', () => {
     for (const level of [250, 300]) {
       const [plain, below, at] = [monster(level), monster(level, { classLevel: 249 }), monster(level, { classLevel: 250 })];
-      assert.deepEqual(below, plain, `class 249 at creature level ${level}`);
+      assert.ok(near(below.weapon.max / plain.weapon.max, ramp249), `class 249 at creature level ${level}`);
       assert.ok(near(at.weapon.max / plain.weapon.max, 1 + mythGame.damage), `blows at ${level}`);
       assert.ok(near(at.maxHp / plain.maxHp, 1 + mythGame.hp, 0.001), `HP at ${level}`);
     }
@@ -96,7 +100,7 @@ describe('against a Drużyna\'s players fighting together, from class level 250'
       assert.ok(near(three.weapon.max / one.weapon.max, damage), `blows at ${level}`);
       assert.ok(near(three.maxHp / one.maxHp, hp, 0.01), `HP at ${level}`);
     }
-    assert.deepEqual(monster(300, { classLevel: 249, players: 3 }), monster(300));
+    assert.deepEqual(monster(300, { classLevel: 249, players: 3 }), monster(300, { classLevel: 249 }));
   });
 
   test('on a trip the highest class level of its roster decides, so nobody hides behind a lower leader; a mercenary is no player', () => {
@@ -119,10 +123,11 @@ describe('against a Drużyna\'s players fighting together, from class level 250'
       low.enemiesView.map((enemy) => enemy.maxHp),
       alone.enemiesView.map((enemy) => enemy.maxHp),
     );
-    // One member of class level 260: the myth game and two players more.
+    // One member of class level 260: the myth game and two players more,
+    // instead of the leader's class level 249 (1207 A).
     high.enemiesView.forEach((enemy, index) => {
       const ratio = enemy.maxHp / alone.enemiesView[index].maxHp;
-      assert.ok(near(ratio, (1 + mythGame.hp) * partyStrength(260, 3, content)[1], 0.01), `${enemy.name}: ${ratio}`);
+      assert.ok(near(ratio, ((1 + mythGame.hp) * partyStrength(260, 3, content)[1]) / ramp249, 0.01), `${enemy.name}: ${ratio}`);
     });
     assert.deepEqual(
       hired.enemiesView.map((enemy) => enemy.maxHp),
@@ -152,13 +157,13 @@ describe('against a Drużyna\'s players fighting together, from class level 250'
       ).fight.enemiesView.map((enemy) => enemy.maxHp);
     const low = hps([member(1, 30), member(2, 249), member(3, 30)]);
     const high = hps([member(1, 30), member(2, 250), member(3, 30)]);
-    high.forEach((hp, index) => assert.ok(near(hp / low[index], (1 + mythGame.hp) * partyStrength(250, 3, content)[1], 0.01), `${hp} / ${low[index]}`));
+    high.forEach((hp, index) => assert.ok(near(hp / low[index], ((1 + mythGame.hp) * partyStrength(250, 3, content)[1]) / ramp249, 0.01), `${hp} / ${low[index]}`));
   });
 
   test('in a portal the character\'s class level decides', () => {
     const fighter = (classLevel) => portalFight({ character: newCharacter('warrior', { level: 40, classLevel }), equipped: [], name: 'Wędrowiec', portalId: 'gold', stage: 40, seed: 'mit' }, content).fights[0].enemiesView;
     const [low, high] = [fighter(249), fighter(250)];
-    high.forEach((enemy, index) => assert.ok(near(enemy.maxHp / low[index].maxHp, 1 + mythGame.hp, 0.01), `${enemy.maxHp} / ${low[index].maxHp}`));
+    high.forEach((enemy, index) => assert.ok(near(enemy.maxHp / low[index].maxHp, (1 + mythGame.hp) / ramp249, 0.01), `${enemy.maxHp} / ${low[index].maxHp}`));
   });
 });
 

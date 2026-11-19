@@ -782,10 +782,12 @@ export function simulateHunt(
     const { unit } = settingOut(partner, week, area, `p${index + 1}`, content);
     return { id: partner.id, unit, hp: unit.hp, out: false };
   });
+  // The companions are the character's, stronger by its class level as it
+  // set out (companionBoost in companions.js).
   const mates = [
     ...friends,
     ...companions.map((/** @type {any} */ companion, /** @type {number} */ index) => {
-      const unit = companionCombatant(companion, { area, id: `a${index + 1}` }, content);
+      const unit = companionCombatant(companion, { area, id: `a${index + 1}`, classLevel: character.classLevel ?? 0 }, content);
       return { id: companion.id, unit, hp: unit.maxHp, out: false };
     }),
   ];

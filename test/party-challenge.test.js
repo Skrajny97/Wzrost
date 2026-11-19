@@ -13,7 +13,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { simulateHunt } from '../src/engine/index.js';
+import { classLevelFactor, simulateHunt } from '../src/engine/index.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -72,11 +72,12 @@ describe("a Drużyna's trip in the Trudna or the Piekielna wyprawa, in the engin
 
   test("on top of the class level 250's threefold creatures and the party's own 25% a player", () => {
     // The same trip with a member of class level 255, the highest of them
-    // (fightingClassLevel), and with all below 250.
+    // (fightingClassLevel), and with all below 250, where the creatures grow
+    // by the class level alone (1207 A, classLevelCurve).
     const high = party.map((one, index) => ({ ...one, character: { ...one.character, classLevel: index === 1 ? 255 : 246 } }));
     const low = party.map((one) => ({ ...one, character: { ...one.character, classLevel: 246 } }));
     const below = tripOf(low, 'druh', false).fights[0].enemiesView;
-    const myth = (1 + mythGame.hp) * (1 + 2 * perPlayer.hp);
+    const myth = ((1 + mythGame.hp) * (1 + 2 * perPlayer.hp)) / classLevelFactor(246, content.balance.monsters.classLevelCurve);
     for (const [, hard, numbers] of MODES) {
       const plain = tripOf(high, 'druh', false).fights[0].enemiesView;
       const harder = tripOf(high, 'druh', hard).fights[0].enemiesView;

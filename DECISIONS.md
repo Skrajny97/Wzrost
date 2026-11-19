@@ -3847,6 +3847,95 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Trudniej od 100. poziomu klasy i silniejsi towarzysze (1207 A, 19.11.2026)
+
+Autor: „trzeba też w obliczu zmian wzmocnić towarzyszy jakoś, bo po zmianach - bez drużyny ciezko bedzie walczyć”, a potem: „Ale od 100ego też zwiekszyc mielismy poziom trudnosci tylko słabiej (nie wiem czy zwiekszyles) to wypadaloby też wzmocnić towarzyszy od 100ego”. Od 100. poziomu dotąd zwalniały tylko poziomy (0.4.46), a stwory rosły w siłę dopiero od 250. poziomu klasy (0.4.57, 0.4.60). Na stronie ocen autor wybrał 1207 A: od 100. poziomu klasy stwory rosną równo do dwa razy silniejszych tuż przed 250., a od 250. zostają trzy razy silniejsze, jak dotąd.
+
+1. **Stwory od 100. poziomu klasy (1207 A).** Stwór rośnie z poziomem klasy postaci, która z nim walczy: na 100. poziomie klasy jest taki jak dotąd, na 249. dwa razy silniejszy (cios i HP po ×1,4142, czyli √2), a pomiędzy równo (na 175. cios i HP po ×1,21). Od 250. jest trzy razy silniejszy, jak dotąd (`mythGame`), a 25% za każdego gracza Drużyny poza pierwszym dalej dochodzi dopiero od 250.
+   - Poziom klasy liczy się jak przy trzykrotnej sile: na wyprawie drużyny, w Wieży Drużyn i w zdarzeniu drużyny najwyższy wśród walczących graczy, a wyprawa i jej zdarzenie biorą go z chwili wyruszenia.
+   - Działa tam, gdzie trzykrotna siła: wyprawy (też Szybkie i Błyskawiczne polowania) i ich zdarzenia, zdarzenia drużyny, Labirynt, Portale, obie Wieże, Sala prób, Poszukiwani i szacowanie zagrożenia. W walce samej (Wieża Solo, zdarzenie bez towarzyszy) działa w połowie (`soloGrowth`). Bez zmian, jak przy trzykrotnej sile: Bestia Gildii, strażnicy Wyprawy Gildii, karty Talii Systemu i podgląd umiejętności.
+   - W danych: `monsters.classLevelCurve` w `data/balance.json`, punkty [poziom klasy, mnożnik ciosu i HP] `[[100, 1], [249, 1.4142], [250, 1]]`, liniowo między punktami, na dokładkę do `mythGame`. Od 250. krzywa wraca do ×1, bo tam działa `mythGame`. Pusta krzywa to gra sprzed tej zmiany.
+2. **Silniejsi towarzysze.** Od 100. poziomu klasy postaci jej towarzysze z Kwater biją 1,4 raza mocniej i mają 1,4 raza więcej maks. HP, razem prawie dwa razy silniejsi. Od 330. poziomu klasy mnożnik maleje równo, do ×1 na 390. (dlaczego: punkt 3).
+   - Mocniej bije broń towarzysza, więc też jego umiejętności, trucizny i przywołania. Pancerz, uniki, szybkość i leczenie, które daje innym, są bez zmian; leczenie, które sam dostaje, rośnie z jego HP.
+   - Liczy się poziom klasy postaci, z którą towarzysz walczy: na wyprawie i w jej zdarzeniu z chwili wyruszenia, w Labiryncie, Portalach, Wieży Drużyn, Sali prób i szacowaniu zagrożenia obecny. W Wieży Drużyn liczy się postać, do której należy towarzysz, a nie gracz Drużyny obok.
+   - Karta towarzysza w Kwaterach i kandydata w Karczmie pokazuje HP, z którym walczy. Najemnik i gracze Drużyny nie są towarzyszami, więc się nie zmieniają.
+   - W danych: `companions.classLevelCurve` w `data/balance.json`, `[[100, 1.4], [330, 1.4], [390, 1]]`, punkty jak u stworów, przed pierwszym ×1.
+3. **Dlaczego ×1,4** (`tools/difficulty-sim.mjs`, realistyczny gracz z 0.4.57 i 0.4.60: postać z dwoma towarzyszami albo Drużyna trzech takich graczy tego samego poziomu, bez towarzyszy; pięć klas, 120 wypraw na klasę, długość i tryb oraz 120 walk z elitą miejsca; nowa opcja `--hell` dla Piekielnej wyprawy). Przy jakim mnożniku towarzyszy postać z nimi dorównuje drużynie według 1207 A (omdlenia na wyprawie 4 h i wygrane z elitą, z tolerancją 1 punktu procentowego; „≤1”: dorównuje już bez wzmocnienia, „~”: oszacowane poza zmierzonymi mnożnikami, którymi były ×1, 1,5, 2 i 2,5, a na 327. i 351. poziomie klasy ×1 i 1,5):
+
+   | Poziom klasy (postaci) | Trudna: wyprawa 4 h | Trudna: elita | Piekielna: wyprawa 4 h | Piekielna: elita |
+   | --- | --- | --- | --- | --- |
+   | 100 (83) | 1,71 | 1,72 | ~2,6 | 1,66 |
+   | 150 (129) | 1,45 | ≤1 | 2,36 | 1,72 |
+   | 200 (173) | 1,48 | ≤1 | ~3,1 | ~2,7 |
+   | 249 (216) | 1,07 | 1,2 | ~2,7 | ~2,5 |
+   | 250 (217) | 1,4 | 1,31 | 1,67 | ≤1 |
+   | 275 (247) | 1,08 | ≤1 | 1,31 | ≤1 |
+   | 300 (277) | 1,41 | 1,42 | 1,67 | 1,25 |
+   | 327 (300) | 1,25 | 1,4 | ~1,7 | ~1,5 |
+   | 351 (318) | ≤1 | 1,09 | 1,42 | ≤1 |
+   | 392 (350) | ≤1 | ≤1 | 1,09 | ≤1 |
+
+   - Na zwykłej wyprawie obie strony prawie nigdy nie mdleją i wygrywają z elitą, więc tam nie ma czego wyrównywać.
+   - Jeden mnożnik nie wyrówna wszystkich trybów naraz. Przed 250. poziomem klasy drużyna trzech graczy jest na Piekielnej wyprawie dużo silniejsza (×2,4–3,1). Od 250., z dopłatą 25% za gracza, dorównuje jej postać z towarzyszami przy ×1,1–1,7.
+   - ×1,4 wyrównuje Trudną wyprawę na wszystkich poziomach (potrzeba od ×1 do ×1,7, średnio ok. ×1,3, a z elitą do ×1,7) i Piekielną od 250. do 330. poziomu klasy (×1,3–1,7). To jedna liczba od 100. poziomu, bez skoku na 250.
+   - Wyżej towarzysze dorównują drużynie sami: na 351. poziomie klasy Trudna przy ×1, Piekielna przy ×1,4, a na 392. obie przy ×1–1,1. Mnożnik maleje więc od 330. do 390., żeby postać z towarzyszami nie miała łatwiej niż drużyna. Towarzysze rosną dalej z własnymi poziomami, więc na karcie ich HP nie spada.
+   - ×2,5–3, które wyrównałoby Piekielną wyprawę przed 250., zrobiłoby z towarzyszy silniejszych od graczy i bardzo ułatwiłoby zwykłe wyprawy i Labirynt.
+4. **Przed → po** (te same pomiary; „przed”: gra 0.4.62, „po”: 1207 A i silniejsi towarzysze). W komórkach: omdlenia; HP na końcu (wyprawa 4 h) albo wygrane; HP po wygranej (elita), w procentach. HP to HP postaci (w drużynie lidera). Drużyna idzie bez towarzyszy, więc u niej zmienia się tylko siła stworów przed 250. poziomem klasy.
+
+   Zwykła wyprawa:
+
+   | Poziom klasy (postaci) | Z towarzyszami: wyprawa 4 h | Z towarzyszami: elita | Drużyna trzech: wyprawa 4 h | Drużyna trzech: elita |
+   | --- | --- | --- | --- | --- |
+   | 100 (83) | 0; 92,8 → 0; 93,9 | 99,8; 84,7 → 100; 86,7 | 0; 97,6 → 0; 97,6 | 100; 90,3 → 100; 90,3 |
+   | 150 (129) | 0; 92,3 → 0; 91,9 | 100; 92,3 → 100; 91,5 | 0; 95,6 → 0; 94,6 | 100; 94,6 → 100; 92,7 |
+   | 200 (173) | 0; 94,9 → 0; 93 | 100; 93,2 → 100; 91,9 | 0; 98,5 → 0; 97,6 | 100; 96,7 → 100; 93,8 |
+   | 249 (216) | 0; 97,9 → 0; 96,5 | 100; 97,4 → 100; 94,9 | 0; 99,3 → 0; 98,1 | 100; 98,3 → 100; 96 |
+   | 250 (217) | 0,2; 93,4 → 0; 95 | 100; 89,2 → 100; 92,6 | 0; 93,4 → 0; 93,4 | 100; 90 → 100; 90 |
+   | 300 (277) | 0; 92,5 → 0; 93,1 | 100; 87,6 → 100; 88,1 | 0; 90,2 → 0; 90,2 | 100; 85 → 100; 85 |
+
+   Trudna wyprawa:
+
+   | Poziom klasy (postaci) | Z towarzyszami: wyprawa 4 h | Z towarzyszami: elita | Drużyna trzech: wyprawa 4 h | Drużyna trzech: elita |
+   | --- | --- | --- | --- | --- |
+   | 100 (83) | 7,8; 80,8 → 2,3; 86 | 75,7; 63,6 → 97,5; 70,2 | 0,2; 94,1 → 0,2; 94,1 | 100; 80,6 → 100; 80,6 |
+   | 150 (129) | 2,5; 84,5 → 0,7; 85,9 | 100; 84,9 → 100; 83,3 | 0; 91,8 → 0; 90,6 | 100; 88,8 → 100; 86,6 |
+   | 200 (173) | 0,2; 89,1 → 0,7; 87,2 | 100; 89,2 → 99,8; 86,4 | 0; 96,1 → 0; 92,8 | 100; 92,4 → 100; 90,6 |
+   | 249 (216) | 0; 94,8 → 0,2; 92,7 | 100; 92,9 → 100; 87,9 | 0; 97,9 → 0; 95,3 | 100; 95,4 → 100; 91,2 |
+   | 250 (217) | 7,5; 81,5 → 3; 88,4 | 88,3; 74,8 → 97,8; 79,8 | 1,8; 87,2 → 1,8; 87,2 | 95,8; 80,8 → 95,8; 80,8 |
+   | 300 (277) | 5,8; 83,5 → 1,3; 87,8 | 87,7; 75,7 → 97,3; 79,8 | 1; 88,3 → 1; 88,3 | 97,8; 78 → 97,8; 78 |
+
+   Piekielna wyprawa:
+
+   | Poziom klasy (postaci) | Z towarzyszami: wyprawa 4 h | Z towarzyszami: elita | Drużyna trzech: wyprawa 4 h | Drużyna trzech: elita |
+   | --- | --- | --- | --- | --- |
+   | 100 (83) | 90,7; 17,8 → 68; 36,1 | 3,3; 76,9 → 5,8; 64,4 | 24; 67,2 → 24; 67,2 | 11,5; 44,8 → 11,5; 44,8 |
+   | 150 (129) | 85,2; 23 → 71,7; 34,1 | 26; 53,7 → 34,7; 52,7 | 15,5; 75,2 → 31,3; 63,6 | 82,2; 63,5 → 55,8; 57,8 |
+   | 200 (173) | 74,5; 31,7 → 76,7; 30,1 | 55,7; 60,2 → 34,8; 60,9 | 0,2; 88 → 7,2; 80,9 | 99,8; 85,9 → 94,3; 75,6 |
+   | 249 (216) | 24; 67,4 → 45,8; 53 | 77,2; 73,4 → 52,5; 68,9 | 0,2; 90,9 → 1,8; 86,1 | 99,8; 85,9 → 89,7; 72,2 |
+   | 250 (217) | 90,3; 18,4 → 72,7; 32,9 | 19; 75,6 → 28,2; 71,5 | 56,8; 45,1 → 56,8; 45,1 | 9,8; 54,9 → 9,8; 54,9 |
+   | 300 (277) | 82,8; 25,1 → 64; 39,9 | 9,3; 75,2 → 18,8; 67,1 | 47; 53,3 → 47; 53,3 | 17,5; 44,1 → 17,5; 44,1 |
+
+   - Wyżej, wyprawa 4 h z towarzyszami przed → po wobec drużyny (omdlenia; Trudna | Piekielna): 275. poziom klasy 22,3 → 7 wobec 18,8 | 93,7 → 76,2 wobec 80; 327. poziom 12,2 → 4,2 wobec 6,5 | 79 → 62,2 wobec 42,5; 351. poziom 3,3 → 1 wobec 3 | 51,3 → 36,7 wobec 29,2; 392. poziom bez zmian (×1), 12,8 wobec 15 | 60,8 wobec 56,3.
+   - Nie jest tak łatwo jak przed trzykrotną siłą (0.4.56, postać z towarzyszami, wyprawa 4 h, omdlenia; Trudna | Piekielna): 250. poziom klasy 0 | 20 (teraz 3 | 72,7), 300. poziom 0 | 18 (teraz 1,3 | 64).
+5. **Co jeszcze widać w pomiarze:**
+   - Na zwykłej wyprawie realistyczny gracz z towarzyszami ani przed, ani po zmianie nie mdleje i kończy z HP bliskim drużyny. „Bez drużyny ciężko” dotyczyło Trudnej i Piekielnej wyprawy (od 0.4.62 także z drużyną) i walk z elitą, a nie zwykłych wypraw.
+   - Piekielna wyprawa przed 250. poziomem klasy zostaje wyprawą dla drużyny: postać z towarzyszami mdleje na wyprawie 4 h w 46–77% wypraw, drużyna w 2–31%. Dawniej, gdy Piekielna wyprawa była tylko samemu, tak samo: 24–91%.
+   - Ranni towarzysze: na Piekielnej wyprawie 4 h pada przeciętnie od 0,9 do 1,9 z dwóch towarzyszy, a po zmianie od 1 do 1,55. Każdy ranny czeka, aż postać odpocznie do pełna HP (rany goją się z ranami postaci), więc po Piekielnej wyprawie postać zwykle idzie dalej sama albo czeka. Czasu gojenia ta zmiana nie rusza.
+   - Labirynt (`tools/labyrinth-sim.mjs`, realistyczny gracz z dwoma towarzyszami, 16 dni na klasę), trzeci poziom i Piekielny, przed → po: 100. poziom klasy 85 → 94% i 10 → 22%, 150. 94 → 96% i 19 → 21%, 200. 100 → 94% i 24 → 16%, 249. 100 → 100% i 71 → 42%, 250. 76 → 95% i 6 → 25%, 300. 86 → 95% i 31 → 48%. Labirynt jest więc łatwiejszy na 100. i od 250. poziomu klasy, a trudniejszy na 200.–249. Jego siła (`levels[].strength` w `data/labyrinth.json`) zostaje bez zmian, do decyzji autora.
+6. **Brakujące szczegóły, rozstrzygnięte najprościej:**
+   - Jedna liczba dla ciosu i HP, jak przy stworach.
+   - Towarzysze rosną skokiem na 100. poziomie klasy (z ×1 na ×1,4), tak jak stwory na 250., bo autor chce ich silniejszych „od 100ego”. Przed 100. poziomem postać z towarzyszami walczy jak dotąd.
+   - Kandydat w Karczmie ma na karcie HP z mnożnikiem postaci, która go ogląda, bo z nią będzie walczył.
+   - Szacowanie zagrożenia liczy stwory i towarzyszy z nowymi mnożnikami.
+   - Wyprawa liczy walki przy odbiorze raportu, więc wyprawa, która wyruszyła przed tą wersją, kończy się już według nowych liczb, z poziomem klasy z chwili wyruszenia.
+   - Bez nowego ekranu i bez nowych tekstów w grze: zmienia się tylko HP na karcie towarzysza.
+7. **Kod i testy.**
+   - Silnik: `classLevelFactor` i `monsterCombatant` w `src/engine/combatant.js`, `companionBoost` i `companionCombatant` (nowe pole `classLevel`) w `src/engine/companions.js`. Poziom klasy postaci podają towarzyszom `simulateHunt` (`hunt.js`), `resolveEvent` (`events.js`), `labyrinthFighters` (`labyrinth.js`), `portalFight` (`portals.js`), `towerFight` (`towers.js`), `trialHallFights` (`trial-hall.js`) i `threatSamples` (`threat.js`).
+   - Serwer: `companionView` w `src/server/settlement.js` (karta w Kwaterach i w Karczmie).
+   - Dane: `monsters.classLevelCurve` i `companions.classLevelCurve` w `data/balance.json`, ze schematem.
+   - Narzędzie: `tools/difficulty-sim.mjs` ma `--hell`, a walki z elitą i czempionem liczą też tryb wyprawy.
+   - Testy: nowy `test/class-level-curves.test.js` (krzywa; stwory na 99., 100., 175., 249., 250. i 300. poziomie klasy, połowa w walce samej, drużyna przed 250., Bestia Gildii i karty bez zmian; towarzysze na 99., 100., 249. i 250. poziomie klasy, na wyprawie, w Labiryncie, w Wieży Drużyn i w Portalu; wyprawa drużyny bez zmian; karta towarzysza w Kwaterach). `test/myth-game.test.js` i `test/party-challenge.test.js` liczą stwory przy klasie 246–249 z nową krzywą, a `test/fourth-evolution.test.js` porównuje formy na stworach bez niej, jak bez trzykrotnej siły.
+
 ## Wersja 0.4.62 (19.11.2026): Trudna i Piekielna wyprawa z drużyną
 
 Autor: „Trudne i Piekielne wyprawy zrób tak by można je bylo robić z drużyną”.
@@ -3884,7 +3973,7 @@ Zgłoszenie gracza (wersja 0.4.56): „W labiryncie przy walce z bossem poziomu 
 
 Autor (19.11.2026), o wersji 0.4.57: „to miało byc od 250 poziomu klasy, mam nadzieje ze tak zrobiles”, a potem: „wszystkie te obwarowania trudnosci sa od poziomu klasy co podałem”.
 
-1. **Trzy razy silniejsze stwory od 250. poziomu klasy postaci, która walczy.** W 0.4.57 liczył się poziom stwora. Teraz postać od 250. poziomu klasy spotyka każdy stwór trzy razy silniejszy (cios i HP ×1,7321), gdziekolwiek walczy, także w niższych miejscach. Postać poniżej 250. poziomu klasy spotyka stwory takie jak dawniej, także te od 250. poziomu. W danych jest `monsters.mythGame.fromClassLevel` (250) zamiast `fromLevel` i `toLevel`. W walce postaci samej dalej połowa (`soloGrowth`).
+1. **Trzy razy silniejsze stwory od 250. poziomu klasy postaci, która walczy.** W 0.4.57 liczył się poziom stwora. Teraz postać od 250. poziomu klasy spotyka każdy stwór trzy razy silniejszy (cios i HP ×1,7321), gdziekolwiek walczy, także w niższych miejscach. Postać poniżej 250. poziomu klasy spotyka stwory takie jak dawniej, także te od 250. poziomu. W danych jest `monsters.mythGame.fromClassLevel` (250) zamiast `fromLevel` i `toLevel`. W walce postaci samej dalej połowa (`soloGrowth`). *Od 1207 A stwory rosną już od 100. poziomu klasy, do dwa razy silniejszych na 249., a towarzysze od 100. poziomu klasy są silniejsi: zob. „Trudniej od 100. poziomu klasy i silniejsi towarzysze”.*
 2. **Drużyna.** Na wyprawie drużyny, w Wieży Drużyn i w walce zdarzenia drużyny liczy się najwyższy poziom klasy wśród walczących graczy (`fightingClassLevel` w `src/engine/combatant.js`), żeby nikt nie chował się za niższym liderem. Od niego zależy i trzykrotna siła, i dopłata 25% za każdego gracza poza pierwszym (`monsters.perPlayer.fromClassLevel` 250). Towarzysze i najemnik się nie liczą.
 3. **Połowa nagród od 250. poziomu klasy** (`rewards.lateRewards.fromClassLevel` 250, `lateRewards` w `src/engine/progression.js`; dotąd od 250. poziomu postaci): wyprawy (na wyprawie drużyny każdy według swojej klasy), zdarzenia wyprawy i drużyny, Labirynt (walki, skarby, elity, ceny kupca i nowego podejścia), Sala prób, listy gończe (według klasy postaci, dla której wiszą), skrzynie Wyprawy Gildii, zadania Tablicy, Portale i Wieże (łup i złoto według klasy postaci, także w podglądzie na ekranie) i złoto z gier w karty, które liczy się z szacunku wyprawy. Krzywe XP bez zmian: XP postaci według poziomu postaci, XP klasy według poziomu klasy.
 4. **Gdzie stwory biorą poziom klasy:** wyprawa i wyprawa drużyny, Wieże, Portale, Labirynt, Sala prób, Poszukiwani na wyprawie, walki zdarzeń wyprawy i drużyny i szacowanie zagrożenia (dla postaci samej). Bestia Gildii, strażnicy Wyprawy Gildii, karty Talii Systemu i podgląd umiejętności nie dostają poziomu klasy, więc mają stwory jak dotąd.

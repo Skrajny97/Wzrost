@@ -22,6 +22,7 @@
     "quickHunt",
     "flashHunt",
     "parties",
+    "companions",
     "journal",
     "challenge"
   ],
@@ -1287,6 +1288,16 @@
           "maximum": 1,
           "description": "Jaka część wzrostu z lateGame, endGame i mythGame działa w walkach, w których postać jest sama: w Wieży Solo, w walkach zdarzeń i (bez mythGame) w atakach na Bestię Gildii (autor: 438.3 A, połowa krzywej)."
         },
+        "classLevelCurve": {
+          "type": "array",
+          "description": "Siła stworów według poziomu klasy postaci, która z nimi walczy, na dokładkę do mythGame (wybór autora 1207 A, 19.11.2026: od 100. poziomu klasy stwory rosną równo od ×1 do ×2 tuż przed 250., a od 250. zostają ×3 z mythGame; autor: „Ale od 100ego też zwiekszyc mielismy poziom trudnosci tylko słabiej”). Punkty [poziom klasy, mnożnik] rosnąco po poziomie klasy, między punktami liniowo, przed pierwszym ×1, za ostatnim jak w ostatnim; pusta lista to ×1. Mnożnik dotyczy obrażeń i HP, każdego z osobna, więc siła stwora rośnie o jego kwadrat (×1,4142 to dwa razy silniejszy stwór). Od mythGame.fromClassLevel krzywa wraca do ×1, bo dalej działa mythGame. Poziom klasy liczy się tak jak w mythGame (na wyprawie drużyny, w Wieży Drużyn i w zdarzeniu drużyny najwyższy wśród walczących graczy), z tymi samymi wyjątkami (Bestia Gildii, strażnicy Wyprawy Gildii, karty Talii Systemu, podgląd umiejętności), a w walce samej tylko w części soloGrowth.",
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": { "type": "number", "minimum": 0 }
+          }
+        },
         "huntCurve": {
           "type": "array",
           "description": "Siła stworów najnowszego miejsca, czyli tego, które sięga poziomu postaci (albo wyższego), na wyprawach i w próbnych walkach szacowania zagrożenia (bez Wież, walk zdarzeń i Bestii Gildii): punkty [poziom postaci, mnożnik obrażeń, mnożnik HP] rosnąco po poziomie, między punktami liniowo, przed pierwszym bez zmian, za ostatnim jak w ostatnim. Niższe miejsca bez zmian. Towarzysze i drużyna nie wzmacniają stworów (autor: 611 między B a C, 612 C, 613 C); od 250. poziomu klasy gracze Drużyny tak (perPlayer).",
@@ -1391,6 +1402,24 @@
         "size": { "type": "integer", "minimum": 2 },
         "xpCost": { "type": "number", "minimum": 0, "maximum": 0.5 },
         "classSpread": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "companions": {
+      "type": "object",
+      "description": "Towarzysze z Kwater w walce (src/engine/companions.js); ich werbunek, cechy i relacja są w settlement.json.",
+      "additionalProperties": false,
+      "required": ["classLevelCurve"],
+      "properties": {
+        "classLevelCurve": {
+          "type": "array",
+          "description": "O ile mocniej biją i ile więcej HP mają towarzysze postaci według jej poziomu klasy (autor 19.11.2026: „trzeba też w obliczu zmian wzmocnić towarzyszy jakoś, bo po zmianach - bez drużyny ciezko bedzie walczyć” i „to wypadaloby też wzmocnić towarzyszy od 100ego”). Punkty [poziom klasy, mnożnik] rosnąco po poziomie klasy, między punktami liniowo, przed pierwszym ×1, za ostatnim jak w ostatnim; pusta lista to ×1. Mnożnik dotyczy ciosów (broni) i maks. HP towarzysza, każdego z osobna. Liczy się poziom klasy postaci, której towarzysz walczy, jak przy stworach (na wyprawie z chwili wyruszenia). Działa wszędzie, gdzie walczą towarzysze: wyprawy i ich zdarzenia, Labirynt, Portale, Wieża Drużyn, Sala prób i szacowanie zagrożenia; karta towarzysza w Kwaterach i w Karczmie pokazuje HP z nim. Liczby z symulacji (tools/difficulty-sim.mjs): postać z dwoma towarzyszami ma radzić sobie mniej więcej jak Drużyna trzech graczy tego samego poziomu, nie łatwiej.",
+          "items": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": { "type": "number", "minimum": 0 }
+            }
+        }
       }
     },
     "journal": {

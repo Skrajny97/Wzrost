@@ -235,7 +235,9 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
   const allies = [
     { ...player, ...(Object.keys(trophies).length > 0 && { trophies }) },
     ...partners.map((partner, index) => playerCombatant(/** @type {any} */ ({ character: weekFighter(partner.character, week), equipped: partner.equipped, name: partner.name, area, id: `p${index + 1}` }), content)),
-    ...companions.map((companion, index) => companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}` }), content)),
+    // The character's companions, stronger by its own class level
+    // (companionBoost in companions.js).
+    ...companions.map((companion, index) => companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}`, classLevel: character.classLevel ?? 0 }), content)),
   ];
   // Alone on a floor (the Wieża Solo), the monsters have only a share of the
   // late and end game's growth, as no companion helps (the author: 438.3 A).
