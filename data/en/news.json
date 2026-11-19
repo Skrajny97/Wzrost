@@ -1120,6 +1120,10 @@
     "0.4.43": {
       "title": "Version 0.4.43",
       "body": "- In the Settings, below Discord, there are now buttons to the game's Facebook and TikTok and to the novel set in the game's world on Wattpad."
+    },
+    "0.4.44": {
+      "title": "Version 0.4.44",
+      "body": "- From level 250 of the character and the class, a level needs much more experience: 3 times as much as before at level 250, and 10 times as much from level 300.\n- The Encyclopedia's chests from Tier V give fewer Time Points: from 50 in Tier V to 100 in Tier X."
     }
   }
 }

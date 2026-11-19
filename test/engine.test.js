@@ -93,6 +93,7 @@ import {
   nextHuntUnlock,
   huntingHours,
   huntReport,
+  lateSlowdown,
   faintForfeit,
   itemName,
   itemView,
@@ -1247,16 +1248,33 @@ describe('inner regions', () => {
 });
 
 describe('progression', () => {
-  test('the first levels take about 20 minutes, level 500 about a day', () => {
+  test('the first levels take about 20 minutes, level 249 about 13 hours, level 500 about ten days', () => {
     assert.ok(xpToNext(2, content) > xpToNext(1, content));
     // A slow burn: a 30-minute exploration gives one or two levels at first.
     for (const level of [1, 2, 5, 10]) assert.ok(Math.abs(huntingHours(level, content) * 60 - 20) < 0.5, `level ${level}`);
     assert.ok(huntingHours(25, content) * 60 > 30);
     assert.ok(huntingHours(100, content) > 8 && huntingHours(100, content) < 12);
-    assert.ok(huntingHours(500, content) > 20 && huntingHours(500, content) < 30);
+    assert.ok(huntingHours(249, content) > 11 && huntingHours(249, content) < 15);
+    // From level 250 the late levels (0.4.44) take 3 to 10 times longer.
+    assert.ok(huntingHours(500, content) > 200 && huntingHours(500, content) < 300);
     assert.equal(content.balance.progression.maxLevel, 500);
     // Class levels need less XP, so they come faster.
     assert.ok(classXpToNext(1, content) < xpToNext(1, content));
+  });
+
+  // The author, 19.11.2026: „Zwiększ dramatycznie bardzo lvl curve od 250 w
+  // górę, bo już w grze ktos ma praktycznie 250” (0.4.44).
+  test('from level 250 each level takes 3 times longer, up to 10 times at 300 and after', () => {
+    const late = content.balance.progression.lateLevels;
+    assert.deepEqual(late, { fromLevel: 250, toLevel: 300, factorFrom: 3, factorTo: 10 });
+    const without = { ...content, balance: { ...content.balance, progression: { ...content.balance.progression, lateLevels: undefined } } };
+    const ratio = (level) => huntingHours(level, content) / huntingHours(level, without);
+    for (const level of [1, 100, 200, 249]) assert.equal(ratio(level), 1, `level ${level}`);
+    assert.ok(Math.abs(ratio(250) - 3) < 1e-9);
+    assert.ok(Math.abs(ratio(275) - 6.5) < 1e-9);
+    for (const level of [300, 400, 500]) assert.ok(Math.abs(ratio(level) - 10) < 1e-9, `level ${level}`);
+    // The class's levels follow, as their XP is the character's curve's.
+    assert.ok(Math.abs(classXpToNext(260, content) / classXpToNext(260, without) - ratio(260)) < 0.001);
   });
 
   test('the mid-game levels take longer, twice as long at its end, and none takes less than the one before', () => {
@@ -1265,8 +1283,9 @@ describe('progression', () => {
     assert.ok(Math.abs(huntingHours(midGame.fromLevel, content) - plain(midGame.fromLevel)) < 1e-9);
     assert.ok(huntingHours(35, content) > plain(35) * 1.3);
     assert.ok(Math.abs(huntingHours(midGame.toLevel, content) / plain(midGame.toLevel) - midGame.levelTimeFactor) < 1e-9);
-    // Past the mid-game the slowdown fades, and the late game keeps its pace.
-    assert.ok(Math.abs(huntingHours(midGame.fadeLevel, content) - plain(midGame.fadeLevel)) < 1e-9);
+    // Past the mid-game the slowdown fades; at its fadeLevel only the late
+    // levels' slowdown (0.4.44) is left.
+    assert.ok(Math.abs(huntingHours(midGame.fadeLevel, content) / plain(midGame.fadeLevel) - lateSlowdown(midGame.fadeLevel, content.balance.progression.lateLevels)) < 1e-9);
     for (let level = 2; level <= content.balance.progression.maxLevel; level++) {
       assert.ok(huntingHours(level, content) >= huntingHours(level - 1, content), `level ${level}`);
     }

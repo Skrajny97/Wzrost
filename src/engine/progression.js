@@ -4,6 +4,7 @@
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {{ fromLevel: number, toLevel: number, fadeLevel: number, levelTimeFactor: number }} MidGame balance.progression.midGame */
+/** @typedef {{ fromLevel: number, toLevel: number, factorFrom: number, factorTo: number }} LateLevels balance.progression.lateLevels */
 
 // The level length is measured in hours of exploring at that level. The first
 // levels take firstLevelMinutes each (a 5-minute exploration is enough), then
@@ -17,9 +18,24 @@
  * @returns {number}
  */
 export function huntingHours(level, content) {
-  const { firstLevelMinutes, flatLevels, levelTimeExponent, midGame } = content.balance.progression;
+  const { firstLevelMinutes, flatLevels, levelTimeExponent, midGame, lateLevels } = content.balance.progression;
   const base = (firstLevelMinutes / 60) * Math.max(1, level / flatLevels) ** levelTimeExponent;
-  return base * midGameSlowdown(level, midGame);
+  return base * midGameSlowdown(level, midGame) * lateSlowdown(level, lateLevels);
+}
+
+// How many times longer a late level takes (the author, 19.11.2026: „Zwiększ
+// dramatycznie bardzo lvl curve od 250 w górę, bo już w grze ktos ma
+// praktycznie 250”): none before fromLevel, factorFrom on it, evenly more to
+// factorTo on toLevel, and that much after. The class's levels follow, as
+// their XP is the character's curve's (classXpToNext).
+/**
+ * @param {number} level
+ * @param {LateLevels | undefined} late
+ */
+export function lateSlowdown(level, late) {
+  if (!late || level < late.fromLevel) return 1;
+  const share = Math.min(1, (level - late.fromLevel) / (late.toLevel - late.fromLevel));
+  return late.factorFrom + (late.factorTo - late.factorFrom) * share;
 }
 
 // How many times longer a level takes for the mid-game: evenly more from

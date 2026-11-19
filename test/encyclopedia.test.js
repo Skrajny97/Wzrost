@@ -96,12 +96,12 @@ describe('the Encyklopedia in the engine', () => {
     // A full set opens the sixth chest, more than Tier V's.
     for (const set of sixth.sets) assert.deepEqual(set.chest, content.encyclopedia.chests[5], set.name);
     assert.deepEqual(content.encyclopedia.chests.slice(4, 6), [
-      { gold: 2500, timePoints: 80, systemPoints: 32 },
-      { gold: 6250, timePoints: 160, systemPoints: 64 },
+      { gold: 2500, timePoints: 50, systemPoints: 32 },
+      { gold: 6250, timePoints: 60, systemPoints: 64 },
     ]);
     const warrior = itemSets(content).find((set) => set.id === 'items:6:warrior');
     const found = Object.fromEntries(warrior.bases.map((id) => [`item:${id}`, 1]));
-    assert.deepEqual(encyclopediaChest('items:6:warrior', found, [], content).chest, { gold: 6250, timePoints: 160, systemPoints: 64 });
+    assert.deepEqual(encyclopediaChest('items:6:warrior', found, [], content).chest, { gold: 6250, timePoints: 60, systemPoints: 64 });
     // Where it comes from: explorations from Stare Wyrobisko (96–100), worn
     // from class level 100, the Warsztat's and the Szlifiernia's patterns
     // from level 100 of their professions.
@@ -142,16 +142,16 @@ describe('the Encyklopedia in the engine', () => {
         ['Dodatki', ['hetman-gloves', 'safian-boots', 'pectoral', 'ancestors-ring', 'grzywna']],
       ],
     );
-    // A full set opens the seventh chest: Tier VI's gold x2.5 and points x2,
-    // as each Tier's before it.
+    // A full set opens the seventh chest: Tier VI's gold x2.5 and Punkty
+    // Systemu x2, Punkty Czasu 10 more (0.4.44).
     for (const set of seventh.sets) assert.deepEqual(set.chest, content.encyclopedia.chests[6], set.name);
     assert.deepEqual(content.encyclopedia.chests.slice(5, 7), [
-      { gold: 6250, timePoints: 160, systemPoints: 64 },
-      { gold: 15625, timePoints: 320, systemPoints: 100 },
+      { gold: 6250, timePoints: 60, systemPoints: 64 },
+      { gold: 15625, timePoints: 70, systemPoints: 100 },
     ]);
     const warrior = itemSets(content).find((set) => set.id === 'items:7:warrior');
     const found = Object.fromEntries(warrior.bases.map((id) => [`item:${id}`, 1]));
-    assert.deepEqual(encyclopediaChest('items:7:warrior', found, [], content).chest, { gold: 15625, timePoints: 320, systemPoints: 100 });
+    assert.deepEqual(encyclopediaChest('items:7:warrior', found, [], content).chest, { gold: 15625, timePoints: 70, systemPoints: 100 });
     // Where it comes from: explorations from Rokitowe Bezdno (121–125), the
     // last place of Czarne Bagno, worn from class level 125, the Warsztat's
     // and the Szlifiernia's patterns from level 125 of their professions.
@@ -201,16 +201,16 @@ describe('the Encyklopedia in the engine', () => {
         ['Dodatki', ['svarog-gauntlets', 'seven-league-boots', 'ryngraf', 'solomon-ring', 'alatyr']],
       ],
     );
-    // A full set opens the eighth chest: Tier VII's gold x2.5 (rounded up)
-    // and points x2, as each Tier's before it.
+    // A full set opens the eighth chest: Tier VII's gold x2.5 (rounded up),
+    // Punkty Systemu at most 100, Punkty Czasu 10 more (0.4.44).
     for (const set of eighth.sets) assert.deepEqual(set.chest, content.encyclopedia.chests[7], set.name);
     assert.deepEqual(content.encyclopedia.chests.slice(6, 8), [
-      { gold: 15625, timePoints: 320, systemPoints: 100 },
-      { gold: 39063, timePoints: 640, systemPoints: 100 },
+      { gold: 15625, timePoints: 70, systemPoints: 100 },
+      { gold: 39063, timePoints: 80, systemPoints: 100 },
     ]);
     const warrior = itemSets(content).find((set) => set.id === 'items:8:warrior');
     const found = Object.fromEntries(warrior.bases.map((id) => [`item:${id}`, 1]));
-    assert.deepEqual(encyclopediaChest('items:8:warrior', found, [], content).chest, { gold: 39063, timePoints: 640, systemPoints: 100 });
+    assert.deepEqual(encyclopediaChest('items:8:warrior', found, [], content).chest, { gold: 39063, timePoints: 80, systemPoints: 100 });
     // Where it comes from: explorations from Pogorzelisko (146–150), the last
     // place of Sosnowe Wydmy, worn from class level 150, the Warsztat's and
     // the Szlifiernia's patterns from level 150 of their professions.
@@ -249,9 +249,10 @@ describe('the Encyklopedia in the engine', () => {
         ['Dodatki', ['dratewka-gloves', 'waligora-boots', 'jurata-necklace', 'kinga-ring', 'golden-horn']],
       ],
     );
-    // Tier VIII's gold x2.5 (rounded up), Punkty Czasu x2, Punkty Systemu
-    // at most 100 (949).
-    for (const set of ninth.sets) assert.deepEqual(set.chest, { gold: 97658, timePoints: 1280, systemPoints: 100 }, set.name);
+    // Tier VIII's gold x2.5 (rounded up), Punkty Systemu at most 100 (949);
+    // from Tier V, Punkty Czasu 10 more a tier (0.4.44, the author: „zmniejszyć
+    // trzeba bonusy do Punktów Czasu z Encyklopedii”, „na pozniejszych lvlach”).
+    for (const set of ninth.sets) assert.deepEqual(set.chest, { gold: 97658, timePoints: 90, systemPoints: 100 }, set.name);
     // From Matecznik (171–175), the last place of Głucha Knieja, worn from
     // class level 175, the patterns from level 175 of the professions.
     assert.deepEqual(ninth.entries.find((entry) => entry.id === 'szczerbiec').sources, [
@@ -284,9 +285,9 @@ describe('the Encyklopedia in the engine', () => {
         ['Dodatki', ['lokietek-gloves', 'walgierz-boots', 'rzepicha-necklace', 'bona-ring', 'golden-duck']],
       ],
     );
-    // Tier IX's gold x2.5 (rounded up), Punkty Czasu x2, Punkty Systemu at
-    // most 100.
-    for (const set of tenth.sets) assert.deepEqual(set.chest, { gold: 244145, timePoints: 2560, systemPoints: 100 }, set.name);
+    // Tier IX's gold x2.5 (rounded up), Punkty Czasu 10 more, Punkty Systemu
+    // at most 100.
+    for (const set of tenth.sets) assert.deepEqual(set.chest, { gold: 244145, timePoints: 100, systemPoints: 100 }, set.name);
     // From Zaćmiona Polana (196–200), the last place of Ostępy Nowiu, worn
     // from class level 200, and no pattern yet.
     assert.deepEqual(tenth.entries.find((entry) => entry.id === 'grunwald-sword').sources, [
