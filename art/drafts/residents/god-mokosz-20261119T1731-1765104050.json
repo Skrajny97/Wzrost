@@ -1,0 +1,14 @@
+{
+  "id": "god-mokosz",
+  "tool": "pixellab generate-image-v2",
+  "description": "Mokosz, the old Slavic mother goddess of the earth, spinning and the harvest, a dignified calm woman of middle age with long dark braided hair under a white embroidered linen headscarf, a wreath of golden wheat ears and red poppies, a red and white embroidered linen dress, holding a wooden distaff with a bundle of pale flax, golden wheat sheaves at her shoulder, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic pagan mythology, dignified, muted natural colours",
+  "style": "src/client/art/residents/hermit.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08075984565416972
+  },
+  "images": 4
+}
