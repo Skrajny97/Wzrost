@@ -3853,7 +3853,7 @@ Autor przyjął na stronie ocen 19.11.2026, bez uwag, makiety 1209–1216 dziewi
 
 1. **Migracje** dostały kolejne numery po 0160 (0161 czeka na „Złoto w Skrzyni Konta”): 0162 Kronika, Róg zbiórki i Podcięcie, 0163 Bohaterowie tygodnia, 0164 Krainy pod sztandarem, 0165 Znaki Gildii, 0166 Pomoc, 0167 Kącina.
 2. **Części Sławy członka** to teraz Bestia, Wyprawa, Próby, Prośby, Wymiana, Wojna, Krainy i Pomoc (`FAME_PARTS`, kolumny `guild_member_fame`, `members.parts`). Wszystkie, także Pomoc, dają Znaki Gildii (1202 A) i liczą się do Filaru Gildii (1198 A).
-3. **Zakładka Gildia** ma od góry: Ogłoszenia, Pomoc przy budowach i pracy, członków, Bohaterów tygodnia i Ranking członków. Karta Róg zbiórki stoi nad Bestią i nad trasą Wyprawy, a Kącina pierwsza w Siedzibie. Dziesięć zakładek Gildii stoi w rzędach 4, 3 i 3, z Kramem przed Wojną.
+3. **Zakładka Gildia** ma od góry: Ogłoszenia, Pomoc przy budowach i pracy, członków, Bohaterów tygodnia i Ranking członków. Karta „Róg zbiórki” stoi nad Bestią i nad trasą Wyprawy, a Kącina pierwsza w Siedzibie. Dziesięć zakładek Gildii stoi w rzędach 4, 3 i 3, z Kramem przed Wojną.
 4. **Kronika Gildii (1195 A)** ogłasza też, każde raz, w tej samej operacji co samo wydarzenie (sekcja „Kronika Gildii w czacie”, punkt 2): Bohaterów tygodnia, sztandary gildii, opiekuna z Kąciny i zakup tytułu Strażnika Sztandaru.
 
 ## Kronika Gildii w czacie (1195 A, 19.11.2026)
