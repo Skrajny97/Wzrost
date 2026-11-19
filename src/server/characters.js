@@ -153,7 +153,7 @@ import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
 import { guildSeatSql } from './guild-seat.js';
 import { companionsKey, woundedWaiting } from './hunts.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
-import { partyOf, partyRemoval } from './parties.js';
+import { partyGate, partyOf, partyRemoval } from './parties.js';
 import { anvilDiscountOf } from './perks.js';
 import { bagHerbs, bagMinerals, bagPantry, bagPotions, herbsOf, mealView, potionsOf, professionsView, settlementPointsOf } from './professions-view.js';
 import { scrollById, scrollsOf } from './scroll-goods.js';
@@ -2037,6 +2037,11 @@ export async function createCharacter(context) {
   if (played.results.length > 0 && parked.results.length > 0) throw new ApiError(409, 'parked', PARKED_TEXT);
 
   await refuseLookAlike(db, name);
+  // The character played until now, in a Drużyna, leaves it first, when its
+  // player says so (1178 B, partyGate in parties.js): a new character sets
+  // it aside as a switch does.
+  const current = played.results.length > 0 ? await db.prepare("SELECT id FROM characters WHERE user_id = ? AND role = 'player'").bind(session.userId).first() : null;
+  const leaving = current ? await partyGate(db, current.id, body, { leader: true }) : [];
   const character = { classId: cls.id, level: 1, classLevel: 1, points: {}, position: cls.position };
   const hp = playerCombatant({ character, equipped: [], name }, content()).maxHp;
   const now = context.now;
@@ -2048,6 +2053,7 @@ export async function createCharacter(context) {
     // the account was left with no character to play.
     await atomically(db, [
       assertion(db, `(SELECT COUNT(*) FROM characters WHERE user_id = ? AND ${OWN_CHARACTERS}) < ?`, [session.userId, max]),
+      ...leaving,
       // The character played until now waits aside, with its exploration or
       // work going on.
       ...setAside(db, session.userId, now),
@@ -2162,7 +2168,12 @@ export async function chooseCharacter(context) {
   if (!chosen) throw new ApiError(404, 'no_character', 'Nie ma takiej postaci na Twoim koncie.');
   if (chosen.role === 'player') return json({ ok: true });
   if (await db.prepare("SELECT 1 FROM characters WHERE user_id = ? AND role = 'parked'").bind(session.userId).first()) throw new ApiError(409, 'parked', PARKED_TEXT);
+  // The character played now, in a Drużyna, leaves it first, when its
+  // player says so (1178 B, partyGate in parties.js): the leader too.
+  const played = await db.prepare("SELECT id FROM characters WHERE user_id = ? AND role = 'player'").bind(session.userId).first();
+  const leaving = played ? await partyGate(db, played.id, body, { leader: true }) : [];
   await db.batch([
+    ...leaving,
     ...setAside(db, session.userId, context.now),
     db
       .prepare("UPDATE characters SET role = 'player', system_points = system_points + (SELECT system_points_waiting FROM users WHERE id = ?), version = version + 1 WHERE id = ? AND role = 'aside'")

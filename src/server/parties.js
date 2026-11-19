@@ -411,6 +411,24 @@ export function partyRemoval(db, characters, binds) {
 
 const leaveStatements = (db, characterId) => partyRemoval(db, '?', [characterId]);
 
+// 1178 B (the author, 19.11.2026, on a player's report that a party went
+// without a member who had switched characters or set out alone): a member
+// who sets out alone on an exploration, and a player who switches to
+// another character while the one played is in a party (the leader too,
+// `leader`: its party could set out no more), is asked first whether to
+// leave the party ("Jesteś w drużynie. Wyjść z drużyny?"). With
+// `leaveParty` it leaves as "Opuść" does: the statements returned go into
+// the caller's own batch, so the leaving and the action are one write.
+// The leader still sets out alone as before. The Wieża Solo, the Labirynt
+// and the Portale ask nothing: their fights are over at once and take the
+// character away from no trip; nor do the professions (1.11.2026).
+export async function partyGate(db, characterId, body, { leader = false } = {}) {
+  const party = await partyOf(db, characterId);
+  if (!party || (!leader && party.leaderId === characterId)) return [];
+  if (body?.leaveParty !== true) throw new ApiError(409, 'in_party', t('Jesteś w drużynie. Wyjść z drużyny?'));
+  return leaveStatements(db, characterId);
+}
+
 // POST /api/party/leave: the character leaves (the author: "1 członek
 // wychodzić z nich jak stwierdzi ze potrzebuje Profesje robić"; since
 // 1.11.2026 the professions need no leaving, see the top). An exploration

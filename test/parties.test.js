@@ -141,12 +141,62 @@ describe('Drużyna through the API', () => {
 
   test('a member busy elsewhere stays home, and a party with nobody free does not go', async () => {
     const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
-    await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    // Out on its own exploration before it joins (since 1178 B a member is
+    // asked to leave the party to set out alone).
     assert.equal((await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
+    await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
     const view = (await as('lider', 'GET', '/api/party')).data.party;
     assert.equal(view.members.find((one) => one.name === 'Druh').status, 'away');
     const nobody = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 5 });
     assert.equal(nobody.data.error.code, 'nobody_free');
+  });
+
+  // 1178 B (the author, 19.11.2026, on a player's report from Discord).
+  test('a member setting out alone is asked to leave the party first; with the answer it leaves and sets out at once; the leader is not asked', async () => {
+    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    const asked = await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 });
+    assert.equal(asked.status, 409);
+    assert.equal(asked.data.error.code, 'in_party');
+    assert.equal(asked.data.error.message, 'Jesteś w drużynie. Wyjść z drużyny?');
+    // Nothing written: still in the party, and free.
+    const view = (await as('lider', 'GET', '/api/party')).data.party;
+    assert.deepEqual(view.members.map((one) => [one.name, one.status]), [['Lider', 'free'], ['Druh', 'free']]);
+    // The leader sets out alone with no question and keeps its party.
+    assert.equal((await as('lider', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
+    assert.equal((await as('lider', 'GET', '/api/party')).data.party.members.length, 2);
+    // With the answer the member leaves and sets out in one write.
+    const went = await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5, leaveParty: true });
+    assert.equal(went.status, 201);
+    assert.equal(went.data.character.activity.kind, 'hunt');
+    assert.equal((await as('druh', 'GET', '/api/party')).data.party, null);
+    assert.equal((await (await db()).prepare('SELECT COUNT(*) AS count FROM party_members WHERE character_id = ?').bind(await idOf('Druh')).first()).count, 0);
+  });
+
+  test('switching to another character or making a new one asks the one played in a party to leave it first, the leader too', async () => {
+    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    // A new character sets the one played aside: asked first, nothing made.
+    const asked = await as('druh', 'POST', '/api/character', { name: 'Druga', classId: 'mage', appearance: 'female' });
+    assert.equal(asked.data.error.code, 'in_party');
+    assert.equal((await (await db()).prepare("SELECT COUNT(*) AS count FROM characters WHERE name = 'Druga'").first()).count, 0);
+    assert.equal((await as('druh', 'POST', '/api/character', { name: 'Druga', classId: 'mage', appearance: 'female', leaveParty: true })).status, 201);
+    assert.equal((await (await db()).prepare('SELECT COUNT(*) AS count FROM party_members WHERE character_id = ?').bind(await idOf('Druh')).first()).count, 0);
+    // Druh back in a party (played again, invited anew), then a switch:
+    // the same question, for the leader as well.
+    assert.equal((await as('druh', 'POST', '/api/characters/choose', { id: await idOf('Druh') })).status, 200);
+    const again = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('druh', 'POST', '/api/party/accept', { partyId: again.data.party.id });
+    const switching = await as('druh', 'POST', '/api/characters/choose', { id: await idOf('Druga') });
+    assert.equal(switching.data.error.code, 'in_party');
+    assert.equal((await (await db()).prepare("SELECT role FROM characters WHERE name = 'Druh'").first()).role, 'player');
+    await player('lider2', 'Lider2');
+    const leader = await as('lider', 'POST', '/api/character', { name: 'Zapas', classId: 'archer', appearance: 'female' });
+    assert.equal(leader.data.error.code, 'in_party');
+    // With the answer: switched, out of the party.
+    assert.equal((await as('druh', 'POST', '/api/characters/choose', { id: await idOf('Druga'), leaveParty: true })).status, 200);
+    assert.equal((await (await db()).prepare("SELECT role FROM characters WHERE name = 'Druh'").first()).role, 'aside');
+    assert.equal((await as('lider', 'GET', '/api/party')).data.party, null);
   });
 
   test('a member at a profession\'s work stays in the party, stays home and limits nothing', async () => {
@@ -601,7 +651,7 @@ describe('a Drużyna and the companions from the Kwatery', () => {
     await player('druh', 'Druh');
   });
 
-  test('one whose companion goes on explorations joins a party and makes one at once, told first; in the party its own explorations, the portals and the Labirynt take the companion, and the switch works (18.11, before 828 B kept it home)', async () => {
+  test('one whose companion goes on explorations joins a party and makes one at once, told first; in the party the portals and the Labirynt take the companion, setting out alone asks first (1178 B), and the switch works (18.11, before 828 B kept it home)', async () => {
     const companion = await hire('druh');
     const own = await hire('lider');
     assert.equal((await stay('lider', own, true)).status, 200);
@@ -631,11 +681,11 @@ describe('a Drużyna and the companions from the Kwatery', () => {
     const joined = await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
     assert.equal(joined.status, 200, JSON.stringify(joined.data));
     assert.equal(joined.data.companions, null);
-    // In the party Druh's own exploration, the portals and the Labirynt take
-    // the companion (players and the author, 18.11: „z drużyną/z
-    // towarzyszami”); the Drużyna names it for the Walka's choice. Lider's,
-    // told to stay, is named nowhere.
-    assert.deepEqual(await alone('druh'), [companion.id]);
+    // In the party the portals and the Labirynt take the companion (players
+    // and the author, 18.11: „z drużyną/z towarzyszami”); the Drużyna names
+    // it for the Walka's choice. Lider's, told to stay, is named nowhere. To
+    // set out alone, Druh, a member, is asked to leave first (1178 B).
+    assert.equal((await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).data.error.code, 'in_party');
     assert.deepEqual(await portalCompanions('druh'), [companion.name]);
     assert.deepEqual(await labyrinthCompanions('druh'), [companion.name]);
     assert.deepEqual((await as('druh', 'GET', '/api/party')).data.ownCompanions, [companion.name]);
@@ -644,9 +694,9 @@ describe('a Drużyna and the companions from the Kwatery', () => {
     let view = await card('druh');
     assert.deepEqual([view.stay.stays, view.stay.action.stays], [false, true]);
     assert.equal((await stay('druh', companion, true)).status, 200);
-    assert.deepEqual(await alone('druh'), []);
+    assert.equal((await card('druh')).stay.stays, true);
     assert.equal((await stay('druh', companion, false)).status, 200);
-    assert.deepEqual(await alone('druh'), [companion.id]);
+    assert.equal((await card('druh')).stay.stays, false);
     assert.equal((await stored('Druh')).stays, undefined);
     assert.equal((await card('lider')).stay.stays, true);
     // Sent out of the party, nothing changes for it.
@@ -697,7 +747,7 @@ describe('a Drużyna and the companions from the Kwatery', () => {
     assert.deepEqual((await hunts()).find((one) => one.name === 'Druh').options.companions?.map((one) => one.id), [companion.id]);
   });
 
-  test("a party's trip goes without companions; a member's own exploration takes its own", async () => {
+  test("a party's trip goes without companions; out of the party a member's own exploration takes its own", async () => {
     const own = await hire('lider');
     assert.equal((await stay('lider', own, true)).status, 200);
     const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
@@ -706,9 +756,8 @@ describe('a Drużyna and the companions from the Kwatery', () => {
     const other = await hire('druh');
     assert.equal(JSON.parse((await (await db()).prepare("SELECT settlement FROM characters WHERE name = 'Druh'").first()).settlement).companions[0].stays, undefined);
     assert.equal((await as('druh', 'GET', '/api/settlement')).data.settlement.companions.hired[0].stay.stays, false);
-    assert.equal((await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
-    assert.deepEqual((await hunts())[0].options.companions.map((one) => one.id), [other.id]);
-    await as('druh', 'POST', '/api/hunts/cancel');
+    // Setting out alone, Druh, a member, is asked to leave first (1178 B).
+    assert.equal((await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).data.error.code, 'in_party');
     // The trip: no companions in anyone's exploration, nor in its roster.
     const went = await as('lider', 'POST', '/api/party/hunt', { areaId: 'mossy-boulders', minutes: 30 });
     assert.equal(went.status, 201, JSON.stringify(went.data));

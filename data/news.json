@@ -1450,6 +1450,11 @@
       "id": "0.4.55",
       "title": "Wersja 0.4.55",
       "body": "- Kowadło: nad listą przedmiotów jest „Sortuj:”: Założone, Najnowsze, Rzadkość, Poziom, Ulepszenie albo Rodzaj. Telefon pamięta wybór.\n- Plecak: przycisk „Zaznacz do sprzedaży”. Stuknij przedmioty, które ma kupić Złomiarz, i sprzedaj je naraz. Ulubionych nie da się zaznaczyć."
+    },
+    {
+      "id": "0.4.56",
+      "title": "Wersja 0.4.56",
+      "body": "- Drużyna: zanim wyruszysz sam jako członek drużyny albo zmienisz postać (także jako lider), gra zapyta: „Jesteś w drużynie. Wyjść z drużyny?”. Dzięki temu drużyna nie rusza już bez kogoś, kto zajął się czymś innym."
     }
   ]
 }

@@ -38,11 +38,19 @@ function drużyna(vars) {
     const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
     await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
   };
-  return { call, db, signUp, player, as, sql, row, activity, reports, age, join };
+  // Druh on its own exploration of 5 minutes while in the party: since 1178 B
+  // a member sets out alone only leaving the party, so it leaves with the
+  // start and joins again while away.
+  const alone = async () => {
+    const started = await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5, leaveParty: true });
+    if (started.status !== 201) throw new Error(JSON.stringify(started.data));
+    await join();
+  };
+  return { call, db, signUp, player, as, sql, row, activity, reports, age, join, alone };
 }
 
 describe('a member\'s waiting report claimed as the party sets out', () => {
-  const { player, as, sql, row, activity, reports, age, join } = drużyna({ PROFESSIONS: 'on' });
+  const { player, as, sql, row, activity, reports, age, join, alone } = drużyna({ PROFESSIONS: 'on' });
 
   beforeEach(async () => {
     await player('lider', 'Lider');
@@ -51,7 +59,7 @@ describe('a member\'s waiting report claimed as the party sets out', () => {
   });
 
   test('a member back from its exploration goes along, its report claimed as its own claim would', async () => {
-    assert.equal((await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
+    await alone();
     await age('Druh', 5);
     const before = await activity('Druh');
     // The party's list shows it free: it goes the next time the party sets out.
@@ -100,7 +108,7 @@ describe('a member\'s waiting report claimed as the party sets out', () => {
   });
 
   test('a leader\'s wrong choice sends nobody and claims nobody\'s report', async () => {
-    assert.equal((await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
+    await alone();
     await age('Druh', 5);
     const before = await activity('Druh');
     const wrong = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 30, healBelow: 0.123 });
@@ -121,7 +129,7 @@ describe('a member\'s waiting report claimed as the party sets out', () => {
   });
 
   test('a claim the member made at the same moment is fine: the member is read again and goes', async () => {
-    assert.equal((await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
+    await alone();
     await age('Druh', 5);
     // The member's own claim lands just as the leader sets out, after the
     // party's request read it with its report waiting: at the first write
@@ -157,7 +165,7 @@ describe('a member\'s waiting report claimed as the party sets out', () => {
 });
 
 describe('a member whose exploration ends in an event', () => {
-  const { player, as, sql, activity, reports, age, join } = drużyna({ EVENTS: 'on' });
+  const { player, as, sql, activity, reports, age, join, alone } = drużyna({ EVENTS: 'on' });
 
   beforeEach(async () => {
     await player('lider', 'Lider');
@@ -174,7 +182,7 @@ describe('a member whose exploration ends in an event', () => {
 
   test('stays home, its event waiting for its own choice, and nobody sets out: the leader hears why', async () => {
     await withEvent('Druh');
-    assert.equal((await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
+    await alone();
     await age('Druh', 5);
     const before = await activity('Druh');
     const refused = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 30 });

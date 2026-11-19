@@ -21,6 +21,7 @@ import { findMark, itemDetails, itemSheet, itemSummary, ownedCopy, storedCopy } 
 import { partyFree, partyWent, skipLines } from './party.js';
 import { fightPortal } from './portals.js';
 import { cropsReport, dishesReport, fishReport, herbsReport, itemsReport, jewelsReport, mineralsReport, potionsReport } from './professions.js';
+import { partyGated } from '../party-gate.js';
 
 // "skóra wilka ×2, rzadkie pióro kruka": what beaten creatures left.
 const materialsText = (materials) => materials.map((material) => (material.count > 1 ? `${material.label} ×${material.count}` : material.label)).join(', ');
@@ -657,7 +658,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
             // Not before the Drużyna is known: a tap in the first moment
             // would send a leader alone.
             const withParty = partyFree(await partyAsked).length > 0;
-            const answer = await call('POST', withParty ? '/api/party/hunt' : '/api/hunts', {
+            const answer = await partyGated(withParty ? '/api/party/hunt' : '/api/hunts', {
               areaId: report.areaId ?? report.regionId,
               minutes: report.minutes,
               avoidRare: avoidRareOn(),
@@ -666,6 +667,8 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
               trackUnknown: trackUnknownOn(),
               ...(!withParty && character.hardHunt && hardHuntOn() && { hard: true }),
             });
+            // Stayed in the Drużyna when asked (1178 B, party-gate.js).
+            if (answer === null) return;
             if (withParty) toast(partyWent(answer));
             navigate('#/walka');
           }),

@@ -943,6 +943,7 @@
     "src/client/install.js",
     "src/client/layout.js",
     "src/client/news.js",
+    "src/client/party-gate.js",
     "src/client/push.js",
     "src/client/screenshot.js",
     "src/client/side.js",
