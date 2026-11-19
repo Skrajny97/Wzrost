@@ -19,13 +19,15 @@ import { narrate } from '../narrator.js';
 import { scrapperSheet } from '../scrapper.js';
 import { findMark, itemDetails, itemSheet, itemSummary, ownedCopy, storedCopy } from './character.js';
 import { partyFree, partyWent, skipLines } from './party.js';
-import { fightPortal } from './portals.js';
+import { portalFightButtons } from './portals.js';
 import { cropsReport, dishesReport, fishReport, herbsReport, itemsReport, jewelsReport, mineralsReport, potionsReport } from './professions.js';
 import { partyGated } from '../party-gate.js';
 
 // "skóra wilka ×2, rzadkie pióro kruka": what beaten creatures left.
 const materialsText = (materials) => materials.map((material) => (material.count > 1 ? `${material.label} ×${material.count}` : material.label)).join(', ');
 const capitalized = (text) => text.charAt(0).toUpperCase() + text.slice(1);
+// A text of the game's data with its {name} filled in.
+const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (whole, name) => (Object.hasOwn(vars, name) ? String(vars[name]) : whole));
 
 const RESULT_CLASS = { success: 'result--success', fainted: 'result--fainted', escaped: 'result--escaped' };
 
@@ -208,9 +210,15 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         : // An entry to a Wieża (towers.js): its tower and floor, no length.
       report.tower
         ? heading(report.tower.name, t('Piętro {floor} · {area} · {date}', { floor: report.tower.floor, area: report.areaName, date: dateTimeFormat.format(new Date(report.endsAt)) }))
-        : // An entry to a Portal Systemu (portals.js): its portal and stage.
+        : // An entry to a Portal Systemu (portals.js): its portal and stage,
+          // a series' stages from the first fought to the last.
           report.portal
-          ? heading(report.portal.name, t('Stopień {stage} · {date}', { stage: report.portal.stage, date: dateTimeFormat.format(new Date(report.endsAt)) }))
+          ? heading(
+              report.portal.name,
+              report.portal.series
+                ? `${capitalized(report.portal.series.range)} · ${dateTimeFormat.format(new Date(report.endsAt))}`
+                : t('Stopień {stage} · {date}', { stage: report.portal.stage, date: dateTimeFormat.format(new Date(report.endsAt)) }),
+            )
           : // A trial of the Sala prób (trial-hall.js): its place, no length.
           report.hall
           ? heading(t('Sala prób'), `${report.hall.areaName} · ${dateTimeFormat.format(new Date(report.endsAt))}`)
@@ -220,17 +228,12 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
             huntBack(report),
           ),
       // A stage just won with the next one open: its fight at the very top
-      // (the author, 7.11.2026), as the button on the portal's card.
+      // (the author, 7.11.2026), with a few stages at one tap beside it, as
+      // on the portal's card.
       fresh &&
         report.portal?.won &&
         report.portal.next &&
-        h('button', {
-          type: 'button',
-          class: 'button button--system report-next-stage',
-          'data-guide': 'report-next-stage',
-          text: t('Walcz o stopień {stage}', { stage: report.portal.next }),
-          onClick: (event) => withButton(event.currentTarget, () => fightPortal(report.portal.id, navigate)),
-        }),
+        portalFightButtons(report.portal.id, report.portal.next, navigate, { className: 'report-next-stage', guide: 'report-next-stage' }),
       // A room's fight of the Labirynt just fought, its report first
       // (labyrinth.js): the way past it to the board, where its result, the
       // blessing's choice and the next level wait, and the switch of the
@@ -246,14 +249,20 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       // The time the others skipped for the whole party (the author: "xxx
       // przewinął czas o xxx").
       skipLines(report.skips).map((line) => h('p', { class: 'report-party', text: line })),
-      summaryCard(report),
+      report.portal?.series ? seriesCard(report) : summaryCard(report),
       report.event && eventCard(report.event),
       report.system.length > 0 && guided(systemPanel(...report.system, ...[pointsBox(report)].filter(Boolean)), 'report-system'),
       count > 0 &&
         h(
           'section',
           { class: 'report-section', 'aria-labelledby': 'fights-title' },
-          h('h2', { class: 'section-title', id: 'fights-title', 'data-guide': count === 1 && 'report-fights', text: t('Walki ({count})', { count }) }),
+          h('h2', {
+            class: 'section-title',
+            id: 'fights-title',
+            'data-guide': count === 1 && 'report-fights',
+            // A series of a portal's stages plays its last fight.
+            text: report.portal?.series && state.content.portalSeries ? filled(state.content.portalSeries.page.lastFight, { stage: report.portal.stage }) : t('Walki ({count})', { count }),
+          }),
           count > 1 && tabList,
           fightBox,
         ),
@@ -368,16 +377,18 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     const header = h(
       'div',
       { class: 'fight-header' },
-      h(
-        'p',
-        { class: 'fight-title' },
-        t('Walka {number} z {count}', { number: index + 1, count }),
-        report.keyFight?.index === index && h('span', { class: 'chip chip--key', text: t('najważniejsza') }),
-        fight.champion && h('span', { class: 'chip chip--champion', text: t('czempion') }),
-        fight.elite && h('span', { class: 'chip chip--elite', text: t('elita') }),
-        fight.tough && h('span', { class: 'chip chip--tough', text: t('wymagająca') }),
-        fight.event && h('span', { class: 'chip chip--event', text: t('zdarzenie') }),
-      ),
+      // A series of a portal's stages has its last fight named above.
+      !report.portal?.series &&
+        h(
+          'p',
+          { class: 'fight-title' },
+          t('Walka {number} z {count}', { number: index + 1, count }),
+          report.keyFight?.index === index && h('span', { class: 'chip chip--key', text: t('najważniejsza') }),
+          fight.champion && h('span', { class: 'chip chip--champion', text: t('czempion') }),
+          fight.elite && h('span', { class: 'chip chip--elite', text: t('elita') }),
+          fight.tough && h('span', { class: 'chip chip--tough', text: t('wymagająca') }),
+          fight.event && h('span', { class: 'chip chip--event', text: t('zdarzenie') }),
+        ),
       h('p', {
         class: 'fight-meta',
         // A fight of no exploration's time (a Portal's stage, a party
@@ -472,6 +483,20 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         (event.steps ?? []).map((step) => h('p', {}, h('strong', { text: `${step.label}. ` }), step.text)),
         h('p', {}, h('strong', { text: `${event.option.label}. ` }), event.option.text),
       ),
+    );
+  }
+
+  // A few stages of a portal at one tap (portals.js, 19.11.2026): the stages
+  // won, the loot of all of them, and where and why the series stopped, in
+  // the server's words; its last fight below.
+  function seriesCard(report) {
+    const { series } = report.portal;
+    return h(
+      'section',
+      { class: 'card report-summary', 'aria-label': t('Podsumowanie'), 'data-guide': 'report-summary' },
+      h('p', { class: `result ${RESULT_CLASS[report.result] ?? ''}`, text: report.resultText }),
+      series.won > 0 && h('dl', { class: 'status-list' }, h('div', { class: 'status-row' }, h('dt', { text: t('Łup') }), h('dd', { text: capitalized(series.loot) }))),
+      h('p', { class: `report-series-stop${report.portal.won ? '' : ' report-series-stop--lost'}`, text: series.stop }),
     );
   }
 
