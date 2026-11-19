@@ -76,12 +76,10 @@ export async function moveGiftRewards(env, now, moves = content().giftMoves ?? [
 
 // The scheduled run (index.js), every ten minutes while a return waits: each
 // return of content.giftReturns not made yet puts its item back into the bag
-// of the one character of its class (and, with `levels`, of a level in that
-// range) on the account whose login has the key (looseKey), by the author's
-// word (19.11.2026: „Tę kapę identyczną zwróć graczowi”). The return is
-// written to gift_returns_done right after, so it is made once; a return
-// whose account or character is not found, or whose account has more than
-// one such character, waits. Returns the returns made. The tests pass
+// of the character whose name has the key (looseKey), by the author's word
+// (19.11.2026: „Tę kapę identyczną zwróć graczowi”). The return is written
+// to gift_returns_done right after, so it is made once; a return whose
+// character is not found waits. Returns the returns made. The tests pass
 // returns of their own.
 export async function returnGiftItems(env, now, returns = content().giftReturns ?? []) {
   if (returns.length === 0 || new Date(now).getUTCMinutes() % 10 !== 0) return 0;
@@ -89,19 +87,13 @@ export async function returnGiftItems(env, now, returns = content().giftReturns 
   const { results: done } = await db.prepare('SELECT id FROM gift_returns_done').all();
   const waiting = returns.filter((one) => !done.some((row) => row.id === one.id));
   if (waiting.length === 0) return 0;
-  const { results: users } = await db.prepare('SELECT id, login FROM users').all();
-  const keyed = await Promise.all(users.map(async (user) => ({ id: user.id, key: await looseKey(user.login) })));
+  const { results: rows } = await db.prepare('SELECT id, name FROM characters').all();
+  const keyed = await Promise.all(rows.map(async (row) => ({ id: row.id, key: await looseKey(row.name) })));
   let returned = 0;
   for (const one of waiting) {
-    const user = keyed.find((each) => each.key === one.login);
-    if (!user) continue;
-    const [low, high] = one.levels ?? [1, Number.MAX_SAFE_INTEGER];
-    const { results: characters } = await db
-      .prepare('SELECT id FROM characters WHERE user_id = ? AND class_id = ? AND level BETWEEN ? AND ?')
-      .bind(user.id, one.classId, low, high)
-      .all();
-    if (characters.length !== 1) continue;
-    const [character] = characters;
+    const found = keyed.filter((each) => each.key === one.character);
+    if (found.length !== 1) continue;
+    const [character] = found;
     const [inserted] = await db.batch([
       db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, ?) RETURNING id').bind(character.id, JSON.stringify(one.item), now),
       db.prepare('UPDATE characters SET version = version + 1 WHERE id = ?').bind(character.id),
