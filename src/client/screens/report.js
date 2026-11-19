@@ -10,7 +10,7 @@ import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatMinutes, formatNumber, formatOffset } from '../format.js';
 import { t } from '../i18n.js';
 import { playSound } from '../sound.js';
-import { activityFinished, avoidRareOn, call, hardHuntOn, isUnlocked, reportCache, seekRareOn, state, trackQuestsOn, trackUnknownOn, unlockInfo } from '../state.js';
+import { activityFinished, avoidRareOn, call, hardHuntOn, hellHuntOn, isUnlocked, reportCache, seekRareOn, state, trackQuestsOn, trackUnknownOn, unlockInfo } from '../state.js';
 import { guided, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { materialIcon } from '../craft-table.js';
 import { droppedCardsSection } from '../cards.js';
@@ -483,8 +483,9 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       { class: 'card report-summary', 'aria-label': t('Podsumowanie'), 'data-guide': 'report-summary' },
       h('p', { class: `result ${RESULT_CLASS[report.result] ?? ''}`, text: report.resultText }),
       lost && h('p', { class: 'report-potions', text: summary.forfeit }),
-      // A Trudna wyprawa (629 A).
+      // A Trudna wyprawa (629 A), or a Piekielna.
       report.hard && h('p', { class: 'report-potions', text: t('Trudna wyprawa: silniejsze stwory, więcej XP i złota.') }),
+      report.hell && h('p', { class: 'report-potions', text: t('Piekielna wyprawa: dużo silniejsze stwory, więcej XP, złota i łupów.') }),
       // The potions drunk and the fights a speed potion sped up.
       (summary.potions ?? []).map((line) => h('p', { class: 'report-potions', text: line })),
       h(
@@ -666,6 +667,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
               trackQuests: trackQuestsOn(),
               trackUnknown: trackUnknownOn(),
               ...(!withParty && character.hardHunt && hardHuntOn() && { hard: true }),
+              ...(!withParty && character.hellHunt && hellHuntOn() && { hell: true }),
             });
             // Stayed in the Drużyna when asked (1178 B, party-gate.js).
             if (answer === null) return;

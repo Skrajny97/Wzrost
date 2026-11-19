@@ -41,7 +41,7 @@ import { durationsUpTo } from './unlocks.js';
  */
 /**
  * @typedef {{ character: Record<string, any>, equipped: Record<string, any>[], hp: number, areaId: string, avoidRare?: boolean, seekRare?: boolean,
- *   catchUp?: any, healing?: { count: number, amount: number, below: number, amounts?: number[] } | null, hard?: boolean }} ThreatInput
+ *   catchUp?: any, healing?: { count: number, amount: number, below: number, amounts?: number[] } | null, hard?: boolean | 'hell' }} ThreatInput
  */
 
 // Sample fights per kind of encounter: each encounter of the inner region and the
@@ -120,9 +120,10 @@ function mix(kinds) {
 // The expensive part: sample fights for the character's current build, with
 // its companions (companions.js) at full HP beside it. It does not depend on
 // HP or the length, so the server can keep it until the build changes.
-// `hard`: against the stronger creatures of a Trudna wyprawa (629 A).
+// `hard`: against the stronger creatures of a Trudna wyprawa (true, 629 A)
+// or of a Piekielna ('hell'; exploreStrength in combatant.js).
 /**
- * @param {{ character: Record<string, any>, equipped: Record<string, any>[], areaId: string, companions?: Record<string, any>[], hard?: boolean }} build
+ * @param {{ character: Record<string, any>, equipped: Record<string, any>[], areaId: string, companions?: Record<string, any>[], hard?: boolean | 'hell' }} build
  * @param {Content} content
  * @returns {ThreatSamples}
  */

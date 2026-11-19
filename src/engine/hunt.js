@@ -23,7 +23,7 @@
 // easy for it, the elite and the champion it has not met yet come far more
 // often, until it meets them (rareCatchUp).
 
-import { challengeAt, combatantView, exploreStrength, monsterCombatant, playerCombatant } from './combatant.js';
+import { challengeAt, challengeMode, combatantView, exploreStrength, monsterCombatant, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
 import { areaLand, cardBonusLine, cardDrop, cardDropText, cardFrom, lowerLandCards, PACK, packDropText } from './cards.js';
 import { mealEffects, mealLine } from './cooking.js';
@@ -681,9 +681,13 @@ function settingOut(one, week, area, id, content) {
 // holds no poster for it (tripWanted). `seat`: the
 // Siedziba Gildii's bonuses for the character as it set out (guild-seat.js,
 // seatHuntBonus): { xp, gold, rarity } shares, or null. `hard`: a Trudna
-// wyprawa (629 A), from the challenge's level: its creatures are
+// wyprawa (true, 629 A), from the challenge's level: its creatures are
 // challenge.hard times stronger, and its fights and finds give that much
-// more XP and gold. `week`: the week of the year the exploration set out in
+// more XP and gold; or a Piekielna ('hell', the author, 19.11.2026), the
+// same by challenge.hell, whose `drop` raises the chance of a chest among
+// the finds and the materials the creatures leave too (challengeMode in
+// combatant.js); the late levels' part (lateRewards) still comes on top
+// of both. `week`: the week of the year the exploration set out in
 // (weeks.js), kept with it, or null: its share more (or less) of the fights'
 // XP and gold, of the chance of a chest among the finds and of a champion's
 // chest, of the materials the creatures leave, and of the players' stats in
@@ -737,11 +741,13 @@ export function simulateHunt(
   // has met), the same for everyone.
   const lead = fighters[0].character;
   // The newest place's creatures, stronger by the leader's level, and those
-  // of a Trudna wyprawa stronger still, for more XP and gold.
-  const harder = hard ? (challengeAt(lead.level, content)?.hard ?? null) : null;
-  const strength = exploreStrength(area, lead.level, content, Boolean(harder));
+  // of a Trudna or a Piekielna wyprawa stronger still, for more XP and
+  // gold, and on a Piekielna for more chests and materials (`drop`).
+  const harder = challengeMode(hard, lead.level, content);
+  const strength = exploreStrength(area, lead.level, content, harder ? hard : false);
   const hardXp = 1 + (harder?.xp ?? 0);
   const hardGold = 1 + (harder?.gold ?? 0);
+  const hardDrop = 1 + (harder?.drop ?? 0);
   const durationMs = minutes * 60000;
   // The companions hired in the Osada (companions.js) go along, up to two
   // more members of the party, each with its own HP through the exploration
@@ -853,8 +859,8 @@ export function simulateHunt(
   /** @type {Record<string, number>} */
   let materials = {}; // { "wolf-pelt:common": 2, … } from beaten creatures
   // Tropiciel (an evolution's trait, the character's or a companion's form's),
-  // and the Bractwo Łowców: more materials from creatures.
-  const moreMaterials = (1 + trackerMaterials(character, companions, content)) * (1 + materialsMore) * weekFactor(week, 'materials') * (1 + fed.materials);
+  // the Bractwo Łowców and a Piekielna wyprawa: more materials from creatures.
+  const moreMaterials = (1 + trackerMaterials(character, companions, content)) * (1 + materialsMore) * weekFactor(week, 'materials') * (1 + fed.materials) * hardDrop;
   // The week's shares of the fights' XP and gold (weeks.js).
   const weekXp = weekFactor(week, 'xp');
   const weekGold = weekFactor(week, 'gold');
@@ -908,7 +914,7 @@ export function simulateHunt(
   const told = (/** @type {string} */ text) => (sought ? gendered(text, sought.female ? 'female' : 'male') : text);
 
   // The find's outcomes: the week's share more (or less) of the chance of a
-  // chest (items); none on the first exploration.
+  // chest (items), and a Piekielna wyprawa's; none on the first exploration.
   // From the late levels on (lateRewards), the character's gold, materials
   // and resources are a part of what they would be, and so are its chests
   // among the finds: the rest of their chance finds nothing.
@@ -917,7 +923,7 @@ export function simulateHunt(
     raisedOutcome(
       Object.entries(rewards.findOutcomes).filter(([kind]) => !(first && kind === 'chest')),
       'chest',
-      weekFactor(week, 'items') * (1 + fed.chests),
+      weekFactor(week, 'items') * (1 + fed.chests) * hardDrop,
     ),
     late,
   );
@@ -1197,7 +1203,8 @@ export function simulateHunt(
     // The wanted poster's target: met on the way, and beaten (of a poster of
     // the character's own).
     ...(own && { wanted: { id: sought.id, ...sighting } }),
-    ...(harder && { hard: true }),
+    // A Trudna wyprawa, or a Piekielna, for the report's line.
+    ...(harder && (hard === 'hell' ? { hell: true } : { hard: true })),
     // The week it set out in, for its event's fight and the report's line
     // (weeks.js).
     ...(week && { week }),
@@ -1417,6 +1424,7 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
     result: hunt.result,
     resultText: content.texts.result[hunt.result],
     ...(hunt.hard && { hard: true }),
+    ...(hunt.hell && { hell: true }),
     summary: {
       // A faint loses all the exploration brought (faintForfeit), said in
       // a line.
