@@ -366,15 +366,15 @@ export function roadKit(plan, area, minutes, content) {
 // draw of the gear, at `hp`) in `area`: alone with its companions, or as
 // the leader of a Drużyna's trip of `party` players (partyRoster).
 // `kitMinutes`: the length the potions are taken for, the exploration's own
-// by default. A Drużyna's trip is never a Trudna wyprawa (`hard`), as in
-// the game.
+// by default. A Drużyna's trip goes as a Trudna wyprawa (`hard`) too, as
+// in the game since 19.11.2026 (parties.js).
 function explore({ model, level, one, hp, area, minutes, kitMinutes = minutes, index, party, seed, hard = false, rumor }, content) {
-  const base = { character: one.character, equipped: one.equipped, hp, name: 'Symulacja', areaId: area.id, minutes, seed, ...(rumor && { rumor }) };
+  const base = { character: one.character, equipped: one.equipped, hp, name: 'Symulacja', areaId: area.id, minutes, seed, hard, ...(rumor && { rumor }) };
   if (party > 1) {
     const roster = partyRoster({ model, level, size: party, index, leader: one, area, minutes: kitMinutes }, content);
     return engine.simulateHunt({ ...base, roster, self: 'lead', lootSeed: `${seed}:loot` }, content);
   }
-  return engine.simulateHunt({ ...base, companions: companionsOf(one.plan, level, index, content), hard, ...roadKit(one.plan, area, kitMinutes, content) }, content);
+  return engine.simulateHunt({ ...base, companions: companionsOf(one.plan, level, index, content), ...roadKit(one.plan, area, kitMinutes, content) }, content);
 }
 
 // HP at the end of a party's exploration, the leader's and the others',
