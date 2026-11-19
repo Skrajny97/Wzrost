@@ -1490,6 +1490,11 @@
       "id": "0.4.63",
       "title": "Wersja 0.4.63",
       "body": "- Gwiazdki u Zaklinaczki: od relacji „Zaufany” Zaklinaczka wbija gwiazdki w przedmioty ulepszone do +10. Najwyżej pięć, a każda dodaje 10% wartości przedmiotu. Szansa jest mała, ale nieudana próba zabiera tylko złoto i części, a przedmiot nic nie traci.\n- Na liście znajomych zmieści się teraz 50 osób zamiast 30."
+    },
+    {
+      "id": "0.4.64",
+      "title": "Wersja 0.4.64",
+      "body": "- Od 100. poziomu klasy stwory są z każdym poziomem trochę silniejsze, aż tuż przed 250. poziomem są dwa razy silniejsze. Za to Twoi towarzysze od 100. poziomu klasy biją 1,4 raza mocniej i mają 1,4 raza więcej HP."
     }
   ]
 }

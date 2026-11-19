@@ -1188,6 +1188,10 @@
     "0.4.63": {
       "title": "Version 0.4.63",
       "body": "- Stars at the Enchantress: from the standing “Trusted” she sets stars in items upgraded to +10. Up to five, each adding 10% of the item's value. The chance is small, but a failed try takes only the gold and the parts, and the item loses nothing.\n- Your friends list now holds 50 people instead of 30."
+    },
+    "0.4.64": {
+      "title": "Version 0.4.64",
+      "body": "- From class level 100 the creatures grow a little stronger with every level, up to twice as strong just before level 250. In return your companions from class level 100 hit 1.4 times harder and have 1.4 times more HP."
     }
   }
 }

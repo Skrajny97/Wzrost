@@ -281,7 +281,7 @@ export function portalFight({ character, equipped, name, portalId, stage, first 
   const player = playerCombatant(/** @type {any} */ ({ character: weekFighter(/** @type {any} */ (character), /** @type {any} */ (week)), equipped, name, area }), content);
   const allies = [
     { ...player, ...(Object.keys(trophies).length > 0 && { trophies }) },
-    ...companions.map((companion, index) => companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}` }), content)),
+    ...companions.map((companion, index) => companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}`, classLevel: character.classLevel ?? 0 }), content)),
   ];
   // From the character's class level 250 they are stronger (the myth game,
   // monsterCombatant).
