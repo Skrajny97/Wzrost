@@ -92,6 +92,7 @@ export * from './trial-hall.js';
 export * from './pvp-arena.js';
 export * from './card-arena.js';
 export * from './guild-beast.js';
+export * from './guild-strike.js';
 export * from './guild-trials.js';
 export * from './guild-seat.js';
 export * from './guild-expedition.js';

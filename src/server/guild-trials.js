@@ -11,8 +11,9 @@
 // week and threshold for each character that finished a trial in the guild
 // that week, claimed that week or the next. What an action brings to the
 // character's trial is saved in the action's own batch (trialProgress), so
-// it lands only with the action. No line in the guild's chat: the chat has
-// no System lines, as for the Bestia Gildii. Where Talia Systemu is on, each
+// it lands only with the action. A threshold reached is told in the guild's
+// chat by the Kronika (1195 A, guild-chronicle.js, from the guild's dots in
+// guild-todo.js). Where Talia Systemu is on, each
 // trial finished may leave a card, given at the next look (903,
 // trialCards).
 

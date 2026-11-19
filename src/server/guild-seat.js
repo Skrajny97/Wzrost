@@ -29,6 +29,7 @@ import { questPeriod, seatBonuses, seatBuilding, seatBuildings, seatCostTo, seat
 import { assertion, atomically } from './atomic.js';
 import { characterView, loadPlayer, walletOf } from './characters.js';
 import { content } from './content.js';
+import { chronicle } from './guild-chronicle.js';
 import { guildPlayer, requireMember } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { numberText } from './i18n.js';
@@ -158,7 +159,8 @@ function amountOf(value) {
 // least one of them, no more than it holds and than the building can still
 // take below its top level. The building's level follows from all the
 // donations to it, the surplus of a level carried over to the next; a level
-// reached is told in the answer's words.
+// reached is told in the answer's words, and by the Kronika in the guild's
+// chat (1195 A, guild-chronicle.js), once a level, after the donation.
 export async function donateToGuildSeat(context) {
   const { session, player, guild, db } = await requireMember(context, errors());
   if (player.row.level < minLevel()) throw new ApiError(403, 'seat_level', cardTexts().donateLevel);
@@ -214,6 +216,9 @@ export async function donateToGuildSeat(context) {
   const after = await loadPlayer(db, session.userId);
   const view = await seatView(db, after, guild);
   const level = view.buildings.find((one) => one.id === building.id).level;
+  if (level > progress.level) {
+    await chronicle(db, guild.id, 'seat', { building: building.id, level }, context.now, { characterId: player.row.id, once: `seat:${building.id}:${level}` }).run();
+  }
   const text = [filled(words().donated, { name: building.accusative, amounts: amountsText(building, gold, resource) }), level > progress.level && filled(words().raised, { name: building.name, level })]
     .filter(Boolean)
     .join(' ');

@@ -820,6 +820,7 @@ function checkReferences(data) {
   errors.push(...checkCards(data, { rarities }));
   errors.push(...checkGuildSeat(data, { resources }));
   errors.push(...checkGuildExpedition(data));
+  errors.push(...checkGuildStrike(data));
   errors.push(...checkGuildWar(data));
   errors.push(...checkWeeks(data, { stats }));
   errors.push(...checkPayments(data));
@@ -911,6 +912,30 @@ function checkGuildSeat(data, { resources }) {
     if (!existsSync(new URL(`art/guild/${building.id}.png`, CLIENT_DIR))) errors.push(`guilds.json: budynek Siedziby ${building.id} nie ma obrazka src/client/art/guild/${building.id}.png`);
   }
   if (!data.guilds.tabs.some((tab) => tab.id === 'seat')) errors.push('guilds.json: strona Gildii nie ma zakładki Siedziby (seat)');
+  return errors;
+}
+
+// The classes of the day, the rally and the podcięcia at the Bestia and the
+// strażnicy (guilds.json classDay, rally, undercut; 1197, 1199 A, 1203):
+// the weekly schedule names known base classes, gives every class some day
+// and each about as many (at most one day apart), and the icons of the
+// rally and of the two attacks are there (src/client/art/icons).
+function checkGuildStrike(data) {
+  const errors = [];
+  const classes = new Set(data.classes.map((cls) => cls.id));
+  const days = new Map([...classes].map((id) => [id, 0]));
+  for (const [index, pair] of data.guilds.classDay.schedule.entries()) {
+    for (const id of pair) {
+      if (!classes.has(id)) errors.push(`guilds.json: klasa dnia ${index + 1}. dnia tygodnia "${id}" nie jest klasą z classes.json`);
+      else days.set(id, days.get(id) + 1);
+    }
+  }
+  const counts = [...days.values()];
+  if (counts.some((count) => count === 0)) errors.push(`guilds.json: nie każda klasa ma swój dzień klasy dnia (${[...days].map(([id, count]) => `${id}: ${count}`).join(', ')})`);
+  if (Math.max(...counts) - Math.min(...counts) > 1) errors.push(`guilds.json: klasy dnia mają nierówno dni (${[...days].map(([id, count]) => `${id}: ${count}`).join(', ')})`);
+  for (const id of ['rally-horn', 'beast-strike', 'beast-undercut']) {
+    if (!existsSync(new URL(`art/icons/${id}.png`, CLIENT_DIR))) errors.push(`guilds.json: brak ikony src/client/art/icons/${id}.png`);
+  }
   return errors;
 }
 

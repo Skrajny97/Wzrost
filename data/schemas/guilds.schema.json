@@ -12,6 +12,10 @@
     "tabs",
     "seat",
     "expedition",
+    "chronicle",
+    "classDay",
+    "rally",
+    "undercut",
     "trials",
     "requests",
     "exchange",
@@ -288,6 +292,92 @@
             "type": "string",
             "minLength": 1
           }
+        }
+      }
+    },
+    "chronicle": {
+      "description": "Kronika Gildii (1195 A; src/server/guild-chronicle.js): słowa linijek Systemu w kanale gildii na czacie.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["texts"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "texts": {
+          "type": "object",
+          "required": ["beastFell", "guardianFell", "guardianLast", "trials", "seat", "warWon", "warLost", "warDraw", "joined", "rally"],
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "classDay": {
+      "description": "Klasa dnia (1197; src/engine/guild-strike.js): dwie klasy dnia na każdy dzień tygodnia, od poniedziałku, ich mnożnik ataków i wzrost HP Bestii i strażników.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["power", "hp", "schedule", "texts"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "power": { "type": "number", "exclusiveMinimum": 1 },
+        "hp": { "type": "number", "minimum": 1 },
+        "schedule": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "items": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+        },
+        "texts": {
+          "type": "object",
+          "required": ["title", "bonus", "own", "how", "dayNames", "classDays"],
+          "properties": {
+            "dayNames": { "type": "array", "minItems": 7, "maxItems": 7, "items": { "type": "string", "minLength": 1 } }
+          },
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "rally": {
+      "description": "Róg zbiórki (1199 A; src/server/guild-rally.js): mnożnik ataków w czasie zbiórki, jej długość i jak daleko naprzód lider ją wyznacza.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["power", "minutes", "aheadHours", "texts"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "power": { "type": "number", "exclusiveMinimum": 1 },
+        "minutes": { "type": "integer", "minimum": 1, "maximum": 1440 },
+        "aheadHours": { "type": "integer", "minimum": 1, "maximum": 48 },
+        "texts": {
+          "type": "object",
+          "required": ["title", "lead", "how", "none", "noneMember", "planned", "plannedBy", "startsIn", "on", "onBonus", "came", "cameNone", "ended", "endedNone", "today", "tomorrow", "now", "hourLabel", "set", "setDone", "setNow", "cancel", "cancelAsk", "canceled", "pushTitle", "pushBody", "errors"],
+          "properties": {
+            "how": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+            "errors": {
+              "type": "object",
+              "required": ["locked", "noGuild", "notLeader", "badHour", "dayTaken", "started", "gone", "changed"],
+              "additionalProperties": { "type": "string", "minLength": 1 }
+            }
+          },
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "undercut": {
+      "description": "Podcięcie i cios (1203; src/server/guild-strike.js): mnożnik podcięcia, premia ciosów innych członków, ile ciosów wzmacnia jedno podcięcie i wzrost HP Bestii i strażników.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["power", "bonus", "uses", "hp", "texts"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "power": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 },
+        "bonus": { "type": "number", "exclusiveMinimum": 1 },
+        "uses": { "type": "integer", "minimum": 1 },
+        "hp": { "type": "number", "minimum": 1 },
+        "texts": {
+          "type": "object",
+          "required": ["strike", "undercut", "strikeNote", "strikeBonus", "undercutNote", "waiting", "waitingNone", "waitingRow", "strikeForms", "own", "how", "boosts", "boostClassDay", "boostRally", "boostBonus", "undercutDone"],
+          "properties": {
+            "strikeForms": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "string", "minLength": 1 } },
+            "how": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+          },
+          "additionalProperties": { "type": "string", "minLength": 1 }
         }
       }
     },

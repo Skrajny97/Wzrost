@@ -514,7 +514,9 @@ export const SPRITES = {
   // scrolls, the Zwój ochronny and the Zwój utrwalenia (598 C).
   icons: {
     size: 32,
-    ids: ['gold', 'time-points', 'encyclopedia', 'ward-scroll', 'steady-scroll', 'oblivion-scroll', 'fir-branch'],
+    // The Róg zbiórki and the Bestia's "Cios" and "Podcięcie" (1199 A,
+    // 1203), drawn in PixelLab, the author's choice.
+    ids: ['gold', 'time-points', 'encyclopedia', 'ward-scroll', 'steady-scroll', 'oblivion-scroll', 'fir-branch', 'rally-horn', 'beast-strike', 'beast-undercut'],
   },
   // The professions' squares on the Profesje tab, 48×48.
   professions: {
@@ -885,6 +887,11 @@ export const encyclopediaArt = (size) => iconArt('encyclopedia', size, 'book');
 export const scrollArt = (id, size) => iconArt(id, size, 'scroll');
 // The fir branch of Szczodre Gody's winter quest (1044.7 D).
 export const firBranchArt = (size) => iconArt('fir-branch', size, 'leaf');
+// The Róg zbiórki (1199 A) and the attacks "Cios" and "Podcięcie" (1203) on
+// the Bestia's and the strażnik's cards.
+export const rallyHornArt = (size) => iconArt('rally-horn', size, 'bell');
+export const beastStrikeArt = (size) => iconArt('beast-strike', size, 'sword');
+export const beastUndercutArt = (size) => iconArt('beast-undercut', size, 'dagger');
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
 // The pictures of the Labirynt Systemu and the Rdzeń (art/labyrinth/, 850–866,
 // accepted in 868 and 869): its rooms (room-<type>), its Artefakty

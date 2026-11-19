@@ -14,10 +14,12 @@
 // for it about once a minute (src/client/chat-news.js) and after its
 // actions in the guild. The cards of Talia Systemu left by the Próby
 // finished since the last look (903, trialCards in guild-trials.js) come
-// with it, for the page's toast.
+// with it, for the page's toast. A threshold of the Próby reached since is
+// told then in the guild's chat (1195 A, guild-chronicle.js).
 
 import { beastView } from './guild-beast.js';
 import { chestWaiting } from './guild-chest.js';
+import { trialsChronicle } from './guild-chronicle.js';
 import { expeditionView } from './guild-expedition.js';
 import { requestsView } from './guild-requests.js';
 import { guildPlayer, trialCards, trialsView } from './guild-trials.js';
@@ -36,6 +38,7 @@ export async function getGuildTodo(context) {
     requestsView(db, player, guild, context.now),
     chestWaiting(db, player.row, guild.id),
   ]);
+  await trialsChronicle(db, guild.id, trials.bar, context.now);
   const ready = (bar) => Boolean(bar?.thresholds.some((threshold) => threshold.ready));
   // An attack it may make now: none while it offers itself or serves as a
   // mercenary (attacks.blocked), as the attack would refuse.

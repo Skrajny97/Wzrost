@@ -242,6 +242,114 @@
       }
     }
   },
+  "chronicle": {
+    "$comment": "Kronika Gildii (1195 A, przyjęta przez autora na stronie ocen 19.11.2026; src/server/guild-chronicle.js; DECISIONS.md, „Kronika Gildii w czacie”): krótkie linijki [ SYSTEM ] w kanale Gildia na czacie o dużych chwilach gildii, dwie, trzy dziennie, bez stukania: upadek Bestii i strażnika Wyprawy z imieniem postaci, która zadała ostatni cios, nowy próg Prób, nowy poziom budynku Siedziby, wynik wieczoru ligi, nowy członek i początek zbiórki (rally). Linijka pamięta swój klucz i liczby, więc każdy czyta ją w swoim języku: {monster} to nazwa stwora, {building} budynku Siedziby, {until} godzina czasu polskiego. Każde wydarzenie pisze się raz. Linijki Systemu nikogo nie oznaczają i nie dają powiadomień na telefon. texts: słowa linijek; {…} wypełnia gra.",
+    "texts": {
+      "beastFell": "Bestia padła: {monster}. Ostatni cios: {name}.",
+      "guardianFell": "Strażnik etapu {stage} Wyprawy padł: {monster}. Ostatni cios: {name}.",
+      "guardianLast": "Strażnik etapu {stage} Wyprawy padł: {monster}. Ostatni cios: {name}. Trasa tygodnia przebyta!",
+      "trials": "Próby Gildii: próg {threshold} z {thresholds} osiągnięty.",
+      "seat": "Siedziba: {building} wchodzi na {level}. poziom.",
+      "warWon": "Wieczór ligi: wygrana z [{tag}] {guild}, walki {won}:{lost}.",
+      "warLost": "Wieczór ligi: przegrana z [{tag}] {guild}, walki {won}:{lost}.",
+      "warDraw": "Wieczór ligi: remis z [{tag}] {guild}, walki {won}:{lost}.",
+      "joined": "Nowy członek gildii: {name}.",
+      "rally": "Róg zbiórki! Do {until} ataki na Bestię i strażnika biją o {percent}% mocniej."
+    }
+  },
+  "classDay": {
+    "$comment": "Klasa dnia (1197, przyjęta przez autora na stronie ocen 19.11.2026; src/engine/guild-strike.js; DECISIONS.md, „Klasa dnia przy Bestii i strażnikach”): co dzień od północy czasu polskiego dwie klasy są klasami dnia, razem ze wszystkimi swoimi ewolucjami. Ich ataki na Bestię Gildii i na strażnika Wyprawy Gildii biją power razy mocniej. schedule: klasy dnia od poniedziałku do niedzieli, jeden stały rozkład dla całej gry („Każda klasa ma swoje dni w tygodniu”): cztery klasy mają po trzy dni, Cień dwa, i żadna klasa nie ma dwóch dni z rzędu, także z niedzieli na poniedziałek. hp: ile razy więcej HP mają za to Bestia i strażnicy (razem z undercut.hp), żeby gildia, która atakuje jak dotąd, kończyła w podobnym czasie. texts: słowa kart Bestii i strażnika; {…} wypełnia gra.",
+    "power": 1.5,
+    "hp": 1.2,
+    "schedule": [["warrior", "archer"], ["mage", "cleric"], ["shadow", "warrior"], ["archer", "mage"], ["cleric", "shadow"], ["warrior", "archer"], ["mage", "cleric"]],
+    "texts": {
+      "title": "Klasy dnia",
+      "bonus": "+{percent}%",
+      "own": "Dziś dzień Twojej klasy: Twoje ataki biją o {percent}% mocniej.",
+      "how": "Co dzień od północy dwie klasy są klasami dnia, razem ze swoimi ewolucjami. Ich ataki na Bestię i strażników Wyprawy biją o {percent}% mocniej. Każda klasa ma swoje dni w tygodniu: {schedule}.",
+      "dayNames": ["pn", "wt", "śr", "cz", "pt", "sb", "nd"],
+      "classDays": "{class} {days}"
+    }
+  },
+  "rally": {
+    "$comment": "Róg zbiórki (1199 A, przyjęty przez autora na stronie ocen 19.11.2026; src/server/guild-rally.js; DECISIONS.md, „Róg zbiórki”): lider albo zastępca wyznacza godzinę zbiórki gildii, od razu albo o pełnej godzinie, najwyżej aheadHours godzin naprzód, najwyżej jedną zbiórkę na dzień (czasu polskiego, dzień jej początku). Gdy zbiórka się zaczyna, każdy członek dostaje powiadomienie na telefon, a Kronika (chronicle) pisze linijkę na czacie gildii. Przez minutes minut ataki członków na Bestię i strażnika Wyprawy biją power razy mocniej, a karta pokazuje, kto przyszedł, czyli kto w tym czasie zaatakował. Kto nie zdąży, nic nie traci: ataki zostają mu na resztę dnia. Zbiórkę, która się jeszcze nie zaczęła, lider albo zastępca może odwołać. texts: słowa karty, powiadomienia i odpowiedzi gry; {…} wypełnia gra.",
+    "power": 1.3,
+    "minutes": 60,
+    "aheadHours": 24,
+    "texts": {
+      "title": "Róg zbiórki",
+      "lead": "Lider albo zastępca wyznacza godzinę zbiórki. Przez godzinę ataki na Bestię i strażnika biją o {percent}% mocniej.",
+      "how": [
+        "Lider albo zastępca wyznacza godzinę zbiórki: od razu albo o pełnej godzinie, najwyżej dobę naprzód. Gildia ma najwyżej jedną zbiórkę dziennie.",
+        "Gdy zbiórka się zaczyna, każdy członek dostaje powiadomienie na telefon, a na czacie gildii pojawia się linijka Systemu.",
+        "Przez {minutes} minut ataki wszystkich członków na Bestię i strażnika Wyprawy biją o {percent}% mocniej. Karta pokazuje, kto przyszedł, czyli kto w tym czasie zaatakował.",
+        "Kto nie zdąży, nic nie traci: ataki zostają mu na resztę dnia."
+      ],
+      "none": "Dziś nie ma zbiórki.",
+      "noneMember": "Zbiórkę wyznacza lider albo zastępca.",
+      "planned": "Zbiórka {day} o {hour}",
+      "plannedBy": "Zwołuje: {name}",
+      "startsIn": "Zacznie się za {time}.",
+      "on": "Zbiórka trwa do {hour}!",
+      "onBonus": "Ataki na Bestię i strażnika biją o {percent}% mocniej.",
+      "came": "Przyszli: {count}",
+      "cameNone": "Nikt jeszcze nie przyszedł. Zaatakuj Bestię albo strażnika, a staniesz na liście.",
+      "ended": "Dzisiejsza zbiórka: {from}–{to}",
+      "endedNone": "Na zbiórkę nikt nie przyszedł.",
+      "today": "dziś",
+      "tomorrow": "jutro",
+      "now": "Od razu",
+      "hourLabel": "Godzina zbiórki",
+      "set": "Wyznacz zbiórkę",
+      "setDone": "Zbiórka wyznaczona: {day} o {hour}.",
+      "setNow": "Zbiórka trwa od teraz do {hour}.",
+      "cancel": "Odwołaj zbiórkę",
+      "cancelAsk": "Odwołać zbiórkę?",
+      "canceled": "Zbiórka odwołana.",
+      "pushTitle": "Róg zbiórki: {guild}",
+      "pushBody": "Zbiórka trwa do {hour}! Ataki na Bestię i strażnika biją o {percent}% mocniej.",
+      "errors": {
+        "locked": "Gildie odblokujesz na poziomie postaci {level}.",
+        "noGuild": "Nie należysz do gildii.",
+        "notLeader": "Zbiórkę wyznacza lider albo zastępca.",
+        "badHour": "Wybierz godzinę zbiórki z listy.",
+        "dayTaken": "Na ten dzień gildia ma już zbiórkę.",
+        "started": "Ta zbiórka już się zaczęła, więc nie można jej odwołać.",
+        "gone": "Tej zbiórki już nie ma.",
+        "changed": "Gildia zmieniła się w międzyczasie. Spróbuj jeszcze raz."
+      }
+    }
+  },
+  "undercut": {
+    "$comment": "Podcięcie i cios (1203, przyjęte przez autora na stronie ocen 19.11.2026; src/server/guild-strike.js; DECISIONS.md, „Podcięcie i cios przy Bestii i strażnikach”): przed każdym atakiem na Bestię albo strażnika gracz wybiera „Cios” albo „Podcięcie”. Podcięcie bije power razy mocniej (połowa obrażeń), ale każdy z uses następnych ciosów członków innych graczy bije bonus razy mocniej; podcięcie nigdy nie pomaga postaciom konta, które je zrobiło. Czekające podcięcia jednej bestii albo jednego strażnika stoją w jednej kolejce: każdy Cios innego gracza zużywa jedno, najstarsze. Podcięcia zostają przy swojej bestii albo swoim strażniku i znikają z nimi: z upadkiem albo z końcem tygodnia. Premie mnożą się: klasa dnia, zbiórka i podcięcie. hp: ile razy więcej HP mają za to Bestia i strażnicy (razem z classDay.hp). texts: słowa kart i odpowiedzi gry; {…} wypełnia gra.",
+    "power": 0.5,
+    "bonus": 1.6,
+    "uses": 3,
+    "hp": 1.3,
+    "texts": {
+      "strike": "Cios",
+      "undercut": "Podcięcie",
+      "strikeNote": "Pełne obrażenia.",
+      "strikeBonus": "Pełne obrażenia i +{percent}% z podcięcia: {name}.",
+      "undercutNote": "Połowa obrażeń, ale {uses} następne ciosy innych członków biją o {percent}% mocniej.",
+      "waiting": "Czekające podcięcia: {count}",
+      "waitingNone": "Nie czeka żadne podcięcie.",
+      "waitingRow": "{name}: {left} {strikes}",
+      "strikeForms": ["cios", "ciosy", "ciosów"],
+      "own": "Twoje podcięcie czeka na ciosy innych członków.",
+      "how": [
+        "Przed każdym atakiem wybierasz „Cios” albo „Podcięcie”.",
+        "Podcięcie zadaje połowę obrażeń, ale {uses} następne ciosy innych członków biją o {percent}% mocniej. Z własnego podcięcia nie korzystasz.",
+        "Czekające podcięcia stoją w kolejce: każdy cios innego członka zużywa najstarsze. Znikają, gdy bestia albo strażnik padnie, i z końcem tygodnia.",
+        "Premie się mnożą: klasa dnia, zbiórka i podcięcie."
+      ],
+      "boosts": "Premie: {boosts}.",
+      "boostClassDay": "klasa dnia +{percent}%",
+      "boostRally": "zbiórka +{percent}%",
+      "boostBonus": "podcięcie ({name}) +{percent}%",
+      "undercutDone": "Podcięcie! {uses} następne ciosy innych członków biją o {percent}% mocniej."
+    }
+  },
   "trials": {
     "$comment": "Próby Gildii (src/engine/guild-trials.js, src/server/guild-trials.js, src/client/guild-trials.js; DECISIONS.md, „Próby i Prośby Gildii”). Autor: „345 A”: cotygodniowa tablica wspólnych prób. Tydzień jak przy zadaniach tygodniowych: od poniedziałku, od północy czasu polskiego. Tablica gildii ma board prób, losowanych z ziarna gildii i tygodnia przy pierwszym spojrzeniu na nią w tygodniu: każda próba to rodzaj (kinds) i rozmiar (sizes: factor razy liczba; waga losowania to weight rodzaju razy weight rozmiaru), bez powtórzeń par. Autor: „615 A”: w poniedziałek widać pierwsze opens.first prób tablicy, a każdego następnego dnia tygodnia opens.perDay więcej. Prób nie trzeba brać (autor: „617 prób nie trzeba będzie brać, one będą wszystkie na raz odpalone u gracza”): każda otwarta próba tablicy biegnie u każdego członka naraz, od chwili otwarcia (albo od dołączenia do gildii, gdy było później), jako jego własny wiersz z liczbą dla poziomu postaci w tej chwili; wiersze robi cron na początku dnia, dołączenie do gildii i spojrzenie na tablicę. Każdą próbę członek wykona raz w tygodniu. Liczy się to, co liczą zadania od narratora (killAny: stwory z wypraw i Wież, explore: minuty wypraw, gatherAny: zebrane zioła, brewAny: uwarzone mikstury, makeAny: wyroby Warsztatu, process i salvage: Stół rozbiórki, orders: zlecenia Osady), a do tego towers: walki wygrane w Wieżach, tylko na piętrach najwyżej levelsBelow poziomów poniżej poziomu postaci (autor: 488 A; {floor} w note to najniższe takie piętro dla postaci, która patrzy), upgrade: udane ulepszenia na Kowadle i gifts: sztuki dane w Prośbach Gildii. Ile trzeba: count (od, do) co step (od 0.2.24 dwa razy więcej niż wcześniej we wszystkich rodzajach poza towers, orders i gifts; autor 8.11.2026: „Za szybko się robi próby Gildii, trzeba zwiększyć progi gdzieś ze dwa razy”; Wieże są od 0.2.11 dużo trudniejsze, a zlecenia Osady i Prośby mają własne tempo, którego gracz nie przyspieszy), a w killAny tyle stworów, ile średnio przynosi fights walk w najnowszym miejscu klasy; miejsce w zakresie losuje się z tablicą, a liczba mnoży się przez factor i udział z krzywej zadań tygodniowych (quests.json, weekly.curve) dla poziomu postaci w chwili wzięcia. note: dopisek pod próbą. requires: czego rodzaj potrzebuje; locks: dlaczego próba jest zamknięta ({level}: poziom odblokowania; off: tej części gry nie ma we wdrożeniu). Każda wykonana próba to punkt gildii, ale jedna postać dokłada najwyżej cap punktów w tygodniu, żeby nikt nie robił wszystkiego za innych, a na pasek tego tygodnia wchodzi najwyżej perDay jego prób za każdy dzień tygodnia do dziś (w poniedziałek perDay, do wtorku łącznie dwa razy tyle i tak dalej); wykonane ponad to wchodzą w kolejnych dniach (615 A). Progi paska (ostatni równy cap, czyli wszyscy członkowie wykonali wszystko, co mogli zaliczyć; autor: „jak wszyscy wykonają wszystkie to wtedy maksa się zdobywa”): aktywni członkowie (konto było w grze w ostatnich activeDays dniach; liczeni przy losowaniu tablicy, co najmniej 1) razy steps. Kto dołącza po losowaniu, dodaje część członka: (7 − dzień tygodnia) / 7, w poniedziałek całego, w niedzielę 1/7 (zapisane przy tablicy, joined), a próg to iloczyn zaokrąglony w górę (615 A). Osiągnięty próg zostaje. Każdy próg daje skrzynię (chests, po kolei) każdemu, kto w tym tygodniu wykonał choć jedną próbę w tej gildii, raz na postać, tydzień i próg, do końca następnego tygodnia, także po wyjściu z gildii, usunięciu z niej albo jej rozpadzie (0.2.72; texts.elsewhere): złoto gold.base + gold.perLevel × poziom postaci, timePoints Punktów Czasu, materials sztuk jednego materiału zwykłego stwora z najnowszego miejsca klasy (w rzadkości gatunku) i systemPoints Punktów Systemu. Tablice, próby i skrzynie sprzed poprzedniego tygodnia znikają, gdy przychodzi nowa tablica. texts: słowa karty Prób i odpowiedzi gry; {…} wypełnia gra.",
     "board": 16,

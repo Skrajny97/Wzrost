@@ -28,6 +28,7 @@ import { ApiError, json, readJson } from './http.js';
 import { language, runInLanguage, t } from './i18n.js';
 import { joinGuildTrials } from './guild-trials.js';
 import { beastJoin } from './guild-beast.js';
+import { chronicle } from './guild-chronicle.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 const rules = () => content().guilds;
@@ -436,7 +437,8 @@ function weekJoin(db, table, guildId, characterId, now) {
 // week's thresholds of the Próby Gildii by its share of the week left, in
 // the same batch (the author's 615 A), and so the Wyprawa Gildii's route of
 // the week, made already, its stages and guardians to come (621 A); not
-// again for a character the week counts already (weekJoin).
+// again for a character the week counts already (weekJoin). The Kronika
+// tells the guild's chat of its new member (1195 A, guild-chronicle.js).
 export async function acceptGuildInvite(context) {
   const { player } = await requireGuildPlayer(context);
   const db = context.env.DB;
@@ -460,6 +462,12 @@ export async function acceptGuildInvite(context) {
       // next stages take more minutes and its next guardians more HP.
       weekJoin(db, 'guild_expeditions', invite.guild_id, player.row.id, context.now),
       ...beast,
+      // The Kronika's line, once the character is in.
+      chronicle(db, invite.guild_id, 'joined', { name: player.row.name }, context.now, {
+        characterId: player.row.id,
+        once: `member:${player.row.id}:${context.now}`,
+        when: { sql: 'EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND guild_id = ? AND joined_at = ?)', binds: [player.row.id, invite.guild_id, context.now] },
+      }),
     ]);
   } catch {
     throw new ApiError(409, 'in_guild', 'Najpierw opuść swoją gildię.');

@@ -191,6 +191,100 @@
       }
     }
   },
+  "chronicle": {
+    "texts": {
+      "beastFell": "The Guild Beast has fallen: {monster}. Last blow: {name}.",
+      "guardianFell": "The Expedition's stage {stage} guardian has fallen: {monster}. Last blow: {name}.",
+      "guardianLast": "The Expedition's stage {stage} guardian has fallen: {monster}. Last blow: {name}. The week's route is done!",
+      "trials": "Guild Trials: threshold {threshold} of {thresholds} reached.",
+      "seat": "Guild Hall: the {building} reaches level {level}.",
+      "warWon": "League evening: a win against [{tag}] {guild}, fights {won}:{lost}.",
+      "warLost": "League evening: a loss to [{tag}] {guild}, fights {won}:{lost}.",
+      "warDraw": "League evening: a draw with [{tag}] {guild}, fights {won}:{lost}.",
+      "joined": "New guild member: {name}.",
+      "rally": "Rally horn! Until {until}, attacks on the Beast and the guardian hit {percent}% harder."
+    }
+  },
+  "classDay": {
+    "texts": {
+      "title": "Classes of the day",
+      "bonus": "+{percent}%",
+      "own": "Today is your class's day: your attacks hit {percent}% harder.",
+      "how": "Every day from midnight two classes are the classes of the day, together with their evolutions. Their attacks on the Beast and the Expedition's guardians hit {percent}% harder. Each class has its own days of the week: {schedule}.",
+      "dayNames": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      "classDays": "{class} {days}"
+    }
+  },
+  "rally": {
+    "texts": {
+      "title": "Rally horn",
+      "lead": "The leader or a deputy sets the hour of the rally. For an hour, attacks on the Beast and the guardian hit {percent}% harder.",
+      "how": [
+        "The leader or a deputy sets the hour of the rally: right away or on the hour, at most a day ahead. The guild has at most one rally a day.",
+        "When the rally starts, every member gets a phone notification, and a System line appears in the guild chat.",
+        "For {minutes} minutes, all members' attacks on the Beast and the Expedition's guardian hit {percent}% harder. The card shows who came, that is, who attacked in that time.",
+        "Whoever misses it loses nothing: their attacks stay for the rest of the day."
+      ],
+      "none": "No rally today.",
+      "noneMember": "The leader or a deputy sets the rally.",
+      "planned": "Rally {day} at {hour}",
+      "plannedBy": "Called by: {name}",
+      "startsIn": "Starts in {time}.",
+      "on": "The rally is on until {hour}!",
+      "onBonus": "Attacks on the Beast and the guardian hit {percent}% harder.",
+      "came": "Came: {count}",
+      "cameNone": "Nobody has come yet. Attack the Beast or the guardian to get on the list.",
+      "ended": "Today's rally: {from}–{to}",
+      "endedNone": "Nobody came to the rally.",
+      "today": "today",
+      "tomorrow": "tomorrow",
+      "now": "Right away",
+      "hourLabel": "Rally hour",
+      "set": "Set the rally",
+      "setDone": "Rally set: {day} at {hour}.",
+      "setNow": "The rally is on from now until {hour}.",
+      "cancel": "Call off the rally",
+      "cancelAsk": "Call off the rally?",
+      "canceled": "Rally called off.",
+      "pushTitle": "Rally horn: {guild}",
+      "pushBody": "The rally is on until {hour}! Attacks on the Beast and the guardian hit {percent}% harder.",
+      "errors": {
+        "locked": "You unlock guilds at character level {level}.",
+        "noGuild": "You are not in a guild.",
+        "notLeader": "The leader or a deputy sets the rally.",
+        "badHour": "Pick the rally hour from the list.",
+        "dayTaken": "The guild already has a rally on that day.",
+        "started": "This rally has already started, so it cannot be called off.",
+        "gone": "This rally is no longer there.",
+        "changed": "The guild changed in the meantime. Try again."
+      }
+    }
+  },
+  "undercut": {
+    "texts": {
+      "strike": "Strike",
+      "undercut": "Hamstring",
+      "strikeNote": "Full damage.",
+      "strikeBonus": "Full damage and +{percent}% from a hamstring: {name}.",
+      "undercutNote": "Half damage, but the next {uses} strikes by other members hit {percent}% harder.",
+      "waiting": "Hamstrings waiting: {count}",
+      "waitingNone": "No hamstring is waiting.",
+      "waitingRow": "{name}: {left} {strikes}",
+      "strikeForms": ["strike", "strikes", "strikes"],
+      "own": "Your hamstring is waiting for other members' strikes.",
+      "how": [
+        "Before each attack you choose “Strike” or “Hamstring”.",
+        "A hamstring deals half damage, but the next {uses} strikes by other members hit {percent}% harder. You do not benefit from your own hamstring.",
+        "Waiting hamstrings queue up: each strike by another member uses up the oldest one. They are gone when the beast or the guardian falls, and at the end of the week.",
+        "The bonuses multiply: the class of the day, the rally and the hamstring."
+      ],
+      "boosts": "Bonuses: {boosts}.",
+      "boostClassDay": "class of the day +{percent}%",
+      "boostRally": "rally +{percent}%",
+      "boostBonus": "hamstring ({name}) +{percent}%",
+      "undercutDone": "Hamstring! The next {uses} strikes by other members hit {percent}% harder."
+    }
+  },
   "trials": {
     "kinds": {
       "killAny": { "text": "Defeat {count} {noun} in total.", "counted": ["creature", "creatures", "creatures"], "note": "Creatures from explorations and from the Towers count." },
