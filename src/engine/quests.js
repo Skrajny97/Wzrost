@@ -448,21 +448,23 @@ function shareCount(count, tuning, share) {
 export const questLevel = (level, content) => content.quests.levels.findLast((/** @type {Record<string, any>} */ band) => band.fromLevel <= level);
 
 // A quest's reward: gold, a resource or parts, more at a higher level, and
-// `factor` times as much for a rarer kind (rewardFactor in quests.json).
+// `factor` times as much for a rarer kind (rewardFactor in quests.json);
+// from the late class levels a part of it (lateRewards).
 /**
  * @param {string} periodId
  * @param {number} level
+ * @param {number} classLevel
  * @param {Rng} rng
  * @param {Content} content
  * @param {number} [factor]
  * @returns {{ kind: string, id?: string, amount: number }}
  */
-function questReward(periodId, level, rng, content, factor = 1) {
+function questReward(periodId, level, classLevel, rng, content, factor = 1) {
   const { rewards } = content.quests;
   const [kind] = rng.weighted(/** @type {[string, number][]} */ (Object.entries(rewards.weights)), ([, weight]) => weight);
   const { base, perLevel } = rewards[periodId][kind];
   const spread = rng.float(1 - rewards.spread, 1 + rewards.spread);
-  const amount = (share = 1) => Math.max(1, Math.round((base + perLevel * level) * share * spread * factor * lateRewards(level, content)));
+  const amount = (share = 1) => Math.max(1, Math.round((base + perLevel * level) * share * spread * factor * lateRewards(classLevel, content)));
   if (kind === 'gold') return { kind, amount: amount() };
   if (kind === 'resource') {
     const [id, share] = rng.pick(/** @type {[string, number][]} */ (Object.entries(rewards.resources)));
@@ -490,7 +492,7 @@ const newQuest = (option, periodId, character, rng, content, share = 1) => {
     ...(option.target && { target: option.target }),
     count: questCount(option, periodId, rng, share, period.targetFactor ?? 1),
     progress: 0,
-    reward: questReward(periodId, character.level, rng, content, (option.kind.rewardFactor ?? 1) * (period.rewardFactor ?? 1)),
+    reward: questReward(periodId, character.level, character.classLevel ?? 0, rng, content, (option.kind.rewardFactor ?? 1) * (period.rewardFactor ?? 1)),
     claimed: false,
   };
 };

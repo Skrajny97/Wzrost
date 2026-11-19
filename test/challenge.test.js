@@ -182,7 +182,7 @@ describe('the Piekielna wyprawa in the engine', () => {
   // from a seed of its own, so the fights go the same and only the loot
   // tells the two apart.
   const even = { ...content, balance: { ...content.balance, challenge: { ...challenge, hell: { ...challenge.hell, damage: 1, hp: 1 } } } };
-  const withoutLate = (data) => ({ ...data, balance: { ...data.balance, rewards: { ...data.balance.rewards, lateRewards: { ...data.balance.rewards.lateRewards, fromLevel: Infinity } } } });
+  const withoutLate = (data) => ({ ...data, balance: { ...data.balance, rewards: { ...data.balance.rewards, lateRewards: { ...data.balance.rewards.lateRewards, fromClassLevel: Infinity } } } });
   // What `count` explorations of four hours bring: their fights and finds,
   // the chests among the finds and the pieces of materials.
   function loot(data, build, areaId, prefix, hard, count) {
@@ -213,7 +213,7 @@ describe('the Piekielna wyprawa in the engine', () => {
 
   test('from the late levels on its gold, chests and materials are a part of what they would be, as on every exploration', () => {
     const late = content.balance.rewards.lateRewards;
-    const old = typicalCharacter('warrior', late.fromLevel, content);
+    const old = typicalCharacter('warrior', late.fromClassLevel, content);
     // One fight before any find: its gold that part, its XP all of it.
     const setOut = (data) => simulateHunt({ ...old, hp: 99999, name: 'Mira', areaId: 'beaver-dams', minutes: 15, seed: 'późna', lootSeed: 'łup', hard: 'hell' }, data);
     const halved = setOut(content);

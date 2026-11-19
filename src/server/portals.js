@@ -91,8 +91,8 @@ function portalsView(player, now) {
         part: portal.part ? content().partsById[portal.part].name : null,
         best,
         next,
-        nextLoot: next === null ? null : portalAmount(portal, next, true, content()),
-        sweepLoot: best > 0 ? portalAmount(portal, best, false, content()) : null,
+        nextLoot: next === null ? null : portalAmount(portal, next, true, content(), row.class_level),
+        sweepLoot: best > 0 ? portalAmount(portal, best, false, content(), row.class_level) : null,
         sweepsLeft: best > 0 ? Math.max(0, sweeps.perDay - sweptToday(record, portal.id, now)) : 0,
       };
     }),
@@ -233,7 +233,7 @@ export async function sweepAllPortals(context) {
     .filter((one) => one.stage > 0 && one.count > 0);
   if (left.length === 0) throw new ApiError(409, 'no_sweeps', 'Na dziś nie ma już czego czyścić. Nowe czyszczenia od północy.');
 
-  const loot = portalSweepAll(left, toHex(crypto.getRandomValues(new Uint8Array(16))), content());
+  const loot = portalSweepAll(left, toHex(crypto.getRandomValues(new Uint8Array(16))), content(), row.class_level);
   const day = today(now);
   const swept = { ...(record.day === day ? record.swept : {}) };
   for (const one of left) swept[one.portalId] = perDay;
@@ -267,7 +267,7 @@ export async function sweepPortal(context) {
   const swept = sweptToday(record, portal.id, now);
   if (swept >= rules().sweeps.perDay) throw new ApiError(409, 'no_sweeps', 'Czyszczenia tego portalu na dziś się skończyły. Nowe od północy.');
 
-  const loot = portalSweep(portal.id, best, toHex(crypto.getRandomValues(new Uint8Array(16))), content());
+  const loot = portalSweep(portal.id, best, toHex(crypto.getRandomValues(new Uint8Array(16))), content(), row.class_level);
   const day = today(now);
   const next = { ...record, day, swept: { ...(record.day === day ? record.swept : {}), [portal.id]: swept + 1 } };
   const stores = storesSql(loot);

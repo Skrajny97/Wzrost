@@ -1459,7 +1459,7 @@
     {
       "id": "0.4.57",
       "title": "Wersja 0.4.57",
-      "body": "- Od 250. poziomu stwory są trzy razy silniejsze: biją mocniej i mają więcej HP. W drużynie każdy dodatkowy gracz wzmacnia je jeszcze o 25%. Dotyczy to wypraw, Wież, Portali, Labiryntu i listów gończych."
+      "body": "- Od 250. poziomu klasy stwory są trzy razy silniejsze: biją mocniej i mają więcej HP. W drużynie każdy dodatkowy gracz wzmacnia je jeszcze o 25%. Dotyczy to wypraw, Wież, Portali, Labiryntu i listów gończych."
     },
     {
       "id": "0.4.58",
@@ -1470,6 +1470,11 @@
       "id": "0.4.59",
       "title": "Wersja 0.4.59",
       "body": "- Drużyna: zmiana postaci i nowa postać już o nic nie pytają, a postać zostaje w drużynie. Lider zabiera ją na wyprawy drużyny także wtedy, gdy grasz inną postacią, a raport czeka, aż do niej wrócisz. Pytanie „Jesteś w drużynie. Wyjść z drużyny?” zostaje tylko przed samotną wyprawą członka drużyny. Do drużyny nie dołączy druga postać tego samego gracza."
+    },
+    {
+      "id": "0.4.60",
+      "title": "Wersja 0.4.60",
+      "body": "- Próg trudności liczy się od poziomu klasy: od 250. poziomu klasy stwory są trzy razy silniejsze wszędzie, gdzie walczysz, a w drużynie liczy się najwyższy poziom klasy wśród graczy. Od 250. poziomu klasy zgarniasz też połowę złota, materiałów, zasobów i skrzyń."
     }
   ]
 }

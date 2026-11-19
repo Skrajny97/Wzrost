@@ -23,7 +23,7 @@
 // easy for it, the elite and the champion it has not met yet come far more
 // often, until it meets them (rareCatchUp).
 
-import { challengeAt, challengeMode, combatantView, exploreStrength, monsterCombatant, playerCombatant } from './combatant.js';
+import { challengeAt, challengeMode, combatantView, exploreStrength, fightingClassLevel, monsterCombatant, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
 import { areaLand, cardBonusLine, cardDrop, cardDropText, cardFrom, lowerLandCards, PACK, packDropText } from './cards.js';
 import { mealEffects, mealLine } from './cooking.js';
@@ -147,14 +147,17 @@ function lateChests(outcomes, late) {
 // camp's resources gathered and found (all kinds together), the materials
 // the creatures leave, and the parts the finds' chests give when taken
 // apart (salvageYield). The Portale pay a part of it (portals.js) and the
-// Wieże their gold (towers.js).
+// Wieże their gold (towers.js). `classLevel`: the class level of the
+// character it pays, from the late class levels on a part of it
+// (lateRewards); 0 pays it whole.
 /**
  * @param {Area} area
  * @param {number} level
  * @param {number} minutes
  * @param {Content} content
+ * @param {number} [classLevel]
  */
-export function expectedExploration(area, level, minutes, content) {
+export function expectedExploration(area, level, minutes, content, classLevel = 0) {
   const { rewards, hunt, crafting } = content.balance;
   const pace = explorationPace(minutes, content);
   const open = encountersFor(area, level);
@@ -175,8 +178,8 @@ export function expectedExploration(area, level, minutes, content) {
   const outcomes = rewards.findOutcomes;
   const all = Object.values(outcomes).reduce((sum, weight) => sum + weight, 0);
   const finds = (/** @type {string} */ kind) => (pace.finds * (outcomes[kind] ?? 0)) / all;
-  // From the late levels on, a part of it (lateRewards).
-  const late = lateRewards(level, content);
+  // From the late class levels on, a part of it (lateRewards).
+  const late = lateRewards(classLevel, content);
   return {
     gold: (rewards.goldPerLevel * level * gold * fights * (1 + pace.lengthBonus) + finds('gold') * rewards.findGoldPerLevel * level) * late,
     resources: (finds('resource') * rewards.findResourcePerLevel * level + (rewards.gatherPerLevelHour * level * minutes) / 60) * late,
@@ -569,8 +572,10 @@ export function championItemRarity(level, rng, content) {
 // the late, end and myth game's growth (monsterCombatant), less in a fight
 // where the character stands alone. `strength`: the [damage, HP]
 // multipliers of the creatures of the newest place (exploreStrength in
-// combatant.js). `players`: the players of a Drużyna who fight them
-// together (partyStrength in combatant.js).
+// combatant.js). `classLevel`: the class level of those who fight them
+// (fightingClassLevel in combatant.js), for the myth game; 0 for none.
+// `players`: the players of a Drużyna who fight them together
+// (partyStrength in combatant.js).
 // A player as it fights now, on the way or in an event's fight (events.js):
 // its strengthening potions still working (`on`, each kind's bonus), the
 // potions it carries (`kit`, fightPotions) and its trophies. Focus raises
@@ -602,9 +607,9 @@ export function fightingPlayer({ unit, character, equipped, name, area, hp, on =
 /**
  * @param {Encounter} encounter
  * @param {Content} content
- * @param {{ growth?: any, strength?: any, players?: number }} [options2]
+ * @param {{ growth?: any, strength?: any, classLevel?: number, players?: number }} [options2]
  */
-export function encounterCombatants(encounter, content, { growth = 1, strength = [1, 1], players = 1 } = {}) {
+export function encounterCombatants(encounter, content, { growth = 1, strength = [1, 1], classLevel = 0, players = 1 } = {}) {
   /** @type {Record<string, number>} */
   const counts = {};
   for (const member of encounter.members) counts[member.monsterId] = (counts[member.monsterId] ?? 0) + 1;
@@ -616,7 +621,7 @@ export function encounterCombatants(encounter, content, { growth = 1, strength =
     // A wanted creature of the Osada's posters (wanted.js) has its own name.
     const baseName = member.name ?? content.monstersById[member.monsterId].name;
     const name = counts[member.monsterId] > 1 ? `${baseName} ${seen[member.monsterId]}` : baseName;
-    return monsterCombatant({ ...member, id: `e${index}`, name, groupFactor, growth, strength, players }, content);
+    return monsterCombatant({ ...member, id: `e${index}`, name, groupFactor, growth, strength, classLevel, players }, content);
   });
 }
 
@@ -763,8 +768,11 @@ export function simulateHunt(
   const others = roster ? fighters.length - 1 : partners.length;
   const partyXp = 1 - companions.length * content.settlement.companions.xpCost - others * content.balance.parties.xpCost;
   // A trip's players all fight, and the creatures grow for them
-  // (partyStrength in combatant.js); a mercenary (`partners`) is no player.
+  // (partyStrength in combatant.js), by the highest class level among them
+  // as they set out (fightingClassLevel), so nobody hides behind a lower
+  // leader; a mercenary (`partners`) and the companions are no players.
   const playerCount = roster ? fighters.length : 1;
+  const classLevel = fightingClassLevel(fighters.map((/** @type {Record<string, any>} */ fighter) => fighter.character));
   // Before the trips' roster, the other players fought beside the character
   // as mates, out once fallen; on a trip they fight as the character does.
   const friends = (roster ? [] : partners).map((/** @type {any} */ partner, /** @type {number} */ index) => {
@@ -915,10 +923,11 @@ export function simulateHunt(
 
   // The find's outcomes: the week's share more (or less) of the chance of a
   // chest (items), and a Piekielna wyprawa's; none on the first exploration.
-  // From the late levels on (lateRewards), the character's gold, materials
-  // and resources are a part of what they would be, and so are its chests
-  // among the finds: the rest of their chance finds nothing.
-  const late = lateRewards(character.level, content);
+  // From the late class levels on (lateRewards), the character's gold,
+  // materials and resources are a part of what they would be, and so are
+  // its chests among the finds: the rest of their chance finds nothing. On
+  // a trip each member's own class level, as its own loot.
+  const late = lateRewards(character.classLevel ?? 0, content);
   const outcomes = lateChests(
     raisedOutcome(
       Object.entries(rewards.findOutcomes).filter(([kind]) => !(first && kind === 'chest')),
@@ -983,7 +992,7 @@ export function simulateHunt(
       if (!catchUp.elite && !catchUp.champion) catchUp = null;
       pace = odds();
     }
-    const enemies = encounterCombatants(encounter, content, { strength: meeting ? wantedStrength(area, sought, strength, content) : strength, players: playerCount });
+    const enemies = encounterCombatants(encounter, content, { strength: meeting ? wantedStrength(area, sought, strength, content) : strength, classLevel, players: playerCount });
     // Each player as it fights now: its strengthening potions still working
     // (in their number of the first fights; a window kept in time, of an
     // exploration started before 0.1.26, while its time lasts), the potions

@@ -1163,7 +1163,7 @@
     },
     "0.4.57": {
       "title": "Version 0.4.57",
-      "body": "- From level 250 the creatures are three times as strong: they hit harder and have more HP. In a party each extra player makes them 25% stronger still. This applies to explorations, the Towers, the Portals, the Labyrinth and the Wanted posters."
+      "body": "- From class level 250 the creatures are three times as strong: they hit harder and have more HP. In a party each extra player makes them 25% stronger still. This applies to explorations, the Towers, the Portals, the Labyrinth and the Wanted posters."
     },
     "0.4.58": {
       "title": "Version 0.4.58",
@@ -1172,6 +1172,10 @@
     "0.4.59": {
       "title": "Version 0.4.59",
       "body": "- Party: switching characters or making a new one no longer asks anything, and the character stays in its party. The leader takes it on the party's explorations even while you play another character, and its report waits until you come back to it. The question “You are in a party. Leave the party?” now comes only before a party member sets out alone. A second character of the same player cannot join the party."
+    },
+    "0.4.60": {
+      "title": "Version 0.4.60",
+      "body": "- The difficulty threshold now counts by class level: from class level 250 the creatures are three times as strong wherever you fight, and in a party the highest class level among the players counts. From class level 250 you also get half the gold, materials, resources and chests."
     }
   }
 }

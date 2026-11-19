@@ -159,7 +159,7 @@ async function towersView(db, player, now) {
   const top = Math.max(1, ...climbs.map((climbers) => climbers.top));
   return {
     loot: {
-      gold: Array.from({ length: top }, (_, index) => towerGold(index + 1, content())),
+      gold: Array.from({ length: top }, (_, index) => towerGold(index + 1, content(), row.class_level)),
       pieces: loot.materials.pieces,
       rarities: loot.materials.rarities,
       itemChance: loot.itemChance,

@@ -129,7 +129,8 @@ export function trialHallFights({ character, equipped, name, area, seed, potions
   let won = true;
   for (const [index, encounter] of trialEncounters(area, seed, content).entries()) {
     /** @type {Record<string, any>[]} */
-    const enemies = encounterCombatants(encounter, content, /** @type {any} */ ({ strength }));
+    // From the character's class level 250 stronger (the myth game).
+    const enemies = encounterCombatants(encounter, content, /** @type {any} */ ({ strength, classLevel: character.classLevel ?? 0 }));
     const kit = fightPotions(left, healBelow ?? content.potionUse?.healBelow, content);
     const ally = {
       ...player,
@@ -163,8 +164,8 @@ export function trialHallFights({ character, equipped, name, area, seed, potions
         const monster = content.monstersById[enemy.monsterId];
         const rank = monster.champion ? rewards.championGoldMultiplier : monster.elite ? rewards.eliteGoldMultiplier : 1;
         fightXp += monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(character.level, enemy.level, content);
-        fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * rng.float(0.5, 1.5) * rank * enemy.groupFactor * lengthed * lateRewards(character.level, content);
-        fightMaterials = addCounts(fightMaterials, materialDrops(enemy.monsterId, enemy.level, enemy.groupFactor * pace.timeFactor * hall.rewardFactor * lateRewards(character.level, content), rng, content));
+        fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * rng.float(0.5, 1.5) * rank * enemy.groupFactor * lengthed * lateRewards(character.classLevel ?? 0, content);
+        fightMaterials = addCounts(fightMaterials, materialDrops(enemy.monsterId, enemy.level, enemy.groupFactor * pace.timeFactor * hall.rewardFactor * lateRewards(character.classLevel ?? 0, content), rng, content));
       }
       fightXp = Math.round(fightXp * (1 + content.balance.hunt.soloXpBonus) * lengthed * partyXp * hall.rewardFactor);
       fightGold = Math.round(fightGold * hall.rewardFactor);

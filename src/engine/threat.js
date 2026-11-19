@@ -79,10 +79,11 @@ const sampleKind = (build, weight) => ({ build, weight, counts: new Array(LOST +
  * @param {Record<string, any>} area
  * @param {Record<string, any>[]} [mates]
  * @param {number[]} [strength]
+ * @param {number} [classLevel] The character's, for the myth game (monsterCombatant).
  */
-function fightSamples(kind, times, player, rng, content, area, mates = [], strength = [1, 1]) {
+function fightSamples(kind, times, player, rng, content, area, mates = [], strength = [1, 1], classLevel = 0) {
   for (let i = 0; i < times; i++) {
-    const fight = simulateFight({ allies: [{ ...player }, ...mates.map((mate) => ({ ...mate }))], enemies: encounterCombatants(kind.build(), content, { strength }), rng, content, trait: area.trait });
+    const fight = simulateFight({ allies: [{ ...player }, ...mates.map((mate) => ({ ...mate }))], enemies: encounterCombatants(kind.build(), content, { strength, classLevel }), rng, content, trait: area.trait });
     if (fight.won === null) continue;
     kind.fought += 1;
     if (!fight.won) {
@@ -148,12 +149,14 @@ export function threatSamples({ character, equipped, areaId, companions = [], ha
     elite: [sampleKind(() => eliteEncounter(area, content), 1)],
     champion: area.champion ? [sampleKind(() => championEncounter(area, content), 1)] : [],
   };
-  for (const list of Object.values(groups)) for (const kind of list) fightSamples(kind, SAMPLES, player, rng, content, area, mates, strength);
+  // The character alone (with "Z drużyną" too: 926 B), at its class level.
+  const classLevel = character.classLevel ?? 0;
+  for (const list of Object.values(groups)) for (const kind of list) fightSamples(kind, SAMPLES, player, rng, content, area, mates, strength, classLevel);
   if (mix(groups.regular)[LOST] < /** @type {number} */ (LIMITS.at(-1))) {
     for (const [group, list] of Object.entries(groups)) {
       const total = list.reduce((sum, kind) => sum + kind.weight, 0);
       for (const kind of list.filter(inDoubt)) {
-        fightSamples(kind, Math.ceil((MORE_SAMPLES[group] * kind.weight) / total), player, rng, content, area, mates, strength);
+        fightSamples(kind, Math.ceil((MORE_SAMPLES[group] * kind.weight) / total), player, rng, content, area, mates, strength, classLevel);
       }
     }
   }
