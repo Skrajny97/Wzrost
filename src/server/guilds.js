@@ -29,6 +29,7 @@ import { language, runInLanguage, t } from './i18n.js';
 import { joinGuildTrials } from './guild-trials.js';
 import { beastJoin } from './guild-beast.js';
 import { chronicle } from './guild-chronicle.js';
+import { badgeView, heroesOf } from './guild-heroes.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 const rules = () => content().guilds;
@@ -108,7 +109,7 @@ export async function guildView(db, characterId, now) {
   const [members, sent, invites, friends, best] = await db.batch([
     db
       .prepare(
-        `SELECT c.id, c.name, c.class_id, c.level, c.role AS played, c.cosmetics, m.role, m.probation_until, u.seen_at
+        `SELECT c.id, c.name, c.class_id, c.level, c.role AS played, c.cosmetics, c.appearance, m.role, m.probation_until, u.seen_at
          FROM guild_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id
          WHERE m.guild_id = ? ORDER BY CASE m.role WHEN 'leader' THEN 0 WHEN 'deputy' THEN 1 ELSE 2 END, m.joined_at, m.character_id`,
       )
@@ -136,6 +137,9 @@ export async function guildView(db, characterId, now) {
   ]);
   const { onlineSeconds } = content().community.trade;
   const online = (row) => row.played === 'player' && (row.seen_at ?? 0) >= now - onlineSeconds * 1000;
+  // The badges of the Bohaterowie tygodnia of the week before (1198 A,
+  // guild-heroes.js), by member.
+  const heroes = guild ? await heroesOf(db, guild.id, now) : new Map();
   const { found, size, name, tag, ranks } = rules();
   const rankView = (membership) => {
     const rank = rankOf(membership, now);
@@ -171,6 +175,8 @@ export async function guildView(db, characterId, now) {
         // „Przydałoby się widzieć kiedy ktoś się zalogował w gildii tak jak u
         // znajomych”): the account's seen_at, null for one never seen.
         lastSeen: row.seen_at ?? null,
+        // Its badges of last week's heroes, each with its name and tip.
+        heroes: (heroes.get(row.id) ?? []).map((kind) => badgeView(kind, row.appearance)),
       })),
       invited: sent.results.map((row) => ({ id: row.id, name: row.name })),
       friends: friends.results.map((row) => ({ id: row.id, name: row.name, nameColor: nameColorOf(row.cosmetics), classId: row.class_id, level: row.level, online: online(row) })),

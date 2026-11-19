@@ -1,5 +1,5 @@
 {
-  "$comment": "Gildie graczy (src/server/guilds.js, screens/guild.js; DECISIONS.md, „Wieże Systemu i Gildia”). Autor: „307 A, ale za 1000 złota”: nazwa i skrót, do size postaci, lider i zastępcy, własny kanał czatu; zakładanie od found.level poziomu postaci za found.gold złota. Dołącza postać ze Społecznością (od jej poziomu), na zaproszenie lidera albo zastępcy. name i tag: najkrótsza i najdłuższa nazwa i skrót (skrót z wielkich liter i cyfr). invites: ile zaproszeń gildia może mieć naraz. tabs: zakładki strony Gildii (#/gildia/<id>), po kolei: gildia z członkami, Siedziba (616 A, druga jak na makiecie), Wyprawa (621 A, przed Bestią), Bestia, Próby, Prośby Gildii, Wymiana, Skrzynia i Wojna (792 v2: dziewięć zakładek w trzech rzędach po trzy; Wojny tylko tam, gdzie GUILD_WARS jest włączone). size: 30 od wojen gildii (793 A: 6 drużyn po 5 osób; dotąd 20). seat: Siedziba Gildii z budynkami, na które wpłacają członkowie. expedition: Wyprawa Gildii, trasa tygodnia ze strażnikami na końcu etapów. war: wojny gildii. fame: Sława gildii w tygodniu, ranking gildii i najlepsza gildia poprzedniego tygodnia.",
+  "$comment": "Gildie graczy (src/server/guilds.js, screens/guild.js; DECISIONS.md, „Wieże Systemu i Gildia”). Autor: „307 A, ale za 1000 złota”: nazwa i skrót, do size postaci, lider i zastępcy, własny kanał czatu; zakładanie od found.level poziomu postaci za found.gold złota. Dołącza postać ze Społecznością (od jej poziomu), na zaproszenie lidera albo zastępcy. name i tag: najkrótsza i najdłuższa nazwa i skrót (skrót z wielkich liter i cyfr). invites: ile zaproszeń gildia może mieć naraz. tabs: zakładki strony Gildii (#/gildia/<id>), po kolei: gildia z członkami, Siedziba (616 A, druga jak na makiecie), Wyprawa (621 A, przed Bestią), Bestia, Próby, Prośby Gildii, Wymiana, Skrzynia, Kram (1202 A) i Wojna (792 v2: dziewięć zakładek w trzech rzędach po trzy, a od Kramu dziesięć: cztery, trzy i trzy; Wojny tylko tam, gdzie GUILD_WARS jest włączone). heroes: Bohaterowie tygodnia (1198 A). lands: Krainy pod sztandarem (1200 A). stall: Znaki Gildii i Kram (1202 A). size: 30 od wojen gildii (793 A: 6 drużyn po 5 osób; dotąd 20). seat: Siedziba Gildii z budynkami, na które wpłacają członkowie. expedition: Wyprawa Gildii, trasa tygodnia ze strażnikami na końcu etapów. war: wojny gildii. fame: Sława gildii w tygodniu, ranking gildii i najlepsza gildia poprzedniego tygodnia.",
   "place": "guild-keep",
   "found": {
     "level": 30,
@@ -24,6 +24,7 @@
     { "id": "requests", "name": "Prośby" },
     { "id": "exchange", "name": "Wymiana" },
     { "id": "chest", "name": "Skrzynia" },
+    { "id": "stall", "name": "Kram" },
     { "id": "war", "name": "Wojna" }
   ],
   "seat": {
@@ -857,10 +858,10 @@
     "views": { "activity": "Aktywność", "donations": "Wpłaty" },
     "periods": { "week": "Ten tydzień", "all": "Od początku" },
     "columns": { "place": "#", "member": "Członek", "fame": "Sława", "gold": "Złoto" },
-    "parts": { "beast": "Bestia", "expedition": "Wyprawa", "trials": "Próby", "requests": "Prośby", "exchange": "Wymiana", "war": "Wojna" },
+    "parts": { "beast": "Bestia", "expedition": "Wyprawa", "trials": "Próby", "requests": "Prośby", "exchange": "Wymiana", "war": "Wojna", "lands": "Krainy" },
     "own": "Twoje miejsce: {place}. z {count}.",
     "tap": "Stuknij w członka, by zobaczyć, skąd ma Sławę.",
-    "lead": "Tu widać, ile Sławy każdy członek wniósł do gildii i ile wpłacił do Siedziby. Ranking niczego nie daje, tylko pokazuje.",
+    "lead": "Tu widać, ile Sławy każdy członek wniósł do gildii i ile wpłacił do Siedziby. Każdy punkt Sławy daje też Znak Gildii, a najlepsi tygodnia zostają Bohaterami tygodnia.",
     "how": [
       "Bestia Gildii: {beastPercent} za każdy pełny 1% paska, który członek zbił, i {beastFell} za ostatni cios.",
       "Wyprawa Gildii: {perGuardian} za każdego pokonanego strażnika, a za siódmego {lastGuardian}. Punkty dzielą się według obrażeń zadanych strażnikowi.",
@@ -874,6 +875,122 @@
     "howWar": "Liga wojen gildii: Sława za miejsce gildii w lidze tygodnia, po równo dla wszystkich, którzy walczyli w jej meczach.",
     "earlier": "Wcześniejsze wpłaty, zanim gra zaczęła zapisywać, kto wpłacił: {amounts}.",
     "list": { "comma": ", ", "and": " i " }
+  },
+  "heroes": {
+    "$comment": "Bohaterowie tygodnia (1198 A, 19.11.2026; src/engine/guild-heroes.js, src/server/guild-heroes.js, src/client/guild-heroes.js; DECISIONS.md, „Bohaterowie tygodnia (1198 A, 19.11.2026)”). Co poniedziałek o północy czasu polskiego gra wyróżnia najlepszych członków każdej gildii z tygodnia, który się skończył, w kolejności kinds: pillar (Filar Gildii) za najwięcej Sławy wniesionej do gildii, liczonej jak w Rankingu członków; slayer (Pogromca) za najwięcej obrażeń zadanych Bestii i strażnikom Wyprawy Gildii; benefactor (Dobroczyńca) za najwięcej sztuk danych w Prośbach. Liczą się tylko ci, którzy w poniedziałek są w gildii. Przy remisie wygrywa ten, kto dłużej jest w gildii, a bez punktów nie wygrywa nikt. Jedna postać może dostać kilka wyróżnień. names: imię wyróżnienia dla mężczyzny i kobiety; units: rzeczownik po liczbie (jedna, kilka, wiele). Ikona: src/client/art/icons/hero-<id>.png. Każdy bohater nosi znaczek przy imieniu na liście członków i na karcie postaci przez cały tydzień i za każde wyróżnienie dostaje raz reward: timePoints Punktów Czasu i packs pakietów kart (to zmienia 897 A, w którym ranking członków niczego nie dawał). texts: słowa karty w zakładce Gildia; {…} wypełnia gra.",
+    "kinds": [
+      { "id": "pillar", "names": ["Filar Gildii", "Filar Gildii"], "units": ["punkt Sławy", "punkty Sławy", "punktów Sławy"] },
+      { "id": "slayer", "names": ["Pogromca", "Pogromczyni"], "units": ["obrażenie", "obrażenia", "obrażeń"] },
+      { "id": "benefactor", "names": ["Dobroczyńca", "Dobroczyńczyni"], "units": ["sztuka", "sztuki", "sztuk"] }
+    ],
+    "reward": { "timePoints": 30, "packs": 1 },
+    "texts": {
+      "title": "Bohaterowie tygodnia",
+      "lead": "Co poniedziałek o północy System wyróżnia najlepszych członków gildii z poprzedniego tygodnia.",
+      "last": "Bohaterowie poprzedniego tygodnia",
+      "none": "W poprzednim tygodniu nikt w gildii nie zdobył wyróżnienia.",
+      "now": "Ten tydzień: kto prowadzi",
+      "nobody": "nikt jeszcze",
+      "reward": "Za każde wyróżnienie zgarniesz {timePoints} i pakiet kart, a przy imieniu przez cały tydzień będzie świecić znaczek.",
+      "badge": "{name} poprzedniego tygodnia",
+      "how": [
+        "Filar Gildii: najwięcej Sławy wniesionej do gildii, liczonej jak w Rankingu członków.",
+        "Pogromca: najwięcej obrażeń zadanych Bestii i strażnikom Wyprawy Gildii.",
+        "Dobroczyńca: najwięcej sztuk danych innym członkom w Prośbach.",
+        "Liczą się tylko ci, którzy w poniedziałek są w gildii. Przy remisie wygrywa ten, kto dłużej jest w gildii.",
+        "Za każde wyróżnienie zgarniesz {timePoints} i pakiet kart. Znaczek przy imieniu widać na liście członków i na karcie postaci do niedzieli."
+      ],
+      "timePointForms": ["Punkt Czasu", "Punkty Czasu", "Punktów Czasu"]
+    }
+  },
+  "lands": {
+    "$comment": "Krainy pod sztandarem (1200 A, 19.11.2026; src/engine/guild-lands.js, src/server/guild-lands.js, src/client/guild-lands.js; DECISIONS.md, „Krainy pod sztandarem (1200 A, 19.11.2026)”). Co tydzień każda kraina (region z data/regions.json, od Wiatrołomów do Krainy bez Słońca, te same co w Wyprawie Gildii) należy do gildii, której członkowie spędzili w niej najwięcej minut wypraw. Minuty liczą się jak w Wyprawie Gildii: przy odbiorze raportu, dla gildii, w której postać wtedy jest; na wyprawie drużyny każdy członek liczy swoje minuty. W poniedziałek o północy zwycięzca stawia sztandar na cały tydzień: jego skrót widzą na karcie krainy wszyscy gracze, gildia zgarnia fame Sławy za każdą krainę (Sława tego tygodnia, w którym stoi sztandar), dzieloną między członków według ich minut w tej krainie, a członkowie gildii dostają +bonus złota i materiałów ze stworów w tej krainie, na wyprawach rozpoczętych w tym tygodniu. Od 250. poziomu klasy, gdy nagrody są o połowę mniejsze, premia mnoży się z tą połową. Przy remisie wygrywa starsza gildia, a gdzie nikt nie był, sztandaru nie ma. texts: słowa karty w zakładce Wojna i na karcie krainy; {…} wypełnia gra.",
+    "fame": 30,
+    "bonus": 0.05,
+    "texts": {
+      "title": "Krainy pod sztandarem",
+      "lead": "Każda kraina należy co tydzień do gildii, która spędziła w niej najwięcej minut wypraw. W poniedziałek o północy zwycięzca stawia tam sztandar.",
+      "week": "Ten tydzień",
+      "yours": "Twoja gildia: {minutes}",
+      "ahead": "Prowadzisz o {gap} przed [{tag}]",
+      "tieWin": "Remis z [{tag}]: przy remisie wygrywa starsza gildia, czyli Twoja",
+      "alone": "Prowadzisz: inne gildie jeszcze tu nie były",
+      "chase": "Gonisz [{tag}]: brakuje {gap}",
+      "tieLose": "Remis z [{tag}]: przy remisie wygrywa starsza gildia, więc brakuje minuty",
+      "empty": "W tym tygodniu żadna gildia nie była jeszcze na wyprawach. Każda minuta Twojej gildii przybliża sztandar.",
+      "banners": "Sztandary Twojej gildii do niedzieli",
+      "noBanners": "W tym tygodniu Twoja gildia nie ma sztandaru w żadnej krainie.",
+      "bonus": "+{bonus}% złota i materiałów ze stworów",
+      "chip": "Sztandar gildii {name} [{tag}] do niedzieli",
+      "ownBanner": "Sztandar Twojej gildii: do niedzieli +{bonus}% złota i materiałów ze stworów w tej krainie.",
+      "otherBanner": "Sztandar gildii {name} [{tag}] stoi tu do niedzieli.",
+      "how": [
+        "Każda minuta wyprawy liczy się dla krainy, w której była wyprawa, gdy członek odbierze raport. Na wyprawie drużyny każdy liczy swoje minuty.",
+        "W poniedziałek o północy krainę dostaje gildia z najwięcej minut. Przy remisie wygrywa starsza gildia, a gdzie nikt nie był, sztandaru nie ma.",
+        "Sztandar stoi cały tydzień, a skrót gildii widzą na karcie krainy wszyscy gracze.",
+        "Za każdą krainę gildia zgarnia {fame} Sławy, a członkowie dzielą ją według swoich minut w tej krainie.",
+        "Członkowie gildii ze sztandarem mają w tej krainie +{bonus}% złota i materiałów ze stworów. Od 250. poziomu klasy premia liczy się od połowy nagród."
+      ],
+      "howFame": "Krainy pod sztandarem: {landFame} za każdą krainę, w której gildia stawia sztandar, w tygodniu, w którym on stoi.",
+      "howMembers": "Krainy pod sztandarem: {landFame} za krainę ze sztandarem, dzielone według minut członków w tej krainie."
+    }
+  },
+  "stall": {
+    "$comment": "Znaki Gildii i Kram (1202 A, 19.11.2026; src/engine/guild-stall.js, src/server/guild-stall.js, src/client/guild-stall.js; DECISIONS.md, „Znaki Gildii i Kram (1202 A, 19.11.2026)”). Każdy punkt Sławy, który członek wnosi do gildii (liczony jak w Rankingu członków, część po części), daje mu jeden Znak Gildii, od razu. Znaki należą do postaci, jak jej Sława w Rankingu członków, i zostają po wyjściu z gildii, ale Kram jest tylko dla członków. goods: towary Kramu w tej kolejności, każdy z ceną w Znakach (price) i limitem na tydzień (weekly, od poniedziałku od północy czasu polskiego); bez weekly towar kupuje się raz na zawsze: tytuł (achievement: osiągnięcie z data/achievements.json z tym tytułem) i ramka (cosmetic: ramka z data/cosmetics.json). item to przedmiot klasy postaci na wybrane miejsce ekwipunku, na jej poziomie i w rzadkości jak ze skrzyni czempiona; trafia do plecaka. texts: słowa zakładki Kram; {…} wypełnia gra (markForms: rzeczownik po liczbie Znaków).",
+    "goods": [
+      { "id": "pack", "price": 50, "weekly": 2 },
+      { "id": "ward-scroll", "price": 40, "weekly": 2 },
+      { "id": "item", "price": 200, "weekly": 1 },
+      { "id": "title", "price": 500, "achievement": "banner-warden" },
+      { "id": "frame", "price": 1000, "cosmetic": "frame-guild-banner" }
+    ],
+    "texts": {
+      "title": "Kram Gildii",
+      "lead": "Każdy punkt Sławy, który wnosisz do gildii, daje Ci jeden Znak Gildii. Za Znaki kupisz tu to, czego potrzebujesz.",
+      "balance": "Twoje Znaki Gildii",
+      "growing": "Znaki przybywają od razu, z każdym punktem Sławy.",
+      "markForms": ["Znak", "Znaki", "Znaków"],
+      "goods": {
+        "pack": { "name": "Pakiet kart", "description": "Trzy karty Talii Systemu, jak u Szczęsnego. Otworzysz go w Salonie Gier, w zakładce Karty." },
+        "ward-scroll": { "name": "Zwój ochronny", "description": "Chroni przedmiot przed rozpadem przy ulepszaniu na Kowadle od +7." },
+        "item": { "name": "Przedmiot Twojej klasy", "description": "Na wybrane miejsce ekwipunku, na Twoim poziomie i w rzadkości jak ze skrzyni czempiona." },
+        "title": { "name": "Tytuł „{title}”", "description": "Tytuł widać w Twoim profilu i w Rankingu. Założysz go w Osiągnięciach, w zakładce Postać." },
+        "frame": { "name": "Ramka Sztandaru", "description": "Ramka portretu ze sztandarem gildii. Założysz ją w Sklepie Systemu, w zakładce Ramki." }
+      },
+      "weekly": "W tym tygodniu: {bought} z {limit}",
+      "once": "Kupujesz raz",
+      "owned": "Masz już",
+      "buy": "Kup za {price}",
+      "limitReached": "Limit na ten tydzień wyczerpany. Kolejne w poniedziałek.",
+      "tooFew": "Brakuje {missing}.",
+      "slotTitle": "Przedmiot na wybrane miejsce",
+      "slotLead": "Wybierz miejsce ekwipunku. Dostaniesz przedmiot swojej klasy na swoim poziomie, w rzadkości jak ze skrzyni czempiona.",
+      "worn": "Nosisz: {item}",
+      "empty": "Pusto",
+      "bought": {
+        "pack": "Pakiet kart czeka w Salonie Gier, w zakładce Karty.",
+        "ward-scroll": "Masz Zwój ochronny więcej. Użyjesz go na Kowadle.",
+        "item": "{item} trafia do plecaka.",
+        "title": "Tytuł „{title}” jest Twój. Założysz go w Osiągnięciach, w zakładce Postać.",
+        "frame": "Ramka Sztandaru jest Twoja. Założysz ją w Sklepie Systemu, w zakładce Ramki."
+      },
+      "outside": "Kram Gildii jest tylko dla członków gildii. Twoje Znaki zostają z Tobą i poczekają, aż dołączysz do gildii.",
+      "how": [
+        "Każdy punkt Sławy, który wnosisz do gildii, daje Ci jeden Znak Gildii, od razu. Sława liczy się jak w Rankingu członków.",
+        "Znaki zostają z Tobą także po wyjściu z gildii, ale Kram jest tylko dla członków.",
+        "Limity tygodnia odnawiają się w poniedziałek o północy. Tytuł i ramkę kupujesz raz.",
+        "Przedmiot jest Twojej klasy, na Twoim poziomie i w rzadkości jak ze skrzyni czempiona. Trafia do plecaka, więc potrzebuje w nim miejsca."
+      ],
+      "errors": {
+        "unknown_good": "Nie ma takiego towaru.",
+        "owned": "Już to masz.",
+        "limit": "Limit tego towaru na ten tydzień jest wyczerpany. Kolejny kupisz w poniedziałek.",
+        "invalid_slot": "Wybierz miejsce ekwipunku.",
+        "too_few_marks": "Masz za mało Znaków Gildii: {marks} z {price}.",
+        "bag_full": "Plecak jest pełny. Zrób w nim miejsce na przedmiot.",
+        "no_guild": "Kram Gildii jest tylko dla członków gildii."
+      }
+    }
   },
   "ranks": {
     "$comment": "Rangi członków gildii (1062; propozycja gracza, którą autor przekazał 16.11.2026 słowami „kolejna mądra rzecz”): R4 to lider, R3 zastępca, R2 członek, a R1 nowicjusz. Postać, która dołącza do gildii, jest nowicjuszem przez probationDays dni albo do awansu przez lidera lub zastępcę. Nowicjusz bierze ze Skrzyni Gildii tylko przedmioty zostawione dla niego i swoje, więc nowa osoba nie wyniesie wspólnych rzeczy i nie odejdzie. short: znaczek rangi przy imieniu; names: nazwa rangi; {days} i {date} wypełnia gra.",

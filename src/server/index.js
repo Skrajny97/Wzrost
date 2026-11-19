@@ -48,7 +48,10 @@ import { getGuildChest, putGoodsInGuildChest, putInGuildChest, takeFromGuildChes
 import { getGuildWar, getGuildWarBattle, getGuildWarMatchBattles, settleWars, testGuildWar } from './guild-wars.js';
 import { donateToGuildSeat, getGuildSeat, preferGuildSeat } from './guild-seat.js';
 import { changePassword, forgotPassword, resetPassword } from './password.js';
-import { guildRanking } from './guild-fame.js';
+import { championOf, guildRanking } from './guild-fame.js';
+import { getGuildHeroes } from './guild-heroes.js';
+import { getGuildLands } from './guild-lands.js';
+import { buyFromGuildStall, getGuildStall } from './guild-stall.js';
 import { getGuildRanking } from './guild-members.js';
 import { claimFame, getFame } from './fame.js';
 import { cancelOrders, craftMaterials, moveOrder, salvageItem, salvageItems, sellMaterials, skipCrafting } from './crafting.js';
@@ -507,6 +510,13 @@ const routes = [
   ['POST', '/api/guild/chest/put', putInGuildChest],
   ['POST', '/api/guild/chest/put-goods', putGoodsInGuildChest],
   ['POST', '/api/guild/chest/take', takeFromGuildChest],
+  // The Bohaterowie tygodnia (guild-heroes.js, 1198 A), the Krainy pod
+  // sztandarem (guild-lands.js, 1200 A) and the Kram Gildii with its Znaki
+  // (guild-stall.js, 1202 A).
+  ['GET', '/api/guild/heroes', getGuildHeroes],
+  ['GET', '/api/guild/lands', getGuildLands],
+  ['GET', '/api/guild/stall', getGuildStall],
+  ['POST', '/api/guild/stall/buy', buyFromGuildStall],
   // The guild wars (guild-wars.js, 792–800), where GUILD_WARS is on.
   ['GET', '/api/guild/war', getGuildWar],
   ['GET', '/api/guild/war/battles/:id', getGuildWarBattle],
@@ -650,6 +660,10 @@ export default {
       // The guild wars' rivals drawn as the week starts and their battles
       // fought every evening at 20:00 (guild-wars.js), where they are on.
       () => guildWarsOn() && settleWars(env.DB, controller.scheduledTime),
+      // The week gone frozen for every guild, its lands' banners raised and
+      // its heroes named (guild-fame.js, 1198 A, 1200 A), once, so they come
+      // at midnight, whoever looks first.
+      () => championOf(env.DB, controller.scheduledTime),
       // The Drużyny's party events nobody chose in 12 hours settled with
       // their `auto` option, the results not given to every member yet
       // given, and the old ones dropped (party-events.js).

@@ -9,6 +9,7 @@
     "requests": { "name": "Requests" },
     "exchange": { "name": "Exchange" },
     "chest": { "name": "Chest" },
+    "stall": { "name": "Stall" },
     "war": { "name": "War" }
   },
   "seat": {
@@ -730,10 +731,10 @@
     "views": { "activity": "Activity", "donations": "Donations" },
     "periods": { "week": "This week", "all": "All time" },
     "columns": { "member": "Member", "fame": "Fame", "gold": "Gold" },
-    "parts": { "beast": "Beast", "expedition": "Expedition", "trials": "Trials", "requests": "Requests", "exchange": "Exchange", "war": "War" },
+    "parts": { "beast": "Beast", "expedition": "Expedition", "trials": "Trials", "requests": "Requests", "exchange": "Exchange", "war": "War", "lands": "Lands" },
     "own": "Your place: {place} of {count}.",
     "tap": "Tap a member to see where their Fame comes from.",
-    "lead": "Here you can see how much Fame each member brought the guild and how much they donated to the Hall. The ranking gives nothing; it only shows.",
+    "lead": "Here you can see how much Fame each member brought the guild and how much they donated to the Hall. Every point of Fame also gives a Guild Mark, and the best of the week become Heroes of the week.",
     "how": [
       "Guild Beast: {beastPercent} for each full 1% of the bar the member knocked off, and {beastFell} for the final blow.",
       "Guild Expedition: {perGuardian} for each guardian defeated, and {lastGuardian} for the seventh. The points are shared by the damage dealt to the guardian.",
@@ -747,6 +748,162 @@
     "howWar": "Guild war league: Fame for the guild's place in the week's league, shared equally by everyone who fought in its matches.",
     "earlier": "Earlier donations, from before the game recorded who gave them: {amounts}.",
     "list": { "comma": ", ", "and": " and " }
+  },
+  "heroes": {
+    "kinds": {
+      "pillar": {
+        "names": [
+          "Guild Pillar",
+          "Guild Pillar"
+        ],
+        "units": [
+          "point of Fame",
+          "points of Fame",
+          "points of Fame"
+        ]
+      },
+      "slayer": {
+        "names": [
+          "Slayer",
+          "Slayer"
+        ],
+        "units": [
+          "damage",
+          "damage",
+          "damage"
+        ]
+      },
+      "benefactor": {
+        "names": [
+          "Benefactor",
+          "Benefactor"
+        ],
+        "units": [
+          "piece",
+          "pieces",
+          "pieces"
+        ]
+      }
+    },
+    "texts": {
+      "title": "Heroes of the week",
+      "lead": "Every Monday at midnight the System honours the guild's best members of the previous week.",
+      "last": "Heroes of the previous week",
+      "none": "Nobody in the guild earned an honour in the previous week.",
+      "now": "This week: who leads",
+      "nobody": "nobody yet",
+      "reward": "For each honour you get {timePoints} and a card pack, and a badge shines by your name for the whole week.",
+      "badge": "{name} of the previous week",
+      "how": [
+        "Guild Pillar: the most Fame brought to the guild, counted as in the members' ranking.",
+        "Slayer: the most damage dealt to the Guild Beast and the Guild Expedition's guardians.",
+        "Benefactor: the most pieces given to other members in Guild Requests.",
+        "Only those in the guild on Monday count. In a tie, the one who has been in the guild longer wins.",
+        "For each honour you get {timePoints} and a card pack. The badge by your name shows on the members' list and on your character card until Sunday."
+      ],
+      "timePointForms": [
+        "Time Point",
+        "Time Points",
+        "Time Points"
+      ]
+    }
+  },
+  "lands": {
+    "texts": {
+      "title": "Lands under the banner",
+      "lead": "Each week every land belongs to the guild that spent the most exploration minutes there. On Monday at midnight the winner raises its banner there.",
+      "week": "This week",
+      "yours": "Your guild: {minutes}",
+      "ahead": "You lead by {gap} over [{tag}]",
+      "tieWin": "Tied with [{tag}]: in a tie the older guild wins, and that is yours",
+      "alone": "You lead: no other guild has been here yet",
+      "chase": "Chasing [{tag}]: {gap} short",
+      "tieLose": "Tied with [{tag}]: in a tie the older guild wins, so you need one more minute",
+      "empty": "No guild has explored yet this week. Every minute of your guild brings a banner closer.",
+      "banners": "Your guild's banners until Sunday",
+      "noBanners": "This week your guild has no banner in any land.",
+      "bonus": "+{bonus}% gold and materials from creatures",
+      "chip": "Banner of the guild {name} [{tag}] until Sunday",
+      "ownBanner": "Your guild's banner: +{bonus}% gold and materials from creatures in this land until Sunday.",
+      "otherBanner": "The banner of the guild {name} [{tag}] stands here until Sunday.",
+      "how": [
+        "Every exploration minute counts for the land of the exploration once the member claims the report. On a party trip each member counts their own minutes.",
+        "On Monday at midnight the land goes to the guild with the most minutes. In a tie the older guild wins, and where nobody explored there is no banner.",
+        "The banner stands for the whole week, and every player sees the guild's tag on the land's card.",
+        "For each land the guild gets {fame} of Fame, and its members share it by their minutes in that land.",
+        "Members of the guild with the banner get +{bonus}% gold and materials from creatures in that land. From class level 250 the bonus counts from the halved rewards."
+      ],
+      "howFame": "Lands under the banner: {landFame} for each land where the guild raises its banner, in the week it stands.",
+      "howMembers": "Lands under the banner: {landFame} for a land with the banner, split by the members' minutes in that land."
+    }
+  },
+  "stall": {
+    "texts": {
+      "title": "Guild Stall",
+      "lead": "Every point of Fame you bring the guild gives you one Guild Mark. Spend the Marks here on what you need.",
+      "balance": "Your Guild Marks",
+      "growing": "Marks come at once, with every point of Fame.",
+      "markForms": [
+        "Mark",
+        "Marks",
+        "Marks"
+      ],
+      "goods": {
+        "pack": {
+          "name": "Card pack",
+          "description": "Three System Deck cards, as at Szczęsny's. Open it in the Games Parlour, on the Cards tab."
+        },
+        "ward-scroll": {
+          "name": "Ward Scroll",
+          "description": "Guards an item against breaking when you upgrade it on the Anvil from +7."
+        },
+        "item": {
+          "name": "An item of your class",
+          "description": "For the equipment slot you choose, at your level, of a rarity as from a champion's chest."
+        },
+        "title": {
+          "name": "Title “{title}”",
+          "description": "The title shows in your profile and in the Ranking. Put it on in Achievements, on the Character tab."
+        },
+        "frame": {
+          "name": "Banner Frame",
+          "description": "A portrait frame with the guild banner. Put it on in the System Shop, on the Frames tab."
+        }
+      },
+      "weekly": "This week: {bought} of {limit}",
+      "once": "Bought once",
+      "owned": "You have it",
+      "buy": "Buy for {price}",
+      "limitReached": "This week's limit is reached. More on Monday.",
+      "tooFew": "{missing} short.",
+      "slotTitle": "An item for the slot you choose",
+      "slotLead": "Choose an equipment slot. You get an item of your class at your level, of a rarity as from a champion's chest.",
+      "worn": "You wear: {item}",
+      "empty": "Empty",
+      "bought": {
+        "pack": "The card pack waits in the Games Parlour, on the Cards tab.",
+        "ward-scroll": "You have one more Ward Scroll. Use it on the Anvil.",
+        "item": "{item} goes into your bag.",
+        "title": "The title “{title}” is yours. Put it on in Achievements, on the Character tab.",
+        "frame": "The Banner Frame is yours. Put it on in the System Shop, on the Frames tab."
+      },
+      "outside": "The Guild Stall is for guild members only. Your Marks stay with you and wait until you join a guild.",
+      "how": [
+        "Every point of Fame you bring the guild gives you one Guild Mark at once. Fame counts as in the members' ranking.",
+        "Your Marks stay with you after you leave the guild, but the Stall is for members only.",
+        "The week's limits renew on Monday at midnight. The title and the frame are bought once.",
+        "The item is of your class, at your level and of a rarity as from a champion's chest. It goes into your bag, so it needs room there."
+      ],
+      "errors": {
+        "unknown_good": "There is no such item for sale.",
+        "owned": "You already have it.",
+        "limit": "This week's limit for it is reached. You can buy the next one on Monday.",
+        "invalid_slot": "Choose an equipment slot.",
+        "too_few_marks": "You have too few Guild Marks: {marks} of {price}.",
+        "bag_full": "Your bag is full. Make room in it for the item.",
+        "no_guild": "The Guild Stall is for guild members only."
+      }
+    }
   },
   "ranks": {
     "short": { "leader": "R4", "deputy": "R3", "member": "R2", "novice": "R1" },

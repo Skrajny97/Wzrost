@@ -29243,3 +29243,568 @@ a.social-button {
 :root[data-layout='desktop'].with-top-button .screen--game {
   padding-bottom: calc(48px + 54px);
 }
+
+/* Ten tabs of the Gildia, with the Kram (1202 A; screens/guild.js): four
+   over three over three in a grid of --guild-columns, each tab spanning
+   --guild-span; the four of the first row a step smaller on a phone, as
+   the four of the two rows were, so the longest still fits from 320 px. */
+.guild-picker .community-tabs.community-tabs--three {
+  grid-template-columns: repeat(var(--guild-columns, 3), minmax(0, 1fr));
+}
+
+.guild-picker .community-tabs--three > .community-tab {
+  grid-column: span var(--guild-span, 1);
+}
+
+@media (max-width: 479px) {
+  .guild-picker .community-tabs--three > .community-tab--crowded {
+    gap: 2px;
+    padding: 4px 2px;
+    font-size: clamp(11px, calc((100vw - 136px) / 15.8), 15px);
+  }
+
+  :lang(en) .guild-picker .community-tabs--three > .community-tab--crowded {
+    font-size: clamp(10px, calc((100vw - 136px) / 19), 14px);
+  }
+}
+
+/* The Bohaterowie tygodnia (1198 A; guild-heroes.js): the badges of last
+   week's heroes by a name, in their own gold, and the card under the
+   members with last week's heroes and this week's leaders. */
+.hero-badges {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 3px;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px;
+  border: 1px solid rgba(247, 211, 106, 0.6);
+  border-radius: 4px;
+  background: rgba(247, 211, 106, 0.1);
+  box-shadow: 0 0 6px rgba(247, 211, 106, 0.25);
+}
+
+.hero-badges--named {
+  flex-wrap: wrap;
+  gap: 4px 6px;
+}
+
+.hero-badges--named .hero-badge {
+  padding: 1px 6px 1px 1px;
+}
+
+.hero-badge-name {
+  color: var(--champion-gold);
+  font-family: var(--font-system);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.profile-heroes {
+  margin: 4px 0 0;
+}
+
+.guild-heroes-head {
+  margin: 10px 0 4px;
+  color: var(--gold);
+  font-size: 15px;
+}
+
+.guild-heroes-list,
+.guild-heroes-now {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guild-hero {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border: 1px solid rgba(247, 211, 106, 0.45);
+  background: linear-gradient(90deg, rgba(247, 211, 106, 0.12), transparent 75%);
+}
+
+.guild-hero-art {
+  display: inline-flex;
+  flex: none;
+  padding: 2px;
+  border: 1px solid rgba(247, 211, 106, 0.6);
+  background: rgba(13, 17, 11, 0.6);
+}
+
+.guild-hero-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
+  min-width: 0;
+}
+
+.guild-hero-title {
+  flex: 1 0 100%;
+  color: var(--champion-gold);
+  font-family: var(--font-system);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.guild-hero-who {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.guild-hero-name {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.guild-hero-count {
+  color: var(--text-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.guild-hero-now {
+  display: grid;
+  grid-template-columns: auto minmax(0, max-content) minmax(0, 1fr);
+  align-items: center;
+  gap: 4px 8px;
+  padding: 4px 0;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.guild-hero-now:first-child {
+  border-top: 0;
+}
+
+.guild-hero-now-kind {
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+.guild-hero-now-who {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 0;
+  text-align: right;
+}
+
+/* The Krainy pod sztandarem (1200 A; guild-lands.js): the card of the
+   Wojna tab with the guild's banners and each land of the week, leading in
+   gold and chasing in red, and the banner on a land's card for every
+   player. */
+.lands-banners {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 4px;
+  padding: 8px 10px;
+  border: 1px solid rgba(217, 180, 90, 0.5);
+  background: rgba(217, 180, 90, 0.08);
+}
+
+.lands-banners-title,
+.lands-bonus {
+  margin: 0;
+}
+
+.lands-banners-title {
+  color: var(--gold);
+  font-size: 14px;
+}
+
+.lands-bonus {
+  color: var(--leaf);
+  font-size: 13px;
+}
+
+.lands-banner-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lands-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px 2px 4px;
+  border: 1px solid rgba(217, 180, 90, 0.7);
+  color: var(--gold);
+  font-size: 13px;
+}
+
+.lands-week {
+  margin: 12px 0 4px;
+  color: var(--gold);
+  font-size: 15px;
+}
+
+.lands-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lands-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--gold);
+  background: rgba(13, 17, 11, 0.45);
+}
+
+.lands-row--chase {
+  border-left-color: var(--danger);
+}
+
+.lands-thumb {
+  flex: none;
+  width: 56px;
+  height: 40px;
+  border: 1px solid var(--bark-line);
+  background: var(--land-art, var(--bark)) center / cover no-repeat;
+  image-rendering: pixelated;
+}
+
+.lands-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.lands-name {
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.lands-own {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.lands-state {
+  color: var(--gold);
+  font-size: 13px;
+}
+
+.lands-row--chase .lands-state {
+  color: var(--danger);
+}
+
+.land-banner-chip {
+  gap: 4px;
+  border-color: rgba(217, 180, 90, 0.6);
+  color: var(--text);
+  font-family: var(--font-system);
+}
+
+.land-banner-chip--own {
+  border-color: rgba(247, 211, 106, 0.85);
+  background: rgba(247, 211, 106, 0.14);
+  color: var(--champion-gold);
+}
+
+.land-banner-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 6px 10px;
+  border: 1px solid rgba(217, 180, 90, 0.5);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.land-banner-line--own {
+  border-color: rgba(247, 211, 106, 0.8);
+  background: rgba(247, 211, 106, 0.1);
+  color: var(--champion-gold);
+}
+
+/* The Kram Gildii (1202 A; guild-stall.js): the Znaki in sight on top, then
+   the goods, each with its picture, price, limit and button, and the
+   item's slots in a sheet. */
+.stall-balance {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+  padding: 8px 12px;
+  border: 1px solid var(--system-line);
+  background: var(--system-fill);
+}
+
+.stall-balance-art {
+  display: inline-flex;
+  flex: none;
+}
+
+.stall-balance-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.stall-balance-label {
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.stall-balance-count {
+  color: var(--system);
+  font-family: var(--font-system);
+  font-size: 26px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.stall-goods {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stall-good {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 8px;
+  border: 1px solid var(--bark-line);
+  background: rgba(13, 17, 11, 0.45);
+}
+
+.stall-good--owned {
+  border-color: rgba(167, 196, 127, 0.55);
+}
+
+.stall-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--gold);
+}
+
+.stall-art-image {
+  image-rendering: pixelated;
+}
+
+.stall-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.stall-name {
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.stall-description {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.stall-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 12px;
+  font-size: 13px;
+}
+
+.stall-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--system);
+  font-family: var(--font-system);
+  white-space: nowrap;
+}
+
+.stall-limit {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.stall-limit--owned {
+  color: var(--leaf);
+}
+
+.stall-reason {
+  margin: 0;
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.stall-buy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+/* On a narrow phone the button goes under the words, at the full width. */
+@media (max-width: 399px) {
+  .stall-good {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+
+  .stall-action {
+    grid-column: 1 / -1;
+  }
+
+  .stall-action .stall-buy {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.stall-slots {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 12px;
+}
+
+.stall-slot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 6px 10px;
+  border: 1px solid var(--bark-line);
+  background: rgba(13, 17, 11, 0.45);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.stall-slot[aria-pressed='true'] {
+  border-color: var(--system);
+  background: var(--system-fill);
+  box-shadow: inset 0 0 0 1px var(--system-line);
+}
+
+.stall-slot-icon {
+  flex: none;
+  color: var(--gold);
+}
+
+.stall-slot-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.stall-slot-worn {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.stall-slot-buy {
+  width: 100%;
+}
+
+.stall-outside {
+  margin: 0;
+  padding: 6px 10px;
+  border: 1px solid rgba(217, 180, 90, 0.5);
+  color: var(--gold);
+  font-size: 14px;
+}
+
+/* On a wider screen last week's heroes and this week's leaders stand side
+   by side, and the lands of the week in two columns, so the cards ask
+   for less scrolling (1198 A, 1200 A). */
+@media (min-width: 700px) {
+  .guild-heroes-list,
+  .guild-heroes-now {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .guild-heroes-now {
+    gap: 8px 16px;
+  }
+
+  /* Each hero a small card of its own: the badge over the words, so a
+     long name keeps its line. */
+  .guild-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .guild-hero-text {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    align-self: stretch;
+  }
+
+  .guild-hero-title {
+    flex: none;
+  }
+
+  /* Each leader: the badge and the honour over the name and the count. */
+  .guild-hero-now {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'badge kind'
+      'who who';
+    align-items: center;
+    border-top: 0;
+  }
+
+  .guild-hero-now > :first-child {
+    grid-area: badge;
+  }
+
+  .guild-hero-now-kind {
+    grid-area: kind;
+  }
+
+  .guild-hero-now-who {
+    grid-area: who;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .lands-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
