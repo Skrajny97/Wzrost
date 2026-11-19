@@ -15,11 +15,14 @@
 // of its Encyklopedia (ownDiscoveries in the engine). So with goods: the
 // pieces a character put in come back to it as they were, and those of
 // another character come as got from others (foreign_stacks), as a
-// Wymiana's (account-chest.js in the engine).
+// Wymiana's (account-chest.js in the engine). And Talia Systemu's cards,
+// from the character's collection into the collection of another
+// (chest-cards.js; the mock-ups of 19.11.2026).
 
 import { CHEST_GOODS, bagCapacity, campLevels, canUse, chestTakes, gearKey, itemView, knownStack, materialView, tradedLeaving } from '../engine/index.js';
 import { assertion, atomically } from './atomic.js';
 import { bagPlaces, characterView, chestLock, loadPlayer, requireOffRack, requirePlayer } from './characters.js';
+import { cardGoodView, chestCards, isCardGood, putCardInChest, takeCardFromChest } from './chest-cards.js';
 import { content } from './content.js';
 import { withoutFavorites } from './favorites.js';
 import { ApiError, json, readJson } from './http.js';
@@ -49,8 +52,10 @@ const listOf = (kind) =>
 // name in the request's language, as the character's own lists name it (a
 // material as "Rzadka skóra wilka"), a material's species for its picture,
 // and its place among its kind (the data's order; materials by rarity and
-// name, as the Stół rozbiórki lists them).
+// name, as the Stół rozbiórki lists them). A card ("Karta: Licho") with its
+// face (chest-cards.js).
 function goodView(kind, id) {
+  if (isCardGood(kind)) return cardGoodView(kind, id);
   if (kind === 'material') {
     if (!knownStack(id, content())) return null;
     const material = materialView(id, 0, content());
@@ -63,8 +68,10 @@ function goodView(kind, id) {
 }
 
 // The goods in the chest by good: how many pieces in all, and how many of
-// them are the character's own, kind by kind in CHEST_GOODS's order.
-function goodsOf(rows) {
+// them are the character's own, kind by kind in CHEST_GOODS's order; a card
+// with its name alone, its face and the copies of it the character has
+// (`have`, by "kind:id", chestCards), for what taking it would give.
+function goodsOf(rows, have = new Map()) {
   return rows
     .map((row) => ({ row, view: CHEST_GOODS.includes(row.kind) ? goodView(row.kind, row.good) : null }))
     .filter(({ view }) => view)
@@ -72,13 +79,23 @@ function goodsOf(rows) {
       (a, b) =>
         CHEST_GOODS.indexOf(a.row.kind) - CHEST_GOODS.indexOf(b.row.kind) || a.view.rank - b.view.rank || a.view.sortName.localeCompare(b.view.sortName, 'pl'),
     )
-    .map(({ row, view }) => ({ kind: row.kind, id: row.good, name: view.name, count: row.count, own: row.own, ...(view.materialId && { materialId: view.materialId }) }));
+    .map(({ row, view }) => ({
+      kind: row.kind,
+      id: row.good,
+      name: view.name,
+      count: row.count,
+      own: row.own,
+      ...(view.materialId && { materialId: view.materialId }),
+      ...(view.face && { cardName: view.cardName, face: view.face, have: have.get(`${row.kind}:${row.good}`) ?? 0 }),
+    }));
 }
 
 // The chest as the character played sees it: each item with the name of
 // the character that put it in, and whether it comes back to this one as
-// its own; and the goods.
+// its own; the goods; and where the game has Talia Systemu, the cards of the
+// character's collection for "Włóż kartę" (`cards`, chest-cards.js).
 async function chestView(db, player, now) {
+  const cards = await chestCards(db, player.row);
   const [items, goods] = await db.batch([
     db
       .prepare('SELECT c.id, c.character_id, c.data, o.name FROM chest_items c LEFT JOIN characters o ON o.id = c.character_id WHERE c.user_id = ? ORDER BY c.id')
@@ -105,7 +122,8 @@ async function chestView(db, player, now) {
         wornFrom: view.classLevel,
       };
     }),
-    goods: goodsOf(goods.results),
+    goods: goodsOf(goods.results, cards?.have),
+    ...(cards && { cards: cards.view }),
   };
 }
 
@@ -213,7 +231,14 @@ export async function putGoodsInChest(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireOpen(row);
-  const { kind, id, count, column } = askedGoods(await readJson(context.request));
+  const asked = askedGoods(await readJson(context.request));
+  // A card of Talia Systemu goes from the character's collection
+  // (chest-cards.js).
+  if (isCardGood(asked.kind)) {
+    await putCardInChest(context, session, player, asked, changed);
+    return answer(context, session);
+  }
+  const { kind, id, count, column } = asked;
   const held = heldOf(row, column, id);
   if (count > held) throw new ApiError(409, 'not_enough', held > 0 ? 'Nie masz tylu.' : 'Nie masz tego towaru.');
   // The camp's resources and the scrolls are in no Encyklopedia, so none is
@@ -268,7 +293,14 @@ export async function takeGoodsFromChest(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireOpen(row);
-  const { kind, id, count, column } = askedGoods(await readJson(context.request));
+  const asked = askedGoods(await readJson(context.request));
+  // A card of Talia Systemu goes into the character's collection
+  // (chest-cards.js).
+  if (isCardGood(asked.kind)) {
+    await takeCardFromChest(context, session, player, asked, changed);
+    return answer(context, session);
+  }
+  const { kind, id, count, column } = asked;
   const db = context.env.DB;
   const rows = (
     await db.prepare('SELECT id, character_id, count, traded FROM chest_goods WHERE user_id = ? AND kind = ? AND good = ? ORDER BY id').bind(session.userId, kind, id).all()

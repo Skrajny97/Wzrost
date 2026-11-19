@@ -223,7 +223,8 @@ test('every sprite on the list has its file at its size, and every class has its
     // Gold, Punkty Czasu, the Encyclopedia's corner and the Kowadło's two
     // scrolls (the Warsztat's Zwój ochronny and Zwój utrwalenia).
     // The Kowadło's scrolls and the Zwój Niepamięci (989).
-    icons: ['gold', 'time-points', 'encyclopedia', data('professions').workshop.scroll.id, data('professions').workshop.steadyScroll.id, 'oblivion-scroll', 'fir-branch'],
+    // The Kulka Systemu over the Walka scene (data/orbs.json).
+    icons: ['gold', 'time-points', 'encyclopedia', data('professions').workshop.scroll.id, data('professions').workshop.steadyScroll.id, 'oblivion-scroll', 'fir-branch', data('orbs').art],
     // The Stajnia's mounts and the looks a mount can wear (each with its
     // trot, and the Sklep Systemu's mount looks), and the character riding
     // them, one for each walk.

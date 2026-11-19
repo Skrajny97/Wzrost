@@ -34,5 +34,30 @@
     "loot": ["Loot: {loot}."],
     "sweptAll": ["Portals cleared: {list}."],
     "swept": ["Stage {stage} cleared again. Loot: {loot}."]
+  },
+  "series": {
+    "options": {
+      "five": { "hint": "Fight for the next 5 stages at once." },
+      "ten": { "hint": "Fight for the next 10 stages at once." },
+      "max": { "label": "Max", "hint": "Fight for the next stages until the first defeat or up to the stage equal to your character's level." }
+    },
+    "page": {
+      "group": "A few stages at once",
+      "about": "With ×5 and ×10 you fight for that many next stages at once, and with Max until the first defeat or up to the stage equal to your character's level. Each fight counts as a single one, and you get one report for the whole series.",
+      "lastFight": "Last fight: stage {stage}"
+    },
+    "texts": {
+      "wonMany": ["Stages {from}–{to} cleared."],
+      "wonOne": ["Stage {stage} cleared."],
+      "wonNone": ["No stage cleared."],
+      "stopLost": ["Stage {stage}: defeat."],
+      "stopCount": ["{fights} fights done. Stage {stage} is next."],
+      "stopLevel": ["The next one opens at character level {level}."],
+      "stopLast": ["This is the portal's last stage. More stages will come later."],
+      "range": ["stages {from}–{to}"],
+      "rangeOne": ["stage {stage}"],
+      "chip": ["{won} cleared"],
+      "entry": ["Stage {stage}. {text}"]
+    }
   }
 }

@@ -16,6 +16,7 @@ import { inAppBrowser, installBlock, installButton } from './install.js';
 import { buildTopbar, showWallet, updateNav, updateTopbar } from './layout.js';
 import { desktopLayout, layoutChoice, layoutOffered, onLayoutChange, setLayoutChoice } from './layout-mode.js';
 import { updateSide } from './side.js';
+import { mountBackToTop } from './back-to-top.js';
 import { chatBubbleOn, setChatBubbleOn, updateChatBubble } from './chat-bubble.js';
 import { mountStreakTab, offerStreak } from './daily-streak.js';
 import { mountWinterTab, offerWinter } from './winter-calendar.js';
@@ -420,6 +421,8 @@ function openGame() {
   mountStreakTab($('#view-game'));
   // Szczodre Gody's calendar under it, while the calendar runs (1044).
   mountWinterTab($('#view-game'));
+  // "Na górę" over a long screen scrolled down (19.11.2026).
+  mountBackToTop();
   show('game');
   buildTopbar(openSettings);
   route();

@@ -124,6 +124,30 @@ export function cardFace(card, { compact = false, marks = {}, onClick = null, la
     : h('span', { class: className, vars, role: 'img', 'aria-label': ariaLabel }, body);
 }
 
+// A card's face at another level (`level`, kept from 1 to the top): its Atak
+// and Życie there, or what an effect card does there, from the levels its
+// view brings (`levels`, src/server/card-goods.js), as the Skrzynia Konta
+// shows the level a move would give.
+export function cardAtLevel(card, level) {
+  const levels = card.levels ?? [];
+  const at = Math.max(1, Math.min(levels.length || level, level));
+  return { ...card, level: at, ...(levels[at - 1] ?? {}) };
+}
+
+// A card's small picture in a line of goods (the Skrzynia Konta, the
+// Targowisko, the Wymiana; DECISIONS.md, "Karty Talii: Skrzynia Konta,
+// Targowisko i Wymiana"): the frame of its rarity around the creature on
+// the place of its first home, or an effect card's picture on the effects'
+// background, without its numbers, which its face (cardFace) shows.
+export function cardThumb(card) {
+  const scene = card.effect ? "url('/art/cards/effects/scene.png')" : card.area ? areaArtUrl(card.area) : null;
+  const art = card.effect
+    ? h('img', { class: 'sprite', src: `/art/cards/effects/${card.id}.png`, alt: '', decoding: 'async', draggable: 'false' })
+    : (monsterSprite(card.id) ?? icon('beast', { size: 18 }));
+  art.classList.add('card-thumb-art');
+  return h('span', { class: `card-thumb tcard--${card.rarity}`, vars: { '--rarity': card.color, ...(scene && { '--scene': scene }) }, 'aria-hidden': 'true' }, art);
+}
+
 // An effect card's face (976–979, mock-up 979.1): the frame of its rarity,
 // its picture on the effects' background (styles.css, .tcard--effect), its
 // name and, in place of Atak and Życie, what it does at its level ("+40%

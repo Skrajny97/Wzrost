@@ -12,6 +12,7 @@
 // (offerTrade), and waits in the Społeczność too (tradeBanner).
 
 import { goldArt, herbSprite, mineralSprite, pantrySprite, potionSprite, resourceArt, scrollArt } from '../art.js';
+import { cardThumb } from '../cards.js';
 import { liveTrade, tradeSeen } from '../chat-news.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
@@ -119,6 +120,9 @@ const stacksOf = (offer) => [
   ...(offer.pantry ?? []).map((stack) => ({ ...stack, pantry: true })),
   // The scrolls (1061).
   ...(offer.scrolls ?? []).map((stack) => ({ ...stack, scroll: true })),
+  // Talia Systemu's cards (DECISIONS.md, "Karty Talii: Skrzynia Konta,
+  // Targowisko i Wymiana"), each with its face for its small picture.
+  ...(offer.cards ?? []).map((card) => ({ ...card, name: card.cardName, card: true })),
 ];
 
 // What an offer holds, in words: "120 złota, Amulet Dębu, Żywokost ×5".
@@ -276,6 +280,9 @@ export function mountTrade(container, { backHash }) {
       offer.gold > 0 && h('p', { class: 'trade-gold' }, goldArt(20), t('{gold} złota', { gold: formatNumber(offer.gold) })),
       offer.items.length > 0 && h('ul', { class: 'item-list' }, offer.items.map((item) => h('li', {}, itemEntry(item, mine)))),
       stacks.length > 0 && h('ul', { class: 'trade-stacks' }, stacks.map((stack) => stackEntry(stack, mine))),
+      // Cards got in a trade: their level, not the Encyklopedia (the
+      // author, 19.11.2026), said once under the other's offer.
+      !mine && (offer.cards ?? []).length > 0 && view.cards?.texts?.rule && h('p', { class: 'muted trade-note', text: view.cards.texts.rule }),
       mine && view.state === 'open' && h('button', { type: 'button', class: 'button button--world', text: isEmpty(offer) ? t('Dodaj do oferty') : t('Zmień ofertę'), onClick: editOffer }),
     );
   }
@@ -316,7 +323,9 @@ export function mountTrade(container, { backHash }) {
   // Herbs, potions, materials, minerals or camp resources of an offer; a
   // potion whose recipe the character does not know waits for it.
   function stackEntry(stack, mine) {
-    const art = stack.material
+    const art = stack.card
+      ? cardThumb(stack.face)
+      : stack.material
       ? materialIcon(stack.materialId, 20)
       : stack.scroll
         ? scrollArt(stack.id, 20)
@@ -333,7 +342,7 @@ export function mountTrade(container, { backHash }) {
       h('span', { class: 'potion-pick-art' }, art),
       h('span', { class: 'trade-stack-name', text: stack.name }),
       h('span', { class: 'trade-stack-count', text: `×${formatNumber(stack.count)}` }),
-      !mine && !stack.herb && !stack.material && !stack.mineral && !stack.resource && !stack.scroll && !stack.pantry && !stack.known && h('p', { class: 'region-warning trade-note', text: t('Nie znasz jej receptury, więc jej nie użyjesz.') }),
+      !mine && !stack.herb && !stack.material && !stack.mineral && !stack.resource && !stack.scroll && !stack.pantry && !stack.card && !stack.known && h('p', { class: 'region-warning trade-note', text: t('Nie znasz jej receptury, więc jej nie użyjesz.') }),
     );
   }
 
@@ -393,6 +402,25 @@ export function mountTrade(container, { backHash }) {
       .filter((entry) => entry.id !== 'gold' && entry.amount > 0)
       .map((entry) => ({ id: entry.id, name: entry.name, count: entry.amount }));
     const resources = stackFields(stores, 'resource', (entry) => resourceArt(entry.id, 20));
+    // Talia Systemu's cards of the collection (the trade's `cards`, while it
+    // is open): a field for each, the copies offered already in it; a card a
+    // match running now plays stays, and says so.
+    const words = view.cards?.texts ?? {};
+    const offeredCards = Object.fromEntries((view.mine.cards ?? []).map((card) => [`${card.kind}:${card.id}`, card.count]));
+    const ownCards = view.cards?.own ?? [];
+    const cardFields = ownCards
+      .filter((entry) => !entry.busy)
+      .map((entry) => {
+        const one = field(`trade-${entry.kind}-${entry.id}`, entry.cardName, offeredCards[`${entry.kind}:${entry.id}`] ?? 0, entry.copies, cardThumb(entry.face));
+        // A few copies: a narrower box leaves the card's name its room.
+        one.element.querySelector('input').classList.add('trade-number--short');
+        return { kind: entry.kind, id: entry.id, ...one };
+      });
+    const busyCards = ownCards
+      .filter((entry) => entry.busy)
+      .map((entry) =>
+        h('div', { class: 'trade-field' }, h('span', { class: 'potion-pick-art' }, cardThumb(entry.face)), h('span', { class: 'trade-field-label', text: entry.cardName }), h('span', { class: 'muted trade-field-most', text: words.busy })),
+      );
     const count = h('p', { class: 'muted' });
     const showCount = () => {
       count.textContent = t('Wybrane: {count} z {max}.', { count: picked.size, max: maxItems });
@@ -425,6 +453,10 @@ export function mountTrade(container, { backHash }) {
       try {
         const kept = (fields) => Object.fromEntries(fields.map((entry) => [entry.id, entry.read()]).filter(([, value]) => value > 0));
         offer = { gold: gold.read(), resources: kept(resources), items: [...picked], herbs: kept(herbs), potions: kept(potions), materials: kept(materials), minerals: kept(minerals), pantry: kept(pantry), scrolls: kept(scrolls) };
+        if (view.cards) {
+          offer.cards = kept(cardFields.filter((entry) => entry.kind === 'card'));
+          offer.effectCards = kept(cardFields.filter((entry) => entry.kind === 'effect-card'));
+        }
       } catch (error) {
         toast(error.message);
         return;
@@ -455,6 +487,7 @@ export function mountTrade(container, { backHash }) {
       minerals.length > 0 && section(t('Minerały'), minerals.map((entry) => entry.element)),
       scrolls.length > 0 && section(t('Zwoje'), scrolls.map((entry) => entry.element)),
       pantry.length > 0 && section(t('Spiżarnia'), pantry.map((entry) => entry.element)),
+      ownCards.length > 0 && section(words.group, cardFields.map((entry) => entry.element), busyCards, h('p', { class: 'muted', text: words.rule })),
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }), button(t('Zapisz ofertę'), 'system', save)),
     );
   }

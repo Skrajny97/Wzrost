@@ -32,7 +32,9 @@ export function featGains(db, characterId, gains) {
 // their Polish names (the data's `land`), whatever the page's language.
 export async function factsOf(db, row, now) {
   const [cards, arena, member, friends] = await db.batch([
-    db.prepare('SELECT monster_id FROM cards WHERE character_id = ?').bind(row.id),
+    // Its own cards only, as the Encyklopedia counts them (ownCardCollection
+    // in cards.js): those from others leave the counts as they were.
+    db.prepare('SELECT monster_id FROM cards WHERE character_id = ? AND copies > traded').bind(row.id),
     db.prepare('SELECT rating FROM arena_ratings WHERE character_id = ?').bind(row.id),
     db.prepare('SELECT joined_at FROM guild_members WHERE character_id = ?').bind(row.id),
     db

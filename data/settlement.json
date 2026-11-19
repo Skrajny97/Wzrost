@@ -645,7 +645,7 @@
     "brotherhood": "merchants",
     "minRaise": 0.05,
     "maxPrice": 100000000,
-    "kinds": ["item", "herb", "potion", "material", "part", "mineral", "scroll", "pantry"],
+    "kinds": ["item", "herb", "potion", "material", "part", "mineral", "scroll", "pantry", "card", "effect-card"],
     "reputation": { "goldPerPointPerLevel": 5, "daily": 30 },
     "merchant": {
       "goods": { "herb": 2, "material": 2, "part": 2 },

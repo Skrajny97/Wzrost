@@ -3,7 +3,7 @@
   "title": "Portale Systemu",
   "type": "object",
   "additionalProperties": false,
-  "required": ["sweeps", "maxStage", "strength", "lootMinutes", "firstWinMultiplier", "portals", "texts"],
+  "required": ["sweeps", "maxStage", "strength", "lootMinutes", "firstWinMultiplier", "portals", "texts", "series"],
   "properties": {
     "$comment": { "type": "string" },
     "sweeps": {
@@ -46,6 +46,58 @@
         "loot": { "$ref": "#/definitions/variants", "description": "{loot}: łup słowami." },
         "swept": { "$ref": "#/definitions/variants", "description": "Czyszczenie: {stage} i {loot}." },
         "sweptAll": { "$ref": "#/definitions/variants", "description": "„Wyczyść wszystkie”: {list}, każdy wyczyszczony portal z liczbą czyszczeń i łupem." }
+      }
+    },
+    "series": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["options", "page", "texts"],
+      "description": "Kilka stopni naraz: przyciski obok „Walcz o stopień N” i zdania raportu serii.",
+      "properties": {
+        "$comment": { "type": "string" },
+        "options": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "label", "hint"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "count": { "type": "integer", "minimum": 2, "description": "Najwięcej walk na jedno stuknięcie; bez count: o wszystkie otwarte stopnie." },
+              "label": { "type": "string", "minLength": 1, "description": "Napis na przycisku." },
+              "hint": { "type": "string", "minLength": 1, "description": "Co robi przycisk, pełnym zdaniem (podpowiedź i czytnik ekranu)." }
+            }
+          }
+        },
+        "page": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["group", "about", "lastFight"],
+          "properties": {
+            "group": { "type": "string", "minLength": 1, "description": "Nazwa grupy przycisków dla czytnika ekranu." },
+            "about": { "type": "string", "minLength": 1, "description": "Zdanie w „Jak to działa?” Portali." },
+            "lastFight": { "type": "string", "minLength": 1, "description": "Tytuł ostatniej walki w raporcie serii; {stage}." }
+          }
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["wonMany", "wonOne", "wonNone", "stopLost", "stopCount", "stopLevel", "stopLast", "range", "rangeOne", "chip", "entry"],
+          "properties": {
+            "wonMany": { "$ref": "#/definitions/variants", "description": "{from}–{to}: stopnie pokonane w serii." },
+            "wonOne": { "$ref": "#/definitions/variants", "description": "{stage}: jedyny pokonany." },
+            "wonNone": { "$ref": "#/definitions/variants" },
+            "stopLost": { "$ref": "#/definitions/variants", "description": "Seria stanęła na porażce; {stage}." },
+            "stopCount": { "$ref": "#/definitions/variants", "description": "Seria zrobiła swoje walki ({fights}), a {stage} jest otwarty." },
+            "stopLevel": { "$ref": "#/definitions/variants", "description": "Seria doszła do poziomu postaci; {level}: poziom, na którym otworzy się kolejny." },
+            "stopLast": { "$ref": "#/definitions/variants", "description": "Seria doszła do ostatniego stopnia portalu." },
+            "range": { "$ref": "#/definitions/variants", "description": "Stopnie walk serii w zdaniu: {from}–{to}." },
+            "rangeOne": { "$ref": "#/definitions/variants", "description": "Jedna walka: {stage}." },
+            "chip": { "$ref": "#/definitions/variants", "description": "Dziennik: {won}, liczba pokonanych stopni." },
+            "entry": { "$ref": "#/definitions/variants", "description": "Wpis pełnej relacji: {stage} i {text}, zdania jednej walki." }
+          }
+        }
       }
     }
   },

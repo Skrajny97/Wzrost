@@ -8,7 +8,7 @@
 // elsewhere there is no such tab.
 
 import { cardCollectionView, encyclopediaChest, encyclopediaView } from '../engine/index.js';
-import { cardCollection } from './cards.js';
+import { ownCardCollection } from './cards.js';
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { cardsOn } from './features.js';
@@ -26,7 +26,10 @@ const recordOf = (row) => ({
 async function bookOf(db, row) {
   const book = encyclopediaView(recordOf(row), content());
   if (!cardsOn() || !content().cards) return { ...book, tabs: book.tabs.filter((tab) => tab.id !== 'cards') };
-  return { ...book, cards: cardCollectionView(await cardCollection(db, row.id), content()) };
+  // Its own cards only: those from others fill no Encyklopedia (the author,
+  // 19.11.2026: „karty z wymiany/targowiska niech nie uzupełniają
+  // encyklopedii jakby coś”).
+  return { ...book, cards: cardCollectionView(await ownCardCollection(db, row.id), content()) };
 }
 
 // GET /api/encyclopedia: every tab with its entries and chests.

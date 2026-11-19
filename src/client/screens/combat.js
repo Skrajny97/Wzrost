@@ -17,6 +17,7 @@ import { language, t } from '../i18n.js';
 import { preloadReportMusic } from '../music.js';
 import { systemPoints } from '../quests.js';
 import { walkScene } from '../scenes.js';
+import { orbField } from '../orbs.js';
 import {
   activityFinished,
   avoidRareOn,
@@ -628,7 +629,8 @@ export function mountCombat(container, { params, navigate }) {
       { class: 'stack' },
       partySkips(activity),
       partyClaimed(activity),
-      ...(scene ? [scene.element] : []),
+      // With the Kulki Systemu over it (orbs.js).
+      ...(scene ? [orbField(activity, scene.element)] : []),
       systemPanel(
         t('Eksploracja w toku: {area}, {time}.', { area: activity.areaName, time: formatMinutes(activity.minutes) }),
         countdown,

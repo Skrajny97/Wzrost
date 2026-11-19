@@ -61,5 +61,31 @@
     "loot": ["Łup: {loot}."],
     "sweptAll": ["Wyczyszczone portale: {list}."],
     "swept": ["Stopień {stage} wyczyszczony. Łup: {loot}."]
+  },
+  "series": {
+    "$comment": "Kilka stopni naraz (pomysł gracza z czatu, autor 19.11.2026: „mądre pomysły”; gracz: „guzik [...] po 5 / 10 albo max na najwyższy lvl który postać pokona”). Obok „Walcz o stopień N” stoją przyciski options: jedno stuknięcie walczy o kolejne stopnie po kolei, najwyżej count razy (bez count: o wszystkie otwarte, do stopnia równego poziomowi postaci i do maxStage), i staje na pierwszej porażce. Każda walka jak pojedyncze wejście (te same zasady, towarzysze, łup pierwszej wygranej, własne ziarno z serwera), a cała seria ma jeden raport: na górze stopnie pokonane, łup razem i gdzie i czemu seria stanęła, pod spodem ostatnia walka. Przyciski są, gdy otwarte są co najmniej dwa stopnie. page: słowa strony (src/client/screens/portals.js, report.js). texts: zdania raportu serii ({from}, {to}, {stage}, {level}, {fights}, {won}, {text}).",
+    "options": [
+      { "id": "five", "count": 5, "label": "×5", "hint": "Walcz o 5 kolejnych stopni naraz." },
+      { "id": "ten", "count": 10, "label": "×10", "hint": "Walcz o 10 kolejnych stopni naraz." },
+      { "id": "max", "label": "Do oporu", "hint": "Walcz o kolejne stopnie aż do pierwszej porażki albo do stopnia równego poziomowi postaci." }
+    ],
+    "page": {
+      "group": "Kilka stopni naraz",
+      "about": "Przyciskami ×5 i ×10 walczysz o tyle kolejnych stopni naraz, a przyciskiem Do oporu – aż do pierwszej porażki albo do stopnia równego poziomowi postaci. Każda walka liczy się jak pojedyncza, a z całej serii dostajesz jeden raport.",
+      "lastFight": "Ostatnia walka: stopień {stage}"
+    },
+    "texts": {
+      "wonMany": ["Stopnie {from}–{to} pokonane."],
+      "wonOne": ["Stopień {stage} pokonany."],
+      "wonNone": ["Żaden stopień nie został pokonany."],
+      "stopLost": ["Stopień {stage}: porażka."],
+      "stopCount": ["{fights|walka|walki|walk} za Tobą. Dalej czeka stopień {stage}."],
+      "stopLevel": ["Dalej otworzy się na poziomie postaci {level}."],
+      "stopLast": ["To ostatni stopień tego portalu. Kolejne stopnie przyjdą później."],
+      "range": ["stopnie {from}–{to}"],
+      "rangeOne": ["stopień {stage}"],
+      "chip": ["{won|pokonany|pokonane|pokonanych}"],
+      "entry": ["Stopień {stage}. {text}"]
+    }
   }
 }

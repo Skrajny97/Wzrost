@@ -18,6 +18,7 @@
 import { potionPrice } from './brewing.js';
 import { companionWearBlock } from './companions.js';
 import { materialPrice, ordinaryMaterial, parseStack, stackKey } from './crafting.js';
+import { cardRarity, effectById, isCard } from './cards.js';
 import { baseClassLevel, canUse, equipBlock, randomItem, sellPrice } from './items.js';
 import { questPeriod } from './quests.js';
 import { createRng } from './rng.js';
@@ -342,7 +343,8 @@ export const OFFER_SORTS = ['ends', 'cheap', 'dear', 'new'];
 export const piecePrice = (offer) => (offer.bid ?? offer.startPrice) / Math.max(1, offer.count ?? 1);
 
 // The rarity of an offer's goods (`kind`, `key`, and `item` of an item), or
-// null: herbs and potions have none.
+// null: herbs and potions have none. A card of Talia Systemu has its
+// creature's rarity, an effect card its own.
 /**
  * @param {{ kind: string, key: string, item?: Record<string, any> | null } | Offer} goods
  * @param {Content} content
@@ -350,6 +352,8 @@ export const piecePrice = (offer) => (offer.bid ?? offer.startPrice) / Math.max(
  */
 export function goodsRarity({ kind, key, item }, content) {
   if (kind === 'item') return item?.rarity ?? null;
+  if (kind === 'card') return content.cards && isCard(key, content) ? cardRarity(key, content) : null;
+  if (kind === 'effect-card') return content.cards ? (effectById(key, content)?.rarity ?? null) : null;
   if (kind === 'material') return parseStack(key).rarityId ?? null;
   if (kind === 'part') return content.partsById[key]?.rarity ?? null;
   if (kind === 'mineral') {
@@ -415,7 +419,16 @@ export function offerTier(offer, content) {
  * @param {Offer} offer
  * @returns {string | undefined}
  */
-const offerCategory = (offer) => (offer.kind === 'item' ? offer.item?.slot : offer.kind);
+const offerCategory = (offer) => (offer.kind === 'item' ? offer.item?.slot : kindTab(offer.kind));
+
+// The tab of the goods an offer shows under: its kind's, but Talia
+// Systemu's effect cards stand under the cards' one tab, "Karty" (the tabs
+// in a row of three on a phone, 19.11.2026).
+/**
+ * @param {string} kind
+ * @returns {string}
+ */
+export const kindTab = (kind) => (kind === 'effect-card' ? 'card' : kind);
 
 /** @type {Record<string, (a: Offer, b: Offer) => number>} */
 const ORDERS = {
@@ -474,9 +487,16 @@ export function browseOffers(offers, asked, team, content) {
   } else if (show === 'bidding') {
     shown = bidding;
   } else {
-    counts.kinds = { ...Object.fromEntries(tuning(content).kinds.map((/** @type {string} */ kind) => [kind, 0])), ...tally(offers, (offer) => offer.kind) };
+    counts.kinds = {
+      ...Object.fromEntries(
+        tuning(content)
+          .kinds.filter((/** @type {string} */ kind) => kindTab(kind) === kind)
+          .map((/** @type {string} */ kind) => [kind, 0]),
+      ),
+      ...tally(offers, (offer) => kindTab(offer.kind)),
+    };
     if (Object.hasOwn(counts.kinds, asked?.kind ?? '')) view.kind = asked.kind;
-    shown = view.kind === 'any' ? offers : offers.filter((offer) => offer.kind === view.kind);
+    shown = view.kind === 'any' ? offers : offers.filter((offer) => kindTab(offer.kind) === view.kind);
     if (view.kind === 'item') {
       counts.classes = Object.fromEntries(content.classes.map((/** @type {Record<string, any>} */ cls) => [cls.id, shown.filter((offer) => offer.item && canUse(offer.item.base, cls.id, content)).length]));
       if (Object.hasOwn(counts.classes, asked?.classId ?? '')) {

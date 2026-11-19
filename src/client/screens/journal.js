@@ -142,7 +142,10 @@ export function mountJournal(container, { params }) {
                   : report.tower
                   ? t('{tower} · piętro {floor}', { tower: report.tower.name, floor: report.tower.floor })
                   : report.portal
-                    ? t('{portal} · stopień {stage}', { portal: report.portal.name, stage: report.portal.stage })
+                    ? // A series of stages at one tap: the stages fought.
+                      report.portal.series
+                      ? `${report.portal.name} · ${report.portal.series.range}`
+                      : t('{portal} · stopień {stage}', { portal: report.portal.name, stage: report.portal.stage })
                     : report.hall
                     ? t('Sala prób · {area}', { area: report.hall.areaName })
                     : `${report.areaName ?? report.regionName ?? report.placeName} · ${formatMinutes(report.minutes)}`,
@@ -164,7 +167,7 @@ export function mountJournal(container, { params }) {
                       text: report.tower || report.portal || report.labyrinth
                         ? report.result === 'success'
                           ? report.portal
-                            ? t('pokonany')
+                            ? (report.portal.series?.chip ?? t('pokonany'))
                             : report.labyrinth
                               ? t('zdobyta')
                               : t('zdobyte')
