@@ -720,6 +720,7 @@
       "tool": "flash"
     },
     "prompts": {
+      "system-orb": "a small glowing orb of pale cyan System light with a bright white core, a soft round halo and a few tiny sparks around it, perfectly round, bold readable shape, single game sprite, the orb alone, no background",
       "wolf-pelt": "folded grey wolf pelt with coarse fur, single inventory item icon",
       "fox-pelt": "folded red fox pelt with a bushy white-tipped tail, single inventory item icon",
       "badger-claws": "three short black badger claws tied together with a cord, single inventory item icon",
