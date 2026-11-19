@@ -1,0 +1,32 @@
+{
+  "$comment": "Kulki Systemu na planszy wyprawy (makieta 19.11.2026; DECISIONS.md, „Kulki Systemu na planszy wyprawy”; src/engine/orbs.js, src/server/orbs.js, src/client/orbs.js). Pomysł gracza, który autor zatwierdził z jednym warunkiem: „ale punktów systemu do tych kulek nie dodawaj”. Chwile kulek wyprawy wynikają z jej ziarna: średnio jedna kulka na minutesPerOrb minut wyprawy, co najmniej jedna od guaranteedFromMinutes minut. Czas oczekiwania od startGapSeconds po starcie do claimSeconds przed końcem dzieli się na równe części, po jednej kulce w losowej chwili każdej części, tak żeby lot kulki mieścił się w jej części. Kulka leci przez scenę flightSeconds sekund, a serwer przyjmuje stuknięcie od earlySeconds przed jej chwilą (różnica zegarów) do claimSeconds po niej (opóźnienie sieci). Postać złapie najwyżej perDay kulek na dobę zadań dziennych (od północy czasu polskiego). Nagroda zależy od poziomu postaci, z którym wyruszyła na wyprawę: rodzaj według wag kinds; złoto to od goldShare[0] do goldShare[1] złota znaleziska (rewards.findGoldPerLevel × poziom), Punkty Czasu od timePoints[0] do timePoints[1], materiał to jedna sztuka najtańszego materiału zwykłych stworów miejsca (bez elity i czempiona, najniższa rzadkość wśród nich). Od poziomu rewards.lateRewards.fromLevel złota jest rewards.lateRewards.factor, a szansa materiału też, z resztą szansy na złoto; Punkty Czasu bez zmian. Nigdy Punktów Systemu. art: obrazek kulki (src/client/art/icons, 32 × 32, w grze dwa razy większy), sound: dźwięk złapania (sounds.json, effects). texts: słowa kulki na stronie i odpowiedzi gry; {…} wypełnia gra.",
+  "art": "system-orb",
+  "sound": "chest",
+  "minutesPerOrb": 10,
+  "guaranteedFromMinutes": 10,
+  "startGapSeconds": 20,
+  "flightSeconds": 8,
+  "earlySeconds": 2,
+  "claimSeconds": 20,
+  "perDay": 8,
+  "kinds": {
+    "gold": 0.75,
+    "time": 0.15,
+    "material": 0.1
+  },
+  "goldShare": [0.5, 1],
+  "timePoints": [1, 3],
+  "texts": {
+    "label": "Złap Kulkę Systemu",
+    "gold": "Kulka Systemu: +{amount} złota",
+    "time": "Kulka Systemu: +{amount} {points}",
+    "timePointForms": ["Punkt Czasu", "Punkty Czasu", "Punktów Czasu"],
+    "material": "Kulka Systemu: +{amount} {material}",
+    "noExploration": "Kulki Systemu pojawiają się tylko w czasie wyprawy.",
+    "noOrb": "Nie ma takiej Kulki Systemu.",
+    "early": "Ta Kulka Systemu jeszcze nie nadleciała.",
+    "gone": "Ta Kulka Systemu już zgasła.",
+    "claimed": "Ta Kulka Systemu jest już złapana.",
+    "limit": "Na dziś to już wszystkie Kulki Systemu ({count}). Następne po północy."
+  }
+}

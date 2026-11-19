@@ -909,6 +909,7 @@
     "tutorial:lines.crafting-ending",
     "!chat:channels.english",
     "weeks", "winter", "!winter:calendar", "!winter:camp", "!winter:snow", "!winter:quests", "!winter:decorations.podlaznniczka.art", "!winter:decorations.snopek.art", "!winter:andrzejki.background", "!winter:andrzejki.feat", "!winter:andrzejki.days", "!winter:andrzejki.omens.dragon.kind", "!winter:andrzejki.omens.purse.kind", "!winter:andrzejki.omens.key.kind", "!winter:andrzejki.omens.raven.kind", "!winter:andrzejki.omens.star.kind", "!winter:andrzejki.omens.leaf.kind", "!winter:andrzejki.omens.heart.kind", "!winter:andrzejki.omens.crown.kind",
+    "orbs",
     "cards",
     "labyrinth",
     "!labyrinth:map",

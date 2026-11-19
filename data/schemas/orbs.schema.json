@@ -1,0 +1,173 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Kulki Systemu na planszy wyprawy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "art",
+    "sound",
+    "minutesPerOrb",
+    "guaranteedFromMinutes",
+    "startGapSeconds",
+    "flightSeconds",
+    "earlySeconds",
+    "claimSeconds",
+    "perDay",
+    "kinds",
+    "goldShare",
+    "timePoints",
+    "texts"
+  ],
+  "properties": {
+    "$comment": {
+      "type": "string"
+    },
+    "art": {
+      "description": "Obrazek kulki w src/client/art/icons (bez .png).",
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "sound": {
+      "description": "Dźwięk złapania kulki: nazwa efektu z sounds.json (effects).",
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "minutesPerOrb": {
+      "description": "Średnio jedna kulka na tyle minut wyprawy.",
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "guaranteedFromMinutes": {
+      "description": "Wyprawa co najmniej tylu minut ma co najmniej jedną kulkę.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "startGapSeconds": {
+      "description": "Pierwsza kulka najwcześniej tyle sekund po starcie wyprawy.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "flightSeconds": {
+      "description": "Tyle sekund kulka leci przez scenę.",
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "earlySeconds": {
+      "description": "Serwer przyjmuje stuknięcie najwcześniej tyle sekund przed chwilą kulki (różnica zegarów).",
+      "type": "number",
+      "minimum": 0
+    },
+    "claimSeconds": {
+      "description": "Serwer przyjmuje stuknięcie najpóźniej tyle sekund po chwili kulki (opóźnienie sieci); co najmniej tyle, ile kulka leci.",
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "perDay": {
+      "description": "Najwięcej kulek, które postać złapie na dobę zadań dziennych.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "kinds": {
+      "description": "Wagi rodzajów nagrody: złoto, Punkty Czasu i materiał. Punktów Systemu nie ma (autor: „ale punktów systemu do tych kulek nie dodawaj”).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gold",
+        "time",
+        "material"
+      ],
+      "properties": {
+        "gold": {
+          "type": "number",
+          "minimum": 0
+        },
+        "time": {
+          "type": "number",
+          "minimum": 0
+        },
+        "material": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "goldShare": {
+      "description": "Złoto kulki: od, do takiej części złota znaleziska (rewards.findGoldPerLevel × poziom postaci).",
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      }
+    },
+    "timePoints": {
+      "description": "Punkty Czasu kulki: od, do.",
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "texts": {
+      "description": "Słowa kulki: label przycisku kulki, gold, time i material w dymku po złapaniu (timePointForms: 1, 2–4 i 5 Punktów Czasu), reszta to odpowiedzi gry na stuknięcie, którego serwer nie przyjmuje.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "gold",
+        "time",
+        "timePointForms",
+        "material",
+        "noExploration",
+        "noOrb",
+        "early",
+        "gone",
+        "claimed",
+        "limit"
+      ],
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "gold": {
+          "type": "string"
+        },
+        "time": {
+          "type": "string"
+        },
+        "timePointForms": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "string"
+          }
+        },
+        "material": {
+          "type": "string"
+        },
+        "noExploration": {
+          "type": "string"
+        },
+        "noOrb": {
+          "type": "string"
+        },
+        "early": {
+          "type": "string"
+        },
+        "gone": {
+          "type": "string"
+        },
+        "claimed": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
