@@ -3847,6 +3847,11 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Nawia: cztery grafiki od nowa (1170) i dźwięki czterech umiejętności (1171) (19.11.2026, do najbliższej wersji)
+
+1. **Grafiki według ocen autora (1170):** Tętent A, Strach D, Sprężyna skoczogonka D, Wąs kota Bajuna C. Są w `src/client/art/monsters/` i `src/client/art/materials/`. Wszystkie cztery wersje każdej leżą w `art/alternatives/nawia/` z dopiskiem `-2-` (np. `stampede-2-A.png`).
+2. **Dźwięki według ocen autora (1171):** Strzała z niebios D, Deszcz gwiazd B, Słup światła B, Legion Nawii A. Są w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` z głośnością 0,7, jak pozostałe dźwięki umiejętności.
+
 ## Czat: „pushujący” bez gwiazdek (19.11.2026, do najbliższej wersji)
 
 1. **Zgłoszenie z czatu (gracz poz. 33, zrzut od autora).** Czat zamienił na gwiazdki słowo „pushujący”, bo w środku ma „huj” z listy słów (`data/chat.json`, `words`). Gracz musiał pisać „p.u.s.h.u.w.a.n.i.e”.
