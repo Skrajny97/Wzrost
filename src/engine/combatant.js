@@ -251,7 +251,8 @@ function unarmed(level, content) {
 // 4.11.2026: harder from the 10th level (613 C), between "średnio-wysoko
 // dla okazjonalnych, średnio dla zaangażowanych" and "mocno" (611), and no
 // stronger creatures for the companions or a party along (612 C: "musi byc
-// motywacja do drużyny/towarzyszy").
+// motywacja do drużyny/towarzyszy"); from level 250 a Drużyna's players do
+// make them stronger (partyStrength).
 /**
  * @param {number} level
  * @param {number[][]} [curve]
@@ -300,20 +301,68 @@ export function exploreStrength(area, level, content, hard = false) {
   return [damage * base.damage * more.damage, hp * base.hp * more.hp];
 }
 
+// The content with some of the creatures' growth stages (balance.monsters:
+// lateGame, endGame, mythGame) at nothing, made once per content and
+// stages: for what keeps its own measure (the skill preview, the Bestia
+// Gildii, the cards of Talia Systemu).
+/** @type {WeakMap<Content, Map<string, Content>>} */
+const flatContents = new WeakMap();
+/**
+ * @param {Content} content
+ * @param {string[]} stages
+ * @returns {Content}
+ */
+export function withoutStages(content, stages) {
+  let made = flatContents.get(content);
+  if (!made) {
+    made = new Map();
+    flatContents.set(content, made);
+  }
+  const key = stages.join(',');
+  if (!made.has(key)) {
+    const monsters = { ...content.balance.monsters };
+    for (const stage of stages) monsters[stage] = { ...monsters[stage], damage: 0, hp: 0 };
+    made.set(key, { ...content, balance: { ...content.balance, monsters } });
+  }
+  return /** @type {Content} */ (made.get(key));
+}
+
+// How much stronger the creatures of a level are against `players` players
+// of a Drużyna fighting together (a trip, the Wieża Drużyn, a party event):
+// [damage, HP] multipliers, balance.monsters.perPlayer's for each player
+// beyond the first, from its fromLevel to its toLevel as the stages grow
+// (the author, 19.11.2026: „szczególnie z drużyną”). Nothing for one
+// player, with its companions or not, nor below its first level: there the
+// creatures do not grow for a party (612 C).
+/**
+ * @param {number} level
+ * @param {number} players
+ * @param {Content} content
+ * @returns {[number, number]}
+ */
+export function partyStrength(level, players, content) {
+  const each = content.balance.monsters.perPlayer;
+  const more = players > 1 ? midGameShare(level, each) * (players - 1) : 0;
+  return [1 + each.damage * more, 1 + each.hp * more];
+}
+
 // `groupFactor` weakens each member of a group, so two or three monsters are
 // harder than one, but not two or three times harder.
-// `growth` is the share of the late and end game's growth the monster has:
-// a fight where the character stands alone (the Wieża Solo, an event's
-// fight) gives it balance.monsters.soloGrowth of it (the author: 438.3 A).
+// `growth` is the share of the late, end and myth game's growth the monster
+// has: a fight where the character stands alone (the Wieża Solo, an
+// event's fight) gives it balance.monsters.soloGrowth of it (the author:
+// 438.3 A).
 // `strength`: the [damage, HP] multipliers of a creature met on an
 // exploration of the newest place (or in the danger estimate's sample
 // fights there), exploreStrength; the Wieże, the events' fights and the
 // Bestia Gildii keep their own measure.
+// `players`: the players of a Drużyna who fight it together, for
+// partyStrength (1: a player alone, with its companions or not).
 /**
- * @param {{ monsterId: string, level: number, id: string, name?: string, position?: string, side?: string, groupFactor?: number, growth?: number, strength?: number[] }} fighter
+ * @param {{ monsterId: string, level: number, id: string, name?: string, position?: string, side?: string, groupFactor?: number, growth?: number, strength?: number[], players?: number }} fighter
  * @param {Content} content
  */
-export function monsterCombatant({ monsterId, level, id, name, position, side = 'enemy', groupFactor = 1, growth = 1, strength = [1, 1] }, content) {
+export function monsterCombatant({ monsterId, level, id, name, position, side = 'enemy', groupFactor = 1, growth = 1, strength = [1, 1], players = 1 }, content) {
   const balance = content.balance;
   const monster = content.monstersById[monsterId];
   /** @param {string} key */
@@ -339,6 +388,14 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
   // keep growing, they grow on once more, the same way.
   const end = balance.monsters.endGame;
   const latest = midGameShare(level, end) * growth;
+  // From level 250 (mythGame), where the mighty items come in, they grow
+  // once more, at once from that level (the author, 19.11.2026: „grę od
+  // 250tego trzeba zrobić też jeszcze trudniejszą, tam wchodzą juz potezne
+  // przedmioty i wszystko”, then „Od 250ego wzrost 3-krotny minimum”), and
+  // more against a Drużyna's players fighting together (partyStrength).
+  const myth = balance.monsters.mythGame;
+  const mythic = midGameShare(level, myth) * growth;
+  const [partyDamage, partyHp] = partyStrength(level, players, content);
   const [huntDamage, huntHp] = strength;
   // A creature's natural weapon from one of its attacks: its own, or one of
   // its shapes' (Weles, `shapes`).
@@ -352,6 +409,8 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
       (1 + coop.damage) *
       (1 + late.damage * later) *
       (1 + end.damage * latest) *
+      (1 + myth.damage * mythic) *
+      partyDamage *
       huntDamage;
     return {
       attackName: attack.name,
@@ -393,7 +452,10 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
     resist[element] = Math.round(value.base + value.perLevel * (level - 1));
   }
   const rawHp = balance.monsters.hpBase + balance.character.hpPerVitality * stat('vitality') + balance.monsters.hpPerLevel * level;
-  const hpMax = Math.max(1, Math.round(rawHp * monster.hpFactor * groupFactor * (1 + mid.hp * stronger) * (1 + coop.hp) * (1 + late.hp * later) * (1 + end.hp * latest) * huntHp));
+  const hpMax = Math.max(
+    1,
+    Math.round(rawHp * monster.hpFactor * groupFactor * (1 + mid.hp * stronger) * (1 + coop.hp) * (1 + late.hp * later) * (1 + end.hp * latest) * (1 + myth.hp * mythic) * partyHp * huntHp),
+  );
   return {
     id,
     side,

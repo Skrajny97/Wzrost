@@ -10,7 +10,7 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 
-import { createRng, monsterCombatant, playerCombatant, simulateFight, towerArea, towerFloor } from '../src/engine/index.js';
+import { createRng, monsterCombatant, playerCombatant, simulateFight, towerArea, towerFloor, withoutStages } from '../src/engine/index.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
 import { content } from './helpers/content.js';
 
@@ -271,7 +271,9 @@ describe('Nawia', () => {
     const shifts = result.events.filter((event) => event.actor === 'e0' && event.kind === 'skill').map((event) => event.skillName);
     assert.deepEqual(shifts.slice(0, 4), ['wąż', 'niedźwiedź', 'rogaty starzec', 'wąż']);
 
-    const koschei = monsterCombatant({ monsterId: 'koschei', level: 352, id: 'e0' }, content);
+    // Without the myth game's growth (twice as strong from 250, 19.11.2026)
+    // three typical warriors fell him in time.
+    const koschei = monsterCombatant({ monsterId: 'koschei', level: 352, id: 'e0' }, withoutStages(content, ['mythGame']));
     const fall = fight([member('warrior', 'a0', 350), member('warrior', 'a1', 350), member('warrior', 'a2', 350)], [koschei], 'kosciej-dane');
     assert.equal(fall.won, true);
     assert.deepEqual(fall.events.filter((event) => event.kind === 'drain' && event.actor === 'e0').map((event) => event.amount), [Math.round(koschei.maxHp * 0.5)]);

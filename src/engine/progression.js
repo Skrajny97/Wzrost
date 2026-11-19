@@ -76,12 +76,15 @@ function midGameSlowdown(level, midGame) {
 // wzrostu wyzwania musimy bardzo delikatnie podwyższyć … I oczywiscie chodzi
 // o midgame, bo early musi byc latwiejssze", so the first levels keep their
 // pace and monsters, and the mid-game levels take a little longer and their
-// monsters hit a little harder (balance.monsters.midGame).
+// monsters hit a little harder (balance.monsters.midGame). A range whose
+// toLevel is its fromLevel is a step: 0 below it, 1 from it on (the myth
+// game from 250, balance.monsters.mythGame: „Od 250ego”).
 /**
  * @param {number} level
  * @param {{ fromLevel: number, toLevel: number }} range
  */
 export function midGameShare(level, { fromLevel, toLevel }) {
+  if (toLevel <= fromLevel) return level >= fromLevel ? 1 : 0;
   return Math.min(1, Math.max(0, (level - fromLevel) / (toLevel - fromLevel)));
 }
 

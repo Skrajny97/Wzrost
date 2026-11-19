@@ -16,7 +16,7 @@
 // the bar the guild knocked off (chests). Pure: the seeds are the server's.
 
 import { simulateFight } from './combat.js';
-import { combatantView, playerCombatant } from './combatant.js';
+import { combatantView, playerCombatant, withoutStages } from './combatant.js';
 import { addCounts, materialDrops, stackKey } from './crafting.js';
 import { championItemRarity, encounterCombatants } from './hunt.js';
 import { randomItem } from './items.js';
@@ -108,8 +108,12 @@ export function guildBeastFight({ character, equipped, name, beast, seed, trophi
   const player = playerCombatant(/** @type {any} */ ({ character, equipped, name, area }), content);
   const ally = Object.keys(trophies).length > 0 ? { ...player, trophies } : player;
   // The character attacks alone: the beast hits with only a share of the
-  // late and end game's growth, as in the Wieża Solo (438.3 A).
-  const [unit] = encounterCombatants({ elite: false, champion: true, members: [{ monsterId: beast.monsterId, level: beast.level }] }, content, { growth: content.balance.monsters.soloGrowth });
+  // late and end game's growth, as in the Wieża Solo (438.3 A). The beast
+  // keeps its own measure (its HP from the members' attacks), so the myth
+  // game's growth from level 250 is not its (withoutStages).
+  const [unit] = encounterCombatants({ elite: false, champion: true, members: [{ monsterId: beast.monsterId, level: beast.level }] }, withoutStages(content, ['mythGame']), {
+    growth: content.balance.monsters.soloGrowth,
+  });
   const foe = { ...unit, maxHp: beast.maxHp, hp: beast.hp };
   const fight = simulateFight({ allies: [ally], enemies: [foe], rng: createRng(`${seed}:beast`), content, record: true, trait: area.trait });
   const left = /** @type {{ hp: number }} */ (fight.units.find((/** @type {{ id: string }} */ one) => one.id === foe.id)).hp;

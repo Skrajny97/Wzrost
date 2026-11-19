@@ -7,7 +7,7 @@
 // to check how each skill looks.
 
 import { simulateFight } from './combat.js';
-import { combatantView, monsterCombatant, playerCombatant } from './combatant.js';
+import { combatantView, monsterCombatant, playerCombatant, withoutStages } from './combatant.js';
 import { generateItem } from './items.js';
 import { createRng } from './rng.js';
 import { WOUND_KINDS } from './skills.js';
@@ -28,23 +28,14 @@ const GROUP_KINDS = new Set(['sweep', 'whirl']);
 /** @typedef {{ kind: string, skill?: string } & Record<string, any>} FightEvent */
 
 // The foes of a preview show a skill, not the balance: they come without
-// the growth of the late game and the end game (balance.monsters), which a
+// the growth of the late, end and myth game (balance.monsters), which a
 // character in common gear and without companions would not stand long
 // enough to show its skill. Made once per content.
-/** @type {WeakMap<Content, Content>} */
-const plainContents = new WeakMap();
 /**
  * @param {Content} content
  * @returns {Content}
  */
-function plainMonsters(content) {
-  if (!plainContents.has(content)) {
-    const { lateGame, endGame } = content.balance.monsters;
-    const monsters = { ...content.balance.monsters, lateGame: { ...lateGame, damage: 0, hp: 0 }, endGame: { ...endGame, damage: 0, hp: 0 } };
-    plainContents.set(content, { ...content, balance: { ...content.balance, monsters } });
-  }
-  return /** @type {Content} */ (plainContents.get(content));
-}
+const plainMonsters = (content) => withoutStages(content, ['lateGame', 'endGame', 'mythGame']);
 
 // Who the skill is shown against: a group for a sweep, a front and a back
 // foe for a blow aimed at the back, a single strong foe otherwise.

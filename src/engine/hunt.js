@@ -566,9 +566,11 @@ export function championItemRarity(level, rng, content) {
 }
 
 // Repeated monsters get numbers: "Wilk 1", "Wilk 2". `growth`: the share of
-// the late and end game's growth (monsterCombatant), less in a fight where
-// the character stands alone. `strength`: the [damage, HP] multipliers of
-// the creatures of the newest place (exploreStrength in combatant.js).
+// the late, end and myth game's growth (monsterCombatant), less in a fight
+// where the character stands alone. `strength`: the [damage, HP]
+// multipliers of the creatures of the newest place (exploreStrength in
+// combatant.js). `players`: the players of a Drużyna who fight them
+// together (partyStrength in combatant.js).
 // A player as it fights now, on the way or in an event's fight (events.js):
 // its strengthening potions still working (`on`, each kind's bonus), the
 // potions it carries (`kit`, fightPotions) and its trophies. Focus raises
@@ -600,9 +602,9 @@ export function fightingPlayer({ unit, character, equipped, name, area, hp, on =
 /**
  * @param {Encounter} encounter
  * @param {Content} content
- * @param {{ growth?: any, strength?: any }} [options2]
+ * @param {{ growth?: any, strength?: any, players?: number }} [options2]
  */
-export function encounterCombatants(encounter, content, { growth = 1, strength = [1, 1] } = {}) {
+export function encounterCombatants(encounter, content, { growth = 1, strength = [1, 1], players = 1 } = {}) {
   /** @type {Record<string, number>} */
   const counts = {};
   for (const member of encounter.members) counts[member.monsterId] = (counts[member.monsterId] ?? 0) + 1;
@@ -614,7 +616,7 @@ export function encounterCombatants(encounter, content, { growth = 1, strength =
     // A wanted creature of the Osada's posters (wanted.js) has its own name.
     const baseName = member.name ?? content.monstersById[member.monsterId].name;
     const name = counts[member.monsterId] > 1 ? `${baseName} ${seen[member.monsterId]}` : baseName;
-    return monsterCombatant({ ...member, id: `e${index}`, name, groupFactor, growth, strength }, content);
+    return monsterCombatant({ ...member, id: `e${index}`, name, groupFactor, growth, strength, players }, content);
   });
 }
 
@@ -760,6 +762,9 @@ export function simulateHunt(
   // (the design document: solo +10% XP, duo +5%, a full party no bonus).
   const others = roster ? fighters.length - 1 : partners.length;
   const partyXp = 1 - companions.length * content.settlement.companions.xpCost - others * content.balance.parties.xpCost;
+  // A trip's players all fight, and the creatures grow for them
+  // (partyStrength in combatant.js); a mercenary (`partners`) is no player.
+  const playerCount = roster ? fighters.length : 1;
   // Before the trips' roster, the other players fought beside the character
   // as mates, out once fallen; on a trip they fight as the character does.
   const friends = (roster ? [] : partners).map((/** @type {any} */ partner, /** @type {number} */ index) => {
@@ -978,7 +983,7 @@ export function simulateHunt(
       if (!catchUp.elite && !catchUp.champion) catchUp = null;
       pace = odds();
     }
-    const enemies = encounterCombatants(encounter, content, { strength: meeting ? wantedStrength(area, sought, strength, content) : strength });
+    const enemies = encounterCombatants(encounter, content, { strength: meeting ? wantedStrength(area, sought, strength, content) : strength, players: playerCount });
     // Each player as it fights now: its strengthening potions still working
     // (in their number of the first fights; a window kept in time, of an
     // exploration started before 0.1.26, while its time lasts), the potions
