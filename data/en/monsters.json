@@ -2441,11 +2441,11 @@
     }
   },
   "shade": {
-    "name": "Shadow",
+    "name": "Shade of the Dead",
     "counted": [
-      "Shadow",
-      "Shadows",
-      "Shadows"
+      "Shade of the Dead",
+      "Shades of the Dead",
+      "Shades of the Dead"
     ],
     "attack": {
       "name": "Stab in the Back"

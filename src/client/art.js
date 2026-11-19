@@ -56,6 +56,12 @@ export const SPRITES = {
       'mistletoe-leech', 'kingfisher', 'witch-cauldron', 'witch-broom', 'hedge-witch', 'empty-armor', 'haunted-portrait', 'black-grimoire', 'cuckoo', 'twardowski', 'fire-wheel', 'nutcracker',
       'seeress', 'mortar', 'witch-hare', 'broom-witch', 'dance-frenzy', 'magpie', 'cursed-piper', 'offering-oven', 'wax-doll', 'fate-spinner', 'hen-leg-hut', 'black-goose',
       'burning-skull', 'kostucha', 'baba-yaga',
+      // Nawia (276–350) from 19.11.2026.
+      'death-boat', 'water-strider', 'nameless', 'bridge-keeper', 'harvestman', 'death-candle', 'mole-cricket', 'forefather', 'giant-mole', 'coffin', 'two-headed-snake', 'candle-snuffer',
+      'gatekeeper', 'hourglass', 'shade', 'indrik', 'nyja', 'woolly-rhino', 'bumblebee', 'stampede', 'cockroach', 'house-serpent', 'greed', 'pill-bug',
+      'snake-maiden', 'dead-water', 'stick-insect', 'simargl', 'blood-feud', 'ghost-smith', 'shackles', 'steward', 'turon', 'veles', 'mammoth', 'pseudoscorpion',
+      'silence', 'sledge', 'snow-flea', 'oblivion', 'ice-block', 'mayfly', 'longing', 'dread', 'rat-king', 'black-flame', 'koschei-egg', 'bayun',
+      'ice-princess', 'marzanna', 'koschei',
     ],
   },
   // <class>-<look>, 96×128 (3:4), filled in as the portraits are approved,
@@ -302,6 +308,12 @@ export const SPRITES = {
       'leech-root', 'kingfisher-feather', 'cauldron-ladle', 'broom-twig', 'witch-pouch', 'armor-plate', 'gilded-frame', 'black-page', 'twardowski-quill', 'cuckoo-egg', 'burning-spoke', 'pine-nut',
       'fortune-bone', 'pestle', 'hare-foot', 'flying-ointment', 'red-ribbon', 'magpie-trinket', 'piper-whistle', 'offering-loaf', 'wax-lump', 'thread-of-fate', 'hut-claw', 'black-down',
       'skull-flame', 'iron-tooth', 'scythe-tip',
+      // Nawia (276–350) from 19.11.2026.
+      'canoe-splinter', 'strider-leg', 'nameless-shroud', 'bridge-coin', 'harvestman-limb', 'death-candle-wax', 'mole-cricket-claw', 'forefather-staff', 'mole-pelt', 'coffin-nail', 'two-headed-fang', 'snuffing-cap',
+      'bone-key', 'time-sand', 'shadow-shred', 'indrik-horn', 'nyja-seal', 'rhino-horn', 'nav-honey', 'ghost-horseshoe', 'cockroach-shell', 'golden-scale', 'cursed-coin', 'pill-bug-plate',
+      'snake-maiden-comb', 'dead-water-vial', 'stick-twig', 'simargl-feather', 'blood-knot', 'smith-hammer', 'shackle-link', 'steward-goblet', 'turon-clapper', 'veles-staff', 'mammoth-tusk', 'pseudoscorpion-venom',
+      'silence-stone', 'sledge-runner', 'snow-flea-spring', 'oblivion-flower', 'eternal-ice', 'mayfly-wing', 'longing-tear', 'dread-mask', 'tail-knot', 'black-wick', 'ice-eggshell', 'bayun-whisker',
+      'ice-diadem', 'marzanna-braid', 'koschei-needle',
     ],
   },
   // The skills of the classes (data/skills.json), 48×48.
@@ -391,13 +403,16 @@ export const SPRITES = {
       'grey-scree', 'windy-ridge', 'devils-stones', 'vulture-crags', 'stone-throne',
       'fir-slope', 'witches-path', 'misty-ravine', 'witch-glade', 'cursed-manor',
       'stone-rampart', 'witch-kitchen', 'dance-circle', 'stone-altars', 'baba-yaga-hut',
+      'misty-shore', 'viburnum-bridge', 'forefathers-isle', 'crossing-of-the-dead', 'gate-of-nav',
+      'eternal-pastures', 'golden-ravines', 'serpent-springs', 'veles-oakwood', 'veles-court',
+      'frozen-caves', 'road-of-the-dead', 'black-lake', 'chernobog-stronghold', 'koschei-castle',
     ],
   },
   // The lands' wide scenes, dim behind the text of their cards, 192×96.
   lands: {
     width: 192,
     height: 96,
-    ids: ['windfalls', 'stone-glade', 'backwaters', 'peat-bogs', 'black-bog', 'pine-dunes', 'silent-wilds', 'new-moon-depths', 'scree-slopes', 'fir-forest', 'bald-mountain'],
+    ids: ['windfalls', 'stone-glade', 'backwaters', 'peat-bogs', 'black-bog', 'pine-dunes', 'silent-wilds', 'new-moon-depths', 'scree-slopes', 'fir-forest', 'bald-mountain', 'navia-marshes', 'veles-meadows', 'sunless-land'],
   },
   // The camp's buildings, <building>-<look> for the looks of levels 1–3, 4–7
   // and 8–10 (8–19 for the resource buildings, whose fourth look is the
@@ -547,7 +562,7 @@ export const SPRITES = {
   boards: {
     width: 192,
     height: 160,
-    ids: ['arena-board', 'board-windfalls', 'board-stone-glade', 'board-backwaters', 'board-peat-bogs', 'board-black-bog', 'board-pine-dunes', 'board-silent-wilds', 'board-new-moon-depths', 'board-scree-slopes', 'board-fir-forest', 'board-bald-mountain'],
+    ids: ['arena-board', 'board-windfalls', 'board-stone-glade', 'board-backwaters', 'board-peat-bogs', 'board-black-bog', 'board-pine-dunes', 'board-silent-wilds', 'board-new-moon-depths', 'board-scree-slopes', 'board-fir-forest', 'board-bald-mountain', 'board-navia-marshes', 'board-veles-meadows', 'board-sunless-land'],
   },
   // The buildings of the Siedziba Gildii (data/guilds.json, seat), by the
   // building's id, 128×96 on a transparent ground: the first look the

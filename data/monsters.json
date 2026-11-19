@@ -3621,8 +3621,8 @@
   },
   {
     "id": "shade",
-    "name": "Cień",
-    "counted": ["cień", "cienie", "cieni"],
+    "name": "Cień Zmarłego",
+    "counted": ["cień zmarłego", "cienie zmarłych", "cieni zmarłych"],
     "family": "spirit",
     "position": "back",
     "stats": {
