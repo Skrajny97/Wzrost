@@ -1495,6 +1495,11 @@
       "id": "0.4.64",
       "title": "Wersja 0.4.64",
       "body": "- Od 100. poziomu klasy stwory są z każdym poziomem trochę silniejsze, aż tuż przed 250. poziomem są dwa razy silniejsze. Za to Twoi towarzysze od 100. poziomu klasy biją 1,4 raza mocniej i mają 1,4 raza więcej HP."
+    },
+    {
+      "id": "0.4.65",
+      "title": "Wersja 0.4.65",
+      "body": "- Portale: obok walki o stopień są przyciski ×5, ×10 i „Do oporu”. Jedno stuknięcie walczy o kolejne stopnie, aż do porażki albo poziomu postaci, a jeden raport pokazuje całą serię i łup.\n- Kulki Systemu: w czasie wyprawy nad sceną w Walce co jakiś czas przelatuje świecąca kulka. Złap ją stuknięciem, a zgarniesz złoto, Punkty Czasu albo materiał. Najwyżej 8 kulek dziennie.\n- Karty Talii przeniesiesz teraz między postaciami przez Skrzynię Konta, wystawisz na Targowisku i dasz w Wymianie. Karta od innych podnosi jej poziom, ale w Encyklopedii, premii kolekcji i osiągnięciach liczy się dopiero wtedy, gdy postać znajdzie własną. Taka karta wypada dalej, aż ją znajdziesz.\n- Na długich zakładkach w rogu pojawia się przycisk „Na górę”."
     }
   ]
 }
