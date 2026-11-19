@@ -1,0 +1,14 @@
+{
+  "id": "beast-strike",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a steel sword swinging down diagonally with a bright white curved slash trail behind the blade, a powerful strike, the symbol alone, no background, single inventory item icon, bold clean outline",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023136847258037992
+  },
+  "images": 1
+}
