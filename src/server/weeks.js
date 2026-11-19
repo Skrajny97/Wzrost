@@ -6,7 +6,7 @@
 // happens, and what one of its kinds multiplies. Where the weeks are off
 // (WEEKS, features.js) there is no week, and every factor is 1.
 
-import { omenEffects, weekAt, weekFactor, weekView } from '../engine/index.js';
+import { omenEffects, patronEffects, questPeriod, weekAt, weekFactor, weekView } from '../engine/index.js';
 import { content } from './content.js';
 import { weeksOn } from './features.js';
 
@@ -44,14 +44,33 @@ function fortunesOf(row) {
 // of the weeks, marked with its omen, and until when it runs.
 export const omensOf = (row, now) => omenEffects(fortunesOf(row), now, content().winter.andrzejki);
 
-// The week at `now` for a character (its row): the week's effects and its
-// Andrzejki omens running then, so an activity keeps them and a factor takes
-// them as the week's own; the week alone when none runs. The omens are a
-// character's own week effects, so where the weeks are off they are too.
+// The effects of the guild's patron from the Kącina (1201 A) for a
+// character at `now`, marked with its god (patronEffects): those of the
+// patron its row brings (`guild_patron`, the latest one of its guild,
+// loaded with it in characters.js), while the week it reigns lasts; none
+// outside a guild, in a week without a patron, or for a row read without it.
+function patronOfRow(row, now) {
+  let kept = null;
+  try {
+    kept = JSON.parse(row?.guild_patron ?? 'null');
+  } catch {
+    return [];
+  }
+  if (!kept?.god || kept.week !== questPeriod('weekly', now, content()).key) return [];
+  return patronEffects(kept.god, content());
+}
+
+// The week at `now` for a character (its row): the week's effects, its
+// Andrzejki omens running then and its guild's patron of the week, so an
+// activity keeps them and a factor takes them as the week's own; the week
+// alone when it has none of them. The omens are a character's own week
+// effects, so where the weeks are off they are too; the patron is the
+// guild's, so it gives its effects also there (a week of effects alone).
 export function weekFor(row, now) {
   const week = weekNow(now);
   const omens = week ? omensOf(row, now).map(({ kind, value, omen }) => ({ kind, value, omen })) : [];
-  return omens.length === 0 ? week : { ...week, effects: [...week.effects, ...omens] };
+  const own = [...omens, ...patronOfRow(row, now)];
+  return own.length === 0 ? week : { ...week, effects: [...(week?.effects ?? []), ...own] };
 }
 
 // What the week and the character's omens at `now` multiply a kind by.

@@ -13,11 +13,15 @@
 // the whole guild. Whoever hits it in a week gets a chest: with the beast
 // fallen an item of the character's class and the beast's materials, and
 // with the beast alive at the week's end only materials, more the more of
-// the bar the guild knocked off (chests). Pure: the seeds are the server's.
+// the bar the guild knocked off (chests). Its HP grows by the classes of the
+// day and the podcięcia (strikeHpGrowth, guild-strike.js), and an attack may
+// hit harder or softer by them and the guild's rally (`power`). Pure: the
+// seeds are the server's.
 
 import { simulateFight } from './combat.js';
 import { combatantView, playerCombatant } from './combatant.js';
 import { addCounts, materialDrops, stackKey } from './crafting.js';
+import { strikeHpGrowth } from './guild-strike.js';
 import { championItemRarity, encounterCombatants } from './hunt.js';
 import { randomItem } from './items.js';
 import { createRng } from './rng.js';
@@ -64,7 +68,7 @@ export function beastAttackDamage(level, content) {
 // The beast of a guild for a week (`seed`, the server's "<guild>:<week>"):
 // a champion of one of the regions, at the rounded average of the members'
 // character levels (`levels`, at least 1), with memberAttacks typical
-// attacks of HP for each member.
+// attacks of HP for each member, times strikeHpGrowth (1197, 1203).
 /**
  * @param {{ seed: unknown, levels: number[] }} guild
  * @param {Content} content
@@ -74,7 +78,7 @@ export function guildBeast({ seed, levels }, content) {
   const members = Math.max(1, levels.length);
   const average = levels.length > 0 ? levels.reduce((sum, level) => sum + level, 0) / levels.length : 1;
   const level = Math.max(1, Math.round(average));
-  const maxHp = Math.max(1, Math.round(members * rules(content).memberAttacks * beastAttackDamage(level, content)));
+  const maxHp = Math.max(1, Math.round(members * rules(content).memberAttacks * beastAttackDamage(level, content) * strikeHpGrowth(content)));
   return { monsterId: /** @type {string} */ (area.champion), areaId: area.id, level, members, maxHp };
 }
 
@@ -82,14 +86,15 @@ export function guildBeast({ seed, levels }, content) {
 // share of the week left (`share`, joinShare in guild-trials.js) of a
 // member's typical attacks at the beast's level, as the Próby's thresholds
 // and the Wyprawa's stages grow for one (the code review, 0.2.72: a beast
-// made for two stayed a two-member beast for all who joined after it).
+// made for two stayed a two-member beast for all who joined after it),
+// grown as the beast's own (strikeHpGrowth).
 /**
  * @param {number} level
  * @param {number} share
  * @param {Content} content
  * @returns {number}
  */
-export const beastJoinHp = (level, share, content) => Math.max(0, Math.round(share * rules(content).memberAttacks * beastAttackDamage(level, content)));
+export const beastJoinHp = (level, share, content) => Math.max(0, Math.round(share * rules(content).memberAttacks * beastAttackDamage(level, content) * strikeHpGrowth(content)));
 
 // One attack on the beast (`beast`: its monster, region, level, HP left and
 // most HP): the character alone at full HP with no potions, the
@@ -99,14 +104,20 @@ export const beastJoinHp = (level, share, content) => Math.max(0, Math.round(sha
 // damage is the HP the beast lost, never more than it had (a draining blow
 // heals it during the fight). No XP, gold or loot. Returns the damage, the
 // HP left, whether the beast fell, the fight's lines and its playback.
+// `power` (strikePower in guild-strike.js: the class of the day, the
+// rally, a Cios strengthened by a podcięcie or a podcięcie's half) makes
+// every blow of the character, its effects and its summons that many times
+// as strong, as the Arena's duelPower does, so the playback shows the blows
+// as they were.
 /**
- * @param {{ character: Record<string, any>, equipped: Record<string, any>[], name: string, beast: Beast, seed: unknown, trophies?: Record<string, any> }} attack
+ * @param {{ character: Record<string, any>, equipped: Record<string, any>[], name: string, beast: Beast, seed: unknown, trophies?: Record<string, any>, power?: number }} attack
  * @param {Content} content
  */
-export function guildBeastFight({ character, equipped, name, beast, seed, trophies = {} }, content) {
+export function guildBeastFight({ character, equipped, name, beast, seed, trophies = {}, power = 1 }, content) {
   const area = content.areasById[beast.areaId];
   const player = playerCombatant(/** @type {any} */ ({ character, equipped, name, area }), content);
-  const ally = Object.keys(trophies).length > 0 ? { ...player, trophies } : player;
+  const strong = power === 1 ? player : { ...player, damageScale: player.damageScale * power };
+  const ally = Object.keys(trophies).length > 0 ? { ...strong, trophies } : strong;
   // The character attacks alone: the beast hits with only a share of the
   // late and end game's growth, as in the Wieża Solo (438.3 A).
   const [unit] = encounterCombatants({ elite: false, champion: true, members: [{ monsterId: beast.monsterId, level: beast.level }] }, content, { growth: content.balance.monsters.soloGrowth });

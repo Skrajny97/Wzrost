@@ -232,7 +232,8 @@ describe('the Gildia through the API', () => {
     const { days } = content.guilds.leaderAway;
     const seen = (name, ago) => database.prepare('UPDATE characters SET seen_at = ? WHERE name = ?').bind(Date.now() - ago, name).run();
     const roles = async (login) => (await as(login, 'GET', '/api/guild')).data.guild.members.map((member) => [member.name, member.role]);
-    const said = async () => (await database.prepare('SELECT text FROM chat_messages WHERE channel = ? AND system = 1 ORDER BY id').bind(`guild:${guildId}`).all()).results.map((row) => row.text);
+    // The System's words of the handover (the Kronika's lines aside, 1195 A).
+    const said = async () => (await database.prepare('SELECT text FROM chat_messages WHERE channel = ? AND system = 1 AND chronicle IS NULL ORDER BY id').bind(`guild:${guildId}`).all()).results.map((row) => row.text);
     // Without a deputy nothing changes, however long the leader is away.
     await seen('Mistrz', (days + 6) * day);
     assert.deepEqual(await roles('druh'), [
@@ -292,7 +293,9 @@ describe('the Gildia through the API', () => {
     assert.equal(sent.status, 201, JSON.stringify(sent.data));
     const read = await as('druh', 'GET', '/api/chat?channel=guild');
     assert.equal(read.data.channel, 'guild');
-    assert.deepEqual(read.data.messages.map((message) => message.text), ['Zbiórka o świcie!']);
+    // The Kronika's line of Druh's joining (1195 A), then the message.
+    assert.deepEqual(read.data.messages.map((message) => message.text), ['Nowy członek gildii: Druh.', 'Zbiórka o świcie!']);
+    assert.deepEqual(read.data.messages.map((message) => Boolean(message.system)), [true, false]);
     // Not in the Globalny, and not for those outside.
     assert.deepEqual((await as('druh', 'GET', '/api/chat?channel=global')).data.messages, []);
     assert.equal((await as('obcy', 'GET', '/api/chat?channel=guild')).data.error.code, 'no_guild');

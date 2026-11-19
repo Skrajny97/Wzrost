@@ -1,5 +1,5 @@
 {
-  "$comment": "Osiągnięcia z tytułami (1030; lista 1036.1 i okno 1036.2 przyjęte 16.11.2026, tytuł tylko w profilu i Rankingu: 1036.3 B; src/engine/achievements.js, src/server/achievements.js, src/client/achievements.js). groups: grupy w oknie, każda z listą osiągnięć: name, goal (cel słowami), count (co się liczy: monsters, champions i wanted to stwory, czempioni i stwory z listów gończych pokonane na wyprawach, gold złoto z wypraw, arenaWins pojedynki wygrane na Arenie, leagueWins walki wygrane w lidze wojen gildii, labyrinths strażnicy 3. poziomu Labiryntu pokonani, deals transakcje na Targowisku: te liczą się od wersji, która je wprowadziła; reszta od razu z tego, co postać ma: landPlaces miejsca krainy land otwarte poziomem postaci, landReached dotarcie do krainy land (poziom postaci jej pierwszego miejsca), level poziom postaci, thirdForm trzecia forma klasy, professionTop najwyższy poziom profesji, professionsAt50 i professionsAt100 profesje z takim poziomem, cards różne karty, landCards wszystkie karty jednej krainy, arenaRating ocena na Arenie, guildWeeks pełne tygodnie w obecnej gildii, towerFloor najwyższe piętro Wieży, friends znajomi, streaks ukończone serie nagrody za kolejne dni), target (ile trzeba), title (tytuł postaci mężczyzny i kobiety), reward (Punkty Czasu i Punkty Systemu, dane raz, gdy osiągnięcie jest zdobyte, przy pierwszym spojrzeniu na okno) i art (obrazek z gry: monster, item, profession albo icon). since: liczniki, które gra prowadzi od wersji 0.4.6; texts.since mówi o tym w oknie.",
+  "$comment": "Osiągnięcia z tytułami (1030; lista 1036.1 i okno 1036.2 przyjęte 16.11.2026, tytuł tylko w profilu i Rankingu: 1036.3 B; src/engine/achievements.js, src/server/achievements.js, src/client/achievements.js). groups: grupy w oknie, każda z listą osiągnięć: name, goal (cel słowami), count (co się liczy: monsters, champions i wanted to stwory, czempioni i stwory z listów gończych pokonane na wyprawach, gold złoto z wypraw, arenaWins pojedynki wygrane na Arenie, leagueWins walki wygrane w lidze wojen gildii, labyrinths strażnicy 3. poziomu Labiryntu pokonani, deals transakcje na Targowisku: te liczą się od wersji, która je wprowadziła; reszta od razu z tego, co postać ma: landPlaces miejsca krainy land otwarte poziomem postaci, landReached dotarcie do krainy land (poziom postaci jej pierwszego miejsca), level poziom postaci, thirdForm trzecia forma klasy, professionTop najwyższy poziom profesji, professionsAt50 i professionsAt100 profesje z takim poziomem, cards różne karty, landCards wszystkie karty jednej krainy, arenaRating ocena na Arenie, guildWeeks pełne tygodnie w obecnej gildii, towerFloor najwyższe piętro Wieży, friends znajomi, streaks ukończone serie nagrody za kolejne dni, bannerWarden tytuł kupiony w Kramie Gildii za Znaki Gildii: 1202 A, bez nagrody, bo tytuł jest kupiony), target (ile trzeba), title (tytuł postaci mężczyzny i kobiety), reward (Punkty Czasu i Punkty Systemu, dane raz, gdy osiągnięcie jest zdobyte, przy pierwszym spojrzeniu na okno) i art (obrazek z gry: monster, item, profession albo icon). since: liczniki, które gra prowadzi od wersji 0.4.6; texts.since mówi o tym w oknie.",
   "since": [
     "arenaWins",
     "champions",
@@ -401,6 +401,22 @@
           "art": [
             "icon",
             "swords"
+          ]
+        },
+        {
+          "id": "banner-warden",
+          "name": "Strażnik Sztandaru",
+          "goal": "Kup ten tytuł w Kramie Gildii za Znaki Gildii.",
+          "count": "bannerWarden",
+          "target": 1,
+          "title": [
+            "Strażnik Sztandaru",
+            "Strażniczka Sztandaru"
+          ],
+          "reward": {},
+          "art": [
+            "icon",
+            "banner"
           ]
         }
       ]

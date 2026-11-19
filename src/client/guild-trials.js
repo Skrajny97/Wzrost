@@ -215,6 +215,9 @@ export function mountGuildTrials(container) {
       { class: 'guild-part guild-board', 'data-guide': 'guild-trials-board' },
       foldPart(
         { key: 'guild-trials-board', title: texts.board, line },
+        // The week's patron from the Kącina, whose domain gave half the
+        // board, each of those trials with its sign (1201 A).
+        view.patron && h('p', { class: 'guild-trials-patron' }, icon('spirit', { size: 18 }), h('span', { text: view.patron.text })),
         h('p', { class: 'muted small', text: texts.fromOpening }),
         h(
           'ul',
@@ -222,11 +225,12 @@ export function mountGuildTrials(container) {
           board.map((trial) =>
             h(
               'li',
-              { class: `guild-trial guild-trial--${trial.state}` },
+              { class: `guild-trial guild-trial--${trial.state}${trial.god ? ' guild-trial--god' : ''}` },
               kindIcon(trial.kind),
               h(
                 'div',
                 { class: 'guild-trial-body' },
+                trial.god && view.patron && h('span', { class: 'chip guild-chip guild-trial-god' }, icon('spirit', { size: 12 }), view.patron.name),
                 h('p', { class: 'guild-trial-words', text: trial.text }),
                 trial.note && h('p', { class: 'guild-trial-note', text: trial.note }),
                 trial.lock && h('p', { class: 'guild-trial-lock' }, icon('lock', { size: 14 }), h('span', { text: trial.lock })),

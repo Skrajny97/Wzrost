@@ -23,7 +23,7 @@ import { stackKey } from './crafting.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {{ id: string, weight: number, text: string, counted: any, step?: number, fights?: [number, number], count: [number, number], requires?: string, levelsBelow?: number, note?: string }} Kind A kind of trial (data/guilds.json). */
-/** @typedef {{ kind: string, size: number, roll: number }} Trial A trial of a week's board. */
+/** @typedef {{ kind: string, size: number, roll: number, god?: string }} Trial A trial of a week's board; `god`: of the domain of the week's patron from the Kącina (1201 A). */
 /** @typedef {{ key: string, startsAt: number, endsAt: number }} Period A period of the quests' clock (quests.js). */
 
 /**
@@ -111,27 +111,57 @@ export const trialKind = (kindId, content) => rules(content).kinds.find((/** @ty
 // The board of a guild's week from its seed: `board` trials, each a kind
 // and one of its sizes, no pair twice, the likelier by the weights of both;
 // `roll` places its count within the kind's range. In the order of the
-// kinds, the smaller size first.
+// kinds, the smaller size first. In a week under a patron from the Kącina
+// (`patron`: its god and the kinds of its domain; guild-shrine.js, 1201 A)
+// its share of the board (shrine.domainShare, half) comes from the domain,
+// each such trial marked with the god, and the rest from outside it; the
+// two halves then take turns on the board, so every day opens as many of
+// one as of the other.
 /**
  * @param {string | number} seed
  * @param {Content} content
+ * @param {{ god: string, domain: string[] } | null} [patron]
  * @returns {Trial[]}
  */
-export function drawTrialBoard(seed, content) {
+export function drawTrialBoard(seed, content, patron = null) {
   /** @type {{ board: number, sizes: { weight: number }[], kinds: Kind[] }} */
   const { board, sizes, kinds } = /** @type {any} */ (rules(content));
   const rng = createRng(seed);
-  let options = kinds.flatMap((kind) => sizes.map((size, index) => ({ kind: kind.id, size: index, weight: kind.weight * size.weight })));
-  /** @type {Trial[]} */
-  const drawn = [];
-  while (drawn.length < board && options.length > 0) {
-    const option = rng.weighted(options);
-    options = options.filter((other) => other !== option);
-    drawn.push({ kind: option.kind, size: option.size, roll: Math.floor(rng.next() * 1000) / 1000 });
-  }
+  const all = kinds.flatMap((kind) => sizes.map((size, index) => ({ kind: kind.id, size: index, weight: kind.weight * size.weight })));
   /** @param {Trial} trial */
   const order = (trial) => kinds.findIndex((kind) => kind.id === trial.kind);
-  return drawn.sort((a, b) => order(a) - order(b) || a.size - b.size);
+  /** @param {Trial} a @param {Trial} b */
+  const byKind = (a, b) => order(a) - order(b) || a.size - b.size;
+  // `count` trials drawn from `options`, no pair twice.
+  /**
+   * @param {typeof all} from
+   * @param {number} count
+   * @returns {Trial[]}
+   */
+  const draw = (from, count) => {
+    let options = from;
+    /** @type {Trial[]} */
+    const drawn = [];
+    while (drawn.length < count && options.length > 0) {
+      const option = rng.weighted(options);
+      options = options.filter((other) => other !== option);
+      drawn.push({ kind: option.kind, size: option.size, roll: Math.floor(rng.next() * 1000) / 1000 });
+    }
+    return drawn;
+  };
+  if (!patron || patron.domain.length === 0) return draw(all, board).sort(byKind);
+  const share = Math.round(board * (content.guilds.shrine?.domainShare ?? 0.5));
+  const inside = draw(all.filter((option) => patron.domain.includes(option.kind)), share)
+    .sort(byKind)
+    .map((trial) => ({ ...trial, god: patron.god }));
+  const outside = draw(all.filter((option) => !patron.domain.includes(option.kind)), board - inside.length).sort(byKind);
+  /** @type {Trial[]} */
+  const turns = [];
+  for (let index = 0; index < Math.max(inside.length, outside.length); index += 1) {
+    if (inside[index]) turns.push(inside[index]);
+    if (outside[index]) turns.push(outside[index]);
+  }
+  return turns;
 }
 
 // How many creatures a fight brings on average in the newest place open to

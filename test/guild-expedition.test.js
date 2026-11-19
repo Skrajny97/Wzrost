@@ -31,6 +31,7 @@ import {
   guildExpedition,
   joinShare,
   questPeriod,
+  strikeHpGrowth,
   trialDay,
 } from '../src/engine/index.js';
 import { CHESTS_SQL } from '../src/server/guild-expedition.js';
@@ -105,20 +106,20 @@ describe('the Wyprawa Gildii', () => {
     assert.equal(expeditionStageMinutes(part, content) % step, 0);
   });
 
-  test('each guardian is a level higher and has more HP, as the Bestia: members × attacks × a typical attack at its level', () => {
+  test('each guardian is a level higher and has more HP, as the Bestia: members × attacks × a typical attack at its level × the growth of 1197 and 1203', () => {
     const route = guildExpedition({ levels: [40, 40, 40] }, content);
     const guardians = route.guardians.map((_, index) => expeditionGuardian({ stage: index + 1, level: route.level, members: 3, guardians: route.guardians }, content));
     guardians.forEach((guardian, index) => {
       assert.equal(guardian.stage, index + 1);
       assert.equal(guardian.level, 40 + index);
       assert.equal(guardian.monsterId, route.guardians[index].monsterId);
-      assert.equal(guardian.maxHp, Math.round(3 * rules.guardians[index].attacks * beastAttackDamage(40 + index, content)));
+      assert.equal(guardian.maxHp, Math.round(3 * rules.guardians[index].attacks * beastAttackDamage(40 + index, content) * strikeHpGrowth(content)));
       if (index > 0) assert.ok(guardian.maxHp > guardians[index - 1].maxHp);
     });
     // More members, more HP; a part of a member counts in part.
     const one = expeditionGuardian({ stage: 1, level: 40, members: 1, guardians: route.guardians }, content);
     const more = expeditionGuardian({ stage: 1, level: 40, members: 2.5, guardians: route.guardians }, content);
-    assert.equal(more.maxHp, Math.round(2.5 * one.maxHp));
+    assert.ok(Math.abs(more.maxHp - 2.5 * one.maxHp) <= 2, `${more.maxHp} ${one.maxHp}`);
   });
 
   test('the route walks with the minutes, stops at a guardian keeping the minutes meanwhile, and walks on with them as it falls', () => {

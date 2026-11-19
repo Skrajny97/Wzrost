@@ -11,16 +11,25 @@
     "invites",
     "tabs",
     "seat",
+    "shrine",
     "expedition",
+    "chronicle",
+    "classDay",
+    "rally",
+    "undercut",
     "trials",
     "requests",
+    "help",
     "exchange",
     "chest",
     "war",
     "fame",
     "members",
     "leaderAway",
-    "ranks"
+    "ranks",
+    "heroes",
+    "lands",
+    "stall"
   ],
   "properties": {
     "$comment": {
@@ -117,10 +126,10 @@
       "minimum": 1
     },
     "tabs": {
-      "description": "Zakładki strony Gildii (src/client/screens/guild.js), w tej kolejności. Wojna (war) tylko tam, gdzie GUILD_WARS jest włączone.",
+      "description": "Zakładki strony Gildii (src/client/screens/guild.js), w tej kolejności. Wojna (war) tylko tam, gdzie GUILD_WARS jest włączone; Kram (stall, 1202 A) przed nią.",
       "type": "array",
-      "minItems": 9,
-      "maxItems": 9,
+      "minItems": 10,
+      "maxItems": 10,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -139,6 +148,7 @@
               "requests",
               "exchange",
               "chest",
+              "stall",
               "war"
             ]
           },
@@ -291,8 +301,97 @@
         }
       }
     },
+    "chronicle": {
+      "description": "Kronika Gildii (1195 A; src/server/guild-chronicle.js): słowa linijek Systemu w kanale gildii na czacie.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["texts"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "texts": {
+          "type": "object",
+          "required": ["beastFell", "guardianFell", "guardianLast", "trials", "seat", "warWon", "warLost", "warDraw", "joined", "rally", "heroes", "hero", "banner", "banners", "patron", "patronNone", "warden", "wardenFemale"],
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "classDay": {
+      "description": "Klasa dnia (1197; src/engine/guild-strike.js): dwie klasy dnia na każdy dzień tygodnia, od poniedziałku, ich mnożnik ataków i wzrost HP Bestii i strażników.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["power", "hp", "schedule", "texts"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "power": { "type": "number", "exclusiveMinimum": 1 },
+        "hp": { "type": "number", "minimum": 1 },
+        "schedule": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "items": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+        },
+        "texts": {
+          "type": "object",
+          "required": ["title", "bonus", "own", "how", "dayNames", "classDays"],
+          "properties": {
+            "dayNames": { "type": "array", "minItems": 7, "maxItems": 7, "items": { "type": "string", "minLength": 1 } }
+          },
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "rally": {
+      "description": "Róg zbiórki (1199 A; src/server/guild-rally.js): mnożnik ataków w czasie zbiórki, jej długość i jak daleko naprzód lider ją wyznacza.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["power", "minutes", "aheadHours", "texts"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "power": { "type": "number", "exclusiveMinimum": 1 },
+        "minutes": { "type": "integer", "minimum": 1, "maximum": 1440 },
+        "aheadHours": { "type": "integer", "minimum": 1, "maximum": 48 },
+        "texts": {
+          "type": "object",
+          "required": ["title", "lead", "how", "none", "noneMember", "planned", "plannedBy", "startsIn", "on", "onBonus", "came", "cameNone", "ended", "endedNone", "today", "tomorrow", "now", "hourLabel", "set", "setDone", "setNow", "cancel", "cancelAsk", "canceled", "pushTitle", "pushBody", "errors"],
+          "properties": {
+            "how": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+            "errors": {
+              "type": "object",
+              "required": ["locked", "noGuild", "notLeader", "badHour", "dayTaken", "started", "gone", "changed"],
+              "additionalProperties": { "type": "string", "minLength": 1 }
+            }
+          },
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "undercut": {
+      "description": "Podcięcie i cios (1203; src/server/guild-strike.js): mnożnik podcięcia, premia ciosów innych członków, ile ciosów wzmacnia jedno podcięcie i wzrost HP Bestii i strażników.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["power", "bonus", "uses", "hp", "texts"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "power": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 },
+        "bonus": { "type": "number", "exclusiveMinimum": 1 },
+        "uses": { "type": "integer", "minimum": 1 },
+        "hp": { "type": "number", "minimum": 1 },
+        "texts": {
+          "type": "object",
+          "required": ["strike", "undercut", "strikeNote", "strikeBonus", "undercutNote", "waiting", "waitingNone", "waitingRow", "strikeForms", "own", "how", "boosts", "boostClassDay", "boostRally", "boostBonus", "undercutDone"],
+          "properties": {
+            "strikeForms": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "string", "minLength": 1 } },
+            "how": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+          },
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
     "seat": {
       "$ref": "#/definitions/seat"
+    },
+    "shrine": {
+      "$ref": "#/definitions/shrine"
     },
     "expedition": {
       "$ref": "#/definitions/expedition"
@@ -302,6 +401,9 @@
     },
     "requests": {
       "$ref": "#/definitions/requests"
+    },
+    "help": {
+      "$ref": "#/definitions/help"
     },
     "exchange": {
       "$ref": "#/definitions/exchange"
@@ -637,9 +739,1067 @@
     },
     "members": {
       "$ref": "#/definitions/members"
+    },
+    "heroes": {
+      "$ref": "#/definitions/heroes"
+    },
+    "lands": {
+      "$ref": "#/definitions/lands"
+    },
+    "stall": {
+      "$ref": "#/definitions/stall"
     }
   },
   "definitions": {
+    "help": {
+      "description": "Pomoc przy budowach i przy pracy (1196 A i B; src/engine/guild-help.js, src/server/guild-help.js, src/client/guild-help.js): ile skraca jedna pomoc i ile pomocy przyjmie jedna budowa albo praca. Sława za pomoc jest w fame.help.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "share",
+        "minMinutes",
+        "maxHelps",
+        "texts"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "share": {
+          "description": "Ile całego czasu budowy albo pracy skraca jedna pomoc, jako ułamek (0.01 to 1%).",
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 0.1
+        },
+        "minMinutes": {
+          "description": "Najmniej tyle minut skraca jedna pomoc.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxHelps": {
+          "description": "Najwięcej pomocy przy jednej budowie albo pracy.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "texts": {
+          "type": "object",
+          "required": [
+            "title",
+            "intro",
+            "how",
+            "mine",
+            "others",
+            "build",
+            "left",
+            "helps",
+            "cut",
+            "help",
+            "helpAll",
+            "waiting",
+            "helped",
+            "full",
+            "helpers",
+            "noHelpers",
+            "cutTotal",
+            "noneMine",
+            "empty",
+            "allHelped",
+            "fame",
+            "done",
+            "doneAll",
+            "doneFame",
+            "doneNoFame",
+            "helpForms",
+            "errors"
+          ],
+          "properties": {
+            "how": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "build": {
+              "type": "string",
+              "pattern": "\\{building\\}"
+            },
+            "helpAll": {
+              "type": "string",
+              "pattern": "\\{count\\}"
+            },
+            "done": {
+              "type": "string",
+              "pattern": "\\{target\\}"
+            },
+            "helpForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "errors": {
+              "type": "object",
+              "required": [
+                "locked",
+                "noGuild",
+                "invalid",
+                "notMember",
+                "own",
+                "sameAccount",
+                "gone",
+                "helped",
+                "full",
+                "nothing",
+                "changed"
+              ],
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "shrine": {
+      "description": "Kącina: opiekun tygodnia (1201 A; src/engine/guild-shrine.js, src/server/guild-shrine.js, src/client/guild-shrine.js): budynek Siedziby, bogowie do wyboru, ich premie (jak skutki tygodni w weeks.json) i dziedziny w Próbach.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "offer",
+        "domainShare",
+        "gods",
+        "texts"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "id": {
+          "description": "Id budynku: jego obrazek to src/client/art/guild/<id>.png.",
+          "type": "string",
+          "pattern": "^[a-z]+(-[a-z]+)*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "offer": {
+          "description": "Ilu bogów jest co tydzień do wyboru.",
+          "type": "integer",
+          "minimum": 2
+        },
+        "domainShare": {
+          "description": "Jaka część tablicy Prób jest w tygodniu opiekuna z jego dziedziny (0.5 to połowa).",
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "gods": {
+          "type": "array",
+          "minItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name",
+              "genitive",
+              "title",
+              "effects",
+              "domain",
+              "domainText"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z]+(-[a-z]+)*$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "genitive": {
+                "description": "Imię w dopełniaczu: „pod opieką Peruna”.",
+                "type": "string",
+                "minLength": 1
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "effects": {
+                "description": "Premia dla członków, jak skutki tygodnia (weeks.json): rodzaj i procent.",
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "kind",
+                    "value"
+                  ],
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "xp",
+                        "gold",
+                        "items",
+                        "materials",
+                        "profession-xp",
+                        "herbs",
+                        "minerals",
+                        "camp",
+                        "rest",
+                        "upgrade",
+                        "reputation",
+                        "stat"
+                      ]
+                    },
+                    "stat": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "value": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 50
+                    }
+                  }
+                }
+              },
+              "domain": {
+                "description": "Rodzaje prób z trials.kinds, z których jest część tablicy Prób w tygodniu opiekuna.",
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "enum": [
+                    "killAny",
+                    "explore",
+                    "towers",
+                    "gatherAny",
+                    "brewAny",
+                    "makeAny",
+                    "process",
+                    "salvage",
+                    "orders",
+                    "upgrade",
+                    "gifts"
+                  ]
+                }
+              },
+              "domainText": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "texts": {
+          "type": "object",
+          "required": [
+            "title",
+            "intro",
+            "how",
+            "patron",
+            "patronNow",
+            "patronNone",
+            "until",
+            "bonus",
+            "domain",
+            "vote",
+            "voteUntil",
+            "voteForms",
+            "voters",
+            "cast",
+            "castTitle",
+            "castText",
+            "mine",
+            "voted",
+            "leading",
+            "tied",
+            "noVotes",
+            "line",
+            "lineNone",
+            "board",
+            "report",
+            "noGuild",
+            "errors"
+          ],
+          "properties": {
+            "how": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "voteForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "patronNow": {
+              "type": "string",
+              "pattern": "\\{god\\}"
+            },
+            "line": {
+              "type": "string",
+              "pattern": "\\{god\\}"
+            },
+            "board": {
+              "type": "string",
+              "pattern": "\\{god\\}"
+            },
+            "report": {
+              "type": "string",
+              "pattern": "\\{effects\\}"
+            },
+            "errors": {
+              "type": "object",
+              "required": [
+                "locked",
+                "noGuild",
+                "noGod",
+                "voted",
+                "changed"
+              ],
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "heroes": {
+      "description": "Bohaterowie tygodnia (1198 A; src/engine/guild-heroes.js, src/server/guild-heroes.js): wyróżnienia za poprzedni tydzień, w tej kolejności, nagroda i słowa karty.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kinds",
+        "reward",
+        "texts"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "kinds": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "names",
+              "units"
+            ],
+            "properties": {
+              "id": {
+                "enum": [
+                  "pillar",
+                  "slayer",
+                  "benefactor"
+                ]
+              },
+              "names": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": "Imię wyróżnienia dla mężczyzny i kobiety."
+              },
+              "units": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": "Rzeczownik po liczbie: jedna, kilka, wiele."
+              }
+            }
+          }
+        },
+        "reward": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "timePoints",
+            "packs"
+          ],
+          "properties": {
+            "timePoints": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "packs": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "lead",
+            "last",
+            "none",
+            "now",
+            "nobody",
+            "reward",
+            "badge",
+            "how",
+            "timePointForms"
+          ],
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "lead": {
+              "type": "string",
+              "minLength": 1
+            },
+            "last": {
+              "type": "string",
+              "minLength": 1
+            },
+            "none": {
+              "type": "string",
+              "minLength": 1
+            },
+            "now": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nobody": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reward": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{timePoints\\}"
+                }
+              ]
+            },
+            "badge": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{name\\}"
+                }
+              ]
+            },
+            "how": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "timePointForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "lands": {
+      "description": "Krainy pod sztandarem (1200 A; src/engine/guild-lands.js, src/server/guild-lands.js): Sława za krainę ze sztandarem, premia do złota i materiałów ze stworów i słowa.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fame",
+        "bonus",
+        "texts"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "fame": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Sława gildii za każdą krainę ze sztandarem, w tygodniu, w którym stoi sztandar."
+        },
+        "bonus": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "O ile więcej złota i materiałów ze stworów w krainie ze sztandarem gildii postaci."
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "lead",
+            "week",
+            "alone",
+            "empty",
+            "banners",
+            "noBanners",
+            "yours",
+            "ahead",
+            "tieWin",
+            "chase",
+            "tieLose",
+            "bonus",
+            "chip",
+            "ownBanner",
+            "otherBanner",
+            "how",
+            "howFame",
+            "howMembers"
+          ],
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "lead": {
+              "type": "string",
+              "minLength": 1
+            },
+            "week": {
+              "type": "string",
+              "minLength": 1
+            },
+            "alone": {
+              "type": "string",
+              "minLength": 1
+            },
+            "empty": {
+              "type": "string",
+              "minLength": 1
+            },
+            "banners": {
+              "type": "string",
+              "minLength": 1
+            },
+            "noBanners": {
+              "type": "string",
+              "minLength": 1
+            },
+            "yours": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{minutes\\}"
+                }
+              ]
+            },
+            "ahead": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{gap\\}"
+                },
+                {
+                  "pattern": "\\{tag\\}"
+                }
+              ]
+            },
+            "tieWin": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{tag\\}"
+                }
+              ]
+            },
+            "chase": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{gap\\}"
+                },
+                {
+                  "pattern": "\\{tag\\}"
+                }
+              ]
+            },
+            "tieLose": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{tag\\}"
+                }
+              ]
+            },
+            "bonus": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{bonus\\}"
+                }
+              ]
+            },
+            "chip": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{name\\}"
+                },
+                {
+                  "pattern": "\\{tag\\}"
+                }
+              ]
+            },
+            "ownBanner": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{bonus\\}"
+                }
+              ]
+            },
+            "otherBanner": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{name\\}"
+                },
+                {
+                  "pattern": "\\{tag\\}"
+                }
+              ]
+            },
+            "how": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "howFame": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{landFame\\}"
+                }
+              ]
+            },
+            "howMembers": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{landFame\\}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "stall": {
+      "description": "Znaki Gildii i Kram (1202 A; src/engine/guild-stall.js, src/server/guild-stall.js): towary Kramu z ceną w Znakach i limitem na tydzień (bez weekly: raz na zawsze) i słowa zakładki.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "goods",
+        "texts"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "goods": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "price"
+            ],
+            "properties": {
+              "id": {
+                "enum": [
+                  "pack",
+                  "ward-scroll",
+                  "item",
+                  "title",
+                  "frame"
+                ]
+              },
+              "price": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "weekly": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "achievement": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Osiągnięcie z tytułem (data/achievements.json), które daje towar."
+              },
+              "cosmetic": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Kosmetyk (data/cosmetics.json), który daje towar."
+              }
+            }
+          }
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "lead",
+            "balance",
+            "growing",
+            "once",
+            "owned",
+            "limitReached",
+            "slotTitle",
+            "slotLead",
+            "empty",
+            "outside",
+            "markForms",
+            "goods",
+            "weekly",
+            "buy",
+            "tooFew",
+            "worn",
+            "bought",
+            "how",
+            "errors"
+          ],
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "lead": {
+              "type": "string",
+              "minLength": 1
+            },
+            "balance": {
+              "type": "string",
+              "minLength": 1
+            },
+            "growing": {
+              "type": "string",
+              "minLength": 1
+            },
+            "once": {
+              "type": "string",
+              "minLength": 1
+            },
+            "owned": {
+              "type": "string",
+              "minLength": 1
+            },
+            "limitReached": {
+              "type": "string",
+              "minLength": 1
+            },
+            "slotTitle": {
+              "type": "string",
+              "minLength": 1
+            },
+            "slotLead": {
+              "type": "string",
+              "minLength": 1
+            },
+            "empty": {
+              "type": "string",
+              "minLength": 1
+            },
+            "outside": {
+              "type": "string",
+              "minLength": 1
+            },
+            "markForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "goods": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "pack",
+                "ward-scroll",
+                "item",
+                "title",
+                "frame"
+              ],
+              "properties": {
+                "pack": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "name",
+                    "description"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "ward-scroll": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "name",
+                    "description"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "item": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "name",
+                    "description"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "title": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "name",
+                    "description"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "frame": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "name",
+                    "description"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              }
+            },
+            "weekly": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{bought\\}"
+                },
+                {
+                  "pattern": "\\{limit\\}"
+                }
+              ]
+            },
+            "buy": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{price\\}"
+                }
+              ]
+            },
+            "tooFew": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{missing\\}"
+                }
+              ]
+            },
+            "worn": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{item\\}"
+                }
+              ]
+            },
+            "bought": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "pack",
+                "ward-scroll",
+                "item",
+                "title",
+                "frame"
+              ],
+              "properties": {
+                "pack": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "ward-scroll": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "item": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "frame": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "how": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "errors": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "unknown_good",
+                "owned",
+                "limit",
+                "invalid_slot",
+                "bag_full",
+                "no_guild",
+                "too_few_marks"
+              ],
+              "properties": {
+                "unknown_good": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "owned": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "limit": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "invalid_slot": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "bag_full": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "no_guild": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "too_few_marks": {
+                  "type": "string",
+                  "allOf": [
+                    {
+                      "pattern": "\\{marks\\}"
+                    },
+                    {
+                      "pattern": "\\{price\\}"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "members": {
       "description": "Ranking członków w zakładce Gildia (src/server/guild-members.js, src/client/guild-ranking.js; 897 A): jego słowa.",
       "type": "object",
@@ -739,9 +1899,15 @@
             "trials",
             "requests",
             "exchange",
-            "war"
+            "war",
+            "lands",
+            "help"
           ],
           "properties": {
+            "lands": {
+              "type": "string",
+              "minLength": 1
+            },
             "beast": {
               "type": "string",
               "minLength": 1
@@ -763,6 +1929,10 @@
               "minLength": 1
             },
             "war": {
+              "type": "string",
+              "minLength": 1
+            },
+            "help": {
               "type": "string",
               "minLength": 1
             }
@@ -2057,6 +3227,7 @@
         "trials",
         "requests",
         "exchange",
+        "help",
         "war",
         "texts"
       ],
@@ -2145,6 +3316,25 @@
           ],
           "properties": {
             "perExchange": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "cap": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "help": {
+          "description": "Pomoc przy budowach i pracy (1196 A i B): Sława za każdą pomoc, z jednej pomagającej postaci najwyżej cap pomocy w tygodniu.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "perHelp",
+            "cap"
+          ],
+          "properties": {
+            "perHelp": {
               "type": "integer",
               "minimum": 0
             },

@@ -9,6 +9,7 @@
     "requests": { "name": "Requests" },
     "exchange": { "name": "Exchange" },
     "chest": { "name": "Chest" },
+    "stall": { "name": "Stall" },
     "war": { "name": "War" }
   },
   "seat": {
@@ -71,6 +72,56 @@
         "tooMuch": "This building will take at most {room} more.",
         "notAllowed": "Buildings are marked by the leader or a deputy.",
         "invalidMark": "Choose whether the building is to be preferred.",
+        "changed": "Something changed in the meantime. Try once more."
+      }
+    }
+  },
+  "shrine": {
+    "name": "Temple",
+    "gods": {
+      "perun": { "name": "Perun", "genitive": "Perun's", "title": "god of thunder and war", "domainText": "fights, Towers, explorations and salvaging loot" },
+      "weles": { "name": "Veles", "genitive": "Veles's", "title": "god of wealth and the wilds", "domainText": "fights, explorations, Settlement orders and Requests" },
+      "swarog": { "name": "Svarog", "genitive": "Svarog's", "title": "god of fire and the forge", "domainText": "the Anvil, the Workshop and the Salvage Table" },
+      "mokosz": { "name": "Mokosh", "genitive": "Mokosh's", "title": "goddess of the earth and herbs", "domainText": "herbs, potions, processing materials and Settlement orders" }
+    },
+    "texts": {
+      "title": "Temple",
+      "intro": "In the Temple your guild picks a patron every week. The god who wins the vote gives every member a bonus for the whole next week.",
+      "how": [
+        "Three gods are on offer every week. Every member casts one vote, until Sunday midnight. A vote cannot be changed.",
+        "On Monday at midnight the god with the most votes wins. In a tie, the god the leader voted for wins; if the leader voted for none of them, the one that reached that many votes first. If nobody votes, the guild has no patron for the week.",
+        "The patron gives every guild member a bonus for the whole week, like the Weeks: an exploration and a profession's work take the bonus of the moment they began, and the Anvil of the moment of upgrading. Whoever joins the guild during the week has the bonus at once, and whoever leaves loses it.",
+        "That week half of the trials on the Trials board are from the patron's domain and bear its sign.",
+        "The Temple stands in the Hall from the start and has no levels."
+      ],
+      "patron": "This week's patron",
+      "patronNow": "This week the guild is under {god} protection.",
+      "patronNone": "This week the guild has no patron, because nobody voted last week.",
+      "until": "until Sunday",
+      "bonus": "Bonus: {bonus}",
+      "domain": "Trials: {domain}",
+      "vote": "Vote for next week",
+      "voteUntil": "Votes until Sunday midnight.",
+      "voteForms": ["vote", "votes", "votes"],
+      "voters": "Voted: {names}.",
+      "cast": "Vote",
+      "castTitle": "Cast your vote?",
+      "castText": "Your vote: {god}. It cannot be changed until the end of the week.",
+      "mine": "Your vote",
+      "voted": "Your vote: {god}.",
+      "leading": "In the lead: {god}.",
+      "tied": "A tie. The leader's vote decides, or without it the god that reached that many votes first. Winning now: {god}.",
+      "noVotes": "Nobody has voted yet.",
+      "line": "Under {god} protection · {bonus}",
+      "lineNone": "No patron this week",
+      "board": "A week under {god} protection: half the trials are from the patron's domain and bear its sign.",
+      "report": "{god} protection: {effects}.",
+      "noGuild": "Every guild's Hall has a Temple. Join a guild or found your own.",
+      "errors": {
+        "locked": "You will unlock guilds at character level {level}.",
+        "noGuild": "You are not in a guild.",
+        "noGod": "This god is not on offer this week.",
+        "voted": "Your vote this week has already been cast: {god}.",
         "changed": "Something changed in the meantime. Try once more."
       }
     }
@@ -189,6 +240,108 @@
         "claimed": "This chest is already open.",
         "bagFull": "The bag is full. Make room in it to open the chest."
       }
+    }
+  },
+  "chronicle": {
+    "texts": {
+      "beastFell": "The Guild Beast has fallen: {monster}. Last blow: {name}.",
+      "guardianFell": "The Expedition's stage {stage} guardian has fallen: {monster}. Last blow: {name}.",
+      "guardianLast": "The Expedition's stage {stage} guardian has fallen: {monster}. Last blow: {name}. The week's route is done!",
+      "trials": "Guild Trials: threshold {threshold} of {thresholds} reached.",
+      "seat": "Guild Hall: the {building} reaches level {level}.",
+      "warWon": "League evening: a win against [{tag}] {guild}, fights {won}:{lost}.",
+      "warLost": "League evening: a loss to [{tag}] {guild}, fights {won}:{lost}.",
+      "warDraw": "League evening: a draw with [{tag}] {guild}, fights {won}:{lost}.",
+      "joined": "New guild member: {name}.",
+      "rally": "Rally horn! Until {until}, attacks on the Beast and the guardian hit {percent}% harder.",
+      "heroes": "Heroes of the week: {heroes}. Each honour brings {timePoints} and a card pack.",
+      "hero": "{title} – {name}",
+      "banner": "Your guild raises its banner in: {lands}. Until Sunday members get +{percent}% gold and materials from creatures there.",
+      "banners": "Your guild raises its banner in: {lands}. Until Sunday members get +{percent}% gold and materials from creatures there.",
+      "patron": "Temple: this week the guild is under {god} protection ({bonus}).",
+      "patronNone": "Temple: this week the guild has no patron, because nobody voted last week.",
+      "warden": "{name} becomes a Banner Warden.",
+      "wardenFemale": "{name} becomes a Banner Warden."
+    }
+  },
+  "classDay": {
+    "texts": {
+      "title": "Classes of the day",
+      "bonus": "+{percent}%",
+      "own": "Today is your class's day: your attacks hit {percent}% harder.",
+      "how": "Every day from midnight two classes are the classes of the day, together with their evolutions. Their attacks on the Beast and the Expedition's guardians hit {percent}% harder. Each class has its own days of the week: {schedule}.",
+      "dayNames": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      "classDays": "{class} {days}"
+    }
+  },
+  "rally": {
+    "texts": {
+      "title": "Rally horn",
+      "lead": "The leader or a deputy sets the hour of the rally. For an hour, attacks on the Beast and the guardian hit {percent}% harder.",
+      "how": [
+        "The leader or a deputy sets the hour of the rally: right away or on the hour, at most a day ahead. The guild has at most one rally a day.",
+        "When the rally starts, every member gets a phone notification, and a System line appears in the guild chat.",
+        "For {minutes} minutes, all members' attacks on the Beast and the Expedition's guardian hit {percent}% harder. The card shows who came, that is, who attacked in that time.",
+        "Whoever misses it loses nothing: their attacks stay for the rest of the day."
+      ],
+      "none": "No rally today.",
+      "noneMember": "The leader or a deputy sets the rally.",
+      "planned": "Rally {day} at {hour}",
+      "plannedBy": "Called by: {name}",
+      "startsIn": "Starts in {time}.",
+      "on": "The rally is on until {hour}!",
+      "onBonus": "Attacks on the Beast and the guardian hit {percent}% harder.",
+      "came": "Came: {count}",
+      "cameNone": "Nobody has come yet. Attack the Beast or the guardian to get on the list.",
+      "ended": "Today's rally: {from}–{to}",
+      "endedNone": "Nobody came to the rally.",
+      "today": "today",
+      "tomorrow": "tomorrow",
+      "now": "Right away",
+      "hourLabel": "Rally hour",
+      "set": "Set the rally",
+      "setDone": "Rally set: {day} at {hour}.",
+      "setNow": "The rally is on from now until {hour}.",
+      "cancel": "Call off the rally",
+      "cancelAsk": "Call off the rally?",
+      "canceled": "Rally called off.",
+      "pushTitle": "Rally horn: {guild}",
+      "pushBody": "The rally is on until {hour}! Attacks on the Beast and the guardian hit {percent}% harder.",
+      "errors": {
+        "locked": "You unlock guilds at character level {level}.",
+        "noGuild": "You are not in a guild.",
+        "notLeader": "The leader or a deputy sets the rally.",
+        "badHour": "Pick the rally hour from the list.",
+        "dayTaken": "The guild already has a rally on that day.",
+        "started": "This rally has already started, so it cannot be called off.",
+        "gone": "This rally is no longer there.",
+        "changed": "The guild changed in the meantime. Try again."
+      }
+    }
+  },
+  "undercut": {
+    "texts": {
+      "strike": "Strike",
+      "undercut": "Hamstring",
+      "strikeNote": "Full damage.",
+      "strikeBonus": "Full damage and +{percent}% from a hamstring: {name}.",
+      "undercutNote": "Half damage, but the next {uses} strikes by other members hit {percent}% harder.",
+      "waiting": "Hamstrings waiting: {count}",
+      "waitingNone": "No hamstring is waiting.",
+      "waitingRow": "{name}: {left} {strikes}",
+      "strikeForms": ["strike", "strikes", "strikes"],
+      "own": "Your hamstring is waiting for other members' strikes.",
+      "how": [
+        "Before each attack you choose “Strike” or “Hamstring”.",
+        "A hamstring deals half damage, but the next {uses} strikes by other members hit {percent}% harder. You do not benefit from your own hamstring.",
+        "Waiting hamstrings queue up: each strike by another member uses up the oldest one. They are gone when the beast or the guardian falls, and at the end of the week.",
+        "The bonuses multiply: the class of the day, the rally and the hamstring."
+      ],
+      "boosts": "Bonuses: {boosts}.",
+      "boostClassDay": "class of the day +{percent}%",
+      "boostRally": "rally +{percent}%",
+      "boostBonus": "hamstring ({name}) +{percent}%",
+      "undercutDone": "Hamstring! The next {uses} strikes by other members hit {percent}% harder."
     }
   },
   "trials": {
@@ -350,6 +503,55 @@
         "noGift": "There is no such gift.",
         "thanked": "Thanks for this gift have already been sent.",
         "levelOther": "{name} can receive gifts only from level {level}."
+      }
+    }
+  },
+  "help": {
+    "texts": {
+      "title": "Help with builds and work",
+      "intro": "Help your guild's members: every help shortens their build or their work in a profession.",
+      "how": [
+        "Here you see the builds in the Camp and the Stronghold and the profession work of your guild's members. Every member can help, except characters of the same account.",
+        "Each help shortens a build or a work by {share}% of its time, but at least by {min}. One build or work takes at most {max} helps, and you help with it once.",
+        "For each help you get {perHelp} of Fame for the guild, at most {cap} a week. The week starts on Monday at midnight.",
+        "A yellow dot by the Guild tab means someone needs help. “Help everyone” helps at once with every build and work you still can.",
+        "At the top you see your own build and work, with the names of those who helped you."
+      ],
+      "mine": "Your build and work",
+      "others": "Who needs help",
+      "build": "{building}, level {level}",
+      "left": "{time} left",
+      "helps": "help {count} of {max}",
+      "cut": "−{time}",
+      "help": "Help",
+      "helpAll": "Help everyone ({count})",
+      "waiting": "Waiting for your help: {count}.",
+      "helped": "Help sent",
+      "full": "Fully helped",
+      "helpers": "Helped by: {names}.",
+      "noHelpers": "Nobody has helped yet.",
+      "cutTotal": "Help has shortened it by {time}.",
+      "noneMine": "You are not building anything or working in a profession now.",
+      "empty": "Nobody else in the guild is building or working in a profession now.",
+      "allHelped": "Nobody needs your help right now. New builds and work will show up here by themselves.",
+      "fame": "Fame for helping this week: {count} of {cap}.",
+      "done": "Help sent to {name}: {target} will finish {time} sooner.",
+      "doneAll": "Help sent {count}.",
+      "doneFame": "You get {points} of Fame.",
+      "doneNoFame": "You already have all of this week's Fame for helping.",
+      "helpForms": ["time", "times", "times"],
+      "errors": {
+        "locked": "You will unlock guilds at character level {level}.",
+        "noGuild": "You are not in a guild.",
+        "invalid": "It is not clear what to help with.",
+        "notMember": "This character is no longer in your guild.",
+        "own": "You do not help with your own build and work.",
+        "sameAccount": "Characters of one account do not help each other.",
+        "gone": "This build or work has already finished.",
+        "helped": "Your help is already on this build or work.",
+        "full": "This build or work already has all its helps.",
+        "nothing": "There is nobody to help now.",
+        "changed": "Something changed in the meantime. Try once more."
       }
     }
   },
@@ -620,6 +822,7 @@
         "Guild Trials: {perTrial} for each trial completed. At most {trialCap} trials count from one character, as on the Trials bar.",
         "Guild Requests: {perPiece} for each piece given to a guild member. At most {giftCap} pieces count from one character.",
         "Exchange: {perExchange} for each exchange. At most {exchangeCap} exchanges count from one character that takes offers.",
+        "Help with builds and work: {perHelp} for each help. At most {helpCap} helps a week count from one character.",
         "“All time” is the Fame of all the weeks, this one included.",
         "The guild with the most Fame in the previous week has a gold tag for the whole week. In a tie, the older guild wins."
       ],
@@ -636,16 +839,17 @@
     "views": { "activity": "Activity", "donations": "Donations" },
     "periods": { "week": "This week", "all": "All time" },
     "columns": { "member": "Member", "fame": "Fame", "gold": "Gold" },
-    "parts": { "beast": "Beast", "expedition": "Expedition", "trials": "Trials", "requests": "Requests", "exchange": "Exchange", "war": "War" },
+    "parts": { "beast": "Beast", "expedition": "Expedition", "trials": "Trials", "requests": "Requests", "exchange": "Exchange", "war": "War", "lands": "Lands", "help": "Help" },
     "own": "Your place: {place} of {count}.",
     "tap": "Tap a member to see where their Fame comes from.",
-    "lead": "Here you can see how much Fame each member brought the guild and how much they donated to the Hall. The ranking gives nothing; it only shows.",
+    "lead": "Here you can see how much Fame each member brought the guild and how much they donated to the Hall. Every point of Fame also gives a Guild Mark, and the best of the week become Heroes of the week.",
     "how": [
       "Guild Beast: {beastPercent} for each full 1% of the bar the member knocked off, and {beastFell} for the final blow.",
       "Guild Expedition: {perGuardian} for each guardian defeated, and {lastGuardian} for the seventh. The points are shared by the damage dealt to the guardian.",
       "Guild Trials: {perTrial} for each trial completed, at most {trialCap} trials a week.",
       "Guild Requests: {perPiece} for each piece given, at most {giftCap} pieces a week.",
       "Exchange: {perExchange} for each offer taken, at most {exchangeCap} exchanges a week.",
+      "Help with builds and work: {perHelp} for each help, at most {helpCap} helps a week.",
       "A member gets whole points only, so all the members' Fame together may be a little lower than the guild's.",
       "Donations are the gold and resources given to the Hall's buildings.",
       "“This week” starts on Monday at midnight. “All time” counts from {since}."
@@ -653,6 +857,162 @@
     "howWar": "Guild war league: Fame for the guild's place in the week's league, shared equally by everyone who fought in its matches.",
     "earlier": "Earlier donations, from before the game recorded who gave them: {amounts}.",
     "list": { "comma": ", ", "and": " and " }
+  },
+  "heroes": {
+    "kinds": {
+      "pillar": {
+        "names": [
+          "Guild Pillar",
+          "Guild Pillar"
+        ],
+        "units": [
+          "point of Fame",
+          "points of Fame",
+          "points of Fame"
+        ]
+      },
+      "slayer": {
+        "names": [
+          "Slayer",
+          "Slayer"
+        ],
+        "units": [
+          "damage",
+          "damage",
+          "damage"
+        ]
+      },
+      "benefactor": {
+        "names": [
+          "Benefactor",
+          "Benefactor"
+        ],
+        "units": [
+          "piece",
+          "pieces",
+          "pieces"
+        ]
+      }
+    },
+    "texts": {
+      "title": "Heroes of the week",
+      "lead": "Every Monday at midnight the System honours the guild's best members of the previous week.",
+      "last": "Heroes of the previous week",
+      "none": "Nobody in the guild earned an honour in the previous week.",
+      "now": "This week: who leads",
+      "nobody": "nobody yet",
+      "reward": "For each honour you get {timePoints} and a card pack, and a badge shines by your name for the whole week.",
+      "badge": "{name} of the previous week",
+      "how": [
+        "Guild Pillar: the most Fame brought to the guild, counted as in the members' ranking.",
+        "Slayer: the most damage dealt to the Guild Beast and the Guild Expedition's guardians.",
+        "Benefactor: the most pieces given to other members in Guild Requests.",
+        "Only those in the guild on Monday count. In a tie, the one who has been in the guild longer wins.",
+        "For each honour you get {timePoints} and a card pack. The badge by your name shows on the members' list and on your character card until Sunday."
+      ],
+      "timePointForms": [
+        "Time Point",
+        "Time Points",
+        "Time Points"
+      ]
+    }
+  },
+  "lands": {
+    "texts": {
+      "title": "Lands under the banner",
+      "lead": "Each week every land belongs to the guild that spent the most exploration minutes there. On Monday at midnight the winner raises its banner there.",
+      "week": "This week",
+      "yours": "Your guild: {minutes}",
+      "ahead": "You lead by {gap} over [{tag}]",
+      "tieWin": "Tied with [{tag}]: in a tie the older guild wins, and that is yours",
+      "alone": "You lead: no other guild has been here yet",
+      "chase": "Chasing [{tag}]: {gap} short",
+      "tieLose": "Tied with [{tag}]: in a tie the older guild wins, so you need one more minute",
+      "empty": "No guild has explored yet this week. Every minute of your guild brings a banner closer.",
+      "banners": "Your guild's banners until Sunday",
+      "noBanners": "This week your guild has no banner in any land.",
+      "bonus": "+{bonus}% gold and materials from creatures",
+      "chip": "Banner of the guild {name} [{tag}] until Sunday",
+      "ownBanner": "Your guild's banner: +{bonus}% gold and materials from creatures in this land until Sunday.",
+      "otherBanner": "The banner of the guild {name} [{tag}] stands here until Sunday.",
+      "how": [
+        "Every exploration minute counts for the land of the exploration once the member claims the report. On a party trip each member counts their own minutes.",
+        "On Monday at midnight the land goes to the guild with the most minutes. In a tie the older guild wins, and where nobody explored there is no banner.",
+        "The banner stands for the whole week, and every player sees the guild's tag on the land's card.",
+        "For each land the guild gets {fame} of Fame, and its members share it by their minutes in that land.",
+        "Members of the guild with the banner get +{bonus}% gold and materials from creatures in that land. From class level 250 the bonus counts from the halved rewards."
+      ],
+      "howFame": "Lands under the banner: {landFame} for each land where the guild raises its banner, in the week it stands.",
+      "howMembers": "Lands under the banner: {landFame} for a land with the banner, split by the members' minutes in that land."
+    }
+  },
+  "stall": {
+    "texts": {
+      "title": "Guild Stall",
+      "lead": "Every point of Fame you bring the guild gives you one Guild Mark. Spend the Marks here on what you need.",
+      "balance": "Your Guild Marks",
+      "growing": "Marks come at once, with every point of Fame.",
+      "markForms": [
+        "Mark",
+        "Marks",
+        "Marks"
+      ],
+      "goods": {
+        "pack": {
+          "name": "Card pack",
+          "description": "Three System Deck cards, as at Szczęsny's. Open it in the Games Parlour, on the Cards tab."
+        },
+        "ward-scroll": {
+          "name": "Ward Scroll",
+          "description": "Guards an item against breaking when you upgrade it on the Anvil from +7."
+        },
+        "item": {
+          "name": "An item of your class",
+          "description": "For the equipment slot you choose, at your level, of a rarity as from a champion's chest."
+        },
+        "title": {
+          "name": "Title “{title}”",
+          "description": "The title shows in your profile and in the Ranking. Put it on in Achievements, on the Character tab."
+        },
+        "frame": {
+          "name": "Banner Frame",
+          "description": "A portrait frame with the guild banner. Put it on in the System Shop, on the Frames tab."
+        }
+      },
+      "weekly": "This week: {bought} of {limit}",
+      "once": "Bought once",
+      "owned": "You have it",
+      "buy": "Buy for {price}",
+      "limitReached": "This week's limit is reached. More on Monday.",
+      "tooFew": "{missing} short.",
+      "slotTitle": "An item for the slot you choose",
+      "slotLead": "Choose an equipment slot. You get an item of your class at your level, of a rarity as from a champion's chest.",
+      "worn": "You wear: {item}",
+      "empty": "Empty",
+      "bought": {
+        "pack": "The card pack waits in the Games Parlour, on the Cards tab.",
+        "ward-scroll": "You have one more Ward Scroll. Use it on the Anvil.",
+        "item": "{item} goes into your bag.",
+        "title": "The title “{title}” is yours. Put it on in Achievements, on the Character tab.",
+        "frame": "The Banner Frame is yours. Put it on in the System Shop, on the Frames tab."
+      },
+      "outside": "The Guild Stall is for guild members only. Your Marks stay with you and wait until you join a guild.",
+      "how": [
+        "Every point of Fame you bring the guild gives you one Guild Mark at once. Fame counts as in the members' ranking.",
+        "Your Marks stay with you after you leave the guild, but the Stall is for members only.",
+        "The week's limits renew on Monday at midnight. The title and the frame are bought once.",
+        "The item is of your class, at your level and of a rarity as from a champion's chest. It goes into your bag, so it needs room there."
+      ],
+      "errors": {
+        "unknown_good": "There is no such item for sale.",
+        "owned": "You already have it.",
+        "limit": "This week's limit for it is reached. You can buy the next one on Monday.",
+        "invalid_slot": "Choose an equipment slot.",
+        "too_few_marks": "You have too few Guild Marks: {marks} of {price}.",
+        "bag_full": "Your bag is full. Make room in it for the item.",
+        "no_guild": "The Guild Stall is for guild members only."
+      }
+    }
   },
   "ranks": {
     "short": { "leader": "R4", "deputy": "R3", "member": "R2", "novice": "R1" },

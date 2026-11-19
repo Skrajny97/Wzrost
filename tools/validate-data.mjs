@@ -829,7 +829,10 @@ function checkReferences(data) {
   errors.push(...checkLabyrinth(data, { stats, elements, rarities }));
   errors.push(...checkCards(data, { rarities }));
   errors.push(...checkGuildSeat(data, { resources }));
+  errors.push(...checkGuildShrine(data, { stats }));
   errors.push(...checkGuildExpedition(data));
+  errors.push(...checkGuildStrike(data));
+  errors.push(...checkGuildWeek(data));
   errors.push(...checkGuildWar(data));
   errors.push(...checkWeeks(data, { stats }));
   errors.push(...checkPayments(data));
@@ -927,6 +930,36 @@ function checkGuildExpedition(data) {
   return errors;
 }
 
+// The Bohaterowie tygodnia, the Krainy pod sztandarem and the Kram Gildii
+// (guilds.json heroes, lands, stall; 1198 A, 1200 A, 1202 A): each hero's
+// badge, the Znak's and the banner's pictures (src/client/art/icons); the
+// Kram's tab before the Wojna; each good of the Kram once, a weekly good
+// with its limit and one bought once with what it gives: the title of an
+// achievement (achievements.json) counted by the Kram, and a frame of the
+// Sklep Systemu given by the Kram alone (cosmetics.json, event guild).
+function checkGuildWeek(data) {
+  const errors = [];
+  const { heroes, stall, tabs } = data.guilds;
+  for (const kind of heroes.kinds) {
+    if (!existsSync(new URL(`art/icons/hero-${kind.id}.png`, CLIENT_DIR))) errors.push(`guilds.json: wyróżnienie ${kind.id} nie ma znaczka src/client/art/icons/hero-${kind.id}.png`);
+  }
+  for (const icon of ['guild-mark', 'land-banner']) {
+    if (!existsSync(new URL(`art/icons/${icon}.png`, CLIENT_DIR))) errors.push(`guilds.json: brak obrazka src/client/art/icons/${icon}.png`);
+  }
+  const ids = tabs.map((tab) => tab.id);
+  if (!ids.includes('stall') || (ids.includes('war') && ids.indexOf('stall') > ids.indexOf('war'))) errors.push('guilds.json: Kram (stall) powinien być zakładką strony Gildii przed Wojną');
+  uniqueIds(errors, 'guilds (stall)', stall.goods);
+  const achievements = new Map(data.achievements.groups.flatMap((group) => group.list).map((one) => [one.id, one]));
+  const cosmetics = new Map(data.cosmetics.items.map((item) => [item.id, item]));
+  for (const good of stall.goods) {
+    const once = good.achievement !== undefined || good.cosmetic !== undefined;
+    if (once === (good.weekly !== undefined)) errors.push(`guilds.json: towar Kramu ${good.id} ma albo limit tygodnia (weekly), albo to, co daje raz (achievement, cosmetic)`);
+    if (good.achievement !== undefined && achievements.get(good.achievement)?.count !== 'bannerWarden') errors.push(`guilds.json: towar Kramu ${good.id} daje osiągnięcie "${good.achievement}", którego nie liczy Kram (count bannerWarden)`);
+    if (good.cosmetic !== undefined && cosmetics.get(good.cosmetic)?.event !== 'guild') errors.push(`guilds.json: towar Kramu ${good.id} daje kosmetyk "${good.cosmetic}", którego nie daje tylko Kram (event guild)`);
+  }
+  return errors;
+}
+
 // The Siedziba Gildii (guilds.json, seat; 616 A): buildings of their own
 // ids, each taking a known camp resource beside gold and with its picture
 // (src/client/art/guild); the Gildia page has its tab.
@@ -939,6 +972,61 @@ function checkGuildSeat(data, { resources }) {
     if (!existsSync(new URL(`art/guild/${building.id}.png`, CLIENT_DIR))) errors.push(`guilds.json: budynek Siedziby ${building.id} nie ma obrazka src/client/art/guild/${building.id}.png`);
   }
   if (!data.guilds.tabs.some((tab) => tab.id === 'seat')) errors.push('guilds.json: strona Gildii nie ma zakładki Siedziby (seat)');
+  return errors;
+}
+
+// The classes of the day, the rally and the podcięcia at the Bestia and the
+// strażnicy (guilds.json classDay, rally, undercut; 1197, 1199 A, 1203):
+// the weekly schedule names known base classes, gives every class some day
+// and each about as many (at most one day apart), and the icons of the
+// rally and of the two attacks are there (src/client/art/icons).
+function checkGuildStrike(data) {
+  const errors = [];
+  const classes = new Set(data.classes.map((cls) => cls.id));
+  const days = new Map([...classes].map((id) => [id, 0]));
+  for (const [index, pair] of data.guilds.classDay.schedule.entries()) {
+    for (const id of pair) {
+      if (!classes.has(id)) errors.push(`guilds.json: klasa dnia ${index + 1}. dnia tygodnia "${id}" nie jest klasą z classes.json`);
+      else days.set(id, days.get(id) + 1);
+    }
+  }
+  const counts = [...days.values()];
+  if (counts.some((count) => count === 0)) errors.push(`guilds.json: nie każda klasa ma swój dzień klasy dnia (${[...days].map(([id, count]) => `${id}: ${count}`).join(', ')})`);
+  if (Math.max(...counts) - Math.min(...counts) > 1) errors.push(`guilds.json: klasy dnia mają nierówno dni (${[...days].map(([id, count]) => `${id}: ${count}`).join(', ')})`);
+  for (const id of ['rally-horn', 'beast-strike', 'beast-undercut']) {
+    if (!existsSync(new URL(`art/icons/${id}.png`, CLIENT_DIR))) errors.push(`guilds.json: brak ikony src/client/art/icons/${id}.png`);
+  }
+  return errors;
+}
+
+// The Kącina (guilds.json, shrine; 1201 A): its picture beside the
+// Siedziba's buildings, an id of its own among them; gods of their own ids,
+// each with its bust (src/client/art/guild/gods), effects of a known stat,
+// and a domain of the Próby's kinds big enough for its share of the board
+// (each kind in every size, no pair twice) with as many pairs left outside
+// it for the rest; no more gods offered a week than there are.
+function checkGuildShrine(data, { stats }) {
+  const errors = [];
+  const { shrine, seat, trials } = data.guilds;
+  if (seat.buildings.some((building) => building.id === shrine.id)) errors.push(`guilds.json: Kącina ma id budynku Siedziby "${shrine.id}"`);
+  if (!existsSync(new URL(`art/guild/${shrine.id}.png`, CLIENT_DIR))) errors.push(`guilds.json: Kącina nie ma obrazka src/client/art/guild/${shrine.id}.png`);
+  uniqueIds(errors, 'guilds (shrine)', shrine.gods);
+  if (shrine.offer > shrine.gods.length) errors.push(`guilds.json: Kącina daje do wyboru ${shrine.offer} bogów, a ma ich ${shrine.gods.length}`);
+  const kinds = new Set(trials.kinds.map((kind) => kind.id));
+  const half = Math.round(trials.board * shrine.domainShare);
+  for (const god of shrine.gods) {
+    if (!existsSync(new URL(`art/guild/gods/${god.id}.png`, CLIENT_DIR))) errors.push(`guilds.json: bóg ${god.id} nie ma obrazka src/client/art/guild/gods/${god.id}.png`);
+    for (const effect of god.effects) {
+      if (effect.kind === 'stat' && !stats.has(effect.stat)) errors.push(`guilds.json: bóg ${god.id} wzmacnia nieznaną statystykę "${effect.stat}"`);
+      if (effect.kind !== 'stat' && effect.stat) errors.push(`guilds.json: bóg ${god.id}: statystyka tylko przy rodzaju stat`);
+      if (!data.weeks.kinds[effect.kind]) errors.push(`guilds.json: bóg ${god.id} daje premię rodzaju "${effect.kind}", którego nie ma w weeks.json`);
+    }
+    for (const kind of god.domain) if (!kinds.has(kind)) errors.push(`guilds.json: dziedzina boga ${god.id} ma nieznany rodzaj próby "${kind}"`);
+    const inside = god.domain.filter((kind) => kinds.has(kind)).length * trials.sizes.length;
+    const outside = (kinds.size - god.domain.filter((kind) => kinds.has(kind)).length) * trials.sizes.length;
+    if (inside < half) errors.push(`guilds.json: dziedzina boga ${god.id} daje ${inside} prób, a tablica potrzebuje z niej ${half}`);
+    if (outside < trials.board - half) errors.push(`guilds.json: poza dziedziną boga ${god.id} jest ${outside} prób, a tablica potrzebuje ${trials.board - half}`);
+  }
   return errors;
 }
 
