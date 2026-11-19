@@ -1,0 +1,14 @@
+{
+  "id": "hero-benefactor",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "an open hand palm up holding a small gift wrapped in red cloth and tied with a golden ribbon, the symbol alone, no background, single inventory item icon, bold clean outline",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024032116615931194
+  },
+  "images": 1
+}
