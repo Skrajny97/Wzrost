@@ -14,6 +14,19 @@
 //   node tools/difficulty-sim.mjs --set monsters.endGame.damage=0.5 --json out.json --rare 200
 //   node tools/difficulty-sim.mjs --models realistic-nocomp,realistic-noevo   one part left out
 //   node tools/difficulty-sim.mjs --hard                       Trudne wyprawy (629 A)
+//   node tools/difficulty-sim.mjs --party 1,2,3 --levels 250,300   alone and in a Drużyna of 2 and 3
+//
+// `--party N` (N 2 or 3): a Drużyna's trip instead of the player with its
+// companions (partyRoster below): N players of the model and level fight
+// together, as the game sends a Drużyna (parties.js, trips.js), with no
+// companions. The class measured leads the trip: its potions are the
+// trip's, the other players carry none (a member's own are not taken), and
+// each has its own trophies. The others' classes change from one
+// exploration to the next as the companions' do (all pairs of classes in
+// turn), each with its own draw of the gear. The HP measured is the
+// leader's, as the player's alone; the party's average is in the JSON
+// (`partyEndHp`). `1` is the player alone with its companions, as without
+// the option.
 //
 // Models: `typical` (tools/simulate.mjs), `casual` (the least any player of
 // the level has: the evolution, which the class waits for at 50 and 100, and
@@ -252,6 +265,45 @@ function playersOf(model, classId, level, content) {
   return Array.from({ length: sets }, (_, set) => playerOf(model, classId, level, content, set));
 }
 
+// playersOf, made once per content, model, class and level: the other
+// players of a Drużyna come again and again.
+const madePlayers = new WeakMap();
+function playersMade(model, classId, level, content) {
+  if (!madePlayers.has(content)) madePlayers.set(content, new Map());
+  const made = madePlayers.get(content);
+  const key = `${model}:${classId}:${level}`;
+  if (!made.has(key)) made.set(key, playersOf(model, classId, level, content));
+  return made.get(key);
+}
+
+// The classes of the other players of a Drużyna of `size` on its
+// `index`-th trip: as the companions' (companionsOf), all pairs of classes
+// in turn.
+export function partyClasses(size, index, content) {
+  const classes = content.classes.map((cls) => cls.id);
+  const first = index % classes.length;
+  const second = (first + 1 + (Math.floor(index / classes.length) % (classes.length - 1))) % classes.length;
+  return [first, second].slice(0, size - 1).map((which) => classes[which]);
+}
+
+// The roster of a Drużyna's trip (simulateHunt's `roster`, as parties.js
+// sends it): the leader (`leader`, with the trip's potions and its mark),
+// then `size` - 1 players of the model and level, each at full HP with its
+// own trophies and no potions.
+export function partyRoster({ model, level, size, index, leader, area, minutes }, content) {
+  const kit = roadKit(leader.plan, area, minutes, content);
+  const full = (one) => engine.playerCombatant({ character: one.character, equipped: one.equipped, name: 'Symulacja', area }, content).maxHp;
+  const members = partyClasses(size, index, content).map((classId, n) => {
+    const sets = playersMade(model, classId, level, content);
+    const one = sets[(index + n + 1) % sets.length];
+    return { id: `p${n + 1}`, name: `Gracz ${n + 2}`, character: one.character, equipped: one.equipped, hp: full(one), windows: {}, trophies: roadKit(one.plan, area, minutes, content).trophies ?? {} };
+  });
+  return [
+    { id: 'lead', name: 'Symulacja', character: leader.character, equipped: leader.equipped, hp: full(leader), potions: kit.potions ?? {}, healBelow: kit.healBelow, windows: {}, trophies: kit.trophies ?? {} },
+    ...members,
+  ];
+}
+
 // The companions of a realistic player on its `index`-th exploration: the
 // classes, skills and traits change from one to the next.
 export function companionsOf(plan, level, index, content) {
@@ -310,23 +362,43 @@ export function roadKit(plan, area, minutes, content) {
   return { potions, healBelow: plan.healBelow, trophies };
 }
 
+// The `index`-th exploration of `minutes` of a model's player (`one`, its
+// draw of the gear, at `hp`) in `area`: alone with its companions, or as
+// the leader of a Drużyna's trip of `party` players (partyRoster).
+// `kitMinutes`: the length the potions are taken for, the exploration's own
+// by default. A Drużyna's trip is never a Trudna wyprawa (`hard`), as in
+// the game.
+function explore({ model, level, one, hp, area, minutes, kitMinutes = minutes, index, party, seed, hard = false, rumor }, content) {
+  const base = { character: one.character, equipped: one.equipped, hp, name: 'Symulacja', areaId: area.id, minutes, seed, ...(rumor && { rumor }) };
+  if (party > 1) {
+    const roster = partyRoster({ model, level, size: party, index, leader: one, area, minutes: kitMinutes }, content);
+    return engine.simulateHunt({ ...base, roster, self: 'lead', lootSeed: `${seed}:loot` }, content);
+  }
+  return engine.simulateHunt({ ...base, companions: companionsOf(one.plan, level, index, content), hard, ...roadKit(one.plan, area, kitMinutes, content) }, content);
+}
+
+// HP at the end of a party's exploration, the leader's and the others',
+// each as a share of its most.
+const partyHp = (hunt) => [hunt.hpEnd / hunt.maxHp, ...(hunt.partners ?? []).map((one) => one.hpEnd / one.maxHp)];
+
 // `hunts` explorations of `minutes` for a model at a level.
-// `hard`: Trudne wyprawy (629 A), from the challenge's level.
-export function measureCell({ model, classId, level, minutes, hunts, offset = 0, hard = false }, content) {
+// `hard`: Trudne wyprawy (629 A), from the challenge's level. `party`: the
+// players of a Drużyna's trip (partyRoster), 1 for the player alone with
+// its companions.
+export function measureCell({ model, classId, level, minutes, hunts, offset = 0, hard = false, party = 1 }, content) {
   const area = newestArea(level, content, offset);
   const local = withArea(area, content);
   const players = playersOf(model, classId, level, local);
   const maxHps = players.map((one) => engine.playerCombatant({ character: one.character, equipped: one.equipped, name: 'Symulacja', area }, local).maxHp);
   const player = players[0];
-  const kit = roadKit(player.plan, area, minutes, local);
-  const totals = { fainted: 0, escaped: 0, xp: 0, penalty: 0, gold: 0, endHp: 0, fights: 0, rare: 0, rareLost: 0, potions: 0, companionsDown: 0 };
+  const totals = { fainted: 0, escaped: 0, xp: 0, penalty: 0, gold: 0, endHp: 0, partyEndHp: 0, fights: 0, rare: 0, rareLost: 0, potions: 0, companionsDown: 0 };
+  // The same seeds alone as before the option, others for a party.
+  const tag = party > 1 ? `difficulty-party${party}` : 'difficulty';
   for (let i = 0; i < hunts; i++) {
-    const { character, equipped } = players[i % players.length];
-    const companions = companionsOf(player.plan, level, i, local);
-    const hunt = engine.simulateHunt(
-      { character, equipped, hp: maxHps[i % players.length], name: 'Symulacja', areaId: area.id, minutes, seed: `difficulty:${classId}:${level}:${minutes}:${offset}:${i}`, companions, hard, ...kit },
-      local,
-    );
+    const one = players[i % players.length];
+    const hunt = explore({ model, level, one, hp: maxHps[i % players.length], area, minutes, index: i, party, seed: `${tag}:${classId}:${level}:${minutes}:${offset}:${i}`, hard }, local);
+    const shares = partyHp(hunt);
+    totals.partyEndHp += shares.reduce((sum, share) => sum + share, 0) / shares.length;
     if (hunt.result === 'fainted') {
       totals.fainted += 1;
       totals.penalty += engine.faintPenalty(level, engine.xpToNext(level, content), content);
@@ -353,6 +425,7 @@ export function measureCell({ model, classId, level, minutes, hunts, offset = 0,
     minutes,
     offset,
     ...(hard && { hard }),
+    ...(party > 1 && { party }),
     area: `${area.id} ${area.minLevel}-${area.maxLevel}`,
     classLevel: player.character.classLevel,
     evolution: player.character.evolution ?? null,
@@ -360,6 +433,7 @@ export function measureCell({ model, classId, level, minutes, hunts, offset = 0,
     faintRate: totals.fainted / hunts,
     escapeRate: totals.escaped / hunts,
     endHp: totals.endHp / hunts,
+    partyEndHp: totals.partyEndHp / hunts,
     xpPerHour: totals.xp / hours,
     netXpPerHour: (totals.xp - totals.penalty) / hours,
     goldPerHour: totals.gold / hours,
@@ -374,27 +448,24 @@ export function measureCell({ model, classId, level, minutes, hunts, offset = 0,
 // Single fights with the place's elite (`elite`) or champion (`champion`)
 // at full HP, with the same kit as an hour's exploration: through a
 // one-minute exploration whose only fight is that one (a rumour that makes
-// it certain), so the fight goes exactly as on the way.
-export function measureRare({ model, classId, level, kind, fights, offset = 0 }, content) {
+// it certain), so the fight goes exactly as on the way. `party`: as in
+// measureCell; the HP after a win is the leader's.
+export function measureRare({ model, classId, level, kind, fights, offset = 0, party = 1 }, content) {
   const found = newestArea(level, content, offset);
   if (kind === 'champion' && !found.champion) return null;
   const area = kind === 'elite' ? { ...found, champion: null, id: `${found.id}-elite` } : found;
   const local = withArea(area, content);
   const players = playersOf(model, classId, level, local);
   const maxHps = players.map((one) => engine.playerCombatant({ character: one.character, equipped: one.equipped, name: 'Symulacja', area }, local).maxHp);
-  const player = players[0];
-  const kit = roadKit(player.plan, area, 60, local);
   let won = 0;
   let hpLeft = 0;
   let lost = 0;
   let companionsDown = 0;
+  const tag = party > 1 ? `difficulty-party${party}-${kind}` : `difficulty-${kind}`;
   for (let i = 0; i < fights; i++) {
-    const { character, equipped } = players[i % players.length];
-    const companions = companionsOf(player.plan, level, i, local);
-    const hunt = engine.simulateHunt(
-      { character, equipped, hp: maxHps[i % players.length], name: 'Symulacja', areaId: area.id, minutes: 1, rumor: 1e9, seed: `difficulty-${kind}:${classId}:${level}:${offset}:${i}`, companions, ...kit },
-      local,
-    );
+    const one = players[i % players.length];
+    // An hour's kit, as alone (roadKit with 60 minutes).
+    const hunt = explore({ model, level, one, hp: maxHps[i % players.length], area, minutes: 1, kitMinutes: 60, index: i, party, seed: `${tag}:${classId}:${level}:${offset}:${i}`, rumor: 1e9 }, local);
     const fight = hunt.fights[0];
     if (!fight || !(fight.elite || fight.champion)) throw new Error(`no ${kind} fight at ${level}`);
     if (fight.won === true) {
@@ -403,7 +474,7 @@ export function measureRare({ model, classId, level, kind, fights, offset = 0 },
     } else lost += 1;
     companionsDown += (hunt.companions ?? []).filter((one) => one.fainted).length;
   }
-  return { model, classId, level, kind, offset, monster: kind === 'elite' ? area.elite : area.champion, monsterLevel: area.maxLevel + (kind === 'elite' ? content.balance.hunt.eliteLevelBonus : content.balance.hunt.championLevelBonus), winRate: won / fights, lossRate: lost / fights, hpLeft: won ? hpLeft / won : 0, companionsDown: companionsDown / fights };
+  return { model, classId, level, kind, offset, ...(party > 1 && { party }), monster: kind === 'elite' ? area.elite : area.champion, monsterLevel: area.maxLevel + (kind === 'elite' ? content.balance.hunt.eliteLevelBonus : content.balance.hunt.championLevelBonus), winRate: won / fights, lossRate: lost / fights, hpLeft: won ? hpLeft / won : 0, companionsDown: companionsDown / fights };
 }
 
 // --set monsters.lateGame.damage=0.5: a balance value changed for the run
@@ -445,27 +516,54 @@ function main() {
   const levels = list(options.levels, LEVELS.map(String)).map(Number);
   const minutesList = options.minutes === 'none' ? [] : list(options.minutes, ['60', '240']).map(Number);
   const models = list(options.models, ['typical', 'realistic']);
+  const parties = list(options.party, ['1']).map(Number);
   const hunts = Number(options.hunts ?? 200);
   const rareFights = Number(options.rare ?? 0);
   const offset = Number(options.offset ?? 0);
   const rows = [];
   const pct = (value) => `${(value * 100).toFixed(1)}%`;
+  // A party's rows are named by its size: "realistic ×3".
+  const named = (model, party) => (party > 1 ? `${model} ×${party}` : model);
   for (const level of levels) {
     for (const classId of classes) {
       for (const model of models) {
-        for (const minutes of minutesList) {
-          const r = measureCell({ model, classId, level, minutes, hunts, offset, hard: options.hard === true }, content);
-          rows.push({ type: 'hunt', ...r });
-          console.log(
-            `${model.padEnd(17)} ${classId.padEnd(8)} ${String(level).padStart(3)} ${String(minutes).padStart(4)} min  omdlenia ${pct(r.faintRate).padStart(6)}  HP ${pct(r.endHp).padStart(6)}  XP/h ${r.xpPerHour.toFixed(0).padStart(7)} (netto ${r.netXpPerHour.toFixed(0).padStart(7)})  złoto/h ${r.goldPerHour.toFixed(0).padStart(5)}  ${r.area}`,
-          );
+        for (const party of parties) {
+          const name = named(model, party);
+          for (const minutes of minutesList) {
+            const r = measureCell({ model, classId, level, minutes, hunts, offset, hard: options.hard === true, party }, content);
+            rows.push({ type: 'hunt', ...r });
+            console.log(
+              `${name.padEnd(17)} ${classId.padEnd(8)} ${String(level).padStart(3)} ${String(minutes).padStart(4)} min  omdlenia ${pct(r.faintRate).padStart(6)}  HP ${pct(r.endHp).padStart(6)}  XP/h ${r.xpPerHour.toFixed(0).padStart(7)} (netto ${r.netXpPerHour.toFixed(0).padStart(7)})  złoto/h ${r.goldPerHour.toFixed(0).padStart(5)}  ${r.area}`,
+            );
+          }
+          for (const kind of rareFights > 0 ? ['elite', 'champion'] : []) {
+            const r = measureRare({ model, classId, level, kind, fights: rareFights, offset, party }, content);
+            if (!r) continue;
+            rows.push({ type: 'rare', ...r });
+            console.log(`${name.padEnd(17)} ${classId.padEnd(8)} ${String(level).padStart(3)} ${kind.padEnd(8)} ${r.monster} poz. ${r.monsterLevel}: wygrane ${pct(r.winRate)}, HP po wygranej ${pct(r.hpLeft)}`);
+          }
         }
-        for (const kind of rareFights > 0 ? ['elite', 'champion'] : []) {
-          const r = measureRare({ model, classId, level, kind, fights: rareFights, offset }, content);
-          if (!r) continue;
-          rows.push({ type: 'rare', ...r });
-          console.log(`${model.padEnd(17)} ${classId.padEnd(8)} ${String(level).padStart(3)} ${kind.padEnd(8)} ${r.monster} poz. ${r.monsterLevel}: wygrane ${pct(r.winRate)}, HP po wygranej ${pct(r.hpLeft)}`);
-        }
+      }
+    }
+  }
+  // With more classes than one, the average of the classes for each model,
+  // party, level and length, and for each elite and champion.
+  if (classes.length > 1) {
+    const mean = (group, key) => group.reduce((sum, row) => sum + row[key], 0) / group.length;
+    const groups = new Map();
+    for (const row of rows) {
+      const key = [row.type, row.model, row.party ?? 1, row.level, row.type === 'hunt' ? row.minutes : row.kind].join('|');
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(row);
+    }
+    console.log('\nŚrednia klas:');
+    for (const group of groups.values()) {
+      const [row] = group;
+      const name = named(row.model, row.party ?? 1).padEnd(17);
+      if (row.type === 'hunt') {
+        console.log(`${name} ${String(row.level).padStart(3)} ${String(row.minutes).padStart(4)} min  omdlenia ${pct(mean(group, 'faintRate')).padStart(6)}  HP ${pct(mean(group, 'endHp')).padStart(6)} (drużyna ${pct(mean(group, 'partyEndHp')).padStart(6)})  XP/h ${mean(group, 'xpPerHour').toFixed(0).padStart(7)}`);
+      } else {
+        console.log(`${name} ${String(row.level).padStart(3)} ${row.kind.padEnd(8)} ${row.monster} poz. ${row.monsterLevel}: wygrane ${pct(mean(group, 'winRate'))}, HP po wygranej ${pct(mean(group, 'hpLeft'))}`);
       }
     }
   }

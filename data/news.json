@@ -1455,6 +1455,11 @@
       "id": "0.4.56",
       "title": "Wersja 0.4.56",
       "body": "- Drużyna: zanim wyruszysz sam jako członek drużyny albo zmienisz postać (także jako lider), gra zapyta: „Jesteś w drużynie. Wyjść z drużyny?”. Dzięki temu drużyna nie rusza już bez kogoś, kto zajął się czymś innym."
+    },
+    {
+      "id": "0.4.57",
+      "title": "Wersja 0.4.57",
+      "body": "- Od 250. poziomu stwory są trzy razy silniejsze: biją mocniej i mają więcej HP. W drużynie każdy dodatkowy gracz wzmacnia je jeszcze o 25%. Dotyczy to wypraw, Wież, Portali, Labiryntu i listów gończych."
     }
   ]
 }
