@@ -1480,6 +1480,11 @@
       "id": "0.4.61",
       "title": "Wersja 0.4.61",
       "body": "- Labirynt: po każdej walce, także ze strażnikiem poziomu, najpierw otwiera się jej raport. Możesz go pominąć przyciskiem „Pomiń raport” albo wyłączyć pod nim pole „Raport walki od razu”. Dopiero potem jest wybór błogosławieństwa i kolejny poziom.\n- Poprawka: okna z wynikiem walki, ołtarza i kupca w Labiryncie nie są już puste, także przy wyłączonych Animacjach."
+    },
+    {
+      "id": "0.4.62",
+      "title": "Wersja 0.4.62",
+      "body": "- Trudna i Piekielna wyprawa działają też z drużyną. Lider zaznacza je w „Opcjach wyprawy” razem z polem „Z drużyną”, a cała drużyna idzie w tym trybie. Stwory są silniejsze dla wszystkich, a każdy dostaje swoją premię: więcej XP i złota, a na Piekielnej także więcej przedmiotów i materiałów."
     }
   ]
 }

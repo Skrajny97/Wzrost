@@ -247,7 +247,7 @@ describe('the Trudna wyprawa through the API', () => {
     await call('POST', '/api/character', { cookie, body: { name: 'Twarda', classId: 'warrior', appearance: 'female' } });
   });
 
-  test('the box opens at the challenge\'s level, on a plain exploration only', async () => {
+  test('the box opens at the challenge\'s level, not on a Szybkie Polowanie', async () => {
     await set('level = ?, class_level = ?, tutorial = NULL', from - 1, from - 1);
     assert.equal((await character()).hardHunt, null);
     const early = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5, hard: true } });
@@ -269,6 +269,7 @@ describe('the Trudna wyprawa through the API', () => {
     // Not on a Szybkie Polowanie.
     const quick = await call('POST', '/api/hunts/quick', { cookie, body: { areaId: 'windfalls-edge', hard: true } });
     assert.equal(quick.data.error?.code, 'hard_plain_only', JSON.stringify(quick.data).slice(0, 300));
+    assert.equal(quick.data.error.message, 'Trudna wyprawa nie działa na Szybkim i Błyskawicznym polowaniu.');
   });
 
   test('the threat of a Trudna wyprawa, asked with ?hard=1', async () => {
@@ -299,7 +300,7 @@ describe('the Piekielna wyprawa through the API', () => {
     await call('POST', '/api/character', { cookie, body: { name: 'Piekielna', classId: 'warrior', appearance: 'female' } });
   });
 
-  test('the box opens with the Trudna\'s, on a plain exploration only, and wins over the Trudna', async () => {
+  test('the box opens with the Trudna\'s, not on a Szybkie or a Błyskawiczne polowanie, and wins over the Trudna', async () => {
     await set('level = ?, class_level = ?, tutorial = NULL', from - 1, from - 1);
     assert.equal((await character()).hellHunt, null);
     const early = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5, hell: true } });
@@ -316,6 +317,7 @@ describe('the Piekielna wyprawa through the API', () => {
     assert.equal(quick.data.error?.code, 'hell_plain_only', JSON.stringify(quick.data).slice(0, 300));
     const flash = await call('POST', '/api/hunts/quick', { cookie, body: { areaId: 'windfalls-edge', kind: 'flash', hell: true } });
     assert.equal(flash.data.error?.code, 'hell_plain_only', JSON.stringify(flash.data).slice(0, 300));
+    assert.equal(flash.data.error.message, 'Piekielna wyprawa nie działa na Szybkim i Błyskawicznym polowaniu.');
     // Both boxes sent: a Piekielna.
     const started = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5, hard: true, hell: true } });
     assert.equal(started.status, 201, JSON.stringify(started.data).slice(0, 300));
@@ -333,18 +335,8 @@ describe('the Piekielna wyprawa through the API', () => {
     assert.equal(claimed.data.report.hard, undefined);
   });
 
-  test('not on a Drużyna\'s trip', async () => {
-    const { cookie: friend } = await signUp('druh');
-    await call('POST', '/api/character', { cookie: friend, body: { name: 'Druh', classId: 'warrior', appearance: 'male' } });
-    await set('level = 30, class_level = 30, tutorial = NULL');
-    const { data } = await call('POST', '/api/party/invite', { cookie, body: { name: 'Druh' } });
-    const joined = await call('POST', '/api/party/accept', { cookie: friend, body: { partyId: data.party.id } });
-    assert.equal(joined.status, 200, JSON.stringify(joined.data).slice(0, 300));
-    const trip = await call('POST', '/api/party/hunt', { cookie, body: { areaId: 'windfalls-edge', minutes: 5, hell: true } });
-    assert.equal(trip.data.error?.code, 'hell_plain_only', JSON.stringify(trip.data).slice(0, 300));
-    // Nobody set out.
-    assert.equal((await (await db()).prepare('SELECT COUNT(*) AS count FROM activities').first()).count, 0);
-  });
+  // On a Drużyna's trip, since 19.11.2026, it is the whole trip's
+  // (party-challenge.test.js).
 
   test('the threat of a Piekielna wyprawa, asked with ?hell=1, which wins over ?hard=1', async () => {
     await set('level = 30, class_level = 30, tutorial = NULL');
