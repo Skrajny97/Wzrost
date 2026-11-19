@@ -1,0 +1,14 @@
+{
+  "id": "hero-pillar",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a sturdy grey stone pillar with a square base and a carved capital, a small deep blue banner ribbon wound around it, the pillar alone, no background, single inventory item icon, bold clean outline",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02329635451571147
+  },
+  "images": 1
+}
