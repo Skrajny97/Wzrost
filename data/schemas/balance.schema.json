@@ -1408,9 +1408,9 @@
     },
     "challenge": {
       "type": "object",
-      "description": "Trudność wypraw od fromLevel poziomu postaci (autor 5.11.2026: 628 B, 629 A i „od 10-ego poziomu postaci wchodzą te duże zmiany trudności”): po wygranej walce wraca recoveryAfterFight brakującego HP zamiast hunt.recoveryAfterFight, a dłuższe wyprawy dokładają restBonusByMinutes zamiast hunt.restBonusByMinutes. Od strength.fromLevel stwory wypraw mają strength.damage razy większe obrażenia i strength.hp razy więcej HP. Trudna wyprawa (hard, przełącznik przy wyruszaniu, od fromLevel): stwory jeszcze damage i hp razy silniejsze, a XP i złoto z wyprawy większe o xp i gold.",
+      "description": "Trudność wypraw od fromLevel poziomu postaci (autor 5.11.2026: 628 B, 629 A i „od 10-ego poziomu postaci wchodzą te duże zmiany trudności”): po wygranej walce wraca recoveryAfterFight brakującego HP zamiast hunt.recoveryAfterFight, a dłuższe wyprawy dokładają restBonusByMinutes zamiast hunt.restBonusByMinutes. Od strength.fromLevel stwory wypraw mają strength.damage razy większe obrażenia i strength.hp razy więcej HP. Trudna wyprawa (hard, przełącznik przy wyruszaniu, od fromLevel): stwory jeszcze damage i hp razy silniejsze, a XP i złoto z wyprawy większe o xp i gold. Piekielna wyprawa (hell, drugi przełącznik, od fromLevel; autor 19.11.2026: „2 razy trudniejsza niz Trudna wyprawa 1,5x lepszy drop”): to samo z jej liczbami, a do tego szansa na skrzynię wśród znalezisk i materiały ze stworów większe o drop.",
       "additionalProperties": false,
-      "required": ["fromLevel", "strength", "recoveryAfterFight", "restBonusByMinutes", "hard"],
+      "required": ["fromLevel", "strength", "recoveryAfterFight", "restBonusByMinutes", "hard", "hell"],
       "properties": {
         "fromLevel": { "type": "integer", "minimum": 1 },
         "strength": {
@@ -1438,6 +1438,18 @@
             "hp": { "type": "number", "exclusiveMinimum": 0 },
             "xp": { "type": "number", "minimum": 0 },
             "gold": { "type": "number", "minimum": 0 }
+          }
+        },
+        "hell": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["damage", "hp", "xp", "gold", "drop"],
+          "properties": {
+            "damage": { "type": "number", "exclusiveMinimum": 0 },
+            "hp": { "type": "number", "exclusiveMinimum": 0 },
+            "xp": { "type": "number", "minimum": 0 },
+            "gold": { "type": "number", "minimum": 0 },
+            "drop": { "type": "number", "minimum": 0 }
           }
         }
       }

@@ -1460,6 +1460,11 @@
       "id": "0.4.57",
       "title": "Wersja 0.4.57",
       "body": "- Od 250. poziomu stwory są trzy razy silniejsze: biją mocniej i mają więcej HP. W drużynie każdy dodatkowy gracz wzmacnia je jeszcze o 25%. Dotyczy to wypraw, Wież, Portali, Labiryntu i listów gończych."
+    },
+    {
+      "id": "0.4.58",
+      "title": "Wersja 0.4.58",
+      "body": "- Piekielna wyprawa: nowe pole w „Opcjach wyprawy”, pod Trudną wyprawą. Stwory mają 3 razy większe obrażenia i HP, czyli dwa razy więcej niż na Trudnej. Za to zgarniesz +50% XP, +125% złota oraz 1,5 raza więcej przedmiotów i materiałów. Nie działa na Szybkim i Błyskawicznym polowaniu ani z drużyną."
     }
   ]
 }

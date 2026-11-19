@@ -23,6 +23,7 @@ import {
   call,
   currentHp,
   hardHuntOn,
+  hellHuntOn,
   huntOptionsOpen,
   isUnlocked,
   reportCache,
@@ -31,6 +32,7 @@ import {
   serverNow,
   setAvoidRare,
   setHardHunt,
+  setHellHunt,
   setHuntOptionsOpen,
   setSeekRare,
   setTrackQuests,
@@ -408,8 +410,9 @@ export function mountCombat(container, { params, navigate }) {
   }
 
   // A Trudna wyprawa for the threat (629 A): "&hard=1" while its box is
-  // ticked, where the character has it.
+  // ticked, where the character has it; a Piekielna's "&hell=1" the same.
   function hardQuery() {
+    if (state.character?.hellHunt && hellHuntOn()) return '&hell=1';
     return state.character?.hardHunt && hardHuntOn() ? '&hard=1' : '';
   }
 
@@ -631,6 +634,7 @@ export function mountCombat(container, { params, navigate }) {
         ...(activity.avoidRare ? [h('p', { class: 'system-hint', text: t('Postać omija elity i czempionów.') })] : []),
         ...(activity.seekRare ? [h('p', { class: 'system-hint', text: t('Postać tropi elity i czempiony.') })] : []),
         ...(activity.hard ? [h('p', { class: 'system-hint', text: t('Trudna wyprawa: silniejsze stwory, więcej XP i złota.') })] : []),
+        ...(activity.hell ? [h('p', { class: 'system-hint', text: t('Piekielna wyprawa: dużo silniejsze stwory, więcej XP, złota i łupów.') })] : []),
         ...(activity.mercenary
           ? [h('p', { class: 'system-hint', text: t('Najemnik: {name}, zapłata {gold} zł.', { name: activity.mercenary.name, gold: formatNumber(activity.mercenary.gold) }) })]
           : []),
@@ -963,6 +967,7 @@ export function mountCombat(container, { params, navigate }) {
         checked: hardHuntOn(),
         onChange: () => {
           setHardHunt(hardBox.checked);
+          if (hellBox) hellBox.checked = hellHuntOn();
           loadOptions();
           showThreat();
         },
@@ -981,6 +986,42 @@ export function mountCombat(container, { params, navigate }) {
             hp: times(hardRules.hp),
             xp: Math.round(hardRules.xp * 100),
             gold: Math.round(hardRules.gold * 100),
+          }),
+        }),
+      );
+    // The Piekielna wyprawa under it (the author, 19.11.2026: „2 razy
+    // trudniejsza niz Trudna wyprawa 1,5x lepszy drop”), on the same terms;
+    // one box unticks the other.
+    const hellRules = !first && character.hellHunt;
+    const hellOn = () => Boolean(hellRules) && hellHuntOn();
+    const hellBox =
+      hellRules &&
+      h('input', {
+        type: 'checkbox',
+        id: 'hell-hunt',
+        class: 'avoid-rare-box',
+        checked: hellHuntOn(),
+        onChange: () => {
+          setHellHunt(hellBox.checked);
+          if (hardBox) hardBox.checked = hardHuntOn();
+          loadOptions();
+          showThreat();
+        },
+      });
+    const hell =
+      hellRules &&
+      h(
+        'div',
+        { class: 'track-quests hell-hunt' },
+        h('label', { class: 'avoid-rare', for: 'hell-hunt' }, hellBox, h('span', { text: t('Piekielna wyprawa') })),
+        h('p', {
+          class: 'muted track-quests-note',
+          text: t('Stwory: obrażenia {damage}, HP {hp}. Nagroda: +{xp}% XP, +{gold}% złota i {drop} raza więcej przedmiotów i materiałów. Nie na Szybkim i Błyskawicznym polowaniu ani z drużyną.', {
+            damage: times(hellRules.damage),
+            hp: times(hellRules.hp),
+            xp: Math.round(hellRules.xp * 100),
+            gold: Math.round(hellRules.gold * 100),
+            drop: decimal(String(1 + hellRules.drop)),
           }),
         }),
       );
@@ -1005,6 +1046,7 @@ export function mountCombat(container, { params, navigate }) {
           unknownNone,
         ),
         hard,
+        hell,
         mercenary?.element,
       );
     // Potions to take along, once the character carries some that work in fights.
@@ -1049,7 +1091,7 @@ export function mountCombat(container, { params, navigate }) {
     const summary = h('span', { class: 'hunt-options-summary' });
     function showSummary() {
       const taken = Object.values(potions?.taken() ?? {}).reduce((sum, count) => sum + count, 0);
-      const ticked = [avoiding(), seeking(), tracking(), tracingUnknown(), Boolean(scouted), hardOn(), Boolean(mercenary?.chosen())].filter(Boolean).length;
+      const ticked = [avoiding(), seeking(), tracking(), tracingUnknown(), Boolean(scouted), hardOn(), hellOn(), Boolean(mercenary?.chosen())].filter(Boolean).length;
       summary.textContent = [
         formatMinutes(minutes),
         taken > 0 && countOf(taken, 'mikstura', 'mikstury', 'mikstur'),
@@ -1180,6 +1222,7 @@ export function mountCombat(container, { params, navigate }) {
               ...(meal?.chosen() && { meal: meal.chosen() }),
               ...(scouted && !along && { scout: scouted }),
               ...(hardOn() && !along && { hard: true }),
+              ...(hellOn() && !along && { hell: true }),
               ...(hiring && { mercenary: hiring }),
             });
           } catch (error) {
