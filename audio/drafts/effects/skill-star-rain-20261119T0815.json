@@ -1,0 +1,15 @@
+{
+  "id": "skill-star-rain",
+  "payload": {
+    "text": "a meteor shower: several fiery meteors streak down from the sky one after another with roaring whooshes and crash into the ground in heavy explosive booms, crackling fire and flying rocks, loud, huge, epic and cinematic, no music",
+    "duration_seconds": 2.5,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-star-rain-20261119T0815-0.mp3",
+    "audio/drafts/effects/skill-star-rain-20261119T0815-1.mp3",
+    "audio/drafts/effects/skill-star-rain-20261119T0815-2.mp3",
+    "audio/drafts/effects/skill-star-rain-20261119T0815-3.mp3"
+  ],
+  "credits": 200
+}

@@ -1,0 +1,15 @@
+{
+  "id": "skill-pillar-of-light",
+  "payload": {
+    "text": "a colossal beam of holy light crashing down from the sky: a loud rising roar that ends in a massive explosive boom shaking the ground, then a bright crackling burst of energy, very loud, powerful and epic, cinematic, no music",
+    "duration_seconds": 1.7,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-pillar-of-light-20261119T0815-0.mp3",
+    "audio/drafts/effects/skill-pillar-of-light-20261119T0815-1.mp3",
+    "audio/drafts/effects/skill-pillar-of-light-20261119T0815-2.mp3",
+    "audio/drafts/effects/skill-pillar-of-light-20261119T0815-3.mp3"
+  ],
+  "credits": 136
+}

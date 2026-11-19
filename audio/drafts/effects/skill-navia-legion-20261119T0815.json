@@ -1,0 +1,15 @@
+{
+  "id": "skill-navia-legion",
+  "payload": {
+    "text": "the ground cracks open with a deep rumble and an army of skeleton warriors rises from the grave: rattling bones, clanking rusty armour and a chorus of ghostly moans, loud and clear, dark and epic, no music",
+    "duration_seconds": 2.5,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-navia-legion-20261119T0815-0.mp3",
+    "audio/drafts/effects/skill-navia-legion-20261119T0815-1.mp3",
+    "audio/drafts/effects/skill-navia-legion-20261119T0815-2.mp3",
+    "audio/drafts/effects/skill-navia-legion-20261119T0815-3.mp3"
+  ],
+  "credits": 200
+}

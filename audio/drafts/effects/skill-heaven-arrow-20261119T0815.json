@@ -1,0 +1,15 @@
+{
+  "id": "skill-heaven-arrow",
+  "payload": {
+    "text": "a blazing holy arrow shot down from the sky: a sharp rushing whoosh as it streaks down, then a huge thunderous impact with a burst of holy fire and a deep rumbling boom, loud, epic and powerful, cinematic, clean, no guitar, no strings, no twang, no plucked sound, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-heaven-arrow-20261119T0815-0.mp3",
+    "audio/drafts/effects/skill-heaven-arrow-20261119T0815-1.mp3",
+    "audio/drafts/effects/skill-heaven-arrow-20261119T0815-2.mp3",
+    "audio/drafts/effects/skill-heaven-arrow-20261119T0815-3.mp3"
+  ],
+  "credits": 128
+}
