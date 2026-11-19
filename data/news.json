@@ -1430,6 +1430,11 @@
       "id": "0.4.48",
       "title": "Wersja 0.4.48",
       "body": "- Talia Systemu: raz na partię, przed swoim pierwszym ruchem, możesz przelosować rezerwę. Twoje karty z rezerwy wracają na spód talii, a Ty dobierasz nowe. Działa u Szczęsnego, u mieszkańców Osady, na Arenie i w partiach na żywo."
+    },
+    {
+      "id": "0.4.49",
+      "title": "Wersja 0.4.49",
+      "body": "- Łysogóry: elity i czempioni (Gryf, Stolem, Kukułka, Pan Twardowski, Kostucha i Baba Jaga) są znów tak trudni, jak przy wejściu Łysogór.\n- Nawia: elity i czempioni wyrównani po zmianie krzywej poziomów.\n- Karty kilku z tych stworów w Talii Systemu mają przez to trochę inny Atak i Życie, np. Gryf bije mocniej, ale ma mniej Życia."
     }
   ]
 }
