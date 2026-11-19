@@ -277,7 +277,9 @@ export function partyFight({ outcome, members, area, level, seed }, content) {
   const allies = members.map((member, index) =>
     playerCombatant({ character: member.character, equipped: member.equipped, hp: Math.max(1, member.hpEnd), name: member.name, area, id: index === 0 ? 'a0' : `p${index}` }, content),
   );
-  const growth = allies.length > 1 ? {} : { growth: content.balance.monsters.soloGrowth };
+  // Two or more players also make them stronger from level 250, as on the
+  // way (partyStrength in combatant.js).
+  const growth = allies.length > 1 ? { players: allies.length } : { growth: content.balance.monsters.soloGrowth };
   /** @type {Record<string, any>[]} */
   const enemies = encounterCombatants({ members: outcome.foes.map((/** @type {string} */ monsterId) => ({ monsterId, level })) }, content, growth);
   const fight = simulateFight({ allies, enemies, rng: createRng(`${seed}:fight`), content, record: true, trait: area.trait, ambush: outcome.ambush === true });

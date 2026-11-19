@@ -3847,6 +3847,62 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Od 250. poziomu co najmniej trzy razy trudniej, drużyna jeszcze bardziej (19.11.2026)
+
+Autor (19.11.2026): „grę od 250tego trzeba zrobić też jeszcze trudniejszą, tam wchodzą juz potezne przedmioty i wszystko, tak z 2 razy trudniej, szczególnie z drużyną”, a potem: „trudność jest za niska dla wysoko lvlowych postaci. Od 250ego wzrost 3-krotny minimum, bo to jest żart co się dzieje, jak szybko lecą z lvlami, na nic te Twoje symulacje”.
+
+1. **Stwory od 250. poziomu są trzy razy silniejsze.** Nowy etap wzrostu stworów `monsters.mythGame` w `data/balance.json` działa jak `lateGame` i `endGame`, ale od razu w pełni od 250. poziomu stwora, bez rampy („Od 250ego”): stwór bije 1,7321 razy mocniej i ma 1,7321 razy więcej HP (√3 i √3, razem 3 razy silniejszy). Stwory poniżej 250. poziomu są takie jak dotąd. W walce postaci samej (Wieża Solo, walka w zdarzeniu bez towarzyszy) etap działa w połowie, jak tamte (`soloGrowth`, 438.3 A): cios i HP ×1,37. Etap, którego `toLevel` jest równy `fromLevel`, jest w kodzie skokiem (`midGameShare` w `src/engine/progression.js`).
+2. **Z drużyną jeszcze trudniej.** Od 250. poziomu stwory, z którymi walczy razem kilku graczy Drużyny, biją o 25% mocniej i mają o 25% więcej HP za każdego gracza poza pierwszym (`monsters.perPlayer`, `partyStrength` w `src/engine/combatant.js`): przy dwóch graczach ×1,25, przy trzech ×1,5, na dokładkę do punktu 1. Działa na wyprawie drużyny, w Wieży Drużyn i w walce zdarzenia drużyny. Towarzysze z Kwater i najemnik nie są graczami. Dotąd stwory nie rosły za graczy obok (612 C); od 250. poziomu rosną, bo autor chce tam trudniej „szczególnie z drużyną”. Niżej bez zmian.
+3. **Brakujące szczegóły:**
+   - Liczby z punktu 1 są autora („3-krotny minimum”), a nie z symulacji. Po równo w cios i HP, jak w etapach przed nim. Pierwsza wersja tego etapu (dwa razy silniejsze stwory, rosnąco od 250. do 260. poziomu) nie weszła do gry: autor zmienił ją drugą wiadomością.
+   - 25% za gracza, bo przy tym drużyna trzech realistycznych graczy jest teraz trochę bardziej wymagająca niż realistyczny gracz z dwoma towarzyszami. Przed zmianą była łatwiejsza: kończyła wyprawy z 99% HP, a gracz z towarzyszami z 98%. Drużyna dwóch graczy jest najtrudniejsza, bo walczą tylko dwie postacie.
+   - Liczy się poziom stwora, jak w innych etapach. Postać na 250. poziomie (miejsce 246–250) spotyka silniejsze tylko stwory 250. poziomu, elitę (poz. 251) i czempiona (poz. 252); od miejsca 251–255 wszystkie są silniejsze.
+   - Tak samo w Portalach (stopnie od 250.), w Labiryncie (jego stwory są między poziomem postaci a klasy, więc silniejsze już przed 250. poziomem postaci), w Sali prób, u Poszukiwanych (ich siła liczy się od elity miejsca) i w szacowaniu zagrożenia (dla postaci samej, bez drużyny). W Wieżach od 201. piętra (poziom 250): w Wieży Solo w połowie, w Wieży Drużyn w pełni, a z graczami Drużyny jeszcze silniej.
+   - Bez zmian: Bestia Gildii i strażnicy Wyprawy Gildii (ich HP liczy się z ataków członków, więc mają własną miarę), karty Talii Systemu (Atak i Życie jak dotąd), Arena, wojny gildii, podgląd umiejętności, nagrody i krzywe XP.
+4. **Pomiar** (`tools/difficulty-sim.mjs`, nowa opcja `--party 2` albo `--party 3`: drużyna realistycznych graczy jednego poziomu, jak na wyprawie drużyny, bez towarzyszy; mikstury niesie lider, każdy ma swoje trofea, klasy pozostałych zmieniają się jak u towarzyszy). Pięć klas, 200 wypraw na klasę i długość, 200 walk z elitą i 200 z czempionem. W komórkach: omdlenia; HP na końcu (wyprawy) albo wygrane; HP po wygranej (elita, czempion), w procentach, przed → po. HP to HP gracza z miksturami (w drużynie lidera). Elity i czempioni: 240 i 250 Kukułka, 250 Pan Twardowski, 260 i 275 Kostucha, 275 Baba Jaga, 300 Indryk i Nyja, 325 Turoń i Weles, 350 Marzanna i Kościej. Od 260. poziomu realistyczny gracz z towarzyszami traci na wyprawach 2,7–3,7 razy więcej HP niż dotąd, a w walce z elitą 2–2,4 razy więcej; drużyna trzech graczy na wyprawach 4,8–9,4 razy więcej.
+   - Realistyczny gracz z dwoma towarzyszami:
+
+     | Poziom | Wyprawa 1 h | Wyprawa 4 h | Elita | Czempion |
+     | --- | --- | --- | --- | --- |
+     | 240 | 0; 98,4 → 0; 98,4 | 0; 97,9 → 0; 97,9 | 100; 93,6 → 100; 93,6 | – |
+     | 250 | 0; 97,7 → 0; 97,2 | 0; 97,3 → 1,3; 94,8 | 100; 93,7 → 99,5; 86,2 | 100; 91,9 → 96,4; 79,8 |
+     | 260 | 0; 97,7 → 0; 93,6 | 0; 97,4 → 0,4; 91,9 | 100; 92,5 → 100; 84,9 | – |
+     | 275 | 0; 98,4 → 0; 94,8 | 0; 97,7 → 0,4; 93,2 | 100; 92,4 → 100; 84,6 | 100; 85,6 → 96,6; 74,6 |
+     | 300 | 0; 98,3 → 0,2; 95,3 | 0; 98 → 0,6; 93,9 | 100; 95 → 100; 88 | 100; 86,5 → 96,8; 75 |
+     | 325 | 0; 98,9 → 0,6; 96,9 | 0; 98,9 → 1; 95,9 | 100; 96,9 → 99,1; 93 | 100; 93,9 → 92,8; 86,8 |
+     | 350 | 0; 98,2 → 0,2; 95,2 | 0; 98 → 1,5; 93,2 | 100; 92 → 97,8; 82,5 | 100; 95,9 → 96; 87,3 |
+
+   - Drużyna dwóch realistycznych graczy:
+
+     | Poziom | Wyprawa 1 h | Wyprawa 4 h | Elita | Czempion |
+     | --- | --- | --- | --- | --- |
+     | 240 | 0; 97,2 → 0; 97,2 | 0; 96,6 → 0; 96,6 | 100; 88,7 → 100; 88,7 | – |
+     | 250 | 0; 96,6 → 1,6; 93,9 | 0; 95,6 → 9,9; 85,2 | 100; 88,9 → 83,1; 65,4 | 100; 84,1 → 44,4; 52,9 |
+     | 260 | 0; 96,3 → 0,4; 83,5 | 0; 95,6 → 0,9; 84,1 | 100; 87,3 → 98,6; 71,7 | – |
+     | 275 | 0; 97,5 → 0,8; 86,6 | 0; 96,3 → 6,6; 82 | 100; 86,8 → 98,1; 72,7 | 100; 80,6 → 63,2; 55,1 |
+     | 300 | 0; 97,6 → 0,6; 90,1 | 0; 96,9 → 3,2; 87 | 100; 94,9 → 99,5; 80,3 | 100; 84,2 → 80,6; 64,6 |
+     | 325 | 0; 97,8 → 0,9; 91,3 | 0; 97,6 → 7,1; 86,4 | 100; 93,8 → 96; 79,9 | 100; 84,8 → 52,4; 64,7 |
+     | 350 | 0; 96,5 → 1,8; 87,3 | 0; 96,2 → 9,2; 81,2 | 100; 88,7 → 77,8; 64,8 | 100; 87,5 → 73,9; 61,3 |
+
+   - Drużyna trzech realistycznych graczy:
+
+     | Poziom | Wyprawa 1 h | Wyprawa 4 h | Elita | Czempion |
+     | --- | --- | --- | --- | --- |
+     | 240 | 0; 99,2 → 0; 99,2 | 0; 99,1 → 0; 99,1 | 100; 95,4 → 100; 95,4 | – |
+     | 250 | 0; 99,2 → 0; 98,5 | 0; 98,9 → 2,3; 95,4 | 100; 96,1 → 99,5; 87 | 100; 91,5 → 89,1; 72,9 |
+     | 260 | 0; 99,2 → 0; 92,2 | 0; 98,9 → 0,2; 92,1 | 100; 94,4 → 99,9; 82,1 | – |
+     | 275 | 0; 99,3 → 0,5; 93,1 | 0; 99 → 1,9; 91,9 | 100; 95,2 → 99,7; 82,4 | 100; 85,3 → 89,1; 69,2 |
+     | 300 | 0; 99,1 → 0; 95 | 0; 98,9 → 0,6; 93,7 | 100; 97,4 → 100; 86 | 100; 91,7 → 96,1; 75,8 |
+     | 325 | 0; 99,4 → 0,3; 96,3 | 0; 99,2 → 1,2; 94,9 | 100; 98 → 99,9; 89,7 | 100; 93,7 → 90,1; 75,6 |
+     | 350 | 0; 98,7 → 0,3; 93,8 | 0; 98,6 → 2,1; 91,3 | 100; 95,1 → 96; 74,5 | 100; 95,5 → 98; 81,8 |
+
+5. **Inni gracze i inne miejsca (te same pomiary, poziomy 250–350):**
+   - Gracz okazjonalny z towarzyszami (rzadkie przedmioty bez ulepszeń, towarzysze prosto z Karczmy; na tych poziomach raczej rzadki): na wyprawach godzinnych mdleje w 3,4–39,9% zamiast 0,2–0,7%, na 4-godzinnych w 19–63% zamiast 3–5%; elity wygrywa w 19–66% walk zamiast 96–98%, czempionów w 10–30% zamiast ok. 86%. To dużo trudniej, niż ustaliły 1166 A i 1169 B; pytanie do autora.
+   - Realistyczny gracz bez towarzyszy: na wyprawach godzinnych mdleje w 3,4–20% zamiast 0–2,5%, na 4-godzinnych w 20–41% zamiast 0,2–10%.
+   - Labirynt (realistyczny gracz z dwoma towarzyszami, 40 dni na klasę, poziomy postaci 245, 260, 300 i 350): drugi poziom przechodzi w 97–98% dni zamiast 100%, trzeci w 76–89% zamiast 99–100%, Piekielny w 9–39% zamiast 70–87%.
+   - Wieże (piętro na poziomie postaci 260, 300 i 350, realistyczni gracze, 40 walk na klasę): Wieża Solo 83–94% wygranych zamiast 94–97%, Wieża Drużyn z dwoma towarzyszami 7–34% zamiast 40–83%, z trzema graczami 9–24% zamiast 83–93%.
+6. **Testy.** Nowy `test/myth-game.test.js`: etap jako skok od 250., połowa w walce samej, `partyStrength`, stwory wyprawy drużyny, Wieży Drużyn i zdarzenia drużyny, najemnik bez zmian, Bestia Gildii i karty bez zmian. Porównanie czwartych form z trzecimi (`test/fourth-evolution.test.js`) liczy się na stworach, z którymi je strojono, bez etapu z punktu 1. W `test/nawia.test.js` Kościej, który ma paść i wstać, jest bez tego etapu.
+
 ## Wersja 0.4.53 (19.11.2026): powiadomienia o prywatnych wiadomościach, bez powiadomień o oznaczeniach na ogólnym czacie, „pushujący” na czacie, grafiki 1170 i dźwięki 1171
 
 1. **Powiadomienia czatu (autor 19.11.2026: „włącz powiadomienia jak ktoś napisze prywatną wiadomość na czacie a wyłącz powiadomienia przy ozaczaniu na ogólnym czacie”).** Prywatna wiadomość wysyła powiadomienie na telefon odbiorcy (`privateNotices` w `src/server/mentions.js`, tekst `mentions.texts.pushPrivate` w `data/chat.json`: „Ala napisała do Ciebie: …”). Tak jak przy oznaczeniach: tylko do postaci, którą gracz gra, dopóki wiadomość jest, nie została przeczytana i jej autor nie jest ukryty.
