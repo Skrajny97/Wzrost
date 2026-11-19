@@ -36,7 +36,8 @@ import {
   requireUnworn,
   walletOf,
 } from './characters.js';
-import { atomically, sameVersion } from './atomic.js';
+import { assertion, atomically, sameVersion } from './atomic.js';
+import { markedIds } from './crafting.js';
 import { toHex } from './encoding.js';
 import { favoriteIds, favoriteRefusal, requireUnmarked, unmarked } from './favorites.js';
 import { trialProgress } from './guild-trials.js';
@@ -219,10 +220,12 @@ export async function discardItem(context) {
   });
 }
 
-// The scrapper buys every item in the bag of a rarity up to the chosen one.
+// The scrapper buys every item in the bag of a rarity up to the chosen one
+// ({ maxRarity }), or the items marked in the bag ({ ids }: sellMarked).
 export async function sellItems(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
+  if (body.ids !== undefined) return sellMarked(context, session, player, body);
   const limit = content().rarities.findIndex((rarity) => rarity.id === body.maxRarity);
   if (limit === -1) throw new ApiError(400, 'invalid_rarity', 'Wybierz rzadkość.');
   const rank = (item) => content().rarities.findIndex((rarity) => rarity.id === item.rarity);
@@ -256,6 +259,59 @@ export async function sellItems(context) {
   return json({
     sold: { count, gold },
     character: characterView(await loadPlayer(context.env.DB, session.userId), context.now),
+  });
+}
+
+// The words of "Zaznacz do sprzedaży" in the request's language
+// (data/buildings.json: the Skup złomu's `pick`).
+const pickTexts = () => content().buildings.find((building) => building.effect.kind === 'sellPrice').pick;
+
+// The marked items' rows: the character's, in its bag, as SQL after WHERE,
+// with the character's id and the ids as a JSON list bound.
+const MARKED_IN_BAG = 'character_id = ? AND slot IS NULL AND id IN (SELECT value FROM json_each(?))';
+
+// "Zaznacz do sprzedaży" in the bag (a player's idea the author wants,
+// 19.11.2026: „możliwość zaznaczania ich w plecaku do sprzedaży wybranych a
+// nie całych rzadkości”): the scrapper buys the items marked ({ ids }), each
+// for the price of its card with the Skup złomu's bonus (sellPrice). Every
+// one must be the character's and in its bag: not worn, not on a
+// Zbrojownia's rack and not a favourite. Upgraded ones and those with a gem
+// set in them sell too, as from their cards, chosen one by one as they are,
+// and the gem falls out and goes back to the minerals (757 B). All or none:
+// the batch holds only while the character is as read and every marked item
+// is still in its bag, so a second tap at the same moment sells nothing
+// twice and says the character changed meanwhile; an id the character no
+// longer has in its bag sells nothing either (a page that still shows an
+// item sold elsewhere asks for the character again).
+async function sellMarked(context, session, player, body) {
+  const { errors } = pickTexts();
+  const ids = markedIds(body, errors.none);
+  const items = ids.map((id) => player.items.find((item) => item.id === id));
+  if (items.includes(undefined)) throw new ApiError(404, 'item_not_found', errors.gone);
+  if (items.some((item) => item.equippedSlot)) throw new ApiError(409, 'equipped', errors.worn);
+  requireOffRack(player, ...items);
+  requireUnmarked(player, 'sell', ...items);
+  const { row } = player;
+  const bonus = sellBonusOf(player, context.now);
+  const list = JSON.stringify(ids);
+  const prices = items.map((item) => `WHEN ${whole(item.id)} THEN ${whole(sellPrice(item, content(), bonus))}`).join(' ');
+  const gems = gemsBackSql(row.id, items);
+  const db = context.env.DB;
+  await atomically(db, [
+    sameVersion(db, row),
+    assertion(db, `(SELECT COUNT(*) FROM items WHERE ${MARKED_IN_BAG}) = ?`, [row.id, list, ids.length]),
+    db
+      .prepare(`UPDATE characters SET gold = gold + (SELECT COALESCE(SUM(CASE id ${prices} ELSE 0 END), 0) FROM items WHERE ${MARKED_IN_BAG})${gems.sql}, version = version + 1 WHERE id = ?`)
+      .bind(row.id, list, ...gems.binds, row.id),
+    db.prepare(`DELETE FROM items WHERE ${MARKED_IN_BAG}`).bind(row.id, list),
+  ]);
+  return json({
+    sold: {
+      count: items.length,
+      gold: items.reduce((sum, item) => sum + sellPrice(item, content(), bonus), 0),
+      gems: items.map(fallenGem).filter(Boolean).map(gemNamed),
+    },
+    character: characterView(await loadPlayer(db, session.userId), context.now),
   });
 }
 
