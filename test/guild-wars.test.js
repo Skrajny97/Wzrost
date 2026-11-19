@@ -825,6 +825,11 @@ describe('the guild wars through the API', () => {
     const after = await first('SELECT gold FROM characters WHERE id = ?', ids.lider);
     assert.equal(after.gold - before.gold, won * warReward(50, content).gold);
     assert.ok([1, 2].includes(view.league.end.place));
+    // The Kronika told each guild's chat of the evening, once (1195 A).
+    const told = await all("SELECT channel, text FROM chat_messages WHERE chronicle_key LIKE 'war:%' ORDER BY channel");
+    assert.equal(told.length, 2);
+    assert.ok(told.every((line) => /^Wieczór ligi: (wygrana|przegrana|remis) z \[(LB|DRG)\] (Leśni Bracia|Drugie), walki \d+:\d+\.$/.test(line.text)), JSON.stringify(told));
+    assert.notEqual(told[0].channel, told[1].channel);
     assert.equal((await as('lider', 'POST', '/api/test/guild-war', { action: 'fight' })).data.error.code, 'no_war');
     assert.equal((await as('lider', 'POST', '/api/test/guild-war', { action: 'nothing' })).data.error.code, 'invalid_action');
   });

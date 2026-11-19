@@ -124,6 +124,18 @@ describe('the Róg zbiórki through the API', () => {
     assert.equal(seen.canSet, false);
   });
 
+  test('outside a guild, or before the Gildie open, no rally to set', async () => {
+    await player('samotnik', 'Samotnik');
+    const alone = await set('samotnik', 'now');
+    assert.equal(alone.status, 409);
+    assert.equal(alone.data.error.code, 'no_guild');
+    await run("UPDATE characters SET level = 1 WHERE name = 'Samotnik'");
+    const early = await set('samotnik', 'now');
+    assert.equal(early.status, 403);
+    assert.equal(early.data.error.code, 'locked');
+    assert.equal((await as('samotnik', 'POST', '/api/guild/rally/cancel', { id: 1 })).data.error.code, 'locked');
+  });
+
   test('calling off: only before the start, by the leader or a deputy', async () => {
     const at = monday + 3 * HOUR;
     const { rally } = (await set('liderka', at)).data;
