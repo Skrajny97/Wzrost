@@ -54,8 +54,8 @@
 // makes or joins one the page still tells it once which of them will not
 // go on the party's trips (partyView's `companions`).
 
-import { areaFor, areaOpenFor, companionsGoingMost, companionStays, huntDurations, huntWait, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange, partyStayText, tripWanted, wantedTarget } from '../engine/index.js';
-import { assertion } from './atomic.js';
+import { areaFor, areaOpenFor, companionsGoingMost, companionStays, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange, partyStayText, tripWanted, wantedTarget } from '../engine/index.js';
+import { assertion, raced } from './atomic.js';
 import { characterView, currentHp, earlyAreaOf, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer, settleCharacter } from './characters.js';
 import { content } from './content.js';
 import { nameColorOf, wayLook } from './cosmetics.js';
@@ -513,12 +513,52 @@ async function claimForTrip(db, member, now) {
 // report, 12.11.2026: „Po wyruszeniu na wyprawę z drużyną czasem nie
 // załącza się jazda w 2 tylko solo”, and skips spent on a trip the leader
 // took for the party's): the answer says who must choose first.
+//
+// The starts of all who go and the trip's crew are written in one batch
+// (setOut), so a trip sets out whole or not at all. Before, each start was
+// written on its own and the crew after them all: a request that failed
+// in between (a database error, a request cut off) left the explorations
+// that had started with the party's names but no crew, and each was fought
+// from its own seed, the others beside it only as they set out and gone
+// once fallen; the leader's report won with the party while a member's
+// lost alone, on the same trip (players, 18.11.2026: „byłem sam bez
+// drużyny”). The batch holds only while the leader and each member going
+// are as read; when one changed meanwhile, the party is read anew and sets
+// out again, without one that got busy at that very moment, a few times at
+// most (SET_OUT_TRIES).
+const SET_OUT_TRIES = 3;
+
 export async function partyHunt(context) {
-  const { session, player } = await requireIdlePlayer(context);
+  let { session, player } = await requireIdlePlayer(context);
   requireUnlocked(player.row);
   const db = context.env.DB;
   const now = context.now;
   const body = await readJson(context.request);
+  // A member's report claimed for the trip (claimForTrip), kept through the
+  // tries: its Walka tells it and opens it (`claimed` below).
+  const claimed = new Map();
+  for (let tries = 1; ; tries += 1) {
+    const out = await setOut(db, player, body, now, claimed);
+    if (out) {
+      return json(
+        {
+          character: characterView(await loadPlayer(db, session.userId), now),
+          ...(await partyView(db, player.row.id, now)),
+          ...out,
+        },
+        201,
+      );
+    }
+    if (tries === SET_OUT_TRIES) throw new ApiError(409, 'changed', 'Drużyna zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
+    ({ session, player } = await requireIdlePlayer(context));
+  }
+}
+
+// One try of partyHunt: the trip's starts and crew in one batch. Gives {
+// went, notes } for the answer, or null when the batch did not hold (the
+// leader or a member changed meanwhile, or a member's exploration began
+// meanwhile): nothing was written then.
+async function setOut(db, player, body, now, claimed) {
   const party = await partyOf(db, player.row.id);
   if (!party) throw new ApiError(409, 'no_party', 'Nie masz drużyny.');
   if (party.leaderId !== player.row.id) throw new ApiError(403, 'not_leader', 'Na wyprawę drużynę wysyła lider.');
@@ -546,7 +586,6 @@ export async function partyHunt(context) {
   // its own: a trip ends in no event, hunts.js).
   const ready = [];
   const choosing = [];
-  const claimed = new Map();
   for (const listed of going) {
     if (!listed.activity) {
       ready.push(listed);
@@ -574,7 +613,7 @@ export async function partyHunt(context) {
   const mount = Math.min(...everyone.map((member) => mountOfRow(member.row)));
   // The party's boon from a party event of a trip before (party-events.js):
   // this trip's, taken in the leader's start only as it was read (one
-  // changed meanwhile asks the leader to try again), so no boon goes on two
+  // changed meanwhile has the party read anew), so no boon goes on two
   // trips. Its haste shortens every member's wait, as a mount does; its XP
   // and gold go with the trip (`boon`) to each member's claim (hunts.js).
   const kept = (await db.prepare('SELECT boon FROM parties WHERE id = ?').bind(party.id).first())?.boon ?? null;
@@ -584,24 +623,22 @@ export async function partyHunt(context) {
     ? [assertion(db, '(SELECT boon FROM parties WHERE id = ?) IS ?', [party.id, kept]), db.prepare('UPDATE parties SET boon = NULL WHERE id = ?').bind(party.id)]
     : [];
   const shots = new Map(everyone.map((member) => [member.row.id, snapshot(member, now)]));
-  const names = everyone.map((member) => member.row.name);
-  const partnersOf = (member, list) => list.filter((other) => other.row.id !== member.row.id).map((other) => shots.get(other.row.id));
   // `trip` marks the explorations of this setting out, for their shared
   // timer (time.js).
-  const party_ = { id: party.id, leader: player.row.name, names, trip: now };
-  // The leader sets out, then the members, each without the leader's
-  // choices. One whose start fails after all (it got busy at that very
-  // moment) stays home.
-  const setups = new Map([[player.row.id, await beginHunt(db, player, body, now, { party: party_, partners: partnersOf(player, everyone), mount, haste, also: takeBoon })]]);
+  const party_ = { id: party.id, leader: player.row.name, names: everyone.map((member) => member.row.name), trip: now };
+  // The leader's start, then the members', each without the leader's
+  // choices, made ready and written below in one batch with the trip's
+  // crew. One whose start cannot be made stays home.
+  const setups = new Map([[player.row.id, await beginHunt(db, player, body, now, { party: party_, mount, haste, also: takeBoon, defer: true })]]);
   const went = [];
   for (const member of ready) {
     try {
       const setup = await beginHunt(db, member, { areaId: area.id, minutes: body.minutes, avoidRare: body.avoidRare === true, seekRare: body.seekRare === true && body.avoidRare !== true }, now, {
         party: party_,
-        partners: partnersOf(member, everyone),
         mount,
         haste,
         follower: true,
+        defer: true,
       });
       setups.set(member.row.id, setup);
       went.push(member);
@@ -609,15 +646,16 @@ export async function partyHunt(context) {
       if (!(error instanceof ApiError)) throw error;
     }
   }
+  if (went.length === 0) throw new ApiError(409, 'nobody_free', 'Nikt z drużyny nie jest teraz wolny. Odznacz „Z drużyną” albo poczekaj, aż ktoś skończy swoje zajęcia.');
   // The trip as it set out, kept by each of its explorations (trips.js): its
   // own seed and its roster, those who went in its order with what each
   // brought, and how the leader leads it (with no companions: hunts.js), so
   // its fights come out the same in every member's report (the
   // author: "postacie z drużyny mają inne raporty odbytych walk. To nie
-  // powinno mieć miejsca"). One that could not go after all (it got busy,
-  // or its character changed meanwhile) fights in nobody's exploration (the
-  // author: "niech się nie okaże, że jednak 3 walczą"), and a leader left
-  // alone goes as on its own.
+  // powinno mieć miejsca"). One that could not go after all (it got busy
+  // at that very moment) fights in nobody's exploration (the author: "niech
+  // się nie okaże, że jednak 3 walczą"): the batch does not hold, and the
+  // next try leaves it home.
   const actual = [player, ...went];
   const lead = setups.get(player.row.id);
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
@@ -660,46 +698,30 @@ export async function partyHunt(context) {
   // A member whose report was claimed for this trip keeps where it is
   // (`claimed`), for its Walka to tell it and open it.
   const trip = `json_extract(options, '$.party.trip') = ? AND json_extract(options, '$.party.id') = ?`;
-  await db.batch([
-    ...actual.map((member) => {
-      const report = claimed.get(member.row.id);
-      const poster = setups.get(member.row.id).wanted;
-      const other = Boolean(poster) && !wantedTarget(poster, target);
-      return went.length > 0
-        ? db
-            .prepare(
-              `UPDATE activities SET options = json_remove(json_set(options, '$.party', json(?)${report ? ", '$.claimed', json(?)" : ''}), '$.partners'${other ? ", '$.wanted'" : ''}) WHERE character_id = ? AND kind = 'hunt' AND ${trip}`,
-            )
-            .bind(JSON.stringify(crew), ...(report ? [JSON.stringify(report)] : []), member.row.id, now, party.id)
-        : // A leader left alone goes as on its own: its exploration keeps
-          // what one of its own keeps and a trip does not (the Ołtarz's
-          // blessing, the professions' levels as it set out; beginHunt).
-          db
-            .prepare(`UPDATE activities SET options = json_patch(json_remove(options, '$.party', '$.partners'), ?) WHERE character_id = ? AND kind = 'hunt' AND ${trip}`)
-            .bind(JSON.stringify(setups.get(member.row.id).own), member.row.id, now, party.id);
-    }),
-    // A leader left alone waits as long as its own mount makes it, not the
-    // slowest of the party's, and without the boon, which goes back to the
-    // party.
-    ...(went.length === 0
-      ? [
-          db
-            .prepare('UPDATE activities SET ends_at = started_at + ? WHERE character_id = ? AND kind = ? AND started_at = ?')
-            .bind(huntWait(body.minutes, mountOfRow(player.row), content()), player.row.id, 'hunt', now),
-          ...(boon ? [db.prepare("UPDATE parties SET boon = json_patch(COALESCE(boon, '{}'), ?) WHERE id = ?").bind(JSON.stringify(boon), party.id)] : []),
-        ]
-      : []),
-  ]);
-  return json(
-    {
-      character: characterView(await loadPlayer(db, session.userId), now),
-      ...(await partyView(db, player.row.id, now)),
-      went: went.map((member) => member.row.name),
-      // Those whose exploration ended in an event: it waits for their choice.
-      notes: choosing.map((name) => t('{name} musi najpierw wybrać w zdarzeniu z poprzedniej wyprawy.', { name })),
-    },
-    201,
-  );
+  try {
+    await db.batch([
+      ...actual.flatMap((member) => setups.get(member.row.id).statements),
+      ...actual.map((member) => {
+        const report = claimed.get(member.row.id);
+        const poster = setups.get(member.row.id).wanted;
+        const other = Boolean(poster) && !wantedTarget(poster, target);
+        const set = `json_set(options, '$.party', json(?)${report ? ", '$.claimed', json(?)" : ''})`;
+        return db
+          .prepare(`UPDATE activities SET options = ${other ? `json_remove(${set}, '$.wanted')` : set} WHERE character_id = ? AND kind = 'hunt' AND ${trip}`)
+          .bind(JSON.stringify(crew), ...(report ? [JSON.stringify(report)] : []), member.row.id, now, party.id);
+      }),
+    ]);
+  } catch (error) {
+    // An assertion of a start (the leader, a member or the boon changed
+    // since read) or a member's exploration that began meanwhile.
+    if (raced(error) || String(error?.message).includes('constraint')) return null;
+    throw error;
+  }
+  return {
+    went: went.map((member) => member.row.name),
+    // Those whose exploration ended in an event: it waits for their choice.
+    notes: choosing.map((name) => t('{name} musi najpierw wybrać w zdarzeniu z poprzedniej wyprawy.', { name })),
+  };
 }
 
 // How many party invitations wait for a character, for the light on the

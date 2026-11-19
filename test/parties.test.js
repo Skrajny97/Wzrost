@@ -8,7 +8,9 @@ import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
 import { huntWait, simulateHunt } from '../src/engine/index.js';
+import { partyHunt } from '../src/server/parties.js';
 import { content, newCharacter } from './helpers/content.js';
+import { meanwhile, posted } from './helpers/meanwhile.js';
 
 // The newest place's stronger creatures (balance.monsters.huntCurve,
 // hunt-strength.test.js) and the harder explorations from the 10th level
@@ -232,31 +234,34 @@ describe('Drużyna through the API', () => {
     await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
     await as('trzeci', 'POST', '/api/party/accept', { partyId: data.party.id });
     // Trzeci gets busy just as the leader sets out: free when counted, busy
-    // when its own exploration would begin.
-    await (await db())
-      .prepare(
-        `CREATE TRIGGER busy_trzeci AFTER INSERT ON activities WHEN NEW.character_id = (SELECT id FROM characters WHERE name = 'Lider')
-         BEGIN
-           INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options)
-           VALUES ((SELECT id FROM characters WHERE name = 'Trzeci'), 'herbs', 'windfalls-edge', 60, NEW.started_at, NEW.started_at + 3600000, 'race', 100, '{}');
-         END`,
-      )
-      .run();
-    try {
-      const went = await as('lider', 'POST', '/api/party/hunt', { areaId: 'mossy-boulders', minutes: 30 });
-      assert.equal(went.status, 201, JSON.stringify(went.data));
-      assert.deepEqual(went.data.went, ['Druh']);
-      const hunts = (await (await db()).prepare("SELECT c.name, a.options FROM activities a JOIN characters c ON c.id = a.character_id WHERE a.kind = 'hunt' ORDER BY c.name").all()).results;
-      assert.deepEqual(
-        hunts.map((row) => [row.name, JSON.parse(row.options).party.names, JSON.parse(row.options).party.roster.map((one) => one.name)]),
-        [
-          ['Druh', ['Lider', 'Druh'], ['Lider', 'Druh']],
-          ['Lider', ['Lider', 'Druh'], ['Lider', 'Druh']],
-        ],
-      );
-    } finally {
-      await (await db()).prepare('DROP TRIGGER IF EXISTS busy_trzeci').run();
-    }
+    // when the trip's starts are written (its own herbs begun meanwhile).
+    // The trip's batch does not hold, and the party, read anew, sets out
+    // without it (parties.js).
+    const database = await db();
+    const now = Date.now();
+    const racing = meanwhile(database, /INSERT INTO activities/, () =>
+      database
+        .prepare(
+          `INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options)
+           VALUES ((SELECT id FROM characters WHERE name = 'Trzeci'), 'herbs', 'windfalls-edge', 60, ?, ?, 'race', 100, '{}')`,
+        )
+        .bind(now, now + 3600000)
+        .run(),
+    );
+    const answer = await partyHunt({ request: posted('/api/party/hunt', cookies.lider, { areaId: 'mossy-boulders', minutes: 30 }), env: { DB: racing }, now });
+    assert.ok(racing.done);
+    assert.equal(answer.status, 201);
+    assert.deepEqual((await answer.json()).went, ['Druh']);
+    const activities = (await database.prepare('SELECT c.name, a.kind, a.options FROM activities a JOIN characters c ON c.id = a.character_id ORDER BY c.name').all()).results;
+    assert.deepEqual(
+      activities.map((row) => [row.name, row.kind, JSON.parse(row.options).party?.names, JSON.parse(row.options).party?.roster.map((one) => one.name)]),
+      [
+        ['Druh', 'hunt', ['Lider', 'Druh'], ['Lider', 'Druh']],
+        ['Lider', 'hunt', ['Lider', 'Druh'], ['Lider', 'Druh']],
+        // Its own work goes on, untouched.
+        ['Trzeci', 'herbs', undefined, undefined],
+      ],
+    );
   });
 
   test('one called back from a trip fights in nobody\'s exploration of it any more', async () => {
@@ -507,58 +512,50 @@ describe("a Drużyna's trip and the Stajnia's mounts", () => {
   });
 });
 
-// A leader whose members' starts all fail after its own went through (each
-// got busy at that very moment) goes as on its own: its exploration keeps
-// what one of its own keeps and a trip does not, the Ołtarz's blessing and
-// the professions' levels as it set out, and waits as long as its own mount
-// makes it, not the slowest of the party's (the code review, 13.11.2026).
-describe('a leader left alone as the party sets out', () => {
-  const { call, db, signUp } = useServer({ PROFESSIONS: 'on', SETTLEMENT: 'on', FORTRESS: 'on' });
+// A member who gets busy at the very moment its leader sets out stays home,
+// and with nobody else free nobody goes, the leader neither (0.2.83: „Bez
+// drużyny nikt nie rusza”). The trip's starts are written in one batch with
+// its crew, so the leader never sets out before its members; before
+// 19.11.2026 its own start went first, and a leader whose members' starts
+// all failed after it went as on its own (the code review, 13.11.2026).
+describe('a member busy at the very moment the party sets out', () => {
+  const { call, db, signUp } = useServer();
   const cookies = {};
-  async function player(login, name, settlement) {
+  async function player(login, name) {
     ({ cookie: cookies[login] } = await signUp(login));
     await call('POST', '/api/character', { cookie: cookies[login], body: { name, classId: 'warrior', appearance: 'female' } });
-    await (await db()).prepare('UPDATE characters SET level = 30, class_level = 30, settlement = ? WHERE name = ?').bind(JSON.stringify(settlement), name).run();
+    await (await db()).prepare('UPDATE characters SET level = 30, class_level = 30 WHERE name = ?').bind(name).run();
   }
   const as = (login, method, path, body) => call(method, path, { cookie: cookies[login], body });
 
-  test('keeps its blessing, its professions and its own mount', async () => {
-    await player('lider', 'Lider', { mount: 2 });
-    await player('druh', 'Druh', {});
-    const professions = { herbalism: { level: 12, xp: 30 } };
-    await (await db())
-      .prepare('UPDATE characters SET fortress = ?, professions = ? WHERE name = ?')
-      .bind(JSON.stringify({ blessing: { day: 'today', kind: 'xp', bonus: 0.1, left: 8 } }), JSON.stringify(professions), 'Lider')
-      .run();
+  test('with nobody else free, nobody goes: the leader stays home and hears why', async () => {
+    await player('lider', 'Lider');
+    await player('druh', 'Druh');
     const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
     await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
     // Druh gets busy just as the leader sets out: free when counted, busy
-    // when its own exploration would begin.
-    await (await db())
-      .prepare(
-        `CREATE TRIGGER busy_druh AFTER INSERT ON activities WHEN NEW.character_id = (SELECT id FROM characters WHERE name = 'Lider')
-         BEGIN
-           INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options)
-           VALUES ((SELECT id FROM characters WHERE name = 'Druh'), 'herbs', 'windfalls-edge', 60, NEW.started_at, NEW.started_at + 3600000, 'race', 100, '{}');
-         END`,
-      )
-      .run();
-    try {
-      const went = await as('lider', 'POST', '/api/party/hunt', { areaId: 'mossy-boulders', minutes: 30 });
-      assert.equal(went.status, 201, JSON.stringify(went.data));
-      assert.deepEqual(went.data.went, []);
-      const hunt = await (await db()).prepare("SELECT a.started_at, a.ends_at, a.options FROM activities a JOIN characters c ON c.id = a.character_id WHERE c.name = 'Lider'").first();
-      const options = JSON.parse(hunt.options);
-      assert.equal(options.party, undefined);
-      assert.equal(options.partners, undefined);
-      assert.deepEqual(options.blessing, { day: 'today', kind: 'xp', bonus: 0.1, fights: 8 });
-      assert.deepEqual(options.professions, professions);
-      // Its own mount's wait, shorter than the party's without a mount.
-      assert.notEqual(huntWait(30, 2, content), huntWait(30, 0, content));
-      assert.equal(hunt.ends_at - hunt.started_at, huntWait(30, 2, content));
-    } finally {
-      await (await db()).prepare('DROP TRIGGER IF EXISTS busy_druh').run();
-    }
+    // when the trip's starts are written.
+    const database = await db();
+    const now = Date.now();
+    const racing = meanwhile(database, /INSERT INTO activities/, () =>
+      database
+        .prepare(
+          `INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options)
+           VALUES ((SELECT id FROM characters WHERE name = 'Druh'), 'herbs', 'windfalls-edge', 60, ?, ?, 'race', 100, '{}')`,
+        )
+        .bind(now, now + 3600000)
+        .run(),
+    );
+    await assert.rejects(
+      partyHunt({ request: posted('/api/party/hunt', cookies.lider, { areaId: 'mossy-boulders', minutes: 30 }), env: { DB: racing }, now }),
+      (error) => error.status === 409 && error.code === 'nobody_free',
+    );
+    assert.ok(racing.done);
+    const activities = (await database.prepare('SELECT c.name, a.kind FROM activities a JOIN characters c ON c.id = a.character_id ORDER BY c.name').all()).results;
+    assert.deepEqual(
+      activities.map((row) => [row.name, row.kind]),
+      [['Druh', 'herbs']],
+    );
   });
 });
 
