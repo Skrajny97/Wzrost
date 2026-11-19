@@ -1287,39 +1287,49 @@ describe('progression', () => {
     for (const level of [160, 260]) assert.ok(Math.abs(classXpToNext(level, content) / classXpToNext(level, without) - ratio(level)) < 0.001, `class level ${level}`);
   });
 
-  test('from level 250 a character earns half the gold, materials, resources, parts and chests (the author, 19.11.2026)', () => {
-    assert.deepEqual(content.balance.rewards.lateRewards, { fromLevel: 250, factor: 0.5 });
+  test('from class level 250 a character earns half the gold, materials, resources, parts and chests (the author, 19.11.2026: „wszystkie te obwarowania trudnosci sa od poziomu klasy”)', () => {
+    assert.deepEqual(content.balance.rewards.lateRewards, { fromClassLevel: 250, factor: 0.5 });
     assert.equal(lateRewards(249, content), 1);
     assert.equal(lateRewards(250, content), 0.5);
     assert.equal(lateRewards(500, content), 0.5);
     const without = { ...content, balance: { ...content.balance, rewards: { ...content.balance.rewards, lateRewards: undefined } } };
     const area = content.areas.find((one) => one.minLevel <= 250 && one.maxLevel >= 250) ?? content.areas[content.areas.length - 1];
-    for (const [level, factor] of [[249, 1], [250, 0.5], [300, 0.5]]) {
-      const late = expectedExplorationOf(area, level, 60, content);
-      const plain = expectedExplorationOf(area, level, 60, without);
-      for (const key of ['gold', 'resources', 'materials', 'parts']) assert.ok(Math.abs(late[key] - plain[key] * factor) < 1e-9, `${key} at ${level}`);
+    // The estimates (Portale, Wieże, Labirynt, the card games' gold): by the
+    // class level of the character they pay, whatever the place's level.
+    for (const [level, classLevel, factor] of [[249, 249, 1], [249, 250, 0.5], [300, 249, 1], [300, 300, 0.5], [120, 260, 0.5]]) {
+      const late = expectedExplorationOf(area, level, 60, content, classLevel);
+      const plain = expectedExplorationOf(area, level, 60, without, classLevel);
+      for (const key of ['gold', 'resources', 'materials', 'parts']) assert.ok(Math.abs(late[key] - plain[key] * factor) < 1e-9, `${key} at ${level}, class ${classLevel}`);
     }
-    // A wanted's bounty follows its place's first level.
+    // A wanted's bounty follows the class level of the character the poster
+    // is for.
     const late = content.areas.find((one) => one.minLevel >= 250);
-    const bounty = wantedGoldOf(late, content) / wantedGoldOf(late, without);
+    const bounty = wantedGoldOf(late, content, 250) / wantedGoldOf(late, without, 250);
     assert.ok(bounty > 0.4 && bounty < 0.6, `bounty ${bounty}`);
+    assert.equal(wantedGoldOf(late, content, 249), wantedGoldOf(late, without, 249));
     const early = content.areas.find((one) => one.maxLevel < 250 && one.minLevel > 200);
-    assert.equal(wantedGoldOf(early, content), wantedGoldOf(early, without));
-    // An exploration's fights and finds: about half the gold, fewer chests.
-    const hunts = (from) => {
+    assert.ok(wantedGoldOf(early, content, 260) < wantedGoldOf(early, without, 260));
+    // An exploration's fights and finds: about half the gold, fewer chests,
+    // from the class level of 250, whatever the character's level; the
+    // creatures as strong at both class levels (the myth game off).
+    const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, mythGame: { ...content.balance.monsters.mythGame, damage: 0, hp: 0 } } } };
+    const calmWithout = { ...calm, balance: { ...calm.balance, rewards: { ...calm.balance.rewards, lateRewards: undefined } } };
+    const hunts = (from, classLevel) => {
       let gold = 0;
       let chests = 0;
       for (let seed = 0; seed < 40; seed++) {
         const { character, equipped } = typicalCharacter('warrior', 250, from);
-        const hunt = simulateHunt({ character, equipped, hp: 1e9, name: 'Próba', areaId: area.id, minutes: 240, seed: `late:${seed}` }, from);
+        const hunt = simulateHunt({ character: { ...character, classLevel }, equipped, hp: 1e9, name: 'Próba', areaId: area.id, minutes: 240, seed: `late:${seed}` }, from);
         gold += hunt.gold;
         chests += hunt.items.length;
       }
       return { gold, chests };
     };
-    const [half, full] = [hunts(content), hunts(without)];
+    const [half, full] = [hunts(calm, 250), hunts(calmWithout, 250)];
     assert.ok(half.gold > full.gold * 0.4 && half.gold < full.gold * 0.6, `gold ${half.gold} of ${full.gold}`);
     assert.ok(half.chests < full.chests, `chests ${half.chests} of ${full.chests}`);
+    const [below, belowWithout] = [hunts(calm, 249), hunts(calmWithout, 249)];
+    assert.deepEqual(below, belowWithout);
   });
 
   test('the mid-game levels take longer, twice as long at its end, and none takes less than the one before', () => {

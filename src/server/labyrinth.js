@@ -144,7 +144,7 @@ function labyrinthView(player, state, now, waiting = 0) {
   const fighters = labyrinthFighters(state, { character, equipped, name: player.row.name, companions }, content());
   const counts = {};
   for (const id of state.blessings) counts[id] = (counts[id] ?? 0) + 1;
-  const prices = merchantPrices(state.charLevel, content());
+  const prices = merchantPrices(state.charLevel, content(), player.row.class_level);
   const pending = state.pending;
   const level = labyrinthLevel(state.level, content());
   const foes = map.rows.map((rooms, row) => rooms.map((room, index) => foesOf(state, row, index, room.type)));
@@ -205,7 +205,7 @@ function labyrinthView(player, state, now, waiting = 0) {
     // offers to take them there.
     waiting,
     // After a fight lost: the gold of starting again and the tries left today.
-    reset: state.over === 'fainted' ? { price: resetPrice(state.charLevel, content()), left: resetsLeft(state, content()) } : null,
+    reset: state.over === 'fainted' ? { price: resetPrice(state.charLevel, content(), player.row.class_level), left: resetsLeft(state, content()) } : null,
     rooms: rules().rooms.map((room) => roomView(room.id)),
   };
 }
@@ -450,7 +450,7 @@ export async function resetLabyrinthDay(context) {
   const state = todayOf(player, context.now);
   const next = resetLabyrinth(state, { companions: companionsOf(player), seed: toHex(crypto.getRandomValues(new Uint8Array(16))) }, content());
   if (!next) throw new ApiError(409, 'no_reset', state.over === 'fainted' ? 'Dziś Labirynt był już zaczęty od nowa. Nowy o północy.' : 'Labirynt można zacząć od nowa tylko po przegranej walce.');
-  const price = resetPrice(state.charLevel, content());
+  const price = resetPrice(state.charLevel, content(), row.class_level);
   if (row.gold < price) throw new ApiError(409, 'no_gold', t('Brakuje złota: potrzeba {price}.', { price }));
   const db = context.env.DB;
   await atomically(db, [
@@ -479,7 +479,7 @@ export async function labyrinthMerchant(context) {
   if (body.buy !== 'heal' && body.buy !== 'blessing') throw new ApiError(400, 'invalid_ware', 'Wybierz, co kupić.');
   const next = buyAtMerchant(state, body.buy, content());
   if (!next) throw new ApiError(409, 'not_for_sale', 'Tego kupiec już nie sprzedaje.');
-  const price = merchantPrices(state.charLevel, content())[body.buy];
+  const price = merchantPrices(state.charLevel, content(), row.class_level)[body.buy];
   if (row.gold < price) throw new ApiError(409, 'no_gold', t('Brakuje złota: potrzeba {price}.', { price }));
   await atomically(db, [
     sameVersion(db, row),

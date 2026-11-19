@@ -43,7 +43,7 @@
 // innych aktywności będzie opcja dropienia boosterów kart zamiast samych
 // kart”) brings a pack of cards instead (PACK), opened as Szczęsny's.
 
-import { monsterCombatant, withoutStages } from './combatant.js';
+import { monsterCombatant } from './combatant.js';
 import { createRng } from './rng.js';
 import { say } from './text.js';
 
@@ -194,9 +194,7 @@ const shapesBuilt = new WeakMap();
 
 // Each card's shape: its creature's blow over its HP in a fight at its first
 // home, over the median of all the cards', kept within shapeRange and raised
-// to shapeExponent. Above 1 the card hits harder than it lasts. The
-// creatures' growth from level 250 (mythGame) is not the cards': the card
-// games keep their own measure.
+// to shapeExponent. Above 1 the card hits harder than it lasts.
 /**
  * @param {Content} content
  * @returns {Map<string, number>}
@@ -205,10 +203,9 @@ function cardShapes(content) {
   const built = shapesBuilt.get(content);
   if (built) return built;
   const { shapeExponent, shapeRange } = cardRules(content).stats;
-  const plain = withoutStages(content, ['mythGame']);
   /** @type {[string, number][]} */
   const ratios = [...cardHomes(content)].map(([id, home]) => {
-    const unit = monsterCombatant({ monsterId: id, level: home.level, id: 'card' }, plain);
+    const unit = monsterCombatant({ monsterId: id, level: home.level, id: 'card' }, content);
     const blow = ((unit.weapon.min + unit.weapon.max) / 2) * unit.damageScale;
     return [id, blow / Math.max(1, unit.maxHp)];
   });

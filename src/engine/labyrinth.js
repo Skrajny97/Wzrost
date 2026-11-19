@@ -253,25 +253,31 @@ export function labyrinthStrength(level, type, charLevel, content) {
 
 // The gold of `minutes` of exploring at the character's level, in the place
 // that holds its level: the elites', the treasures' and the merchant's
-// measure.
+// measure; for a character of class level `classLevel` a part of it from
+// the late class levels on (lateRewards in expectedExploration), 0 for all
+// of it.
 /**
  * @param {number} minutes
  * @param {number} charLevel
  * @param {Content} content
+ * @param {number} [classLevel]
  * @returns {number}
  */
-export const labyrinthGold = (minutes, charLevel, content) => Math.max(1, Math.round(expectedExploration(portalArea(charLevel, content), charLevel, minutes, content).gold));
+export const labyrinthGold = (minutes, charLevel, content, classLevel = 0) =>
+  Math.max(1, Math.round(expectedExploration(portalArea(charLevel, content), charLevel, minutes, content, classLevel).gold));
 
 // The merchant's prices at a character level: the healing and a choice of a
-// blessing, each the gold of so many minutes of exploring.
+// blessing, each the gold of so many minutes of exploring (`classLevel` as
+// in labyrinthGold).
 /**
  * @param {number} charLevel
  * @param {Content} content
+ * @param {number} [classLevel]
  * @returns {{ heal: number, blessing: number }}
  */
-export function merchantPrices(charLevel, content) {
+export function merchantPrices(charLevel, content, classLevel = 0) {
   const { healMinutes, blessingMinutes } = rules(content).merchant;
-  return { heal: labyrinthGold(healMinutes, charLevel, content), blessing: labyrinthGold(blessingMinutes, charLevel, content) };
+  return { heal: labyrinthGold(healMinutes, charLevel, content, classLevel), blessing: labyrinthGold(blessingMinutes, charLevel, content, classLevel) };
 }
 
 // Three blessings to choose from (853 A), each of the pool once, drawn from
@@ -410,9 +416,10 @@ export const resetsLeft = (state, content) => (state.over === 'fainted' ? Math.m
 /**
  * @param {number} charLevel
  * @param {Content} content
+ * @param {number} [classLevel] As in labyrinthGold.
  * @returns {number}
  */
-export const resetPrice = (charLevel, content) => labyrinthGold(rules(content).reset.goldMinutes, charLevel, content);
+export const resetPrice = (charLevel, content, classLevel = 0) => labyrinthGold(rules(content).reset.goldMinutes, charLevel, content, classLevel);
 
 /**
  * @param {LabyrinthState} state
@@ -497,7 +504,7 @@ export function roomDanger({ state, type, row, room, party, seed }, content) {
   const sample = (times) => {
     for (let i = 0; i < times; i++, fought++) {
       const rng = createRng(`${seed}:${state.level}:${row}:${room}:${fought}`);
-      const enemies = encounterCombatants(plan.encounter, content, { strength });
+      const enemies = encounterCombatants(plan.encounter, content, { strength, classLevel: party.character.classLevel ?? 0 });
       const fight = simulateFight({ allies: allies.map((unit) => ({ ...unit })), enemies, rng, content, trait: area.trait });
       if (fight.won !== true) {
         lost += 1;
@@ -612,7 +619,7 @@ export function enterRoom(state, target, party, seed, content) {
     next.pending = { kind: 'merchant', heal: false, blessing: false, choices: null };
   } else if (type === 'treasure') {
     gains.shards = level.shards.treasure;
-    gains.gold = labyrinthGold(rules(content).rewards.treasureGoldMinutes, state.charLevel, content);
+    gains.gold = labyrinthGold(rules(content).rewards.treasureGoldMinutes, state.charLevel, content, party.character.classLevel ?? 0);
     lines.push(say(texts, 'treasure', index, { gold: gains.gold, shards: gains.shards }));
   } else {
     hunt = labyrinthFight({ state: next, type, row: target.row, room: target.room, party, seed }, content);
@@ -624,7 +631,7 @@ export function enterRoom(state, target, party, seed, content) {
       next.over = 'fainted';
     } else if (type === 'elite') {
       gains.shards = level.shards.elite;
-      gains.gold += labyrinthGold(rules(content).rewards.eliteGoldMinutes, state.charLevel, content);
+      gains.gold += labyrinthGold(rules(content).rewards.eliteGoldMinutes, state.charLevel, content, party.character.classLevel ?? 0);
       next.pending = { kind: 'blessing', from: 'elite', choices: blessingChoices(`${state.seed}:${state.level}:${target.row}:${target.room}`, content) };
     } else if (type === 'guardian') {
       artifact = makeArtifact(level.artifact, createRng(`${seed}:artifact`), content);
@@ -723,7 +730,9 @@ export function labyrinthFight({ state, type, row, room, party, seed }, content)
   const standing = fighters.filter((fighter) => fighter.unit.hp > 0);
   const allies = standing.map((fighter) => (fighter.key === 'me' && Object.keys(trophies).length > 0 ? { ...fighter.unit, trophies } : fighter.unit));
   const strength = labyrinthStrength(state.level, type, state.charLevel, content);
-  const enemies = encounterCombatants(plan.encounter, content, { strength });
+  // From the character's class level 250 they are stronger still (the myth
+  // game, monsterCombatant).
+  const enemies = encounterCombatants(plan.encounter, content, { strength, classLevel: character.classLevel ?? 0 });
   const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait });
   const won = fight.won === true;
   /** @type {Record<string, number>} */
@@ -753,7 +762,7 @@ export function labyrinthFight({ state, type, row, room, party, seed }, content)
       fightGold += content.balance.rewards.goldPerLevel * enemy.level * monster.reward.gold * enemy.groupFactor * lootRng.float(0.5, 1.5);
     }
     xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * lengthed * partyXp * weekFactor(/** @type {any} */ (week), 'xp'));
-    gold = Math.round(fightGold * lengthed * weekFactor(/** @type {any} */ (week), 'gold') * lateRewards(character.level, content));
+    gold = Math.round(fightGold * lengthed * weekFactor(/** @type {any} */ (week), 'gold') * lateRewards(character.classLevel ?? 0, content));
   }
 
   // The cards the creatures beaten leave (903), from a seed of their own,

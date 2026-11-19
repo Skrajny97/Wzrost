@@ -521,7 +521,7 @@ export function resolveEvent(
     ...(gives?.buff && { buff: gives.buff }),
     ...(gives?.points && { points: gives.points }),
   });
-  const goldOf = (/** @type {number} */ times) => Math.round(content.balance.rewards.goldPerLevel * character.level * times * rng.float(0.75, 1.25) * lateRewards(character.level, content));
+  const goldOf = (/** @type {number} */ times) => Math.round(content.balance.rewards.goldPerLevel * character.level * times * rng.float(0.75, 1.25) * lateRewards(character.classLevel ?? 0, content));
   const itemOf = (/** @type {Record<string, number>} */ rarities) => {
     const [rarityId] = rng.weighted(Object.entries(rarities), ([, weight]) => weight);
     return randomItem(character.level, rng, content, { ...lootRules(character, equipped, area, content), rarityId });
@@ -637,9 +637,14 @@ export function resolveEvent(
     if (!end || end.fainted || end.hpEnd <= 0) return [];
     return [{ id: companion.id, unit: companionCombatant(companion, { hp: end.hpEnd, area, id: `a${index + 1}` }, content) }];
   });
+  // From the character's class level 250 they are stronger (the myth game,
+  // monsterCombatant).
   const growth = mates.length > 0 ? {} : { growth: content.balance.monsters.soloGrowth };
   /** @type {Record<string, any>[]} */
-  const enemies = encounterCombatants({ members: outcome.foes.map((/** @type {string} */ monsterId) => ({ monsterId, level: character.level })) }, content, growth);
+  const enemies = encounterCombatants({ members: outcome.foes.map((/** @type {string} */ monsterId) => ({ monsterId, level: character.level })) }, content, {
+    ...growth,
+    classLevel: character.classLevel ?? 0,
+  });
   // The potions the character still carries of those taken along, its
   // strengthening potions still working (in their number of the first
   // fights) and its trophies work in the event's fight as on the way (the
@@ -710,7 +715,7 @@ export function resolveEvent(
     for (const enemy of enemies) {
       const foe = content.monstersById[enemy.monsterId];
       fightXp += monsterXp(foe, enemy.level, content) * enemy.groupFactor;
-      fightGold += rewards.goldPerLevel * enemy.level * foe.reward.gold * rng.float(0.5, 1.5) * enemy.groupFactor * weekFactor(hunt.week, 'gold') * lateRewards(character.level, content);
+      fightGold += rewards.goldPerLevel * enemy.level * foe.reward.gold * rng.float(0.5, 1.5) * enemy.groupFactor * weekFactor(hunt.week, 'gold') * lateRewards(character.classLevel ?? 0, content);
       if (rng.chance(weekChance(outcome.itemChance ?? 0, hunt.week, 'items'))) summary.chests.push(items.push(randomItem(enemy.level, rng, content, loot)) - 1);
     }
     // What the win leaves besides: the offerings' silver, the leshy's gift.

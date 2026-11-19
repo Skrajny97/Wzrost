@@ -3847,6 +3847,30 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.60 (19.11.2026): od 250. poziomu klasy, nie stwora
+
+Autor (19.11.2026), o wersji 0.4.57: „to miało byc od 250 poziomu klasy, mam nadzieje ze tak zrobiles”, a potem: „wszystkie te obwarowania trudnosci sa od poziomu klasy co podałem”.
+
+1. **Trzy razy silniejsze stwory od 250. poziomu klasy postaci, która walczy.** W 0.4.57 liczył się poziom stwora. Teraz postać od 250. poziomu klasy spotyka każdy stwór trzy razy silniejszy (cios i HP ×1,7321), gdziekolwiek walczy, także w niższych miejscach. Postać poniżej 250. poziomu klasy spotyka stwory takie jak dawniej, także te od 250. poziomu. W danych jest `monsters.mythGame.fromClassLevel` (250) zamiast `fromLevel` i `toLevel`. W walce postaci samej dalej połowa (`soloGrowth`).
+2. **Drużyna.** Na wyprawie drużyny, w Wieży Drużyn i w walce zdarzenia drużyny liczy się najwyższy poziom klasy wśród walczących graczy (`fightingClassLevel` w `src/engine/combatant.js`), żeby nikt nie chował się za niższym liderem. Od niego zależy i trzykrotna siła, i dopłata 25% za każdego gracza poza pierwszym (`monsters.perPlayer.fromClassLevel` 250). Towarzysze i najemnik się nie liczą.
+3. **Połowa nagród od 250. poziomu klasy** (`rewards.lateRewards.fromClassLevel` 250, `lateRewards` w `src/engine/progression.js`; dotąd od 250. poziomu postaci): wyprawy (na wyprawie drużyny każdy według swojej klasy), zdarzenia wyprawy i drużyny, Labirynt (walki, skarby, elity, ceny kupca i nowego podejścia), Sala prób, listy gończe (według klasy postaci, dla której wiszą), skrzynie Wyprawy Gildii, zadania Tablicy, Portale i Wieże (łup i złoto według klasy postaci, także w podglądzie na ekranie) i złoto z gier w karty, które liczy się z szacunku wyprawy. Krzywe XP bez zmian: XP postaci według poziomu postaci, XP klasy według poziomu klasy.
+4. **Gdzie stwory biorą poziom klasy:** wyprawa i wyprawa drużyny, Wieże, Portale, Labirynt, Sala prób, Poszukiwani na wyprawie, walki zdarzeń wyprawy i drużyny i szacowanie zagrożenia (dla postaci samej). Bestia Gildii, strażnicy Wyprawy Gildii, karty Talii Systemu i podgląd umiejętności nie dostają poziomu klasy, więc mają stwory jak dotąd.
+5. **Brakujące szczegóły:**
+   - Wyprawa i jej zdarzenie liczą poziom klasy z chwili wyruszenia, jak inne liczby wyprawy (924 A); Labirynt, Portale, Wieże i Sala prób obecny.
+   - Skok w `midGameShare` z 0.4.57 nie jest już potrzebny, więc zniknął.
+   - Typowa postać ma 250. poziom klasy już na 217. poziomie postaci (na 216. klasę 249), więc trzykrotna siła stworów i połowa nagród przychodzą wcześniej niż w 0.4.57, w Łysogórach.
+6. **Pomiar** (`tools/difficulty-sim.mjs`, realistyczny gracz z dwoma towarzyszami, 5 klas, 200 wypraw na klasę i długość, 200 walk z elitą miejsca, Gryfem). Przed: gra 0.4.58, w której na tych poziomach nie było ani trzykrotnej siły, ani połowy nagród. W komórkach: omdlenia; HP na końcu (wyprawy) albo wygrane; HP po wygranej (elita), w procentach, oraz złoto na godzinę z wypraw godzinnych, przed → po. XP na godzinę bez zmian.
+
+   | Poziom postaci (klasa) | Wyprawa 1 h | Wyprawa 4 h | Elita | Złoto na godzinę |
+   | --- | --- | --- | --- | --- |
+   | 215 (248) | 0; 98 → 0; 98 | 0; 97,6 → 0; 97,6 | 100; 97 → 100; 97 | 3097 → 3097 |
+   | 216 (249) | 0; 98,2 → 0; 98,2 | 0; 98,1 → 0; 98,1 | 100; 97,5 → 100; 97,5 | 3164 → 3164 |
+   | 217 (250) | 0; 98,4 → 0; 94,6 | 0; 98 → 0,1; 93,5 | 100; 97,3 → 100; 89,3 | 3200 → 1596 |
+   | 218 (252) | 0; 98,3 → 0; 94,5 | 0; 98 → 0,1; 93,5 | 100; 96,9 → 100; 89,8 | 3137 → 1574 |
+   | 220 (254) | 0; 98,3 → 0; 94,7 | 0; 97,9 → 0,1; 93,7 | 100; 97,1 → 99,9; 88,5 | 3113 → 1577 |
+
+7. **Testy.** `test/myth-game.test.js`: klasa 249 i 250 przy tym samym stworze, niski stwór przy klasie 250 i wyżej, najwyższa klasa graczy na wyprawie drużyny, w Wieży Drużyn i w zdarzeniu drużyny (poziom towarzysza i najemnika się nie liczy), Portal, połowa nagród Portali, Wież i Labiryntu według klasy, Bestia Gildii i karty bez zmian. `test/engine.test.js`: połowa nagród według klasy (szacunki, listy gończe, wyprawa). `test/challenge.test.js`: pole `fromClassLevel`. `test/nawia.test.js` wrócił do stanu sprzed 0.4.57, bo stwór bez poziomu klasy ma dawną siłę.
+
 ## Wersja 0.4.59 (19.11.2026): Drużyna niezależna od zmiany postaci
 
 Gracz poskarżył się, że przy zmianie postaci gra pyta: „Jesteś w drużynie. Wyjść z drużyny?” (0.4.56, 1178 B). Autor: „to jest jednak irytujące dla graczy i w sumie bezsensowne” oraz „dlaczego system robił błąd kiedy ktoś zmienia postać? przecież trzeba to jakoś rozdzielić to jest absurdalne”.

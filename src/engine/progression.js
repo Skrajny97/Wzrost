@@ -43,18 +43,20 @@ export function lateSlowdown(level, points) {
   return from.factor + ((to.factor - from.factor) * (level - from.level)) / (to.level - from.level);
 }
 
-// How much of what it earns a character of `level` gets (the author,
-// 19.11.2026: „Zmniejsz też zdobywane złoto i inne rzeczy od 250ego tak
-// dwukrotnie gdzieś”): `factor` of it from fromLevel on, all of it before
-// (balance.rewards.lateRewards). An exploration's gold, materials, resources,
-// parts and chests with items, and the gold of the other pursuits.
+// How much of what it earns a character of class level `classLevel` gets
+// (the author, 19.11.2026: „Zmniejsz też zdobywane złoto i inne rzeczy od
+// 250ego tak dwukrotnie gdzieś”, then „wszystkie te obwarowania trudnosci
+// sa od poziomu klasy co podałem”): `factor` of it from fromClassLevel on,
+// all of it before (balance.rewards.lateRewards). An exploration's gold,
+// materials, resources, parts and chests with items, and the gold of the
+// other pursuits.
 /**
- * @param {number} level
+ * @param {number} classLevel
  * @param {Content} content
  */
-export function lateRewards(level, content) {
+export function lateRewards(classLevel, content) {
   const late = content.balance.rewards.lateRewards;
-  return late && level >= late.fromLevel ? late.factor : 1;
+  return late && classLevel >= late.fromClassLevel ? late.factor : 1;
 }
 
 // How many times longer a level takes for the mid-game: evenly more from
@@ -76,15 +78,12 @@ function midGameSlowdown(level, midGame) {
 // wzrostu wyzwania musimy bardzo delikatnie podwyższyć … I oczywiscie chodzi
 // o midgame, bo early musi byc latwiejssze", so the first levels keep their
 // pace and monsters, and the mid-game levels take a little longer and their
-// monsters hit a little harder (balance.monsters.midGame). A range whose
-// toLevel is its fromLevel is a step: 0 below it, 1 from it on (the myth
-// game from 250, balance.monsters.mythGame: „Od 250ego”).
+// monsters hit a little harder (balance.monsters.midGame).
 /**
  * @param {number} level
  * @param {{ fromLevel: number, toLevel: number }} range
  */
 export function midGameShare(level, { fromLevel, toLevel }) {
-  if (toLevel <= fromLevel) return level >= fromLevel ? 1 : 0;
   return Math.min(1, Math.max(0, (level - fromLevel) / (toLevel - fromLevel)));
 }
 
