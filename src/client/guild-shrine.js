@@ -65,7 +65,12 @@ export function guildShrineCard() {
   async function vote(god) {
     const { texts } = view;
     if (!(await confirmAction({ title: texts.castTitle, text: filled(texts.castText, { god: god.name }), confirmLabel: texts.cast }))) return;
-    const answer = await call('POST', '/api/guild/shrine/vote', { god: god.id, week: view.week });
+    // A vote refused as the card stood (cast already, a week gone, 409)
+    // brings the card as it is now, under the words why.
+    const answer = await call('POST', '/api/guild/shrine/vote', { god: god.id, week: view.week }).catch((error) => {
+      if (error?.status === 409) card.reload();
+      throw error;
+    });
     view = answer;
     render();
     checkGuildTodo({ now: true });
@@ -144,13 +149,15 @@ export function guildShrineCard() {
     );
   }
 
-  call('GET', '/api/guild/shrine')
-    .then((answer) => {
-      view = answer;
-      render();
-    })
-    .catch((error) => {
-      if (!view) fill(card, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać Kąciny.') }));
-    });
+  card.reload = () =>
+    call('GET', '/api/guild/shrine')
+      .then((answer) => {
+        view = answer;
+        render();
+      })
+      .catch((error) => {
+        if (!view) fill(card, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać Kąciny.') }));
+      });
+  card.reload();
   return card;
 }

@@ -5,7 +5,7 @@
 // the Obóz or the Warownia and its work in a profession, each with its time
 // left, its helps and the names of those who helped; under it the other
 // members' builds and work, each with its owner, its time left, its helps
-// and "Pomóż" with what one help cuts off, or "Pomogłeś" and "Komplet
+// and "Pomóż" with what one help cuts off, or "Pomoc wysłana" and "Komplet
 // pomocy"; "Pomóż wszystkim" over them while any waits; the character's
 // Sława for helping this week and "Jak to działa?". The words come with the
 // answer (data/guilds.json, help.texts), in the page's language; the card's
@@ -70,8 +70,13 @@ export function guildHelpCard() {
       h('span', { class: 'chat-level', text: t('poz. {level}', { level: formatNumber(person.level) }) }),
     );
 
+  // A help refused as the card stood (a build or a work over, full or
+  // changed meanwhile, 409) brings the card as it is now, under the words why.
   async function act(path, body) {
-    const answer = await call('POST', path, body);
+    const answer = await call('POST', path, body).catch((error) => {
+      if (error?.status === 409) card.reload();
+      throw error;
+    });
     view = answer;
     render();
     checkGuildTodo({ now: true });

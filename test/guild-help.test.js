@@ -134,7 +134,7 @@ describe('the help through the API', () => {
 
     const given = await help('ziomek', druh, entry.target);
     assert.equal(given.status, 200, JSON.stringify(given.data));
-    assert.equal(given.data.text, 'Pomogłeś postaci Druh: Kowadło, 7. poziom skończy się 14 min wcześniej. Zgarniasz 1 punkt Sławy.');
+    assert.equal(given.data.text, 'Pomoc wysłana do postaci Druh: Kowadło, 7. poziom skończy się 14 min wcześniej. Zgarniasz 1 punkt Sławy.');
     const moved = await first("SELECT started_at, ends_at FROM buildings WHERE character_id = ? AND building_id = 'anvil'", druh);
     assert.deepEqual([moved.started_at, moved.ends_at], [clock - HOUR - 864000, ends - 864000]);
     const after = await first('SELECT build_queue, version FROM characters WHERE id = ?', druh);
@@ -247,7 +247,7 @@ describe('the help through the API', () => {
     const all = await as('mistrz', 'POST', '/api/guild/help/all');
     assert.equal(all.status, 200, JSON.stringify(all.data));
     assert.equal(all.data.helped, 2);
-    assert.equal(all.data.text, 'Pomogłeś 2 razy. Zgarniasz 2 punkty Sławy.');
+    assert.equal(all.data.text, 'Pomoc wysłana 2 razy. Zgarniasz 2 punkty Sławy.');
     assert.equal(all.data.open, 0);
     assert.equal((await first('SELECT COUNT(*) AS n FROM guild_helps WHERE helper_id = ?', await idOf('Mistrz'))).n, 2);
     const twice = await as('mistrz', 'POST', '/api/guild/help/all');

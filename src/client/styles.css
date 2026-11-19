@@ -17734,6 +17734,16 @@ button.tcard-slot {
   flex: none;
 }
 
+/* "Pomoc wysłana" and "Komplet pomocy" in two lines, as narrow as "Pomóż",
+   so the owner and the build keep their room on a small phone. */
+.guild-help-action .guild-chip {
+  justify-content: center;
+  max-width: 96px;
+  line-height: 1.15;
+  text-align: center;
+  white-space: normal;
+}
+
 .guild-help-button {
   display: inline-flex;
   flex-direction: column;
