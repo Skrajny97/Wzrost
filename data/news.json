@@ -1420,6 +1420,11 @@
       "id": "0.4.46",
       "title": "Wersja 0.4.46",
       "body": "- Poziomy od 100. do 250. trwają coraz dłużej: na 100. poziomie tak jak dotąd, a potem coraz dłużej, aż przed 250. poziomem prawie 3 razy dłużej niż dotąd. Tak samo poziomy klasy.\n- Od 250. poziomu postaci wyprawy dają o połowę mniej złota, materiałów, zasobów i skrzyń z przedmiotami, a pozostałe zajęcia o połowę mniej złota.\n- Drużyna: wyprawa drużyny rusza teraz cała albo wcale. Dotąd przerwane połączenie przy wyruszaniu mogło sprawić, że członek drużyny walczył sam i przegrywał, choć lider wygrał tę samą wyprawę.\n- Kto zawróci z wyprawy drużyny, znika też z marszu pozostałych na ekranie Walki."
+    },
+    {
+      "id": "0.4.47",
+      "title": "Wersja 0.4.47",
+      "body": "- Nawia, kraina umarłych, czeka za Łysogórami, na poziomach 276–350: Mgliste Bagna Nawii, Łąki Welesa i Kraina bez Słońca, 15 miejsc i 51 nowych stworów z własnymi sposobami walki (ogłuszanie, uciszanie, tratowanie, zemsta i inne).\n- Nowe materiały, karty Talii Systemu, listy gończe i osiągnięcie „Odkrywca Nawii”."
     }
   ]
 }

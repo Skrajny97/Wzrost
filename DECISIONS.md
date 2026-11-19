@@ -3847,6 +3847,25 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.47 (19.11.2026): Nawia w grze
+
+1. **Autor (19.11.2026): „to na co chciałem mieć wpływ w ocenach zaznaczyłem, reszte przeanalizuj solidnie i wybierz sam, bo nie mam na to siły”, „Najwyżej jak wybierzesz tragicznie to zostaw gdzieś te assety i kiedyś je poprawimy” i „trzeba zrobić już to”.** Nawia (276–350) jest w grze: trzy krainy, 15 miejsc, 51 stworów, 51 materiałów, z danymi i liczbami opisanymi w „Nawia: dane, liczby i nowe zasady walki”. Punkt 14 tamtej części („Bez grafik”) jest już nieaktualny.
+2. **Grafiki według ocen autora:**
+   - kręgi miejsc (1160): Mglisty Brzeg A, Kalinowy Most B, Wyspa Praszczurów A, Przeprawa Umarłych B, Brama Nawii C, Wieczne Pastwiska C, Złote Jary A, Wężowe Źródła A, Dąbrowa Welesa C, Dwór Welesa A, Zamarznięte Pieczary D, Szlak Umarłych A, Czarne Jezioro A, Gród Czarnoboga C, Zamek Kościeja B;
+   - karty krain: Mgliste Bagna Nawii karta D z 1088, Łąki Welesa B (1162.1), Kraina bez Słońca C (1162.2);
+   - plansze walki (1163): Mgliste Bagna Nawii A, Łąki Welesa B, Kraina bez Słońca B.
+3. **Grafiki wybrane przeze mnie (autor ich nie oceniał).** Stwory (1147–1149) i materiały (1161): z każdej czwórki jedna wersja, po obejrzeniu w powiększeniu i w wielkości z gry (stwór 72 px, materiał 32 i 64 px). Przy stworach sprawdzony też czarny obrys, bo stwór jeszcze niespotkany pokazuje się w grze jako czarny kształt. Materiały porównane z 215 dawnymi ikonami, żeby się nie powtarzały.
+   - Tęsknota i Kret są odbite w poziomie, żeby patrzyły w prawo jak pozostałe stwory.
+   - Łza tęsknoty ma kolor fioletowy, bo w niebieskim była prawie taka sama jak Łza topielicy.
+   - Słabsze, do poprawy kiedyś: Tętent (konie ledwo widać w zielonej plamie), Strach (ma twarz, choć opis mówi „bez twarzy”), Sprężyna skoczogonka (wygląda jak róg) i Wąs kota Bajuna (cienka kreska, słabo widoczna na 32 px).
+   - Wszystkie cztery wersje każdego stwora i materiału leżą w `art/alternatives/nawia/` (`<id>-A.png` … `<id>-D.png`), żeby można było kiedyś wybrać inną. Surowe szkice kręgów, kart, plansz i materiałów są też na gałęzi `art-drafts`.
+4. **Okrzyki (1165):** autor ich nie oceniał, więc do gry trafiły oba nagrania każdego okrzyku: 51 stworów, po dwa nagrania bólu i dwa śmierci (`src/client/audio/sfx/<id>-hurt-1.mp3` itd., w `data/sounds.json` z głośnością 0,6 i 0,7 jak w Łysogórach).
+5. **Odpowiedzi autora na pytania 1166–1169:**
+   - 1166 A: elity i czempioni Nawii zostają tak trudni, jak wyszli z liczenia (elity jak Południca, 97% wygranych z towarzyszami; czempioni trochę trudniejsi niż Raróg, 86%).
+   - 1167 B: stwór „Cień” z Bramy Nawii nazywa się „Cień Zmarłego” (po angielsku „Shade of the Dead”), żeby nie mylił się z klasą Cień (Shadow). Identyfikator `shade` i grafika zostają.
+   - 1168 A: Weles i Kościej dalej biją jedną postać naraz.
+   - 1169 B: elity i czempioni Łysogór wracają do trudności z wejścia Łysogór. To osobny etap, zaraz po tym.
+
 ## Wersja 0.4.46 (19.11.2026): wolniejsze poziomy od 100., połowa nagród od 250., wyprawa drużyny w całości albo wcale
 
 1. **Autor: „Lvl curve od 100 do 250 też zwiększ, gdzieś tak o połowę tego co zwiększysz w zakresie 250-500”.** Od 100. poziomu każdy poziom postaci i klasy trwa coraz dłużej: na 100. tak jak dotąd, potem równo coraz dłużej, aż na 250. 3 razy dłużej, czyli tyle, ile od 0.4.44 trwa 250. poziom. Dalej bez zmian: 10 razy dłużej od 300. poziomu. Krzywa to teraz trzy punkty w `data/balance.json` (`progression.lateLevels`: 100 → 1 raz, 250 → 3 razy, 300 → 10 razy, między nimi równo), a `lateSlowdown` w `src/engine/progression.js` liczy z nich mnożnik.
