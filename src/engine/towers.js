@@ -24,7 +24,7 @@
 // odpowiedniego inaczej niż Portale").
 // Pure: the seed is the server's.
 
-import { combatantView, playerCombatant } from './combatant.js';
+import { combatantView, fightingClassLevel, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
 import { companionCombatant, trackerMaterials } from './companions.js';
 import { addCounts, materialDrops, materialsText, stackKey } from './crafting.js';
@@ -110,15 +110,18 @@ export function towerFloor(floor, seed, content) {
 // The gold a win on floor `floor` pays: what a whole exploration of
 // rewardMinutes brings on average at the floor's level in its region,
 // loot.goldMultiplier times (the author: "zmodyfikować Wieże by dawały
-// więcej niż Portale, o wiele więcej").
+// więcej niż Portale, o wiele więcej"); for a character of class level
+// `classLevel`, a part of it from the late class levels on (lateRewards in
+// expectedExploration), 0 for all of it.
 /**
  * @param {number} floor
  * @param {Content} content
+ * @param {number} [classLevel]
  * @returns {number}
  */
-export function towerGold(floor, content) {
+export function towerGold(floor, content, classLevel = 0) {
   const { rewardMinutes, loot } = content.towers;
-  return Math.round(expectedExploration(towerArea(floor, content), towerLevel(floor, content), rewardMinutes, content).gold * loot.goldMultiplier);
+  return Math.round(expectedExploration(towerArea(floor, content), towerLevel(floor, content), rewardMinutes, content, classLevel).gold * loot.goldMultiplier);
 }
 
 // The rarity weights of a tower material on floor `floor`: those of the
@@ -242,13 +245,15 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
   // players or companions face creatures three times as strong as the Wieża
   // Solo's (the author, 7.11.2026: "drużynowych chyba nie ruszałeś bo dalej
   // są banalnie łatwe").
-  // From level 250 the players of the Drużyna make the creatures stronger
-  // still, beyond that, as on a trip (partyStrength in combatant.js; the
-  // author, 19.11.2026: „szczególnie z drużyną”): three players more than
-  // a player with two companions.
+  // From class level 250 of the highest of its players the creatures are
+  // stronger (the myth game), and the players of the Drużyna make them
+  // stronger still, beyond that, as on a trip (fightingClassLevel and
+  // partyStrength in combatant.js; the author, 19.11.2026: „szczególnie z
+  // drużyną”): three players more than a player with two companions.
   const [damage, hp] = content.towers.strength;
   const strength = [damage * allies.length, hp * allies.length];
-  const enemies = encounterCombatants(plan.encounter, content, { growth: alone ? content.balance.monsters.soloGrowth : 1, strength, players: 1 + partners.length });
+  const classLevel = fightingClassLevel([character, ...partners.map((partner) => partner.character)]);
+  const enemies = encounterCombatants(plan.encounter, content, { growth: alone ? content.balance.monsters.soloGrowth : 1, strength, classLevel, players: 1 + partners.length });
   const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait });
   const won = fight.won === true;
   const hpAfter = Math.max(0, fight.units.find((/** @type {{ id: string }} */ unit) => unit.id === player.id)?.hp ?? 0);
@@ -270,7 +275,7 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
     }
     xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * lengthed * partyXp * weekFactor(week, 'xp'));
     // The tower's loot (towerGold, towerMaterials), far above a portal's.
-    gold = Math.round(towerGold(floor, content) * weekFactor(week, 'gold'));
+    gold = Math.round(towerGold(floor, content, character.classLevel ?? 0) * weekFactor(week, 'gold'));
     materials = addCounts(materials, towerMaterials(floor, enemies, rng, content, moreMaterials));
     // items.js is not checked yet: its options are typed by their defaults
     // alone (classId, rarityId and area have none).

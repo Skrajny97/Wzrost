@@ -50,27 +50,31 @@ export function wantedName(poster, content) {
 }
 
 // The bounty for a target in `area`: goldPerLevel × the place's first
-// level, in whole goldSteps, at least one; from the late levels on a part
-// of it (lateRewards, by the place's first level).
+// level, in whole goldSteps, at least one; for a character of class level
+// `classLevel` (the one the poster is for), a part of it from the late
+// class levels on (lateRewards), 0 for all of it.
 /**
  * @param {Area} area
  * @param {Content} content
+ * @param {number} [classLevel]
  * @returns {number}
  */
-export function wantedGold(area, content) {
+export function wantedGold(area, content, classLevel = 0) {
   const { goldPerLevel, goldStep } = rulesOf(content);
-  return Math.max(goldStep, Math.round((goldPerLevel * area.minLevel * lateRewards(area.minLevel, content)) / goldStep) * goldStep);
+  return Math.max(goldStep, Math.round((goldPerLevel * area.minLevel * lateRewards(classLevel, content)) / goldStep) * goldStep);
 }
 
-// A poster: its target, at the level of the place's elite.
+// A poster: its target, at the level of the place's elite, and its bounty
+// for a character of `classLevel` (wantedGold).
 /**
  * @param {string} day
  * @param {Area} area
  * @param {Record<string, any>} target a creature's variant (`area`, `monster`) or an outlaw (a monster)
+ * @param {number} classLevel
  * @param {Content} content
  * @returns {Poster}
  */
-function poster(day, area, target, content) {
+function poster(day, area, target, classLevel, content) {
   const outlaw = !target.area;
   const monsterId = outlaw ? target.id : target.monster;
   return {
@@ -81,7 +85,7 @@ function poster(day, area, target, content) {
     name: target.name,
     female: target.female === true,
     level: area.maxLevel + content.balance.hunt.eliteLevelBonus,
-    gold: wantedGold(area, content),
+    gold: wantedGold(area, content, classLevel),
   };
 }
 
@@ -120,9 +124,9 @@ export function wantedPosters(classLevel, day, seed, content, early = null) {
     .map((area) => /** @type {[Area, Record<string, any> | undefined]} */ ([area, rules.variants.find((/** @type {{ area: string }} */ variant) => variant.area === area.id)]))
     .filter(([, variant]) => variant)
     .sort(([a], [b]) => b.minLevel - a.minLevel)
-    .map(([area, variant]) => poster(day, area, /** @type {Record<string, any>} */ (variant), content));
+    .map(([area, variant]) => poster(day, area, /** @type {Record<string, any>} */ (variant), classLevel, content));
   const outlaw = content.monstersById[rng.pick(rules.outlaws)];
-  return [...creatures, poster(day, rng.pick(places), outlaw, content)];
+  return [...creatures, poster(day, rng.pick(places), outlaw, classLevel, content)];
 }
 
 // The wanted target a Drużyna's trip seeks (src/server/parties.js), since

@@ -428,8 +428,9 @@ export function heroView(row) {
 }
 
 // The gold of `minutes` of exploring at a character level, as the Labirynt's
-// rewards count it: a tier's reward of the day.
-const explorationGold = (minutes, level) => (minutes > 0 ? Math.max(1, Math.round(expectedExploration(portalArea(level, content()), level, minutes, content()).gold)) : 0);
+// rewards count it: a tier's reward of the day; for a character of class level
+// `classLevel`, a part of it from the late class levels on (lateRewards).
+const explorationGold = (minutes, level, classLevel) => (minutes > 0 ? Math.max(1, Math.round(expectedExploration(portalArea(level, content()), level, minutes, content(), classLevel).gold)) : 0);
 
 // A match's opponent: Szczęsny's tier ("host:3", its number) or a resident
 // of the Osada ("resident:herbalist", its id, 904 B), the other null.
@@ -489,7 +490,7 @@ function summaryOf(row) {
 // one a standing, the last for the higher ones), rounded up.
 function packPrice(row, stored = settlementOf(row)) {
   const { pack } = rules();
-  const full = explorationGold(pack.goldMinutes, row.level);
+  const full = explorationGold(pack.goldMinutes, row.level, row.class_level);
   const standing = standingOf(stored.relations[rules().host.resident] ?? 0, content());
   const discount = pack.relationDiscount[Math.min(standing.index, pack.relationDiscount.length - 1)];
   return { full, discount, standing: standing.name, price: Math.max(1, Math.ceil(full * (1 - discount))) };
@@ -593,7 +594,7 @@ async function cardsView(db, player, now) {
         text: tier.text,
         stake,
         win: 2 * stake,
-        reward: explorationGold(tier.rewardMinutes, row.level),
+        reward: explorationGold(tier.rewardMinutes, row.level, row.class_level),
         rewarded: game.rewarded.includes(number),
         beaten: game.beaten.includes(number),
         firstWin: rarity(tier.firstWin.rarity),
@@ -961,7 +962,7 @@ async function endStatements(db, player, match, state, now) {
     result: state.result,
     staked,
     stake: match.stake,
-    dailyGold: tier ? explorationGold(tier.rewardMinutes, row.level) : 0,
+    dailyGold: tier ? explorationGold(tier.rewardMinutes, row.level, row.class_level) : 0,
     rewardedToday: tier ? game.rewarded.includes(number) : true,
     beatenBefore: tier ? game.beaten.includes(number) : true,
     firstCard: spent ? null : drawn,

@@ -74,26 +74,30 @@ export function portalArea(stage, content) {
 // wyprawy na tym poziomie"), as hunt.js pays them: the gold of the fights
 // and of the finds, the camp's resources gathered and found (all kinds
 // together), the materials the creatures leave, and the parts the finds'
-// chests give when taken apart (salvageYield).
+// chests give when taken apart (salvageYield). `classLevel`: the class
+// level of the character it pays, a part of it from the late class levels
+// on (lateRewards); 0 pays it whole.
 /**
  * @param {number} stage
  * @param {Content} content
+ * @param {number} [classLevel]
  * @returns {{ gold: number, resources: number, materials: number, parts: number } & Record<string, any>}
  */
-export const portalExpected = (stage, content) => expectedExploration(portalArea(stage, content), stage, content.portals.lootMinutes, content);
+export const portalExpected = (stage, content, classLevel = 0) => expectedExploration(portalArea(stage, content), stage, content.portals.lootMinutes, content, classLevel);
 
 // How much a portal pays on `stage`: its part of portalExpected, in whole
 // pieces, at least one, firstWinMultiplier times as much at the stage's
-// first win.
+// first win; `classLevel` as in portalExpected.
 /**
  * @param {Portal} portal
  * @param {number} stage
  * @param {boolean} first
  * @param {Content} content
+ * @param {number} [classLevel]
  * @returns {number}
  */
-export function portalAmount(portal, stage, first, content) {
-  const expected = portalExpected(stage, content);
+export function portalAmount(portal, stage, first, content, classLevel = 0) {
+  const expected = portalExpected(stage, content, classLevel);
   const value = { gold: expected.gold, resource: expected.resources, material: expected.materials, part: expected.parts }[portal.loot];
   return Math.max(1, Math.round(value * (first ? content.portals.firstWinMultiplier : 1)));
 }
@@ -121,7 +125,8 @@ function stageCreatures(area, stage, content) {
 // at the stage's level (rarityUpChances). A fight's loot takes the week of
 // its entry (`week`, weeks.js): its share more (or less) of a Portal
 // Złota's gold and a Portal Materiałów's pieces, made whole with the loot's
-// draws; a sweep, no fight, keeps the stage's loot as it is.
+// draws; a sweep, no fight, keeps the stage's loot as it is. `classLevel`
+// as in portalExpected.
 /**
  * @param {Portal} portal
  * @param {number} stage
@@ -129,10 +134,11 @@ function stageCreatures(area, stage, content) {
  * @param {Rng} rng
  * @param {Content} content
  * @param {Record<string, any> | null} [week]
+ * @param {number} [classLevel]
  * @returns {Loot}
  */
-export function portalLoot(portal, stage, first, rng, content, week = null) {
-  const amount = portalAmount(portal, stage, first, content);
+export function portalLoot(portal, stage, first, rng, content, week = null, classLevel = 0) {
+  const amount = portalAmount(portal, stage, first, content, classLevel);
   /** @type {Record<string, string>} */
   const kinds = { gold: 'gold', material: 'materials' };
   const factor = weekFactor(/** @type {any} */ (week), kinds[portal.loot]);
@@ -201,19 +207,21 @@ function addLoot(sum, loot) {
 // author, 7.11.2026: "daj tez przycisk na górze \"Wyczyść wszystkie\""):
 // `left` lists each portal's id, its highest stage won and its sweeps left,
 // each sweep drawn on its own as a single one. The loot of all, each
-// portal's in words, and one line naming them.
+// portal's in words, and one line naming them. `classLevel` as in
+// portalExpected.
 /**
  * @param {{ portalId: string, stage: number, count: number }[]} left
  * @param {string | number} seed
  * @param {Content} content
+ * @param {number} [classLevel]
  */
-export function portalSweepAll(left, seed, content) {
+export function portalSweepAll(left, seed, content, classLevel = 0) {
   /** @type {Loot} */
   const total = { gold: 0, resources: {}, materials: {}, parts: {} };
   const swept = left.map(({ portalId, stage, count }) => {
     /** @type {Loot} */
     const sum = { gold: 0, resources: {}, materials: {}, parts: {} };
-    for (let i = 0; i < count; i++) addLoot(sum, portalSweep(portalId, stage, `${seed}:${portalId}:${i}`, content));
+    for (let i = 0; i < count; i++) addLoot(sum, portalSweep(portalId, stage, `${seed}:${portalId}:${i}`, content, classLevel));
     addLoot(total, sum);
     return { portal: portalId, stage, count, loot: portalLootText(sum, content) };
   });
@@ -275,12 +283,14 @@ export function portalFight({ character, equipped, name, portalId, stage, first 
     { ...player, ...(Object.keys(trophies).length > 0 && { trophies }) },
     ...companions.map((companion, index) => companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}` }), content)),
   ];
-  const enemies = encounterCombatants(plan.encounter, content, { strength: content.portals.strength });
+  // From the character's class level 250 they are stronger (the myth game,
+  // monsterCombatant).
+  const enemies = encounterCombatants(plan.encounter, content, { strength: content.portals.strength, classLevel: character.classLevel ?? 0 });
   const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait });
   const won = fight.won === true;
   const hpAfter = Math.max(0, fight.units.find((/** @type {{ id: string }} */ unit) => unit.id === player.id)?.hp ?? 0);
   /** @type {Loot} */
-  const loot = won ? portalLoot(portal, stage, first, createRng(`${seed}:loot`), content, week) : { gold: 0, resources: {}, materials: {}, parts: {} };
+  const loot = won ? portalLoot(portal, stage, first, createRng(`${seed}:loot`), content, week, character.classLevel ?? 0) : { gold: 0, resources: {}, materials: {}, parts: {} };
 
   const enemyList = enemies.map((/** @type {{ name: string, level: number }} */ enemy) => word(content, '{name} (poz. {level})', { name: enemy.name, level: enemy.level })).join(', ');
   const lines = [say(texts, 'fightStart', stage, { enemies: enemyList })];
@@ -336,16 +346,17 @@ export function portalFight({ character, equipped, name, portalId, stage, first 
 
 // A sweep of a won stage (the author: "Na czyszczenia (swipe'y) będzie
 // ograniczona ilość - do 5 dziennie"): its plain loot at once, with no
-// fight, and its line.
+// fight, and its line. `classLevel` as in portalExpected.
 /**
  * @param {string} portalId
  * @param {number} stage
  * @param {string | number} seed
  * @param {Content} content
+ * @param {number} [classLevel]
  */
-export function portalSweep(portalId, stage, seed, content) {
+export function portalSweep(portalId, stage, seed, content, classLevel = 0) {
   const portal = /** @type {Portal} */ (portalById(portalId, content));
-  const loot = portalLoot(portal, stage, false, createRng(`${seed}:sweep`), content);
+  const loot = portalLoot(portal, stage, false, createRng(`${seed}:sweep`), content, null, classLevel);
   const text = portalLootText(loot, content);
   return { ...loot, loot: text, text: say(content.portals.texts, 'swept', stage, { stage, loot: text }) };
 }

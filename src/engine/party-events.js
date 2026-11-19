@@ -18,7 +18,7 @@
 // (src/server/party-events.js).
 
 import { simulateFight } from './combat.js';
-import { combatantView, playerCombatant } from './combatant.js';
+import { combatantView, fightingClassLevel, playerCombatant } from './combatant.js';
 import { materialPiece, materialsText, rarityUpChances } from './crafting.js';
 import { eventChance } from './events.js';
 import { encounterCombatants } from './hunt.js';
@@ -231,7 +231,7 @@ function areaMaterials(area, count, level, rng, content) {
  */
 function rewardOf(gives, member, area, rng, content) {
   const { level } = member.character;
-  const goldOf = (/** @type {number} */ times) => Math.round(content.balance.rewards.goldPerLevel * level * times * rng.float(0.75, 1.25) * lateRewards(level, content));
+  const goldOf = (/** @type {number} */ times) => Math.round(content.balance.rewards.goldPerLevel * level * times * rng.float(0.75, 1.25) * lateRewards(member.character.classLevel ?? 0, content));
   /** @type {Share} */
   const share = { gold: gives.gold ? goldOf(gives.gold) : 0, xp: 0 };
   if (gives.xpFoes) {
@@ -277,11 +277,13 @@ export function partyFight({ outcome, members, area, level, seed }, content) {
   const allies = members.map((member, index) =>
     playerCombatant({ character: member.character, equipped: member.equipped, hp: Math.max(1, member.hpEnd), name: member.name, area, id: index === 0 ? 'a0' : `p${index}` }, content),
   );
-  // Two or more players also make them stronger from level 250, as on the
-  // way (partyStrength in combatant.js).
+  // From class level 250 of the highest of the players they are stronger
+  // (the myth game), and two or more players make them stronger still, as
+  // on the way (fightingClassLevel and partyStrength in combatant.js).
+  const classLevel = fightingClassLevel(members.map((member) => member.character));
   const growth = allies.length > 1 ? { players: allies.length } : { growth: content.balance.monsters.soloGrowth };
   /** @type {Record<string, any>[]} */
-  const enemies = encounterCombatants({ members: outcome.foes.map((/** @type {string} */ monsterId) => ({ monsterId, level })) }, content, growth);
+  const enemies = encounterCombatants({ members: outcome.foes.map((/** @type {string} */ monsterId) => ({ monsterId, level })) }, content, { ...growth, classLevel });
   const fight = simulateFight({ allies, enemies, rng: createRng(`${seed}:fight`), content, record: true, trait: area.trait, ambush: outcome.ambush === true });
   const after = (/** @type {Record<string, any>} */ unit) => Math.max(0, /** @type {Record<string, any>} */ (fight.units.find((/** @type {Record<string, any>} */ one) => one.id === unit.id)).hp);
   return {
@@ -343,7 +345,7 @@ export function resolvePartyEvent({ event, optionId, seed, areaId, level, leader
       }
       if (outcome.win?.gold) gold += rewards.goldPerLevel * at * outcome.win.gold * rng.float(0.75, 1.25);
       shares[member.id] = {
-        gold: Math.round(gold * lateRewards(member.character.level, content)),
+        gold: Math.round(gold * lateRewards(member.character.classLevel ?? 0, content)),
         xp: Math.round(xp * (1 + content.balance.hunt.soloXpBonus)),
         ...(outcome.win?.materials && { materials: areaMaterials(area, outcome.win.materials.count, at, rng, content) }),
       };
