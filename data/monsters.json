@@ -2831,8 +2831,8 @@
       "base": { "strength": 10, "dexterity": 7, "vitality": 9, "endurance": 5, "intellect": 1, "wisdom": 2, "perception": 7, "will": 7 },
       "growth": { "strength": 3, "dexterity": 1.8, "vitality": 3.6, "endurance": 2, "perception": 1.6, "will": 1.5 }
     },
-    "attack": { "name": "Szpony gryfa", "sound": "claw", "category": "physical", "scaling": "strength", "damageFactor": 0.968, "variance": 0.25, "target": "back", "dot": { "effect": "bleeding", "chance": 0.35, "power": 0.25, "ticks": 3 } },
-    "hpFactor": 1.045,
+    "attack": { "name": "Szpony gryfa", "sound": "claw", "category": "physical", "scaling": "strength", "damageFactor": 1.395, "variance": 0.25, "target": "back", "dot": { "effect": "bleeding", "chance": 0.35, "power": 0.25, "ticks": 3 } },
+    "hpFactor": 0.814,
     "armorFactor": 0.35,
     "reward": { "xp": 1.0, "gold": 1.0 }
   },
@@ -2847,8 +2847,8 @@
       "base": { "strength": 11, "dexterity": 3, "vitality": 11, "endurance": 9, "intellect": 1, "wisdom": 2, "perception": 4, "will": 8 },
       "growth": { "strength": 3.2, "dexterity": 0.8, "vitality": 4.4, "endurance": 3, "perception": 0.8, "will": 2 }
     },
-    "attack": { "name": "Rzut skałą", "sound": "fist", "category": "physical", "scaling": "strength", "damageFactor": 0.63, "variance": 0.25, "cleave": 0.6 },
-    "hpFactor": 1.98,
+    "attack": { "name": "Rzut skałą", "sound": "fist", "category": "physical", "scaling": "strength", "damageFactor": 0.684, "variance": 0.25, "cleave": 0.6 },
+    "hpFactor": 2.374,
     "armorFactor": 0.8,
     "resistances": { "earth": { "base": 40, "perLevel": 5 } },
     "reward": { "xp": 1.0, "gold": 1.0 }
@@ -3100,8 +3100,8 @@
       "base": { "strength": 3, "dexterity": 5, "vitality": 7, "endurance": 4, "intellect": 10, "wisdom": 6, "perception": 5, "will": 7 },
       "growth": { "strength": 1, "dexterity": 1.4, "vitality": 3.6, "endurance": 2, "intellect": 3, "wisdom": 1, "will": 1.5 }
     },
-    "attack": { "name": "Kukanie", "sound": "magic", "category": "magical", "element": "nature", "scaling": "intellect", "damageFactor": 0.752, "variance": 0.2, "target": "back", "slow": { "effect": "mired", "chance": 0.3, "slow": 0.35 }, "drain": 0.3 },
-    "hpFactor": 0.99,
+    "attack": { "name": "Kukanie", "sound": "magic", "category": "magical", "element": "nature", "scaling": "intellect", "damageFactor": 0.7, "variance": 0.2, "target": "back", "slow": { "effect": "mired", "chance": 0.3, "slow": 0.35 }, "drain": 0.3 },
+    "hpFactor": 1.204,
     "armorFactor": 0.3,
     "reward": { "xp": 1.0, "gold": 1.0 }
   },
@@ -3116,8 +3116,8 @@
       "base": { "strength": 6, "dexterity": 6, "vitality": 11, "endurance": 7, "intellect": 10, "wisdom": 6, "perception": 7, "will": 8 },
       "growth": { "strength": 1.8, "dexterity": 1.4, "vitality": 4.4, "endurance": 2.8, "intellect": 2.3, "wisdom": 1, "will": 2 }
     },
-    "attack": { "name": "Czarna magia", "sound": "magic", "category": "magical", "element": "fire", "scaling": "intellect", "damageFactor": 0.6, "variance": 0.25, "dot": { "effect": "burning", "chance": 0.3, "power": 0.3, "ticks": 3 }, "drain": 0.4 },
-    "hpFactor": 1.65,
+    "attack": { "name": "Czarna magia", "sound": "magic", "category": "magical", "element": "fire", "scaling": "intellect", "damageFactor": 0.649, "variance": 0.25, "dot": { "effect": "burning", "chance": 0.3, "power": 0.3, "ticks": 3 }, "drain": 0.4 },
+    "hpFactor": 1.729,
     "armorFactor": 0.6,
     "resistances": { "fire": { "base": 40, "perLevel": 5 } },
     "weaknesses": { "sacred": 0.4 },
@@ -3368,8 +3368,8 @@
       "base": { "strength": 10, "dexterity": 7, "vitality": 9, "endurance": 5, "intellect": 1, "wisdom": 2, "perception": 7, "will": 7 },
       "growth": { "strength": 3, "dexterity": 1.8, "vitality": 3.6, "endurance": 2, "perception": 1.6, "will": 1.5 }
     },
-    "attack": { "name": "Zamach kosą", "sound": "blade", "category": "physical", "scaling": "strength", "damageFactor": 0.765, "variance": 0.25, "cleave": 0.5, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } },
-    "hpFactor": 1.298,
+    "attack": { "name": "Zamach kosą", "sound": "blade", "category": "physical", "scaling": "strength", "damageFactor": 0.85, "variance": 0.25, "cleave": 0.5, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } },
+    "hpFactor": 1.4,
     "armorFactor": 0.35,
     "weaknesses": { "sacred": 0.4 },
     "reward": { "xp": 1.0, "gold": 1.0 }
@@ -3385,8 +3385,8 @@
       "base": { "strength": 6, "dexterity": 6, "vitality": 11, "endurance": 7, "intellect": 10, "wisdom": 6, "perception": 7, "will": 8 },
       "growth": { "strength": 1.8, "dexterity": 1.4, "vitality": 4.4, "endurance": 2.8, "intellect": 2.3, "wisdom": 1, "will": 2 }
     },
-    "attack": { "name": "Klątwa Baby Jagi", "sound": "magic", "category": "magical", "element": "poison", "scaling": "intellect", "damageFactor": 0.4, "variance": 0.25, "cleave": 0.6, "dot": { "effect": "poisoned", "chance": 0.3, "power": 0.3, "ticks": 3 } },
-    "hpFactor": 1.666,
+    "attack": { "name": "Klątwa Baby Jagi", "sound": "magic", "category": "magical", "element": "poison", "scaling": "intellect", "damageFactor": 0.469, "variance": 0.25, "cleave": 0.6, "dot": { "effect": "poisoned", "chance": 0.3, "power": 0.3, "ticks": 3 } },
+    "hpFactor": 1.634,
     "armorFactor": 0.6,
     "resistances": { "poison": { "base": 40, "perLevel": 5 } },
     "weaknesses": { "sacred": 0.4 },
@@ -3646,8 +3646,8 @@
       "base": { "strength": 10, "dexterity": 7, "vitality": 9, "endurance": 5, "intellect": 1, "wisdom": 2, "perception": 7, "will": 7 },
       "growth": { "strength": 3, "dexterity": 1.8, "vitality": 3.6, "endurance": 2, "perception": 1.6, "will": 1.5 }
     },
-    "attack": { "name": "Tupnięcie Indryka", "sound": "charge", "category": "physical", "scaling": "strength", "damageFactor": 1.1, "variance": 0.25, "cleave": 0.5, "slow": { "effect": "mired", "chance": 0.3, "slow": 0.35 } },
-    "hpFactor": 1.35,
+    "attack": { "name": "Tupnięcie Indryka", "sound": "charge", "category": "physical", "scaling": "strength", "damageFactor": 1.055, "variance": 0.25, "cleave": 0.5, "slow": { "effect": "mired", "chance": 0.3, "slow": 0.35 } },
+    "hpFactor": 1.234,
     "armorFactor": 0.35,
     "resistances": { "water": { "base": 40, "perLevel": 5 } },
     "reward": { "xp": 1.0, "gold": 1.0 }
@@ -3664,7 +3664,7 @@
       "growth": { "strength": 1.8, "dexterity": 1.4, "vitality": 4.4, "endurance": 2.8, "intellect": 2.3, "wisdom": 1, "will": 2 }
     },
     "attack": { "name": "Oddech Nawii", "sound": "magic", "category": "magical", "element": "frost", "scaling": "intellect", "damageFactor": 0.62, "variance": 0.25, "cleave": 0.6, "dot": { "effect": "chilled", "chance": 0.3, "power": 0.3, "ticks": 3 } },
-    "hpFactor": 1.7,
+    "hpFactor": 1.546,
     "armorFactor": 0.6,
     "resistances": { "frost": { "base": 40, "perLevel": 5 } },
     "weaknesses": { "fire": 0.4 },
@@ -3944,13 +3944,13 @@
       "base": { "strength": 9, "dexterity": 7, "vitality": 11, "endurance": 7, "intellect": 9, "wisdom": 6, "perception": 7, "will": 8 },
       "growth": { "strength": 2.4, "dexterity": 1.8, "vitality": 4.4, "endurance": 2.8, "intellect": 2.4, "wisdom": 1, "perception": 1, "will": 2 }
     },
-    "attack": { "name": "Laska Welesa", "sound": "magic", "category": "magical", "element": "nature", "scaling": "intellect", "damageFactor": 1.2, "variance": 0.25, "slow": { "effect": "mired", "chance": 0.3, "slow": 0.35 } },
+    "attack": { "name": "Laska Welesa", "sound": "magic", "category": "magical", "element": "nature", "scaling": "intellect", "damageFactor": 1.185, "variance": 0.25, "slow": { "effect": "mired", "chance": 0.3, "slow": 0.35 } },
     "shapes": [
       { "id": "elder", "name": "rogaty starzec" },
-      { "id": "serpent", "name": "wąż", "attack": { "name": "Kieł węża", "sound": "bite", "category": "physical", "scaling": "dexterity", "damageFactor": 1.4, "variance": 0.25, "dot": { "effect": "poisoned", "chance": 0.4, "power": 0.3, "ticks": 3 } } },
-      { "id": "bear", "name": "niedźwiedź", "attack": { "name": "Łapa niedźwiedzia", "sound": "claw", "category": "physical", "scaling": "strength", "damageFactor": 1.3, "variance": 0.25, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } } }
+      { "id": "serpent", "name": "wąż", "attack": { "name": "Kieł węża", "sound": "bite", "category": "physical", "scaling": "dexterity", "damageFactor": 1.383, "variance": 0.25, "dot": { "effect": "poisoned", "chance": 0.4, "power": 0.3, "ticks": 3 } } },
+      { "id": "bear", "name": "niedźwiedź", "attack": { "name": "Łapa niedźwiedzia", "sound": "claw", "category": "physical", "scaling": "strength", "damageFactor": 1.284, "variance": 0.25, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } } }
     ],
-    "hpFactor": 2.1,
+    "hpFactor": 2.016,
     "armorFactor": 0.6,
     "resistances": { "nature": { "base": 40, "perLevel": 5 } },
     "weaknesses": { "lightning": 0.4 },
@@ -4235,7 +4235,7 @@
       "growth": { "strength": 3.1, "dexterity": 1.2, "vitality": 4.4, "endurance": 2.8, "intellect": 0.8, "wisdom": 0.6, "perception": 1, "will": 2 }
     },
     "attack": { "name": "Miecz Kościeja", "sound": "blade", "category": "physical", "scaling": "strength", "damageFactor": 1.2, "variance": 0.25, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } },
-    "hpFactor": 2.1,
+    "hpFactor": 2.03,
     "armorFactor": 0.7,
     "resistances": { "frost": { "base": 40, "perLevel": 5 } },
     "weaknesses": { "sacred": 0.4 },

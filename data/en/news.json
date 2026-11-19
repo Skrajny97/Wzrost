@@ -1140,6 +1140,10 @@
     "0.4.48": {
       "title": "Version 0.4.48",
       "body": "- System Deck: once a match, before your first move, you can redraw your reserve. Your reserve cards go to the bottom of your deck and you draw new ones. It works at Szczęsny's, with the Settlement's residents, in the Arena and in live matches."
+    },
+    "0.4.49": {
+      "title": "Version 0.4.49",
+      "body": "- Bald Mountains: the elites and champions (Griffin, Stone Giant, Cuckoo, Master Twardowski, Lady Death and Baba Yaga) are as hard again as when the Bald Mountains opened.\n- Nav: the elites and champions evened out after the change of the level curve.\n- Because of it, the System Deck cards of a few of these creatures have a slightly different Attack and Life; the Griffin, for example, hits harder but has less Life."
     }
   }
 }

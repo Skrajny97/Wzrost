@@ -3847,6 +3847,30 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.49 (19.11.2026): elity i czempioni Łysogór jak przy wejściu (1169 B), Nawia jak w 1166 A
+
+1. **Autor (1169 B): „przywróć im dawną trudność”.** Elity i czempioni Łysogór są znów tak trudni jak przy wejściu Łysogór (0.3.55, „Łysogóry: krainy, miejsca i stwory”, punkt 4): gracz okazjonalny z towarzyszami wygrywa z nimi tyle walk i kończy wygraną z tyloma HP, co wtedy, najwyżej o punkt inaczej. Liczone na obecnej krzywej (0.4.46) w `tools/difficulty-sim.mjs`, jak przy Nawii: elita na pięciu miejscach swojej krainy, czempion na ostatnim, pięć klas; przed zmianą 800 walk na klasę i miejsce, po zmianie 1600. Zmienione są tylko cios (`damageFactor`) i zdrowie (`hpFactor`) w `data/monsters.json`. Wygrane i HP po wygranej przed → po (przy wejściu Łysogór):
+   - Gryf: cios 0,968 → 1,395, zdrowie 1,045 → 0,814; 98,9% i 84,0% → 96,3% i 77,4% (97,1% i 77%).
+   - Stolem: cios 0,63 → 0,684, zdrowie 1,98 → 2,374; 97,1% i 74,8% → 85,7% i 65,7% (85,2% i 65%).
+   - Kukułka: cios 0,752 → 0,7, zdrowie 0,99 → 1,204; 97,8% i 82,2% → 96,8% i 79,5% (97,4% i 79%).
+   - Pan Twardowski: cios 0,6 → 0,649, zdrowie 1,65 → 1,729; 92,2% i 71,0% → 85,5% i 67,8% (85,7% i 68%).
+   - Kostucha: cios 0,765 → 0,85, zdrowie 1,298 → 1,4; 99,2% i 78,7% → 97,0% i 74,2% (97,2% i 75%).
+   - Baba Jaga: cios 0,4 → 0,469, zdrowie 1,666 → 1,634; 93,3% i 66,7% → 85,8% i 64,1% (86,3% i 64%).
+2. **Brakujące szczegóły:**
+   - Dwa cele i dwie liczby: mocniejszy cios bardziej zbija HP po walce, a więcej zdrowia bardziej zbija liczbę wygranych. Gryf w dawnym kształcie nie schodził do 77% HP po walce bez spadku wygranych poniżej 96%, więc bije teraz mocniej i ma mniej zdrowia.
+   - Kostucha ma kilka kształtów o tej samej trudności. Wybrałem bliższy dawnemu (cios 0,85 i zdrowie 1,4 zamiast np. 0,95 i 1,213), bo przy mocniejszym ciosie Tytan bez towarzyszy na 260. poziomie mdlał częściej niż jego trzecia forma (12 zamiast 7 na 480 czterogodzinnych wypraw), a tego pilnuje test czwartej ewolucji. Przy wybranym kształcie: 13 i 15.
+   - Karty tych stworów w Talii Systemu liczą Atak i Życie z ich ciosu i zdrowia, więc zmieniają się razem z nimi (1. poziom karty): Gryf 15/36 → 19/28, Kukułka 14/39 → 12/43, Kostucha 12/43 → 12/42. Karty Stolema, Pana Twardowskiego i Baby Jagi zostają takie same.
+3. **Wyprawy w Łysogórach po zmianie.** Gracz okazjonalny z towarzyszami mdleje na wyprawach godzinnych na 0,1–0,4% wypraw w zwykłych miejscach i 0,4–0,6% w miejscach z czempionem (przed zmianą 0–0,2% i 0–0,5%), na czterogodzinnych na 1,7–3,9% i 4,6–5,1% (przed 1,2–2,8% i 1,7–2,9%). Realistyczny gracz dalej nie mdleje, wygrywa każdą walkę z elitą i czempionem i zdobywa na godzinę tyle samo XP i złota (±0,2%).
+4. **Nawia na krzywej z 0.4.46 (1166 A), zmierzona na nowo.** Wolniejsze poziomy klasy zrobiły część elit i czempionów trudniejszymi. Te, które odeszły od przyjętych liczb o ok. 1,5 punktu albo więcej, wróciły do nich:
+   - Indryk: cios 1,1 → 1,055, zdrowie 1,35 → 1,234; 96,0% i 78,2% → 97,8% i 80,7% (przyjęte 97,3% i 81,0%).
+   - Nyja: zdrowie 1,7 → 1,546 (cios bez zmian); 81,9% i 65,1% → 86,8% i 66,4% (przyjęte 86,6% i 67,7%). Przy 86–87% wygranych każdy kształt Nyi zostawia postaci ok. 66–67% HP, więc bliżej przyjętego HP się nie da.
+   - Weles: cios we wszystkich trzech postaciach o 1,25% słabszy (1,2 → 1,185; 1,4 → 1,383; 1,3 → 1,284), zdrowie 2,1 → 2,016; 84,2% i 79,2% → 86,0% i 80,2% (przyjęte 86,3% i 79,9%).
+   - Kościej: zdrowie 2,1 → 2,03 (cios bez zmian); 84,3% i 77,8% (przy 1600 walkach 84,1%) → 85,7% i 78,5% (przyjęte 85,7% i 78,5%).
+   - Bez zmian, bo zostali blisko przyjętych liczb: Turoń 96,4% i 88,1% (przyjęte 97,2% i 88,8%) i Marzanna 97,3% i 76,8% (97,8% i 78,1%).
+   - Omdlenia gracza okazjonalnego w Nawii po poprawkach: na wyprawach godzinnych 0–0,4% w zwykłych miejscach i 0,3–0,5% w miejscach z czempionem, na czterogodzinnych 0,9–1,7% i 3,0–3,5% (przyjęte 0–0,3%, 0,3–0,6%, 0,5–1,5% i 2,9–4,1%). Przed poprawkami najbardziej odeszło pierwsze miejsce: 2,7% czterogodzinnych wypraw (przyjęte 1,2%, teraz 1,6%).
+   - XP na godzinę bez zmian: realistyczny gracz zdobywa w Nawii 312 tys. na 280. poziomie i 393 tys. na 350., w średniej z wypraw godzinnych i czterogodzinnych od 0,5% mniej do 0,3% więcej niż krzywa zmierzona na nowo. Złota od 250. poziomu jest połowa (0.4.46), w Nawii i na krzywej tak samo, więc nagrody stworów się nie zmieniają.
+   - Karty: Indryk 15/40 → 15/39, Kościej 12/50 → 13/50, Weles tylko na 5. poziomie karty 17/72 → 17/71; karta Nyi bez zmian.
+
 ## Wersja 0.4.48 (19.11.2026): przelosowanie rezerwy w kartach
 
 Autor: „Trzeba też dodac do gry w karty opcję przelosowania ręki, bo nie raz trafią się 4 jednostki tej samej kategorii i łatwo przegrać z powodu felernego RNG”.
