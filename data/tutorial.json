@@ -1433,7 +1433,8 @@
       "chapter": "party",
       "text": [
         "Drużyna to do trzech wędrowców na jednej wyprawie, a ich poziomy klasy mogą się różnić najwyżej o dziesięć. Wyprawę wysyła lider, gdy nad „Wyrusz” zaznaczy „Z drużyną”."
-      ]
+      ],
+      "voice": "audio/narration/party-intro.mp3"
     },
     {
       "id": "fortress-stone",

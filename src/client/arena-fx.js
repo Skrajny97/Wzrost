@@ -1539,11 +1539,18 @@ export function createFx(kit) {
     // on through its last target flies on into this one.
     if (motion()) {
       if (style.orb === 'bite') return bite(from, to, a, b, onImpact, settle, id);
+      // The fourth forms' creatures: the bear rushes at its foe and its paw
+      // strikes (no jaws); the ancient oak only leans at its foe and its
+      // branches lash it (skill-fx.js draws the claws and the branches).
+      if (style.orb === 'maul') return bite(from, to, a, b, onImpact, settle, id, { jaws: false });
+      if (style.orb === 'lash') return bite(from, to, a, b, onImpact, settle, id, { jaws: false, reach: 0.12 });
       if (style.orb === 'falcon' || style.orb === 'eagle') {
         const picture = monsterSprite(style.orb);
         if (picture) return dive(style.orb, picture, from, to, a, onImpact, settle, id);
       }
       if (style.orb === 'thunder-orb') return zap(from, b, style.color, onImpact, settle, id);
+      // The Gromowładny's great ball over the battlefield strikes.
+      if (style.orb === 'globe') return globeZap(b, style.color, onImpact, settle, id);
       if (THROUGH.has(style.orb) && style.blow?.event?.pierced) return onward(actor, a, b, style, onImpact, settle, id);
       // 962: the Miażdżący cios's force goes on through its target into
       // the one behind.
@@ -1947,13 +1954,13 @@ export function createFx(kit) {
 
   // A wolf (a summon's card) crouches and leaps at its foe, its jaws
   // snapping shut on it as it lands, and springs back.
-  async function bite(from, to, a, b, onImpact, settle, id) {
+  async function bite(from, to, a, b, onImpact, settle, id, { jaws: snapping = true, reach = 0.5 } = {}) {
     const dx = b.x - a.x;
     const dy = b.y - a.y;
     const distance = Math.hypot(dx, dy) || 1;
     const ux = dx / distance;
     const uy = dy / distance;
-    const hit = { x: dx * 0.5, y: dy * 0.5 };
+    const hit = { x: dx * reach, y: dy * reach };
     const crouch = { x: -ux * 7, y: -uy * 7 };
     const pose = (point, scale) => `translate(${point.x.toFixed(1)}px, ${point.y.toFixed(1)}px) scale(${scale})`;
     from.classList.add('unit--acting');
@@ -1972,7 +1979,7 @@ export function createFx(kit) {
     // The jaws open over the foe as the wolf flies at it, and shut as it
     // lands.
     later(leap - 105).then(() => {
-      if (id !== run()) return;
+      if (id !== run() || !snapping) return;
       const art = pictureOf(to);
       jaws({ x: art.x + art.width / 2, y: art.y + art.height * 0.55 }, to);
     });
@@ -2091,6 +2098,42 @@ export function createFx(kit) {
     onImpact();
     await settle();
     await later(260);
+  }
+
+  // The Gromowładny's Kula piorunów strikes: the great ball of lightning
+  // high over the middle of the battlefield (where skill-fx.js globeAt()
+  // hangs it) flares and a thick, forked bolt strikes from it down at the
+  // target.
+  async function globeZap(b, color, onImpact, settle, id) {
+    const width = stage.clientWidth;
+    const size = Math.round(Math.min(58, width * 0.15));
+    const point = { x: width / 2, y: Math.round(Math.max(size * 1.2, stage.clientHeight * 0.11)) };
+    const ball = mark('fx-thunderorb fx-thunderorb--globe', point, { '--fx': color, '--size': `${size}px` });
+    ball.innerHTML = ORB_ARCS;
+    playSound('magic');
+    const at = (scale) => `translate(-50%, -50%) scale(${scale})`;
+    animate(
+      ball,
+      [
+        { transform: at(0.3), opacity: 0 },
+        { transform: at(1.1), opacity: 1, offset: 0.25 },
+        { transform: at(1), opacity: 1, offset: 0.34 },
+        { transform: at(1.15), opacity: 1, offset: 0.42 },
+        { transform: at(1), opacity: 1, offset: 0.66 },
+        { transform: at(0.5), opacity: 0 },
+      ],
+      { duration: 860, easing: 'ease-out' },
+    ).then(() => ball.remove());
+    specks.burst({ x: point.x, y: point.y, count: 10, colors: KINDS.storm.specks, speed: [50, 140], life: [220, 400], size: [1, 2], shape: 'spark', drag: 3 });
+    await later(320);
+    if (id !== run()) return;
+    const made = boltArt(point, b, { jag: 1.2, forks: 2, width: 1.5 });
+    const bolt = mark('fx-zap', { x: made.x, y: made.y }, { '--fx': color });
+    bolt.innerHTML = made.html;
+    animate(bolt, FLICKER, { duration: 480 }).then(() => bolt.remove());
+    onImpact();
+    await settle();
+    await later(300);
   }
 
   // A shot that went through its last target flies on into this one, from

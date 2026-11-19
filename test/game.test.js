@@ -2231,13 +2231,11 @@ describe('Time Points and the narrator', () => {
     const line = (id) => tutorial.lines.find((one) => one.id === id);
     const at = (id) => tutorial.lines.findIndex((one) => one.id === id);
     const fresh = ['shop-system', 'guild-tabs', 'guild-seat', 'guild-beast', 'guild-trials', 'guild-requests', 'guild-exchange', 'party-intro', 'fortress-stone', 'hard-hunt', 'account-chest', 'faint-first'];
-    // The Drużyna's line said "najwyżej o pięć"; since 18.11.2026 the spread
-    // is ten, and the line has no voice until the author accepts its new
-    // recording (DECISIONS.md, Wersja 0.4.42).
-    const unvoiced = ['party-intro'];
+    // The Drużyna's line reads "najwyżej o dziesięć" since 0.4.42, with the
+    // recording the author accepted on 19.11.2026 (1164 A).
     for (const id of fresh) {
       assert.equal(line(id).kind, 'point', id);
-      assert.equal(line(id).voice, unvoiced.includes(id) ? undefined : `audio/narration/${id}.mp3`, id);
+      assert.equal(line(id).voice, `audio/narration/${id}.mp3`, id);
     }
     // The introduction one line longer: the Sklep Systemu after the Encyklopedia.
     assert.equal(line('shop-system').chapter, undefined);

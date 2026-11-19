@@ -364,11 +364,20 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   // Serce puszczy two stand at once, each in its own card: a summon is known
   // by its summoner and its skill (the events name it, `summonSkill`, once it
   // stands; a report from before them has one summon a summoner).
-  const summoned = new Map(); // `${summoner's id} ${skill}` → { unit, card, skill, owner, down }
-  const summonKey = (owner, skill) => `${owner} ${skill}`;
+  // Legion Nawii's two knights stand at once, each in its own card (the
+  // event says how many, `count`): the foes' blows land on the first still
+  // standing, which falls or goes first, and their own blows of a moment go
+  // to them in turn.
+  const summoned = new Map(); // `${summoner's id} ${skill}[ ${order}]` → { unit, card, skill, owner, down, order }
+  const summonKey = (owner, skill, order = 1) => `${owner} ${skill}${order > 1 ? ` ${order}` : ''}`;
   const summonsOf = (owner) => [...summoned.values()].filter((decoy) => decoy.owner === owner);
-  // The summon an event is about: by its skill, else the summoner's only one.
-  const summonFor = (event) => summoned.get(summonKey(event.target, event.summonSkill ?? event.skill)) ?? summonsOf(event.target)[0] ?? null;
+  const squadOf = (owner, skill) => summonsOf(owner).filter((decoy) => decoy.skill === skill);
+  // The summon an event is about: by its skill (of several, the first still
+  // standing), else the summoner's only one.
+  const summonFor = (event) => {
+    const squad = squadOf(event.target, event.summonSkill ?? event.skill);
+    return squad.find((decoy) => !decoy.down) ?? squad[0] ?? summonsOf(event.target)[0] ?? null;
+  };
   function summonPlace(owner, card) {
     const at = FIELDS.findIndex(([position]) => position === owner.position);
     const ahead = FIELDS.slice(0, Math.max(0, at)).reverse().map(([position]) => fields.get(`${owner.side} ${position}`));
@@ -379,28 +388,32 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   function summonUp(event, quiet) {
     const owner = byId.get(event.target);
     if (!owner) return Promise.resolve();
-    let decoy = summoned.get(summonKey(owner.id, event.skill));
-    if (!decoy) {
-      // A fallen summon's grey card gives way to the one called now.
-      for (const old of summonsOf(owner.id)) if (old.down) summonRemove(owner.id, true, old.skill);
-      const unit = { id: `${owner.id}~summon~${event.skill}`, side: owner.side, name: event.summon, level: owner.level, maxHp: event.summonHp, strike: 'magic', summon: event.skill, figure: event.figure };
-      decoy = { unit, card: unitCard(unit), skill: event.skill, owner: owner.id, down: false };
-      summoned.set(summonKey(owner.id, event.skill), decoy);
-      summonPlace(owner, decoy.card);
+    const coming = [];
+    for (let order = 1; order <= Math.max(1, event.count ?? 1); order++) {
+      let decoy = summoned.get(summonKey(owner.id, event.skill, order));
+      if (!decoy) {
+        // A fallen summon's grey card gives way to the one called now.
+        for (const old of summonsOf(owner.id)) if (old.down) summonRemove(owner.id, true, old.skill, old);
+        const unit = { id: `${owner.id}~summon~${event.skill}${order > 1 ? `~${order}` : ''}`, side: owner.side, name: event.summon, level: owner.level, maxHp: event.summonHp, strike: 'magic', summon: event.skill, figure: event.figure };
+        decoy = { unit, card: unitCard(unit), skill: event.skill, owner: owner.id, down: false, order };
+        summoned.set(summonKey(owner.id, event.skill, order), decoy);
+        summonPlace(owner, decoy.card);
+      }
+      decoy.down = false;
+      decoy.unit.maxHp = event.summonHp;
+      setHp(decoy.unit.id, event.summonHp);
+      setDown(decoy.unit.id, false);
+      if (!quiet && !reducedMotion()) coming.push(animate(decoy.card, [{ opacity: 0, transform: 'scale(0.4)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 320, easing: 'ease-out' }));
     }
-    decoy.down = false;
-    decoy.unit.maxHp = event.summonHp;
-    setHp(decoy.unit.id, event.summonHp);
-    setDown(decoy.unit.id, false);
-    if (quiet || reducedMotion()) return Promise.resolve();
-    return animate(decoy.card, [{ opacity: 0, transform: 'scale(0.4)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 320, easing: 'ease-out' });
+    return Promise.all(coming);
   }
-  // The cards of a summoner's summons go: all of them, or the one of `skill`.
-  function summonRemove(id, quiet = false, skill = null) {
-    const gone = summonsOf(id).filter((decoy) => skill === null || decoy.skill === skill);
+  // The cards of a summoner's summons go: all of them, those of `skill`, or
+  // that one (`only`, one of several of a skill).
+  function summonRemove(id, quiet = false, skill = null, only = null) {
+    const gone = summonsOf(id).filter((decoy) => (skill === null || decoy.skill === skill) && (only === null || decoy === only));
     return Promise.all(
       gone.map((decoy) => {
-        summoned.delete(summonKey(id, decoy.skill));
+        summoned.delete(summonKey(id, decoy.skill, decoy.order));
         cards.delete(decoy.unit.id);
         if (quiet || reducedMotion() || !decoy.card.isConnected) {
           decoy.card.remove();
@@ -414,7 +427,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   function summonState(event) {
     if (event.state === 'up') return summonUp(event, true);
     const decoy = summonFor(event);
-    if (event.state === 'gone') return summonRemove(event.target, true, decoy?.skill ?? null);
+    if (event.state === 'gone') return summonRemove(event.target, true, decoy?.skill ?? null, decoy);
     if (!decoy) return;
     setHp(decoy.unit.id, event.summonHp);
     if (event.state === 'fell') {
@@ -425,8 +438,21 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   // Who acts in an event: the summon for its own blows and spit (its
   // skill's events under its summoner's name), otherwise the unit itself.
   function actorOf(event) {
-    const decoy = event.skill ? summoned.get(summonKey(event.actor, event.skill)) : null;
-    if (decoy && (MOVES.has(event.kind) || event.kind === 'skill')) return decoy.unit;
+    const squad = event.skill ? squadOf(event.actor, event.skill) : [];
+    if (squad.length > 0 && (MOVES.has(event.kind) || event.kind === 'skill')) {
+      // (Of several standing, the blows of one moment go to them in turn.)
+      const standing = squad.filter((decoy) => !decoy.down);
+      if (standing.length > 1 && MOVES.has(event.kind)) {
+        const at = fight.events.indexOf(event);
+        let before = 0;
+        for (let back = at - 1; back >= 0 && fight.events[back].t === event.t; back--) {
+          const earlier = fight.events[back];
+          if (MOVES.has(earlier.kind) && earlier.actor === event.actor && earlier.skill === event.skill) before += 1;
+        }
+        return standing[before % standing.length].unit;
+      }
+      return (standing[0] ?? squad[0]).unit;
+    }
     return byId.get(event.actor);
   }
 
@@ -573,7 +599,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       }
       if (event.state === 'gone') {
         line();
-        await summonRemove(event.target, false, decoy?.skill ?? null);
+        await summonRemove(event.target, false, decoy?.skill ?? null, decoy);
         return;
       }
       if (!decoy) {
@@ -657,7 +683,9 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
         fxs.hit(blow);
         // (964: the Znak śmierci's wounds given back come as a sweep's blow
         // with a look of their own.)
-        if (look && (!event.sweep || look.echo)) skills.impact(event);
+        // (The Ścięcie dusz's blade catching the foe beside is its sweep's
+        // blow, with a look of its own.)
+        if (look && (!event.sweep || look.echo || look.reaper)) skills.impact(event);
         float(target.id, strong ? `−${event.damage}!` : `−${event.damage}`, strong ? 'crit' : 'hit');
         // The part of the blow from the weapon's element, in its colour,
         // under the damage (914).
@@ -735,12 +763,14 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   // (not those that dodge or block them, or whose summon takes them), and
   // which of its turns it is (Huragan stali turns twice). 964: its blows in
   // the order they land, the dodged ones too (`blows`), and the foes its
-  // effect takes hold of (`affected`, the Klątwa rozkładu's).
+  // effect takes hold of (`affected`, the Klątwa rozkładu's). The fourth
+  // forms: the foes its blows fell (`felled`, the Taniec kosy's souls).
   function sweepOf(event) {
     const at = fight.events.indexOf(event);
     const struck = [];
     const blows = [];
     const affected = [];
+    const felled = [];
     for (let next = at + 1; next < fight.events.length; next++) {
       const coming = fight.events[next];
       if (coming.t !== event.t || coming.kind === 'skill') break;
@@ -748,13 +778,14 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       if (own && (coming.kind === 'hit' || coming.kind === 'crit')) struck.push(coming.target);
       if (own && (coming.kind === 'hit' || coming.kind === 'crit' || coming.kind === 'dodge')) blows.push({ target: coming.target, hit: coming.kind !== 'dodge' });
       if (coming.kind === 'effect' && coming.actor === event.actor) affected.push(coming.target);
+      if (coming.kind === 'kill' && struck.includes(coming.target)) felled.push(coming.target);
     }
     let turn = 1;
     for (let back = at - 1; back >= 0 && fight.events[back].t === event.t; back--) {
       const earlier = fight.events[back];
       if (earlier.kind === 'skill' && earlier.actor === event.actor && earlier.skill === event.skill) turn += 1;
     }
-    return { struck, turn, blows, affected };
+    return { struck, turn, blows, affected, felled };
   }
 
   // 963: what a party heal's look needs of its moment: the members its
