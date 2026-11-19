@@ -105,7 +105,7 @@ import { assertion, atomically, characterChanged, raced, sameVersion } from './a
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { cardsOn, eventDraftsOn, eventsOn, fortressOn, settlementOn } from './features.js';
-import { cardCollection, cardUpserts, droppedCards, droppedEffect, effectChance, effectFoundLine, effectUpserts, maxedCards, ownCardCollection, packGains, packViews } from './cards.js';
+import { cardUpserts, dropCollection, droppedCards, droppedEffect, effectChance, effectFoundLine, effectUpserts, maxedCards, ownCardCollection, packGains, packViews } from './cards.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { expeditionMinutes } from './guild-expedition.js';
 import { huntFamePoints } from './fame.js';
@@ -899,8 +899,10 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
   // at its top level, and the collection's bonus gives more XP and gold
   // (884 A, card-collection.js), from the cards won before this report. The
   // collection as read; the claim holds only while the character is, and
-  // every change of the collection changes it too.
-  const collection = cardsOn() && content().cards ? await cardCollection(db, row.id) : null;
+  // every change of the collection changes it too. As the sources weigh it
+  // (dropCollection): a card at its top level held only with copies from
+  // others still comes, till a copy of the character's own does (1193 B).
+  const collection = cardsOn() && content().cards ? await dropCollection(db, row.id) : null;
   // The bonus counts its own cards only, as the Encyklopedia does: those from
   // others (the Wymiana, the Targowisko, the Skrzynia Konta) add nothing to
   // it (ownCardCollection in cards.js).
