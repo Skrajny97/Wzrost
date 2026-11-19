@@ -1,0 +1,14 @@
+{
+  "id": "rally-horn",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a curved war horn of pale ox horn with bronze bands at the mouthpiece and at the wide bell, hanging on a brown leather strap, the horn alone, no background, single inventory item icon, bold clean outline",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023159127608829076
+  },
+  "images": 1
+}
