@@ -25,6 +25,7 @@ import {
   strikePower,
 } from '../src/engine/index.js';
 import { chronicleText } from '../src/server/guild-chronicle.js';
+import { strikePlan } from '../src/server/guild-strike.js';
 import { runInLanguage } from '../src/server/i18n.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
 import { content } from './helpers/content.js';
@@ -191,6 +192,24 @@ describe('the classes of the day, the podcięcia and the Kronika through the API
       (await all('SELECT c.name, u.uses_left FROM guild_undercuts u JOIN characters c ON c.id = u.character_id ORDER BY u.id')).map((row) => [row.name, row.uses_left]),
       [['Magini', 0], ['Trzecia', 3]],
     );
+  });
+
+  test('two Cios at once on the last bonus: one takes it, the other one\'s batch is refused, so nothing is used twice', async () => {
+    await strike('magini', 'undercut');
+    await run('UPDATE guild_undercuts SET uses_left = 1');
+    const database = await db();
+    const guild = await first('SELECT id FROM guilds');
+    const beast = await first('SELECT id FROM guild_beasts');
+    const row = await first("SELECT * FROM characters WHERE name = 'Wojowniczka'");
+    // Wojowniczka's attack reads the bonus waiting…
+    const plan = await strikePlan(database, { guild, row, target: `beast:${beast.id}`, kind: 'strike', now: clock });
+    assert.deepEqual(plan.boosts.bonus, { name: 'Magini' });
+    // …Trzecia's Cios takes it meanwhile…
+    assert.deepEqual((await strike('trzecia')).data.attack.boosts.bonus, { name: 'Magini' });
+    // …and Wojowniczka's batch fails on its assertion (the game answers that
+    // the beast changed meanwhile), the bonus not taken a second time.
+    await assert.rejects(database.batch(plan.statements), /malformed JSON/);
+    assert.equal((await first('SELECT uses_left FROM guild_undercuts')).uses_left, 0);
   });
 
   test('a podcięcie of a character of the same account never helps it', async () => {
