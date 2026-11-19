@@ -57,7 +57,23 @@
 // makes or joins one the page still tells it once which of them will not
 // go on the party's trips (partyView's `companions`).
 
-import { areaFor, areaOpenFor, companionsGoingMost, companionStays, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange, partyStayText, tripWanted, wantedTarget } from '../engine/index.js';
+import {
+  areaFor,
+  areaOpenFor,
+  challengeAt,
+  companionsGoingMost,
+  companionStays,
+  huntDurations,
+  isUnlocked,
+  longestHunt,
+  mountOf,
+  mountStage,
+  partyFit,
+  partyRange,
+  partyStayText,
+  tripWanted,
+  wantedTarget,
+} from '../engine/index.js';
 import { assertion, raced } from './atomic.js';
 import { characterView, currentHp, earlyAreaOf, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer, settleCharacter } from './characters.js';
 import { content } from './content.js';
@@ -96,6 +112,17 @@ function levelGap(name, classLevel, levels) {
       ? `${name} ma ${classLevel}. poziom klasy. Poziomy klas w drużynie mogą się różnić najwyżej o ${classSpread}, więc teraz dołączy postać z poziomem klasy od ${from} do ${to}.`
       : `Masz ${classLevel}. poziom klasy. Poziomy klas w drużynie mogą się różnić najwyżej o ${classSpread}, więc teraz dołączy postać z poziomem klasy od ${from} do ${to}.`,
   );
+}
+
+// Why a Drużyna's trip cannot go as a Trudna (`mode` 'hard') or a
+// Piekielna ('hell') wyprawa: `name`, one of those going, has not opened it
+// yet (balance.challenge's level). Each a whole sentence, for its English
+// (i18n.js).
+function challengeLocked(name, mode) {
+  const level = content().balance.challenge.fromLevel;
+  return mode === 'hell'
+    ? new ApiError(403, 'party_hell_locked', `${name} nie ma jeszcze Piekielnej wyprawy: otworzy się na ${level}. poziomie postaci. Drużyna idzie na nią tylko wtedy, gdy może każdy z was.`)
+    : new ApiError(403, 'party_hard_locked', `${name} nie ma jeszcze Trudnej wyprawy: otworzy się na ${level}. poziomie postaci. Drużyna idzie na nią tylko wtedy, gdy może każdy z was.`);
 }
 
 const unlock = () => content().unlocksById.party;
@@ -559,7 +586,11 @@ async function claimForTrip(db, member, now) {
 // leader too, must have the place and the length open, so the party goes
 // only as far and as long as its lowest member may, and waits as long as
 // its slowest mount (the Stajnia, 327 A). The leader's choices of potions
-// and tracking are its own; the others go without them. A member busy with
+// and tracking are its own; the others go without them. A Trudna or a
+// Piekielna wyprawa (`hard`, `hell`) is the whole trip's, for every member
+// who goes, and only where each of them has it open (the author,
+// 19.11.2026: „Trudne i Piekielne wyprawy zrób tak by można je bylo robić z
+// drużyną”; challengeLocked). A member busy with
 // something still running is left alone, its activity untouched. With no
 // member able to go, nobody goes, the leader neither (a player's bug
 // report, 12.11.2026: „Po wyruszeniu na wyprawę z drużyną czasem nie
@@ -621,6 +652,9 @@ async function setOut(db, player, body, now, claimed) {
   if (going.length === 0) throw new ApiError(409, 'nobody_free', 'Nikt z drużyny nie jest teraz wolny. Odznacz „Z drużyną” albo poczekaj, aż ktoś skończy swoje zajęcia.');
   const area = typeof body.areaId === 'string' ? areaFor(body.areaId, player.row.level, content()) : undefined;
   if (!area) throw new ApiError(400, 'invalid_area', 'Wybierz miejsce wyprawy.');
+  // The trip's challenge, the Piekielna when both boxes come, as on a
+  // "Wyrusz" alone (beginHunt): every member goes in it.
+  const mode = body.hell === true ? 'hell' : body.hard === true ? 'hard' : null;
   for (const member of [player, ...going]) {
     if (!areaOpenFor(area, member.row.class_level, earlyAreaOf(member.row), content())) {
       throw new ApiError(403, 'party_area_locked', `${member.row.name} nie ma jeszcze otwartego miejsca ${area.name}. Drużyna idzie tylko tam, gdzie może każdy z was.`);
@@ -628,6 +662,7 @@ async function setOut(db, player, body, now, claimed) {
     if (!huntDurations(member.row.level, content()).includes(body.minutes)) {
       throw new ApiError(403, 'party_duration_locked', `${member.row.name} może iść najwyżej na ${longestHunt(member.row.level, content())} minut. Drużyna idzie tylko tak długo, jak może każdy z was.`);
     }
+    if (mode && !challengeAt(member.row.level, content())) throw challengeLocked(member.row.name, mode);
   }
   // The leader's own choices first (potions, the healing mark, tracking),
   // checked with nothing saved, so a wrong one sends nobody (the code
@@ -681,13 +716,14 @@ async function setOut(db, player, body, now, claimed) {
   // timer (time.js).
   const party_ = { id: party.id, leader: player.row.name, names: everyone.map((member) => member.row.name), trip: now };
   // The leader's start, then the members', each without the leader's
-  // choices, made ready and written below in one batch with the trip's
-  // crew. One whose start cannot be made stays home.
+  // choices but the trip's challenge, made ready and written below in one
+  // batch with the trip's crew. One whose start cannot be made stays home.
   const setups = new Map([[player.row.id, await beginHunt(db, player, body, now, { party: party_, mount, haste, also: takeBoon, defer: true })]]);
   const went = [];
   for (const member of ready) {
     try {
-      const setup = await beginHunt(db, member, { areaId: area.id, minutes: body.minutes, avoidRare: body.avoidRare === true, seekRare: body.seekRare === true && body.avoidRare !== true }, now, {
+      const own = { areaId: area.id, minutes: body.minutes, avoidRare: body.avoidRare === true, seekRare: body.seekRare === true && body.avoidRare !== true, hard: mode === 'hard', hell: mode === 'hell' };
+      const setup = await beginHunt(db, member, own, now, {
         party: party_,
         mount,
         haste,
@@ -748,6 +784,10 @@ async function setOut(db, player, body, now, claimed) {
     },
     // The party's boon it set out with (party-events.js).
     ...(boon && { boon }),
+    // A Trudna wyprawa ({ hard: true }) or a Piekielna ({ hell: true }),
+    // as each member's start keeps it too: every member's report is fought
+    // with the same stronger creatures (hunts.js: finishHunt).
+    ...(mode && { [mode]: true }),
   };
   // A member whose report was claimed for this trip keeps where it is
   // (`claimed`), for its Walka to tell it and open it.
