@@ -1144,6 +1144,10 @@
     "0.4.49": {
       "title": "Version 0.4.49",
       "body": "- Bald Mountains: the elites and champions (Griffin, Stone Giant, Cuckoo, Master Twardowski, Lady Death and Baba Yaga) are as hard again as when the Bald Mountains opened.\n- Nav: the elites and champions evened out after the change of the level curve.\n- Because of it, the System Deck cards of a few of these creatures have a slightly different Attack and Life; the Griffin, for example, hits harder but has less Life."
+    },
+    "0.4.50": {
+      "title": "Version 0.4.50",
+      "body": "- Full bag: the scrap dealer now sells the lowest rarity first. An item your class cannot use goes before the others only among items of the same rarity, so a valuable item of another class stays while you have anything weaker in the bag."
     }
   }
 }

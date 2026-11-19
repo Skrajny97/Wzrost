@@ -398,9 +398,14 @@ export function sellPrice(item, content, bonus = 0) {
 }
 
 // When the bag holds more than its places, the scrapper buys the weakest
-// items: those the class cannot use first, upgraded ones and those with a
-// gem set in them (Jubilerstwo) last, then by rarity
-// and level, a new find before an item already in the bag (it has an id).
+// items: upgraded ones and those with a gem set in them (Jubilerstwo) last,
+// the others by rarity, the lowest first, and within a rarity those the
+// class cannot use first, then by level, a new find before an item already
+// in the bag (it has an id). Rarity comes before use (a player's report,
+// 19.11.2026: a divine armour of another class was sold before every lesser
+// item, as the class could not use it; the author: „Tę kapę identyczną zwróć
+// graczowi wraz z poprawkami w tej zasadzie”), so an item worth keeping or
+// trading goes only when nothing lesser is left.
 // An item the owner marked as a favourite (`favorites`, the ids of its
 // items; the author, 10.11.2026: "Do tego opcja dodawania do ulubionych, by
 // przypadkiem nie rozebrać czegoś na później") is never sold: the weakest of
@@ -424,13 +429,16 @@ export function bagOverflow(items, capacity, classId, content, favorites = new S
   const upgraded = (item) => (item.upgrade > 0 || item.gem ? 1 : 0);
   /** @param {Item} item */
   const kept = (item) => (item.id === undefined ? 0 : 1);
+  /** @param {Item} item */
+  const rarityOf = (item) => content.rarities.findIndex((/** @type {{ id: string }} */ rarity) => rarity.id === item.rarity);
   return items
     .map((item, index) => ({ item, index }))
     .filter(({ item }) => item.id === undefined || !favorites.has(item.id))
     .sort(
       (a, b) =>
-        usable(a.item) - usable(b.item) ||
         upgraded(a.item) - upgraded(b.item) ||
+        rarityOf(a.item) - rarityOf(b.item) ||
+        usable(a.item) - usable(b.item) ||
         itemRank(a.item, content) - itemRank(b.item, content) ||
         kept(a.item) - kept(b.item) ||
         a.index - b.index,

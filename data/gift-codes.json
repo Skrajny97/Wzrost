@@ -151,6 +151,61 @@
       "systemPoints": 500
     }
   ],
+  "returns": [
+    {
+      "id": "divine-cope-2026-11-19",
+      "login": "bab0b06ff825c848fe81efa6c314c97148bcfa6928141c12f11f8663ff9b1c7d",
+      "classId": "archer",
+      "levels": [175, 199],
+      "item": {
+        "base": "casimir-cope",
+        "slot": "chest",
+        "level": 227,
+        "rarity": "divine",
+        "affixes": [
+          {
+            "id": "nimble",
+            "kind": "prefix",
+            "stat": "dexterity",
+            "value": 230,
+            "monster": "griffin"
+          },
+          {
+            "id": "silence",
+            "kind": "suffix",
+            "stat": "will",
+            "value": 230,
+            "monster": "stolem"
+          },
+          {
+            "id": "oak",
+            "kind": "prefix",
+            "stat": "vitality",
+            "value": 230
+          },
+          {
+            "id": "raven",
+            "kind": "suffix",
+            "stat": "perception",
+            "value": 230
+          },
+          {
+            "id": "stone",
+            "kind": "prefix",
+            "stat": "endurance",
+            "value": 230
+          },
+          {
+            "id": "spark",
+            "kind": "suffix",
+            "stat": "intellect",
+            "value": 230
+          }
+        ],
+        "armor": 1311
+      }
+    }
+  ],
   "texts": {
     "title": "Kod podarunkowy",
     "intro": "Wpisz kod podarunkowy. Każdy kod działa raz na konto.",

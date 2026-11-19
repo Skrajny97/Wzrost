@@ -10,7 +10,7 @@ import { buyAvatar, cancelAvatar, claimAvatar } from './avatar.js';
 import { openBestiaryChest } from './bestiary.js';
 import { openEncyclopediaChest, readEncyclopedia } from './encyclopedia.js';
 import { decidePointsReset, takeEvolution, testClassLevel, testEvolutions, undoEvolution } from './evolutions.js';
-import { authorGiftCodes, createGiftCode, endGiftCode, moveGiftRewards, redeemGiftCode } from './gift-codes.js';
+import { authorGiftCodes, createGiftCode, endGiftCode, moveGiftRewards, redeemGiftCode, returnGiftItems } from './gift-codes.js';
 import { getStreak, takeStreak } from './streak.js';
 import { buyWinterSet, getWinter, takeWinter } from './winter.js';
 import { tellFortune } from './andrzejki.js';
@@ -627,6 +627,8 @@ export default {
       () => sendNotifications(env, controller.scheduledTime),
       // A code's rewards moved by the author's word (gift-codes.js).
       () => moveGiftRewards(env, controller.scheduledTime),
+      // An item given back by the author's word (gift-codes.js).
+      () => returnGiftItems(env, controller.scheduledTime),
       // The guilds' boards of the Próby Gildii drawn as the week starts and
       // their trials of the day opened for every member (guild-trials.js).
       () => openGuildTrials(env.DB, controller.scheduledTime),

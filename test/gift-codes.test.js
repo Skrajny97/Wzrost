@@ -6,8 +6,8 @@ import { beforeEach, describe, test } from 'node:test';
 
 import { createHash } from 'node:crypto';
 
-import { giftCodeOf, giftMovePair, giftRewardsText, normalCode, withGiftResources } from '../src/engine/index.js';
-import { characterKey, looseKey, moveGiftRewards, usedCodes } from '../src/server/gift-codes.js';
+import { giftCodeOf, giftMovePair, giftRewardsText, itemName, normalCode, sellPrice, withGiftResources } from '../src/engine/index.js';
+import { characterKey, looseKey, moveGiftRewards, returnGiftItems, usedCodes } from '../src/server/gift-codes.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -242,6 +242,41 @@ describe('a code\'s rewards moved by the scheduled run', () => {
     assert.deepEqual([await points(giver.id), await points(taker.id) - before], [30, 500]);
     // The player sees it on the character's card.
     assert.equal((await call('GET', '/api/character', { cookie })).data.character.name, 'Obdarowana');
+  });
+
+  // The author, 19.11.2026: „Tę kapę identyczną zwróć graczowi” (a divine
+  // armour of another class the full bag sold before every lesser item).
+  test('an item given back goes once into the bag of the one character of its class on the account', async () => {
+    const back = content.giftReturns.find((one) => one.id === 'divine-cope-2026-11-19');
+    assert.equal(itemName(back.item, content), 'Gryfia Kapa Kazimierza Stolema');
+    assert.equal(sellPrice(back.item, content), 14528);
+    const { cookie } = await signUp('zwrot-konto');
+    assert.equal((await call('POST', '/api/character', { cookie, body: { name: 'Łuczniczka Zwrotna', classId: 'archer', appearance: 'female' } })).status, 201);
+    const database = await db();
+    const archer = await database.prepare("SELECT id FROM characters WHERE name = 'Łuczniczka Zwrotna'").first();
+    const bag = async () => (await database.prepare('SELECT data FROM items WHERE character_id = ? AND slot IS NULL').bind(archer.id).all()).results.map((row) => JSON.parse(row.data));
+    const before = (await bag()).length;
+    // The data's own return names no account here and gives nothing.
+    assert.equal(await returnGiftItems({ DB: database }, minute), 0);
+    const returns = [{ ...back, id: 'test-return', login: await looseKey('Zwrot-Konto'), levels: undefined }];
+    // Only every ten minutes.
+    assert.equal(await returnGiftItems({ DB: database }, minute + 5 * 60000, returns), 0);
+    assert.equal(await returnGiftItems({ DB: database }, minute, returns), 1);
+    const after = await bag();
+    assert.equal(after.length, before + 1);
+    assert.deepEqual(after.at(-1), back.item);
+    // Once only.
+    assert.equal(await returnGiftItems({ DB: database }, minute + 10 * 60000, returns), 0);
+    assert.equal((await bag()).length, before + 1);
+    // Two characters of the class on the account: the author did not say which, so it waits…
+    assert.equal((await call('POST', '/api/character', { cookie, body: { name: 'Drugi Łucznik', classId: 'archer', appearance: 'male' } })).status, 201);
+    assert.equal(await returnGiftItems({ DB: database }, minute + 20 * 60000, [{ ...returns[0], levels: undefined, id: 'test-return-two' }]), 0);
+    // …unless the levels tell them apart.
+    await database.prepare("UPDATE characters SET level = 181 WHERE name = 'Łuczniczka Zwrotna'").run();
+    await database.prepare("UPDATE characters SET level = 217 WHERE name = 'Drugi Łucznik'").run();
+    assert.deepEqual(back.levels, [175, 199]);
+    assert.equal(await returnGiftItems({ DB: database }, minute + 30 * 60000, [{ ...returns[0], levels: back.levels, id: 'test-return-three' }]), 1);
+    assert.equal((await bag()).length, before + 2);
   });
 
   // The code review (0.2.71): a code for one character is keyed by its

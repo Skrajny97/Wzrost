@@ -1905,14 +1905,30 @@ describe('camp', () => {
     assert.deepEqual(restBonus(stored, 40 * 60000, 60 * 60000, content), { bonus: 0.1 });
   });
 
-  test('a full bag sells the weakest items, new finds before old ones', () => {
+  test('a full bag sells the lowest rarity first, within it what the class cannot use, new finds before old ones', () => {
     const rng = createRng('bag');
     const make = (baseId, rarityId, level, id) => ({ ...generateItem({ baseId, level, rarityId }, rng, content), ...(id && { id }) });
     const bag = [make('sword', 'rare', 5, 1), make('staff', 'rare', 9, 2), make('sword', 'common', 3, 3)];
     const finds = [make('sword', 'common', 3), make('helmet', 'unique', 4)];
-    // A warrior cannot use the staff, so it goes first; then the new common sword.
-    assert.deepEqual(bagOverflow([...bag, ...finds], 3, 'warrior', content), [1, 3]);
+    // The two common swords go first, the new one before the old; the rare
+    // staff a warrior cannot use stays, as nothing lesser is left only then.
+    assert.deepEqual(bagOverflow([...bag, ...finds], 3, 'warrior', content), [3, 2]);
+    assert.deepEqual(bagOverflow([...bag, ...finds], 2, 'warrior', content), [3, 2, 1]);
     assert.deepEqual(bagOverflow(bag, 3, 'warrior', content), []);
+  });
+
+  // A player's report, 19.11.2026: an archer's full bag sold a divine
+  // armour of the Kleryk before every lesser item.
+  test("a full bag keeps a divine item of another class while lesser items are left", () => {
+    const rng = createRng('divine-cope');
+    const make = (baseId, rarityId, level, id) => ({ ...generateItem({ baseId, level, rarityId }, rng, content), ...(id && { id }) });
+    const cope = make('casimir-cope', 'divine', 227, 1);
+    const bag = [cope, make('bow', 'rare', 180, 2), make('bow', 'epic', 180, 3)];
+    const finds = [make('bow', 'legendary', 181)];
+    assert.deepEqual(bagOverflow([...bag, ...finds], 3, 'archer', content), [1]);
+    // Of two items of one rarity, the one the class cannot use goes first.
+    const otherCope = make('casimir-cope', 'rare', 180, 4);
+    assert.deepEqual(bagOverflow([otherCope, make('bow', 'rare', 180, 5)], 1, 'archer', content), [0]);
   });
 
   test("the Ognisko's fire spirit: cheaper pieces and more of them a day with each level, counted anew each Polish day", () => {

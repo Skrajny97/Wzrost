@@ -48,6 +48,22 @@
         }
       }
     },
+    "returns": {
+      "type": "array",
+      "description": "Przedmiot oddany na polecenie autora (np. sprzedany przez pomyłkę), raz (returnGiftItems w src/server/gift-codes.js): serwer wkłada go do plecaka jedynej postaci danej klasy na koncie o tym loginie.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "login", "classId", "item"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "Stałe id: serwer zapisuje je po oddaniu i nie oddaje drugi raz." },
+          "login": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "Konto: SHA-256 loginu małymi literami, tylko z liter i cyfr (looseKey), bo repozytorium jest publiczne." },
+          "classId": { "type": "string", "description": "Klasa postaci, do której przedmiot wraca; na koncie musi być dokładnie jedna taka postać." },
+          "levels": { "type": "array", "items": { "type": "integer", "minimum": 1 }, "minItems": 2, "maxItems": 2, "description": "Najniższy i najwyższy poziom postaci, gdy konto może mieć kilka postaci tej klasy." },
+          "item": { "type": "object", "required": ["base", "slot", "level", "rarity", "affixes"], "description": "Przedmiot taki, jaki był, jak w kolumnie data tabeli items." }
+        }
+      }
+    },
     "texts": {
       "type": "object",
       "additionalProperties": false,
