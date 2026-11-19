@@ -14,7 +14,7 @@ import { activityFinished, avoidRareOn, call, hardHuntOn, hellHuntOn, isUnlocked
 import { guided, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { materialIcon } from '../craft-table.js';
 import { droppedCardsSection } from '../cards.js';
-import { LABYRINTH_BOARD } from '../labyrinth.js';
+import { LABYRINTH_BOARD, labyrinthReportOn, setLabyrinthReport } from '../labyrinth.js';
 import { narrate } from '../narrator.js';
 import { scrapperSheet } from '../scrapper.js';
 import { findMark, itemDetails, itemSheet, itemSummary, ownedCopy, storedCopy } from './character.js';
@@ -231,6 +231,11 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
           text: t('Walcz o stopień {stage}', { stage: report.portal.next }),
           onClick: (event) => withButton(event.currentTarget, () => fightPortal(report.portal.id, navigate)),
         }),
+      // A room's fight of the Labirynt just fought, its report first
+      // (labyrinth.js): the way past it to the board, where its result, the
+      // blessing's choice and the next level wait, and the switch of the
+      // report first.
+      fresh && report.labyrinth && labyrinthSkip(),
       report.portal?.companions?.length > 0 && h('p', { class: 'report-party', text: t('Z postacią: {names}.', { names: report.portal.companions.join(', ') }) }),
       report.labyrinth?.companions?.length > 0 && h('p', { class: 'report-party', text: t('Z postacią: {names}.', { names: report.labyrinth.companions.join(', ') }) }),
       report.tower &&
@@ -264,6 +269,27 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     showFight(selected);
     renderActions();
     if (report.system.length > 0 && firstPlayback) playSound('system');
+  }
+
+  // "Pomiń raport" and "Raport walki od razu" over a Labirynt's fight (the
+  // author, 19.11.2026: „automatycznie otwierał się raport walki każdej,
+  // który można wyłączyć lub pominąć”): the box kept in this browser; off,
+  // the report waits under "Obejrzyj walkę" in the result, where it opens
+  // with the box again.
+  function labyrinthSkip() {
+    const box = h('input', {
+      type: 'checkbox',
+      id: 'labyrinth-report',
+      class: 'avoid-rare-box',
+      checked: labyrinthReportOn(),
+      onChange: () => setLabyrinthReport(box.checked),
+    });
+    return h(
+      'div',
+      { class: 'report-skip' },
+      h('a', { class: 'button button--system', href: LABYRINTH_BOARD, text: t('Pomiń raport') }),
+      h('label', { class: 'avoid-rare', for: 'labyrinth-report' }, box, h('span', { text: t('Raport walki od razu') })),
+    );
   }
 
   const fightKind = (fight) => (fight.champion ? 'champion' : fight.elite ? 'elite' : fight.event ? 'event' : fight.tough ? 'tough' : null);

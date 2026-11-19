@@ -1475,6 +1475,11 @@
       "id": "0.4.60",
       "title": "Wersja 0.4.60",
       "body": "- Próg trudności liczy się od poziomu klasy: od 250. poziomu klasy stwory są trzy razy silniejsze wszędzie, gdzie walczysz, a w drużynie liczy się najwyższy poziom klasy wśród graczy. Od 250. poziomu klasy zgarniasz też połowę złota, materiałów, zasobów i skrzyń."
+    },
+    {
+      "id": "0.4.61",
+      "title": "Wersja 0.4.61",
+      "body": "- Labirynt: po każdej walce, także ze strażnikiem poziomu, najpierw otwiera się jej raport. Możesz go pominąć przyciskiem „Pomiń raport” albo wyłączyć pod nim pole „Raport walki od razu”. Dopiero potem jest wybór błogosławieństwa i kolejny poziom.\n- Poprawka: okna z wynikiem walki, ołtarza i kupca w Labiryncie nie są już puste, także przy wyłączonych Animacjach."
     }
   ]
 }

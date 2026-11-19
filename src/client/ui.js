@@ -202,7 +202,12 @@ export function initSheet() {
   dialog.addEventListener('cancel', (event) => {
     if (dialog.dataset.locked) event.preventDefault();
   });
+  // The browser tells of a close a moment after it. A sheet closed and
+  // another opened at once (the Labirynt's room, then the result of its
+  // fight: the guardian's came empty, 19.11.2026) is open again by then,
+  // and the close no longer empties it or takes its lock.
   dialog.addEventListener('close', () => {
+    if (dialog.open) return;
     delete dialog.dataset.locked;
     clear(dialog);
   });
