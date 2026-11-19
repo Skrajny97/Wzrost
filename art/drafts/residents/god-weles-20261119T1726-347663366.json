@@ -1,0 +1,14 @@
+{
+  "id": "god-weles",
+  "tool": "pixellab generate-image-v2",
+  "description": "Weles, the old Slavic god of herds, wealth and the underworld, a dignified dark elder with a long black beard streaked with grey and long black hair, two great curved ox horns growing from his head, calm deep-set eyes with a faint green glow, a heavy dark brown bear fur cloak over his shoulders, a twisted gold torque at his neck and a string of old gold coins, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic pagan mythology, dignified, muted natural colours",
+  "style": "src/client/art/residents/hermit.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08088820189899869
+  },
+  "images": 4
+}
