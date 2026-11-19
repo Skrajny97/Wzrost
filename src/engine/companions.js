@@ -19,7 +19,7 @@
 // `given`; `stays` marks one told to stay in the Kwatery (companionStays);
 // `trained` counts the day's trainings ({ day, count }, companionTraining).
 
-import { playerCombatant } from './combatant.js';
+import { classLevelFactor, playerCombatant } from './combatant.js';
 import { evolutionName, evolutionOf, nextFormOf } from './evolutions.js';
 import { baseClassLevel, canUse, generateItem } from './items.js';
 import { explorationGold } from './mining.js';
@@ -411,24 +411,46 @@ export function companionAfterErrand(companion, { relation, errand }, content) {
   return { ...companion, relation: raised, ...(errand && { errand }) };
 }
 
+// How much stronger the companions of a character of `classLevel` are
+// (balance.companions.classLevelCurve; the author, 19.11.2026: „trzeba też
+// w obliczu zmian wzmocnić towarzyszy jakoś, bo po zmianach - bez drużyny
+// ciezko bedzie walczyć” and „to wypadaloby też wzmocnić towarzyszy od
+// 100ego”): the multiplier of their blows and their HP, ×1 below the
+// curve's first point, so that a character with its companions does about
+// as well as a Drużyna of three players of its level
+// (tools/difficulty-sim.mjs). By the character's own class level, as the
+// creatures grow by it (monsterCombatant).
+/**
+ * @param {number} classLevel
+ * @param {Content} content
+ * @returns {number}
+ */
+export const companionBoost = (classLevel, content) => classLevelFactor(classLevel, content.balance.companions?.classLevelCurve);
+
 // The companion in a fight: a character of its class with its gear, its
 // traits on top, and the relation's bonus (296 A). `hp` its HP now (full
-// when not given).
+// when not given). `classLevel`: the class level of the character it
+// fights for, whose companions hit harder and last longer from the class
+// level the creatures grow from (companionBoost); 0 for none.
 /**
  * @param {Companion} companion
- * @param {{ hp?: number | null, area?: Record<string, any> | null, id?: string }} fight
+ * @param {{ hp?: number | null, area?: Record<string, any> | null, id?: string, classLevel?: number }} fight
  * @param {Content} content
  */
-export function companionCombatant(companion, { hp, area, id = 'a1' } = {}, content) {
+export function companionCombatant(companion, { hp, area, id = 'a1', classLevel = 0 } = {}, content) {
   // Its form's portrait stays off: a companion keeps its own look (896 A).
   const { evolution: _form, ...unit } = playerCombatant({ character: companionCharacter(companion, content), equipped: companion.gear, hp, name: companion.name, area, id }, content);
   const bonus = traitBonuses(companion, content);
   const bond = bondBonus(companion, content);
-  const maxHp = Math.max(1, Math.round(unit.maxHp * (1 + (bonus.hp ?? 0) + bond)));
+  // Its blows (its weapon, as a creature's grow) and its HP, `boost` times.
+  const boost = companionBoost(classLevel, content);
+  const maxHp = Math.max(1, Math.round(unit.maxHp * (1 + (bonus.hp ?? 0) + bond) * boost));
+  const weapon = boost === 1 ? unit.weapon : { ...unit.weapon, min: Math.max(1, Math.round(unit.weapon.min * boost)), max: Math.max(1, Math.round(unit.weapon.max * boost)) };
   return {
     ...unit,
     isPlayer: false,
     companion: true,
+    weapon,
     maxHp,
     hp: Math.min(hp ?? maxHp, maxHp),
     armor: Math.round(unit.armor * (1 + (bonus.armor ?? 0))),

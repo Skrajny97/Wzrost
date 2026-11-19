@@ -131,7 +131,7 @@ function mix(kinds) {
 export function threatSamples({ character, equipped, areaId, companions = [], hard = false }, content) {
   const area = content.areasById[areaId];
   const player = playerCombatant(/** @type {any} */ ({ character, equipped, name: 'próba', area }), content);
-  const mates = companions.map((companion, index) => companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}` }), content));
+  const mates = companions.map((companion, index) => companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}`, classLevel: character.classLevel ?? 0 }), content));
   const rng = createRng(`threat:${areaId}:${character.level}`);
   const strength = exploreStrength(area, character.level, content, hard);
   /**

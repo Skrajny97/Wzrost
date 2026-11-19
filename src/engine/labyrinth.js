@@ -447,7 +447,10 @@ export function labyrinthFighters(state, { character, equipped, name, companions
   const player = blessed(playerCombatant(/** @type {any} */ ({ character: weekFighter(/** @type {any} */ (character), /** @type {any} */ (week)), equipped, name, area }), content), boons.character);
   const fighters = [
     { key: 'me', unit: player },
-    ...going.map((companion, index) => ({ key: companionKey(companion), unit: blessed(companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}` }), content), boons.companions) })),
+    ...going.map((companion, index) => ({
+      key: companionKey(companion),
+      unit: blessed(companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}`, classLevel: character.classLevel ?? 0 }), content), boons.companions),
+    })),
   ];
   return fighters.map(({ key, unit }) => {
     const share = state.hp[key] ?? 1;

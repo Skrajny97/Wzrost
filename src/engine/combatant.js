@@ -301,6 +301,24 @@ export function exploreStrength(area, level, content, hard = false) {
   return [damage * base.damage * more.damage, hp * base.hp * more.hp];
 }
 
+// A curve by class level (balance.monsters.classLevelCurve for the
+// creatures, balance.companions.classLevelCurve for the companions): points
+// [class level, multiplier] by class level, ×1 below the first, straight
+// between two points and as the last past it; ×1 for an empty curve.
+/**
+ * @param {number} classLevel
+ * @param {number[][]} [curve]
+ * @returns {number}
+ */
+export function classLevelFactor(classLevel, curve = []) {
+  if (curve.length === 0 || classLevel < curve[0][0]) return 1;
+  const next = curve.findIndex(([at]) => at > classLevel);
+  if (next === -1) return /** @type {number[]} */ (curve.at(-1))[1];
+  const [fromLevel, from] = curve[next - 1];
+  const [toLevel, to] = curve[next];
+  return from + ((to - from) * (classLevel - fromLevel)) / (toLevel - fromLevel);
+}
+
 // The class level that decides how strong the creatures are for those who
 // fight them (the myth game, partyStrength): the highest of the players'
 // own (the characters of a Drużyna's trip, of the Wieża Drużyn or of a
@@ -387,6 +405,13 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
   // fighting together (partyStrength).
   const myth = balance.monsters.mythGame;
   const mythic = (classLevel >= myth.fromClassLevel ? 1 : 0) * growth;
+  // On top of it, the creatures' strength by the same class level
+  // (balance.monsters.classLevelCurve; the author, 19.11.2026: „od 100ego
+  // też zwiekszyc mielismy poziom trudnosci tylko słabiej”, and 1207 A:
+  // from class level 100 evenly up to twice as strong just before 250),
+  // for its blows and its HP alike, in a fight alone only `growth` of it,
+  // as the myth game; ×1 with the curve empty, as before 1207 A.
+  const ramp = 1 + (classLevelFactor(classLevel, balance.monsters.classLevelCurve) - 1) * growth;
   const [partyDamage, partyHp] = partyStrength(classLevel, players, content);
   const [huntDamage, huntHp] = strength;
   // A creature's natural weapon from one of its attacks: its own, or one of
@@ -402,6 +427,7 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
       (1 + late.damage * later) *
       (1 + end.damage * latest) *
       (1 + myth.damage * mythic) *
+      ramp *
       partyDamage *
       huntDamage;
     return {
@@ -446,7 +472,7 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
   const rawHp = balance.monsters.hpBase + balance.character.hpPerVitality * stat('vitality') + balance.monsters.hpPerLevel * level;
   const hpMax = Math.max(
     1,
-    Math.round(rawHp * monster.hpFactor * groupFactor * (1 + mid.hp * stronger) * (1 + coop.hp) * (1 + late.hp * later) * (1 + end.hp * latest) * (1 + myth.hp * mythic) * partyHp * huntHp),
+    Math.round(rawHp * monster.hpFactor * groupFactor * (1 + mid.hp * stronger) * (1 + coop.hp) * (1 + late.hp * later) * (1 + end.hp * latest) * (1 + myth.hp * mythic) * ramp * partyHp * huntHp),
   );
   return {
     id,

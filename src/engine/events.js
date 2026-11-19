@@ -635,7 +635,7 @@ export function resolveEvent(
   const mates = companions.flatMap((companion, index) => {
     const end = ended.get(companion.id);
     if (!end || end.fainted || end.hpEnd <= 0) return [];
-    return [{ id: companion.id, unit: companionCombatant(companion, { hp: end.hpEnd, area, id: `a${index + 1}` }, content) }];
+    return [{ id: companion.id, unit: companionCombatant(companion, { hp: end.hpEnd, area, id: `a${index + 1}`, classLevel: character.classLevel ?? 0 }, content) }];
   });
   // From the character's class level 250 they are stronger (the myth game,
   // monsterCombatant).
