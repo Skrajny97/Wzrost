@@ -699,6 +699,12 @@ describe('the third forms in fights', () => {
   });
 });
 
+// Since 19.11.2026 the creatures grow from class level 100 by the
+// fighter's class level (balance.monsters.classLevelCurve, 1207 A): the
+// forms are compared against the creatures they were tuned with, as the
+// fourth evolution's tests do.
+const untuned = (data) => ({ ...data, balance: { ...data.balance, monsters: { ...data.balance.monsters, classLevelCurve: [] } } });
+
 describe('the third forms against the second forms (tools/class-balance-sim.mjs, tools/pvp-arena-sim.mjs)', () => {
   test('a third form is clearly stronger than its second form, and the third forms are closer to each other than the second forms', () => {
     // Four-hour explorations of the newest place at level 200 by the
@@ -710,7 +716,7 @@ describe('the third forms against the second forms (tools/class-balance-sim.mjs,
       content.skills.filter((skill) => skill.classId === cls.id).forEach((skill, index) => {
         const path = index === 0 ? null : skill.id;
         const options = { model: 'realistic-nocomp', classId: cls.id, level: 200, minutes: 240, hunts: 120, path };
-        rows.push([measureClass(options, secondOnly), measureClass(options, content)]);
+        rows.push([measureClass(options, untuned(secondOnly)), measureClass(options, untuned(content))]);
       });
     }
     assert.deepEqual(rows.map(([, third]) => third.evolution).sort(), [...FORMS].sort());
