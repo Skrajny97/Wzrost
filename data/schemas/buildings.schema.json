@@ -181,6 +181,67 @@
           }
         }
       },
+      "pick": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["button", "hint", "none", "marked", "sell", "sellNone", "cancel", "favorites", "confirm", "done", "errors"],
+        "description": "Tylko Skup złomu (sellPrice): „Zaznacz do sprzedaży” w plecaku (pomysł gracza, który autor chce mieć, 19.11.2026: „możliwość zaznaczania ich w plecaku do sprzedaży wybranych a nie całych rzadkości”). Gracz zaznacza przedmioty, a złomiarz kupuje je naraz, każdy za cenę z jego karty z premią Skupu złomu (POST /api/items/sell z { ids }). button: przycisk pod tytułem plecaka, hint: zdanie nad przedmiotami, none i marked ({count}): pasek na dole, sell ({gold}: złoto za wszystkie zaznaczone) i sellNone: przycisk sprzedaży z zaznaczonymi i bez nich, cancel: wyjście z zaznaczania, favorites: dopisek, gdy w plecaku są ulubione. confirm: pytanie przed sprzedażą ({names}: nazwy, {gold}: złoto; upgraded z {count} ulepszonych, gems z {gems} kamieni, które wypadną). done ({count}, {gold}): komunikat po sprzedaży. errors: odmowy serwera (none: pusta lista, gone: przedmiotu nie ma już w plecaku, worn: przedmiot założony).",
+        "properties": {
+          "button": { "type": "string", "minLength": 1 },
+          "hint": { "type": "string", "minLength": 1 },
+          "none": { "type": "string", "minLength": 1 },
+          "marked": { "type": "string", "pattern": "\\{count\\}" },
+          "sell": { "type": "string", "pattern": "\\{gold\\}" },
+          "sellNone": { "type": "string", "minLength": 1 },
+          "cancel": { "type": "string", "minLength": 1 },
+          "favorites": { "type": "string", "minLength": 1 },
+          "confirm": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["title", "text", "upgraded", "gems", "yes"],
+            "properties": {
+              "title": { "type": "string", "minLength": 1 },
+              "text": { "type": "string", "pattern": "\\{names\\}.*\\{gold\\}|\\{gold\\}.*\\{names\\}" },
+              "upgraded": { "type": "string", "pattern": "\\{count\\}" },
+              "gems": { "type": "string", "pattern": "\\{gems\\}" },
+              "yes": { "type": "string", "minLength": 1 }
+            }
+          },
+          "done": { "type": "string", "pattern": "\\{count\\}.*\\{gold\\}|\\{gold\\}.*\\{count\\}" },
+          "errors": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["none", "gone", "worn"],
+            "properties": {
+              "none": { "type": "string", "minLength": 1 },
+              "gone": { "type": "string", "minLength": 1 },
+              "worn": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      },
+      "sort": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "orders"],
+        "description": "Tylko Kowadło (upgradeCap): „Sortuj:” nad przedmiotami do ulepszenia (pomysł gracza, który autor chce mieć, 19.11.2026: „Można by dodać sortowanie itemów np. w kowadle”). label: nazwa grupy przycisków dla czytnika ekranu. orders: kolejności w tej kolejności przycisków, pierwsza domyślna: worn (założone najpierw, potem plecak od najnowszych, jak dotąd), new (najnowsze), rarity (najrzadsze), level (najwyższy poziom), upgrade (najwyższe ulepszenie), slot (rodzaj, w kolejności slotów).",
+        "properties": {
+          "label": { "type": "string", "minLength": 1 },
+          "orders": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "name"],
+              "properties": {
+                "id": { "enum": ["worn", "new", "rarity", "level", "upgrade", "slot"] },
+                "name": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        }
+      },
       "costs": {
         "type": "array",
         "minItems": 1,

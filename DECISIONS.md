@@ -3847,6 +3847,27 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.55 (19.11.2026): sortowanie w Kowadle i sprzedaż zaznaczonych przedmiotów (1176, 1177)
+
+Autor przyjął obie makiety na stronie ocen (1176 i 1177, 19.11.2026), bez uwag, więc zostają domyślna kolejność „Założone”, przycisk „Sprzedaj za X złota” i zaznaczanie w samym plecaku.
+
+
+Gracz: „Można by dodać sortowanie itemów np. w kowadle i dodatkowo możliwość zaznaczania ich w plecaku do sprzedaży wybranych a nie całych rzadkości”. Autor: „do tego taka opcja potrzebna”. Na gałęzi, do oceny na makietach (telefon, 1366 i 1920 px), jeszcze nie w grze.
+
+1. **„Sortuj:” w Kowadle**, takie samo jak nad plecakiem i w Talii: Założone, Najnowsze, Rzadkość, Poziom, Ulepszenie i Rodzaj (`sort` Kowadła w `data/buildings.json`, z angielskim). Wybór zostaje na urządzeniu, osobno od plecaka. Brakujące szczegóły:
+   - Pierwsza i domyślna jest „Założone”, czyli dotychczasowa kolejność: najpierw to, co postać nosi, potem plecak od najnowszych. Kto nie ruszy sortowania, widzi Kowadło jak dotąd.
+   - W pozostałych kolejnościach założone przedmioty stoją między przedmiotami z plecaka i mają dalej znaczek „założony”. Przy równych wartościach zostaje kolejność gry.
+   - Sześć przycisków stoi w dwóch rzędach po trzy, a w jednym rzędzie tam, gdzie karta Kowadła jest szeroka, czyli na komputerze. Liczy się szerokość karty, a nie ekranu, bo na tablecie karta jest tak wąska jak na telefonie, a w jednym rzędzie napisy wychodziły poza przyciski.
+2. **„Zaznacz do sprzedaży” w plecaku**, obok „Sprzedaj zbędne”. Sprzedaż do rzadkości zostaje bez zmian. Brakujące szczegóły:
+   - Po stuknięciu plecak pokazuje same przedmioty, bez zakładek, ziół i mikstur, z tym samym „Sortuj:” co zwykle. Stuknięcie zaznacza przedmiot albo zdejmuje zaznaczenie, a zaznaczony wygląda jak w „Rozbierz kilka”: jasna ramka, poświata i ptaszek.
+   - Ulubionego przedmiotu nie da się zaznaczyć: jest przyciemniony, z gwiazdką, a stuknięcie mówi to samo co karta przedmiotu („Ulubiony przedmiot: zdejmij gwiazdkę, żeby go sprzedać.”). Pod przedmiotami stoi dopisek o gwiazdce.
+   - Na telefonie tuż nad dolnym paskiem stoi pasek na całą szerokość ekranu, jak pasek rozdanych punktów w Statystykach, a na komputerze ramka na dole kolumny plecaka. Są na nim „Zaznaczone: N”, „Anuluj” i „Sprzedaj za X złota”. Złoto to suma cen z kart przedmiotów, z premią Skupu złomu. Przycisk jest krótszy niż proponowane „Sprzedaj zaznaczone (N) za X złota”, bo na telefonie 360 px, obok kółka czatu, łamał się na dwie linijki. Liczba zaznaczonych stoi linijkę wyżej, a prawy koniec paska zostaje wolny dla kółka czatu, jak przy przyciskach w kartach.
+   - Zaznaczyć można też przedmioty ulepszone i z kamieniem, inaczej niż w sprzedaży do rzadkości, bo gracz wybiera je sam, jak z karty przedmiotu. Kamień wypada i wraca do minerałów (757 B).
+   - Przed sprzedażą gra pyta jak zwykle: „Sprzedać zaznaczone?”, z nazwami przedmiotów, złotem, liczbą ulepszonych i kamieniami, które wypadną. Po sprzedaży jest komunikat i brzęk monet, a plecak wraca do zwykłego wyglądu. „Anuluj” wychodzi bez sprzedaży.
+   - Serwer: `POST /api/items/sell` z `{ ids }` (z `{ maxRarity }` jak dotąd sprzedaje do rzadkości). Wszystko albo nic: przedmiot cudzy albo już nie w plecaku daje „Któregoś z zaznaczonych przedmiotów nie masz już w plecaku.”, założony „Założonych przedmiotów złomiarz nie kupi. Najpierw je zdejmij.”, ulubiony i ze stojaka Zbrojowni te same odmowy co przy jednym przedmiocie. Zapis przechodzi tylko wtedy, gdy postać się nie zmieniła i każdy zaznaczony przedmiot jest jeszcze w plecaku, więc dwa stuknięcia naraz płacą raz, a drugie dostaje „Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.”. Po odmowie strona pobiera postać na nowo, a zaznaczenia przedmiotów, których już nie ma, znikają.
+   - Teksty są w `pick` Skupu złomu w `data/buildings.json`, z angielskim w `data/en/buildings.json`.
+3. `tools/layout-check.cjs` sprawdza teraz też Kowadło z sortowaniem i plecak w trybie zaznaczania, z zaznaczonym przedmiotem.
+
 ## Wersja 0.4.54 (19.11.2026): powiadomienia o prywatnych wiadomościach, bez powiadomień o oznaczeniach na ogólnym czacie, „pushujący” na czacie, grafiki 1170 i dźwięki 1171
 
 1. **Powiadomienia czatu (autor 19.11.2026: „włącz powiadomienia jak ktoś napisze prywatną wiadomość na czacie a wyłącz powiadomienia przy ozaczaniu na ogólnym czacie”).** Prywatna wiadomość wysyła powiadomienie na telefon odbiorcy (`privateNotices` w `src/server/mentions.js`, tekst `mentions.texts.pushPrivate` w `data/chat.json`: „Ala napisała do Ciebie: …”). Tak jak przy oznaczeniach: tylko do postaci, którą gracz gra, dopóki wiadomość jest, nie została przeczytana i jej autor nie jest ukryty.

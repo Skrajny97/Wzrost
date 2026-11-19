@@ -28,7 +28,7 @@ import { closeSheet, confirmAction, guided, meter, openSheet, systemPanel, toast
 import { desktopLayout, onLayoutChange } from '../layout-mode.js';
 import { scrapperSheet } from '../scrapper.js';
 import { blessingSection, fortressPart, gearSetsSection, greenhouseSection, trainingSection } from '../fortress.js';
-import { itemSheet, itemSummary, salvagePicker } from './character.js';
+import { itemOrder, itemSheet, itemSummary, salvagePicker, sortButtons } from './character.js';
 import { mountChest } from './chest.js';
 import { mountQuarters } from '../companions.js';
 import { dayPart } from '../scenes.js';
@@ -62,6 +62,17 @@ let fireChoice = null;
 // The resource last given at the Stół rozbiórki's exchange and the pieces
 // last picked there, the same way.
 const exchangeChoice = { from: null, amount: null };
+// The order of the Kowadło's items (a player's idea the author wants,
+// 19.11.2026: „Można by dodać sortowanie itemów np. w kowadle”), kept on the
+// device as the bag's: one of the Kowadło's `sort` in data/buildings.json,
+// the game's own at first (the worn ones first, then the bag's newest).
+const ANVIL_SORT_KEY = 'insight-anvil-sort';
+let anvilSort = 'worn';
+try {
+  anvilSort = localStorage.getItem(ANVIL_SORT_KEY) ?? 'worn';
+} catch {
+  // Without storage the game's order.
+}
 
 export function mountCamp(container, { params, backHash = '#/walka' }) {
   const id = params.building;
@@ -790,15 +801,18 @@ function mountBuilding(container, id) {
   // The Kowadło's work: the character's items, worn first, each opening its
   // card with the upgrade, as from the backpack (character.js). The author:
   // items are upgraded "nie tylko na Kowadle, ale i z pozycji samego
-  // przedmiotu".
+  // przedmiotu". "Sortuj:" over them, as over the bag, orders the worn and
+  // the bag's together (anvilSort); the worn keep their "założony".
   function upgradeList(building) {
     const character = state.character;
-    const items = [
-      ...Object.values(character.equipment)
-        .filter(Boolean)
-        .map((item) => ({ item, equipped: true })),
-      ...character.bag.map((item) => ({ item, equipped: false })),
-    ];
+    const worn = Object.values(character.equipment).filter(Boolean);
+    const wornIds = new Set(worn.map((item) => item.id));
+    const sort = state.content.anvilSort;
+    const orders = sort?.orders ?? [];
+    const chosen = orders.some((one) => one.id === anvilSort) ? anvilSort : orders[0]?.id;
+    const order = itemOrder(chosen);
+    const items = [...worn, ...character.bag].map((item) => ({ item, equipped: wornIds.has(item.id) }));
+    if (order) items.sort((a, b) => order(a.item, b.item));
     return h(
       'section',
       { class: 'card anvil-items', 'aria-labelledby': 'anvil-items' },
@@ -810,6 +824,22 @@ function mountBuilding(container, id) {
             ? t('Wybierz przedmiot, żeby go ulepszyć. Kowadło ulepsza do +{level}.', { level: building.level })
             : t('Zbuduj Kowadło, żeby ulepszać przedmioty. Ulepszysz je tu albo z karty przedmiotu w plecaku.'),
       }),
+      items.length > 1 &&
+        orders.length > 1 &&
+        sortButtons({
+          orders: orders.map(({ id: orderId, name }) => ({ id: orderId, label: name })),
+          chosen,
+          label: sort.label,
+          onPick: (orderId) => {
+            anvilSort = orderId;
+            try {
+              localStorage.setItem(ANVIL_SORT_KEY, orderId);
+            } catch {
+              // Kept while the page is open.
+            }
+            render();
+          },
+        }),
       items.length === 0
         ? h('p', { class: 'muted', text: t('Nie masz jeszcze przedmiotów.') })
         : h(

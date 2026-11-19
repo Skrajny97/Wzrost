@@ -25,6 +25,9 @@ import { transmutePart } from '../transmute.js';
 // language (t(), i18n.js).
 const POSITION_NAMES = { front: 'przód', middle: 'środek', back: 'tył' };
 
+// A text of the game's data in the page's language with its {name} filled in.
+const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (whole, name) => (Object.hasOwn(vars, name) ? String(vars[name]) : whole));
+
 // An item's name with its upgrade, e.g. "Miecz Rysia +3".
 export const itemTitle = (item) => (item.upgrade > 0 ? `${item.name} +${item.upgrade}` : item.name);
 
@@ -133,9 +136,12 @@ try {
 } catch {
   // Without storage the bag keeps the game's order.
 }
-export function sortBag(kind, list) {
-  const sort = bagSorts[kind];
-  if (!BAG_SORTS[kind].some((one) => one.id === sort) || sort === 'order') return list;
+// How two of the character's items or materials compare in an order of a
+// "Sortuj:" (the bag's, the Kowadło's in camp.js): the rarest first, the
+// highest level first, by the gear's slot, the most pieces first, the
+// highest upgrade first, or the newest first (ids grow with each item
+// found); null for the game's own order.
+export function itemOrder(sort) {
   const rarity = (entry) => state.content.rarities.findIndex((one) => one.id === entry.rarity);
   const slot = (item) => state.content.slots.findIndex((one) => one.id === item.slot);
   const by = {
@@ -143,44 +149,53 @@ export function sortBag(kind, list) {
     level: (a, b) => b.level - a.level || rarity(b) - rarity(a),
     slot: (a, b) => slot(a) - slot(b) || rarity(b) - rarity(a) || b.level - a.level,
     count: (a, b) => b.count - a.count || rarity(b) - rarity(a),
-  }[sort];
-  return [...list].sort(by);
+    upgrade: (a, b) => (b.upgrade ?? 0) - (a.upgrade ?? 0) || rarity(b) - rarity(a) || b.level - a.level,
+    new: (a, b) => b.id - a.id,
+  };
+  return by[sort] ?? null;
 }
 
-// "Sortuj:" over a list of the bag's items or materials: the game's own
-// buttons, the choice kept on the device and shared by every list of that
-// kind (the bag's tabs, the Skrzynia Konta's bag); `onChange` draws the
-// list again.
-export function bagSortRow(kind, onChange) {
+export function sortBag(kind, list) {
+  const sort = bagSorts[kind];
+  if (!BAG_SORTS[kind].some((one) => one.id === sort) || sort === 'order') return list;
+  return [...list].sort(itemOrder(sort));
+}
+
+// "Sortuj:" with the game's own buttons over a list, one for each of
+// `orders` ({ id, label }, the labels in the page's language), the one
+// `chosen` pressed; `label` names the group for a screen reader and
+// `onPick` takes the id tapped.
+export function sortButtons({ orders, chosen, label, onPick }) {
   return h(
     'div',
     { class: 'bag-sort' },
     h('span', { class: 'bag-sort-label', text: t('Sortuj:') }),
     h(
       'div',
-      { class: `segmented bag-sort-options bag-sort-options--${BAG_SORTS[kind].length}`, role: 'group', 'aria-label': t('Sortowanie plecaka') },
-      BAG_SORTS[kind].map((one) =>
-        h(
-          'button',
-          {
-            type: 'button',
-            class: 'segmented-option',
-            'aria-pressed': bagSorts[kind] === one.id,
-            onClick: () => {
-              bagSorts = { ...bagSorts, [kind]: one.id };
-              try {
-                localStorage.setItem(BAG_SORT_KEY, JSON.stringify(bagSorts));
-              } catch {
-                // Kept while the page is open.
-              }
-              onChange();
-            },
-          },
-          t(one.label),
-        ),
-      ),
+      { class: `segmented bag-sort-options bag-sort-options--${orders.length}`, role: 'group', 'aria-label': label },
+      orders.map((one) => h('button', { type: 'button', class: 'segmented-option', 'aria-pressed': chosen === one.id, onClick: () => onPick(one.id) }, one.label)),
     ),
   );
+}
+
+// "Sortuj:" over a list of the bag's items or materials, the choice kept on
+// the device and shared by every list of that kind (the bag's tabs, the
+// Skrzynia Konta's bag); `onChange` draws the list again.
+export function bagSortRow(kind, onChange) {
+  return sortButtons({
+    orders: BAG_SORTS[kind].map((one) => ({ id: one.id, label: t(one.label) })),
+    chosen: bagSorts[kind],
+    label: t('Sortowanie plecaka'),
+    onPick: (id) => {
+      bagSorts = { ...bagSorts, [kind]: id };
+      try {
+        localStorage.setItem(BAG_SORT_KEY, JSON.stringify(bagSorts));
+      } catch {
+        // Kept while the page is open.
+      }
+      onChange();
+    },
+  });
 }
 
 // A material's name as a title, from the Stół rozbiórki's module (trade.js
@@ -285,6 +300,9 @@ function characterSwitch(list, switchCharacter) {
 export function mountCharacter(container, { switchCharacter } = {}) {
   // The account's characters for the busts at the top, asked once.
   let characters = null;
+  // "Zaznacz do sprzedaży" (saleSection): the ids of the bag's items marked
+  // for the scrapper while the bag is in that mode, null outside it.
+  let selling = null;
   call('GET', '/api/characters')
     .then((list) => {
       characters = list;
@@ -421,6 +439,7 @@ export function mountCharacter(container, { switchCharacter } = {}) {
       class: `section-count${used >= capacity ? ' section-count--full' : ''}`,
       text: `(${formatNumber(used)}/${formatNumber(capacity)})`,
     });
+    if (selling) return saleSection(bag, count);
     const tab = (id, label) =>
       h(
         'button',
@@ -505,18 +524,157 @@ export function mountCharacter(container, { switchCharacter } = {}) {
   const sortRow = (kind) => bagSortRow(kind, render);
 
   // Under the bag's title: the scrapper's sale by the handful, without going
-  // to the camp (320 A), and taking several items apart on the Stół
+  // to the camp (320 A), marking the items for him one by one ("Zaznacz do
+  // sprzedaży", saleSection), and taking several items apart on the Stół
   // rozbiórki, once it stands.
   function bagActions(bag) {
     const sell = bag.some((item) => !(item.upgrade > 0) && !item.gem && !item.favorite);
+    const pick = state.content.scrapperPick?.button && bag.some((item) => !item.favorite);
     const salvage = state.character.crafting.pace > 0 && bag.some((item) => item.salvage);
-    if (!sell && !salvage) return null;
+    if (!sell && !pick && !salvage) return null;
     return h(
       'div',
       { class: 'bag-actions' },
       sell && h('button', { type: 'button', class: 'button button--world button--small', text: t('Sprzedaj zbędne'), onClick: scrapperSheet }),
+      pick &&
+        h('button', {
+          type: 'button',
+          class: 'button button--world button--small',
+          'data-guide': 'bag-pick',
+          text: state.content.scrapperPick.button,
+          onClick: () => {
+            selling = new Set();
+            render();
+          },
+        }),
       salvage && h('button', { type: 'button', class: 'button button--world button--small', text: t('Rozbierz kilka'), onClick: () => salvageManySheet() }),
     );
+  }
+
+  // "Zaznacz do sprzedaży" (a player's idea the author wants, 19.11.2026:
+  // „możliwość zaznaczania ich w plecaku do sprzedaży wybranych a nie całych
+  // rzadkości”): the bag shows its items alone, under its "Sortuj:", and a
+  // tap marks one for the scrapper or takes its mark off, in the look of
+  // "Rozbierz kilka" (a frame with a glow and a tick). A favourite stays dim
+  // with its star, and a tap on it says why. The bar at the bottom of the
+  // screen, over the tabs, says how many are marked and sells them for the
+  // gold of their cards, with the Skup złomu's bonus, once the player
+  // confirms; "Anuluj" leaves the mode, and so does the sale. The words are
+  // the Skup złomu's (data/buildings.json: `pick`).
+  function saleSection(bag, count) {
+    const pick = state.content.scrapperPick;
+    // The marks of items no longer in the bag (sold, worn or put away
+    // meanwhile) go, and a favourite is never marked.
+    const open = new Set(bag.filter((item) => !item.favorite).map((item) => item.id));
+    for (const id of selling) if (!open.has(id)) selling.delete(id);
+    const marked = () => bag.filter((item) => selling.has(item.id));
+    const sum = h('p', { class: 'sale-bar-sum', role: 'status' });
+    const sell = h('button', { type: 'button', class: 'button button--world sale-bar-sell', onClick: (event) => sellMarked(event.currentTarget, marked()) });
+    const update = () => {
+      const items = marked();
+      const gold = items.reduce((total, item) => total + item.price, 0);
+      sum.textContent = items.length > 0 ? filled(pick.marked, { count: formatNumber(items.length) }) : pick.none;
+      sell.textContent = items.length > 0 ? filled(pick.sell, { count: formatNumber(items.length), gold: formatNumber(gold) }) : pick.sellNone;
+      sell.disabled = items.length === 0;
+    };
+    const tile = (item) => {
+      const favorite = Boolean(item.favorite);
+      const button = h(
+        'button',
+        {
+          type: 'button',
+          class: `slot slot--bag salvage-pick${favorite ? ' salvage-pick--favorite' : ''}`,
+          vars: { '--rarity': item.color },
+          'aria-disabled': favorite ? 'true' : null,
+          'aria-pressed': String(selling.has(item.id)),
+          'aria-label': [
+            itemTitle(item),
+            item.rarityName,
+            item.slotName,
+            t('poziom {level}', { level: item.level }),
+            favorite && t('ulubiony'),
+          ]
+            .filter(Boolean)
+            .join(', '),
+          onClick: () => {
+            if (favorite) {
+              refuseFavorite('sell');
+              return;
+            }
+            if (selling.has(item.id)) selling.delete(item.id);
+            else selling.add(item.id);
+            button.setAttribute('aria-pressed', String(selling.has(item.id)));
+            update();
+          },
+        },
+        itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
+        verdictMark(item.verdict, { tile: true }),
+        upgradeBadge(item),
+        favoriteBadge(item),
+        h('span', { class: 'salvage-check', 'aria-hidden': 'true' }, icon('check', { size: 14 })),
+      );
+      return h('li', {}, itemTip(button, item));
+    };
+    update();
+    return h(
+      'section',
+      { class: 'bag bag--sale', 'aria-labelledby': 'bag-title' },
+      h('div', { class: 'bag-head' }, h('h2', { class: 'section-title', id: 'bag-title' }, `${t('Plecak')} `, count)),
+      h('p', { class: 'bag-note', text: pick.hint }),
+      bag.length > 1 && sortRow('items'),
+      bag.length === 0 ? h('p', { class: 'muted', text: t('Plecak jest pusty. Łupy z wypraw trafiają tutaj.') }) : h('ul', { class: 'bag-grid salvage-grid' }, sortBag('items', bag).map(tile)),
+      bag.some((item) => item.favorite) && h('p', { class: 'muted', text: pick.favorites }),
+      h(
+        'div',
+        { class: 'sale-bar' },
+        h('div', { class: 'sale-bar-head' }, sum, h('button', { type: 'button', class: 'button button--world button--small', text: pick.cancel, onClick: leaveSale })),
+        sell,
+      ),
+    );
+  }
+
+  function leaveSale() {
+    selling = null;
+    render();
+  }
+
+  // The sale of the marked items, once the player confirms, in the game's
+  // usual question: their names and the gold, and what goes with them, the
+  // gold spent on upgrades and the gems that fall out (757 B). Turned down,
+  // the marks stay; refused because an item is no longer in the bag (404;
+  // on a 409 call() does it itself), the page asks for the character again
+  // and the marks of items gone go with them.
+  async function sellMarked(button, items) {
+    if (items.length === 0) return;
+    const pick = state.content.scrapperPick;
+    const gold = items.reduce((total, item) => total + item.price, 0);
+    const upgraded = items.filter((item) => item.upgrade > 0).length;
+    const gems = items.filter((item) => item.gem).map((item) => item.gem.name);
+    const sure = await confirmAction({
+      title: pick.confirm.title,
+      text: [
+        filled(pick.confirm.text, { names: items.map(itemTitle).join(', '), gold: formatNumber(gold) }),
+        upgraded > 0 && filled(pick.confirm.upgraded, { count: formatNumber(upgraded) }),
+        gems.length > 0 && filled(pick.confirm.gems, { gems: gems.join(', ') }),
+      ]
+        .filter(Boolean)
+        .join(' '),
+      confirmLabel: pick.confirm.yes,
+    });
+    if (!sure) return;
+    await withButton(button, async () => {
+      let sold;
+      try {
+        ({ sold } = await call('POST', '/api/items/sell', { ids: items.map((item) => item.id) }));
+      } catch (error) {
+        if (error.status === 404) call('GET', '/api/character').catch(() => {});
+        throw error;
+      }
+      selling = null;
+      playSound('coin');
+      toast([filled(pick.done, { count: formatNumber(sold.count), gold: formatNumber(sold.gold) }), gemsBackText(sold.gems)].filter(Boolean).join(' '));
+      render();
+    });
   }
 
   // The parts for the Warsztat, a slot for each, outside the bag's room too.

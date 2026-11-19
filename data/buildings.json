@@ -112,6 +112,29 @@
       "counts": [1, 10],
       "daily": { "common": 30, "rare": 20, "unique": 10, "epic": 5, "legendary": 3, "mythic": 2, "divine": 1 }
     },
+    "pick": {
+      "button": "Zaznacz do sprzedaży",
+      "hint": "Wybierz przedmioty, które ma kupić złomiarz. Ponowny wybór odznacza przedmiot.",
+      "none": "Nic jeszcze nie zaznaczono.",
+      "marked": "Zaznaczone: {count}",
+      "sell": "Sprzedaj za {gold} złota",
+      "sellNone": "Sprzedaj",
+      "cancel": "Anuluj",
+      "favorites": "Przedmiotów z gwiazdką złomiarz nie kupi: to Twoje ulubione. Gwiazdkę zdejmiesz w karcie przedmiotu.",
+      "confirm": {
+        "title": "Sprzedać zaznaczone?",
+        "text": "Złomiarz kupi: {names}. Zapłaci {gold} złota.",
+        "upgraded": "Ulepszone wśród nich: {count}. W cenie jest też część złota wydanego na ulepszenia.",
+        "gems": "Kamienie z nich wypadną i wrócą do Twoich minerałów: {gems}.",
+        "yes": "Sprzedaj"
+      },
+      "done": "Złomiarz kupił zaznaczone przedmioty ({count}) za {gold} złota.",
+      "errors": {
+        "none": "Zaznacz przedmioty do sprzedaży.",
+        "gone": "Któregoś z zaznaczonych przedmiotów nie masz już w plecaku.",
+        "worn": "Założonych przedmiotów złomiarz nie kupi. Najpierw je zdejmij."
+      }
+    },
     "costs": [
       { "resource": "gold", "base": 12, "growth": 2.0 },
       { "resource": "wood", "base": 3.52, "growth": 1.9 },
@@ -126,6 +149,17 @@
     "description": "Kowadło na pniu, a z czasem kuźnia z paleniskiem. Każdy poziom pozwala ulepszać przedmioty o jedno ulepszenie wyżej, aż do +10.",
     "maxLevel": 10,
     "effect": { "kind": "upgradeCap", "perLevel": 1, "unit": "count", "text": "Ulepszanie przedmiotów do +{value}" },
+    "sort": {
+      "label": "Kolejność przedmiotów",
+      "orders": [
+        { "id": "worn", "name": "Założone" },
+        { "id": "new", "name": "Najnowsze" },
+        { "id": "rarity", "name": "Rzadkość" },
+        { "id": "level", "name": "Poziom" },
+        { "id": "upgrade", "name": "Ulepszenie" },
+        { "id": "slot", "name": "Rodzaj" }
+      ]
+    },
     "costs": [
       { "resource": "gold", "base": 15, "growth": 2.0 },
       { "resource": "wood", "base": 6.3, "growth": 1.9 },

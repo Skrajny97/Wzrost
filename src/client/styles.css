@@ -530,6 +530,23 @@ button {
   }
 }
 
+/* The Kowadło's six orders (camp.js) by its card's width, not the screen's:
+   on a tablet the card is as narrow as on a phone, so two rows of three,
+   and one row where the card is wide enough, as on a computer. */
+.anvil-items {
+  container: anvil / inline-size;
+}
+
+.anvil-items .bag-sort-options--6 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@container anvil (min-width: 560px) {
+  .anvil-items .bag-sort-options--6 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
 .bag-sort-options .segmented-option {
   min-height: 34px;
   padding: 0 2px;
@@ -16163,6 +16180,62 @@ button.tcard-slot {
   padding: 10px 0 0;
   border-top: 1px solid var(--line);
   background: none;
+}
+
+/* "Zaznacz do sprzedaży" in the bag (character.js): the items marked as in
+   "Rozbierz kilka", and under them how many, "Anuluj" and the sale, held at
+   the bottom of the screen on a strip over the tabs, the whole width, as
+   the points spent in the Statystyki are (.pending-bar); on a computer, in
+   a frame of its own at the bottom of the bag's column. */
+.sale-bar {
+  position: sticky;
+  bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
+  z-index: 4;
+  display: grid;
+  gap: 8px;
+  margin: 4px calc(-1 * var(--gutter)) 0;
+  padding: 10px var(--gutter);
+  border-top: 1px solid var(--system-line);
+  background: var(--bg-deep);
+  box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.55);
+}
+
+:root[data-layout='desktop'] .sale-bar {
+  bottom: 8px;
+  margin: 4px 0 0;
+  padding: 10px 12px;
+  border: 1px solid var(--system-line);
+  border-radius: 4px;
+}
+
+.sale-bar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sale-bar-sum {
+  min-width: 0;
+  margin: 0;
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.sale-bar-head .button {
+  flex: none;
+  width: auto;
+}
+
+/* The round chat button stands over the strip's right end on a phone (52 px
+   wide, 10 px from the edge, over a screen at most 440 px wide in the
+   middle): the words and buttons leave it room, as the card table's
+   buttons do. */
+@media (max-width: 563px) {
+  :root.with-chat-bubble:not([data-layout='desktop']) .sale-bar {
+    padding-right: calc(var(--gutter) + 60px);
+  }
 }
 
 /* The Zaklinaczka's hints on the affixes (settlement.js). */

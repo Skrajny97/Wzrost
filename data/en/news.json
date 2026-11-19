@@ -1152,6 +1152,10 @@
     "0.4.54": {
       "title": "Version 0.4.54",
       "body": "- Phone notifications now come for a private message in the chat: for the first message of a conversation.\n- A tag in the Global, Trade or English chat no longer sends a notification. A tag in the guild chat still does.\n- The chat no longer turns words like “pushujący” or “rushujemy” into stars.\n- Navia: new pictures of the Stampede, the Dread, the Snow Flea Spring and Bayun's Whisker, and new sounds for the skills Arrow from Heaven, Rain of Stars, Pillar of Light and Legion of Navia."
+    },
+    "0.4.55": {
+      "title": "Version 0.4.55",
+      "body": "- Kowadło: an “Order of items” row over the list: Equipped, Newest, Rarity, Level, Upgrade or Type. The phone remembers the choice.\n- Bag: a “Mark for sale” button. Tap the items the scrap dealer should buy and sell them all at once. Favourites cannot be marked."
     }
   }
 }
