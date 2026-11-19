@@ -1,0 +1,14 @@
+{
+  "id": "god-perun",
+  "tool": "pixellab generate-image-v2",
+  "description": "Perun, the old Slavic god of thunder, a mighty dignified man in his prime with a long thick copper-red beard and long copper hair, stern wise grey eyes, a plain bronze circlet on his brow, a dark red cloak pinned with a bronze brooch over a shirt of bronze scale armour, holding a great bearded battle axe up at his shoulder, thin bright blue-white lightning crackling around the axe blade, no birds, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic pagan mythology, dignified, muted natural colours",
+  "style": "src/client/art/residents/hermit.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08046694493293763
+  },
+  "images": 4
+}
