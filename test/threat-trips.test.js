@@ -4,10 +4,11 @@
 // and some of them fall, after which the creatures turn on the character: a
 // realistic player of level 100 with two companions was shown 1.8% where
 // about one 4-hour exploration in five ended in a faint. So a build with
-// companions also goes on explorations of the longest length, fight after
+// companions also goes on explorations of 1, 2 and 4 hours, fight after
 // fight as simulateHunt fights them (threatSamples' `trips`), and each
-// length takes their share fainted within its number of fights, moved by
-// the sample fights' recursion for its own pace, HP and odds.
+// length takes their share fainted within its number of fights, weighed to
+// its odds of each kind of encounter (the elite and the champion avoided or
+// sought too), moved by the sample fights' recursion for its rest and HP.
 
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
@@ -66,13 +67,18 @@ describe('the companions\' explorations', () => {
     assert.deepEqual(threatSamples({ character: one.character, equipped: one.equipped, areaId: one.area.id, companions: one.companions, healing: one.healing }, one.local).trips, samples.trips);
   });
 
-  test('each of their lengths from full HP is their share itself; less HP, the elite sought or avoided move it as the recursion says', () => {
+  test('each of their lengths from full HP is their share itself; less HP, the elite avoided or sought move it', () => {
     const chances = (input) => faintChances({ character: one.character, equipped: one.equipped, hp: one.maxHp, areaId: one.area.id, healing: one.healing, ...input }, one.local, samples);
     const longest = content.balance.hunt.maxMinutes;
     for (const trip of samples.trips) near(chances({})[trip.minutes], trip.by.at(-1), 1e-9);
     assert.ok(chances({ hp: one.maxHp * 0.5 })[longest] > chances({})[longest]);
-    assert.ok(chances({ avoidRare: true })[longest] <= chances({})[longest]);
-    assert.ok(chances({ seekRare: true })[longest] >= chances({})[longest]);
+    // Avoided, only the explorations that met no elite nor champion count
+    // (each weighed by how much likelier its other fights are so).
+    const went = samples.trips.at(-1);
+    const without = went.paths.map((path, index) => [path, went.faints[index]]).filter(([path]) => !/[ce]/.test(path));
+    assert.ok(without.length > 0 && without.length < went.paths.length);
+    near(chances({ avoidRare: true })[longest], without.filter(([, faint]) => faint).length / without.length, 0.05);
+    assert.ok(chances({ seekRare: true })[longest] >= chances({ avoidRare: true })[longest]);
     // A short exploration less often than a long one.
     assert.ok(chances({})[60] < chances({})[longest]);
   });

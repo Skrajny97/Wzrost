@@ -50,9 +50,10 @@ import { durationsUpTo } from './unlocks.js';
  *   One kind of encounter and its sample fights.
  */
 /**
- * @typedef {{ minutes: number, by: number[], count: number }} ThreatTrips
+ * @typedef {{ minutes: number, by: number[], count: number, paths: string[], faints: boolean[] }} ThreatTrips
  *   Explorations of `minutes` with the companions (tripFaints): `by[n]`, the
- *   share of the `count` of them fainted within their first n fights.
+ *   share of the `count` of them fainted within their first n fights; each
+ *   one's kinds of encounter (`paths`) and whether it ended in a faint.
  */
 /**
  * @typedef {{ maxHp: number, recovery: number, regular: number[], tough: number[] | null, elite: number[], champion: number[] | null, safe: boolean, trips?: ThreatTrips[] | null }} ThreatSamples
@@ -158,7 +159,10 @@ function mix(kinds) {
 // the HP the last fight left it; a lost fight ends it in a faint (a retreat
 // from the elite or the champion of a safe place), a drawn one in a return,
 // and after each won fight everyone standing rests as on the way. Returns
-// the share fainted within each number of fights.
+// the share fainted within each number of fights, and each exploration's
+// kinds of encounter in order (`paths`: c champion, e elite, t demanding, r
+// regular) with whether it ended in a faint (`faints`), so other odds of
+// those kinds weigh the same explorations (tripShare).
 /**
  * @param {{ minutes: number, character: Record<string, any>, area: Record<string, any>, player: Record<string, any>, mates: Record<string, any>[], strength: [number, number], classLevel: number, potions: Record<string, number>, healBelow: number }} trip
  * @param {Content} content
@@ -168,6 +172,10 @@ function tripFaints({ minutes, character, area, player, mates, strength, classLe
   const pace = explorationPace(minutes, content, character.level);
   const rng = createRng(`threat-trips:${area.id}:${character.level}:${minutes}`);
   const fainted = new Array(pace.fights + 1).fill(0);
+  /** @type {string[]} */
+  const paths = [];
+  /** @type {boolean[]} */
+  const faints = [];
   /** @param {Record<string, any>} unit @param {number} hp */
   const rested = (unit, hp) => hp + Math.round((unit.maxHp - hp) * Math.min(1, unit.recovery + pace.restBonus));
   for (let trip = 0; trip < THREAT_TRIPS; trip++) {
@@ -175,8 +183,11 @@ function tripFaints({ minutes, character, area, player, mates, strength, classLe
     const mateHp = mates.map((mate) => mate.maxHp);
     /** @type {Record<string, number>} */
     const left = { ...potions };
+    let path = '';
+    let faint = false;
     for (let fight = 0; fight < pace.fights; fight++) {
       const encounter = /** @type {Record<string, any>} */ (rollEncounter(area, rng, content, character.level, pace));
+      path += encounter.champion ? 'c' : encounter.elite ? 'e' : encounter.tough ? 't' : 'r';
       const kit = fightPotions(left, healBelow, content);
       const allies = [{ ...player, hp, ...(Object.keys(kit).length > 0 && { potions: kit }) }];
       mates.forEach((mate, index) => {
@@ -186,7 +197,8 @@ function tripFaints({ minutes, character, area, player, mates, strength, classLe
       for (const id of result.drunk) left[id] = (left[id] ?? 0) - 1;
       if (result.won === null) break;
       if (result.won === false) {
-        if (!((encounter.elite || encounter.champion) && area.safe)) fainted[fight + 1] += 1;
+        faint = !((encounter.elite || encounter.champion) && area.safe);
+        if (faint) fainted[fight + 1] += 1;
         break;
       }
       /** @param {string} id */
@@ -196,10 +208,56 @@ function tripFaints({ minutes, character, area, player, mates, strength, classLe
         if (mateHp[index] > 0) mateHp[index] = after(mate.id) > 0 ? rested(mate, after(mate.id)) : 0;
       });
     }
+    paths.push(path);
+    faints.push(faint);
   }
   const by = new Array(pace.fights + 1).fill(0);
   for (let fights = 1; fights <= pace.fights; fights++) by[fights] = by[fights - 1] + fainted[fights] / THREAT_TRIPS;
-  return { minutes, by, count: THREAT_TRIPS };
+  return { minutes, by, count: THREAT_TRIPS, paths, faints };
+}
+
+// The odds of each kind of encounter of a fight at `pace` (rollEncounter):
+// the champion first where the place has one, then the elite, then a
+// demanding encounter where the place has them, else a regular one.
+/**
+ * @param {Record<string, any>} pace
+ * @param {boolean} champion
+ * @param {boolean} tough
+ * @returns {Record<string, number>}
+ */
+const kindOdds = (pace, champion, tough) => {
+  const c = champion ? pace.championChance : 0;
+  const e = (1 - c) * pace.eliteChance;
+  const t = (1 - c - e) * (tough ? pace.toughChance : 0);
+  return { c, e, t, r: 1 - c - e - t };
+};
+
+// The share of the explorations `went` fainted within `fights` fights, had
+// their encounters come by the odds of `pace` instead of their own
+// (`ownPace`): each exploration weighed by how much likelier its kinds of
+// encounter are so, the weights summing to one; null when no exploration
+// could have gone so (an elite met by all, with the elite avoided).
+/**
+ * @param {ThreatTrips} went
+ * @param {number} fights
+ * @param {Record<string, any>} pace
+ * @param {Record<string, any>} ownPace
+ * @param {boolean} champion
+ * @param {boolean} tough
+ * @returns {number | null}
+ */
+function tripShare(went, fights, pace, ownPace, champion, tough) {
+  const wanted = kindOdds(pace, champion, tough);
+  const had = kindOdds(ownPace, champion, tough);
+  let total = 0;
+  let fainted = 0;
+  went.paths.forEach((path, index) => {
+    let weight = 1;
+    for (let fight = 0; fight < Math.min(fights, path.length); fight++) weight *= wanted[path[fight]] / had[path[fight]];
+    total += weight;
+    if (went.faints[index] && path.length <= fights) fainted += weight;
+  });
+  return total > 0 ? fainted / total : null;
 }
 
 // The expensive part: sample fights for the character's current build, with
@@ -383,19 +441,6 @@ export function faintChances({ character, equipped, hp, areaId, avoidRare = fals
     return Math.min(1, fainted);
   };
 
-  // The recursion's chance for `fights` fights at the pace of the
-  // companions' explorations of `minutes`, from full HP, as they went.
-  /** @type {Map<string, number>} */
-  const references = new Map();
-  /**
-   * @param {number} minutes
-   * @param {number} fights
-   */
-  const reference = (minutes, fights) => {
-    const key = `${minutes}:${fights}`;
-    if (!references.has(key)) references.set(key, recursion({ ...explorationPace(minutes, content, character.level), fights }, STEPS));
-    return /** @type {number} */ (references.get(key));
-  };
   /** @type {Record<string, number>} */
   const result = {};
   for (const minutes of durationsUpTo(content.balance.hunt.maxMinutes, content)) {
@@ -405,10 +450,21 @@ export function faintChances({ character, equipped, hp, areaId, avoidRare = fals
       result[minutes] = own;
       continue;
     }
-    // The longest of the explorations this one reaches, else the shortest.
+    // The longest of the explorations this one reaches, else the shortest:
+    // their share fainted within its number of fights, weighed to its odds
+    // of each kind of encounter (the elite and the champion avoided or
+    // sought too). The recursion then moves it by what is left: the rest
+    // after each fight and the HP it starts with.
     const went = trips.filter((trip) => trip.minutes <= minutes).at(-1) ?? trips[0];
+    const wentPace = explorationPace(went.minutes, content, character.level);
     const fights = Math.min(pace.fights, went.by.length - 1);
-    const back = ((1 - went.by[fights]) * (1 - own)) / Math.max(1e-9, 1 - reference(went.minutes, fights));
+    const share = tripShare(went, fights, pace, wentPace, Boolean(champion), Boolean(tough));
+    if (share === null) {
+      result[minutes] = own;
+      continue;
+    }
+    const reference = recursion({ ...pace, restBonus: wentPace.restBonus, fights }, STEPS);
+    const back = ((1 - share) * (1 - own)) / Math.max(1e-9, 1 - reference);
     result[minutes] = Math.min(1, Math.max(0, 1 - back));
   }
   return result;
