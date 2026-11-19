@@ -296,7 +296,7 @@ export function setTrackUnknown(value) {
 
 // Whether explorations go as a Trudna wyprawa (629 A: the box in "Opcje
 // wyprawy" from the level the server opens it at, and "Wyrusz ponownie");
-// kept in this browser.
+// kept in this browser. Only one of it and the Piekielna is on at a time.
 const HARD_KEY = 'wzrost.hard-hunt';
 let hardHunt = readHardHunt();
 
@@ -317,6 +317,33 @@ export function setHardHunt(value) {
   } catch {
     // Without storage the choice lasts until the page is closed.
   }
+  if (value && hellHunt) setHellHunt(false);
+}
+
+// Whether explorations go as a Piekielna wyprawa instead (the box under the
+// Trudna's, the author, 19.11.2026, and "Wyrusz ponownie"); kept in this
+// browser too.
+const HELL_KEY = 'wzrost.hell-hunt';
+let hellHunt = readHellHunt();
+
+function readHellHunt() {
+  try {
+    return localStorage.getItem(HELL_KEY) === 'on' && !hardHunt;
+  } catch {
+    return false;
+  }
+}
+
+export const hellHuntOn = () => hellHunt;
+
+export function setHellHunt(value) {
+  hellHunt = value;
+  try {
+    localStorage.setItem(HELL_KEY, value ? 'on' : 'off');
+  } catch {
+    // Without storage the choice lasts until the page is closed.
+  }
+  if (value && hardHunt) setHardHunt(false);
 }
 
 // "Opcje wyprawy" on the Walka screen stays as the player left it, folded

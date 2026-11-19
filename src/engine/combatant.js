@@ -28,6 +28,19 @@ import { computeStats } from './stats.js';
  */
 export const challengeAt = (level, content) => (level >= content.balance.challenge.fromLevel ? content.balance.challenge : null);
 
+// An exploration's challenge (`hard`): false for a plain one, true for a
+// Trudna wyprawa (629 A), 'hell' for a Piekielna (the author, 19.11.2026:
+// „2 razy trudniejsza niz Trudna wyprawa 1,5x lepszy drop”). Its numbers
+// (challenge.hard or challenge.hell) from the challenge's level, null for a
+// plain one or before that level.
+/**
+ * @param {boolean | 'hell'} hard
+ * @param {number} level
+ * @param {Content} content
+ * @returns {Record<string, any> | null}
+ */
+export const challengeMode = (hard, level, content) => (hard ? (challengeAt(level, content)?.[hard === 'hell' ? 'hell' : 'hard'] ?? null) : null);
+
 // `statBoost`: shares some stats are raised by for a while, by stat (a
 // potion of focus, potions.js). A character in a fight of a week that
 // raises or lowers a stat (`weekStats`, weekFighter in weeks.js) has those
@@ -269,12 +282,13 @@ export function huntStrength(level, curve = []) {
 // From the level of the challenge's strength every exploration's creatures,
 // in any place, are stronger again by its damage and HP (the author:
 // "wszystkim zwiększamy stwory"), and from the challenge's level those of a
-// Trudna wyprawa (`hard`, 629 A) by its hard ones on top.
+// Trudna wyprawa (`hard` true, 629 A) by its hard ones on top, and those of
+// a Piekielna (`hard` 'hell') by its hell ones (challengeMode).
 /**
  * @param {Area} area
  * @param {number} level
  * @param {Content} content
- * @param {boolean} [hard]
+ * @param {boolean | 'hell'} [hard]
  * @returns {[number, number]}
  */
 export function exploreStrength(area, level, content, hard = false) {
@@ -282,7 +296,7 @@ export function exploreStrength(area, level, content, hard = false) {
   const challenge = challengeAt(level, content);
   if (!challenge) return [damage, hp];
   const base = level >= challenge.strength.fromLevel ? challenge.strength : { damage: 1, hp: 1 };
-  const more = hard ? challenge.hard : { damage: 1, hp: 1 };
+  const more = challengeMode(hard, level, content) ?? { damage: 1, hp: 1 };
   return [damage * base.damage * more.damage, hp * base.hp * more.hp];
 }
 

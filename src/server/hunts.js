@@ -190,7 +190,8 @@ export function companionsKey(player, now, rested) {
   return fighting.length > 0 ? createRng(JSON.stringify(fighting)).int(0, 2 ** 30).toString(36) : null;
 }
 
-// `hard`: against the creatures of a Trudna wyprawa (629 A).
+// `hard`: against the creatures of a Trudna wyprawa (true, 629 A) or of a
+// Piekielna ('hell').
 function cachedSamples(player, character, equipped, areaId, now, hard = false) {
   // Each item worn whole: an upgrade, a reforged affix or an element keeps
   // the item's id; and the evolution and the professions, whose levels give
@@ -301,9 +302,10 @@ export async function huntOptions(context) {
   // count too (healingFor).
   const met = JSON.parse(player.row.met ?? '[]');
   const healing = healingFor(player, params);
-  // ?hard=1: the threats of a Trudna wyprawa, from the challenge's level
-  // (629 A).
-  const hard = params.get('hard') === '1' && Boolean(challengeAt(character.level, content()));
+  // ?hard=1: the threats of a Trudna wyprawa, ?hell=1 of a Piekielna (which
+  // wins when both come), from the challenge's level (629 A; the author,
+  // 19.11.2026).
+  const hard = !challengeAt(character.level, content()) ? false : params.get('hell') === '1' ? 'hell' : params.get('hard') === '1';
   // The Warownia's Strażnica: the chances of an elite, a champion and an
   // event for each length, plain and with the rare sought, and from its 2nd
   // level the place's creatures to track (fortress.js).
@@ -331,7 +333,7 @@ export async function huntOptions(context) {
       const threat = estimateThreat({ character, equipped, hp, areaId: id, catchUp, healing }, content(), samples);
       const avoiding = estimateThreat({ character, equipped, hp, areaId: id, avoidRare: true, healing }, content(), samples);
       const seeking = estimateThreat({ character, equipped, hp, areaId: id, seekRare: true, catchUp, healing }, content(), samples);
-      return { id, ...(hard && { hard }), threat, threatAvoiding: lowerThreat(avoiding, threat), threatSeeking: higherThreat(seeking, threat), ...(watch && scoutView(place, threat, catchUp)) };
+      return { id, ...(hard && { [hard === 'hell' ? 'hell' : 'hard']: true }), threat, threatAvoiding: lowerThreat(avoiding, threat), threatSeeking: higherThreat(seeking, threat), ...(watch && scoutView(place, threat, catchUp)) };
     }),
   });
 }
@@ -402,6 +404,9 @@ export async function startHunt(context) {
 // exploration goes at, which the party code gives a Drużyna's trip. `hard`:
 // a Trudna wyprawa (629 A), from the challenge's level, on a plain "Wyrusz"
 // only: its creatures are stronger, for more XP and gold (simulateHunt).
+// `hell`: a Piekielna wyprawa (the author, 19.11.2026), on the same terms:
+// creatures stronger still, for more gold, chests and materials; it wins
+// over `hard` when both come.
 // `haste`: the share shorter a Drużyna's boon makes its trip's wait
 // (party-events.js), as a mount does. `defer`: the start is not written
 // but given back with its statements, for the caller's own batch: a
@@ -409,7 +414,7 @@ export async function startHunt(context) {
 export async function beginHunt(
   db,
   player,
-  { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow, scout = null, hard = false, mercenary = null, meal = null } = {},
+  { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow, scout = null, hard = false, hell = false, mercenary = null, meal = null } = {},
   now,
   { quick = false, flash = false, party: crew = null, mount = null, haste = 0, follower = false, also = [], check = false, defer = false } = {},
 ) {
@@ -427,6 +432,9 @@ export async function beginHunt(
   if (typeof trackQuests !== 'boolean') throw new ApiError(400, 'invalid_track', 'Zaznacz albo odznacz tropienie stworów z zadań.');
   if (typeof trackUnknown !== 'boolean') throw new ApiError(400, 'invalid_track_unknown', 'Zaznacz albo odznacz tropienie nieznanych stworów.');
   if (typeof hard !== 'boolean') throw new ApiError(400, 'invalid_hard', 'Zaznacz albo odznacz Trudną wyprawę.');
+  if (typeof hell !== 'boolean') throw new ApiError(400, 'invalid_hell', 'Zaznacz albo odznacz Piekielną wyprawę.');
+  if (hell && (quick || crew)) throw new ApiError(400, 'hell_plain_only', 'Piekielna wyprawa jest tylko na zwykłej wyprawie, bez drużyny.');
+  if (hell && !challengeAt(player.row.level, content())) throw new ApiError(403, 'hell_locked', `Piekielna wyprawa otwiera się na ${content().balance.challenge.fromLevel}. poziomie postaci.`);
   if (hard && (quick || crew)) throw new ApiError(400, 'hard_plain_only', 'Trudna wyprawa jest tylko na zwykłej wyprawie, bez drużyny.');
   if (hard && !challengeAt(player.row.level, content())) throw new ApiError(403, 'hard_locked', `Trudna wyprawa otwiera się na ${content().balance.challenge.fromLevel}. poziomie postaci.`);
   if (!huntDurations(player.row.level, content()).includes(minutes)) {
@@ -577,7 +585,8 @@ export async function beginHunt(
     ...(Object.keys(trophies).length > 0 && { trophies }),
     ...(scouted && { scouted }),
     ...(sought && { wanted: sought }),
-    ...(hard && { hard: true }),
+    // A Piekielna wyprawa, or else a Trudna.
+    ...(hell ? { hell: true } : hard && { hard: true }),
     ...(hire && { partners: [hire.partner], mercenary: hire.view }),
     // The meal's bonus for this exploration, and the meal as it was before,
     // for a call back, which costs nothing (cancelHunt).
@@ -930,7 +939,8 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
       // A trip's wanted target (parties.js), the member's own poster for it
       // or a foe only (wanted.js: wantedOnTrip).
       wanted: trip ? wantedOnTrip(trip, options) : (options.wanted ?? null),
-      hard: !trip && options.hard === true,
+      // A Trudna wyprawa (true) or a Piekielna ('hell'), never on a trip.
+      hard: trip ? false : options.hell === true ? 'hell' : options.hard === true,
       // The week it set out in (weeks.js), none before the weeks.
       week: keptWeek(options),
       // The meal eaten as it set out (cooking.js): its own, so on a trip too.

@@ -1492,8 +1492,9 @@ function activityView(activity, level, now) {
       endsAt: activity.ends_at,
       avoidRare: activity.avoid_rare === 1,
       seekRare: activity.seek_rare === 1,
-      // A Trudna wyprawa (629 A, hunts.js).
+      // A Trudna wyprawa (629 A, hunts.js), or a Piekielna.
       ...(options.hard && { hard: true }),
+      ...(options.hell && { hell: true }),
       // The mercenary from the Karczma it took along, and its fee
       // (mercenaries.js); and its look on the way, kept from its hire: it
       // walks beside the character in the Walka scene, as a Drużyna's
@@ -1741,9 +1742,10 @@ export function characterView(player, now) {
     // The Karczma's mercenaries (mercenaries.js): what the character may
     // offer and ask, or null below their level.
     mercenaries: mercenaryRules(row),
-    // The Trudna wyprawa's creatures and rewards (629 A), from the
-    // challenge's level; null before it.
+    // The Trudna wyprawa's creatures and rewards (629 A), and the Piekielna's
+    // (the author, 19.11.2026), from the challenge's level; null before it.
     hardHunt: challengeAt(row.level, content())?.hard ?? null,
+    hellHunt: challengeAt(row.level, content())?.hell ?? null,
     // Szybkie Polowania left today (hunts.js), or null below their level.
     quickHunts: quickHuntsView(row, now),
     // The next longer exploration and its level, for the hint under the slider.

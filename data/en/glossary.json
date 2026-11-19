@@ -680,6 +680,11 @@
           "note": "wyprawa z większą nagrodą (707)"
         },
         {
+          "pl": "Piekielna wyprawa",
+          "en": "Hellish exploration",
+          "note": "dwa razy trudniejsza od Trudnej, z większymi łupami (19.11.2026); „Hellish” jak poziom Piekielny Labiryntu"
+        },
+        {
           "pl": "Porażka",
           "en": "Defeat",
           "note": "gdy postać przegra wyprawę (707)"
