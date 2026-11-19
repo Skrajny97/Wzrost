@@ -215,7 +215,16 @@ export function cleanText(raw, { admin = false } = {}) {
   const shown = admin ? text.replace(ADMIN_LINK, (whole, label) => label ?? whole) : text;
   if ([...shown].length > limit || [...text].length > linkMaxLength) throw new ApiError(400, 'too_long', `Wiadomość może mieć najwyżej ${limit} znaków.`);
   const words = [...content().chat.words, ...(content().chat.wordsEn ?? [])];
-  const masked = (part) => part.replace(WORD, (word) => (words.some((bad) => word.toLowerCase().includes(bad)) ? '*'.repeat([...word].length) : word));
+  // A word whose rude part sits inside one of wordsAllowed stays as written
+  // ("pushujący", "rushujemy": 19.11.2026, the chat starred a player's
+  // "pushujący" for its "huj"); the part goes out as a space, so that the
+  // letters around it do not join into a rude word.
+  const allowed = content().chat.wordsAllowed ?? [];
+  const rude = (word) => {
+    const plain = allowed.reduce((text, fine) => text.replaceAll(fine, ' '), word.toLowerCase());
+    return words.some((bad) => plain.includes(bad));
+  };
+  const masked = (part) => part.replace(WORD, (word) => (rude(word) ? '*'.repeat([...word].length) : word));
   if (!admin) {
     if (LINK.test(asRead(text))) throw new ApiError(400, 'link', 'Linki w czacie są niedozwolone.');
     return masked(text);

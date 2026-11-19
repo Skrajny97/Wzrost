@@ -91,6 +91,11 @@ describe('Czat', () => {
     }
     const masked = await send(newcomer, 'Ty KURWA, co za pierdoły');
     assert.equal(masked.data.message.text, 'Ty *****, co za ********');
+    // A rude part inside an allowed one (wordsAllowed) stays: "pushujący"
+    // holds "huj" (19.11.2026), while the word on its own is starred.
+    await age();
+    const pushed = await send(newcomer, 'Guzik pushujący, Rushujemy, a ten huj nie');
+    assert.equal(pushed.data.message.text, 'Guzik pushujący, Rushujemy, a ten *** nie');
     // A message without a character is not written.
     const { cookie } = await signUp('Bez');
     await call('POST', '/api/chat/rules', { cookie });

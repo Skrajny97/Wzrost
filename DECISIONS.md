@@ -3847,6 +3847,11 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Czat: „pushujący” bez gwiazdek (19.11.2026, do najbliższej wersji)
+
+1. **Zgłoszenie z czatu (gracz poz. 33, zrzut od autora).** Czat zamienił na gwiazdki słowo „pushujący”, bo w środku ma „huj” z listy słów (`data/chat.json`, `words`). Gracz musiał pisać „p.u.s.h.u.w.a.n.i.e”.
+2. **Poprawka (brakujący szczegół, najprostsza).** `data/chat.json` ma listę `wordsAllowed`: części słów, w których słowo z listy nie jest wulgaryzmem. Na razie jest tam tylko „shuj”, więc przechodzą „pushujący”, „rushujemy”, „flashuje” i podobne. Samo „huj” i „chuj” dalej idą na gwiazdki. Filtr imion postaci (`src/engine/names.js`) zostaje bez zmian.
+
 ## Wersja 0.4.52 (19.11.2026): zmiany z 0.4.50 i 0.4.51 w grze
 
 1. **0.4.50 i 0.4.51 nie weszły do gry.** Wdrożenie 0.4.50 zatrzymał test `test/gem-fallout.test.js`. Zakładał starą kolejność, w której laska z oprawionym kamieniem, której wojownik nie używa, szła z pełnego plecaka przed zwykłymi hełmami. Według nowej zasady przedmiot z kamieniem idzie na końcu, więc Złomiarz sprzedał hełm. Wdrożenie 0.4.51 przerwałem, bo miało ten sam test.
