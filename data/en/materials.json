@@ -828,6 +828,210 @@
     "scythe-tip": {
       "name": "Scythe Tip",
       "description": "The snapped tip of Lady Death's scythe. Cold as the grave."
+    },
+    "canoe-splinter": {
+      "name": "Canoe Splinter",
+      "description": "A black splinter from the side of the canoe, damp and cold even in the sun."
+    },
+    "strider-leg": {
+      "name": "Strider Leg",
+      "description": "A long, thin leg that does not sink even in black water."
+    },
+    "nameless-shroud": {
+      "name": "Nameless Shroud",
+      "description": "A grey scrap of shroud on which no one embroidered a name."
+    },
+    "bridge-coin": {
+      "name": "Bridge Toll Coin",
+      "description": "An old, green-tarnished coin that pays for crossing the bridge over the river of the dead."
+    },
+    "harvestman-limb": {
+      "name": "Harvestman Limb",
+      "description": "A limb as long as a scythe, sharp along its whole length."
+    },
+    "death-candle-wax": {
+      "name": "Death Candle Wax",
+      "description": "A drop of wax that is still warm, though the candle went out long ago."
+    },
+    "mole-cricket-claw": {
+      "name": "Mole Cricket Claw",
+      "description": "A hard, serrated claw that the mole cricket digs its tunnels with."
+    },
+    "forefather-staff": {
+      "name": "Forefather's Staff",
+      "description": "A knotty staff worn smooth by the hands of many generations."
+    },
+    "mole-pelt": {
+      "name": "Mole Pelt",
+      "description": "A velvety black pelt that no crumb of earth ever sticks to."
+    },
+    "coffin-nail": {
+      "name": "Coffin Nail",
+      "description": "A forged nail from a coffin lid, bent from the inside."
+    },
+    "two-headed-fang": {
+      "name": "Two-Headed Fang",
+      "description": "A fang from one of the two heads. The other head is still looking for it."
+    },
+    "snuffing-cap": {
+      "name": "Snuffing Cap",
+      "description": "A brass cap on a long handle, with which the snuffer puts out the candles of the dying."
+    },
+    "bone-key": {
+      "name": "Bone Key",
+      "description": "A key of bone that opens only gates behind which no one lives."
+    },
+    "time-sand": {
+      "name": "Sand of Time",
+      "description": "A handful of grey sand that keeps trickling by itself, even in a closed hand."
+    },
+    "shadow-shred": {
+      "name": "Shred of Shadow",
+      "description": "A scrap of shadow that does not vanish even in full sunlight."
+    },
+    "indrik-horn": {
+      "name": "Indrik's Horn",
+      "description": "A long, twisted horn from whose tip clear water drips."
+    },
+    "nyja-seal": {
+      "name": "Seal of Nyja",
+      "description": "A black seal from the gates of Nav, cold as ice. Whoever wears it will pass through the gate and come back."
+    },
+    "rhino-horn": {
+      "name": "Rhino Horn",
+      "description": "A long, flat horn covered in scratches like bark."
+    },
+    "nav-honey": {
+      "name": "Nav Honey",
+      "description": "Thick, dark golden honey from flowers that grow only in Nav."
+    },
+    "ghost-horseshoe": {
+      "name": "Ghost Horseshoe",
+      "description": "A horseshoe you cannot see in the dark, but you can hear it clatter."
+    },
+    "cockroach-shell": {
+      "name": "Cockroach Shell",
+      "description": "A black, shiny shell that not even a knife can pierce."
+    },
+    "golden-scale": {
+      "name": "Golden Serpent Scale",
+      "description": "A house serpent's scale that gleams like a gold coin."
+    },
+    "cursed-coin": {
+      "name": "Cursed Coin",
+      "description": "A gold coin that weighs more than a stone in your pocket."
+    },
+    "pill-bug-plate": {
+      "name": "Pill Bug Plate",
+      "description": "A grey, curved plate of armour, as hard as a roof tile."
+    },
+    "snake-maiden-comb": {
+      "name": "Snake Maiden's Comb",
+      "description": "A comb of green stone with which the snake maiden combs her hair over the spring."
+    },
+    "dead-water-vial": {
+      "name": "Vial of Dead Water",
+      "description": "Water that closes the wounds of the dead. It does nothing for the living."
+    },
+    "stick-twig": {
+      "name": "Stick Insect Twig",
+      "description": "A dry twig that sometimes moves by itself."
+    },
+    "simargl-feather": {
+      "name": "Simargl Feather",
+      "description": "A flight feather from the wing of the dog that guards the seeds of all plants."
+    },
+    "blood-knot": {
+      "name": "Blood Knot",
+      "description": "A knot of red cord that ties itself whenever someone cries for vengeance."
+    },
+    "smith-hammer": {
+      "name": "Smith's Hammer",
+      "description": "A small hammer that never cools down."
+    },
+    "shackle-link": {
+      "name": "Shackle Link",
+      "description": "An iron chain link that keeps trying to lock itself onto someone."
+    },
+    "steward-goblet": {
+      "name": "Steward's Goblet",
+      "description": "A silver goblet at the bottom of which a drop of poison always remains."
+    },
+    "turon-clapper": {
+      "name": "Turoń's Clapper",
+      "description": "The Turoń's wooden jaw, which clacks by itself in the dark."
+    },
+    "veles-staff": {
+      "name": "Staff of Veles",
+      "description": "The staff of the lord of Nav, wood entwined by a serpent, warm as if alive."
+    },
+    "mammoth-tusk": {
+      "name": "Mammoth Tusk",
+      "description": "A curved tusk of white bone, cool in any weather."
+    },
+    "pseudoscorpion-venom": {
+      "name": "Pseudoscorpion Venom",
+      "description": "A drop of thick venom that does not freeze even in the hardest frost."
+    },
+    "silence-stone": {
+      "name": "Silence Stone",
+      "description": "A smooth stone near which every sound falls silent."
+    },
+    "sledge-runner": {
+      "name": "Sledge Runner",
+      "description": "A worn wooden runner, shod with iron and covered in frost."
+    },
+    "snow-flea-spring": {
+      "name": "Snow Flea Spring",
+      "description": "A tiny forked tail that bounces off the snow like a spring."
+    },
+    "oblivion-flower": {
+      "name": "Flower of Oblivion",
+      "description": "A pale blue flower. Whoever smells it forgets why they came."
+    },
+    "eternal-ice": {
+      "name": "Shard of Eternal Ice",
+      "description": "A piece of ice that does not melt even in fire."
+    },
+    "mayfly-wing": {
+      "name": "Mayfly Wing",
+      "description": "A transparent wing that lives longer than the mayfly itself."
+    },
+    "longing-tear": {
+      "name": "Tear of Longing",
+      "description": "A tear that does not dry as long as someone remembers someone."
+    },
+    "dread-mask": {
+      "name": "Mask of Dread",
+      "description": "A smooth mask without a face. Whoever looks at it steps back."
+    },
+    "tail-knot": {
+      "name": "Knot of Tails",
+      "description": "Tangled rat tails that can never be untied."
+    },
+    "black-wick": {
+      "name": "Black Wick",
+      "description": "A wick from Chernobog's torch. It burns, but gives no light."
+    },
+    "ice-eggshell": {
+      "name": "Ice Eggshell",
+      "description": "A piece of shell from Koschei's egg, as thin as frost."
+    },
+    "bayun-whisker": {
+      "name": "Bayun's Whisker",
+      "description": "A long silver whisker. Whoever holds it starts to yawn."
+    },
+    "ice-diadem": {
+      "name": "Ice Diadem",
+      "description": "A diadem of ice in which the memory of a former name has frozen."
+    },
+    "marzanna-braid": {
+      "name": "Marzanna's Straw Braid",
+      "description": "A braid of straw, frosted and stiff as iron. No one will drown it."
+    },
+    "koschei-needle": {
+      "name": "Koschei's Needle",
+      "description": "The needle in which Koschei hid his death. Cool, light and terrible."
     }
   },
   "parts": {

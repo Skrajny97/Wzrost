@@ -24,6 +24,24 @@
       "champion": { "type": "boolean", "description": "Czempion: najsilniejszy stwór regionu. Spotyka się go tylko w regionie wewnętrznym, który go wskazuje (champion w regions.json)." },
       "ambush": { "type": "boolean", "description": "Zasadzka (464): walka, w której jest ten stwór, zaczyna się od ruchów stworów, wszystkich przed pierwszym ruchem drużyny, jak zasadzka w zdarzeniach." },
       "hidden": { "type": "boolean", "description": "Ukryty w mroku (666): drużyna nie wybiera tego stwora na cel, dopóki walczy obok niego stwór bez tej cechy; gdy zostaną same ukryte, bije je normalnie. Ciosy w kilku wrogów naraz (zamach, chmura, rozprysk, przebicie, wir) trafiają go jak każdego." },
+      "vengeance": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Zemsta (Wróżda, Nawia): kto trafi tego stwora, od razu dostaje cios z powrotem, z taką częścią siły jego ciosu (nie dotyczy odpowiedzi na odpowiedź)." },
+      "regen": { "type": "number", "exclusiveMinimum": 0, "maximum": 0.2, "description": "Źródło (Wężowa Panna, Nawia): na początku każdego swojego ruchu stwór odzyskuje taką część maks. HP." },
+      "rises": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Nieśmiertelny (Kościej, Nawia): raz na walkę, gdy padnie, wstaje z taką częścią maks. HP." },
+      "shapes": {
+        "type": "array",
+        "description": "Postacie (Weles, Nawia): co ruch stwór przybiera kolejną, po kolei i od nowa, i bije jej atakiem; postać bez ataku bije własnym atakiem stwora. Pierwszy ruch w pierwszej postaci.",
+        "minItems": 2,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "name"],
+          "properties": {
+            "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+            "name": { "type": "string", "minLength": 1 },
+            "attack": { "$ref": "#/items/properties/attack" }
+          }
+        }
+      },
       "stats": {
         "type": "object",
         "additionalProperties": false,
@@ -71,7 +89,41 @@
               "slow": { "type": "number", "exclusiveMinimum": 0, "maximum": 0.8 }
             }
           },
-          "drain": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Wysysanie: stwór odzyskuje taką część obrażeń zadanych ciosem." }
+          "drain": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Wysysanie: stwór odzyskuje taką część obrażeń zadanych ciosem." },
+          "stun": {
+            "type": "object",
+            "description": "Ogłuszenie (Nawia): z szansą chance (mniejszą o Wolę celu) cel traci najbliższy ruch; label to napis na jego karcie.",
+            "additionalProperties": false,
+            "required": ["chance", "label"],
+            "properties": {
+              "chance": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+              "label": { "type": "string", "minLength": 1 }
+            }
+          },
+          "silence": {
+            "type": "object",
+            "description": "Cisza (Nawia): z szansą chance (mniejszą o Wolę celu) cel w najbliższym ruchu nie używa umiejętności, tylko zwykłego ciosu; label to napis na jego karcie.",
+            "additionalProperties": false,
+            "required": ["chance", "label"],
+            "properties": {
+              "chance": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+              "label": { "type": "string", "minLength": 1 }
+            }
+          },
+          "hits": { "type": "integer", "minimum": 2, "maximum": 3, "description": "Kilka ciosów w jednym ruchu (Dwugłowiec, Szczurzy Król, Nawia): w ten sam cel, dopóki stoi, a potem w innego." },
+          "trample": { "const": true, "description": "Tratowanie (Tętent, Sanie, Turoń, Nawia): stwór bije każdego z pierwszego rzędu drużyny, który jeszcze stoi, każdego pełnym ciosem i osobno (unik, krytyk i efekt ciosu dla każdego), zamiast wybierać cel." },
+          "dot2": {
+            "type": "object",
+            "description": "Drugi efekt ciosu (Czarny Płomień, Nawia), z własną szansą, jak dot.",
+            "additionalProperties": false,
+            "required": ["effect", "chance", "power", "ticks"],
+            "properties": {
+              "effect": { "type": "string" },
+              "chance": { "type": "number", "minimum": 0, "maximum": 1 },
+              "power": { "type": "number", "exclusiveMinimum": 0 },
+              "ticks": { "type": "integer", "minimum": 1, "maximum": 10 }
+            }
+          }
         },
         "if": { "properties": { "category": { "const": "magical" } } },
         "then": { "required": ["element"] }

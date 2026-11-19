@@ -1132,6 +1132,10 @@
     "0.4.46": {
       "title": "Version 0.4.46",
       "body": "- Levels 100 to 250 take longer and longer: level 100 as before, then longer with every level, up to almost 3 times as long as before just under level 250. Class levels too.\n- From character level 250, explorations give half the gold, materials, resources and chests with items, and the other pursuits half the gold.\n- Party: a party's trip now sets out whole or not at all. Before, a connection cut off while setting out could make a party member fight alone and lose while the leader won the same trip.\n- One who turns back from a party's trip also leaves the others' march on the Combat screen."
+    },
+    "0.4.47": {
+      "title": "Version 0.4.47",
+      "body": "- Nav, the land of the dead, awaits past the Bald Mountains, at levels 276–350: the Misty Marshes of Nav, the Meadows of Veles and the Sunless Land, 15 places and 51 new creatures with their own ways of fighting (stunning, silencing, trampling, vengeance and more).\n- New materials, System Deck cards, Wanted posters and the “Explorer of Nav” achievement."
     }
   }
 }

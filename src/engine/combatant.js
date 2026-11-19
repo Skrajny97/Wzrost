@@ -326,15 +326,53 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
   const end = balance.monsters.endGame;
   const latest = midGameShare(level, end) * growth;
   const [huntDamage, huntHp] = strength;
-  const average =
-    weaponDamage(hide, monster.attack.damageFactor, balance) *
-    balance.monsters.damageMultiplier *
-    groupFactor *
-    (1 + mid.damage * stronger) *
-    (1 + coop.damage) *
-    (1 + late.damage * later) *
-    (1 + end.damage * latest) *
-    huntDamage;
+  // A creature's natural weapon from one of its attacks: its own, or one of
+  // its shapes' (Weles, `shapes`).
+  /** @param {Record<string, any>} attack */
+  const weaponOf = (attack) => {
+    const average =
+      weaponDamage(hide, attack.damageFactor, balance) *
+      balance.monsters.damageMultiplier *
+      groupFactor *
+      (1 + mid.damage * stronger) *
+      (1 + coop.damage) *
+      (1 + late.damage * later) *
+      (1 + end.damage * latest) *
+      huntDamage;
+    return {
+      attackName: attack.name,
+      category: attack.category,
+      strike: strikeOf(attack.strike, attack.category),
+      sound: attack.sound,
+      element: attack.element,
+      scaling: attack.scaling,
+      min: average * (1 - attack.variance),
+      max: average * (1 + attack.variance),
+      dot: attack.dot,
+      // Ugrzęźnięcie and Wysysanie (combat.js).
+      slow: attack.slow,
+      drain: attack.drain,
+      // Atak na tył szyku (463): its blows go to the one standing furthest
+      // back (combat.js).
+      ...(attack.target && { target: attack.target }),
+      // Cios w cały szyk (666): the rest of the party takes this share of
+      // each blow (combat.js).
+      ...(attack.cleave && { cleave: attack.cleave }),
+      // Nawia's blows (combat.js): Ogłuszenie, Cisza, two blows in a move,
+      // the whole foremost row trampled, a second effect at once.
+      ...(attack.stun && { stun: attack.stun }),
+      ...(attack.silence && { silence: attack.silence }),
+      ...(attack.hits && { hits: attack.hits }),
+      ...(attack.trample && { trample: true }),
+      ...(attack.dot2 && { dot2: attack.dot2 }),
+    };
+  };
+  // Weles changes its shape with each move, and its blow with it; its first
+  // shape is the one it starts with (combat.js).
+  const shapes = monster.shapes?.map((/** @type {Record<string, any>} */ shape) => {
+    const attack = shape.attack ?? monster.attack;
+    return { name: shape.name, weapon: weaponOf(attack), damageScale: damageScale(stat(attack.scaling), level, balance) };
+  });
   /** @type {Record<string, number>} */
   const resist = {};
   for (const [element, value] of Object.entries(monster.resistances ?? {})) {
@@ -357,33 +395,21 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
     // Ukryty w mroku (666): the party does not choose it while a creature
     // without it still fights (combat.js).
     ...(monster.hidden && { hidden: true }),
+    // Nawia (combat.js): Wróżda strikes back whoever strikes it, Wężowa
+    // Panna's spring heals her each move, Kościej rises once, Weles changes
+    // its shape.
+    ...(monster.vengeance && { vengeance: monster.vengeance }),
+    ...(monster.regen && { regen: monster.regen }),
+    ...(monster.rises && { rises: monster.rises }),
+    ...(shapes && { shapes }),
     groupFactor,
     position: position ?? monster.position,
     level,
     maxHp: hpMax,
     hp: hpMax,
-    weapon: {
-      attackName: monster.attack.name,
-      category: monster.attack.category,
-      strike: strikeOf(monster.attack.strike, monster.attack.category),
-      sound: monster.attack.sound,
-      element: monster.attack.element,
-      scaling: monster.attack.scaling,
-      min: average * (1 - monster.attack.variance),
-      max: average * (1 + monster.attack.variance),
-      dot: monster.attack.dot,
-      // Ugrzęźnięcie and Wysysanie (combat.js).
-      slow: monster.attack.slow,
-      drain: monster.attack.drain,
-      // Atak na tył szyku (463): its blows go to the one standing furthest
-      // back (combat.js).
-      ...(monster.attack.target && { target: monster.attack.target }),
-      // Cios w cały szyk (666): the rest of the party takes this share of
-      // each blow (combat.js).
-      ...(monster.attack.cleave && { cleave: monster.attack.cleave }),
-    },
+    weapon: shapes ? shapes[0].weapon : weaponOf(monster.attack),
     scalingValue: stat(monster.attack.scaling),
-    damageScale: damageScale(stat(monster.attack.scaling), level, balance),
+    damageScale: shapes ? shapes[0].damageScale : damageScale(stat(monster.attack.scaling), level, balance),
     armor: Math.round(hide * balance.items.armorPerBudget * monster.armorFactor + stat('endurance') * balance.combat.armorPerEndurance),
     resist,
     // More damage from these elements, e.g. { fire: 0.5 }: half as much again.

@@ -22,10 +22,10 @@ describe('the achievements (1036)', () => {
     await call('POST', '/api/character', { cookie, body: { name: 'Wytrwała', classId: 'mage', appearance: 'female' } });
   });
 
-  test('25 in their groups, none done at first, with the words of the counts that begin now', async () => {
+  test('26 in their groups, none done at first, with the words of the counts that begin now', async () => {
     const { achievements, fresh } = await look();
-    // 24, and Andrzejki's (1084 A).
-    assert.equal(all(achievements).length, 25);
+    // 24, Andrzejki's (1084 A) and Nawia's explorer.
+    assert.equal(all(achievements).length, 26);
     assert.deepEqual(fresh, []);
     assert.ok(all(achievements).every((one) => !one.done));
     assert.ok(achievements.since.length > 0);
@@ -56,6 +56,20 @@ describe('the achievements (1036)', () => {
     // And taken off.
     assert.equal((await call('POST', '/api/achievements/title', { cookie, body: { id: null } })).data.achievements.worn, null);
     assert.equal((await call('GET', '/api/profile/Wytrwała', { cookie })).data.profile.title, null);
+  });
+
+  // Two achievements of one count, each of its own land: below the 276th
+  // level the Łysogóry's explorer only, from it Nawia's too.
+  test('the explorers of the Łysogóry and of Nawia each count their own land', async () => {
+    const levelTo = async (level) => (await db()).prepare("UPDATE characters SET level = ? WHERE name = 'Wytrwała'").bind(level).run();
+    const explorers = (view) => ['bald-explorer', 'nav-explorer'].map((id) => [id, find(view.achievements, id).done]);
+    await levelTo(275);
+    assert.deepEqual(explorers(await look()), [['bald-explorer', true], ['nav-explorer', false]]);
+    await levelTo(276);
+    const reached = await look();
+    assert.deepEqual(explorers(reached), [['bald-explorer', true], ['nav-explorer', true]]);
+    assert.deepEqual(reached.fresh.map((one) => one.name), ['Odkrywca Nawii']);
+    assert.equal(find(reached.achievements, 'nav-explorer').title, 'Odkrywczyni Nawii');
   });
 
   test('the counts kept from now on: creatures, champions, gold and the rest add up', async () => {

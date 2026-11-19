@@ -1017,6 +1017,51 @@
       },
       "black-goose": {
         "name": "Guardian Goose"
+      },
+      "death-boat": {
+        "name": "Black Death Canoe"
+      },
+      "bridge-keeper": {
+        "name": "Bridge Keeper the Toll Collector"
+      },
+      "forefather": {
+        "name": "Eldest Forefather"
+      },
+      "coffin": {
+        "name": "Iron-Bound Coffin"
+      },
+      "gatekeeper": {
+        "name": "Old Gatekeeper"
+      },
+      "woolly-rhino": {
+        "name": "Grey Rhino"
+      },
+      "house-serpent": {
+        "name": "Golden House Serpent"
+      },
+      "snake-maiden": {
+        "name": "Youngest Snake Maiden"
+      },
+      "simargl": {
+        "name": "Simargl the Guardian"
+      },
+      "ghost-smith": {
+        "name": "Smith of Fetters"
+      },
+      "mammoth": {
+        "name": "Ancient Mammoth"
+      },
+      "sledge": {
+        "name": "Driverless Sledge"
+      },
+      "ice-block": {
+        "name": "Black Glacier"
+      },
+      "rat-king": {
+        "name": "Rat King of the Stronghold"
+      },
+      "bayun": {
+        "name": "Bayun the Storyteller"
       }
     },
     "texts": {

@@ -153,6 +153,26 @@
             "icon",
             "star"
           ]
+        },
+        {
+          "id": "nav-explorer",
+          "name": "Odkrywca Nawii",
+          "goal": "Dotrzyj do Nawii (276. poziom postaci).",
+          "count": "landReached",
+          "land": "Nawia",
+          "target": 1,
+          "title": [
+            "Odkrywca Nawii",
+            "Odkrywczyni Nawii"
+          ],
+          "reward": {
+            "timePoints": 100,
+            "systemPoints": 10
+          },
+          "art": [
+            "omen",
+            "candle"
+          ]
         }
       ]
     },

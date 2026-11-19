@@ -340,5 +340,98 @@
         "description": "At the very top, behind a fence of bones, stands a hut on a hen's leg. Skulls burn on the fence, black geese walk the yard, and inside waits Baba Yaga."
       }
     }
+  },
+  "navia-marshes": {
+    "land": "Nav",
+    "name": "Misty Marshes of Nav",
+    "description": "Here the world of the living ends. Over the black water hangs a fog so thick that even souls get lost in it, and through the marshes flows the river beyond which Nav begins.",
+    "trait": {
+      "name": "Otherworld Fog",
+      "description": "Every blow has a 5% chance to miss in the fog, for creatures and characters alike."
+    },
+    "areas": {
+      "misty-shore": {
+        "name": "Misty Shore",
+        "description": "The grey shore of the river beyond which Nav begins. The fog hangs so low that you can see only your own boots and pale lights on the water."
+      },
+      "viburnum-bridge": {
+        "name": "Viburnum Bridge",
+        "description": "A bridge of viburnum branches over the river of the dead. Red berries glow in the fog like drops of blood, and the planks creak with every step."
+      },
+      "forefathers-isle": {
+        "name": "Isle of the Forefathers",
+        "description": "An island in the fog where the forefathers rest. Their spirits sit by cold campfires and wait for their descendants."
+      },
+      "crossing-of-the-dead": {
+        "name": "Crossing of the Dead",
+        "description": "An old landing from which canoes carry the dead to the other shore. On the pier wait the souls who have nothing to pay with."
+      },
+      "gate-of-nav": {
+        "name": "Gate of Nav",
+        "description": "A gate of black wood, as tall as the pines. Beyond it the fog ends and a meadow begins that no living soul has ever seen."
+      }
+    }
+  },
+  "veles-meadows": {
+    "land": "Nav",
+    "name": "Meadows of Veles",
+    "description": "Beyond the gate of Nav begin the meadows of Veles, lord of the underworld. The grass never withers here, though the sun never rises, and a green glow from under the ground lights the meadows. Here Veles grazes his herds and guards the treasures hidden under the roots of the World Tree.",
+    "trait": {
+      "name": "Veles' Sorcery",
+      "description": "Spells are 5% stronger, for creatures and characters alike."
+    },
+    "areas": {
+      "eternal-pastures": {
+        "name": "Eternal Pastures",
+        "description": "A meadow where the grass never withers. The herds of Veles graze here, animals so old that they vanished from the earth long ago."
+      },
+      "golden-ravines": {
+        "name": "Golden Ravines",
+        "description": "Ravines where Veles hides his treasures. The gold lies in plain sight, but whoever reaches for it stays in Nav forever."
+      },
+      "serpent-springs": {
+        "name": "Serpent Springs",
+        "description": "Springs from under the roots of the World Tree, where Veles in the shape of a serpent basks in the green glow. The water here is either living or dead, and no one knows which is which."
+      },
+      "veles-oakwood": {
+        "name": "Oakwood of Veles",
+        "description": "Old oaks under which offerings were made to Veles. Horns hang from the branches, and between the trunks you hear the rush of wings, though there are no birds here."
+      },
+      "veles-court": {
+        "name": "Court of Veles",
+        "description": "A manor of black logs where Veles receives the dead at a feast. Heaps of gold lie by the gates, and inside burns a fire that gives no warmth."
+      }
+    }
+  },
+  "sunless-land": {
+    "land": "Nav",
+    "name": "Sunless Land",
+    "description": "The deepest Nav, which the sun has never reached. Chernobog, the god of darkness, rules here, and Marzanna spreads eternal winter. In the frozen caves sleep creatures older than people, and somewhere in a castle of ice Koschei the Deathless has hidden his death.",
+    "trait": {
+      "name": "Sunless",
+      "description": "Healing restores 5% less HP, for creatures and characters alike."
+    },
+    "areas": {
+      "frozen-caves": {
+        "name": "Frozen Caves",
+        "description": "Caves of ice where creatures older than people have slept for thousands of years. Their breath settles as frost on the walls."
+      },
+      "road-of-the-dead": {
+        "name": "Road of the Dead",
+        "description": "A snowy road along which the dead have been carried for centuries. In the Sunless Land it is always winter, so sledges run here all year round."
+      },
+      "black-lake": {
+        "name": "Black Lake",
+        "description": "A lake in which the sun has never been reflected. The water is black as tar and so cold that it burns."
+      },
+      "chernobog-stronghold": {
+        "name": "Stronghold of Chernobog",
+        "description": "A stronghold of black stone where Chernobog counts all the misfortunes of the world. The torches here burn with a black flame."
+      },
+      "koschei-castle": {
+        "name": "Koschei's Castle",
+        "description": "A castle of ice and bone at the very bottom of Nav. Somewhere in it Koschei has hidden his death: in a needle, the needle in an egg, the egg in a duck, the duck in a hare, and the hare in a chest."
+      }
+    }
   }
 }

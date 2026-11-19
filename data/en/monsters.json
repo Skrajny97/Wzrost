@@ -2276,5 +2276,613 @@
     "attack": {
       "name": "Baba Yaga's Curse"
     }
+  },
+  "death-boat": {
+    "name": "Death Canoe",
+    "counted": [
+      "Death Canoe",
+      "Death Canoes",
+      "Death Canoes"
+    ],
+    "attack": {
+      "name": "Prow Ram",
+      "stun": {
+        "label": "stunned"
+      }
+    }
+  },
+  "water-strider": {
+    "name": "Water Strider",
+    "counted": [
+      "Water Strider",
+      "Water Striders",
+      "Water Striders"
+    ],
+    "attack": {
+      "name": "Piercing Bite"
+    }
+  },
+  "nameless": {
+    "name": "Nameless One",
+    "counted": [
+      "Nameless One",
+      "Nameless Ones",
+      "Nameless Ones"
+    ],
+    "attack": {
+      "name": "Cold Touch"
+    }
+  },
+  "bridge-keeper": {
+    "name": "Bridge Keeper",
+    "counted": [
+      "Bridge Keeper",
+      "Bridge Keepers",
+      "Bridge Keepers"
+    ],
+    "attack": {
+      "name": "Shove into the Mud"
+    }
+  },
+  "harvestman": {
+    "name": "Harvestman",
+    "counted": [
+      "Harvestman",
+      "Harvestmen",
+      "Harvestmen"
+    ],
+    "attack": {
+      "name": "Scythe Legs"
+    }
+  },
+  "death-candle": {
+    "name": "Death Candle",
+    "counted": [
+      "Death Candle",
+      "Death Candles",
+      "Death Candles"
+    ],
+    "attack": {
+      "name": "Funeral Flame"
+    }
+  },
+  "mole-cricket": {
+    "name": "Mole Cricket",
+    "counted": [
+      "Mole Cricket",
+      "Mole Crickets",
+      "Mole Crickets"
+    ],
+    "attack": {
+      "name": "Shovel Claws"
+    }
+  },
+  "forefather": {
+    "name": "Forefather",
+    "counted": [
+      "Forefather",
+      "Forefathers",
+      "Forefathers"
+    ],
+    "attack": {
+      "name": "Ancestral Staff",
+      "stun": {
+        "label": "stunned"
+      }
+    }
+  },
+  "giant-mole": {
+    "name": "Giant Mole",
+    "counted": [
+      "Giant Mole",
+      "Giant Moles",
+      "Giant Moles"
+    ],
+    "attack": {
+      "name": "Strike from Below"
+    }
+  },
+  "coffin": {
+    "name": "Coffin",
+    "counted": [
+      "Coffin",
+      "Coffins",
+      "Coffins"
+    ],
+    "attack": {
+      "name": "Slamming Lid",
+      "stun": {
+        "label": "trapped"
+      }
+    }
+  },
+  "two-headed-snake": {
+    "name": "Two-Headed Snake",
+    "counted": [
+      "Two-Headed Snake",
+      "Two-Headed Snakes",
+      "Two-Headed Snakes"
+    ],
+    "attack": {
+      "name": "Double Bite"
+    }
+  },
+  "candle-snuffer": {
+    "name": "Snuffer",
+    "counted": [
+      "Snuffer",
+      "Snuffers",
+      "Snuffers"
+    ],
+    "attack": {
+      "name": "Snuffing Breath"
+    }
+  },
+  "gatekeeper": {
+    "name": "Gatekeeper",
+    "counted": [
+      "Gatekeeper",
+      "Gatekeepers",
+      "Gatekeepers"
+    ],
+    "attack": {
+      "name": "Bunch of Keys"
+    }
+  },
+  "hourglass": {
+    "name": "Hourglass",
+    "counted": [
+      "Hourglass",
+      "Hourglasses",
+      "Hourglasses"
+    ],
+    "attack": {
+      "name": "Sands of Time"
+    }
+  },
+  "shade": {
+    "name": "Shade of the Dead",
+    "counted": [
+      "Shade of the Dead",
+      "Shades of the Dead",
+      "Shades of the Dead"
+    ],
+    "attack": {
+      "name": "Stab in the Back"
+    }
+  },
+  "indrik": {
+    "name": "Indrik",
+    "counted": [
+      "Indrik",
+      "Indriks",
+      "Indriks"
+    ],
+    "attack": {
+      "name": "Indrik's Stomp"
+    }
+  },
+  "nyja": {
+    "name": "Nyja",
+    "counted": [
+      "Nyja",
+      "Nyjas",
+      "Nyjas"
+    ],
+    "attack": {
+      "name": "Breath of Nav"
+    }
+  },
+  "woolly-rhino": {
+    "name": "Woolly Rhino",
+    "counted": [
+      "Woolly Rhino",
+      "Woolly Rhinos",
+      "Woolly Rhinos"
+    ],
+    "attack": {
+      "name": "Horn Charge"
+    }
+  },
+  "bumblebee": {
+    "name": "Bumblebee",
+    "counted": [
+      "Bumblebee",
+      "Bumblebees",
+      "Bumblebees"
+    ],
+    "attack": {
+      "name": "Sting"
+    }
+  },
+  "stampede": {
+    "name": "Stampede",
+    "counted": [
+      "Stampede",
+      "Stampedes",
+      "Stampedes"
+    ],
+    "attack": {
+      "name": "Trampling Hooves"
+    }
+  },
+  "cockroach": {
+    "name": "Cockroach",
+    "counted": [
+      "Cockroach",
+      "Cockroaches",
+      "Cockroaches"
+    ],
+    "attack": {
+      "name": "Mandibles"
+    }
+  },
+  "house-serpent": {
+    "name": "House Serpent",
+    "counted": [
+      "House Serpent",
+      "House Serpents",
+      "House Serpents"
+    ],
+    "attack": {
+      "name": "Coiling Bite"
+    }
+  },
+  "greed": {
+    "name": "Greed",
+    "counted": [
+      "Greed",
+      "Greeds",
+      "Greeds"
+    ],
+    "attack": {
+      "name": "Weight of Gold"
+    }
+  },
+  "pill-bug": {
+    "name": "Pill Bug",
+    "counted": [
+      "Pill Bug",
+      "Pill Bugs",
+      "Pill Bugs"
+    ],
+    "attack": {
+      "name": "Armoured Roll",
+      "stun": {
+        "label": "stunned"
+      }
+    }
+  },
+  "snake-maiden": {
+    "name": "Snake Maiden",
+    "counted": [
+      "Snake Maiden",
+      "Snake Maidens",
+      "Snake Maidens"
+    ],
+    "attack": {
+      "name": "Venomous Bite"
+    }
+  },
+  "dead-water": {
+    "name": "Dead Water",
+    "counted": [
+      "Dead Water",
+      "Dead Waters",
+      "Dead Waters"
+    ],
+    "attack": {
+      "name": "Deathly Chill"
+    }
+  },
+  "stick-insect": {
+    "name": "Stick Insect",
+    "counted": [
+      "Stick Insect",
+      "Stick Insects",
+      "Stick Insects"
+    ],
+    "attack": {
+      "name": "Hidden Strike"
+    }
+  },
+  "simargl": {
+    "name": "Simargl",
+    "counted": [
+      "Simargl",
+      "Simargls",
+      "Simargls"
+    ],
+    "attack": {
+      "name": "Diving Bite"
+    }
+  },
+  "blood-feud": {
+    "name": "Blood Feud",
+    "counted": [
+      "Blood Feud",
+      "Blood Feuds",
+      "Blood Feuds"
+    ],
+    "attack": {
+      "name": "Vengeful Blade"
+    }
+  },
+  "ghost-smith": {
+    "name": "Ghost Smith",
+    "counted": [
+      "Ghost Smith",
+      "Ghost Smiths",
+      "Ghost Smiths"
+    ],
+    "attack": {
+      "name": "Hammer Blow",
+      "stun": {
+        "label": "stunned"
+      }
+    }
+  },
+  "shackles": {
+    "name": "Shackles",
+    "counted": [
+      "Shackles",
+      "Shackles",
+      "Shackles"
+    ],
+    "attack": {
+      "name": "Iron Grip"
+    }
+  },
+  "steward": {
+    "name": "Steward",
+    "counted": [
+      "Steward",
+      "Stewards",
+      "Stewards"
+    ],
+    "attack": {
+      "name": "Poisoned Cup"
+    }
+  },
+  "turon": {
+    "name": "Turoń",
+    "counted": [
+      "Turoń",
+      "Turońs",
+      "Turońs"
+    ],
+    "attack": {
+      "name": "Horned Charge"
+    }
+  },
+  "veles": {
+    "name": "Veles",
+    "counted": [
+      "Veles",
+      "Veleses",
+      "Veleses"
+    ],
+    "attack": {
+      "name": "Staff of Veles"
+    },
+    "shapes": {
+      "elder": {
+        "name": "horned elder"
+      },
+      "serpent": {
+        "name": "serpent",
+        "attack": {
+          "name": "Serpent's Fang"
+        }
+      },
+      "bear": {
+        "name": "bear",
+        "attack": {
+          "name": "Bear's Paw"
+        }
+      }
+    }
+  },
+  "mammoth": {
+    "name": "Mammoth",
+    "counted": [
+      "Mammoth",
+      "Mammoths",
+      "Mammoths"
+    ],
+    "attack": {
+      "name": "Trample",
+      "stun": {
+        "label": "stunned"
+      }
+    }
+  },
+  "pseudoscorpion": {
+    "name": "Pseudoscorpion",
+    "counted": [
+      "Pseudoscorpion",
+      "Pseudoscorpions",
+      "Pseudoscorpions"
+    ],
+    "attack": {
+      "name": "Venom Pincers"
+    }
+  },
+  "silence": {
+    "name": "Silence",
+    "counted": [
+      "Silence",
+      "Silences",
+      "Silences"
+    ],
+    "attack": {
+      "name": "Hush",
+      "silence": {
+        "label": "silenced"
+      }
+    }
+  },
+  "sledge": {
+    "name": "Sledge",
+    "counted": [
+      "Sledge",
+      "Sledges",
+      "Sledges"
+    ],
+    "attack": {
+      "name": "Runaway Runners"
+    }
+  },
+  "snow-flea": {
+    "name": "Snow Flea",
+    "counted": [
+      "Snow Flea",
+      "Snow Fleas",
+      "Snow Fleas"
+    ],
+    "attack": {
+      "name": "Sudden Leap"
+    }
+  },
+  "oblivion": {
+    "name": "Oblivion",
+    "counted": [
+      "Oblivion",
+      "Oblivions",
+      "Oblivions"
+    ],
+    "attack": {
+      "name": "Fog of Forgetting",
+      "stun": {
+        "label": "dazed"
+      }
+    }
+  },
+  "ice-block": {
+    "name": "Glacier",
+    "counted": [
+      "Glacier",
+      "Glaciers",
+      "Glaciers"
+    ],
+    "attack": {
+      "name": "Crushing Ice"
+    }
+  },
+  "mayfly": {
+    "name": "Mayfly",
+    "counted": [
+      "Mayfly",
+      "Mayflies",
+      "Mayflies"
+    ],
+    "attack": {
+      "name": "Darting Strike"
+    }
+  },
+  "longing": {
+    "name": "Longing",
+    "counted": [
+      "Longing",
+      "Longings",
+      "Longings"
+    ],
+    "attack": {
+      "name": "Whisper of Names"
+    }
+  },
+  "dread": {
+    "name": "Dread",
+    "counted": [
+      "Dread",
+      "Dreads",
+      "Dreads"
+    ],
+    "attack": {
+      "name": "Cold Fear",
+      "stun": {
+        "label": "terrified"
+      }
+    }
+  },
+  "rat-king": {
+    "name": "Rat King",
+    "counted": [
+      "Rat King",
+      "Rat Kings",
+      "Rat Kings"
+    ],
+    "attack": {
+      "name": "Many Jaws"
+    }
+  },
+  "black-flame": {
+    "name": "Black Flame",
+    "counted": [
+      "Black Flame",
+      "Black Flames",
+      "Black Flames"
+    ],
+    "attack": {
+      "name": "Cold Burn"
+    }
+  },
+  "koschei-egg": {
+    "name": "Koschei's Egg",
+    "counted": [
+      "Koschei's Egg",
+      "Koschei's Eggs",
+      "Koschei's Eggs"
+    ],
+    "attack": {
+      "name": "Icy Roll"
+    }
+  },
+  "bayun": {
+    "name": "Bayun the Cat",
+    "counted": [
+      "Bayun the Cat",
+      "Bayun Cats",
+      "Bayun Cats"
+    ],
+    "attack": {
+      "name": "Lulling Purr",
+      "stun": {
+        "label": "asleep"
+      }
+    }
+  },
+  "ice-princess": {
+    "name": "Enchanted Princess",
+    "counted": [
+      "Enchanted Princess",
+      "Enchanted Princesses",
+      "Enchanted Princesses"
+    ],
+    "attack": {
+      "name": "Frozen Touch"
+    }
+  },
+  "marzanna": {
+    "name": "Marzanna",
+    "counted": [
+      "Marzanna",
+      "Marzannas",
+      "Marzannas"
+    ],
+    "attack": {
+      "name": "Frost Breath"
+    }
+  },
+  "koschei": {
+    "name": "Koschei the Deathless",
+    "counted": [
+      "Koschei the Deathless",
+      "Koscheis",
+      "Koscheis"
+    ],
+    "attack": {
+      "name": "Koschei's Sword"
+    }
   }
 }

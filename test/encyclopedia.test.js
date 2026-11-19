@@ -267,9 +267,10 @@ describe('the Encyklopedia in the engine', () => {
   });
 
   // The author's 1086: Tier X from class level 200, as Tier IX came from
-  // 175. Until the lands from level 276 come it only drops (1086.0 A): no
-  // pattern in the Warsztat or the Szlifiernia.
-  test('Tier X: its items from class level 200 with a set for every class and the accessories, its chest, dropping only, and the materials of creatures above level 275', () => {
+  // 175. Until the lands from level 276 came it only dropped (1086.0 A);
+  // with Nawia's lands (276–350) the Warsztat and the Szlifiernia show its
+  // patterns from the 200th level of their professions.
+  test('Tier X: its items from class level 200 with a set for every class and the accessories, its chest, its patterns, and the materials of Nawia\'s creatures', () => {
     const levels = { level: 230, classLevel: 200, professions: {} };
     const view = encyclopediaView({ discovered: {}, claimed: [], met: [], levels }, content);
     const tenth = view.items.tiers.at(-1);
@@ -289,15 +290,16 @@ describe('the Encyklopedia in the engine', () => {
     // at most 100.
     for (const set of tenth.sets) assert.deepEqual(set.chest, { gold: 244145, timePoints: 100, systemPoints: 100 }, set.name);
     // From Zaćmiona Polana (196–200), the last place of Ostępy Nowiu, worn
-    // from class level 200, and no pattern yet.
+    // from class level 200, and made in the Warsztat from its 200th level.
     assert.deepEqual(tenth.entries.find((entry) => entry.id === 'grunwald-sword').sources, [
       'Wyprawy: wypada od regionu Zaćmiona Polana (poz. 196–200).',
       'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
       'Założysz od 200. poziomu klasy.',
+      'Warsztat: wzór od 200. poziomu Rzemieślnictwa.',
     ]);
-    assert.ok(!tenth.entries.find((entry) => entry.id === 'rzepicha-necklace').sources.some((line) => line.startsWith('Szlifiernia')));
-    // The materials of creatures above level 275 (Łysogóry's champions above
-    // it), as Tier IX took those of Ostępy Nowiu above 200.
+    assert.ok(tenth.entries.find((entry) => entry.id === 'rzepicha-necklace').sources.includes('Szlifiernia: wzór od 200. poziomu Jubilerstwa.'));
+    // The materials of creatures above level 275: Nawia's, and the Łysogóry's
+    // champions above it, as Tier IX took those of Ostępy Nowiu above 200.
     const tenthMaterials = view.materials.tiers.at(-1);
     assert.deepEqual([tenthMaterials.name, tenthMaterials.range, tenthMaterials.current], ['Tier X', 'poziomy 276–350', false]);
   });
