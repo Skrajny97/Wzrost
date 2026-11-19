@@ -1,0 +1,14 @@
+{
+  "id": "beast-undercut",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a short curved steel blade sweeping low across a furry brown beast leg with a clawed paw, a bright red cut across the leg at the knee, the symbol alone, no background, single inventory item icon, bold clean outline",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023259850831985476
+  },
+  "images": 1
+}
