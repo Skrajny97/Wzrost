@@ -25,6 +25,7 @@ import { openProfile } from './profile.js';
 import { call, onCharacterChange, state } from './state.js';
 import { foldPart, howItWorks, openSheet, toast, withButton } from './ui.js';
 import { itemSheet } from './screens/character.js';
+import { attackChoice, classDayPart, rallyCard, rallyTurn, undercutsPart } from './guild-strike.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 
@@ -50,8 +51,11 @@ export function mountGuildBeast(container) {
   let last = null;
   let opened = null;
   let gone = false;
+  // The Róg zbiórki's card over the beast's, and its next change by itself.
+  const rallyBox = h('div', { class: 'guild-rally-box', hidden: true });
+  let turn = null;
   const card = h('section', { class: 'card guild-beast', 'aria-labelledby': 'guild-beast-title' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
-  container.append(card);
+  container.append(rallyBox, card);
 
   function show(next) {
     if (gone) return;
@@ -59,8 +63,14 @@ export function mountGuildBeast(container) {
     render();
   }
 
-  async function attack() {
-    const answer = await call('POST', '/api/guild/beast/attack');
+  // The words of the last attack: what it took off the bar, its bonuses,
+  // what a podcięcie leaves for the others, and the fall.
+  const attackText = (attack, texts, strike) =>
+    [filled(texts.lastAttack, { damage: formatNumber(attack.damage) }), attack.boostsText, attack.kind === 'undercut' && strike?.texts.undercut.undercutDone, attack.fell && texts.fell].filter(Boolean).join(' ');
+
+  // A Cios or a Podcięcie (`kind`, 1203).
+  async function attack(kind = 'strike') {
+    const answer = await call('POST', '/api/guild/beast/attack', { kind });
     checkGuildTodo({ now: true });
     last = answer.attack;
     opened = null;
@@ -71,7 +81,7 @@ export function mountGuildBeast(container) {
       const arena = createArena(answer.attack.fight, { autoplay: 'now' });
       const dialog = openSheet(
         h('h2', { class: 'sheet-title', text: answer.texts.fightTitle }),
-        h('p', { class: 'sheet-text', text: [filled(answer.texts.lastAttack, { damage: formatNumber(answer.attack.damage) }), answer.attack.fell && answer.texts.fell].filter(Boolean).join(' ') }),
+        h('p', { class: 'sheet-text', text: attackText(answer.attack, answer.texts, answer.strike) }),
         arena.element,
       );
       dialog.addEventListener('close', () => arena.stop(), { once: true });
@@ -157,20 +167,24 @@ export function mountGuildBeast(container) {
     );
   }
 
-  // The beast, its bar, and "Atakuj" with the attacks left today; shut, with
-  // the words of why, while the character offers itself or serves as a
+  // The beast, its bar, the classes of the day and the podcięcia waiting,
+  // and "Cios" and "Podcięcie" with the attacks left today; shut, with the
+  // words of why, while the character offers itself or serves as a
   // mercenary (attacks.blocked). The narrator's line about the Bestia rings
   // the three (narrator.js).
   function beastPart() {
-    const { beast, attacks, texts } = view;
-    const button = h('button', {
-      type: 'button',
-      class: 'button button--system',
-      'data-guide': 'guild-beast',
-      text: texts.attack,
-      disabled: beast.fallen || attacks.left === 0 || Boolean(attacks.blocked),
-      onClick: (event) => withButton(event.currentTarget, attack),
-    });
+    const { beast, attacks, texts, strike } = view;
+    const disabled = beast.fallen || attacks.left === 0 || Boolean(attacks.blocked);
+    const button = strike
+      ? attackChoice(strike, { disabled, onAttack: attack, guide: 'guild-beast' })
+      : h('button', {
+          type: 'button',
+          class: 'button button--system',
+          'data-guide': 'guild-beast',
+          text: texts.attack,
+          disabled,
+          onClick: (event) => withButton(event.currentTarget, () => attack()),
+        });
     return [
       h(
         'div',
@@ -188,6 +202,8 @@ export function mountGuildBeast(container) {
         ? h('p', { class: 'guild-beast-fallen', text: [filled(texts.fallen, { at: dateTimeFormat.format(new Date(beast.fallenAt)) }), beast.fallenBy && filled(texts.lastBlow, { name: beast.fallenBy })].filter(Boolean).join(' ') })
         : h('p', { class: 'muted', text: texts.until }),
       !beast.fallen && [
+        strike && classDayPart(strike),
+        strike && undercutsPart(strike),
         h('p', { class: 'guild-beast-attacks', text: [filled(texts.attacksLeft, { left: attacks.left, perDay: attacks.perDay }), attacks.left === 0 && texts.newAttacks].filter(Boolean).join('. ') }),
         attacks.blocked && h('p', { class: 'muted', text: attacks.blocked }),
         button,
@@ -202,7 +218,7 @@ export function mountGuildBeast(container) {
     return h(
       'div',
       { class: 'guild-beast-last' },
-      h('p', { text: [filled(texts.lastAttack, { damage: formatNumber(last.damage) }), last.fell && texts.fell].filter(Boolean).join(' ') }),
+      h('p', { text: attackText(last, texts, view.strike) }),
       last.log.length > 0 &&
         h(
           'details',
@@ -276,9 +292,23 @@ export function mountGuildBeast(container) {
     );
   }
 
+  // The Róg zbiórki over the card, in a guild; it asks for the Bestia anew
+  // when the rally starts or ends, so the bonus shows as it is.
+  function rallyPart() {
+    clearTimeout(turn);
+    turn = null;
+    const rally = view.strike?.rally;
+    rallyBox.hidden = !rally;
+    if (!rally) return fill(rallyBox);
+    fill(rallyBox, rallyCard(rally, { onChange: (next) => show({ ...view, strike: { ...view.strike, rally: next } }) }));
+    const wait = rallyTurn(rally);
+    if (wait !== null && wait < 2 ** 31) turn = setTimeout(refresh, wait);
+  }
+
   function render() {
     const { texts } = view;
-    const how = howItWorks(texts.lead, texts.rules);
+    const how = howItWorks(texts.lead, [...texts.rules, ...(view.strike?.texts.how ?? [])]);
+    rallyPart();
     if (!view.beast) {
       fill(card, title(), h('p', { class: 'muted', text: texts.noGuild }), chestsPart(), how);
       return;
@@ -292,16 +322,21 @@ export function mountGuildBeast(container) {
     if (view && !gone) render();
   });
 
-  call('GET', '/api/guild/beast')
-    .then(show)
-    .catch((error) => {
-      if (!gone) fill(card, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać Bestii Gildii.') }));
-    });
+  function refresh() {
+    return call('GET', '/api/guild/beast')
+      .then(show)
+      .catch((error) => {
+        if (!gone) fill(card, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać Bestii Gildii.') }));
+      });
+  }
+  refresh();
 
   return {
     unmount() {
       gone = true;
+      clearTimeout(turn);
       unsubscribe();
+      rallyBox.remove();
       card.remove();
     },
   };

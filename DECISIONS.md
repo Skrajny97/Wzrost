@@ -3847,6 +3847,95 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Kronika Gildii w czacie (1195 A, 19.11.2026)
+
+Autor przyjął na stronie ocen 19.11.2026 propozycję 1195 w wariancie A: „linijki Systemu w kanale Gildia na czacie”. Z propozycji: „System pisałby w kanale Gildia krótkie linijki [ SYSTEM ] o dużych chwilach: upadek Bestii i strażnika z imieniem postaci, która zadała ostatni cios, nowy próg Prób, nowy poziom budynku, wynik wieczoru ligi i nowy członek. To dwie, trzy linijki dziennie. Gracz niczego nie stuka”.
+
+1. **Gdzie i jak.** Linijki pisze System w kanale Gildia na czacie, pod nagłówkiem [ SYSTEM ], tak jak wynik Loterii w kanale Globalnym: w chłodnym panelu Systemu, bez imienia autora, bez zgłaszania i ukrywania. Nowa linijka zapala kropkę kanału Gildia, jak każda wiadomość.
+2. **Wydarzenia i słowa** (`chronicle.texts` w `data/guilds.json`, po angielsku w `data/en/guilds.json`):
+    - upadek Bestii: „Bestia padła: Raróg. Ostatni cios: Radomira.”;
+    - upadek strażnika Wyprawy: „Strażnik etapu 3 Wyprawy padł: Niedźwiedź. Ostatni cios: Radomira.”, a przy ostatnim strażniku na końcu „Trasa tygodnia przebyta!”;
+    - nowy próg Prób: „Próby Gildii: próg 3 z 7 osiągnięty.”;
+    - nowy poziom budynku Siedziby: „Siedziba: Kuźnia Gildii wchodzi na 4. poziom.”;
+    - wynik wieczoru ligi: „Wieczór ligi: wygrana z [LB] Leśni Bracia, walki 12:3.”, a także przegrana i remis;
+    - nowy członek: „Nowy członek gildii: Radomira.”;
+    - początek zbiórki (1199 A): „Róg zbiórki! Do 21:00 ataki na Bestię i strażnika biją o 30% mocniej.”
+3. **Brakujący szczegół: krótko i bez rodzaju.** Linijki mówią „Ostatni cios: imię” i „Nowy członek gildii: imię”, jak karta Bestii („Ostatni cios: …”), więc nie potrzebują osobnych słów dla postaci żeńskich i męskich.
+4. **Brakujący szczegół: język.** Linijka pamięta swój klucz i liczby, a nie gotowe zdanie, więc każdy czyta ją w swoim języku, z nazwą stwora i budynku w tym języku. Godzina zbiórki jest czasu polskiego. Wiadomość trzyma też tekst polski.
+5. **Każde wydarzenie raz.** Linijka ma klucz wydarzenia (np. `beast:12`), a baza nie przyjmie drugiej linijki z tym samym kluczem w kanale tej samej gildii (migracja 0162). Upadek Bestii i strażnika, nowy członek i wynik ligi zapisują się w tej samej operacji co samo wydarzenie, więc linijka powstaje tylko razem z nim.
+6. **Brakujący szczegół: próg Prób.** Pasek Prób liczy się z prób wszystkich członków przy każdym spojrzeniu, więc nowy próg sprawdza się przy kropkach Gildii, czyli mniej więcej co minutę, gdy ktoś z gildii ma grę otwartą. Linijka przychodzi wtedy, raz na próg i tydzień. Gdy dwa progi przyjdą naraz, linijka mówi o wyższym.
+7. **Brakujący szczegół: Siedziba.** Linijka o nowym poziomie przychodzi zaraz po wpłacie, która go dała. Poziom liczy się z wpłat po niej, więc dwie wpłaty naraz, które razem dały poziom, też go ogłoszą, i to raz.
+8. **Brakujący szczegół: liga.** Każda gildia meczu dostaje swoją linijkę: wygrana, przegrana albo remis z gildią rywala, i wygrane do przegranych walk swojej gildii, z walkowerami, jak w tabeli ligi. Mecz bez walk i mecz z gildią, której już nie ma, nie mają linijki.
+9. **Brakujący szczegół: zbiórka.** Linijkę o początku zbiórki pisze cron w minucie jej startu, a gdyby się spóźnił, pierwsze spojrzenie na kartę Bestii albo Wyprawy w czasie zbiórki. Zbiórka, która minęła bez linijki, już jej nie dostaje, bo jej słowa byłyby nieaktualne.
+10. **Bez powiadomień.** Linijki Systemu nikogo nie oznaczają, więc nie dają powiadomień na telefon, także gdy wymieniają imię członka. Powiadomienia o oznaczeniach na czacie pomijają też każdą wiadomość Systemu (`mentions.js`).
+11. **Brakujący szczegół: czyja linijka.** Wiadomość czatu musi mieć autora, więc linijka należy do postaci, o której mówi albo która ją wywołała (ostatni cios, nowy członek, wpłata, kto zwołał zbiórkę), a próg Prób i wynik ligi do lidera gildii. Gdy ta postać zostanie usunięta, linijka znika razem z jej wiadomościami.
+12. **Ile linijek.** Bestia raz w tygodniu, strażnicy do siedmiu razy, próg Prób kilka razy w tygodniu, wieczór ligi raz dziennie, zbiórka najwyżej raz dziennie, członkowie rzadko: zwykle dwie, trzy linijki dziennie.
+13. **Dla kolejnych funkcji.** `chronicle(db, guildId, key, params, now, { characterId, once, when })` w `src/server/guild-chronicle.js` daje zapis linijki do operacji wydarzenia, więc kolejne aktywności Gildii (np. Bohaterowie tygodnia, 1198) dopiszą swoje linijki tak samo: klucz i słowa w `chronicle.texts`.
+14. **Kod i testy:** `src/server/guild-chronicle.js`, wywołania w `guild-beast.js`, `guild-expedition.js`, `guilds.js`, `guild-wars.js`, `guild-seat.js`, `guild-todo.js` i `guild-rally.js`, wyświetlanie w `chat.js`; testy w `test/guild-strike.test.js` i `test/guild-rally.test.js`.
+
+## Klasa dnia przy Bestii i strażnikach (1197, 19.11.2026)
+
+Autor przyjął na stronie ocen 19.11.2026 propozycję 1197: „Co dzień o północy System wybierałby dwie klasy dnia, razem z ich ewolucjami: ich ataki na Bestię i strażnika Wyprawy biją o połowę mocniej, a karta pokazuje te klasy ikonami. Każda klasa ma swoje dni w tygodniu. Bestia i strażnicy dostają o 20% więcej HP, więc gildia, która atakuje jak dziś, kończy w podobnym czasie.”
+
+1. **Dwie klasy dnia** od północy czasu polskiego, razem ze wszystkimi swoimi ewolucjami: liczy się klasa, od której postać zaczynała.
+2. **Ataki klas dnia** na Bestię Gildii i na strażnika Wyprawy Gildii biją o 50% mocniej (`classDay.power` 1,5 w `data/guilds.json`).
+3. **Brakujący szczegół: co znaczy „mocniej”.** Każdy cios postaci w tej walce, z umiejętnościami, efektami i przywołańcami, bije 1,5 raza mocniej, tak jak siła ciosów form ewolucji na Arenie. Powtórka walki pokazuje więc ciosy takie, jakie były. Symulacja: z mnożnikiem ×1,5 obrażenia ataku rosną ×1,51.
+4. **Stały rozkład tygodnia dla całej gry** (`classDay.schedule`): poniedziałek Wojownik i Łucznik, wtorek Mag i Kleryk, środa Cień i Wojownik, czwartek Łucznik i Mag, piątek Kleryk i Cień, sobota Wojownik i Łucznik, niedziela Mag i Kleryk. Brakujący szczegół: 14 miejsc w tygodniu nie dzieli się równo na pięć klas, więc cztery klasy mają po trzy dni, a Cień dwa. Żadna klasa nie ma dwóch dni z rzędu, także z niedzieli na poniedziałek. `tools/validate-data.mjs` pilnuje, żeby każda klasa miała swoje dni i żeby różniły się najwyżej o jeden.
+5. **Karta Bestii i karta strażnika** pokazują nad przyciskami ataku „Klasy dnia:” z ikonami klas gry, nazwami i „+50%”, a postaci klasy dnia także „Dziś dzień Twojej klasy: Twoje ataki biją o 50% mocniej.”. „Jak to działa?” podaje cały rozkład tygodnia.
+6. **HP Bestii i strażników ×1,2** (`classDay.hp`), a razem z ×1,3 z Podcięcia (1203) ×1,56. Bestie i strażnicy, którzy już stoją, zostają tacy, jacy są, jak przy zmianach HP w 0.4.40 i 0.4.41: większe HP mają nowi, a premie działają od razu.
+7. **Tempo.** Gildia, której klasy są rozłożone jak zwykle, ma co dzień dwie piąte ataków z premią, czyli średnio ×1,2 obrażeń, tyle co wzrost HP z tej propozycji. Pełne sprawdzenie razem z Podcięciem: zob. „Podcięcie i cios przy Bestii i strażnikach”, punkt 10.
+8. **Kod i testy:** `src/engine/guild-strike.js` (`classesOfDay`, `classDays`, `strikePower`, `strikeHpGrowth`), `src/server/guild-strike.js`, `src/client/guild-strike.js`; testy w `test/guild-strike.test.js`.
+
+## Róg zbiórki (1199 A, 19.11.2026)
+
+Autor przyjął na stronie ocen 19.11.2026 propozycję 1199 w wariancie A: „lider albo zastępca dmie w róg: sam wyznacza godzinę zbiórki, z wyprzedzeniem do doby”. Z propozycji: „Raz dziennie gildia ma godzinę zbiórki: gdy się zaczyna, członkowie dostają powiadomienie na telefon i linijkę na czacie. Przez godzinę ataki na Bestię i strażnika biją o 30% mocniej, a karta pokazuje, kto przyszedł. Kto nie zdąży, nic nie traci, bo ataki zostają mu na resztę dnia.”
+
+1. **Kto wyznacza:** lider albo zastępca, czyli rangi, które zarządzają gildią. Członek i Nowicjusz widzą zbiórkę, ale jej nie wyznaczają.
+2. **Brakujący szczegół: kiedy.** „Od razu” albo o pełnej godzinie, od najbliższej do 24 godzin naprzód (`rally.aheadHours`), z listy na karcie. Pełne godziny, bo to „godzina zbiórki”, a lista na telefonie zostaje krótka.
+3. **Raz dziennie:** najwyżej jedna zbiórka na dzień czasu polskiego, liczony dniem jej początku. Pilnuje tego baza, więc dwa stuknięcia naraz wyznaczą jedną zbiórkę, a drugie dostanie „Na ten dzień gildia ma już zbiórkę.”.
+4. **Brakujący szczegół: odwołanie.** Zbiórkę, która się jeszcze nie zaczęła, lider albo zastępca może odwołać („Odwołaj zbiórkę”, z pytaniem). Zaczętej nie. Po odwołaniu dzień jest znów wolny.
+5. **Brakujący szczegół: następna zbiórka i zegar.** Gdy zbiórka jest wyznaczona albo trwa, karta nie pokazuje wyboru godziny. Po jej końcu lider albo zastępca wyznacza następną, na jutro. Godziny na karcie są według zegara telefonu, w Polsce czasu polskiego, a dzień zbiórki liczy się czasem polskim, jak wszystkie dni gry.
+6. **Start:** każdy członek, którego postać jest grana i który ma włączone powiadomienia, dostaje na telefon „Róg zbiórki: <nazwa gildii>” i „Zbiórka trwa do 21:00! Ataki na Bestię i strażnika biją o 30% mocniej.”, w języku swojego konta, z crona co minutę, jak inne powiadomienia gry. Kronika pisze wtedy linijkę na czacie gildii (1195 A).
+7. **Godzina premii:** przez 60 minut (`rally.minutes`) ataki wszystkich członków na Bestię i na strażnika Wyprawy biją o 30% mocniej (`rally.power` 1,3). Premia mnoży się z klasą dnia i z podcięciem.
+8. **Kto przyszedł:** karta pokazuje imiona tych, którzy w czasie zbiórki zaatakowali Bestię albo strażnika, w kolejności pierwszego ataku. Po zbiórce do północy karta pokazuje „Dzisiejsza zbiórka: 20:00–21:00” i kto przyszedł.
+9. **Kto nie zdąży, nic nie traci:** ataki nie przepadają i zostają do północy, jak zawsze.
+10. **Brakujący szczegół: gdzie.** Karta „Róg zbiórki” stoi nad kartą Bestii i nad trasą Wyprawy, bo tam się atakuje. Przed zbiórką mówi „Zbiórka dziś o 20:00”, „Zacznie się za 1 h 20 min.” i „Zwołuje: Radomira”, a w czasie zbiórki świeci złotem. Karta odświeża się sama w chwili startu i końca zbiórki.
+11. **Ikona rogu** (`src/client/art/icons/rally-horn.png`, 32 × 32) jest z PixelLab, w wersji wybranej przez autora.
+12. **Baza i API:** migracja 0162, tabela `guild_rallies`. `POST /api/guild/rally { at }` („now” albo pełna godzina) i `POST /api/guild/rally/cancel { id }`; zbiórka przychodzi z `GET /api/guild/beast` i `GET /api/guild/expedition` (`strike.rally`). Testy: `test/guild-rally.test.js`.
+
+## Podcięcie i cios przy Bestii i strażnikach (1203, 19.11.2026)
+
+Autor przyjął na stronie ocen 19.11.2026 propozycję 1203: „Przed atakiem wybierałbyś „Cios” albo „Podcięcie”. Podcięcie zadaje połowę obrażeń, ale trzy następne ciosy innych członków biją o 60% mocniej. Z własnego podcięcia nie korzystasz. Karta Bestii pokazuje, ile podcięć czeka i kto je zrobił … Zgrana gildia bije wtedy o ok. 30% szybciej, więc HP Bestii i strażników urośnie o tyle samo. Gildia, która tylko stuka „Cios”, będzie bić wolniej niż dziś.”
+
+1. **Wybór:** zamiast „Atakuj” karta Bestii i karta strażnika mają dwa przyciski, „Cios” i „Podcięcie”, każdy z ikoną i jednym zdaniem pod spodem. Strona sprzed tej zmiany, która nie wysyła wyboru, zadaje Cios.
+2. **Podcięcie** zadaje połowę obrażeń (`undercut.power` 0,5) i czeka przy swojej bestii albo swoim strażniku na trzy (`undercut.uses`) ciosy członków innych graczy. Każdy z nich bije o 60% mocniej (`undercut.bonus` 1,6).
+3. **Brakujący szczegół: kolejka.** Czekające podcięcia jednej bestii albo jednego strażnika stoją w jednej kolejce: każdy Cios innego gracza zużywa jedno, najstarsze, z którego może skorzystać. Jeden cios bierze najwyżej jedną premię.
+4. **Brakujący szczegół: własne podcięcie** nie pomaga żadnej postaci konta, które je zrobiło, także jego drugiej postaci w tej samej gildii, jak w zasadzie „Postacie jednego konta sobie nie pomagają” (1196).
+5. **Brakujący szczegół: wygasanie.** Podcięcie należy do swojej bestii albo swojego strażnika i znika razem z nimi: gdy padną albo gdy kończy się tydzień. Na następnego strażnika nie przechodzi.
+6. **Brakujący szczegół: mnożenie.** Premie się mnożą: klasa dnia ×1,5, zbiórka ×1,3 i cios z podcięciem ×1,6, razem do ×3,12. Podcięcie klasy dnia w czasie zbiórki to 0,5 × 1,5 × 1,3 = ×0,975. Podcięcie samo z cudzego podcięcia nie korzysta i premii nie zużywa.
+7. **Karta** pokazuje „Czekające podcięcia: 2” i kto je zrobił, z liczbą ciosów, które jeszcze wzmocni („Radomira: 3 ciosy”), a pod „Cios”, gdy następny cios gracza weźmie premię, „Pełne obrażenia i +60% z podcięcia: Radomira.”. Po ataku okno walki mówi, ile atak zabrał i jakie miał premie („Premie: klasa dnia +50%, zbiórka +30%, podcięcie (Radomira) +60%.”), a po podcięciu „Podcięcie! 3 następne ciosy innych członków biją o 60% mocniej.”.
+8. **Brakujący szczegół: dwa ciosy naraz.** Premia schodzi w tej samej operacji co atak i tylko wtedy, gdy jeszcze czeka. Z dwóch ciosów naraz na ostatnią premię jeden ją bierze, a drugi dostaje „Bestia albo postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.” i nie traci ataku.
+9. **HP Bestii i strażników ×1,3** (`undercut.hp`), a razem z Klasą dnia (1197) ×1,56 (`strikeHpGrowth`), także HP, które dochodzi z nowym członkiem. Bestie i strażnicy, którzy już stoją, zostają tacy, jacy są.
+10. **Sprawdzenie tempa** (`tools/guild-beast-sim.mjs`). Gildia typowych postaci z `tools/simulate.mjs`, klasy po kolei (Wojownik, Łucznik, Mag, Kleryk, Cień), każdy atakuje 3 razy dziennie. Prawdziwe postacie biją mocniej od typowych, więc ataki są przeskalowane tak, żeby bestia sprzed zmian padała po około 4 dniach ataków, jak u autora po 0.4.41. Średnio z 400 tygodni, w dniach ataków do upadku:
+
+    | gildia | dotąd | same ciosy | zgrana | zgrana i codzienna zbiórka |
+    |---|---|---|---|---|
+    | 5 członków, poziom 30 | 4,2 | 5,4 | 4,2 | 3,3 |
+    | 5 członków, poziom 60 | 4,2 | 5,4 | 4,2 | 3,3 |
+    | 5 członków, poziom 100 | 4,2 | 5,4 | 4,2 | 3,3 |
+    | 5 członków, poziom 150 | 4,2 | 5,4 | 4,2 | 3,3 |
+    | 3 członków, poziom 60 | 4,2 | 5,3 | 3,9 | 3,2 |
+    | 10 członków, poziom 60 | 4,2 | 5,4 | 4,0 | 3,2 |
+    | 20 członków, poziom 60 | 4,2 | 5,4 | 4,0 | 3,1 |
+
+    - „Same ciosy”: gildia, która atakuje jak dotąd, z klasami dnia, kończy o około 28% później, czyli wolniej niż dziś, jak zapowiadała propozycja.
+    - „Zgrana”: w każdej rundzie ataków najpierw atakują ci, którzy nie mają dnia swojej klasy, i robią podcięcie, dopóki dzienne ataki pozostałych wykorzystają czekające premie; reszta bije ciosem z premią. Taka gildia kończy w czasie sprzed zmian.
+    - „Zgrana i codzienna zbiórka”: wszystkie ataki w czasie zbiórki kończą o około jedną piątą szybciej niż dziś. Zbiórka jest nagrodą za wspólną godzinę i HP za nią nie rośnie.
+    - Mnożnik ciosów działa w walce prawie dokładnie: ×1,6 daje ×1,61 obrażeń, ×0,5 daje ×0,49, a ×3,12 od ×3,14 do ×3,18.
+    - Typowa postać z symulacji nie ma ewolucji ani premii z profesji, więc liczby dni pokazują stosunek do dzisiejszego tempa, nie dokładne dni gildii autora.
+11. **Ikony** „Cios” i „Podcięcie” (`src/client/art/icons/beast-strike.png` i `beast-undercut.png`, 32 × 32) są z PixelLab, w wersjach wybranych przez autora.
+12. **Baza i API:** migracja 0162, tabela `guild_undercuts`. `POST /api/guild/beast/attack { kind: "strike" | "undercut" }` i `POST /api/guild/expedition/attack` tak samo; w odpowiedzi ataku `kind`, `boosts` i `boostsText`. Testy: `test/guild-strike.test.js`.
+
 ## Przyjęte 19.11.2026: Portale po kilka stopni, Kulki Systemu, karty Talii i „Na górę” (1185–1194)
 
 Autor przyjął na stronie ocen, bez uwag: kilka stopni Portalu naraz (1185), Kulki Systemu (1186), karty Talii w Skrzyni Konta, na Targowisku i w Wymianie (1187–1189) i przycisk „Na górę” (1190). Odpowiedzi na pytania o karty: 1191 A, 1192 A, 1193 B i 1194 A (sekcja „Karty Talii”, punkt 12). Wszystko wchodzi do gry z najbliższą wersją. Zasady są w czterech sekcjach poniżej. Przy scalaniu z wersjami 0.4.52–0.4.64 doszło:
@@ -10719,7 +10808,7 @@ Autor: „344 A”.
 3. **Ataki.** Postać w gildii atakuje 3 razy na dobę, od północy czasu polskiego, także przy pracy w profesji, ale nie w trakcie wyprawy ani przed odebraniem jej raportu, jak w Wieżach. *Zmienione: zob. „Bestia Gildii: atak także w trakcie wyprawy”.* Atak to jedna walka jak wejście do Wieży: sama, z pełnym HP, bez mikstur. Trofeum z Encyklopedii przeciw bestii i cecha jej regionu się liczą. Bestia zaczyna walkę z HP, które jej zostało, a atak zbija tyle, ile straciła. Atak nie daje XP, złota ani łupów.
 4. **Skrzynia Bestii (brakujący szczegół).** Każda postać, która w tygodniu choć raz zaatakowała, otwiera jedną Skrzynię Bestii. *Od 0.4.40 skrzynię dostaje każdy członek gildii, także bez ataku: zob. „Wersja 0.4.40”.* Gdy bestia padnie, w skrzyni jest przedmiot klasy postaci na jej poziomie, w rzadkości czempiona, i 4 losowania materiału bestii. Gdy bestia przeżyje tydzień, są tylko materiały: 3, 2 albo 1 losowanie za zbite 75%, 50% albo 25% paska, a poniżej 25% nic. Skrzynię otwiera się od upadku bestii albo przez cały następny tydzień. Skrzynia z przedmiotem czeka zamknięta, gdy plecak jest pełny.
 5. **Porządki.** Bestie sprzed poprzedniego tygodnia znikają razem z atakami i skrzyniami, gdy przychodzi nowa bestia.
-6. **Bez linii w czacie**, bo czat nie ma linii Systemu.
+6. **Bez linii w czacie**, bo czat nie ma linii Systemu. *Od 1195 A Kronika Gildii pisze w czacie gildii linijkę o upadku bestii: zob. „Kronika Gildii w czacie”.*
 7. **Migracja bazy:** 0066, w grze od wersji 0.0.79.
 
 ## Wersja 0.0.80 (2.11.2026)

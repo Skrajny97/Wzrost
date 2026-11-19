@@ -28,6 +28,7 @@ import { isAuthor } from './author.js';
 import { chatChannels, content } from './content.js';
 import { friendNews } from './community.js';
 import { nameColorOf } from './cosmetics.js';
+import { chronicleShown } from './guild-chronicle.js';
 import { guildChannel, guildNews, guildOf, guildTagSql } from './guilds.js';
 import { findMentions, mentionPeople, mentionsSaved, mentionsSql, mentionsView, newestMentions } from './mentions.js';
 import { chatAccountName } from './names.js';
@@ -250,10 +251,12 @@ export function shownText(text) {
 }
 
 // A message of the System (the Loteria's result in the Globalny,
-// casino.js) shows as the System's: its words and time only. `readerId`:
-// the character that reads, whom the message may tag (mentions.js).
+// casino.js; the Kronika's lines in a guild's channel, guild-chronicle.js,
+// in the reader's language) shows as the System's: its words and time
+// only. `readerId`: the character that reads, whom the message may tag
+// (mentions.js).
 const messageView = (row, userId, env, readerId) =>
-  row.system ? { id: row.id, system: true, text: row.text, createdAt: row.created_at, own: false } : playerMessageView(row, userId, env, readerId);
+  row.system ? { id: row.id, system: true, text: chronicleShown(row), createdAt: row.created_at, own: false } : playerMessageView(row, userId, env, readerId);
 
 const playerMessageView = (row, userId, env, readerId) => ({
   id: row.id,
@@ -437,7 +440,7 @@ export async function readChat(context) {
   const [messages, hidden, blocked, reports, conversations] = await db.batch([
     db
       .prepare(
-        `SELECT m.id, m.user_id, m.character_id, m.name, COALESCE(c.level, m.level) AS level, m.class_id, m.text, m.items, m.stacks, m.created_at, m.system, u.login, u.google_sub, u.chat_moderator, u.language AS writer_language, u.account_name,
+        `SELECT m.id, m.user_id, m.character_id, m.name, COALESCE(c.level, m.level) AS level, m.class_id, m.text, m.items, m.stacks, m.created_at, m.system, m.chronicle, u.login, u.google_sub, u.chat_moderator, u.language AS writer_language, u.account_name,
                 c.cosmetics, ${guildTagSql('m.character_id')} AS guild_tag, ${mentionsSql('m.id')} AS mentions
          FROM chat_messages m JOIN users u ON u.id = m.user_id LEFT JOIN characters c ON c.id = m.character_id
          WHERE ${where} AND m.id > ? AND m.hidden_at IS NULL AND (m.system = 1 OR m.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?))

@@ -515,7 +515,9 @@ export const SPRITES = {
   // Systemu over the Walka scene (data/orbs.json, orbs.js).
   icons: {
     size: 32,
-    ids: ['gold', 'time-points', 'encyclopedia', 'ward-scroll', 'steady-scroll', 'oblivion-scroll', 'fir-branch', 'system-orb'],
+    // The Róg zbiórki and the Bestia's "Cios" and "Podcięcie" (1199 A,
+    // 1203), drawn in PixelLab, the author's choice.
+    ids: ['gold', 'time-points', 'encyclopedia', 'ward-scroll', 'steady-scroll', 'oblivion-scroll', 'fir-branch', 'system-orb', 'rally-horn', 'beast-strike', 'beast-undercut'],
   },
   // The professions' squares on the Profesje tab, 48×48.
   professions: {
@@ -895,6 +897,11 @@ export function orbArt(id, scale) {
   art.height = SPRITES.icons.size * scale;
   return art;
 }
+// The Róg zbiórki (1199 A) and the attacks "Cios" and "Podcięcie" (1203) on
+// the Bestia's and the strażnik's cards.
+export const rallyHornArt = (size) => iconArt('rally-horn', size, 'bell');
+export const beastStrikeArt = (size) => iconArt('beast-strike', size, 'sword');
+export const beastUndercutArt = (size) => iconArt('beast-undercut', size, 'dagger');
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
 // The pictures of the Labirynt Systemu and the Rdzeń (art/labyrinth/, 850–866,
 // accepted in 868 and 869): its rooms (room-<type>), its Artefakty

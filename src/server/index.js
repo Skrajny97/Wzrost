@@ -42,6 +42,7 @@ import { attackGuildGuardian, claimGuildExpeditionChest, getGuildExpedition } fr
 import { claimGuildTrialChest, dropGuildTrial, getGuildTrials, openGuildTrials, takeGuildTrial } from './guild-trials.js';
 import { askGuild, cancelGuildRequest, getGuildRequests, giveToGuildRequest, thankForGuildGift } from './guild-requests.js';
 import { getGuildTodo } from './guild-todo.js';
+import { announceRallies, cancelGuildRally, setGuildRally } from './guild-rally.js';
 import { getGuildExchange, postGuildOffer, takeGuildOffer, withdrawGuildOffer } from './guild-exchange.js';
 import { getGuildChest, putGoodsInGuildChest, putInGuildChest, takeFromGuildChest } from './guild-chest.js';
 import { getGuildWar, getGuildWarBattle, getGuildWarMatchBattles, settleWars, testGuildWar } from './guild-wars.js';
@@ -482,6 +483,9 @@ const routes = [
   ['GET', '/api/guild/beast', getGuildBeast],
   ['POST', '/api/guild/beast/attack', attackGuildBeast],
   ['POST', '/api/guild/beast/claim', claimGuildBeastChest],
+  // The Róg zbiórki (guild-rally.js, 1199 A).
+  ['POST', '/api/guild/rally', setGuildRally],
+  ['POST', '/api/guild/rally/cancel', cancelGuildRally],
   // The Próby Gildii (guild-trials.js, 345 A) and the Prośby Gildii (guild-requests.js, 346 A).
   ['GET', '/api/guild/todo', getGuildTodo],
   ['GET', '/api/guild/trials', getGuildTrials],
@@ -639,6 +643,10 @@ export default {
       // The guilds' boards of the Próby Gildii drawn as the week starts and
       // their trials of the day opened for every member (guild-trials.js).
       () => openGuildTrials(env.DB, controller.scheduledTime),
+      // The guilds' rallies started: the Kronika's line of each in its
+      // guild's chat (guild-rally.js, 1199 A; the phones hear it from
+      // sendNotifications).
+      () => announceRallies(env.DB, controller.scheduledTime),
       // The guild wars' rivals drawn as the week starts and their battles
       // fought every evening at 20:00 (guild-wars.js), where they are on.
       () => guildWarsOn() && settleWars(env.DB, controller.scheduledTime),

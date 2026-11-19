@@ -187,7 +187,9 @@ const channelName = (channel) =>
 // character whose player has a phone signed up, while its message is still
 // there, the character has not read its channel that far (chat_seen) and
 // does not hide its writer, and in a guild's channel only while the
-// character is still in that guild. "Mira oznaczyła Cię na czacie: …", a
+// character is still in that guild; never for a System line (the
+// Kronika's, guild-chronicle.js, which names members but tags nobody).
+// "Mira oznaczyła Cię na czacie: …", a
 // woman's verb for a female writer; in the language of the tagged player's
 // account, as the cron runs outside any request (push.js).
 export async function mentionNotices(db, from, to) {
@@ -203,7 +205,7 @@ export async function mentionNotices(db, from, to) {
        JOIN chat_messages m ON m.id = x.message_id
        JOIN characters c ON c.id = x.character_id
        JOIN characters w ON w.id = m.character_id
-       WHERE x.push = 1 AND x.created_at > ? AND x.created_at <= ? AND c.role = 'player'
+       WHERE x.push = 1 AND x.created_at > ? AND x.created_at <= ? AND c.role = 'player' AND m.system = 0
          AND c.user_id IN (SELECT user_id FROM push_subscriptions WHERE gone_at IS NULL)
          AND m.hidden_at IS NULL
          AND m.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = c.user_id)
