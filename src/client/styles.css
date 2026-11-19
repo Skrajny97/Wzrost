@@ -16858,6 +16858,16 @@ button.tcard-slot {
   background: rgba(217, 180, 90, 0.22);
 }
 
+/* On the narrowest phones the icon over the word, so "Podcięcie" stays
+   whole in its half of the card. */
+@media (max-width: 359px) {
+  .guild-strike-button {
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px 4px;
+  }
+}
+
 .guild-strike-note {
   color: var(--text-muted);
   font-size: 14px;
