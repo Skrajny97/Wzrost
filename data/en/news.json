@@ -1180,6 +1180,10 @@
     "0.4.61": {
       "title": "Version 0.4.61",
       "body": "- Labyrinth: after every fight, the level guardian's too, its report opens first. You can skip it with “Skip the report” or turn off the “Fight report at once” box under it. Only then come the blessing choice and the next level.\n- Fix: the Labyrinth's windows with a fight's result, an altar and the merchant are no longer empty, also with Animations off."
+    },
+    "0.4.62": {
+      "title": "Version 0.4.62",
+      "body": "- The Hard and the Hellish exploration work with a party too. The leader ticks one in the “Exploration options” together with the “With the party” box, and the whole party goes in that mode. The creatures are stronger for everyone, and each player gets their own bonus: more XP and gold, and on the Hellish one more items and materials too."
     }
   }
 }
