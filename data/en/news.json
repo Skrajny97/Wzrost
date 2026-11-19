@@ -1124,6 +1124,10 @@
     "0.4.44": {
       "title": "Version 0.4.44",
       "body": "- From level 250 of the character and the class, a level needs much more experience: 3 times as much as before at level 250, and 10 times as much from level 300.\n- The Encyclopedia's chests from Tier V give fewer Time Points: from 50 in Tier V to 100 in Tier X."
+    },
+    "0.4.45": {
+      "title": "Version 0.4.45",
+      "body": "- The fourth evolution: at class level 300 each third form grows into its fourth, with new skills, looks, walk and riding.\n- The narrator's line about the Party has its voice again."
     }
   }
 }

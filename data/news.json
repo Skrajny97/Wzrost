@@ -1410,6 +1410,11 @@
       "id": "0.4.44",
       "title": "Wersja 0.4.44",
       "body": "- Od 250. poziomu postaci i klasy awans wymaga dużo więcej doświadczenia: na 250. poziomie 3 razy więcej niż dotąd, a od 300. poziomu 10 razy więcej.\n- Skrzynie Encyklopedii od Tieru V dają mniej Punktów Czasu: od 50 w Tierze V do 100 w Tierze X."
+    },
+    {
+      "id": "0.4.45",
+      "title": "Wersja 0.4.45",
+      "body": "- Czwarta ewolucja: na 300. poziomie klasy każda trzecia forma przechodzi w swoją czwartą, z nowymi umiejętnościami, wyglądem, chodem i jazdą wierzchem.\n- Kwestia narratora o Drużynie znów ma głos."
     }
   ]
 }

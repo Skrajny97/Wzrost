@@ -582,7 +582,8 @@ export const SPRITES = {
   summons: {
     size: 48,
     fit: true,
-    ids: ['elemental-summon', 'toxic-slime', 'ent-summon', 'oak-awakening'],
+    // The Stwórca Żywiołów's Żywiołak (1140; drawn in PixelLab, 19.11.2026).
+    ids: ['elemental-summon', 'toxic-slime', 'ent-summon', 'oak-awakening', 'elemental'],
   },
   // The Osada (data/settlement.json): its places on the board, by the
   // place's id, each cut to its outline, the Targowisko in the middle the

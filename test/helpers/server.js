@@ -32,7 +32,7 @@ export function useServer(vars = {}) {
     workers: [
       {
         configPath: './wrangler.jsonc',
-        vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', EVENTS: '', EVOLUTIONS: 'on', THIRD_EVOLUTION: 'on', SETTLEMENT: '', FORTRESS: '', ENGLISH: '', WEEKS: '', ARENA: '', GUILD_WARS: '', LABYRINTH: '', CARDS: '', PAYMENTS: '', PAYMENTS_FOR: '', ...vars },
+        vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', EVENTS: '', EVOLUTIONS: 'on', THIRD_EVOLUTION: 'on', FOURTH_EVOLUTION: '', SETTLEMENT: '', FORTRESS: '', ENGLISH: '', WEEKS: '', ARENA: '', GUILD_WARS: '', LABYRINTH: '', CARDS: '', PAYMENTS: '', PAYMENTS_FOR: '', ...vars },
       },
     ],
   });
