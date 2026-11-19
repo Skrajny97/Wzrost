@@ -4053,6 +4053,10 @@ Autor przyjął na stronie ocen 19.11.2026 propozycję 1201 w wariancie A: „A 
 10. **Kronika (1195).** Opiekuna tygodnia, albo to, że nikt nie zagłosował, ogłasza Kronika Gildii: zob. „Kronika Gildii w czacie”, punkty 2 i 17.
 11. **Grafiki** z PixelLab, w wersjach wybranych przez autora 19.11.2026: Kącina `src/client/art/guild/guild-shrine.png` (128 × 96, drewniana świątynia z ogniem przed wejściem) i popiersia bogów `src/client/art/guild/gods/<id>.png` (96 × 128, jak popiersia mieszkańców): Perun z toporem i piorunem, Weles z rogami, Swaróg z młotem i Mokosz z kądzielą i wieńcem z kłosów.
 
+## Wersja 0.4.65 (19.11.2026): Portale seriami, Kulki Systemu, karty Talii w Skrzyni Konta, na Targowisku i w Wymianie, „Na górę”
+
+Wchodzą przyjęte 1185, 1186 i 1187–1190 z odpowiedziami 1191 A, 1192 A, 1193 B i 1194 A, według czterech sekcji niżej i sekcji „Przyjęte 19.11.2026”. Scalone z 0.4.62–0.4.64; pełne testy (2573) przeszły.
+
 ## Przyjęte 19.11.2026: Portale po kilka stopni, Kulki Systemu, karty Talii i „Na górę” (1185–1194)
 
 Autor przyjął na stronie ocen, bez uwag: kilka stopni Portalu naraz (1185), Kulki Systemu (1186), karty Talii w Skrzyni Konta, na Targowisku i w Wymianie (1187–1189) i przycisk „Na górę” (1190). Odpowiedzi na pytania o karty: 1191 A, 1192 A, 1193 B i 1194 A (sekcja „Karty Talii”, punkt 12). Wszystko wchodzi do gry z najbliższą wersją. Zasady są w czterech sekcjach poniżej. Przy scalaniu z wersjami 0.4.52–0.4.64 doszło:
