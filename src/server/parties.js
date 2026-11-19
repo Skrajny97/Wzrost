@@ -26,10 +26,13 @@
 // withdrawn, or with the others gone, it ends (partyOf, 11.11.2026), so its
 // companions do not stay in the Kwatery for a party that is not there.
 //
-// An exploration of the party: every member free now (its character played,
-// at home, with nothing going on) goes with the leader to the place and for
-// the length the leader chose, if each of them has them open; the others
-// stay in the party and go the next time they are free. Since 10.11.2026 a
+// An exploration of the party: every member free now (at home, with nothing
+// going on) goes with the leader to the place and for the length the leader
+// chose, if each of them has them open; the others stay in the party and go
+// the next time they are free. Which of its player's characters is played
+// makes no difference since 0.4.59: one set aside goes too, and its report
+// waits for it (the author, 19.11.2026: „przecież trzeba to jakoś
+// rozdzielić”); before, it stayed home. Since 10.11.2026 a
 // member whose exploration or work has ended goes too: its report is
 // claimed first, as its own "Odbierz raport" would claim it (claimForTrip;
 // the author: „Koniecznie musimy zrobić jakieś obejście odbierania raportu
@@ -140,7 +143,7 @@ export async function partyOf(db, characterId) {
   const [party, members] = await db.batch([
     db.prepare('SELECT id, leader_id FROM parties WHERE id = ?').bind(membership.party_id),
     db
-      .prepare('SELECT m.character_id, c.class_level FROM party_members m JOIN characters c ON c.id = m.character_id WHERE m.party_id = ? ORDER BY m.joined_at, m.character_id')
+      .prepare('SELECT m.character_id, c.class_level, c.user_id FROM party_members m JOIN characters c ON c.id = m.character_id WHERE m.party_id = ? ORDER BY m.joined_at, m.character_id')
       .bind(membership.party_id),
   ]);
   const row = party.results[0];
@@ -149,18 +152,32 @@ export async function partyOf(db, characterId) {
     await db.prepare('DELETE FROM party_members WHERE character_id = ? AND party_id = ?').bind(characterId, membership.party_id).run();
     return null;
   }
-  // One whose class level grew more than the spread apart leaves (engine
+  // A party is of characters of different players (1.11.2026): a second
+  // character of one player leaves, the first in the party's order staying,
+  // the leader before all. Since 0.4.59 a character set aside goes on its
+  // party's trips, so two of one player would go together; none joins so
+  // any more (acceptPartyInvite), and one that joined before goes here.
+  const list = members.results.map((member) => ({ id: member.character_id, classLevel: member.class_level, userId: member.user_id }));
+  const leader = list.find((member) => member.id === row.leader_id);
+  const players = new Set(leader ? [leader.userId] : []);
+  const twice = [];
+  const others = [];
+  for (const member of list) {
+    if (member === leader) continue;
+    (players.has(member.userId) ? twice : others).push(member);
+    players.add(member.userId);
+  }
+  // One whose class level grew more than the spread apart leaves too (engine
   // partyFit): the leader stays, and the members in the party's order who
   // fit with those staying.
-  const list = members.results.map((member) => ({ id: member.character_id, classLevel: member.class_level }));
-  const leader = list.find((member) => member.id === row.leader_id);
-  const { apart } = leader ? partyFit(leader, list.filter((member) => member !== leader), content()) : { apart: [] };
-  if (apart.length > 0) {
-    const ids = apart.map((member) => member.id);
+  const { apart } = leader ? partyFit(leader, others, content()) : { apart: [] };
+  const leaving = [...twice, ...apart];
+  if (leaving.length > 0) {
+    const ids = leaving.map((member) => member.id);
     await db.batch(partyRemoval(db, ids.map(() => '?').join(', '), ids));
     if (ids.includes(characterId)) return null;
   }
-  const staying = list.filter((member) => !apart.includes(member)).map((member) => member.id);
+  const staying = list.filter((member) => !leaving.includes(member)).map((member) => member.id);
   // A party of one with no invitation waiting is no party: after a declined
   // or withdrawn invitation, or once the others have left, it ends, so its
   // last member's companions go on the explorations again at once (828 B:
@@ -177,16 +194,13 @@ export async function partyOf(db, characterId) {
 // whose close waits in the Karczma (mercenaries.js).
 const reportWaits = (kind, endsAt, now) => kind !== 'mercenary' && endsAt <= now;
 
-// A member's state for the party's list: free (its character played and at
-// home, or back with its report waiting, which the party's setting out
-// claims: partyHunt), away (on an exploration), working (at a profession's
-// work) or aside (its player plays another character). Only the free go
-// along.
-// Since 0.4.59 a member whose player plays another character now is no
-// longer set apart ('aside'): it goes on the party's trips all the same
-// (the author, 19.11.2026: „dlaczego system robił błąd kiedy ktoś zmienia
-// postać? przecież trzeba to jakoś rozdzielić”), so only its own activity
-// tells whether it is free.
+// A member's state for the party's list: free (at home, or back with its
+// report waiting, which the party's setting out claims: partyHunt), away
+// (on an exploration) or working (at a profession's work). Only the free go
+// along. Whether its player plays it now does not count: before 0.4.59 one
+// whose player played another character was 'aside' and stayed home (the
+// author, 19.11.2026: „dlaczego system robił błąd kiedy ktoś zmienia
+// postać? przecież trzeba to jakoś rozdzielić”).
 function memberStatus(row, now) {
   if (!row.activity || reportWaits(row.activity, row.activity_ends, now)) return 'free';
   return row.activity === 'hunt' ? 'away' : 'working';
@@ -282,8 +296,9 @@ export async function getParty(context) {
 
 // POST /api/party/invite { name }: the leader invites a character by its
 // name; a character without a party makes one with the first invitation.
-// Not one of its own player's characters (it could not go with it), nor
-// one whose player hid the inviting one's in the chat.
+// Not one of its own player's characters (a party is of characters of
+// different players, 1.11.2026), nor one whose player hid the inviting
+// one's in the chat.
 export async function inviteToParty(context) {
   const { session, player } = await requirePartyPlayer(context);
   const db = context.env.DB;
@@ -353,6 +368,15 @@ export async function acceptPartyInvite(context) {
   const invite = await db.prepare('SELECT party_id FROM party_invites WHERE party_id = ? AND character_id = ?').bind(partyIdOf(body), player.row.id).first();
   if (!invite) throw new ApiError(404, 'no_invite', 'Tego zaproszenia już nie ma.');
   if (await partyOf(db, player.row.id)) throw new ApiError(409, 'in_party', 'Najpierw opuść swoją drużynę.');
+  // Not into a party with another of the player's characters, played or set
+  // aside: a party is of characters of different players (1.11.2026), and
+  // since 0.4.59 one set aside goes on its trips too (partyOf). Said only to
+  // the player, so the inviting one learns nothing of its characters.
+  const own = await db
+    .prepare('SELECT c.name FROM party_members m JOIN characters c ON c.id = m.character_id WHERE m.party_id = ? AND c.user_id = ? AND c.id != ?')
+    .bind(invite.party_id, player.row.user_id, player.row.id)
+    .first();
+  if (own) throw new ApiError(409, 'own_in_party', `W tej drużynie jest już Twoja postać ${own.name}. Drużynę tworzą postacie różnych graczy.`);
   // Joins only while the party has a place and the character's class level
   // keeps the party within the spread (both in the same statement), so two
   // invitations accepted at once join one party.
@@ -507,18 +531,23 @@ async function claimForTrip(db, member, now) {
   try {
     return await runInLanguage(accountLanguage(user?.language), async () => {
       await settleCharacter(db, member, now);
-      // Its player went over to another character meanwhile.
+      // Settling reads the character again by its player when another
+      // request changed it meanwhile (loadPlayer), which gives the one
+      // played: for a member set aside, or one whose player went over to
+      // another character meanwhile, not this one. It stays home this time,
+      // and no other character's report is claimed for it.
       if (member.row.id !== id || !member.activity) return {};
       const kind = member.activity.kind;
       const done = await finishActivity(db, member, now, { forTrip: true });
       if (done?.event) return { event: true };
+      // Played or set aside, it goes (0.4.59).
       const after = await loadCharacter(db, id);
-      return after?.row.role === 'player' ? { member: after, report: done ? { id: done.id, kind } : null } : {};
+      return after ? { member: after, report: done ? { id: done.id, kind } : null } : {};
     });
   } catch (error) {
     if (!(error instanceof ApiError)) throw error;
     const again = await loadCharacter(db, id);
-    return again?.row.role === 'player' && !again.activity ? { member: again } : {};
+    return again && !again.activity ? { member: again } : {};
   }
 }
 
