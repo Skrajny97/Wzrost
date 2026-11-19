@@ -2760,7 +2760,7 @@
       "hero-benefactor": "an open hand palm up holding a small gift wrapped in red cloth and tied with a golden ribbon, the symbol alone, no background, single inventory item icon, bold clean outline",
       "land-banner": "a small deep blue guild banner with a golden stag head emblem with big antlers and gold trim, like the guild seat's great banner, flying from a wooden pole with an iron spear tip, the banner alone, no background, single inventory item icon, bold clean outline",
       "guild-help": "two hands clasped firmly in a handshake, one in a brown leather bracer and one in a deep blue sleeve, the symbol alone, no background, single inventory item icon, bold clean outline",
-      "frame-guild-banner": {"prompt": "an ornate portrait frame of dark carved oak with forged iron corner brackets, a deep blue cloth guild banner with gold trim and a golden stag emblem hanging across the top edge, two spear-tipped banner poles at the top corners, narrow deep blue banners with gold trim hanging down the left and right sides, a large empty window in the middle for a portrait, seen flat from the front, pixel art user interface, symmetrical", "width": 120, "height": 160, "tool": "pro"}
+      "frame-guild-banner": {"prompt": "an ornate portrait frame of dark carved oak with forged iron corner brackets, the frame fills the whole image edge to edge with a thin border, a deep blue cloth guild banner with gold trim and a golden stag head emblem hanging from a banner pole along the top border of the frame, a spear tip at each end of the pole, no other banners, a large empty window in the middle for a portrait, seen flat from the front, pixel art user interface, symmetrical", "width": 120, "height": 160, "tool": "pro"}
     }
   },
   "winter": {
