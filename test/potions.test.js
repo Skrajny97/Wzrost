@@ -30,10 +30,11 @@ import {
 import { typicalCharacter } from '../tools/simulate.mjs';
 import { content } from './helpers/content.js';
 
-// The newest place's stronger creatures (balance.monsters.huntCurve,
-// hunt-strength.test.js) and the harder explorations from the 10th level
-// (balance.challenge) aside: these fights test something else.
-const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [] }, challenge: { ...content.balance.challenge, fromLevel: Infinity } } };
+// The newest place's stronger creatures (balance.monsters.huntCurve and
+// newestPlace, hunt-strength.test.js and newest-place.test.js) and the
+// harder explorations from the 10th level (balance.challenge) aside: these
+// fights test something else.
+const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [], newestPlace: null }, challenge: { ...content.balance.challenge, fromLevel: Infinity } } };
 import { useServer } from './helpers/server.js';
 
 const heal = { id: 'lesser-healing', accusative: 'Mniejszą miksturę leczenia', amount: 0.2, below: 0.4 };

@@ -133,7 +133,9 @@ export function threatSamples({ character, equipped, areaId, companions = [], ha
   const player = playerCombatant(/** @type {any} */ ({ character, equipped, name: 'próba', area }), content);
   const mates = companions.map((companion, index) => companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}`, classLevel: character.classLevel ?? 0 }), content));
   const rng = createRng(`threat:${areaId}:${character.level}`);
-  const strength = exploreStrength(area, character.level, content, hard);
+  // The character alone (with "Z drużyną" too: 926 B), at its class level.
+  const classLevel = character.classLevel ?? 0;
+  const strength = exploreStrength(area, character.level, content, hard, { classLevel });
   /**
    * @param {Record<string, any>[]} encounters
    * @param {Record<string, any>} [options]
@@ -149,8 +151,6 @@ export function threatSamples({ character, equipped, areaId, companions = [], ha
     elite: [sampleKind(() => eliteEncounter(area, content), 1)],
     champion: area.champion ? [sampleKind(() => championEncounter(area, content), 1)] : [],
   };
-  // The character alone (with "Z drużyną" too: 926 B), at its class level.
-  const classLevel = character.classLevel ?? 0;
   for (const list of Object.values(groups)) for (const kind of list) fightSamples(kind, SAMPLES, player, rng, content, area, mates, strength, classLevel);
   if (mix(groups.regular)[LOST] < /** @type {number} */ (LIMITS.at(-1))) {
     for (const [group, list] of Object.entries(groups)) {

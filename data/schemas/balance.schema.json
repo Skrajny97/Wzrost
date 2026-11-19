@@ -1314,6 +1314,33 @@
             "items": { "type": "number", "minimum": 0 }
           }
         },
+        "newestPlace": {
+          "type": "object",
+          "description": "Najnowsze miejsce znów groźne (19.11.2026; autor: „nie może tak być, chyba że na niskim zagrożeniu i nizszych od aktualnego levelu krainach”, wybór autora B: zwykła wyprawa 4 h w najnowsze miejsce kończy się omdleniem w ok. 20% wypraw, z towarzyszami i w drużynie trzech graczy). Stwory najnowszego miejsca i wyższych, na dokładkę do huntCurve, od poziomu postaci fromLevel (wcześniejsze poziomy bez zmian; w drużynie poziom lidera). curve: punkty [poziom klasy, mnożnik obrażeń, mnożnik HP] jak w huntCurve (między punktami liniowo, przed pierwszym bez zmian, za ostatnim jak w ostatnim), według poziomu klasy walczących (na wyprawie drużyny najwyższego wśród graczy, jak w mythGame); HP rośnie o 60% tego, o ile rosną obrażenia. perPlayer: na wyprawie drużyny każdy gracz poza pierwszym dokłada tę część obrażeń i HP, punkty [poziom klasy, część obrażeń, część HP], między punktami liniowo, przed pierwszym nic; towarzysze i najemnik nie są graczami. Działa na wyprawach (także Szybkich i Błyskawicznych polowaniach i u Poszukiwanych spotkanych w drodze) i w szacowaniu zagrożenia (dla postaci samej, 926 B). Bez zmian: niższe miejsca, Labirynt, Sala prób, Wieże, Portale, walki zdarzeń i Bestia Gildii.",
+          "additionalProperties": false,
+          "required": ["fromLevel", "curve", "perPlayer"],
+          "properties": {
+            "fromLevel": { "type": "integer", "minimum": 1 },
+            "curve": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": { "type": "number", "minimum": 0 }
+              }
+            },
+            "perPlayer": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": { "type": "number", "minimum": 0 }
+              }
+            }
+          }
+        },
         "endGame": {
           "type": "object",
           "description": "Od fromLevel, po drugiej ewolucji klasy, gdy umiejętności i ekwipunek postaci dalej rosną, potwory rosną w siłę jeszcze raz, tak samo jak w lateGame: o damage więcej obrażeń i o hp więcej HP, rosnąco do pełnej wartości na toLevel i dalej (autor: „od 100ego być mid”).",

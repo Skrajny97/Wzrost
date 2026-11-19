@@ -183,10 +183,11 @@ import { content, newCharacter } from './helpers/content.js';
 // (rewards.youngChests): the finds as they come from character level 25 on.
 const plainChests = { ...content, balance: { ...content.balance, rewards: { ...content.balance.rewards, youngChests: undefined } } };
 
-// The newest place's stronger creatures (balance.monsters.huntCurve,
-// hunt-strength.test.js) and the harder explorations from the 10th level
-// (balance.challenge) aside: these fights test something else.
-const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [] }, challenge: { ...content.balance.challenge, fromLevel: Infinity } } };
+// The newest place's stronger creatures (balance.monsters.huntCurve and
+// newestPlace, hunt-strength.test.js and newest-place.test.js) and the
+// harder explorations from the 10th level (balance.challenge) aside: these
+// fights test something else.
+const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [], newestPlace: null }, challenge: { ...content.balance.challenge, fromLevel: Infinity } } };
 
 // A few level 1 common items of a class, like the first gear a character finds.
 const KITS = {

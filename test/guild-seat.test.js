@@ -33,9 +33,10 @@ import { useServer } from './helpers/server.js';
 
 const rules = content.guilds.seat;
 const TOP = seatCostTo(rules.maxLevel, content);
-// The newest place's stronger creatures (balance.monsters.huntCurve,
-// hunt-strength.test.js) aside: these fights test something else.
-const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [] } } };
+// The newest place's stronger creatures (balance.monsters.huntCurve and
+// newestPlace, hunt-strength.test.js and newest-place.test.js) aside:
+// these fights test something else.
+const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [], newestPlace: null } } };
 
 describe('the Siedziba Gildii in the engine', () => {
   test('four buildings, each with its resource and its bonus (616 A, 623)', () => {

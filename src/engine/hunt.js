@@ -748,11 +748,18 @@ export function simulateHunt(
   // The trip's encounters follow its leader (its level and the creatures it
   // has met), the same for everyone.
   const lead = fighters[0].character;
-  // The newest place's creatures, stronger by the leader's level, and those
-  // of a Trudna or a Piekielna wyprawa stronger still, for more XP and
-  // gold, and on a Piekielna for more chests and materials (`drop`).
+  // A trip's players all fight, and the creatures grow for them
+  // (partyStrength in combatant.js), by the highest class level among them
+  // as they set out (fightingClassLevel), so nobody hides behind a lower
+  // leader; a mercenary (`partners`) and the companions are no players.
+  const playerCount = roster ? fighters.length : 1;
+  const classLevel = fightingClassLevel(fighters.map((/** @type {Record<string, any>} */ fighter) => fighter.character));
+  // The newest place's creatures, stronger by the leader's level and by
+  // that class level and those players (newestStrength), and those of a
+  // Trudna or a Piekielna wyprawa stronger still, for more XP and gold,
+  // and on a Piekielna for more chests and materials (`drop`).
   const harder = challengeMode(hard, lead.level, content);
-  const strength = exploreStrength(area, lead.level, content, harder ? hard : false);
+  const strength = exploreStrength(area, lead.level, content, harder ? hard : false, { classLevel, players: playerCount });
   const hardXp = 1 + (harder?.xp ?? 0);
   const hardGold = 1 + (harder?.gold ?? 0);
   const hardDrop = 1 + (harder?.drop ?? 0);
@@ -770,12 +777,6 @@ export function simulateHunt(
   // (the design document: solo +10% XP, duo +5%, a full party no bonus).
   const others = roster ? fighters.length - 1 : partners.length;
   const partyXp = 1 - companions.length * content.settlement.companions.xpCost - others * content.balance.parties.xpCost;
-  // A trip's players all fight, and the creatures grow for them
-  // (partyStrength in combatant.js), by the highest class level among them
-  // as they set out (fightingClassLevel), so nobody hides behind a lower
-  // leader; a mercenary (`partners`) and the companions are no players.
-  const playerCount = roster ? fighters.length : 1;
-  const classLevel = fightingClassLevel(fighters.map((/** @type {Record<string, any>} */ fighter) => fighter.character));
   // Before the trips' roster, the other players fought beside the character
   // as mates, out once fallen; on a trip they fight as the character does.
   const friends = (roster ? [] : partners).map((/** @type {any} */ partner, /** @type {number} */ index) => {
