@@ -264,7 +264,7 @@ describe('Drużyna through the API', () => {
     );
   });
 
-  test('one called back from a trip fights in nobody\'s exploration of it any more', async () => {
+  test('one called back from a trip fights in nobody\'s exploration of it any more, nor walks in their Walka', async () => {
     await player('trzeci', 'Trzeci');
     const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
     await as('lider', 'POST', '/api/party/invite', { name: 'Trzeci' });
@@ -280,6 +280,15 @@ describe('Drużyna through the API', () => {
         ['Lider', ['Lider', 'Druh'], ['Lider', 'Druh']],
       ],
     );
+    // Nor does it walk in the others' Walka scene any more.
+    assert.deepEqual(
+      hunts.map((row) => JSON.parse(row.options).party.looks.map((one) => one.name)),
+      [
+        ['Lider', 'Druh'],
+        ['Lider', 'Druh'],
+      ],
+    );
+    assert.deepEqual((await as('druh', 'GET', '/api/character')).data.character.activity.party.walkers.map((one) => one.name), ['Lider']);
   });
 
   test('a trip\'s fights are the same in every member\'s report; finds, XP and events are each one\'s own', async () => {

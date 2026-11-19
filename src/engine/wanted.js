@@ -12,6 +12,7 @@
 import { monsterCombatant } from './combatant.js';
 import { stackKey } from './crafting.js';
 import { trophyGrades } from './encyclopedia.js';
+import { lateRewards } from './progression.js';
 import { createRng } from './rng.js';
 import { areaOpenFor } from './trial-hall.js';
 
@@ -49,7 +50,8 @@ export function wantedName(poster, content) {
 }
 
 // The bounty for a target in `area`: goldPerLevel × the place's first
-// level, in whole goldSteps, at least one.
+// level, in whole goldSteps, at least one; from the late levels on a part
+// of it (lateRewards, by the place's first level).
 /**
  * @param {Area} area
  * @param {Content} content
@@ -57,7 +59,7 @@ export function wantedName(poster, content) {
  */
 export function wantedGold(area, content) {
   const { goldPerLevel, goldStep } = rulesOf(content);
-  return Math.max(goldStep, Math.round((goldPerLevel * area.minLevel) / goldStep) * goldStep);
+  return Math.max(goldStep, Math.round((goldPerLevel * area.minLevel * lateRewards(area.minLevel, content)) / goldStep) * goldStep);
 }
 
 // A poster: its target, at the level of the place's elite.

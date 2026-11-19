@@ -4,7 +4,7 @@
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {{ fromLevel: number, toLevel: number, fadeLevel: number, levelTimeFactor: number }} MidGame balance.progression.midGame */
-/** @typedef {{ fromLevel: number, toLevel: number, factorFrom: number, factorTo: number }} LateLevels balance.progression.lateLevels */
+/** @typedef {{ level: number, factor: number }[]} LateLevels balance.progression.lateLevels */
 
 // The level length is measured in hours of exploring at that level. The first
 // levels take firstLevelMinutes each (a 5-minute exploration is enough), then
@@ -25,17 +25,36 @@ export function huntingHours(level, content) {
 
 // How many times longer a late level takes (the author, 19.11.2026: „Zwiększ
 // dramatycznie bardzo lvl curve od 250 w górę, bo już w grze ktos ma
-// praktycznie 250”): none before fromLevel, factorFrom on it, evenly more to
-// factorTo on toLevel, and that much after. The class's levels follow, as
-// their XP is the character's curve's (classXpToNext).
+// praktycznie 250”, then „Lvl curve od 100 do 250 też zwiększ, gdzieś tak o
+// połowę tego co zwiększysz w zakresie 250-500”): the points' factors, evenly
+// between two points, none before the first and the last one's after it. The
+// class's levels follow, as their XP is the character's curve's
+// (classXpToNext).
 /**
  * @param {number} level
- * @param {LateLevels | undefined} late
+ * @param {LateLevels | undefined} points
  */
-export function lateSlowdown(level, late) {
-  if (!late || level < late.fromLevel) return 1;
-  const share = Math.min(1, (level - late.fromLevel) / (late.toLevel - late.fromLevel));
-  return late.factorFrom + (late.factorTo - late.factorFrom) * share;
+export function lateSlowdown(level, points) {
+  if (!points || points.length === 0 || level < points[0].level) return 1;
+  const next = points.findIndex((point) => level < point.level);
+  if (next === -1) return points[points.length - 1].factor;
+  const from = points[next - 1];
+  const to = points[next];
+  return from.factor + ((to.factor - from.factor) * (level - from.level)) / (to.level - from.level);
+}
+
+// How much of what it earns a character of `level` gets (the author,
+// 19.11.2026: „Zmniejsz też zdobywane złoto i inne rzeczy od 250ego tak
+// dwukrotnie gdzieś”): `factor` of it from fromLevel on, all of it before
+// (balance.rewards.lateRewards). An exploration's gold, materials, resources,
+// parts and chests with items, and the gold of the other pursuits.
+/**
+ * @param {number} level
+ * @param {Content} content
+ */
+export function lateRewards(level, content) {
+  const late = content.balance.rewards.lateRewards;
+  return late && level >= late.fromLevel ? late.factor : 1;
 }
 
 // How many times longer a level takes for the mid-game: evenly more from
