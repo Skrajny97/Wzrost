@@ -3856,6 +3856,7 @@ Autor: „Trzeba też dodac do gry w karty opcję przelosowania ręki, bo nie ra
 3. **Wszędzie, gdzie gracz gra z rezerwy:** u Szczęsnego i mieszkańców (`POST /api/cards/redraw`), na Arenie (`POST /api/cards/arena/redraw`) i w partiach na żywo (`POST /api/cards/duel/redraw`, `duelRedraw` w `src/engine/card-duel.js`). W partii na żywo każdy gracz ma własne przelosowanie przed swoim pierwszym ruchem. Kto odpowiada w pierwszej rundzie, może przelosować też wtedy, gdy rywal jeszcze wykłada karty (brakujący szczegół). Rywal widzi tylko liczbę kart w rezerwie, a ta się nie zmienia. Czas na ruch biegnie dalej, a ruch zrobiony przez grę za spóźnionego gracza jest jego pierwszym ruchem.
 4. **Partie sprzed tej zmiany (brakujący szczegół).** Partia zapisana wcześniej nie ma znaku przelosowania, więc jeśli jest jeszcze w pierwszej rundzie przed ruchem gracza, można w niej przelosować rezerwę, a później już nie.
 5. Zasada jest też w „Jak to działa?” przy kartach. Po angielsku przycisk to „Redraw reserve”. Przy włączonych animacjach nowe karty przylatują z talii i się odwracają, tak jak karty dobierane po rundzie.
+6. **Zakładki czatu u moderatora:** autor potwierdził, że moderator widzi już obie zakładki, „Dowództwo” i „Administracja” (19.11.2026: „tak już działa”).
 
 ## Wersja 0.4.47 (19.11.2026): Nawia w grze
 
