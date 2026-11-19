@@ -316,9 +316,21 @@
     "texts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["intro", "starterOffer", "starterTaken", "rules", "win", "loss", "draw", "drop", "lower", "guild", "trial", "packName", "packDrop", "packGuild", "packTrial", "pack", "live", "collection"],
+      "required": ["intro", "starterOffer", "starterTaken", "rules", "win", "loss", "draw", "drop", "lower", "guild", "trial", "packName", "packDrop", "packGuild", "packTrial", "pack", "redraw", "live", "collection"],
       "properties": {
         "intro": { "type": "string", "minLength": 1 },
+        "redraw": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Przelosowanie rezerwy, raz na partię przed pierwszym ruchem gracza (autor, 19.11.2026): przycisk, zdanie pod nim i odmowy, gdy przelosowanie jest już użyte (used) albo za późno (late).",
+          "required": ["button", "note", "used", "late"],
+          "properties": {
+            "button": { "type": "string", "minLength": 1 },
+            "note": { "type": "string", "minLength": 1 },
+            "used": { "type": "string", "minLength": 1 },
+            "late": { "type": "string", "minLength": 1 }
+          }
+        },
         "starterOffer": { "type": "string", "minLength": 1 },
         "starterTaken": { "type": "string", "minLength": 1 },
         "pack": {

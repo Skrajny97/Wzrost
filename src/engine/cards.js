@@ -28,7 +28,9 @@
 // (both at once: a draw); after roundCap rounds the side with more cards
 // left wins, then the one with more Życie, and else it is a draw. Every
 // number is the data's; hits are not random, so the page can show what a
-// round will do before "Walcz".
+// round will do before "Walcz". Once a match, before its first turn, the
+// player may draw its whole reserve anew (redrawReserve; the author,
+// 19.11.2026).
 //
 // Cards come from the creatures beaten on explorations and in the Labirynt,
 // each its own (cardDrop), and from more sources (902 B, 903): a won fight
@@ -56,7 +58,7 @@ import { say } from './text.js';
 /** @typedef {{ classId: string, stage: number, used: boolean }} Hero A side's hero: its class, its evolution's stage (0 for none) and whether its skill is used. */
 /** @typedef {{ card: number, target?: number, type?: string, swap?: number }} SkillUse A hero's skill as a turn uses it: the player's card it works on, and the rival's line aimed at (aim), the new type (shift) or the reserve's card swapped in (swap). */
 /** @typedef {SkillUse & { kind: string }} RivalPlan The rival's hero's skill in this round (rivalSkill, 900 A): its kind, the rival's card it works on, and the player's line aimed at (aim), the new type (shift) or the reserve's card swapped in (swap). */
-/** @typedef {{ cards: MatchCard[], deck: number[], hand: number[], lines: (number | null)[], out: number[], hero: Hero | null, smart: number, plan?: RivalPlan, effects?: EffectCard[], effectPlan?: EffectUse | null }} Side A side of a match: its cards, those still in its deck (in draw order), in its reserve, on its three lines, and beaten; the rival's hero's skill of this round; its effect cards and the rival's effect card of this round. */
+/** @typedef {{ cards: MatchCard[], deck: number[], hand: number[], lines: (number | null)[], out: number[], hero: Hero | null, smart: number, plan?: RivalPlan, effects?: EffectCard[], effectPlan?: EffectUse | null, redrawn?: true }} Side A side of a match: its cards, those still in its deck (in draw order), in its reserve, on its three lines, and beaten; the rival's hero's skill of this round; its effect cards and the rival's effect card of this round; whether its reserve was drawn anew this match (redrawReserve). */
 /** @typedef {{ round: number, lines: (number | null)[], skill?: SkillUse | null, effect?: EffectUse | null }} Turn The player's turn: the round it is for, its cards on its three lines after it, its hero's skill and its effect card. */
 /** @typedef {{ side: Seat, line: number, key: number, target: { line: number, key: number }, damage: number, advantage: boolean, boosted: boolean, missed?: true }} Hit A card's blow in a round (`missed`: lost in Mgła). */
 /** @typedef {{ round: number, hits: Hit[], beaten: { me: number[], foe: number[] }, revived: number | null, skill: (SkillUse & { kind: string }) | null, placed: number[], rivalSkill?: RivalPlan, rivalRevived?: number | null, effect?: EffectLog | null, rivalEffect?: EffectLog | null }} RoundLog What a round did: its blows, the cards beaten, the card a Kleryk brought back, the skill used and the rival's lines filled for the next round; the rival's hero's skill used in it and the card its Wskrzeszenie brought back. */
@@ -1466,6 +1468,57 @@ export function surrenderMatch(current) {
   return match;
 }
 
+// --- The reserve drawn anew (the author, 19.11.2026) -------------------------
+
+// Why the player cannot draw its reserve anew now, or null (the author,
+// 19.11.2026: „Trzeba też dodac do gry w karty opcję przelosowania ręki, bo
+// nie raz trafią się 4 jednostki tej samej kategorii i łatwo przegrać z
+// powodu felernego RNG”): the match still on, its first round, no card of
+// the player's laid on a line yet (its first turn not played), and once a
+// match. A match kept from before has no mark of it (`redrawn`), so it may
+// be drawn anew while it still stands so.
+/**
+ * @param {Match} match
+ * @param {Content} content
+ * @returns {{ code: string, message: string, status?: number } | null}
+ */
+export function redrawBlock(match, content) {
+  const texts = cardRules(content).texts.redraw;
+  if (match.result) return { code: 'match_over', message: 'Ta partia już się skończyła.', status: 409 };
+  if (match.me.redrawn) return { code: 'redraw_used', message: texts.used, status: 409 };
+  if (match.round !== 1 || match.me.lines.some((key) => key !== null)) return { code: 'redraw_late', message: texts.late, status: 409 };
+  return null;
+}
+
+// A side's reserve drawn anew, in place: its cards to the bottom of its
+// deck in their order, and a whole reserve drawn from the top (refill). In
+// the first round the deck holds deckSize less a reserve, more than a
+// reserve, so every card drawn is another one; nothing random.
+/**
+ * @param {Side} side
+ * @param {Content} content
+ */
+export function redrawSide(side, content) {
+  side.deck = [...side.deck, ...side.hand];
+  side.hand = [];
+  refill(side, content);
+  side.redrawn = true;
+}
+
+// The player's reserve drawn anew (checked by redrawBlock first). The
+// rival laid its cards first and never sees the reserve, so it plays on as
+// it would have.
+/**
+ * @param {Match} current
+ * @param {Content} content
+ * @returns {Match}
+ */
+export function redrawReserve(current, content) {
+  const match = clone(current);
+  redrawSide(match.me, content);
+  return match;
+}
+
 // A turn for the player's side chosen by the game (the simulations, and a
 // live match's move missed, card-duel.js; the Arena's absent players are
 // played as Szczęsny, rivalSetup): its reserve's cards on its empty lines,
@@ -1521,8 +1574,9 @@ export function autoTurn(match, content) {
 
 // The match as the page sees it: the round, each side's lines with their
 // cards, the player's reserve and the number of the rival's, the decks'
-// sizes, the cards beaten, the heroes, the last round's account and the
-// result. Never the seed, the decks' order nor the rival's reserve.
+// sizes, the cards beaten, the heroes, whether the player may draw its
+// reserve anew now (redrawBlock), the last round's account and the result.
+// Never the seed, the decks' order nor the rival's reserve.
 /**
  * @param {Match} match
  * @param {Content} content
@@ -1562,7 +1616,16 @@ export function matchView(match, content) {
     cap: cardRules(content).roundCap,
     result: match.result,
     end: match.end,
-    me: { lines: lines(match.me), hand: match.me.hand.map((key) => card(match.me.cards[key])), deck: match.me.deck.length, out: match.me.out.length, left: cardsLeft(match.me), hero: heroOf(match.me.hero), effects: effects(match.me) },
+    me: {
+      lines: lines(match.me),
+      hand: match.me.hand.map((key) => card(match.me.cards[key])),
+      deck: match.me.deck.length,
+      out: match.me.out.length,
+      left: cardsLeft(match.me),
+      hero: heroOf(match.me.hero),
+      effects: effects(match.me),
+      redraw: redrawBlock(match, content) === null,
+    },
     // The rival's hero's skill of this round (900 A), shown before the
     // player answers it.
     // Its effect cards and its effect card of this round (977.4 A), shown

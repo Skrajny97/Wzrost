@@ -7,8 +7,9 @@
 // zgarniesz podwójną stawkę, the tier's reward of the day once a day and its
 // card at the first win, a draw's stake back, a surrender lost; the cards
 // the creatures of an exploration leave in the report and the collection;
-// the saved decks (938), one played with a tap; the cards gone with the
-// character and the account; and the cards of the
+// the saved decks (938), one played with a tap; the reserve drawn anew once
+// a match before the first turn; the cards gone with the character and the
+// account; and the cards of the
 // sources of 903: a profession's work, a Próba Gildii finished, an attack
 // on the Bestia and the creatures beaten in the Labirynt.
 
@@ -542,6 +543,46 @@ describe('Talia Systemu through the API', () => {
       const twice = await turn({ ...fill(next), skill: { card: fill(next).lines.find((key) => key !== null) } });
       assert.equal(twice.data.error.code, 'skill_used');
     }
+  });
+
+  // The author, 19.11.2026: „opcję przelosowania ręki, bo nie raz trafią się
+  // 4 jednostki tej samej kategorii”.
+  test('the reserve drawn anew once a match, before the first turn: the next cards of the deck, Szczęsny\'s as they were, two taps one redraw, then refused', async () => {
+    const redraw = () => call('POST', '/api/cards/redraw', { cookie });
+    await call('POST', '/api/cards/starter', { cookie });
+    assert.deepEqual([(await redraw()).status, (await redraw()).data.error.code], [409, 'no_match']);
+    const started = await start(1, false);
+    const match = started.data.cards.match;
+    assert.equal(match.me.redraw, true);
+    assert.deepEqual(started.data.cards.texts.redraw, rules.texts.redraw);
+    const before = await state();
+    // Two taps at once: one redraw.
+    const [one, two] = await Promise.all([redraw(), redraw()]);
+    assert.deepEqual([one.status, two.status].sort(), [200, 409]);
+    const after = await state();
+    assert.deepEqual(after.me.hand, before.me.deck.slice(0, rules.hand));
+    assert.deepEqual(after.me.deck, [...before.me.deck.slice(rules.hand), ...before.me.hand]);
+    assert.deepEqual([after.foe, after.round, after.seed], [before.foe, before.round, before.seed]);
+    const view = (one.status === 200 ? one : two).data.cards.match;
+    assert.equal(view.me.redraw, false);
+    assert.deepEqual(view.me.hand.map((card) => card.key), after.me.hand);
+    assert.deepEqual(view.foe.lines, match.foe.lines);
+    assert.ok(!JSON.stringify(view).includes(after.seed));
+    // Once a match.
+    const again = await redraw();
+    assert.deepEqual([again.status, again.data.error.code, again.data.error.message], [409, 'redraw_used', rules.texts.redraw.used]);
+    // The turn from the new reserve; the old one's cards are not in it.
+    assert.equal((await turn({ round: 1, lines: before.me.hand.slice(0, 3) })).data.error.code, 'not_in_hand');
+    assert.equal((await turn(fill(view))).status, 200);
+    // Another match: its own redraw, and too late after the first turn.
+    await call('POST', '/api/cards/surrender', { cookie });
+    const fresh = (await start(1, false)).data.cards.match;
+    assert.equal(fresh.me.redraw, true);
+    const turned = await turn(fill(fresh));
+    assert.equal(turned.status, 200);
+    assert.equal(turned.data.cards.match.me.redraw, false);
+    const late = await redraw();
+    assert.deepEqual([late.status, late.data.error.code, late.data.error.message], [409, 'redraw_late', rules.texts.redraw.late]);
   });
 
   test('the creatures of an exploration leave cards: in the report, the Dziennik and the collection', async () => {

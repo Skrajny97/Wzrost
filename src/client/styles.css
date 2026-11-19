@@ -14824,7 +14824,8 @@ button.tcard-slot {
 .cards-table-count,
 .cards-line-name,
 .cards-reserve .section-title,
-.cards-reserve .cards-hint {
+.cards-reserve .cards-hint,
+.cards-reserve .cards-redraw-note {
   color: #ece6d6;
   text-shadow:
     0 1px 2px #000,
@@ -15019,6 +15020,26 @@ button.tcard-slot {
 .cards-types .button {
   flex: 1;
   gap: 6px;
+}
+
+/* "Przelosuj rezerwę" under the reserve while the player may draw it anew
+   (once a match, before its first move; 19.11.2026): the die's button of
+   "Losuj innych", the rule beside it, or under it where the row is
+   narrow. */
+.cards-redraw {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-top: 4px;
+}
+
+.cards-redraw-note {
+  flex: 1 1 180px;
+  min-width: 0;
+  margin: 0;
+  font-size: 13px;
+  overflow-wrap: anywhere;
 }
 
 /* The hero's card and its skill. */

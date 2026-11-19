@@ -3,7 +3,8 @@
 // „Potrzebujemy też … animacje w grze w karty”).
 //   A card laid flies in a low arc from the reserve to its line and settles
 //     there, or back; the cards dealt to the reserve and laid by Szczęsny fly
-//     face down from their pile and turn face up in their place.
+//     face down from their pile and turn face up in their place, and so do
+//     the reserve's when it is drawn anew.
 //   After "Walcz" the round plays on the table as it stood, line by line,
 //     the player's card first in each: the two cards of a blow come into
 //     focus (they grow a little, the rest of the cards dims, the table's
@@ -1115,6 +1116,22 @@ export function createCardsFx(holder) {
           current.animate(chip, [{ opacity: 0, transform: 'translateX(-50%) translateY(4px)' }, { opacity: 1, transform: 'translateX(-50%) translateY(0px)' }], { duration: 200, easing: EASE_OUT });
         }
         await current.wait(120);
+      })();
+    },
+
+    // The reserve drawn anew (once a match, before the first move): its cards
+    // come from the deck's pile and turn face up, as a round's new ones do
+    // (enter); the rest of the table stays as it is.
+    redealt(current) {
+      const cards = [...holder.querySelectorAll('.cards-reserve .tcard')];
+      if (cards.length === 0) return Promise.resolve();
+      for (const card of cards) card.classList.add('cfx-hidden');
+      current.later(() => cards.forEach((card) => card.classList.remove('cfx-hidden')));
+      return (async () => {
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        const pile = holder.querySelector('.cards-table-count--me .cards-backs') ?? holder.querySelector('.cards-table-count--me');
+        const from = pile?.getBoundingClientRect() ?? null;
+        await Promise.all(cards.map((card, index) => dealCard(current, card, from, { delay: 60 + index * PACE.dealGap })));
       })();
     },
 

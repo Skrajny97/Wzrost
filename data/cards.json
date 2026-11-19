@@ -542,7 +542,7 @@
     "starterTaken": "Szczęsny przesuwa po stole talię dwunastu kart. „Twoja. Graj nią śmiało.”",
     "rules": [
       "Talia to 12 kart. Każda karta to stwór z Bestiariusza z Atakiem, Życiem i typem: Siłą, Zręcznością albo Magią. Siła bije Zręczność, Zręczność bije Magię, a Magia bije Siłę: karta zadaje o połowę więcej karcie typu, który bije.",
-      "Na stole są trzy linie, jak w szyku: przód, środek i tył. Co rundę Szczęsny pierwszy dokłada karty na swoje puste linie. Potem Ty dokładasz karty z rezerwy (4 karty dobierane z talii) na swoje puste linie. Karta stoi na swojej linii, dopóki nie zostanie zbita.",
+      "Na stole są trzy linie, jak w szyku: przód, środek i tył. Co rundę Szczęsny pierwszy dokłada karty na swoje puste linie. Potem Ty dokładasz karty z rezerwy (4 karty dobierane z talii) na swoje puste linie. Karta stoi na swojej linii, dopóki nie zostanie zbita. Raz na partię, przed pierwszym ruchem, możesz przelosować rezerwę: jej karty wracają na spód talii, a Ty dobierasz nowe.",
       "Po „Walcz” każda karta bije kartę naprzeciw, wszystkie naraz. Gdy naprzeciw nie ma karty, bije pierwszą kartę rywala od przodu. Karta, której skończy się Życie, jest zbita.",
       "Wygrywa ten, kto zbije wszystkie karty rywala. Po 20 rundach wygrywa ten, komu zostało więcej kart, a potem więcej Życia. Przy równości jest remis.",
       "Karta bohatera to umiejętność Twojej klasy, raz na partię. Ewolucja klasy ją wzmacnia.",
@@ -573,6 +573,12 @@
       "noDiscount": "Z lepszą relacją ze Szczęsnym zapłacisz mniej, nawet o {most}%.",
       "openedFound": "Rozrywasz pakiet i rozkładasz karty na stole.",
       "found": "Pakiety z wypraw i innych aktywności do otwarcia: {count}."
+    },
+    "redraw": {
+      "button": "Przelosuj rezerwę",
+      "note": "Raz na partię, przed pierwszym ruchem: Twoja rezerwa wraca na spód talii, a Ty dobierasz nowe karty.",
+      "used": "Rezerwę przelosujesz tylko raz na partię.",
+      "late": "Rezerwę przelosujesz tylko przed swoim pierwszym ruchem."
     },
     "live": {
       "challengeTitle": "Partia kart z: {name}",

@@ -10,7 +10,8 @@
 // moved by the stakes fixed at the start, the defender's notice new once,
 // a match ended after its week froze refused, "Losuj innych", the week's
 // table frozen once with its reward claimed once, the season, a rival
-// removed mid-match, and nothing of it where the cards are off.
+// removed mid-match, the reserve drawn anew once a match before the first
+// turn, and nothing of it where the cards are off.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -324,6 +325,7 @@ describe('the Karty of the Arena through the API', () => {
   const surrender = (who) => call('POST', '/api/cards/arena/surrender', { cookie: who.cookie });
   const turn = (who, body) => call('POST', '/api/cards/arena/turn', { cookie: who.cookie, body });
   const reroll = (who) => call('POST', '/api/cards/arena/reroll', { cookie: who.cookie });
+  const redraw = (who) => call('POST', '/api/cards/arena/redraw', { cookie: who.cookie });
   const ratingOf = async (who) => (await first('SELECT rating FROM card_arena_ratings WHERE character_id = ?', who.id))?.rating;
   const stateOf = async (who) => JSON.parse((await first('SELECT state FROM card_arena_matches WHERE character_id = ?', who.id)).state);
   const setState = (who, state) => run('UPDATE card_arena_matches SET state = ? WHERE character_id = ?', JSON.stringify(state), who.id);
@@ -440,6 +442,31 @@ describe('the Karty of the Arena through the API', () => {
     assert.deepEqual([one.status, two.status].sort(), [200, 409]);
     const after = (one.status === 200 ? one : two).data;
     assert.ok(after.end || after.arena.match.round === 2);
+  });
+
+  // As at the Salon's table (the author, 19.11.2026).
+  test("the reserve drawn anew once a match, before the first turn: the next cards of the deck, the rival's cards as they were", async () => {
+    assert.equal((await redraw(ala)).data.error.code, 'no_match');
+    await look(ala);
+    const started = await play(ala, bolek.id);
+    assert.equal(started.data.arena.match.me.redraw, true);
+    assert.equal(started.data.arena.texts.redraw.button, content.cards.texts.redraw.button);
+    const before = await stateOf(ala);
+    const redrawn = await redraw(ala);
+    assert.equal(redrawn.status, 200, JSON.stringify(redrawn.data).slice(0, 300));
+    const after = await stateOf(ala);
+    assert.deepEqual(after.me.hand, before.me.deck.slice(0, content.cards.hand));
+    assert.deepEqual(after.me.deck, [...before.me.deck.slice(content.cards.hand), ...before.me.hand]);
+    assert.deepEqual(after.foe, before.foe);
+    const match = redrawn.data.arena.match;
+    assert.equal(match.me.redraw, false);
+    assert.deepEqual(match.me.hand.map((card) => card.key), after.me.hand);
+    assert.deepEqual(match.foe.lines, started.data.arena.match.foe.lines);
+    assert.equal((await redraw(ala)).data.error.code, 'redraw_used');
+    // A turn from the new reserve.
+    const played = await turn(ala, { round: 1, lines: after.me.hand.slice(0, 3) });
+    assert.equal(played.status, 200, JSON.stringify(played.data).slice(0, 300));
+    assert.equal((await redraw(ala)).data.error.code, 'redraw_used');
   });
 
   test('two taps on "Graj" start one match, one of the day\'s five; then none until midnight', async () => {

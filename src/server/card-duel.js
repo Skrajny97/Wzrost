@@ -24,11 +24,12 @@
 // wins takes both stakes but the System's cut; a draw gives each its own
 // back. One challenge or match a character at a time; a challenge turned
 // down, expired or withdrawn goes to the same player again after
-// live.repeatSeconds, and to anyone else at once.
+// live.repeatSeconds, and to anyone else at once. Each player may draw its
+// reserve anew once a match, before its first move (duelRedrawReserve).
 // While a character's match runs, Szczęsny's waits (withoutDuel).
 
 import { cardLevel, casinoDay, classNameOf } from '../engine/index.js';
-import { duelCatchUp, duelMove, duelPayout, duelPot, duelStakes, duelTurnBlock, duelView, liveRules, newDuel, surrenderDuel } from '../engine/card-duel.js';
+import { duelCatchUp, duelMove, duelPayout, duelPot, duelRedraw, duelRedrawBlock, duelStakes, duelTurnBlock, duelView, liveRules, newDuel, surrenderDuel } from '../engine/card-duel.js';
 import { assertion, atomically } from './atomic.js';
 import { cardCollection, cardsHere, deckOf, heroOf } from './cards.js';
 import { characterView, loadPlayer } from './characters.js';
@@ -240,7 +241,8 @@ export async function duelNews(db, characterId, now) {
 async function tableData(db, characterId, now) {
   const data = content().cards;
   return {
-    texts: data.texts.live,
+    // With "Przelosuj rezerwę" and its line, as at Szczęsny's table.
+    texts: { ...data.texts.live, redraw: data.texts.redraw },
     types: data.types,
     lines: data.lines,
     typeBonus: data.typeBonus,
@@ -503,6 +505,23 @@ export async function duelTurn(context) {
   const next = duelMove(game, seat, turn, now, content());
   await atomically(db, saveStatements(db, found, next, now), duelChanged);
   return respond(db, await rowById(db, found.id), row.id, now, next.result && found.stake > 0 ? await characterNow(db, session, now) : {});
+}
+
+// POST /api/cards/duel/redraw { id }: the character's reserve drawn anew in
+// its match (duelRedrawBlock, duelRedraw), once a match before its first
+// move, as at Szczęsny's table; its move need not be due. Saved only over
+// the match as read (its version), so two taps draw it anew once.
+export async function duelRedrawReserve(context) {
+  const { row, db } = await requireDuelist(context);
+  const body = await readJson(context.request);
+  const now = context.now;
+  const found = await ownMatch(db, row, body?.id, now);
+  const seat = found.from_id === row.id ? 'me' : 'foe';
+  const game = JSON.parse(found.game);
+  const block = duelRedrawBlock(game, seat, content());
+  if (block) throw new ApiError(block.status ?? 400, block.code, block.message);
+  await atomically(db, saveStatements(db, found, duelRedraw(game, seat, content()), now), duelChanged);
+  return respond(db, await rowById(db, found.id), row.id, now);
 }
 
 // POST /api/cards/duel/surrender { id }: the character gives up its match,

@@ -152,7 +152,7 @@
     "starterTaken": "Szczęsny slides a deck of twelve cards across the table. \"Yours. Play it boldly.\"",
     "rules": [
       "A deck is 12 cards. Each card is a creature of the Bestiary with Attack, Life and a type: Strength, Dexterity or Magic. Strength beats Dexterity, Dexterity beats Magic and Magic beats Strength: a card deals half again as much to a card of the type it beats.",
-      "The table has three lines, as in a formation: front, middle and back. Each round Szczęsny first puts cards on his empty lines. Then you put cards from your reserve (4 cards drawn from your deck) on your empty lines. A card stays on its line until it is beaten.",
+      "The table has three lines, as in a formation: front, middle and back. Each round Szczęsny first puts cards on his empty lines. Then you put cards from your reserve (4 cards drawn from your deck) on your empty lines. A card stays on its line until it is beaten. Once a match, before your first move, you can redraw your reserve: its cards go to the bottom of your deck and you draw new ones.",
       "After \"Fight\" every card hits the card opposite, all at once. With no card opposite, it hits the rival's first card from the front. A card left with no Life is beaten.",
       "Whoever beats all of the rival's cards wins. After 20 rounds the one with more cards left wins, then the one with more Life. If they are equal, it is a draw.",
       "The hero card is your class's skill, once a match. Your class's evolution strengthens it.",
@@ -183,6 +183,12 @@
       "noDiscount": "With a better relation with Szczęsny you pay less, up to {most}%.",
       "openedFound": "You tear the pack open and lay the cards on the table.",
       "found": "Packs from explorations and other activities to open: {count}."
+    },
+    "redraw": {
+      "button": "Redraw reserve",
+      "note": "Once a match, before your first move: your reserve goes to the bottom of your deck and you draw new cards.",
+      "used": "You can redraw your reserve only once a match.",
+      "late": "You can redraw your reserve only before your first move."
     },
     "live": {
       "challengeTitle": "A card match with: {name}",
