@@ -337,6 +337,7 @@
       "additionalProperties": false,
       "required": [
         "bonusPerLevel",
+        "bonusPerStar",
         "minGainPerLevel",
         "chances",
         "breakFrom",
@@ -353,6 +354,11 @@
           "type": "number",
           "exclusiveMinimum": 0,
           "description": "O ile każdy poziom ulepszenia podnosi liczby przedmiotu (obrażenia, pancerz, cechy), jako ułamek wartości bazowej."
+        },
+        "bonusPerStar": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "O ile każda gwiazdka od Zaklinaczki (settlement.json, ascension) podnosi liczby przedmiotu ulepszonego do +10, jako ułamek wartości bazowej, obok ulepszeń Kowadła (1180 B: każda gwiazdka +10% wartości przedmiotu). Każda gwiazdka dodaje też co najmniej minGainPerLevel, jak poziom ulepszenia."
         },
         "minGainPerLevel": {
           "type": "integer",

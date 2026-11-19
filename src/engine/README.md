@@ -33,6 +33,7 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 | `tannery.js` | Garbarnia w Osadzie: skóry, które garbarz skupuje i sprzedaje |
 | `resident-gifts.js` | podarunki dla mieszkańców Osady (raz dziennie to, co lubią, albo złoto, za relację; rzadsza sztuka daje więcej) i cotygodniowy podarek od mieszkańca z relacją Przyjaciel |
 | `forge.js` | Kuźnia w Osadzie: Zwoje ochronne i przekucie przedmiotu na wyższą rzadkość |
+| `ascension.js` | Gwiazdki u Zaklinaczki w Osadzie: do pięciu gwiazdek w przedmiocie na +10, od relacji Zaufany, każda próba z własną małą szansą, za złoto i części; nieudana próba zabiera tylko zapłatę (co gwiazdka daje liczbom przedmiotu i ile kosztuje próba, liczy `items.js`) |
 | `parties.js` | Drużyna: rozpiętość poziomów klas i kto zostaje w drużynie, gdy poziomy się rozjadą |
 | `towers.js` | Wieże Systemu: podwaliny, jeszcze poza grą |
 | `labyrinth.js` | Labirynt Systemu: mapa dnia (ta sama dla wszystkich), komnaty i ich drogi, stwory z krain do poziomu postaci, siła poziomów (Piekielny dwa razy mocniejszy niż 3.), walka z HP przenoszonym między komnatami, źródło, ołtarz, kupiec, błogosławieństwa w walkach i nagrody |

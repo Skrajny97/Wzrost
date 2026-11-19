@@ -2398,6 +2398,14 @@ a.segmented-option {
   line-height: 14px;
 }
 
+/* The Zaklinaczka's stars of an item at +10 beside its upgrade, one gold
+   star and their count ("+10★2"; ascension, 1180 B). */
+.slot-stars {
+  margin-left: 1px;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
 .eye-toggle {
   position: absolute;
   top: 10px;
@@ -13724,6 +13732,83 @@ button.farm-plot {
   opacity: 0.75;
 }
 
+/* The Zaklinaczka's "Gwiazdki" (ascension, 1180 B–1184 A): each item at +10
+   with its stars, the next one's chance and price and "Spróbuj", one under
+   another; the result of a try in its sheet. */
+.stars-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stars-title-mark {
+  color: var(--gold);
+  font-size: 22px;
+  line-height: 1;
+  text-shadow: 0 0 8px rgba(217, 180, 90, 0.55);
+}
+
+.stars-card > p {
+  margin: 0;
+}
+
+.stars-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stars-item {
+  display: grid;
+  gap: 8px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.stars-item:last-child {
+  padding-bottom: 0;
+}
+
+.stars-item-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.stars-item-head > .chip {
+  margin-left: auto;
+}
+
+.stars-next,
+.stars-again {
+  margin: 0;
+}
+
+.stars-next {
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.stars-result .stars-row {
+  justify-self: start;
+}
+
+.stars-result .sheet-text {
+  margin: 0;
+}
+
+.settlement-result-title.stars-result-failed {
+  color: var(--text-muted);
+}
+
+/* A number before the star, beside it with the star in green. */
+.stars-gain-before {
+  color: var(--text-muted);
+}
+
 /* "Testuj Osadę" on the test version (app.js): one button per standing. */
 .settlement-test-standings {
   display: flex;
@@ -21038,6 +21123,87 @@ a.social-button {
   margin-left: 4px;
   color: var(--gold);
   vertical-align: -2px;
+}
+
+/* The Zaklinaczka's stars after an item's name and upgrade ("+10 ★★",
+   1180 B), in gold whatever the rarity's colour of the name. */
+.item-stars {
+  color: var(--gold);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 6px rgba(217, 180, 90, 0.45);
+  white-space: nowrap;
+}
+
+/* All the stars an item may take in a row: those it has in gold, the rest
+   dim; on the item card beside what they add. */
+.stars-row {
+  display: inline-flex;
+  flex: none;
+  gap: 1px;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.stars-row-star {
+  color: rgba(231, 220, 194, 0.22);
+}
+
+.stars-row-star--lit {
+  color: var(--gold);
+  text-shadow: 0 0 6px rgba(217, 180, 90, 0.5);
+}
+
+/* The star just set, in the try's result: it flares up once and keeps a
+   brighter glow than the others. */
+.stars-row-star--new {
+  color: #f6dc8c;
+  text-shadow:
+    0 0 8px rgba(255, 228, 140, 0.9),
+    0 0 16px rgba(217, 180, 90, 0.6);
+  animation: star-set 1.1s ease-out 1 both;
+}
+
+@keyframes star-set {
+  0% {
+    color: #fff4c9;
+    text-shadow: 0 0 2px #fff4c9;
+    transform: scale(0.3);
+  }
+  45% {
+    color: #fff4c9;
+    text-shadow:
+      0 0 14px rgba(255, 228, 140, 0.95),
+      0 0 26px rgba(217, 180, 90, 0.8);
+    transform: scale(1.45);
+  }
+  100% {
+    color: #f6dc8c;
+    text-shadow:
+      0 0 8px rgba(255, 228, 140, 0.9),
+      0 0 16px rgba(217, 180, 90, 0.6);
+    transform: scale(1);
+  }
+}
+
+.calm .stars-row-star--new {
+  animation: none;
+}
+
+.stars-row--large {
+  gap: 3px;
+  font-size: 24px;
+}
+
+.stars-row--large .stars-row-star {
+  display: inline-block;
+}
+
+.item-stars-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
 }
 
 .favorite-row {

@@ -290,6 +290,7 @@ const offeredItem = (item) => {
     slotName: view.slotName,
     level: view.level,
     upgrade: view.upgrade,
+    ...(view.stars ? { stars: view.stars } : {}),
     rarity: view.rarity,
     rarityName: view.rarityName,
     color: view.color,
