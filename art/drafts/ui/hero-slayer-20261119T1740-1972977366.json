@@ -1,0 +1,14 @@
+{
+  "id": "hero-slayer",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a horned beast skull with a bearded battle axe crossed behind it, bone white with dark shading, the symbol alone, no background, single inventory item icon, bold clean outline",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023646848051706953
+  },
+  "images": 1
+}
