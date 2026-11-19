@@ -692,12 +692,15 @@ function settingOut(one, week, area, id, content) {
 // same by challenge.hell, whose `drop` raises the chance of a chest among
 // the finds and the materials the creatures leave too (challengeMode in
 // combatant.js); the late levels' part (lateRewards) still comes on top
-// of both. `week`: the week of the year the exploration set out in
-// (weeks.js), kept with it, or null: its share more (or less) of the fights'
-// XP and gold, of the chance of a chest among the finds and of a champion's
-// chest, of the materials the creatures leave, and of the players' stats in
-// the fights; on a Drużyna's trip every member's is the same, as they set
-// out at once. `cards`: Talia Systemu's cards (cards.js), where the game has
+// of both. On a Drużyna's trip (since 19.11.2026) the trip's, the same in
+// every member's: its creatures by the leader's level, as its encounters,
+// and the bonuses on each member's own XP and loot. `week`: the week of
+// the year the exploration set out in (weeks.js), kept with it, or null:
+// its share more (or less) of the fights' XP and gold, of the chance of a
+// chest among the finds and of a champion's chest, of the materials the
+// creatures leave, and of the players' stats in the fights; on a Drużyna's
+// trip every member's is the same, as they set out at once. `cards`:
+// Talia Systemu's cards (cards.js), where the game has
 // it on (the server's CARDS): { maxed: the creatures whose card the
 // character has at its top level, owned: those whose card it has at all,
 // xp and gold: the collection's shares more of the XP and gold

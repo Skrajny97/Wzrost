@@ -717,8 +717,10 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
               seekRare: seekRareOn(),
               trackQuests: trackQuestsOn(),
               trackUnknown: trackUnknownOn(),
-              ...(!withParty && character.hardHunt && hardHuntOn() && { hard: true }),
-              ...(!withParty && character.hellHunt && hellHuntOn() && { hell: true }),
+              // The Trudna or the Piekielna as the boxes are kept, with the
+              // Drużyna too (parties.js).
+              ...(character.hardHunt && hardHuntOn() && { hard: true }),
+              ...(character.hellHunt && hellHuntOn() && { hell: true }),
             });
             // Stayed in the Drużyna when asked (1178 B, party-gate.js).
             if (answer === null) return;

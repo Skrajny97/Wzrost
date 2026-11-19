@@ -412,6 +412,8 @@ export function mountCombat(container, { params, navigate }) {
 
   // A Trudna wyprawa for the threat (629 A): "&hard=1" while its box is
   // ticked, where the character has it; a Piekielna's "&hell=1" the same.
+  // So with "Z drużyną" ticked too, as the party's trip goes in it
+  // (parties.js); the threat is still the character's alone (926 B).
   function hardQuery() {
     if (state.character?.hellHunt && hellHuntOn()) return '&hell=1';
     return state.character?.hardHunt && hardHuntOn() ? '&hard=1' : '';
@@ -956,7 +958,10 @@ export function mountCombat(container, { params, navigate }) {
     });
     showUnknownNote();
     // The Trudna wyprawa (629 A), from the level the server opens it at:
-    // stronger creatures for more XP and gold, on a plain "Wyrusz" only.
+    // stronger creatures for more XP and gold, on "Wyrusz" alone or with
+    // the Drużyna (the author, 19.11.2026: „Trudne i Piekielne wyprawy zrób
+    // tak by można je bylo robić z drużyną”), not on a Szybkie or a
+    // Błyskawiczne polowanie.
     const hardRules = !first && character.hardHunt;
     const hardOn = () => Boolean(hardRules) && hardHuntOn();
     const times = (value) => `×${decimal(String(value))}`;
@@ -983,7 +988,7 @@ export function mountCombat(container, { params, navigate }) {
         h('label', { class: 'avoid-rare', for: 'hard-hunt' }, hardBox, h('span', { text: t('Trudna wyprawa') })),
         h('p', {
           class: 'muted track-quests-note',
-          text: t('Stwory: obrażenia {damage}, HP {hp}. Nagroda: +{xp}% XP i +{gold}% złota. Nie na Szybkim i Błyskawicznym polowaniu ani z drużyną.', {
+          text: t('Stwory: obrażenia {damage}, HP {hp}. Nagroda: +{xp}% XP i +{gold}% złota. Nie na Szybkim i Błyskawicznym polowaniu.', {
             damage: times(hardRules.damage),
             hp: times(hardRules.hp),
             xp: Math.round(hardRules.xp * 100),
@@ -1018,7 +1023,7 @@ export function mountCombat(container, { params, navigate }) {
         h('label', { class: 'avoid-rare', for: 'hell-hunt' }, hellBox, h('span', { text: t('Piekielna wyprawa') })),
         h('p', {
           class: 'muted track-quests-note',
-          text: t('Stwory: obrażenia {damage}, HP {hp}. Nagroda: +{xp}% XP, +{gold}% złota i {drop} raza więcej przedmiotów i materiałów. Nie na Szybkim i Błyskawicznym polowaniu ani z drużyną.', {
+          text: t('Stwory: obrażenia {damage}, HP {hp}. Nagroda: +{xp}% XP, +{gold}% złota i {drop} raza więcej przedmiotów i materiałów. Nie na Szybkim i Błyskawicznym polowaniu.', {
             damage: times(hellRules.damage),
             hp: times(hellRules.hp),
             xp: Math.round(hellRules.xp * 100),
@@ -1223,8 +1228,10 @@ export function mountCombat(container, { params, navigate }) {
               ...(potions && { potions: potions.taken(), healBelow: potions.below() }),
               ...(meal?.chosen() && { meal: meal.chosen() }),
               ...(scouted && !along && { scout: scouted }),
-              ...(hardOn() && !along && { hard: true }),
-              ...(hellOn() && !along && { hell: true }),
+              // The Trudna or the Piekielna, alone or the whole Drużyna's
+              // trip (parties.js).
+              ...(hardOn() && { hard: true }),
+              ...(hellOn() && { hell: true }),
               ...(hiring && { mercenary: hiring }),
             });
           } catch (error) {

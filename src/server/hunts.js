@@ -256,6 +256,11 @@ function potionsBack(row, back, drunk) {
   return Object.fromEntries(Object.entries(bag).filter(([, count]) => count > 0));
 }
 
+// The challenge an exploration or a Drużyna's trip set out with, as kept
+// (beginHunt's options, parties.js's crew): 'hell' for a Piekielna wyprawa,
+// true for a Trudna (629 A), false for a plain one (simulateHunt's `hard`).
+const challengeOf = (kept) => (kept.hell === true ? 'hell' : kept.hard === true);
+
 // Inner regions open with the class level (areaUnlockLevel).
 const areaLocked = (area) =>
   new ApiError(403, 'area_locked', `To miejsce odblokujesz na poziomie klasy ${areaUnlockLevel(area, content())}.`);
@@ -402,8 +407,11 @@ export async function startHunt(context) {
 // without companions (the author: "wtedy nie poluje się z towarzyszem,
 // tylko samemu/z drużyną"). `mount`: the stage of the Stajnia's mount the
 // exploration goes at, which the party code gives a Drużyna's trip. `hard`:
-// a Trudna wyprawa (629 A), from the challenge's level, on a plain "Wyrusz"
-// only: its creatures are stronger, for more XP and gold (simulateHunt).
+// a Trudna wyprawa (629 A), from the challenge's level, on a "Wyrusz" alone
+// or with a Drużyna (the author, 19.11.2026: „Trudne i Piekielne wyprawy
+// zrób tak by można je bylo robić z drużyną”; the party code gives every
+// member the leader's), not on a Szybkie or a Błyskawiczne polowanie: its
+// creatures are stronger, for more XP and gold (simulateHunt).
 // `hell`: a Piekielna wyprawa (the author, 19.11.2026), on the same terms:
 // creatures stronger still, for more gold, chests and materials; it wins
 // over `hard` when both come.
@@ -433,9 +441,9 @@ export async function beginHunt(
   if (typeof trackUnknown !== 'boolean') throw new ApiError(400, 'invalid_track_unknown', 'Zaznacz albo odznacz tropienie nieznanych stworów.');
   if (typeof hard !== 'boolean') throw new ApiError(400, 'invalid_hard', 'Zaznacz albo odznacz Trudną wyprawę.');
   if (typeof hell !== 'boolean') throw new ApiError(400, 'invalid_hell', 'Zaznacz albo odznacz Piekielną wyprawę.');
-  if (hell && (quick || crew)) throw new ApiError(400, 'hell_plain_only', 'Piekielna wyprawa jest tylko na zwykłej wyprawie, bez drużyny.');
+  if (hell && quick) throw new ApiError(400, 'hell_plain_only', 'Piekielna wyprawa nie działa na Szybkim i Błyskawicznym polowaniu.');
   if (hell && !challengeAt(player.row.level, content())) throw new ApiError(403, 'hell_locked', `Piekielna wyprawa otwiera się na ${content().balance.challenge.fromLevel}. poziomie postaci.`);
-  if (hard && (quick || crew)) throw new ApiError(400, 'hard_plain_only', 'Trudna wyprawa jest tylko na zwykłej wyprawie, bez drużyny.');
+  if (hard && quick) throw new ApiError(400, 'hard_plain_only', 'Trudna wyprawa nie działa na Szybkim i Błyskawicznym polowaniu.');
   if (hard && !challengeAt(player.row.level, content())) throw new ApiError(403, 'hard_locked', `Trudna wyprawa otwiera się na ${content().balance.challenge.fromLevel}. poziomie postaci.`);
   if (!huntDurations(player.row.level, content()).includes(minutes)) {
     const longest = longestHunt(player.row.level, content());
@@ -945,8 +953,11 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
       // A trip's wanted target (parties.js), the member's own poster for it
       // or a foe only (wanted.js: wantedOnTrip).
       wanted: trip ? wantedOnTrip(trip, options) : (options.wanted ?? null),
-      // A Trudna wyprawa (true) or a Piekielna ('hell'), never on a trip.
-      hard: trip ? false : options.hell === true ? 'hell' : options.hard === true,
+      // A Trudna wyprawa (true) or a Piekielna ('hell'); on a trip the
+      // trip's, kept with its crew (parties.js), so its creatures are the
+      // same in every member's report, and each member's own loot and XP
+      // get its bonuses. A trip that set out before 19.11.2026 has none.
+      hard: challengeOf(trip ?? options),
       // The week it set out in (weeks.js), none before the weeks.
       week: keptWeek(options),
       // The meal eaten as it set out (cooking.js): its own, so on a trip too.
