@@ -14,12 +14,48 @@
 
 // The kinds of goods, in the order the chest shows them (as the screen
 // shows the character's own: the camp's resources, potions, herbs,
-// materials, the Stół rozbiórki's parts, minerals, the scrolls and the
-// Spiżarnia's fish, crops and dishes). Gold stays with the character. The
-// parts since 0.3.90 (a player, poz. 48, through the author, 16.11.2026:
-// „będzie możliwość wkładnia do skrzyni konta części potrzebnych do
-// wytwarzania ekwipunku?”; the author: „Raczej tak”).
-export const CHEST_GOODS = ['resource', 'potion', 'herb', 'material', 'part', 'mineral', 'scroll', 'pantry'];
+// materials, the Stół rozbiórki's parts, minerals, the scrolls, the
+// Spiżarnia's fish, crops and dishes, and Talia Systemu's cards). Gold
+// stays with the character. The parts since 0.3.90 (a player, poz. 48,
+// through the author, 16.11.2026: „będzie możliwość wkładnia do skrzyni
+// konta części potrzebnych do wytwarzania ekwipunku?”; the author: „Raczej
+// tak”). The cards (CARD_GOODS) since the mock-ups of 19.11.2026.
+export const CHEST_GOODS = ['resource', 'potion', 'herb', 'material', 'part', 'mineral', 'scroll', 'pantry', 'card', 'effect-card'];
+
+// Talia Systemu's cards as goods (a player, poz. 33, in the game's chat:
+// „możliwość wymiany kartami talii między postaciami. Wypadła mi fajna ale
+// nie na głównej tylko pobocznym alcie i trochę smutek.”; the author,
+// 19.11.2026: „mądre pomysły”, and: „przenoszenie kart Talii to powinno być
+// w Skrzyni Konta, powinno się móc nimi też handlować i wymieniać miedzy
+// graczami”): a creature's card (`card`, its id the creature's) and an
+// effect card (`effect-card`, the effect card's id), moved by their copies
+// through the Skrzynia Konta, the Targowisko and the Wymiana. A character's
+// copies are its card's level (cardLevel in cards.js, up to the top level;
+// copies past it stay with it, to be moved on).
+export const CARD_GOODS = ['card', 'effect-card'];
+
+// A character's copies of a card after a move (cardAfter): `held` as its
+// row keeps them ({ copies, traded }: `traded` of them came from others,
+// which the Encyklopedia leaves out; 0 copies when it has none), `given`
+// copies leave it, those from others first, and `got` arrive, `foreign` of
+// them from others. Copies 0: the card leaves its collection. Unlike goods
+// (tradedLeaving), whose find the Encyklopedia keeps once made, a card
+// counts there only while the character holds a copy of its own, so the
+// copies from others go first: a character that found the card keeps it in
+// its Encyklopedia as long as any of its own is held. No copy from others
+// becomes its own by this: they leave marked so (`foreign` of the move).
+/**
+ * @param {{ copies: number, traded: number }} held
+ * @param {number} given
+ * @param {number} [got]
+ * @param {number} [foreign]
+ * @returns {{ copies: number, traded: number }}
+ */
+export function cardAfter(held, given, got = 0, foreign = got) {
+  const copies = held.copies - given + got;
+  const traded = held.traded - Math.min(held.traded, given) + foreign;
+  return { copies, traded: Math.max(0, Math.min(traded, copies)) };
+}
 
 // Of `count` pieces leaving a stack of `held`, `traded` of which were got
 // from others, how many are such: the own pieces go first, as when an order

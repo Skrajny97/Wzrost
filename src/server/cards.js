@@ -148,6 +148,17 @@ export async function cardCollection(db, characterId) {
   return new Map(results.filter((row) => isCard(row.monster_id, content())).map((row) => [row.monster_id, row.copies]));
 }
 
+// The character's own cards: those of its collection with a copy it won
+// itself, not only copies from others (`traded`: the Wymiana, the
+// Targowisko, another character through the Skrzynia Konta; card-goods.js),
+// each with all its copies. The Encyklopedia's "Karty", the collection's
+// bonus and the achievements count these (the author, 19.11.2026: „karty z
+// wymiany/targowiska niech nie uzupełniają encyklopedii jakby coś”).
+export async function ownCardCollection(db, characterId) {
+  const { results } = await db.prepare('SELECT monster_id, copies FROM cards WHERE character_id = ? AND copies > traded').bind(characterId).all();
+  return new Map(results.filter((row) => isCard(row.monster_id, content())).map((row) => [row.monster_id, row.copies]));
+}
+
 // The cards at their top level, which no exploration gives again.
 export const maxedCards = (collection) => [...collection].filter(([, copies]) => copies >= rules().stats.maxLevel).map(([id]) => id);
 

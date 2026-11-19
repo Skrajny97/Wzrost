@@ -105,7 +105,7 @@ import { assertion, atomically, characterChanged, raced, sameVersion } from './a
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { cardsOn, eventDraftsOn, eventsOn, fortressOn, settlementOn } from './features.js';
-import { cardCollection, cardUpserts, droppedCards, droppedEffect, effectChance, effectFoundLine, effectUpserts, maxedCards, packGains, packViews } from './cards.js';
+import { cardCollection, cardUpserts, droppedCards, droppedEffect, effectChance, effectFoundLine, effectUpserts, maxedCards, ownCardCollection, packGains, packViews } from './cards.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { expeditionMinutes } from './guild-expedition.js';
 import { huntFamePoints } from './fame.js';
@@ -888,6 +888,10 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
   // collection as read; the claim holds only while the character is, and
   // every change of the collection changes it too.
   const collection = cardsOn() && content().cards ? await cardCollection(db, row.id) : null;
+  // The bonus counts its own cards only, as the Encyklopedia does: those from
+  // others (the Wymiana, the Targowisko, the Skrzynia Konta) add nothing to
+  // it (ownCardCollection in cards.js).
+  const ownCards = collection ? (await ownCardCollection(db, row.id)).size : 0;
   let hunt = simulateHunt(
     {
       character: fighter,
@@ -931,7 +935,7 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
       week: keptWeek(options),
       // The meal eaten as it set out (cooking.js): its own, so on a trip too.
       meal: options.meal ?? null,
-      cards: collection && { maxed: maxedCards(collection), owned: [...collection.keys()], ...cardExplorationBonus(collection.size, content()) },
+      cards: collection && { maxed: maxedCards(collection), owned: [...collection.keys()], ...cardExplorationBonus(ownCards, content()) },
     },
     content(),
   );

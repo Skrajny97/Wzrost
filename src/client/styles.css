@@ -28382,3 +28382,164 @@ a.social-button {
 .andrzejki-cup-buttons .button {
   flex: 1 1 90px;
 }
+
+/* Talia Systemu's cards as goods (DECISIONS.md, "Karty Talii: Skrzynia
+   Konta, Targowisko i Wymiana"): a card's small picture in a line of goods
+   (cardThumb in cards.js), the frame of its rarity cut in nine as on the
+   card's face, around the creature on the place of its first home; as
+   small as a deck's pile in the Salon Gier (.deck-slot-pile). */
+.card-thumb {
+  display: grid;
+  flex: none;
+  place-items: center;
+  box-sizing: border-box;
+  width: 30px;
+  height: 41px;
+  border-style: solid;
+  border-color: transparent;
+  border-width: 6px;
+  border-image: var(--frame, url('/art/cards/frame-common.png')) 18 17 / 1 / 0 stretch;
+  background: var(--scene, linear-gradient(180deg, #2a3322, #151b11)) center 30% / cover no-repeat;
+  background-clip: padding-box;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+  image-rendering: pixelated;
+}
+
+.card-thumb .card-thumb-art {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000);
+  image-rendering: pixelated;
+}
+
+/* "Karty" under the character's goods in the Skrzynia Konta: the deck's
+   back as in the Salon's piles, the count and "Włóż kartę". */
+.chest-cards-back {
+  width: 30px;
+  height: 41px;
+  background: url('/art/cards/back.png') center / 100% 100% no-repeat;
+  filter: drop-shadow(2px 2px 0 var(--bark-line)) drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.8));
+  image-rendering: pixelated;
+}
+
+/* "Włóż kartę": the collection's faces, one size as everywhere (888), each
+   with its copies under it. */
+.chest-card-grid {
+  padding-top: 4px;
+}
+
+.chest-card-pick {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+
+.chest-card-copies {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.chest-card-copies--busy {
+  color: var(--danger);
+}
+
+/* How many copies to move: the card's face at the level the move gives. */
+.chest-card-show {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.chest-card-after {
+  margin: 0;
+}
+
+.chest-card-warn[hidden] {
+  display: none;
+}
+
+/* A card's field in the Wymiana's offer (trade.js): its count is a few
+   copies, so a narrower box leaves the card's name its room on a 320 px
+   phone; a name longer still breaks inside its frame. */
+.trade-number--short {
+  width: 72px;
+}
+
+.trade-field .trade-field-label {
+  overflow-wrap: anywhere;
+}
+
+/* "Na górę" (back-to-top.js; a player's idea the author called wise,
+   19.11.2026): a round button in the look of the round chat button, a size
+   smaller, under it in the page's layers (40) and over the screens; it
+   fades in at its place, which the script keeps clear of the floating
+   controls. */
+.top-button {
+  position: fixed;
+  z-index: 38;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  background: var(--bg-deep);
+  color: var(--text);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(6px) scale(0.92);
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.top-button--shown {
+  opacity: 1;
+  transform: none;
+}
+
+.top-button[hidden] {
+  display: none;
+}
+
+.top-button:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+.top-button:focus-visible {
+  outline: 2px solid var(--system);
+  outline-offset: 2px;
+}
+
+.calm .top-button {
+  transition: none;
+}
+
+/* While it shows, a screen's last row can scroll up past it: its 44 px and
+   10 px from what it stands on (as the round chat button's room, 993). */
+.with-top-button .screen--game {
+  padding-bottom: calc(var(--nav-height) + 28px + 54px + env(safe-area-inset-bottom));
+}
+
+.with-top-button.with-chat-bubble .screen--game {
+  padding-bottom: calc(var(--nav-height) + 28px + 60px + 54px + env(safe-area-inset-bottom));
+}
+
+.with-top-button .screen--game:has(.pending-bar) {
+  padding-bottom: calc(var(--nav-height) + 96px + 54px + env(safe-area-inset-bottom));
+}
+
+.with-top-button.with-chat-bubble .screen--game:has(.pending-bar) {
+  padding-bottom: calc(var(--nav-height) + 96px + 60px + 54px + env(safe-area-inset-bottom));
+}
+
+:root[data-layout='desktop'].with-top-button .screen--game {
+  padding-bottom: calc(48px + 54px);
+}

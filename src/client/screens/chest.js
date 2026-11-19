@@ -12,8 +12,17 @@
 // each taken out by the piece, and the character's own, each put in by the
 // piece. A chest the character cannot open yet (`chest.locked`, its level)
 // shows only when it opens.
+//
+// Talia Systemu's cards too, where the game has them (`chest.cards`;
+// DECISIONS.md, "Karty Talii: Skrzynia Konta, Targowisko i Wymiana"): a card
+// in the chest is a line of the goods, „Karta: Licho ×2” with its small
+// picture and „Weź”, and the character's collection is under "Włóż kartę",
+// its cards' faces to choose from. Both ask how many copies, with the card
+// at the level the move would give. Their words come from the data
+// (cards.json texts.goods), with the chest's answer.
 
 import { herbSprite, materialSprite, mineralSprite, pantrySprite, potionSprite, resourceArt, scrollArt } from '../art.js';
+import { cardAtLevel, cardFace, cardThumb } from '../cards.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
@@ -52,6 +61,10 @@ function sortGoods(goods) {
 // The art of a good, by its kind.
 function goodArt(good, size = 24) {
   switch (good.kind) {
+    // A card of Talia Systemu: its small picture.
+    case 'card':
+    case 'effect-card':
+      return cardThumb(good.face);
     case 'resource':
       return resourceArt(good.id, size);
     case 'material':
@@ -295,11 +308,13 @@ export function mountChest(container, onBack) {
               'ul',
               { class: 'chest-list' },
               chest.goods.map((good) =>
-                goodRow(
-                  good,
-                  good.own >= good.count ? t('Twoje') : good.own > 0 ? t('Twoje: {count} szt.', { count: formatNumber(good.own) }) : t('Od innych postaci'),
-                  h('button', { type: 'button', class: 'button button--system button--small', text: t('Wyjmij'), onClick: () => amountSheet(good, false) }),
-                ),
+                isCard(good)
+                  ? goodRow(good, cardNote(good), h('button', { type: 'button', class: 'button button--system button--small', text: words().take, onClick: () => cardSheet(good, false) }))
+                  : goodRow(
+                      good,
+                      good.own >= good.count ? t('Twoje') : good.own > 0 ? t('Twoje: {count} szt.', { count: formatNumber(good.own) }) : t('Od innych postaci'),
+                      h('button', { type: 'button', class: 'button button--system button--small', text: t('Wyjmij'), onClick: () => amountSheet(good, false) }),
+                    ),
               ),
             ),
       ),
@@ -308,7 +323,7 @@ export function mountChest(container, onBack) {
         { class: 'card chest-section', 'aria-label': t('Twoje towary') },
         h('h2', { class: 'section-title', text: t('Twoje towary') }),
         own.length > 0 && goodSortRow(),
-        own.length === 0
+        own.length === 0 && !chest.cards
           ? h('p', { class: 'muted', text: t('Postać nie ma teraz żadnych towarów.') })
           : own.map(([title, goods]) => [
               h('h3', { class: 'profile-section', text: title }),
@@ -318,8 +333,162 @@ export function mountChest(container, onBack) {
                 sortGoods(goods).map((good) => goodRow(good, null, h('button', { type: 'button', class: 'button button--world button--small', text: t('Włóż'), onClick: () => amountSheet(good, true) }))),
               ),
             ]),
+        chest.cards && cardsGroup(),
       ),
     ];
+  }
+
+  // --- Talia Systemu's cards -------------------------------------------
+
+  const words = () => chest.cards?.texts ?? {};
+  const isCard = (good) => good.kind === 'card' || good.kind === 'effect-card';
+  const filled = (text, vars) => String(text ?? '').replace(/\{(\w+)\}/g, (whole, name) => (Object.hasOwn(vars, name) ? String(vars[name]) : whole));
+  // A level from copies, up to the top.
+  const levelOf = (copies) => Math.max(1, Math.min(chest.cards.maxLevel, copies));
+
+  // Under a card in the chest: whose copies they are, and the level the
+  // character has it at (or that it has none).
+  function cardNote(good) {
+    const whose = good.own >= good.count ? words().own : good.own > 0 ? filled(words().ownSome, { count: formatNumber(good.own) }) : words().others;
+    const have = good.have > 0 ? filled(words().haveLevel, { level: levelOf(good.have) }) : words().haveNone;
+    return `${whose} · ${have}`;
+  }
+
+  // "Karty" under the character's own goods: its collection's count and
+  // "Włóż kartę", which opens the collection to choose from.
+  function cardsGroup() {
+    const own = chest.cards.own;
+    return [
+      h('h3', { class: 'profile-section', text: words().group }),
+      h(
+        'div',
+        { class: 'chest-row chest-cards-row' },
+        h(
+          'span',
+          { class: 'chest-good' },
+          h('span', { class: 'potion-pick-art chest-cards-back', 'aria-hidden': 'true' }),
+          h('span', { class: 'chest-item' }, h('span', { class: 'chest-good-name', text: own.length > 0 ? filled(words().collection, { count: formatNumber(own.length) }) : words().pickEmpty })),
+        ),
+        own.length > 0 && h('button', { type: 'button', class: 'button button--world button--small', 'data-guide': 'chest-put-card', text: words().put, onClick: pickSheet }),
+      ),
+    ];
+  }
+
+  // "Włóż kartę": the collection's faces, the creatures' first and then the
+  // effect cards, each with its copies; a card a match running now plays
+  // says so and stays.
+  function pickSheet() {
+    const own = chest.cards.own;
+    const grid = (entries) =>
+      h(
+        'div',
+        { class: 'tcard-grid chest-card-grid' },
+        entries.map((entry) =>
+          h(
+            'div',
+            { class: 'chest-card-pick' },
+            cardFace(entry.face, {
+              marks: { dim: entry.busy },
+              label: `${entry.cardName}, ${entry.busy ? words().busy : filled(words().copies, { count: formatNumber(entry.copies) })}`,
+              onClick: () => (entry.busy ? toast(words().inMatch) : cardSheet(entry, true)),
+            }),
+            h('span', { class: `chest-card-copies${entry.busy ? ' chest-card-copies--busy' : ''}`, text: entry.busy ? words().busy : filled(words().copies, { count: formatNumber(entry.copies) }) }),
+          ),
+        ),
+      );
+    const creatures = own.filter((entry) => entry.kind === 'card');
+    const effects = own.filter((entry) => entry.kind === 'effect-card');
+    openSheet(
+      h('h2', { class: 'sheet-title', text: words().put }),
+      h('p', { class: 'sheet-text', text: words().pickText }),
+      creatures.length > 0 && grid(creatures),
+      effects.length > 0 && [h('h3', { class: 'profile-section', text: words().pickEffects }), grid(effects)],
+    );
+  }
+
+  // How many copies of a card to put in (`put`: an entry of the collection)
+  // or to take out (a card of the chest), as amountSheet asks for goods: the
+  // card's face at the level the move would give, what it does to the
+  // collection and to the decks the card is in, and the button.
+  function cardSheet(card, put) {
+    const most = put ? card.copies : card.count;
+    const have = put ? card.copies : card.have;
+    let count = most;
+    const show = h('div', { class: 'chest-card-show' });
+    const after = h('p', { class: 'sheet-text chest-card-after' });
+    const warn = h('p', { class: 'region-warning chest-card-warn' });
+    const value = h('output', { class: 'fire-trade-amount', 'aria-live': 'off' });
+    const go = h('button', { type: 'button', class: 'button button--system' });
+    const slider = h('input', {
+      type: 'range',
+      class: 'duration-slider fire-trade-slider',
+      min: 1,
+      max: most,
+      step: 1,
+      value: count,
+      'aria-label': put ? t('Ile sztuk włożyć') : t('Ile sztuk wyjąć'),
+      disabled: most <= 1,
+      onInput: () => set(Number(slider.value)),
+    });
+    const stepButton = (sign, label) =>
+      h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': label, text: sign < 0 ? '−' : '+', onClick: () => set(count + sign) });
+    const less = stepButton(-1, t('O sztukę mniej'));
+    const more = stepButton(1, t('O sztukę więcej'));
+    // The decks a card put in whole leaves incomplete.
+    const decks = put ? (card.decks ?? []).map((deck) => (deck.name ? `„${deck.name}”` : String(deck.slot))) : [];
+    function set(next) {
+      count = Math.min(most, Math.max(1, next));
+      slider.value = String(count);
+      slider.setAttribute('aria-valuetext', t('{count} szt.', { count: formatNumber(count) }));
+      slider.style.setProperty('--fill', `${((count - 1) / Math.max(1, most - 1)) * 100}%`);
+      value.textContent = t('{count} szt.', { count: formatNumber(count) });
+      less.disabled = count <= 1;
+      more.disabled = count >= most;
+      if (put) {
+        const left = have - count;
+        fill(show, cardFace(card.face));
+        after.textContent = left > 0 ? filled(words().putLeft, { level: levelOf(left) }) : words().putAll;
+        warn.hidden = left > 0 || decks.length === 0;
+        warn.textContent = decks.length > 1 ? filled(words().putDecks, { decks: decks.join(', ') }) : filled(words().putDeck, { deck: decks[0] ?? '' });
+        go.textContent = filled(words().putButton, { count: formatNumber(count) });
+      } else {
+        const level = levelOf(have + count);
+        fill(show, cardFace(cardAtLevel(card.face, level)));
+        after.textContent =
+          have >= chest.cards.maxLevel
+            ? filled(words().takeTop, { level: chest.cards.maxLevel })
+            : have > 0
+              ? filled(words().takeHave, { have: levelOf(have), level })
+              : filled(words().takeNew, { level });
+        warn.hidden = true;
+        go.textContent = filled(words().takeButton, { count: formatNumber(count) });
+      }
+    }
+    set(count);
+    go.addEventListener('click', (event) =>
+      withButton(event.currentTarget, async () => {
+        ({ chest } = await call('POST', put ? '/api/chest/goods/put' : '/api/chest/goods/take', { kind: card.kind, id: card.id, count }));
+        closeSheet();
+        toast(put ? filled(words().putDone, { name: card.cardName, count: formatNumber(count) }) : filled(words().takeDone, { name: card.cardName, level: levelOf(have + count) }));
+        render();
+      }),
+    );
+    openSheet(
+      h('h2', { class: 'sheet-title chest-sheet-title' }, h('span', { text: card.cardName })),
+      show,
+      h('p', {
+        class: 'sheet-text',
+        text: put ? filled(words().putHave, { count: formatNumber(card.copies), level: levelOf(card.copies) }) : filled(words().takeChest, { count: formatNumber(card.count) }),
+      }),
+      h('p', { class: 'fire-trade-pick' }, value),
+      h('div', { class: 'duration-row' }, less, slider, more),
+      h('p', { class: 'builder-spirit-quick' }, h('button', { type: 'button', class: 'link-button', text: t('wszystkie'), onClick: () => set(most) })),
+      after,
+      warn,
+      // Copies of another character: the level, not the Encyklopedia.
+      !put && card.own < card.count && h('p', { class: 'muted chest-card-rule', text: words().rule }),
+      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }), go),
+    );
   }
 
   function render() {

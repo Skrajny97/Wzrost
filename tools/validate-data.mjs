@@ -1912,6 +1912,35 @@ function checkCards(data, { rarities }) {
     if (!icons.has(table.icon)) errors.push(`${where}: ${owner}: nieznana ikona "${table.icon}" (src/client/icons.js)`);
   }
   if (tables.size === 0) errors.push(`${where}: mieszkańcy nie mają stołów`);
+  // The words of the cards as goods (src/server/card-goods.js and the
+  // Skrzynia Konta's, the Targowisko's and the Wymiana's screens): each
+  // names what the game fills in.
+  const chestWords = {
+    card: ['name'],
+    effect: ['name'],
+    collection: ['count'],
+    copies: ['count'],
+    putHave: ['count', 'level'],
+    putLeft: ['level'],
+    putDeck: ['deck'],
+    putDecks: ['decks'],
+    putButton: ['count'],
+    putDone: ['name', 'count'],
+    ownSome: ['count'],
+    haveLevel: ['level'],
+    takeChest: ['count'],
+    takeNew: ['level'],
+    takeHave: ['have', 'level'],
+    takeTop: ['level'],
+    takeButton: ['count'],
+    takeDone: ['name', 'level'],
+    marketHave: ['level', 'count'],
+    fewer: ['count'],
+    only: ['count'],
+  };
+  for (const [key, words] of Object.entries(chestWords)) {
+    for (const word of words) if (!rules.texts.goods?.[key]?.includes(`{${word}}`)) errors.push(`${where}: texts.goods.${key} nie ma {${word}}`);
+  }
   return errors;
 }
 

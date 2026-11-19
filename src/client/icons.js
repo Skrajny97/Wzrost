@@ -55,6 +55,8 @@ export const ICONS = {
   unlocked: [['rect', { x: 5, y: 11, width: 14, height: 10, rx: 1 }], path('M8 11V8a4 4 0 0 1 7.6-1.8')],
   plus: [path('M12 5v14M5 12h14')],
   minus: [path('M5 12h14')],
+  // "Na górę" (back-to-top.js): an arrow up to the top's line.
+  top: [path('M6 4.5h12'), path('M12 20V9'), path('M7.5 13.5L12 9l4.5 4.5')],
   close: [path('M6 6l12 12M18 6L6 18')],
   // Straight glass narrowing to the neck, with sand above and below.
   hourglass: [
