@@ -10,7 +10,6 @@ import { t } from '../i18n.js';
 import { CLASS_ICONS } from '../icons.js';
 import { call, state } from '../state.js';
 import { skinSwatches, systemPanel, toast, voiceSwitch } from '../ui.js';
-import { partyGated } from '../party-gate.js';
 
 const POSITION_NAMES = { front: 'przód', middle: 'środek', back: 'tył' };
 const START_BADGES = { gentle: 'łagodniejszy start', hard: 'trudniejszy start' };
@@ -197,11 +196,7 @@ export function renderCreate(container, onCreated, counts = null) {
     submit.disabled = true;
     submit.textContent = t('Tworzenie postaci…');
     try {
-      // The character played now, in a Drużyna, leaves it first, when the
-      // player says so (1178 B, party-gate.js).
-      const answer = await partyGated('/api/character', { name: nameInput.value, classId: selected, appearance: look, skin });
-      if (answer === null) return;
-      const { character } = answer;
+      const { character } = await call('POST', '/api/character', { name: nameInput.value, classId: selected, appearance: look, skin });
       onCreated();
       // "Pomijaj objaśnienia narratora" on the account: the server skipped
       // the introduction as "Pomiń wprowadzenie" does (tutorial.js), and the

@@ -182,8 +182,12 @@ const reportWaits = (kind, endsAt, now) => kind !== 'mercenary' && endsAt <= now
 // claims: partyHunt), away (on an exploration), working (at a profession's
 // work) or aside (its player plays another character). Only the free go
 // along.
+// Since 0.4.59 a member whose player plays another character now is no
+// longer set apart ('aside'): it goes on the party's trips all the same
+// (the author, 19.11.2026: „dlaczego system robił błąd kiedy ktoś zmienia
+// postać? przecież trzeba to jakoś rozdzielić”), so only its own activity
+// tells whether it is free.
 function memberStatus(row, now) {
-  if (row.role !== 'player') return 'aside';
   if (!row.activity || reportWaits(row.activity, row.activity_ends, now)) return 'free';
   return row.activity === 'hunt' ? 'away' : 'working';
 }
@@ -412,19 +416,20 @@ export function partyRemoval(db, characters, binds) {
 const leaveStatements = (db, characterId) => partyRemoval(db, '?', [characterId]);
 
 // 1178 B (the author, 19.11.2026, on a player's report that a party went
-// without a member who had switched characters or set out alone): a member
-// who sets out alone on an exploration, and a player who switches to
-// another character while the one played is in a party (the leader too,
-// `leader`: its party could set out no more), is asked first whether to
-// leave the party ("Jesteś w drużynie. Wyjść z drużyny?"). With
-// `leaveParty` it leaves as "Opuść" does: the statements returned go into
-// the caller's own batch, so the leaving and the action are one write.
-// The leader still sets out alone as before. The Wieża Solo, the Labirynt
-// and the Portale ask nothing: their fights are over at once and take the
-// character away from no trip; nor do the professions (1.11.2026).
-export async function partyGate(db, characterId, body, { leader = false } = {}) {
+// without a member who had set out alone): a member who sets out alone on
+// an exploration is asked first whether to leave the party ("Jesteś w
+// drużynie. Wyjść z drużyny?"). With `leaveParty` it leaves as "Opuść"
+// does: the statements returned go into the caller's own batch, so the
+// leaving and the start are one write. The leader still sets out alone as
+// before. A switch of characters asks nothing since 0.4.59 (the author:
+// „to jest jednak irytujące dla graczy i w sumie bezsensowne”): the
+// character stays in its party and goes on its trips. The Wieża Solo, the
+// Labirynt and the Portale ask nothing either: their fights are over at
+// once and take the character away from no trip; nor do the professions
+// (1.11.2026).
+export async function partyGate(db, characterId, body) {
   const party = await partyOf(db, characterId);
-  if (!party || (!leader && party.leaderId === characterId)) return [];
+  if (!party || party.leaderId === characterId) return [];
   if (body?.leaveParty !== true) throw new ApiError(409, 'in_party', t('Jesteś w drużynie. Wyjść z drużyny?'));
   return leaveStatements(db, characterId);
 }
@@ -581,7 +586,9 @@ async function setOut(db, player, body, now, claimed) {
   if (!party) throw new ApiError(409, 'no_party', 'Nie masz drużyny.');
   if (party.leaderId !== player.row.id) throw new ApiError(403, 'not_leader', 'Na wyprawę drużynę wysyła lider.');
   const others = (await Promise.all(party.memberIds.filter((id) => id !== player.row.id).map((id) => loadCharacter(db, id)))).filter(Boolean);
-  const going = others.filter((other) => other.row.role === 'player' && (!other.activity || reportWaits(other.activity.kind, other.activity.ends_at, now)));
+  // Every free member goes, also one whose player plays another character
+  // now: its report waits for it there (0.4.59).
+  const going = others.filter((other) => !other.activity || reportWaits(other.activity.kind, other.activity.ends_at, now));
   if (going.length === 0) throw new ApiError(409, 'nobody_free', 'Nikt z drużyny nie jest teraz wolny. Odznacz „Z drużyną” albo poczekaj, aż ktoś skończy swoje zajęcia.');
   const area = typeof body.areaId === 'string' ? areaFor(body.areaId, player.row.level, content()) : undefined;
   if (!area) throw new ApiError(400, 'invalid_area', 'Wybierz miejsce wyprawy.');
