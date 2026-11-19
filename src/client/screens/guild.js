@@ -17,9 +17,10 @@
 // activities, "Wyprawa" (guild-expedition.js, 621 A), "Bestia"
 // (guild-beast.js), "Próby" (guild-trials.js), "Prośby"
 // (guild-requests.js), "Wymiana" (guild-exchange.js), "Skrzynia"
-// (guild-chest.js, the author, 10.11.2026: „Wspólna skrzynia Gildii”) and,
-// where the guild wars are on, "Wojna" (guild-war.js, 792–800), the nine
-// tabs then in three rows of three (792 v2). The
+// (guild-chest.js, the author, 10.11.2026: „Wspólna skrzynia Gildii”), the
+// "Kram" (guild-stall.js, 1202 A) and, where the guild wars are on, "Wojna"
+// (guild-war.js, 792–800), the nine tabs then in three rows of three (792
+// v2), ten in four over three over three. The
 // address keeps the tab (#/gildia/<id>), and the page opens on the one
 // shown last on the device, or on "Gildia" outside a guild. Its own words
 // are shown in the page's language (t(), i18n.js); the tabs' names and the
@@ -34,9 +35,11 @@ import { mountGuildBeast } from '../guild-beast.js';
 import { mountGuildChest } from '../guild-chest.js';
 import { mountGuildExchange } from '../guild-exchange.js';
 import { mountGuildExpedition } from '../guild-expedition.js';
+import { guildHeroesCard, heroBadges } from '../guild-heroes.js';
 import { guildRankingCard } from '../guild-ranking.js';
 import { mountGuildRequests } from '../guild-requests.js';
 import { mountGuildSeat } from '../guild-seat.js';
+import { mountGuildStall } from '../guild-stall.js';
 import { mountGuildTrials } from '../guild-trials.js';
 import { mountGuildWar } from '../guild-war.js';
 import { CLASS_ICONS } from '../icons.js';
@@ -49,7 +52,7 @@ import { lockedScreen } from './locked.js';
 
 const PAGE = '#/gildia';
 const TAB_KEY = 'insight-guild-tab';
-const TAB_ICONS = { guild: 'banner', seat: 'keep', expedition: 'tent', beast: 'beast', trials: 'trophy', requests: 'gift', exchange: 'swap', chest: 'coffer', war: 'swords' };
+const TAB_ICONS = { guild: 'banner', seat: 'keep', expedition: 'tent', beast: 'beast', trials: 'trophy', requests: 'gift', exchange: 'swap', chest: 'coffer', stall: 'shop', war: 'swords' };
 const TAB_MOUNTS = {
   guild: mountGuild,
   seat: mountGuildSeat,
@@ -59,6 +62,7 @@ const TAB_MOUNTS = {
   requests: mountGuildRequests,
   exchange: mountGuildExchange,
   chest: mountGuildChest,
+  stall: mountGuildStall,
   war: mountGuildWar,
 };
 
@@ -121,11 +125,18 @@ export function mountGuildPage(container, context) {
   // tab of the first row spans `second` of them, one of the second `first`.
   // Nine tabs, with the Wojna (792 v2), stand in three rows of three, their
   // names at full size: in two rows they did not fit a phone of 320 px.
+  // Ten, with the Kram (1202 A), stand four over three over three: the
+  // rows share a grid of twelve columns, a tab of the first row spans
+  // three of them and one of the others four, and the four of the first
+  // row have their names a step smaller on a phone (styles.css).
   const three = tabs.length > 8;
   const first = three ? 1 : Math.ceil(tabs.length / 2);
   const second = three ? 0 : tabs.length - first;
+  const rows = three ? [0, 1, 2].map((index) => Math.floor(tabs.length / 3) + (index < tabs.length % 3 ? 1 : 0)) : [];
+  const columns = three ? rows.reduce((all, count) => (all % count === 0 ? all : all * count), 1) : 0;
+  const rowOf = (index) => (index < rows[0] ? 0 : index < rows[0] + rows[1] ? 1 : 2);
   row.classList.toggle('community-tabs--three', three);
-  row.style.setProperty('--guild-columns', String(three ? 3 : second ? first * second : first));
+  row.style.setProperty('--guild-columns', String(three ? columns : second ? first * second : first));
 
   function render() {
     fill(
@@ -150,7 +161,8 @@ export function mountGuildPage(container, context) {
           // guild-todo.js); on the first tab a new announcement (998.1).
           (guildTodoNews(tab.id) || (tab.id === 'guild' && noticeNews())) && h('span', { class: 'community-dot', role: 'img', 'aria-label': t('do zrobienia') }),
         );
-        button.style.setProperty('--guild-span', String(second ? (index < first ? second : first) : 1));
+        button.style.setProperty('--guild-span', String(three ? columns / rows[rowOf(index)] : second ? (index < first ? second : first) : 1));
+        if (three) button.classList.toggle('community-tab--crowded', rows[rowOf(index)] > 3);
         return button;
       }),
     );
@@ -179,6 +191,9 @@ function mountGuild(container) {
   // The guild's board of announcements on top (noticeBoard), made once for
   // the guild too.
   let board = null;
+  // The Bohaterowie tygodnia (guild-heroes.js, 1198 A), under the members,
+  // made once for the guild too.
+  let heroes = null;
   const body = h('div', { class: 'friends guild' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
   fill(container, body);
 
@@ -192,7 +207,11 @@ function mountGuild(container) {
     }
     if (view.guild && board?.dataset.guild !== String(view.guild.id)) board = noticeBoard(view.guild.id);
     else board?.redraw();
-    fill(body, invitesCard(), view.guild ? [board, guildCard(), ranking, inviteCard(), sentCard(), leaveCard()] : foundCard());
+    if (view.guild && heroes?.dataset.guild !== String(view.guild.id)) {
+      heroes = guildHeroesCard();
+      heroes.dataset.guild = String(view.guild.id);
+    }
+    fill(body, invitesCard(), view.guild ? [board, guildCard(), heroes, ranking, inviteCard(), sentCard(), leaveCard()] : foundCard());
   }
 
   // The guild's board of announcements (998.1, accepted by the author on
@@ -449,7 +468,8 @@ function mountGuild(container) {
         h(
           'ul',
           { class: 'friends-list' },
-          guild.members.map((member) => h('li', { class: 'friend' }, who(member, rankBadge(member)), actions(member))),
+          // Last week's heroes wear their badges by the name (1198 A).
+          guild.members.map((member) => h('li', { class: 'friend' }, who(member, rankBadge(member), heroBadges(member.heroes)), actions(member))),
         ),
         // The ranks R4-R1 and the Nowicjusz's days (1062).
         guild.ranksRule && h('p', { class: 'muted', text: guild.ranksRule }),

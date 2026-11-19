@@ -511,10 +511,12 @@ export const SPRITES = {
   // stood, and the Encyclopedia's corner of the top bar, 32×32. Punkty
   // Systemu keep their line icon (the author: "tylko Punkty Systemu będą w
   // takiej wyróżniającej formie jak do tej pory"). The Kowadło's two
-  // scrolls, the Zwój ochronny and the Zwój utrwalenia (598 C).
+  // scrolls, the Zwój ochronny and the Zwój utrwalenia (598 C). The Znak
+  // Gildii (1202 A), the badges of the Bohaterowie tygodnia (1198 A) and the
+  // banner over a land (1200 A), drawn in PixelLab, the author's picks.
   icons: {
     size: 32,
-    ids: ['gold', 'time-points', 'encyclopedia', 'ward-scroll', 'steady-scroll', 'oblivion-scroll', 'fir-branch'],
+    ids: ['gold', 'time-points', 'encyclopedia', 'ward-scroll', 'steady-scroll', 'oblivion-scroll', 'fir-branch', 'guild-mark', 'hero-pillar', 'hero-slayer', 'hero-benefactor', 'land-banner'],
   },
   // The professions' squares on the Profesje tab, 48×48.
   professions: {
@@ -714,7 +716,7 @@ export const SPRITES = {
     width: 120,
     height: 160,
     fit: true,
-    ids: ['frame-gold', 'frame-system', 'frame-forest', 'bg-spring', 'bg-tower', 'bg-camp', 'frame-szron', 'bg-szczodre', 'bg-andrzejki'],
+    ids: ['frame-gold', 'frame-system', 'frame-forest', 'bg-spring', 'bg-tower', 'bg-camp', 'frame-szron', 'bg-szczodre', 'bg-andrzejki', 'frame-guild-banner'],
   },
   // The character riding, <class>-<look> or an evolution's
   // <evolution>-<look>: one picture sitting in a saddle that is not drawn
@@ -885,6 +887,11 @@ export const encyclopediaArt = (size) => iconArt('encyclopedia', size, 'book');
 export const scrollArt = (id, size) => iconArt(id, size, 'scroll');
 // The fir branch of Szczodre Gody's winter quest (1044.7 D).
 export const firBranchArt = (size) => iconArt('fir-branch', size, 'leaf');
+// The Znak Gildii of the Kram (1202 A), a hero's badge of the week (1198 A:
+// pillar, slayer, benefactor) and the banner over a land (1200 A).
+export const guildMarkArt = (size) => iconArt('guild-mark', size, 'coin');
+export const heroArt = (kind, size) => iconArt(`hero-${kind}`, size, 'star');
+export const landBannerArt = (size) => iconArt('land-banner', size, 'banner');
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
 // The pictures of the Labirynt Systemu and the Rdzeń (art/labyrinth/, 850–866,
 // accepted in 868 and 869): its rooms (room-<type>), its Artefakty

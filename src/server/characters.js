@@ -148,6 +148,8 @@ import { marketRemoval } from './market.js';
 import { mercenaryBusy, mercenaryPlace, mercenaryRules, serviceEnded } from './mercenaries.js';
 import { ACCOUNT_NAMES, ALL_CHARACTERS, looksTaken, nameKey, validateName } from './names.js';
 import { championOf } from './guild-fame.js';
+import { badgesOf, badgeView } from './guild-heroes.js';
+import { bannersNow } from './guild-lands.js';
 import { fameNotice } from './fame.js';
 import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
 import { guildSeatSql } from './guild-seat.js';
@@ -1892,11 +1894,14 @@ export function characterView(player, now) {
 // shows (380 C): asking for it the first time in a new week freezes the
 // Sława of the week before (guild-fame.js). And the Punkty Sławy's best
 // character of last week, its name in gold, with the character's reward
-// waiting (fame.js, 760 A), the week before closed the same way.
+// waiting (fame.js, 760 A), the week before closed the same way. And the
+// lands' banners of the week, by land, for every land's card (1200 A,
+// guild-lands.js), raised first by championOf when the week is new.
 export async function getCharacter(context) {
   const { player } = await requirePlayer(context);
   const [champion, fame] = await Promise.all([championOf(context.env.DB, context.now), fameNotice(context.env.DB, player.row.id, context.now)]);
-  return json({ character: characterView(player, context.now), championTag: champion?.tag ?? null, fame });
+  const landBanners = await bannersNow(context.env.DB, context.now);
+  return json({ character: characterView(player, context.now), championTag: champion?.tag ?? null, fame, landBanners });
 }
 
 // GET /api/profile/:name: another player's character as everyone may see
@@ -1975,6 +1980,9 @@ export async function characterProfile(context) {
       role: chatRole(context.env, found),
       // Its guild, by name and tag (guilds.js), or null.
       guild: guild && { name: guild.name, tag: guild.tag },
+      // Its badges of the Bohaterowie tygodnia of the week before (1198 A,
+      // guild-heroes.js), worn the whole week, whatever its guild now.
+      heroes: (await badgesOf(db, found.id, context.now)).map((kind) => badgeView(kind, found.appearance)),
       guildInvite,
       relation: mine ? { state: 'self' } : own ? await relationTo(db, own.id, found.id, context.now) : null,
       tradeBlocked: await tradeBlockOf(db, session.userId, found.user_id),
@@ -2358,10 +2366,11 @@ export const detachedRows = (db, which, binds) => [
   // ranking, guild-members.js).
   db
     .prepare(
-      `INSERT INTO guild_member_fame (guild_id, character_id, week, beast, expedition, trials, requests, exchange, war)
-       SELECT guild_id, -character_id, week, beast, expedition, trials, requests, exchange, war FROM guild_member_fame WHERE character_id ${which}
+      `INSERT INTO guild_member_fame (guild_id, character_id, week, beast, expedition, trials, requests, exchange, war, lands)
+       SELECT guild_id, -character_id, week, beast, expedition, trials, requests, exchange, war, lands FROM guild_member_fame WHERE character_id ${which}
        ON CONFLICT (guild_id, character_id, week) DO UPDATE SET beast = beast + excluded.beast, expedition = expedition + excluded.expedition,
-         trials = trials + excluded.trials, requests = requests + excluded.requests, exchange = exchange + excluded.exchange, war = war + excluded.war`,
+         trials = trials + excluded.trials, requests = requests + excluded.requests, exchange = exchange + excluded.exchange, war = war + excluded.war,
+         lands = lands + excluded.lands`,
     )
     .bind(...binds),
   db.prepare(`DELETE FROM guild_member_fame WHERE character_id ${which}`).bind(...binds),

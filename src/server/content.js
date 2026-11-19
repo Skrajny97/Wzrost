@@ -363,6 +363,14 @@ export function publicContent() {
     // The Ranking's tabs and the periods of its "Gildie", and the words of
     // the best guild of last week by its gold tag (guild-fame.js, 380 C).
     guildFame: { tabs: game.guilds.fame.texts.tabs, periods: game.guilds.fame.texts.periods, champion: game.guilds.fame.texts.champion },
+    // The words of a banner over a land's card, for every player (1200 A,
+    // guild-lands.js; src/client/guild-lands.js), with the bonus in percent.
+    guildLands: {
+      chip: game.guilds.lands.texts.chip,
+      ownBanner: game.guilds.lands.texts.ownBanner,
+      otherBanner: game.guilds.lands.texts.otherBanner,
+      bonusPercent: Math.round(game.guilds.lands.bonus * 100),
+    },
     // The words of the best character of last week's Punkty Sławy by its
     // gold name (fame.js, 760 A).
     fame: { champion: game.fame.texts.champion },

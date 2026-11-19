@@ -12,10 +12,14 @@
 // of the league with the place and what it brought; the bar to the next
 // team and the rules under "Jak to działa?". On the test version, "Test
 // ligi" fights the next evening at a tap and draws the league again.
+// Under the league's table, the Krainy pod sztandarem (guild-lands.js, 1200
+// A): where the guild leads this week and where it chases, made once for
+// the tab and kept as it is drawn anew.
 // The words are the server's (data/guilds.json, war.texts), in the page's
 // language; the tab's own few go through t() (i18n.js).
 
 import { createArena } from './arena.js';
+import { guildLandsCard } from './guild-lands.js';
 import { goldArt, placeArt } from './art.js';
 import { h, icon } from './dom.js';
 import { formatMinutes, formatNumber } from './format.js';
@@ -152,6 +156,9 @@ export function mountGuildWar(container) {
   let asked = 0;
   const holder = h('div', { class: 'war' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
   container.append(holder);
+  // The lands' card (1200 A), asked for once.
+  let lands = null;
+  const landsPart = () => (lands ??= guildLandsCard());
 
   async function load() {
     asked += 1;
@@ -850,12 +857,13 @@ export function mountGuildWar(container) {
 
   function overview() {
     const { league } = view;
-    if (!league) return [noLeague(), teamsPart(), nextTeamPart(), howItWorks(null, texts().how), testPart()];
+    if (!league) return [noLeague(), landsPart(), teamsPart(), nextTeamPart(), howItWorks(null, texts().how), testPart()];
     return [
       hero(),
       league.next ? eveningPart() : league.end ? endPart() : donePart(),
       league.next && teamsPart(),
       tablePart(),
+      landsPart(),
       eveningsPart(),
       recentPart(),
       nextTeamPart(),

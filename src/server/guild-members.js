@@ -13,8 +13,11 @@
 // for each Próba done, up to the Próby's cap; perPiece for each piece given
 // in the Prośby, up to its cap; perExchange for each offer taken in the
 // Wymiana, up to its cap; and a won war's points split evenly among the
-// guild's fighters of that war. A member gets whole points only, so the
-// members' Sława together may come out a little below the guild's. A
+// guild's fighters of that war; and the Sława of a land whose banner the
+// guild raised (1200 A, guild-lands.js), the member's share of it by its
+// minutes there, in the week the banner stands. A member gets whole points
+// only, so the members' Sława together may come out a little below the
+// guild's. A
 // character removed and its id given again counts nothing of the old one's
 // (the sources' times against its own, as the Bestia's "Wkład tygodnia").
 //
@@ -48,7 +51,7 @@ const words = () => content().guilds.members;
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (whole, name) => String(vars[name] ?? whole));
 
 // The parts of a member's Sława, as the columns of guild_member_fame.
-export const FAME_PARTS = ['beast', 'expedition', 'trials', 'requests', 'exchange', 'war'];
+export const FAME_PARTS = ['beast', 'expedition', 'trials', 'requests', 'exchange', 'war', 'lands'];
 
 // The week around `now` and the one before it.
 function weeksAround(now) {
@@ -133,6 +136,13 @@ export function memberFame(week, guildId = null) {
             WHERE 1 = 1${only('f.guild_id')}`,
       binds: [week.key, ...guild],
     },
+    // The lands under the guild's banner this week (1200 A): each member's
+    // share, written as the banners were raised (guild-lands.js).
+    {
+      part: 'lands',
+      sql: `SELECT f.guild_id, f.character_id, f.points FROM guild_land_fame f WHERE f.week = ?${only('f.guild_id')}`,
+      binds: [week.key, ...guild],
+    },
   ];
 }
 
@@ -147,10 +157,14 @@ function warsOver(week) {
 // The statements that write the members' Sława of `week` (one gone) for
 // every guild at once, part by part, with the mark that it was written;
 // nothing once it was, or while its wars go on. In one batch: also of two
-// requests at once each part is written once.
+// requests at once each part is written once. With them each character's
+// Znaki Gildii of that week (1202 A, guild-stall.js), a Znak for each
+// point of its Sława in every guild, credited before the mark, so they are
+// counted live until this batch and stored after it, never twice.
 export function memberFameFreeze(db, week, now) {
   const over = warsOver(week);
   const unwritten = `NOT EXISTS (SELECT 1 FROM guild_member_fame_weeks WHERE week = ?)${over.sql}`;
+  const points = FAME_PARTS.map((part) => `f.${part}`).join(' + ');
   return [
     ...memberFame(week).map(({ part, sql, binds }) =>
       db
@@ -161,6 +175,14 @@ export function memberFameFreeze(db, week, now) {
         )
         .bind(week.key, ...binds, week.key, ...over.binds),
     ),
+    db
+      .prepare(
+        `INSERT INTO guild_marks (character_id, earned, version)
+         SELECT f.character_id, SUM(${points}), 1 FROM guild_member_fame f JOIN characters c ON c.id = f.character_id
+         WHERE f.week = ? AND ${unwritten} GROUP BY f.character_id HAVING SUM(${points}) > 0
+         ON CONFLICT (character_id) DO UPDATE SET earned = earned + excluded.earned, version = version + 1`,
+      )
+      .bind(week.key, week.key, ...over.binds),
     db.prepare(`INSERT OR IGNORE INTO guild_member_fame_weeks (week, frozen_at) SELECT ?, ? WHERE ${unwritten}`).bind(week.key, now, week.key, ...over.binds),
   ];
 }
@@ -193,7 +215,8 @@ function rankingTexts() {
   const texts = words();
   const vars = fameNumbers();
   const { $comment: _comment, howWar, list: _list, ...rest } = texts;
-  const how = guildWarsOn() ? [...texts.how.slice(0, 5), howWar, ...texts.how.slice(5)] : texts.how;
+  const lands = filled(content().guilds.lands.texts.howMembers, vars);
+  const how = [...texts.how.slice(0, 5), ...(guildWarsOn() ? [howWar] : []), lands, ...texts.how.slice(5)];
   return { ...rest, how: how.map((line) => filled(line, vars)) };
 }
 
@@ -217,6 +240,7 @@ export function fameNumbers() {
     warFirst: points(war.places[0]),
     warSecond: points(war.places[1]),
     warThird: points(war.places[2]),
+    landFame: points(content().guilds.lands.fame),
   };
 }
 

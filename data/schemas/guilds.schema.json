@@ -20,7 +20,10 @@
     "fame",
     "members",
     "leaderAway",
-    "ranks"
+    "ranks",
+    "heroes",
+    "lands",
+    "stall"
   ],
   "properties": {
     "$comment": {
@@ -117,10 +120,10 @@
       "minimum": 1
     },
     "tabs": {
-      "description": "Zakładki strony Gildii (src/client/screens/guild.js), w tej kolejności. Wojna (war) tylko tam, gdzie GUILD_WARS jest włączone.",
+      "description": "Zakładki strony Gildii (src/client/screens/guild.js), w tej kolejności. Wojna (war) tylko tam, gdzie GUILD_WARS jest włączone; Kram (stall, 1202 A) przed nią.",
       "type": "array",
-      "minItems": 9,
-      "maxItems": 9,
+      "minItems": 10,
+      "maxItems": 10,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -139,6 +142,7 @@
               "requests",
               "exchange",
               "chest",
+              "stall",
               "war"
             ]
           },
@@ -637,9 +641,724 @@
     },
     "members": {
       "$ref": "#/definitions/members"
+    },
+    "heroes": {
+      "$ref": "#/definitions/heroes"
+    },
+    "lands": {
+      "$ref": "#/definitions/lands"
+    },
+    "stall": {
+      "$ref": "#/definitions/stall"
     }
   },
   "definitions": {
+    "heroes": {
+      "description": "Bohaterowie tygodnia (1198 A; src/engine/guild-heroes.js, src/server/guild-heroes.js): wyróżnienia za poprzedni tydzień, w tej kolejności, nagroda i słowa karty.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kinds",
+        "reward",
+        "texts"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "kinds": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "names",
+              "units"
+            ],
+            "properties": {
+              "id": {
+                "enum": [
+                  "pillar",
+                  "slayer",
+                  "benefactor"
+                ]
+              },
+              "names": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": "Imię wyróżnienia dla mężczyzny i kobiety."
+              },
+              "units": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": "Rzeczownik po liczbie: jedna, kilka, wiele."
+              }
+            }
+          }
+        },
+        "reward": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "timePoints",
+            "packs"
+          ],
+          "properties": {
+            "timePoints": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "packs": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "lead",
+            "last",
+            "none",
+            "now",
+            "nobody",
+            "reward",
+            "badge",
+            "how",
+            "timePointForms"
+          ],
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "lead": {
+              "type": "string",
+              "minLength": 1
+            },
+            "last": {
+              "type": "string",
+              "minLength": 1
+            },
+            "none": {
+              "type": "string",
+              "minLength": 1
+            },
+            "now": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nobody": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reward": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{timePoints\\}"
+                }
+              ]
+            },
+            "badge": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{name\\}"
+                }
+              ]
+            },
+            "how": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "timePointForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "lands": {
+      "description": "Krainy pod sztandarem (1200 A; src/engine/guild-lands.js, src/server/guild-lands.js): Sława za krainę ze sztandarem, premia do złota i materiałów ze stworów i słowa.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fame",
+        "bonus",
+        "texts"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "fame": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Sława gildii za każdą krainę ze sztandarem, w tygodniu, w którym stoi sztandar."
+        },
+        "bonus": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "O ile więcej złota i materiałów ze stworów w krainie ze sztandarem gildii postaci."
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "lead",
+            "week",
+            "alone",
+            "empty",
+            "banners",
+            "noBanners",
+            "yours",
+            "ahead",
+            "tieWin",
+            "chase",
+            "tieLose",
+            "bonus",
+            "chip",
+            "ownBanner",
+            "otherBanner",
+            "how",
+            "howFame",
+            "howMembers"
+          ],
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "lead": {
+              "type": "string",
+              "minLength": 1
+            },
+            "week": {
+              "type": "string",
+              "minLength": 1
+            },
+            "alone": {
+              "type": "string",
+              "minLength": 1
+            },
+            "empty": {
+              "type": "string",
+              "minLength": 1
+            },
+            "banners": {
+              "type": "string",
+              "minLength": 1
+            },
+            "noBanners": {
+              "type": "string",
+              "minLength": 1
+            },
+            "yours": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{minutes\\}"
+                }
+              ]
+            },
+            "ahead": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{gap\\}"
+                },
+                {
+                  "pattern": "\\{tag\\}"
+                }
+              ]
+            },
+            "tieWin": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{tag\\}"
+                }
+              ]
+            },
+            "chase": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{gap\\}"
+                },
+                {
+                  "pattern": "\\{tag\\}"
+                }
+              ]
+            },
+            "tieLose": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{tag\\}"
+                }
+              ]
+            },
+            "bonus": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{bonus\\}"
+                }
+              ]
+            },
+            "chip": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{name\\}"
+                },
+                {
+                  "pattern": "\\{tag\\}"
+                }
+              ]
+            },
+            "ownBanner": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{bonus\\}"
+                }
+              ]
+            },
+            "otherBanner": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{name\\}"
+                },
+                {
+                  "pattern": "\\{tag\\}"
+                }
+              ]
+            },
+            "how": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "howFame": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{landFame\\}"
+                }
+              ]
+            },
+            "howMembers": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{landFame\\}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "stall": {
+      "description": "Znaki Gildii i Kram (1202 A; src/engine/guild-stall.js, src/server/guild-stall.js): towary Kramu z ceną w Znakach i limitem na tydzień (bez weekly: raz na zawsze) i słowa zakładki.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "goods",
+        "texts"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "goods": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "price"
+            ],
+            "properties": {
+              "id": {
+                "enum": [
+                  "pack",
+                  "ward-scroll",
+                  "item",
+                  "title",
+                  "frame"
+                ]
+              },
+              "price": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "weekly": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "achievement": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Osiągnięcie z tytułem (data/achievements.json), które daje towar."
+              },
+              "cosmetic": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Kosmetyk (data/cosmetics.json), który daje towar."
+              }
+            }
+          }
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "lead",
+            "balance",
+            "growing",
+            "once",
+            "owned",
+            "limitReached",
+            "slotTitle",
+            "slotLead",
+            "empty",
+            "outside",
+            "markForms",
+            "goods",
+            "weekly",
+            "buy",
+            "tooFew",
+            "worn",
+            "bought",
+            "how",
+            "errors"
+          ],
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "lead": {
+              "type": "string",
+              "minLength": 1
+            },
+            "balance": {
+              "type": "string",
+              "minLength": 1
+            },
+            "growing": {
+              "type": "string",
+              "minLength": 1
+            },
+            "once": {
+              "type": "string",
+              "minLength": 1
+            },
+            "owned": {
+              "type": "string",
+              "minLength": 1
+            },
+            "limitReached": {
+              "type": "string",
+              "minLength": 1
+            },
+            "slotTitle": {
+              "type": "string",
+              "minLength": 1
+            },
+            "slotLead": {
+              "type": "string",
+              "minLength": 1
+            },
+            "empty": {
+              "type": "string",
+              "minLength": 1
+            },
+            "outside": {
+              "type": "string",
+              "minLength": 1
+            },
+            "markForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "goods": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "pack",
+                "ward-scroll",
+                "item",
+                "title",
+                "frame"
+              ],
+              "properties": {
+                "pack": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "name",
+                    "description"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "ward-scroll": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "name",
+                    "description"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "item": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "name",
+                    "description"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "title": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "name",
+                    "description"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "frame": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "name",
+                    "description"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              }
+            },
+            "weekly": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{bought\\}"
+                },
+                {
+                  "pattern": "\\{limit\\}"
+                }
+              ]
+            },
+            "buy": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{price\\}"
+                }
+              ]
+            },
+            "tooFew": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{missing\\}"
+                }
+              ]
+            },
+            "worn": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "\\{item\\}"
+                }
+              ]
+            },
+            "bought": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "pack",
+                "ward-scroll",
+                "item",
+                "title",
+                "frame"
+              ],
+              "properties": {
+                "pack": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "ward-scroll": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "item": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "frame": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "how": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "errors": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "unknown_good",
+                "owned",
+                "limit",
+                "invalid_slot",
+                "bag_full",
+                "no_guild",
+                "too_few_marks"
+              ],
+              "properties": {
+                "unknown_good": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "owned": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "limit": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "invalid_slot": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "bag_full": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "no_guild": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "too_few_marks": {
+                  "type": "string",
+                  "allOf": [
+                    {
+                      "pattern": "\\{marks\\}"
+                    },
+                    {
+                      "pattern": "\\{price\\}"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "members": {
       "description": "Ranking członków w zakładce Gildia (src/server/guild-members.js, src/client/guild-ranking.js; 897 A): jego słowa.",
       "type": "object",
@@ -739,9 +1458,14 @@
             "trials",
             "requests",
             "exchange",
-            "war"
+            "war",
+            "lands"
           ],
           "properties": {
+            "lands": {
+              "type": "string",
+              "minLength": 1
+            },
             "beast": {
               "type": "string",
               "minLength": 1

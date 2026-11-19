@@ -242,10 +242,11 @@
             "pattern": "^[a-z0-9-]+$"
           },
           "event": {
-            "description": "Przedmiot tylko z wydarzenia, bez ceny w sklepie: winter (kalendarz Szczodrych Godów, data/winter.json), andrzejki (wróżby w oba wieczory Andrzejek, winter.json: andrzejki).",
+            "description": "Przedmiot tylko z wydarzenia, bez ceny w sklepie: winter (kalendarz Szczodrych Godów, data/winter.json), andrzejki (wróżby w oba wieczory Andrzejek, winter.json: andrzejki), guild (Kram Gildii za Znaki Gildii, data/guilds.json: stall; 1202 A).",
             "enum": [
               "winter",
-              "andrzejki"
+              "andrzejki",
+              "guild"
             ]
           },
           "season": {

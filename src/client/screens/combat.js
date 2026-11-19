@@ -53,6 +53,7 @@ import { combatModes } from './towers.js';
 import { weekLine } from '../weeks.js';
 import { andrzejkiCard, omenLines } from '../andrzejki.js';
 import { partyGated } from '../party-gate.js';
+import { bannerChip, bannerLine } from '../guild-lands.js';
 
 // Shown through t(), as the page loads its English after this module.
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
@@ -777,6 +778,8 @@ export function mountCombat(container, { params, navigate }) {
           yours && chip(t('Twój poziom'), 'chip--yours'),
           chip(t('poz. {min}–{max}', { min: candidate.minLevel, max: candidate.maxLevel })),
           candidate.safe && chip(t('bezpieczny'), 'chip--safe'),
+          // The banner of the guild that holds the land this week (1200 A).
+          bannerChip(candidate.id),
         ),
       ),
       h('p', { class: 'region-trait' }, h('strong', { text: `${candidate.trait.name}. ` }), candidate.trait.description),
@@ -802,6 +805,9 @@ export function mountCombat(container, { params, navigate }) {
       { class: 'stack' },
       restSkip(character),
       h('p', { class: 'region-description', text: region.description }),
+      // Whose banner stands over the land this week, and its bonus for the
+      // character's own guild (1200 A).
+      bannerLine(region.id),
       h('p', { class: 'region-trait' }, h('strong', { text: `${region.trait.name}. ` }), region.trait.description),
       region.dangers?.length > 0 && bestiaryRow(region, true),
       h('div', { class: 'area-grid' }, region.areas.map((place) => areaTile(place, character))),

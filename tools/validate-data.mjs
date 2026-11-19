@@ -820,6 +820,7 @@ function checkReferences(data) {
   errors.push(...checkCards(data, { rarities }));
   errors.push(...checkGuildSeat(data, { resources }));
   errors.push(...checkGuildExpedition(data));
+  errors.push(...checkGuildWeek(data));
   errors.push(...checkGuildWar(data));
   errors.push(...checkWeeks(data, { stats }));
   errors.push(...checkPayments(data));
@@ -895,6 +896,36 @@ function checkGuildExpedition(data) {
       region.areas.flatMap((area) => [...area.encounters, ...(area.tough ?? [])].flatMap((encounter) => encounter.monsters).concat(area.elite ?? region.elite ?? [], area.champion ?? [])),
     );
     if (creatures.size < guardians.length) errors.push(`guilds.json: kraina ${region.id} ma ${creatures.size} stworów, a Wyprawa ${guardians.length} strażników`);
+  }
+  return errors;
+}
+
+// The Bohaterowie tygodnia, the Krainy pod sztandarem and the Kram Gildii
+// (guilds.json heroes, lands, stall; 1198 A, 1200 A, 1202 A): each hero's
+// badge, the Znak's and the banner's pictures (src/client/art/icons); the
+// Kram's tab before the Wojna; each good of the Kram once, a weekly good
+// with its limit and one bought once with what it gives: the title of an
+// achievement (achievements.json) counted by the Kram, and a frame of the
+// Sklep Systemu given by the Kram alone (cosmetics.json, event guild).
+function checkGuildWeek(data) {
+  const errors = [];
+  const { heroes, stall, tabs } = data.guilds;
+  for (const kind of heroes.kinds) {
+    if (!existsSync(new URL(`art/icons/hero-${kind.id}.png`, CLIENT_DIR))) errors.push(`guilds.json: wyróżnienie ${kind.id} nie ma znaczka src/client/art/icons/hero-${kind.id}.png`);
+  }
+  for (const icon of ['guild-mark', 'land-banner']) {
+    if (!existsSync(new URL(`art/icons/${icon}.png`, CLIENT_DIR))) errors.push(`guilds.json: brak obrazka src/client/art/icons/${icon}.png`);
+  }
+  const ids = tabs.map((tab) => tab.id);
+  if (!ids.includes('stall') || (ids.includes('war') && ids.indexOf('stall') > ids.indexOf('war'))) errors.push('guilds.json: Kram (stall) powinien być zakładką strony Gildii przed Wojną');
+  uniqueIds(errors, 'guilds (stall)', stall.goods);
+  const achievements = new Map(data.achievements.groups.flatMap((group) => group.list).map((one) => [one.id, one]));
+  const cosmetics = new Map(data.cosmetics.items.map((item) => [item.id, item]));
+  for (const good of stall.goods) {
+    const once = good.achievement !== undefined || good.cosmetic !== undefined;
+    if (once === (good.weekly !== undefined)) errors.push(`guilds.json: towar Kramu ${good.id} ma albo limit tygodnia (weekly), albo to, co daje raz (achievement, cosmetic)`);
+    if (good.achievement !== undefined && achievements.get(good.achievement)?.count !== 'bannerWarden') errors.push(`guilds.json: towar Kramu ${good.id} daje osiągnięcie "${good.achievement}", którego nie liczy Kram (count bannerWarden)`);
+    if (good.cosmetic !== undefined && cosmetics.get(good.cosmetic)?.event !== 'guild') errors.push(`guilds.json: towar Kramu ${good.id} daje kosmetyk "${good.cosmetic}", którego nie daje tylko Kram (event guild)`);
   }
   return errors;
 }

@@ -24,6 +24,9 @@ export const state = {
   // framedName), and the Punkty Systemu of the character's reward waiting
   // (GET /api/character and the Sława tab).
   fame: null,
+  // The banners standing over the lands this week, by land: the guild's
+  // id, tag and name (1200 A; GET /api/character, guild-lands.js).
+  landBanners: {},
   // The mercenary taken from the Karczma or picked in "Opcje wyprawy", for
   // the next exploration of the character named `by` (mercenaries.js).
   mercenary: null,
@@ -99,6 +102,7 @@ export async function call(method, path, body) {
   }
   if (data && Object.hasOwn(data, 'championTag')) state.championTag = data.championTag;
   if (data && Object.hasOwn(data, 'fame')) state.fame = data.fame;
+  if (data && Object.hasOwn(data, 'landBanners')) state.landBanners = data.landBanners ?? {};
   if (data?.character && (action || actionsShown === shownBefore)) {
     if (action) actionsShown += 1;
     state.offset = data.character.serverTime - (sentAt + Date.now()) / 2;
