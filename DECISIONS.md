@@ -3847,6 +3847,12 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.52 (19.11.2026): zmiany z 0.4.50 i 0.4.51 w grze
+
+1. **0.4.50 i 0.4.51 nie weszły do gry.** Wdrożenie 0.4.50 zatrzymał test `test/gem-fallout.test.js`. Zakładał starą kolejność, w której laska z oprawionym kamieniem, której wojownik nie używa, szła z pełnego plecaka przed zwykłymi hełmami. Według nowej zasady przedmiot z kamieniem idzie na końcu, więc Złomiarz sprzedał hełm. Wdrożenie 0.4.51 przerwałem, bo miało ten sam test.
+2. **Test sprawdza nową kolejność.** Hełmy też mają kamień, więc wszystkie przedmioty są z kamieniem i tej samej rzadkości. Złomiarz bierze wtedy najpierw laskę, której klasa nie używa, i raport mówi o kamieniu, który wrócił. Pozostałe testy, które dotykają pełnego plecaka (warzenie, ulubione, gra, górnictwo, profesje, Wieże), przechodzą bez zmian.
+3. **Co wchodzi.** Kolejność sprzedaży z 0.4.50 i zwrot Kapy po imieniu postaci z 0.4.51. Wpis „Co nowego?” z 0.4.50 ma teraz numer 0.4.52.
+
 ## Wersja 0.4.51 (19.11.2026): zwrot Kapy po imieniu postaci
 
 1. **Autor wskazał postać („to jest ten łucznik”):** Mistrz Łuku na 217. poziomie (klasa 262). Na czacie przed nawiasem stoi nazwa konta, a w nawiasie imię postaci, więc słowo, które w 0.4.50 trafiło do danych jako skrót loginu, jest imieniem postaci. Zwrot z 0.4.50 szukał go wśród loginów i nie zadziałałby, a do tego zakres poziomów 175–199 pochodził ze starszego zrzutu.

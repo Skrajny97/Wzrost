@@ -199,10 +199,12 @@ describe('a gem falls out of an item lost, through the API', () => {
   test('sold when the bag overflows after an exploration, a gem goes back and the report says so', async () => {
     const database = await db();
     const rng = createRng('gems');
-    // A staff a warrior cannot use, with a gem: the first the scrapper
-    // takes from a bag of 31 items for its 30 places.
+    // A staff a warrior cannot use, with a gem, among 30 helmets with gems
+    // too: an item with a gem goes only when every item left has one
+    // (0.4.50), and of those the scrapper takes the staff first from a bag
+    // of 31 items for its 30 places, as the class cannot use it.
     const staff = await inBag({ ...generateItem({ baseId: 'staff', level: 3, rarityId: 'common' }, rng, content), gem: 'emerald' });
-    for (let i = 0; i < 30; i++) await inBag(generateItem({ baseId: 'helmet', level: 3, rarityId: 'common' }, rng, content));
+    for (let i = 0; i < 30; i++) await inBag({ ...generateItem({ baseId: 'helmet', level: 3, rarityId: 'common' }, rng, content), gem: 'emerald' });
     await database.prepare('UPDATE characters SET level = 1, class_level = 1 WHERE id = ?').bind(id).run();
     assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 15 } })).status, 201);
     await database.prepare("UPDATE activities SET started_at = started_at - 86400000, ends_at = ?, seed = 'test-seed'").bind(Date.now() - 1).run();
