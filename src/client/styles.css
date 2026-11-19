@@ -28997,7 +28997,13 @@ a.social-button {
 
   .guild-hero-text {
     flex-direction: column;
+    flex-wrap: nowrap;
     align-items: flex-start;
+    align-self: stretch;
+  }
+
+  .guild-hero-title {
+    flex: none;
   }
 
   /* Each leader: the badge and the honour over the name and the count. */
