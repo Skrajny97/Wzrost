@@ -1,0 +1,14 @@
+{
+  "id": "guild-help",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "two hands clasped firmly in a handshake, one in a brown leather bracer and one in a deep blue sleeve, the symbol alone, no background, single inventory item icon, bold clean outline",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023310811211691963
+  },
+  "images": 1
+}
