@@ -53,7 +53,7 @@ import {
 import { say } from '../engine/text.js';
 import { atomically, sameVersion } from './atomic.js';
 import { featGains } from './achievements.js';
-import { cardCollection, cardsHere, cardSummary, cardUpserts, droppedCards, droppedEffect, effectChance, effectFoundLine, effectUpserts, maxedCards, packGains, packViews } from './cards.js';
+import { cardsHere, cardSummary, cardUpserts, dropCollection, droppedCards, droppedEffect, effectChance, effectFoundLine, effectUpserts, maxedCards, packGains, packViews } from './cards.js';
 import { characterView, coreOf, engineCharacter, equippedItems, loadPlayer, questsNow, requirePlayer, trophiesFor } from './characters.js';
 import { content } from './content.js';
 import { artifactData } from './core.js';
@@ -272,10 +272,11 @@ export async function enterLabyrinth(context) {
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const week = weekFor(row, now);
   // Talia Systemu (cards.js), where the game has it on: the creatures beaten
-  // may leave their cards (903), none at its top level. The collection as
+  // may leave their cards (903), none at its top level (but one held only
+  // with copies from others, 1193 B: dropCollection). The collection as
   // read, for a fight only; the room's save holds only while the character
   // is as read, and every change of the collection changes it too.
-  const collection = foes.length > 0 && cardsHere() ? await cardCollection(db, row.id) : null;
+  const collection = foes.length > 0 && cardsHere() ? await dropCollection(db, row.id) : null;
   const done = enterRoom(state, target, { character, equipped, name: row.name, companions, trophies, week, cards: collection && { maxed: maxedCards(collection) } }, seed, content());
   const { hunt, gains, artifact } = done;
   const next = done.state;

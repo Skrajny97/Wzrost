@@ -148,7 +148,34 @@ export async function cardCollection(db, characterId) {
   return new Map(results.filter((row) => isCard(row.monster_id, content())).map((row) => [row.monster_id, row.copies]));
 }
 
-// The cards at their top level, which no exploration gives again.
+// The character's own cards: those of its collection with a copy it won
+// itself, not only copies from others (`traded`: the Wymiana, the
+// Targowisko, another character through the Skrzynia Konta; card-goods.js),
+// each with all its copies. The Encyklopedia's "Karty", the collection's
+// bonus and the achievements count these (the author, 19.11.2026: „karty z
+// wymiany/targowiska niech nie uzupełniają encyklopedii jakby coś”).
+export async function ownCardCollection(db, characterId) {
+  const { results } = await db.prepare('SELECT monster_id, copies FROM cards WHERE character_id = ? AND copies > traded').bind(characterId).all();
+  return new Map(results.filter((row) => isCard(row.monster_id, content())).map((row) => [row.monster_id, row.copies]));
+}
+
+// The collection as the sources of cards weigh it (1193 B; the author,
+// 19.11.2026: a card at its top level held only with copies from others
+// „wypada dalej, aż postać znajdzie własną kopię”): the copies of each card,
+// but such a card's one below its top level, so no source takes it for done
+// (maxedCards, a tier's first win, the pack's and a resident's cards left)
+// till a copy of the character's own comes, and the Encyklopedia counts it
+// (ownCardCollection). Only to draw by: a card it gives shows at its top
+// level all the same (the copies + 1, droppedCards), and the keys are the
+// collection's, so a card held only so is no card not got yet.
+export async function dropCollection(db, characterId) {
+  const below = rules().stats.maxLevel - 1;
+  const { results } = await db.prepare('SELECT monster_id, copies, traded FROM cards WHERE character_id = ?').bind(characterId).all();
+  return new Map(results.filter((row) => isCard(row.monster_id, content())).map((row) => [row.monster_id, row.copies > row.traded ? row.copies : Math.min(row.copies, below)]));
+}
+
+// The cards at their top level, which no source gives again: of a
+// dropCollection, so never one held only with copies from others (1193 B).
 export const maxedCards = (collection) => [...collection].filter(([, copies]) => copies >= rules().stats.maxLevel).map(([id]) => id);
 
 // The statements that add a copy of each card of `ids` to the collection.
@@ -255,7 +282,7 @@ export async function sourceCards(db, row, seeds, chance) {
   if (rolls.length === 0) return null;
   const packs = rolls.filter((roll) => roll.kind === 'pack').length;
   const drawn = rolls.filter((roll) => roll.kind === 'card');
-  const collection = drawn.length > 0 ? await cardCollection(db, row.id) : new Map();
+  const collection = drawn.length > 0 ? await dropCollection(db, row.id) : new Map();
   const pool = cardsUpTo(sourceLevel(row), content());
   const ids = [];
   for (const { rng } of drawn) {
@@ -443,8 +470,9 @@ function opponentOf(match) {
 // the forms of the name its words take, its deck's name and style, its place
 // among Szczęsny's tiers, the stake at the character's level and what a win
 // gives, whether its first staked win is behind the character, how many of
-// its cards the character has not got and how many can still come, its
-// first cards (the rest it shows at the table) and its words after a match.
+// its cards the character has not got and how many can still come (of the
+// dropCollection, 1193 B), its first cards (the rest it shows at the table)
+// and its words after a match.
 function residentsView(row, game, collection) {
   const data = rules();
   const { places, residents } = content().settlement;
@@ -501,7 +529,9 @@ function packPrice(row, stored = settlementOf(row)) {
 // price, pack.second times as much, and whether it is bought), the packs
 // found to open (drops.packShare), the odds of each rarity (of every card
 // and of the last), the cards of the game the character still misses and
-// whether any is left to draw (none once all are at their top level).
+// whether any is left to draw (none once all are at their top level; of the
+// dropCollection, so a card held only with copies from others is still
+// there to draw, 1193 B).
 function packView(row, game, collection) {
   const { pack, stats } = rules();
   const ids = [...cardHomes(content()).keys()];
@@ -535,8 +565,10 @@ async function cardsView(db, player, now) {
   const { row } = player;
   const day = casinoDay(now, content());
   const game = cardGameOf(row, day.key);
-  const [collection, running, last, effects] = await Promise.all([
+  const [collection, drops, running, last, effects] = await Promise.all([
     cardCollection(db, row.id),
+    // What can still come (1193 B): the pack's and the residents' cards left.
+    dropCollection(db, row.id),
     runningMatch(db, row.id),
     db.prepare('SELECT * FROM card_matches WHERE character_id = ? AND result IS NOT NULL ORDER BY id DESC LIMIT 1').bind(row.id).first(),
     effectCollection(db, row.id),
@@ -606,9 +638,9 @@ async function cardsView(db, player, now) {
         levels: [Math.min(...tier.cards.map((card) => card.level)), Math.max(...tier.cards.map((card) => card.level))],
       };
     }),
-    residents: residentsView(row, game, collection),
+    residents: residentsView(row, game, drops),
     staked: { today: game.staked, limit: data.stakes.perDay },
-    pack: game.starter ? packView(row, game, collection) : null,
+    pack: game.starter ? packView(row, game, drops) : null,
     match: running ? { id: running.id, ...opponentOf(running), mode: running.mode, stake: running.stake, ...matchView(JSON.parse(running.state), content()) } : null,
     last: last ? { id: last.id, ...opponentOf(last), mode: last.mode, stake: last.stake, result: last.result, at: last.finished_at, ...summaryOf(last) } : null,
     endsAt: day.endsAt,
@@ -785,7 +817,7 @@ export async function keyedSeed(db, parts) {
 // the ids to add and the cards as they will be in the collection; null
 // once every card is at its top level.
 async function packDraw(db, row, seed) {
-  const collection = await cardCollection(db, row.id);
+  const collection = await dropCollection(db, row.id);
   const effects = await effectCollection(db, row.id);
   const effect = packEffect({ maxed: maxedEffects(effects), seed }, content());
   const drawn = packCards({ maxed: maxedCards(collection), seed, count: rules().pack.cards }, content());
@@ -944,7 +976,7 @@ async function endStatements(db, player, match, state, now) {
   const game = cardGameOf(row, day);
   const firstTier = Boolean(tier) && won && !game.beaten.includes(number);
   const firstResident = Boolean(table) && won && !game.residents.includes(table.id);
-  const collection = firstTier || (table && won) ? await cardCollection(db, row.id) : new Map();
+  const collection = firstTier || (table && won) ? await dropCollection(db, row.id) : new Map();
   // The tier's effect card at its first staked win since the effect cards
   // came (977.3 B), of the rarity effects.firstWin gives the tier.
   const effectTier = Boolean(tier) && won && !game.effectTiers.includes(number);
@@ -954,7 +986,9 @@ async function endStatements(db, player, match, state, now) {
   // The tier's card at its first win; when every card of its rarity is at
   // its top level already, it would be lost, so the tier's stake comes once
   // more instead (the author's 919 B, 13.11.2026: nothing else in the game
-  // prices a card of a rarity, and the stake is the tier's own number).
+  // prices a card of a rarity, and the stake is the tier's own number). A
+  // card held only with copies from others is not done yet (1193 B,
+  // dropCollection): it comes before those done.
   const drawn = firstTier ? firstWinCard(tier, collection, state.seed, content()) : null;
   const spent = drawn !== null && (collection.get(drawn) ?? 0) >= rules().stats.maxLevel;
   const cardGold = spent ? match.stake : 0;

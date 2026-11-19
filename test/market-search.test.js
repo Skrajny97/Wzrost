@@ -59,8 +59,9 @@ describe('the search over the offers, in the engine', () => {
     const herbs = search({ show: 'all', kind: 'herb' });
     assert.deepEqual(herbs.ids, [5, 6]);
     assert.equal(herbs.view.kind, 'herb');
-    // The scrolls have a tab of their own too (1061).
-    assert.deepEqual(herbs.counts.kinds, { item: 4, herb: 2, potion: 0, material: 1, part: 0, mineral: 1, scroll: 0, pantry: 0 });
+    // The scrolls have a tab of their own too (1061), and so have Talia
+    // Systemu's cards, effect cards with them (19.11.2026).
+    assert.deepEqual(herbs.counts.kinds, { item: 4, herb: 2, potion: 0, material: 1, part: 0, mineral: 1, scroll: 0, pantry: 0, card: 0 });
     assert.deepEqual(herbs.counts.shows, { all: 8, 'for-me': 2, bidding: 1 });
     // No categories over one kind of stacks.
     assert.equal(herbs.counts.categories, undefined);

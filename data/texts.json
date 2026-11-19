@@ -288,5 +288,8 @@
     "success": "Wyprawa zakończona.",
     "fainted": "Porażka.",
     "escaped": "Odwrót."
+  },
+  "page": {
+    "toTop": "Na górę"
   }
 }

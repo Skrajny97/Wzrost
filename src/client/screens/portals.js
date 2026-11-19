@@ -1,9 +1,10 @@
 // The Portale Systemu in the Walka (src/server/portals.js), from character
 // level 5 (731 A): each portal with its highest stage won, the fight for
 // the next one (its level and the loot of a win, as often as the player
-// likes, up to the character's level) and the sweep of the stage won, its
-// loot at once, a few times a day. A fight's report opens at once; a
-// sweep's loot shows in a toast. Entries come at any time, also during an
+// likes, up to the character's level, or a few stages at one tap: ×5, ×10,
+// "Do oporu", 19.11.2026) and the sweep of the stage won, its loot at once,
+// a few times a day. A fight's report opens at once, one for a series too;
+// a sweep's loot shows in a toast. Entries come at any time, also during an
 // exploration (732 A). A card is its portal's picture with its name
 // (data/portals.json, art); a tap on it shows the stage, with nothing of
 // the lands (the author, 7.11.2026: "po prostu się klika w te tła Portal
@@ -44,12 +45,54 @@ function setTakesCompanions(value) {
 // box on the Portale says, its report opened at once: from the portal's card
 // and from the top of the report of a stage won (the author, 7.11.2026:
 // "dodaj opcje następny portal po pokonaniu jednego stopnia jesli jest
-// dostępny […] na samej górze raportu").
-export async function fightPortal(portalId, navigate) {
-  const { report } = await call('POST', '/api/portals/enter', { portal: portalId, companions: takesCompanions() });
+// dostępny […] na samej górze raportu"). `series`: a few stages at one tap
+// (data/portals.json, series.options), from stage `from` as the page shows
+// it, so that the server fights nothing for a page gone old.
+export async function fightPortal(portalId, navigate, { series = null, from = null } = {}) {
+  const { report } = await call('POST', '/api/portals/enter', { portal: portalId, companions: takesCompanions(), ...(series && { series, from }) });
   reportCache.set(String(report.id), report);
   state.freshReport = String(report.id);
   navigate(`#/raport/${report.id}`);
+}
+
+// "Walcz o stopień N" and, beside it, a few stages at one tap (a player's
+// idea, the author: „mądre pomysły”, 19.11.2026: ×5, ×10 and "Do oporu",
+// data/portals.json, series) while at least two stages are open, up to the
+// character's level and the portals' last stage: on a portal's card and at
+// the top of the report of a stage won. While one fights, none of them
+// can be tapped. `failed`: what the screen does after a refusal.
+export function portalFightButtons(portalId, next, navigate, { className = '', guide = null, failed = null } = {}) {
+  const series = state.content.portalSeries;
+  const open = Math.min(series?.maxStage ?? next, state.character.level) - next + 1;
+  const fight = (event, options) => {
+    const buttons = [...row.querySelectorAll('button')];
+    return withButton(event.currentTarget, async () => {
+      for (const button of buttons) button.disabled = true;
+      try {
+        await fightPortal(portalId, navigate, options);
+      } catch (error) {
+        failed?.(error);
+        throw error;
+      } finally {
+        for (const button of buttons) if (button.isConnected) button.disabled = false;
+      }
+    });
+  };
+  const row = h(
+    'div',
+    { class: `portal-fight${className ? ` ${className}` : ''}` },
+    h('button', { type: 'button', class: 'button button--system portal-fight-one', 'data-guide': guide, text: t('Walcz o stopień {stage}', { stage: next }), onClick: (event) => fight(event) }),
+    series &&
+      open >= 2 &&
+      h(
+        'div',
+        { class: 'portal-series', role: 'group', 'aria-label': series.page.group },
+        series.options.map((option) =>
+          h('button', { type: 'button', class: 'button button--system button--small', title: option.hint, 'aria-label': option.hint, text: option.label, onClick: (event) => fight(event, { series: option.id, from: next }) }),
+        ),
+      ),
+  );
+  return row;
 }
 
 // The portals opened with a tap, kept while the page is open: a portal
@@ -74,15 +117,19 @@ export function mountPortals(container, { navigate }) {
       ...heading(),
       h(
         'section',
-        { class: 'card towers-intro' },
+        { class: 'card towers-intro portals-intro' },
         view.companions.length > 0 && companionsBox(),
         sweepAllButton(),
         howItWorks(
           t('Walcz o kolejne stopnie portali, ile chcesz. Pokonane stopnie czyścisz: łup od razu, bez walki, {count} razy dziennie w każdym portalu.', { count: view.sweepsPerDay }),
-          t(
-            'Postać walczy z pełnym HP i bez mikstur, a może zabrać towarzyszy z Kwater (bez Drużyny). Wejść można zawsze, także w czasie wyprawy i pracy w profesji. W każdym portalu za wygraną zgarniesz tylko jego łup: złoto, zasób obozu, materiały stworów albo części do rzemiosła. Na stopniu czekają zwykłe stwory jego poziomu, silniejsze niż w Eksploracji, bez elit i czempionów. Pokonany stopień otwiera następny, najwyżej do stopnia równego poziomowi postaci i do {max}. Za wygraną i za czyszczenie zgarniesz tyle, ile daje około {minutes} minut wyprawy na poziomie stopnia, więc im wyższy stopień, tym większy łup. Czyszczenie daje łup najwyższego pokonanego stopnia. Portale nie dają doświadczenia ani przedmiotów.',
-            { max: view.maxStage, minutes: view.lootMinutes },
-          ),
+          [
+            t(
+              'Postać walczy z pełnym HP i bez mikstur, a może zabrać towarzyszy z Kwater (bez Drużyny). Wejść można zawsze, także w czasie wyprawy i pracy w profesji. W każdym portalu za wygraną zgarniesz tylko jego łup: złoto, zasób obozu, materiały stworów albo części do rzemiosła. Na stopniu czekają zwykłe stwory jego poziomu, silniejsze niż w Eksploracji, bez elit i czempionów. Pokonany stopień otwiera następny, najwyżej do stopnia równego poziomowi postaci i do {max}. Za wygraną i za czyszczenie zgarniesz tyle, ile daje około {minutes} minut wyprawy na poziomie stopnia, więc im wyższy stopień, tym większy łup. Czyszczenie daje łup najwyższego pokonanego stopnia. Portale nie dają doświadczenia ani przedmiotów.',
+              { max: view.maxStage, minutes: view.lootMinutes },
+            ),
+            // A few stages at one tap (data/portals.json, series.page).
+            state.content.portalSeries?.page.about,
+          ].filter(Boolean),
         ),
       ),
       view.portals.map(portalCard),
@@ -143,12 +190,9 @@ export function mountPortals(container, { navigate }) {
               h('p', { class: 'tower-floor-title', text: t('Stopień {stage} · poz. {level}', { stage: portal.next, level: portal.next }) }),
               h('p', { text: t('Za wygraną zgarniesz: {loot}.', { loot: lootText(portal, portal.nextLoot) }) }),
             ),
-            h('button', {
-              type: 'button',
-              class: 'button button--system',
-              text: t('Walcz o stopień {stage}', { stage: portal.next }),
-              onClick: (event) => withButton(event.currentTarget, () => fightPortal(portal.id, navigate)),
-            }),
+            // A refused fight (the portal moved on elsewhere, a new day):
+            // the cards again, as the server has them.
+            portalFightButtons(portal.id, portal.next, navigate, { failed: (error) => error.status === 409 && load().catch(() => {}) }),
           ];
     const sweep =
       portal.best > 0 && [

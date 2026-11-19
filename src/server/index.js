@@ -78,6 +78,7 @@ import { englishOn, guildWarsOn, readFeatures, registrationOpen, settlementOn } 
 import { language, pageDictionary, requestLanguage, runInLanguage, t } from './i18n.js';
 import { bidOnOffer, buyFromResident, buyOffer, cancelOffer, collectParcels, getMarket, getMarketLog, listOffer, settleMarket } from './market.js';
 import { cancelHunt, claimHunt, huntOptions, quickHunt, startHunt } from './hunts.js';
+import { claimOrb } from './orbs.js';
 import { discardItem, equipItem, previewItem, sellItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
 import { markFavorite } from './favorites.js';
 import { discardHerbs, sellHerbs, startGathering } from './professions.js';
@@ -96,6 +97,7 @@ import {
   backFromTest,
   chooseTestEvent,
   eventTests,
+  orbSoon,
   repeatAccountChestTour,
   repeatCommunityTour,
   repeatCornerstoneTour,
@@ -276,6 +278,8 @@ const routes = [
   ['POST', '/api/hunts/cancel', cancelHunt],
   ['POST', '/api/hunts/claim', claimHunt],
   ['POST', '/api/hunts/quick', quickHunt],
+  // A Kulka Systemu caught over the exploration's scene (orbs.js).
+  ['POST', '/api/hunts/orb', claimOrb],
   ['POST', '/api/professions/gather', startGathering],
   ['POST', '/api/herbs/sell', sellHerbs],
   ['POST', '/api/herbs/discard', discardHerbs],
@@ -549,6 +553,7 @@ const routes = [
   ['POST', '/api/push/unsubscribe', unsubscribePush],
   ['POST', '/api/push/test', testPush],
   ['POST', '/api/test/skip-time', skipTime],
+  ['POST', '/api/test/orb', orbSoon],
   ['POST', '/api/test/skip-build', skipBuilding],
   ['POST', '/api/test/skip-craft', skipCrafting],
   ['POST', '/api/test/skills-tour', repeatSkillsTour],

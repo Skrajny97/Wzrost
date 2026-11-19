@@ -326,5 +326,7 @@ export function buildContent(raw) {
     achievements: raw.achievements ?? null,
     // Szczodre Gody: the calendar, the winter camp and their words (winter.js, 1044).
     winter: raw.winter ?? null,
+    // The Kulki Systemu over the Walka scene of an exploration (orbs.js).
+    orbs: raw.orbs ?? null,
   };
 }

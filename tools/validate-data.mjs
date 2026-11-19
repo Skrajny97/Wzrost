@@ -15,7 +15,7 @@ export const DATA_FILES = [
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
   'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat', 'community',
   'events', 'encyclopedia', 'evolutions', 'gift-codes', 'settlement', 'towers', 'portals', 'guilds', 'cosmetics', 'news', 'fame',
-  'weeks', 'payments', 'party-events', 'labyrinth', 'cards', 'achievements', 'winter',
+  'weeks', 'payments', 'party-events', 'labyrinth', 'cards', 'achievements', 'winter', 'orbs',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'evolution', 'professions', 'settlement', 'party', 'towers', 'portals', 'labyrinth', 'core'];
@@ -847,6 +847,24 @@ function checkReferences(data) {
   errors.push(...checkWeeks(data, { stats }));
   errors.push(...checkPayments(data));
   errors.push(...checkWinter(data));
+  errors.push(...checkOrbs(data));
+  return errors;
+}
+
+// The Kulki Systemu (orbs.json): the picture of 32 × 32 (art/icons), a
+// recorded sound for the catch, a claim open at least as long as the orb
+// flies, the ranges from the lower to the higher, and a reward of some
+// kind.
+function checkOrbs(data) {
+  const errors = [];
+  const orbs = data.orbs;
+  const size = pngSize(`art/icons/${orbs.art}.png`);
+  if (!size) errors.push(`orbs.json: brak obrazka src/client/art/icons/${orbs.art}.png`);
+  else if (size.width !== 32 || size.height !== 32) errors.push(`orbs.json: obrazek ma ${size.width} × ${size.height}, a nie 32 × 32`);
+  if (!data.sounds.effects?.[orbs.sound]) errors.push(`orbs.json: sounds.json nie ma efektu ${orbs.sound}`);
+  if (orbs.claimSeconds < orbs.flightSeconds) errors.push('orbs.json: claimSeconds krótsze niż flightSeconds');
+  for (const key of ['goldShare', 'timePoints']) if (orbs[key][0] > orbs[key][1]) errors.push(`orbs.json: ${key} od większego do mniejszego`);
+  if (Object.values(orbs.kinds).every((weight) => weight === 0)) errors.push('orbs.json: kinds bez żadnej nagrody');
   return errors;
 }
 
@@ -1958,6 +1976,35 @@ function checkCards(data, { rarities }) {
     if (!icons.has(table.icon)) errors.push(`${where}: ${owner}: nieznana ikona "${table.icon}" (src/client/icons.js)`);
   }
   if (tables.size === 0) errors.push(`${where}: mieszkańcy nie mają stołów`);
+  // The words of the cards as goods (src/server/card-goods.js and the
+  // Skrzynia Konta's, the Targowisko's and the Wymiana's screens): each
+  // names what the game fills in.
+  const chestWords = {
+    card: ['name'],
+    effect: ['name'],
+    collection: ['count'],
+    copies: ['count'],
+    putHave: ['count', 'level'],
+    putLeft: ['level'],
+    putDeck: ['deck'],
+    putDecks: ['decks'],
+    putButton: ['count'],
+    putDone: ['name', 'count'],
+    ownSome: ['count'],
+    haveLevel: ['level'],
+    takeChest: ['count'],
+    takeNew: ['level'],
+    takeHave: ['have', 'level'],
+    takeTop: ['level'],
+    takeButton: ['count'],
+    takeDone: ['name', 'level'],
+    marketHave: ['level', 'count'],
+    fewer: ['count'],
+    only: ['count'],
+  };
+  for (const [key, words] of Object.entries(chestWords)) {
+    for (const word of words) if (!rules.texts.goods?.[key]?.includes(`{${word}}`)) errors.push(`${where}: texts.goods.${key} nie ma {${word}}`);
+  }
   return errors;
 }
 
