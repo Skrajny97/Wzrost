@@ -1,0 +1,14 @@
+{
+  "id": "frame-guild-banner",
+  "tool": "pixellab generate-image-v2",
+  "description": "an ornate portrait frame of dark carved oak with forged iron corner brackets, the frame fills the whole image edge to edge with a thin border, a short wide deep blue cloth guild banner with gold trim and a small golden stag head emblem draped across the top border of the frame, not hanging down into the window, a spear tip at each end of its pole, no other banners, a large empty window in the middle for a portrait, seen flat from the front, pixel art user interface, symmetrical",
+  "style": "src/client/art/cosmetics/frame-forest.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.11579932271109687
+  },
+  "images": 4
+}
