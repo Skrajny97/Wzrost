@@ -3,17 +3,19 @@
 // unlocks.json (731 A: the 5th). In each portal the character fights for
 // the stage above the highest it has won there, up to its level, as often
 // as it likes (the author: "niech będą nieograniczone co do ilości wejść.
-// Ograniczeniem będzie trudność"), each fight with its report at once; the
-// highest stage won it sweeps, its loot at once with no fight, sweeps.perDay
-// times a day in each portal, from midnight in Poland ("Na czyszczenia
-// (swipe'y) będzie ograniczona ilość - do 5 dziennie"). The portals pay
-// only their loot and write the creatures fought into the Bestiariusz, so
-// an entry may come at any time: during an exploration, before its report
-// is claimed, and during work in a profession. The character fights at
-// full HP with no potions and its HP stays as it was. Everything is saved
-// in one batch only while the character is as read (atomic.js).
+// Ograniczeniem będzie trudność"), each fight with its report at once, or a
+// few stages at one tap (×5, ×10, "Do oporu", 19.11.2026) with one report
+// for them all; the highest stage won it sweeps, its loot at once with no
+// fight, sweeps.perDay times a day in each portal, from midnight in Poland
+// ("Na czyszczenia (swipe'y) będzie ograniczona ilość - do 5 dziennie").
+// The portals pay only their loot and write the creatures fought into the
+// Bestiariusz, so an entry may come at any time: during an exploration,
+// before its report is claimed, and during work in a profession. The
+// character fights at full HP with no potions and its HP stays as it was.
+// Everything is saved in one batch only while the character is as read
+// (atomic.js).
 
-import { applyHunt, areaDangers, companionReady, companionsGoingMost, companionStays, huntReport, isUnlocked, laterPeriod, portalAmount, portalArea, portalById, portalFight, portalNext, portalSweep, portalSweepAll, questPeriod } from '../engine/index.js';
+import { applyHunt, areaDangers, companionReady, companionsGoingMost, companionStays, huntReport, isUnlocked, laterPeriod, portalAmount, portalArea, portalById, portalFight, portalNext, portalSeries, portalSweep, portalSweepAll, questPeriod } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
 import { characterView, engineCharacter, equippedItems, loadPlayer, requireNotExploring, requirePlayer, trophiesFor } from './characters.js';
 import { content } from './content.js';
@@ -134,9 +136,26 @@ export function requireFree(player, now) {
   if (player.activity?.kind === 'mercenary') requireNotExploring(player, now);
 }
 
-// { portal, companions }: a fight for the portal's next stage, with the
-// character's companions unless `companions` is false. The report comes at
-// once; the loot and the creatures met are saved with it.
+// The series a tap fights (data/portals.json, series.options), named by the
+// body's `series`; none, a single fight.
+function seriesOf(body) {
+  if (body.series === undefined || body.series === null) return null;
+  const option = rules().series.options.find((one) => one.id === body.series);
+  if (!option) throw new ApiError(400, 'invalid_series', 'Wybierz, ile stopni naraz.');
+  return option;
+}
+
+// { portal, companions, series, from }: a fight for the portal's next stage,
+// with the character's companions unless `companions` is false. With
+// `series` (data/portals.json, series.options), a few stages at one tap (a
+// player's idea, the author: „mądre pomysły”, 19.11.2026): the stages one
+// after another, up to the series' count or, for "Do oporu", every stage
+// open (portalNext), until the first loss; each fight a single entry's, with
+// a seed of its own. A series names the stage it starts from as the page
+// saw it (`from`): a second tap, or a page left open while the portal moved
+// on, fights nothing (the Labirynt's rooms likewise, labyrinth.js). The
+// report comes at once, one for the whole series; the loot and the
+// creatures met are saved with it, all in one batch.
 export async function enterPortal(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -146,37 +165,65 @@ export async function enterPortal(context) {
   const now = context.now;
   const body = await readJson(context.request);
   const portal = portalOf(body);
+  const series = seriesOf(body);
   const record = recordOf(row);
   const best = record.best[portal.id] ?? 0;
   const stage = portalNext(best, row.level, content());
   if (stage === null && best >= rules().maxStage) throw new ApiError(409, 'last_stage', 'To ostatni stopień tego portalu. Kolejne stopnie przyjdą później.');
   if (stage === null) throw new ApiError(409, 'level', `Kolejny stopień otworzy się na poziomie postaci ${best + 1}.`);
+  if (series && (body.from ?? stage) !== stage) throw new ApiError(409, 'stale_stage', 'Portal zmienił się w międzyczasie. Spróbuj jeszcze raz.');
   const companions = body.companions === false ? [] : companionsOf(player);
 
   const character = engineCharacter(row);
-  const area = portalArea(stage, content());
-  // The Encyklopedia's trophies for the creatures of the stage's region.
-  const trophies = trophiesFor(player, now, areaDangers(area, content()).map((danger) => danger.monsterId));
-  const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
+  const equipped = equippedItems(player);
   // The week of the year of the entry (weeks.js).
-  const hunt = portalFight({ character, equipped: equippedItems(player), name: row.name, portalId: portal.id, stage, first: true, seed, trophies, companions, week: weekFor(row, now) }, content());
-  const { won } = hunt.portal;
+  const week = weekFor(row, now);
+  // The creatures fought join those the character has met (the Bestiariusz),
+  // fight by fight, as tap by tap.
+  const met = new Set(JSON.parse(row.met ?? '[]'));
+  const most = series ? (series.count ?? Infinity) : 1;
+  const fights = [];
+  for (let at = stage; at !== null && fights.length < most; ) {
+    const area = portalArea(at, content());
+    // The Encyklopedia's trophies for the creatures of the stage's region,
+    // the Sala trofeów's with the creatures met in the fights before it.
+    const seen = fights.length === 0 ? player : { ...player, row: { ...row, met: JSON.stringify([...met]) } };
+    const trophies = trophiesFor(seen, now, areaDangers(area, content()).map((danger) => danger.monsterId));
+    const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
+    const hunt = portalFight({ character, equipped, name: row.name, portalId: portal.id, stage: at, first: true, seed, trophies, companions, week }, content());
+    fights.push({ area, seed, hunt });
+    for (const fight of hunt.fights) for (const enemy of fight.enemies) met.add(enemy.monsterId);
+    at = hunt.portal.won ? portalNext(at, row.level, content()) : null;
+  }
+  const last = fights[fights.length - 1];
+  const fought = last.hunt.portal;
+  // A series' fights in one: the last fight, the loot of all, its summary.
+  const run = series && portalSeries(fights.map((one) => one.hunt), { best, level: row.level }, content());
+  const hunt = run ? run.hunt : last.hunt;
+  const highest = run ? run.highest : fought.won ? stage : best;
   const applied = applyHunt(character, hunt, content());
 
-  const base = huntReport({ hunt, applied, character, areaId: area.id, startedAt: now, endsAt: now }, content());
+  const base = huntReport({ hunt, applied, character, areaId: last.area.id, startedAt: now, endsAt: now }, content());
   const report = {
     ...base,
     kind: 'portal',
-    resultText: hunt.portal.text,
-    portal: { id: portal.id, name: portal.name, stage, level: hunt.portal.level, won, first: hunt.portal.first, loot: hunt.portal.loot, companions: hunt.portal.companions },
+    resultText: fought.text,
+    portal: { id: portal.id, name: portal.name, stage: fought.stage, level: fought.level, won: fought.won, first: fought.first, loot: fought.loot, companions: fought.companions },
   };
   // The stage the portal opens next, null when the character's level or the
   // last stage holds it: the report of a stage won offers its fight at the
   // top (the author, 7.11.2026). A portal's fight gives no experience, so
   // the level is the one fought at.
-  report.portal.next = portalNext(won ? stage : best, row.level, content());
+  report.portal.next = portalNext(highest, row.level, content());
+  // A series: won with any stage won; at the top the stages won, the loot of
+  // all and where and why it stopped, its last fight below.
+  if (run) {
+    report.result = run.won > 0 ? 'success' : 'escaped';
+    report.resultText = run.result;
+    report.portal.series = { id: series.id, from: run.from, to: run.to, won: run.won, range: run.range, loot: run.loot, stop: run.stop };
+  }
   const summary = {
-    portal: { id: portal.id, name: portal.name, stage, loot: hunt.portal.loot },
+    portal: { id: portal.id, name: portal.name, stage: fought.stage, loot: run ? run.loot : fought.loot, ...(run && { series: { range: run.range, chip: run.chip } }) },
     areaName: report.areaName,
     minutes: 0,
     result: report.result,
@@ -193,19 +240,17 @@ export async function enterPortal(context) {
     levelAfter: row.level,
     system: report.system,
   };
-  const next = { ...record, best: { ...record.best, [portal.id]: won ? stage : best } };
-  // The creatures fought join those the character has met (the Bestiariusz).
-  const met = [...new Set([...JSON.parse(row.met ?? '[]'), ...hunt.fights.flatMap((fight) => fight.enemies.map((enemy) => enemy.monsterId))])];
+  const next = { ...record, best: { ...record.best, [portal.id]: highest } };
   const stores = storesSql(hunt);
   const results = await atomically(db, [
     sameVersion(db, row),
     db
       .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
-      .bind(row.id, `${row.id}:portal:${seed}`, 'portal', now, JSON.stringify(summary), JSON.stringify(report)),
+      .bind(row.id, `${row.id}:portal:${last.seed}`, 'portal', now, JSON.stringify(summary), JSON.stringify(report)),
     trimReports(db, row.id, 'portal'),
     db
       .prepare(`UPDATE characters SET gold = gold + ?${stores.sql}, met = ?, portals = ?, version = version + 1 WHERE id = ?`)
-      .bind(hunt.gold, ...stores.binds, JSON.stringify(met), JSON.stringify(next), row.id),
+      .bind(hunt.gold, ...stores.binds, JSON.stringify([...met]), JSON.stringify(next), row.id),
   ]);
   const after = await loadPlayer(db, session.userId);
   return json({

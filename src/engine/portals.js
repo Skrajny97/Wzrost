@@ -165,6 +165,21 @@ export function portalLoot(portal, stage, first, rng, content, week = null) {
   return loot;
 }
 
+// A number in the content's language, as the page writes its numbers
+// (src/client/format.js): "16 834" in Polish (from ten thousand on),
+// "16,834" in English; a series of stages adds up to such sums.
+/** @type {Map<string, Intl.NumberFormat>} */
+const numberFormats = new Map();
+/**
+ * @param {number} value
+ * @param {Content} content
+ */
+function grouped(value, content) {
+  const locale = content?.language === 'en' ? 'en-GB' : 'pl-PL';
+  if (!numberFormats.has(locale)) numberFormats.set(locale, new Intl.NumberFormat(locale));
+  return /** @type {Intl.NumberFormat} */ (numberFormats.get(locale)).format(value);
+}
+
 // The loot in a sentence: "30 złota", "drewno +90", "skóra wilka ×2",
 // "ścinki ×2".
 /**
@@ -175,12 +190,12 @@ export function portalLoot(portal, stage, first, rng, content, week = null) {
 export function portalLootText(loot, content) {
   /** @type {string[]} */
   const parts = [];
-  if (loot.gold > 0) parts.push(word(content, '{gold} złota', { gold: loot.gold }));
-  for (const [id, count] of Object.entries(loot.resources)) parts.push(`${nameInText(content.resourcesById[id].name, content)} +${count}`);
+  if (loot.gold > 0) parts.push(word(content, '{gold} złota', { gold: grouped(loot.gold, content) }));
+  for (const [id, count] of Object.entries(loot.resources)) parts.push(`${nameInText(content.resourcesById[id].name, content)} +${grouped(count, content)}`);
   if (Object.keys(loot.materials).length > 0) parts.push(materialsText(loot.materials, content));
   for (const [id, count] of Object.entries(loot.parts)) {
     const name = nameInText(content.partsById[id].name, content);
-    parts.push(count > 1 ? `${name} ×${count}` : name);
+    parts.push(count > 1 ? `${name} ×${grouped(count, content)}` : name);
   }
   return parts.join(', ');
 }
@@ -331,6 +346,64 @@ export function portalFight({ character, equipped, name, portalId, stage, first 
     // The week of the entry, for the report's line (weeks.js).
     ...(week && { week }),
     portal: { id: portal.id, stage, level: plan.level, won, first: won && first, loot: portalLootText(loot, content), companions: companions.map((companion) => companion.name), text: say(texts, won ? 'won' : 'lost', stage, { stage }) },
+  };
+}
+
+// A few stages at one tap (a player on the chat: „guzik [...] po 5 / 10 albo
+// max na najwyższy lvl który postać pokona”, the author: „mądre pomysły”,
+// 19.11.2026; data/portals.json, series): `hunts`, the fights of a series in
+// the order fought, each a single entry's (portalFight, its own seed from
+// the server), from the stage above `best`, the highest won before, and
+// stopped at the first loss; `level`, the character's. One hunt for
+// huntReport: the last fight with its playback, the loot of every stage won
+// together, and each fight's lines in the full account under its stage; and
+// the series in words: the stages won, their loot, and where and why it
+// stopped (a stage lost, the stage open next after all its fights, the
+// character's level or the portal's last stage).
+/**
+ * @param {Record<string, any>[]} hunts
+ * @param {{ best: number, level: number }} where
+ * @param {Content} content
+ */
+export function portalSeries(hunts, { best, level }, content) {
+  const { texts } = content.portals.series;
+  const last = hunts[hunts.length - 1];
+  const won = hunts.filter((hunt) => hunt.portal.won);
+  const from = hunts[0].portal.stage;
+  const to = last.portal.stage;
+  const highest = won.length > 0 ? won[won.length - 1].portal.stage : best;
+  /** @type {Loot} */
+  const loot = { gold: 0, resources: {}, materials: {}, parts: {} };
+  for (const hunt of won) addLoot(loot, /** @type {Loot} */ (hunt));
+  const next = portalNext(highest, level, content);
+  const stop = !last.portal.won
+    ? say(texts, 'stopLost', 0, { stage: to })
+    : next !== null
+      ? say(texts, 'stopCount', 0, { fights: hunts.length, stage: next })
+      : highest >= content.portals.maxStage
+        ? say(texts, 'stopLast', 0, {})
+        : say(texts, 'stopLevel', 0, { level: highest + 1 });
+  // The account: each fight's lines under its stage; only the last fight's
+  // are those of the fight the report plays.
+  const entries = hunts.flatMap((hunt, index) =>
+    hunt.entries.map((/** @type {Record<string, any>} */ { fight, ...entry }) => ({
+      ...entry,
+      ...(index === hunts.length - 1 && { fight }),
+      text: say(texts, 'entry', 0, { stage: hunt.portal.stage, text: entry.text }),
+    })),
+  );
+  return {
+    hunt: { ...last, gold: loot.gold, resources: loot.resources, materials: loot.materials, parts: loot.parts, entries },
+    from,
+    to,
+    won: won.length,
+    highest,
+    next,
+    loot: portalLootText(loot, content),
+    result: won.length === 0 ? say(texts, 'wonNone', 0, {}) : won.length === 1 ? say(texts, 'wonOne', 0, { stage: from }) : say(texts, 'wonMany', 0, { from, to: highest }),
+    stop,
+    range: from === to ? say(texts, 'rangeOne', 0, { stage: from }) : say(texts, 'range', 0, { from, to }),
+    chip: say(texts, 'chip', 0, { won: won.length }),
   };
 }
 

@@ -8,12 +8,15 @@
 // from character level 5: fights for the next stage as often as the
 // player likes, up to the character's level, sweeps a few times a day in
 // each portal, also during an exploration, and their reports kept in the
-// Dziennik apart from the others.
+// Dziennik apart from the others; and a few stages at one tap (×5, ×10, "Do
+// oporu", 19.11.2026), each fight a single entry's, until the first loss,
+// with one report for them all.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { createRng, encounterCombatants, encountersFor, explorationPace, portalAmount, portalArea, portalById, portalExpected, portalFight, portalLoot, portalNext, portalStage, portalSweep } from '../src/engine/index.js';
+import { createRng, encounterCombatants, encountersFor, explorationPace, portalAmount, portalArea, portalById, portalExpected, portalFight, portalLoot, portalLootText, portalNext, portalSeries, portalStage, portalSweep } from '../src/engine/index.js';
+import { say } from '../src/engine/text.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -207,6 +210,67 @@ describe('an entry\'s fight', () => {
     assert.equal(fought.xp, 0);
   });
 
+  test('a few stages at one tap: the last fight, the loot of every stage won, and the series in words', () => {
+    const texts = rules.series.texts;
+    assert.deepEqual(
+      rules.series.options.map((one) => [one.id, one.count ?? null, one.label]),
+      [
+        ['five', 5, '×5'],
+        ['ten', 10, '×10'],
+        ['max', null, 'Do oporu'],
+      ],
+    );
+    // A hunt as portalFight returns it, of a fight won or lost on a stage.
+    const hunt = (stage, won) => ({
+      portal: { stage, won, loot: won ? `${stage} złota` : '' },
+      gold: won ? stage : 0,
+      resources: {},
+      materials: {},
+      parts: {},
+      fights: [{ stage }],
+      entries: [{ t: 0, type: 'fight', fight: 0, text: `Walka ${stage}.` }],
+    });
+    // Five won of five, the next open: all their gold, the last fight played.
+    const five = portalSeries([11, 12, 13, 14, 15].map((stage) => hunt(stage, true)), { best: 10, level: 30 }, content);
+    assert.deepEqual([five.from, five.to, five.won, five.highest, five.next], [11, 15, 5, 15, 16]);
+    assert.equal(five.result, 'Stopnie 11–15 pokonane.');
+    assert.equal(five.stop, '5 walk za Tobą. Dalej czeka stopień 16.');
+    assert.equal(five.range, 'stopnie 11–15');
+    assert.equal(five.chip, '5 pokonanych');
+    assert.equal(five.loot, `${11 + 12 + 13 + 14 + 15} złota`);
+    assert.equal(five.hunt.gold, 11 + 12 + 13 + 14 + 15);
+    assert.deepEqual(five.hunt.fights, [{ stage: 15 }]);
+    assert.deepEqual(
+      five.hunt.entries.map((entry) => entry.text),
+      [11, 12, 13, 14, 15].map((stage) => `Stopień ${stage}. Walka ${stage}.`),
+    );
+    // Only the last fight's lines name the fight the report plays.
+    assert.deepEqual(
+      five.hunt.entries.map((entry) => entry.fight),
+      [undefined, undefined, undefined, undefined, 0],
+    );
+    assert.equal(say(texts, 'stopCount', 0, { fights: 2, stage: 3 }), '2 walki za Tobą. Dalej czeka stopień 3.');
+    // Lost on the third: the two before won, the third still open.
+    const lost = portalSeries([hunt(21, true), hunt(22, true), hunt(23, false)], { best: 20, level: 40 }, content);
+    assert.deepEqual([lost.won, lost.highest, lost.next, lost.hunt.gold], [2, 22, 23, 21 + 22]);
+    assert.equal(lost.result, 'Stopnie 21–22 pokonane.');
+    assert.equal(lost.stop, 'Stopień 23: porażka.');
+    assert.equal(lost.range, 'stopnie 21–23');
+    // Lost on the first: nothing won.
+    const none = portalSeries([hunt(7, false)], { best: 6, level: 40 }, content);
+    assert.deepEqual([none.won, none.highest, none.loot, none.hunt.gold], [0, 6, '', 0]);
+    assert.equal(none.result, 'Żaden stopień nie został pokonany.');
+    assert.equal(none.range, 'stopień 7');
+    assert.equal(none.chip, '0 pokonanych');
+    // Up to the character's level, and up to the portals' last stage.
+    const top = portalSeries([hunt(33, true)], { best: 32, level: 33 }, content);
+    assert.deepEqual([top.result, top.stop, top.next], ['Stopień 33 pokonany.', 'Dalej otworzy się na poziomie postaci 34.', null]);
+    const last = portalSeries([hunt(rules.maxStage - 1, true), hunt(rules.maxStage, true)], { best: rules.maxStage - 2, level: rules.maxStage }, content);
+    assert.equal(last.stop, 'To ostatni stopień tego portalu. Kolejne stopnie przyjdą później.');
+    // The sums a series brings, written as the page writes its numbers.
+    assert.equal(portalLootText({ gold: 16834, resources: { wood: 12345 }, materials: {}, parts: { scraps: 1500 } }, content), '16\u00a0834 złota, drewno +12\u00a0345, ścinki ×1500');
+  });
+
   test('the higher the stage, the stronger the creatures', () => {
     const hp = (stage) => {
       const enemies = fight(stage, 'h').fights[0].enemiesView;
@@ -398,5 +462,130 @@ describe('the Portale through the API', () => {
     assert.equal(await stays('old-portal-1'), true);
     assert.equal(await stays('old-hunt-0'), true);
     assert.equal((await as('GET', '/api/reports')).data.reports.length, kept + portalReports);
+  });
+
+  // A few stages at one tap (a player's idea, the author: „mądre pomysły”,
+  // 19.11.2026): ×5, ×10 and "Do oporu", each fight as a single entry.
+  const series = (id, kind, from, extra = {}) => as('POST', '/api/portals/enter', { portal: id, series: kind, from, ...extra });
+  // A warrior far stronger than the stages it fights: it wins every one of
+  // them, whatever the seeds (in 2000 fights on each of stages 1–20, with at
+  // least 91% of its HP left).
+  const strong = () => set('level = 20, class_level = 20, points = ?', JSON.stringify({ strength: 400, vitality: 400, endurance: 200, dexterity: 100 }));
+  const reportCount = async () => (await (await db()).prepare("SELECT COUNT(*) AS count FROM reports WHERE kind = 'portal'").first()).count;
+  const goldOf = (from, to) => Array.from({ length: to - from + 1 }, (_, index) => portalAmount(portal('gold'), from + index, true, content)).reduce((sum, one) => sum + one, 0);
+
+  test('×5 fights five stages one after another at one tap, with one report for all: the last fight, the loot of each first win, the stages won and the next one open', async () => {
+    await strong();
+    const before = await row();
+    const fought = await series('gold', 'five', 1);
+    assert.equal(fought.status, 200, JSON.stringify(fought.data).slice(0, 300));
+    const { report } = fought.data;
+    assert.equal(report.kind, 'portal');
+    assert.equal(report.result, 'success');
+    assert.equal(report.resultText, 'Stopnie 1–5 pokonane.');
+    assert.deepEqual(report.portal.series, { id: 'five', from: 1, to: 5, won: 5, range: 'stopnie 1–5', loot: `${goldOf(1, 5)} złota`, stop: '5 walk za Tobą. Dalej czeka stopień 6.' });
+    // The last fight as a single entry's report shows it, the next stage open.
+    assert.deepEqual([report.portal.stage, report.portal.won, report.portal.next, report.fights.length], [5, true, 6, 1]);
+    assert.ok(report.fights[0].events.length > 0);
+    assert.equal(report.portal.loot, `${portalAmount(portal('gold'), 5, true, content)} złota`);
+    assert.deepEqual(
+      report.entries.map((entry) => entry.text.split('. ')[0]),
+      [1, 2, 3, 4, 5].map((stage) => `Stopień ${stage}`),
+    );
+    // One report, the loot of the five first wins, the creatures met, the
+    // stage won; nothing else.
+    assert.equal(await reportCount(), 1);
+    const after = await row();
+    assert.equal(after.gold - before.gold, goldOf(1, 5));
+    assert.equal(report.summary.gold, goldOf(1, 5));
+    assert.equal(JSON.parse(after.portals).best.gold, 5);
+    const met = JSON.parse(after.met);
+    assert.ok(report.fights[0].enemies.every((enemy) => met.includes(enemy.monsterId)));
+    for (const key of ['xp', 'level', 'quests', 'hp', 'hp_at', 'resources', 'materials', 'parts']) assert.deepEqual(after[key], before[key], key);
+    // The Dziennik: the stages fought and how many were won.
+    const [listed] = (await as('GET', '/api/reports')).data.reports;
+    assert.deepEqual([listed.result, listed.portal.loot, listed.portal.series], ['success', `${goldOf(1, 5)} złota`, { range: 'stopnie 1–5', chip: '5 pokonanych' }]);
+    const gold = fought.data.portals.portals.find((one) => one.id === 'gold');
+    assert.deepEqual([gold.best, gold.next], [5, 6]);
+    // A resource's portal pays its resource, each stage's first win.
+    const wood = await series('wood', 'five', 1);
+    assert.equal(wood.status, 200);
+    const pieces = [1, 2, 3, 4, 5].reduce((sum, stage) => sum + portalAmount(portal('wood'), stage, true, content), 0);
+    assert.equal(JSON.parse((await row()).resources).wood - (JSON.parse(before.resources).wood ?? 0), pieces);
+    assert.equal(await reportCount(), 2);
+  });
+
+  test('a series stops at its first loss: the stages won before it pay, the stage lost stays the next', async () => {
+    // Of level 300 with nothing spent: the first ten stages it wins (in 3000
+    // fights on each, with a third of its HP left at the least), from stage
+    // 36 on it loses (all but one in 3000), so "Do oporu" stops on a loss.
+    await set('level = 300');
+    const before = await row();
+    const fought = await series('gold', 'max', 1);
+    assert.equal(fought.status, 200, JSON.stringify(fought.data).slice(0, 300));
+    const { report } = fought.data;
+    const lost = report.portal.series.to;
+    assert.ok(lost > 10 && lost <= 40, `lost on stage ${lost}`);
+    assert.equal(report.portal.won, false);
+    assert.equal(report.portal.stage, lost);
+    assert.equal(report.portal.next, lost);
+    assert.deepEqual([report.portal.series.from, report.portal.series.won], [1, lost - 1]);
+    assert.equal(report.resultText, `Stopnie 1–${lost - 1} pokonane.`);
+    assert.equal(report.portal.series.stop, `Stopień ${lost}: porażka.`);
+    assert.equal(report.entries.length, lost);
+    assert.equal(report.fights[0].won, false);
+    const after = await row();
+    assert.equal(after.gold - before.gold, goldOf(1, lost - 1));
+    assert.equal(JSON.parse(after.portals).best.gold, lost - 1);
+    assert.equal(await reportCount(), 1);
+    // The next tap starts from the stage lost.
+    assert.equal((await series('gold', 'five', lost - 1)).data.error.code, 'stale_stage');
+  });
+
+  test('"Do oporu" goes up to the character\'s level, ×10 too when fewer are open; then nothing is left to fight', async () => {
+    await strong();
+    await set('portals = ?', JSON.stringify({ best: { gold: 10, stone: 15 } }));
+    const fought = await series('gold', 'max', 11);
+    assert.equal(fought.status, 200, JSON.stringify(fought.data).slice(0, 300));
+    const { report } = fought.data;
+    assert.deepEqual([report.portal.series.from, report.portal.series.to, report.portal.series.won], [11, 20, 10]);
+    assert.equal(report.portal.series.stop, 'Dalej otworzy się na poziomie postaci 21.');
+    assert.equal(report.portal.next, null);
+    assert.equal(JSON.parse((await row()).portals).best.gold, 20);
+    // ×10 with five stages open fights those five.
+    const ten = await series('stone', 'ten', 16);
+    assert.equal(ten.status, 200);
+    assert.deepEqual([ten.data.report.portal.series.from, ten.data.report.portal.series.to, ten.data.report.portal.series.stop], [16, 20, 'Dalej otworzy się na poziomie postaci 21.']);
+    assert.equal((await series('gold', 'max', 21)).data.error.code, 'level');
+    assert.equal((await enter('gold')).data.error.code, 'level');
+    assert.equal(await reportCount(), 2);
+  });
+
+  test('a stale or a double tap fights nothing: the stage the page saw must still be the next', async () => {
+    await strong();
+    await set('portals = ?', JSON.stringify({ best: { gold: 3 } }));
+    const before = await row();
+    // A page left open while the portal moved on.
+    const stale = await series('gold', 'ten', 2);
+    assert.equal(stale.status, 409);
+    assert.equal(stale.data.error.code, 'stale_stage');
+    assert.equal(stale.data.error.message, 'Portal zmienił się w międzyczasie. Spróbuj jeszcze raz.');
+    assert.deepEqual(await row(), before);
+    assert.equal(await reportCount(), 0);
+    // Two taps at once: one series, the other refused.
+    const both = await Promise.all([series('gold', 'five', 4), series('gold', 'five', 4)]);
+    assert.deepEqual(both.map((one) => one.status).sort(), [200, 409], JSON.stringify(both.map((one) => one.data.error)));
+    assert.ok(['character_changed', 'stale_stage'].includes(both.find((one) => one.status === 409).data.error.code));
+    const after = await row();
+    assert.equal(after.gold - before.gold, goldOf(4, 8));
+    assert.equal(JSON.parse(after.portals).best.gold, 8);
+    assert.equal(await reportCount(), 1);
+    // The same tap once more, after the first came back.
+    assert.equal((await series('gold', 'five', 4)).data.error.code, 'stale_stage');
+    assert.equal((await row()).gold, after.gold);
+    // A series the game has not got.
+    const unknown = await series('gold', 'twenty', 9);
+    assert.equal(unknown.status, 400);
+    assert.equal(unknown.data.error.code, 'invalid_series');
   });
 });

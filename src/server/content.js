@@ -419,6 +419,14 @@ export function publicContent() {
         };
       }),
     })),
+    // A few stages of a portal at one tap (portals.js, 19.11.2026): the
+    // buttons beside "Walcz o stopień N", on the Portale and at the top of a
+    // report, the words of the page and the last stage of the portals.
+    portalSeries: {
+      options: game.portals.series.options.map(({ id, label, hint }) => ({ id, label, hint })),
+      page: game.portals.series.page,
+      maxStage: game.portals.maxStage,
+    },
     durations: { min: game.balance.hunt.minMinutes, step: game.balance.hunt.stepMinutes, max: game.balance.hunt.maxMinutes },
     lengths: game.texts.lengths,
     unlocks: game.unlocks.map(({ id, name, level, classLevel, condition, locked }) => ({ id, name, level, classLevel, condition, locked })),

@@ -4832,6 +4832,13 @@ summary {
   gap: 8px;
 }
 
+/* A fight with its report at once (a Portal's stages, a Wieża, the
+   Labirynt) has no time on a way to show: its line takes the whole row, not
+   the column of the time. */
+.account li > :only-child {
+  grid-column: 1 / -1;
+}
+
 .account-time {
   color: var(--text-muted);
   font-family: var(--font-system);
@@ -16045,7 +16052,8 @@ button.tcard-slot {
   color: var(--text-muted);
 }
 
-/* The next stage of a portal, at the top of the report of a stage won. */
+/* The next stage of a portal, with a few at one tap beside it (.portal-fight),
+   at the top of the report of a stage won. */
 .report-next-stage {
   width: 100%;
   margin: 0 0 12px;
@@ -16358,6 +16366,11 @@ button.tcard-slot {
   width: 100%;
 }
 
+/* "Jak to działa?" of the Portale: its rules, then a few stages at once. */
+.portals-intro .how-more > p + p {
+  margin-top: 6px;
+}
+
 .portal-head .card-title {
   flex: 1;
   min-width: 0;
@@ -16416,6 +16429,44 @@ button.tcard-slot {
 
 .portal-stage p {
   margin: 0 0 4px;
+}
+
+/* "Walcz o stopień N" and, beside it, a few stages at one tap (×5, ×10, Do
+   oporu; 19.11.2026): on a phone the three under it, side by side, and in
+   one row with it where the card is wide enough. */
+.portal-fight {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.portal-fight-one {
+  flex: 1 1 240px;
+  width: auto;
+}
+
+.portal-series {
+  display: grid;
+  flex: 1 1 220px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.portal-series .button {
+  width: 100%;
+  padding-right: 4px;
+  padding-left: 4px;
+}
+
+/* A series' report: where and why it stopped, under its loot. */
+.report-series-stop {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.report-series-stop--lost {
+  color: var(--gold);
 }
 
 .tower-floor {
