@@ -58,6 +58,18 @@ const thirdOnly = (() => {
   return buildContent(raw);
 })();
 
+// The balance of the fourth forms was set at class level 320 against the
+// creatures and gear of character level 260 (and 365 at 300 in the Arena).
+// Since 0.4.44 the class levels from 250 take longer, so a character of
+// level 260 is usually of class level 275; the simulations below keep the
+// curve they were tuned with (without the late levels' slowdown), so that
+// they still compare the forms at those class levels. Since 0.4.46 a
+// character from level 250 also earns half the gold, materials and chests
+// (balance.rewards.lateRewards): fewer chests among the finds change the
+// draws of the fights after them, so the simulations keep the rewards they
+// were tuned with too.
+const tuned = (data) => ({ ...data, balance: { ...data.balance, progression: { ...data.balance.progression, lateLevels: undefined }, rewards: { ...data.balance.rewards, lateRewards: undefined } } });
+
 // A Pogromca Hord at a class level, its skills at their top by default.
 const hordeSlayer = (classLevel, skills = { 'smashing-blow': 145, slaughter: 145 }, extra = {}) => ({
   classId: 'warrior',
@@ -465,13 +477,13 @@ describe('the fourth forms in fights', () => {
 describe('the fourth forms against the third forms (tools/class-balance-sim.mjs, tools/pvp-arena-sim.mjs)', () => {
   test('on four-hour explorations at level 260 a fourth form faints no more often than its third form, and ends them with as much HP or kills clearly quicker', () => {
     // The realistic player of tools/difficulty-sim.mjs, alone (without
-    // companions it is harder), at class level 320.
+    // companions it is harder), at class level 320 (the tuned curve).
     const rows = [];
     for (const cls of content.classes) {
       content.skills.filter((skill) => skill.classId === cls.id).forEach((skill, index) => {
         const path = index === 0 ? null : skill.id;
         const options = { model: 'realistic-nocomp', classId: cls.id, level: 260, minutes: 240, hunts: 120, path };
-        rows.push([measureClass(options, thirdOnly), measureClass(options, content)]);
+        rows.push([measureClass(options, tuned(thirdOnly)), measureClass(options, tuned(content))]);
       });
     }
     assert.deepEqual(rows.map(([, fourth]) => fourth.evolution).sort(), [...FORMS].sort());
@@ -487,8 +499,9 @@ describe('the fourth forms against the third forms (tools/class-balance-sim.mjs,
     // Fourteen fourth forms have their own strength in the players' duels
     // (evolutions.json duelPower, duelHp): the Tytan, a shield for its
     // party, strikes little in a duel of one against one.
+    // Class levels about 320 and 365 (the tuned curve).
     for (const level of [260, 300]) {
-      const result = measure({ level, seeds: 1, model: 'realistic', paths: true }, content);
+      const result = measure({ level, seeds: 1, model: 'realistic', paths: true }, tuned(content));
       assert.deepEqual(Object.keys(result.paths).sort(), [...FORMS].sort());
       for (const [id, share] of Object.entries(result.paths)) assert.ok(share >= 0.25 && share <= 0.75, `level ${level}: ${id} wins ${share}`);
       assert.ok(result.median >= 16 && result.median <= 40, `level ${level}: median ${result.median} moves`);

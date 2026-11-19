@@ -37,10 +37,10 @@ export function leaveTrip(db, trip, row) {
   return db
     .prepare(
       `UPDATE activities SET options = CASE WHEN json_type(options, '$.party.roster') = 'array'
-         THEN json_set(options, '$.party.roster', ${without('$.party.roster')}, '$.party.names', json((SELECT json_group_array(value) FROM json_each(activities.options, '$.party.names') WHERE value != ?)))
+         THEN json_set(options, '$.party.roster', ${without('$.party.roster')}, '$.party.looks', ${without('$.party.looks')}, '$.party.names', json((SELECT json_group_array(value) FROM json_each(activities.options, '$.party.names') WHERE value != ?)))
          ELSE json_set(options, '$.partners', ${without('$.partners')}, '$.party.names', json((SELECT json_group_array(value) FROM json_each(activities.options, '$.party.names') WHERE value != ?)))
        END
        WHERE kind = 'hunt' AND character_id != ? AND json_extract(options, '$.party.id') = ? AND json_extract(options, '$.party.trip') = ?`,
     )
-    .bind(row.id, row.name, row.id, row.name, row.id, trip.id, trip.trip);
+    .bind(row.id, row.id, row.name, row.id, row.name, row.id, trip.id, trip.trip);
 }

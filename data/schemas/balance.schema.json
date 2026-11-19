@@ -728,6 +728,16 @@
         "materialRarityStepEvery"
       ],
       "properties": {
+        "lateRewards": {
+          "type": "object",
+          "description": "Nagrody późnych poziomów (autor 19.11.2026: „Zmniejsz też zdobywane złoto i inne rzeczy od 250ego tak dwukrotnie gdzieś”): postać od fromLevel dostaje factor złota, materiałów, zasobów, części i skrzyń z przedmiotami, które daje wyprawa, i złota z innych zajęć.",
+          "additionalProperties": false,
+          "required": ["fromLevel", "factor"],
+          "properties": {
+            "fromLevel": { "type": "integer", "minimum": 2 },
+            "factor": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+          }
+        },
         "xpBase": {
           "type": "number",
           "minimum": 0
@@ -1115,6 +1125,7 @@
         "xpPerHourScale",
         "classXpFactor",
         "midGame",
+        "lateLevels",
         "earlyXpFactors",
         "freeResetMaxLevel",
         "classEvolutionLevels"
@@ -1160,6 +1171,20 @@
             "toLevel": { "type": "integer", "minimum": 2 },
             "fadeLevel": { "type": "integer", "minimum": 3 },
             "levelTimeFactor": { "type": "number", "minimum": 1 }
+          }
+        },
+        "lateLevels": {
+          "type": "array",
+          "description": "Późne poziomy: punkty (poziom, ile razy dłużej trwa poziom postaci i klasy niż według reszty krzywej), między punktami równo, przed pierwszym bez zmian, po ostatnim tyle co w nim. Autor 19.11.2026: „Zwiększ dramatycznie bardzo lvl curve od 250 w górę” (3 razy na 250., 10 razy od 300.) i „Lvl curve od 100 do 250 też zwiększ, gdzieś tak o połowę tego co zwiększysz w zakresie 250-500” (od 1 raz na 100. do 3 razy na 250.).",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["level", "factor"],
+            "properties": {
+              "level": { "type": "integer", "minimum": 2 },
+              "factor": { "type": "number", "minimum": 1 }
+            }
           }
         },
         "classXpFactor": {

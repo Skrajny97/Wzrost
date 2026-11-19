@@ -541,6 +541,7 @@ describe('the second forms in fights', () => {
     // such exploration with either form, so the comparison keeps them.
     const level = 90;
     const RUNS = 100;
+    const tunedCurve = { ...content, balance: { ...content.balance, progression: { ...content.balance.progression, lateLevels: undefined } } };
     const area = areaForLevel(level + 8, content);
     const { lateGame, endGame } = content.balance.monsters;
     const monsters = { ...content.balance.monsters, lateGame: { ...lateGame, damage: 0.25, hp: 0.25 }, endGame: { ...endGame, damage: 0, hp: 0 } };
@@ -548,7 +549,10 @@ describe('the second forms in fights', () => {
     const then = { ...content, balance: { ...content.balance, monsters, challenge } };
     const local = { ...then, areasById: { ...content.areasById, [area.id]: area } };
     const explore = (evolution) => {
-      const base = typicalCharacter(evolution.classId, level, content);
+      // The class level and gear of a character of level 90 as the forms
+      // were set (since 0.4.46 class levels from 100 take longer: class
+      // level 108 instead of 109).
+      const base = typicalCharacter(evolution.classId, level, tunedCurve);
       const character = { ...base.character, evolution: evolution.id, skills: simulatedSkills(evolution, base.character.classLevel, content) };
       character.points = autoDistribute(character, content);
       // A form with another class's gear wears it as the game makes it

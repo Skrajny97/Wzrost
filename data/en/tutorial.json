@@ -709,7 +709,7 @@
     },
     "party-intro": {
       "text": [
-        "A Party is up to three wanderers on one exploration, and their class levels may differ by five at most. The leader sends the exploration off by ticking “With the party” above “Set out”."
+        "A Party is up to three wanderers on one exploration, and their class levels may differ by ten at most. The leader sends the exploration off by ticking “With the party” above “Set out”."
       ],
       "voice": "audio/narration/en/party-intro.mp3"
     },

@@ -1385,6 +1385,41 @@
       "id": "0.4.39",
       "title": "Wersja 0.4.39",
       "body": "- Szczodre Gody (1–24 grudnia): zimowy zestaw (ramka Szron, tło Szczodre Gody i aura Śnieżyca) dostaniesz w 24. okienku tylko za odebranie wszystkich 24 okienek.\n- Od 12 do 24 grudnia każdy przedmiot zestawu kupisz też za Punkty Systemu, tylko w oknie kalendarza."
+    },
+    {
+      "id": "0.4.40",
+      "title": "Wersja 0.4.40",
+      "body": "- Skrzynię Bestii dostaje teraz każdy członek gildii, także ten, kto nie atakował. Liczy się każdy, kto był w gildii, gdy przyszła bestia, albo dołączył, zanim padła. Dotyczy to też bestii z tego i poprzedniego tygodnia.\n- Nowe bestie mają dwa razy więcej HP. Bestie, które już stoją w tym tygodniu, zostają takie, jakie są.\n- Leczenie całej drużyny nie pokazuje już „+0” przy postaciach z pełnym zdrowiem."
+    },
+    {
+      "id": "0.4.41",
+      "title": "Wersja 0.4.41",
+      "body": "- Nowe bestie mają cztery razy więcej HP niż przed wersją 0.4.40, a nie dwa razy. Bestie, które już stoją w tym tygodniu, zostają takie, jakie są."
+    },
+    {
+      "id": "0.4.42",
+      "title": "Wersja 0.4.42",
+      "body": "- Do Drużyny zaprosisz teraz postać, której poziom klasy różni się od Twojego najwyżej o 10, a nie o 5. Liczy się tylko poziom klasy.\n- Handel na Targowisku daje teraz do 30 punktów reputacji u Kompanii Kupców dziennie zamiast 10."
+    },
+    {
+      "id": "0.4.43",
+      "title": "Wersja 0.4.43",
+      "body": "- W Ustawieniach, pod Discordem, są teraz przyciski do Facebooka i TikToka gry oraz do powieści ze świata gry na Wattpadzie."
+    },
+    {
+      "id": "0.4.44",
+      "title": "Wersja 0.4.44",
+      "body": "- Od 250. poziomu postaci i klasy awans wymaga dużo więcej doświadczenia: na 250. poziomie 3 razy więcej niż dotąd, a od 300. poziomu 10 razy więcej.\n- Skrzynie Encyklopedii od Tieru V dają mniej Punktów Czasu: od 50 w Tierze V do 100 w Tierze X."
+    },
+    {
+      "id": "0.4.45",
+      "title": "Wersja 0.4.45",
+      "body": "- Czwarta ewolucja: na 300. poziomie klasy każda trzecia forma przechodzi w swoją czwartą, z nowymi umiejętnościami, wyglądem, chodem i jazdą wierzchem.\n- Kwestia narratora o Drużynie znów ma głos."
+    },
+    {
+      "id": "0.4.46",
+      "title": "Wersja 0.4.46",
+      "body": "- Poziomy od 100. do 250. trwają coraz dłużej: na 100. poziomie tak jak dotąd, a potem coraz dłużej, aż przed 250. poziomem prawie 3 razy dłużej niż dotąd. Tak samo poziomy klasy.\n- Od 250. poziomu postaci wyprawy dają o połowę mniej złota, materiałów, zasobów i skrzyń z przedmiotami, a pozostałe zajęcia o połowę mniej złota.\n- Drużyna: wyprawa drużyny rusza teraz cała albo wcale. Dotąd przerwane połączenie przy wyruszaniu mogło sprawić, że członek drużyny walczył sam i przegrywał, choć lider wygrał tę samą wyprawę.\n- Kto zawróci z wyprawy drużyny, znika też z marszu pozostałych na ekranie Walki."
     }
   ]
 }

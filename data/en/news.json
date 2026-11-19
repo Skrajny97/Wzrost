@@ -1104,6 +1104,34 @@
     "0.4.39": {
       "title": "Version 0.4.39",
       "body": "- Generous Feast (1–24 December): the winter set (the Hoarfrost frame, the Generous Feast background and the Snowstorm aura) comes in the 24th window only if you took all 24 windows.\n- From 12 to 24 December you can also buy each piece of the set for System Points, only in the calendar's window."
+    },
+    "0.4.40": {
+      "title": "Version 0.4.40",
+      "body": "- Every guild member now gets a Beast Chest, even without attacking. It counts everyone who was in the guild when the beast came or joined before it fell. This also applies to this week's and last week's beasts.\n- New beasts have twice as much HP. The beasts already standing this week stay as they are.\n- A heal of the whole party no longer shows \"+0\" on characters at full HP."
+    },
+    "0.4.41": {
+      "title": "Version 0.4.41",
+      "body": "- New beasts have four times as much HP as before version 0.4.40, not twice. The beasts already standing this week stay as they are."
+    },
+    "0.4.42": {
+      "title": "Version 0.4.42",
+      "body": "- You can now invite to a Party a character whose class level differs from yours by up to 10, not 5. Only the class level counts.\n- Trading on the Marketplace now gives up to 30 reputation points with the Merchants' Company a day instead of 10."
+    },
+    "0.4.43": {
+      "title": "Version 0.4.43",
+      "body": "- In the Settings, below Discord, there are now buttons to the game's Facebook and TikTok and to the novel set in the game's world on Wattpad."
+    },
+    "0.4.44": {
+      "title": "Version 0.4.44",
+      "body": "- From level 250 of the character and the class, a level needs much more experience: 3 times as much as before at level 250, and 10 times as much from level 300.\n- The Encyclopedia's chests from Tier V give fewer Time Points: from 50 in Tier V to 100 in Tier X."
+    },
+    "0.4.45": {
+      "title": "Version 0.4.45",
+      "body": "- The fourth evolution: at class level 300 each third form grows into its fourth, with new skills, looks, walk and riding.\n- The narrator's line about the Party has its voice again."
+    },
+    "0.4.46": {
+      "title": "Version 0.4.46",
+      "body": "- Levels 100 to 250 take longer and longer: level 100 as before, then longer with every level, up to almost 3 times as long as before just under level 250. Class levels too.\n- From character level 250, explorations give half the gold, materials, resources and chests with items, and the other pursuits half the gold.\n- Party: a party's trip now sets out whole or not at all. Before, a connection cut off while setting out could make a party member fight alone and lose while the leader won the same trip.\n- One who turns back from a party's trip also leaves the others' march on the Combat screen."
     }
   }
 }

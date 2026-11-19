@@ -3,8 +3,9 @@
 // seed, its level and its HP growing with the members; an attack's damage,
 // never more than the HP left; the chests by how the week ended; and
 // through the API the attacks of a day, in whatever guild, the bar going
-// down for the whole guild, the fall, one chest a week only for those who
-// hit, never on an exploration, and a full bag keeping the item's chest shut.
+// down for the whole guild, the fall, one chest a week for every member of
+// the guild while the beast stood, whether it hit or not, never on an
+// exploration, and a full bag keeping the item's chest shut.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -235,18 +236,21 @@ describe('the Bestia Gildii through the API', () => {
     assert.equal((await view('lowczyni')).attacks.left, rules.attacksPerDay);
   });
 
-  test('one chest a week, only for those who hit: an item and materials once the beast fell', async () => {
+  test('one chest a week for every member, whether it hit or not: an item and materials once the beast fell', async () => {
     await attack('lowczyni');
     // While the beast stands, this week's chest waits.
     assert.deepEqual((await view('lowczyni')).chests, []);
+    assert.deepEqual((await view('tropiciel')).chests, []);
     await run('UPDATE guild_beasts SET hp = 0, fallen_at = ?', Date.now());
     const week = questPeriod('weekly', Date.now(), content).key;
     const [chest] = (await view('lowczyni')).chests;
     assert.equal(chest.week, week);
     assert.equal(chest.fallen, true);
     assert.equal(chest.item, true);
-    assert.deepEqual((await view('tropiciel')).chests, []);
-    assert.equal((await as('tropiciel', 'POST', '/api/guild/beast/claim', { week })).data.error.code, 'no_chest');
+    // The author: "Niech każdy w Gildii dostaje skrzynie bestii nie tylko
+    // ten kto atakował". Tropiciel never attacked, and opens the same chest.
+    assert.deepEqual((await view('tropiciel')).chests, [chest]);
+    assert.equal((await as('tropiciel', 'POST', '/api/guild/beast/claim', { week })).status, 200);
     const before = JSON.parse((await first("SELECT materials FROM characters WHERE name = 'Łowczyni'")).materials);
     const opened = await as('lowczyni', 'POST', '/api/guild/beast/claim', { week });
     assert.equal(opened.status, 200, JSON.stringify(opened.data).slice(0, 300));
@@ -291,8 +295,11 @@ describe('the Bestia Gildii through the API', () => {
     await hit(await beast(older.key, 0));
     const { chests } = await view('lowczyni');
     assert.deepEqual(chests, [{ week: previous.key, fallen: false, share: 60, item: false, until: current.endsAt }]);
-    // Only for those who hit.
+    // A beast that does not count Tropiciel among its members gives it
+    // nothing; counted, it gets the same chest without a hit.
     assert.deepEqual((await view('tropiciel')).chests, []);
+    await run('UPDATE guild_beasts SET counted = json_array(?) WHERE week = ?', await characterId('Tropiciel'), previous.key);
+    assert.deepEqual((await view('tropiciel')).chests, chests);
     // The week's new beast took the older weeks' beasts and hits away.
     assert.equal((await first('SELECT COUNT(*) AS count FROM guild_beasts WHERE week = ?', older.key)).count, 0);
     assert.equal((await first('SELECT COUNT(*) AS count FROM guild_beast_hits')).count, 1);
@@ -335,6 +342,27 @@ describe('the Bestia Gildii through the API', () => {
     const alone = await view('samotnik');
     assert.equal(alone.beast, null);
     assert.equal((await attack('samotnik')).data.error.code, 'no_guild');
+  });
+
+  test('a member who joined while the beast stood gets its chest; one who joined after it fell, or another character with a removed one\'s id, does not', async () => {
+    await player('zwiadowca', 'Zwiadowca');
+    await player('maruder', 'Maruder');
+    await view('lowczyni');
+    // Joined while it stood: counted (its HP went up), so a chest once it falls.
+    await as('lowczyni', 'POST', '/api/guild/invite', { name: 'Zwiadowca' });
+    assert.equal((await join('zwiadowca', 'SF')).status, 200);
+    await run('UPDATE guild_beasts SET hp = 0, fallen_at = ?', Date.now());
+    assert.equal((await view('zwiadowca')).chests.length, 1);
+    // Joined after the fall: not counted, no chest.
+    await as('lowczyni', 'POST', '/api/guild/invite', { name: 'Maruder' });
+    assert.equal((await join('maruder', 'SF')).status, 200);
+    assert.deepEqual((await view('maruder')).chests, []);
+    // A counted id taken by a character made after the beast came, outside
+    // its guild: nothing of the one before.
+    await player('nowa', 'Nowa');
+    const id = await characterId('Nowa');
+    await run('UPDATE guild_beasts SET counted = json_insert(counted, \'$[#]\', ?), created_at = 1', id);
+    assert.deepEqual((await view('nowa')).chests, []);
   });
 
   test('a full bag keeps the chest with an item shut; a chest of materials opens anyway', async () => {

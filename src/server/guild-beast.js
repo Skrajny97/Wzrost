@@ -13,10 +13,11 @@
 // the gear it fights with is the one the exploration keeps. An attack is one
 // fight with the report at once; what the beast loses stays on its bar for
 // the whole guild, and the hit that brings it to 0 is written down with
-// who made it and when. No XP, gold or loot for an attack: whoever hit the
-// beast in a week opens a Skrzynia Bestii once for that week (the best of
-// the beasts it hit then), as soon as its beast fell and through the whole
-// next week whatever came of it. Where Talia Systemu is on, an attack may
+// who made it and when. No XP, gold or loot for an attack: every member of
+// the guild while its beast stood, whether it attacked or not, and whoever
+// hit the beast, opens a Skrzynia Bestii once for that week (the best of
+// its beasts then), as soon as its beast fell and through the whole next
+// week whatever came of it. Where Talia Systemu is on, an attack may
 // leave a card (903, cards.js), which moves the character's version with
 // its collection. Each save holds only while what was read
 // still holds (atomic.js). A character removed and its id given again (the
@@ -125,22 +126,30 @@ const engineBeast = (row) => ({ monsterId: row.monster_id, areaId: row.area_id, 
 const attacksOn = (db, row, day) =>
   db.prepare('SELECT COUNT(*) AS count FROM guild_beast_hits WHERE character_id = ? AND day = ? AND created_at >= ?').bind(row.id, day, row.created_at);
 
-// The Skrzynie Bestii the character may open now: one for each week in
-// which it hit a beast and has not opened that week's chest, of the best
-// result among the beasts it hit that week (it may have changed its
-// guild): this week's once the beast fell, last week's whatever came of
-// it, none under the smallest share of the bar knocked off.
+// The Skrzynie Bestii the character may open now: one for each week of a
+// beast it hunted with its guild and whose chest it has not opened, of the
+// best result among those beasts (it may have changed its guild): this
+// week's once the beast fell, last week's whatever came of it, none under
+// the smallest share of the bar knocked off. Every member hunts, not only
+// who attacked (the author, 18.11.2026: "Niech każdy w Gildii dostaje
+// skrzynie bestii nie tylko ten kto atakował"): a beast's members are those
+// it counts (`counted`: in the guild when it came, or joined while it
+// stood), and whoever hit it. A member counted is this character only if
+// the beast came after it was made, or if it is in that guild now (a
+// removed character's id given again takes nothing of the one before).
 async function chestsOf(db, row, now) {
   const { current, previous, nextEndsAt } = weeksAround(now);
   const { results } = await db
     .prepare(
       `SELECT b.* FROM guild_beasts b
        WHERE b.week IN (?, ?)
-         AND b.id IN (SELECT h.beast_id FROM guild_beast_hits h WHERE h.character_id = ? AND h.created_at >= ?)
+         AND (b.id IN (SELECT h.beast_id FROM guild_beast_hits h WHERE h.character_id = ? AND h.created_at >= ?)
+           OR (EXISTS (SELECT 1 FROM json_each(b.counted) WHERE value = ?)
+             AND (b.created_at >= ? OR EXISTS (SELECT 1 FROM guild_members m WHERE m.character_id = ? AND m.guild_id = b.guild_id AND m.joined_at >= ?))))
          AND NOT EXISTS (SELECT 1 FROM guild_beast_chests x WHERE x.character_id = ? AND x.week = b.week AND x.created_at >= ?)
        ORDER BY b.id`,
     )
-    .bind(previous.key, current.key, row.id, row.created_at, row.id, row.created_at)
+    .bind(previous.key, current.key, row.id, row.created_at, row.id, row.created_at, row.id, row.created_at, row.id, row.created_at)
     .all();
   const rank = (tier) => rules().chests.indexOf(tier);
   const best = new Map();

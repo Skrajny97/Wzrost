@@ -2231,6 +2231,8 @@ describe('Time Points and the narrator', () => {
     const line = (id) => tutorial.lines.find((one) => one.id === id);
     const at = (id) => tutorial.lines.findIndex((one) => one.id === id);
     const fresh = ['shop-system', 'guild-tabs', 'guild-seat', 'guild-beast', 'guild-trials', 'guild-requests', 'guild-exchange', 'party-intro', 'fortress-stone', 'hard-hunt', 'account-chest', 'faint-first'];
+    // The Drużyna's line reads "najwyżej o dziesięć" since 0.4.42, with the
+    // recording the author accepted on 19.11.2026 (1164 A).
     for (const id of fresh) {
       assert.equal(line(id).kind, 'point', id);
       assert.equal(line(id).voice, `audio/narration/${id}.mp3`, id);
@@ -2259,7 +2261,7 @@ describe('Time Points and the narrator', () => {
     // The Zbieracz Systemu has no line since 0.2.26: the player finds him alone.
     assert.equal(line('system-collector'), undefined);
     assert.equal(tutorial.chapters['system-collector'], undefined);
-    assert.deepEqual(line('party-intro').text, ['Drużyna to do trzech wędrowców na jednej wyprawie, a ich poziomy klasy mogą się różnić najwyżej o pięć. Wyprawę wysyła lider, gdy nad „Wyrusz” zaznaczy „Z drużyną”.']);
+    assert.deepEqual(line('party-intro').text, ['Drużyna to do trzech wędrowców na jednej wyprawie, a ich poziomy klasy mogą się różnić najwyżej o dziesięć. Wyprawę wysyła lider, gdy nad „Wyrusz” zaznaczy „Z drużyną”.']);
     assert.deepEqual(line('faint-first').text, ['Po porażce nic z wyprawy nie zostaje, a System odbiera jeszcze część doświadczenia. Zanim znów wyruszysz, sprawdź zagrożenie i odpocznij.']);
     // The two cards changed (their recordings come anew).
     assert.match(line('professions-list').text[0], / Na pozostałe profesje przyjdzie jeszcze czas\.$/);
