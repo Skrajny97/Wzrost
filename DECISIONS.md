@@ -3847,6 +3847,10 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.65 (19.11.2026): Portale seriami, Kulki Systemu, karty Talii w Skrzyni Konta, na Targowisku i w Wymianie, „Na górę”
+
+Wchodzą przyjęte 1185, 1186 i 1187–1190 z odpowiedziami 1191 A, 1192 A, 1193 B i 1194 A, według czterech sekcji niżej i sekcji „Przyjęte 19.11.2026”. Scalone z 0.4.62–0.4.64; pełne testy (2573) przeszły.
+
 ## Przyjęte 19.11.2026: Portale po kilka stopni, Kulki Systemu, karty Talii i „Na górę” (1185–1194)
 
 Autor przyjął na stronie ocen, bez uwag: kilka stopni Portalu naraz (1185), Kulki Systemu (1186), karty Talii w Skrzyni Konta, na Targowisku i w Wymianie (1187–1189) i przycisk „Na górę” (1190). Odpowiedzi na pytania o karty: 1191 A, 1192 A, 1193 B i 1194 A (sekcja „Karty Talii”, punkt 12). Wszystko wchodzi do gry z najbliższą wersją. Zasady są w czterech sekcjach poniżej. Przy scalaniu z wersjami 0.4.52–0.4.64 doszło:
