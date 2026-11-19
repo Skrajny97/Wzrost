@@ -1,0 +1,14 @@
+{
+  "id": "land-banner",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small deep blue guild banner with a golden emblem and gold trim flying from a wooden pole with an iron spear tip, the banner alone, no background, single inventory item icon, bold clean outline",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023336125807656184
+  },
+  "images": 1
+}
