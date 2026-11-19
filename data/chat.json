@@ -160,6 +160,7 @@
       "news": "oznaczenie na czacie czeka",
       "pushTitle": "Czat: {channel}",
       "pushBody": "{name} [oznaczyła|oznaczył] Cię na czacie: {text}",
+      "pushPrivate": "{name} [napisała|napisał] do Ciebie: {text}",
       "channels": {
         "guild": "Gildia",
         "private": "prywatna rozmowa"

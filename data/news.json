@@ -1440,6 +1440,11 @@
       "id": "0.4.52",
       "title": "Wersja 0.4.52",
       "body": "- Pełny plecak: Złomiarz sprzedaje teraz najpierw przedmioty najniższej rzadkości. Przedmiot, którego Twoja klasa nie używa, idzie przed innymi tylko wśród przedmiotów tej samej rzadkości, więc cenny przedmiot innej klasy zostaje, dopóki masz w plecaku coś słabszego."
+    },
+    {
+      "id": "0.4.53",
+      "title": "Wersja 0.4.53",
+      "body": "- Powiadomienia na telefon przychodzą teraz przy prywatnej wiadomości na czacie: przy pierwszej wiadomości rozmowy.\n- Oznaczenie Cię na czacie Globalnym, w Wymianie i na kanale angielskim nie wysyła już powiadomienia. Oznaczenie na czacie gildii wysyła je jak dotąd.\n- Czat nie zamienia już na gwiazdki słów w rodzaju „pushujący” czy „rushujemy”.\n- Nawia: nowe grafiki Tętentu, Strachu, Sprężyny skoczogonka i Wąsa kota Bajuna oraz nowe dźwięki umiejętności Strzała z niebios, Deszcz gwiazd, Słup światła i Legion Nawii."
     }
   ]
 }

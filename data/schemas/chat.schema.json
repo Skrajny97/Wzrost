@@ -141,7 +141,7 @@
         "texts": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["button", "suggestions", "tagged", "news", "pushTitle", "pushBody", "channels"],
+          "required": ["button", "suggestions", "tagged", "news", "pushTitle", "pushBody", "pushPrivate", "channels"],
           "properties": {
             "button": { "type": "string", "minLength": 1 },
             "suggestions": { "type": "string", "minLength": 1 },
@@ -149,6 +149,7 @@
             "news": { "type": "string", "minLength": 1 },
             "pushTitle": { "type": "string", "pattern": "\\{channel\\}" },
             "pushBody": { "type": "string", "pattern": "\\{name\\}[\\s\\S]*\\{text\\}" },
+            "pushPrivate": { "type": "string", "pattern": "\\{name\\}[\\s\\S]*\\{text\\}", "description": "Powiadomienie na telefon o prywatnej wiadomości (privateNotices w src/server/mentions.js), z formą żeńską i męską w nawiasie." },
             "channels": {
               "type": "object",
               "additionalProperties": false,

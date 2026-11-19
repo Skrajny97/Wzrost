@@ -59,6 +59,7 @@
       "news": "a tag in the chat waits",
       "pushTitle": "Chat: {channel}",
       "pushBody": "{name} tagged you in the chat: {text}",
+      "pushPrivate": "{name} wrote to you: {text}",
       "channels": {
         "guild": "Guild",
         "private": "private conversation"
