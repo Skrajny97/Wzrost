@@ -1,6 +1,6 @@
-// 1178 B (the author, 19.11.2026): a member of a Drużyna who sets out alone,
-// and a player who switches characters while the one played is in a party,
-// is asked first. The server answers such a request with 'in_party'
+// 1178 B (the author, 19.11.2026): a member of a Drużyna who sets out alone
+// is asked first (a switch of characters asks nothing since 0.4.59). The
+// server answers such a request with 'in_party'
 // (partyGate in src/server/parties.js); "Wyjdź z drużyny" sends it again with
 // `leaveParty`, and the character leaves the party with that same write.
 // Gives the server's answer, or null when the player stays in the party.

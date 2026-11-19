@@ -1,8 +1,8 @@
 // The Drużyna in the Społeczność (src/server/parties.js), from the character
 // level of data/unlocks.json (the 10th since 0.1.69, 642 B): the
 // invitations waiting for this character; its party with the
-// members and their state (free, on an exploration, at a profession's work,
-// playing another character), the leader marked; the friends to invite at a tap and a name to invite; the
+// members and their state (free, on an exploration, at a profession's
+// work), the leader marked; the friends to invite at a tap and a name to invite; the
 // invitations sent; and "Opuść drużynę". The leader sends the party out
 // from "Wyrusz" in the Walka (screens/combat.js, "Z drużyną").
 
@@ -27,11 +27,13 @@ const COMPANIONS_STAY = 'Póki jesteś w drużynie, towarzysze zostają w Kwater
 // A member's dot (the Znajomi's colours, styles.css) and its words; the
 // busy ones say it beside the name too, as they stay home when the party
 // goes (screens/combat.js). The words are shown in the page's language
-// (t()), here and in the Walka.
-const DOTS = { free: 'online', away: 'busy', working: 'busy', aside: 'offline' };
-const STATES = { free: 'może iść na wyprawę', away: 'na wyprawie', working: 'pracuje w profesji', aside: 'gra teraz inną postacią' };
+// (t()), here and in the Walka. Which of its player's characters is played
+// does not count: since 0.4.59 one set aside goes on the party's trips too
+// (src/server/parties.js), so no member is 'aside' any more.
+const DOTS = { free: 'online', away: 'busy', working: 'busy' };
+const STATES = { free: 'może iść na wyprawę', away: 'na wyprawie', working: 'pracuje w profesji' };
 const stateText = (status) => (STATES[status] ? t(STATES[status]) : status);
-export const BUSY = { away: 'na wyprawie', working: 'w profesji', aside: 'gra inną postacią' };
+export const BUSY = { away: 'na wyprawie', working: 'w profesji' };
 
 // The class levels' spread (the author: "Rozpiętość poziomu klas w Drużynie
 // maks 5 lvl", "niech nie będzie możliwości w ogole bycia w drużynie z kimś

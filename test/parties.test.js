@@ -173,30 +173,80 @@ describe('Drużyna through the API', () => {
     assert.equal((await (await db()).prepare('SELECT COUNT(*) AS count FROM party_members WHERE character_id = ?').bind(await idOf('Druh')).first()).count, 0);
   });
 
-  test('switching to another character or making a new one asks the one played in a party to leave it first, the leader too', async () => {
+  // 0.4.59 (the author, 19.11.2026: „dlaczego system robił błąd kiedy ktoś
+  // zmienia postać? przecież trzeba to jakoś rozdzielić”).
+  test('switching characters asks nothing: the character stays in its party, goes on its trips while its player plays another, and its report waits for it', async () => {
     const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
     await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
-    // A new character sets the one played aside: asked first, nothing made.
-    const asked = await as('druh', 'POST', '/api/character', { name: 'Druga', classId: 'mage', appearance: 'female' });
-    assert.equal(asked.data.error.code, 'in_party');
-    assert.equal((await (await db()).prepare("SELECT COUNT(*) AS count FROM characters WHERE name = 'Druga'").first()).count, 0);
-    assert.equal((await as('druh', 'POST', '/api/character', { name: 'Druga', classId: 'mage', appearance: 'female', leaveParty: true })).status, 201);
-    assert.equal((await (await db()).prepare('SELECT COUNT(*) AS count FROM party_members WHERE character_id = ?').bind(await idOf('Druh')).first()).count, 0);
-    // Druh back in a party (played again, invited anew), then a switch:
-    // the same question, for the leader as well.
-    assert.equal((await as('druh', 'POST', '/api/characters/choose', { id: await idOf('Druh') })).status, 200);
-    const again = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
-    await as('druh', 'POST', '/api/party/accept', { partyId: again.data.party.id });
-    const switching = await as('druh', 'POST', '/api/characters/choose', { id: await idOf('Druga') });
-    assert.equal(switching.data.error.code, 'in_party');
-    assert.equal((await (await db()).prepare("SELECT role FROM characters WHERE name = 'Druh'").first()).role, 'player');
-    await player('lider2', 'Lider2');
-    const leader = await as('lider', 'POST', '/api/character', { name: 'Zapas', classId: 'archer', appearance: 'female' });
-    assert.equal(leader.data.error.code, 'in_party');
-    // With the answer: switched, out of the party.
-    assert.equal((await as('druh', 'POST', '/api/characters/choose', { id: await idOf('Druga'), leaveParty: true })).status, 200);
+    // A new character, then back and forth: no question, still in the party.
+    assert.equal((await as('druh', 'POST', '/api/character', { name: 'Druga', classId: 'mage', appearance: 'female' })).status, 201);
     assert.equal((await (await db()).prepare("SELECT role FROM characters WHERE name = 'Druh'").first()).role, 'aside');
-    assert.equal((await as('lider', 'GET', '/api/party')).data.party, null);
+    assert.equal((await (await db()).prepare('SELECT COUNT(*) AS count FROM party_members WHERE character_id = ?').bind(await idOf('Druh')).first()).count, 1);
+    // The leader sees it free, and the trip takes it along.
+    const view = (await as('lider', 'GET', '/api/party')).data.party;
+    assert.equal(view.members.find((one) => one.name === 'Druh').status, 'free');
+    const went = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 5 });
+    assert.equal(went.status, 201, JSON.stringify(went.data).slice(0, 300));
+    assert.deepEqual(went.data.went, ['Druh']);
+    const trip = await (await db()).prepare("SELECT a.options FROM activities a JOIN characters c ON c.id = a.character_id WHERE c.name = 'Druh'").first();
+    assert.deepEqual(JSON.parse(trip.options).party.names, ['Lider', 'Druh']);
+    // Meanwhile its player plays Druga freely; back on Druh, the report waits.
+    assert.equal((await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
+    await (await db()).prepare('UPDATE activities SET started_at = started_at - 600000, ends_at = ends_at - 600000').run();
+    assert.equal((await as('druh', 'POST', '/api/characters/choose', { id: await idOf('Druh') })).status, 200);
+    let claimed = await as('druh', 'POST', '/api/hunts/claim');
+    if (claimed.data.event) claimed = await as('druh', 'POST', '/api/hunts/claim', { choice: claimed.data.event.options.find((option) => !option.disabled)?.id ?? claimed.data.event.options[0].id });
+    assert.equal(claimed.status, 200, JSON.stringify(claimed.data).slice(0, 300));
+    assert.ok(claimed.data.report.fights.some((fight) => fight.allies.some((ally) => ally.name === 'Lider')));
+  });
+
+  test('a member set aside goes on the next trip too, its waiting report claimed as the party sets out', async () => {
+    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    assert.equal((await as('druh', 'POST', '/api/character', { name: 'Druga', classId: 'mage', appearance: 'female' })).status, 201);
+    assert.deepEqual((await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 5 })).data.went, ['Druh']);
+    await (await db()).prepare('UPDATE activities SET started_at = started_at - 600000, ends_at = ends_at - 600000').run();
+    const first = await (await db()).prepare("SELECT a.character_id, a.started_at FROM activities a JOIN characters c ON c.id = a.character_id WHERE c.name = 'Druh'").first();
+    let own = await as('lider', 'POST', '/api/hunts/claim');
+    if (own.data.event) own = await as('lider', 'POST', '/api/hunts/claim', { choice: own.data.event.options.find((option) => !option.disabled)?.id ?? own.data.event.options[0].id });
+    assert.equal(own.status, 200, JSON.stringify(own.data).slice(0, 300));
+    // Its player still plays Druga: Druh goes again, the report of its first
+    // trip claimed first, in its Dziennik.
+    const again = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 5 });
+    assert.equal(again.status, 201, JSON.stringify(again.data).slice(0, 300));
+    assert.deepEqual(again.data.went, ['Druh']);
+    const report = await (await db()).prepare("SELECT r.id, r.activity_key FROM reports r JOIN characters c ON c.id = r.character_id WHERE c.name = 'Druh' AND r.kind = 'hunt'").first();
+    assert.equal(report.activity_key, `${first.character_id}:${first.started_at}`);
+    assert.equal((await (await db()).prepare("SELECT role FROM characters WHERE name = 'Druh'").first()).role, 'aside');
+    // Back on Druh, its Walka tells it and opens that report.
+    assert.equal((await as('druh', 'POST', '/api/characters/choose', { id: await idOf('Druh') })).status, 200);
+    const { character } = (await as('druh', 'GET', '/api/character')).data;
+    assert.deepEqual(character.activity.party.claimed, { id: report.id, kind: 'hunt' });
+    assert.deepEqual(character.activity.party.names, ['Lider', 'Druh']);
+  });
+
+  test('a party is of characters of different players: another of its player\'s characters joins none it is in, and one from before leaves it', async () => {
+    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    assert.equal((await as('druh', 'POST', '/api/character', { name: 'Druga', classId: 'mage', appearance: 'female' })).status, 201);
+    await (await db()).prepare("UPDATE characters SET level = 30, class_level = 30 WHERE name = 'Druga'").run();
+    // The leader may invite Druga, and learns nothing of whose it is; the
+    // player hears why it cannot join.
+    assert.equal((await as('lider', 'POST', '/api/party/invite', { name: 'Druga' })).status, 200);
+    const refused = await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    assert.equal(refused.status, 409);
+    assert.equal(refused.data.error.code, 'own_in_party');
+    assert.equal(refused.data.error.message, 'W tej drużynie jest już Twoja postać Druh. Drużynę tworzą postacie różnych graczy.');
+    assert.equal((await (await db()).prepare('SELECT COUNT(*) AS count FROM party_members WHERE character_id = ?').bind(await idOf('Druga')).first()).count, 0);
+    // One that joined before 0.4.59, when only the character played went
+    // along: the first of the player's in the party's order stays.
+    await (await db())
+      .prepare('INSERT INTO party_members (character_id, party_id, joined_at) SELECT ?, party_id, MAX(joined_at) + 1 FROM party_members WHERE party_id = ?')
+      .bind(await idOf('Druga'), data.party.id)
+      .run();
+    const view = (await as('lider', 'GET', '/api/party')).data.party;
+    assert.deepEqual(view.members.map((one) => one.name), ['Lider', 'Druh']);
+    assert.equal((await (await db()).prepare('SELECT COUNT(*) AS count FROM party_members WHERE character_id = ?').bind(await idOf('Druga')).first()).count, 0);
   });
 
   test('a member at a profession\'s work stays in the party, stays home and limits nothing', async () => {

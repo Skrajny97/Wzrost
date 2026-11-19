@@ -1465,6 +1465,11 @@
       "id": "0.4.58",
       "title": "Wersja 0.4.58",
       "body": "- Piekielna wyprawa: nowe pole w „Opcjach wyprawy”, pod Trudną wyprawą. Stwory mają 3 razy większe obrażenia i HP, czyli dwa razy więcej niż na Trudnej. Za to zgarniesz +50% XP, +125% złota oraz 1,5 raza więcej przedmiotów i materiałów. Nie działa na Szybkim i Błyskawicznym polowaniu ani z drużyną."
+    },
+    {
+      "id": "0.4.59",
+      "title": "Wersja 0.4.59",
+      "body": "- Drużyna: zmiana postaci i nowa postać już o nic nie pytają, a postać zostaje w drużynie. Lider zabiera ją na wyprawy drużyny także wtedy, gdy grasz inną postacią, a raport czeka, aż do niej wrócisz. Pytanie „Jesteś w drużynie. Wyjść z drużyny?” zostaje tylko przed samotną wyprawą członka drużyny. Do drużyny nie dołączy druga postać tego samego gracza."
     }
   ]
 }

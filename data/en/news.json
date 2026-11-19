@@ -1168,6 +1168,10 @@
     "0.4.58": {
       "title": "Version 0.4.58",
       "body": "- Hellish exploration: a new box in the exploration options, under the Hard exploration. The creatures deal 3× damage and have 3× HP, twice the Hard one. In return you get +50% XP, +125% gold and 1.5× as many items and materials. Not on quick or lightning hunts, nor with a party."
+    },
+    "0.4.59": {
+      "title": "Version 0.4.59",
+      "body": "- Party: switching characters or making a new one no longer asks anything, and the character stays in its party. The leader takes it on the party's explorations even while you play another character, and its report waits until you come back to it. The question “You are in a party. Leave the party?” now comes only before a party member sets out alone. A second character of the same player cannot join the party."
     }
   }
 }
