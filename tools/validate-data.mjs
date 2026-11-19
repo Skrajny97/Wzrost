@@ -810,6 +810,7 @@ function checkReferences(data) {
   errors.push(...checkEncyclopedia(data));
   errors.push(...checkSettlement(data, { rarities }));
   errors.push(...checkStable(data));
+  errors.push(...checkAscension(data));
   errors.push(...checkTannery(data));
   errors.push(...checkResidentGifts(data));
   errors.push(...checkCasino(data));
@@ -1645,6 +1646,29 @@ function checkStable(data) {
       errors.push(`settlement.json: wierzchowiec ${mount.name} musi być szybszy i droższy od poprzedniego, od poziomu nie niższego`);
     }
   });
+  return errors;
+}
+
+// The Zaklinaczka's stars (1180 B–1184 A): she lives in a place on the
+// board and sets them from a standing that exists; each star has its parts,
+// known ones of a rarity from legendary up (the author: „Będzie to
+// wymagało co najmniej legendarnych części”), and no star is likelier than
+// the one before.
+function checkAscension(data) {
+  const errors = [];
+  const { ascension, residents, places, standings } = data.settlement;
+  if (!ascension) return errors;
+  if (!residents.some((resident) => resident.id === ascension.resident)) errors.push(`settlement.json: ascension.resident to nieznany mieszkaniec ${ascension.resident}`);
+  if (!places.some((place) => place.resident === ascension.resident)) errors.push(`settlement.json: mieszkaniec ${ascension.resident} (ascension) nie ma miejsca na planszy`);
+  if (!standings.some((standing) => standing.id === ascension.from)) errors.push(`settlement.json: ascension.from to nieznany stopień ${ascension.from}`);
+  if (ascension.parts.length !== ascension.chances.length) errors.push(`settlement.json: ascension.parts ma ${ascension.parts.length} pozycji, a gwiazdek (chances) jest ${ascension.chances.length}`);
+  const order = data.rarities.map((rarity) => rarity.id);
+  for (const { part } of ascension.parts) {
+    const known = data.materials.parts.find((one) => one.id === part);
+    if (!known) errors.push(`settlement.json: ascension.parts ma nieznaną część ${part}`);
+    else if (order.indexOf(known.rarity) < order.indexOf('legendary')) errors.push(`settlement.json: ascension.parts: część ${part} jest poniżej legendarnej`);
+  }
+  if (ascension.chances.some((chance, index) => index > 0 && chance > ascension.chances[index - 1])) errors.push('settlement.json: ascension.chances nie mogą rosnąć z kolejną gwiazdką');
   return errors;
 }
 

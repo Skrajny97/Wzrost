@@ -212,7 +212,7 @@ export function valueChanges(now, after) {
  */
 const pathWeights = (classId, content) => statWeightsOf(classId, content);
 
-// An item for the verdict: its numbers final (its upgrade and gem in them),
+// An item for the verdict: its numbers final (its upgrade, stars and gem in them),
 // without its attributes, and with `pathScore`, their sum weighted by the
 // class's path.
 /**
@@ -235,7 +235,7 @@ export function bareItem(item, classId, content) {
   const implicit = final.implicit && stays(final.implicit) ? final.implicit : null;
   const imbue = final.imbue && stays(final.imbue) ? final.imbue : null;
   const affixes = final.affixes.filter(stays);
-  return { ...final, upgrade: 0, gem: null, implicit, imbue, affixes, pathScore };
+  return { ...final, upgrade: 0, stars: 0, gem: null, implicit, imbue, affixes, pathScore };
 }
 
 // The gear for the verdict (bareItem), for the character's class.

@@ -66,10 +66,11 @@ const counted = (count, forms) => `${numberText(count)} ${countedForm(count, for
 const capacityText = () => counted(rules().capacity, words().itemForms);
 const changed = () => new ApiError(409, 'changed', errors().changed);
 
-// An item's name as the bag shows it, its upgrade after it ("Miecz +3").
+// An item's name as the bag shows it, its upgrade after it ("Miecz +3"),
+// and the Zaklinaczka's stars after that ("Miecz +10 ★★").
 const titleOf = (item) => {
   const name = itemName(item, content());
-  return item.upgrade > 0 ? `${name} +${item.upgrade}` : name;
+  return item.upgrade > 0 ? `${name} +${item.upgrade}${item.stars > 0 ? ` ${'★'.repeat(item.stars)}` : ''}` : name;
 };
 
 // The Spiżarnia's goods in the chest too (the author, 18.11.2026:

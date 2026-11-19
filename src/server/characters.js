@@ -1936,6 +1936,8 @@ export async function characterProfile(context) {
       slotName: item.slotName,
       level: item.level,
       upgrade: item.upgrade,
+      // The Zaklinaczka's stars, after its upgrade ("+10 ★★").
+      ...(item.stars ? { stars: item.stars } : {}),
       rarity: item.rarity,
       rarityName: item.rarityName,
       color: item.color,

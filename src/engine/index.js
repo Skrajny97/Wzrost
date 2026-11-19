@@ -73,6 +73,7 @@ export * from './settlement.js';
 export * from './brotherhood-rewards.js';
 export * from './parties.js';
 export * from './forge.js';
+export * from './ascension.js';
 export * from './companions.js';
 export * from './market.js';
 export * from './stable.js';

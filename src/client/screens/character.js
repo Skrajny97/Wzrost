@@ -28,11 +28,39 @@ const POSITION_NAMES = { front: 'przód', middle: 'środek', back: 'tył' };
 // A text of the game's data in the page's language with its {name} filled in.
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (whole, name) => (Object.hasOwn(vars, name) ? String(vars[name]) : whole));
 
-// An item's name with its upgrade, e.g. "Miecz Rysia +3".
-export const itemTitle = (item) => (item.upgrade > 0 ? `${item.name} +${item.upgrade}` : item.name);
+// The Zaklinaczka's stars of an item at +10 (1180 B–1184 A), one ★ each,
+// or '' for none.
+const starsText = (item) => (item.stars > 0 ? '★'.repeat(item.stars) : '');
 
-// The number in the corner of a slot: the upgrade level.
-const upgradeBadge = (item) => item.upgrade > 0 && h('span', { class: 'slot-level', text: `+${item.upgrade}` });
+// An item's name with its upgrade, e.g. "Miecz Rysia +3", and its stars after
+// it, "Miecz Rysia +10 ★★".
+export const itemTitle = (item) => (item.upgrade > 0 ? `${item.name} +${item.upgrade}${item.stars > 0 ? ` ${starsText(item)}` : ''}` : item.name);
+
+// The words of the stars (data/settlement.json `ascension.texts`), with
+// their {name} filled in; '' where the game has no stars.
+export const starWords = (key, vars = {}) => {
+  const text = state.content?.ascension?.texts[key];
+  return text ? filled(text, vars) : '';
+};
+
+// The stars after the name and the upgrade, in gold, on the lists and the
+// card, read out as "Gwiazdki: 2 z 5".
+const starsMark = (item) =>
+  h('span', {
+    class: 'item-stars',
+    role: 'img',
+    'aria-label': starWords('label', { stars: item.stars, max: state.content?.ascension?.max ?? item.stars }),
+    text: starsText(item),
+  });
+
+// An item's name as itemTitle writes it, its stars in their own mark.
+export const itemTitleParts = (item) => (item.upgrade > 0 && item.stars > 0 ? [`${item.name} +${item.upgrade} `, starsMark(item)] : itemTitle(item));
+
+// The number in the corner of a slot: the upgrade level, and an item's
+// stars beside it as one gold star and their count ("+10★2"), as the tile
+// has no room for five.
+const upgradeBadge = (item) =>
+  item.upgrade > 0 && h('span', { class: 'slot-level' }, `+${item.upgrade}`, item.stars > 0 && h('span', { class: 'slot-stars', text: `★${item.stars}` }));
 
 // The gem set in a worn item (Jubilerstwo's Oprawianie), on its slot as in
 // the Oprawianie tab: its picture in a ring of its colour, in the slot's top
@@ -1786,16 +1814,22 @@ function reopenOwned(done) {
 // The way from the item card to the Zaklinaczka in the Osada, once the Osada
 // is open (the author: „Zrób też zaklinanie w plecaku (niech przenosi do
 // Zaklinaczki) jak już Osada jest odblokowana”): her place opens with the
-// item chosen for the zaklęcie afiksu and the zaklęcie żywiołu.
+// item chosen for the zaklęcie afiksu and the zaklęcie żywiołu, and first
+// among the items of her "Gwiazdki" for an item at +10 with stars to take.
 function enchanterLink(item) {
-  const { reforge, imbue } = item.enchant ?? {};
-  if (!state.character.settlementOpen || !(reforge || imbue) || item.id === undefined) return null;
-  const hint =
+  const { reforge, imbue, stars } = item.enchant ?? {};
+  if (!state.character.settlementOpen || !(reforge || imbue || stars) || item.id === undefined) return null;
+  const percent = Math.round((state.content?.ascension?.bonus ?? 0) * 100);
+  const hint = [
     reforge && imbue
       ? t('W Osadzie wylosuje od nowa jeden afiks tego przedmiotu albo zaklnie w niego żywioł.')
       : reforge
         ? t('W Osadzie wylosuje od nowa jeden afiks tego przedmiotu.')
-        : t('W Osadzie zaklnie w ten przedmiot żywioł.');
+        : imbue && t('W Osadzie zaklnie w ten przedmiot żywioł.'),
+    stars && starWords(reforge || imbue ? 'cardHintAlso' : 'cardHint', { percent }),
+  ]
+    .filter(Boolean)
+    .join(' ');
   return h(
     'div',
     { class: 'compare' },
@@ -1808,7 +1842,7 @@ function enchanterLink(item) {
         state.enchantItem = item.id;
         closeSheet();
       },
-      text: t('Zaklnij u Zaklinaczki'),
+      text: reforge || imbue ? t('Zaklnij u Zaklinaczki') : starWords('cardButton'),
     }),
   );
 }
@@ -2075,7 +2109,7 @@ export function itemSummary(item, { stats = false, tier = false } = {}) {
     h(
       'span',
       { class: 'item-name', vars: { '--rarity': item.color } },
-      itemTitle(item),
+      itemTitleParts(item),
       // A favourite's star after its name (favorites.js).
       item.favorite && h('span', { class: 'item-favorite', role: 'img', 'aria-label': t('ulubiony') }, icon('star', { size: 14 })),
     ),
@@ -2131,8 +2165,22 @@ export const gemFold = (gem) =>
     ),
   );
 
+// The line of an item's stars on its card: all its stars in a row, those
+// it has lit and those still to take dim, and what they add ("Gwiazdki: 2
+// z 5 (+20% wartości)"); also on the Targowisko's cards (market.js).
+export function starsLine(item) {
+  const max = state.content?.ascension?.max ?? item.stars;
+  const percent = Math.round(item.stars * (state.content?.ascension?.bonus ?? 0) * 100);
+  return h(
+    'li',
+    { class: 'item-stars-line' },
+    h('span', { class: 'stars-row', 'aria-hidden': 'true' }, Array.from({ length: max }, (_, index) => h('span', { class: `stars-row-star${index < item.stars ? ' stars-row-star--lit' : ''}`, text: '★' }))),
+    h('span', { text: starWords('cardLine', { stars: item.stars, max, percent }) }),
+  );
+}
+
 export function itemDetails(item, { small = false } = {}) {
-  const title = h(small ? 'p' : 'h2', { class: 'item-title', vars: { '--rarity': item.color }, text: itemTitle(item) });
+  const title = h(small ? 'p' : 'h2', { class: 'item-title', vars: { '--rarity': item.color } }, itemTitleParts(item));
   const meta = h('p', { class: 'item-meta', text: [item.rarityName, item.slotName, t('poz. {level}', { level: item.level }), item.tier].filter(Boolean).join(' · ') });
   // The card of an item shows its sprite large, on a frame in its rarity colour.
   const art = !small && itemSprite(item);
@@ -2145,6 +2193,8 @@ export function itemDetails(item, { small = false } = {}) {
       { class: 'item-properties' },
       propertyLines(item),
       item.gem && gemFold(item.gem),
+      // The Zaklinaczka's stars, which its numbers above include (1180 B).
+      item.stars > 0 && starsLine(item),
       classLines(item),
       item.classLevel && h('li', { class: 'item-classes', text: t('Od poziomu klasy {level}', { level: item.classLevel }) }),
       // Raised by the Kowal, once per item (the author, 12.11.2026).

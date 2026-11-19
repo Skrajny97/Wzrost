@@ -131,6 +131,7 @@ import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { wantedToKeep, wantedView } from './wanted.js';
 import { forgeView } from './forge.js';
+import { ascensionView } from './ascension.js';
 import { trialProgress } from './guild-trials.js';
 import { sourceFamePoints, upgradeFamePoints } from './fame.js';
 import { favoriteIds } from './favorites.js';
@@ -379,6 +380,8 @@ export function settlementView(player, stored, board, now) {
     forge: forgeView(player, stored, now),
     tannery: tanneryView(player, stored, now),
     imbue: imbueView(player),
+    // The Zaklinaczka's stars for the items at +10 (ascension.js, 1180 B–1184 A).
+    ascension: ascensionView(player, stored),
     // After an evolution the paths change with it, so no path reset. The
     // Zwój Niepamięci at its price, past the free reset's level, and
     // whether the character holds one already (hermitService).
