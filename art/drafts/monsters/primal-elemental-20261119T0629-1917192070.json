@@ -1,0 +1,14 @@
+{
+  "id": "primal-elemental",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a living elemental of the four elements summoned by a mage: a towering humanoid body of dark rough stone cracked with glowing molten fire, a crown and shoulders of jagged pale blue ice crystals, crackling bright blue lightning coiling around its huge fists, glowing white eyes, powerful and menacing, standing on both feet, full body, three-quarter view facing right, the creature alone, no ground, no rocks, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02349454238933987
+  },
+  "images": 1
+}
