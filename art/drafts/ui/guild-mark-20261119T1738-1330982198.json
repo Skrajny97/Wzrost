@@ -1,0 +1,14 @@
+{
+  "id": "guild-mark",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a round bronze guild token coin with a thick rim, embossed with a small banner flying on a pole, warm bronze with bright highlights, the coin alone, no background, single inventory item icon, bold clean outline",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023318020911110775
+  },
+  "images": 1
+}
