@@ -115,9 +115,10 @@ describe('Oznaczanie na czacie', () => {
     assert.equal(sent.status, 201);
     // The writer sees the names its message tags, as written.
     assert.deepEqual([sent.data.message.mentions, sent.data.message.mentioned], [['Ola', 'ewa'], undefined]);
+    // A tag in the Globalny goes to no phone (19.11.2026).
     assert.deepEqual(await tags(), [
-      { written: 'Ola', push: 1, name: 'Ola' },
-      { written: 'ewa', push: 1, name: 'Ewa' },
+      { written: 'Ola', push: 0, name: 'Ola' },
+      { written: 'ewa', push: 0, name: 'Ewa' },
     ]);
     const seenBy = async (cookie) => (await read(cookie)).messages.map(({ mentions, mentioned }) => [mentions, mentioned]);
     assert.deepEqual(await seenBy(players.ola), [[['Ola', 'ewa'], true]]);
@@ -183,7 +184,7 @@ describe('Oznaczanie na czacie', () => {
     const sent = await send(players.ala, 'Hej @wędrowiec, co słychać?');
     assert.equal(sent.status, 201);
     assert.deepEqual(sent.data.message.mentions, ['wędrowiec']);
-    assert.deepEqual(await tags(), [{ written: 'wędrowiec', push: 1, name: 'Ola' }]);
+    assert.deepEqual(await tags(), [{ written: 'wędrowiec', push: 0, name: 'Ola' }]);
     assert.equal((await read(players.ola)).messages[0].mentioned, true);
     assert.equal((await read(players.ewa)).messages[0].mentioned, undefined);
     // By the account's name and the character's name in one message: one tag.
@@ -298,94 +299,136 @@ describe('Oznaczanie na czacie', () => {
     assert.deepEqual(await tags(), []);
   });
 
-  test('a tag reaches the phone, at most once a while from the same writer, and not once read or taken down', async () => {
+  test('a tag reaches the phone only from a guild\'s channel: once a while from the same writer, not once read, taken down or out of the guild', async () => {
     const database = await db();
-    const olek = await player('olek', { name: 'Olek', appearance: 'male' });
     const phone = await fakePhone('/push/ola');
     assert.equal((await call('POST', '/api/push/subscribe', { cookie: players.ola, body: phone.subscription })).status, 200);
     const run = (at) => server.getWorker().scheduled({ cron: '* * * * *', scheduledTime: new Date(at) });
-
-    await send(players.ala, '@Ola, idziesz z nami do Wieży? Czekamy przy Ognisku od samego rana i nikt nie wie, kiedy wrócisz z wyprawy');
-    await age();
-    await send(players.ala, '@Ola halo');
-    await send(olek, 'Cześć @Ola');
-    // The second tag from the same writer within the window sends nothing.
-    assert.deepEqual((await tags()).map(({ push }) => push), [1, 0, 1]);
-    const start = Date.now() + 30000;
-    await run(start);
-    // The two go out at once, in either order.
-    const shown = await Promise.all(pushService.received.map((message) => phone.read(message.body)));
-    const { pushLength } = content.chat.mentions;
-    const long = '@Ola, idziesz z nami do Wieży? Czekamy przy Ognisku od samego rana i nikt nie wie, kiedy wrócisz z wyprawy';
-    assert.ok(long.length > pushLength);
-    assert.deepEqual(
-      shown.map(({ title, body, url, tag }) => [title, body, url, tag]).sort(),
-      [
-        ['Czat: Globalny', `Ala oznaczyła Cię na czacie: ${long.slice(0, pushLength - 1).trimEnd()}…`, '#/czat', `mention-${await idOf('Ala')}`],
-        ['Czat: Globalny', 'Olek oznaczył Cię na czacie: Cześć @Ola', '#/czat', `mention-${await idOf('Olek')}`],
-      ].sort(),
-    );
-    assert.deepEqual(pushService.received.map((message) => message.headers.topic).sort(), [`mention-${await idOf('Ala')}`, `mention-${await idOf('Olek')}`].sort());
-    // Not twice.
-    await run(start + 60000);
-    assert.equal(pushService.received.length, 2);
-
-    // Past the window, the same writer's tag sends one again: unless the
-    // character has read it first, or the moderation took it down.
-    await database.prepare('UPDATE chat_mentions SET created_at = created_at - ?').bind((content.chat.mentions.pushEveryMinutes + 1) * 60000).run();
-    await age();
-    const readTag = (await send(players.ala, '@Ola, już jesteś?')).data.message;
-    await call('POST', '/api/chat/seen', { cookie: players.ola, body: { global: readTag.id } });
-    await age();
-    const hidden = (await send(olek, '@Ola coś brzydkiego')).data.message;
-    await call('POST', '/api/chat/moderate', { cookie: await admin(), body: { messageId: hidden.id, action: 'hide' } });
-    assert.deepEqual((await tags()).slice(-2).map(({ push }) => push), [1, 1]);
-    await database.prepare('UPDATE chat_mentions SET created_at = ? WHERE message_id IN (?, ?)').bind(start + 90000, readTag.id, hidden.id).run();
-    await run(start + 120000);
-    assert.equal(pushService.received.length, 2);
-    // Each later tag in the next minute's window, as if made then.
-    let clock = start + 120000;
-    async function deliver(messageId) {
+    // Each tag in the next minute's window, as if made then.
+    let clock = Date.now() + 30000;
+    async function deliver(...messageIds) {
       const before = pushService.received.length;
-      await database.prepare('UPDATE chat_mentions SET created_at = ?, push = 1 WHERE message_id = ?').bind(clock + 10000, messageId).run();
+      for (const messageId of messageIds) await database.prepare('UPDATE chat_mentions SET created_at = ? WHERE message_id = ?').bind(clock + 10000, messageId).run();
       clock += 30000;
       await run(clock);
       return Promise.all(pushService.received.slice(before).map((message) => phone.read(message.body)));
     }
-    const [alaId, olaId] = [await idOf('Ala'), await idOf('Ola')];
-    // A tag in a private conversation names it; read there before the run,
-    // it sends nothing.
-    await age();
-    const secret = (await whisper(players.ala, olaId, '@Ola tylko dla Ciebie')).data.message;
-    // Inside the window of Ala's last tag: no notification of its own.
-    assert.equal((await tags()).at(-1).push, 0);
-    assert.deepEqual(
-      (await deliver(secret.id)).map(({ title, body }) => [title, body]),
-      [['Czat: prywatna rozmowa', 'Ala oznaczyła Cię na czacie: @Ola tylko dla Ciebie']],
-    );
-    await age();
-    const readSecret = (await whisper(players.ala, olaId, '@Ola jesteś?')).data.message;
-    await call('POST', '/api/chat/seen', { cookie: players.ola, body: { with: alaId, id: readSecret.id } });
-    assert.deepEqual(await deliver(readSecret.id), []);
-    // The same in the Wymiana.
+    // A pause longer than the window between one writer's tags (deliver
+    // moves a tag minutes ahead, so the pause goes back further still).
+    const pause = () => database.prepare('UPDATE chat_mentions SET created_at = created_at - ?').bind((content.chat.mentions.pushEveryMinutes + 15) * 60000).run();
+    const alaId = await idOf('Ala');
+
+    // The Globalny and the Wymiana: no phone (the author, 19.11.2026:
+    // „wyłącz powiadomienia przy oznaczaniu na ogólnym czacie”).
+    const loud = (await send(players.ala, '@Ola, idziesz z nami do Wieży?')).data.message;
     await age();
     const offer = (await send(players.ala, '@Ola mam amulet', 'trade')).data.message;
-    assert.deepEqual((await deliver(offer.id)).map(({ title }) => title), ['Czat: Wymiana']);
-    await age();
-    const readOffer = (await send(players.ala, '@Ola i jeszcze pierścień', 'trade')).data.message;
-    await call('POST', '/api/chat/seen', { cookie: players.ola, body: { trade: readOffer.id } });
-    assert.deepEqual(await deliver(readOffer.id), []);
-    // And in the guild's channel, only while the character is in the guild.
+    assert.deepEqual((await tags()).map(({ push }) => push), [0, 0]);
+    assert.deepEqual(await deliver(loud.id, offer.id), []);
+
+    // The guild's channel: the first tag, and no other from the same writer
+    // within the window.
     await database.prepare("UPDATE characters SET level = 30, gold = 5000 WHERE name = 'Ala'").run();
     const founded = await call('POST', '/api/guild/found', { cookie: players.ala, body: { name: 'Leśni Bracia', tag: 'LB' } });
     await call('POST', '/api/guild/invite', { cookie: players.ala, body: { name: 'Ola' } });
     assert.equal((await call('POST', '/api/guild/accept', { cookie: players.ola, body: { guildId: founded.data.guild.id } })).status, 200);
     await age();
-    const rally = (await send(players.ala, '@Ola zbiórka przy Bestii', 'guild')).data.message;
-    assert.deepEqual((await deliver(rally.id)).map(({ title }) => title), ['Czat: Gildia']);
+    const long = '@Ola, zbiórka przy Bestii, czekamy przy Ognisku od samego rana i nikt nie wie, kiedy wrócisz z wyprawy';
+    const { pushLength } = content.chat.mentions;
+    assert.ok(long.length > pushLength);
+    const rally = (await send(players.ala, long, 'guild')).data.message;
+    await age();
+    const again = (await send(players.ala, '@Ola słyszysz?', 'guild')).data.message;
+    assert.deepEqual((await tags()).slice(-2).map(({ push }) => push), [1, 0]);
+    assert.deepEqual(
+      (await deliver(rally.id, again.id)).map(({ title, body, url, tag }) => [title, body, url, tag]),
+      [['Czat: Gildia', `Ala oznaczyła Cię na czacie: ${long.slice(0, pushLength - 1).trimEnd()}…`, '#/czat', `mention-${alaId}`]],
+    );
+    // Not twice.
+    clock += 60000;
+    await run(clock);
+    assert.equal(pushService.received.length, 1);
+
+    // Past the window it sends one again: unless the character has read it,
+    // the moderation took it down, or the character left the guild.
+    await pause();
+    await age();
+    const seen = (await send(players.ala, '@Ola, już jesteś?', 'guild')).data.message;
+    await call('POST', '/api/chat/seen', { cookie: players.ola, body: { guild: seen.id } });
+    assert.deepEqual(await deliver(seen.id), []);
+    await pause();
+    await age();
+    const hidden = (await send(players.ala, '@Ola coś brzydkiego', 'guild')).data.message;
+    await call('POST', '/api/chat/moderate', { cookie: await admin(), body: { messageId: hidden.id, action: 'hide' } });
+    assert.deepEqual(await deliver(hidden.id), []);
+    await pause();
     await age();
     const late = (await send(players.ala, '@Ola gdzie jesteś?', 'guild')).data.message;
+    assert.equal((await tags()).at(-1).push, 1);
     assert.equal((await call('POST', '/api/guild/leave', { cookie: players.ola })).status, 200);
     assert.deepEqual(await deliver(late.id), []);
+  });
+
+  // The author, 19.11.2026: „włącz powiadomienia jak ktoś napisze prywatną
+  // wiadomość na czacie”.
+  test('a private message reaches the phone: the first of a talk, and not once read, taken down or from a hidden writer', async () => {
+    const database = await db();
+    const olek = await player('olek', { name: 'Olek', appearance: 'male' });
+    const phone = await fakePhone('/push/ola');
+    assert.equal((await call('POST', '/api/push/subscribe', { cookie: players.ola, body: phone.subscription })).status, 200);
+    const run = (at) => server.getWorker().scheduled({ cron: '* * * * *', scheduledTime: new Date(at) });
+    const [alaId, olaId, olekId] = [await idOf('Ala'), await idOf('Ola'), await idOf('Olek')];
+    let clock = Date.now() + 30000;
+    async function deliver(messageId) {
+      const before = pushService.received.length;
+      await database.prepare('UPDATE chat_messages SET created_at = ? WHERE id = ?').bind(clock + 10000, messageId).run();
+      clock += 30000;
+      await run(clock);
+      return Promise.all(pushService.received.slice(before).map((message) => phone.read(message.body)));
+    }
+    // A pause longer than the window between one writer's messages.
+    const pause = () => database.prepare('UPDATE chat_messages SET created_at = created_at - ?').bind((content.chat.mentions.pushEveryMinutes + 1) * 60000).run();
+
+    // A talk wakes the phone once a writer: Ala's second line sends nothing.
+    await whisper(players.ala, olaId, 'Hej, masz chwilę?');
+    await age();
+    await whisper(players.ala, olaId, 'Pomożesz mi w Wieży?');
+    await whisper(olek, olaId, 'Cześć Ola');
+    await run(clock);
+    const shown = await Promise.all(pushService.received.map((message) => phone.read(message.body)));
+    assert.deepEqual(
+      shown.map(({ title, body, url, tag }) => [title, body, url, tag]).sort(),
+      [
+        ['Czat: prywatna rozmowa', 'Ala napisała do Ciebie: Hej, masz chwilę?', '#/czat', `private-${alaId}`],
+        ['Czat: prywatna rozmowa', 'Olek napisał do Ciebie: Cześć Ola', '#/czat', `private-${olekId}`],
+      ].sort(),
+    );
+    // Not twice.
+    clock += 60000;
+    await run(clock);
+    assert.equal(pushService.received.length, 2);
+
+    // After a pause, again; a tag in it sends no notification of its own.
+    await pause();
+    await age();
+    const tagged = (await whisper(players.ala, olaId, '@Ola tylko dla Ciebie')).data.message;
+    assert.equal((await tags()).at(-1).push, 0);
+    assert.deepEqual((await deliver(tagged.id)).map(({ body }) => body), ['Ala napisała do Ciebie: @Ola tylko dla Ciebie']);
+    // Not once read, taken down, or from a writer the character hides.
+    await pause();
+    await age();
+    const seen = (await whisper(players.ala, olaId, 'Jesteś?')).data.message;
+    await call('POST', '/api/chat/seen', { cookie: players.ola, body: { with: alaId, id: seen.id } });
+    assert.deepEqual(await deliver(seen.id), []);
+    await pause();
+    await age();
+    const hidden = (await whisper(players.ala, olaId, 'Coś brzydkiego')).data.message;
+    await call('POST', '/api/chat/moderate', { cookie: await admin(), body: { messageId: hidden.id, action: 'hide' } });
+    assert.deepEqual(await deliver(hidden.id), []);
+    await pause();
+    await age();
+    const blocked = (await whisper(olek, olaId, 'Odpiszesz?')).data.message;
+    await call('POST', '/api/chat/block', { cookie: players.ola, body: { messageId: blocked.id } });
+    assert.deepEqual(await deliver(blocked.id), []);
   });
 });

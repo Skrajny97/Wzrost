@@ -15,10 +15,15 @@
 // long as their message: the message shows gilded to the one it tags, and
 // the tab of its channel and the Społeczność light until the tagged
 // character has read that channel (chat_seen, chat.js), on any device. A
-// tag goes to the tagged player's phones too, with the next minute's
-// notifications (push.js): at most one from the same writer to the same
-// character within mentions.pushEveryMinutes, and none once the message is
-// read, taken down or its writer hidden.
+// tag in a guild's channel goes to the tagged player's phones too, with the
+// next minute's notifications (push.js): at most one from the same writer to
+// the same character within mentions.pushEveryMinutes, and none once the
+// message is read, taken down or its writer hidden. A tag in the Globalny,
+// the Wymiana or the English channel goes to no phone (the author,
+// 19.11.2026: „wyłącz powiadomienia przy oznaczaniu na ogólnym czacie”), nor
+// one in a private conversation, whose every message notifies by itself
+// (privateNotices: „włącz powiadomienia jak ktoś napisze prywatną wiadomość
+// na czacie”).
 
 import { gendered, isUnlocked, mentionPlaces, pickMentions } from '../engine/index.js';
 import { shownText } from './chat.js';
@@ -74,6 +79,8 @@ export async function findMentions(db, text, { userId, channel, recipientId = nu
     .filter((one, index, all) => all.findIndex((other) => other.character.id === one.character.id) === index)
     .slice(0, tuning().perMessage);
   if (tagged.length === 0) return [];
+  // A phone notification only for a tag in a guild's channel (above).
+  if (!channel.startsWith(GUILD_PREFIX)) return tagged.map(({ character, written }) => ({ characterId: character.id, written, push: false }));
   // The characters this writer's tags already sent a notification to lately.
   const ids = tagged.map(({ character }) => character.id);
   const notified = await db
@@ -220,6 +227,55 @@ export async function mentionNotices(db, from, to) {
         at: row.created_at,
         title: filled(texts.pushTitle, words),
         body: filled(gendered(texts.pushBody, row.appearance), words),
+      };
+    });
+    due.set(row.user_id, [...(due.get(row.user_id) ?? []), notice]);
+  }
+  return due;
+}
+
+// The phone notifications of the private messages written after `from` up
+// to `to` (the author, 19.11.2026: „włącz powiadomienia jak ktoś napisze
+// prywatną wiadomość na czacie”), as mentionNotices gives them: to the
+// player whose played character the message is for, while the message is
+// still there, the character has not read the conversation that far
+// (chat_seen) and does not hide the writer. Only the first message of a
+// talk: none when the same writer wrote to the same character within
+// mentions.pushEveryMinutes before, so a conversation wakes the phone once,
+// not at every line. "Mira napisała do Ciebie: …", a woman's verb for a
+// female writer, in the language of the player's account.
+export async function privateNotices(db, from, to) {
+  const rows = await db
+    .prepare(
+      `SELECT m.id AS message_id, m.created_at, c.user_id, m.character_id AS writer_id, m.text, w.name, w.appearance,
+              (SELECT u.language FROM users u WHERE u.id = c.user_id) AS language,
+              CASE WHEN json_valid(c.chat_seen) THEN json_extract(c.chat_seen, '$.private."' || m.character_id || '"') END AS seen
+       FROM chat_messages m
+       JOIN characters c ON c.id = m.recipient_id
+       JOIN characters w ON w.id = m.character_id
+       WHERE m.channel = '${PRIVATE}' AND m.system = 0 AND m.created_at > ? AND m.created_at <= ? AND c.role = 'player'
+         AND c.user_id IN (SELECT user_id FROM push_subscriptions WHERE gone_at IS NULL)
+         AND m.hidden_at IS NULL
+         AND m.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = c.user_id)
+         AND NOT EXISTS (SELECT 1 FROM chat_messages e WHERE e.channel = '${PRIVATE}' AND e.character_id = m.character_id
+                           AND e.recipient_id = m.recipient_id AND e.id < m.id AND e.created_at > m.created_at - ?)
+       ORDER BY m.created_at, m.id`,
+    )
+    .bind(from, to, tuning().pushEveryMinutes * 60000)
+    .all();
+  const due = new Map();
+  for (const row of rows.results) {
+    if ((Number(row.seen) || 0) >= row.message_id) continue;
+    const notice = runInLanguage(accountLanguage(row.language), () => {
+      const { texts, pushLength } = tuning();
+      const words = { channel: channelName(PRIVATE), name: row.name, text: beginning(shownText(row.text), pushLength) };
+      return {
+        // One writer's newer message takes the place of its older one.
+        tag: `private-${row.writer_id}`,
+        url: '#/czat',
+        at: row.created_at,
+        title: filled(texts.pushTitle, words),
+        body: filled(gendered(texts.pushPrivate, row.appearance), words),
       };
     });
     due.set(row.user_id, [...(due.get(row.user_id) ?? []), notice]);

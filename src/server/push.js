@@ -1,6 +1,6 @@
 // Phone notifications: the end of an exploration, of a build, and a full
-// store (src/engine/notifications.js says when and in what words), and a
-// tag in the chat (mentions.js). The
+// store (src/engine/notifications.js says when and in what words), a tag in
+// a guild's chat and a private message (mentions.js). The
 // switch in the settings asks the phone for permission and hands the server
 // its push subscription; every minute the cron trigger (wrangler.jsonc)
 // takes the minute that passed and sends what came due in it to the phones
@@ -15,7 +15,7 @@ import { content, contentIn } from './content.js';
 import { fromBase64Url } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { accountLanguage } from './i18n.js';
-import { mentionNotices } from './mentions.js';
+import { mentionNotices, privateNotices } from './mentions.js';
 import { requireSession } from './sessions.js';
 import { createVapidKeys, sendPush, vapidAuthorization } from './webpush.js';
 
@@ -144,8 +144,8 @@ export async function sendNotifications(env, now) {
   if (subscriptions.length === 0) return { sent: 0, gone: 0 };
 
   const due = await notificationsByUser(db, from, now);
-  // The tags in the chat made meanwhile (mentions.js).
-  for (const [userId, notices] of await mentionNotices(db, from, now)) due.set(userId, [...(due.get(userId) ?? []), ...notices]);
+  // The tags in the chat and the private messages made meanwhile (mentions.js).
+  for (const [userId, notices] of [...(await mentionNotices(db, from, now)), ...(await privateNotices(db, from, now))]) due.set(userId, [...(due.get(userId) ?? []), ...notices]);
   const keys = await vapidKeys(db);
   // One signature for each push service in a run.
   const signatures = new Map();

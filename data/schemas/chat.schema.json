@@ -56,6 +56,11 @@
       "description": "Angielskie początki albo części słów, które czat zamienia na gwiazdki, obok words, w każdym kanale; filtr imion postaci ich nie bierze.",
       "items": { "type": "string", "pattern": "^[a-z]+$" }
     },
+    "wordsAllowed": {
+      "type": "array",
+      "description": "Części słów, w których słowo z words albo wordsEn nie jest wulgaryzmem i czat go nie gwiazdkuje, np. „shuj” w „pushujący”, „rushujemy”, „flashuje” (19.11.2026: czat zamienił „pushujący” na gwiazdki).",
+      "items": { "type": "string", "pattern": "^[a-ząćęłńóśźż]+$" }
+    },
     "names": {
       "type": "object",
       "description": "Filtr imion postaci (src/engine/names.js) z listą words: niepomijalny komunikat dla postaci, której imię łamie zasady, i odmowa przy tworzeniu postaci.",
@@ -136,7 +141,7 @@
         "texts": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["button", "suggestions", "tagged", "news", "pushTitle", "pushBody", "channels"],
+          "required": ["button", "suggestions", "tagged", "news", "pushTitle", "pushBody", "pushPrivate", "channels"],
           "properties": {
             "button": { "type": "string", "minLength": 1 },
             "suggestions": { "type": "string", "minLength": 1 },
@@ -144,6 +149,7 @@
             "news": { "type": "string", "minLength": 1 },
             "pushTitle": { "type": "string", "pattern": "\\{channel\\}" },
             "pushBody": { "type": "string", "pattern": "\\{name\\}[\\s\\S]*\\{text\\}" },
+            "pushPrivate": { "type": "string", "pattern": "\\{name\\}[\\s\\S]*\\{text\\}", "description": "Powiadomienie na telefon o prywatnej wiadomości (privateNotices w src/server/mentions.js), z formą żeńską i męską w nawiasie." },
             "channels": {
               "type": "object",
               "additionalProperties": false,
