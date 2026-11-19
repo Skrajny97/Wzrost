@@ -1,0 +1,14 @@
+{
+  "id": "guild-shrine",
+  "tool": "pixellab generate-image-v2",
+  "description": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of a stone stronghold at the edge of a forest, standing directly on bare ground with no ground tile, base or platform under it, the guild's pagan shrine: a small old Slavic temple (gontyna) built all of dark carved wood on a low footing of grey hewn stone, a steep wooden shingle roof with small crossed carved horse heads on its gables, carved wooden posts with Slavic folk patterns and sun signs, the front gable end open, inside it a tall carved wooden idol post with a bearded face under a round cap, a small fire burning in a stone bowl and offerings of bread, red apples and wildflowers before it, a small building with the whole roof and its carved horse heads inside the picture and empty space above the roof, no people",
+  "style": "src/client/art/camp/quarters-3.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08044586197535197
+  },
+  "images": 4
+}
