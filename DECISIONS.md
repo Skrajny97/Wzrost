@@ -3847,6 +3847,24 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Piekielna wyprawa (19.11.2026)
+
+Autor: „Dodaj też opcje Piekielnej wyprawy - 2 razy trudniejsza niz Trudna wyprawa 1,5x lepszy drop”.
+
+1. **Liczby** (`challenge.hell` w `data/balance.json`):
+   - stwory: obrażenia ×3 i HP ×3, czyli dwa razy więcej niż ×1,5 Trudnej wyprawy;
+   - XP: +50%, tyle samo co na Trudnej, bo według autora postacie na wysokich poziomach i tak awansują za szybko;
+   - złoto: +125%, czyli 1,5 raza więcej niż +50% Trudnej (1,5 × 1,5 = 2,25);
+   - łupy („drop”, `drop` 0,5): szansa na skrzynię z przedmiotem wśród znalezisk i materiały ze stworów ×1,5.
+2. **Od 250. poziomu postaci** zostaje połowa złota, skrzyń i materiałów, jak na każdej wyprawie (`lateRewards`). Siła Piekielnej wyprawy dochodzi do wzrostu stworów od 250. poziomu (0.4.57), tak jak siła Trudnej.
+3. **Zasady jak przy Trudnej wyprawie:** od 10. poziomu postaci i tylko przy zwykłym „Wyrusz”. Nie działa na Szybkim i Błyskawicznym polowaniu ani na wyprawie z drużyną. Serwer odmawia wtedy własnymi słowami. Gdy przyjdą oba pola, liczy się Piekielna wyprawa. „Zagrożenie” liczy jej stwory (`?hell=1`).
+4. **Na ekranie:** pole „Piekielna wyprawa” stoi w „Opcjach wyprawy” pod „Trudną wyprawą”, z linijką: „Stwory: obrażenia ×3, HP ×3. Nagroda: +50% XP, +125% złota i 1,5 raza więcej przedmiotów i materiałów. Nie na Szybkim i Błyskawicznym polowaniu ani z drużyną.” Zaznaczenie jednego pola odznacza drugie. Telefon pamięta wybór tak jak przy Trudnej, a „Wyrusz ponownie” go bierze. Wyprawa w toku i raport mówią: „Piekielna wyprawa: dużo silniejsze stwory, więcej XP, złota i łupów.”
+5. **Brakujące szczegóły:**
+   - Skrzynie elit i czempionów zostają bez zmian. Łupy to skrzynie wśród znalezisk i materiały ze stworów.
+   - Po angielsku „Hellish exploration”, jak poziom Piekielny Labiryntu („Hellish”). Nazwa jest w słowniku nazw.
+   - Narrator nie ma osobnej kwestii o Piekielnej wyprawie. Pole stoi pod Trudną, o której narrator mówi.
+   - Przykład z szacunku zagrożenia: typowy Wojownik bez towarzyszy w Omszałych Głazach (26–30), wyprawa godzinna, szansa omdlenia: zwykła / Trudna / Piekielna. Na 40. poziomie: 0% / 3% / 91,5%. Na 60. poziomie: 0% / 0% / 3,7%.
+
 ## Wersja 0.4.57 (19.11.2026): od 250. poziomu co najmniej trzy razy trudniej, drużyna jeszcze bardziej
 
 Autor (19.11.2026): „grę od 250tego trzeba zrobić też jeszcze trudniejszą, tam wchodzą juz potezne przedmioty i wszystko, tak z 2 razy trudniej, szczególnie z drużyną”, a potem: „trudność jest za niska dla wysoko lvlowych postaci. Od 250ego wzrost 3-krotny minimum, bo to jest żart co się dzieje, jak szybko lecą z lvlami, na nic te Twoje symulacje”.
