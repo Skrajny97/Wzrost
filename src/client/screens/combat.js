@@ -50,6 +50,7 @@ import { mercenaryChoice, servicePanel } from '../mercenaries.js';
 import { combatModes } from './towers.js';
 import { weekLine } from '../weeks.js';
 import { andrzejkiCard, omenLines } from '../andrzejki.js';
+import { partyGated } from '../party-gate.js';
 
 // Shown through t(), as the page loads its English after this module.
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
@@ -1168,7 +1169,7 @@ export function mountCombat(container, { params, navigate }) {
           const hiring = !along && mercenary?.chosen();
           let answer;
           try {
-            answer = await call('POST', along ? '/api/party/hunt' : '/api/hunts', {
+            answer = await partyGated(along ? '/api/party/hunt' : '/api/hunts', {
               areaId: area.id,
               minutes,
               avoidRare: avoiding(),
@@ -1187,6 +1188,9 @@ export function mountCombat(container, { params, navigate }) {
             if (hiring) mercenary.failed(error);
             throw error;
           }
+          // Asked to leave the Drużyna to set out alone, the player stayed
+          // in it (1178 B, party-gate.js).
+          if (answer === null) return;
           // Those who went, as the server says: one may have got busy
           // meanwhile. A mercenary chosen stays home, chosen for a plain
           // exploration (mercenaries.js).

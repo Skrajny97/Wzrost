@@ -67,7 +67,11 @@ describe('the chat\'s check tells a member the trip it was sent on', () => {
   });
 
   test('a member back from its own exploration: the trip after its report, not the report, is what it hears', async () => {
-    assert.equal((await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
+    // Since 1178 B a member sets out alone only leaving the party: it leaves
+    // with the start and joins again while away.
+    assert.equal((await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5, leaveParty: true })).status, 201);
+    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    assert.equal((await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id })).status, 200);
     await (await db()).prepare("UPDATE activities SET started_at = started_at - 600000, ends_at = ends_at - 600000 WHERE character_id = (SELECT id FROM characters WHERE name = 'Druh')").run();
     const page = (await as('druh', 'GET', '/api/character')).data.character;
     assert.equal(page.activity.party, undefined);

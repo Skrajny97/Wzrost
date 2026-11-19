@@ -3847,6 +3847,14 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.56 (19.11.2026): w drużynie pytanie przed samotną wyprawą i zmianą postaci (1178 B)
+
+1. **Zgłoszenie gracza z Discorda (przez autora) i wybór autora 1178 B.** Gdy ktoś w drużynie zmienia postać albo idzie walczyć sam, drużyna rusza bez niego, a pozostali tego nie widzą. Błąd z różnymi raportami jednej wyprawy naprawiła już 0.4.46. Autor wybrał wariant B: zamiast blokady pytanie.
+2. **Samotna wyprawa członka.** Członek drużyny (nie lider), który stuka „Wyrusz” bez drużyny albo „Wyrusz ponownie” w raporcie, dostaje pytanie „Jesteś w drużynie. Wyjść z drużyny?”. „Wyjdź z drużyny” zapisuje wyjście i start wyprawy razem, w jednym zapisie, a „Zostań w drużynie” niczego nie zmienia. Lider wyrusza sam bez pytania, jak dotąd, i zostaje liderem.
+3. **Zmiana postaci i nowa postać.** Gracz, którego grana postać jest w drużynie, dostaje to samo pytanie przy zmianie postaci i przy tworzeniu nowej, bo nowa postać odkłada obecną. Dotyczy to też lidera, bo bez niego drużyna nie wyruszy. Wyjście zapisuje się razem ze zmianą.
+4. **Brakujący szczegół: gdzie bez pytania.** Wieża Solo, Labirynt i Portale nie zajmują postaci, bo walka kończy się od razu, więc nie odbierają jej drużynie i nie pytają, choć wymieniłem je w 1178 B. Pytanie tylko by tam przeszkadzało. Jeśli autor chce je i tam, wystarczy jedno zdanie. Profesje bez zmian (1.11.2026).
+5. **Kod.** Serwer: `partyGate` w `src/server/parties.js` (odpowiedź `in_party`, a z `leaveParty` wyjście w tym samym zapisie). Strona: `src/client/party-gate.js`. Testy w `test/parties.test.js`. Starsze testy, w których członek sam wyruszał, będąc w drużynie, wyruszają teraz z wyjściem i dołączają ponownie.
+
 ## Wersja 0.4.55 (19.11.2026): sortowanie w Kowadle i sprzedaż zaznaczonych przedmiotów (1176, 1177)
 
 Autor przyjął obie makiety na stronie ocen (1176 i 1177, 19.11.2026), bez uwag, więc zostają domyślna kolejność „Założone”, przycisk „Sprzedaj za X złota” i zaznaczanie w samym plecaku.

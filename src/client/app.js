@@ -72,6 +72,7 @@ import { giftCodeRow } from './gift-code.js';
 import { discordRow } from './discord.js';
 import { socialRows } from './social.js';
 import { closeSheet, confirmAction, initSheet, motionSwitch, openSheet, skinSwatches, switchButton, toast, voiceSwitch, withButton } from './ui.js';
+import { partyGated } from './party-gate.js';
 
 const views = {
   loading: $('#view-loading'),
@@ -367,7 +368,9 @@ function showChoice(list) {
 // The account plays that character from now on: the game starts again with
 // it, from the Walka tab.
 async function chooseCharacter(id) {
-  await request('POST', '/api/characters/choose', { id });
+  // The one played now in a Drużyna leaves it first, when the player says
+  // so (1178 B, party-gate.js).
+  if ((await partyGated('/api/characters/choose', { id }, (to, what) => request('POST', to, what))) === null) return;
   await characterGone();
 }
 
@@ -376,7 +379,7 @@ async function chooseCharacter(id) {
 // "miniaturki postaci w formie ikon"): the game starts again with it, on its
 // Postać tab.
 async function switchCharacter(id) {
-  await call('POST', '/api/characters/choose', { id });
+  if ((await partyGated('/api/characters/choose', { id })) === null) return;
   await characterGone('#/postac');
 }
 

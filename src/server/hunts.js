@@ -125,6 +125,7 @@ import { finishMining } from './mining.js';
 import { finishFishing } from './fishing.js';
 import { finishFarming } from './farming.js';
 import { applyPartyEvent, checkedChoice, leaderView, resolveAuto, resolvePartyRow, tripEvent, tripLine } from './party-events.js';
+import { partyGate } from './parties.js';
 import { wantedAfterHunt, wantedGoing, wantedOnTrip } from './wanted.js';
 import { keptWeek, weekFor } from './weeks.js';
 import { winterGainSql } from './winter.js';
@@ -377,7 +378,10 @@ export async function quickHunt(context) {
 export async function startHunt(context) {
   const { session, player } = await requireIdlePlayer(context);
   const body = await readJson(context.request);
-  await beginHunt(context.env.DB, player, body, context.now);
+  // A member of a Drużyna setting out alone is asked to leave it first
+  // (1178 B, partyGate in parties.js); the leaving goes with the start.
+  const leaving = await partyGate(context.env.DB, player.row.id, body);
+  await beginHunt(context.env.DB, player, body, context.now, { also: leaving });
   return json({ character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) }, 201);
 }
 

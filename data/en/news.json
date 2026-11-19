@@ -1156,6 +1156,10 @@
     "0.4.55": {
       "title": "Version 0.4.55",
       "body": "- Kowadło: an “Order of items” row over the list: Equipped, Newest, Rarity, Level, Upgrade or Type. The phone remembers the choice.\n- Bag: a “Mark for sale” button. Tap the items the scrap dealer should buy and sell them all at once. Favourites cannot be marked."
+    },
+    "0.4.56": {
+      "title": "Version 0.4.56",
+      "body": "- Party: before you set out alone as a party member, or switch characters (as the leader too), the game asks: “You are in a party. Leave the party?”. So a party no longer sets out without someone who got busy elsewhere."
     }
   }
 }
