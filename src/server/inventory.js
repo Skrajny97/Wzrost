@@ -44,7 +44,7 @@ import { trialProgress } from './guild-trials.js';
 import { upgradeFamePoints } from './fame.js';
 import { ApiError, json, readJson } from './http.js';
 import { takenOff } from './market.js';
-import { weekFactorNow } from './weeks.js';
+import { weekFactorFor } from './weeks.js';
 import { anvilDiscountOf } from './perks.js';
 import { addTo } from './professions.js';
 
@@ -387,10 +387,11 @@ export async function previewItem(context) {
 // Zwój ochronny where the item may break and the player asked for it
 // (`body.ward`). The same for an item a companion wears, paid by the
 // character (settlement.js). `week`: the factor of the week's upgrade
-// chance now (weeks.js), for the try (rollUpgrade).
+// chance now, with the guild's patron's from the Kącina (weeks.js, 1201
+// A), for the try (rollUpgrade).
 export function upgradePlan(player, item, body, now) {
   const cap = campBonus(campLevels(player.buildings, now, content()), 'upgradeCap', content());
-  const week = weekFactorNow(now, 'upgrade');
+  const week = weekFactorFor(player.row, now, 'upgrade');
   // Less gold with the Bractwo Kowali (590) and the guild's Kuźnia Gildii
   // (616 A), as the item card shows.
   const view = upgradeView(item, cap, content(), null, anvilDiscountOf(player), week);

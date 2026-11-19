@@ -153,6 +153,7 @@ import { bannersNow } from './guild-lands.js';
 import { fameNotice } from './fame.js';
 import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
 import { guildSeatSql } from './guild-seat.js';
+import { guildPatronSql } from './guild-shrine.js';
 import { companionsKey, woundedWaiting } from './hunts.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { partyOf, partyRemoval } from './parties.js';
@@ -163,7 +164,7 @@ import { OWN_CHARACTERS } from './roles.js';
 import { requirePlayable } from './sessions.js';
 import { tradeBlockOf, tradesEnded } from './trades.js';
 import { skipIntroduction } from './tutorial.js';
-import { restOmens, weekFactorNow, weekOfCharacter } from './weeks.js';
+import { restOmens, weekFactorFor, weekFactorNow, weekOfCharacter } from './weeks.js';
 import { winterCampView, winterQuestsPeriod } from './winter.js';
 import { andrzejkiView } from './andrzejki.js';
 import { orbsView } from './orbs.js';
@@ -233,16 +234,22 @@ async function playerOf(db, row) {
     // is in a Drużyna, where its companions stay in the Kwatery (parties.js,
     // companions.js in the engine), and the donations to its guild's
     // Siedziba, whose levels give it its bonuses (guild-seat.js).
+    // The patron of its guild from the Kącina, the latest counted
+    // (guild-shrine.js, 1201 A), whose effects weekFor gives it while its
+    // week lasts.
     db
       .prepare(
         `SELECT (SELECT COUNT(*) FROM market_parcels WHERE character_id = ?) AS waiting, ${guildTagSql('?')} AS guild_tag,
-           EXISTS (SELECT 1 FROM party_members WHERE character_id = ?) AS in_party, ${guildSeatSql('?')} AS guild_seat`,
+           EXISTS (SELECT 1 FROM party_members WHERE character_id = ?) AS in_party, ${guildSeatSql('?')} AS guild_seat,
+           ${guildPatronSql('?')} AS guild_patron`,
       )
-      .bind(row.id, row.id, row.id, row.id),
+      .bind(row.id, row.id, row.id, row.id, row.id),
     // What the Warsztat and the Szlifiernia made, waiting in the
     // Przechowalnia out of the bag (storage.js).
     db.prepare('SELECT id, data FROM storage_items WHERE character_id = ? ORDER BY id').bind(row.id),
   ]);
+  // Its guild's patron goes with the row, as weekFor reads the row alone.
+  if (parcels.results[0]?.guild_patron) row.guild_patron = parcels.results[0].guild_patron;
   return {
     row,
     // equippedSlot is where the item is worn (null in the bag); item.slot is where it can go.
@@ -1632,8 +1639,9 @@ export function characterView(player, now) {
   // Less gold on the Kowadło with the Bractwo Kowali (590) and the guild's
   // Kuźnia Gildii (616 A).
   const anvilDiscount = anvilDiscountOf(player);
-  // The chance of an upgrade with the week's share of it (weeks.js).
-  const anvilWeek = weekFactorNow(now, 'upgrade');
+  // The chance of an upgrade with the week's share of it and the guild's
+  // patron's from the Kącina (weeks.js, 1201 A).
+  const anvilWeek = weekFactorFor(row, now, 'upgrade');
   // The items the player marked with a star (favorites.js), which are not
   // taken apart nor sold to the scrapper.
   const favorites = favoriteIds(row);
@@ -2374,11 +2382,11 @@ export const detachedRows = (db, which, binds) => [
   // ranking, guild-members.js).
   db
     .prepare(
-      `INSERT INTO guild_member_fame (guild_id, character_id, week, beast, expedition, trials, requests, exchange, war, lands)
-       SELECT guild_id, -character_id, week, beast, expedition, trials, requests, exchange, war, lands FROM guild_member_fame WHERE character_id ${which}
+      `INSERT INTO guild_member_fame (guild_id, character_id, week, beast, expedition, trials, requests, exchange, war, lands, help)
+       SELECT guild_id, -character_id, week, beast, expedition, trials, requests, exchange, war, lands, help FROM guild_member_fame WHERE character_id ${which}
        ON CONFLICT (guild_id, character_id, week) DO UPDATE SET beast = beast + excluded.beast, expedition = expedition + excluded.expedition,
          trials = trials + excluded.trials, requests = requests + excluded.requests, exchange = exchange + excluded.exchange, war = war + excluded.war,
-         lands = lands + excluded.lands`,
+         lands = lands + excluded.lands, help = help + excluded.help`,
     )
     .bind(...binds),
   db.prepare(`DELETE FROM guild_member_fame WHERE character_id ${which}`).bind(...binds),

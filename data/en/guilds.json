@@ -76,6 +76,56 @@
       }
     }
   },
+  "shrine": {
+    "name": "Temple",
+    "gods": {
+      "perun": { "name": "Perun", "genitive": "Perun's", "title": "god of thunder and war", "domainText": "fights, Towers, explorations and salvaging loot" },
+      "weles": { "name": "Veles", "genitive": "Veles's", "title": "god of wealth and the wilds", "domainText": "fights, explorations, Settlement orders and Requests" },
+      "swarog": { "name": "Svarog", "genitive": "Svarog's", "title": "god of fire and the forge", "domainText": "the Anvil, the Workshop and the Salvage Table" },
+      "mokosz": { "name": "Mokosh", "genitive": "Mokosh's", "title": "goddess of the earth and herbs", "domainText": "herbs, potions, processing materials and Settlement orders" }
+    },
+    "texts": {
+      "title": "Temple",
+      "intro": "In the Temple your guild picks a patron every week. The god who wins the vote gives every member a bonus for the whole next week.",
+      "how": [
+        "Three gods are on offer every week. Every member casts one vote, until Sunday midnight. A vote cannot be changed.",
+        "On Monday at midnight the god with the most votes wins. In a tie, the god the leader voted for wins; if the leader voted for none of them, the one that reached that many votes first. If nobody votes, the guild has no patron for the week.",
+        "The patron gives every guild member a bonus for the whole week, like the Weeks: an exploration and a profession's work take the bonus of the moment they began, and the Anvil of the moment of upgrading. Whoever joins the guild during the week has the bonus at once, and whoever leaves loses it.",
+        "That week half of the trials on the Trials board are from the patron's domain and bear its sign.",
+        "The Temple stands in the Hall from the start and has no levels."
+      ],
+      "patron": "This week's patron",
+      "patronNow": "This week the guild is under {god} protection.",
+      "patronNone": "This week the guild has no patron, because nobody voted last week.",
+      "until": "until Sunday",
+      "bonus": "Bonus: {bonus}",
+      "domain": "Trials: {domain}",
+      "vote": "Vote for next week",
+      "voteUntil": "Votes until Sunday midnight.",
+      "voteForms": ["vote", "votes", "votes"],
+      "voters": "Voted: {names}.",
+      "cast": "Vote",
+      "castTitle": "Cast your vote?",
+      "castText": "Your vote: {god}. It cannot be changed until the end of the week.",
+      "mine": "Your vote",
+      "voted": "Your vote: {god}.",
+      "leading": "In the lead: {god}.",
+      "tied": "A tie. The leader's vote decides, or without it the god that reached that many votes first. Winning now: {god}.",
+      "noVotes": "Nobody has voted yet.",
+      "line": "Under {god} protection · {bonus}",
+      "lineNone": "No patron this week",
+      "board": "A week under {god} protection: half the trials are from the patron's domain and bear its sign.",
+      "report": "{god} protection: {effects}.",
+      "noGuild": "Every guild's Hall has a Temple. Join a guild or found your own.",
+      "errors": {
+        "locked": "You will unlock guilds at character level {level}.",
+        "noGuild": "You are not in a guild.",
+        "noGod": "This god is not on offer this week.",
+        "voted": "Your vote this week has already been cast: {god}.",
+        "changed": "Something changed in the meantime. Try once more."
+      }
+    }
+  },
   "expedition": {
     "texts": {
       "title": "Guild Expedition",
@@ -448,6 +498,55 @@
       }
     }
   },
+  "help": {
+    "texts": {
+      "title": "Help with builds and work",
+      "intro": "Help your guild's members: every help shortens their build or their work in a profession.",
+      "how": [
+        "Here you see the builds in the Camp and the Stronghold and the profession work of your guild's members. Every member can help, except characters of the same account.",
+        "Each help shortens a build or a work by {share}% of its time, but at least by {min}. One build or work takes at most {max} helps, and you help with it once.",
+        "For each help you get {perHelp} of Fame for the guild, at most {cap} a week. The week starts on Monday at midnight.",
+        "A yellow dot by the Guild tab means someone needs help. “Help everyone” helps at once with every build and work you still can.",
+        "At the top you see your own build and work, with the names of those who helped you."
+      ],
+      "mine": "Your build and work",
+      "others": "Who needs help",
+      "build": "{building}, level {level}",
+      "left": "{time} left",
+      "helps": "help {count} of {max}",
+      "cut": "−{time}",
+      "help": "Help",
+      "helpAll": "Help everyone ({count})",
+      "waiting": "Waiting for your help: {count}.",
+      "helped": "Help sent",
+      "full": "Fully helped",
+      "helpers": "Helped by: {names}.",
+      "noHelpers": "Nobody has helped yet.",
+      "cutTotal": "Help has shortened it by {time}.",
+      "noneMine": "You are not building anything or working in a profession now.",
+      "empty": "Nobody else in the guild is building or working in a profession now.",
+      "allHelped": "Nobody needs your help right now. New builds and work will show up here by themselves.",
+      "fame": "Fame for helping this week: {count} of {cap}.",
+      "done": "Help sent to {name}: {target} will finish {time} sooner.",
+      "doneAll": "Help sent {count}.",
+      "doneFame": "You get {points} of Fame.",
+      "doneNoFame": "You already have all of this week's Fame for helping.",
+      "helpForms": ["time", "times", "times"],
+      "errors": {
+        "locked": "You will unlock guilds at character level {level}.",
+        "noGuild": "You are not in a guild.",
+        "invalid": "It is not clear what to help with.",
+        "notMember": "This character is no longer in your guild.",
+        "own": "You do not help with your own build and work.",
+        "sameAccount": "Characters of one account do not help each other.",
+        "gone": "This build or work has already finished.",
+        "helped": "Your help is already on this build or work.",
+        "full": "This build or work already has all its helps.",
+        "nothing": "There is nobody to help now.",
+        "changed": "Something changed in the meantime. Try once more."
+      }
+    }
+  },
   "exchange": {
     "gold": { "name": "Gold", "genitive": "gold" },
     "texts": {
@@ -715,6 +814,7 @@
         "Guild Trials: {perTrial} for each trial completed. At most {trialCap} trials count from one character, as on the Trials bar.",
         "Guild Requests: {perPiece} for each piece given to a guild member. At most {giftCap} pieces count from one character.",
         "Exchange: {perExchange} for each exchange. At most {exchangeCap} exchanges count from one character that takes offers.",
+        "Help with builds and work: {perHelp} for each help. At most {helpCap} helps a week count from one character.",
         "“All time” is the Fame of all the weeks, this one included.",
         "The guild with the most Fame in the previous week has a gold tag for the whole week. In a tie, the older guild wins."
       ],
@@ -731,7 +831,7 @@
     "views": { "activity": "Activity", "donations": "Donations" },
     "periods": { "week": "This week", "all": "All time" },
     "columns": { "member": "Member", "fame": "Fame", "gold": "Gold" },
-    "parts": { "beast": "Beast", "expedition": "Expedition", "trials": "Trials", "requests": "Requests", "exchange": "Exchange", "war": "War", "lands": "Lands" },
+    "parts": { "beast": "Beast", "expedition": "Expedition", "trials": "Trials", "requests": "Requests", "exchange": "Exchange", "war": "War", "lands": "Lands", "help": "Help" },
     "own": "Your place: {place} of {count}.",
     "tap": "Tap a member to see where their Fame comes from.",
     "lead": "Here you can see how much Fame each member brought the guild and how much they donated to the Hall. Every point of Fame also gives a Guild Mark, and the best of the week become Heroes of the week.",
@@ -741,6 +841,7 @@
       "Guild Trials: {perTrial} for each trial completed, at most {trialCap} trials a week.",
       "Guild Requests: {perPiece} for each piece given, at most {giftCap} pieces a week.",
       "Exchange: {perExchange} for each offer taken, at most {exchangeCap} exchanges a week.",
+      "Help with builds and work: {perHelp} for each help, at most {helpCap} helps a week.",
       "A member gets whole points only, so all the members' Fame together may be a little lower than the guild's.",
       "Donations are the gold and resources given to the Hall's buildings.",
       "“This week” starts on Monday at midnight. “All time” counts from {since}."

@@ -96,6 +96,8 @@ export * from './guild-beast.js';
 export * from './guild-strike.js';
 export * from './guild-trials.js';
 export * from './guild-seat.js';
+export * from './guild-help.js';
+export * from './guild-shrine.js';
 export * from './guild-expedition.js';
 export * from './guild-wars.js';
 export * from './guild-heroes.js';

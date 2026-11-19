@@ -17997,6 +17997,346 @@ button.tcard-slot {
   }
 }
 
+/* The Kącina (guild-shrine.js, 1201 A): among the Siedziba's buildings, the
+   week's patron with its bust, then the vote for the next week, a god to a
+   row: its bust beside its name, who it is, its bonus and domain, its votes
+   on a bar, its voters and "Głosuj"; the character's own vote and the god
+   leading ringed in gold. */
+.guild-shrine .guild-part {
+  gap: 8px;
+}
+
+.guild-god {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.guild-god-art {
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  justify-content: center;
+  width: 60px;
+  height: 80px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: radial-gradient(ellipse at 50% 70%, #2d3b24, #1a2416 70%);
+  color: var(--gold);
+}
+
+.guild-god-art .god-bust {
+  width: 60px;
+  height: 80px;
+}
+
+.guild-god--patron .guild-god-art {
+  width: 72px;
+  height: 96px;
+  border-color: var(--gold);
+}
+
+.guild-god--patron .guild-god-art .god-bust {
+  width: 72px;
+  height: 96px;
+}
+
+.guild-god-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.guild-god-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  font-size: 17px;
+}
+
+.guild-god-title {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.guild-god-bonus {
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.guild-god-domain {
+  color: var(--text-muted);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.guild-god-until {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.guild-shrine-now {
+  font-size: 16px;
+}
+
+.guild-shrine-gods {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guild-shrine-god {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg-deep);
+}
+
+.guild-shrine-god--leading {
+  border-color: var(--bark-line);
+}
+
+.guild-shrine-god--mine {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px rgba(217, 180, 90, 0.25) inset;
+}
+
+.guild-shrine-meter .meter-label {
+  align-items: center;
+}
+
+.guild-shrine-voters {
+  color: var(--text-muted);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.guild-shrine-cast {
+  align-self: flex-start;
+}
+
+.guild-shrine-status {
+  font-size: 15px;
+}
+
+.guild-shrine-status--tied {
+  color: var(--gold);
+}
+
+.guild-shrine-own {
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+/* Pomoc przy budowach i pracy (guild-help.js, 1196 A and B), on the Gildia
+   tab: the character's own build and work, then the others', a build or a
+   work to a row with its picture, its owner, what it is, its time left and
+   helps, and "Pomóż" with the cut on the right; "Pomóż wszystkim" over them. */
+.guild-help p {
+  margin: 0;
+}
+
+.guild-help .fold-part-art {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg-deep);
+  color: var(--gold);
+}
+
+.guild-help .fold-part-art .sprite {
+  width: 32px;
+  height: 32px;
+}
+
+.guild-help-fold > .guild-part + .guild-part {
+  margin-top: 14px;
+}
+
+.guild-help-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guild-help-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+
+.guild-help-row:first-child {
+  border-top: 0;
+}
+
+.guild-help-art {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 36px;
+  color: var(--gold);
+}
+
+.guild-help-art .sprite--profession {
+  width: 32px;
+  height: 32px;
+}
+
+.guild-help-building {
+  max-width: 44px;
+  max-height: 36px;
+  object-fit: contain;
+}
+
+.guild-help-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.guild-help-owner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 6px;
+  min-width: 0;
+}
+
+.guild-help-owner .chat-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.guild-help-title {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.guild-help-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
+.guild-help-note,
+.guild-help-helpers {
+  color: var(--text-muted);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.guild-help-row--mine .guild-help-helpers {
+  color: var(--text);
+}
+
+.guild-help-action {
+  display: flex;
+  flex: none;
+}
+
+/* "Pomoc wysłana" and "Komplet pomocy" in two lines, as narrow as "Pomóż",
+   so the owner and the build keep their room on a small phone. */
+.guild-help-action .guild-chip {
+  justify-content: center;
+  max-width: 96px;
+  line-height: 1.15;
+  text-align: center;
+  white-space: normal;
+}
+
+.guild-help-button {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  min-width: 76px;
+  line-height: 1.15;
+}
+
+.guild-help-cut {
+  color: var(--system);
+  font-size: 12px;
+}
+
+.guild-help-all {
+  align-self: stretch;
+}
+
+.guild-help-fame {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.guild-help-fame svg {
+  flex: none;
+  color: var(--gold);
+}
+
+/* The Próby's board in a week under a patron from the Kącina (1201 A): the
+   line about its half over the list, and the sign of the god on each trial
+   of its domain. */
+.guild-trials-patron {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--gold);
+  font-size: 15px;
+}
+
+.guild-trials-patron svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.guild-trial--god {
+  padding-left: 8px;
+  border-left: 2px solid var(--gold);
+}
+
+.guild-trial-god {
+  align-self: flex-start;
+  gap: 4px;
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
 /* The Wyprawa Gildii (guild-expedition.js, 621 A, mock-up 624): its cards
    one under another. The route of the week: seven stops on a dotted path
    winding over the card, up and down as on the mock-up; a stage done is a

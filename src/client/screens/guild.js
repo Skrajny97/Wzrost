@@ -7,7 +7,8 @@
 // the Znajomi, and what its role lets it do (invite a
 // friend at a tap or anyone by name, take an invitation back, remove, name
 // a deputy, hand the lead over); the Ranking członków under it
-// (guild-ranking.js, 897 A); "Opuść gildię"; and, outside a guild,
+// (guild-ranking.js, 897 A); Pomoc przy budowach i pracy over the guild's
+// card (guild-help.js, 1196 A and B); "Opuść gildię"; and, outside a guild,
 // founding one from its level for its gold. The guild's channel is a tab
 // of the Czat (community.js).
 //
@@ -36,6 +37,7 @@ import { mountGuildChest } from '../guild-chest.js';
 import { mountGuildExchange } from '../guild-exchange.js';
 import { mountGuildExpedition } from '../guild-expedition.js';
 import { guildHeroesCard, heroBadges } from '../guild-heroes.js';
+import { guildHelpCard } from '../guild-help.js';
 import { guildRankingCard } from '../guild-ranking.js';
 import { mountGuildRequests } from '../guild-requests.js';
 import { mountGuildSeat } from '../guild-seat.js';
@@ -191,6 +193,9 @@ function mountGuild(container) {
   // The guild's board of announcements on top (noticeBoard), made once for
   // the guild too.
   let board = null;
+  // Pomoc przy budowach i pracy under it (guild-help.js, 1196 A and B), made
+  // once for the guild as well.
+  let help = null;
   // The Bohaterowie tygodnia (guild-heroes.js, 1198 A), under the members,
   // made once for the guild too.
   let heroes = null;
@@ -207,11 +212,15 @@ function mountGuild(container) {
     }
     if (view.guild && board?.dataset.guild !== String(view.guild.id)) board = noticeBoard(view.guild.id);
     else board?.redraw();
+    if (view.guild && help?.dataset.guild !== String(view.guild.id)) {
+      help = guildHelpCard();
+      help.dataset.guild = String(view.guild.id);
+    }
     if (view.guild && heroes?.dataset.guild !== String(view.guild.id)) {
       heroes = guildHeroesCard();
       heroes.dataset.guild = String(view.guild.id);
     }
-    fill(body, invitesCard(), view.guild ? [board, guildCard(), heroes, ranking, inviteCard(), sentCard(), leaveCard()] : foundCard());
+    fill(body, invitesCard(), view.guild ? [board, help, guildCard(), heroes, ranking, inviteCard(), sentCard(), leaveCard()] : foundCard());
   }
 
   // The guild's board of announcements (998.1, accepted by the author on

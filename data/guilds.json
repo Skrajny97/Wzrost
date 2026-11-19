@@ -101,6 +101,92 @@
       }
     }
   },
+  "shrine": {
+    "$comment": "Kącina: opiekun tygodnia (1201 A, przyjęte przez autora na stronie ocen 19.11.2026; src/engine/guild-shrine.js, src/server/guild-shrine.js, src/client/guild-shrine.js; DECISIONS.md, „Kącina: opiekun tygodnia (1201 A, 19.11.2026)”). Słowiańska świątynia w Siedzibie każdej gildii, od początku, bez poziomów i wpłat (obrazek src/client/art/guild/<id>.png). Tydzień jak przy Próbach: od poniedziałku, od północy czasu polskiego. Co tydzień do wyboru jest offer bogów z gods, po kolei z listy: co tydzień lista przesuwa się o offer miejsc, więc przy czterech bogach każdy odpoczywa co czwarty tydzień. Każdy członek oddaje jeden głos na jednego z nich, do końca niedzieli, bez zmiany. W poniedziałek o północy (przy pierwszym spojrzeniu na gildię w nowym tygodniu, przy losowaniu tablicy Prób albo w cronie) wygrywa bóg z największą liczbą głosów; przy remisie bóg, na którego głosował lider, a gdy lider na żadnego z remisujących nie głosował, ten, który pierwszy zebrał tyle głosów. Bez głosów gildia nie ma opiekuna przez tydzień. Opiekun przez cały następny tydzień daje każdemu członkowi effects, skutki jak w Tygodniach roku (weeks.json: kind i value w procentach; wyprawa i praca w profesji biorą premię z chwili początku, Kowadło z chwili ulepszania; kto dołączy w trakcie tygodnia, ma ją od razu, a kto odejdzie, traci ją). W tym tygodniu domainShare tablicy Prób (połowa: 8 z 16) to próby z dziedziny opiekuna (domain: rodzaje prób z trials.kinds, każdy w obu rozmiarach, więc dziedzina ma co najmniej tyle par rodzaju i rozmiaru, ile prób z niej trzeba), oznaczone na tablicy; druga połowa jest spoza dziedziny, a obie otwierają się po równo. name: imię boga, genitive: dopełniacz („pod opieką Peruna”), title: kim jest, domainText: dziedzina w słowach. texts: słowa karty Kąciny, tablicy Prób, raportu wyprawy (report: {god} w dopełniaczu, {effects} skutki, które zmieniły wynik) i odpowiedzi gry; {…} wypełnia gra.",
+    "id": "guild-shrine",
+    "name": "Kącina",
+    "offer": 3,
+    "domainShare": 0.5,
+    "gods": [
+      {
+        "id": "perun",
+        "name": "Perun",
+        "genitive": "Peruna",
+        "title": "bóg gromu i wojny",
+        "effects": [{ "kind": "xp", "value": 5 }],
+        "domain": ["killAny", "towers", "explore", "salvage"],
+        "domainText": "walki, Wieże, wyprawy i rozbiórka łupów"
+      },
+      {
+        "id": "weles",
+        "name": "Weles",
+        "genitive": "Welesa",
+        "title": "bóg bogactwa i puszczy",
+        "effects": [{ "kind": "gold", "value": 5 }],
+        "domain": ["killAny", "explore", "orders", "gifts"],
+        "domainText": "walki, wyprawy, zlecenia Osady i Prośby"
+      },
+      {
+        "id": "swarog",
+        "name": "Swaróg",
+        "genitive": "Swaroga",
+        "title": "bóg ognia i kuźni",
+        "effects": [{ "kind": "upgrade", "value": 5 }],
+        "domain": ["upgrade", "makeAny", "process", "salvage"],
+        "domainText": "Kowadło, Warsztat i Stół rozbiórki"
+      },
+      {
+        "id": "mokosz",
+        "name": "Mokosz",
+        "genitive": "Mokoszy",
+        "title": "bogini ziemi i ziół",
+        "effects": [{ "kind": "herbs", "value": 5 }, { "kind": "profession-xp", "value": 5 }],
+        "domain": ["gatherAny", "brewAny", "process", "orders"],
+        "domainText": "zioła, mikstury, przeróbka materiałów i zlecenia Osady"
+      }
+    ],
+    "texts": {
+      "title": "Kącina",
+      "intro": "W Kącinie gildia co tydzień wybiera opiekuna. Bóg, który wygra głosowanie, przez cały następny tydzień daje premię każdemu członkowi.",
+      "how": [
+        "Co tydzień do wyboru jest trzech bogów. Każdy członek oddaje jeden głos, do niedzieli do północy. Głosu nie da się zmienić.",
+        "W poniedziałek o północy wygrywa bóg, który ma najwięcej głosów. Przy remisie wygrywa bóg, na którego głosował lider, a gdy lider na żadnego z nich nie głosował, ten, który pierwszy zebrał tyle głosów. Gdy nikt nie zagłosuje, gildia przez tydzień nie ma opiekuna.",
+        "Opiekun przez cały tydzień daje premię każdemu członkowi gildii, tak jak Tygodnie roku: wyprawa i praca w profesji biorą premię z chwili, w której się zaczęły, a Kowadło z chwili ulepszania. Kto dołączy do gildii w trakcie tygodnia, ma premię od razu, a kto odejdzie, traci ją.",
+        "W tym tygodniu połowa prób na tablicy Prób jest z dziedziny opiekuna i ma jego znak.",
+        "Kącina stoi w Siedzibie od początku i nie ma poziomów."
+      ],
+      "patron": "Opiekun tego tygodnia",
+      "patronNow": "W tym tygodniu gildia jest pod opieką {god}.",
+      "patronNone": "W tym tygodniu gildia nie ma opiekuna, bo w zeszłym tygodniu nikt nie zagłosował.",
+      "until": "do niedzieli",
+      "bonus": "Premia: {bonus}",
+      "domain": "Próby: {domain}",
+      "vote": "Głosowanie na przyszły tydzień",
+      "voteUntil": "Głosy do niedzieli, do północy.",
+      "voteForms": ["głos", "głosy", "głosów"],
+      "voters": "Głosowali: {names}.",
+      "cast": "Głosuj",
+      "castTitle": "Oddać głos?",
+      "castText": "Twój głos: {god}. Głosu nie da się zmienić do końca tygodnia.",
+      "mine": "Twój głos",
+      "voted": "Twój głos: {god}.",
+      "leading": "Teraz prowadzi: {god}.",
+      "tied": "Remis. Rozstrzyga głos lidera, a bez niego bóg, który pierwszy zebrał tyle głosów. Teraz wygrywa: {god}.",
+      "noVotes": "Nikt jeszcze nie zagłosował.",
+      "line": "Pod opieką {god} · {bonus}",
+      "lineNone": "Bez opiekuna w tym tygodniu",
+      "board": "Tydzień pod opieką {god}: połowa prób jest z dziedziny opiekuna i ma jego znak.",
+      "report": "Opieka {god}: {effects}.",
+      "noGuild": "Kącina stoi w Siedzibie każdej gildii. Dołącz do gildii albo załóż własną.",
+      "errors": {
+        "locked": "Gildie odblokujesz na poziomie postaci {level}.",
+        "noGuild": "Nie należysz do gildii.",
+        "noGod": "Tego boga nie ma w tym tygodniu do wyboru.",
+        "voted": "Twój głos w tym tygodniu już padł: {god}.",
+        "changed": "Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz."
+      }
+    }
+  },
   "expedition": {
     "$comment": "Wyprawa Gildii (src/engine/guild-expedition.js, src/server/guild-expedition.js, src/client/guild-expedition.js; DECISIONS.md, „Wyprawa Gildii (621 A)”). Autor: „621 A” i „624 akcept”: trasa tygodnia w 7 etapach, a na końcu każdego strażnik, który zagradza drogę, aż gildia go pokona. Tydzień jak przy Bestii i Próbach: od poniedziałku, od północy czasu polskiego. Trasa przychodzi z pierwszym spojrzeniem w tygodniu i prowadzi przez krainę, w której zakresie poziomów leży zaokrąglony średni poziom postaci aktywnych członków (konto w grze w ostatnich activeDays dniach; gdy żaden nie jest aktywny, wszystkich; autor 837 A, 12.11.2026: członek, który nie gra, nie zmienia trasy; powyżej wszystkich krain: najwyższa). Strażnicy to stwory tej krainy, każdy inny, od najsłabszego: najsilniejsze zwykłe stwory z jej najwyższych miejsc, potem elity jej miejsc, na końcu czempion. Strażnik etapu k ma poziom trasy plus k − 1, a HP jak Bestia: członkowie × guardians[k].attacks × typowe obrażenia ataku na jego poziomie (beast.damage). Członkowie to aktywni przy przyjściu trasy (konto w grze w ostatnich activeDays dniach, co najmniej 1) i część tygodnia tych, którzy dołączyli później, jak w Próbach. Minuty: każda minuta wyprawy członka (także Szybkie i Błyskawiczne polowanie i wyprawa Drużyny, bez najemników) liczy się przy odebraniu raportu, w gildii, w której postać wtedy jest. Etap to stageMinutes.perMember minut na członka, w górę do pełnych stageMinutes.step, co najmniej stageMinutes.min. Trasa staje u strażnika, którego gildia jeszcze nie pokonała; minuty zebrane w tym czasie czekają i przesuwają trasę od razu po jego upadku. Atakuje każdy, kto w tym tygodniu dołożył w tej gildii choć minutę, attacksPerDay razy na dobę (od północy czasu polskiego), osobno od ataków na Bestię; atak to jedna walka jak atak na Bestię. Pokonany strażnik daje każdemu, kto w tym tygodniu dołożył minut, skrzynię etapu (raz na postać, tydzień i etap, do końca następnego tygodnia): złoto gold.base + gold.perLevel × poziom postaci, materials losowań materiału strażnika (jak w Skrzyni Bestii, co najmniej jedna sztuka), a z item także przedmiot klasy postaci w rzadkości czempiona. texts: słowa zakładki Wyprawa i odpowiedzi gry; {…} wypełnia gra.",
     "attacksPerDay": 3,
@@ -538,6 +624,59 @@
       }
     }
   },
+  "help": {
+    "$comment": "Pomoc przy budowach i przy pracy (1196 A i B, przyjęte przez autora na stronie ocen 19.11.2026; src/engine/guild-help.js, src/server/guild-help.js, src/client/guild-help.js; DECISIONS.md, „Pomoc przy budowach i pracy (1196 A i B, 19.11.2026)”). Na zakładce Gildia widać budowę, która trwa w Obozie albo w Warowni każdego członka (także poziom samego Obozu i przemianę w Warownię; nie te czekające w kolejce), i jego pracę w profesji (zbieranie, warzenie, Warsztat, kopanie, Szlifiernia, łowienie, pole, gotowanie; nie wyprawę i nie pracę Awatara). Pomagają członkowie tej samej gildii, poza postaciami tego samego konta i samym budującym. Każda pomoc skraca budowę albo pracę o share jej całego czasu, najmniej o minMinutes minut, ale nie dalej niż do chwili pomocy (wtedy kończy się od razu). Jedna budowa albo praca przyjmie najwyżej maxHelps pomocy, od każdego członka jedną. Budowę zna się po budynku i poziomie, a liczą się pomoce od jej początku; pracę po jej ziarnie. „Pomóż wszystkim” pomaga przy każdej budowie i pracy, przy której postać jeszcze może, każda osobno. Żółta kropka przy zakładce Gildia świeci, gdy jest komu pomóc. Sława za pomoc: fame.help. texts: słowa karty pomocy i odpowiedzi gry ({share}, {min}, {max}, {perHelp} i {cap} w how, {…} wypełnia gra; helpForms: rzeczownik po liczbie pomocy).",
+    "share": 0.01,
+    "minMinutes": 1,
+    "maxHelps": 10,
+    "texts": {
+      "title": "Pomoc przy budowach i pracy",
+      "intro": "Pomagaj członkom gildii: każda pomoc skraca ich budowę albo pracę w profesji.",
+      "how": [
+        "Tu widać budowy w Obozie i w Warowni oraz pracę w profesjach członków gildii. Pomagać mogą wszyscy członkowie, poza postaciami tego samego konta.",
+        "Każda pomoc skraca budowę albo pracę o {share}% jej czasu, ale najmniej o {min}. Jedna budowa albo praca przyjmie najwyżej {max} pomocy, a Ty pomożesz przy niej raz.",
+        "Za każdą pomoc zgarniesz {perHelp} Sławy dla gildii, najwyżej {cap} w tygodniu. Tydzień zaczyna się w poniedziałek o północy.",
+        "Żółta kropka przy zakładce Gildia mówi, że jest komu pomóc. „Pomóż wszystkim” pomaga od razu przy każdej budowie i pracy, przy której jeszcze możesz.",
+        "Na górze widzisz swoją budowę i pracę, a przy nich imiona tych, którzy Ci pomogli."
+      ],
+      "mine": "Twoja budowa i praca",
+      "others": "Komu pomóc",
+      "build": "{building}, {level}. poziom",
+      "left": "zostało {time}",
+      "helps": "pomoc {count} z {max}",
+      "cut": "−{time}",
+      "help": "Pomóż",
+      "helpAll": "Pomóż wszystkim ({count})",
+      "waiting": "Czeka na Twoją pomoc: {count}.",
+      "helped": "Pomoc wysłana",
+      "full": "Komplet pomocy",
+      "helpers": "Pomogli: {names}.",
+      "noHelpers": "Nikt jeszcze nie pomógł.",
+      "cutTotal": "Pomoc skróciła ją o {time}.",
+      "noneMine": "Nic teraz nie budujesz i nie pracujesz w profesji.",
+      "empty": "Teraz nikt inny w gildii nie buduje ani nie pracuje w profesji.",
+      "allHelped": "Teraz nie ma komu pomóc. Nowe budowy i prace pojawią się tu same.",
+      "fame": "Sława za pomoc w tym tygodniu: {count} z {cap}.",
+      "done": "Pomoc wysłana do postaci {name}: {target} skończy się {time} wcześniej.",
+      "doneAll": "Pomoc wysłana {count}.",
+      "doneFame": "Zgarniasz {points} Sławy.",
+      "doneNoFame": "Sławę za pomoc w tym tygodniu masz już całą.",
+      "helpForms": ["raz", "razy", "razy"],
+      "errors": {
+        "locked": "Gildie odblokujesz na poziomie postaci {level}.",
+        "noGuild": "Nie należysz do gildii.",
+        "invalid": "Nie wiadomo, przy czym pomóc.",
+        "notMember": "Tej postaci nie ma już w Twojej gildii.",
+        "own": "Przy swojej budowie i pracy nie pomagasz.",
+        "sameAccount": "Postacie jednego konta sobie nie pomagają.",
+        "gone": "Ta budowa albo praca już się skończyła.",
+        "helped": "Przy tej budowie albo pracy już jest Twoja pomoc.",
+        "full": "Ta budowa albo praca ma już komplet pomocy.",
+        "nothing": "Nie ma teraz komu pomóc.",
+        "changed": "Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz."
+      }
+    }
+  },
   "exchange": {
     "$comment": "Wymiana zasobów w Gildii (src/server/guild-exchange.js, src/client/guild-exchange.js; DECISIONS.md, „Wymiana zasobów w Gildii”). Autor: „Dodatkowa funkcja w Gildii -> wymiana zasobów. Można wystawić, że chce się wymienić x kamienia na x drewna i odwrotnie, każdy zasób na inny.” Członek gildii wystawia ofertę: sztuki jednego zasobu obozu (data/resources.json) za sztuki innego, od 1 do most z każdej strony. Do 17.11.2026 most wynosiło 1000; autor: „Wymiana zasobów w gildii powinna pozwalać na wymianę większą niż 1000 sztuk surowca”, więc teraz 100 000, tyle co złota. Obie liczby wpisuje wystawiający; przy sameCount: true druga liczba musi równać się pierwszej, a okno oferty ją powtarza. Dawane sztuki od razu schodzą z zasobów i czekają w ofercie. Naraz najwyżej offers otwartych ofert postaci, każda wisi najwyżej openHours godzin. Inny członek tej samej gildii bierze całą ofertę („Wymień”): oddaje chciane sztuki i dostaje dawane, a wystawiający dostaje chciane, wszystko naraz. Postacie jednego konta nie wymieniają się ze sobą. Wystawiający wycofuje otwartą ofertę, kiedy chce; sztuki wracają w całości także wtedy, gdy czas oferty minie (przy jego następnym wejściu do Wymiany albo na stronę Gildii), i gdy opuści gildię albo zostanie z niej usunięty (od razu). closedShown: ile ostatnich zamkniętych ofert postać widzi pod swoimi otwartymi. Oferty zamknięte (wzięte, wycofane i te, którym minął czas) zostają z godziną i biorącym, a te zamknięte przed początkiem poprzedniego tygodnia znikają przy kolejnej ofercie. texts: słowa karty Wymiany, okna oferty i odpowiedzi gry; {…} wypełnia gra (offerForms i hourForms: rzeczownik po liczbie ofert i godzin). Złoto (gold, 4.11.2026; autor: „Daj też mozliwość wymiany i wystawiania ofert w Gildii zasoby za złoto”): jedna strona oferty może być złotem, od 1 do gold.most sztuk, nigdy obie; dawane złoto też od razu schodzi z sakiewki, czeka w ofercie i wraca tak jak sztuki zasobów. gold.name i gold.genitive to jego nazwa w oknie oferty i w odpowiedziach gry. Od 0.2.65 oferty wystawia i bierze postać od poziomu trade.minLevel z community.json, jak w Wymianie między graczami (826 A, autor 11.11.2026: „Wymiana w Gildii od 20. poziomu postaci po obu stronach, jak Wymiana między graczami”). Ofert wystawionych wcześniej przez postać poniżej tego poziomu nikt nie widzi ani nie bierze; ich sztuki wracają jak zawsze, gdy minie ich czas albo gdy je wycofa. texts.level i errors.levelOther: słowa gry o tym progu ({level} i {name} wypełnia gra).",
     "most": 100000,
@@ -824,12 +963,13 @@
     }
   },
   "fame": {
-    "$comment": "Ranking gildii: Sława tygodnia (src/server/guild-fame.js, screens/ranking.js; DECISIONS.md, „Ranking gildii: Sława tygodnia”). Autor: „379 A”, „380 C”, „381 A”. Tydzień jak przy zadaniach tygodniowych: od poniedziałku, od północy czasu polskiego. Sława gildii w tygodniu: beast.perPercent za każdy pełny 1% paska HP bestii tygodnia zbity przez gildię i beast.fell, gdy bestia padła; expedition.perGuardian za każdego strażnika Wyprawy Gildii pokonanego na trasie tygodnia, a za ostatniego (siódmego) expedition.last zamiast tego, razem do 170 (autor: „638 A”); trials.perTrial za każdą próbę wykonaną w tygodniu, z jednej postaci najwyżej tyle prób, ile liczy pasek Prób (trials.cap Prób Gildii); requests.perPiece za każdą sztukę daną w tygodniu w Prośbach Gildii, z jednej postaci najwyżej requests.cap sztuk; exchange.perExchange za każdą ofertę Wymiany wziętą w tygodniu, z jednej biorącej postaci najwyżej exchange.cap wymian. Liga wojen gildii (tylko tam, gdzie GUILD_WARS jest włączone): war.places to Sława za 1., 2. i 3. miejsce w lidze tygodnia (war.league.prizes mówi, od ilu gildii w lidze), liczona w tygodniu tej ligi; howWar to jej linijka pod „Jak to działa?”. Najpierw limity postaci, potem suma gildii. Pierwsze w nowym tygodniu spojrzenie na ranking gildii, stronę Gildii albo najlepszą gildię (każde wczytanie postaci) zapisuje raz Sławę poprzedniego tygodnia każdej gildii; „Od początku” to zapisane tygodnie i Sława tego tygodnia. Najlepsza gildia poprzedniego tygodnia (najwięcej Sławy, większej niż zero; przy remisie starsza gildia) ma przez cały tydzień złoty skrót wszędzie, gdzie skrót stoi, a jej strona Gildii mówi o tym słowami champion. texts: słowa Rankingu (zakładki, okresy, kolumny), opis pod „Jak to działa?” i strona Gildii; {…} wypełnia gra (pointForms: rzeczownik po liczbie punktów).",
+    "$comment": "Ranking gildii: Sława tygodnia (src/server/guild-fame.js, screens/ranking.js; DECISIONS.md, „Ranking gildii: Sława tygodnia”). Autor: „379 A”, „380 C”, „381 A”. Tydzień jak przy zadaniach tygodniowych: od poniedziałku, od północy czasu polskiego. Sława gildii w tygodniu: beast.perPercent za każdy pełny 1% paska HP bestii tygodnia zbity przez gildię i beast.fell, gdy bestia padła; expedition.perGuardian za każdego strażnika Wyprawy Gildii pokonanego na trasie tygodnia, a za ostatniego (siódmego) expedition.last zamiast tego, razem do 170 (autor: „638 A”); trials.perTrial za każdą próbę wykonaną w tygodniu, z jednej postaci najwyżej tyle prób, ile liczy pasek Prób (trials.cap Prób Gildii); requests.perPiece za każdą sztukę daną w tygodniu w Prośbach Gildii, z jednej postaci najwyżej requests.cap sztuk; exchange.perExchange za każdą ofertę Wymiany wziętą w tygodniu, z jednej biorącej postaci najwyżej exchange.cap wymian; help.perHelp za każdą pomoc przy budowie albo pracy członka (1196 A i B, help), z jednej pomagającej postaci najwyżej help.cap pomocy w tygodniu. Liga wojen gildii (tylko tam, gdzie GUILD_WARS jest włączone): war.places to Sława za 1., 2. i 3. miejsce w lidze tygodnia (war.league.prizes mówi, od ilu gildii w lidze), liczona w tygodniu tej ligi; howWar to jej linijka pod „Jak to działa?”. Najpierw limity postaci, potem suma gildii. Pierwsze w nowym tygodniu spojrzenie na ranking gildii, stronę Gildii albo najlepszą gildię (każde wczytanie postaci) zapisuje raz Sławę poprzedniego tygodnia każdej gildii; „Od początku” to zapisane tygodnie i Sława tego tygodnia. Najlepsza gildia poprzedniego tygodnia (najwięcej Sławy, większej niż zero; przy remisie starsza gildia) ma przez cały tydzień złoty skrót wszędzie, gdzie skrót stoi, a jej strona Gildii mówi o tym słowami champion. texts: słowa Rankingu (zakładki, okresy, kolumny), opis pod „Jak to działa?” i strona Gildii; {…} wypełnia gra (pointForms: rzeczownik po liczbie punktów).",
     "beast": { "perPercent": 1, "fell": 50 },
     "expedition": { "perGuardian": 20, "last": 50 },
     "trials": { "perTrial": 10 },
     "requests": { "perPiece": 1, "cap": 30 },
     "exchange": { "perExchange": 2, "cap": 10 },
+    "help": { "perHelp": 1, "cap": 20 },
     "war": { "places": [100, 60, 30] },
     "texts": {
       "tabs": { "characters": "Postacie", "guilds": "Gildie" },
@@ -841,6 +981,7 @@
         "Próby Gildii: {perTrial} za każdą wykonaną próbę. Z jednej postaci liczy się najwyżej {trialCap} prób, jak na pasku Prób.",
         "Prośby Gildii: {perPiece} za każdą sztukę daną członkowi gildii. Z jednej postaci liczy się najwyżej {giftCap} sztuk.",
         "Wymiana: {perExchange} za każdą wymianę. Z jednej postaci, która bierze oferty, liczy się najwyżej {exchangeCap} wymian.",
+        "Pomoc przy budowach i pracy: {perHelp} za każdą pomoc. Z jednej postaci liczy się najwyżej {helpCap} pomocy w tygodniu.",
         "„Od początku” to Sława wszystkich tygodni razem z tym.",
         "Gildia z największą Sławą poprzedniego tygodnia ma przez cały tydzień złoty skrót. Przy remisie wygrywa starsza gildia."
       ],
@@ -858,7 +999,7 @@
     "views": { "activity": "Aktywność", "donations": "Wpłaty" },
     "periods": { "week": "Ten tydzień", "all": "Od początku" },
     "columns": { "place": "#", "member": "Członek", "fame": "Sława", "gold": "Złoto" },
-    "parts": { "beast": "Bestia", "expedition": "Wyprawa", "trials": "Próby", "requests": "Prośby", "exchange": "Wymiana", "war": "Wojna", "lands": "Krainy" },
+    "parts": { "beast": "Bestia", "expedition": "Wyprawa", "trials": "Próby", "requests": "Prośby", "exchange": "Wymiana", "war": "Wojna", "lands": "Krainy", "help": "Pomoc" },
     "own": "Twoje miejsce: {place}. z {count}.",
     "tap": "Stuknij w członka, by zobaczyć, skąd ma Sławę.",
     "lead": "Tu widać, ile Sławy każdy członek wniósł do gildii i ile wpłacił do Siedziby. Każdy punkt Sławy daje też Znak Gildii, a najlepsi tygodnia zostają Bohaterami tygodnia.",
@@ -868,6 +1009,7 @@
       "Próby Gildii: {perTrial} za każdą wykonaną próbę, najwyżej {trialCap} prób w tygodniu.",
       "Prośby Gildii: {perPiece} za każdą daną sztukę, najwyżej {giftCap} sztuk w tygodniu.",
       "Wymiana: {perExchange} za każdą wziętą ofertę, najwyżej {exchangeCap} wymian w tygodniu.",
+      "Pomoc przy budowach i pracy: {perHelp} za każdą pomoc, najwyżej {helpCap} pomocy w tygodniu.",
       "Członek dostaje tylko pełne punkty, więc Sława wszystkich członków razem bywa trochę mniejsza niż Sława gildii.",
       "Wpłaty to złoto i surowce wpłacone do budynków Siedziby.",
       "„Ten tydzień” zaczyna się w poniedziałek o północy. „Od początku” liczy się od {since}."
