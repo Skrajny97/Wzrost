@@ -1149,8 +1149,8 @@
       "title": "Version 0.4.52",
       "body": "- Full bag: the scrap dealer now sells the lowest rarity first. An item your class cannot use goes before the others only among items of the same rarity, so a valuable item of another class stays while you have anything weaker in the bag."
     },
-    "0.4.53": {
-      "title": "Version 0.4.53",
+    "0.4.54": {
+      "title": "Version 0.4.54",
       "body": "- Phone notifications now come for a private message in the chat: for the first message of a conversation.\n- A tag in the Global, Trade or English chat no longer sends a notification. A tag in the guild chat still does.\n- The chat no longer turns words like “pushujący” or “rushujemy” into stars.\n- Navia: new pictures of the Stampede, the Dread, the Snow Flea Spring and Bayun's Whisker, and new sounds for the skills Arrow from Heaven, Rain of Stars, Pillar of Light and Legion of Navia."
     }
   }
