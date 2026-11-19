@@ -20,6 +20,7 @@ import { featGains } from './achievements.js';
 import { bagPlaces, characterView, equippedItems, loadPlayer } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
+import { chronicle } from './guild-chronicle.js';
 import { memberFame } from './guild-members.js';
 import { guildPlayer } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
@@ -217,6 +218,9 @@ export async function buyFromGuildStall(context) {
     // feat, so the title is worn at a tap in the Osiągnięcia.
     const granted = { ...JSON.parse(row.achievements ?? '{}'), [good.achievement]: now };
     gives.push(db.prepare('UPDATE characters SET achievements = ?, version = version + 1 WHERE id = ?').bind(JSON.stringify(granted), row.id), ...featGains(db, row.id, { bannerWarden: 1 }));
+    // The Kronika tells the guild (1195 A, guild-chronicle.js), once:
+    // "Radomira zostaje Strażniczką Sztandaru."
+    gives.push(chronicle(db, guild.id, row.appearance === 'female' ? 'wardenFemale' : 'warden', { name: row.name }, now, { characterId: row.id, once: `warden:${row.id}` }));
   }
   if (good.cosmetic) {
     const cosmetics = JSON.parse(row.cosmetics ?? '{}');

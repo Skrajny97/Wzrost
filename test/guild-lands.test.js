@@ -129,6 +129,14 @@ describe('the Krainy pod sztandarem through the API', () => {
         [next.key, 'windfalls', forest, 150],
       ],
     );
+    // The Kronika told each guild its banners in its chat (1195 A), once.
+    const named = (ids) => content.regions.filter((region) => ids.includes(region.id)).map((region) => region.name).join(', ');
+    const percent = Math.round(bonus * 100);
+    const told = await all('SELECT channel, text FROM chat_messages WHERE chronicle_key = ? ORDER BY id', `lands:${next.key}`);
+    assert.deepEqual(Object.fromEntries(told.map((line) => [line.channel, line.text])), {
+      [`guild:${forest}`]: `Twoja gildia stawia sztandar w krainach: ${named(['windfalls', 'stone-glade'])}. Do niedzieli członkowie mają tam +${percent}% złota i materiałów ze stworów.`,
+      [`guild:${stone}`]: `Twoja gildia stawia sztandar w krainie: ${named(['backwaters'])}. Do niedzieli członkowie mają tam +${percent}% złota i materiałów ze stworów.`,
+    });
     // The tags on every player's land cards, also of one in no guild.
     assert.deepEqual(look.landBanners, {
       windfalls: { guildId: forest, tag: 'LB', name: 'Leśni Bracia' },

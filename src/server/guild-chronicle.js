@@ -5,8 +5,13 @@
 // anything: the Bestia's and a strażnik's fall with the name of the
 // character who struck the last blow, a new threshold of the Próby, a new
 // level of a building of the Siedziba, a league evening's result, a new
-// member and the start of the guild's rally. Shown as the Loteria's lines
-// are (chat.js), under [ SYSTEM ], nobody's to report or hide.
+// member and the start of the guild's rally; and as a week starts, the
+// Bohaterowie tygodnia (1198 A, guild-heroes.js), the lands under the
+// guild's banner (1200 A, guild-lands.js) and the Kącina's patron of the
+// week (1201 A, guild-shrine.js); and a member who bought the title of the
+// Strażnik Sztandaru in the Kram (1202 A, guild-stall.js). Shown as the
+// Loteria's lines are (chat.js), under [ SYSTEM ], nobody's to report or
+// hide.
 //
 // chronicle() gives the statement that writes one, for the batch of the
 // action that makes the event, so the line lands only with it: `once`
@@ -21,6 +26,7 @@
 // never brings a phone notification (mentions.js reads only the tags of
 // players' messages).
 
+import { countedForm, godBonusText, heroName, shrineGod } from '../engine/index.js';
 import { content } from './content.js';
 import { language, numberText, runInLanguage } from './i18n.js';
 
@@ -47,6 +53,22 @@ export function chronicleText(key, params = {}) {
   if (params.until) vars.until = hourText(params.until);
   // Plain numbers: a stage, a level, a threshold and fights won are small.
   for (const name of ['stage', 'level', 'threshold', 'thresholds', 'percent']) if (typeof params[name] === 'number') vars[name] = String(params[name]);
+  // The Bohaterowie tygodnia (1198 A): each hero's title, a woman's for a
+  // woman ("Pogromczyni"), with its name, and the Punkty Czasu of the
+  // reward with their noun.
+  if (Array.isArray(params.heroes)) {
+    vars.heroes = params.heroes.map((hero) => filled(words().hero, { title: heroName(hero.kind, hero.appearance, game), name: hero.name })).join(', ');
+  }
+  if (typeof params.timePoints === 'number') vars.timePoints = `${numberText(params.timePoints)} ${countedForm(params.timePoints, game.guilds.heroes.texts.timePointForms)}`;
+  // The lands of the guild's banners (1200 A), by their names.
+  if (Array.isArray(params.lands)) vars.lands = params.lands.map((id) => game.regionsById[id]?.name ?? id).join(', ');
+  // The Kącina's patron of the week (1201 A): the god as "pod opieką
+  // Peruna" ("under Perun's protection") has it, and what it gives.
+  if (typeof params.god === 'string') {
+    const god = shrineGod(params.god, game);
+    vars.god = god?.genitive ?? params.god;
+    vars.bonus = god ? godBonusText(god, game) : '';
+  }
   return filled(template, vars);
 }
 

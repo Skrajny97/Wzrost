@@ -253,7 +253,15 @@
       "warLost": "League evening: a loss to [{tag}] {guild}, fights {won}:{lost}.",
       "warDraw": "League evening: a draw with [{tag}] {guild}, fights {won}:{lost}.",
       "joined": "New guild member: {name}.",
-      "rally": "Rally horn! Until {until}, attacks on the Beast and the guardian hit {percent}% harder."
+      "rally": "Rally horn! Until {until}, attacks on the Beast and the guardian hit {percent}% harder.",
+      "heroes": "Heroes of the week: {heroes}. Each honour brings {timePoints} and a card pack.",
+      "hero": "{title} – {name}",
+      "banner": "Your guild raises its banner in: {lands}. Until Sunday members get +{percent}% gold and materials from creatures there.",
+      "banners": "Your guild raises its banner in: {lands}. Until Sunday members get +{percent}% gold and materials from creatures there.",
+      "patron": "Temple: this week the guild is under {god} protection ({bonus}).",
+      "patronNone": "Temple: this week the guild has no patron, because nobody voted last week.",
+      "warden": "{name} becomes a Banner Warden.",
+      "wardenFemale": "{name} becomes a Banner Warden."
     }
   },
   "classDay": {

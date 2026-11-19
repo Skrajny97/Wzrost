@@ -21,6 +21,7 @@
 import { godBonusText, offeredGods, patronWinner, questPeriod, shrineGod, voteCounts } from '../engine/index.js';
 import { assertion, atomically } from './atomic.js';
 import { content } from './content.js';
+import { chronicle } from './guild-chronicle.js';
 import { guildPlayer, requireMember } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 
@@ -53,7 +54,12 @@ const patronRow = (db, guildId, week) => db.prepare('SELECT god_id FROM guild_pa
 // that reached as many first (patronWinner). Of two requests at once the
 // first one's stays. Counting a week takes the votes and the patrons of the
 // weeks before the last one away, of every guild. `kept`: the row of this
-// week already read (todo).
+// week already read (todo). The count is told in the guild's chat by the
+// Kronika (1195 A, guild-chronicle.js), in the same batch and only by the
+// count that wrote the week's row (its settled_at), once: the patron with
+// its bonus, or that nobody voted. The latter only where the Kącina counted
+// the week before too (its row of it), so neither a guild new this week nor
+// the week the Kącina came to the game hears that nobody voted.
 export async function patronOf(db, guildId, now, kept = undefined) {
   const { current, previous } = weeksAround(now);
   const found = kept === undefined ? await patronRow(db, guildId, current.key).first() : kept;
@@ -64,8 +70,16 @@ export async function patronOf(db, guildId, now, kept = undefined) {
   ]);
   const list = votes.results.map((vote) => ({ characterId: vote.character_id, god: vote.god_id, at: vote.voted_at }));
   const winner = patronWinner(list, leader.results[0]?.character_id ?? null, offeredGods(previous.key, content()));
+  const counted = 'EXISTS (SELECT 1 FROM guild_patrons WHERE guild_id = ? AND week = ? AND settled_at = ?)';
+  const before = 'EXISTS (SELECT 1 FROM guild_patrons WHERE guild_id = ? AND week = ?)';
   await db.batch([
     db.prepare('INSERT OR IGNORE INTO guild_patrons (guild_id, week, god_id, settled_at) VALUES (?, ?, ?, ?)').bind(guildId, current.key, winner, now),
+    winner
+      ? chronicle(db, guildId, 'patron', { god: winner }, now, { once: `patron:${current.key}`, when: { sql: counted, binds: [guildId, current.key, now] } })
+      : chronicle(db, guildId, 'patronNone', {}, now, {
+          once: `patron:${current.key}`,
+          when: { sql: `${counted} AND ${before}`, binds: [guildId, current.key, now, guildId, previous.key] },
+        }),
     db.prepare('DELETE FROM guild_shrine_votes WHERE week < ?').bind(previous.key),
     db.prepare('DELETE FROM guild_patrons WHERE week < ?').bind(previous.key),
   ]);

@@ -181,6 +181,14 @@ describe('the Bohaterowie tygodnia through the API', () => {
     // Another look changes nothing.
     await as('ola', 'GET', '/api/character');
     assert.equal(await packs('ola'), packsBefore.ola + reward.packs);
+    // The Kronika told each guild its heroes in its chat (1195 A), once, the
+    // women's titles of women, a title nobody won left out.
+    const told = await all('SELECT channel, text, chronicle FROM chat_messages WHERE chronicle_key = ? ORDER BY id', `heroes:${week.key}`);
+    assert.deepEqual(Object.fromEntries(told.map((line) => [line.channel, line.text])), {
+      [`guild:${forest}`]: 'Bohaterowie tygodnia: Filar Gildii – Ala, Pogromczyni – Ola, Dobroczyńczyni – Ewa. Każde wyróżnienie to 30 Punktów Czasu i pakiet kart.',
+      [`guild:${stone}`]: 'Bohaterowie tygodnia: Filar Gildii – Iza, Dobroczyńczyni – Iza. Każde wyróżnienie to 30 Punktów Czasu i pakiet kart.',
+    });
+    assert.equal(JSON.parse(told[0].chronicle).key, 'heroes');
 
     // The badges by the names on the members' list…
     const members = (await as('ala', 'GET', '/api/guild')).data.guild.members;

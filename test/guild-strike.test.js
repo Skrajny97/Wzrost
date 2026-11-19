@@ -103,6 +103,34 @@ describe('the classes of the day, the Cios and the Podcięcie', () => {
     const at = Date.UTC(2026, 10, 23, 19, 0);
     assert.equal(runInLanguage('pl', () => chronicleText('rally', { until: at, percent: 30 })), 'Róg zbiórki! Do 20:00 ataki na Bestię i strażnika biją o 30% mocniej.');
     assert.equal(chronicleText('gone', {}), null);
+    // The week's lines (1198 A, 1200 A, 1201 A, 1202 A): a woman's title for
+    // a woman, the lands' and the gods' names in the reader's language.
+    const heroes = {
+      heroes: [
+        { kind: 'pillar', name: 'Radomira', appearance: 'female' },
+        { kind: 'slayer', name: 'Bogdan', appearance: 'male' },
+        { kind: 'benefactor', name: 'Radomira', appearance: 'female' },
+      ],
+      timePoints: 30,
+    };
+    assert.equal(
+      runInLanguage('pl', () => chronicleText('heroes', heroes)),
+      'Bohaterowie tygodnia: Filar Gildii – Radomira, Pogromca – Bogdan, Dobroczyńczyni – Radomira. Każde wyróżnienie to 30 Punktów Czasu i pakiet kart.',
+    );
+    assert.equal(
+      runInLanguage('en', () => chronicleText('heroes', heroes)),
+      'Heroes of the week: Guild Pillar – Radomira, Slayer – Bogdan, Benefactor – Radomira. Each honour brings 30 Time Points and a card pack.',
+    );
+    assert.equal(
+      runInLanguage('pl', () => chronicleText('banners', { lands: ['windfalls', 'stone-glade'], percent: 5 })),
+      `Twoja gildia stawia sztandar w krainach: Wiatrołomy, ${content.regionsById['stone-glade'].name}. Do niedzieli członkowie mają tam +5% złota i materiałów ze stworów.`,
+    );
+    assert.match(runInLanguage('en', () => chronicleText('banner', { lands: ['windfalls'], percent: 5 })), /^Your guild raises its banner in: [^.]+\. Until Sunday members get \+5% gold and materials from creatures there\.$/);
+    assert.equal(runInLanguage('pl', () => chronicleText('patron', { god: 'perun' })), 'Kącina: w tym tygodniu gildia jest pod opieką Peruna (+5% XP z walk).');
+    assert.equal(runInLanguage('pl', () => chronicleText('patron', { god: 'mokosz' })).startsWith('Kącina: w tym tygodniu gildia jest pod opieką Mokoszy (+5%'), true);
+    assert.match(runInLanguage('en', () => chronicleText('patron', { god: 'perun' })), /^Temple: this week the guild is under Perun's protection \(\+5% .+\)\.$/);
+    assert.equal(runInLanguage('pl', () => chronicleText('wardenFemale', { name: 'Radomira' })), 'Radomira zostaje Strażniczką Sztandaru.');
+    assert.equal(runInLanguage('en', () => chronicleText('warden', { name: 'Bogdan' })), 'Bogdan becomes a Banner Warden.');
   });
 });
 

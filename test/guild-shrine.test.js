@@ -286,6 +286,18 @@ describe('the Kącina through the API', () => {
     assert.equal((await as('kmiec', 'GET', '/api/guild/trials')).data.patron, null);
     const board = JSON.parse((await first('SELECT trials FROM guild_trial_boards WHERE week = ?', weekKey(clock))).trials);
     assert.ok(board.every((trial) => !trial.god));
+    // The Kronika told each count in the guild's chat (1195 A), once: not
+    // the first week, when the Kącina had no week before to count; the
+    // patron with its bonus; nobody's votes.
+    const told = (await (await db()).prepare("SELECT chronicle_key, text FROM chat_messages WHERE chronicle_key LIKE 'patron:%' ORDER BY id").all()).results;
+    const patron = shrineGod(god, content);
+    assert.deepEqual(
+      told.map((line) => [line.chronicle_key, line.text]),
+      [
+        [`patron:${weekKey(WEDNESDAY + 7 * DAY)}`, `Kącina: w tym tygodniu gildia jest pod opieką ${patron.genitive} (${godBonusText(patron, content)}).`],
+        [`patron:${weekKey(WEDNESDAY + 14 * DAY)}`, 'Kącina: w tym tygodniu gildia nie ma opiekuna, bo w zeszłym tygodniu nikt nie zagłosował.'],
+      ],
+    );
   });
 
   test('a tie goes to the god the leader voted for', async () => {

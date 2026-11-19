@@ -15,6 +15,7 @@
 import { countedForm, heroKinds, heroName, heroReward, questPeriod, weekHeroes } from '../engine/index.js';
 import { raced } from './atomic.js';
 import { content } from './content.js';
+import { chronicle } from './guild-chronicle.js';
 import { FAME_PARTS, memberFame } from './guild-members.js';
 import { requireMember } from './guild-trials.js';
 import { json } from './http.js';
@@ -78,6 +79,10 @@ function addRows(into, rows, field = 'count') {
 // its reward (Punkty Czasu and packs of cards), in one batch that holds
 // only while the week is not named; a hero gone from its guild in between
 // gets neither row nor reward. The rows of the weeks before the last one go.
+// With them, the Kronika's line of each guild's heroes in its chat (1195 A,
+// guild-chronicle.js), once, and only when every hero of the guild got its
+// row: each hero's title (a woman's for a woman) and name, in the kinds'
+// order, a title nobody won left out.
 export async function nameHeroes(db, now) {
   const { previous } = weeksAround(now);
   const [named, frozen] = await db.batch([
@@ -88,7 +93,7 @@ export async function nameHeroes(db, now) {
   const counts = weekCounts(db, previous);
   const sum = FAME_PARTS.map((part) => `COALESCE(${part}, 0)`).join(' + ');
   const [members, fame, beast, guardians, gifts] = await db.batch([
-    db.prepare('SELECT guild_id, character_id, joined_at FROM guild_members ORDER BY guild_id'),
+    db.prepare('SELECT m.guild_id, m.character_id, m.joined_at, c.name, c.appearance FROM guild_members m LEFT JOIN characters c ON c.id = m.character_id ORDER BY m.guild_id'),
     db.prepare(`SELECT guild_id, character_id, SUM(${sum}) AS count FROM guild_member_fame WHERE week = ? AND character_id > 0 GROUP BY guild_id, character_id`).bind(previous.key),
     counts.beast,
     counts.guardians,
@@ -98,18 +103,24 @@ export async function nameHeroes(db, now) {
   const slayer = addRows(addRows(new Map(), beast.results), guardians.results);
   const benefactor = addRows(new Map(), gifts.results);
   const byGuild = new Map();
+  const people = new Map();
   for (const row of members.results) {
     const list = byGuild.get(row.guild_id) ?? [];
     list.push({ id: row.character_id, joinedAt: row.joined_at });
     byGuild.set(row.guild_id, list);
+    people.set(row.character_id, row);
   }
   const heroes = [];
+  // Each guild's heroes for its line of the Kronika, as the line keeps them.
+  const lines = new Map();
   for (const [guildId, list] of byGuild) {
     const found = weekHeroes(
       { members: list, counts: { pillar: pillar.get(guildId) ?? new Map(), slayer: slayer.get(guildId) ?? new Map(), benefactor: benefactor.get(guildId) ?? new Map() } },
       content(),
     );
     for (const hero of found) heroes.push({ ...hero, guildId });
+    const named = found.map((hero) => ({ kind: hero.kind, name: people.get(hero.characterId)?.name ?? '', appearance: people.get(hero.characterId)?.appearance ?? 'male' }));
+    if (named.length > 0) lines.set(guildId, named);
   }
   const reward = heroReward(content());
   const isHero = 'EXISTS (SELECT 1 FROM guild_heroes WHERE week = ? AND guild_id = ? AND kind = ? AND character_id = ?)';
@@ -128,6 +139,12 @@ export async function nameHeroes(db, now) {
           .prepare(`UPDATE characters SET time_points = time_points + ?, card_packs = card_packs + ? WHERE id = ? AND ${isHero}`)
           .bind(reward.timePoints, reward.packs, hero.characterId, previous.key, hero.guildId, hero.kind, hero.characterId),
       ]),
+      ...[...lines].map(([guildId, named]) =>
+        chronicle(db, guildId, 'heroes', { heroes: named, timePoints: reward.timePoints }, now, {
+          once: `heroes:${previous.key}`,
+          when: { sql: '(SELECT COUNT(*) FROM guild_heroes WHERE week = ? AND guild_id = ?) = ?', binds: [previous.key, guildId, named.length] },
+        }),
+      ),
       db.prepare('DELETE FROM guild_heroes WHERE week < ?').bind(previous.key),
       db.prepare('DELETE FROM guild_hero_weeks WHERE week < ?').bind(previous.key),
     ]);

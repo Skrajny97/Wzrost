@@ -310,7 +310,7 @@
         "$comment": { "type": "string" },
         "texts": {
           "type": "object",
-          "required": ["beastFell", "guardianFell", "guardianLast", "trials", "seat", "warWon", "warLost", "warDraw", "joined", "rally"],
+          "required": ["beastFell", "guardianFell", "guardianLast", "trials", "seat", "warWon", "warLost", "warDraw", "joined", "rally", "heroes", "hero", "banner", "banners", "patron", "patronNone", "warden", "wardenFemale"],
           "additionalProperties": { "type": "string", "minLength": 1 }
         }
       }

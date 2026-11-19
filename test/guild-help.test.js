@@ -274,6 +274,8 @@ describe('the help through the API', () => {
     assert.ok(ranking.data.texts.how.some((line) => line.startsWith('Pomoc przy budowach i pracy: 1 punkt za każdą pomoc')));
     const guilds = await as('ziomek', 'GET', '/api/ranking/guilds');
     assert.equal(guilds.data.rows.find((row) => row.tag === 'PD').fame, 20);
+    // Each point of it a Znak Gildii (1202 A), counted live this week.
+    assert.equal((await as('ziomek', 'GET', '/api/guild/stall')).data.stall.marks.live, 20);
 
     // The next week: the week gone is written with its Sława, and a help
     // counts again.
@@ -284,6 +286,9 @@ describe('the help through the API', () => {
     const later = await as('ziomek', 'GET', '/api/guild/ranking');
     assert.deepEqual(later.data.activity.all.find((row) => row.name === 'Ziomek').parts.map((part) => [part.id, part.points]), [['help', 20]]);
     assert.equal((await first('SELECT help FROM guild_member_fame WHERE character_id = ? AND week = ?', ziomek, weekKey(WEDNESDAY))).help, 20);
+    // Its Znaki credited as the week was written, once.
+    const marks = (await as('ziomek', 'GET', '/api/guild/stall')).data.stall.marks;
+    assert.deepEqual([marks.earned, marks.live, marks.left], [20, 0, 20]);
     // The helps of the weeks before the last one go as a new help is saved.
     clock += 7 * DAY;
     await join('obcy', 'Obcy');

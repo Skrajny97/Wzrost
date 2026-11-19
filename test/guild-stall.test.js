@@ -172,6 +172,12 @@ describe('the Znaki Gildii and the Kram Gildii through the API', () => {
     assert.equal((await as('ala', 'POST', '/api/achievements/title', { id: 'banner-warden' })).status, 200);
     assert.equal((await as('ola', 'GET', '/api/profile/Ala')).data.profile.title, 'Strażniczka Sztandaru');
     assert.equal((await buy('ala', 'title')).data.error.code, 'owned');
+    // The Kronika told the guild (1195 A), once.
+    const told = await (await db()).prepare("SELECT text FROM chat_messages WHERE chronicle_key LIKE 'warden:%'").all();
+    assert.deepEqual(
+      told.results.map((line) => line.text),
+      ['Ala zostaje Strażniczką Sztandaru.'],
+    );
     assert.equal(goodOf(await stall('ala'), 'title').owned, true);
 
     // The frame: among the cosmetics owned, worn in the Sklep Systemu.

@@ -330,7 +330,7 @@
     }
   },
   "chronicle": {
-    "$comment": "Kronika Gildii (1195 A, przyjęta przez autora na stronie ocen 19.11.2026; src/server/guild-chronicle.js; DECISIONS.md, „Kronika Gildii w czacie”): krótkie linijki [ SYSTEM ] w kanale Gildia na czacie o dużych chwilach gildii, dwie, trzy dziennie, bez stukania: upadek Bestii i strażnika Wyprawy z imieniem postaci, która zadała ostatni cios, nowy próg Prób, nowy poziom budynku Siedziby, wynik wieczoru ligi, nowy członek i początek zbiórki (rally). Linijka pamięta swój klucz i liczby, więc każdy czyta ją w swoim języku: {monster} to nazwa stwora, {building} budynku Siedziby, {until} godzina czasu polskiego. Każde wydarzenie pisze się raz. Linijki Systemu nikogo nie oznaczają i nie dają powiadomień na telefon. texts: słowa linijek; {…} wypełnia gra.",
+    "$comment": "Kronika Gildii (1195 A, przyjęta przez autora na stronie ocen 19.11.2026; src/server/guild-chronicle.js; DECISIONS.md, „Kronika Gildii w czacie”): krótkie linijki [ SYSTEM ] w kanale Gildia na czacie o dużych chwilach gildii, dwie, trzy dziennie, bez stukania: upadek Bestii i strażnika Wyprawy z imieniem postaci, która zadała ostatni cios, nowy próg Prób, nowy poziom budynku Siedziby, wynik wieczoru ligi, nowy członek, początek zbiórki (rally), a w poniedziałek Bohaterowie tygodnia (heroes, 1198 A, każdy wpis jak hero), sztandary gildii w krainach (banner przy jednej krainie, banners przy kilku; 1200 A) i opiekun tygodnia z Kąciny (patron, a patronNone, gdy w zeszłym tygodniu nikt nie zagłosował; 1201 A), a także zakup tytułu Strażnika Sztandaru w Kramie (warden, wardenFemale; 1202 A). Linijka pamięta swój klucz i liczby, więc każdy czyta ją w swoim języku: {monster} to nazwa stwora, {building} budynku Siedziby, {until} godzina czasu polskiego, {heroes} wyróżnienia z imionami (dla kobiet żeńskie nazwy), {timePoints} Punkty Czasu nagrody, {lands} nazwy krain, {god} bóg w dopełniaczu, a {bonus} jego premia. Każde wydarzenie pisze się raz. Linijki Systemu nikogo nie oznaczają i nie dają powiadomień na telefon. texts: słowa linijek; {…} wypełnia gra.",
     "texts": {
       "beastFell": "Bestia padła: {monster}. Ostatni cios: {name}.",
       "guardianFell": "Strażnik etapu {stage} Wyprawy padł: {monster}. Ostatni cios: {name}.",
@@ -341,7 +341,15 @@
       "warLost": "Wieczór ligi: przegrana z [{tag}] {guild}, walki {won}:{lost}.",
       "warDraw": "Wieczór ligi: remis z [{tag}] {guild}, walki {won}:{lost}.",
       "joined": "Nowy członek gildii: {name}.",
-      "rally": "Róg zbiórki! Do {until} ataki na Bestię i strażnika biją o {percent}% mocniej."
+      "rally": "Róg zbiórki! Do {until} ataki na Bestię i strażnika biją o {percent}% mocniej.",
+      "heroes": "Bohaterowie tygodnia: {heroes}. Każde wyróżnienie to {timePoints} i pakiet kart.",
+      "hero": "{title} – {name}",
+      "banner": "Twoja gildia stawia sztandar w krainie: {lands}. Do niedzieli członkowie mają tam +{percent}% złota i materiałów ze stworów.",
+      "banners": "Twoja gildia stawia sztandar w krainach: {lands}. Do niedzieli członkowie mają tam +{percent}% złota i materiałów ze stworów.",
+      "patron": "Kącina: w tym tygodniu gildia jest pod opieką {god} ({bonus}).",
+      "patronNone": "Kącina: w tym tygodniu gildia nie ma opiekuna, bo w zeszłym tygodniu nikt nie zagłosował.",
+      "warden": "{name} zostaje Strażnikiem Sztandaru.",
+      "wardenFemale": "{name} zostaje Strażniczką Sztandaru."
     }
   },
   "classDay": {

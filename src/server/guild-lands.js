@@ -17,6 +17,7 @@
 import { countedForm, landOfArea, landRules, landShares, landStandings, landWinners, questPeriod } from '../engine/index.js';
 import { raced } from './atomic.js';
 import { content } from './content.js';
+import { chronicle } from './guild-chronicle.js';
 import { guildPlayer } from './guild-trials.js';
 import { json } from './http.js';
 
@@ -58,7 +59,9 @@ export function landMinutes(db, characterId, placeId, minutes, now) {
 // Sława by their minutes there. A guild gone has no minutes any more. In
 // one batch that holds only while the week's banners are not raised, so of
 // two requests at once one raises them. The rows of the weeks before the
-// last one go with it.
+// last one go with it. With them, the Kronika's line of each guild that
+// raised a banner, in its chat (1195 A, guild-chronicle.js), once: its
+// lands and the bonus its members have there till Sunday.
 export async function raiseBanners(db, now) {
   const { current, previous } = weeksAround(now);
   if (await db.prepare('SELECT 1 AS done FROM guild_land_weeks WHERE week = ?').bind(current.key).first()) return false;
@@ -70,7 +73,7 @@ export async function raiseBanners(db, now) {
     results.map((row) => ({ landId: row.land_id, guildId: row.guild_id, minutes: row.minutes })),
     content(),
   );
-  const { fame } = landRules(content());
+  const { fame, bonus } = landRules(content());
   // Each member's share of each land won, summed by guild and character.
   const shares = new Map();
   for (const banner of banners) {
@@ -86,6 +89,9 @@ export async function raiseBanners(db, now) {
       shares.set(key, kept);
     }
   }
+  // Each guild's lands won, in the lands' order, for its line.
+  const landsByGuild = new Map();
+  for (const banner of banners) landsByGuild.set(banner.guildId, [...(landsByGuild.get(banner.guildId) ?? []), banner.landId]);
   try {
     await db.batch([
       db.prepare("SELECT CASE WHEN EXISTS (SELECT 1 FROM guild_land_weeks WHERE week = ?) THEN json('nie') ELSE 1 END AS ok").bind(current.key),
@@ -94,6 +100,9 @@ export async function raiseBanners(db, now) {
         db
           .prepare('INSERT INTO guild_land_banners (week, land_id, guild_id, minutes, created_at) SELECT ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM guilds WHERE id = ?)')
           .bind(current.key, banner.landId, banner.guildId, banner.minutes, now, banner.guildId),
+      ),
+      ...[...landsByGuild].map(([guildId, lands]) =>
+        chronicle(db, guildId, lands.length === 1 ? 'banner' : 'banners', { lands, percent: Math.round(bonus * 100) }, now, { once: `lands:${current.key}` }),
       ),
       ...[...shares.values()].map((share) =>
         db
