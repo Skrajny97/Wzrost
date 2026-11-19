@@ -24,7 +24,9 @@
 // back to the start. Every request of the Karty catches up so first
 // (catchUp). Each turn is one request, saved only over the match as read
 // (its version): two taps play one turn, and two taps on "Graj" start one
-// match. Tables: migrations/0128_card_arena.sql.
+// match. The reserve may be drawn anew once a match before the first turn,
+// as at the Salon's table (redrawCardArena). Tables:
+// migrations/0128_card_arena.sql.
 
 import {
   arenaDay,
@@ -50,6 +52,8 @@ import {
   matchView,
   newMatch,
   playTurn,
+  redrawBlock,
+  redrawReserve,
   surrenderMatch,
   turnBlock,
 } from '../engine/index.js';
@@ -350,7 +354,8 @@ async function cardArenaView(db, player, record, rivals, now, defences = null) {
       defence: Math.round(data.defenceBonus * 100),
       deckSize: cards.deckSize,
     },
-    texts: data.texts,
+    // With "Przelosuj rezerwę" and its line, as at the Salon's table.
+    texts: { ...data.texts, redraw: cards.texts.redraw },
     // The cards' table, as the Salon's tab has it (cards.js).
     types: cards.types,
     lines: cards.lines,
@@ -536,6 +541,33 @@ export async function playCardArenaTurn(context) {
     [
       assertion(db, '(SELECT version FROM card_arena_matches WHERE character_id = ?) = ?', [row.id, match.version]),
       db.prepare('UPDATE card_arena_matches SET state = ?, version = version + 1 WHERE character_id = ? AND version = ?').bind(JSON.stringify(next), row.id, match.version),
+    ],
+    matchChanged,
+  );
+  return respond(db, player, now);
+}
+
+// POST /api/cards/arena/redraw: the player's reserve of the running match
+// drawn anew, once a match before its first turn, as at the Salon's table
+// (redrawBlock, redrawReserve); the rival's deck plays on as it would. Only
+// over the match as read (its version).
+export async function redrawCardArena(context) {
+  const { player } = await requirePlayer(context);
+  const { row } = player;
+  requireCardArena(row);
+  const db = context.env.DB;
+  const now = context.now;
+  await catchUp(db, now);
+  const match = await runningMatch(db, row.id);
+  if (!match) throw new ApiError(409, 'no_match', texts().noMatch);
+  const state = JSON.parse(match.state);
+  const block = redrawBlock(state, content());
+  if (block) throw new ApiError(block.status ?? 400, block.code, block.message);
+  await atomically(
+    db,
+    [
+      assertion(db, '(SELECT version FROM card_arena_matches WHERE character_id = ?) = ?', [row.id, match.version]),
+      db.prepare('UPDATE card_arena_matches SET state = ?, version = version + 1 WHERE character_id = ? AND version = ?').bind(JSON.stringify(redrawReserve(state, content())), row.id, match.version),
     ],
     matchChanged,
   );

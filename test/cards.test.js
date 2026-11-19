@@ -6,7 +6,8 @@
 // round (the type advantage, the card with none opposite), the cards beaten,
 // the reserves drawn, the end and the rounds' limit; the heroes' skills with
 // their evolutions; the stakes, the payouts and the first win's card; the
-// cards the creatures of an exploration leave, from a seed of their own.
+// cards the creatures of an exploration leave, from a seed of their own;
+// the reserve drawn anew once a match, before the first turn.
 
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
@@ -34,6 +35,8 @@ import {
   newMatch,
   PACK,
   playTurn,
+  redrawBlock,
+  redrawReserve,
   roundHits,
   simulateHunt,
   stakeBase,
@@ -292,6 +295,50 @@ describe('Talia Systemu: a match', () => {
     assert.deepEqual(play('powtorka'), one);
     assert.ok(['won', 'lost', 'drawn'].includes(one.match.result));
     assert.ok(one.match.round <= rules.roundCap);
+  });
+
+  // The author, 19.11.2026: „Trzeba też dodac do gry w karty opcję
+  // przelosowania ręki, bo nie raz trafią się 4 jednostki tej samej
+  // kategorii i łatwo przegrać z powodu felernego RNG”.
+  test('the reserve drawn anew: once a match, before the first turn; the next cards of the deck in its place, its own at the bottom; the rival as it was; nothing random', () => {
+    const match = matchWith(1, 'przelosowanie');
+    // A match as newMatch deals it, as one kept from before has no mark of
+    // a redraw: it may be drawn anew.
+    assert.equal('redrawn' in match.me, false);
+    assert.equal(redrawBlock(match, content), null);
+    assert.equal(matchView(match, content).me.redraw, true);
+    const next = redrawReserve(match, content);
+    assert.deepEqual(next.me.hand, match.me.deck.slice(0, rules.hand));
+    assert.deepEqual(next.me.deck, [...match.me.deck.slice(rules.hand), ...match.me.hand]);
+    assert.ok(next.me.hand.every((key) => !match.me.hand.includes(key)));
+    assert.equal(cardsLeft(next.me), rules.deckSize);
+    assert.deepEqual(next.me.lines, [null, null, null]);
+    assert.equal(next.me.redrawn, true);
+    // The rival's lines, reserve and deck, the round and the seed as they were.
+    assert.deepEqual(next.foe, match.foe);
+    assert.deepEqual([next.round, next.seed, next.last, next.result], [match.round, match.seed, match.last, match.result]);
+    // The match given is left as it was; the same match, the same reserve.
+    assert.equal('redrawn' in match.me, false);
+    assert.deepEqual(redrawReserve(match, content), next);
+    // Once a match.
+    assert.equal(redrawBlock(next, content).code, 'redraw_used');
+    assert.equal(redrawBlock(next, content).message, rules.texts.redraw.used);
+    assert.equal(matchView(next, content).me.redraw, false);
+    // The turn is laid from the new reserve, never from the old one.
+    assert.equal(turnBlock(next, { round: 1, lines: next.me.hand.slice(0, 3) }, content), null);
+    assert.equal(turnBlock(next, { round: 1, lines: match.me.hand.slice(0, 3) }, content).code, 'not_in_hand');
+    let played = playTurn(next, { round: 1, lines: next.me.hand.slice(0, 3) }, content);
+    while (!played.result) played = playTurn(played, autoTurn(played, content), content);
+    assert.ok(['won', 'lost', 'drawn'].includes(played.result));
+    // After the first turn, with a card laid in the first round, or with the
+    // match over: too late.
+    const turned = playTurn(match, { round: 1, lines: match.me.hand.slice(0, 3) }, content);
+    assert.equal(turned.round, 2);
+    assert.equal(redrawBlock(turned, content).code, 'redraw_late');
+    assert.equal(redrawBlock(turned, content).message, rules.texts.redraw.late);
+    assert.equal(matchView(turned, content).me.redraw, false);
+    assert.equal(redrawBlock(laidOut({ me: [{ id: 'wolf' }, { id: 'fox' }], foe: [{ id: 'fox' }], meLines: [0, null, null], meHand: [1], foeLines: [0, null, null] }), content).code, 'redraw_late');
+    assert.equal(redrawBlock(surrenderMatch(match), content).code, 'match_over');
   });
 
   test('a match takes several rounds of decisions, about five minutes', () => {
