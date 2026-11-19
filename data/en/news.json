@@ -1128,6 +1128,10 @@
     "0.4.45": {
       "title": "Version 0.4.45",
       "body": "- The fourth evolution: at class level 300 each third form grows into its fourth, with new skills, looks, walk and riding.\n- The narrator's line about the Party has its voice again."
+    },
+    "0.4.46": {
+      "title": "Version 0.4.46",
+      "body": "- Levels 100 to 250 take longer and longer: level 100 as before, then longer with every level, up to almost 3 times as long as before just under level 250. Class levels too.\n- From character level 250, explorations give half the gold, materials, resources and chests with items, and the other pursuits half the gold.\n- Party: a party's trip now sets out whole or not at all. Before, a connection cut off while setting out could make a party member fight alone and lose while the leader won the same trip.\n- One who turns back from a party's trip also leaves the others' march on the Combat screen."
     }
   }
 }

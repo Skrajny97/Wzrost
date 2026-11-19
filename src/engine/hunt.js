@@ -34,6 +34,7 @@ import {
   classXpToNext,
   faintPenalty,
   gainXp,
+  lateRewards,
   lowLevelMultiplier,
   monsterXp,
   xpToNext,
@@ -128,6 +129,19 @@ export function youngChestFactor(level, content) {
   return 1 + ((young.factor - 1) * (young.until - level)) / (young.until - young.fullTo);
 }
 
+// The finds' outcomes with `late` of the chests' chance (lateRewards); the
+// rest of it goes to finding nothing.
+/**
+ * @param {[string, number][]} outcomes
+ * @param {number} late
+ * @returns {[string, number][]}
+ */
+function lateChests(outcomes, late) {
+  if (late === 1) return outcomes;
+  const chest = outcomes.find(([kind]) => kind === 'chest')?.[1] ?? 0;
+  return outcomes.map(([kind, weight]) => [kind, kind === 'chest' ? weight * late : kind === 'nothing' ? weight + chest * (1 - late) : weight]);
+}
+
 // What `minutes` of an exploration in `area` at `level` bring on average,
 // as an exploration pays them: the gold of the fights and of the finds, the
 // camp's resources gathered and found (all kinds together), the materials
@@ -161,11 +175,13 @@ export function expectedExploration(area, level, minutes, content) {
   const outcomes = rewards.findOutcomes;
   const all = Object.values(outcomes).reduce((sum, weight) => sum + weight, 0);
   const finds = (/** @type {string} */ kind) => (pace.finds * (outcomes[kind] ?? 0)) / all;
+  // From the late levels on, a part of it (lateRewards).
+  const late = lateRewards(level, content);
   return {
-    gold: rewards.goldPerLevel * level * gold * fights * (1 + pace.lengthBonus) + finds('gold') * rewards.findGoldPerLevel * level,
-    resources: finds('resource') * rewards.findResourcePerLevel * level + (rewards.gatherPerLevelHour * level * minutes) / 60,
-    materials: materials * fights,
-    parts: finds('chest') * (crafting.salvageBase + Math.floor(level / crafting.salvageLevelStep)),
+    gold: (rewards.goldPerLevel * level * gold * fights * (1 + pace.lengthBonus) + finds('gold') * rewards.findGoldPerLevel * level) * late,
+    resources: (finds('resource') * rewards.findResourcePerLevel * level + (rewards.gatherPerLevelHour * level * minutes) / 60) * late,
+    materials: materials * fights * late,
+    parts: finds('chest') * (crafting.salvageBase + Math.floor(level / crafting.salvageLevelStep)) * late,
   };
 }
 
@@ -888,10 +904,17 @@ export function simulateHunt(
 
   // The find's outcomes: the week's share more (or less) of the chance of a
   // chest (items); none on the first exploration.
-  const outcomes = raisedOutcome(
-    Object.entries(rewards.findOutcomes).filter(([kind]) => !(first && kind === 'chest')),
-    'chest',
-    weekFactor(week, 'items') * (1 + fed.chests),
+  // From the late levels on (lateRewards), the character's gold, materials
+  // and resources are a part of what they would be, and so are its chests
+  // among the finds: the rest of their chance finds nothing.
+  const late = lateRewards(character.level, content);
+  const outcomes = lateChests(
+    raisedOutcome(
+      Object.entries(rewards.findOutcomes).filter(([kind]) => !(first && kind === 'chest')),
+      'chest',
+      weekFactor(week, 'items') * (1 + fed.chests),
+    ),
+    late,
   );
   // A young character's finds hold more chests (youngChestFactor), beside
   // what they hold, so no gold, resources or shards of time go: each find
@@ -912,14 +935,14 @@ export function simulateHunt(
       const findLevel = areaLevel(area, lootRng, content);
       const outcome = lootRng.weighted(outcomes, ([, weight]) => weight)[0];
       if (outcome === 'gold') {
-        const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * lootRng.float(0.5, 1.5) * blessedBy('gold', fights.length) * seatGold * cardsGold * mealGold * hardGold));
+        const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * lootRng.float(0.5, 1.5) * blessedBy('gold', fights.length) * seatGold * cardsGold * mealGold * hardGold * late));
         gold += amount;
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findGold', step, { gold: amount }) });
       } else if (outcome === 'chest') {
         const item = randomItem(findLevel, lootRng, content, blessedLoot(loot, fights.length));
         entries.push({ t: event.t, type: 'find', item: take(item), text: say(texts, 'findChest', step, { item: itemName(item, content) }) });
       } else if (outcome === 'resource') {
-        const found = resourceBundle(area, rewards.findResourcePerLevel * findLevel * lootRng.float(0.5, 1.5) * (1 + fed.resources));
+        const found = resourceBundle(area, rewards.findResourcePerLevel * findLevel * lootRng.float(0.5, 1.5) * (1 + fed.resources) * late);
         for (const [id, amount] of found) resources[id] = (resources[id] ?? 0) + amount;
         const list = found.map(([id, amount]) => `${nameInText(content.resourcesById[id].name, content)} +${amount}`).join(', ');
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findResource', step, { resources: list }) });
@@ -1030,9 +1053,9 @@ export function simulateHunt(
         fightXp +=
           monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(reached.level, enemy.level, content);
         const rank = monster.champion ? rewards.championGoldMultiplier : monster.elite ? rewards.eliteGoldMultiplier : 1;
-        const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus) * blessedBy('gold', fights.length - 1) * seatGold * cardsGold * mealGold * hardGold * weekGold;
+        const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus) * blessedBy('gold', fights.length - 1) * seatGold * cardsGold * mealGold * hardGold * weekGold * late;
         fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * lootRng.float(0.5, 1.5) * goldFactor;
-        const weight = enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1) * moreMaterials;
+        const weight = enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1) * moreMaterials * late;
         summary.materials = addCounts(summary.materials, materialDrops(enemy.monsterId, enemy.level, weight, lootRng, content));
         // A card of the creature (874 A), not of the wanted's target nor
         // twice of one creature in an exploration.
@@ -1130,7 +1153,7 @@ export function simulateHunt(
   // On the way the character also gathers a little of the region's resources:
   // a steady amount for the time explored, at the place's middle level, so
   // the camp does not wait for lucky finds.
-  const gatheredTotal = rewards.gatherPerLevelHour * ((area.minLevel + area.maxLevel) / 2) * (endedAt / 3600000) * (1 + fed.resources);
+  const gatheredTotal = rewards.gatherPerLevelHour * ((area.minLevel + area.maxLevel) / 2) * (endedAt / 3600000) * (1 + fed.resources) * late;
   if (gatheredTotal >= 0.5) {
     const gathered = resourceBundle(area, gatheredTotal);
     for (const [id, amount] of gathered) resources[id] = (resources[id] ?? 0) + amount;

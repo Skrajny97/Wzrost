@@ -33,7 +33,7 @@ import { companionCombatant } from './companions.js';
 import { makeArtifact } from './core.js';
 import { encounterCombatants, encountersFor, expectedExploration, explorationPace } from './hunt.js';
 import { portalArea } from './portals.js';
-import { lowLevelMultiplier, monsterXp } from './progression.js';
+import { lateRewards, lowLevelMultiplier, monsterXp } from './progression.js';
 import { questPeriod } from './quests.js';
 import { createRng } from './rng.js';
 import { say, word } from './text.js';
@@ -753,7 +753,7 @@ export function labyrinthFight({ state, type, row, room, party, seed }, content)
       fightGold += content.balance.rewards.goldPerLevel * enemy.level * monster.reward.gold * enemy.groupFactor * lootRng.float(0.5, 1.5);
     }
     xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * lengthed * partyXp * weekFactor(/** @type {any} */ (week), 'xp'));
-    gold = Math.round(fightGold * lengthed * weekFactor(/** @type {any} */ (week), 'gold'));
+    gold = Math.round(fightGold * lengthed * weekFactor(/** @type {any} */ (week), 'gold') * lateRewards(character.level, content));
   }
 
   // The cards the creatures beaten leave (903), from a seed of their own,

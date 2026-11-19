@@ -16,6 +16,7 @@ import { addCounts, materialDrops, stackKey } from './crafting.js';
 import { beastAttackDamage } from './guild-beast.js';
 import { championItemRarity } from './hunt.js';
 import { randomItem } from './items.js';
+import { lateRewards } from './progression.js';
 import { createRng } from './rng.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
@@ -194,5 +195,5 @@ export function expeditionChest({ stage, level, classId, classLevel, wornSlots =
   for (let draw = 0; draw < tuning.materials; draw++) materials = addCounts(materials, materialDrops(guardian.monsterId, guardian.level, 1, rng, content));
   const material = content.materialsByMonster[guardian.monsterId];
   if (material && tuning.materials > 0 && Object.keys(materials).length === 0) materials = { [stackKey(material.id, material.rarity)]: 1 };
-  return { gold: Math.round(tuning.gold.base + tuning.gold.perLevel * level), materials, item };
+  return { gold: Math.round((tuning.gold.base + tuning.gold.perLevel * level) * lateRewards(level, content)), materials, item };
 }

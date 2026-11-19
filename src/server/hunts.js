@@ -391,22 +391,23 @@ export async function startHunt(context) {
 // The skipped introduction sends the first one this way too (tutorial.js).
 // A Szybkie Polowanie (`quick`) is over as it starts: it began `minutes`
 // ago; a Błyskawiczne polowanie is one too (`flash`, for its report's name).
-// An exploration of a Drużyna (parties.js) keeps the party (its id, leader
-// and the names of those who went) and the other players as they set out
-// (`partners`), who fight beside the character; it goes without companions
-// (the author: "wtedy nie poluje się z towarzyszem, tylko samemu/z
-// drużyną"). `mount`: the stage of the Stajnia's mount the exploration goes
-// at, which the party code gives a Drużyna's trip. `hard`: a Trudna wyprawa
-// (629 A), from the challenge's level, on a plain "Wyrusz" only: its
-// creatures are stronger, for more XP and gold (simulateHunt). `haste`: the
-// share shorter a Drużyna's boon makes its trip's wait (party-events.js),
-// as a mount does.
+// An exploration of a Drużyna (parties.js) keeps the party (its id, the
+// moment its trip set out and, written with it, the trip's crew); it goes
+// without companions (the author: "wtedy nie poluje się z towarzyszem,
+// tylko samemu/z drużyną"). `mount`: the stage of the Stajnia's mount the
+// exploration goes at, which the party code gives a Drużyna's trip. `hard`:
+// a Trudna wyprawa (629 A), from the challenge's level, on a plain "Wyrusz"
+// only: its creatures are stronger, for more XP and gold (simulateHunt).
+// `haste`: the share shorter a Drużyna's boon makes its trip's wait
+// (party-events.js), as a mount does. `defer`: the start is not written
+// but given back with its statements, for the caller's own batch: a
+// Drużyna's trip sets out in one, its crew with it (parties.js).
 export async function beginHunt(
   db,
   player,
   { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow, scout = null, hard = false, mercenary = null, meal = null } = {},
   now,
-  { quick = false, flash = false, party: crew = null, partners = [], mount = null, haste = 0, follower = false, also = [], check = false } = {},
+  { quick = false, flash = false, party: crew = null, mount = null, haste = 0, follower = false, also = [], check = false, defer = false } = {},
 ) {
   // regionId: "Wyrusz ponownie" from a report made before inner regions.
   const id = areaId ?? regionId;
@@ -545,9 +546,7 @@ export async function beginHunt(
   // stats its fights count: the Awatar's report claimed on the way raises
   // them (avatar.js), and its fights would count the new levels (the code
   // review, 0.2.72), as a gem or a training would, which wait for the
-  // report; a trip keeps its roster as it set out anyway. A leader whose
-  // members all stayed home after all goes as on its own, and its
-  // exploration gets them then (parties.js).
+  // report; a trip keeps its roster as it set out anyway.
   const blessing = blessingOf(player.row);
   const own = { ...(blessing && { blessing }), professions: JSON.parse(player.row.professions ?? '{}') };
   const options = {
@@ -568,7 +567,6 @@ export async function beginHunt(
     ...(week && { week }),
     ...(party.length > 0 && { companions: party }),
     ...(crew && { party: crew }),
-    ...(partners.length > 0 && { partners }),
     ...(reserving && { potions: taken, reserved: true, healBelow: healBelow ?? content().potionUse.healBelow }),
     ...(timed && { buffs: windows, spend: 'claim' }),
     ...(unknown.length > 0 && { unknown }),
@@ -590,47 +588,51 @@ export async function beginHunt(
   const { hp } = currentHp(player, now);
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const tracked = trackQuests ? questCreatures(questsNow(player, now), area) : [];
+  const statements = [
+    // The HP, potions, buffs and the Osada below are computed from the row
+    // read: the whole start holds only while it is as read (atomic.js).
+    sameVersion(db, player.row),
+    ...(hire ? hire.statements : []),
+    db
+      .prepare(
+        'INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, avoid_rare, seek_rare, tracked, options) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      )
+      .bind(
+        player.row.id,
+        'hunt',
+        area.id,
+        minutes,
+        startsAt,
+        endsAt,
+        seed,
+        hp,
+        avoidRare ? 1 : 0,
+        seekRare ? 1 : 0,
+        tracked.length > 0 ? JSON.stringify(tracked) : null,
+        JSON.stringify(options),
+      ),
+    // The HP rested so far is saved now, so it is not counted again later.
+    db
+      .prepare(
+        `UPDATE characters SET hp = ?, hp_at = ?${settlement ? ', settlement = ?' : ''}${reserving ? ', potions = ?' : ''}${hire ? ', gold = gold - ?' : ''}${fed ? fed.sets.sql : ''}, version = version + 1 WHERE id = ?`,
+      )
+      .bind(
+        hp,
+        now,
+        ...(settlement ? [settlement] : []),
+        ...(reserving ? [JSON.stringify(bagPotions)] : []),
+        ...(hire ? [hire.fee] : []),
+        ...(fed ? fed.sets.binds : []),
+        player.row.id,
+      ),
+    // What goes with this start alone (`also`): a Szybkie Polowanie's count.
+    ...also,
+  ];
+  // What it set out with, for the roster of a Drużyna's trip (parties.js).
+  const setup = { windows, trophies, taken, healBelow: healBelow ?? content().potionUse.healBelow, tracked, unknown, rumor, rareMore, avoidRare, seekRare, wanted: sought };
+  if (defer) return { ...setup, statements };
   try {
-    await db.batch([
-      // The HP, potions, buffs and the Osada below are computed from the row
-      // read: the whole start holds only while it is as read (atomic.js).
-      sameVersion(db, player.row),
-      ...(hire ? hire.statements : []),
-      db
-        .prepare(
-          'INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, avoid_rare, seek_rare, tracked, options) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        )
-        .bind(
-          player.row.id,
-          'hunt',
-          area.id,
-          minutes,
-          startsAt,
-          endsAt,
-          seed,
-          hp,
-          avoidRare ? 1 : 0,
-          seekRare ? 1 : 0,
-          tracked.length > 0 ? JSON.stringify(tracked) : null,
-          JSON.stringify(options),
-        ),
-      // The HP rested so far is saved now, so it is not counted again later.
-      db
-        .prepare(
-          `UPDATE characters SET hp = ?, hp_at = ?${settlement ? ', settlement = ?' : ''}${reserving ? ', potions = ?' : ''}${hire ? ', gold = gold - ?' : ''}${fed ? fed.sets.sql : ''}, version = version + 1 WHERE id = ?`,
-        )
-        .bind(
-          hp,
-          now,
-          ...(settlement ? [settlement] : []),
-          ...(reserving ? [JSON.stringify(bagPotions)] : []),
-          ...(hire ? [hire.fee] : []),
-          ...(fed ? fed.sets.binds : []),
-          player.row.id,
-        ),
-      // What goes with this start alone (`also`): a Szybkie Polowanie's count.
-      ...also,
-    ]);
+    await db.batch(statements);
   } catch (error) {
     if (raced(error)) throw hire ? await hireRaced(db, hire) : characterChanged();
     if (String(error?.message).includes('constraint')) {
@@ -638,9 +640,7 @@ export async function beginHunt(
     }
     throw error;
   }
-  // What it set out with, for the roster of a Drużyna's trip (parties.js),
-  // and what it keeps should its leader go alone after all (`own`).
-  return { windows, trophies, taken, healBelow: healBelow ?? content().potionUse.healBelow, tracked, unknown, rumor, rareMore, avoidRare, seekRare, wanted: sought, own };
+  return setup;
 }
 
 // The meal an exploration of `minutes` sets out with (cooking.js): the dish

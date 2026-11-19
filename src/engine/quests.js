@@ -24,6 +24,7 @@ import { knownPotions } from './brewing.js';
 import { easyPlace, encountersFor } from './hunt.js';
 import { randomItem } from './items.js';
 import { knownHerbs, professionState } from './professions.js';
+import { lateRewards } from './progression.js';
 import { createRng } from './rng.js';
 import { countedForm } from './text.js';
 import { areasOpened, areaUnlocked } from './unlocks.js';
@@ -461,7 +462,7 @@ function questReward(periodId, level, rng, content, factor = 1) {
   const [kind] = rng.weighted(/** @type {[string, number][]} */ (Object.entries(rewards.weights)), ([, weight]) => weight);
   const { base, perLevel } = rewards[periodId][kind];
   const spread = rng.float(1 - rewards.spread, 1 + rewards.spread);
-  const amount = (share = 1) => Math.max(1, Math.round((base + perLevel * level) * share * spread * factor));
+  const amount = (share = 1) => Math.max(1, Math.round((base + perLevel * level) * share * spread * factor * lateRewards(level, content)));
   if (kind === 'gold') return { kind, amount: amount() };
   if (kind === 'resource') {
     const [id, share] = rng.pick(/** @type {[string, number][]} */ (Object.entries(rewards.resources)));

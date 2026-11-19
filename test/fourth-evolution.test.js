@@ -63,8 +63,12 @@ const thirdOnly = (() => {
 // Since 0.4.44 the class levels from 250 take longer, so a character of
 // level 260 is usually of class level 275; the simulations below keep the
 // curve they were tuned with (without the late levels' slowdown), so that
-// they still compare the forms at those class levels.
-const tuned = (data) => ({ ...data, balance: { ...data.balance, progression: { ...data.balance.progression, lateLevels: undefined } } });
+// they still compare the forms at those class levels. Since 0.4.46 a
+// character from level 250 also earns half the gold, materials and chests
+// (balance.rewards.lateRewards): fewer chests among the finds change the
+// draws of the fights after them, so the simulations keep the rewards they
+// were tuned with too.
+const tuned = (data) => ({ ...data, balance: { ...data.balance, progression: { ...data.balance.progression, lateLevels: undefined }, rewards: { ...data.balance.rewards, lateRewards: undefined } } });
 
 // A Pogromca Hord at a class level, its skills at their top by default.
 const hordeSlayer = (classLevel, skills = { 'smashing-blow': 145, slaughter: 145 }, extra = {}) => ({

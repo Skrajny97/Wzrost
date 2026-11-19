@@ -31,7 +31,7 @@ import { encounterCombatants, fightingPlayer } from './hunt.js';
 import { itemName, randomItem } from './items.js';
 import { fightPotions } from './potions.js';
 import { countList, knownHerbs, professionOpen, professionState } from './professions.js';
-import { monsterXp } from './progression.js';
+import { lateRewards, monsterXp } from './progression.js';
 import { createRng } from './rng.js';
 import { say, word } from './text.js';
 import { weekChance, weekFactor, weekFighter } from './weeks.js';
@@ -521,7 +521,7 @@ export function resolveEvent(
     ...(gives?.buff && { buff: gives.buff }),
     ...(gives?.points && { points: gives.points }),
   });
-  const goldOf = (/** @type {number} */ times) => Math.round(content.balance.rewards.goldPerLevel * character.level * times * rng.float(0.75, 1.25));
+  const goldOf = (/** @type {number} */ times) => Math.round(content.balance.rewards.goldPerLevel * character.level * times * rng.float(0.75, 1.25) * lateRewards(character.level, content));
   const itemOf = (/** @type {Record<string, number>} */ rarities) => {
     const [rarityId] = rng.weighted(Object.entries(rarities), ([, weight]) => weight);
     return randomItem(character.level, rng, content, { ...lootRules(character, equipped, area, content), rarityId });
@@ -710,7 +710,7 @@ export function resolveEvent(
     for (const enemy of enemies) {
       const foe = content.monstersById[enemy.monsterId];
       fightXp += monsterXp(foe, enemy.level, content) * enemy.groupFactor;
-      fightGold += rewards.goldPerLevel * enemy.level * foe.reward.gold * rng.float(0.5, 1.5) * enemy.groupFactor * weekFactor(hunt.week, 'gold');
+      fightGold += rewards.goldPerLevel * enemy.level * foe.reward.gold * rng.float(0.5, 1.5) * enemy.groupFactor * weekFactor(hunt.week, 'gold') * lateRewards(character.level, content);
       if (rng.chance(weekChance(outcome.itemChance ?? 0, hunt.week, 'items'))) summary.chests.push(items.push(randomItem(enemy.level, rng, content, loot)) - 1);
     }
     // What the win leaves besides: the offerings' silver, the leshy's gift.

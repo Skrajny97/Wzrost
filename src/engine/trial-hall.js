@@ -18,7 +18,7 @@ import { companionCombatant } from './companions.js';
 import { addCounts, materialDrops, materialsText } from './crafting.js';
 import { encounterCombatants, encountersFor, explorationPace } from './hunt.js';
 import { fightPotions } from './potions.js';
-import { lowLevelMultiplier, monsterXp } from './progression.js';
+import { lateRewards, lowLevelMultiplier, monsterXp } from './progression.js';
 import { createRng } from './rng.js';
 import { say, word } from './text.js';
 import { areaUnlocked } from './unlocks.js';
@@ -163,8 +163,8 @@ export function trialHallFights({ character, equipped, name, area, seed, potions
         const monster = content.monstersById[enemy.monsterId];
         const rank = monster.champion ? rewards.championGoldMultiplier : monster.elite ? rewards.eliteGoldMultiplier : 1;
         fightXp += monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(character.level, enemy.level, content);
-        fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * rng.float(0.5, 1.5) * rank * enemy.groupFactor * lengthed;
-        fightMaterials = addCounts(fightMaterials, materialDrops(enemy.monsterId, enemy.level, enemy.groupFactor * pace.timeFactor * hall.rewardFactor, rng, content));
+        fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * rng.float(0.5, 1.5) * rank * enemy.groupFactor * lengthed * lateRewards(character.level, content);
+        fightMaterials = addCounts(fightMaterials, materialDrops(enemy.monsterId, enemy.level, enemy.groupFactor * pace.timeFactor * hall.rewardFactor * lateRewards(character.level, content), rng, content));
       }
       fightXp = Math.round(fightXp * (1 + content.balance.hunt.soloXpBonus) * lengthed * partyXp * hall.rewardFactor);
       fightGold = Math.round(fightGold * hall.rewardFactor);

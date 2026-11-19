@@ -23,7 +23,7 @@ import { materialPiece, materialsText, rarityUpChances } from './crafting.js';
 import { eventChance } from './events.js';
 import { encounterCombatants } from './hunt.js';
 import { countList, knownHerbs, professionOpen, professionState } from './professions.js';
-import { monsterXp } from './progression.js';
+import { lateRewards, monsterXp } from './progression.js';
 import { createRng } from './rng.js';
 import { say, word } from './text.js';
 
@@ -231,7 +231,7 @@ function areaMaterials(area, count, level, rng, content) {
  */
 function rewardOf(gives, member, area, rng, content) {
   const { level } = member.character;
-  const goldOf = (/** @type {number} */ times) => Math.round(content.balance.rewards.goldPerLevel * level * times * rng.float(0.75, 1.25));
+  const goldOf = (/** @type {number} */ times) => Math.round(content.balance.rewards.goldPerLevel * level * times * rng.float(0.75, 1.25) * lateRewards(level, content));
   /** @type {Share} */
   const share = { gold: gives.gold ? goldOf(gives.gold) : 0, xp: 0 };
   if (gives.xpFoes) {
@@ -341,7 +341,7 @@ export function resolvePartyEvent({ event, optionId, seed, areaId, level, leader
       }
       if (outcome.win?.gold) gold += rewards.goldPerLevel * at * outcome.win.gold * rng.float(0.75, 1.25);
       shares[member.id] = {
-        gold: Math.round(gold),
+        gold: Math.round(gold * lateRewards(member.character.level, content)),
         xp: Math.round(xp * (1 + content.balance.hunt.soloXpBonus)),
         ...(outcome.win?.materials && { materials: areaMaterials(area, outcome.win.materials.count, at, rng, content) }),
       };

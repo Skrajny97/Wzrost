@@ -94,6 +94,9 @@ import {
   huntingHours,
   huntReport,
   lateSlowdown,
+  lateRewards,
+  expectedExploration as expectedExplorationOf,
+  wantedGold as wantedGoldOf,
   faintForfeit,
   itemName,
   itemView,
@@ -1248,14 +1251,15 @@ describe('inner regions', () => {
 });
 
 describe('progression', () => {
-  test('the first levels take about 20 minutes, level 249 about 13 hours, level 500 about ten days', () => {
+  test('the first levels take about 20 minutes, level 249 about 39 hours, level 500 about ten days', () => {
     assert.ok(xpToNext(2, content) > xpToNext(1, content));
     // A slow burn: a 30-minute exploration gives one or two levels at first.
     for (const level of [1, 2, 5, 10]) assert.ok(Math.abs(huntingHours(level, content) * 60 - 20) < 0.5, `level ${level}`);
     assert.ok(huntingHours(25, content) * 60 > 30);
     assert.ok(huntingHours(100, content) > 8 && huntingHours(100, content) < 12);
-    assert.ok(huntingHours(249, content) > 11 && huntingHours(249, content) < 15);
-    // From level 250 the late levels (0.4.44) take 3 to 10 times longer.
+    // From level 100 the levels take evenly longer, up to 3 times at 250
+    // (0.4.46), and from 250 3 to 10 times longer (0.4.44).
+    assert.ok(huntingHours(249, content) > 35 && huntingHours(249, content) < 42);
     assert.ok(huntingHours(500, content) > 200 && huntingHours(500, content) < 300);
     assert.equal(content.balance.progression.maxLevel, 500);
     // Class levels need less XP, so they come faster.
@@ -1264,17 +1268,58 @@ describe('progression', () => {
 
   // The author, 19.11.2026: „Zwiększ dramatycznie bardzo lvl curve od 250 w
   // górę, bo już w grze ktos ma praktycznie 250” (0.4.44).
-  test('from level 250 each level takes 3 times longer, up to 10 times at 300 and after', () => {
+  test('from level 100 each level takes longer, evenly up to 3 times at 250 and 10 times at 300 and after', () => {
     const late = content.balance.progression.lateLevels;
-    assert.deepEqual(late, { fromLevel: 250, toLevel: 300, factorFrom: 3, factorTo: 10 });
+    assert.deepEqual(late, [
+      { level: 100, factor: 1 },
+      { level: 250, factor: 3 },
+      { level: 300, factor: 10 },
+    ]);
     const without = { ...content, balance: { ...content.balance, progression: { ...content.balance.progression, lateLevels: undefined } } };
     const ratio = (level) => huntingHours(level, content) / huntingHours(level, without);
-    for (const level of [1, 100, 200, 249]) assert.equal(ratio(level), 1, `level ${level}`);
+    for (const level of [1, 50, 99, 100]) assert.equal(ratio(level), 1, `level ${level}`);
+    assert.ok(Math.abs(ratio(175) - 2) < 1e-9);
+    assert.ok(Math.abs(ratio(249) - (1 + (2 * 149) / 150)) < 1e-9);
     assert.ok(Math.abs(ratio(250) - 3) < 1e-9);
     assert.ok(Math.abs(ratio(275) - 6.5) < 1e-9);
     for (const level of [300, 400, 500]) assert.ok(Math.abs(ratio(level) - 10) < 1e-9, `level ${level}`);
     // The class's levels follow, as their XP is the character's curve's.
-    assert.ok(Math.abs(classXpToNext(260, content) / classXpToNext(260, without) - ratio(260)) < 0.001);
+    for (const level of [160, 260]) assert.ok(Math.abs(classXpToNext(level, content) / classXpToNext(level, without) - ratio(level)) < 0.001, `class level ${level}`);
+  });
+
+  test('from level 250 a character earns half the gold, materials, resources, parts and chests (the author, 19.11.2026)', () => {
+    assert.deepEqual(content.balance.rewards.lateRewards, { fromLevel: 250, factor: 0.5 });
+    assert.equal(lateRewards(249, content), 1);
+    assert.equal(lateRewards(250, content), 0.5);
+    assert.equal(lateRewards(500, content), 0.5);
+    const without = { ...content, balance: { ...content.balance, rewards: { ...content.balance.rewards, lateRewards: undefined } } };
+    const area = content.areas.find((one) => one.minLevel <= 250 && one.maxLevel >= 250) ?? content.areas[content.areas.length - 1];
+    for (const [level, factor] of [[249, 1], [250, 0.5], [300, 0.5]]) {
+      const late = expectedExplorationOf(area, level, 60, content);
+      const plain = expectedExplorationOf(area, level, 60, without);
+      for (const key of ['gold', 'resources', 'materials', 'parts']) assert.ok(Math.abs(late[key] - plain[key] * factor) < 1e-9, `${key} at ${level}`);
+    }
+    // A wanted's bounty follows its place's first level.
+    const late = content.areas.find((one) => one.minLevel >= 250);
+    const bounty = wantedGoldOf(late, content) / wantedGoldOf(late, without);
+    assert.ok(bounty > 0.4 && bounty < 0.6, `bounty ${bounty}`);
+    const early = content.areas.find((one) => one.maxLevel < 250 && one.minLevel > 200);
+    assert.equal(wantedGoldOf(early, content), wantedGoldOf(early, without));
+    // An exploration's fights and finds: about half the gold, fewer chests.
+    const hunts = (from) => {
+      let gold = 0;
+      let chests = 0;
+      for (let seed = 0; seed < 40; seed++) {
+        const { character, equipped } = typicalCharacter('warrior', 250, from);
+        const hunt = simulateHunt({ character, equipped, hp: 1e9, name: 'Próba', areaId: area.id, minutes: 240, seed: `late:${seed}` }, from);
+        gold += hunt.gold;
+        chests += hunt.items.length;
+      }
+      return { gold, chests };
+    };
+    const [half, full] = [hunts(content), hunts(without)];
+    assert.ok(half.gold > full.gold * 0.4 && half.gold < full.gold * 0.6, `gold ${half.gold} of ${full.gold}`);
+    assert.ok(half.chests < full.chests, `chests ${half.chests} of ${full.chests}`);
   });
 
   test('the mid-game levels take longer, twice as long at its end, and none takes less than the one before', () => {
