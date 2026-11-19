@@ -27,12 +27,12 @@
     { "gold": 150, "timePoints": 10, "systemPoints": 4 },
     { "gold": 400, "timePoints": 20, "systemPoints": 8 },
     { "gold": 1000, "timePoints": 40, "systemPoints": 16 },
-    { "gold": 2500, "timePoints": 80, "systemPoints": 32 },
-    { "gold": 6250, "timePoints": 160, "systemPoints": 64 },
-    { "gold": 15625, "timePoints": 320, "systemPoints": 100 },
-    { "gold": 39063, "timePoints": 640, "systemPoints": 100 },
-    { "gold": 97658, "timePoints": 1280, "systemPoints": 100 },
-    { "gold": 244145, "timePoints": 2560, "systemPoints": 100 }
+    { "gold": 2500, "timePoints": 50, "systemPoints": 32 },
+    { "gold": 6250, "timePoints": 60, "systemPoints": 64 },
+    { "gold": 15625, "timePoints": 70, "systemPoints": 100 },
+    { "gold": 39063, "timePoints": 80, "systemPoints": 100 },
+    { "gold": 97658, "timePoints": 90, "systemPoints": 100 },
+    { "gold": 244145, "timePoints": 100, "systemPoints": 100 }
   ],
   "milestones": {
     "potions": [4, 8, 12, 16],

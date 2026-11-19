@@ -1115,6 +1115,7 @@
         "xpPerHourScale",
         "classXpFactor",
         "midGame",
+        "lateLevels",
         "earlyXpFactors",
         "freeResetMaxLevel",
         "classEvolutionLevels"
@@ -1160,6 +1161,18 @@
             "toLevel": { "type": "integer", "minimum": 2 },
             "fadeLevel": { "type": "integer", "minimum": 3 },
             "levelTimeFactor": { "type": "number", "minimum": 1 }
+          }
+        },
+        "lateLevels": {
+          "type": "object",
+          "description": "Późne poziomy (autor 19.11.2026: „Zwiększ dramatycznie bardzo lvl curve od 250 w górę”): od fromLevel każdy poziom postaci i klasy trwa factorFrom razy dłużej niż według reszty krzywej, rosnąco równo do factorTo razy na toLevel, i tyle dalej. Wcześniejsze poziomy bez zmian.",
+          "additionalProperties": false,
+          "required": ["fromLevel", "toLevel", "factorFrom", "factorTo"],
+          "properties": {
+            "fromLevel": { "type": "integer", "minimum": 2 },
+            "toLevel": { "type": "integer", "minimum": 3 },
+            "factorFrom": { "type": "number", "minimum": 1 },
+            "factorTo": { "type": "number", "minimum": 1 }
           }
         },
         "classXpFactor": {

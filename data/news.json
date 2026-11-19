@@ -1405,6 +1405,11 @@
       "id": "0.4.43",
       "title": "Wersja 0.4.43",
       "body": "- W Ustawieniach, pod Discordem, są teraz przyciski do Facebooka i TikToka gry oraz do powieści ze świata gry na Wattpadzie."
+    },
+    {
+      "id": "0.4.44",
+      "title": "Wersja 0.4.44",
+      "body": "- Od 250. poziomu postaci i klasy awans wymaga dużo więcej doświadczenia: na 250. poziomie 3 razy więcej niż dotąd, a od 300. poziomu 10 razy więcej.\n- Skrzynie Encyklopedii od Tieru V dają mniej Punktów Czasu: od 50 w Tierze V do 100 w Tierze X."
     }
   ]
 }
