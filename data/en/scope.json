@@ -138,6 +138,7 @@
     "events:foes",
     "gift-codes",
     "!gift-codes:moves",
+    "!gift-codes:returns",
     "item-bases:sword",
     "item-bases:broadsword",
     "item-bases:saber",

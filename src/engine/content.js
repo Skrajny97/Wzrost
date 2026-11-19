@@ -238,6 +238,7 @@ export function buildContent(raw) {
     // A code's rewards moved by the author's word from one character of an
     // account to another (giftMovePair, src/server/gift-codes.js).
     giftMoves: raw['gift-codes']?.moves ?? [],
+    giftReturns: raw['gift-codes']?.returns ?? [],
     // The professions, the System's words over them, the herbs gathered in
     // them, the gathering and the texts of their reports (professions.js),
     // and the brewing with its potions (brewing.js).

@@ -1435,6 +1435,11 @@
       "id": "0.4.49",
       "title": "Wersja 0.4.49",
       "body": "- Łysogóry: elity i czempioni (Gryf, Stolem, Kukułka, Pan Twardowski, Kostucha i Baba Jaga) są znów tak trudni, jak przy wejściu Łysogór.\n- Nawia: elity i czempioni wyrównani po zmianie krzywej poziomów.\n- Karty kilku z tych stworów w Talii Systemu mają przez to trochę inny Atak i Życie, np. Gryf bije mocniej, ale ma mniej Życia."
+    },
+    {
+      "id": "0.4.50",
+      "title": "Wersja 0.4.50",
+      "body": "- Pełny plecak: Złomiarz sprzedaje teraz najpierw przedmioty najniższej rzadkości. Przedmiot, którego Twoja klasa nie używa, idzie przed innymi tylko wśród przedmiotów tej samej rzadkości, więc cenny przedmiot innej klasy zostaje, dopóki masz w plecaku coś słabszego."
     }
   ]
 }
