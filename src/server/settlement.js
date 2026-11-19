@@ -662,8 +662,11 @@ function tavernView(row, stored, now) {
 // paid from the character's `materials` too, and `roll`, the seed of its
 // last try on the Kowadło, which the next try names (upgradeCompanionItem);
 // `anvilWeek`, the factor of the week's upgrade chance (weeks.js).
-function companionView(companion, { upgradeCap, materials, anvilDiscount = 0, anvilWeek = 1 } = {}) {
-  const unit = companionCombatant(companion, {}, content());
+// `classLevel`: the character's, whose companions are stronger from the
+// class level the creatures grow from (companionBoost), so the card shows
+// the HP it fights with; a candidate's as it would fight once hired.
+function companionView(companion, { upgradeCap, materials, anvilDiscount = 0, anvilWeek = 1, classLevel = 0 } = {}) {
+  const unit = companionCombatant(companion, { classLevel }, content());
   const female = companion.appearance === 'female';
   const { traits, professions, stories } = content().settlement.companions;
   const form = companionForm(companion, content());
@@ -770,7 +773,13 @@ function companionsView(player, stored, now) {
       return {
         // The Kowadło's price with the Bractwo Kowali (590) and the guild's
         // Kuźnia Gildii (616 A), as for the character's own items.
-        ...companionView(companion, { upgradeCap, materials, anvilDiscount: withSeatDiscount(brotherhoodPerk('anvilDiscount', stored.reputation, content()), seatBonuses(player.guildSeat, content()).anvil), anvilWeek: weekFactorNow(now, 'upgrade') }),
+        ...companionView(companion, {
+          upgradeCap,
+          materials,
+          anvilDiscount: withSeatDiscount(brotherhoodPerk('anvilDiscount', stored.reputation, content()), seatBonuses(player.guildSeat, content()).anvil),
+          anvilWeek: weekFactorNow(now, 'upgrade'),
+          classLevel: row.class_level,
+        }),
         // Wounded until the character rests to full HP, and when that is.
         ...(companion.wounded && rested !== now && { wounded: true, healsAt: rested }),
         gift: giftOf(companion, row, now),
@@ -787,7 +796,7 @@ function companionsView(player, stored, now) {
         training: companionTraining(companion, row.level, now, content()),
       };
     }),
-    candidates: candidates.map((candidate) => ({ ...companionView(candidate), price: hireCost(candidate, content(), points) })),
+    candidates: candidates.map((candidate) => ({ ...companionView(candidate, { classLevel: row.class_level }), price: hireCost(candidate, content(), points) })),
     // "Nowi kandydaci" (890 B): the next draw's gold and how many are left
     // this week, or none left ({ left: 0 }).
     redraw: candidateRedraw(row.level, candidateDrawsOf(stored, now), content()) ?? { gold: null, left: 0, perWeek: content().settlement.companions.redraws.perWeek },

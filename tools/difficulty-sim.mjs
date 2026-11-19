@@ -14,6 +14,7 @@
 //   node tools/difficulty-sim.mjs --set monsters.endGame.damage=0.5 --json out.json --rare 200
 //   node tools/difficulty-sim.mjs --models realistic-nocomp,realistic-noevo   one part left out
 //   node tools/difficulty-sim.mjs --hard                       Trudne wyprawy (629 A)
+//   node tools/difficulty-sim.mjs --hell                       Piekielne wyprawy (19.11.2026)
 //   node tools/difficulty-sim.mjs --party 1,2,3 --levels 250,300   alone and in a Drużyna of 2 and 3
 //
 // `--party N` (N 2 or 3): a Drużyna's trip instead of the player with its
@@ -382,7 +383,8 @@ function explore({ model, level, one, hp, area, minutes, kitMinutes = minutes, i
 const partyHp = (hunt) => [hunt.hpEnd / hunt.maxHp, ...(hunt.partners ?? []).map((one) => one.hpEnd / one.maxHp)];
 
 // `hunts` explorations of `minutes` for a model at a level.
-// `hard`: Trudne wyprawy (629 A), from the challenge's level. `party`: the
+// `hard`: Trudne wyprawy (true, 629 A) or Piekielne ('hell'), from the
+// challenge's level. `party`: the
 // players of a Drużyna's trip (partyRoster), 1 for the player alone with
 // its companions.
 export function measureCell({ model, classId, level, minutes, hunts, offset = 0, hard = false, party = 1 }, content) {
@@ -448,9 +450,10 @@ export function measureCell({ model, classId, level, minutes, hunts, offset = 0,
 // Single fights with the place's elite (`elite`) or champion (`champion`)
 // at full HP, with the same kit as an hour's exploration: through a
 // one-minute exploration whose only fight is that one (a rumour that makes
-// it certain), so the fight goes exactly as on the way. `party`: as in
-// measureCell; the HP after a win is the leader's.
-export function measureRare({ model, classId, level, kind, fights, offset = 0, party = 1 }, content) {
+// it certain), so the fight goes exactly as on the way. `party` and `hard`
+// (true for a Trudna wyprawa, 'hell' for a Piekielna): as in measureCell;
+// the HP after a win is the leader's.
+export function measureRare({ model, classId, level, kind, fights, offset = 0, party = 1, hard = false }, content) {
   const found = newestArea(level, content, offset);
   if (kind === 'champion' && !found.champion) return null;
   const area = kind === 'elite' ? { ...found, champion: null, id: `${found.id}-elite` } : found;
@@ -465,7 +468,7 @@ export function measureRare({ model, classId, level, kind, fights, offset = 0, p
   for (let i = 0; i < fights; i++) {
     const one = players[i % players.length];
     // An hour's kit, as alone (roadKit with 60 minutes).
-    const hunt = explore({ model, level, one, hp: maxHps[i % players.length], area, minutes: 1, kitMinutes: 60, index: i, party, seed: `${tag}:${classId}:${level}:${offset}:${i}`, rumor: 1e9 }, local);
+    const hunt = explore({ model, level, one, hp: maxHps[i % players.length], area, minutes: 1, kitMinutes: 60, index: i, party, seed: `${tag}:${classId}:${level}:${offset}:${i}`, hard, rumor: 1e9 }, local);
     const fight = hunt.fights[0];
     if (!fight || !(fight.elite || fight.champion)) throw new Error(`no ${kind} fight at ${level}`);
     if (fight.won === true) {
@@ -474,7 +477,7 @@ export function measureRare({ model, classId, level, kind, fights, offset = 0, p
     } else lost += 1;
     companionsDown += (hunt.companions ?? []).filter((one) => one.fainted).length;
   }
-  return { model, classId, level, kind, offset, ...(party > 1 && { party }), monster: kind === 'elite' ? area.elite : area.champion, monsterLevel: area.maxLevel + (kind === 'elite' ? content.balance.hunt.eliteLevelBonus : content.balance.hunt.championLevelBonus), winRate: won / fights, lossRate: lost / fights, hpLeft: won ? hpLeft / won : 0, companionsDown: companionsDown / fights };
+  return { model, classId, level, kind, offset, ...(party > 1 && { party }), ...(hard && { hard }), monster: kind === 'elite' ? area.elite : area.champion, monsterLevel: area.maxLevel + (kind === 'elite' ? content.balance.hunt.eliteLevelBonus : content.balance.hunt.championLevelBonus), winRate: won / fights, lossRate: lost / fights, hpLeft: won ? hpLeft / won : 0, companionsDown: companionsDown / fights };
 }
 
 // --set monsters.lateGame.damage=0.5: a balance value changed for the run
@@ -520,6 +523,8 @@ function main() {
   const hunts = Number(options.hunts ?? 200);
   const rareFights = Number(options.rare ?? 0);
   const offset = Number(options.offset ?? 0);
+  // --hell: a Piekielna wyprawa, before --hard when both are given, as in the game.
+  const hard = options.hell === true ? 'hell' : options.hard === true;
   const rows = [];
   const pct = (value) => `${(value * 100).toFixed(1)}%`;
   // A party's rows are named by its size: "realistic ×3".
@@ -530,14 +535,14 @@ function main() {
         for (const party of parties) {
           const name = named(model, party);
           for (const minutes of minutesList) {
-            const r = measureCell({ model, classId, level, minutes, hunts, offset, hard: options.hard === true, party }, content);
+            const r = measureCell({ model, classId, level, minutes, hunts, offset, hard, party }, content);
             rows.push({ type: 'hunt', ...r });
             console.log(
               `${name.padEnd(17)} ${classId.padEnd(8)} ${String(level).padStart(3)} ${String(minutes).padStart(4)} min  omdlenia ${pct(r.faintRate).padStart(6)}  HP ${pct(r.endHp).padStart(6)}  XP/h ${r.xpPerHour.toFixed(0).padStart(7)} (netto ${r.netXpPerHour.toFixed(0).padStart(7)})  złoto/h ${r.goldPerHour.toFixed(0).padStart(5)}  ${r.area}`,
             );
           }
           for (const kind of rareFights > 0 ? ['elite', 'champion'] : []) {
-            const r = measureRare({ model, classId, level, kind, fights: rareFights, offset, party }, content);
+            const r = measureRare({ model, classId, level, kind, fights: rareFights, offset, party, hard }, content);
             if (!r) continue;
             rows.push({ type: 'rare', ...r });
             console.log(`${name.padEnd(17)} ${classId.padEnd(8)} ${String(level).padStart(3)} ${kind.padEnd(8)} ${r.monster} poz. ${r.monsterLevel}: wygrane ${pct(r.winRate)}, HP po wygranej ${pct(r.hpLeft)}`);

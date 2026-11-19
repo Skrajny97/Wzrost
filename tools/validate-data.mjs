@@ -630,6 +630,15 @@ function checkReferences(data) {
   const evolutions = data.balance.progression.classEvolutionLevels;
   if (evolutions.some((level, i) => i > 0 && level <= evolutions[i - 1])) errors.push('balance.json: classEvolutionLevels musi rosnąć');
   if (evolutions.at(-1) > data.balance.progression.maxLevel) errors.push('balance.json: ewolucja klasy powyżej maxLevel');
+  // The curves by class level (classLevelFactor in combatant.js): their
+  // points by rising class level, each multiplier above 0.
+  for (const [name, curve] of [
+    ['monsters.classLevelCurve', data.balance.monsters.classLevelCurve ?? []],
+    ['companions.classLevelCurve', data.balance.companions?.classLevelCurve ?? []],
+  ]) {
+    if (curve.some(([level], i) => i > 0 && level <= curve[i - 1][0])) errors.push(`balance.json: ${name} musi rosnąć po poziomie klasy`);
+    if (curve.some(([, factor]) => !(factor > 0))) errors.push(`balance.json: ${name} ma mnożnik, który nie jest większy od zera`);
+  }
 
   // Skin tones: the default among them, every tone recoloured on its own
   // ramp, Jasna too (the author: "567 A"), and a file for every portrait in

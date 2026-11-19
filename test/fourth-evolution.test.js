@@ -68,15 +68,16 @@ const thirdOnly = (() => {
 // (balance.rewards.lateRewards): fewer chests among the finds change the
 // draws of the fights after them, so the simulations keep the rewards they
 // were tuned with too. Since 19.11.2026 the creatures from level 250 are
-// twice as strong (balance.monsters.mythGame): the forms are compared
-// against the creatures they were tuned with as well.
+// twice as strong (balance.monsters.mythGame), and from class level 100
+// they grow by the class level (classLevelCurve, 1207 A): the forms are
+// compared against the creatures they were tuned with as well.
 const tuned = (data) => ({
   ...data,
   balance: {
     ...data.balance,
     progression: { ...data.balance.progression, lateLevels: undefined },
     rewards: { ...data.balance.rewards, lateRewards: undefined },
-    monsters: { ...data.balance.monsters, mythGame: { ...data.balance.monsters.mythGame, damage: 0, hp: 0 } },
+    monsters: { ...data.balance.monsters, mythGame: { ...data.balance.monsters.mythGame, damage: 0, hp: 0 }, classLevelCurve: [] },
   },
 });
 

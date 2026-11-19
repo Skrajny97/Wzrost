@@ -114,7 +114,7 @@ export function trialHallFights({ character, equipped, name, area, seed, potions
   const potionsUsed = {};
   let hp = player.hp;
   const mates = companions.map((companion, index) => {
-    const unit = companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}` }), content);
+    const unit = companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}`, classLevel: character.classLevel ?? 0 }), content);
     return { unit, hp: unit.hp };
   });
 
