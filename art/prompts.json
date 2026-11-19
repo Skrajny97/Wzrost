@@ -2620,7 +2620,7 @@
     }
   },
   "ui": {
-    "$comment": "Trzy propozycje całościowej przebudowy wyglądu (autor 16.11.2026: „3 propozycje jak zrobić całościowy rework UI i GUI by był odległy od stylu stosowanego przez AI … Chodzi o ikonki, panele, kwadraty”): A „Kronika” (rękopis, atrament i pergamin), B „Warownia” (rzeźbione drewno i kute żelazo, ikony jak przedmioty), C „System” (świecące glify Systemu). Te same ikony menu w trzech stylach i ramki paneli. Ikony 32 × 32 rysuje Pro Flash, po jednym obrazku z wywołania; ramki paneli 128 × 128 Pro (cztery wersje). Ikony nowych zajęć gildii (19.11.2026, do src/client/art/icons): róg zwołania, Cios, Podcięcie, Znak Gildii, odznaki Filar Gildii, Pogromca i Dobroczyńca, sztandar krainy i pomoc gildii, 32 × 32 w stylu materiałów (styles: rat-tail), Pro Flash po jednym obrazku z wywołania, najwyżej cztery wersje. Ramka portretu ze sztandarem gildii (frame-guild-banner, do src/client/art/cosmetics): 120 × 160 jak inne ramki, w stylu Leśnej ramki, Pro (cztery wersje z wywołania).",
+    "$comment": "Trzy propozycje całościowej przebudowy wyglądu (autor 16.11.2026: „3 propozycje jak zrobić całościowy rework UI i GUI by był odległy od stylu stosowanego przez AI … Chodzi o ikonki, panele, kwadraty”): A „Kronika” (rękopis, atrament i pergamin), B „Warownia” (rzeźbione drewno i kute żelazo, ikony jak przedmioty), C „System” (świecące glify Systemu). Te same ikony menu w trzech stylach i ramki paneli. Ikony 32 × 32 rysuje Pro Flash, po jednym obrazku z wywołania; ramki paneli 128 × 128 Pro (cztery wersje). Ikony nowych zajęć gildii (19.11.2026, do src/client/art/icons): róg zwołania, Cios, Podcięcie, Znak Gildii, odznaki Filar Gildii, Pogromca i Dobroczyńca, sztandar krainy i pomoc gildii, 32 × 32 w stylu materiałów (styles: rat-tail), Pro Flash po jednym obrazku z wywołania, najwyżej cztery wersje. Ramka portretu ze sztandarem gildii (frame-guild-banner, do src/client/art/cosmetics): 120 × 160 jak inne ramki, w stylu Leśnej ramki, Pro (cztery wersje z wywołania); PixelLab rysował okno 66 × 99, więc w obu wybranych szkicach boki ramki są odsunięte o 3 px, a góra i dół o 3 i 4 px, żeby okno miało 72 × 104–106 jak inne ramki.",
     "width": 32,
     "height": 32,
     "pixellab": {
@@ -2654,9 +2654,6 @@
         "land-banner": "src/client/art/materials/rat-tail.png",
         "guild-help": "src/client/art/materials/rat-tail.png",
         "frame-guild-banner": "src/client/art/cosmetics/frame-forest.png"
-      },
-      "references": {
-        "frame-guild-banner": [{"path": "src/client/art/cosmetics/frame-gold.png", "usage": "only the layout of this portrait frame: the same outer size, the same narrow borders and the same large empty window in the middle, at the same place and of the same size; not its gold, its rubies or its ornaments"}]
       }
     },
     "prompts": {
@@ -2763,7 +2760,7 @@
       "hero-benefactor": "an open hand palm up holding a small gift wrapped in red cloth and tied with a golden ribbon, the symbol alone, no background, single inventory item icon, bold clean outline",
       "land-banner": "a small deep blue guild banner with a golden stag head emblem with big antlers and gold trim, like the guild seat's great banner, flying from a wooden pole with an iron spear tip, the banner alone, no background, single inventory item icon, bold clean outline",
       "guild-help": "two hands clasped firmly in a handshake, one in a brown leather bracer and one in a deep blue sleeve, the symbol alone, no background, single inventory item icon, bold clean outline",
-      "frame-guild-banner": {"prompt": "a thin portrait frame of dark carved oak with Slavic carved patterns and small iron studs in the corners, narrow borders, the frame fills the whole image edge to edge, a short wide deep blue cloth guild banner with gold trim and a small golden stag head emblem draped across the top border of the frame, not hanging down into the window, a spear tip at each end of its pole, no other banners, a very large empty window in the middle for a portrait, seen flat from the front, pixel art user interface, symmetrical", "width": 120, "height": 160, "tool": "pro"}
+      "frame-guild-banner": {"prompt": "an ornate portrait frame of dark carved oak with forged iron corner brackets, the frame fills the whole image edge to edge with a thin border, a short wide deep blue cloth guild banner with gold trim and a small golden stag head emblem draped across the top border of the frame, not hanging down into the window, a spear tip at each end of its pole, no other banners, a large empty window in the middle for a portrait, seen flat from the front, pixel art user interface, symmetrical", "width": 120, "height": 160, "tool": "pro"}
     }
   },
   "winter": {
