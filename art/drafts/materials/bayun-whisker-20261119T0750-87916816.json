@@ -1,0 +1,14 @@
+{
+  "id": "bayun-whisker",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a single long thick cat whisker glowing bright silver-white with small green magic sparkles along it, drawn diagonally across the whole icon, clearly visible, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023242659241782298
+  },
+  "images": 1
+}

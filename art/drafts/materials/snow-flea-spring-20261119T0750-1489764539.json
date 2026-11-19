@@ -1,0 +1,14 @@
+{
+  "id": "snow-flea-spring",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small tightly coiled spiral spring made of pale blue ice with frost on it, clearly a spring, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023209605080710516
+  },
+  "images": 1
+}
