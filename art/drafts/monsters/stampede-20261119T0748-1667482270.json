@@ -1,0 +1,14 @@
+{
+  "id": "stampede",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Tetent, the ghost of a stampeding herd: three translucent pale green ghost horses galloping together, clearly drawn horse heads, manes and legs, misty tails and glowing hooves, eerie and menacing, full body, side view facing right, the spirits alone, no ground, no dust cloud, no background, the whole group inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02511365394634671
+  },
+  "images": 1
+}

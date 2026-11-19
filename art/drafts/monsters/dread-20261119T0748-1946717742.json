@@ -1,0 +1,14 @@
+{
+  "id": "dread",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Strach, fear itself: a faceless, shapeless mass of writhing black shadow with no eyes, no mouth and no face at all, long clawed shadow tendrils reaching out, a faint cold violet glow inside the darkness, eerie and terrifying, floating, full body, the creature alone, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023418981786727907
+  },
+  "images": 1
+}
