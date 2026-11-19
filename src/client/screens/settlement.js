@@ -33,7 +33,8 @@ import { tanneryCard } from '../tannery.js';
 import { wantedCard } from '../wanted.js';
 import { timePointsButton } from '../hermit-time.js';
 import { residentGifts } from '../resident-gifts.js';
-import { itemSummary, piecesText } from './character.js';
+import { itemSummary, piecesText, starWords } from './character.js';
+import { playSound } from '../sound.js';
 import { mountMarket, numberField, stackArt, stackButton } from './market.js';
 
 // Whether "Akceptacja Bractw" over the board is open, kept on the device.
@@ -1401,6 +1402,169 @@ export function mountSettlement(container, { params = {} } = {}) {
     );
   }
 
+  // A chance as the page writes it: "15%", "12,5%".
+  const chanceText = (share) => `${formatDecimal(share * 100)}%`;
+
+  // An item's stars in a row: those it has in gold, those still to take dim,
+  // and with `fresh` the star just set glowing.
+  const starsRow = (stars, max, fresh = 0) =>
+    h(
+      'span',
+      { class: 'stars-row stars-row--large', role: 'img', 'aria-label': starWords('label', { stars, max }) },
+      Array.from({ length: max }, (_, index) =>
+        h('span', { class: `stars-row-star${index < stars ? ' stars-row-star--lit' : ''}${index + 1 === fresh ? ' stars-row-star--new' : ''}`, 'aria-hidden': 'true', text: '★' }),
+      ),
+    );
+
+  // What the next star takes, as had / needed, red while short (as costPart).
+  const starCost = (next) => {
+    const chip = (art, label, have, wanted) =>
+      h('li', { class: `cost${have < wanted ? ' cost--missing' : ''}` }, art, h('span', { text: label }), h('strong', { text: `${formatNumber(have)} / ${formatNumber(wanted)}` }));
+    return h(
+      'ul',
+      { class: 'cost-list', 'aria-label': starWords('cost') },
+      chip(resourceArt('gold', 16), t('Złoto'), state.character.gold, next.gold),
+      chip(materialIcon(next.part, 16), next.partName, next.have, next.count),
+    );
+  };
+
+  // Why "Spróbuj" waits, in its own words, or null when it is ready: a
+  // relation with her below the standing, too little gold, too few parts.
+  const starWait = (next) =>
+    !data.ascension.open
+      ? starWords('lockedButton', { standing: data.ascension.standing })
+      : state.character.gold < next.gold
+        ? starWords('noGold')
+        : next.have < next.count
+          ? starWords('noParts')
+          : null;
+
+  // One try at an item's next star; the result in its sheet. Refused (409),
+  // the place is read anew, so a page gone stale shows the stars as they are.
+  const tryStar = async (item) => {
+    let answer;
+    try {
+      answer = await call('POST', '/api/settlement/stars', { itemId: item.id, stars: item.stars });
+    } catch (error) {
+      if (error.status === 409) load();
+      throw error;
+    }
+    apply(answer);
+    playSound(answer.stars.result === 'success' ? 'done' : 'defeat');
+    return answer.stars;
+  };
+
+  // The Zaklinaczka's stars (1180 B–1184 A, src/server/ascension.js): each
+  // item at +10, worn ones first and the one brought from its card before
+  // them, with its stars, the next star's chance and price, and "Spróbuj";
+  // until her relation allows it, what is missing to it.
+  function starsCard() {
+    const view = data.ascension;
+    const content = state.content?.ascension;
+    if (!view || !content) return null;
+    const { max, upgrade } = content;
+    const brought = view.items.filter((item) => String(item.id) === String(state.enchantItem));
+    const items = [...brought, ...view.items.filter((item) => !brought.includes(item))];
+    const row = (item) => {
+      const { next } = item;
+      const wait = next && starWait(next);
+      return h(
+        'li',
+        { class: `stars-item${brought.includes(item) ? ' stars-item--brought' : ''}` },
+        h('div', { class: 'stars-item-head' }, itemHead(item), item.equipped && h('span', { class: 'chip', text: t('Założony') })),
+        starsRow(item.stars, max),
+        next
+          ? [
+              h('p', { class: 'stars-next', text: starWords('next', { star: next.star, max, chance: chanceText(next.chance) }) }),
+              starCost(next),
+              view.open && next.have < next.count && h('p', { class: 'system-hint', text: starWords('partsHint') }),
+              h('button', {
+                type: 'button',
+                class: 'button button--world',
+                text: wait ?? starWords('try'),
+                disabled: Boolean(wait),
+                onClick: (event) => withButton(event.currentTarget, async () => starResult(await tryStar(item))),
+              }),
+            ]
+          : h('p', { class: 'muted', text: starWords('full') }),
+      );
+    };
+    return h(
+      'section',
+      { class: 'card stack stars-card', 'data-guide': 'enchanter-stars' },
+      h('h2', { class: 'section-title stars-title' }, h('span', { class: 'stars-title-mark', 'aria-hidden': 'true', text: '★' }), starWords('title')),
+      h('p', { class: 'muted', text: starWords('intro', { upgrade, max, percent: Math.round(content.bonus * 100) }) }),
+      h('p', { class: 'muted', text: starWords('rule') }),
+      !view.open && [
+        h('p', { class: 'region-warning', text: starWords('locked', { standing: view.standing, points: formatNumber(view.toGo) }) }),
+        h('p', { class: 'system-hint', text: starWords('lockedHint') }),
+      ],
+      items.length === 0 ? h('p', { class: 'muted', text: starWords('none', { upgrade }) }) : h('ul', { class: 'stars-list' }, items.map(row)),
+    );
+  }
+
+  // A try's result in a sheet (the author: a success shows the new star, a
+  // failure what it took, and that the item lost nothing), and the next try
+  // at once, with what it takes.
+  function starResult(done) {
+    const body = h('div', { class: 'settlement-reforge stars-result' });
+    openSheet(h('h2', { class: 'sheet-title', text: starWords('title') }), body);
+    draw(done);
+
+    function draw(result) {
+      const success = result.result === 'success';
+      const item = data.ascension?.items.find((one) => one.id === result.itemId);
+      const next = item?.next;
+      const wait = next && starWait(next);
+      fill(
+        body,
+        h('p', { class: `settlement-result-title${success ? '' : ' stars-result-failed'}`, text: starWords(success ? 'success' : 'failure') }),
+        h('div', { class: 'settlement-reforge-item' }, itemHead({ id: result.itemId, name: result.name })),
+        starsRow(result.to, result.max, success ? result.to : 0),
+        h('p', { class: 'sheet-text', text: starWords(success ? 'successText' : 'failureText', { stars: result.to, max: result.max }) }),
+        h('p', { class: 'muted', text: starWords('spent', { gold: formatNumber(result.gold), parts: `${result.part.count} × ${result.part.name}` }) }),
+        // Each number of the item before the star and with it.
+        success && [
+          h('p', { class: 'field-label', text: starWords('numbers') }),
+          h(
+            'ul',
+            { class: 'preview-list stars-gains' },
+            result.gains.map(({ label, before, after }) =>
+              h('li', { class: 'preview-up' }, h('span', { text: label }), h('span', { class: 'num' }, before !== null && h('span', { class: 'stars-gain-before', text: `${before} → ` }), after)),
+            ),
+          ),
+        ],
+        next && h('p', { class: 'muted stars-again', text: starWords('again', { star: next.star, max: result.max, chance: chanceText(next.chance), gold: formatNumber(next.gold), parts: `${next.count} × ${next.partName}` }) }),
+        h(
+          'div',
+          { class: 'sheet-actions' },
+          next &&
+            h('button', {
+              type: 'button',
+              class: 'button button--world',
+              text: wait ?? starWords(success ? 'tryNext' : 'tryAgain'),
+              disabled: Boolean(wait),
+              // The item as the place shows it now, also after a refusal read it anew.
+              onClick: (event) => withButton(event.currentTarget, async () => draw(await tryStar(data.ascension?.items.find((one) => one.id === result.itemId) ?? item))),
+            }),
+          h('button', { type: 'button', class: 'button button--system', text: t('Gotowe'), onClick: closeSheet }),
+        ),
+      );
+    }
+  }
+
+  // An item brought from its card for a star alone ("Gwiazdki u
+  // Zaklinaczki": no affix nor element of hers for it): its row in the
+  // Gwiazdki comes into view, once.
+  let starsShown = false;
+  function showBroughtStar() {
+    if (starsShown || !data?.ascension || cardItem(data.reforge.items) || cardItem(data.imbue?.items ?? [])) return;
+    const row = container.querySelector('.stars-item--brought');
+    if (!row) return;
+    starsShown = true;
+    row.scrollIntoView({ block: 'center' });
+  }
+
   // The item brought from its card (character.js, "Zaklnij u Zaklinaczki"),
   // among those a service takes, while it is still there to enchant.
   function cardItem(items) {
@@ -1410,20 +1574,23 @@ export function mountSettlement(container, { params = {} } = {}) {
   // A resident's services, on their place's screen.
   function services(resident) {
     if (resident.service === 'reforge')
-      return h(
-        'div',
-        { class: 'stack', 'data-guide': 'enchanter-services' },
-        // The item brought from its card, which both zaklęcia take first.
-        (cardItem(data.reforge.items) || cardItem(data.imbue?.items ?? [])) &&
-          h(
-            'div',
-            { class: 'settlement-reforge-item' },
-            h('p', { class: 'field-label', text: t('Przyniesiony przedmiot') }),
-            itemHead(cardItem(data.reforge.items) ?? cardItem(data.imbue.items)),
-          ),
-        data.reforge.pending ? choiceCard(data.reforge.pending) : h('button', { type: 'button', class: 'button button--world', text: t('Zaklnij afiks'), onClick: reforgeSheet }),
-        data.imbue && h('button', { type: 'button', class: 'button button--world', text: t('Zaklnij żywioł'), onClick: imbueSheet }),
-      );
+      return [
+        h(
+          'div',
+          { class: 'stack', 'data-guide': 'enchanter-services' },
+          // The item brought from its card, which both zaklęcia take first.
+          (cardItem(data.reforge.items) || cardItem(data.imbue?.items ?? [])) &&
+            h(
+              'div',
+              { class: 'settlement-reforge-item' },
+              h('p', { class: 'field-label', text: t('Przyniesiony przedmiot') }),
+              itemHead(cardItem(data.reforge.items) ?? cardItem(data.imbue.items)),
+            ),
+          data.reforge.pending ? choiceCard(data.reforge.pending) : h('button', { type: 'button', class: 'button button--world', text: t('Zaklnij afiks'), onClick: reforgeSheet }),
+          data.imbue && h('button', { type: 'button', class: 'button button--world', text: t('Zaklnij żywioł'), onClick: imbueSheet }),
+        ),
+        starsCard(),
+      ];
     if (resident.service === 'tavern') return tavernTabs();
     if (resident.service === 'herbalist') return herbalistCard();
     if (resident.service === 'forge') return forgeCard();
@@ -1796,6 +1963,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       // The Arena's fights, table and rewards (762 A).
       place.id === 'arena' && !place.soon && pvpArenaPanel(place),
     );
+    if (place.id === 'enchanter') showBroughtStar();
   }
 
   function render() {

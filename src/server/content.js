@@ -321,6 +321,13 @@ const dangerView = (game) => (danger) => {
   };
 };
 
+// The Zaklinaczka's stars for the page (data/settlement.json `ascension`).
+function ascensionContent(game) {
+  const { chances, texts } = game.settlement.ascension;
+  const { errors: _refusals, ...words } = texts;
+  return { max: chances.length, upgrade: game.balance.upgrades.chances.length, bonus: game.balance.upgrades.bonusPerStar, texts: words };
+}
+
 // What the page needs to label things; no balance numbers.
 export function publicContent() {
   const game = content();
@@ -450,6 +457,11 @@ export function publicContent() {
     // The places of the Osada's board, for their shortcuts under the Osada
     // in the computer's menu (src/client/layout.js).
     settlementPlaces: (game.settlement?.places ?? []).filter(placeOn).map(({ id, name, soon }) => ({ id, name, ...(soon && { soon: true }) })),
+    // The Zaklinaczka's stars (1180 B–1184 A, src/server/ascension.js): how
+    // many an item at the Kowadło's highest upgrade takes, what each adds of
+    // its base numbers, and the words of her "Gwiazdki" and the item card,
+    // without the server's refusals.
+    ascension: game.settlement?.ascension ? ascensionContent(game) : null,
     // With the family of the creature that leaves it, for its icon, and
     // `trophy` for an elite's or a champion's, which no order for any
     // materials takes ("Poproś gildię", src/client/guild-requests.js).

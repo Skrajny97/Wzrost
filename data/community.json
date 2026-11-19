@@ -8,7 +8,7 @@
     { "id": "fame", "name": "Sława" }
   ],
   "ranking": { "page": 50 },
-  "friends": { "max": 30 },
+  "friends": { "max": 50 },
   "gift": {
     "name": "Upominek",
     "claimsPerDay": 30,

@@ -6,7 +6,9 @@
 // agreeing with the base's grammatical gender. The names of the affixes come
 // from the creatures living where the item was found, and only name them:
 // what an affix gives rolls the same anywhere. The Kowadło in the camp
-// upgrades an item from +1 to +10, which raises all of its numbers.
+// upgrades an item from +1 to +10, which raises all of its numbers, and the
+// Zaklinaczka in the Osada sets up to five stars in an item at +10, each
+// raising them further (ascension.js).
 
 import { rarityNeedView } from './crafting.js';
 import { gearLists, gearWearers } from './gear.js';
@@ -383,6 +385,9 @@ export const saleGold = (unit, count) => Math.max(1, Math.floor(unit * count + 1
 // raises the item's own price only, so an upgrade never pays for itself. An
 // item made upgraded in the Warsztat (`crafted`) cost no gold for the
 // upgrades it came with, so only those of the Kowadło above them count.
+// The Zaklinaczka's stars count the same: the gold of the try that set each
+// star, not the tries that failed nor the parts (as the Kowadło's failed
+// tries and ore do not count).
 /**
  * @param {Item} item
  * @param {Content} content
@@ -394,6 +399,7 @@ export function sellPrice(item, content, bonus = 0) {
   const price = Math.max(1, Math.round(item.level * content.balance.items.sellGoldPerLevel * rarity.sell * (1 + bonus)));
   let spent = 0;
   for (let target = (item.crafted?.upgrade ?? 0) + 1; target <= (item.upgrade ?? 0); target += 1) spent += itemUpgradeCost(item, target, content).gold;
+  for (let star = 1; star <= Math.min(item.stars ?? 0, maxStars(content)); star += 1) spent += starCost(item, star, content).gold;
   return price + Math.round(spent * content.balance.upgrades.sellRefund);
 }
 
@@ -488,8 +494,8 @@ export function propertyName(stat, content) {
   return content.statsById[stat].name;
 }
 
-// The numbers of an item as it works: upgraded on the Kowadło, then raised
-// by the gem set in it.
+// The numbers of an item as it works: upgraded on the Kowadło, with the
+// Zaklinaczka's stars, then raised by the gem set in it.
 /**
  * @param {Item} item
  * @param {Content} content
@@ -505,6 +511,9 @@ export function upgradedItem(item, content) {
 // without armor of its own, like a talisman, gets that armor from the
 // upgrade alone (the author: "może dawać chociaż +1 do pancerza przy każdym
 // ulepszeniu"), so no level of upgrade leaves the numbers as they were.
+// Each star of the Zaklinaczka (`stars`) adds bonusPerStar of every base
+// number on top (1180 B: „każda gwiazdka +10% wartości przedmiotu”, so five
+// stars make +50% beside the +60% of +10), and at least as much as a level.
 /**
  * @param {Item} item
  * @param {Content} content
@@ -512,12 +521,13 @@ export function upgradedItem(item, content) {
  */
 function upgradeNumbers(item, content) {
   const level = item.upgrade ?? 0;
-  if (!level) return item;
-  const { bonusPerLevel, minGainPerLevel } = content.balance.upgrades;
-  const factor = 1 + bonusPerLevel * level;
+  const stars = item.stars ?? 0;
+  if (!level && !stars) return item;
+  const { bonusPerLevel, bonusPerStar = 0, minGainPerLevel } = content.balance.upgrades;
+  const factor = 1 + bonusPerLevel * level + bonusPerStar * stars;
   /** @param {number} value */
   const scale = (value) => Math.round(value * factor);
-  const least = minGainPerLevel * level;
+  const least = minGainPerLevel * (level + stars);
   /** @type {Item} */
   const upgraded = { ...item, affixes: item.affixes.map((/** @type {Affix} */ affix) => ({ ...affix, value: scale(affix.value) })) };
   if (item.damage) {
@@ -585,6 +595,33 @@ export function gemView(gemId, content) {
  * @returns {number}
  */
 export const maxUpgrade = (content) => content.balance.upgrades.chances.length;
+
+// How many stars of the Zaklinaczka an item at the Kowadło's highest
+// upgrade takes (data/settlement.json `ascension`, 1181 A: five); none
+// where the game has no Osada.
+/**
+ * @param {Content} content
+ * @returns {number}
+ */
+export const maxStars = (content) => content.settlement?.ascension?.chances.length ?? 0;
+
+// The price of the try at the `star`-th star (1182 A): goldFactor times the
+// gold of the item's last step on the Kowadło (+9 → +10, itemUpgradeCost,
+// without the Bractwo's discount), goldGrowth times more for each star
+// before it, and the parts of its place in `parts`: 3, 4 and 5 Bursztyny,
+// then 2 Krwawniki, then a Gwiezdny odprysk.
+/**
+ * @param {Item} item
+ * @param {number} star
+ * @param {Content} content
+ * @returns {{ gold: number, part: string, count: number }}
+ */
+export function starCost(item, star, content) {
+  const { goldFactor, goldGrowth, parts } = content.settlement.ascension;
+  const last = itemUpgradeCost(item, maxUpgrade(content), content).gold;
+  const { part, count } = parts[star - 1];
+  return { gold: Math.round(last * goldFactor * goldGrowth ** (star - 1)), part, count };
+}
 
 // The price of upgrading to `target`: gold and iron ore, more for a higher
 // item level, a rarer item and each level further.
@@ -885,6 +922,9 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap, materials =
     level: item.level,
     tier: tier?.name ?? null,
     upgrade: item.upgrade ?? 0,
+    // The Zaklinaczka's stars (ascension.js), which its numbers include;
+    // the page writes them after its upgrade, "+10 ★★".
+    ...(item.stars > 0 && { stars: item.stars }),
     rarity: rarity.id,
     rarityName: rarity.name,
     color: rarity.color,
@@ -916,9 +956,14 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap, materials =
     ...(item.raised ? { raised: true } : {}),
     // What the Zaklinaczka in the Osada can do with it, for the card's way
     // to her (the author: „Zrób też zaklinanie w plecaku (niech przenosi do
-    // Zaklinaczki)”): reforge an affix of an item that has them, and enchant
-    // an element into the slots her zaklęcie żywiołu takes.
-    enchant: { reforge: (item.affixes?.length ?? 0) > 0, imbue: Boolean(content.settlement?.imbue?.slots?.includes(item.slot)) },
+    // Zaklinaczki)”): reforge an affix of an item that has them, enchant
+    // an element into the slots her zaklęcie żywiołu takes, and set a star
+    // in an item at +10 with stars still to take.
+    enchant: {
+      reforge: (item.affixes?.length ?? 0) > 0,
+      imbue: Boolean(content.settlement?.imbue?.slots?.includes(item.slot)),
+      stars: (item.upgrade ?? 0) >= maxUpgrade(content) && (item.stars ?? 0) < maxStars(content),
+    },
     ...(upgradeCap === undefined ? {} : { anvil: upgradeView(item, upgradeCap, content, materials, anvilDiscount, anvilWeek) }),
   };
 }

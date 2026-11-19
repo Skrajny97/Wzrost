@@ -1184,6 +1184,10 @@
     "0.4.62": {
       "title": "Version 0.4.62",
       "body": "- The Hard and the Hellish exploration work with a party too. The leader ticks one in the “Exploration options” together with the “With the party” box, and the whole party goes in that mode. The creatures are stronger for everyone, and each player gets their own bonus: more XP and gold, and on the Hellish one more items and materials too."
+    },
+    "0.4.63": {
+      "title": "Version 0.4.63",
+      "body": "- Stars at the Enchantress: from the standing “Trusted” she sets stars in items upgraded to +10. Up to five, each adding 10% of the item's value. The chance is small, but a failed try takes only the gold and the parts, and the item loses nothing.\n- Your friends list now holds 50 people instead of 30."
     }
   }
 }

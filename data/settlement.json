@@ -546,6 +546,60 @@
       { "part": "amber", "count": 2 }
     ]
   },
+  "ascension": {
+    "$comment": "Gwiazdki u Zaklinaczki (pomysł autora z 19.11.2026: „gdy przedmiot jest na +10 to można mu wbić jeszcze 5 gwiazdek z małą szansą na sukces za kupę złota jak ma się rozwiniętą relacje z Zaklinaczką… nie bedzie sie to cofać nic jak przy Kowadle. Będzie to wymagało co najmniej legendarnych części i masę złota”; odpowiedzi 1180 B, 1181 A, 1182 A, 1183 A i 1184 A; src/engine/ascension.js, src/server/ascension.js). Przedmiot ulepszony na Kowadle do najwyższego ulepszenia (+10), dowolnej rzadkości, przyjmuje tyle gwiazdek, ile jest szans w chances, po jednej na udaną próbę. Gwiazdki wbija Zaklinaczka (resident) postaci od stopnia relacji from z nią. chances: szansa kolejnych gwiazdek, pierwsza na 1. gwiazdkę; każda próba osobno, bez gwarancji po serii porażek. Próba kosztuje złoto: goldFactor razy złoto ostatniego ulepszenia tego przedmiotu na Kowadle (z +9 na +10, itemUpgradeCost bez upustów), a każda następna gwiazdka goldGrowth razy więcej; i części do rzemiosła (parts: pozycja n dla n-tej gwiazdki, part to id części z materials.json, count ile sztuk). Nieudana próba zabiera tylko złoto i części, przedmiot niczego nie traci. Każda próba podnosi relację z Zaklinaczką o relationGain, jak jej zaklęcia. Co daje gwiazdka liczbom przedmiotu: bonusPerStar w balance.json (upgrades). Gwiazdki zostają z przedmiotem przy sprzedaży, w Wymianie, na Targowisku i w skrzyniach, a złomiarz dolicza do ceny sellRefund (balance.json) złota prób, które wbiły gwiazdki, jak przy ulepszeniach Kowadła. texts: słowa części „Gwiazdki” w Pracowni Zaklinaczki i karty przedmiotu ({upgrade}: najwyższe ulepszenie, {max}: liczba gwiazdek, {percent}: ile procent daje gwiazdka albo wszystkie gwiazdki przedmiotu, {star}: numer następnej gwiazdki, {stars}: gwiazdki przedmiotu, {chance}: szansa, {standing}: stopień relacji, {points}: brakujące punkty, {gold} i {parts}: zapłata), a errors odmowy serwera.",
+    "resident": "enchantress",
+    "from": "trusted",
+    "relationGain": 5,
+    "chances": [0.15, 0.125, 0.1, 0.075, 0.05],
+    "goldFactor": 2,
+    "goldGrowth": 1.5,
+    "parts": [
+      { "part": "amber", "count": 3 },
+      { "part": "amber", "count": 4 },
+      { "part": "amber", "count": 5 },
+      { "part": "bloodstone", "count": 2 },
+      { "part": "star-shard", "count": 1 }
+    ],
+    "texts": {
+      "title": "Gwiazdki",
+      "intro": "Przedmiot ulepszony do +{upgrade} przyjmie jeszcze do {max} gwiazdek. Każda gwiazdka dodaje {percent}% wartości przedmiotu: obrażeń, pancerza i afiksów.",
+      "rule": "Szansa jest mała, a każda próba to osobne losowanie. Nieudana próba zabiera tylko złoto i części: przedmiot nic nie traci.",
+      "locked": "Zaklinaczka wbija gwiazdki tylko tym, którym ufa: od relacji „{standing}”. Do tego stopnia brakuje Ci {points} pkt.",
+      "lockedHint": "Relacja z nią rośnie z każdym zaklęciem afiksu i żywiołu.",
+      "none": "Nie masz jeszcze przedmiotu ulepszonego do +{upgrade}. Ulepszysz go na Kowadle w obozie.",
+      "next": "Gwiazdka {star} z {max} · szansa {chance}",
+      "full": "Ma już wszystkie gwiazdki.",
+      "cost": "Koszt próby",
+      "try": "Spróbuj",
+      "tryAgain": "Spróbuj ponownie",
+      "tryNext": "Spróbuj o kolejną",
+      "lockedButton": "Od relacji „{standing}”",
+      "noGold": "Brakuje złota",
+      "noParts": "Brakuje części",
+      "partsHint": "Części kupisz na Ladzie złomiarza i na Targowisku, a Stół rozbiórki robi je z rozebranych przedmiotów.",
+      "success": "Zaklinaczka wbiła gwiazdkę",
+      "successText": "Przedmiot ma teraz {stars} z {max} gwiazdek, a każda jego wartość wzrosła.",
+      "failure": "Tym razem się nie udało",
+      "failureText": "Przedmiot nic nie stracił: dalej ma {stars} z {max} gwiazdek.",
+      "spent": "Za próbę: {gold} złota i {parts}.",
+      "again": "Następna próba: gwiazdka {star} z {max}, szansa {chance}, {gold} złota i {parts}.",
+      "numbers": "Wartości przedmiotu",
+      "label": "Gwiazdki: {stars} z {max}",
+      "cardLine": "Gwiazdki: {stars} z {max} (+{percent}% wartości)",
+      "cardHint": "W Osadzie wbije w ten przedmiot gwiazdkę: każda dodaje {percent}% jego wartości.",
+      "cardHintAlso": "Wbije w niego też gwiazdkę: każda dodaje {percent}% jego wartości.",
+      "cardButton": "Gwiazdki u Zaklinaczki",
+      "errors": {
+        "notUpgraded": "Gwiazdki przyjmie tylko przedmiot ulepszony do +{upgrade}.",
+        "full": "Ten przedmiot ma już wszystkie gwiazdki.",
+        "relation": "Zaklinaczka wbija gwiazdki od relacji „{standing}”.",
+        "gold": "Brakuje złota na tę próbę.",
+        "parts": "Brakuje części: {part} (potrzeba {count}).",
+        "changed": "Przedmiot zmienił się w międzyczasie. Spróbuj jeszcze raz."
+      }
+    }
+  },
   "forge": {
     "$comment": "Kuźnia (pytanie 326 A): kowal Żelisław z Bractwa Kowali. Zwój ochronny za scroll.gold złota, najwyżej scroll.daily dziennie, i Zwój utrwalenia za steadyScroll.gold złota, najwyżej steadyScroll.daily dziennie (autor 4.11.2026: ochronne „pewnie z 2000”, a przed spadkiem „1000 i mniej wraz z Rozwojem Bractwa”); oba tańsze o discount. Podniesienie rzadkości o stopień, raz na przedmiot: raise.goldPerLevel złota za poziom przedmiotu razy sell nowej rzadkości, i raise.materials sztuk materiałów obecnej rzadkości przedmiotu (339 A); różne materiały tej rzadkości się sumują (481 B). topRarity: najwyższa rzadkość według stopnia relacji z kowalem. discount: o ile taniej (złoto) według stopnia reputacji Bractwa Kowali. reputation: jak u zielarki.",
     "resident": "smith",

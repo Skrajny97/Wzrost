@@ -1485,6 +1485,11 @@
       "id": "0.4.62",
       "title": "Wersja 0.4.62",
       "body": "- Trudna i Piekielna wyprawa działają też z drużyną. Lider zaznacza je w „Opcjach wyprawy” razem z polem „Z drużyną”, a cała drużyna idzie w tym trybie. Stwory są silniejsze dla wszystkich, a każdy dostaje swoją premię: więcej XP i złota, a na Piekielnej także więcej przedmiotów i materiałów."
+    },
+    {
+      "id": "0.4.63",
+      "title": "Wersja 0.4.63",
+      "body": "- Gwiazdki u Zaklinaczki: od relacji „Zaufany” Zaklinaczka wbija gwiazdki w przedmioty ulepszone do +10. Najwyżej pięć, a każda dodaje 10% wartości przedmiotu. Szansa jest mała, ale nieudana próba zabiera tylko złoto i części, a przedmiot nic nie traci.\n- Na liście znajomych zmieści się teraz 50 osób zamiast 30."
     }
   ]
 }

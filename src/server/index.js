@@ -128,6 +128,7 @@ import { answerDuel, challengeDuel, duelOffer, duelRedrawReserve, duelTurn, read
 import { enterTrialHall } from './trial-hall.js';
 import { arenaFight, claimArenaReward, getArena, getArenaDefence, rerollArenaRivals } from './pvp-arena.js';
 import { claimCardArenaReward, getCardArena, playCardArenaTurn, redrawCardArena, rerollCardArena, startCardArenaMatch, surrenderCardArena } from './card-arena.js';
+import { ascendAtEnchantress } from './ascension.js';
 import { buyFromHerbalist, buyMug, chooseReforged, claimStandingReward, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, redrawCandidates, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, setCompanionStay, settlementTests, takeCompanionGift, testSettlement, trainCompanion, unequipCompanion, upgradeCompanionItem } from './settlement.js';
 import { claimWanted, dropWanted, takeWanted } from './wanted.js';
 import { claimMercenary, listMercenaries, offerMercenary, withdrawMercenary } from './mercenaries.js';
@@ -367,6 +368,7 @@ const routes = [
   ['POST', '/api/settlement/residents/present', claimResidentPresent],
   ['POST', '/api/settlement/talk', talkWithCompanion],
   ['POST', '/api/settlement/imbue', imbueAtEnchantress],
+  ['POST', '/api/settlement/stars', ascendAtEnchantress],
   ['POST', '/api/settlement/forge/scrolls', buyScrolls],
   ['POST', '/api/settlement/forge/raise', raiseAtForge],
   // The Salon Gier: the Loteria and the Koło Fortuny (casino.js).

@@ -5,7 +5,8 @@
 // long name, a build under way in the camp, orders on the Stół rozbiórki's queue and a guild of its own
 // with a long name, and a companion hired in the Kwatery, with its five
 // places for items and amulets of big numbers in the bag for "Załóż z
-// plecaka" (one worn by the companion), on an account with the longest login. The bag
+// plecaka" (one worn by the companion), a sword at +10 with three of the
+// Zaklinaczka's stars, on an account with the longest login. The bag
 // is checked in "Zaznacz do sprzedaży" too, with an item marked. On each screen,
 // on the tabs TABS opens and in the sheets SHEETS opens over a screen (the
 // Ustawienia and "Zgłoś błąd", with a screenshot picked too), it looks for a
@@ -73,6 +74,7 @@ const SCREENS = [
   '#/oboz/quarters',
   '#/osada',
   '#/osada/board',
+  '#/osada/enchanter',
   '#/osada/tavern',
   '#/osada/tavern/companions',
   '#/osada/tavern/mercenaries',
@@ -123,6 +125,7 @@ const TRANSLATED = new Set([
   '#/oboz/quarters',
   '#/osada',
   '#/osada/board',
+  '#/osada/enchanter',
   '#/osada/tavern',
   '#/osada/tavern/companions',
   '#/osada/tavern/mercenaries',
@@ -448,6 +451,14 @@ async function main() {
   }
   const hired = (await page.evaluate(() => fetch('/api/settlement').then((response) => response.json()))).settlement?.companions?.hired?.[0];
   if (!hired?.wearable?.length || (await api('POST', '/api/settlement/equip', { companionId: hired.id, itemId: hired.wearable[0] })) >= 400) throw new Error('Towarzysz nie założył amuletu.');
+  // A sword at +10 with three of the Zaklinaczka's stars and big numbers, and
+  // her relation at Zaufany, for her "Gwiazdki" (ascension, 1180 B–1184 A),
+  // the name with its stars and the tile's "+10★3".
+  const starred = JSON.stringify({ base: 'karabela', slot: 'weapon', level: 146, rarity: 'legendary', upgrade: 10, stars: 3, damage: { min: 98765, max: 123456 }, affixes: [{ id: 'bear', kind: 'prefix', stat: 'strength', value: 9876 }] });
+  sql(`INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, '${starred}', 1 FROM characters WHERE name = '${name}'`);
+  sql(
+    `UPDATE characters SET settlement = json_set(COALESCE(settlement, '{}'), '$.relations', json_set(COALESCE(json_extract(settlement, '$.relations'), '{}'), '$.enchantress', 760)) WHERE name = '${name}'`,
+  );
   // The picture for "Dołącz zrzut ekranu": a PNG drawn on a canvas, of a
   // computer screen's shape and wider than any sheet, so that its preview
   // has to fit itself in.

@@ -294,6 +294,46 @@
   "hermit": {
     "scroll": { "name": "Scroll of Oblivion", "description": "A System scroll. In the Stats it resets the stat points spent, to spend them anew." }
   },
+  "ascension": {
+    "texts": {
+      "title": "Stars",
+      "intro": "An item upgraded to +{upgrade} takes up to {max} stars more. Each star adds {percent}% of the item's value: damage, armour and affixes.",
+      "rule": "The chance is small, and each try is a draw of its own. A failed try takes only the gold and the parts: the item loses nothing.",
+      "locked": "The Enchantress sets stars only for those she trusts: from the standing “{standing}”. You need {points} more points for it.",
+      "lockedHint": "Your relation with her grows with each affix and element she enchants.",
+      "none": "You have no item upgraded to +{upgrade} yet. You can upgrade one on the Anvil in the camp.",
+      "next": "Star {star} of {max} · chance {chance}",
+      "full": "It already has all its stars.",
+      "cost": "Cost of a try",
+      "try": "Try",
+      "tryAgain": "Try again",
+      "tryNext": "Try for the next one",
+      "lockedButton": "From the standing “{standing}”",
+      "noGold": "Not enough gold",
+      "noParts": "Not enough parts",
+      "partsHint": "You can buy parts at the scrap dealer's counter and at the Marketplace, and the Salvage Table makes them from salvaged items.",
+      "success": "The Enchantress has set a star",
+      "successText": "The item now has {stars} of {max} stars, and each of its values has grown.",
+      "failure": "Not this time",
+      "failureText": "The item has lost nothing: it still has {stars} of {max} stars.",
+      "spent": "For the try: {gold} gold and {parts}.",
+      "again": "Next try: star {star} of {max}, chance {chance}, {gold} gold and {parts}.",
+      "numbers": "The item's values",
+      "label": "Stars: {stars} of {max}",
+      "cardLine": "Stars: {stars} of {max} (+{percent}% of its value)",
+      "cardHint": "In the Settlement she sets stars in this item: each adds {percent}% of its value.",
+      "cardHintAlso": "She also sets stars in it: each adds {percent}% of its value.",
+      "cardButton": "Stars at the Enchantress",
+      "errors": {
+        "notUpgraded": "Only an item upgraded to +{upgrade} takes stars.",
+        "full": "This item already has all its stars.",
+        "relation": "The Enchantress sets stars from the standing “{standing}”.",
+        "gold": "Not enough gold for this try.",
+        "parts": "Not enough parts: {part} ({count} needed).",
+        "changed": "The item changed meanwhile. Try again."
+      }
+    }
+  },
   "stable": {
     "mounts": {
       "pony": {
