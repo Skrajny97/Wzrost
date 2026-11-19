@@ -16,9 +16,11 @@
 //   altar, the merchant), the roads between them, the party's figure where
 //   it stands and the rooms it may enter lit. A tap on a lit room tells what
 //   waits there and enters it; the figure walks there and the result comes:
-//   a fight's with its playback in the report, a spring's healing, the
-//   choice of a blessing (after an elite, a guardian, at an altar) and the
-//   merchant's wares in a sheet before the player's eyes. The fighters, the
+//   a fight's report first, on its own screen (unless "Raport walki od
+//   razu" is off), then on the board the fight's result, a spring's
+//   healing, the choice of a blessing (after an elite, a guardian, at an
+//   altar) and the merchant's wares in a sheet before the player's eyes,
+//   and a new level after a guardian. The fighters, the
 //   blessings, the rewards and the rules are a tap away at the bottom of a
 //   phone's screen, and beside the board on a computer's.
 //
@@ -45,6 +47,46 @@ export const LABYRINTH_ENTRANCE = '#/osada/trial-hall/labyrinth';
 export const LABYRINTH_BOARD = '#/labirynt';
 // How long the party's figure walks from one platform to the next, in ms.
 const WALK_MS = 650;
+
+// "Raport walki od razu" (the author, 19.11.2026: „żeby automatycznie
+// otwierał się raport walki każdej, który można wyłączyć lub pominąć a
+// pozniej dopiero cala reszta blogoslawienstwa itp.”): every fight of the
+// Labirynt opens its report first, and its result, the blessing's choice
+// and a new level come on the board after it. On unless turned off on the
+// report's screen (screens/report.js); kept in this browser.
+const REPORT_KEY = 'wzrost.labyrinth-report';
+let reportFirst = readReportFirst();
+
+function readReportFirst() {
+  try {
+    return localStorage.getItem(REPORT_KEY) !== 'off';
+  } catch {
+    return true;
+  }
+}
+
+export const labyrinthReportOn = () => reportFirst;
+
+export function setLabyrinthReport(value) {
+  reportFirst = value;
+  try {
+    localStorage.setItem(REPORT_KEY, value ? 'on' : 'off');
+  } catch {
+    // Without storage the choice lasts until the page is closed.
+  }
+}
+
+// The result of the room whose fight's report opened first: it waits for
+// the board, the next time it shows (the report closed or skipped), for
+// the character and the day it came in.
+let waiting = null;
+const waitingKey = (labyrinth) => `${state.character?.id}:${labyrinth.day}`;
+
+function takeWaiting(labyrinth) {
+  const found = waiting;
+  waiting = null;
+  return found?.key === waitingKey(labyrinth) ? found : null;
+}
 
 // The danger of a fight room against the party as it is now (899 A, the
 // server's roomDanger): the ring's colour, its name and words.
@@ -676,8 +718,17 @@ function mountView(container, { navigate, board }) {
   async function enter(row, index) {
     const before = view;
     const result = await fresh(() => call('POST', '/api/labyrinth/room', { level: view.level, row, room: index }));
-    // The figure walks from where it stood, on the same level's board.
-    if (board && result.labyrinth.level === before.level) {
+    if (result.report) reportCache.set(String(result.report.id), result.report);
+    // A fight's report first ("Raport walki od razu"): its result, the
+    // blessing's choice and the next level wait for the board (takeWaiting),
+    // as the report closes or is skipped.
+    const first = board && Boolean(result.report) && labyrinthReportOn();
+    const sameLevel = result.labyrinth.level === before.level;
+    // The figure walks from where it stood, on the same level's board; with
+    // the report first also to the guardian beaten, on the level it cleared
+    // (a player, 19.11.2026: after the guardian the game went straight to
+    // the next level).
+    if (board && (sameLevel || first)) {
       const rows = before.map;
       const lanes = rows.length + 1;
       const lane = (at) => rows.length - 1 - at;
@@ -685,14 +736,40 @@ function mountView(container, { navigate, board }) {
       walkFrom = before.row < 0 ? [50, laneY(lanes - 1, lanes)] : [x(before.room, rows[before.row].length), laneY(lane(before.row), lanes)];
     }
     const walking = board && walkFrom !== null && motionOn();
-    view = result.labyrinth;
-    if (result.report) reportCache.set(String(result.report.id), result.report);
+    view = sameLevel || !first ? result.labyrinth : onGuardian(before, row, index, result.labyrinth);
+    if (first) waiting = { key: waitingKey(result.labyrinth), room: result.room, report: result.report };
     closeSheet();
     show();
-    // The result once the figure has reached the room.
-    const then = () => !gone && resultSheet(result.room, result.report);
+    // The report, or the result, once the figure has reached the room.
+    const then = () => {
+      if (gone) return;
+      if (first) openReport(result.report);
+      else resultSheet(result.room, result.report);
+    };
     if (walking) setTimeout(then, WALK_MS);
     else then();
+  }
+
+  // The level its guardian was beaten on, the party on the guardian's
+  // platform, for the walk there before the report; the next level shows
+  // once the report is closed.
+  const onGuardian = (before, row, index, after) => ({
+    ...before,
+    row,
+    room: index,
+    path: [...before.path, index],
+    reachable: [],
+    pending: after.pending,
+    fighters: after.fighters,
+    levels: after.levels,
+    gains: after.gains,
+  });
+
+  // A fight's report on its own screen, as just fought (its music, and its
+  // "Pomiń raport" back to the board in screens/report.js).
+  function openReport(report) {
+    state.freshReport = String(report.id);
+    navigate(`#/raport/${report.id}`);
   }
 
   // A refusal because the Labirynt is not as the page shows it (a new day
@@ -740,9 +817,8 @@ function mountView(container, { navigate, board }) {
         class: 'button button--world',
         text: t('Obejrzyj walkę'),
         onClick: () => {
-          state.freshReport = String(report.id);
           closeSheet();
-          navigate(`#/raport/${report.id}`);
+          openReport(report);
         },
       });
     openSheet(
@@ -795,10 +871,15 @@ function mountView(container, { navigate, board }) {
   fill(container, board ? h('div', { class: 'lab-board' }, boardBar(false), h('p', { class: 'muted lab-board-message', text: t('Wczytywanie…') })) : h('p', { class: 'muted', text: t('Wczytywanie…') }));
   call('GET', '/api/labyrinth')
     .then(({ labyrinth }) => {
+      if (gone) return;
       view = labyrinth;
       show();
-      // A choice waiting when the board opens comes before the player's eyes.
-      if (board && view.pending && !view.over) choiceSheet();
+      // The result of a fight whose report came first comes now, a
+      // blessing's choice in it; else a choice waiting when the board opens
+      // comes before the player's eyes.
+      const after = board ? takeWaiting(view) : null;
+      if (after) resultSheet(after.room, after.report);
+      else if (board && view.pending && !view.over) choiceSheet();
     })
     .catch((error) => show(error.message ?? t('Nie udało się wczytać Labiryntu.')));
 

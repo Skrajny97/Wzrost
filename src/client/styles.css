@@ -16068,6 +16068,20 @@ button.tcard-slot {
   margin: 0 0 12px;
 }
 
+/* A Labirynt's fight report opened first (labyrinth.js): "Pomiń raport"
+   back to the board, the box "Raport walki od razu" under it, in the
+   middle, clear of the tabs on the screen's edges. */
+.report-skip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 0 12px;
+}
+
+.report-skip .avoid-rare {
+  justify-content: center;
+}
+
 /* "Wyrusz" held above the bottom tabs on a place's screen (combat.js). */
 .start-bar {
   position: sticky;
