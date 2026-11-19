@@ -1,0 +1,14 @@
+{
+  "id": "guardian-rings",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, the source of the system at the edge of the universe: gigantic ancient rings of dark metal covered with glowing runes orbiting a dead dark star, huge floating stone monoliths, distant nebulae and galaxies, wide panorama for a dim background behind text, low contrast, very dark muted palette of deep space black, cold cyan glow and dim gold, no text, no border, no people in front, no animals in front",
+  "style": "src/client/art/lands/black-bog.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "ice-moon",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, a frozen alien moon in deep space: a plain of blue ice with tall frost geysers, jagged ice ridges and cracks glowing faintly from below, a huge ringed planet hanging in the black starry sky, green and violet aurora, wide panorama for a dim background behind text, low contrast, very dark muted palette of icy blue, black and pale violet, no text, no border, no people in front, no animals in front",
+  "style": "src/client/art/lands/black-bog.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}

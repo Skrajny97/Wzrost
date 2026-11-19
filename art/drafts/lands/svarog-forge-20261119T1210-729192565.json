@@ -1,0 +1,14 @@
+{
+  "id": "svarog-forge",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, the forge of svarog, the slavic god of fire, inside a star among the galaxies: a giant anvil of black stone floating over a sea of sun fire, molten new stars cooling in the dark, gigantic chains and hammers, distant galaxies, wide panorama for a dim background behind text, low contrast, very dark muted palette of ember orange, deep red and space black, no text, no border, no people in front, no animals in front",
+  "style": "src/client/art/lands/black-bog.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
