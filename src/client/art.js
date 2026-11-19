@@ -511,10 +511,11 @@ export const SPRITES = {
   // stood, and the Encyclopedia's corner of the top bar, 32×32. Punkty
   // Systemu keep their line icon (the author: "tylko Punkty Systemu będą w
   // takiej wyróżniającej formie jak do tej pory"). The Kowadło's two
-  // scrolls, the Zwój ochronny and the Zwój utrwalenia (598 C).
+  // scrolls, the Zwój ochronny and the Zwój utrwalenia (598 C). The Kulka
+  // Systemu over the Walka scene (data/orbs.json, orbs.js).
   icons: {
     size: 32,
-    ids: ['gold', 'time-points', 'encyclopedia', 'ward-scroll', 'steady-scroll', 'oblivion-scroll', 'fir-branch'],
+    ids: ['gold', 'time-points', 'encyclopedia', 'ward-scroll', 'steady-scroll', 'oblivion-scroll', 'fir-branch', 'system-orb'],
   },
   // The professions' squares on the Profesje tab, 48×48.
   professions: {
@@ -885,6 +886,15 @@ export const encyclopediaArt = (size) => iconArt('encyclopedia', size, 'book');
 export const scrollArt = (id, size) => iconArt(id, size, 'scroll');
 // The fir branch of Szczodre Gody's winter quest (1044.7 D).
 export const firBranchArt = (size) => iconArt('fir-branch', size, 'leaf');
+// The Kulka Systemu (data/orbs.json `art`) at `scale` times its 32 px, a
+// whole number, so its pixels stay sharp; null while it has no picture.
+export function orbArt(id, scale) {
+  const art = sprite('icons', id, 'sprite--orb');
+  if (!art) return null;
+  art.width = SPRITES.icons.size * scale;
+  art.height = SPRITES.icons.size * scale;
+  return art;
+}
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
 // The pictures of the Labirynt Systemu and the Rdzeń (art/labyrinth/, 850–866,
 // accepted in 868 and 869): its rooms (room-<type>), its Artefakty

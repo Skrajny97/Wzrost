@@ -54,6 +54,7 @@ import weeks from '../../data/weeks.json' with { type: 'json' };
 import achievements from '../../data/achievements.json' with { type: 'json' };
 import winter from '../../data/winter.json' with { type: 'json' };
 import fame from '../../data/fame.json' with { type: 'json' };
+import orbs from '../../data/orbs.json' with { type: 'json' };
 // The English texts (data/en/), by the data file they translate. A file
 // added there is named here too (tools/i18n-check.mjs checks it).
 import enAffixes from '../../data/en/affixes.json' with { type: 'json' };
@@ -99,6 +100,7 @@ import enUnlocks from '../../data/en/unlocks.json' with { type: 'json' };
 import enWeeks from '../../data/en/weeks.json' with { type: 'json' };
 import enAchievements from '../../data/en/achievements.json' with { type: 'json' };
 import enWinter from '../../data/en/winter.json' with { type: 'json' };
+import enOrbs from '../../data/en/orbs.json' with { type: 'json' };
 
 // The data files by their names, as data/en/ names its translations.
 const polishData = {
@@ -146,6 +148,7 @@ const polishData = {
   weeks,
   achievements,
   winter,
+  orbs,
 };
 
 export const OVERLAYS = {
@@ -194,6 +197,7 @@ export const OVERLAYS = {
     weeks: enWeeks,
     achievements: enAchievements,
     winter: enWinter,
+    orbs: enOrbs,
   },
 };
 
@@ -477,6 +481,10 @@ export function publicContent() {
     sounds: data.sounds,
     // The looping scenes while the character works or explores (scenes.js).
     animations: { ...data.animations, $comment: undefined },
+    // The Kulki Systemu over the Walka scene of an exploration (orbs.js):
+    // the orb's picture, the sound of a catch, how long one flies and the
+    // words of its button; when they come is in the character's view.
+    orbs: game.orbs && { art: game.orbs.art, sound: game.orbs.sound, flightSeconds: game.orbs.flightSeconds, texts: { label: game.orbs.texts.label } },
     // The narrator's introduction for a new character (narrator.js), with
     // the Time Points the narrator gives.
     tutorial: { ...data.tutorial, $comment: undefined, startTimePoints: game.balance.timePoints.start },

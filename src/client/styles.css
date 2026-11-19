@@ -10741,7 +10741,7 @@ button.farm-plot {
   overflow: hidden;
   background: var(--land, none) 0 0 / var(--land-width) var(--land-height) repeat-x, var(--bg-deep);
   image-rendering: pixelated;
-  animation: scene-land var(--land-duration) linear infinite;
+  animation: scene-land var(--land-duration) linear var(--scene-phase, 0s) infinite;
   /* Where the figures stand, the bottom of each one's box over the scene's:
      the System's figure, the character's own walking frame and the ride. A
      pet keeps to its figure's box (scenes.js companion). */
@@ -10779,7 +10779,14 @@ button.farm-plot {
   height: var(--path-height);
   background: var(--path) 0 0 / var(--path-width) var(--path-height) repeat-x;
   image-rendering: pixelated;
-  animation: scene-path var(--path-duration) linear infinite;
+  animation: scene-path var(--path-duration) linear var(--scene-phase, 0s) infinite;
+}
+/* The walk's, the trot's, the rider's and the pet's frames at the scene's
+   phase (scenes.js walkScene), in step with the land and the path. */
+.scene-walk .scene-frames,
+.scene-walk .scene-ride-mount,
+.scene-walk .scene-ride-rider {
+  animation-delay: var(--scene-phase, 0s);
 }
 @keyframes scene-path {
   to {
@@ -11286,6 +11293,168 @@ button.farm-plot {
 .calm .scene,
 .calm .scene * {
   animation: none !important;
+}
+
+/* The Kulki Systemu over the Walka scene (orbs.js): a layer the size of the
+   scene and cut to it, so an orb never covers the buttons around it; only
+   the orb takes taps. Each flies by the server's clock: --since puts a new
+   one, or one drawn anew, where its flight is now. The orb is its 32 px
+   picture at twice the size, its pixels sharp; it rides a gentle wave and
+   glows softly in the System's light. */
+.orb-host {
+  position: relative;
+}
+.orb-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 4px;
+  pointer-events: none;
+}
+.orb-flight {
+  position: absolute;
+  left: 0;
+  width: 64px;
+  height: 64px;
+  animation: orb-across var(--flight) linear var(--since, 0s) forwards;
+}
+.orb-flight--back {
+  animation-name: orb-across-back;
+}
+@keyframes orb-across {
+  from {
+    transform: translateX(-64px);
+  }
+  to {
+    transform: translateX(var(--across));
+  }
+}
+@keyframes orb-across-back {
+  from {
+    transform: translateX(var(--across));
+  }
+  to {
+    transform: translateX(-64px);
+  }
+}
+.orb {
+  display: block;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  animation: orb-wave 2s ease-in-out var(--since, 0s) infinite alternate;
+}
+.orb:focus-visible {
+  outline: 2px solid var(--system);
+  outline-offset: 2px;
+}
+.orb img {
+  display: block;
+  image-rendering: pixelated;
+  animation: orb-glow 1.2s ease-in-out var(--since, 0s) infinite alternate;
+}
+@keyframes orb-wave {
+  from {
+    transform: translateY(-12px);
+  }
+  to {
+    transform: translateY(12px);
+  }
+}
+@keyframes orb-glow {
+  from {
+    filter: drop-shadow(0 0 2px rgba(143, 227, 239, 0.5));
+  }
+  to {
+    filter: drop-shadow(0 0 8px rgba(143, 227, 239, 0.95)) brightness(1.12);
+  }
+}
+/* With the game's animations off: the orb stands still and fades in and out
+   (a soft fade, no movement). */
+.orb-flight--still {
+  animation-name: orb-fade;
+}
+.orb-flight--still .orb,
+.orb-flight--still .orb img {
+  animation: none;
+}
+.orb-flight--still .orb img {
+  filter: drop-shadow(0 0 5px rgba(143, 227, 239, 0.8));
+}
+@keyframes orb-fade {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+/* A catch: the orb bursts into light where it was, over the page (orbs.js
+   burst), as the screen is drawn anew, in a frame of the scene's box that
+   cuts it as the orbs' layer does. */
+.orb-burst-frame {
+  position: fixed;
+  /* Under the top bar and the bottom menu (20), over the page. */
+  z-index: 15;
+  overflow: hidden;
+  border-radius: 4px;
+  pointer-events: none;
+}
+.orb-burst {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  animation: orb-burst 0.65s ease-out forwards;
+}
+.orb-burst img {
+  display: block;
+  image-rendering: pixelated;
+}
+.orb-burst::after {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border: 2px solid var(--system);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--system), inset 0 0 8px var(--system);
+  animation: orb-ring 0.65s ease-out forwards;
+}
+@keyframes orb-burst {
+  from {
+    opacity: 1;
+    filter: brightness(1.4) drop-shadow(0 0 8px var(--system));
+  }
+  to {
+    opacity: 0;
+    filter: brightness(2) drop-shadow(0 0 16px var(--system));
+  }
+}
+@keyframes orb-ring {
+  from {
+    opacity: 1;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+.calm .orb-burst::after {
+  display: none;
 }
 
 /* Skin tones (ui.js skinSwatches): a dot of each tone, the chosen one ringed. */

@@ -111,6 +111,11 @@ export function walkScene(activity) {
   stage.style.setProperty('--path-width', `${PATH.width * PATH.scale}px`);
   stage.style.setProperty('--path-height', `${PATH.height * PATH.scale}px`);
   stage.style.setProperty('--path-duration', `${(PATH.width * PATH.scale) / walk.pathSpeed}s`);
+  // Its loops (the land, the path, the walk and the trot) at the phase of
+  // the page's clock, all together as before: a screen drawn anew, as a
+  // catch of a Kulka Systemu draws it (orbs.js), goes on where it was
+  // instead of starting the land and the path over (styles.css).
+  stage.style.setProperty('--scene-phase', `${(-performance.now() / 1000).toFixed(3)}s`);
   nowAndThen(stage, () => (pick(walk.moments) === 'shadow' ? shadow(stage, activity) : bird(stage)));
   return { element: h('div', { class: 'scene', 'aria-hidden': 'true' }, stage), update: () => {} };
 }

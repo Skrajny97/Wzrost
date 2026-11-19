@@ -1,0 +1,16 @@
+{
+  "$comment": "English texts of data/orbs.json (src/engine/orbs.js, src/server/orbs.js): the words of the System Orbs over the exploration's scene.",
+  "texts": {
+    "label": "Catch the System Orb",
+    "gold": "System Orb: +{amount} gold",
+    "time": "System Orb: +{amount} {points}",
+    "timePointForms": ["Time Point", "Time Points", "Time Points"],
+    "material": "System Orb: +{amount} {material}",
+    "noExploration": "System Orbs only appear during an exploration.",
+    "noOrb": "There is no such System Orb.",
+    "early": "This System Orb has not arrived yet.",
+    "gone": "This System Orb has already faded.",
+    "claimed": "This System Orb has already been caught.",
+    "limit": "That's all the System Orbs for today ({count}). More after midnight."
+  }
+}

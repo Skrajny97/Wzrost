@@ -14,6 +14,7 @@ import { requireSession } from './sessions.js';
 import { testMode, testModeFor, tutorialTestsFor } from './test-mode.js';
 import { shiftTrip, skipRecord, tripOf } from './trips.js';
 import { endService } from './mercenaries.js';
+import { caughtOrbs, orbTimes } from './orbs.js';
 
 const notFound = () => new ApiError(404, 'not_found', 'Nie znaleziono.');
 
@@ -53,6 +54,36 @@ export async function skipTime(context) {
     await db
       .prepare('UPDATE characters SET hp = ?, hp_at = ?, version = version + 1 WHERE id = ?')
       .bind(maxHp, now, player.row.id)
+      .run();
+  }
+  return json({ character: characterView(await loadPlayer(db, session.userId), now) });
+}
+
+// A Kulka Systemu soon, for trying the orbs and recording them (orbs.js):
+// the exploration under way moves on, as "Pomiń czas" moves it, till its
+// next orb not caught comes `seconds` from now (3 by default, at most 60). A
+// Drużyna's trip moves for all its members, as with "Przewiń".
+export async function orbSoon(context) {
+  if (!testMode(context.env)) throw notFound();
+  const { session, player } = await requirePlayer(context);
+  if (!testModeFor(context.env, session.user.login)) throw notFound();
+  const body = await readJson(context.request);
+  const seconds = Number.isFinite(body.seconds) ? Math.min(60, Math.max(0, body.seconds)) : 3;
+  const db = context.env.DB;
+  const now = context.now;
+  const activity = player.activity;
+  if (activity?.kind !== 'hunt' || activity.ends_at <= now) throw new ApiError(409, 'no_activity', 'Postać nie jest na wyprawie.');
+  const soon = now + seconds * 1000;
+  const caught = caughtOrbs(activity);
+  const next = orbTimes(activity).find((at, index) => at >= soon && !caught.includes(index));
+  if (next === undefined) throw new ApiError(409, 'no_orb', 'Ta wyprawa nie ma już przed sobą Kulek Systemu.');
+  const shift = next - soon;
+  const trip = tripOf(activity);
+  if (trip) await shiftTrip(db, trip, activity.started_at, shift, skipRecord(player.row, Math.max(1, Math.round(shift / 60000)))).run();
+  else {
+    await db
+      .prepare('UPDATE activities SET started_at = started_at - ?, ends_at = ends_at - ? WHERE character_id = ? AND started_at = ?')
+      .bind(shift, shift, player.row.id, activity.started_at)
       .run();
   }
   return json({ character: characterView(await loadPlayer(db, session.userId), now) });
