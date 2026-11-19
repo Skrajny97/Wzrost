@@ -3847,7 +3847,7 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
-## Wersja 0.4.53 (19.11.2026): powiadomienia o prywatnych wiadomościach, bez powiadomień o oznaczeniach na ogólnym czacie, „pushujący” na czacie, grafiki 1170 i dźwięki 1171
+## Wersja 0.4.54 (19.11.2026): powiadomienia o prywatnych wiadomościach, bez powiadomień o oznaczeniach na ogólnym czacie, „pushujący” na czacie, grafiki 1170 i dźwięki 1171
 
 1. **Powiadomienia czatu (autor 19.11.2026: „włącz powiadomienia jak ktoś napisze prywatną wiadomość na czacie a wyłącz powiadomienia przy ozaczaniu na ogólnym czacie”).** Prywatna wiadomość wysyła powiadomienie na telefon odbiorcy (`privateNotices` w `src/server/mentions.js`, tekst `mentions.texts.pushPrivate` w `data/chat.json`: „Ala napisała do Ciebie: …”). Tak jak przy oznaczeniach: tylko do postaci, którą gracz gra, dopóki wiadomość jest, nie została przeczytana i jej autor nie jest ukryty.
 2. **Brakujący szczegół: rozmowa budzi telefon raz.** Powiadomienie idzie tylko za pierwszą wiadomością od danego gracza po co najmniej 10 minutach przerwy (`mentions.pushEveryMinutes`), żeby rozmowa nie dzwoniła przy każdym zdaniu. Nowsze powiadomienie od tego samego gracza zastępuje starsze (`private-<id>`).
@@ -3856,6 +3856,7 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
 5. **Poprawka (brakujący szczegół, najprostsza).** `data/chat.json` ma listę `wordsAllowed`: części słów, w których słowo z listy nie jest wulgaryzmem. Na razie jest tam tylko „shuj”, więc przechodzą „pushujący”, „rushujemy”, „flashuje” i podobne. Samo „huj” i „chuj” dalej idą na gwiazdki. Filtr imion postaci (`src/engine/names.js`) zostaje bez zmian.
 6. **Grafiki według ocen autora (1170):** Tętent A, Strach D, Sprężyna skoczogonka D, Wąs kota Bajuna C. Są w `src/client/art/monsters/` i `src/client/art/materials/`. Wszystkie cztery wersje każdej leżą w `art/alternatives/nawia/` z dopiskiem `-2-` (np. `stampede-2-A.png`).
 7. **Dźwięki według ocen autora (1171):** Strzała z niebios D, Deszcz gwiazd B, Słup światła B, Legion Nawii A. Są w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` z głośnością 0,7, jak pozostałe dźwięki umiejętności.
+8. **0.4.53 nie weszła do gry.** Wdrożenie zatrzymał test tłumaczeń (`test/i18n.test.js`): uznał listę `wordsAllowed` z `data/chat.json` za polski tekst bez angielskiego. `tools/i18n-check.mjs` pomija ją teraz tak jak listy `words` i `wordsEn`, bo to nie tekst gry, tylko filtr czatu. Zmiany z 0.4.53 wchodzą w tej wersji.
 
 ## Wersja 0.4.52 (19.11.2026): zmiany z 0.4.50 i 0.4.51 w grze
 
