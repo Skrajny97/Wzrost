@@ -1306,7 +1306,7 @@
         },
         "huntCurve": {
           "type": "array",
-          "description": "Siła stworów najnowszego miejsca, czyli tego, które sięga poziomu postaci (albo wyższego), na wyprawach i w próbnych walkach szacowania zagrożenia (bez Wież, walk zdarzeń i Bestii Gildii): punkty [poziom postaci, mnożnik obrażeń, mnożnik HP] rosnąco po poziomie, między punktami liniowo, przed pierwszym bez zmian, za ostatnim jak w ostatnim. Niższe miejsca bez zmian. Towarzysze i drużyna nie wzmacniają stworów (autor: 611 między B a C, 612 C, 613 C); od 250. poziomu klasy gracze Drużyny tak (perPlayer).",
+          "description": "Siła stworów najnowszego miejsca, czyli tego, które sięga poziomu postaci (albo wyższego), na wyprawach i w próbnych walkach szacowania zagrożenia (bez Wież, walk zdarzeń i Bestii Gildii): punkty [poziom postaci, mnożnik obrażeń, mnożnik HP] rosnąco po poziomie, między punktami liniowo, przed pierwszym bez zmian, za ostatnim jak w ostatnim. Niższe miejsca bez zmian. Towarzysze i drużyna nie wzmacniają stworów (autor: 611 między B a C, 612 C, 613 C); od 250. poziomu klasy gracze Drużyny tak (perPlayer). Od 30. poziomu postaci na wyprawach dochodzi do niej newestPlace (19.11.2026).",
           "items": {
             "type": "array",
             "minItems": 3,

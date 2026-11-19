@@ -252,7 +252,8 @@ function unarmed(level, content) {
 // dla okazjonalnych, średnio dla zaangażowanych" and "mocno" (611), and no
 // stronger creatures for the companions or a party along (612 C: "musi byc
 // motywacja do drużyny/towarzyszy"); from class level 250 a Drużyna's
-// players do make them stronger (partyStrength). `before`: what comes
+// players do make them stronger (partyStrength), and in the newest place
+// since 19.11.2026 below it too (newestStrength). `before`: what comes
 // before the first point ([1, 1], or [0, 0] for shares).
 /**
  * @param {number} level
