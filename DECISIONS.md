@@ -3847,6 +3847,12 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.63 (19.11.2026): Gwiazdki u Zaklinaczki, 50 znajomych
+
+1. **Gwiazdki u Zaklinaczki** (Ascendencje przedmiotów), według sekcji niżej: przyjęte makiety 1204, z 1205 A i 1206 A.
+2. **Lista znajomych do 50.** Autor (19.11.2026): „Poszerz listę znajomych do 50”. `community.friends.max` w `data/community.json` to teraz 50 zamiast 30; licznik „Znajomi (N/50)” i zaproszenia liczą się z tej liczby.
+   - Brakujący szczegół: dziennie dalej odbiera się do 30 Upominków (`gift.claimsPerDay`, decyzja autora z 0.2.4). Upominki ponad to czekają do 7 dni, jak dotąd.
+
 ## Ascendencje przedmiotów: Gwiazdki u Zaklinaczki (1180–1184, 1204–1206, 19.11.2026)
 
 Autor (19.11.2026): „gdy przedmiot jest na +10 to można mu wbić jeszcze 5 gwiazdek z małą szansą na sukces za kupę złota jak ma się rozwiniętą relacje z Zaklinaczką. Będzie to cos w stylu 15% szans na 1 gwiazdke i 5% na 5 gwiazdek, ale nie bedzie sie to cofać nic jak przy Kowadle. Będzie to wymagało co najmniej legendarnych części i masę złota.” Odpowiedzi autora na stronie ocen: 1180 B, 1181 A, 1182 A, 1183 A i 1184 A. Makiety (telefon 360 px, komputer 1366 i 1920 px) autor przyjął w 1204, z wyborami 1205 A i 1206 A (punkt 10).
