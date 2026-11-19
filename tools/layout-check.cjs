@@ -6,7 +6,9 @@
 // with a long name, and a companion hired in the Kwatery, with its five
 // places for items and amulets of big numbers in the bag for "Załóż z
 // plecaka" (one worn by the companion), a sword at +10 with three of the
-// Zaklinaczka's stars, on an account with the longest login. The bag
+// Zaklinaczka's stars, on an account with the longest login and gold in
+// billions in its Skrzynia Konta (its sheet "Wyjmij złoto" with all of it, and
+// with too much typed). The bag
 // is checked in "Zaznacz do sprzedaży" too, with an item marked. On each screen,
 // on the tabs TABS opens and in the sheets SHEETS opens over a screen (the
 // Ustawienia and "Zgłoś błąd", with a screenshot picked too), it looks for a
@@ -72,6 +74,7 @@ const SCREENS = [
   '#/oboz/craft-table',
   '#/oboz/anvil',
   '#/oboz/quarters',
+  '#/oboz/skrzynia-konta',
   '#/osada',
   '#/osada/board',
   '#/osada/enchanter',
@@ -123,6 +126,7 @@ const TRANSLATED = new Set([
   '#/oboz/craft-table',
   '#/oboz/anvil',
   '#/oboz/quarters',
+  '#/oboz/skrzynia-konta',
   '#/osada',
   '#/osada/board',
   '#/osada/enchanter',
@@ -183,6 +187,8 @@ const ARENA = JSON.parse(fs.readFileSync(path.join(__dirname, `../data/${LANG ==
 const TABS = {
   '#/oboz/craft-table': [said('Kolejka ({count}/{limit})').replace(/\s*\(.*$/, '')],
   '#/osada/board': [said('Poszukiwani')],
+  // The Skrzynia Konta's goods, under its gold.
+  '#/oboz/skrzynia-konta': [said('Towary')],
   '#/osada/arena': [
     { name: ARENA.cards.texts.tab, tap: '[data-guide="arena-tab-cards"]', wait: 2000 },
     ARENA.texts.tabTable,
@@ -201,7 +207,8 @@ const TABS = {
   ],
 };
 // Sheets opened over a screen after its tabs, each from the one before (a
-// tap on `tap`, or a picture given to the file field `pick`), looked at
+// tap on `tap`, a picture given to the file field `pick`, or `value` typed
+// into the field `fill`), looked at
 // alone once `ready` shows in it, and closed at the end with "Zamknij". The
 // Ustawienia from the gear in the top bar, found by its class as the
 // narrator finds it (on a computer the bar is laid out otherwise), with
@@ -212,6 +219,14 @@ const SHEETS = {
   '#/oboz/quarters': [
     { name: 'Załóż z plecaka', tap: `button:text-is("${said('Załóż z plecaka')}")`, ready: '.item-list:has(.wear-choice)', words: true },
     { name: 'porównanie', tap: '#sheet .item-list > li:first-child .wear-choice > summary', ready: '.wear-choice[open] .compare', words: true },
+  ],
+  // "Wyjmij złoto" in the Skrzynia Konta (19.11.2026): the chest's gold in
+  // billions, all of it with "Wszystko" (the button's longest words), then
+  // more than there is typed, with the line that says so.
+  '#/oboz/skrzynia-konta': [
+    { name: 'Wyjmij złoto', tap: '[data-chest-gold="take"]', ready: '.chest-gold-field', words: true },
+    { name: 'Wszystko', tap: '#sheet .chest-gold-quick--all', ready: '.chest-gold-field' },
+    { name: 'za dużo', fill: '#chest-gold-amount', value: '99999999999', ready: '.chest-gold-warn:not([hidden])', words: true },
   ],
   // The sheet Tygodnie from the week's line on the Walka screen (weeks.js),
   // its whole year left as the player left it.
@@ -337,6 +352,8 @@ async function main() {
   if ((await api('POST', '/api/character', { name, classId: 'warrior', appearance: 'female' })) >= 400) throw new Error('Nie powstała postać.');
   sql(`UPDATE characters SET level = 146, class_level = 99, gold = 987654, system_points = 12345, time_points = 9876, tutorial = NULL WHERE name = '${name}'`);
   sql(`UPDATE characters SET resources = '${JSON.stringify({ wood: 123456, stone: 98765, 'iron-ore': 54321 })}' WHERE name = '${name}'`);
+  // Gold in billions in the account's Skrzynia Konta (19.11.2026).
+  sql(`UPDATE users SET chest_gold = 9876543210 WHERE login = '${login}'`);
   // A "Co nowego?" entry with a long address, the newest (the author,
   // 14.11.2026: the testers' link went out of the frame).
   const longLink = 'https://play.google.com/apps/testing/com.insightrpg.app?sprawdzenie-ukladu-bardzo-dlugi-adres-bez-spacji=1';
@@ -604,6 +621,7 @@ async function main() {
         for (const step of SHEETS[screen] ?? []) {
           trail.push(step.name);
           if (step.pick) await view.locator(step.pick).setInputFiles(picture, { timeout: 5000 });
+          else if (step.fill) await view.locator(step.fill).fill(step.value, { timeout: 5000 });
           else await view.locator(step.tap).click({ timeout: 5000 });
           await view.locator(`#sheet[open] ${step.ready}`).waitFor({ timeout: 5000 });
           await view.waitForTimeout(500);

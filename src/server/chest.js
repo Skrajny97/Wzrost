@@ -5,7 +5,10 @@
 // 12.11.2026: „Skrzynia Konta powinna pozwalać przekładać też mikstury,
 // rośliny, wszystko, nawet zasoby, ale miec kłódkę i być zablokowana do 20
 // poziomu postaci”) any number of goods: potions, herbs, materials, the Stół
-// rozbiórki's parts (0.3.90), minerals and the camp's resources. Gold stays with its character. A character
+// rozbiórki's parts (0.3.90), minerals and the camp's resources. And gold
+// since 19.11.2026 (the author: „dorób złoto możliwe do przenoszenia
+// miedzy postaciami w skrzyni konta”): one number for the whole account
+// (users.chest_gold), see putGoldInChest. A character
 // below the chest's level (chestLock in characters.js) neither puts
 // anything in nor takes anything out. A character puts and takes also
 // while away, as every change of the bag (DECISIONS.md, "Plecak poza
@@ -26,6 +29,7 @@ import { cardGoodView, chestCards, isCardGood, putCardInChest, takeCardFromChest
 import { content } from './content.js';
 import { withoutFavorites } from './favorites.js';
 import { ApiError, json, readJson } from './http.js';
+import { numberText } from './i18n.js';
 import { counted, foreign, takenOff } from './market.js';
 import { SCROLL_COLUMNS, scrollGoods, scrollHeld } from './scroll-goods.js';
 
@@ -92,18 +96,22 @@ function goodsOf(rows, have = new Map()) {
 
 // The chest as the character played sees it: each item with the name of
 // the character that put it in, and whether it comes back to this one as
-// its own; the goods; and where the game has Talia Systemu, the cards of the
+// its own; the goods; the account's gold in it (`gold`: how much, with the
+// quick amounts and the words of its row and sheets, data/camp.json
+// chest.gold); and where the game has Talia Systemu, the cards of the
 // character's collection for "Włóż kartę" (`cards`, chest-cards.js).
 async function chestView(db, player, now) {
   const cards = await chestCards(db, player.row);
-  const [items, goods] = await db.batch([
+  const [items, goods, gold] = await db.batch([
     db
       .prepare('SELECT c.id, c.character_id, c.data, o.name FROM chest_items c LEFT JOIN characters o ON o.id = c.character_id WHERE c.user_id = ? ORDER BY c.id')
       .bind(player.row.user_id),
     db
       .prepare('SELECT kind, good, SUM(count) AS count, SUM(CASE WHEN character_id = ? THEN count ELSE 0 END) AS own FROM chest_goods WHERE user_id = ? GROUP BY kind, good')
       .bind(player.row.id, player.row.user_id),
+    db.prepare('SELECT chest_gold FROM users WHERE id = ?').bind(player.row.user_id),
   ]);
+  const { quick, texts } = content().camp.chest.gold;
   return {
     slots: slots(player, now),
     items: items.results.map((row) => {
@@ -123,6 +131,7 @@ async function chestView(db, player, now) {
       };
     }),
     goods: goodsOf(goods.results, cards?.have),
+    gold: { amount: gold.results[0]?.chest_gold ?? 0, quick, texts },
     ...(cards && { cards: cards.view }),
   };
 }
@@ -208,8 +217,8 @@ export async function takeFromChest(context) {
 }
 
 // The goods a request names, { kind, id, count }: a kind the chest takes, a
-// good of it the data knows (gold is none: it stays with its character) and
-// a whole number of pieces.
+// good of it the data knows (gold is none: it has requests of its own,
+// putGoldInChest) and a whole number of pieces.
 function askedGoods(body) {
   const { kind, id, count } = body;
   if (!CHEST_GOODS.includes(kind)) throw new ApiError(400, 'invalid_kind', 'Takich towarów Skrzynia Konta nie przyjmuje.');
@@ -332,6 +341,68 @@ export async function takeGoodsFromChest(context) {
     ),
     db.prepare(`UPDATE characters SET ${scroll ?? column} = ${gain.sql}, foreign_stacks = ${others.sql}, version = version + 1 WHERE id = ?`).bind(...gain.binds, ...others.binds, row.id),
   ], changed);
+  return answer(context, session);
+}
+
+// --- Gold ------------------------------------------------------------------
+//
+// The account's gold in the chest (DECISIONS.md, "Złoto w Skrzyni Konta
+// (19.11.2026)"; the author: „dorób złoto możliwe do przenoszenia miedzy
+// postaciami w skrzyni konta”): one number (users.chest_gold, migration
+// 0161). A character puts in any amount of its gold up to what it has, and
+// takes out any amount up to what the chest has, with no fee and no limit,
+// as the goods. The padlock holds it as everything in the chest, and like
+// the goods it moves also while away. Gold has no Encyklopedia, so whose it
+// was is not kept: any character of the account takes any of it, also the
+// gold of a character removed since. Each move is one batch that moves the
+// character's gold and the chest's together, valid only while the character
+// is as read and the chest holds the gold the page showed (`seen`): a second
+// tap, or a page that missed a move made meanwhile (another tab, another
+// character of the account), gets the chest's "changed meanwhile", and the
+// page reads the chest again.
+
+const goldErrors = () => content().camp.chest.gold.texts.errors;
+const withGold = (text, gold) => text.replaceAll('{gold}', numberText(gold));
+
+// POST /api/chest/gold/put { amount, seen }: gold of the character's into
+// the chest.
+export const putGoldInChest = (context) => moveGold(context, true);
+
+// POST /api/chest/gold/take { amount, seen }: gold out of the chest to the
+// character.
+export const takeGoldFromChest = (context) => moveGold(context, false);
+
+async function moveGold(context, put) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const { amount, seen } = await readJson(context.request);
+  const errors = goldErrors();
+  if (!Number.isSafeInteger(amount) || amount < 1) throw new ApiError(400, 'invalid_amount', errors.invalid);
+  const db = context.env.DB;
+  const there = (await db.prepare('SELECT chest_gold FROM users WHERE id = ?').bind(session.userId).first())?.chest_gold ?? 0;
+  // The chest is no longer as the page showed it.
+  if (seen !== there) throw changed();
+  if (put && amount > row.gold) throw new ApiError(409, 'not_enough', row.gold > 0 ? withGold(errors.notEnough, row.gold) : errors.none);
+  if (!put && amount > there) throw new ApiError(409, 'not_in_chest', there > 0 ? withGold(errors.notInChest, there) : errors.empty);
+  // What leaves the character (a take: less than nothing) comes to the chest.
+  const moved = put ? amount : -amount;
+  await atomically(
+    db,
+    [
+      assertion(db, '(SELECT version FROM characters WHERE id = ?) = ? AND (SELECT gold FROM characters WHERE id = ?) >= ? AND (SELECT chest_gold FROM users WHERE id = ?) = ?', [
+        row.id,
+        row.version,
+        row.id,
+        Math.max(0, moved),
+        session.userId,
+        there,
+      ]),
+      db.prepare('UPDATE characters SET gold = gold - ?, version = version + 1 WHERE id = ?').bind(moved, row.id),
+      db.prepare('UPDATE users SET chest_gold = chest_gold + ? WHERE id = ?').bind(moved, session.userId),
+    ],
+    changed,
+  );
   return answer(context, session);
 }
 

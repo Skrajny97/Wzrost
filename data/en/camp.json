@@ -45,5 +45,33 @@
       "owned": "You already have the System Collector.",
       "noGold": "Not enough gold for the System Collector."
     }
+  },
+  "chest": {
+    "gold": {
+      "texts": {
+        "title": "Gold in the chest",
+        "own": "Your gold: {gold}",
+        "inChest": "In the Account Chest: {gold}",
+        "put": "Put in",
+        "take": "Take out",
+        "putTitle": "Put gold in",
+        "takeTitle": "Take gold out",
+        "putText": "Gold you put in waits in the Account Chest for every character on this account.",
+        "takeText": "Gold you take out goes to the character you are playing now.",
+        "amount": "How much gold",
+        "all": "All",
+        "putButton": "Put in {gold} gold",
+        "takeButton": "Take out {gold} gold",
+        "putDone": "{gold} gold in the Account Chest.",
+        "takeDone": "{gold} gold with the character.",
+        "errors": {
+          "invalid": "Enter a whole number of gold, from 1 up.",
+          "none": "You have no gold.",
+          "notEnough": "You have only {gold} gold.",
+          "empty": "There is no gold in the Account Chest.",
+          "notInChest": "There is only {gold} gold in the Account Chest."
+        }
+      }
+    }
   }
 }

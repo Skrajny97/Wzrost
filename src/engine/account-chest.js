@@ -15,8 +15,9 @@
 // The kinds of goods, in the order the chest shows them (as the screen
 // shows the character's own: the camp's resources, potions, herbs,
 // materials, the Stół rozbiórki's parts, minerals, the scrolls, the
-// Spiżarnia's fish, crops and dishes, and Talia Systemu's cards). Gold
-// stays with the character. The parts since 0.3.90 (a player, poz. 48,
+// Spiżarnia's fish, crops and dishes, and Talia Systemu's cards). Gold is
+// none of them: since 19.11.2026 the chest holds it as one number for the
+// whole account (src/server/chest.js). The parts since 0.3.90 (a player, poz. 48,
 // through the author, 16.11.2026: „będzie możliwość wkładnia do skrzyni
 // konta części potrzebnych do wytwarzania ekwipunku?”; the author: „Raczej
 // tak”). The cards (CARD_GOODS) since the mock-ups of 19.11.2026.
