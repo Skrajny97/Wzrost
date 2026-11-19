@@ -5,7 +5,8 @@
 // long name, a build under way in the camp, orders on the Stół rozbiórki's queue and a guild of its own
 // with a long name, and a companion hired in the Kwatery, with its five
 // places for items and amulets of big numbers in the bag for "Załóż z
-// plecaka" (one worn by the companion), on an account with the longest login. On each screen,
+// plecaka" (one worn by the companion), on an account with the longest login. The bag
+// is checked in "Zaznacz do sprzedaży" too, with an item marked. On each screen,
 // on the tabs TABS opens and in the sheets SHEETS opens over a screen (the
 // Ustawienia and "Zgłoś błąd", with a screenshot picked too), it looks for a
 // page wider than the screen (a sheet that scrolls sideways), text out of
@@ -68,6 +69,7 @@ const SCREENS = [
   '#/profesje',
   '#/oboz',
   '#/oboz/craft-table',
+  '#/oboz/anvil',
   '#/oboz/quarters',
   '#/osada',
   '#/osada/board',
@@ -117,6 +119,7 @@ const TRANSLATED = new Set([
   '#/profesje',
   '#/oboz',
   '#/oboz/craft-table',
+  '#/oboz/anvil',
   '#/oboz/quarters',
   '#/osada',
   '#/osada/board',
@@ -185,6 +188,14 @@ const TABS = {
   // "Poziom Profesji" with its list of professions (975 B), then the guilds.
   '#/spolecznosc/ranking': [said('Poziom Profesji'), GUILDS_TAB],
   '#/gildia': [MEMBERS.views.donations, MEMBERS.periods.all],
+  // The Kowadło's "Sortuj:" at its fifth order, Ulepszenie, and the bag in
+  // "Zaznacz do sprzedaży" with an item marked and the bar at the bottom
+  // (19.11.2026; their words in data/buildings.json).
+  '#/oboz/anvil': [{ name: 'Sortuj › Ulepszenie', tap: '.anvil-items .bag-sort .segmented-option:nth-child(5)' }],
+  '#/postac': [
+    { name: 'Zaznacz do sprzedaży', tap: '[data-guide="bag-pick"]' },
+    { name: 'Zaznacz do sprzedaży › zaznaczony', tap: '.bag--sale .salvage-pick:not(.salvage-pick--favorite)' },
+  ],
 };
 // Sheets opened over a screen after its tabs, each from the one before (a
 // tap on `tap`, or a picture given to the file field `pick`), looked at

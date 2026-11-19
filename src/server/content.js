@@ -321,6 +321,9 @@ const dangerView = (game) => (danger) => {
 export function publicContent() {
   const game = content();
   const data = dataIn(language());
+  // The words of the bag's "Zaznacz do sprzedaży" (the Skup złomu's `pick`),
+  // without the server's refusals.
+  const { errors: _refusals, ...scrapperPick } = game.buildings.find((building) => building.effect.kind === 'sellPrice')?.pick ?? {};
   return {
     stats: game.stats.map(({ id, name, combat }) => ({ id, name, effect: combat })),
     classes: game.classes.map(({ id, name, short, role, start, description, position, autoPoints }) => ({
@@ -424,6 +427,11 @@ export function publicContent() {
     unlocks: game.unlocks.map(({ id, name, level, classLevel, condition, locked }) => ({ id, name, level, classLevel, condition, locked })),
     resources: game.resources.map(({ id, name, genitive, description, system }) => ({ id, name, genitive, description, system: Boolean(system) })),
     buildings: game.buildings.filter(buildingOn).map(({ id, name, description, maxLevel }) => ({ id, name, description, maxLevel })),
+    // The Kowadło's "Sortuj:" over its items (camp.js) and the scrapper's
+    // "Zaznacz do sprzedaży" in the bag (character.js), from
+    // data/buildings.json (a player's idea the author wants, 19.11.2026).
+    anvilSort: game.buildings.find((building) => building.effect.kind === 'upgradeCap')?.sort ?? null,
+    scrapperPick,
     // The places of the Osada's board, for their shortcuts under the Osada
     // in the computer's menu (src/client/layout.js).
     settlementPlaces: (game.settlement?.places ?? []).filter(placeOn).map(({ id, name, soon }) => ({ id, name, ...(soon && { soon: true }) })),

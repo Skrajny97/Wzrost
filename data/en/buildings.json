@@ -45,12 +45,46 @@
     "shop": {
       "title": "Scrap dealer's counter",
       "text": "The scrap dealer sells parts for crafting for gold. The higher the Scrapyard's level, the rarer his parts and the less he charges for them."
+    },
+    "pick": {
+      "button": "Mark for sale",
+      "hint": "Choose the items for the scrap dealer to buy. Choosing one again unmarks it.",
+      "none": "Nothing marked yet.",
+      "marked": "Marked: {count}",
+      "sell": "Sell for {gold} gold",
+      "sellNone": "Sell",
+      "cancel": "Cancel",
+      "favorites": "The scrap dealer does not buy items with a star: they are your favourites. You can take the star off in the item's card.",
+      "confirm": {
+        "title": "Sell the marked items?",
+        "text": "The scrap dealer will buy: {names}. He will pay {gold} gold.",
+        "upgraded": "Upgraded among them: {count}. The price includes part of the gold spent on upgrades.",
+        "gems": "Their gems will fall out and go back to your minerals: {gems}.",
+        "yes": "Sell"
+      },
+      "done": "The scrap dealer bought the marked items ({count}) for {gold} gold.",
+      "errors": {
+        "none": "Mark the items to sell.",
+        "gone": "One of the marked items is no longer in your bag.",
+        "worn": "The scrap dealer does not buy equipped items. Unequip them first."
+      }
     }
   },
   "anvil": {
     "name": "Anvil",
     "description": "An anvil on a stump, and in time a smithy with a hearth. Each level lets you upgrade items one step higher, up to +10.",
-    "effect": { "text": "Item upgrades up to +{value}" }
+    "effect": { "text": "Item upgrades up to +{value}" },
+    "sort": {
+      "label": "Order of items",
+      "orders": {
+        "worn": { "name": "Equipped" },
+        "new": { "name": "Newest" },
+        "rarity": { "name": "Rarity" },
+        "level": { "name": "Level" },
+        "upgrade": { "name": "Upgrade" },
+        "slot": { "name": "Type" }
+      }
+    }
   },
   "craft-table": {
     "name": "Salvage Table",
