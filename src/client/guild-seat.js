@@ -3,7 +3,9 @@
 // budynki i ludzie muszą móc wpłacać na co chcą, lider i zastępca może tylko
 // oznaczyć co jest preferowane"): the Gildia page's "Siedziba" tab. On top a
 // card with the bonuses the guild's buildings give every member now and the
-// rules under "Jak to działa?"; under it a card for each building, folded
+// rules under "Jak to działa?"; under it the Kącina's card, with its weekly
+// vote of the guild's patron (guild-shrine.js, 1201 A), and a card for each
+// building, folded
 // under its picture, name, level and what it gives now, with "Preferowany"
 // once the leader or a deputy marked it. Unfolded: what it gives now and at
 // its next level, that level's cost with what is collected for it, the
@@ -20,6 +22,7 @@ import { goldArt, guildSeatSprite, resourceArt } from './art.js';
 import { fill, h, icon } from './dom.js';
 import { formatNumber } from './format.js';
 import { askDonations } from './guild-ranking.js';
+import { guildShrineCard } from './guild-shrine.js';
 import { t } from './i18n.js';
 import { call } from './state.js';
 import { confirmAction, foldPart, howItWorks, toast, withButton } from './ui.js';
@@ -243,8 +246,12 @@ export function mountGuildSeat(container) {
     );
   }
 
+  // The Kącina (guild-shrine.js, 1201 A) first among the buildings: it asks
+  // for its own part, once for the tab.
+  let shrine = null;
   function render() {
-    fill(body, headCard(), view.guild && view.buildings.map(buildingCard));
+    if (view.guild && !shrine) shrine = guildShrineCard();
+    fill(body, headCard(), view.guild && [shrine, view.buildings.map(buildingCard)]);
   }
 
   call('GET', '/api/guild/seat')

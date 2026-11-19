@@ -142,7 +142,7 @@ import { stableView } from './stable.js';
 import { tanneryView } from './tannery.js';
 import { giftWords, residentGiftsView } from './resident-gifts.js';
 import { say } from '../engine/text.js';
-import { weekFactorNow, weekFor } from './weeks.js';
+import { weekFactorFor, weekFor } from './weeks.js';
 
 // A JSON path for a key with a hyphen or a colon ("iron-ore", "wolf-pelt:rare").
 const jsonPath = (key) => `$."${key}"`;
@@ -767,7 +767,7 @@ function companionsView(player, stored, now) {
       return {
         // The Kowadło's price with the Bractwo Kowali (590) and the guild's
         // Kuźnia Gildii (616 A), as for the character's own items.
-        ...companionView(companion, { upgradeCap, materials, anvilDiscount: withSeatDiscount(brotherhoodPerk('anvilDiscount', stored.reputation, content()), seatBonuses(player.guildSeat, content()).anvil), anvilWeek: weekFactorNow(now, 'upgrade') }),
+        ...companionView(companion, { upgradeCap, materials, anvilDiscount: withSeatDiscount(brotherhoodPerk('anvilDiscount', stored.reputation, content()), seatBonuses(player.guildSeat, content()).anvil), anvilWeek: weekFactorFor(player.row, now, 'upgrade') }),
         // Wounded until the character rests to full HP, and when that is.
         ...(companion.wounded && rested !== now && { wounded: true, healsAt: rested }),
         gift: giftOf(companion, row, now),

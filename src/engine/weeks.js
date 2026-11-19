@@ -48,7 +48,7 @@ import { decimalText } from './text.js';
 const DAY = 86400000;
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
-/** @typedef {{ kind: string, value: number, stat?: string, omen?: string }} WeekEffect An effect of a week (data/weeks.json), or of an Andrzejki omen kept with it (`omen`, andrzejki.js). */
+/** @typedef {{ kind: string, value: number, stat?: string, omen?: string, patron?: string }} WeekEffect An effect of a week (data/weeks.json), or of an Andrzejki omen kept with it (`omen`, andrzejki.js), or of the guild's patron from the Kącina (`patron`, guild-shrine.js, 1201 A). */
 /** @typedef {{ number?: number, effects?: WeekEffect[] } & Record<string, any>} Week A week as an activity keeps it ({ number, effects }). */
 /** @typedef {{ timeZone: string, startsAt: number, endsAt: number, isoYear: number, iso: number }} Span */
 
@@ -267,15 +267,18 @@ const CHANGED = {
  * @returns {string | null}
  */
 export function weekLine(hunt, content) {
-  const changed = effectsOf(hunt.week).filter((effect) => !effect.omen && CHANGED[effect.kind]?.(hunt));
+  const changed = effectsOf(hunt.week).filter((effect) => !effect.omen && !effect.patron && CHANGED[effect.kind]?.(hunt));
   const name = content.weeksByNumber?.[hunt.week?.number]?.name;
   if (changed.length === 0 || !name) return null;
   return content.weeks.texts.report.replace('{week}', name).replace('{effects}', weekEffectsText(changed, content, true));
 }
 
-// The System's lines of a report on the Andrzejki omens the hunt kept (the
-// effects of `hunt.week` marked with their omen, andrzejki.js, 1083 C): one
-// for each omen that changed the result ("Wróżba Smok: +10% XP z walk.").
+// The System's lines of a report on the character's own week effects the
+// hunt kept: one for each Andrzejki omen (the effects of `hunt.week` marked
+// with their omen, andrzejki.js, 1083 C) that changed the result ("Wróżba
+// Smok: +10% XP z walk."), and then one for the guild's patron from the
+// Kącina (marked with its god, 1201 A), where its effects did ("Opieka
+// Peruna: +5% XP z walk.", patronLines).
 /**
  * @param {Record<string, any>} hunt
  * @param {Content} content
@@ -283,11 +286,31 @@ export function weekLine(hunt, content) {
  */
 export function omenLines(hunt, content) {
   const rules = content.winter?.andrzejki;
-  if (!rules) return [];
+  if (!rules) return patronLines(hunt, content);
   const changed = effectsOf(hunt.week).filter((effect) => effect.omen && CHANGED[effect.kind]?.(hunt));
-  return [...new Set(changed.map((effect) => effect.omen))].map((id) => {
+  const omens = [...new Set(changed.map((effect) => effect.omen))].map((id) => {
     const name = rules.omens.find((/** @type {{ id: string }} */ omen) => omen.id === id)?.name ?? id;
     return rules.texts.report.replace('{omen}', name).replace('{effects}', weekEffectsText(changed.filter((effect) => effect.omen === id), content, true));
+  });
+  return [...omens, ...patronLines(hunt, content)];
+}
+
+// The System's line of a report on the guild's patron the hunt kept (the
+// effects of `hunt.week` marked with their god, data/guilds.json shrine,
+// 1201 A), where they changed the result, with the god's name in the
+// genitive ("Opieka Peruna: +5% XP z walk."); none otherwise.
+/**
+ * @param {Record<string, any>} hunt
+ * @param {Content} content
+ * @returns {string[]}
+ */
+export function patronLines(hunt, content) {
+  const shrine = content.guilds?.shrine;
+  if (!shrine) return [];
+  const changed = effectsOf(hunt.week).filter((effect) => effect.patron && CHANGED[effect.kind]?.(hunt));
+  return [...new Set(changed.map((effect) => effect.patron))].map((id) => {
+    const god = shrine.gods.find((/** @type {{ id: string }} */ one) => one.id === id);
+    return shrine.texts.report.replace('{god}', god?.genitive ?? id).replace('{effects}', weekEffectsText(changed.filter((effect) => effect.patron === id), content, true));
   });
 }
 

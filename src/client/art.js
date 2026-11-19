@@ -514,7 +514,7 @@ export const SPRITES = {
   // scrolls, the Zwój ochronny and the Zwój utrwalenia (598 C).
   icons: {
     size: 32,
-    ids: ['gold', 'time-points', 'encyclopedia', 'ward-scroll', 'steady-scroll', 'oblivion-scroll', 'fir-branch'],
+    ids: ['gold', 'time-points', 'encyclopedia', 'ward-scroll', 'steady-scroll', 'oblivion-scroll', 'fir-branch', 'guild-help'],
   },
   // The professions' squares on the Profesje tab, 48×48.
   professions: {
@@ -571,7 +571,14 @@ export const SPRITES = {
   guild: {
     width: 128,
     height: 96,
-    ids: ['guild-banner', 'guild-treasury', 'guild-forge', 'scouts-house'],
+    ids: ['guild-banner', 'guild-treasury', 'guild-forge', 'scouts-house', 'guild-shrine'],
+  },
+  // The gods of the Kącina (data/guilds.json, shrine.gods; 1201 A), busts
+  // as the residents', drawn in PixelLab.
+  'guild/gods': {
+    width: 96,
+    height: 128,
+    ids: ['perun', 'weles', 'swarog', 'mokosz'],
   },
   // The events at the end of an exploration (data/events.json): the people
   // met, 96×128, and the scenes behind them, 192×96, filled in as they are
@@ -885,6 +892,8 @@ export const encyclopediaArt = (size) => iconArt('encyclopedia', size, 'book');
 export const scrollArt = (id, size) => iconArt(id, size, 'scroll');
 // The fir branch of Szczodre Gody's winter quest (1044.7 D).
 export const firBranchArt = (size) => iconArt('fir-branch', size, 'leaf');
+// The help of Pomoc przy budowach i pracy (1196 A and B), 32×32.
+export const guildHelpArt = (size = 32) => iconArt('guild-help', size, 'hands');
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
 // The pictures of the Labirynt Systemu and the Rdzeń (art/labyrinth/, 850–866,
 // accepted in 868 and 869): its rooms (room-<type>), its Artefakty
@@ -953,6 +962,11 @@ export const settlementTorchArt = (lit = true) => {
 };
 // A picture of the Salon Gier's games, by its name, or null while there is none.
 export const salonArt = (id) => (available.salon.has(id) ? `/art/salon/${id}.png` : available['salon-small'].has(id) ? `/art/salon-small/${id}.png` : null);
+// A god of the Kącina (1201 A) as a bust, or null while it has none.
+export const godBust = (godId) =>
+  available['guild/gods'].has(godId)
+    ? h('img', { src: `/art/guild/gods/${godId}.png`, alt: '', width: 96, height: 128, class: 'sprite god-bust', decoding: 'async', draggable: 'false' })
+    : null;
 export const residentBust = (residentId) =>
   available.residents.has(residentId)
     ? h('img', { src: `/art/residents/${residentId}.png`, alt: '', width: 96, height: 128, class: 'sprite resident-bust', decoding: 'async', draggable: 'false' })

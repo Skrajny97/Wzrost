@@ -46,6 +46,8 @@ import { getGuildExchange, postGuildOffer, takeGuildOffer, withdrawGuildOffer } 
 import { getGuildChest, putGoodsInGuildChest, putInGuildChest, takeFromGuildChest } from './guild-chest.js';
 import { getGuildWar, getGuildWarBattle, getGuildWarMatchBattles, settleWars, testGuildWar } from './guild-wars.js';
 import { donateToGuildSeat, getGuildSeat, preferGuildSeat } from './guild-seat.js';
+import { getGuildShrine, voteAtShrine } from './guild-shrine.js';
+import { getGuildHelp, helpGuildAll, helpGuildMember } from './guild-help.js';
 import { changePassword, forgotPassword, resetPassword } from './password.js';
 import { guildRanking } from './guild-fame.js';
 import { getGuildRanking } from './guild-members.js';
@@ -468,6 +470,13 @@ const routes = [
   ['GET', '/api/guild/seat', getGuildSeat],
   ['POST', '/api/guild/seat/donate', donateToGuildSeat],
   ['POST', '/api/guild/seat/prefer', preferGuildSeat],
+  // The Kącina in the Siedziba (guild-shrine.js, 1201 A).
+  ['GET', '/api/guild/shrine', getGuildShrine],
+  ['POST', '/api/guild/shrine/vote', voteAtShrine],
+  // Pomoc przy budowach i przy pracy on the Gildia tab (guild-help.js, 1196 A and B).
+  ['GET', '/api/guild/help', getGuildHelp],
+  ['POST', '/api/guild/help', helpGuildMember],
+  ['POST', '/api/guild/help/all', helpGuildAll],
   // The Wyprawa Gildii (guild-expedition.js, 621 A).
   ['GET', '/api/guild/expedition', getGuildExpedition],
   ['POST', '/api/guild/expedition/attack', attackGuildGuardian],

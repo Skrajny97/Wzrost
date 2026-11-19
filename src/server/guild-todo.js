@@ -10,7 +10,10 @@
 // itself or serves as a mercenary);
 // a gift to its request not thanked for yet; an item waiting for it in the
 // Skrzynia Gildii (guild-chest.js; the author, 10.11.2026: an item left
-// for one member lights its dot). The page asks
+// for one member lights its dot); a build or a work of another member the
+// character may help (guild-help.js, 1196 A and B), on the Gildia tab; its
+// vote of the week in the Kącina not cast yet (guild-shrine.js, 1201 A), on
+// the Siedziba's. The page asks
 // for it about once a minute (src/client/chat-news.js) and after its
 // actions in the guild. The cards of Talia Systemu left by the Próby
 // finished since the last look (903, trialCards in guild-trials.js) come
@@ -19,22 +22,30 @@
 import { beastView } from './guild-beast.js';
 import { chestWaiting } from './guild-chest.js';
 import { expeditionView } from './guild-expedition.js';
+import { helpTodo } from './guild-help.js';
 import { requestsView } from './guild-requests.js';
+import { shrineTodo } from './guild-shrine.js';
 import { guildPlayer, trialCards, trialsView } from './guild-trials.js';
 import { json } from './http.js';
 
 // GET /api/guild/todo: {todo: {trials, beast, expedition, requests,
-// chest}, cards?}, or {todo: null} outside a guild.
+// chest, guild, seat}, cards?}, or {todo: null} outside a guild; each key
+// the id of the tab whose dot it lights.
 export async function getGuildTodo(context) {
   const { player, guild, db } = await guildPlayer(context);
   if (!guild) return json({ todo: null });
   const cards = await trialCards(db, player, context.now);
-  const [trials, beast, expedition, requests, chest] = await Promise.all([
+  const [trials, beast, expedition, requests, chest, help, vote] = await Promise.all([
     trialsView(db, player, guild, context.now),
     beastView(db, player.row, context.now, player.activity),
     expeditionView(db, player.row, guild, context.now, player.activity),
     requestsView(db, player, guild, context.now),
     chestWaiting(db, player.row, guild.id),
+    // A build or a work of another member to help (1196 A and B), on the
+    // Gildia tab, and this week's vote in the Kącina not cast yet (1201 A),
+    // on the Siedziba's, which counts the week's patron first.
+    helpTodo(db, player, guild, context.now),
+    shrineTodo(db, player.row, guild.id, context.now),
   ]);
   const ready = (bar) => Boolean(bar?.thresholds.some((threshold) => threshold.ready));
   // An attack it may make now: none while it offers itself or serves as a
@@ -48,6 +59,8 @@ export async function getGuildTodo(context) {
       expedition: Boolean(expedition.expedition?.barred && expedition.contributor && canAttack(expedition.attacks)) || expedition.chests.length > 0,
       requests: Boolean(requests.mine?.gifts.some((gift) => !gift.thanked)),
       chest,
+      guild: help,
+      seat: vote,
     },
     ...(cards.length > 0 && { cards }),
   });

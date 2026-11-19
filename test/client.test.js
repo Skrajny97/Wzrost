@@ -214,8 +214,10 @@ test('every sprite on the list has its file at its size, and every class has its
       ...data('settlement').places.flatMap((place) => place.backdrop ?? []),
       ...(data('settlement').wanted?.backdrop ? [data('settlement').wanted.backdrop] : []),
     ],
-    // The Siedziba Gildii's buildings (616 A, 623).
-    guild: data('guilds').seat.buildings.map((building) => building.id),
+    // The Siedziba Gildii's buildings (616 A, 623) and its Kącina (1201 A).
+    guild: [...data('guilds').seat.buildings.map((building) => building.id), data('guilds').shrine.id],
+    // The Kącina's gods (1201 A).
+    'guild/gods': data('guilds').shrine.gods.map((god) => god.id),
     events: data('events').list.map((event) => event.art),
     'event-scenes': data('events').list.map((event) => event.scene),
     // The camp's resources in place of their line icons.
@@ -223,7 +225,8 @@ test('every sprite on the list has its file at its size, and every class has its
     // Gold, Punkty Czasu, the Encyclopedia's corner and the Kowadło's two
     // scrolls (the Warsztat's Zwój ochronny and Zwój utrwalenia).
     // The Kowadło's scrolls and the Zwój Niepamięci (989).
-    icons: ['gold', 'time-points', 'encyclopedia', data('professions').workshop.scroll.id, data('professions').workshop.steadyScroll.id, 'oblivion-scroll', 'fir-branch'],
+    // The help of Pomoc przy budowach i pracy (1196).
+    icons: ['gold', 'time-points', 'encyclopedia', data('professions').workshop.scroll.id, data('professions').workshop.steadyScroll.id, 'oblivion-scroll', 'fir-branch', 'guild-help'],
     // The Stajnia's mounts and the looks a mount can wear (each with its
     // trot, and the Sklep Systemu's mount looks), and the character riding
     // them, one for each walk.

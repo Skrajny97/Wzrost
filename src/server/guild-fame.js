@@ -4,8 +4,10 @@
 // weekly quests), in points: the share of its Bestia's bar it took and the
 // beast's fall, the guardians of its Wyprawa that fell (the author: "638
 // A"), the Próby its members finished, the pieces they gave in the
-// Prośby and the offers they took in the Wymiana, each member's part up to
-// its cap first, then summed for the guild, and the guild war it won that
+// Prośby, the offers they took in the Wymiana and the helps they gave with
+// each other's builds and work (guild-help.js, 1196 A and B), each
+// member's part up to its cap first, then summed for the guild, and the
+// guild war it won that
 // week (guild-wars.js, 799 A). The Ranking's "Gildie" tab
 // shows the guilds by this week's Sława or by all of it ("Od początku": the
 // weeks frozen and this one). The first time a new week asks for the
@@ -50,11 +52,13 @@ function weeksAround(now) {
 // fell, and `last` instead for the last of them (638 A: 20 each and 50 for
 // the seventh, up to 170 a week). Wojna: the Sława of its place in that
 // week's league of the wars (fame.war.places), once its Sunday's matches
-// are fought and its places written (guild-wars.js).
+// are fought and its places written (guild-wars.js). Pomoc: perHelp for
+// each help with a member's build or work that week (guild-help.js, 1196 A
+// and B), each helper's up to its cap.
 function weekFame(week) {
-  const { beast, expedition, trials, requests, exchange } = rules();
+  const { beast, expedition, trials, requests, exchange, help } = rules();
   return {
-    sql: `SELECT g.id AS guild_id, COALESCE(b.points, 0) + COALESCE(t.points, 0) + COALESCE(r.points, 0) + COALESCE(x.points, 0) + COALESCE(w.points, 0) + COALESCE(v.points, 0) AS points
+    sql: `SELECT g.id AS guild_id, COALESCE(b.points, 0) + COALESCE(t.points, 0) + COALESCE(r.points, 0) + COALESCE(x.points, 0) + COALESCE(w.points, 0) + COALESCE(v.points, 0) + COALESCE(p.points, 0) AS points
       FROM guilds g
       LEFT JOIN (SELECT guild_id, SUM(CAST(MAX(0, max_hp - hp) * 100 / max_hp AS INTEGER) * ? + CASE WHEN fallen_at IS NULL THEN 0 ELSE ? END) AS points
                  FROM guild_beasts WHERE week = ? AND max_hp > 0 GROUP BY guild_id) b ON b.guild_id = g.id
@@ -70,7 +74,10 @@ function weekFame(week) {
       LEFT JOIN (SELECT e.guild_id, SUM(CASE WHEN s.stage = ? THEN ? ELSE ? END) AS points
                  FROM guild_expedition_guardians s JOIN guild_expeditions e ON e.id = s.expedition_id
                  WHERE e.week = ? AND s.fallen_at IS NOT NULL GROUP BY e.guild_id) w ON w.guild_id = g.id
-      LEFT JOIN (SELECT guild_id, fame AS points FROM guild_league_places WHERE week = ?) v ON v.guild_id = g.id`,
+      LEFT JOIN (SELECT guild_id, fame AS points FROM guild_league_places WHERE week = ?) v ON v.guild_id = g.id
+      LEFT JOIN (SELECT guild_id, SUM(MIN(n, ?)) * ? AS points
+                 FROM (SELECT guild_id, COUNT(*) AS n FROM guild_helps WHERE week = ? GROUP BY guild_id, helper_id)
+                 GROUP BY guild_id) p ON p.guild_id = g.id`,
     binds: [
       beast.perPercent,
       beast.fell,
@@ -90,6 +97,9 @@ function weekFame(week) {
       expedition.last,
       expedition.perGuardian,
       week.key,
+      week.key,
+      help.cap,
+      help.perHelp,
       week.key,
     ],
   };

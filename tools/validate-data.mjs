@@ -819,6 +819,7 @@ function checkReferences(data) {
   errors.push(...checkLabyrinth(data, { stats, elements, rarities }));
   errors.push(...checkCards(data, { rarities }));
   errors.push(...checkGuildSeat(data, { resources }));
+  errors.push(...checkGuildShrine(data, { stats }));
   errors.push(...checkGuildExpedition(data));
   errors.push(...checkGuildWar(data));
   errors.push(...checkWeeks(data, { stats }));
@@ -911,6 +912,37 @@ function checkGuildSeat(data, { resources }) {
     if (!existsSync(new URL(`art/guild/${building.id}.png`, CLIENT_DIR))) errors.push(`guilds.json: budynek Siedziby ${building.id} nie ma obrazka src/client/art/guild/${building.id}.png`);
   }
   if (!data.guilds.tabs.some((tab) => tab.id === 'seat')) errors.push('guilds.json: strona Gildii nie ma zakładki Siedziby (seat)');
+  return errors;
+}
+
+// The Kącina (guilds.json, shrine; 1201 A): its picture beside the
+// Siedziba's buildings, an id of its own among them; gods of their own ids,
+// each with its bust (src/client/art/guild/gods), effects of a known stat,
+// and a domain of the Próby's kinds big enough for its share of the board
+// (each kind in every size, no pair twice) with as many pairs left outside
+// it for the rest; no more gods offered a week than there are.
+function checkGuildShrine(data, { stats }) {
+  const errors = [];
+  const { shrine, seat, trials } = data.guilds;
+  if (seat.buildings.some((building) => building.id === shrine.id)) errors.push(`guilds.json: Kącina ma id budynku Siedziby "${shrine.id}"`);
+  if (!existsSync(new URL(`art/guild/${shrine.id}.png`, CLIENT_DIR))) errors.push(`guilds.json: Kącina nie ma obrazka src/client/art/guild/${shrine.id}.png`);
+  uniqueIds(errors, 'guilds (shrine)', shrine.gods);
+  if (shrine.offer > shrine.gods.length) errors.push(`guilds.json: Kącina daje do wyboru ${shrine.offer} bogów, a ma ich ${shrine.gods.length}`);
+  const kinds = new Set(trials.kinds.map((kind) => kind.id));
+  const half = Math.round(trials.board * shrine.domainShare);
+  for (const god of shrine.gods) {
+    if (!existsSync(new URL(`art/guild/gods/${god.id}.png`, CLIENT_DIR))) errors.push(`guilds.json: bóg ${god.id} nie ma obrazka src/client/art/guild/gods/${god.id}.png`);
+    for (const effect of god.effects) {
+      if (effect.kind === 'stat' && !stats.has(effect.stat)) errors.push(`guilds.json: bóg ${god.id} wzmacnia nieznaną statystykę "${effect.stat}"`);
+      if (effect.kind !== 'stat' && effect.stat) errors.push(`guilds.json: bóg ${god.id}: statystyka tylko przy rodzaju stat`);
+      if (!data.weeks.kinds[effect.kind]) errors.push(`guilds.json: bóg ${god.id} daje premię rodzaju "${effect.kind}", którego nie ma w weeks.json`);
+    }
+    for (const kind of god.domain) if (!kinds.has(kind)) errors.push(`guilds.json: dziedzina boga ${god.id} ma nieznany rodzaj próby "${kind}"`);
+    const inside = god.domain.filter((kind) => kinds.has(kind)).length * trials.sizes.length;
+    const outside = (kinds.size - god.domain.filter((kind) => kinds.has(kind)).length) * trials.sizes.length;
+    if (inside < half) errors.push(`guilds.json: dziedzina boga ${god.id} daje ${inside} prób, a tablica potrzebuje z niej ${half}`);
+    if (outside < trials.board - half) errors.push(`guilds.json: poza dziedziną boga ${god.id} jest ${outside} prób, a tablica potrzebuje ${trials.board - half}`);
+  }
   return errors;
 }
 
