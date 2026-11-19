@@ -3847,6 +3847,11 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.51 (19.11.2026): zwrot Kapy po imieniu postaci
+
+1. **Autor wskazał postać („to jest ten łucznik”):** Mistrz Łuku na 217. poziomie (klasa 262). Na czacie przed nawiasem stoi nazwa konta, a w nawiasie imię postaci, więc słowo, które w 0.4.50 trafiło do danych jako skrót loginu, jest imieniem postaci. Zwrot z 0.4.50 szukał go wśród loginów i nie zadziałałby, a do tego zakres poziomów 175–199 pochodził ze starszego zrzutu.
+2. **Poprawka.** Zwrot w `data/gift-codes.json` (`returns`) ma teraz skrót imienia postaci (`character`, looseKey), jak przenoszenie nagród z kodów (`moves`). Serwer (`returnGiftItems`) wkłada przedmiot raz do plecaka jedynej postaci o tym imieniu; klasa i poziomy nie są już potrzebne.
+
 ## Wersja 0.4.50 (19.11.2026): pełny plecak sprzedaje najpierw najniższą rzadkość, zwrot przedmiotu boskiego
 
 1. **Zgłoszenie gracza (poz. 181, przez autora).** Przy pełnym plecaku Złomiarz sprzedał przedmiot boski (Gryfia Kapa Kazimierza Stolema, dla Kleryka, poz. 227), choć raport mówił o „najsłabszych przedmiotach”. Przyczyna: zasada z pierwszych dni („Plecak ma 20 miejsc”, punkt 8) sprzedawała najpierw przedmioty, których klasa postaci nie może używać, bez względu na rzadkość, a ta postać jest Łucznikiem.

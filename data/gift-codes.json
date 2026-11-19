@@ -154,9 +154,7 @@
   "returns": [
     {
       "id": "divine-cope-2026-11-19",
-      "login": "bab0b06ff825c848fe81efa6c314c97148bcfa6928141c12f11f8663ff9b1c7d",
-      "classId": "archer",
-      "levels": [175, 199],
+      "character": "bab0b06ff825c848fe81efa6c314c97148bcfa6928141c12f11f8663ff9b1c7d",
       "item": {
         "base": "casimir-cope",
         "slot": "chest",

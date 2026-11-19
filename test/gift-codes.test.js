@@ -246,7 +246,7 @@ describe('a code\'s rewards moved by the scheduled run', () => {
 
   // The author, 19.11.2026: „Tę kapę identyczną zwróć graczowi” (a divine
   // armour of another class the full bag sold before every lesser item).
-  test('an item given back goes once into the bag of the one character of its class on the account', async () => {
+  test('an item given back goes once into the bag of the character with the name', async () => {
     const back = content.giftReturns.find((one) => one.id === 'divine-cope-2026-11-19');
     assert.equal(itemName(back.item, content), 'Gryfia Kapa Kazimierza Stolema');
     assert.equal(sellPrice(back.item, content), 14528);
@@ -256,27 +256,24 @@ describe('a code\'s rewards moved by the scheduled run', () => {
     const archer = await database.prepare("SELECT id FROM characters WHERE name = 'Łuczniczka Zwrotna'").first();
     const bag = async () => (await database.prepare('SELECT data FROM items WHERE character_id = ? AND slot IS NULL').bind(archer.id).all()).results.map((row) => JSON.parse(row.data));
     const before = (await bag()).length;
-    // The data's own return names no account here and gives nothing.
+    // The data's own return names no character here and gives nothing.
     assert.equal(await returnGiftItems({ DB: database }, minute), 0);
-    const returns = [{ ...back, id: 'test-return', login: await looseKey('Zwrot-Konto'), levels: undefined }];
+    // The key is loose: small letters, letters and digits only.
+    const returns = [{ ...back, id: 'test-return', character: await looseKey('łuczniczka_ZWROTNA') }];
     // Only every ten minutes.
     assert.equal(await returnGiftItems({ DB: database }, minute + 5 * 60000, returns), 0);
     assert.equal(await returnGiftItems({ DB: database }, minute, returns), 1);
     const after = await bag();
     assert.equal(after.length, before + 1);
     assert.deepEqual(after.at(-1), back.item);
+    const done = await database.prepare("SELECT character_id, item_id FROM gift_returns_done WHERE id = 'test-return'").first();
+    assert.equal(done.character_id, archer.id);
+    assert.ok(done.item_id > 0);
     // Once only.
     assert.equal(await returnGiftItems({ DB: database }, minute + 10 * 60000, returns), 0);
     assert.equal((await bag()).length, before + 1);
-    // Two characters of the class on the account: the author did not say which, so it waits…
-    assert.equal((await call('POST', '/api/character', { cookie, body: { name: 'Drugi Łucznik', classId: 'archer', appearance: 'male' } })).status, 201);
-    assert.equal(await returnGiftItems({ DB: database }, minute + 20 * 60000, [{ ...returns[0], levels: undefined, id: 'test-return-two' }]), 0);
-    // …unless the levels tell them apart.
-    await database.prepare("UPDATE characters SET level = 181 WHERE name = 'Łuczniczka Zwrotna'").run();
-    await database.prepare("UPDATE characters SET level = 217 WHERE name = 'Drugi Łucznik'").run();
-    assert.deepEqual(back.levels, [175, 199]);
-    assert.equal(await returnGiftItems({ DB: database }, minute + 30 * 60000, [{ ...returns[0], levels: back.levels, id: 'test-return-three' }]), 1);
-    assert.equal((await bag()).length, before + 2);
+    // A name nobody has: it waits.
+    assert.equal(await returnGiftItems({ DB: database }, minute + 20 * 60000, [{ ...back, id: 'test-return-none', character: await looseKey('Nikt Taki') }]), 0);
   });
 
   // The code review (0.2.71): a code for one character is keyed by its
