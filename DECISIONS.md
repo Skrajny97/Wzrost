@@ -3847,6 +3847,10 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.66 (19.11.2026): dziewięć nowych aktywności Gildii (1195–1203)
+
+Wchodzą przyjęte propozycje 1195 A, 1196 A i B, 1197, 1198 A, 1199 A, 1200 A, 1201 A, 1202 A i 1203 z makietami 1209–1216 i grafikami 1208, według sekcji niżej. Migracje 0162–0167 (0161 czeka na złoto w Skrzyni Konta). Pełne testy przeszły.
+
 ## Przyjęte 19.11.2026: makiety aktywności Gildii (1209–1216)
 
 Autor przyjął na stronie ocen 19.11.2026, bez uwag, makiety 1209–1216 dziewięciu aktywności Gildii z sekcji poniżej: Kronika Gildii (1195 A), Pomoc przy budowach i pracy (1196 A i B), Klasa dnia (1197), Bohaterowie tygodnia (1198 A), Róg zbiórki (1199 A), Krainy pod sztandarem (1200 A), Kącina (1201 A), Znaki Gildii i Kram (1202 A) oraz Podcięcie i cios (1203). Róg zbiórki zostaje bez dodatkowego HP Bestii i strażników, jak na makiecie 1216: HP rośnie tylko za Klasę dnia i Podcięcie (×1,56). Wszystko wchodzi do gry razem, z najbliższą wersją. Przy łączeniu trzech gałęzi:
