@@ -1,0 +1,14 @@
+{
+  "id": "system-orb",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small glowing orb of pale cyan System light with a bright white core, a soft round halo and a few tiny sparks around it, perfectly round, bold readable shape, single game sprite, the orb alone, no background",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02330184361076355
+  },
+  "images": 1
+}
