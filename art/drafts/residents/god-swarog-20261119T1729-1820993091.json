@@ -1,0 +1,14 @@
+{
+  "id": "god-swarog",
+  "tool": "pixellab generate-image-v2",
+  "description": "Swarog, the old Slavic smith god of the heavenly fire, a powerful dignified elder with long white hair and a long white beard, a gold circlet with a sun sign on his brow, glowing amber eyes, a scorched leather smith's apron over a dark red tunic, a heavy smith's hammer held at his chest, small glowing orange embers and sparks floating around him, warm orange firelight on his face, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic pagan mythology, dignified, muted natural colours",
+  "style": "src/client/art/residents/hermit.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08085277138815986
+  },
+  "images": 4
+}
