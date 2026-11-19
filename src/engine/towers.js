@@ -242,9 +242,13 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
   // players or companions face creatures three times as strong as the Wieża
   // Solo's (the author, 7.11.2026: "drużynowych chyba nie ruszałeś bo dalej
   // są banalnie łatwe").
+  // From level 250 the players of the Drużyna make the creatures stronger
+  // still, beyond that, as on a trip (partyStrength in combatant.js; the
+  // author, 19.11.2026: „szczególnie z drużyną”): three players more than
+  // a player with two companions.
   const [damage, hp] = content.towers.strength;
   const strength = [damage * allies.length, hp * allies.length];
-  const enemies = encounterCombatants(plan.encounter, content, { growth: alone ? content.balance.monsters.soloGrowth : 1, strength });
+  const enemies = encounterCombatants(plan.encounter, content, { growth: alone ? content.balance.monsters.soloGrowth : 1, strength, players: 1 + partners.length });
   const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait });
   const won = fight.won === true;
   const hpAfter = Math.max(0, fight.units.find((/** @type {{ id: string }} */ unit) => unit.id === player.id)?.hp ?? 0);

@@ -67,8 +67,18 @@ const thirdOnly = (() => {
 // character from level 250 also earns half the gold, materials and chests
 // (balance.rewards.lateRewards): fewer chests among the finds change the
 // draws of the fights after them, so the simulations keep the rewards they
-// were tuned with too.
-const tuned = (data) => ({ ...data, balance: { ...data.balance, progression: { ...data.balance.progression, lateLevels: undefined }, rewards: { ...data.balance.rewards, lateRewards: undefined } } });
+// were tuned with too. Since 19.11.2026 the creatures from level 250 are
+// twice as strong (balance.monsters.mythGame): the forms are compared
+// against the creatures they were tuned with as well.
+const tuned = (data) => ({
+  ...data,
+  balance: {
+    ...data.balance,
+    progression: { ...data.balance.progression, lateLevels: undefined },
+    rewards: { ...data.balance.rewards, lateRewards: undefined },
+    monsters: { ...data.balance.monsters, mythGame: { ...data.balance.monsters.mythGame, damage: 0, hp: 0 } },
+  },
+});
 
 // A Pogromca Hord at a class level, its skills at their top by default.
 const hordeSlayer = (classLevel, skills = { 'smashing-blow': 145, slaughter: 145 }, extra = {}) => ({

@@ -1160,6 +1160,10 @@
     "0.4.56": {
       "title": "Version 0.4.56",
       "body": "- Party: before you set out alone as a party member, or switch characters (as the leader too), the game asks: “You are in a party. Leave the party?”. So a party no longer sets out without someone who got busy elsewhere."
+    },
+    "0.4.57": {
+      "title": "Version 0.4.57",
+      "body": "- From level 250 the creatures are three times as strong: they hit harder and have more HP. In a party each extra player makes them 25% stronger still. This applies to explorations, the Towers, the Portals, the Labyrinth and the Wanted posters."
     }
   }
 }
