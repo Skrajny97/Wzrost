@@ -14,7 +14,7 @@
 // The Wojna tab shows the week live: where the guild leads and where it
 // chases, and by how much (GET /api/guild/lands).
 
-import { landOfArea, landRules, landShares, landStandings, landWinners, questPeriod } from '../engine/index.js';
+import { countedForm, landOfArea, landRules, landShares, landStandings, landWinners, questPeriod } from '../engine/index.js';
 import { raced } from './atomic.js';
 import { content } from './content.js';
 import { guildPlayer } from './guild-trials.js';
@@ -144,7 +144,8 @@ export async function bannerBonus(db, characterId, placeId, now) {
 function landTexts() {
   const { fame, bonus } = landRules(content());
   const { how, howFame: _fame, howMembers: _members, ...rest } = words();
-  const vars = { fame, bonus: Math.round(bonus * 100) };
+  // "30 punktów" ("30 points"), as the rankings write the Sława.
+  const vars = { fame: `${fame} ${countedForm(fame, content().guilds.fame.texts.pointForms)}`, bonus: Math.round(bonus * 100) };
   return { ...rest, how: how.map((line) => filled(line, vars)), bonusPercent: Math.round(bonus * 100) };
 }
 

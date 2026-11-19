@@ -736,7 +736,7 @@
         "Every exploration minute counts for the land of the exploration once the member claims the report. On a party trip each member counts their own minutes.",
         "On Monday at midnight the land goes to the guild with the most minutes. In a tie the older guild wins, and where nobody explored there is no banner.",
         "The banner stands for the whole week, and every player sees the guild's tag on the land's card.",
-        "For each land the guild gets {fame} Fame, and its members share it by their minutes in that land.",
+        "For each land the guild gets {fame} of Fame, and its members share it by their minutes in that land.",
         "Members of the guild with the banner get +{bonus}% gold and materials from creatures in that land. From class level 250 the bonus counts from the halved rewards."
       ],
       "howFame": "Lands under the banner: {landFame} for each land where the guild raises its banner, in the week it stands.",
