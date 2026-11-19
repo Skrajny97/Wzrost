@@ -932,13 +932,13 @@
         "seconds": 1.5
       },
       "skill-heaven-arrow": {
-        "text": "an epic holy arrow from the heavens: a powerful deep bow twang, a bright divine ringing tone and a huge thunderous impact with a crystal echo, cinematic, punchy, clean, no hiss, no whistle, no music",
+        "text": "a blazing holy arrow shot down from the sky: a sharp rushing whoosh as it streaks down, then a huge thunderous impact with a burst of holy fire and a deep rumbling boom, loud, epic and powerful, cinematic, clean, no guitar, no strings, no twang, no plucked sound, no music",
         "seconds": 1.6,
         "influence": 0.7
       },
       "skill-star-rain": {
-        "text": "a meteor shower of falling stars: one deep cinematic boom after another as stars crash into the ground, each impact with a short bright crystal sparkle on top, epic and powerful, clean, no hiss, no whistle, no music",
-        "seconds": 2.0,
+        "text": "a meteor shower: several fiery meteors streak down from the sky one after another with roaring whooshes and crash into the ground in heavy explosive booms, crackling fire and flying rocks, loud, huge, epic and cinematic, no music",
+        "seconds": 2.5,
         "influence": 0.7
       },
       "skill-perun-storm": {
@@ -1000,7 +1000,7 @@
         "influence": 0.7
       },
       "skill-pillar-of-light": {
-        "text": "a pillar of holy light slamming down from the sky: a deep powerful rising energy hum, a massive radiant impact with a cinematic bass boom and bright ringing glass, epic, clean, no whistle, no hiss, no music",
+        "text": "a colossal beam of holy light crashing down from the sky: a loud rising roar that ends in a massive explosive boom shaking the ground, then a bright crackling burst of energy, very loud, powerful and epic, cinematic, no music",
         "seconds": 1.7,
         "influence": 0.7
       },
@@ -1023,8 +1023,8 @@
         "seconds": 1.8
       },
       "skill-navia-legion": {
-        "text": "an army of undead knights rising from the underworld: the ground cracking open with a deep rumble, heavy armoured footsteps marching in unison, swords drawn with metallic rings and a deep commanding war horn, dark and epic, no music",
-        "seconds": 2.0,
+        "text": "the ground cracks open with a deep rumble and an army of skeleton warriors rises from the grave: rattling bones, clanking rusty armour and a chorus of ghostly moans, loud and clear, dark and epic, no music",
+        "seconds": 2.5,
         "influence": 0.7
       },
       "skill-navia-mist": {
