@@ -1240,6 +1240,10 @@
     "0.4.76": {
       "title": "Version 0.4.76",
       "body": "- Strength or Intellect that your weapon does not use now gives something too. Strength: +1 HP per point and +1% resources from explorations for every 50 points. Intellect: +1 resistance to every element for every 2 points and +1% profession XP for every 50 points. The resource and XP bonuses go up to +10%. See what they give your character in Character › Stats › “Advanced stats”."
+    },
+    "0.4.77": {
+      "title": "Version 0.4.77",
+      "body": "- The headman's wanted posters now come from places one land below the highest one open to you, or two lands below once that place goes beyond level 100, and a poster still earns you as much gold as before. Today's posters have been drawn anew; a poster already in your hand stays.\n- Stats › “Spend by hand”: type how many points to add next to each stat, so after a reset you can spend even thousands of points in moments."
     }
   }
 }

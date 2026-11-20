@@ -1555,6 +1555,11 @@
       "id": "0.4.76",
       "title": "Wersja 0.4.76",
       "body": "- Siła albo Intelekt, których Twoja broń nie używa, teraz też coś dają. Siła: +1 HP za każdy punkt i +1% zasobów z wypraw za każde 50 punktów. Intelekt: +1 do odporności na każdy żywioł za każde 2 punkty i +1% doświadczenia profesji za każde 50 punktów. Premie do zasobów i doświadczenia sięgają najwyżej +10%. Ile to daje Twojej postaci, zobaczysz w Postać › Statystyki › „Parametry dodatkowe”."
+    },
+    {
+      "id": "0.4.77",
+      "title": "Wersja 0.4.77",
+      "body": "- Listy gończe sołtysa są teraz z miejsc o krainę niżej niż najwyższe, które masz otwarte, a gdy najwyższe sięga ponad 100. poziom, o dwie krainy niżej. Za list zgarniesz tyle samo złota co dotąd. Dzisiejsze listy wylosowały się od nowa, a list, który masz w ręku, zostaje.\n- Statystyki › „Rozdaj ręcznie”: przy każdej statystyce wpiszesz liczbę punktów do dodania, więc po wyzerowaniu rozdasz nawet tysiące punktów w kilka chwil."
     }
   ]
 }

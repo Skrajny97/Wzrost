@@ -3847,6 +3847,18 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.77 (20.11.2026): poszukiwani niżej, wpisywanie punktów w „Rozdaj ręcznie”
+
+Według dwóch sekcji niżej, bez makiet (autor: „Wdrażaj od razu, szkoda Twoich zasobów na makiety”).
+
+## Wpisywanie punktów w „Rozdaj ręcznie” (20.11.2026)
+
+Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce do wpisania liczby ile chce się dodać bo przy 3k punktów bardzo długo to zajmuje” (20.11.2026). Suwaki są w „Rozdaj ręcznie” od 8.11.2026, ale przy tysiącach punktów suwak na telefonie skacze o kilkanaście punktów na piksel.
+
+1. Przy każdej statystyce w „Rozdaj ręcznie” jest pole na liczbę punktów do dodania, obok jej wartości. Wpisana liczba od razu ustawia suwak i wolne punkty. Więcej, niż zostało, gra przytnie do tego, co zostało, a gdy pole straci fokus, pokaże przyciętą liczbę.
+2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
+3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
+
 ## Poszukiwani o krainę albo dwie niżej (20.11.2026)
 
 Autor (20.11.2026): „poszukiwani z listów gończych z tablicy zlecen z racji wyższego poziomu trudności muszą pójść krainę lub dwie niżej”. Gra jest od niedawna trudniejsza: od 0.4.57 stwory biją trzy razy mocniej od 250. poziomu klasy, od 0.4.64 rosną z poziomem klasy od 100., a od 0.4.67 najnowsze miejsce postaci znów jest groźne (ok. 20% omdleń na wyprawie 4 h od 30. poziomu). Listy były dotąd z najwyższego otwartego miejsca i dwóch pod nim, a poziom klasy wyprzedza poziom postaci, więc poszukiwany stał zwykle w miejscach powyżej poziomu postaci.
