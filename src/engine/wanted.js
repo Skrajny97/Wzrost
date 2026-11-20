@@ -3,11 +3,11 @@
 // "Poszukiwani"; the author's 619 B: „nazwane, silniejsze odmiany stworów z
 // tych miejsc” and „wyjęci spod prawa”). Every day the sołtys posts wanted
 // posters for each character: one for the named variant of the creatures of
-// each of its highest open places (its highest and the two below it), and
-// one for an outlaw in one of them. A poster taken brings its target into
-// the explorations of its place (simulateHunt): as strong as the place's
-// elite, by the rules' strength more. Pure: the day and the seed are the
-// server's.
+// each of three of its open places (since 20.11.2026 two lands below its
+// highest), and one for an outlaw in one of them. A poster taken brings its
+// target into the explorations of its place (simulateHunt): as strong as
+// the place's elite, by the rules' strength more. Pure: the day and the
+// seed are the server's.
 
 import { monsterCombatant } from './combatant.js';
 import { stackKey } from './crafting.js';
@@ -65,16 +65,17 @@ export function wantedGold(area, content, classLevel = 0) {
 }
 
 // A poster: its target, at the level of the place's elite, and its bounty
-// for a character of `classLevel` (wantedGold).
+// for a character of `classLevel` (wantedGold), that of the place `paid`.
 /**
  * @param {string} day
  * @param {Area} area
  * @param {Record<string, any>} target a creature's variant (`area`, `monster`) or an outlaw (a monster)
  * @param {number} classLevel
  * @param {Content} content
+ * @param {Area} [paid]
  * @returns {Poster}
  */
-function poster(day, area, target, classLevel, content) {
+function poster(day, area, target, classLevel, content, paid = area) {
   const outlaw = !target.area;
   const monsterId = outlaw ? target.id : target.monster;
   return {
@@ -85,19 +86,39 @@ function poster(day, area, target, classLevel, content) {
     name: target.name,
     female: target.female === true,
     level: area.maxLevel + content.balance.hunt.eliteLevelBonus,
-    gold: wantedGold(area, content, classLevel),
+    gold: wantedGold(paid, content, classLevel),
   };
 }
 
+// The places of the day's posters among those open to a character
+// (`open`, the lowest first): the rules' `places` of them, the highest of
+// them the rules' `lower` places below its highest, a land having five
+// places (20.11.2026, the author: „poszukiwani z
+// listów gończych z tablicy zlecen z racji wyższego poziomu trudności muszą
+// pójść krainę lub dwie niżej”; from 12.11.2026 to then its highest and the
+// two below it, „maksymalnie 2 stopnie niżej niż pozwala level”), and with
+// too few places open below them, its lowest, as many as it has. `shift`:
+// how many places lower than the highest ones they are.
+/**
+ * @param {Area[]} open
+ * @param {Content} content
+ * @returns {{ places: Area[], shift: number }}
+ */
+export function wantedPlaces(open, content) {
+  const rules = rulesOf(content);
+  const end = Math.max(open.length - rules.lower, Math.min(rules.places, open.length));
+  return { places: open.slice(Math.max(0, end - rules.places), end), shift: open.length - end };
+}
+
 // The posters of `day` for a character of `classLevel` (`seed`: the
-// character's own; `early`: the place the Sala prób opened for it, if any):
-// from the rules' `places` highest places open to it, since 12.11.2026 its
-// highest and the two below it whatever their land (the author: „Te listy
-// gończe, poszukiwani powinni sięgać maksymalnie 2 stopnie niżej niż
-// pozwala level”, after a player at level 43 got posters of the first land,
-// 400 gold each; from 10.11.2026 they left out its newest land), `creatures`
-// of them drawn, each with its variant, the highest first, then an outlaw
-// drawn in one of them.
+// character's own; `early`: the place the Sala prób opened for it, if any,
+// the highest it has): from the places of wantedPlaces, `creatures` of them
+// drawn, each with its variant, the highest first, then an outlaw drawn in
+// one of them. Each pays the bounty of the place `shift` places higher, as
+// the posters of the highest places did before 20.11.2026: the posters
+// went lower for the harder creatures, not for less gold (from 10.11.2026
+// they left out its newest land, then, after a player at level 43 got
+// posters of the first land, 400 gold each, came from its highest places).
 /**
  * @param {number} classLevel
  * @param {string} day
@@ -111,8 +132,10 @@ export function wantedPosters(classLevel, day, seed, content, early = null) {
   if (!rules) return [];
   /** @type {Area[]} */
   const open = content.areas.filter((/** @type {Area} */ area) => areaOpenFor(area, classLevel, early, content));
-  const places = open.slice(-rules.places);
+  const { places, shift } = wantedPlaces(open, content);
   if (places.length === 0) return [];
+  /** @param {Area} area */
+  const paid = (area) => open[Math.min(open.indexOf(area) + shift, open.length - 1)];
   const rng = createRng(`${seed}:${day}:wanted`);
   const order = [...places];
   for (let i = order.length - 1; i > 0; i--) {
@@ -124,9 +147,10 @@ export function wantedPosters(classLevel, day, seed, content, early = null) {
     .map((area) => /** @type {[Area, Record<string, any> | undefined]} */ ([area, rules.variants.find((/** @type {{ area: string }} */ variant) => variant.area === area.id)]))
     .filter(([, variant]) => variant)
     .sort(([a], [b]) => b.minLevel - a.minLevel)
-    .map(([area, variant]) => poster(day, area, /** @type {Record<string, any>} */ (variant), classLevel, content));
+    .map(([area, variant]) => poster(day, area, /** @type {Record<string, any>} */ (variant), classLevel, content, paid(area)));
   const outlaw = content.monstersById[rng.pick(rules.outlaws)];
-  return [...creatures, poster(day, rng.pick(places), outlaw, classLevel, content)];
+  const hideout = rng.pick(places);
+  return [...creatures, poster(day, hideout, outlaw, classLevel, content, paid(hideout))];
 }
 
 // The wanted target a Drużyna's trip seeks (src/server/parties.js), since

@@ -1,73 +1,112 @@
-// The wanted posters' places (src/engine/wanted.js, wantedPosters;
-// src/server/wanted.js; 12.11.2026, the author: „Te listy gończe,
-// poszukiwani powinni sięgać maksymalnie 2 stopnie niżej niż pozwala
-// level”, after a player at level 43 got posters of the first land, 400
-// gold each): the day's posters come from the character's highest open
-// place and the two below it, whatever their land, with the Sala prób's
-// place among them, so the bounties grow with the character. A day drawn
-// before, without the newest land (10.11.2026 to 12.11.2026), is drawn
-// anew from its first look („Albo generuj nowych poszukiwanych”), with the
-// poster in hand kept among the day's.
+// The wanted posters' places (src/engine/wanted.js, wantedPlaces and
+// wantedPosters; src/server/wanted.js). Since 20.11.2026 two lands below
+// the character's highest open place (the author: „poszukiwani z listów
+// gończych z tablicy zlecen z racji wyższego poziomu trudności muszą pójść
+// krainę lub dwie niżej”; two by the measurement in DECISIONS.md), with the
+// Sala prób's place counted as its highest; with too few places open below
+// it, its lowest. Each poster pays the bounty of the place as many places
+// higher, so the bounties are those of its highest places, as from
+// 12.11.2026 („maksymalnie 2 stopnie niżej niż pozwala level”, after a
+// player at level 43 got posters of the first land, 400 gold each). A day
+// drawn before is drawn anew from its first look („Albo generuj nowych
+// poszukiwanych”), with the poster in hand kept as it was taken.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { areaOpenFor, questPeriod, wantedPosters } from '../src/engine/index.js';
+import { areaOpenFor, questPeriod, wantedGold, wantedPlaces, wantedPosters } from '../src/engine/index.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
 const rules = content.settlement.wanted;
-const openTo = (classLevel, early = null) => content.areas.filter((area) => areaOpenFor(area, classLevel, early, content)).map((area) => area.id);
+const open = (classLevel, early = null) => content.areas.filter((area) => areaOpenFor(area, classLevel, early, content));
+const openTo = (classLevel, early = null) => open(classLevel, early).map((area) => area.id);
 // The places of a day's posters, whatever the draw.
-const placesOf = (classLevel, early = null) => new Set(['a', 'b', 'c', 'd', 'e'].flatMap((seed) => wantedPosters(classLevel, '2026-11-12', seed, content, early).map((poster) => poster.areaId)));
+const placesOf = (classLevel, early = null) => new Set(['a', 'b', 'c', 'd', 'e'].flatMap((seed) => wantedPosters(classLevel, '2026-11-20', seed, content, early).map((poster) => poster.areaId)));
 const sorted = (ids) => [...ids].sort();
+// The bounties of the posters before 20.11.2026: those of the three highest
+// open places, the highest first.
+const before = (classLevel, early = null) => open(classLevel, early).slice(-rules.places).map((area) => wantedGold(area, content, classLevel)).reverse();
 
-describe('the wanted posters come from the highest open place and the two below it', () => {
-  test('the rules: three places, a creature\'s poster for each', () => {
+describe('the wanted posters come from places two lands below the highest open one', () => {
+  test('the rules: three places, ten places (two lands of five) below the highest, a creature\'s poster for each', () => {
     assert.equal(rules.places, 3);
+    assert.equal(rules.lower, 10);
     assert.equal(rules.creatures, rules.places);
+    assert.equal(content.areas.filter((area) => area.regionId === content.areas[0].regionId).length, 5);
   });
 
-  test('class level 43, as the player\'s: the Pajęczy Parów, the Rysia Grań and the Wilcze Kręgi, 1900 to 2500 gold', () => {
-    assert.deepEqual(openTo(43).slice(-3), ['spider-gully', 'lynx-ridge', 'wolf-circles']);
+  test('class level 100: from the Wilcze Kręgi to the Trzcinowisko, with the bounties of the Tlące się Torfy to the Czarny Ols', () => {
+    const ids = openTo(100);
+    assert.deepEqual(ids.slice(-rules.places), ['smoldering-peat', 'old-diggings', 'black-alder-carr']);
+    assert.deepEqual(ids.slice(-13, -10), ['wolf-circles', 'glade-heart', 'reed-beds']);
     for (const seed of ['a', 'b', 'c', 'd', 'e']) {
-      const posters = wantedPosters(43, '2026-11-12', seed, content);
+      const posters = wantedPosters(100, '2026-11-20', seed, content);
       const creatures = posters.filter((poster) => poster.kind === 'creature');
-      // One for each of the three places, the highest first, and an outlaw
-      // in one of them.
-      assert.deepEqual(creatures.map((poster) => poster.areaId), ['wolf-circles', 'lynx-ridge', 'spider-gully']);
-      assert.deepEqual(creatures.map((poster) => poster.gold), [2500, 2200, 1900]);
-      const outlaws = posters.filter((poster) => poster.kind === 'outlaw');
-      assert.equal(outlaws.length, 1);
-      assert.ok(['spider-gully', 'lynx-ridge', 'wolf-circles'].includes(outlaws[0].areaId));
-      // None of the first land, none below 1900 gold.
-      assert.ok(posters.every((poster) => content.areasById[poster.areaId].regionId === 'stone-glade' && poster.gold >= 1900), JSON.stringify(posters));
+      assert.deepEqual(creatures.map((poster) => poster.areaId), ['reed-beds', 'glade-heart', 'wolf-circles']);
+      // The targets of their own places, at their elites' level.
+      assert.deepEqual(creatures.map((poster) => poster.level), [56, 51, 46]);
+      // The gold of the three highest, as before.
+      assert.deepEqual(creatures.map((poster) => poster.gold), [6100, 5800, 5500]);
+      assert.deepEqual(creatures.map((poster) => poster.gold), before(100));
     }
   });
 
-  test('the newest land counts: a place just opened is among them, across the lands\' border too', () => {
-    // Class level 25 has just opened the Omszałe Głazy, the second land's
-    // first place.
-    assert.equal(openTo(25).at(-1), 'mossy-boulders');
-    assert.deepEqual(sorted(placesOf(25)), sorted(['viper-heaps', 'boar-thicket', 'mossy-boulders']));
-    // Class level 60: the Zarośnięte Rozlewiska's highest three.
-    assert.deepEqual(sorted(placesOf(60)), sorted(openTo(60).slice(-3)));
-    assert.ok([...placesOf(60)].every((id) => content.areasById[id].regionId === 'backwaters'));
+  test('every class level: the window ten places lower, the same gold as before, the outlaw in one of the places, paid as its place ten higher', () => {
+    for (let classLevel = 1; classLevel <= 400; classLevel += 3) {
+      const all = open(classLevel);
+      const end = Math.max(all.length - rules.lower, Math.min(rules.places, all.length));
+      const window = all.slice(Math.max(0, end - rules.places), end);
+      assert.deepEqual(wantedPlaces(all, content), { places: window, shift: all.length - end });
+      for (const seed of ['a', 'b']) {
+        const posters = wantedPosters(classLevel, '2026-11-20', seed, content);
+        const creatures = posters.filter((poster) => poster.kind === 'creature');
+        assert.deepEqual(sorted(creatures.map((poster) => poster.areaId)), sorted(window.map((area) => area.id)), `class level ${classLevel}`);
+        assert.deepEqual(creatures.map((poster) => poster.gold), before(classLevel), `class level ${classLevel}`);
+        const outlaws = posters.filter((poster) => poster.kind === 'outlaw');
+        assert.equal(outlaws.length, 1);
+        const at = all.findIndex((area) => area.id === outlaws[0].areaId);
+        assert.ok(window.includes(all[at]), `class level ${classLevel}: ${outlaws[0].areaId}`);
+        assert.equal(outlaws[0].gold, wantedGold(all[at + all.length - end], content, classLevel));
+        assert.equal(outlaws[0].level, all[at].maxLevel + content.balance.hunt.eliteLevelBonus);
+      }
+    }
   });
 
-  test('fewer places open: those there are', () => {
+  test('two lands down from 13 places open; with fewer, the lowest three, still with the gold of the highest', () => {
+    // Thirteen places, the highest the Zatopiony Las (61–65): the first land.
+    assert.equal(openTo(60).length, 13);
+    assert.deepEqual(sorted(placesOf(60)), sorted(['windfalls-edge', 'fox-ravines', 'raven-hollows']));
+    // One more place, one place up.
+    assert.equal(openTo(65).length, 14);
+    assert.deepEqual(sorted(placesOf(65)), sorted(['fox-ravines', 'raven-hollows', 'viper-heaps']));
+    // Class level 43, as the player's of 12.11.2026: the lowest three, for
+    // the gold of the Pajęczy Parów, the Rysia Grań and the Wilcze Kręgi.
+    assert.deepEqual(sorted(placesOf(43)), sorted(['windfalls-edge', 'fox-ravines', 'raven-hollows']));
+    const posters = wantedPosters(43, '2026-11-20', 'a', content);
+    assert.deepEqual(posters.filter((poster) => poster.kind === 'creature').map((poster) => poster.gold), [2500, 2200, 1900]);
+    assert.ok(posters.every((poster) => poster.gold >= 1900), JSON.stringify(posters));
+  });
+
+  test('fewer than four places open: those there are, as before', () => {
     assert.deepEqual([...placesOf(1)], ['windfalls-edge']);
     assert.deepEqual(sorted(placesOf(5)), sorted(['windfalls-edge', 'fox-ravines']));
     // Of two places, two creatures' posters and the outlaw.
-    const posters = wantedPosters(5, '2026-11-12', 'a', content);
+    const posters = wantedPosters(5, '2026-11-20', 'a', content);
     assert.equal(posters.filter((poster) => poster.kind === 'creature').length, 2);
     assert.equal(posters.filter((poster) => poster.kind === 'outlaw').length, 1);
+    assert.deepEqual(posters.filter((poster) => poster.kind === 'creature').map((poster) => poster.gold), [400, 100]);
   });
 
-  test('the place the Sala prób opened is the highest of them', () => {
-    const early = content.areas.find((area) => !areaOpenFor(area, 43, null, content));
-    assert.equal(early.id, 'glade-heart');
-    assert.deepEqual(sorted(placesOf(43, early.id)), sorted(['lynx-ridge', 'wolf-circles', 'glade-heart']));
+  test('the place the Sala prób opened counts as the highest open one', () => {
+    const early = content.areas.find((area) => !areaOpenFor(area, 100, null, content));
+    assert.equal(early.id, 'black-tarn');
+    assert.deepEqual(openTo(100, early.id).slice(-13, -10), ['glade-heart', 'reed-beds', 'beaver-dams']);
+    assert.deepEqual(sorted(placesOf(100, early.id)), sorted(['glade-heart', 'reed-beds', 'beaver-dams']));
+    // Paid as the highest three with it, the Sala prób's the best.
+    const posters = wantedPosters(100, '2026-11-20', 'a', content, early.id);
+    assert.deepEqual(posters.filter((poster) => poster.kind === 'creature').map((poster) => poster.gold), before(100, early.id));
+    assert.equal(posters[0].gold, wantedGold(early, content, 100));
   });
 });
 
@@ -79,63 +118,86 @@ describe('the wanted posters\' places through the API', () => {
   const wanted = async () => (await call('GET', '/api/settlement', { cookie })).data.settlement.wanted;
   const characterId = async () => (await (await db()).prepare('SELECT id FROM characters').first()).id;
   const today = () => questPeriod('daily', Date.now(), content).key;
-  // A poster of the newest-land rule (10.11.2026): the Wiatrołomy's.
-  const old = (id, place, monster, gold) => ({ id: `${id}:${place}:${monster}`, kind: 'creature', areaId: place, monsterId: monster, name: 'Stara odmiana', female: false, level: 26, gold });
+  // A poster of the rule before 20.11.2026, of the three highest places.
+  const old = (id, place, monster, gold, level) => ({ id: `${id}:${place}:${monster}`, kind: 'creature', areaId: place, monsterId: monster, name: 'Stara odmiana', female: false, level, gold });
 
   beforeEach(async () => {
     ({ cookie } = await signUp('tropicielka'));
     await call('POST', '/api/character', { cookie, body: { name: 'Tropicielka', classId: 'warrior', appearance: 'female' } });
-    await set('level = 80, class_level = 43, tutorial = NULL');
+    await set('level = 100, class_level = 100, tutorial = NULL');
   });
 
-  test('the day\'s first look draws from the three highest places, and keeps its basis', async () => {
+  test('the day\'s first look draws from the places two lands below, and keeps its basis', async () => {
     const view = await wanted();
     assert.deepEqual(
       view.posters.map((poster) => poster.id),
-      wantedPosters(43, today(), await characterId(), content).map((poster) => poster.id),
+      wantedPosters(100, today(), await characterId(), content).map((poster) => poster.id),
     );
-    assert.ok(view.posters.every((poster) => ['spider-gully', 'lynx-ridge', 'wolf-circles'].includes(poster.areaId)));
-    assert.deepEqual((await stored()).wanted.basis, { classLevel: 43, early: null });
+    assert.ok(view.posters.every((poster) => ['wolf-circles', 'glade-heart', 'reed-beds'].includes(poster.areaId)));
+    assert.deepEqual((await stored()).wanted.basis, { classLevel: 100, early: null });
   });
 
-  test('a day drawn by the newest-land rule is drawn anew from its first look: the poster in hand stays first, those done stay done', async () => {
-    // The first look made at class level 41, before the change, with a
-    // poster of the Wiatrołomy done and another in hand.
+  test('a day drawn by the rule before is drawn anew from its first look: the poster in hand stays first, as taken, and on an exploration; those done stay done', async () => {
+    // The first look made at class level 100, before the change, with a
+    // poster of the Tlące się Torfy done and one of the Czarny Ols in hand.
     const day = today();
-    const done = old(day, 'fox-ravines', 'fox', 400);
-    const taken = { ...old(day, 'boar-thicket', 'boar', 1300), beaten: false };
-    await set('settlement = ?', JSON.stringify({ wanted: { day, basis: { classLevel: 41, early: null, lands: true }, done: [done.id], taken } }));
+    const done = old(day, 'smoldering-peat', 'zmij', 5500, 96);
+    const taken = { ...old(day, 'black-alder-carr', 'pond-turtle', 6100, 106), beaten: false };
+    await set('settlement = ?', JSON.stringify({ wanted: { day, basis: { classLevel: 100, early: null }, done: [done.id], taken } }));
     const view = await wanted();
-    const fresh = wantedPosters(41, day, await characterId(), content);
-    assert.ok(fresh.every((poster) => ['lynx-ridge', 'wolf-circles', 'spider-gully'].includes(poster.areaId)), JSON.stringify(fresh.map((poster) => poster.areaId)));
+    const fresh = wantedPosters(100, day, await characterId(), content);
+    assert.ok(fresh.every((poster) => ['wolf-circles', 'glade-heart', 'reed-beds'].includes(poster.areaId)), JSON.stringify(fresh.map((poster) => poster.areaId)));
     assert.deepEqual(
-      view.posters.map((poster) => [poster.id, poster.state]),
-      [[taken.id, 'taken'], ...fresh.map((poster) => [poster.id, 'open'])],
+      view.posters.map((poster) => [poster.id, poster.state, poster.gold]),
+      [[taken.id, 'taken', 6100], ...fresh.map((poster) => [poster.id, 'open', poster.gold])],
     );
     assert.equal(view.earlier, null);
     assert.equal(view.holding, true);
-    // Another is not taken while it is in hand; given back, it is gone.
+    // Another is not taken while it is in hand.
     assert.equal((await call('POST', '/api/settlement/wanted', { cookie, body: { posterId: fresh[0].id } })).data.error.code, 'holding');
+    // Carried on an exploration of its place, it is not given back.
+    const hunt = await call('POST', '/api/hunts', { cookie, body: { areaId: taken.areaId, minutes: 60 } });
+    assert.equal(hunt.status, 201, JSON.stringify(hunt.data).slice(0, 300));
+    assert.equal((await call('POST', '/api/settlement/wanted/drop', { cookie })).data.error.code, 'carried');
+    assert.deepEqual((await wanted()).posters[0], view.posters[0]);
+    // With the exploration given up, it is; then it is gone from the board.
+    await (await db()).prepare('DELETE FROM activities').run();
     const dropped = await call('POST', '/api/settlement/wanted/drop', { cookie });
     assert.equal(dropped.status, 200, JSON.stringify(dropped.data).slice(0, 300));
     assert.deepEqual(dropped.data.settlement.wanted.posters.map((poster) => poster.id), fresh.map((poster) => poster.id));
     assert.equal((await call('POST', '/api/settlement/wanted', { cookie, body: { posterId: taken.id } })).data.error.code, 'no_poster');
-    // The record keeps the first look's level without the old rule's mark,
-    // and the poster done.
-    assert.deepEqual((await stored()).wanted, { day, basis: { classLevel: 41, early: null }, done: [done.id], taken: null });
+    assert.deepEqual((await stored()).wanted, { day, basis: { classLevel: 100, early: null }, done: [done.id], taken: null });
   });
 
   test('the poster in hand of such a day, its target beaten, pays its own bounty and is done', async () => {
     const day = today();
-    const taken = { ...old(day, 'boar-thicket', 'boar', 1300), beaten: true };
-    await set('settlement = ?', JSON.stringify({ wanted: { day, basis: { classLevel: 43, early: null, lands: true }, done: [], taken } }));
+    const taken = { ...old(day, 'old-diggings', 'giant-rat', 5800, 101), beaten: true };
+    await set('settlement = ?', JSON.stringify({ wanted: { day, basis: { classLevel: 100, early: null }, done: [], taken } }));
     const view = await wanted();
-    assert.deepEqual(view.posters[0], { ...view.posters[0], id: taken.id, state: 'beaten', gold: 1300 });
+    assert.deepEqual(view.posters[0], { ...view.posters[0], id: taken.id, state: 'beaten', gold: 5800 });
     const claimed = await call('POST', '/api/settlement/wanted/claim', { cookie });
     assert.equal(claimed.status, 200, JSON.stringify(claimed.data).slice(0, 300));
-    assert.equal(claimed.data.claimed.gold, 1300);
+    assert.equal(claimed.data.claimed.gold, 5800);
     const after = claimed.data.settlement.wanted;
     assert.ok(after.posters.every((poster) => poster.state === 'open' && poster.id !== taken.id));
     assert.deepEqual((await stored()).wanted.done, [taken.id]);
+  });
+
+  test('a poster in hand the new draw has too shows as taken, with the bounty it was taken with', async () => {
+    // Class level 22, five places: before, the Krucze Wykroty were the
+    // lowest of the three highest, for 700 gold; now the highest of the
+    // lowest three, paid as the Dzicza Głusza two places higher.
+    await set('class_level = 22');
+    const day = today();
+    const taken = { ...old(day, 'raven-hollows', 'crow', 700, 16), beaten: false };
+    await set('settlement = ?', JSON.stringify({ wanted: { day, basis: { classLevel: 22, early: null }, done: [], taken } }));
+    const fresh = wantedPosters(22, day, await characterId(), content);
+    assert.equal(fresh.find((poster) => poster.id === taken.id).gold, 1300);
+    const view = await wanted();
+    assert.deepEqual(view.posters.map((poster) => poster.id), fresh.map((poster) => poster.id));
+    const held = view.posters.find((poster) => poster.id === taken.id);
+    assert.deepEqual([held.state, held.gold], ['taken', 700]);
+    await set('settlement = ?', JSON.stringify({ wanted: { day, basis: { classLevel: 22, early: null }, done: [], taken: { ...taken, beaten: true } } }));
+    assert.equal((await call('POST', '/api/settlement/wanted/claim', { cookie })).data.claimed.gold, 700);
   });
 });

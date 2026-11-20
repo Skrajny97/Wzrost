@@ -25,6 +25,7 @@ import {
   wantedEncounter,
   wantedGold,
   wantedName,
+  wantedPlaces,
   wantedPosters,
   wantedStrength,
   wantedTrophy,
@@ -57,13 +58,14 @@ describe('the wanted posters', () => {
     for (const id of rules.outlaws) assert.ok(content.eventFoesById[id], id);
   });
 
-  test('the day\'s posters: variants of the three highest open places, the highest first, and an outlaw among them', () => {
+  test('the day\'s posters: variants of three open places, the highest first, and an outlaw among them', () => {
     const posters = wantedPosters(47, '2026-11-05', 'postać', content);
     assert.deepEqual(wantedPosters(47, '2026-11-05', 'postać', content), posters);
     assert.notDeepEqual(wantedPosters(47, '2026-11-06', 'postać', content), posters);
-    // Class level 47: its highest open place and the two below it
-    // (12.11.2026, wanted-places.test.js).
-    const open = content.areas.filter((area) => areaUnlocked(area, 47, content)).slice(-rules.places).map((area) => area.id);
+    // Class level 47: two lands below its highest open place, its lowest
+    // three with ten places open (20.11.2026, wanted-places.test.js).
+    const open = wantedPlaces(content.areas.filter((area) => areaUnlocked(area, 47, content)), content).places.map((area) => area.id);
+    assert.deepEqual(open, ['windfalls-edge', 'fox-ravines', 'raven-hollows']);
     const creatures = posters.filter((poster) => poster.kind === 'creature');
     assert.equal(creatures.length, rules.creatures);
     assert.equal(new Set(creatures.map((poster) => poster.areaId)).size, rules.creatures);
@@ -80,10 +82,12 @@ describe('the wanted posters', () => {
     assert.ok(posters.every((poster) => poster.level === content.areasById[poster.areaId].maxLevel + content.balance.hunt.eliteLevelBonus));
     // A new character's posters come from the places it has.
     assert.ok(wantedPosters(1, '2026-11-05', 'nowa', content).every((poster) => areaUnlocked(content.areasById[poster.areaId], 1, content)));
-    // The place the Sala prób opened counts too, the highest of them.
-    const early = content.areas.find((area) => !areaUnlocked(area, 47, content));
-    const places = [...content.areas.filter((area) => areaUnlocked(area, 47, content)).slice(1 - rules.places).map((area) => area.id), early.id];
-    assert.ok(wantedPosters(47, '2026-11-05', 'postać', content, early.id).every((poster) => places.includes(poster.areaId)));
+    // The place the Sala prób opened counts too, the highest of them: at
+    // class level 100 the window goes one place up with it.
+    const early = content.areas.find((area) => !areaUnlocked(area, 100, content));
+    const places = wantedPlaces([...content.areas.filter((area) => areaUnlocked(area, 100, content)), early], content).places.map((area) => area.id);
+    assert.deepEqual(places, ['glade-heart', 'reed-beds', 'beaver-dams']);
+    assert.ok(wantedPosters(100, '2026-11-05', 'postać', content, early.id).every((poster) => places.includes(poster.areaId)));
   });
 
   test('a poster\'s target is named as the data names it now, its own name kept where the data has none', () => {
@@ -413,12 +417,12 @@ describe('the wanted posters through the API', () => {
     assert.equal(kept.day, today());
     assert.deepEqual(kept.basis, { classLevel: 30, early: null });
     const opened = trialTarget(30, null, content).area.id;
-    // Class level 50 and the place the Sala prób opened would hang posters
+    // Class level 100 and the place the Sala prób opened would hang posters
     // of higher places (wanted-places.test.js).
-    await set('trial_hall = ?, class_level = 50', JSON.stringify({ day: today(), early: opened }));
+    await set('trial_hall = ?, class_level = 100', JSON.stringify({ day: today(), early: opened }));
     assert.deepEqual((await wanted()).posters.map((poster) => poster.id), ids);
     // A poster those places would hang is not the day's.
-    const fresh = wantedPosters(50, today(), await characterId(), content, opened).find((poster) => !ids.includes(poster.id));
+    const fresh = wantedPosters(100, today(), await characterId(), content, opened).find((poster) => !ids.includes(poster.id));
     assert.ok(fresh);
     assert.equal((await take(fresh.id)).data.error.code, 'no_poster');
     // The day's four done, none is left that day.
@@ -431,8 +435,8 @@ describe('the wanted posters through the API', () => {
     const stored = JSON.parse((await row()).settlement);
     await set('settlement = ?', JSON.stringify({ ...stored, wanted: { ...stored.wanted, day: '2020-01-01' } }));
     const later = await wanted();
-    assert.deepEqual(later.posters.map((poster) => poster.id), wantedPosters(50, today(), await characterId(), content, opened).map((poster) => poster.id));
-    assert.deepEqual(JSON.parse((await row()).settlement).wanted.basis, { classLevel: 50, early: opened });
+    assert.deepEqual(later.posters.map((poster) => poster.id), wantedPosters(100, today(), await characterId(), content, opened).map((poster) => poster.id));
+    assert.deepEqual(JSON.parse((await row()).settlement).wanted.basis, { classLevel: 100, early: opened });
   });
 
   test('a record kept before 0.1.68, without the day\'s basis, keeps its poster in hand and those done', async () => {

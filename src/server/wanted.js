@@ -29,7 +29,10 @@ const today = (now) => questPeriod('daily', now, content()).key;
 // moment, so a day drawn before 12.11.2026, without the newest land (its
 // basis with `lands`, left out now), has them drawn anew from the same first
 // look (the author: „Albo generuj nowych poszukiwanych albo po prostu
-// poustawiaj ich tez z lepszymi nagrodami w wyzszych lokacjach”).
+// poustawiaj ich tez z lepszymi nagrodami w wyzszych lokacjach”), and so is
+// a day drawn before 20.11.2026, from the highest places, now two lands
+// lower (the author: „muszą pójść krainę lub dwie niżej”). The poster in
+// hand stays as it was taken, its place and bounty too (wantedView).
 //
 // A record of a later day stays the record (laterPeriod in quests.js): a
 // request still of the day before, met by the record the next day's first
@@ -87,13 +90,14 @@ const stateOf = (poster, done, taken) => (done.includes(poster.id) ? 'done' : ta
 // (its bounty waiting) or done, and a poster of an earlier day still in
 // hand; null where the game has no posters. A poster of the day in hand
 // that its posters no longer have, drawn before they were drawn anew
-// (12.11.2026), stays with them, first.
+// (12.11.2026, 20.11.2026), stays with them, first; one they still have
+// shows as it was taken, with the bounty it brings (claimWanted).
 export function wantedView(row, stored, now) {
   const rules = wantedOf(content());
   if (!rules) return null;
   const record = recordOf(row, stored, today(now));
   const { done, taken } = record;
-  const posters = postersOf(row, record).map((poster) => posterView(poster, stateOf(poster, done, taken)));
+  const posters = postersOf(row, record).map((poster) => posterView(taken?.id === poster.id ? taken : poster, stateOf(poster, done, taken)));
   const apart = taken && !posters.some((poster) => poster.id === taken.id) ? posterView(taken, taken.beaten ? 'beaten' : 'taken') : null;
   const ofDay = Boolean(apart) && taken.id.startsWith(`${record.day}:`);
   const { meet: _a, won: _b, trophy: _c, loot: _d, ...texts } = rules.texts;
