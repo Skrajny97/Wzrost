@@ -3,9 +3,11 @@
 // what it is doing, the one played now marked, and "Nowa postać" while the
 // account has room for one more (GET /api/characters). The game comes with
 // the one chosen; the others wait aside, their explorations and works going
-// on meanwhile.
+// on meanwhile. The characters stand in the order their busts have over the
+// Postać tab on this device (character-order.js, 20.11.2026).
 
 import { portraitSprite } from '../art.js';
+import { orderedCharacters } from '../character-order.js';
 import { classArt } from '../class-art.js';
 import { $, fill, h, icon } from '../dom.js';
 import { countOf, timeFormat } from '../format.js';
@@ -62,7 +64,7 @@ export function renderSelect(container, list, { onChoose, onCreate, onLogout }) 
       h('p', { class: 'hero-tagline', text: t('Postacie na koncie: {count} z {max}', { count: characters.length, max }) }),
     ),
     systemPanel(t('Wybierz postać, którą chcesz grać. Pozostałe czekają, a ich wyprawy i prace trwają dalej.')),
-    h('ul', { class: 'select-list' }, characters.map(card)),
+    h('ul', { class: 'select-list' }, orderedCharacters(characters).map(card)),
     h(
       'div',
       { class: 'select-actions' },

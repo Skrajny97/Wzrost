@@ -1216,6 +1216,10 @@
     "0.4.70": {
       "title": "Version 0.4.70",
       "body": "- Temple: Svarog now also gives +5% chance of rarer items from explorations, and Mokosh also +5% materials from creatures, +5% resources from explorations and +5% from the Camp's buildings."
+    },
+    "0.4.71": {
+      "title": "Version 0.4.71",
+      "body": "- Character: you can rearrange the character-switch circles like the chat tabs. Hold a circle and slide it to a new place. Your device remembers the order, and “Choose a character” shows your characters in the same order."
     }
   }
 }

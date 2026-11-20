@@ -76,6 +76,7 @@ import { CLASS_ICONS } from '../icons.js';
 import { GOODS_KINDS, goodsArt, goodsHeading, goodsKindName, ownedCount, ownedGoods } from '../goods.js';
 import { appendMention, matchingPeople, taggedParts, typedMention, withMention } from '../mentions.js';
 import { linkedText } from '../links.js';
+import { slideInRow } from '../slide-row.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, serverNow, state } from '../state.js';
 import { closeSheet, framedName, guildTag, openSheet, pageHeading, toast, withButton } from '../ui.js';
@@ -149,99 +150,11 @@ export function chatTabs() {
 
 // A channel's tab slides into another place among the channels' tabs
 // (1039.3; the author: „niech będzie można je po prostu slideować te
-// zakładki na czacie”): held still for HOLD ms it lifts and follows the
-// finger (or the mouse), the other tabs making room as it passes their
-// middle; let go, it stays there, and `onDrop` gets the channels' new order
-// (`onCancel` when the slide breaks off). A move before the lift is the
-// bar's own scroll, a short tap chooses the tab as before. While a tab
-// slides, the bar is not drawn anew (renderTabs).
-const HOLD = 350;
-function slideTab(element, bar, onDrop, onCancel) {
-  let start = null;
-  let timer = null;
-  let lifted = false;
-  let grip = null;
-  let dropped = false;
-  const others = () => [...bar.querySelectorAll('.chat-tab[data-channel]')].filter((one) => one !== element);
-  const reset = () => {
-    clearTimeout(timer);
-    timer = null;
-    start = null;
-    if (!lifted) return;
-    lifted = false;
-    element.style.transform = '';
-    element.classList.remove('chat-tab--lifted');
-    bar.classList.remove('chat-tabs--sliding');
-  };
-  element.addEventListener('pointerdown', (event) => {
-    if (event.button !== 0) return;
-    start = { x: event.clientX, y: event.clientY, id: event.pointerId };
-    timer = setTimeout(() => {
-      lifted = true;
-      const box = element.getBoundingClientRect();
-      grip = { x: start.x - box.left, y: start.y - box.top };
-      try {
-        element.setPointerCapture(start.id);
-      } catch {
-        // The finger already gone.
-      }
-      element.classList.add('chat-tab--lifted');
-      bar.classList.add('chat-tabs--sliding');
-      navigator.vibrate?.(15);
-    }, HOLD);
-  });
-  element.addEventListener('pointermove', (event) => {
-    if (!start) return;
-    if (!lifted) {
-      if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > 8) reset();
-      return;
-    }
-    event.preventDefault();
-    element.style.transform = '';
-    const under = others().find((one) => {
-      const box = one.getBoundingClientRect();
-      return event.clientX >= box.left && event.clientX <= box.right && event.clientY >= box.top && event.clientY <= box.bottom;
-    });
-    if (under) {
-      const box = under.getBoundingClientRect();
-      bar.insertBefore(element, event.clientX < box.left + box.width / 2 ? under : under.nextSibling);
-    }
-    const here = element.getBoundingClientRect();
-    element.style.transform = `translate(${event.clientX - grip.x - here.left}px, ${event.clientY - grip.y - here.top}px)`;
-  });
-  // Lifted, the finger moves the tab and not the bar.
-  element.addEventListener(
-    'touchmove',
-    (event) => {
-      if (lifted) event.preventDefault();
-    },
-    { passive: false },
-  );
-  element.addEventListener('pointerup', () => {
-    const was = lifted;
-    reset();
-    if (!was) return;
-    dropped = true;
-    onDrop([...bar.querySelectorAll('.chat-tab[data-channel]')].map((one) => one.dataset.channel));
-  });
-  element.addEventListener('pointercancel', () => {
-    const was = lifted;
-    reset();
-    if (was) onCancel();
-  });
-  element.addEventListener('contextmenu', (event) => event.preventDefault());
-  // The release after a slide chooses nothing.
-  element.addEventListener(
-    'click',
-    (event) => {
-      if (!dropped) return;
-      dropped = false;
-      event.preventDefault();
-      event.stopImmediatePropagation();
-    },
-    true,
-  );
-}
+// zakładki na czacie”; slide-row.js): held still a moment it lifts and
+// follows the finger (or the mouse); let go, it stays there, and the
+// channels' new order is kept (keepOrder). While a tab slides, the bar is
+// not drawn anew (renderTabs).
+const CHAT_SLIDE = { items: '.chat-tab[data-channel]', lifted: 'chat-tab--lifted', sliding: 'chat-tabs--sliding', key: 'channel' };
 
 const SECTION_KEY = 'insight-community-section';
 // The part whose tab opens the Gildia's own page (screens/guild.js).
@@ -953,7 +866,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
       tabs,
       channels.map((entry) => {
         const element = tab(entry.name, !talk && entry.id === channel.id, elsewhere(entry) && channelNews(entry.id), () => switchTo(entry, null), mentionNews(entry.id), entry.id);
-        slideTab(element, tabs, keepOrder, renderTabs);
+        slideInRow(element, tabs, CHAT_SLIDE, keepOrder, renderTabs);
         return element;
       }),
       entries.map(privateTab),

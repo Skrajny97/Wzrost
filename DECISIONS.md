@@ -3847,6 +3847,22 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.71 (20.11.2026): kolejność postaci w karcie postaci
+
+Według sekcji niżej. Bez makiet: przeciąganie jak zakładki czatu (1039), na istniejących kółkach.
+
+## Kolejność postaci w karcie postaci (20.11.2026)
+
+Autor: „W karcie postaci daj możliwość tez przenoszenia jak na czacie zakładek tych kółek od zmiany postaci, żeby sobie ustawić jak komu wygodnie” (20.11.2026).
+
+1. **Przesuwanie jak na czacie (1039.3).** Przytrzymane chwilę kółko postaci nad zakładką Postać unosi się na własnej karcie w złotej obwódce (telefon z Androidem lekko zawibruje) i idzie za palcem albo myszą wzdłuż rzędu, a pozostałe kółka robią mu miejsce. Puszczone zostaje w nowym miejscu. Krótkie stuknięcie dalej od razu zmienia postać, puszczenie kółka po przesunięciu postaci nie zmienia, a ruch palcem przed uniesieniem przewija rząd. Rząd, który się nie mieści (pięć postaci na telefonie 360 px), przy brzegu przewija się sam, więc kółko dojdzie na każde miejsce. Gdy ekran rysuje się na nowo, rząd zostaje przewinięty tak, jak był, więc kółko przesunięte na koniec nie znika z widoku.
+2. **Gdzie:** w kółkach nad zakładką Postać i na ekranie „Wybierz postać” (po zalogowaniu na konto z kilkoma postaciami i po „Zmień postać” w Ustawieniach). Innej listy postaci konta gra nie pokazuje: górny pasek nie ma przełącznika postaci.
+3. **Zapis na urządzeniu, jak kolejność czatu.** Kolejność zostaje w przeglądarce (`localStorage`, `insight.characterOrder`: numery postaci), a nie na serwerze. Drugi telefon albo komputer ma swoją kolejność, a okno prywatne albo wyczyszczone dane strony wracają do kolejności gry.
+4. **Nowe na końcu, usunięte znikają.** Postać spoza zapisanej kolejności (nowa) staje na końcu, a kilka nowych w kolejności powstania. Usunięta postać znika z kółek i z „Wybierz postać”, a usunięta na tym urządzeniu od razu znika też z zapisu, więc postać, która kiedyś dostanie jej numer, stanie na końcu. Zapis uszkodzony albo nieaktualny daje kolejność gry: złe wpisy gra pomija, a następne przesunięcie zapisuje kolejność od nowa. Dwa konta na jednym urządzeniu mają każde swoją kolejność: przesunięcie zapisuje postacie zalogowanego konta, a numery postaci drugiego konta zostają w zapisie za nimi.
+5. **Bez nowych słów.** Czat nie ma na ekranie podpowiedzi o przesuwaniu, więc kółka też nie. Graczom powie o tym wpis w „Co nowego?”.
+6. **Jeden mechanizm dla czatu i kółek** (`src/client/slide-row.js`, wcześniej w `screens/community.js`), z poprawkami, które działają też na czacie: przesuwana zakładka nie wychodzi już na chwilę ze strony, tylko pozostałe przesuwają się wokół niej (przy szybkim ruchu myszą gubiła wskaźnik i zostawała uniesiona, a pasek przestawał się odświeżać); unosi się dopiero wtedy, gdy trzyma wskaźnik, a utrata wskaźnika kończy przesuwanie jak puszczenie; drugi palec niczego nie zaczyna; na telefonie pasek zakładek czatu przy brzegu też przewija się sam.
+7. **Pliki:** `src/client/character-order.js`, `src/client/slide-row.js`, `src/client/screens/character.js`, `screens/select.js` i `screens/community.js`, `src/client/app.js` (usunięcie postaci), `src/client/styles.css`; testy w `test/character-order.test.js`.
+
 ## Wersja 0.4.70 (20.11.2026): Swaróg i Mokosz z dodatkowymi premiami
 
 Autor: „Swaróg niech daje dodatkowe premię a nie tylko Kowadło i Mokosz też, bo sie nie opłacają” i „Ad. 1 tak niech bedzie” (20.11.2026). Według sekcji niżej.
