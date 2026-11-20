@@ -252,14 +252,17 @@ function unarmed(level, content) {
 // dla okazjonalnych, średnio dla zaangażowanych" and "mocno" (611), and no
 // stronger creatures for the companions or a party along (612 C: "musi byc
 // motywacja do drużyny/towarzyszy"); from class level 250 a Drużyna's
-// players do make them stronger (partyStrength).
+// players do make them stronger (partyStrength), and in the newest place
+// since 19.11.2026 below it too (newestStrength). `before`: what comes
+// before the first point ([1, 1], or [0, 0] for shares).
 /**
  * @param {number} level
  * @param {number[][]} [curve]
+ * @param {[number, number]} [before]
  * @returns {[number, number]}
  */
-export function huntStrength(level, curve = []) {
-  if (curve.length === 0 || level < curve[0][0]) return [1, 1];
+export function huntStrength(level, curve = [], before = [1, 1]) {
+  if (curve.length === 0 || level < curve[0][0]) return before;
   const next = curve.findIndex(([at]) => at > level);
   if (next === -1) {
     const last = /** @type {number[]} */ (curve.at(-1));
@@ -269,6 +272,39 @@ export function huntStrength(level, curve = []) {
   const [toLevel, toDamage, toHp] = curve[next];
   const share = (level - fromLevel) / (toLevel - fromLevel);
   return [fromDamage + (toDamage - fromDamage) * share, fromHp + (toHp - fromHp) * share];
+}
+
+// The newest place's creatures stronger again on an exploration
+// (balance.monsters.newestPlace), as [damage, HP] multipliers on top of
+// huntCurve. The author, 19.11.2026, on a measurement where from the 100th
+// level on almost nobody fainted there, alone with companions or in a
+// Drużyna: „nie może tak być, chyba że na niskim zagrożeniu i nizszych od
+// aktualnego levelu krainach”, and his choice B (about one 4-hour
+// exploration in five ending in a faint). From the character's level
+// `fromLevel` on (the first levels as they were), in the place that holds
+// it and the higher ones, by `curve`: points [character level, damage, HP]
+// as huntCurve's, at the first and the last level of each place, since
+// neighbouring places' creatures are far apart (one strength by class level
+// left some places almost safe and others far too hard). A Drużyna's
+// players fighting together make them stronger still: each one beyond the
+// first adds `perPlayer`'s shares, points [class level, damage, HP] by the
+// highest class level among them (fightingClassLevel), nothing before the
+// first, as monsters.perPlayer counts. [1, 1] in the lower places.
+/**
+ * @param {Area} area
+ * @param {number} level The character's (on a Drużyna's trip the leader's).
+ * @param {number} classLevel Of those who fight (fightingClassLevel).
+ * @param {number} players The Drużyna's players who fight together, 1 alone.
+ * @param {Content} content
+ * @returns {[number, number]}
+ */
+export function newestStrength(area, level, classLevel, players, content) {
+  const newest = content.balance.monsters.newestPlace;
+  if (!newest || level < newest.fromLevel || area.maxLevel < level) return [1, 1];
+  const [damage, hp] = huntStrength(Math.max(level, area.minLevel), newest.curve);
+  const more = Math.max(0, players - 1);
+  const [eachDamage, eachHp] = more > 0 ? huntStrength(classLevel, newest.perPlayer, [0, 0]) : [0, 0];
+  return [damage * (1 + eachDamage * more), hp * (1 + eachHp * more)];
 }
 
 // The strength of an exploration's creatures: in the place that holds the
@@ -285,15 +321,22 @@ export function huntStrength(level, curve = []) {
 // "wszystkim zwiększamy stwory"), and from the challenge's level those of a
 // Trudna wyprawa (`hard` true, 629 A) by its hard ones on top, and those of
 // a Piekielna (`hard` 'hell') by its hell ones (challengeMode).
+// `fighters`: on an exploration and in the threat's sample fights, the
+// class level of those who fight and the Drużyna's players among them, for
+// newestStrength; without them (the Labirynt and the Sala prób, which take
+// an exploration's creatures as their measure) none of it.
 /**
  * @param {Area} area
  * @param {number} level
  * @param {Content} content
  * @param {boolean | 'hell'} [hard]
+ * @param {{ classLevel?: number, players?: number } | null} [fighters]
  * @returns {[number, number]}
  */
-export function exploreStrength(area, level, content, hard = false) {
-  const [damage, hp] = area.maxLevel < level ? [1, 1] : huntStrength(Math.max(level, area.minLevel), content.balance.monsters.huntCurve);
+export function exploreStrength(area, level, content, hard = false, fighters = null) {
+  const [placeDamage, placeHp] = area.maxLevel < level ? [1, 1] : huntStrength(Math.max(level, area.minLevel), content.balance.monsters.huntCurve);
+  const [newDamage, newHp] = fighters ? newestStrength(area, level, fighters.classLevel ?? 0, fighters.players ?? 1, content) : [1, 1];
+  const [damage, hp] = [placeDamage * newDamage, placeHp * newHp];
   const challenge = challengeAt(level, content);
   if (!challenge) return [damage, hp];
   const base = level >= challenge.strength.fromLevel ? challenge.strength : { damage: 1, hp: 1 };

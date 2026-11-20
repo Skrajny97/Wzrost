@@ -545,8 +545,9 @@ describe('the second forms in fights', () => {
     const area = areaForLevel(level + 8, content);
     const { lateGame, endGame } = content.balance.monsters;
     // Nor the class-level curve of 19.11.2026 (1207 A): from class level 100
-    // the creatures grow by the fighter's class level.
-    const monsters = { ...content.balance.monsters, lateGame: { ...lateGame, damage: 0.25, hp: 0.25 }, endGame: { ...endGame, damage: 0, hp: 0 }, classLevelCurve: [] };
+    // the creatures grow by the fighter's class level; nor the newest
+    // place's strength of the same day (balance.monsters.newestPlace).
+    const monsters = { ...content.balance.monsters, lateGame: { ...lateGame, damage: 0.25, hp: 0.25 }, endGame: { ...endGame, damage: 0, hp: 0 }, classLevelCurve: [], newestPlace: null };
     const challenge = { ...content.balance.challenge, fromLevel: Infinity };
     const then = { ...content, balance: { ...content.balance, monsters, challenge } };
     const local = { ...then, areasById: { ...content.areasById, [area.id]: area } };

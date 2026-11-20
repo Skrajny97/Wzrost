@@ -12,10 +12,11 @@ import { partyHunt } from '../src/server/parties.js';
 import { content, newCharacter } from './helpers/content.js';
 import { meanwhile, posted } from './helpers/meanwhile.js';
 
-// The newest place's stronger creatures (balance.monsters.huntCurve,
-// hunt-strength.test.js) and the harder explorations from the 10th level
-// (balance.challenge) aside: these fights test something else.
-const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [] }, challenge: { ...content.balance.challenge, fromLevel: Infinity } } };
+// The newest place's stronger creatures (balance.monsters.huntCurve and
+// newestPlace, hunt-strength.test.js and newest-place.test.js) and the
+// harder explorations from the 10th level (balance.challenge) aside: these
+// fights test something else.
+const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [], newestPlace: null }, challenge: { ...content.balance.challenge, fromLevel: Infinity } } };
 import { useServer } from './helpers/server.js';
 
 describe('a party in the engine', () => {

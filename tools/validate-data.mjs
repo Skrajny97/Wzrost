@@ -639,6 +639,19 @@ function checkReferences(data) {
     if (curve.some(([level], i) => i > 0 && level <= curve[i - 1][0])) errors.push(`balance.json: ${name} musi rosnąć po poziomie klasy`);
     if (curve.some(([, factor]) => !(factor > 0))) errors.push(`balance.json: ${name} ma mnożnik, który nie jest większy od zera`);
   }
+  // The newest place by class level (newestStrength in combatant.js): its
+  // points by rising class level, never easier than without it, and the
+  // Drużyna's shares never below nothing.
+  const newest = data.balance.monsters.newestPlace;
+  if (newest) {
+    for (const [name, points] of [
+      ['monsters.newestPlace.curve', newest.curve],
+      ['monsters.newestPlace.perPlayer', newest.perPlayer],
+    ]) {
+      if (points.some(([level], i) => i > 0 && level <= points[i - 1][0])) errors.push(`balance.json: ${name} musi rosnąć po poziomie klasy`);
+    }
+    if (newest.curve.some(([, damage, hp]) => damage < 1 || hp < 1)) errors.push('balance.json: monsters.newestPlace.curve nie może osłabiać stworów (mnożnik poniżej 1)');
+  }
 
   // Skin tones: the default among them, every tone recoloured on its own
   // ramp, Jasna too (the author: "567 A"), and a file for every portrait in

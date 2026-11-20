@@ -192,8 +192,10 @@ export function companionsKey(player, now, rested) {
 }
 
 // `hard`: against the creatures of a Trudna wyprawa (true, 629 A) or of a
-// Piekielna ('hell').
-function cachedSamples(player, character, equipped, areaId, now, hard = false) {
+// Piekielna ('hell'). `healing`: the healing potions taken along
+// (healingFor), which the explorations with companions drink as on the way
+// (threatSamples' trips), so they are part of the key.
+function cachedSamples(player, character, equipped, areaId, now, hard = false, healing = null) {
   // Each item worn whole: an upgrade, a reforged affix or an element keeps
   // the item's id; and the evolution and the professions, whose levels give
   // stats (the code review: the threat stayed as before them).
@@ -202,11 +204,13 @@ function cachedSamples(player, character, equipped, areaId, now, hard = false) {
   // (companions.js).
   const companions = settlementOn() ? companionsGoing(player, now) : [];
   const party = companionsInFights(companions);
+  // The potions count only where the companions' explorations drink them.
+  const potions = party.length > 0 && healing ? [healing.potions, healing.below] : null;
   // The Rdzeń's Artefakty and gem too (core.js), which change the fights.
-  const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, character.evolution, character.professions, gear, party, hard, character.core ?? null]);
+  const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, character.evolution, character.professions, gear, party, hard, character.core ?? null, potions]);
   let samples = samplesCache.get(key);
   if (!samples) {
-    samples = threatSamples({ character, equipped, areaId, companions, hard }, content());
+    samples = threatSamples({ character, equipped, areaId, companions, hard, healing }, content());
     if (samplesCache.size >= SAMPLES_CACHE_SIZE) samplesCache.delete(samplesCache.keys().next().value);
     samplesCache.set(key, samples);
   }
@@ -216,15 +220,18 @@ function cachedSamples(player, character, equipped, areaId, now, hard = false) {
 // The healing potions of ?heal=…&below=…&kind=… for the threat
 // (potions.js): as many as asked of the kind chosen and, where the bag has
 // fewer of it, of the weaker ones after it (kindLine, 959), the strongest
-// carried without a kind, drunk below the mark asked, or null.
+// carried without a kind, drunk below the mark asked, or null. `potions`:
+// the same by id, for the explorations with companions (threatSamples).
 function healingFor(player, params) {
   const count = Number(params.get('heal') ?? 0);
   if (!Number.isInteger(count) || count <= 0) return null;
   const { healBelow, healBelowChoices } = content().potionUse;
   const asked = Number(params.get('below') ?? healBelow);
   const below = healBelowChoices.includes(asked) ? asked : healBelow;
-  const amounts = kindLine(knownPotionsOf(player.row), 'heal', params.get('kind'), count, content()).flatMap((one) => Array.from({ length: one.count }, () => one.amount));
-  return amounts.length > 0 ? { count: amounts.length, amount: amounts[0], amounts, below } : null;
+  const line = kindLine(knownPotionsOf(player.row), 'heal', params.get('kind'), count, content());
+  const amounts = line.flatMap((one) => Array.from({ length: one.count }, () => one.amount));
+  const potions = Object.fromEntries(line.map((one) => [one.id, one.count]));
+  return amounts.length > 0 ? { count: amounts.length, amount: amounts[0], amounts, below, potions } : null;
 }
 
 // The potions an exploration of `minutes` takes along (potions.js): known
@@ -334,7 +341,7 @@ export async function huntOptions(context) {
     maxHp,
     areas: areas.map((place) => {
       const { id } = place;
-      const samples = cachedSamples(player, character, equipped, id, context.now, hard);
+      const samples = cachedSamples(player, character, equipped, id, context.now, hard, healing);
       const catchUp = rareCatchUp(character.level, place, met, content());
       const threat = estimateThreat({ character, equipped, hp, areaId: id, catchUp, healing }, content(), samples);
       const avoiding = estimateThreat({ character, equipped, hp, areaId: id, avoidRare: true, healing }, content(), samples);

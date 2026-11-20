@@ -220,7 +220,11 @@ describe('Talia Systemu: the pack of the day at Szczęsny\'s, like a booster (90
 
 describe('Talia Systemu: a card of a lower land on an exploration (902 B)', () => {
   const { character, equipped } = playerOf('realistic', 'warrior', 60, content);
-  const always = withDrops({ lower: 1 });
+  // Without the newest place's strength of 19.11.2026
+  // (balance.monsters.newestPlace): these explorations count the cards of
+  // many won fights, and the character goes without companions.
+  const calm = (data) => ({ ...data, balance: { ...data.balance, monsters: { ...data.balance.monsters, newestPlace: null } } });
+  const always = calm(withDrops({ lower: 1 }));
   const hunt = (cards, data = always, areaId = 'beaver-dams', seed = 'nizsze') => simulateHunt({ character, equipped, hp: 99999, name: 'Mira', areaId, minutes: 240, seed, cards }, data);
   const lowerLand = areaLand('beaver-dams', content);
 
@@ -258,7 +262,7 @@ describe('Talia Systemu: a card of a lower land on an exploration (902 B)', () =
     const first = hunt({ maxed: [], owned: [] }, always, 'boar-thicket');
     const beaten = new Set(first.fights.filter((fight) => fight.won === true).flatMap((fight) => fight.enemies.map((enemy) => enemy.monsterId)));
     assert.ok(first.cards.every((id) => beaten.has(id)));
-    const never = hunt({ maxed: [], owned: [] }, withDrops({ lower: 0 }));
+    const never = hunt({ maxed: [], owned: [] }, calm(withDrops({ lower: 0 })));
     assert.ok(never.cards.every((id) => homes.get(id).land === lowerLand));
   });
 });
