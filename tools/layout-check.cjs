@@ -247,7 +247,7 @@ const SHEETS = {
   '#/postac/statystyki': [
     { name: 'Parametry dodatkowe', tap: '.combat-extra', ready: `h2.sheet-title:text-is("${said('Parametry dodatkowe')}")`, words: true },
     // "Rozdaj ręcznie" with the points typed in beside each stat (20.11.2026).
-    { name: 'Rozdaj ręcznie', anew: true, tap: `button:text-is("${said('Rozdaj ręcznie')}")`, ready: '.manual-list .manual-input', words: true },
+    { name: 'Rozdaj ręcznie', anew: true, tap: `button:text-is("${said('Rozdaj ręcznie')}")`, ready: '.manual-list > .manual-stat:first-child .manual-input', words: true },
     { name: 'Co nowego?', anew: true, tap: '.topbar .news-button', ready: '.news-entries > .news-entry:first-child .news-text .news-link' },
   ],
   '#/postac': [
