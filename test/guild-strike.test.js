@@ -329,6 +329,9 @@ describe('the classes of the day, the podcięcia and the Kronika through the API
     const seen = (await as('magini', 'GET', '/api/guild/expedition')).data;
     assert.equal(seen.expedition.barred, true, JSON.stringify(seen.expedition).slice(0, 300));
     await run('UPDATE guild_expedition_guardians SET hp = 2');
+    // A strong attacker, so the fight never ends before her first blow (a
+    // level-40 Magini without gear could fall first, by the fight's seed).
+    await run("UPDATE characters SET level = 150, class_level = 150 WHERE name = 'Magini'");
     const hit = await as('magini', 'POST', '/api/guild/expedition/attack', { kind: 'strike' });
     assert.equal(hit.status, 200, JSON.stringify(hit.data).slice(0, 300));
     assert.equal(hit.data.attack.fell, true);
