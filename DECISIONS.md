@@ -3847,6 +3847,27 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Relacje z mieszkańcami Osady: punkty i pasek (20.11.2026)
+
+Gracz zapytał na czacie, gdzie widać, kiedy pakiety kart u Szczęsnego stanieją. Autor: „Stopień relacji jest widoczny, a konkretna punktacja nie... w sumie racja może dodam i ją albo jakiś pasek progressu” (19.11.2026), „Chodzi o relacje z NPC w Osadzie” i „nie dawaj makiet, bedzie dobrze wierze, wdrażaj” (20.11.2026). Bez makiet, prosto do gry.
+
+1. **Gdzie.** Na karcie każdego z dziesięciu mieszkańców, w jego miejscu w Osadzie, pod popiersiem i historią: „Relacja: Znajomy”, obok punkty „180 / 250”, pod spodem cienki złoty pasek (jak w Akceptacji Bractw) i jedna linijka, co da wyższy stopień. Dotąd była tam sama nazwa stopnia. Na planszy Osady stopni mieszkańców nie było (jest tam tylko Akceptacja Bractw), więc plansza się nie zmienia.
+2. **Pasek i punkty.** Punkty postaci przez próg następnego stopnia, tak jak liczby obok: przy 180 z 250 pasek jest w 72%. Na najwyższym stopniu pasek jest pełny, a obok same punkty („1520 pkt”, większe liczby z odstępami jak złoto).
+3. **Linijka.** Najbliższy wyższy stopień, który u tego mieszkańca coś zmienia, i co daje: „Stały klient: pakiety kart 20% taniej”, „Zaufany: do wyboru 3 nowe afiksy i Gwiazdki”. Gdy następny stopień nic u niego nie zmienia, linijka mówi o pierwszym, który zmienia: u sołtysa, Pustelnika i koniuszego od Obcego do Zaufanego „Przyjaciel: podarek raz w tygodniu”. Na najwyższym stopniu „Przyjaciel: najwyższy stopień”. Gdyby żaden wyższy stopień nic nie zmieniał, zostają pasek i punkty bez linijki (dziś takiego mieszkańca nie ma).
+4. **Liczby z danych, nie pisane ręcznie.** Gra bierze je z danych usług mieszkańców przez te same funkcje, które je stosują w grze (`src/engine/resident-relation.js`), więc linijka zawsze mówi to, co stopień naprawdę daje:
+   - Szczęsny: pakiety kart taniej o 10, 20, 30 i 40% (`cards.json` `pack.relationDiscount`; w prośbie przykład mówił o 10% przy Stałym kliencie, a dane dają tam 20%, więc linijka mówi 20%). Bez Talii Systemu (CARDS wyłączone) pakietów w linijce nie ma.
+   - Wiedana: do wyboru 2 nowe afiksy od Znajomego i 3 od Zaufanego (`reforge.choices`), Gwiazdki od Zaufanego (`ascension.from`).
+   - Żelisław: przekucie do rzadkości „epicki”, „legendarny”, „mityczny”, „boski” (`forge.topRarity`).
+   - Jagna: rzadkie przepisy Alchemii (bez tych, których już nauczyła za reputację Bractwa Zielarzy), liczba ziół na sprzedaż, towar taniej, ile płaci ponad złomiarza.
+   - Wszebor: liczba materiałów na sprzedaż, towar taniej, ile płaci ponad złomiarza (z punktami Bractwa Łowców, jak w jego Garbarni).
+   - Gościwit: towar taniej o 2,5, 5, 7,5 i 10% (`relationDiscount`).
+   - Zbylut: werbunek taniej o tyle, ile mniej płaci się niż jako Obcy: 20, 35, 45 i 50% (`companions.priceByStanding`).
+   - Każdy z podarkiem przyjaciela (`gifts.from`, dziś wszyscy): „podarek raz w tygodniu” na stopniu Przyjaciel.
+   - Procent to cała zniżka albo premia na tym stopniu, tak jak w opisach usług, a nie różnica wobec obecnego stopnia. Korzyści łączą się przecinkami i „i” przed ostatnią. U Jagny i Wszebora bywają cztery naraz, więc na telefonie 360 px linijka zajmuje dwa albo trzy wiersze, cała w ramce.
+5. **Słowa** są w `data/settlement.json` (`residentRelation`: punkty, linijki i jedenaście korzyści, schemat w `data/schemas/settlement.schema.json`), po angielsku w `data/en/settlement.json` („Regular: card packs 20% cheaper”, „Friend: the highest standing”).
+6. **Serwer** (`settlementView` w `src/server/settlement.js`) wysyła przy każdym mieszkańcu `relation`: punkty, próg następnego stopnia (null na najwyższym) i linijkę, a obok słowa punktów (`residentRelation`). Strona (`relationBlock` w `src/client/screens/settlement.js`, style `.resident-relation…`) bez tych pól pokazuje sam stopień, jak dotąd.
+7. **Sprawdzone:** test `test/resident-relation.test.js` (punkty i progi, najwyższy stopień, linijka każdego mieszkańca z danych, przepisy już nauczone, punkty Bractwa Łowców, bez kart, po angielsku i przez API). `tools/layout-check.cjs` ustawia teraz kilku mieszkańców na różnych stopniach, w tym Jagnę z najdłuższą linijką i Gościwita na najwyższym stopniu z siedmiocyfrową liczbą punktów.
+
 ## Wersja 0.4.68 (20.11.2026): złoto w Skrzyni Konta
 
 Makietę (zrzuty z gry na 360, 1366 i 1920 px) autor przyjął 20.11.2026 jako 1217, bez uwag: „makieta 1217 zaakceptowana”. Bez opłat i limitów, jak przy towarach i kartach (1191 A).

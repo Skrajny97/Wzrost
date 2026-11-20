@@ -86,6 +86,39 @@
         }
       }
     },
+    "residentRelation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["points", "pointsTop", "next", "top", "and", "perks"],
+      "description": "Relacja z mieszkańcem na jego karcie: punkty, pasek i co da najbliższy wyższy stopień, który u niego coś zmienia (src/engine/resident-relation.js).",
+      "properties": {
+        "$comment": { "type": "string" },
+        "points": { "type": "string", "pattern": "\\{points\\}.*\\{next\\}", "description": "Punkty wobec progu następnego stopnia, np. „180 / 250”." },
+        "pointsTop": { "type": "string", "pattern": "\\{points\\}", "description": "Punkty na najwyższym stopniu." },
+        "next": { "type": "string", "pattern": "\\{standing\\}.*\\{perks\\}", "description": "Linijka: najbliższy wyższy stopień, który coś zmienia, i jego korzyści." },
+        "top": { "type": "string", "pattern": "\\{standing\\}", "description": "Linijka na najwyższym stopniu." },
+        "and": { "type": "string", "minLength": 1, "description": "Słowo przed ostatnią korzyścią w linijce." },
+        "perks": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["packDiscount", "choices", "ascension", "forge", "recipes", "herbs", "materials", "discount", "premium", "hire", "present"],
+          "description": "Korzyść stopnia, w kolejności linijki. {percent} i {count} wypełnia gra z danych usług mieszkańców, {rarity} nazwą rzadkości.",
+          "properties": {
+            "packDiscount": { "type": "string", "pattern": "\\{percent\\}" },
+            "choices": { "type": "string", "pattern": "\\{count[|}]" },
+            "ascension": { "type": "string", "minLength": 1 },
+            "forge": { "type": "string", "pattern": "\\{rarity\\}" },
+            "recipes": { "type": "string", "pattern": "\\{count[|}]" },
+            "herbs": { "type": "string", "pattern": "\\{count[|}]" },
+            "materials": { "type": "string", "pattern": "\\{count[|}]" },
+            "discount": { "type": "string", "pattern": "\\{percent\\}" },
+            "premium": { "type": "string", "pattern": "\\{percent\\}" },
+            "hire": { "type": "string", "pattern": "\\{percent\\}" },
+            "present": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
     "brotherhoodsPanel": {
       "type": "object",
       "additionalProperties": false,

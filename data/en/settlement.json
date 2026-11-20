@@ -197,6 +197,26 @@
       "name": "Friend"
     }
   },
+  "residentRelation": {
+    "points": "{points} / {next}",
+    "pointsTop": "{points} pts",
+    "next": "{standing}: {perks}",
+    "top": "{standing}: the highest standing",
+    "and": "and",
+    "perks": {
+      "packDiscount": "card packs {percent}% cheaper",
+      "choices": "{count|new affix|new affixes|new affixes} to choose from",
+      "ascension": "Stars",
+      "forge": "reforging up to the “{rarity}” rarity",
+      "recipes": "{count|rare Alchemy recipe|rare Alchemy recipes|rare Alchemy recipes}",
+      "herbs": "{count|herb|herbs|herbs} for sale",
+      "materials": "{count|material|materials|materials} for sale",
+      "discount": "goods {percent}% cheaper",
+      "premium": "pays {percent}% more than the scrap dealer",
+      "hire": "hiring {percent}% cheaper",
+      "present": "a gift every week"
+    }
+  },
   "brotherhoodsPanel": {
     "title": "Brotherhood standings",
     "points": "{points} pts",

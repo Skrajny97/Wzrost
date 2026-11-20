@@ -6,7 +6,8 @@
 // with a long name, and a companion hired in the Kwatery, with its five
 // places for items and amulets of big numbers in the bag for "Załóż z
 // plecaka" (one worn by the companion), a sword at +10 with three of the
-// Zaklinaczka's stars, on an account with the longest login and gold in
+// Zaklinaczka's stars, the Osada's residents at several standings of the
+// relation (one at the top in seven digits), on an account with the longest login and gold in
 // billions in its Skrzynia Konta (its sheet "Wyjmij złoto" with all of it, and
 // with too much typed). The bag
 // is checked in "Zaznacz do sprzedaży" too, with an item marked. On each screen,
@@ -472,11 +473,19 @@ async function main() {
   if (!hired?.wearable?.length || (await api('POST', '/api/settlement/equip', { companionId: hired.id, itemId: hired.wearable[0] })) >= 400) throw new Error('Towarzysz nie założył amuletu.');
   // A sword at +10 with three of the Zaklinaczka's stars and big numbers, and
   // her relation at Zaufany, for her "Gwiazdki" (ascension, 1180 B–1184 A),
-  // the name with its stars and the tile's "+10★3".
+  // the name with its stars and the tile's "+10★3". The other residents'
+  // relations for their cards' bars (20.11.2026): Szczęsny's halfway to Stały
+  // klient, Jagna's just below Zaufany with the longest line of what it
+  // gives, Gościwit's at the top in seven digits, Zbylut's just below
+  // Przyjaciel and the sołtys's below Znajomy.
   const starred = JSON.stringify({ base: 'karabela', slot: 'weapon', level: 146, rarity: 'legendary', upgrade: 10, stars: 3, damage: { min: 98765, max: 123456 }, affixes: [{ id: 'bear', kind: 'prefix', stat: 'strength', value: 9876 }] });
   sql(`INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, '${starred}', 1 FROM characters WHERE name = '${name}'`);
+  const relations = { enchantress: 760, gamehost: 180, herbalist: 699, merchant: 1234567, innkeeper: 1399, headman: 30 };
+  const setRelations = Object.entries(relations)
+    .map(([resident, points]) => `'$.${resident}', ${points}`)
+    .join(', ');
   sql(
-    `UPDATE characters SET settlement = json_set(COALESCE(settlement, '{}'), '$.relations', json_set(COALESCE(json_extract(settlement, '$.relations'), '{}'), '$.enchantress', 760)) WHERE name = '${name}'`,
+    `UPDATE characters SET settlement = json_set(COALESCE(settlement, '{}'), '$.relations', json_set(COALESCE(json_extract(settlement, '$.relations'), '{}'), ${setRelations})) WHERE name = '${name}'`,
   );
   // The picture for "Dołącz zrzut ekranu": a PNG drawn on a canvas, of a
   // computer screen's shape and wider than any sheet, so that its preview
