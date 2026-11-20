@@ -1,10 +1,10 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Społeczność",
-  "description": "Działy listy rozwijanej Społeczności, Ranking postaci, Znajomi, codzienny Upominek (src/server/community.js) link zaproszenia na serwer Discord (src/client/discord.js) oraz Facebook, TikTok i Wattpad gry (src/client/social.js).",
+  "description": "Działy listy rozwijanej Społeczności, Ranking postaci, Znajomi, codzienny Upominek (src/server/community.js) link zaproszenia na serwer Discord (src/client/discord.js) oraz Facebook, TikTok i Wattpad gry (src/client/social.js) i słowa Drużyny (src/server/parties.js).",
   "type": "object",
   "additionalProperties": false,
-  "required": ["sections", "ranking", "friends", "gift", "trade", "referral", "discord", "social"],
+  "required": ["sections", "ranking", "friends", "gift", "trade", "referral", "discord", "social", "party"],
   "properties": {
     "$comment": { "type": "string" },
     "sections": {
@@ -103,6 +103,29 @@
           "required": ["join"],
           "properties": {
             "join": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "party": {
+      "description": "Drużyna: słowa przekazania przywództwa (przycisk, pytanie, odpowiedź i odmowy).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["texts"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["lead", "leadTitle", "leadText", "leadConfirm", "led", "notLeader", "self"],
+          "properties": {
+            "lead": { "type": "string", "minLength": 1 },
+            "leadTitle": { "type": "string", "minLength": 1 },
+            "leadText": { "type": "string", "pattern": "\\{name\\}" },
+            "leadConfirm": { "type": "string", "minLength": 1 },
+            "led": { "type": "string", "pattern": "\\{name\\}" },
+            "notLeader": { "type": "string", "minLength": 1 },
+            "self": { "type": "string", "minLength": 1 }
           }
         }
       }

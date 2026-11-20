@@ -54,5 +54,16 @@
       "tiktok": { "label": "Follow us on TikTok" },
       "wattpad": { "label": "Read the novel set in the game's world" }
     }
+  },
+  "party": {
+    "texts": {
+      "lead": "Hand over the lead",
+      "leadTitle": "Hand over the lead?",
+      "leadText": "{name} will lead the party, and you will become an ordinary member.",
+      "leadConfirm": "Hand over",
+      "led": "{name} now leads the party.",
+      "notLeader": "Only the leader hands over the lead.",
+      "self": "You already lead this party."
+    }
   }
 }
