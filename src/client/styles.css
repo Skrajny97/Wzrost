@@ -8209,7 +8209,9 @@ a.camp-level-button {
    line keeps its room. */
 .chat-form-row .chat-bell {
   width: 44px;
+  height: 48px;
   min-height: 48px;
+  background: var(--bg-deep);
 }
 
 .chat-footer-bell {

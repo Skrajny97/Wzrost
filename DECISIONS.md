@@ -3901,6 +3901,15 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Wersja 0.4.81 (20.11.2026): dzwonek czatu przy polu do pisania, bez „Na górę” w czacie
+
+Autor: „W ogóle w czacie już nie da się wyciszyć powiadomień, ta rubryka całkiem praktycznie zniknęła pojawia się na ułamek sekundy tylko podczas przeskakiwania z zakladkę czatu na zakładkę to też trzeba zmienić i dodać dzwonek powiadomień jako wyłącznik gdzieś w okolicach rubryki do pisania może” i „i usun przycisk do góry z czatu” (20.11.2026). Bez makiet (autor: „Wdrażaj od razu, szkoda Twoich zasobów na makiety”).
+
+1. **Przyczyna.** Dzwonek stał przy tytule „Czat”, a strona czatu przewija się na dół, do najnowszych wiadomości, więc tytuł z dzwonkiem uciekał w górę i mignął tylko przy zmianie zakładki.
+2. **Dzwonek przy polu do pisania.** Jest pierwszym przyciskiem w rzędzie z polem (przed „Pokaż przedmioty i materiały”), na telefonie i w czacie z boku na komputerze; przy tytule już go nie ma. Gdy zamiast pola stoją zasady czatu albo wiadomość o wyciszeniu przez moderatora, dzwonek stoi nad nimi po prawej. Działa jak dotąd: wycisza kropkę Globalnego na tym urządzeniu, a prywatne wiadomości i oznaczenia dalej ją zapalają. Na telefonach do 360 px dzwonek i spinacz mają po 40 px, żeby pole zostało szerokie.
+3. **Bez „Na górę” w czacie.** Przycisk „Na górę” (0.4.65) nie pokazuje się na ekranie Czatu (`#/czat`), bo najnowsze wiadomości są na dole, przy polu. Czat z boku na komputerze przewija się we własnym okienku, więc przycisku tam i tak nie było.
+4. **Pliki:** `src/client/screens/community.js` (`mountChat`, `footerPart`), `src/client/screens/chat.js`, `src/client/side.js`, `src/client/back-to-top.js`, `src/client/styles.css`. `tools/layout-check.cjs`: 9 rozmiarów × 53 ekranów bez problemów.
+
 ## Wersja 0.4.80 (20.11.2026): poszukiwani kilka miejsc niżej
 
 Według sekcji niżej. Autor wybrał 1219 A (liczyć od odblokowanych miejsc, jak napisał), odrzucił B (od poziomu postaci), wiedząc z pomiaru, że od 200. poziomu poszukiwani będą trudniejsi niż przed zmianami.
