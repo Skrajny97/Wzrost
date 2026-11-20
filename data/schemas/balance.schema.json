@@ -24,7 +24,8 @@
     "parties",
     "companions",
     "journal",
-    "challenge"
+    "challenge",
+    "sideStats"
   ],
   "properties": {
     "combat": {
@@ -1512,6 +1513,19 @@
             "drop": { "type": "number", "minimum": 0 }
           }
         }
+      }
+    },
+    "sideStats": {
+      "type": "object",
+      "description": "Poboczne statystyki (src/engine/side-stats.js; 1218 B i D, autor zaznaczył na stronie ocen oba warianty naraz, 20.11.2026): Siła albo Intelekt, którymi broń klasy lub formy nie bije. Poboczna Siła daje strengthHp maks. HP za punkt we wszystkich walkach i więcej zasobów z wypraw, poboczny Intelekt 1 odporności na każdy żywioł za każde intellectResistPer punktów i więcej doświadczenia profesji. Obie premie poza walką: step za każde pełne per punktów, najwyżej cap.",
+      "additionalProperties": false,
+      "required": ["strengthHp", "intellectResistPer", "per", "step", "cap"],
+      "properties": {
+        "strengthHp": { "type": "number", "minimum": 0 },
+        "intellectResistPer": { "type": "integer", "minimum": 1 },
+        "per": { "type": "integer", "minimum": 1 },
+        "step": { "type": "number", "minimum": 0 },
+        "cap": { "type": "number", "minimum": 0, "maximum": 1 }
       }
     }
   }

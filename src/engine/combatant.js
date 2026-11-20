@@ -9,6 +9,7 @@ import { gearDamageOf, gearElementOf, gearKey, statAsOf, weaponScalingOf } from 
 import { upgradedItem } from './items.js';
 import { gearLevel, midGameShare } from './progression.js';
 import { learnedSkills, skillMana } from './skills.js';
+import { sideStats } from './side-stats.js';
 import { computeStats } from './stats.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
@@ -86,7 +87,12 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
   // The Rdzeń's Artefakty (core.js): the character's own, never a
   // companion's (a companion's character has no core).
   const core = character.core ? coreEffects(character.core, key, content) : null;
-  const hpBase = maxHp(totals.vitality, character.classLevel, perClassLevel, balance);
+  // Poboczne statystyki (side-stats.js, 1218 B): Siła its weapons do not
+  // hit with gives HP, and such Intelekt resistance to every element, from
+  // the totals with the week's and the potions' shares, before the
+  // Rdzeń's, Opoka's and the like raise them by a share.
+  const spare = sideStats(character, totals, content);
+  const hpBase = maxHp(totals.vitality, character.classLevel, perClassLevel, balance) + spare.hp;
   const hpMax = core?.hp ? Math.round(hpBase * (1 + core.hp)) : hpBase;
   // The evolution's trait (evolutions.js) works in fights (combat.js); some
   // shape the character itself: Opoka's armour and resistances, Arkana's
@@ -104,6 +110,7 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
   const skillPower =
     skillStat && skillWeight > 0 ? damageScale(totals[weapon.scaling] + skillWeight * (totals[skillStat] ?? 0), character.level, balance) / damageScale(totals[weapon.scaling], character.level, balance) : 1;
   const resist = { ...bonuses.resist };
+  if (spare.resist > 0) for (const { id: element } of content.elements) resist[element] = (resist[element] ?? 0) + spare.resist;
   if (feat?.kind === 'bulwark') {
     armor *= 1 + feat.armor;
     for (const element of Object.keys(resist)) resist[element] = Math.round(resist[element] * (1 + feat.resist));

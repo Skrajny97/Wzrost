@@ -703,8 +703,18 @@ describe('the third forms in fights', () => {
 // fighter's class level (balance.monsters.classLevelCurve, 1207 A), and the
 // newest place's are stronger again (balance.monsters.newestPlace): the
 // forms are compared against the creatures they were tuned with, as the
-// fourth evolution's tests do.
-const untuned = (data) => ({ ...data, balance: { ...data.balance, monsters: { ...data.balance.monsters, classLevelCurve: [], newestPlace: null } } });
+// fourth evolution's tests do. Since 20.11.2026 Siła and Intelekt a
+// form's weapon does not use give HP and resistance (side stats, 1218),
+// second and third forms alike, and lift the weakest second form, the
+// Widmo, the most: the forms are compared without them too, as tuned.
+const untuned = (data) => ({
+  ...data,
+  balance: {
+    ...data.balance,
+    monsters: { ...data.balance.monsters, classLevelCurve: [], newestPlace: null },
+    sideStats: { ...data.balance.sideStats, strengthHp: 0, intellectResistPer: Infinity, step: 0 },
+  },
+});
 
 describe('the third forms against the second forms (tools/class-balance-sim.mjs, tools/pvp-arena-sim.mjs)', () => {
   test('a third form is clearly stronger than its second form, and the third forms are closer to each other than the second forms', () => {

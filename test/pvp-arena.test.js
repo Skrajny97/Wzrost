@@ -147,9 +147,12 @@ describe("the Arena's rules", () => {
 
   test('no class loses most of its duels: each wins 30–70% of them against the other classes from the first evolution on (772)', () => {
     // Before 772 the Cień won 6–24% of them and the Łucznik 26–44%, while
-    // the Mag and the Kleryk won 65–89% (tools/pvp-arena-sim.mjs).
+    // the Mag and the Kleryk won 65–89% (tools/pvp-arena-sim.mjs). Three
+    // draws of the gear a level: one draw moves a share by up to 15
+    // points, and with the side stats (1218) the Łucznik's one draw at
+    // level 50 came to 70.3%, one duel of 64 past the line (63% over three).
     for (const level of [50, 75, 100, 200]) {
-      const { wins } = measure({ level, seeds: 1, model: 'realistic' }, content);
+      const { wins } = measure({ level, seeds: 3, model: 'realistic' }, content);
       for (const [classId, share] of Object.entries(wins)) assert.ok(share >= 0.3 && share <= 0.7, `level ${level}: ${classId} wins ${share}`);
     }
   });

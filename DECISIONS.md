@@ -3847,6 +3847,43 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.76 (20.11.2026): poboczne statystyki z Profesji
+
+Według sekcji niżej (1218 B i D), bez makiet: nowa grupa w „Parametrach dodatkowych”, w stylu istniejących. Do tego podgląd „Po założeniu” / „Po zdjęciu”: gdy przedmiot zmienia odporność na każdy żywioł naraz (poboczny Intelekt), zamiast ośmiu wierszy jest jeden, „Odporność na żywioły”, od najmniejszej do największej zmiany (np. „+1,2–1,4%”), a przy równych zmianach jedna liczba (`mergedResist` w `src/client/screens/character.js`).
+
+## Poboczne statystyki z Profesji (20.11.2026)
+
+Pozycja 1218 na stronie ocen: autor zaznaczył warianty B i D razem („zaznaczone na stronie ocen dwa warianty na raz”). Profesje dają statystyki, a części postaci Siła albo Intelekt nic nie dawały. Bez makiet: to wiersze w istniejącym oknie i na istniejącej liście statystyk.
+
+1. **Poboczna statystyka** to Siła albo Intelekt, którymi broń postaci nie bije. Pozostałe statystyki i tak pomagają każdemu (Zręczność daje unik i szybkość, Witalność HP i tak dalej).
+2. **Według klasy albo formy, nie broni w ręku** (`gearKey`). Broń klasy bije statystyką swojej rodziny z `item-bases.json` (miecz i topór Siłą, łuk i sztylet Zręcznością, kostur i kropidło Intelektem), a forma, która to zmienia, swoją (`scaling` w `evolutions.json`: Strzelec Burzy Intelektem, Łowca Siłą; Nekromanta bierze kostury Maga), z dalszymi formami linii. Brakujące szczegóły: zdjęcie broni niczego nie zmienia, choć pięści biją Siłą; statystyka liczona jako inna (`as`) nie jest poboczna, bo jej punkty przechodzą do tamtej (Intelekt Wielkiego Inkwizytora to jego Siła); nie jest nią też statystyka umiejętności ewolucji (`skillStat`, 986 B, dziś żadna ewolucja jej nie ma).
+3. **Kto ma jaką:** Wojownik z formami oraz linia Łowcy: Intelekt. Łucznik i Cień z formami (poza liniami Strzelca Burzy i Nekromanty): Siła i Intelekt. Mag, Kleryk, linie Strzelca Burzy i Nekromanty: Siła. Wielki Inkwizytor, Pogromca Demonów i Mściciel Niebios: żadna.
+4. **B, w walce, wszędzie** (wyprawy, Drużyna, Arena i pojedynki, Wieże, Labirynt; `playerCombatant`): poboczna Siła daje +1 maks. HP za punkt, doliczone do HP przed mnożnikiem Rdzenia; poboczny Intelekt +1 do odporności na każdy żywioł z `elements.json` za każde pełne 2 punkty, przed premią Opoki i jej następców oraz Rdzenia. Liczą się punkty z udziałami tygodnia i mikstur, jak w reszcie walki. Towarzysze idą przez tę samą funkcję, a bez profesji zyskują niewiele (brakujący szczegół: tak zostaje).
+5. **D, poza walką:** poboczna Siła daje +1% zasobów z wypraw za każde pełne 50 punktów, najwyżej +10%: tych ze znalezisk i tych zbieranych po drodze, jak posiłek i Mokosz, a premie się mnożą. Poboczny Intelekt daje tak samo +1% doświadczenia profesji, najwyżej +10%, w jednym miejscu dla wszystkich ośmiu profesji (`workGains`), razem z udziałem tygodnia. Liczą się punkty postaci bez premii walki (`computeStats`). Brakujące szczegóły: na wyprawie Drużyny każdy liczy swoją Siłę do swoich zasobów; praca Awatara też dostaje premię, bo liczy się jak praca postaci; zaokrąglenie jak przy tygodniu.
+6. **Liczby** w `data/balance.json` `sideStats` (schemat w `data/schemas/balance.schema.json`): `strengthHp` 1, `intellectResistPer` 2, `per` 50, `step` 0,01, `cap` 0,1.
+7. **Co widać.** Statystyki › „Parametry dodatkowe”: grupa „Poboczne statystyki” z wierszami tylko tych pobocznych statystyk, które postać ma, np. „Siła (poboczna) 490”, pod spodem „+490 HP · +9% zasobów z wypraw” i zasada („Twoja broń jej nie używa: 1 HP za punkt i +1% zasobów za każde 50 pkt, najwyżej +10%.”). Wielki Inkwizytor grupy nie widzi. Po stuknięciu w Siłę albo Intelekt na liście statystyk są też „odporność na żywioły”, „zasoby z wypraw” i „doświadczenie profesji”. Opisy Siły i Intelektu w `data/stats.json` mają dopisane zdanie („Gdy Twoja broń jej nie używa: HP i więcej zasobów z wypraw.”). Wszystko po polsku i po angielsku. Brakujący szczegół: podgląd „Po założeniu” przy przedmiocie z Intelektem pokazuje teraz zmianę odporności na każdy żywioł, bo to prawdziwa zmiana; werdykt (lepszy, gorszy) liczy atrybuty po staremu, według „Rozdaj według klasy”.
+8. **Ile to daje** typowej postaci z `tools/simulate.mjs` (wszystkie profesje na jednym poziomie, bez odporności z ekwipunku; „mniej obrażeń” to punkty procentowe przeciw przeciwnikowi na poziomie postaci):
+
+    | Postać / profesje | Klasa (poboczne) | HP | Odporność na każdy żywioł | Mniej obrażeń od żywiołów | Zasoby z wypraw | Doświadczenie profesji |
+    |---|---|---|---|---|---|---|
+    | 30. / 10. poziom | Wojownik (Intelekt) | — | +46 | 6,7% | — | +1% |
+    | | Łucznik, Cień (obie) | +7,2–7,3% | +46 | 6,7% | +1% | +1% |
+    | | Mag, Kleryk (Siła) | +7,3–7,4% | — | — | +1% | — |
+    | 60. / 30. poziom | Wojownik | — | +146 | 10,5% | — | +5% |
+    | | Łucznik, Cień | +9,3–9,5% | +146 | 10,5% | +5% | +5% |
+    | | Mag, Kleryk | +9,5–9,6% | — | — | +5% | — |
+    | 100. / 50. poziom | Wojownik | — | +246 | 10,8% | — | +9% |
+    | | Łucznik, Cień | +9,3–9,5% | +246 | 10,8% | +9% | +9% |
+    | | Mag, Kleryk | +9,6–9,7% | — | — | +9% | — |
+
+    W pojedynkach Areny (trzy losowania ekwipunku na poziom, `tools/pvp-arena-sim.mjs`) Łucznik i Cień trochę zyskują, a Kleryk traci: na 50. poziomie Łucznik wygrywa 63% pojedynków zamiast 57%, Kleryk 34% zamiast 38%. Wszystkie klasy zostają w granicach 30–70% (772).
+9. **Testy, które się zmieniły** (granice bez zmian):
+   - `test/challenge.test.js` (Zagrożenie przy Trudnej wyprawie): typowy Mag na 30. poziomie w Omszałych Głazach mdleje od godziny wyprawy prawie na pewno, także bez Trudnej, więc porównanie godzinnych szans zależało od zaokrągleń (0,9999999999999999 i 1). Punkt HP z pobocznej Siły to odwrócił. Test porównuje teraz najkrótszą wyprawę (64% i 96%).
+   - `test/pvp-arena.test.js` (772: każda klasa wygrywa 30–70% pojedynków): trzy losowania ekwipunku na poziom zamiast jednego. Z jednym Łucznik na 50. poziomie miał 70,3%, czyli o jeden pojedynek z 64 za dużo; z trzema ma 63%.
+   - `test/third-evolution.test.js` (trzecie formy bliżej siebie niż drugie): formy porównuje się bez pobocznych statystyk, tak jak już bez późniejszych zmian stworów, czyli w warunkach, w których je dostrojono. Poboczne statystyki najbardziej podnoszą najsłabszą drugą formę, Widmo, więc różnica HP na końcu wypraw między drugimi formami spada z 0,322 do 0,301, a między trzecimi wynosi 0,311.
+   - `test/threat-trips.test.js` (Zagrożenie z towarzyszami): 120 prawdziwych wypraw na postać zamiast 60. Na 100. poziomie pierwsze 60 dało 31,2% omdleń przy szacunku 36,8%, a 240 wypraw daje 33,6%.
+10. **Pliki:** `src/engine/side-stats.js` (nowy: `weaponStatsOf`, `sideStatIds`, `sideStats`), `src/engine/combatant.js` (B), `src/engine/hunt.js` (zasoby), `src/server/professions.js` (`workGains`), `src/engine/preview.js` (`extraValues` `side`, `statShares`), `src/client/screens/stats.js`, dane `balance.json`, `stats.json`, po angielsku `data/en/stats.json` i `data/en/strings.json`; `tools/layout-check.cjs` otwiera teraz „Parametry dodatkowe” i szczegóły statystyk (krok `anew` zamyka poprzednie okno); testy w `test/side-stats.test.js` oraz cztery z punktu 9.
+
 ## Wersja 0.4.75 (20.11.2026): porcje posiłków, jedzenie ze Spiżarni, profesje +5
 
 Według dwóch sekcji niżej, bez makiet (autor: „Wdrażaj od razu, szkoda Twoich zasobów na makiety”): „Porcje” z −/+ w „Opcjach wyprawy” i na karcie potrawy w Spiżarni, w stylu istniejących rzędów mikstur.

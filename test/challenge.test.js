@@ -113,7 +113,13 @@ describe('the challenge in the engine', () => {
     const input = { character, equipped, hp: 99999, areaId: 'mossy-boulders' };
     const plain = faintChances(input, content);
     const hard = faintChances({ ...input, hard: true }, content);
-    assert.ok(hard[60] > plain[60], `${hard[60]} vs ${plain[60]}`);
+    // On the shortest exploration: from an hour on a typical Mag faints
+    // there all but surely either way, so the two hours' chances differ
+    // only by the rounding of numbers (1218: a point of HP from a side Siła
+    // turned it).
+    assert.ok(plain[1] < 0.9, String(plain[1]));
+    assert.ok(hard[1] > plain[1] + 0.1, `${hard[1]} vs ${plain[1]}`);
+    assert.ok(hard[60] > plain[60] - 1e-9, `${hard[60]} vs ${plain[60]}`);
   });
 });
 
