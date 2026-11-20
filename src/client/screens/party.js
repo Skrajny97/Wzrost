@@ -5,8 +5,10 @@
 // work), the leader marked, and for the leader "Przekaż przywództwo" and
 // "Usuń z drużyny" by each other member; the friends to invite at a tap and a name to invite; the
 // invitations sent; and "Opuść drużynę". The leader sends the party out
-// from "Wyrusz" in the Walka (screens/combat.js, "Z drużyną").
+// from "Wyrusz" in the Walka (screens/combat.js, "Z drużyną"); each other
+// member chooses here the potions it takes along (potionsRubric).
 
+import { potionSprite } from '../art.js';
 import { partySeen } from '../chat-news.js';
 import { fill, h, icon } from '../dom.js';
 import { formatMinutes } from '../format.js';
@@ -40,6 +42,12 @@ export const BUSY = { away: 'na wyprawie', working: 'w profesji' };
 // maks 5 lvl", "niech nie będzie możliwości w ogole bycia w drużynie z kimś
 // o rozpiętości lvli wyzszej niz 5"; src/server/parties.js).
 const spreadText = (spread) => t('Poziomy klas w drużynie mogą się różnić najwyżej o {spread}. Kto przez awans odstanie bardziej, wypada z drużyny.', { spread });
+
+// The fights of an exploration of `minutes`, and so the most potions of one
+// it takes along (potionsPerKind in the engine; fightsFor in combat.js).
+const fightsUpTo = (use, minutes) => use.fightsByMinutes.filter(([from]) => from <= minutes).at(-1)?.[1] ?? 1;
+// How long after the last tap of the potions' rubric its choice is saved.
+const POTIONS_SAVE_MS = 700;
 
 // The time other members of a Drużyna's trip skipped for everyone
 // (src/server/time.js), one line each, their skips added up (the author:
@@ -80,6 +88,35 @@ export function mountParty(container) {
   let view = null;
   let friends = [];
   let gone = false;
+  // A member's choice of potions for the party's trips (potionsRubric), as
+  // last changed here: saved a moment after the last tap (PUT
+  // /api/party/potions), and taken from the server's answers again only
+  // once every change made here has been saved.
+  let potionChoice = null;
+  let potionEdits = 0;
+  let potionSynced = 0;
+  let potionTimer = null;
+  const savePotions = () => {
+    clearTimeout(potionTimer);
+    potionTimer = null;
+    const edits = potionEdits;
+    call('PUT', '/api/party/potions', potionChoice ?? {})
+      .then(() => {
+        potionSynced = Math.max(potionSynced, edits);
+      })
+      .catch((error) => {
+        toast(error.message);
+        // The rubric shows what the server keeps.
+        potionSynced = potionEdits;
+        if (!gone) call('GET', '/api/party').then(show, () => {});
+      });
+  };
+  const changePotions = (next) => {
+    potionChoice = next;
+    potionEdits += 1;
+    clearTimeout(potionTimer);
+    potionTimer = setTimeout(savePotions, POTIONS_SAVE_MS);
+  };
   const body = h('div', { class: 'friends party' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
   fill(container, body);
 
@@ -121,6 +158,7 @@ export function mountParty(container) {
   function show(next) {
     if (gone) return;
     view = next;
+    if (!potionTimer && potionSynced === potionEdits) potionChoice = view.potions ?? null;
     partySeen(view);
     fill(body, invitesCard(), partyCard(), inviteCard(), sentCard(), leaveCard());
   }
@@ -254,6 +292,7 @@ export function mountParty(container) {
           ),
         ),
       ),
+      potionsRubric(own),
       // Who goes and who stays: the author's words (1.11.2026: "zły opis,
       // powinno być …"), on both cards, folded under "Jak to działa?" (the
       // author: "ten taki długi tekst o Drużynie schowaj pod "Jak to
@@ -272,6 +311,82 @@ export function mountParty(container) {
             t('Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.'),
             t(COMPANIONS_STAY),
           ]),
+    );
+  }
+
+  // A member's potions for the party's trips (the author, 20.11.2026:
+  // „Powinna byc opcja zabierania przez reszte drużyny jakos mikstur
+  // zdrowia i many”): each healing and mana potion of the bag whose recipe
+  // it knows, with −/+, and the healing mark, as in the Walka's "Opcje
+  // wyprawy" (screens/combat.js), of each at most as many as the longest
+  // trip it may go on has fights. As the leader sends the party out, the
+  // server takes from the bag what there is of it, as many as that trip's
+  // fights allow, and what is not drunk comes back with the report
+  // (src/server/parties.js, memberPotions). A choice of a potion the bag
+  // has run out of stays for when it has one again. The leader takes its
+  // own in "Opcje wyprawy", so it has no such rubric.
+  function potionsRubric(own) {
+    const texts = state.content.community?.party?.texts;
+    const use = state.character.professions?.potionUse;
+    if (!own || own.leader || !texts?.potionsTitle || !use) return null;
+    // Healing first, then mana, each the strongest first.
+    const carried = (state.character.potions ?? [])
+      .filter((potion) => (potion.fight === 'heal' || potion.fight === 'mana') && potion.known && potion.count > 0)
+      .sort((a, b) => Number(a.fight === 'mana') - Number(b.fight === 'mana') || (b.amount ?? 0) - (a.amount ?? 0));
+    const longest = Math.min(Math.max(1, ...(state.character.huntDurations ?? [])), view.party.limits?.minutes ?? Infinity);
+    const fights = fightsUpTo(use, longest);
+    const wanted = { ...potionChoice?.potions };
+    let below = use.healBelowChoices.includes(potionChoice?.healBelow) ? potionChoice.healBelow : use.healBelow;
+    const changed = () => changePotions({ potions: Object.fromEntries(Object.entries(wanted).filter(([, count]) => count > 0)), healBelow: below });
+    const stepper = (label, onStep) => ({
+      less: h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('{name}: mniej', { name: label }), text: '−', onClick: () => onStep(-1) }),
+      more: h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('{name}: więcej', { name: label }), text: '+', onClick: () => onStep(1) }),
+    });
+    const rows = carried.map((potion) => {
+      const limit = Math.min(potion.count, fights);
+      const count = () => Math.min(wanted[potion.id] ?? 0, limit);
+      const value = h('output', { class: 'potion-pick-value' });
+      const { less, more } = stepper(potion.name, (sign) => {
+        wanted[potion.id] = Math.max(0, Math.min(limit, count() + sign));
+        showRow();
+        changed();
+      });
+      const showRow = () => {
+        value.textContent = t('{count} z {all}', { count: count(), all: limit });
+        less.disabled = count() === 0;
+        more.disabled = count() >= limit;
+      };
+      showRow();
+      const element = h('div', { class: 'potion-pick' }, h('span', { class: 'potion-pick-art' }, potionSprite(potion.id) ?? icon('flask', { size: 20 })), h('span', { class: 'potion-pick-name', text: potion.name }), less, value, more);
+      return { fight: potion.fight, element };
+    });
+    // The healing mark, under the healing potions, as in "Opcje wyprawy".
+    const healing = rows.filter((row) => row.fight === 'heal');
+    let mark = null;
+    if (healing.length > 0) {
+      const markValue = h('output', { class: 'potion-pick-value' });
+      const steps = stepper(t('Próg leczenia'), (sign) => {
+        const choices = use.healBelowChoices;
+        below = choices[Math.max(0, Math.min(choices.length - 1, choices.indexOf(below) + sign))];
+        showMark();
+        changed();
+      });
+      const showMark = () => {
+        markValue.textContent = `${Math.round(below * 100)}% HP`;
+        steps.less.disabled = below === use.healBelowChoices[0];
+        steps.more.disabled = below === use.healBelowChoices.at(-1);
+      };
+      showMark();
+      mark = h('div', { class: 'potion-pick' }, h('span', { class: 'potion-pick-name', text: t('Lecz poniżej') }), steps.less, markValue, steps.more);
+    }
+    return h(
+      'section',
+      { class: 'potion-picks party-potions', 'aria-labelledby': 'party-potions-title' },
+      h('p', { class: 'duration-head', id: 'party-potions-title', text: texts.potionsTitle }),
+      healing.map((row) => row.element),
+      mark,
+      rows.filter((row) => row.fight !== 'heal').map((row) => row.element),
+      h('p', { class: 'muted', text: rows.length > 0 ? texts.potionsHint : texts.potionsNone }),
     );
   }
 
@@ -347,6 +462,8 @@ export function mountParty(container) {
   return {
     unmount() {
       gone = true;
+      // A change made a moment ago is saved all the same.
+      if (potionTimer) savePotions();
     },
   };
 }

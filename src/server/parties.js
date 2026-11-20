@@ -61,9 +61,11 @@
 import {
   areaFor,
   areaOpenFor,
+  carryLimit,
   challengeAt,
   companionsGoingMost,
   companionStays,
+  fightKind,
   huntDurations,
   isUnlocked,
   longestHunt,
@@ -72,6 +74,7 @@ import {
   partyFit,
   partyRange,
   partyStayText,
+  potionsPerKind,
   tripWanted,
   wantedTarget,
 } from '../engine/index.js';
@@ -85,6 +88,7 @@ import { beginHunt, finishActivity } from './hunts.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { accountLanguage, runInLanguage, t } from './i18n.js';
+import { potionKnown, potionsOf } from './professions-view.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 // The most invitations one party may have waiting.
@@ -264,7 +268,7 @@ export async function partyView(db, characterId, now) {
          WHERE i.character_id = ? ORDER BY i.created_at DESC`,
       )
       .bind(characterId),
-    db.prepare('SELECT class_level, settlement FROM characters WHERE id = ?').bind(characterId),
+    db.prepare('SELECT class_level, settlement, party_potions FROM characters WHERE id = ?').bind(characterId),
   ]);
   const { onlineSeconds } = content().community.trade;
   const list = members.results.map((row) => ({
@@ -314,6 +318,9 @@ export async function partyView(db, characterId, now) {
     companions: !party && self.results[0] ? companionsQuestion(self.results[0]) : null,
     // In a party, the companions of the character's own explorations.
     ownCompanions: party && self.results[0] ? ownCompanions(self.results[0]) : [],
+    // In a party, the potions it takes along as a member (memberPotions):
+    // { potions, healBelow } as saved, or null for none.
+    potions: party && self.results[0] ? partyPotionsOf(self.results[0]) : null,
   };
 }
 
@@ -562,6 +569,80 @@ export async function cancelPartyInvite(context) {
   return answer(db, player.row.id, context.now);
 }
 
+// Mikstury członków drużyny (the author, 20.11.2026: „Powinna byc opcja
+// zabierania przez reszte drużyny jakos mikstur zdrowia i many”): a member,
+// not the leader, chooses in the Drużyna the healing and mana potions it
+// takes along on its party's trips, and its healing mark, as "Opcje
+// wyprawy" does for a "Wyrusz" (combat.js). Kept on its row
+// (characters.party_potions) for later trips and parties: { potions: { [id]:
+// count }, healBelow }, or null for none, which takes nothing (as before
+// 20.11.2026). The leader takes its own in "Opcje wyprawy"; a member that
+// comes to lead keeps its choice for when it is a member again.
+function partyPotionsOf(row) {
+  try {
+    const kept = JSON.parse(row.party_potions ?? 'null');
+    return kept && typeof kept === 'object' && !Array.isArray(kept) && kept.potions && typeof kept.potions === 'object' ? kept : null;
+  } catch {
+    return null;
+  }
+}
+
+// The potion of `id` when a member may choose it: one of healing or mana.
+function memberPotion(id) {
+  const potion = Object.hasOwn(content().potionsById, id) ? content().potionsById[id] : null;
+  return potion && ['heal', 'mana'].includes(fightKind(potion)) ? potion : null;
+}
+
+// What a member going on a trip of `minutes` takes along of its choice, by
+// a "Wyrusz"'s rules (takenPotions in hunts.js): the potions whose recipes
+// it knows, of each at most as many as its bag holds and as the trip has
+// fights; and its healing mark. { potions, healBelow } for its start
+// (beginHunt), or {} for none.
+function memberPotions(row, minutes) {
+  const kept = partyPotionsOf(row);
+  if (!kept) return {};
+  const have = potionsOf(row);
+  const most = potionsPerKind(minutes, content());
+  const potions = {};
+  for (const [id, count] of Object.entries(kept.potions)) {
+    const potion = memberPotion(id);
+    if (!potion || !Number.isInteger(count) || !potionKnown(row, potion)) continue;
+    const take = Math.min(count, have[id] ?? 0, carryLimit(potion, most));
+    if (take > 0) potions[id] = take;
+  }
+  if (Object.keys(potions).length === 0) return {};
+  const { healBelow, healBelowChoices } = content().potionUse;
+  return { potions, healBelow: healBelowChoices.includes(kept.healBelow) ? kept.healBelow : healBelow };
+}
+
+// PUT /api/party/potions { potions: { [id]: count }, healBelow }: a member's
+// choice of potions for its party's trips (memberPotions): healing and mana
+// potions by id, each a whole number from 0 to the fights of the longest
+// exploration, and a healing mark of potionUse (its usual one when none
+// comes). A choice of nothing is kept as none. Saved as it comes, whatever
+// the bag holds now: the trip takes what there is as it sets out. Answers
+// the Drużyna anew.
+export async function setPartyPotions(context) {
+  const { player } = await requirePartyPlayer(context);
+  const db = context.env.DB;
+  const body = await readJson(context.request);
+  const asked = body.potions ?? {};
+  if (typeof asked !== 'object' || asked === null || Array.isArray(asked)) throw new ApiError(400, 'invalid_potions', 'Wybierz mikstury na wyprawę.');
+  const most = potionsPerKind(content().balance.hunt.maxMinutes, content());
+  const potions = {};
+  for (const [id, count] of Object.entries(asked)) {
+    if (!memberPotion(id)) throw new ApiError(400, 'invalid_potions', 'Tej mikstury nie zabiera się na wyprawę.');
+    if (!Number.isInteger(count) || count < 0 || count > most) throw new ApiError(400, 'invalid_potions', `Zabierz od 0 do ${most} sztuk.`);
+    if (count > 0) potions[id] = count;
+  }
+  const { healBelow: usual, healBelowChoices } = content().potionUse;
+  const healBelow = body.healBelow ?? usual;
+  if (!healBelowChoices.includes(healBelow)) throw new ApiError(400, 'invalid_heal_below', 'Wybierz próg mikstury leczenia.');
+  const kept = Object.keys(potions).length > 0 || healBelow !== usual ? JSON.stringify({ potions, healBelow }) : null;
+  await db.prepare('UPDATE characters SET party_potions = ? WHERE id = ?').bind(kept, player.row.id).run();
+  return answer(db, player.row.id, context.now);
+}
+
 // A party's boon as kept (parties.boon, party-events.js): its { haste, xp,
 // gold } shares, or null for none, or one that does not read.
 function boonOf(text) {
@@ -626,7 +707,9 @@ async function claimForTrip(db, member, now) {
 // leader too, must have the place and the length open, so the party goes
 // only as far and as long as its lowest member may, and waits as long as
 // its slowest mount (the Stajnia, 327 A). The leader's choices of potions
-// and tracking are its own; the others go without them. A Trudna or a
+// and tracking are its own; the others go without them, but since
+// 20.11.2026 each takes its own healing and mana potions as it chose them in
+// the Drużyna (memberPotions; none without a choice). A Trudna or a
 // Piekielna wyprawa (`hard`, `hell`) is the whole trip's, for every member
 // who goes, and only where each of them has it open (the author,
 // 19.11.2026: „Trudne i Piekielne wyprawy zrób tak by można je bylo robić z
@@ -756,13 +839,26 @@ async function setOut(db, player, body, now, claimed) {
   // timer (time.js).
   const party_ = { id: party.id, leader: player.row.name, names: everyone.map((member) => member.row.name), trip: now };
   // The leader's start, then the members', each without the leader's
-  // choices but the trip's challenge, made ready and written below in one
-  // batch with the trip's crew. One whose start cannot be made stays home.
+  // choices but the trip's challenge, with its own potions, made ready and
+  // written below in one batch with the trip's crew: a member's potions
+  // leave its bag only as the trip sets out, and one whose bag changed
+  // meanwhile has the party read anew (its start's version). One whose
+  // start cannot be made stays home.
   const setups = new Map([[player.row.id, await beginHunt(db, player, body, now, { party: party_, mount, haste, also: takeBoon, defer: true })]]);
   const went = [];
   for (const member of ready) {
     try {
-      const own = { areaId: area.id, minutes: body.minutes, avoidRare: body.avoidRare === true, seekRare: body.seekRare === true && body.avoidRare !== true, hard: mode === 'hard', hell: mode === 'hell' };
+      const own = {
+        areaId: area.id,
+        minutes: body.minutes,
+        avoidRare: body.avoidRare === true,
+        seekRare: body.seekRare === true && body.avoidRare !== true,
+        hard: mode === 'hard',
+        hell: mode === 'hell',
+        // Its own potions of its choice, taken from its bag with its start
+        // in the batch below (beginHunt), and back with its report.
+        ...memberPotions(member.row, body.minutes),
+      };
       const setup = await beginHunt(db, member, own, now, {
         party: party_,
         mount,
@@ -809,7 +905,11 @@ async function setOut(db, player, body, now, claimed) {
     seed,
     roster: actual.map((member) => {
       const setup = setups.get(member.row.id);
-      return { ...shots.get(member.row.id), windows: setup.windows, trophies: setup.trophies, ...(member === player && { potions: setup.taken, healBelow: setup.healBelow }) };
+      // The potions each took along: the leader's of its "Opcje wyprawy", a
+      // member's of its choice in the Drużyna (memberPotions); one that took
+      // none fights without them, as before.
+      const carries = member === player || Object.keys(setup.taken).length > 0;
+      return { ...shots.get(member.row.id), windows: setup.windows, trophies: setup.trophies, ...(carries && { potions: setup.taken, healBelow: setup.healBelow }) };
     }),
     encounter: {
       avoidRare: lead.avoidRare,
