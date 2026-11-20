@@ -54,6 +54,7 @@ import { combatModes } from './towers.js';
 import { weekLine } from '../weeks.js';
 import { andrzejkiCard, omenLines } from '../andrzejki.js';
 import { partyGated } from '../party-gate.js';
+import { guildHelpStrip } from '../guild-help.js';
 import { bannerChip, bannerLine } from '../guild-lands.js';
 
 // Shown through t(), as the page loads its English after this module.
@@ -352,6 +353,9 @@ export function mountCombat(container, { params, navigate }) {
   let partyAskedAt = 0;
   let partyLeads = false;
   let partyAgain = null;
+  // The shortcut to help in the guild (guild-help.js, 20.11.2026), made once
+  // for the visit and kept over the screen's renders.
+  const helpStrip = guildHelpStrip();
 
   // HP in tenths of the maximum: resting moves the threat now and then.
   const hpStep = (character, now) => Math.floor((currentHp(character, now) / character.maxHp) * 10);
@@ -441,12 +445,14 @@ export function mountCombat(container, { params, navigate }) {
     meal = null;
 
     // While the character is away, every view shows the exploration. The
-    // main view has the week of the year under the top bar (weeks.js), the
-    // Andrzejki omens running under it and, on the fortune evenings, their
-    // card (andrzejki.js, 1082 C).
+    // main view has the shortcut to help in the guild under the top bar
+    // while someone waits for it (guild-help.js, 20.11.2026), the week of
+    // the year (weeks.js), the Andrzejki omens running under it and, on the
+    // fortune evenings, their card (andrzejki.js, 1082 C).
     if (activity || !region) {
       fill(
         container,
+        helpStrip,
         weekLine(character),
         omenLines(character),
         andrzejkiCard(character),
@@ -1879,5 +1885,5 @@ export function mountCombat(container, { params, navigate }) {
   }
 
   render();
-  return { update: render, tick };
+  return { update: render, tick, unmount: helpStrip.stop };
 }

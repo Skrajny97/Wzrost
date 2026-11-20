@@ -11,7 +11,8 @@
 // a gift to its request not thanked for yet; an item waiting for it in the
 // Skrzynia Gildii (guild-chest.js; the author, 10.11.2026: an item left
 // for one member lights its dot); a build or a work of another member the
-// character may help (guild-help.js, 1196 A and B), on the Gildia tab; its
+// character may help (guild-help.js, 1196 A and B), on the Gildia tab, with
+// how many of them for the shortcut on the Walka screen (20.11.2026); its
 // vote of the week in the Kącina not cast yet (guild-shrine.js, 1201 A), on
 // the Siedziba's. The page asks
 // for it about once a minute (src/client/chat-news.js) and after its
@@ -31,8 +32,9 @@ import { guildPlayer, trialCards, trialsView } from './guild-trials.js';
 import { json } from './http.js';
 
 // GET /api/guild/todo: {todo: {trials, beast, expedition, requests,
-// chest, guild, seat}, cards?}, or {todo: null} outside a guild; each key
-// the id of the tab whose dot it lights.
+// chest, guild, seat}, help, cards?}, or {todo: null} outside a guild; each
+// key of `todo` the id of the tab whose dot it lights, `help` how many
+// builds and works the character may help now.
 export async function getGuildTodo(context) {
   const { player, guild, db } = await guildPlayer(context);
   if (!guild) return json({ todo: null });
@@ -62,9 +64,10 @@ export async function getGuildTodo(context) {
       expedition: Boolean(expedition.expedition?.barred && expedition.contributor && canAttack(expedition.attacks)) || expedition.chests.length > 0,
       requests: Boolean(requests.mine?.gifts.some((gift) => !gift.thanked)),
       chest,
-      guild: help,
+      guild: help > 0,
       seat: vote,
     },
+    help,
     ...(cards.length > 0 && { cards }),
   });
 }

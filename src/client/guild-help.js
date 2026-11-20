@@ -11,21 +11,24 @@
 // answer (data/guilds.json, help.texts), in the page's language; the card's
 // own few go through t() (i18n.js). guildHelpCard() makes the card, which
 // asks for its part itself and draws its times anew every half a minute
-// while it is on the page.
+// while it is on the page. guildHelpStrip() makes the shortcut to it on the
+// Walka screen (the author, 20.11.2026).
 
 import { campArt, guildHelpArt, professionSprite } from './art.js';
 import { buildingTier } from './camp-art.js';
-import { checkGuildTodo } from './chat-news.js';
+import { checkGuildTodo, guildHelpWaiting, onChatNews } from './chat-news.js';
 import { fill, h, icon } from './dom.js';
 import { formatCountdown, formatMinutes, formatNumber } from './format.js';
 import { t } from './i18n.js';
 import { CLASS_ICONS } from './icons.js';
 import { openProfile } from './profile.js';
-import { call, serverNow } from './state.js';
+import { call, serverNow, state } from './state.js';
 import { foldPart, framedName, howItWorks, toast, withButton } from './ui.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 const REDRAW_MS = 30000;
+// How long the shortcut shows the game's answer before it hides.
+const ANSWER_MS = 6000;
 
 // "14 min", "1 h 5 min": a length in whole minutes, at least one.
 const minutes = (ms) => formatMinutes(Math.max(1, Math.round(ms / 60000)));
@@ -221,4 +224,68 @@ export function guildHelpCard() {
       });
   card.reload();
   return card;
+}
+
+// The shortcut to help on the Walka screen (the author, 20.11.2026: „Trzeba
+// zrobić jakoś łatwo dostepny skrót do pomagania innym z gildii w ramach tej
+// nowej funkcji”; DECISIONS.md, „Skrót do pomocy w gildii (20.11.2026)”): a
+// slim strip while the Gildia tab's dot says there is someone to help
+// (chat-news.js, from the guild's todo the page asks for anyway): the
+// help's icon and „Gildia czeka na pomoc: N”, which open the help card on
+// the Gildia tab, and „Pomóż wszystkim”, which helps at once, as the card's
+// button does. The game's answer stays in the strip for a moment, then it
+// hides. Hidden with nobody to help, outside a guild and before the
+// Społeczność. Made once for a visit of the screen; `stop()` ends its
+// following of the news. Its words: data/guilds.json, help.texts.strip and
+// stripAll (state.content.guildHelp).
+export function guildHelpStrip() {
+  const strip = h('div', { class: 'guild-help-strip', role: 'status' });
+  let answer = null;
+  let answerTimer = null;
+
+  async function helpAll() {
+    const result = await call('POST', '/api/guild/help/all');
+    answer = result.text;
+    render();
+    checkGuildTodo({ now: true });
+    clearTimeout(answerTimer);
+    answerTimer = setTimeout(() => {
+      answer = null;
+      render();
+    }, ANSWER_MS);
+  }
+
+  function render() {
+    const words = state.content?.guildHelp;
+    const count = guildHelpWaiting();
+    strip.classList.toggle('guild-help-strip--done', Boolean(answer));
+    strip.hidden = !answer && (!words || count === 0);
+    if (answer) {
+      fill(strip, h('span', { class: 'guild-help-strip-art', 'aria-hidden': 'true' }, guildHelpArt(24)), h('span', { class: 'guild-help-strip-text', text: answer }));
+      return;
+    }
+    if (strip.hidden) {
+      fill(strip);
+      return;
+    }
+    fill(
+      strip,
+      h(
+        'a',
+        { class: 'guild-help-strip-link', href: '#/gildia/guild' },
+        h('span', { class: 'guild-help-strip-art', 'aria-hidden': 'true' }, guildHelpArt(24)),
+        h('span', { class: 'guild-help-strip-text', text: filled(words.waiting, { count: formatNumber(count) }) }),
+      ),
+      h('button', {
+        type: 'button',
+        class: 'button button--system button--small guild-help-strip-button',
+        text: words.all,
+        onClick: (event) => withButton(event.currentTarget, helpAll),
+      }),
+    );
+  }
+
+  render();
+  strip.stop = onChatNews(render);
+  return strip;
 }

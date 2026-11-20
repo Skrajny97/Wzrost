@@ -525,6 +525,8 @@
       "cut": "−{time}",
       "help": "Help",
       "helpAll": "Help everyone ({count})",
+      "strip": "Your guild needs help: {count}",
+      "stripAll": "Help everyone",
       "waiting": "Waiting for your help: {count}.",
       "helped": "Help sent",
       "full": "Fully helped",

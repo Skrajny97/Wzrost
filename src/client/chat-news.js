@@ -64,6 +64,10 @@ let staff = null;
 // beast, expedition, requests, chest}, each true when there is something to
 // do, or null.
 let guildTodo = null;
+// How many builds and works of the guild's members the character may help
+// now (guild-todo.js `help`), for the shortcut on the Walka screen
+// (guild-help.js, guildHelpStrip).
+let guildHelp = 0;
 let todoAskedAt = 0;
 const TODO_EVERY_MS = 60000;
 // The newest message read in each private conversation, by the other
@@ -170,6 +174,9 @@ export const guildNews = () => open() && guildInvites > 0;
 // Something to do in the guild: in its part `part` (trials, beast,
 // requests), or in any (the author: a trial not taken lights the dot).
 export const guildTodoNews = (part) => open() && Boolean(guild) && Boolean(guildTodo) && (part ? Boolean(guildTodo[part]) : Object.values(guildTodo).some(Boolean));
+// How many builds and works the character may help now, while the Gildia
+// tab's dot says so (0 otherwise: no guild, no Społeczność yet).
+export const guildHelpWaiting = () => (guildTodoNews('guild') ? guildHelp : 0);
 export const liveTrade = () => (open() ? trade : null);
 // A proposal to this character, or a trade going on.
 export const tradeNews = () => Boolean(liveTrade()) && !(trade.state === 'proposed' && trade.proposer);
@@ -226,6 +233,7 @@ const lights = () =>
     guildNews(),
     guild?.name,
     JSON.stringify(guildTodo),
+    guildHelp,
     trade && `${trade.id}:${trade.state}:${trade.proposer}`,
     ...conversations.map((entry) => `${entry.id}:${conversationNews(entry.id, entry.latest)}`),
   ].join();
@@ -253,6 +261,7 @@ onCharacterChange((character) => {
     tagged = { private: {} };
     guild = null;
     guildTodo = null;
+    guildHelp = 0;
     guildInvites = 0;
     party = null;
     staff = null;
@@ -459,7 +468,12 @@ export async function checkChat({ now = false } = {}) {
 // `now` is set (after an action in the guild), and only in a guild.
 export async function checkGuildTodo({ now = false } = {}) {
   if (!open() || !guild) {
-    if (guildTodo) update(() => (guildTodo = null));
+    if (guildTodo) {
+      update(() => {
+        guildTodo = null;
+        guildHelp = 0;
+      });
+    }
     return;
   }
   if (!now && Date.now() - todoAskedAt < TODO_EVERY_MS) return;
@@ -472,6 +486,7 @@ export async function checkGuildTodo({ now = false } = {}) {
   }
   update(() => {
     guildTodo = answer.todo ?? null;
+    guildHelp = answer.help ?? 0;
   });
   // The cards of Talia Systemu the Próby Gildii finished since the last
   // look left (903, src/server/guild-trials.js).

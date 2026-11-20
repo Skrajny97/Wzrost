@@ -18477,6 +18477,65 @@ button.tcard-slot {
   color: var(--gold);
 }
 
+/* The shortcut to help on the Walka screen (guild-help.js, guildHelpStrip;
+   the author, 20.11.2026): a slim line under the top bar, as the week's,
+   with the help's icon and how many wait, which open the Gildia tab, and
+   "Pomóż wszystkim"; after the tap, the game's answer in it for a moment. */
+.guild-help-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 3px 3px 3px 10px;
+  border: 1px solid rgba(217, 180, 90, 0.45);
+  background: rgba(217, 180, 90, 0.1);
+  font-family: var(--font-system);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.guild-help-strip--done {
+  padding-right: 10px;
+  border-color: var(--bark-line);
+  background: rgba(217, 180, 90, 0.06);
+  color: var(--text-muted);
+}
+
+.guild-help-strip-link {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 44px;
+  color: var(--gold);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.guild-help-strip-art {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+}
+
+.guild-help-strip-art img {
+  width: 24px;
+  height: 24px;
+  image-rendering: pixelated;
+}
+
+.guild-help-strip-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.guild-help-strip-button {
+  flex: none;
+}
+
 /* The Próby's board in a week under a patron from the Kącina (1201 A): the
    line about its half over the list, and the sign of the god on each trial
    of its domain. */
