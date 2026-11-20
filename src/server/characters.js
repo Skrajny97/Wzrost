@@ -164,7 +164,7 @@ import { OWN_CHARACTERS } from './roles.js';
 import { requirePlayable } from './sessions.js';
 import { tradeBlockOf, tradesEnded } from './trades.js';
 import { skipIntroduction } from './tutorial.js';
-import { restOmens, weekFactorFor, weekFactorNow, weekOfCharacter } from './weeks.js';
+import { restOmens, weekFactorFor, weekOfCharacter } from './weeks.js';
 import { winterCampView, winterQuestsPeriod } from './winter.js';
 import { andrzejkiView } from './andrzejki.js';
 import { orbsView } from './orbs.js';
@@ -505,8 +505,10 @@ export async function settleCollector(db, player, now) {
       .filter((building) => building.effect.kind === 'production')
       .map((building) => {
         const stored = player.buildings[building.id];
-        // With the week's share of what the buildings give (weeks.js).
-        return { building, stored, gathered: collectorTakes(building, stored, now, row.collector_at, every, weekFactorNow(now, 'camp')) };
+        // With the week's share of what the buildings give and the
+        // guild's patron's from the Kącina (weeks.js; Mokosz since
+        // 20.11.2026).
+        return { building, stored, gathered: collectorTakes(building, stored, now, row.collector_at, every, weekFactorFor(row, now, 'camp')) };
       })
       .filter((fill) => fill.gathered);
     if (fills.length === 0) return;
@@ -543,8 +545,10 @@ async function settleBuilds(db, player, now) {
     const building = content().buildingsById[entry.buildingId];
     const producing = building?.effect?.kind === 'production';
     const stored = player.buildings[building?.id];
-    // The store goes as the build begins, with that week's share (weeks.js).
-    const week = weekFactorNow(at, 'camp');
+    // The store goes as the build begins, with that week's share and the
+    // guild's patron's if it reigned then (weeks.js: the row brings the
+    // latest patron).
+    const week = weekFactorFor(row, at, 'camp');
     const gathered = !producing ? null : row.collector_at ? collectWithFills(building, stored, at, row.collector_at, week) : collect(building, stored, at, week);
     const resting = restsDuring(player.activity);
     const hp = resting ? currentHp(player, at).hp : null;

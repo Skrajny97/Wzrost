@@ -29,6 +29,7 @@ import {
   weekLine,
   weekNumber,
 } from '../src/engine/index.js';
+import { contentIn } from '../src/server/content.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -44,21 +45,44 @@ describe('the Kącina in the engine', () => {
       [
         ['perun', 'Perun', 'xp 5'],
         ['weles', 'Weles', 'gold 5'],
-        ['swarog', 'Swaróg', 'upgrade 5'],
-        ['mokosz', 'Mokosz', 'herbs 5, profession-xp 5'],
+        // Since 20.11.2026 Swaróg and Mokosz give more (the author: „Swaróg
+        // niech daje dodatkowe premię a nie tylko Kowadło i Mokosz też”).
+        ['swarog', 'Swaróg', 'upgrade 5, rarity 5'],
+        ['mokosz', 'Mokosz', 'herbs 5, profession-xp 5, materials 5, resources 5, camp 5'],
       ],
     );
     assert.equal(godBonusText(shrineGod('perun', content), content), '+5% XP z walk');
     assert.equal(godBonusText(shrineGod('weles', content), content), '+5% złota z walk');
-    assert.equal(godBonusText(shrineGod('swarog', content), content), '+5% szansy ulepszenia na Kowadle');
-    assert.equal(godBonusText(shrineGod('mokosz', content), content), '+5% ziół w Zielarstwie, +5% XP profesji');
+    assert.equal(godBonusText(shrineGod('swarog', content), content), '+5% szansy ulepszenia na Kowadle, +5% szansy na rzadsze przedmioty z wypraw');
+    assert.equal(
+      godBonusText(shrineGod('mokosz', content), content),
+      '+5% ziół w Zielarstwie, +5% XP profesji, +5% materiałów ze stworów, +5% zasobów z wypraw, +5% z budynków Obozu',
+    );
+    // In English too.
+    const english = contentIn('en');
+    assert.equal(godBonusText(shrineGod('perun', english), english), '+5% XP from fights');
+    assert.equal(godBonusText(shrineGod('swarog', english), english), '+5% upgrade chance on the Anvil, +5% chance of rarer items from explorations');
+    assert.equal(
+      godBonusText(shrineGod('mokosz', english), english),
+      "+5% herbs in Herbalism, +5% profession XP, +5% materials from creatures, +5% resources from explorations, +5% from the Camp's buildings",
+    );
     assert.deepEqual(godDomain('perun', content), ['killAny', 'towers', 'explore', 'salvage']);
+    assert.deepEqual(godDomain('swarog', content), ['upgrade', 'makeAny', 'process', 'salvage']);
     assert.deepEqual(godDomain('mokosz', content), ['gatherAny', 'brewAny', 'process', 'orders']);
     assert.deepEqual(godDomain('nobody', content), []);
     assert.equal(shrineGod('nobody', content), null);
+    assert.deepEqual(patronEffects('perun', content), [{ kind: 'xp', value: 5, patron: 'perun' }]);
+    assert.deepEqual(patronEffects('weles', content), [{ kind: 'gold', value: 5, patron: 'weles' }]);
+    assert.deepEqual(patronEffects('swarog', content), [
+      { kind: 'upgrade', value: 5, patron: 'swarog' },
+      { kind: 'rarity', value: 5, patron: 'swarog' },
+    ]);
     assert.deepEqual(patronEffects('mokosz', content), [
       { kind: 'herbs', value: 5, patron: 'mokosz' },
       { kind: 'profession-xp', value: 5, patron: 'mokosz' },
+      { kind: 'materials', value: 5, patron: 'mokosz' },
+      { kind: 'resources', value: 5, patron: 'mokosz' },
+      { kind: 'camp', value: 5, patron: 'mokosz' },
     ]);
     assert.deepEqual(patronEffects(null, content), []);
   });
@@ -135,8 +159,66 @@ describe('the Kącina in the engine', () => {
     assert.deepEqual(omenLines(both, content), ['Opieka Peruna: +5% XP z walk.']);
     const report = huntReport({ hunt: both, applied: applyHunt(settled.character, both, content), character: settled.character, areaId: 'raven-hollows', startedAt: 0, endsAt: 1 }, content);
     assert.ok(report.system.includes('Opieka Peruna: +5% XP z walk.'), report.system.join(' | '));
-    // Mokosz changes nothing of a fight: no line.
-    assert.deepEqual(omenLines(setOut({ effects: patronEffects('mokosz', content) }), content), []);
+    // Mokosz's bonuses of an exploration are its materials and resources:
+    // one that brought none of them has no line of hers.
+    const quiet = setOut({ effects: patronEffects('mokosz', content) });
+    assert.deepEqual([quiet.materials, quiet.resources], [{}, {}]);
+    assert.deepEqual(omenLines(quiet, content), []);
+  });
+
+  // Perun and Weles as they were; Swaróg and Mokosz since 20.11.2026 also on
+  // every exploration: rarer items, more materials and resources.
+  test('an exploration of four hours under each god: Perun its XP, Weles its gold, Swaróg rarer items, Mokosz materials and resources', () => {
+    const settled = typicalCharacter('warrior', 40, content);
+    const explore = (seed, effects = null) =>
+      simulateHunt({ ...settled, hp: 99999, name: 'Mira', areaId: 'raven-hollows', minutes: 240, seed, lootSeed: `${seed}:łup`, week: effects && { effects } }, content);
+    const seeds = Array.from({ length: 6 }, (_, index) => `kącina-${index}`);
+    const plain = seeds.map((seed) => explore(seed));
+    const under = (god) => seeds.map((seed) => explore(seed, patronEffects(god, content)));
+    const sum = (hunts, of) => hunts.reduce((all, hunt) => all + of(hunt), 0);
+    const fightGold = (hunt) => hunt.fights.reduce((all, fight) => all + fight.gold, 0);
+    const pieces = (counts) => Object.values(counts).reduce((all, count) => all + count, 0);
+
+    // Perun: 5% more XP from each fight, the loot as it was.
+    const perun = under('perun');
+    perun.forEach((hunt, index) => {
+      assert.ok(Math.abs(hunt.xp - plain[index].xp * 1.05) <= hunt.fights.length, `${hunt.xp} for ${plain[index].xp}`);
+      assert.deepEqual([hunt.gold, hunt.items, hunt.materials, hunt.resources], [plain[index].gold, plain[index].items, plain[index].materials, plain[index].resources]);
+    });
+    // Weles: 5% more gold from the fights, the XP and the loot as they were.
+    const weles = under('weles');
+    weles.forEach((hunt, index) => {
+      assert.ok(Math.abs(fightGold(hunt) - fightGold(plain[index]) * 1.05) <= hunt.fights.length, `${fightGold(hunt)} for ${fightGold(plain[index])}`);
+      assert.deepEqual([hunt.xp, hunt.items, hunt.materials, hunt.resources], [plain[index].xp, plain[index].items, plain[index].materials, plain[index].resources]);
+    });
+    // Swaróg: the rarer items' share times 1.05 (the loot's own draws, so a
+    // few items change), the fights as they were; his line where items came.
+    const swarog = under('swarog');
+    swarog.forEach((hunt, index) => assert.equal(hunt.xp, plain[index].xp));
+    assert.equal(weekFactor({ effects: patronEffects('swarog', content) }, 'rarity'), 1.05);
+    const withItems = swarog.find((hunt) => hunt.items.length > 0);
+    assert.deepEqual(omenLines(withItems, content), ['Opieka Swaroga: +5% szansy na rzadsze przedmioty z wypraw.']);
+    // Mokosz: 5% more materials from the creatures (the weeks' share, as
+    // weeks.test.js tries it) and 5% more resources, found and gathered on
+    // the way. Against the same exploration with her materials alone, which
+    // draws the loot alike, each bundle of resources times 1.05, rounded on
+    // its own, and nothing else: herbs, a profession's XP and the camp's
+    // buildings are no exploration's. Her line names what changed.
+    const mokosz = under('mokosz');
+    const materialsAlone = seeds.map((seed) => explore(seed, [{ kind: 'materials', value: 5, patron: 'mokosz' }]));
+    assert.ok(sum(materialsAlone, (hunt) => pieces(hunt.resources)) > 0);
+    mokosz.forEach((hunt, index) => {
+      const same = materialsAlone[index];
+      assert.deepEqual([hunt.xp, hunt.gold, hunt.items, hunt.materials], [same.xp, same.gold, same.items, same.materials]);
+      const bundles = same.entries.filter((entry) => entry.type === 'find' || entry.type === 'gather').length;
+      assert.ok(Math.abs(pieces(hunt.resources) - pieces(same.resources) * 1.05) <= bundles * 3, `${pieces(hunt.resources)} for ${pieces(same.resources)}`);
+      const named = [Object.keys(hunt.materials).length > 0 && '+5% materiałów ze stworów', Object.keys(hunt.resources).length > 0 && '+5% zasobów z wypraw'].filter(Boolean);
+      assert.deepEqual(omenLines(hunt, content), named.length > 0 ? [`Opieka Mokoszy: ${named.join(', ')}.`] : []);
+    });
+    assert.ok(mokosz.some((hunt) => Object.keys(hunt.materials).length > 0));
+    assert.ok(sum(mokosz, (hunt) => pieces(hunt.resources)) > sum(materialsAlone, (hunt) => pieces(hunt.resources)));
+    assert.equal(weekFactor({ effects: patronEffects('mokosz', content) }, 'materials'), 1.05);
+    assert.equal(weekFactor({ effects: patronEffects('mokosz', content) }, 'camp'), 1.05);
   });
 });
 
@@ -348,6 +430,50 @@ describe('the Kącina through the API', () => {
     const kept = JSON.parse(options).week;
     assert.equal(weekFactor(kept, 'herbs'), 1.05);
     assert.equal(weekFactor(kept, 'profession-xp'), 1.05);
+  });
+
+  // Since 20.11.2026 (the author: „Swaróg niech daje dodatkowe premię a nie
+  // tylko Kowadło i Mokosz też, bo sie nie opłacają”).
+  test("under Swaróg an exploration keeps his rarer items; under Mokosz hers, and the camp's buildings give 5% more as a store is collected", async () => {
+    const guildId = (await first("SELECT id FROM guilds WHERE tag = 'GT'")).id;
+    const week = weekKey(clock);
+    const patron = (god) => run('INSERT OR REPLACE INTO guild_patrons (guild_id, week, god_id, settled_at) VALUES (?, ?, ?, ?)', guildId, week, god, clock);
+    const keptBy = async (login, name) => {
+      assert.equal((await as(login, 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 10 })).status, 201);
+      const { options } = await first('SELECT options FROM activities WHERE character_id = (SELECT id FROM characters WHERE name = ?)', name);
+      return JSON.parse(options).week;
+    };
+    await patron('swarog');
+    const swarog = await keptBy('kmiec', 'Kmieć');
+    assert.equal(weekFactor(swarog, 'rarity'), 1.05);
+    assert.equal(weekFactor(swarog, 'upgrade'), 1.05);
+    // (The weeks of the year are off here: the patron's effects alone.)
+    await patron('mokosz');
+    const mokosz = await keptBy('baba', 'Baba');
+    assert.deepEqual(mokosz.effects, patronEffects('mokosz', content));
+    assert.deepEqual(['materials', 'resources', 'camp', 'rarity'].map((kind) => weekFactor(mokosz, kind)), [1.05, 1.05, 1.05, 1]);
+
+    // A Tartak of level 10 with its store full, 1 200 wood: 1 260 for a
+    // member under Mokosz, 1 200 for one outside the guild.
+    const tartak = (name, collectedAt) =>
+      run("INSERT OR REPLACE INTO buildings (character_id, building_id, level, started_at, ends_at, collected_at) SELECT id, 'sawmill', 10, 0, 1, ? FROM characters WHERE name = ?", collectedAt, name);
+    await tartak('Kmieć', clock - 24 * HOUR);
+    await tartak('Obcy', clock - 24 * HOUR);
+    const collected = async (login) => {
+      const answer = await as(login, 'POST', '/api/camp/collect', { buildingId: 'sawmill' });
+      assert.equal(answer.status, 200, JSON.stringify(answer.data));
+      return answer.data.collected.amount;
+    };
+    assert.equal(await collected('obcy'), 1200);
+    assert.equal(await collected('kmiec'), 1260);
+    // The Zbieracz Systemu's too: ten hours of the store, 600 wood, and 630
+    // under Mokosz.
+    await run("UPDATE characters SET collector_at = ?, resources = json_set(resources, '$.wood', 0) WHERE name IN ('Kmieć', 'Obcy')", clock - 20 * HOUR);
+    await tartak('Kmieć', clock - 10 * HOUR);
+    await tartak('Obcy', clock - 10 * HOUR);
+    const wood = async (login) => (await as(login, 'GET', '/api/character')).data.character.resources.wood;
+    assert.equal(await wood('obcy'), 600);
+    assert.equal(await wood('kmiec'), 630);
   });
 
   test('a guild that goes takes its votes and patrons along', async () => {

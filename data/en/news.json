@@ -1212,6 +1212,10 @@
     "0.4.69": {
       "title": "Version 0.4.69",
       "body": "- Settlement: every resident's card now shows your relationship points, a bar to the next standing and what that standing gives, e.g. “Regular: card packs 20% cheaper”."
+    },
+    "0.4.70": {
+      "title": "Version 0.4.70",
+      "body": "- Temple: Svarog now also gives +5% chance of rarer items from explorations, and Mokosh also +5% materials from creatures, +5% resources from explorations and +5% from the Camp's buildings."
     }
   }
 }

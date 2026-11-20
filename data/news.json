@@ -1520,6 +1520,11 @@
       "id": "0.4.69",
       "title": "Wersja 0.4.69",
       "body": "- Osada: karta każdego mieszkańca pokazuje teraz punkty relacji, pasek do następnego stopnia i to, co ten stopień da, np. „Stały klient: pakiety kart 20% taniej”."
+    },
+    {
+      "id": "0.4.70",
+      "title": "Wersja 0.4.70",
+      "body": "- Kącina: Swaróg daje teraz też +5% szansy na rzadsze przedmioty z wypraw, a Mokosz także +5% materiałów ze stworów, +5% zasobów z wypraw i +5% z budynków Obozu."
     }
   ]
 }
