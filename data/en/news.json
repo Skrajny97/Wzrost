@@ -1260,6 +1260,10 @@
     "0.4.81": {
       "title": "Version 0.4.81",
       "body": "- Chat: the bell that mutes chat notifications now sits by the message line, so it no longer scrolls away with the title. The “Back to top” button no longer shows in the chat."
+    },
+    "0.4.82": {
+      "title": "Version 0.4.82",
+      "body": "- Jewelcrafting › “Setting”: you can now claim the System Avatar's report from setting a stone in a worn item or the Core during an exploration or a mercenary service, so the Avatar gets back to work at once. The stone goes into the item once the character is back."
     }
   }
 }

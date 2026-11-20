@@ -222,6 +222,45 @@ async function regearWorn(db, row, items) {
   return next;
 }
 
+// The gems an Awatar's setting brought into a worn item or the Rdzeń while
+// the character was on an exploration or a mercenary's service wait beside
+// them (`pendingGem`, finishJewels in jewelcraft.js) and go in at the first
+// look at the character on neither (gracz (poz. 43), 20.11.2026): the
+// exploration's row stays until its report is claimed, so that report is
+// made with what it wore, without them. Each gem once: only while the
+// character is as read and on neither, and only where a gem still waits;
+// a look that loses the race leaves them to the next.
+async function settlePendingGems(db, row, items, activity) {
+  if (activity?.kind === 'hunt' || activity?.kind === 'mercenary') return items;
+  const waiting = items.filter((item) => typeof item.pendingGem === 'string');
+  const core = typeof row.core === 'string' && row.core.includes('pendingGem') && Boolean(coreOf(row).pendingGem);
+  if (waiting.length === 0 && !core) return items;
+  let results;
+  try {
+    results = await db.batch([
+      assertion(db, "(SELECT version FROM characters WHERE id = ?) = ? AND NOT EXISTS (SELECT 1 FROM activities WHERE character_id = ? AND kind IN ('hunt', 'mercenary'))", [row.id, row.version, row.id]),
+      ...waiting.map((item) =>
+        db
+          .prepare("UPDATE items SET data = json_remove(json_set(data, '$.gem', json_extract(data, '$.pendingGem')), '$.pendingGem') WHERE id = ? AND character_id = ? AND json_type(data, '$.pendingGem') = 'text'")
+          .bind(item.id, row.id),
+      ),
+      db
+        .prepare(`UPDATE characters SET version = version + 1${core ? ", core = json_remove(json_set(core, '$.gem', json_extract(core, '$.pendingGem')), '$.pendingGem')" : ''} WHERE id = ?`)
+        .bind(row.id),
+      db.prepare('SELECT version, core FROM characters WHERE id = ?').bind(row.id),
+    ]);
+  } catch (error) {
+    if (raced(error)) return items;
+    throw error;
+  }
+  Object.assign(row, results.at(-1).results[0]);
+  return items.map((item) => {
+    if (typeof item.pendingGem !== 'string') return item;
+    const { pendingGem, ...kept } = item;
+    return { ...kept, gem: pendingGem };
+  });
+}
+
 // A character's row with its items, activities and camp buildings.
 async function playerOf(db, row) {
   const [items, activities, avatarActivities, avatar2Activities, buildings, parcels, stored] = await db.batch([
@@ -253,7 +292,12 @@ async function playerOf(db, row) {
   return {
     row,
     // equippedSlot is where the item is worn (null in the bag); item.slot is where it can go.
-    items: await regearWorn(db, row, items.results.map((item) => ({ id: item.id, equippedSlot: item.slot, ...JSON.parse(item.data) }))),
+    items: await settlePendingGems(
+      db,
+      row,
+      await regearWorn(db, row, items.results.map((item) => ({ id: item.id, equippedSlot: item.slot, ...JSON.parse(item.data) }))),
+      activities.results[0] ?? null,
+    ),
     // The items of the Przechowalnia, the oldest first, each with its own id
     // there (not an item's of the bag).
     stored: stored.results.map((item) => ({ id: item.id, ...JSON.parse(item.data) })),
@@ -940,6 +984,9 @@ export function coreOf(row) {
     shards: Number.isSafeInteger(stored.shards) && stored.shards > 0 ? stored.shards : 0,
     gem: typeof stored.gem === 'string' ? stored.gem : null,
     absorbed: (Array.isArray(stored.absorbed) ? stored.absorbed : []).filter((artifact) => knownArtifact(artifact, content())),
+    // A gem waiting for the character's return (settlePendingGems), kept
+    // by every write of the Rdzeń made from this; in no fight before then.
+    ...(typeof stored.pendingGem === 'string' && { pendingGem: stored.pendingGem }),
   };
 }
 
@@ -2406,6 +2453,8 @@ function coreSummary(row) {
     free: freeSockets(core, row.level, content()),
     shards: core.shards,
     gem: gemView(core.gem, content()),
+    // The gem waiting for the character's return (settlePendingGems).
+    ...(core.pendingGem && { pendingGem: gemView(core.pendingGem, content()) }),
   };
 }
 

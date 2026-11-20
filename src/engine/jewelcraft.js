@@ -306,7 +306,7 @@ export function transmuteGems(minerals, gemId, count, content) {
  * @property {Base} [base] The pattern of an order of jewellery (none for a gem set).
  * @property {string} [rarityId] The rarity of the order's jewels.
  * @property {JewelResult[]} [results] The order's jewels.
- * @property {{ gem: string, item?: Item | null, core?: boolean, replaced?: string | null }} [set] A gem set instead of an order: in an item, or in the Rdzeń (`core`).
+ * @property {{ gem: string, item?: Item | null, core?: boolean, replaced?: string | null, pending?: string }} [set] A gem set instead of an order: in an item, or in the Rdzeń (`core`); `pending` ('hunt' or 'mercenary') when it waits for the character's return.
  * @property {string[]} [learned]
  * @property {number} minutes
  * @property {number} startedAt
@@ -357,19 +357,28 @@ export function jewelReport({ base, rarityId, results = [], set, learned = [], m
     // w Rdzeniu." (setCore; the code review, 13.11.2026: it said "…
     // w przedmiocie: Rdzeń.").
     const target = set.item ? itemName(set.item, content) : null;
-    const text = set.core
-      ? say(texts, 'setCore', 0, { gem: gem.name })
-      : target
-        ? say(texts, 'set', 0, { gem: gem.name, item: target })
-        : say(texts, 'missing', 0, { gem: gem.name });
+    // One claimed on an exploration or a mercenary's service waits for the
+    // character's return (`pending`, src/server/jewelcraft.js), its gem
+    // before it still there till then.
+    const serving = set.pending === 'mercenary';
+    const text = set.pending
+      ? set.core
+        ? say(texts, serving ? 'pendingCoreMercenary' : 'pendingCore', 0, { gem: gem.name })
+        : say(texts, serving ? 'pendingMercenary' : 'pending', 0, { gem: gem.name, item: target })
+      : set.core
+        ? say(texts, 'setCore', 0, { gem: gem.name })
+        : target
+          ? say(texts, 'set', 0, { gem: gem.name, item: target })
+          : say(texts, 'missing', 0, { gem: gem.name });
     return {
       ...report,
       set: {
         gem: gemView(gem.id, content),
         item: set.item ? itemView(set.item, content) : null,
         ...(set.core && { core: true }),
+        ...(set.pending && { pending: true }),
         text,
-        replaced: replaced ? say(texts, 'replaced', 0, { gem: replaced.name }) : null,
+        replaced: replaced && !set.pending ? say(texts, 'replaced', 0, { gem: replaced.name }) : null,
       },
     };
   }

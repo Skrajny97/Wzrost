@@ -1580,6 +1580,11 @@
       "id": "0.4.81",
       "title": "Wersja 0.4.81",
       "body": "- Czat: dzwonek, który wycisza powiadomienia czatu, stoi teraz przy polu do pisania, więc nie ucieka już w górę razem z tytułem. Przycisk „Na górę” nie pokazuje się w czacie."
+    },
+    {
+      "id": "0.4.82",
+      "title": "Wersja 0.4.82",
+      "body": "- Jubilerstwo › „Oprawianie”: raport Awatara Systemu z oprawiania kamienia w noszonym przedmiocie albo w Rdzeniu odbierzesz też w trakcie wyprawy i usługi najemnej, więc Awatar od razu wraca do pracy. Kamień trafi do przedmiotu, gdy postać wróci."
     }
   ]
 }

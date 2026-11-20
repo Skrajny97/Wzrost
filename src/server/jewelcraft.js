@@ -67,8 +67,8 @@ function jewelOrder(player, level, body) {
 // wyprawy mozna bylo oprawiać kamień w rzeczy spoza ekwipunku (z plecaka)”):
 // what it wears and the Rdzeń count in the exploration's fights, whose
 // report is made with them, in the words of the note over the Oprawianie's
-// figure. A setting started before the trip still waits for its end
-// (finishJewels).
+// figure. A setting started before the trip is claimed on the way, its gem
+// waiting for the trip's end (finishJewels).
 function requireAtHome(player) {
   const kind = player.activity?.kind;
   if (kind !== 'hunt' && kind !== 'mercenary') return;
@@ -95,6 +95,9 @@ function settingOrder(player, level, body) {
     return options.set === true && options.item === item.id;
   });
   if (setting) throw new ApiError(409, 'setting_under_way', 'W tym przedmiocie trwa już oprawianie kamienia.');
+  // A gem waiting for the character's return keeps its place till then
+  // (finishJewels); at home it is in already (settlePendingGems).
+  if (item.pendingGem) throw new ApiError(409, 'gem_waiting', t('Ten przedmiot czeka już na kamień: {gem}.', { gem: content().mineralsById[item.pendingGem]?.name ?? item.pendingGem }));
   const gem = typeof body.gem === 'string' ? content().mineralsById[body.gem] : undefined;
   if (!gem || gem.kind !== 'gem') throw new ApiError(400, 'unknown_gem', 'Nie ma takiego kamienia.');
   if (gem.level > level) throw new ApiError(403, 'locked', say(content().jewelcrafting.texts, 'hidden', 0, { level: gem.level }));
@@ -104,14 +107,15 @@ function settingOrder(player, level, body) {
   return { cost: { [gem.id]: 1 }, minutes: setMinutes(gem.id, level, content()), options: { set: true, item: item.id, itemName: itemName(item, content()), gem: gem.id } };
 }
 
-// A gem set in the Rdzeń: as in a worn item, it waits for the character's
-// return from an exploration, as the Rdzeń counts in its fights, and one
-// setting of it at a time.
+// A gem set in the Rdzeń: as in a worn item, none starts on an exploration,
+// as the Rdzeń counts in its fights, and one setting of it at a time.
 function coreSettingOrder(player, level, body) {
   if (!labyrinthOn() || !coreOf(player.row).open) throw new ApiError(404, 'item_not_found', 'Nie masz tego przedmiotu.');
   requireAtHome(player);
   const setting = [player.activity, player.avatarActivity, player.avatar2Activity].some((work) => work?.kind === 'jewels' && JSON.parse(work.options ?? '{}').core === true);
   if (setting) throw new ApiError(409, 'setting_under_way', 'W Rdzeniu trwa już oprawianie kamienia.');
+  const waiting = coreOf(player.row).pendingGem;
+  if (waiting) throw new ApiError(409, 'gem_waiting', t('Rdzeń czeka już na kamień: {gem}.', { gem: content().mineralsById[waiting]?.name ?? waiting }));
   const gem = typeof body.gem === 'string' ? content().mineralsById[body.gem] : undefined;
   if (!gem || gem.kind !== 'gem') throw new ApiError(400, 'unknown_gem', 'Nie ma takiego kamienia.');
   if (gem.level > level) throw new ApiError(403, 'locked', say(content().jewelcrafting.texts, 'hidden', 0, { level: gem.level }));
@@ -231,22 +235,20 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
   };
   const known = (amounts) => Object.fromEntries(Object.entries(amounts ?? {}).filter(([id]) => content().mineralsById[id]));
   const taken = known(options.minerals);
+  // On an exploration or a mercenary's service what the character wears and
+  // the Rdzeń count in its fights, whose report is made with them when it is
+  // claimed (the code review of 3.11.2026: the Awatar's setting claimed on
+  // the way changed the exploration's fights; mercenaries.js). A gem set in
+  // them then waits beside them (`pendingGem`) and goes in once the
+  // character is back (settlePendingGems in characters.js), while the work
+  // ends at once, with its XP, and the Awatar is free (gracz (poz. 43),
+  // 20.11.2026: the report waited for the trip's end, and the Awatar with it).
+  const away = ['hunt', 'mercenary'].includes(player.activity?.kind) ? player.activity.kind : null;
 
   if (options.set && options.core) {
     const gem = content().mineralsById[options.gem];
     if (stop || !gem || !labyrinthOn() || !coreOf(row).open) return giveBack(taken);
-    // The Rdzeń takes its gem only once the character is back from an
-    // exploration and its report is claimed, as a worn item does.
-    if (['hunt', 'mercenary'].includes(player.activity?.kind)) {
-      throw new ApiError(
-        409,
-        'item_worn_exploring',
-        player.activity.kind === 'mercenary'
-          ? 'Kamień trafi do Rdzenia, gdy postać skończy usługę najemną albo zdejmie ogłoszenie.'
-          : 'Kamień trafi do Rdzenia, gdy postać wróci z wyprawy i odbierze jej raport.',
-      );
-    }
-    return saveReport({}, { set: { gem: gem.id, core: true, replaced: coreOf(row).gem } }, activity.minutes, null);
+    return saveReport({}, { set: { gem: gem.id, core: true, replaced: coreOf(row).gem, ...(away && { pending: away }) } }, activity.minutes, null);
   }
 
   if (options.set) {
@@ -255,23 +257,10 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
     // An item gone by now (sold, taken apart, given away) gets no gem: the
     // gem comes back, and the report says so.
     const item = player.items.find((candidate) => candidate.id === options.item) ?? null;
-    // A worn item takes its gem only once the character is back from an
-    // exploration and its report is claimed, as that report is made with
-    // what it wears (the code review of 3.11.2026: the Awatar's setting
-    // claimed on the way changed the exploration's fights).
-    // A mercenary's gear waits as well (mercenaries.js).
-    if (item?.equippedSlot && ['hunt', 'mercenary'].includes(player.activity?.kind)) {
-      throw new ApiError(
-        409,
-        'item_worn_exploring',
-        player.activity.kind === 'mercenary'
-          ? 'Kamień trafi do noszonego przedmiotu, gdy postać skończy usługę najemną albo zdejmie ogłoszenie.'
-          : 'Kamień trafi do noszonego przedmiotu, gdy postać wróci z wyprawy i odbierze jej raport.',
-      );
-    }
+    const pending = item?.equippedSlot ? away : null;
     // The item as its row's data keeps it, without the row's id and slot.
     const data = item && Object.fromEntries(Object.entries(item).filter(([field]) => field !== 'id' && field !== 'equippedSlot'));
-    return saveReport(item ? {} : taken, { set: { gem: gem.id, item: data && { ...data, gem: gem.id }, replaced: data?.gem ?? null } }, activity.minutes, item);
+    return saveReport(item ? {} : taken, { set: { gem: gem.id, item: data && { ...data, gem: gem.id }, replaced: data?.gem ?? null, ...(pending && { pending }) } }, activity.minutes, item);
   }
 
   const base = content().basesById[options.base];
@@ -359,10 +348,11 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
         db
           .prepare(`UPDATE characters SET version = version + 1, quests = CASE WHEN quests = ? THEN ? ELSE quests END${sets.sql}${minerals.sql} WHERE id = ? AND ${ongoing}`)
           .bind(row.quests, quests, ...sets.binds, ...minerals.binds, row.id, row.id, activity.started_at),
-        // The gem goes into the item as it is now, so an upgrade meanwhile stays.
-        ...(item ? [db.prepare("UPDATE items SET data = json_set(data, '$.gem', ?) WHERE id = ? AND character_id = ?").bind(made.set.gem, item.id, row.id)] : []),
-        // Or into the Rdzeń, the gem before it gone (core.js).
-        ...(made.set?.core ? [db.prepare("UPDATE characters SET core = json_set(core, '$.gem', ?) WHERE id = ?").bind(made.set.gem, row.id)] : []),
+        // The gem goes into the item as it is now, so an upgrade meanwhile
+        // stays, or on the way waits beside it (`pendingGem`, above).
+        ...(item ? [db.prepare(`UPDATE items SET data = json_set(data, '$.${made.set.pending ? 'pendingGem' : 'gem'}', ?) WHERE id = ? AND character_id = ?`).bind(made.set.gem, item.id, row.id)] : []),
+        // Or into the Rdzeń, the gem before it gone (core.js), or beside it.
+        ...(made.set?.core ? [db.prepare(`UPDATE characters SET core = json_set(core, '$.${made.set.pending ? 'pendingGem' : 'gem'}', ?) WHERE id = ?`).bind(made.set.gem, row.id)] : []),
         // The jewels made wait in the Przechowalnia, out of the bag (842).
         ...jewels.map((jewel) => store.bind(row.id, JSON.stringify(jewel), now)),
         // The Punkty Sławy of the work (fame.js), the Awatar's a quarter.

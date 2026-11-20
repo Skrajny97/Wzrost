@@ -946,6 +946,9 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap, materials =
     // its numbers without the gem and with it, which its card writes side by
     // side (gemProperties, 906 B).
     ...(gem ? { gem, gemProperties: gemProperties(item, content) } : {}),
+    // A gem that waits for the character's return from an exploration to go
+    // in (src/server/jewelcraft.js), not in its numbers till then.
+    ...(item.pendingGem && content.mineralsById[item.pendingGem] ? { pendingGem: gemView(item.pendingGem, content) } : {}),
     // Got in a Wymiana, or from another character through the Skrzynia
     // Konta: worn from its own level on (src/server/inventory.js).
     ...(item.traded ? { traded: true } : {}),
