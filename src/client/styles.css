@@ -11924,6 +11924,28 @@ button.farm-plot {
   background: var(--gold);
 }
 
+/* A bust slides into another place among them (20.11.2026, slide-row.js),
+   as a chat's tab does (1039.3): held, it lifts above the others on a card
+   of its own, which covers the names it passes, ringed in gold, and follows
+   the finger along the row; no menu or selection from the long press. */
+.char-switch-item {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.char-switch .char-switch-item--lifted {
+  z-index: 2;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+  cursor: grabbing;
+}
+
+.char-switch .char-switch-item--lifted .char-switch-bust {
+  border-color: var(--gold);
+}
+
 .select-text {
   display: flex;
   flex-direction: column;

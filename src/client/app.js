@@ -18,6 +18,7 @@ import { desktopLayout, layoutChoice, layoutOffered, onLayoutChange, setLayoutCh
 import { updateSide } from './side.js';
 import { mountBackToTop } from './back-to-top.js';
 import { chatBubbleOn, setChatBubbleOn, updateChatBubble } from './chat-bubble.js';
+import { forgetCharacter } from './character-order.js';
 import { mountStreakTab, offerStreak } from './daily-streak.js';
 import { mountWinterTab, offerWinter } from './winter-calendar.js';
 // The computer's keys 1–6 for the main tabs (477 A, 508 A).
@@ -1719,7 +1720,7 @@ async function deleteCharacter() {
     toast(error.message);
     return;
   }
-  const { name } = state.character;
+  const { id, name } = state.character;
   const sure = await confirmAction({
     title: t('Usunąć postać?'),
     text: t('{name} zniknie na zawsze razem z przedmiotami, złotem i raportami. Tego nie da się cofnąć. {then}', {
@@ -1733,6 +1734,8 @@ async function deleteCharacter() {
   if (!sure) return;
   try {
     await call('DELETE', '/api/character');
+    // Gone from the order of the busts kept on this device too.
+    forgetCharacter(id);
     await characterGone();
   } catch (error) {
     toast(error.message);

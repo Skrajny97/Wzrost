@@ -6,6 +6,7 @@
 import { herbSprite, itemSprite, materialSprite, mineralSprite, pantrySprite, potionSprite, resourceArt, scrollArt } from '../art.js';
 import { bonusList } from '../bonuses.js';
 import { showAchievements } from '../achievements.js';
+import { keepCharacterOrder, orderedCharacters } from '../character-order.js';
 import { characterLook, portraitLayers } from '../cosmetics.js';
 import { MATERIALS_HINT, materialIcon, materialSheet, materialTitle } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
@@ -16,6 +17,7 @@ import { SLOT_ICONS, itemIcon } from '../icons.js';
 import { playSound } from '../sound.js';
 import { buildLocked, buildLockedText, call, costShortfall, isUnlocked, serverNow, state, unlockInfo, walletEntries } from '../state.js';
 import { scrapperSheet } from '../scrapper.js';
+import { slideInRow } from '../slide-row.js';
 import { itemTip, setTipRenderer } from '../item-tip.js';
 import { afterSheet, closeSheet, confirmAction, openSheet, pageHeading, systemLink, systemPanel, toast, withButton } from '../ui.js';
 import { bust } from './select.js';
@@ -299,30 +301,47 @@ function switchTimer(one) {
   return [own, avatar];
 }
 
-function characterSwitch(list, switchCharacter) {
+// The busts in the order kept on this device (character-order.js), and
+// each slides into another place among them as a chat's tab does (the
+// author, 20.11.2026: „W karcie postaci daj możliwość tez przenoszenia jak
+// na czacie zakładek tych kółek od zmiany postaci, żeby sobie ustawić jak
+// komu wygodnie”; slide-row.js): held a moment, it lifts in a gold ring and
+// follows the finger along the row; let go, the order stays, and `redraw`
+// draws the screen with it (after a slide broken off, as it was). A short
+// tap plays the character as before.
+const BUSTS_SLIDE = { items: '.char-switch-item[data-character]', lifted: 'char-switch-item--lifted', sliding: 'char-switch--sliding', key: 'character', sideways: true };
+function characterSwitch(list, switchCharacter, redraw) {
   switchTicks = [];
   if (!list || list.characters.length < 2 || !switchCharacter) return null;
-  return h(
+  const busts = orderedCharacters(list.characters).map((one) =>
+    h(
+      'button',
+      {
+        type: 'button',
+        class: 'char-switch-item',
+        dataset: { character: String(one.id) },
+        'aria-current': one.played ? 'true' : null,
+        'aria-label': one.played ? t('{name} (grasz teraz)', { name: one.name }) : t('Graj postacią {name}', { name: one.name }),
+        onClick: one.played ? null : (event) => withButton(event.currentTarget, () => switchCharacter(one.id)),
+      },
+      switchTimer(one),
+      h('span', { class: 'char-switch-bust' }, bust(one)),
+      one.activity?.finished && !one.played && h('span', { class: 'char-switch-dot', 'aria-hidden': 'true' }),
+      h('span', { class: 'char-switch-name', text: one.name }),
+    ),
+  );
+  const row = h(
     'nav',
     // The Awatar's line only when one of the busts has its Awatar at work.
     { class: `char-switch${list.characters.some((one) => avatarWorkOf(one)) ? ' char-switch--avatars' : ''}`, 'aria-label': t('Twoje postacie'), 'data-guide': 'char-switch' },
-    list.characters.map((one) =>
-      h(
-        'button',
-        {
-          type: 'button',
-          class: 'char-switch-item',
-          'aria-current': one.played ? 'true' : null,
-          'aria-label': one.played ? t('{name} (grasz teraz)', { name: one.name }) : t('Graj postacią {name}', { name: one.name }),
-          onClick: one.played ? null : (event) => withButton(event.currentTarget, () => switchCharacter(one.id)),
-        },
-        switchTimer(one),
-        h('span', { class: 'char-switch-bust' }, bust(one)),
-        one.activity?.finished && !one.played && h('span', { class: 'char-switch-dot', 'aria-hidden': 'true' }),
-        h('span', { class: 'char-switch-name', text: one.name }),
-      ),
-    ),
+    busts,
   );
+  const dropped = (order) => {
+    keepCharacterOrder(order);
+    redraw();
+  };
+  for (const one of busts) slideInRow(one, row, BUSTS_SLIDE, dropped, redraw);
+  return row;
 }
 
 export function mountCharacter(container, { switchCharacter } = {}) {
@@ -339,6 +358,11 @@ export function mountCharacter(container, { switchCharacter } = {}) {
     .catch(() => {});
 
   function render() {
+    // While a bust slides, the screen waits: drawn anew, it would take the
+    // bust from under the finger. The drop draws it (characterSwitch).
+    if (container.querySelector('.char-switch--sliding')) return;
+    // The busts' row keeps how far it is scrolled sideways.
+    const scrolled = container.querySelector('.char-switch')?.scrollLeft ?? 0;
     const character = state.character;
     const busy = onExploration(character);
     const slots = state.content.slots;
@@ -371,8 +395,9 @@ export function mountCharacter(container, { switchCharacter } = {}) {
     frame.classList.toggle('portrait--framed', layers.length > 1);
     frame.append(...layers, column('left'), column('right'), eye);
 
+    const busts = characterSwitch(characters, switchCharacter, render);
     fill(container,
-      characterSwitch(characters, switchCharacter),
+      busts,
       pageHeading(character.name, `${character.evolution?.current ? t('{name} (z klasy: {base})', { name: character.className, base: character.baseClassName }) : character.className} · ${t(POSITION_NAMES[character.position])} · solo`, {
         tag: character.guildTag,
         nameColor: character.nameColor,
@@ -400,6 +425,7 @@ export function mountCharacter(container, { switchCharacter } = {}) {
         bagSection(character.bag),
       ),
     );
+    if (busts) busts.scrollLeft = scrolled;
   }
 
   function slotButton(slot, item) {

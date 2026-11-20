@@ -1222,6 +1222,8 @@
   "src/server/achievements.js",
   "src/engine/achievements.js",
   "src/client/chat-order.js",
+  "src/client/character-order.js",
+  "src/client/slide-row.js",
   "src/client/guild-heroes.js",
   "src/client/guild-lands.js",
   "src/client/guild-stall.js",
