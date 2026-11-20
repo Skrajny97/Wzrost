@@ -3901,6 +3901,13 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Wersja 0.4.83 (20.11.2026): trening towarzyszy 10 razy dziennie
+
+Autor: „Daj też opcję trenowania towarzyszy nawet 10 razy dziennie jesli chodzi o wyższy poziom zbliżony do gracza” (20.11.2026).
+
+1. „Trenuj” w Kwaterach działa do 10 razy na dobę zadań narratora dla każdego towarzysza (`settlement.companions.training.perDay` 10 zamiast 3). Cena (25 złota razy poziom, na który wchodzi) i górna granica (poziom postaci −3) bez zmian, więc towarzysz szybciej dogoni postać, ale dalej nie wyżej niż 3 poziomy pod nią.
+2. Testy: `test/companions.test.js` liczy 10 treningów na dzień; test dwóch stuknięć naraz ma teraz jeden trening do końca dnia, tak jak wcześniej przy limicie 3.
+
 ## Wersja 0.4.82 (20.11.2026): raport Awatara z oprawiania także w trakcie wyprawy
 
 Według sekcji niżej (zgłoszenie gracza przez autora).
