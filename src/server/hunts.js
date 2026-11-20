@@ -6,6 +6,7 @@ import {
   addQuestProgress,
   applyHunt,
   freshMeal,
+  mealName,
   mealOf,
   mealTime,
   mealUse,
@@ -430,7 +431,7 @@ export async function startHunt(context) {
 export async function beginHunt(
   db,
   player,
-  { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow, scout = null, hard = false, hell = false, mercenary = null, meal = null, mealReplaces = null } = {},
+  { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow, scout = null, hard = false, hell = false, mercenary = null, meal = null, mealPortions = 1, mealReplaces = null } = {},
   now,
   { quick = false, flash = false, party: crew = null, mount = null, haste = 0, follower = false, also = [], check = false, defer = false } = {},
 ) {
@@ -468,11 +469,12 @@ export async function beginHunt(
   }
   const taken = takenPotions(player, potions, minutes);
   // The meal (cooking.js; 999.5 v2): a dish of the Spiżarnia chosen as it
-  // sets out (`meal`, its id) is eaten now, in place of the meal at work
-  // (`mealReplaces`, mealAtStart); the meal at work covers this
-  // exploration's time, as much as it has left, and what is left waits for
-  // the next one. On a Drużyna's trip each member's own.
-  const fed = mealAtStart(player, meal, minutes, mealReplaces);
+  // sets out (`meal`, its id), `mealPortions` of it, is eaten now, in
+  // place of the meal at work or on top of its portions (`mealReplaces`,
+  // mealAtStart); the meal at work covers this exploration's time, as much
+  // as it has left, and what is left waits for the next one. On a
+  // Drużyna's trip each member's own.
+  const fed = mealAtStart(player, meal, minutes, mealReplaces, mealPortions);
   // The strengthening potions drunk before cover the exploration's first
   // fights, as many as theirs; they are used up only when its report is
   // claimed (the author: "bonusy wszelkie za picie mikstur itp. nie zużywają
@@ -678,44 +680,92 @@ export async function beginHunt(
   return setup;
 }
 
-// The meal an exploration of `minutes` sets out with (cooking.js): the dish
-// chosen (`dishId`, or null) eaten now, or the meal still at work; null
-// without either, or where the game has no Gotowanie. `bonus`: what it does
-// on this exploration (simulateHunt); `back`: the meal before, and the dish
-// eaten, for a call back; `sets`: the row's changes, the meal after and the
-// dish taken from the Spiżarnia.
-// Another dish eaten while a meal works takes its place (the author,
+// `count` portions of a dish of the Spiżarnia (`dishId`) eaten now: the
+// meal at work as the row has it (`before`), and the meal they make, with
+// its full time (`meal`). Another dish takes the meal's place (the author,
 // 20.11.2026: „może dam opcję zjedzenia innego posiłku i zmarnowania
-// poprzedniego bonusu”): the meal at work ends at once, what it had left is
-// lost, and the new one has its full time. Only the meal the page showed
-// (`replaces`, its dish's id) is replaced: one eaten meanwhile elsewhere is
-// the usual "changed meanwhile". The same dish waits for its own end.
-function mealAtStart(player, dishId, minutes, replaces = null) {
+// poprzedniego bonusu”): the meal at work ends at once, all its portions
+// and what it had left lost. The same dish adds its portions, up to
+// meal.portions together (the author, 20.11.2026: „maksymalnie do 3 potraw
+// jednego rodzaju na raz”), and gives the meal its full time again. Only
+// the meal the page showed (`replaces`: its dish's id, or { dish, portions
+// }) is replaced or added to: one eaten meanwhile elsewhere is the usual
+// "changed meanwhile".
+function mealEaten(player, dishId, replaces = null, count = 1) {
   const { cooking } = content();
-  if (!cooking) return null;
   const before = mealOf(player.row.meal, content());
-  let eaten = null;
-  if (dishId !== null && dishId !== undefined) {
-    const dish = typeof dishId === 'string' ? content().dishesById[dishId] : undefined;
-    if (!dish) throw new ApiError(400, 'unknown_dish', 'Nie ma takiej potrawy.');
-    if (before && replaces !== before.dish) throw characterChanged();
-    if (before?.dish === dish.id) {
-      throw new ApiError(409, 'meal_active', say(cooking.texts, 'mealActive', 0, { dish: dish.name, time: mealTime(before.left) }));
-    }
-    if (!((pantryOf(player.row)[dish.id] ?? 0) >= 1)) throw new ApiError(409, 'no_dish', say(cooking.texts, 'noDish', 0));
-    eaten = dish.id;
+  const dish = typeof dishId === 'string' ? content().dishesById[dishId] : undefined;
+  if (!dish) throw new ApiError(400, 'unknown_dish', 'Nie ma takiej potrawy.');
+  const most = cooking.meal.portions;
+  if (!Number.isInteger(count) || count < 1 || count > most) throw new ApiError(400, 'invalid_portions', `Wybierz od 1 do ${most} porcji.`);
+  const seen = replaces !== null && typeof replaces === 'object' ? replaces : { dish: replaces };
+  if (before && (seen.dish !== before.dish || (seen.portions !== undefined && seen.portions !== before.portions))) throw characterChanged();
+  const had = before?.dish === dish.id ? before.portions : 0;
+  if (had + count > most) {
+    throw new ApiError(409, 'meal_full', say(cooking.texts, 'mealFull', 0, { dish: mealName(dish, had, content()), time: mealTime(before.left), most }));
   }
-  const { bonus, after } = mealUse(eaten ? freshMeal(eaten, content()) : before, minutes, content());
+  if (!((pantryOf(player.row)[dish.id] ?? 0) >= count)) throw new ApiError(409, 'no_dish', say(cooking.texts, 'noDish', 0));
+  return { before, meal: freshMeal(dish.id, content(), had + count) };
+}
+
+// The SQL taking `count` dishes out of the Spiżarnia, with its binds after
+// the meal's.
+const dishesTaken = (dishId, count) => ({ sql: ', pantry = json_set(pantry, ?, json_extract(pantry, ?) - ?)', binds: [`$."${dishId}"`, `$."${dishId}"`, count] });
+
+// The meal an exploration of `minutes` sets out with (cooking.js): `count`
+// portions of the dish chosen (`dishId`, or null) eaten now (mealEaten), or
+// the meal still at work; null without either, or where the game has no
+// Gotowanie. `bonus`: what it does on this exploration (simulateHunt);
+// `back`: the meal before, and the dishes eaten, for a call back; `sets`:
+// the row's changes, the meal after and the dishes taken from the
+// Spiżarnia.
+function mealAtStart(player, dishId, minutes, replaces = null, count = 1) {
+  if (!content().cooking) return null;
+  const eating = dishId !== null && dishId !== undefined ? mealEaten(player, dishId, replaces, count) : null;
+  const before = eating ? eating.before : mealOf(player.row.meal, content());
+  const { bonus, after } = mealUse(eating?.meal ?? before, minutes, content());
   if (!bonus) return null;
-  const path = eaten && `$."${eaten}"`;
+  const taken = eating && dishesTaken(eating.meal.dish, count);
   return {
     bonus,
-    back: { before, ...(eaten && { eaten }) },
+    back: { before, ...(eating && { eaten: eating.meal.dish, count }) },
     sets: {
-      sql: `, meal = ?${eaten ? ', pantry = json_set(pantry, ?, json_extract(pantry, ?) - 1)' : ''}`,
-      binds: [after ? JSON.stringify(after) : null, ...(eaten ? [path, path] : [])],
+      sql: `, meal = ?${taken ? taken.sql : ''}`,
+      binds: [after ? JSON.stringify(after) : null, ...(taken ? taken.binds : [])],
     },
   };
+}
+
+// A dish of the Spiżarnia eaten now, from its card in the bag, not as an
+// exploration sets out (the author, 20.11.2026: „Pozwól zjeść posiłek z
+// pozycji plecaka może? To ułatwi sprawę”): `count` portions of it (`id`),
+// by mealEaten's rules (`replaces`: the meal at work the page showed). Not
+// while the character is on an exploration, a Drużyna's trip too: the
+// exploration keeps the meal it set out with, and a call back gives back
+// the meal as it was. The meal's time runs only on explorations, so nothing
+// is lost by eating early; a member of a Drużyna eats so before its trip,
+// whose set-out feeds only the leader, and the meal covers the trip.
+export async function eatDish(context) {
+  const { session, player } = await requirePlayer(context);
+  const { cooking } = content();
+  if (!cooking) throw new ApiError(404, 'not_found', 'Nie ma takiej potrawy.');
+  const activity = player.activity;
+  if (activity?.kind === 'hunt') {
+    if (activity.ends_at <= context.now) throw new ApiError(409, 'claim_first', 'Wyprawa się skończyła. Odbierz raport.');
+    throw new ApiError(409, 'on_exploration', say(cooking.texts, 'eatAway', 0));
+  }
+  const body = await readJson(context.request);
+  const count = body.count ?? 1;
+  const { meal } = mealEaten(player, body.id, body.replaces ?? null, count);
+  const taken = dishesTaken(meal.dish, count);
+  const db = context.env.DB;
+  // Only while the character is as read (atomic.js): two taps at once eat
+  // once, and an exploration set out meanwhile keeps its meal.
+  await atomically(db, [
+    sameVersion(db, player.row),
+    db.prepare(`UPDATE characters SET meal = ?${taken.sql}, version = version + 1 WHERE id = ?`).bind(JSON.stringify(meal), ...taken.binds, player.row.id),
+  ]);
+  return json({ character: characterView(await loadPlayer(db, session.userId), context.now) });
 }
 
 // Calling the character back early gives nothing and costs nothing. A
@@ -747,10 +797,11 @@ export async function cancelHunt(context) {
   const options = JSON.parse(activity.options ?? '{}');
   const back = options.reserved ? options.potions ?? {} : {};
   const returning = Object.keys(back).length > 0;
-  // The meal as it was before the start, and the dish eaten back in the
-  // Spiżarnia (mealAtStart).
+  // The meal as it was before the start, and the dishes eaten back in the
+  // Spiżarnia (mealAtStart), one where the start kept no count.
   const mealBack = options.mealBack ?? null;
   const dishBack = mealBack?.eaten && content().dishesById[mealBack.eaten] ? `$."${mealBack.eaten}"` : null;
+  const dishesBack = Number.isInteger(mealBack?.count) && mealBack.count > 0 ? mealBack.count : 1;
   // The potions written back are computed from the row read: the call holds
   // only while the row is as read and the exploration still goes on, so a
   // claim or a sale meanwhile is not undone (atomic.js). One called back
@@ -770,8 +821,8 @@ export async function cancelHunt(context) {
     ...(mealBack
       ? [
           db
-            .prepare(`UPDATE characters SET meal = ?${dishBack ? ', pantry = json_set(pantry, ?, COALESCE(json_extract(pantry, ?), 0) + 1)' : ''}, version = version + 1 WHERE id = ?`)
-            .bind(mealBack.before ? JSON.stringify(mealBack.before) : null, ...(dishBack ? [dishBack, dishBack] : []), player.row.id),
+            .prepare(`UPDATE characters SET meal = ?${dishBack ? ', pantry = json_set(pantry, ?, COALESCE(json_extract(pantry, ?), 0) + ?)' : ''}, version = version + 1 WHERE id = ?`)
+            .bind(mealBack.before ? JSON.stringify(mealBack.before) : null, ...(dishBack ? [dishBack, dishBack, dishesBack] : []), player.row.id),
         ]
       : []),
     ...(trip ? [leaveTrip(db, trip, player.row)] : []),

@@ -33,7 +33,9 @@ import {
   jewelPatternLevel,
   masteryChance,
   mealBonusText,
+  mealName,
   mealOf,
+  mealStacks,
   materialView,
   mineralsPerHour,
   miningMinutes,
@@ -111,7 +113,8 @@ export function bagMinerals(row, sellBonus) {
 // The Spiżarnia's goods, one entry for each, with the innkeeper's price of
 // one: Zbylut pays the price itself, as the camp's Skup złomu raises only
 // the scrapper's (1057); `group`: a fish, a crop or a dish, a dish with
-// its meal's bonus in words.
+// its meal's bonus in words and the meals its portions make, of one up to
+// the most at once (`stacks`: each one's name and bonus, mealStacks).
 export function bagPantry(row) {
   const pantry = pantryOf(row);
   return content()
@@ -123,15 +126,16 @@ export function bagPantry(row) {
       description: good.description,
       count: pantry[good.id],
       price: good.price,
-      ...(good.group === 'dish' && { bonus: mealBonusText(good, content()) }),
+      ...(good.group === 'dish' && { bonus: mealBonusText(good, content()), stacks: mealStacks(good, content()) }),
     }));
 }
 
-// The meal at work (cooking.js; 999.5 v2): its dish, its bonus in words and
-// the minutes of explorations it still works for, of how many; null without
-// one, or where the game has no Gotowanie. `swap`: the words asking before
-// another dish takes its place (hunts.js, mealAtStart), {dish}, {current}
-// and {time} filled in by the page.
+// The meal at work (cooking.js; 999.5 v2): its dish, its name and bonus in
+// words with its portions ("Żurek ×2", the bonuses that many times), and
+// the minutes of explorations it still works for, of how many; null
+// without one, or where the game has no Gotowanie. `swap`: the words
+// asking before another dish takes its place (hunts.js, mealAtStart),
+// {dish}, {current} and {time} filled in by the page.
 export function mealView(row) {
   if (!content().cooking) return null;
   const meal = mealOf(row.meal, content());
@@ -140,8 +144,9 @@ export function mealView(row) {
   const { texts } = content().cooking;
   return {
     id: dish.id,
-    name: dish.name,
-    bonus: mealBonusText(dish, content()),
+    name: mealName(dish, meal.portions, content()),
+    bonus: mealBonusText(dish, content(), meal.portions),
+    portions: meal.portions,
     left: meal.left,
     minutes: content().cooking.meal.minutes,
     swap: { title: texts.swapTitle[0], text: texts.swapText[0], eat: texts.swapEat[0] },

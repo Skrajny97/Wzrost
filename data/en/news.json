@@ -1232,6 +1232,10 @@
     "0.4.74": {
       "title": "Version 0.4.74",
       "body": "- A party leader can now hand the lead to another member: Community › Party › “Hand over the lead”. A trip already under way goes on as it set out."
+    },
+    "0.4.75": {
+      "title": "Version 0.4.75",
+      "body": "- Meals: up to 3 portions of the same dish at once, and their bonuses add up (2 portions give twice the bonus, 3 portions three times). Each portion eaten gives the meal its full 4 hours of explorations again. Choose how many in the “Exploration options”.\n- You can also eat a dish straight from the Pantry in your bag (“Eat” on its card) while the character is not on an exploration. This way a party member eats before the party's trip.\n- Each profession level now gives +5 to both of its stats instead of +3, including levels gained earlier."
     }
   }
 }

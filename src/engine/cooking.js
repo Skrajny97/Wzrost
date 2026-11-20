@@ -16,6 +16,13 @@
 // join two or three bonuses, the finest four, of seven kinds (the author,
 // 16.11.2026: „Trzeba troche lepsze te bonusy dać i niech się łączą w
 // lepszych potrawach większą roznorodnosc tez trzeba”).
+//
+// Up to meal.portions portions of one dish work at once (the author,
+// 20.11.2026: „Dajemy możliwość stackowania bonusów z potraw, bo Gotowanie
+// dużej ilości potraw jest bezsensowne maksymalnie do 3 potraw jednego
+// rodzaju na raz (i analogicznie dodane 3x procenty danej potrawy)”): their
+// bonuses add up, all of them, and every portion eaten gives the meal its
+// full time again, one timer for them all.
 
 import { countList, masteryChance, professionLevelLines, professionProgress } from './professions.js';
 import { createRng } from './rng.js';
@@ -24,7 +31,7 @@ import { say } from './text.js';
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {{ kind: string, value: number }} Bonus A meal's bonus: its kind and how much (a share in percent, or percentage points for `rare`). */
 /** @typedef {{ id: string, name: string, level: number, ingredients: Record<string, number>, bonuses: Bonus[], description: string }} Dish A dish of data/professions.json. */
-/** @typedef {{ dish: string, left: number }} Meal The meal a character has eaten: its dish, and the minutes of explorations it still works for. */
+/** @typedef {{ dish: string, left: number, portions: number }} Meal The meal a character has eaten: its dish, the minutes of explorations it still works for, and how many portions of it work together. */
 
 // The recipes the System shows at a level of Gotowanie.
 /**
@@ -125,17 +132,39 @@ export function cookDishes({ count, seed, level = 1 }, content) {
  */
 export const dishPrice = (dish, content) => content.pantryById[dish.id]?.price ?? 0;
 
-// A dish's bonuses in words: "+12% XP z wyprawy, +10% szansy na skrzynię
-// wśród znalezisk" (cooking.bonuses).
+// A dish's bonuses in words, of `portions` portions together, each value
+// that many times: "+12% XP z wyprawy, +10% szansy na skrzynię wśród
+// znalezisk" (cooking.bonuses).
 /**
  * @param {{ bonuses: Bonus[] }} dish
  * @param {Content} content
+ * @param {number} [portions]
  * @returns {string}
  */
-export const mealBonusText = (dish, content) => dish.bonuses.map((bonus) => content.cooking.bonuses[bonus.kind].replace('{value}', String(bonus.value))).join(', ');
+export const mealBonusText = (dish, content, portions = 1) =>
+  dish.bonuses.map((bonus) => content.cooking.bonuses[bonus.kind].replace('{value}', String(bonus.value * portions))).join(', ');
+
+// A meal's name: its dish's, from two portions on with them ("Żurek ×2").
+/**
+ * @param {{ name: string }} dish
+ * @param {number} portions
+ * @param {Content} content
+ * @returns {string}
+ */
+export const mealName = (dish, portions, content) => (portions > 1 ? say(content.cooking.texts, 'portions', 0, { dish: dish.name, count: portions }) : dish.name);
+
+// The meals a dish makes, of one portion up to the most at once: each
+// one's name and bonus in words, for the page to show before it is eaten.
+/**
+ * @param {Dish} dish
+ * @param {Content} content
+ */
+export const mealStacks = (dish, content) =>
+  Array.from({ length: content.cooking.meal.portions }, (_, index) => ({ name: mealName(dish, index + 1, content), bonus: mealBonusText(dish, content, index + 1) }));
 
 // The meal a character has eaten, as the row keeps it, or null once it is
-// used up (or its dish is gone from the data).
+// used up (or its dish is gone from the data); one portion where the row
+// says none (before 20.11.2026).
 /**
  * @param {unknown} stored
  * @param {Content} content
@@ -144,35 +173,39 @@ export const mealBonusText = (dish, content) => dish.bonuses.map((bonus) => cont
 export function mealOf(stored, content) {
   const meal = /** @type {Record<string, any> | null} */ (typeof stored === 'string' ? JSON.parse(stored) : stored);
   if (!meal || typeof meal.dish !== 'string' || !content.dishesById[meal.dish] || !(meal.left > 0)) return null;
-  return { dish: meal.dish, left: meal.left };
+  const portions = Number.isInteger(meal.portions) ? Math.min(content.cooking.meal.portions, Math.max(1, meal.portions)) : 1;
+  return { dish: meal.dish, left: meal.left, portions };
 }
 
-// A dish eaten now: its bonus for meal.minutes of explorations.
+// `portions` of a dish eaten now: their bonus for meal.minutes of
+// explorations.
 /**
  * @param {string} dishId
  * @param {Content} content
+ * @param {number} [portions]
  * @returns {Meal}
  */
-export const freshMeal = (dishId, content) => ({ dish: dishId, left: content.cooking.meal.minutes });
+export const freshMeal = (dishId, content, portions = 1) => ({ dish: dishId, left: content.cooking.meal.minutes, portions });
 
 // An exploration of `minutes` setting out with the meal: what it gets
-// (`bonus`: the dish's bonuses, the share of its time the meal covers, its
-// minutes of the meal, and `last` when it uses the meal up), and the meal
-// after it, or null once used up.
+// (`bonus`: the dish's bonuses and its portions, the share of its time the
+// meal covers, its minutes of the meal, and `last` when it uses the meal
+// up), and the meal after it, or null once used up.
 /**
  * @param {Meal | null} meal
  * @param {number} minutes
  * @param {Content} content
- * @returns {{ bonus: { dish: string, bonuses: Bonus[], share: number, minutes: number, last?: boolean } | null, after: Meal | null }}
+ * @returns {{ bonus: { dish: string, bonuses: Bonus[], portions: number, share: number, minutes: number, last?: boolean } | null, after: Meal | null }}
  */
 export function mealUse(meal, minutes, content) {
   if (!meal || minutes <= 0) return { bonus: null, after: meal };
   const dish = content.dishesById[meal.dish];
+  const portions = meal.portions ?? 1;
   const used = Math.min(meal.left, minutes);
   const left = meal.left - used;
   return {
-    bonus: { dish: dish.id, bonuses: dish.bonuses, share: used / minutes, minutes: used, ...(left <= 0 && { last: true }) },
-    after: left > 0 ? { dish: dish.id, left } : null,
+    bonus: { dish: dish.id, bonuses: dish.bonuses, portions, share: used / minutes, minutes: used, ...(left <= 0 && { last: true }) },
+    after: left > 0 ? { dish: dish.id, left, portions } : null,
   };
 }
 
@@ -184,9 +217,10 @@ export function mealTime(minutes) {
   return [hours > 0 && `${hours} h`, rest > 0 && `${rest} min`].filter(Boolean).join(' ') || '0 min';
 }
 
-// An exploration report's line of its meal: the dish, the time of this
-// exploration it worked for and its bonus, and when it is used up, that a
-// new one waits for the next exploration; null without a meal.
+// An exploration report's line of its meal: the dish with its portions,
+// the time of this exploration it worked for and its bonus, and when it is
+// used up, that a new one waits for the next exploration; null without a
+// meal.
 /**
  * @param {Record<string, any>} hunt
  * @param {Content} content
@@ -196,24 +230,33 @@ export function mealLine(hunt, content) {
   const meal = hunt.meal;
   const dish = meal && content.cooking ? content.dishesById[meal.dish] : null;
   if (!dish) return null;
-  const line = say(content.cooking.texts, 'mealLine', 0, { dish: dish.name, time: mealTime(meal.minutes), bonus: mealBonusText(dish, content) });
+  const portions = meal.portions ?? 1;
+  const line = say(content.cooking.texts, 'mealLine', 0, {
+    dish: mealName(dish, portions, content),
+    time: mealTime(meal.minutes),
+    bonus: mealBonusText(dish, content, portions),
+  });
   return meal.last ? `${line} ${say(content.cooking.texts, 'mealOver', 0)}` : line;
 }
 
 // What a meal's bonuses do on an exploration (simulateHunt): the shares
 // more of its XP, gold, materials, card chances, resources and chance of a
 // chest among the finds, and the percentage points more of a rarer item,
-// each by the share of the time it covers; all nothing without one.
+// each times its portions and by the share of the time it covers; all
+// nothing without one. Three portions of the finest break nothing: the
+// rarer item's points stop at 99.9% (items.js, rollRarity), and a card's
+// chance comes to 85% at most (a champion's 25%, 3 × 80% more).
 /**
- * @param {{ bonuses?: Bonus[], share: number } | null | undefined} meal
+ * @param {{ bonuses?: Bonus[], portions?: number, share: number } | null | undefined} meal
  * @returns {{ xp: number, gold: number, materials: number, rare: number, cards: number, resources: number, chests: number }}
  */
 export function mealEffects(meal) {
   const effects = { xp: 0, gold: 0, materials: 0, rare: 0, cards: 0, resources: 0, chests: 0 };
   if (!meal) return effects;
   const share = Math.min(1, Math.max(0, meal.share));
+  const portions = meal.portions ?? 1;
   for (const bonus of meal.bonuses ?? []) {
-    if (bonus.kind in effects) effects[/** @type {keyof typeof effects} */ (bonus.kind)] += (bonus.value / 100) * share;
+    if (bonus.kind in effects) effects[/** @type {keyof typeof effects} */ (bonus.kind)] += ((bonus.value * portions) / 100) * share;
   }
   return effects;
 }

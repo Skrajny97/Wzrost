@@ -20,6 +20,7 @@ import {
   mealEffects,
   mealLine,
   mealOf,
+  mealStacks,
   mealUse,
   mostDishes,
   notificationsDue,
@@ -29,7 +30,7 @@ import {
   workProfession,
 } from '../src/engine/index.js';
 import { createRng } from '../src/engine/rng.js';
-import { startHunt } from '../src/server/hunts.js';
+import { eatDish, startHunt } from '../src/server/hunts.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
 import { content } from './helpers/content.js';
 import { meanwhile, posted } from './helpers/meanwhile.js';
@@ -90,14 +91,15 @@ describe('Gotowanie in the engine', () => {
 
   test('the meal works for 4 hours of explorations, each using up its own length; the last share of its time', () => {
     const meal = freshMeal('zurek', content);
-    assert.deepEqual(meal, { dish: 'zurek', left: 240 });
+    assert.deepEqual(meal, { dish: 'zurek', left: 240, portions: 1 });
     const first = mealUse(meal, 60, content);
     const zurek = content.dishesById.zurek.bonuses;
-    assert.deepEqual(first, { bonus: { dish: 'zurek', bonuses: zurek, share: 1, minutes: 60 }, after: { dish: 'zurek', left: 180 } });
-    const second = mealUse({ dish: 'zurek', left: 30 }, 120, content);
-    assert.deepEqual(second, { bonus: { dish: 'zurek', bonuses: zurek, share: 0.25, minutes: 30, last: true }, after: null });
+    assert.deepEqual(first, { bonus: { dish: 'zurek', bonuses: zurek, portions: 1, share: 1, minutes: 60 }, after: { dish: 'zurek', left: 180, portions: 1 } });
+    const second = mealUse({ dish: 'zurek', left: 30, portions: 1 }, 120, content);
+    assert.deepEqual(second, { bonus: { dish: 'zurek', bonuses: zurek, portions: 1, share: 0.25, minutes: 30, last: true }, after: null });
     assert.deepEqual(mealUse(null, 60, content), { bonus: null, after: null });
-    assert.deepEqual(mealOf('{"dish":"zurek","left":30}', content), { dish: 'zurek', left: 30 });
+    // A meal kept before the portions (20.11.2026) is one portion.
+    assert.deepEqual(mealOf('{"dish":"zurek","left":30}', content), { dish: 'zurek', left: 30, portions: 1 });
     assert.equal(mealOf('{"dish":"zurek","left":0}', content), null);
     assert.equal(mealOf('{"dish":"boot","left":30}', content), null);
     assert.equal(mealOf(null, content), null);
@@ -105,6 +107,36 @@ describe('Gotowanie in the engine', () => {
     assert.equal(mealLine({ meal: first.bonus }, content), 'Posiłek (Żurek) działał przez 1 h tej wyprawy: +12% XP z wyprawy, +10% szansy na skrzynię wśród znalezisk.');
     assert.equal(mealLine({ meal: second.bonus }, content), 'Posiłek (Żurek) działał przez 30 min tej wyprawy: +12% XP z wyprawy, +10% szansy na skrzynię wśród znalezisk. Posiłek się skończył. Nową potrawę wybierzesz przy następnej wyprawie.');
     assert.equal(mealLine({}, content), null);
+  });
+
+  // The author, 20.11.2026: „maksymalnie do 3 potraw jednego rodzaju na raz
+  // (i analogicznie dodane 3x procenty danej potrawy)”.
+  test('up to 3 portions of one dish: every bonus that many times, in words and on the exploration, one timer for them all', () => {
+    assert.equal(content.cooking.meal.portions, 3);
+    const meal = freshMeal('zurek', content, 3);
+    assert.deepEqual(meal, { dish: 'zurek', left: 240, portions: 3 });
+    const used = mealUse(meal, 60, content);
+    assert.deepEqual(used.after, { dish: 'zurek', left: 180, portions: 3 });
+    assert.equal(used.bonus.portions, 3);
+    assert.deepEqual(mealEffects(used.bonus), { xp: 0.36, gold: 0, materials: 0, rare: 0, cards: 0, resources: 0, chests: 0.3 });
+    // The rarer item's points too, by the share of the time.
+    assert.ok(Math.abs(mealEffects({ bonuses: content.dishesById['millet-crucian'].bonuses, portions: 2, share: 0.5 }).rare - 0.03) < 1e-9);
+    assert.equal(mealLine({ meal: used.bonus }, content), 'Posiłek (Żurek ×3) działał przez 1 h tej wyprawy: +36% XP z wyprawy, +30% szansy na skrzynię wśród znalezisk.');
+    assert.deepEqual(mealStacks(content.dishesById.zurek, content), [
+      { name: 'Żurek', bonus: '+12% XP z wyprawy, +10% szansy na skrzynię wśród znalezisk' },
+      { name: 'Żurek ×2', bonus: '+24% XP z wyprawy, +20% szansy na skrzynię wśród znalezisk' },
+      { name: 'Żurek ×3', bonus: '+36% XP z wyprawy, +30% szansy na skrzynię wśród znalezisk' },
+    ]);
+    // A row with more than the most is held to it.
+    assert.equal(mealOf('{"dish":"zurek","left":30,"portions":9}', content).portions, 3);
+    // Three portions of any dish keep every chance below certainty: a
+    // champion's card and the rarer item's share of the draws.
+    const { drops } = content.cards;
+    for (const dish of content.dishes) {
+      const most = mealEffects({ bonuses: dish.bonuses, portions: 3, share: 1 });
+      assert.ok(drops.champion * (1 + most.cards) < 1, dish.id);
+      assert.ok(most.rare < 0.5, dish.id);
+    }
   });
 
   test('the points of a rarer item raise the rarities with affixes by that many points, the draws staying as many', () => {
@@ -134,6 +166,10 @@ describe('Gotowanie in the engine', () => {
         assert.equal(fed.fights.length, plain.fights.length);
         const slack = plain.fights.length + plain.entries.length;
         assert.ok(fed.xp > plain.xp * 1.06 && fed.xp <= plain.xp * 1.1 + slack, `${plain.xp} → ${fed.xp}`);
+        // Three portions: three times the share more.
+        const three = hunt({ dish: 'pike-pierogi', bonuses: [{ kind: 'xp', value: 10 }], portions: 3, share: 1, minutes: 240 }, seed);
+        assert.ok(three.xp > plain.xp * 1.26 && three.xp <= plain.xp * 1.3 + slack, `${plain.xp} → ${three.xp}`);
+        assert.deepEqual(three.items, plain.items);
         assert.equal(fed.gold, plain.gold);
         const rich = hunt({ dish: 'fried-carp', bonuses: [{ kind: 'gold', value: 10 }], share: 0.5, minutes: 120 }, seed);
         assert.ok(Math.abs(rich.gold - plain.gold * 1.05) <= slack, `${plain.gold} → ${rich.gold}`);
@@ -263,7 +299,7 @@ describe('Gotowanie and the meal through the API', () => {
     assert.deepEqual([JSON.parse(after.pantry), JSON.parse(after.herbs)], [{}, { 'st-johns-wort': 1 }]);
   });
 
-  test('the meal: eaten as an exploration sets out, its time used up by explorations, the same dish again only once it is over, nothing lost on a call back', async () => {
+  test('the meal: eaten as an exploration sets out, its time used up by explorations, nothing lost on a call back', async () => {
     await set(`pantry = '{"zurek":2,"turnip":1}', hp = 99999`);
     const explore = (body) => call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 60, ...body } });
     assert.equal((await explore({ meal: 'boot' })).data.error.code, 'unknown_dish');
@@ -271,7 +307,7 @@ describe('Gotowanie and the meal through the API', () => {
     const started = await explore({ meal: 'zurek' });
     assert.equal(started.status, 201, JSON.stringify(started.data));
     const { swap, ...meal } = started.data.character.meal;
-    assert.deepEqual(meal, { id: 'zurek', name: 'Żurek', bonus: '+12% XP z wyprawy, +10% szansy na skrzynię wśród znalezisk', left: 180, minutes: 240 });
+    assert.deepEqual(meal, { id: 'zurek', name: 'Żurek', bonus: '+12% XP z wyprawy, +10% szansy na skrzynię wśród znalezisk', portions: 1, left: 180, minutes: 240 });
     // The words asking before another dish takes its place, filled in by the page.
     assert.deepEqual(swap, {
       title: 'Zmienić posiłek?',
@@ -289,13 +325,11 @@ describe('Gotowanie and the meal through the API', () => {
     const claimed = await claim();
     assert.equal(claimed.status, 200, JSON.stringify(claimed.data));
     assert.ok(claimed.data.report.system.includes('Posiłek (Żurek) działał przez 1 h tej wyprawy: +12% XP z wyprawy, +10% szansy na skrzynię wśród znalezisk.'), JSON.stringify(claimed.data.report.system));
-    // While it works, the same dish waits for its end; a page that did not
-    // know of it (no `mealReplaces`) is told the character changed
-    // meanwhile; the next exploration goes on with the meal by itself.
-    const refused = await explore({ meal: 'zurek', mealReplaces: 'zurek' });
-    assert.deepEqual([refused.status, refused.data.error.code, refused.data.error.message], [409, 'meal_active', 'Posiłek jeszcze działa: Żurek, zostało 3 h wypraw. Tę samą potrawę zjesz znowu, gdy się skończy.']);
+    // A page that did not know of the meal at work (no `mealReplaces`) is
+    // told the character changed meanwhile; the next exploration goes on
+    // with the meal by itself.
     assert.equal((await explore({ meal: 'zurek' })).data.error.code, 'character_changed');
-    assert.deepEqual(JSON.parse((await row()).meal), { dish: 'zurek', left: 180 });
+    assert.deepEqual(JSON.parse((await row()).meal), { dish: 'zurek', left: 180, portions: 1 });
     const next = await explore({});
     assert.equal(next.data.character.meal.left, 120);
   });
@@ -347,8 +381,146 @@ describe('Gotowanie and the meal through the API', () => {
     );
     assert.ok(racing.done);
     const after = await row();
-    assert.deepEqual(JSON.parse(after.meal), { dish: 'pea-soup', left: 180 });
+    assert.deepEqual(JSON.parse(after.meal), { dish: 'pea-soup', left: 180, portions: 1 });
     assert.deepEqual(JSON.parse(after.pantry), { zurek: 1, 'pea-soup': 1 });
     assert.equal((await database.prepare('SELECT COUNT(*) AS count FROM activities').first()).count, 1);
+  });
+
+  // The author, 20.11.2026: „Dajemy możliwość stackowania bonusów z potraw
+  // (…) maksymalnie do 3 potraw jednego rodzaju na raz (i analogicznie
+  // dodane 3x procenty danej potrawy)”.
+  test('up to 3 portions of one dish: eaten at once or added to the meal at work, each giving it its full time; at 3 no more; a call back gives them back', async () => {
+    await set(`pantry = '{"zurek":5,"pea-soup":1}', hp = 99999`);
+    const explore = (body) => call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 60, ...body } });
+    for (const portions of [0, 4, 1.5, '2']) assert.equal((await explore({ meal: 'zurek', mealPortions: portions })).data.error.code, 'invalid_portions');
+    assert.equal((await explore({ meal: 'pea-soup', mealPortions: 2 })).data.error.code, 'no_dish');
+    // Two portions at once: twice the bonus, one timer.
+    const two = await explore({ meal: 'zurek', mealPortions: 2 });
+    assert.equal(two.status, 201, JSON.stringify(two.data));
+    const { swap, ...meal } = two.data.character.meal;
+    assert.deepEqual(meal, { id: 'zurek', name: 'Żurek ×2', bonus: '+24% XP z wyprawy, +20% szansy na skrzynię wśród znalezisk', portions: 2, left: 180, minutes: 240 });
+    assert.deepEqual(pantry(two.data.character), { zurek: 3, 'pea-soup': 1 });
+    // The Spiżarnia's dish shows the meals its portions make.
+    assert.deepEqual(two.data.character.pantry.find((good) => good.id === 'zurek').stacks.map((stack) => stack.name), ['Żurek', 'Żurek ×2', 'Żurek ×3']);
+    await age(60);
+    const claimed = await claim();
+    assert.ok(claimed.data.report.system.includes('Posiłek (Żurek ×2) działał przez 1 h tej wyprawy: +24% XP z wyprawy, +20% szansy na skrzynię wśród znalezisk.'), JSON.stringify(claimed.data.report.system));
+    // A page that saw fewer portions than there are is told the character
+    // changed meanwhile; more than 3 together is refused.
+    assert.equal((await explore({ meal: 'zurek', mealReplaces: { dish: 'zurek', portions: 1 } })).data.error.code, 'character_changed');
+    const over = await explore({ meal: 'zurek', mealPortions: 2, mealReplaces: { dish: 'zurek', portions: 2 } });
+    assert.deepEqual([over.status, over.data.error.code, over.data.error.message], [409, 'meal_full', 'Posiłek: Żurek ×2, jeszcze 3 h wypraw. Jednej potrawy możesz mieć naraz najwyżej 3 porcje.']);
+    // One more on top of the two: three portions, the full 4 hours again,
+    // this exploration takes its first hour.
+    const three = await explore({ meal: 'zurek', mealReplaces: { dish: 'zurek', portions: 2 } });
+    assert.equal(three.status, 201, JSON.stringify(three.data));
+    assert.deepEqual([three.data.character.meal.name, three.data.character.meal.left, three.data.character.meal.bonus], ['Żurek ×3', 180, '+36% XP z wyprawy, +30% szansy na skrzynię wśród znalezisk']);
+    assert.deepEqual(pantry(three.data.character), { zurek: 2, 'pea-soup': 1 });
+    // Called back: the two portions with their 3 hours, the dish back.
+    const back = await call('POST', '/api/hunts/cancel', { cookie });
+    assert.deepEqual(JSON.parse((await row()).meal), { dish: 'zurek', left: 180, portions: 2 });
+    assert.deepEqual(pantry(back.data.character), { zurek: 3, 'pea-soup': 1 });
+    await explore({ meal: 'zurek', mealReplaces: { dish: 'zurek', portions: 2 } });
+    await age(60);
+    await claim();
+    // At 3 portions no more of it, whatever the page asks.
+    const full = await explore({ meal: 'zurek', mealReplaces: { dish: 'zurek', portions: 3 } });
+    assert.deepEqual([full.status, full.data.error.code, full.data.error.message], [409, 'meal_full', 'Posiłek: Żurek ×3, jeszcze 3 h wypraw. Jednej potrawy możesz mieć naraz najwyżej 3 porcje.']);
+    // Another dish replaces all three portions, after the question on the page.
+    const swapped = await explore({ meal: 'pea-soup', mealReplaces: { dish: 'zurek', portions: 3 } });
+    assert.equal(swapped.status, 201, JSON.stringify(swapped.data));
+    assert.deepEqual([swapped.data.character.meal.name, swapped.data.character.meal.portions, swapped.data.character.meal.left], ['Grochówka', 1, 180]);
+    // Called back: the three Żurek portions as they were, the Grochówka in the Spiżarnia.
+    const again = await call('POST', '/api/hunts/cancel', { cookie });
+    assert.deepEqual([again.data.character.meal.name, again.data.character.meal.left], ['Żurek ×3', 180]);
+    assert.deepEqual(pantry(again.data.character), { zurek: 2, 'pea-soup': 1 });
+  });
+
+  // The author, 20.11.2026: „Pozwól zjeść posiłek z pozycji plecaka może? To ułatwi sprawę”.
+  test('a dish eaten from the Spiżarnia by the same rules, the meal at work at once; not on an exploration', async () => {
+    await set(`pantry = '{"zurek":4,"pea-soup":1}', hp = 99999`);
+    const eat = (body) => call('POST', '/api/pantry/eat', { cookie, body });
+    const explore = (body) => call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 60, ...body } });
+    // Two portions from the bag: the meal at work at once, its full time.
+    const two = await eat({ id: 'zurek', count: 2 });
+    assert.equal(two.status, 200, JSON.stringify(two.data));
+    assert.deepEqual([two.data.character.meal.name, two.data.character.meal.portions, two.data.character.meal.left], ['Żurek ×2', 2, 240]);
+    assert.deepEqual(pantry(two.data.character), { zurek: 2, 'pea-soup': 1 });
+    // Its time runs only on explorations: the next one sets out with it.
+    assert.equal((await explore({})).status, 201);
+    // On an exploration nothing is eaten, nor once it is over before its report.
+    const away = await eat({ id: 'zurek', replaces: { dish: 'zurek', portions: 2 } });
+    assert.deepEqual([away.status, away.data.error.code, away.data.error.message], [409, 'on_exploration', 'Zjesz po powrocie z wyprawy.']);
+    await age(60);
+    assert.equal((await eat({ id: 'zurek', replaces: { dish: 'zurek', portions: 2 } })).data.error.code, 'claim_first');
+    const claimed = await claim();
+    assert.ok(claimed.data.report.system.includes('Posiłek (Żurek ×2) działał przez 1 h tej wyprawy: +24% XP z wyprawy, +20% szansy na skrzynię wśród znalezisk.'), JSON.stringify(claimed.data.report.system));
+    assert.deepEqual(pantry(claimed.data.character), { zurek: 2, 'pea-soup': 1 });
+    // One portion added: three, the full 4 hours again. A page that saw
+    // fewer portions is told the character changed meanwhile; at 3 no more.
+    assert.equal((await eat({ id: 'zurek', replaces: { dish: 'zurek', portions: 1 } })).data.error.code, 'character_changed');
+    const three = await eat({ id: 'zurek', replaces: { dish: 'zurek', portions: 2 } });
+    assert.deepEqual([three.data.character.meal.name, three.data.character.meal.left], ['Żurek ×3', 240]);
+    assert.equal((await eat({ id: 'zurek', replaces: { dish: 'zurek', portions: 3 } })).data.error.code, 'meal_full');
+    // Another dish replaces all three portions, once the page asked.
+    assert.equal((await eat({ id: 'pea-soup' })).data.error.code, 'character_changed');
+    const swapped = await eat({ id: 'pea-soup', replaces: { dish: 'zurek', portions: 3 } });
+    assert.deepEqual([swapped.data.character.meal.name, swapped.data.character.meal.portions, swapped.data.character.meal.left], ['Grochówka', 1, 240]);
+    assert.deepEqual(pantry(swapped.data.character), { zurek: 1 });
+  });
+
+  test('two taps at once eat from the Spiżarnia once', async () => {
+    await set(`pantry = '{"zurek":3}'`);
+    const body = { id: 'zurek', count: 2 };
+    const database = await db();
+    // The other tap's meal is saved just before this one's batch.
+    const racing = meanwhile(database, /UPDATE characters SET meal/, () => call('POST', '/api/pantry/eat', { cookie, body }));
+    await assert.rejects(
+      eatDish({ request: posted('/api/pantry/eat', cookie, body), env: { DB: racing }, now: Date.now(), params: {} }),
+      (error) => error.code === 'character_changed' && error.status === 409,
+    );
+    assert.ok(racing.done);
+    const after = await row();
+    assert.deepEqual([JSON.parse(after.meal), JSON.parse(after.pantry)], [{ dish: 'zurek', left: 240, portions: 2 }, { zurek: 1 }]);
+  });
+});
+
+// A member of a Drużyna eats nothing as its leader sets out: its own meal,
+// eaten from the Spiżarnia before, covers the trip (the author, 20.11.2026:
+// „Pozwól zjeść posiłek z pozycji plecaka może? To ułatwi sprawę”).
+describe('a meal eaten before a Drużyna’s trip', () => {
+  const { call, db, signUp } = useServer({ PROFESSIONS: 'on', CRAFTING: 'on' });
+  const cookies = {};
+  const as = (login, method, path, body) => call(method, path, { cookie: cookies[login], body });
+
+  beforeEach(async () => {
+    for (const [login, name] of [
+      ['wodz', 'Wodz'],
+      ['kompan', 'Kompan'],
+    ]) {
+      ({ cookie: cookies[login] } = await signUp(login));
+      await call('POST', '/api/character', { cookie: cookies[login], body: { name, classId: 'warrior', appearance: 'female' } });
+    }
+    await (await db()).prepare('UPDATE characters SET level = 30, class_level = 30, hp = 99999').run();
+  });
+
+  test('a member who ate before the trip gets its bonus on it', async () => {
+    const { data } = await as('wodz', 'POST', '/api/party/invite', { name: 'Kompan' });
+    await as('kompan', 'POST', '/api/party/accept', { partyId: data.party.id });
+    await (await db()).prepare(`UPDATE characters SET pantry = '{"zurek":2}' WHERE name = 'Kompan'`).run();
+    const ate = await as('kompan', 'POST', '/api/pantry/eat', { id: 'zurek', count: 2 });
+    assert.equal(ate.status, 200, JSON.stringify(ate.data));
+    const went = await as('wodz', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 5 });
+    assert.equal(went.status, 201, JSON.stringify(went.data).slice(0, 300));
+    assert.deepEqual(went.data.went, ['Kompan']);
+    await (await db()).prepare('UPDATE activities SET started_at = started_at - 600000, ends_at = ends_at - 600000').run();
+    let claimed = await as('kompan', 'POST', '/api/hunts/claim');
+    if (claimed.data.event) claimed = await as('kompan', 'POST', '/api/hunts/claim', { choice: claimed.data.event.options.find((option) => !option.disabled)?.id ?? claimed.data.event.options[0].id });
+    assert.equal(claimed.status, 200, JSON.stringify(claimed.data).slice(0, 300));
+    assert.ok(claimed.data.report.system.includes('Posiłek (Żurek ×2) działał przez 5 min tej wyprawy: +24% XP z wyprawy, +20% szansy na skrzynię wśród znalezisk.'), JSON.stringify(claimed.data.report.system));
+    assert.equal(claimed.data.character.meal.left, 235);
+    // The leader, who ate nothing, has no meal on the trip.
+    const leader = await as('wodz', 'POST', '/api/hunts/claim');
+    assert.ok(!(leader.data.report?.system ?? []).some((line) => line.startsWith('Posiłek')), JSON.stringify(leader.data).slice(0, 300));
   });
 });

@@ -7,6 +7,7 @@ import { herbSprite, itemSprite, materialSprite, mineralSprite, pantrySprite, po
 import { bonusList } from '../bonuses.js';
 import { showAchievements } from '../achievements.js';
 import { keepCharacterOrder, orderedCharacters } from '../character-order.js';
+import { askMealSwap } from '../meal.js';
 import { characterLook, portraitLayers } from '../cosmetics.js';
 import { MATERIALS_HINT, materialIcon, materialSheet, materialTitle } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
@@ -920,6 +921,47 @@ export function mountCharacter(container, { switchCharacter } = {}) {
     ];
   }
 
+  // A dish's meal on its card, and eating it now (hunts.js, eatDish; the
+  // author, 20.11.2026: „Pozwól zjeść posiłek z pozycji plecaka może? To
+  // ułatwi sprawę”): how many portions with −/+, as many as the Spiżarnia
+  // has and the meal has room for (up to 3 of one dish, the meal at work's
+  // own on top of its portions), and the meal they make. Another dish than
+  // the meal at work's asks first, as on the Walka screen; on an
+  // exploration the server says to eat after it.
+  function mealPart(good) {
+    const current = state.character.meal ?? null;
+    const had = current?.id === good.id ? current.portions : 0;
+    const room = Math.max(1, Math.min(good.count, good.stacks.length - had));
+    let portions = 1;
+    const text = h('p', { class: 'sheet-text cook-bonus' });
+    const value = h('output', { class: 'potion-pick-value' });
+    const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('{name}: mniej', { name: t('Porcje') }), text: '−', onClick: () => set(portions - 1) });
+    const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('{name}: więcej', { name: t('Porcje') }), text: '+', onClick: () => set(portions + 1) });
+    function set(next) {
+      portions = Math.max(1, Math.min(room, next));
+      const made = good.stacks[Math.min(good.stacks.length, had + portions) - 1];
+      text.textContent = t('Posiłek: {dish}, {bonus}, przez 4 godziny wypraw.', { dish: made.name, bonus: made.bonus });
+      value.textContent = t('{count} z {all}', { count: portions, all: room });
+      less.disabled = portions <= 1;
+      more.disabled = portions >= room;
+    }
+    set(1);
+    const eat = (event) =>
+      withButton(event.currentTarget, async () => {
+        if (current && current.id !== good.id && !(await askMealSwap(current, good))) return;
+        await call('POST', '/api/pantry/eat', { id: good.id, count: portions, replaces: current && { dish: current.id, portions: current.portions } });
+        closeSheet();
+        const now = state.character.meal;
+        if (now) toast(t('Posiłek: {dish}, {bonus}. Jeszcze {time} wypraw.', { dish: now.name, bonus: now.bonus, time: formatMinutes(now.left) }));
+      });
+    return [
+      text,
+      h('div', { class: 'potion-pick', hidden: room < 2 }, h('span', { class: 'potion-pick-name', text: t('Porcje') }), less, value, more),
+      h('button', { type: 'button', class: 'button button--system', onClick: eat, text: t('Zjedz') }),
+      h('p', { class: 'sheet-text muted', text: t('Potrawę zjesz teraz albo przy wyruszaniu na wyprawę, w opcjach wyprawy.') }),
+    ];
+  }
+
   // A good of the Spiżarnia's card: what it is, and selling as many as
   // chosen to the innkeeper Zbylut or throwing them away, once the player
   // confirms, as for minerals.
@@ -975,10 +1017,7 @@ export function mountCharacter(container, { switchCharacter } = {}) {
     const dish = good.group === 'dish';
     const title = h('h2', { class: 'item-title', text: good.name });
     const meta = h('p', { class: 'item-meta', text: t('{kind} · {count} szt.', { kind: dish ? t('Potrawa') : crop ? t('Plon') : t('Ryba'), count: formatNumber(good.count) }) });
-    const meal = dish && [
-      h('p', { class: 'sheet-text cook-bonus', text: t('Posiłek: {bonus} przez 4 godziny wypraw.', { bonus: good.bonus }) }),
-      h('p', { class: 'sheet-text muted', text: t('Potrawę wybierzesz przy wyruszaniu na wyprawę, w opcjach wyprawy.') }),
-    ];
+    const meal = dish && mealPart(good);
     openSheet(
       h(
         'div',
