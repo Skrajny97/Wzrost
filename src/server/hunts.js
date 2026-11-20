@@ -430,7 +430,7 @@ export async function startHunt(context) {
 export async function beginHunt(
   db,
   player,
-  { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow, scout = null, hard = false, hell = false, mercenary = null, meal = null } = {},
+  { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow, scout = null, hard = false, hell = false, mercenary = null, meal = null, mealReplaces = null } = {},
   now,
   { quick = false, flash = false, party: crew = null, mount = null, haste = 0, follower = false, also = [], check = false, defer = false } = {},
 ) {
@@ -468,10 +468,11 @@ export async function beginHunt(
   }
   const taken = takenPotions(player, potions, minutes);
   // The meal (cooking.js; 999.5 v2): a dish of the Spiżarnia chosen as it
-  // sets out (`meal`, its id) is eaten now, while no meal works; the meal at
-  // work covers this exploration's time, as much as it has left, and what
-  // is left waits for the next one. On a Drużyna's trip each member's own.
-  const fed = mealAtStart(player, meal, minutes);
+  // sets out (`meal`, its id) is eaten now, in place of the meal at work
+  // (`mealReplaces`, mealAtStart); the meal at work covers this
+  // exploration's time, as much as it has left, and what is left waits for
+  // the next one. On a Drużyna's trip each member's own.
+  const fed = mealAtStart(player, meal, minutes, mealReplaces);
   // The strengthening potions drunk before cover the exploration's first
   // fights, as many as theirs; they are used up only when its report is
   // claimed (the author: "bonusy wszelkie za picie mikstur itp. nie zużywają
@@ -683,7 +684,13 @@ export async function beginHunt(
 // on this exploration (simulateHunt); `back`: the meal before, and the dish
 // eaten, for a call back; `sets`: the row's changes, the meal after and the
 // dish taken from the Spiżarnia.
-function mealAtStart(player, dishId, minutes) {
+// Another dish eaten while a meal works takes its place (the author,
+// 20.11.2026: „może dam opcję zjedzenia innego posiłku i zmarnowania
+// poprzedniego bonusu”): the meal at work ends at once, what it had left is
+// lost, and the new one has its full time. Only the meal the page showed
+// (`replaces`, its dish's id) is replaced: one eaten meanwhile elsewhere is
+// the usual "changed meanwhile". The same dish waits for its own end.
+function mealAtStart(player, dishId, minutes, replaces = null) {
   const { cooking } = content();
   if (!cooking) return null;
   const before = mealOf(player.row.meal, content());
@@ -691,8 +698,9 @@ function mealAtStart(player, dishId, minutes) {
   if (dishId !== null && dishId !== undefined) {
     const dish = typeof dishId === 'string' ? content().dishesById[dishId] : undefined;
     if (!dish) throw new ApiError(400, 'unknown_dish', 'Nie ma takiej potrawy.');
-    if (before) {
-      throw new ApiError(409, 'meal_active', say(cooking.texts, 'mealActive', 0, { dish: content().dishesById[before.dish].name, time: mealTime(before.left) }));
+    if (before && replaces !== before.dish) throw characterChanged();
+    if (before?.dish === dish.id) {
+      throw new ApiError(409, 'meal_active', say(cooking.texts, 'mealActive', 0, { dish: dish.name, time: mealTime(before.left) }));
     }
     if (!((pantryOf(player.row)[dish.id] ?? 0) >= 1)) throw new ApiError(409, 'no_dish', say(cooking.texts, 'noDish', 0));
     eaten = dish.id;

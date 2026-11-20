@@ -129,13 +129,23 @@ export function bagPantry(row) {
 
 // The meal at work (cooking.js; 999.5 v2): its dish, its bonus in words and
 // the minutes of explorations it still works for, of how many; null without
-// one, or where the game has no Gotowanie.
+// one, or where the game has no Gotowanie. `swap`: the words asking before
+// another dish takes its place (hunts.js, mealAtStart), {dish}, {current}
+// and {time} filled in by the page.
 export function mealView(row) {
   if (!content().cooking) return null;
   const meal = mealOf(row.meal, content());
   if (!meal) return null;
   const dish = content().dishesById[meal.dish];
-  return { id: dish.id, name: dish.name, bonus: mealBonusText(dish, content()), left: meal.left, minutes: content().cooking.meal.minutes };
+  const { texts } = content().cooking;
+  return {
+    id: dish.id,
+    name: dish.name,
+    bonus: mealBonusText(dish, content()),
+    left: meal.left,
+    minutes: content().cooking.meal.minutes,
+    swap: { title: texts.swapTitle[0], text: texts.swapText[0], eat: texts.swapEat[0] },
+  };
 }
 
 // A recipe's catalyst (proposal 3: "Wybrane mikstury biorą jeden materiał

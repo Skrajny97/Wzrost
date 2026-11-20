@@ -3847,6 +3847,17 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Zmiana posiłku w trakcie działania (20.11.2026)
+
+Gracz: „Przydałaby się możliwość zmiany jedzenia na wyprawę, bo jak jeden jest aktywny to nie mogę zmienić”. Autor: „może dam opcję zjedzenia innego posiłku i zmarnowania poprzedniego bonusu” i „druga prosta zmiana” (20.11.2026). To zastępuje zasadę z 999.5 v2, że nową potrawę zjada się dopiero po końcu poprzedniej.
+
+1. **Zasada.** Przy wyruszaniu można zjeść inną potrawę, choć posiłek jeszcze działa. Nowa zastępuje poprzednią: poprzedni posiłek kończy się od razu, reszta jego czasu i jego premia przepadają, a nowy ma pełne 4 godziny wypraw. Reszta bez zmian: jedna potrawa ze Spiżarni, jedzenie tylko przy wyruszaniu (także na Szybkim i Błyskawicznym polowaniu i na wyprawie Drużyny), każda wyprawa ma premię, z którą wyruszyła, a odwołanie wyprawy oddaje potrawę i przywraca poprzedni posiłek z jego czasem.
+2. **Ta sama potrawa** (brakujący szczegół): póki działa, gra jej nie przyjmuje: „Posiłek jeszcze działa: Żurek, zostało 3 h wypraw. Tę samą potrawę zjesz znowu, gdy się skończy.” Autor pisał o innym posiłku, więc odświeżania czasu tej samej potrawy nie ma, a na liście jej nie widać.
+3. **Ekran.** W „Opcjach wyprawy” wybór posiłku jest też przy działającym posiłku. Zaczyna od niego („Posiłek: Żurek · jeszcze 2 h 13 min wypraw”), a niżej są inne potrawy ze Spiżarni. Stuknięcie w inną otwiera okienko gry „Zmienić posiłek?”: „Postać zje: Grochówka. Obecny posiłek (Żurek) przestanie działać, choć zostało mu 2 h 13 min wypraw, a jego premia przepadnie.”, z „Anuluj” i „Zjedz”. Postać zjada potrawę przy wyruszeniu. Wybór przy działającym posiłku nie zapisuje się w przeglądarce, więc posiłek nigdy nie przepada bez pytania.
+4. **Zapis.** Strona podaje, który posiłek zastępuje (`mealReplaces`). Gdy działa inny (np. zjedzony w innej karcie) albo strona nie wiedziała o działającym, gra odpowiada zwykłym „Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.”, a strona wczytuje postać od nowa. Posiłek, Spiżarnia i wyprawa zapisują się razem, tylko gdy postać jest taka, jak ją odczytano, więc dwa stuknięcia naraz zjadają jedną potrawę.
+5. **Słowa:** `data/professions.json` (`cooking.texts.swapTitle`, `swapText`, `swapEat`, `mealActive` i `cooking.about`), po angielsku w `data/en/professions.json`.
+6. **Pliki:** `src/server/hunts.js` (`mealAtStart`), `src/server/professions-view.js` (`mealView` ze słowami okienka), `src/client/screens/combat.js` (`mealPicker`); testy w `test/cooking.test.js`.
+
 ## Wersja 0.4.72 (20.11.2026): skrót do pomocy w gildii na ekranie Walki
 
 Bez makiet, na prośbę autora („Wdrażaj od razu, szkoda Twoich zasobów na makiety”), według sekcji niżej.
