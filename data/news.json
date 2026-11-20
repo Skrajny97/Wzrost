@@ -1540,6 +1540,11 @@
       "id": "0.4.73",
       "title": "Wersja 0.4.73",
       "body": "- Posiłek zmienisz teraz także w trakcie działania: przy wyruszaniu wybierz inną potrawę, a gra zapyta, czy na pewno. Poprzedni posiłek przestanie działać, a jego premia przepadnie."
+    },
+    {
+      "id": "0.4.74",
+      "title": "Wersja 0.4.74",
+      "body": "- Lider drużyny może przekazać przywództwo innemu członkowi: Społeczność › Drużyna › „Przekaż przywództwo”. Wyprawa, która już trwa, idzie dalej tak, jak wyruszyła."
     }
   ]
 }

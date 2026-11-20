@@ -2,7 +2,8 @@
 // level of data/unlocks.json (the 10th since 0.1.69, 642 B): the
 // invitations waiting for this character; its party with the
 // members and their state (free, on an exploration, at a profession's
-// work), the leader marked; the friends to invite at a tap and a name to invite; the
+// work), the leader marked, and for the leader "Przekaż przywództwo" and
+// "Usuń z drużyny" by each other member; the friends to invite at a tap and a name to invite; the
 // invitations sent; and "Opuść drużynę". The leader sends the party out
 // from "Wyrusz" in the Walka (screens/combat.js, "Z drużyną").
 
@@ -219,6 +220,10 @@ export function mountParty(container) {
       );
     }
     const own = party.members.find((member) => member.own);
+    // The hand-over of the lead (the author, 20.11.2026: „Dodaj też opcje
+    // przekazania pozycji lidera w drużynie”), as the guild's: its words
+    // from data/community.json.
+    const lead = state.content.community?.party?.texts;
     return h(
       'section',
       { class: 'card', 'aria-labelledby': 'party-title' },
@@ -236,6 +241,11 @@ export function mountParty(container) {
               h(
                 'div',
                 { class: 'friend-actions' },
+                lead &&
+                  button(lead.lead, async () => {
+                    if (!(await confirmAction({ title: lead.leadTitle, text: lead.leadText.replace('{name}', member.name), confirmLabel: lead.leadConfirm }))) return;
+                    await act('/api/party/lead', { characterId: member.id })();
+                  }),
                 button(t('Usuń z drużyny'), async () => {
                   if (!(await confirmAction({ title: t('Usunąć z drużyny?'), text: t('{name} opuści drużynę.', { name: member.name }), confirmLabel: t('Usuń') }))) return;
                   await act('/api/party/kick', { characterId: member.id }, t('{name} nie jest już w drużynie.', { name: member.name }))();

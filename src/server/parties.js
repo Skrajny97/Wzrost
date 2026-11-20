@@ -21,7 +21,8 @@
 // The leader invites a character by its name; a party comes with the first
 // invitation. The invited one accepts or declines; a member leaves when it
 // wants, and the leader may send one out. A leader who leaves passes the
-// lead to the member who joined first, and a party nobody is in is gone. A
+// lead to the member who joined first, and a party nobody is in is gone;
+// since 20.11.2026 the leader may hand it to any member (handPartyLead). A
 // party of one is a party only while an invitation of it waits: declined,
 // withdrawn, or with the others gone, it ends (partyOf, 11.11.2026), so its
 // companions do not stay in the Kwatery for a party that is not there.
@@ -74,7 +75,7 @@ import {
   tripWanted,
   wantedTarget,
 } from '../engine/index.js';
-import { assertion, raced } from './atomic.js';
+import { assertion, atomically, raced } from './atomic.js';
 import { characterView, currentHp, earlyAreaOf, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer, settleCharacter } from './characters.js';
 import { content } from './content.js';
 import { nameColorOf, wayLook } from './cosmetics.js';
@@ -88,6 +89,9 @@ import { OWN_CHARACTERS } from './roles.js';
 
 // The most invitations one party may have waiting.
 const MAX_INVITES = 5;
+
+// The party changed between its reading and the write.
+const partyChanged = () => new ApiError(409, 'changed', 'Drużyna zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
 
 // The class levels of a party's members, in its order.
 async function classLevels(db, partyId) {
@@ -367,7 +371,7 @@ export async function inviteToParty(context) {
       ]);
     } catch {
       // Another request made one meanwhile.
-      throw new ApiError(409, 'changed', 'Drużyna zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
+      throw partyChanged();
     }
     return answer(db, player.row.id, context.now, { text: t('Zaproszenie wysłane. {name} przyjmie je w Społeczności, w Drużynie.', { name: target.name }) });
   }
@@ -510,6 +514,42 @@ export async function kickFromParty(context) {
   return answer(db, player.row.id, context.now);
 }
 
+// POST /api/party/lead { characterId }: the leader hands the lead to another
+// member and stays in the party as an ordinary one (the author, 20.11.2026:
+// „Dodaj też opcje przekazania pozycji lidera w drużynie”). All the leader
+// may do goes with it: inviting, taking back invitations, removing members
+// and sending the party out; the invitations already sent stay the party's. One
+// write, holding only while the one asking still leads and the one named
+// is still in the party, so of two hand-overs at once (a double tap, two
+// cards) one saves and the other hears that the party changed. A trip
+// under way goes on as it set out: its crew, its leader (first of its
+// roster: the creatures of the newest place, its party event) and its
+// options are kept with each exploration (setOut), so the new leader leads
+// from the next trip on. The party's chat has no lines of the System, so
+// none is written.
+export async function handPartyLead(context) {
+  const { player } = await requirePartyPlayer(context);
+  const db = context.env.DB;
+  const body = await readJson(context.request);
+  const { texts } = content().community.party;
+  const party = await partyOf(db, player.row.id);
+  if (!party || party.leaderId !== player.row.id) throw new ApiError(403, 'not_leader', texts.notLeader);
+  const id = Number(body.characterId);
+  if (id === player.row.id) throw new ApiError(400, 'self', texts.self);
+  if (!party.memberIds.includes(id)) throw new ApiError(404, 'no_member', 'Tej postaci nie ma w drużynie.');
+  await atomically(
+    db,
+    [
+      assertion(db, '(SELECT leader_id FROM parties WHERE id = ?) = ? AND EXISTS (SELECT 1 FROM party_members WHERE party_id = ? AND character_id = ?)', [party.id, player.row.id, party.id, id]),
+      db.prepare('UPDATE parties SET leader_id = ? WHERE id = ? AND leader_id = ?').bind(id, party.id, player.row.id),
+    ],
+    partyChanged,
+  );
+  const view = await partyView(db, player.row.id, context.now);
+  const heir = view.party?.members.find((member) => member.id === id);
+  return json({ ...view, text: texts.led.replace('{name}', heir?.name ?? '') });
+}
+
 // POST /api/party/cancel { characterId }: the leader takes back an
 // invitation.
 export async function cancelPartyInvite(context) {
@@ -605,10 +645,10 @@ async function claimForTrip(db, member, now) {
 // from its own seed, the others beside it only as they set out and gone
 // once fallen; the leader's report won with the party while a member's
 // lost alone, on the same trip (players, 18.11.2026: „byłem sam bez
-// drużyny”). The batch holds only while the leader and each member going
-// are as read; when one changed meanwhile, the party is read anew and sets
-// out again, without one that got busy at that very moment, a few times at
-// most (SET_OUT_TRIES).
+// drużyny”). The batch holds only while the leader (still leading) and
+// each member going are as read; when one changed meanwhile, the party is
+// read anew and sets out again, without one that got busy at that very
+// moment, a few times at most (SET_OUT_TRIES).
 const SET_OUT_TRIES = 3;
 
 export async function partyHunt(context) {
@@ -632,7 +672,7 @@ export async function partyHunt(context) {
         201,
       );
     }
-    if (tries === SET_OUT_TRIES) throw new ApiError(409, 'changed', 'Drużyna zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
+    if (tries === SET_OUT_TRIES) throw partyChanged();
     ({ session, player } = await requireIdlePlayer(context));
   }
 }
@@ -794,6 +834,10 @@ async function setOut(db, player, body, now, claimed) {
   const trip = `json_extract(options, '$.party.trip') = ? AND json_extract(options, '$.party.id') = ?`;
   try {
     await db.batch([
+      // The one sending still leads: after a lead handed over meanwhile
+      // (handPartyLead) the party is read anew, and only its new leader
+      // sends it out.
+      assertion(db, '(SELECT leader_id FROM parties WHERE id = ?) IS ?', [party.id, player.row.id]),
       ...actual.flatMap((member) => setups.get(member.row.id).statements),
       ...actual.map((member) => {
         const report = claimed.get(member.row.id);

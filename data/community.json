@@ -72,5 +72,17 @@
       { "id": "tiktok", "url": "https://www.tiktok.com/@insight_rpg", "label": "Obserwuj nas na TikToku" },
       { "id": "wattpad", "url": "https://www.wattpad.com/story/419946881", "label": "Czytaj powieść ze świata gry" }
     ]
+  },
+  "party": {
+    "$comment": "Drużyna (src/server/parties.js, screens/party.js). texts: the hand-over of the lead (the author, 20.11.2026: „Dodaj też opcje przekazania pozycji lidera w drużynie”): lead the button by each other member, which only the leader sees, as the guild's; leadTitle, leadText ({name}: the member) and leadConfirm its question; led the answer once done; notLeader and self the refusals.",
+    "texts": {
+      "lead": "Przekaż przywództwo",
+      "leadTitle": "Przekazać przywództwo?",
+      "leadText": "{name} poprowadzi drużynę, a Ty zostaniesz zwykłym członkiem.",
+      "leadConfirm": "Przekaż",
+      "led": "{name} prowadzi teraz drużynę.",
+      "notLeader": "Przywództwo przekazuje lider.",
+      "self": "Już prowadzisz tę drużynę."
+    }
   }
 }

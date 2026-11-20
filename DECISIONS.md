@@ -3879,6 +3879,23 @@ Autor: „Do tego zwiększamy bonusy statystyk ze wszystkich Profesji do +5 na p
 
     Jedna profesja daje połowę tego przyrostu, i to tylko w swoich dwóch statystykach. Testy porównujące klasy i ewolucje biorą typowe postacie bez profesji, więc się nie zmieniły.
 
+## Wersja 0.4.74 (20.11.2026): przekazanie przywództwa w drużynie
+
+Według sekcji niżej, bez makiet (przycisk i pytanie w stylu przycisku gildii na istniejącym ekranie).
+
+## Przekazanie przywództwa w drużynie (20.11.2026)
+
+Autor: „Dodaj też opcje przekazania pozycji lidera w drużynie” (20.11.2026). Bez makiet: przycisk i pytanie jak w gildii, na istniejącej karcie Drużyny.
+
+1. **Co widać.** W Społeczności, w Drużynie, lider ma przy każdym innym członku przycisk „Przekaż przywództwo”, obok „Usuń z drużyny”. Pytanie jak w gildii: „Przekazać przywództwo?”, „{imię} poprowadzi drużynę, a Ty zostaniesz zwykłym członkiem.”, „Przekaż” i „Anuluj”, bez form zależnych od płci. Po przekazaniu: „{imię} prowadzi teraz drużynę.”
+2. **Zasada.** Wskazany członek zostaje liderem, a dawny lider zostaje w drużynie jako zwykły członek. Z rolą przechodzi wszystko, co robi tylko lider: zapraszanie, cofanie zaproszeń, usuwanie z drużyny i wysyłanie drużyny na wyprawę. Dawny lider, który wyrusza sam, dostaje pytanie „Jesteś w drużynie. Wyjść z drużyny?” jak każdy członek (1178 B). Brakujący szczegół: wskazany nie musi być wolny ani grany; drużyna czeka na swojego lidera jak dotąd (0.4.59).
+3. **Odmowy:** „Przywództwo przekazuje lider.” (kto nie prowadzi drużyny, także stara strona po przekazaniu), „Tej postaci nie ma w drużynie.” (postać spoza drużyny, także taka, która właśnie wyszła), „Już prowadzisz tę drużynę.” (lider wskazał siebie). Przekazanie to jeden zapis, który przechodzi tylko wtedy, gdy pytający dalej prowadzi drużynę, a wskazany dalej w niej jest. Z dwóch przekazań naraz (podwójne stuknięcie, dwie karty) zapisze się więc jedno, a drugie dostaje zwykłe „Drużyna zmieniła się w międzyczasie. Spróbuj jeszcze raz.”.
+4. **Wyprawa w toku (brakujący szczegół).** Przekazanie działa także w trakcie wyprawy drużyny i niczego w niej nie zmienia. Każda wyprawa trzyma swój skład, ziarno, opcje, tryb (Trudna, Piekielna, 0.4.62) i swojego lidera, pierwszego w składzie, więc stwory najnowszego miejsca dalej liczą jego poziom (0.4.67), a zdarzenie drużynowe na końcu dalej wybiera on. Nowy lider prowadzi od następnej wyprawy. To bezpieczne, bo w trakcie wyprawy gra czyta lidera wyprawy, a nie lidera drużyny. Gdy nowy lider wyśle drużynę dalej, zanim dawny wybierze w zdarzeniu drużynowym, raport dawnego lidera odbiera się przy wyjściu, a zdarzenie rozstrzyga się samo, jak dotąd przy wyjściu pod innym liderem.
+5. **Wyjście w tej samej chwili (brakujący szczegół).** Wyjście drużyny zapisuje się teraz tylko wtedy, gdy wysyłający dalej prowadzi drużynę, w tym samym zapisie co starty (0.4.46: w całości albo wcale). Gdy przywództwo przeszło w międzyczasie, nikt nie wyrusza, a dawny lider dostaje „Na wyprawę drużynę wysyła lider.”.
+6. **Zaproszenia dawnego lidera (brakujący szczegół)** zostają, bo to zaproszenia drużyny: nowy lider widzi je w „Wysłanych zaproszeniach” i może je cofnąć. Przepadają, gdy dawny lider wyjdzie z drużyny, jak dotąd.
+7. **Czat Drużyny** nie ma linijek Systemu, więc przekazanie niczego w nim nie pisze.
+8. **Słowa:** `data/community.json` (`party.texts`), po angielsku w `data/en/community.json`. **Pliki:** `src/server/parties.js` (`handPartyLead`, `POST /api/party/lead`; sprawdzenie lidera w zapisie wyjścia w `setOut`), `src/server/content.js`, `src/client/screens/party.js`; testy w `test/party-lead.test.js`.
+
 ## Wersja 0.4.73 (20.11.2026): zmiana posiłku w trakcie działania
 
 Według sekcji niżej, bez makiet (okno pytania w stylu gry na istniejącym ekranie).
