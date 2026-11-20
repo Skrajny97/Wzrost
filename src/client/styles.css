@@ -16515,6 +16515,19 @@ button.tcard-slot {
   padding: 8px 0 16px;
 }
 
+/* A member's potions for the party's trips (screens/party.js
+   potionsRubric), under the members, in the look of "Opcje wyprawy". On the
+   narrowest phones the potion's name keeps the room of its picture. */
+.party-potions {
+  margin-top: 14px;
+}
+
+@media (max-width: 359px) {
+  .party-potions .potion-pick-art {
+    display: none;
+  }
+}
+
 .party-choice {
   display: grid;
   gap: 4px;

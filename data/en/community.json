@@ -63,7 +63,10 @@
       "leadConfirm": "Hand over",
       "led": "{name} now leads the party.",
       "notLeader": "Only the leader hands over the lead.",
-      "self": "You already lead this party."
+      "self": "You already lead this party.",
+      "potionsTitle": "Potions for party trips",
+      "potionsHint": "You take them from your bag when the leader sends the party out: of each, at most as many as the trip has fights. Those not drunk come back.",
+      "potionsNone": "You have no healing or mana potions in your bag."
     }
   }
 }

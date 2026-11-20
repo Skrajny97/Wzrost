@@ -345,9 +345,13 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
 
   /** @type {Record<string, any>[]} */
   const events = [];
-  // The potions drunk, by id, and which unit drank which kind already.
+  // The potions drunk, by id, the unit that drank each (`drinkers`, in the
+  // same order: on a Drużyna's trip every player drinks from its own bag)
+  // and which unit drank which kind already.
   /** @type {string[]} */
   const drunk = [];
+  /** @type {string[]} */
+  const drinkers = [];
   const drank = new Set();
   const dealt = Object.fromEntries(units.map((unit) => [unit.id, 0]));
   const taken = Object.fromEntries(units.map((unit) => [unit.id, 0]));
@@ -392,6 +396,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     if (!potion || drank.has(once)) return false;
     drank.add(once);
     drunk.push(potion.id);
+    drinkers.push(unit.id);
     const vars = { actor: unit.name, potion: potion.accusative };
     const potionTexts = content.potionUse.texts;
     if (kind === 'heal') {
@@ -2240,6 +2245,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         dealt,
         taken,
         drunk,
+        drinkers,
       };
     }
 

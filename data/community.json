@@ -74,7 +74,7 @@
     ]
   },
   "party": {
-    "$comment": "Drużyna (src/server/parties.js, screens/party.js). texts: the hand-over of the lead (the author, 20.11.2026: „Dodaj też opcje przekazania pozycji lidera w drużynie”): lead the button by each other member, which only the leader sees, as the guild's; leadTitle, leadText ({name}: the member) and leadConfirm its question; led the answer once done; notLeader and self the refusals.",
+    "$comment": "Drużyna (src/server/parties.js, screens/party.js). texts: the hand-over of the lead (the author, 20.11.2026: „Dodaj też opcje przekazania pozycji lidera w drużynie”): lead the button by each other member, which only the leader sees, as the guild's; leadTitle, leadText ({name}: the member) and leadConfirm its question; led the answer once done; notLeader and self the refusals. The potions of a member who is not the leader for the party's trips (the author, 20.11.2026: „Powinna byc opcja zabierania przez reszte drużyny jakos mikstur zdrowia i many”): potionsTitle the rubric's heading on the Drużyna card, potionsHint the line under its rows, potionsNone in place of the rows when the bag has no healing or mana potion.",
     "texts": {
       "lead": "Przekaż przywództwo",
       "leadTitle": "Przekazać przywództwo?",
@@ -82,7 +82,10 @@
       "leadConfirm": "Przekaż",
       "led": "{name} prowadzi teraz drużynę.",
       "notLeader": "Przywództwo przekazuje lider.",
-      "self": "Już prowadzisz tę drużynę."
+      "self": "Już prowadzisz tę drużynę.",
+      "potionsTitle": "Mikstury na wyprawę drużyny",
+      "potionsHint": "Zabierzesz je z plecaka, gdy lider wyśle drużynę: każdej najwyżej tyle, ile walk ma wyprawa. Niewypite wrócą.",
+      "potionsNone": "Nie masz w plecaku mikstur leczenia ani many."
     }
   }
 }

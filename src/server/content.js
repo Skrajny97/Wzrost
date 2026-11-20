@@ -560,8 +560,13 @@ export function publicContent() {
       // the invitation on the sign-up, and the words of the card.
       referral: { start: game.community.referral.start, milestones: game.community.referral.milestones, texts: game.community.referral.texts },
       // The Drużyna's button and question of the hand-over of the lead
-      // (screens/party.js), without the server's answer and refusals.
-      party: { texts: (({ lead, leadTitle, leadText, leadConfirm }) => ({ lead, leadTitle, leadText, leadConfirm }))(game.community.party.texts) },
+      // (screens/party.js), without the server's answer and refusals, and
+      // the words of a member's rubric of potions for the party's trips.
+      party: {
+        texts: (({ lead, leadTitle, leadText, leadConfirm, potionsTitle, potionsHint, potionsNone }) => ({ lead, leadTitle, leadText, leadConfirm, potionsTitle, potionsHint, potionsNone }))(
+          game.community.party.texts,
+        ),
+      },
     },
   };
 }
