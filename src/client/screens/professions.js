@@ -2818,7 +2818,7 @@ export function mountProfessions(container, { params, navigate }) {
     const coreSlot = state.content.slots.find((slot) => slot.id === 'core');
     const allGems = jewelcrafting.gems;
     const coreGem = character.core?.gem ? (typeof character.core.gem === 'string' ? allGems.find((gem) => gem.id === character.core.gem) : character.core.gem) : null;
-    const core = character.core?.open ? { id: 'core', core: true, name: coreSlot?.name ?? t('Rdzeń'), slotName: t('Artefakty Rdzenia'), gem: coreGem } : null;
+    const core = character.core?.open ? { id: 'core', core: true, name: coreSlot?.name ?? t('Rdzeń'), slotName: t('Artefakty Rdzenia'), gem: coreGem, pendingGem: character.core.pendingGem ?? null } : null;
     const worn = [...state.content.slots.map((slot) => character.equipment[slot.id]).filter(Boolean), ...(core ? [core] : [])];
     // Every item of the bag takes a gem as a worn one does (settingOrder on
     // the server), the highest level first, then the rarest.
@@ -3020,9 +3020,18 @@ export function mountProfessions(container, { params, navigate }) {
       : character.activity.kind === 'mercenary'
         ? t('Na usłudze najemnej oprawisz tylko przedmioty z plecaka.')
         : t('Na wyprawie oprawisz tylko przedmioty z plecaka.');
+    // A gem the Awatar set on the way waits for the character's return
+    // (pendingGem, jewelcraft.js on the server), said under the hint.
+    const serving = character.activity?.kind === 'mercenary';
+    const waitingText = (each) => {
+      const words = { gem: each.pendingGem.name, item: titleOf(each) };
+      if (each.core) return serving ? t('Kamień ({gem}) czeka: trafi do Rdzenia, gdy postać skończy usługę najemną albo zdejmie ogłoszenie.', words) : t('Kamień ({gem}) czeka: trafi do Rdzenia, gdy postać wróci z wyprawy.', words);
+      return serving ? t('Kamień ({gem}) czeka: trafi do przedmiotu {item}, gdy postać skończy usługę najemną albo zdejmie ogłoszenie.', words) : t('Kamień ({gem}) czeka: trafi do przedmiotu {item}, gdy postać wróci z wyprawy.', words);
+    };
     return card(
       who.element,
       h('p', { class: 'herb-estimate set-hint', text: hint }),
+      worn.filter((each) => each.pendingGem).map((each) => h('p', { class: 'muted small', text: waitingText(each) })),
       h('div', { class: 'set-doll' }, h('div', { class: 'portrait-wrap' }, frame)),
       legend,
       bagSection,

@@ -484,6 +484,18 @@
       "missing": [
         "This item is gone. The stone went back to the bag: {gem}."
       ],
+      "pending": [
+        "The stone ({gem}) is waiting: it goes into the item {item} once the character is back from the exploration."
+      ],
+      "pendingMercenary": [
+        "The stone ({gem}) is waiting: it goes into the item {item} once the character finishes the mercenary service or takes down the notice."
+      ],
+      "pendingCore": [
+        "The stone ({gem}) is waiting: it goes into the Core once the character is back from the exploration."
+      ],
+      "pendingCoreMercenary": [
+        "The stone ({gem}) is waiting: it goes into the Core once the character finishes the mercenary service or takes down the notice."
+      ],
       "revealed": [
         "The System reveals new patterns: {patterns}"
       ],

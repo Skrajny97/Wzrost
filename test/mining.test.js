@@ -907,12 +907,18 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
     assert.deepEqual(again.set.item.gem, shown);
   });
 
-  test('one setting of an item at a time, and a worn item takes the Awatar\'s gem only after the exploration\'s report (the code review)', async () => {
-    await set(`minerals = '{"quartz":3}', gold = 10000`);
+  // gracz (poz. 43), 20.11.2026: „Nie da się odebrać raportu z pracy awatara
+  // w osadzaniu kamyka w itemów gdy postać główna jest na wyprawie”. The
+  // claim on the way ends the work, with its XP, and frees the Awatar; the
+  // gem waits beside the worn item, the exploration's report is made
+  // without it (the code review of 3.11.2026), and it goes in once after.
+  test('one setting of an item at a time; the Awatar\'s setting of a worn item claimed on an exploration frees it, and the gem waits for the exploration\'s report (20.11.2026)', async () => {
+    await set(`minerals = '{"quartz":3}', gold = 10000, class_level = 25`);
     await call('POST', '/api/avatar/buy', { cookie });
     const database = await db();
     const { id } = await database.prepare('SELECT id FROM characters').first();
-    const sword = generateItem({ baseId: 'sword', level: 25, rarityId: 'rare' }, createRng('sword'), content);
+    // Its Witalność, raised by the gem, shows in the HP which gear fought.
+    const sword = { ...generateItem({ baseId: 'sword', level: 25, rarityId: 'rare' }, createRng('sword'), content), affixes: [{ id: 'leshy', kind: 'suffix', stat: 'vitality', value: 19 }] };
     await database.prepare("INSERT INTO items (character_id, slot, data, created_at) VALUES (?, 'weapon', ?, 0)").bind(id, JSON.stringify(sword)).run();
     const weapon = (await character()).equipment.weapon;
     // While the character sets a gem in the sword, the Awatar sets none in
@@ -922,18 +928,61 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
     assert.equal((await call('POST', '/api/hunts/cancel', { cookie })).status, 200);
     assert.equal((await jewel({ set: true, itemId: weapon.id, gem: 'quartz', avatar: true })).status, 201);
     assert.equal((await jewel({ set: true, itemId: weapon.id, gem: 'quartz' })).data.error.code, 'setting_under_way');
-    // The character sets out and the Awatar's work ends on the way: the worn
-    // sword takes the gem only once the exploration's report is claimed.
+    // The character sets out and the Awatar's work ends on the way: its
+    // report comes, with its XP, and the gem waits beside the sword.
     assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 1 } })).status, 201);
     await age(15, 'avatar_activities');
     const early = await call('POST', '/api/avatar/claim', { cookie });
-    assert.equal(early.data.error.code, 'item_worn_exploring');
-    assert.ok(!(await character()).equipment.weapon.gem);
+    assert.equal(early.status, 200);
+    assert.equal(early.data.report.set.text, `Kamień (Kwarc) czeka: trafi do przedmiotu ${weapon.name}, gdy postać wróci z wyprawy.`);
+    assert.equal(early.data.report.set.replaced, null);
+    assert.ok(JSON.parse((await database.prepare('SELECT professions FROM characters').first()).professions).jewelcrafting.xp > 0);
+    const away = early.data.character;
+    assert.equal(away.professions.avatar.activity, null);
+    assert.ok(!away.equipment.weapon.gem);
+    assert.equal(away.equipment.weapon.pendingGem.id, 'quartz');
+    assert.deepEqual(minerals(away), { quartz: 2 });
+    // The Awatar works again at once.
+    assert.equal((await mine({ minutes: 60, avatar: true })).status, 201);
+    // The exploration's end: its report is made with the sword as it was,
+    // and the gem goes in as it is claimed, once.
     await age(1);
-    assert.equal((await claim()).status, 200);
-    const later = (await call('POST', '/api/avatar/claim', { cookie })).data;
-    assert.equal(later.report.set.text, `Kwarc tkwi teraz w przedmiocie: ${weapon.name}.`);
-    assert.equal(later.character.equipment.weapon.gem.id, 'quartz');
+    assert.equal((await character()).equipment.weapon.pendingGem.id, 'quartz');
+    const trip = (await claim()).data;
+    assert.equal(trip.report.summary.maxHp, away.maxHp);
+    const back = trip.character;
+    assert.equal(back.equipment.weapon.gem.id, 'quartz');
+    assert.equal(back.equipment.weapon.pendingGem, undefined);
+    assert.ok(back.maxHp > away.maxHp);
+    const stored = JSON.parse((await database.prepare('SELECT data FROM items WHERE id = ?').bind(weapon.id).first()).data);
+    assert.deepEqual([stored.gem, 'pendingGem' in stored], ['quartz', false]);
+    const again = await character();
+    assert.equal(again.equipment.weapon.gem.id, 'quartz');
+    assert.deepEqual(minerals(again), { quartz: 2 });
+  });
+
+  test('a worn item\'s setting claimed on a mercenary\'s service waits for its end, in the words of the service (20.11.2026)', async () => {
+    await set(`minerals = '{"quartz":1}', gold = 10000`);
+    await call('POST', '/api/avatar/buy', { cookie });
+    const database = await db();
+    const { id } = await database.prepare('SELECT id FROM characters').first();
+    const sword = generateItem({ baseId: 'sword', level: 25, rarityId: 'rare' }, createRng('sword'), content);
+    await database.prepare("INSERT INTO items (character_id, slot, data, created_at) VALUES (?, 'weapon', ?, 0)").bind(id, JSON.stringify(sword)).run();
+    const weapon = (await character()).equipment.weapon;
+    assert.equal((await jewel({ set: true, itemId: weapon.id, gem: 'quartz', avatar: true })).status, 201);
+    await database
+      .prepare("INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options) VALUES (?, 'mercenary', '', 240, ?, ?, '', 100, ?)")
+      .bind(id, Date.now(), Date.now() + 4 * 3600000, JSON.stringify({ perHour: 400 }))
+      .run();
+    await age(15, 'avatar_activities');
+    const claimed = (await call('POST', '/api/avatar/claim', { cookie })).data;
+    assert.equal(claimed.report.set.text, `Kamień (Kwarc) czeka: trafi do przedmiotu ${weapon.name}, gdy postać skończy usługę najemną albo zdejmie ogłoszenie.`);
+    assert.equal(claimed.character.professions.avatar.activity, null);
+    assert.equal(claimed.character.equipment.weapon.pendingGem.id, 'quartz');
+    // The offer taken down, the gem is in.
+    const back = (await call('POST', '/api/mercenary/withdraw', { cookie })).data.character;
+    assert.equal(back.equipment.weapon.gem.id, 'quartz');
+    assert.equal(back.equipment.weapon.pendingGem, undefined);
   });
 
   // The author, 20.11.2026: „Spraw by w czasie wyprawy mozna bylo oprawiać

@@ -469,17 +469,37 @@ describe('the Rdzeń through the API', () => {
 
   // On an exploration only the bag's items take a gem (the author,
   // 20.11.2026): the Rdzeń counts in its fights, as a worn item does.
-  test('on an exploration the Awatar sets no gem in the Rdzeń, refused at the start; back home it does (20.11.2026)', async () => {
+  // Started at home and claimed on an exploration (gracz (poz. 43),
+  // 20.11.2026): the Awatar is free at once, and the gem waits for the
+  // exploration's end, then goes in once.
+  test('on an exploration the Awatar sets no gem in the Rdzeń, refused at the start; one started at home and claimed on the way waits for the return (20.11.2026)', async () => {
     await set(`core = '{"open":true}', minerals = '{"quartz":1}', gold = 10000`);
     assert.equal((await post('/api/avatar/buy')).status, 200);
-    await (await db())
-      .prepare("INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options) VALUES (?, 'hunt', 'windfalls-edge', 60, ?, ?, 'x', 100, '{}')")
-      .bind(characterId, Date.now(), Date.now() + 3600000)
-      .run();
+    const setOut = () =>
+      db().then((database) =>
+        database
+          .prepare("INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options) VALUES (?, 'hunt', 'windfalls-edge', 60, ?, ?, 'x', 100, '{}')")
+          .bind(characterId, Date.now(), Date.now() + 3600000)
+          .run(),
+      );
+    await setOut();
     const refused = await post('/api/professions/jewel', { set: true, itemId: 'core', gem: 'quartz', avatar: true });
     assert.deepEqual([refused.status, refused.data.error.code, refused.data.error.message], [409, 'bag_only', 'Na wyprawie oprawisz tylko przedmioty z plecaka.']);
     await (await db()).prepare('DELETE FROM activities').run();
     assert.equal((await post('/api/professions/jewel', { set: true, itemId: 'core', gem: 'quartz', avatar: true })).status, 201);
+    await setOut();
+    await (await db()).prepare('UPDATE avatar_activities SET started_at = started_at - ?, ends_at = ends_at - ?').bind(3600000, 3600000).run();
+    const claimed = await post('/api/avatar/claim');
+    assert.equal(claimed.status, 200);
+    assert.equal(claimed.data.report.set.text, 'Kamień (Kwarc) czeka: trafi do Rdzenia, gdy postać wróci z wyprawy.');
+    assert.equal(claimed.data.character.professions.avatar.activity, null);
+    assert.deepEqual([claimed.data.character.core.gem, claimed.data.character.core.pendingGem.id], [null, 'quartz']);
+    assert.deepEqual([(await coreRow()).gem, (await coreRow()).pendingGem], [undefined, 'quartz']);
+    // Back home: the gem is in, once.
+    await (await db()).prepare('DELETE FROM activities').run();
+    const back = (await call('GET', '/api/character', { cookie })).data.character;
+    assert.deepEqual([back.core.gem.id, back.core.pendingGem], ['quartz', undefined]);
+    assert.deepEqual(await coreRow(), { open: true, gem: 'quartz' });
   });
 
   test('the Artefakty work in the character\'s fights, never in a companion\'s', () => {

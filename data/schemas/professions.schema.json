@@ -1384,6 +1384,10 @@
             "setCore",
             "replaced",
             "missing",
+            "pending",
+            "pendingMercenary",
+            "pendingCore",
+            "pendingCoreMercenary",
             "revealed",
             "gem",
             "hidden",
@@ -1461,6 +1465,38 @@
               }
             },
             "missing": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "pending": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "pendingMercenary": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "pendingCore": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "pendingCoreMercenary": {
               "type": "array",
               "minItems": 1,
               "items": {
