@@ -16,7 +16,8 @@
 // chat button (it stands over it while that one waits by the right edge),
 // the bars a screen holds at its bottom ("Wyrusz", a card match's buttons,
 // the chat's line, the bag's „Zaznacz do sprzedaży” of 0.4.55), the tabs on
-// the edges, the narrator and the toasts.
+// the edges, the narrator and the toasts. Never on the Czat's screen, whose
+// newest messages are at its bottom (the author, 20.11.2026).
 // While it shows, the screen leaves room under its last row for it
 // (styles.css, .with-top-button), so it covers no button at the end of a
 // page. Its name comes from the data (texts.json, page.toTop).
@@ -102,7 +103,10 @@ function update() {
   if (!button) return;
   const game = $('#view-game');
   const far = window.scrollY > window.innerHeight * FROM;
-  const wanted = Boolean(state.character) && Boolean(game) && !game.hidden && far && !document.querySelector('.guide');
+  // Never on the Czat's screen (the author, 20.11.2026: „usun przycisk do
+  // góry z czatu”): its newest messages are at the bottom, by the line.
+  const chat = location.hash === '#/czat' || location.hash.startsWith('#/czat/') || location.hash.startsWith('#/czat?');
+  const wanted = Boolean(state.character) && Boolean(game) && !game.hidden && far && !chat && !document.querySelector('.guide');
   const at = wanted ? spot() : null;
   const show = Boolean(at);
   document.documentElement.classList.toggle('with-top-button', show);
