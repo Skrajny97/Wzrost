@@ -1228,6 +1228,10 @@
     "0.4.73": {
       "title": "Version 0.4.73",
       "body": "- You can now change your meal while one is still working: pick another dish as you set out, and the game asks first. The previous meal stops, and its bonus is lost."
+    },
+    "0.4.74": {
+      "title": "Version 0.4.74",
+      "body": "- A party leader can now hand the lead to another member: Community › Party › “Hand over the lead”. A trip already under way goes on as it set out."
     }
   }
 }

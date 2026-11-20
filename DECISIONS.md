@@ -3847,6 +3847,10 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.74 (20.11.2026): przekazanie przywództwa w drużynie
+
+Według sekcji niżej, bez makiet (przycisk i pytanie w stylu przycisku gildii na istniejącym ekranie).
+
 ## Przekazanie przywództwa w drużynie (20.11.2026)
 
 Autor: „Dodaj też opcje przekazania pozycji lidera w drużynie” (20.11.2026). Bez makiet: przycisk i pytanie jak w gildii, na istniejącej karcie Drużyny.
