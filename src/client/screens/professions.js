@@ -27,7 +27,7 @@ import { language, t } from '../i18n.js';
 import { motionOn } from '../motion.js';
 import { workScene } from '../scenes.js';
 import { playSound } from '../sound.js';
-import { activityFinished, call, reportCache, serverNow, state, testModeOn } from '../state.js';
+import { activityFinished, buildLocked, call, reportCache, serverNow, state, testModeOn } from '../state.js';
 import { skipControl } from '../time.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, splitLead, systemPanel, toast, withButton } from '../ui.js';
 import { transmuteForm } from '../transmute.js';
@@ -75,6 +75,9 @@ const FISH_CHOICE = 'wzrost.fish-choice';
 const FARM_CHOICE = 'wzrost.farm-choice';
 const COOK_CHOICE = 'wzrost.cook-choice';
 const SET_CHOICE = 'wzrost.set-choice';
+// How many of the bag's items Oprawianie's „Z plecaka” shows at first, and
+// how many more each „Pokaż kolejne” adds.
+const SET_BAG_STEP = 20;
 // The Stół rozbiórki, where parts are made.
 const TABLE = '#/oboz/craft-table';
 
@@ -2805,7 +2808,11 @@ export function mountProfessions(container, { params, navigate }) {
   // once open; a tap opens a sheet with the item and its gem now, the gem to
   // set (those the System still hides are shadows), what it gives, the time
   // and „Oprawiaj”. A gem already in the item is lost, and only a stronger
-  // one takes its place (the author, 13.11.2026).
+  // one takes its place (the author, 13.11.2026). Under the figure „Z
+  // plecaka”, the bag's items, which open the same sheet; while the
+  // character explores or serves as a mercenary only they do, the figure
+  // dim (the author, 20.11.2026: „Dodatkowa rubryka na oprawianiu gdzie są
+  // przedmioty z plecaka i w trakcie wyprawy ją tylko można ruszać”).
   function setForm(character, jewelcrafting) {
     // The Rdzeń takes a gem too, once it is open (863 A, screens/core.js).
     const coreSlot = state.content.slots.find((slot) => slot.id === 'core');
@@ -2813,9 +2820,17 @@ export function mountProfessions(container, { params, navigate }) {
     const coreGem = character.core?.gem ? (typeof character.core.gem === 'string' ? allGems.find((gem) => gem.id === character.core.gem) : character.core.gem) : null;
     const core = character.core?.open ? { id: 'core', core: true, name: coreSlot?.name ?? t('Rdzeń'), slotName: t('Artefakty Rdzenia'), gem: coreGem } : null;
     const worn = [...state.content.slots.map((slot) => character.equipment[slot.id]).filter(Boolean), ...(core ? [core] : [])];
+    // Every item of the bag takes a gem as a worn one does (settingOrder on
+    // the server), the highest level first, then the rarest.
+    const rarityRank = (item) => state.content.rarities.findIndex((one) => one.id === item.rarity);
+    const bag = [...character.bag].sort((a, b) => b.level - a.level || rarityRank(b) - rarityRank(a));
+    // On an exploration or a mercenary's service what the character wears
+    // and the Rdzeń wait for its end, as the exploration's report is made
+    // with them (requireAtHome on the server).
+    const away = buildLocked(character);
     const head = h('h2', { class: 'section-title', id: 'set-title', text: t('Oprawianie') });
     const card = (...children) => h('section', { class: 'card gather-card', 'aria-labelledby': 'set-title', 'data-guide': 'jewel-setting' }, head, children);
-    if (worn.length === 0) return card(h('p', { class: 'muted', text: t('Załóż przedmiot, żeby oprawić w nim kamień.') }));
+    if (worn.length === 0 && bag.length === 0) return card(h('p', { class: 'muted', text: t('Załóż przedmiot, żeby oprawić w nim kamień.') }));
     const gems = allGems.filter((gem) => !gem.hidden);
     const who = workerPicker(character);
     const itemArt = (each) => (each.core ? icon('core', { size: 24 }) : (itemSprite(each) ?? icon('ring', { size: 24 })));
@@ -2839,7 +2854,14 @@ export function mountProfessions(container, { params, navigate }) {
         if (!core) return h('span', { class: 'slot slot--core slot--locked', 'aria-hidden': 'true' }, icon('core', { size: 24 }));
         return h(
           'button',
-          { type: 'button', class: 'slot slot--core slot--open', 'data-guide': `set-slot-${slot.id}`, 'aria-label': t('{slot}: {gem}', { slot: core.name, gem: gemNow(core) }), onClick: () => openSetting(core) },
+          {
+            type: 'button',
+            class: 'slot slot--core slot--open',
+            'data-guide': `set-slot-${slot.id}`,
+            disabled: away,
+            'aria-label': t('{slot}: {gem}', { slot: core.name, gem: gemNow(core) }),
+            onClick: () => openSetting(core),
+          },
           icon('core', { size: 24 }),
           gemMark(core.gem),
         );
@@ -2852,6 +2874,7 @@ export function mountProfessions(container, { params, navigate }) {
           type: 'button',
           class: 'slot',
           'data-guide': `set-slot-${slot.id}`,
+          disabled: away,
           vars: { '--rarity': item.color },
           'aria-label': t('{slot}: {item}, {gem}', { slot: slot.name, item: itemTitle(item), gem: gemNow(item) }),
           onClick: () => openSetting(item),
@@ -2869,6 +2892,31 @@ export function mountProfessions(container, { params, navigate }) {
       { class: 'set-legend muted' },
       example && h('span', {}, gemMark(example), t('oprawiony kamień')),
       h('span', {}, gemMark(null), t('bez kamienia')),
+    );
+
+    // „Z plecaka”: each item of the bag with its picture, name and level, and
+    // its gem's mark or an empty socket as on the figure; a tap opens the
+    // same sheet. A long bag shows SET_BAG_STEP of them, and as many more
+    // with each „Pokaż kolejne”.
+    const bagRow = (item) =>
+      h(
+        'button',
+        { type: 'button', class: 'item-row set-bag-row', onClick: () => openSetting(item) },
+        itemSummary(item),
+        h('span', { class: 'set-bag-gem' }, gemMark(item.gem), h('span', { class: 'visually-hidden', text: gemNow(item) })),
+      );
+    const bagList = h('ul', { class: 'item-list' });
+    const more = h('button', { type: 'button', class: 'button button--world', text: t('Pokaż kolejne'), onClick: () => showBag(bagList.childElementCount + SET_BAG_STEP) });
+    const showBag = (count) => {
+      fill(bagList, bag.slice(0, count).map((item) => h('li', {}, bagRow(item))));
+      more.hidden = count >= bag.length;
+    };
+    showBag(SET_BAG_STEP);
+    const bagSection = h(
+      'section',
+      { class: 'set-bag', 'aria-labelledby': 'set-bag-title' },
+      h('h3', { class: 'workshop-subtitle', id: 'set-bag-title', text: t('Z plecaka') }),
+      bag.length === 0 ? h('p', { class: 'muted', text: t('W plecaku nie ma przedmiotów do oprawienia.') }) : [bagList, more],
     );
 
     // The sheet of one item: the item and its gem now, the gem to set and
@@ -2966,11 +3014,18 @@ export function mountProfessions(container, { params, navigate }) {
       );
     }
 
+    // Away, a note in the hint's place says why the figure is dim.
+    const hint = !away
+      ? t('Stuknij przedmiot albo Rdzeń, żeby oprawić w nim kamień.')
+      : character.activity.kind === 'mercenary'
+        ? t('Na usłudze najemnej oprawisz tylko przedmioty z plecaka.')
+        : t('Na wyprawie oprawisz tylko przedmioty z plecaka.');
     return card(
       who.element,
-      h('p', { class: 'herb-estimate set-hint', text: t('Stuknij przedmiot albo Rdzeń, żeby oprawić w nim kamień.') }),
+      h('p', { class: 'herb-estimate set-hint', text: hint }),
       h('div', { class: 'set-doll' }, h('div', { class: 'portrait-wrap' }, frame)),
       legend,
+      bagSection,
     );
   }
 

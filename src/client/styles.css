@@ -25415,6 +25415,40 @@ a.social-button {
   bottom: auto;
 }
 
+/* On an exploration or a mercenary's service the figure's items and the
+   Rdzeń dim and take no tap: only "Z plecaka" works (20.11.2026). */
+.set-doll .slot:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* "Z plecaka" under the figure (20.11.2026): the bag's items, each with its
+   gem's mark or an empty socket at the end of its row. */
+.set-bag {
+  display: grid;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.set-bag-row > .item-summary-art,
+.set-bag-row > .item-summary {
+  flex: 1 1 auto;
+}
+
+.set-bag-gem {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+}
+
+.set-bag-gem .set-gem,
+.set-bag-gem .set-socket {
+  position: static;
+}
+
 .set-chosen {
   display: flex;
   align-items: center;

@@ -936,6 +936,58 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
     assert.equal(later.character.equipment.weapon.gem.id, 'quartz');
   });
 
+  // The author, 20.11.2026: „Spraw by w czasie wyprawy mozna bylo oprawiać
+  // kamień w rzeczy spoza ekwipunku (z plecaka)”.
+  test('on an exploration or a mercenary\'s service a setting starts only in a bag item, which takes its gem at the claim; a worn item is refused at the start (20.11.2026)', async () => {
+    await set(`minerals = '{"quartz":4}', gold = 10000`);
+    await call('POST', '/api/avatar/buy', { cookie });
+    const database = await db();
+    const { id } = await database.prepare('SELECT id FROM characters').first();
+    const sword = generateItem({ baseId: 'sword', level: 25, rarityId: 'rare' }, createRng('sword'), content);
+    await database.prepare("INSERT INTO items (character_id, slot, data, created_at) VALUES (?, 'weapon', ?, 0)").bind(id, JSON.stringify(sword)).run();
+    await database.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, 0)').bind(id, JSON.stringify({ base: 'ring', slot: 'ring', level: 25, rarity: 'common', affixes: [], implicit: { stat: 'perception', value: 5 } })).run();
+    const { equipment, bag } = await character();
+    const weapon = equipment.weapon;
+    const ring = bag.find((item) => item.slot === 'ring');
+
+    // On an exploration: the worn sword is refused in the words of the
+    // page's note, and nothing is taken; the ring in the bag gets its gem.
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } })).status, 201);
+    const worn = await jewel({ set: true, itemId: weapon.id, gem: 'quartz', avatar: true });
+    assert.deepEqual([worn.status, worn.data.error.code, worn.data.error.message], [409, 'bag_only', 'Na wyprawie oprawisz tylko przedmioty z plecaka.']);
+    assert.deepEqual(minerals(await character()), { quartz: 4 });
+    const started = await jewel({ set: true, itemId: ring.id, gem: 'quartz', avatar: true });
+    assert.equal(started.status, 201);
+    assert.deepEqual(minerals(started.data.character), { quartz: 3 });
+    await age(15, 'avatar_activities');
+    const claimed = (await call('POST', '/api/avatar/claim', { cookie })).data;
+    assert.equal(claimed.report.set.text, `Kwarc tkwi teraz w przedmiocie: ${ring.name}.`);
+    assert.equal(claimed.character.bag.find((item) => item.id === ring.id).gem.id, 'quartz');
+    assert.ok(!claimed.character.equipment.weapon.gem);
+    assert.equal(claimed.character.activity.kind, 'hunt');
+
+    // Offered as a mercenary: the same, in the words of the service.
+    await database.prepare('DELETE FROM activities').run();
+    await database
+      .prepare("INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options) VALUES (?, 'mercenary', '', 240, ?, ?, '', 100, ?)")
+      .bind(id, Date.now(), Date.now() + 4 * 3600000, JSON.stringify({ perHour: 400 }))
+      .run();
+    const serving = await jewel({ set: true, itemId: weapon.id, gem: 'quartz', avatar: true });
+    assert.deepEqual([serving.status, serving.data.error.code, serving.data.error.message], [409, 'bag_only', 'Na usłudze najemnej oprawisz tylko przedmioty z plecaka.']);
+
+    // Outside an exploration nothing changes: at another work of the
+    // character the Awatar sets a gem in what it wears, and at home the
+    // character does too.
+    await database.prepare('DELETE FROM activities').run();
+    assert.equal((await mine({ minutes: 60 })).status, 201);
+    assert.equal((await jewel({ set: true, itemId: weapon.id, gem: 'quartz', avatar: true })).status, 201);
+    await age(15, 'avatar_activities');
+    assert.equal((await call('POST', '/api/avatar/claim', { cookie })).data.character.equipment.weapon.gem.id, 'quartz');
+    await database.prepare('DELETE FROM activities').run();
+    await database.prepare("UPDATE characters SET professions = '{\"jewelcrafting\":{\"level\":5,\"xp\":0}}', minerals = '{\"agate\":1}'").run();
+    assert.equal((await jewel({ set: true, itemId: weapon.id, gem: 'agate' })).status, 201);
+  });
+
   test('"Sprzedaj zbędne" keeps an item with a gem, as an upgraded one', async () => {
     const database = await db();
     const { id } = await database.prepare('SELECT id FROM characters').first();

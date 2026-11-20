@@ -29,7 +29,7 @@ import {
 } from '../engine/index.js';
 import { say } from '../engine/text.js';
 import { content } from './content.js';
-import { avatarMark, characterView, coreOf, currentHp, loadPlayer, questsNow, requireNotExploring, requirePlayer, requireWorker, workOf, workTable } from './characters.js';
+import { avatarMark, characterView, coreOf, currentHp, loadPlayer, questsNow, requirePlayer, requireWorker, workOf, workTable } from './characters.js';
 import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
 import { labyrinthOn } from './features.js';
 import { toHex } from './encoding.js';
@@ -62,19 +62,33 @@ function jewelOrder(player, level, body) {
   };
 }
 
+// While the character explores or serves as a mercenary, a setting starts
+// only in an item of the bag (the author, 20.11.2026: „Spraw by w czasie
+// wyprawy mozna bylo oprawiać kamień w rzeczy spoza ekwipunku (z plecaka)”):
+// what it wears and the Rdzeń count in the exploration's fights, whose
+// report is made with them, in the words of the note over the Oprawianie's
+// figure. A setting started before the trip still waits for its end
+// (finishJewels).
+function requireAtHome(player) {
+  const kind = player.activity?.kind;
+  if (kind !== 'hunt' && kind !== 'mercenary') return;
+  throw new ApiError(409, 'bag_only', kind === 'mercenary' ? 'Na usłudze najemnej oprawisz tylko przedmioty z plecaka.' : 'Na wyprawie oprawisz tylko przedmioty z plecaka.');
+}
+
 // A setting: an item of the character's, worn or in the bag, and a gem the
-// level sets that is not in it already and not weaker than the one in it. A worn item waits while the
-// character explores, as the Kowadło does, since the exploration's report is
-// made with what it wears. One setting of an item at a time: of the
-// character's and the Awatar's, the later would break the earlier's gem
-// without asking (the code review of 3.11.2026).
-function settingOrder(player, level, body, now) {
+// level sets that is not in it already and not weaker than the one in it. A
+// worn item takes none while the character explores (requireAtHome), as the
+// Kowadło does, since the exploration's report is made with what it wears.
+// One setting of an item at a time: of the character's and the Awatar's, the
+// later would break the earlier's gem without asking (the code review of
+// 3.11.2026).
+function settingOrder(player, level, body) {
   // The Rdzeń takes one gem as any item does (863 A), where the Labirynt is
   // on and the Rdzeń is open.
-  if (body.itemId === 'core') return coreSettingOrder(player, level, body, now);
+  if (body.itemId === 'core') return coreSettingOrder(player, level, body);
   const item = player.items.find((candidate) => candidate.id === body.itemId);
   if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz tego przedmiotu.');
-  if (item.equippedSlot) requireNotExploring(player, now);
+  if (item.equippedSlot) requireAtHome(player);
   const setting = [player.activity, player.avatarActivity, player.avatar2Activity].some((work) => {
     if (work?.kind !== 'jewels') return false;
     const options = JSON.parse(work.options ?? '{}');
@@ -93,9 +107,9 @@ function settingOrder(player, level, body, now) {
 // A gem set in the Rdzeń: as in a worn item, it waits for the character's
 // return from an exploration, as the Rdzeń counts in its fights, and one
 // setting of it at a time.
-function coreSettingOrder(player, level, body, now) {
+function coreSettingOrder(player, level, body) {
   if (!labyrinthOn() || !coreOf(player.row).open) throw new ApiError(404, 'item_not_found', 'Nie masz tego przedmiotu.');
-  requireNotExploring(player, now);
+  requireAtHome(player);
   const setting = [player.activity, player.avatarActivity, player.avatar2Activity].some((work) => work?.kind === 'jewels' && JSON.parse(work.options ?? '{}').core === true);
   if (setting) throw new ApiError(409, 'setting_under_way', 'W Rdzeniu trwa już oprawianie kamienia.');
   const gem = typeof body.gem === 'string' ? content().mineralsById[body.gem] : undefined;
@@ -119,7 +133,7 @@ export async function startJewelcraft(context) {
   requireOpen(player, content().professionsById[jewelcrafting.profession]);
   const { level } = professionState(JSON.parse(player.row.professions ?? '{}'), jewelcrafting.profession);
   const now = context.now;
-  const order = body.set === true ? settingOrder(player, level, body, now) : jewelOrder(player, level, body);
+  const order = body.set === true ? settingOrder(player, level, body) : jewelOrder(player, level, body);
   const have = mineralsOf(player.row);
   const short = Object.entries(order.cost).find(([id, amount]) => (have[id] ?? 0) < amount);
   if (short) throw new ApiError(409, 'no_minerals', `Brakuje: ${content().mineralsById[short[0]].name} (potrzeba ${short[1]}).`);

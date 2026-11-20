@@ -467,6 +467,21 @@ describe('the Rdzeń through the API', () => {
     assert.equal(weaker.data.error.message, 'W Rdzeniu tkwi Agat. Oprawisz w nim tylko mocniejszy kamień.');
   });
 
+  // On an exploration only the bag's items take a gem (the author,
+  // 20.11.2026): the Rdzeń counts in its fights, as a worn item does.
+  test('on an exploration the Awatar sets no gem in the Rdzeń, refused at the start; back home it does (20.11.2026)', async () => {
+    await set(`core = '{"open":true}', minerals = '{"quartz":1}', gold = 10000`);
+    assert.equal((await post('/api/avatar/buy')).status, 200);
+    await (await db())
+      .prepare("INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options) VALUES (?, 'hunt', 'windfalls-edge', 60, ?, ?, 'x', 100, '{}')")
+      .bind(characterId, Date.now(), Date.now() + 3600000)
+      .run();
+    const refused = await post('/api/professions/jewel', { set: true, itemId: 'core', gem: 'quartz', avatar: true });
+    assert.deepEqual([refused.status, refused.data.error.code, refused.data.error.message], [409, 'bag_only', 'Na wyprawie oprawisz tylko przedmioty z plecaka.']);
+    await (await db()).prepare('DELETE FROM activities').run();
+    assert.equal((await post('/api/professions/jewel', { set: true, itemId: 'core', gem: 'quartz', avatar: true })).status, 201);
+  });
+
   test('the Artefakty work in the character\'s fights, never in a companion\'s', () => {
     const character = { classId: 'warrior', level: 40, xp: 0, classLevel: 40, classXp: 0, points: {}, position: 'front' };
     const plain = playerCombatant({ character, equipped: [], name: 'A' }, content);
