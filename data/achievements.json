@@ -1,5 +1,5 @@
 {
-  "$comment": "Osiągnięcia z tytułami (1030; lista 1036.1 i okno 1036.2 przyjęte 16.11.2026, tytuł tylko w profilu i Rankingu: 1036.3 B; src/engine/achievements.js, src/server/achievements.js, src/client/achievements.js). groups: grupy w oknie, każda z listą osiągnięć: name, goal (cel słowami), count (co się liczy: monsters, champions i wanted to stwory, czempioni i stwory z listów gończych pokonane na wyprawach, gold złoto z wypraw, arenaWins pojedynki wygrane na Arenie, leagueWins walki wygrane w lidze wojen gildii, labyrinths strażnicy 3. poziomu Labiryntu pokonani, deals transakcje na Targowisku: te liczą się od wersji, która je wprowadziła; reszta od razu z tego, co postać ma: landPlaces miejsca krainy land otwarte poziomem postaci, landReached dotarcie do krainy land (poziom postaci jej pierwszego miejsca), level poziom postaci, thirdForm trzecia forma klasy, professionTop najwyższy poziom profesji, professionsAt50 i professionsAt100 profesje z takim poziomem, cards różne karty, landCards wszystkie karty jednej krainy, arenaRating ocena na Arenie, guildWeeks pełne tygodnie w obecnej gildii, towerFloor najwyższe piętro Wieży, friends znajomi, streaks ukończone serie nagrody za kolejne dni, bannerWarden tytuł kupiony w Kramie Gildii za Znaki Gildii: 1202 A, bez nagrody, bo tytuł jest kupiony), target (ile trzeba), title (tytuł postaci mężczyzny i kobiety), reward (Punkty Czasu i Punkty Systemu, dane raz, gdy osiągnięcie jest zdobyte, przy pierwszym spojrzeniu na okno) i art (obrazek z gry: monster, item, profession albo icon). since: liczniki, które gra prowadzi od wersji 0.4.6; texts.since mówi o tym w oknie.",
+  "$comment": "Osiągnięcia z tytułami (1030; lista 1036.1 i okno 1036.2 przyjęte 16.11.2026, tytuł tylko w profilu i Rankingu: 1036.3 B; src/engine/achievements.js, src/server/achievements.js, src/client/achievements.js). groups: grupy w oknie, każda z listą osiągnięć: name, goal (cel słowami), count (co się liczy: monsters, champions i wanted to stwory, czempioni i stwory z listów gończych pokonane na wyprawach, gold złoto z wypraw, arenaWins pojedynki wygrane na Arenie, leagueWins walki wygrane w lidze wojen gildii, labyrinths strażnicy 3. poziomu Labiryntu pokonani, deals transakcje na Targowisku: te liczą się od wersji, która je wprowadziła; reszta od razu z tego, co postać ma: landPlaces miejsca krainy land otwarte poziomem postaci, landReached dotarcie do krainy land (poziom postaci jej pierwszego miejsca), level poziom postaci, thirdForm trzecia forma klasy, professionTop najwyższy poziom profesji, professionsAt10, professionsAt25, professionsAt50 i professionsAt100 profesje z takim poziomem, professionLevel poziom profesji profession (id z professions.json; drobniejsze osiągnięcia Profesji z 20.11.2026), cards różne karty, landCards wszystkie karty jednej krainy, arenaRating ocena na Arenie, guildWeeks pełne tygodnie w obecnej gildii, towerFloor najwyższe piętro Wieży, friends znajomi, streaks ukończone serie nagrody za kolejne dni, bannerWarden tytuł kupiony w Kramie Gildii za Znaki Gildii: 1202 A, bez nagrody, bo tytuł jest kupiony), target (ile trzeba), title (tytuł postaci mężczyzny i kobiety), reward (Punkty Czasu i Punkty Systemu, dane raz, gdy osiągnięcie jest zdobyte, przy pierwszym spojrzeniu na okno) i art (obrazek z gry: monster, item, profession albo icon). since: liczniki, które gra prowadzi od wersji 0.4.6; texts.since mówi o tym w oknie.",
   "since": [
     "arenaWins",
     "champions",
@@ -223,6 +223,60 @@
       "name": "Profesje",
       "list": [
         {
+          "id": "apprentice",
+          "name": "Terminator",
+          "goal": "Zdobądź 10. poziom dowolnej profesji.",
+          "count": "professionTop",
+          "target": 10,
+          "title": [
+            "Terminator",
+            "Terminatorka"
+          ],
+          "reward": {
+            "timePoints": 10
+          },
+          "art": [
+            "profession",
+            "herbalism"
+          ]
+        },
+        {
+          "id": "journeyman",
+          "name": "Czeladnik",
+          "goal": "Zdobądź 25. poziom dowolnej profesji.",
+          "count": "professionTop",
+          "target": 25,
+          "title": [
+            "Czeladnik",
+            "Czeladniczka"
+          ],
+          "reward": {
+            "timePoints": 20
+          },
+          "art": [
+            "profession",
+            "mining"
+          ]
+        },
+        {
+          "id": "craftsman",
+          "name": "Fachowiec",
+          "goal": "Zdobądź 50. poziom dowolnej profesji.",
+          "count": "professionTop",
+          "target": 50,
+          "title": [
+            "Fachowiec",
+            "Fachowczyni"
+          ],
+          "reward": {
+            "timePoints": 30
+          },
+          "art": [
+            "profession",
+            "jewelcrafting"
+          ]
+        },
+        {
           "id": "master-craft",
           "name": "Mistrz rzemiosła",
           "goal": "Zdobądź 100. poziom dowolnej profesji.",
@@ -238,6 +292,60 @@
           "art": [
             "profession",
             "crafting"
+          ]
+        },
+        {
+          "id": "many-hands",
+          "name": "Na wiele rąk",
+          "goal": "Zdobądź 10. poziom w 4 profesjach.",
+          "count": "professionsAt10",
+          "target": 4,
+          "title": [
+            "Zaradny",
+            "Zaradna"
+          ],
+          "reward": {
+            "timePoints": 15
+          },
+          "art": [
+            "profession",
+            "farming"
+          ]
+        },
+        {
+          "id": "little-of-everything",
+          "name": "Wszystkiego po trochu",
+          "goal": "Zdobądź 10. poziom we wszystkich 8 profesjach.",
+          "count": "professionsAt10",
+          "target": 8,
+          "title": [
+            "Pracowity",
+            "Pracowita"
+          ],
+          "reward": {
+            "timePoints": 25
+          },
+          "art": [
+            "profession",
+            "cooking"
+          ]
+        },
+        {
+          "id": "many-trades",
+          "name": "Wiele fachów",
+          "goal": "Zdobądź 25. poziom we wszystkich 8 profesjach.",
+          "count": "professionsAt25",
+          "target": 8,
+          "title": [
+            "Obrotny",
+            "Obrotna"
+          ],
+          "reward": {
+            "timePoints": 40
+          },
+          "art": [
+            "profession",
+            "fishing"
           ]
         },
         {
@@ -275,6 +383,158 @@
           "art": [
             "profession",
             "jewelcrafting"
+          ]
+        },
+        {
+          "id": "herbalist",
+          "name": "Zielarz",
+          "goal": "Zdobądź 25. poziom Zielarstwa.",
+          "count": "professionLevel",
+          "profession": "herbalism",
+          "target": 25,
+          "title": [
+            "Zielarz",
+            "Zielarka"
+          ],
+          "reward": {
+            "timePoints": 15
+          },
+          "art": [
+            "profession",
+            "herbalism"
+          ]
+        },
+        {
+          "id": "alchemist",
+          "name": "Alchemik",
+          "goal": "Zdobądź 25. poziom Alchemii.",
+          "count": "professionLevel",
+          "profession": "alchemy",
+          "target": 25,
+          "title": [
+            "Alchemik",
+            "Alchemiczka"
+          ],
+          "reward": {
+            "timePoints": 15
+          },
+          "art": [
+            "profession",
+            "alchemy"
+          ]
+        },
+        {
+          "id": "artisan",
+          "name": "Rzemieślnik",
+          "goal": "Zdobądź 25. poziom Rzemieślnictwa.",
+          "count": "professionLevel",
+          "profession": "crafting",
+          "target": 25,
+          "title": [
+            "Rzemieślnik",
+            "Rzemieślniczka"
+          ],
+          "reward": {
+            "timePoints": 15
+          },
+          "art": [
+            "profession",
+            "crafting"
+          ]
+        },
+        {
+          "id": "miner",
+          "name": "Górnik",
+          "goal": "Zdobądź 25. poziom Górnictwa.",
+          "count": "professionLevel",
+          "profession": "mining",
+          "target": 25,
+          "title": [
+            "Górnik",
+            "Górniczka"
+          ],
+          "reward": {
+            "timePoints": 15
+          },
+          "art": [
+            "profession",
+            "mining"
+          ]
+        },
+        {
+          "id": "jeweller",
+          "name": "Jubiler",
+          "goal": "Zdobądź 25. poziom Jubilerstwa.",
+          "count": "professionLevel",
+          "profession": "jewelcrafting",
+          "target": 25,
+          "title": [
+            "Jubiler",
+            "Jubilerka"
+          ],
+          "reward": {
+            "timePoints": 15
+          },
+          "art": [
+            "profession",
+            "jewelcrafting"
+          ]
+        },
+        {
+          "id": "fisher",
+          "name": "Rybak",
+          "goal": "Zdobądź 25. poziom Rybołówstwa.",
+          "count": "professionLevel",
+          "profession": "fishing",
+          "target": 25,
+          "title": [
+            "Rybak",
+            "Rybaczka"
+          ],
+          "reward": {
+            "timePoints": 15
+          },
+          "art": [
+            "profession",
+            "fishing"
+          ]
+        },
+        {
+          "id": "farmer",
+          "name": "Rolnik",
+          "goal": "Zdobądź 25. poziom Rolnictwa.",
+          "count": "professionLevel",
+          "profession": "farming",
+          "target": 25,
+          "title": [
+            "Rolnik",
+            "Rolniczka"
+          ],
+          "reward": {
+            "timePoints": 15
+          },
+          "art": [
+            "profession",
+            "farming"
+          ]
+        },
+        {
+          "id": "cook",
+          "name": "Kucharz",
+          "goal": "Zdobądź 25. poziom Gotowania.",
+          "count": "professionLevel",
+          "profession": "cooking",
+          "target": 25,
+          "title": [
+            "Kucharz",
+            "Kucharka"
+          ],
+          "reward": {
+            "timePoints": 15
+          },
+          "art": [
+            "profession",
+            "cooking"
           ]
         }
       ]

@@ -26,11 +26,15 @@ export const achievementOf = (id, content) => achievementList(content).find((one
  * The fact an achievement counts: its `count`, and for one of a land
  * (landPlaces, landReached) that land's own, `count:land`, so that two of
  * the same count, the explorers of the Łysogóry and of Nawia, each count
- * their land.
+ * their land; the same for one of a profession (professionLevel),
+ * `count:profession`, the Zielarz's and the Górnik's each their own.
  * @param {Achievement} one
  * @returns {string}
  */
-export const achievementFact = (one) => (one.land ? `${one.count}:${one.land}` : one.count);
+export const achievementFact = (one) => {
+  const of = one.land ?? one.profession;
+  return of ? `${one.count}:${of}` : one.count;
+};
 
 /**
  * An achievement's count, at most its target.

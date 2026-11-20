@@ -102,12 +102,60 @@
     "professions": {
       "name": "Professions",
       "list": {
+        "apprentice": {
+          "name": "Apprentice",
+          "goal": "Reach level 10 in any profession.",
+          "title": [
+            "Apprentice",
+            "Apprentice"
+          ]
+        },
+        "journeyman": {
+          "name": "Journeyman",
+          "goal": "Reach level 25 in any profession.",
+          "title": [
+            "Journeyman",
+            "Journeywoman"
+          ]
+        },
+        "craftsman": {
+          "name": "Expert",
+          "goal": "Reach level 50 in any profession.",
+          "title": [
+            "Expert",
+            "Expert"
+          ]
+        },
         "master-craft": {
           "name": "Master of a Craft",
           "goal": "Reach level 100 in any profession.",
           "title": [
             "Master",
             "Master"
+          ]
+        },
+        "many-hands": {
+          "name": "Many Hands",
+          "goal": "Reach level 10 in 4 professions.",
+          "title": [
+            "Resourceful",
+            "Resourceful"
+          ]
+        },
+        "little-of-everything": {
+          "name": "A Little of Everything",
+          "goal": "Reach level 10 in all 8 professions.",
+          "title": [
+            "Hardworking",
+            "Hardworking"
+          ]
+        },
+        "many-trades": {
+          "name": "Many Trades",
+          "goal": "Reach level 25 in all 8 professions.",
+          "title": [
+            "Enterprising",
+            "Enterprising"
           ]
         },
         "handy": {
@@ -124,6 +172,70 @@
           "title": [
             "Versatile",
             "Versatile"
+          ]
+        },
+        "herbalist": {
+          "name": "Herbalist",
+          "goal": "Reach level 25 in Herbalism.",
+          "title": [
+            "Herbalist",
+            "Herbalist"
+          ]
+        },
+        "alchemist": {
+          "name": "Alchemist",
+          "goal": "Reach level 25 in Alchemy.",
+          "title": [
+            "Alchemist",
+            "Alchemist"
+          ]
+        },
+        "artisan": {
+          "name": "Artisan",
+          "goal": "Reach level 25 in Crafting.",
+          "title": [
+            "Artisan",
+            "Artisan"
+          ]
+        },
+        "miner": {
+          "name": "Miner",
+          "goal": "Reach level 25 in Mining.",
+          "title": [
+            "Miner",
+            "Miner"
+          ]
+        },
+        "jeweller": {
+          "name": "Jeweller",
+          "goal": "Reach level 25 in Jewelcrafting.",
+          "title": [
+            "Jeweller",
+            "Jeweller"
+          ]
+        },
+        "fisher": {
+          "name": "Fisher",
+          "goal": "Reach level 25 in Fishing.",
+          "title": [
+            "Fisher",
+            "Fisher"
+          ]
+        },
+        "farmer": {
+          "name": "Farmer",
+          "goal": "Reach level 25 in Farming.",
+          "title": [
+            "Farmer",
+            "Farmer"
+          ]
+        },
+        "cook": {
+          "name": "Cook",
+          "goal": "Reach level 25 in Cooking.",
+          "title": [
+            "Cook",
+            "Cook"
           ]
         }
       }

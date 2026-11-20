@@ -1560,6 +1560,11 @@
       "id": "0.4.77",
       "title": "Wersja 0.4.77",
       "body": "- Listy gończe sołtysa są teraz z miejsc o krainę niżej niż najwyższe, które masz otwarte, a gdy najwyższe sięga ponad 100. poziom, o dwie krainy niżej. Za list zgarniesz tyle samo złota co dotąd. Dzisiejsze listy wylosowały się od nowa, a list, który masz w ręku, zostaje.\n- Statystyki › „Rozdaj ręcznie”: przy każdej statystyce wpiszesz liczbę punktów do dodania, więc po wyzerowaniu rozdasz nawet tysiące punktów w kilka chwil."
+    },
+    {
+      "id": "0.4.78",
+      "title": "Wersja 0.4.78",
+      "body": "- 14 nowych osiągnięć Profesji z tytułami: za 10., 25. i 50. poziom dowolnej profesji, za 10. poziom w 4 i we wszystkich 8 profesjach, za 25. poziom we wszystkich 8 i za 25. poziom każdej profesji z osobna. Jeśli już spełniasz warunek, zgarniesz osiągnięcie i Punkty Czasu, gdy otworzysz okno osiągnięć."
     }
   ]
 }
