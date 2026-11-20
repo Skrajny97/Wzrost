@@ -1550,6 +1550,11 @@
       "id": "0.4.75",
       "title": "Wersja 0.4.75",
       "body": "- Posiłki: do 3 porcji tej samej potrawy naraz, a ich premie się sumują (2 porcje dają premię razy 2, 3 porcje razy 3). Każda zjedzona porcja przywraca posiłkowi pełne 4 godziny wypraw. Liczbę porcji wybierasz w „Opcjach wyprawy”.\n- Potrawę zjesz też od razu ze Spiżarni w plecaku („Zjedz” na jej karcie), gdy postać nie jest na wyprawie. Tak członek drużyny zje przed jej wyprawą.\n- Każdy poziom profesji daje teraz +5 do obu jej statystyk zamiast +3, także za poziomy zdobyte wcześniej."
+    },
+    {
+      "id": "0.4.76",
+      "title": "Wersja 0.4.76",
+      "body": "- Siła albo Intelekt, których Twoja broń nie używa, teraz też coś dają. Siła: +1 HP za każdy punkt i +1% zasobów z wypraw za każde 50 punktów. Intelekt: +1 do odporności na każdy żywioł za każde 2 punkty i +1% doświadczenia profesji za każde 50 punktów. Premie do zasobów i doświadczenia sięgają najwyżej +10%. Ile to daje Twojej postaci, zobaczysz w Postać › Statystyki › „Parametry dodatkowe”."
     }
   ]
 }

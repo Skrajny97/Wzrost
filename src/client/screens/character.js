@@ -2131,7 +2131,24 @@ const CHANGES = {
   regen: ['Regeneracja', ' HP/min'],
   recovery: ['Odzysk HP po walce', '%'],
 };
-const changeName = (key) => (CHANGES[key] ? [t(CHANGES[key][0]), CHANGES[key][1]] : [state.content.elements.find((element) => `resist.${element.id}` === key)?.resistance ?? key, '%']);
+const changeName = (key) =>
+  CHANGES[key]
+    ? [t(CHANGES[key][0]), CHANGES[key][1]]
+    : key === 'resist.all'
+      ? [t('Odporność na żywioły'), '%']
+      : [state.content.elements.find((element) => `resist.${element.id}` === key)?.resistance ?? key, '%'];
+
+// Side Intelekt (1218) changes every element's resistance at once: then one
+// row for all of them, from the smallest change to the largest ("+1,2–1,4%"),
+// instead of a row for each element. Rows are [key, change, largest change].
+function mergedResist(rows) {
+  const elements = state.content.elements.map((element) => `resist.${element.id}`);
+  const each = rows.filter(([key]) => elements.includes(key));
+  const sign = Math.sign(each[0]?.[1] ?? 0);
+  if (elements.length < 2 || each.length < elements.length || each.some(([, change]) => Math.sign(change) !== sign)) return rows;
+  const sizes = each.map(([, change]) => Math.abs(change));
+  return [...rows.filter(([key]) => !elements.includes(key)), ['resist.all', sign * Math.min(...sizes), sign * Math.max(...sizes)]];
+}
 
 // What wearing (or taking off) the item changes, counted by the server: the
 // verdict on the whole, then each change, as the author asked: "+2,5", "−4",
@@ -2139,7 +2156,7 @@ const changeName = (key) => (CHANGES[key] ? [t(CHANGES[key][0]), CHANGES[key][1]
 async function showPreview(box, item, equipped) {
   try {
     const { changes, verdict } = await call('GET', `/api/items/${item.id}/preview`);
-    const rows = Object.entries(changes);
+    const rows = mergedResist(Object.entries(changes));
     fill(
       box,
       h('p', { class: 'compare-title', text: equipped ? t('Po zdjęciu') : t('Po założeniu') }),
@@ -2149,13 +2166,15 @@ async function showPreview(box, item, equipped) {
         h(
           'ul',
           { class: 'preview-list' },
-          rows.map(([key, change]) => {
+          rows.map(([key, change, largest]) => {
             const [label, unit] = changeName(key);
+            const low = formatPrecise(Math.abs(change));
+            const high = largest === undefined ? low : formatPrecise(Math.abs(largest));
             return h(
               'li',
               { class: change > 0 ? 'preview-up' : 'preview-down' },
               h('span', { text: label }),
-              h('span', { class: 'num', text: `${change > 0 ? '+' : '−'}${formatPrecise(Math.abs(change))}${unit}` }),
+              h('span', { class: 'num', text: `${change > 0 ? '+' : '−'}${low}${high === low ? '' : `–${high}`}${unit}` }),
             );
           }),
         ),
