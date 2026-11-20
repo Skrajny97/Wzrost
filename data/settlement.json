@@ -99,6 +99,27 @@
     { "id": "trusted", "name": "Zaufany", "points": 700 },
     { "id": "friend", "name": "Przyjaciel", "points": 1400 }
   ],
+  "residentRelation": {
+    "$comment": "Relacja z mieszkańcem na jego karcie (gracz pytał, gdzie widać, kiedy pakiety kart u Szczęsnego tanieją; autor 19.11.2026: „Stopień relacji jest widoczny, a konkretna punktacja nie... w sumie racja może dodam i ją albo jakiś pasek progressu”, 20.11.2026: „Chodzi o relacje z NPC w Osadzie”). Pod imieniem: stopień i punkty wobec progu następnego stopnia (points; na najwyższym stopniu pointsTop), cienki pasek (punkty przez próg następnego stopnia, na najwyższym pełny) i jedna linijka: co daje najbliższy wyższy stopień, który u tego mieszkańca cokolwiek zmienia (next: {standing} to ten stopień, {perks} to jego korzyści, połączone przecinkami i słowem and przed ostatnią), a na najwyższym stopniu top. Gdy żaden wyższy stopień nic nie zmienia, linijki nie ma. Liczby w perks gra bierze z danych usług mieszkańców przez te same funkcje, które je stosują (src/engine/resident-relation.js): packDiscount z cards.json pack.relationDiscount (Szczęsny), choices z reforge.choices i ascension z ascension.from (Zaklinaczka), forge z forge.topRarity (kowal), recipes z rzadkich przepisów Jagny (professions.json taught; bez tych, których już nauczyła za reputację Bractwa Zielarzy), herbs i materials z herbalist.sell i tannery.sell, discount z relationDiscount (Gościwit, Jagna, Wszebor), premium z herbalist.premium i tannery.premium (u Wszebora z punktami Bractwa Łowców), hire z companions.priceByStanding (Zbylut; o ile taniej niż u Obcego), present z gifts.from (podarek przyjaciela raz w tygodniu). Kolejność perks to kolejność w linijce. {count|a|b|c} odmienia rzeczownik po liczbie.",
+    "points": "{points} / {next}",
+    "pointsTop": "{points} pkt",
+    "next": "{standing}: {perks}",
+    "top": "{standing}: najwyższy stopień",
+    "and": "i",
+    "perks": {
+      "packDiscount": "pakiety kart {percent}% taniej",
+      "choices": "do wyboru {count|nowy afiks|nowe afiksy|nowych afiksów}",
+      "ascension": "Gwiazdki",
+      "forge": "przekucie do rzadkości „{rarity}”",
+      "recipes": "{count|rzadki przepis|rzadkie przepisy|rzadkich przepisów} Alchemii",
+      "herbs": "{count|zioło|zioła|ziół} na sprzedaż",
+      "materials": "{count|materiał|materiały|materiałów} na sprzedaż",
+      "discount": "towar o {percent}% tańszy",
+      "premium": "płaci o {percent}% więcej niż złomiarz",
+      "hire": "werbunek {percent}% taniej",
+      "present": "podarek raz w tygodniu"
+    }
+  },
   "brotherhoodsPanel": {
     "$comment": "Zwijany pasek „Akceptacja Bractw” na planszy Osady (autor 4.11.2026: „Niech przy wejściu do Osady wyświetla się gdzieś łatwo dostepny (zwijalny) poziom akceptacji przez Bractwa”): stopień każdego Bractwa, pasek do następnego, co stopień daje teraz i co doda następny (perks; {…} wypełnia gra z liczb Kuźni, Targowiska i zleceń).",
     "title": "Akceptacja Bractw",

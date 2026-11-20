@@ -1208,6 +1208,10 @@
     "0.4.68": {
       "title": "Version 0.4.68",
       "body": "- Gold in the Account Chest: you can now move gold between the characters of your account. “Put in” moves it from the character to the chest, and “Take out” from the chest to the character you play. No fees and no limits, from character level 20."
+    },
+    "0.4.69": {
+      "title": "Version 0.4.69",
+      "body": "- Settlement: every resident's card now shows your relationship points, a bar to the next standing and what that standing gives, e.g. “Regular: card packs 20% cheaper”."
     }
   }
 }

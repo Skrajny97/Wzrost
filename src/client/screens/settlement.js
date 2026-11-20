@@ -1626,9 +1626,43 @@ export function mountSettlement(container, { params = {} } = {}) {
     );
   }
 
+  // The relation with a resident under their bust (a player asked where to
+  // see when Szczęsny's packs get cheaper; the author, 19.11.2026: "może
+  // dodam i ją [punktację] albo jakiś pasek progressu"): the standing and
+  // the points against the next standing's ("180 / 250"), a thin bar to it,
+  // full at the top, and what the nearest standing that changes anything
+  // with them gives (resident-relation.js in the engine; the words in
+  // data/settlement.json residentRelation). A view without the relation
+  // (an older server) shows the standing alone, as before.
+  const relationBlock = (resident) => {
+    const label = t('Relacja: {standing}', { standing: resident.standing.name });
+    const words = data.residentRelation;
+    if (!words || !resident.relation) return h('p', { class: 'muted', text: label });
+    const { points, next, line } = resident.relation;
+    const fillWords = (text, vars) => text.replace(/\{(\w+)\}/g, (whole, name) => (Object.hasOwn(vars, name) ? String(vars[name]) : whole));
+    const bar = h('div', { class: 'meter-fill' });
+    bar.style.width = `${(next ? Math.max(0, Math.min(1, points / next)) : 1) * 100}%`;
+    return h(
+      'div',
+      { class: 'resident-relation' },
+      h(
+        'p',
+        { class: 'resident-relation-head' },
+        h('span', { class: 'resident-relation-standing', text: label }),
+        h('span', {
+          class: 'resident-relation-points',
+          text: next ? fillWords(words.points, { points: formatNumber(points), next: formatNumber(next) }) : fillWords(words.pointsTop, { points: formatNumber(points) }),
+        }),
+      ),
+      h('div', { class: 'meter resident-relation-meter' }, h('div', { class: 'meter-track', role: 'progressbar', 'aria-label': label, 'aria-valuemin': 0, 'aria-valuemax': next ?? points, 'aria-valuenow': points }, bar)),
+      line && h('p', { class: 'muted resident-relation-next', text: line }),
+    );
+  };
+
   // The resident of a place (question 76): the bust, who they are, their
-  // story and how they greet the character at its relation, then the gift
-  // of the day for them and a friend's present of the week (818.1 and
+  // story, the relation with them (relationBlock) and how they greet the
+  // character at its relation, then the gift of the day for them and a
+  // friend's present of the week (818.1 and
   // 818.2), and "Zagraj w karty" where the resident plays cards (904 B,
   // mock-up 910.1) until its table opens under the card; the place's room
   // dim behind, where it has one (the Salon Gier's, 550.5 D), as the
@@ -1646,10 +1680,10 @@ export function mountSettlement(container, { params = {} } = {}) {
           'div',
           {},
           h('p', { class: 'settlement-resident-name', text: `${resident.name}, ${resident.title}` }),
-          h('p', { class: 'muted', text: t('Relacja: {standing}', { standing: resident.standing.name }) }),
           h('p', { class: 'muted settlement-resident-story', text: resident.story }),
         ),
       ),
+      relationBlock(resident),
       h('p', { class: 'settlement-greeting', text: t('„{line}”', { line: resident.greeting }) }),
       residentGifts(resident, data.gifts, apply),
       plays &&

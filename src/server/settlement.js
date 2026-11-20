@@ -103,6 +103,7 @@ import {
   withSeatDiscount,
   candidateRedraw,
   questPeriod,
+  residentRelation,
   residentTable,
 } from '../engine/index.js';
 import { trialHallView } from './trial-hall.js';
@@ -319,8 +320,11 @@ function storyOf(order) {
 }
 
 // The Osada for the page: the board's places, the residents with the
-// greeting of their relation's standing, the brotherhoods' standings and
-// the orders on the board, each with what the character holds of it.
+// greeting of their relation's standing and the relation for the card's
+// bar (its points, the next standing's and what the nearest standing that
+// changes anything with them gives; resident-relation.js), the
+// brotherhoods' standings and the orders on the board, each with what the
+// character holds of it.
 export function settlementView(player, stored, board, now) {
   const stocks = settlementGoods(player.row, player.items, now);
   const sellBonus = sellBonusOf(player, now);
@@ -337,12 +341,16 @@ export function settlementView(player, stored, board, now) {
     // The Sala prób's trial of the day (trial-hall.js; 620 B).
     trialHall: trialHallView(player.row, now),
     residents: residents.map((resident) => {
-      const standing = standingOf(stored.relations[resident.id] ?? 0, content());
+      const points = stored.relations[resident.id] ?? 0;
+      const standing = standingOf(points, content());
       // `cards`: the resident plays Talia Systemu at its place (904 B), where
       // the game has the cards.
       const cards = cardsOn() && Boolean(content().cards) && Boolean(residentTable(resident.id, content()));
-      return { ...resident, service: serviceOf(resident.id), standing, greeting: resident.greetings[Math.min(standing.index, resident.greetings.length - 1)], cards, ...gifts(resident.id) };
+      const relation = residentRelation(resident.id, points, content(), { cards: cardsOn(), reputation: stored.reputation });
+      return { ...resident, service: serviceOf(resident.id), standing, relation, greeting: resident.greetings[Math.min(standing.index, resident.greetings.length - 1)], cards, ...gifts(resident.id) };
     }),
+    // The words of the relation's points on the residents' cards.
+    residentRelation: { points: content().settlement.residentRelation.points, pointsTop: content().settlement.residentRelation.pointsTop },
     // The words of "Podaruj" and "Odbierz" on the residents' places.
     gifts: giftWords(),
     // Each brotherhood's standing, its points, and what the standing gives

@@ -13623,6 +13623,51 @@ button.farm-plot {
   font-weight: 600;
 }
 
+/* The relation with a resident under the bust: the standing with the
+   points beside it, a thin bar in the gold of the Akceptacja Bractw, full
+   at the top standing, and what the next standing gives. */
+.resident-relation {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 10px;
+}
+
+.settlement-resident .resident-relation p {
+  margin: 0;
+}
+
+.resident-relation-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0 10px;
+}
+
+.resident-relation-points {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.resident-relation-meter .meter-track {
+  height: 6px;
+  border: 1px solid var(--bark-line);
+  background: var(--bg-deep);
+}
+
+.resident-relation-meter .meter-fill {
+  height: 100%;
+  background: var(--gold);
+}
+
+.resident-relation-next {
+  font-size: 13px;
+  line-height: 1.35;
+}
+
 /* The Tablica's orders and the brotherhoods, on its screen. */
 .settlement-board {
   display: grid;

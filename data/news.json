@@ -1515,6 +1515,11 @@
       "id": "0.4.68",
       "title": "Wersja 0.4.68",
       "body": "- Złoto w Skrzyni Konta: przełożysz teraz złoto między postaciami swojego konta. „Włóż” przenosi je z postaci do skrzyni, a „Wyjmij” ze skrzyni do postaci, na którą grasz. Bez opłat i limitów, od 20. poziomu postaci."
+    },
+    {
+      "id": "0.4.69",
+      "title": "Wersja 0.4.69",
+      "body": "- Osada: karta każdego mieszkańca pokazuje teraz punkty relacji, pasek do następnego stopnia i to, co ten stopień da, np. „Stały klient: pakiety kart 20% taniej”."
     }
   ]
 }

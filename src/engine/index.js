@@ -80,6 +80,7 @@ export * from './stable.js';
 export * from './casino.js';
 export * from './tannery.js';
 export * from './resident-gifts.js';
+export * from './resident-relation.js';
 export * from './names.js';
 export * from './mentions.js';
 export * from './towers.js';
