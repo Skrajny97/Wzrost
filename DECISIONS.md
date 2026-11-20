@@ -3847,6 +3847,21 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.72 (20.11.2026): skrót do pomocy w gildii na ekranie Walki
+
+Bez makiet, na prośbę autora („Wdrażaj od razu, szkoda Twoich zasobów na makiety”), według sekcji niżej.
+
+## Skrót do pomocy w gildii (20.11.2026)
+
+Autor: „Trzeba zrobić jakoś łatwo dostepny skrót do pomagania innym z gildii w ramach tej nowej funkcji” (20.11.2026), o Pomocy przy budowach i pracy (1196 A i B).
+
+1. **Co widać.** Na ekranie Walka, na samej górze pod górnym paskiem i nad linijką tygodnia, cienki pasek w stylu linijki tygodnia, w złotej ramce: ikona pomocy, „Gildia czeka na pomoc: N” i przycisk „Pomóż wszystkim”. N to liczba budów i prac, przy których postać może teraz pomóc (ta sama co w „Pomóż wszystkim (N)” na karcie pomocy). Stuknięcie w ikonę albo w napis otwiera zakładkę Gildia, gdzie karta pomocy otwiera się sama.
+2. **Kiedy.** Tylko wtedy, gdy świeci żółta kropka Gildii od pomocy: Społeczność odblokowana, postać w gildii i co najmniej jedna budowa albo praca do pomocy. Brakujący szczegół: pasek stoi tylko na głównym widoku Walki (krainy albo trwająca eksploracja), jak linijka tygodnia, a nie na ekranach krainy i miejsca.
+3. **Dane.** Liczba przychodzi z listą rzeczy do zrobienia w gildii, o którą strona i tak pyta mniej więcej co minutę (`GET /api/guild/todo`, nowe pole `help`). Nowego zapytania nie ma.
+4. **Stuknięcie.** „Pomóż wszystkim” robi to samo co przycisk na karcie (`POST /api/guild/help/all`). Brakujący szczegół: pasek pokazuje przez 6 sekund tę samą odpowiedź gry co karta, bez form zależnych od płci („Pomoc wysłana 4 razy. Zgarniasz 4 punkty Sławy.”), i znika. Gdy ktoś nowy czeka na pomoc, wraca z nową liczbą. Błąd pokazuje się w dymku jak zwykle.
+5. **Słowa:** `data/guilds.json`, `help.texts.strip` i `stripAll`, po angielsku w `data/en/guilds.json` („Your guild needs help: N”, „Help everyone”).
+6. **Pliki:** `src/client/guild-help.js` (`guildHelpStrip`), `src/client/chat-news.js` (`guildHelpWaiting`), `src/client/screens/combat.js`, `src/client/styles.css`, `src/server/guild-help.js` i `src/server/guild-todo.js`, `src/server/content.js`; testy w `test/guild-help-strip.test.js` i `test/guild-help.test.js`. `tools/layout-check.cjs` daje piętnastu członkom gildii budowy, więc sprawdza pasek na wszystkich rozmiarach ekranu.
+
 ## Wersja 0.4.71 (20.11.2026): kolejność postaci w karcie postaci
 
 Według sekcji niżej. Bez makiet: przeciąganie jak zakładki czatu (1039), na istniejących kółkach.

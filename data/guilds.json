@@ -639,7 +639,7 @@
     }
   },
   "help": {
-    "$comment": "Pomoc przy budowach i przy pracy (1196 A i B, przyjęte przez autora na stronie ocen 19.11.2026; src/engine/guild-help.js, src/server/guild-help.js, src/client/guild-help.js; DECISIONS.md, „Pomoc przy budowach i pracy (1196 A i B, 19.11.2026)”). Na zakładce Gildia widać budowę, która trwa w Obozie albo w Warowni każdego członka (także poziom samego Obozu i przemianę w Warownię; nie te czekające w kolejce), i jego pracę w profesji (zbieranie, warzenie, Warsztat, kopanie, Szlifiernia, łowienie, pole, gotowanie; nie wyprawę i nie pracę Awatara). Pomagają członkowie tej samej gildii, poza postaciami tego samego konta i samym budującym. Każda pomoc skraca budowę albo pracę o share jej całego czasu, najmniej o minMinutes minut, ale nie dalej niż do chwili pomocy (wtedy kończy się od razu). Jedna budowa albo praca przyjmie najwyżej maxHelps pomocy, od każdego członka jedną. Budowę zna się po budynku i poziomie, a liczą się pomoce od jej początku; pracę po jej ziarnie. „Pomóż wszystkim” pomaga przy każdej budowie i pracy, przy której postać jeszcze może, każda osobno. Żółta kropka przy zakładce Gildia świeci, gdy jest komu pomóc. Sława za pomoc: fame.help. texts: słowa karty pomocy i odpowiedzi gry ({share}, {min}, {max}, {perHelp} i {cap} w how, {…} wypełnia gra; helpForms: rzeczownik po liczbie pomocy).",
+    "$comment": "Pomoc przy budowach i przy pracy (1196 A i B, przyjęte przez autora na stronie ocen 19.11.2026; src/engine/guild-help.js, src/server/guild-help.js, src/client/guild-help.js; DECISIONS.md, „Pomoc przy budowach i pracy (1196 A i B, 19.11.2026)”). Na zakładce Gildia widać budowę, która trwa w Obozie albo w Warowni każdego członka (także poziom samego Obozu i przemianę w Warownię; nie te czekające w kolejce), i jego pracę w profesji (zbieranie, warzenie, Warsztat, kopanie, Szlifiernia, łowienie, pole, gotowanie; nie wyprawę i nie pracę Awatara). Pomagają członkowie tej samej gildii, poza postaciami tego samego konta i samym budującym. Każda pomoc skraca budowę albo pracę o share jej całego czasu, najmniej o minMinutes minut, ale nie dalej niż do chwili pomocy (wtedy kończy się od razu). Jedna budowa albo praca przyjmie najwyżej maxHelps pomocy, od każdego członka jedną. Budowę zna się po budynku i poziomie, a liczą się pomoce od jej początku; pracę po jej ziarnie. „Pomóż wszystkim” pomaga przy każdej budowie i pracy, przy której postać jeszcze może, każda osobno. Żółta kropka przy zakładce Gildia świeci, gdy jest komu pomóc. Sława za pomoc: fame.help. texts: słowa karty pomocy i odpowiedzi gry ({share}, {min}, {max}, {perHelp} i {cap} w how, {…} wypełnia gra; helpForms: rzeczownik po liczbie pomocy; strip i stripAll: skrót do pomocy na ekranie Walka, od 20.11.2026, DECISIONS.md, „Skrót do pomocy w gildii (20.11.2026)”).",
     "share": 0.01,
     "minMinutes": 1,
     "maxHelps": 10,
@@ -661,6 +661,8 @@
       "cut": "−{time}",
       "help": "Pomóż",
       "helpAll": "Pomóż wszystkim ({count})",
+      "strip": "Gildia czeka na pomoc: {count}",
+      "stripAll": "Pomóż wszystkim",
       "waiting": "Czeka na Twoją pomoc: {count}.",
       "helped": "Pomoc wysłana",
       "full": "Komplet pomocy",

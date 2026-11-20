@@ -1530,6 +1530,11 @@
       "id": "0.4.71",
       "title": "Wersja 0.4.71",
       "body": "- Postać: kółka zmiany postaci przestawisz jak zakładki czatu. Przytrzymaj kółko i przesuń je w nowe miejsce. Kolejność zapamiętuje urządzenie, a „Wybierz postać” pokazuje postacie w tej samej kolejności."
+    },
+    {
+      "id": "0.4.72",
+      "title": "Wersja 0.4.72",
+      "body": "- Na ekranie Walki pojawia się pasek „Gildia czeka na pomoc”: jednym stuknięciem w „Pomóż wszystkim” pomożesz członkom gildii przy ich budowach i pracy."
     }
   ]
 }

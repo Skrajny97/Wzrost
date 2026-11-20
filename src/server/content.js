@@ -371,6 +371,9 @@ export function publicContent() {
     // The words of "Poproś gildię", shown where pieces are missing, before
     // the Prośby Gildii answer (src/client/guild-requests.js).
     guildAsk: game.guilds.requests.texts.ask,
+    // The words of the shortcut to help in the guild on the Walka screen
+    // (src/client/guild-help.js, guildHelpStrip; 20.11.2026).
+    guildHelp: { waiting: game.guilds.help.texts.strip, all: game.guilds.help.texts.stripAll },
     // The Ranking's tabs and the periods of its "Gildie", and the words of
     // the best guild of last week by its gold tag (guild-fame.js, 380 C).
     guildFame: { tabs: game.guilds.fame.texts.tabs, periods: game.guilds.fame.texts.periods, champion: game.guilds.fame.texts.champion },

@@ -3,7 +3,9 @@
 // from 320 to 430 px wide, a tablet and computers, with a character of big
 // numbers (level 146, almost a million gold, six-digit camp resources), a
 // long name, a build under way in the camp, orders on the Stół rozbiórki's queue and a guild of its own
-// with a long name, and a companion hired in the Kwatery, with its five
+// with a long name (its fifteen other members each building, for the
+// shortcut to help on the Walka screen), and a companion hired in the
+// Kwatery, with its five
 // places for items and amulets of big numbers in the bag for "Załóż z
 // plecaka" (one worn by the companion), a sword at +10 with three of the
 // Zaklinaczka's stars, the Osada's residents at several standings of the
@@ -422,6 +424,11 @@ async function main() {
       `INSERT INTO guild_members (character_id, guild_id, role, joined_at)
         SELECT c.id, m.guild_id, 'member', 2 FROM characters c, guild_members m
         WHERE c.user_id = (SELECT id FROM users WHERE login = '${reserveLogin}') AND m.character_id = (SELECT id FROM characters WHERE name = '${name}')`,
+      // Each with a build under way, so the shortcut to help in the guild
+      // shows on the Walka screen ("Gildia czeka na pomoc: 15", 20.11.2026)
+      // and the Gildia tab's help card lists them all.
+      `INSERT INTO buildings (character_id, building_id, level, started_at, ends_at)
+        SELECT id, 'quarry', 3, ${Date.now() - 600000}, ${Date.now() + 18000000} FROM characters WHERE user_id = (SELECT id FROM users WHERE login = '${reserveLogin}')`,
     ].join('; '),
   );
   // The Arena's Karty (where CARDS is on): the first reserve's deck, the

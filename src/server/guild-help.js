@@ -188,11 +188,13 @@ async function helpView(db, player, guild, now) {
   };
 }
 
-// Whether the character may help now (the yellow dot of the Gildia tab,
-// guild-todo.js): a build or a work of another member it may still help.
+// How many builds and works of other members the character may still help
+// now (guild-todo.js): the yellow dot of the Gildia tab while there is one,
+// and the count on the shortcut of the Walka screen (src/client/guild-help.js,
+// guildHelpStrip; the author, 20.11.2026).
 export async function helpTodo(db, player, guild, now) {
   const { targets } = await guildWork(db, player, guild, now);
-  return targets.some((target) => helpBlock(player, target) === null);
+  return targets.filter((target) => helpBlock(player, target) === null).length;
 }
 
 // One help of the character with `target`, as read: the cut off it and the

@@ -795,6 +795,8 @@
             "cut",
             "help",
             "helpAll",
+            "strip",
+            "stripAll",
             "waiting",
             "helped",
             "full",
@@ -826,6 +828,11 @@
               "pattern": "\\{building\\}"
             },
             "helpAll": {
+              "type": "string",
+              "pattern": "\\{count\\}"
+            },
+            "strip": {
+              "description": "Skrót do pomocy na ekranie Walka (src/client/guild-help.js, guildHelpStrip; 20.11.2026): ile budów i prac czeka na pomoc postaci. Obok przycisk stripAll.",
               "type": "string",
               "pattern": "\\{count\\}"
             },

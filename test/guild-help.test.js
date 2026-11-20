@@ -74,6 +74,9 @@ describe('the help through the API', () => {
   const view = async (login) => (await as(login, 'GET', '/api/guild/help')).data;
   const help = (login, ownerId, target) => as(login, 'POST', '/api/guild/help', { ownerId, target });
   const todo = async (login) => (await as(login, 'GET', '/api/guild/todo')).data.todo;
+  // How many builds and works the guild's todo says the character may help
+  // now, for the shortcut on the Walka screen (20.11.2026).
+  const waiting = async (login) => (await as(login, 'GET', '/api/guild/todo')).data.help;
   const weekKey = (at) => questPeriod('weekly', at, content).key;
 
   async function player(login, name) {
@@ -244,12 +247,16 @@ describe('the help through the API', () => {
     await run("UPDATE characters SET level = 30 WHERE name = 'Ziomek'");
     assert.equal((await as('ziomek', 'POST', '/api/professions/gather', { herbs: ['comfrey'], minutes: 60 })).status, 201);
     assert.equal((await view('mistrz')).open, 2);
+    // The guild's todo counts them for the shortcut on the Walka screen; the
+    // builder sees the work alone, its own build not counted.
+    assert.deepEqual([(await todo('mistrz')).guild, await waiting('mistrz'), await waiting('druh')], [true, 2, 1]);
     const all = await as('mistrz', 'POST', '/api/guild/help/all');
     assert.equal(all.status, 200, JSON.stringify(all.data));
     assert.equal(all.data.helped, 2);
     assert.equal(all.data.text, 'Pomoc wysłana 2 razy. Zgarniasz 2 punkty Sławy.');
     assert.equal(all.data.open, 0);
     assert.equal((await first('SELECT COUNT(*) AS n FROM guild_helps WHERE helper_id = ?', await idOf('Mistrz'))).n, 2);
+    assert.deepEqual([(await todo('mistrz')).guild, await waiting('mistrz')], [false, 0]);
     const twice = await as('mistrz', 'POST', '/api/guild/help/all');
     assert.deepEqual([twice.status, twice.data.helped, twice.data.text], [200, 0, rules.texts.allHelped]);
     assert.equal((await first('SELECT COUNT(*) AS n FROM guild_helps')).n, 2);
