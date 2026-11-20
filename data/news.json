@@ -1575,6 +1575,11 @@
       "id": "0.4.80",
       "title": "Wersja 0.4.80",
       "body": "- Listy gończe sołtysa są teraz o kilka miejsc niżej niż najwyższe, które masz otwarte, a nie o całe krainy: o jedno miejsce (ok. 5 poziomów), a gdy najwyższe sięga ponad 50. poziom, o dwa (ok. 10), ponad 100., o trzy (ok. 15). Za list zgarniesz tyle samo złota co dotąd. Dzisiejsze listy wylosowały się od nowa, a list, który masz w ręku, zostaje."
+    },
+    {
+      "id": "0.4.81",
+      "title": "Wersja 0.4.81",
+      "body": "- Czat: dzwonek, który wycisza powiadomienia czatu, stoi teraz przy polu do pisania, więc nie ucieka już w górę razem z tytułem. Przycisk „Na górę” nie pokazuje się w czacie."
     }
   ]
 }
