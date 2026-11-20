@@ -37,6 +37,8 @@ const EFFECTS = [
   { key: 'speed', label: 'szybkość', format: (v) => `+${formatPrecise(v)}` },
   { key: 'recovery', label: 'odzysk HP po walce', format: percentPoints },
   { key: 'mana', label: 'maks. mana', format: (v) => `+${formatNumber(v)}` },
+  // Mądrość's share more of what the healing and mana potions restore.
+  { key: 'potions', label: 'mikstury leczenia i many', format: percentPoints },
   // Siła and Intelekt the weapon does not use, outside the fights (1218).
   { key: 'resources', label: 'zasoby z wypraw', format: percentPoints },
   { key: 'professionXp', label: 'doświadczenie profesji', format: percentPoints },
@@ -55,7 +57,7 @@ const percent = (value) => `${formatDecimal(value * 100)}%`;
 // on where it comes from or what it does.
 function openExtra(character) {
   const extra = character.combat.extra;
-  const { armor, dodge, crit, effectResist } = extra;
+  const { armor, dodge, crit, effectResist, potions } = extra;
   const row = (label, value, ...notes) =>
     h(
       'div',
@@ -122,6 +124,18 @@ function openExtra(character) {
       t('Zdrowie'),
       row(t('Regeneracja'), `${formatPrecise(extra.regen)} HP/min`, t('między wyprawami, z premią Ogniska')),
       row(t('Odzysk HP po walce'), percent(Math.min(1, extra.recovery)), t('tyle brakującego HP wraca po każdej walce na wyprawie'), extra.recoveryCore > 0 && t('Rdzeń +{share} pkt proc.', { share: formatDecimal(extra.recoveryCore * 100) })),
+      // Mądrość strengthens the healing and mana potions (preview.js).
+      potions?.rule &&
+        row(
+          t('Mikstury leczenia i many'),
+          `+${formatDecimal(potions.bonus * 100)}%`,
+          t('Mądrość {wisdom}: +{step}% za każde {per} pkt, najwyżej +{cap}%', {
+            wisdom: formatNumber(potions.wisdom),
+            step: formatDecimal(potions.rule.step * 100),
+            per: formatNumber(potions.rule.per),
+            cap: formatDecimal(potions.rule.cap * 100),
+          }),
+        ),
     ),
     group(
       t('Odporności na żywioły'),

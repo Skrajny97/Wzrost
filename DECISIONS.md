@@ -3901,6 +3901,58 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Mana ×2, Mądrość i Zręczność (20.11.2026)
+
+Gracz (poz. 94), postać podobna do maga, której klasa rozdaje punkty w Intelekt, Witalność i Mądrość, omija Mądrość: „bo to większość mana a jak widzę na wyprawach nie wypijam mikstur many, więc wystarczająco posiadam many”. Autor: „zwiększ jeszcze bardziej użycie many by mikstury miały sens, myślę, że dwukrotne zwiększenie użycia to minimum, gracze mają tysiące jednostek many” i „Daj też boost jakiś dla statystyki Mądrość i chyba Zręczność bo one zdają się niczego nie dawać sporej ilości graczom”.
+
+1. **Mana ×2.** Umiejętność kosztuje cały swój koszt z danych i 6% maksymalnej many postaci zamiast połowy kosztu i 3% (1045 B), czyli dwa razy więcej (`balance.skills.manaCost`: `base` 1, `share` 0,06; `skillMana` w `src/engine/skills.js`). Potężny cios (10 many) przy 1200 many kosztuje 82 zamiast 41. Mała pula płaciła dotąd sam koszt z danych, więc teraz płaci go z 6% puli: przy 58 many 13 zamiast 10. Karta umiejętności: „Koszt: 82 many (10 + 6% maks. many), najwyżej co 3. ruch.” Tak samo płacą towarzysze i najemnicy.
+   - Przywołania Arkanisty i Druida (wycenione w udziale maks. many, `manaShare` 25%) kosztują dwa razy ten udział, 50% maks. many (`manaCost.manaShareFactor` 2), żeby i one zużywały dwa razy więcej. Karta: „Koszt: 50% maks. many, najwyżej co 8. ruch.” Tarcza many bez zmian: bierze udział many i oddaje go w punktach osłony, więc to jej siła, a nie koszt (brakujący szczegół).
+   - **Odstępstwo: pojedynki graczy (Arena, wojny gildii) płacą jak dotąd**, połowę kosztu i 3% (`balance.skills.duelManaCost`; `duelist` w `src/engine/pvp-arena.js`), jak osobna waga statystyki ewolucji w pojedynkach (987 B). Pojedynek nie ma mikstur i trwa kilka razy dłużej niż walka na wyprawie (HP razy `duelHpFactor`), więc podwójny koszt tylko odbierał szybkim klasom umiejętności w drugiej połowie walki. Bogobójca na 200. poziomie kończył manę po ok. 15 umiejętnościach, a Kleryk wygrywał 76% pojedynków na 100. poziomie, 79% na 200. i 71% średnio na 210.–290. (z Cieniem 100%, z Łucznikiem 98%; 772: 30–70%).
+2. **Mana między walkami i mikstury many (1050) bez zmian.** Każda walka zaczyna się z pełną maną, a miksturę many postać pije raz na walkę, gdy zabraknie jej many na umiejętność (`potionUse` w `data/professions.json`). Po podwojeniu walka na wyprawie bierze średnio 4–45% puli (przy tysiącach many 4–25%), a przed następną mana wraca do pełna, więc mikstury many piją dalej tylko małe pule: Wojownik i Łucznik na 30. poziomie 1,6 i 3,6 na czterogodzinną wyprawę zamiast 0,5 i 0,8, a od 60. poziomu wszyscy najwyżej 0,13 (tabela niżej). Żeby mikstury many miały sens przy tysiącach many, mana musiałaby nie wracać do pełna między walkami wyprawy: to pytanie do autora, bez zmiany.
+3. **Mądrość wzmacnia mikstury leczenia i many.** +1% tego, co przywracają (udziału maks. HP albo maks. many), za każde pełne 20 punktów Mądrości, najwyżej +50% przy 1000 (`balance.potionWisdom`: `per` 20, `step` 0,01, `cap` 0,5; `potionBonus` w `src/engine/formulas.js`). Zwykła mikstura leczenia (35% HP) przy 300 Mądrości leczy 40,25% HP.
+   - Działa w każdej walce, w której postać pije mikstury (wyprawy, także Drużyny, walki zdarzeń, Sala prób: `drink` w `src/engine/combat.js`, z `potionBonus` z `playerCombatant`), przy piciu mikstury leczenia z plecaka (`src/server/brewing.js`) i w ocenie zagrożenia (`faintChances` w `src/engine/threat.js`). Liczy się Mądrość razem z miksturą skupienia i tygodniem, jak mana. Napar z kwiatu paproci i Woda żywa (wstanie po omdleniu) bez zmian, bo to nie mikstury leczenia ani many (brakujący szczegół).
+   - Postać › Statystyki: Mądrość „daje teraz” też „mikstury leczenia i many +12%” (`statShares`, klucz `potions`). „Parametry dodatkowe” mają w grupie Zdrowie wiersz „Mikstury leczenia i many” z premią i zasadą: „Mądrość 245: +1% za każde 20 pkt, najwyżej +50%” (`extraValues.potions`). Opis Mądrości w `data/stats.json`: „Mana, skuteczność leczenia. Mikstury leczenia i many działają mocniej.”
+4. **Zręczność: większy unik.** Punkt Zręczności daje 3 oceny uniku zamiast 2 (`balance.combat.dodgePerDexterity`), granica uniku bez zmian (30%). Stwory zostają przy 2 (nowe `balance.monsters.dodgePerDexterity` w `monsterCombatant`), więc nie są trudniejsze. Szansa rośnie z malejącym zwrotem, więc unik Łucznika i Cienia rośnie o 2,5–3 punkty procentowe, a klas z małą Zręcznością o ułamek punktu. Towarzysze, najemnicy i postacie na Arenie mają nowy unik tak samo.
+5. **Pomiar przed → po.** Realistyczny gracz z `tools/difficulty-sim.mjs` (główna ścieżka, towarzysze, mikstury leczenia z jego zestawu i 10 mikstur many), czterogodzinne wyprawy w najnowszym miejscu poziomu, 160 wypraw na wiersz. „Walk do pustej puli”: maks. mana przez manę jednej walki, gdyby mana nie wracała. Typowa postać z `tools/simulate.mjs` (bez ewolucji, sprzęt rzadki i pospolity) mdleje w najnowszym miejscu w 100% takich wypraw przed zmianą i po niej, więc omdlenia są realistycznego gracza. Jej koszty rosną tak samo: przy małej puli 1,3–1,6 raza na 30.–100. poziomie (Potężny cios 10 → 14–19), przy dużej 2 razy (Kula ognia Maga na 100. poziomie 55 → 110).
+
+| Klasa (forma) | Poz. | Mana | Many na walkę | Walk do pustej puli | Mikstury many / 4 h | Unik | Omdlenia (4 h) |
+|---|---|---|---|---|---|---|---|
+| Wojownik | 30 | 63 | 34 → 48 | 1,8 → 1,3 | 0,46 → 1,57 | 2,6% → 3,7% | 13,8% → 19,4% |
+| Łucznik | 30 | 68 | 44 → 55 | 1,5 → 1,2 | 0,81 → 3,63 | 18,9% → 21,5% | 9,4% → 13,1% |
+| Mag | 30 | 489 | 71 → 138 | 6,9 → 3,5 | 0 → 0 | 2,6% → 3,7% | 17,5% → 16,9% |
+| Kleryk | 30 | 816 | 76 → 159 | 10,7 → 5,1 | 0 → 0 | 0,3% → 0,4% | 32,5% → 36,3% |
+| Cień | 30 | 188 | 31 → 46 | 6,0 → 4,1 | 0,01 → 0,23 | 18,8% → 21,5% | 7,5% → 7,5% |
+| Wojownik (Barbarzyńca) | 60 | 100 | 64 → 124 | 1,6 → 0,8 | 0 → 0,01 | 2,6% → 3,8% | 17,5% → 18,8% |
+| Łucznik (Snajper) | 60 | 105 | 50 → 93 | 2,1 → 1,1 | 0 → 0,05 | 19,6% → 22,1% | 30,6% → 26,3% |
+| Mag (Elementalista) | 60 | 980 | 113 → 225 | 8,7 → 4,4 | 0 → 0 | 4,8% → 6,7% | 13,1% → 12,5% |
+| Kleryk (Uzdrowiciel) | 60 | 2325 | 48 → 95 | 48,7 → 24,5 | 0 → 0 | 0,1% → 0,2% | 18,1% → 19,4% |
+| Cień (Skrytobójca) | 60 | 390 | 78 → 153 | 5,0 → 2,5 | 0,01 → 0,13 | 19,7% → 22,2% | 21,9% → 18,8% |
+| Wojownik (Berserker) | 100 | 149 | 121 → 234 | 1,2 → 0,6 | 0,01 → 0,04 | 2,8% → 4,0% | 8,1% → 7,5% |
+| Łucznik (Strzelec Wyborowy) | 100 | 1124 | 201 → 402 | 5,6 → 2,8 | 0 → 0 | 19,9% → 22,4% | 34,4% → 29,4% |
+| Mag (Arcymag Żywiołów) | 100 | 3112 | 238 → 476 | 13,1 → 6,5 | 0 → 0 | 5,3% → 7,3% | 35,6% → 31,3% |
+| Kleryk (Cudotwórca) | 100 | 4598 | 207 → 403 | 22,2 → 11,4 | 0 → 0 | 5,2% → 7,2% | 0% → 0% |
+| Cień (Królobójca) | 100 | 1659 | 210 → 421 | 7,9 → 3,9 | 0 → 0,01 | 20,1% → 22,6% | 18,1% → 16,9% |
+| Wojownik (Berserker) | 150 | 1099 | 218 → 440 | 5,1 → 2,5 | 0 → 0,02 | 5,2% → 7,2% | 6,9% → 3,8% |
+| Łucznik (Strzelec Wyborowy) | 150 | 1104 | 243 → 494 | 4,5 → 2,2 | 0 → 0,03 | 20,5% → 22,9% | 21,9% → 19,4% |
+| Mag (Arcymag Żywiołów) | 150 | 4762 | 348 → 698 | 13,7 → 6,8 | 0 → 0 | 0,1% → 0,1% | 37,5% → 33,1% |
+| Kleryk (Cudotwórca) | 150 | 5203 | 302 → 617 | 17,2 → 8,4 | 0 → 0 | 0,1% → 0,1% | 1,9% → 3,1% |
+| Cień (Królobójca) | 150 | 4324 | 306 → 617 | 14,1 → 7,0 | 0 → 0 | 21,0% → 23,3% | 18,8% → 16,9% |
+
+   - Omdlenia zmieniają się w granicach szumu (160 wypraw: ok. 4 punkty procentowe), poza małymi pulami na 30. poziomie: Wojownik +5,6 i Łucznik +3,7 punktu, bo częściej brakuje im many na umiejętność, choć piją mikstury many.
+   - Arena (`tools/pvp-arena-sim.mjs` jak w `test/pvp-arena.test.js`, procent wygranych pojedynków z innymi klasami, przed → po, z kosztem pojedynków jak dotąd; zmienia je tylko unik):
+
+| Poziom | Wojownik | Łucznik | Mag | Kleryk | Cień |
+|---|---|---|---|---|---|
+| 25 | 56 → 52 | 78 → 79 | 39 → 40 | 19 → 19 | 58 → 60 |
+| 50 | 43 → 39 | 63 → 63 | 53 → 53 | 34 → 36 | 58 → 59 |
+| 75 | 39 → 37 | 51 → 54 | 61 → 61 | 44 → 46 | 55 → 51 |
+| 100 | 57 → 55 | 45 → 44 | 40 → 42 | 60 → 60 | 48 → 49 |
+| 200 | 42 → 41 | 53 → 53 | 45 → 46 | 56 → 56 | 55 → 54 |
+| 210–290 | 58 → 56 | 54 → 55 | 43 → 45 | 49 → 52 | 46 → 43 |
+
+6. **Testy.** Nowe w `test/mana-wisdom-dexterity.test.js` (liczby w danych, premia Mądrości, mikstury w walce, ocena zagrożenia, Statystyki, koszty na wyprawie i w pojedynku, unik postaci i stworów). Zmienione liczby: `test/skills.test.js` (Potężny cios 82 i 13 many zamiast 41 i 10, pojedynki 41 i 10) i `test/evolutions.test.js` (żywiołak za 50% maks. many zamiast 25%). `test/third-evolution.test.js`: Kolos i Wybraniec Peruna mdleją w próbie 120 wypraw raz częściej niż ich drugie formy (10 wobec 9, 1 wobec 0), a w 600 wyprawach 6,3% wobec 8,7% i 0,2% wobec 0,0%, czyli to szum. Forma o jedną wyprawę gorsza jest więc mierzona jeszcze raz na 600 wyprawach i tam może być gorsza najwyżej o jedną; wyjątek Arcydruida (935 A) bez zmian.
+7. **Pliki:** `data/balance.json`, `data/schemas/balance.schema.json` (opisy nowych liczb), `data/stats.json`, `data/en/stats.json`, `data/en/strings.json`, `data/en/sources.json`, `src/engine/formulas.js`, `src/engine/combatant.js`, `src/engine/combat.js`, `src/engine/skills.js`, `src/engine/pvp-arena.js`, `src/engine/threat.js`, `src/engine/preview.js`, `src/server/brewing.js`, `src/client/screens/stats.js`.
+
 ## Wersja 0.4.82 (20.11.2026): raport Awatara z oprawiania także w trakcie wyprawy
 
 Według sekcji niżej (zgłoszenie gracza przez autora).

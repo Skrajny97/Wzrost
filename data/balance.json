@@ -4,7 +4,7 @@
     "kPerLevel": 20,
     "scalingMax": 2.5,
     "armorPerEndurance": 3,
-    "dodgePerDexterity": 2,
+    "dodgePerDexterity": 3,
     "dodgeCap": 0.3,
     "critPerPerception": 2,
     "critCap": 0.5,
@@ -35,9 +35,11 @@
     "lastPointClassLevel": 49,
     "skillStatWeight": 2,
     "duelSkillStatWeight": 1,
-    "manaCost": { "base": 0.5, "share": 0.03 }
+    "manaCost": { "base": 1, "share": 0.06, "manaShareFactor": 2 },
+    "duelManaCost": { "base": 0.5, "share": 0.03 }
   },
   "monsters": {
+    "dodgePerDexterity": 2,
     "hpBase": 2,
     "hpPerLevel": 5,
     "budgetBase": 0,
@@ -232,5 +234,6 @@
     "hard": { "damage": 1.5, "hp": 1.5, "xp": 0.5, "gold": 0.5 },
     "hell": { "damage": 3, "hp": 3, "xp": 0.5, "gold": 1.25, "drop": 0.5 }
   },
-  "sideStats": { "strengthHp": 1, "intellectResistPer": 2, "per": 50, "step": 0.01, "cap": 0.1 }
+  "sideStats": { "strengthHp": 1, "intellectResistPer": 2, "per": 50, "step": 0.01, "cap": 0.1 },
+  "potionWisdom": { "per": 20, "step": 0.01, "cap": 0.5 }
 }

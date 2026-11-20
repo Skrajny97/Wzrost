@@ -306,9 +306,10 @@ export async function drinkPotion(context) {
   if (potion.effect.heal) {
     // On an exploration the HP is the report's: healing waits for the return.
     if (player.activity?.kind === 'hunt') requireIdle(player, now);
-    const { hp, maxHp } = currentHp(player, now);
+    const { hp, maxHp, combatant } = currentHp(player, now);
     if (hp >= maxHp) throw new ApiError(409, 'full_hp', 'Postać ma pełne HP.');
-    const healed = Math.min(maxHp - hp, Math.round(potion.effect.heal * maxHp));
+    // With Mądrość's share more, as in the fights (balance.potionWisdom).
+    const healed = Math.min(maxHp - hp, Math.round(potion.effect.heal * (1 + (combatant.potionBonus ?? 0)) * maxHp));
     // Resting goes on from the HP the potion gave.
     also = { sql: 'hp = ?, hp_at = ?', binds: [hp + healed, now] };
     text = say(texts, 'drunkHeal', 0, { potion: potion.counted[0], amount: healed });

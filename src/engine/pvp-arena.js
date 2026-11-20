@@ -127,8 +127,15 @@ export function duelist({ character, equipped, name }, id, side, { factor, armor
   // combatant.js is not checked yet: its options are typed by their
   // defaults alone (hp, area).
   // The evolution's stat counts once here, not twice (987 B: the Arena's
-  // third forms stay in 25–75% of their duels; combatant.js).
-  const unit = playerCombatant(/** @type {any} */ ({ character, equipped, name, id, side, skillStatWeight: content.balance.skills.duelSkillStatWeight ?? 0 }), content);
+  // third forms stay in 25–75% of their duels; combatant.js). The skills
+  // cost as before 20.11.2026 (balance.skills.duelManaCost): a duel has no
+  // potions and lasts several times longer (`factor`), so the doubled cost
+  // only left the quick classes without mana halfway through it (the
+  // Kleryk won 76–80% of its duels from level 100 on, 772: 30–70%).
+  const unit = playerCombatant(
+    /** @type {any} */ ({ character, equipped, name, id, side, skillStatWeight: content.balance.skills.duelSkillStatWeight ?? 0, manaCost: content.balance.skills.duelManaCost ?? null }),
+    content,
+  );
   // The form's own strength in the players' duels (992 A: the second forms
   // the Arena's numbers left outside 25–75% of their duels): its blows'
   // share (evolutions.json `duelPower`) and its HP's (`duelHp`), of that

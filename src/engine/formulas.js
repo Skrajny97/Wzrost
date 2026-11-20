@@ -82,6 +82,20 @@ export function maxMana(wisdom, classLevel, perClassLevel, balance) {
   return Math.round(manaBase + manaPerWisdom * wisdom + perClassLevel.mana * classLevel);
 }
 
+// Mądrość strengthens the healing and mana potions (the author, 20.11.2026:
+// „Daj też boost jakiś dla statystyki Mądrość”): `step` more of what they
+// restore, a share of the maximum HP or mana, for every whole `per` points,
+// at most `cap` (balance.potionWisdom); nothing without the rule.
+/**
+ * @param {number} wisdom
+ * @param {Balance} balance
+ */
+export function potionBonus(wisdom, balance) {
+  const rule = balance.potionWisdom;
+  if (!rule) return 0;
+  return Math.min(rule.cap, Math.round(Math.floor(Math.max(0, wisdom) / rule.per) * rule.step * 10000) / 10000);
+}
+
 // Stat budget of an item (or of a monster's natural weapon and hide) at a level.
 /**
  * @param {number} level
