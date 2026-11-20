@@ -2671,6 +2671,7 @@
   "Rozdaj ręcznie": "Spend by hand",
   "O punkt mniej: {name}": "One point less: {name}",
   "O punkt więcej: {name}": "One point more: {name}",
+  "Ile punktów dodać: {name}": "How many points to add: {name}",
   "Wolne punkty: {count}": "Free points: {count}",
   "Rozdaj {count} {points}": "Spend {count} {points}",
   "Ile Punktów Umiejętności dodać": "How many Skill Points to add",
