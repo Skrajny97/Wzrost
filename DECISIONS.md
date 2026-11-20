@@ -3847,6 +3847,28 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Drobniejsze osiągnięcia Profesji (20.11.2026)
+
+Autor: „Dodaj też więcej drobniejszych skrzyń achievementowych (ze 3 rodzaje) z Profesji. Ufam Ci, napisz tylko jakie robisz i lecisz.” Grupa Profesje w oknie osiągnięć ma teraz 17 osiągnięć zamiast 3, a wszystkich jest 41 zamiast 27. Nowe są trzech rodzajów:
+
+1. **Najlepsza profesja** (`professionTop`), przed „Mistrzem rzemiosła”:
+   - „Terminator”: 10. poziom dowolnej profesji, tytuł Terminator / Terminatorka, 10 Punktów Czasu;
+   - „Czeladnik”: 25. poziom, Czeladnik / Czeladniczka, 20 Punktów Czasu;
+   - „Fachowiec”: 50. poziom, Fachowiec / Fachowczyni, 30 Punktów Czasu.
+2. **Wiele profesji** (nowe liczniki `professionsAt10` i `professionsAt25`), przed „Złotą rączką” i „Wszechstronnością”:
+   - „Na wiele rąk”: 10. poziom w 4 profesjach, Zaradny / Zaradna, 15 Punktów Czasu;
+   - „Wszystkiego po trochu”: 10. poziom we wszystkich 8 profesjach, Pracowity / Pracowita, 25 Punktów Czasu;
+   - „Wiele fachów”: 25. poziom we wszystkich 8 profesjach, Obrotny / Obrotna, 40 Punktów Czasu.
+3. **Każda profesja na 25. poziomie** (jeden licznik `professionLevel` z polem `profession`, czyli id profesji), po 15 Punktów Czasu, w kolejności profesji: „Zielarz” (Zielarz / Zielarka), „Alchemik” (Alchemik / Alchemiczka), „Rzemieślnik” (Rzemieślnik / Rzemieślniczka), „Górnik” (Górnik / Górniczka), „Jubiler” (Jubiler / Jubilerka), „Rybak” (Rybak / Rybaczka), „Rolnik” (Rolnik / Rolniczka), „Kucharz” (Kucharz / Kucharka).
+
+- Razem 260 Punktów Czasu, bez Punktów Systemu. Obrazki to ikony profesji, które gra już ma.
+- Jak dawne osiągnięcia profesji liczą się od razu z tego, co postać ma: postać, która już spełnia warunek, dostaje osiągnięcie z nagrodą przy pierwszym spojrzeniu na okno, raz.
+- Każda profesja liczy swój poziom osobno (`professionLevel:<id>` w `achievementFact`, jak odkrywcy krain). Profesja, której postać jeszcze nie zaczęła, ma 0, jak w „Mistrzu rzemiosła”.
+- Po angielsku (bez zatwierdzania, zasada z 6.11.2026): Apprentice, Journeyman (tytuł Journeyman / Journeywoman), Expert, Many Hands (Resourceful), A Little of Everything (Hardworking), Many Trades (Enterprising), Herbalist, Alchemist, Artisan, Miner, Jeweller, Fisher, Farmer, Cook. Tytuł „Jack of All Trades” ma już „Złota rączka”, więc „Wiele fachów” nosi po angielsku Enterprising.
+- Tytuły i id nie powtarzają się w żadnym języku. Walidator pilnuje tego po polsku (`checkAchievements` w `tools/validate-data.mjs`, razem z `profession`: tylko przy `professionLevel` i tylko id z `data/professions.json`), a test po polsku i po angielsku.
+- Okno sprawdzone na dziewięciu rozmiarach ekranu (320–430 px, 768, 1366 i 1920 px), po polsku i po angielsku: bez przewijania na boki i bez tekstu poza ramkami.
+- Pliki: `data/achievements.json` (`$comment`), `data/schemas/achievements.schema.json`, `data/en/achievements.json`, `data/en/scope.json`, `data/en/sources.json`, `src/engine/achievements.js` (`achievementFact`), `src/server/achievements.js` (`factsOf`), `tools/validate-data.mjs`. Testy: `test/achievements.test.js` (liczniki, w tym poziom każdej profesji osobno, dokładnie te osiągnięcia przy danych poziomach, każda nagroda raz, tytuły bez powtórzeń).
+
 ## Wersja 0.4.77 (20.11.2026): poszukiwani niżej, wpisywanie punktów w „Rozdaj ręcznie”
 
 Według dwóch sekcji niżej, bez makiet (autor: „Wdrażaj od razu, szkoda Twoich zasobów na makiety”).

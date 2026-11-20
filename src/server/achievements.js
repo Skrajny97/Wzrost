@@ -43,7 +43,10 @@ export async function factsOf(db, row, now) {
   ]);
   const polish = contentIn('pl');
   const feats = JSON.parse(row.feats ?? '{}');
-  const professions = Object.values(JSON.parse(row.professions ?? '{}')).map((one) => (typeof one === 'number' ? one : (one?.level ?? 0)));
+  // Each profession's level, by its id.
+  const professionLevels = Object.fromEntries(Object.entries(JSON.parse(row.professions ?? '{}')).map(([id, one]) => [id, typeof one === 'number' ? one : (one?.level ?? 0)]));
+  const professions = Object.values(professionLevels);
+  const professionsAt = (level) => professions.filter((one) => one >= level).length;
   const towers = Object.values(JSON.parse(row.towers ?? '{}').best ?? {});
   // The cards by land: each land's cards and those the character has.
   const owned = new Set(cards.results.map((card) => card.monster_id));
@@ -64,8 +67,10 @@ export async function factsOf(db, row, now) {
     // The third form: an evolution's third stage (content.js in the engine).
     thirdForm: polish.evolutionsById[row.evolution]?.stage === 3 ? 1 : 0,
     professionTop: Math.max(0, ...professions),
-    professionsAt50: professions.filter((level) => level >= 50).length,
-    professionsAt100: professions.filter((level) => level >= 100).length,
+    professionsAt10: professionsAt(10),
+    professionsAt25: professionsAt(25),
+    professionsAt50: professionsAt(50),
+    professionsAt100: professionsAt(100),
     cards: owned.size,
     landCards: [...lands.values()].some((land) => land.target > 0 && land.count >= land.target) ? 1 : 0,
     arenaRating: arena.results[0]?.rating ?? 0,
@@ -76,10 +81,11 @@ export async function factsOf(db, row, now) {
     shown: { landCards: best },
   };
   // Each land's own count (achievementFact): the Łysogóry's explorer and
-  // Nawia's count their lands apart.
+  // Nawia's count their lands apart; so does each profession's.
   for (const one of polish.achievements.groups.flatMap((group) => group.list)) {
     if (one.count === 'landPlaces') facts[achievementFact(one)] = areasOf(one.land).filter((area) => area.minLevel <= row.level).length;
     if (one.count === 'landReached') facts[achievementFact(one)] = row.level >= Math.min(...areasOf(one.land).map((area) => area.minLevel)) ? 1 : 0;
+    if (one.count === 'professionLevel') facts[achievementFact(one)] = professionLevels[one.profession] ?? 0;
   }
   return facts;
 }

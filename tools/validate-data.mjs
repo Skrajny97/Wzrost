@@ -850,6 +850,7 @@ function checkReferences(data) {
   errors.push(...checkGuildExpedition(data));
   errors.push(...checkGuildStrike(data));
   errors.push(...checkGuildWeek(data));
+  errors.push(...checkAchievements(data));
   errors.push(...checkGuildWar(data));
   errors.push(...checkWeeks(data, { stats }));
   errors.push(...checkPayments(data));
@@ -973,6 +974,28 @@ function checkGuildWeek(data) {
     if (once === (good.weekly !== undefined)) errors.push(`guilds.json: towar Kramu ${good.id} ma albo limit tygodnia (weekly), albo to, co daje raz (achievement, cosmetic)`);
     if (good.achievement !== undefined && achievements.get(good.achievement)?.count !== 'bannerWarden') errors.push(`guilds.json: towar Kramu ${good.id} daje osiągnięcie "${good.achievement}", którego nie liczy Kram (count bannerWarden)`);
     if (good.cosmetic !== undefined && cosmetics.get(good.cosmetic)?.event !== 'guild') errors.push(`guilds.json: towar Kramu ${good.id} daje kosmetyk "${good.cosmetic}", którego nie daje tylko Kram (event guild)`);
+  }
+  return errors;
+}
+
+// The achievements (achievements.json): ids and titles of their own, and
+// `profession`, a profession of professions.json, with professionLevel and
+// only there (the smaller achievements of the Profesje, 20.11.2026).
+function checkAchievements(data) {
+  const errors = [];
+  const list = data.achievements.groups.flatMap((group) => group.list);
+  uniqueIds(errors, 'achievements', list);
+  const titles = new Map();
+  for (const one of list) {
+    for (const title of new Set(one.title)) {
+      if (titles.has(title)) errors.push(`achievements.json: tytuł „${title}” mają ${titles.get(title)} i ${one.id}`);
+      titles.set(title, one.id);
+    }
+  }
+  const professions = new Set(data.professions.professions.map((profession) => profession.id));
+  for (const one of list) {
+    if ((one.count === 'professionLevel') !== (one.profession !== undefined)) errors.push(`achievements.json: ${one.id}: profession ma być przy count professionLevel i tylko tam`);
+    else if (one.profession !== undefined && !professions.has(one.profession)) errors.push(`achievements.json: ${one.id}: nieznana profesja ${one.profession}`);
   }
   return errors;
 }
