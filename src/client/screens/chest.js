@@ -20,8 +20,16 @@
 // its cards' faces to choose from. Both ask how many copies, with the card
 // at the level the move would give. Their words come from the data
 // (cards.json texts.goods), with the chest's answer.
+//
+// And the account's gold (`chest.gold`; DECISIONS.md, "Złoto w Skrzyni Konta
+// (19.11.2026)"; the author: „dorób złoto możliwe do przenoszenia miedzy
+// postaciami w skrzyni konta”): a row over the tabs with the gold in the
+// chest, the character's own under it, and "Włóż" and "Wyjmij", each with a
+// sheet that asks how much: a field, the quick amounts and "Wszystko". Its
+// words and quick amounts come from the data (camp.json chest.gold), with
+// the chest's answer.
 
-import { herbSprite, materialSprite, mineralSprite, pantrySprite, potionSprite, resourceArt, scrollArt } from '../art.js';
+import { goldArt, herbSprite, materialSprite, mineralSprite, pantrySprite, potionSprite, resourceArt, scrollArt } from '../art.js';
 import { cardAtLevel, cardFace, cardThumb } from '../cards.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
@@ -491,6 +499,122 @@ export function mountChest(container, onBack) {
     );
   }
 
+  // --- Gold --------------------------------------------------------------
+
+  const goldWords = () => chest.gold.texts;
+  const withGold = (text, gold) => filled(text, { gold: formatNumber(gold) });
+  // The character's gold as the server counts it: whole.
+  const ownGold = () => Math.max(0, Math.floor(state.character.gold ?? 0));
+
+  // The row over the tabs: the gold in the chest, the character's own under
+  // it, and the two buttons, each off while there is nothing to move.
+  function goldRow() {
+    const words = goldWords();
+    return h(
+      'section',
+      { class: 'card chest-gold', 'aria-label': words.title },
+      h(
+        'div',
+        { class: 'chest-gold-inner' },
+        h('span', { class: 'chest-gold-art', 'aria-hidden': 'true' }, goldArt(32)),
+        h(
+          'span',
+          { class: 'chest-gold-text' },
+          h('span', { class: 'chest-gold-title', text: words.title }),
+          h('span', { class: 'chest-gold-amount', text: formatNumber(chest.gold.amount) }),
+          h('span', { class: 'chest-note', text: withGold(words.own, ownGold()) }),
+        ),
+        h(
+          'span',
+          { class: 'chest-gold-actions' },
+          h('button', { type: 'button', class: 'button button--world button--small', 'data-chest-gold': 'put', text: words.put, disabled: ownGold() < 1, onClick: () => goldSheet(true) }),
+          h('button', { type: 'button', class: 'button button--system button--small', 'data-chest-gold': 'take', text: words.take, disabled: chest.gold.amount < 1, onClick: () => goldSheet(false) }),
+        ),
+      ),
+    );
+  }
+
+  // "Włóż złoto" (`put`) or "Wyjmij złoto": both numbers, a field for the
+  // amount with the quick amounts and "Wszystko" under it, and the button
+  // with the amount, off until the amount is a whole number from 1 up to
+  // what there is (a line under the field says what is wrong). The request
+  // carries the chest's gold the sheet showed (`seen`): when the chest moved
+  // meanwhile, the server says so and the chest is read again.
+  function goldSheet(put) {
+    const words = goldWords();
+    const seen = chest.gold.amount;
+    const most = put ? ownGold() : seen;
+    const input = h('input', {
+      type: 'number',
+      id: 'chest-gold-amount',
+      class: 'trade-number chest-gold-number',
+      min: '1',
+      max: String(most),
+      step: '1',
+      inputmode: 'numeric',
+      placeholder: '0',
+      'aria-label': words.amount,
+    });
+    const warn = h('p', { class: 'region-warning chest-gold-warn', 'aria-live': 'polite' });
+    const go = h('button', { type: 'button', class: 'button button--system' });
+    const typed = () => (input.value.trim() === '' ? null : Number(input.value));
+    function update() {
+      const amount = typed();
+      const whole = Number.isSafeInteger(amount) && amount >= 1;
+      const fits = whole && amount <= most;
+      go.disabled = !fits;
+      go.textContent = fits ? withGold(put ? words.putButton : words.takeButton, amount) : put ? words.putTitle : words.takeTitle;
+      warn.hidden = amount === null || fits;
+      const short = put ? (most > 0 ? withGold(words.errors.notEnough, most) : words.errors.none) : most > 0 ? withGold(words.errors.notInChest, most) : words.errors.empty;
+      warn.textContent = whole ? short : words.errors.invalid;
+    }
+    const set = (amount) => {
+      input.value = String(amount);
+      update();
+    };
+    input.addEventListener('input', update);
+    const quick = (text, amount, extra = '') =>
+      h('button', { type: 'button', class: `button button--world button--small chest-gold-quick${extra}`, text, disabled: amount < 1 || amount > most, onClick: () => set(amount) });
+    update();
+    go.addEventListener('click', (event) =>
+      withButton(event.currentTarget, async () => {
+        const amount = typed();
+        try {
+          ({ chest } = await call('POST', put ? '/api/chest/gold/put' : '/api/chest/gold/take', { amount, seen }));
+        } catch (error) {
+          // The chest is not as the sheet showed it: read again, the sheet
+          // closed, so the next try starts from what is there now.
+          if (error.status === 409) {
+            closeSheet();
+            await load();
+          }
+          throw error;
+        }
+        closeSheet();
+        toast(withGold(put ? words.putDone : words.takeDone, amount));
+        render();
+      }),
+    );
+    openSheet(
+      h('h2', { class: 'sheet-title chest-sheet-title' }, h('span', { class: 'potion-pick-art' }, goldArt(28)), h('span', { text: put ? words.putTitle : words.takeTitle })),
+      h('p', { class: 'chest-gold-both' }, h('span', { text: withGold(words.own, ownGold()) }), h('span', { text: withGold(words.inChest, seen) })),
+      h('p', { class: 'sheet-text', text: put ? words.putText : words.takeText }),
+      h(
+        'div',
+        { class: 'chest-gold-field' },
+        input,
+        h(
+          'div',
+          { class: 'chest-gold-quicks' },
+          chest.gold.quick.map((amount) => quick(formatNumber(amount), amount)),
+          quick(words.all, most, ' chest-gold-quick--all'),
+        ),
+      ),
+      warn,
+      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }), go),
+    );
+  }
+
   function render() {
     const character = state.character;
     const tabs = chest && Array.isArray(chest.goods);
@@ -520,6 +644,7 @@ export function mountChest(container, onBack) {
                 ? t('Encyklopedia nie zaliczy przedmiotu ani towaru od innej postaci: liczy się tylko to, co postać sama zdobędzie albo wytworzy.')
                 : t('Encyklopedia nie zaliczy przedmiotu: liczy się tylko to, co postać sama zdobędzie albo wytworzy.'),
             ),
+            chest?.gold && goldRow(),
             tabs &&
               h(
                 'div',

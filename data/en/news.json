@@ -1204,6 +1204,10 @@
     "0.4.67": {
       "title": "Version 0.4.67",
       "body": "- The newest place for your level is dangerous again from level 30. A four-hour exploration there ends in a faint about one time in five, with companions and in a party. Shorter explorations are safer, and places a level or two lower are almost safe.\n- In a party the creatures of the newest place grow with every extra player also below class level 250.\n- “Threat” on the Combat screen now counts the whole exploration, including companions weakening and falling along the way, so it shows the real chance of fainting. Check it before you set out."
+    },
+    "0.4.68": {
+      "title": "Version 0.4.68",
+      "body": "- Gold in the Account Chest: you can now move gold between the characters of your account. “Put in” moves it from the character to the chest, and “Take out” from the chest to the character you play. No fees and no limits, from character level 20."
     }
   }
 }

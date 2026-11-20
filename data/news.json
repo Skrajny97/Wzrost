@@ -1510,6 +1510,11 @@
       "id": "0.4.67",
       "title": "Wersja 0.4.67",
       "body": "- Najnowsze miejsce dla Twojego poziomu znów jest groźne, od 30. poziomu. Czterogodzinna wyprawa kończy się tam omdleniem mniej więcej co piąty raz, z towarzyszami i w drużynie. Krótsze wyprawy są bezpieczniejsze, a miejsca o poziom czy dwa niżej są prawie bezpieczne.\n- W drużynie stwory w najnowszym miejscu rosną za każdego dodatkowego gracza także poniżej 250. poziomu klasy.\n- „Zagrożenie” w Walce liczy teraz całą wyprawę, także to, że towarzysze po drodze słabną i padają, więc pokazuje prawdziwą szansę omdlenia. Sprawdź je przed wyruszeniem."
+    },
+    {
+      "id": "0.4.68",
+      "title": "Wersja 0.4.68",
+      "body": "- Złoto w Skrzyni Konta: przełożysz teraz złoto między postaciami swojego konta. „Włóż” przenosi je z postaci do skrzyni, a „Wyjmij” ze skrzyni do postaci, na którą grasz. Bez opłat i limitów, od 20. poziomu postaci."
     }
   ]
 }

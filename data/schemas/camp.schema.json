@@ -4,7 +4,7 @@
   "description": "Poziom samego obozu: od startLevel do maxLevel, za samo złoto, a każdy poziom ponad pierwszy przyspiesza budowy budynków.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "name", "description", "startLevel", "maxLevel", "effect", "costs", "minutes", "evolution", "cornerstone", "collector", "queue"],
+  "required": ["id", "name", "description", "startLevel", "maxLevel", "effect", "costs", "minutes", "evolution", "cornerstone", "collector", "chest", "queue"],
   "properties": {
     "$comment": { "type": "string" },
     "id": { "const": "camp" },
@@ -122,6 +122,63 @@
             "hint": { "type": "string", "minLength": 1, "description": "Zdanie na ekranie budynku produkcyjnego, gdy postać ma Zbieracza." },
             "owned": { "type": "string", "minLength": 1, "description": "Odmowa serwera: Zbieracz jest już kupiony." },
             "noGold": { "type": "string", "minLength": 1, "description": "Odmowa serwera: za mało złota." }
+          }
+        }
+      }
+    },
+    "chest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gold"],
+      "description": "Skrzynia Konta na planszy obozu: gold to złoto w skrzyni, jedna liczba na całe konto.",
+      "properties": {
+        "$comment": { "type": "string" },
+        "gold": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["quick", "texts"],
+          "properties": {
+            "quick": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 4,
+              "items": { "type": "integer", "minimum": 1 },
+              "description": "Szybkie kwoty w okienkach „Włóż złoto” i „Wyjmij złoto”, rosnąco; obok nich „Wszystko”."
+            },
+            "texts": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["title", "own", "inChest", "put", "take", "putTitle", "takeTitle", "putText", "takeText", "amount", "all", "putButton", "takeButton", "putDone", "takeDone", "errors"],
+              "properties": {
+                "title": { "type": "string", "minLength": 1, "description": "Nagłówek wiersza złota na ekranie Skrzyni." },
+                "own": { "type": "string", "pattern": "\\{gold\\}", "description": "Złoto postaci, pod złotem w skrzyni i w okienkach." },
+                "inChest": { "type": "string", "pattern": "\\{gold\\}", "description": "Złoto w skrzyni, w okienkach." },
+                "put": { "type": "string", "minLength": 1, "description": "Przycisk wiersza: włóż złoto." },
+                "take": { "type": "string", "minLength": 1, "description": "Przycisk wiersza: wyjmij złoto." },
+                "putTitle": { "type": "string", "minLength": 1, "description": "Tytuł okienka wkładania, także przycisk okienka bez poprawnej kwoty." },
+                "takeTitle": { "type": "string", "minLength": 1, "description": "Tytuł okienka wyjmowania, także przycisk okienka bez poprawnej kwoty." },
+                "putText": { "type": "string", "minLength": 1, "description": "Zdanie w okienku wkładania." },
+                "takeText": { "type": "string", "minLength": 1, "description": "Zdanie w okienku wyjmowania." },
+                "amount": { "type": "string", "minLength": 1, "description": "Nazwa pola kwoty." },
+                "all": { "type": "string", "minLength": 1, "description": "Szybka kwota: całe złoto postaci albo skrzyni." },
+                "putButton": { "type": "string", "pattern": "\\{gold\\}", "description": "Przycisk okienka wkładania z kwotą." },
+                "takeButton": { "type": "string", "pattern": "\\{gold\\}", "description": "Przycisk okienka wyjmowania z kwotą." },
+                "putDone": { "type": "string", "pattern": "\\{gold\\}", "description": "Komunikat po włożeniu." },
+                "takeDone": { "type": "string", "pattern": "\\{gold\\}", "description": "Komunikat po wyjęciu." },
+                "errors": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["invalid", "none", "notEnough", "empty", "notInChest"],
+                  "properties": {
+                    "invalid": { "type": "string", "minLength": 1, "description": "Odmowa: kwota nie jest całą liczbą od 1 w górę." },
+                    "none": { "type": "string", "minLength": 1, "description": "Odmowa wkładania: postać nie ma złota." },
+                    "notEnough": { "type": "string", "pattern": "\\{gold\\}", "description": "Odmowa wkładania: postać ma mniej złota." },
+                    "empty": { "type": "string", "minLength": 1, "description": "Odmowa wyjmowania: w skrzyni nie ma złota." },
+                    "notInChest": { "type": "string", "pattern": "\\{gold\\}", "description": "Odmowa wyjmowania: w skrzyni jest mniej złota." }
+                  }
+                }
+              }
+            }
           }
         }
       }
