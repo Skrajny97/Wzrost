@@ -8203,6 +8203,33 @@ a.camp-level-button {
   background: var(--bg-deep);
 }
 
+/* The bell that mutes the chat's light, first in the line to write in
+   (the author, 20.11.2026), and over the rules or the note of a muted chat
+   when those stand there instead. Narrower on the narrowest phones, so the
+   line keeps its room. */
+.chat-form-row .chat-bell {
+  width: 44px;
+  min-height: 48px;
+}
+
+.chat-footer-bell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 360px) {
+  .chat-form-row {
+    gap: 6px;
+  }
+
+  .chat-form-row .chat-bell,
+  .chat-form-row .chat-attach {
+    width: 40px;
+  }
+}
+
 .chat-attached {
   display: flex;
   flex-wrap: wrap;
@@ -19768,10 +19795,6 @@ button.tcard-slot {
   gap: 8px;
 }
 
-.side-chat-head .chat-bell {
-  width: 40px;
-  min-height: 40px;
-}
 
 .side-chat-scroll {
   flex: 1;

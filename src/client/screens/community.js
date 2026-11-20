@@ -300,7 +300,7 @@ function sectionPicker(sections, current, choose) {
   };
 }
 
-// The bell by the chat's title (screens/chat.js, ../side.js): it mutes the
+// The bell by the chat's line to write in (mountChat): it mutes the
 // Globalny's light, on the round chat button and on the chat's tab
 // (chat-news.js), on this device; private messages and tags light them
 // still. `unmount` stops it following another bell's change.
@@ -420,9 +420,16 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
     );
     label.focus();
   }
+  // The bell by the line to write in (the author, 20.11.2026: „dodać
+  // dzwonek powiadomień jako wyłącznik gdzieś w okolicach rubryki do
+  // pisania”): by the chat's title it went up with the page over the
+  // messages, seen only for a moment on a change of tab. It stays by the line,
+  // and by the rules or the note of a muted chat when those stand there.
+  const bell = chatBell();
   const attachedList = h('ul', { class: 'chat-attached', 'aria-label': t('Przedmioty i materiały w wiadomości') });
   // The names "@" suggests, over the line (see suggest below).
   const suggestions = h('ul', { class: 'chat-mentions', id: `${id}-mentions`, role: 'listbox', 'aria-label': tagWords.suggestions, hidden: true });
+  const formRow = h('div', { class: 'chat-form-row' }, bell.element, attachButton, linkButton, text, sendButton);
   const form = h(
     'form',
     {
@@ -434,7 +441,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
     },
     suggestions,
     attachedList,
-    h('div', { class: 'chat-form-row' }, attachButton, linkButton, text, sendButton),
+    formRow,
   );
 
   // "@" and the start of a name before the caret: the characters that may
@@ -1136,9 +1143,13 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
 
   function footerPart(part) {
     if (part === 'loading') return null;
-    if (part === 'form') return form;
+    if (part === 'form') {
+      formRow.prepend(bell.element);
+      return form;
+    }
+    const withBell = (shown) => h('div', { class: 'chat-footer-bell' }, bell.element, shown);
     if (part === 'rules') {
-      return h(
+      return withBell(h(
         'section',
         { class: 'card chat-rules', 'aria-label': t('Zasady czatu') },
         h('h2', { class: 'card-title', text: t('Zasady czatu') }),
@@ -1155,9 +1166,9 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
               text.focus();
             }),
         }),
-      );
+      ));
     }
-    return h('p', { class: 'chat-muted', text: t('Czat jest dla Ciebie wyciszony {until}.', { until: untilText(account.mutedUntil) }) });
+    return withBell(h('p', { class: 'chat-muted', text: t('Czat jest dla Ciebie wyciszony {until}.', { until: untilText(account.mutedUntil) }) }));
   }
 
   function hiddenList(blocked) {
@@ -1413,6 +1424,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
       gone = true;
       clearTimeout(timer);
       stopNews();
+      bell.unmount();
       document.removeEventListener('visibilitychange', onVisible);
       window.removeEventListener('resize', fit);
       if ($('#sheet')?.open && $('#sheet .chat-sheet')) closeSheet();
