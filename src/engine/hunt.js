@@ -839,7 +839,10 @@ export function simulateHunt(
   // Siedziba's, in every fight and find; on a trip each member's own.
   const cardsXp = 1 + (cards?.xp ?? 0);
   const cardsGold = 1 + (cards?.gold ?? 0);
-  const seatRarity = 1 + (seat?.rarity ?? 0);
+  // The Dom Zwiadowców's rarer items, times the week's share of them
+  // (rarity, weeks.js: the Kącina's Swaróg since 20.11.2026), in the chests
+  // among the finds and the elites'.
+  const rarer = (1 + (seat?.rarity ?? 0)) * weekFactor(week, 'rarity');
   // The meal (cooking.js): its shares more of the XP, the gold, the
   // materials, the card chances, the resources and the chests among the
   // finds, and its points more of a rarer item, in every fight and find,
@@ -858,7 +861,7 @@ export function simulateHunt(
     area,
     otherClassShare,
     uniqueBonus,
-    ...(seatRarity !== 1 && { rarityBonus: seatRarity }),
+    ...(rarer !== 1 && { rarityBonus: rarer }),
     ...(fed.rare > 0 && { rarityPoints: fed.rare }),
   };
   const hpStart = me.hp;
@@ -882,9 +885,12 @@ export function simulateHunt(
   // Tropiciel (an evolution's trait, the character's or a companion's form's),
   // the Bractwo Łowców and a Piekielna wyprawa: more materials from creatures.
   const moreMaterials = (1 + trackerMaterials(character, companions, content)) * (1 + materialsMore) * weekFactor(week, 'materials') * (1 + fed.materials) * hardDrop;
-  // The week's shares of the fights' XP and gold (weeks.js).
+  // The week's shares of the fights' XP and gold (weeks.js), and of the
+  // resources the finds bring and those gathered on the way (resources: the
+  // Kącina's Mokosz since 20.11.2026), as the meal's share of them.
   const weekXp = weekFactor(week, 'xp');
   const weekGold = weekFactor(week, 'gold');
+  const weekResources = weekFactor(week, 'resources');
   const fights = [];
   const entries = [];
   let key = null;
@@ -975,7 +981,7 @@ export function simulateHunt(
         const item = randomItem(findLevel, lootRng, content, blessedLoot(loot, fights.length));
         entries.push({ t: event.t, type: 'find', item: take(item), text: say(texts, 'findChest', step, { item: itemName(item, content) }) });
       } else if (outcome === 'resource') {
-        const found = resourceBundle(area, rewards.findResourcePerLevel * findLevel * lootRng.float(0.5, 1.5) * (1 + fed.resources) * late);
+        const found = resourceBundle(area, rewards.findResourcePerLevel * findLevel * lootRng.float(0.5, 1.5) * (1 + fed.resources) * weekResources * late);
         for (const [id, amount] of found) resources[id] = (resources[id] ?? 0) + amount;
         const list = found.map(([id, amount]) => `${nameInText(content.resourcesById[id].name, content)} +${amount}`).join(', ');
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findResource', step, { resources: list }) });
@@ -1125,7 +1131,7 @@ export function simulateHunt(
         chests.push([weapon, 'firstChest']);
       }
       if (encounter.elite) {
-        chests.push([randomItem(enemies[0].level, lootRng, content, blessedLoot({ ...loot, rarityBonus: rewards.eliteRarityBonus * seatRarity }, fights.length - 1)), 'eliteChest']);
+        chests.push([randomItem(enemies[0].level, lootRng, content, blessedLoot({ ...loot, rarityBonus: rewards.eliteRarityBonus * rarer }, fights.length - 1)), 'eliteChest']);
       }
       if (encounter.champion && lootRng.chance(weekChance(rewards.championItemChance, week, 'items'))) {
         const rarityId = championItemRarity(enemies[0].level, lootRng, content);
@@ -1185,8 +1191,9 @@ export function simulateHunt(
 
   // On the way the character also gathers a little of the region's resources:
   // a steady amount for the time explored, at the place's middle level, so
-  // the camp does not wait for lucky finds.
-  const gatheredTotal = rewards.gatherPerLevelHour * ((area.minLevel + area.maxLevel) / 2) * (endedAt / 3600000) * (1 + fed.resources) * late;
+  // the camp does not wait for lucky finds; with the meal's and the week's
+  // share of them, as the finds'.
+  const gatheredTotal = rewards.gatherPerLevelHour * ((area.minLevel + area.maxLevel) / 2) * (endedAt / 3600000) * (1 + fed.resources) * weekResources * late;
   if (gatheredTotal >= 0.5) {
     const gathered = resourceBundle(area, gatheredTotal);
     for (const [id, amount] of gathered) resources[id] = (resources[id] ?? 0) + amount;

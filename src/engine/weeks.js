@@ -17,8 +17,15 @@
 //   items         the chance of an item in the loot: the chest among an
 //                 exploration's finds, a champion's chest, an event's and
 //                 a Wieża's item, at most certain;
+//   rarity        the rarer items of explorations: the rarities with
+//                 affixes in the chests among the finds and the elites',
+//                 that many times as likely, as the Siedziba's Dom
+//                 Zwiadowców raises them (simulateHunt);
 //   materials     the materials creatures leave, a Wieża's and a Portal
 //                 Materiałów's;
+//   resources     the resources an exploration brings for the camp, found
+//                 and gathered on the way (simulateHunt, a Drużyna's trip
+//                 too);
 //   profession-xp a profession's XP from work (workProfession);
 //   herbs         the herbs gathered (gatherHerbs);
 //   minerals      what the Kopalnia digs (mineMinerals);
@@ -247,14 +254,16 @@ export const weekEffectsText = (effects, content, short = false) =>
     .join(', ');
 
 // What a fight's effects had to change in a hunt (an exploration, a
-// Wieża's or a Portal's fight): XP, gold, items and materials it brought,
-// and the stats in any fight it had.
+// Wieża's or a Portal's fight): XP, gold, items (also rarer ones),
+// materials and resources it brought, and the stats in any fight it had.
 /** @type {Record<string, (hunt: Record<string, any>) => boolean>} */
 const CHANGED = {
   xp: (hunt) => hunt.xp > 0,
   gold: (hunt) => hunt.gold > 0,
   items: (hunt) => (hunt.items ?? []).length > 0,
+  rarity: (hunt) => (hunt.items ?? []).length > 0,
   materials: (hunt) => Object.keys(hunt.materials ?? {}).length > 0,
+  resources: (hunt) => Object.keys(hunt.resources ?? {}).length > 0,
   stat: (hunt) => (hunt.fights ?? []).length > 0,
 };
 
