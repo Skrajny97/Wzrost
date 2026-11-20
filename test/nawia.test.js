@@ -271,8 +271,13 @@ describe('Nawia', () => {
     const shifts = result.events.filter((event) => event.actor === 'e0' && event.kind === 'skill').map((event) => event.skillName);
     assert.deepEqual(shifts.slice(0, 4), ['wąż', 'niedźwiedź', 'rogaty starzec', 'wąż']);
 
+    // Three plain Wojownicy fell him twice just within the 300 moves of a
+    // fight (284) while their skills cost half as much; since 20.11.2026
+    // (mana ×2) they strike half as many skills, so the fight may go on
+    // longer: it is his rising that counts here.
     const koschei = monsterCombatant({ monsterId: 'koschei', level: 352, id: 'e0' }, content);
-    const fall = fight([member('warrior', 'a0', 350), member('warrior', 'a1', 350), member('warrior', 'a2', 350)], [koschei], 'kosciej-dane');
+    const allies = [member('warrior', 'a0', 350), member('warrior', 'a1', 350), member('warrior', 'a2', 350)];
+    const fall = simulateFight({ allies, enemies: [koschei], rng: createRng('kosciej-dane'), content, record: true, maxActions: 600 });
     assert.equal(fall.won, true);
     assert.deepEqual(fall.events.filter((event) => event.kind === 'drain' && event.actor === 'e0').map((event) => event.amount), [Math.round(koschei.maxHp * 0.5)]);
   });
