@@ -1264,6 +1264,10 @@
     "0.4.82": {
       "title": "Version 0.4.82",
       "body": "- Jewelcrafting › “Setting”: you can now claim the System Avatar's report from setting a stone in a worn item or the Core during an exploration or a mercenary service, so the Avatar gets back to work at once. The stone goes into the item once the character is back."
+    },
+    "0.4.83": {
+      "title": "Version 0.4.83",
+      "body": "- Quarters: you can now train a companion up to 10 times a day instead of 3 (still up to your character's level −3), so it catches up with your character faster."
     }
   }
 }
