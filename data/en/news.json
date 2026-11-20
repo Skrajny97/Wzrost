@@ -1244,6 +1244,10 @@
     "0.4.77": {
       "title": "Version 0.4.77",
       "body": "- The headman's wanted posters now come from places one land below the highest one open to you, or two lands below once that place goes beyond level 100, and a poster still earns you as much gold as before. Today's posters have been drawn anew; a poster already in your hand stays.\n- Stats › “Spend by hand”: type how many points to add next to each stat, so after a reset you can spend even thousands of points in moments."
+    },
+    "0.4.78": {
+      "title": "Version 0.4.78",
+      "body": "- 14 new Profession achievements with titles: level 10, 25 and 50 in any profession, level 10 in 4 and in all 8 professions, level 25 in all 8, and level 25 in each profession. If you already qualify, you get the achievement and its Time Points when you open the achievements window."
     }
   }
 }
