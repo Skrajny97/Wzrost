@@ -62,10 +62,10 @@ describe('the wanted posters', () => {
     const posters = wantedPosters(47, '2026-11-05', 'postać', content);
     assert.deepEqual(wantedPosters(47, '2026-11-05', 'postać', content), posters);
     assert.notDeepEqual(wantedPosters(47, '2026-11-06', 'postać', content), posters);
-    // Class level 47: two lands below its highest open place, its lowest
-    // three with ten places open (20.11.2026, wanted-places.test.js).
+    // Class level 47: one land below its highest open place, the Serce
+    // Uroczyska (46–50) (20.11.2026, wanted-places.test.js).
     const open = wantedPlaces(content.areas.filter((area) => areaUnlocked(area, 47, content)), content).places.map((area) => area.id);
-    assert.deepEqual(open, ['windfalls-edge', 'fox-ravines', 'raven-hollows']);
+    assert.deepEqual(open, ['raven-hollows', 'viper-heaps', 'boar-thicket']);
     const creatures = posters.filter((poster) => poster.kind === 'creature');
     assert.equal(creatures.length, rules.creatures);
     assert.equal(new Set(creatures.map((poster) => poster.areaId)).size, rules.creatures);
@@ -83,7 +83,7 @@ describe('the wanted posters', () => {
     // A new character's posters come from the places it has.
     assert.ok(wantedPosters(1, '2026-11-05', 'nowa', content).every((poster) => areaUnlocked(content.areasById[poster.areaId], 1, content)));
     // The place the Sala prób opened counts too, the highest of them: at
-    // class level 100 the window goes one place up with it.
+    // class level 100, two lands down, the window goes one place up with it.
     const early = content.areas.find((area) => !areaUnlocked(area, 100, content));
     const places = wantedPlaces([...content.areas.filter((area) => areaUnlocked(area, 100, content)), early], content).places.map((area) => area.id);
     assert.deepEqual(places, ['glade-heart', 'reed-beds', 'beaver-dams']);

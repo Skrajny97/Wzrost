@@ -3,8 +3,8 @@
 // "Poszukiwani"; the author's 619 B: „nazwane, silniejsze odmiany stworów z
 // tych miejsc” and „wyjęci spod prawa”). Every day the sołtys posts wanted
 // posters for each character: one for the named variant of the creatures of
-// each of three of its open places (since 20.11.2026 two lands below its
-// highest), and one for an outlaw in one of them. A poster taken brings its
+// each of three of its open places (since 20.11.2026 one or two lands below
+// its highest), and one for an outlaw in one of them. A poster taken brings its
 // target into the explorations of its place (simulateHunt): as strong as
 // the place's elite, by the rules' strength more. Pure: the day and the
 // seed are the server's.
@@ -92,13 +92,15 @@ function poster(day, area, target, classLevel, content, paid = area) {
 
 // The places of the day's posters among those open to a character
 // (`open`, the lowest first): the rules' `places` of them, the highest of
-// them the rules' `lower` places below its highest, a land having five
-// places (20.11.2026, the author: „poszukiwani z
-// listów gończych z tablicy zlecen z racji wyższego poziomu trudności muszą
-// pójść krainę lub dwie niżej”; from 12.11.2026 to then its highest and the
-// two below it, „maksymalnie 2 stopnie niżej niż pozwala level”), and with
-// too few places open below them, its lowest, as many as it has. `shift`:
-// how many places lower than the highest ones they are.
+// them some places below its highest, by the rules' `lower` tiers, by that
+// highest place's first level (each tier from its `from`), a land having
+// five places: one land below up to the place 96–100, two from 101–105 on
+// (20.11.2026, the author: „poszukiwani z listów gończych z tablicy zlecen
+// z racji wyższego poziomu trudności muszą pójść krainę lub dwie niżej”;
+// from 12.11.2026 to then its highest and the two below it, „maksymalnie 2
+// stopnie niżej niż pozwala level”), and with too few places open below
+// them, its lowest, as many as it has. `shift`: how many places lower than
+// the highest ones they are.
 /**
  * @param {Area[]} open
  * @param {Content} content
@@ -106,7 +108,11 @@ function poster(day, area, target, classLevel, content, paid = area) {
  */
 export function wantedPlaces(open, content) {
   const rules = rulesOf(content);
-  const end = Math.max(open.length - rules.lower, Math.min(rules.places, open.length));
+  const highest = open.at(-1);
+  /** @type {{ from: number, places: number }[]} */
+  const tiers = rules.lower.filter((/** @type {{ from: number }} */ tier) => highest && tier.from <= highest.minLevel);
+  const lower = tiers.reduce((best, tier) => (tier.from > best.from ? tier : best), { from: -Infinity, places: 0 }).places;
+  const end = Math.max(open.length - lower, Math.min(rules.places, open.length));
   return { places: open.slice(Math.max(0, end - rules.places), end), shift: open.length - end };
 }
 

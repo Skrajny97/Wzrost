@@ -1,15 +1,16 @@
 // The wanted posters' places (src/engine/wanted.js, wantedPlaces and
-// wantedPosters; src/server/wanted.js). Since 20.11.2026 two lands below
-// the character's highest open place (the author: „poszukiwani z listów
-// gończych z tablicy zlecen z racji wyższego poziomu trudności muszą pójść
-// krainę lub dwie niżej”; two by the measurement in DECISIONS.md), with the
-// Sala prób's place counted as its highest; with too few places open below
-// it, its lowest. Each poster pays the bounty of the place as many places
-// higher, so the bounties are those of its highest places, as from
-// 12.11.2026 („maksymalnie 2 stopnie niżej niż pozwala level”, after a
-// player at level 43 got posters of the first land, 400 gold each). A day
-// drawn before is drawn anew from its first look („Albo generuj nowych
-// poszukiwanych”), with the poster in hand kept as it was taken.
+// wantedPosters; src/server/wanted.js). Since 20.11.2026 one land below
+// the character's highest open place, and two once that place is past the
+// 100th level (the author: „poszukiwani z listów gończych z tablicy zlecen
+// z racji wyższego poziomu trudności muszą pójść krainę lub dwie niżej”;
+// the tiers by the measurement in DECISIONS.md), with the Sala prób's place
+// counted as its highest; with too few places open below it, its lowest.
+// Each poster pays the bounty of the place as many places higher, so the
+// bounties are those of its highest places, as from 12.11.2026
+// („maksymalnie 2 stopnie niżej niż pozwala level”, after a player at level
+// 43 got posters of the first land, 400 gold each). A day drawn before is
+// drawn anew from its first look („Albo generuj nowych poszukiwanych”),
+// with the poster in hand kept as it was taken.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -27,11 +28,14 @@ const sorted = (ids) => [...ids].sort();
 // The bounties of the posters before 20.11.2026: those of the three highest
 // open places, the highest first.
 const before = (classLevel, early = null) => open(classLevel, early).slice(-rules.places).map((area) => wantedGold(area, content, classLevel)).reverse();
+// How many places lower than the highest open place the posters go: by the
+// tier of its first level.
+const lowerOf = (highest) => (highest.minLevel >= 101 ? 10 : 5);
 
-describe('the wanted posters come from places two lands below the highest open one', () => {
-  test('the rules: three places, ten places (two lands of five) below the highest, a creature\'s poster for each', () => {
+describe('the wanted posters come from places one or two lands below the highest open one', () => {
+  test('the rules: three places, five (a land of five) below the highest up to the place 96–100, ten (two lands) from 101–105, a creature\'s poster for each', () => {
     assert.equal(rules.places, 3);
-    assert.equal(rules.lower, 10);
+    assert.deepEqual(rules.lower, [{ from: 1, places: 5 }, { from: 101, places: 10 }]);
     assert.equal(rules.creatures, rules.places);
     assert.equal(content.areas.filter((area) => area.regionId === content.areas[0].regionId).length, 5);
   });
@@ -52,10 +56,10 @@ describe('the wanted posters come from places two lands below the highest open o
     }
   });
 
-  test('every class level: the window ten places lower, the same gold as before, the outlaw in one of the places, paid as its place ten higher', () => {
+  test('every class level: the window five or ten places lower, the same gold as before, the outlaw in one of the places, paid as its place as many higher', () => {
     for (let classLevel = 1; classLevel <= 400; classLevel += 3) {
       const all = open(classLevel);
-      const end = Math.max(all.length - rules.lower, Math.min(rules.places, all.length));
+      const end = Math.max(all.length - lowerOf(all.at(-1)), Math.min(rules.places, all.length));
       const window = all.slice(Math.max(0, end - rules.places), end);
       assert.deepEqual(wantedPlaces(all, content), { places: window, shift: all.length - end });
       for (const seed of ['a', 'b']) {
@@ -73,19 +77,49 @@ describe('the wanted posters come from places two lands below the highest open o
     }
   });
 
-  test('two lands down from 13 places open; with fewer, the lowest three, still with the gold of the highest', () => {
-    // Thirteen places, the highest the Zatopiony Las (61–65): the first land.
+  test('one land down while the highest open place starts at the 100th level or below; with fewer places below it, the lowest three, still with the gold of the highest', () => {
+    // Thirteen places, the highest the Zatopiony Las (61–65): five places
+    // lower, from the Omszałe Głazy to the Rysia Grań.
     assert.equal(openTo(60).length, 13);
-    assert.deepEqual(sorted(placesOf(60)), sorted(['windfalls-edge', 'fox-ravines', 'raven-hollows']));
+    assert.deepEqual(sorted(placesOf(60)), sorted(['mossy-boulders', 'spider-gully', 'lynx-ridge']));
     // One more place, one place up.
-    assert.equal(openTo(65).length, 14);
-    assert.deepEqual(sorted(placesOf(65)), sorted(['fox-ravines', 'raven-hollows', 'viper-heaps']));
-    // Class level 43, as the player's of 12.11.2026: the lowest three, for
-    // the gold of the Pajęczy Parów, the Rysia Grań and the Wilcze Kręgi.
-    assert.deepEqual(sorted(placesOf(43)), sorted(['windfalls-edge', 'fox-ravines', 'raven-hollows']));
+    assert.deepEqual(sorted(placesOf(65)), sorted(['spider-gully', 'lynx-ridge', 'wolf-circles']));
+    // Class level 43, as the player's of 12.11.2026: from the Lisie Jary to
+    // the Żmijowe Zwalisko, for the gold of the Pajęczy Parów, the Rysia
+    // Grań and the Wilcze Kręgi.
+    assert.deepEqual(sorted(placesOf(43)), sorted(['fox-ravines', 'raven-hollows', 'viper-heaps']));
     const posters = wantedPosters(43, '2026-11-20', 'a', content);
     assert.deepEqual(posters.filter((poster) => poster.kind === 'creature').map((poster) => poster.gold), [2500, 2200, 1900]);
     assert.ok(posters.every((poster) => poster.gold >= 1900), JSON.stringify(posters));
+    // Eight places, five of them below the three: the lowest three, for the
+    // gold of the highest three.
+    assert.equal(openTo(35).length, 8);
+    assert.deepEqual(sorted(placesOf(35)), sorted(['windfalls-edge', 'fox-ravines', 'raven-hollows']));
+    assert.deepEqual(wantedPosters(35, '2026-11-20', 'a', content).filter((poster) => poster.kind === 'creature').map((poster) => poster.gold), before(35));
+  });
+
+  test('the tiers\' border: the highest open place 96–100 one land down, 101–105 two lands down, the Sala prób\'s place too', () => {
+    // Class level 99: the highest the Stare Wyrobisko (96–100), so from the
+    // Zatopiony Las to the Stare Koryto, for 5200 to 5800 gold.
+    assert.equal(open(99).at(-1).id, 'old-diggings');
+    for (const seed of ['a', 'b', 'c']) {
+      const creatures = wantedPosters(99, '2026-11-20', seed, content).filter((poster) => poster.kind === 'creature');
+      assert.deepEqual(creatures.map((poster) => poster.areaId), ['old-riverbed', 'willow-isles', 'drowned-forest']);
+      assert.deepEqual(creatures.map((poster) => poster.gold), [5800, 5500, 5200]);
+    }
+    assert.equal(wantedPlaces(open(99), content).shift, 5);
+    // Class level 100: the Czarny Ols (101–105) open, so two lands down,
+    // from the Wilcze Kręgi to the Trzcinowisko, for 5500 to 6100 gold.
+    assert.equal(open(100).at(-1).id, 'black-alder-carr');
+    assert.deepEqual(sorted(placesOf(100)), sorted(['wolf-circles', 'glade-heart', 'reed-beds']));
+    assert.equal(wantedPlaces(open(100), content).shift, 10);
+    // Across the whole tiers: 95 as 99, 104 as 100.
+    assert.deepEqual(sorted(placesOf(95)), sorted(placesOf(99)));
+    assert.deepEqual(sorted(placesOf(104)), sorted(placesOf(100)));
+    // At class level 99 the Czarny Ols opened in the Sala prób is the
+    // highest: two lands down, as at 100.
+    assert.deepEqual(sorted(placesOf(99, 'black-alder-carr')), sorted(['wolf-circles', 'glade-heart', 'reed-beds']));
+    assert.deepEqual(wantedPosters(99, '2026-11-20', 'a', content, 'black-alder-carr').filter((poster) => poster.kind === 'creature').map((poster) => poster.gold), before(99, 'black-alder-carr'));
   });
 
   test('fewer than four places open: those there are, as before', () => {
