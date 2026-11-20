@@ -3901,6 +3901,10 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Wersja 0.4.80 (20.11.2026): poszukiwani kilka miejsc niżej
+
+Według sekcji niżej. Autor wybrał 1219 A (liczyć od odblokowanych miejsc, jak napisał), odrzucił B (od poziomu postaci), wiedząc z pomiaru, że od 200. poziomu poszukiwani będą trudniejsi niż przed zmianami.
+
 ## Poszukiwani kilka miejsc niżej (20.11.2026)
 
 Autor po wersji 0.4.77 (20.11.2026): „Miały być regiony wewnętrzne a nie cale krainy jeśli chodzi o listy gończe w poszukiwaniach. Teraz te listy 50 lvli niżej sie pokazują a bardziej chodziło żeby było tak z 5-10 lvli niżej niż odblokowane regiony wewnętrzne na niskich lvlach i z 15 na wyższych lvlach”. **Poprawka:** 0.4.77 przesunęła listy o całe krainy (5 albo 10 miejsc, czyli 25 albo 50 poziomów), a teraz schodzą o miejsca, czyli regiony wewnętrzne po 5 poziomów. Powód zejścia jest ten sam co w 0.4.77: gra jest od niedawna trudniejsza (od 0.4.57 stwory biją trzy razy mocniej od 250. poziomu klasy, od 0.4.64 rosną z poziomem klasy od 100., a od 0.4.67 najnowsze miejsce postaci znów jest groźne), a listy z trzech najwyższych otwartych miejsc stawiały poszukiwanego zwykle powyżej poziomu postaci, bo poziom klasy go wyprzedza.

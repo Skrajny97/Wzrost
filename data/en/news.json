@@ -1252,6 +1252,10 @@
     "0.4.79": {
       "title": "Version 0.4.79",
       "body": "- Jewelcrafting › “Setting” has a new “From the bag” section: you can set a stone in an item from your bag too. During an exploration or mercenary service only items from the bag can be set, and your System Avatar does the work."
+    },
+    "0.4.80": {
+      "title": "Version 0.4.80",
+      "body": "- The headman's wanted posters are now a few places below the highest one open to you instead of whole lands: one place (about 5 levels), two (about 10) once that place goes beyond level 50, and three (about 15) beyond level 100. A poster still earns you the same gold. Today's posters were drawn anew; the poster in hand stays."
     }
   }
 }
