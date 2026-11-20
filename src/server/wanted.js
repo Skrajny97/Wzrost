@@ -30,9 +30,11 @@ const today = (now) => questPeriod('daily', now, content()).key;
 // basis with `lands`, left out now), has them drawn anew from the same first
 // look (the author: „Albo generuj nowych poszukiwanych albo po prostu
 // poustawiaj ich tez z lepszymi nagrodami w wyzszych lokacjach”), and so is
-// a day drawn before 20.11.2026, from the highest places, now two lands
-// lower (the author: „muszą pójść krainę lub dwie niżej”). The poster in
-// hand stays as it was taken, its place and bounty too (wantedView).
+// a day drawn before 20.11.2026, from the highest places, or by whole
+// lands in 0.4.77–0.4.79, now a few places lower (the author: „z 5-10 lvli
+// niżej niż odblokowane regiony wewnętrzne na niskich lvlach i z 15 na
+// wyższych lvlach”). The poster in hand stays as it was taken, its place
+// and bounty too (wantedView).
 //
 // A record of a later day stays the record (laterPeriod in quests.js): a
 // request still of the day before, met by the record the next day's first
