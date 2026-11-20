@@ -3901,6 +3901,10 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Wersja 0.4.82 (20.11.2026): raport Awatara z oprawiania także w trakcie wyprawy
+
+Według sekcji niżej (zgłoszenie gracza przez autora).
+
 ## Raport Awatara z oprawiania w trakcie wyprawy (20.11.2026)
 
 Gracz (poz. 43) przez autora, w wersji 0.4.80: „Nie da się odebrać raportu z pracy awatara w osadzaniu kamyka w itemów gdy postać główna jest na wyprawie. Przez co zablokowane jest ponowne wysłanie awatara do pracy dopóki nie wróci postać”.
