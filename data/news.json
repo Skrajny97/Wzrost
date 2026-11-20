@@ -1525,6 +1525,11 @@
       "id": "0.4.70",
       "title": "Wersja 0.4.70",
       "body": "- Kącina: Swaróg daje teraz też +5% szansy na rzadsze przedmioty z wypraw, a Mokosz także +5% materiałów ze stworów, +5% zasobów z wypraw i +5% z budynków Obozu."
+    },
+    {
+      "id": "0.4.71",
+      "title": "Wersja 0.4.71",
+      "body": "- Postać: kółka zmiany postaci przestawisz jak zakładki czatu. Przytrzymaj kółko i przesuń je w nowe miejsce. Kolejność zapamiętuje urządzenie, a „Wybierz postać” pokazuje postacie w tej samej kolejności."
     }
   ]
 }
