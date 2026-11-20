@@ -11804,6 +11804,23 @@ button.farm-plot {
   color: var(--system);
 }
 
+/* The points typed in for a stat, beside its value (a player's note,
+   20.11.2026): small, so the row keeps its name on a 320 px phone. */
+.manual-head {
+  align-items: center;
+}
+
+.manual-name {
+  flex: 1 1 auto;
+}
+
+.manual-input {
+  width: 76px;
+  min-height: 34px;
+  padding: 4px 8px;
+  text-align: right;
+}
+
 .skill-many {
   display: grid;
   gap: 4px;

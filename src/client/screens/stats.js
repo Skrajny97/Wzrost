@@ -334,23 +334,46 @@ export function mountStats(container) {
         h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': label, text: sign < 0 ? '−' : '+', onClick: () => set((chosen[stat.id] ?? 0) + sign) });
       const less = step(-1, t('O punkt mniej: {name}', { name: stat.name }));
       const more = step(1, t('O punkt więcej: {name}', { name: stat.name }));
+      // The points typed in (a player at level 228: „miejsce do wpisania
+      // liczby ile chce się dodać bo przy 3k punktów bardzo długo to
+      // zajmuje”): as many as typed, at most what the stat may still take;
+      // the field keeps what is typed while it has the focus and shows the
+      // points given once it loses it.
+      const typed = h('input', {
+        type: 'number',
+        class: 'trade-number manual-input',
+        min: '0',
+        step: '1',
+        inputmode: 'numeric',
+        placeholder: '0',
+        'aria-label': t('Ile punktów dodać: {name}', { name: stat.name }),
+        onInput: () => {
+          const amount = Math.floor(Number(typed.value));
+          set(Number.isFinite(amount) ? amount : 0);
+        },
+        onChange: () => refresh(),
+        onBlur: () => refresh(),
+      });
       const element = h(
         'div',
         { class: 'manual-stat' },
-        h('div', { class: 'manual-head' }, h('span', { class: 'manual-name', text: stat.name }), value),
+        h('div', { class: 'manual-head' }, h('span', { class: 'manual-name', text: stat.name }), value, typed),
         h('div', { class: 'duration-row' }, less, slider, more),
       );
-      return { stat, value, slider, less, more, element };
+      return { stat, value, slider, less, more, typed, element };
     });
     function refresh() {
-      for (const { stat, value, slider, less, more } of rows) {
+      for (const { stat, value, slider, less, more, typed } of rows) {
         const own = chosen[stat.id] ?? 0;
         const most = own + left();
         slider.max = String(most);
         slider.value = String(own);
         slider.disabled = most === 0;
         slider.style.setProperty('--fill', `${most > 0 ? (own / most) * 100 : 0}%`);
-        value.textContent = own > 0 ? `${formatNumber(stat.total + own)} (+${formatNumber(own)})` : formatNumber(stat.total);
+        typed.max = String(most);
+        typed.disabled = most === 0;
+        if (document.activeElement !== typed) typed.value = own > 0 ? String(own) : '';
+        value.textContent = formatNumber(stat.total + own);
         value.classList.toggle('manual-value--added', own > 0);
         less.disabled = own <= 0;
         more.disabled = left() <= 0;

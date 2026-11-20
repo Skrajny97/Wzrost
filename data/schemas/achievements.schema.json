@@ -94,8 +94,11 @@
                     "level",
                     "thirdForm",
                     "professionTop",
+                    "professionsAt10",
+                    "professionsAt25",
                     "professionsAt50",
                     "professionsAt100",
+                    "professionLevel",
                     "cards",
                     "landCards",
                     "arenaRating",
@@ -150,6 +153,11 @@
                   "type": "string",
                   "minLength": 1,
                   "description": "Kraina (land z regions.json, po polsku) dla landPlaces i landReached."
+                },
+                "profession": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Profesja (id z professions.json) dla professionLevel."
                 }
               }
             }
