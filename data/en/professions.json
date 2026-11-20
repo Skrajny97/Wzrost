@@ -362,7 +362,7 @@
     },
     "about": [
       "You choose a recipe and how many dishes. The fish and crops come from the Pantry, and some recipes also need herbs from the bag. With each Cooking level the System reveals new recipes, and the work goes faster.",
-      "The dishes go to the Pantry. As you set out on an exploration you choose one: the character eats it, and its bonus works for 4 hours of explorations. A 4-hour exploration uses it all, shorter ones use it up in turn. You eat a new dish once the last one is over."
+      "The dishes go to the Pantry. As you set out on an exploration you choose one: the character eats it, and its bonus works for 4 hours of explorations. A 4-hour exploration uses it all, shorter ones use it up in turn. You can eat another dish sooner: it replaces the last one, whose bonus is lost."
     ],
     "texts": {
       "report": [
@@ -413,7 +413,16 @@
         "The meal is over. You will choose a new dish on the next exploration."
       ],
       "mealActive": [
-        "The meal is still working: {dish}, {time} of explorations left."
+        "The meal is still working: {dish}, {time} of explorations left. You can eat the same dish again once it is over."
+      ],
+      "swapTitle": [
+        "Change your meal?"
+      ],
+      "swapText": [
+        "The character will eat: {dish}. The current meal ({current}) will stop working with {time} of explorations left, and its bonus will be lost."
+      ],
+      "swapEat": [
+        "Eat"
       ],
       "noDish": [
         "You have no such dish in the Pantry."

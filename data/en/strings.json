@@ -3564,7 +3564,7 @@
   "Przerwij gotowanie": "Stop cooking",
   "Raport z gotowania": "Cooking report",
   "Tryb testowy: gotowanie skończy się od razu, z tym samym wynikiem.": "Test mode: the cooking will end at once, with the same result.",
-  "Zjedzona potrawa działa przez 4 godziny wypraw. Nową zjesz, gdy poprzednia się skończy.": "A dish eaten works for 4 hours of explorations. You eat a new one once the last one is over.",
+  "Zjedzona potrawa działa przez 4 godziny wypraw. Nowa zastępuje poprzednią, a premia poprzedniej przepada.": "A dish eaten works for 4 hours of explorations. A new one replaces the last one, whose bonus is lost.",
   "bez premii": "no bonus",
   "brak składników": "no ingredients",
   "gotowania": "of cooking",

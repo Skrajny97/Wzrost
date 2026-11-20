@@ -1224,6 +1224,10 @@
     "0.4.72": {
       "title": "Version 0.4.72",
       "body": "- The Combat screen now shows a “Your guild needs help” strip: one tap on “Help everyone” helps your guild's members with their builds and work."
+    },
+    "0.4.73": {
+      "title": "Version 0.4.73",
+      "body": "- You can now change your meal while one is still working: pick another dish as you set out, and the game asks first. The previous meal stops, and its bonus is lost."
     }
   }
 }

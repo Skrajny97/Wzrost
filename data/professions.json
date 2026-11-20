@@ -542,7 +542,7 @@
     },
     "about": [
       "Wybierasz przepis i liczbę potraw. Ryby i plony bierzesz ze Spiżarni, a niektóre przepisy potrzebują też ziół z plecaka. Z poziomem Gotowania System odsłania nowe przepisy, a praca idzie szybciej.",
-      "Potrawy trafiają do Spiżarni. Przy wyruszaniu na wyprawę wybierasz jedną: postać ją zjada, a premia działa przez 4 godziny wypraw. Wyprawa 4-godzinna zużywa ją całą, krótsze po kolei. Nową potrawę zjesz, gdy poprzednia się skończy."
+      "Potrawy trafiają do Spiżarni. Przy wyruszaniu na wyprawę wybierasz jedną: postać ją zjada, a premia działa przez 4 godziny wypraw. Wyprawa 4-godzinna zużywa ją całą, krótsze po kolei. Inną potrawę możesz zjeść wcześniej: zastąpi poprzednią, a premia poprzedniej przepadnie."
     ],
     "texts": {
       "report": [
@@ -564,7 +564,10 @@
       "eaten": ["Postać zjada: {dish}. {bonus} przez 4 godziny wypraw."],
       "mealLine": ["Posiłek ({dish}) działał przez {time} tej wyprawy: {bonus}."],
       "mealOver": ["Posiłek się skończył. Nową potrawę wybierzesz przy następnej wyprawie."],
-      "mealActive": ["Posiłek jeszcze działa: {dish}, zostało {time} wypraw."],
+      "mealActive": ["Posiłek jeszcze działa: {dish}, zostało {time} wypraw. Tę samą potrawę zjesz znowu, gdy się skończy."],
+      "swapTitle": ["Zmienić posiłek?"],
+      "swapText": ["Postać zje: {dish}. Obecny posiłek ({current}) przestanie działać, choć zostało mu {time} wypraw, a jego premia przepadnie."],
+      "swapEat": ["Zjedz"],
       "noDish": ["Nie masz tej potrawy w Spiżarni."]
     }
   },
