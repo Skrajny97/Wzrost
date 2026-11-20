@@ -3,11 +3,11 @@
 // "Poszukiwani"; the author's 619 B: „nazwane, silniejsze odmiany stworów z
 // tych miejsc” and „wyjęci spod prawa”). Every day the sołtys posts wanted
 // posters for each character: one for the named variant of the creatures of
-// each of three of its open places (since 20.11.2026 one or two lands below
-// its highest), and one for an outlaw in one of them. A poster taken brings its
-// target into the explorations of its place (simulateHunt): as strong as
-// the place's elite, by the rules' strength more. Pure: the day and the
-// seed are the server's.
+// each of three of its open places (since 20.11.2026 one to three places
+// below its highest), and one for an outlaw in one of them. A poster taken
+// brings its target into the explorations of its place (simulateHunt): as
+// strong as the place's elite, by the rules' strength more. Pure: the day
+// and the seed are the server's.
 
 import { monsterCombatant } from './combatant.js';
 import { stackKey } from './crafting.js';
@@ -93,14 +93,15 @@ function poster(day, area, target, classLevel, content, paid = area) {
 // The places of the day's posters among those open to a character
 // (`open`, the lowest first): the rules' `places` of them, the highest of
 // them some places below its highest, by the rules' `lower` tiers, by that
-// highest place's first level (each tier from its `from`), a land having
-// five places: one land below up to the place 96–100, two from 101–105 on
-// (20.11.2026, the author: „poszukiwani z listów gończych z tablicy zlecen
-// z racji wyższego poziomu trudności muszą pójść krainę lub dwie niżej”;
-// from 12.11.2026 to then its highest and the two below it, „maksymalnie 2
-// stopnie niżej niż pozwala level”), and with too few places open below
-// them, its lowest, as many as it has. `shift`: how many places lower than
-// the highest ones they are.
+// highest place's first level (each tier from its `from`), a place having
+// five levels: one place below up to the place 46–50, two from 51–55 on,
+// three from 101–105 (20.11.2026, the author: „z 5-10 lvli niżej niż
+// odblokowane regiony wewnętrzne na niskich lvlach i z 15 na wyższych
+// lvlach”; in 0.4.77–0.4.79 whole lands, five or ten places, „krainę lub
+// dwie niżej”; from 12.11.2026 to then its highest and the two below it,
+// „maksymalnie 2 stopnie niżej niż pozwala level”), and with too few places
+// open below them, its lowest, as many as it has. `shift`: how many places
+// lower than the highest ones they are.
 /**
  * @param {Area[]} open
  * @param {Content} content
