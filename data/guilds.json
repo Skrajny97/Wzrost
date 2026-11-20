@@ -102,7 +102,7 @@
     }
   },
   "shrine": {
-    "$comment": "Kącina: opiekun tygodnia (1201 A, przyjęte przez autora na stronie ocen 19.11.2026; src/engine/guild-shrine.js, src/server/guild-shrine.js, src/client/guild-shrine.js; DECISIONS.md, „Kącina: opiekun tygodnia (1201 A, 19.11.2026)”). Słowiańska świątynia w Siedzibie każdej gildii, od początku, bez poziomów i wpłat (obrazek src/client/art/guild/<id>.png). Tydzień jak przy Próbach: od poniedziałku, od północy czasu polskiego. Co tydzień do wyboru jest offer bogów z gods, po kolei z listy: co tydzień lista przesuwa się o offer miejsc, więc przy czterech bogach każdy odpoczywa co czwarty tydzień. Każdy członek oddaje jeden głos na jednego z nich, do końca niedzieli, bez zmiany. W poniedziałek o północy (przy pierwszym spojrzeniu na gildię w nowym tygodniu, przy losowaniu tablicy Prób albo w cronie) wygrywa bóg z największą liczbą głosów; przy remisie bóg, na którego głosował lider, a gdy lider na żadnego z remisujących nie głosował, ten, który pierwszy zebrał tyle głosów. Bez głosów gildia nie ma opiekuna przez tydzień. Opiekun przez cały następny tydzień daje każdemu członkowi effects, skutki jak w Tygodniach roku (weeks.json: kind i value w procentach; wyprawa i praca w profesji biorą premię z chwili początku, Kowadło z chwili ulepszania; kto dołączy w trakcie tygodnia, ma ją od razu, a kto odejdzie, traci ją). W tym tygodniu domainShare tablicy Prób (połowa: 8 z 16) to próby z dziedziny opiekuna (domain: rodzaje prób z trials.kinds, każdy w obu rozmiarach, więc dziedzina ma co najmniej tyle par rodzaju i rozmiaru, ile prób z niej trzeba), oznaczone na tablicy; druga połowa jest spoza dziedziny, a obie otwierają się po równo. name: imię boga, genitive: dopełniacz („pod opieką Peruna”), title: kim jest, domainText: dziedzina w słowach. texts: słowa karty Kąciny, tablicy Prób, raportu wyprawy (report: {god} w dopełniaczu, {effects} skutki, które zmieniły wynik) i odpowiedzi gry; {…} wypełnia gra.",
+    "$comment": "Kącina: opiekun tygodnia (1201 A, przyjęte przez autora na stronie ocen 19.11.2026; src/engine/guild-shrine.js, src/server/guild-shrine.js, src/client/guild-shrine.js; DECISIONS.md, „Kącina: opiekun tygodnia (1201 A, 19.11.2026)”). Słowiańska świątynia w Siedzibie każdej gildii, od początku, bez poziomów i wpłat (obrazek src/client/art/guild/<id>.png). Tydzień jak przy Próbach: od poniedziałku, od północy czasu polskiego. Co tydzień do wyboru jest offer bogów z gods, po kolei z listy: co tydzień lista przesuwa się o offer miejsc, więc przy czterech bogach każdy odpoczywa co czwarty tydzień. Każdy członek oddaje jeden głos na jednego z nich, do końca niedzieli, bez zmiany. W poniedziałek o północy (przy pierwszym spojrzeniu na gildię w nowym tygodniu, przy losowaniu tablicy Prób albo w cronie) wygrywa bóg z największą liczbą głosów; przy remisie bóg, na którego głosował lider, a gdy lider na żadnego z remisujących nie głosował, ten, który pierwszy zebrał tyle głosów. Bez głosów gildia nie ma opiekuna przez tydzień. Opiekun przez cały następny tydzień daje każdemu członkowi effects, skutki jak w Tygodniach roku (weeks.json: kind i value w procentach; wyprawa i praca w profesji biorą premię z chwili początku, Kowadło z chwili ulepszania, a budynki Obozu z chwili zbierania; kto dołączy w trakcie tygodnia, ma ją od razu, a kto odejdzie, traci ją). Od 20.11.2026 Swaróg daje też rzadsze przedmioty z wypraw (rarity), a Mokosz materiały ze stworów, zasoby z wypraw i więcej z budynków Obozu (materials, resources i camp; DECISIONS.md, „Swaróg i Mokosz: dodatkowe premie (20.11.2026)”). W tym tygodniu domainShare tablicy Prób (połowa: 8 z 16) to próby z dziedziny opiekuna (domain: rodzaje prób z trials.kinds, każdy w obu rozmiarach, więc dziedzina ma co najmniej tyle par rodzaju i rozmiaru, ile prób z niej trzeba), oznaczone na tablicy; druga połowa jest spoza dziedziny, a obie otwierają się po równo. name: imię boga, genitive: dopełniacz („pod opieką Peruna”), title: kim jest, domainText: dziedzina w słowach. texts: słowa karty Kąciny, tablicy Prób, raportu wyprawy (report: {god} w dopełniaczu, {effects} skutki, które zmieniły wynik) i odpowiedzi gry; {…} wypełnia gra.",
     "id": "guild-shrine",
     "name": "Kącina",
     "offer": 3,
@@ -131,7 +131,7 @@
         "name": "Swaróg",
         "genitive": "Swaroga",
         "title": "bóg ognia i kuźni",
-        "effects": [{ "kind": "upgrade", "value": 5 }],
+        "effects": [{ "kind": "upgrade", "value": 5 }, { "kind": "rarity", "value": 5 }],
         "domain": ["upgrade", "makeAny", "process", "salvage"],
         "domainText": "Kowadło, Warsztat i Stół rozbiórki"
       },
@@ -140,7 +140,13 @@
         "name": "Mokosz",
         "genitive": "Mokoszy",
         "title": "bogini ziemi i ziół",
-        "effects": [{ "kind": "herbs", "value": 5 }, { "kind": "profession-xp", "value": 5 }],
+        "effects": [
+          { "kind": "herbs", "value": 5 },
+          { "kind": "profession-xp", "value": 5 },
+          { "kind": "materials", "value": 5 },
+          { "kind": "resources", "value": 5 },
+          { "kind": "camp", "value": 5 }
+        ],
         "domain": ["gatherAny", "brewAny", "process", "orders"],
         "domainText": "zioła, mikstury, przeróbka materiałów i zlecenia Osady"
       }

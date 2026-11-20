@@ -30,12 +30,14 @@
     "kinds": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["xp", "gold", "items", "materials", "profession-xp", "herbs", "minerals", "camp", "rest", "upgrade", "reputation", "stat"],
+      "required": ["xp", "gold", "items", "rarity", "materials", "resources", "profession-xp", "herbs", "minerals", "camp", "rest", "upgrade", "reputation", "stat"],
       "properties": {
         "xp": { "$ref": "#/definitions/words" },
         "gold": { "$ref": "#/definitions/words" },
         "items": { "$ref": "#/definitions/words" },
+        "rarity": { "$ref": "#/definitions/words" },
         "materials": { "$ref": "#/definitions/words" },
+        "resources": { "$ref": "#/definitions/words" },
         "profession-xp": { "$ref": "#/definitions/words" },
         "herbs": { "$ref": "#/definitions/words" },
         "minerals": { "$ref": "#/definitions/words" },
@@ -66,7 +68,7 @@
               "additionalProperties": false,
               "required": ["kind", "value"],
               "properties": {
-                "kind": { "enum": ["xp", "gold", "items", "materials", "profession-xp", "herbs", "minerals", "camp", "rest", "upgrade", "reputation", "stat"] },
+                "kind": { "enum": ["xp", "gold", "items", "rarity", "materials", "resources", "profession-xp", "herbs", "minerals", "camp", "rest", "upgrade", "reputation", "stat"] },
                 "value": { "type": "number", "minimum": -50, "maximum": 100, "not": { "const": 0 }, "description": "Procent więcej (ujemny: mniej)." },
                 "stat": { "type": "string", "pattern": "^[a-z]+$", "description": "Statystyka przy rodzaju stat." }
               }

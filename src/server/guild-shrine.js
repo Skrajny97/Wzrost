@@ -13,9 +13,10 @@
 // whole week, as a week of the year's: the character's row brings the
 // latest patron of its guild (guildPatronSql, loaded in characters.js) and
 // weekFor (weeks.js) adds its effects while its week lasts, so an
-// exploration and a profession's work keep them from their start and the
-// Kowadło takes them at the upgrade; a character that leaves its guild has
-// none from then on. A guild gone takes its votes and patrons along
+// exploration and a profession's work keep them from their start, the
+// Kowadło takes them at the upgrade and the camp's buildings as their
+// stores are collected; a character that leaves its guild has none from
+// then on. A guild gone takes its votes and patrons along
 // (guildRemoval, guilds.js).
 
 import { godBonusText, offeredGods, patronWinner, questPeriod, shrineGod, voteCounts } from '../engine/index.js';

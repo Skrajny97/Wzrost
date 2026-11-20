@@ -194,6 +194,50 @@ describe('the week in fights', () => {
     assert.ok(plain > 0 && more > plain * 1.5, `${more} vs ${plain}`);
   });
 
+  // The kinds the Kącina's Swaróg and Mokosz brought (20.11.2026): rarer
+  // items and resources from explorations.
+  test('rarity: the rarities with affixes in the chests of the finds, as the Dom Zwiadowców raises them, the fights as ever', () => {
+    const affixed = (hunts) => {
+      const items = hunts.flatMap((hunt) => hunt.items);
+      return { count: items.length, share: items.filter((item) => item.rarity !== 'common').length / items.length };
+    };
+    const explore = (more) => Array.from({ length: 10 }, (_, index) => setOut({ minutes: 240, seed: `rzadsze-${index}`, lootSeed: `rzadsze-łup-${index}`, ...more }));
+    const plain = explore({});
+    const rarer = explore({ week: week('rarity', 900) });
+    const plainItems = affixed(plain);
+    const rarerItems = affixed(rarer);
+    assert.ok(plainItems.count >= 20 && rarerItems.count >= 20, `${plainItems.count}, ${rarerItems.count}`);
+    // Ten times the weight of the rarities with affixes: about 30% of the
+    // items have them without the week, about 80% with it.
+    assert.ok(plainItems.share < 0.5 && rarerItems.share > 0.65, `${plainItems.share} vs ${rarerItems.share}`);
+    // The loot has its own seed, so the fights go as they would.
+    rarer.forEach((hunt, index) => assert.deepEqual(hunt.fights.map((fight) => fight.xp), plain[index].fights.map((fight) => fight.xp)));
+    // With the Siedziba's Dom Zwiadowców the two multiply, as with the
+    // Ołtarz's blessing of luck: a week's −90% takes the seat's +900% away.
+    const both = explore({ week: week('rarity', -90), seat: { rarity: 9 } });
+    assert.deepEqual(both.map((hunt) => hunt.items), plain.map((hunt) => hunt.items));
+  });
+
+  test('resources: more from the finds and from the gathering on the way, each bundle times the share, and nothing else', () => {
+    const total = (hunt) => Object.values(hunt.resources).reduce((sum, count) => sum + count, 0);
+    let found = 0;
+    for (let index = 0; index < 4; index += 1) {
+      const options = { minutes: 240, seed: `zasoby-${index}`, lootSeed: `zasoby-łup-${index}` };
+      const plain = setOut(options);
+      const more = setOut({ ...options, week: week('resources', 100) });
+      // The resources take no draw of their own: the rest is the same.
+      assert.deepEqual([more.xp, more.gold, more.items, more.materials], [plain.xp, plain.gold, plain.items, plain.materials]);
+      assert.deepEqual(Object.keys(more.resources).sort(), Object.keys(plain.resources).sort());
+      // Each find's resources twice as many, and those gathered on the way,
+      // each rounded on its own.
+      const bundles = plain.entries.filter((entry) => entry.type === 'find' || entry.type === 'gather').length;
+      assert.ok(plain.entries.some((entry) => entry.type === 'gather'));
+      assert.ok(Math.abs(total(more) - 2 * total(plain)) <= bundles * Object.keys(plain.resources).length, `${total(more)} vs ${total(plain)}`);
+      found += total(plain);
+    }
+    assert.ok(found > 0);
+  });
+
   test('a stat: the share of it in fights, a malus too, nothing outside fights', () => {
     const { character, equipped } = settled;
     const { totals } = computeStats(character, equipped, content);

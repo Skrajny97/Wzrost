@@ -27,9 +27,6 @@ export function weekOfCharacter(row, now) {
 // The week at `now` as an activity keeps it ({ number, effects }), or null.
 export const weekNow = (now) => (weeksOn() ? weekAt(now, content()).week : null);
 
-// What the week at `now` multiplies a kind of effect by.
-export const weekFactorNow = (now, kind) => weekFactor(weekNow(now), kind);
-
 // The character's fortunes of Andrzejki (characters.andrzejki, andrzejki.js),
 // or none.
 function fortunesOf(row) {
@@ -73,7 +70,8 @@ export function weekFor(row, now) {
   return own.length === 0 ? week : { ...week, effects: [...(week?.effects ?? []), ...own] };
 }
 
-// What the week and the character's omens at `now` multiply a kind by.
+// What the week, the character's omens and its guild's patron at `now`
+// multiply a kind by: the Kowadło's chance, what the camp's buildings give.
 export const weekFactorFor = (row, now, kind) => weekFactor(weekFor(row, now), kind);
 
 // The character's omens of rest, each with when it runs, for the pace of
