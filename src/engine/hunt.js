@@ -48,6 +48,8 @@ import { companionCombatant, gendered, trackerMaterials } from './companions.js'
 import { wantedEncounter, wantedLootRarity, wantedOf, wantedStrength } from './wanted.js';
 import { omenLines, raisedOutcome, weekChance, weekFactor, weekFighter, weekLine } from './weeks.js';
 import { gearKey } from './gear.js';
+import { sideStats } from './side-stats.js';
+import { computeStats } from './stats.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {Record<string, any>} Character A character, as the engine takes it. */
@@ -850,6 +852,11 @@ export function simulateHunt(
   const fed = mealEffects(meal);
   const mealXp = 1 + fed.xp;
   const mealGold = 1 + fed.gold;
+  // Poboczna Siła (side-stats.js, 1218 D): Siła its weapons do not hit
+  // with, its share more of the resources, the finds' and those gathered
+  // on the way, as the meal's; the character's own stats, without the
+  // fights' shares, so on a trip each member's own.
+  const spareResources = 1 + sideStats(character, computeStats(character, equipped, content).totals, content).resources;
   // A banner of the character's guild over the land (1200 A, guild-lands.js):
   // its share more gold and materials from the creatures, on top of the
   // late class levels' part; on a trip each member's own, from its own loot.
@@ -981,7 +988,7 @@ export function simulateHunt(
         const item = randomItem(findLevel, lootRng, content, blessedLoot(loot, fights.length));
         entries.push({ t: event.t, type: 'find', item: take(item), text: say(texts, 'findChest', step, { item: itemName(item, content) }) });
       } else if (outcome === 'resource') {
-        const found = resourceBundle(area, rewards.findResourcePerLevel * findLevel * lootRng.float(0.5, 1.5) * (1 + fed.resources) * weekResources * late);
+        const found = resourceBundle(area, rewards.findResourcePerLevel * findLevel * lootRng.float(0.5, 1.5) * (1 + fed.resources) * spareResources * weekResources * late);
         for (const [id, amount] of found) resources[id] = (resources[id] ?? 0) + amount;
         const list = found.map(([id, amount]) => `${nameInText(content.resourcesById[id].name, content)} +${amount}`).join(', ');
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findResource', step, { resources: list }) });
@@ -1191,9 +1198,9 @@ export function simulateHunt(
 
   // On the way the character also gathers a little of the region's resources:
   // a steady amount for the time explored, at the place's middle level, so
-  // the camp does not wait for lucky finds; with the meal's and the week's
-  // share of them, as the finds'.
-  const gatheredTotal = rewards.gatherPerLevelHour * ((area.minLevel + area.maxLevel) / 2) * (endedAt / 3600000) * (1 + fed.resources) * weekResources * late;
+  // the camp does not wait for lucky finds; with the meal's, the side
+  // Siła's and the week's share of them, as the finds'.
+  const gatheredTotal = rewards.gatherPerLevelHour * ((area.minLevel + area.maxLevel) / 2) * (endedAt / 3600000) * (1 + fed.resources) * spareResources * weekResources * late;
   if (gatheredTotal >= 0.5) {
     const gathered = resourceBundle(area, gatheredTotal);
     for (const [id, amount] of gathered) resources[id] = (resources[id] ?? 0) + amount;

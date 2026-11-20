@@ -178,7 +178,10 @@ const MEMBERS = GUILDS.members;
 // The Encyklopedia's "Karty" (where CARDS is on), every land's cards.
 // The league of the Wojna (996): its trios, the evenings' results and the
 // fights, and "Jak to działa?", all opened.
+// The Statystyki's stats, each with what it gives now (the side stats'
+// lines too, 1218).
 const FOLDS = {
+  '#/postac/statystyki': '.stat-main[aria-expanded="false"]',
   '#/portale': '.portal-toggle[aria-expanded="false"]',
   '#/encyklopedia/cards': 'details.encyclopedia-fold:not([open]) > summary',
   '#/gildia/war': '.war details:not([open]) > summary',
@@ -238,8 +241,13 @@ const SHEETS = {
   '#/walka': [{ name: 'Tygodnie', tap: '.week-line', ready: '.week-card--now', words: true }],
   // A card of the starter deck in the Encyklopedia's "Karty": its sheet.
   '#/encyklopedia/cards': [{ name: 'karta', tap: '[data-guide="encyclopedia-card"]', ready: '.encyclopedia-card-sheet', words: true }],
-  // "Co nowego?" under the scroll in the top bar, with its long address.
-  '#/postac/statystyki': [{ name: 'Co nowego?', tap: '.topbar .news-button', ready: '.news-entries > .news-entry:first-child .news-text .news-link' }],
+  // "Parametry dodatkowe" (with the side stats, 1218), then, that sheet
+  // closed first (`anew`), "Co nowego?" under the scroll in the top bar,
+  // with its long address.
+  '#/postac/statystyki': [
+    { name: 'Parametry dodatkowe', tap: '.combat-extra', ready: `h2.sheet-title:text-is("${said('Parametry dodatkowe')}")`, words: true },
+    { name: 'Co nowego?', anew: true, tap: '.topbar .news-button', ready: '.news-entries > .news-entry:first-child .news-text .news-link' },
+  ],
   '#/postac': [
     { name: 'Ustawienia', tap: '.topbar .settings-button', ready: `h2.sheet-title:text-is("${said('Ustawienia')}")`, words: true },
     { name: 'Zgłoś błąd', tap: `#sheet button:text-is("${said('Zgłoś błąd')}")`, ready: `h2.sheet-title:text-is("${said('Zgłoś błąd')}")`, words: true },
@@ -638,6 +646,10 @@ async function main() {
         }
         for (const step of SHEETS[screen] ?? []) {
           trail.push(step.name);
+          if (step.anew) {
+            await view.locator('#sheet .sheet-close').click({ timeout: 5000 });
+            await view.locator('#sheet').waitFor({ state: 'hidden', timeout: 5000 });
+          }
           if (step.pick) await view.locator(step.pick).setInputFiles(picture, { timeout: 5000 });
           else if (step.fill) await view.locator(step.fill).fill(step.value, { timeout: 5000 });
           else await view.locator(step.tap).click({ timeout: 5000 });

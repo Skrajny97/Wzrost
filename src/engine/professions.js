@@ -53,9 +53,9 @@ export const professionXpToNext = (profession, level) => level * profession.leve
 
 // The profession after `minutes` of work, with the levels gained. At its top
 // level the XP stays at 0. `factor`: the share more (or less) of the XP of
-// the week the work began in (profession-xp, weeks.js), the XP rounded; the
-// XP gained (`gained`) for the report, where the week made it other than the
-// minutes.
+// the week the work began in (profession-xp, weeks.js) and of a side
+// Intelekt (side-stats.js), the XP rounded; the XP gained (`gained`) for
+// the report, where they made it other than the minutes.
 /**
  * @param {Profession} profession
  * @param {ProfessionState} state

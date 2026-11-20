@@ -32,9 +32,14 @@ const EFFECTS = [
   { key: 'dodge', label: 'unik', format: percentPoints },
   { key: 'crit', label: 'trafienie krytyczne', format: percentPoints },
   { key: 'effectResist', label: 'odporność na efekty', format: percentPoints },
+  // Intelekt the weapon does not use (poboczne statystyki, 1218), to every element.
+  { key: 'resist', label: 'odporność na żywioły', format: (v) => `+${formatNumber(v)}` },
   { key: 'speed', label: 'szybkość', format: (v) => `+${formatPrecise(v)}` },
   { key: 'recovery', label: 'odzysk HP po walce', format: percentPoints },
   { key: 'mana', label: 'maks. mana', format: (v) => `+${formatNumber(v)}` },
+  // Siła and Intelekt the weapon does not use, outside the fights (1218).
+  { key: 'resources', label: 'zasoby z wypraw', format: percentPoints },
+  { key: 'professionXp', label: 'doświadczenie profesji', format: percentPoints },
 ];
 
 function percentPoints(value) {
@@ -69,6 +74,32 @@ function openExtra(character) {
     armor.trait && t('cecha {name} +{share}%', { name: armor.trait.name, share: formatDecimal(armor.trait.share * 100) }),
     fromCore(armor.core),
   ].filter(Boolean);
+  // Poboczne statystyki (1218): Siła and Intelekt the weapon does not use,
+  // only those the character has, with the rule's numbers (preview.js).
+  const side = extra.side;
+  const rule = side?.rule;
+  const steps = rule && { step: formatDecimal(rule.step * 100), per: formatNumber(rule.per), cap: formatDecimal(rule.cap * 100) };
+  const sideRows = side
+    ? [
+        side.ids.includes('strength') &&
+          row(
+            t('Siła (poboczna)'),
+            formatNumber(side.strength),
+            t('+{hp} HP · +{share}% zasobów z wypraw', { hp: formatNumber(side.hp), share: formatDecimal(side.resources * 100) }),
+            t('Twoja broń jej nie używa: {hp} HP za punkt i +{step}% zasobów za każde {per} pkt, najwyżej +{cap}%.', { hp: formatDecimal(rule.strengthHp), ...steps }),
+          ),
+        side.ids.includes('intellect') &&
+          row(
+            t('Intelekt (poboczny)'),
+            formatNumber(side.intellect),
+            t('+{resist} do odporności na każdy żywioł · +{share}% doświadczenia profesji', { resist: formatNumber(side.resist), share: formatDecimal(side.professionXp * 100) }),
+            t('Twoja broń go nie używa: +1 do odporności za każde {resistPer} pkt i +{step}% doświadczenia profesji za każde {per} pkt, najwyżej +{cap}%.', {
+              resistPer: formatNumber(rule.intellectResistPer),
+              ...steps,
+            }),
+          ),
+      ].filter(Boolean)
+    : [];
   openSheet(
     h('h2', { class: 'sheet-title', text: t('Parametry dodatkowe') }),
     h('p', {
@@ -104,6 +135,7 @@ function openExtra(character) {
         ),
       ),
     ),
+    sideRows.length > 0 && group(t('Poboczne statystyki'), ...sideRows),
   );
 }
 

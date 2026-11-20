@@ -10,6 +10,7 @@ import {
   bagCapacity,
   campBonus,
   campLevels,
+  computeStats,
   gatheringMinutes,
   gatheringReport,
   herbHarvest,
@@ -22,6 +23,7 @@ import {
   workProfession,
   workXp,
   saleGold,
+  sideStats,
   weekFactor,
 } from '../engine/index.js';
 import { content } from './content.js';
@@ -65,19 +67,24 @@ export function addTo(column, amounts) {
 // jakby gracz robił te czynności. Tak, pamiętam pierwotne założenia, ale
 // wszystko ewoluuje.”); before, none of it. The profession's XP takes the
 // share of the week the work began in (profession-xp, weeks.js), kept with
-// it, the Awatar's as the character's. All of it is computed from the row
-// read, so a claim saves it only while the row is as read (workClaim).
+// it, the Awatar's as the character's, and the share more of a side
+// Intelekt (side-stats.js, 1218 D: Intelekt its weapons do not hit with),
+// as the character has it now, the Awatar's work's too. All of it is
+// computed from the row read, so a claim saves it only while the row is as
+// read (workClaim).
 export function workGains(player, profession, before, minutes, avatar, now) {
   const { row } = player;
   const character = engineCharacter(row);
+  const equipped = equippedItems(player);
   // The Awatar's share of the character's XP, and since 0.3.87 its whole
   // share of the profession's (avatar.professionShare, 1020.1: „Awatar z
   // pełnym doświadczeniem”).
   const share = avatar ? content().avatar.share : 1;
   const professionShare = avatar ? (content().avatar.professionShare ?? share) : 1;
   const week = weekFactor(keptWeek(workOf(player, avatar).activity?.options), 'profession-xp');
+  const spare = 1 + sideStats(character, computeStats(character, equipped, content()).totals, content()).professionXp;
   const worked = Math.round(minutes * professionShare);
-  const progress = workProfession(profession, before, worked, week);
+  const progress = workProfession(profession, before, worked, week * spare);
   // The report's XP of the profession (professionProgress) is what the work
   // gave: the Awatar's share too, not the minutes the report counts.
   const after = { ...progress, gained: progress.gained ?? worked };
@@ -85,7 +92,7 @@ export function workGains(player, profession, before, minutes, avatar, now) {
   const work = applyWork(character, xp, content());
   // A new level heals fully; otherwise resting simply goes on.
   const levelled = { ...character, level: work.level, xp: work.xp };
-  const hp = work.levelled ? playerCombatant({ character: levelled, equipped: equippedItems(player), name: row.name }, content()).maxHp : null;
+  const hp = work.levelled ? playerCombatant({ character: levelled, equipped, name: row.name }, content()).maxHp : null;
   const professions = { ...character.professions, [profession.id]: { level: after.level, xp: after.xp } };
   const sets = {
     sql: `, level = ?, xp = ?, time_points = time_points + ?, professions = ?${hp === null ? '' : ', hp = ?, hp_at = ?'}`,

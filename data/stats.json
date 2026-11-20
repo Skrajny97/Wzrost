@@ -3,7 +3,7 @@
     "id": "strength",
     "name": "Siła",
     "accusative": "Siłę",
-    "combat": "Obrażenia bronią ciężką.",
+    "combat": "Obrażenia bronią ciężką. Gdy Twoja broń jej nie używa: HP i więcej zasobów z wypraw.",
     "events": "Odsunięcie głazu, wyważenie wejścia."
   },
   {
@@ -31,7 +31,7 @@
     "id": "intellect",
     "name": "Intelekt",
     "accusative": "Intelekt",
-    "combat": "Moc zaklęć i broni magicznej.",
+    "combat": "Moc zaklęć i broni magicznej. Gdy Twoja broń go nie używa: odporność na żywioły i więcej doświadczenia profesji.",
     "events": "Odczytywanie run, rozpoznawanie nieznanych materiałów."
   },
   {

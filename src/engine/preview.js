@@ -10,6 +10,7 @@ import { gearKey, statWeightsOf } from './gear.js';
 import { cappedChance, reduction } from './formulas.js';
 import { upgradedItem } from './items.js';
 import { regenPerMinute } from './progression.js';
+import { sideStats } from './side-stats.js';
 import { computeStats } from './stats.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
@@ -20,6 +21,7 @@ import { computeStats } from './stats.js';
  *   speed: number, maxHp: number, mana: number, regen: number, recovery: number, skillPower: number, resist: Record<string, number> }} CombatValues
  */
 /** @typedef {'damage' | 'skillPower' | 'reduction' | 'dodge' | 'crit' | 'effectResist' | 'speed' | 'maxHp' | 'mana' | 'regen' | 'recovery'} ValueKey */
+/** @typedef {ValueKey | 'resist' | 'resources' | 'professionXp'} ShareKey */
 
 /**
  * @param {Character} character
@@ -63,8 +65,9 @@ export function combatValues(character, equipped, content) {
 // with its sources (the items, Wytrzymałość, and the evolution's trait that
 // raises it by a share), the chances with their caps, the crit's multiplier,
 // the speed, the HP at rest (with `rest`, the share the Ognisko adds, as the
-// character rests now) and after each fight, and each element's resistance,
-// with the share less of its damage a trait shelters from.
+// character rests now) and after each fight, each element's resistance,
+// with the share less of its damage a trait shelters from, and what its
+// side stats give (side-stats.js, 1218), with the rule's numbers.
 /**
  * @param {Character} character
  * @param {Item[]} equipped
@@ -116,22 +119,33 @@ export function extraValues(character, equipped, content, { rest = 0 } = {}) {
       const rating = unit.resist[id] ?? 0;
       return { id, name, rating, reduction: reduction(rating, level, balance), shelter: unit.shelter?.[id] ?? 0, core: core?.resist ?? 0 };
     }),
+    side: { ...sideStats(character, totals, content), rule: balance.sideStats },
   };
 }
 
 // For each stat, what its whole total gives now: the combat values as they
 // are against those with the stat at nothing (the author: „lepiej pisz ile
 // daja aktualne staty a nie jeden punkt”). Damage is a relative change (0.92
-// is +92%), everything else an absolute one.
+// is +92%), everything else an absolute one. A side stat (side-stats.js,
+// 1218) also its resistance to every element (`resist`, Intelekt's) and
+// its shares more of the explorations' resources (`resources`, Siła's) and
+// of the professions' XP (`professionXp`, Intelekt's); its HP is among the
+// combat values.
 /**
  * @param {Character} character
  * @param {Item[]} equipped
  * @param {Content} content
- * @returns {Record<string, Partial<Record<ValueKey, number>>>}
+ * @returns {Record<string, Partial<Record<ShareKey, number>>>}
  */
 export function statShares(character, equipped, content) {
   const now = combatValues(character, equipped, content);
   const { totals, sources } = computeStats(character, equipped, content);
+  const side = sideStats(character, totals, content);
+  /** @type {Record<string, Partial<Record<ShareKey, number>>>} */
+  const spare = {
+    strength: { ...(side.resources > 0 && { resources: side.resources }) },
+    intellect: { ...(side.resist > 0 && { resist: side.resist }), ...(side.professionXp > 0 && { professionXp: side.professionXp }) },
+  };
   /** @type {ValueKey[]} */
   const keys = ['damage', 'skillPower', 'reduction', 'dodge', 'crit', 'effectResist', 'speed', 'maxHp', 'mana', 'regen', 'recovery'];
   return Object.fromEntries(
@@ -139,13 +153,13 @@ export function statShares(character, equipped, content) {
       // The Rdzeń's share of a stat goes with the stat's other points.
       const points = { ...character.points, [stat]: (character.points[stat] ?? 0) - (totals[stat] - sources[stat].core) };
       const without = combatValues({ ...character, points }, equipped, content);
-      /** @type {Partial<Record<ValueKey, number>>} */
+      /** @type {Partial<Record<ShareKey, number>>} */
       const shares = {};
       for (const key of keys) {
         const share = key === 'damage' || key === 'skillPower' ? now[key] / without[key] - 1 : now[key] - without[key];
         if (Math.abs(share) > 1e-9) shares[key] = share;
       }
-      return [stat, shares];
+      return [stat, { ...shares, ...spare[stat] }];
     }),
   );
 }

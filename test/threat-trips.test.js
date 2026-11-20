@@ -94,8 +94,11 @@ describe('the companions\' explorations', () => {
 describe('the estimate against explorations as the game runs them', () => {
   // Realistic players of three levels with two companions each, two builds
   // of every class: the estimate for 1 and 4 hours within a few points of
-  // the share of 60 explorations of each build that end in a faint. Before
-  // 19.11.2026 the recursion alone showed a fraction of it.
+  // the share of 120 explorations of each build that end in a faint. Before
+  // 19.11.2026 the recursion alone showed a fraction of it. 120, not 60,
+  // since the side stats (1218): at level 100 the first 60 of each build
+  // came to 31.2% fainted against the estimate's 36.8%, while 240 of them
+  // come to 33.6%.
   for (const level of [50, 100, 300]) {
     test(`level ${level}: 1 and 4 hours`, () => {
       const rows = { 60: { estimate: 0, real: 0, before: 0 }, 240: { estimate: 0, real: 0, before: 0 } };
@@ -110,7 +113,7 @@ describe('the estimate against explorations as the game runs them', () => {
           for (const minutes of [60, 240]) {
             rows[minutes].estimate += chances[minutes];
             rows[minutes].before += before[minutes];
-            rows[minutes].real += simulated(one, minutes, 60, `${cls.id}:${level}:${build}`);
+            rows[minutes].real += simulated(one, minutes, 120, `${cls.id}:${level}:${build}`);
           }
           builds += 1;
         }
