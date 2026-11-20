@@ -3953,6 +3953,13 @@ Gracz (poz. 94), postać podobna do maga, której klasa rozdaje punkty w Intelek
 6. **Testy.** Nowe w `test/mana-wisdom-dexterity.test.js` (liczby w danych, premia Mądrości, mikstury w walce, ocena zagrożenia, Statystyki, koszty na wyprawie i w pojedynku, unik postaci i stworów). Zmienione liczby: `test/skills.test.js` (Potężny cios 82 i 13 many zamiast 41 i 10, pojedynki 41 i 10) i `test/evolutions.test.js` (żywiołak za 50% maks. many zamiast 25%). `test/third-evolution.test.js`: Kolos i Wybraniec Peruna mdleją w próbie 120 wypraw raz częściej niż ich drugie formy (10 wobec 9, 1 wobec 0), a w 600 wyprawach 6,3% wobec 8,7% i 0,2% wobec 0,0%, czyli to szum. Forma o jedną wyprawę gorsza jest więc mierzona jeszcze raz na 600 wyprawach i tam może być gorsza najwyżej o jedną; wyjątek Arcydruida (935 A) bez zmian.
 7. **Pliki:** `data/balance.json`, `data/schemas/balance.schema.json` (opisy nowych liczb), `data/stats.json`, `data/en/stats.json`, `data/en/strings.json`, `data/en/sources.json`, `src/engine/formulas.js`, `src/engine/combatant.js`, `src/engine/combat.js`, `src/engine/skills.js`, `src/engine/pvp-arena.js`, `src/engine/threat.js`, `src/engine/preview.js`, `src/server/brewing.js`, `src/client/screens/stats.js`.
 
+## Wersja 0.4.83 (20.11.2026): trening towarzyszy 10 razy dziennie
+
+Autor: „Daj też opcję trenowania towarzyszy nawet 10 razy dziennie jesli chodzi o wyższy poziom zbliżony do gracza” (20.11.2026).
+
+1. „Trenuj” w Kwaterach działa do 10 razy na dobę zadań narratora dla każdego towarzysza (`settlement.companions.training.perDay` 10 zamiast 3). Cena (25 złota razy poziom, na który wchodzi) i górna granica (poziom postaci −3) bez zmian, więc towarzysz szybciej dogoni postać, ale dalej nie wyżej niż 3 poziomy pod nią.
+2. Testy: `test/companions.test.js` liczy 10 treningów na dzień; test dwóch stuknięć naraz ma teraz jeden trening do końca dnia, tak jak wcześniej przy limicie 3.
+
 ## Wersja 0.4.82 (20.11.2026): raport Awatara z oprawiania także w trakcie wyprawy
 
 Według sekcji niżej (zgłoszenie gracza przez autora).

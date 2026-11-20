@@ -141,13 +141,13 @@ describe('companions in the engine', () => {
     assert.deepEqual([he.stays, companionStays(he), companionStays(he, true)], [undefined, false, true]);
   });
 
-  test('training: a level for 25 gold times the level it goes up to, three times a day, up to the character\'s level less three (829 B)', () => {
+  test('training: a level for 25 gold times the level it goes up to, ten times a day (from 20.11.2026; three before), up to the character\'s level less three (829 B)', () => {
     const { goldPerLevel, perDay, belowCharacter } = tuning.training;
-    assert.deepEqual([goldPerLevel, perDay, belowCharacter], [25, 3, 3]);
+    assert.deepEqual([goldPerLevel, perDay, belowCharacter], [25, 10, 3]);
     const [candidate] = drawCandidates({ character, seed: 's' }, NOW, content);
     const companion = { ...candidate, level: 50, xp: 1234 };
     // From 50 to 51: 1275 gold (the author's example, 829).
-    assert.deepEqual(companionTraining(companion, 60, NOW, content), { price: 1275, level: 51, cap: 57, left: 3, perDay: 3, below: 3, block: null });
+    assert.deepEqual(companionTraining(companion, 60, NOW, content), { price: 1275, level: 51, cap: 57, left: 10, perDay: 10, below: 3, block: null });
     // A level the same as one earned, its XP to the next from nothing, the
     // day's trainings counted.
     const day = questPeriod('daily', NOW, content).key;
@@ -155,12 +155,12 @@ describe('companions in the engine', () => {
     assert.deepEqual(trained.trained, { day, count: 1 });
     assert.deepEqual([trained.level, trained.xp, trained.trained.count], [51, 0, 1]);
     assert.deepEqual({ ...trained, level: 50, xp: 1234, trained: undefined }, { ...companion, trained: undefined });
-    trained = companionTrained(companionTrained(trained, NOW, content), NOW, content);
-    assert.deepEqual([trained.level, trained.trained], [53, { day, count: 3 }]);
-    assert.deepEqual(companionTraining(trained, 60, NOW, content), { price: 1350, level: 54, cap: 57, left: 0, perDay: 3, below: 3, block: 'day' });
-    // The next day three more.
-    const tomorrow = companionTraining(trained, 60, NOW + 86400000, content);
-    assert.deepEqual([tomorrow.left, tomorrow.block], [3, null]);
+    for (let more = 1; more < 10; more += 1) trained = companionTrained(trained, NOW, content);
+    assert.deepEqual([trained.level, trained.trained], [60, { day, count: 10 }]);
+    assert.deepEqual(companionTraining(trained, 80, NOW, content), { price: 1525, level: 61, cap: 77, left: 0, perDay: 10, below: 3, block: 'day' });
+    // The next day ten more.
+    const tomorrow = companionTraining(trained, 80, NOW + 86400000, content);
+    assert.deepEqual([tomorrow.left, tomorrow.block], [10, null]);
     assert.equal(companionTrained(trained, NOW + 86400000, content).trained.count, 1);
     // At the character's level less three, no more.
     assert.equal(companionTraining({ ...companion, level: 57 }, 60, NOW, content).block, 'cap');
@@ -782,7 +782,7 @@ describe('companions through the API', () => {
     await write(() => ({ level: 50, xp: 500 }));
     await database.prepare('UPDATE characters SET level = 60, gold = 1274').run();
     const before = (await settlement()).companions.hired[0];
-    assert.deepEqual(before.training, { price: 1275, level: 51, cap: 57, left: 3, perDay: 3, below: 3, block: null });
+    assert.deepEqual(before.training, { price: 1275, level: 51, cap: 57, left: 10, perDay: 10, below: 3, block: null });
     // Not enough gold: nothing changes.
     const poor = await train();
     assert.deepEqual([poor.status, poor.data.error.code, poor.data.error.message], [409, 'not_enough_gold', 'Brakuje złota na trening.']);
@@ -795,17 +795,19 @@ describe('companions through the API', () => {
     assert.deepEqual(first.data.trained, { name: candidate.name, level: 51, price: 1275 });
     assert.equal(first.data.character.gold, 10000 - 1275);
     let card = first.data.settlement.companions.hired[0];
-    assert.deepEqual([card.level, card.xp, card.training.price, card.training.left], [51, 0, 1300, 2]);
+    assert.deepEqual([card.level, card.xp, card.training.price, card.training.left], [51, 0, 1300, 9]);
     assert.ok(card.maxHp > before.maxHp, `${card.maxHp} > ${before.maxHp}`);
-    // Two more today, for 1300 and 1325; then the day's trainings are used.
+    // Two more today, for 1300 and 1325; seven of the day's ten left.
     assert.equal((await train()).status, 200);
     const third = await train();
     assert.equal(third.status, 200);
     card = third.data.settlement.companions.hired[0];
-    assert.deepEqual([card.level, card.training.left, card.training.block], [53, 0, 'day']);
+    assert.deepEqual([card.level, card.training.left, card.training.block], [53, 7, null]);
     assert.equal(third.data.character.gold, 10000 - 1275 - 1300 - 1325);
+    // With the day's ten used, no more today.
+    await write((companion) => ({ trained: { ...companion.trained, count: 10 } }));
     const fourth = await train();
-    assert.deepEqual([fourth.status, fourth.data.error.code, fourth.data.error.message], [409, 'trained_today', 'Dziś już 3 razy. Kolejny trening jutro.']);
+    assert.deepEqual([fourth.status, fourth.data.error.code, fourth.data.error.message], [409, 'trained_today', 'Dziś już 10 razy. Kolejny trening jutro.']);
     assert.equal((await stored()).companions[0].level, 53);
     // Another day: up to 57, the character's level less three, and no higher.
     await write((companion) => ({ level: 56, trained: { ...companion.trained, day: '2026-01-01' } }));
@@ -826,7 +828,8 @@ describe('companions through the API', () => {
     await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
     assert.equal((await train()).status, 200);
     await call('POST', '/api/hunts/cancel', { cookie });
-    // Two taps at once buy one level.
+    // Two taps at once with one training left today buy one level.
+    await write((companion) => ({ trained: { ...companion.trained, count: 9 } }));
     const gold = (await database.prepare('SELECT gold FROM characters').first()).gold;
     const taps = await Promise.all([train(), train()]);
     assert.deepEqual(taps.map((tap) => tap.status).sort(), [200, 409]);
