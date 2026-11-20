@@ -83,7 +83,7 @@ import { ApiError, errorResponse, json } from './http.js';
 import { englishOn, guildWarsOn, readFeatures, registrationOpen, settlementOn } from './features.js';
 import { language, pageDictionary, requestLanguage, runInLanguage, t } from './i18n.js';
 import { bidOnOffer, buyFromResident, buyOffer, cancelOffer, collectParcels, getMarket, getMarketLog, listOffer, settleMarket } from './market.js';
-import { cancelHunt, claimHunt, huntOptions, quickHunt, startHunt } from './hunts.js';
+import { cancelHunt, claimHunt, eatDish, huntOptions, quickHunt, startHunt } from './hunts.js';
 import { claimOrb } from './orbs.js';
 import { discardItem, equipItem, previewItem, sellItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
 import { markFavorite } from './favorites.js';
@@ -310,6 +310,8 @@ const routes = [
   ['POST', '/api/minerals/discard', discardMinerals],
   ['POST', '/api/pantry/sell', sellPantry],
   ['POST', '/api/pantry/discard', discardPantry],
+  // A dish eaten from the Spiżarnia, its meal at work at once (hunts.js).
+  ['POST', '/api/pantry/eat', eatDish],
   ['POST', '/api/avatar/buy', buyAvatar],
   ['POST', '/api/avatar/claim', claimAvatar],
   ['POST', '/api/avatar/cancel', cancelAvatar],

@@ -10,6 +10,7 @@
 import { areaArt } from '../area-art.js';
 import { dishSprite, landArt, materialSprite, monsterSprite, potionSprite } from '../art.js';
 import { bonusList } from '../bonuses.js';
+import { askMealSwap } from '../meal.js';
 import { leaveView as leaveHistoryView, openView as openHistoryView } from '../history.js';
 import { fill, h, icon, setTimer } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
@@ -67,8 +68,6 @@ const CHOICE_KEY = 'wzrost.hunt-choice';
 const POTION_KEY = 'wzrost.potion-choice';
 // The dish last chosen to eat as an exploration sets out (mealPicker).
 const MEAL_KEY = 'wzrost.meal-choice';
-// The server's words with their {name} gaps filled in.
-const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 // The kinds of potions taken as one choice from a list (959 B), with the
 // name of the row.
 const POTION_GROUPS = { heal: 'Leczenie', mana: 'Mana' };
@@ -1240,7 +1239,7 @@ export function mountCombat(container, { params, navigate }) {
               trackQuests: tracking(),
               trackUnknown: tracingUnknown(),
               ...(potions && { potions: potions.taken(), healBelow: potions.below() }),
-              ...(meal?.chosen() && { meal: meal.chosen(), mealReplaces: meal.replaces() }),
+              ...(meal?.chosen() && { meal: meal.chosen(), mealPortions: meal.portions(), mealReplaces: meal.replaces() }),
               ...(scouted && !along && { scout: scouted }),
               // The Trudna or the Piekielna, alone or the whole Drużyna's
               // trip (parties.js).
@@ -1286,7 +1285,7 @@ export function mountCombat(container, { params, navigate }) {
         trackQuests: tracking(),
         trackUnknown: tracingUnknown(),
         ...(potions && { potions: potions.taken(), healBelow: potions.below() }),
-        ...(meal?.chosen() && { meal: meal.chosen(), mealReplaces: meal.replaces() }),
+        ...(meal?.chosen() && { meal: meal.chosen(), mealPortions: meal.portions(), mealReplaces: meal.replaces() }),
         ...(scouted && { scout: scouted }),
       }));
 
@@ -1567,11 +1566,20 @@ export function mountCombat(container, { params, navigate }) {
   // zjedzenia innego posiłku i zmarnowania poprzedniego bonusu”): the
   // choice starts at keeping it, and another dish first asks, as the meal
   // at work would end with its bonus lost (hunts.js, mealAtStart).
-  // { element, chosen(): the dish's id or null, replaces(): the dish of the
-  // meal at work or null }, or null.
+  // Up to 3 portions of one dish at once (the author, 20.11.2026:
+  // „maksymalnie do 3 potraw jednego rodzaju na raz (i analogicznie dodane
+  // 3x procenty danej potrawy)”): how many to eat now with −/+, as many as
+  // the Spiżarnia has and the meal has room for, the meal at work's own
+  // dish on top of its portions; the line shows the meal they make.
+  // { element, chosen(): the dish's id or null, portions(): how many of it,
+  // replaces(): the meal at work, { dish, portions }, or null }, or null.
   function mealPicker(character) {
     const current = character.meal ?? null;
-    const dishes = (character.pantry ?? []).filter((good) => good.group === 'dish' && good.id !== current?.id);
+    // The portions of a dish the meal at work already has, and how many
+    // more of it can be eaten now (`stacks`: its meals, one to the most).
+    const had = (dish) => (dish && dish.id === current?.id ? current.portions : 0);
+    const room = (dish) => (dish ? Math.min(dish.count, dish.stacks.length - had(dish)) : 0);
+    const dishes = (character.pantry ?? []).filter((good) => good.group === 'dish' && room(good) > 0);
     if (dishes.length === 0) return null;
     let stored = null;
     try {
@@ -1580,31 +1588,36 @@ export function mountCombat(container, { params, navigate }) {
       // Without storage nothing is remembered.
     }
     let picked = current ? null : (dishes.find((dish) => dish.id === stored) ?? null);
+    let portions = 1;
+    // The meal a dish makes with `count` portions eaten now: its name and bonus.
+    const made = (dish, count) => dish.stacks[Math.min(dish.stacks.length, had(dish) + count) - 1];
     const art = (dish) => ((dish ?? current) && dishSprite((dish ?? current).id)) ?? icon('pot', { size: 24 });
-    // The dish's name over its bonuses and how many there are, which wrap;
-    // without one, the meal at work with its time left, or none.
-    const name = (dish) =>
+    // The meal's name over its bonuses and how many dishes there are, which
+    // wrap; without one, the meal at work with its time left, or none.
+    const name = (dish, count) =>
       dish
-        ? `${dish.name} · ${t('masz {count}', { count: dish.count })}`
+        ? `${made(dish, count).name} · ${t('masz {count}', { count: dish.count })}`
         : current
           ? `${t('Posiłek: {dish}', { dish: current.name })} · ${t('jeszcze {time} wypraw', { time: formatMinutes(current.left) })}`
           : t('Bez posiłku');
-    const line = (dish) => [
+    const line = (dish, count = 1) => [
       h('span', { class: 'potion-pick-art' }, art(dish)),
       h(
         'span',
         { class: 'meal-kind-text' },
-        h('span', { class: 'potion-kind-name', text: name(dish) }),
-        h('span', { class: 'potion-kind-meta cook-bonus', text: dish ? dish.bonus : (current?.bonus ?? t('bez premii')) }),
+        h('span', { class: 'potion-kind-name', text: name(dish, count) }),
+        h('span', { class: 'potion-kind-meta cook-bonus', text: dish ? made(dish, count).bonus : (current?.bonus ?? t('bez premii')) }),
       ),
     ];
-    // Another dish in place of the meal at work, once the player agrees.
-    const swap = (dish) =>
-      confirmAction({
-        title: current.swap.title,
-        text: filled(current.swap.text, { dish: dish.name, current: current.name, time: formatMinutes(current.left) }),
-        confirmLabel: current.swap.eat,
-      });
+    // How many portions of the dish picked, once more than one can be eaten.
+    const step = (sign) => {
+      portions = Math.max(1, Math.min(room(picked), portions + sign));
+      show();
+    };
+    const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('{name}: mniej', { name: t('Porcje') }), text: '−', onClick: () => step(-1) });
+    const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('{name}: więcej', { name: t('Porcje') }), text: '+', onClick: () => step(1) });
+    const value = h('output', { class: 'potion-pick-value' });
+    const portionsRow = h('div', { class: 'potion-pick', hidden: true }, h('span', { class: 'potion-pick-name', text: t('Porcje') }), less, value, more);
     const shown = h('span', { class: 'potion-kind-current' });
     const options = h('ul', { class: 'potion-kind-options', hidden: true, role: 'listbox', 'aria-label': t('Posiłek') });
     const setOpen = (open) => {
@@ -1613,7 +1626,13 @@ export function mountCombat(container, { params, navigate }) {
     };
     const toggle = h('button', { type: 'button', class: 'potion-kind', 'aria-expanded': 'false', 'aria-label': t('Posiłek'), onClick: () => setOpen(options.hidden) }, shown, h('span', { class: 'potion-kind-caret', 'aria-hidden': 'true', text: '▾' }));
     const show = () => {
-      shown.replaceChildren(...line(picked));
+      const most = room(picked);
+      portions = Math.max(1, Math.min(portions, most));
+      shown.replaceChildren(...line(picked, portions));
+      portionsRow.hidden = most < 2;
+      value.textContent = t('{count} z {all}', { count: portions, all: most });
+      less.disabled = portions <= 1;
+      more.disabled = portions >= most;
       options.replaceChildren(
         ...[null, ...dishes].map((dish) =>
           h(
@@ -1628,7 +1647,9 @@ export function mountCombat(container, { params, navigate }) {
                 'aria-selected': String((dish?.id ?? null) === (picked?.id ?? null)),
                 onClick: async () => {
                   setOpen(false);
-                  if (dish && current && dish.id !== picked?.id && !(await swap(dish))) return;
+                  // Another dish in place of the meal at work, once the player agrees.
+                  if (dish && current && dish.id !== current.id && dish.id !== picked?.id && !(await askMealSwap(current, dish))) return;
+                  if (dish?.id !== picked?.id) portions = 1;
                   picked = dish;
                   // The choice made with no meal at work is the one remembered.
                   if (!current) {
@@ -1655,10 +1676,17 @@ export function mountCombat(container, { params, navigate }) {
         { class: 'stack meal-picker' },
         h('p', { class: 'duration-title', text: t('Posiłek') }),
         h('div', { class: 'potion-kind-box' }, toggle, options),
-        h('p', { class: 'muted', text: t('Zjedzona potrawa działa przez 4 godziny wypraw. Nowa zastępuje poprzednią, a premia poprzedniej przepada.') }),
+        portionsRow,
+        h('p', {
+          class: 'muted',
+          text: t('Zjedzona potrawa działa przez 4 godziny wypraw. Tej samej potrawy możesz mieć naraz do {most} porcji: premie się sumują, a każda porcja przywraca pełny czas. Inna potrawa zastępuje poprzednią, a premia poprzedniej przepada.', {
+            most: dishes[0].stacks.length,
+          }),
+        }),
       ),
       chosen: () => picked?.id ?? null,
-      replaces: () => (picked && current ? current.id : null),
+      portions: () => (picked ? portions : 1),
+      replaces: () => (picked && current ? { dish: current.id, portions: current.portions } : null),
     };
   }
 

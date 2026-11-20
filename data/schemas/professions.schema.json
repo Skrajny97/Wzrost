@@ -2041,15 +2041,20 @@
           "type": "object",
           "additionalProperties": false,
           "required": [
-            "minutes"
+            "minutes",
+            "portions"
           ],
           "properties": {
             "minutes": {
               "type": "integer",
               "minimum": 1
+            },
+            "portions": {
+              "type": "integer",
+              "minimum": 1
             }
           },
-          "description": "Posiłek (999.5 v2): ile minut wypraw działa zjedzona potrawa."
+          "description": "Posiłek (999.5 v2): ile minut wypraw działa zjedzona potrawa i ile porcji jednej potrawy działa naraz (20.11.2026); ich premie się sumują, a każda zjedzona porcja przywraca pełny czas."
         },
         "bonuses": {
           "type": "object",

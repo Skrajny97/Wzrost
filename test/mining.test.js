@@ -79,7 +79,7 @@ describe('Górnictwo in the engine', () => {
     });
     // Both go on to the 200th (825), the mastery's reward kept from the 100th.
     const past = professionStats({ mining: { level: 150, xp: 0 }, jewelcrafting: { level: 200, xp: 0 } }, content);
-    assert.deepEqual([past.vitality, past.endurance, past.will, past.perception], [600, 600, 750, 750]);
+    assert.deepEqual([past.vitality, past.endurance, past.will, past.perception], [898, 898, 1148, 1148]);
     assert.deepEqual([mining.maxLevel, jewels.maxLevel, mining.masteryLevel, jewels.masteryLevel], [200, 200, 100, 100]);
   });
 

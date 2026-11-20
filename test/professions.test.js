@@ -71,21 +71,22 @@ describe('herbalism in the engine', () => {
   });
 
   test('level 1 gives no stats, each level after it its statPerLevel to Mądrość and Percepcja, and level 100 its maxLevelBonus more, kept to the 200th', () => {
-    // Three times what they were until 0.1.61 (the author, 5.11.2026: „Zwiększmy też bonus ze statystyk z Profesji x3”).
+    // Three times what they were until 0.1.61 (the author, 5.11.2026: „Zwiększmy też bonus ze statystyk z Profesji x3”),
+    // and +5 a level since 20.11.2026 (the author: „zwiększamy bonusy statystyk ze wszystkich Profesji do +5 na poziom”), the mastery's reward kept.
     const { statPerLevel: per, maxLevelBonus: bonus } = herbalism;
-    assert.deepEqual([per, bonus], [3, 153]);
+    assert.deepEqual([per, bonus], [5, 153]);
     assert.equal(professionStats({}, content).wisdom, 0);
     const third = professionStats({ herbalism: { level: 3, xp: 0 } }, content);
     assert.equal(third.wisdom, 2 * per);
     assert.equal(third.perception, 2 * per);
     assert.equal(professionStats({ herbalism: { level: 99, xp: 0 } }, content).wisdom, 98 * per);
     const master = professionStats({ herbalism: { level: 100, xp: 0 } }, content);
-    assert.deepEqual([master.wisdom, master.perception], [450, 450]);
+    assert.deepEqual([master.wisdom, master.perception], [648, 648]);
     // The levels past the 100th (825) go on adding statPerLevel, the mastery's reward kept.
     const wisdomAt = (level) => professionStats({ herbalism: { level, xp: 0 } }, content).wisdom;
-    assert.deepEqual([101, 150, 200].map(wisdomAt), [453, 600, 750]);
+    assert.deepEqual([101, 150, 200].map(wisdomAt), [653, 898, 1148]);
     const top = professionStats({ herbalism: { level: 200, xp: 0 } }, content);
-    assert.deepEqual([top.wisdom, top.perception], [750, 750]);
+    assert.deepEqual([top.wisdom, top.perception], [1148, 1148]);
     const character = newCharacter('warrior', { professions: { herbalism: { level: 4, xp: 0 } } });
     const { sources, totals } = computeStats(character, [], content);
     assert.equal(sources.perception.professions, 3 * per);

@@ -3847,6 +3847,38 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Posiłki: do 3 porcji jednej potrawy (20.11.2026)
+
+Autor: „Dajemy możliwość stackowania bonusów z potraw, bo Gotowanie dużej ilości potraw jest bezsensowne maksymalnie do 3 potraw jednego rodzaju na raz (i analogicznie dodane 3x procenty danej potrawy)” (20.11.2026). Rozwija „Zmianę posiłku w trakcie działania” (0.4.73).
+
+1. **Zasada.** Naraz działa jedna potrawa, ale do 3 jej porcji (`cooking.meal.portions`). Premie porcji się sumują: 2 porcje dają 2 razy, a 3 porcje 3 razy każdą premię potrawy, także punkty procentowe szansy na rzadszy przedmiot.
+2. **Czas (brakujący szczegół).** Każda zjedzona porcja przywraca posiłkowi pełne 4 godziny wypraw, a wszystkie porcje mają jeden wspólny czas i kończą się razem.
+3. **Wybór.** W „Opcjach wyprawy” pod wybraną potrawą stoi „Porcje” z −/+ jak przy miksturach: ile porcji postać zje przy wyruszeniu, najwyżej tyle, ile jest w Spiżarni i ile zmieści się do 3. Rząd widać, gdy można zjeść więcej niż jedną. Linia potrawy pokazuje posiłek, który wyjdzie („Żurek ×3 · masz 5” z premią razy 3). Brakujący szczegół: liczba porcji nie zapisuje się w przeglądarce i po zmianie potrawy wraca do 1.
+4. **Ta sama potrawa** jest na liście także przy działającym posiłku i dokłada porcje bez pytania, bo nic nie przepada. Przy 3 porcjach znika z listy, a gra odmawia: „Posiłek: Żurek ×3, jeszcze 3 h wypraw. Jednej potrawy możesz mieć naraz najwyżej 3 porcje.”
+5. **Inna potrawa** zastępuje posiłek po pytaniu, jak w 0.4.73, a przepadają wszystkie jego porcje („Obecny posiłek (Żurek ×2) przestanie działać…”).
+6. **Bez zmian:** wyprawa ma posiłek, z którym wyruszyła; odwołanie oddaje wszystkie zjedzone porcje i przywraca poprzedni posiłek; na wyprawie Drużyny każdy ma swój posiłek. Strona podaje posiłek, który widziała, z porcjami (`mealReplaces: { dish, portions }`); inny albo z inną liczbą porcji daje zwykłe „Postać zmieniła się w międzyczasie”.
+7. **Gdzie widać:** „Posiłek: Żurek ×2 · jeszcze 3 h 40 min wypraw” i premia razy 2 w „Aktywnych bonusach”, w Spiżarni, w „Opcjach wyprawy” i w raporcie („Posiłek (Żurek ×2) działał przez 1 h tej wyprawy: +24% XP z wyprawy, …”). Zagrożenie liczy same walki, na które posiłek nie wpływa, więc bez zmian.
+8. **Jedzenie ze Spiżarni.** Autor: „Pozwól zjeść posiłek z pozycji plecaka może? To ułatwi sprawę” (20.11.2026). Karta potrawy w Spiżarni ma „Porcje” z −/+ i „Zjedz”, z posiłkiem, który wyjdzie („Posiłek: Żurek ×2, …, przez 4 godziny wypraw.”). Zasady jak przy wyruszaniu: ta sama potrawa dokłada porcje do 3 i przywraca pełny czas, inna zastępuje posiłek po tym samym pytaniu, a nieaktualna strona albo dwa stuknięcia dają „Postać zmieniła się w międzyczasie”. Nie na wyprawie, także z Drużyną: „Zjesz po powrocie z wyprawy.” (a po jej końcu „Odbierz raport”), więc wyprawa ma swój posiłek, a odwołanie dalej oddaje to, co zjadła przy wyruszeniu. Czas posiłku liczą tylko wyprawy, więc zjedzenie wcześniej nic nie marnuje. Tak członek Drużyny je przed jej wyprawą, a jego posiłek obejmuje wyprawę jak dotąd; przy wyruszeniu członkowie dalej nic nie jedzą, a „Opcje wyprawy” prowadzącego zostają. „Aktywne bonusy” i linia posiłku pokazują wynik od razu (`POST /api/pantry/eat`, `eatDish` w `src/server/hunts.js`; karta w `src/client/screens/character.js`, pytanie w `src/client/meal.js`).
+9. **Granice (sprawdzone, bez nowego limitu):** szansa na rzadszy przedmiot i tak zatrzymuje się na 99,9% (`rollRarity`), a trzy porcje dają najwyżej +24 pkt proc. (Zupa ze Świtezi); szansa na kartę czempiona dochodzi najwyżej do 85% (25% razy 1 + 3 × 80%, Uczta Mokoszy). Test pilnuje tego dla każdej potrawy.
+10. **Pliki:** dane `cooking.meal.portions`, `texts.mealFull`, `texts.portions` (zamiast `mealActive`) i `texts.eatAway` oraz `about`, po angielsku w `data/en/`; `src/engine/cooking.js`, `src/server/hunts.js` (`mealAtStart`, `cancelHunt`), `src/server/professions-view.js` (`stacks` potraw), `src/client/screens/combat.js` (`mealPicker`); testy w `test/cooking.test.js`.
+
+## Profesje: +5 do statystyki na poziom (20.11.2026)
+
+Autor: „Do tego zwiększamy bonusy statystyk ze wszystkich Profesji do +5 na poziom” (20.11.2026).
+
+1. Każdy poziom każdej z ośmiu profesji daje +5 do obu jej statystyk zamiast +3 (`statPerLevel`), także za poziomy zdobyte wcześniej, bo statystyki wynikają z poziomu.
+2. **Nagroda za opanowanie (brakujący szczegół):** 100. poziom dokłada dalej 153, bo autor mówił o premii na poziom. Opanowana profesja daje 648 do każdej ze swoich statystyk zamiast 450, a 200. poziom 1148 zamiast 750.
+3. **Słowa:** gra bierze liczby z danych („Zdobyto Mądrość: +5”, karta profesji, „Parametry”), więc nowych tekstów nie ma.
+4. **O ile silniej** (typowa postać z `tools/simulate.mjs`, średnia pięciu klas, wszystkie osiem profesji na jednym poziomie, więc każda statystyka ma dwie profesje):
+
+    | Profesje | Postać | Każda statystyka | HP | Obrażenia | HP × obrażenia |
+    |---|---|---|---|---|---|
+    | 10. poziom | 30. poziom | +54 → +90 | +16% | +2,4% | +19% |
+    | 30. poziom | 60. poziom | +174 → +290 | +22% | +3,2% | +26% |
+    | 50. poziom | 100. poziom | +294 → +490 | +23% | +3,2% | +27% |
+
+    Jedna profesja daje połowę tego przyrostu, i to tylko w swoich dwóch statystykach. Testy porównujące klasy i ewolucje biorą typowe postacie bez profesji, więc się nie zmieniły.
+
 ## Wersja 0.4.73 (20.11.2026): zmiana posiłku w trakcie działania
 
 Według sekcji niżej, bez makiet (okno pytania w stylu gry na istniejącym ekranie).
