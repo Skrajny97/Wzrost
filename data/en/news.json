@@ -1268,6 +1268,10 @@
     "0.4.83": {
       "title": "Version 0.4.83",
       "body": "- Quarters: you can now train a companion up to 10 times a day instead of 3 (still up to your character's level −3), so it catches up with your character faster."
+    },
+    "0.4.84": {
+      "title": "Version 0.4.84",
+      "body": "- Party members (other than the leader) now take their own healing and mana potions on party trips. Choose them under Community › Party, in “Potions for party trips”. They are taken from your bag when the leader sends the party out, and those not drunk come back."
     }
   }
 }

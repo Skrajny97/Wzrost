@@ -3901,6 +3901,10 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Wersja 0.4.84 (20.11.2026): mikstury członków drużyny
+
+Według sekcji niżej, bez makiet (autor: „Wdrażaj od razu, szkoda Twoich zasobów na makiety”). Migracja 0168 (`characters.party_potions`).
+
 ## Mikstury członków drużyny (20.11.2026)
 
 Autor: „Powinna byc opcja zabierania przez reszte drużyny jakos mikstur zdrowia i many” (20.11.2026). Dotąd na wyprawę Drużyny szły tylko mikstury lidera, z jego „Opcji wyprawy”. Bez makiet (autor zwolnił z nich drobne zmiany GUI).
