@@ -1535,6 +1535,11 @@
       "id": "0.4.72",
       "title": "Wersja 0.4.72",
       "body": "- Na ekranie Walki pojawia się pasek „Gildia czeka na pomoc”: jednym stuknięciem w „Pomóż wszystkim” pomożesz członkom gildii przy ich budowach i pracy."
+    },
+    {
+      "id": "0.4.73",
+      "title": "Wersja 0.4.73",
+      "body": "- Posiłek zmienisz teraz także w trakcie działania: przy wyruszaniu wybierz inną potrawę, a gra zapyta, czy na pewno. Poprzedni posiłek przestanie działać, a jego premia przepadnie."
     }
   ]
 }
