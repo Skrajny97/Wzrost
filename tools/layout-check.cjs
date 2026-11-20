@@ -8,7 +8,9 @@
 // Kwatery, with its five
 // places for items and amulets of big numbers in the bag for "Załóż z
 // plecaka" (one worn by the companion), a sword at +10 with three of the
-// Zaklinaczka's stars, the Osada's residents at several standings of the
+// Zaklinaczka's stars, an item of the longest name with a gem in it and
+// gems by the hundred thousand for Jubilerstwo's „Oprawianie” and its "Z
+// plecaka" (20.11.2026), the Osada's residents at several standings of the
 // relation (one at the top in seven digits), on an account with the longest login and gold in
 // billions in its Skrzynia Konta (its sheet "Wyjmij złoto" with all of it, and
 // with too much typed). The bag
@@ -73,6 +75,7 @@ const SCREENS = [
   '#/postac/rdzen',
   '#/postac/rdzen/skrytka',
   '#/profesje',
+  '#/profesje/jubilerstwo',
   '#/oboz',
   '#/oboz/craft-table',
   '#/oboz/anvil',
@@ -126,6 +129,7 @@ const TRANSLATED = new Set([
   '#/postac/rdzen',
   '#/postac/rdzen/skrytka',
   '#/profesje',
+  '#/profesje/jubilerstwo',
   '#/oboz',
   '#/oboz/craft-table',
   '#/oboz/anvil',
@@ -213,6 +217,9 @@ const TABS = {
     { name: 'Zaznacz do sprzedaży', tap: '[data-guide="bag-pick"]' },
     { name: 'Zaznacz do sprzedaży › zaznaczony', tap: '.bag--sale .salvage-pick:not(.salvage-pick--favorite)' },
   ],
+  // Jubilerstwo's „Oprawianie”: the figure and „Z plecaka” under it
+  // (20.11.2026).
+  '#/profesje/jubilerstwo': [said('Oprawianie')],
 };
 // Sheets opened over a screen after its tabs, each from the one before (a
 // tap on `tap`, a picture given to the file field `pick`, or `value` typed
@@ -228,6 +235,9 @@ const SHEETS = {
     { name: 'Załóż z plecaka', tap: `button:text-is("${said('Załóż z plecaka')}")`, ready: '.item-list:has(.wear-choice)', words: true },
     { name: 'porównanie', tap: '#sheet .item-list > li:first-child .wear-choice > summary', ready: '.wear-choice[open] .compare', words: true },
   ],
+  // The sheet of the first item of „Z plecaka” in „Oprawianie” (the tab
+  // TABS opens, 20.11.2026): the item of the longest name, with a gem in it.
+  '#/profesje/jubilerstwo': [{ name: 'Oprawianie › z plecaka', tap: '.set-bag .item-list > li:first-child > .set-bag-row', ready: '.set-chosen', words: true }],
   // "Wyjmij złoto" in the Skrzynia Konta (19.11.2026): the chest's gold in
   // billions, all of it with "Wszystko" (the button's longest words), then
   // more than there is typed, with the line that says so.
@@ -497,6 +507,28 @@ async function main() {
   // Przyjaciel and the sołtys's below Znajomy.
   const starred = JSON.stringify({ base: 'karabela', slot: 'weapon', level: 146, rarity: 'legendary', upgrade: 10, stars: 3, damage: { min: 98765, max: 123456 }, affixes: [{ id: 'bear', kind: 'prefix', stat: 'strength', value: 9876 }] });
   sql(`INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, '${starred}', 1 FROM characters WHERE name = '${name}'`);
+  // Jubilerstwo's „Oprawianie” (20.11.2026): the longest name an item gets
+  // („Czarnoksięski Ząb Smoka Wawelskiego Wielkiego Kleszcza +10”, its stars
+  // after it), divine with a Rubin in it, the first in „Z plecaka”, and the
+  // gems by the hundred thousand at the profession's last level, which
+  // shows them all.
+  const longest = JSON.stringify({
+    base: 'wawel-dragon-tooth',
+    slot: 'offhand',
+    level: 146,
+    rarity: 'divine',
+    upgrade: 10,
+    stars: 3,
+    gem: 'ruby',
+    implicit: { stat: 'dexterity', value: 123456 },
+    affixes: [
+      { id: 'bear', monster: 'black-grimoire', kind: 'prefix', stat: 'dexterity', value: 98765 },
+      { id: 'aurochs', monster: 'tick', kind: 'suffix', stat: 'strength', value: 87654 },
+    ],
+  });
+  sql(`INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, '${longest}', 1 FROM characters WHERE name = '${name}'`);
+  const gems = { quartz: 123456, agate: 234567, amethyst: 345678, emerald: 456789, sapphire: 567890, ruby: 678901, diamond: 987654 };
+  sql(`UPDATE characters SET minerals = '${JSON.stringify(gems)}', professions = json_set(COALESCE(professions, '{}'), '$.jewelcrafting', json('{"level":200,"xp":0}')) WHERE name = '${name}'`);
   const relations = { enchantress: 760, gamehost: 180, herbalist: 699, merchant: 1234567, innkeeper: 1399, headman: 30 };
   const setRelations = Object.entries(relations)
     .map(([resident, points]) => `'$.${resident}', ${points}`)
