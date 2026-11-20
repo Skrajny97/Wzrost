@@ -3915,6 +3915,13 @@ Autor: „Powinna byc opcja zabierania przez reszte drużyny jakos mikstur zdrow
 8. **Pliki:** `migrations/0168_party_potions.sql`, `src/server/parties.js` (`partyPotionsOf`, `memberPotion`, `memberPotions`, `setPartyPotions`, `setOut`, `partyView`), `src/server/index.js`, `src/server/content.js`, `src/engine/combat.js` (`drinkers`), `src/engine/hunt.js`, `src/client/screens/party.js` (`potionsRubric`), `src/client/styles.css` (`.party-potions`; poniżej 360 px bez obrazków mikstur, żeby nazwy miały miejsce), `data/community.json`, `data/schemas/community.schema.json`, `data/en/community.json`, `data/en/sources.json`. Testy: `test/party-potions.test.js` (członek z wyborem: zabranie z plecaka przy wyruszeniu, picie w walkach wyprawy, zwrot niewypitych i linia raportu; członek bez wyboru nic nie bierze; krótsza wyprawa i pusty plecak; lider bez zmian, także po przekazaniu przywództwa; sprawdzanie API).
 9. **Układ.** `tools/layout-check.cjs` nie otwiera karty Drużyny (jego postać nie jest w drużynie), więc kartę z rubryką sprawdził osobny, jednorazowy skrypt z tym samym sprawdzeniem: członek z dziewięcioma rodzajami mikstur w setkach tysięcy, długie imię, po polsku i po angielsku, na dziewięciu rozmiarach ekranu (320–430 px, 768, 1366 i 1920 px). Bez przewijania na boki, bez tekstu poza ramkami, wszystkie przyciski w karcie, bez błędów strony; dotknięcie „+” zapisało wybór na serwerze.
 
+## Wersja 0.4.83 (20.11.2026): trening towarzyszy 10 razy dziennie
+
+Autor: „Daj też opcję trenowania towarzyszy nawet 10 razy dziennie jesli chodzi o wyższy poziom zbliżony do gracza” (20.11.2026).
+
+1. „Trenuj” w Kwaterach działa do 10 razy na dobę zadań narratora dla każdego towarzysza (`settlement.companions.training.perDay` 10 zamiast 3). Cena (25 złota razy poziom, na który wchodzi) i górna granica (poziom postaci −3) bez zmian, więc towarzysz szybciej dogoni postać, ale dalej nie wyżej niż 3 poziomy pod nią.
+2. Testy: `test/companions.test.js` liczy 10 treningów na dzień; test dwóch stuknięć naraz ma teraz jeden trening do końca dnia, tak jak wcześniej przy limicie 3.
+
 ## Wersja 0.4.82 (20.11.2026): raport Awatara z oprawiania także w trakcie wyprawy
 
 Według sekcji niżej (zgłoszenie gracza przez autora).

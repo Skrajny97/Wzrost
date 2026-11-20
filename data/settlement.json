@@ -695,9 +695,9 @@
     "thirdTraitChance": 0.25,
     "xpCost": 0.03,
     "training": {
-      "$comment": "Trening towarzysza w Kwaterach (odpowiedź autora 829 B, 11.11.2026; src/engine/companions.js, companionTraining): przycisk „Trenuj” podnosi poziom towarzysza o jeden za goldPerLevel złota razy poziom, na który wchodzi (z 50. na 51. to 1275 zł), najwyżej perDay razy na dobę zadań narratora (od północy czasu polskiego) dla każdego towarzysza, tylko do poziomu postaci minus belowCharacter i nie wtedy, gdy towarzysz jest na wyprawie. Poziom z treningu jest taki sam jak z wypraw: liczby i umiejętności idą za poziomem, a XP do kolejnego poziomu liczy się od zera.",
+      "$comment": "Trening towarzysza w Kwaterach (odpowiedź autora 829 B, 11.11.2026; src/engine/companions.js, companionTraining): przycisk „Trenuj” podnosi poziom towarzysza o jeden za goldPerLevel złota razy poziom, na który wchodzi (z 50. na 51. to 1275 zł), najwyżej perDay razy na dobę zadań narratora (od północy czasu polskiego) dla każdego towarzysza, tylko do poziomu postaci minus belowCharacter i nie wtedy, gdy towarzysz jest na wyprawie. Od 20.11.2026 10 razy zamiast 3 (autor: „Daj też opcję trenowania towarzyszy nawet 10 razy dziennie jesli chodzi o wyższy poziom zbliżony do gracza”). Poziom z treningu jest taki sam jak z wypraw: liczby i umiejętności idą za poziomem, a XP do kolejnego poziomu liczy się od zera.",
       "goldPerLevel": 25,
-      "perDay": 3,
+      "perDay": 10,
       "belowCharacter": 3
     },
     "names": {
