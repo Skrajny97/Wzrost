@@ -3847,6 +3847,10 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.75 (20.11.2026): porcje posiłków, jedzenie ze Spiżarni, profesje +5
+
+Według dwóch sekcji niżej, bez makiet (autor: „Wdrażaj od razu, szkoda Twoich zasobów na makiety”): „Porcje” z −/+ w „Opcjach wyprawy” i na karcie potrawy w Spiżarni, w stylu istniejących rzędów mikstur.
+
 ## Posiłki: do 3 porcji jednej potrawy (20.11.2026)
 
 Autor: „Dajemy możliwość stackowania bonusów z potraw, bo Gotowanie dużej ilości potraw jest bezsensowne maksymalnie do 3 potraw jednego rodzaju na raz (i analogicznie dodane 3x procenty danej potrawy)” (20.11.2026). Rozwija „Zmianę posiłku w trakcie działania” (0.4.73).
