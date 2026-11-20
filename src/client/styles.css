@@ -5401,6 +5401,107 @@ a.camp-level-button {
   gap: 8px;
 }
 
+/* The account's gold in the Skrzynia Konta (19.11.2026): the coin, the
+   gold in the chest over the character's own, and "Włóż" and "Wyjmij" in
+   one row; in a narrow card (a phone) the buttons go under the numbers,
+   each half of the row. */
+.chest-gold {
+  container: chest-gold / inline-size;
+}
+
+.chest-gold-inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 12px;
+}
+
+.chest-gold-art .sprite {
+  width: 32px;
+  height: 32px;
+}
+
+.chest-gold-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.chest-gold-amount {
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.chest-gold-actions {
+  display: flex;
+  gap: 8px;
+}
+
+@container chest-gold (max-width: 439px) {
+  .chest-gold-inner {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .chest-gold-actions {
+    grid-column: 1 / -1;
+  }
+
+  .chest-gold-actions .button {
+    flex: 1 1 0;
+  }
+}
+
+/* Its sheets: both numbers, then the field over the quick amounts, which
+   share the row's width ("Wszystko" keeps its word in one line). */
+.chest-gold-both {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.chest-gold-field {
+  display: grid;
+  gap: 6px;
+}
+
+.chest-gold-field .chest-gold-number {
+  width: 100%;
+}
+
+.chest-gold-quicks {
+  display: flex;
+  gap: 6px;
+}
+
+.chest-gold-quicks .chest-gold-quick {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 6px 2px;
+  font-family: var(--font-system);
+  font-size: 13px;
+  line-height: 1.15;
+}
+
+.chest-gold-quicks .chest-gold-quick--all {
+  flex: 0 0 auto;
+  padding: 6px 8px;
+  white-space: nowrap;
+}
+
+.chest-gold-warn {
+  margin: 0;
+}
+
+.chest-gold-warn[hidden] {
+  display: none;
+}
+
 /* The padlock on the Skrzynia Konta below its level (843). */
 .camp-chest-lock {
   position: absolute;

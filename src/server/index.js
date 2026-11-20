@@ -98,7 +98,7 @@ import { pushKey, sendNotifications, subscribePush, testPush, unsubscribePush } 
 import { claimAllQuests, claimQuest, openChest, rerollQuests } from './quests.js';
 import { getReport, listReports } from './reports.js';
 import { learnSkill, raiseSkill } from './skills.js';
-import { getChest, putGoodsInChest, putInChest, takeFromChest, takeGoodsFromChest } from './chest.js';
+import { getChest, putGoldInChest, putGoodsInChest, putInChest, takeFromChest, takeGoldFromChest, takeGoodsFromChest } from './chest.js';
 import {
   backFromTest,
   chooseTestEvent,
@@ -215,6 +215,9 @@ const routes = [
   // minerals and the camp's resources.
   ['POST', '/api/chest/goods/put', putGoodsInChest],
   ['POST', '/api/chest/goods/take', takeGoodsFromChest],
+  // The account's gold in it (19.11.2026): one number for the account.
+  ['POST', '/api/chest/gold/put', putGoldInChest],
+  ['POST', '/api/chest/gold/take', takeGoldFromChest],
   ['POST', '/api/character/points', spendPoints],
   ['POST', '/api/character/points/auto', autoPoints],
   ['POST', '/api/character/points/reset', resetPoints],

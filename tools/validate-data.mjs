@@ -533,6 +533,10 @@ function checkReferences(data) {
     errors.push(`camp.json: minutes.levels muszą mieć po jednym czasie na poziom (${data.camp.maxLevel}) i rosnąć`);
   }
   if (data.camp.startLevel >= data.camp.maxLevel) errors.push('camp.json: startLevel musi być niższy niż maxLevel');
+  // The gold's quick amounts in the Skrzynia Konta stand in a row by size,
+  // each one more than the last.
+  const goldQuick = data.camp.chest.gold.quick;
+  if (goldQuick.some((amount, i) => i > 0 && amount <= goldQuick[i - 1])) errors.push('camp.json: chest.gold.quick muszą rosnąć');
   if (data.buildings.some((building) => building.id === data.camp.id)) errors.push(`buildings.json: id "${data.camp.id}" należy do obozu`);
   for (const building of data.buildings) {
     const { effect } = building;

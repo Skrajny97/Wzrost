@@ -53,6 +53,36 @@
       "noGold": "Brakuje złota na Zbieracza Systemu."
     }
   },
+  "chest": {
+    "$comment": "Skrzynia Konta (src/server/chest.js, src/client/screens/chest.js). gold: złoto w skrzyni (DECISIONS.md, „Złoto w Skrzyni Konta (19.11.2026)”; autor: „dorób złoto możliwe do przenoszenia miedzy postaciami w skrzyni konta”), jedna liczba na całe konto. Każda postać konta od poziomu skrzyni (balance.account.chestLevel) wkłada do niej swoje złoto i wyjmuje je do siebie, w dowolnej kwocie do tego, co jest, bez opłaty i limitu. quick: szybkie kwoty w okienku „Włóż złoto” i „Wyjmij złoto”, rosnąco, obok „Wszystko” (texts.all). texts: słowa wiersza złota, okienek i odpowiedzi gry; {gold} wypełnia gra liczbą złota. errors: odmowy serwera (texts.errors.notEnough i notInChest pokazuje też okienko, gdy wpisana kwota jest za duża).",
+    "gold": {
+      "quick": [1000, 10000, 100000],
+      "texts": {
+        "title": "Złoto w skrzyni",
+        "own": "Twoje złoto: {gold}",
+        "inChest": "W Skrzyni Konta: {gold}",
+        "put": "Włóż",
+        "take": "Wyjmij",
+        "putTitle": "Włóż złoto",
+        "takeTitle": "Wyjmij złoto",
+        "putText": "Włożone złoto czeka w Skrzyni Konta na każdą postać tego konta.",
+        "takeText": "Wyjęte złoto trafi do postaci, którą teraz grasz.",
+        "amount": "Ile złota",
+        "all": "Wszystko",
+        "putButton": "Włóż {gold} złota",
+        "takeButton": "Wyjmij {gold} złota",
+        "putDone": "{gold} złota w Skrzyni Konta.",
+        "takeDone": "{gold} złota u postaci.",
+        "errors": {
+          "invalid": "Wpisz całą liczbę złota, od 1 w górę.",
+          "none": "Nie masz złota.",
+          "notEnough": "Masz tylko {gold} złota.",
+          "empty": "W Skrzyni Konta nie ma złota.",
+          "notInChest": "W Skrzyni Konta jest tylko {gold} złota."
+        }
+      }
+    }
+  },
   "fortress": {
     "id": "fortress",
     "name": "Warownia",
