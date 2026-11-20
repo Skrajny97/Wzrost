@@ -1040,12 +1040,15 @@ export function simulateHunt(
     const hpBefore = me.hp;
     for (const fighter of fighters) fighter.hp = /** @type {Record<string, any>} */ (fight.units.find((unit) => unit.id === fighter.unit.id)).hp;
     for (const mate of fighting) mate.hp = Math.max(0, /** @type {Record<string, any>} */ (fight.units.find((unit) => unit.id === mate.unit.id)).hp);
-    // A potion drunk is the one player's that carries it (on a trip, the leader's).
-    for (const id of fight.drunk) {
-      const drinker = fighters.find((/** @type {any} */ fighter) => (fighter.left[id] ?? 0) > 0) ?? me;
+    // A potion drunk is the one player's that drank it (combat.js:
+    // `drinkers`): on a trip each takes its own along, the members too since
+    // 20.11.2026 (parties.js), so two may carry the same potion. Before, only
+    // the leader's went, and the first player carrying it paid for it.
+    fight.drunk.forEach((/** @type {string} */ id, /** @type {number} */ index) => {
+      const drinker = fighters.find((/** @type {any} */ fighter) => fighter.unit.id === fight.drinkers[index]) ?? me;
       drinker.left[id] = (drinker.left[id] ?? 0) - 1;
       drinker.potionsUsed[id] = (drinker.potionsUsed[id] ?? 0) + 1;
-    }
+    });
 
     // Every fight keeps what its playback needs: the sides and the events.
     /** @type {Record<string, any>} */

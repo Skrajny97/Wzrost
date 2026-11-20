@@ -1590,6 +1590,11 @@
       "id": "0.4.83",
       "title": "Wersja 0.4.83",
       "body": "- Kwatery: towarzysza wytrenujesz teraz do 10 razy dziennie zamiast 3 (dalej najwyżej do poziomu postaci −3), więc szybciej dogoni Twoją postać."
+    },
+    {
+      "id": "0.4.84",
+      "title": "Wersja 0.4.84",
+      "body": "- Członkowie drużyny (poza liderem) zabierają teraz na wyprawę drużyny własne mikstury leczenia i many. Wybierz je w Społeczność › Drużyna, w rubryce „Mikstury na wyprawę drużyny”. Gra zabierze je z plecaka, gdy lider wyśle drużynę, a niewypite wrócą."
     }
   ]
 }
