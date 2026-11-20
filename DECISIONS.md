@@ -3847,6 +3847,66 @@ Dane trzech krain z 1088 B i 1096 są w grze bez grafik i okrzyków (te dojdą o
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.4.77 (20.11.2026): poszukiwani niżej, wpisywanie punktów w „Rozdaj ręcznie”
+
+Według dwóch sekcji niżej, bez makiet (autor: „Wdrażaj od razu, szkoda Twoich zasobów na makiety”).
+
+## Wpisywanie punktów w „Rozdaj ręcznie” (20.11.2026)
+
+Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce do wpisania liczby ile chce się dodać bo przy 3k punktów bardzo długo to zajmuje” (20.11.2026). Suwaki są w „Rozdaj ręcznie” od 8.11.2026, ale przy tysiącach punktów suwak na telefonie skacze o kilkanaście punktów na piksel.
+
+1. Przy każdej statystyce w „Rozdaj ręcznie” jest pole na liczbę punktów do dodania, obok jej wartości. Wpisana liczba od razu ustawia suwak i wolne punkty. Więcej, niż zostało, gra przytnie do tego, co zostało, a gdy pole straci fokus, pokaże przyciętą liczbę.
+2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
+3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
+
+## Poszukiwani o krainę albo dwie niżej (20.11.2026)
+
+Autor (20.11.2026): „poszukiwani z listów gończych z tablicy zlecen z racji wyższego poziomu trudności muszą pójść krainę lub dwie niżej”. Gra jest od niedawna trudniejsza: od 0.4.57 stwory biją trzy razy mocniej od 250. poziomu klasy, od 0.4.64 rosną z poziomem klasy od 100., a od 0.4.67 najnowsze miejsce postaci znów jest groźne (ok. 20% omdleń na wyprawie 4 h od 30. poziomu). Listy były dotąd z najwyższego otwartego miejsca i dwóch pod nim, a poziom klasy wyprzedza poziom postaci, więc poszukiwany stał zwykle w miejscach powyżej poziomu postaci.
+
+1. **Zasada.** Sołtys wywiesza listy z trzech kolejnych miejsc, a najwyższe z nich leży pod najwyższym miejscem otwartym dla postaci:
+   - o 5 miejsc, czyli krainę niżej, gdy najwyższe otwarte miejsce zaczyna się na 100. poziomie albo niżej (do miejsca 96–100, czyli do 99. poziomu klasy);
+   - o 10 miejsc, czyli dwie krainy niżej, od miejsca 101–105 (od 100. poziomu klasy).
+
+   Progi są w `data/settlement.json` → `wanted.lower`: `[{ "from": 1, "places": 5 }, { "from": 101, "places": 10 }]`, według pierwszego poziomu najwyższego otwartego miejsca. Obowiązuje próg z największym `from`, które go nie przekracza. Wyjęty spod prawa jest w jednym z tych trzech miejsc.
+   - Przykłady: przy 99. poziomie klasy najwyższe otwarte miejsce to Stare Wyrobisko (96–100), a listy są z Zatopionego Lasu (61–65), Wierzbowych Kęp (66–70) i Starego Koryta (71–75). Przy 100. poziomie klasy otwarty jest już Czarny Ols (101–105), a listy są z Wilczych Kręgów (41–45), Serca Uroczyska (46–50) i Trzcinowiska (51–55). Dotąd były z trzech najwyższych otwartych miejsc.
+   - Miejsce otwarte w Sali prób liczy się jak dotąd jako najwyższe otwarte, także przy wyborze progu: postać na 99. poziomie klasy z Czarnym Olsem z Sali prób ma listy o dwie krainy niżej, jak na 100.
+   - Postać, która nie ma pod najwyższym miejscem tylu otwartych miejsc (mniej niż 8 otwartych, czyli poniżej 35. poziomu klasy), dostaje listy z trzech najniższych miejsc, a z jednym albo dwoma otwartymi z tych, które ma, jak dotąd. Wzór: koniec = max(otwarte − zejście z progu, min(`places`, otwarte)), początek = max(0, koniec − `places`) (`wantedPlaces` w `src/engine/wanted.js`).
+   - Do 49. poziomu klasy listy są z samych Wiatrołomów, bo tylko one leżą krainę niżej.
+2. **Krainę albo dwie: z pomiaru.** Pomiar (jednorazowy skrypt na `tools/simulate.mjs` i `tools/difficulty-sim.mjs`): jedna walka z poszukiwanym przy pełnym HP, ustawiona jak w `simulateHunt`. Stwór ma siłę wyprawy (`exploreStrength` z poziomem postaci, jej poziomem klasy i jednym graczem), HP i obrażenia elity miejsca razy [1,1; 1,2] (`wantedStrength`) i poziom elity miejsca. Obok postaci walczy dwóch towarzyszy z Karczmy z bronią i zbroją, z jakimi przychodzą (pary klas po kolei). Mikstur i trofeów nie ma. Listy dnia idą po kolei: trzy odmiany stworów i wyjęty spod prawa (siedmiu po kolei) w jednym z trzech miejsc. Pięć klas podstawowych.
+   - „Typowa postać” to `typicalCharacter` z `tools/simulate.mjs` (rzadkie przedmioty z główną statystyką, bez ewolucji i ulepszeń), 1200 walk na komórkę.
+   - Dla porównania, po 400 walk na komórkę: „z ewolucją” to najsłabsza postać, jaka dochodzi do tych poziomów (ewolucja i późniejsze bazy, a do tego rzadkie przedmioty typowej postaci i towarzysze z Karczmy; `casualcomp` w `tools/difficulty-sim.mjs`); „realistyczny gracz” to model z 0.4.67, bez mikstur i trofeów.
+   - W komórkach: wygrane w procentach, kolejno listy dzisiejsze / o krainę niżej / o dwie krainy niżej. Według progów do 82. poziomu postaci (98. poziomu klasy) liczy się kolumna o krainę niżej, a od 83. (100. poziomu klasy) o dwie krainy niżej.
+
+   | Poziom postaci (klasy) | Typowa postać | Z ewolucją | Realistyczny gracz |
+   | --- | --- | --- | --- |
+   | 50 (56) | 16 / 100 / 100 | 25,5 / 100 / 100 | 52,3 / 100 / 100 |
+   | 60 (70) | 9,9 / 100 / 100 | 11,5 / 100 / 100 | 81,5 / 100 / 100 |
+   | 70 (83) | 11 / 100 / 100 | 18,3 / 100 / 100 | 83,3 / 100 / 100 |
+   | 82 (98) | 3,3 / 100 / 100 | 3,8 / 100 / 100 | 43,3 / 100 / 100 |
+   | 83 (100) | 4,5 / 100 / 100 | 9 / 100 / 100 | 76,8 / 100 / 100 |
+   | 100 (119) | 5,8 / 98,3 / 100 | 10 / 100 / 100 | 88,3 / 100 / 100 |
+   | 150 (174) | 3,3 / 44,6 / 99,1 | 19,5 / 78,5 / 100 | 97 / 99,8 / 100 |
+   | 200 (231) | 0,9 / 0,8 / 69,8 | 2 / 7 / 98,5 | 81,3 / 58,8 / 100 |
+   | 225 (258) | 1,7 / 2,6 / 23,8 | 4 / 8 / 86 | 50,5 / 93,3 / 100 |
+   | 250 (277) | 1 / 4,7 / 26,3 | 1,8 / 27,3 / 90,5 | 54,8 / 79,8 / 100 |
+   | 275 (298) | 2,3 / 5,9 / 28,3 | 5 / 33 / 93,5 | 56 / 93,8 / 100 |
+   | 300 (327) | 2,4 / 6,8 / 13 | 4,5 / 34,8 / 90,8 | 47,5 / 72,5 / 100 |
+   | 340 (379) | 7,8 / 16 / 40,5 | 27,8 / 70,5 / 97,3 | 84,3 / 99,3 / 100 |
+
+   - **Dlaczego progi.** Najpierw była jedna reguła dla wszystkich: krainę niżej, jeśli typowa postać wygrywa z poszukiwanym w co najmniej ok. 80% walk na każdym mierzonym poziomie, a inaczej dwie. Kraina niżej daje typowej postaci 98–100% do 100. poziomu, ale na 150. tylko 45%, a od 200. 1–16%, więc wyszły dwie krainy. Wtedy jednak postać do 74. poziomu klasy dostawała listy z samych Wiatrołomów, choć na tych poziomach wystarcza kraina niżej (100%). Stąd progi, zgodnie z „krainę lub dwie” autora: do miejsca 96–100 kraina niżej (typowa postać 100% do 82. poziomu postaci, ostatniego z tym progiem), od miejsca 101–105 dwie (99,1% na 150. poziomie). Kraina niżej nie wystarcza od 150. poziomu także postaci z ewolucją ani realistycznemu graczowi (59% na 200., 72,5% na 300.).
+   - Na 200. poziomie realistyczny gracz ma o krainę niżej mniej wygranych niż dziś: miejsca 196–210 sięgają jeszcze jego poziomu albo leżą wyżej, więc mają siłę najnowszego miejsca, a krzywa `newestPlace` jest tam wyższa (obrażenia ×3,05–3,16 w 201–210) niż od 217. poziomu (×2,25–2,49 w 221–235), gdzie zakłada już trzykrotną siłę stworów od 250. poziomu klasy.
+   - **Skok ×3 od 250. poziomu klasy** wypada między 200. a 225. poziomem postaci: o dwie krainy niżej typowa postać spada tam z 70% do 24%, a postać z ewolucją z 98,5% do 86%. Dlatego w tabeli jest też 225. poziom postaci (258. poziom klasy).
+   - **Do sprawdzenia: dwie krainy nie wystarczają typowej postaci od 200. poziomu** (13–70% wygranych, najmniej na 300.). Ta postać nie ma jednak ewolucji, a klasa bez ewolucji zatrzymuje się na 50. i 100. poziomie klasy, więc takiej postaci na tych poziomach w grze nie ma. Postać z ewolucją wygrywa o dwie krainy niżej w 86–100% walk, a realistyczny gracz w 100%. Bez towarzyszy typowa postać przegrywa prawie zawsze od 100. poziomu, nawet o dwie krainy niżej (600 walk na komórkę: 67% na 100. poziomie, od 150. 0%).
+3. **Złoto bez zmian (brakujący szczegół).** Zmiana dotyczy trudności, nie nagród. Każdy list daje więc tyle złota co przed zmianą: nagroda liczy się z miejsca o tyle miejsc wyżej, o ile listy zeszły (`shift` = otwarte miejsca − koniec okna), najwyżej z najwyższego otwartego. To są trzy najwyższe otwarte miejsca, jak od 12.11.2026.
+   - Przy 99. poziomie klasy 5200, 5500 i 5800 złota, przy 100. 5500, 5800 i 6100, a przy 43. (gracz z 12.11.2026) 1900, 2200 i 2500 złota, choć listy są teraz z Lisich Jarów, Kruczych Wykrotów i Żmijowego Zwaliska (6–20).
+   - Wyjęty spod prawa daje złoto miejsca o tyle samo wyżej niż jego miejsce.
+   - Poszukiwany ma poziom elity swojego nowego miejsca. Punkty Czasu, przychylność Bractwa Łowców i relacja z sołtysem bez zmian.
+4. **Dzisiejsze listy od nowa, jak 12.11.2026.** Listy dnia nie są zapisane: liczą się z pierwszego spojrzenia na tablicę (poziom klasy i miejsce z Sali prób), więc te wylosowane według starej zasady losują się od nowa, z tego samego spojrzenia. Wypełnione zostają wypełnione.
+   - List w ręku zostaje taki, jaki był wzięty: z miejscem, poziomem poszukiwanego i nagrodą, jako pierwszy z listów dnia. Także gdy postać jest z nim na wyprawie: nie porzuci go przed odebraniem raportu. Cel wyprawy Drużyny zostaje jak był.
+   - Brakujący szczegół: gdy nowe losowanie ma ten sam list (to samo miejsce i stwór, np. przy 22. poziomie klasy, gdzie stare i nowe okno mają wspólne miejsce), tablica pokazuje go z nagrodą, z którą był wzięty, i tyle sołtys płaci (`wantedView` w `src/server/wanted.js`).
+5. **Teksty.** „Jak to działa?” przy listach zaczyna się teraz od: „Sołtys Bogumił wywiesza co dzień trzy listy gończe za stworami z miejsc o krainę niżej niż najwyższe, które masz otwarte, a gdy najwyższe sięga ponad 100. poziom, o dwie krainy niżej. Wywiesza też jeden list za wyjętym spod prawa. Za list zgarniesz jednak tyle złota, ile w Twoich najwyższych miejscach.” Po angielsku: „Every day Headman Bogumił posts three wanted posters for creatures from places one land below the highest one open to you, or two lands below once that place goes beyond level 100. He also posts one for an outlaw. Still, a poster earns you as much gold as in your highest places.”
+6. **Pliki:** `data/settlement.json` (`lower`, `$comment`, `texts.intro`), `data/schemas/settlement.schema.json`, `data/en/settlement.json`, `data/en/sources.json`, `src/engine/wanted.js` (`wantedPlaces`, `wantedPosters`), `src/server/wanted.js` (`wantedView`). Testy: `test/wanted-places.test.js` (okno, oba progi i granica między nimi przy najwyższym otwartym miejscu 96–100 i 101–105, z miejscem z Sali prób, niskie poziomy, złoto jak przed zmianą, wyjęty spod prawa, dzisiejsze listy od nowa z listem w ręku i na wyprawie) i `test/wanted.test.js`.
+
 ## Wersja 0.4.76 (20.11.2026): poboczne statystyki z Profesji
 
 Według sekcji niżej (1218 B i D), bez makiet: nowa grupa w „Parametrach dodatkowych”, w stylu istniejących. Do tego podgląd „Po założeniu” / „Po zdjęciu”: gdy przedmiot zmienia odporność na każdy żywioł naraz (poboczny Intelekt), zamiast ośmiu wierszy jest jeden, „Odporność na żywioły”, od najmniejszej do największej zmiany (np. „+1,2–1,4%”), a przy równych zmianach jedna liczba (`mergedResist` w `src/client/screens/character.js`).
