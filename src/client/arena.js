@@ -11,6 +11,7 @@ import { createFx } from './arena-fx.js';
 import { boardArt, companionBust, companionPortrait, monsterSprite, portraitSprite, summonSprite } from './art.js';
 import { classArt } from './class-art.js';
 import { h, icon } from './dom.js';
+import { manaChanges, manaStart } from './fight-mana.js';
 import { language, t } from './i18n.js';
 import { CLASS_ICONS } from './icons.js';
 import { motionOn } from './motion.js';
@@ -97,6 +98,11 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     const hpFill = h('div', { class: 'unit-hp-fill' });
     const hpText = h('span', { class: 'unit-hp-text' });
     const status = h('span', { class: 'unit-status' });
+    // The unit's mana, thin under its HP (21.11.2026): it falls as a skill
+    // is paid and a mana shield takes its share, and rises with a mana
+    // potion. A unit without mana (a creature, a summon, any unit of a fight
+    // kept before) has none.
+    const manaFill = manaStart(unit) === null ? null : h('div', { class: 'unit-mana-fill' });
     // A mana shield's points, under the HP while the shield holds.
     const shieldFill = h('div', { class: 'unit-shield-fill' });
     const shieldBar = h('div', { class: 'unit-shield', hidden: true }, shieldFill);
@@ -133,11 +139,12 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
           ),
       h('span', { class: 'unit-name', text: unit.name }),
       h('div', { class: 'unit-hp' }, hpFill),
+      manaFill && h('div', { class: 'unit-mana' }, manaFill),
       shieldBar,
       hpText,
       status,
     );
-    cards.set(unit.id, { card, hpFill, hpText, status, shieldBar, shieldFill, unit });
+    cards.set(unit.id, { card, hpFill, hpText, status, shieldBar, shieldFill, manaFill, unit });
     return card;
   }
 
@@ -192,6 +199,13 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     if (!entry) return;
     entry.hpFill.style.width = `${Math.max(0, (hp / entry.unit.maxHp) * 100)}%`;
     entry.hpText.textContent = `${hp} / ${entry.unit.maxHp}`;
+  }
+
+  // A unit's mana bar after an event, or at the fight's start.
+  function setMana(id, mana) {
+    const entry = cards.get(id);
+    if (!entry?.manaFill) return;
+    entry.manaFill.style.width = `${Math.max(0, Math.min(1, mana / entry.unit.maxMana)) * 100}%`;
   }
 
   function setDown(id, down) {
@@ -494,6 +508,8 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     // The event as its actor's: the summon's own under its card.
     const acting = actor && actor.id !== event.actor ? { ...event, actor: actor.id } : event;
     release(event);
+    // The mana an event spent or gave shows as its move begins.
+    for (const [id, mana] of manaChanges(event)) setMana(id, mana);
     const line = () => {
       log.append(logLine(event));
       log.scrollTop = log.scrollHeight;
@@ -827,6 +843,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   // The state right after an event, without animation (for "Pomiń").
   function applyQuietly(event) {
     release(event);
+    for (const [id, mana] of manaChanges(event)) setMana(id, mana);
     if (event.hp !== undefined && byId.has(event.target)) setHp(event.target, event.hp);
     if (event.kind === 'effect') cards.get(event.target).status.textContent = event.effect;
     if (event.kind === 'kill') {
@@ -868,6 +885,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     banner.classList.remove('arena-banner--shown');
     for (const unit of units) {
       setHp(unit.id, unit.hp);
+      setMana(unit.id, manaStart(unit));
       setDown(unit.id, unit.hp <= 0);
       cards.get(unit.id).status.textContent = '';
       cards.get(unit.id).shieldBar.hidden = true;

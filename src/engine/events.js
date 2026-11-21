@@ -682,6 +682,11 @@ export function resolveEvent(
   const index = hunt.fights.length;
   const hpBefore = hunt.hpEnd;
   let hpNow = fight.units.find((/** @type {Record<string, any>} */ unit) => unit.id === ally.id).hp;
+  // The character's mana as the fight began (the exploration's, never above
+  // its most) and as it ended, where the fight counted it, as on the way
+  // (hunt.js), for the report's line under the fight (21.11.2026).
+  const manaBefore = Math.min(ally.maxMana ?? 0, ally.mana ?? ally.maxMana ?? 0);
+  const manaAfter = fight.units.find((/** @type {Record<string, any>} */ unit) => unit.id === ally.id).mana;
   const summary = {
     index,
     t,
@@ -693,6 +698,7 @@ export function resolveEvent(
     won: fight.won,
     hpBefore,
     hpAfter: hpNow,
+    ...(manaAfter !== undefined && { manaBefore, manaAfter }),
     xp: 0,
     gold: 0,
     materials: {},
@@ -746,7 +752,7 @@ export function resolveEvent(
 
   // The character's mana at the end (1220 B), with the rest after a won
   // fight, as on the way (restedMana).
-  const manaLeft = fight.units.find((/** @type {Record<string, any>} */ unit) => unit.id === ally.id).mana ?? hunt.manaEnd ?? null;
+  const manaLeft = manaAfter ?? hunt.manaEnd ?? null;
   const manaEnd = fight.won === true ? restedMana(manaLeft, ally.maxMana ?? 0, content) : manaLeft;
   const told = fill(outcome.text);
   // A won fight gives what its win names besides (ties), and one not won

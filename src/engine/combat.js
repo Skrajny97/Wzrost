@@ -15,8 +15,10 @@
 // takes a share of mana at once and holds until its points are spent. A
 // fight starts with full mana, or with the mana a unit brings (`mana`: on an
 // exploration what the last fight left, hunt.js); the fight's end gives
-// each unit's mana back with its HP. A fight without skills draws the same
-// random numbers as before skills existed.
+// each unit's mana back with its HP, and a recorded fight's events carry
+// each change of a unit's mana for the playback's mana bar (`mana`, by the
+// unit's id). A fight without skills draws the same random numbers as
+// before skills existed.
 //
 // A character may carry potions (potions.js): a healing one is drunk the
 // moment HP falls below the player's mark, a mana one when a skill lacks
@@ -364,8 +366,25 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
 
   // Events and their texts are built only for a fight that is recorded: the
   // threat estimate runs many fights that nobody reads.
+  // The playback's mana bars (21.11.2026): an event carries the mana of each
+  // unit whose mana changed since the event before it (`mana`, by the unit's
+  // id: a skill paid, a mana potion, a mana shield's share of mana, the mana
+  // the trait Arkana gives back each move), so the bars move with the fight;
+  // each bar starts from the unit's view (combatantView's `mana`, as the
+  // fight starts it). Only a fight with skills spends or gives mana.
+  /** @type {Map<Unit, number> | null} */
+  const shownMana = record && skilled ? new Map(units.filter((unit) => unit.maxMana > 0).map((unit) => [unit, unit.mana])) : null;
   const log = (/** @type {() => Record<string, any>} */ event) => {
-    if (record) events.push(event());
+    if (!record) return;
+    const entry = event();
+    if (shownMana) {
+      for (const [unit, shown] of shownMana) {
+        if (unit.mana === shown) continue;
+        shownMana.set(unit, unit.mana);
+        entry.mana = { ...entry.mana, [unit.id]: unit.mana };
+      }
+    }
+    events.push(entry);
   };
   // Zasadzka: the playback opens with the creature that lay in wait.
   if (lurker) log(() => ({ t: 0, kind: 'ambush', actor: lurker.id, text: say(texts, 'ambush', 0, { actor: lurker.name }) }));
