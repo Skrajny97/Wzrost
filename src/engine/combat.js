@@ -1772,8 +1772,6 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
           const meant = (p.heal * member.maxHp + (p.wisdomPerHp ? (actor.wisdom ?? 0) / p.wisdomPerHp : 0)) * care;
           const amount = mend(member, meant);
           overheal(actor, member, meant, amount);
-          // Odrodzenie puszczy: the summons of the party stand at full HP again.
-          if (p.summonsFull) for (const summon of member.summons) summon.hp = Math.max(summon.hp, summon.maxHp);
           const own = member === actor;
           // A companion already at full HP gets no line and no "+0": the
           // caster's own line stays, as it says the skill was used.
@@ -1886,7 +1884,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
             skill,
             name,
             hp,
-            // Its full HP, to which Odrodzenie lasu heals it.
+            // Its full HP.
             maxHp: hp,
             until: actor.moves + Math.round(m.turns),
             power: m.power === undefined ? undefined : m.power * stronger,

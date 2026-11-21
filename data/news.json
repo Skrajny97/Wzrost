@@ -1625,6 +1625,11 @@
       "id": "0.4.90",
       "title": "Wersja 0.4.90",
       "body": "- Arcydruid: „Przywołanie żubra” zmienia się w „Zew zwierząt”. Jednym rzuceniem przywołuje naraz żubra i niedźwiedzia, więc razem z dębem z „Przebudzenia dębu” Arcydruid ma trzy przywołańce naraz.\n- Pradruid: „Dąb wieków” zmienia się w „Gaj wieków” i przywołuje naraz dwa Dęby wieków. Każdy jest słabszy od dawnego dębu, a drużynę leczą razem raz na ruch, póki stoi choć jeden.\n- W odtwarzaniu walki każdy przywołaniec ma własną kartę."
+    },
+    {
+      "id": "0.4.91",
+      "title": "Wersja 0.4.91",
+      "body": "- Pradruid: „Pradawne stado” zastępuje „Odrodzenie puszczy”. Jednym rzuceniem przywołuje naraz żubra i niedźwiedzia, więc razem z dwoma Dębami wieków z „Gaju wieków” Pradruid ma cztery przywołańce naraz. Poziomy Odrodzenia puszczy przechodzą na Pradawne stado, więc nie tracisz punktów umiejętności. Drużynę leczy dalej Gaj wieków.\n- W odtwarzaniu walki przywołańce stają równo w dwóch kolumnach przed postacią."
     }
   ]
 }

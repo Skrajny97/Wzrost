@@ -460,7 +460,7 @@
       "description": "The oldest of the druids. The forest grows from their wisdom, and its creatures stand by them in battle.",
       "trait": {
         "name": "Roots of the World",
-        "text": "+50% mana and up to four summons at once. 6% of mana comes back every turn, and summons have 40% more HP and deal 40% more damage. Every 20 points of Wisdom give the summons another 1% HP and damage."
+        "text": "+50% mana and up to four summons at once: two Oaks of Ages, the Bison and the Bear. 6% of mana comes back every turn, and summons have 40% more HP and deal 40% more damage. Every 20 points of Wisdom give the summons another 1% HP and damage."
       }
     },
     "archangel": {
@@ -1285,11 +1285,22 @@
         ]
       }
     },
-    "forest-rebirth": {
-      "name": "Rebirth of the Forest",
-      "style": "healing",
-      "description": "The forest takes a deep breath, and all that lives rises anew.",
-      "effect": "When someone in the party has less than {below%} HP, heals the whole party by {heal%} of max HP and 1 HP for every {wisdomPerHp} points of Wisdom, and restores all summons to full HP."
+    "ancient-herd": {
+      "name": "Ancient Herd",
+      "style": "attack",
+      "description": "At the Elder Druid's call a bison and a bear burst out of the ancient wilds together. The bison rams first, then both stand like a wall before the Elder Druid.",
+      "effect": "Summons a bison and a bear at once for {turns|turn|turns|turns}. Both stand before the character and take the enemies' blows. The bison has HP equal to {hp1%} of the character's max mana. It charges the enemy in front at once for {charge1%} damage and stuns it for its next turn, then gores a random enemy every turn for {power1%} damage. The bear has HP equal to {hp2%} of the character's max mana and rakes a random enemy with its claws every turn for {power2%} damage.",
+      "params": {
+        "pack": [
+          {
+            "summonName": "Bison",
+            "stunLabel": "stunned"
+          },
+          {
+            "summonName": "Bear"
+          }
+        ]
+      }
     },
     "divine-healing": {
       "name": "Divine Healing",

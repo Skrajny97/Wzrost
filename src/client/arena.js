@@ -398,8 +398,12 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   function summonPlace(owner, card) {
     const at = FIELDS.findIndex(([position]) => position === owner.position);
     const ahead = FIELDS.slice(0, Math.max(0, at)).reverse().map(([position]) => fields.get(`${owner.side} ${position}`));
+    // With every field ahead taken, the one with the fewest cards, the
+    // nearest of equals: the Pradruid's four stand two by two, not three in
+    // one column (21.11.2026).
     const free = ahead.find((field) => !field.querySelector('.unit'));
-    if (free || ahead.length > 0) (free ?? ahead[0]).append(card);
+    const fewest = ahead.reduce((best, field) => (best === null || field.querySelectorAll('.unit').length < best.querySelectorAll('.unit').length ? field : best), null);
+    if (free || fewest) (free ?? fewest).append(card);
     else cards.get(owner.id)?.card.before(card);
   }
   function summonUp(event, quiet) {

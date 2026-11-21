@@ -1296,6 +1296,10 @@
     "0.4.90": {
       "title": "Version 0.4.90",
       "body": "- Archdruid: “Summon Bison” becomes “Call of the Beasts”. One cast summons the bison and the bear at once, so with the oak of “Awakening of the Oak” the Archdruid has three summons at once.\n- Elder Druid: “Oak of Ages” becomes “Grove of Ages” and summons two Oaks of Ages at once. Each is weaker than the old oak, and together they heal the party once a turn while at least one stands.\n- In the fight playback each summon has its own card."
+    },
+    "0.4.91": {
+      "title": "Version 0.4.91",
+      "body": "- Elder Druid: “Ancient Herd” replaces “Rebirth of the Forest”. One cast summons the bison and the bear at once, so with the two Oaks of Ages of “Grove of Ages” the Elder Druid has four summons at once. Your levels in Rebirth of the Forest move to Ancient Herd, so no skill points are lost. The Grove of Ages still heals the party.\n- In the fight playback, summons stand evenly in two columns in front of the character."
     }
   }
 }
