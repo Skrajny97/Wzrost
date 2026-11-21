@@ -99,9 +99,11 @@ describe('the third evolution in the engine', () => {
       assert.equal(form.classId, second.classId, form.id);
       assert.equal(form.stage, 3, form.id);
       assert.ok(form.description, form.id);
-      // Its first skill grows one of the second form's, the other is new.
+      // Its first skill grows one of the second form's, the other is new;
+      // the Arcydruid's Zew zwierząt grows the Druid's bear (21.11.2026).
       assert.ok(second.skills.includes(content.skillsById[form.skills[0]].from), form.id);
-      assert.ok(!content.skillsById[form.skills[1]].from, form.id);
+      if (form.id === 'archdruid') assert.equal(content.skillsById[form.skills[1]].from, 'bear-summon');
+      else assert.ok(!content.skillsById[form.skills[1]].from, form.id);
       for (const id of form.skills) {
         assert.equal(content.skillsById[id].maxLevel, 145, id);
         assert.equal(content.skillsById[id].classLevel, 200, id);
@@ -529,22 +531,81 @@ describe('the third forms in fights', () => {
     near(nextOn(monarch) / nextOn(withParam(monarch, 'ice-tomb', 'bonus', 0)), 1 + paramOf(monarch, 'ice-tomb', 'bonus'), 0.02, 'Lodowy grobowiec');
   });
 
-  test('Serce puszczy: up to three summons at once (two before 21.11.2026); the oak roots the foe it strikes; the bison charges the foe in front and stuns it', () => {
-    assert.equal(form('archdruid').feat.summons, 3);
-    const grove = fight('serce', [form('archdruid', { skillLevel: 145 })], [sturdy('boar', 'e0'), sturdy('crow', 'e1')]);
+  // The summons standing after each summon event of a fight, by their skill
+  // and place in a pack (a pack's events name it, `order`, `summonOrder`).
+  const standingAfter = (result, check = () => {}) => {
     const standing = new Set();
-    let both = false;
-    for (const event of grove.events.filter((one) => one.kind === 'summon')) {
-      if (event.state === 'up') standing.add(event.skill);
-      else if (['gone', 'fell'].includes(event.state)) standing.delete(event.summonSkill);
-      if (standing.size === 2) both = true;
+    let most = 0;
+    for (const event of result.events.filter((one) => one.kind === 'summon')) {
+      if (event.state === 'up') check(event, standing);
+      if (event.state === 'up') standing.add(`${event.skill} ${event.order ?? 1}`);
+      else if (['gone', 'fell'].includes(event.state)) standing.delete(`${event.summonSkill} ${event.summonOrder ?? 1}`);
+      most = Math.max(most, standing.size);
     }
-    assert.ok(both, 'the oak and the bison at once');
+    return most;
+  };
+
+  test('Serce puszczy: three summons at once, the oak and Zew zwierząt\'s bison and bear (21.11.2026); the oak roots the foe it strikes; the bison charges the foe in front and stuns it', () => {
+    const archdruid = form('archdruid', { skillLevel: 145 });
+    assert.equal(archdruid.feat.summons, 3);
+    const grove = fight('serce', [archdruid], [sturdy('boar', 'e0'), sturdy('crow', 'e1')]);
+    assert.equal(standingAfter(grove), 3, 'the oak, the bison and the bear at once');
     assert.ok(grove.events.some((event) => event.kind === 'slow' && /grzęźnie w korzeniach/.test(event.text)));
     const charge = grove.events.findIndex((event) => event.skill === 'bison-call' && /Żubr szarżuje/.test(event.text ?? ''));
     assert.ok(charge > 0);
     assert.equal(grove.events[charge].target, 'e0');
+    assert.equal(grove.events[charge].summonOrder, 1);
     if (grove.events[charge].kind !== 'dodge') assert.deepEqual([grove.events[charge + 1].kind, grove.events[charge + 1].target], ['stun', 'e0']);
+  });
+
+  test('Zew zwierząt calls the bison and the bear in one cast, each its own summon with the trait\'s strength; it waits for room for both and comes again only once both are gone', () => {
+    // The author (21.11.2026): „Arcydruid ma umiejetnosc wzywajaca zwierzeta
+    // i pojawia się jednoczesnie niedzwiedz i żubr”.
+    const archdruid = form('archdruid', { skillLevel: 145, only: ['bison-call'] });
+    const result = fight('zew', [archdruid], [sturdy('boar', 'e0'), sturdy('crow', 'e1')]);
+    const ups = result.events.filter((event) => event.kind === 'summon' && event.state === 'up');
+    const [bison, bear] = ups;
+    assert.deepEqual([bison.t, bison.order, bison.summon, bison.figure], [bear.t, 1, 'Żubr', 'aurochs']);
+    assert.deepEqual([bear.order, bear.summon, bear.figure], [2, 'Niedźwiedź', 'bear']);
+    assert.match(bear.text, /przywołuje: Niedźwiedź, \d+ HP\./);
+    // One cast: one payment of mana for both.
+    assert.equal(result.events.filter((event) => event.kind === 'summon' && event.state === 'up' && event.t === bison.t).length, 2);
+    // Each with its own HP out of the Arcydruid's mana, 30% more (Serce puszczy).
+    const [ownBison, ownBear] = skillParams(content.skillsById['bison-call'], 145, content).pack;
+    assert.equal(bison.summonHp, Math.max(1, Math.round(archdruid.maxMana * ownBison.hp * 1.3)));
+    assert.equal(bear.summonHp, Math.max(1, Math.round(archdruid.maxMana * ownBear.hp * 1.3)));
+    // The bear claws a random foe every move, under its own name.
+    assert.ok(result.events.some((event) => event.skill === 'bison-call' && BLOWS.includes(event.kind) && event.summonOrder === 2 && /Niedźwiedź atakuje/.test(event.text)));
+    // Without room for both (one summon at a time), it never comes.
+    const cramped = fight('zew', [withFeat(archdruid, 'summons', 1)], [sturdy('boar', 'e0'), sturdy('crow', 'e1')]);
+    assert.ok(!cramped.events.some((event) => event.kind === 'summon' && event.skill === 'bison-call'));
+    // With room for two, it waits while the oak stands.
+    const two = fight('zew-dab', [withFeat(form('archdruid', { skillLevel: 145 }), 'summons', 2)], [sturdy('boar', 'e0'), sturdy('crow', 'e1')]);
+    let packs = 0;
+    assert.equal(
+      standingAfter(two, (event, standing) => {
+        if (event.skill !== 'bison-call' || event.order !== 1) return;
+        packs += 1;
+        assert.equal(standing.size, 0, 'the pack came with the oak standing');
+      }),
+      2,
+    );
+    assert.ok(packs > 0);
+    // Ready again at once (a cooldown of 1) and its bison falling at the
+    // first blow: no new pack while the bear stands.
+    const quick = {
+      ...archdruid,
+      skills: archdruid.skills.map((skill) =>
+        skill.id === 'bison-call' ? { ...skill, cooldown: 1, params: { ...skill.params, pack: skill.params.pack.map((one, index) => (index === 0 ? { ...one, hp: 1e-9 } : one)) } } : skill,
+      ),
+    };
+    const lone = fight('zew-sam', [quick], [foe('boar', 'e0'), foe('crow', 'e1')]);
+    let fell = false;
+    standingAfter(lone, (event, standing) => {
+      if (event.skill === 'bison-call' && event.order === 1) assert.equal(standing.size, 0, 'a new pack while one of the last stood');
+    });
+    for (const event of lone.events) if (event.kind === 'summon' && event.state === 'fell' && event.summonOrder === 1) fell = true;
+    assert.ok(fell, 'the bison fell');
   });
 
   test('Cudowne ocalenie raises a fallen member of the party once; Cudowne uzdrowienie heals the party and takes every effect off; Święte światło heals the party', () => {

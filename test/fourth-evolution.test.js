@@ -181,14 +181,17 @@ describe('the fourth evolution in the engine', () => {
     assert.deepEqual(view.evolution, { level: 400, need: 'skill_points' });
     // At the level the 290 points bring it to at once (145 each), a grown
     // skill strikes, heals and calls at least as strongly as its root at the
-    // top level (a summon's HP counted for all it calls at once).
+    // top level (a summon's HP counted for all it calls at once, and a
+    // pack's blows too: Gaj wieków's two oaks, each weaker than the
+    // Arcydruid's one, 21.11.2026).
     for (const form of fourths) {
       const grown = content.skillsById[form.skills[0]];
       const root = skillParams(content.skillsById[grown.from], 145, content);
       const now = skillParams(grown, 145, content);
+      const called = now.pack?.length ?? Math.round(now.count ?? 1);
       for (const key of ['power', 'single', 'heal', 'hp']) {
         if (typeof root[key] !== 'number') continue;
-        const counted = key === 'hp' ? now[key] * Math.round(now.count ?? 1) : now[key];
+        const counted = key === 'hp' || (key === 'power' && now.pack) ? now[key] * called : now[key];
         assert.ok(counted >= root[key] - 1e-9, `${grown.id} ${key}: ${counted} vs ${grown.from} ${root[key]}`);
       }
     }
@@ -392,11 +395,35 @@ describe('the fourth forms in fights', () => {
     assert.match(raised.text, /zatrzymuje \d+% obrażeń/);
   });
 
-  test('Korzenie świata: four summons may stand (three before 21.11.2026); Dąb wieków heals the party every move; Odrodzenie lasu heals the party and its summons to full once', () => {
+  test('Korzenie świata: four summons may stand (three before 21.11.2026), Gaj wieków\'s two oaks and a pack of two more; the grove heals the party once a move; Odrodzenie lasu heals the party and its summons to full once', () => {
     const druid = form('elder-druid');
     assert.equal(druid.feat.summons, 4);
     const oak = fight('dab', [form('elder-druid', { only: ['oak-of-ages'] }), form('archangel', { only: [], id: 'a1' })], line());
     assert.ok(oak.events.some((event) => event.skill === 'oak-of-ages' && event.kind === 'heal'));
+    // Gaj wieków (21.11.2026): two Dęby wieków in one cast, each with the
+    // trait's HP (40% more and 1% for every 20 points of Wisdom), and while
+    // both stand the party heals once a move, not twice.
+    const [first, second] = oak.events.filter((event) => event.kind === 'summon' && event.state === 'up');
+    assert.deepEqual([first.t, first.order, first.summon, first.figure, second.order, second.summon, second.figure], [second.t, 1, 'Dąb wieków', 'oak', 2, 'Dąb wieków', 'oak']);
+    const grove = form('elder-druid', { only: ['oak-of-ages'] });
+    const wise = grove.wisdom / 20 / 100;
+    assert.equal(first.summonHp, Math.max(1, Math.round(grove.maxMana * skillParams(content.skillsById['oak-of-ages'], 150, content).hp * (1 + 0.4 + wise))));
+    const heals = oak.events.filter((event) => event.skill === 'oak-of-ages' && event.kind === 'heal');
+    assert.equal(new Set(heals.map((event) => `${event.t} ${event.target}`)).size, heals.length, 'the grove healed someone twice in one move');
+    // Four at once: the two oaks and the Arcydruid's Zew zwierząt, given to
+    // the Pradruid for the count (the bison and the bear).
+    const mage = typicalCharacter('mage', 270, content);
+    const call = playerCombatant({ character: { ...mage.character, classLevel: 330, skills: { 'bison-call': 145 }, evolution: 'archdruid' }, equipped: mage.equipped, name: 'Arcydruid' }, content);
+    const both = { ...druid, skills: [...druid.skills.filter((skill) => skill.id === 'oak-of-ages'), ...call.skills] };
+    const herd = fight('gaj', [both], line());
+    const standing = new Set();
+    let most = 0;
+    for (const event of herd.events.filter((one) => one.kind === 'summon')) {
+      if (event.state === 'up') standing.add(`${event.skill} ${event.order}`);
+      else if (['gone', 'fell'].includes(event.state)) standing.delete(`${event.summonSkill} ${event.summonOrder}`);
+      most = Math.max(most, standing.size);
+    }
+    assert.equal(most, 4, 'two oaks, the bison and the bear at once');
     const rebirth = fight('odrodzenie', [form('elder-druid', { hpShare: 0.6 })], line());
     const healed = rebirth.events.find((event) => event.skill === 'forest-rebirth' && event.kind === 'heal');
     assert.ok(healed);

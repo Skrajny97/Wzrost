@@ -96,7 +96,8 @@
 // with every fallen foe, charge the party's blows with lightning, make the
 // party dodge more or the foes miss more; a summon may howl the party's
 // blows stronger, root the foes it strikes or charge in with a stunning
-// blow, and with Serce puszczy two summons stand at once; a shield of mana
+// blow, and with Serce puszczy three summons stand at once (one skill, Zew
+// zwierząt, calls a pack of two: `pack`); a shield of mana
 // may burn, chill or shock those who strike it. Their traits: a share of
 // the blows meant for the party taken by the Kolos, a spark that jumps on
 // to another foe, a chilled foe frozen by a frost spell, a fallen member of
@@ -248,6 +249,9 @@ function marksOf(/** @type {Move} */ move) {
   // strzał, Strzał w serce, Miażdżący cios, Mistrzowski strzał): a blow at
   // many, which strikes a hidden creature as any (Ukryty w mroku).
   if (move.pierced) marks.pierced = true;
+  // A blow of a pack's summon (Zew zwierząt, Gaj wieków): its place in the
+  // pack, so the playback knows which card strikes.
+  if (move.summonOrder) marks.summonOrder = move.summonOrder;
   return marks;
 }
 
@@ -689,8 +693,8 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     unit.dots = unit.dots.filter((/** @type {Dot} */ dot) => dot.ticks > 0);
   };
 
-  // How many summons may stand by a unit at once: one, two with Serce
-  // puszczy.
+  // How many summons may stand by a unit at once: one; the Druid's line
+  // two, three and four (Moc puszczy, Serce puszczy, Korzenie świata).
   const summonLimit = (/** @type {Unit} */ unit) => unit.feat?.summons ?? 1;
 
   // Żniwo: a foe killed by the Nekromanta's poison rises as a skeleton that
@@ -1060,10 +1064,10 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   // A summon (Przywołanie żywiołaka, Trujący Szlam) stands before its
   // summoner and takes the foes' blows meant for it: it cannot dodge, it has
   // the summoner's armour and resistances, and when its HP runs out it falls
-  // (the slime bursts and poisons every foe). Of two summons (Serce puszczy)
-  // the one called first stands in front; when it falls, the other takes
-  // its place. The events name the summon's skill (summonSkill), so the
-  // playback finds its card among two.
+  // (the slime bursts and poisons every foe). Of several summons (the
+  // Druid's line) the one called first stands in front; when it falls, the
+  // next takes its place. The events name the summon's skill (summonSkill)
+  // and, in a pack, its place (summonOrder), so the playback finds its card.
   const summonTakes = (/** @type {Unit} */ actor, /** @type {Unit} */ owner, /** @type {number} */ t, /** @type {Move} */ move) => {
     const decoy = owner.summons[0];
     const weapon = actor.weapon;
@@ -1083,6 +1087,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       target: owner.id,
       summon: decoy.name,
       summonSkill: decoy.skill.id,
+      ...(decoy.order && { summonOrder: decoy.order }),
       summonHp: decoy.hp,
       damage: amount,
       hp: owner.hp,
@@ -1098,6 +1103,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       target: owner.id,
       summon: decoy.name,
       summonSkill: decoy.skill.id,
+      ...(decoy.order && { summonOrder: decoy.order }),
       summonHp: 0,
       hp: owner.hp,
       text: say(texts, 'summonFell', actions, { summon: decoy.name }),
@@ -1609,8 +1615,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   const summonActs = (/** @type {Unit} */ actor, /** @type {Unit} */ summon, /** @type {number} */ t) => {
     const foes = foesOf(actor);
     if (!summon || foes.length === 0 || actor.hp <= 0 || !actor.summons.includes(summon)) return;
-    // Dąb wieków: while it stands, the party heals a little every move.
-    if (summon.partyHeal) {
+    // Dąb wieków: while it stands, the party heals a little every move; the
+    // two of Gaj wieków heal it once, by the first of them still standing.
+    if (summon.partyHeal && actor.summons.find((/** @type {Unit} */ one) => one.skill === summon.skill && one.partyHeal) === summon) {
       for (const member of units) {
         if (member.side !== actor.side || member.hp <= 0) continue;
         const amount = mend(member, summon.partyHeal * member.maxHp);
@@ -1630,6 +1637,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         ...(summon.dot && { dot: summon.dot }),
         ...(summon.root && { root: summon.root }),
         ...(summon.stunChance && { stunChance: summon.stunChance, stunLabel: summon.stunLabel }),
+        ...(summon.order && { summonOrder: summon.order }),
         words: { hit: 'summonStrike', crit: 'summonStrike', dodge: 'summonMiss' },
         vars: { summon: summon.name },
       });
@@ -1650,6 +1658,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       category: 'magical',
       element,
       summoned: true,
+      ...(summon.order && { summonOrder: summon.order }),
       words: 'summonHit',
       vars: { summon: summon.name, element: content.elementsById[element].name },
     });
@@ -1743,10 +1752,11 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       // in sight below its mark.
       if (p.opener && actor.moves > 0) continue;
       if (p.below !== undefined && skill.kind === 'strike' && !inSight(opponents).some((/** @type {Unit} */ unit) => unit.hp < p.below * unit.maxHp)) continue;
-      // A character has one summon at a time (two with Serce puszczy):
-      // another summoning skill (the Druid's ent and bear) waits until the
-      // one standing falls or goes, and none calls its own summon twice.
-      if (skill.kind === 'summon' && (actor.summons.length >= summonLimit(actor) || actor.summons.some((/** @type {Unit} */ one) => one.skill === skill))) continue;
+      // A character has one summon at a time (the Druid's line two, three
+      // and four): another summoning skill waits until there is room, a
+      // pack (Zew zwierząt, Gaj wieków) room for all of it, and none calls
+      // its own summons again while one of them stands.
+      if (skill.kind === 'summon' && (actor.summons.length + (p.pack?.length ?? 1) > summonLimit(actor) || actor.summons.some((/** @type {Unit} */ one) => one.skill === skill))) continue;
       // A duel or a lock waits until the foe it marked falls.
       if ((p.duel || p.lock) && opponents.some((/** @type {Unit} */ unit) => unit.hp > 0 && unit.focus?.source === actor)) continue;
       if (!manaFor(actor, skill.mana, t)) continue;
@@ -1859,68 +1869,85 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         // The Arkanista's line calls its summons out of mana (934 A, 935 A):
         // their HP is a share of the summoner's maximum mana, not its HP.
         const pool = p.hpFrom === 'mana' ? (actor.maxMana ?? 0) : actor.maxHp;
-        const hp = Math.max(1, Math.round(pool * p.hp * (1 + (grove?.summonHp ?? 0) + wise)));
-        const name = p.summonName;
         const stronger = 1 + (grove?.summonPower ?? 0) + wise;
         // The slime's poison: a share of the summoner's average blow a move.
         const raw = ((actor.weapon.min + actor.weapon.max) / 2) * actor.damageScale;
-        const summon = {
-          skill,
-          name,
-          hp,
-          // Its full HP, to which Odrodzenie lasu heals it.
-          maxHp: hp,
-          until: actor.moves + Math.round(p.turns),
-          power: p.power === undefined ? undefined : p.power * stronger,
-          raw,
-          dot: p.dotEffect ? { effect: p.dotEffect, chance: 1, power: p.dotPower, ticks: Math.round(p.dotTicks) } : null,
-          // A slime bursts when it falls; a wolf, an ent, a bear or a
-          // skeleton strikes with its body; the white wolf howls (howl), the
-          // oak roots the foes it strikes (root).
-          burst: Boolean(p.burst),
-          physical: Boolean(p.physical),
-          ...(p.howl && { howl: p.howl }),
-          ...(p.root && { root: p.root }),
-          // The fourth forms' summons: the bear strikes the foe in front and
-          // may stun it, the Dąb wieków heals the party every move.
-          ...(p.front && { front: true, stunChance: p.stunChance, stunLabel: p.stunLabel }),
-          ...(p.partyHeal && { partyHeal: p.partyHeal }),
-        };
-        actor.summons.push(summon);
-        // Legion Nawii: more of the same at once, as many as may stand (the
-        // event says how many stood, so the playback gives each its card).
-        let called = 1;
-        for (let more = 1; more < Math.round(p.count ?? 1) && actor.summons.length < summonLimit(actor); more++) {
-          actor.summons.push({ ...summon });
-          called += 1;
-        }
-        log(() => ({
-          ...base,
-          kind: 'summon',
-          state: 'up',
-          target: actor.id,
-          summon: name,
-          figure: p.summon,
-          summonHp: hp,
-          ...(called > 1 && { count: called }),
-          hp: actor.hp,
-          text: say(texts, 'summonUp', actions, { ...vars, summon: name, hp }) + (p.howl ? ` ${say(texts, 'summonHowl', actions, { howl: Math.round(p.howl * 100) })}` : ''),
-        }));
-        if (p.charge) {
-          // Przywołanie żubra: the bison charges the foe in front at once and
-          // stuns it, then stands as a summon does.
-          const target = /** @type {Unit} */ (pickTarget(actor, foremost(opponents)));
-          strike(actor, target, t, {
+        // Zew zwierząt and Gaj wieków call a pack at once (`pack`,
+        // 21.11.2026): each of its own, with its name, figure and numbers
+        // over the skill's, and its place in the pack (`order`), which its
+        // events carry, so the playback gives each its card. The skill went
+        // only with room for the whole pack (above).
+        const members = p.pack ? p.pack.map((/** @type {Record<string, any>} */ one) => ({ ...p, ...one })) : [p];
+        const called = members.map((/** @type {Record<string, any>} */ m, /** @type {number} */ index) => {
+          const hp = Math.max(1, Math.round(pool * m.hp * (1 + (grove?.summonHp ?? 0) + wise)));
+          const name = m.summonName;
+          const order = p.pack ? index + 1 : 0;
+          const summon = {
             skill,
-            power: p.charge * stronger,
-            category: 'physical',
-            summoned: true,
-            stun: true,
-            stunLabel: p.stunLabel,
-            words: { hit: 'chargeHit', crit: 'chargeHit', dodge: 'chargeMiss' },
-            vars: { summon: name },
-          });
-        } else summonActs(actor, summon, t);
+            name,
+            hp,
+            // Its full HP, to which Odrodzenie lasu heals it.
+            maxHp: hp,
+            until: actor.moves + Math.round(m.turns),
+            power: m.power === undefined ? undefined : m.power * stronger,
+            raw,
+            dot: m.dotEffect ? { effect: m.dotEffect, chance: 1, power: m.dotPower, ticks: Math.round(m.dotTicks) } : null,
+            // A slime bursts when it falls; a wolf, an ent, a bear or a
+            // skeleton strikes with its body; the white wolf howls (howl), the
+            // oak roots the foes it strikes (root).
+            burst: Boolean(m.burst),
+            physical: Boolean(m.physical),
+            ...(m.howl && { howl: m.howl }),
+            ...(m.root && { root: m.root }),
+            // The fourth forms' summons: the bear strikes the foe in front and
+            // may stun it, the Dąb wieków heals the party every move.
+            ...(m.front && { front: true, stunChance: m.stunChance, stunLabel: m.stunLabel }),
+            ...(m.partyHeal && { partyHeal: m.partyHeal }),
+            ...(order > 0 && { order }),
+          };
+          actor.summons.push(summon);
+          // Legion Nawii: more of the same at once, as many as may stand (the
+          // event says how many stood, so the playback gives each its card).
+          let count = 1;
+          for (let more = 1; more < Math.round(m.count ?? 1) && actor.summons.length < summonLimit(actor); more++) {
+            actor.summons.push({ ...summon });
+            count += 1;
+          }
+          log(() => ({
+            ...base,
+            kind: 'summon',
+            state: 'up',
+            target: actor.id,
+            summon: name,
+            figure: m.summon,
+            summonHp: hp,
+            ...(count > 1 && { count }),
+            ...(order > 0 && { order }),
+            hp: actor.hp,
+            text: say(texts, 'summonUp', actions, { ...vars, summon: name, hp }) + (m.howl ? ` ${say(texts, 'summonHowl', actions, { howl: Math.round(m.howl * 100) })}` : ''),
+          }));
+          return { summon, m };
+        });
+        for (const { summon, m } of called) {
+          if (m.charge) {
+            // Przywołanie żubra (Zew zwierząt): the bison charges the foe in
+            // front at once and stuns it, then stands as a summon does.
+            const front = foremost(opponents);
+            if (front.length === 0 || actor.hp <= 0) continue;
+            const target = /** @type {Unit} */ (pickTarget(actor, front));
+            strike(actor, target, t, {
+              skill,
+              power: m.charge * stronger,
+              category: 'physical',
+              summoned: true,
+              stun: true,
+              stunLabel: m.stunLabel,
+              words: { hit: 'chargeHit', crit: 'chargeHit', dodge: 'chargeMiss' },
+              vars: { summon: summon.name },
+              ...(summon.order && { summonOrder: summon.order }),
+            });
+          } else summonActs(actor, summon, t);
+        }
       } else if (p.curse) {
         // Klątwa rozkładu: no blow, a poison on every foe that wears its
         // armour away, of the curser's average blow.
@@ -2034,6 +2061,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         target: actor.id,
         summon: name,
         summonSkill: summon.skill.id,
+        ...(summon.order && { summonOrder: summon.order }),
         summonHp: 0,
         hp: actor.hp,
         text: say(texts, 'summonGone', actions, { summon: name }),

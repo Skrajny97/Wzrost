@@ -375,13 +375,15 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   // ahead of it, at the front). The foes' blows meant for the summoner land
   // on it, its blows and spit start from it, fallen it stays grey like a
   // fallen unit until it or another is called, and gone, its card goes. With
-  // Serce puszczy two stand at once, each in its own card: a summon is known
+  // the Druid's line several stand at once, each in its own card: a summon is known
   // by its summoner and its skill (the events name it, `summonSkill`, once it
   // stands; a report from before them has one summon a summoner).
   // Legion Nawii's two knights stand at once, each in its own card (the
   // event says how many, `count`): the foes' blows land on the first still
   // standing, which falls or goes first, and their own blows of a moment go
-  // to them in turn.
+  // to them in turn. A pack (Zew zwierząt's bison and bear, Gaj wieków's two
+  // oaks, 21.11.2026) comes in one event a summon, each named by its place
+  // (`order`), and the events of each name it too (`summonOrder`).
   const summoned = new Map(); // `${summoner's id} ${skill}[ ${order}]` → { unit, card, skill, owner, down, order }
   const summonKey = (owner, skill, order = 1) => `${owner} ${skill}${order > 1 ? ` ${order}` : ''}`;
   const summonsOf = (owner) => [...summoned.values()].filter((decoy) => decoy.owner === owner);
@@ -390,7 +392,8 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   // standing), else the summoner's only one.
   const summonFor = (event) => {
     const squad = squadOf(event.target, event.summonSkill ?? event.skill);
-    return squad.find((decoy) => !decoy.down) ?? squad[0] ?? summonsOf(event.target)[0] ?? null;
+    const own = event.summonOrder ? squad.find((decoy) => decoy.order === event.summonOrder) : null;
+    return own ?? squad.find((decoy) => !decoy.down) ?? squad[0] ?? summonsOf(event.target)[0] ?? null;
   };
   function summonPlace(owner, card) {
     const at = FIELDS.findIndex(([position]) => position === owner.position);
@@ -403,7 +406,8 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     const owner = byId.get(event.target);
     if (!owner) return Promise.resolve();
     const coming = [];
-    for (let order = 1; order <= Math.max(1, event.count ?? 1); order++) {
+    const first = event.order ?? 1;
+    for (let order = first; order < first + Math.max(1, event.count ?? 1); order++) {
       let decoy = summoned.get(summonKey(owner.id, event.skill, order));
       if (!decoy) {
         // A fallen summon's grey card gives way to the one called now.
@@ -454,7 +458,10 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   function actorOf(event) {
     const squad = event.skill ? squadOf(event.actor, event.skill) : [];
     if (squad.length > 0 && (MOVES.has(event.kind) || event.kind === 'skill')) {
-      // (Of several standing, the blows of one moment go to them in turn.)
+      // (A pack's summon by its place; of several standing, the blows of one
+      // moment go to them in turn.)
+      const own = event.summonOrder ? squad.find((decoy) => decoy.order === event.summonOrder) : null;
+      if (own) return own.unit;
       const standing = squad.filter((decoy) => !decoy.down);
       if (standing.length > 1 && MOVES.has(event.kind)) {
         const at = fight.events.indexOf(event);

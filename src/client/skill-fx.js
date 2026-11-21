@@ -2857,6 +2857,11 @@ export function skillEffects(kit) {
   // The card of the creature a summon calls (arena.js gives it a card of
   // its own before its summoner), by its summoner and its skill.
   function summonedCard(event) {
+    // A pack's summon (Zew zwierząt, Gaj wieków): its own card, by its place.
+    if (event.order) {
+      const own = cards.get(`${event.target}~summon~${event.skill}${event.order > 1 ? `~${event.order}` : ''}`);
+      if (own) return own;
+    }
     for (const entry of cards.values()) {
       if (entry.unit.summon === event.skill && entry.unit.id.startsWith(`${event.target}~`)) return entry;
     }
