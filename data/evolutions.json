@@ -249,7 +249,7 @@
       "description": "Zamiast czystej many sięga po moc puszczy. Na jego wezwanie przychodzą drzewa i zwierzęta.",
       "growth": { "intellect": 3, "wisdom": 3, "vitality": 1 },
       "perClassLevel": { "hp": 4, "mana": 5 },
-      "trait": { "name": "Moc puszczy", "text": "Maks. mana +25%, co ruch wraca 5% many, a przywołańce mają o 30% więcej HP i zadają o 30% więcej obrażeń.", "kind": "arcana", "params": { "mana": 0.25, "regen": 0.05, "summonHp": 0.3, "summonPower": 0.3 } },
+      "trait": { "name": "Moc puszczy", "text": "Maks. mana +25%, co ruch wraca 5% many, a przywołańce mają o 30% więcej HP i zadają o 30% więcej obrażeń. Dwa przywołańce naraz: Ent i Niedźwiedź.", "kind": "arcana", "params": { "mana": 0.25, "regen": 0.05, "summonHp": 0.3, "summonPower": 0.3, "summons": 2 } },
       "skills": ["ent-summon", "bear-summon"]
     },
     {
@@ -424,7 +424,7 @@
       "description": "Najstarsze drzewa puszczy budzą się na jego wezwanie.",
       "growth": { "intellect": 4, "wisdom": 3, "vitality": 2 },
       "perClassLevel": { "hp": 5, "mana": 6 },
-      "trait": { "name": "Serce puszczy", "text": "+40% many i drugi przywołaniec naraz. Co ruch wraca 5% many, a przywołańce mają o 30% więcej HP i zadają o 30% więcej obrażeń.", "kind": "arcana", "params": { "mana": 0.4, "regen": 0.05, "summonHp": 0.3, "summonPower": 0.3, "summons": 2 } },
+      "trait": { "name": "Serce puszczy", "text": "+40% many i trzy przywołańce naraz. Co ruch wraca 5% many, a przywołańce mają o 30% więcej HP i zadają o 30% więcej obrażeń.", "kind": "arcana", "params": { "mana": 0.4, "regen": 0.05, "summonHp": 0.3, "summonPower": 0.3, "summons": 3 } },
       "skills": ["oak-awakening", "bison-call"]
     },
     {
@@ -603,7 +603,7 @@
       "description": "Najstarszy z druidów. Puszcza rośnie z jego mądrości, a jej stworzenia stają przy nim do walki.",
       "perClassLevel": { "hp": 6, "mana": 7 },
       "growth": { "intellect": 5, "wisdom": 3, "vitality": 3 },
-      "trait": { "name": "Korzenie świata", "text": "+50% many i trzy przywołańce naraz. Co ruch wraca 6% many, a przywołańce mają o 40% więcej HP i zadają o 40% więcej obrażeń. Każde 20 punktów Mądrości daje przywołańcom jeszcze 1% HP i obrażeń.", "kind": "arcana", "params": { "mana": 0.5, "regen": 0.06, "summonHp": 0.4, "summonPower": 0.4, "summons": 3, "wisdomPer": 20 } },
+      "trait": { "name": "Korzenie świata", "text": "+50% many i cztery przywołańce naraz. Co ruch wraca 6% many, a przywołańce mają o 40% więcej HP i zadają o 40% więcej obrażeń. Każde 20 punktów Mądrości daje przywołańcom jeszcze 1% HP i obrażeń.", "kind": "arcana", "params": { "mana": 0.5, "regen": 0.06, "summonHp": 0.4, "summonPower": 0.4, "summons": 4, "wisdomPer": 20 } },
       "skills": ["oak-of-ages", "forest-rebirth"]
     },
     {

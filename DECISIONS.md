@@ -3901,9 +3901,17 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
-## Wersja 0.4.89 (21.11.2026): pasek many w walce
+## Wersja 0.4.89 (21.11.2026): pasek many w walce, przywołańce Druidów
 
-Według sekcji niżej, bez makiet (autor: „Wdrażaj od razu, szkoda Twoich zasobów na makiety”).
+Według dwóch sekcji niżej, bez makiet (autor: „Wdrażaj od razu, szkoda Twoich zasobów na makiety”). Pierwsze wdrożenie 0.4.89 zatrzymał test czasu oceny zagrożenia na wolnym serwerze GitHuba (6,07 ms przy granicy 6 ms); lokalnie przed zmianą i po niej ok. 2 ms, więc wersja idzie jeszcze raz, razem z przywołańcami Druidów.
+
+## Przywołańce Druidów: 2, 3 i 4 naraz (21.11.2026)
+
+Gracz (poz. 81) przez autora: Druid „korzysta tylko z jednej umiejętności na raz, przywołuje drzewca a jak ten padnie to dopiero niedźwiedzia”. Tak było zaprojektowane (`summonLimit`: jeden przywołaniec, Arcydruid dwa, Pradruid trzy). Autor: „Zmieniamy arcydruid bedzie mial trzech, pradruid czterech” i „Nawet jeśli się rozjedzie to tylko zmniejsz siłę Przywołańców”.
+
+1. **Limity (`trait.params.summons`):** Druid 2 (Moc puszczy: Ent i Niedźwiedź naraz), Arcydruid 3 (Serce puszczy), Pradruid 4 (Korzenie świata); opisy cech po polsku i angielsku mówią o tym wprost.
+2. **Ten sam przywołaniec dalej tylko raz naraz** (każda umiejętność przywołania stoi najwyżej raz), więc Arcydruid ma dziś trzy umiejętności przywołania (Dąb, Niedźwiedź, Żubr) i może mieć wszystkie trzy naraz, a Pradruid też trzy (Dąb wieków, Niedźwiedź, Żubr); czwarte miejsce zadziała, gdy dostanie kolejną umiejętność przywołania. Przywołanie kosztuje 50% maks. many (0.4.85), więc dwa naraz biorą całą pulę, a odnowienie (10 ruchów) i czas trwania (4 ruchy) i tak rzadko pozwalają mieć wszystkie naraz.
+3. **Balans:** testy Areny (przedział 30–70%) i porównania ewolucji (druga, trzecia, czwarta forma) przechodzą bez zmian siły przywołańców, więc ich nie zmniejszałem. Testy limitów: `test/second-evolution.test.js` (Ent i Niedźwiedź razem, nigdy więcej niż dwa), `third-evolution` (limit 3), `fourth-evolution` (limit 4).
 
 ## Pasek many w walce (21.11.2026)
 

@@ -529,7 +529,8 @@ describe('the third forms in fights', () => {
     near(nextOn(monarch) / nextOn(withParam(monarch, 'ice-tomb', 'bonus', 0)), 1 + paramOf(monarch, 'ice-tomb', 'bonus'), 0.02, 'Lodowy grobowiec');
   });
 
-  test('Serce puszczy: two summons stand at once; the oak roots the foe it strikes; the bison charges the foe in front and stuns it', () => {
+  test('Serce puszczy: up to three summons at once (two before 21.11.2026); the oak roots the foe it strikes; the bison charges the foe in front and stuns it', () => {
+    assert.equal(form('archdruid').feat.summons, 3);
     const grove = fight('serce', [form('archdruid', { skillLevel: 145 })], [sturdy('boar', 'e0'), sturdy('crow', 'e1')]);
     const standing = new Set();
     let both = false;

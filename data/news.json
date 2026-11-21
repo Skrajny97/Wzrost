@@ -1619,7 +1619,7 @@
     {
       "id": "0.4.89",
       "title": "Wersja 0.4.89",
-      "body": "- Walka: w odtwarzaniu walki pod paskiem HP jest teraz cienki niebieski pasek many. Spada przy każdej umiejętności, także gdy włącza się Osłona many, i rośnie po miksturze many. W raporcie z wyprawy pod każdą walką widać manę postaci na początku i na końcu, np. „Mana: 1552 → 340”."
+      "body": "- Walka: w odtwarzaniu walki pod paskiem HP jest teraz cienki niebieski pasek many. Spada przy każdej umiejętności, także gdy włącza się Osłona many, i rośnie po miksturze many. W raporcie z wyprawy pod każdą walką widać manę postaci na początku i na końcu, np. „Mana: 1552 → 340”.\n- Druid ma teraz dwa przywołańce naraz (Ent i Niedźwiedź), Arcydruid trzy, a Pradruid cztery."
     }
   ]
 }
