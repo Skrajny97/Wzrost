@@ -980,11 +980,6 @@
         "text": "an ancient giant oak rising from the ground: the earth rumbling, roots tearing out, deep creaking and groaning wood and leaves rustling in the wind, fantasy, no music",
         "seconds": 2.0
       },
-      "skill-forest-rebirth": {
-        "text": "an ancient forest coming back to life: deep creaking of growing tree trunks, roots cracking up through the earth, a rich warm magical chime and birdsong, epic nature magic, clean, no wind noise, no hiss, no music",
-        "seconds": 2.0,
-        "influence": 0.7
-      },
       "skill-divine-healing": {
         "text": "a divine healing spell: a clear bright heavenly bell chime, warm glowing magical tones rising up and a soft powerful sparkle at the end, clean and pure, no hiss, no noise, no music",
         "seconds": 2.0,

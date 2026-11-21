@@ -10,6 +10,7 @@
 // close to each other in the Arena.
 
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, test } from 'node:test';
 
 import {
@@ -106,9 +107,12 @@ describe('the fourth evolution in the engine', () => {
       assert.equal(form.classId, third.classId, form.id);
       assert.equal(form.stage, 4, form.id);
       assert.ok(form.description, form.id);
-      // Its first skill grows one of the third form's, the other is new.
+      // Its first skill grows one of the third form's, the other is new; the
+      // Pradruid's grows the Arcydruid's other one (Pradawne stado from Zew
+      // zwierząt, 1221 A).
       assert.ok(third.skills.includes(content.skillsById[form.skills[0]].from), form.id);
-      assert.ok(!content.skillsById[form.skills[1]].from, form.id);
+      if (form.id === 'elder-druid') assert.equal(content.skillsById[form.skills[1]].from, 'bison-call');
+      else assert.ok(!content.skillsById[form.skills[1]].from, form.id);
       for (const id of form.skills) {
         assert.equal(content.skillsById[id].maxLevel, 195, id);
         assert.equal(content.skillsById[id].classLevel, 300, id);
@@ -183,7 +187,9 @@ describe('the fourth evolution in the engine', () => {
     // skill strikes, heals and calls at least as strongly as its root at the
     // top level (a summon's HP counted for all it calls at once, and a
     // pack's blows too: Gaj wieków's two oaks, each weaker than the
-    // Arcydruid's one, 21.11.2026).
+    // Arcydruid's one, 21.11.2026). The Pradruid's Pradawne stado grows Zew
+    // zwierząt too, with weaker beasts: four summons at once keep the
+    // Pradruid in the Arena's band (1221 A).
     for (const form of fourths) {
       const grown = content.skillsById[form.skills[0]];
       const root = skillParams(content.skillsById[grown.from], 145, content);
@@ -395,7 +401,7 @@ describe('the fourth forms in fights', () => {
     assert.match(raised.text, /zatrzymuje \d+% obrażeń/);
   });
 
-  test('Korzenie świata: four summons may stand (three before 21.11.2026), Gaj wieków\'s two oaks and a pack of two more; the grove heals the party once a move; Odrodzenie lasu heals the party and its summons to full once', () => {
+  test('Korzenie świata: four summons may stand, Gaj wieków\'s two oaks and Pradawne stado\'s bison and bear (1221 A); the grove heals the party once a move; the bison charges the foe in front and stuns it', () => {
     const druid = form('elder-druid');
     assert.equal(druid.feat.summons, 4);
     const oak = fight('dab', [form('elder-druid', { only: ['oak-of-ages'] }), form('archangel', { only: [], id: 'a1' })], line());
@@ -410,23 +416,38 @@ describe('the fourth forms in fights', () => {
     assert.equal(first.summonHp, Math.max(1, Math.round(grove.maxMana * skillParams(content.skillsById['oak-of-ages'], 150, content).hp * (1 + 0.4 + wise))));
     const heals = oak.events.filter((event) => event.skill === 'oak-of-ages' && event.kind === 'heal');
     assert.equal(new Set(heals.map((event) => `${event.t} ${event.target}`)).size, heals.length, 'the grove healed someone twice in one move');
-    // Four at once: the two oaks and the Arcydruid's Zew zwierząt, given to
-    // the Pradruid for the count (the bison and the bear).
-    const mage = typicalCharacter('mage', 270, content);
-    const call = playerCombatant({ character: { ...mage.character, classLevel: 330, skills: { 'bison-call': 145 }, evolution: 'archdruid' }, equipped: mage.equipped, name: 'Arcydruid' }, content);
-    const both = { ...druid, skills: [...druid.skills.filter((skill) => skill.id === 'oak-of-ages'), ...call.skills] };
-    const herd = fight('gaj', [both], line());
-    const standing = new Set();
-    let most = 0;
-    for (const event of herd.events.filter((one) => one.kind === 'summon')) {
-      if (event.state === 'up') standing.add(`${event.skill} ${event.order}`);
-      else if (['gone', 'fell'].includes(event.state)) standing.delete(`${event.summonSkill} ${event.summonOrder}`);
-      most = Math.max(most, standing.size);
-    }
-    assert.equal(most, 4, 'two oaks, the bison and the bear at once');
-    const rebirth = fight('odrodzenie', [form('elder-druid', { hpShare: 0.6 })], line());
-    const healed = rebirth.events.find((event) => event.skill === 'forest-rebirth' && event.kind === 'heal');
-    assert.ok(healed);
+    // Pradawne stado (1221 A): the bison and the bear in one cast, each its
+    // own summon with its numbers and the trait's HP; the bison charges the
+    // foe in front at once and stuns it.
+    const caller = form('elder-druid', { only: ['ancient-herd'] });
+    const called = fight('stado', [caller], line());
+    const [bison, bear] = called.events.filter((event) => event.kind === 'summon' && event.state === 'up');
+    assert.deepEqual([bison.t, bison.skill, bison.order, bison.summon, bison.figure], [bear.t, 'ancient-herd', 1, 'Żubr', 'aurochs']);
+    assert.deepEqual([bear.skill, bear.order, bear.summon, bear.figure], ['ancient-herd', 2, 'Niedźwiedź', 'bear']);
+    const [ownBison, ownBear] = skillParams(content.skillsById['ancient-herd'], 150, content).pack;
+    const trait = 1 + 0.4 + caller.wisdom / 20 / 100;
+    assert.equal(bison.summonHp, Math.max(1, Math.round(caller.maxMana * ownBison.hp * trait)));
+    assert.equal(bear.summonHp, Math.max(1, Math.round(caller.maxMana * ownBear.hp * trait)));
+    const charge = called.events.findIndex((event) => event.skill === 'ancient-herd' && /Żubr szarżuje/.test(event.text ?? ''));
+    assert.ok(charge > 0);
+    assert.equal(called.events[charge].summonOrder, 1);
+    if (called.events[charge].kind !== 'dodge') assert.deepEqual([called.events[charge + 1].kind, called.events[charge + 1].target], ['stun', called.events[charge].target]);
+    assert.ok(called.events.some((event) => event.skill === 'ancient-herd' && BLOWS.includes(event.kind) && event.summonOrder === 2 && /Niedźwiedź atakuje/.test(event.text)));
+    // Four at once in a Pradruid's own fight: the two oaks, the bison and the
+    // bear, each under its name.
+    const standingNames = (result) => {
+      const standing = new Map();
+      let most = [];
+      for (const event of result.events.filter((one) => one.kind === 'summon')) {
+        if (event.state === 'up') standing.set(`${event.skill} ${event.order}`, event.summon);
+        else if (['gone', 'fell'].includes(event.state)) standing.delete(`${event.summonSkill} ${event.summonOrder}`);
+        if (standing.size > most.length) most = [...standing.values()].sort();
+      }
+      return most;
+    };
+    assert.deepEqual(standingNames(fight('gaj', [druid], line())), ['Dąb wieków', 'Dąb wieków', 'Niedźwiedź', 'Żubr']);
+    // With room for two, a pack waits while the other stands.
+    assert.equal(standingNames(fight('gaj-ciasno', [withFeat(druid, 'summons', 2)], line())).length, 2);
   });
 
   test('Anielska opieka: healing past full HP becomes a shield; Skrzydła światłości shield the party and burn whoever strikes the shield; Boskie uzdrowienie heals the party and keeps healing it', () => {
@@ -582,6 +603,24 @@ describe('the fourth evolution through the API (FOURTH_EVOLUTION "on")', () => {
       ['breach', 0, 195],
     ]);
     assert.deepEqual(JSON.parse((await (await db()).prepare('SELECT points FROM characters').first()).points), { strength: 3 });
+  });
+
+  test('a Pradruid keeps its Skill Points: its level in Odrodzenie puszczy moves to Pradawne stado (migrations/0169_ancient_herd.sql, 1221 A)', async () => {
+    await set(`class_id = 'mage', level = 270, class_level = 330, evolution = 'elder-druid', skills = '{"oak-of-ages":150,"forest-rebirth":141}', evolution_undo = '{"forest-rebirth":5,"oak-of-ages":2}'`);
+    const before = (await character()).skills.points;
+    const database = await db();
+    const migration = readFileSync('migrations/0169_ancient_herd.sql', 'utf8')
+      .replace(/--.*$/gm, '')
+      .split(';')
+      .map((statement) => statement.trim())
+      .filter(Boolean);
+    await database.batch(migration.map((statement) => database.prepare(statement)));
+    const row = await database.prepare('SELECT skills, evolution_undo FROM characters').first();
+    assert.equal(row.skills, '{"oak-of-ages":150,"ancient-herd":141}');
+    assert.deepEqual(JSON.parse(row.evolution_undo), { 'oak-of-ages': 2, 'ancient-herd': 5 });
+    const view = await character();
+    assert.deepEqual(view.skills.pools[0].options.map((skill) => [skill.id, skill.level]), [['oak-of-ages', 150], ['ancient-herd', 141]]);
+    assert.equal(view.skills.points, before);
   });
 
   test('on the test version a third form gets class level 300 at once, and keeps its form', async () => {

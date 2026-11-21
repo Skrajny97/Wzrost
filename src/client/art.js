@@ -335,7 +335,7 @@ export const SPRITES = {
       // The fourth forms' skills at class level 300, as the author chose them
       // (1100).
       'carnage', 'breach', 'glory-hurricane', 'champion-challenge', 'mountain-wrath', 'titan-shield', 'heaven-arrow', 'star-rain', 'perun-storm', 'ball-lightning',
-      'pack-chief', 'bear-call', 'primal-chaos', 'elemental', 'ice-eternity', 'ice-heart', 'oak-of-ages', 'forest-rebirth', 'divine-healing', 'wings-of-light',
+      'pack-chief', 'bear-call', 'primal-chaos', 'elemental', 'ice-eternity', 'ice-heart', 'oak-of-ages', 'divine-healing', 'wings-of-light',
       'day-of-wrath', 'pillar-of-light', 'clairvoyance', 'fate-reversal', 'soul-harvest', 'scythe-dance', 'navia-legion', 'navia-mist', 'eternal-night', 'shadow-strike',
     ],
   },

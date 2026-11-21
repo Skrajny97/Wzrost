@@ -1154,7 +1154,6 @@
     "skill-perun-storm": { "files": ["audio/sfx/skill-perun-storm-1.mp3"], "gain": 0.7 },
     "skill-ball-lightning": { "files": ["audio/sfx/skill-ball-lightning-1.mp3"], "gain": 0.7 },
     "skill-pack-chief": { "files": ["audio/sfx/skill-pack-chief-1.mp3"], "gain": 0.7 },
-    "skill-forest-rebirth": { "files": ["audio/sfx/skill-forest-rebirth-1.mp3"], "gain": 0.7 },
     "skill-divine-healing": { "files": ["audio/sfx/skill-divine-healing-1.mp3"], "gain": 0.7 },
     "skill-day-of-wrath": { "files": ["audio/sfx/skill-day-of-wrath-1.mp3"], "gain": 0.7 },
     "skill-clairvoyance": { "files": ["audio/sfx/skill-clairvoyance-1.mp3"], "gain": 0.7 },

@@ -144,7 +144,6 @@ export const SKILL_LOOKS = {
   'ice-eternity': { color: '#cdf3ff', impact: 'heavy', big: true, glow: true },
   'ice-heart': { color: '#9fe3ff', cast: 'shield' },
   'oak-of-ages': { color: '#9fd36b', cast: 'bless' },
-  'forest-rebirth': { color: '#8fdc6a', cast: 'heal' },
   'divine-healing': { color: '#ffe9a8', cast: 'heal' },
   'wings-of-light': { color: '#fff2b0', cast: 'shield' },
   'day-of-wrath': { color: '#ffb14a', impact: 'heavy', glow: true, big: true },
@@ -439,10 +438,10 @@ Object.assign(SKILL_LOOKS.elemental, { arrival: 'elemental', prism: true });
 Object.assign(SKILL_LOOKS['ice-eternity'], { orb: 'ice-lance', eternity: true, reticle: false });
 Object.assign(SKILL_LOOKS['ice-heart'], { iceheart: true, stance: 'unit--shielded' });
 // The Pradruid: the ancient oak with roots under the whole field, its
-// branches lashing and roots twining up its foe (Dąb wieków); the forest
-// breathing in, vines blossoming on every card (Odrodzenie puszczy).
+// branches lashing and roots twining up its foe (Gaj wieków). Its Pradawne
+// stado (`from: "bison-call"`) has the look, icon and sound of the
+// Arcydruid's Zew zwierząt (artChain).
 Object.assign(SKILL_LOOKS['oak-of-ages'], { arrival: 'oak', orb: 'lash', kind: 'physical', ancient: true });
-SKILL_LOOKS['forest-rebirth'].rebirth = true;
 // The Archanioł: wings of light and a rain of light over the party
 // (Boskie uzdrowienie); wings of light shielding every card (Skrzydła
 // światłości).
@@ -11183,43 +11182,6 @@ export function skillEffects(kit) {
     await wait(260);
   }
 
-  // The Odrodzenie puszczy: the forest breathes in: green light floods the
-  // arena and leaves fall all over it; on every card of the party vines
-  // climb up and burst into white and pink blossom, golden pollen rises,
-  // a ring of green opens at its feet and the HP comes back.
-  async function rebirthHeal(event, color) {
-    const entry = cards.get(event.target);
-    if (!entry || reduced() || !particles) {
-      await plainHeal(event, color);
-      return;
-    }
-    const card = entry.card;
-    const art = artOf(card);
-    const box = boxOf(card);
-    const figure = figureOf(art);
-    let lead = 0;
-    if (!event.place) {
-      lead = 260;
-      flash('#b6e388', 0.14, 420);
-      groundRing(event.actor, color, { duration: 900, scale: 1.4 });
-      const width = stageWidth();
-      for (let k = 0; k < 5; k++) leaves({ x: width * (0.1 + k * 0.2), y: 34 }, { count: 4, reach: 26, delay: k * 60 });
-    }
-    const middle = art.x + art.width / 2;
-    sprout(card, { x: middle - figure * 0.36, size: Math.min(figure * 0.9, box.height * 0.6), delay: lead });
-    sprout(card, { x: middle + figure * 0.36, size: Math.min(figure * 0.8, box.height * 0.55), delay: lead + 80 });
-    sprout(card, { x: middle, size: Math.min(figure * 0.6, box.height * 0.42), delay: lead + 160 });
-    const mark = anchor(lead + 1200);
-    after(lead + 380, mark, () => {
-      particles.burst({ x: middle, y: art.y + art.height * 0.55, area: { width: figure * 0.9, height: art.height * 0.5 }, count: 14, colors: ['#ffffff', '#ffd6e8', '#ff9ec4', '#fff6cf'], speed: [30, 90], gravity: 30, drag: 1.4, life: [700, 1000], size: [1.4, 2.6], shape: 'mote' });
-      particles.burst({ x: middle, y: box.y + box.height - 10, area: { width: figure, height: 6 }, count: 10, colors: GOLD, angle: -Math.PI / 2, spread: 0.4, speed: [30, 80], gravity: -30, drag: 1, life: [700, 1000], size: [1, 1.8], shape: 'mote' });
-      healed(event);
-      groundRing(entry.unit.id, color, { duration: 700 });
-      animate(card, [{ filter: 'brightness(1.35) saturate(1.3)' }, { filter: 'brightness(1)' }], { duration: 600, easing: 'ease-out' });
-    });
-    await wait(lead + 640);
-  }
-
   // Wings of light spread from a card's figure's shoulders (the
   // Archanioł's), kept on the stage, gold and glowing, for `duration`.
   function spreadWings(entry, duration, { delay = 0, scale = 1 } = {}) {
@@ -12352,10 +12314,9 @@ export function skillEffects(kit) {
     voices: [null, choirTick],
     laurels: [null, hymnTick],
     sun: [null, sunTick],
-    // The fourth forms' heals: the Dąb wieków's each move, the Odrodzenie
-    // puszczy, the Boskie uzdrowienie and its light over the next moves.
+    // The fourth forms' heals: the Dąb wieków's each move, the Boskie
+    // uzdrowienie and its light over the next moves.
     ancient: [null, oakTick],
-    rebirth: [rebirthHeal, rebirthHeal],
     divine: [divineHeal, divineTick],
     // The Odwrócenie losu's sand on the party.
     fate: [fateHeal, fateHeal],
@@ -12367,7 +12328,7 @@ export function skillEffects(kit) {
   async function heal(event) {
     const look = lookOf(event);
     // (963: a party heal's name is called over its first heal only.)
-    const again = event.place > 0 && (look.sprout || look.uplift || look.radiance || look.rebirth || look.divine || look.fate);
+    const again = event.place > 0 && (look.sprout || look.uplift || look.radiance || look.divine || look.fate);
     if (!event.quiet && !again) {
       playSkill(artChain(event.skill), 'effect');
       callout(event.actor, event.skillName, look.color);
