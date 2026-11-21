@@ -3901,6 +3901,10 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Wersja 0.4.88 (21.11.2026): Oprawianie z plecaka widoczne zawsze
+
+Według sekcji niżej (autor: „niby nie działa”, gracze nie mogli znaleźć „Z plecaka”).
+
 ## Oprawianie z plecaka: widoczne zawsze (21.11.2026)
 
 Autor ze zrzutem czatu: „niby nie działa”. Gracze widzieli „oprawianie z plecaka” (0.4.79) w „Co nowego?”, ale nie znaleźli go w Jubilerstwie; jeden napisał „No to nie można, bo też próbowałem”. Postać autora kopała w Kopalni, a jego Awatar pracował, więc nikt nie był wolny.
