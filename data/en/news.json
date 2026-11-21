@@ -1288,6 +1288,10 @@
     "0.4.88": {
       "title": "Version 0.4.88",
       "body": "- Jewelcrafting › “Setting”: the figure and “From the bag” always show. When no one can work (e.g. the character is on an exploration and the System Avatar is busy or not bought), they are dimmed and one line says when you can set a stone. During an exploration the System Avatar sets stones in items from the bag."
+    },
+    "0.4.89": {
+      "title": "Version 0.4.89",
+      "body": "- Fights: the fight playback now shows a thin blue mana bar under the HP bar. It drops with every skill, also when the Mana Shield switches on, and rises after a mana potion. In an exploration report, each fight shows the character's mana at its start and end, e.g. “Mana: 1552 → 340”."
     }
   }
 }
