@@ -3901,6 +3901,10 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Wersja 0.4.85 (21.11.2026): mana ×2, Mądrość i Zręczność
+
+Według sekcji niżej. Odstępstwo od polecenia autora („dwukrotne zwiększenie użycia to minimum”): na Arenie i w wojnach gildii koszt zostaje jak w 1045 B, bo przy ×2 Kleryk wypadał z przedziału 30–70% (772); autor dostaje to w raporcie. Pytanie 1220 o manę między walkami wyprawy, bo przy pełnej manie przed każdą walką mikstury many dalej prawie nie są potrzebne.
+
 ## Mana ×2, Mądrość i Zręczność (20.11.2026)
 
 Gracz (poz. 94), postać podobna do maga, której klasa rozdaje punkty w Intelekt, Witalność i Mądrość, omija Mądrość: „bo to większość mana a jak widzę na wyprawach nie wypijam mikstur many, więc wystarczająco posiadam many”. Autor: „zwiększ jeszcze bardziej użycie many by mikstury miały sens, myślę, że dwukrotne zwiększenie użycia to minimum, gracze mają tysiące jednostek many” i „Daj też boost jakiś dla statystyki Mądrość i chyba Zręczność bo one zdają się niczego nie dawać sporej ilości graczom”.
