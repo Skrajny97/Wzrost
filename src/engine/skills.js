@@ -86,9 +86,11 @@ const stagesOf = (content) => content.evolutionStages ?? (content.evolutionRules
 export function skillParams(skill, level, content) {
   const top = topLevel(skill, content);
   const share = (Math.min(Math.max(level, 1), top) - 1) / (top - 1);
-  return Object.fromEntries(
-    Object.entries(skill.params).map(([key, value]) => [key, Array.isArray(value) ? value[0] + (value[1] - value[0]) * share : value]),
-  );
+  /** @param {Record<string, any>} params */
+  const at = (params) => Object.fromEntries(Object.entries(params).map(([key, value]) => [key, Array.isArray(value) ? value[0] + (value[1] - value[0]) * share : value]));
+  // A pack's summons (Zew zwierząt, Gaj wieków) have numbers of their own.
+  const { pack, ...own } = skill.params;
+  return pack ? { ...at(own), pack: pack.map(at) } : at(own);
 }
 
 // Skill Points: earned from the class level of the first milestone on, that
@@ -286,12 +288,29 @@ export function raiseBlock(character, skillId, content, count = 1) {
   return null;
 }
 
+// The numbers of a pack's summons (Zew zwierząt, Gaj wieków) as a skill's
+// text names them: those of the first `{hp1%}`, `{power1%}`, of the second
+// `{hp2%}`, `{charge2%}` (skillText; tools/validate-data.mjs).
+/**
+ * @param {Record<string, any>} params
+ * @returns {Record<string, number>}
+ */
+export const packValues = (params) =>
+  Object.fromEntries(
+    (Array.isArray(params.pack) ? params.pack : []).flatMap((/** @type {Record<string, any>} */ one, /** @type {number} */ index) =>
+      Object.entries(one)
+        .filter(([, value]) => typeof value === 'number' || Array.isArray(value))
+        .map(([key, value]) => [`${key}${index + 1}`, value]),
+    ),
+  );
+
 // The skill's effect in words at its numbers. {name} is a whole number,
 // {name%} a percent, {name%.1} a percent with one decimal, {name pp}
 // percentage points, {name.1} one decimal, {cooldown} the cooldown,
 // {critPower%} the power with a critical hit and {name|one|few|many} the
 // number with its words in their form (counted, text.js); the decimals and
 // the points as the content's language writes them ("2,5", "2.5"; word()).
+// A pack's summons' numbers by their place (packValues).
 /**
  * @param {string} template
  * @param {Skill} skill
@@ -306,7 +325,7 @@ export function skillText(template, skill, params, content) {
   const evolution = skill.evolution ? content.evolutionsById?.[skill.evolution] : null;
   const critDamage = evolution?.trait?.params?.critDamage ?? 0;
   /** @type {Record<string, any>} */
-  const values = { ...params, cooldown: skill.cooldown, critPower: (params.power ?? 0) * content.balance.combat.critMultiplier * (1 + critDamage) };
+  const values = { ...params, ...packValues(params), cooldown: skill.cooldown, critPower: (params.power ?? 0) * content.balance.combat.critMultiplier * (1 + critDamage) };
   return counted(template, values).replace(/\{(\w+)(%\.1|%| pp|\.1)?\}/g, (whole, name, format) => {
     const value = values[name];
     if (typeof value !== 'number') return whole;

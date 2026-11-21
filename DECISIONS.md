@@ -3901,6 +3901,12 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Wersja 0.4.90 (21.11.2026): pasek many z 0.4.89, Zew zwierząt i Gaj wieków
+
+0.4.89 nie weszła do gry: trzecie wdrożenie znowu zatrzymał test czasu oceny zagrożenia (`test/engine.test.js`, 6,70 ms przy granicy 6 ms; pierwsze 6,07 ms). 0.4.89 tej oceny nie spowalnia (pasek many zapisuje manę tylko w walkach zapisywanych do odtwarzania, a ocena zagrożenia ich nie zapisuje), a lokalnie ocena trwa 2–4 ms. Serwery GitHuba, na których obok tego testu idą inne testy tej samej części, mierzą ten sam kod mniej więcej trzy razy dłużej, więc tam granica wynosi teraz 10 ms (`process.env.CI`), a lokalnie zostaje 6 ms. Jak przy 0.4.44 i 0.4.45, wszystko z 0.4.89 wchodzi do gry w 0.4.90, a wpis nowości 0.4.89 zostaje.
+
+Do tego Zew zwierząt i Gaj wieków według podsekcji „Zew zwierząt i Gaj wieków” w sekcji „Przywołańce Druidów: 2, 3 i 4 naraz” niżej. Pradruid ma na razie jedną umiejętność przywołania (dwa dęby); drugą, do „2×2”, wybiera autor w 1221 na stronie ocen. Wpis nowości 0.4.89 mówi już tylko o Druidzie: Arcydruid miałby w nim najwyżej dwa przywołańce, a Pradruid jednego, bo forma nie zachowuje umiejętności poprzedniej. Odtwarzanie walki sprawdzone w przeglądarce na telefonie (390 px): Arcydruid ma naraz Żubra, Prastary dąb i Niedźwiedzia, każdego z własną kartą, a Pradruid dwa Dęby wieków; bez błędów strony.
+
 ## Wersja 0.4.89 (21.11.2026): pasek many w walce, przywołańce Druidów
 
 Według dwóch sekcji niżej, bez makiet (autor: „Wdrażaj od razu, szkoda Twoich zasobów na makiety”). Pierwsze wdrożenie 0.4.89 zatrzymał test czasu oceny zagrożenia na wolnym serwerze GitHuba (6,07 ms przy granicy 6 ms); lokalnie przed zmianą i po niej ok. 2 ms, więc wersja idzie jeszcze raz, razem z przywołańcami Druidów.
@@ -3914,6 +3920,41 @@ Gracz (poz. 81) przez autora: Druid „korzysta tylko z jednej umiejętności na
 1. **Limity (`trait.params.summons`):** Druid 2 (Moc puszczy: Ent i Niedźwiedź naraz), Arcydruid 3 (Serce puszczy), Pradruid 4 (Korzenie świata); opisy cech po polsku i angielsku mówią o tym wprost.
 2. **Ten sam przywołaniec dalej tylko raz naraz** (każda umiejętność przywołania stoi najwyżej raz), więc Arcydruid ma dziś trzy umiejętności przywołania (Dąb, Niedźwiedź, Żubr) i może mieć wszystkie trzy naraz, a Pradruid też trzy (Dąb wieków, Niedźwiedź, Żubr); czwarte miejsce zadziała, gdy dostanie kolejną umiejętność przywołania. Przywołanie kosztuje 50% maks. many (0.4.85), więc dwa naraz biorą całą pulę, a odnowienie (10 ruchów) i czas trwania (4 ruchy) i tak rzadko pozwalają mieć wszystkie naraz.
 3. **Balans:** testy Areny (przedział 30–70%) i porównania ewolucji (druga, trzecia, czwarta forma) przechodzą bez zmian siły przywołańców, więc ich nie zmniejszałem. Testy limitów: `test/second-evolution.test.js` (Ent i Niedźwiedź razem, nigdy więcej niż dwa), `third-evolution` (limit 3), `fourth-evolution` (limit 4).
+
+### Zew zwierząt i Gaj wieków (21.11.2026)
+
+Autor: „Tylko będzie trzeba to jakoś rozdzielić nazwami że Arcydruid ma umiejetnosc wzywajaca zwierzeta i pojawia się jednoczesnie niedzwiedz i żubr a druga umiejętność od dębu. pradruid z kolei 2x2 przywołania”. Wcześniej: „Nawet jeśli się rozjedzie to tylko zmniejsz siłę Przywołańców”.
+
+1. **Poprawka do punktu 2 wyżej.** Forma nie zachowuje umiejętności formy przed nią: po każdej ewolucji postać ma tylko dwie umiejętności nowej formy (`evolvedSkills`; `$comment` w `data/evolutions.json`: „Dotychczasowe umiejętności znikają”). W 0.4.89 Arcydruid miał więc dwie umiejętności przywołania (Przebudzenie dębu, Przywołanie żubra), czyli najwyżej dwa przywołańce, a Pradruid jedną (Dąb wieków) obok Odrodzenia puszczy, czyli najwyżej jednego.
+2. **Druid bez zmian:** Przywołanie enta i Przywołanie niedźwiedzia, najwyżej dwa przywołańce naraz.
+3. **Arcydruid: dwie umiejętności przywołania, najwyżej trzy przywołańce naraz.**
+   - „Przebudzenie dębu” bez zmian: jeden Prastary dąb.
+   - „Zew zwierząt” (po angielsku „Call of the Beasts”; dawne „Przywołanie żubra”, to samo id `bison-call`, więc ikona, dźwięk i animacje zostają) rozwija Przywołanie niedźwiedzia Druida (`from: "bear-summon"`; karta ewolucji pokazuje „z: Przywołanie niedźwiedzia”). Jedno rzucenie, za jedną cenę many, przywołuje naraz żubra i niedźwiedzia na 4 ruchy, każdego jako osobnego przywołańca. Żubr (HP 35–50% maks. many, co ruch 190–270% obrażeń) od razu szarżuje na wroga z przodu za 250–350% i ogłusza go, a potem bodzie losowego wroga. Niedźwiedź ma liczby niedźwiedzia Druida (HP 25–35%, 120–190%) i rwie pazurami losowego wroga. Brakujący szczegół: żubr staje z przodu i pierwszy przyjmuje ciosy (ma więcej HP, a opis mówi „staje murem”), a na wezwanie najpierw szarżuje żubr, potem bije niedźwiedź.
+4. **Pradruid: „Gaj wieków”** (po angielsku „Grove of Ages”; dawny „Dąb wieków”, to samo id `oak-of-ages`) przywołuje naraz dwa Dęby wieków na 6 ruchów, każdy z ciosem gałęzi i korzeniami dębu. Brakujący szczegół: drużynę leczy cały gaj raz na ruch, póki stoi choć jeden dąb (leczy pierwszy stojący), a nie każdy dąb osobno, bo podwójnego leczenia nie dałoby się zmniejszyć samą siłą przywołańców. „Odrodzenie puszczy” zostaje.
+   - **Czeka na autora:** „2×2” wymaga drugiej umiejętności przywołania, a Pradruid ma dwa miejsca: Gaj wieków i Odrodzenie puszczy. Dziś stoją przy nim najwyżej dwa przywołańce (dwa dęby); limit cechy zostaje 4, a opis cechy mówi „do czterech”.
+5. **Zasady w walce** (`params.pack` w `data/evolutions.json`: przywołańce jednej umiejętności, każdy ze stworem, nazwą i liczbami, które zastępują liczby umiejętności; `src/engine/combat.js`):
+   - umiejętność rusza tylko wtedy, gdy zmieszczą się wszystkie przywołańce paczki, inaczej czeka (Zew zwierząt przy dębie Arcydruida z limitem 2 czeka, aż dąb zniknie);
+   - nie wraca, póki stoi którykolwiek z jej przywołańców, jak dotąd każda umiejętność przywołania;
+   - każdy przywołaniec ma premie cechy właściciela: HP i obrażenia przywołańców Serca puszczy i Korzeni świata oraz 1% za każde 20 punktów Mądrości;
+   - zapis walki: każdy przywołaniec przychodzi w osobnym zdarzeniu, pod własną nazwą („Arcydruid przywołuje: Żubr, 4363 HP.”, „Arcydruid przywołuje: Niedźwiedź, 3054 HP.”), z miejscem w paczce (`order`). Jego ciosy, przyjęte ciosy, upadek i odejście niosą to miejsce (`summonOrder`), więc odtwarzanie walki daje każdemu własną kartę i własne przyjście. Walka zapisana przed zmianą odtwarza się jak dotąd;
+   - Legion Nawii (`count`) bez zmian: przywołuje tylu rycerzy, ilu się zmieści.
+6. **Balans.** Pomiar jak w testach ewolucji: wyprawy 4 h w najnowszym miejscu, realistyczny gracz bez towarzyszy, 120 wypraw (`measureClass` z `tools/class-balance-sim.mjs`; Arcydruid na 200. poziomie wobec Druida, Pradruid na 260. wobec Arcydruida), i Arena (`tools/pvp-arena-sim.mjs`, wszystkie ścieżki).
+
+   | Forma | Pomiar | 0.4.89 | Po zmianie |
+   |---|---|---|---|
+   | Arcydruid | wyprawy: omdlenia, HP na końcu, szybkość zabijania wobec Druida | 0%, 0,780, 1,48× | 0%, 0,796, 1,78× |
+   | Arcydruid | Arena, 200. poziom | 27,1% | 48,4% |
+   | Arcydruid | Arena, poziomy 210–290 | 30,3% | 49,8% |
+   | Pradruid | wyprawy: omdlenia, HP na końcu, szybkość zabijania wobec Arcydruida | 0%, 0,890, 1,74× | 0%, 0,901, 1,69× |
+   | Pradruid | Arena, 260. poziom | 44,3% | 49,0% |
+   | Pradruid | Arena, 300. poziom | 71,4% | 65,6% |
+
+   - Arcydruid mieści się w przedziałach bez zmniejszania: w Arenie był najsłabszą trzecią formą, a teraz jest w środku stawki. Najsłabsza trzecia forma na 200. poziomie to teraz Legenda Areny (31,3 → 27,1%, przedział 25–75%).
+   - Pradruid z dwoma dębami pełnej siły wygrywał w Arenie 86,5% (260. poziom) i 96,4% (300.) pojedynków, więc według autora zmniejszyłem tylko siłę dębów: każdy dąb ma około 40% dawnych liczb, HP 20–34% maks. many zamiast 45–86% i cios 80–153% zamiast 200–383%. Przy połowie dawnych liczb Pradruid miał 77,6% na 300. poziomie, przy 40% wyprawy wychodzą jak przed zmianą (HP na końcu 0,901 wobec 0,890). Najniższe HP to 20%, a nie 18%: wtedy dwa dęby na 145. poziomie umiejętności (tyle daje 290 oddanych punktów) mają razem tyle HP co Prastary dąb Arcydruida na najwyższym, jak chce test rozwiniętych umiejętności czwartych form. Ten test liczy teraz przy paczce HP i ciosy wszystkich jej przywołańców (dwa dęby: 2 × 134% wobec 220% jednego Prastarego dębu).
+   - Na tle innych form: trzecie formy kończą wyprawy z 0,717–1,000 HP (Arcydruid 0,796), czwarte z 0,720–1,000 (Pradruid 0,901).
+7. **Opisy cech:** Serce puszczy „+40% many i do trzech przywołańców naraz: Prastary dąb, Żubr i Niedźwiedź…”, Korzenie świata „+50% many i do czterech przywołańców naraz…”, Moc puszczy bez zmian. Po angielsku od razu, bez zatwierdzania.
+8. **Testy:** `test/third-evolution.test.js` (trzy naraz: dąb, żubr i niedźwiedź; Zew zwierząt przywołuje obu jednym rzuceniem, każdego pod swoją nazwą, z HP z many i premią cechy; bez miejsca na obu nie rusza; przy dębie i limicie 2 czeka; nie wraca, póki stoi niedźwiedź, choć żubr padł; druga umiejętność Arcydruida rozwija niedźwiedzia), `test/fourth-evolution.test.js` (dwa Dęby wieków jednym rzuceniem, gaj leczy raz na ruch; cztery naraz: dwa dęby oraz żubr i niedźwiedź Zewu zwierząt, dany Pradruidowi do próby).
+9. **Pliki:** `data/evolutions.json`, `data/en/evolutions.json`, `data/en/sources.json`, `data/schemas/evolutions.schema.json` (`pack`), `src/engine/combat.js` (`summonLimit`, `useSkill`, `summonActs`, `summonTakes`, `evolutionMove`, `marksOf`), `src/engine/skills.js` (`skillParams`, `packValues`, `skillText`), `src/engine/combatant.js` (`poweredParams`), `src/client/arena.js` (`summonUp`, `summonFor`, `actorOf`), `src/client/skill-fx.js` (`summonedCard`), `tools/validate-data.mjs` (paczka: tylko przy przywołaniu, z HP i czasem, nie większa niż limit formy; liczby z opisu, np. `{hp1%}`).
 
 ## Pasek many w walce (21.11.2026)
 

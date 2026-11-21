@@ -223,6 +223,8 @@ const strikeOf = (strike, category) => strike ?? (category === 'magical' ? 'magi
 function poweredParams(params, power) {
   const out = { ...params };
   for (const key of ['power', 'single', 'dotPower', 'chainPower']) if (typeof out[key] === 'number') out[key] *= power;
+  // A pack's summons (Zew zwierząt, Gaj wieków), each with its own power.
+  if (Array.isArray(out.pack)) out.pack = out.pack.map((/** @type {Record<string, any>} */ one) => poweredParams(one, power));
   return out;
 }
 

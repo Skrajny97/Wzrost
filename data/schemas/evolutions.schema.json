@@ -125,6 +125,25 @@
           "once": { "const": true },
           "params": {
             "type": "object",
+            "properties": {
+              "pack": {
+                "type": "array",
+                "minItems": 2,
+                "description": "Przywołańce jednej umiejętności, które przychodzą naraz (Zew zwierząt, Gaj wieków; 21.11.2026): każdy ze swoim stworem (summon), nazwą (summonName) i liczbami, które zastępują liczby umiejętności. Umiejętność działa tylko wtedy, gdy zmieszczą się wszystkie.",
+                "items": {
+                  "type": "object",
+                  "required": ["summon", "summonName"],
+                  "additionalProperties": {
+                    "anyOf": [
+                      { "type": "number" },
+                      { "type": "boolean" },
+                      { "type": "string" },
+                      { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 }
+                    ]
+                  }
+                }
+              }
+            },
             "additionalProperties": {
               "anyOf": [
                 { "type": "number" },

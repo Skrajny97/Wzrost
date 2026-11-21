@@ -1761,7 +1761,10 @@ test('the threat estimate for one inner region stays well within the CPU budget'
   for (const { character, equipped } of cases) faintChances({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, content);
   // The best of five rounds measures the warmed code (about 2 ms), not the compiling
   // or a busy machine: the first round alone came close to the limit on an idle
-  // computer and went over it on a slow GitHub runner.
+  // computer and went over it on a slow GitHub runner. GitHub's runners, with
+  // the other tests of a shard running beside it, measure the same code about
+  // three times longer (6.1 and 6.7 ms in November 2026), so there the limit is 10 ms.
+  const limit = process.env.CI ? 10 : 6;
   let best = Infinity;
   for (let round = 0; round < 5; round++) {
     const started = performance.now();
@@ -1770,7 +1773,7 @@ test('the threat estimate for one inner region stays well within the CPU budget'
     }
     best = Math.min(best, (performance.now() - started) / 30);
   }
-  assert.ok(best < 6, `the average estimate took too long: ${best.toFixed(2)} ms`);
+  assert.ok(best < limit, `the average estimate took too long: ${best.toFixed(2)} ms (limit ${limit} ms)`);
 });
 
 describe('camp', () => {

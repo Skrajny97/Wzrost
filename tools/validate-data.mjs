@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import Ajv from 'ajv';
 import { fireBuilding, fireTrade } from '../src/engine/fire.js';
 import { TIMED_KINDS, fightsText } from '../src/engine/potions.js';
+import { packValues } from '../src/engine/skills.js';
 
 const DATA_DIR = new URL('../data/', import.meta.url);
 const CLIENT_DIR = new URL('../src/client/', import.meta.url);
@@ -136,8 +137,21 @@ function checkEvolutions(data, { classIds, effectIds, elements, stats }) {
       if (element !== undefined && !elements.has(element)) errors.push(`${at} ma nieznany żywioł "${element}"`);
     }
     if (params.category !== undefined && !['physical', 'magical'].includes(params.category)) errors.push(`${at} ma nieznany rodzaj obrażeń "${params.category}"`);
+    // A pack (Zew zwierząt, Gaj wieków): summons that come at once, each
+    // with its HP and time, no more than the form lets stand; the text
+    // names the numbers of each by its place ({hp1%}, {power2%}).
+    if (params.pack !== undefined) {
+      if (skill.kind !== 'summon') errors.push(`${at} ma przywołańców naraz (pack), a nie przywołuje`);
+      for (const one of params.pack) {
+        const member = { ...params, ...one };
+        if (member.hp === undefined || typeof member.turns !== 'number') errors.push(`${at}: przywołaniec "${one.summonName}" nie ma HP albo czasu`);
+      }
+      const limit = evolutionById.get(skill.evolution)?.trait.params.summons ?? 1;
+      if (params.pack.length > limit) errors.push(`${at} przywołuje naraz ${params.pack.length}, a forma pozwala na ${limit}`);
+    }
+    const named = { ...params, ...packValues(params) };
     for (const [, name] of skill.effect.matchAll(/\{(\w+)(?:%\.1|%| pp|\.1)?\}/g)) {
-      if (!(name in params) && name !== 'cooldown' && name !== 'critPower') errors.push(`${at} ma w opisie skutku nieznaną liczbę "${name}"`);
+      if (!(name in named) && name !== 'cooldown' && name !== 'critPower') errors.push(`${at} ma w opisie skutku nieznaną liczbę "${name}"`);
     }
   }
   const before = (data.balance.skills.lastPointClassLevel - data.balance.skills.unlockClassLevel + 1) * data.balance.skills.pointsPerClassLevel;
