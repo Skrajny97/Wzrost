@@ -3901,6 +3901,27 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Oprawianie z plecaka: widoczne zawsze (21.11.2026)
+
+Autor ze zrzutem czatu: „niby nie działa”. Gracze widzieli „oprawianie z plecaka” (0.4.79) w „Co nowego?”, ale nie znaleźli go w Jubilerstwie; jeden napisał „No to nie można, bo też próbowałem”. Postać autora kopała w Kopalni, a jego Awatar pracował, więc nikt nie był wolny.
+
+1. **Co pokazała przeglądarka (360 px, przed zmianą).**
+   - (a) Postać w domu: „Oprawianie” z „Z plecaka”; kamień w przedmiocie z plecaka oprawia się od początku do końca (start, koniec po czasie, odbiór raportu, kamień w przedmiocie).
+   - (b) Na wyprawie z wolnym Awatarem: noszone przygaszone, „Z plecaka” działa, pracuje Awatar, jego raport odbiera się w trakcie wyprawy i kamień trafia do przedmiotu. Tak samo na usłudze najemnej.
+   - (c) Na wyprawie bez Awatara i (d) na wyprawie z zajętym Awatarem: karty „Oprawianie” nie było wcale, nad zakładkami stał tylko panel „Postać jest na wyprawie. Praca w Szlifierni możliwa po powrocie.” (przy (d) mylący: Awatar oprawi w trakcie wyprawy). Tak samo u autora (kopanie i zajęty Awatar) i na usłudze najemnej.
+   - Błędu serwera ani strony nie było. Zgłoszenia brały się stąd, że bez wolnego pracownika „Z plecaka” w ogóle się nie pokazywało.
+2. **Zmiana.** W „Oprawianiu” postać z ekwipunkiem i „Z plecaka” są zawsze. Gdy nikt nie jest wolny (postać zajęta, a Awatara nie ma albo pracuje), noszone przedmioty, Rdzeń i wiersze „Z plecaka” są przygaszone i nie da się ich stuknąć, nie ma wyboru „Kto pracuje”, a w miejscu wskazówki nad postacią stoi jedna linijka, dlaczego i kiedy:
+   - na wyprawie z Awatarem: „Postać jest na wyprawie. Kamień w przedmiocie z plecaka oprawi Awatar Systemu, gdy będzie wolny.”;
+   - na wyprawie bez Awatara: „Postać jest na wyprawie. W trakcie wyprawy oprawia tylko Awatar Systemu.”;
+   - na usłudze najemnej tak samo, z „Postać wykonuje usługę najemną.” i „W trakcie usługi oprawia tylko Awatar Systemu.”;
+   - (brakujący szczegół) przy innej pracy postaci, z zajętym Awatarem: „Postać kopie w Kopalni, a Awatar Systemu jest zajęty. Oprawisz kamień, gdy któreś z nich będzie wolne.”, a bez Awatara: „Postać kopie w Kopalni. Oprawisz kamień, gdy będzie wolna.” Z dwoma Awatarami linijka mówi „Awatar Systemu”, jak przy jednym.
+
+   Panel „…Praca w Szlifierni możliwa po powrocie.” nad zakładkami znika wtedy w „Oprawianiu”, żeby nie było dwóch komunikatów; w „Biżuterii”, „Przemianie” i „Przechowalni” zostaje bez zmian. Praca Szlifierni w toku i raport do odbioru stoją nad zakładkami jak dotąd.
+3. **Podpowiedź pod „Z plecaka”:** „Oprawisz kamień w przedmiocie z plecaka, także gdy postać jest na wyprawie (pracę wykona Awatar Systemu).” (brakujący szczegół) Tylko gdy postać nie jest na wyprawie ani na usłudze najemnej: wtedy linijka nad postacią mówi już o plecaku i Awatarze.
+4. **Po angielsku** w `data/en/strings.json`, np. „The character is on an exploration. The System Avatar will set a stone in an item from the bag once it is free.” i „You can set a stone in an item from the bag even while the character is on an exploration (the System Avatar does the work).”
+5. **Sprawdzone:** (a)–(d), kopanie z zajętym Awatarem i usługa najemna w przeglądarce po zmianie; przygaszony stan po polsku i po angielsku na 320, 360, 430, 1366 i 1920 px (z przedmiotem o najdłuższej nazwie) bez przewijania na boki i tekstu poza ramką; `tools/layout-check.cjs`: 9 rozmiarów ekranu × 53 ekrany bez problemów.
+6. **Pliki:** `src/client/jewel-setting.js` (nowy, `settingLines`), `src/client/screens/professions.js` (`setForm`, `works`, `renderJewelcraft`), `src/client/styles.css` (`.set-bag-row:disabled`, `.set-bag-note`), `data/en/strings.json`, testy w `test/mining.test.js` („Oprawianie: the line over the figure”).
+
 ## Wersja 0.4.87 (21.11.2026): skrót gildii przy właśnie wysłanej wiadomości
 
 Zgłoszenie gracza (poz. 63) przez autora: „jak piszę wiadomość to nie widać nazwy gildii, wraca dopiero po przełączeniu okna”. Serwer odsyłał świeżo wysłaną wiadomość bez skrótu gildii piszącego, a czytane później wiadomości go miały. Teraz `POST /api/chat` dokłada skrót tak jak listy wiadomości (`guildTagSql` w `src/server/chat.js`); test w `test/guilds.test.js`.

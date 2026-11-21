@@ -1067,3 +1067,36 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
     assert.ok(after.minerals.length > 0);
   });
 });
+
+// Jubilerstwo's „Oprawianie” on the page (src/client/jewel-setting.js,
+// 21.11.2026): with no one free the figure and „Z plecaka” stay, dim, and
+// the line over them says why and when; players had found no „Z plecaka”
+// while the character explored, as the tab showed nothing then.
+describe('Oprawianie: the line over the figure', () => {
+  const character = (kind, owned) => ({ activity: kind ? { kind } : null, professions: { avatar: { owned } } });
+  const BAG = 'Oprawisz kamień w przedmiocie z plecaka, także gdy postać jest na wyprawie (pracę wykona Awatar Systemu).';
+
+  test('with someone free: a tap at home, only the bag away, and what „Z plecaka” is for while at home', async () => {
+    const { settingLines } = await import('../src/client/jewel-setting.js');
+    assert.deepEqual(settingLines(character(null, false), false, ''), { hint: 'Stuknij przedmiot albo Rdzeń, żeby oprawić w nim kamień.', bag: BAG });
+    // The character mining, the Awatar free.
+    assert.deepEqual(settingLines(character('minerals', true), false, 'kopie w Kopalni'), { hint: 'Stuknij przedmiot albo Rdzeń, żeby oprawić w nim kamień.', bag: BAG });
+    assert.deepEqual(settingLines(character('hunt', true), false, 'jest na wyprawie'), { hint: 'Na wyprawie oprawisz tylko przedmioty z plecaka.', bag: null });
+    assert.deepEqual(settingLines(character('mercenary', true), false, 'wykonuje usługę najemną'), { hint: 'Na usłudze najemnej oprawisz tylko przedmioty z plecaka.', bag: null });
+  });
+
+  test('with no one free: one line of why and when, by the Awatar bought or not', async () => {
+    const { settingLines } = await import('../src/client/jewel-setting.js');
+    const hint = (kind, owned, doing) => settingLines(character(kind, owned), true, doing).hint;
+    assert.equal(hint('hunt', true, 'jest na wyprawie'), 'Postać jest na wyprawie. Kamień w przedmiocie z plecaka oprawi Awatar Systemu, gdy będzie wolny.');
+    assert.equal(hint('hunt', false, 'jest na wyprawie'), 'Postać jest na wyprawie. W trakcie wyprawy oprawia tylko Awatar Systemu.');
+    assert.equal(hint('mercenary', true, 'wykonuje usługę najemną'), 'Postać wykonuje usługę najemną. Kamień w przedmiocie z plecaka oprawi Awatar Systemu, gdy będzie wolny.');
+    assert.equal(hint('mercenary', false, 'wykonuje usługę najemną'), 'Postać wykonuje usługę najemną. W trakcie usługi oprawia tylko Awatar Systemu.');
+    // The author's case: the character mining, the Awatar at work.
+    assert.equal(hint('minerals', true, 'kopie w Kopalni'), 'Postać kopie w Kopalni, a Awatar Systemu jest zajęty. Oprawisz kamień, gdy któreś z nich będzie wolne.');
+    assert.equal(hint('minerals', false, 'kopie w Kopalni'), 'Postać kopie w Kopalni. Oprawisz kamień, gdy będzie wolna.');
+    // „Z plecaka” says what it is for only where the hint does not.
+    assert.equal(settingLines(character('hunt', true), true, 'jest na wyprawie').bag, null);
+    assert.equal(settingLines(character('minerals', true), true, 'kopie w Kopalni').bag, BAG);
+  });
+});
