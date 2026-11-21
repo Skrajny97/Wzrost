@@ -4183,6 +4183,21 @@ summary {
   transition: width 0.35s ease;
 }
 
+/* A unit's mana, thin right under its HP (21.11.2026), in the mana colour
+   of the top bar; it moves as the HP bar does. A mana shield's brighter,
+   glowing bar comes under it while the shield holds. */
+.unit-mana {
+  height: 3px;
+  margin-top: -1px;
+  background: var(--mana-track);
+}
+
+.unit-mana-fill {
+  height: 3px;
+  background: var(--mana);
+  transition: width 0.35s ease;
+}
+
 /* A mana shield's points under the HP bar, while the shield holds. */
 .unit-shield {
   height: 4px;
@@ -4509,6 +4524,16 @@ summary {
 
 .fight-outcome--false {
   color: var(--danger);
+}
+
+/* The character's mana as the fight began and ended (21.11.2026), under
+   its outcome, in the light blue of a mana potion's number in the
+   playback. */
+.fight-mana {
+  margin: 0;
+  color: #8fd3ff;
+  font-family: var(--font-system);
+  font-size: 12px;
 }
 
 .fight-pager {

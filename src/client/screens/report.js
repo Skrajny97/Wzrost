@@ -7,6 +7,7 @@
 import { createArena } from '../arena.js';
 import { eventFigure, itemSprite, materialSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
+import { fightManaLine } from '../fight-mana.js';
 import { countOf, dateTimeFormat, formatMinutes, formatNumber, formatOffset } from '../format.js';
 import { t } from '../i18n.js';
 import { playSound } from '../sound.js';
@@ -374,6 +375,9 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
             chests: chest,
           })
         : `HP ${fight.hpBefore} → ${fight.hpAfter} · ${fightResult(fight.won)}`;
+    // The character's mana as the fight began and ended, where the
+    // exploration keeps it (21.11.2026): „Mana: 1552 → 340”.
+    const manaLine = fightManaLine(fight);
     const header = h(
       'div',
       { class: 'fight-header' },
@@ -402,6 +406,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
           .join(' · '),
       }),
       h('p', { class: `fight-outcome fight-outcome--${String(fight.won)}`, text: outcome }),
+      manaLine && h('p', { class: 'fight-mana', text: manaLine }),
     );
 
     const pager =

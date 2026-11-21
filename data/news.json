@@ -1615,6 +1615,11 @@
       "id": "0.4.88",
       "title": "Wersja 0.4.88",
       "body": "- Jubilerstwo › „Oprawianie”: postać i rubrykę „Z plecaka” widać zawsze. Gdy nikt nie może pracować (np. postać jest na wyprawie, a Awatar Systemu pracuje albo go nie masz), są przygaszone, a jedna linijka mówi, kiedy oprawisz kamień. W trakcie wyprawy kamień w przedmiocie z plecaka oprawia Awatar Systemu."
+    },
+    {
+      "id": "0.4.89",
+      "title": "Wersja 0.4.89",
+      "body": "- Walka: w odtwarzaniu walki pod paskiem HP jest teraz cienki niebieski pasek many. Spada przy każdej umiejętności, także gdy włącza się Osłona many, i rośnie po miksturze many. W raporcie z wyprawy pod każdą walką widać manę postaci na początku i na końcu, np. „Mana: 1552 → 340”."
     }
   ]
 }

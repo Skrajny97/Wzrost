@@ -1564,6 +1564,9 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
       won: fight.won,
       hpBefore: fight.hpBefore,
       hpAfter: fight.hpAfter,
+      // The character's mana as the fight began and ended (1220 B), for the
+      // report's line under the fight („Mana: 1552 → 340”, 21.11.2026).
+      ...(fight.manaAfter !== undefined && { manaBefore: fight.manaBefore, manaAfter: fight.manaAfter }),
       xp: fight.xp,
       gold: fight.gold,
       materials: Object.entries(fight.materials).map(([key, count]) => materialView(key, count, content)),

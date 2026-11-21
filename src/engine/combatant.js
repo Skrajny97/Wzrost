@@ -615,6 +615,11 @@ export function combatantView(unit, opponentLevel, content) {
     champion: unit.champion ?? false,
     maxHp: unit.maxHp,
     hp: unit.hp,
+    // The playback's mana bar (21.11.2026): the most mana and what the fight
+    // starts with (full, or what the unit brings, never above its most, as
+    // combat.js starts it); the events carry each change. A creature has
+    // none, and no bar.
+    ...(unit.maxMana > 0 && { maxMana: unit.maxMana, mana: Math.min(unit.maxMana, unit.mana ?? unit.maxMana) }),
     attack: unit.weapon.attackName,
     strike: unit.weapon.strike,
     // The weapon's base and family, whose picture swings in a blade's blow.
