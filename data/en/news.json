@@ -1291,7 +1291,11 @@
     },
     "0.4.89": {
       "title": "Version 0.4.89",
-      "body": "- Fights: the fight playback now shows a thin blue mana bar under the HP bar. It drops with every skill, also when the Mana Shield switches on, and rises after a mana potion. In an exploration report, each fight shows the character's mana at its start and end, e.g. “Mana: 1552 → 340”.\n- The Druid now has two summons at once (the Ent and the Bear), the Archdruid three and the Elder Druid four."
+      "body": "- Fights: the fight playback now shows a thin blue mana bar under the HP bar. It drops with every skill, also when the Mana Shield switches on, and rises after a mana potion. In an exploration report, each fight shows the character's mana at its start and end, e.g. “Mana: 1552 → 340”.\n- The Druid now has two summons at once (the Ent and the Bear)."
+    },
+    "0.4.90": {
+      "title": "Version 0.4.90",
+      "body": "- Archdruid: “Summon Bison” becomes “Call of the Beasts”. One cast summons the bison and the bear at once, so with the oak of “Awakening of the Oak” the Archdruid has three summons at once.\n- Elder Druid: “Oak of Ages” becomes “Grove of Ages” and summons two Oaks of Ages at once. Each is weaker than the old oak, and together they heal the party once a turn while at least one stands.\n- In the fight playback each summon has its own card."
     }
   }
 }

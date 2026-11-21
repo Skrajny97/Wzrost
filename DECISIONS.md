@@ -3901,6 +3901,12 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Wersja 0.4.90 (21.11.2026): pasek many z 0.4.89, Zew zwierząt i Gaj wieków
+
+0.4.89 nie weszła do gry: trzecie wdrożenie znowu zatrzymał test czasu oceny zagrożenia (`test/engine.test.js`, 6,70 ms przy granicy 6 ms; pierwsze 6,07 ms). 0.4.89 tej oceny nie spowalnia (pasek many zapisuje manę tylko w walkach zapisywanych do odtwarzania, a ocena zagrożenia ich nie zapisuje), a lokalnie ocena trwa 2–4 ms. Serwery GitHuba, na których obok tego testu idą inne testy tej samej części, mierzą ten sam kod mniej więcej trzy razy dłużej, więc tam granica wynosi teraz 10 ms (`process.env.CI`), a lokalnie zostaje 6 ms. Jak przy 0.4.44 i 0.4.45, wszystko z 0.4.89 wchodzi do gry w 0.4.90, a wpis nowości 0.4.89 zostaje.
+
+Do tego Zew zwierząt i Gaj wieków według podsekcji „Zew zwierząt i Gaj wieków” w sekcji „Przywołańce Druidów: 2, 3 i 4 naraz” niżej. Pradruid ma na razie jedną umiejętność przywołania (dwa dęby); drugą, do „2×2”, wybiera autor w 1221 na stronie ocen. Wpis nowości 0.4.89 mówi już tylko o Druidzie: Arcydruid miałby w nim najwyżej dwa przywołańce, a Pradruid jednego, bo forma nie zachowuje umiejętności poprzedniej. Odtwarzanie walki sprawdzone w przeglądarce na telefonie (390 px): Arcydruid ma naraz Żubra, Prastary dąb i Niedźwiedzia, każdego z własną kartą, a Pradruid dwa Dęby wieków; bez błędów strony.
+
 ## Wersja 0.4.89 (21.11.2026): pasek many w walce, przywołańce Druidów
 
 Według dwóch sekcji niżej, bez makiet (autor: „Wdrażaj od razu, szkoda Twoich zasobów na makiety”). Pierwsze wdrożenie 0.4.89 zatrzymał test czasu oceny zagrożenia na wolnym serwerze GitHuba (6,07 ms przy granicy 6 ms); lokalnie przed zmianą i po niej ok. 2 ms, więc wersja idzie jeszcze raz, razem z przywołańcami Druidów.
