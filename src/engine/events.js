@@ -27,7 +27,7 @@
 import { simulateFight } from './combat.js';
 import { companionCombatant, gendered } from './companions.js';
 import { combatantView, playerCombatant } from './combatant.js';
-import { encounterCombatants, fightingPlayer } from './hunt.js';
+import { encounterCombatants, fightingPlayer, restedMana } from './hunt.js';
 import { itemName, randomItem } from './items.js';
 import { fightPotions } from './potions.js';
 import { countList, knownHerbs, professionOpen, professionState } from './professions.js';
@@ -627,9 +627,10 @@ export function resolveEvent(
   const texts = content.texts;
   // The companions who went on the exploration and are still standing fight
   // beside the character, each with the HP it ended the exploration with
-  // (the author, 5.11.2026: "nie walczył w zdarzeniu to taki błąd"). With
-  // them the foes grow as on the exploration; a character alone meets foes
-  // with only a share of the late and end game's growth (438.3 A).
+  // (the author, 5.11.2026: "nie walczył w zdarzeniu to taki błąd") and full
+  // mana, as in each fight on the way (hunt.js). With them the foes grow as
+  // on the exploration; a character alone meets foes with only a share of
+  // the late and end game's growth (438.3 A).
   /** @type {Map<string, Record<string, any>>} */
   const ended = new Map((hunt.companions ?? []).map((/** @type {Record<string, any>} */ one) => [one.id, one]));
   const mates = companions.flatMap((companion, index) => {
@@ -663,7 +664,7 @@ export function resolveEvent(
   }
   const fighter = weekFighter(character, hunt.week);
   const player = playerCombatant({ character: fighter, equipped, hp: hunt.hpEnd, name, area }, content);
-  const armed = fightingPlayer({ unit: player, character: fighter, equipped, name, area, hp: hunt.hpEnd, on, kit, trophies }, content);
+  const armed = fightingPlayer({ unit: player, character: fighter, equipped, name, area, hp: hunt.hpEnd, mana: hunt.manaEnd ?? null, on, kit, trophies }, content);
   const ally = { ...armed, ...(outcome.speedBonus && { speed: armed.speed * (1 + outcome.speedBonus) }) };
   const allies = [ally, ...mates.map((mate) => mate.unit)];
   /** @type {Record<string, any>} */
@@ -743,6 +744,10 @@ export function resolveEvent(
     summary.hpAfter = hpNow;
   }
 
+  // The character's mana at the end (1220 B), with the rest after a won
+  // fight, as on the way (restedMana).
+  const manaLeft = fight.units.find((/** @type {Record<string, any>} */ unit) => unit.id === ally.id).mana ?? hunt.manaEnd ?? null;
+  const manaEnd = fight.won === true ? restedMana(manaLeft, ally.maxMana ?? 0, content) : manaLeft;
   const told = fill(outcome.text);
   // A won fight gives what its win names besides (ties), and one not won
   // what its `lose` names (a companion's errand settled).
@@ -755,6 +760,7 @@ export function resolveEvent(
     gold: hunt.gold + summary.gold,
     items,
     hpEnd: hpNow,
+    ...(manaEnd !== null && { manaEnd }),
     potionsUsed,
     buffFights,
     ...(companionsAfter && { companions: companionsAfter }),

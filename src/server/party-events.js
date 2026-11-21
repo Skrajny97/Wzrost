@@ -59,14 +59,17 @@ const TRIES = 3;
 // kept at the first claim of any member's report, and its row as it is
 // now. `trip`: the exploration's options.party, with its roster in the
 // trip's order (its leader first) and seed; `hunt`: the exploration as the
-// claim simulates it, whose HP and the partners' are those of the trip's
-// end, the same in every member's.
+// claim simulates it, whose HP and mana and the partners' are those of the
+// trip's end, the same in every member's.
 export async function tripEvent(db, { row, activity, trip, hunt, area, now }) {
   const event = partyEventFor({ hunt, seed: trip.seed, drafts: eventDraftsOn() }, content());
   if (!event || activity.ends_at < now - KEEP_MS) return null;
   const leader = trip.roster[0];
   const partners = new Map((hunt.partners ?? []).map((one) => [one.id, one]));
-  const members = trip.roster.map((one) => ({ id: one.id, name: one.name, hpEnd: one.id === row.id ? hunt.hpEnd : (partners.get(one.id)?.hpEnd ?? one.hp) }));
+  const members = trip.roster.map((one) => {
+    const manaEnd = one.id === row.id ? hunt.manaEnd : partners.get(one.id)?.manaEnd;
+    return { id: one.id, name: one.name, hpEnd: one.id === row.id ? hunt.hpEnd : (partners.get(one.id)?.hpEnd ?? one.hp), ...(manaEnd !== undefined && { manaEnd }) };
+  });
   await db
     .prepare(
       `INSERT OR IGNORE INTO party_events (trip_key, party_id, leader_id, leader_name, event_id, area_id, region_id, level, members, ends_at, auto_at, created_at)
@@ -120,13 +123,14 @@ export function tripLine(eventRow) {
 }
 
 // Those who went, as the event is resolved: each still there, as it is now,
-// with its HP at the trip's end.
+// with its HP and mana at the trip's end (an event kept before 1220 B has
+// no mana: full).
 async function membersNow(db, eventRow) {
   const listed = JSON.parse(eventRow.members);
   const loaded = await Promise.all(listed.map((one) => loadCharacter(db, one.id)));
   return listed.flatMap((one, index) => {
     const member = loaded[index];
-    return member ? [{ id: one.id, name: member.row.name, hpEnd: one.hpEnd, character: engineCharacter(member.row), equipped: equippedItems(member) }] : [];
+    return member ? [{ id: one.id, name: member.row.name, hpEnd: one.hpEnd, ...(one.manaEnd !== undefined && { manaEnd: one.manaEnd }), character: engineCharacter(member.row), equipped: equippedItems(member) }] : [];
   });
 }
 

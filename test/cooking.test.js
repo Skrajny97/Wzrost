@@ -156,7 +156,11 @@ describe('Gotowanie in the engine', () => {
 
   describe('an exploration with a meal', () => {
     const { character, equipped } = typicalCharacter('warrior', 24, content);
-    const hunt = (meal, seed) => simulateHunt({ character, equipped, hp: 99999, name: 'Mira', areaId: 'boar-thicket', minutes: 240, seed, meal }, content);
+    // All the mana back after each fight, as before 1220 B
+    // (balance.hunt.manaRecoveryAfterFight): the meal's shares are counted
+    // on explorations that go as they went, a Wojownik without mana potions.
+    const steady = { ...content, balance: { ...content.balance, hunt: { ...content.balance.hunt, manaRecoveryAfterFight: 1 } } };
+    const hunt = (meal, seed) => simulateHunt({ character, equipped, hp: 99999, name: 'Mira', areaId: 'boar-thicket', minutes: 240, seed, meal }, steady);
 
     test('XP or gold by the share it covers, the fights and finds the same, and a line in the report', () => {
       for (const seed of ['posilek:1', 'posilek:2']) {

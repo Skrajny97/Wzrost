@@ -463,6 +463,7 @@
         "questTrackBonus",
         "unknownTrackBonus",
         "recoveryAfterFight",
+        "manaRecoveryAfterFight",
         "soloXpBonus",
         "lowLevelFreeDiff",
         "companionsAdvice",
@@ -675,6 +676,12 @@
         "recoveryAfterFight": {
           "type": "number",
           "minimum": 0
+        },
+        "manaRecoveryAfterFight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Jaka część brakującej many wraca po każdej wygranej walce wyprawy (1220 B, autor 21.11.2026: „mana wraca częściowo. Po każdej wygranej walce wraca 30% brakującej many, tak jak HP. Mikstury many przydadzą się na dłuższych wyprawach, a postać bez nich dalej da radę.”). Wyprawa zaczyna się z pełną maną, a każda następna walka z tym, co zostało po poprzedniej (z wypitymi miksturami many), i tą częścią brakującej. Tak samo każdy gracz wyprawy Drużyny, każdy ze swoją maną, i walka zdarzenia na końcu wyprawy, także zdarzenia Drużyny. Towarzysze i najemnik nie noszą mikstur, więc każdą walkę zaczynają z pełną maną. Bez dodatków odpoczynku HP (dłuższa wyprawa, klasa, Mądrość, cecha miejsca, Rdzeń). Wieże, Labirynt, Portale, Sala prób, Arena, wojny gildii i Bestia Gildii: każda walka z pełną maną, jak dotąd (src/engine/hunt.js: restedMana)."
         },
         "soloXpBonus": {
           "type": "number",

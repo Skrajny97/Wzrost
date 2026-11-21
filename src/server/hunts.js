@@ -221,18 +221,25 @@ function cachedSamples(player, character, equipped, areaId, now, hard = false, h
 // The healing potions of ?heal=…&below=…&kind=… for the threat
 // (potions.js): as many as asked of the kind chosen and, where the bag has
 // fewer of it, of the weaker ones after it (kindLine, 959), the strongest
-// carried without a kind, drunk below the mark asked, or null. `potions`:
-// the same by id, for the explorations with companions (threatSamples).
+// carried without a kind, drunk below the mark asked. `potions`: the same
+// by id, for the explorations with companions (threatSamples), with the
+// mana potions of ?mana=…&manaKind=… chosen the same way, which they drink
+// as on the way since the mana goes on from fight to fight (1220 B). Null
+// without either.
 function healingFor(player, params) {
-  const count = Number(params.get('heal') ?? 0);
-  if (!Number.isInteger(count) || count <= 0) return null;
   const { healBelow, healBelowChoices } = content().potionUse;
   const asked = Number(params.get('below') ?? healBelow);
   const below = healBelowChoices.includes(asked) ? asked : healBelow;
-  const line = kindLine(knownPotionsOf(player.row), 'heal', params.get('kind'), count, content());
-  const amounts = line.flatMap((one) => Array.from({ length: one.count }, () => one.amount));
-  const potions = Object.fromEntries(line.map((one) => [one.id, one.count]));
-  return amounts.length > 0 ? { count: amounts.length, amount: amounts[0], amounts, below, potions } : null;
+  const line = (kind, countKey, kindKey) => {
+    const count = Number(params.get(countKey) ?? 0);
+    return Number.isInteger(count) && count > 0 ? kindLine(knownPotionsOf(player.row), kind, params.get(kindKey), count, content()) : [];
+  };
+  const heal = line('heal', 'heal', 'kind');
+  const mana = line('mana', 'mana', 'manaKind');
+  if (heal.length === 0 && mana.length === 0) return null;
+  const amounts = heal.flatMap((one) => Array.from({ length: one.count }, () => one.amount));
+  const potions = Object.fromEntries([...heal, ...mana].map((one) => [one.id, one.count]));
+  return { count: amounts.length, amount: amounts[0] ?? 0, amounts, below, potions };
 }
 
 // The potions an exploration of `minutes` takes along (potions.js): known

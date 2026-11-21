@@ -578,22 +578,45 @@ export function championItemRarity(level, rng, content) {
 // (fightingClassLevel in combatant.js), for the myth game; 0 for none.
 // `players`: the players of a Drużyna who fight them together
 // (partyStrength in combatant.js).
+// The mana a fighter of an exploration takes into its next fight after a
+// won one (1220 B, the author, 21.11.2026: „Po każdej wygranej walce wraca
+// 30% brakującej many, tak jak HP”): what the fight left it and
+// hunt.manaRecoveryAfterFight of the rest up to its most, without the extras
+// of HP's rest (a longer exploration's, the class's, Mądrość's, the
+// place's, the Rdzeń's). An exploration sets out with full mana, and its
+// fights spend it from one to the next, as HP; the other fights (the
+// Wieże, the Labirynt, the Portale, the Sala prób, the Arena, the guild
+// wars, the Bestia Gildii) each start full. null (full, nothing spent yet)
+// stays null.
+/**
+ * @param {number | null} mana
+ * @param {number} maxMana
+ * @param {Content} content
+ * @returns {number | null}
+ */
+export function restedMana(mana, maxMana, content) {
+  if (mana === null) return null;
+  return mana + Math.round(Math.max(0, maxMana - mana) * content.balance.hunt.manaRecoveryAfterFight);
+}
+
 // A player as it fights now, on the way or in an event's fight (events.js):
 // its strengthening potions still working (`on`, each kind's bonus), the
 // potions it carries (`kit`, fightPotions) and its trophies. Focus raises
 // Intelekt and Mądrość, which the character's numbers grow from; the oil
 // of the poison buff (bladeOil) coats a blade that has no coat of its own
-// yet.
+// yet. `mana`: what the exploration's last fight left it, with the rest
+// after it (restedMana); null, full, as it sets out.
 /**
- * @param {{ unit: Record<string, any>, character: Character, equipped: Item[], name: string, area: Area, hp: number, on?: any, kit?: any, trophies: any }} options
+ * @param {{ unit: Record<string, any>, character: Character, equipped: Item[], name: string, area: Area, hp: number, mana?: number | null, on?: any, kit?: any, trophies: any }} options
  * @param {Content} content
  */
-export function fightingPlayer({ unit, character, equipped, name, area, hp, on = {}, kit = {}, trophies = {} }, content) {
+export function fightingPlayer({ unit, character, equipped, name, area, hp, mana = null, on = {}, kit = {}, trophies = {} }, content) {
   const base = on.focus ? playerCombatant({ character, equipped, hp, name, area, id: unit.id, statBoost: { intellect: on.focus, wisdom: on.focus } }, content) : unit;
   const oil = on.poison ? bladeOil(on.poison, content)?.dot : null;
   return {
     ...base,
     hp,
+    ...(mana !== null && { mana }),
     ...(on.speed && { speed: base.speed * (1 + on.speed) }),
     ...(on.armor && { armor: Math.round(base.armor * (1 + on.armor)) }),
     // A curse and wounds take off what a strength potion adds, both on top
@@ -742,12 +765,13 @@ export function simulateHunt(
   const rewards = content.balance.rewards;
   const texts = content.texts;
   const area = content.areasById[areaId];
-  // The players who fight, each with its HP through the exploration, the
-  // potions it still carries and drank, and the fights its potions for a
-  // time worked in: the trip's roster, or the character alone.
+  // The players who fight, each with its HP and mana through the
+  // exploration (the mana full as it sets out: null), the potions it still
+  // carries and drank, and the fights its potions for a time worked in: the
+  // trip's roster, or the character alone.
   const fighters = (roster ?? [{ id: null, character, equipped, hp, name, potions, healBelow, windows: { ...(speed && { speed }), ...buffs }, trophies }]).map((/** @type {Record<string, any>} */ one, /** @type {number} */ index) => {
     const { fighter, unit } = settingOut(one, week, area, index === 0 ? 'a0' : `p${index}`, content);
-    return { ...one, character: fighter, worn: one.equipped, unit, hp: unit.hp, left: { ...(one.potions ?? {}) }, potionsUsed: {}, buffFights: {}, windows: one.windows ?? {}, trophies: one.trophies ?? {} };
+    return { ...one, character: fighter, worn: one.equipped, unit, hp: unit.hp, mana: null, left: { ...(one.potions ?? {}) }, potionsUsed: {}, buffFights: {}, windows: one.windows ?? {}, trophies: one.trophies ?? {} };
   });
   const me = (roster && fighters.find((/** @type {Record<string, any>} */ one) => one.id === self)) || fighters[0];
   // The trip's encounters follow its leader (its level and the creatures it
@@ -772,7 +796,10 @@ export function simulateHunt(
   // The companions hired in the Osada (companions.js) go along, up to two
   // more members of the party, each with its own HP through the exploration
   // and a rest after each won fight as the character's; once one falls, it
-  // keeps to the back for the rest of the way.
+  // keeps to the back for the rest of the way. They carry no potions, so
+  // each of their fights starts with full mana, as the mercenary's (1220 B:
+  // a companion's mana going on from fight to fight made every exploration
+  // with companions harder, for every class, with mana potions or without).
   // Each companion along takes xpCost of the character's XP (question 235
   // B: alone, the character gets as much as before).
   // The other players of a Drużyna (src/server/parties.js) fight beside the
@@ -1031,15 +1058,26 @@ export function simulateHunt(
         if (Number.isFinite(window.fights) ? fights.length < window.fights : event.t < window.ms) on[kind] = window.bonus;
       }
       for (const kind of Object.keys(on)) fighter.buffFights[kind] = (fighter.buffFights[kind] ?? 0) + 1;
-      return fightingPlayer({ unit: fighter.unit, character: fighter.character, equipped: fighter.worn, name: fighter.name, area, hp: fighter.hp, on, kit, trophies: fighter.trophies }, content);
+      return fightingPlayer({ unit: fighter.unit, character: fighter.character, equipped: fighter.worn, name: fighter.name, area, hp: fighter.hp, mana: fighter.mana, on, kit, trophies: fighter.trophies }, content);
     });
     const ally = players[fighters.indexOf(me)];
     const fighting = mates.filter((mate) => !mate.out);
     const allies = [...players, ...fighting.map((mate) => ({ ...mate.unit, hp: mate.hp }))];
     const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait });
     const hpBefore = me.hp;
-    for (const fighter of fighters) fighter.hp = /** @type {Record<string, any>} */ (fight.units.find((unit) => unit.id === fighter.unit.id)).hp;
-    for (const mate of fighting) mate.hp = Math.max(0, /** @type {Record<string, any>} */ (fight.units.find((unit) => unit.id === mate.unit.id)).hp);
+    // The character's mana as the fight began (full, or what it brought,
+    // never more than its most, as combat.js starts it).
+    const manaBefore = Math.min(ally.maxMana ?? 0, me.mana ?? ally.maxMana ?? 0);
+    // What the fight left each one: its HP, and a player's mana, which the
+    // next fight starts from (1220 B), where the fight counted it.
+    /** @param {Record<string, any>} one */
+    const leftOf = (one) => /** @type {Record<string, any>} */ (fight.units.find((unit) => unit.id === one.unit.id));
+    const manaAfter = leftOf(me).mana;
+    for (const fighter of fighters) {
+      fighter.hp = leftOf(fighter).hp;
+      fighter.mana = leftOf(fighter).mana ?? fighter.mana;
+    }
+    for (const mate of fighting) mate.hp = Math.max(0, leftOf(mate).hp);
     // A potion drunk is the one player's that drank it (combat.js:
     // `drinkers`): on a trip each takes its own along, the members too since
     // 20.11.2026 (parties.js), so two may carry the same potion. Before, only
@@ -1063,6 +1101,9 @@ export function simulateHunt(
       won: fight.won,
       hpBefore,
       hpAfter: me.hp,
+      // The character's mana as the fight began and as it ended, before the
+      // rest (1220 B), where the fight counted it.
+      ...(manaAfter !== undefined && { manaBefore, manaAfter }),
       xp: 0,
       gold: 0,
       materials: {},
@@ -1158,11 +1199,14 @@ export function simulateHunt(
       xp += summary.xp;
       reached = gainXp(reached.level, reached.xp, summary.xp, (level) => xpToNext(level, content), maxLevel);
       gold += summary.gold;
-      for (const fighter of fighters) {
+      // The rest: a share of the missing HP back, and a player's of the
+      // missing mana (restedMana, up to the most it fought with).
+      fighters.forEach((/** @type {Record<string, any>} */ fighter, /** @type {number} */ index) => {
         const back = Math.round((fighter.unit.maxHp - fighter.hp) * Math.min(1, fighter.unit.recovery + pace.restBonus));
         if (fighter === me) summary.recovered = back;
         fighter.hp += back;
-      }
+        fighter.mana = restedMana(fighter.mana, players[index].maxMana ?? 0, content);
+      });
       for (const mate of fighting.filter((one) => !one.out)) mate.hp += Math.round((mate.unit.maxHp - mate.hp) * Math.min(1, mate.unit.recovery + pace.restBonus));
 
       lines.push(say(texts, 'victory', step), word(content, 'HP: {before} → {after}. +{xp} XP, +{gold} złota.', { before: hpBefore, after: summary.hpAfter, xp: summary.xp, gold: summary.gold }));
@@ -1232,6 +1276,9 @@ export function simulateHunt(
     hpStart,
     hpEnd: me.hp,
     maxHp: me.unit.maxHp,
+    // The mana the exploration ends with, for an event's fight at its end
+    // (events.js, party-events.js); none while nothing spent any (full).
+    ...(me.mana !== null && { manaEnd: me.mana }),
     fights,
     entries,
     keyFight: key && { index: key.index },
@@ -1248,12 +1295,12 @@ export function simulateHunt(
     // (weeks.js).
     ...(week && { week }),
     // The companions at the end: their HP and whether they fell on the way;
-    // the party's players too.
+    // the party's players too, a player's mana as the character's (manaEnd).
     ...(companions.length > 0 && {
       companions: mates.filter((mate) => !friends.includes(mate)).map((mate) => ({ id: mate.id, name: mate.unit.name, hpEnd: mate.hp, maxHp: mate.unit.maxHp, fainted: mate.out })),
     }),
     ...(friends.length > 0 && { partners: friends.map((/** @type {any} */ mate) => ({ id: mate.id, name: mate.unit.name, hpEnd: mate.hp, maxHp: mate.unit.maxHp, fainted: mate.out })) }),
-    ...(roster && { partners: fighters.filter((/** @type {any} */ fighter) => fighter !== me).map((/** @type {any} */ fighter) => ({ id: fighter.id, name: fighter.unit.name, hpEnd: fighter.hp, maxHp: fighter.unit.maxHp, fainted: false })) }),
+    ...(roster && { partners: fighters.filter((/** @type {any} */ fighter) => fighter !== me).map((/** @type {any} */ fighter) => ({ id: fighter.id, name: fighter.unit.name, hpEnd: fighter.hp, ...(fighter.mana !== null && { manaEnd: fighter.mana }), maxHp: fighter.unit.maxHp, fainted: false })) }),
   };
 }
 

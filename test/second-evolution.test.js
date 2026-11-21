@@ -549,7 +549,10 @@ describe('the second forms in fights', () => {
     // place's strength of the same day (balance.monsters.newestPlace).
     const monsters = { ...content.balance.monsters, lateGame: { ...lateGame, damage: 0.25, hp: 0.25 }, endGame: { ...endGame, damage: 0, hp: 0 }, classLevelCurve: [], newestPlace: null };
     const challenge = { ...content.balance.challenge, fromLevel: Infinity };
-    const then = { ...content, balance: { ...content.balance, monsters, challenge } };
+    // And all the mana back after each fight, as the forms were set (before
+    // 1220 B, balance.hunt.manaRecoveryAfterFight).
+    const rested = { ...content.balance.hunt, manaRecoveryAfterFight: 1 };
+    const then = { ...content, balance: { ...content.balance, monsters, challenge, hunt: rested } };
     const local = { ...then, areasById: { ...content.areasById, [area.id]: area } };
     const explore = (evolution) => {
       // The class level and gear of a character of level 90 as the forms

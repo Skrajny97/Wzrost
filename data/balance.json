@@ -112,6 +112,7 @@
     "questTrackBonus": 0.5,
     "unknownTrackBonus": 0.1,
     "recoveryAfterFight": 0.3,
+    "manaRecoveryAfterFight": 0.3,
     "soloXpBonus": 0.1,
     "lowLevelFreeDiff": 3,
     "companionsAdvice": { "fromLevel": 66, "text": "Od tej krainy stwory są bardzo silne. Idź tu z dwoma towarzyszami z Karczmy." },

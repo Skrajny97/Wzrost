@@ -426,10 +426,14 @@ export function mountCombat(container, { params, navigate }) {
   }
 
   // The healing potions taken along, for the threat: "&heal=2&below=0.4",
-  // with the kind chosen from the list (959).
+  // with the kind chosen from the list (959); and the mana potions,
+  // "&mana=3&manaKind=mana", which its explorations with companions drink
+  // too, as the mana goes on from fight to fight (1220 B).
   function healingQuery() {
     const healing = potions?.healing();
-    return healing && healing.count > 0 ? `&heal=${healing.count}&below=${healing.below}${healing.kind ? `&kind=${encodeURIComponent(healing.kind)}` : ''}` : '';
+    const mana = potions?.mana();
+    const heal = healing && healing.count > 0 ? `&heal=${healing.count}&below=${healing.below}${healing.kind ? `&kind=${encodeURIComponent(healing.kind)}` : ''}` : '';
+    return heal + (mana && mana.count > 0 ? `&mana=${mana.count}${mana.kind ? `&manaKind=${encodeURIComponent(mana.kind)}` : ''}` : '');
   }
 
   function render() {
@@ -1849,6 +1853,7 @@ export function mountCombat(container, { params, navigate }) {
       return [{ kind, taken, show, element, count }];
     });
     const heal = groups.find((group) => group.kind === 'heal');
+    const manaGroup = groups.find((group) => group.kind === 'mana');
     // Jagna's burn brew (667) is named only when the character carries it:
     // until she teaches the recipe, it has never heard of it.
     const burnCure = carried.some((potion) => potion.cures === 'burning');
@@ -1892,6 +1897,8 @@ export function mountCombat(container, { params, navigate }) {
       // The healing potions wished for, whatever the length: the server
       // takes one for each fight of every length.
       healing: () => heal && { count: counts.heal ?? 0, below, kind: picks.heal },
+      // And the mana potions, the same way (1220 B).
+      mana: () => manaGroup && { count: counts.mana ?? 0, kind: picks.mana },
       below: () => below,
     };
   }

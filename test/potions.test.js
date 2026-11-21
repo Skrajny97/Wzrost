@@ -381,6 +381,12 @@ describe('potions through the API', () => {
       assert.equal(chosen.status, 200);
       assert.ok(chosen.data.areas[0].threat[30]);
     }
+    // The mana potions taken along count too (1220 B), with healing ones or alone.
+    for (const query of ['&heal=3&below=0.5&mana=2', '&mana=2&manaKind=lesser-mana']) {
+      const withMana = await call('GET', `/api/hunts/options?area=fox-ravines${query}`, { cookie });
+      assert.equal(withMana.status, 200);
+      assert.ok(withMana.data.areas[0].threat[30]);
+    }
 
     // At a third of the HP the first blow taken calls for the potion.
     const { maxHp } = await character();
