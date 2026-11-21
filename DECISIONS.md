@@ -3901,6 +3901,10 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Wersja 0.4.86 (21.11.2026): mana między walkami wyprawy (1220 B)
+
+Według sekcji niżej. Towarzysze i najemnik zaczynają każdą walkę z pełną maną (nie noszą mikstur); bez mikstur many Wojownik, Łucznik i Cień mdleją częściej (do +16 punktów), co autor dostaje w raporcie razem z możliwością innego procentu.
+
 ## Mana między walkami wyprawy (1220 B, 21.11.2026)
 
 Pytanie 1220 z 0.4.85: przy pełnej manie przed każdą walką mikstury many dalej prawie nie były potrzebne. Wybór autora na stronie ocen (21.11.2026): „B: mana wraca częściowo. Po każdej wygranej walce wraca 30% brakującej many, tak jak HP. Mikstury many przydadzą się na dłuższych wyprawach, a postać bez nich dalej da radę.”

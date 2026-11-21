@@ -1600,6 +1600,11 @@
       "id": "0.4.85",
       "title": "Wersja 0.4.85",
       "body": "- Mana: umiejętności kosztują dwa razy więcej: cały swój koszt i 6% maks. many, a przywołania Arkanisty i Druida 50% maks. many. Na Arenie i w wojnach gildii koszt bez zmian.\n- Mądrość wzmacnia mikstury leczenia i many: +1% za każde 20 punktów, najwyżej +50% (Postać › Statystyki). Zręczność daje więcej uniku: 3 punkty oceny uniku za punkt zamiast 2."
+    },
+    {
+      "id": "0.4.86",
+      "title": "Wersja 0.4.86",
+      "body": "- Mana nie wraca już cała między walkami wyprawy: każda walka zaczyna się z maną, która została po poprzedniej, a po wygranej wraca 30% brakującej. Mikstury many przydają się na dłuższych wyprawach, a „Zagrożenie” liczy też te, które zabierasz."
     }
   ]
 }
