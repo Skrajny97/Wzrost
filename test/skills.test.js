@@ -418,23 +418,32 @@ describe('skills', () => {
     assert.ok(stab.kind === 'crit' || stab.kind === 'dodge');
   });
 
-  test('a skill costs half its cost and 3% of the maximum mana, never less than its own cost (1045 B)', () => {
+  test('a skill costs its whole cost and 6% of the maximum mana, twice the 1045 B rule (20.11.2026); the players\' duels keep 1045 B', () => {
     const strike = content.skillsById['power-strike'];
-    // A small pool pays the skill's own cost, as before.
-    assert.equal(skillMana(strike.mana, 58, content), strike.mana);
-    // A big pool pays half the cost and 3% of it: 1200 mana, 5 + 36.
-    assert.equal(skillMana(10, 1200, content), 41);
+    // A small pool pays the skill's own cost and 6% of it: 58 mana, 10 + 3.
+    assert.equal(skillMana(strike.mana, 58, content), 13);
+    // A big pool pays twice what it paid under 1045 B: 1200 mana, 10 + 72
+    // (5 + 36 = 41 before).
+    assert.equal(skillMana(10, 1200, content), 82);
     assert.equal(skillMana(0, 1200, content), 0);
-    // The card says what the skill costs the character, and how when the share counts.
-    assert.equal(skillView(strike, 1, content, 58).cost, 'Koszt: 10 many, najwyżej co 3. ruch.');
-    assert.equal(skillView(strike, 1, content, 1200).cost, 'Koszt: 41 many (5 + 3% maks. many), najwyżej co 3. ruch.');
+    // The Arena and the guild wars pay as under 1045 B (duelManaCost): half
+    // the cost and 3%, never less than the skill's own cost.
+    const duel = content.balance.skills.duelManaCost;
+    assert.equal(skillMana(10, 1200, content, duel), 41);
+    assert.equal(skillMana(strike.mana, 58, content, duel), strike.mana);
+    // The card says what the skill costs the character, and how.
+    assert.equal(skillView(strike, 1, content, 58).cost, 'Koszt: 13 many (10 + 6% maks. many), najwyżej co 3. ruch.');
+    assert.equal(skillView(strike, 1, content, 1200).cost, 'Koszt: 82 many (10 + 6% maks. many), najwyżej co 3. ruch.');
     const view = skillsView({ classId: 'warrior', classLevel: 12, skills: { 'power-strike': 1 } }, content, 1200);
-    assert.equal(view.pools[0].options.find((one) => one.id === 'power-strike').cost, 'Koszt: 41 many (5 + 3% maks. many), najwyżej co 3. ruch.');
+    assert.equal(view.pools[0].options.find((one) => one.id === 'power-strike').cost, 'Koszt: 82 many (10 + 6% maks. many), najwyżej co 3. ruch.');
     // In a fight the skill costs the same: a wise warrior pays more than its own cost.
     const { character, equipped } = typicalCharacter('warrior', 60, content);
     const wise = playerCombatant({ character: { ...character, points: { ...character.points, wisdom: (character.points?.wisdom ?? 0) + 200 }, skills: { 'power-strike': 1 } }, equipped, name: 'Mira' }, content);
     assert.equal(wise.skills.find((one) => one.id === 'power-strike').mana, skillMana(strike.mana, wise.maxMana, content));
     assert.ok(wise.skills.find((one) => one.id === 'power-strike').mana > strike.mana);
+    // A duelist pays the duels' rule.
+    const duelist = playerCombatant({ character: { ...character, points: { ...character.points, wisdom: (character.points?.wisdom ?? 0) + 200 }, skills: { 'power-strike': 1 } }, equipped, name: 'Mira', manaCost: duel }, content);
+    assert.equal(duelist.skills.find((one) => one.id === 'power-strike').mana, skillMana(strike.mana, duelist.maxMana, content, duel));
   });
 
   test('without a skill the fight is the same as before skills', () => {

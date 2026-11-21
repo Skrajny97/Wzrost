@@ -1595,6 +1595,11 @@
       "id": "0.4.84",
       "title": "Wersja 0.4.84",
       "body": "- Członkowie drużyny (poza liderem) zabierają teraz na wyprawę drużyny własne mikstury leczenia i many. Wybierz je w Społeczność › Drużyna, w rubryce „Mikstury na wyprawę drużyny”. Gra zabierze je z plecaka, gdy lider wyśle drużynę, a niewypite wrócą."
+    },
+    {
+      "id": "0.4.85",
+      "title": "Wersja 0.4.85",
+      "body": "- Mana: umiejętności kosztują dwa razy więcej: cały swój koszt i 6% maks. many, a przywołania Arkanisty i Druida 50% maks. many. Na Arenie i w wojnach gildii koszt bez zmian.\n- Mądrość wzmacnia mikstury leczenia i many: +1% za każde 20 punktów, najwyżej +50% (Postać › Statystyki). Zręczność daje więcej uniku: 3 punkty oceny uniku za punkt zamiast 2."
     }
   ]
 }

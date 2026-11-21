@@ -25,7 +25,8 @@
     "companions",
     "journal",
     "challenge",
-    "sideStats"
+    "sideStats",
+    "potionWisdom"
   ],
   "properties": {
     "combat": {
@@ -72,7 +73,8 @@
         },
         "dodgePerDexterity": {
           "type": "number",
-          "minimum": 0
+          "minimum": 0,
+          "description": "Ocena uniku postaci za punkt Zręczności (od 20.11.2026 3 zamiast 2, autor: „Daj też boost jakiś dla statystyki Mądrość i chyba Zręczność”). Stwory mają własną liczbę (monsters.dodgePerDexterity), więc nie są trudniejsze."
         },
         "dodgeCap": {
           "type": "number",
@@ -248,10 +250,22 @@
           "type": "object",
           "additionalProperties": false,
           "required": ["base", "share"],
-          "description": "Koszt umiejętności w manie (1045 B, autor 17.11.2026): base razy koszt z data/skills.json i evolutions.json (co najmniej 1) i share maksymalnej many postaci, ale nigdy mniej niż koszt z danych. Przywołania Arkanisty (manaShare) i umiejętności bez kosztu bez zmian.",
+          "description": "Koszt umiejętności w manie (1045 B, autor 17.11.2026; od 20.11.2026 dwa razy większy, autor: „dwukrotne zwiększenie użycia to minimum, gracze mają tysiące jednostek many”): base razy koszt z data/skills.json i evolutions.json (co najmniej 1) i share maksymalnej many postaci, ale nigdy mniej niż koszt z danych. Umiejętność wyceniona w udziale maksymalnej many (manaShare: przywołania Arkanisty i Druida) kosztuje manaShareFactor razy ten udział (bez niego 1). Tarcza many i umiejętności bez kosztu bez zmian.",
           "properties": {
             "base": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
-            "share": { "type": "number", "minimum": 0, "maximum": 0.5 }
+            "share": { "type": "number", "minimum": 0, "maximum": 0.5 },
+            "manaShareFactor": { "type": "number", "exclusiveMinimum": 0, "maximum": 4 }
+          }
+        },
+        "duelManaCost": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["base", "share"],
+          "description": "Koszt umiejętności w pojedynkach graczy (Arena, wojny gildii; pvp-arena.js: duelist), w tym samym kształcie co manaCost: jak przed 20.11.2026 (1045 B). Pojedynek nie ma mikstur i trwa kilka razy dłużej niż walka na wyprawie, więc podwójny koszt tylko odbierał szybkim klasom umiejętności w drugiej połowie walki (Kleryk wygrywał 76–80% pojedynków od 100. poziomu; 772: 30–70%). Bez niej pojedynki płacą jak wyprawy.",
+          "properties": {
+            "base": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+            "share": { "type": "number", "minimum": 0, "maximum": 0.5 },
+            "manaShareFactor": { "type": "number", "exclusiveMinimum": 0, "maximum": 4 }
           }
         },
         "lastPointClassLevel": {
@@ -1232,6 +1246,11 @@
         "soloGrowth"
       ],
       "properties": {
+        "dodgePerDexterity": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Ocena uniku stworów za punkt Zręczności: 2, jak przed zwiększeniem uniku postaci do 3 (combat.dodgePerDexterity, 20.11.2026), żeby stwory nie stały się trudniejsze. Bez niej stwory biorą liczbę postaci."
+        },
         "coop": {
           "type": "object",
           "description": "Od fromLevel stwory biją o damage mocniej i mają o hp więcej HP, z myślą o grze w drużynie (autor: „zwiększ poziom trudności o trochę od 25 lvla Postaci, czyli od Omszałych Głazów w górę w związku z mozliwoscia co-opa, nawet mimo kary za drużynę”).",
@@ -1526,6 +1545,17 @@
         "per": { "type": "integer", "minimum": 1 },
         "step": { "type": "number", "minimum": 0 },
         "cap": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "potionWisdom": {
+      "type": "object",
+      "description": "Mądrość wzmacnia mikstury leczenia i many (20.11.2026, autor: „Daj też boost jakiś dla statystyki Mądrość”): step więcej tego, co przywracają (udziału maks. HP albo maks. many), za każde pełne per punktów Mądrości, najwyżej cap. Działa wszędzie, gdzie postać pije takie mikstury: w walkach wypraw, wypraw Drużyny, Wież i innych, i przy piciu mikstury leczenia z plecaka (src/engine/formulas.js: potionBonus).",
+      "additionalProperties": false,
+      "required": ["per", "step", "cap"],
+      "properties": {
+        "per": { "type": "integer", "minimum": 1 },
+        "step": { "type": "number", "minimum": 0 },
+        "cap": { "type": "number", "minimum": 0, "maximum": 2 }
       }
     }
   }

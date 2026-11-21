@@ -38,7 +38,7 @@
     "id": "wisdom",
     "name": "Mądrość",
     "accusative": "Mądrość",
-    "combat": "Mana, skuteczność leczenia.",
+    "combat": "Mana, skuteczność leczenia. Mikstury leczenia i many działają mocniej.",
     "events": "Intencje zwierząt i duchów lasu."
   },
   {

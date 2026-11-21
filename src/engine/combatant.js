@@ -4,11 +4,11 @@
 
 import { coreEffects } from './core.js';
 import { evolutionOf, perClassLevelOf } from './evolutions.js';
-import { budget, cappedChance, damageScale, maxHp, maxMana, speed, weaponDamage } from './formulas.js';
+import { budget, cappedChance, damageScale, maxHp, maxMana, potionBonus, speed, weaponDamage } from './formulas.js';
 import { gearDamageOf, gearElementOf, gearKey, statAsOf, weaponScalingOf } from './gear.js';
 import { upgradedItem } from './items.js';
 import { gearLevel, midGameShare } from './progression.js';
-import { learnedSkills, skillMana } from './skills.js';
+import { learnedSkills, manaCostRule, skillMana } from './skills.js';
 import { sideStats } from './side-stats.js';
 import { computeStats } from './stats.js';
 
@@ -45,12 +45,13 @@ export const challengeMode = (hard, level, content) => (hard ? (challengeAt(leve
 // `statBoost`: shares some stats are raised by for a while, by stat (a
 // potion of focus, potions.js). A character in a fight of a week that
 // raises or lowers a stat (`weekStats`, weekFighter in weeks.js) has those
-// shares too.
+// shares too. `manaCost`: the skills' cost rule asked for (the players'
+// duels: balance.skills.duelManaCost), else the game's (manaCostRule).
 /**
- * @param {{ character: Character, equipped: Item[], hp?: number | null, name: string, area?: Area | null, id?: string, side?: string, statBoost?: Record<string, number> | null, skillStatWeight?: number | null }} fighter
+ * @param {{ character: Character, equipped: Item[], hp?: number | null, name: string, area?: Area | null, id?: string, side?: string, statBoost?: Record<string, number> | null, skillStatWeight?: number | null, manaCost?: { base: number, share: number, manaShareFactor?: number } | null }} fighter
  * @param {Content} content
  */
-export function playerCombatant({ character, equipped, hp, name, area, id = 'a0', side = 'ally', statBoost = null, skillStatWeight = null }, content) {
+export function playerCombatant({ character, equipped, hp, name, area, id = 'a0', side = 'ally', statBoost = null, skillStatWeight = null, manaCost = null }, content) {
   const balance = content.balance;
   const { totals: stats, bonuses } = computeStats(character, equipped, content);
   const week = character.weekStats ?? null;
@@ -125,6 +126,15 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
   const abilities = core?.abilities ?? {};
   // (Żniwo, the Nekromanta's trait grown from Toksyny, gives none.)
   const shelter = feat?.resist ? /** @type {Record<string, string>} */ ({ winter: 'frost', toxins: 'poison' })[feat.kind] : undefined;
+  // Mądrość's share more of what its healing and mana potions restore
+  // (balance.potionWisdom, combat.js), from the totals with the week's and
+  // the potions' shares.
+  const potions = potionBonus(totals.wisdom, balance);
+  // The skills' cost (skillMana): a skill priced in a share of the maximum
+  // mana pays manaShareFactor times that share (balance.skills.manaCost,
+  // 20.11.2026: twice).
+  const costRule = manaCost ?? manaCostRule(content);
+  const shareFactor = costRule?.manaShareFactor ?? 1;
   return {
     id,
     side,
@@ -148,16 +158,19 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     armor: Math.round(armor),
     resist,
     ...(shelter && { shelter: { [shelter]: feat.resist } }),
+    // 3 a point of Zręczność since 20.11.2026 (2 before; the creatures keep
+    // theirs, balance.monsters.dodgePerDexterity).
     dodgeRating: totals[agile] * balance.combat.dodgePerDexterity * (1 + dodgeBonus) * (1 + (core?.dodge ?? 0)),
     critRating: totals.perception * balance.combat.critPerPerception * (1 + (core?.crit ?? 0)),
     willRating: totals.will * balance.combat.willPerPoint * (1 + (core?.will ?? 0)),
     speed: speed(totals[agile], character.level, balance) * (feat?.kind === 'shadowStep' ? 1 + feat.speed : 1) * (1 + (core?.speed ?? 0)),
     // Skills and the mana they spend, full at the start of every fight;
-    // Wisdom also strengthens healing.
+    // Wisdom also strengthens healing, and the healing and mana potions.
     maxMana: manaFull,
     wisdom: totals.wisdom,
+    ...(potions > 0 && { potionBonus: potions }),
     // A skill priced in a share of the maximum mana costs that share of it
-    // (the Arkanista's summons, 934 A and 935 A).
+    // (the Arkanista's summons, 934 A and 935 A), times manaShareFactor.
     // The evolution's skills of an evolution whose growth gives a stat its
     // weapon does not use (986 B, evolutions.json skillStat): they scale with
     // the weapon's stat and that stat (balance.skills.skillStatWeight times
@@ -165,7 +178,7 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     // curses, summons and lightning. `skillPower`: their multiplier.
     skillPower,
     skills: learnedSkills(character, content).map((skill) => {
-      const priced = skill.manaShare ? { ...skill, mana: Math.max(1, Math.round(manaFull * skill.manaShare)) } : { ...skill, mana: skillMana(skill.mana, manaFull, content) };
+      const priced = skill.manaShare ? { ...skill, mana: Math.max(1, Math.round(manaFull * skill.manaShare * shareFactor)) } : { ...skill, mana: skillMana(skill.mana, manaFull, content, costRule) };
       return skillPower !== 1 && content.skillsById[skill.id]?.evolution ? { ...priced, params: poweredParams(priced.params, skillPower) } : priced;
     }),
     ...(feat && { feat }),
@@ -558,7 +571,9 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
     resist,
     // More damage from these elements, e.g. { fire: 0.5 }: half as much again.
     weak: monster.weaknesses,
-    dodgeRating: stat('dexterity') * balance.combat.dodgePerDexterity,
+    // The creatures' own number (2), not the characters' (3 since
+    // 20.11.2026), so they are no harder for it.
+    dodgeRating: stat('dexterity') * (balance.monsters.dodgePerDexterity ?? balance.combat.dodgePerDexterity),
     critRating: stat('perception') * balance.combat.critPerPerception,
     willRating: stat('will') * balance.combat.willPerPoint,
     speed: speed(stat('dexterity'), level, balance),

@@ -18,9 +18,9 @@ import { computeStats } from './stats.js';
 /** @typedef {Record<string, any>} Item An item, as items.js makes it. */
 /**
  * @typedef {{ damageMin: number, damageMax: number, damage: number, reduction: number, dodge: number, crit: number, effectResist: number,
- *   speed: number, maxHp: number, mana: number, regen: number, recovery: number, skillPower: number, resist: Record<string, number> }} CombatValues
+ *   speed: number, maxHp: number, mana: number, regen: number, recovery: number, skillPower: number, potions: number, resist: Record<string, number> }} CombatValues
  */
-/** @typedef {'damage' | 'skillPower' | 'reduction' | 'dodge' | 'crit' | 'effectResist' | 'speed' | 'maxHp' | 'mana' | 'regen' | 'recovery'} ValueKey */
+/** @typedef {'damage' | 'skillPower' | 'reduction' | 'dodge' | 'crit' | 'effectResist' | 'speed' | 'maxHp' | 'mana' | 'regen' | 'recovery' | 'potions'} ValueKey */
 /** @typedef {ValueKey | 'resist' | 'resources' | 'professionXp'} ShareKey */
 
 /**
@@ -53,6 +53,9 @@ export function combatValues(character, equipped, content) {
     recovery: unit.recovery,
     // The evolution skills' strength from the evolution's stat (986 B).
     skillPower: unit.skillPower ?? 1,
+    // The share more the healing and mana potions restore, from Mądrość
+    // (balance.potionWisdom).
+    potions: unit.potionBonus ?? 0,
     // Each element's resistance as the share of its damage it takes away.
     resist: Object.fromEntries(content.elements.map((/** @type {{ id: string }} */ { id }) => [id, reduction(unit.resist[id] ?? 0, level, balance)])),
   };
@@ -66,8 +69,10 @@ export function combatValues(character, equipped, content) {
 // raises it by a share), the chances with their caps, the crit's multiplier,
 // the speed, the HP at rest (with `rest`, the share the Ognisko adds, as the
 // character rests now) and after each fight, each element's resistance,
-// with the share less of its damage a trait shelters from, and what its
-// side stats give (side-stats.js, 1218), with the rule's numbers.
+// with the share less of its damage a trait shelters from, what its
+// side stats give (side-stats.js, 1218), with the rule's numbers, and how
+// much more its healing and mana potions restore with its Mądrość
+// (balance.potionWisdom), with the rule's numbers too.
 /**
  * @param {Character} character
  * @param {Item[]} equipped
@@ -120,6 +125,7 @@ export function extraValues(character, equipped, content, { rest = 0 } = {}) {
       return { id, name, rating, reduction: reduction(rating, level, balance), shelter: unit.shelter?.[id] ?? 0, core: core?.resist ?? 0 };
     }),
     side: { ...sideStats(character, totals, content), rule: balance.sideStats },
+    potions: { bonus: unit.potionBonus ?? 0, wisdom: Math.round(totals.wisdom), rule: balance.potionWisdom ?? null },
   };
 }
 
@@ -130,7 +136,8 @@ export function extraValues(character, equipped, content, { rest = 0 } = {}) {
 // 1218) also its resistance to every element (`resist`, Intelekt's) and
 // its shares more of the explorations' resources (`resources`, Siła's) and
 // of the professions' XP (`professionXp`, Intelekt's); its HP is among the
-// combat values.
+// combat values. Mądrość also the share more its healing and mana potions
+// restore (`potions`, balance.potionWisdom).
 /**
  * @param {Character} character
  * @param {Item[]} equipped
@@ -147,7 +154,7 @@ export function statShares(character, equipped, content) {
     intellect: { ...(side.resist > 0 && { resist: side.resist }), ...(side.professionXp > 0 && { professionXp: side.professionXp }) },
   };
   /** @type {ValueKey[]} */
-  const keys = ['damage', 'skillPower', 'reduction', 'dodge', 'crit', 'effectResist', 'speed', 'maxHp', 'mana', 'regen', 'recovery'];
+  const keys = ['damage', 'skillPower', 'reduction', 'dodge', 'crit', 'effectResist', 'speed', 'maxHp', 'mana', 'regen', 'recovery', 'potions'];
   return Object.fromEntries(
     content.statIds.map((/** @type {string} */ stat) => {
       // The Rdzeń's share of a stat goes with the stat's other points.

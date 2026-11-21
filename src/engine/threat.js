@@ -56,7 +56,7 @@ import { durationsUpTo } from './unlocks.js';
  *   one's kinds of encounter (`paths`) and whether it ended in a faint.
  */
 /**
- * @typedef {{ maxHp: number, recovery: number, regular: number[], tough: number[] | null, elite: number[], champion: number[] | null, safe: boolean, trips?: ThreatTrips[] | null }} ThreatSamples
+ * @typedef {{ maxHp: number, recovery: number, potionBonus?: number, regular: number[], tough: number[] | null, elite: number[], champion: number[] | null, safe: boolean, trips?: ThreatTrips[] | null }} ThreatSamples
  *   The sample fights of a build, mixed by kind (threatSamples), and with
  *   companions its explorations of each THREAT_TRIP_MINUTES (tripFaints).
  */
@@ -309,6 +309,8 @@ export function threatSamples({ character, equipped, areaId, companions = [], ha
   return {
     maxHp: player.maxHp,
     recovery: player.recovery,
+    // Mądrość's share more of what a healing potion heals (balance.potionWisdom).
+    potionBonus: player.potionBonus ?? 0,
     regular: mix(groups.regular),
     tough: groups.tough.length > 0 ? mix(groups.tough) : null,
     elite: mix(groups.elite),
@@ -343,11 +345,12 @@ export function threatSamples({ character, equipped, areaId, companions = [], ha
  * @returns {Record<string, number>}
  */
 export function faintChances({ character, equipped, hp, areaId, avoidRare = false, seekRare = false, catchUp = null, healing = null, hard = false }, content, samples) {
-  const { maxHp, recovery, regular, tough, elite, champion, safe, trips = null } = samples ?? threatSamples({ character, equipped, areaId, hard }, content);
+  const { maxHp, recovery, potionBonus = 0, regular, tough, elite, champion, safe, trips = null } = samples ?? threatSamples({ character, equipped, areaId, hard }, content);
   const start = Math.round((Math.min(hp, maxHp) / maxHp) * STEPS);
-  // A healing potion, in steps: what it heals, and the HP below which it is
-  // drunk. The chances are kept for each number of potions left.
-  const amounts = healing ? (healing.amounts ?? Array.from({ length: healing.count }, () => healing.amount)) : [];
+  // A healing potion, in steps: what it heals, with the share more the
+  // character's Mądrość gives (as combat.js drinks it), and the HP below
+  // which it is drunk. The chances are kept for each number of potions left.
+  const amounts = (healing ? (healing.amounts ?? Array.from({ length: healing.count }, () => healing.amount)) : []).map((amount) => Math.min(1, amount * (1 + potionBonus)));
   const mark = healing ? healing.below * STEPS : 0;
   /** @param {number} count */
   const layers = (count) => Array.from({ length: count + 1 }, () => new Float64Array(STEPS + 1));

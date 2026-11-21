@@ -389,7 +389,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   // A potion of a kind (`heal`, `mana`, `cure` or `revive`) the unit carries
   // and has not drunk yet in this fight; of the cures the one for the effect
   // `cures` (an antidote for Zatrucie, the burn brew for Oparzenie), each
-  // once a fight. Gives whether it drank.
+  // once a fight. Gives whether it drank. A healing or mana potion restores
+  // its share of the maximum HP or mana, a share more with the unit's
+  // Mądrość (`potionBonus`, balance.potionWisdom).
   const drink = (/** @type {Unit} */ unit, /** @type {string} */ kind, /** @type {number} */ t, /** @type {string | null} */ cures = null) => {
     const potion = kind === 'cure' ? unit.potions?.cure?.[/** @type {string} */ (cures)] : unit.potions?.[kind];
     const once = kind === 'cure' ? `${unit.id}:cure:${cures}` : `${unit.id}:${kind}`;
@@ -399,8 +401,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     drinkers.push(unit.id);
     const vars = { actor: unit.name, potion: potion.accusative };
     const potionTexts = content.potionUse.texts;
+    const power = 1 + (unit.potionBonus ?? 0);
     if (kind === 'heal') {
-      const amount = mend(unit, potion.amount * unit.maxHp);
+      const amount = mend(unit, potion.amount * power * unit.maxHp);
       log(() => ({ t, kind: 'potion', effect: 'heal', actor: unit.id, target: unit.id, potion: potion.id, amount, hp: unit.hp, text: say(potionTexts, 'drinkHeal', actions, { ...vars, amount }) }));
     } else if (kind === 'cure') {
       // The effect goes and stays off to the end of the fight.
@@ -414,7 +417,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       log(() => ({ t, kind: 'potion', effect: 'revive', actor: unit.id, target: unit.id, potion: potion.id, amount, hp: unit.hp, text: say(potionTexts, 'drinkRevive', actions, { ...vars, amount }) }));
     } else {
       const before = unit.mana;
-      unit.mana = Math.min(unit.maxMana ?? 0, unit.mana + Math.round(potion.amount * (unit.maxMana ?? 0)));
+      unit.mana = Math.min(unit.maxMana ?? 0, unit.mana + Math.round(potion.amount * power * (unit.maxMana ?? 0)));
       const amount = unit.mana - before;
       log(() => ({ t, kind: 'potion', effect: 'mana', actor: unit.id, target: unit.id, potion: potion.id, amount, hp: unit.hp, text: say(potionTexts, 'drinkMana', actions, { ...vars, amount }) }));
     }

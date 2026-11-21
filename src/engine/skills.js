@@ -322,11 +322,15 @@ export function skillText(template, skill, params, content) {
 // Łowca mam ponad 1200 many, a umiejętności kosztują po 1%”): `base` of the
 // skill's own cost (at least 1) and `share` of the maximum mana, so a big
 // pool of mana no longer makes the skills free; never less than the skill's
-// own cost, so a small pool pays as before (the choice promised „klasy bez
-// mądrości bez zmian”). Without the rule in the data, the skill's own cost.
+// own cost (the choice promised „klasy bez mądrości bez zmian”). Since
+// 20.11.2026 twice as much (the author: „dwukrotne zwiększenie użycia to
+// minimum, gracze mają tysiące jednostek many”): the whole own cost and 6%,
+// and a skill priced in a share of the maximum mana (manaShare)
+// `manaShareFactor` times that share. Without the rule in the data, the
+// skill's own cost.
 /**
  * @param {Content} content
- * @returns {{ base: number, share: number } | null}
+ * @returns {{ base: number, share: number, manaShareFactor?: number } | null}
  */
 export const manaCostRule = (content) => content.balance?.skills?.manaCost ?? null;
 /**
@@ -334,14 +338,15 @@ export const manaCostRule = (content) => content.balance?.skills?.manaCost ?? nu
  * @param {{ base: number, share: number }} rule
  */
 const baseMana = (mana, rule) => Math.max(1, Math.round(mana * rule.base));
-// What a skill of `mana` costs a character of `maxMana`.
+// What a skill of `mana` costs a character of `maxMana`, by the game's rule
+// or by `rule` (the players' duels: balance.skills.duelManaCost).
 /**
  * @param {number} mana
  * @param {number} maxMana
  * @param {Content} content
+ * @param {{ base: number, share: number } | null} [rule]
  */
-export function skillMana(mana, maxMana, content) {
-  const rule = manaCostRule(content);
+export function skillMana(mana, maxMana, content, rule = manaCostRule(content)) {
   if (!rule || mana <= 0) return mana;
   return Math.max(mana, baseMana(mana, rule) + Math.round(maxMana * rule.share));
 }
@@ -361,9 +366,10 @@ export function skillMana(mana, maxMana, content) {
 export function skillCost(skill, content, params = skill.params, maxMana = null) {
   if (typeof params.pool === 'number') return content.texts.skillCostPool[0].replace('{pool}', `${Math.round(params.pool * 100)}%`);
   // The Arkanista's line summons out of a share of its maximum mana (934 A,
-  // 935 A).
+  // 935 A), times the rule's manaShareFactor (combatant.js).
   if (typeof skill.manaShare === 'number') {
-    return content.texts.skillCostShare[0].replace('{share}', `${Math.round(skill.manaShare * 100)}%`).replace('{cooldown}', String(skill.cooldown ?? 1));
+    const share = skill.manaShare * (manaCostRule(content)?.manaShareFactor ?? 1);
+    return content.texts.skillCostShare[0].replace('{share}', `${Math.round(share * 100)}%`).replace('{cooldown}', String(skill.cooldown ?? 1));
   }
   const key = skill.once ? 'skillCostOnce' : ACTIVE_KINDS.has(skill.kind) || STANCE_KINDS.has(skill.kind) ? 'skillCostActive' : START_KINDS.has(skill.kind) ? 'skillCostStart' : 'skillCostOnce';
   // A skill with a cost pays a share of it and a share of the maximum mana
