@@ -3905,6 +3905,8 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 
 Według dwóch sekcji niżej, bez makiet (autor: „Wdrażaj od razu, szkoda Twoich zasobów na makiety”). Pierwsze wdrożenie 0.4.89 zatrzymał test czasu oceny zagrożenia na wolnym serwerze GitHuba (6,07 ms przy granicy 6 ms); lokalnie przed zmianą i po niej ok. 2 ms, więc wersja idzie jeszcze raz, razem z przywołańcami Druidów.
 
+Drugie wdrożenie zatrzymał test mikstur członków drużyny (`test/party-potions.test.js`): Druh pije miksturę leczenia dopiero po ciosie, który zostawi go pod progiem, a po każdej walce wraca mu część HP, więc po trzech walkach bez ciosu w niego jest już nad progiem i nie pije nic. Przy losowaniu wyprawy przez serwer zdarzało się to mniej więcej raz na 50 wypraw. Teraz Druh stoi sam w pierwszym szeregu (dwaj pozostali to magowie z tyłu), walki są dłuższe (mało Siły), a wyprawa bez ciosu pod próg jest sprawdzana osobno: w 250 próbach Druh zawsze pił, a test nie zależy już od losowania. Gra się nie zmienia.
+
 ## Przywołańce Druidów: 2, 3 i 4 naraz (21.11.2026)
 
 Gracz (poz. 81) przez autora: Druid „korzysta tylko z jednej umiejętności na raz, przywołuje drzewca a jak ten padnie to dopiero niedźwiedzia”. Tak było zaprojektowane (`summonLimit`: jeden przywołaniec, Arcydruid dwa, Pradruid trzy). Autor: „Zmieniamy arcydruid bedzie mial trzech, pradruid czterech” i „Nawet jeśli się rozjedzie to tylko zmniejsz siłę Przywołańców”.
