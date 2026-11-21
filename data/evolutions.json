@@ -249,7 +249,7 @@
       "description": "Zamiast czystej many sięga po moc puszczy. Na jego wezwanie przychodzą drzewa i zwierzęta.",
       "growth": { "intellect": 3, "wisdom": 3, "vitality": 1 },
       "perClassLevel": { "hp": 4, "mana": 5 },
-      "trait": { "name": "Moc puszczy", "text": "Maks. mana +25%, co ruch wraca 5% many, a przywołańce mają o 30% więcej HP i zadają o 30% więcej obrażeń.", "kind": "arcana", "params": { "mana": 0.25, "regen": 0.05, "summonHp": 0.3, "summonPower": 0.3 } },
+      "trait": { "name": "Moc puszczy", "text": "Maks. mana +25%, co ruch wraca 5% many, a przywołańce mają o 30% więcej HP i zadają o 30% więcej obrażeń. Jeden przywołaniec naraz: Ent albo Niedźwiedź.", "kind": "arcana", "params": { "mana": 0.25, "regen": 0.05, "summonHp": 0.3, "summonPower": 0.3 } },
       "skills": ["ent-summon", "bear-summon"]
     },
     {

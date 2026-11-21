@@ -183,7 +183,7 @@
       "description": "Instead of pure mana, the Druid draws on the power of the wilds. Trees and beasts come at their call.",
       "trait": {
         "name": "Power of the Wilds",
-        "text": "Max mana +25%, 5% of mana returns every turn, and summons have 30% more HP and deal 30% more damage."
+        "text": "Max mana +25%, 5% of mana returns every turn, and summons have 30% more HP and deal 30% more damage. One summon at a time: the Ent or the Bear."
       }
     },
     "miracle-worker": {
