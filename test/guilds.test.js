@@ -139,7 +139,10 @@ describe('the Gildia through the API', () => {
     await as('mistrz', 'POST', '/api/guild/found', { name: 'Leśni Bracia', tag: 'LB' });
     // The chat: the writer's guild now.
     await as('mistrz', 'POST', '/api/chat/rules');
-    assert.equal((await as('mistrz', 'POST', '/api/chat', { channel: 'global', text: 'Witajcie' })).status, 201);
+    const sent = await as('mistrz', 'POST', '/api/chat', { channel: 'global', text: 'Witajcie' });
+    assert.equal(sent.status, 201);
+    // The message just sent shows the tag at once, not only once read again.
+    assert.equal(sent.data.message.guildTag, 'LB');
     const chat = (await as('druh', 'GET', '/api/chat?channel=global')).data;
     assert.equal(chat.messages.find((message) => message.name === 'Mistrz').guildTag, 'LB');
     const ranking = (await as('druh', 'GET', '/api/ranking')).data;

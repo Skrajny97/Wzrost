@@ -668,6 +668,10 @@ export async function sendChat(context) {
       console.error(error);
     }
   }
+  // The writer's guild now, as the messages read later show it (a player,
+  // 21.11.2026: „jak piszę wiadomość to nie widać nazwy gildii, wraca
+  // dopiero po przełączeniu okna”).
+  const guild = await db.prepare(`SELECT ${guildTagSql('?')} AS guild_tag`).bind(character.id).first();
   const row = {
     ...account,
     id,
@@ -677,6 +681,7 @@ export async function sendChat(context) {
     level: character.level,
     class_id: character.class_id,
     cosmetics: character.cosmetics,
+    guild_tag: guild?.guild_tag ?? null,
     text,
     items,
     stacks,
