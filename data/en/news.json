@@ -1291,7 +1291,7 @@
     },
     "0.4.89": {
       "title": "Version 0.4.89",
-      "body": "- Fights: the fight playback now shows a thin blue mana bar under the HP bar. It drops with every skill, also when the Mana Shield switches on, and rises after a mana potion. In an exploration report, each fight shows the character's mana at its start and end, e.g. “Mana: 1552 → 340”."
+      "body": "- Fights: the fight playback now shows a thin blue mana bar under the HP bar. It drops with every skill, also when the Mana Shield switches on, and rises after a mana potion. In an exploration report, each fight shows the character's mana at its start and end, e.g. “Mana: 1552 → 340”.\n- The Druid now has two summons at once (the Ent and the Bear), the Archdruid three and the Elder Druid four."
     }
   }
 }

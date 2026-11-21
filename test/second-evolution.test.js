@@ -337,7 +337,7 @@ describe('the second forms in fights', () => {
     assert.ok(!cursed.events.some((event) => event.skill === 'curse-of-decay' && ['hit', 'crit'].includes(event.kind)));
   });
 
-  test('Moc puszczy: the Druid\'s ent and bear have 30% more HP and strike 30% harder, and one waits while the other stands', () => {
+  test('Moc puszczy: the Druid\'s ent and bear have 30% more HP and strike 30% harder, and both may stand at once (one at a time before 21.11.2026)', () => {
     const druid = form('druid', { only: ['ent-summon', 'bear-summon'], skillLevel: 40 });
     const plain = withFeat(withFeat(druid, 'summonHp', 0), 'summonPower', 0);
     const strong = fight('druid', [druid], [sturdy('boar', 88, 'e0')]);
@@ -349,16 +349,21 @@ describe('the second forms in fights', () => {
     assert.ok(Math.abs(upOf(strong).summonHp / upOf(weak).summonHp - 1.3) < 0.01);
     const firstBlow = (result) => result.events.find((event) => event.skill === 'ent-summon' && event.kind === 'hit');
     assert.ok(Math.abs(firstBlow(strong).damage / firstBlow(weak).damage - 1.3) < 0.03, `${firstBlow(strong).damage} / ${firstBlow(weak).damage}`);
-    // One summon at a time: the bear comes after the ent has gone or fallen.
+    // Two summons at a time (the author, 21.11.2026: „Zmieniamy arcydruid
+    // bedzie mial trzech, pradruid czterech”): the bear may come while the
+    // ent stands, and never more than the two.
+    assert.equal(druid.feat.summons, 2);
     const summons = strong.events.filter((event) => event.kind === 'summon' && ['up', 'gone', 'fell'].includes(event.state));
     assert.ok(summons.some((event) => event.state === 'up' && event.skill === 'bear-summon'));
-    let standing = null;
+    const standing = new Set();
+    let both = false;
     for (const event of summons) {
-      if (event.state === 'up') {
-        assert.equal(standing, null, 'a second summon while one stands');
-        standing = event.skill;
-      } else standing = null;
+      if (event.state === 'up') standing.add(event.skill);
+      else standing.delete(event.summonSkill ?? event.skill);
+      assert.ok(standing.size <= 2, 'more than two summons at once');
+      if (standing.size === 2) both = true;
     }
+    assert.ok(both, 'the ent and the bear never stood together');
   });
 
   test('Kruszący cios takes two moves; Wir stali makes every foe it hits bleed; Deszcz meteorów burns them', () => {

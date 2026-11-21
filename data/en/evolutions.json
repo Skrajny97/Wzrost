@@ -183,7 +183,7 @@
       "description": "Instead of pure mana, the Druid draws on the power of the wilds. Trees and beasts come at their call.",
       "trait": {
         "name": "Power of the Wilds",
-        "text": "Max mana +25%, 5% of mana returns every turn, and summons have 30% more HP and deal 30% more damage. One summon at a time: the Ent or the Bear."
+        "text": "Max mana +25%, 5% of mana returns every turn, and summons have 30% more HP and deal 30% more damage. Two summons at a time: the Ent and the Bear."
       }
     },
     "miracle-worker": {
@@ -320,7 +320,7 @@
       "description": "The oldest trees of the wilds wake at the Archdruid's call.",
       "trait": {
         "name": "Heart of the Wilds",
-        "text": "+40% mana and a second summon at once. 5% of mana returns every turn, and summons have 30% more HP and deal 30% more damage."
+        "text": "+40% mana and three summons at once. 5% of mana returns every turn, and summons have 30% more HP and deal 30% more damage."
       }
     },
     "saint": {
@@ -460,7 +460,7 @@
       "description": "The oldest of the druids. The forest grows from their wisdom, and its creatures stand by them in battle.",
       "trait": {
         "name": "Roots of the World",
-        "text": "+50% mana and three summons at once. 6% of mana comes back every turn, and summons have 40% more HP and deal 40% more damage. Every 20 points of Wisdom give the summons another 1% HP and damage."
+        "text": "+50% mana and four summons at once. 6% of mana comes back every turn, and summons have 40% more HP and deal 40% more damage. Every 20 points of Wisdom give the summons another 1% HP and damage."
       }
     },
     "archangel": {

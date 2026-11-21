@@ -392,9 +392,9 @@ describe('the fourth forms in fights', () => {
     assert.match(raised.text, /zatrzymuje \d+% obrażeń/);
   });
 
-  test('Korzenie świata: three summons may stand; Dąb wieków heals the party every move; Odrodzenie lasu heals the party and its summons to full once', () => {
+  test('Korzenie świata: four summons may stand (three before 21.11.2026); Dąb wieków heals the party every move; Odrodzenie lasu heals the party and its summons to full once', () => {
     const druid = form('elder-druid');
-    assert.equal(druid.feat.summons, 3);
+    assert.equal(druid.feat.summons, 4);
     const oak = fight('dab', [form('elder-druid', { only: ['oak-of-ages'] }), form('archangel', { only: [], id: 'a1' })], line());
     assert.ok(oak.events.some((event) => event.skill === 'oak-of-ages' && event.kind === 'heal'));
     const rebirth = fight('odrodzenie', [form('elder-druid', { hpShare: 0.6 })], line());
