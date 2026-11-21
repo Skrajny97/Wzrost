@@ -20,13 +20,14 @@ describe("a Drużyna's members take their own potions along", () => {
   const { call, db, signUp } = useServer({ PROFESSIONS: 'on' });
   const cookies = {};
   const sql = async (query, ...binds) => (await db()).prepare(query).bind(...binds);
-  // Alchemia at level 5 knows the lesser healing and mana potions.
-  const player = async (login, name, potions) => {
+  // Alchemia at level 5 knows the lesser healing and mana potions. Little
+  // Siła makes the fights long, so the creatures strike often.
+  const player = async (login, name, potions, classId = 'warrior') => {
     ({ cookie: cookies[login] } = await signUp(login));
-    await call('POST', '/api/character', { cookie: cookies[login], body: { name, classId: 'warrior', appearance: 'female' } });
+    await call('POST', '/api/character', { cookie: cookies[login], body: { name, classId, appearance: 'female' } });
     await (
       await sql(
-        `UPDATE characters SET level = 30, class_level = 30, points = '{"strength":150,"vitality":140}', professions = '{"alchemy":{"level":5,"xp":0}}', potions = ? WHERE name = ?`,
+        `UPDATE characters SET level = 30, class_level = 30, points = '{"strength":5,"vitality":140}', professions = '{"alchemy":{"level":5,"xp":0}}', potions = ? WHERE name = ?`,
         JSON.stringify(potions),
         name,
       )
@@ -61,10 +62,12 @@ describe("a Drużyna's members take their own potions along", () => {
     return drunk;
   };
 
+  // Druh, a warrior, stands alone in the front row, where the creatures
+  // strike most (balance.combat.targetWeights); the two mages stand behind.
   beforeEach(async () => {
-    await player('lider', 'Lider', { 'lesser-healing': 4 });
+    await player('lider', 'Lider', { 'lesser-healing': 4 }, 'mage');
     await player('druh', 'Druh', { 'lesser-healing': 8, 'lesser-mana': 1 });
-    await player('trzeci', 'Trzeci', { 'lesser-healing': 3 });
+    await player('trzeci', 'Trzeci', { 'lesser-healing': 3 }, 'mage');
     const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
     await as('lider', 'POST', '/api/party/invite', { name: 'Trzeci' });
     await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
@@ -78,7 +81,10 @@ describe("a Drużyna's members take their own potions along", () => {
     assert.deepEqual(chosen.data.potions, { potions: { 'lesser-healing': 9, 'lesser-mana': 3 }, healBelow: 0.7 });
     assert.deepEqual((await as('druh', 'GET', '/api/party')).data.potions, chosen.data.potions);
     assert.equal((await as('trzeci', 'GET', '/api/party')).data.potions, null);
-    // At a third of its HP the first blow it takes calls for a potion.
+    // At a third of its HP the first blow it takes calls for a potion. A
+    // share of the HP comes back after each fight, so after three fights
+    // with no blow at it, it is over its mark; a creature almost always
+    // reaches it in the first fight (the trip's draw is the server's).
     const { maxHp } = (await as('druh', 'GET', '/api/character')).data.character;
     await (await sql("UPDATE characters SET hp = ?, hp_at = ? WHERE name = 'Druh'", Math.round(maxHp / 3), Date.now())).run();
 
@@ -109,7 +115,16 @@ describe("a Drużyna's members take their own potions along", () => {
     for (const name of ['Lider', 'Druh', 'Trzeci']) assert.deepEqual(reports[name].potionsUsed, drunk[name] ?? {}, `${name}'s potions`);
     const heal = drunk.Druh?.['lesser-healing'] ?? 0;
     const mana = drunk.Druh?.['lesser-mana'] ?? 0;
-    assert.ok(heal >= 1 && heal <= 6, `Druh drank ${heal}`);
+    assert.ok(heal <= 6, `Druh drank ${heal}`);
+    // A trip in which no blow left it below its mark is the only one in
+    // which it drinks none.
+    if (heal === 0) {
+      for (const fight of reports.Lider.fights) {
+        const druh = fight.allies.find((ally) => ally.name === 'Druh');
+        const below = fight.events.some((event) => event.target === druh.id && event.damage > 0 && event.hp > 0 && event.hp < 0.7 * druh.maxHp);
+        assert.ok(!below, 'Druh fell below its mark and drank nothing');
+      }
+    }
     assert.ok(mana <= 1);
     assert.equal(drunk.Trzeci, undefined);
     assert.ok((drunk.Lider?.['lesser-healing'] ?? 0) <= 2);
@@ -119,9 +134,10 @@ describe("a Drużyna's members take their own potions along", () => {
     const leaderDrank = drunk.Lider?.['lesser-healing'] ?? 0;
     assert.deepEqual(await bag('Lider'), leaderDrank === 4 ? {} : { 'lesser-healing': 4 - leaderDrank });
     // Its report says so as on a "Wyrusz" alone; Trzeci's says nothing.
-    assert.equal(reports.Druh.summary.potions.length, 1);
-    assert.match(reports.Druh.summary.potions[0], new RegExp(`^Zużyte mikstury: .*${heal} × Mniejsza mikstura leczenia`));
-    if (mana > 0) assert.match(reports.Druh.summary.potions[0], /1 × Mniejsza mikstura many/);
+    const lines = reports.Druh.summary.potions ?? [];
+    assert.equal(lines.length, heal + mana > 0 ? 1 : 0);
+    if (heal > 0) assert.match(lines[0], new RegExp(`^Zużyte mikstury: .*${heal} × Mniejsza mikstura leczenia`));
+    if (mana > 0) assert.match(lines[0], /1 × Mniejsza mikstura many/);
     assert.deepEqual(reports.Trzeci.summary.potions ?? [], []);
   });
 
