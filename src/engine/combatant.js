@@ -164,8 +164,10 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     critRating: totals.perception * balance.combat.critPerPerception * (1 + (core?.crit ?? 0)),
     willRating: totals.will * balance.combat.willPerPoint * (1 + (core?.will ?? 0)),
     speed: speed(totals[agile], character.level, balance) * (feat?.kind === 'shadowStep' ? 1 + feat.speed : 1) * (1 + (core?.speed ?? 0)),
-    // Skills and the mana they spend, full at the start of every fight;
-    // Wisdom also strengthens healing, and the healing and mana potions.
+    // Skills and the mana they spend, full at the start of a fight, but on
+    // an exploration each fight starts with what the last left and a share
+    // of the missing (1220 B, hunt.js: restedMana); Wisdom also strengthens
+    // healing, and the healing and mana potions.
     maxMana: manaFull,
     wisdom: totals.wisdom,
     ...(potions > 0 && { potionBonus: potions }),

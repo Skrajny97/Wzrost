@@ -24,10 +24,14 @@ const gearedAt = (classId, level) => {
   if (!geared.has(key)) geared.set(key, typicalCharacter(classId, level, content));
   return geared.get(key);
 };
+// The exploration before the event gives all the mana back after each
+// fight, as before 1220 B (balance.hunt.manaRecoveryAfterFight), so the
+// event's fight starts with full mana and stays a fair one.
+const steady = { ...content, balance: { ...content.balance, hunt: { ...content.balance.hunt, manaRecoveryAfterFight: 1 } } };
 const resolve = (id, optionId, { level = 60, classId = 'warrior', ...extra } = {}) => {
   const { character, equipped } = gearedAt(classId, level);
   const seed = extra.seed ?? `951-${id}`;
-  const hunt = simulateHunt({ character, equipped, hp: 99999, name: 'Mira', areaId: 'windfalls-edge', minutes: 60, seed }, content);
+  const hunt = simulateHunt({ character, equipped, hp: 99999, name: 'Mira', areaId: 'windfalls-edge', minutes: 60, seed }, steady);
   return resolveEvent({ hunt, event: event(id), optionId, character, equipped, name: 'Mira', seed, purse: 1_000_000, ...extra }, content);
 };
 

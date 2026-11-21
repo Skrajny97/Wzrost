@@ -33,7 +33,7 @@ import { say, word } from './text.js';
 /** @typedef {Record<string, any>} Area An inner region (content.areas). */
 /** @typedef {Record<string, any>} PartyResult A resolved party event (resolvePartyEvent). */
 /** @typedef {Record<string, any>} FightView The party's fight as its reports show it (partyFight). */
-/** @typedef {{ id: number, name: string, hpEnd: number, character: Record<string, any>, equipped: Record<string, any>[] }} PartyMember One who went, as the event is resolved: its character and gear now, its HP at the trip's end. */
+/** @typedef {{ id: number, name: string, hpEnd: number, manaEnd?: number, character: Record<string, any>, equipped: Record<string, any>[] }} PartyMember One who went, as the event is resolved: its character and gear now, its HP and mana at the trip's end (no manaEnd: full). */
 /** @typedef {{ gold: number, xp: number, part?: string, herbs?: Record<string, number>, herbsGold?: boolean, potions?: Record<string, number>, materials?: Record<string, number>, minerals?: Record<string, number>, reputation?: Record<string, number>, hpLoss?: number, faint?: boolean }} Share What one member gets of a result. */
 /** @typedef {import('./rng.js').Rng} Rng */
 
@@ -264,8 +264,9 @@ function rewardOf(gives, member, area, rng, content) {
 
 // The party's one fight against the outcome's foes (the trip leader's
 // `level`, the trip's inner region): its players only, each as it is now
-// with the HP it ended the trip with, in the trip's order; with two or more
-// the foes grow as on the way, one alone meets them as on its own
+// with the HP and the mana it ended the trip with (1220 B: the trip's
+// fights spend the mana from one to the next), in the trip's order; with
+// two or more the foes grow as on the way, one alone meets them as on its own
 // (events.js). Ambushed, the foes all move first. Kept for the playback as
 // an exploration's event fight is, and each one's HP before and after.
 /**
@@ -274,9 +275,10 @@ function rewardOf(gives, member, area, rng, content) {
  * @returns {FightView}
  */
 export function partyFight({ outcome, members, area, level, seed }, content) {
-  const allies = members.map((member, index) =>
-    playerCombatant({ character: member.character, equipped: member.equipped, hp: Math.max(1, member.hpEnd), name: member.name, area, id: index === 0 ? 'a0' : `p${index}` }, content),
-  );
+  const allies = members.map((member, index) => {
+    const unit = playerCombatant({ character: member.character, equipped: member.equipped, hp: Math.max(1, member.hpEnd), name: member.name, area, id: index === 0 ? 'a0' : `p${index}` }, content);
+    return member.manaEnd === undefined ? unit : { ...unit, mana: member.manaEnd };
+  });
   // From class level 250 of the highest of the players they are stronger
   // (the myth game), and two or more players make them stronger still, as
   // on the way (fightingClassLevel and partyStrength in combatant.js).

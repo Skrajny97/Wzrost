@@ -1276,6 +1276,10 @@
     "0.4.85": {
       "title": "Version 0.4.85",
       "body": "- Mana: skills cost twice as much: their whole cost and 6% of max mana, and the Arcanist's and Druid's summons 50% of max mana. In the Arena and guild wars the cost stays as it was.\n- Wisdom makes healing and mana potions stronger: +1% for every 20 points, up to +50% (Character › Stats). Dexterity gives more dodge: 3 dodge rating per point instead of 2."
+    },
+    "0.4.86": {
+      "title": "Version 0.4.86",
+      "body": "- Mana no longer refills fully between the fights of an exploration: each fight starts with the mana the last one left, and a win brings back 30% of what is missing. Mana potions now matter on longer explorations, and the threat counts the ones you take along."
     }
   }
 }

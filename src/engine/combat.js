@@ -12,9 +12,11 @@
 // coated blade works from the start of the fight, and a guard, a mana shield
 // or a dance of shadows wakes once a fight, the moment HP falls below its
 // mark. A guard's armour lasts a few of the unit's own moves, a mana shield
-// takes a share of mana at once and holds until its points are spent. Every
-// fight starts with full mana. A fight without skills draws the same random
-// numbers as before skills existed.
+// takes a share of mana at once and holds until its points are spent. A
+// fight starts with full mana, or with the mana a unit brings (`mana`: on an
+// exploration what the last fight left, hunt.js); the fight's end gives
+// each unit's mana back with its HP. A fight without skills draws the same
+// random numbers as before skills existed.
 //
 // A character may carry potions (potions.js): a healing one is drunk the
 // moment HP falls below the player's mark, a mana one when a skill lacks
@@ -286,10 +288,11 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     next: 0,
     skills: unit.skills?.length ? openersFirst(unit.skills.map((/** @type {Skill} */ skill) => ({ ...skill, ready: 0, used: false }))) : NO_SKILLS,
   }));
-  // For skills: the fight's mana, the unit's own moves so far and the effects
-  // of the skills that woke; each skill knows the move it is ready again from.
+  // For skills: the fight's mana (full, or what the unit brings, never more
+  // than its most), the unit's own moves so far and the effects of the
+  // skills that woke; each skill knows the move it is ready again from.
   if (skilled) {
-    for (const unit of units) Object.assign(unit, { mana: unit.maxMana ?? 0, moves: 0, damageBonus: unit.damageBonus ?? 0, guard: null, shield: null, evade: null });
+    for (const unit of units) Object.assign(unit, { mana: Math.min(unit.maxMana ?? 0, unit.mana ?? unit.maxMana ?? 0), moves: 0, damageBonus: unit.damageBonus ?? 0, guard: null, shield: null, evade: null });
   }
   // For evolutions: the unit's stances and summons (the one in front first),
   // its riposte, how many of its blows landed yet (Zimna krew, Sokole oko)
@@ -2244,7 +2247,8 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         won: !enemiesLeft ? true : !alliesLeft ? false : null,
         actions,
         events,
-        units: units.map((unit) => ({ id: unit.id, hp: unit.hp })),
+        // Each unit's HP, and its mana where the fight counted it (skilled).
+        units: units.map((unit) => ({ id: unit.id, hp: unit.hp, ...(skilled && { mana: unit.mana }) })),
         dealt,
         taken,
         drunk,

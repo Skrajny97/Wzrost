@@ -10,16 +10,21 @@
 // for that length and the rest after each won fight, as in a real
 // exploration. HP is counted in steps of 4% of the maximum. Healing potions
 // taken along (potions.js) count too: one a fight, drunk when HP falls below
-// the player's mark. Mana and speed potions only make the fights easier, so
-// the estimate leaves them out and stays on the safe side.
+// the player's mark. Speed potions only make the fights easier, so the
+// estimate leaves them out and stays on the safe side. The sample fights
+// start with full mana, though on the way the mana goes on from fight to
+// fight (1220 B): alone, without companions, a realistic character of
+// levels 10–25 fainted at most 1.5 points more often so, with mana
+// potions or without, so they leave the mana and its potions out.
 // With companions that alone is far too low: their HP goes from fight to
 // fight as the character's and some of them fall, and once they are down
 // the creatures turn on the character (19.11.2026: a realistic player of
 // level 100 with two companions was shown 1.8% where one 4-hour exploration
 // in five ended in a faint). So a build with companions also goes on
 // explorations of 1, 2 and 4 hours (THREAT_TRIP_MINUTES), fight after fight
-// as simulateHunt fights them, everyone's HP carried on and the fallen out
-// (tripFaints): the share of them fainted within each number of fights is
+// as simulateHunt fights them, everyone's HP carried on and the fallen out,
+// the character's mana too, with the mana potions taken along (tripFaints):
+// the share of them fainted within each number of fights is
 // the chance for an exploration of that many fights at that pace, and the
 // sample fights' recursion only moves it by what changes from there to the
 // exploration asked for (its own pace, the HP it starts with, the elite and
@@ -35,6 +40,7 @@ import {
   encountersFor,
   explorationPace,
   regularEncounter,
+  restedMana,
   rollEncounter,
   toughEncountersFor,
   withRareOdds,
@@ -63,8 +69,8 @@ import { durationsUpTo } from './unlocks.js';
 /**
  * @typedef {{ count: number, amount: number, below: number, amounts?: number[], potions?: Record<string, number> }} Healing
  *   The healing potions taken along: how many, their strengths (strongest
- *   first) and the mark below which one is drunk; `potions` by id, for the
- *   explorations of tripFaints.
+ *   first) and the mark below which one is drunk; `potions` by id, the
+ *   mana potions taken along too, for the explorations of tripFaints.
  */
 /**
  * @typedef {{ character: Record<string, any>, equipped: Record<string, any>[], hp: number, areaId: string, avoidRare?: boolean, seekRare?: boolean,
@@ -152,13 +158,15 @@ function mix(kinds) {
   return shares;
 }
 
-// Explorations of `minutes` (THREAT_TRIPS of them) from full HP, each
-// fight as simulateHunt fights it: the encounter drawn by its odds
-// (rollEncounter), the character with the healing potions it took along
-// (one a fight, below its mark) and every companion still standing with
-// the HP the last fight left it; a lost fight ends it in a faint (a retreat
-// from the elite or the champion of a safe place), a drawn one in a return,
-// and after each won fight everyone standing rests as on the way. Returns
+// Explorations of `minutes` (THREAT_TRIPS of them) from full HP and mana,
+// each fight as simulateHunt fights it: the encounter drawn by its odds
+// (rollEncounter), the character with the potions it took along (one of a
+// kind a fight: healing below its mark, mana when short of it) and the
+// mana the last fight left it (1220 B), and every companion still standing
+// with the HP the last fight left it and full mana; a lost fight ends it
+// in a faint (a retreat from the elite or the champion of a safe place), a
+// drawn one in a return, and after each won fight everyone standing rests
+// as on the way, the character's mana too (restedMana). Returns
 // the share fainted within each number of fights, and each exploration's
 // kinds of encounter in order (`paths`: c champion, e elite, t demanding, r
 // regular) with whether it ended in a faint (`faints`), so other odds of
@@ -181,6 +189,10 @@ function tripFaints({ minutes, character, area, player, mates, strength, classLe
   for (let trip = 0; trip < THREAT_TRIPS; trip++) {
     let hp = player.maxHp;
     const mateHp = mates.map((mate) => mate.maxHp);
+    // The character's mana, full as it sets out (null), then what each
+    // fight leaves it.
+    /** @type {number | null} */
+    let mana = null;
     /** @type {Record<string, number>} */
     const left = { ...potions };
     let path = '';
@@ -189,7 +201,7 @@ function tripFaints({ minutes, character, area, player, mates, strength, classLe
       const encounter = /** @type {Record<string, any>} */ (rollEncounter(area, rng, content, character.level, pace));
       path += encounter.champion ? 'c' : encounter.elite ? 'e' : encounter.tough ? 't' : 'r';
       const kit = fightPotions(left, healBelow, content);
-      const allies = [{ ...player, hp, ...(Object.keys(kit).length > 0 && { potions: kit }) }];
+      const allies = [{ ...player, hp, ...(mana !== null && { mana }), ...(Object.keys(kit).length > 0 && { potions: kit }) }];
       mates.forEach((mate, index) => {
         if (mateHp[index] > 0) allies.push({ ...mate, hp: mateHp[index] });
       });
@@ -204,6 +216,8 @@ function tripFaints({ minutes, character, area, player, mates, strength, classLe
       /** @param {string} id */
       const after = (id) => /** @type {{ hp: number } | undefined} */ (result.units.find((/** @type {{ id: string }} */ unit) => unit.id === id))?.hp ?? 0;
       hp = rested(player, after(player.id));
+      const manaLeft = /** @type {{ mana?: number } | undefined} */ (result.units.find((/** @type {{ id: string }} */ unit) => unit.id === player.id))?.mana;
+      mana = restedMana(manaLeft ?? mana, player.maxMana ?? 0, content);
       mates.forEach((mate, index) => {
         if (mateHp[index] > 0) mateHp[index] = after(mate.id) > 0 ? rested(mate, after(mate.id)) : 0;
       });
@@ -262,8 +276,8 @@ function tripShare(went, fights, pace, ownPace, champion, tough) {
 
 // The expensive part: sample fights for the character's current build, with
 // its companions (companions.js) at full HP beside it, and with companions
-// its explorations (tripFaints) with the healing potions taken along
-// (`healing.potions`, by id). It does not depend on HP or the length, so
+// its explorations (tripFaints) with the healing and mana potions taken
+// along (`healing.potions`, by id). It does not depend on HP or the length, so
 // the server can keep it until the build or those potions change.
 // `hard`: against the stronger creatures of a Trudna wyprawa (true, 629 A)
 // or of a Piekielna ('hell'; exploreStrength in combatant.js).

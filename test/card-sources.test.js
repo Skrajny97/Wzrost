@@ -221,9 +221,14 @@ describe('Talia Systemu: the pack of the day at Szczęsny\'s, like a booster (90
 describe('Talia Systemu: a card of a lower land on an exploration (902 B)', () => {
   const { character, equipped } = playerOf('realistic', 'warrior', 60, content);
   // Without the newest place's strength of 19.11.2026
-  // (balance.monsters.newestPlace): these explorations count the cards of
-  // many won fights, and the character goes without companions.
-  const calm = (data) => ({ ...data, balance: { ...data.balance, monsters: { ...data.balance.monsters, newestPlace: null } } });
+  // (balance.monsters.newestPlace), and with all the mana back after each
+  // fight, as before 1220 B (balance.hunt.manaRecoveryAfterFight): these
+  // explorations count the cards of many won fights, and the character goes
+  // without companions and mana potions.
+  const calm = (data) => ({
+    ...data,
+    balance: { ...data.balance, monsters: { ...data.balance.monsters, newestPlace: null }, hunt: { ...data.balance.hunt, manaRecoveryAfterFight: 1 } },
+  });
   const always = calm(withDrops({ lower: 1 }));
   const hunt = (cards, data = always, areaId = 'beaver-dams', seed = 'nizsze') => simulateHunt({ character, equipped, hp: 99999, name: 'Mira', areaId, minutes: 240, seed, cards }, data);
   const lowerLand = areaLand('beaver-dams', content);

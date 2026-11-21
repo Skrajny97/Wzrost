@@ -707,12 +707,15 @@ describe('the third forms in fights', () => {
 // form's weapon does not use give HP and resistance (side stats, 1218),
 // second and third forms alike, and lift the weakest second form, the
 // Widmo, the most: the forms are compared without them too, as tuned.
+// Since 21.11.2026 the mana goes on from one fight of an exploration to the
+// next (1220 B): the forms were tuned with all of it back after each fight.
 const untuned = (data) => ({
   ...data,
   balance: {
     ...data.balance,
     monsters: { ...data.balance.monsters, classLevelCurve: [], newestPlace: null },
     sideStats: { ...data.balance.sideStats, strengthHp: 0, intellectResistPer: Infinity, step: 0 },
+    hunt: { ...data.balance.hunt, manaRecoveryAfterFight: 1 },
   },
 });
 
