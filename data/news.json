@@ -1610,6 +1610,11 @@
       "id": "0.4.87",
       "title": "Wersja 0.4.87",
       "body": "- Czat: przy wiadomości, którą właśnie wysyłasz, od razu widać skrót Twojej gildii, a nie dopiero po przełączeniu okna."
+    },
+    {
+      "id": "0.4.88",
+      "title": "Wersja 0.4.88",
+      "body": "- Jubilerstwo › „Oprawianie”: postać i rubrykę „Z plecaka” widać zawsze. Gdy nikt nie może pracować (np. postać jest na wyprawie, a Awatar Systemu pracuje albo go nie masz), są przygaszone, a jedna linijka mówi, kiedy oprawisz kamień. W trakcie wyprawy kamień w przedmiocie z plecaka oprawia Awatar Systemu."
     }
   ]
 }

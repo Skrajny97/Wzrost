@@ -31,6 +31,7 @@ import { activityFinished, buildLocked, call, reportCache, serverNow, state, tes
 import { skipControl } from '../time.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, splitLead, systemPanel, toast, withButton } from '../ui.js';
 import { transmuteForm } from '../transmute.js';
+import { settingLines } from '../jewel-setting.js';
 import { playMinigame } from '../minigame.js';
 import { characterLook, portraitLayers } from '../cosmetics.js';
 import { SLOT_ICONS } from '../icons.js';
@@ -577,13 +578,13 @@ export function mountProfessions(container, { params, navigate }) {
 
   // The works of `kind` here, by `card`: the character's, or what it does
   // elsewhere while no one can take this work (`busy`, a text of t() with
-  // {doing}, says it and when it can come), and the Awatar's under its name.
-  // A report to claim comes first.
+  // {doing}, says it and when it can come; null where the tab's form says
+  // it), and the Awatar's under its name. A report to claim comes first.
   function works(character, kind, card, busy) {
     const { avatar } = character.professions;
     const activity = character.activity;
     const free = freeWorkers(character);
-    const own = activity?.kind === kind ? card(activity, false) : activity && !free.avatar && !free.avatar2 && busyPanel(activity, busy);
+    const own = activity?.kind === kind ? card(activity, false) : activity && !free.avatar && !free.avatar2 && busy && busyPanel(activity, busy);
     // Each Awatar's (the second's too, 1066) under its name.
     const theirs = (one, which) => {
       const work = one?.activity?.kind === kind ? one.activity : null;
@@ -2567,7 +2568,8 @@ export function mountProfessions(container, { params, navigate }) {
     fill(
       container,
       backHeading(profession.name, t('poziom {level}', { level: profession.level }), HOME),
-      works(character, 'jewels', jewelsCard, 'Postać {doing}. Praca w Szlifierni możliwa po powrocie.'),
+      // On the Oprawianie tab its form says why no one can work (setForm).
+      works(character, 'jewels', jewelsCard, setting ? null : 'Postać {doing}. Praca w Szlifierni możliwa po powrocie.'),
       testTools(character, 'jewels', t('Tryb testowy: praca skończy się od razu, z tym samym wynikiem.')),
       h(
         'div',
@@ -2594,7 +2596,9 @@ export function mountProfessions(container, { params, navigate }) {
           : [
               placeCard(jewelcrafting.place, setting ? jewelcrafting.about.set : jewelcrafting.about.craft),
               levelCard(profession, t('pracy')),
-              anyFree(character) && (setting ? setForm(character, jewelcrafting) : jewelForm(character, jewelcrafting)),
+              // The Oprawianie's figure and „Z plecaka” show also with no
+              // one free, dim (21.11.2026).
+              setting ? setForm(character, jewelcrafting) : anyFree(character) && jewelForm(character, jewelcrafting),
             ],
     );
   }
@@ -2812,7 +2816,10 @@ export function mountProfessions(container, { params, navigate }) {
   // plecaka”, the bag's items, which open the same sheet; while the
   // character explores or serves as a mercenary only they do, the figure
   // dim (the author, 20.11.2026: „Dodatkowa rubryka na oprawianiu gdzie są
-  // przedmioty z plecaka i w trakcie wyprawy ją tylko można ruszać”).
+  // przedmioty z plecaka i w trakcie wyprawy ją tylko można ruszać”). With
+  // no one free for a new work, the figure and „Z plecaka” dim both, and
+  // the line over them says why, in place of the busy panel over the tabs
+  // (21.11.2026: players could not find „Z plecaka” then).
   function setForm(character, jewelcrafting) {
     // The Rdzeń takes a gem too, once it is open (863 A, screens/core.js).
     const coreSlot = state.content.slots.find((slot) => slot.id === 'core');
@@ -2828,11 +2835,14 @@ export function mountProfessions(container, { params, navigate }) {
     // and the Rdzeń wait for its end, as the exploration's report is made
     // with them (requireAtHome on the server).
     const away = buildLocked(character);
+    // No one free for a new work: nothing takes a tap, and the hint says why.
+    const idle = !anyFree(character);
+    const lines = settingLines(character, idle, character.activity ? t(DOING[character.activity.kind] ?? 'jest na wyprawie') : '');
     const head = h('h2', { class: 'section-title', id: 'set-title', text: t('Oprawianie') });
     const card = (...children) => h('section', { class: 'card gather-card', 'aria-labelledby': 'set-title', 'data-guide': 'jewel-setting' }, head, children);
-    if (worn.length === 0 && bag.length === 0) return card(h('p', { class: 'muted', text: t('Załóż przedmiot, żeby oprawić w nim kamień.') }));
+    if (worn.length === 0 && bag.length === 0) return card(h('p', { class: 'muted', text: idle ? lines.hint : t('Załóż przedmiot, żeby oprawić w nim kamień.') }));
     const gems = allGems.filter((gem) => !gem.hidden);
-    const who = workerPicker(character);
+    const who = idle ? null : workerPicker(character);
     const itemArt = (each) => (each.core ? icon('core', { size: 24 }) : (itemSprite(each) ?? icon('ring', { size: 24 })));
     const titleOf = (each) => (each.core ? each.name : itemTitle(each));
     const gemNow = (each) => (each.gem ? `${each.gem.name} +${percentText(each.gem.bonus)}` : t('bez kamienia'));
@@ -2858,7 +2868,7 @@ export function mountProfessions(container, { params, navigate }) {
             type: 'button',
             class: 'slot slot--core slot--open',
             'data-guide': `set-slot-${slot.id}`,
-            disabled: away,
+            disabled: away || idle,
             'aria-label': t('{slot}: {gem}', { slot: core.name, gem: gemNow(core) }),
             onClick: () => openSetting(core),
           },
@@ -2874,7 +2884,7 @@ export function mountProfessions(container, { params, navigate }) {
           type: 'button',
           class: 'slot',
           'data-guide': `set-slot-${slot.id}`,
-          disabled: away,
+          disabled: away || idle,
           vars: { '--rarity': item.color },
           'aria-label': t('{slot}: {item}, {gem}', { slot: slot.name, item: itemTitle(item), gem: gemNow(item) }),
           onClick: () => openSetting(item),
@@ -2901,7 +2911,7 @@ export function mountProfessions(container, { params, navigate }) {
     const bagRow = (item) =>
       h(
         'button',
-        { type: 'button', class: 'item-row set-bag-row', onClick: () => openSetting(item) },
+        { type: 'button', class: 'item-row set-bag-row', disabled: idle, onClick: () => openSetting(item) },
         itemSummary(item),
         h('span', { class: 'set-bag-gem' }, gemMark(item.gem), h('span', { class: 'visually-hidden', text: gemNow(item) })),
       );
@@ -2916,6 +2926,8 @@ export function mountProfessions(container, { params, navigate }) {
       'section',
       { class: 'set-bag', 'aria-labelledby': 'set-bag-title' },
       h('h3', { class: 'workshop-subtitle', id: 'set-bag-title', text: t('Z plecaka') }),
+      // What the section is for (21.11.2026).
+      lines.bag && h('p', { class: 'muted small set-bag-note', text: lines.bag }),
       bag.length === 0 ? h('p', { class: 'muted', text: t('W plecaku nie ma przedmiotów do oprawienia.') }) : [bagList, more],
     );
 
@@ -2970,7 +2982,7 @@ export function mountProfessions(container, { params, navigate }) {
             }
             await withButton(button, async () => {
               remember();
-              await call('POST', '/api/professions/jewel', { set: true, itemId: item.id, gem: gem.id, ...who.body() });
+              await call('POST', '/api/professions/jewel', { set: true, itemId: item.id, gem: gem.id, ...who?.body() });
               closeSheet();
               window.scrollTo(0, 0);
             });
@@ -3014,12 +3026,6 @@ export function mountProfessions(container, { params, navigate }) {
       );
     }
 
-    // Away, a note in the hint's place says why the figure is dim.
-    const hint = !away
-      ? t('Stuknij przedmiot albo Rdzeń, żeby oprawić w nim kamień.')
-      : character.activity.kind === 'mercenary'
-        ? t('Na usłudze najemnej oprawisz tylko przedmioty z plecaka.')
-        : t('Na wyprawie oprawisz tylko przedmioty z plecaka.');
     // A gem the Awatar set on the way waits for the character's return
     // (pendingGem, jewelcraft.js on the server), said under the hint.
     const serving = character.activity?.kind === 'mercenary';
@@ -3028,9 +3034,11 @@ export function mountProfessions(container, { params, navigate }) {
       if (each.core) return serving ? t('Kamień ({gem}) czeka: trafi do Rdzenia, gdy postać skończy usługę najemną albo zdejmie ogłoszenie.', words) : t('Kamień ({gem}) czeka: trafi do Rdzenia, gdy postać wróci z wyprawy.', words);
       return serving ? t('Kamień ({gem}) czeka: trafi do przedmiotu {item}, gdy postać skończy usługę najemną albo zdejmie ogłoszenie.', words) : t('Kamień ({gem}) czeka: trafi do przedmiotu {item}, gdy postać wróci z wyprawy.', words);
     };
+    // Away or with no one free, the line in the hint's place says why the
+    // figure is dim (settingLines).
     return card(
-      who.element,
-      h('p', { class: 'herb-estimate set-hint', text: hint }),
+      who?.element,
+      h('p', { class: 'herb-estimate set-hint', text: lines.hint }),
       worn.filter((each) => each.pendingGem).map((each) => h('p', { class: 'muted small', text: waitingText(each) })),
       h('div', { class: 'set-doll' }, h('div', { class: 'portrait-wrap' }, frame)),
       legend,

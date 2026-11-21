@@ -25471,8 +25471,10 @@ a.social-button {
 }
 
 /* On an exploration or a mercenary's service the figure's items and the
-   Rdzeń dim and take no tap: only "Z plecaka" works (20.11.2026). */
-.set-doll .slot:disabled {
+   Rdzeń dim and take no tap: only "Z plecaka" works (20.11.2026). With no
+   one free for a new work, "Z plecaka" dims too (21.11.2026). */
+.set-doll .slot:disabled,
+.set-bag-row:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
@@ -25484,6 +25486,10 @@ a.social-button {
   gap: 8px;
   padding-top: 12px;
   border-top: 1px solid var(--line);
+}
+
+.set-bag-note {
+  margin: 0;
 }
 
 .set-bag-row > .item-summary-art,
