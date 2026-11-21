@@ -3901,6 +3901,10 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Wersja 0.4.91 (21.11.2026): Pradawne stado
+
+Według podsekcji „Pradawne stado (1221 A, 21.11.2026)” w sekcji „Przywołańce Druidów: 2, 3 i 4 naraz” niżej. Do tego w odtwarzaniu walki (`summonPlace` w `src/client/arena.js`) przywołaniec, dla którego nie ma już wolnego pola przed postacią, staje w polu z najmniejszą liczbą kart (z równych w najbliższym), a nie zawsze w najbliższym: cztery przywołańce Pradruida stoją dwa na dwa zamiast trzech w środkowej kolumnie, więc plansza jest o rząd niższa. Sprawdzone w przeglądarce na telefonie (390 px) i komputerze (1366 px): dwa Dęby wieków, Żubr i Niedźwiedź naraz, każdy z własną kartą, bez błędów strony.
+
 ## Wersja 0.4.90 (21.11.2026): pasek many z 0.4.89, Zew zwierząt i Gaj wieków
 
 0.4.89 nie weszła do gry: trzecie wdrożenie znowu zatrzymał test czasu oceny zagrożenia (`test/engine.test.js`, 6,70 ms przy granicy 6 ms; pierwsze 6,07 ms). 0.4.89 tej oceny nie spowalnia (pasek many zapisuje manę tylko w walkach zapisywanych do odtwarzania, a ocena zagrożenia ich nie zapisuje), a lokalnie ocena trwa 2–4 ms. Serwery GitHuba, na których obok tego testu idą inne testy tej samej części, mierzą ten sam kod mniej więcej trzy razy dłużej, więc tam granica wynosi teraz 10 ms (`process.env.CI`), a lokalnie zostaje 6 ms. Jak przy 0.4.44 i 0.4.45, wszystko z 0.4.89 wchodzi do gry w 0.4.90, a wpis nowości 0.4.89 zostaje.
