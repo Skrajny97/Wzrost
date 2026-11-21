@@ -3901,6 +3901,10 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Wersja 0.4.87 (21.11.2026): skrót gildii przy właśnie wysłanej wiadomości
+
+Zgłoszenie gracza (poz. 63) przez autora: „jak piszę wiadomość to nie widać nazwy gildii, wraca dopiero po przełączeniu okna”. Serwer odsyłał świeżo wysłaną wiadomość bez skrótu gildii piszącego, a czytane później wiadomości go miały. Teraz `POST /api/chat` dokłada skrót tak jak listy wiadomości (`guildTagSql` w `src/server/chat.js`); test w `test/guilds.test.js`.
+
 ## Wersja 0.4.86 (21.11.2026): mana między walkami wyprawy (1220 B)
 
 Według sekcji niżej. Towarzysze i najemnik zaczynają każdą walkę z pełną maną (nie noszą mikstur); bez mikstur many Wojownik, Łucznik i Cień mdleją częściej (do +16 punktów), co autor dostaje w raporcie razem z możliwością innego procentu.

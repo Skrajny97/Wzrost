@@ -1605,6 +1605,11 @@
       "id": "0.4.86",
       "title": "Wersja 0.4.86",
       "body": "- Mana nie wraca już cała między walkami wyprawy: każda walka zaczyna się z maną, która została po poprzedniej, a po wygranej wraca 30% brakującej. Mikstury many przydają się na dłuższych wyprawach, a „Zagrożenie” liczy też te, które zabierasz."
+    },
+    {
+      "id": "0.4.87",
+      "title": "Wersja 0.4.87",
+      "body": "- Czat: przy wiadomości, którą właśnie wysyłasz, od razu widać skrót Twojej gildii, a nie dopiero po przełączeniu okna."
     }
   ]
 }
