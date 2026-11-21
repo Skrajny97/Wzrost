@@ -3901,6 +3901,10 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Górna granica uniku zostaje 30% (21.11.2026)
+
+Gracz (poz. 62) przez autora: Zręczność „ma dawać więcej uniku ale w sumie nie zauważyłem u siebie specjalnego wzrostu. Zawsze miałem jakoś ponad 20% i tak jest nadal”. Od 0.4.85 punkt Zręczności daje 3 punkty oceny uniku zamiast 2, ale przy górnej granicy 30% i liczeniu względem poziomu wroga postać zręcznościowa zyskuje tylko ok. 2–3 punkty procentowe (np. 19,9% → 22,4% na 100. poziomie). Propozycję podniesienia granicy do 40% autor odrzucił: „Nie podnoś uniku”. `balance.combat.dodgeCap` zostaje 0,3.
+
 ## Wersja 0.4.88 (21.11.2026): Oprawianie z plecaka widoczne zawsze
 
 Według sekcji niżej (autor: „niby nie działa”, gracze nie mogli znaleźć „Z plecaka”).
