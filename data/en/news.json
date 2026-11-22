@@ -1300,6 +1300,10 @@
     "0.4.91": {
       "title": "Version 0.4.91",
       "body": "- Elder Druid: “Ancient Herd” replaces “Rebirth of the Forest”. One cast summons the bison and the bear at once, so with the two Oaks of Ages of “Grove of Ages” the Elder Druid has four summons at once. Your levels in Rebirth of the Forest move to Ancient Herd, so no skill points are lost. The Grove of Ages still heals the party.\n- In the fight playback, summons stand evenly in two columns in front of the character."
+    },
+    "0.4.92": {
+      "title": "Version 0.4.92",
+      "body": "- Settings: below Discord, Facebook, TikTok and Wattpad there is now a Wiki button. It opens the game's wiki on Fandom, written by players (in Polish)."
     }
   }
 }

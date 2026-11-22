@@ -1630,6 +1630,11 @@
       "id": "0.4.91",
       "title": "Wersja 0.4.91",
       "body": "- Pradruid: „Pradawne stado” zastępuje „Odrodzenie puszczy”. Jednym rzuceniem przywołuje naraz żubra i niedźwiedzia, więc razem z dwoma Dębami wieków z „Gaju wieków” Pradruid ma cztery przywołańce naraz. Poziomy Odrodzenia puszczy przechodzą na Pradawne stado, więc nie tracisz punktów umiejętności. Drużynę leczy dalej Gaj wieków.\n- W odtwarzaniu walki przywołańce stają równo w dwóch kolumnach przed postacią."
+    },
+    {
+      "id": "0.4.92",
+      "title": "Wersja 0.4.92",
+      "body": "- Ustawienia: pod Discordem, Facebookiem, TikTokiem i Wattpadem jest teraz przycisk Wiki. Otwiera wiki gry na Fandomie, którą tworzą gracze."
     }
   ]
 }

@@ -3901,6 +3901,20 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Wersja 0.4.92 (22.11.2026): przycisk Wiki w Ustawieniach
+
+Według sekcji niżej.
+
+## Wiki graczy w Ustawieniach (22.11.2026)
+
+Autor: „Podepnij Wiki społecznościową jako przycisk pod grę” z linkiem do strony Klasy i Ewolucje na Fandomie.
+
+1. **Gdzie:** wiersz „Wiki” w Ustawieniach pod Discordem, Facebookiem, TikTokiem i Wattpadem, zrobiony tak samo jak one (`social.places` w `data/community.json`, `src/client/social.js`): przycisk ze znakiem i słowami otwiera link w nowej karcie.
+2. **Link:** dokładnie ten, który podał autor (`https://insightrpg.fandom.com/pl/wiki/Klasy_i_Ewolucje`). Fandom nie wpuszcza automatów (strona „Just a moment…”), więc nie dało się sprawdzić adresu strony głównej wiki; zmiana linku to jedna linijka w danych. Schemat przyjmuje dla wiki tylko adresy `https://<nazwa>.fandom.com/…`.
+3. **Znak:** znak Fandomu z Simple Icons (CC0, jak znaki Facebooka, TikToka i Wattpada), biały na różowym kafelku `#FA005A`.
+4. **Słowa:** „Zajrzyj do wiki tworzonej przez graczy”, po angielsku „Browse the players' wiki (in Polish)”, bo wiki jest po polsku.
+5. **Sprawdzone** w przeglądarce: telefon 320 px i 360 px po angielsku, komputer 1366 px; tekst mieści się w przycisku, bez przewijania na boki.
+
 ## Wersja 0.4.91 (21.11.2026): Pradawne stado
 
 Według podsekcji „Pradawne stado (1221 A, 21.11.2026)” w sekcji „Przywołańce Druidów: 2, 3 i 4 naraz” niżej. Do tego w odtwarzaniu walki (`summonPlace` w `src/client/arena.js`) przywołaniec, dla którego nie ma już wolnego pola przed postacią, staje w polu z najmniejszą liczbą kart (z równych w najbliższym), a nie zawsze w najbliższym: cztery przywołańce Pradruida stoją dwa na dwa zamiast trzech w środkowej kolumnie, więc plansza jest o rząd niższa. Sprawdzone w przeglądarce na telefonie (390 px) i komputerze (1366 px): dwa Dęby wieków, Żubr i Niedźwiedź naraz, każdy z własną kartą, bez błędów strony.

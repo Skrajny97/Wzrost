@@ -1,7 +1,9 @@
 // @ts-check
 // Facebook, TikTok and Wattpad (the author, 18.11.2026: „podepnij
 // facebooka, tiktoka i wattpada do gry, gdzieś w ustawienia albo
-// społeczność obok discorda z przyciskami”): a row each in the Ustawienia,
+// społeczność obok discorda z przyciskami”), and the players' wiki on Fandom
+// (22.11.2026: „Podepnij Wiki społecznościową jako przycisk pod grę”): a row
+// each in the Ustawienia,
 // right below the Discord row and like it, with a game button that bears the
 // place's mark and its words (data/community.json, social.places) and opens
 // the link in a new card, or in the place's app where the phone has it. A
@@ -17,7 +19,8 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 // The marks as Simple Icons draws them (simpleicons.org, CC0; 24 × 24), in
 // their brands' colours and otherwise unchanged: Facebook's "f" logo, a white
 // f in its blue circle; TikTok's note, white on black; Wattpad's W, white on
-// its orange, as on the apps' own tiles.
+// its orange, as on the apps' own tiles; Fandom's mark, white on its pink,
+// for the wiki its players keep there.
 /** @type {Record<string, { name: string, color: string, path: string, circle?: boolean }>} */
 export const MARKS = {
   facebook: {
@@ -35,6 +38,11 @@ export const MARKS = {
     name: 'Wattpad',
     color: '#FF500A',
     path: 'M13.034 3.09c-1.695.113-3.9 2.027-6.9 6.947.245-2.758.345-4.716-.857-5.743-.823-.702-2.764-.974-3.926.536C.18 6.349-.09 9.312.024 12.432c.238 6.518 2.544 8.487 4.59 8.487h.001c3.623 0 4.13-4.439 6.604-8.4-.09 1.416-.008 2.668.266 3.532 1.078 3.398 4.784 3.663 6.467.21 2.374-4.87 3.058-6.016 5.453-9.521 1.58-2.314-.252-3.812-2.374-2.735-1.09.554-2.86 1.935-5.065 4.867.387-2.23.28-5.996-2.932-5.782z',
+  },
+  wiki: {
+    name: 'Wiki',
+    color: '#FA005A',
+    path: 'M8.123.008a.431.431 0 00-.512.42v9.746L4.104 6.666a.432.432 0 00-.66.064.428.428 0 00-.071.239v10.064a2.387 2.387 0 00.701 1.694l4.565 4.57a2.4 2.4 0 001.693.703h3.34c.635 0 1.242-.252 1.691-.701l4.565-4.572a2.394 2.394 0 00.699-1.694V13.41a2.39 2.39 0 00-.7-1.693L8.343.125a.427.427 0 00-.219-.117zM9.646 12.51a.719.719 0 01.508.21l1.848 1.85 1.844-1.85a.714.714 0 011.015 0l1.32 1.321a.724.724 0 01.212.508v1.406a.72.72 0 01-.21.508l-3.68 3.7a.72.72 0 01-1.019 0l-3.668-3.7a.716.716 0 01-.209-.506v-1.408a.71.71 0 01.211-.506l1.32-1.322a.713.713 0 01.508-.211Z',
   },
 };
 
