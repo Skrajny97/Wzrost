@@ -553,8 +553,9 @@ export function publicContent() {
       // The game's Discord server: its invite link and the page's words
       // (src/client/discord.js).
       discord: { invite: game.community.discord.invite, texts: game.community.discord.texts },
-      // The game's Facebook, TikTok and Wattpad and the players' wiki: their
-      // links and the words of their buttons (src/client/social.js).
+      // The game's Facebook, TikTok and Wattpad, the players' wiki and the
+      // soundtrack: their links and the words of their buttons
+      // (src/client/social.js).
       social: { places: game.community.social.places.map(({ id, url, label }) => ({ id, url, label })) },
       // Poleć grę (referrals.js): the start points and the milestones for
       // the invitation on the sign-up, and the words of the card.

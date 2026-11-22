@@ -134,7 +134,7 @@
       }
     },
     "social": {
-      "description": "Facebook, TikTok i Wattpad gry oraz wiki graczy na Fandomie: każde miejsce to wiersz w Ustawieniach pod Discordem, z przyciskiem ze znakiem miejsca i słowami (label), który otwiera link (url, pusty: wiersza nie ma). Link musi prowadzić do tego miejsca.",
+      "description": "Facebook, TikTok i Wattpad gry, wiki graczy na Fandomie i soundtrack na YouTube: każde miejsce to wiersz w Ustawieniach pod Discordem, z przyciskiem ze znakiem miejsca i słowami (label), który otwiera link (url, pusty: wiersza nie ma). Link musi prowadzić do tego miejsca.",
       "type": "object",
       "additionalProperties": false,
       "required": ["places"],
@@ -147,15 +147,16 @@
             "additionalProperties": false,
             "required": ["id", "url", "label"],
             "properties": {
-              "id": { "enum": ["facebook", "tiktok", "wattpad", "wiki"] },
-              "url": { "type": "string", "pattern": "^(https://((www\\.)?(facebook\\.com|tiktok\\.com|wattpad\\.com)|[a-z0-9-]+\\.fandom\\.com)/[^\\s]+)?$" },
+              "id": { "enum": ["facebook", "tiktok", "wattpad", "wiki", "youtube"] },
+              "url": { "type": "string", "pattern": "^(https://((www\\.)?(facebook\\.com|tiktok\\.com|wattpad\\.com|youtube\\.com)|youtu\\.be|[a-z0-9-]+\\.fandom\\.com)/[^\\s]+)?$" },
               "label": { "type": "string", "minLength": 1 }
             },
             "allOf": [
               { "if": { "properties": { "id": { "const": "facebook" } } }, "then": { "properties": { "url": { "pattern": "^(https://(www\\.)?facebook\\.com/.+)?$" } } } },
               { "if": { "properties": { "id": { "const": "tiktok" } } }, "then": { "properties": { "url": { "pattern": "^(https://(www\\.)?tiktok\\.com/.+)?$" } } } },
               { "if": { "properties": { "id": { "const": "wattpad" } } }, "then": { "properties": { "url": { "pattern": "^(https://(www\\.)?wattpad\\.com/.+)?$" } } } },
-              { "if": { "properties": { "id": { "const": "wiki" } } }, "then": { "properties": { "url": { "pattern": "^(https://[a-z0-9-]+\\.fandom\\.com/.+)?$" } } } }
+              { "if": { "properties": { "id": { "const": "wiki" } } }, "then": { "properties": { "url": { "pattern": "^(https://[a-z0-9-]+\\.fandom\\.com/.+)?$" } } } },
+              { "if": { "properties": { "id": { "const": "youtube" } } }, "then": { "properties": { "url": { "pattern": "^(https://((www\\.)?youtube\\.com|youtu\\.be)/.+)?$" } } } }
             ]
           }
         }

@@ -1304,6 +1304,10 @@
     "0.4.92": {
       "title": "Version 0.4.92",
       "body": "- Settings: below Discord, Facebook, TikTok and Wattpad there is now a Wiki button. It opens the game's wiki on Fandom, written by players (in Polish)."
+    },
+    "0.4.93": {
+      "title": "Version 0.4.93",
+      "body": "- Settings: a new Soundtrack row. Its button opens a YouTube video with the game's music, each track over a land from the game."
     }
   }
 }

@@ -1635,6 +1635,11 @@
       "id": "0.4.92",
       "title": "Wersja 0.4.92",
       "body": "- Ustawienia: pod Discordem, Facebookiem, TikTokiem i Wattpadem jest teraz przycisk Wiki. Otwiera wiki gry na Fandomie, którą tworzą gracze."
+    },
+    {
+      "id": "0.4.93",
+      "title": "Wersja 0.4.93",
+      "body": "- Ustawienia: nowy wiersz Soundtrack. Przycisk otwiera na YouTube film z muzyką z gry, a pod każdym utworem jest kraina z gry."
     }
   ]
 }

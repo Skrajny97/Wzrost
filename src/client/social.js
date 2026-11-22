@@ -2,7 +2,9 @@
 // Facebook, TikTok and Wattpad (the author, 18.11.2026: „podepnij
 // facebooka, tiktoka i wattpada do gry, gdzieś w ustawienia albo
 // społeczność obok discorda z przyciskami”), and the players' wiki on Fandom
-// (22.11.2026: „Podepnij Wiki społecznościową jako przycisk pod grę”): a row
+// (22.11.2026: „Podepnij Wiki społecznościową jako przycisk pod grę”), and
+// the soundtrack on YouTube (22.11.2026: „Podepnij ten film z podpisem
+// soundtrack tam gdzie wszystkie sociale”), in a row named Soundtrack: a row
 // each in the Ustawienia,
 // right below the Discord row and like it, with a game button that bears the
 // place's mark and its words (data/community.json, social.places) and opens
@@ -20,7 +22,8 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 // their brands' colours and otherwise unchanged: Facebook's "f" logo, a white
 // f in its blue circle; TikTok's note, white on black; Wattpad's W, white on
 // its orange, as on the apps' own tiles; Fandom's mark, white on its pink,
-// for the wiki its players keep there.
+// for the wiki its players keep there; YouTube's, white on its red, for the
+// soundtrack.
 /** @type {Record<string, { name: string, color: string, path: string, circle?: boolean }>} */
 export const MARKS = {
   facebook: {
@@ -43,6 +46,11 @@ export const MARKS = {
     name: 'Wiki',
     color: '#FA005A',
     path: 'M8.123.008a.431.431 0 00-.512.42v9.746L4.104 6.666a.432.432 0 00-.66.064.428.428 0 00-.071.239v10.064a2.387 2.387 0 00.701 1.694l4.565 4.57a2.4 2.4 0 001.693.703h3.34c.635 0 1.242-.252 1.691-.701l4.565-4.572a2.394 2.394 0 00.699-1.694V13.41a2.39 2.39 0 00-.7-1.693L8.343.125a.427.427 0 00-.219-.117zM9.646 12.51a.719.719 0 01.508.21l1.848 1.85 1.844-1.85a.714.714 0 011.015 0l1.32 1.321a.724.724 0 01.212.508v1.406a.72.72 0 01-.21.508l-3.68 3.7a.72.72 0 01-1.019 0l-3.668-3.7a.716.716 0 01-.209-.506v-1.408a.71.71 0 01.211-.506l1.32-1.322a.713.713 0 01.508-.211Z',
+  },
+  youtube: {
+    name: 'Soundtrack',
+    color: '#FF0000',
+    path: 'M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z',
   },
 };
 
