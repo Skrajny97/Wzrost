@@ -3901,6 +3901,10 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Wersja 0.4.93 (22.11.2026): soundtrack w Ustawieniach
+
+Autor: „Podepnij ten film z podpisem soundtrack tam gdzie wszystkie sociale” z linkiem do filmu na YouTube z muzyką z gry (29 minut, 10 utworów, pod każdym kraina z gry). Wiersz „Soundtrack” w Ustawieniach pod Wiki, zrobiony jak pozostałe (`social.places`, id `youtube`): znak YouTube z Simple Icons (CC0), biały na czerwonym kafelku `#FF0000`, i przycisk „Posłuchaj muzyki z gry” (po angielsku „Listen to the game's music”). Link bez dopisku `?feature=shared`, jak link Wattpada bez znaczników udostępniania. Schemat przyjmuje dla niego tylko `https://youtu.be/…` i `https://(www.)youtube.com/…`. Sprawdzone w przeglądarce na 320 px i 1366 px.
+
 ## Wersja 0.4.92 (22.11.2026): przycisk Wiki w Ustawieniach
 
 Według sekcji niżej.
