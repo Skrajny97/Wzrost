@@ -66,11 +66,12 @@
     }
   },
   "social": {
-    "$comment": "Facebook, TikTok and Wattpad (src/client/social.js, the author 18.11.2026: „podepnij facebooka, tiktoka i wattpada do gry, gdzieś w ustawienia albo społeczność obok discorda z przyciskami”): each place a row in the Ustawienia below Discord's, a game button with the place's mark (only these three have one) and its words (label), opening url in a new card. A place with an empty url does not show.",
+    "$comment": "Facebook, TikTok and Wattpad (src/client/social.js, the author 18.11.2026: „podepnij facebooka, tiktoka i wattpada do gry, gdzieś w ustawienia albo społeczność obok discorda z przyciskami”): and from 22.11.2026 the players' wiki on Fandom (the author: „Podepnij Wiki społecznościową jako przycisk pod grę”, with the link of its page Klasy i Ewolucje): each place a row in the Ustawienia below Discord's, a game button with the place's mark (only these four have one) and its words (label), opening url in a new card. A place with an empty url does not show.",
     "places": [
       { "id": "facebook", "url": "https://www.facebook.com/share/1AQJtnqMi2/", "label": "Odwiedź nas na Facebooku" },
       { "id": "tiktok", "url": "https://www.tiktok.com/@insight_rpg", "label": "Obserwuj nas na TikToku" },
-      { "id": "wattpad", "url": "https://www.wattpad.com/story/419946881", "label": "Czytaj powieść ze świata gry" }
+      { "id": "wattpad", "url": "https://www.wattpad.com/story/419946881", "label": "Czytaj powieść ze świata gry" },
+      { "id": "wiki", "url": "https://insightrpg.fandom.com/pl/wiki/Klasy_i_Ewolucje", "label": "Zajrzyj do wiki tworzonej przez graczy" }
     ]
   },
   "party": {

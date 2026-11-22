@@ -52,7 +52,8 @@
     "places": {
       "facebook": { "label": "Visit us on Facebook" },
       "tiktok": { "label": "Follow us on TikTok" },
-      "wattpad": { "label": "Read the novel set in the game's world" }
+      "wattpad": { "label": "Read the novel set in the game's world" },
+      "wiki": { "label": "Browse the players' wiki (in Polish)" }
     }
   },
   "party": {
