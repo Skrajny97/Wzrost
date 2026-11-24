@@ -1,0 +1,13 @@
+{
+  "id": "shark-hurt",
+  "payload": {
+    "text": "a huge shark thrashes with a violent splash and a deep gurgling snarl of pain, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/shark-hurt-20261124T1523-0.mp3",
+    "audio/drafts/voices/shark-hurt-20261124T1523-1.mp3"
+  ],
+  "credits": 24
+}

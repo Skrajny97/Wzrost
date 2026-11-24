@@ -1,0 +1,13 @@
+{
+  "id": "log-hive-death",
+  "payload": {
+    "text": "an old living log hive cracks and falls with a heavy wooden thud while the bees buzz away, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/log-hive-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/log-hive-death-20261124T1523-1.mp3"
+  ],
+  "credits": 56
+}

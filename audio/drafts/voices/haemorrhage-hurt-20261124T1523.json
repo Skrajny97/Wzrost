@@ -1,0 +1,13 @@
+{
+  "id": "haemorrhage-hurt",
+  "payload": {
+    "text": "a creature of living blood gives a wet gurgling snarl and a splatter of pain, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/haemorrhage-hurt-20261124T1523-0.mp3",
+    "audio/drafts/voices/haemorrhage-hurt-20261124T1523-1.mp3"
+  ],
+  "credits": 24
+}

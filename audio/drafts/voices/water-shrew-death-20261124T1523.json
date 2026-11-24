@@ -1,0 +1,13 @@
+{
+  "id": "water-shrew-death",
+  "payload": {
+    "text": "a giant shrew gives a long thin fading squeak and goes still, no words, close up, dry, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/water-shrew-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/water-shrew-death-20261124T1523-1.mp3"
+  ],
+  "credits": 44
+}

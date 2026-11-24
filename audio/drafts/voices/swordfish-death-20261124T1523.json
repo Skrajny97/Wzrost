@@ -1,0 +1,13 @@
+{
+  "id": "swordfish-death",
+  "payload": {
+    "text": "a big swordfish gives a long fading thrash of its tail and a hollow bubbling gasp, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/swordfish-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/swordfish-death-20261124T1523-1.mp3"
+  ],
+  "credits": 52
+}

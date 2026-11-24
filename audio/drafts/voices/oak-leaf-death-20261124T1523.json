@@ -1,0 +1,13 @@
+{
+  "id": "oak-leaf-death",
+  "payload": {
+    "text": "a giant living leaf gives a long fading rustle and drifts down with a soft papery swish, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/oak-leaf-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/oak-leaf-death-20261124T1523-1.mp3"
+  ],
+  "credits": 52
+}

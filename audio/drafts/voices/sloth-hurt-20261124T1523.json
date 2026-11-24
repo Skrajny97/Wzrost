@@ -1,0 +1,13 @@
+{
+  "id": "sloth-hurt",
+  "payload": {
+    "text": "a giant sloth gives a slow deep groaning bleat of pain, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/sloth-hurt-20261124T1523-0.mp3",
+    "audio/drafts/voices/sloth-hurt-20261124T1523-1.mp3"
+  ],
+  "credits": 24
+}

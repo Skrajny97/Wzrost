@@ -1,0 +1,13 @@
+{
+  "id": "oak-gall-hurt",
+  "payload": {
+    "text": "an angry swarm of wasps bursts out with a sharp buzzing hiss of pain, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/oak-gall-hurt-20261124T1523-0.mp3",
+    "audio/drafts/voices/oak-gall-hurt-20261124T1523-1.mp3"
+  ],
+  "credits": 20
+}

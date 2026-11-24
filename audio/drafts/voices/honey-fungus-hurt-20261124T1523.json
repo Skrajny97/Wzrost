@@ -1,0 +1,13 @@
+{
+  "id": "honey-fungus-hurt",
+  "payload": {
+    "text": "a clump of living mushrooms gives a soft wet creak and an eerie whispering hiss of pain, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/honey-fungus-hurt-20261124T1523-0.mp3",
+    "audio/drafts/voices/honey-fungus-hurt-20261124T1523-1.mp3"
+  ],
+  "credits": 20
+}

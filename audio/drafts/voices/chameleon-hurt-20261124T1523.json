@@ -1,0 +1,13 @@
+{
+  "id": "chameleon-hurt",
+  "payload": {
+    "text": "a big chameleon gives a sharp hissing pop and a raspy squeak of pain, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/chameleon-hurt-20261124T1523-0.mp3",
+    "audio/drafts/voices/chameleon-hurt-20261124T1523-1.mp3"
+  ],
+  "credits": 20
+}

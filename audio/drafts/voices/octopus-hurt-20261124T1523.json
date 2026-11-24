@@ -1,0 +1,13 @@
+{
+  "id": "octopus-hurt",
+  "payload": {
+    "text": "a gigantic octopus gives a deep wet gurgling roar of pain and a slap of tentacles, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/octopus-hurt-20261124T1523-0.mp3",
+    "audio/drafts/voices/octopus-hurt-20261124T1523-1.mp3"
+  ],
+  "credits": 28
+}

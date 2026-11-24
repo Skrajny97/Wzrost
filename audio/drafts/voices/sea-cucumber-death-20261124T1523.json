@@ -1,0 +1,13 @@
+{
+  "id": "sea-cucumber-death",
+  "payload": {
+    "text": "a giant sea cucumber deflates with a long wet squelching sigh and a soft slimy flop, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/sea-cucumber-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/sea-cucumber-death-20261124T1523-1.mp3"
+  ],
+  "credits": 56
+}

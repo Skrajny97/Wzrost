@@ -1,0 +1,13 @@
+{
+  "id": "pride-hurt",
+  "payload": {
+    "text": "a haughty golden mask spirit gives a cold disdainful hiss and a metallic ringing cry of pain, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/pride-hurt-20261124T1523-0.mp3",
+    "audio/drafts/voices/pride-hurt-20261124T1523-1.mp3"
+  ],
+  "credits": 28
+}

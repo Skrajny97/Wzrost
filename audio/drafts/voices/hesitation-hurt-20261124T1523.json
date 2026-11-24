@@ -1,0 +1,13 @@
+{
+  "id": "hesitation-hurt",
+  "payload": {
+    "text": "an old living wooden signpost gives a creaking wooden groan of pain and a hollow knock, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/hesitation-hurt-20261124T1523-0.mp3",
+    "audio/drafts/voices/hesitation-hurt-20261124T1523-1.mp3"
+  ],
+  "credits": 20
+}

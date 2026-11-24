@@ -1,0 +1,13 @@
+{
+  "id": "horseshoe-crab-death",
+  "payload": {
+    "text": "a giant horseshoe crab gives a long rattling hiss and its heavy shell falls with a hollow clatter, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/horseshoe-crab-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/horseshoe-crab-death-20261124T1523-1.mp3"
+  ],
+  "credits": 56
+}

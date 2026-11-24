@@ -1,0 +1,13 @@
+{
+  "id": "pangolin-hurt",
+  "payload": {
+    "text": "a huge pangolin gives a deep huffing snort and a hiss of pain with a rattle of scales, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/pangolin-hurt-20261124T1523-0.mp3",
+    "audio/drafts/voices/pangolin-hurt-20261124T1523-1.mp3"
+  ],
+  "credits": 28
+}

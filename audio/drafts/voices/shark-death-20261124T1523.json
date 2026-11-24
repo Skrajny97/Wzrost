@@ -1,0 +1,13 @@
+{
+  "id": "shark-death",
+  "payload": {
+    "text": "a huge shark gives a last heavy thrash, a long bubbling gurgle and sinks with a dull splash, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/shark-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/shark-death-20261124T1523-1.mp3"
+  ],
+  "credits": 56
+}

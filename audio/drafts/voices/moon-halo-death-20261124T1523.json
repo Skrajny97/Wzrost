@@ -1,0 +1,13 @@
+{
+  "id": "moon-halo-death",
+  "payload": {
+    "text": "a ring of moonlight gives a long fading glassy shimmer that dies away into silence, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/moon-halo-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/moon-halo-death-20261124T1523-1.mp3"
+  ],
+  "credits": 56
+}

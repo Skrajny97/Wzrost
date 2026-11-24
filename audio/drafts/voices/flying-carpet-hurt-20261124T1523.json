@@ -1,0 +1,13 @@
+{
+  "id": "flying-carpet-hurt",
+  "payload": {
+    "text": "a living flying carpet gives a sharp flapping snap of cloth and a rustling hiss of pain, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/flying-carpet-hurt-20261124T1523-0.mp3",
+    "audio/drafts/voices/flying-carpet-hurt-20261124T1523-1.mp3"
+  ],
+  "credits": 20
+}

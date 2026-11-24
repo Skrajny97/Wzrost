@@ -1,0 +1,13 @@
+{
+  "id": "sleepwalker-death",
+  "payload": {
+    "text": "a sleepwalking man gives a long sleepy sigh that turns into a soft snore and goes quiet, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/sleepwalker-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/sleepwalker-death-20261124T1523-1.mp3"
+  ],
+  "credits": 56
+}

@@ -1,0 +1,13 @@
+{
+  "id": "capricorn-beetle-death",
+  "payload": {
+    "text": "a huge long-horned beetle gives a long dry creaking rattle and falls with a hard clatter, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/capricorn-beetle-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/capricorn-beetle-death-20261124T1523-1.mp3"
+  ],
+  "credits": 52
+}

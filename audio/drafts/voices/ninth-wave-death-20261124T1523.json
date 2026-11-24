@@ -1,0 +1,13 @@
+{
+  "id": "ninth-wave-death",
+  "payload": {
+    "text": "a huge living sea wave collapses with a long roaring crash and hiss of foam that slowly drains away, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/ninth-wave-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/ninth-wave-death-20261124T1523-1.mp3"
+  ],
+  "credits": 64
+}

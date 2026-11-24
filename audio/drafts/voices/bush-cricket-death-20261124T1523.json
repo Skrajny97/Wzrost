@@ -1,0 +1,13 @@
+{
+  "id": "bush-cricket-death",
+  "payload": {
+    "text": "a horse-sized bush cricket gives a long slowing chirp that fades out and a dry rustle, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/bush-cricket-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/bush-cricket-death-20261124T1523-1.mp3"
+  ],
+  "credits": 52
+}

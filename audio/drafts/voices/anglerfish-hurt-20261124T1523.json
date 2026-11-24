@@ -1,0 +1,13 @@
+{
+  "id": "anglerfish-hurt",
+  "payload": {
+    "text": "a deep sea anglerfish gives a low bubbling croak and a snap of needle teeth, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/anglerfish-hurt-20261124T1523-0.mp3",
+    "audio/drafts/voices/anglerfish-hurt-20261124T1523-1.mp3"
+  ],
+  "credits": 24
+}

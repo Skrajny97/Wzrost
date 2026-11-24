@@ -1,0 +1,13 @@
+{
+  "id": "comet-death",
+  "payload": {
+    "text": "a falling comet gives a long fading fiery whoosh and fizzles out with a hiss of steam, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/comet-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/comet-death-20261124T1523-1.mp3"
+  ],
+  "credits": 56
+}

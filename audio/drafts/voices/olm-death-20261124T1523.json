@@ -1,0 +1,13 @@
+{
+  "id": "olm-death",
+  "payload": {
+    "text": "a pale blind cave salamander gives a long thin wet whimper that fades into dripping water, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/olm-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/olm-death-20261124T1523-1.mp3"
+  ],
+  "credits": 48
+}

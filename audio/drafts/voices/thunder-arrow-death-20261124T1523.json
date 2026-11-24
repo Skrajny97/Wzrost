@@ -1,0 +1,13 @@
+{
+  "id": "thunder-arrow-death",
+  "payload": {
+    "text": "a living stone arrow gives a long fading rumble of thunder and drops with a stony clink, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/thunder-arrow-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/thunder-arrow-death-20261124T1523-1.mp3"
+  ],
+  "credits": 56
+}

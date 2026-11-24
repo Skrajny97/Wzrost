@@ -1,0 +1,13 @@
+{
+  "id": "whispered-charm-death",
+  "payload": {
+    "text": "many ghostly whispers fade together into one long breathy sigh and silence, no understandable words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/whispered-charm-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/whispered-charm-death-20261124T1523-1.mp3"
+  ],
+  "credits": 56
+}

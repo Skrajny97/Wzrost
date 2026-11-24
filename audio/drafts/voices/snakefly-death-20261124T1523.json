@@ -1,0 +1,13 @@
+{
+  "id": "snakefly-death",
+  "payload": {
+    "text": "a giant long-necked insect gives a long dry rattling buzz that fades out, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/snakefly-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/snakefly-death-20261124T1523-1.mp3"
+  ],
+  "credits": 48
+}

@@ -1,0 +1,13 @@
+{
+  "id": "flying-carpet-death",
+  "payload": {
+    "text": "a living flying carpet gives a long fading flutter of cloth and falls with a soft heavy flop, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/flying-carpet-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/flying-carpet-death-20261124T1523-1.mp3"
+  ],
+  "credits": 48
+}

@@ -1,0 +1,13 @@
+{
+  "id": "intoxication-death",
+  "payload": {
+    "text": "a drunken clay jug spirit gives a long sleepy gurgling sigh and a hollow clay clunk as it tips over, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/intoxication-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/intoxication-death-20261124T1523-1.mp3"
+  ],
+  "credits": 56
+}

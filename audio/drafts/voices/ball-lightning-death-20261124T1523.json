@@ -1,0 +1,13 @@
+{
+  "id": "ball-lightning-death",
+  "payload": {
+    "text": "a ball of lightning bursts with a deafening crack of thunder and a long fading electric fizz, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/ball-lightning-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/ball-lightning-death-20261124T1523-1.mp3"
+  ],
+  "credits": 64
+}

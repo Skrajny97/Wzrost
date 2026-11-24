@@ -1,0 +1,13 @@
+{
+  "id": "heartwood-death",
+  "payload": {
+    "text": "a giant living wooden heart gives a last slow booming heartbeat and a long groaning creak of breaking wood, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/heartwood-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/heartwood-death-20261124T1523-1.mp3"
+  ],
+  "credits": 64
+}

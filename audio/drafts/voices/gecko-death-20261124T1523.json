@@ -1,0 +1,13 @@
+{
+  "id": "gecko-death",
+  "payload": {
+    "text": "a big gecko gives a long fading chirp and drops with a soft slap, no words, close up, dry, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/gecko-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/gecko-death-20261124T1523-1.mp3"
+  ],
+  "credits": 44
+}

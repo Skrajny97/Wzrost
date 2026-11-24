@@ -1,0 +1,13 @@
+{
+  "id": "hesitation-death",
+  "payload": {
+    "text": "an old living wooden signpost gives a long creaking groan and falls apart with clattering boards, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/hesitation-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/hesitation-death-20261124T1523-1.mp3"
+  ],
+  "credits": 56
+}

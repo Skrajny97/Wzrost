@@ -1,0 +1,13 @@
+{
+  "id": "starfish-hurt",
+  "payload": {
+    "text": "a giant starfish gives a wet squelching gurgle of pain with a crackle of spines, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/starfish-hurt-20261124T1523-0.mp3",
+    "audio/drafts/voices/starfish-hurt-20261124T1523-1.mp3"
+  ],
+  "credits": 20
+}

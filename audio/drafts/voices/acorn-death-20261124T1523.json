@@ -1,0 +1,13 @@
+{
+  "id": "acorn-death",
+  "payload": {
+    "text": "a huge living acorn cracks open with a loud wooden split and rolls away with hollow knocks, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/acorn-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/acorn-death-20261124T1523-1.mp3"
+  ],
+  "credits": 52
+}

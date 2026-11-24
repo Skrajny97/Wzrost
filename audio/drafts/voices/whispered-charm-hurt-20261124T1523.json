@@ -1,0 +1,13 @@
+{
+  "id": "whispered-charm-hurt",
+  "payload": {
+    "text": "a ghostly whispering voice gives a sharp hissing gasp of pain, many whispers at once, no understandable words, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/whispered-charm-hurt-20261124T1523-0.mp3",
+    "audio/drafts/voices/whispered-charm-hurt-20261124T1523-1.mp3"
+  ],
+  "credits": 20
+}

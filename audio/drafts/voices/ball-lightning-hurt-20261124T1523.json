@@ -1,0 +1,13 @@
+{
+  "id": "ball-lightning-hurt",
+  "payload": {
+    "text": "a ball of lightning gives a loud crackling buzz and a sharp electric snap of pain, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/ball-lightning-hurt-20261124T1523-0.mp3",
+    "audio/drafts/voices/ball-lightning-hurt-20261124T1523-1.mp3"
+  ],
+  "credits": 28
+}

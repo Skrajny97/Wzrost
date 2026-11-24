@@ -1,0 +1,13 @@
+{
+  "id": "acorn-hurt",
+  "payload": {
+    "text": "a huge living acorn gives a hollow wooden knock and a creaking groan of pain, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/acorn-hurt-20261124T1523-0.mp3",
+    "audio/drafts/voices/acorn-hurt-20261124T1523-1.mp3"
+  ],
+  "credits": 20
+}

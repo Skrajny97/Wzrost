@@ -1,0 +1,13 @@
+{
+  "id": "jewel-beetle-death",
+  "payload": {
+    "text": "a giant metallic beetle gives a long dry rattling click and drops with a hard metallic clack, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/jewel-beetle-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/jewel-beetle-death-20261124T1523-1.mp3"
+  ],
+  "credits": 48
+}

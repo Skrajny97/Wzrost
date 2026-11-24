@@ -1,0 +1,13 @@
+{
+  "id": "scorpionfly-death",
+  "payload": {
+    "text": "a giant insect gives a long fading buzz and its wings flutter to a stop, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/scorpionfly-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/scorpionfly-death-20261124T1523-1.mp3"
+  ],
+  "credits": 48
+}

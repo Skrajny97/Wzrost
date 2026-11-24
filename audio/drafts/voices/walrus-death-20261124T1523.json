@@ -1,0 +1,13 @@
+{
+  "id": "walrus-death",
+  "payload": {
+    "text": "a huge walrus gives a long deep groaning bellow and slumps down with a heavy wet thud, no words, close up, dry, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/walrus-death-20261124T1523-0.mp3",
+    "audio/drafts/voices/walrus-death-20261124T1523-1.mp3"
+  ],
+  "credits": 60
+}
