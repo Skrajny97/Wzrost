@@ -201,7 +201,7 @@ describe('Drużyna through the API', () => {
     assert.ok(claimed.data.report.fights.some((fight) => fight.allies.some((ally) => ally.name === 'Lider')));
   });
 
-  test('a member set aside goes on the next trip too, its waiting report claimed as the party sets out', async () => {
+  test("a member set aside goes on the next trip too, its report claimed with the leader's, and its Walka marks it", async () => {
     const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
     await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
     assert.equal((await as('druh', 'POST', '/api/character', { name: 'Druga', classId: 'mage', appearance: 'female' })).status, 201);
@@ -211,18 +211,20 @@ describe('Drużyna through the API', () => {
     let own = await as('lider', 'POST', '/api/hunts/claim');
     if (own.data.event) own = await as('lider', 'POST', '/api/hunts/claim', { choice: own.data.event.options.find((option) => !option.disabled)?.id ?? own.data.event.options[0].id });
     assert.equal(own.status, 200, JSON.stringify(own.data).slice(0, 300));
-    // Its player still plays Druga: Druh goes again, the report of its first
-    // trip claimed first, in its Dziennik.
+    // The leader's claim claimed Druh's too (the shared report, 24.11.2026),
+    // in its Dziennik.
+    const report = await (await db()).prepare("SELECT r.id, r.activity_key FROM reports r JOIN characters c ON c.id = r.character_id WHERE c.name = 'Druh' AND r.kind = 'hunt'").first();
+    assert.equal(report.activity_key, `${first.character_id}:${first.started_at}`);
+    // Its player still plays Druga: Druh goes again at once.
     const again = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 5 });
     assert.equal(again.status, 201, JSON.stringify(again.data).slice(0, 300));
     assert.deepEqual(again.data.went, ['Druh']);
-    const report = await (await db()).prepare("SELECT r.id, r.activity_key FROM reports r JOIN characters c ON c.id = r.character_id WHERE c.name = 'Druh' AND r.kind = 'hunt'").first();
-    assert.equal(report.activity_key, `${first.character_id}:${first.started_at}`);
     assert.equal((await (await db()).prepare("SELECT role FROM characters WHERE name = 'Druh'").first()).role, 'aside');
-    // Back on Druh, its Walka tells it and opens that report.
+    // Back on Druh, its Walka tells it who claimed that report and opens it.
     assert.equal((await as('druh', 'POST', '/api/characters/choose', { id: await idOf('Druh') })).status, 200);
     const { character } = (await as('druh', 'GET', '/api/character')).data;
-    assert.deepEqual(character.activity.party.claimed, { id: report.id, kind: 'hunt' });
+    assert.deepEqual(character.partyReport, { id: report.id, by: 'Lider' });
+    assert.equal(character.activity.party.claimed, undefined);
     assert.deepEqual(character.activity.party.names, ['Lider', 'Druh']);
   });
 

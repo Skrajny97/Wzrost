@@ -23,6 +23,11 @@ import { confirmAction, framedName, guildTag, howItWorks, toast, withButton } fr
 // language (t()).
 const GOERS =
   'Na wyprawę ruszają członkowie bez zajęć w trakcie, z dopasowaniem do najniższego poziomu klasy z drużyny. Kto zajmuje się profesją albo jest na solo wyprawie, zostaje w drużynie, ale nie uczestniczy we wspólnej wyprawie.';
+// The shared report of a party's trip (24.11.2026, the author: „niech lider
+// odbiera raport za wszystkich, niech wszyscy mają wspólny”; hunts.js:
+// claimTrip), under "Jak to działa?" for the leader and the members.
+const SHARED_REPORT =
+  'Raport wyprawy drużyny odbiera za wszystkich ten, kto zrobi to pierwszy, zwykle lider. Każdy od razu dostaje swoje XP i łupy, a w Dzienniku ma wspólny raport z tym, co kto zdobył. Wolne punkty czekają na postać, więc lider może od razu wysłać drużynę dalej, także gdy kogoś nie ma w grze.';
 // The companions from the Kwatery in a party: the sentence of 828 A, which
 // 828 B goes like (11.11.2026), under "Jak to działa?".
 const COMPANIONS_STAY = 'Póki jesteś w drużynie, towarzysze zostają w Kwaterach i nie zdobywają XP ani relacji z wypraw.';
@@ -302,13 +307,15 @@ export function mountParty(container) {
             t(GOERS),
             spreadText(view.range.spread),
             t('Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.'),
+            t(SHARED_REPORT),
             t('Bez „Z drużyną” wyprawa jest tylko Twoja, a członkowie też mogą wyruszać na własne wyprawy.'),
             t(COMPANIONS_STAY),
           ])
-        : howItWorks(t('Wyprawy wybiera lider. Gdy nie masz innych zajęć, lider zabierze Cię ze sobą, a raport odbierzesz w Walce jak zwykle.'), [
+        : howItWorks(t('Wyprawy wybiera lider. Gdy nie masz innych zajęć, lider zabierze Cię ze sobą, a raport za całą drużynę odbierze ten, kto zrobi to pierwszy.'), [
             t(GOERS),
             spreadText(view.range.spread),
             t('Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.'),
+            t(SHARED_REPORT),
             t(COMPANIONS_STAY),
           ]),
     );

@@ -569,12 +569,12 @@ export function publicContent() {
       // the invitation on the sign-up, and the words of the card.
       referral: { start: game.community.referral.start, milestones: game.community.referral.milestones, texts: game.community.referral.texts },
       // The Drużyna's button and question of the hand-over of the lead
-      // (screens/party.js), without the server's answer and refusals, and
-      // the words of a member's rubric of potions for the party's trips.
+      // (screens/party.js), without the server's answer and refusals, the
+      // words of a member's rubric of potions for the party's trips, and
+      // those of a trip's shared report (screens/report.js, combat.js and
+      // journal.js; hunts.js: claimTrip).
       party: {
-        texts: (({ lead, leadTitle, leadText, leadConfirm, potionsTitle, potionsHint, potionsNone }) => ({ lead, leadTitle, leadText, leadConfirm, potionsTitle, potionsHint, potionsNone }))(
-          game.community.party.texts,
-        ),
+        texts: (({ notLeader: _notLeader, self: _self, led: _led, ...shown }) => shown)(game.community.party.texts),
       },
     },
   };

@@ -8,6 +8,8 @@
     "auto": "Party event: {title}. The leader did not choose within 12 hours, so the party took the safest way: {option}. The result is in a separate report in the Journal.",
     "reportChosen": "The leader chose: {option}.",
     "reportAuto": "The leader did not choose within 12 hours, so the party took the safest way: {option}.",
+    "claimed": "Party event: {title}. The report was claimed for the whole party before the leader ({leader}) chose, so the party took the safest way: {option}. The result is in a separate report in the Journal.",
+    "reportClaimed": "The report was claimed for the whole party before the leader chose, so the party took the safest way: {option}.",
     "reportTitle": "Party event",
     "hpLost": "You lose {hp} HP.",
     "busyHp": "The wounds will heal on the way, as the character is already busy with something else.",

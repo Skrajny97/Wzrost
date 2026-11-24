@@ -16736,6 +16736,69 @@ button.tcard-slot {
   color: var(--text-muted);
 }
 
+/* A Drużyna's shared report (screens/report.js, partyPartsSection): what
+   each member got, a card each, the character's own in a gold frame; the
+   finds by name, each on a line of its own, wrapping on a narrow phone. */
+.party-parts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.party-part--own {
+  border-color: var(--gold);
+}
+
+.party-part-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin: 0;
+  min-width: 0;
+}
+
+.party-part-name {
+  overflow-wrap: anywhere;
+}
+
+.party-part-levels {
+  color: var(--leaf);
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
+.party-part-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.party-part-items li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.party-part-items .link-button {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+
+/* The shared report another claimed, on the Walka screen (combat.js). */
+.party-report-note .button {
+  align-self: flex-start;
+}
+
 /* The next stage of a portal, with a few at one tap beside it (.portal-fight),
    at the top of the report of a stage won. */
 .report-next-stage {

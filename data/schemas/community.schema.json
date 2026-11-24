@@ -108,7 +108,7 @@
       }
     },
     "party": {
-      "description": "Drużyna: słowa przekazania przywództwa (przycisk, pytanie, odpowiedź i odmowy) i rubryki mikstur członka na wyprawę drużyny (nagłówek, wskazówka, brak mikstur).",
+      "description": "Drużyna: słowa przekazania przywództwa (przycisk, pytanie, odpowiedź i odmowy), rubryki mikstur członka na wyprawę drużyny (nagłówek, wskazówka, brak mikstur) i wspólnego raportu wyprawy drużyny (kto odebrał, co kto zdobył, linijka w Walce i w Dzienniku).",
       "type": "object",
       "additionalProperties": false,
       "required": ["texts"],
@@ -117,7 +117,7 @@
         "texts": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["lead", "leadTitle", "leadText", "leadConfirm", "led", "notLeader", "self", "potionsTitle", "potionsHint", "potionsNone"],
+          "required": ["lead", "leadTitle", "leadText", "leadConfirm", "led", "notLeader", "self", "potionsTitle", "potionsHint", "potionsNone", "claimedBy", "partsTitle", "partYou", "partLevel", "partClassLevel", "partPotions", "partWorn", "waiting", "open", "listed"],
           "properties": {
             "lead": { "type": "string", "minLength": 1 },
             "leadTitle": { "type": "string", "minLength": 1 },
@@ -128,7 +128,17 @@
             "self": { "type": "string", "minLength": 1 },
             "potionsTitle": { "type": "string", "minLength": 1 },
             "potionsHint": { "type": "string", "minLength": 1 },
-            "potionsNone": { "type": "string", "minLength": 1 }
+            "potionsNone": { "type": "string", "minLength": 1 },
+            "claimedBy": { "type": "string", "pattern": "\\{name\\}" },
+            "partsTitle": { "type": "string", "minLength": 1 },
+            "partYou": { "type": "string", "minLength": 1 },
+            "partLevel": { "type": "string", "pattern": "\\{from\\}.*\\{to\\}" },
+            "partClassLevel": { "type": "string", "pattern": "\\{from\\}.*\\{to\\}" },
+            "partPotions": { "type": "string", "minLength": 1 },
+            "partWorn": { "type": "string", "minLength": 1 },
+            "waiting": { "type": "string", "pattern": "\\{name\\}" },
+            "open": { "type": "string", "minLength": 1 },
+            "listed": { "type": "string", "pattern": "\\{name\\}" }
           }
         }
       }

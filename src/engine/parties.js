@@ -7,9 +7,72 @@
 // "Rozszerz możliwość zapraszania do drużyny do 10 poziomów klasy. Niech to
 // będzie uzależnione tylko od poziomu klasy"). An invitation and a joining
 // keep to it, and one whose level grows out of it leaves the party.
+//
+// And the shared report of a Drużyna's trip (24.11.2026; the author: „niech
+// lider odbiera raport za wszystkich, niech wszyscy mają wspólny”): each
+// member's part, what it got (partyPartView), the same list in every
+// member's report (src/server/hunts.js, claimTrip).
+
+import { materialView } from './crafting.js';
+import { itemView } from './items.js';
 
 /** @typedef {Record<string, any>} Content */
 /** @typedef {{ classLevel: number }} Member */
+/**
+ * @typedef {{ id: number, name: string, result: string, forfeit?: boolean, xp: number, classXp?: number, penalty: number, gold: number, timePoints: number,
+ *   levelBefore: number, levelAfter: number, classLevelBefore: number, classLevelAfter: number, items: Record<string, any>[], worn?: number[], sold?: number[],
+ *   lost?: number[], materials?: Record<string, number>, resources?: Record<string, number>, potionsUsed?: Record<string, number>, cards?: string[], packs?: number }} PartyPart
+ *   One member's part of a trip as its claim computes it, in no language yet:
+ *   its result, XP, gold, Time Points and levels, the items found (`worn`:
+ *   the indices of those worn at once into an empty slot, `sold`: bought by
+ *   the scrapper, `lost`: those the full bag had no place for), the
+ *   materials by stack, the camp's resources, the potions drunk, by id, and
+ *   Talia Systemu's cards the creatures left (their creatures' ids) and
+ *   packs of cards.
+ */
+
+// One member's part of a Drużyna's shared report in the words of `content`'s
+// language: so each member reads every part in its own language.
+/**
+ * @param {PartyPart} part
+ * @param {Content} content
+ */
+export function partyPartView(part, content) {
+  const worn = new Set(part.worn ?? []);
+  const sold = new Set(part.sold ?? []);
+  const lost = new Set(part.lost ?? []);
+  return {
+    id: part.id,
+    name: part.name,
+    result: part.result,
+    ...(part.forfeit && { forfeit: true }),
+    xp: part.xp,
+    classXp: part.classXp ?? part.xp,
+    penalty: part.penalty,
+    gold: part.gold,
+    timePoints: part.timePoints,
+    levelBefore: part.levelBefore,
+    levelAfter: part.levelAfter,
+    classLevelBefore: part.classLevelBefore,
+    classLevelAfter: part.classLevelAfter,
+    items: part.items.map((item, index) => ({
+      ...itemView(item, content),
+      ...(worn.has(index) && { worn: true }),
+      ...(sold.has(index) && { sold: true }),
+      ...(lost.has(index) && { lost: true }),
+    })),
+    materials: Object.entries(part.materials ?? {}).map(([key, count]) => materialView(key, count, content)),
+    resources: part.resources ?? {},
+    potions: Object.entries(part.potionsUsed ?? {})
+      .filter(([id, count]) => content.potionsById[id] && count > 0)
+      .map(([id, count]) => ({ name: content.potionsById[id].name, count })),
+    // A card is its creature's name (cards.js: cardView), a pack its own.
+    cards: [
+      ...(part.cards ?? []).filter((id) => content.monstersById[id]).map((id) => content.monstersById[id].name),
+      ...Array.from({ length: part.packs ?? 0 }, () => content.cards?.texts?.packName).filter(Boolean),
+    ],
+  };
+}
 
 /** @param {Content} content @returns {number} */
 const spreadOf = (content) => content.balance.parties.classSpread;

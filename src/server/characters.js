@@ -519,6 +519,18 @@ export function requireOffRack(player, ...items) {
 // stack.
 export const bagPlaces = (player) => bagItems(player).length + bagStacks(herbsOf(player.row), content()) + bagStacks(potionsOf(player.row), content());
 
+// The shared report of a Drużyna's trip another claimed for the whole party
+// and the character has not opened yet (hunts.js: claimTrip): { id, by },
+// its id in the character's Dziennik and who claimed it, or null.
+export function partyReportOf(row) {
+  try {
+    const kept = JSON.parse(row.party_report ?? 'null');
+    return kept && Number.isSafeInteger(kept.id) && typeof kept.by === 'string' ? { id: kept.id, by: kept.by } : null;
+  } catch {
+    return null;
+  }
+}
+
 // The Skrzynia Konta's padlock (843, the author: „miec kłódkę i być
 // zablokowana do 20 poziomu postaci”): below the character level of
 // balance.account.chestLevel a character puts nothing in and takes nothing
@@ -1998,6 +2010,10 @@ export function characterView(player, now) {
     // Profesji of a work of the character's own: when they come, never
     // what they give (orbs.js, profession-orbs.js).
     activity: withOrbs(activityView(activity, row.level, now), orbsView(activity, row, now) ?? workOrbsView(activity, row, now)),
+    // The shared report of a Drużyna's trip another claimed for the whole
+    // party, not opened yet, for its line on the Walka screen (hunts.js:
+    // claimTrip): { id, by }, or null.
+    partyReport: partyReportOf(row),
     // The week of the year and the three after it, for the line on the
     // Walka screen and the sheet Tygodnie, with the notice of a new week not
     // told yet (weeks.js), or null where the weeks are off.

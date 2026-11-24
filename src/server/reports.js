@@ -4,7 +4,7 @@
 // portal or labyrinth).
 
 import { gemView } from '../engine/index.js';
-import { requirePlayer } from './characters.js';
+import { partyReportOf, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { ApiError, json } from './http.js';
 
@@ -49,6 +49,22 @@ export async function listReports(context) {
   });
 }
 
+// The shared report of a Drużyna's trip that another claimed for the whole
+// party (hunts.js: claimTrip), opened: no longer marked on the Walka.
+const reportSeen = (db, characterId, id) =>
+  db.prepare("UPDATE characters SET party_report = NULL WHERE id = ? AND json_extract(party_report, '$.id') = ?").bind(characterId, id).run();
+
+// That shared report, opened at a claim of the character with nothing to
+// claim (a Walka from before the claim, or a claim at the same moment as
+// another's): as the claim's answer gives a report, or null without one.
+export async function openPartyReport(db, row) {
+  const waiting = row && partyReportOf(row);
+  if (!waiting) return null;
+  const kept = await db.prepare('SELECT id, created_at, data FROM reports WHERE id = ? AND character_id = ?').bind(waiting.id, row.id).first();
+  await reportSeen(db, row.id, waiting.id);
+  return kept ? { id: kept.id, createdAt: kept.created_at, ...JSON.parse(kept.data) } : null;
+}
+
 export async function getReport(context) {
   const { player } = await requirePlayer(context);
   const id = Number(context.params.id);
@@ -58,6 +74,7 @@ export async function getReport(context) {
     .bind(id, player.row.id)
     .first();
   if (!row) throw notFound;
+  if (partyReportOf(player.row)?.id === id) await reportSeen(context.env.DB, player.row.id, id);
   const report = JSON.parse(row.data);
   // A setting's item keeps its card as it was made, and the card opens when
   // the item is no longer there as it was. Its gem is told as now (gemView):

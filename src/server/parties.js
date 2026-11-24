@@ -40,7 +40,12 @@
 // przez każdego członka drużyny zanim wyruszy się w kolejną wyprawę.”).
 // Each one gets
 // an exploration of its own (hunts.js), with the others fighting beside it
-// as they are when they set out, and its own report and finds. The
+// as they are when they set out, and its own finds. Since 24.11.2026 the
+// first claim of a trip, by any who went, claims it for all of them at
+// once, each its own report with what every one got (hunts.js: claimTrip;
+// the author: „niech lider odbiera raport za wszystkich, niech wszyscy mają
+// wspólny”), so nobody's report waits for its player and the leader sends
+// the party out again at once. The
 // explorations of one trip share their timer: a "Przewiń" of any of them
 // moves them all, and the others hear who skipped (time.js; the author:
 // "Musi być wspólny timer").
@@ -669,11 +674,14 @@ function snapshot(member, now) {
 // an event, which waits for the member's own choice (nothing is saved);
 // {} when the member is still not free. A claim that failed because the
 // member claimed it at the same moment, or changed meanwhile, is fine: the
-// member is read again, and goes if free by then. The leader of a trip
-// whose party event waits for its choice does not hold the party up: the
-// event settles itself with its `auto` option (`forTrip`, hunts.js;
+// member is read again, and goes if free by then. A trip of the party
+// still waiting is claimed for all who went at once, by the `leader` who
+// sends the party now (claimTrip in hunts.js), its shared report marked on
+// each one's Walka (characters.party_report) instead of `report`; `settled`
+// names them all. Its party event, waiting for the trip's leader, does not
+// hold the party up: it settles itself with its `auto` option (`forTrip`;
 // party-events.js).
-async function claimForTrip(db, member, now) {
+async function claimForTrip(db, member, now, leader) {
   const id = member.row.id;
   const user = await db.prepare('SELECT language FROM users WHERE id = ?').bind(member.row.user_id).first();
   try {
@@ -686,11 +694,12 @@ async function claimForTrip(db, member, now) {
       // and no other character's report is claimed for it.
       if (member.row.id !== id || !member.activity) return {};
       const kind = member.activity.kind;
-      const done = await finishActivity(db, member, now, { forTrip: true });
+      const done = await finishActivity(db, member, now, { forTrip: true, claimer: { id: leader.id, name: leader.name } });
       if (done?.event) return { event: true };
       // Played or set aside, it goes (0.4.59).
       const after = await loadCharacter(db, id);
-      return after ? { member: after, report: done ? { id: done.id, kind } : null } : {};
+      if (!after) return {};
+      return done?.shared ? { member: after, report: null, settled: [...done.shared.keys()] } : { member: after, report: done ? { id: done.id, kind } : null };
     });
   } catch (error) {
     if (!(error instanceof ApiError)) throw error;
@@ -798,13 +807,22 @@ async function setOut(db, player, body, now, claimed) {
   // its own: a trip ends in no event, hunts.js).
   const ready = [];
   const choosing = [];
+  // Those whose trip of the party another's claim here claimed with its own
+  // (claimTrip): read again, they go.
+  const settled = new Set();
   for (const listed of going) {
     if (!listed.activity) {
       ready.push(listed);
       continue;
     }
-    const done = await claimForTrip(db, listed, now);
+    if (settled.has(listed.row.id)) {
+      const again = await loadCharacter(db, listed.row.id);
+      if (again && !again.activity) ready.push(again);
+      continue;
+    }
+    const done = await claimForTrip(db, listed, now, player.row);
     if (done.event) choosing.push(listed.row.name);
+    for (const id of done.settled ?? []) settled.add(id);
     if (!done.member) continue;
     if (done.report) claimed.set(done.member.row.id, done.report);
     ready.push(done.member);

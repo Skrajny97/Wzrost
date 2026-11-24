@@ -247,10 +247,15 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         h('p', { class: 'report-party', text: t('Z postacią: {names}.', { names: [...report.tower.partners, ...report.tower.companions].join(', ') }) }),
       // An exploration of a Drużyna names those who went (parties.js).
       report.party?.length > 1 && h('p', { class: 'report-party', text: t('W drużynie: {names}.', { names: report.party.join(', ') }) }),
+      // A Drużyna's trip claimed once for everyone, and by whom (hunts.js:
+      // claimTrip; the author, 24.11.2026: „niech lider odbiera raport za
+      // wszystkich”).
+      report.partyClaim && partyTexts()?.claimedBy && h('p', { class: 'report-party', text: filled(partyTexts().claimedBy, { name: report.partyClaim.by }) }),
       // The time the others skipped for the whole party (the author: "xxx
       // przewinął czas o xxx").
       skipLines(report.skips).map((line) => h('p', { class: 'report-party', text: line })),
       report.portal?.series ? seriesCard(report) : summaryCard(report),
+      partyPartsSection(report),
       report.event && eventCard(report.event),
       report.system.length > 0 && guided(systemPanel(...report.system, ...[pointsBox(report)].filter(Boolean)), 'report-system'),
       count > 0 &&
@@ -576,6 +581,84 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
           ),
       ),
     );
+  }
+
+  // The words of a Drużyna's shared report (data/community.json, party.texts).
+  const partyTexts = () => state.content.community?.party?.texts ?? null;
+
+  // A Drużyna's trip claimed once for everyone (hunts.js: claimTrip; the
+  // author, 24.11.2026: „niech wszyscy mają wspólny”): what each member
+  // got, the same list in every member's report, the character's own
+  // marked. A find of its own opens as in the bag; another's, its card.
+  function partyPartsSection(report) {
+    const members = report.partyClaim?.members;
+    const texts = partyTexts();
+    if (!members?.length || !texts?.partsTitle) return null;
+    return h(
+      'section',
+      { class: 'report-section', 'aria-labelledby': 'party-parts-title' },
+      h('h2', { class: 'section-title', id: 'party-parts-title', text: texts.partsTitle }),
+      h(
+        'ul',
+        { class: 'party-parts' },
+        members.map((part) => h('li', { class: `card party-part${part.own ? ' party-part--own' : ''}` }, partView(part, texts))),
+      ),
+    );
+  }
+
+  function partView(part, texts) {
+    const levels = [
+      part.levelAfter > part.levelBefore && filled(texts.partLevel, { from: part.levelBefore, to: part.levelAfter }),
+      part.classLevelAfter > part.classLevelBefore && filled(texts.partClassLevel, { from: part.classLevelBefore, to: part.classLevelAfter }),
+    ].filter(Boolean);
+    const lost = Boolean(part.forfeit);
+    const rows = [
+      !lost && [t('XP postaci'), `+${formatNumber(part.xp)} XP`],
+      part.penalty > 0 && [t('Kara za porażkę'), t('−{xp} XP postaci', { xp: formatNumber(part.penalty) })],
+      !lost && [t('XP klasy'), `+${formatNumber(part.classXp)} XP`],
+      !lost && [t('Złoto'), `+${formatNumber(part.gold)}`],
+      !lost && resourcesRow(part.resources),
+      part.materials?.length > 0 && [t('Materiały'), capitalized(materialsText(part.materials))],
+      part.cards?.length > 0 && [t('Karty'), part.cards.join(', ')],
+      part.timePoints > 0 && [t('Punkty Czasu'), `+${formatNumber(part.timePoints)}`],
+      part.potions?.length > 0 && [texts.partPotions, part.potions.map((potion) => `${potion.count} × ${potion.name}`).join(', ')],
+    ].filter(Boolean);
+    return [
+      h(
+        'p',
+        { class: 'party-part-head' },
+        h('strong', { class: 'party-part-name', text: part.name }),
+        part.own && h('span', { class: 'chip', text: texts.partYou }),
+        levels.length > 0 && h('span', { class: 'party-part-levels', text: levels.join(' · ') }),
+      ),
+      rows.length > 0 && h('dl', { class: 'status-list' }, rows.map(([label, value]) => h('div', { class: 'status-row' }, h('dt', { text: label }), h('dd', { text: value })))),
+      part.items?.length > 0 &&
+        h(
+          'ul',
+          { class: 'party-part-items' },
+          part.items.map((item) =>
+            h(
+              'li',
+              {},
+              h(
+                'button',
+                {
+                  type: 'button',
+                  class: 'link-button item-name',
+                  vars: { '--rarity': item.color },
+                  'aria-label': t('{name}: pokaż przedmiot', { name: item.name }),
+                  onClick: () => (part.own ? findSheet(item) : openSheet(itemDetails(item))),
+                },
+                itemSprite(item),
+                item.name,
+              ),
+              // Worn at once in an empty slot, or bought by the scrapper.
+              item.worn && h('span', { class: 'chip', text: texts.partWorn }),
+              item.sold && h('span', { class: 'chip chip--dashed', text: t('sprzedany') }),
+            ),
+          ),
+        ),
+    ];
   }
 
   // A find the character still has opens like in the bag: with what wearing

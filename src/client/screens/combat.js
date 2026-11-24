@@ -464,6 +464,7 @@ export function mountCombat(container, { params, navigate }) {
         h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: t('Walka') })),
         modeTabs(),
         testTools(),
+        partyReportNote(character),
         activity ? [activityCard(activity), wantedStrip(character)] : regionList(character),
       );
       return;
@@ -1350,6 +1351,21 @@ export function mountCombat(container, { params, navigate }) {
   function partySkips(activity) {
     const lines = skipLines(activity.party?.skips);
     return lines.length > 0 ? systemPanel(...lines) : null;
+  }
+
+  // A Drużyna's trip another claimed for the whole party (hunts.js:
+  // claimTrip; the author, 24.11.2026: „niech lider odbiera raport za
+  // wszystkich”), not opened yet: who claimed it, and the way to the shared
+  // report, which the server marks opened as it opens.
+  function partyReportNote(character) {
+    const waiting = character.partyReport;
+    const texts = state.content.community?.party?.texts;
+    if (!waiting || !texts?.waiting) return null;
+    const open = systemLink(`#/raport/${waiting.id}`, texts.open);
+    open.addEventListener('click', () => {
+      if (state.character?.partyReport?.id === waiting.id) state.character.partyReport = null;
+    });
+    return systemPanel(texts.waiting.replace('{name}', waiting.by), open);
   }
 
   // On a Drużyna's trip that set out with the character's waiting report

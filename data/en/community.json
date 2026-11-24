@@ -68,7 +68,17 @@
       "self": "You already lead this party.",
       "potionsTitle": "Potions for party trips",
       "potionsHint": "You take them from your bag when the leader sends the party out: of each, at most as many as the trip has fights. Those not drunk come back.",
-      "potionsNone": "You have no healing or mana potions in your bag."
+      "potionsNone": "You have no healing or mana potions in your bag.",
+      "claimedBy": "The party's shared report, claimed by: {name}.",
+      "partsTitle": "What each got",
+      "partYou": "You",
+      "partLevel": "level {from} → {to}",
+      "partClassLevel": "class {from} → {to}",
+      "partPotions": "Potions",
+      "partWorn": "worn",
+      "waiting": "The party trip's report was claimed by: {name}. Your share of the loot is already yours.",
+      "open": "View report",
+      "listed": "Shared report · claimed by: {name}"
     }
   }
 }
