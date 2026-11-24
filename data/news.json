@@ -1655,6 +1655,11 @@
       "id": "0.4.96",
       "title": "Wersja 0.4.96",
       "body": "- Ranking postaci: nazwa gracza jest zawsze widoczna i zawsze otwiera podgląd postaci, także przy tytule, znaczku moderatora i skrócie gildii. Gdy brakuje miejsca, te dopiski przechodzą pod nazwę.\n- Ranking postaci ma listę „Klasa”: wybierz np. Kleryka, a zobaczysz, które miejsce zajmujesz wśród Kleryków. Ewolucje liczą się do swojej klasy.\n- Plecak: zioła mają własną zakładkę „Zioła”, a Spiżarnia dzieli się na Potrawy i Składniki.\n- Spiżarnia: karta innej potrawy niż obecny posiłek mówi już przed „Zjedz”, że obecny posiłek przestanie działać, a jego premia przepadnie."
+    },
+    {
+      "id": "0.4.97",
+      "title": "Wersja 0.4.97",
+      "body": "- Stwory są słabsze: do 150. poziomu 2,5 raza, potem coraz mniej, aż do 1,5 raza od 250. poziomu. Dotyczy wszystkich walk ze stworami: wypraw, listów gończych, Wież, Portali, Labiryntu i Bestii gildii. Ocena zagrożenia miejsc liczy już nowe siły.\n- Karta przedmiotu w plecaku ma przełącznik „Bez ulepszeń”. Porównanie z założonym przedmiotem liczy wtedy oba bez ich +N, więc widać, czy warto ulepszać nowy."
     }
   ]
 }
