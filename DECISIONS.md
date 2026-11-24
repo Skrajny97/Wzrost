@@ -3905,6 +3905,10 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 
 Autor: „Podepnij ten film z podpisem soundtrack tam gdzie wszystkie sociale” z linkiem do filmu na YouTube z muzyką z gry (29 minut, 10 utworów, pod każdym kraina z gry). Wiersz „Soundtrack” w Ustawieniach pod Wiki, zrobiony jak pozostałe (`social.places`, id `youtube`): znak YouTube z Simple Icons (CC0), biały na czerwonym kafelku `#FF0000`, i przycisk „Posłuchaj muzyki z gry” (po angielsku „Listen to the game's music”). Link bez dopisku `?feature=shared`, jak link Wattpada bez znaczników udostępniania. Schemat przyjmuje dla niego tylko `https://youtu.be/…` i `https://(www.)youtube.com/…`. Sprawdzone w przeglądarce na 320 px i 1366 px.
 
+## Wersja 0.4.94 (24.11.2026): Stół rozbiórki 20 razy szybszy, premie gildii w raporcie
+
+Według dwóch sekcji niżej, bez makiet (nowe linijki raportu w istniejącym panelu Systemu).
+
 ## Stół rozbiórki: 20 razy szybciej, kolejka 30 (24.11.2026)
 
 Gracz (poz. 228): „aktualnie 8 epickich itemków na stole 10 lv trwa rozebranie 30 h” i „kolejka nastawiona z epików i legend blisko 50-60 przedmiotów zajmuje blisko 2 tygodnie”. Autor: „zmienię czas trwania i zwiększę kolejkę”, a potem: „Stół rozbiórki jeszcze przyspiesz od nowego poziomu który ustaliłeś tak z 5 razy”.
