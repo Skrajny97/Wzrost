@@ -1,0 +1,14 @@
+{
+  "id": "heartwood",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Serce Pnia, the living heart of the World Tree, a huge beating heart of dark red-brown heartwood with rings of tree growth on it, one wide chunky shape filling the whole picture, thick root-like veins full of glowing golden sap wrapped around it like arms, two root arms with claws, glowing amber cracks, one deep glowing eye-like knot, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the creature alone, no tree, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023750691942003042
+  },
+  "images": 1
+}

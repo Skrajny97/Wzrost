@@ -1,0 +1,14 @@
+{
+  "id": "gecko",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant gecko lizard, a flat orange-brown body with dark bands, huge round golden eyes with slit pupils, wide sticky toe pads spread out, a thick curling tail, lunging down with its mouth open, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the lizard alone, no bark, no amber, no ground, no background, the whole lizard inside the picture, the tail too",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023529417859607275
+  },
+  "images": 1
+}

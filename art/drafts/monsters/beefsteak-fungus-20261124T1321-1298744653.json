@@ -1,0 +1,14 @@
+{
+  "id": "beefsteak-fungus",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Ozorek, a living beefsteak fungus, a big fleshy blood-red bracket fungus shaped like a huge tongue of raw meat, its surface wet and glistening and oozing red juice, a wide toothless mouth on its underside, small dark eyes, creeping on thick fleshy lobes, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, eerie and menacing, full body, three-quarter view, the fungus alone, no bark, no tree, no ground, no background, the whole fungus inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02375414800262451
+  },
+  "images": 1
+}

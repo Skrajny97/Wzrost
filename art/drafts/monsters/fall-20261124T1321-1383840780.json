@@ -1,0 +1,14 @@
+{
+  "id": "fall",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Upadek, the spirit of falling, a pale grey ghostly figure plunging head first diagonally, its tattered cloak streaming upward behind it like broken wings, long thin arms reaching down with clawed fingers, a hollow face with glowing eyes, falling bark chips around it, an abstract eerie creature, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, the figure alone, no ground, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023527538662380644
+  },
+  "images": 1
+}

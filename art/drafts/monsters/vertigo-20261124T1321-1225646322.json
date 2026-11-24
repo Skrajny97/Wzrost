@@ -1,0 +1,14 @@
+{
+  "id": "vertigo",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Zawrot Glowy, the spirit of vertigo, a tall spinning figure made of a twisting spiral of pale grey and violet mist and falling leaves, a round face with huge spiral eyes, long whirling arms like ribbons, an abstract creature, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, floating, full body, three-quarter view, the creature alone, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023522425932778254
+  },
+  "images": 1
+}

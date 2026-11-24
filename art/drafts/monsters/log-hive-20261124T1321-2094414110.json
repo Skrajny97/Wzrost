@@ -1,0 +1,14 @@
+{
+  "id": "log-hive",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Ul, a living old log beehive, a thick hollow log of dark oak with a carved wooden hatch and a small door hole, walking on short root legs, a grumpy face carved in the wood, golden honey dripping from cracks, an angry swarm of bees pouring out of the hole, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the hive alone, no tree, no ground, no background, the whole hive inside the picture, its bees too",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024558806440989178
+  },
+  "images": 1
+}

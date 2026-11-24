@@ -1,0 +1,14 @@
+{
+  "id": "scorpionfly",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant scorpionfly, a slender yellow and black insect with a long downward beak like a bird's, four clear wings with dark spots, its abdomen curled up over its back ending in a bulbous scorpion-like stinger, long legs, ready to strike, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the insect alone, no leaves, no ground, no background, the whole insect inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0235924088344574
+  },
+  "images": 1
+}

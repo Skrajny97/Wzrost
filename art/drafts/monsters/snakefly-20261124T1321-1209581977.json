@@ -1,0 +1,14 @@
+{
+  "id": "snakefly",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant snakefly, an insect with a very long thin neck like a snake raising its small flat head with sharp mandibles high, four clear veined wings folded like a roof over its back, a long thin tail spike, slender legs, striking forward, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the insect alone, no bark, no ground, no background, the whole insect inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023662865656110976
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "olm",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant olm, a blind cave salamander as long as a man, a pale pinkish-white eel-like body with four small thin legs, a flat snout without eyes, big bright red feathery gills on both sides of its head, its mouth open with tiny teeth, slithering forward, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, eerie and menacing, full body, three-quarter view, the creature alone, no water, no cave, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023754787909613717
+  },
+  "images": 1
+}

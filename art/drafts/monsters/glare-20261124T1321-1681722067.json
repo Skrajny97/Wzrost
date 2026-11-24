@@ -1,0 +1,14 @@
+{
+  "id": "glare",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Blask, the living glare of sunlit amber, a blazing burst of golden-orange light shaped like a sharp-rayed star with a fierce glowing face in its centre, rays like blades, small amber shards orbiting it, an abstract creature of light, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, floating, full body, the creature alone, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02407378855217828
+  },
+  "images": 1
+}

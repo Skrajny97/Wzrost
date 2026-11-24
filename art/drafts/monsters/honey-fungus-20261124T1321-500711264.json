@@ -1,0 +1,14 @@
+{
+  "id": "honey-fungus",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Opienka, a living cluster of honey fungus, a tall clump of golden-brown mushrooms with scaly caps growing from one thick base, glowing pale green foxfire light, long black root-like bootlaces lashing out like whips, small glowing eyes under the caps, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, eerie and menacing, full body, three-quarter view, the fungus alone, no tree, no ground, no background, the whole fungus inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023735902002546525
+  },
+  "images": 1
+}

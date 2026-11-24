@@ -1,0 +1,14 @@
+{
+  "id": "waxworm",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant wax moth caterpillar, a fat segmented greyish-white grub with a dark brown head and strong jaws, wrapped in tangled grey silk threads and bits of chewed honeycomb, spinning silk from its mouth, rearing up, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the creature alone, no honeycomb wall, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023525080432256065
+  },
+  "images": 1
+}

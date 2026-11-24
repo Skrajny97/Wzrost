@@ -1,0 +1,14 @@
+{
+  "id": "processionary",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a procession of giant hairy grey caterpillars crawling nose to tail in a single line curving like one long snake-like creature, each covered in long pale poisonous hairs, the first one raising its dark head with small jaws, poison hairs drifting in the air, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the procession alone, no bark, no ground, no background, the whole procession inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023540742626614042
+  },
+  "images": 1
+}
