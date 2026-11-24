@@ -1,0 +1,19 @@
+{
+  "id": "star-lord-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "young man lord of the stars, a celestial archer, lean and tall, black hair tied back, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, the highest and most epic form of all, even richer and more splendid than a god, a long flowing cloak of the deep night sky with drifting glowing star constellations, shining silver armour gleaming like the moon, a diadem of seven bright stars on the brow, a quiver of arrows glowing like falling stars, holding a long bow made of pure white light with a glowing arrow like a falling star nocked, the whole bow inside the image, calm and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/celestial-archer-male.png",
+      "usage": "the same man: the same face, hair and build, drawn the same way; now in a far grander, even more epic outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08070176890161303
+  },
+  "images": 4
+}

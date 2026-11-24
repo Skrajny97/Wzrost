@@ -1,0 +1,19 @@
+{
+  "id": "hunt-god-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult man god of the hunt, a hunter, strong, light brown hair and a short beard, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, the highest and most epic form of all, even richer and more splendid than a god, a hooded mantle of a great white wolf pelt, the great curved horns of an aurochs rising above the head, armour of bark and living green moss, a necklace of fangs, a quiver of arrows, holding a long bow carved from a single huge antler, the whole bow inside the image, a small pack of three white wolves close at the feet, the whole wolves inside the image, wild and calm, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/beast-lord-male.png",
+      "usage": "the same man: the same face, hair and build, drawn the same way; now in a far grander, even more epic outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08045037961006164
+  },
+  "images": 4
+}

@@ -1,0 +1,19 @@
+{
+  "id": "all-seeing-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "old man all-seeing seer, a poet prophet, a long white beard and long white hair, the nose, cheeks and mouth clearly visible, the beard starting below the mouth, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, the highest and most epic form of all, even richer and more splendid than a god, eyes glowing with gold, a long robe like the night sky with tiny stars, a golden open eye on the chest, a few glowing cards from the book of fate floating close around the body, holding a tall staff topped with a crystal ball in which images of the future drift, the whole staff inside the image, wise and solemn, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/seer-male.png",
+      "usage": "the same man: the same face, hair and build, drawn the same way; now in a far grander, even more epic outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08055530945460002
+  },
+  "images": 4
+}

@@ -1,0 +1,19 @@
+{
+  "id": "navia-emperor-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult man undead emperor of the slavic underworld, gaunt, very pale skin, sunken cheeks, glowing green eyes, long black hair, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, the highest and most epic form of all, even richer and more splendid than a god, a tall crown of black antlers and bone with small green flames, long robes of the grey mist of the underworld, a chain of skulls across the chest, holding a tall staff of bone with a lantern in which a trapped soul glows green, the whole staff inside the image, menacing and regal, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/navia-king-male.png",
+      "usage": "the same man: the same face, hair and build, drawn the same way; now in a far grander, even more epic outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0805265896850162
+  },
+  "images": 4
+}

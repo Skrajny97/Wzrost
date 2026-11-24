@@ -1,0 +1,19 @@
+{
+  "id": "winter-incarnate-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult man winter incarnate, tall and regal, long white hair and a white beard, fair natural skin with a warm human face touched by frost, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, the highest and most epic form of all, even richer and more splendid than a god, white frost on the eyebrows and the cheeks, the hair and the long cape streaming sideways into a swirling blizzard of snow, armour of clear ice with cold blue light shining through it, a crown of icicles, holding a long sceptre topped with a frozen star, the whole sceptre inside the image, no halo and no ring behind the head, no wings, cold and majestic, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/frost-god-male.png",
+      "usage": "the same man: the same face, hair and build, drawn the same way; now in a far grander, even more epic outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08053293527497185
+  },
+  "images": 4
+}

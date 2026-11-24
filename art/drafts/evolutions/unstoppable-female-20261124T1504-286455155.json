@@ -1,0 +1,19 @@
+{
+  "id": "unstoppable-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult woman unstoppable warlord of fire and lava, tall, strong and muscular, long wild red-brown hair in thick braids with iron rings, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, the highest and most epic form of all, even richer and more splendid than a god, skin cracked with glowing molten orange light like cooling lava, a crown of tall black obsidian horns, massive armour of black volcanic rock with glowing cracks of magma, a long cape of black smoke and drifting sparks, holding a colossal war axe whose blade is made of liquid fire with both hands, the whole axe inside the image, unstoppable fury, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/ravager-female.png",
+      "usage": "the same woman: the same face, hair and build, drawn the same way; now in a far grander, even more epic outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08051770271195306
+  },
+  "images": 4
+}

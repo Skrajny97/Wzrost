@@ -1,0 +1,19 @@
+{
+  "id": "heaven-sword-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult man sword of heaven, a holy knight, broad and strong, short dark hair, a stern scarred face, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, the highest and most epic form of all, even richer and more splendid than a god, eyes burning with white holy fire, ornate silver and gold plate armour radiating white light, a ring of small flaming swords behind the shoulders in place of a halo, a long white cape, holding a huge two-handed greatsword of white fire with a golden hilt, the blade pointing down and resting in front of the feet, the whole sword inside the image, stern and fearless, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/heaven-avenger-male.png",
+      "usage": "the same man: the same face, hair and build, drawn the same way; now in a far grander, even more epic outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08047687509324816
+  },
+  "images": 4
+}

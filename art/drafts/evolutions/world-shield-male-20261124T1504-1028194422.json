@@ -1,0 +1,19 @@
+{
+  "id": "world-shield-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult man shield of the world, a titan warrior enormous like a living stronghold, enormous and broad, short dark hair and a short beard, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, the highest and most epic form of all, even richer and more splendid than a god, full heavy plate armour carved like the stone walls of an ancient stronghold with runes glowing blue, warm golden light like the glow inside a mountain shining from the seams of the armour, a tall helmet crowned with battlements showing the face, holding a gigantic tower shield as big as a stronghold gate in one hand and a heavy stone war hammer in the other hand, the whole shield and hammer inside the image, unshakeable, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/titan-male.png",
+      "usage": "the same man: the same face, hair and build, drawn the same way; now in a far grander, even more epic outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08072563555505541
+  },
+  "images": 4
+}
