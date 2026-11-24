@@ -584,7 +584,10 @@
       "wb-boruta-cry": { "text": "a devil gives a menacing demonic growl rising into a roar, with the bright ring of a sabre drawn from its scabbard, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
       "wb-gorynych-cry": { "text": "a three-headed dragon gives a huge harsh roar from three throats at once, fiery, with a hiss of smoke, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
       "wb-jaszczur-cry": { "text": "a giant ancient lizard gives a rasping hissing roar with a wet gurgle of underground water, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
-      "wb-czarnobog-cry": { "text": "the god of darkness gives a colossal harsh echoing roar, a cold ominous otherworldly growl that swells like a dark storm, no words, video game boss battle cry, close up, no music", "seconds": 1.8 }
+      "wb-czarnobog-cry": { "text": "the god of darkness gives a colossal harsh echoing roar, a cold ominous otherworldly growl that swells like a dark storm, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
+      "wb-whale-fish-cry": { "text": "a colossal ancient whale gives a deep booming moaning roar that rumbles like an earthquake under the sea, with a great rush of water, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
+      "wb-svarozhich-cry": { "text": "a god of living fire gives a furious roaring blast like a huge bonfire flaring up, crackling and hissing flames with a deep fiery growl, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
+      "wb-miesiac-cry": { "text": "the pale moon spirit gives an eerie cold echoing cry, a long silvery haunting wail that rises into a ringing howl, otherworldly and menacing, no words, video game boss battle cry, close up, no music", "seconds": 1.8 }
     }
   },
   "effects": {
