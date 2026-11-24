@@ -12,7 +12,7 @@
 import { placeArt, resourceArt, residentBust, scrollArt, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
-import { countOf, formatCountdown, formatDecimal, formatHours, formatMinutes, formatNumber, saleGold, tradePace } from '../format.js';
+import { countOf, formatCountdown, formatDecimal, formatHours, formatNumber, saleGold, tradePace } from '../format.js';
 import { leaveView, openView } from '../history.js';
 import { t } from '../i18n.js';
 import { desktopLayout, onLayoutChange } from '../layout-mode.js';
@@ -257,25 +257,12 @@ export function mountSettlement(container, { params = {} } = {}) {
           apply(answer);
         }),
     });
-    const reject =
-      order.id !== 'weekly' &&
-      h('button', {
-        type: 'button',
-        class: 'button button--small',
-        text: t('Odrzuć'),
-        onClick: async (event) => {
-          const button = event.currentTarget;
-          const wait = data.board.refillMinutes
-            ? t('Nowe zlecenie przyjdzie za {time}.', { time: formatMinutes(data.board.refillMinutes) })
-            : t('Nowe zlecenie przyjdzie za kilka godzin.');
-          if (!(await confirmAction({ title: t('Odrzucić zlecenie?'), text: wait, confirmLabel: t('Odrzuć') }))) return;
-          withButton(button, async () => apply(await call('POST', '/api/settlement/reject', { orderId: order.id })));
-        },
-      });
     const ask = order.forms ? countOf(order.count, ...order.forms) : `${formatNumber(order.count)} × ${order.label}`;
     // The die (24.11.2026): the order drawn anew at once, for free, while
-    // today's rerolls last; not the week's, which cannot be rejected either.
-    // The new order stays unfolded where this one was.
+    // today's rerolls last; not the week's. It is the only way to change an
+    // order: „Odrzuć” is gone (the author, 24.11.2026: „Usuń odrzuć z tablicy
+    // zleceń zostaw samo przelosowanie”). The new order stays unfolded where
+    // this one was.
     const reroll =
       order.id !== 'weekly' &&
       data.board.reroll &&
@@ -340,7 +327,7 @@ export function mountSettlement(container, { params = {} } = {}) {
               ? t('Oddasz: {list}.', { list: order.takes.map((one) => `${formatNumber(one.count)} × ${one.name}`).join(', ') })
               : t('Pasuje każdy {name}.', { name: order.forms[0] }),
           }),
-        h('div', { class: `settlement-actions${reroll ? ' settlement-actions--reroll' : ''}` }, deliver, reject, reroll),
+        h('div', { class: `settlement-actions${reroll ? ' settlement-actions--reroll' : ''}` }, deliver, reroll),
         !enough && orderAsk(order),
       ),
     );

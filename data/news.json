@@ -1700,6 +1700,11 @@
       "id": "0.5.5",
       "title": "Wersja 0.5.5",
       "body": "- Postrach Krainy: poprawiony opis na karcie (wszyscy gracze z przedziału biją tego samego stwora), a „Jak to działa?” mówi wprost, że wielkość skrzyni zależy od tego, ile zadasz w porównaniu z Twoją częścią HP bossa, a nie od miejsca w rankingu."
+    },
+    {
+      "id": "0.5.6",
+      "title": "Wersja 0.5.6",
+      "body": "- Osada: z tablicy zleceń zniknął przycisk „Odrzuć”. Zlecenie, które Ci nie pasuje, zmienisz kostką przelosowania."
     }
   ]
 }
