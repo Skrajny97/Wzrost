@@ -1,0 +1,19 @@
+{
+  "id": "gods-champion-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult woman champion of the gods, athletic and strong, dark hair in a long braid, bareheaded with no helmet and the whole face clearly visible, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, the highest and most epic form of all, even richer and more splendid than a god, a tall radiant crown of golden sun rays instead of a wreath, heavy ornate golden plate armour from the neck to the feet with reliefs of gods, a big roaring golden lion's head on the breastplate, large ornate golden pauldrons, full golden plate on the legs instead of a short skirt, a long flowing royal purple cape covered with many small golden stars, holding a gleaming golden sword and a large round golden shield with a rising sun in relief, the whole sword and shield inside the image, a new outfit far richer and heavier than any she wore before, triumphant and divine, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/immortal-female.png",
+      "usage": "the same woman: the same face, skin, long dark braid and build, drawn the same way; now in a completely new, far grander and heavier golden outfit, not this outfit: not this short skirt, not these small shoulder pieces and not this wing on the shoulder"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08048810760180156
+  },
+  "images": 4
+}
