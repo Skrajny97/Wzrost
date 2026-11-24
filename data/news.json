@@ -1690,6 +1690,11 @@
       "id": "0.5.3",
       "title": "Wersja 0.5.3",
       "body": "- Nowość: Postrach Krainy. Co tydzień w każdym przedziale poziomów (1–25, 26–50 i tak dalej) pojawia się jeden boss, a wszyscy gracze z przedziału biją ten sam pasek HP. Znajdziesz go w Walce od 15. poziomu postaci.\n- Masz 3 ataki dziennie. Za udział zgarniesz Skrzynię Bossa ze złotem, materiałami i szansą na przedmiot: im więcej obrażeń zadasz, tym większa skrzynia. Najlepsza dziesiątka dostaje tytuł na tydzień, a za ostatni cios zgarniesz dodatkowy przedmiot.\n- Gdy boss przetrwa do niedzieli, skrzynie są o połowę mniejsze. W poniedziałek pojawia się nowy.\n- W okienku walki duże liczby HP mają teraz odstępy."
+    },
+    {
+      "id": "0.5.4",
+      "title": "Wersja 0.5.4",
+      "body": "- Posiłki: z „Autouzupełnianiem” w Drużynie postać zjada naraz do 3 porcji wybranej potrawy (liczbę porcji wybierasz: ×1, ×2 albo ×3).\n- W „Opcjach wyprawy” potrawa od razu ma tyle porcji, ile możesz teraz zjeść, najwyżej 3, a gra pamięta Twój ostatni wybór."
     }
   ]
 }

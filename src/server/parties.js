@@ -81,6 +81,7 @@ import {
   partyFit,
   partyRange,
   partyStayText,
+  portionsWanted,
   potionsPerKind,
   tripWanted,
   wantedTarget,
@@ -329,8 +330,10 @@ export async function partyView(db, characterId, now) {
     // { potions, healBelow } as saved, or null for none.
     potions: party && self.results[0] ? partyPotionsOf(self.results[0]) : null,
     // And the dish it eats by its Autouzupełnianie (memberMeal): { dish,
-    // auto } as saved, with the dish's name, or null for none.
+    // auto, portions } as saved, with the dish's name, or null for none;
+    // with the most portions of one dish at once, for its −/+.
     meal: party && self.results[0] ? mealChoiceView(partyMealOf(self.results[0])) : null,
+    mealMost: party && content().cooking ? content().cooking.meal.portions : null,
   };
 }
 
@@ -688,18 +691,23 @@ export async function setPartyPotions(context) {
 // Posiłek członka drużyny z autouzupełnianiem (gracz (poz. 95), 24.11.2026:
 // „może dodadzą jeszcze posiłki ze spiżarni z zaznaczeniem autouzupełniania
 // do wyczerpania zapasów”): a member, not the leader, chooses in the
-// Drużyna, beside its potions, a dish of its Spiżarnia and
-// „Autouzupełnianie”; as its party's trip sets out, a member whose meal has
-// run out eats one portion of that dish from its own Spiżarnia, while it
-// has one, as eating by hand would (mealRefill in the engine: a meal at
-// work goes on). Kept on its row (characters.party_meal) for later trips
-// and parties: { dish, auto }, or null for none. The leader eats in its own
-// "Opcje wyprawy"; a member that comes to lead keeps its choice for when it
-// is a member again.
+// Drużyna, beside its potions, a dish of its Spiżarnia, how many portions
+// of it at once and „Autouzupełnianie”; as its party's trip sets out, a
+// member whose meal has run out eats those portions of that dish from its
+// own Spiżarnia, or as many as it has (the author, 24.11.2026:
+// „Automatyczne jedzenie w drużynie i w ogóle trzeba ustawić tak mogło
+// jeść 3 te same posiłki na raz nie tylko jeden”), as eating by hand
+// would (mealRefill in the engine: a meal at work goes on). Kept on its
+// row (characters.party_meal) for later trips and parties: { dish, auto,
+// portions }, or null for none; a choice kept before with no portions
+// eats the most at once. The leader eats in its own "Opcje wyprawy"; a
+// member that comes to lead keeps its choice for when it is a member
+// again.
 function partyMealOf(row) {
   try {
     const kept = JSON.parse(row.party_meal ?? 'null');
-    return kept && typeof kept === 'object' && !Array.isArray(kept) && typeof kept.dish === 'string' ? { dish: kept.dish, auto: kept.auto === true } : null;
+    if (!kept || typeof kept !== 'object' || Array.isArray(kept) || typeof kept.dish !== 'string') return null;
+    return { dish: kept.dish, auto: kept.auto === true, ...(content().cooking && { portions: portionsWanted(kept.portions, content()) }) };
   } catch {
     return null;
   }
@@ -714,18 +722,19 @@ function mealChoiceView(kept) {
 }
 
 // What a member going on a trip eats of its choice as it sets out, for its
-// start (beginHunt): { meal, mealPortions } with one portion of the dish,
-// or {} for nothing.
+// start (beginHunt): { meal, mealPortions } with the dish and its portions
+// eaten at once, or {} for nothing.
 function memberMeal(row) {
-  const dish = mealRefill(partyMealOf(row), content().cooking ? mealOf(row.meal, content()) : null, pantryOf(row), content());
-  return dish ? { meal: dish, mealPortions: 1 } : {};
+  const refill = mealRefill(partyMealOf(row), content().cooking ? mealOf(row.meal, content()) : null, pantryOf(row), content());
+  return refill ? { meal: refill.dish, mealPortions: refill.portions } : {};
 }
 
-// PUT /api/party/meal { dish, auto }: a member's choice of the dish of its
-// Autouzupełnianie for its party's trips (memberMeal): a dish of the game
-// by id, or null, and whether to eat it. Saved as it comes, whatever the
-// Spiżarnia holds now: a trip eats what there is as it sets out. A choice
-// of nothing is kept as none. Answers the Drużyna anew.
+// PUT /api/party/meal { dish, auto, portions }: a member's choice of the
+// dish of its Autouzupełnianie for its party's trips (memberMeal): a dish
+// of the game by id, or null, whether to eat it, and how many portions of
+// it at once, one to the most (the most where it says none). Saved as it
+// comes, whatever the Spiżarnia holds now: a trip eats what there is as it
+// sets out. A choice of nothing is kept as none. Answers the Drużyna anew.
 export async function setPartyMeal(context) {
   const { player } = await requirePartyPlayer(context);
   const db = context.env.DB;
@@ -735,7 +744,10 @@ export async function setPartyMeal(context) {
   if (typeof (body.auto ?? false) !== 'boolean') throw new ApiError(400, 'invalid_auto', 'Zaznacz albo odznacz autouzupełnianie.');
   const auto = body.auto === true;
   if (auto && dish === null) throw new ApiError(400, 'no_dish_chosen', 'Wybierz potrawę do autouzupełniania.');
-  const kept = dish === null ? null : JSON.stringify({ dish, auto });
+  const most = content().cooking?.meal.portions ?? 1;
+  const portions = body.portions ?? most;
+  if (!Number.isInteger(portions) || portions < 1 || portions > most) throw new ApiError(400, 'invalid_portions', `Wybierz od 1 do ${most} porcji.`);
+  const kept = dish === null ? null : JSON.stringify({ dish, auto, portions });
   await db.prepare('UPDATE characters SET party_meal = ? WHERE id = ?').bind(kept, player.row.id).run();
   return answer(db, player.row.id, context.now);
 }
@@ -968,8 +980,8 @@ async function setOut(db, player, body, now, claimed) {
         // Its own potions of its choice, taken from its bag with its start
         // in the batch below (beginHunt), and back with its report.
         ...memberPotions(member.row, body.minutes),
-        // And a portion of the dish of its Autouzupełnianie once its meal
-        // has run out, from its Spiżarnia with its start (memberMeal).
+        // And the portions of the dish of its Autouzupełnianie once its
+        // meal has run out, from its Spiżarnia with its start (memberMeal).
         ...memberMeal(member.row),
       };
       const setup = await beginHunt(db, member, own, now, {

@@ -69,6 +69,9 @@ const CHOICE_KEY = 'wzrost.hunt-choice';
 const POTION_KEY = 'wzrost.potion-choice';
 // The dish last chosen to eat as an exploration sets out (mealPicker).
 const MEAL_KEY = 'wzrost.meal-choice';
+// And how many portions of it at once, when fewer than the most were last
+// chosen (mealPicker, 24.11.2026); none for the most.
+const MEAL_PORTIONS_KEY = 'wzrost.meal-portions';
 // The kinds of potions taken as one choice from a list (959 B), with the
 // name of the row.
 const POTION_GROUPS = { heal: 'Leczenie', mana: 'Mana' };
@@ -1626,7 +1629,11 @@ export function mountCombat(container, { params, navigate }) {
   // „maksymalnie do 3 potraw jednego rodzaju na raz (i analogicznie dodane
   // 3x procenty danej potrawy)”): how many to eat now with −/+, as many as
   // the Spiżarnia has and the meal has room for, the meal at work's own
-  // dish on top of its portions; the line shows the meal they make.
+  // dish on top of its portions; the line shows the meal they make. A dish
+  // picked starts at the most of them, or at as many as the player last
+  // chose, remembered beside the dish (the author, 24.11.2026:
+  // „Automatyczne jedzenie w drużynie i w ogóle trzeba ustawić tak mogło
+  // jeść 3 te same posiłki na raz nie tylko jeden”).
   // { element, chosen(): the dish's id or null, portions(): how many of it,
   // replaces(): the meal at work, { dish, portions }, or null }, or null.
   function mealPicker(character) {
@@ -1637,14 +1644,21 @@ export function mountCombat(container, { params, navigate }) {
     const room = (dish) => (dish ? Math.min(dish.count, dish.stacks.length - had(dish)) : 0);
     const dishes = (character.pantry ?? []).filter((good) => good.group === 'dish' && room(good) > 0);
     if (dishes.length === 0) return null;
+    // The most portions of one dish at once (cooking.meal.portions).
+    const atOnce = dishes[0].stacks.length;
     let stored = null;
+    let storedPortions = 0;
     try {
       stored = localStorage.getItem(MEAL_KEY);
+      storedPortions = Number(localStorage.getItem(MEAL_PORTIONS_KEY));
     } catch {
       // Without storage nothing is remembered.
     }
+    // How many portions a dish picked starts at: as many as last chosen,
+    // the most without a choice, then as many as there is room for (show).
+    let wanted = Number.isInteger(storedPortions) && storedPortions >= 1 && storedPortions < atOnce ? storedPortions : atOnce;
     let picked = current ? null : (dishes.find((dish) => dish.id === stored) ?? null);
-    let portions = 1;
+    let portions = wanted;
     // The meal a dish makes with `count` portions eaten now: its name and bonus.
     const made = (dish, count) => dish.stacks[Math.min(dish.stacks.length, had(dish) + count) - 1];
     const art = (dish) => ((dish ?? current) && dishSprite((dish ?? current).id)) ?? icon('pot', { size: 24 });
@@ -1666,8 +1680,20 @@ export function mountCombat(container, { params, navigate }) {
       ),
     ];
     // How many portions of the dish picked, once more than one can be eaten.
+    // The choice made with no meal at work is the one remembered, as the
+    // dish: all there is room for counts as the most, for when the
+    // Spiżarnia has more again.
     const step = (sign) => {
       portions = Math.max(1, Math.min(room(picked), portions + sign));
+      if (!current) {
+        wanted = portions >= room(picked) ? atOnce : portions;
+        try {
+          if (wanted < atOnce) localStorage.setItem(MEAL_PORTIONS_KEY, String(wanted));
+          else localStorage.removeItem(MEAL_PORTIONS_KEY);
+        } catch {
+          // Without storage nothing is remembered.
+        }
+      }
       show();
     };
     const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('{name}: mniej', { name: t('Porcje') }), text: '−', onClick: () => step(-1) });
@@ -1705,7 +1731,7 @@ export function mountCombat(container, { params, navigate }) {
                   setOpen(false);
                   // Another dish in place of the meal at work, once the player agrees.
                   if (dish && current && dish.id !== current.id && dish.id !== picked?.id && !(await askMealSwap(current, dish))) return;
-                  if (dish?.id !== picked?.id) portions = 1;
+                  if (dish?.id !== picked?.id) portions = wanted;
                   picked = dish;
                   // The choice made with no meal at work is the one remembered.
                   if (!current) {
@@ -1719,7 +1745,8 @@ export function mountCombat(container, { params, navigate }) {
                   show();
                 },
               },
-              ...line(dish),
+              // Each with the meal it makes as picked now.
+              ...line(dish, dish?.id === picked?.id ? portions : Math.max(1, Math.min(wanted, room(dish)))),
             ),
           ),
         ),
@@ -1736,7 +1763,7 @@ export function mountCombat(container, { params, navigate }) {
         h('p', {
           class: 'muted',
           text: t('Zjedzona potrawa działa przez 4 godziny wypraw. Tej samej potrawy możesz mieć naraz do {most} porcji: premie się sumują, a każda porcja przywraca pełny czas. Inna potrawa zastępuje poprzednią, a premia poprzedniej przepada.', {
-            most: dishes[0].stacks.length,
+            most: atOnce,
           }),
         }),
       ),

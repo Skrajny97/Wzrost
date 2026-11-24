@@ -81,7 +81,7 @@
       "mealPick": "No meal",
       "mealOption": "{dish} · you have {count}",
       "mealAuto": "Auto-refill",
-      "mealHint": "When your meal runs out, as the party sets out your character eats one portion of this dish from its own Pantry, until there is none left. A meal of another dish still at work is not replaced.",
+      "mealHint": "When your meal runs out, as the party sets out your character eats the chosen number of portions of this dish at once from its own Pantry (or as many as are left), and their bonuses add up. This goes on until there is none left. A meal still at work stays as it is.",
       "mealNone": "You have no dishes in your Pantry.",
       "waiting": "The party trip's report was claimed by: {name}. Your share of the loot is already yours.",
       "open": "View report",
