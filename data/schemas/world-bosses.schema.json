@@ -1,0 +1,141 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Postrach Krainy",
+  "description": "Cotygodniowi bossowie przedziałów poziomów (1222–1226 A; src/engine/world-boss.js). Walka bossa ma kształt stwora z monsters.json (tools/validate-data.mjs sprawdza ją schematem stworów), a HP bierze z paska.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["attacksPerDay", "activeDays", "power", "hp", "damage", "goldRound", "chests", "unbeaten", "lastBlow", "title", "bosses", "texts"],
+  "definitions": {
+    "text": { "type": "string", "minLength": 1 }
+  },
+  "properties": {
+    "$comment": { "type": "string" },
+    "attacksPerDay": {
+      "description": "Ataki postaci na dobę, od północy czasu polskiego.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "power": {
+      "description": "Ciosy bossa są tyle razy mocniejsze niż stwora jego poziomu, żeby walka z nim nie ciągnęła się do końca.",
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "activeDays": {
+      "description": "Aktywna jest grana postać konta, które było w grze w ostatnich tylu dniach.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "hp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["attacksPerPlayer"],
+      "properties": {
+        "attacksPerPlayer": {
+          "description": "Tyle średnich ataków (damage) HP boss ma na każdą aktywną postać przedziału.",
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "damage": {
+      "description": "[poziom, średnie obrażenia jednego ataku] po kolei rosnącym poziomem, zmierzone tools/world-boss-sim.mjs.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "items": [
+          { "type": "integer", "minimum": 1 },
+          { "type": "number", "exclusiveMinimum": 0 }
+        ]
+      }
+    },
+    "goldRound": {
+      "description": "Złoto skrzyni zaokrąglone do tylu.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "chests": {
+      "description": "Skrzynie od najmniejszej: share to część udziału postaci w HP bossa, od której jest ta skrzynia (pierwsza od 0).",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "share", "goldMinutes", "elite", "champion", "itemChance"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z]+$" },
+          "share": { "type": "number", "minimum": 0 },
+          "goldMinutes": { "type": "number", "minimum": 0 },
+          "elite": { "type": "integer", "minimum": 0 },
+          "champion": { "type": "integer", "minimum": 0 },
+          "itemChance": { "type": "number", "minimum": 0, "maximum": 1 }
+        }
+      }
+    },
+    "unbeaten": {
+      "description": "Część skrzyni, gdy boss przetrwał do niedzieli.",
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1
+    },
+    "lastBlow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["goldMinutes", "item"],
+      "properties": {
+        "goldMinutes": { "type": "number", "minimum": 0 },
+        "item": { "type": "boolean" }
+      }
+    },
+    "title": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["places", "days"],
+      "properties": {
+        "places": { "type": "integer", "minimum": 1 },
+        "days": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "bosses": {
+      "description": "Jeden boss na krainę z regions.json (region), po kolei jak krainy.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "region", "name", "description", "title", "art", "sprite", "sound", "family", "position", "stats", "attack", "armorFactor"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^wb-[a-z0-9-]+$" },
+          "region": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "name": { "$ref": "#/definitions/text" },
+          "female": { "type": "boolean" },
+          "description": { "$ref": "#/definitions/text" },
+          "title": {
+            "description": "Tytuł dla mężczyzny i dla kobiety.",
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": { "$ref": "#/definitions/text" }
+          },
+          "art": { "description": "Obrazek src/client/art/monsters/<art>.png (48 × 48), gdy jest na liście SPRITES.monsters w src/client/art.js.", "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "sprite": { "description": "Stwór z monsters.json, którego obrazek stoi w zastępstwie.", "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "sound": { "description": "Okrzyk: głos z sounds.json (voices.<sound>.cry), grany na początku walki z bossem.", "type": "string", "pattern": "^wb-[a-z0-9-]+$" },
+          "family": { "type": "string" },
+          "position": { "enum": ["front", "middle", "back"] },
+          "stats": { "type": "object" },
+          "attack": { "type": "object" },
+          "armorFactor": { "type": "number", "exclusiveMinimum": 0 },
+          "resistances": { "type": "object" },
+          "weaknesses": { "type": "object" }
+        }
+      }
+    },
+    "texts": {
+      "type": "object",
+      "additionalProperties": { "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }, { "type": "object", "additionalProperties": { "type": "string" } }] },
+      "required": ["title", "lead", "rules", "errors"]
+    }
+  }
+}

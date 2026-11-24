@@ -57,6 +57,7 @@ import { andrzejkiCard, omenLines } from '../andrzejki.js';
 import { partyGated } from '../party-gate.js';
 import { guildHelpStrip } from '../guild-help.js';
 import { bannerChip, bannerLine } from '../guild-lands.js';
+import { worldBossCard } from '../world-boss.js';
 
 // Shown through t(), as the page loads its English after this module.
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
@@ -362,6 +363,10 @@ export function mountCombat(container, { params, navigate }) {
   // The shortcut to help in the guild (guild-help.js, 20.11.2026), made once
   // for the visit and kept over the screen's renders.
   const helpStrip = guildHelpStrip();
+  // The World Boss's card (world-boss.js; 1222–1226 A), made with the main
+  // view's first render and kept over the screen's renders, empty below its
+  // unlock.
+  let bossCard = null;
 
   // HP in tenths of the maximum: resting moves the threat now and then.
   const hpStep = (character, now) => Math.floor((currentHp(character, now) / character.maxHp) * 10);
@@ -471,6 +476,7 @@ export function mountCombat(container, { params, navigate }) {
     // the year (weeks.js), the Andrzejki omens running under it and, on the
     // fortune evenings, their card (andrzejki.js, 1082 C).
     if (activity || !region) {
+      bossCard ??= worldBossCard();
       fill(
         container,
         helpStrip,
@@ -481,7 +487,9 @@ export function mountCombat(container, { params, navigate }) {
         modeTabs(),
         testTools(),
         partyReportNote(character),
-        activity ? [activityCard(activity), wantedStrip(character)] : regionList(character),
+        // The World Boss under the exploration on its way, and over the
+        // lands while the character is free (1226).
+        activity ? [activityCard(activity), wantedStrip(character), bossCard] : [bossCard, regionList(character)],
       );
       return;
     }
@@ -1990,5 +1998,12 @@ export function mountCombat(container, { params, navigate }) {
   }
 
   render();
-  return { update: render, tick, unmount: helpStrip.stop };
+  return {
+    update: render,
+    tick,
+    unmount: () => {
+      helpStrip.stop();
+      bossCard?.stop();
+    },
+  };
 }

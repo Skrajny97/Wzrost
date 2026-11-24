@@ -38,6 +38,7 @@ import { chooseLabyrinthBlessing, enterLabyrinth, getLabyrinth, labyrinthMerchan
 import { absorbArtifact, breakArtifact, dissolveArtifact, getCore, upgradeArtifact } from './core.js';
 import { acceptGuildInvite, cancelGuildInvite, declineGuildInvite, foundGuild, getGuild, handGuildLead, inviteToGuild, kickFromGuild, leaveGuild, promoteGuildNovice, setGuildRole } from './guilds.js';
 import { attackGuildBeast, claimGuildBeastChest, getGuildBeast } from './guild-beast.js';
+import { attackWorldBoss, claimWorldBossChest, getWorldBoss } from './world-boss.js';
 import { attackGuildGuardian, claimGuildExpeditionChest, getGuildExpedition } from './guild-expedition.js';
 import { claimGuildTrialChest, dropGuildTrial, getGuildTrials, openGuildTrials, takeGuildTrial } from './guild-trials.js';
 import { askGuild, cancelGuildRequest, getGuildRequests, giveToGuildRequest, thankForGuildGift } from './guild-requests.js';
@@ -508,6 +509,10 @@ const routes = [
   ['GET', '/api/guild/beast', getGuildBeast],
   ['POST', '/api/guild/beast/attack', attackGuildBeast],
   ['POST', '/api/guild/beast/claim', claimGuildBeastChest],
+  // The World Bosses (world-boss.js; 1222–1226 A).
+  ['GET', '/api/world-boss', getWorldBoss],
+  ['POST', '/api/world-boss/attack', attackWorldBoss],
+  ['POST', '/api/world-boss/claim', claimWorldBossChest],
   // The Róg zbiórki (guild-rally.js, 1199 A).
   ['POST', '/api/guild/rally', setGuildRally],
   ['POST', '/api/guild/rally/cancel', cancelGuildRally],

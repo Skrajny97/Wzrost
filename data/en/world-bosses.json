@@ -1,0 +1,159 @@
+{
+  "$comment": "English texts of data/world-bosses.json, by the boss's id (src/engine/overlay.js): the World Bosses' names, words, titles and blows, and the words of the card. The creatures of Slavic tales have English names (data/en/glossary.json): Chernobog as the glossary has him, Boruta and Gorynych as their names stay.",
+  "bosses": {
+    "wb-pochwist": {
+      "name": "Whirlwind Lord",
+      "description": "The spirit of the gale that snaps trees like matchsticks. Its body is a spinning wind with a shaggy, horned head, and it leaves the Windfalls in its wake. When it howls, hold on tight: it knocks you off your feet.",
+      "title": ["Whirlwind Lord Slayer", "Whirlwind Lord Slayer"],
+      "attack": { "name": "Gale", "stun": { "label": "knocked down" } }
+    },
+    "wb-kotolak": {
+      "name": "Werelynx",
+      "description": "A man who turns into a lynx at night. Hunched, with tufts on his ears, he lies in wait on the stone circle and leaps at whoever walks last.",
+      "title": ["Werelynx Slayer", "Werelynx Slayer"],
+      "attack": { "name": "Leap from the Circle" }
+    },
+    "wb-rusalka": {
+      "name": "Rusalka",
+      "description": "Queen of the drowned maidens. Her long green hair is like waterweed, and her laughter carries over the backwaters. She coils around your legs so you can barely move.",
+      "title": ["Rusalka Slayer", "Rusalka Slayer"],
+      "attack": { "name": "Waterweed Coils" }
+    },
+    "wb-zmora": {
+      "name": "Nightmare",
+      "description": "Born of the mist over the peat. At night she sits on sleepers' chests and smothers them until they can't catch their breath. Whoever she crushes forgets their skills.",
+      "title": ["Nightmare Slayer", "Nightmare Slayer"],
+      "attack": { "name": "Smothering Weight", "silence": { "label": "smothered" } }
+    },
+    "wb-triglav-steed": {
+      "name": "Triglav's Black Steed",
+      "description": "Triglav's huge black horse, which once foretold the future for the priests of the temple. The temple sank into the Black Bog, but the horse rose from the deep, and it tramples everyone who stands in front.",
+      "title": ["Slayer of Triglav's Steed", "Slayer of Triglav's Steed"],
+      "attack": { "name": "Hooves of Triglav" }
+    },
+    "wb-stone-baba": {
+      "name": "Stone Idol",
+      "description": "A stone idol from a burial mound, uncovered and woken by the drifting sands. Its cracks glow like embers in a tar kiln, and every blow it strikes burns.",
+      "title": ["Stone Idol Slayer", "Stone Idol Slayer"],
+      "attack": { "name": "Glowing Fist" }
+    },
+    "wb-borowy": {
+      "name": "Deepwood Lord",
+      "description": "Lord of the deep spruce wilds. His skin is bark and his antlers are like boughs, and wherever he walks, the birds fall silent. His blow takes your voice away, so a spell is hard to cast.",
+      "title": ["Deepwood Lord Slayer", "Deepwood Lord Slayer"],
+      "attack": { "name": "Antler Strike", "silence": { "label": "silenced" } }
+    },
+    "wb-wapierz": {
+      "name": "Elder Vampire",
+      "description": "A revenant who rose from a barrow on a moonless night. He drags a torn shroud behind him, and fangs stick out of his mouth. He drinks blood and never has enough.",
+      "title": ["Vampire Slayer", "Vampire Slayer"],
+      "attack": { "name": "Vampire's Fangs" }
+    },
+    "wb-czart": {
+      "name": "Goatfoot Devil",
+      "description": "A goat-legged devil carrying a huge boulder to the Bald Mountain. He once dropped it when the cock crowed, and so the Scree Fields were born. Now he hurls that boulder at anyone who stands in his way.",
+      "title": ["Goatfoot Devil Slayer", "Goatfoot Devil Slayer"],
+      "attack": { "name": "Boulder Throw", "stun": { "label": "crushed" } }
+    },
+    "wb-dziwozona": {
+      "name": "Wild Woman",
+      "description": "The wild woman of the fir forest. Her matted hair reaches the ground, her claws are long, and she swaps babies in their cradles for changelings. She scratches twice before you can raise your guard.",
+      "title": ["Wild Woman Slayer", "Wild Woman Slayer"],
+      "attack": { "name": "Wild Woman's Claws" }
+    },
+    "wb-boruta": {
+      "name": "Boruta",
+      "description": "A devil nobleman in a green kontusz coat, with a heron feather on his fur cap and a hoof instead of a boot. He leads the sabbath on the Bald Mountain, and whoever won't sign his pact must fight his hellfire.",
+      "title": ["Boruta Slayer", "Boruta Slayer"],
+      "attack": { "name": "Hellfire" }
+    },
+    "wb-gorynych": {
+      "name": "Gorynych",
+      "description": "A three-headed dragon guarding the Viburnum Bridge over the river into Nav. Each head breathes fire on its own, so it strikes three times in a single move.",
+      "title": ["Gorynych Slayer", "Gorynych Slayer"],
+      "attack": { "name": "Fire of Three Jaws" }
+    },
+    "wb-jaszczur": {
+      "name": "Lizard King",
+      "description": "The king of lizards from the underground waters. He guards the treasures hidden under the roots of the World Tree, and one sweep of his tail breaks stones.",
+      "title": ["Lizard King Slayer", "Lizard King Slayer"],
+      "attack": { "name": "Lizard's Tail", "stun": { "label": "stunned" } }
+    },
+    "wb-czarnobog": {
+      "name": "Chernobog",
+      "description": "The god of darkness who rules the Sunless Land. Wherever he stands, every light goes out and the frost freezes the blood in your veins. He is the oldest and the most dangerous of the bosses.",
+      "title": ["Chernobog Slayer", "Chernobog Slayer"],
+      "attack": { "name": "Eternal Darkness", "silence": { "label": "in darkness" } }
+    }
+  },
+  "texts": {
+    "title": "World Boss",
+    "lead": "Every week one boss stands in each band of levels. All the band's players hit the same HP bar.",
+    "rules": [
+      "A band is 25 levels, counted by the higher of your levels: character or class. Each band has its own boss from the land of those levels.",
+      "Your band is set at your first attack of the week and stays until Sunday, even if you level up.",
+      "You have {attacks} attacks a day. They renew at midnight.",
+      "An attack is one fight of your character with your companions, at full HP and without potions, with the result at once. The boss fights at your level. An attack gives no XP, gold or loot, and works during an exploration too.",
+      "The boss's HP depends on how many players of the band were in the game in the last week.",
+      "When the boss falls, everyone who hit it gets a Boss Chest with gold, the boss's materials and a chance at an item. The more damage you deal, the bigger the chest.",
+      "The top ten wear the boss's title for a week, and the last blow puts an item and extra gold in the chest.",
+      "The boss stays until Sunday midnight. If it survives, it leaves, and the chests are half as big. On Monday a new one appears.",
+      "You can open the chest from the boss's fall or from the end of the week, until the end of the next week at the latest."
+    ],
+    "band": "Levels {min}–{max}",
+    "bandOpen": "Levels from {min}",
+    "until": "The boss stays until Sunday midnight.",
+    "attacksLeft": "Attacks today: {left} of {perDay}",
+    "newAttacks": "New ones at midnight.",
+    "attack": "Attack",
+    "mercenary": "A mercenary does not attack. You can attack once you take down your notice or collect your pay for the service.",
+    "lastAttack": "Your attack took {damage} HP from the boss.",
+    "fell": "The boss falls!",
+    "fallen": "The boss fell on {at}.",
+    "lastBlow": "Last blow: {name}.",
+    "next": "A new boss will appear on Monday.",
+    "log": "Fight log",
+    "fightTitle": "Attack on the boss",
+    "own": "Your contribution: {damage} HP, place {place}.",
+    "noOwn": "You aren't fighting this boss yet.",
+    "size": "Your chest now: {size}.",
+    "nextSize": "{size} from {damage} HP: {missing} HP to go.",
+    "sizes": {
+      "small": "small",
+      "medium": "medium",
+      "large": "large",
+      "huge": "huge"
+    },
+    "nextSizes": {
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large",
+      "huge": "Huge"
+    },
+    "top": "Best of the week",
+    "topLine": "Fighters: {count}.",
+    "noHits": "The boss awaits the first attack.",
+    "you": "You: place {place}, {damage} HP",
+    "titleWorn": "Your title until {until}: {title}.",
+    "chestTitle": "Boss Chest",
+    "chestFallen": "Week {week}: the boss fell. Your chest: {size}.",
+    "chestUnbeaten": "Week {week}: the boss survived. Your chest: {size}, but half as big.",
+    "chestContents": "Inside: {gold} gold, the boss's materials ({pieces} pcs) and a {chance}% chance at an item.",
+    "chestLastBlow": "For the last blow: an item and {gold} more gold.",
+    "chestTitleEarned": "Place {place}: the title “{title}” until {until}.",
+    "chestUntil": "You can open it until {until}.",
+    "open": "Open the chest",
+    "opened": "Boss Chest opened. Inside: {contents}.",
+    "gold": "{gold} gold",
+    "notInBag": "This is no longer in the bag.",
+    "errors": {
+      "locked": "You will unlock the World Boss at character level {level}.",
+      "fallen": "The boss has already fallen. A new one will appear on Monday.",
+      "noAttacks": "Today's attacks are used up. New ones from midnight.",
+      "raced": "The boss or the character changed in the meantime. Try once more.",
+      "noChest": "There is no such chest to open.",
+      "claimed": "This chest is already open.",
+      "bagFull": "The bag is full. Make room in it for the items from the chest."
+    }
+  }
+}

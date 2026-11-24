@@ -16,6 +16,7 @@ import { guildTagSql } from './guilds.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { askedPage, lastOffset } from './ranking-pages.js';
+import { worldBossTitleSql, worldBossTitleText } from './world-boss.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 const today = (now) => questPeriod('daily', now, content()).key;
@@ -77,11 +78,11 @@ export async function ranking(context) {
     db
       .prepare(
         `SELECT c.id, c.name, c.class_id, c.evolution, c.appearance, c.level, c.class_level, c.professions, u.login, u.google_sub, u.chat_moderator,
-                c.cosmetics, c.title, c.achievements, ${guildTagSql('c.id')} AS guild_tag
+                c.cosmetics, c.title, c.achievements, ${guildTagSql('c.id')} AS guild_tag, ${worldBossTitleSql} AS boss_title
          FROM characters c JOIN users u ON u.id = c.user_id
          WHERE c.${OWN_CHARACTERS}${where} ORDER BY ${order} LIMIT ? OFFSET ?`,
       )
-      .bind(...ofClass, page.limit, offset);
+      .bind(context.now, ...ofClass, page.limit, offset);
   const [first, own, counted] = await db.batch([
     rowsFrom(page.offset),
     db
@@ -112,6 +113,8 @@ export async function ranking(context) {
       name: row.name,
       // The title of an achievement it wears (achievements.js, 1036.3 B).
       title: titleText(row),
+      // The title of a fallen World Boss it wears for a week (1224 A).
+      bossTitle: worldBossTitleText(row.boss_title, row.appearance),
       guildTag: row.guild_tag ?? null,
       nameColor: nameColorOf(row.cosmetics),
       classId: row.class_id,

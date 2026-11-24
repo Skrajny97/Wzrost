@@ -15,7 +15,10 @@
 // billions in its Skrzynia Konta (its sheet "Wyjmij złoto" with all of it, and
 // with too much typed), and above it in the Ranking postaci and the Punkty
 // Sławy a member of its guild with all a row can hold (the longest name and
-// title, the moderator's mark, the guild's tag). The bag
+// title, the moderator's mark, the guild's tag, a World Boss's title), and on
+// the Walka screen the World Boss of its band with HP in ten digits, the
+// best ten of the week and last week's chest to open, and an attack on it
+// with the fight in the arena (the cards' HP lines inside their cards). The bag
 // is checked with its six tabs, on its Zioła and Spiżarnia (herbs, dishes,
 // fish and crops by the thousand), and in "Zaznacz do sprzedaży" too, with
 // an item marked. On each screen,
@@ -257,8 +260,15 @@ const SHEETS = {
     { name: 'za dużo', fill: '#chest-gold-amount', value: '99999999999', ready: '.chest-gold-warn:not([hidden])', words: true },
   ],
   // The sheet Tygodnie from the week's line on the Walka screen (weeks.js),
-  // its whole year left as the player left it.
-  '#/walka': [{ name: 'Tygodnie', tap: '.week-line', ready: '.week-card--now', words: true }],
+  // its whole year left as the player left it; then, that sheet closed, an
+  // attack on the World Boss (Postrach Krainy) with its fight played in the
+  // arena, the boss's HP of ten digits on its card (24.11.2026). The button
+  // under a short phone's bars is tapped as a script would (`script`), and
+  // the fight is given the time the server takes for it.
+  '#/walka': [
+    { name: 'Tygodnie', tap: '.week-line', ready: '.week-card--now', words: true },
+    { name: 'Postrach Krainy › walka', anew: true, tap: '.world-boss-attack', script: true, ready: '.arena', timeout: 30000, words: true },
+  ],
   // A card of the starter deck in the Encyklopedia's "Karty": its sheet.
   '#/encyklopedia/cards': [{ name: 'karta', tap: '[data-guide="encyclopedia-card"]', ready: '.encyclopedia-card-sheet', words: true }],
   // "Parametry dodatkowe" (with the side stats, 1218), then, that sheet
@@ -370,6 +380,20 @@ function audit(frame) {
     if (!shown(run)) continue;
     const lines = new Set([...run.querySelectorAll('.timer-digit')].map((digit) => Math.round(digit.getBoundingClientRect().top))).size;
     if (lines > 1) found.push({ kind: 'spill', where: label(run.parentElement), text: `licznik ${run.textContent} łamie się na ${lines} linijki` });
+  }
+  // A fight card's HP line (arena.js; 24.11.2026, the World Boss's HP of
+  // eight digits on a phone): inside its card, on one line or on two, the
+  // maximum on the second. The arena clips what reaches past it, so the
+  // check above does not see it.
+  for (const line of top.querySelectorAll('.unit-hp-line')) {
+    if (!shown(line)) continue;
+    const box = line.parentElement.getBoundingClientRect();
+    const range = document.createRange();
+    range.selectNodeContents(line);
+    const rects = [...range.getClientRects()];
+    const lines = new Set(rects.map((rect) => Math.round(rect.top))).size;
+    const out = rects.some((rect) => rect.left < box.left - 1 || rect.right > box.right + 1);
+    if (out || lines > 2) found.push({ kind: 'spill', where: label(line.closest('.unit') ?? line), text: `HP „${line.textContent}” ${out ? 'wychodzi poza kartę' : `łamie się na ${lines} linijki`}` });
   }
   // One line for each element: an element past the edge drags its children.
   const seen = new Set();
@@ -588,6 +612,41 @@ async function main() {
   sql(
     `UPDATE characters SET settlement = json_set(COALESCE(settlement, '{}'), '$.relations', json_set(COALESCE(json_extract(settlement, '$.relations'), '{}'), ${setRelations})) WHERE name = '${name}'`,
   );
+  // The World Boss of its band on the Walka screen (world-boss.js; 1222–1226
+  // A): Kamienna Baba of the levels 126–150, with HP in ten digits and two
+  // attacks left today; the best ten of the week, the member of the longest
+  // name first, then the guild's reserve, and the character 12th with nine
+  // digits of damage; last week's boss fallen by its blow, its chest waiting
+  // with the last blow's part and the title of the first place, which the
+  // member of the longest name wears in the Ranking too.
+  const weekDay = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].indexOf(new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Warsaw', weekday: 'short' }).format(new Date()));
+  const weekOf = (back) => {
+    const date = new Date(`${day}T12:00:00Z`);
+    date.setUTCDate(date.getUTCDate() - weekDay - 7 * back);
+    return date.toISOString().slice(0, 10);
+  };
+  const now = Date.now();
+  const own = `(SELECT id FROM characters WHERE name = '${name}')`;
+  const boss = (back) => `(SELECT id FROM world_bosses WHERE week = '${weekOf(back)}' AND region = 'pine-dunes')`;
+  // The band's bosses of these two weeks made anew on each run, with whom
+  // they had (the local D1 keeps those of the run before).
+  const bands = `SELECT id FROM world_bosses WHERE region = 'pine-dunes' AND week IN ('${weekOf(0)}', '${weekOf(1)}')`;
+  sql(
+    [
+      `DELETE FROM world_boss_titles WHERE boss_id IN (${bands})`,
+      `DELETE FROM world_boss_fighters WHERE boss_id IN (${bands})`,
+      `DELETE FROM world_bosses WHERE id IN (${bands})`,
+      `INSERT INTO world_bosses (week, region, boss, players, level, max_hp, hp, created_at) VALUES ('${weekOf(0)}', 'pine-dunes', 'wb-stone-baba', 12345, 141, 9876543210, 4567890123, ${now})`,
+      `INSERT INTO world_bosses (week, region, boss, players, level, max_hp, hp, created_at, fallen_at, fallen_by) SELECT '${weekOf(1)}', 'pine-dunes', 'wb-stone-baba', 12345, 141, 9876543210, 0, ${now}, ${now - 3 * 86400000}, id FROM characters WHERE name = '${name}'`,
+      `INSERT INTO world_boss_fighters (week, character_id, boss_id, damage, hits, day, day_hits, created_at) SELECT '${weekOf(0)}', id, ${boss(0)}, 987654321, 21, '${day}', 1, ${now} FROM characters WHERE name = '${marked}'`,
+      `INSERT INTO world_boss_fighters (week, character_id, boss_id, damage, hits, day, day_hits, created_at)
+        SELECT '${weekOf(0)}', id, ${boss(0)}, 900000000 - id, 18, '${day}', 3, ${now} FROM characters WHERE name LIKE 'Rezerwowy${stamp}%'`,
+      `INSERT INTO world_boss_fighters (week, character_id, boss_id, damage, hits, day, day_hits, created_at) SELECT '${weekOf(0)}', ${own}, ${boss(0)}, 123456789, 13, '${day}', 1, ${now}`,
+      `INSERT INTO world_boss_fighters (week, character_id, boss_id, damage, hits, day, day_hits, created_at) SELECT '${weekOf(1)}', ${own}, ${boss(1)}, 1987654321, 21, '${weekOf(1)}', 3, ${now}`,
+      `INSERT INTO world_boss_titles (boss_id, character_id, place, until, created_at) SELECT ${boss(1)}, ${own}, 1, ${now + 4 * 86400000}, ${now}`,
+      `INSERT INTO world_boss_titles (boss_id, character_id, place, until, created_at) SELECT ${boss(1)}, id, 2, ${now + 4 * 86400000}, ${now} FROM characters WHERE name = '${marked}'`,
+    ].join('; '),
+  );
   // The picture for "Dołącz zrzut ekranu": a PNG drawn on a canvas, of a
   // computer screen's shape and wider than any sheet, so that its preview
   // has to fit itself in.
@@ -620,7 +679,10 @@ async function main() {
 
   let problems = 0;
   for (const size of SIZES) {
-    const options = { viewport: { width: size.width, height: size.height }, deviceScaleFactor: 1, isMobile: size.mobile, hasTouch: size.mobile, locale: LOCALE, timezoneId: 'Europe/Warsaw' };
+    // The World Boss's attacks of today as seeded (two left), whatever the
+    // size before took with its fight (SHEETS, '#/walka').
+    sql(`UPDATE world_boss_fighters SET day = '${day}', day_hits = 1 WHERE week = '${weekOf(0)}' AND character_id = ${own}`);
+    const options ={ viewport: { width: size.width, height: size.height }, deviceScaleFactor: 1, isMobile: size.mobile, hasTouch: size.mobile, locale: LOCALE, timezoneId: 'Europe/Warsaw' };
     let view = null;
     const check = async (screen, frame, words = false) => {
       const found = await view.evaluate(audit, frame);
@@ -738,8 +800,11 @@ async function main() {
           }
           if (step.pick) await view.locator(step.pick).setInputFiles(picture, { timeout: 5000 });
           else if (step.fill) await view.locator(step.fill).fill(step.value, { timeout: 5000 });
-          else await view.locator(step.tap).click({ timeout: 5000 });
-          await view.locator(`#sheet[open] ${step.ready}`).waitFor({ timeout: 5000 });
+          else if (step.script) {
+            const button = view.locator(step.tap).first();
+            await button.click({ timeout: 3000 }).catch(() => button.evaluate((element) => element.click()));
+          } else await view.locator(step.tap).click({ timeout: 5000 });
+          await view.locator(`#sheet[open] ${step.ready}`).waitFor({ timeout: step.timeout ?? 5000 });
           await view.waitForTimeout(500);
           await check(trail.join(' › '), '#sheet', step.words);
         }

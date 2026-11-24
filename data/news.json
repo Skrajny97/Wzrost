@@ -1685,6 +1685,11 @@
       "id": "0.5.2",
       "title": "Wersja 0.5.2",
       "body": "- Drużyna: raport z wyprawy drużyny odbiera jedna osoba za wszystkich, zwykle lider. Każdy od razu dostaje swoje łupy, a w Dzienniku ma wspólny raport z częścią „Co kto zdobył”.\n- Wolne punkty statystyk, Punkty Umiejętności i XP klasy czekające na ewolucję zbierają się na postaci i nie zatrzymują już drużyny. Lider może od razu wysłać drużynę na kolejną wyprawę.\n- Na wyprawie drużyny łupy trafiają do wolnych miejsc w plecaku, najpierw najlepsze. Gdy plecak jest pełny, reszta łupów przepada, dopóki nie zrobisz w nim miejsca. Rzeczy, które już masz w plecaku, zostają.\n- Gdy na Walce zaznaczysz „Z drużyną”, zagrożenie liczy całą drużynę: sprzęt, zdrowie i mikstury każdego, kto wyruszy.\n- Członek drużyny może w zakładce Drużyna wybrać posiłek ze swojej Spiżarni. Z zaznaczonym „Autouzupełnianiem” zje kolejną porcję przy wyruszeniu, gdy poprzedni posiłek przestanie działać."
+    },
+    {
+      "id": "0.5.3",
+      "title": "Wersja 0.5.3",
+      "body": "- Nowość: Postrach Krainy. Co tydzień w każdym przedziale poziomów (1–25, 26–50 i tak dalej) pojawia się jeden boss, a wszyscy gracze z przedziału biją ten sam pasek HP. Znajdziesz go w Walce od 15. poziomu postaci.\n- Masz 3 ataki dziennie. Za udział zgarniesz Skrzynię Bossa ze złotem, materiałami i szansą na przedmiot: im więcej obrażeń zadasz, tym większa skrzynia. Najlepsza dziesiątka dostaje tytuł na tydzień, a za ostatni cios zgarniesz dodatkowy przedmiot.\n- Gdy boss przetrwa do niedzieli, skrzynie są o połowę mniejsze. W poniedziałek pojawia się nowy.\n- W okienku walki duże liczby HP mają teraz odstępy."
     }
   ]
 }

@@ -16,10 +16,10 @@ export const DATA_FILES = [
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
   'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat', 'community',
   'events', 'encyclopedia', 'evolutions', 'gift-codes', 'settlement', 'towers', 'portals', 'guilds', 'cosmetics', 'news', 'fame',
-  'weeks', 'payments', 'party-events', 'labyrinth', 'cards', 'achievements', 'winter', 'orbs',
+  'weeks', 'payments', 'party-events', 'labyrinth', 'cards', 'achievements', 'winter', 'orbs', 'world-bosses',
 ];
 // Unlocks the code refers to by id.
-const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'evolution', 'professions', 'settlement', 'party', 'towers', 'portals', 'labyrinth', 'core'];
+const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'evolution', 'professions', 'settlement', 'party', 'towers', 'portals', 'labyrinth', 'core', 'world-boss'];
 const POSITIONS = ['front', 'middle', 'back'];
 
 function readJson(path) {
@@ -46,9 +46,35 @@ export function validateData(data = loadData()) {
   if (!foes(data.events.foes)) {
     for (const error of foes.errors) errors.push(`events.json/foes${error.instancePath || ''}: ${error.message}`);
   }
+  // So does the World Bosses' fight (world-bosses.json), its HP from the bar.
+  if (errors.length === 0 && !foes(worldBossCreatures(data))) {
+    for (const error of foes.errors) errors.push(`world-bosses.json/bosses${error.instancePath || ''}: ${error.message}`);
+  }
   // References only make sense once every file has the expected shape.
   if (errors.length === 0) errors.push(...checkReferences(data));
   return errors;
+}
+
+// The World Bosses as creatures of the fights (worldBossCreature in
+// src/engine/world-boss.js): their own blow and stats, champions, the HP
+// from the bar; `counted` their name, as no quest counts them.
+function worldBossCreatures(data) {
+  return (data['world-bosses']?.bosses ?? []).map(({ id, name, female, family, position, stats, attack, armorFactor, resistances, weaknesses }) => ({
+    id,
+    name,
+    counted: [name, name, name],
+    ...(female !== undefined && { female }),
+    family,
+    position,
+    champion: true,
+    stats,
+    attack,
+    hpFactor: 1,
+    armorFactor,
+    ...(resistances && { resistances }),
+    ...(weaknesses && { weaknesses }),
+    reward: { xp: 0, gold: 0 },
+  }));
 }
 
 function uniqueIds(errors, file, list) {
@@ -438,8 +464,9 @@ function checkReferences(data) {
   }
 
   const monstersById = new Map(data.monsters.map((monster) => [monster.id, monster]));
-  // The events' foes fight as creatures do, so they are checked the same way.
-  for (const monster of [...data.monsters, ...data.events.foes]) {
+  // The events' foes and the World Bosses fight as creatures do, so they are
+  // checked the same way.
+  for (const monster of [...data.monsters, ...data.events.foes, ...worldBossCreatures(data)]) {
     statKeys('monsters', monster.id, monster.stats.base, { all: true });
     statKeys('monsters', monster.id, monster.stats.growth);
     // Its own attack and the attacks of its shapes (Weles, Nawia).
@@ -778,13 +805,16 @@ function checkReferences(data) {
   for (const base of data['item-bases']) {
     if (base.kind === 'weapon' && !kinds.has(base.sound)) errors.push(`item-bases.json: ${base.id} ma nieznany dźwięk ${base.sound}`);
   }
-  for (const monster of data.monsters) {
+  for (const monster of [...data.monsters, ...worldBossCreatures(data)]) {
     if (!kinds.has(monster.attack.sound)) errors.push(`monsters.json: ${monster.id} ma nieznany dźwięk ataku ${monster.attack.sound}`);
   }
   const appearances = uniqueIds(errors, 'appearances', data.appearances);
   if (!appearances.has('male')) errors.push('appearances.json: brak wyglądu male, domyślnego dla dawnych postaci (migrations/0006)');
+  // Voices of the creatures, of the looks, and the World Bosses' cries
+  // (world-bosses.json `sound`).
+  const bossSounds = new Set((data['world-bosses']?.bosses ?? []).map((boss) => boss.sound));
   for (const id of Object.keys(sounds.voices)) {
-    if (!monsters.has(id) && !appearances.has(id)) errors.push(`sounds.json: głos dla nieznanego ${id}`);
+    if (!monsters.has(id) && !appearances.has(id) && !bossSounds.has(id)) errors.push(`sounds.json: głos dla nieznanego ${id}`);
   }
 
   // The new character's supply: resources that exist. The narrator's lines:
@@ -870,6 +900,52 @@ function checkReferences(data) {
   errors.push(...checkPayments(data));
   errors.push(...checkWinter(data));
   errors.push(...checkOrbs(data));
+  errors.push(...checkWorldBosses(data, { monsters }));
+  return errors;
+}
+
+// The World Bosses (world-boss.js): one boss for each land, in the order of
+// regions.json from the first, with no land left out between them (a land
+// after the last boss's waits for its own, and its levels fight the last
+// band's boss), each with the picture of a creature in its place until its
+// own and the materials of its land's elite and champion for the chests;
+// the measured damage by rising levels; the chests from the smallest (share
+// 0) by rising share, each with its words on the card.
+function checkWorldBosses(data, { monsters }) {
+  const errors = [];
+  const rules = data['world-bosses'];
+  const bosses = uniqueIds(errors, 'world-bosses', rules.bosses);
+  const regions = data.regions.map((region) => region.id);
+  const lands = rules.bosses.map((boss) => boss.region);
+  if (new Set(lands).size !== lands.length) errors.push('world-bosses.json: dwóch bossów jednej krainy');
+  lands.forEach((land, index) => {
+    if (!regions.includes(land)) errors.push(`world-bosses.json: nie ma krainy ${land}`);
+    else if (regions[index] !== land) errors.push(`world-bosses.json: boss krainy ${land} nie stoi na jej miejscu (${index + 1}. kraina to ${regions[index]})`);
+  });
+  const materials = new Set(data.materials.materials.map((material) => material.monster));
+  for (const boss of rules.bosses) {
+    if (!monsters.has(boss.sprite)) errors.push(`world-bosses.json: ${boss.id} ma w zastępstwie nieznanego stwora ${boss.sprite}`);
+    else if (!existsSync(new URL(`art/monsters/${boss.sprite}.png`, CLIENT_DIR))) errors.push(`world-bosses.json: ${boss.id}: brak obrazka src/client/art/monsters/${boss.sprite}.png`);
+    // Its cry, once recorded, is the voice of its `sound` (the files are
+    // checked with every sound's).
+    const voice = data.sounds.voices[boss.sound];
+    if (voice && !voice.cry) errors.push(`world-bosses.json: głos ${boss.sound} bossa ${boss.id} nie ma okrzyku (cry)`);
+    const region = data.regions.find((one) => one.id === boss.region);
+    if (!region) continue;
+    const champion = region.areas.find((area) => area.champion)?.champion;
+    if (!materials.has(region.elite)) errors.push(`world-bosses.json: elita krainy ${region.id} (${region.elite}) nie ma materiału`);
+    if (!champion || !materials.has(champion)) errors.push(`world-bosses.json: czempion krainy ${region.id} nie ma materiału`);
+  }
+  const levels = rules.damage.map(([level]) => level);
+  if (levels.some((level, index) => index > 0 && level <= levels[index - 1])) errors.push('world-bosses.json: damage nie idzie rosnącym poziomem');
+  const shares = rules.chests.map((chest) => chest.share);
+  if (shares[0] !== 0) errors.push('world-bosses.json: pierwsza skrzynia nie zaczyna się od share 0');
+  if (shares.some((share, index) => index > 0 && share <= shares[index - 1])) errors.push('world-bosses.json: chests nie idą rosnącym share');
+  uniqueIds(errors, 'world-bosses chests', rules.chests);
+  for (const chest of rules.chests) {
+    if (!rules.texts.sizes?.[chest.id] || !rules.texts.nextSizes?.[chest.id]) errors.push(`world-bosses.json: texts nie nazywają skrzyni ${chest.id}`);
+  }
+  if (!bosses.size) errors.push('world-bosses.json: brak bossów');
   return errors;
 }
 

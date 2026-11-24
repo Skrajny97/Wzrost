@@ -51,6 +51,8 @@ export async function openProfile(name, { onChange, mention } = {}) {
         profile.title && h('p', { class: 'profile-worn-title', text: `„${profile.title}”` }),
         // Its badges of last week's heroes of its guild (1198 A), named.
         profile.heroes?.length > 0 && h('p', { class: 'profile-heroes' }, heroBadges(profile.heroes, { size: 20, named: true })),
+        // The title of a fallen World Boss it wears for a week (1224 A).
+        profile.worldBossTitle && h('p', { class: 'profile-boss-title' }, icon('trophy', { size: 16 }), h('span', { text: profile.worldBossTitle })),
         h('p', { class: 'profile-levels', text: t('{className} · poziom {level} · klasa {classLevel}', { className: profile.className, level: profile.level, classLevel: profile.classLevel }) }),
         profile.guild && h('p', { class: 'profile-levels', text: t('Gildia: {name} [{tag}]', { name: profile.guild.name, tag: profile.guild.tag }) }),
       ),

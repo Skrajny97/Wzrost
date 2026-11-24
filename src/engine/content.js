@@ -328,5 +328,11 @@ export function buildContent(raw) {
     winter: raw.winter ?? null,
     // The Kulki Systemu over the Walka scene of an exploration (orbs.js).
     orbs: raw.orbs ?? null,
+    // The World Bosses (world-boss.js; 1222–1226 A): the rules, a boss for
+    // each band of levels, and the bosses by id. They fight as creatures
+    // but live in no region and have no Bestiariusz, so they are not among
+    // the creatures (monstersById).
+    worldBosses: raw['world-bosses'] ?? null,
+    worldBossesById: byId(raw['world-bosses']?.bosses ?? []),
   };
 }

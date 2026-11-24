@@ -324,6 +324,8 @@ function mountCharacterRanking(container) {
                       row.role && h('span', { class: `chat-role chat-role--${row.role}`, text: `(${row.role})` }),
                       // The title of an achievement it wears (1036.3 B).
                       row.title && h('span', { class: 'ranking-title', text: row.title }),
+                      // The title of a fallen World Boss it wears for a week (1224 A).
+                      row.bossTitle && h('span', { class: 'ranking-title ranking-title--boss' }, icon('trophy', { size: 12 }), h('span', { text: row.bossTitle })),
                     ),
                   ),
                   h('td', { class: sorted('level'), text: formatNumber(row.level) }),

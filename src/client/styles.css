@@ -4252,6 +4252,27 @@ summary {
   text-align: right;
 }
 
+/* The HP line's box, whose width (cqi) sizes the words in it. */
+.unit-hp-text {
+  container-type: inline-size;
+}
+
+/* The HP and its maximum in the game's numbers (arena.js) at the cards'
+   10 px while they fit the card's width on one line, else as much smaller
+   as they need, but not under 7.5 px; on a card narrower still the maximum
+   goes to a second line, both lines at the size that fits them, up to
+   10 px (24.11.2026: the World Boss's HP of eight digits on a phone).
+   --hp-one and --hp-two: how wide in em the line, and the wider of its two
+   lines, can get in the fight; the clamp() is 0 while one line fits at
+   7.5 px or more, else the two lines' size. */
+@supports (width: 1cqi) {
+  .unit-hp-line {
+    --hp-one-size: calc(99cqi / var(--hp-one, 1));
+    --hp-two-size: calc(99cqi / var(--hp-two, 1));
+    font-size: min(10px, max(var(--hp-one-size), clamp(0px, (7.5px - var(--hp-one-size)) * 1000, var(--hp-two-size))));
+  }
+}
+
 .unit-status {
   overflow: hidden;
   color: var(--gold);
@@ -30815,5 +30836,246 @@ a.social-button {
 
   .lands-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* The World Boss (world-boss.js; 1222–1226 A): its card on the Walka
+   screen, framed in the red of a champion in fights, the boss large in the
+   champion's gold beside its name, band and words, its HP bar thicker as
+   the Bestia's; the attack wide under the bar; the character's part, its
+   title in gold, the chests each in the colour of its size and the best of
+   the week with their places. The Bestia's rows and chests (guild-beast.js)
+   lend their shapes. */
+.world-boss {
+  border-color: #6b1a1f;
+  box-shadow: inset 0 0 0 1px rgba(179, 18, 31, 0.25), 0 0 18px rgba(179, 18, 31, 0.12);
+}
+
+.world-boss p {
+  margin: 0;
+}
+
+.world-boss .how-more > p + p {
+  margin-top: 6px;
+}
+
+.world-boss .card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.world-boss .card-title svg {
+  color: var(--champion-gold);
+}
+
+.world-boss-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.world-boss-art {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 104px;
+  height: 104px;
+  border: 1px solid #b3121f;
+  border-radius: 4px;
+  background: radial-gradient(circle at 50% 60%, rgba(179, 18, 31, 0.28), var(--bg-deep) 70%);
+  box-shadow: 0 0 0 1px rgba(179, 18, 31, 0.5), 0 0 14px rgba(200, 20, 35, 0.35);
+}
+
+/* The boss's 48-pixel picture twice as large (three times on a computer),
+   each of its pixels whole. */
+.world-boss-art .sprite {
+  width: 96px;
+  height: 96px;
+}
+
+.world-boss-who {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.world-boss-name {
+  color: var(--champion-gold);
+  font-family: var(--font-world);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.world-boss-meta {
+  color: #e8414d;
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.world-boss-description {
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.world-boss-hp .meter-label {
+  font-size: 12px;
+}
+
+.world-boss-hp .meter-value {
+  overflow-wrap: anywhere;
+}
+
+.world-boss-hp .meter-track,
+.world-boss-hp .meter-fill {
+  height: 14px;
+}
+
+.world-boss-attacks {
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.world-boss-attack {
+  width: 100%;
+}
+
+.world-boss-fallen {
+  color: var(--accent);
+}
+
+.world-boss-own {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 10px;
+  border: 1px solid var(--bark-line);
+  border-radius: 4px;
+  background: var(--bg-deep);
+  font-size: 15px;
+}
+
+.world-boss-own-damage {
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.world-boss-title-worn,
+.world-boss-chest-extra {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: var(--gold);
+}
+
+.world-boss-title-worn svg,
+.world-boss-chest-extra svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.world-boss-chest--small {
+  border-color: var(--bark-line);
+}
+
+.world-boss-chest--medium {
+  border-color: #5f86b0;
+}
+
+.world-boss-chest--large {
+  border-color: #a986e8;
+}
+
+.world-boss-chest--huge {
+  border-color: var(--champion-gold);
+  box-shadow: 0 0 10px rgba(247, 211, 106, 0.25);
+}
+
+.world-boss-chest-head {
+  font-weight: 700;
+}
+
+.world-boss-row .guild-beast-row-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.world-boss-place {
+  flex: none;
+  min-width: 2.2em;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.world-boss-row .chat-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.world-boss-you {
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
+/* A World Boss's title worn for a week (1224 A): in the champion's gold
+   with a trophy, under the name in the profile and small in the Ranking. */
+.profile-boss-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 2px 0 0;
+  color: var(--champion-gold);
+  font-size: 14px;
+}
+
+.ranking-title--boss {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--champion-gold);
+}
+
+.ranking-title--boss > span {
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-title--boss svg {
+  flex: none;
+}
+
+@media (min-width: 900px) {
+  .world-boss-art {
+    width: 152px;
+    height: 152px;
+  }
+
+  .world-boss-art .sprite {
+    width: 144px;
+    height: 144px;
+  }
+
+  .world-boss-attack,
+  .world-boss-chest .button {
+    width: auto;
+    align-self: flex-start;
+    min-width: 220px;
   }
 }

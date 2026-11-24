@@ -455,13 +455,15 @@ export function partyStrength(classLevel, players, content) {
 // keeps its strength without balance.monsters.weaker: the cards of Talia
 // Systemu (the measure of their Atak and Życie) and the skill preview of
 // the author's panel.
+// `monster`: the creature itself, for one that lives in no data of the
+// creatures (a World Boss, world-boss.js); else monstersById's.
 /**
- * @param {{ monsterId: string, level: number, id: string, name?: string, position?: string, side?: string, groupFactor?: number, growth?: number, strength?: number[], classLevel?: number, players?: number, weaken?: boolean }} fighter
+ * @param {{ monsterId: string, monster?: Record<string, any>, level: number, id: string, name?: string, position?: string, side?: string, groupFactor?: number, growth?: number, strength?: number[], classLevel?: number, players?: number, weaken?: boolean }} fighter
  * @param {Content} content
  */
-export function monsterCombatant({ monsterId, level, id, name, position, side = 'enemy', groupFactor = 1, growth = 1, strength = [1, 1], classLevel = 0, players = 1, weaken = true }, content) {
+export function monsterCombatant({ monsterId, monster: own, level, id, name, position, side = 'enemy', groupFactor = 1, growth = 1, strength = [1, 1], classLevel = 0, players = 1, weaken = true }, content) {
   const balance = content.balance;
-  const monster = content.monstersById[monsterId];
+  const monster = own ?? content.monstersById[monsterId];
   /** @param {string} key */
   const stat = (key) => (monster.stats.base[key] ?? 0) + (monster.stats.growth[key] ?? 0) * (level - 1);
   // A monster's natural weapon and hide match the items a character usually

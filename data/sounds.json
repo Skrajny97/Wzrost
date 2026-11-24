@@ -1053,7 +1053,21 @@
     "koschei": {
       "hurt": { "files": ["audio/sfx/koschei-hurt-1.mp3", "audio/sfx/koschei-hurt-2.mp3"], "gain": 0.6 },
       "death": { "files": ["audio/sfx/koschei-death-1.mp3", "audio/sfx/koschei-death-2.mp3"], "gain": 0.7 }
-    }
+    },
+    "wb-pochwist": { "cry": { "files": ["audio/sfx/wb-pochwist-cry-1.mp3"], "gain": 0.7 } },
+    "wb-kotolak": { "cry": { "files": ["audio/sfx/wb-kotolak-cry-1.mp3"], "gain": 0.7 } },
+    "wb-rusalka": { "cry": { "files": ["audio/sfx/wb-rusalka-cry-1.mp3"], "gain": 0.7 } },
+    "wb-zmora": { "cry": { "files": ["audio/sfx/wb-zmora-cry-1.mp3"], "gain": 0.7 } },
+    "wb-triglav-steed": { "cry": { "files": ["audio/sfx/wb-triglav-steed-cry-1.mp3"], "gain": 0.7 } },
+    "wb-stone-baba": { "cry": { "files": ["audio/sfx/wb-stone-baba-cry-1.mp3"], "gain": 0.7 } },
+    "wb-borowy": { "cry": { "files": ["audio/sfx/wb-borowy-cry-1.mp3"], "gain": 0.7 } },
+    "wb-wapierz": { "cry": { "files": ["audio/sfx/wb-wapierz-cry-1.mp3"], "gain": 0.7 } },
+    "wb-czart": { "cry": { "files": ["audio/sfx/wb-czart-cry-1.mp3"], "gain": 0.7 } },
+    "wb-dziwozona": { "cry": { "files": ["audio/sfx/wb-dziwozona-cry-1.mp3"], "gain": 0.7 } },
+    "wb-boruta": { "cry": { "files": ["audio/sfx/wb-boruta-cry-1.mp3"], "gain": 0.7 } },
+    "wb-gorynych": { "cry": { "files": ["audio/sfx/wb-gorynych-cry-1.mp3"], "gain": 0.7 } },
+    "wb-jaszczur": { "cry": { "files": ["audio/sfx/wb-jaszczur-cry-1.mp3"], "gain": 0.7 } },
+    "wb-czarnobog": { "cry": { "files": ["audio/sfx/wb-czarnobog-cry-1.mp3"], "gain": 0.7 } }
   },
   "effects": {
     "tab": { "files": ["audio/sfx/tab-1.mp3", "audio/sfx/tab-2.mp3"], "gain": 0.5 },

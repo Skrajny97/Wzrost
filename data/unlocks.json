@@ -49,6 +49,12 @@
     "message": "Odblokowano Rzemieślnictwo. Systemowy Warsztat czeka w zakładce Profesje."
   },
   {
+    "id": "world-boss",
+    "name": "Postrach Krainy",
+    "level": 15,
+    "message": "Odblokowano Postrach Krainy. Co tydzień w Twoim przedziale poziomów stoi jeden boss, którego wszyscy gracze biją razem, po 3 ataki dziennie. Znajdziesz go w zakładce Walka."
+  },
+  {
     "id": "mining",
     "name": "Górnictwo",
     "level": 25,
