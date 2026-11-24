@@ -570,10 +570,13 @@ describe('the third forms in fights', () => {
     assert.match(bear.text, /przywołuje: Niedźwiedź, \d+ HP\./);
     // One cast: one payment of mana for both.
     assert.equal(result.events.filter((event) => event.kind === 'summon' && event.state === 'up' && event.t === bison.t).length, 2);
-    // Each with its own HP out of the Arcydruid's mana, 30% more (Serce puszczy).
+    // Each with its own HP out of the Arcydruid's mana, 30% more (Serce
+    // puszczy), and since 24.11.2026 75% of the Arcydruid's maximum HP on
+    // top (`summonLife`, test/druid-summons.test.js).
     const [ownBison, ownBear] = skillParams(content.skillsById['bison-call'], 145, content).pack;
-    assert.equal(bison.summonHp, Math.max(1, Math.round(archdruid.maxMana * ownBison.hp * 1.3)));
-    assert.equal(bear.summonHp, Math.max(1, Math.round(archdruid.maxMana * ownBear.hp * 1.3)));
+    const life = archdruid.maxHp * 0.75;
+    assert.equal(bison.summonHp, Math.max(1, Math.round(archdruid.maxMana * ownBison.hp * 1.3 + life)));
+    assert.equal(bear.summonHp, Math.max(1, Math.round(archdruid.maxMana * ownBear.hp * 1.3 + life)));
     // The bear claws a random foe every move, under its own name.
     assert.ok(result.events.some((event) => event.skill === 'bison-call' && BLOWS.includes(event.kind) && event.summonOrder === 2 && /Niedźwiedź atakuje/.test(event.text)));
     // Without room for both (one summon at a time), it never comes.

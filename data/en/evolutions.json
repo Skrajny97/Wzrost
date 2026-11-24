@@ -183,7 +183,7 @@
       "description": "Instead of pure mana, the Druid draws on the power of the wilds. Trees and beasts come at their call.",
       "trait": {
         "name": "Power of the Wilds",
-        "text": "Max mana +25%, 5% of mana returns every turn, and summons have 30% more HP and deal 30% more damage. Two summons at a time: the Ent and the Bear."
+        "text": "Max mana +25%, 5% of mana returns every turn, and summons have 30% more HP and deal 30% more damage. Two summons at a time: the Ent and the Bear. Each also gets an extra 75% of the character's max HP and draws the enemies' blows onto itself."
       }
     },
     "miracle-worker": {
@@ -320,7 +320,7 @@
       "description": "The oldest trees of the wilds wake at the Archdruid's call.",
       "trait": {
         "name": "Heart of the Wilds",
-        "text": "+40% mana and up to three summons at once: the Ancient Oak, the Bison and the Bear. 5% of mana returns every turn, and summons have 30% more HP and deal 30% more damage."
+        "text": "+40% mana and up to three summons at once: the Ancient Oak, the Bison and the Bear. 5% of mana returns every turn, and summons have 30% more HP and deal 30% more damage. Each summon also gets an extra 75% of the character's max HP and draws the enemies' blows onto itself."
       }
     },
     "saint": {
@@ -460,7 +460,7 @@
       "description": "The oldest of the druids. The forest grows from their wisdom, and its creatures stand by them in battle.",
       "trait": {
         "name": "Roots of the World",
-        "text": "+50% mana and up to four summons at once: two Oaks of Ages, the Bison and the Bear. 6% of mana comes back every turn, and summons have 40% more HP and deal 40% more damage. Every 20 points of Wisdom give the summons another 1% HP and damage."
+        "text": "+50% mana and up to four summons at once: two Oaks of Ages, the Bison and the Bear. 6% of mana comes back every turn, and summons have 40% more HP and deal 40% more damage. Every 20 points of Wisdom give the summons another 1% HP and damage. Each summon also gets an extra 75% of the character's max HP and draws the enemies' blows onto itself."
       }
     },
     "archangel": {
@@ -835,7 +835,7 @@
       "name": "Summon Ent",
       "style": "defence",
       "description": "A tree-being with bark as hard as stone grows out of the ground. It draws the blows to itself and strikes back with its branches.",
-      "effect": "Summons an ent for {turns} of their own turns. The ent stands before the character with HP equal to {hp%} of the character's max mana and takes the enemies' blows. Every turn it lashes a random enemy with its branches for {power%} damage.",
+      "effect": "Summons an ent for {turns} of their own turns. The ent stands before the character with HP equal to {hp%} of the character's max mana and draws the enemies' blows onto itself. Every turn it lashes a random enemy with its branches for {power%} damage.",
       "params": {
         "summonName": "Ent"
       }
@@ -844,7 +844,7 @@
       "name": "Summon Bear",
       "style": "attack",
       "description": "A bear steps out of the thicket and stands between the Druid and the enemies. Whoever comes closer will feel its claws.",
-      "effect": "Summons a bear for {turns} of their own turns. The bear stands before the character with HP equal to {hp%} of the character's max mana and takes the enemies' blows. Every turn it rakes a random enemy with its claws for {power%} damage.",
+      "effect": "Summons a bear for {turns} of their own turns. The bear stands before the character with HP equal to {hp%} of the character's max mana and draws the enemies' blows onto itself. Every turn it rakes a random enemy with its claws for {power%} damage.",
       "params": {
         "summonName": "Bear"
       }
@@ -1045,7 +1045,7 @@
       "name": "Awakening of the Oak",
       "style": "defence",
       "description": "The ground trembles and an ancient oak rises from it. Its roots seize anyone who comes close.",
-      "effect": "Summons an ancient oak for {turns} of their own turns. The oak stands before the character with HP equal to {hp%} of the character's max mana and takes the enemies' blows. Every turn it lashes a random enemy with its branches for {power%} damage and entangles it in roots: the enemy hit slows down by {root%}.",
+      "effect": "Summons an ancient oak for {turns} of their own turns. The oak stands before the character with HP equal to {hp%} of the character's max mana and draws the enemies' blows onto itself. Every turn it lashes a random enemy with its branches for {power%} damage and entangles it in roots: the enemy hit slows down by {root%}.",
       "params": {
         "summonName": "Ancient Oak"
       }
@@ -1054,7 +1054,7 @@
       "name": "Call of the Beasts",
       "style": "attack",
       "description": "At the Archdruid's call a bear and a bison burst out of the wilds together. The bison rams first, then both stand like a wall before the Archdruid.",
-      "effect": "Summons a bison and a bear at once for {turns|turn|turns|turns}. Both stand before the character and take the enemies' blows. The bison has HP equal to {hp1%} of the character's max mana. It charges the enemy in front at once for {charge1%} damage and stuns it for its next turn, then gores a random enemy every turn for {power1%} damage. The bear has HP equal to {hp2%} of the character's max mana and rakes a random enemy with its claws every turn for {power2%} damage.",
+      "effect": "Summons a bison and a bear at once for {turns|turn|turns|turns}. Both stand before the character and draw the enemies' blows onto themselves. The bison has HP equal to {hp1%} of the character's max mana. It charges the enemy in front at once for {charge1%} damage and stuns it for its next turn, then gores a random enemy every turn for {power1%} damage. The bear has HP equal to {hp2%} of the character's max mana and rakes a random enemy with its claws every turn for {power2%} damage.",
       "params": {
         "pack": [
           {
@@ -1273,7 +1273,7 @@
       "name": "Grove of Ages",
       "style": "defence",
       "description": "Two oaks older than human memory rise from the ground. In their shade wounds close by themselves.",
-      "effect": "Summons two Oaks of Ages at once for {turns|turn|turns|turns}. Each stands in front of the character with HP equal to {hp%} of its max mana and takes the enemies’ blows. Every turn each lashes a random enemy with its branches for {power%} damage and binds it with roots: the one struck slows by {root%}. While at least one stands, every turn the party heals by {partyHeal%.1} of max HP.",
+      "effect": "Summons two Oaks of Ages at once for {turns|turn|turns|turns}. Each stands in front of the character with HP equal to {hp%} of its max mana and draws the enemies’ blows onto itself. Every turn each lashes a random enemy with its branches for {power%} damage and binds it with roots: the one struck slows by {root%}. While at least one stands, every turn the party heals by {partyHeal%.1} of max HP.",
       "params": {
         "pack": [
           {
@@ -1289,7 +1289,7 @@
       "name": "Ancient Herd",
       "style": "attack",
       "description": "At the Elder Druid's call a bison and a bear burst out of the ancient wilds together. The bison rams first, then both stand like a wall before the Elder Druid.",
-      "effect": "Summons a bison and a bear at once for {turns|turn|turns|turns}. Both stand before the character and take the enemies' blows. The bison has HP equal to {hp1%} of the character's max mana. It charges the enemy in front at once for {charge1%} damage and stuns it for its next turn, then gores a random enemy every turn for {power1%} damage. The bear has HP equal to {hp2%} of the character's max mana and rakes a random enemy with its claws every turn for {power2%} damage.",
+      "effect": "Summons a bison and a bear at once for {turns|turn|turns|turns}. Both stand before the character and draw the enemies' blows onto themselves. The bison has HP equal to {hp1%} of the character's max mana. It charges the enemy in front at once for {charge1%} damage and stuns it for its next turn, then gores a random enemy every turn for {power1%} damage. The bear has HP equal to {hp2%} of the character's max mana and rakes a random enemy with its claws every turn for {power2%} damage.",
       "params": {
         "pack": [
           {

@@ -3484,7 +3484,7 @@ Przy przeglądzie klas wyszło, że na Arenie na 100. poziomie Wielki Inkwizytor
 1. **Jak:** forma może mieć w `data/evolutions.json` własny mnożnik obrażeń w pojedynkach (`duelPower`) i HP (`duelHp`). Działa tylko w pojedynkach graczy, na Arenie i w wojnach gildii (`duelist` w `src/engine/pvp-arena.js`), i tylko dla tej formy, bez jej trzeciej formy. Wyprawy, wieże, Labirynt i walki z potworami się nie zmieniają.
 2. **Liczby** (`tools/pvp-arena-sim.mjs --levels 100 --paths all`, opcja `--power` do prób):
    - Wielki Inkwizytor: obrażenia ×2, z 1% na 31% wygranych.
-   - Druid: obrażenia ×1,9, z 9% na 36%.
+   - Druid: obrażenia ×1,9, z 9% na 36%. *Od 24.11.2026 siła Druida w pojedynkach jest w ciosach jego przywołańców (`duelSummonPower`), a jego własne ciosy liczą się jak u innych: zob. „Druid: przywołańce na wyprawach i na Arenie”, punkty 10–16.*
    - Widmo: obrażenia ×1,2, z 28% na 33%. Bez tego, po wzmocnieniu Inkwizytora i Druida, spadłoby do 21%.
    - Władca Piorunów: obrażenia ×0,9, z 78% na 66%.
    - Mistrz Łowów: obrażenia ×0,9, z 75–77% na 68%.
@@ -3768,7 +3768,7 @@ Najpierw Tier X przedmiotów (potrzebny najlepszej postaci za około dwa tygodni
     - **Dar widzenia** daje na start pancerz i odporności +45% i obrażenia +22% (w propozycji +30% i +16%).
     - **Władca Nawii** podnosi każdego zabitego wroga, nie tylko zabitego trucizną, jak mówi opis, z własnymi słowami („wstaje jako upiór Nawii”).
     - **Tarcza tytana** trwa 4 ruchy; **Odwrócenie losu** działa poniżej 40% HP.
-    - Siła w pojedynkach (`duelPower`, `duelHp` w `data/evolutions.json`, tylko Arena) dla 14 form (bez Niebiańskiego Łucznika); Tytan, tarcza drużyny, w pojedynku jeden na jednego bije mało (2,3 siły i 1,9 HP). *Pradruid od 24.11.2026 ×0,8 zamiast ×0,9: zob. „Druid: przywołańce na wyprawach i na Arenie”.*
+    - Siła w pojedynkach (`duelPower`, `duelHp` w `data/evolutions.json`, tylko Arena) dla 14 form (bez Niebiańskiego Łucznika); Tytan, tarcza drużyny, w pojedynku jeden na jednego bije mało (2,3 siły i 1,9 HP). *Pradruid od 24.11.2026 ×0,8 zamiast ×0,9, a tego samego dnia cała linia Druida dostała siłę w pojedynkach w ciosach przywołańców (`duelSummonPower`) zamiast `duelPower`: zob. „Druid: przywołańce na wyprawach i na Arenie”.*
     - Trzeci obrót Huraganu chwały ma własne słowa („trzeci obrót”), a oślepienie z Ognia niebios nie powtarza komunikatu, gdy Słup światła oślepił już tym samym ciosem.
     - „Kula piorunów” Gromowładnego ma tę samą nazwę co umiejętność Władcy Piorunów, drugiej formy z tej samej linii: wraca mocniejsza, więc nazwa zostaje, jak w 1095 (w danych to dwie umiejętności z osobnymi id, a słowa w walce mają osobny klucz `stanceBallLightning`).
 8. Do zrobienia z grafiką: kilku przywołańców jednej umiejętności (dwaj rycerze Legionu Nawii, kolejne Dęby wieków, upiory Nawii) walka pokazuje dziś jako jedną kartę; upiór Nawii ma wygląd szkieletu. Upiór Nawii ma już postać stwora Upiór (szary upiór z czerwonymi oczami z gry) zamiast szkieletu (18.11.2026); kilku przywołańców jednej umiejętności pokażą animacje umiejętności Pradruida i Króla Nawii.
@@ -4353,6 +4353,10 @@ Gracz (poz. 99) przez autora: „Kosmetyczna uwaga. Jak w rankingu ktoś ma nada
 
 Autor zapytał informacyjnie o grę podobną do Stardew Valley, a potem do Coral Island, osadzoną w świecie Insight, skupioną na walce, z profesjami, robioną na boku po trochu jako osobny projekt, w grafice innej niż pixel art. Rozpoznanie (silnik, grafika 3D z AI, budżet telefonu, co skopiować z Insight, plan 10 etapów, nakład i ryzyka) jest w `docs/plans/gra-3d-w-stylu-coral-island.md`. Autor: „Na razie zapisujemy ten plan na przyszłość”. Nic się nie zaczyna, dopóki autor sam tego nie powie; decyzje S1–S3 z końca planu czekają na start.
 
+## Wersja 0.5.11 (24.11.2026): przywołańce Druida ściągają ciosy wrogów
+
+Zob. „Druid: przywołańce na wyprawach i na Arenie (24.11.2026)”, punkty 10–16: przywołańce Druida, Arcydruida i Pradruida ściągają na siebie ciosy wrogów (także rywala na Arenie i w wojnach gildii), mają dodatkowo 75% maks. HP postaci i stoją ruch dłużej, a siła linii w pojedynkach przeszła z własnych ciosów Druida na przywołańce (bez `duelPower`, z `duelSummonPower`). Przy okazji teksty z liczbą ruchów („przez {turns} swoje ruchy”, „przez {turns} ruchy” w dzienniku walki) odmieniają się teraz według liczby: „1 swój ruch”, „3 swoje ruchy”, „5 swoich ruchów” (`{turns|swój ruch|swoje ruchy|swoich ruchów}`, `counted` w `src/engine/text.js`), bo przy 5 ruchach przywołań wychodziło „na 5 swoje ruchy”. Angielski bez zmian.
+
 ## Wersja 0.5.8 (24.11.2026): Druid na wyprawach i Pradruid na Arenie
 
 Według sekcji niżej. Autor: „Druid jest za silny na Arenie a za słaby na wyprawach coś z tym musimy zrobić”. Pomiary pokazały, że na Arenie najsilniejszy z tej linii jest Pradruid, a sam Druid jest najsłabszą drugą formą, więc osłabiony jest Pradruid (punkt 7).
@@ -4403,7 +4407,7 @@ Autor: „Druid jest za silny na Arenie a za słaby na wyprawach coś z tym musi
    - Druid na 85. poziomie, zaraz po ewolucji, ma jeszcze −7% (Wielki Inkwizytor i Nekromanta −4%, 2,1–2,5% omdleń).
    - Pradruid bez zmian: 5,0%, 1,7% i 12,5% omdleń na 280., 300. i 330. poziomie (średnia głównych ścieżek 5,5%, 8,2% i 9,2%).
    - Sama postać, wyprawy 1 h: Druid na 100. poziomie 90,0% → 16,7% omdleń (średnia głównych 18,8%), na 150. 100% → 49,2% (średnia 25,2%, Arcymag Żywiołów 75,8%, Pan Zimy 90%), Arcydruid na 200. 70,8% → 0,8% (średnia 33,0%).
-7. **Arena: słabszy Pradruid, Druid i Arcydruid bez zmian.** Autor chciał linii Druida słabszej na Arenie, a najsilniejszą jej formą jest tam Pradruid (najwięcej wygranych z czwartych form), podczas gdy sam Druid jest najsłabszą drugą formą. Dlatego maleje siła Pradruida w pojedynkach graczy, tą samą dźwignią co w 992 A (`duelPower` w `data/evolutions.json`, tylko Arena i wojny gildii): ×0,8 zamiast ×0,9. Mnoży ona jego ciosy i ciosy jego przywołańców, które biją z jego siłą. Wyprawy, Wieże, Labirynt i walki ze stworami się nie zmieniają.
+7. **Arena: słabszy Pradruid, Druid i Arcydruid bez zmian.** Autor chciał linii Druida słabszej na Arenie, a najsilniejszą jej formą jest tam Pradruid (najwięcej wygranych z czwartych form), podczas gdy sam Druid jest najsłabszą drugą formą. Dlatego maleje siła Pradruida w pojedynkach graczy, tą samą dźwignią co w 992 A (`duelPower` w `data/evolutions.json`, tylko Arena i wojny gildii): ×0,8 zamiast ×0,9. Mnoży ona jego ciosy i ciosy jego przywołańców, które biją z jego siłą. Wyprawy, Wieże, Labirynt i walki ze stworami się nie zmieniają. *Tego samego dnia `duelPower` trzech form Druida zastąpiła siła samych ciosów przywołańców (`duelSummonPower`, punkt 11): Pradruid ×0,42 na przywołańce, a jego własne ciosy jak poza pojedynkiem.*
 
    | Poziom postaci (klasy) | Pradruid na Arenie przed → po | Miejsce wśród 15 czwartych form |
    |---|---|---|
@@ -4417,9 +4421,96 @@ Autor: „Druid jest za silny na Arenie a za słaby na wyprawach coś z tym musi
 
    - Na poziomach 280–350 najwięcej wygrywa teraz średnio Niebiański Łucznik (60,7%) i Pan Zwierząt (59,6%). Na samym 300. poziomie Pradruid dalej wygrywa najwięcej (65,1%, następny Tytan 59,4%), ale wyraźnie w przedziale. Pozostałe czwarte formy wygrywają po 0–1,4 punktu więcej (rzadziej przegrywają z Pradruidem), od 34,0% (Mściciel Niebios) do 60,7%.
    - W ustawieniu testu czwartych form (krzywa poziomów, z którą je strojono, 260. i 300. poziom, jedno ziarno): 57,8% → 52,6% i 70,8% → 68,2%, w przedziale testu 25–75%.
-   - Druid (38,0%) i Arcydruid (53,5%) w pojedynkach bez zmian, co do pojedynku tak samo jak przed zmianą ceny przywołań. Gdyby autor chciał osłabić także samego Druida: `duelPower` 1,9 → 1,8 daje średnio 33,0% (30,7%, 32,7%, 32,8%, 41,5%, 18,5%, 41,8% i 33,1% na poziomach z punktu 3), wyraźnie najsłabsza druga forma; Druid z Mądrością: połowa punktów 44,2% → 37,9%, wszystkie 51,6% → 45,2%. 1,85 daje 35,7%, 1,75 daje 30,7%.
+   - Druid (38,0%) i Arcydruid (53,5%) w pojedynkach bez zmian, co do pojedynku tak samo jak przed zmianą ceny przywołań. Gdyby autor chciał osłabić także samego Druida: `duelPower` 1,9 → 1,8 daje średnio 33,0% (30,7%, 32,7%, 32,8%, 41,5%, 18,5%, 41,8% i 33,1% na poziomach z punktu 3), wyraźnie najsłabsza druga forma; Druid z Mądrością: połowa punktów 44,2% → 37,9%, wszystkie 51,6% → 45,2%. 1,85 daje 35,7%, 1,75 daje 30,7%. *Tego samego dnia po słowach graczy siła Druida w pojedynkach przeszła do przywołańców, a Druid wygrywa średnio 49,1%: punkty 10–16.*
 8. **Testy:** nowy `test/druid-summons.test.js`: każdy przywołaniec form Druida kosztuje w danych 0,125 (pojedyncze 0,125, paczki dwóch 0,25), na wyprawie 25% maks. many, w pojedynku 12,5%; karty po polsku i po angielsku; Druid z połową many ma naraz Enta i Niedźwiedzia, a przy dawnej cenie tylko jednego; Druid na 100. i Arcydruid na 200. poziomie mdleją najwyżej na 3 ze 120 wypraw i mają co najmniej 95% XP na godzinę średniej głównych ścieżek (przed zmianą 12 i 6 omdleń, −23% i −15%); pojedynki Druida i Arcydruida z każdą klasą na 100., 150., 200. i 250. poziomie wychodzą co do ruchu tak samo jak przy dawnej cenie; Pradruid bije w pojedynku z siłą ×0,8 (ciosy i przywołańce), z tym samym HP, a Druid i Arcydruid mają dalej ×1,9 i ×1,3. Testy drugiej, trzeciej i czwartej formy (wyprawy i Arena, w tym czwarte formy na Arenie na 260. i 300. poziomie w przedziale 25–75%) przechodzą bez zmian.
 9. **Pliki:** `data/evolutions.json` (`manaShare` trzech umiejętności, `duelPower` Pradruida), `data/schemas/evolutions.schema.json` (opis `manaShare`), `test/druid-summons.test.js`.
+
+### Przywołańce ściągają ciosy, a siła Druida w pojedynkach jest w przywołańcach (24.11.2026, po 0.5.8)
+
+Gracze przez autora, po 0.5.8: Druid na poziomach postaci ok. 85–100 zabija na Arenie gracza tego samego poziomu jednym, dwoma ciosami. Gracz z bronią 300–500 obrażeń i ok. 2100 Intelektu widział w statystykach uczestników u Druida ze słabszą bronią zwykły atak 1500–2300 („jeden kryt i po walce”). Druidzi od 150. poziomu: przywołańce padają od jednego ciosu, sam Druid (bez osłony) od jednego krytyka, a w Wieży Solo wchodzą nisko. Autor: „Ogólnie Druid powinien czerpać siłę z przywołańców, niech oni jakoś ściągają aggro i w ogóle niech się wyróżniają.”
+
+10. **Co pokazał pomiar przed zmianą** (narzędzia z punktu 1, do tego walki z elitą i czempionem, Wieża Solo, wojny gildii i największe ciosy w pojedynkach; tabele w punkcie 13):
+    - Statystyki uczestników na Arenie pokazują zwykły atak z siłą formy w pojedynkach (992 A). Druid miał ×1,9 na wszystkie swoje ciosy, więc przy tym samym kosturze i Intelekcie co Arcymag pokazywał prawie dwa razy więcej: na 100. poziomie 982–1384 wobec 522–735, na 130. 1739–2328 wobec 924–1237. Te liczby widzieli gracze.
+    - W walce Druid nie kończył pojedynku jednym ciosem: jego największy cios na poziomach 85–130 zabierał 26–46% HP rywala (pojedynek daje każdemu kilka razy więcej HP), a najmniej ruchów do zabicia było 3. Największe ciosy innych form tych poziomów sięgały 90–107% (Berserker, Wielki Inkwizytor, Królobójca, Arcymag). Druid wygrywał średnio 37,6% pojedynków, 14. z 15 drugich form. Wrażenie dawały liczby w tabeli i trzy ciosy w jednym ruchu Druida: jego własny i dwóch przywołańców, wszystkie ×1,9.
+    - Przywołańce miały HP tylko z many. Druid sam na sam z elitą albo czempionem (jak w Wieży Solo): na 250. poziomie średni cios elity zabierał przywołańcowi Arcydruida 127% HP, a co trzeci przywołaniec padał od pierwszego ciosu; na 300. poziomie cios czempiona zabierał przywołańcowi Pradruida 99% HP.
+    - Wieża Solo: Druid na 130. i 150. poziomie dochodził do 64. i 69. piętra, a najlepsze ścieżki do 144.–154.
+11. **Zmiany.**
+    - **Przywołańce ściągają ciosy wrogów** (`lure` w cechach Moc puszczy, Serce puszczy i Korzenie świata). Póki stoi choć jeden przywołaniec Druida, stwory, a w pojedynkach i wojnach gildii gracze i ich przywołańce, wybierają cel tylko spośród takich Druidów, a cios w Druida przyjmuje przywołaniec stojący z przodu, jak dotąd (`lured` w `src/engine/combat.js`, obok Wyzwania). Cel losuje się tak samo, tylko z krótszej listy, więc walka, w której Druid i tak jest jedynym celem (sam na sam, Wieża Solo, pojedynek), idzie jak dotąd. Wyzwanie i inne prowokacje mają pierwszeństwo, a umiejętności z własnym celem (najsłabszy wróg, ten z tyłu, ten z największym HP) i ciosy w wielu celują jak dotąd. Brakujący szczegół: przywołaniec rywala (np. szkielet Nekromanty) też idzie na Druida.
+    - **Wytrzymałe przywołańce** (`summonLife` 0,75): każdy przywołaniec Druida, Arcydruida i Pradruida ma oprócz HP z many 75% maks. HP postaci, więc rośnie też z poziomem klasy i Witalnością. Premie cech (+30%, +40% i Mądrość Pradruida) liczą się jak dotąd tylko do części z many. Brakujący szczegół: w pojedynku 75% HP sprzed mnożnika pojedynku (`baseMaxHp`), więc przywołaniec wytrzymuje tam mniej więcej tyle ciosów co na wyprawie.
+    - **Dłużej stoją:** Przywołanie enta, Przywołanie niedźwiedzia i Zew zwierząt 5 ruchów zamiast 4, a Pradawne stado, rozwinięte z Zewu zwierząt, 6 zamiast 5, jak Gaj wieków. Odnowienie bez zmian (10 ruchów), więc każdy przywołaniec stoi przez połowę walki, a nie przez 40%.
+    - **Pojedynki: własne ciosy jak u innych, siła w przywołańcach.** Druid, Arcydruid i Pradruid nie mają już siły w pojedynkach (`duelPower` 1,9, 1,3 i 0,8): ich własne ciosy są w pojedynkach takie jak poza nimi, a statystyki uczestników pokazują atak, który mają w walce (Druid na 100. poziomie 517–728, Arcymag 522–735). Siła w pojedynkach jest w ciosach przywołańców (`duelSummonPower` w `data/evolutions.json`, tylko Arena i wojny gildii): Druid ×1,35, Arcydruid ×0,8, Pradruid ×0,42. Wyprawy, Wieże, Labirynt i walki ze stworami tego mnożnika nie mają.
+    - **Odtwarzanie walki:** gdy przywołaniec przychodzi, każdy wróg odwraca się do jego karty (czerwony „!” nad wrogiem), a od każdego wroga do przywołańca biegnie czerwona linia, jak przy Wyzwaniu Strażnika (`lure` w `src/client/skill-fx.js`, bez nowej grafiki). Paczka (Zew zwierząt, Gaj wieków, Pradawne stado) pokazuje to raz, przy pierwszym przywołańcu. W przebiegu walki: „Druidka przywołuje: Ent, 5009 HP. Ent ściąga na siebie ciosy wrogów.” Sprawdzone w przeglądarce: walka wyprawy Druidki z dwoma towarzyszami na telefonie (390 px) i pojedynek Arcydruida na komputerze (1366 px), bez błędów strony.
+    - **Teksty** (po polsku i po angielsku): cechy kończą się zdaniem „Każdy [przywołaniec] ma dodatkowo 75% maks. HP postaci i ściąga na siebie ciosy wrogów.” („Each [summon] also gets an extra 75% of the character's max HP and draws the enemies' blows onto itself.”), a umiejętności przywołań mówią „…i ściąga na siebie ciosy wrogów” zamiast „…i przyjmuje ciosy wrogów”. Liczba ruchów bierze się z danych; Przywołanie enta i Przywołanie niedźwiedzia odmieniają ją teraz jak pozostałe przywołania („na 5 swoich ruchów”, a nie „na 5 swoje ruchy”).
+    - `tools/pvp-arena-sim.mjs --power` przyjmuje trzecią liczbę, siłę ciosów przywołańców w pojedynkach (np. `druid:1:1:1.35`).
+    - Bez zmian: HP przywołańców z many i premie cech, siła ich ciosów poza pojedynkami, koszty i odnowienia, Arkanista, inne klasy.
+12. **Jak teraz walczy Druid.** Druid przyzywa Enta i Niedźwiedzia (Arcydruid Prastary dąb, Żubra i Niedźwiedzia, Pradruid dwa Dęby wieków, Żubra i Niedźwiedzia). Póki stoją, wrogowie biją w nie, a nie w Druida ani w jego towarzyszy. Każdy przywołaniec ma HP z many i do tego 75% HP Druida, więc wytrzymuje kilka ciosów elity albo czempiona. To przywołańce zadają większość obrażeń (na wyprawach 83–88%, w pojedynkach 66–73%), a sam Druid bije jak każdy mag tego poziomu, także na Arenie.
+13. **Pomiary przed → po** (przed: 0.5.8; po: ta zmiana).
+    - **Arena** (`tools/pvp-arena-sim.mjs`, `measure`, wszystkie ścieżki, 4 ziarna; odsetek wygranych z innymi klasami i miejsce wśród 15 form):
+
+      | Forma | Poziomy postaci: przed → po (miejsce) | Średnio | Pozostałe formy po (średnio) |
+      |---|---|---|---|
+      | Druid | 85: 35,2% → 54,8% (13. → 6.); 90: 37,1% → 47,1% (13. → 8.); 100: 37,3% → 56,0% (13. → 5.); 115: 37,8% → 51,7% (14. → 6.); 130: 46,2% → 57,6% (9. → 5.); 145: 24,5% → 32,4% (15. → 14.); 160: 45,1% → 52,1% (9. → 7.); 170: 37,9% → 41,0% (14. → 12.) | 37,6% → 49,1% (14. → 8.) | 34,8% (Wielki Inkwizytor) – 67,0% (Władca Piorunów), mediana 49,1% |
+      | Arcydruid | 180: 55,5% → 48,4%; 200: 51,4% → 51,1%; 230: 50,0% → 51,3%; 250: 46,2% → 43,7%; 275: 57,4% → 57,2% | 52,1% → 50,3% (8. → 8.) | 32,5% (Pogromca Demonów) – 66,0% (Kolos), mediana 50,3% |
+      | Pradruid | 280: 49,9% → 49,2%; 290: 60,2% → 54,4%; 300: 65,1% → 62,3%; 315: 56,1% → 58,6%; 330: 59,6% → 58,9%; 350: 60,4% → 56,1% | 58,5% → 56,6% (3. → 4.) | 34,1% (Mściciel Niebios) – 61,8% (Niebiański Łucznik), mediana 51,2% |
+
+    - **Największy cios i ruchy do zabicia w pojedynkach** (każda ścieżka innych klas, 8 losowań wyposażenia, jako atakujący i jako obrońca, 2 ziarna; „Intelekt” i „Mądrość”: wszystkie wolne punkty w tej statystyce; największy cios jako część HP rywala w pojedynku; „ruchy”: ruchy formy do zabicia rywala):
+
+      | Poziom | Forma | Największy cios: realistyczna; Intelekt; Mądrość | Najmniej ruchów do zabicia: realistyczna; Intelekt; Mądrość | Mediana ruchów | Wygrane: realistyczna; Intelekt; Mądrość | Inne formy po: największy cios (mediana, najwięcej); mediana ruchów |
+      |---|---|---|---|---|---|---|
+      | 85 | Druid | 33% → 25%; 35% → 25%; 35% → 25% | 5 → 4; 6 → 5; 3 → 4 | 14 → 12 | 38% → 58%; 17% → 27%; 59% → 38% | 48%, 95%; 10 |
+      | 90 | Druid | 34% → 25%; 40% → 26%; 32% → 22% | 5 → 4; 3 → 5; 3 → 4 | 12 → 12 | 39% → 47%; 20% → 17%; 48% → 26% | 45%, 106%; 10 |
+      | 100 | Druid | 32% → 21%; 33% → 22%; 26% → 20% | 5 → 5; 5 → 5; 4 → 5 | 12 → 13 | 40% → 53%; 20% → 23%; 45% → 29% | 40%, 90%; 13 |
+      | 115 | Druid | 34% → 24%; 38% → 27%; 32% → 22% | 5 → 5; 4 → 5; 3 → 5 | 13 → 13 | 38% → 54%; 19% → 29%; 54% → 30% | 45%, 94%; 12 |
+      | 130 | Druid | 37% → 29%; 41% → 28%; 36% → 25% | 4 → 5; 4 → 4; 3 → 4 | 11 → 13 | 48% → 55%; 28% → 29%; 63% → 40% | 53%, 107%; 10 |
+      | 170 | Druid | 37% → 28%; 46% → 30%; 41% → 29% | 3 → 4; 3 → 4; 3 → 4 | 10 → 10 | 37% → 42%; 26% → 21%; 54% → 32% | 54%, 132%; 10 |
+      | 200 | Arcydruid | 25% → 19%; 32% → 20%; 22% → 13% | 4 → 5; 4 → 6; 4 → 6 | 12 → 14 | 53% → 51%; 43% → 30%; 48% → 29% | 41%, 102%; 10 |
+      | 250 | Arcydruid | 26% → 15%; 31% → 19%; 22% → 15% | 4 → 5; 4 → 6; 3 → 5 | 10 → 15 | 46% → 41%; 38% → 29%; 46% → 27% | 43%, 120%; 10 |
+      | 300 | Pradruid | 16% → 9%; 17% → 9%; 25% → 13% | 4 → 6; 4 → 7; 3 → 5 | 15 → 19 | 64% → 62%; 49% → 46%; 79% → 69% | 66%, 163%; 11 |
+
+      Druid nie ma już największych ciosów wyraźnie ponad innymi (miał je tylko w tabeli), a jego najszybsze zabicie trwa 4–5 ruchów. Druid z wszystkimi punktami w Mądrości albo Intelekcie wygrywa teraz mniej niż z „Rozdaj według klasy” (punkt 14).
+    - **Przywołańce wobec elity i czempiona najnowszego miejsca** (pełne HP, jak na wyprawie: `measureRare` z `tools/difficulty-sim.mjs`, 48 walk; sama postać, jak w Wieży Solo):
+
+      | Poziom | Forma | Stwór | Wygrane | Średni cios stwora w przywołańca (część jego HP) | Przywołańce padłe od 1. ciosu | Ciosów przyjętych na przywołańca |
+      |---|---|---|---|---|---|---|
+      | 100 | Druid | elita (Kikimora) | 10% → 54% | 53% → 20% | 0% → 0% | 2,1 → 2,4 |
+      | 100 | Druid | czempion (Król Błót) | 10% → 56% | 40% → 15% | 0% → 0% | 2,1 → 2,3 |
+      | 170 | Druid | elita (Słowik Rozbójnik) | 38% → 79% | 53% → 22% | 1% → 0% | 1,9 → 2,2 |
+      | 250 | Arcydruid | elita (Kukułka) | 6% → 25% | 127% → 56% | 31% → 0% | 0,5 → 0,7 |
+      | 250 | Arcydruid | czempion (Pan Twardowski) | 0% → 4% | 103% → 46% | 13% → 0% | 0,4 → 0,7 |
+      | 300 | Pradruid | elita (Indryk) | 96% → 98% | 76% → 38% | 2% → 0% | 0,4 → 0,4 |
+      | 300 | Pradruid | czempion (Nyja) | 63% → 73% | 99% → 49% | 20% → 0% | 0,5 → 0,5 |
+
+      Pozostałe główne ścieżki sam na sam: na 100. poziomie 0–75%, na 170. 2–96%, na 250. 0%, na 300. 0–77% z elitą i 0–2% z czempionem. Z towarzyszami forma Druida wygrywa 98–100% tych walk (przed zmianą 92–100%), pozostałe główne ścieżki 38–100%; przywołańce przyjmują teraz ciosy, które szły w towarzyszy (na 100. poziomie 1,1–1,5 ciosu na przywołańca zamiast 0,3).
+    - **Wyprawy** (`measureClass` z `tools/class-balance-sim.mjs`, z towarzyszami, 4 h, najnowsze miejsce, 120 wypraw):
+
+      | Forma | Poziom: omdlenia; XP na godzinę wobec średniej głównych ścieżek |
+      |---|---|
+      | Druid | 85: 4,2% → 0%, −7% → +2%; 100: 0,8% → 0%, −3% → +1%; 115: 1,7% → 0%, −3% → −1%; 130: 0% → 0%, 0% → +2%; 145: 0% → 0%, −1% → −1%; 160: 0,8% → 0%, −2% → −1%; 170: 0,8% → 0%, −3% → 0% |
+      | Arcydruid | 180: 0% → 0%, +1% → 0%; 200: 0% → 0%, +8% → +8%; 230: 1,7% → 0,8%, +11% → +19%; 260: 2,5% → 0%, +13% → +48% |
+      | Pradruid | 280: 5,0% → 3,3%, +16% → +46%; 300: 1,7% → 1,7%; 330: 12,5% → 7,5% (średnia głównych ścieżek 4,8%, 7,7% i 8,8% omdleń; na 300. i 330. jej XP na godzinę jest ujemne przez kary za omdlenia, więc bez porównania) |
+
+      Od 230. poziomu XP na godzinę zależy głównie od kar za omdlenia, jak w punkcie 6: na 260. poziomie ścieżki bez omdleń mają +37% do +50% (Arcydruid +48%, Święty +50%), a na 280. Pradruid (+46%) jest w środku czwartych form (od −173% do +145%).
+
+      Sama postać, wyprawy 1 h: Druid na 100. poziomie 16,7% → 1,7% omdleń (średnia głównych 18,8%), na 150. 49,2% → 2,5% (25,2%); Arcydruid na 200. 0,8% → 0% (33,0%), na 250. 74,2% → 36,7% (85,0%); Pradruid na 300. 23,3% → 22,5% (55,3%).
+    - **Wieża Solo** (gracz realistyczny każdej ścieżki, 8 losowań wyposażenia, wspinaczka od piętra o ok. 40 poziomów niższego niż postać; piętro czempiona do 15 wejść, inne do 3; mediana najwyższego wygranego piętra):
+
+      | Poziom postaci | Forma | Do pierwszego nieprzejętego piętra | Pomijając piętra czempionów | Pozostałe 14 ścieżek po (pomijając czempionów): mediana, najwyżej |
+      |---|---|---|---|---|
+      | 100 | Druid | 49 → 49 (wszyscy staną przed czempionem na 50.) | 54 → 56,5 | 54, 64 |
+      | 130 | Druid | 64 → 99 | 64 → 144 (13. → 1. miejsce) | 69, 144 |
+      | 150 | Druid | 69 → 124 | 69 → 144 (10. → 4.) | 136,5, 154 |
+      | 170 | Druid | 124 → 136,5 | 144 → 154 (9. → 1.) | 151,5, 154 |
+      | 200 | Arcydruid | 189 → 194 | 189 → 194 (2. → 2.) | 166,5, 199 |
+      | 250 | Arcydruid | 211,5 → 274 | 276,5 → 289 (1. → 1.) | 189, 209 |
+      | 300 | Pradruid | 484 → 489 | 484 → 489 (1. → 1.) | 306,5, 336,5 |
+
+    - **Wojny gildii 3 na 3** (każda ścieżka z dwiema wylosowanymi przeciw trzem wylosowanym, 400 bitew, `warBattle`): Druid na 100., 130. i 160. poziomie 38,5% → 49,0%, 34,8% → 43,0%, 36,6% → 42,0% (14. → 6.–9. z 15); Arcydruid na 200. i 250. 38,3% → 46,0% i 40,3% → 45,8%; Pradruid na 300. 40,0% → 49,5%. Pozostałe ścieżki 29–84%.
+    - **Udział przywołańców w obrażeniach:** na wyprawach bez zmian (Druid 84–88%, Arcydruid 83%, Pradruid 84%), w pojedynkach Druid 51–59% → 66–69%, Arcydruid 76% → 73%, Pradruid 85% → 69%.
+14. **Do decyzji autora:**
+    - **Pradruid w Wieży Solo** wchodzi dużo wyżej niż inne czwarte formy, także przed tą zmianą: na 300. poziomie do 484.–489. piętra (stwory 533.–538. poziomu), gdy pozostałe czwarte formy do 239.–336,5. Cztery przywołańce przyjmują ciosy wymierzone w niego, dęby oplatają korzeniami (wróg zwalnia), a żubr ogłusza, więc stwór rzadko dochodzi do samego Pradruida. Ta zmiana dodała mu tam 5 pięter. Nie zmieniam tego bez autora.
+    - **Druid z punktami w Mądrości albo Intelekcie** wygrywa teraz mniej pojedynków niż z „Rozdaj według klasy” (wszystko w Mądrość: 26–40% zamiast 45–63% na poziomach 90–170). Jego siła w pojedynkach brała się z ×1,9 i z przywołańców z dużą maną, a teraz przywołańce biorą też 75% HP postaci, które daje Witalność. Prawdopodobnie tacy Druidzi zabijali na Arenie najszybciej. Na wyprawach i w Wieży Solo takie budowy wypadają jak dotąd albo lepiej (Wieża Solo na 150. poziomie: 69. → 106,5.–144. piętro).
+15. **Testy** (`test/druid-summons.test.js`): przy przywołańcu stwory biją tylko w Druida, a przywołaniec przyjmuje cios (bez `lure` bili też w Wojownika z przodu); w walce graczy Nekromanta i jego szkielet biją w przywołańca Druida, nie w Wojownika obok; przyjście przywołańca niesie `lure` i mówi o tym w dzienniku; czasy przywołań 5, 5, 5 i 6 ruchów; 75% maks. HP w każdym przywołańcu (w pojedynku sprzed mnożnika); sam na sam z elitą na 170. i 250. i z czempionem na 250. i 300. poziomie żaden przywołaniec nie pada od pierwszego ciosu, a żaden cios nie zabiera mu więcej niż 80% HP (bez `summonLife` na 250. tak); własne ciosy Druida, Arcydruida i Pradruida w pojedynku takie jak poza nim, tabela Areny pokazuje atak walki, siła w ciosach przywołańców (1,35, 0,8, 0,42); na 90. i 130. poziomie największy cios Druida (też z punktami w samym Intelekcie albo w samej Mądrości) zabiera mniej niż jedną trzecią HP rywala, a zabicie trwa co najmniej 4 ruchy. Testy drugich, trzecich i czwartych form liczą HP przywołańców z `summonLife`; testy Areny form (25–75% na 100., 200., 210–290, 260. i 300. poziomie), wojen gildii, ewolucji towarzyszy i paska many przechodzą.
+16. **Pliki:** `data/evolutions.json` (`lure`, `summonLife`, czasy przywołań, `duelSummonPower` zamiast `duelPower` trzech form, opisy cech i umiejętności), `data/en/evolutions.json`, `data/texts.json` i `data/en/texts.json` (`summonLure`), `data/en/sources.json`, `data/schemas/evolutions.schema.json` (`duelSummonPower`), `src/engine/combat.js` (`lured`, `summonLife`, `summonScale`), `src/engine/pvp-arena.js` (`duelist`: `baseMaxHp`, `summonScale`), `src/client/skill-fx.js` (`lure`, `allEyesOn`), `tools/pvp-arena-sim.mjs` (`--power`), `test/druid-summons.test.js`, `test/second-evolution.test.js`, `test/third-evolution.test.js`, `test/fourth-evolution.test.js`.
 
 ## Wersja 0.4.91 (21.11.2026): Pradawne stado
 
@@ -6121,7 +6212,7 @@ Autor 16.11.2026 do listy zadań: „Ad. 4 Zbalansuj zatem Arenę”, „Ad. 6 Z
 1. **Arena na poziomach Łysogór.** Testy pilnowały balansu pojedynków do 200. poziomu. Wyżej (`tools/pvp-arena-sim.mjs`, średnio na poziomach 200–300, po 2 ziarna) Wojownik wygrywał 71% pojedynków z innymi klasami, Łucznik 38%, a Kleryk 36%. Z trzecich form Arcydruid wygrywał 26% (na niektórych poziomach 17%), Pogromca Demonów 31% (na 275. poziomie 17%), a Władca Puszczy 73% (do 77%).
     - Przyczyna: od 299. poziomu klasy umiejętności trzecich form mają pełną siłę. Miażdżący cios Pogromcy Hord ogłusza wtedy na 2 ruchy z szansą 55%, a główne ścieżki Łucznika, Kleryka i Cienia (Mistrz Łuku, Święty, Bogobójca) wypadają słabo. Bez ogłuszenia Wojownik wygrywałby średnio 51%.
     - Pogromca Hord zostaje bez zmian. Wśród wszystkich form jest pośrodku (55%), a Wojownik wygrywał tak często, bo słabe były główne ścieżki innych klas. Ogłuszenie też zostaje, bo zmiana samej umiejętności zmieniłaby wyprawy (por. 786 v2).
-    - Dźwignia z 992 A, czyli siła formy tylko w pojedynkach graczy (`duelPower` w `data/evolutions.json`; Arena i wojny gildii): Władca Puszczy ×0,9, Arcydruid ×1,3 (od 0.3.93 było ×1,1), Pogromca Demonów ×1,2, Święty ×1,2, Mistrz Łuku ×1,12, Bogobójca ×1,08 i Władca Cieni ×1,05. Pogromca Demonów zostaje jedną z najsłabszych form w pojedynkach (779 A), ale nie spada poniżej 25%.
+    - Dźwignia z 992 A, czyli siła formy tylko w pojedynkach graczy (`duelPower` w `data/evolutions.json`; Arena i wojny gildii): Władca Puszczy ×0,9, Arcydruid ×1,3 (od 0.3.93 było ×1,1), Pogromca Demonów ×1,2, Święty ×1,2, Mistrz Łuku ×1,12, Bogobójca ×1,08 i Władca Cieni ×1,05. Pogromca Demonów zostaje jedną z najsłabszych form w pojedynkach (779 A), ale nie spada poniżej 25%. *Arcydruid od 24.11.2026 bez `duelPower`, z siłą w ciosach przywołańców (`duelSummonPower` 0,8): zob. „Druid: przywołańce na wyprawach i na Arenie”, punkty 10–16.*
     - Mnożnik HP pojedynku: 3,9 na 200. poziomie i 4,15 na 300. (od 0.3.93 było 3,6 i 3,8; `duel.hpCurve` w `data/settlement.json`), bo mocniejsze formy skróciły pojedynki do mediany 16 ruchów. Do 175. poziomu bez zmian.
     - Wynik, średnio na poziomach 200–300: klasy wygrywają 43–65%, a trzecie formy 35–64%. Na 200. poziomie klasy mają 44–56%, formy 34–70%, a pojedynek trwa zwykle 17 ruchów.
     - **Testy:** nowe, uśrednione po poziomach 210, 230, 250, 270 i 290. Na jednym poziomie 8 losowań wyposażenia przesuwa udział formy nawet o 15 punktów. Każda klasa ma wygrywać 30–70%, każda trzecia forma 25–75%, a pojedynek ma trwać 16–40 ruchów (`test/pvp-arena.test.js`, `test/third-evolution.test.js`).

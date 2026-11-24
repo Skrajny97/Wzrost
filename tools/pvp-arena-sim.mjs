@@ -18,7 +18,7 @@
 //   node tools/pvp-arena-sim.mjs --curve 25:1.5,75:2,100:2.75,300:3
 //   node tools/pvp-arena-sim.mjs --levels 25,50,100,200 --seeds 6 --models realistic,low --gap 10
 //   node tools/pvp-arena-sim.mjs --paths all --armor 1
-//   node tools/pvp-arena-sim.mjs --levels 100 --paths all --power druid:1.3,bastion:1:0.8   a form's duelPower (and duelHp) tried
+//   node tools/pvp-arena-sim.mjs --levels 100 --paths all --power bastion:1:0.8,druid:1:1:1.3   a form's duelPower (and duelHp, and duelSummonPower) tried
 
 import { fileURLToPath } from 'node:url';
 import * as engine from '../src/engine/index.js';
@@ -28,14 +28,20 @@ import { GEAR_SETS, playerOf } from './difficulty-sim.mjs';
 const LEVELS = [25, 50, 100, 200, 300];
 
 // The forms' strength in duels tried instead of the data's (`--power
-// grand-inquisitor:1.5,druid:1.3`, evolutions.json duelPower, 992 A).
+// grand-inquisitor:1.5,bastion:1:0.8`, evolutions.json duelPower and duelHp,
+// 992 A; a third number the strength of the form's summons' blows,
+// duelSummonPower, the Druid's line since 24.11.2026: `druid:1:1:1.3`).
 let powers = {};
 
 // The content with the duel's numbers changed for the run.
 function contentWith(duel) {
   const raw = loadData();
   raw.settlement.arena = { ...raw.settlement.arena, duel: { ...raw.settlement.arena.duel, ...duel } };
-  raw.evolutions.evolutions = raw.evolutions.evolutions.map((form) => (form.id in powers ? { ...form, duelPower: powers[form.id][0], duelHp: powers[form.id][1] ?? form.duelHp } : form));
+  raw.evolutions.evolutions = raw.evolutions.evolutions.map((form) => {
+    if (!(form.id in powers)) return form;
+    const [power, hp, summons] = powers[form.id];
+    return { ...form, duelPower: power, duelHp: hp ?? form.duelHp, duelSummonPower: summons ?? form.duelSummonPower };
+  });
   return engine.buildContent(raw);
 }
 

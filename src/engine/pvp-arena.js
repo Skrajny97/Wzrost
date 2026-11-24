@@ -139,10 +139,23 @@ export function duelist({ character, equipped, name }, id, side, { factor, armor
   // The form's own strength in the players' duels (992 A: the second forms
   // the Arena's numbers left outside 25–75% of their duels): its blows'
   // share (evolutions.json `duelPower`) and its HP's (`duelHp`), of that
-  // form alone, not its next forms.
+  // form alone, not its next forms. The Druid's line (24.11.2026) has its
+  // strength in its summons instead (`duelSummonPower`: their blows, on top
+  // of the form's own), so its own blows are as anyone's.
   const form = content.evolutionsById?.[character.evolution];
   const maxHp = Math.max(1, Math.round(unit.maxHp * factor * (form?.duelHp ?? 1)));
-  return { ...unit, maxHp, hp: maxHp, armor: Math.round(unit.armor * armor), reflectShare: armor, damageScale: unit.damageScale * (form?.duelPower ?? 1) };
+  return {
+    ...unit,
+    maxHp,
+    hp: maxHp,
+    // The HP before the duel's factor: the Druid's summons take their share
+    // of it (combat.js, `summonLife`).
+    baseMaxHp: unit.maxHp,
+    armor: Math.round(unit.armor * armor),
+    reflectShare: armor,
+    damageScale: unit.damageScale * (form?.duelPower ?? 1),
+    ...(form?.duelSummonPower && { summonScale: form.duelSummonPower }),
+  };
 }
 
 // A duel of the attacker's character (`attacker`: { character, equipped,

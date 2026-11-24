@@ -770,6 +770,17 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   // Wyzwanie: while it lasts, the foes strike only the one who challenged
   // them.
   const challenger = (/** @type {Unit[]} */ opponents) => opponents.find((/** @type {Unit} */ unit) => unit.stances.some((/** @type {Stance} */ stance) => stance.provoke));
+  // The Druid's line (its trait's `lure`, 24.11.2026; the author: „niech
+  // oni jakoś ściągają aggro”): while one of its summons stands, the foes
+  // and their summons (summonActs) choose among such Druids only, and the
+  // summon in front takes each blow meant for one (summonTakes). The choice
+  // draws as before, so a fight with the Druid as the only target goes as
+  // it did.
+  const lured = (/** @type {Unit[]} */ opponents) => {
+    if (!evolving) return opponents;
+    const drawing = opponents.filter((/** @type {Unit} */ unit) => unit.feat?.lure && unit.summons.length > 0);
+    return drawing.length > 0 ? drawing : opponents;
+  };
 
   // Those standing furthest back: the back row, or the row nearest to it
   // while it is empty. A summon stands before its summoner, so it takes the
@@ -796,7 +807,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     if (dared && dared.hp > 0 && opponents.includes(dared)) return dared;
     const taunt = evolving ? challenger(opponents) : null;
     if (taunt) return taunt;
-    const seen = inSight(opponents);
+    const seen = lured(inSight(opponents));
     if (actor.side === 'ally' || even) return quickestKill(actor, seen);
     // Atak na tył szyku (463: a monster's attack with `target: "back"`):
     // the one standing furthest back, by the same draw among equals.
@@ -1624,7 +1635,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         if (amount > 0) log(() => ({ t, kind: 'heal', actor: actor.id, target: member.id, skill: summon.skill.id, skillName: summon.skill.name, amount, hp: member.hp, quiet: true, text: say(texts, 'regen', actions, { skill: summon.name, target: member.name, amount }) }));
       }
     }
-    const foe = summon.front ? /** @type {Unit} */ (pickTarget(actor, foremost(foes))) : rng.pick(inSight(foes));
+    // A summon goes for a Druid whose summons stand too (`lure`, lured
+    // above), by the same one draw.
+    const foe = summon.front ? /** @type {Unit} */ (pickTarget(actor, foremost(foes))) : rng.pick(lured(inSight(foes)));
     // A wolf, an ent, a bear or a skeleton strikes with its claws, branches
     // or sword: a physical blow, which may miss, the skeleton's with its
     // poison (Wskrzeszenie), the oak's rooting its foe (Przebudzenie dębu).
@@ -1867,7 +1880,16 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         // The Arkanista's line calls its summons out of mana (934 A, 935 A):
         // their HP is a share of the summoner's maximum mana, not its HP.
         const pool = p.hpFrom === 'mana' ? (actor.maxMana ?? 0) : actor.maxHp;
-        const stronger = 1 + (grove?.summonPower ?? 0) + wise;
+        // The Druid's line (24.11.2026): each summon has a share of the
+        // summoner's maximum HP on top (its trait's `summonLife`), so it
+        // grows with the Druid's level and Witalność too, not only with its
+        // mana; in a players' duel the HP before the duel's factor
+        // (`baseMaxHp`, duelist in pvp-arena.js), so a summon takes as many
+        // blows there as anywhere.
+        const life = grove?.summonLife ? (actor.baseMaxHp ?? actor.maxHp) * grove.summonLife : 0;
+        // In a players' duel a form may have its summons' own strength
+        // (evolutions.json duelSummonPower; duelist in pvp-arena.js).
+        const stronger = (1 + (grove?.summonPower ?? 0) + wise) * (actor.summonScale ?? 1);
         // The slime's poison: a share of the summoner's average blow a move.
         const raw = ((actor.weapon.min + actor.weapon.max) / 2) * actor.damageScale;
         // Zew zwierząt and Gaj wieków call a pack at once (`pack`,
@@ -1877,7 +1899,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         // only with room for the whole pack (above).
         const members = p.pack ? p.pack.map((/** @type {Record<string, any>} */ one) => ({ ...p, ...one })) : [p];
         const called = members.map((/** @type {Record<string, any>} */ m, /** @type {number} */ index) => {
-          const hp = Math.max(1, Math.round(pool * m.hp * (1 + (grove?.summonHp ?? 0) + wise)));
+          const hp = Math.max(1, Math.round(pool * m.hp * (1 + (grove?.summonHp ?? 0) + wise) + life));
           const name = m.summonName;
           const order = p.pack ? index + 1 : 0;
           const summon = {
@@ -1921,8 +1943,14 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
             summonHp: hp,
             ...(count > 1 && { count }),
             ...(order > 0 && { order }),
+            // The Druid's line: its summons draw the foes' blows (`lure`,
+            // lured above), which the log says and the playback shows.
+            ...(grove?.lure && { lure: true }),
             hp: actor.hp,
-            text: say(texts, 'summonUp', actions, { ...vars, summon: name, hp }) + (m.howl ? ` ${say(texts, 'summonHowl', actions, { howl: Math.round(m.howl * 100) })}` : ''),
+            text:
+              say(texts, 'summonUp', actions, { ...vars, summon: name, hp }) +
+              (m.howl ? ` ${say(texts, 'summonHowl', actions, { howl: Math.round(m.howl * 100) })}` : '') +
+              (grove?.lure ? ` ${say(texts, 'summonLure', actions, { summon: name })}` : ''),
           }));
           return { summon, m };
         });

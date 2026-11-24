@@ -208,6 +208,7 @@
   "bloodMarked": ["{actor}: {skill}. {target} bleeds, and until the end of the fight critical hits land on it {crit} percentage points more often."],
   "rooted": ["{target} is caught in the roots and slows down."],
   "summonHowl": ["Its howl gives the whole party {howl}% more damage."],
+  "summonLure": ["{summon} draws the enemies' blows onto itself."],
   "chargeHit": ["{summon} charges. {target} loses {damage} HP."],
   "chargeMiss": ["{summon} charges, but {target} leaps aside."],
   "skillShieldRetort": ["Whoever strikes it burns, slows down or loses a turn."],

@@ -413,7 +413,9 @@ describe('the fourth forms in fights', () => {
     assert.deepEqual([first.t, first.order, first.summon, first.figure, second.order, second.summon, second.figure], [second.t, 1, 'Dąb wieków', 'oak', 2, 'Dąb wieków', 'oak']);
     const grove = form('elder-druid', { only: ['oak-of-ages'] });
     const wise = grove.wisdom / 20 / 100;
-    assert.equal(first.summonHp, Math.max(1, Math.round(grove.maxMana * skillParams(content.skillsById['oak-of-ages'], 150, content).hp * (1 + 0.4 + wise))));
+    // Since 24.11.2026 each summon has 75% of the Pradruid's maximum HP on
+    // top (`summonLife`, test/druid-summons.test.js).
+    assert.equal(first.summonHp, Math.max(1, Math.round(grove.maxMana * skillParams(content.skillsById['oak-of-ages'], 150, content).hp * (1 + 0.4 + wise) + grove.maxHp * 0.75)));
     const heals = oak.events.filter((event) => event.skill === 'oak-of-ages' && event.kind === 'heal');
     assert.equal(new Set(heals.map((event) => `${event.t} ${event.target}`)).size, heals.length, 'the grove healed someone twice in one move');
     // Pradawne stado (1221 A): the bison and the bear in one cast, each its
@@ -426,8 +428,8 @@ describe('the fourth forms in fights', () => {
     assert.deepEqual([bear.skill, bear.order, bear.summon, bear.figure], ['ancient-herd', 2, 'Niedźwiedź', 'bear']);
     const [ownBison, ownBear] = skillParams(content.skillsById['ancient-herd'], 150, content).pack;
     const trait = 1 + 0.4 + caller.wisdom / 20 / 100;
-    assert.equal(bison.summonHp, Math.max(1, Math.round(caller.maxMana * ownBison.hp * trait)));
-    assert.equal(bear.summonHp, Math.max(1, Math.round(caller.maxMana * ownBear.hp * trait)));
+    assert.equal(bison.summonHp, Math.max(1, Math.round(caller.maxMana * ownBison.hp * trait + caller.maxHp * 0.75)));
+    assert.equal(bear.summonHp, Math.max(1, Math.round(caller.maxMana * ownBear.hp * trait + caller.maxHp * 0.75)));
     const charge = called.events.findIndex((event) => event.skill === 'ancient-herd' && /Żubr szarżuje/.test(event.text ?? ''));
     assert.ok(charge > 0);
     assert.equal(called.events[charge].summonOrder, 1);
