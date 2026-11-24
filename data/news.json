@@ -1750,6 +1750,11 @@
       "id": "0.5.15",
       "title": "Wersja 0.5.15",
       "body": "- Profesja Rzemieślnictwo nazywa się teraz Rzemiosło."
+    },
+    {
+      "id": "0.5.16",
+      "title": "Wersja 0.5.16",
+      "body": "- Narrator też mówi teraz „Rzemiosło” w rozdziale tej profesji."
     }
   ]
 }

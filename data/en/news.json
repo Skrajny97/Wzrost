@@ -1396,6 +1396,10 @@
     "0.5.15": {
       "title": "Version 0.5.15",
       "body": "- In Polish, the Crafting profession is now called Rzemiosło."
+    },
+    "0.5.16": {
+      "title": "Version 0.5.16",
+      "body": "- In Polish, the narrator now says „Rzemiosło” in the Crafting chapter too."
     }
   }
 }
