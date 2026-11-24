@@ -753,7 +753,7 @@ export function resolveEvent(
   // The character's mana at the end (1220 B), with the rest after a won
   // fight, as on the way (restedMana).
   const manaLeft = manaAfter ?? hunt.manaEnd ?? null;
-  const manaEnd = fight.won === true ? restedMana(manaLeft, ally.maxMana ?? 0, content) : manaLeft;
+  const manaEnd = fight.won === true ? restedMana(manaLeft, ally.maxMana ?? 0, content, area.trait) : manaLeft;
   const told = fill(outcome.text);
   // A won fight gives what its win names besides (ties), and one not won
   // what its `lose` names (a companion's errand settled).

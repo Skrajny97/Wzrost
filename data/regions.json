@@ -1742,5 +1742,182 @@
         "champion": "koschei"
       }
     ]
+  },
+  {
+    "id": "isle-of-buyan",
+    "land": "Drzewo Świata",
+    "name": "Wyspa Bujan",
+    "minLevel": 351,
+    "maxLevel": 375,
+    "safe": false,
+    "soon": true,
+    "description": "Wyspa na środku morza, z której wyrasta Drzewo Świata: dąb tak wielki, że korzeniami sięga Nawii, a koroną nieba. U jego stóp leży biały kamień Ałatyr, który w starych zaklęciach tamuje krew.",
+    "trait": {
+      "name": "Ałatyr",
+      "description": "Krwawienie trwa o jeden ruch krócej, u stworów i u postaci.",
+      "effectTicks": {"bleeding": -1}
+    },
+    "resources": { "wood": 3, "stone": 5, "iron-ore": 2 },
+    "fightBoard": "board-isle-of-buyan",
+    "areas": [
+      {
+        "id": "rocky-cape",
+        "name": "Skalisty Przylądek",
+        "minLevel": 351,
+        "maxLevel": 355,
+        "description": "Szary cypel, o który morze bije od zawsze. Fale rozbijają się tu w pył, a nad skałami widać z daleka koronę Drzewa Świata.",
+        "encounters": []
+      },
+      {
+        "id": "shipwreck-bay",
+        "name": "Zatoka Rozbitków",
+        "minLevel": 356,
+        "maxLevel": 360,
+        "description": "Płytka zatoka pełna wraków. Morze wyrzuca tu statki, które szukały Bujanu, a w ich kadłubach mieszkają stwory z głębin.",
+        "encounters": []
+      },
+      {
+        "id": "sea-caves",
+        "name": "Morskie Groty",
+        "minLevel": 361,
+        "maxLevel": 365,
+        "description": "Groty wymyte przez morze w skałach wyspy. Woda wpływa tu aż pod Drzewo Świata, a w ciemności świecą tylko meduzy.",
+        "encounters": []
+      },
+      {
+        "id": "white-stone",
+        "name": "Biały Kamień",
+        "minLevel": 366,
+        "maxLevel": 370,
+        "description": "Biały kamień Ałatyr, ojciec wszystkich kamieni. Kto zna stare zaklęcie, ten szeptem nad nim zatrzyma każdą krew.",
+        "encounters": []
+      },
+      {
+        "id": "green-oak",
+        "name": "Pod Zielonym Dębem",
+        "minLevel": 371,
+        "maxLevel": 375,
+        "description": "Stopy Drzewa Świata. Korzenie grube jak wały schodzą tu prosto do morza, a między nimi leżą żołędzie wielkie jak beczki.",
+        "encounters": []
+      }
+    ]
+  },
+  {
+    "id": "great-trunk",
+    "land": "Drzewo Świata",
+    "name": "Wielki Pień",
+    "minLevel": 376,
+    "maxLevel": 400,
+    "safe": false,
+    "soon": true,
+    "description": "Pień Drzewa Świata jest tak gruby, że jego kora tworzy urwiska, a po nich spływa żywica i twardnieje w bursztyn. Wspina się tu po hubach wielkich jak tarasy, a dziuple prowadzą w głąb pnia jak jaskinie.",
+    "trait": {
+      "name": "Stromizna",
+      "description": "Odpoczynek między walkami przywraca o 5% mniej HP i many, bo na stromej korze trudno złapać oddech.",
+      "restMalus": 0.05
+    },
+    "resources": { "wood": 6, "stone": 2, "iron-ore": 2 },
+    "fightBoard": "board-great-trunk",
+    "areas": [
+      {
+        "id": "bark-cliffs",
+        "name": "Korowe Urwiska",
+        "minLevel": 376,
+        "maxLevel": 380,
+        "description": "Pionowe ściany kory pocięte szczelinami jak wąwozy. Wspina się po nich długo, a w dole widać już tylko chmury.",
+        "encounters": []
+      },
+      {
+        "id": "fungus-terraces",
+        "name": "Hubowe Tarasy",
+        "minLevel": 381,
+        "maxLevel": 385,
+        "description": "Huby wielkie jak tarasy wyrastają z pnia jedna nad drugą. Na każdej można odpocząć, ale nikt tu nie odpoczywa sam.",
+        "encounters": []
+      },
+      {
+        "id": "honey-hives",
+        "name": "Miodowe Barcie",
+        "minLevel": 386,
+        "maxLevel": 390,
+        "description": "Dawne barcie wydrążone w pniu. Miód spływa z nich po korze, a pszczoły bronią go przed każdym, kto się zbliży.",
+        "encounters": []
+      },
+      {
+        "id": "amber-cascades",
+        "name": "Bursztynowe Kaskady",
+        "minLevel": 391,
+        "maxLevel": 395,
+        "description": "Żywica spływa tu po korze jak wodospad i twardnieje w bursztyn. W słońcu kaskady świecą tak, że trudno na nie patrzeć.",
+        "encounters": []
+      },
+      {
+        "id": "bottomless-hollow",
+        "name": "Bezdenna Dziupla",
+        "minLevel": 396,
+        "maxLevel": 400,
+        "description": "Dziupla, której dna nikt nie widział. Prowadzi w głąb pnia jak jaskinia, a z dołu słychać, jak bije serce Drzewa.",
+        "encounters": []
+      }
+    ]
+  },
+  {
+    "id": "sky-boughs",
+    "land": "Drzewo Świata",
+    "name": "Podniebne Konary",
+    "minLevel": 401,
+    "maxLevel": 425,
+    "safe": false,
+    "soon": true,
+    "description": "Najwyższe konary Drzewa Świata, szerokie jak gościńce, sięgają chmur. Wiatr wieje tu tak, że trudno ustać, a nocą między gałęziami przepływa księżyc.",
+    "trait": {
+      "name": "Wicher",
+      "description": "Każdy na przedzie szyku ma o 5% mniej pancerza, u stworów i u postaci, bo wicher wyrywa tarcze z rąk.",
+      "frontArmorMalus": 0.05
+    },
+    "resources": { "wood": 5, "stone": 1, "iron-ore": 4 },
+    "fightBoard": "board-sky-boughs",
+    "areas": [
+      {
+        "id": "great-fork",
+        "name": "Rozwidlenie",
+        "minLevel": 401,
+        "maxLevel": 405,
+        "description": "Tu pień rozchodzi się w konary szerokie jak gościńce. Każda droga prowadzi wyżej, ale trzeba wybrać jedną.",
+        "encounters": []
+      },
+      {
+        "id": "cloud-bridges",
+        "name": "Obłoczne Kładki",
+        "minLevel": 406,
+        "maxLevel": 410,
+        "description": "Wąskie kładki z obłoków rozpięte między konarami. Chmury trzymają wędrowca, dopóki nie spojrzy w dół.",
+        "encounters": []
+      },
+      {
+        "id": "sea-of-leaves",
+        "name": "Morze Liści",
+        "minLevel": 411,
+        "maxLevel": 415,
+        "description": "Liście Drzewa Świata falują tu jak morze aż po horyzont. Pod nimi szeleści coś, czego nie widać.",
+        "encounters": []
+      },
+      {
+        "id": "moon-cradle",
+        "name": "Kołyska Księżyca",
+        "minLevel": 416,
+        "maxLevel": 420,
+        "description": "Konary wygięte jak kołyska, w której nocą odpoczywa księżyc. Srebrne światło kładzie się na korze, a wokół tańczą świetliki.",
+        "encounters": []
+      },
+      {
+        "id": "highest-bough",
+        "name": "Najwyższa Gałąź",
+        "minLevel": 421,
+        "maxLevel": 425,
+        "description": "Ostatnia gałąź Drzewa Świata, ponad chmurami. Stąd widać cały świat, a nad głową huczą burze.",
+        "encounters": []
+      }
+    ]
   }
 ]

@@ -433,5 +433,98 @@
         "description": "A castle of ice and bone at the very bottom of Nav. Somewhere in it Koschei has hidden his death: in a needle, the needle in an egg, the egg in a duck, the duck in a hare, and the hare in a chest."
       }
     }
+  },
+  "isle-of-buyan": {
+    "land": "World Tree",
+    "name": "Isle of Buyan",
+    "description": "An island in the middle of the sea, from which the World Tree grows: an oak so great that its roots reach Nav and its crown the sky. At its foot lies the white stone Alatyr, which stops blood in old spells.",
+    "trait": {
+      "name": "Alatyr",
+      "description": "Bleeding lasts one turn less, for creatures and characters alike."
+    },
+    "areas": {
+      "rocky-cape": {
+        "name": "Rocky Cape",
+        "description": "A grey cape the sea has always beaten against. The waves break into spray here, and above the rocks the crown of the World Tree can be seen from afar."
+      },
+      "shipwreck-bay": {
+        "name": "Castaways' Bay",
+        "description": "A shallow bay full of wrecks. The sea throws up here the ships that went looking for Buyan, and creatures of the deep live in their hulls."
+      },
+      "sea-caves": {
+        "name": "Sea Caves",
+        "description": "Caves the sea has washed out of the island's rocks. The water flows in all the way under the World Tree, and in the dark only jellyfish glow."
+      },
+      "white-stone": {
+        "name": "White Stone",
+        "description": "The white stone Alatyr, the father of all stones. Whoever knows the old spell can stop any blood by whispering over it."
+      },
+      "green-oak": {
+        "name": "Under the Green Oak",
+        "description": "The feet of the World Tree. Roots as thick as ramparts go straight down into the sea here, and among them lie acorns as big as barrels."
+      }
+    }
+  },
+  "great-trunk": {
+    "land": "World Tree",
+    "name": "Great Trunk",
+    "description": "The trunk of the World Tree is so thick that its bark forms cliffs, and resin flows down them and hardens into amber. Here you climb on bracket fungi as big as terraces, and hollows lead deep into the trunk like caves.",
+    "trait": {
+      "name": "Steepness",
+      "description": "Rest between fights restores 5% less HP and mana, as it is hard to catch your breath on the steep bark."
+    },
+    "areas": {
+      "bark-cliffs": {
+        "name": "Bark Cliffs",
+        "description": "Sheer walls of bark cut by cracks like ravines. The climb up them is long, and below only clouds can be seen."
+      },
+      "fungus-terraces": {
+        "name": "Fungus Terraces",
+        "description": "Bracket fungi as big as terraces grow out of the trunk one above another. You can rest on each of them, but nobody rests here alone."
+      },
+      "honey-hives": {
+        "name": "Honey Hives",
+        "description": "Old tree hives hollowed out in the trunk. Honey runs from them down the bark, and the bees guard it against anyone who comes near."
+      },
+      "amber-cascades": {
+        "name": "Amber Cascades",
+        "description": "Resin runs down the bark here like a waterfall and hardens into amber. In the sun the cascades shine so brightly that it is hard to look at them."
+      },
+      "bottomless-hollow": {
+        "name": "Bottomless Hollow",
+        "description": "A hollow whose bottom nobody has ever seen. It leads deep into the trunk like a cave, and from below you can hear the heart of the Tree beating."
+      }
+    }
+  },
+  "sky-boughs": {
+    "land": "World Tree",
+    "name": "Sky Boughs",
+    "description": "The highest boughs of the World Tree, as wide as highways, reach the clouds. The wind blows so hard here that it is difficult to stand, and at night the moon drifts between the branches.",
+    "trait": {
+      "name": "Gale",
+      "description": "Everyone at the front of the line has 5% less armour, for creatures and characters alike, as the gale tears shields from their hands."
+    },
+    "areas": {
+      "great-fork": {
+        "name": "The Fork",
+        "description": "Here the trunk parts into boughs as wide as highways. Every road leads higher, but you have to choose one."
+      },
+      "cloud-bridges": {
+        "name": "Cloud Bridges",
+        "description": "Narrow footbridges of cloud stretched between the boughs. The clouds hold a wanderer up as long as he does not look down."
+      },
+      "sea-of-leaves": {
+        "name": "Sea of Leaves",
+        "description": "The leaves of the World Tree roll here like a sea as far as the horizon. Something you cannot see rustles beneath them."
+      },
+      "moon-cradle": {
+        "name": "Cradle of the Moon",
+        "description": "Boughs bent like a cradle in which the moon rests at night. Silver light lies on the bark, and glowworms dance around it."
+      },
+      "highest-bough": {
+        "name": "Highest Bough",
+        "description": "The last branch of the World Tree, above the clouds. From here the whole world can be seen, and storms rumble overhead."
+      }
+    }
   }
 }

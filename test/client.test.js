@@ -67,7 +67,9 @@ test('every inner region has its picture', async () => {
   const { areaArtIds } = await import('../src/client/area-art.js');
   const { SPRITES } = await import('../src/client/art.js');
   const regions = JSON.parse(readFileSync(new URL('../data/regions.json', import.meta.url), 'utf8'));
-  const areas = regions.flatMap((region) => region.areas.map((area) => area.id));
+  // A land still being made (`soon`) is not in the game yet, and its places
+  // get their pictures with its creatures.
+  const areas = regions.filter((region) => !region.soon).flatMap((region) => region.areas.map((area) => area.id));
   // Its drawn scene (art.js), or a vector one for a place still without it.
   assert.deepEqual(areas.filter((id) => !SPRITES.areas.ids.includes(id) && !areaArtIds.includes(id)), []);
 });

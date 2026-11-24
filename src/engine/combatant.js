@@ -189,13 +189,18 @@ export function playerCombatant({ character, equipped: worn, hp, name, area, id 
     }),
     ...(feat && { feat }),
     // The share of the missing HP back after a won fight on an exploration:
-    // less from the challenge's level (628 B).
-    recovery:
+    // less from the challenge's level (628 B), and less on a steep place
+    // (the place's trait `restMalus`: Stromizna, which takes as much off the
+    // rest's mana, hunt.js: restedMana), never below none.
+    recovery: Math.max(
+      0,
       (challengeAt(character.level, content)?.recoveryAfterFight ?? balance.hunt.recoveryAfterFight) +
-      cls.recovery.base +
-      cls.recovery.perWisdom * totals.wisdom +
-      (area?.trait.recoveryBonus ?? 0) +
-      (core?.recovery ?? 0),
+        cls.recovery.base +
+        cls.recovery.perWisdom * totals.wisdom +
+        (area?.trait.recoveryBonus ?? 0) -
+        (area?.trait.restMalus ?? 0) +
+        (core?.recovery ?? 0),
+    ),
     // What the Rdzeń adds to the fights (combat.js): more damage, a share of
     // it back as HP, and its large Artefakty's abilities: a first blow that
     // always lands, the first move, a first critical blow, a shield at the
