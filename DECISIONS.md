@@ -3901,6 +3901,17 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Porównanie przedmiotów bez ulepszeń (24.11.2026)
+
+Gracz (poz. 63) przez autora: „fajne też jakby można było porównać przedmioty z podglądem statystyk bez ulepszeń” i „w tym momencie często nie jestem w stanie powiedzieć czy jest sens coś ulepszać, bo nie wiem czy statystyki będą lepsze niż to co mam założone”.
+
+1. Karta przedmiotu z plecaka ma pole „Bez ulepszeń” nad „Po założeniu”, gdy ten przedmiot albo przedmiot założony w jego miejscu ma ulepszenie (+N). Po zaznaczeniu „Po założeniu” (z oceną „Lepiej”, „Gorzej”…) i „Porównanie z założonym” liczą oba przedmioty tak, jakby żaden nie miał ulepszeń, a ich tytuły mają dopisek „(bez ulepszeń)”. Widać wtedy, który przedmiot jest lepszy sam w sobie. Reszta wyposażenia liczy się z ulepszeniami, jak zawsze.
+2. Kamień w oprawie i gwiazdki Zaklinaczki zostają w liczbach. Znika całe +N, także to, z którym przedmiot wyszedł z Warsztatu (brakujący szczegół: to ten sam poziom ulepszenia). Liczby na górze karty zostają z ulepszeniami: pole zmienia tylko porównanie pod sobą.
+3. Wybór pamięta przeglądarka, jak „Zabierz towarzyszy” w Portalach. Na początku pole jest puste.
+4. Liczy silnik tymi samymi funkcjami co zawsze, tylko dla obu przedmiotów na +0 (`compareWithoutUpgrades` w `src/engine/preview.js`, `GET /api/items/:id/preview?upgrades=off`).
+5. Po angielsku: „Without upgrades”. Karta sprawdzona na 320, 390 i 1366 px, po polsku i po angielsku, z długą nazwą przedmiotu i liczbami przedmiotów 500. poziomu.
+6. Pliki: `src/engine/preview.js`, `src/server/inventory.js`, `src/client/screens/character.js` (`itemCard`, `compareBare`), `src/client/styles.css`, `data/en/strings.json`, `README.md`. Test: `test/engine.test.js`.
+
 ## Wersja 0.4.95 (24.11.2026): blokada poziomu przedmiotów
 
 Według sekcji niżej, bez makiet (nowa linijka na karcie przedmiotu i przyciski zablokowane jak przy Tierze).

@@ -8,7 +8,7 @@ import { coreEffects } from './core.js';
 import { evolutionOf } from './evolutions.js';
 import { gearKey, statWeightsOf } from './gear.js';
 import { cappedChance, reduction } from './formulas.js';
-import { upgradedItem } from './items.js';
+import { itemLines, upgradedItem } from './items.js';
 import { regenPerMinute } from './progression.js';
 import { sideStats } from './side-stats.js';
 import { computeStats } from './stats.js';
@@ -330,4 +330,31 @@ export function equipChange(character, equipped, item, content, now = combatValu
   const worn = equipped.filter((candidate) => candidate.slot !== item.slot);
   const { changes } = valueChanges(now, combatValues(character, [...worn, item], content));
   return { changes, verdict: equipVerdict(character, item, content, pathGear(character, equipped, content)) };
+}
+
+// "Bez ulepszeń" on a bag item's card (a player, 24.11.2026: „fajne też
+// jakby można było porównać przedmioty z podglądem statystyk bez
+// ulepszeń”): `item` beside what its slot holds as if neither had its
+// upgrade (+N), the rest of the gear as it is. Both items' lines (itemLines;
+// the worn one's null for an empty slot) and what putting it on changes
+// (equipChange), their numbers from upgradedItem at +0, so their stars and
+// gems stay in them.
+/**
+ * @param {Character} character
+ * @param {Item[]} equipped
+ * @param {Item} item
+ * @param {Content} content
+ */
+export function compareWithoutUpgrades(character, equipped, item, content) {
+  /**
+   * @param {Item} one
+   * @returns {Item}
+   */
+  const plain = (one) => ({ ...one, upgrade: 0 });
+  const worn = equipped.map((one) => (one.slot === item.slot ? plain(one) : one));
+  const held = worn.find((one) => one.slot === item.slot);
+  return {
+    lines: { item: itemLines(plain(item), content), worn: held ? itemLines(held, content) : null },
+    ...equipChange(character, worn, plain(item), content),
+  };
 }

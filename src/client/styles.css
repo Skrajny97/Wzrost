@@ -2544,6 +2544,11 @@ a.segmented-option {
   text-transform: uppercase;
 }
 
+/* "(bez ulepszeń)" after a comparison's title, never broken in two. */
+.compare-bare-mark {
+  white-space: nowrap;
+}
+
 /* The item beside the one worn in its slot, number by number. */
 .compare-worn {
   margin: 0;

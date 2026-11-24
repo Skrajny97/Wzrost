@@ -131,6 +131,7 @@ import {
   statShares,
   extraValues,
   combatValues,
+  compareWithoutUpgrades,
   equipChange,
   bareItem,
   equipVerdict,
@@ -1706,6 +1707,30 @@ describe('item comparisons', () => {
     ]);
     const mail = { base: 'chainmail', slot: 'chest', level: 1, rarity: 'common', armor: 10, affixes: [{ kind: 'suffix', stat: 'armor', value: 2 }] };
     assert.deepEqual(itemLines(mail, content), [{ id: 'armor', label: 'Pancerz', value: 12, text: '+12' }]);
+  });
+
+  // "Bez ulepszeń" on a bag item's card (a player, 24.11.2026: „nie wiem
+  // czy statystyki będą lepsze niż to co mam założone”).
+  test('without upgrades, the find and the worn item count at +0, their gem and stars kept, the rest of the gear as it is', () => {
+    const character = newCharacter('warrior');
+    const sword = { base: 'sword', slot: 'weapon', level: 1, rarity: 'common', affixes: [] };
+    const worn = { ...sword, damage: { min: 10, max: 14 }, upgrade: 10, stars: 2 };
+    const found = { ...sword, damage: { min: 14, max: 18 }, upgrade: 2, gem: 'ruby' };
+    const ring = { base: 'ring', slot: 'ring', level: 1, rarity: 'common', upgrade: 10, affixes: [{ kind: 'prefix', stat: 'strength', value: 20 }] };
+    // With the upgrades the worn sword at +10 hits harder; without, the find's base does.
+    assert.equal(equipChange(character, [worn, ring], found, content).verdict, 'worse');
+    const bare = compareWithoutUpgrades(character, [worn, ring], found, content);
+    assert.equal(bare.verdict, 'better');
+    assert.ok(bare.changes.damage > 0);
+    // The find with its Rubin (+30%), the worn sword with its two stars (+20%).
+    assert.equal(bare.lines.item.find((line) => line.id === 'damage').text, '18–23');
+    assert.equal(bare.lines.worn.find((line) => line.id === 'damage').text, '12–17');
+    // The ring keeps its +10, which raises the damage the change counts.
+    const plain = (item) => ({ ...item, upgrade: 0 });
+    assert.deepEqual(bare, { lines: bare.lines, ...equipChange(character, [plain(worn), ring], plain(found), content) });
+    assert.notDeepEqual(bare.changes, equipChange(character, [plain(worn), plain(ring)], plain(found), content).changes);
+    // Into an empty slot: no worn item's lines.
+    assert.equal(compareWithoutUpgrades(character, [ring], found, content).lines.worn, null);
   });
 });
 

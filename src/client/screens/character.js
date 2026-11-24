@@ -1510,13 +1510,63 @@ function itemCard(item, { equipped, anvil = false, preview: withPreview = true, 
   };
 
   const preview = withPreview && usable && !high && h('div', { class: 'preview', 'aria-live': 'polite' }, h('p', { class: 'muted', text: t('Liczenie zmian…') }));
+  // The comparison with the item worn in its slot, and over it and the
+  // preview "Bez ulepszeń" (compareBare) where one of the two has an upgrade.
+  const fitted = usable && worn ? compareTable(item, worn) : null;
+  let table = fitted;
+  const bare =
+    fitted && item.id !== undefined && (item.upgrade > 0 || worn.upgrade > 0)
+      ? h('input', {
+          type: 'checkbox',
+          class: 'avoid-rare-box',
+          id: `compare-bare-${item.id}`,
+          checked: compareBare(),
+          onChange: () => {
+            setCompareBare(bare.checked);
+            show();
+          },
+        })
+      : null;
+  const swap = (next) => {
+    next.hidden = false;
+    if (next !== table) table.replaceWith(next);
+    table = next;
+  };
+  // The preview and the comparison as the box says: the server's answer
+  // for each state of it asked for once, and of answers that cross, the
+  // last one asked for shown. Ticked, the comparison waits for its numbers.
+  const answers = {};
+  let asked = 0;
+  const show = async () => {
+    const off = Boolean(bare?.checked);
+    const ask = ++asked;
+    if (off) table.hidden = true;
+    else if (table) swap(fitted);
+    if (!preview && !off) return;
+    const path = `/api/items/${item.id}/preview${off ? '?upgrades=off' : ''}`;
+    if (preview && !answers[path]) fill(preview, h('p', { class: 'muted', text: t('Liczenie zmian…') }));
+    try {
+      const answer = answers[path] ?? (answers[path] = await call('GET', path));
+      if (ask !== asked) return;
+      if (preview) fillPreview(preview, answer, equipped, off);
+      if (off) swap(compareTable({ ...item, lines: answer.lines.item }, { ...worn, lines: answer.lines.worn }, { title: bareTitle(t('Porównanie z założonym')) }));
+    } catch {
+      if (ask !== asked) return;
+      if (preview) fill(preview);
+      if (off) {
+        bare.checked = false;
+        swap(fitted);
+      }
+    }
+  };
   return {
     nodes: [
       itemDetails(item),
       // A report's copy of an item has no id: no star for it.
       item.id !== undefined && favoriteToggle(item, reopen),
+      bare && h('label', { class: 'avoid-rare', for: bare.id }, bare, h('span', { text: t('Bez ulepszeń') })),
       preview,
-      usable && worn && compareTable(item, worn),
+      table,
       anvilSection(item, busy && equipped, anvil),
       enchanterLink(item),
       !equipped && salvageSection(item, false),
@@ -1541,9 +1591,7 @@ function itemCard(item, { equipped, anvil = false, preview: withPreview = true, 
             ],
       ),
     ],
-    shown: () => {
-      if (preview) showPreview(preview, item, equipped);
-    },
+    shown: show,
   };
 }
 
@@ -1551,14 +1599,14 @@ function itemCard(item, { equipped, anvil = false, preview: withPreview = true, 
 // a weapon, the armor and each stat, and by how much the item has more or
 // less of it (for damage, of its average). Also for an item of the
 // Targowisko (market.js) and, with its own words, for what a companion
-// wears (companions.js).
+// wears (companions.js). `title`: a text, or nodes (bareTitle).
 export function compareTable(item, worn, { title = t('Porównanie z założonym'), wornLabel = t('Założony') } = {}) {
   const ids = [...new Set([...item.lines, ...worn.lines].map((line) => line.id))];
   const lineOf = (of, id) => of.lines.find((line) => line.id === id);
   return h(
     'div',
     { class: 'compare' },
-    h('p', { class: 'compare-title', text: title }),
+    h('p', { class: 'compare-title' }, title),
     h(
       'p',
       { class: 'compare-worn' },
@@ -2203,39 +2251,61 @@ function mergedResist(rows) {
   return [...rows.filter(([key]) => !elements.includes(key)), ['resist.all', sign * Math.min(...sizes), sign * Math.max(...sizes)]];
 }
 
-// What wearing (or taking off) the item changes, counted by the server: the
-// verdict on the whole, then each change, as the author asked: "+2,5", "−4",
-// "+1%".
-async function showPreview(box, item, equipped) {
+// What wearing (or taking off) the item changes, counted by the server
+// (`changes` and `verdict` of its preview; `bare`, without the upgrades):
+// the verdict on the whole, then each change, as the author asked: "+2,5",
+// "−4", "+1%".
+function fillPreview(box, { changes, verdict }, equipped, bare = false) {
+  const rows = mergedResist(Object.entries(changes));
+  fill(
+    box,
+    h('p', { class: 'compare-title' }, equipped ? t('Po zdjęciu') : bare ? bareTitle(t('Po założeniu')) : t('Po założeniu')),
+    h('p', { class: `verdict verdict-line verdict--${verdict}`, text: t(VERDICTS[verdict].line) }),
+    pathNames() && h('p', { class: 'muted small', text: t('Ocena liczy atrybuty tak jak „Rozdaj według klasy”: {stats}.', { stats: pathNames() }) }),
+    rows.length > 0 &&
+      h(
+        'ul',
+        { class: 'preview-list' },
+        rows.map(([key, change, largest]) => {
+          const [label, unit] = changeName(key);
+          const low = formatPrecise(Math.abs(change));
+          const high = largest === undefined ? low : formatPrecise(Math.abs(largest));
+          return h(
+            'li',
+            { class: change > 0 ? 'preview-up' : 'preview-down' },
+            h('span', { text: label }),
+            h('span', { class: 'num', text: `${change > 0 ? '+' : '−'}${low}${high === low ? '' : `–${high}`}${unit}` }),
+          );
+        }),
+      ),
+  );
+}
+
+// "Bez ulepszeń" on a bag item's card (a player, 24.11.2026: „często nie
+// jestem w stanie powiedzieć czy jest sens coś ulepszać, bo nie wiem czy
+// statystyki będą lepsze niż to co mam założone”): ticked, what putting it
+// on changes and its comparison with the item worn in its slot count
+// neither's upgrade (compareWithoutUpgrades in preview.js). Shown where one
+// of the two has an upgrade; kept in this browser, at first off.
+const BARE_KEY = 'insight.compareBare';
+function compareBare() {
   try {
-    const { changes, verdict } = await call('GET', `/api/items/${item.id}/preview`);
-    const rows = mergedResist(Object.entries(changes));
-    fill(
-      box,
-      h('p', { class: 'compare-title', text: equipped ? t('Po zdjęciu') : t('Po założeniu') }),
-      h('p', { class: `verdict verdict-line verdict--${verdict}`, text: t(VERDICTS[verdict].line) }),
-      pathNames() && h('p', { class: 'muted small', text: t('Ocena liczy atrybuty tak jak „Rozdaj według klasy”: {stats}.', { stats: pathNames() }) }),
-      rows.length > 0 &&
-        h(
-          'ul',
-          { class: 'preview-list' },
-          rows.map(([key, change, largest]) => {
-            const [label, unit] = changeName(key);
-            const low = formatPrecise(Math.abs(change));
-            const high = largest === undefined ? low : formatPrecise(Math.abs(largest));
-            return h(
-              'li',
-              { class: change > 0 ? 'preview-up' : 'preview-down' },
-              h('span', { text: label }),
-              h('span', { class: 'num', text: `${change > 0 ? '+' : '−'}${low}${high === low ? '' : `–${high}`}${unit}` }),
-            );
-          }),
-        ),
-    );
+    return localStorage.getItem(BARE_KEY) === 'on';
   } catch {
-    fill(box);
+    return false;
   }
 }
+function setCompareBare(on) {
+  try {
+    localStorage.setItem(BARE_KEY, on ? 'on' : 'off');
+  } catch {
+    // Without storage the box starts empty on the next card.
+  }
+}
+
+// A comparison's title while the box is ticked: "(bez ulepszeń)" after it,
+// in one piece.
+const bareTitle = (title) => [title, ' ', h('span', { class: 'compare-bare-mark', text: `(${t('Bez ulepszeń')})` })];
 
 // `tier`: its Tier too, after its level (the Targowisko's lists, the author:
 // „Na targowisku nie widać tierów przedmiotów a musi być”).

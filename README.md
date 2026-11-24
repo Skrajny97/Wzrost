@@ -141,7 +141,7 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/character/points` | rozdanie punktów: `points`, np. `{ "strength": 2 }` |
 | POST | `/api/character/points/auto` | „Rozdaj według klasy” |
 | POST | `/api/character/points/reset` | darmowe zerowanie punktów (do poziomu 20) |
-| GET | `/api/items/:id/preview` | wartości bojowe teraz i po założeniu (albo zdjęciu) przedmiotu |
+| GET | `/api/items/:id/preview` | wartości bojowe teraz i po założeniu (albo zdjęciu) przedmiotu; z `?upgrades=off` zmiany i ocena tak, jakby ani przedmiot z plecaka, ani założony w jego miejscu nie miał ulepszeń, oraz ich wartości do porównania (`lines`) |
 | POST | `/api/items/:id/equip` | załóż przedmiot z plecaka; przedmiot z wymiany (`traded` w widoku przedmiotu) dopiero od jego poziomu (403 `trade_level`) |
 | POST | `/api/items/:id/unequip` | zdejmij przedmiot do plecaka |
 | POST | `/api/items/:id/discard` | wyrzuć przedmiot z plecaka |
