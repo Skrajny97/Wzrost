@@ -1,0 +1,14 @@
+{
+  "id": "wernyhora-kaftan",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the kaftan of wernyhora, the legendary bard and prophet of the borderlands: a long white kaftan of fine wool with a wide red sash, embroidered with blue and red folk patterns, single inventory item icon",
+  "style": "src/client/art/items/sobieski-zupan.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024353128348880346
+  },
+  "images": 1
+}

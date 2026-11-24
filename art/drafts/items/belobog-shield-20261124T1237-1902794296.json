@@ -1,0 +1,14 @@
+{
+  "id": "belobog-shield",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the shield of belobog, the white slavic god of light and good fortune: a round shield of shining white silver with a radiant golden sun in its centre and rays of white light, a rim studded with pearls, a bright white glow, single inventory item icon",
+  "style": "src/client/art/items/lech-shield.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02329891843944126
+  },
+  "images": 1
+}

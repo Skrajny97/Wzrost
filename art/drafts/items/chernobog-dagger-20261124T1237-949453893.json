@@ -1,0 +1,14 @@
+{
+  "id": "chernobog-dagger",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the dagger of chernobog, the black slavic god of darkness and misfortune: a jagged blade of pitch black obsidian that swallows the light, a black iron hilt shaped like a coiled serpent with a red eye, dark smoke around it, diagonal, single inventory item icon",
+  "style": "src/client/art/items/marzanna-dagger.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023321611519283723
+  },
+  "images": 1
+}

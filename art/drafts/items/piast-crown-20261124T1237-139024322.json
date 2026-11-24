@@ -1,0 +1,14 @@
+{
+  "id": "piast-crown",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the crown of the piast kings: a massive golden crown with four tall points set with large rubies and emeralds and a small cross on top, a radiant holy glow, single inventory item icon",
+  "style": "src/client/art/items/jadwiga-crown.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023216204962624446
+  },
+  "images": 1
+}

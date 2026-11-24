@@ -1,0 +1,14 @@
+{
+  "id": "volkhv-hood",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the hood of a volkhv, a slavic pagan priest and sorcerer: a long hood of rough white wool with a brown bear fur trim, hung with small bone amulets and a carved wooden sun charm on the brow, the inside of the hood dark and empty with no face, single inventory item icon",
+  "style": "src/client/art/items/strzygon-hood.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023343712251875138
+  },
+  "images": 1
+}

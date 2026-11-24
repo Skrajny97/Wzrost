@@ -1,0 +1,14 @@
+{
+  "id": "vyraj-quiver",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the quiver of vyraj, the slavic paradise beyond the sea where birds fly for the winter: a quiver of sky blue leather embroidered with silver birds and clouds, arrows fletched with white swan feathers, a soft heavenly glow, single inventory item icon",
+  "style": "src/client/art/items/zorza-quiver.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023314437272177805
+  },
+  "images": 1
+}

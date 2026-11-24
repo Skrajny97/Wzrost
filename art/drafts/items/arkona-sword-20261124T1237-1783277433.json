@@ -1,0 +1,14 @@
+{
+  "id": "arkona-sword",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the great sword of arkona, from the temple of svantevit on the island of rugia: a huge broad sword with a silver blade engraved with four faces looking four ways, a crossguard of gold and amber, a horse head pommel, a soft white glow, diagonal, single inventory item icon",
+  "style": "src/client/art/items/grunwald-sword.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023319927454418608
+  },
+  "images": 1
+}

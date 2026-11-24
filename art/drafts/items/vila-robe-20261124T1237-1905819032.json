@@ -1,0 +1,14 @@
+{
+  "id": "vila-robe",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the robe of a vila, a slavic mountain fairy: a long shimmering white and pale gold robe light as mist, embroidered with silver stars and mountain flowers, a faint magical glow, single inventory item icon",
+  "style": "src/client/art/items/wanda-robe.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02327612362268236
+  },
+  "images": 1
+}

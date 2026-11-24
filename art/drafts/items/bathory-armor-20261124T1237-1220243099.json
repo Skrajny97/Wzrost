@@ -1,0 +1,14 @@
+{
+  "id": "bathory-armor",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the parade armour of king stefan batory: an ornate breastplate of blued steel with etched golden vines, a high collar, a crowned eagle on the chest, a soft glow, single inventory item icon",
+  "style": "src/client/art/items/jagiello-armor.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.04127614595709907
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "pozvizd-boots",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the boots of pozvizd, the slavic god of wind and storms: a pair of light grey boots with small white wings at the heels and swirling wind patterns, a faint whirl of wind around them, single inventory item icon",
+  "style": "src/client/art/items/walgierz-boots.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023195594658745662
+  },
+  "images": 1
+}

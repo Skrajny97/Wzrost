@@ -1,0 +1,14 @@
+{
+  "id": "siemowit-axe",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the battle axe of siemowit, the legendary son of piast who drove out the wicked king popiel: a broad bearded axe of bright steel with a silver eagle inlaid in its blade, a long haft of ash wood bound with gold wire, diagonal, single inventory item icon",
+  "style": "src/client/art/items/svarozhich-axe.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023996706114239163
+  },
+  "images": 1
+}

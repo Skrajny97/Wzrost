@@ -1,0 +1,14 @@
+{
+  "id": "rozhanitsy-spindle",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the spindle of the rozhanitsy, the slavic goddesses who spin the thread of fate: an ornate golden spindle wound with a glowing silver thread, its whorl a small shining moon, single inventory item icon",
+  "style": "src/client/art/items/copernicus-sphere.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02335013240644667
+  },
+  "images": 1
+}

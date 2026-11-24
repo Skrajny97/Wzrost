@@ -1,0 +1,14 @@
+{
+  "id": "boruta-claw",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the claw of boruta, the devil of the leczyca castle: a long black curved devil's claw set as a short parrying dagger in a hilt of red velvet and gold, a small horned devil head pommel, a faint red glow, diagonal, single inventory item icon",
+  "style": "src/client/art/items/basilisk-fang.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023460836966196698
+  },
+  "images": 1
+}

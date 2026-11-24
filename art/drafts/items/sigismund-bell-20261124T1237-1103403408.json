@@ -1,0 +1,14 @@
+{
+  "id": "sigismund-bell",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the sigismund bell of the wawel cathedral as a holy hand bell: a heavy bronze bell with golden relief bands and a small crowned eagle, a short golden handle on top, a holy golden glow, single inventory item icon",
+  "style": "src/client/art/items/stanislaus-crosier.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02325486832555135
+  },
+  "images": 1
+}

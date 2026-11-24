@@ -1,0 +1,14 @@
+{
+  "id": "wrymouth-helmet",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the helmet of king boleslaw wrymouth: a tall conical helmet of polished steel with a long nose guard, bands of gold engraved with eagles, a red plume on top, an empty helmet with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/mieszko-helmet.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024350629714753894
+  },
+  "images": 1
+}

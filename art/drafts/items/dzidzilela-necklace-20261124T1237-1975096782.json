@@ -1,0 +1,14 @@
+{
+  "id": "dzidzilela-necklace",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the necklace of dzidzilela, the slavic goddess of love and marriage: a delicate golden necklace of small red coral beads with a heart shaped red garnet pendant, single inventory item icon",
+  "style": "src/client/art/items/rzepicha-necklace.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023215454959233602
+  },
+  "images": 1
+}

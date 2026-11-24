@@ -1,0 +1,14 @@
+{
+  "id": "thunderstone",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a thunderstone, a belemnite fossil that slavic folk believed was left in the ground by perun's lightning: a long smooth bullet shaped stone of honey brown colour crackling with small blue lightning sparks, single inventory item icon",
+  "style": "src/client/art/items/golden-duck.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023306858031378854
+  },
+  "images": 1
+}

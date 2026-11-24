@@ -1,0 +1,14 @@
+{
+  "id": "florian-chasuble",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the chasuble of saint florian, patron of krakow: a red liturgical chasuble with golden embroidered flames and a golden cross, a jewelled collar, single inventory item icon",
+  "style": "src/client/art/items/casimir-cope.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0232063791501787
+  },
+  "images": 1
+}

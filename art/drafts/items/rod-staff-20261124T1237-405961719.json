@@ -1,0 +1,14 @@
+{
+  "id": "rod-staff",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the staff of rod, the slavic creator of all things: a tall staff of living white birch wood with fresh green leaves sprouting along it, crowned with roots holding a glowing seed of golden light, diagonal, single inventory item icon",
+  "style": "src/client/art/items/veles-staff.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023212714473300512
+  },
+  "images": 1
+}

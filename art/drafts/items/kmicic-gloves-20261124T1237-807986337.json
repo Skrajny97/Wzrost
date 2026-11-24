@@ -1,0 +1,14 @@
+{
+  "id": "kmicic-gloves",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the gloves of andrzej kmicic, the dashing hero of the deluge: a pair of elegant yellow leather riding gloves with long flared cuffs embroidered with gold thread and small steel plates on the knuckles, single inventory item icon",
+  "style": "src/client/art/items/lokietek-gloves.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023219471061918472
+  },
+  "images": 1
+}

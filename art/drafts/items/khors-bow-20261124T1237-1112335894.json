@@ -1,0 +1,14 @@
+{
+  "id": "khors-bow",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the bow of khors, the slavic god of the sun disc: a long golden bow shaped like two curved sun rays with a blazing golden sun disc at its grip, a bowstring of bright light, diagonal, single inventory item icon",
+  "style": "src/client/art/items/jutrzenka-bow.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023202952901416357
+  },
+  "images": 1
+}
