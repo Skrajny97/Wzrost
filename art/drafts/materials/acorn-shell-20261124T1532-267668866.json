@@ -1,0 +1,14 @@
+{
+  "id": "acorn-shell",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a big glossy brown acorn shell half broken open, with its scaly cap, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023111628509521486
+  },
+  "images": 1
+}

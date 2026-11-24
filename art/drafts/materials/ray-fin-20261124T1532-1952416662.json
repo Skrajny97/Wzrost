@@ -1,0 +1,14 @@
+{
+  "id": "ray-fin",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a flat dark grey-blue fin of an electric ray with small bright blue sparks crackling along its edge, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023283269189622667
+  },
+  "images": 1
+}

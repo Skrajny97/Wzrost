@@ -1,0 +1,14 @@
+{
+  "id": "haemorrhage-clot",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a dark crimson lump of clotted blood, glossy like a gem, with a faint red glow, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023221667135450576
+  },
+  "images": 1
+}

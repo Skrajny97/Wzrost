@@ -1,0 +1,14 @@
+{
+  "id": "pufferfish-spine",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a long thin sharp yellow-brown spine with a drop of green venom at its tip, drawn diagonally, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023113924067179364
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "horseshoe-crab-shell",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a domed olive-brown horseshoe crab shell like a small helmet with a short spiny ridge, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023298058585484824
+  },
+  "images": 1
+}

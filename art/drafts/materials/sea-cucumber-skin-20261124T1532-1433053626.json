@@ -1,0 +1,14 @@
+{
+  "id": "sea-cucumber-skin",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a folded piece of thick leathery dark red-brown skin covered in pale warts, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023262940269470216
+  },
+  "images": 1
+}

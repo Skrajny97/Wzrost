@@ -1,0 +1,14 @@
+{
+  "id": "anglerfish-lure",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a thin curved fleshy rod ending in a glowing cyan bead of light, drawn diagonally, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023157659808688693
+  },
+  "images": 1
+}

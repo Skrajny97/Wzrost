@@ -1,0 +1,14 @@
+{
+  "id": "gall-ink",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small glass bottle of black ink beside a round brown oak gall, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023110825037850273
+  },
+  "images": 1
+}

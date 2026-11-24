@@ -1,0 +1,14 @@
+{
+  "id": "ninth-wave-foam",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a swirling ball of glowing white sea foam with small blue waves curling inside it, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02307867401059469
+  },
+  "images": 1
+}

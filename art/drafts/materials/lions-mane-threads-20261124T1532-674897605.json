@@ -1,0 +1,14 @@
+{
+  "id": "lions-mane-threads",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a bundle of long thin glowing translucent orange-red jellyfish threads tangled together, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023940021879831953
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "octopus-sucker",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a big round pale pink octopus sucker on a piece of dark red tentacle, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02315755558374193
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "shark-tooth",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a big white triangular shark tooth with a finely serrated edge, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023428429270214508
+  },
+  "images": 1
+}
