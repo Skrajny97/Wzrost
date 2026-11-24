@@ -4302,6 +4302,10 @@ Zadanie: przedmioty na całą grę do 500. poziomu. Krainy sięgają dziś 350. 
 10. **Czwarte formy a trzecie (test).** Test porównuje formy na wyprawach na 260. poziomie z tym, z czym je ustawiano (krzywą poziomów, nagrodami i stworami sprzed późniejszych zmian), więc teraz także z Tierem X jako najnowszym (`tunedGear` w `test/fourth-evolution.test.js`). Z Tierem XII każda forma kończy wyprawę z 80–100% HP i porównanie HP mówi mało: Książę Ciemności kończy z 95,4% HP wobec 96,2% swojej trzeciej formy i zabija 0,7 raza tak szybko (z Tierem X 91,7% wobec 88,6% i 0,84 raza). Do ewentualnego strojenia przy liczbach czwartej ewolucji.
 11. **Pliki:** `src/client/art/items` (44 ikony) i `src/client/art.js` (`SPRITES.items`), `data/item-bases.json`, `data/en/item-bases.json`, `data/encyclopedia.json`, `data/en/encyclopedia.json`, `data/en/sources.json`, `data/balance.json` (`monsters.newestPlace.curve` od 226.), `data/evolutions.json` (Licz), `art/prompts.json` (44 opisy ikon), `tools/validate-data.mjs`. Testy: `test/engine.test.js` (zasada Tierów XI i XII, wypadanie od 225. i 250. poziomu klasy ze wszystkich źródeł), `test/encyclopedia.test.js` (dwanaście Tierów, zestawy, skrzynie, materiały powyżej 350), `test/workshop.test.js` i `test/mining.test.js` (bez wzorów do czasu krain), `test/fourth-evolution.test.js` (punkt 10).
 
+## Wersja 0.5.15 (24.11.2026): Rzemiosło
+
+Zob. sekcję niżej: profesja nazywa się teraz Rzemiosło we wszystkich tekstach gry. Dwie kwestie narratora z tą nazwą zostają w starej wersji, aż autor oceni nowe nagrania (1250).
+
 ## Rzemiosło zamiast Rzemieślnictwa (24.11.2026)
 
 Autor: „Zmień WSZĘDZIE gdzie to występuje nazwę Rzemieślnictwo na Rzemiosło (bardziej poprawna forma)”.
