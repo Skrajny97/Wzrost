@@ -16,11 +16,11 @@ import { knownStack } from './crafting.js';
 import { areaDangers } from './hunt.js';
 import { gearWearers } from './gear.js';
 import { baseClasses, baseClassLevel, baseFamily } from './items.js';
-import { jewelBases, jewelPatternLevel } from './jewelcraft.js';
-import { professionState } from './professions.js';
+import { jewelPatternLevel, jewelPatternMade } from './jewelcraft.js';
+import { professionOpen, professionState, professionUnlockLevel } from './professions.js';
 import { shopLevelFor } from './shop.js';
 import { say } from './text.js';
-import { craftableBases, partSource, patternLevel } from './workshop.js';
+import { partSource, patternLevel, patternMade } from './workshop.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {Record<string, any>} Entry An entry of the game's data: a rarity, a tier, a creature's material… */
@@ -31,6 +31,8 @@ import { craftableBases, partSource, patternLevel } from './workshop.js';
 /** @typedef {Chest & { have: number, need: number, opened: boolean, ready: boolean }} ChestState A chest with how far it is. */
 /** @typedef {{ areas: Entry[], maxLevel: number }} Range Where a creature lives. */
 /** @typedef {{ level: number, classLevel: number, professions: Record<string, any> }} Levels A character's levels. */
+/** @typedef {{ levels?: Levels | null, patterns?: string[], hidden?: string[] }} Maker The character at a pattern: its levels, the patterns it learned by taking items apart (characters.patterns) and the professions this deployment hides (features.js). */
+/** @typedef {{ profession: string, open: boolean, reason: string | null }} Way The way from an entry to its pattern: the profession's screen, open, or shut with why. */
 
 /**
  * @param {string} rarityId
@@ -371,16 +373,50 @@ function tierHeadings(content, byClassLevel) {
 const firstAreaTo = (level, content) =>
   content.regions.flatMap((/** @type {Entry} */ region) => region.areas).find((/** @type {Entry} */ area) => area.maxLevel >= level) ?? null;
 
-// `patterns` and `jewels`: the bases the Warsztat and the Szlifiernia make
-// (their ids).
+// Where an item base is made, for its entry (a player's wish of 24.11.2026:
+// from the Encyklopedia straight to the item's pattern): the Warsztat of
+// Rzemieślnictwo or the Szlifiernia of Jubilerstwo, else null. Its line says
+// the profession's level the pattern opens at, or that the character knows
+// it: by that level once the profession is open, or learned by taking such
+// an item apart, which may come earlier. The way there („Do Warsztatu”, „Do
+// Szlifierni”) is open when the profession and the pattern both are, else
+// shut with the level it waits for: the character's, then the profession's.
+// Without the character's levels, or where this deployment hides the
+// profession, only the line of the level.
+/**
+ * @param {import('./workshop.js').Base} base
+ * @param {Maker} maker
+ * @param {Content} content
+ * @returns {{ line: string, way: Way | null } | null}
+ */
+export function patternWay(base, { levels = null, patterns = [], hidden = [] }, content) {
+  const jewel = Boolean(content.jewelcrafting.ores[base.slot]);
+  if (jewel ? !jewelPatternMade(base, content) : !(content.workshop.parts[base.slot] && patternMade(base, content))) return null;
+  const professionId = jewel ? content.jewelcrafting.profession : content.workshop.profession;
+  const from = jewel ? jewelPatternLevel(base, content) : patternLevel(base, content);
+  const later = text(content, jewel ? 'itemJewelPattern' : 'itemPattern', { level: from });
+  if (!levels || hidden.includes(professionId)) return { line: later, way: null };
+  const profession = content.professionsById[professionId];
+  const open = professionOpen(profession, levels.level, content);
+  const known = patterns.includes(base.id) || (open && from <= professionState(levels.professions, professionId).level);
+  const reason = !open
+    ? text(content, 'patternProfession', { profession: profession.name, level: professionUnlockLevel(profession, content) })
+    : known
+      ? null
+      : text(content, 'patternLevel', { profession: profession.genitive, level: from });
+  return {
+    line: known ? text(content, jewel ? 'itemJewelPatternKnown' : 'itemPatternKnown') : later,
+    way: { profession: professionId, open: reason === null, reason },
+  };
+}
+
 /**
  * @param {import('./workshop.js').Base} base
  * @param {Discovered} discovered
  * @param {Content} content
- * @param {Set<string>} patterns
- * @param {Set<string>} jewels
+ * @param {Maker} maker
  */
-function itemEntry(base, discovered, content, patterns, jewels) {
+function itemEntry(base, discovered, content, maker) {
   const best = discovered[`item:${base.id}`] ?? 0;
   const classes = baseClasses(base.id, content);
   const classLevel = baseClassLevel(base.id, content);
@@ -392,6 +428,7 @@ function itemEntry(base, discovered, content, patterns, jewels) {
   const wearing = [...(classes?.map((/** @type {string} */ id) => content.classesById[id].name) ?? []), ...wearers.forms.map((id) => content.evolutionsById[id].name)];
   const names = wearing.join(', ');
   const notFor = wearers.without.map((id) => content.evolutionsById[id].name).join(', ');
+  const pattern = patternWay(base, maker, content);
   return {
     id: base.id,
     found: best > 0,
@@ -404,10 +441,10 @@ function itemEntry(base, discovered, content, patterns, jewels) {
       classes ? text(content, wearing.length > 1 ? 'itemClasses' : 'itemClass', { classes: names }) : text(content, 'itemAnyClass'),
       notFor && text(content, 'itemNotFor', { classes: notFor }),
       classLevel > 1 && text(content, 'itemWear', { level: classLevel }),
-      patterns.has(base.id) && text(content, 'itemPattern', { level: patternLevel(base, content) }),
-      jewels.has(base.id) && text(content, 'itemJewelPattern', { level: jewelPatternLevel(base, content) }),
+      pattern?.line,
       best > 0 && text(content, 'itemBest', { rarity: content.rarities[best - 1].name }),
     ].filter(Boolean),
+    ...(pattern?.way && { craft: pattern.way }),
   };
 }
 
@@ -592,12 +629,13 @@ function currentTiers(levels, content) {
 // entries (a stranger as "???" with only where to get it), how many are
 // discovered, and the chests; the tier the character is in is `current`.
 // `met` is the creatures met (characters.met), `levels` the character's
-// { level, classLevel, professions }.
+// { level, classLevel, professions }; `patterns` and `hidden` lead an item
+// to its pattern (patternWay).
 /**
- * @param {{ discovered: Discovered, claimed: string[], met: string[], levels?: Levels | null }} character
+ * @param {{ discovered: Discovered, claimed: string[], met: string[], levels?: Levels | null, patterns?: string[], hidden?: string[] }} character
  * @param {Content} content
  */
-export function encyclopediaView({ discovered, claimed, met, levels = null }, content) {
+export function encyclopediaView({ discovered, claimed, met, levels = null, patterns = [], hidden = [] }, content) {
   const metSet = new Set(met);
   const current = currentTiers(levels, content);
   const chests = chestStates(discovered, claimed, content);
@@ -613,8 +651,8 @@ export function encyclopediaView({ discovered, claimed, met, levels = null }, co
     opened: entry.opened,
     chest: entry.chest,
   });
-  const patterns = new Set(craftableBases(content).map((base) => base.id));
-  const jewels = new Set(jewelBases(content).map((base) => base.id));
+  /** @type {Maker} */
+  const maker = { levels, patterns, hidden };
   const ranges = creatureRanges(content);
   const fromEvents = eventHerbs(content);
   // A level past the last tier with entries, as a profession above the 100th
@@ -634,7 +672,7 @@ export function encyclopediaView({ discovered, claimed, met, levels = null }, co
   const count = (entries) => ({ found: entries.filter((entry) => entry.found).length, all: entries.length });
 
   /** @type {(ReturnType<typeof itemEntry> & { tier: number })[]} */
-  const items = content.bases.map((/** @type {import('./workshop.js').Base} */ base) => ({ ...itemEntry(base, discovered, content, patterns, jewels), tier: baseTier(base.id, content) }));
+  const items = content.bases.map((/** @type {import('./workshop.js').Base} */ base) => ({ ...itemEntry(base, discovered, content, maker), tier: baseTier(base.id, content) }));
   const potions = [...content.potions].sort((a, b) => a.level - b.level).map((potion) => potionEntry(potion, discovered, content));
   const herbs = [...content.herbs].sort((a, b) => a.level - b.level).map((herb) => herbEntry(herb, discovered, content, fromEvents));
   /** @type {{ entry: ReturnType<typeof materialEntry>, maxLevel: number }[]} */

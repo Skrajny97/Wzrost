@@ -13446,6 +13446,27 @@ button.farm-plot {
   padding-left: 18px;
 }
 
+/* An item's way to its pattern shut: a lock on "Do Warsztatu" or "Do
+   Szlifierni" and the level it waits for under it. */
+.encyclopedia-way {
+  display: grid;
+  gap: 6px;
+}
+
+.button.encyclopedia-way-shut {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: not-allowed;
+}
+
+.encyclopedia-way-reason {
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: center;
+}
+
 .encyclopedia-area {
   display: flex;
   flex-direction: column;

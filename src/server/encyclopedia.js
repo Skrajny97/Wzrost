@@ -5,13 +5,15 @@
 // character is as read (its version), so two taps give one reward. Where
 // the game has Talia Systemu (CARDS, cards.js) its tab "Karty" shows the
 // collection by land with its bonus (card-collection.js in the engine);
-// elsewhere there is no such tab.
+// elsewhere there is no such tab. An item made in the Warsztat or the
+// Szlifiernia leads to its pattern (patternWay in the engine), except
+// where this deployment hides its profession.
 
 import { cardCollectionView, encyclopediaChest, encyclopediaView } from '../engine/index.js';
 import { ownCardCollection } from './cards.js';
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
-import { cardsOn } from './features.js';
+import { cardsOn, craftingOn, professionsOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 
 const recordOf = (row) => ({
@@ -19,12 +21,18 @@ const recordOf = (row) => ({
   claimed: JSON.parse(row.encyclopedia ?? '[]'),
   met: JSON.parse(row.met ?? '[]'),
   levels: { level: row.level, classLevel: row.class_level, professions: JSON.parse(row.professions ?? '{}') },
+  // The patterns learned by taking items apart.
+  patterns: JSON.parse(row.patterns ?? '[]'),
 });
+
+// The professions this deployment hides (features.js): no way to their
+// patterns.
+const hiddenProfessions = () => (professionsOn() ? (craftingOn() ? [] : [content().workshop.profession]) : content().professions.map((profession) => profession.id));
 
 // The book of a character's row: its tabs, with the cards' where the game
 // has them.
 async function bookOf(db, row) {
-  const book = encyclopediaView(recordOf(row), content());
+  const book = encyclopediaView({ ...recordOf(row), hidden: hiddenProfessions() }, content());
   if (!cardsOn() || !content().cards) return { ...book, tabs: book.tabs.filter((tab) => tab.id !== 'cards') };
   // Its own cards only: those from others fill no Encyklopedia (the author,
   // 19.11.2026: „karty z wymiany/targowiska niech nie uzupełniają

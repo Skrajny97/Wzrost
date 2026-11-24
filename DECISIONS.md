@@ -3929,6 +3929,17 @@ Gracz zaproponował „możliwość rollowania tablicy zleceń / poszukiwani”.
 7. Bez migracji bazy: licznik zleceń leży w zapisie Tablicy (`board.rerolls`), a licznik listów i przelosowane listy w zapisie dnia Poszukiwanych (`wanted.rerolled`).
 8. Sprawdzone na 320, 390 i 1366 px: bez przewijania na boki, kostki w ramkach. Pliki: `data/settlement.json` (`orders.reroll`, `wanted.reroll`, teksty `wanted.texts.reroll…`), `data/schemas/settlement.schema.json`, `data/en/settlement.json`, `data/en/strings.json`, `src/engine/settlement.js` (`drawOrder` z `avoid`, `orderRerolls`, `rerollOrder`), `src/engine/wanted.js` (`rerollPoster`, `swappedPosters`, `wantedRerolls`), `src/server/settlement.js` (`POST /api/settlement/reroll`), `src/server/wanted.js` (`POST /api/settlement/wanted/reroll`), `src/client/ui.js` (`rerollDie`), `src/client/screens/settlement.js`, `src/client/wanted.js`, `src/client/styles.css`. Testy: `test/board-reroll.test.js`.
 
+## Z encyklopedii do Rzemieślnictwa (24.11.2026)
+
+Gracz przez autora: „Brakuje opcji, aby z bestiariusza można było automatycznie kliknąć na rzemiosło.” Chodzi o zakładkę „Przedmioty” w Encyklopedii: okno przedmiotu mówiło już, od którego poziomu profesji jest jego wzór, ale nie prowadziło do Warsztatu.
+
+1. **Linijka wzoru.** Okno przedmiotu, który robi Warsztat, dalej mówi „Warsztat: wzór od 25. poziomu Rzemieślnictwa.”, a gdy postać zna już ten wzór: „Warsztat: znasz już ten wzór.”. Biżuteria tak samo, ze Szlifiernią i Jubilerstwem. Postać zna wzór od jego poziomu profesji, gdy profesja jest już otwarta, albo wcześniej, gdy nauczyła się go z rozbiórki przedmiotu.
+2. **Przycisk.** Pod linijkami stoi „Do Warsztatu” albo „Do Szlifierni”. Otwiera Rzemieślnictwo albo Jubilerstwo z tym wzorem już wybranym i przewija ekran do „Wzory”.
+3. **Gdy jeszcze nie można.** Przycisk jest wyłączony, z kłódką, a pod nim stoi powód: „Rzemieślnictwo otworzy się na 15. poziomie postaci.” (Jubilerstwo na 25.) albo „Wzór odsłoni się na 25. poziomie Rzemieślnictwa.”. Gdzie wdrożenie ukrywa profesję, przycisku nie ma.
+4. **Adres (brakujący szczegół).** Przycisk prowadzi pod `#/profesje/rzemieslnictwo/<wzór>` albo `#/profesje/jubilerstwo/<wzór>`. Ekran wybiera ten wzór raz, zapisuje go jak zwykły wybór i przechodzi na swój zwykły adres, więc późniejszy „Powrót” na ten ekran nie zmienia wzoru, który gracz wybrał potem.
+5. **Po angielsku:** „Workshop: you know this pattern.”, „Gem Workshop: you know this pattern.”, „Crafting opens at character level 15.” i „The pattern opens at Crafting level 25.”. Przyciski mają już swoje angielskie słowa: „To the Workshop” i „To the Gem Workshop”.
+6. **Pliki:** `src/engine/encyclopedia.js` (`patternWay`), `src/server/encyclopedia.js`, `src/client/screens/encyclopedia.js`, `src/client/screens/professions.js`, `src/client/app.js`, `src/client/styles.css`, `data/encyclopedia.json`, `data/en/encyclopedia.json`, `data/en/sources.json`, testy w `test/encyclopedia.test.js`. Okno sprawdzone na 320, 390 i 1366 px: bez przewijania na boki i bez tekstu poza ramkami.
+
 ## Wersja 0.4.95 (24.11.2026): blokada poziomu przedmiotów
 
 Według sekcji niżej, bez makiet (nowa linijka na karcie przedmiotu i przyciski zablokowane jak przy Tierze).

@@ -1,5 +1,5 @@
 {
-  "$comment": "Encyklopedia (DECISIONS.md, „Encyklopedia”): wszystko, co postać już zdobyła, w zakładkach i tierach, ze wskazówką, skąd to wziąć. Przedmioty mają zestawy: w każdym tierze jeden na klasę i jeden z dodatkami dla wszystkich. Biżuteria stoi w tierach jak inne przedmioty, według poziomu klasy, od którego się ją zakłada, a ten sam poziom Jubilerstwa odsłania jej wzór w Szlifierni. Mikstury, zioła i minerały Górnictwa stoją w tierach według poziomu swojej profesji (upTo), a materiały według najwyższego poziomu swojego stwora. Rzadki przepis zielarki (taught w professions.json) mówi, od którego stopnia w relacji z nią albo w reputacji Bractwa Zielarzy go zna postać (potionTaught). Mikstury, zioła, materiały, części i minerały mają progi odkryć (milestones). Pełny zestaw albo próg otwiera skrzynię: zestaw ze skrzynią swojego tieru, kolejne progi z kolejnymi skrzyniami (chests). Materiał zdobyty w stopniu swojego gatunku i w trophy.grades - 1 wyższych to trofeum: obrażenia przeciw jego stworowi rosną o trophy.damage. Zakładka cards to karty Talii Systemu (src/engine/card-collection.js, słowa w cards.json), tylko tam, gdzie gra ma karty (CARDS).",
+  "$comment": "Encyklopedia (DECISIONS.md, „Encyklopedia”): wszystko, co postać już zdobyła, w zakładkach i tierach, ze wskazówką, skąd to wziąć. Przedmioty mają zestawy: w każdym tierze jeden na klasę i jeden z dodatkami dla wszystkich. Biżuteria stoi w tierach jak inne przedmioty, według poziomu klasy, od którego się ją zakłada, a ten sam poziom Jubilerstwa odsłania jej wzór w Szlifierni. Wpis przedmiotu, którego wzór ma Warsztat albo Szlifiernia, podaje poziom profesji, od którego jest wzór, albo że postać już go zna (itemPatternKnown, itemJewelPatternKnown), i ma przycisk „Do Warsztatu” albo „Do Szlifierni” (patternWay w src/engine/encyclopedia.js). Dopóki profesja albo wzór są zamknięte, przycisk jest wyłączony, a pod nim stoi poziom, na który czeka (patternProfession, patternLevel). Mikstury, zioła i minerały Górnictwa stoją w tierach według poziomu swojej profesji (upTo), a materiały według najwyższego poziomu swojego stwora. Rzadki przepis zielarki (taught w professions.json) mówi, od którego stopnia w relacji z nią albo w reputacji Bractwa Zielarzy go zna postać (potionTaught). Mikstury, zioła, materiały, części i minerały mają progi odkryć (milestones). Pełny zestaw albo próg otwiera skrzynię: zestaw ze skrzynią swojego tieru, kolejne progi z kolejnymi skrzyniami (chests). Materiał zdobyty w stopniu swojego gatunku i w trophy.grades - 1 wyższych to trofeum: obrażenia przeciw jego stworowi rosną o trophy.damage. Zakładka cards to karty Talii Systemu (src/engine/card-collection.js, słowa w cards.json), tylko tam, gdzie gra ma karty (CARDS).",
   "tabs": [
     { "id": "bestiary", "name": "Bestiariusz" },
     { "id": "items", "name": "Przedmioty" },
@@ -57,6 +57,10 @@
     "itemWear": ["Założysz od {level}. poziomu klasy."],
     "itemPattern": ["Warsztat: wzór od {level}. poziomu Rzemieślnictwa."],
     "itemJewelPattern": ["Szlifiernia: wzór od {level}. poziomu Jubilerstwa."],
+    "itemPatternKnown": ["Warsztat: znasz już ten wzór."],
+    "itemJewelPatternKnown": ["Szlifiernia: znasz już ten wzór."],
+    "patternProfession": ["{profession} otworzy się na {level}. poziomie postaci."],
+    "patternLevel": ["Wzór odsłoni się na {level}. poziomie {profession}."],
     "itemBest": ["Najlepszy zdobyty: {rarity}."],
     "potionRecipe": ["Alchemia: przepis od {level}. poziomu."],
     "potionHerbs": ["Składniki: {herbs}."],

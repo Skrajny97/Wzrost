@@ -101,6 +101,18 @@
     "itemJewelPattern": [
       "Gem Workshop: pattern from Jewelcrafting level {level}."
     ],
+    "itemPatternKnown": [
+      "Workshop: you know this pattern."
+    ],
+    "itemJewelPatternKnown": [
+      "Gem Workshop: you know this pattern."
+    ],
+    "patternProfession": [
+      "{profession} opens at character level {level}."
+    ],
+    "patternLevel": [
+      "The pattern opens at {profession} level {level}."
+    ],
     "itemBest": [
       "Best obtained: {rarity}."
     ],

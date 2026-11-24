@@ -99,8 +99,16 @@ const ROUTES = [
   // The Rdzeń (screens/core.js), its locked words until it opens; from the
   // Labirynt's "Odbierz Artefakty" (940), at its Skrytka.
   { pattern: /^#\/postac\/rdzen(?:\/(?<part>skrytka))?$/, nav: 'character', tab: 'core', mount: mountCore },
-  // Profesje, or one profession's screen (Zielarstwo).
-  { pattern: /^#\/profesje(?:\/(?<profession>[a-z]+))?$/, nav: 'main', tab: 'profesje', part: ({ profession }) => profession, music: 'professions', mount: mountProfessions },
+  // Profesje, or one profession's screen (Zielarstwo); the Warsztat's or
+  // the Szlifiernia's with a pattern to choose, from the Encyklopedia.
+  {
+    pattern: /^#\/profesje(?:\/(?<profession>[a-z]+)(?:\/(?<pattern>[a-z0-9-]+))?)?$/,
+    nav: 'main',
+    tab: 'profesje',
+    part: ({ profession }) => profession,
+    music: 'professions',
+    mount: mountProfessions,
+  },
   // The Osada's board, or one of its places, the Karczma at one of its
   // tabs (settlement.js).
   { pattern: /^#\/osada(?:\/(?<place>[a-z0-9-]+)(?:\/(?<tab>[a-z]+))?)?$/, nav: 'main', tab: 'osada', part: ({ place }) => place, mount: mountSettlement },
