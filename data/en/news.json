@@ -1380,6 +1380,10 @@
     "0.5.11": {
       "title": "Version 0.5.11",
       "body": "- World Boss: the current boss stays through Thursday 26 November, and a new one appears on Friday 27 November. After that, a new boss appears every 3 days.\n- Druid, Archdruid and Elder Druid: summons draw the enemies' blows onto themselves. While they stand, creatures and rivals hit them, not your character or your companions.\n- Each summon also gets an extra 75% of the character's max HP, so it can take several blows from an elite or a champion. Summon Ent, Summon Bear and Call of the Beasts now last 5 turns, and Ancient Herd 6.\n- In the Arena and guild wars the Druid's own blows are like anyone else's, and the fight stats show its real attack. The Druid's strength in duels now lies in its summons.\n- Polish skill descriptions and fight log lines now use the right word forms for the number of turns."
+    },
+    "0.5.12": {
+      "title": "Version 0.5.12",
+      "body": "- Elder Druid: in the System Towers the Oaks of Ages' roots slow enemies only half as much, so it climbs about as high as the other fourth forms there.\n- Nothing changes on explorations, in the Labyrinth, in the Arena or in guild wars."
     }
   }
 }

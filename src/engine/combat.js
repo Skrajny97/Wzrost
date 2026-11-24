@@ -1918,7 +1918,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
             burst: Boolean(m.burst),
             physical: Boolean(m.physical),
             ...(m.howl && { howl: m.howl }),
-            ...(m.root && { root: m.root }),
+            // In the Wieże the Pradruid's roots slow by a share of that
+            // (1249 B: evolutions.json towerSummonRoot; towerFight in towers.js).
+            ...(m.root && { root: m.root * (actor.summonRootScale ?? 1) }),
             // The fourth forms' summons: the bear strikes the foe in front and
             // may stun it, the Dąb wieków heals the party every move.
             ...(m.front && { front: true, stunChance: m.stunChance, stunLabel: m.stunLabel }),

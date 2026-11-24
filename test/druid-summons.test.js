@@ -40,9 +40,26 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { describe, test } from 'node:test';
 
-import { arenaDuel, buildContent, combatantView, createRng, duelArmorShare, duelHpFactor, duelist, monsterCombatant, playerCombatant, simulateFight, simulateHunt, skillCost, skillView } from '../src/engine/index.js';
+import {
+  arenaDuel,
+  buildContent,
+  combatantView,
+  companionForm,
+  createRng,
+  duelArmorShare,
+  duelHpFactor,
+  duelist,
+  monsterCombatant,
+  playerCombatant,
+  simulateFight,
+  simulateHunt,
+  skillCost,
+  skillView,
+  towerFight,
+  warBattle,
+} from '../src/engine/index.js';
 import { measureClass } from '../tools/class-balance-sim.mjs';
-import { GEAR_SETS, newestArea, playerOf, withArea } from '../tools/difficulty-sim.mjs';
+import { GEAR_SETS, companionsOf, newestArea, playerOf, withArea } from '../tools/difficulty-sim.mjs';
 import { loadData } from '../tools/validate-data.mjs';
 import { content } from './helpers/content.js';
 
@@ -392,5 +409,104 @@ describe('the Druid line in duels', () => {
         }
       }
     }
+  });
+});
+
+describe('the Pradruid in the Wieże (1249 B)', () => {
+  // The author's choice 1249 B: the Pradruid weaker in the Wieże only, so
+  // that it climbs about as high as the best other fourth form. Before
+  // (0.5.11) alone at level 300 it climbed to floor 489, the other fourth
+  // forms to 224–329: the two oaks' roots pushed every move of its foe back,
+  // so the foe hardly ever struck (less HP for its summons hardly changed
+  // that). Now its roots slow at half their strength there
+  // (evolutions.json towerSummonRoot). `whole`: the game as in 0.5.11.
+  const whole = (() => {
+    const raw = loadData();
+    delete raw.evolutions.evolutions.find((form) => form.id === 'elder-druid').towerSummonRoot;
+    return buildContent(raw);
+  })();
+  const share = content.evolutionsById['elder-druid'].towerSummonRoot;
+  const pradruid = { ...druidAt(300), name: 'Pradruid' };
+
+  test('only the Pradruid has a share of its roots\' strength in the Wieże, half, and its trait says so in Polish and in English', () => {
+    assert.equal(share, 0.5);
+    assert.deepEqual(content.evolutions.filter((form) => form.towerSummonRoot !== undefined).map((form) => form.id), ['elder-druid']);
+    assert.equal(pradruid.character.evolution, 'elder-druid');
+    assert.ok(content.evolutionsById['elder-druid'].trait.text.endsWith('W Wieżach Systemu korzenie Dębów wieków spowalniają wrogów o połowę słabiej.'));
+    const english = JSON.parse(readFileSync(new URL('../data/en/evolutions.json', import.meta.url), 'utf8'));
+    assert.ok(english.evolutions['elder-druid'].trait.text.endsWith("In the System Towers the Oaks of Ages' roots slow enemies only half as much."));
+  });
+
+  test('a rooted foe of a summoner with that share moves again sooner: half the delay of the roots', () => {
+    // The Pradruid alone against a sturdy creature, with the share
+    // (summonRootScale, as towerFight gives it) and without.
+    const fight = (scale) => {
+      const unit = { ...playerCombatant({ character: pradruid.character, equipped: pradruid.equipped, name: 'Pradruid' }, content), ...(scale && { summonRootScale: scale }) };
+      const foe = { ...monsterCombatant({ monsterId: 'boar', level: 300, id: 'e0' }, content), hp: 1e7, maxHp: 1e7 };
+      return simulateFight({ allies: [unit], enemies: [foe], rng: createRng('tower-roots'), content, record: true, maxActions: 40 }).events;
+    };
+    // The foe's first move after its first rooting.
+    const nextMove = (events) => {
+      const rooted = events.findIndex((event) => event.kind === 'slow' && event.targets?.includes('e0') && /korzeniach/.test(event.text));
+      assert.ok(rooted > 0);
+      return { at: events[rooted].t, next: events.slice(rooted + 1).find((event) => event.actor === 'e0').t };
+    };
+    const [half, full] = [nextMove(fight(share)), nextMove(fight(null))];
+    assert.equal(half.at, full.at);
+    assert.ok(half.next < full.next, `${half.next} vs ${full.next}`);
+  });
+
+  test('in a Wieża the share is the Pradruid\'s, whoever it fights as: the climber, a partner or a companion; nobody else\'s', () => {
+    const warrior = { ...playerOf('realistic', 'warrior', 300, content, 0), name: 'Wojownik' };
+    // A Mag of the Arkanista's path at level 300 as a companion: a Pradruid.
+    const [mate] = companionsOf(warrior.plan, 301, 2, content);
+    const companion = { ...mate, classId: 'mage', skills: ['mana-shield', 'fireball'] };
+    assert.equal(companionForm(companion, content)?.id, 'elder-druid');
+    const climb = (options, data) => towerFight({ floor: 250, seed: 'tower-share', ...options }, data);
+    for (const options of [
+      { character: pradruid.character, equipped: pradruid.equipped, name: 'Pradruid' },
+      { character: warrior.character, equipped: warrior.equipped, name: 'Wojownik', partners: [pradruid] },
+      { character: warrior.character, equipped: warrior.equipped, name: 'Wojownik', companions: [companion] },
+    ]) {
+      assert.notDeepEqual(climb(options, content), climb(options, whole));
+    }
+    // An Arcydruid partner and a Wojownik companion: as in 0.5.11.
+    const [other] = companionsOf(warrior.plan, 301, 0, content);
+    assert.notEqual(companionForm(other, content)?.id, 'elder-druid');
+    const mates = { character: warrior.character, equipped: warrior.equipped, name: 'Wojownik', partners: [{ ...druidAt(250), name: 'Arcydruid' }], companions: [other] };
+    assert.deepEqual(climb(mates, content), climb(mates, whole));
+  });
+
+  test('outside the Wieże nothing changes: an exploration\'s fight, a duel and a guild war\'s battle go as in 0.5.11', () => {
+    const rival = { ...playerOf('realistic', 'warrior', 300, content, 1), name: 'Rywal' };
+    const duel = (data) => arenaDuel({ attacker: pradruid, defender: rival, seed: 'tower-duel' }, data);
+    assert.deepEqual(duel(content), duel(whole));
+    const battle = (data) => warBattle({ sideA: [pradruid, rival, rival], sideB: [rival, pradruid, rival], seed: 'tower-war' }, data);
+    assert.deepEqual(battle(content), battle(whole));
+    const area = newestArea(300, content);
+    const hunt = (data) => {
+      const local = withArea(area, data);
+      const hp = playerCombatant({ character: pradruid.character, equipped: pradruid.equipped, name: 'Pradruid', area }, local).maxHp;
+      return simulateHunt({ character: pradruid.character, equipped: pradruid.equipped, hp, name: 'Pradruid', areaId: area.id, minutes: 60, seed: 'tower-hunt', rumor: 1e9 }, local);
+    };
+    const [now, then] = [hunt(content), hunt(whole)];
+    assert.ok(now.fights.some((fight) => fight.events.some((event) => event.kind === 'summon' && event.state === 'up')));
+    assert.deepEqual(now, then);
+  });
+
+  test('alone at level 300 it no longer gets past the champion of floor 350 (20% of the entries before), as the best other fourth forms stop before it, and it still wins the one of floor 325', () => {
+    const rate = (floor, data) => {
+      let won = 0;
+      for (let set = 0; set < GEAR_SETS; set++) {
+        const { character, equipped } = playerOf('realistic', 'mage', 300, data, set, 'mana-shield');
+        for (let seed = 0; seed < 4; seed++) {
+          if (towerFight({ character, equipped, name: 'Pradruid', floor, seed: `tower-wall:${set}:${seed}` }, data).result === 'success') won += 1;
+        }
+      }
+      return won / (GEAR_SETS * 4);
+    };
+    assert.equal(rate(350, content), 0);
+    assert.ok(rate(350, whole) > 0.05);
+    assert.ok(rate(325, content) >= 0.75);
   });
 });
