@@ -4260,6 +4260,8 @@ Brakujące szczegóły rozstrzygnięte najprościej, zgodnie z resztą gry:
 
 Zob. sekcję niżej: 44 nowe przedmioty od 225. i 250. poziomu klasy z ikonami wybranymi przez autora (1239). Wzory do wyrobu dojdą z krainami Drzewa Świata (1246 A). W tej samej wersji Kultywacja: zob. „Kultywacja (1230 A, 24.11.2026)”, z makietami 1247 i tempem poziomów 1248 B (migracja `0174_cultivation.sql`).
 
+Pradruid w Wieżach dostroił się jeszcze raz pod nowy sprzęt: korzenie Dębów wieków spowalniają tam wrogów pięć razy słabiej (`towerSummonRoot` 0,2 zamiast 0,5), zob. punkt 17 w „Druid: przywołańce na wyprawach i na Arenie”. Pierwsze wdrożenie 0.5.13 nie przeszło przez test Wieży Pradruida, który zakładał sprzęt Tieru X.
+
 ## Tiery XI i XII przedmiotów (24.11.2026)
 
 Zadanie: przedmioty na całą grę do 500. poziomu. Krainy sięgają dziś 350. poziomu, a dojdą jeszcze dwie: 351–425 i 426–500 (ewolucje klas na 400. i 500. poziomie klasy). Brakujący szczegół rozstrzygnięty najprostszą zasadą zgodną z dotychczasowymi Tierami.
