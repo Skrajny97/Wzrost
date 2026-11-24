@@ -1,0 +1,14 @@
+{
+  "id": "przemysl-crown",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the crown of king przemysl the second, who restored the kingdom of poland: a closed royal crown of pale silver with two crossing arches over a cap of crimson velvet, set with large green emeralds, a small silver orb with a cross on top, single inventory item icon",
+  "style": "src/client/art/items/papal-tiara.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023292649947696264
+  },
+  "images": 1
+}
