@@ -1,0 +1,13 @@
+{
+  "id": "pride-hurt",
+  "payload": {
+    "text": "a haughty golden mask spirit gives a loud cold disdainful shriek of pain with a ringing metallic clang, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/pride-hurt-20261124T1605-0.mp3",
+    "audio/drafts/voices/pride-hurt-20261124T1605-1.mp3"
+  ],
+  "credits": 28
+}

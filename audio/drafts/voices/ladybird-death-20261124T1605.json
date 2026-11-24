@@ -1,0 +1,13 @@
+{
+  "id": "ladybird-death",
+  "payload": {
+    "text": "a giant ladybird gives a loud angry buzzing screech that fades out and drops with a hard click, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/ladybird-death-20261124T1605-0.mp3",
+    "audio/drafts/voices/ladybird-death-20261124T1605-1.mp3"
+  ],
+  "credits": 48
+}

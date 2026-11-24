@@ -1,0 +1,13 @@
+{
+  "id": "honey-fungus-death",
+  "payload": {
+    "text": "a clump of living glowing mushrooms gives a loud eerie hollow moaning groan and bursts apart with a wet crunch, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/honey-fungus-death-20261124T1605-0.mp3",
+    "audio/drafts/voices/honey-fungus-death-20261124T1605-1.mp3"
+  ],
+  "credits": 52
+}

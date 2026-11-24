@@ -1,0 +1,13 @@
+{
+  "id": "aphid-death",
+  "payload": {
+    "text": "a giant aphid gives a loud wet squealing screech of pain that fades and ends with a wet pop, no words, close up, dry, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/aphid-death-20261124T1605-0.mp3",
+    "audio/drafts/voices/aphid-death-20261124T1605-1.mp3"
+  ],
+  "credits": 44
+}
