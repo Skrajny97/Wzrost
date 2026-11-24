@@ -63,6 +63,7 @@ import {
   orderGold,
   orderStories,
   orderSystemPoints,
+  orderRerolls,
   parseStack,
   pathResetCost,
   piecesOfRarity,
@@ -124,6 +125,7 @@ import {
   requireUnworn,
   settlementBoard,
   settlementGoods,
+  settlementReroll,
 } from './characters.js';
 import { atomically, sameVersion } from './atomic.js';
 import { toHex } from './encoding.js';
@@ -370,6 +372,8 @@ export function settlementView(player, stored, board, now) {
       weeklyDone: board.weekly?.done ?? false,
       // The wait for a new order in a slot emptied (data/settlement.json).
       refillMinutes: content().settlement.orders.refillMinutes,
+      // The dice's rerolls left today (orderRerolls, 24.11.2026).
+      reroll: rerollsView(orderRerolls(board, now, content())),
     },
     reforge: {
       items: player.items.filter((item) => item.affixes?.length > 0).map((item) => reforgeView(item, stocks.materials, gearKey(player.row.class_id, player.row.evolution, content()))),
@@ -1535,6 +1539,31 @@ export async function talkWithCompanion(context) {
     settlement: settlementView(loaded, next, settlementBoard(loaded.row, next, context.now), context.now),
     character: characterView(loaded, context.now),
   });
+}
+
+// The rerolls of a board's dice for the page: the day's and those left.
+const rerollsView = ({ daily, left }) => ({ daily, left });
+
+// { orderId }: the order's die (24.11.2026): the order drawn anew at once,
+// for free, while today's rerolls last (orderRerolls), one at a time: the
+// board saved only if the character is as read, so two taps at once draw
+// once.
+export async function rerollSettlementOrder(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const body = await readJson(context.request);
+  const stored = settlementOf(row);
+  const settled = settlementBoard(row, stored, context.now);
+  if (orderRerolls(settled, context.now, content()).left === 0) throw new ApiError(409, 'reroll_limit', 'Dziś nie masz już przelosowań zleceń. Nowe o północy.');
+  const board = settlementReroll(row, stored, settled, body.orderId, context.now);
+  if (!board) throw new ApiError(404, 'no_order', 'Tego zlecenia nie da się przelosować.');
+  const next = { ...stored, board };
+  const result = await context.env.DB.prepare('UPDATE characters SET settlement = ?, version = version + 1 WHERE id = ? AND version = ?')
+    .bind(JSON.stringify(next), row.id, row.version)
+    .run();
+  if (result.meta.changes !== 1) throw changed();
+  return json({ settlement: settlementView(player, next, board, context.now), character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) });
 }
 
 // { orderId }: takes an order off the board for free; a new one comes later.

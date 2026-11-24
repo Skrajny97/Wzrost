@@ -9,7 +9,8 @@
 // with a chest to open start unfolded. Where the game has Talia Systemu
 // (CARDS) the last tab, "Karty", is the cards collected (card-collection.js
 // in the engine): the count and its bonus, then every land's cards, a card
-// not found yet as its creature's shadow.
+// not found yet as its creature's shadow. An item's sheet leads to its
+// pattern in the Warsztat or the Szlifiernia, or says when it opens.
 
 import { herbSprite, itemSprite, materialSprite, mineralSprite, potionSprite } from '../art.js';
 import { bestiaryReady, placeReady } from '../bestiary.js';
@@ -22,11 +23,33 @@ import { systemPoints } from '../quests.js';
 import { playSound } from '../sound.js';
 import { call, state } from '../state.js';
 import { timePoints } from '../time.js';
-import { openSheet, pageHeading, toast, withButton } from '../ui.js';
+import { closeSheet, openSheet, pageHeading, toast, withButton } from '../ui.js';
 import { bestiaryRow } from './combat.js';
 
 const HOME = '#/encyklopedia';
 const DEFAULT_TAB = 'items';
+
+// The way from an item to its pattern (a player's wish, 24.11.2026), by its
+// profession: the Warsztat or the Szlifiernia, whose address with the base
+// chooses its pattern there (professions.js).
+const WAYS = {
+  crafting: { hash: '#/profesje/rzemieslnictwo', label: () => t('Do Warsztatu') },
+  jewelcrafting: { hash: '#/profesje/jubilerstwo', label: () => t('Do Szlifierni') },
+};
+
+// An item's way to its pattern, or null: open, or shut with a lock and the
+// level it waits for under it (patternWay in the engine).
+function wayTo(entry) {
+  const way = entry.craft && WAYS[entry.craft.profession];
+  if (!way) return null;
+  if (entry.craft.open) return h('a', { class: 'button button--world', href: `${way.hash}/${entry.id}`, onClick: closeSheet, text: way.label() });
+  return h(
+    'div',
+    { class: 'encyclopedia-way' },
+    h('button', { type: 'button', class: 'button button--world encyclopedia-way-shut', disabled: true }, icon('lock', { size: 16 }), way.label()),
+    h('p', { class: 'muted encyclopedia-way-reason', text: entry.craft.reason }),
+  );
+}
 
 // The tiers and lands the player folded or unfolded by hand, kept while
 // the game is open.
@@ -206,6 +229,7 @@ export function mountEncyclopedia(container, { params }) {
         entry.description && h('p', { class: 'sheet-text', text: entry.description }),
         h('ul', { class: 'encyclopedia-sources' }, entry.sources.map((line) => h('li', { text: line }))),
       ),
+      kind === 'items' && wayTo(entry),
     );
   }
 

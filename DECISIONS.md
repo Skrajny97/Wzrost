@@ -3916,6 +3916,34 @@ Gracz (poz. 63) przez autora: „fajne też jakby można było porównać przedm
 5. Po angielsku: „Without upgrades”. Karta sprawdzona na 320, 390 i 1366 px, po polsku i po angielsku, z długą nazwą przedmiotu i liczbami przedmiotów 500. poziomu.
 6. Pliki: `src/engine/preview.js`, `src/server/inventory.js`, `src/client/screens/character.js` (`itemCard`, `compareBare`), `src/client/styles.css`, `data/en/strings.json`, `README.md`. Test: `test/engine.test.js`.
 
+## Wersja 0.4.98 (24.11.2026): przelosowanie zleceń i listów gończych, z encyklopedii do Rzemieślnictwa
+
+Według sekcji „Przelosowanie zleceń i listów gończych” i „Z encyklopedii do Rzemieślnictwa” (obie z 24.11.2026) niżej, bez makiet (kostka i przycisk na istniejących ekranach).
+
+## Przelosowanie zleceń i listów gończych (24.11.2026)
+
+Gracz zaproponował „możliwość rollowania tablicy zleceń / poszukiwani”. Autor: „potrzeba jeszcze przelosowania tablicy poszukiwanych oraz zleceń (zamiast odrzucania i czekania 12 godzin)”. Do tej pory niechciane zlecenie można było tylko odrzucić i czekać 12 godzin na nowe, a listu gończego nie dało się wymienić wcale.
+
+1. **Kostka.** Każde zlecenie na Tablicy zleceń ma po rozwinięciu kostkę obok „Oddaj” i „Odrzuć”. Każdy list gończy, który wisi na tablicy, ma kostkę obok „Weź list”, a na wąskim telefonie pod nim. Kostka wygląda jak kostka przy zadaniach narratora (1023 B). Stuknięcie od razu, bez pytania, zmienia to jedno zlecenie albo ten jeden list na nowy, a reszta tablicy zostaje.
+2. **Ile razy.** Za darmo, 3 razy dziennie na Tablicy zleceń i osobno 3 razy na Poszukiwanych (`orders.reroll.perDay` i `wanted.reroll.perDay` w `data/settlement.json`). Przelosowania wracają o północy czasu polskiego, jak inne dzienne liczniki gry. Obok tytułu „Tablica zleceń” i nad listami gończymi stoi „Przelosowania dziś: 2 z 3”. Gdy przelosowań brak, kostki są wyszarzone, a zdanie mówi: „Przelosowania dziś: 0 z 3. Nowe o północy.”
+3. **Nowe zlecenie** losuje się tak samo jak każde zlecenie Tablicy (te same towary, liczby i zapłata według poziomu postaci i reputacji bractw), ale nigdy o ten sam towar co przelosowane, o ile postać może dostać zlecenie na coś innego. Dostaje nowy, tygodniowy termin.
+4. **Nowy list** jest z tych samych trzech miejsc dnia, z poziomem i nagrodą według tych samych zasad co pozostałe listy dnia, i zawsze za kimś, za kim tego dnia nie było jeszcze listu. Każde z trzech miejsc ma już list za swoim stworem, więc w miejsce listu za stworem przychodzi list za wyjętym spod prawa (jest ich siedmiu), a w miejsce listu za wyjętym spod prawa list za innym wyjętym spod prawa (brakujący szczegół: w tych miejscach nie ma innego stwora).
+5. **Czego nie przelosujesz** (brakujące szczegóły): listu w ręku, także tego, z którym postać jest na wyprawie, listu wypełnionego i zlecenia tygodnia, którego nie da się też odrzucić. Puste miejsce po oddanym albo odrzuconym zleceniu czeka na nowe zlecenie jak dotąd. Odrzucanie zleceń i porzucanie listów działa jak wcześniej: porzucony list znowu wisi na tablicy i można go przelosować.
+6. **Dwa stuknięcia naraz przelosowują raz.** Losuje serwer, z ziarna postaci. Sprawdza limit i stan zlecenia albo listu, a tablicę zapisuje tylko wtedy, gdy postać nie zmieniła się w międzyczasie.
+7. Bez migracji bazy: licznik zleceń leży w zapisie Tablicy (`board.rerolls`), a licznik listów i przelosowane listy w zapisie dnia Poszukiwanych (`wanted.rerolled`).
+8. Sprawdzone na 320, 390 i 1366 px: bez przewijania na boki, kostki w ramkach. Pliki: `data/settlement.json` (`orders.reroll`, `wanted.reroll`, teksty `wanted.texts.reroll…`), `data/schemas/settlement.schema.json`, `data/en/settlement.json`, `data/en/strings.json`, `src/engine/settlement.js` (`drawOrder` z `avoid`, `orderRerolls`, `rerollOrder`), `src/engine/wanted.js` (`rerollPoster`, `swappedPosters`, `wantedRerolls`), `src/server/settlement.js` (`POST /api/settlement/reroll`), `src/server/wanted.js` (`POST /api/settlement/wanted/reroll`), `src/client/ui.js` (`rerollDie`), `src/client/screens/settlement.js`, `src/client/wanted.js`, `src/client/styles.css`. Testy: `test/board-reroll.test.js`.
+
+## Z encyklopedii do Rzemieślnictwa (24.11.2026)
+
+Gracz przez autora: „Brakuje opcji, aby z bestiariusza można było automatycznie kliknąć na rzemiosło.” Chodzi o zakładkę „Przedmioty” w Encyklopedii: okno przedmiotu mówiło już, od którego poziomu profesji jest jego wzór, ale nie prowadziło do Warsztatu.
+
+1. **Linijka wzoru.** Okno przedmiotu, który robi Warsztat, dalej mówi „Warsztat: wzór od 25. poziomu Rzemieślnictwa.”, a gdy postać zna już ten wzór: „Warsztat: znasz już ten wzór.”. Biżuteria tak samo, ze Szlifiernią i Jubilerstwem. Postać zna wzór od jego poziomu profesji, gdy profesja jest już otwarta, albo wcześniej, gdy nauczyła się go z rozbiórki przedmiotu.
+2. **Przycisk.** Pod linijkami stoi „Do Warsztatu” albo „Do Szlifierni”. Otwiera Rzemieślnictwo albo Jubilerstwo z tym wzorem już wybranym i przewija ekran do „Wzory”.
+3. **Gdy jeszcze nie można.** Przycisk jest wyłączony, z kłódką, a pod nim stoi powód: „Rzemieślnictwo otworzy się na 15. poziomie postaci.” (Jubilerstwo na 25.) albo „Wzór odsłoni się na 25. poziomie Rzemieślnictwa.”. Gdzie wdrożenie ukrywa profesję, przycisku nie ma.
+4. **Adres (brakujący szczegół).** Przycisk prowadzi pod `#/profesje/rzemieslnictwo/<wzór>` albo `#/profesje/jubilerstwo/<wzór>`. Ekran wybiera ten wzór raz, zapisuje go jak zwykły wybór i przechodzi na swój zwykły adres, więc późniejszy „Powrót” na ten ekran nie zmienia wzoru, który gracz wybrał potem.
+5. **Po angielsku:** „Workshop: you know this pattern.”, „Gem Workshop: you know this pattern.”, „Crafting opens at character level 15.” i „The pattern opens at Crafting level 25.”. Przyciski mają już swoje angielskie słowa: „To the Workshop” i „To the Gem Workshop”.
+6. **Pliki:** `src/engine/encyclopedia.js` (`patternWay`), `src/server/encyclopedia.js`, `src/client/screens/encyclopedia.js`, `src/client/screens/professions.js`, `src/client/app.js`, `src/client/styles.css`, `data/encyclopedia.json`, `data/en/encyclopedia.json`, `data/en/sources.json`, testy w `test/encyclopedia.test.js`. Okno sprawdzone na 320, 390 i 1366 px: bez przewijania na boki i bez tekstu poza ramkami.
+
 ## Wersja 0.4.95 (24.11.2026): blokada poziomu przedmiotów
 
 Według sekcji niżej, bez makiet (nowa linijka na karcie przedmiotu i przyciski zablokowane jak przy Tierze).

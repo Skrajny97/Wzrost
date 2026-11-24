@@ -82,6 +82,13 @@ const SET_BAG_STEP = 20;
 // The Stół rozbiórki, where parts are made.
 const TABLE = '#/oboz/craft-table';
 
+// A pattern asked for in the address (#/profesje/rzemieslnictwo/<base>,
+// #/profesje/jubilerstwo/<base>), from the Encyklopedia's „Do Warsztatu”
+// and „Do Szlifierni” (a player's wish, 24.11.2026): the screen moves to
+// its own address and chooses the pattern there once, so a later „Powrót”
+// to it keeps what the player chose since.
+let askedPattern = null;
+
 function loadChoice(key) {
   try {
     return JSON.parse(localStorage.getItem(key)) ?? {};
@@ -262,6 +269,13 @@ export function mountProfessions(container, { params, navigate }) {
     location.replace(HOME);
     return {};
   }
+  if (params.pattern) {
+    if (professionId === 'crafting' || professionId === 'jewelcrafting') askedPattern = { professionId, id: params.pattern };
+    location.replace(HASHES[professionId]);
+    return {};
+  }
+  const asked = askedPattern?.professionId === professionId ? askedPattern.id : null;
+  askedPattern = null;
   const choice = loadChoice(HERB_CHOICE); // { herbs: [ids], minutes }
   const brewChoice = loadChoice(BREW_CHOICE); // { recipe, count }
   const craftChoice = loadChoice(CRAFT_CHOICE); // { slot, pattern, rarity, count }
@@ -271,6 +285,18 @@ export function mountProfessions(container, { params, navigate }) {
   const fishChoice = loadChoice(FISH_CHOICE); // { fish: [ids], minutes }
   const farmChoice = loadChoice(FARM_CHOICE); // { plots: [id or null], crop, minutes }
   const cookChoice = loadChoice(COOK_CHOICE); // { recipe, count }
+  // The pattern asked for becomes the last choice of its place, with its
+  // slot, if the character knows it.
+  if (asked) {
+    const crafting = professionId === 'crafting';
+    const place = crafting ? state.character.professions?.workshop : state.character.professions?.jewelcrafting;
+    const slot = place?.slots.find((each) => each.patterns.some((pattern) => pattern.id === asked && !pattern.hidden));
+    if (slot) {
+      const last = crafting ? craftChoice : jewelChoice;
+      Object.assign(last, { slot: slot.id, pattern: asked });
+      saveChoice(crafting ? CRAFT_CHOICE : JEWEL_CHOICE, last);
+    }
+  }
   let lockedScreenShown = null;
   let shownState = null;
   // The Warsztat's tab: the workshop itself or its part exchange.
@@ -3109,6 +3135,13 @@ export function mountProfessions(container, { params, navigate }) {
   }
 
   render();
+  // The pattern asked for in sight under the top bar, with its card's top,
+  // as the Rdzeń's Skrytka from the Labirynt (core.js).
+  const patternsCard = asked && container.querySelector('#patterns-title, #jewels-title')?.closest('section');
+  if (patternsCard) {
+    const covered = document.querySelector('.topbar')?.getBoundingClientRect().bottom ?? 0;
+    window.scrollTo({ top: Math.max(0, window.scrollY + patternsCard.getBoundingClientRect().top - Math.max(0, covered) - 8) });
+  }
   return { update: render, tick };
 }
 

@@ -5,10 +5,11 @@
 // from the sołtys once it has fallen. The Osada's record keeps `wanted`:
 // the day, what the day's posters are drawn from (`basis`: the class level
 // and the place the Sala prób opened, as the day's first look found them),
-// the posters done that day and the poster taken (`beaten` once its target
-// fell).
+// the posters done that day, the poster taken (`beaten` once its target
+// fell) and the posters drawn anew by their dice that day (`rerolled`, by
+// the id of each one drawn away, 24.11.2026).
 
-import { laterPeriod, questPeriod, samePeriod, wantedName, wantedOf, wantedPosters, wantedTarget, wantedTrophy, weekCount } from '../engine/index.js';
+import { laterPeriod, questPeriod, rerollPoster, samePeriod, swappedPosters, wantedName, wantedOf, wantedPosters, wantedRerolls, wantedTarget, wantedTrophy, weekCount } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
 import { characterView, loadPlayer, requirePlayer, settlementBoard } from './characters.js';
 import { content } from './content.js';
@@ -50,11 +51,16 @@ function recordOf(row, stored, day) {
     basis: same && record.basis ? { classLevel: record.basis.classLevel, early: record.basis.early } : { classLevel: row.class_level, early: hallRecord(row).early },
     done: same ? (record.done ?? []) : [],
     taken: record.taken ?? null,
+    // The day's dice: a new day has its rerolls anew (wantedRerolls).
+    ...(same && record.rerolled && { rerolled: record.rerolled }),
   };
 }
 
-// The day's posters, from the record's basis.
-const postersOf = (row, record) => wantedPosters(record.basis.classLevel, record.day, row.id, content(), record.basis.early);
+// The day's posters as drawn first, from the record's basis.
+const firstPosters = (row, record) => wantedPosters(record.basis.classLevel, record.day, row.id, content(), record.basis.early);
+
+// The day's posters, those drawn anew by their dice in their places.
+const postersOf = (row, record) => swappedPosters(firstPosters(row, record), record.rerolled);
 
 // The record the Osada's first look of a day keeps (getSettlement in
 // settlement.js), as the Koło Fortuny keeps its pool's basis; null when the
@@ -109,6 +115,8 @@ export function wantedView(row, stored, now) {
     posters: ofDay ? [apart, ...posters] : posters,
     earlier: ofDay ? null : apart,
     holding: Boolean(taken),
+    // The dice's rerolls left today (24.11.2026): an open poster has its die.
+    reroll: wantedRerolls(record.rerolled, content()),
   };
 }
 
@@ -213,6 +221,32 @@ export async function dropWanted(context) {
   if (taken.beaten) throw new ApiError(409, 'beaten', rules.texts.claimFirst);
   if (carried === taken.id) throw new ApiError(409, 'carried', rules.texts.carried);
   return json(await save(context, session, row, { ...stored, wanted: { ...record, taken: null } }));
+}
+
+// POST /api/settlement/wanted/reroll { posterId }: a poster's die
+// (24.11.2026; a player's idea, „możliwość rollowania tablicy zleceń /
+// poszukiwani”, and the author: „potrzeba jeszcze przelosowania tablicy
+// poszukiwanych oraz zleceń (zamiast odrzucania i czekania 12 godzin)”):
+// one of the day's posters still open, not in hand, not done, nor the one
+// an exploration under way set out with, drawn anew at once for a target
+// the day has not had (rerollPoster in the engine), for free while the
+// day's rerolls last (wantedRerolls). The record is saved only if the
+// character is as read, so two taps at once draw once.
+export async function rerollWanted(context) {
+  const { session, row, rules, stored, record, carried } = await start(context);
+  const body = await readJson(context.request);
+  if (record.taken?.id === body.posterId || carried === body.posterId) throw new ApiError(409, 'held', rules.texts.rerollHeld);
+  const posters = postersOf(row, record);
+  const poster = posters.find((one) => one.id === body.posterId);
+  if (!poster) throw new ApiError(404, 'no_poster', rules.texts.gone);
+  if (record.done.includes(poster.id)) throw new ApiError(409, 'done', rules.texts.rerollDone);
+  const rerolled = record.rerolled ?? {};
+  if (wantedRerolls(rerolled, content()).left === 0) throw new ApiError(409, 'reroll_limit', rules.texts.rerollLimit);
+  const seen = [...firstPosters(row, record), ...Object.values(rerolled), ...(record.taken ? [record.taken] : [])];
+  const basis = { classLevel: record.basis.classLevel, day: record.day, seed: row.id, early: record.basis.early };
+  const fresh = rerollPoster(basis, poster, seen, Object.keys(rerolled).length + 1, content());
+  if (!fresh) throw new ApiError(409, 'no_other', rules.texts.rerollNone);
+  return json(await save(context, session, row, { ...stored, wanted: { ...record, rerolled: { ...rerolled, [poster.id]: fresh } } }));
 }
 
 // POST /api/settlement/wanted/claim: the sołtys pays the bounty of the

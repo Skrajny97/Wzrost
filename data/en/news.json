@@ -1324,6 +1324,10 @@
     "0.4.97": {
       "title": "Version 0.4.97",
       "body": "- Creatures are weaker: 2.5 times up to level 150, then less and less, down to 1.5 times from level 250. This applies to every fight with creatures: explorations, Wanted posters, Towers, Portals, the Labyrinth and the Guild Beast. The places' danger estimate already counts the new strength.\n- An item card in the bag has a \"Without upgrades\" switch. The comparison with the worn item then counts both without their +N, so you can see whether the new one is worth upgrading."
+    },
+    "0.4.98": {
+      "title": "Version 0.4.98",
+      "body": "- Order Board and Wanted: every order and every wanted poster has a \"Reroll\" die. It draws a new one in its place at once, with no waiting. Rerolls are free, 3 a day on each board, from midnight. The weekly order cannot be rerolled.\n- Encyclopedia › Items: an item's card has a \"To the Workshop\" or \"To the Gem Workshop\" button. It opens Crafting or Jewelcrafting with that pattern already chosen, and when you do not know the pattern yet, it says from which level you will."
     }
   }
 }

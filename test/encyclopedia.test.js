@@ -14,6 +14,7 @@ import {
   itemSets,
   mergeDiscoveries,
   monsterCombatant,
+  patternWay,
   playerCombatant,
   readyChests,
   simulateFight,
@@ -381,6 +382,47 @@ describe('the Encyklopedia in the engine', () => {
     const potion = view.potions.tiers[0].entries[0];
     assert.deepEqual([potion.name, potion.description, potion.sources.length], ['???', null, 1]);
   });
+
+  // A player's wish (24.11.2026): from an item's entry straight to its
+  // pattern in the Warsztat or the Szlifiernia.
+  test('an item made in the Warsztat or the Szlifiernia leads to its pattern: open once the profession and the pattern are, else shut with the level it waits for', () => {
+    const way = (id, maker) => patternWay(content.basesById[id], maker, content);
+    const levels = (level, professions = {}) => ({ level, classLevel: level, professions });
+    // Without the character's levels only the level of the pattern, as before.
+    assert.deepEqual(way('sword', {}), { line: 'Warsztat: wzór od 1. poziomu Rzemieślnictwa.', way: null });
+    assert.equal(patternWay({ id: 'nothing', slot: 'nowhere' }, {}, content), null);
+    // Rzemieślnictwo opens at the 15th level of the character.
+    assert.deepEqual(way('sword', { levels: levels(10) }), {
+      line: 'Warsztat: wzór od 1. poziomu Rzemieślnictwa.',
+      way: { profession: 'crafting', open: false, reason: 'Rzemieślnictwo otworzy się na 15. poziomie postaci.' },
+    });
+    // The first of a family at once, a later one from the 10th level, one of
+    // class level 25 from the 25th; or learned by taking such an item apart.
+    const crafter = levels(30, { crafting: { level: 12, xp: 0 } });
+    assert.deepEqual(way('sword', { levels: crafter }), { line: 'Warsztat: znasz już ten wzór.', way: { profession: 'crafting', open: true, reason: null } });
+    assert.equal(way('broadsword', { levels: crafter }).way.open, true);
+    assert.deepEqual(way('saber', { levels: crafter }), {
+      line: 'Warsztat: wzór od 25. poziomu Rzemieślnictwa.',
+      way: { profession: 'crafting', open: false, reason: 'Wzór odsłoni się na 25. poziomie Rzemieślnictwa.' },
+    });
+    assert.deepEqual(way('saber', { levels: crafter, patterns: ['saber'] }).way, { profession: 'crafting', open: true, reason: null });
+    // Jewellery in the Szlifiernia, from the 25th level of the character;
+    // a pattern learned before that is known, the way still shut.
+    assert.deepEqual(way('band-ring', { levels: levels(20), patterns: ['band-ring'] }), {
+      line: 'Szlifiernia: znasz już ten wzór.',
+      way: { profession: 'jewelcrafting', open: false, reason: 'Jubilerstwo otworzy się na 25. poziomie postaci.' },
+    });
+    assert.deepEqual(way('ring', { levels: levels(30) }).way, { profession: 'jewelcrafting', open: true, reason: null });
+    assert.equal(way('signet-ring', { levels: levels(30) }).way.reason, 'Wzór odsłoni się na 10. poziomie Jubilerstwa.');
+    // Where this deployment hides the profession, no way.
+    assert.deepEqual(way('sword', { levels: crafter, hidden: ['crafting'] }), { line: 'Warsztat: wzór od 1. poziomu Rzemieślnictwa.', way: null });
+    // The entry carries the line and the way.
+    const view = encyclopediaView({ discovered: {}, claimed: [], met: [], levels: crafter, patterns: [] }, content);
+    const sword = view.items.tiers[0].entries.find((entry) => entry.id === 'sword');
+    assert.ok(sword.sources.includes('Warsztat: znasz już ten wzór.'));
+    assert.deepEqual(sword.craft, { profession: 'crafting', open: true, reason: null });
+    assert.equal(encyclopediaView({ discovered: {}, claimed: [], met: [] }, content).items.tiers[0].entries.find((entry) => entry.id === 'sword').craft, undefined);
+  });
 });
 
 describe('the Encyklopedia through the API', () => {
@@ -431,6 +473,16 @@ describe('the Encyklopedia through the API', () => {
     assert.equal(opened.data.encyclopedia.parts.chests[0].opened, true);
     assert.equal((await call('POST', '/api/encyclopedia/chest', { cookie, body: { id: 'parts:3' } })).data.error.code, 'opened');
     assert.equal((await call('POST', '/api/encyclopedia/chest', { cookie, body: { id: 'nic' } })).status, 404);
+  });
+
+  test('an item leads to its pattern by the character\'s level and the patterns it learned by taking items apart', async () => {
+    const entry = (book, id) => book.items.tiers.flatMap((tier) => tier.entries).find((each) => each.id === id);
+    assert.deepEqual(entry(await read(), 'sword').craft, { profession: 'crafting', open: false, reason: 'Rzemieślnictwo otworzy się na 15. poziomie postaci.' });
+    await set(`level = 30, patterns = '["saber"]'`);
+    const book = await read();
+    assert.deepEqual(entry(book, 'saber').craft, { profession: 'crafting', open: true, reason: null });
+    assert.ok(entry(book, 'saber').sources.includes('Warsztat: znasz już ten wzór.'));
+    assert.equal(entry(book, 'bearded-axe').craft.reason, 'Wzór odsłoni się na 25. poziomie Rzemieślnictwa.');
   });
 
   test('an exploration takes the trophies of its creatures along', async () => {
