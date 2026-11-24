@@ -4317,6 +4317,10 @@ Gracz (poz. 99) przez autora: „Kosmetyczna uwaga. Jak w rankingu ktoś ma nada
 5. **Brakujący szczegół:** wybrana klasa zostaje przy zmianie kolejności, ale nie po wyjściu z rankingu (wraca „Wszystkie klasy”), jak wybrana profesja.
 6. **Pliki:** `src/client/screens/ranking.js`, `src/client/screens/fame.js`, `src/client/styles.css` (`.ranking-who--parts`, `.ranking-title`, `.ranking-choices`), `src/server/community.js`, `data/en/strings.json`, `tools/layout-check.cjs`. Test: `test/community.test.js` (ranking jednej klasy w każdej kolejności, z ewolucją, stronami i własnym miejscem; nieznana klasa to wszystkie).
 
+## Wersja 0.5.8 (24.11.2026): Druid na wyprawach i Pradruid na Arenie
+
+Według sekcji niżej. Autor: „Druid jest za silny na Arenie a za słaby na wyprawach coś z tym musimy zrobić”. Pomiary pokazały, że na Arenie najsilniejszy z tej linii jest Pradruid, a sam Druid jest najsłabszą drugą formą, więc osłabiony jest Pradruid (punkt 7).
+
 ## Druid: przywołańce na wyprawach i na Arenie (24.11.2026)
 
 Autor: „Druid jest za silny na Arenie a za słaby na wyprawach coś z tym musimy zrobić” (24.11.2026).

@@ -1710,6 +1710,11 @@
       "id": "0.5.7",
       "title": "Wersja 0.5.7",
       "body": "- Andrzejki: Wieczór wróżb (29 listopada od 18:00 do końca 30 listopada) odbędzie się u Zaklinaczki w Osadzie, dla postaci od 20. poziomu.\n- Do każdej wróżby dojdzie krótka przepowiednia, jedna z czterdziestu."
+    },
+    {
+      "id": "0.5.8",
+      "title": "Wersja 0.5.8",
+      "body": "- Druid i Arcydruid: Przywołanie enta, Przywołanie niedźwiedzia i Przebudzenie dębu kosztują na wyprawach 25% maks. many zamiast 50%, więc Twój Druid ma teraz na wyprawach oba przywołańce naraz.\n- Pradruid i jego przywołańce zadają na Arenie i w wojnach gildii trochę mniejsze obrażenia. Na wyprawach nic się nie zmienia."
     }
   ]
 }

@@ -1364,6 +1364,10 @@
     "0.5.7": {
       "title": "Version 0.5.7",
       "body": "- St Andrew's Eve: the Fortune Evening (29 November from 18:00 until the end of 30 November) takes place at the Enchantress's in the Settlement, for characters from level 20.\n- Every fortune comes with a short prophecy, one of forty."
+    },
+    "0.5.8": {
+      "title": "Version 0.5.8",
+      "body": "- Druid and Archdruid: Summon Ent, Summon Bear and Awakening of the Oak now cost 25% of max mana on explorations instead of 50%, so your Druid has both summons at once on explorations too.\n- The Elder Druid and its summons deal a little less damage in the Arena and guild wars. Nothing changes on explorations."
     }
   }
 }
