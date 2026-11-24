@@ -3,8 +3,8 @@
 // exploration as long gives in the newest place its class opens (xpPerHour
 // at that place's top level, as tools/level-gap-sim.mjs counts it), never
 // past the class's level; every meditation also grows the Kultywacja's own
-// level (0–100, the first in 4 hours, the next ones longer, as a
-// profession's), each a share more character XP from explorations.
+// level (0–100, from 4 hours for the first to 20 for the hundredth, the
+// author's 1248 B), each a share more character XP from explorations.
 
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
@@ -29,6 +29,7 @@ import {
   xpToNext,
 } from '../src/engine/index.js';
 import { content } from './helpers/content.js';
+import { project, VARIANTS } from '../tools/level-gap-sim.mjs';
 
 const FACTOR = content.balance.cultivation.xpFactor;
 const toNext = (level) => xpToNext(level, content);
@@ -74,25 +75,33 @@ describe('Kultywacja: the character XP', () => {
 });
 
 describe("Kultywacja: its own levels and their bonus", () => {
-  test('the first level takes 4 hours of meditation, each next one longer, as a profession', () => {
+  test('1248 B: 4 hours for the first level, evenly more to 20 hours for the hundredth, in 5 minutes', () => {
     assert.equal(cultivationXpToNext(0, content), 240);
-    assert.equal(cultivationXpToNext(1, content), 480);
-    assert.equal(cultivationXpToNext(9, content), 2400);
+    assert.equal(cultivationXpToNext(1, content), 250);
+    assert.equal(cultivationXpToNext(9, content), 325);
+    assert.equal(cultivationXpToNext(49, content), 715);
+    assert.equal(cultivationXpToNext(99, content), 1200);
+    for (let level = 1; level < 100; level += 1) {
+      assert.ok(cultivationXpToNext(level, content) >= cultivationXpToNext(level - 1, content), `level ${level}`);
+      assert.equal(cultivationXpToNext(level, content) % 5, 0, `level ${level}`);
+    }
+    // The totals the author chose by (1248 B) and DECISIONS.md gives, in
+    // minutes: level 10 after 47 h 25 min, 25 after 148 h 40 min, 50 after
+    // 398 h and 100 after 1200 h.
     assert.equal(cultivationHours(1, content), 4);
-    // The totals DECISIONS.md gives.
     assert.deepEqual(
-      [10, 25, 50, 100].map((level) => cultivationHours(level, content)),
-      [220, 1300, 5100, 20200],
+      [5, 10, 25, 50, 75, 100].map((level) => Math.round(cultivationHours(level, content) * 60)),
+      [1300, 2845, 8920, 23880, 44920, 72000],
     );
   });
 
   test('a point of its XP a minute; level 100 is the top, nothing past it', () => {
     assert.deepEqual(cultivationProgress(fresh, 240, content), { level: 1, xp: 0, gained: 240 });
     assert.deepEqual(cultivationProgress(fresh, 60, content), { level: 0, xp: 60, gained: 60 });
-    assert.deepEqual(cultivationProgress({ level: 1, xp: 470 }, 30, content), { level: 2, xp: 20, gained: 30 });
+    assert.deepEqual(cultivationProgress({ level: 1, xp: 240 }, 30, content), { level: 2, xp: 20, gained: 30 });
     assert.equal(cultivationXpToNext(100, content), 0);
     // Ten minutes short of the top: those ten count, the rest is lost.
-    assert.deepEqual(cultivationProgress({ level: 99, xp: 100 * 240 - 10 }, 240, content), { level: 100, xp: 0, gained: 10 });
+    assert.deepEqual(cultivationProgress({ level: 99, xp: 1200 - 10 }, 240, content), { level: 100, xp: 0, gained: 10 });
     assert.deepEqual(cultivationProgress({ level: 100, xp: 0 }, 240, content), { level: 100, xp: 0, gained: 0 });
   });
 
@@ -228,5 +237,17 @@ describe('Kultywacja: the claim', () => {
     assert.equal(after.level, 124);
     assert.equal(after.levelled, false);
     assert.deepEqual(after.messages, []);
+  });
+});
+
+describe('Kultywacja in tools/level-gap-sim.mjs', () => {
+  const from = { level: 100, classLevel: 119 };
+
+  test("the sim's meditation grows the Kultywacja's levels as the game counts them", () => {
+    const [week] = project({ variant: VARIANTS.cult4cap, cultivate: 'slot', from, weeks: [1] }, content);
+    assert.ok(week.cultivated > 0);
+    assert.equal(week.cultivationLevel, cultivationProgress(fresh, Math.round(week.cultivated * 60), content).level);
+    // Without a Kultywacja, no levels.
+    assert.equal(project({ variant: VARIANTS.now, from, weeks: [1] }, content)[0].cultivationLevel, 0);
   });
 });

@@ -54,7 +54,7 @@ describe('Kultywacja', () => {
   test('the card plans each length an exploration offers, up to the class level, with the Kultywacja at level 0', async () => {
     const { data } = await as('mnich', 'GET', '/api/character');
     const { plan, ...own } = data.character.cultivation;
-    assert.deepEqual(own, { level: 0, xp: 0, xpToNext: 240, maxLevel: 100, bonus: 0, perLevel: 0.01, firstMinutes: 240 });
+    assert.deepEqual(own, { level: 0, xp: 0, xpToNext: 240, maxLevel: 100, bonus: 0, perLevel: 0.01, firstMinutes: 240, lastMinutes: 1200 });
     assert.equal(plan.open, true);
     assert.equal(plan.possible, true);
     assert.equal(plan.factor, 4);

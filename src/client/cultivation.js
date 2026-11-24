@@ -153,9 +153,10 @@ const about = (view) =>
     [
       t('Kultywacja może trwać tyle samo co wyprawa. W tym czasie postać nie wyrusza na wyprawy, nie pracuje w profesji i nie idzie z Drużyną, ale odpoczywa. Nie zdobywa XP klasy, łupów ani złota.'),
       t('Kultywacja nigdy nie da postaci wyższego poziomu niż klasa: daje najwyżej tyle XP, ile w chwili odbioru raportu brakuje do poziomu klasy. Gdy poziomy się zrównają, medytacja rozwija już tylko poziom Kultywacji.'),
-      t('Poziom Kultywacji rośnie o punkt za każdą minutę medytacji, do poziomu {max}. Pierwszy poziom to {first} medytacji, a każdy następny trwa dłużej. Premia działa na każdej wyprawie, także z Drużyną, ale nie na XP klasy.', {
+      t('Każda minuta medytacji to punkt XP Kultywacji. Pierwszy poziom zajmuje {first}, każdy następny trochę dłużej, aż do {last} na poziom {max}. Premia działa na każdej wyprawie, także z Drużyną, ale nie na XP klasy.', {
         max: view.maxLevel,
         first: formatMinutes(view.firstMinutes),
+        last: formatMinutes(view.lastMinutes),
       }),
       t('Punkty Czasu przewijają ją jak wyprawę. Przerwana nie daje nic.'),
     ],

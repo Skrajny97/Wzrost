@@ -10,9 +10,9 @@
 // Kultywacja's own level, 0 to `maxLevel` (the author, 24.11.2026: „Niech
 // Kultywacja ma swoje poziomy (max 100) i daje +1% do XP postaci podczas
 // wypraw”, „wbicie pierwszego poziomu powinno zająć już z 4 godziny”): a
-// point of its XP a minute, its levels growing as a profession's
-// (`levelMinutes` the first), each one `levelBonus` more character XP from
-// explorations (applyHunt in hunt.js).
+// point of its XP a minute, from 4 hours for the first level to 20 for the
+// hundredth (the author's 1248 B, cultivationXpToNext), each one
+// `levelBonus` more character XP from explorations (applyHunt in hunt.js).
 
 import { gainXp, xpPerHour, xpToNext } from './progression.js';
 import { applyWork } from './professions.js';
@@ -71,16 +71,18 @@ export const cultivationXp = (rate, minutes, cap = Infinity) => Math.min(cap, Ma
 
 /**
  * The Kultywacja's own XP from a level to the next, a point a minute of
- * meditation: (level + 1) times `levelMinutes`, as a profession's levels
- * grow (professionXpToNext), so the first level takes `levelMinutes`; 0 at
- * the top.
+ * meditation (the author's 1248 B): `firstLevelMinutes` for the first level,
+ * evenly more for each next one, up to `lastLevelMinutes` for the last (from
+ * level maxLevel − 1), each rounded to `levelRoundMinutes`; 0 at the top.
  * @param {number} level
  * @param {Content} content
  * @returns {number}
  */
 export function cultivationXpToNext(level, content) {
-  const { levelMinutes, maxLevel } = content.balance.cultivation;
-  return level >= maxLevel ? 0 : (level + 1) * levelMinutes;
+  const { firstLevelMinutes: first, lastLevelMinutes: last, levelRoundMinutes: step, maxLevel } = content.balance.cultivation;
+  if (level >= maxLevel) return 0;
+  const minutes = first + ((last - first) * Math.max(0, level)) / Math.max(1, maxLevel - 1);
+  return step * Math.round(minutes / step);
 }
 
 /**

@@ -87,9 +87,11 @@ export function cultivationView(player) {
     xpToNext: cultivationXpToNext(progress.level, content()),
     maxLevel,
     bonus: cultivationBonus(progress.level, content()),
-    // A level's share and the first level's minutes, for "Jak to działa?".
+    // A level's share and the first and the last level's minutes, for
+    // "Jak to działa?".
     perLevel: levelBonus,
     firstMinutes: cultivationXpToNext(0, content()),
+    lastMinutes: cultivationXpToNext(maxLevel - 1, content()),
   };
   const character = engineCharacter(row);
   if (activity?.kind === CULTIVATION) {
