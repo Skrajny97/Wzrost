@@ -166,9 +166,20 @@ function mountView(container, { navigate, board }) {
       head,
       overLine(),
       levelSteps(),
+      behindLine(),
       h('p', { class: 'muted small', text: t('Stwory na poziomie {level}. Nowy Labirynt o północy.', { level: view.charLevel }) }),
     );
   }
+
+  // After the Labirynt started again (the author, 24.11.2026: „Niech
+  // restartowanie Labiryntu dodatkowo po porażce nie daje nagród (poza
+  // błogosławieństwami) aż do momentu w którym się przegrało, ale za to niech
+  // będzie darmowe”), while the party is still before the place of the defeat.
+  const spentWords = () => t('Do miejsca porażki komnaty nie dają nagród, tylko błogosławieństwa.');
+  const behindLine = () => view.behind && h('p', { class: 'labyrinth-spent-note' }, spentMark(), h('span', { text: spentWords() }));
+
+  // A coin struck through: a room that gives no rewards.
+  const spentMark = () => h('span', { class: 'lab-spent-mark', 'aria-hidden': 'true' }, goldArt(14));
 
   function levelSteps() {
     return h(
@@ -206,29 +217,27 @@ function mountView(container, { navigate, board }) {
   }
 
   // After a fight lost: the Labirynt from its first level again, once a day
-  // and for a lot of gold (the author, 13.11.2026), asked before it is paid.
+  // (the author, 13.11.2026), for free, its rooms up to the place of the
+  // defeat giving only blessings (24.11.2026), asked before it starts.
   function resetPart() {
     const reset = view.reset;
     if (!reset) return null;
     if (reset.left <= 0) return h('p', { class: 'muted small labyrinth-reset-note', text: t('Dziś Labirynt był już zaczęty od nowa. Nowy o północy.') });
-    const price = formatNumber(reset.price);
-    const missing = reset.price - state.character.gold;
     const button = h('button', {
       type: 'button',
       class: 'button button--system button--small labyrinth-reset',
-      disabled: missing > 0,
-      text: t('Zacznij od nowa: {price} złota', { price }),
+      text: t('Zacznij od nowa za darmo'),
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           const sure = await confirmAction({
             title: t('Zacząć Labirynt od nowa?'),
-            text: t('Drużyna wraca na 1. poziom tej samej mapy, z pełnym HP i bez błogosławieństw. Zdobyte dziś nagrody zostają. Koszt: {price} złota. Od nowa można zacząć raz dziennie, tylko po przegranej walce.', { price }),
+            text: t('Drużyna wraca na 1. poziom tej samej mapy, z pełnym HP i bez błogosławieństw. Do miejsca porażki komnaty nie dają nagród, tylko błogosławieństwa, a dalej znowu jak zwykle. Zdobyte dziś nagrody zostają. Od nowa można zacząć za darmo, raz dziennie i tylko po przegranej walce.'),
             confirmLabel: t('Zacznij od nowa'),
           });
           if (sure) await act('/api/labyrinth/reset', {});
         }),
     });
-    return h('div', { class: 'labyrinth-reset-part' }, button, missing > 0 && h('p', { class: 'muted small labyrinth-reset-note', text: t('Brakuje: {what}.', { what: t('{gold} złota', { gold: formatNumber(missing) }) }) }));
+    return h('div', { class: 'labyrinth-reset-part' }, button, h('p', { class: 'muted small labyrinth-reset-note', text: spentWords() }));
   }
 
   // The fighters' small portraits with their HP, in a row.
@@ -305,12 +314,13 @@ function mountView(container, { navigate, board }) {
   }
 
   const about = () =>
-    howItWorks(
-      t('Codziennie nowy Labirynt: trzy poziomy, a po trzecim tego samego dnia Piekielny. Mapa jest ta sama dla wszystkich.'),
+    howItWorks(t('Codziennie nowy Labirynt: trzy poziomy, a po trzecim tego samego dnia Piekielny. Mapa jest ta sama dla wszystkich.'), [
       t(
         'Wchodzi postać i do dwóch towarzyszy z Kwater, jak na wyprawę, o każdej porze, także w czasie wyprawy i pracy w profesji. Poziom to sześć rzędów komnat i strażnik na końcu; z komnaty prowadzą drogi do dwóch albo trzech komnat następnego rzędu. HP przechodzi z walki do walki, bez mikstur. Walka nie wygrana kończy Labirynt na dziś. Nagrody przychodzą od razu, po każdej zdobytej komnacie, więc nic nie przepada. Za zwykłą walkę zgarniesz PD i złoto, za elitę i skarb Odłamki Rdzenia i złoto, a za strażnika Artefakt do Rdzenia. Po elicie, strażniku i na ołtarzu wybierasz jedno z trzech błogosławieństw, które działa do końca dnia. Postęp przepada o północy.',
       ),
-    );
+      t('Za pierwsze dziś ukończenie poziomu, czyli pokonanie jego strażnika, zgarniesz dodatkowo Odłamki Rdzenia i złoto: im dalszy poziom, tym więcej, a najwięcej za 3. poziom i Piekielny.'),
+      t('Po przegranej walce Labirynt można raz dziennie zacząć od nowa, za darmo. Do miejsca porażki komnaty nie dają nagród, tylko błogosławieństwa.'),
+    ]);
 
   // ---- The board ----------------------------------------------------------
 
@@ -432,17 +442,28 @@ function mountView(container, { navigate, board }) {
     const rule = roomRule(room.type);
     const guardian = room.type === 'guardian';
     const status = here ? t('tu stoi drużyna') : open ? t('można wejść') : done ? t('zdobyta') : past ? t('ominięta') : null;
-    // The danger of a fight still ahead (899 A) and the Odłamki of an elite or
-    // a treasure not taken yet.
+    // The danger of a fight still ahead (899 A), the Odłamki of an elite or
+    // a treasure not taken yet, and a coin struck through on a room before
+    // the place of the defeat, which gives no rewards (24.11.2026).
     const ring = !here && !done && !past && DANGER[room.danger] ? room.danger : null;
     const shards = !here && !done && !past && room.shards > 0;
+    const spent = !here && !done && !past && room.spent;
     const button = h(
       'button',
       {
         type: 'button',
-        class: ['lab-tile', `lab-tile--${room.type}`, here && 'lab-tile--here', open && 'lab-tile--open', done && 'lab-tile--done', past && 'lab-tile--past'].filter(Boolean).join(' '),
-        'aria-label': [rule?.name ?? room.type, room.foes?.length > 0 && room.foes.map((foe) => foe.name).join(', '), ring && DANGER[room.danger].name, shards && t('Odłamki Rdzenia: {count}', { count: room.shards }), status].filter(Boolean).join(', '),
-        onClick: () => (open ? roomSheet(row, index, room) : roomInfo(room)),
+        class: ['lab-tile', `lab-tile--${room.type}`, here && 'lab-tile--here', open && 'lab-tile--open', done && 'lab-tile--done', past && 'lab-tile--past', spent && 'lab-tile--spent'].filter(Boolean).join(' '),
+        'aria-label': [
+          rule?.name ?? room.type,
+          room.foes?.length > 0 && room.foes.map((foe) => foe.name).join(', '),
+          ring && DANGER[room.danger].name,
+          shards && t('Odłamki Rdzenia: {count}', { count: room.shards }),
+          spent && t('bez nagród'),
+          status,
+        ]
+          .filter(Boolean)
+          .join(', '),
+        onClick: () => (open ? roomSheet(row, index, room) : roomInfo(room, row)),
       },
       h('span', { class: 'lab-tile-base', 'aria-hidden': 'true' }),
       ring && h('span', { class: `lab-tile-ring lab-tile-ring--${ring}`, 'aria-hidden': 'true' }),
@@ -450,6 +471,7 @@ function mountView(container, { navigate, board }) {
       !here && !done && room.foes?.length > 1 && h('span', { class: 'lab-tile-count', 'aria-hidden': 'true', text: `×${room.foes.length}` }),
       room.type === 'elite' && !done && !here && h('span', { class: 'lab-tile-mark', 'aria-hidden': 'true' }, icon('star', { size: 12 })),
       shards && h('span', { class: 'lab-tile-shards', 'aria-hidden': 'true' }, labyrinthArt('shards', 14, icon('core', { size: 12 })), formatNumber(room.shards)),
+      spent && h('span', { class: 'lab-tile-spent' }, spentMark()),
       open && h('span', { class: 'lab-tile-name', text: rule?.name ?? room.type }),
       done && !here && h('span', { class: 'lab-tile-check', 'aria-hidden': 'true' }, icon('check', { size: 14 })),
     );
@@ -526,7 +548,9 @@ function mountView(container, { navigate, board }) {
         h('button', { type: 'button', class: 'button button--system lab-prompt-choice', text: view.pending.kind === 'merchant' ? t('Kupiec czeka') : t('Wybierz błogosławieństwo'), onClick: choiceSheet }),
       );
     }
-    return h('p', { class: 'lab-hint', text: view.row < 0 ? t('Stuknij świecącą komnatę, żeby do niej wejść.') : t('Wybierz następną komnatę.') });
+    const hint = h('p', { class: 'lab-hint', text: view.row < 0 ? t('Stuknij świecącą komnatę, żeby do niej wejść.') : t('Wybierz następną komnatę.') });
+    // After the Labirynt started again, before the place of the defeat.
+    return view.behind ? h('div', { class: 'lab-prompt lab-prompt--behind' }, hint, behindLine()) : hint;
   }
 
   // The phone's bottom bar: the fighters with their HP, the blessings, the
@@ -593,6 +617,8 @@ function mountView(container, { navigate, board }) {
         h('span', { class: 'lab-danger-swatches', 'aria-hidden': 'true' }, Object.keys(DANGER).map((level) => h('span', { class: `lab-danger-swatch lab-danger-swatch--${level}` }))),
         h('span', null, h('strong', { text: t('Kolor obwódki') }), ' ', h('span', { class: 'muted', text: t('Pokazuje, jak trudna będzie walka dla Twojej drużyny: zielona – łatwa, żółta – wyrównana, czerwona – groźna.') })),
       ),
+      // After the Labirynt started again today: the coin struck through.
+      view.lost && h('li', null, spentMark(), h('span', null, h('strong', { text: t('Przekreślona moneta') }), ' ', h('span', { class: 'muted', text: spentWords() }))),
       types.map((type) => {
         const rule = roomRule(type);
         return h('li', null, roomArt(type), h('span', null, h('strong', { text: rule?.name ?? type }), ' ', h('span', { class: 'muted', text: rule?.text ?? '' })));
@@ -685,12 +711,20 @@ function mountView(container, { navigate, board }) {
   const dangerLine = (room) =>
     DANGER[room.danger] && h('p', { class: `sheet-text lab-danger lab-danger--${room.danger}` }, h('span', { class: 'lab-danger-dot', 'aria-hidden': 'true' }), DANGER[room.danger].text);
   const shardsLine = (room) => room.shards > 0 && h('p', { class: 'sheet-text', text: t('Odłamki Rdzenia: {count}.', { count: formatNumber(room.shards) }) });
+  // The guardian's room still ahead: the level's completion reward, while
+  // it is still to be had today; a room before the place of the defeat: that
+  // it gives no rewards.
+  const rewardLine = (room, ahead) =>
+    room.spent
+      ? h('p', { class: 'sheet-text labyrinth-spent-note' }, spentMark(), h('span', { text: spentWords() }))
+      : ahead && room.type === 'guardian' && view.completion && h('p', { class: 'sheet-text labyrinth-completion' }, labyrinthArt('shards', 18, icon('core', { size: 16 })), h('span', { text: view.completion.text }));
 
   // A room not open now: what it is, and who waits in it.
-  function roomInfo(room) {
+  function roomInfo(room, row) {
     const rule = roomRule(room.type);
     if (!rule) return;
-    openSheet(h('h2', { class: 'sheet-title sheet-title--art' }, roomArt(room.type), rule.name), h('p', { class: 'sheet-text', text: rule.text }), shardsLine(room), foesLine(room), dangerLine(room));
+    const ahead = row > view.row;
+    openSheet(h('h2', { class: 'sheet-title sheet-title--art' }, roomArt(room.type), rule.name), h('p', { class: 'sheet-text', text: rule.text }), shardsLine(room), ahead && rewardLine(room, ahead), foesLine(room), dangerLine(room));
   }
 
   // A room open next: what waits there, and the way in.
@@ -700,6 +734,7 @@ function mountView(container, { navigate, board }) {
       h('h2', { class: 'sheet-title sheet-title--art' }, roomArt(room.type), rule?.name ?? room.type),
       h('p', { class: 'sheet-text', text: rule?.text ?? '' }),
       shardsLine(room),
+      rewardLine(room, true),
       foesLine(room),
       dangerLine(room),
       h(
@@ -823,9 +858,9 @@ function mountView(container, { navigate, board }) {
       });
     openSheet(
       h('h2', { class: 'sheet-title sheet-title--art' }, roomArt(room.type), title),
-      // An ordinary fight's XP and gold; an elite's and a guardian's gains
-      // are in their lines.
-      room.type === 'fight' && room.won && h('p', { class: 'sheet-text', text: t('+{xp} XP, +{gold} złota.', { xp: formatNumber(room.gains.xp), gold: formatNumber(room.gains.gold) }) }),
+      // An ordinary fight's XP and gold (none before the place of the
+      // defeat); an elite's and a guardian's gains are in their lines.
+      room.type === 'fight' && room.won && !room.spent && h('p', { class: 'sheet-text', text: t('+{xp} XP, +{gold} złota.', { xp: formatNumber(room.gains.xp), gold: formatNumber(room.gains.gold) }) }),
       lines.map((line) => h('p', { class: 'sheet-text', text: line })),
       room.artifact && artifactLine(room.artifact),
       // With a blessing to choose, the fight to watch first, above the

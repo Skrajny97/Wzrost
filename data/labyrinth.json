@@ -1,5 +1,5 @@
 {
-  "$comment": "Labirynt Systemu i Rdzeń (src/engine/labyrinth.js, src/engine/core.js, src/server/labyrinth.js, src/server/core.js; DECISIONS.md, „Labirynt Systemu i Rdzeń: zasady”, 850–866). Labirynt od 30. poziomu postaci (unlocks.json, labyrinth), tylko tam, gdzie zmienna LABYRINTH jest „on”. Codziennie o północy czasu polskiego nowa mapa, ta sama dla wszystkich graczy (ziarno z samego dnia): trzy poziomy (levels), a po przejściu 3. tego samego dnia poziom Piekielny (hell: stwory dwa razy mocniejsze niż na 3. poziomie, 854 A; pilnuje tego walidator). Poziom to map.rows rzędów komnat (po map.rooms[0]–map.rooms[1] w rzędzie), z każdej komnaty map.links[0]–map.links[1] dróg do następnego rzędu, a na końcu strażnik. Rodzaje komnat (rooms) losują się z wag weight; pierwszy rząd to same walki, elity dopiero od rzędu map.eliteFromRow, najwyżej map.merchantMost kupców na poziom i co najmniej map.springLeast źródło. Stwory: na poziomie po środku między poziomem postaci a poziomem klasy z początku dnia, zaokrąglonym w dół (autor, 13.11.2026: „Niech w Labiryncie daje przeciwników z poziomem równo miedzy klasą a postacią”; od 12.11 był to wyższy z tych poziomów), z krain na tym poziomie i niższych, tak mocne jak na najnowszym miejscu eksploracji na tym poziomie, razy strength poziomu Labiryntu (elita razy eliteStrength, strażnik czempion razy guardianStrength). HP postaci i towarzyszy przechodzi z walki do walki (852 A); leczą tylko źródło (spring.heal maks. HP każdego), kupiec (merchant.heal) i błogosławieństwa. Walka nie wygrana kończy Labirynt na ten dzień. Nagrody (857): zwykła walka PD i złoto jak jedna walka wyprawy rewardMinutes minut, elita Odłamki Rdzenia (levels[].shards.elite) i złoto rewards.eliteGoldMinutes minut eksploracji, skarb Odłamki (shards.treasure) i złoto rewards.treasureGoldMinutes minut, strażnik Artefakt (rzadkość z levels[].artifact). Kupiec bierze za leczenie i za wybór błogosławieństwa złoto merchant.*Minutes minut eksploracji na tym samym poziomie co stwory. Po przegranej walce Labirynt można zacząć od nowa, od 1. poziomu, z pełnym HP i bez błogosławieństw (zdobyte nagrody zostają): reset.perDay razy dziennie za złoto reset.goldMinutes minut eksploracji na poziomie stworów (autor, 13.11.2026: „naprawdę sroga opłata (ale uzasadniona, czyli górna granica balansu)”; dzień Labiryntu daje średnio złoto 100–140 minut eksploracji). Błogosławieństwa (blessings, 853 A): wybór jednego z trzech po elicie, strażniku i na ołtarzu, do końca dnia, łączą się. Rdzeń (core): gniazda floor(poziom postaci / sockets.per), co najmniej sockets.least (858 v2 A); Artefakt mały zajmuje 1 gniazdo i ma 1 cechę, średni 2 i 2 cechy, duży 3, 2 cechy i zdolność (sizes). Cechy pasują do żywiołu (elements[].traits, 860 A), ich liczby rosną z budżetem rzadkości (rarities.json), z traitFactor rozmiaru, z ulepszeniem (upgrade.bonus za stopień, do upgrade.max, koszt upgrade.costs[stopień-1] × upgradeCost rozmiaru, 862 A) i z klejnotem w Rdzeniu (setBonus, 863 A); liczba zdolności dużego Artefaktu (abilities[].value) rośnie tak samo, ale tylko z pierwiastkiem budżetu rzadkości. Rezonans (861 A): 2, 4 i 6 wchłoniętych Artefaktów jednego żywiołu (resonance.counts) dają rosnącą premię żywiołu (elements[].resonance). Rozbicie (Rozbij) daje break[rzadkość] × gniazda Odłamków i połowę włożonych w ulepszenie; rozpuszczenie (Rozpuść, 859 A) zwraca połowę Odłamków z ulepszania (dissolveRefund). Czempion Wieży przy pierwszym zwycięstwie daje Artefakt o rzadkości poziomu tower.level (864 A).",
+  "$comment": "Labirynt Systemu i Rdzeń (src/engine/labyrinth.js, src/engine/core.js, src/server/labyrinth.js, src/server/core.js; DECISIONS.md, „Labirynt Systemu i Rdzeń: zasady”, 850–866). Labirynt od 30. poziomu postaci (unlocks.json, labyrinth), tylko tam, gdzie zmienna LABYRINTH jest „on”. Codziennie o północy czasu polskiego nowa mapa, ta sama dla wszystkich graczy (ziarno z samego dnia): trzy poziomy (levels), a po przejściu 3. tego samego dnia poziom Piekielny (hell: stwory dwa razy mocniejsze niż na 3. poziomie, 854 A; pilnuje tego walidator). Poziom to map.rows rzędów komnat (po map.rooms[0]–map.rooms[1] w rzędzie), z każdej komnaty map.links[0]–map.links[1] dróg do następnego rzędu, a na końcu strażnik. Rodzaje komnat (rooms) losują się z wag weight; pierwszy rząd to same walki, elity dopiero od rzędu map.eliteFromRow, najwyżej map.merchantMost kupców na poziom i co najmniej map.springLeast źródło. Stwory: na poziomie po środku między poziomem postaci a poziomem klasy z początku dnia, zaokrąglonym w dół (autor, 13.11.2026: „Niech w Labiryncie daje przeciwników z poziomem równo miedzy klasą a postacią”; od 12.11 był to wyższy z tych poziomów), z krain na tym poziomie i niższych, tak mocne jak na najnowszym miejscu eksploracji na tym poziomie, razy strength poziomu Labiryntu (elita razy eliteStrength, strażnik czempion razy guardianStrength). HP postaci i towarzyszy przechodzi z walki do walki (852 A); leczą tylko źródło (spring.heal maks. HP każdego), kupiec (merchant.heal) i błogosławieństwa. Walka nie wygrana kończy Labirynt na ten dzień. Nagrody (857): zwykła walka PD i złoto jak jedna walka wyprawy rewardMinutes minut, elita Odłamki Rdzenia (levels[].shards.elite) i złoto rewards.eliteGoldMinutes minut eksploracji, skarb Odłamki (shards.treasure) i złoto rewards.treasureGoldMinutes minut, strażnik Artefakt (rzadkość z levels[].artifact) i nagrodę za ukończenie poziomu (levels[].completion: shards Odłamków Rdzenia i złoto goldMinutes minut eksploracji na poziomie stworów; name to poziom w dopełniaczu do zdania „Za ukończenie {level}…”), tylko za pierwsze ukończenie poziomu tego dnia. Gracz (poz. 228): „Jeszcze można ogarnąć coś dodatkowego za labirynt, ukończenie całego”, „bo teraz bardziej się opłaca wywalić przed i zrobić jeszcze raz niż to kończyć”; autor (24.11.2026): „Racja, też dobry pomysł”, „jakieś dodatkowe nagrody za pełne poziomy? żeby się nie opłacało przegrywać?”. Liczby z modelu tools/labyrinth-value.mjs (DECISIONS.md, „Labirynt: nagrody za ukończenie”): 1. i 2. poziom dają Odłamki swojej elity i złoto elity albo skarbu (10 i 15 minut), 3. poziom (cały Labirynt) i Piekielny Odłamki swojej elity i skarbu razem oraz złoto 45 i 60 minut, tak że ukończenie poziomów 1–3 daje o ok. 1/3 więcej Odłamków i o ok. 1/4 więcej złota niż celowa porażka przed strażnikiem 3. poziomu. Kupiec bierze za leczenie i za wybór błogosławieństwa złoto merchant.*Minutes minut eksploracji na tym samym poziomie co stwory. Po przegranej walce Labirynt można zacząć od nowa, od 1. poziomu, z pełnym HP i bez błogosławieństw (zdobyte nagrody zostają), reset.perDay razy dziennie i za darmo, ale do miejsca porażki (poziom i rząd przegranej walki, najdalszy tego dnia) komnaty nie dają nagród, tylko błogosławieństwa; komnata porażki i dalsze płacą jak zwykle. Autor (24.11.2026): „Niech restartowanie Labiryntu dodatkowo po porażce nie daje nagród (poza błogosławieństwami) aż do momentu w którym się przegrało, ale za to niech będzie darmowe”. Do 24.11.2026 kosztowało to złoto 150 minut eksploracji (autor, 13.11.2026: „naprawdę sroga opłata (ale uzasadniona, czyli górna granica balansu)”). Błogosławieństwa (blessings, 853 A): wybór jednego z trzech po elicie, strażniku i na ołtarzu, do końca dnia, łączą się. Rdzeń (core): gniazda floor(poziom postaci / sockets.per), co najmniej sockets.least (858 v2 A); Artefakt mały zajmuje 1 gniazdo i ma 1 cechę, średni 2 i 2 cechy, duży 3, 2 cechy i zdolność (sizes). Cechy pasują do żywiołu (elements[].traits, 860 A), ich liczby rosną z budżetem rzadkości (rarities.json), z traitFactor rozmiaru, z ulepszeniem (upgrade.bonus za stopień, do upgrade.max, koszt upgrade.costs[stopień-1] × upgradeCost rozmiaru, 862 A) i z klejnotem w Rdzeniu (setBonus, 863 A); liczba zdolności dużego Artefaktu (abilities[].value) rośnie tak samo, ale tylko z pierwiastkiem budżetu rzadkości. Rezonans (861 A): 2, 4 i 6 wchłoniętych Artefaktów jednego żywiołu (resonance.counts) dają rosnącą premię żywiołu (elements[].resonance). Rozbicie (Rozbij) daje break[rzadkość] × gniazda Odłamków i połowę włożonych w ulepszenie; rozpuszczenie (Rozpuść, 859 A) zwraca połowę Odłamków z ulepszania (dissolveRefund). Czempion Wieży przy pierwszym zwycięstwie daje Artefakt o rzadkości poziomu tower.level (864 A).",
   "rewardMinutes": 60,
   "levels": [
     {
@@ -7,21 +7,24 @@
       "name": "Poziom 1",
       "strength": [0.65, 0.65],
       "shards": { "elite": 3, "treasure": 2 },
-      "artifact": { "common": 55, "rare": 35, "unique": 10 }
+      "artifact": { "common": 55, "rare": 35, "unique": 10 },
+      "completion": { "name": "1. poziomu", "shards": 3, "goldMinutes": 10 }
     },
     {
       "id": "second",
       "name": "Poziom 2",
       "strength": [0.95, 0.95],
       "shards": { "elite": 4, "treasure": 3 },
-      "artifact": { "common": 46, "rare": 37, "unique": 14, "epic": 3 }
+      "artifact": { "common": 46, "rare": 37, "unique": 14, "epic": 3 },
+      "completion": { "name": "2. poziomu", "shards": 4, "goldMinutes": 15 }
     },
     {
       "id": "third",
       "name": "Poziom 3",
       "strength": [1.35, 1.35],
       "shards": { "elite": 5, "treasure": 4 },
-      "artifact": { "common": 37, "rare": 38, "unique": 18, "epic": 6, "legendary": 1 }
+      "artifact": { "common": 37, "rare": 38, "unique": 18, "epic": 6, "legendary": 1 },
+      "completion": { "name": "3. poziomu", "shards": 9, "goldMinutes": 45 }
     },
     {
       "id": "hell",
@@ -29,7 +32,8 @@
       "hell": true,
       "strength": [2.7, 2.7],
       "shards": { "elite": 9, "treasure": 7 },
-      "artifact": { "common": 22, "rare": 34, "unique": 25, "epic": 12, "legendary": 5, "mythic": 1.5, "divine": 0.5 }
+      "artifact": { "common": 22, "rare": 34, "unique": 25, "epic": 12, "legendary": 5, "mythic": 1.5, "divine": 0.5 },
+      "completion": { "name": "poziomu Piekielnego", "shards": 16, "goldMinutes": 60 }
     }
   ],
   "eliteStrength": [1, 1],
@@ -54,7 +58,7 @@
   ],
   "spring": { "heal": 0.35 },
   "merchant": { "heal": 0.5, "healMinutes": 30, "blessingMinutes": 60 },
-  "reset": { "goldMinutes": 150, "perDay": 1 },
+  "reset": { "perDay": 1 },
   "rewards": { "eliteGoldMinutes": 10, "treasureGoldMinutes": 15 },
   "reportsKept": 40,
   "blessings": [
@@ -87,6 +91,8 @@
     "levelCleared": ["{level} zdobyty."],
     "hellOpen": ["Otwiera się poziom Piekielny: stwory dwa razy mocniejsze niż na 3. poziomie."],
     "dayDone": ["Labirynt zdobyty do końca. Nowy o północy."],
+    "completion": ["Za ukończenie {level}: +{shards|Odłamek Rdzenia|Odłamki Rdzenia|Odłamków Rdzenia}, +{gold} złota."],
+    "spent": ["Do miejsca porażki komnaty nie dają nagród, tylko błogosławieństwa."],
     "coreOpen": ["Rdzeń się otwiera. Artefakty wchłoniesz w zakładce Postać, w Rdzeniu."],
     "towerArtifact": ["Czempion Wieży zostawia Artefakt: {artifact}. Czeka w Skrytce Rdzenia."]
   },

@@ -12,7 +12,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { artifactUpgradeCost, breakShards, coreEffects, labyrinthMap, makeArtifact, createRng, playerCombatant, resetPrice, xpToNext } from '../src/engine/index.js';
+import { artifactUpgradeCost, breakShards, completionLine, coreEffects, labyrinthMap, makeArtifact, createRng, playerCombatant, xpToNext } from '../src/engine/index.js';
 import { makeClimber } from './helpers/climb.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -169,22 +169,18 @@ describe('the Labirynt Systemu through the API', () => {
     assert.equal(fresh.started, false);
   });
 
-  test('after a fight lost, once a day and for its gold, the Labirynt starts again from the first level; the day\'s rewards stay', async () => {
-    const price = resetPrice(60, content);
+  test('after a fight lost, once a day and for free, the Labirynt starts again from the first level; the day\'s rewards stay and the place of the defeat is kept', async () => {
     const reset = () => call('POST', '/api/labyrinth/reset', { cookie, body: {} });
     // Not before a fight is lost.
-    await set('labyrinth = ?, gold = ?', JSON.stringify(stateOf({ row: 0, room: 0, path: [0] })), price * 3);
+    await set('labyrinth = ?, gold = 0', JSON.stringify(stateOf({ row: 0, room: 0, path: [0] })));
     assert.equal((await get()).reset, null);
     assert.equal((await reset()).data.error.code, 'no_reset');
-    // Not without the gold.
+    // After one, free (the author, 24.11.2026): no gold needed, none taken.
     const lost = stateOf({ level: 3, row: 2, room: 1, path: [0, 1, 1], cleared: 2, over: 'fainted', hp: { me: 0 }, blessings: ['might'], gains: { xp: 10, gold: 20, shards: 3, artifacts: 1 } });
-    await set('labyrinth = ?, gold = ?', JSON.stringify(lost), price - 1);
-    assert.deepEqual((await get()).reset, { price, left: 1 });
-    assert.equal((await reset()).data.error.code, 'no_gold');
-    // Paid: the first level again, at full HP and without blessings.
-    await set('gold = ?', price * 2);
+    await set('labyrinth = ?', JSON.stringify(lost));
+    assert.deepEqual((await get()).reset, { left: 1 });
     const again = (await reset()).data;
-    assert.equal(again.character.gold, price);
+    assert.equal(again.character.gold, 0);
     assert.equal(again.labyrinth.over, null);
     assert.equal(again.labyrinth.level, 1);
     assert.equal(again.labyrinth.row, -1);
@@ -192,15 +188,115 @@ describe('the Labirynt Systemu through the API', () => {
     assert.deepEqual(again.labyrinth.blessings, []);
     assert.deepEqual(again.labyrinth.gains, lost.gains);
     assert.equal(again.labyrinth.fighters[0].hp, again.labyrinth.fighters[0].maxHp);
+    // The place of the defeat, 3rd level's 3rd row: on the 1st level every
+    // room with rewards is marked as giving none (no Odłamki shown), and its
+    // guardian pays no completion reward again.
+    assert.deepEqual(again.labyrinth.lost, { level: 3, row: 2 });
+    assert.equal(again.labyrinth.behind, true);
+    for (const room of again.labyrinth.map.flat()) {
+      assert.equal(room.spent, ['fight', 'elite', 'treasure', 'guardian'].includes(room.type), room.type);
+      assert.equal(room.shards, null);
+    }
+    assert.equal(again.labyrinth.completion, null);
     const saved = await kept();
     assert.equal(saved.resets, 1);
     assert.equal(saved.cleared, 0);
+    assert.deepEqual(saved.lost, { level: 3, row: 2 });
     assert.notEqual(saved.seed, lost.seed);
     // Lost again the same day: no second try.
     await set('labyrinth = ?', JSON.stringify({ ...saved, over: 'fainted' }));
-    assert.deepEqual((await get()).reset, { price, left: 0 });
+    assert.deepEqual((await get()).reset, { left: 0 });
     assert.equal((await reset()).data.error.code, 'no_reset');
-    assert.equal((await call('GET', '/api/character', { cookie })).data.character.gold, price);
+  });
+
+  test('after starting again, the rooms before the place of the defeat give nothing but their blessings, and say so; from it on the rewards come back', async () => {
+    await makeClimber(await db(), (await (await db()).prepare('SELECT id FROM characters').first()).id);
+    const spentWords = content.labyrinth.texts.spent[0];
+    const start = (await call('GET', '/api/character', { cookie })).data.character;
+    // A fight of the first row, the place of the defeat on the 2nd level.
+    await set('labyrinth = ?', JSON.stringify(stateOf({ charLevel: 30, resets: 1, lost: { level: 2, row: 0 } })));
+    const board = await get();
+    assert.equal(board.behind, true);
+    assert.ok(board.map[0].every((room) => room.spent));
+    const fight = (await enter({ level: 1, row: 0, room: 0 })).data;
+    assert.equal(fight.room.spent, true);
+    assert.deepEqual(fight.room.gains, { xp: 0, gold: 0, shards: 0 });
+    if (fight.room.won) {
+      assert.equal(fight.character.gold, start.gold);
+      assert.equal(fight.character.xp, start.xp);
+      assert.ok(fight.room.lines.includes(spentWords));
+      assert.ok(fight.report.system.includes(spentWords));
+    }
+    // A treasure before the place of the defeat is empty; at it, full.
+    const treasure = findRoom('treasure');
+    if (treasure) {
+      const shards = (await coreRow())?.shards ?? 0;
+      await standBefore(treasure, { resets: 1, lost: { level: treasure.level, row: treasure.row + 1 } });
+      const empty = (await enter({ level: treasure.level, row: treasure.row, room: treasure.room })).data;
+      assert.deepEqual(empty.room.gains, { xp: 0, gold: 0, shards: 0 });
+      assert.deepEqual(empty.room.lines, [spentWords]);
+      assert.equal((await coreRow()).shards, shards);
+      await standBefore(treasure, { resets: 1, lost: { level: treasure.level, row: treasure.row } });
+      const full = (await enter({ level: treasure.level, row: treasure.row, room: treasure.room })).data;
+      assert.equal(full.room.spent, false);
+      assert.equal(full.room.gains.shards, content.labyrinth.levels[treasure.level - 1].shards.treasure);
+      assert.equal((await coreRow()).shards, shards + full.room.gains.shards);
+    }
+    // An altar before it still offers its blessings.
+    const altar = findRoom('altar');
+    if (altar) {
+      await standBefore(altar, { resets: 1, lost: { level: 4, row: 6 } });
+      const at = (await enter({ level: altar.level, row: altar.row, room: altar.room })).data.labyrinth;
+      assert.equal(at.pending.kind, 'blessing');
+      assert.equal(at.pending.choices.length, 3);
+    }
+  });
+
+  test('a guardian beaten pays its level\'s completion reward with the win, in the report too; two taps give it once; a level completed before starting again pays none', async () => {
+    await makeClimber(await db(), (await (await db()).prepare('SELECT id FROM characters').first()).id);
+    const last = content.labyrinth.map.rows;
+    const place = (fields = {}) => set('labyrinth = ?', JSON.stringify(stateOf({ row: last - 1, room: 0, path: Array(last).fill(0), charLevel: 30, ...fields })));
+    const body = { level: 1, row: last, room: 0 };
+    let won = null;
+    let gold = 0;
+    let shards = 0;
+    for (let i = 0; i < 4 && !won?.room.won; i++) {
+      await place();
+      gold = (await call('GET', '/api/character', { cookie })).data.character.gold;
+      shards = (await coreRow())?.shards ?? 0;
+      // Two taps at once: one goes in, the other finds the Labirynt changed.
+      const both = await Promise.all([enter(body), enter(body)]);
+      assert.deepEqual(both.map((answer) => answer.status).sort(), [200, 409]);
+      won = both.find((answer) => answer.status === 200).data;
+    }
+    assert.equal(won.room.won, true, 'the guardian is beaten');
+    const reward = won.room.completion;
+    assert.deepEqual(reward, { shards: content.labyrinth.levels[0].completion.shards, gold: reward.gold });
+    assert.ok(reward.gold > 0);
+    assert.equal(won.character.gold, gold + reward.gold);
+    assert.equal((await coreRow()).shards, shards + reward.shards);
+    const words = completionLine(1, reward, content);
+    assert.ok(words.startsWith(`Za ukończenie 1. poziomu: +${reward.shards} Odłam`));
+    assert.ok(won.report.system.includes(words), won.report.system.join(' | '));
+    assert.ok(won.room.lines.includes(words));
+    // The next level's completion reward, shown before its guardian.
+    assert.equal(won.labyrinth.completion.shards, content.labyrinth.levels[1].completion.shards);
+    assert.ok(won.labyrinth.completion.text.startsWith('Za ukończenie 2. poziomu: '));
+    // After starting again with the place of the defeat on the 2nd level,
+    // the 1st level's guardian gives no Artefakt and no completion reward,
+    // only its blessings and the way on.
+    let again = null;
+    for (let i = 0; i < 4 && !again?.room.won; i++) {
+      await place({ resets: 1, lost: { level: 2, row: 3 } });
+      again = (await enter(body)).data;
+    }
+    assert.equal(again.room.won, true);
+    assert.equal(again.room.completion, null);
+    assert.equal(again.room.artifact, null);
+    assert.deepEqual(again.room.gains, { xp: 0, gold: 0, shards: 0 });
+    assert.equal(again.labyrinth.level, 2);
+    assert.equal(again.labyrinth.pending.kind, 'blessing');
+    assert.ok(!again.report.system.some((line) => line.startsWith('Za ukończenie')));
   });
 
   test('a spring heals every fighter by its share of the max HP', async () => {

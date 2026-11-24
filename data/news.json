@@ -1675,6 +1675,11 @@
       "id": "0.5.0",
       "title": "Wersja 0.5.0",
       "body": "- Gildia › Członkowie: przy każdym członku obok „ostatnio online” widać jego wkład w Sławę gildii w tym tygodniu. Listę można sortować: Ranga, Ostatnio online albo Sława."
+    },
+    {
+      "id": "0.5.1",
+      "title": "Wersja 0.5.1",
+      "body": "- Labirynt: za pierwsze tego dnia pokonanie strażnika każdego poziomu jest dodatkowa nagroda: Odłamki Rdzenia i złoto, najwięcej za 3. poziom i za poziom Piekielny.\n- Labirynt: po porażce zaczniesz od nowa za darmo. Do miejsca porażki komnaty nie dają nagród, tylko błogosławieństwa, a dalej znowu normalnie. Na mapie takie komnaty mają przekreśloną monetę."
     }
   ]
 }

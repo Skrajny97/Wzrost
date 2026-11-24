@@ -1,10 +1,10 @@
 {
   "$comment": "English texts of data/labyrinth.json (src/engine/overlay.js): the System Labyrinth's levels, rooms, blessings and report sentences, and the Core's Artifacts, their sizes, traits, abilities and words. Each key of the texts keeps the Polish number of variants, as the engine picks one by index. An Artifact's name is \"{size} {name}\": \"Small Fire Artifact\".",
   "levels": {
-    "first": { "name": "Level 1" },
-    "second": { "name": "Level 2" },
-    "third": { "name": "Level 3" },
-    "hell": { "name": "Hellish" }
+    "first": { "name": "Level 1", "completion": { "name": "level 1" } },
+    "second": { "name": "Level 2", "completion": { "name": "level 2" } },
+    "third": { "name": "Level 3", "completion": { "name": "level 3" } },
+    "hell": { "name": "Hellish", "completion": { "name": "the Hellish level" } }
   },
   "rooms": {
     "fight": { "name": "Combat", "text": "Creatures of the Labyrinth. Win to gain XP and gold." },
@@ -45,6 +45,8 @@
     "levelCleared": ["{level} conquered."],
     "hellOpen": ["The Hellish level opens: creatures twice as strong as on level 3."],
     "dayDone": ["The Labyrinth conquered to its end. A new one at midnight."],
+    "completion": ["For completing {level}: +{shards} Core Shards, +{gold} gold."],
+    "spent": ["Up to the place of the defeat, chambers give no rewards, only blessings."],
     "coreOpen": ["The Core opens. You absorb Artifacts in the Character tab, in the Core."],
     "towerArtifact": ["The Tower's champion leaves an Artifact: {artifact}. It waits in the Core Cache."]
   },

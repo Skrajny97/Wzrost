@@ -22,9 +22,12 @@
 // end of the day and add up. Rewards (857): a fight the XP and gold of one
 // fight of an exploration of rewardMinutes, an elite and a treasure Odłamki
 // Rdzenia and gold, a guardian an Artefakt (core.js), its rarity by the
-// level's weights; and where Talia Systemu is on, the creatures beaten may
-// leave their cards (903, cards.js). Pure: the server keeps the state, the
-// time and the seeds.
+// level's weights, and the level completed its completion reward
+// (completionReward); and where Talia Systemu is on, the creatures beaten
+// may leave their cards (903, cards.js). After a fight lost the Labirynt may
+// start again for free, its rooms up to the place of the defeat giving no
+// rewards, only the blessings (resetLabyrinth, spentRoom). Pure: the server
+// keeps the state, the time and the seeds.
 
 import { cardDrop, PACK } from './cards.js';
 import { combatantView, exploreStrength, playerCombatant } from './combatant.js';
@@ -52,13 +55,15 @@ import { weekFactor, weekFighter } from './weeks.js';
  * (their ids, as at the start), each fighter's HP as a share of its maximum
  * (the character's under `me`), the character's level the creatures have,
  * the blessings taken, a choice waiting, the day's rewards, the seed of
- * the day's draws and how many times it was started again (resetLabyrinth).
+ * the day's draws, how many times it was started again (resetLabyrinth)
+ * and then the place of the defeat (`lost`: the level and the row of the
+ * fight lost, the furthest the party got that day).
  * @typedef {{
  *   day: string, level: number, row: number, room: number | null, path: number[], cleared: number,
  *   over: null | 'fainted' | 'done', team: string[], hp: Record<string, number>, charLevel: number,
  *   blessings: string[], pending: Pending | null,
  *   gains: { xp: number, gold: number, shards: number, artifacts: number }, seed: string,
- *   resets?: number,
+ *   resets?: number, lost?: { level: number, row: number },
  * }} LabyrinthState
  */
 
@@ -398,28 +403,23 @@ export function newLabyrinth({ day, charLevel, companions, seed }) {
 }
 
 // A Labirynt lost may start again (the author, 13.11.2026: „Pozwól, w
-// przypadku porażki zresetować Labirynt raz dziennie za naprawdę srogą
-// opłatą (ale uzasadnioną, czyli górna granica balansu)”): after a fight
-// lost, reset.perDay times a day, for the gold of reset.goldMinutes minutes
-// of exploring at the creatures' level; a day of the Labirynt gives on
-// average the gold of 100–140 of them, so the second try pays only in its
-// XP, Odłamki, Artefakty and cards. It starts from the first level of the
-// same day's map, with the fighters at full HP, no blessings and the
-// companions going now; the day's rewards stay.
+// przypadku porażki zresetować Labirynt raz dziennie…”): after a fight lost,
+// reset.perDay times a day. Free since 24.11.2026, its rooms up to the place
+// of the defeat giving nothing (the author: „Niech restartowanie Labiryntu
+// dodatkowo po porażce nie daje nagród (poza błogosławieństwami) aż do
+// momentu w którym się przegrało, ale za to niech będzie darmowe”; until
+// then it cost the gold of 150 minutes of exploring, and a player found that
+// a day lost on purpose and played again paid more than one finished). It
+// starts from the first level of the same day's map, with the fighters at
+// full HP, no blessings and the companions going now; the day's rewards
+// stay, and the place of the defeat is kept (`lost`, the furthest of the
+// day's: the level and the row of the fight lost).
 /**
  * @param {LabyrinthState} state
  * @param {Content} content
  * @returns {number} the tries left now, 0 unless a fight was lost
  */
 export const resetsLeft = (state, content) => (state.over === 'fainted' ? Math.max(0, rules(content).reset.perDay - (state.resets ?? 0)) : 0);
-
-/**
- * @param {number} charLevel
- * @param {Content} content
- * @param {number} [classLevel] As in labyrinthGold.
- * @returns {number}
- */
-export const resetPrice = (charLevel, content, classLevel = 0) => labyrinthGold(rules(content).reset.goldMinutes, charLevel, content, classLevel);
 
 /**
  * @param {LabyrinthState} state
@@ -429,8 +429,59 @@ export const resetPrice = (charLevel, content, classLevel = 0) => labyrinthGold(
  */
 export function resetLabyrinth(state, { companions, seed }, content) {
   if (resetsLeft(state, content) <= 0) return null;
-  return { ...newLabyrinth({ day: state.day, charLevel: state.charLevel, companions, seed }), gains: state.gains, resets: (state.resets ?? 0) + 1 };
+  const here = { level: state.level, row: state.row };
+  const lost = state.lost && spentRoom(state, here.level, here.row) ? state.lost : here;
+  return { ...newLabyrinth({ day: state.day, charLevel: state.charLevel, companions, seed }), gains: state.gains, resets: (state.resets ?? 0) + 1, lost };
 }
+
+// Whether a room of the day, by its level and row, lies before the place of
+// the defeat after the Labirynt started again: there a fight, an elite, a
+// treasure and a guardian give no rewards (no XP, gold, Odłamki, Artefakt,
+// cards nor completion reward), only the blessings, the springs and the
+// merchant are as ever (the author, 24.11.2026). The room of the defeat and
+// those after it pay again: its fight paid nothing the first time.
+/**
+ * @param {LabyrinthState} state
+ * @param {number} level
+ * @param {number} row
+ * @returns {boolean}
+ */
+export function spentRoom(state, level, row) {
+  const lost = state.lost;
+  if (!lost) return false;
+  return level < lost.level || (level === lost.level && row < lost.row);
+}
+
+// The reward for a level completed, its guardian beaten (a player, level
+// 228: „Jeszcze można ogarnąć coś dodatkowego za labirynt, ukończenie
+// całego”, „bo teraz bardziej się opłaca wywalić przed i zrobić jeszcze raz
+// niż to kończyć”; the author: „Racja, też dobry pomysł”, „jakieś dodatkowe
+// nagrody za pełne poziomy? żeby się nie opłacało przegrywać?”): the
+// level's completion.shards Odłamki Rdzenia and the gold of its
+// completion.goldMinutes minutes of exploring at the creatures' level
+// (`classLevel` as in labyrinthGold). The first time that day only: a
+// level completed before the Labirynt started again lies before the place
+// of the defeat (spentRoom), so its guardian gives none again.
+/**
+ * @param {number} level
+ * @param {number} charLevel
+ * @param {Content} content
+ * @param {number} [classLevel]
+ * @returns {{ shards: number, gold: number }}
+ */
+export function completionReward(level, charLevel, content, classLevel = 0) {
+  const { completion } = labyrinthLevel(level, content);
+  return { shards: completion.shards, gold: labyrinthGold(completion.goldMinutes, charLevel, content, classLevel) };
+}
+
+// Its words: „Za ukończenie 2. poziomu: +4 Odłamki Rdzenia, +480 złota.”
+/**
+ * @param {number} level
+ * @param {{ shards: number, gold: number }} reward
+ * @param {Content} content
+ * @returns {string}
+ */
+export const completionLine = (level, reward, content) => say(rules(content).texts, 'completion', 0, { level: labyrinthLevel(level, content).completion.name, shards: reward.shards, gold: reward.gold });
 
 // The fighters of a Labirynt as they stand now: the character and its
 // companions of the day who are still hired, each with its blessings, its
@@ -582,11 +633,15 @@ export function roomRefusal(state, map, target) {
 // next one opens, Piekielny after the third, and the day is done after it.
 // A treasure gives Odłamki and gold, a spring heals everyone, an altar
 // offers blessings, a merchant waits with its wares. Blessing Oddech
-// Labiryntu heals those standing after each won fight. `seed`: the
-// server's, for the fight and its loot. `party.cards`: Talia Systemu's
-// cards where the game has them on ({ maxed }, as an exploration's): the
-// creatures beaten in a won fight may leave theirs (labyrinthFight). Returns
-// the new state, what the room gave and, for a fight, the hunt.
+// Labiryntu heals those standing after each won fight. A guardian beaten
+// gives the level's completion reward too (completionReward). After the
+// Labirynt started again, a room before the place of the defeat (spentRoom)
+// gives none of its rewards, only its blessings, and says so (`spent`).
+// `seed`: the server's, for the fight and its loot. `party.cards`: Talia
+// Systemu's cards where the game has them on ({ maxed }, as an
+// exploration's): the creatures beaten in a won fight may leave theirs
+// (labyrinthFight). Returns the new state, what the room gave (the
+// completion reward apart too) and, for a fight, the hunt.
 /**
  * @param {LabyrinthState} state
  * @param {{ row: number, room: number }} target
@@ -606,11 +661,15 @@ export function enterRoom(state, target, party, seed, content) {
   const gains = { xp: 0, gold: 0, shards: 0 };
   /** @type {import('./core.js').Artifact | null} */
   let artifact = null;
+  /** @type {{ shards: number, gold: number } | null} */
+  let completion = null;
   /** @type {string[]} */
   const lines = [];
   /** @type {Record<string, any> | null} */
   let hunt = null;
   const index = target.row * 3 + target.room;
+  const classLevel = party.character.classLevel ?? 0;
+  const spent = spentRoom(state, state.level, target.row);
 
   if (type === 'spring') {
     const heal = rules(content).spring.heal;
@@ -621,9 +680,12 @@ export function enterRoom(state, target, party, seed, content) {
   } else if (type === 'merchant') {
     next.pending = { kind: 'merchant', heal: false, blessing: false, choices: null };
   } else if (type === 'treasure') {
-    gains.shards = level.shards.treasure;
-    gains.gold = labyrinthGold(rules(content).rewards.treasureGoldMinutes, state.charLevel, content, party.character.classLevel ?? 0);
-    lines.push(say(texts, 'treasure', index, { gold: gains.gold, shards: gains.shards }));
+    if (spent) lines.push(say(texts, 'spent', index));
+    else {
+      gains.shards = level.shards.treasure;
+      gains.gold = labyrinthGold(rules(content).rewards.treasureGoldMinutes, state.charLevel, content, classLevel);
+      lines.push(say(texts, 'treasure', index, { gold: gains.gold, shards: gains.shards }));
+    }
   } else {
     hunt = labyrinthFight({ state: next, type, row: target.row, room: target.room, party, seed }, content);
     const { won } = hunt.labyrinth;
@@ -633,11 +695,18 @@ export function enterRoom(state, target, party, seed, content) {
     if (!won) {
       next.over = 'fainted';
     } else if (type === 'elite') {
-      gains.shards = level.shards.elite;
-      gains.gold += labyrinthGold(rules(content).rewards.eliteGoldMinutes, state.charLevel, content, party.character.classLevel ?? 0);
+      if (!spent) {
+        gains.shards = level.shards.elite;
+        gains.gold += labyrinthGold(rules(content).rewards.eliteGoldMinutes, state.charLevel, content, classLevel);
+      }
       next.pending = { kind: 'blessing', from: 'elite', choices: blessingChoices(`${state.seed}:${state.level}:${target.row}:${target.room}`, content) };
     } else if (type === 'guardian') {
-      artifact = makeArtifact(level.artifact, createRng(`${seed}:artifact`), content);
+      if (!spent) {
+        artifact = makeArtifact(level.artifact, createRng(`${seed}:artifact`), content);
+        completion = completionReward(state.level, state.charLevel, content, classLevel);
+        gains.shards += completion.shards;
+        gains.gold += completion.gold;
+      }
       next.cleared = Math.max(next.cleared, state.level);
       if (state.level >= labyrinthLevels(content).length) {
         next.over = 'done';
@@ -649,6 +718,7 @@ export function enterRoom(state, target, party, seed, content) {
     if (won) {
       const { mend } = blessingEffects(state.blessings, content);
       if (mend > 0) next.hp = Object.fromEntries(Object.entries(next.hp).map(([key, value]) => [key, value > 0 ? shareOf(value + mend) : value]));
+      if (spent) lines.push(say(texts, 'spent', index));
     }
   }
   next.gains = {
@@ -657,7 +727,7 @@ export function enterRoom(state, target, party, seed, content) {
     shards: next.gains.shards + gains.shards,
     artifacts: next.gains.artifacts + (artifact ? 1 : 0),
   };
-  return { state: next, type, gains, artifact, lines, hunt };
+  return { state: next, type, gains, artifact, completion, spent, lines, hunt };
 }
 
 // A blessing chosen of those offered (after an elite, a guardian, at an
@@ -715,7 +785,8 @@ export const leaveMerchant = (state) => (state.pending?.kind === 'merchant' && !
 // guardian's by the guardians'), at most one of a creature a fight and none
 // at its top level (`maxed`); drawn from the day's seed and the room, so
 // the fight and its loot go as without them, and the hunt has them
-// (`cards`).
+// (`cards`). Before the place of the defeat (spentRoom), no XP, gold nor
+// cards.
 /**
  * @param {{ state: LabyrinthState, type: string, row: number, room: number, party: { character: Record<string, any>, equipped: Record<string, any>[], name: string, companions?: Record<string, any>[], trophies?: Record<string, any>, week?: Record<string, any> | null, cards?: { maxed?: string[] } | null }, seed: string }} options
  * @param {Content} content
@@ -749,9 +820,11 @@ export function labyrinthFight({ state, type, row, room, party, seed }, content)
   if (won && hp.me <= 0) hp.me = shareOf(1 / me.unit.maxHp) || 0.0001;
   const hpAfter = Math.max(0, Math.round(hp.me * me.unit.maxHp));
 
+  // Up to the place of the defeat after the Labirynt started again, nothing.
+  const spent = spentRoom(state, state.level, row);
   let xp = 0;
   let gold = 0;
-  if (won && type === 'fight') {
+  if (won && type === 'fight' && !spent) {
     const tuning = content.balance.hunt;
     const pace = explorationPace(rules(content).rewardMinutes, content);
     const lengthed = pace.timeFactor * (1 + pace.lengthBonus);
@@ -773,7 +846,7 @@ export function labyrinthFight({ state, type, row, room, party, seed }, content)
   /** @type {string[]} */
   const found = [];
   let packs = 0;
-  if (won && cards && content.cards) {
+  if (won && cards && content.cards && !spent) {
     const cardRng = createRng(`${state.seed}:${state.level}:${row}:${room}:cards`);
     for (const enemy of enemies) {
       const card = cardDrop(enemy.monsterId, cardRng, { maxed: [...(cards.maxed ?? []), ...found], guardian: type === 'guardian' }, content);
