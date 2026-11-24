@@ -29,8 +29,17 @@
 // sample fights' recursion only moves it by what changes from there to the
 // exploration asked for (its own pace, the HP it starts with, the elite and
 // the champion sought or avoided).
+// A Drużyna's trip counts the whole party as it would go (gracz (poz. 95),
+// 24.11.2026: „żeby system przeliczał ryzyko wyprawy dla drużyny razem z
+// innymi graczami w drużynie”): the other players (`partners`) fight beside
+// the character in every sample fight and every trip of tripFaints, with
+// the HP they set out with, their own healing and mana potions and their
+// mana, and, as on a trip, rest after each won fight and fight on after a
+// fall; the creatures grow for them as on the trip (exploreStrength's
+// players, by the highest class level among them), and the trip goes
+// without companions.
 
-import { exploreStrength, playerCombatant } from './combatant.js';
+import { exploreStrength, fightingClassLevel, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
 import { companionCombatant } from './companions.js';
 import {
@@ -45,7 +54,7 @@ import {
   toughEncountersFor,
   withRareOdds,
 } from './hunt.js';
-import { fightPotions } from './potions.js';
+import { carryLimit, fightPotions } from './potions.js';
 import { createRng } from './rng.js';
 import { durationsUpTo } from './unlocks.js';
 
@@ -65,6 +74,12 @@ import { durationsUpTo } from './unlocks.js';
  * @typedef {{ maxHp: number, recovery: number, potionBonus?: number, regular: number[], tough: number[] | null, elite: number[], champion: number[] | null, safe: boolean, trips?: ThreatTrips[] | null }} ThreatSamples
  *   The sample fights of a build, mixed by kind (threatSamples), and with
  *   companions its explorations of each THREAT_TRIP_MINUTES (tripFaints).
+ */
+/**
+ * @typedef {{ character: Record<string, any>, equipped: Record<string, any>[], name?: string, hpShare?: number, potions?: Record<string, number>, healBelow?: number }} Partner
+ *   Another player of a Drużyna's trip, as it would set out: its character,
+ *   its gear, its HP as a share of its most (full without one), and the
+ *   healing and mana potions it takes along, with its healing mark.
  */
 /**
  * @typedef {{ count: number, amount: number, below: number, amounts?: number[], potions?: Record<string, number> }} Healing
@@ -117,13 +132,14 @@ const sampleKind = (build, weight) => ({ build, weight, counts: new Array(LOST +
  * @param {Rng} rng
  * @param {Content} content
  * @param {Record<string, any>} area
- * @param {Record<string, any>[]} [mates]
+ * @param {Record<string, any>[]} [mates] The other players of a Drużyna's trip first, then the companions.
  * @param {number[]} [strength]
- * @param {number} [classLevel] The character's, for the myth game (monsterCombatant).
+ * @param {number} [classLevel] Of those who fight, for the myth game (monsterCombatant).
+ * @param {number} [players] The Drużyna's players who fight, 1 alone (partyStrength).
  */
-function fightSamples(kind, times, player, rng, content, area, mates = [], strength = [1, 1], classLevel = 0) {
+function fightSamples(kind, times, player, rng, content, area, mates = [], strength = [1, 1], classLevel = 0, players = 1) {
   for (let i = 0; i < times; i++) {
-    const fight = simulateFight({ allies: [{ ...player }, ...mates.map((mate) => ({ ...mate }))], enemies: encounterCombatants(kind.build(), content, { strength, classLevel }), rng, content, trait: area.trait });
+    const fight = simulateFight({ allies: [{ ...player }, ...mates.map((mate) => ({ ...mate }))], enemies: encounterCombatants(kind.build(), content, { strength, classLevel, players }), rng, content, trait: area.trait });
     if (fight.won === null) continue;
     kind.fought += 1;
     if (!fight.won) {
@@ -172,11 +188,11 @@ function mix(kinds) {
 // regular) with whether it ended in a faint (`faints`), so other odds of
 // those kinds weigh the same explorations (tripShare).
 /**
- * @param {{ minutes: number, character: Record<string, any>, area: Record<string, any>, player: Record<string, any>, mates: Record<string, any>[], strength: [number, number], classLevel: number, potions: Record<string, number>, healBelow: number }} trip
+ * @param {{ minutes: number, character: Record<string, any>, area: Record<string, any>, player: Record<string, any>, mates: Record<string, any>[], partners?: { unit: Record<string, any>, hpShare: number, potions: Record<string, number>, healBelow: number }[], strength: [number, number], classLevel: number, players?: number, potions: Record<string, number>, healBelow: number }} trip
  * @param {Content} content
  * @returns {ThreatTrips}
  */
-function tripFaints({ minutes, character, area, player, mates, strength, classLevel, potions, healBelow }, content) {
+function tripFaints({ minutes, character, area, player, mates, partners = [], strength, classLevel, players = 1, potions, healBelow }, content) {
   const pace = explorationPace(minutes, content, character.level);
   const rng = createRng(`threat-trips:${area.id}:${character.level}:${minutes}`);
   const fainted = new Array(pace.fights + 1).fill(0);
@@ -186,9 +202,24 @@ function tripFaints({ minutes, character, area, player, mates, strength, classLe
   const faints = [];
   /** @param {Record<string, any>} unit @param {number} hp */
   const rested = (unit, hp) => hp + Math.round((unit.maxHp - hp) * Math.min(1, unit.recovery + pace.restBonus));
+  // The other players' potions for a trip of these minutes: of each at most
+  // one a fight (carryLimit), as a member takes them along (parties.js).
+  const carried = partners.map((one) =>
+    Object.fromEntries(
+      Object.entries(one.potions)
+        .filter(([id, count]) => content.potionsById[id] && count > 0)
+        .map(([id, count]) => [id, Math.min(count, carryLimit(content.potionsById[id], pace.fights))]),
+    ),
+  );
   for (let trip = 0; trip < THREAT_TRIPS; trip++) {
     let hp = player.maxHp;
     const mateHp = mates.map((mate) => mate.maxHp);
+    // The other players of a Drużyna's trip: the HP each sets out with,
+    // its mana (full: null) and its potions, as the character's.
+    const partnerHp = partners.map((one) => Math.max(1, Math.round(one.unit.maxHp * one.hpShare)));
+    /** @type {(number | null)[]} */
+    const partnerMana = partners.map(() => null);
+    const partnerLeft = carried.map((kept) => ({ ...kept }));
     // The character's mana, full as it sets out (null), then what each
     // fight leaves it.
     /** @type {number | null} */
@@ -202,11 +233,22 @@ function tripFaints({ minutes, character, area, player, mates, strength, classLe
       path += encounter.champion ? 'c' : encounter.elite ? 'e' : encounter.tough ? 't' : 'r';
       const kit = fightPotions(left, healBelow, content);
       const allies = [{ ...player, hp, ...(mana !== null && { mana }), ...(Object.keys(kit).length > 0 && { potions: kit }) }];
+      partners.forEach((one, index) => {
+        const own = fightPotions(partnerLeft[index], one.healBelow, content);
+        const partnerManaNow = partnerMana[index];
+        allies.push({ ...one.unit, hp: partnerHp[index], ...(partnerManaNow !== null && { mana: partnerManaNow }), ...(Object.keys(own).length > 0 && { potions: own }) });
+      });
       mates.forEach((mate, index) => {
         if (mateHp[index] > 0) allies.push({ ...mate, hp: mateHp[index] });
       });
-      const result = simulateFight({ allies, enemies: encounterCombatants(encounter, content, { strength, classLevel }), rng, content, trait: area.trait });
-      for (const id of result.drunk) left[id] = (left[id] ?? 0) - 1;
+      const result = simulateFight({ allies, enemies: encounterCombatants(encounter, content, { strength, classLevel, players }), rng, content, trait: area.trait });
+      // A potion drunk is the one player's that drank it (combat.js:
+      // `drinkers`), the character's when no other player carries it.
+      result.drunk.forEach((/** @type {string} */ id, /** @type {number} */ index) => {
+        const drinker = partners.findIndex((one) => one.unit.id === result.drinkers?.[index]);
+        const from = drinker >= 0 ? partnerLeft[drinker] : left;
+        from[id] = (from[id] ?? 0) - 1;
+      });
       if (result.won === null) break;
       if (result.won === false) {
         faint = !((encounter.elite || encounter.champion) && area.safe);
@@ -218,6 +260,13 @@ function tripFaints({ minutes, character, area, player, mates, strength, classLe
       hp = rested(player, after(player.id));
       const manaLeft = /** @type {{ mana?: number } | undefined} */ (result.units.find((/** @type {{ id: string }} */ unit) => unit.id === player.id))?.mana;
       mana = restedMana(manaLeft ?? mana, player.maxMana ?? 0, content);
+      // The other players rest as the character does, and one that fell
+      // fights on (simulateHunt).
+      partners.forEach((one, index) => {
+        partnerHp[index] = rested(one.unit, after(one.unit.id));
+        const own = /** @type {{ mana?: number } | undefined} */ (result.units.find((/** @type {{ id: string }} */ unit) => unit.id === one.unit.id))?.mana;
+        partnerMana[index] = restedMana(own ?? partnerMana[index], one.unit.maxMana ?? 0, content);
+      });
       mates.forEach((mate, index) => {
         if (mateHp[index] > 0) mateHp[index] = after(mate.id) > 0 ? rested(mate, after(mate.id)) : 0;
       });
@@ -281,19 +330,42 @@ function tripShare(went, fights, pace, ownPace, champion, tough) {
 // the server can keep it until the build or those potions change.
 // `hard`: against the stronger creatures of a Trudna wyprawa (true, 629 A)
 // or of a Piekielna ('hell'; exploreStrength in combatant.js).
+// `partners`: the other players of a Drużyna's trip, as it would set out
+// (gracz (poz. 95), 24.11.2026; parties.js: threatCrew): they fight beside
+// the character in the sample fights, with their potions, and in its
+// explorations of tripFaints with the HP they set out with, and the
+// creatures grow for all of them; a trip takes no companions. Before, the
+// threat with "Z drużyną" was the character's alone (926 B).
 /**
- * @param {{ character: Record<string, any>, equipped: Record<string, any>[], areaId: string, companions?: Record<string, any>[], hard?: boolean | 'hell', healing?: Healing | null }} build
+ * @param {{ character: Record<string, any>, equipped: Record<string, any>[], areaId: string, companions?: Record<string, any>[], partners?: Partner[], hard?: boolean | 'hell', healing?: Healing | null }} build
  * @param {Content} content
  * @returns {ThreatSamples}
  */
-export function threatSamples({ character, equipped, areaId, companions = [], hard = false, healing = null }, content) {
+export function threatSamples({ character, equipped, areaId, companions = [], partners = [], hard = false, healing = null }, content) {
   const area = content.areasById[areaId];
   const player = playerCombatant(/** @type {any} */ ({ character, equipped, name: 'próba', area }), content);
-  const mates = companions.map((companion, index) => companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}`, classLevel: character.classLevel ?? 0 }), content));
+  // The other players, after the character as on a trip (simulateHunt's
+  // `p` ids), each with its potions in the sample fights.
+  const others = partners.map((one, index) => ({
+    unit: playerCombatant(/** @type {any} */ ({ character: one.character, equipped: one.equipped, name: one.name ?? 'próba', area, id: `p${index + 1}` }), content),
+    hpShare: Math.min(1, Math.max(0.01, one.hpShare ?? 1)),
+    potions: one.potions ?? {},
+    healBelow: one.healBelow ?? content.potionUse?.healBelow ?? 0,
+  }));
+  const companionsGoing = others.length > 0 ? [] : companions;
+  const mates = [
+    ...others.map((one) => {
+      const kit = fightPotions(one.potions, one.healBelow, content);
+      return { ...one.unit, ...(Object.keys(kit).length > 0 && { potions: kit }) };
+    }),
+    ...companionsGoing.map((companion, index) => companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}`, classLevel: character.classLevel ?? 0 }), content)),
+  ];
   const rng = createRng(`threat:${areaId}:${character.level}`);
-  // The character alone (with "Z drużyną" too: 926 B), at its class level.
-  const classLevel = character.classLevel ?? 0;
-  const strength = exploreStrength(area, character.level, content, hard, { classLevel });
+  // The creatures by the highest class level of those who fight and by the
+  // Drużyna's players among them, as on the trip (simulateHunt).
+  const classLevel = fightingClassLevel([character, ...partners.map((one) => one.character)]);
+  const players = 1 + others.length;
+  const strength = exploreStrength(area, character.level, content, hard, { classLevel, players });
   /**
    * @param {Record<string, any>[]} encounters
    * @param {Record<string, any>} [options]
@@ -309,12 +381,12 @@ export function threatSamples({ character, equipped, areaId, companions = [], ha
     elite: [sampleKind(() => eliteEncounter(area, content), 1)],
     champion: area.champion ? [sampleKind(() => championEncounter(area, content), 1)] : [],
   };
-  for (const list of Object.values(groups)) for (const kind of list) fightSamples(kind, SAMPLES, player, rng, content, area, mates, strength, classLevel);
+  for (const list of Object.values(groups)) for (const kind of list) fightSamples(kind, SAMPLES, player, rng, content, area, mates, strength, classLevel, players);
   if (mix(groups.regular)[LOST] < /** @type {number} */ (LIMITS.at(-1))) {
     for (const [group, list] of Object.entries(groups)) {
       const total = list.reduce((sum, kind) => sum + kind.weight, 0);
       for (const kind of list.filter(inDoubt)) {
-        fightSamples(kind, Math.ceil((MORE_SAMPLES[group] * kind.weight) / total), player, rng, content, area, mates, strength, classLevel);
+        fightSamples(kind, Math.ceil((MORE_SAMPLES[group] * kind.weight) / total), player, rng, content, area, mates, strength, classLevel, players);
       }
     }
   }
@@ -335,7 +407,7 @@ export function threatSamples({ character, equipped, areaId, companions = [], ha
     trips:
       mates.length > 0
         ? THREAT_TRIP_MINUTES.filter((minutes) => minutes <= content.balance.hunt.maxMinutes).map((minutes) =>
-            tripFaints({ minutes, character, area, player, mates, strength, classLevel, potions, healBelow }, content),
+            tripFaints({ minutes, character, area, player, mates: mates.slice(others.length), partners: others, strength, classLevel, players, potions, healBelow }, content),
           )
         : null,
   };

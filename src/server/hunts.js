@@ -47,6 +47,8 @@ import {
   fightKind,
   kindLine,
   higherThreat,
+  partyBagLost,
+  partyPartView,
   hpAfterHunt,
   huntDurations,
   isUnlocked,
@@ -91,6 +93,7 @@ import {
   engineCharacter,
   equippedItems,
   huntsLeft,
+  loadCharacter,
   loadPlayer,
   questsNow,
   blessingAfter,
@@ -98,13 +101,14 @@ import {
   requireIdle,
   requireIdlePlayer,
   requirePlayer,
+  settleCharacter,
   settlementOpen,
   trophiesFor,
 } from './characters.js';
 import { toHex } from './encoding.js';
 import { assertion, atomically, characterChanged, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
-import { t } from './i18n.js';
+import { accountLanguage, runInLanguage, t } from './i18n.js';
 import { cardsOn, eventDraftsOn, eventsOn, fortressOn, settlementOn } from './features.js';
 import { cardUpserts, dropCollection, droppedCards, droppedEffect, effectChance, effectFoundLine, effectUpserts, maxedCards, ownCardCollection, packGains, packViews } from './cards.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
@@ -119,7 +123,7 @@ import { finishGathering } from './professions.js';
 import { herbsOf, knownPotionsOf, pantryOf, potionKnown, potionsOf } from './professions-view.js';
 import { finishCooking } from './cooking.js';
 import { minigameOutcome } from './minigame.js';
-import { trimReports } from './reports.js';
+import { openPartyReport, trimReports } from './reports.js';
 import { leaveTrip, tripOf } from './trips.js';
 import { finishCrafting } from './workshop.js';
 import { finishJewels } from './jewelcraft.js';
@@ -127,7 +131,7 @@ import { finishMining } from './mining.js';
 import { finishFishing } from './fishing.js';
 import { finishFarming } from './farming.js';
 import { applyPartyEvent, checkedChoice, leaderView, resolveAuto, resolvePartyRow, tripEvent, tripLine } from './party-events.js';
-import { partyGate } from './parties.js';
+import { partyGate, threatCrew } from './parties.js';
 import { wantedAfterHunt, wantedGoing, wantedOnTrip } from './wanted.js';
 import { keptWeek, weekFor } from './weeks.js';
 import { winterGainSql } from './winter.js';
@@ -195,23 +199,28 @@ export function companionsKey(player, now, rested) {
 // `hard`: against the creatures of a Trudna wyprawa (true, 629 A) or of a
 // Piekielna ('hell'). `healing`: the healing potions taken along
 // (healingFor), which the explorations with companions drink as on the way
-// (threatSamples' trips), so they are part of the key.
-function cachedSamples(player, character, equipped, areaId, now, hard = false, healing = null) {
+// (threatSamples' trips), so they are part of the key. `crew`: the others
+// of a Drużyna's trip as it would go (parties.js: threatCrew), who fight
+// beside the character in place of its companions, each whole in the key.
+function cachedSamples(player, character, equipped, areaId, now, hard = false, healing = null, crew = null) {
   // Each item worn whole: an upgrade, a reforged affix or an element keeps
   // the item's id; and the evolution and the professions, whose levels give
   // stats (the code review: the threat stayed as before them).
-  const gear = [...equipped].sort((a, b) => a.id - b.id).map((item) => JSON.stringify(item));
+  const gearOf = (items) => [...items].sort((a, b) => a.id - b.id).map((item) => JSON.stringify(item));
+  const gear = gearOf(equipped);
   // The companions who would go along fight beside the character
-  // (companions.js).
-  const companions = settlementOn() ? companionsGoing(player, now) : [];
+  // (companions.js); a Drużyna's trip goes without them.
+  const companions = settlementOn() && !crew ? companionsGoing(player, now) : [];
   const party = companionsInFights(companions);
-  // The potions count only where the companions' explorations drink them.
-  const potions = party.length > 0 && healing ? [healing.potions, healing.below] : null;
+  const partners = (crew ?? []).map((one) => ({ character: one.character, equipped: one.equipped, name: one.name, hpShare: one.hpShare, potions: one.potions, healBelow: one.healBelow }));
+  const others = (crew ?? []).map((one) => [one.id, one.character, gearOf(one.equipped), one.hpShare, one.potions, one.healBelow ?? null]);
+  // The potions count only where the explorations with others drink them.
+  const potions = (party.length > 0 || partners.length > 0) && healing ? [healing.potions, healing.below] : null;
   // The Rdzeń's Artefakty and gem too (core.js), which change the fights.
-  const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, character.evolution, character.professions, gear, party, hard, character.core ?? null, potions]);
+  const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, character.evolution, character.professions, gear, party, hard, character.core ?? null, potions, others]);
   let samples = samplesCache.get(key);
   if (!samples) {
-    samples = threatSamples({ character, equipped, areaId, companions, hard, healing }, content());
+    samples = threatSamples({ character, equipped, areaId, companions, partners, hard, healing }, content());
     if (samplesCache.size >= SAMPLES_CACHE_SIZE) samplesCache.delete(samplesCache.keys().next().value);
     samplesCache.set(key, samples);
   }
@@ -297,7 +306,11 @@ function huntFeats(hunt, kills) {
 
 // ?area=… asks for one inner region, which keeps each request within the CPU
 // limit. Without it the answer covers the inner region of each region that fits
-// the character's level, if it is open.
+// the character's level, if it is open. ?party=1: the threat of a Drużyna's
+// trip, its leader with the others as they would go (gracz (poz. 95),
+// 24.11.2026: „żeby system przeliczał ryzyko wyprawy dla drużyny razem z
+// innymi graczami w drużynie”; parties.js: threatCrew), each area's answer
+// with `party` true; without a member to take, the character's own.
 export async function huntOptions(context) {
   const { player } = await requirePlayer(context);
   const character = engineCharacter(player.row);
@@ -323,6 +336,7 @@ export async function huntOptions(context) {
   // count too (healingFor).
   const met = JSON.parse(player.row.met ?? '[]');
   const healing = healingFor(player, params);
+  const crew = params.get('party') === '1' ? await threatCrew(context.env.DB, player, context.now) : null;
   // ?hard=1: the threats of a Trudna wyprawa, ?hell=1 of a Piekielna (which
   // wins when both come), from the challenge's level (629 A; the author,
   // 19.11.2026).
@@ -349,12 +363,20 @@ export async function huntOptions(context) {
     maxHp,
     areas: areas.map((place) => {
       const { id } = place;
-      const samples = cachedSamples(player, character, equipped, id, context.now, hard, healing);
+      const samples = cachedSamples(player, character, equipped, id, context.now, hard, healing, crew);
       const catchUp = rareCatchUp(character.level, place, met, content());
       const threat = estimateThreat({ character, equipped, hp, areaId: id, catchUp, healing }, content(), samples);
       const avoiding = estimateThreat({ character, equipped, hp, areaId: id, avoidRare: true, healing }, content(), samples);
       const seeking = estimateThreat({ character, equipped, hp, areaId: id, seekRare: true, catchUp, healing }, content(), samples);
-      return { id, ...(hard && { [hard === 'hell' ? 'hell' : 'hard']: true }), threat, threatAvoiding: lowerThreat(avoiding, threat), threatSeeking: higherThreat(seeking, threat), ...(watch && scoutView(place, threat, catchUp)) };
+      return {
+        id,
+        ...(hard && { [hard === 'hell' ? 'hell' : 'hard']: true }),
+        ...(crew && { party: true }),
+        threat,
+        threatAvoiding: lowerThreat(avoiding, threat),
+        threatSeeking: higherThreat(seeking, threat),
+        ...(watch && scoutView(place, threat, catchUp)),
+      };
     }),
   });
 }
@@ -751,7 +773,8 @@ function mealAtStart(player, dishId, minutes, replaces = null, count = 1) {
 // exploration keeps the meal it set out with, and a call back gives back
 // the meal as it was. The meal's time runs only on explorations, so nothing
 // is lost by eating early; a member of a Drużyna eats so before its trip,
-// whose set-out feeds only the leader, and the meal covers the trip.
+// whose set-out feeds the leader by its choice and a member only by its
+// Autouzupełnianie (parties.js: memberMeal), and the meal covers the trip.
 export async function eatDish(context) {
   const { session, player } = await requirePlayer(context);
   const { cooking } = content();
@@ -846,13 +869,33 @@ export async function cancelHunt(context) {
 export async function claimHunt(context) {
   const { session, player } = await requirePlayer(context);
   const now = context.now;
+  const db = context.env.DB;
+  // A Drużyna's trip another claimed for the whole party (claimTrip): its
+  // report opens as claimed (a Walka from before that claim still offered
+  // it), with nothing more given.
+  const shared = async (row) => {
+    const report = await openPartyReport(db, row);
+    return report && json({ report, character: characterView(await loadPlayer(db, session.userId), now) });
+  };
+  if (!player.activity) {
+    const opened = await shared(player.row);
+    if (opened) return opened;
+  }
   // A mercenary's offer or service has no report: its pay or its close
   // waits in the Karczma (mercenaries.js), as these words say (the code
   // review: it ran into the exploration's claim and failed).
   if (player.activity?.kind === 'mercenary') requireIdle(player, now);
   // The option chosen in the event at the exploration's end, if one came.
   const body = (context.request.headers.get('Content-Type') ?? '').startsWith('application/json') ? await readJson(context.request) : {};
-  const done = await finishActivity(context.env.DB, player, now, { choice: body.choice, minigame: body.minigame });
+  let done;
+  try {
+    done = await finishActivity(db, player, now, { choice: body.choice, minigame: body.minigame });
+  } catch (error) {
+    // Claimed for the whole party by another at that very moment.
+    const opened = error instanceof ApiError && ['already_claimed', 'no_activity'].includes(error.code) ? await shared((await loadPlayer(db, session.userId))?.row) : null;
+    if (opened) return opened;
+    throw error;
+  }
   // A work whose recipe or pattern the game no longer has gave back what it
   // took and made no report.
   if (!done) return json({ character: characterView(await loadPlayer(context.env.DB, session.userId), now) });
@@ -868,11 +911,13 @@ export async function claimHunt(context) {
 // The claim of the activity that ended, as "Odbierz raport" makes it: a
 // profession's work by its own finish, an exploration by finishHunt (with
 // the option chosen in the event at its end, if one came). Also the claim
-// of a Drużyna's member as its party sets out (parties.js, `forTrip`).
-export function finishActivity(db, player, now, { choice, forTrip = false, minigame = null } = {}) {
+// of a Drużyna's member as its party sets out (parties.js, `forTrip`, with
+// `claimer` the leader who sends it: a trip's report is then claimed for
+// all who went, claimTrip).
+export function finishActivity(db, player, now, { choice, forTrip = false, claimer = null, minigame = null } = {}) {
   const finish = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting, minerals: finishMining, jewels: finishJewels, fish: finishFishing, crops: finishFarming, dishes: finishCooking }[player.activity?.kind];
   // A work's mini-game, if it was begun, by the taps of the claim (minigame.js).
-  return finish && player.activity.ends_at <= now ? finish(db, player, now, { minigame: minigameOutcome(player.activity, minigame, now) }) : finishHunt(db, player, now, { choice, forTrip });
+  return finish && player.activity.ends_at <= now ? finish(db, player, now, { minigame: minigameOutcome(player.activity, minigame, now) }) : finishHunt(db, player, now, { choice, forTrip, claimer });
 }
 
 // The Osada after an exploration of `minutes`: each companion who went
@@ -945,15 +990,206 @@ function huntMates(stored, hunt, setOut = []) {
 // saved at its start, and the character gets what it brought. An event at
 // its end (events.js) comes first: without `choice` only the event is
 // returned ({ event }), and nothing is saved; with an option of it, the
-// exploration takes the option's outcome. A Drużyna's trip's party event
-// (party-events.js) comes the same way to the trip's leader, unless its
-// report is claimed as the party sets out under another leader
-// (`forTrip`): then the event settles itself.
-export async function finishHunt(db, player, now, { choice, forTrip = false } = {}) {
+// exploration takes the option's outcome. A Drużyna's trip is claimed for
+// all who went at once (claimTrip): its party event (party-events.js) comes
+// the same way to the trip's leader claiming it, and settles itself when
+// another claims, or as the party sets out (`forTrip`; `claimer`, the one
+// who sends it).
+export async function finishHunt(db, player, now, { choice, forTrip = false, claimer = null } = {}) {
   const activity = player.activity;
   if (!activity) throw new ApiError(409, 'no_activity', 'Postać nie jest na wyprawie.');
   if (activity.ends_at > now) throw new ApiError(409, 'not_finished', 'Wyprawa jeszcze trwa.');
+  const shared = sharedTrip(activity);
+  if (shared) return claimTrip(db, player, now, shared, { choice, forTrip, claimer });
+  const claim = await huntClaim(db, player, now, { choice });
+  if (claim.event) return claim;
+  const [id] = await commitClaims(db, [claim]);
+  return { id, report: claim.report };
+}
 
+// The trip of a Drużyna's exploration claimed for all who went at once
+// (claimTrip): one with its roster and seed (parties.js), or null.
+function sharedTrip(activity) {
+  if (activity.kind !== 'hunt') return null;
+  const party = JSON.parse(activity.options ?? '{}').party;
+  return party?.seed && party.trip && party.roster?.length > 0 ? party : null;
+}
+
+// The claims made ready (huntClaim) written in one batch, with `extra`
+// statements after them: all of them or none. Gives each claim's report id.
+async function commitClaims(db, claims, extra = []) {
+  const lists = claims.map((claim) => claim.statements());
+  let results;
+  try {
+    results = await db.batch([...lists.flat(), ...extra]);
+  } catch (error) {
+    if (String(error?.message).includes('UNIQUE')) {
+      throw new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
+    }
+    if (raced(error)) throw characterChanged();
+    throw error;
+  }
+  // Each claim's report is the second of its statements (huntClaim).
+  let at = 0;
+  return lists.map((list) => {
+    const id = results[at + 1].meta.last_row_id;
+    at += list.length;
+    return id;
+  });
+}
+
+// Wspólny raport drużyny (24.11.2026; the author: „niech lider odbiera raport
+// za wszystkich, niech wszyscy mają wspólny”, and „niech moga isc dalej na
+// wyprawy nawet jak jednego gracza nie ma”). The first claim of a Drużyna's
+// trip by any who went, normally its leader, claims it for every one of
+// them at once, in one batch: each gets all its own claim would give (XP,
+// gold, levels, finds, materials, the potions not drunk back, the quests and
+// all), but for a full bag: its finds go into it up to its places and those
+// beyond them are lost (`partyBag`, huntClaim; the author: „w plecaku
+// zostaja rzeczy do maksymalnego napełnienia a pozniej przepadają dopóki
+// ktos nie posprząta”), and its own report in its Dziennik, in its account's language, each
+// with the same list of what every one got (partyPartView) and who claimed
+// it. What a member would spend, free stat points or Skill Points, waits on
+// the character. Each other member's report is marked for its Walka until
+// it opens it (characters.party_report). The trip's party event is the trip
+// leader's to choose only when it claims (`choice`); claimed by another, or
+// as the party sets out (`forTrip`), it settles itself with its careful
+// option. `claimer`: who claims for the party, { id, name }, the one whose
+// claim it is unless the party's setting out claims it (parties.js:
+// claimForTrip). The members whose character changed at that very moment
+// are read anew, a few times at most. Gives the claimer's report as a solo
+// claim does, and `shared`: the report ids by character.
+const CLAIM_TRIES = 3;
+
+async function claimTrip(db, player, now, trip, { choice, forTrip = false, claimer = null }) {
+  const by = claimer ?? { id: player.row.id, name: player.row.name };
+  for (let tries = 1; ; tries += 1) {
+    const members = await tripMembers(db, tries === 1 ? player : null, player.row.id, trip, now);
+    if (!members[0]) throw new ApiError(409, 'no_activity', 'Postać nie jest na wyprawie.');
+    // The party event, decided once for the trip, at the claim of the first
+    // of them (the one claiming): the trip's leader chooses at its own
+    // claim; anyone else's, or one as the party sets out, settles it.
+    let decided;
+    const decideEvent = async (context) => {
+      if (decided !== undefined) return decided;
+      let eventRow = eventsOn() ? await tripEvent(db, context) : null;
+      if (eventRow && !eventRow.choice) {
+        const leads = eventRow.leader_id === context.row.id && context.row.id === by.id;
+        const late = now >= eventRow.auto_at;
+        if (leads && !forTrip && !late && choice === undefined) return { event: leaderView(eventRow, context.area, context.bagPotions) };
+        eventRow =
+          leads && !forTrip && !late
+            ? await resolvePartyRow(db, eventRow, { optionId: checkedChoice(eventRow, choice, context.bagPotions), chosenBy: 'leader', now })
+            : await resolveAuto(db, eventRow, now, late ? 'auto' : 'claim');
+      }
+      decided = eventRow;
+      return decided;
+    };
+    const claims = [];
+    for (const member of members) {
+      const own = member.player.row.id === player.row.id;
+      const claim = await inLanguage(member.language, () => huntClaim(db, member.player, now, { choice: own ? choice : undefined, decideEvent, partyBag: true }));
+      if (claim.event) return claim;
+      claims.push({ ...member, claim });
+    }
+    // The list of what each got, in each one's language, and who claimed.
+    const parts = claims.map((one) => one.claim.part);
+    for (const one of claims) {
+      const views = await inLanguage(one.language, () => parts.map((part) => partyPartView(part, content())));
+      one.claim.report.partyClaim = { by: by.name, members: views.map((view) => (view.id === one.player.row.id ? { ...view, own: true } : view)) };
+      one.claim.summary.partyClaim = { by: by.name };
+    }
+    // Each one's report marked for its Walka (characters.party_report),
+    // but the claimer's own, which it opens now.
+    const marks = claims.map(({ player: member }) =>
+      member.row.id === by.id
+        ? db.prepare('UPDATE characters SET party_report = NULL WHERE id = ?').bind(member.row.id)
+        : db
+            .prepare("UPDATE characters SET party_report = json_object('id', (SELECT id FROM reports WHERE character_id = ? AND activity_key = ?), 'by', ?) WHERE id = ?")
+            .bind(member.row.id, `${member.row.id}:${member.activity.started_at}`, by.name, member.row.id),
+    );
+    let ids;
+    try {
+      ids = await commitClaims(
+        db,
+        claims.map((one) => one.claim),
+        marks,
+      );
+    } catch (error) {
+      // One of them changed meanwhile: all are read anew.
+      if (error instanceof ApiError && error.code === 'character_changed' && tries < CLAIM_TRIES) continue;
+      throw error;
+    }
+    // The party event's result for everyone who went, given now (or by the
+    // cron a minute later as the party sets out: its start holds only while
+    // its members are as it read them, parties.js). One that fails waits
+    // for the cron: the claim stays made.
+    if (!forTrip && decided?.choice && !decided.applied) {
+      try {
+        await applyPartyEvent(db, decided, now);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    const shared = new Map(claims.map((one, index) => [one.player.row.id, ids[index]]));
+    const index = claims.findIndex((one) => one.player.row.id === player.row.id);
+    return { id: ids[index], report: claims[index].claim.report, shared };
+  }
+}
+
+// A task in `lang`, or in the request's own language (null).
+const inLanguage = (lang, task) => (lang ? runInLanguage(lang, task) : task());
+
+// Those who went on a trip and have not had it claimed, its exploration
+// ended: the one claiming first (`first`, as its request read and settled
+// it, or read anew by `firstId`), then the others in the trip's order, each
+// settled first as its own request would settle it (settleCharacter), with
+// its account's language. One whose character is gone, or whose
+// exploration is no longer the trip's, is left out.
+async function tripMembers(db, first, firstId, trip, now) {
+  // Of those in the trip's roster (one called back left it, trips.js), by
+  // the activities' key.
+  const order = trip.roster.map((one) => one.id).filter((id) => Number.isSafeInteger(id));
+  const { results } = await db
+    .prepare(
+      `SELECT character_id FROM activities WHERE character_id IN (${order.map(() => '?').join(', ') || 'NULL'}) AND kind = 'hunt' AND ends_at <= ? AND json_extract(options, '$.party.id') = ? AND json_extract(options, '$.party.trip') = ?`,
+    )
+    .bind(...order, now, trip.id, trip.trip)
+    .all();
+  const rank = (id) => (order.includes(id) ? order.indexOf(id) : order.length);
+  const ids = results.map((one) => one.character_id).filter((id) => id !== firstId).sort((a, b) => rank(a) - rank(b));
+  const ofTrip = (member) => {
+    const party = member?.activity ? sharedTrip(member.activity) : null;
+    return Boolean(party) && party.id === trip.id && party.trip === trip.trip && member.activity.ends_at <= now;
+  };
+  const members = [];
+  const claimer = first ?? (await loadCharacter(db, firstId));
+  members.push(ofTrip(claimer) ? { player: claimer, language: null } : null);
+  for (const id of ids) {
+    let member = await loadCharacter(db, id);
+    if (!member) continue;
+    const user = await db.prepare('SELECT language FROM users WHERE id = ?').bind(member.row.user_id).first();
+    const language = accountLanguage(user?.language);
+    await runInLanguage(language, () => settleCharacter(db, member, now));
+    // Settling reads a character changed meanwhile again by its player,
+    // which gives the one played: for a member set aside, not this one.
+    if (member.row.id !== id) member = await loadCharacter(db, id);
+    if (ofTrip(member)) members.push({ player: member, language });
+  }
+  return members[0] ? members : [null];
+}
+
+// One exploration's claim made ready, not written (finishHunt, claimTrip):
+// the report, its summary for the Dziennik, the part of a Drużyna's trip's
+// shared report (`part`, partyPartView in the engine), and `statements()`,
+// those that write it, the report's insert second (commitClaims). Or {
+// event } when it waits for a choice first: the exploration's event, or on
+// a Drużyna's trip the party event its leader chooses (`decideEvent`,
+// claimTrip, which decides the trip's party event: its row, or { event }).
+// `partyBag`: the finds a full bag has no place for are lost, as on a
+// Drużyna's trip (claimTrip), instead of the scrapper buying the weakest.
+async function huntClaim(db, player, now, { choice, decideEvent = null, partyBag = false } = {}) {
+  const activity = player.activity;
   const row = player.row;
   // The potions taken along and the windows of the potions for a time
   // (beginHunt).
@@ -1084,23 +1320,15 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
   if (event && choice === undefined) return { event: eventView(event, eventArea, who, content(), before.length > 0 ? eventChoices(event, before, walkOptions) : null, mate) };
   // A trip that ended as planned may end in a party event instead (the
   // author, 12.11.2026: „wygenerujmy specjalne drużynowe zdarzenia”;
-  // party-events.js), kept at the first claim of any member's report, the
-  // same for everyone who went. It waits for the trip's leader: without
-  // `choice` its claim returns only the event, and saves nothing more. Past
-  // its time, or claimed as the party sets out under another leader
-  // (`forTrip`), it settles itself with its `auto` option. The others choose
-  // nothing: their reports go on as ever, with a line about it.
-  let partyEvent = trip && eventsOn() ? await tripEvent(db, { row, activity, trip, hunt, area, now }) : null;
-  if (partyEvent && !partyEvent.choice && partyEvent.leader_id === row.id) {
-    // The bag as this claim leaves it, with the potions taken along and
-    // not drunk back: an option may give one away.
-    const bagPotions = potionsBack(row, options.reserved ? (options.potions ?? {}) : {}, hunt.potionsUsed);
-    const auto = forTrip || now >= partyEvent.auto_at;
-    if (!auto && choice === undefined) return { event: leaderView(partyEvent, area, bagPotions) };
-    partyEvent = auto
-      ? await resolveAuto(db, partyEvent, now)
-      : await resolvePartyRow(db, partyEvent, { optionId: checkedChoice(partyEvent, choice, bagPotions), chosenBy: 'leader', now });
-  }
+  // party-events.js), kept at the first claim of the trip, the same for
+  // everyone who went, and decided once for the whole trip (claimTrip): the
+  // trip's leader claiming it chooses first, and nothing is saved before
+  // (`{ event }`); otherwise it settles itself. Every report has a line
+  // about it. The bag as this claim leaves it, with the potions taken along
+  // and not drunk back: an option may give one away.
+  const decision = trip && decideEvent ? await decideEvent({ row, activity, trip, hunt, area, now, bagPotions: potionsBack(row, options.reserved ? (options.potions ?? {}) : {}, hunt.potionsUsed) }) : null;
+  if (decision?.event) return decision;
+  const partyEvent = decision;
   // Today's rumor, as the Karczma told it, or as the beggar's song may.
   const kept = rumorToday(JSON.parse(row.settlement ?? '{}').rumor, now, content());
   if (event) {
@@ -1193,9 +1421,17 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
   const sellBonus = campBonus(levels, 'sellPrice', content());
   const toBag = hunt.items.map((item, index) => index).filter((index) => !autoEquipped.includes(index));
   const candidates = [...bag, ...toBag.map((index) => hunt.items[index])];
-  // The favourites stay (favorites.js): the weakest of the others go. The
-  // claim holds only while the character is as read, its stars too.
-  const sold = bagOverflow(candidates, capacity, gearKey(row.class_id, row.evolution, content()), content(), favoriteIds(row));
+  // On a Drużyna's trip (`partyBag`, claimTrip: every member's, the
+  // leader's too) the finds fill the places the bag has left, the best of
+  // them first, and those beyond them are lost until the player makes room
+  // (the author, 24.11.2026: „w plecaku zostaja rzeczy do maksymalnego
+  // napełnienia a pozniej przepadają dopóki ktos nie posprząta”;
+  // partyBagLost in the engine): the scrapper buys nothing, and nothing in
+  // the bag is touched.
+  const lostFound = partyBag ? partyBagLost(toBag.map((index) => hunt.items[index]), capacity - bag.length, gearKey(row.class_id, row.evolution, content()), content()).map((index) => toBag[index]) : [];
+  // Otherwise the favourites stay (favorites.js): the weakest of the others
+  // go. The claim holds only while the character is as read, its stars too.
+  const sold = partyBag ? [] : bagOverflow(candidates, capacity, gearKey(row.class_id, row.evolution, content()), content(), favoriteIds(row));
   const storedSold = sold.filter((index) => index < bag.length).map((index) => bag[index]);
   const soldStored = storedSold.map((item) => item.id);
   const soldFound = sold.filter((index) => index >= bag.length).map((index) => toBag[index - bag.length]);
@@ -1210,7 +1446,10 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
         }
       : null;
   const report = {
-    ...huntReport({ hunt, applied, character, areaId: area.id, startedAt: activity.started_at, endsAt: activity.ends_at, autoEquipped, overflow }, content()),
+    ...huntReport(
+      { hunt, applied, character, areaId: area.id, startedAt: activity.started_at, endsAt: activity.ends_at, autoEquipped, overflow, lost: lostFound.length > 0 ? { capacity, indices: lostFound } : null },
+      content(),
+    ),
     ...(options.quick && { quick: true }),
     ...(options.flash && { flash: true }),
     // The Drużyna that went, by name (parties.js), and the time the others
@@ -1317,125 +1556,132 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
   // their price is (the code review, 12.11.2026: one put into the Skrzynia
   // Konta meanwhile kept its gem, which came to the minerals too).
   const setGems = gemsBackSql(row.id, storedSold);
-  let results;
-  try {
-    results = await db.batch([
-      // The level, the potions, the buffs, the Osada and the rest below are
-      // computed from the row read: the claim holds only while it is as
-      // read, so a potion sold or an order delivered meanwhile is not undone
-      // (atomic.js); a retry claims anew. So does the exploration: another
-      // member's "Przewiń" moves a Drużyna's whole trip without this
-      // character's version (trips.js: shiftTrip), and "Wróć" ends it, so a
-      // claim of the exploration as read, moved or gone meanwhile, would
-      // pay its report and leave the moved one to be paid again (the code
-      // review, 0.2.72).
-      assertion(db, '(SELECT version FROM characters WHERE id = ?) = ? AND EXISTS (SELECT 1 FROM activities WHERE character_id = ? AND started_at = ? AND ends_at = ?)', [
-        row.id,
-        row.version,
-        row.id,
-        activity.started_at,
+  // What this member got, for a Drużyna's shared report (claimTrip): the
+  // summary's numbers, its finds and materials in no language yet.
+  const part = {
+    id: row.id,
+    name: row.name,
+    result: hunt.result,
+    ...(hunt.forfeit && { forfeit: true }),
+    xp: report.summary.xp,
+    classXp: report.summary.classXp,
+    penalty: applied.penalty,
+    gold: report.summary.gold,
+    timePoints: applied.timePoints,
+    levelBefore: character.level,
+    levelAfter: applied.level,
+    classLevelBefore: character.classLevel,
+    classLevelAfter: applied.classLevel,
+    items: hunt.items,
+    worn: autoEquipped,
+    sold: soldFound,
+    lost: lostFound,
+    materials: hunt.materials,
+    resources: hunt.resources,
+    potionsUsed: hunt.potionsUsed,
+    cards: cardsWon,
+    packs: packsWon,
+  };
+  // The statements that write the claim, made when the caller writes it:
+  // the report and its summary as they are then (a Drużyna's shared report
+  // adds its list to them).
+  const statements = () => [
+    // The level, the potions, the buffs, the Osada and the rest below are
+    // computed from the row read: the claim holds only while it is as
+    // read, so a potion sold or an order delivered meanwhile is not undone
+    // (atomic.js); a retry claims anew. So does the exploration: another
+    // member's "Przewiń" moves a Drużyna's whole trip without this
+    // character's version (trips.js: shiftTrip), and "Wróć" ends it, so a
+    // claim of the exploration as read, moved or gone meanwhile, would
+    // pay its report and leave the moved one to be paid again (the code
+    // review, 0.2.72).
+    assertion(db, '(SELECT version FROM characters WHERE id = ?) = ? AND EXISTS (SELECT 1 FROM activities WHERE character_id = ? AND started_at = ? AND ends_at = ?)', [
+      row.id,
+      row.version,
+      row.id,
+      activity.started_at,
+      activity.ends_at,
+    ]),
+    // Then the report, so that a second claim of the same hunt fails as a whole.
+    db
+      .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
+      .bind(row.id, `${row.id}:${activity.started_at}`, 'hunt', now, JSON.stringify(summary), JSON.stringify(report)),
+    // A report keeps every fight (about 40 KB for 4 hours), so only those the journal shows stay.
+    trimReports(db, row.id, 'hunt'),
+    db
+      .prepare(
+        `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = MAX(0, gold + ? + ${storedPrice.sql})${setResources}${setMaterials}${setHerbs}${setGems.sql},
+           time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${potionsChanged ? ', potions = ?' : ''}${event ? ', event_test = NULL' : ''}${eventBuffs ? ', buffs = ?' : ''}${eventPoints > 0 ? ', bonus_points = bonus_points + ?' : ''}${settlementAfter ? ', settlement = ?' : ''}${fortressAfter ? ', fortress = ?' : ''}${winterGain.sql},
+           version = version + 1
+         WHERE id = ?`,
+      )
+      .bind(
+        applied.level,
+        applied.xp,
+        applied.classLevel,
+        applied.classXp,
+        // What an event took from the purse (an option's price, a thief's
+        // grab) comes off the exploration's gold.
+        hunt.gold + soldFoundGold - (hunt.spent ?? 0),
+        ...storedPrice.binds,
+        ...found.flatMap(([id, amount]) => [resourcePath(id), resourcePath(id), amount]),
+        ...left.flatMap(([key, count]) => [resourcePath(key), resourcePath(key), count]),
+        ...storedHerbs.flatMap(([id, count]) => [resourcePath(id), resourcePath(id), count]),
+        ...setGems.binds,
+        applied.timePoints,
+        hp,
         activity.ends_at,
-      ]),
-      // Then the report, so that a second claim of the same hunt fails as a whole.
-      db
-        .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
-        .bind(row.id, `${row.id}:${activity.started_at}`, 'hunt', now, JSON.stringify(summary), JSON.stringify(report)),
-      // A report keeps every fight (about 40 KB for 4 hours), so only those the journal shows stay.
-      trimReports(db, row.id, 'hunt'),
-      db
-        .prepare(
-          `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = MAX(0, gold + ? + ${storedPrice.sql})${setResources}${setMaterials}${setHerbs}${setGems.sql},
-             time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${potionsChanged ? ', potions = ?' : ''}${event ? ', event_test = NULL' : ''}${eventBuffs ? ', buffs = ?' : ''}${eventPoints > 0 ? ', bonus_points = bonus_points + ?' : ''}${settlementAfter ? ', settlement = ?' : ''}${fortressAfter ? ', fortress = ?' : ''}${winterGain.sql},
-             version = version + 1
-           WHERE id = ?`,
-        )
-        .bind(
-          applied.level,
-          applied.xp,
-          applied.classLevel,
-          applied.classXp,
-          // What an event took from the purse (an option's price, a thief's
-          // grab) comes off the exploration's gold.
-          hunt.gold + soldFoundGold - (hunt.spent ?? 0),
-          ...storedPrice.binds,
-          ...found.flatMap(([id, amount]) => [resourcePath(id), resourcePath(id), amount]),
-          ...left.flatMap(([key, count]) => [resourcePath(key), resourcePath(key), count]),
-          ...storedHerbs.flatMap(([id, count]) => [resourcePath(id), resourcePath(id), count]),
-          ...setGems.binds,
-          applied.timePoints,
-          hp,
-          activity.ends_at,
-          JSON.stringify(met),
-          row.quests,
-          quests,
-          ...(potionsChanged ? [JSON.stringify(potionsLeft)] : []),
-          ...(eventBuffs ? [JSON.stringify(eventBuffs)] : []),
-          ...(eventPoints > 0 ? [eventPoints] : []),
-          ...(settlementAfter ? [settlementAfter] : []),
-          ...(fortressAfter ? [fortressAfter] : []),
-          ...winterGain.binds,
-          row.id,
-        ),
-      // The Próby Gildii's trial too (guild-trials.js), one taken before the
-      // exploration set out: a trial's progress counts from its taking, so
-      // an exploration on its way when a trial is taken moves it not (the
-      // author: "żeby się nie naliczała wyprawa jedna do obu zadań"). A
-      // Szybkie or Błyskawiczne polowanie, over as it starts, counts from
-      // the moment it is made. One that set out before this rule moves the
-      // trial on as before.
-      ...trialProgress(db, row.id, progress, now, takenBefore(options.begun)),
-      // The Wyprawa Gildii's route (guild-expedition.js): the exploration's
-      // minutes for the guild the character is in now, as the report is
-      // claimed (621 A), whenever the exploration set out.
-      ...expeditionMinutes(db, row.id, credited, now),
-      // The Krainy pod sztandarem (guild-lands.js, 1200 A): the same minutes
-      // for the land of the place, counted the same way.
-      ...landMinutes(db, row.id, activity.region_id, credited, now),
-      // The Punkty Sławy of the exploration, a Drużyna's trip too (fame.js):
-      // its minutes and the elites and champions beaten, none for a lost one.
-      ...huntFamePoints(db, row.id, hunt, activity.minutes, now),
-      // The achievements' counts (achievements.js): the creatures, champions
-      // and wanted beaten, and the exploration's gold; none for a lost one.
-      ...featGains(db, row.id, huntFeats(hunt, progress.kills)),
-      // Bag items the scrapper bought: paid for above, while they were still there.
-      ...(soldStored.length > 0
-        ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${soldStored.map(() => '?').join(', ')})`).bind(row.id, ...soldStored)]
-        : []),
-      // The exploration's items after it: the database may give a new item
-      // the id of an item gone from the bag meanwhile, which the scrapper's
-      // price, gems and deletion, counted by the ids read, would then take
-      // for the one they sell (the code review, 12.11.2026).
-      ...hunt.items.flatMap((item, index) =>
-        soldFound.includes(index) ? [] : [insertItem.bind(row.id, autoEquipped.includes(index) ? item.slot : null, JSON.stringify(item), now)],
+        JSON.stringify(met),
+        row.quests,
+        quests,
+        ...(potionsChanged ? [JSON.stringify(potionsLeft)] : []),
+        ...(eventBuffs ? [JSON.stringify(eventBuffs)] : []),
+        ...(eventPoints > 0 ? [eventPoints] : []),
+        ...(settlementAfter ? [settlementAfter] : []),
+        ...(fortressAfter ? [fortressAfter] : []),
+        ...winterGain.binds,
+        row.id,
       ),
-      // The cards the creatures left, a copy each (cards.js).
-      ...cardUpserts(db, row.id, cardsWon, now),
-      ...packGains(db, row.id, packsWon),
-      ...(effectWon ? effectUpserts(db, row.id, [effectWon.id], now) : []),
-      db.prepare('DELETE FROM activities WHERE character_id = ? AND started_at = ?').bind(row.id, activity.started_at),
-    ]);
-  } catch (error) {
-    if (String(error?.message).includes('UNIQUE')) {
-      throw new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
-    }
-    if (raced(error)) throw characterChanged();
-    throw error;
-  }
-  // The party event's result for everyone who went, given by the claim of
-  // its leader's report that settled it (or one settled before and not
-  // given to all yet), each a report of its own (party-events.js). One that
-  // fails waits for the cron: the claim stays made. Claimed as the party
-  // sets out (`forTrip`), the cron gives it a minute later: the party's
-  // start holds only while its members are as it read them (parties.js).
-  if (!forTrip && partyEvent?.choice && !partyEvent.applied && partyEvent.leader_id === row.id) {
-    try {
-      await applyPartyEvent(db, partyEvent, now);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  return { id: results[1].meta.last_row_id, report };
+    // The Próby Gildii's trial too (guild-trials.js), one taken before the
+    // exploration set out: a trial's progress counts from its taking, so
+    // an exploration on its way when a trial is taken moves it not (the
+    // author: "żeby się nie naliczała wyprawa jedna do obu zadań"). A
+    // Szybkie or Błyskawiczne polowanie, over as it starts, counts from
+    // the moment it is made. One that set out before this rule moves the
+    // trial on as before.
+    ...trialProgress(db, row.id, progress, now, takenBefore(options.begun)),
+    // The Wyprawa Gildii's route (guild-expedition.js): the exploration's
+    // minutes for the guild the character is in now, as the report is
+    // claimed (621 A), whenever the exploration set out.
+    ...expeditionMinutes(db, row.id, credited, now),
+    // The Krainy pod sztandarem (guild-lands.js, 1200 A): the same minutes
+    // for the land of the place, counted the same way.
+    ...landMinutes(db, row.id, activity.region_id, credited, now),
+    // The Punkty Sławy of the exploration, a Drużyna's trip too (fame.js):
+    // its minutes and the elites and champions beaten, none for a lost one.
+    ...huntFamePoints(db, row.id, hunt, activity.minutes, now),
+    // The achievements' counts (achievements.js): the creatures, champions
+    // and wanted beaten, and the exploration's gold; none for a lost one.
+    ...featGains(db, row.id, huntFeats(hunt, progress.kills)),
+    // Bag items the scrapper bought: paid for above, while they were still there.
+    ...(soldStored.length > 0
+      ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${soldStored.map(() => '?').join(', ')})`).bind(row.id, ...soldStored)]
+      : []),
+    // The exploration's items after it: the database may give a new item
+    // the id of an item gone from the bag meanwhile, which the scrapper's
+    // price, gems and deletion, counted by the ids read, would then take
+    // for the one they sell (the code review, 12.11.2026).
+    // Of a Drużyna's trip, not those lost to a full bag (partyBag).
+    ...hunt.items.flatMap((item, index) =>
+      soldFound.includes(index) || lostFound.includes(index) ? [] : [insertItem.bind(row.id, autoEquipped.includes(index) ? item.slot : null, JSON.stringify(item), now)],
+    ),
+    // The cards the creatures left, a copy each (cards.js).
+    ...cardUpserts(db, row.id, cardsWon, now),
+    ...packGains(db, row.id, packsWon),
+    ...(effectWon ? effectUpserts(db, row.id, [effectWon.id], now) : []),
+    db.prepare('DELETE FROM activities WHERE character_id = ? AND started_at = ?').bind(row.id, activity.started_at),
+  ];
+  return { row, activity, report, summary, part, partyEvent, statements };
 }
 
 // The report's line of the gems that fell out of items the scrapper bought

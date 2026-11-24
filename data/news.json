@@ -1680,6 +1680,11 @@
       "id": "0.5.1",
       "title": "Wersja 0.5.1",
       "body": "- Labirynt: za pierwsze tego dnia pokonanie strażnika każdego poziomu jest dodatkowa nagroda: Odłamki Rdzenia i złoto, najwięcej za 3. poziom i za poziom Piekielny.\n- Labirynt: po porażce zaczniesz od nowa za darmo. Do miejsca porażki komnaty nie dają nagród, tylko błogosławieństwa, a dalej znowu normalnie. Na mapie takie komnaty mają przekreśloną monetę."
+    },
+    {
+      "id": "0.5.2",
+      "title": "Wersja 0.5.2",
+      "body": "- Drużyna: raport z wyprawy drużyny odbiera jedna osoba za wszystkich, zwykle lider. Każdy od razu dostaje swoje łupy, a w Dzienniku ma wspólny raport z częścią „Co kto zdobył”.\n- Wolne punkty statystyk, Punkty Umiejętności i XP klasy czekające na ewolucję zbierają się na postaci i nie zatrzymują już drużyny. Lider może od razu wysłać drużynę na kolejną wyprawę.\n- Na wyprawie drużyny łupy trafiają do wolnych miejsc w plecaku, najpierw najlepsze. Gdy plecak jest pełny, reszta łupów przepada, dopóki nie zrobisz w nim miejsca. Rzeczy, które już masz w plecaku, zostają.\n- Gdy na Walce zaznaczysz „Z drużyną”, zagrożenie liczy całą drużynę: sprzęt, zdrowie i mikstury każdego, kto wyruszy.\n- Członek drużyny może w zakładce Drużyna wybrać posiłek ze swojej Spiżarni. Z zaznaczonym „Autouzupełnianiem” zje kolejną porcję przy wyruszeniu, gdy poprzedni posiłek przestanie działać."
     }
   ]
 }

@@ -40,7 +40,12 @@
 // przez każdego członka drużyny zanim wyruszy się w kolejną wyprawę.”).
 // Each one gets
 // an exploration of its own (hunts.js), with the others fighting beside it
-// as they are when they set out, and its own report and finds. The
+// as they are when they set out, and its own finds. Since 24.11.2026 the
+// first claim of a trip, by any who went, claims it for all of them at
+// once, each its own report with what every one got (hunts.js: claimTrip;
+// the author: „niech lider odbiera raport za wszystkich, niech wszyscy mają
+// wspólny”), so nobody's report waits for its player and the leader sends
+// the party out again at once. The
 // explorations of one trip share their timer: a "Przewiń" of any of them
 // moves them all, and the others hear who skipped (time.js; the author:
 // "Musi być wspólny timer").
@@ -69,6 +74,8 @@ import {
   huntDurations,
   isUnlocked,
   longestHunt,
+  mealOf,
+  mealRefill,
   mountOf,
   mountStage,
   partyFit,
@@ -88,7 +95,7 @@ import { beginHunt, finishActivity } from './hunts.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { accountLanguage, runInLanguage, t } from './i18n.js';
-import { potionKnown, potionsOf } from './professions-view.js';
+import { pantryOf, potionKnown, potionsOf } from './professions-view.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 // The most invitations one party may have waiting.
@@ -268,7 +275,7 @@ export async function partyView(db, characterId, now) {
          WHERE i.character_id = ? ORDER BY i.created_at DESC`,
       )
       .bind(characterId),
-    db.prepare('SELECT class_level, settlement, party_potions FROM characters WHERE id = ?').bind(characterId),
+    db.prepare('SELECT class_level, settlement, party_potions, party_meal FROM characters WHERE id = ?').bind(characterId),
   ]);
   const { onlineSeconds } = content().community.trade;
   const list = members.results.map((row) => ({
@@ -321,6 +328,9 @@ export async function partyView(db, characterId, now) {
     // In a party, the potions it takes along as a member (memberPotions):
     // { potions, healBelow } as saved, or null for none.
     potions: party && self.results[0] ? partyPotionsOf(self.results[0]) : null,
+    // And the dish it eats by its Autouzupełnianie (memberMeal): { dish,
+    // auto } as saved, with the dish's name, or null for none.
+    meal: party && self.results[0] ? mealChoiceView(partyMealOf(self.results[0])) : null,
   };
 }
 
@@ -615,6 +625,38 @@ function memberPotions(row, minutes) {
   return { potions, healBelow: healBelowChoices.includes(kept.healBelow) ? kept.healBelow : healBelow };
 }
 
+// The others of a Drużyna as its trip would take them now, for the threat
+// of the trip (hunts.js: huntOptions; gracz (poz. 95), 24.11.2026: „żeby
+// system przeliczał ryzyko wyprawy dla drużyny razem z innymi graczami w
+// drużynie”): the members free now, or back with a report waiting, as the
+// setting out takes them (setOut), each with its character, its gear, its
+// HP as a share of its most in tenths (so the threat is asked anew only as
+// it rests by a tenth) and the potions of its choice (memberPotions; those
+// of the longest trip, the threat's trips taking of each one a fight). Only
+// for the party's leader with a member to take: null otherwise, and the
+// threat is the character's own.
+export async function threatCrew(db, player, now) {
+  const party = await partyOf(db, player.row.id);
+  if (!party || party.leaderId !== player.row.id) return null;
+  const others = (await Promise.all(party.memberIds.filter((id) => id !== player.row.id).map((id) => loadCharacter(db, id)))).filter(Boolean);
+  const going = others.filter((other) => !other.activity || reportWaits(other.activity.kind, other.activity.ends_at, now));
+  if (going.length === 0) return null;
+  const longest = content().balance.hunt.maxMinutes;
+  return going.map((member) => {
+    const { hp, maxHp } = currentHp(member, now);
+    const { potions = {}, healBelow } = memberPotions(member.row, longest);
+    return {
+      id: member.row.id,
+      name: member.row.name,
+      character: engineCharacter(member.row),
+      equipped: equippedItems(member),
+      hpShare: Math.max(1, Math.floor((hp / maxHp) * 10)) / 10,
+      potions,
+      ...(healBelow !== undefined && { healBelow }),
+    };
+  });
+}
+
 // PUT /api/party/potions { potions: { [id]: count }, healBelow }: a member's
 // choice of potions for its party's trips (memberPotions): healing and mana
 // potions by id, each a whole number from 0 to the fights of the longest
@@ -640,6 +682,61 @@ export async function setPartyPotions(context) {
   if (!healBelowChoices.includes(healBelow)) throw new ApiError(400, 'invalid_heal_below', 'Wybierz próg mikstury leczenia.');
   const kept = Object.keys(potions).length > 0 || healBelow !== usual ? JSON.stringify({ potions, healBelow }) : null;
   await db.prepare('UPDATE characters SET party_potions = ? WHERE id = ?').bind(kept, player.row.id).run();
+  return answer(db, player.row.id, context.now);
+}
+
+// Posiłek członka drużyny z autouzupełnianiem (gracz (poz. 95), 24.11.2026:
+// „może dodadzą jeszcze posiłki ze spiżarni z zaznaczeniem autouzupełniania
+// do wyczerpania zapasów”): a member, not the leader, chooses in the
+// Drużyna, beside its potions, a dish of its Spiżarnia and
+// „Autouzupełnianie”; as its party's trip sets out, a member whose meal has
+// run out eats one portion of that dish from its own Spiżarnia, while it
+// has one, as eating by hand would (mealRefill in the engine: a meal at
+// work goes on). Kept on its row (characters.party_meal) for later trips
+// and parties: { dish, auto }, or null for none. The leader eats in its own
+// "Opcje wyprawy"; a member that comes to lead keeps its choice for when it
+// is a member again.
+function partyMealOf(row) {
+  try {
+    const kept = JSON.parse(row.party_meal ?? 'null');
+    return kept && typeof kept === 'object' && !Array.isArray(kept) && typeof kept.dish === 'string' ? { dish: kept.dish, auto: kept.auto === true } : null;
+  } catch {
+    return null;
+  }
+}
+
+// The choice as the Drużyna shows it: with the dish's name, for a dish the
+// Spiżarnia has run out of too; null for none, or a dish the game no longer
+// has.
+function mealChoiceView(kept) {
+  const dish = kept && content().cooking ? content().dishesById[kept.dish] : null;
+  return dish ? { ...kept, name: dish.name } : null;
+}
+
+// What a member going on a trip eats of its choice as it sets out, for its
+// start (beginHunt): { meal, mealPortions } with one portion of the dish,
+// or {} for nothing.
+function memberMeal(row) {
+  const dish = mealRefill(partyMealOf(row), content().cooking ? mealOf(row.meal, content()) : null, pantryOf(row), content());
+  return dish ? { meal: dish, mealPortions: 1 } : {};
+}
+
+// PUT /api/party/meal { dish, auto }: a member's choice of the dish of its
+// Autouzupełnianie for its party's trips (memberMeal): a dish of the game
+// by id, or null, and whether to eat it. Saved as it comes, whatever the
+// Spiżarnia holds now: a trip eats what there is as it sets out. A choice
+// of nothing is kept as none. Answers the Drużyna anew.
+export async function setPartyMeal(context) {
+  const { player } = await requirePartyPlayer(context);
+  const db = context.env.DB;
+  const body = await readJson(context.request);
+  const dish = body.dish ?? null;
+  if (dish !== null && (typeof dish !== 'string' || !content().cooking || !Object.hasOwn(content().dishesById, dish))) throw new ApiError(400, 'unknown_dish', 'Nie ma takiej potrawy.');
+  if (typeof (body.auto ?? false) !== 'boolean') throw new ApiError(400, 'invalid_auto', 'Zaznacz albo odznacz autouzupełnianie.');
+  const auto = body.auto === true;
+  if (auto && dish === null) throw new ApiError(400, 'no_dish_chosen', 'Wybierz potrawę do autouzupełniania.');
+  const kept = dish === null ? null : JSON.stringify({ dish, auto });
+  await db.prepare('UPDATE characters SET party_meal = ? WHERE id = ?').bind(kept, player.row.id).run();
   return answer(db, player.row.id, context.now);
 }
 
@@ -669,11 +766,14 @@ function snapshot(member, now) {
 // an event, which waits for the member's own choice (nothing is saved);
 // {} when the member is still not free. A claim that failed because the
 // member claimed it at the same moment, or changed meanwhile, is fine: the
-// member is read again, and goes if free by then. The leader of a trip
-// whose party event waits for its choice does not hold the party up: the
-// event settles itself with its `auto` option (`forTrip`, hunts.js;
+// member is read again, and goes if free by then. A trip of the party
+// still waiting is claimed for all who went at once, by the `leader` who
+// sends the party now (claimTrip in hunts.js), its shared report marked on
+// each one's Walka (characters.party_report) instead of `report`; `settled`
+// names them all. Its party event, waiting for the trip's leader, does not
+// hold the party up: it settles itself with its `auto` option (`forTrip`;
 // party-events.js).
-async function claimForTrip(db, member, now) {
+async function claimForTrip(db, member, now, leader) {
   const id = member.row.id;
   const user = await db.prepare('SELECT language FROM users WHERE id = ?').bind(member.row.user_id).first();
   try {
@@ -686,11 +786,12 @@ async function claimForTrip(db, member, now) {
       // and no other character's report is claimed for it.
       if (member.row.id !== id || !member.activity) return {};
       const kind = member.activity.kind;
-      const done = await finishActivity(db, member, now, { forTrip: true });
+      const done = await finishActivity(db, member, now, { forTrip: true, claimer: { id: leader.id, name: leader.name } });
       if (done?.event) return { event: true };
       // Played or set aside, it goes (0.4.59).
       const after = await loadCharacter(db, id);
-      return after ? { member: after, report: done ? { id: done.id, kind } : null } : {};
+      if (!after) return {};
+      return done?.shared ? { member: after, report: null, settled: [...done.shared.keys()] } : { member: after, report: done ? { id: done.id, kind } : null };
     });
   } catch (error) {
     if (!(error instanceof ApiError)) throw error;
@@ -798,13 +899,22 @@ async function setOut(db, player, body, now, claimed) {
   // its own: a trip ends in no event, hunts.js).
   const ready = [];
   const choosing = [];
+  // Those whose trip of the party another's claim here claimed with its own
+  // (claimTrip): read again, they go.
+  const settled = new Set();
   for (const listed of going) {
     if (!listed.activity) {
       ready.push(listed);
       continue;
     }
-    const done = await claimForTrip(db, listed, now);
+    if (settled.has(listed.row.id)) {
+      const again = await loadCharacter(db, listed.row.id);
+      if (again && !again.activity) ready.push(again);
+      continue;
+    }
+    const done = await claimForTrip(db, listed, now, player.row);
     if (done.event) choosing.push(listed.row.name);
+    for (const id of done.settled ?? []) settled.add(id);
     if (!done.member) continue;
     if (done.report) claimed.set(done.member.row.id, done.report);
     ready.push(done.member);
@@ -858,6 +968,9 @@ async function setOut(db, player, body, now, claimed) {
         // Its own potions of its choice, taken from its bag with its start
         // in the batch below (beginHunt), and back with its report.
         ...memberPotions(member.row, body.minutes),
+        // And a portion of the dish of its Autouzupełnianie once its meal
+        // has run out, from its Spiżarnia with its start (memberMeal).
+        ...memberMeal(member.row),
       };
       const setup = await beginHunt(db, member, own, now, {
         party: party_,

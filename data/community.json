@@ -76,7 +76,7 @@
     ]
   },
   "party": {
-    "$comment": "Drużyna (src/server/parties.js, screens/party.js). texts: the hand-over of the lead (the author, 20.11.2026: „Dodaj też opcje przekazania pozycji lidera w drużynie”): lead the button by each other member, which only the leader sees, as the guild's; leadTitle, leadText ({name}: the member) and leadConfirm its question; led the answer once done; notLeader and self the refusals. The potions of a member who is not the leader for the party's trips (the author, 20.11.2026: „Powinna byc opcja zabierania przez reszte drużyny jakos mikstur zdrowia i many”): potionsTitle the rubric's heading on the Drużyna card, potionsHint the line under its rows, potionsNone in place of the rows when the bag has no healing or mana potion.",
+    "$comment": "Drużyna (src/server/parties.js, screens/party.js). texts: the hand-over of the lead (the author, 20.11.2026: „Dodaj też opcje przekazania pozycji lidera w drużynie”): lead the button by each other member, which only the leader sees, as the guild's; leadTitle, leadText ({name}: the member) and leadConfirm its question; led the answer once done; notLeader and self the refusals. The potions of a member who is not the leader for the party's trips (the author, 20.11.2026: „Powinna byc opcja zabierania przez reszte drużyny jakos mikstur zdrowia i many”): potionsTitle the rubric's heading on the Drużyna card, potionsHint the line under its rows, potionsNone in place of the rows when the bag has no healing or mana potion. The shared report of a party's trip (24.11.2026, the author: „niech lider odbiera raport za wszystkich, niech wszyscy mają wspólny”; src/server/hunts.js, claimTrip): claimedBy the line at the report's top ({name}: who claimed it for everyone), partsTitle the heading of the list of what each member got, partYou the chip by one's own part, partLevel and partClassLevel its new levels ({from}, {to}), partPotions the row of the potions it drank, partWorn the chip of a find worn at once in an empty slot, partLost of one lost to a full bag; the meal of a member who is not the leader for the party's trips (gracz (poz. 95), 24.11.2026: „posiłki ze spiżarni z zaznaczeniem autouzupełniania do wyczerpania zapasów”): mealTitle the rubric's heading under the potions, mealPick the list's choice of no dish, mealOption a dish in it ({dish}, {count}: how many the Spiżarnia has), mealAuto the box, mealHint the line under it, mealNone in place of the list when the Spiżarnia has no dish; waiting the line on the Walka screen of a member whose report another claimed ({name}), open its button, listed the line under it in the Dziennik ({name}).",
     "texts": {
       "lead": "Przekaż przywództwo",
       "leadTitle": "Przekazać przywództwo?",
@@ -87,7 +87,24 @@
       "self": "Już prowadzisz tę drużynę.",
       "potionsTitle": "Mikstury na wyprawę drużyny",
       "potionsHint": "Zabierzesz je z plecaka, gdy lider wyśle drużynę: każdej najwyżej tyle, ile walk ma wyprawa. Niewypite wrócą.",
-      "potionsNone": "Nie masz w plecaku mikstur leczenia ani many."
+      "potionsNone": "Nie masz w plecaku mikstur leczenia ani many.",
+      "claimedBy": "Wspólny raport drużyny odebrany przez: {name}.",
+      "partsTitle": "Co kto zdobył",
+      "partYou": "Ty",
+      "partLevel": "poziom {from} → {to}",
+      "partClassLevel": "klasa {from} → {to}",
+      "partPotions": "Mikstury",
+      "partWorn": "założony",
+      "partLost": "przepadł",
+      "mealTitle": "Posiłek na wyprawy drużyny",
+      "mealPick": "Bez posiłku",
+      "mealOption": "{dish} · masz {count}",
+      "mealAuto": "Autouzupełnianie",
+      "mealHint": "Gdy posiłek się skończy, przy wyruszeniu drużyny postać zje jedną porcję tej potrawy ze swojej Spiżarni, aż do wyczerpania zapasu. Działający posiłek innej potrawy nie zostanie zastąpiony.",
+      "mealNone": "Nie masz w Spiżarni gotowych potraw.",
+      "waiting": "Raport z wyprawy drużyny odebrany przez: {name}. Twoja część łupów jest już u Ciebie.",
+      "open": "Zobacz raport",
+      "listed": "Wspólny raport · odebrany przez: {name}"
     }
   }
 }

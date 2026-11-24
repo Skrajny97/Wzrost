@@ -6,12 +6,13 @@
 // "Usuń z drużyny" by each other member; the friends to invite at a tap and a name to invite; the
 // invitations sent; and "Opuść drużynę". The leader sends the party out
 // from "Wyrusz" in the Walka (screens/combat.js, "Z drużyną"); each other
-// member chooses here the potions it takes along (potionsRubric).
+// member chooses here the potions it takes along (potionsRubric) and the
+// dish of its Autouzupełnianie (mealRubric).
 
 import { potionSprite } from '../art.js';
 import { partySeen } from '../chat-news.js';
 import { fill, h, icon } from '../dom.js';
-import { formatMinutes } from '../format.js';
+import { formatMinutes, formatNumber } from '../format.js';
 import { t } from '../i18n.js';
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
@@ -23,6 +24,15 @@ import { confirmAction, framedName, guildTag, howItWorks, toast, withButton } fr
 // language (t()).
 const GOERS =
   'Na wyprawę ruszają członkowie bez zajęć w trakcie, z dopasowaniem do najniższego poziomu klasy z drużyny. Kto zajmuje się profesją albo jest na solo wyprawie, zostaje w drużynie, ale nie uczestniczy we wspólnej wyprawie.';
+// The shared report of a party's trip (24.11.2026, the author: „niech lider
+// odbiera raport za wszystkich, niech wszyscy mają wspólny”; hunts.js:
+// claimTrip), under "Jak to działa?" for the leader and the members.
+const SHARED_REPORT =
+  'Raport wyprawy drużyny odbiera za wszystkich ten, kto zrobi to pierwszy, zwykle lider. Każdy od razu dostaje swoje XP i łupy, a w Dzienniku ma wspólny raport z tym, co kto zdobył. Wolne punkty czekają na postać, więc lider może od razu wysłać drużynę dalej, także gdy kogoś nie ma w grze.';
+// A full bag on a party's trip (24.11.2026, the author: „w plecaku zostaja
+// rzeczy do maksymalnego napełnienia a pozniej przepadają dopóki ktos nie
+// posprząta”; hunts.js: huntClaim's `partyBag`).
+const FULL_BAG = 'Łupy z wyprawy drużyny trafiają do plecaka, dopóki jest w nim miejsce, najpierw najlepsze. Te, dla których miejsca zabraknie, przepadają, a rzeczy w plecaku zostają nietknięte.';
 // The companions from the Kwatery in a party: the sentence of 828 A, which
 // 828 B goes like (11.11.2026), under "Jak to działa?".
 const COMPANIONS_STAY = 'Póki jesteś w drużynie, towarzysze zostają w Kwaterach i nie zdobywają XP ani relacji z wypraw.';
@@ -293,6 +303,7 @@ export function mountParty(container) {
         ),
       ),
       potionsRubric(own),
+      mealRubric(own),
       // Who goes and who stays: the author's words (1.11.2026: "zły opis,
       // powinno być …"), on both cards, folded under "Jak to działa?" (the
       // author: "ten taki długi tekst o Drużynie schowaj pod "Jak to
@@ -302,13 +313,17 @@ export function mountParty(container) {
             t(GOERS),
             spreadText(view.range.spread),
             t('Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.'),
+            t(SHARED_REPORT),
+            t(FULL_BAG),
             t('Bez „Z drużyną” wyprawa jest tylko Twoja, a członkowie też mogą wyruszać na własne wyprawy.'),
             t(COMPANIONS_STAY),
           ])
-        : howItWorks(t('Wyprawy wybiera lider. Gdy nie masz innych zajęć, lider zabierze Cię ze sobą, a raport odbierzesz w Walce jak zwykle.'), [
+        : howItWorks(t('Wyprawy wybiera lider. Gdy nie masz innych zajęć, lider zabierze Cię ze sobą, a raport za całą drużynę odbierze ten, kto zrobi to pierwszy.'), [
             t(GOERS),
             spreadText(view.range.spread),
             t('Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.'),
+            t(SHARED_REPORT),
+            t(FULL_BAG),
             t(COMPANIONS_STAY),
           ]),
     );
@@ -387,6 +402,65 @@ export function mountParty(container) {
       mark,
       rows.filter((row) => row.fight !== 'heal').map((row) => row.element),
       h('p', { class: 'muted', text: rows.length > 0 ? texts.potionsHint : texts.potionsNone }),
+    );
+  }
+
+  // A member's meal for the party's trips (gracz (poz. 95), 24.11.2026:
+  // „posiłki ze spiżarni z zaznaczeniem autouzupełniania do wyczerpania
+  // zapasów”): a dish of its Spiżarnia and „Autouzupełnianie”. As the leader
+  // sends the party out, a member whose meal has run out eats one portion
+  // of it from its own Spiżarnia, while there is one (src/server/parties.js,
+  // memberMeal); a meal at work goes on. Saved at each change (PUT
+  // /api/party/meal), for the next trips too. A dish chosen that the
+  // Spiżarnia has run out of stays in the list, with none. The leader eats
+  // in its own "Opcje wyprawy", so it has no such rubric.
+  function mealRubric(own) {
+    const texts = state.content.community?.party?.texts;
+    if (!own || own.leader || !texts?.mealTitle) return null;
+    const chosen = view.meal ?? null;
+    const dishes = (state.character.pantry ?? []).filter((good) => good.group === 'dish');
+    const eaten = chosen && !dishes.some((dish) => dish.id === chosen.dish);
+    const choices = [...dishes, ...(eaten ? [{ id: chosen.dish, name: chosen.name, count: 0 }] : [])];
+    if (choices.length === 0) {
+      return h('section', { class: 'potion-picks party-potions party-meal', 'aria-labelledby': 'party-meal-title' }, h('p', { class: 'duration-head', id: 'party-meal-title', text: texts.mealTitle }), h('p', { class: 'muted', text: texts.mealNone }));
+    }
+    const save = async (next) => {
+      try {
+        show(await call('PUT', '/api/party/meal', next));
+      } catch (error) {
+        toast(error.message);
+        if (!gone) call('GET', '/api/party').then(show, () => {});
+      }
+    };
+    const select = h(
+      'select',
+      {
+        id: 'party-meal-dish',
+        class: 'anvil-material party-meal-dish',
+        'aria-label': texts.mealTitle,
+        onChange: (event) => {
+          const dish = event.currentTarget.value || null;
+          save({ dish, auto: Boolean(dish) && box.checked });
+        },
+      },
+      h('option', { value: '', selected: !chosen, text: texts.mealPick }),
+      choices.map((dish) => h('option', { value: dish.id, selected: dish.id === chosen?.dish, text: texts.mealOption.replace('{dish}', dish.name).replace('{count}', formatNumber(dish.count)) })),
+    );
+    const box = h('input', {
+      type: 'checkbox',
+      id: 'party-meal-auto',
+      class: 'avoid-rare-box',
+      checked: Boolean(chosen?.auto),
+      disabled: !chosen,
+      onChange: () => save({ dish: select.value || null, auto: box.checked }),
+    });
+    return h(
+      'section',
+      { class: 'potion-picks party-potions party-meal', 'aria-labelledby': 'party-meal-title' },
+      h('label', { class: 'duration-head', id: 'party-meal-title', for: 'party-meal-dish', text: texts.mealTitle }),
+      select,
+      h('label', { class: 'avoid-rare', for: 'party-meal-auto' }, box, h('span', { text: texts.mealAuto })),
+      h('p', { class: 'muted', text: texts.mealHint }),
     );
   }
 

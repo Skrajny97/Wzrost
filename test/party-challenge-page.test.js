@@ -3,7 +3,8 @@
 // zrób tak by można je bylo robić z drużyną”), on just enough of a page
 // (helpers/narrator-page.js): the boxes stay with "Z drużyną" and their
 // lines no longer leave the party out, the threat counts the mode's
-// creatures, "Wyrusz" sends the party out in it, and "Wyrusz ponownie z
+// creatures, for the whole party since 24.11.2026 („party=1”, gracz (poz.
+// 95)), "Wyrusz" sends the party out in it, and "Wyrusz ponownie z
 // drużyną" keeps it, as the boxes are kept. The names are synthetic.
 
 import assert from 'node:assert/strict';
@@ -131,8 +132,9 @@ describe('the Walka of a Drużyna\'s leader', () => {
       }
       tick(box, true);
       await settled();
+      // For the whole party as it would go (hunts.js: huntOptions).
       assert.ok(
-        sent.some((one) => one.path === `/api/hunts/options?area=${area.id}&${key}=1`),
+        sent.some((one) => one.path === `/api/hunts/options?area=${area.id}&${key}=1&party=1`),
         sent.map((one) => one.path).join(', '),
       );
       const [start] = screen.find((node) => node.tagName === 'BUTTON' && node.textContent.startsWith('Wyrusz'));

@@ -130,7 +130,7 @@
     "texts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["leaderNote", "noPotion", "waiting", "chosen", "auto", "reportChosen", "reportAuto", "reportTitle", "hpLost", "busyHp", "fainted", "draw", "bagFull", "boonHaste", "boonXp", "boonGold"],
+      "required": ["leaderNote", "noPotion", "waiting", "chosen", "auto", "reportChosen", "reportAuto", "claimed", "reportClaimed", "reportTitle", "hpLost", "busyHp", "fainted", "draw", "bagFull", "boonHaste", "boonXp", "boonGold"],
       "properties": {
         "leaderNote": { "type": "string", "minLength": 1, "description": "Pod tekstem zdarzenia u lidera, z {names}." },
         "noPotion": { "type": "string", "minLength": 1, "description": "Dopisek wyszarzonej opcji leaderPotion, gdy lider nie ma mikstury leczenia." },
@@ -139,6 +139,8 @@
         "auto": { "type": "string", "minLength": 1, "description": "Linia Systemu w raporcie wyprawy, gdy zdarzenie rozstrzygnęło się samo ({title}, {option})." },
         "reportChosen": { "type": "string", "minLength": 1, "description": "W raporcie zdarzenia: wybór lidera ({option})." },
         "reportAuto": { "type": "string", "minLength": 1, "description": "W raporcie zdarzenia: opcja auto ({option})." },
+        "claimed": { "type": "string", "minLength": 1, "description": "Linia Systemu w raporcie wyprawy, gdy raport odebrał za całą drużynę ktoś inny niż lider wyprawy albo wyruszenie drużyny, więc zdarzenie rozstrzygnęło się samo ({title}, {leader}, {option})." },
+        "reportClaimed": { "type": "string", "minLength": 1, "description": "W raporcie zdarzenia: opcja auto, gdy raport odebrano za całą drużynę przed wyborem lidera ({option})." },
         "reportTitle": { "type": "string", "minLength": 1 },
         "hpLost": { "type": "string", "minLength": 1, "description": "Ile HP traci postać ({hp})." },
         "busyHp": { "type": "string", "minLength": 1, "description": "Postać zajęta czym innym nie traci teraz HP." },

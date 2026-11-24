@@ -2,12 +2,15 @@
 // author's 844 A, 845 A, 846 A, 847 B and 848, 12.11.2026): the claim of
 // the trip leader's report brings the trip's party event, and its choice
 // gives every member a report of its own, with its gold, XP and reputation;
-// a member's trip report says who chooses, and then what was chosen; the
-// event settles itself after 12 hours (the cron), or when the party sets
-// out under another leader; an option that gives away a healing potion
-// waits for one, and takes it; the party's boon goes on its next trip; and
-// a result is never given twice. Each trip's seed is set to one that brings
-// the event the test needs.
+// since 24.11.2026 the trip is claimed for everyone at once (the shared
+// report, src/server/hunts.js: claimTrip), so a member's claim, or the
+// party setting out under a leader who was not on the trip, settles the
+// event at once with its careful option, and every trip report says what
+// was chosen; nobody claiming, the event settles itself after 12 hours (the
+// cron); an option that gives away a healing potion waits for one, and
+// takes it; the party's boon goes on its next trip; and a result is never
+// given twice. Each trip's seed is set to one that brings the event the
+// test needs.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -145,34 +148,51 @@ describe('a Drużyna\'s party event', () => {
       assert.equal(listed.partyEvent.title, 'Zdarzenie drużyny: Ranny łowca');
       assert.equal(listed.gold, result.members[id].gold);
     }
-    // The leader's gold: its trip's and the event's; the member's, the event's
-    // so far (its trip waits for its claim).
-    assert.equal((await row('Lider')).gold, before.Lider.gold + chosen.data.report.summary.gold + result.members[before.Lider.id].gold);
-    assert.equal((await row('Druh')).gold, before.Druh.gold + result.members[before.Druh.id].gold);
-    // The member's trip report says what the leader chose.
+    // Each one's gold: its trip's, claimed with the leader's for everyone
+    // (the shared report, 24.11.2026), and the event's.
     const druh = await as('druh', 'POST', '/api/hunts/claim');
     assert.equal(druh.data.event, undefined);
+    assert.equal(druh.data.report.partyClaim.by, 'Lider');
+    assert.equal((await row('Lider')).gold, before.Lider.gold + chosen.data.report.summary.gold + result.members[before.Lider.id].gold);
+    assert.equal((await row('Druh')).gold, before.Druh.gold + druh.data.report.summary.gold + result.members[before.Druh.id].gold);
+    // The member's trip report says what the leader chose.
     assert.ok(druh.data.report.system.includes(line), JSON.stringify(druh.data.report.system));
   });
 
-  test('a member\'s trip report says the leader chooses; the event\'s boon waits for the party\'s next trip', async () => {
+  test("a member's claim claims the trip for everyone and settles the event at once with the careful option; its boon waits for the party's next trip", async () => {
     await trip(seedFor('campfire-tales'));
     const druh = await as('druh', 'POST', '/api/hunts/claim');
     assert.equal(druh.data.event, undefined);
     assert.ok(
-      druh.data.report.system.includes('Zdarzenie drużyny: Ognisko opowieści. Wybiera lider (Lider). Wynik przyjdzie w osobnym raporcie, najpóźniej 12 godzin po końcu wyprawy.'),
+      druh.data.report.system.includes(
+        'Zdarzenie drużyny: Ognisko opowieści. Raport odebrano za całą drużynę, zanim wybrał lider (Lider), więc drużyna wybrała najostrożniej: Słuchamy do świtu. Wynik jest w osobnym raporcie w Dzienniku.',
+      ),
       JSON.stringify(druh.data.report.system),
     );
-    assert.equal((await as('lider', 'POST', '/api/hunts/claim')).data.event.id, 'campfire-tales');
-    assert.equal((await as('lider', 'POST', '/api/hunts/claim', { choice: 'listen' })).status, 200);
+    const settled = await kept();
+    assert.equal(settled.choice, 'listen');
+    assert.equal(settled.chosen_by, 'claim');
+    assert.equal(settled.applied, 1);
+    // The leader's trip is claimed too: its own claim only opens its report.
+    assert.equal(await activity('Lider'), null);
+    const leader = await as('lider', 'POST', '/api/hunts/claim');
+    assert.equal(leader.data.event, undefined);
+    assert.equal(leader.data.report.partyClaim.by, 'Druh');
     assert.deepEqual(JSON.parse(await boon()), { xp: 0.1 });
-    const report = await eventReport('druh', 'Druh');
-    assert.ok(report.event.option.text.startsWith('Opowieści ciągną się do świtu.'));
+    for (const [login, name] of [
+      ['lider', 'Lider'],
+      ['druh', 'Druh'],
+    ]) {
+      const report = await eventReport(login, name);
+      assert.equal(report.resultText, 'Raport odebrano za całą drużynę, zanim wybrał lider, więc drużyna wybrała najostrożniej: Słuchamy do świtu.');
+      assert.ok(report.event.option.text.startsWith('Opowieści ciągną się do świtu.'));
+    }
   });
 
   test('nobody chose in 12 hours: the cron settles it with the careful option for everyone', async () => {
     await trip(seedFor('wounded-hunter'));
-    assert.ok((await as('druh', 'POST', '/api/hunts/claim')).data.report);
+    // The leader sees the event and leaves it: nothing is claimed.
+    assert.equal((await as('lider', 'POST', '/api/hunts/claim')).data.event.id, 'wounded-hunter');
     const waiting = await kept();
     await cron(waiting.auto_at - 3600000);
     assert.equal((await kept()).choice, null);
@@ -189,30 +209,32 @@ describe('a Drużyna\'s party event', () => {
       assert.equal(report.resultText, 'Lider nie wybrał w ciągu 12 godzin, więc drużyna wybrała najostrożniej: Odprowadzamy go do osady.');
       assert.deepEqual(JSON.parse((await row(name)).settlement).reputation, { hunters: 15 });
     }
-    // The leader's own claim brings no event now, only its report, which
-    // says so.
+    // The leader's claim brings no event now, only the trip's report for
+    // everyone, which says so.
     const claim = await as('lider', 'POST', '/api/hunts/claim');
     assert.equal(claim.data.event, undefined);
-    assert.ok(
-      claim.data.report.system.includes(
-        'Zdarzenie drużyny: Ranny łowca. Lider nie wybrał w ciągu 12 godzin, więc drużyna wybrała najostrożniej: Odprowadzamy go do osady. Wynik jest w osobnym raporcie w Dzienniku.',
-      ),
-      JSON.stringify(claim.data.report.system),
-    );
+    const line = 'Zdarzenie drużyny: Ranny łowca. Lider nie wybrał w ciągu 12 godzin, więc drużyna wybrała najostrożniej: Odprowadzamy go do osady. Wynik jest w osobnym raporcie w Dzienniku.';
+    assert.ok(claim.data.report.system.includes(line), JSON.stringify(claim.data.report.system));
+    const druh = await as('druh', 'POST', '/api/hunts/claim');
+    assert.ok(druh.data.report.system.includes(line), JSON.stringify(druh.data.report.system));
   });
 
-  test('the party setting out under another leader settles the waiting event by itself', async () => {
+  test('the party setting out under a new leader who was not on the trip claims it for those who went, and settles the waiting event by itself', async () => {
+    await player('trzeci', 'Trzeci');
+    // Trzeci joins while the trip is on its way, and comes to lead (as when
+    // the leader hands the lead over); the trip's leader is still the one
+    // who chose its place.
+    await as('lider', 'POST', '/api/party/invite', { name: 'Trzeci' });
     await trip(seedFor('wounded-hunter'));
-    // The lead passed to the member meanwhile (as when the leader leaves and
-    // comes back); the trip's leader is still the one who chose its place.
-    await (await sql('UPDATE parties SET leader_id = (SELECT id FROM characters WHERE name = ?)', 'Druh')).run();
-    assert.ok((await as('druh', 'POST', '/api/hunts/claim')).data.report);
-    const went = await as('druh', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: MINUTES });
+    const { data } = await as('trzeci', 'GET', '/api/party');
+    assert.equal((await as('trzeci', 'POST', '/api/party/accept', { partyId: data.invites[0].partyId })).status, 200);
+    await (await sql('UPDATE parties SET leader_id = (SELECT id FROM characters WHERE name = ?)', 'Trzeci')).run();
+    const went = await as('trzeci', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: MINUTES });
     assert.equal(went.status, 201, JSON.stringify(went.data).slice(0, 400));
-    assert.deepEqual(went.data.went, ['Lider']);
+    assert.deepEqual(went.data.went, ['Lider', 'Druh']);
     assert.deepEqual(went.data.notes, []);
     const settled = await kept();
-    assert.equal(settled.chosen_by, 'auto');
+    assert.equal(settled.chosen_by, 'claim');
     // Given by the cron a minute later: the party's start keeps its members
     // as it read them.
     assert.equal(settled.applied, 0);
@@ -223,16 +245,19 @@ describe('a Drużyna\'s party event', () => {
       ['druh', 'Druh'],
     ]) {
       const report = await eventReport(login, name);
-      assert.equal(report.resultText, 'Lider nie wybrał w ciągu 12 godzin, więc drużyna wybrała najostrożniej: Odprowadzamy go do osady.');
+      assert.equal(report.resultText, 'Raport odebrano za całą drużynę, zanim wybrał lider, więc drużyna wybrała najostrożniej: Odprowadzamy go do osady.');
+      // The trip's report, claimed by the new leader as it set out, marked
+      // on each one's Walka.
+      const list = await reports(name);
+      assert.deepEqual(
+        list.map((one) => one.kind),
+        ['hunt', 'hunt', 'party-event'],
+      );
+      const tripReport = (await as(login, 'GET', `/api/reports/${list[1].id}`)).data.report;
+      assert.equal(tripReport.partyClaim.by, 'Trzeci');
+      assert.ok(tripReport.system.some((one) => one.startsWith('Zdarzenie drużyny: Ranny łowca. Raport odebrano za całą drużynę')), JSON.stringify(tripReport.system));
+      assert.equal((await activity(name)).kind, 'hunt');
     }
-    const list = await reports('Lider');
-    assert.deepEqual(
-      list.map((one) => one.kind),
-      ['hunt', 'hunt', 'party-event'],
-    );
-    const tripReport = (await as('lider', 'GET', `/api/reports/${list[1].id}`)).data.report;
-    assert.ok(tripReport.system.some((one) => one.startsWith('Zdarzenie drużyny: Ranny łowca. Lider nie wybrał w ciągu 12 godzin')), JSON.stringify(tripReport.system));
-    assert.equal((await activity('Lider')).kind, 'hunt');
   });
 
   test('an option that gives away a healing potion waits for one, and takes the best', async () => {
@@ -302,22 +327,20 @@ describe('a Drużyna\'s party event', () => {
     }
   });
 
-  test('a loss of HP: the leader at home loses its share of the most HP, the member still on its trip hears its wounds heal on the way', async () => {
+  test('a loss of HP: everyone at home, the trip claimed for all at once, loses its share of the most HP', async () => {
     await trip(seedFor('rope-bridge', { optionId: 'run', outcomeId: 'breaks' }));
-    const before = await row('Druh');
     assert.equal((await as('lider', 'POST', '/api/hunts/claim', { choice: 'run' })).status, 200);
-    const lider = await eventReport('lider', 'Lider');
-    const { hpStart, hpEnd, maxHp } = lider.summary;
-    const lost = Math.round(maxHp * 0.15);
-    assert.equal(hpEnd, hpStart - lost);
-    assert.ok(lider.event.option.text.endsWith(`Każdy traci 15% zdrowia. Tracisz ${lost} HP.`), lider.event.option.text);
-    assert.equal((await row('Lider')).hp, hpEnd);
-    const druh = await eventReport('druh', 'Druh');
-    assert.ok(druh.event.option.text.endsWith(texts.busyHp), druh.event.option.text);
-    assert.equal(druh.summary.hpEnd, null);
-    const after = await row('Druh');
-    assert.equal(after.hp, before.hp);
-    assert.equal(after.hp_at, before.hp_at);
+    for (const [login, name] of [
+      ['lider', 'Lider'],
+      ['druh', 'Druh'],
+    ]) {
+      const report = await eventReport(login, name);
+      const { hpStart, hpEnd, maxHp } = report.summary;
+      const lost = Math.round(maxHp * 0.15);
+      assert.equal(hpEnd, hpStart - lost);
+      assert.ok(report.event.option.text.endsWith(`Każdy traci 15% zdrowia. Tracisz ${lost} HP.`), report.event.option.text);
+      assert.equal((await row(name)).hp, hpEnd);
+    }
   });
 
   test('a fight of the whole party: in every member\'s report, with its own XP, gold and materials, or a faint', async () => {

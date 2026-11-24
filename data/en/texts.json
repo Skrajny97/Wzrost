@@ -259,6 +259,7 @@
   "faintPenalty": ["Defeat. Experience lost: {xp}."],
   "faintForfeit": ["After a defeat, nothing of this exploration is kept: XP, gold, resources, materials and items are lost."],
   "bagOverflow": ["The bag was full ({capacity} slots). The scrap dealer bought the weakest items: {count} for {gold} gold."],
+  "bagLost": ["The bag is full ({capacity} slots), so this loot of the party trip was lost: {items}. Make room in it, and the next loot will go into the bag."],
   "autoEquip": ["Equipped at once: {item} ({slot}), as that slot was empty."],
   "blessingFights": ["The System Altar's blessing ({blessing}) was active in {fights} of {all} fights."],
   "brotherhoodMaterials": ["{brotherhood}: +{value}% materials from creatures."],

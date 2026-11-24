@@ -169,8 +169,11 @@ export async function resolvePartyRow(db, eventRow, { optionId, chosenBy, now })
   return db.prepare('SELECT * FROM party_events WHERE id = ?').bind(eventRow.id).first();
 }
 
-// The event settled with its `auto` option: nobody chose in time.
-export const resolveAuto = (db, eventRow, now) => resolvePartyRow(db, eventRow, { optionId: content().partyEventsById[eventRow.event_id].auto, chosenBy: 'auto', now });
+// The event settled with its `auto` option: nobody chose in time
+// (`chosenBy` 'auto'), or another claimed the trip for the whole party
+// before its leader chose ('claim': a member, or the party's setting out;
+// hunts.js: claimTrip).
+export const resolveAuto = (db, eventRow, now, chosenBy = 'auto') => resolvePartyRow(db, eventRow, { optionId: content().partyEventsById[eventRow.event_id].auto, chosenBy, now });
 
 // Its result given to every member still there, each its own report once
 // (giveMember); the row marked `applied` once all of them have it. A member

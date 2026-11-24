@@ -30,7 +30,7 @@ import {
 import { acceptChatRules, blockInChat, chatPeople, chatReports, closeChat, latestChat, markChatSeen, moderateChat, readChat, reportChat, sendChat, setModerator, translateChat, unblockInChat, unmuteInChat } from './chat.js';
 import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendAllGifts, sendGift } from './community.js';
 import { claimReferral, inviterView, referralView } from './referrals.js';
-import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, handPartyLead, inviteToParty, kickFromParty, leaveParty, partyHunt, setPartyPotions } from './parties.js';
+import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, handPartyLead, inviteToParty, kickFromParty, leaveParty, partyHunt, setPartyMeal, setPartyPotions } from './parties.js';
 import { settlePartyEvents } from './party-events.js';
 import { enterTower, getTowers } from './towers.js';
 import { enterPortal, getPortals, sweepAllPortals, sweepPortal } from './portals.js';
@@ -473,6 +473,7 @@ const routes = [
   ['POST', '/api/party/lead', handPartyLead],
   ['POST', '/api/party/hunt', partyHunt],
   ['PUT', '/api/party/potions', setPartyPotions],
+  ['PUT', '/api/party/meal', setPartyMeal],
   ['GET', '/api/towers', getTowers],
   ['GET', '/api/portals', getPortals],
   ['GET', '/api/guild', getGuild],

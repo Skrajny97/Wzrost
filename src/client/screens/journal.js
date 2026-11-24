@@ -5,7 +5,7 @@
 import { fill, h, icon } from '../dom.js';
 import { dateTimeFormat, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { language, t } from '../i18n.js';
-import { call, serverNow, unlockInfo } from '../state.js';
+import { call, serverNow, state, unlockInfo } from '../state.js';
 import { systemPanel } from '../ui.js';
 import { workSummaryText } from './professions.js';
 
@@ -28,6 +28,8 @@ const FILTERS = [
 // The Labirynt's filter only where the game has it (its unlock in the content).
 const shownFilters = () => FILTERS.filter(([id]) => id !== 'labyrinth' || unlockInfo('labyrinth'));
 const FILTER_KEY = 'insight.journalFilter';
+// The Dziennik's line of a Drużyna's shared report (data/community.json).
+const partyListed = () => state.content.community?.party?.texts?.listed ?? null;
 const kindOf = (report) => (report.labyrinth ? 'labyrinth' : report.tower ? 'towers' : report.portal ? 'portals' : WORK_CHIPS[report.kind] ? 'work' : 'hunts');
 const dayKey = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' });
 // "6 listopada", or "6 November" in English, made once for each language.
@@ -193,6 +195,9 @@ export function mountJournal(container, { params }) {
                           : t(' +{xp} XP · +{gold} złota', { xp: formatNumber(report.xp), gold: formatNumber(report.gold) }),
                   ),
               WORK_CHIPS[report.kind] && h('span', { class: 'report-row-herbs', text: workSummaryText(report) }),
+              // A Drużyna's trip claimed once for everyone, and by whom
+              // (hunts.js: claimTrip).
+              report.partyClaim && partyListed() && h('span', { class: 'report-row-herbs', text: partyListed().replace('{name}', report.partyClaim.by) }),
               report.bestFind && h('span', { class: 'item-name', vars: { '--rarity': report.bestFind.color }, text: report.bestFind.name }),
             ),
             h('span', { class: 'report-row-date', text: timeFormat.format(new Date(report.createdAt)) }),

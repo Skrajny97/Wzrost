@@ -1340,6 +1340,10 @@
     "0.5.1": {
       "title": "Version 0.5.1",
       "body": "- Labyrinth: beating each level's guardian for the first time that day gives an extra reward: Core Shards and gold, the most for level 3 and the Hellish level.\n- Labyrinth: after a defeat you start again for free. Up to the place of the defeat, chambers give no rewards, only blessings; after it they pay as usual. On the map such chambers show a coin struck through."
+    },
+    "0.5.2": {
+      "title": "Version 0.5.2",
+      "body": "- Party: one person claims a party trip's report for everyone, usually the leader. Everyone gets their loot at once, and their Journal holds the shared report with a “What each got” section.\n- Free stat points, Skill Points and class XP waiting for an evolution pile up on the character and no longer hold the party back. The leader can send the party out again at once.\n- On a party trip, loot fills the free places in the bag, best first. When the bag is full, the rest is lost until you make room. Whatever is already in the bag stays.\n- With “With the party” ticked in Combat, the threat counts the whole party: the gear, health and potions of everyone who sets out.\n- A party member can pick a meal from their own Pantry in the Party tab. With “Auto-refill” ticked, they eat another portion when setting out once the previous meal has run out."
     }
   }
 }

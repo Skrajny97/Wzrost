@@ -570,7 +570,21 @@
       "marzanna-hurt": { "text": "a goddess of winter gives a cold furious hissing shriek of pain with a howl of icy wind, no words, video game boss hurt sound, close up, no music", "seconds": 0.7 },
       "marzanna-death": { "text": "a goddess of winter gives a long fading cold shriek that dies into a howling blizzard and the tinkle of ice, no words, video game boss death sound, close up, no music", "seconds": 1.6 },
       "koschei-hurt": { "text": "an ancient skeletal sorcerer gives a raspy furious snarl of pain with a rattle of bones, no words, video game boss hurt sound, close up, no music", "seconds": 0.7 },
-      "koschei-death": { "text": "an ancient skeletal sorcerer gives a long raspy dying wail and collapses with a clatter of bones and a cold echo, no words, video game boss death sound, close up, no music", "seconds": 1.6 }
+      "koschei-death": { "text": "an ancient skeletal sorcerer gives a long raspy dying wail and collapses with a clatter of bones and a cold echo, no words, video game boss death sound, close up, no music", "seconds": 1.6 },
+      "wb-pochwist-cry": { "text": "a storm wind spirit gives a furious howling roar, an inhuman voice swelling like a gale, with wind rushing and leaves whipping around it, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
+      "wb-kotolak-cry": { "text": "a huge were-lynx gives a fierce snarling battle yowl, a wild cat's scream with a hiss through bared fangs, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
+      "wb-rusalka-cry": { "text": "a drowned water maiden gives an eerie haunting wailing shriek that echoes as over a lake, with a soft gurgle of water, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
+      "wb-zmora-cry": { "text": "a nightmare spirit made of mist gives a long eerie breathy moaning howl that rises into a cold hiss, ghostly and distorted, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
+      "wb-triglav-steed-cry": { "text": "a huge black warhorse with three heads gives a furious neighing scream from three throats at once, with a heavy stamp of hooves, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
+      "wb-stone-baba-cry": { "text": "a living stone idol gives a harsh guttural groan of grinding stone, rock cracking and crunching as it moves, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
+      "wb-borowy-cry": { "text": "an ancient forest lord gives a throaty bellowing roar mixed with the loud creak and groan of a giant spruce bending in a storm, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
+      "wb-wapierz-cry": { "text": "a vampire risen from the grave gives a vicious rasping hiss that rises into a shrill snarling shriek, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
+      "wb-czart-cry": { "text": "a horned goat-legged devil gives a furious bleating roar with a hoarse demonic snarl, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
+      "wb-dziwozona-cry": { "text": "a wild forest hag gives a savage screeching shriek with a snarl through her teeth, feral and raw, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
+      "wb-boruta-cry": { "text": "a devil gives a menacing demonic growl rising into a roar, with the bright ring of a sabre drawn from its scabbard, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
+      "wb-gorynych-cry": { "text": "a three-headed dragon gives a huge harsh roar from three throats at once, fiery, with a hiss of smoke, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
+      "wb-jaszczur-cry": { "text": "a giant ancient lizard gives a rasping hissing roar with a wet gurgle of underground water, no words, video game boss battle cry, close up, no music", "seconds": 1.8 },
+      "wb-czarnobog-cry": { "text": "the god of darkness gives a colossal harsh echoing roar, a cold ominous otherworldly growl that swells like a dark storm, no words, video game boss battle cry, close up, no music", "seconds": 1.8 }
     }
   },
   "effects": {

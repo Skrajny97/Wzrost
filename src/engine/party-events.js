@@ -372,7 +372,9 @@ export function resolvePartyEvent({ event, optionId, seed, areaId, level, leader
 
 // The line of the System in a trip's report (every member's, the leader's
 // too) about its event: waiting for the leader's choice (`chosenBy` null),
-// the leader's choice, or the one made when nobody chose in time.
+// the leader's choice, the one made when nobody chose in time ('auto'), or
+// the one made as another claimed the trip for the whole party, a member or
+// the party's setting out, before the leader chose ('claim'; 24.11.2026).
 /**
  * @param {{ event: PartyEvent, leaderName: string, chosenBy?: string | null, optionId?: string | null }} said
  * @param {Content} content
@@ -382,7 +384,8 @@ export function partyTripLine({ event, leaderName, chosenBy = null, optionId = n
   const { texts } = content.partyEvents;
   const option = event.options.find((/** @type {Record<string, any>} */ one) => one.id === optionId);
   if (!chosenBy || !option) return fill(texts.waiting, { title: event.title, leader: leaderName });
-  return fill(chosenBy === 'auto' ? texts.auto : texts.chosen, { title: event.title, leader: leaderName, option: option.label });
+  const text = chosenBy === 'auto' ? texts.auto : chosenBy === 'claim' ? texts.claimed : texts.chosen;
+  return fill(text, { title: event.title, leader: leaderName, option: option.label });
 }
 
 // A trip's XP and gold with the party's boon it set out with (`boon`: its
@@ -491,7 +494,7 @@ export function partyEventHunt({ event, result, fight = null, memberId, area, ch
   }
   return {
     title: `${texts.reportTitle}: ${event.title}`,
-    line: fill(chosenBy === 'auto' ? texts.reportAuto : texts.reportChosen, { option: label }),
+    line: fill(chosenBy === 'auto' ? texts.reportAuto : chosenBy === 'claim' ? texts.reportClaimed : texts.reportChosen, { option: label }),
     hunt: {
       areaId: area.id,
       minutes: 0,
