@@ -1,0 +1,13 @@
+{
+  "id": "heartwood-death",
+  "payload": {
+    "text": "an angry wooden tree spirit gives a long shrill wailing shriek with a sizzling hiss of boiling resin and a crackle of burning twigs, no words, close up, dry, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/heartwood-death-20261124T1714-0.mp3",
+    "audio/drafts/voices/heartwood-death-20261124T1714-1.mp3"
+  ],
+  "credits": 64
+}
