@@ -1,0 +1,13 @@
+{
+  "id": "heartwood-death",
+  "payload": {
+    "text": "an ancient living tree heart gives a loud high creaking screech as its wood splits apart with sharp crackling splinters and snapping branches, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/heartwood-death-20261124T1708-0.mp3",
+    "audio/drafts/voices/heartwood-death-20261124T1708-1.mp3"
+  ],
+  "credits": 64
+}

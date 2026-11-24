@@ -1,0 +1,13 @@
+{
+  "id": "heartwood-hurt",
+  "payload": {
+    "text": "an ancient living tree heart gives a sharp loud crack of splitting wood and a high creaking screech of pain, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/heartwood-hurt-20261124T1708-0.mp3",
+    "audio/drafts/voices/heartwood-hurt-20261124T1708-1.mp3"
+  ],
+  "credits": 28
+}
