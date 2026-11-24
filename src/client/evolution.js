@@ -252,7 +252,7 @@ function testLevelButton({ next = false } = {}) {
 // the one tried, and the class level of an evolution at once (the next
 // form's while it has one: 100 for a first evolution, 200 for a second
 // form where the third forms are on, 300 for a third form where the
-// fourth forms are on).
+// fourth forms are on, 400 for a fourth form where the fifth forms are on).
 export async function openEvolutionTests() {
   const words = texts();
   const character = state.character;

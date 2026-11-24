@@ -1408,6 +1408,10 @@
     "0.5.18": {
       "title": "Version 0.5.18",
       "body": "- The World Boss and Cultivation now have their own tabs in Combat, next to Exploration, Portals and Towers. A gold dot on a tab tells you a Boss Chest is waiting to be opened or a Cultivation report is ready.\n- The item comparison now fits on the narrowest phones, even with very large damage numbers."
+    },
+    "0.5.19": {
+      "title": "Version 0.5.19",
+      "body": "- Behind the scenes: the fifth class evolution, from class level 400, is already in the game's code. It will open once all its art is ready."
     }
   }
 }

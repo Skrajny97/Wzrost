@@ -111,12 +111,13 @@ describe('Ewolucje, które zmieniają broń (988)', () => {
 });
 
 // The forms of the Mag's gear and of the Wojownik's: the next forms keep
-// what a form changed (the fourth: the Król Nawii, the Mściciel Niebios).
-const MAGES = ['necromancer', 'lich', 'navia-king'];
-const WARRIORS = ['grand-inquisitor', 'demon-slayer', 'heaven-avenger'];
+// what a form changed (the fourth: the Król Nawii, the Mściciel Niebios; the
+// fifth: the Cesarz Nawii, the Miecz Niebios).
+const MAGES = ['necromancer', 'lich', 'navia-king', 'navia-emperor'];
+const WARRIORS = ['grand-inquisitor', 'demon-slayer', 'heaven-avenger', 'heaven-sword'];
 
 describe('Kto nosi jaką broń (988; the author, 15.11.2026: „tak logicznie to przemyśl żeby sie zgadzalo wszystko u każdej ewolucji i klasy”)', () => {
-  test('every form wears its class\'s gear but the Nekromanta, the Licz and the Król Nawii, with the Mag\'s, and the Wielki Inkwizytor, the Pogromca Demonów and the Mściciel Niebios, with the Wojownik\'s (991 A; a fourth form keeps its line\'s gear)', () => {
+  test('every form wears its class\'s gear but the Nekromanta, the Licz and the Król Nawii, with the Mag\'s, and the Wielki Inkwizytor, the Pogromca Demonów and the Mściciel Niebios, with the Wojownik\'s (991 A; a fourth and a fifth form keep their line\'s gear)', () => {
     const mage = content.classesById.mage;
     const warrior = content.classesById.warrior;
     for (const form of content.evolutions) {
@@ -142,9 +143,9 @@ describe('Kto nosi jaką broń (988; the author, 15.11.2026: „tak logicznie to
     for (const family of ['shield', 'bow', 'quiver', 'hood']) assert.deepEqual(gearWearers(family, content), { forms: [], without: [] }, family);
     const card = (baseId) => itemView(generateItem({ baseId, level: 30 }, createRng(baseId), content), content);
     const staff = card('staff');
-    assert.deepEqual([staff.family, staff.classNames, staff.formNames, staff.exceptNames], ['staff', ['Mag'], ['Nekromanta', 'Licz', 'Król Nawii'], undefined]);
+    assert.deepEqual([staff.family, staff.classNames, staff.formNames, staff.exceptNames], ['staff', ['Mag'], ['Nekromanta', 'Licz', 'Król Nawii', 'Cesarz Nawii'], undefined]);
     const dagger = card('dagger');
-    assert.deepEqual([dagger.family, dagger.classNames, dagger.formNames, dagger.exceptNames], ['dagger', ['Cień'], undefined, ['Nekromanta', 'Licz', 'Król Nawii']]);
+    assert.deepEqual([dagger.family, dagger.classNames, dagger.formNames, dagger.exceptNames], ['dagger', ['Cień'], undefined, ['Nekromanta', 'Licz', 'Król Nawii', 'Cesarz Nawii']]);
     const ring = card('ring');
     assert.deepEqual([ring.classIds, ring.formNames, ring.exceptNames], [null, undefined, undefined]);
   });
