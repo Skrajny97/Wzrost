@@ -1,0 +1,15 @@
+{
+  "id": "cultivation",
+  "payload": {
+    "first_frame": "art/references/scenes/cultivation-hd.png",
+    "action": "a gentle calm seamless loop: the soft ice-blue aura around the sitting figure slowly pulses a little brighter and dimmer, a few small motes of light rise slowly upward from the figure and fade away, the low mist drifts slowly across the grass; the figure, its glowing face and hands, the standing stones and the trees stay perfectly still",
+    "frame_count": 8,
+    "seed": 1298510576,
+    "no_background": false
+  },
+  "usage": {
+    "type": "usd",
+    "usd": 0.017722820652855766
+  },
+  "frames": 9
+}
