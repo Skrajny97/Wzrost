@@ -28,5 +28,40 @@
     "gone": "Ta Kulka Systemu już zgasła.",
     "claimed": "Ta Kulka Systemu jest już złapana.",
     "limit": "Na dziś to już wszystkie Kulki Systemu ({count}). Następne po północy."
+  },
+  "professions": {
+    "$comment": "Kulki Profesji nad sceną pracy na ekranie Profesji (24.11.2026; DECISIONS.md, „Kulki Profesji (24.11.2026)”; src/engine/profession-orbs.js, src/server/profession-orbs.js, src/client/orbs.js). Autor: „Podczas Profesji niech latają osobne kulki z bonusami i zasobami jak podczas wyprawy”. Lecą tylko nad pracą samej postaci, nigdy Awatara Systemu, w chwilach z ziarna i długości pracy według tych samych zasad co Kulki Systemu wyżej (minutesPerOrb, guaranteedFromMinutes, startGapSeconds, flightSeconds, earlySeconds, claimSeconds), z tym samym obrazkiem (art, w grze w barwie profesji) i dźwiękiem (sound). Mają własny limit: perDay na dobę zadań dziennych (od północy czasu polskiego), osobno od Kulek Systemu. Nagroda zależy od poziomu postaci, z którym zaczęła pracę; rodzaj według wag kinds. resources: zasoby obozu, jeden z trzech po równo (drewno, kamień albo ruda żelaza), od resourceShare[0] do resourceShare[1] zasobów znaleziska wyprawy (rewards.findResourcePerLevel × poziom; znalezisko daje tyle samo zasobów co złota, więc to tyle, ile złota daje Kulka Systemu), a od poziomu klasy rewards.lateRewards.fromClassLevel (z chwili rozpoczęcia pracy) rewards.lateRewards.factor tego, jak złoto Kulki Systemu. product: od products[profesja][0] do products[profesja][1] sztuk wytworu tej pracy, który postać już zna: zioła ze zbieranych, minerału odsłoniętego w Górnictwie, ryby z łowionych albo plonu z zasianych (każde tak często, jak przychodzi w pracy: perHour), albo warzonej mikstury czy gotowanego dania. Zioła i mikstury idą do plecaka jak z pracy: co się nie zmieści, przepada. Profesja bez products (Rzemieślnictwo, Jubilerstwo: ich wyroby to przedmioty, nie sztuki) nie ma tego rodzaju, a jego waga przechodzi na zasoby. xp: doświadczenie profesji jak z xpMinutes minut jej pracy, tą samą drogą co raport pracy (z udziałem tygodnia i Intelektu, z odrobiną XP postaci), więc poziomy i statystyki rosną od razu. time: Punkty Czasu jak w Kulkach Systemu (timePoints wyżej). Nigdy Punktów Systemu. texts: słowa kulki na stronie i odpowiedzi gry; {…} wypełnia gra (resource: nazwa zasobu po liczbie, product: nazwa wytworu, profession: nazwa profesji w dopełniaczu).",
+    "perDay": 8,
+    "kinds": {
+      "resources": 0.45,
+      "product": 0.3,
+      "xp": 0.1,
+      "time": 0.15
+    },
+    "resourceShare": [0.5, 1],
+    "products": {
+      "herbalism": [1, 3],
+      "mining": [1, 3],
+      "fishing": [1, 3],
+      "farming": [1, 3],
+      "alchemy": [1, 1],
+      "cooking": [1, 1]
+    },
+    "xpMinutes": 10,
+    "texts": {
+      "label": "Złap Kulkę Profesji",
+      "resources": "Kulka Profesji: +{amount} {resource}",
+      "product": "Kulka Profesji: +{amount} × {product}",
+      "productLost": "Kulka Profesji: +{amount} × {product}. Plecak jest pełny, nie zmieściło się: {lost}.",
+      "xp": "Kulka Profesji: +{amount} XP {profession}",
+      "xpLevel": "Kulka Profesji: +{amount} XP {profession}, nowy poziom: {level}.",
+      "time": "Kulka Profesji: +{amount} {points}",
+      "noWork": "Kulki Profesji pojawiają się tylko w czasie pracy postaci w profesji.",
+      "noOrb": "Nie ma takiej Kulki Profesji.",
+      "early": "Ta Kulka Profesji jeszcze nie nadleciała.",
+      "gone": "Ta Kulka Profesji już zgasła.",
+      "claimed": "Ta Kulka Profesji jest już złapana.",
+      "limit": "Na dziś to już wszystkie Kulki Profesji ({count}). Następne po północy."
+    }
   }
 }

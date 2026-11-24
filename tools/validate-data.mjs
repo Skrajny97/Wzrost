@@ -887,6 +887,18 @@ function checkOrbs(data) {
   if (orbs.claimSeconds < orbs.flightSeconds) errors.push('orbs.json: claimSeconds krótsze niż flightSeconds');
   for (const key of ['goldShare', 'timePoints']) if (orbs[key][0] > orbs[key][1]) errors.push(`orbs.json: ${key} od większego do mniejszego`);
   if (Object.values(orbs.kinds).every((weight) => weight === 0)) errors.push('orbs.json: kinds bez żadnej nagrody');
+  // The Kulki Profesji: their products by the professions there are, and
+  // a reward even where a work has no product.
+  const work = orbs.professions;
+  if (work) {
+    const professions = new Set(data.professions.professions.map((profession) => profession.id));
+    if (work.resourceShare[0] > work.resourceShare[1]) errors.push('orbs.json: professions.resourceShare od większego do mniejszego');
+    for (const [id, [low, high]] of Object.entries(work.products)) {
+      if (!professions.has(id)) errors.push(`orbs.json: professions.products: nie ma profesji ${id}`);
+      if (low > high) errors.push(`orbs.json: professions.products.${id} od większego do mniejszego`);
+    }
+    if (work.kinds.resources + work.kinds.xp + work.kinds.time === 0) errors.push('orbs.json: professions.kinds bez nagrody dla pracy bez wytworu');
+  }
   return errors;
 }
 

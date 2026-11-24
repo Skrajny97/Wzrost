@@ -109,33 +109,36 @@ export function orbReward({ seed, index, level, classLevel = 0, area }, content)
 // quests' day, from midnight Polish time), from its record { day, count }:
 // one of an earlier day is none today, and one of a later day leaves none,
 // as if all were caught (laterPeriod in quests.js: a request still of the
-// day gone catches no more and writes no day back).
+// day gone catches no more and writes no day back). `perDay`: the day's
+// limit, the Kulki Profesji's their own (profession-orbs.js).
 /**
  * @param {{ day?: string, count?: number } | null | undefined} stored
  * @param {number} now
  * @param {Content} content
+ * @param {number} [perDay]
  * @returns {number}
  */
-export function orbsCaught(stored, now, content) {
+export function orbsCaught(stored, now, content, perDay = content.orbs.perDay) {
   const today = questPeriod('daily', now, content).key;
-  if (laterPeriod(stored?.day, today)) return content.orbs.perDay;
+  if (laterPeriod(stored?.day, today)) return perDay;
   return stored?.day === today ? (stored.count ?? 0) : 0;
 }
 
 // Why the orb of the moment `at` (server time) cannot be caught at `now`,
 // or null: caught already (`taken`), not come yet (earlier than
 // earlySeconds before it, for the clocks), gone (later than claimSeconds
-// after it, for the network), or the day's perDay caught already (`caught`).
+// after it, for the network), or the day's perDay caught already (`caught`;
+// `perDay`, the Kulki Profesji's own limit, profession-orbs.js).
 /**
- * @param {{ at: number, now: number, taken: boolean, caught: number }} orb
+ * @param {{ at: number, now: number, taken: boolean, caught: number, perDay?: number }} orb
  * @param {Content} content
  * @returns {'claimed' | 'early' | 'gone' | 'limit' | null}
  */
-export function orbBlock({ at, now, taken, caught }, content) {
+export function orbBlock({ at, now, taken, caught, perDay }, content) {
   const rules = content.orbs;
   if (taken) return 'claimed';
   if (now < at - rules.earlySeconds * SECOND) return 'early';
   if (now > at + rules.claimSeconds * SECOND) return 'gone';
-  if (caught >= rules.perDay) return 'limit';
+  if (caught >= (perDay ?? rules.perDay)) return 'limit';
   return null;
 }

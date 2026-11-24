@@ -130,17 +130,23 @@ export async function workClaimFailed(db, row, table, activity) {
 export const shareOf = (amounts, of, count) =>
   Object.fromEntries(Object.entries(amounts ?? {}).map(([id, amount]) => [id, Math.round((amount * of) / Math.max(1, count))]));
 
+// The character's and the class's levels as a work begins (24.11.2026),
+// which its Kulki Profesji give by (profession-orbs.js), as an exploration
+// keeps them for its fights (hunts.js).
+export const startLevels = (row) => ({ levels: { level: row.level, classLevel: row.class_level } });
+
 // The start of a work that takes things from the bag or the camp (brewing.js,
 // workshop.js): its activity, for the character with its HP at the start or
 // for its Awatar Systemu, saved only once the statement before has taken
 // them, so two taps at once start one work. Its batch begins with the
 // assertion that the row is as read (atomic.js), so the version one higher
 // here is the statement before's own. The work keeps the week of the year
-// it begins in (`week`, weeks.js), whose share of its XP it gets.
+// it begins in (`week`, weeks.js), whose share of its XP it gets, and the
+// levels it begins with (startLevels).
 export function insertWork(db, avatar, row, { kind, placeId, minutes, now, seed, hp, options }) {
   const week = weekFor(row, now);
   const columns = ['character_id', 'kind', 'region_id', 'minutes', 'started_at', 'ends_at', 'seed', ...(avatar ? [] : ['hp_at_start']), 'options'];
-  const values = [row.id, kind, placeId, minutes, now, now + minutes * 60000, seed, ...(avatar ? [] : [hp]), JSON.stringify(week ? { ...options, week } : options)];
+  const values = [row.id, kind, placeId, minutes, now, now + minutes * 60000, seed, ...(avatar ? [] : [hp]), JSON.stringify({ ...options, ...startLevels(row), ...(week && { week }) })];
   return db
     .prepare(
       `INSERT INTO ${workTable(avatar)} (${columns.join(', ')})
@@ -186,10 +192,11 @@ export async function startGathering(context) {
   const db = context.env.DB;
   // `begun`: when it really began, for the Próby Gildii (takenBefore);
   // `more`: the Bractwo Zielarzy's share of herbs more (589 A), as now;
-  // `week`: the week of the year it begins in (weeks.js).
+  // `levels`: for its Kulki Profesji (startLevels); `week`: the week of
+  // the year it begins in (weeks.js).
   const more = perkOf(player.row, 'herbYield');
   const week = weekFor(player.row, now);
-  const options = JSON.stringify({ herbs: herbIds, begun: now, ...(more > 0 && { more }), ...(week && { week }) });
+  const options = JSON.stringify({ herbs: herbIds, begun: now, ...(more > 0 && { more }), ...startLevels(player.row), ...(week && { week }) });
   const ends = now + body.minutes * 60000;
   try {
     await db.batch(

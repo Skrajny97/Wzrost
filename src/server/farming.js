@@ -12,7 +12,7 @@ import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { characterChanged, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
-import { addTo, alreadyClaimed, requireProfessions, workClaim, workClaimFailed, workGains } from './professions.js';
+import { addTo, alreadyClaimed, requireProfessions, startLevels, workClaim, workClaimFailed, workGains } from './professions.js';
 import { workFamePoints } from './fame.js';
 import { requireOpen } from './mining.js';
 import { trimReports } from './reports.js';
@@ -48,11 +48,11 @@ export async function startFarming(context) {
   const db = context.env.DB;
   const { row } = player;
   // The field as many plots long as the level gives, the rest left empty;
-  // `begun`, when it really began; `week`, the week of the year it begins
-  // in (weeks.js).
+  // `begun`, when it really began; `levels`, for its Kulki Profesji
+  // (startLevels); `week`, the week of the year it begins in (weeks.js).
   const field = Array.from({ length: count }, (_, index) => plots[index] ?? null);
   const week = weekFor(row, now);
-  const options = JSON.stringify({ plots: field, begun: now, ...(week && { week }) });
+  const options = JSON.stringify({ plots: field, begun: now, ...startLevels(row), ...(week && { week }) });
   const ends = now + body.minutes * 60000;
   try {
     await db.batch(

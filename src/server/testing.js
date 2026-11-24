@@ -4,7 +4,7 @@
 // account without test mode, and with test mode off, these routes do not
 // exist.
 
-import { caseOutcomes, construction, eventOutcomes } from '../engine/index.js';
+import { caseOutcomes, construction, eventOutcomes, helpableWork } from '../engine/index.js';
 import { content, tutorialPart } from './content.js';
 import { completeBuilding } from './camp.js';
 import { characterRemoval, characterView, currentHp, loadPlayer, loadSettled, requirePlayer } from './characters.js';
@@ -15,6 +15,7 @@ import { testMode, testModeFor, tutorialTestsFor } from './test-mode.js';
 import { shiftTrip, skipRecord, tripOf } from './trips.js';
 import { endService } from './mercenaries.js';
 import { caughtOrbs, orbTimes } from './orbs.js';
+import { workOrbTimesOf } from './profession-orbs.js';
 
 const notFound = () => new ApiError(404, 'not_found', 'Nie znaleziono.');
 
@@ -62,7 +63,9 @@ export async function skipTime(context) {
 // A Kulka Systemu soon, for trying the orbs and recording them (orbs.js):
 // the exploration under way moves on, as "Pomiń czas" moves it, till its
 // next orb not caught comes `seconds` from now (3 by default, at most 60). A
-// Drużyna's trip moves for all its members, as with "Przewiń".
+// Drużyna's trip moves for all its members, as with "Przewiń". A work of
+// the character's own under way moves so till its next Kulka Profesji
+// (profession-orbs.js).
 export async function orbSoon(context) {
   if (!testMode(context.env)) throw notFound();
   const { session, player } = await requirePlayer(context);
@@ -72,11 +75,12 @@ export async function orbSoon(context) {
   const db = context.env.DB;
   const now = context.now;
   const activity = player.activity;
-  if (activity?.kind !== 'hunt' || activity.ends_at <= now) throw new ApiError(409, 'no_activity', 'Postać nie jest na wyprawie.');
+  const work = helpableWork(activity?.kind) && activity.ends_at > now;
+  if (!work && (activity?.kind !== 'hunt' || activity.ends_at <= now)) throw new ApiError(409, 'no_activity', 'Postać nie jest na wyprawie.');
   const soon = now + seconds * 1000;
   const caught = caughtOrbs(activity);
-  const next = orbTimes(activity).find((at, index) => at >= soon && !caught.includes(index));
-  if (next === undefined) throw new ApiError(409, 'no_orb', 'Ta wyprawa nie ma już przed sobą Kulek Systemu.');
+  const next = (work ? workOrbTimesOf(activity) : orbTimes(activity)).find((at, index) => at >= soon && !caught.includes(index));
+  if (next === undefined) throw new ApiError(409, 'no_orb', work ? 'Ta praca nie ma już przed sobą Kulek Profesji.' : 'Ta wyprawa nie ma już przed sobą Kulek Systemu.');
   const shift = next - soon;
   const trip = tripOf(activity);
   if (trip) await shiftTrip(db, trip, activity.started_at, shift, skipRecord(player.row, Math.max(1, Math.round(shift / 60000)))).run();

@@ -61,6 +61,10 @@ export function workScene(professionId, activity, { avatar = false } = {}) {
   const sheet = config()?.work[professionId];
   if (!sheet) return null;
   const stage = h('div', { class: `scene-stage scene--${dayPart()}${avatar ? ' scene--avatar' : ''}` }, frames(sheet, 'scene-figure'));
+  // The figure's loop at the phase of the page's clock, as the walk's: a
+  // screen drawn anew, as a catch of a Kulka Profesji draws it (orbs.js),
+  // goes on where it was (styles.css).
+  stage.style.setProperty('--scene-phase', `${(-performance.now() / 1000).toFixed(3)}s`);
   const art = sheet.place && placeArt(sheet.place);
   if (art) {
     stage.classList.add('scene-stage--place');

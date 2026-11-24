@@ -12,7 +12,7 @@ import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { characterChanged, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
-import { addTo, alreadyClaimed, requireProfessions, takeFromBag, workClaim, workClaimFailed, workGains } from './professions.js';
+import { addTo, alreadyClaimed, requireProfessions, startLevels, takeFromBag, workClaim, workClaimFailed, workGains } from './professions.js';
 import { workFamePoints } from './fame.js';
 import { requireOpen } from './mining.js';
 import { pantryOf } from './professions-view.js';
@@ -52,10 +52,10 @@ export async function startFishing(context) {
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const db = context.env.DB;
   const { row } = player;
-  // `begun`, when it really began; `week`, the week of the year it begins
-  // in (weeks.js).
+  // `begun`, when it really began; `levels`, for its Kulki Profesji
+  // (startLevels); `week`, the week of the year it begins in (weeks.js).
   const week = weekFor(row, now);
-  const options = JSON.stringify({ fish: fishIds, begun: now, ...(week && { week }) });
+  const options = JSON.stringify({ fish: fishIds, begun: now, ...startLevels(row), ...(week && { week }) });
   const ends = now + body.minutes * 60000;
   try {
     await db.batch(
