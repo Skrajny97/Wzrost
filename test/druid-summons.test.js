@@ -11,7 +11,11 @@
 // a pack of two (Zew zwierząt, Gaj wieków, Pradawne stado) half, as
 // before. A duel starts with full mana and pays the data's share once
 // (balance.skills.duelManaCost), and the Druid line's mana never runs
-// short in one: its duels go exactly as before.
+// short in one: its duels go exactly as before. In the Arena the line's
+// strongest form, the Pradruid (63% of its duels on levels 280–350, the
+// most of the fourth forms), strikes at 0.8 of its strength instead of 0.9
+// (evolutions.json duelPower, 992 A), at the author's word; the Druid, the
+// weakest second form there (38%), and the Arcydruid keep theirs.
 
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -121,6 +125,18 @@ describe('the Druid line on explorations (tools/class-balance-sim.mjs)', () => {
 });
 
 describe('the Druid line in duels', () => {
+  test('the Pradruid strikes at 0.8 of its strength in the players\' duels (0.9 before 24.11.2026); the Druid and the Arcydruid keep 1.9 and 1.3', () => {
+    assert.deepEqual(FORMS.map((id) => content.evolutionsById[id].duelPower), [1.9, 1.3, 0.8]);
+    const { character, equipped } = druidAt(300);
+    assert.equal(character.evolution, 'elder-druid');
+    const plain = playerCombatant({ character, equipped, name: 'Pradruid' }, content);
+    const duel = duelist({ character, equipped, name: 'Pradruid' }, 'a0', 'ally', { factor: 1, armor: 1 }, content);
+    // Its own blows and its summons' (they strike with its damageScale).
+    assert.ok(Math.abs(duel.damageScale - 0.8 * plain.damageScale) < 1e-9);
+    // Its HP as before: no duelHp of its own.
+    assert.equal(duel.maxHp, plain.maxHp);
+  });
+
   test('the price changes no duel: a Druid and an Arcydruid fight every class as before, move for move', () => {
     for (const level of [100, 150, 200, 250]) {
       const druid = { ...druidAt(level), name: 'Druid' };

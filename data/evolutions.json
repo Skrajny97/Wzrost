@@ -595,7 +595,7 @@
     },
     {
       "id": "elder-druid",
-      "duelPower": 0.9,
+      "duelPower": 0.8,
       "classId": "mage",
       "from": "archdruid",
       "name": "Pradruid",

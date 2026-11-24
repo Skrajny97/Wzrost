@@ -3768,7 +3768,7 @@ Najpierw Tier X przedmiotów (potrzebny najlepszej postaci za około dwa tygodni
     - **Dar widzenia** daje na start pancerz i odporności +45% i obrażenia +22% (w propozycji +30% i +16%).
     - **Władca Nawii** podnosi każdego zabitego wroga, nie tylko zabitego trucizną, jak mówi opis, z własnymi słowami („wstaje jako upiór Nawii”).
     - **Tarcza tytana** trwa 4 ruchy; **Odwrócenie losu** działa poniżej 40% HP.
-    - Siła w pojedynkach (`duelPower`, `duelHp` w `data/evolutions.json`, tylko Arena) dla 14 form (bez Niebiańskiego Łucznika); Tytan, tarcza drużyny, w pojedynku jeden na jednego bije mało (2,3 siły i 1,9 HP).
+    - Siła w pojedynkach (`duelPower`, `duelHp` w `data/evolutions.json`, tylko Arena) dla 14 form (bez Niebiańskiego Łucznika); Tytan, tarcza drużyny, w pojedynku jeden na jednego bije mało (2,3 siły i 1,9 HP). *Pradruid od 24.11.2026 ×0,8 zamiast ×0,9: zob. „Druid: przywołańce na wyprawach i na Arenie”.*
     - Trzeci obrót Huraganu chwały ma własne słowa („trzeci obrót”), a oślepienie z Ognia niebios nie powtarza komunikatu, gdy Słup światła oślepił już tym samym ciosem.
     - „Kula piorunów” Gromowładnego ma tę samą nazwę co umiejętność Władcy Piorunów, drugiej formy z tej samej linii: wraca mocniejsza, więc nazwa zostaje, jak w 1095 (w danych to dwie umiejętności z osobnymi id, a słowa w walce mają osobny klucz `stanceBallLightning`).
 8. Do zrobienia z grafiką: kilku przywołańców jednej umiejętności (dwaj rycerze Legionu Nawii, kolejne Dęby wieków, upiory Nawii) walka pokazuje dziś jako jedną kartę; upiór Nawii ma wygląd szkieletu. Upiór Nawii ma już postać stwora Upiór (szary upiór z czerwonymi oczami z gry) zamiast szkieletu (18.11.2026); kilku przywołańców jednej umiejętności pokażą animacje umiejętności Pradruida i Króla Nawii.
@@ -4340,7 +4340,7 @@ Autor: „Druid jest za silny na Arenie a za słaby na wyprawach coś z tym musi
    - Na walkę Druid zużywa mniej więcej tyle many co dotąd: 1,6–1,8 przywołańca po 25% zamiast 0,9–1,0 po 50%, czyli ok. 40–50% maks. many. Mikstury many (0.4.85, 1220 B) mają więc dla niego ten sam sens.
    - Pojedynki płacą udział raz, czyli 12,5% zamiast 25%, ale mana Druida i Arcydruida w pojedynku się nie kończy, więc Arena i wojny gildii zostają co do ruchu takie same (test).
    - Rozważone i odrzucone: więcej many z cechy (Moc puszczy 10% co ruch zamiast 5%) przy dawnej cenie pomaga mniej (100. poziom: 2,5% omdleń, −6% XP na godzinę, 1,3 przywołańca na walkę; 160.: 0% i −1%), zmienia opis cechy i dawałoby Druidowi więcej many co ruch niż Arcydruidowi i Pradruidowi.
-   - Bez zmian: Pradruid (obie jego umiejętności to paczki), siła i HP przywołańców, `duelPower` form, cechy, Arkanista i pozostałe klasy. Arkanista ma tę samą słabość na wyprawach (omdlenia 4,2–7,5%, XP na godzinę od −9% do −15% na poziomach 55–80, 0,7 przywołańca na walkę). Ta sama cena żywiołaka (0,125) dałaby mu od −6% do −1% na poziomach 60–80 (na 55. bez zmian, −16%), bez zmian na Arenie (36,1%). Zostawiam do decyzji autora, bo to nie jest forma Druida.
+   - Bez zmian: Pradruid na wyprawach (obie jego umiejętności to paczki), siła i HP przywołańców, cechy, siła Druida i Arcydruida w pojedynkach (`duelPower` 1,9 i 1,3; Pradruid w punkcie 7), Arkanista i pozostałe klasy. Arkanista ma tę samą słabość na wyprawach (omdlenia 4,2–7,5%, XP na godzinę od −9% do −15% na poziomach 55–80, 0,7 przywołańca na walkę). Ta sama cena żywiołaka (0,125) dałaby mu od −6% do −1% na poziomach 60–80 (na 55. bez zmian, −16%), bez zmian na Arenie (36,1%). Zostawiam do decyzji autora, bo to nie jest forma Druida.
 6. **Wyprawy przed → po** (z towarzyszami, 4 h, najnowsze miejsce, 120 wypraw; na 85., 90. i 95. poziomie 360 wypraw):
 
    | Forma | Poziom postaci (klasy) | Omdlenia | XP na godzinę wobec średniej głównych ścieżek | Przywołańców na walkę |
@@ -4363,11 +4363,23 @@ Autor: „Druid jest za silny na Arenie a za słaby na wyprawach coś z tym musi
    - Druid na 85. poziomie, zaraz po ewolucji, ma jeszcze −7% (Wielki Inkwizytor i Nekromanta −4%, 2,1–2,5% omdleń).
    - Pradruid bez zmian: 5,0%, 1,7% i 12,5% omdleń na 280., 300. i 330. poziomie (średnia głównych ścieżek 5,5%, 8,2% i 9,2%).
    - Sama postać, wyprawy 1 h: Druid na 100. poziomie 90,0% → 16,7% omdleń (średnia głównych 18,8%), na 150. 100% → 49,2% (średnia 25,2%, Arcymag Żywiołów 75,8%, Pan Zimy 90%), Arcydruid na 200. 70,8% → 0,8% (średnia 33,0%).
-7. **Arena przed → po: bez zmian.** Druid 38,0% (najsłabsza druga forma), Arcydruid 53,5%, Pradruid 63,2%, co do pojedynku tak samo jak przed zmianą. Druida nie osłabiam w pojedynkach, bo pomiar pokazuje najsłabszą drugą formę, a osłabienie zepchnęłoby go na dół przedziału. **Do decyzji autora,** gdyby chciał go na Arenie jednak słabszego:
-   - Druid `duelPower` 1,9 → 1,8 (dźwignia 992 A, tylko pojedynki graczy): średnio 33,0% (30,7%, 32,7%, 32,8%, 41,5%, 18,5%, 41,8% i 33,1% na poziomach jak wyżej), wyraźnie najsłabsza druga forma; Druid z Mądrością: połowa punktów 44,2% → 37,9%, wszystkie 51,6% → 45,2%. 1,85 daje 35,7%, 1,75 daje 30,7%.
-   - albo najsilniejsza forma linii, Pradruid `duelPower` 0,9 → 0,8: 63,2% → 58,5% (trzecia z czwartych form zamiast pierwszej).
-8. **Testy:** nowy `test/druid-summons.test.js`: każdy przywołaniec form Druida kosztuje w danych 0,125 (pojedyncze 0,125, paczki dwóch 0,25), na wyprawie 25% maks. many, w pojedynku 12,5%; karty po polsku i po angielsku; Druid z połową many ma naraz Enta i Niedźwiedzia, a przy dawnej cenie tylko jednego; Druid na 100. i Arcydruid na 200. poziomie mdleją najwyżej na 3 ze 120 wypraw i mają co najmniej 95% XP na godzinę średniej głównych ścieżek (przed zmianą 12 i 6 omdleń, −23% i −15%); pojedynki Druida i Arcydruida z każdą klasą na 100., 150., 200. i 250. poziomie wychodzą co do ruchu tak samo jak przy dawnej cenie. Testy drugiej, trzeciej i czwartej formy (wyprawy i Arena) przechodzą bez zmian.
-9. **Pliki:** `data/evolutions.json` (`manaShare` trzech umiejętności), `data/schemas/evolutions.schema.json` (opis `manaShare`), `test/druid-summons.test.js`.
+7. **Arena: słabszy Pradruid, Druid i Arcydruid bez zmian.** Autor chciał linii Druida słabszej na Arenie, a najsilniejszą jej formą jest tam Pradruid (najwięcej wygranych z czwartych form), podczas gdy sam Druid jest najsłabszą drugą formą. Dlatego maleje siła Pradruida w pojedynkach graczy, tą samą dźwignią co w 992 A (`duelPower` w `data/evolutions.json`, tylko Arena i wojny gildii): ×0,8 zamiast ×0,9. Mnoży ona jego ciosy i ciosy jego przywołańców, które biją z jego siłą. Wyprawy, Wieże, Labirynt i walki ze stworami się nie zmieniają.
+
+   | Poziom postaci (klasy) | Pradruid na Arenie przed → po | Miejsce wśród 15 czwartych form |
+   |---|---|---|
+   | 280 (303) | 55,3% → 49,9% | 5. → 8. |
+   | 290 (314) | 65,4% → 60,2% | 1. → 4. |
+   | 300 (327) | 69,8% → 65,1% | 1. → 1. |
+   | 315 (347) | 60,2% → 56,1% | 3. → 4. |
+   | 330 (366) | 65,1% → 59,6% | 1. → 3. |
+   | 350 (392) | 63,7% → 60,4% | 1. → 3. |
+   | średnio | 63,2% → 58,5% | 1. → 3. |
+
+   - Na poziomach 280–350 najwięcej wygrywa teraz średnio Niebiański Łucznik (60,7%) i Pan Zwierząt (59,6%). Na samym 300. poziomie Pradruid dalej wygrywa najwięcej (65,1%, następny Tytan 59,4%), ale wyraźnie w przedziale. Pozostałe czwarte formy wygrywają po 0–1,4 punktu więcej (rzadziej przegrywają z Pradruidem), od 34,0% (Mściciel Niebios) do 60,7%.
+   - W ustawieniu testu czwartych form (krzywa poziomów, z którą je strojono, 260. i 300. poziom, jedno ziarno): 57,8% → 52,6% i 70,8% → 68,2%, w przedziale testu 25–75%.
+   - Druid (38,0%) i Arcydruid (53,5%) w pojedynkach bez zmian, co do pojedynku tak samo jak przed zmianą ceny przywołań. Gdyby autor chciał osłabić także samego Druida: `duelPower` 1,9 → 1,8 daje średnio 33,0% (30,7%, 32,7%, 32,8%, 41,5%, 18,5%, 41,8% i 33,1% na poziomach z punktu 3), wyraźnie najsłabsza druga forma; Druid z Mądrością: połowa punktów 44,2% → 37,9%, wszystkie 51,6% → 45,2%. 1,85 daje 35,7%, 1,75 daje 30,7%.
+8. **Testy:** nowy `test/druid-summons.test.js`: każdy przywołaniec form Druida kosztuje w danych 0,125 (pojedyncze 0,125, paczki dwóch 0,25), na wyprawie 25% maks. many, w pojedynku 12,5%; karty po polsku i po angielsku; Druid z połową many ma naraz Enta i Niedźwiedzia, a przy dawnej cenie tylko jednego; Druid na 100. i Arcydruid na 200. poziomie mdleją najwyżej na 3 ze 120 wypraw i mają co najmniej 95% XP na godzinę średniej głównych ścieżek (przed zmianą 12 i 6 omdleń, −23% i −15%); pojedynki Druida i Arcydruida z każdą klasą na 100., 150., 200. i 250. poziomie wychodzą co do ruchu tak samo jak przy dawnej cenie; Pradruid bije w pojedynku z siłą ×0,8 (ciosy i przywołańce), z tym samym HP, a Druid i Arcydruid mają dalej ×1,9 i ×1,3. Testy drugiej, trzeciej i czwartej formy (wyprawy i Arena, w tym czwarte formy na Arenie na 260. i 300. poziomie w przedziale 25–75%) przechodzą bez zmian.
+9. **Pliki:** `data/evolutions.json` (`manaShare` trzech umiejętności, `duelPower` Pradruida), `data/schemas/evolutions.schema.json` (opis `manaShare`), `test/druid-summons.test.js`.
 
 ## Wersja 0.4.91 (21.11.2026): Pradawne stado
 
@@ -4458,7 +4470,7 @@ Autor wybrał wariant A z pytania 1221: Pradruid ma przywołania „2×2”, czy
    | Pradruid | Arena, 300. poziom | 65,6% | 70,8% |
 
    - Arcydruid w tym samym pomiarze: 1,7% omdleń, HP na końcu 0,766. Bez Odrodzenia puszczy Pradruid kończy wyprawy z trochę mniejszym HP, ale nie pada i ma go wyraźnie więcej niż Arcydruid.
-   - Wszystkie czwarte formy mieszczą się w przedziale testu (25–75%): na 260. poziomie od 34,4% (Burzyciel) do 62,8% (Archanioł), na 300. od 30,7% (Mściciel Niebios) do 70,8% (Pradruid).
+   - Wszystkie czwarte formy mieszczą się w przedziale testu (25–75%): na 260. poziomie od 34,4% (Burzyciel) do 62,8% (Archanioł), na 300. od 30,7% (Mściciel Niebios) do 70,8% (Pradruid). *Od 24.11.2026 Pradruid ma w pojedynkach ×0,8 zamiast ×0,9: w tym samym pomiarze 52,6% i 68,2%; zob. „Druid: przywołańce na wyprawach i na Arenie”.*
 8. **Testy** (`test/fourth-evolution.test.js`): Pradruid w zwykłej walce ma naraz cztery przywołańce, każdy pod swoją nazwą (dwa Dęby wieków, Żubr i Niedźwiedź); Pradawne stado przywołuje oba zwierzęta jednym rzuceniem, z HP z many i premią cechy, Żubr szarżuje i ogłusza, Niedźwiedź bije pod swoją nazwą; przy limicie 2 jedna paczka czeka, aż zejdzie druga; druga umiejętność Pradruida rozwija Zew zwierząt; migracja przenosi poziom i nie zmienia wolnych punktów. Test „rozwinięta umiejętność na 145. poziomie co najmniej tak silna jak jej korzeń na najwyższym” dalej sprawdza tylko pierwszą umiejętność czwartej formy, bo stado jest celowo słabsze (punkt 3).
 
 ## Pasek many w walce (21.11.2026)
