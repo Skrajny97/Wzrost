@@ -509,7 +509,7 @@ const routes = [
   ['GET', '/api/guild/beast', getGuildBeast],
   ['POST', '/api/guild/beast/attack', attackGuildBeast],
   ['POST', '/api/guild/beast/claim', claimGuildBeastChest],
-  // The World Bossy (world-boss.js; 1222–1226 A).
+  // The World Bosses (world-boss.js; 1222–1226 A).
   ['GET', '/api/world-boss', getWorldBoss],
   ['POST', '/api/world-boss/attack', attackWorldBoss],
   ['POST', '/api/world-boss/claim', claimWorldBossChest],

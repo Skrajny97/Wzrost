@@ -5254,9 +5254,11 @@ export function skillEffects(kit) {
   // The standing cards of a side (the foes of a unit: the other side's).
   const standing = (side) => [...cards.values()].filter((other) => other.unit.side === side && other.card.isConnected && !other.card.classList.contains('unit--down'));
   const foesOf = (entry) => standing(entry.unit.side === 'ally' ? 'enemy' : 'ally');
-  // A card's current HP and its maximum (from its HP line).
+  // A card's current HP and its maximum (arena.js setHp keeps the HP; its
+  // line is written in the game's numbers, "11 376 192 / 18 650 000").
   function hpOf(entry) {
-    const [now, max] = entry.hpText.textContent.split('/').map((part) => Number(part.trim()));
+    const now = entry.hp;
+    const max = entry.unit.maxHp;
     return Number.isFinite(now) && max > 0 ? { now, max } : { now: 1, max: 1 };
   }
   // A card lit for a moment in a colour, over its picture and words.

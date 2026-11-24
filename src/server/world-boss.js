@@ -1,5 +1,5 @@
-// World Bossy (1222–1226 A; data/world-bosses.json; src/engine/world-boss.js;
-// DECISIONS.md, "World Bossy (1222–1226)"): every week (from Monday,
+// The World Bosses (1222–1226 A; data/world-bosses.json; src/engine/world-boss.js;
+// DECISIONS.md, "Postrach Krainy (1222–1226)"): every week (from Monday,
 // midnight in Poland, as the weekly quests) each band of levels has one
 // boss with one HP bar for all its players. A band's boss of a week comes
 // with the first look at it or attack on it in that week, with HP for the

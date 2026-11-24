@@ -1,4 +1,4 @@
-// The World Bossy through the API (src/server/world-boss.js; the author:
+// The World Bosses through the API (src/server/world-boss.js; the author:
 // 1222–1226 A): one boss for each band of levels and week, with HP for the
 // band's active characters and one bar for all of them; three attacks a
 // day; a character's band written down with its first attack of the week

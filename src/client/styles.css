@@ -4252,6 +4252,27 @@ summary {
   text-align: right;
 }
 
+/* The HP line's box, whose width (cqi) sizes the words in it. */
+.unit-hp-text {
+  container-type: inline-size;
+}
+
+/* The HP and its maximum in the game's numbers (arena.js) at the cards'
+   10 px while they fit the card's width on one line, else as much smaller
+   as they need, but not under 7.5 px; on a card narrower still the maximum
+   goes to a second line, both lines at the size that fits them, up to
+   10 px (24.11.2026: the World Boss's HP of eight digits on a phone).
+   --hp-one and --hp-two: how wide in em the line, and the wider of its two
+   lines, can get in the fight; the clamp() is 0 while one line fits at
+   7.5 px or more, else the two lines' size. */
+@supports (width: 1cqi) {
+  .unit-hp-line {
+    --hp-one-size: calc(99cqi / var(--hp-one, 1));
+    --hp-two-size: calc(99cqi / var(--hp-two, 1));
+    font-size: min(10px, max(var(--hp-one-size), clamp(0px, (7.5px - var(--hp-one-size)) * 1000, var(--hp-two-size))));
+  }
+}
+
 .unit-status {
   overflow: hidden;
   color: var(--gold);

@@ -1,5 +1,5 @@
--- World Bossy (1222–1226 A; src/engine/world-boss.js, src/server/world-boss.js;
--- DECISIONS.md, "World Bossy (1222–1226)").
+-- The World Bosses (1222–1226 A; src/engine/world-boss.js, src/server/world-boss.js;
+-- DECISIONS.md, "Postrach Krainy (1222–1226)").
 --
 -- The boss of each band of levels and week (`week`: the key of its Monday,
 -- as the weekly quests have it; `region`: the band's land in

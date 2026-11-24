@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Dźwięki walki",
-  "description": "Nagrane dźwięki walki (src/client/audio/sfx). Broń (sound w item-bases.json) i atak potwora (attack.sound w monsters.json) mają rodzaj dźwięku: nagrany z sounds albo grany z syntezatora (synth). crit gra się dodatkowo przy trafieniu krytycznym, dodge przy uniku, a kill przy pokonaniu. voices: głosy przy trafieniu (hurt) i pokonaniu (death), dla id potwora albo wyglądu postaci (female, male), a World Bossa (world-bosses.json, sound) jego okrzyk (cry) na początku walki z nim. effects: nagrania dźwięków gry wołanych po nazwie (np. tab: zmiana zakładki, skill-<id umiejętności>: umiejętność w walce); nazwa bez nagrania gra z syntezatora, a umiejętność bez nagrania gra zwykły dźwięk ataku albo czaru.",
+  "description": "Nagrane dźwięki walki (src/client/audio/sfx). Broń (sound w item-bases.json) i atak potwora (attack.sound w monsters.json) mają rodzaj dźwięku: nagrany z sounds albo grany z syntezatora (synth). crit gra się dodatkowo przy trafieniu krytycznym, dodge przy uniku, a kill przy pokonaniu. voices: głosy przy trafieniu (hurt) i pokonaniu (death), dla id potwora albo wyglądu postaci (female, male), a Postrachu Krainy (world-bosses.json, sound) jego okrzyk (cry) na początku walki z nim. effects: nagrania dźwięków gry wołanych po nazwie (np. tab: zmiana zakładki, skill-<id umiejętności>: umiejętność w walce); nazwa bez nagrania gra z syntezatora, a umiejętność bez nagrania gra zwykły dźwięk ataku albo czaru.",
   "type": "object",
   "additionalProperties": false,
   "required": ["sounds", "synth", "voices", "effects"],

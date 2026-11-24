@@ -1,5 +1,5 @@
-// The World Bossy's numbers (data/world-bosses.json; src/engine/world-boss.js;
-// DECISIONS.md, "World Bossy (1222–1226)"), measured and checked as
+// The World Bosses' numbers (data/world-bosses.json; src/engine/world-boss.js;
+// DECISIONS.md, "Postrach Krainy (1222–1226)"), measured and checked as
 // tools/guild-beast-sim.mjs does for the Bestia Gildii:
 //   - `damage`: the average damage of one attack on each band's boss at a
 //     few levels of the band (its first, its middle and its last; in the

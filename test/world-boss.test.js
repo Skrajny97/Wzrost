@@ -1,4 +1,4 @@
-// The World Bossy in the engine (src/engine/world-boss.js; data/world-bosses.json;
+// The World Bosses in the engine (src/engine/world-boss.js; data/world-bosses.json;
 // the author: 1222–1226 A): the bands of levels from the lands, a
 // character's band by the higher of its levels, the boss's HP from the
 // band's active characters, an attack with the companions, never more than
@@ -30,7 +30,7 @@ import { content, newCharacter } from './helpers/content.js';
 const rules = content.worldBosses;
 const pieces = (materials) => Object.values(materials).reduce((sum, count) => sum + count, 0);
 
-describe('the World Bossy', () => {
+describe('the World Bosses', () => {
   test('fourteen bands, one for each land in order, each with its own boss of the land, none a bird', () => {
     const bands = worldBossBands(content);
     assert.equal(bands.length, 14);

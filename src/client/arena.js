@@ -12,6 +12,7 @@ import { boardArt, companionBust, companionPortrait, monsterSprite, portraitSpri
 import { classArt } from './class-art.js';
 import { h, icon } from './dom.js';
 import { manaChanges, manaStart } from './fight-mana.js';
+import { formatNumber } from './format.js';
 import { language, t } from './i18n.js';
 import { CLASS_ICONS } from './icons.js';
 import { motionOn } from './motion.js';
@@ -70,6 +71,38 @@ const tint = (hex, alpha) => `rgba(${[1, 3, 5].map((at) => parseInt(hex.slice(at
 // Whose voice a unit has (data/sounds.json): a creature's own, a character's by its look.
 const voiceOf = (unit) => unit.monsterId ?? unit.appearance ?? null;
 
+// A card's HP and its maximum in the game's numbers (format.js), as the
+// World Boss's card writes them: "11 376 192 / 18 650 000" (24.11.2026).
+// The HP keeps its "/" by a no-break space, so a line too narrow for both
+// breaks only before the maximum.
+const hpWords = (hp, maxHp) => `${formatNumber(hp)}\u00a0/ ${formatNumber(maxHp)}`;
+
+// How wide words are in em in the font of the cards' HP (styles.css,
+// --font-system), measured on a canvas; without one, at 0.63 em a
+// character, the widest digit of that font.
+let ruler;
+function emWidth(text) {
+  if (ruler === undefined) {
+    ruler = document.createElement('canvas').getContext('2d');
+    if (ruler) ruler.font = `100px ${getComputedStyle(document.documentElement).getPropertyValue('--font-system').trim() || 'sans-serif'}`;
+  }
+  return ruler ? ruler.measureText(text).width / 100 : text.length * 0.63;
+}
+
+// How wide in em the HP line of a card of `maxHp` can get in a fight, for
+// its size (styles.css, .unit-hp-line): `one` on one line, `two` the wider
+// of its two lines when the maximum goes to the second. The HP is at most
+// as long as its maximum, so it is taken at its widest: its first digit the
+// widest up to the maximum's first, the others the font's widest digit.
+function hpWidths(maxHp) {
+  const digits = String(Math.max(1, Math.round(maxHp)));
+  const widest = (choice) => [...choice].reduce((best, digit) => (emWidth(digit) > emWidth(best) ? digit : best));
+  const first = widest('123456789'.slice(0, Math.max(1, Number(digits[0]))));
+  const hp = formatNumber(Number(first + widest('0123456789').repeat(digits.length - 1)));
+  const max = formatNumber(maxHp);
+  return { one: emWidth(`${hp}\u00a0/ ${max}`), two: Math.max(emWidth(`${hp}\u00a0/`), emWidth(max)) };
+}
+
 // `board`: a place's picture under the fight's formation (790 B, the Arena's
 // sand; the author: „tła planszy walki… chociaż pod Arenę zacząć”).
 export function createArena(fight, { autoplay = 'visible', board = null } = {}) {
@@ -96,7 +129,10 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
 
   function unitCard(unit) {
     const hpFill = h('div', { class: 'unit-hp-fill' });
-    const hpText = h('span', { class: 'unit-hp-text' });
+    // The HP line, its words in a box of their own: the line's width sizes
+    // them (styles.css, .unit-hp-line).
+    const hpLine = h('span', { class: 'unit-hp-line' });
+    const hpText = h('span', { class: 'unit-hp-text' }, hpLine);
     const status = h('span', { class: 'unit-status' });
     // The unit's mana, thin under its HP (21.11.2026): it falls as a skill
     // is paid and a mana shield takes its share, and rises with a mana
@@ -144,7 +180,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       hpText,
       status,
     );
-    cards.set(unit.id, { card, hpFill, hpText, status, shieldBar, shieldFill, manaFill, unit });
+    cards.set(unit.id, { card, hpFill, hpText, hpLine, status, shieldBar, shieldFill, manaFill, unit });
     return card;
   }
 
@@ -194,11 +230,20 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     return animation;
   }
 
+  // A card's HP now (`hp`, for skill-fx.js too), its bar and its line; the
+  // line's widths for its size once for each maximum (a summon's comes with it).
   function setHp(id, hp) {
     const entry = cards.get(id);
     if (!entry) return;
+    entry.hp = hp;
     entry.hpFill.style.width = `${Math.max(0, (hp / entry.unit.maxHp) * 100)}%`;
-    entry.hpText.textContent = `${hp} / ${entry.unit.maxHp}`;
+    if (entry.sizedFor !== entry.unit.maxHp) {
+      const widths = hpWidths(entry.unit.maxHp);
+      entry.hpLine.style.setProperty('--hp-one', String(widths.one));
+      entry.hpLine.style.setProperty('--hp-two', String(widths.two));
+      entry.sizedFor = entry.unit.maxHp;
+    }
+    entry.hpLine.textContent = hpWords(hp, entry.unit.maxHp);
   }
 
   // A unit's mana bar after an event, or at the fight's start.

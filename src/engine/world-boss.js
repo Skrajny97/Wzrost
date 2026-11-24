@@ -1,7 +1,7 @@
 // @ts-check
-// World Bossy (1222–1226, all variant A, accepted by the author on the
+// The World Bosses (1222–1226, all variant A, accepted by the author on the
 // review page; data/world-bosses.json; src/server/world-boss.js;
-// DECISIONS.md, "World Bossy (1222–1226)"): every week, from Monday to
+// DECISIONS.md, "Postrach Krainy (1222–1226)"): every week, from Monday to
 // Sunday, one boss for each band of levels, with one HP bar shared by all
 // the band's players. The bands are the lands of data/regions.json in order
 // (1–25, 26–50, … 326–350), each with its own boss; a character above the

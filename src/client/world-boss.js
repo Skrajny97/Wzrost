@@ -1,5 +1,5 @@
 // The World Boss's card on the Walka screen (src/server/world-boss.js;
-// DECISIONS.md, "World Bossy (1222–1226)"; the author: 1222–1226 A): the
+// DECISIONS.md, "Postrach Krainy (1222–1226)"; the author: 1222–1226 A): the
 // boss the character fights this week, with its picture (its own once
 // drawn, else a creature of its land's in its place: art.js), name, band of
 // levels and land, and the HP bar shared by the whole band; the attacks
@@ -68,7 +68,7 @@ export function worldBossCard() {
     return call('GET', '/api/world-boss')
       .then(show)
       .catch((error) => {
-        if (!gone) fill(card, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać World Bossa.') }));
+        if (!gone) fill(card, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać Postrachu Krainy.') }));
       });
   }
 

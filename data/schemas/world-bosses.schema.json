@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "World Bossy",
+  "title": "Postrach Krainy",
   "description": "Cotygodniowi bossowie przedziałów poziomów (1222–1226 A; src/engine/world-boss.js). Walka bossa ma kształt stwora z monsters.json (tools/validate-data.mjs sprawdza ją schematem stworów), a HP bierze z paska.",
   "type": "object",
   "additionalProperties": false,

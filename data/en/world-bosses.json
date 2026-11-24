@@ -92,12 +92,12 @@
     "rules": [
       "A band is 25 levels, counted by the higher of your levels: character or class. Each band has its own boss from the land of those levels.",
       "Your band is set at your first attack of the week and stays until Sunday, even if you level up.",
-      "You have {attacks} attacks a day. New ones come at midnight.",
+      "You have {attacks} attacks a day. They renew at midnight.",
       "An attack is one fight of your character with your companions, at full HP and without potions, with the result at once. The boss fights at your level. An attack gives no XP, gold or loot, and works during an exploration too.",
       "The boss's HP depends on how many players of the band were in the game in the last week.",
       "When the boss falls, everyone who hit it gets a Boss Chest with gold, the boss's materials and a chance at an item. The more damage you deal, the bigger the chest.",
       "The top ten wear the boss's title for a week, and the last blow puts an item and extra gold in the chest.",
-      "The boss stays until Sunday midnight. If it survives, it leaves, and the chests are half as big. On Monday a new one comes.",
+      "The boss stays until Sunday midnight. If it survives, it leaves, and the chests are half as big. On Monday a new one appears.",
       "You can open the chest from the boss's fall or from the end of the week, until the end of the next week at the latest."
     ],
     "band": "Levels {min}–{max}",
@@ -111,7 +111,7 @@
     "fell": "The boss falls!",
     "fallen": "The boss fell on {at}.",
     "lastBlow": "Last blow: {name}.",
-    "next": "A new boss will come on Monday.",
+    "next": "A new boss will appear on Monday.",
     "log": "Fight log",
     "fightTitle": "Attack on the boss",
     "own": "Your contribution: {damage} HP, place {place}.",
@@ -148,7 +148,7 @@
     "notInBag": "This is no longer in the bag.",
     "errors": {
       "locked": "You will unlock the World Boss at character level {level}.",
-      "fallen": "The boss has already fallen. A new one will come on Monday.",
+      "fallen": "The boss has already fallen. A new one will appear on Monday.",
       "noAttacks": "Today's attacks are used up. New ones from midnight.",
       "raced": "The boss or the character changed in the meantime. Try once more.",
       "noChest": "There is no such chest to open.",
