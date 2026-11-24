@@ -4143,6 +4143,11 @@ Autor: „Do tego trzeba też w końcu ogarnąć te drużyny cholerne - niech li
    - **Dane i API.** Kolumna `characters.party_meal` (migracja `0172_party_meal.sql`): `{ "dish": id, "auto": true/false }` albo NULL. `PUT /api/party/meal { dish, auto }` przyjmuje potrawę gry po id albo null i pole tak/nie; pole bez potrawy odmawia („Wybierz potrawę do autouzupełniania.”), a brak potrawy zapisuje jako NULL. Drużyna (`GET /api/party`) ma pole `meal` z nazwą potrawy. Słowa w `data/community.json` (`party.texts.meal…`), po angielsku w `data/en/community.json` („Meal for party trips”, „Auto-refill”) i w `data/en/strings.json`.
    - **Kod:** `mealRefill` w `src/engine/cooking.js`, `partyMealOf`, `memberMeal`, `setPartyMeal` i `setOut` w `src/server/parties.js`, `src/server/index.js`, `mealRubric` w `src/client/screens/party.js`. Test: `test/party-meal.test.js` (silnik i API: porcja po skończonym posiłku aż do wyczerpania Spiżarni, działający posiłek innej i tej samej potrawy zostaje, bez pola nic, lider bez zmian, sprawdzanie wyboru). Rubryka sprawdzona na 320, 390 i 1366 px.
 
+## Wersja 0.5.5 (24.11.2026): Postrach Krainy, poprawki tekstów
+
+1. Autor: „biją tego samego stwora, a nie pasek HP.” Zdanie pod tytułem karty brzmi teraz „Wszyscy gracze z przedziału biją tego samego stwora.” (po angielsku „All the band's players fight the same creature.”), tak samo we wpisie „Co nowego?” 0.5.3.
+2. Po pytaniu autora „póki co mam pierwsze miejsce a skrzynia mała?” reguła skrzyni w „Jak to działa?” mówi wprost, że liczą się obrażenia w porównaniu z częścią HP bossa, a nie miejsce w rankingu (zasada bez zmian, punkt o wielkości skrzyni w sekcji „Postrach Krainy (1222–1226)”).
+
 ## Wersja 0.5.4 (24.11.2026): automatyczne jedzenie do 3 porcji naraz
 
 Według sekcji niżej, bez makiet (wiersz „Porcje” w rubryce posiłku Drużyny i start wyboru porcji w „Opcjach wyprawy”).
