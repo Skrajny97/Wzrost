@@ -1,0 +1,14 @@
+{
+  "id": "sleepwalker",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Lunatyk, a sleepwalker walking in his sleep, a pale thin man in a long white nightshirt and a nightcap, eyes closed, arms stretched forward, walking on tiptoes, a cold silver moonlight glow around him, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, eerie and menacing, full body, three-quarter view, the figure alone, no branch, no ground, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023711087305704752
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "oak-leaf",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant living oak leaf as big as a sail torn off by the wind, wavy lobed green and golden-brown edges sharp as blades, glowing veins, flying like a ray, a fierce face formed by its veins, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, flying, full body, three-quarter view, the leaf alone, no tree, no ground, no background, the whole leaf inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023604232018152874
+  },
+  "images": 1
+}

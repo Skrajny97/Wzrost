@@ -1,0 +1,14 @@
+{
+  "id": "shield-bug",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant shield bug, a broad flat green and red body shaped like a knight's shield, a hard pointed shield plate on its back, a small head with a long beak, long antennae, six legs, a cloud of yellowish stink coming from its sides, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the insect alone, no leaves, no ground, no background, the whole insect inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02364187425231934
+  },
+  "images": 1
+}

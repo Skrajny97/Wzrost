@@ -1,0 +1,14 @@
+{
+  "id": "thunder-arrow",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Gromowa Strzala, a thunderstone, a big dark flint arrowhead as big as a man thrown down from the clouds by the thunder god, chipped sharp edges, crackling with bright blue-white lightning, glowing cracks, a fierce glowing eye in its middle, flying point forward, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the arrowhead alone, no ground, no background, the whole arrowhead inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023606251621670196
+  },
+  "images": 1
+}

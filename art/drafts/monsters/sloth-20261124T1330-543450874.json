@@ -1,0 +1,14 @@
+{
+  "id": "sloth",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant sloth as big as a bear, shaggy grey-brown fur with green moss growing in it, a small round face with a dark eye mask and a sleepy grin, three huge curved claws on each long arm, standing up with its long arms raised to swipe, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the animal alone, no branch, no tree, no ground, no background, the whole animal inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02357368647829692
+  },
+  "images": 1
+}

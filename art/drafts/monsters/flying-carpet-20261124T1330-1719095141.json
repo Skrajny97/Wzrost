@@ -1,0 +1,14 @@
+{
+  "id": "flying-carpet",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the flying carpet of old Slavic fairy tales come alive, a long red woven carpet with gold and blue folk patterns and long tassels, flying and curling like a snake ready to strike, two glowing eyes in its pattern, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, flying, full body, three-quarter view, the carpet alone, no rider, no ground, no background, the whole carpet inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023688819997999405
+  },
+  "images": 1
+}

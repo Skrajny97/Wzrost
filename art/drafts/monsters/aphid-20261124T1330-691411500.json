@@ -1,0 +1,14 @@
+{
+  "id": "aphid",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant aphid, a plump pear-shaped bright green soft body, long thin legs and antennae, two short tubes sticking out of its back, a long needle-like beak, small red eyes, drops of sticky honeydew, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the insect alone, no leaves, no ground, no background, the whole insect inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023597982431411747
+  },
+  "images": 1
+}

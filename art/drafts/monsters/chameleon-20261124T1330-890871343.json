@@ -1,0 +1,14 @@
+{
+  "id": "chameleon",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant chameleon, a green body with a high helmet-like casque on its head, bulging turret eyes looking two ways, a long tail curled in a spiral, its long sticky tongue shooting out, its skin half blending into green leaf patterns, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the lizard alone, no branch, no ground, no background, the whole lizard inside the picture, the tongue too",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023761395941204497
+  },
+  "images": 1
+}

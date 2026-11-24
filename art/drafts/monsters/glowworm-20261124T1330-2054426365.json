@@ -1,0 +1,14 @@
+{
+  "id": "glowworm",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant glowworm, a segmented dark brown larva-like beetle with a flat armoured body, its tail end glowing with bright yellow-green light, a small head with short antennae, cold light shining around it, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the creature alone, no leaves, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02355961068195767
+  },
+  "images": 1
+}

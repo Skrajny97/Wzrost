@@ -1,0 +1,14 @@
+{
+  "id": "hailstone",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Grad, a giant living hailstone, a big round lump of cloudy white-blue ice with sharp icy spikes all over it, an angry face frozen inside it with glowing cold eyes, frost and small hailstones falling around it, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the creature alone, no clouds, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023484501862419977
+  },
+  "images": 1
+}

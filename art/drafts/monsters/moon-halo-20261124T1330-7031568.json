@@ -1,0 +1,14 @@
+{
+  "id": "moon-halo",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Halo, a living halo of the moon, a big glowing ring of pale silver-white moonlight with a faint rainbow rim floating in the air, a calm cold face of moonlight in its centre, small frost crystals orbiting it, an abstract creature, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, eerie and menacing, floating, full body, the ring alone, no moon, no ground, no background, the whole ring inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023561869302749634
+  },
+  "images": 1
+}

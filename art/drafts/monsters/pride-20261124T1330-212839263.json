@@ -1,0 +1,14 @@
+{
+  "id": "pride",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Pycha, the spirit of pride, a tall haughty figure looking down its nose, one wide chunky shape filling the whole picture, a pale cold mask-like face with half-closed disdainful eyes, a tall golden crown, a long purple and gold cloak spread wide, chin raised, one hand raised in contempt, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the figure alone, no throne, no ground, no background, the whole figure inside the picture, the crown too",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0237100403980679
+  },
+  "images": 1
+}

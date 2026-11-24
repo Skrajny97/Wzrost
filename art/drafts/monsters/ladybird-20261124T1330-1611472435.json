@@ -1,0 +1,14 @@
+{
+  "id": "ladybird",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant ladybird, a round glossy red dome with seven big black spots, a black head with white cheek patches, short antennae, its wing cases half open with dark wings buzzing, flying up, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the beetle alone, no leaves, no ground, no background, the whole beetle inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02362806541485257
+  },
+  "images": 1
+}

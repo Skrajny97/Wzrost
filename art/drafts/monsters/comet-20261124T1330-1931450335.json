@@ -1,0 +1,14 @@
+{
+  "id": "comet",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Kometa, a living comet, a blazing white-hot head of fire and ice with a fierce face and glowing eyes, a long streaming tail of orange flames and sparks curving behind it, flying diagonally, an omen of doom, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, the comet alone, no stars, no ground, no background, the whole comet inside the picture, the tail too",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023581300583309598
+  },
+  "images": 1
+}
