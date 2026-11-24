@@ -1,0 +1,14 @@
+{
+  "id": "wb-boruta",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Boruta, the devil nobleman of Polish legends, unmistakably a devil: a red-skinned devil face with a pointed black beard, a thin black moustache and a sly grin, glowing yellow eyes, two small curved black horns sticking out of his fur kolpak cap, a short white heron feather on the cap, a long green Polish kontusz coat over a red zupan, a wide gold and red sash at the waist, a curved sabre in his hand, a thin devil tail with a black tuft at its end, one leg ending in a black goat hoof and the other foot in a red boot, menacing, standing, full body, three-quarter view, the creature alone, no rocks, no ground, no background, the whole creature inside the picture, the whole feather inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024947597831514148
+  },
+  "images": 1
+}
