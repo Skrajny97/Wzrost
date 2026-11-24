@@ -1,0 +1,14 @@
+{
+  "id": "highest-bough",
+  "tool": "pixellab generate-image-v2",
+  "description": "the highest branch of the World Tree reaching above the clouds, a thin bough against a vast sky, a thunderstorm on the horizon with distant lightning, the sun breaking through the clouds, centered composition for a round medallion frame, pixel art scene, muted palette of sky blue, storm grey and gold, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

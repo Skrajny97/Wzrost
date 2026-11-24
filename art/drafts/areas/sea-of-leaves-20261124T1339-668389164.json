@@ -1,0 +1,14 @@
+{
+  "id": "sea-of-leaves",
+  "tool": "pixellab generate-image-v2",
+  "description": "an endless sea of green oak leaves in the crown of the World Tree, waves of foliage rolling in the wind, a few big acorns among the leaves, the sky above, centered composition for a round medallion frame, pixel art scene, muted palette of deep greens, leaf greens and pale gold, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

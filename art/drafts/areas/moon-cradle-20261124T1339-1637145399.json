@@ -1,0 +1,14 @@
+{
+  "id": "moon-cradle",
+  "tool": "pixellab generate-image-v2",
+  "description": "a big pale moon resting at night in a cradle of curved gigantic tree boughs, silver light on the bark and leaves, stars all around, fireflies glowing, centered composition for a round medallion frame, pixel art scene, muted dark palette of night blue, silver and pale gold, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

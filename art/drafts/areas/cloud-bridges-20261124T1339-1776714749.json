@@ -1,0 +1,14 @@
+{
+  "id": "cloud-bridges",
+  "tool": "pixellab generate-image-v2",
+  "description": "narrow footbridges made of white clouds stretching between gigantic tree boughs high above the world, wisps of mist, a deep blue sky with more clouds far below, centered composition for a round medallion frame, pixel art scene, muted palette of cloud white, sky blue and bark brown, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

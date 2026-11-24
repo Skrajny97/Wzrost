@@ -1,0 +1,14 @@
+{
+  "id": "white-stone",
+  "tool": "pixellab generate-image-v2",
+  "description": "a great smooth white stone lying on a grassy shore at the foot of a gigantic oak, the stone glowing faintly, old carved signs on it, a few red threads tied around it, the sea behind, centered composition for a round medallion frame, pixel art scene, muted palette of bone white, sea grey-blue and deep green, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

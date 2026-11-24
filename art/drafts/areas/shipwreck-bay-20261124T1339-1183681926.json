@@ -1,0 +1,14 @@
+{
+  "id": "shipwreck-bay",
+  "tool": "pixellab generate-image-v2",
+  "description": "a quiet bay full of old shipwrecks, broken wooden hulls and masts sticking out of the shallow green water, torn sails, a dark beach with scattered barrels and ropes, centered composition for a round medallion frame, pixel art scene, muted dark palette of murky green, weathered wood browns and grey, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

@@ -1,0 +1,14 @@
+{
+  "id": "amber-cascades",
+  "tool": "pixellab generate-image-v2",
+  "description": "frozen cascades of golden amber pouring down the bark of a colossal tree trunk like waterfalls turned to stone, sunlight glowing through the amber, small dark shapes trapped inside, centered composition for a round medallion frame, pixel art scene, muted palette of amber orange, honey gold and deep brown, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

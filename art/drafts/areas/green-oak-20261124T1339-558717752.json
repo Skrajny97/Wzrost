@@ -1,0 +1,14 @@
+{
+  "id": "green-oak",
+  "tool": "pixellab generate-image-v2",
+  "description": "the foot of a gigantic ancient green oak, the World Tree, its enormous roots as thick as walls going down into the sea between rocks, acorns as big as barrels lying among the roots, centered composition for a round medallion frame, pixel art scene, muted palette of deep greens, oak browns and sea teal, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

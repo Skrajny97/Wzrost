@@ -1,0 +1,14 @@
+{
+  "id": "bark-cliffs",
+  "tool": "pixellab generate-image-v2",
+  "description": "the bark of a colossal oak trunk forming vertical cliffs with deep cracks like canyons, small ledges, a thin trickle of golden resin running down, clouds far below, centered composition for a round medallion frame, pixel art scene, muted palette of bark browns, dark grey and dim gold, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

@@ -1,0 +1,14 @@
+{
+  "id": "great-fork",
+  "tool": "pixellab generate-image-v2",
+  "description": "the great fork of the World Tree where its colossal trunk splits into enormous boughs as wide as roads, a small pool of rainwater in the fork, moss and ferns, the sky and clouds around, centered composition for a round medallion frame, pixel art scene, muted palette of bark brown, moss green and pale sky blue, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

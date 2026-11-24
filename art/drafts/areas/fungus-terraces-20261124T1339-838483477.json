@@ -1,0 +1,14 @@
+{
+  "id": "fungus-terraces",
+  "tool": "pixellab generate-image-v2",
+  "description": "huge bracket fungi growing out of a gigantic tree trunk like wide terraces stacked one above another, pale cream and rust coloured shelves, mossy bark between them, mist below, centered composition for a round medallion frame, pixel art scene, muted palette of bark browns, cream and rust orange, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

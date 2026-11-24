@@ -1,0 +1,14 @@
+{
+  "id": "rocky-cape",
+  "tool": "pixellab generate-image-v2",
+  "description": "a rocky cape of dark grey cliffs jutting into a stormy sea, big waves crashing on the rocks and throwing white spray, the huge distant silhouette of a gigantic oak tree on the island behind, centered composition for a round medallion frame, pixel art scene, muted dark palette of sea greys, deep teal and foam white, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

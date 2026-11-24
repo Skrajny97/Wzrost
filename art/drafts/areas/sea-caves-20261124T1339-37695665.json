@@ -1,0 +1,14 @@
+{
+  "id": "sea-caves",
+  "tool": "pixellab generate-image-v2",
+  "description": "a dark sea cave with the sea flowing inside, wet black rock arches, pale blue light coming up from the water, faintly glowing jellyfish deep in the dark water, centered composition for a round medallion frame, pixel art scene, muted dark palette of deep blue, black and pale cyan glow, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

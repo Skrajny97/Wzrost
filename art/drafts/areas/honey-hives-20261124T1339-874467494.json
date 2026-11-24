@@ -1,0 +1,14 @@
+{
+  "id": "honey-hives",
+  "tool": "pixellab generate-image-v2",
+  "description": "wild beehives in hollows of a gigantic tree trunk, old wooden hatches on the hollows, honeycombs dripping golden honey down the bark, a few bees glowing in warm light, centered composition for a round medallion frame, pixel art scene, muted palette of warm amber, honey gold and dark bark brown, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
