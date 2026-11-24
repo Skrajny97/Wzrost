@@ -1,0 +1,14 @@
+{
+  "id": "shrew-tooth",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a tiny sharp white tooth with a red tip and a drop of green venom, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02307454886584812
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "jewel-elytron",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a single glossy beetle wing case shining metallic green and gold, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023108059337827898
+  },
+  "images": 1
+}

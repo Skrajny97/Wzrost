@@ -1,0 +1,14 @@
+{
+  "id": "gecko-foot",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small orange gecko foot with five wide round sticky toe pads, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023206167117648654
+  },
+  "images": 1
+}

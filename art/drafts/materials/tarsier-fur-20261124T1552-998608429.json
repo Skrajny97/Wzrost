@@ -1,0 +1,14 @@
+{
+  "id": "tarsier-fur",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small soft tuft of grey-brown fur with one big glowing amber eye-shaped mark, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023144069481319855
+  },
+  "images": 1
+}

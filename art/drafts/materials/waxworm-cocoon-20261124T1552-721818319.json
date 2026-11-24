@@ -1,0 +1,14 @@
+{
+  "id": "waxworm-cocoon",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a white silky cocoon stuck with bits of yellow wax, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023197038749482896
+  },
+  "images": 1
+}

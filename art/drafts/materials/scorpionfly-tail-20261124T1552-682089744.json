@@ -1,0 +1,14 @@
+{
+  "id": "scorpionfly-tail",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a curled black and yellow insect tail ending in a red bulb like a scorpion sting, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02325514949205187
+  },
+  "images": 1
+}

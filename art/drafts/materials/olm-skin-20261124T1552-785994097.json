@@ -1,0 +1,14 @@
+{
+  "id": "olm-skin",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a folded piece of pale pink almost translucent skin with thin red veins, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023131779434839884
+  },
+  "images": 1
+}

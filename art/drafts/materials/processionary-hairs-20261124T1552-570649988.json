@@ -1,0 +1,14 @@
+{
+  "id": "processionary-hairs",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a tuft of long pale grey poisonous caterpillar hairs with a faint green tint, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023252132215923735
+  },
+  "images": 1
+}

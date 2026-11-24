@@ -1,0 +1,14 @@
+{
+  "id": "glowing-mycelium",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a tangle of black root-like fungus strands glowing with pale green foxfire light, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02324265440665351
+  },
+  "images": 1
+}

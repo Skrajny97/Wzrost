@@ -1,0 +1,14 @@
+{
+  "id": "honeycomb",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a piece of golden honeycomb dripping with honey, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023111624754163954
+  },
+  "images": 1
+}

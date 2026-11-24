@@ -1,0 +1,14 @@
+{
+  "id": "heartwood-resin",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a heart-shaped drop of glowing golden resin with a faint pulse of light inside, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023057185026168825
+  },
+  "images": 1
+}

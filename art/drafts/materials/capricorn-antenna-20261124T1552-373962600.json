@@ -1,0 +1,14 @@
+{
+  "id": "capricorn-antenna",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a very long segmented dark brown beetle antenna, drawn diagonally across the whole icon, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023144203710979888
+  },
+  "images": 1
+}

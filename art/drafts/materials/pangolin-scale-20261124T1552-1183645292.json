@@ -1,0 +1,14 @@
+{
+  "id": "pangolin-scale",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a single big curved olive-brown scale like a plate of armour, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02319518690893385
+  },
+  "images": 1
+}

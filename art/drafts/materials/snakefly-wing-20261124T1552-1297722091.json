@@ -1,0 +1,14 @@
+{
+  "id": "snakefly-wing",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a single long clear insect wing with a dense dark net of veins, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0233738294467926
+  },
+  "images": 1
+}
