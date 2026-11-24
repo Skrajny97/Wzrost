@@ -55,6 +55,7 @@ import achievements from '../../data/achievements.json' with { type: 'json' };
 import winter from '../../data/winter.json' with { type: 'json' };
 import fame from '../../data/fame.json' with { type: 'json' };
 import orbs from '../../data/orbs.json' with { type: 'json' };
+import worldBosses from '../../data/world-bosses.json' with { type: 'json' };
 // The English texts (data/en/), by the data file they translate. A file
 // added there is named here too (tools/i18n-check.mjs checks it).
 import enAffixes from '../../data/en/affixes.json' with { type: 'json' };
@@ -101,6 +102,7 @@ import enWeeks from '../../data/en/weeks.json' with { type: 'json' };
 import enAchievements from '../../data/en/achievements.json' with { type: 'json' };
 import enWinter from '../../data/en/winter.json' with { type: 'json' };
 import enOrbs from '../../data/en/orbs.json' with { type: 'json' };
+import enWorldBosses from '../../data/en/world-bosses.json' with { type: 'json' };
 
 // The data files by their names, as data/en/ names its translations.
 const polishData = {
@@ -149,6 +151,7 @@ const polishData = {
   achievements,
   winter,
   orbs,
+  'world-bosses': worldBosses,
 };
 
 export const OVERLAYS = {
@@ -198,6 +201,7 @@ export const OVERLAYS = {
     achievements: enAchievements,
     winter: enWinter,
     orbs: enOrbs,
+    'world-bosses': enWorldBosses,
   },
 };
 
@@ -519,6 +523,10 @@ export function publicContent() {
       texts: { label: game.orbs.texts.label },
       ...(game.orbs.professions && { professions: { texts: { label: game.orbs.professions.texts.label } } }),
     },
+    // The World Bosses' pictures for the page (art.js), by their ids: their
+    // own once drawn (`art`), else the creature's in their place
+    // (`sprite`), also in a fight's playback.
+    worldBossArt: Object.fromEntries((game.worldBosses?.bosses ?? []).map((boss) => [boss.id, { art: boss.art, sprite: boss.sprite }])),
     // The narrator's introduction for a new character (narrator.js), with
     // the Time Points the narrator gives.
     tutorial: { ...data.tutorial, $comment: undefined, startTimePoints: game.balance.timePoints.start },
