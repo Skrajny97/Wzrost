@@ -1,0 +1,14 @@
+{
+  "id": "great-trunk",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, the colossal trunk of the world tree rising like a cliff: its bark forming deep canyons, golden amber cascades running down, huge bracket fungi like terraces, wild beehives in dark hollows, clouds drifting around the trunk, wide panorama for a dim background behind text, low contrast, very dark muted palette of bark brown, amber gold and dim grey, no text, no border, no people in front, no animals in front",
+  "style": "src/client/art/lands/black-bog.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "sky-boughs",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, the highest boughs of the world tree as wide as roads above a sea of clouds: an endless sea of leaves, a pale moon resting between the branches, stars in a deep night sky, wide panorama for a dim background behind text, low contrast, very dark muted palette of night blue, leaf green and silver, no text, no border, no people in front, no animals in front",
+  "style": "src/client/art/lands/black-bog.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}

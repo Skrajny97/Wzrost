@@ -1,0 +1,14 @@
+{
+  "id": "isle-of-buyan",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, the island of buyan in the middle of the sea: a gigantic green oak, the world tree, rising from a rocky island up into the clouds, a white stone glowing at its foot, waves around the island and old shipwrecks on the shore, wide panorama for a dim background behind text, low contrast, very dark muted palette of sea teal, deep green and foam white, no text, no border, no people in front, no animals in front",
+  "style": "src/client/art/lands/black-bog.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
