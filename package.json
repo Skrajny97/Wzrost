@@ -1,6 +1,6 @@
 {
   "name": "insight",
-  "version": "0.4.99",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "engines": {

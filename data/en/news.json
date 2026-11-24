@@ -1332,6 +1332,10 @@
     "0.4.99": {
       "title": "Version 0.4.99",
       "body": "- Professions: while your character works, amber Profession Orbs fly over its profession's scene. Tap one to catch it: it gives camp resources, the profession's product (e.g. a herb, a mineral or a fish), profession XP or Time Points. About one orb per 10 minutes of work, up to 8 a day, apart from the System Orbs of explorations."
+    },
+    "0.5.0": {
+      "title": "Version 0.5.0",
+      "body": "- Guild › Members: each member shows the Fame it brought the guild this week next to its “last online”. The list can be sorted by Rank, Last online or Fame."
     }
   }
 }

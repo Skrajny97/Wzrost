@@ -1670,6 +1670,11 @@
       "id": "0.4.99",
       "title": "Wersja 0.4.99",
       "body": "- Profesje: gdy postać pracuje, nad sceną jej profesji latają bursztynowe Kulki Profesji. Złap kulkę stuknięciem: daje zasoby obozu, produkt tej profesji (np. zioło, minerał albo rybę), doświadczenie profesji albo Punkty Czasu. Średnio jedna kulka na 10 minut pracy, do 8 dziennie, osobno od Kulek Systemu z wypraw."
+    },
+    {
+      "id": "0.5.0",
+      "title": "Wersja 0.5.0",
+      "body": "- Gildia › Członkowie: przy każdym członku obok „ostatnio online” widać jego wkład w Sławę gildii w tym tygodniu. Listę można sortować: Ranga, Ostatnio online albo Sława."
     }
   ]
 }

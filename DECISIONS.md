@@ -3916,6 +3916,10 @@ Gracz (poz. 63) przez autora: „fajne też jakby można było porównać przedm
 5. Po angielsku: „Without upgrades”. Karta sprawdzona na 320, 390 i 1366 px, po polsku i po angielsku, z długą nazwą przedmiotu i liczbami przedmiotów 500. poziomu.
 6. Pliki: `src/engine/preview.js`, `src/server/inventory.js`, `src/client/screens/character.js` (`itemCard`, `compareBare`), `src/client/styles.css`, `data/en/strings.json`, `README.md`. Test: `test/engine.test.js`.
 
+## Wersja 0.5.0 (24.11.2026): aktywność i Sława członków gildii w jednym miejscu
+
+Według sekcji niżej, bez makiet (linijka i rząd „Sortuj:” na istniejącej liście członków). Po 0.4.99 idzie 0.5.0, tak jak po 0.0.99 przyszło 0.1.0.
+
 ## Członkowie gildii: aktywność i Sława w jednym miejscu (24.11.2026)
 
 Gracz (poz. 69), moderator gildii, przez autora: „Jeśli chodzi o aktywność to widać kiedy byli online i widać też pkt sławy każdego gracza jaki wkład ma, choć mogło by to być w jednym miejscu widoczne”. Lista członków na karcie gildii pokazywała, kiedy kto był ostatnio online, a Sławę, którą każdy wniósł do gildii, pokazywał tylko Ranking członków niżej na tej samej zakładce.
