@@ -1368,6 +1368,10 @@
     "0.5.8": {
       "title": "Version 0.5.8",
       "body": "- Druid and Archdruid: Summon Ent, Summon Bear and Awakening of the Oak now cost 25% of max mana on explorations instead of 50%, so your Druid has both summons at once on explorations too.\n- The Elder Druid and its summons deal a little less damage in the Arena and guild wars. Nothing changes on explorations."
+    },
+    "0.5.9": {
+      "title": "Version 0.5.9",
+      "body": "- Community → Friends: “Copy link” in the “Recommend the game” card now copies your link instead of showing an error."
     }
   }
 }

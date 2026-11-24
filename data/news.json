@@ -1715,6 +1715,11 @@
       "id": "0.5.8",
       "title": "Wersja 0.5.8",
       "body": "- Druid i Arcydruid: Przywołanie enta, Przywołanie niedźwiedzia i Przebudzenie dębu kosztują na wyprawach 25% maks. many zamiast 50%, więc Twój Druid ma teraz na wyprawach oba przywołańce naraz.\n- Pradruid i jego przywołańce zadają na Arenie i w wojnach gildii trochę mniejsze obrażenia. Na wyprawach nic się nie zmienia."
+    },
+    {
+      "id": "0.5.9",
+      "title": "Wersja 0.5.9",
+      "body": "- Społeczność → Znajomi: przycisk „Kopiuj link” w karcie „Poleć grę” kopiuje już Twój link, bez komunikatu o błędzie."
     }
   ]
 }

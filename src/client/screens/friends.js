@@ -279,15 +279,19 @@ export function mountFriends(container) {
       if (view) show(view);
       if (answer.text) toast(answer.text);
     };
-    const copyLink = async (event) => {
-      const box = event.currentTarget.closest('.referral-link')?.querySelector('.referral-url');
+    // The link as shown, kept here: the button's helper runs the copy
+    // without the click (withButton), so the copy must not look for it
+    // there (a player's report, 24.11.2026: „Cannot read properties of
+    // undefined (reading 'currentTarget')”).
+    const url = h('span', { class: 'referral-url', text: referral.link.replace(/^https?:\/\//, '') });
+    const copyLink = async () => {
       try {
         await navigator.clipboard.writeText(referral.link);
         toast(words.copied);
       } catch {
         // Where the phone refuses the clipboard, the link is selected for a
         // long press to copy it.
-        if (box) getSelection().selectAllChildren(box);
+        getSelection()?.selectAllChildren(url);
       }
     };
     const share = () => navigator.share?.({ title: 'Insight', text: words.shareText, url: referral.link }).catch(() => {});
@@ -324,7 +328,7 @@ export function mountFriends(container) {
       h(
         'div',
         { class: 'referral-link' },
-        h('span', { class: 'referral-url', text: referral.link.replace(/^https?:\/\//, '') }),
+        url,
         h('div', { class: 'referral-actions' }, button(words.copy, copyLink, 'system'), typeof navigator.share === 'function' && button(words.share, share, 'system')),
       ),
       h('p', { class: 'muted small', text: filled(words.month, { given: referral.month.given, limit: referral.month.limit }) }),
