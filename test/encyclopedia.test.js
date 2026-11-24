@@ -112,7 +112,7 @@ describe('the Encyklopedia in the engine', () => {
     // from level 100 of their professions.
     assert.deepEqual(sixth.entries.find((entry) => entry.id === 'flamberge').sources, [
       'Wyprawy: wypada od regionu Stare Wyrobisko (poz. 96–100).',
-      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
+      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios, Miecz Niebios.',
       'Założysz od 100. poziomu klasy.',
       'Warsztat: wzór od 100. poziomu Rzemiosła.',
     ]);
@@ -162,16 +162,16 @@ describe('the Encyklopedia in the engine', () => {
     // and the Szlifiernia's patterns from level 125 of their professions.
     assert.deepEqual(seventh.entries.find((entry) => entry.id === 'coronation-sword').sources, [
       'Wyprawy: wypada od regionu Rokitowe Bezdno (poz. 121–125).',
-      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
+      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios, Miecz Niebios.',
       'Założysz od 125. poziomu klasy.',
       'Warsztat: wzór od 125. poziomu Rzemiosła.',
     ]);
     assert.ok(seventh.entries.find((entry) => entry.id === 'pectoral').sources.includes('Szlifiernia: wzór od 125. poziomu Jubilerstwa.'));
-    // A Cień's sztylet, which the Nekromanta, the Licz and the Król Nawii no longer wear
-    // (988), and the Mag's kostur, which they do.
+    // A Cień's sztylet, which the Nekromanta, the Licz, the Król Nawii and the
+    // Cesarz Nawii no longer wear (988), and the Mag's kostur, which they do.
     const baselard = seventh.entries.find((entry) => entry.id === 'baselard').sources;
-    assert.ok(baselard.includes('Dla klasy: Cień.') && baselard.includes('Nie dla: Nekromanta, Licz, Król Nawii.'), JSON.stringify(baselard));
-    assert.ok(seventh.entries.find((entry) => entry.id === 'archmage-staff').sources.includes('Dla klas: Mag, Nekromanta, Licz, Król Nawii.'));
+    assert.ok(baselard.includes('Dla klasy: Cień.') && baselard.includes('Nie dla: Nekromanta, Licz, Król Nawii, Cesarz Nawii.'), JSON.stringify(baselard));
+    assert.ok(seventh.entries.find((entry) => entry.id === 'archmage-staff').sources.includes('Dla klas: Mag, Nekromanta, Licz, Król Nawii, Cesarz Nawii.'));
     // Materials of creatures of levels 151–175 in Tier VII: Głucha Knieja's
     // and those of Sosnowe Wydmy that come a level or two above its 150 (the
     // Południca, the Raróg and Pogorzelisko's). Ostępy Nowiu's go on to Tier
@@ -221,7 +221,7 @@ describe('the Encyklopedia in the engine', () => {
     // the Szlifiernia's patterns from level 150 of their professions.
     assert.deepEqual(eighth.entries.find((entry) => entry.id === 'self-swinging-sword').sources, [
       'Wyprawy: wypada od regionu Pogorzelisko (poz. 146–150).',
-      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
+      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios, Miecz Niebios.',
       'Założysz od 150. poziomu klasy.',
       'Warsztat: wzór od 150. poziomu Rzemiosła.',
     ]);
@@ -262,7 +262,7 @@ describe('the Encyklopedia in the engine', () => {
     // class level 175, the patterns from level 175 of the professions.
     assert.deepEqual(ninth.entries.find((entry) => entry.id === 'szczerbiec').sources, [
       'Wyprawy: wypada od regionu Matecznik (poz. 171–175).',
-      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
+      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios, Miecz Niebios.',
       'Założysz od 175. poziomu klasy.',
       'Warsztat: wzór od 175. poziomu Rzemiosła.',
     ]);
@@ -298,7 +298,7 @@ describe('the Encyklopedia in the engine', () => {
     // from class level 200, and made in the Warsztat from its 200th level.
     assert.deepEqual(tenth.entries.find((entry) => entry.id === 'grunwald-sword').sources, [
       'Wyprawy: wypada od regionu Zaćmiona Polana (poz. 196–200).',
-      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
+      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios, Miecz Niebios.',
       'Założysz od 200. poziomu klasy.',
       'Warsztat: wzór od 200. poziomu Rzemiosła.',
     ]);
@@ -355,7 +355,7 @@ describe('the Encyklopedia in the engine', () => {
     // the professions' last level, the 200th (1246 A).
     assert.deepEqual(eleventh.entries.find((entry) => entry.id === 'rugievit-sword').sources, [
       'Wyprawy: wypada od regionu Kamienny Tron (poz. 221–225).',
-      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
+      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios, Miecz Niebios.',
       'Założysz od 225. poziomu klasy.',
       'Warsztat: wzór od 200. poziomu Rzemiosła.',
     ]);

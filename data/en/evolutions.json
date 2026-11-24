@@ -519,6 +519,143 @@
         "name": "Child of the Night",
         "text": "+35% speed, and after a dodge the next blow is 160% stronger. Dodge grows by 10 pp. For the first two turns of the fight the character hides in the shadow and no one can hit it."
       }
+    },
+    "unstoppable": {
+      "name": "Unstoppable",
+      "nameFemale": "Unstoppable",
+      "description": "Their wrath flows like lava: the closer to death, the harder it is to stop.",
+      "trait": {
+        "name": "Volcanic Wrath",
+        "text": "The less HP, the more damage, up to +130% at 10% HP, and the more healing from the damage dealt, up to 25% at 10% HP. Every plain blow also hits the enemy standing behind the target, for 50% damage. Once a fight a deadly blow leaves the character with 1 HP, and for the next 3 turns nothing fells or stops them."
+      }
+    },
+    "gods-champion": {
+      "name": "Champion of the Gods",
+      "nameFemale": "Champion of the Gods",
+      "description": "Chosen by the gods themselves. Wherever they stand to fight, the whole party grows stronger.",
+      "trait": {
+        "name": "Divine Glory",
+        "text": "+15% damage for every defeated enemy, up to +90%, and 15% of max HP back, for the whole party. Once a fight survives a deadly blow with 1 HP and at once returns to 50% of max HP."
+      }
+    },
+    "world-shield": {
+      "name": "Shield of the World",
+      "description": "A living stronghold. While the Shield of the World stands, the whole party is safe.",
+      "trait": {
+        "name": "Walls of the World",
+        "text": "+60% armour and resistances, and takes 70% of the blows aimed at someone else in the party. Reflects 30% of the damage of every blow taken back at the attacker. While it stands, the whole party takes 20% less damage."
+      }
+    },
+    "star-lord": {
+      "name": "Lord of the Stars",
+      "nameFemale": "Lady of the Stars",
+      "description": "The stars obey this bow. When an arrow flies, a whole constellation shoots along with it.",
+      "trait": {
+        "name": "Seven Stars",
+        "text": "Critical hits deal 100% more, and the first seven arrows of a fight are always critical. Arrows never miss and ignore 25% of armour, critical hits 55%."
+      }
+    },
+    "perun-son": {
+      "name": "Son of Perun",
+      "nameFemale": "Daughter of Perun",
+      "description": "Blood of Perun’s blood. When they draw the bow, a storm begins over the battlefield.",
+      "trait": {
+        "name": "Blood of Perun",
+        "text": "Every arrow has a 45% chance to add 75% lightning damage, and the one struck then loses 50% of its speed. The lightning from the arrowhead leaps on to every next enemy in turn, 20% weaker each time, and takes 50% of each one’s speed."
+      }
+    },
+    "hunt-god": {
+      "name": "God of the Hunt",
+      "nameFemale": "Goddess of the Hunt",
+      "description": "When they sound the horn, the whole forest sets out on the hunt, and the pack runs first.",
+      "trait": {
+        "name": "Law of the Hunt",
+        "text": "The whole party deals 50% more damage to beasts, birds and snakes, and creatures leave 50% more materials. Up to four summons at once, and each deals 40% more damage."
+      }
+    },
+    "demiurge": {
+      "name": "Demiurge",
+      "description": "The maker who shaped the world. Fire, ice, storm and stone circle around them like little worlds.",
+      "trait": {
+        "name": "Power of Creation",
+        "text": "Fire, frost, lightning and earth spells are 60% stronger, and their effects last 5 turns longer. Every spell, plain attacks and skills alike, strikes with whichever of the four elements the target is weakest to."
+      }
+    },
+    "winter-incarnate": {
+      "name": "Winter Incarnate",
+      "description": "Winter itself in human shape. Wherever it passes, everything alive freezes.",
+      "trait": {
+        "name": "Everlasting Winter",
+        "text": "Chilled enemies deal 50% less damage, and each of their turns is lost with a 40% chance. Frost resistance rises by 50%, and every frost spell chills those struck until the end of the fight. From the first turn of a fight all enemies are chilled, and at the start of each of its turns a chilled enemy freezes and loses 30% of the damage of the character’s plain blow.",
+        "params": {
+          "freezeLabel": "frozen"
+        }
+      }
+    },
+    "wilds-father": {
+      "name": "Father of the Wilds",
+      "nameFemale": "Mother of the Wilds",
+      "description": "The wilds have heeded this voice forever. At a single word oaks rise from the ground and the herd charges into battle.",
+      "trait": {
+        "name": "Soul of the Wilds",
+        "text": "+60% mana and up to five summons at once: two Eternal Oaks, the Bison, the Bear and the Elk. 7% of mana comes back every turn, and summons have 60% more HP and deal 50% more damage. Every 15 points of Wisdom give the summons another 1% HP and damage. Each summon also gets an extra 75% of the character's max HP and draws the enemies' blows onto itself. In the System Towers the Eternal Oaks' roots slow enemies only a fifth as much."
+      }
+    },
+    "seraph": {
+      "name": "Seraph",
+      "nameFemale": "Seraph",
+      "description": "The highest choir of angels comes down to earth. The white fire of six wings heals friends and burns enemies to the bone.",
+      "trait": {
+        "name": "Choir of Seraphim",
+        "text": "Healing is 85% stronger, and once a fight raises every fallen member of the party: each rises with 75% of max HP. Healing removes all bad effects, and healing beyond full HP becomes a shield, up to 40% of the healed one’s max HP."
+      }
+    },
+    "heaven-sword": {
+      "name": "Sword of Heaven",
+      "description": "The sword with which heaven deals out justice. When the sentence falls, shining knights come down from the sky.",
+      "trait": {
+        "name": "Holy Flame",
+        "text": "Sacred damage is 70% stronger, and 140% against spirits and demons. Spirits struck with sacred damage burn: for 4 turns they lose 40% of the blow’s damage each, and other enemies 15%. Every sacred hit has a 25% chance to blind the enemy: for 2 turns it misses 35% of its blows. Two summons at once."
+      }
+    },
+    "all-seeing": {
+      "name": "All-Seeing",
+      "nameFemale": "All-Seeing",
+      "description": "They see all that was, is and will be. The enemies’ blows fall where the party left long ago.",
+      "trait": {
+        "name": "Omniscience",
+        "text": "Blessings are 100% stronger and are not shared out in the party, and the party starts the fight blessed: armour and resistances +60%, damage +30%. The first blow of an enemy at each member of the party always misses, and every later blow of an enemy that has already struck at the party misses with a 25% chance."
+      }
+    },
+    "soul-lord": {
+      "name": "Lord of Souls",
+      "nameFemale": "Lady of Souls",
+      "description": "Hundreds of souls circle around, waiting for an order. Whoever falls by the hand of the Lord of Souls joins them.",
+      "trait": {
+        "name": "Dominion over Souls",
+        "text": "Critical hits deal 100% more, and after killing an enemy the character moves again at once. A poisoned target takes 25% more. An enemy with less than 12% HP left falls to any blow of the character (except champions). Every enemy killed is a gathered soul: each strengthens the character’s blows by 18% until the end of the fight, up to 90%."
+      }
+    },
+    "navia-emperor": {
+      "name": "Emperor of Nav",
+      "nameFemale": "Empress of Nav",
+      "description": "Rule over all of Nav. Plague passes from enemy to enemy, and the dead rise to fight whenever they fall.",
+      "trait": {
+        "name": "Empire of the Dead",
+        "text": "Once a fight survives a deadly blow with 1 HP, and Poison deals 100% more and lasts 4 turns longer. When a poisoned enemy falls, its poison passes on to another enemy. Every enemy killed rises as a wraith of Nav and fights on the character’s side until the end of the fight, up to four at once.",
+        "params": {
+          "raiseName": "Wraith of Nav"
+        }
+      }
+    },
+    "dark-king": {
+      "name": "King of Darkness",
+      "nameFemale": "Queen of Darkness",
+      "description": "A starless night in human shape. The shadows strike along with it, and no one sees where the blow came from.",
+      "trait": {
+        "name": "Heart of the Night",
+        "text": "+45% speed, and after a dodge the next blow is 200% stronger. Dodge rises by 15 percentage points. For the first three turns of a fight the character hides in the shadows and no one can hit them. The shadows repeat every blow of theirs for 30% damage."
+      }
     }
   },
   "skills": {
@@ -1379,6 +1516,239 @@
       "style": "attack",
       "description": "The character melts into the shadow and emerges behind the victim. Before it turns, it is all over.",
       "effect": "The character vanishes into the shadow and emerges behind the enemy with the least HP: a blow dealing {power%} damage, always critical. Until its next turn no one can hit it."
+    },
+    "devastation": {
+      "name": "Devastation",
+      "style": "area",
+      "description": "The Unstoppable goes through the enemy ranks like lava through a forest. Whatever it touches burns, and the deeper the wounds, the more terrible the blows.",
+      "effect": "A blow at every enemy for {power%} damage, and at a single enemy for {single%}, ignoring {armorIgnore%} of the armour of those struck. Those struck burn for {dotTicks|turn|turns|turns}, losing {dotPower%} of the blow’s damage each. The less HP the character has, the harder it hits: up to {rage%} more at {rageAt%} HP."
+    },
+    "last-frenzy": {
+      "name": "Last Frenzy",
+      "style": "empowerment",
+      "description": "When the blood already flows in streams, the Unstoppable is only getting started. This frenzy may be the last, but no one comes out of it unscathed.",
+      "effect": "When the character’s HP falls below {below%}, they fly into a frenzy for {turns|turn|turns|turns}: they deal {damage%} more damage and heal by {lifesteal%} of the damage dealt."
+    },
+    "gods-hurricane": {
+      "name": "Hurricane of the Gods",
+      "style": "area",
+      "description": "Three spins, each blessed by the gods. The blade cuts so fast that the enemies see only a golden flash.",
+      "effect": "Three spins in one turn: each attacks every enemy for {power%} damage, without a miss, and a single enemy for {single%}. Those struck bleed for {dotTicks|turn|turns|turns}, losing {dotPower%} of the blow’s damage each."
+    },
+    "triumph": {
+      "name": "Triumph",
+      "style": "empowerment",
+      "description": "The Champion raises the sword, and the sky answers with thunder. The party feels that the gods stand on its side today.",
+      "effect": "For {turns|turn|turns|turns} the whole party deals {chorus%} more damage, and another {perKill%} more for every defeated enemy."
+    },
+    "earth-wrath": {
+      "name": "Wrath of the Earth",
+      "style": "area",
+      "description": "The Shield of the World strikes the ground, and the ground answers. It cracks under the whole enemy line, as if the world wanted to throw them off.",
+      "effect": "A blow of the shield into the ground deals every enemy {power%} damage, without a miss, and a single enemy {single%}. Every enemy struck has a {stunChance%} chance to lose its next turn.",
+      "params": {
+        "stunLabel": "stunned"
+      }
+    },
+    "stronghold": {
+      "name": "Stronghold",
+      "style": "defence",
+      "description": "The Shield of the World drives the shield into the ground like a rampart. Behind it the whole party is as safe as behind walls.",
+      "effect": "For {turns|turn|turns|turns} the whole party takes {reduction%} less damage, and everyone in the party gets a shield of {partyShield%} of their max HP."
+    },
+    "comet": {
+      "name": "Comet",
+      "style": "attack",
+      "description": "The arrow falls from the sky like a comet. It pierces the whole line, and only fire is left behind it.",
+      "effect": "A comet shot dealing {power%} damage that cannot be dodged, always critical. The target burns for {dotTicks|turn|turns|turns}, losing {dotPower%} of the shot’s damage each. The comet pierces the target and hits every enemy in the rows behind it, each for {pierce%} damage."
+    },
+    "constellation": {
+      "name": "Constellation",
+      "style": "area",
+      "description": "A constellation lights up in the sky. Each of its stars looses an arrow along with the archer.",
+      "effect": "For {turns|turn|turns|turns} a constellation shines over the battlefield: every turn of the character its stars shoot every enemy for {power%} damage, without a miss."
+    },
+    "perun-arrows": {
+      "name": "Arrows of Perun",
+      "style": "area",
+      "description": "In the old beliefs thunderbolts are Perun’s arrows. Now they are the arrows of his child, and each one seeks another target.",
+      "effect": "Bolts deal every enemy {power%} lightning damage, and a single enemy {single%}. Everyone struck may lose its next turn ({stunChance%} chance), and every bolt leaps on to another enemy for {chainPower%} damage.",
+      "params": {
+        "stunLabel": "shocked"
+      }
+    },
+    "storm-eye": {
+      "name": "Eye of the Storm",
+      "style": "empowerment",
+      "description": "The Son of Perun stands in the eye of the storm. A tempest rages all around, and in the middle there is calm and a steady hand.",
+      "effect": "For {turns|turn|turns|turns} the character stands in the eye of the storm: they deal {damage%} more damage, and every turn the storm strikes every enemy for {power%} lightning damage."
+    },
+    "white-pack": {
+      "name": "White Pack",
+      "style": "attack",
+      "description": "At the call of the God of the Hunt a whole pack of white wolves runs out of the forest. They run together, bite together and howl so that the party’s hearts swell.",
+      "effect": "Summons three white wolves for {turns|turn|turns|turns}. Each stands in front of the character with {hp%} of its max HP and takes the enemies’ blows. Every turn each bites a random enemy for {power%} damage, and the one bitten bleeds for {dotTicks|turn|turns|turns}, losing {dotPower%} of the bite’s damage each. While at least one wolf stands, the howl of the pack gives the whole party {howl%} more damage.",
+      "params": {
+        "summonName": "White wolf"
+      }
+    },
+    "aurochs-call": {
+      "name": "Call of the Aurochs",
+      "style": "defence",
+      "description": "An aurochs older than the oldest oaks steps out of the mist over the marsh. It lowers its horns, and no one gets past any more.",
+      "effect": "Summons an aurochs for {turns|turn|turns|turns}. The aurochs stands in front of the character with {hp%} of its max HP and takes the enemies’ blows. It charges the enemy in front at once for {charge%} damage and stuns it for its next turn, then every turn it gores the enemy in front for {power%} damage, and the one struck has a {stunChance%} chance to lose its next turn.",
+      "params": {
+        "summonName": "Aurochs",
+        "stunLabel": "stunned"
+      }
+    },
+    "world-genesis": {
+      "name": "Beginning of the World",
+      "style": "area",
+      "description": "The world is born once more, here and now. Fire, ice, storm and stone fall on the enemies before anyone has put them in order.",
+      "effect": "Fire, ice, lightning and boulders fall at once on every enemy for {power%} damage, and on a single enemy for {single%}, each with the element it is weakest to. Everyone struck burns for {dotTicks|turn|turns|turns}, losing {dotPower%} of the spell’s damage each, is chilled, so it deals {chillWeaken%} less damage, and has a {stunChance%} chance to lose its next turn. The boulders stun the enemy in front with a {frontStun%} chance.",
+      "params": {
+        "stunLabel": "shocked"
+      }
+    },
+    "sunbirth": {
+      "name": "Birth of the Sun",
+      "style": "attack",
+      "description": "The Demiurge raises a hand, and a new sun lights up over the battlefield. It burns hardest whoever stands proudest.",
+      "effect": "For {turns|turn|turns|turns} a sun blazes over the battlefield. Every turn of the character it strikes the enemy with the most HP for {power%} damage with the element that enemy is weakest to, and the one struck burns for {dotTicks|turn|turns|turns}, losing {dotPower%} of the damage each."
+    },
+    "great-frost": {
+      "name": "Great Frost",
+      "style": "control",
+      "description": "The ice locks the three strongest enemies inside at once. Under its sheet not an eyelid moves, and every blow crushes them together with the ice.",
+      "effect": "Locks the three enemies with the most HP in ice and deals each {power%} frost damage. For {stunMoves|turn|turns|turns} the frozen do not strike and take {bonus%} more damage.",
+      "params": {
+        "stunLabel": "frozen"
+      }
+    },
+    "winter-cloak": {
+      "name": "Cloak of Winter",
+      "style": "defence",
+      "description": "Winter covers the party with a cloak of snow and hoarfrost. Whoever breaks through the snow slows down, as if wading through drifts.",
+      "effect": "For {turns|turn|turns|turns} the cloak of winter covers the party: everyone gets a shield of {partyShield%} of their max HP, and an enemy that strikes it slows by {slow%}."
+    },
+    "eternal-grove": {
+      "name": "Eternal Grove",
+      "style": "defence",
+      "description": "Two oaks that remember the beginning of the world rise from the ground. In their shade wounds close by themselves, and the roots let no enemy go.",
+      "effect": "Summons two Eternal Oaks at once for {turns|turn|turns|turns}. Each stands in front of the character with HP equal to {hp%} of its max mana and draws the enemies’ blows onto itself. Every turn each lashes a random enemy with its branches for {power%} damage and binds it with roots: the one struck slows by {root%}. While at least one stands, every turn the party heals by {partyHeal%.1} of max HP.",
+      "params": {
+        "pack": [
+          {
+            "summonName": "Eternal Oak"
+          },
+          {
+            "summonName": "Eternal Oak"
+          }
+        ]
+      }
+    },
+    "eternal-herd": {
+      "name": "Eternal Herd",
+      "style": "attack",
+      "description": "At the call a herd bursts out of the eternal wilds: a bison, a bear and an elk. The bison and the elk ram the enemies, and then the whole herd stands like a wall before the party.",
+      "effect": "Summons a bison, a bear and an elk at once for {turns|turn|turns|turns}. All of them stand before the character and draw the enemies’ blows onto themselves. The bison has HP equal to {hp1%} of the character’s max mana. It charges the enemy in front at once for {charge1%} damage and stuns it for its next turn, then gores a random enemy every turn for {power1%} damage. The bear has HP equal to {hp2%} of the character’s max mana and rakes a random enemy with its claws every turn for {power2%} damage. The elk has HP equal to {hp3%} of the character’s max mana. It rams the enemy in front at once for {charge3%} damage and stuns it for its next turn, then kicks a random enemy every turn for {power3%} damage.",
+      "params": {
+        "pack": [
+          {
+            "summonName": "Bison",
+            "stunLabel": "stunned"
+          },
+          {
+            "summonName": "Bear"
+          },
+          {
+            "summonName": "Elk",
+            "stunLabel": "stunned"
+          }
+        ]
+      }
+    },
+    "six-wings": {
+      "name": "Six Wings",
+      "style": "defence",
+      "description": "Six wings of white fire spread over the party. Whoever raises a hand against it will burn.",
+      "effect": "For {turns|turn|turns|turns} six wings shield the party: everyone gets a shield of {partyShield%} of their max HP, and an enemy that strikes it burns with sacred fire for {retort%} of its blow’s damage."
+    },
+    "breath-of-life": {
+      "name": "Breath of Life",
+      "style": "healing",
+      "description": "The Seraph breathes the warmth of the sun into the party. Wounds close, and the weary rise as if the fight had only begun.",
+      "effect": "When someone in the party falls below {below%} HP, heals the whole party by {heal%} of max HP and 1 HP for every {wisdomPerHp} points of Wisdom, and removes bad effects from it. Then for {hotTurns|turn|turns|turns} heals everyone by {hot%} of max HP each turn."
+    },
+    "fiery-sword": {
+      "name": "Fiery Sword",
+      "style": "attack",
+      "description": "A sword of white fire falls like a sentence from heaven. When one sinner falls, the fire seeks the next, until no one is left.",
+      "effect": "A sacred sentence dealing {power%} damage to an enemy with less than {below%} HP left. Spirits and demons take {familyBonus%} more. When the target falls, the sentence falls on the next enemy for {onKill%} damage, and so on, as long as they keep falling."
+    },
+    "heavenly-host": {
+      "name": "Heavenly Host",
+      "style": "attack",
+      "description": "The sky opens, and shining knights come down out of the light. They stand before the Sword of Heaven and cut the enemies with holy fire.",
+      "effect": "Summons two shining knights for {turns|turn|turns|turns}. Each stands in front of the character with {hp%} of its max HP and takes the enemies’ blows. Every turn each cuts a random enemy for {power%} sacred damage.",
+      "params": {
+        "summonName": "Shining knight"
+      }
+    },
+    "destiny": {
+      "name": "Destiny",
+      "style": "control",
+      "description": "Destiny had another ending, but the All-Seeing turns a page in the book of fate. The fallen rise, and the enemies stand rooted to the spot.",
+      "effect": "Once a fight, when someone in the party falls, the character turns destiny around: the fallen rises with {hp%} of max HP, the rest of the party recovers {heal%} of max HP, and every enemy loses its next turn.",
+      "params": {
+        "stunLabel": "dazed"
+      }
+    },
+    "book-of-fate": {
+      "name": "Book of Fate",
+      "style": "empowerment",
+      "description": "The cards of the book of fate circle around the party. Each shows a blow before it falls, and the place where to strike.",
+      "effect": "For {turns|turn|turns|turns} the cards of the book of fate guide the party: everyone deals {chorus%} more damage and dodges blows, spells too, {evasion pp} more often, and whoever dodges a blow counterattacks at once for {counter%} damage."
+    },
+    "last-harvest": {
+      "name": "Last Harvest",
+      "style": "attack",
+      "description": "The scythe swings its last arc. Whatever has ripened is cut down, and the soul joins the others at once.",
+      "effect": "A scythe blow dealing {power%} damage, always critical. An enemy with less than {killBelow%} HP dies at once (except champions), and such an enemy is sought first. The scythe also hits the enemy beside the target, for {cleave%} damage."
+    },
+    "soul-lament": {
+      "name": "Lament of Souls",
+      "style": "area",
+      "description": "The gathered souls scream at once and strike every enemy. The more of them gathered, the more terrible the lament.",
+      "effect": "The gathered souls strike every enemy at once for {power%} damage, and another {perSoul%} for every soul gathered in this fight. The character heals by {drain%} of the damage dealt."
+    },
+    "eternal-legion": {
+      "name": "Eternal Legion",
+      "style": "poison",
+      "description": "The knights of Nav do not remember how to die. Cut down, they rise again as long as the Emperor needs them.",
+      "effect": "For {turns|turn|turns|turns} two dead knights rise. Each stands in front of the character with {hp%} of its max HP and takes the enemies’ blows. Every turn each strikes a random enemy for {power%} damage and poisons it: for {dotTicks|turn|turns|turns} the target loses {dotPower%} of the blow’s damage each. Whenever a knight falls, it rises again on the character’s next turn with {returns%} of its HP.",
+      "params": {
+        "summonName": "Dead knight"
+      }
+    },
+    "pestilence": {
+      "name": "Pestilence",
+      "style": "poison",
+      "description": "A plague blows from Nav, and there is no escape from it. Whoever catches it grows weaker with every breath.",
+      "effect": "A plague from Nav falls on every enemy: each takes {power%} poison damage and is poisoned for {dotTicks|turn|turns|turns}, losing {dotPower%} of the plague’s damage each, and while poisoned deals {weaken%} less damage. The character heals by {drain%} of the damage dealt."
+    },
+    "thousand-shadows": {
+      "name": "A Thousand Shadows",
+      "style": "area",
+      "description": "The King of Darkness breaks into a thousand shadows. Each cuts a different enemy, and when they become one again, no one knows where to look.",
+      "effect": "The character breaks into a thousand shadows and cuts every enemy for {power%} damage, and a lone enemy for {single%}, always critically. Until their next turn no one can hit them."
+    },
+    "starless-night": {
+      "name": "Starless Night",
+      "style": "dodge",
+      "description": "Every star goes out. In the dark the enemies strike blindly, and the party vanishes before their eyes.",
+      "effect": "For {turns|turn|turns|turns} a starless night falls: every enemy blow has an {eclipse%} chance to miss, and the whole party dodges blows {evasion pp} more often."
     }
   },
   "texts": {

@@ -432,9 +432,10 @@ describe('the Pradruid in the Wieże (1249 B)', () => {
   const share = content.evolutionsById['elder-druid'].towerSummonRoot;
   const pradruid = { ...druidAt(300), name: 'Pradruid' };
 
-  test('only the Pradruid has a share of its roots\' strength in the Wieże, a fifth, and its trait says so in Polish and in English', () => {
+  test('only the Pradruid has a share of its roots\' strength in the Wieże, a fifth, and its trait says so in Polish and in English (and the Ojciec Puszczy grown from it, the same)', () => {
     assert.equal(share, 0.2);
-    assert.deepEqual(content.evolutions.filter((form) => form.towerSummonRoot !== undefined).map((form) => form.id), ['elder-druid']);
+    // The fifth form of the line keeps the rule (test/fifth-evolution.test.js).
+    assert.deepEqual(content.evolutions.filter((form) => form.towerSummonRoot !== undefined).map((form) => form.id), ['elder-druid', 'wilds-father']);
     assert.equal(pradruid.character.evolution, 'elder-druid');
     assert.ok(content.evolutionsById['elder-druid'].trait.text.endsWith('W Wieżach Systemu korzenie Dębów wieków spowalniają wrogów pięć razy słabiej.'));
     const english = JSON.parse(readFileSync(new URL('../data/en/evolutions.json', import.meta.url), 'utf8'));

@@ -3,7 +3,8 @@
 // at class level 50 of one of the two paths' evolutions, for good, at class
 // level 100 the one form that evolution grows into, and at 200, where the
 // deployment has the third forms on (features.js), the one third form of
-// that. On the test version "Testuj ewolucję" takes any evolution of the
+// that; the same at 300 (the fourth forms) and 400 (the fifth), each where
+// the deployment has them. On the test version "Testuj ewolucję" takes any evolution of the
 // class, or the next form of the one the character has, at any class level
 // and keeps the skills it had, so the test can be undone. Like skills, an
 // evolution is taken only at home, and only if the character is as read
@@ -115,8 +116,9 @@ function evolutionBefore(kept) {
 // evolution, taken for good or tried, gets that class level and keeps it,
 // so its second form is then taken as in the game; with ?level=200 (the
 // third's) the same for a character with a second form, where the third
-// forms are on, and with ?level=300 (the fourth's) for a character with a
-// third form, where the fourth forms are on.
+// forms are on, with ?level=300 (the fourth's) for a character with a
+// third form, where the fourth forms are on, and with ?level=400 (the
+// fifth's) for a character with a fourth form, where the fifth forms are on.
 export async function testClassLevel(context) {
   requireEvolutions();
   const { session, player } = await requireIdlePlayer(context);
@@ -126,11 +128,12 @@ export async function testClassLevel(context) {
   const db = context.env.DB;
   const asked = Number(new URL(context.request.url).searchParams.get('level'));
   const stage = levels.indexOf(asked);
-  if (stage === 1 || stage === 2 || stage === 3) {
+  if (stage >= 1 && stage <= 4) {
     const current = evolutionOf(engineCharacter(row), content());
     if (stage === 1 && (!current || current.from)) throw new ApiError(409, 'not_first', 'Najpierw potrzebna jest pierwsza ewolucja, bez drugiej.');
     if (stage === 2 && (current?.stage !== 2 || !nextFormOf(current, content()))) throw new ApiError(409, 'not_second', 'Najpierw potrzebna jest druga ewolucja, bez trzeciej.');
     if (stage === 3 && (current?.stage !== 3 || !nextFormOf(current, content()))) throw new ApiError(409, 'not_third', 'Najpierw potrzebna jest trzecia ewolucja, bez czwartej.');
+    if (stage === 4 && (current?.stage !== 4 || !nextFormOf(current, content()))) throw new ApiError(409, 'not_fourth', 'Najpierw potrzebna jest czwarta ewolucja, bez piątej.');
     const raised = await db
       .prepare('UPDATE characters SET class_level = MAX(class_level, ?), class_xp = 0, version = version + 1 WHERE id = ? AND version = ?')
       .bind(asked, row.id, row.version)

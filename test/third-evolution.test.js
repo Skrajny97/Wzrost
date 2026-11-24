@@ -53,12 +53,12 @@ const FORMS = [
 const seconds = content.evolutions.filter((evolution) => evolution.stage === 2);
 const thirds = content.evolutions.filter((evolution) => evolution.stage === 3);
 
-// The game's data with the third forms taken out: the second forms as they
-// were before the third evolution (and as a deployment has them with
-// THIRD_EVOLUTION "off").
+// The game's data with the third forms taken out, and the later forms that
+// grow out of them: the second forms as they were before the third evolution
+// (and as a deployment has them with THIRD_EVOLUTION "off").
 const secondOnly = (() => {
   const raw = loadData();
-  const thirdIds = new Set(thirds.map((evolution) => evolution.id));
+  const thirdIds = new Set(content.evolutions.filter((evolution) => evolution.stage >= 3).map((evolution) => evolution.id));
   raw.evolutions.evolutions = raw.evolutions.evolutions.filter((evolution) => !thirdIds.has(evolution.id));
   raw.evolutions.skills = raw.evolutions.skills.filter((skill) => !thirdIds.has(skill.evolution));
   return buildContent(raw);
@@ -69,7 +69,7 @@ const secondOnly = (() => {
 // FOURTH_EVOLUTION "off"): at 300 they wait only for their points.
 const thirdOnly = (() => {
   const raw = loadData();
-  const fourthIds = new Set(content.evolutions.filter((evolution) => evolution.stage === 4).map((evolution) => evolution.id));
+  const fourthIds = new Set(content.evolutions.filter((evolution) => evolution.stage >= 4).map((evolution) => evolution.id));
   raw.evolutions.evolutions = raw.evolutions.evolutions.filter((evolution) => !fourthIds.has(evolution.id));
   raw.evolutions.skills = raw.evolutions.skills.filter((skill) => !fourthIds.has(skill.evolution));
   return buildContent(raw);
