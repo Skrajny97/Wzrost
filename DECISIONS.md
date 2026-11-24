@@ -3862,6 +3862,8 @@ Autor wybrał na stronie ocen 1233 B: z Krainy bez Słońca droga postaci wychod
 
 Zob. sekcje niżej i „Drzewo Świata: krainy 351–425, najpierw bez stworów”: trzy krainy 351–425 (Wyspa Bujan, Wielki Pień, Podniebne Konary) z 51 stworami, materiałami, ikonami i okrzykami wybranymi przez autora (1240–1242, 1244), trzy Postrachy Krainy, wzory Tierów XI i XII (1246 A) i obrażenia Postrachu od 226. poziomu zmierzone na nowo ze sprzętem Tierów XI i XII.
 
+W tej samej wersji Kultywacja trwa od 10 minut do 8 godzin co 10 minut, jak praca w profesji (autor: „I Kultywacja powinna mieć do 8h możliwość Kultywowania a nie jak wyprawa” i „Kultywacja ma działać jak Profesja czyli można ją robić nawet po 10 minut, a nie tylko 1 2 4 i 8 godzin”), zob. punkt 1 sekcji „Kultywacja (1230 A, 24.11.2026)”.
+
 ## Drzewo Świata: stwory, liczby i Postrach Krainy (1240–1242, 24.11.2026)
 
 Autor ocenił na stronie ocen grafiki Drzewa Świata (1240–1242) i w każdej pozycji przyjął jedną wersję. Trzy krainy weszły do danych ze stworami, a znacznik `soon` zniknął z nich (zostaje dla następnych krain, zob. punkt 2 sekcji wyżej). Potem autor ocenił okrzyki stworów i ikony materiałów (1244, punkt 14), więc Drzewo Świata jest gotowe do wdrożenia razem z wzorami Tierów XI i XII (punkt 17).
