@@ -16,9 +16,10 @@
 // with too much typed), and above it in the Ranking postaci and the Punkty
 // Sławy a member of its guild with all a row can hold (the longest name and
 // title, the moderator's mark, the guild's tag, a World Boss's title), and on
-// the Walka screen the World Boss of its band with HP in ten digits, the
-// best ten of the week and last week's chest to open, and an attack on it
-// with the fight in the arena (the cards' HP lines inside their cards). The bag
+// the Walka's Postrach Krainy tab the World Boss of its band with HP in ten
+// digits, the best ten of the week and last week's chest to open (the dot
+// on its option of the Walka's switch), and an attack on it with the fight
+// in the arena (the cards' HP lines inside their cards). The bag
 // is checked with its six tabs, on its Zioła and Spiżarnia (herbs, dishes,
 // fish and crops by the thousand), and in "Zaznacz do sprzedaży" too, with
 // an item marked. On each screen,
@@ -79,6 +80,7 @@ const SCREENS = [
   '#/walka',
   '#/walka/windfalls',
   '#/walka/windfalls/windfalls-edge',
+  '#/postrach',
   '#/kultywacja',
   '#/portale',
   '#/wieze',
@@ -134,6 +136,7 @@ const TRANSLATED = new Set([
   '#/walka',
   '#/walka/windfalls',
   '#/walka/windfalls/windfalls-edge',
+  '#/postrach',
   '#/kultywacja',
   '#/portale',
   '#/wieze',
@@ -264,15 +267,14 @@ const SHEETS = {
     { name: 'za dużo', fill: '#chest-gold-amount', value: '99999999999', ready: '.chest-gold-warn:not([hidden])', words: true },
   ],
   // The sheet Tygodnie from the week's line on the Walka screen (weeks.js),
-  // its whole year left as the player left it; then, that sheet closed, an
-  // attack on the World Boss (Postrach Krainy) with its fight played in the
-  // arena, the boss's HP of ten digits on its card (24.11.2026). The button
-  // under a short phone's bars is tapped as a script would (`script`), and
-  // the fight is given the time the server takes for it.
-  '#/walka': [
-    { name: 'Tygodnie', tap: '.week-line', ready: '.week-card--now', words: true },
-    { name: 'Postrach Krainy › walka', anew: true, tap: '.world-boss-attack', script: true, ready: '.arena', timeout: 30000, words: true },
-  ],
+  // its whole year left as the player left it.
+  '#/walka': [{ name: 'Tygodnie', tap: '.week-line', ready: '.week-card--now', words: true }],
+  // An attack on the World Boss on its tab of the Walka (Postrach Krainy,
+  // 24.11.2026) with its fight played in the arena, the boss's HP of ten
+  // digits on its card. The button under a short phone's bars is tapped as
+  // a script would (`script`), and the fight is given the time the server
+  // takes for it.
+  '#/postrach': [{ name: 'walka', tap: '.world-boss-attack', script: true, ready: '.arena', timeout: 30000, words: true }],
   // A card of the starter deck in the Encyklopedia's "Karty": its sheet.
   '#/encyklopedia/cards': [{ name: 'karta', tap: '[data-guide="encyclopedia-card"]', ready: '.encyclopedia-card-sheet', words: true }],
   // "Parametry dodatkowe" (with the side stats, 1218), then, that sheet
@@ -616,8 +618,8 @@ async function main() {
   sql(
     `UPDATE characters SET settlement = json_set(COALESCE(settlement, '{}'), '$.relations', json_set(COALESCE(json_extract(settlement, '$.relations'), '{}'), ${setRelations})) WHERE name = '${name}'`,
   );
-  // The World Boss of its band on the Walka screen (world-boss.js; 1222–1226
-  // A): Kamienna Baba of the levels 126–150, with HP in ten digits and two
+  // The World Boss of its band on its tab of the Walka (world-boss.js;
+  // 1222–1226 A): Kamienna Baba of the levels 126–150, with HP in ten digits and two
   // attacks left today; the best ten of the boss, the member of the longest
   // name first, then the guild's reserve, and the character 12th with nine
   // digits of damage; the boss of the period before fallen by its blow, its
@@ -685,7 +687,7 @@ async function main() {
   let problems = 0;
   for (const size of SIZES) {
     // The World Boss's attacks of today as seeded (two left), whatever the
-    // size before took with its fight (SHEETS, '#/walka').
+    // size before took with its fight (SHEETS, '#/postrach').
     sql(`UPDATE world_boss_fighters SET day = '${day}', day_hits = 1 WHERE week = '${weekOf(0)}' AND character_id = ${own}`);
     const options ={ viewport: { width: size.width, height: size.height }, deviceScaleFactor: 1, isMobile: size.mobile, hasTouch: size.mobile, locale: LOCALE, timezoneId: 'Europe/Warsaw' };
     let view = null;

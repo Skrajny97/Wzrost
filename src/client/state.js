@@ -27,6 +27,10 @@ export const state = {
   // The banners standing over the lands this week, by land: the guild's
   // id, tag and name (1200 A; GET /api/character, guild-lands.js).
   landBanners: {},
+  // The Skrzynie Bossa the character may open now (GET /api/character and
+  // the World Boss's answers, src/server/world-boss.js), for the dot of the
+  // Postrach Krainy's tab in the Walka (combat-modes.js).
+  worldBossChests: 0,
   // The mercenary taken from the Karczma or picked in "Opcje wyprawy", for
   // the next exploration of the character named `by` (mercenaries.js).
   mercenary: null,
@@ -103,6 +107,7 @@ export async function call(method, path, body) {
   if (data && Object.hasOwn(data, 'championTag')) state.championTag = data.championTag;
   if (data && Object.hasOwn(data, 'fame')) state.fame = data.fame;
   if (data && Object.hasOwn(data, 'landBanners')) state.landBanners = data.landBanners ?? {};
+  if (data && Object.hasOwn(data, 'worldBossChests')) state.worldBossChests = data.worldBossChests ?? 0;
   if (data?.character && (action || actionsShown === shownBefore)) {
     if (action) actionsShown += 1;
     state.offset = data.character.serverTime - (sentAt + Date.now()) / 2;

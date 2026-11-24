@@ -2,10 +2,10 @@
 // (or shows the running exploration and the report to claim). A region shows
 // its inner regions as circles, open from the class level each needs. An
 // inner region shows the length, the threat level and the start. The
-// Portale and the Wieże are tabs beside it (combatModes, screens/towers.js),
-// shown from the start. The code calls explorations hunts and
-// inner regions areas. Its texts are written in Polish and shown in the
-// page's language (t(), i18n.js).
+// Portale, the Wieże, the Postrach Krainy and the Kultywacja are tabs beside
+// it (combat-modes.js), shown from the start. The code calls explorations
+// hunts and inner regions areas. Its texts are written in Polish and shown
+// in the page's language (t(), i18n.js).
 
 import { areaArt } from '../area-art.js';
 import { dishSprite, landArt, materialSprite, monsterSprite, potionSprite } from '../art.js';
@@ -51,14 +51,13 @@ import { confirmAction, lockLabel, openSheet, systemLink, systemPanel, toast, wi
 import { openEvent } from '../event.js';
 import { BUSY, partyFree, partyWent, skipLines } from './party.js';
 import { mercenaryChoice, servicePanel } from '../mercenaries.js';
-import { combatModes } from './towers.js';
+import { combatModes } from '../combat-modes.js';
 import { weekLine } from '../weeks.js';
 import { omenLines } from '../andrzejki.js';
 import { partyGated } from '../party-gate.js';
 import { guildHelpStrip } from '../guild-help.js';
 import { bannerChip, bannerLine } from '../guild-lands.js';
-import { worldBossCard } from '../world-boss.js';
-import { cultivationBusy, cultivationLink } from '../cultivation.js';
+import { cultivationBusy } from '../cultivation.js';
 
 // Shown through t(), as the page loads its English after this module.
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
@@ -367,10 +366,6 @@ export function mountCombat(container, { params, navigate }) {
   // The shortcut to help in the guild (guild-help.js, 20.11.2026), made once
   // for the visit and kept over the screen's renders.
   const helpStrip = guildHelpStrip();
-  // The World Boss's card (world-boss.js; 1222–1226 A), made with the main
-  // view's first render and kept over the screen's renders, empty below its
-  // unlock.
-  let bossCard = null;
 
   // HP in tenths of the maximum: resting moves the threat now and then.
   const hpStep = (character, now) => Math.floor((currentHp(character, now) / character.maxHp) * 10);
@@ -481,7 +476,6 @@ export function mountCombat(container, { params, navigate }) {
     // (andrzejki.js, 1082 C). The fortune evenings' card is at the
     // Zaklinaczka's in the Osada (24.11.2026).
     if (activity || !region) {
-      bossCard ??= worldBossCard();
       fill(
         container,
         helpStrip,
@@ -491,9 +485,7 @@ export function mountCombat(container, { params, navigate }) {
         modeTabs(),
         testTools(),
         partyReportNote(character),
-        // The World Boss under the exploration on its way, and over the
-        // lands while the character is free (1226).
-        activity ? [activityCard(activity), wantedStrip(character), bossCard] : [bossCard, regionList(character)],
+        activity ? [activityCard(activity), wantedStrip(character)] : regionList(character),
       );
       return;
     }
@@ -560,13 +552,15 @@ export function mountCombat(container, { params, navigate }) {
     );
   }
 
-  // "Eksploracja" and "Wieże" (screens/towers.js), the Wieże from their level.
+  // The switch over the Walka's parts (combat-modes.js), the Eksploracja
+  // pressed.
   const modeTabs = () => combatModes('explore', navigate);
 
   function activityCard(activity) {
     // A mercenary's offer or service lives in the Karczma (mercenaries.js).
     if (activity.kind === 'mercenary') return servicePanel(activity);
-    // A Kultywacja lives on its own screen (cultivation.js).
+    // A Kultywacja lives on its own tab (cultivation.js): here a line, as
+    // the character sets out on no exploration meanwhile, with the way there.
     if (activity.kind === 'cultivation') return cultivationBusy(activity);
     // A gathering of herbs, a brewing of potions and an order of items live
     // on their own screens; here they only say so.
@@ -715,8 +709,6 @@ export function mountCombat(container, { params, navigate }) {
         ? systemPanel(t('Wiatrołomy to najbezpieczniejsze miejsce na start. Wybierz czas eksploracji i wyrusz.'))
         : unarmed && systemPanel(t('Walczysz gołymi rękami. Załóż broń z plecaka w zakładce Postać, jeśli już ją masz.')),
       wantedStrip(character),
-      // The way to the Kultywacja, from its unlock (cultivation.js).
-      cultivationLink(character),
       landList(character),
     );
   }
@@ -2035,7 +2027,6 @@ export function mountCombat(container, { params, navigate }) {
     tick,
     unmount: () => {
       helpStrip.stop();
-      bossCard?.stop();
     },
   };
 }

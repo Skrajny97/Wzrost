@@ -12,12 +12,12 @@
 // wyprawami"). The words are shown in the page's language (t(), i18n.js).
 
 import { placeArt } from '../art.js';
+import { combatModes } from '../combat-modes.js';
 import { fill, h } from '../dom.js';
 import { formatNumber } from '../format.js';
 import { language, t } from '../i18n.js';
 import { call, isUnlocked, reportCache, setCharacter, state, unlockInfo } from '../state.js';
 import { howItWorks, systemPanel, toast, withButton } from '../ui.js';
-import { combatModes } from './towers.js';
 
 // A name inside a sentence: small in Polish ("drewno +9"), as written in
 // English ("Wood +9").

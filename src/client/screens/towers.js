@@ -19,42 +19,13 @@
 
 import { areaArt } from '../area-art.js';
 import { placeArt } from '../art.js';
+import { combatModes } from '../combat-modes.js';
 import { fill, h } from '../dom.js';
 import { formatDecimal, formatNumber } from '../format.js';
 import { t } from '../i18n.js';
 import { MERCENARIES_HASH, serviceBusy } from '../mercenaries.js';
 import { activityFinished, call, isUnlocked, reportCache, state, unlockInfo } from '../state.js';
-import { howItWorks, lockLabel, systemLink, systemPanel, withButton } from '../ui.js';
-
-// "Eksploracja", "Portale" and "Wieże" over the Walka, as in
-// screens/combat.js, in the page's language (t(), i18n.js): the Walka tab
-// shows them from the start, a locked one with its level.
-export function combatModes(active, navigate) {
-  const option = (label, hash, pressed, id) => {
-    const locked = Boolean(id) && !isUnlocked(id);
-    const info = id && unlockInfo(id);
-    return h(
-      'button',
-      {
-        type: 'button',
-        class: 'segmented-option',
-        'aria-pressed': pressed,
-        disabled: locked,
-        onClick: () => {
-          if (!pressed) navigate(hash);
-        },
-      },
-      locked ? [label, ' ', lockLabel(t('poz. {level}', { level: info.level }))] : label,
-    );
-  };
-  return h(
-    'div',
-    { class: 'segmented segmented--three', role: 'group', 'aria-label': t('Rodzaj walki') },
-    option(t('Eksploracja'), '#/walka', active === 'explore', null),
-    option(t('Portale'), '#/portale', active === 'portals', 'portals'),
-    option(t('Wieże'), '#/wieze', active === 'towers', 'towers'),
-  );
-}
+import { howItWorks, systemLink, systemPanel, withButton } from '../ui.js';
 
 export function mountTowers(container, { navigate }) {
   let view = null;

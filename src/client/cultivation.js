@@ -4,20 +4,23 @@
 // it gets character XP, up to the class's level, and every meditation
 // grows the Kultywacja's own level (0–100), each level a share more
 // character XP from explorations. It has a screen of its own
-// (#/kultywacja, mountCultivation), as a profession's, with its scene and
-// its music (data/music.json, place `cultivation`): its level with the bar
-// to the next one and its bonus, the character's and the class's levels,
-// the XP of each length split into character XP and the Kultywacja's, and
+// (#/kultywacja, mountCultivation), a tab of the Walka since 24.11.2026
+// (combat-modes.js; the author: „Postrach Krainy i Kultywacja powinny byc
+// osobnymi zakładkami w Walce”), with its scene and its music
+// (data/music.json, place `cultivation`): its level with the bar to the
+// next one and its bonus, the character's and the class's levels, the XP
+// of each length split into character XP and the Kultywacja's, and
 // "Medytuj"; while it runs, the timer, "Przewiń" and "Przerwij Kultywację";
-// then "Odbierz raport". The Walka's main view leads to it with a card
-// (cultivationLink) and, while it runs, with a line as for a profession's
-// work (cultivationBusy). The scene is data/animations.json `cultivation`,
-// a sheet as a work's (scenes.js loopScene). Its texts are written in
-// Polish and shown in the page's language (t(), i18n.js).
+// then "Odbierz raport". While it runs, the Eksploracja says so with a line
+// as for a profession's work (cultivationBusy), as no exploration sets out
+// meanwhile; once it has ended, a dot lights its tab. The scene is
+// data/animations.json `cultivation`, a sheet as a work's (scenes.js
+// loopScene). Its texts are written in Polish and shown in the page's
+// language (t(), i18n.js).
 
-import { fill, h, icon, setTimer } from './dom.js';
+import { combatModes } from './combat-modes.js';
+import { fill, h, setTimer } from './dom.js';
 import { dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from './format.js';
-import { leaveView, openView } from './history.js';
 import { t } from './i18n.js';
 import { loopScene } from './scenes.js';
 import { activityFinished, call, isUnlocked, reportCache, serverNow, state, unlockInfo } from './state.js';
@@ -69,37 +72,8 @@ const newLevels = (before, after) => (after > before ? ` · ${t('poziom {before}
 // The Kultywacja's bonus, "+7% XP postaci z wypraw".
 const bonusText = (view) => t('{share} XP postaci z wypraw', { share: percent(view.bonus) });
 
-// The Walka's way to the Kultywacja while the character is at home, from
-// its unlock: a card as a land's, its scene behind the words, with its
-// level and bonus, and how far the class is.
-export function cultivationLink(character) {
-  const view = character.cultivation;
-  const plan = view?.plan;
-  if (!plan || character.activity) return null;
-  const card = h(
-    'a',
-    { class: `card region-card region-link cultivation-link${plan.open ? '' : ' cultivation-link--met'}`, href: CULTIVATION_HASH, 'data-guide': 'cultivation', onClick: (event) => openView(event, CULTIVATION_HASH, 'walka') },
-    h('div', { class: 'region-head' }, h('h2', { class: 'card-title', text: t('Kultywacja') }), h('span', { class: 'region-chips' }, h('span', { class: 'chip chip--system', text: t('poz. {level}', { level: view.level }) }))),
-    h('p', { class: 'region-trait', text: t('Twoja postać medytuje zamiast wyprawy: zdobywa XP postaci, aż dogoni klasę, i poziomy Kultywacji, które dają więcej XP postaci z wypraw.') }),
-    h(
-      'p',
-      { class: 'region-foot' },
-      // The class's part on one line, not "54 h 28" and "min" below.
-      h('span', {}, `${bonusText(view)} · `, h('span', { class: 'cultivation-foot-class', text: plan.open ? t('do klasy {time}', { time: formatMinutes(plan.minutes) }) : t('postać dogoniła klasę') })),
-      icon('chevron', { size: 20 }),
-    ),
-  );
-  // The sheet's first frame, as wide as the card (styles.css).
-  const art = sheet();
-  if (art) {
-    card.style.setProperty('--cultivation-art', `url("/${art.file}")`);
-    card.style.setProperty('--cultivation-frames', String(art.frames));
-  }
-  return card;
-}
-
-// The Walka's line while a Kultywacja runs or its report waits, as a
-// profession's work has its own, with the way to its screen.
+// The Eksploracja's line while a Kultywacja runs or its report waits, as a
+// profession's work has its own, with the way to its tab.
 export const cultivationBusy = (activity) =>
   systemPanel(
     activityFinished(activity) ? t('Kultywacja zakończona. Raport czeka w Kultywacji.') : t('Twoja postać medytuje w Kultywacji do {time}.', { time: timeFormat.format(new Date(activity.endsAt)) }),
@@ -260,30 +234,20 @@ function picker(character, view) {
   );
 }
 
-// The Kultywacja's screen: at home, what it is, its own level, the
-// character's and the class's levels, the length and "Medytuj" (or the word
-// that a meditation would give nothing now); while it runs, the timer with
-// the bar, "Przewiń" and "Przerwij Kultywację"; once it has ended, "Odbierz
-// raport". The scene stands on top of each, and the music of the place
-// plays (app.js: the route's music).
+// The Kultywacja's screen, under the Walka's heading and its switch
+// (combat-modes.js) as the Portale and the Wieże: at home, what it is, its
+// own level, the character's and the class's levels, the length and
+// "Medytuj" (or the word that a meditation would give nothing now); while it
+// runs, the timer with the bar, "Przewiń" and "Przerwij Kultywację"; once it
+// has ended, "Odbierz raport". The scene stands on top of each, and the
+// music of the place plays (app.js: the route's music).
 export function mountCultivation(container, { navigate }) {
   let countdown = null;
   let progress = null;
   let skipper = null;
   let shownFinished = null;
 
-  const heading = (character) =>
-    h(
-      'div',
-      { class: 'page-heading page-heading--back' },
-      h(
-        'div',
-        { class: 'page-heading-text' },
-        h('h1', { class: 'page-title', tabindex: '-1', text: t('Kultywacja') }),
-        h('p', { class: 'page-subtitle', text: t('Postać: poz. {level} · Klasa: poz. {classLevel}', { level: character.level, classLevel: character.classLevel }) }),
-      ),
-      h('button', { type: 'button', class: 'button button--system back-button', onClick: () => leaveView(WALKA, 1, 'walka') }, icon('back', { size: 20 }), t('Powrót')),
-    );
+  const heading = () => [h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: t('Walka') })), combatModes('cultivation', navigate)];
 
   function render() {
     const character = state.character;
@@ -297,24 +261,24 @@ export function mountCultivation(container, { navigate }) {
       const unlock = unlockInfo('cultivation');
       fill(
         container,
-        heading(character),
+        heading(),
         systemPanel(t('Dostęp zablokowany. {name}: od poziomu postaci {level}. Twój poziom: {own}.', { name: unlock?.name ?? t('Kultywacja'), level: unlock?.level ?? '', own: character.level })),
       );
       return;
     }
     if (activity?.kind === 'cultivation') {
-      fill(container, heading(character), activityView(activity, view));
+      fill(container, heading(), activityView(activity, view));
       tick(serverNow());
       return;
     }
     // Busy with another activity: the Kultywacja waits for its end.
     if (activity || !view.plan) {
-      fill(container, heading(character), scene(), levelCard(view), systemPanel(t('Twoja postać jest teraz zajęta. Kultywację zaczniesz, gdy skończy.'), systemLink(WALKA, t('Do Walki'))));
+      fill(container, heading(), scene(), levelCard(view), systemPanel(t('Twoja postać jest teraz zajęta. Kultywację zaczniesz, gdy skończy.'), systemLink(WALKA, t('Do Walki'))));
       return;
     }
     fill(
       container,
-      heading(character),
+      heading(),
       h(
         'article',
         { class: 'card cultivation-card', 'aria-label': t('Kultywacja') },
