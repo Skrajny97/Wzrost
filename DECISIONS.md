@@ -4353,6 +4353,10 @@ Gracz (poz. 99) przez autora: „Kosmetyczna uwaga. Jak w rankingu ktoś ma nada
 
 Autor zapytał informacyjnie o grę podobną do Stardew Valley, a potem do Coral Island, osadzoną w świecie Insight, skupioną na walce, z profesjami, robioną na boku po trochu jako osobny projekt, w grafice innej niż pixel art. Rozpoznanie (silnik, grafika 3D z AI, budżet telefonu, co skopiować z Insight, plan 10 etapów, nakład i ryzyka) jest w `docs/plans/gra-3d-w-stylu-coral-island.md`. Autor: „Na razie zapisujemy ten plan na przyszłość”. Nic się nie zaczyna, dopóki autor sam tego nie powie; decyzje S1–S3 z końca planu czekają na start.
 
+## Wersja 0.5.11 (24.11.2026): przywołańce Druida ściągają ciosy wrogów
+
+Zob. „Druid: przywołańce na wyprawach i na Arenie (24.11.2026)”, punkty 10–16: przywołańce Druida, Arcydruida i Pradruida ściągają na siebie ciosy wrogów (także rywala na Arenie i w wojnach gildii), mają dodatkowo 75% maks. HP postaci i stoją ruch dłużej, a siła linii w pojedynkach przeszła z własnych ciosów Druida na przywołańce (bez `duelPower`, z `duelSummonPower`). Przy okazji teksty z liczbą ruchów („przez {turns} swoje ruchy”, „przez {turns} ruchy” w dzienniku walki) odmieniają się teraz według liczby: „1 swój ruch”, „3 swoje ruchy”, „5 swoich ruchów” (`{turns|swój ruch|swoje ruchy|swoich ruchów}`, `counted` w `src/engine/text.js`), bo przy 5 ruchach przywołań wychodziło „na 5 swoje ruchy”. Angielski bez zmian.
+
 ## Wersja 0.5.8 (24.11.2026): Druid na wyprawach i Pradruid na Arenie
 
 Według sekcji niżej. Autor: „Druid jest za silny na Arenie a za słaby na wyprawach coś z tym musimy zrobić”. Pomiary pokazały, że na Arenie najsilniejszy z tej linii jest Pradruid, a sam Druid jest najsłabszą drugą formą, więc osłabiony jest Pradruid (punkt 7).

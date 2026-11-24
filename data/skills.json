@@ -38,7 +38,7 @@
     "style": "obrona",
     "rarity": "common",
     "description": "Kiedy robi się groźnie, wojownik zapiera się tarczą i nie cofa się o krok.",
-    "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}, odzyskuje {heal%} maks. HP i na {turns} swoje ruchy zyskuje {armor%} pancerza więcej.",
+    "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}, odzyskuje {heal%} maks. HP i na {turns|swój ruch|swoje ruchy|swoich ruchów} zyskuje {armor%} pancerza więcej.",
     "kind": "guard",
     "mana": 12,
     "params": { "below": 0.5, "heal": [0.08, 0.12], "armor": [1.5, 2.5], "turns": [3, 4] }
@@ -97,7 +97,7 @@
     "style": "atak",
     "rarity": "common",
     "description": "Mag zbiera żar w dłoniach i ciska nim we wroga.",
-    "effect": "Zaklęcie ognia za {power%} obrażeń. Trafiony ma {dotChance%} szans na Oparzenie: przez {dotTicks} swoje ruchy traci po {dotPower%} obrażeń zaklęcia.",
+    "effect": "Zaklęcie ognia za {power%} obrażeń. Trafiony ma {dotChance%} szans na Oparzenie: przez {dotTicks|swój ruch|swoje ruchy|swoich ruchów} traci po {dotPower%} obrażeń zaklęcia.",
     "kind": "strike",
     "mana": 12,
     "cooldown": 3,
@@ -208,7 +208,7 @@
     "style": "trucizna",
     "rarity": "common",
     "description": "Cień smaruje ostrze jadem żmii. Każde draśnięcie pali od środka.",
-    "effect": "Na początku walki, do jej końca: każdy cios ma {dotChance%} szans na Zatrucie. Zatruty przez {dotTicks} swoje ruchy traci po {dotPower%} obrażeń ciosu.",
+    "effect": "Na początku walki, do jej końca: każdy cios ma {dotChance%} szans na Zatrucie. Zatruty przez {dotTicks|swój ruch|swoje ruchy|swoich ruchów} traci po {dotPower%} obrażeń ciosu.",
     "kind": "coat",
     "mana": 12,
     "params": { "dotEffect": "poisoned", "dotChance": [0.45, 0.65], "dotPower": [0.15, 0.25], "dotTicks": 3 }

@@ -1376,6 +1376,10 @@
     "0.5.10": {
       "title": "Version 0.5.10",
       "body": "- The World Boss now appears every 3 days instead of every week, so you win chests and titles more often. The first such boss appears on Monday 30 November.\n- The top ten's title now lasts until the end of the next boss's time."
+    },
+    "0.5.11": {
+      "title": "Version 0.5.11",
+      "body": "- Druid, Archdruid and Elder Druid: summons draw the enemies' blows onto themselves. While they stand, creatures and rivals hit them, not your character or your companions.\n- Each summon also gets an extra 75% of the character's max HP, so it can take several blows from an elite or a champion. Summon Ent, Summon Bear and Call of the Beasts now last 5 turns, and Ancient Herd 6.\n- In the Arena and guild wars the Druid's own blows are like anyone else's, and the fight stats show its real attack. The Druid's strength in duels now lies in its summons."
     }
   }
 }
