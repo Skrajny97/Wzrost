@@ -3930,6 +3930,10 @@ Gracz (poz. 69), moderator gildii, przez autora: „Jeśli chodzi o aktywność 
 4. Po angielsku: „Fame this week: 1,234” i „Sort: Rank | Last online | Fame”. Sprawdzone na 320, 360, 390, 430, 1366 i 1920 px z imionami po 20 znaków i Sławą w sześciu cyfrach, po polsku i po angielsku: bez przewijania na boki i bez tekstu poza ramką. Na 320 px „Ostatnio online” mieści się w przycisku w dwóch linijkach.
 5. Pliki: `src/server/guild-members.js`, `src/server/guilds.js`, `src/client/screens/guild.js`, `src/client/styles.css` (`.guild-member-fame`), `data/en/strings.json`. Test: `test/guild-members.test.js`.
 
+## Wersja 0.5.1 (24.11.2026): Labirynt: nagrody za ukończenie, darmowy start od nowa
+
+Według sekcji niżej, bez makiet (linijki i znaczek przekreślonej monety na istniejących ekranach Labiryntu).
+
 ## Labirynt: nagrody za ukończenie (24.11.2026)
 
 Gracz (poz. 228): „Jeszcze można ogarnąć coś dodatkowego za labirynt, ukończenie całego”, „bo teraz bardziej się opłaca wywalić przed i zrobić jeszcze raz niż to kończyć”. Autor: „Racja, też dobry pomysł” i „jakieś dodatkowe nagrody za pełne poziomy? żeby się nie opłacało przegrywać?”. W trakcie pracy autor dodał: „Niech restartowanie Labiryntu dodatkowo po porażce nie daje nagród (poza błogosławieństwami) aż do momentu w którym się przegrało, ale za to niech będzie darmowe”.

@@ -1336,6 +1336,10 @@
     "0.5.0": {
       "title": "Version 0.5.0",
       "body": "- Guild › Members: each member shows the Fame it brought the guild this week next to its “last online”. The list can be sorted by Rank, Last online or Fame."
+    },
+    "0.5.1": {
+      "title": "Version 0.5.1",
+      "body": "- Labyrinth: beating each level's guardian for the first time that day gives an extra reward: Core Shards and gold, the most for level 3 and the Hellish level.\n- Labyrinth: after a defeat you start again for free. Up to the place of the defeat, chambers give no rewards, only blessings; after it they pay as usual. On the map such chambers show a coin struck through."
     }
   }
 }
