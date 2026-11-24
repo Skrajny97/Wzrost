@@ -131,7 +131,7 @@ import { finishMining } from './mining.js';
 import { finishFishing } from './fishing.js';
 import { finishFarming } from './farming.js';
 import { applyPartyEvent, checkedChoice, leaderView, resolveAuto, resolvePartyRow, tripEvent, tripLine } from './party-events.js';
-import { partyGate } from './parties.js';
+import { partyGate, threatCrew } from './parties.js';
 import { wantedAfterHunt, wantedGoing, wantedOnTrip } from './wanted.js';
 import { keptWeek, weekFor } from './weeks.js';
 import { winterGainSql } from './winter.js';
@@ -199,23 +199,28 @@ export function companionsKey(player, now, rested) {
 // `hard`: against the creatures of a Trudna wyprawa (true, 629 A) or of a
 // Piekielna ('hell'). `healing`: the healing potions taken along
 // (healingFor), which the explorations with companions drink as on the way
-// (threatSamples' trips), so they are part of the key.
-function cachedSamples(player, character, equipped, areaId, now, hard = false, healing = null) {
+// (threatSamples' trips), so they are part of the key. `crew`: the others
+// of a Drużyna's trip as it would go (parties.js: threatCrew), who fight
+// beside the character in place of its companions, each whole in the key.
+function cachedSamples(player, character, equipped, areaId, now, hard = false, healing = null, crew = null) {
   // Each item worn whole: an upgrade, a reforged affix or an element keeps
   // the item's id; and the evolution and the professions, whose levels give
   // stats (the code review: the threat stayed as before them).
-  const gear = [...equipped].sort((a, b) => a.id - b.id).map((item) => JSON.stringify(item));
+  const gearOf = (items) => [...items].sort((a, b) => a.id - b.id).map((item) => JSON.stringify(item));
+  const gear = gearOf(equipped);
   // The companions who would go along fight beside the character
-  // (companions.js).
-  const companions = settlementOn() ? companionsGoing(player, now) : [];
+  // (companions.js); a Drużyna's trip goes without them.
+  const companions = settlementOn() && !crew ? companionsGoing(player, now) : [];
   const party = companionsInFights(companions);
-  // The potions count only where the companions' explorations drink them.
-  const potions = party.length > 0 && healing ? [healing.potions, healing.below] : null;
+  const partners = (crew ?? []).map((one) => ({ character: one.character, equipped: one.equipped, name: one.name, hpShare: one.hpShare, potions: one.potions, healBelow: one.healBelow }));
+  const others = (crew ?? []).map((one) => [one.id, one.character, gearOf(one.equipped), one.hpShare, one.potions, one.healBelow ?? null]);
+  // The potions count only where the explorations with others drink them.
+  const potions = (party.length > 0 || partners.length > 0) && healing ? [healing.potions, healing.below] : null;
   // The Rdzeń's Artefakty and gem too (core.js), which change the fights.
-  const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, character.evolution, character.professions, gear, party, hard, character.core ?? null, potions]);
+  const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, character.evolution, character.professions, gear, party, hard, character.core ?? null, potions, others]);
   let samples = samplesCache.get(key);
   if (!samples) {
-    samples = threatSamples({ character, equipped, areaId, companions, hard, healing }, content());
+    samples = threatSamples({ character, equipped, areaId, companions, partners, hard, healing }, content());
     if (samplesCache.size >= SAMPLES_CACHE_SIZE) samplesCache.delete(samplesCache.keys().next().value);
     samplesCache.set(key, samples);
   }
@@ -301,7 +306,11 @@ function huntFeats(hunt, kills) {
 
 // ?area=… asks for one inner region, which keeps each request within the CPU
 // limit. Without it the answer covers the inner region of each region that fits
-// the character's level, if it is open.
+// the character's level, if it is open. ?party=1: the threat of a Drużyna's
+// trip, its leader with the others as they would go (gracz (poz. 95),
+// 24.11.2026: „żeby system przeliczał ryzyko wyprawy dla drużyny razem z
+// innymi graczami w drużynie”; parties.js: threatCrew), each area's answer
+// with `party` true; without a member to take, the character's own.
 export async function huntOptions(context) {
   const { player } = await requirePlayer(context);
   const character = engineCharacter(player.row);
@@ -327,6 +336,7 @@ export async function huntOptions(context) {
   // count too (healingFor).
   const met = JSON.parse(player.row.met ?? '[]');
   const healing = healingFor(player, params);
+  const crew = params.get('party') === '1' ? await threatCrew(context.env.DB, player, context.now) : null;
   // ?hard=1: the threats of a Trudna wyprawa, ?hell=1 of a Piekielna (which
   // wins when both come), from the challenge's level (629 A; the author,
   // 19.11.2026).
@@ -353,12 +363,20 @@ export async function huntOptions(context) {
     maxHp,
     areas: areas.map((place) => {
       const { id } = place;
-      const samples = cachedSamples(player, character, equipped, id, context.now, hard, healing);
+      const samples = cachedSamples(player, character, equipped, id, context.now, hard, healing, crew);
       const catchUp = rareCatchUp(character.level, place, met, content());
       const threat = estimateThreat({ character, equipped, hp, areaId: id, catchUp, healing }, content(), samples);
       const avoiding = estimateThreat({ character, equipped, hp, areaId: id, avoidRare: true, healing }, content(), samples);
       const seeking = estimateThreat({ character, equipped, hp, areaId: id, seekRare: true, catchUp, healing }, content(), samples);
-      return { id, ...(hard && { [hard === 'hell' ? 'hell' : 'hard']: true }), threat, threatAvoiding: lowerThreat(avoiding, threat), threatSeeking: higherThreat(seeking, threat), ...(watch && scoutView(place, threat, catchUp)) };
+      return {
+        id,
+        ...(hard && { [hard === 'hell' ? 'hell' : 'hard']: true }),
+        ...(crew && { party: true }),
+        threat,
+        threatAvoiding: lowerThreat(avoiding, threat),
+        threatSeeking: higherThreat(seeking, threat),
+        ...(watch && scoutView(place, threat, catchUp)),
+      };
     }),
   });
 }

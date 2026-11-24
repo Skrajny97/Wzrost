@@ -354,6 +354,11 @@ export function mountCombat(container, { params, navigate }) {
   let partyAskedAt = 0;
   let partyLeads = false;
   let partyAgain = null;
+  // The members a party's trip would take now while "Z drużyną" is ticked
+  // (partyChoice), or null: the threat is then the whole party's (gracz
+  // (poz. 95), 24.11.2026: „żeby system przeliczał ryzyko wyprawy dla
+  // drużyny razem z innymi graczami w drużynie”; partyQuery).
+  let partyGoers = null;
   // The shortcut to help in the guild (guild-help.js, 20.11.2026), made once
   // for the visit and kept over the screen's renders.
   const helpStrip = guildHelpStrip();
@@ -388,15 +393,20 @@ export function mountCombat(container, { params, navigate }) {
         const hp = hpStep(character, serverNow());
         const healing = healingQuery();
         const hard = hardQuery();
+        const party = partyKey();
         const known = options[areaId];
-        if (known && known.build === build && known.hp === hp && known.healing === healing && known.hard === hard) continue;
-        const { areas } = await call('GET', `/api/hunts/options?area=${encodeURIComponent(areaId)}${healing}${hard}`);
+        if (known && known.build === build && known.hp === hp && known.healing === healing && known.hard === hard && known.party === party) continue;
+        const { areas } = await call('GET', `/api/hunts/options?area=${encodeURIComponent(areaId)}${healing}${hard}${party ? '&party=1' : ''}`);
         const [found] = areas;
         options[areaId] = {
           build,
           hp,
           healing,
           hard,
+          party,
+          // Whether the server counted the party: without a member to take
+          // the threat is the character's own.
+          partyCounted: Boolean(found.party),
           threat: found.threat,
           threatAvoiding: found.threatAvoiding,
           threatSeeking: found.threatSeeking,
@@ -416,10 +426,16 @@ export function mountCombat(container, { params, navigate }) {
     }
   }
 
+  // The threat of a Drużyna's trip: while "Z drużyną" is ticked with members
+  // to take, the server counts them all as the trip would go ("&party=1",
+  // hunts.js: huntOptions), and a change of who goes asks again; before
+  // 24.11.2026 it was the character's alone (926 B).
+  const partyKey = () => (partyGoers?.length > 0 ? partyGoers.join('|') : '');
+
   // A Trudna wyprawa for the threat (629 A): "&hard=1" while its box is
   // ticked, where the character has it; a Piekielna's "&hell=1" the same.
   // So with "Z drużyną" ticked too, as the party's trip goes in it
-  // (parties.js); the threat is still the character's alone (926 B).
+  // (parties.js), for the whole party (partyKey).
   function hardQuery() {
     if (state.character?.hellHunt && hellHuntOn()) return '&hell=1';
     return state.character?.hardHunt && hardHuntOn() ? '&hard=1' : '';
@@ -869,10 +885,12 @@ export function mountCombat(container, { params, navigate }) {
 
     const threatValue = h('strong', {});
     const threatLine = h('p', { class: 'threat' }, t('Zagrożenie: '), threatValue);
-    // With "Z drużyną" ticked the threat is still the character's alone,
-    // which the line under it says (the author's 926 B, 13.11.2026); hidden
-    // while the exploration is the character's own (partyChoice's ride).
-    const threatAlone = h('p', { class: 'threat-alone', hidden: true, text: t('Zagrożenie liczone dla Ciebie samego.') });
+    // With "Z drużyną" ticked, the line under it says whom the threat
+    // counts: the whole party as it would go (gracz (poz. 95), 24.11.2026),
+    // or the character alone where the server had no member to take (the
+    // author's 926 B, 13.11.2026, before the party's threat); hidden while
+    // the exploration is the character's own (partyChoice's ride).
+    const threatAlone = h('p', { class: 'threat-alone', hidden: true });
     // The Warownia's Strażnica: the chances of the length chosen under the
     // threat, and from its 2nd level one of the place's creatures to track
     // (fortress.js in the engine). Not on a Drużyna's trip, whose fights are
@@ -1085,7 +1103,7 @@ export function mountCombat(container, { params, navigate }) {
     showThreat = () => {
       const known = options[area.id];
       const ratings =
-        known && known.build === buildKey(state.character) && known.healing === healingQuery() && known.hard === hardQuery()
+        known && known.build === buildKey(state.character) && known.healing === healingQuery() && known.hard === hardQuery() && known.party === partyKey()
           ? avoiding()
             ? known.threatAvoiding
             : seeking()
@@ -1095,6 +1113,8 @@ export function mountCombat(container, { params, navigate }) {
       const threat = ratings?.[minutes];
       threatLine.className = `threat threat--${threat ?? 'unknown'}`;
       threatValue.textContent = threat ? t(THREAT_NAMES[threat]) : '…';
+      threatAlone.hidden = !partyKey() || !ratings;
+      threatAlone.textContent = known?.partyCounted ? t('Zagrożenie liczone dla całej drużyny.') : t('Zagrożenie liczone dla Ciebie samego.');
       const chances = !first && known ? (seeking() ? known.chancesSeeking : known.chances)?.[minutes] : null;
       watchLine.hidden = !chances;
       if (chances) {
@@ -1222,7 +1242,10 @@ export function mountCombat(container, { params, navigate }) {
       : partyChoice((ride) => {
           partyRide = ride;
           showRide();
-          threatAlone.hidden = ride === undefined;
+          // The threat of the trip as it would go now: the party's, or the
+          // character's own.
+          loadOptions();
+          showThreat?.();
         });
     start = h('button', {
       type: 'button',
@@ -1384,10 +1407,15 @@ export function mountCombat(container, { params, navigate }) {
   // and undefined when the trip is the character's own. A leader's box is
   // asked again now and then (partyAskedAt), and drawn again only when what
   // it says changed, so it does not jump under the finger.
-  function partyChoice(onRide) {
+  function partyChoice(told) {
     const element = h('div', { class: 'party-choice', hidden: true });
     let free = [];
     let said = null;
+    // Who the trip takes for the threat (partyGoers), with the ride.
+    const onRide = (ride) => {
+      partyGoers = ride === undefined || free.length === 0 ? null : [...free];
+      told(ride);
+    };
     const show = ({ party, ownCompanions = [] }) => {
       // A box of a view drawn over since is left as it is.
       if (!element.isConnected) return;

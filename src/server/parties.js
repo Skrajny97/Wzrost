@@ -620,6 +620,38 @@ function memberPotions(row, minutes) {
   return { potions, healBelow: healBelowChoices.includes(kept.healBelow) ? kept.healBelow : healBelow };
 }
 
+// The others of a Drużyna as its trip would take them now, for the threat
+// of the trip (hunts.js: huntOptions; gracz (poz. 95), 24.11.2026: „żeby
+// system przeliczał ryzyko wyprawy dla drużyny razem z innymi graczami w
+// drużynie”): the members free now, or back with a report waiting, as the
+// setting out takes them (setOut), each with its character, its gear, its
+// HP as a share of its most in tenths (so the threat is asked anew only as
+// it rests by a tenth) and the potions of its choice (memberPotions; those
+// of the longest trip, the threat's trips taking of each one a fight). Only
+// for the party's leader with a member to take: null otherwise, and the
+// threat is the character's own.
+export async function threatCrew(db, player, now) {
+  const party = await partyOf(db, player.row.id);
+  if (!party || party.leaderId !== player.row.id) return null;
+  const others = (await Promise.all(party.memberIds.filter((id) => id !== player.row.id).map((id) => loadCharacter(db, id)))).filter(Boolean);
+  const going = others.filter((other) => !other.activity || reportWaits(other.activity.kind, other.activity.ends_at, now));
+  if (going.length === 0) return null;
+  const longest = content().balance.hunt.maxMinutes;
+  return going.map((member) => {
+    const { hp, maxHp } = currentHp(member, now);
+    const { potions = {}, healBelow } = memberPotions(member.row, longest);
+    return {
+      id: member.row.id,
+      name: member.row.name,
+      character: engineCharacter(member.row),
+      equipped: equippedItems(member),
+      hpShare: Math.max(1, Math.floor((hp / maxHp) * 10)) / 10,
+      potions,
+      ...(healBelow !== undefined && { healBelow }),
+    };
+  });
+}
+
 // PUT /api/party/potions { potions: { [id]: count }, healBelow }: a member's
 // choice of potions for its party's trips (memberPotions): healing and mana
 // potions by id, each a whole number from 0 to the fights of the longest
