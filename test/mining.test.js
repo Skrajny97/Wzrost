@@ -235,6 +235,12 @@ describe('Górnictwo in the engine', () => {
       ['Złoty róg', 'Tier IX', 'Dodatki', 'Szlifiernia: wzór od 175. poziomu Jubilerstwa.'],
       ['Złota kaczka', 'Tier X', 'Dodatki', 'Szlifiernia: wzór od 200. poziomu Jubilerstwa.'],
     ]);
+    // The jewels of Tiers XI and XII stand in their Tiers, without a pattern
+    // of the Szlifiernia until their lands come.
+    for (const [id, tier] of [['syrenka-necklace', 'Tier XI'], ['barbara-ring', 'Tier XI'], ['golden-apple', 'Tier XI'], ['dzidzilela-necklace', 'Tier XII'], ['snake-king-ring', 'Tier XII'], ['thunderstone', 'Tier XII']]) {
+      assert.equal(tierOf.get(id).name, tier, id);
+      assert.ok(!tierOf.get(id).entries.find((entry) => entry.id === id).sources.some((line) => line.startsWith('Szlifiernia')), id);
+    }
     // A jewel's card names the same Tier, and no Warsztat base says Szlifiernia.
     for (const base of jewelBases(content)) {
       const item = generateItem({ baseId: base.id, rarityId: 'common', level: 60 }, createRng(base.id), content);
@@ -335,6 +341,11 @@ describe('Jubilerstwo in the engine', () => {
     assert.deepEqual([at200.length, ['rzepicha-necklace', 'bona-ring', 'golden-duck'].every((id) => at200.includes(id))], [30, true]);
     assert.ok(knownJewelPatterns(199, ['rzepicha-necklace'], content).some((base) => base.id === 'rzepicha-necklace'));
     assert.equal(jewelPatternFrom({ base: 'rzepicha-necklace' }, [], content), 'rzepicha-necklace');
+    // Tiers XI and XII (DECISIONS.md, „Tiery XI i XII przedmiotów”): their
+    // jewels only drop until their lands come, as Tier X's did before Nawia's.
+    assert.equal(knownJewelPatterns(200, ['syrenka-necklace', 'thunderstone'], content).length, 30);
+    assert.equal(jewelPatternFrom({ base: 'barbara-ring' }, [], content), null);
+    assert.equal(jewelPatternFrom({ base: 'snake-king-ring' }, [], content), null);
     const seventh = jewelReport({ ...reportOf, before: { level: 124, xp: 0 }, after: { level: 125, xp: 0 } }, content);
     assert.deepEqual(seventh.revealed, ['pectoral', 'ancestors-ring', 'grzywna']);
     assert.ok(seventh.system.includes('Osiągnięto poziom Jubilerstwa: 125'), seventh.system.join(' | '));

@@ -384,10 +384,10 @@ describe('items', () => {
       const before = content.bases
         .filter((other) => (other.family ?? other.id) === base.family && (other.classLevel ?? 1) < base.classLevel)
         .reduce((best, other) => ((other.classLevel ?? 1) > (best.classLevel ?? 1) ? other : best));
-      assert.ok([10, 25, 50, 75, 100, 125, 150, 175, 200].includes(base.classLevel), base.id);
-      // At most 45% above the first base's (Tier X: x1.45, rounded up to
-      // hundredths; Tier IX: x1.40; Tier VIII: x1.35).
-      assert.ok(base[key[base.kind]] > before[key[base.kind]] && base[key[base.kind]] <= Math.ceil(first[key[base.kind]] * 145 - 1e-9) / 100, base.id);
+      assert.ok([10, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250].includes(base.classLevel), base.id);
+      // At most 55% above the first base's (Tier XII: x1.55, rounded up to
+      // hundredths; Tier XI: x1.50; Tier X: x1.45; Tier IX: x1.40).
+      assert.ok(base[key[base.kind]] > before[key[base.kind]] && base[key[base.kind]] <= Math.ceil(first[key[base.kind]] * 155 - 1e-9) / 100, base.id);
       for (const cls of content.classes) {
         assert.equal(canUse(base.id, cls.id, content), canUse(first.id, cls.id, content), `${base.id} for ${cls.id}`);
       }
@@ -401,11 +401,11 @@ describe('items', () => {
     }
   });
 
-  test('every category has bases from class levels 10, 25, 50, 75, 100, 125, 150, 175 and 200, dropping from those levels', () => {
+  test('every category has bases from class levels 10, 25, 50, 75, 100, 125, 150, 175, 200, 225 and 250, dropping from those levels', () => {
     const firsts = content.bases.filter((base) => !base.family);
     for (const first of firsts) {
       const levels = content.bases.filter((base) => base.family === first.id).map((base) => base.classLevel);
-      assert.deepEqual(levels, [10, 25, 50, 75, 100, 125, 150, 175, 200], first.id);
+      assert.deepEqual(levels, [10, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250], first.id);
     }
     assert.equal(canUse('saber', 'warrior', content, 24), false);
     assert.equal(canUse('saber', 'warrior', content, 25), true);
@@ -433,6 +433,13 @@ describe('items', () => {
     // Tier X (1086): the Miecz Grunwaldzki from class level 200.
     assert.equal(canUse('grunwald-sword', 'warrior', content, 199), false);
     assert.equal(canUse('grunwald-sword', 'warrior', content, 200), true);
+    // Tiers XI and XII (DECISIONS.md, „Tiery XI i XII przedmiotów”): the
+    // Miecz Rugiewita from class level 225, the Miecz Arkony from 250.
+    assert.equal(canUse('rugievit-sword', 'warrior', content, 224), false);
+    assert.equal(canUse('rugievit-sword', 'warrior', content, 225), true);
+    assert.equal(canUse('arkona-sword', 'warrior', content, 249), false);
+    assert.equal(canUse('arkona-sword', 'warrior', content, 250), true);
+    assert.equal(canUse('arkona-sword', 'mage', content, 250), false);
     assert.equal(canUse('self-swinging-sword', 'mage', content, 150), false);
     const rng = createRng('trzecie-bazy');
     const swords = (maxClassLevel) => {
@@ -459,6 +466,11 @@ describe('items', () => {
     // of Sosnowe Wydmy, reaches it).
     assert.deepEqual(swords(149), ['broadsword', 'coronation-sword', 'estoc', 'flamberge', 'karabela', 'saber']);
     assert.deepEqual(swords(150), ['broadsword', 'coronation-sword', 'estoc', 'flamberge', 'karabela', 'saber', 'self-swinging-sword']);
+    // The Miecz Rugiewita from 225 (Kamienny Tron, 221–225, the last place of
+    // Gołoborza, reaches it) and the Miecz Arkony from 250 (Zaklęty Dwór,
+    // 246–250, the last place of Jodłowa Puszcza).
+    assert.ok(!swords(224).includes('rugievit-sword') && swords(225).includes('rugievit-sword'));
+    assert.ok(!swords(249).includes('arkona-sword') && swords(250).includes('arkona-sword'));
   });
 
   // The author's 570 A and 665: Tier VI from class level 100, one base in
@@ -598,6 +610,66 @@ describe('items', () => {
     }
   });
 
+  // Tiers XI and XII (DECISIONS.md, „Tiery XI i XII przedmiotów”): the
+  // Tiers up to level 500, one for each of the lands to come (351–425 and
+  // 426–500), from class levels 225 and 250, by the rule of the Tiers before
+  // them: the first base's factor x1.50 and x1.55, rounded up to hundredths,
+  // and the bonus from one above the Tier below's best up to half again it,
+  // rounded down; all else as the family's Tier X base has it.
+  test('Tiers XI and XII follow the Tier rule: the first base\'s factor x1.50 and x1.55 rounded up to hundredths, the bonus from one above the Tier below\'s best up to half again it, rounded down', () => {
+    const key = { weapon: 'damageFactor', armor: 'armorFactor', implicit: 'statFactor' };
+    const eleventh = content.bases.filter((base) => base.classLevel === 225);
+    const twelfth = content.bases.filter((base) => base.classLevel === 250);
+    assert.deepEqual(
+      eleventh.map((base) => base.name),
+      [
+        'Miecz Rugiewita', 'Ciupaga Janosika', 'Sztylet Zmory', 'Łuk Lela', 'Kostur Radogosta', 'Krzyż Świętokrzyski', 'Tarcza Jarowita', 'Kołczan Żar-ptaka',
+        'Szpon Gryfa', 'Globus Jagielloński', 'Kaptur Wilkołaka', 'Hełm Śpiącego Rycerza', 'Sukmana Kościuszki', 'Zbroja Czarnieckiego', 'Szata Rusałki',
+        'Korona Przemysła', 'Płaszcz Jacka', 'Rękawice Wyrwidęba', 'Buty Lajkonika', 'Naszyjnik Syrenki', 'Pierścień Barbary', 'Złote jabłko',
+      ],
+    );
+    assert.deepEqual(
+      twelfth.map((base) => base.name),
+      [
+        'Miecz Arkony', 'Topór Siemowita', 'Sztylet Czarnoboga', 'Łuk Chorsa', 'Kostur Roda', 'Dzwon Zygmunta', 'Tarcza Białoboga', 'Kołczan Wyraju',
+        'Pazur Boruty', 'Wrzeciono Rodzanic', 'Kaptur Wołchwa', 'Hełm Krzywoustego', 'Kaftan Wernyhory', 'Zbroja Batorego', 'Szata Wiły',
+        'Korona Piastów', 'Ornat Floriana', 'Rękawice Kmicica', 'Buty Pochwista', 'Naszyjnik Dzidzileli', 'Pierścień Króla Węży', 'Piorunowa strzałka',
+      ],
+    );
+    const below = (base) => content.bases.find((one) => one.family === base.family && one.classLevel === base.classLevel - 25);
+    for (const [bases, step] of [[eleventh, 150], [twelfth, 155]]) {
+      for (const base of bases) {
+        const first = content.basesById[base.family];
+        const before = below(base);
+        assert.equal(base[key[base.kind]], Math.ceil(first[key[base.kind]] * step - 1e-9) / 100, base.id);
+        assert.deepEqual(base.bonus, { min: before.bonus.max + 1, max: Math.floor(before.bonus.max * 1.5) }, base.id);
+        // All else as the family's Tier X base has it.
+        const own = new Set(['id', 'name', 'gender', 'classLevel', 'bonus', key[base.kind]]);
+        const rest = (one) => Object.fromEntries(Object.entries(one).filter(([field]) => !own.has(field)));
+        const tenth = content.bases.find((one) => one.family === base.family && one.classLevel === 200);
+        assert.deepEqual(rest(base), rest(tenth), base.id);
+      }
+    }
+    // The Miecz Rugiewita 1.2 x 1.5 = 1.8 and 407–609 (the Miecz Grunwaldzki's
+    // 406), the Miecz Arkony 1.2 x 1.55 = 1.86 and 610–913 (half again 913.5);
+    // the Sztylet Zmory 0.85 x 1.5 = 1.275, so 1.28, and 293–438.
+    assert.deepEqual([content.basesById['rugievit-sword'].damageFactor, content.basesById['rugievit-sword'].bonus], [1.8, { min: 407, max: 609 }]);
+    assert.deepEqual([content.basesById['arkona-sword'].damageFactor, content.basesById['arkona-sword'].bonus], [1.86, { min: 610, max: 913 }]);
+    assert.deepEqual([content.basesById['zmora-dagger'].damageFactor, content.basesById['zmora-dagger'].bonus], [1.28, { min: 293, max: 438 }]);
+    // The weakest piece of each beats the best of the Tier below at the levels
+    // it drops at, and well past them.
+    const number = (item) => (item.damage ? (item.damage.min + item.damage.max) / 2 : item.armor ?? item.implicit.value);
+    const rng = createRng('jedenasty-tier');
+    const rolls = (baseId, level) => Array.from({ length: 24 }, () => number(generateItem({ baseId, level }, rng, content)));
+    for (const base of [...eleventh, ...twelfth]) {
+      for (const level of [base.classLevel, 350, 500]) {
+        const weakest = Math.min(...rolls(base.id, level));
+        const best = Math.max(...rolls(below(base).id, level));
+        assert.ok(weakest > best, `${base.id} at level ${level}: ${weakest} against ${below(base).id} ${best}`);
+      }
+    }
+  });
+
   // The author's 814: wherever an item goes by the character's class level,
   // Tier VII comes from 125 and not before, as Tier VI from 100. The Wieże:
   // test/towers.test.js.
@@ -657,6 +729,38 @@ describe('items', () => {
           .filter((item) => eighth.has(item.base)).length;
       assert.equal(found(149), 0, `${name} at class level 149`);
       assert.ok(found(150) > 0, `${name} at class level 150`);
+    }
+  });
+
+  // Tiers XI and XII the same way, from 225 and from 250.
+  test('Tiers XI and XII from class levels 225 and 250 in the weekly chest, from the wandering trader, in the Salon Gier and in the chests of the Bestia, the Wyprawa and the war of the guilds', () => {
+    const beast = guildBeast({ seed: 'jedenasty', levels: [260] }, content);
+    const route = guildExpedition({ levels: [260] }, content);
+    const stage = content.guilds.expedition.guardians.findIndex((tuning) => tuning.item) + 1;
+    const guardian = expeditionGuardian({ stage, level: route.level, members: 2, guardians: route.guardians }, content);
+    const day = { key: 'jedenasty', startsAt: 0, endsAt: 1 };
+    const warrior = (classLevel, seed) => ({ level: 260, classId: 'warrior', classLevel, seed });
+    const sources = {
+      weekly: (classLevel, seed) => [chestItem(warrior(classLevel), [], createRng(seed), content)],
+      trader: (classLevel, seed) => wandererGoods(warrior(classLevel, seed), 0, content, day).goods.map((good) => good.item),
+      salon: (classLevel, seed) =>
+        wheelPrizes({ ...warrior(classLevel), sellBonus: 0, tanneryPremium: 0 }, seed, day.key, content)
+          .filter((prize) => prize.kind === 'item')
+          .map((prize) => prize.item),
+      beast: (classLevel, seed) => [beastChest({ ...warrior(classLevel, seed), wornSlots: ['weapon'], beast, tier: beastChestTier({ hp: 0, maxHp: 1 }, content) }, content).item],
+      expedition: (classLevel, seed) => [expeditionChest({ ...warrior(classLevel, seed), stage, wornSlots: ['weapon'], guardian }, content).item],
+      war: (classLevel, seed) => warChest({ fighters: [warrior(classLevel)], teams: 2, seed }, content),
+    };
+    for (const tierLevel of [225, 250]) {
+      const tier = new Set(content.bases.filter((base) => base.classLevel === tierLevel).map((base) => base.id));
+      for (const [name, draw] of Object.entries(sources)) {
+        const found = (classLevel) =>
+          Array.from({ length: 60 }, (_, index) => draw(classLevel, `${name}${tierLevel}-${index}`))
+            .flat()
+            .filter((item) => tier.has(item.base)).length;
+        assert.equal(found(tierLevel - 1), 0, `${name} at class level ${tierLevel - 1}`);
+        assert.ok(found(tierLevel) > 0, `${name} at class level ${tierLevel}`);
+      }
     }
   });
 

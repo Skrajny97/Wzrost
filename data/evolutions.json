@@ -477,6 +477,7 @@
     },
     {
       "id": "lich",
+      "duelPower": 0.9,
       "classId": "shadow",
       "from": "necromancer",
       "name": "Licz",

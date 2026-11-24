@@ -96,6 +96,13 @@ describe('the Warsztat in the engine', () => {
     assert.ok(at200.length === 190 && at200.includes('grunwald-sword') && at200.includes('walgierz-boots') && !at200.includes('rzepicha-necklace'));
     assert.ok(knownPatterns(199, ['grunwald-sword'], content).some((pattern) => pattern.id === 'grunwald-sword'));
     assert.equal(patternFrom({ base: 'grunwald-sword' }, [], content), 'grunwald-sword');
+    // Tiers XI and XII (DECISIONS.md, „Tiery XI i XII przedmiotów”) only drop
+    // until their lands come (351–425 and 426–500), as Tier X did before
+    // Nawia's: no pattern at the profession's last level, nor from one taken
+    // apart.
+    assert.equal(knownPatterns(content.professionsById[content.workshop.profession].maxLevel, ['rugievit-sword', 'kmicic-gloves'], content).length, 190);
+    assert.equal(patternFrom({ base: 'rugievit-sword' }, [], content), null);
+    assert.equal(patternFrom({ base: 'pozvizd-boots' }, [], content), null);
     // Taking one apart teaches it earlier.
     assert.ok(knownPatterns(10, ['estoc'], content).some((pattern) => pattern.id === 'estoc'));
     assert.ok(knownPatterns(50, ['gothic-armor'], content).some((pattern) => pattern.id === 'gothic-armor'));

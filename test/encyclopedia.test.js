@@ -45,9 +45,9 @@ describe('the Encyklopedia in the engine', () => {
     assert.deepEqual(mergeDiscoveries({ 'item:sword': 2, 'herb:comfrey': 1 }, held), held);
   });
 
-  test('items come in ten tiers by the class level they are worn from, each with a set for every class and one with the accessories', () => {
+  test('items come in twelve tiers by the class level they are worn from, each with a set for every class and one with the accessories', () => {
     const sets = itemSets(content);
-    assert.equal(sets.length, 60);
+    assert.equal(sets.length, 72);
     assert.deepEqual(
       sets.filter((set) => set.tier === 0).map((set) => [set.name, set.bases.length]),
       [
@@ -72,6 +72,10 @@ describe('the Encyklopedia in the engine', () => {
     assert.deepEqual(sets.find((set) => set.id === 'items:9:warrior').bases.slice(0, 3), ['szczerbiec', 'perun-axe', 'achilles-shield']);
     // Tier X (1086), from class level 200.
     assert.deepEqual(sets.find((set) => set.id === 'items:10:warrior').bases.slice(0, 3), ['grunwald-sword', 'svarozhich-axe', 'lech-shield']);
+    // Tiers XI and XII, from class levels 225 and 250 (DECISIONS.md, „Tiery XI
+    // i XII przedmiotów”).
+    assert.deepEqual(sets.find((set) => set.id === 'items:11:warrior').bases.slice(0, 3), ['rugievit-sword', 'janosik-ciupaga', 'jarovit-shield']);
+    assert.deepEqual(sets.find((set) => set.id === 'items:12:warrior').bases.slice(0, 3), ['arkona-sword', 'siemowit-axe', 'belobog-shield']);
     const covered = new Set(sets.flatMap((set) => set.bases));
     assert.equal(covered.size, content.bases.length);
   });
@@ -274,7 +278,7 @@ describe('the Encyklopedia in the engine', () => {
   test('Tier X: its items from class level 200 with a set for every class and the accessories, its chest, its patterns, and the materials of Nawia\'s creatures', () => {
     const levels = { level: 230, classLevel: 200, professions: {} };
     const view = encyclopediaView({ discovered: {}, claimed: [], met: [], levels }, content);
-    const tenth = view.items.tiers.at(-1);
+    const tenth = view.items.tiers.find((tier) => tier.name === 'Tier X');
     assert.deepEqual([tenth.name, tenth.range, tenth.current, tenth.entries.length], ['Tier X', 'od 200. poziomu klasy', true, 22]);
     assert.deepEqual(
       tenth.sets.map((set) => [set.name, set.bases]),
@@ -300,9 +304,71 @@ describe('the Encyklopedia in the engine', () => {
     ]);
     assert.ok(tenth.entries.find((entry) => entry.id === 'rzepicha-necklace').sources.includes('Szlifiernia: wzór od 200. poziomu Jubilerstwa.'));
     // The materials of creatures above level 275: Nawia's, and the Łysogóry's
-    // champions above it, as Tier IX took those of Ostępy Nowiu above 200.
-    const tenthMaterials = view.materials.tiers.at(-1);
+    // champions above it, as Tier IX took those of Ostępy Nowiu above 200;
+    // those above 350 in Tier XI since it came.
+    const tenthMaterials = view.materials.tiers.find((tier) => tier.name === 'Tier X');
     assert.deepEqual([tenthMaterials.name, tenthMaterials.range, tenthMaterials.current], ['Tier X', 'poziomy 276–350', false]);
+  });
+
+  // Tiers XI and XII (DECISIONS.md, „Tiery XI i XII przedmiotów”): the Tiers up
+  // to level 500, one for each of the lands to come, 351–425 and 426–500, as
+  // Tier IX for Łysogóry and Tier X for Nawia; from class levels 225 and 250.
+  // Until their lands come they only drop, as Tier X did before Nawia's
+  // (1086.0 A): no pattern of the Warsztat or the Szlifiernia.
+  test('Tiers XI and XII: their items from class levels 225 and 250 with a set for every class and the accessories, their chests, no patterns yet, and the materials of the creatures above level 350', () => {
+    const levels = { level: 360, classLevel: 250, professions: {} };
+    const view = encyclopediaView({ discovered: {}, claimed: [], met: [], levels }, content);
+    const [eleventh, twelfth] = view.items.tiers.slice(-2);
+    assert.deepEqual([eleventh.name, eleventh.range, eleventh.current, eleventh.entries.length], ['Tier XI', 'od 225. poziomu klasy', false, 22]);
+    assert.deepEqual([twelfth.name, twelfth.range, twelfth.current, twelfth.entries.length], ['Tier XII', 'od 250. poziomu klasy', true, 22]);
+    assert.deepEqual(
+      eleventh.sets.map((set) => [set.name, set.bases]),
+      [
+        ['Wojownik', ['rugievit-sword', 'janosik-ciupaga', 'jarovit-shield', 'sleeping-knight-helmet', 'czarniecki-armor']],
+        ['Łucznik', ['lel-bow', 'zar-ptak-quiver', 'werewolf-hood', 'kosciuszko-sukmana']],
+        ['Mag', ['radegast-staff', 'jagiellonian-globe', 'werewolf-hood', 'rusalka-robe']],
+        ['Kleryk', ['lysiec-cross', 'jarovit-shield', 'jagiellonian-globe', 'przemysl-crown', 'hyacinth-cloak']],
+        ['Cień', ['zmora-dagger', 'griffin-talon', 'werewolf-hood', 'kosciuszko-sukmana']],
+        ['Dodatki', ['wyrwidab-gloves', 'lajkonik-boots', 'syrenka-necklace', 'barbara-ring', 'golden-apple']],
+      ],
+    );
+    assert.deepEqual(
+      twelfth.sets.map((set) => [set.name, set.bases]),
+      [
+        ['Wojownik', ['arkona-sword', 'siemowit-axe', 'belobog-shield', 'wrymouth-helmet', 'bathory-armor']],
+        ['Łucznik', ['khors-bow', 'vyraj-quiver', 'volkhv-hood', 'wernyhora-kaftan']],
+        ['Mag', ['rod-staff', 'rozhanitsy-spindle', 'volkhv-hood', 'vila-robe']],
+        ['Kleryk', ['sigismund-bell', 'belobog-shield', 'rozhanitsy-spindle', 'piast-crown', 'saint-florian-chasuble']],
+        ['Cień', ['chernobog-dagger', 'boruta-claw', 'volkhv-hood', 'wernyhora-kaftan']],
+        ['Dodatki', ['kmicic-gloves', 'pozvizd-boots', 'dzidzilela-necklace', 'snake-king-ring', 'thunderstone']],
+      ],
+    );
+    // Tier X's gold x2.5 (rounded up), Punkty Czasu 10 more a tier, Punkty
+    // Systemu at most 100.
+    for (const set of eleventh.sets) assert.deepEqual(set.chest, { gold: 610363, timePoints: 110, systemPoints: 100 }, set.name);
+    for (const set of twelfth.sets) assert.deepEqual(set.chest, { gold: 1525908, timePoints: 120, systemPoints: 100 }, set.name);
+    const warrior = itemSets(content).find((set) => set.id === 'items:12:warrior');
+    const found = Object.fromEntries(warrior.bases.map((id) => [`item:${id}`, 1]));
+    assert.deepEqual(encyclopediaChest('items:12:warrior', found, [], content).chest, { gold: 1525908, timePoints: 120, systemPoints: 100 });
+    // From Kamienny Tron (221–225), the last place of Gołoborza, and from
+    // Zaklęty Dwór (246–250), the last of Jodłowa Puszcza; no pattern line.
+    assert.deepEqual(eleventh.entries.find((entry) => entry.id === 'rugievit-sword').sources, [
+      'Wyprawy: wypada od regionu Kamienny Tron (poz. 221–225).',
+      'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
+      'Założysz od 225. poziomu klasy.',
+    ]);
+    assert.deepEqual(twelfth.entries.find((entry) => entry.id === 'thunderstone').sources, [
+      'Wyprawy: wypada od regionu Zaklęty Dwór (poz. 246–250).',
+      'Dla każdej klasy.',
+      'Założysz od 250. poziomu klasy.',
+    ]);
+    assert.ok([...eleventh.entries, ...twelfth.entries].every((entry) => !entry.craft && !entry.sources.some((line) => /^(Warsztat|Szlifiernia)/.test(line))));
+    // The materials of creatures above level 350, the champions and elites of
+    // Nawia's last place, in Tier XI, as Tier X took the Łysogóry's above 275.
+    const eleventhMaterials = view.materials.tiers.find((tier) => tier.name === 'Tier XI');
+    assert.deepEqual([eleventhMaterials.range, eleventhMaterials.current], ['poziomy 351–425', true]);
+    assert.ok(eleventhMaterials.entries.length > 0 && eleventhMaterials.entries.every((entry) => entry.id !== 'hut-claw'));
+    assert.equal(view.materials.tiers.at(-1).name, 'Tier XI');
   });
 
   test('a full set opens the chest of its tier, a count of discoveries its own chest in turn, each once', () => {
