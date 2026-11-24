@@ -1,0 +1,14 @@
+{
+  "id": "wb-miesiac",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Miesiac, the Moon of Slavic beliefs as a strong young man, the shepherd of the stars, broad shoulders, short silver hair and no beard, a calm cold face with glowing silver eyes, pale skin glowing softly like moonlight, a short belted silver-white tunic, dark blue trousers and tall boots, a bright silver crescent moon floating above his head like a crown with its two tips pointing up, a big round glowing full moon held on his arm like a shield, his other hand raised with cold silver light, standing firmly with feet apart, one bright wide shape filling the whole picture, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, majestic and menacing, full body, three-quarter view, the figure alone, no clouds, no ground, no background, the whole figure inside the picture, the crescent and the moon shield too",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024583166318893436
+  },
+  "images": 1
+}

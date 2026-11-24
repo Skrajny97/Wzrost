@@ -1,0 +1,14 @@
+{
+  "id": "pangolin",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant pangolin as big as a bear standing upright on its two hind legs, its whole body covered in big overlapping olive-brown scales like a pine cone or armour, a small pointed head with a long snout and small eyes, both front legs raised high with huge curved claws ready to slash, a long thick scaly tail curving behind it, one wide chunky shape filling the whole picture, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the animal alone, no branch, no ground, no background, the whole animal inside the picture, the whole tail too",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02453761773045858
+  },
+  "images": 1
+}
