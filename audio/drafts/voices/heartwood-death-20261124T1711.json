@@ -1,0 +1,13 @@
+{
+  "id": "heartwood-death",
+  "payload": {
+    "text": "a haunted living tree heart gives a long loud piercing creak like a rusty door hinge with a dry crackle of splinters that fades away, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/heartwood-death-20261124T1711-0.mp3",
+    "audio/drafts/voices/heartwood-death-20261124T1711-1.mp3"
+  ],
+  "credits": 64
+}
