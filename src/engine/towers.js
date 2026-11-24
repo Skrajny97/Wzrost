@@ -26,7 +26,7 @@
 
 import { combatantView, fightingClassLevel, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
-import { companionCombatant, trackerMaterials } from './companions.js';
+import { companionCombatant, companionForm, trackerMaterials } from './companions.js';
 import { addCounts, materialDrops, materialsText, stackKey } from './crafting.js';
 import { championItemRarity, encounterCombatants, encountersFor, expectedExploration, explorationPace } from './hunt.js';
 import { itemName, randomItem } from './items.js';
@@ -232,12 +232,29 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
   // combatant.js and companions.js are not checked yet: their options are
   // typed by their defaults alone (hp, area).
   const player = playerCombatant(/** @type {any} */ ({ character: weekFighter(character, week), equipped, name, area }), content);
+  // In the Wieże a form may call its summons with a share of their HP
+  // (evolutions.json towerSummonHp; combat.js): the Pradruid's (1249 B, the
+  // author 24.11.2026), whose four summons took every blow meant for it,
+  // so that alone it climbed some 150 floors above the other fourth forms.
+  // Its own form's, whoever fights: the character, a partner or a companion.
+  /**
+   * @param {Record<string, any>} unit
+   * @param {string | null | undefined} formId
+   */
+  const inTower = (unit, formId) => {
+    const share = formId ? content.evolutionsById?.[formId]?.towerSummonHp : undefined;
+    return share ? { ...unit, summonHpScale: share } : unit;
+  };
   const allies = [
-    { ...player, ...(Object.keys(trophies).length > 0 && { trophies }) },
-    ...partners.map((partner, index) => playerCombatant(/** @type {any} */ ({ character: weekFighter(partner.character, week), equipped: partner.equipped, name: partner.name, area, id: `p${index + 1}` }), content)),
+    inTower({ ...player, ...(Object.keys(trophies).length > 0 && { trophies }) }, character.evolution),
+    ...partners.map((partner, index) =>
+      inTower(playerCombatant(/** @type {any} */ ({ character: weekFighter(partner.character, week), equipped: partner.equipped, name: partner.name, area, id: `p${index + 1}` }), content), partner.character.evolution),
+    ),
     // The character's companions, stronger by its own class level
     // (companionBoost in companions.js).
-    ...companions.map((companion, index) => companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}`, classLevel: character.classLevel ?? 0 }), content)),
+    ...companions.map((companion, index) =>
+      inTower(companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}`, classLevel: character.classLevel ?? 0 }), content), companionForm(companion, content)?.id),
+    ),
   ];
   // Alone on a floor (the Wieża Solo), the monsters have only a share of the
   // late and end game's growth, as no companion helps (the author: 438.3 A).

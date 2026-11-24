@@ -40,9 +40,26 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { describe, test } from 'node:test';
 
-import { arenaDuel, buildContent, combatantView, createRng, duelArmorShare, duelHpFactor, duelist, monsterCombatant, playerCombatant, simulateFight, simulateHunt, skillCost, skillView } from '../src/engine/index.js';
+import {
+  arenaDuel,
+  buildContent,
+  combatantView,
+  companionForm,
+  createRng,
+  duelArmorShare,
+  duelHpFactor,
+  duelist,
+  monsterCombatant,
+  playerCombatant,
+  simulateFight,
+  simulateHunt,
+  skillCost,
+  skillView,
+  towerFight,
+  warBattle,
+} from '../src/engine/index.js';
 import { measureClass } from '../tools/class-balance-sim.mjs';
-import { GEAR_SETS, newestArea, playerOf, withArea } from '../tools/difficulty-sim.mjs';
+import { GEAR_SETS, companionsOf, newestArea, playerOf, withArea } from '../tools/difficulty-sim.mjs';
 import { loadData } from '../tools/validate-data.mjs';
 import { content } from './helpers/content.js';
 
@@ -392,5 +409,84 @@ describe('the Druid line in duels', () => {
         }
       }
     }
+  });
+});
+
+describe('the Pradruid in the Wieże (1249 B)', () => {
+  // The author's choice 1249 B: the Pradruid weaker in the Wieże only, its
+  // summons with less HP there. Before (0.5.11) alone at level 300 it
+  // climbed to floor 489, the other fourth forms to 224–329, and in the
+  // Wieża Drużyn too it climbed the highest. `whole`: the game as then.
+  const whole = (() => {
+    const raw = loadData();
+    delete raw.evolutions.evolutions.find((form) => form.id === 'elder-druid').towerSummonHp;
+    return buildContent(raw);
+  })();
+  const share = content.evolutionsById['elder-druid'].towerSummonHp;
+  // The first summon the fighter `id` calls in a fight.
+  const firstUp = (events, id) => events.find((event) => event.kind === 'summon' && event.state === 'up' && event.target === id);
+  const pradruid = { ...druidAt(300), name: 'Pradruid' };
+
+  test('only the Pradruid has its own share of its summons\' HP in the Wieże, and its trait says so in Polish and in English', () => {
+    assert.ok(share > 0 && share < 1, String(share));
+    assert.deepEqual(content.evolutions.filter((form) => form.towerSummonHp !== undefined).map((form) => form.id), ['elder-druid']);
+    assert.equal(pradruid.character.evolution, 'elder-druid');
+    const percent = `${Math.round(share * 100)}%`;
+    assert.ok(content.evolutionsById['elder-druid'].trait.text.endsWith(`W Wieżach Systemu przywołańce mają tylko ${percent} swojego HP.`));
+    const english = JSON.parse(readFileSync(new URL('../data/en/evolutions.json', import.meta.url), 'utf8'));
+    assert.ok(english.evolutions['elder-druid'].trait.text.endsWith(`In the System Towers the summons have only ${percent} of their HP.`));
+  });
+
+  test('in a Wieża its summons come with that share of their HP: the climber\'s, a partner\'s and a companion\'s', () => {
+    const warrior = { ...playerOf('realistic', 'warrior', 300, content, 0), name: 'Wojownik' };
+    // A Mag of the Arkanista's path at level 300 as a companion: a Pradruid.
+    const [mate] = companionsOf(warrior.plan, 301, 2, content);
+    const companion = { ...mate, classId: 'mage', skills: ['mana-shield', 'fireball'] };
+    assert.equal(companionForm(companion, content)?.id, 'elder-druid');
+    const cases = [
+      [{ character: pradruid.character, equipped: pradruid.equipped, name: 'Pradruid' }, 'a0'],
+      [{ character: warrior.character, equipped: warrior.equipped, name: 'Wojownik', partners: [pradruid] }, 'p1'],
+      [{ character: warrior.character, equipped: warrior.equipped, name: 'Wojownik', companions: [companion] }, 'a1'],
+    ];
+    for (const [options, id] of cases) {
+      const climb = (data) => towerFight({ floor: 250, seed: `tower-share:${id}`, ...options }, data).fights[0].events;
+      const now = firstUp(climb(content), id);
+      const then = firstUp(climb(whole), id);
+      assert.equal(now.summon, then.summon, id);
+      assert.ok(Math.abs(now.summonHp - then.summonHp * share) <= 1, `${id}: ${now.summonHp} of ${then.summonHp}`);
+    }
+  });
+
+  test('outside the Wieże nothing changes: an exploration\'s fight, a duel and a guild war\'s battle go as in 0.5.11', () => {
+    const rival = { ...playerOf('realistic', 'warrior', 300, content, 1), name: 'Rywal' };
+    const duel = (data) => arenaDuel({ attacker: pradruid, defender: rival, seed: 'tower-duel' }, data);
+    assert.deepEqual(duel(content), duel(whole));
+    const battle = (data) => warBattle({ sideA: [pradruid, rival, rival], sideB: [rival, pradruid, rival], seed: 'tower-war' }, data);
+    assert.deepEqual(battle(content), battle(whole));
+    const area = newestArea(300, content);
+    const hunt = (data) => {
+      const local = withArea(area, data);
+      const hp = playerCombatant({ character: pradruid.character, equipped: pradruid.equipped, name: 'Pradruid', area }, local).maxHp;
+      return simulateHunt({ character: pradruid.character, equipped: pradruid.equipped, hp, name: 'Pradruid', areaId: area.id, minutes: 60, seed: 'tower-hunt', rumor: 1e9 }, local);
+    };
+    const [now, then] = [hunt(content), hunt(whole)];
+    assert.ok(now.fights.some((fight) => fight.events.some((event) => event.kind === 'summon' && event.state === 'up')));
+    assert.deepEqual(now, then);
+  });
+
+  test('alone at level 300 it no longer gets past the champion of floor 350 (20% of the entries before), and it still wins the one of floor 325', () => {
+    const rate = (floor, data) => {
+      let won = 0;
+      for (let set = 0; set < GEAR_SETS; set++) {
+        const { character, equipped } = playerOf('realistic', 'mage', 300, data, set, 'mana-shield');
+        for (let seed = 0; seed < 4; seed++) {
+          if (towerFight({ character, equipped, name: 'Pradruid', floor, seed: `tower-wall:${set}:${seed}` }, data).result === 'success') won += 1;
+        }
+      }
+      return won / (GEAR_SETS * 4);
+    };
+    assert.equal(rate(350, content), 0);
+    assert.ok(rate(350, whole) > 0.05);
+    assert.ok(rate(325, content) >= 0.75);
   });
 });

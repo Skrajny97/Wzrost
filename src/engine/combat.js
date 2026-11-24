@@ -1899,7 +1899,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         // only with room for the whole pack (above).
         const members = p.pack ? p.pack.map((/** @type {Record<string, any>} */ one) => ({ ...p, ...one })) : [p];
         const called = members.map((/** @type {Record<string, any>} */ m, /** @type {number} */ index) => {
-          const hp = Math.max(1, Math.round(pool * m.hp * (1 + (grove?.summonHp ?? 0) + wise) + life));
+          // In the Wieże the Pradruid calls them with a share of that HP
+          // (1249 B: evolutions.json towerSummonHp; towerFight in towers.js).
+          const hp = Math.max(1, Math.round((pool * m.hp * (1 + (grove?.summonHp ?? 0) + wise) + life) * (actor.summonHpScale ?? 1)));
           const name = m.summonName;
           const order = p.pack ? index + 1 : 0;
           const summon = {
