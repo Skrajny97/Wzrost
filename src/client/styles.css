@@ -21253,6 +21253,18 @@ button.tcard-slot {
   margin-right: 6px;
 }
 
+/* A guild member's Sława of this week under its name and its last time
+   online (screens/guild.js), on a line of its own, so the members' numbers
+   stand one under another. */
+.guild-member-fame {
+  flex: 1 0 100%;
+  min-width: 0;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
 /* The allies in the Bestia's "Wkład tygodnia", their names to tap for their
    cards (guild-beast.js), the own one in the System's light. */
 .guild-beast-row {

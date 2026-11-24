@@ -241,6 +241,47 @@ describe('the Ranking członków through the API', () => {
     ]);
   });
 
+  // The Gildia's list of members (guilds.js; a player, 24.11.2026: „widać
+  // kiedy byli online i widać też pkt sławy każdego gracza jaki wkład ma,
+  // choć mogło by to być w jednym miejscu widoczne”): each member with the
+  // Sława of this week, the ranking's "Ten tydzień", every part counted.
+  test("the Gildia's members come with each one's Sława of this week, as the ranking's", async () => {
+    const forest = await guild('ala', 'Leśni Bracia', 'LB', [['ola', 'Ola']]);
+    const stone = await guild('ewa', 'Kamienny Krąg', 'KK', [['iza', 'Iza']]);
+    const week = questPeriod('weekly', Date.now(), content);
+    const last = questPeriod('weekly', week.startsAt - 1, content);
+    const at = Math.max(week.startsAt, Date.now() - HOUR);
+    await beast(forest, week.key, [[ids.ala, 655], [ids.ola, 345]], ids.ola, at);
+    await guardian(forest, week.key, stages, [[ids.ala, 1000]], at);
+    await trials(forest, week.key, ids.ola, cap + 2, at);
+    await gift(forest, ids.ala, ids.ola, 5, at);
+    await exchanges(forest, ids.ola, ids.ala, 2, at);
+    await run("INSERT INTO guild_helps (guild_id, week, helper_id, owner_id, target, cut, created_at) VALUES (?, ?, ?, ?, 'build', 60000, ?)", forest, week.key, ids.ola, ids.ala, at);
+    await run('INSERT INTO guild_land_fame (week, guild_id, character_id, points) VALUES (?, ?, ?, 7)', week.key, forest, ids.ala);
+    await war(week.key, forest, stone, [[[ids.ala, ids.ola], [ids.ewa, ids.iza]]]);
+    // Another guild's and last week's count not.
+    await trials(stone, week.key, ids.iza, 2, at);
+    await trials(forest, last.key, ids.ala, 2, last.startsAt + HOUR);
+    const share = Math.floor(fame.war.places[0] / 2);
+    const members = (await as('ola', 'GET', '/api/guild')).data.guild.members;
+    assert.deepEqual(
+      members.map((member) => [member.name, member.weekFame]),
+      [
+        ['Ala', 65 * fame.beast.perPercent + fame.expedition.last + 5 * fame.requests.perPiece + 2 * fame.exchange.perExchange + share + 7],
+        ['Ola', 34 * fame.beast.perPercent + fame.beast.fell + cap * fame.trials.perTrial + fame.help.perHelp + share],
+      ],
+    );
+    const weekly = (await ranking('ola')).activity.week;
+    assert.deepEqual(Object.fromEntries(members.map((member) => [member.name, member.weekFame])), Object.fromEntries(weekly.map((row) => [row.name, row.fame])));
+    assert.deepEqual(
+      (await as('iza', 'GET', '/api/guild')).data.guild.members.map((member) => [member.name, member.weekFame]),
+      [
+        ['Ewa', 0],
+        ['Iza', 2 * fame.trials.perTrial],
+      ],
+    );
+  });
+
   test("the donations by member, this week and from the start, and those of before in one line", async () => {
     const forest = await guild('ala', 'Leśni Bracia', 'LB', [['ola', 'Ola']]);
     const week = questPeriod('weekly', Date.now(), content);

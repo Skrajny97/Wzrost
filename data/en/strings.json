@@ -3700,5 +3700,9 @@
   "Nie udało się wczytać bohaterów tygodnia.": "Could not load the heroes of the week.",
   "Nie udało się wczytać krain.": "Could not load the lands.",
   "Nie udało się wczytać Kramu.": "Could not load the Stall.",
-  "Mana: {before} → {after}": "Mana: {before} → {after}"
+  "Mana: {before} → {after}": "Mana: {before} → {after}",
+  "Sława w tym tygodniu: {points}": "Fame this week: {points}",
+  "Ranga": "Rank",
+  "Sława": "Fame",
+  "Kolejność członków": "Member order"
 }
