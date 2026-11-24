@@ -1,0 +1,14 @@
+{
+  "id": "wb-jaszczur",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Jaszczur, the lizard king of the underground waters, a huge ancient lizard with a heavy body and a long tail, a crown-like crest of bony spikes on its head, mossy green scales with faint glowing pale blue runes on them, cold glowing yellow eyes, jaws open, crawling on four clawed legs, majestic and menacing, full body, three-quarter view, no water, the creature alone, no rocks, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023534901483747695
+  },
+  "images": 1
+}

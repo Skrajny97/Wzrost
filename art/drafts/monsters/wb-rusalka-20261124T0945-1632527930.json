@@ -1,0 +1,14 @@
+{
+  "id": "wb-rusalka",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Rusalka, the queen of the Slavic water maidens, a pale drowned young woman with grey-white skin, very long dark green hair like waterweed flowing down to her feet, a veil of green duckweed and a crown of white water lilies on her head, a wet ragged white gown, empty glowing pale eyes, both hands reaching out to grab, eerie and menacing, floating, full body, three-quarter view, no water, the creature alone, no rocks, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023639244759241743
+  },
+  "images": 1
+}

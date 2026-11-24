@@ -1,0 +1,14 @@
+{
+  "id": "wb-wapierz",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Wapierz, a Slavic vampire risen from an old barrow, a tall gaunt corpse-pale man with grey-white skin and a bald head, a torn white burial shroud hanging from his shoulders, long sharp fangs, glowing red eyes, long clawed hands reaching out, standing upright, eerie and menacing, full body, three-quarter view, no grave, the creature alone, no rocks, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02395218351512485
+  },
+  "images": 1
+}

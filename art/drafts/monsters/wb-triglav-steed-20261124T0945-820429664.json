@@ -1,0 +1,14 @@
+{
+  "id": "wb-triglav-steed",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Kary Kon Trzyglowa, the huge black sacred horse of the three-headed god Triglav, one powerful black horse body with three horse heads on three necks, a long flowing mane glistening like black water, glowing silver eyes, an old Slavic temple harness of red leather straps with round bronze plaques, rearing up on its hind legs, menacing, full body, three-quarter view, no rider, the creature alone, no rocks, no ground, no background, the whole creature inside the picture, all three heads whole",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024362870543162028
+  },
+  "images": 1
+}

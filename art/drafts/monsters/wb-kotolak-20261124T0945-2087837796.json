@@ -1,0 +1,14 @@
+{
+  "id": "wb-kotolak",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Kotolak, a were-lynx of Slavic legends, a hunched lynx-man standing on two legs, thick tawny fur with dark spots, a lynx head with long black ear tufts and a ruff of fur on its cheeks, long sharp claws on both hands, glowing yellow eyes, fangs bared, crouched and ready to pounce, menacing, full body, three-quarter view, the creature alone, no rocks, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024342631956100466
+  },
+  "images": 1
+}

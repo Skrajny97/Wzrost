@@ -1,0 +1,14 @@
+{
+  "id": "wb-dziwozona",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Dziwozona, a wild woman of the Slavic forests, a hag with wild matted black hair full of twigs, long dirty claws, sharp teeth bared, ragged clothes of bark and moss, crouching low and ready to leap, glowing yellow eyes, eerie and menacing, full body, three-quarter view, the creature alone, no rocks, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02350028562588162
+  },
+  "images": 1
+}

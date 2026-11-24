@@ -1,0 +1,14 @@
+{
+  "id": "wb-gorynych",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Gorynycz, the three-headed dragon of Slavic tales who guards the bridge into the land of the dead, a huge wingless dragon with dark green scales, three long snake-like necks with three horned dragon heads, grey smoke rising from the nostrils, glowing yellow eyes and sharp fangs, a long spiked tail, standing on four clawed legs, menacing, full body, three-quarter view, no wings, no bridge, the creature alone, no rocks, no ground, no background, the whole creature inside the picture, all three heads whole",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024643664450539487
+  },
+  "images": 1
+}

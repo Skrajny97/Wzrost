@@ -1,0 +1,14 @@
+{
+  "id": "wb-czarnobog",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Czarnobog, the Slavic god of darkness, a towering figure made of black smoke and night with faint stars glinting inside it, a tall crown of black iron spikes, cold pale glowing eyes in a dark faceless head, a long black cloak dissolving into darkness at its edges, long clawed shadow hands, majestic and menacing, standing, full body, three-quarter view, no wings, the creature alone, no rocks, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02441876437653436
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "wb-stone-baba",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Kamienna Baba, a living stone idol risen from an ancient burial mound, a squat heavy statue of a woman roughly carved from grey stone, a flat stern carved face, both hands folded over her round belly, deep cracks glowing orange like embers all over the stone, eyes glowing like embers, patches of green moss, menacing, standing, full body, three-quarter view, no mound, the creature alone, no rocks, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024249328617943662
+  },
+  "images": 1
+}

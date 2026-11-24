@@ -1,0 +1,14 @@
+{
+  "id": "wb-pochwist",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Pochwist, the Slavic spirit of the storm wind that fells whole forests, a towering whirlwind of swirling grey air full of torn green leaves and broken twigs for a body, no legs, a shaggy grey horned head with two glowing pale eyes on top of the whirlwind, two long thin arms ending in twig-like claws reaching out, furious and menacing, floating, full body, three-quarter view, no trees, the creature alone, no rocks, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023718641668319704
+  },
+  "images": 1
+}

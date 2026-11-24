@@ -1,0 +1,14 @@
+{
+  "id": "wb-boruta",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Boruta, the devil nobleman of Polish legends, a devil dressed as a Polish nobleman in a long green kontusz coat over a red zupan, a wide gold and red sash at the waist, a curved sabre in his hand, a fur kolpak cap with a white heron feather plume, small horns poking out from under the cap, a curled black moustache and a sly grin, glowing red eyes, one leg in a red boot and one goat hoof, menacing, standing, full body, three-quarter view, the creature alone, no rocks, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024362929332945087
+  },
+  "images": 1
+}

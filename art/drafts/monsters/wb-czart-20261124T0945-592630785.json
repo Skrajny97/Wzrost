@@ -1,0 +1,14 @@
+{
+  "id": "wb-czart",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Czart, a Polish devil with shaggy black fur, two curved goat horns, goat legs with cloven hooves and a long thin tail with a tuft at its end, glowing red eyes and a wicked grin, lifting a huge grey boulder above his head with both hands, ready to throw it, menacing, full body, three-quarter view, the creature alone holding its boulder, no other rocks, no ground, no background, the whole creature and the whole boulder inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024587727401945328
+  },
+  "images": 1
+}

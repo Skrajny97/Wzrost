@@ -1,0 +1,14 @@
+{
+  "id": "wb-zmora",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Zmora, the Slavic nightmare made of bog mist, a gaunt grey-white figure of thick mist and fog, a hollow skull-like face with two glowing pale green eyes, very long thin arms with very long bony fingers reaching out, wisps of fog trailing from its body, its lower half dissolving into fog, eerie and menacing, floating, full body, three-quarter view, the creature alone, no rocks, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023544927778667873
+  },
+  "images": 1
+}
