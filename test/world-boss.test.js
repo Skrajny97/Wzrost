@@ -34,19 +34,19 @@ const rules = content.worldBosses;
 const pieces = (materials) => Object.values(materials).reduce((sum, count) => sum + count, 0);
 
 describe('the World Bosses', () => {
-  test('fourteen bands, one for each land in order, each with its own boss of the land, none a bird', () => {
+  test('seventeen bands, one for each land in order, each with its own boss of the land, none a bird', () => {
     const bands = worldBossBands(content);
-    assert.equal(bands.length, 14);
+    assert.equal(bands.length, 17);
     assert.deepEqual(
       bands.map((band) => band.region),
       content.regions.map((region) => region.id),
     );
     assert.deepEqual(
       bands.map((band) => [band.minLevel, band.maxLevel]),
-      Array.from({ length: 14 }, (_, index) => [index * 25 + 1, index * 25 + 25]),
+      Array.from({ length: 17 }, (_, index) => [index * 25 + 1, index * 25 + 25]),
     );
-    assert.equal(new Set(bands.map((band) => band.boss.id)).size, 14);
-    assert.ok(bands.every((band, index) => band.last === (index === 13)));
+    assert.equal(new Set(bands.map((band) => band.boss.id)).size, 17);
+    assert.ok(bands.every((band, index) => band.last === (index === 16)));
     assert.ok(bands.every((band) => band.boss.family !== 'bird'));
     // The Boruta of the Łysa Góra is the nobleman of the event „Cyrograf”.
     assert.equal(worldBossBandOf('bald-mountain', content).boss.id, 'wb-boruta');
@@ -58,13 +58,15 @@ describe('the World Bosses', () => {
     assert.equal(worldBossBand(25, 25, content).region, 'windfalls');
     assert.equal(worldBossBand(20, 26, content).region, 'stone-glade');
     assert.equal(worldBossBand(126, 90, content).region, 'pine-dunes');
-    assert.equal(worldBossBand(300, 351, content).region, 'sunless-land');
-    assert.equal(worldBossBand(420, 500, content).region, 'sunless-land');
+    assert.equal(worldBossBand(300, 350, content).region, 'sunless-land');
+    assert.equal(worldBossBand(300, 351, content).region, 'isle-of-buyan');
+    assert.equal(worldBossBand(420, 500, content).region, 'sky-boughs');
     // The boss fights at that level, kept inside the band; the last band has no top.
     const first = worldBossBandOf('windfalls', content);
     assert.equal(bandLevel(first, 30), 25);
     assert.equal(bandLevel(worldBossBandOf('stone-glade', content), 12), 26);
-    assert.equal(bandLevel(worldBossBandOf('sunless-land', content), 400), 400);
+    assert.equal(bandLevel(worldBossBandOf('sunless-land', content), 400), 350);
+    assert.equal(bandLevel(worldBossBandOf('sky-boughs', content), 480), 480);
   });
 
   test('the measured damage of an attack: on the line between levels, below the first as at it, above the last in proportion', () => {

@@ -173,6 +173,26 @@
             "omen",
             "candle"
           ]
+        },
+        {
+          "id": "tree-explorer",
+          "name": "Odkrywca Drzewa Świata",
+          "goal": "Dotrzyj do Drzewa Świata (351. poziom postaci).",
+          "count": "landReached",
+          "land": "Drzewo Świata",
+          "target": 1,
+          "title": [
+            "Odkrywca Drzewa Świata",
+            "Odkrywczyni Drzewa Świata"
+          ],
+          "reward": {
+            "timePoints": 100,
+            "systemPoints": 10
+          },
+          "art": [
+            "monster",
+            "heartwood"
+          ]
         }
       ]
     },

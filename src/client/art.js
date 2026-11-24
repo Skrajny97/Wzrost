@@ -67,6 +67,14 @@ export const SPRITES = {
       'snake-maiden', 'dead-water', 'stick-insect', 'simargl', 'blood-feud', 'ghost-smith', 'shackles', 'steward', 'turon', 'veles', 'mammoth', 'pseudoscorpion',
       'silence', 'sledge', 'snow-flea', 'oblivion', 'ice-block', 'mayfly', 'longing', 'dread', 'rat-king', 'black-flame', 'koschei-egg', 'bayun',
       'ice-princess', 'marzanna', 'koschei',
+      // Drzewo Świata (351–425), as the author chose them on 24.11.2026 (1240),
+      // and its three World Bosses (1241).
+      'horseshoe-crab', 'starfish', 'electric-ray', 'shark', 'pufferfish', 'swordfish', 'sea-cucumber', 'anglerfish', 'lions-mane', 'walrus', 'haemorrhage', 'whispered-charm',
+      'acorn', 'acorn-weevil', 'oak-gall', 'ninth-wave', 'octopus', 'processionary', 'tarsier', 'scorpionfly', 'beefsteak-fungus', 'water-shrew', 'snakefly', 'log-hive',
+      'waxworm', 'intoxication', 'jewel-beetle', 'gecko', 'glare', 'capricorn-beetle', 'olm', 'honey-fungus', 'pangolin', 'heartwood', 'sloth', 'aphid',
+      'hesitation', 'hailstone', 'flying-carpet', 'thunder-arrow', 'bush-cricket', 'chameleon', 'oak-leaf', 'sleepwalker', 'glowworm', 'moon-halo', 'shield-bug', 'ladybird',
+      'comet', 'ball-lightning', 'pride',
+      'wb-whale-fish', 'wb-svarozhich', 'wb-miesiac',
     ],
   },
   // <class>-<look>, 96×128 (3:4), filled in as the portraits are approved,
@@ -417,13 +425,16 @@ export const SPRITES = {
       'misty-shore', 'viburnum-bridge', 'forefathers-isle', 'crossing-of-the-dead', 'gate-of-nav',
       'eternal-pastures', 'golden-ravines', 'serpent-springs', 'veles-oakwood', 'veles-court',
       'frozen-caves', 'road-of-the-dead', 'black-lake', 'chernobog-stronghold', 'koschei-castle',
+      'rocky-cape', 'shipwreck-bay', 'sea-caves', 'white-stone', 'green-oak',
+      'bark-cliffs', 'fungus-terraces', 'honey-hives', 'amber-cascades', 'bottomless-hollow',
+      'great-fork', 'cloud-bridges', 'sea-of-leaves', 'moon-cradle', 'highest-bough',
     ],
   },
   // The lands' wide scenes, dim behind the text of their cards, 192×96.
   lands: {
     width: 192,
     height: 96,
-    ids: ['windfalls', 'stone-glade', 'backwaters', 'peat-bogs', 'black-bog', 'pine-dunes', 'silent-wilds', 'new-moon-depths', 'scree-slopes', 'fir-forest', 'bald-mountain', 'navia-marshes', 'veles-meadows', 'sunless-land'],
+    ids: ['windfalls', 'stone-glade', 'backwaters', 'peat-bogs', 'black-bog', 'pine-dunes', 'silent-wilds', 'new-moon-depths', 'scree-slopes', 'fir-forest', 'bald-mountain', 'navia-marshes', 'veles-meadows', 'sunless-land', 'isle-of-buyan', 'great-trunk', 'sky-boughs'],
   },
   // The camp's buildings, <building>-<look> for the looks of levels 1–3, 4–7
   // and 8–10 (8–19 for the resource buildings, whose fourth look is the
@@ -579,7 +590,7 @@ export const SPRITES = {
   boards: {
     width: 192,
     height: 160,
-    ids: ['arena-board', 'board-windfalls', 'board-stone-glade', 'board-backwaters', 'board-peat-bogs', 'board-black-bog', 'board-pine-dunes', 'board-silent-wilds', 'board-new-moon-depths', 'board-scree-slopes', 'board-fir-forest', 'board-bald-mountain', 'board-navia-marshes', 'board-veles-meadows', 'board-sunless-land'],
+    ids: ['arena-board', 'board-windfalls', 'board-stone-glade', 'board-backwaters', 'board-peat-bogs', 'board-black-bog', 'board-pine-dunes', 'board-silent-wilds', 'board-new-moon-depths', 'board-scree-slopes', 'board-fir-forest', 'board-bald-mountain', 'board-navia-marshes', 'board-veles-meadows', 'board-sunless-land', 'board-isle-of-buyan', 'board-great-trunk', 'board-sky-boughs'],
   },
   // The buildings of the Siedziba Gildii (data/guilds.json, seat), by the
   // building's id, 128×96 on a transparent ground: the first look the

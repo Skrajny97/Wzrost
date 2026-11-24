@@ -1,5 +1,5 @@
 {
-  "$comment": "Postrach Krainy (1222–1226, wszystkie w wariancie A, przyjęte przez autora na stronie ocen; src/engine/world-boss.js, src/server/world-boss.js, src/client/world-boss.js; DECISIONS.md, „Postrach Krainy (1222–1226)”). W każdym okresie w każdym przedziale poziomów stoi jeden boss z jednym wspólnym HP dla wszystkich graczy przedziału. cycle: od dnia from (piątek 27.11.2026) okres to days dni po kolei, od północy czasu polskiego, liczone od tego dnia, te same dla wszystkich przedziałów; wcześniej był to tydzień, od poniedziałku do niedzieli, a tydzień trwający w dniu from kończy się o jego północy, z tym samym kluczem (DECISIONS.md, „Postrach Krainy co 3 dni (24.11.2026)”). Przedziały to krainy z data/regions.json, po kolei (1–25, 26–50, …, 326–350), każda ze swoim bossem z bosses (region: id krainy); postać wyżej niż ostatni przedział bije ostatniego bossa. Przedział postaci liczy się z wyższego z jej poziomów, postaci i klasy (jak blokada poziomu przedmiotów), i zostaje na cały okres od pierwszego ataku. attacksPerDay: ataki postaci na dobę. Atak to jedna walka postaci z towarzyszami, którzy poszliby z nią na wyprawę, z pełnym HP i bez mikstur, z bossem na poziomie postaci (wyższym z dwóch poziomów) w granicach przedziału; boss zaczyna walkę z HP, które mu zostało, a atak zbija tyle, ile stracił. Atak nie daje XP, złota ani łupów. hp: boss pojawia się z pierwszym spojrzeniem albo atakiem w okresie, a jego HP to attacksPerPlayer średnich ataków (damage) na każdą aktywną postać przedziału z tej chwili (grana postać konta, które było w grze w ostatnich activeDays dniach, z odblokowanym Postrachem Krainy), każda na swoim poziomie w granicach przedziału; bez nikogo jak jedna postać ze środka przedziału. damage: [poziom, średnie obrażenia jednego ataku], zmierzone realistycznymi postaciami z towarzyszami (tools/world-boss-sim.mjs); między punktami po prostej, poniżej pierwszego jak w pierwszym, powyżej ostatniego proporcjonalnie do poziomu. chests: Skrzynia Bossa dla każdej postaci, która biła bossa, po upadku bossa albo po końcu okresu; liczy się ostatnia skrzynia, której share osiągnęły obrażenia postaci, a share to część jej udziału, czyli HP bossa podzielonego przez aktywne postacie z chwili, gdy się pojawił. W skrzyni: złoto z goldMinutes minut wyprawy na poziomie postaci w przedziale (zaokrąglone do goldRound), elite sztuk materiału elity krainy przedziału, champion sztuk materiału jej czempiona (każda sztuka z szansą na wyższą rzadkość, jak ze stwora na tym poziomie) i z szansą itemChance przedmiot klasy postaci z tej krainy, na jej poziomie w przedziale, w rzadkości jak w skrzyni czempiona. unbeaten: boss, który przetrwał do końca okresu, odchodzi, a skrzynie są o połowę mniejsze: złoto i szansa na przedmiot razy share, materiały elity razy share zaokrąglone w górę, materiały czempiona w dół. lastBlow: ostatni cios daje do skrzyni przedmiot i złoto z goldMinutes minut. title: najlepsze places postaci według obrażeń bossa, który padł, nosi tytuł bossa do końca następnego okresu, czyli przez cały czas następnego bossa. Bez Punktów Systemu w nagrodach (1224). bosses: id, region (kraina przedziału), name, female (dla tekstów), description, title (tytuł dla mężczyzny i kobiety), art (obrazek 48 × 48 w src/client/art/monsters/<art>.png, z PixelLab, w wersji wybranej przez autora, gdy jest na liście SPRITES.monsters w src/client/art.js), sprite (stwór z data/monsters.json, którego obrazek stoi w zastępstwie, dopóki boss nie ma własnego), sound (okrzyk: głos voices.<sound>.cry w data/sounds.json, grany na początku walki z bossem; bez niego boss milczy) i walka jak u stwora z monsters.json (family, position, stats, attack, armorFactor, resistances, weaknesses); HP bierze z paska. texts: słowa karty i odpowiedzi gry; {…} wypełnia gra.",
+  "$comment": "Postrach Krainy (1222–1226, wszystkie w wariancie A, przyjęte przez autora na stronie ocen; src/engine/world-boss.js, src/server/world-boss.js, src/client/world-boss.js; DECISIONS.md, „Postrach Krainy (1222–1226)”). W każdym okresie w każdym przedziale poziomów stoi jeden boss z jednym wspólnym HP dla wszystkich graczy przedziału. cycle: od dnia from (piątek 27.11.2026) okres to days dni po kolei, od północy czasu polskiego, liczone od tego dnia, te same dla wszystkich przedziałów; wcześniej był to tydzień, od poniedziałku do niedzieli, a tydzień trwający w dniu from kończy się o jego północy, z tym samym kluczem (DECISIONS.md, „Postrach Krainy co 3 dni (24.11.2026)”). Przedziały to krainy z data/regions.json, po kolei (1–25, 26–50, …, 401–425), każda ze swoim bossem z bosses (region: id krainy); postać wyżej niż ostatni przedział bije ostatniego bossa. Przedział postaci liczy się z wyższego z jej poziomów, postaci i klasy (jak blokada poziomu przedmiotów), i zostaje na cały okres od pierwszego ataku. attacksPerDay: ataki postaci na dobę. Atak to jedna walka postaci z towarzyszami, którzy poszliby z nią na wyprawę, z pełnym HP i bez mikstur, z bossem na poziomie postaci (wyższym z dwóch poziomów) w granicach przedziału; boss zaczyna walkę z HP, które mu zostało, a atak zbija tyle, ile stracił. Atak nie daje XP, złota ani łupów. hp: boss pojawia się z pierwszym spojrzeniem albo atakiem w okresie, a jego HP to attacksPerPlayer średnich ataków (damage) na każdą aktywną postać przedziału z tej chwili (grana postać konta, które było w grze w ostatnich activeDays dniach, z odblokowanym Postrachem Krainy), każda na swoim poziomie w granicach przedziału; bez nikogo jak jedna postać ze środka przedziału. damage: [poziom, średnie obrażenia jednego ataku], zmierzone realistycznymi postaciami z towarzyszami (tools/world-boss-sim.mjs); między punktami po prostej, poniżej pierwszego jak w pierwszym, powyżej ostatniego proporcjonalnie do poziomu. chests: Skrzynia Bossa dla każdej postaci, która biła bossa, po upadku bossa albo po końcu okresu; liczy się ostatnia skrzynia, której share osiągnęły obrażenia postaci, a share to część jej udziału, czyli HP bossa podzielonego przez aktywne postacie z chwili, gdy się pojawił. W skrzyni: złoto z goldMinutes minut wyprawy na poziomie postaci w przedziale (zaokrąglone do goldRound), elite sztuk materiału elity krainy przedziału, champion sztuk materiału jej czempiona (każda sztuka z szansą na wyższą rzadkość, jak ze stwora na tym poziomie) i z szansą itemChance przedmiot klasy postaci z tej krainy, na jej poziomie w przedziale, w rzadkości jak w skrzyni czempiona. unbeaten: boss, który przetrwał do końca okresu, odchodzi, a skrzynie są o połowę mniejsze: złoto i szansa na przedmiot razy share, materiały elity razy share zaokrąglone w górę, materiały czempiona w dół. lastBlow: ostatni cios daje do skrzyni przedmiot i złoto z goldMinutes minut. title: najlepsze places postaci według obrażeń bossa, który padł, nosi tytuł bossa do końca następnego okresu, czyli przez cały czas następnego bossa. Bez Punktów Systemu w nagrodach (1224). bosses: id, region (kraina przedziału), name, female (dla tekstów), description, title (tytuł dla mężczyzny i kobiety), art (obrazek 48 × 48 w src/client/art/monsters/<art>.png, z PixelLab, w wersji wybranej przez autora, gdy jest na liście SPRITES.monsters w src/client/art.js), sprite (stwór z data/monsters.json, którego obrazek stoi w zastępstwie, dopóki boss nie ma własnego), sound (okrzyk: głos voices.<sound>.cry w data/sounds.json, grany na początku walki z bossem; bez niego boss milczy) i walka jak u stwora z monsters.json (family, position, stats, attack, armorFactor, resistances, weaknesses); HP bierze z paska. texts: słowa karty i odpowiedzi gry; {…} wypełnia gra.",
   "attacksPerDay": 3,
   "activeDays": 7,
   "cycle": { "days": 3, "from": "2026-11-27" },
@@ -49,7 +49,16 @@
     [325, 676475],
     [326, 183913],
     [338, 398455],
-    [350, 398286]
+    [350, 398286],
+    [351, 494769],
+    [363, 488324],
+    [375, 517640],
+    [376, 594522],
+    [388, 540815],
+    [400, 540511],
+    [401, 431433],
+    [413, 460375],
+    [425, 459216]
   ],
   "goldRound": 5,
   "chests": [
@@ -342,6 +351,67 @@
       "armorFactor": 0.7,
       "resistances": { "frost": { "base": 40, "perLevel": 5 }, "poison": { "base": 30, "perLevel": 4 } },
       "weaknesses": { "sacred": 0.5, "fire": 0.3 }
+    },
+    {
+      "id": "wb-whale-fish",
+      "region": "isle-of-buyan",
+      "name": "Ryba-Wieloryb",
+      "female": true,
+      "description": "Ogromna ryba z bajek, na której grzbiecie stoi cała wieś z sadami. Według starych wierzeń na takiej rybie spoczywa świat, a gdy się poruszy, trzęsie się ziemia. Gdy uderzy ogonem, fala zalewa cały szyk, a kogo przewróci, ten traci ruch.",
+      "title": ["Pogromca Ryby-Wieloryba", "Pogromczyni Ryby-Wieloryba"],
+      "art": "wb-whale-fish",
+      "sprite": "walrus",
+      "sound": "wb-whale-fish",
+      "family": "snake",
+      "position": "front",
+      "stats": {
+        "base": { "strength": 11, "dexterity": 5, "vitality": 11, "endurance": 8, "intellect": 4, "wisdom": 3, "perception": 6, "will": 8 },
+        "growth": { "strength": 3.1, "dexterity": 1.2, "vitality": 4.4, "endurance": 2.8, "intellect": 0.8, "wisdom": 0.6, "perception": 1, "will": 2 }
+      },
+      "attack": { "name": "Uderzenie ogonem", "sound": "charge", "category": "physical", "scaling": "strength", "damageFactor": 1.6, "variance": 0.25, "cleave": 0.5, "stun": { "chance": 0.15, "label": "przewrócony" } },
+      "armorFactor": 0.7,
+      "resistances": { "water": { "base": 40, "perLevel": 5 }, "frost": { "base": 30, "perLevel": 4 } },
+      "weaknesses": { "lightning": 0.5 }
+    },
+    {
+      "id": "wb-svarozhich",
+      "region": "great-trunk",
+      "name": "Swarożyc",
+      "description": "Bóg ognia, syn Swaroga: brodaty olbrzym z żywego ognia, który od zawsze śpi w drewnie Drzewa Świata. Ludzie budzili go, trąc drewno o drewno. Jego płonący topór pali, a ogień rośnie z każdym ciosem.",
+      "title": ["Pogromca Swarożyca", "Pogromczyni Swarożyca"],
+      "art": "wb-svarozhich",
+      "sprite": "glare",
+      "sound": "wb-svarozhich",
+      "family": "spirit",
+      "position": "front",
+      "stats": {
+        "base": { "strength": 11, "dexterity": 5, "vitality": 11, "endurance": 8, "intellect": 4, "wisdom": 3, "perception": 6, "will": 8 },
+        "growth": { "strength": 3.1, "dexterity": 1.2, "vitality": 4.4, "endurance": 2.8, "intellect": 0.8, "wisdom": 0.6, "perception": 1, "will": 2 }
+      },
+      "attack": { "name": "Płonący topór", "sound": "axe", "category": "physical", "scaling": "strength", "damageFactor": 1.6, "variance": 0.25, "dot": { "effect": "burning", "chance": 0.3, "power": 0.3, "ticks": 3 }, "drain": 0.3 },
+      "armorFactor": 0.7,
+      "resistances": { "fire": { "base": 40, "perLevel": 5 }, "nature": { "base": 30, "perLevel": 4 } },
+      "weaknesses": { "water": 0.5, "frost": 0.3 }
+    },
+    {
+      "id": "wb-miesiac",
+      "region": "sky-boughs",
+      "name": "Miesiąc",
+      "description": "Miesiąc, czyli księżyc z dawnych wierzeń: młody pasterz gwiazd ze srebrnym sierpem nad głową i pełnią na ramieniu jak tarczą. Nocą pasie gwiazdy jak owce i odpoczywa w kołysce z konarów. Jego sierp tnie do krwi, a blask pełni oczarowuje tak, że traci się ruch.",
+      "title": ["Pogromca Miesiąca", "Pogromczyni Miesiąca"],
+      "art": "wb-miesiac",
+      "sprite": "moon-halo",
+      "sound": "wb-miesiac",
+      "family": "spirit",
+      "position": "middle",
+      "stats": {
+        "base": { "strength": 8, "dexterity": 6, "vitality": 11, "endurance": 8, "intellect": 11, "wisdom": 7, "perception": 7, "will": 9 },
+        "growth": { "strength": 2.2, "dexterity": 1.4, "vitality": 4.4, "endurance": 2.8, "intellect": 2.5, "wisdom": 1.2, "perception": 1, "will": 2.2 }
+      },
+      "attack": { "name": "Srebrny sierp", "sound": "magic", "category": "magical", "element": "sacred", "scaling": "intellect", "damageFactor": 1.6, "variance": 0.25, "stun": { "chance": 0.15, "label": "oczarowany" }, "dot": { "effect": "bleeding", "chance": 0.3, "power": 0.25, "ticks": 2 } },
+      "armorFactor": 0.6,
+      "resistances": { "sacred": { "base": 40, "perLevel": 5 }, "frost": { "base": 30, "perLevel": 4 } },
+      "weaknesses": { "fire": 0.5, "earth": 0.3 }
     }
   ],
   "texts": {

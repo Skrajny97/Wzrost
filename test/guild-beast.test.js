@@ -48,8 +48,9 @@ describe('the Bestia Gildii', () => {
     assert.deepEqual(guildBeast({ seed: '7:2026-11-02', levels: [40] }, content), beast);
     assert.ok(content.monstersById[beast.monsterId].champion);
     assert.equal(content.areasById[beast.areaId].champion, beast.monsterId);
-    // Every region's champion comes in some week.
-    const drawn = new Set(Array.from({ length: 60 }, (_, guild) => guildBeast({ seed: `${guild + 1}:2026-11-02`, levels: [40] }, content).monsterId));
+    // Every region's champion comes in some week: of a hundred guilds, as
+    // sixty no longer meet all seventeen since the World Tree.
+    const drawn = new Set(Array.from({ length: 100 }, (_, guild) => guildBeast({ seed: `${guild + 1}:2026-11-02`, levels: [40] }, content).monsterId));
     assert.deepEqual([...drawn].sort(), lairs.map((area) => area.champion).sort());
   });
 

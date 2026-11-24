@@ -1067,7 +1067,10 @@
     "wb-boruta": { "cry": { "files": ["audio/sfx/wb-boruta-cry-1.mp3"], "gain": 0.7 } },
     "wb-gorynych": { "cry": { "files": ["audio/sfx/wb-gorynych-cry-1.mp3"], "gain": 0.7 } },
     "wb-jaszczur": { "cry": { "files": ["audio/sfx/wb-jaszczur-cry-1.mp3"], "gain": 0.7 } },
-    "wb-czarnobog": { "cry": { "files": ["audio/sfx/wb-czarnobog-cry-1.mp3"], "gain": 0.7 } }
+    "wb-czarnobog": { "cry": { "files": ["audio/sfx/wb-czarnobog-cry-1.mp3"], "gain": 0.7 } },
+    "wb-whale-fish": { "cry": { "files": ["audio/sfx/wb-whale-fish-cry-1.mp3"], "gain": 0.7 } },
+    "wb-svarozhich": { "cry": { "files": ["audio/sfx/wb-svarozhich-cry-1.mp3"], "gain": 0.7 } },
+    "wb-miesiac": { "cry": { "files": ["audio/sfx/wb-miesiac-cry-1.mp3"], "gain": 0.7 } }
   },
   "effects": {
     "tab": { "files": ["audio/sfx/tab-1.mp3", "audio/sfx/tab-2.mp3"], "gain": 0.5 },

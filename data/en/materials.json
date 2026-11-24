@@ -1032,6 +1032,210 @@
     "koschei-needle": {
       "name": "Koschei's Needle",
       "description": "The needle in which Koschei hid his death. Cool, light and terrible."
+    },
+    "horseshoe-crab-shell": {
+      "name": "Horseshoe Crab Shell",
+      "description": "A hard olive shell like a helmet, older than the oldest trees."
+    },
+    "starfish-arm": {
+      "name": "Starfish Arm",
+      "description": "A rough, spiny arm. They say it grows back even when torn off."
+    },
+    "ray-fin": {
+      "name": "Electric Ray Fin",
+      "description": "A flat fin that still stings your fingers a little."
+    },
+    "shark-tooth": {
+      "name": "Shark Tooth",
+      "description": "A triangular tooth with a serrated edge. A shark loses hundreds of them."
+    },
+    "pufferfish-spine": {
+      "name": "Pufferfish Spine",
+      "description": "A thin spine with green venom drying on it."
+    },
+    "swordfish-bill": {
+      "name": "Swordfish Bill",
+      "description": "A long, flat sword of bone, as sharp as a real one."
+    },
+    "sea-cucumber-skin": {
+      "name": "Sea Cucumber Skin",
+      "description": "A thick, leathery skin covered in warts, slippery even when dry."
+    },
+    "anglerfish-lure": {
+      "name": "Anglerfish Lure",
+      "description": "A thin rod with a glowing bead at its end. In the dark it draws the eye."
+    },
+    "lions-mane-threads": {
+      "name": "Lion's Mane Threads",
+      "description": "Long, clear threads. They sting even when dried."
+    },
+    "walrus-tusk": {
+      "name": "Walrus Tusks",
+      "description": "Two long, yellowish tusks in a piece of the jaw, as heavy as a hammer."
+    },
+    "haemorrhage-clot": {
+      "name": "Haemorrhage Clot",
+      "description": "A dark, hard clot that is still warm."
+    },
+    "charm-thread": {
+      "name": "Red Charm Thread",
+      "description": "A red thread someone tied nine knots in."
+    },
+    "acorn-shell": {
+      "name": "World Acorn Shell",
+      "description": "A hard, glossy shell as big as a shield."
+    },
+    "weevil-snout": {
+      "name": "Acorn Weevil Snout",
+      "description": "A long, thin snout that drills right through an acorn."
+    },
+    "gall-ink": {
+      "name": "Oak Gall Ink",
+      "description": "Black ink made from oak galls, once used to write books."
+    },
+    "ninth-wave-foam": {
+      "name": "Ninth Wave Foam",
+      "description": "White foam that never settles. It roars like the sea when held to the ear."
+    },
+    "octopus-sucker": {
+      "name": "Octopus Sucker",
+      "description": "A sucker as big as a hand. It clings to anything, even smooth stone."
+    },
+    "processionary-hairs": {
+      "name": "Processionary Hairs",
+      "description": "A tuft of grey hairs. Better not touch them with a bare hand."
+    },
+    "tarsier-fur": {
+      "name": "Tarsier Fur",
+      "description": "Soft grey-brown fur, as warm as a hand."
+    },
+    "scorpionfly-tail": {
+      "name": "Scorpionfly Tail",
+      "description": "A curled tail like a scorpion's, though there is no venom in it."
+    },
+    "fungus-sap": {
+      "name": "Beefsteak Fungus Slab",
+      "description": "A slab of the fungus as red as raw meat, still dripping red sap. It smells of oak."
+    },
+    "shrew-tooth": {
+      "name": "Water Shrew Tooth",
+      "description": "A tiny red-tipped tooth, still slightly venomous."
+    },
+    "snakefly-wing": {
+      "name": "Snakefly Wings",
+      "description": "A pair of smoky wings with red veins."
+    },
+    "honeycomb": {
+      "name": "Honeycomb",
+      "description": "A comb full of golden honey. It drips though nobody squeezes it."
+    },
+    "waxworm-cocoon": {
+      "name": "Waxworm Cocoon",
+      "description": "A sticky silk cocoon that smells of wax and honey."
+    },
+    "mead": {
+      "name": "Mead",
+      "description": "Thick golden mead. One sip and the world starts to sway."
+    },
+    "jewel-elytron": {
+      "name": "Jewel Beetle Wing Case",
+      "description": "A wing case shining green and gold like a jewel."
+    },
+    "gecko-foot": {
+      "name": "Gecko Foot",
+      "description": "A foot that sticks to anything, even glass."
+    },
+    "sunray-amber": {
+      "name": "Sunray in Amber",
+      "description": "Amber with a sunray trapped inside. It shines even at night."
+    },
+    "capricorn-antenna": {
+      "name": "Capricorn Beetle Antenna",
+      "description": "A thick, segmented antenna, hard and springy like a rod."
+    },
+    "olm-skin": {
+      "name": "Dragon's Whelp Skin",
+      "description": "Pale, almost see-through skin. Held to the light, it shows its veins."
+    },
+    "glowing-mycelium": {
+      "name": "Glowing Mycelium",
+      "description": "Black strands of mycelium that glow in the dark with a cold green light."
+    },
+    "pangolin-scale": {
+      "name": "Pangolin Scale",
+      "description": "A hard scale like a plate of armour, curved like a pine-cone scale."
+    },
+    "heartwood-resin": {
+      "name": "Heartwood Resin",
+      "description": "Golden resin that beats like a heart when held in the hand."
+    },
+    "sloth-moss": {
+      "name": "Sloth Moss",
+      "description": "Green moss that grew on a sloth for a hundred years."
+    },
+    "aphid-honeydew": {
+      "name": "Aphid Honeydew",
+      "description": "A sweet, sticky drop the aphid leaves on the leaves."
+    },
+    "signpost-board": {
+      "name": "Signpost Board",
+      "description": "A board with an arrow that keeps pointing a different way."
+    },
+    "ice-spike": {
+      "name": "Ice Spike",
+      "description": "A sharp spike of cloudy ice, broken off a hailstone as big as a head."
+    },
+    "carpet-tassel": {
+      "name": "Carpet Tassel",
+      "description": "A colourful tassel that sways on its own without any wind."
+    },
+    "thunderstone": {
+      "name": "Thunderstone",
+      "description": "A smooth black stone shaped like an arrowhead. Old beliefs say it guards a house from lightning."
+    },
+    "cricket-wing": {
+      "name": "Bush-Cricket Wing",
+      "description": "A green wing that chirps softly when rubbed."
+    },
+    "chameleon-scale": {
+      "name": "Chameleon Scale",
+      "description": "A scale that keeps changing its colour."
+    },
+    "world-tree-leaf": {
+      "name": "Leaf of the World Tree",
+      "description": "A golden leaf that never wilts. It rustles though there is no wind."
+    },
+    "nightcap": {
+      "name": "Sleepwalker's Nightcap",
+      "description": "A red nightcap with a pompom. Whoever puts it on dreams of the moon."
+    },
+    "glowworm-light": {
+      "name": "Glowworm Light",
+      "description": "A greenish light that shines but gives no warmth."
+    },
+    "halo-ring": {
+      "name": "Halo Ring",
+      "description": "A thin ring of light. Look into it and everything goes quiet."
+    },
+    "shield-bug-plate": {
+      "name": "Shield Bug Plate",
+      "description": "A green plate from its back, still smelling so strong your eyes water."
+    },
+    "ladybird-elytron": {
+      "name": "Ladybird Wing Case",
+      "description": "A red wing case with black spots. They say it brings luck."
+    },
+    "comet-shard": {
+      "name": "Comet Shard",
+      "description": "A glowing shard from a comet's tail. It never cools."
+    },
+    "lightning-spark": {
+      "name": "Ball Lightning Spark",
+      "description": "A spark that circles in a closed hand and will not go out."
+    },
+    "golden-mask-shard": {
+      "name": "Golden Mask Shard",
+      "description": "A shard of the golden mask of Pride. Whoever looks at it feels better than everyone else."
     }
   },
   "parts": {
