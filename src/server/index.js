@@ -85,6 +85,7 @@ import { englishOn, guildWarsOn, readFeatures, registrationOpen, settlementOn } 
 import { language, pageDictionary, requestLanguage, runInLanguage, t } from './i18n.js';
 import { bidOnOffer, buyFromResident, buyOffer, cancelOffer, collectParcels, getMarket, getMarketLog, listOffer, settleMarket } from './market.js';
 import { cancelHunt, claimHunt, eatDish, huntOptions, quickHunt, startHunt } from './hunts.js';
+import { startCultivation } from './cultivation.js';
 import { claimOrb } from './orbs.js';
 import { claimWorkOrb } from './profession-orbs.js';
 import { discardItem, equipItem, previewItem, sellItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
@@ -289,6 +290,9 @@ const routes = [
   ['POST', '/api/hunts/cancel', cancelHunt],
   ['POST', '/api/hunts/claim', claimHunt],
   ['POST', '/api/hunts/quick', quickHunt],
+  // A Kultywacja (cultivation.js, 1230 A): claimed and called back as an
+  // exploration, through /api/hunts/claim and /api/hunts/cancel.
+  ['POST', '/api/cultivation', startCultivation],
   // A Kulka Systemu caught over the exploration's scene (orbs.js).
   ['POST', '/api/hunts/orb', claimOrb],
   // A Kulka Profesji caught over a work's scene (profession-orbs.js).

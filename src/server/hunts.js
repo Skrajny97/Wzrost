@@ -130,6 +130,7 @@ import { finishJewels } from './jewelcraft.js';
 import { finishMining } from './mining.js';
 import { finishFishing } from './fishing.js';
 import { finishFarming } from './farming.js';
+import { cultivationShare, finishCultivation } from './cultivation.js';
 import { applyPartyEvent, checkedChoice, leaderView, resolveAuto, resolvePartyRow, tripEvent, tripLine } from './party-events.js';
 import { partyGate, threatCrew } from './parties.js';
 import { wantedAfterHunt, wantedGoing, wantedOnTrip } from './wanted.js';
@@ -864,8 +865,8 @@ export async function cancelHunt(context) {
 
 // The report of the activity that ended: an exploration, a gathering of
 // herbs (professions.js), a brewing of potions (brewing.js), an order of
-// items (workshop.js), a digging (mining.js) or a work of the Szlifiernia
-// (jewelcraft.js).
+// items (workshop.js), a digging (mining.js), a work of the Szlifiernia
+// (jewelcraft.js) or a Kultywacja (cultivation.js).
 export async function claimHunt(context) {
   const { session, player } = await requirePlayer(context);
   const now = context.now;
@@ -915,6 +916,11 @@ export async function claimHunt(context) {
 // `claimer` the leader who sends it: a trip's report is then claimed for
 // all who went, claimTrip).
 export function finishActivity(db, player, now, { choice, forTrip = false, claimer = null, minigame = null } = {}) {
+  // A Kultywacja has its own claim (cultivation.js).
+  if (player.activity?.kind === 'cultivation') {
+    if (player.activity.ends_at > now) throw new ApiError(409, 'not_finished', 'Kultywacja jeszcze trwa.');
+    return finishCultivation(db, player, now);
+  }
   const finish = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting, minerals: finishMining, jewels: finishJewels, fish: finishFishing, crops: finishFarming, dishes: finishCooking }[player.activity?.kind];
   // A work's mini-game, if it was begun, by the taps of the claim (minigame.js).
   return finish && player.activity.ends_at <= now ? finish(db, player, now, { minigame: minigameOutcome(player.activity, minigame, now) }) : finishHunt(db, player, now, { choice, forTrip, claimer });
@@ -1380,7 +1386,9 @@ async function huntClaim(db, player, now, { choice, decideEvent = null, partyBag
   // A faint loses everything the exploration brought (faintForfeit, 651 C),
   // and costs XP, less with the Warownia's Kapliczka (427 A).
   hunt = faintForfeit(hunt);
-  const applied = applyHunt(character, hunt, content(), { faintShare: faintShare(campLevels(player.buildings, now, content()), content()) });
+  // The Kultywacja's share more character XP (cultivation.js), the
+  // class's XP as it is.
+  const applied = applyHunt(character, hunt, content(), { faintShare: faintShare(campLevels(player.buildings, now, content()), content()), cultivation: cultivationShare(row) });
   // The companions who went gain XP, one who fell is wounded, and an
   // event's reputation and rumor are kept (settlementAfterHunt); of an
   // older trip's, only in its leader's report.

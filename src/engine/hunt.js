@@ -1361,16 +1361,21 @@ export function faintForfeit(hunt) {
 // a player would need a second one. `heal: false`: a new level heals nothing
 // now, as for a character away on an exploration, whose report settles its
 // HP (the Labirynt, a party event), so the System lines say nothing of a
-// heal either (the code review, 13.11.2026).
+// heal either (the code review, 13.11.2026). `cultivation`: the level of
+// the character's Kultywacja and its share more character XP
+// (cultivationBonus in cultivation.js), on an exploration's XP, alone or on
+// a Drużyna's trip; the class gets the XP as it is. `characterXp` tells the
+// character's, and `cultivation` the share's XP, for the report's line.
 /**
  * @param {Character} character
  * @param {Hunt} hunt
  * @param {Content} content
- * @param {{ evolutionGate?: any, faintShare?: any, heal?: boolean }} [options3]
+ * @param {{ evolutionGate?: any, faintShare?: any, heal?: boolean, cultivation?: { level: number, share: number } | null }} [options3]
  */
-export function applyHunt(character, hunt, content, { evolutionGate = true, faintShare = 1, heal = true } = {}) {
+export function applyHunt(character, hunt, content, { evolutionGate = true, faintShare = 1, heal = true, cultivation = null } = {}) {
   const maxLevel = content.balance.progression.maxLevel;
-  const next = gainXp(character.level, character.xp, hunt.xp, (level) => xpToNext(level, content), maxLevel);
+  const characterXp = cultivation && cultivation.share > 0 ? Math.round(hunt.xp * (1 + cultivation.share)) : hunt.xp;
+  const next = gainXp(character.level, character.xp, characterXp, (level) => xpToNext(level, content), maxLevel);
   const { next: nextClass, wait } = classGain(character, hunt.xp, content, evolutionGate);
   const penalty = hunt.result === 'fainted' ? faintPenalty(next.level, next.xp, content, faintShare) : 0;
 
@@ -1392,6 +1397,8 @@ export function applyHunt(character, hunt, content, { evolutionGate = true, fain
     levelled: levels > 0 || classLevels > 0,
     timePoints: time.perLevel * levels + time.perClassLevel * classLevels + (hunt.timePoints ?? 0),
     messages,
+    characterXp,
+    ...(characterXp > hunt.xp && cultivation && { cultivation: { level: cultivation.level, share: cultivation.share, xp: characterXp - hunt.xp } }),
   };
 }
 
@@ -1569,9 +1576,10 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
       // A faint loses all the exploration brought (faintForfeit), said in
       // a line.
       ...(hunt.forfeit && { forfeit: say(content.texts, 'faintForfeit', 0, {}) }),
-      // Fights give the same XP to the character and the class (solo); the
+      // Fights give the same XP to the character and the class (solo), the
+      // character's with its Kultywacja's share more (applyHunt); the
       // fainting penalty takes only character XP.
-      xp: hunt.xp,
+      xp: applied.characterXp ?? hunt.xp,
       classXp: hunt.xp,
       penalty: applied.penalty,
       gold: hunt.gold,
@@ -1615,6 +1623,8 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
         seatLine(hunt, content),
         bannerLine(hunt, content),
         cardBonusLine(hunt, content),
+        // The Kultywacja's share more character XP (cultivation.js).
+        applied.cultivation && say(content.texts, 'cultivationBonus', 0, { level: applied.cultivation.level, share: Math.round(applied.cultivation.share * 1000) / 10, xp: applied.cultivation.xp }),
         mealLine(hunt, content),
         blessingLine(hunt, content),
         huntersLine(hunt, content),

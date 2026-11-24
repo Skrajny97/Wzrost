@@ -1,9 +1,9 @@
 // @ts-check
 // Phone notifications (src/server/push.js sends them): what a player hears
 // about from a stretch of time, after `from` up to `to`: the exploration,
-// gathering, brewing, order of items, digging or work in the Szlifiernia
-// that ended, the camp builds that ended and the stores that filled up,
-// which stops their production. Each
+// Kultywacja, gathering, brewing, order of items, digging or work in the
+// Szlifiernia that ended, the camp builds that ended and the stores that
+// filled up, which stops their production. Each
 // kind has its tag, and on the phone a newer notification takes the place of
 // an older one with the same tag, so the store's one names every store full
 // at `to`.
@@ -89,6 +89,10 @@ export function notificationsDue({ level, activity, avatarActivity = null, avata
       title: say(texts, 'pushHuntTitle', 0),
       body: say(texts, 'pushHuntBody', 0, { area: area?.name ?? '' }),
     });
+  }
+  // A Kultywacja (cultivation.js), whose report waits in the Walka too.
+  if (activity?.kind === 'cultivation' && within(activity.endsAt, from, to)) {
+    due.push({ tag: 'cultivation', url: '#/walka', at: activity.endsAt, title: say(texts, 'pushCultivationTitle', 0), body: say(texts, 'pushCultivationBody', 0) });
   }
   // A gathering of herbs (professions.js), a brewing of potions (brewing.js),
   // an order of items (workshop.js), a digging (mining.js) and a work in the

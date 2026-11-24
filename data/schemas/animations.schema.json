@@ -50,6 +50,22 @@
         ]
       }
     },
+    "cultivation": {
+      "description": "Scena Kultywacji (src/client/cultivation.js): arkusz klatek jak scena pracy, zapętlony na ekranie Kultywacji i przyciemniony za słowami jej karty w Walce.",
+      "allOf": [
+        { "$ref": "#/definitions/sheet" },
+        {
+          "properties": {
+            "file": true,
+            "size": true,
+            "frames": true,
+            "fps": true,
+            "scale": { "type": "integer", "minimum": 1, "description": "Ile razy powiększyć klatkę, gdy nie dwa (scena rysowana w 256 pikselach, w swojej wielkości)." }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
     "walk": {
       "type": "object",
       "additionalProperties": false,

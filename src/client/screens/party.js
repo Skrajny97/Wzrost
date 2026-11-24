@@ -43,10 +43,11 @@ const COMPANIONS_STAY = 'Póki jesteś w drużynie, towarzysze zostają w Kwater
 // (t()), here and in the Walka. Which of its player's characters is played
 // does not count: since 0.4.59 one set aside goes on the party's trips too
 // (src/server/parties.js), so no member is 'aside' any more.
-const DOTS = { free: 'online', away: 'busy', working: 'busy' };
-const STATES = { free: 'może iść na wyprawę', away: 'na wyprawie', working: 'pracuje w profesji' };
+// One meditating in a Kultywacja (cultivation.js) is busy too.
+const DOTS = { free: 'online', away: 'busy', working: 'busy', meditating: 'busy' };
+const STATES = { free: 'może iść na wyprawę', away: 'na wyprawie', working: 'pracuje w profesji', meditating: 'medytuje w Kultywacji' };
 const stateText = (status) => (STATES[status] ? t(STATES[status]) : status);
-export const BUSY = { away: 'na wyprawie', working: 'w profesji' };
+export const BUSY = { away: 'na wyprawie', working: 'w profesji', meditating: 'w Kultywacji' };
 
 // The class levels' spread (the author: "Rozpiętość poziomu klas w Drużynie
 // maks 5 lvl", "niech nie będzie możliwości w ogole bycia w drużynie z kimś

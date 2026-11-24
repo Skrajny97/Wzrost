@@ -20,7 +20,12 @@ const WORKS = { herbs: 'Zielarstwo', potions: 'Alchemia', items: 'Rzemieślnictw
 // What the character is doing, in a few words.
 function doing(activity) {
   if (!activity) return t('Odpoczynek');
-  const what = WORKS[activity.kind] ? `${t(WORKS[activity.kind])} · ${activity.placeName}` : t('Eksploracja · {area}', { area: activity.areaName });
+  const what =
+    activity.kind === 'cultivation'
+      ? t('Kultywacja')
+      : WORKS[activity.kind]
+        ? `${t(WORKS[activity.kind])} · ${activity.placeName}`
+        : t('Eksploracja · {area}', { area: activity.areaName });
   return `${what} · ${activity.finished ? t('raport gotowy') : t('do {time}', { time: timeFormat.format(new Date(activity.endsAt)) })}`;
 }
 

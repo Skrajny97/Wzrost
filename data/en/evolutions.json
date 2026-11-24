@@ -460,7 +460,7 @@
       "description": "The oldest of the druids. The forest grows from their wisdom, and its creatures stand by them in battle.",
       "trait": {
         "name": "Roots of the World",
-        "text": "+50% mana and up to four summons at once: two Oaks of Ages, the Bison and the Bear. 6% of mana comes back every turn, and summons have 40% more HP and deal 40% more damage. Every 20 points of Wisdom give the summons another 1% HP and damage. Each summon also gets an extra 75% of the character's max HP and draws the enemies' blows onto itself. In the System Towers the Oaks of Ages' roots slow enemies only half as much."
+        "text": "+50% mana and up to four summons at once: two Oaks of Ages, the Bison and the Bear. 6% of mana comes back every turn, and summons have 40% more HP and deal 40% more damage. Every 20 points of Wisdom give the summons another 1% HP and damage. Each summon also gets an extra 75% of the character's max HP and draws the enemies' blows onto itself. In the System Towers the Oaks of Ages' roots slow enemies only a fifth as much."
       }
     },
     "archangel": {

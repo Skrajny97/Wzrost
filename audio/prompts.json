@@ -1500,10 +1500,10 @@
           "speed": 0.85
         }
       },
-      "crafting-welcome": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Piętnasty poziom postaci… System otworzył przed Tobą Rzemieślnictwo." },
+      "crafting-welcome": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Piętnasty poziom postaci… System otworzył przed Tobą Rzemiosło." },
       "crafting-lead": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Systemowy Warsztat czeka w zakładce Profesje. Zajrzyjmy tam." },
       "crafting-patterns": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Tu wykonasz broń i pancerz według wzorów. Części do nich uzyskasz przy Stole rozbiórki albo kupisz u złomiarza." },
-      "crafting-ending": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Każdy nowy poziom Rzemieślnictwa odsłoni Ci kolejne wzory. Zajrzyj tu też, gdy rozbierzesz na części wcześniej nierozbierany przedmiot." },
+      "crafting-ending": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Każdy nowy poziom Rzemiosła odsłoni Ci kolejne wzory. Zajrzyj tu też, gdy rozbierzesz na części wcześniej nierozbierany przedmiot." },
       "towers-welcome": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Pięćdziesiąty poziom postaci… System otworzył przed Tobą Wieże." },
       "towers-lead": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Wieże czekają w zakładce Walka. Zajrzyjmy tam." },
       "towers-entries": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Każde wejście to jedna walka, z wynikiem od razu. Walczysz z pełnym HP, ale bez mikstur." },

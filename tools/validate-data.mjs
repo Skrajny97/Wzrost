@@ -736,6 +736,16 @@ function checkReferences(data) {
   for (const id of Object.keys(animations.work)) {
     if (!data.professions.professions.some((profession) => profession.id === id)) errors.push(`animations.json: nieznana profesja ${id}`);
   }
+  // The Kultywacja's scene (src/client/cultivation.js): one row of its
+  // frames at its size, so its loop drops in with its frames and fps.
+  if (animations.cultivation) {
+    const sheet = animations.cultivation;
+    const size = pngSize(sheet.file);
+    if (!size) errors.push(`animations.json: brak pliku src/client/${sheet.file}`);
+    else if (size.width !== sheet.size * sheet.frames || size.height !== sheet.size) {
+      errors.push(`animations.json: scena Kultywacji ma ${size.width} × ${size.height}, a nie ${sheet.size * sheet.frames} × ${sheet.size} (${sheet.frames} klatek po ${sheet.size})`);
+    }
+  }
   for (const id of Object.keys(animations.walk.lands)) {
     if (!data.regions.some((region) => region.id === id)) errors.push(`animations.json: nieznany region ${id}`);
   }
@@ -774,6 +784,8 @@ function checkReferences(data) {
     'professions',
     'evolution',
     'settlement',
+    // The Kultywacja's screen (src/client/cultivation.js).
+    'cultivation',
     ...data.settlement.places.map((place) => `settlement:${place.id}`),
     ...data.regions.flatMap((region) => [region.id, ...region.areas.map((area) => area.id)]),
   ]);

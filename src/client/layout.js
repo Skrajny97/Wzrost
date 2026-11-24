@@ -15,6 +15,7 @@ import { $, fill, h, icon, setTimer } from './dom.js';
 import { formatCountdown, formatMinutes, formatNumber, formatShort } from './format.js';
 import { SYSTEM_POINTS_ICON } from './icons.js';
 import { MERCENARIES_HASH } from './mercenaries.js';
+import { CULTIVATION_HASH } from './cultivation.js';
 import { anyClaimable, showQuests } from './quests.js';
 import { SECTION_ICONS, SECTION_NEWS, sectionHash } from './screens/community.js';
 import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNow, state, timePointsNow, unlockInfo, walletEntries } from './state.js';
@@ -469,16 +470,20 @@ export function updateTopbar(now = serverNow()) {
   const { activityLabel, activityTime } = topbar;
   topbar.activity.classList.toggle('activity--done', activityFinished(activity, now));
   // A profession's work leads to its screen, a mercenary's offer or service
-  // to the Karczma's Najemnicy tab (mercenaries.js), the rest to Walka.
+  // to the Karczma's Najemnicy tab (mercenaries.js), a Kultywacja to its
+  // screen (cultivation.js), the rest to Walka.
   const work = WORK_SCREENS[activity?.kind];
   const serving = activity?.kind === 'mercenary';
-  topbar.activity.setAttribute('href', work ? work.href : serving ? MERCENARIES_HASH : '#/walka');
+  const meditating = activity?.kind === 'cultivation';
+  topbar.activity.setAttribute('href', work ? work.href : serving ? MERCENARIES_HASH : meditating ? CULTIVATION_HASH : '#/walka');
   if (activity) {
     activityLabel.textContent = work
       ? t('{work} · {place}', { work: t(work.label), place: activity.placeName })
       : serving
         ? t('USŁUGA NAJEMNA · {place}', { place: activity.placeName })
-        : t('EKSPLORACJA · {area}', { area: activity.areaName });
+        : meditating
+          ? t('KULTYWACJA')
+          : t('EKSPLORACJA · {area}', { area: activity.areaName });
     if (!activityFinished(activity, now)) setTimer(activityTime, formatCountdown(activity.endsAt - now));
     else activityTime.textContent = serving ? (activity.service?.hired ? t('ZAPŁATA CZEKA') : t('OGŁOSZENIE WYGASŁO')) : t('RAPORT GOTOWY');
   } else {
@@ -547,7 +552,7 @@ const settlementWaiting = () => Boolean(state.character?.settlementWaiting) && i
 // build; then a dot says the report waits (updateNavTimers, every second).
 // The Awatar Systemu's work, once done, lights the Profesje tab too.
 const TIMED = {
-  walka: { label: 'Walka', kinds: ['hunt'], doing: 'eksploracja' },
+  walka: { label: 'Walka', kinds: ['hunt', 'cultivation'], doing: 'eksploracja' },
   profesje: { label: 'Profesje', kinds: Object.keys(WORK_SCREENS), doing: 'praca' },
 };
 // Profesje counts down the Awatar's work too while the character's own is

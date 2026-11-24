@@ -8,6 +8,7 @@ import { language, t } from '../i18n.js';
 import { call, serverNow, state, unlockInfo } from '../state.js';
 import { systemPanel } from '../ui.js';
 import { workSummaryText } from './professions.js';
+import { cultivationRowMeta } from '../cultivation.js';
 
 // The names below are shown through t(), as the page loads its English
 // after this module.
@@ -152,7 +153,10 @@ export function mountJournal(container, { params }) {
                     ? t('Sala prób · {area}', { area: report.hall.areaName })
                     : `${report.areaName ?? report.regionName ?? report.placeName} · ${formatMinutes(report.minutes)}`,
               }),
-              WORK_CHIPS[report.kind]
+              // A Kultywacja's XP and levels (cultivation.js).
+              report.kind === 'cultivation'
+                ? cultivationRowMeta(report)
+                : WORK_CHIPS[report.kind]
                 ? h(
                     'span',
                     { class: 'report-row-meta' },

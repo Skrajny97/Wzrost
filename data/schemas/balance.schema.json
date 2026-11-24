@@ -21,6 +21,7 @@
     "account",
     "quickHunt",
     "flashHunt",
+    "cultivation",
     "parties",
     "companions",
     "journal",
@@ -1496,6 +1497,20 @@
         "count": { "type": "integer", "minimum": 1 },
         "minutes": { "type": "integer", "minimum": 1 },
         "refillHours": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "cultivation": {
+      "type": "object",
+      "description": "Kultywacja (1230 A, src/engine/cultivation.js): postać zamiast wyprawy medytuje tyle, ile może trwać wyprawa. Gdy poziom klasy jest wyższy niż poziom postaci, zdobywa XP postaci: xpFactor razy tyle, ile daje wyprawa tej samej długości w najnowszym miejscu otwartym przez klasę (xpPerHour na najwyższym poziomie tego miejsca), ale najwyżej tyle, ile brakuje do poziomu klasy. Bez XP klasy, łupów i złota. Każda medytacja rozwija też własny poziom Kultywacji (od 0 do maxLevel): punkt XP Kultywacji za minutę. Pierwszy poziom to firstLevelMinutes minut, każdy następny po równo dłużej, aż do lastLevelMinutes na ostatni (z poziomu maxLevel − 1), a czas każdego poziomu jest zaokrąglony do levelRoundMinutes minut (autor 24.11.2026, 1248 B: od 4 godzin na pierwszy poziom do 20 godzin na setny). Każdy poziom daje levelBonus więcej XP postaci z wypraw (samotnych i drużyny), bez XP klasy i bez samej medytacji.",
+      "additionalProperties": false,
+      "required": ["xpFactor", "firstLevelMinutes", "lastLevelMinutes", "levelRoundMinutes", "maxLevel", "levelBonus"],
+      "properties": {
+        "xpFactor": { "type": "number", "exclusiveMinimum": 0 },
+        "firstLevelMinutes": { "type": "integer", "minimum": 1 },
+        "lastLevelMinutes": { "type": "integer", "minimum": 1 },
+        "levelRoundMinutes": { "type": "integer", "minimum": 1 },
+        "maxLevel": { "type": "integer", "minimum": 1 },
+        "levelBonus": { "type": "number", "minimum": 0 }
       }
     },
     "parties": {

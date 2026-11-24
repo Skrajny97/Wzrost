@@ -56,6 +56,7 @@ import {
   skillCost,
   skillView,
   towerFight,
+  towerFloor,
   warBattle,
 } from '../src/engine/index.js';
 import { measureClass } from '../tools/class-balance-sim.mjs';
@@ -232,7 +233,7 @@ describe('the Druid line\'s summons draw the foes\' blows and stand longer', () 
     assert.equal(content.evolutionsById.arcanist.trait.params.summonLife, undefined);
   });
 
-  test('its summons stand against an elite and a champion: none falls to the first blow it takes, and no blow takes more than 80% of a summon\'s HP', () => {
+  test('its summons stand against an elite and a champion: none falls to the first blow it takes, and no blow takes more than 90% of a summon\'s HP', () => {
     // The game without the share of the maximum HP.
     const frail = (() => {
       const raw = loadData();
@@ -273,12 +274,14 @@ describe('the Druid line\'s summons draw the foes\' blows and stand longer', () 
     };
     // Before (the 0.5.8 numbers): at level 250 11 of 48 summons fell to the
     // elite's first blow and a blow took up to 1.8 times a summon's HP; at
-    // level 300 8 of 84 to the champion's, up to 2 times.
+    // level 300 8 of 84 to the champion's, up to 2 times. With 75% of the
+    // Druid's HP the biggest blow took 0.37–0.74 of a summon's HP until the
+    // gear of Tiers XI and XII (0.5.13), with it 0.37–0.81.
     for (const [level, kind] of [[170, 'elite'], [250, 'elite'], [250, 'champion'], [300, 'champion']]) {
       const now = against(level, kind, content);
       assert.ok(now.summons >= 30, `${level} ${kind}: ${now.summons} summons`);
       assert.equal(now.firstBlow, 0, `${level} ${kind}`);
-      assert.ok(now.worst < 0.8, `${level} ${kind}: a blow took ${now.worst.toFixed(2)} of a summon's HP`);
+      assert.ok(now.worst < 0.9, `${level} ${kind}: a blow took ${now.worst.toFixed(2)} of a summon's HP`);
     }
     const weak = against(250, 'elite', frail);
     assert.ok(weak.firstBlow > 0 && weak.worst > 1, JSON.stringify(weak));
@@ -414,12 +417,13 @@ describe('the Druid line in duels', () => {
 
 describe('the Pradruid in the Wieże (1249 B)', () => {
   // The author's choice 1249 B: the Pradruid weaker in the Wieże only, so
-  // that it climbs about as high as the best other fourth form. Before
-  // (0.5.11) alone at level 300 it climbed to floor 489, the other fourth
-  // forms to 224–329: the two oaks' roots pushed every move of its foe back,
-  // so the foe hardly ever struck (less HP for its summons hardly changed
-  // that). Now its roots slow at half their strength there
-  // (evolutions.json towerSummonRoot). `whole`: the game as in 0.5.11.
+  // that it climbs about as high as the best other fourth form at every
+  // level. The two oaks' roots pushed every move of its foe back, so the foe
+  // hardly ever struck and the Pradruid climbed some 200 floors above the
+  // other fourth forms (less HP for its summons hardly changed that). Now
+  // its roots slow at a fifth of their strength there (evolutions.json
+  // towerSummonRoot; a half until the gear of Tiers XI and XII, 0.5.13).
+  // `whole`: the game without it.
   const whole = (() => {
     const raw = loadData();
     delete raw.evolutions.evolutions.find((form) => form.id === 'elder-druid').towerSummonRoot;
@@ -428,13 +432,13 @@ describe('the Pradruid in the Wieże (1249 B)', () => {
   const share = content.evolutionsById['elder-druid'].towerSummonRoot;
   const pradruid = { ...druidAt(300), name: 'Pradruid' };
 
-  test('only the Pradruid has a share of its roots\' strength in the Wieże, half, and its trait says so in Polish and in English', () => {
-    assert.equal(share, 0.5);
+  test('only the Pradruid has a share of its roots\' strength in the Wieże, a fifth, and its trait says so in Polish and in English', () => {
+    assert.equal(share, 0.2);
     assert.deepEqual(content.evolutions.filter((form) => form.towerSummonRoot !== undefined).map((form) => form.id), ['elder-druid']);
     assert.equal(pradruid.character.evolution, 'elder-druid');
-    assert.ok(content.evolutionsById['elder-druid'].trait.text.endsWith('W Wieżach Systemu korzenie Dębów wieków spowalniają wrogów o połowę słabiej.'));
+    assert.ok(content.evolutionsById['elder-druid'].trait.text.endsWith('W Wieżach Systemu korzenie Dębów wieków spowalniają wrogów pięć razy słabiej.'));
     const english = JSON.parse(readFileSync(new URL('../data/en/evolutions.json', import.meta.url), 'utf8'));
-    assert.ok(english.evolutions['elder-druid'].trait.text.endsWith("In the System Towers the Oaks of Ages' roots slow enemies only half as much."));
+    assert.ok(english.evolutions['elder-druid'].trait.text.endsWith("In the System Towers the Oaks of Ages' roots slow enemies only a fifth as much."));
   });
 
   test('a rooted foe of a summoner with that share moves again sooner: half the delay of the roots', () => {
@@ -494,19 +498,46 @@ describe('the Pradruid in the Wieże (1249 B)', () => {
     assert.deepEqual(now, then);
   });
 
-  test('alone at level 300 it no longer gets past the champion of floor 350 (20% of the entries before), as the best other fourth forms stop before it, and it still wins the one of floor 325', () => {
-    const rate = (floor, data) => {
-      let won = 0;
-      for (let set = 0; set < GEAR_SETS; set++) {
-        const { character, equipped } = playerOf('realistic', 'mage', 300, data, set, 'mana-shield');
-        for (let seed = 0; seed < 4; seed++) {
-          if (towerFight({ character, equipped, name: 'Pradruid', floor, seed: `tower-wall:${set}:${seed}` }, data).result === 'success') won += 1;
+  test('alone at level 300 it climbs the Wieża Solo about as high as the best other fourth form (within 7%), and without the share far higher', () => {
+    // Each path's realistic player, each draw of its gear, climbs as in the
+    // measurement (DECISIONS.md, „Druid: przywołańce na wyprawach i na
+    // Arenie”, point 17): from a floor some 40 levels below it, every floor
+    // up to 3 entries, a champion's up to 15 (a day's), to the first floor
+    // lost every time; the median of the highest floor won.
+    const level = 300;
+    const champion = (floor, data) => towerFloor(floor, 'x', data).encounter.champion === true;
+    const climb = ({ character, equipped }, set, data) => {
+      const wins = (floor) => {
+        for (let attempt = 0; attempt < (champion(floor, data) ? 15 : 3); attempt++) {
+          if (towerFight({ character, equipped, name: 'Wspinacz', floor, seed: `tower:${set}:${floor}:${attempt}` }, data).result === 'success') return true;
         }
-      }
-      return won / (GEAR_SETS * 4);
+        return false;
+      };
+      let floor = Math.max(1, level - 40 - data.towers.firstFloorLevel + 1);
+      while (floor > 1 && (champion(floor, data) || !wins(floor))) floor = Math.max(1, floor - 7);
+      let top = floor;
+      while (top < floor + 500 && wins(top)) top += 1;
+      return top - 1;
     };
-    assert.equal(rate(350, content), 0);
-    assert.ok(rate(350, whole) > 0.05);
-    assert.ok(rate(325, content) >= 0.75);
+    const median = (list) => {
+      const sorted = [...list].sort((a, b) => a - b);
+      return (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2;
+    };
+    // The median of a path's climbs: its class and the skill that leads it.
+    const climbs = (classId, path, data) => median(Array.from({ length: GEAR_SETS }, (_, set) => climb(playerOf('realistic', classId, level, data, set, path), set, data)));
+    const others = [];
+    for (const cls of content.classes) {
+      for (const [index, skill] of content.skills.filter((one) => one.classId === cls.id).entries()) {
+        const path = index === 0 ? null : skill.id;
+        const form = playerOf('realistic', cls.id, level, content, 0, path).character.evolution;
+        assert.equal(content.evolutionsById[form].stage, 4, form);
+        if (form !== 'elder-druid') others.push(climbs(cls.id, path, content));
+      }
+    }
+    assert.equal(others.length, 14);
+    const best = Math.max(...others);
+    const now = climbs('mage', 'mana-shield', content);
+    assert.ok(Math.abs(now / best - 1) <= 0.07, `the Pradruid ${now}, the best other fourth form ${best}`);
+    assert.ok(climbs('mage', 'mana-shield', whole) > 1.2 * best);
   });
 });

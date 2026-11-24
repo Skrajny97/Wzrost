@@ -159,6 +159,7 @@ import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
 import { guildSeatSql } from './guild-seat.js';
 import { guildPatronSql } from './guild-shrine.js';
 import { companionsKey, woundedWaiting } from './hunts.js';
+import { cultivationBusy, cultivationPlace, cultivationView } from './cultivation.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { partyOf, partyRemoval } from './parties.js';
 import { anvilDiscountOf } from './perks.js';
@@ -467,7 +468,8 @@ const path = (id) => `$."${id}"`;
 // rests meanwhile, as at home.
 // A mercenary waiting in the Karczma or serving rests too (mercenaries.js):
 // its HP is its own, the exploration's fights are another's.
-export const restsDuring = (activity) => !activity || ['herbs', 'potions', 'items', 'minerals', 'jewels', 'fish', 'crops', 'dishes', 'mercenary'].includes(activity.kind);
+// So does one meditating in a Kultywacja (cultivation.js).
+export const restsDuring = (activity) => !activity || ['herbs', 'potions', 'items', 'minerals', 'jewels', 'fish', 'crops', 'dishes', 'mercenary', 'cultivation'].includes(activity.kind);
 
 // A character's buffs in fights (storedBuffs in potions.js): those kept in
 // time before 0.1.26 count as the fights of their minutes.
@@ -932,6 +934,8 @@ export async function requireIdlePlayer(context) {
 export function requireIdle(player, now) {
   const activity = player.activity;
   if (!activity) return;
+  // A Kultywacja says so in its own words (cultivation.js).
+  if (activity.kind === 'cultivation') throw cultivationBusy(activity.ends_at <= now);
   // A profession's work says so in its own words.
   const texts =
     activity.kind === 'mercenary'
@@ -1566,6 +1570,8 @@ function activityPlace(activity, level) {
   }
   // A mercenary's offer or service in the Karczma (mercenaries.js).
   if (activity.kind === 'mercenary') return mercenaryPlace(activity);
+  // A Kultywacja (cultivation.js).
+  if (activity.kind === 'cultivation') return cultivationPlace();
   if (activity.kind === 'jewels') {
     const { base: baseId, rarity, count, set, gem, itemName } = JSON.parse(activity.options ?? '{}');
     const base = content().basesById[baseId];
@@ -1866,6 +1872,9 @@ export function characterView(player, now) {
     // An order of the Osada that can be delivered now lights its tab.
     settlementWaiting: settlementWaiting(row, items, now, player.marketWaiting) || serviceEnded(player.activity, now),
     huntDurations: huntDurations(row.level, content()),
+    // The Kultywacja's card on the Walka screen (cultivation.js), or null
+    // before its unlock and while another activity goes on.
+    cultivation: cultivationView(player),
     // The Karczma's mercenaries (mercenaries.js): what the character may
     // offer and ask, or null below their level.
     mercenaries: mercenaryRules(row),

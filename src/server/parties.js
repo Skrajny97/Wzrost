@@ -239,14 +239,15 @@ const reportWaits = (kind, endsAt, now) => kind !== 'mercenary' && endsAt <= now
 
 // A member's state for the party's list: free (at home, or back with its
 // report waiting, which the party's setting out claims: partyHunt), away
-// (on an exploration) or working (at a profession's work). Only the free go
-// along. Whether its player plays it now does not count: before 0.4.59 one
+// (on an exploration), working (at a profession's work) or meditating (in a
+// Kultywacja, cultivation.js). Only the free go along. Whether its player
+// plays it now does not count: before 0.4.59 one
 // whose player played another character was 'aside' and stayed home (the
 // author, 19.11.2026: „dlaczego system robił błąd kiedy ktoś zmienia
 // postać? przecież trzeba to jakoś rozdzielić”).
 function memberStatus(row, now) {
   if (!row.activity || reportWaits(row.activity, row.activity_ends, now)) return 'free';
-  return row.activity === 'hunt' ? 'away' : 'working';
+  return row.activity === 'hunt' ? 'away' : row.activity === 'cultivation' ? 'meditating' : 'working';
 }
 
 // The stage of the Stajnia's mount of a character's row (327 A): a party's

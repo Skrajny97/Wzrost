@@ -3398,6 +3398,130 @@ a.segmented-option {
   font-size: 13px;
 }
 
+/* Kultywacja (cultivation.js, 1230 A): its card among the lands, in the
+   System's light, the first frame of its scene's sheet dim behind the words,
+   as wide as the card, around the meditating figure; its screen with the
+   scene on top, the levels, the length and the XP it gives. */
+.cultivation-link {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: var(--system-line);
+}
+
+.cultivation-link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--cultivation-art, none) 0 62% / calc(var(--cultivation-frames, 1) * 100%) auto no-repeat;
+  image-rendering: pixelated;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.cultivation-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to right, rgba(13, 17, 11, 0.72), rgba(13, 17, 11, 0.25));
+  pointer-events: none;
+}
+
+.cultivation-link--met::before {
+  opacity: 0.3;
+}
+
+.cultivation-link .region-foot {
+  border-top-color: var(--system-line);
+}
+
+.cultivation-foot-class {
+  white-space: nowrap;
+}
+
+.chip--system,
+.chip--cultivation {
+  border-color: var(--system-line);
+  color: var(--system);
+}
+
+.cultivation-card {
+  gap: 12px;
+}
+
+.cultivation-card .status-row dd {
+  overflow-wrap: anywhere;
+}
+
+.cultivation-gain {
+  margin: 0;
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 15px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.cultivation-gain--caught {
+  color: var(--gold);
+}
+
+.cultivation-note {
+  margin: 0;
+}
+
+/* The Kultywacja's own level (1230 A, 24.11.2026), as a profession's:
+   the bar to the next one and its bonus. What a length gives, the
+   character's XP over the Kultywacja's. */
+.cultivation-level {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--system-line);
+  border-radius: 4px;
+  background: var(--system-fill);
+}
+
+.cultivation-level p {
+  margin: 0;
+}
+
+.cultivation-bonus {
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.cultivation-gains {
+  display: grid;
+  gap: 2px;
+}
+
+.cultivation-gains-title {
+  margin: 0;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.cultivation-gain--level {
+  color: var(--system);
+}
+
+/* The meditating figure from the scene's first frame, beside its bonus
+   among the others (bonuses.js). */
+.cultivation-mark {
+  display: block;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: var(--sheet) -112px -150px no-repeat;
+  image-rendering: pixelated;
+}
+
 /* Inner regions as circles with a picture of the place, two in a row and
    the odd last one in the middle. */
 .area-grid {
