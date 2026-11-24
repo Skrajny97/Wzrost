@@ -1,0 +1,14 @@
+{
+  "id": "lightning-spark",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small bright blue-white ball of crackling lightning with tiny sparks around it, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023090954686694677
+  },
+  "images": 1
+}

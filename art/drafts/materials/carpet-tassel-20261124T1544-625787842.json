@@ -1,0 +1,14 @@
+{
+  "id": "carpet-tassel",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a colourful red and gold woven carpet tassel, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02307258008257548
+  },
+  "images": 1
+}

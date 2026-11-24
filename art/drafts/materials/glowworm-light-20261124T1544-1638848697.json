@@ -1,0 +1,14 @@
+{
+  "id": "glowworm-light",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small glowing yellow-green orb of cold light in a tiny glass jar, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0241175276643965
+  },
+  "images": 1
+}

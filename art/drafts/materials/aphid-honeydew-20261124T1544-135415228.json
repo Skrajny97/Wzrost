@@ -1,0 +1,14 @@
+{
+  "id": "aphid-honeydew",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a big shiny sticky golden drop of honeydew on a small green leaf, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023080463562435576
+  },
+  "images": 1
+}

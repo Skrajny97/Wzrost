@@ -1,0 +1,14 @@
+{
+  "id": "chameleon-scale",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small round scale shimmering in green, yellow and red at once, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023260352269702488
+  },
+  "images": 1
+}

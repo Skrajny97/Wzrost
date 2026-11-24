@@ -1,0 +1,14 @@
+{
+  "id": "ladybird-elytron",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a single glossy round red beetle wing case with black spots, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023145906115002106
+  },
+  "images": 1
+}

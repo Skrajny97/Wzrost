@@ -1,0 +1,14 @@
+{
+  "id": "golden-mask-shard",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a jagged shard of a shiny golden mask with part of a haughty eye, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0232467411924998
+  },
+  "images": 1
+}

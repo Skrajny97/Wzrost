@@ -1,0 +1,14 @@
+{
+  "id": "sloth-moss",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a clump of soft green moss tangled with long grey-brown fur, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023221685377120972
+  },
+  "images": 1
+}

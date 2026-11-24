@@ -1,0 +1,14 @@
+{
+  "id": "cricket-wing",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a single long bright green insect wing with fine veins, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02309779779264662
+  },
+  "images": 1
+}

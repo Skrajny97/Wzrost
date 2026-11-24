@@ -1,0 +1,14 @@
+{
+  "id": "ice-spike",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a sharp spike of cloudy white-blue ice, drawn diagonally, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02347566671943665
+  },
+  "images": 1
+}

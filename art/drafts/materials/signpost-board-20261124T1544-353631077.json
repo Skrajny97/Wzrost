@@ -1,0 +1,14 @@
+{
+  "id": "signpost-board",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a weathered wooden signpost board shaped like an arrow with blank carved marks, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02307005602667067
+  },
+  "images": 1
+}

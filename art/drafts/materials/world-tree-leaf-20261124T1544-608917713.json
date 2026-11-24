@@ -1,0 +1,14 @@
+{
+  "id": "world-tree-leaf",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a single big golden-green oak leaf glowing softly, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02305950012143453
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "comet-shard",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a small jagged glowing orange-white rock shard with a short fiery trail, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023207301902135213
+  },
+  "images": 1
+}

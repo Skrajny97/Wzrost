@@ -1,0 +1,14 @@
+{
+  "id": "shield-bug-plate",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a green shield-shaped insect back plate with red edges and faint green stink fumes, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023673262899610734
+  },
+  "images": 1
+}
