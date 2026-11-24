@@ -274,6 +274,12 @@ export const SPRITES = {
       // The tenth bases, from class level 200 (1086, the author's picks).
       'grunwald-sword', 'svarozhich-axe', 'marzanna-dagger', 'jutrzenka-bow', 'veles-staff', 'stanislaus-crosier', 'lech-shield', 'zorza-quiver', 'basilisk-fang', 'copernicus-sphere', 'strzygon-hood',
       'mieszko-helmet', 'sobieski-zupan', 'jagiello-armor', 'wanda-robe', 'jadwiga-crown', 'casimir-cope', 'lokietek-gloves', 'walgierz-boots', 'rzepicha-necklace', 'bona-ring', 'golden-duck',
+      // The eleventh bases, from class level 225 (1239, the author's picks).
+      'rugievit-sword', 'janosik-ciupaga', 'zmora-dagger', 'lel-bow', 'radegast-staff', 'lysiec-cross', 'jarovit-shield', 'zar-ptak-quiver', 'griffin-talon', 'jagiellonian-globe', 'werewolf-hood',
+      'sleeping-knight-helmet', 'kosciuszko-sukmana', 'czarniecki-armor', 'rusalka-robe', 'przemysl-crown', 'hyacinth-cloak', 'wyrwidab-gloves', 'lajkonik-boots', 'syrenka-necklace', 'barbara-ring', 'golden-apple',
+      // The twelfth bases, from class level 250 (1239, the author's picks).
+      'arkona-sword', 'siemowit-axe', 'chernobog-dagger', 'khors-bow', 'rod-staff', 'sigismund-bell', 'belobog-shield', 'vyraj-quiver', 'boruta-claw', 'rozhanitsy-spindle', 'volkhv-hood',
+      'wrymouth-helmet', 'wernyhora-kaftan', 'bathory-armor', 'vila-robe', 'piast-crown', 'saint-florian-chasuble', 'kmicic-gloves', 'pozvizd-boots', 'dzidzilela-necklace', 'snake-king-ring', 'thunderstone',
     ],
   },
   // Materials left by creatures, the parts the Stół rozbiórki makes and

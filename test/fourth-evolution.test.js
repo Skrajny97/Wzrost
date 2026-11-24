@@ -82,6 +82,14 @@ const tuned = (data) => ({
     monsters: { ...data.balance.monsters, mythGame: { ...data.balance.monsters.mythGame, damage: 0, hp: 0 }, classLevelCurve: [], newestPlace: null },
   },
 });
+// On the explorations the gear they were tuned with too: since Tiers XI and
+// XII (DECISIONS.md, „Tiery XI i XII przedmiotów”) the realistic player of
+// level 260 wears Tier XII, and with it every fourth form ends with 80–100%
+// of its HP, so the comparison of the HP left says little (the Książę
+// Ciemności 95.4% against its third form's 96.2%); Tier X stays the latest
+// base here, as when the forms were tuned. The Arena below keeps the game's
+// gear.
+const tunedGear = (data) => ({ ...tuned(data), bases: data.bases.filter((base) => (base.classLevel ?? 1) <= 200) });
 
 // A Pogromca Hord at a class level, its skills at their top by default.
 const hordeSlayer = (classLevel, skills = { 'smashing-blow': 145, slaughter: 145 }, extra = {}) => ({
@@ -545,7 +553,7 @@ describe('the fourth forms against the third forms (tools/class-balance-sim.mjs,
       content.skills.filter((skill) => skill.classId === cls.id).forEach((skill, index) => {
         const path = index === 0 ? null : skill.id;
         const options = { model: 'realistic-nocomp', classId: cls.id, level: 260, minutes: 240, hunts: 120, path };
-        rows.push([measureClass(options, tuned(thirdOnly)), measureClass(options, tuned(content))]);
+        rows.push([measureClass(options, tunedGear(thirdOnly)), measureClass(options, tunedGear(content))]);
       });
     }
     assert.deepEqual(rows.map(([, fourth]) => fourth.evolution).sort(), [...FORMS].sort());

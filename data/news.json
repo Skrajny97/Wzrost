@@ -1735,6 +1735,11 @@
       "id": "0.5.12",
       "title": "Wersja 0.5.12",
       "body": "- Pradruid: w Wieżach Systemu korzenie Dębów wieków spowalniają wrogów o połowę słabiej, więc Pradruid wchodzi tam mniej więcej tak wysoko jak inne czwarte formy.\n- Na wyprawach, w Labiryncie, na Arenie i w wojnach gildii nic się nie zmienia."
+    },
+    {
+      "id": "0.5.13",
+      "title": "Wersja 0.5.13",
+      "body": "- Tier XI i XII przedmiotów: 44 nowe przedmioty od 225. i 250. poziomu klasy, po jednym w każdej rodzinie, m.in. Miecz Rugiewita, Ciupaga Janosika, Miecz Arkony, Korona Piastów i Piorunowa strzałka.\n- Wypadają na wyprawach od Kamiennego Tronu (poz. 221–225) i od Zaklętego Dworu (poz. 246–250). Postaciom z klasą na 225. i 250. poziomie dają je też skrzynia tygodniowa, handlarz, Salon Gier, Wieże, Bestia, Wyprawa Gildii i wojna gildii.\n- Encyklopedia pokazuje je już teraz. Wzory do ich wyrobu dojdą razem z krainami Drzewa Świata."
     }
   ]
 }

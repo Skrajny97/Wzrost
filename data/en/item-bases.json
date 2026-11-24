@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/item-bases.json, by the base's id (src/engine/overlay.js): every base, Tiers I–X, with the attack of a weapon.",
+  "$comment": "English texts of data/item-bases.json, by the base's id (src/engine/overlay.js): every base, Tiers I–XII, with the attack of a weapon.",
   "sword": {
     "name": "Sword",
     "attackName": "Slash"
@@ -38,6 +38,14 @@
   },
   "grunwald-sword": {
     "name": "Grunwald Sword",
+    "attackName": "Slash"
+  },
+  "rugievit-sword": {
+    "name": "Rugievit's Sword",
+    "attackName": "Slash"
+  },
+  "arkona-sword": {
+    "name": "Sword of Arkona",
     "attackName": "Slash"
   },
   "axe": {
@@ -80,6 +88,14 @@
     "name": "Svarozhich's Axe",
     "attackName": "Chop"
   },
+  "janosik-ciupaga": {
+    "name": "Janosik's Highland Axe",
+    "attackName": "Chop"
+  },
+  "siemowit-axe": {
+    "name": "Siemowit's Axe",
+    "attackName": "Chop"
+  },
   "dagger": {
     "name": "Dagger",
     "attackName": "Stab"
@@ -118,6 +134,14 @@
   },
   "marzanna-dagger": {
     "name": "Marzanna's Dagger",
+    "attackName": "Stab"
+  },
+  "zmora-dagger": {
+    "name": "Nightmare's Dagger",
+    "attackName": "Stab"
+  },
+  "chernobog-dagger": {
+    "name": "Chernobog's Dagger",
     "attackName": "Stab"
   },
   "bow": {
@@ -160,6 +184,14 @@
     "name": "Jutrzenka's Bow",
     "attackName": "Shot"
   },
+  "lel-bow": {
+    "name": "Lel's Bow",
+    "attackName": "Shot"
+  },
+  "khors-bow": {
+    "name": "Khors's Bow",
+    "attackName": "Shot"
+  },
   "staff": {
     "name": "Staff",
     "attackName": "Elemental Bolt"
@@ -198,6 +230,14 @@
   },
   "veles-staff": {
     "name": "Veles's Staff",
+    "attackName": "Elemental Bolt"
+  },
+  "radegast-staff": {
+    "name": "Radegast's Staff",
+    "attackName": "Elemental Bolt"
+  },
+  "rod-staff": {
+    "name": "Rod's Staff",
     "attackName": "Elemental Bolt"
   },
   "aspergillum": {
@@ -240,6 +280,14 @@
     "name": "Stanislaus's Crosier",
     "attackName": "Sacred Bolt"
   },
+  "lysiec-cross": {
+    "name": "Holy Cross of Łysiec",
+    "attackName": "Sacred Bolt"
+  },
+  "sigismund-bell": {
+    "name": "Sigismund Bell",
+    "attackName": "Sacred Bolt"
+  },
   "shield": {
     "name": "Shield"
   },
@@ -269,6 +317,12 @@
   },
   "lech-shield": {
     "name": "Lech's Shield"
+  },
+  "jarovit-shield": {
+    "name": "Jarovit's Shield"
+  },
+  "belobog-shield": {
+    "name": "Belobog's Shield"
   },
   "quiver": {
     "name": "Quiver"
@@ -300,6 +354,12 @@
   "zorza-quiver": {
     "name": "Zorza's Quiver"
   },
+  "zar-ptak-quiver": {
+    "name": "Firebird Quiver"
+  },
+  "vyraj-quiver": {
+    "name": "Quiver of Vyraj"
+  },
   "misericorde": {
     "name": "Misericorde"
   },
@@ -329,6 +389,12 @@
   },
   "basilisk-fang": {
     "name": "Basilisk Fang"
+  },
+  "griffin-talon": {
+    "name": "Griffin Talon"
+  },
+  "boruta-claw": {
+    "name": "Boruta's Claw"
   },
   "focus": {
     "name": "Focus"
@@ -360,6 +426,12 @@
   "copernicus-sphere": {
     "name": "Copernicus's Sphere"
   },
+  "jagiellonian-globe": {
+    "name": "Jagiellonian Globe"
+  },
+  "rozhanitsy-spindle": {
+    "name": "Spindle of the Rozhanitsy"
+  },
   "hood": {
     "name": "Hood"
   },
@@ -389,6 +461,12 @@
   },
   "strzygon-hood": {
     "name": "Strzygoń's Hood"
+  },
+  "werewolf-hood": {
+    "name": "Werewolf Hood"
+  },
+  "volkhv-hood": {
+    "name": "Volkhv's Hood"
   },
   "helmet": {
     "name": "Helmet"
@@ -420,6 +498,12 @@
   "mieszko-helmet": {
     "name": "Mieszko's Helmet"
   },
+  "sleeping-knight-helmet": {
+    "name": "Sleeping Knight's Helmet"
+  },
+  "wrymouth-helmet": {
+    "name": "Wrymouth's Helmet"
+  },
   "tunic": {
     "name": "Tunic"
   },
@@ -449,6 +533,12 @@
   },
   "sobieski-zupan": {
     "name": "Sobieski's Żupan"
+  },
+  "kosciuszko-sukmana": {
+    "name": "Kościuszko's Sukmana"
+  },
+  "wernyhora-kaftan": {
+    "name": "Wernyhora's Kaftan"
   },
   "chainmail": {
     "name": "Chainmail"
@@ -480,6 +570,12 @@
   "jagiello-armor": {
     "name": "Jagiełło's Armour"
   },
+  "czarniecki-armor": {
+    "name": "Czarniecki's Armour"
+  },
+  "bathory-armor": {
+    "name": "Báthory's Armour"
+  },
   "robe": {
     "name": "Robe"
   },
@@ -509,6 +605,12 @@
   },
   "wanda-robe": {
     "name": "Wanda's Robe"
+  },
+  "rusalka-robe": {
+    "name": "Rusalka's Robe"
+  },
+  "vila-robe": {
+    "name": "Vila's Robe"
   },
   "cowl": {
     "name": "Cowl"
@@ -540,6 +642,12 @@
   "jadwiga-crown": {
     "name": "Jadwiga's Crown"
   },
+  "przemysl-crown": {
+    "name": "Przemysł's Crown"
+  },
+  "piast-crown": {
+    "name": "Crown of the Piasts"
+  },
   "surplice": {
     "name": "Surplice"
   },
@@ -569,6 +677,12 @@
   },
   "casimir-cope": {
     "name": "Casimir's Cope"
+  },
+  "hyacinth-cloak": {
+    "name": "Saint Hyacinth's Cloak"
+  },
+  "saint-florian-chasuble": {
+    "name": "Saint Florian's Chasuble"
   },
   "gloves": {
     "name": "Gloves"
@@ -600,6 +714,12 @@
   "lokietek-gloves": {
     "name": "Łokietek's Gloves"
   },
+  "wyrwidab-gloves": {
+    "name": "Wyrwidąb's Gloves"
+  },
+  "kmicic-gloves": {
+    "name": "Kmicic's Gloves"
+  },
   "boots": {
     "name": "Boots"
   },
@@ -629,6 +749,12 @@
   },
   "walgierz-boots": {
     "name": "Walgierz's Boots"
+  },
+  "lajkonik-boots": {
+    "name": "Lajkonik's Boots"
+  },
+  "pozvizd-boots": {
+    "name": "Pozvizd's Boots"
   },
   "amulet": {
     "name": "Amulet"
@@ -660,6 +786,12 @@
   "rzepicha-necklace": {
     "name": "Rzepicha's Necklace"
   },
+  "syrenka-necklace": {
+    "name": "Warsaw Mermaid's Necklace"
+  },
+  "dzidzilela-necklace": {
+    "name": "Dzidzilela's Necklace"
+  },
   "ring": {
     "name": "Ring"
   },
@@ -690,6 +822,12 @@
   "bona-ring": {
     "name": "Bona's Ring"
   },
+  "barbara-ring": {
+    "name": "Barbara's Ring"
+  },
+  "snake-king-ring": {
+    "name": "Snake King's Ring"
+  },
   "talisman": {
     "name": "Talisman"
   },
@@ -719,5 +857,11 @@
   },
   "golden-duck": {
     "name": "Golden Duck"
+  },
+  "golden-apple": {
+    "name": "Golden Apple"
+  },
+  "thunderstone": {
+    "name": "Thunderstone"
   }
 }
