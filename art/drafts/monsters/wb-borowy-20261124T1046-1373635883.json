@@ -1,0 +1,14 @@
+{
+  "id": "wb-borowy",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Borowy, the lord of the deep spruce forest, a bold simple silhouette, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, a very tall gaunt forest giant with light pale grey-green bark skin, a big clear crown of wide branching pale antlers, a long pale grey-green moss beard, a bright glowing pale green face with brightly glowing green eyes, long thin arms with long twig fingers, a few big moss patches, light clear colours, menacing, standing on both feet, full body, three-quarter view, no trees, the creature alone, no rocks, no ground, no background, the whole creature inside the picture with space below the feet, the whole antlers inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0246306999751197
+  },
+  "images": 1
+}
