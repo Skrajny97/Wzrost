@@ -52,7 +52,7 @@
     "id": "world-boss",
     "name": "Postrach Krainy",
     "level": 15,
-    "message": "Odblokowano Postrach Krainy. Co tydzień w Twoim przedziale poziomów stoi jeden boss, którego wszyscy gracze biją razem, po 3 ataki dziennie. Znajdziesz go w zakładce Walka."
+    "message": "Odblokowano Postrach Krainy. Co 3 dni w Twoim przedziale poziomów pojawia się nowy boss, którego wszyscy gracze biją razem, po 3 ataki dziennie. Znajdziesz go w zakładce Walka."
   },
   {
     "id": "mining",

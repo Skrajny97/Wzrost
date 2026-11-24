@@ -1,14 +1,17 @@
 // The World Bosses (1222–1226 A; data/world-bosses.json; src/engine/world-boss.js;
-// DECISIONS.md, "Postrach Krainy (1222–1226)"): every week (from Monday,
-// midnight in Poland, as the weekly quests) each band of levels has one
-// boss with one HP bar for all its players. A band's boss of a week comes
-// with the first look at it or attack on it in that week, with HP for the
-// band's active characters then (the character in play of an account seen
-// in the last activeDays days, with the World Boss unlocked, its higher
-// level in the band), as the Bestia Gildii comes for a guild's members. A
-// character's band goes by the higher of its levels; its first attack of
-// the week writes it down with that boss (world_boss_fighters), and the
-// character fights that boss to Sunday, whatever its levels do meanwhile.
+// DECISIONS.md, "Postrach Krainy (1222–1226)" and "Postrach Krainy co 3 dni
+// (24.11.2026)"): in every period (worldBossPeriod: a week, Monday to
+// Sunday, before cycle.from, then cycle.days Polish days in a row, from
+// midnight in Poland) each band of levels has one boss with one HP bar for
+// all its players. A band's boss of a period comes with the first look at
+// it or attack on it in that period, with HP for the band's active
+// characters then (the character in play of an account seen in the last
+// activeDays days, with the World Boss unlocked, its higher level in the
+// band), as the Bestia Gildii comes for a guild's members. The column
+// `week` keeps the period's key, the date of its first day. A character's
+// band goes by the higher of its levels; its first attack of the period
+// writes it down with that boss (world_boss_fighters), and the character
+// fights that boss to the period's end, whatever its levels do meanwhile.
 // It attacks attacksPerDay times a Polish day, whatever it is doing (an
 // attack changes nothing of the character, so an exploration's report
 // comes out the same), but not while it offers itself or serves as a
@@ -17,9 +20,9 @@
 // 0 is written down with who made it and when, and writes the titles of the
 // best (world_boss_titles) in the same batch. No XP, gold or loot for an
 // attack: whoever hit the boss opens its Skrzynia Bossa once the boss fell,
-// or through the whole next week whatever came of it, half as big when the
-// boss lived through the week, an item and more gold in it for the last
-// blow (each character's own chest, on its own visit: nothing is settled
+// or through the whole next period whatever came of it, half as big when
+// the boss lived through its period, an item and more gold in it for the
+// last blow (each character's own chest, on its own visit: nothing is settled
 // for the others in its request). Each save holds only while what was read
 // still holds (atomic.js). A character removed takes its rows along.
 
@@ -41,6 +44,7 @@ import {
   worldBossHp,
   worldBossLevelOf,
   worldBossPart,
+  worldBossPeriod,
   worldBossThresholds,
   worldBossTitle,
 } from '../engine/index.js';
@@ -66,20 +70,20 @@ async function requireBossPlayer(context) {
   return found;
 }
 
-// The week around `now`, the one before it and the end of the one after.
-function weeksAround(now) {
-  const current = questPeriod('weekly', now, content());
-  const nextEndsAt = questPeriod('weekly', current.endsAt, content()).endsAt;
-  const previous = questPeriod('weekly', current.startsAt - 1, content());
-  return { current, previous, nextEndsAt };
+// The boss's period around `now` (worldBossPeriod), the one before it and
+// the one after.
+function periodsAround(now) {
+  const current = worldBossPeriod(now, content());
+  return { current, previous: worldBossPeriod(current.startsAt - 1, content()), next: worldBossPeriod(current.endsAt, content()) };
 }
 
-// The band's boss of the week, made by the first look at it or attack on
-// it: HP for the band's active characters now (worldBossHp). The bosses,
-// the fighters' weeks of the weeks before the last one and the titles worn
-// out go then, of every band: nothing of them shows or opens any more.
+// The band's boss of the period, made by the first look at it or attack
+// on it: HP for the band's active characters now (worldBossHp). The
+// bosses, the fighters' periods of the periods before the last one and the
+// titles worn out go then, of every band: nothing of them shows or opens
+// any more.
 async function bossOf(db, band, now) {
-  const { current, previous } = weeksAround(now);
+  const { current, previous } = periodsAround(now);
   const read = () => db.prepare('SELECT * FROM world_bosses WHERE week = ? AND region = ?').bind(current.key, band.region).first();
   const found = await read();
   if (found) return found;
@@ -103,14 +107,14 @@ async function bossOf(db, band, now) {
   return read();
 }
 
-// The character's week with a boss (its first attack's row), or null.
+// The character's period with a boss (its first attack's row), or null.
 const fighterOf = (db, row, week) => db.prepare('SELECT * FROM world_boss_fighters WHERE week = ? AND character_id = ? AND created_at >= ?').bind(week, row.id, row.created_at);
 
-// The boss the character fights this week and its band: the one its first
-// attack wrote down, else its band's by its levels now; with its row of
-// the week (`fighter`, null before the first attack).
+// The boss the character fights in this period and its band: the one its
+// first attack wrote down, else its band's by its levels now; with its row
+// of the period (`fighter`, null before the first attack).
 async function standingOf(db, row, now) {
-  const { current } = weeksAround(now);
+  const { current } = periodsAround(now);
   const fighter = await fighterOf(db, row, current.key).first();
   if (fighter) {
     const boss = await db.prepare('SELECT * FROM world_bosses WHERE id = ?').bind(fighter.boss_id).first();
@@ -124,13 +128,14 @@ async function standingOf(db, row, now) {
 // The level the character fights its band's boss at, and its chest's.
 const levelIn = (band, row) => bandLevel(band, worldBossLevelOf(row.level, row.class_level));
 
-// The Skrzynie Bossa the character may open now: one for each week of a
-// boss it hit and whose chest it has not opened, this week's once the boss
-// fell, last week's whatever came of it, each with what it holds but its
-// draws (worldBossChestPlan), the title its place won and the day it opens
-// until.
+// The Skrzynie Bossa the character may open now: one for each period of a
+// boss it hit and whose chest it has not opened, this period's once the
+// boss fell, the last one's whatever came of it, each with what it holds
+// but its draws (worldBossChestPlan), the title its place won, its
+// period's first and last midnight and the moment it opens until: the end
+// of the period after the boss's.
 async function chestsOf(db, row, now) {
-  const { current, previous, nextEndsAt } = weeksAround(now);
+  const { current, previous, next } = periodsAround(now);
   const { results } = await db
     .prepare(
       `SELECT f.week, f.damage, f.boss_id, b.region, b.boss, b.players, b.max_hp, b.hp, b.fallen_by, t.place, t.until AS title_until
@@ -148,16 +153,18 @@ async function chestsOf(db, row, now) {
       if (!band) return null;
       const fallen = one.hp <= 0;
       const plan = worldBossChestPlan({ level: levelIn(band, row), damage: one.damage, part: worldBossPart({ maxHp: one.max_hp, players: one.players }), fallen, lastBlow: one.fallen_by === row.id }, content());
-      return { ...one, band, fallen, plan, until: one.week === current.key ? nextEndsAt : current.endsAt };
+      const period = one.week === current.key ? current : previous;
+      return { ...one, band, fallen, plan, startsAt: period.startsAt, endsAt: period.endsAt, until: one.week === current.key ? next.endsAt : current.endsAt };
     })
     .filter(Boolean);
 }
 
 // The words of the card (all but the answers' errors), with the rules'
-// numbers filled in.
+// numbers filled in: the attacks of a day and the days of a boss.
 function cardTexts() {
   const words = Object.fromEntries(Object.entries(rules().texts).filter(([key]) => key !== 'errors'));
-  return { ...words, rules: words.rules.map((line) => filled(line, { attacks: rules().attacksPerDay })) };
+  const numbers = { attacks: rules().attacksPerDay, days: rules().cycle.days };
+  return { ...words, lead: filled(words.lead, numbers), rules: words.rules.map((line) => filled(line, numbers)) };
 }
 
 // The title of a fallen boss the character wears now (its newest), for its
@@ -186,16 +193,17 @@ export const worldBossTitleText = (bossId, appearance) => {
   return boss ? worldBossTitle(boss, appearance) : null;
 };
 
-// The World Boss for the card: the boss the character fights this week
-// (its name, words, land and band, the level it fights the character at,
-// its HP, and who felled it), the attacks left today, with the words of why
-// it may not attack at all while it is a mercenary (`attacks.blocked`); the
-// best of the week by damage (title.places of them; a character removed
-// since is left out, its damage stays off the bar) and the character's own
-// damage, place and chest now with the next one; the chests it may open,
-// the title it wears and the card's words.
+// The World Boss for the card: the boss the character fights in this
+// period (its name, words, land and band, the level it fights the
+// character at, its HP, who felled it, and its period's first and last
+// midnight, the next boss's coming), the attacks left today, with the
+// words of why it may not attack at all while it is a mercenary
+// (`attacks.blocked`); the best of the boss by damage (title.places of
+// them; a character removed since is left out, its damage stays off the
+// bar) and the character's own damage, place and chest now with the next
+// one; the chests it may open, the title it wears and the card's words.
 export async function worldBossView(db, row, now, activity = null) {
-  const { current } = weeksAround(now);
+  const { current } = periodsAround(now);
   const day = questPeriod('daily', now, content()).key;
   const { fighter, boss, band } = await standingOf(db, row, now);
   const definition = content().worldBossesById[boss.boss];
@@ -241,6 +249,7 @@ export async function worldBossView(db, row, now, activity = null) {
       fallen: boss.hp <= 0,
       fallenAt: boss.fallen_at,
       fallenBy: felled.results[0]?.name ?? null,
+      startsAt: current.startsAt,
       endsAt: current.endsAt,
       // Its picture (src/client/art.js: its own once drawn, else the
       // creature's in its place) and its cry (sounds.json, voices.<sound>.cry).
@@ -270,6 +279,8 @@ export async function worldBossView(db, row, now, activity = null) {
       itemChance: chest.plan.itemChance,
       lastBlow: chest.plan.lastBlowItem ? { gold: chest.plan.lastBlowGold } : null,
       title: chest.place && chest.title_until > now ? { text: worldBossTitle(content().worldBossesById[chest.boss], row.appearance), place: chest.place, until: chest.title_until } : null,
+      startsAt: chest.startsAt,
+      endsAt: chest.endsAt,
       until: chest.until,
     })),
     title: await worldBossTitleOf(db, row, now),
@@ -285,12 +296,14 @@ export async function getWorldBoss(context) {
 
 // POST /api/world-boss/attack: one fight of the character and its
 // companions who would go on an exploration (companionsGoing) with the
-// boss it fights this week, at its level in the band. Saved only while the
-// character is as read, the boss still stands, the character's week is
-// with this boss (its first attack writes it down) and it has an attack
-// left today: its damage, never more than the HP left, added to its week,
-// and the HP it takes off the bar, with who felled the boss and when, and
-// the titles of the best when this hit felled it. Answers with the damage,
+// boss it fights in this period, at its level in the band. Saved only
+// while the character is as read, the boss still stands, the character's
+// period is with this boss (its first attack writes it down) and it has an
+// attack left today: its damage, never more than the HP left, added to its
+// period, and the HP it takes off the bar, with who felled the boss and
+// when, and the titles of the best when this hit felled it, worn to the
+// end of the next period (the author, 24.11.2026: the title holds while
+// the next boss is fought). Answers with the damage,
 // the HP left, whether this hit felled the boss, the fight's lines, its
 // playback for the arena and the World Boss anew.
 export async function attackWorldBoss(context) {
@@ -301,7 +314,7 @@ export async function attackWorldBoss(context) {
   // A character offering itself as a mercenary, or serving, does not fight
   // the boss (DECISIONS.md, "Najemnicy w Karczmie", 2), as the Bestia.
   if (player.activity?.kind === 'mercenary') requireNotExploring(player, now);
-  const { current } = weeksAround(now);
+  const { current, next } = periodsAround(now);
   const day = questPeriod('daily', now, content()).key;
   const { fighter, boss, band } = await standingOf(db, row, now);
   if (boss.hp <= 0) throw new ApiError(409, 'fallen', errors().fallen);
@@ -319,13 +332,13 @@ export async function attackWorldBoss(context) {
     },
     content(),
   );
-  const { places, days } = rules().title;
+  const { places } = rules().title;
   const [, , , , , before, , , after] = await atomically(
     db,
     [
       sameVersion(db, row),
       assertion(db, '(SELECT hp FROM world_bosses WHERE id = ?) > 0', [boss.id]),
-      // The character's week with this boss, from its first attack.
+      // The character's period with this boss, from its first attack.
       db.prepare('INSERT OR IGNORE INTO world_boss_fighters (week, character_id, boss_id, day, created_at) VALUES (?, ?, ?, ?, ?)').bind(current.key, row.id, boss.id, day, now),
       assertion(db, '(SELECT boss_id FROM world_boss_fighters WHERE week = ? AND character_id = ?) = ?', [current.key, row.id, boss.id]),
       assertion(db, '(SELECT CASE WHEN day = ? THEN day_hits ELSE 0 END FROM world_boss_fighters WHERE week = ? AND character_id = ?) < ?', [day, current.key, row.id, perDay]),
@@ -354,7 +367,7 @@ export async function attackWorldBoss(context) {
            WHERE boss_id = ? AND EXISTS (SELECT 1 FROM world_bosses WHERE id = ? AND hp <= 0 AND fallen_by = ? AND fallen_at = ?)
            ORDER BY damage DESC, created_at, character_id LIMIT ?`,
         )
-        .bind(now + days * DAY, now, boss.id, boss.id, row.id, now, places),
+        .bind(next.endsAt, now, boss.id, boss.id, row.id, now, places),
     ],
     () => new ApiError(409, 'raced', errors().raced),
   );
@@ -372,11 +385,12 @@ export async function attackWorldBoss(context) {
   });
 }
 
-// POST /api/world-boss/claim { week }: the Skrzynia Bossa of a week, once
-// (chestsOf). Its items need places in the bag; the gold and the materials
-// take none. The batch holds only while the character is as read and the
-// chest is not opened, and the items come only with the chest written down
-// by it. The same week's chest holds the same, whenever it is opened.
+// POST /api/world-boss/claim { week }: the Skrzynia Bossa of a period (its
+// key), once (chestsOf). Its items need places in the bag; the gold and
+// the materials take none. The batch holds only while the character is as
+// read and the chest is not opened, and the items come only with the chest
+// written down by it. The same period's chest holds the same, whenever it
+// is opened.
 export async function claimWorldBossChest(context) {
   const { session, player } = await requireBossPlayer(context);
   const { row } = player;

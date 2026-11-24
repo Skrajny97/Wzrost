@@ -614,17 +614,18 @@ async function main() {
   );
   // The World Boss of its band on the Walka screen (world-boss.js; 1222–1226
   // A): Kamienna Baba of the levels 126–150, with HP in ten digits and two
-  // attacks left today; the best ten of the week, the member of the longest
+  // attacks left today; the best ten of the boss, the member of the longest
   // name first, then the guild's reserve, and the character 12th with nine
-  // digits of damage; last week's boss fallen by its blow, its chest waiting
-  // with the last blow's part and the title of the first place, which the
-  // member of the longest name wears in the Ranking too.
-  const weekDay = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].indexOf(new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Warsaw', weekday: 'short' }).format(new Date()));
-  const weekOf = (back) => {
-    const date = new Date(`${day}T12:00:00Z`);
-    date.setUTCDate(date.getUTCDate() - weekDay - 7 * back);
-    return date.toISOString().slice(0, 10);
-  };
+  // digits of damage; the boss of the period before fallen by its blow, its
+  // chest waiting with the last blow's part and the title of the first
+  // place, which the member of the longest name wears in the Ranking too.
+  // The periods' keys as the server has them (worldBossPeriod: weeks, then
+  // 3 days from 30.11.2026).
+  const engine = await import('../src/engine/index.js');
+  const { loadData } = await import('./validate-data.mjs');
+  const bossContent = engine.buildContent(loadData());
+  const period = engine.worldBossPeriod(Date.now(), bossContent);
+  const weekOf = (back) => (back === 0 ? period : engine.worldBossPeriod(period.startsAt - 1, bossContent)).key;
   const now = Date.now();
   const own = `(SELECT id FROM characters WHERE name = '${name}')`;
   const boss = (back) => `(SELECT id FROM world_bosses WHERE week = '${weekOf(back)}' AND region = 'pine-dunes')`;

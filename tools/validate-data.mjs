@@ -945,6 +945,11 @@ function checkWorldBosses(data, { monsters }) {
   for (const chest of rules.chests) {
     if (!rules.texts.sizes?.[chest.id] || !rules.texts.nextSizes?.[chest.id]) errors.push(`world-bosses.json: texts nie nazywają skrzyni ${chest.id}`);
   }
+  // The cycles' first day a real day of the calendar (worldBossPeriod
+  // counts the cycles from it).
+  const [year, month, day] = String(rules.cycle?.from).split('-').map(Number);
+  const from = new Date(Date.UTC(year, month - 1, day));
+  if (from.getUTCFullYear() !== year || from.getUTCMonth() !== month - 1 || from.getUTCDate() !== day) errors.push(`world-bosses.json: cycle.from (${rules.cycle?.from}) to nie dzień kalendarza`);
   if (!bosses.size) errors.push('world-bosses.json: brak bossów');
   return errors;
 }

@@ -1372,6 +1372,10 @@
     "0.5.9": {
       "title": "Version 0.5.9",
       "body": "- Community → Friends: “Copy link” in the “Recommend the game” card now copies your link instead of showing an error."
+    },
+    "0.5.10": {
+      "title": "Version 0.5.10",
+      "body": "- The World Boss now appears every 3 days instead of every week, so you win chests and titles more often. The first such boss appears on Monday 30 November.\n- The top ten's title now lasts until the end of the next boss's time."
     }
   }
 }

@@ -1720,6 +1720,11 @@
       "id": "0.5.9",
       "title": "Wersja 0.5.9",
       "body": "- Społeczność → Znajomi: przycisk „Kopiuj link” w karcie „Poleć grę” kopiuje już Twój link, bez komunikatu o błędzie."
+    },
+    {
+      "id": "0.5.10",
+      "title": "Wersja 0.5.10",
+      "body": "- Postrach Krainy pojawia się teraz co 3 dni zamiast co tydzień, więc skrzynie i tytuły zdobywasz częściej. Pierwszy taki boss pojawi się w poniedziałek 30 listopada.\n- Tytuł dla najlepszej dziesiątki trwa teraz do końca czasu następnego bossa."
     }
   ]
 }

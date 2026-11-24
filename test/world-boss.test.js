@@ -3,8 +3,9 @@
 // character's band by the higher of its levels, the boss's HP from the
 // band's active characters, an attack with the companions, never more than
 // the HP left, the chests by the damage against a character's share (half
-// as big when the boss lived through the week, the last blow's item and
-// gold), and the title.
+// as big when the boss lived through its period, the last blow's item and
+// gold), the title, and the boss's periods: the week to Sunday 29.11.2026,
+// then 3 Polish days in a row (the author, 24.11.2026).
 
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
@@ -21,6 +22,7 @@ import {
   worldBossFight,
   worldBossHp,
   worldBossPart,
+  worldBossPeriod,
   worldBossThresholds,
   worldBossTitle,
 } from '../src/engine/index.js';
@@ -201,11 +203,31 @@ describe('the World Bosses', () => {
     assert.ok(half.items.length <= 1);
   });
 
+  test('the boss\'s period: the week to Sunday 29.11.2026, then 3 Polish days in a row from Monday 30.11.2026', () => {
+    const at = (iso) => Date.parse(iso);
+    assert.deepEqual(rules.cycle, { days: 3, from: '2026-11-30' });
+    // The last week, Monday 23.11 to Sunday 29.11, to its last moment (Polish midnights in UTC).
+    const week = worldBossPeriod(at('2026-11-29T22:59:59Z'), content);
+    assert.deepEqual(week, { key: '2026-11-23', startsAt: at('2026-11-22T23:00:00Z'), endsAt: at('2026-11-29T23:00:00Z') });
+    // Then 30.11–2.12, 3–5.12, … from midnight to midnight.
+    const first = worldBossPeriod(at('2026-11-29T23:00:00Z'), content);
+    assert.deepEqual(first, { key: '2026-11-30', startsAt: at('2026-11-29T23:00:00Z'), endsAt: at('2026-12-02T23:00:00Z') });
+    assert.deepEqual(worldBossPeriod(at('2026-12-02T22:59:59Z'), content), first);
+    assert.deepEqual(worldBossPeriod(at('2026-12-02T23:00:00Z'), content), { key: '2026-12-03', startsAt: at('2026-12-02T23:00:00Z'), endsAt: at('2026-12-05T23:00:00Z') });
+    // The period before the first cycle is the last week, and the one after a cycle starts at its end.
+    assert.deepEqual(worldBossPeriod(first.startsAt - 1, content), week);
+    assert.equal(worldBossPeriod(first.endsAt, content).startsAt, first.endsAt);
+    // Over the change to summer time (Sunday 28.03.2027, in the cycle of 27–29.03): 71 hours, midnight to midnight on the Polish clock.
+    const spring = worldBossPeriod(at('2027-03-28T10:00:00Z'), content);
+    assert.deepEqual(spring, { key: '2027-03-27', startsAt: at('2027-03-26T23:00:00Z'), endsAt: at('2027-03-29T22:00:00Z') });
+    // The keys sort as the periods do.
+    assert.ok(week.key < first.key && first.key < spring.key);
+  });
+
   test('the title of a boss, a woman\'s for a female character', () => {
     const boss = worldBossBandOf('bald-mountain', content).boss;
     assert.equal(worldBossTitle(boss, 'male'), 'Pogromca Boruty');
     assert.equal(worldBossTitle(boss, 'female'), 'Pogromczyni Boruty');
     assert.equal(rules.title.places, 10);
-    assert.equal(rules.title.days, 7);
   });
 });
