@@ -7,20 +7,25 @@
 // omens, each a premium of `value` percent for `hours` hours to one kind of
 // the weeks' effects (weeks.js: XP or gold from fights, the chance of an
 // item, materials, the professions' XP, herbs, the pace of rest, reputation)
-// and a small reward at once. A fortune on both evenings of a year gives the
-// portrait's background and the achievement with its title. The day is the
-// Polish one, as the daily quests' (questPeriod('daily') in quests.js).
+// and a small reward at once. With the omen comes one of the fortunes'
+// words (`fortunes`, the author's, 24.11.2026: „Takie skierowane do gracza
+// nie do postaci nawet”), drawn from the same seed. A fortune on both
+// evenings of a year gives the portrait's background and the achievement
+// with its title. The day is the Polish one, as the daily quests'
+// (questPeriod('daily') in quests.js).
 //
 // Stored state (characters.andrzejki): {"2026-11-29": {"omen": "dragon",
-// "kind": "wax", "at": 1795…}, …}, the fortunes told, by the Polish day.
+// "kind": "wax", "at": 1795…, "line": 17}, …}, the fortunes told, by the
+// Polish day; `line` is the place of the words in `fortunes`, missing in a
+// fortune told before they came.
 
 import { explorationGold } from './mining.js';
 import { createRng } from './rng.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {{ id: string, name: string, kind: string, reward: { timePoints?: number, goldMinutes?: number, packs?: number } }} Omen */
-/** @typedef {{ month: number, days: { day: number, from: number, kind: string }[], hours: number, value: number, goldRound: number, omens: Omen[] }} AndrzejkiRules */
-/** @typedef {{ omen: string, kind: string, at: number }} Fortune */
+/** @typedef {{ month: number, days: { day: number, from: number, kind: string }[], hours: number, value: number, goldRound: number, omens: Omen[], fortunes?: string[] }} AndrzejkiRules */
+/** @typedef {{ omen: string, kind: string, at: number, cup?: number, line?: number }} Fortune */
 /** @typedef {{ key: string, kind: string, opensAt: number, endsAt: number }} Evening */
 
 const HOUR = 3600000;
@@ -45,15 +50,31 @@ export function andrzejkiEvening(day, now, rules, test = false) {
   return now >= opensAt && now < day.endsAt ? { key: day.key, kind: evening.kind, opensAt, endsAt: day.endsAt } : null;
 }
 
-// The omen a fortune shows: drawn from the server's seed (the character, the
-// evening and, among the cups, the one chosen).
+// A fortune drawn from the server's seed (the character, the evening and,
+// among the cups, the one chosen): its omen first, as before the words came,
+// then the place of its words in `fortunes` (`line`), or null without them.
 /**
  * @param {string} seed
  * @param {AndrzejkiRules} rules
- * @returns {Omen}
+ * @returns {{ omen: Omen, line: number | null }}
  */
-export function drawOmen(seed, rules) {
-  return createRng(seed).pick(rules.omens);
+export function drawFortune(seed, rules) {
+  const rng = createRng(seed);
+  const omen = rng.pick(rules.omens);
+  const count = rules.fortunes?.length ?? 0;
+  return { omen, line: count > 0 ? rng.int(0, count - 1) : null };
+}
+
+// The words of a fortune told: those at its `line` in `fortunes`, or null
+// for a fortune told before the words came (or a line no longer there).
+/**
+ * @param {Fortune | null | undefined} fortune
+ * @param {AndrzejkiRules} rules
+ * @returns {string | null}
+ */
+export function fortuneWords(fortune, rules) {
+  const line = fortune?.line;
+  return typeof line === 'number' && Number.isInteger(line) ? (rules.fortunes?.[line] ?? null) : null;
 }
 
 // The omens of the fortunes told whose premium still runs at `now`: each as

@@ -29945,10 +29945,11 @@ a.social-button {
 }
 
 /* Andrzejki (andrzejki.js, 1082 C): an omen still running, a slim line
-   under the week's in its look, and the card of the fortune evening: the
-   picture of the evening at a whole multiple of its pixels where it fits,
-   the omen's wax shape as a shadow on the wall over the wax's picture (and
-   in the bowl), or the figurine where the cup chosen stood. */
+   under the week's in its look, and the card of the fortune evening at the
+   Zaklinaczka's in the Osada (24.11.2026): the picture of the evening at a
+   whole multiple of its pixels where it fits, the omen's wax shape as a
+   shadow on the wall over the wax's picture (and in the bowl), or the
+   figurine where the cup chosen stood. */
 .omen-line {
   display: flex;
   align-items: center;
@@ -30084,6 +30085,7 @@ a.social-button {
 
 .andrzejki-about,
 .andrzejki-result,
+.andrzejki-line,
 .andrzejki-omen,
 .andrzejki-both,
 .andrzejki-next,
@@ -30094,6 +30096,12 @@ a.social-button {
 .andrzejki-result {
   color: var(--gold);
   font-weight: bold;
+}
+
+/* The fortune's words for the player under the omen (24.11.2026): spoken
+   low, as the residents' greetings. */
+.andrzejki-line {
+  font-style: italic;
 }
 
 .omen-reward {

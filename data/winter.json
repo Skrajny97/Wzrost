@@ -89,7 +89,7 @@
     "questsNote": "Zimowe zadania są codziennie przez cały grudzień i nie da się ich przelosować."
   },
   "andrzejki": {
-    "$comment": "Andrzejki: Wieczór wróżb (1082 C, 1083 C, 1084 A i B; src/engine/andrzejki.js, src/server/andrzejki.js). W miesiącu month: dnia days[].day od godziny from (czas polski) do północy jeden wieczór wróżb danego rodzaju (kind: wax to lanie wosku, cups to trzy kubki); każda postać wróży raz każdego wieczoru. Wróżba to jeden z omens, losowany z ziarna serwera: przez hours godzin dodaje value procent do jednego rodzaju premii tygodni (kind jak w weeks.json: xp, gold, items, materials, profession-xp, herbs, rest, reputation), a od razu daje reward: Punkty Czasu (timePoints), złoto z goldMinutes minut wyprawy na poziomie postaci (zaokrąglone do goldRound) albo pakiety kart (packs). Wróżby w oba wieczory jednego roku dają tło portretu background (z cosmetics.json, tylko z wydarzenia) i dopisują do feats postaci feat, z którego liczy się osiągnięcie z tytułem (achievements.json). Wersja testowa (ANDRZEJKI: test) gra każdy dzień od północy: nieparzysty jak lanie wosku, parzysty jak trzy kubki.",
+    "$comment": "Andrzejki: Wieczór wróżb (1082 C, 1083 C, 1084 A i B; src/engine/andrzejki.js, src/server/andrzejki.js). W miesiącu month: dnia days[].day od godziny from (czas polski) do północy jeden wieczór wróżb danego rodzaju (kind: wax to lanie wosku, cups to trzy kubki); każda postać wróży raz każdego wieczoru, u Zaklinaczki w Osadzie, więc tylko postać, która może wejść do Osady (inaczej odmowa locked z poziomem Osady). Wróżba to jeden z omens, losowany z ziarna serwera: przez hours godzin dodaje value procent do jednego rodzaju premii tygodni (kind jak w weeks.json: xp, gold, items, materials, profession-xp, herbs, rest, reputation), a od razu daje reward: Punkty Czasu (timePoints), złoto z goldMinutes minut wyprawy na poziomie postaci (zaokrąglone do goldRound) albo pakiety kart (packs). Z kształtem przychodzą słowa wróżby dla gracza: jedna z fortunes, losowana z tego samego ziarna, a jej numer (line) zapisuje się przy wróżbie. Wróżby w oba wieczory jednego roku dają tło portretu background (z cosmetics.json, tylko z wydarzenia) i dopisują do feats postaci feat, z którego liczy się osiągnięcie z tytułem (achievements.json). Wersja testowa (ANDRZEJKI: test) gra każdy dzień od północy: nieparzysty jak lanie wosku, parzysty jak trzy kubki.",
     "month": 11,
     "days": [
       {
@@ -173,6 +173,48 @@
         }
       }
     ],
+    "fortunes": [
+      "Ten wosk zastygł dla Ciebie, nie dla Twojej postaci. Ona tylko trzyma świecę.",
+      "Kiedy zgasisz dziś ekran, ktoś o Tobie pomyśli. Nie będzie to nikt z gry.",
+      "Gdy odłożysz telefon, rozejrzyj się. Coś w Twoim pokoju od dawna czeka na Twoją uwagę.",
+      "Twoja postać zbiera złoto. Ty w tym miesiącu zbierzesz coś cenniejszego.",
+      "System widzi tylko Twoją postać. Wróżba widzi też Ciebie, po drugiej stronie ekranu.",
+      "Najbliższa wiadomość spoza gry, która przyjdzie na Twój telefon, przyniesie dobrą nowinę.",
+      "Twoja postać odpoczywa między walkami. Tobie też się to należy, i to szybciej, niż myślisz.",
+      "Pierwsza osoba, która jutro się do Ciebie odezwie, ma dla Ciebie więcej, niż powie.",
+      "Kubki nie kłamią: w prawdziwym świecie też czeka na Ciebie skrzynia. Wystarczy ją otworzyć.",
+      "Ktoś obok Ciebie nie wie, że właśnie wróżysz. Niech na razie tak zostanie.",
+      "Przed końcem tygodnia ktoś poprosi Cię o radę. Twoja postać byłaby z Ciebie dumna.",
+      "Twój poziom w grze rośnie z każdą wyprawą. Twój prawdziwy poziom rośnie po cichu, nawet dziś.",
+      "Herbata, którą dziś wypijesz, będzie smakować lepiej, jeśli pomyślisz przy niej życzenie.",
+      "Zanim zaśniesz, przypomnij sobie jedną dobrą rzecz z dzisiaj. Jutro wróci z odsetkami.",
+      "Ekran oświetla tylko Twoją twarz. Ta świeca oświetli też Twoje jutro.",
+      "Wyprawy w grze trwają godzinami. Twoja najważniejsza droga tej zimy zacznie się od jednego kroku za próg.",
+      "Ktoś z Twojego prawdziwego życia potrzebuje dziś tylko jednego słowa. Wiesz, kto.",
+      "Twoja postać zdobędzie dziś premię. Ty zdobędziesz coś trwalszego: dobry pomysł tuż przed snem.",
+      "Wosk widzi Twoje dłonie, a nie dłonie postaci. Są silniejsze, niż Ci się wydaje.",
+      "Najbliższy sen nie będzie o grze. Zapamiętaj go.",
+      "Twoja postać ma towarzyszy z Karczmy. Ty masz kogoś, kto stanąłby za Tobą bez zapłaty.",
+      "Gdy następnym razem spojrzysz na zegar i zobaczysz te same cyfry, wróżba się spełni.",
+      "Nie wszystkie skarby wypadają z czempionów. Jeden leży w szufladzie, do której dawno nie zaglądasz.",
+      "Gdzieś po drugiej stronie innego ekranu ktoś też właśnie wróży. Życzy Ci dobrze.",
+      "Twoje Punkty Czasu odnawiają się same. Twój czas też, jeśli dziś trochę odpoczniesz.",
+      "Za oknem dzieje się teraz coś, czego nie zobaczysz w żadnej krainie. Wyjrzyj.",
+      "Ktoś czeka, aż oderwiesz wzrok od ekranu i się uśmiechniesz. Sprawdź, czy to dziś.",
+      "Następna rzecz, którą zgubisz, nie przepadnie. Wróci w najlepszym momencie.",
+      "Twoja postać nie wie, że w nią grasz. Ty nie wiesz jeszcze, jak dobry będzie Twój grudzień.",
+      "Słowa, które przeczytasz dziś poza grą, będą miały ukryty sens. Szukaj trzeciego zdania.",
+      "Mówią, że wróżba spełnia się, gdy się o niej zapomni. Więc zapomnij i graj dalej.",
+      "Przy następnym posiłku w prawdziwym świecie dostaniesz premię do humoru.",
+      "Najlepsze znalezisko tego tygodnia nie trafi do plecaka postaci, tylko do Twojej pamięci.",
+      "Tej nocy System na chwilę zamyka oczy. Zrób coś tylko dla siebie.",
+      "Ktoś, z kim grasz, pamięta Twoje imię lepiej, niż sądzisz.",
+      "Ten weekend przyniesie Ci coś, czego nie da żadna wyprawa: dobrą rozmowę.",
+      "Liczba, która dziś trzy razy rzuci Ci się w oczy poza grą, będzie Twoją szczęśliwą do końca roku.",
+      "Gdy następnym razem stracisz zasięg, potraktuj to jako znak. Odpocznij.",
+      "Twoja postać śpi, kiedy Ty śpisz. Połóż się dziś wcześniej, a jutrzejsza wyprawa pójdzie lepiej.",
+      "Ta wróżba spełni się tylko w połowie. Druga połowa należy do Ciebie."
+    ],
     "background": "bg-andrzejki",
     "feat": "andrzejki",
     "texts": {
@@ -195,6 +237,7 @@
       "active": "Wróżba: {omen}",
       "report": "Wróżba {omen}: {effects}.",
       "closed": "Wieczór wróżb już minął.",
+      "locked": "Wieczór wróżb czeka u Zaklinaczki w Osadzie, a Osadę odblokujesz na poziomie postaci {level}.",
       "taken": "Ten wieczór już wywróżony.",
       "changed": "Coś się zmieniło w międzyczasie. Spróbuj jeszcze raz."
     }

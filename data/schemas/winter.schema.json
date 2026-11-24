@@ -477,6 +477,7 @@
         "goldRound",
         "cups",
         "omens",
+        "fortunes",
         "background",
         "feat",
         "texts"
@@ -600,6 +601,15 @@
                 }
               }
             }
+          }
+        },
+        "fortunes": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Wróżby słowami (autor, 24.11.2026): przy każdej wróżbie serwer losuje jedną z nich z tego samego ziarna co kształt, a postać zapisuje jej numer (line) przy wróżbie, więc ponowne wejście jej nie zmienia.",
+          "items": {
+            "type": "string",
+            "minLength": 1
           }
         },
         "background": {
