@@ -34,7 +34,7 @@
   },
   "world-boss": {
     "name": "World Boss",
-    "message": "World Boss unlocked. Every week one boss stands in your band of levels, and all its players fight it together, 3 attacks a day each. Find it in the Combat tab."
+    "message": "World Boss unlocked. Every 3 days a new boss appears in your band of levels, and all its players fight it together, 3 attacks a day each. Find it in the Combat tab."
   },
   "mining": {
     "name": "Mining",

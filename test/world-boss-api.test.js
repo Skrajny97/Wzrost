@@ -1,17 +1,19 @@
 // The World Bosses through the API (src/server/world-boss.js; the author:
-// 1222–1226 A): one boss for each band of levels and week, with HP for the
-// band's active characters and one bar for all of them; three attacks a
-// day; a character's band written down with its first attack of the week
-// and kept, whatever its levels do; the hit that fells the boss, with the
-// last blow and the titles of the best ten in the profile and the Ranking;
-// the chests each character opens on its own visit, half as big when the
-// boss lived through the week, with the last blow's item and gold; a full
-// bag keeping a chest with items shut.
+// 1222–1226 A, and a boss every 3 days from 30.11.2026): one boss for each
+// band of levels and period, with HP for the band's active characters and
+// one bar for all of them; three attacks a day; a character's band written
+// down with its first attack of the period and kept, whatever its levels
+// do; the hit that fells the boss, with the last blow and the titles of the
+// best ten in the profile and the Ranking; the chests each character opens
+// on its own visit, half as big when the boss lived through its period,
+// with the last blow's item and gold; a full bag keeping a chest with items
+// shut; and on the test clock, the last weekly boss to its Sunday, then the
+// cycles of 3 days with their band, chests and titles.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { createRng, generateItem, questPeriod, worldBossBandOf, worldBossDamage, worldBossHp, worldBossPart } from '../src/engine/index.js';
+import { createRng, generateItem, worldBossBandOf, worldBossDamage, worldBossHp, worldBossPart, worldBossPeriod } from '../src/engine/index.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -35,7 +37,8 @@ describe('the World Boss through the API', () => {
   const attack = (login) => as(login, 'POST', '/api/world-boss/attack');
   const view = async (login) => (await as(login, 'GET', '/api/world-boss')).data;
   const characterId = async (name) => (await first('SELECT id FROM characters WHERE name = ?', name)).id;
-  const week = () => questPeriod('weekly', Date.now(), content).key;
+  // The key of the boss's period now (a week, then 3 days from 30.11.2026).
+  const week = () => worldBossPeriod(Date.now(), content).key;
 
   beforeEach(async () => {
     await player('lowczyni', 'Łowczyni', 40);
@@ -50,7 +53,7 @@ describe('the World Boss through the API', () => {
     assert.equal((await attack('nowicjusz')).status, 403);
   });
 
-  test('a band\'s boss of the week: HP for the band\'s active characters, the same for all of them, one row for the band', async () => {
+  test('a band\'s boss of the period: HP for the band\'s active characters, the same for all of them, one row for the band', async () => {
     // Someone of another band, someone not seen for long and one below the unlock count not.
     await player('daleki', 'Daleki', 120);
     await player('dawny', 'Dawny', 41);
@@ -83,7 +86,7 @@ describe('the World Boss through the API', () => {
     assert.equal((await first('SELECT COUNT(*) AS count FROM world_bosses')).count, 2);
   });
 
-  test('three attacks a day; the HP goes down for the whole band and the best of the week show who hit how much', async () => {
+  test('three attacks a day; the HP goes down for the whole band and the best of the boss show who hit how much', async () => {
     let damage = 0;
     for (let left = rules.attacksPerDay - 1; left >= 0; left--) {
       const hit = await attack('lowczyni');
@@ -114,9 +117,9 @@ describe('the World Boss through the API', () => {
     assert.equal((await view('lowczyni')).attacks.left, rules.attacksPerDay - 1);
   });
 
-  test('the band is written down with the first attack and kept for the week; before it, the band follows the levels', async () => {
+  test('the band is written down with the first attack and kept for the period; before it, the band follows the levels', async () => {
     assert.equal((await attack('lowczyni')).status, 200);
-    // Both go up to the next band in the week.
+    // Both go up to the next band in the period.
     await run("UPDATE characters SET level = 60, class_level = 60 WHERE name IN ('Łowczyni', 'Tropiciel')");
     const kept = await view('lowczyni');
     assert.equal(kept.boss.id, 'wb-kotolak');
@@ -130,7 +133,7 @@ describe('the World Boss through the API', () => {
     assert.equal((await first('SELECT COUNT(*) AS count FROM world_boss_fighters')).count, 2);
   });
 
-  test('the hit that fells the boss is written down; the best ten get its title for a week, in the profile and the Ranking', async () => {
+  test('the hit that fells the boss is written down; the best ten get its title to the end of the next period, in the profile and the Ranking', async () => {
     await attack('tropiciel');
     await attack('lowczyni');
     await run('UPDATE world_bosses SET hp = 3');
@@ -144,10 +147,11 @@ describe('the World Boss through the API', () => {
     const late = await attack('lowczyni');
     assert.equal(late.status, 409);
     assert.equal(late.data.error.code, 'fallen');
-    // The titles: both, by their damage, for title.days days from the fall.
+    // The titles: both, by their damage, to the end of the period after the boss's.
     const titles = (await (await db()).prepare('SELECT character_id, place, until, created_at FROM world_boss_titles ORDER BY place').all()).results;
     assert.equal(titles.length, 2);
-    assert.equal(titles[0].until, titles[0].created_at + rules.title.days * 86400000);
+    const period = worldBossPeriod(titles[0].created_at, content);
+    assert.equal(titles[0].until, worldBossPeriod(period.endsAt, content).endsAt);
     const fighters = (await (await db()).prepare('SELECT character_id FROM world_boss_fighters ORDER BY damage DESC, created_at, character_id').all()).results;
     assert.deepEqual(
       titles.map((one) => one.character_id),
@@ -161,7 +165,7 @@ describe('the World Boss through the API', () => {
     assert.equal((await as('lowczyni', 'GET', '/api/profile/Tropiciel')).data.profile.worldBossTitle, 'Pogromca Kotołaka');
     const ranking = (await as('lowczyni', 'GET', '/api/ranking')).data.rows;
     assert.equal(ranking.find((row) => row.name === 'Łowczyni').bossTitle, 'Pogromczyni Kotołaka');
-    // Worn out after a week.
+    // Worn out after the next period.
     await run('UPDATE world_boss_titles SET until = ?', Date.now() - 1);
     assert.equal((await as('tropiciel', 'GET', '/api/profile/Łowczyni')).data.profile.worldBossTitle, null);
     assert.equal((await as('lowczyni', 'GET', '/api/ranking')).data.rows.find((row) => row.name === 'Łowczyni').bossTitle, null);
@@ -170,7 +174,7 @@ describe('the World Boss through the API', () => {
   test('the chests wait for each character\'s own visit; the last blow\'s holds an item and more gold; each opens once', async () => {
     await attack('lowczyni');
     await attack('tropiciel');
-    // While the boss stands, this week's chest waits.
+    // While the boss stands, this period's chest waits.
     assert.deepEqual((await view('lowczyni')).chests, []);
     await run('UPDATE world_bosses SET hp = 2');
     assert.equal((await attack('lowczyni')).data.attack.fell, true);
@@ -208,10 +212,10 @@ describe('the World Boss through the API', () => {
     assert.equal((await as('tropiciel', 'POST', '/api/world-boss/claim', { week: week() })).status, 200);
   });
 
-  test('last week\'s boss that lived: half the chest, no last blow, and none of the weeks before', async () => {
-    const current = questPeriod('weekly', Date.now(), content);
-    const previous = questPeriod('weekly', current.startsAt - 1, content);
-    const older = questPeriod('weekly', previous.startsAt - 1, content);
+  test('the last period\'s boss that lived: half the chest, no last blow, and none of the periods before', async () => {
+    const current = worldBossPeriod(Date.now(), content);
+    const previous = worldBossPeriod(current.startsAt - 1, content);
+    const older = worldBossPeriod(previous.startsAt - 1, content);
     const id = await characterId('Łowczyni');
     const boss = async (key, hp) => {
       const made = await run("INSERT INTO world_bosses (week, region, boss, players, level, max_hp, hp, created_at) VALUES (?, 'stone-glade', 'wb-kotolak', 4, 40, 1000, ?, ?)", key, hp, Date.now());
@@ -230,8 +234,10 @@ describe('the World Boss through the API', () => {
     assert.equal(chest.lastBlow, null);
     assert.equal(chest.itemChance, rules.chests.find((one) => one.id === 'huge').itemChance * rules.unbeaten);
     assert.equal(chest.until, current.endsAt);
+    assert.equal(chest.startsAt, previous.startsAt);
+    assert.equal(chest.endsAt, previous.endsAt);
     assert.equal(worldBossPart({ maxHp: 1000, players: 4 }), 250);
-    // The week's new boss took the older weeks' bosses and fighters away.
+    // The period's new boss took the older periods' bosses and fighters away.
     assert.equal((await first('SELECT COUNT(*) AS count FROM world_bosses WHERE week = ?', older.key)).count, 0);
     assert.equal((await first('SELECT COUNT(*) AS count FROM world_boss_fighters WHERE week = ?', older.key)).count, 0);
     assert.equal((await as('lowczyni', 'POST', '/api/world-boss/claim', { week: older.key })).data.error.code, 'no_chest');
@@ -268,5 +274,125 @@ describe('the World Boss through the API', () => {
     const before = await version();
     assert.equal((await attack('lowczyni')).status, 200);
     assert.equal(await version(), before);
+  });
+});
+
+// A boss every 3 days (the author, 24.11.2026: „Ewentualnie resp co 3 dni
+// zamiast tygodnia - więcej nagród i zabawy”): the weekly boss of 23–29.11
+// to its Sunday, then from Monday 30.11.2026 cycles of 3 Polish days, each
+// with its own boss, band, chests and titles, on the test clock.
+describe('the World Boss every 3 days through the API', () => {
+  const { call, db, signUp } = useServer({ TEST_CLOCK: 'on' });
+  const cookies = {};
+  const run = async (sql, ...binds) => (await db()).prepare(sql).bind(...binds).run();
+  const first = async (sql, ...binds) => (await db()).prepare(sql).bind(...binds).first();
+  const DAY = 86400000;
+  // The Polish midnights of Monday 23.11.2026, Monday 30.11, Thursday 3.12, Sunday 6.12 and Wednesday 9.12.
+  const MONDAY = Date.parse('2026-11-22T23:00:00Z');
+  const FIRST = Date.parse('2026-11-29T23:00:00Z');
+  const SECOND = FIRST + 3 * DAY;
+  const THIRD = SECOND + 3 * DAY;
+  const FOURTH = THIRD + 3 * DAY;
+
+  // A character of `level` made at `now`, its account seen an hour before.
+  async function player(login, name, level, now) {
+    ({ cookie: cookies[login] } = await signUp(login));
+    await call('POST', '/api/character', { cookie: cookies[login], body: { name, classId: 'warrior', appearance: 'female' }, now });
+    await run('UPDATE characters SET level = ?, class_level = ?, gold = 5000 WHERE name = ?', level, level, name);
+    await run('UPDATE users SET seen_at = ? WHERE login = ?', now - HOUR, login);
+    await run('UPDATE sessions SET expires_at = ?', Date.UTC(2030, 0, 1));
+  }
+  const as = (login, method, path, now, body) => call(method, path, { cookie: cookies[login], body, now });
+  const attack = (login, now) => as(login, 'POST', '/api/world-boss/attack', now);
+  const view = async (login, now) => (await as(login, 'GET', '/api/world-boss', now)).data;
+  const fell = async (login, now) => {
+    await run('UPDATE world_bosses SET hp = 1 WHERE hp > 0');
+    const hit = await attack(login, now);
+    assert.equal(hit.data.attack.fell, true, JSON.stringify(hit.data).slice(0, 300));
+  };
+
+  beforeEach(async () => {
+    await player('lowczyni', 'Łowczyni', 40, MONDAY + 4 * DAY);
+  });
+
+  test('the last weekly boss stays to Sunday midnight; then a boss every 3 days, its chest and title to the end of the first cycle', async () => {
+    // Sunday 29.11, 23:00: still the week of 23.11.
+    const sunday = FIRST - HOUR;
+    const last = await view('lowczyni', sunday);
+    assert.equal(last.boss.week, '2026-11-23');
+    assert.equal(last.boss.startsAt, MONDAY);
+    assert.equal(last.boss.endsAt, FIRST);
+    await attack('lowczyni', sunday);
+    await fell('lowczyni', sunday + 1000);
+    // Its title to the end of the period after it: the first cycle.
+    assert.equal((await first('SELECT until FROM world_boss_titles')).until, SECOND);
+    // Monday 30.11, 0:30: the first cycle's boss, new; the week's chest to open to the cycle's end.
+    const monday = FIRST + HOUR / 2;
+    const cycle = await view('lowczyni', monday);
+    assert.equal(cycle.boss.week, '2026-11-30');
+    assert.equal(cycle.boss.startsAt, FIRST);
+    assert.equal(cycle.boss.endsAt, SECOND);
+    assert.equal(cycle.boss.fallen, false);
+    assert.equal(cycle.boss.hp, cycle.boss.maxHp);
+    assert.equal(cycle.attacks.left, content.worldBosses.attacksPerDay);
+    assert.equal(cycle.chests.length, 1);
+    assert.deepEqual([cycle.chests[0].week, cycle.chests[0].fallen, cycle.chests[0].startsAt, cycle.chests[0].endsAt, cycle.chests[0].until], ['2026-11-23', true, MONDAY, FIRST, SECOND]);
+    assert.equal(cycle.title.until, SECOND);
+    assert.equal(cycle.texts.rules.join(' ').includes('{'), false);
+    assert.match(cycle.texts.lead, /Co 3 dni/);
+    // Thursday 3.12, 0:30: the second cycle; the week's chest and title gone with the first cycle.
+    const thursday = await view('lowczyni', SECOND + HOUR / 2);
+    assert.equal(thursday.boss.week, '2026-12-03');
+    assert.deepEqual(thursday.chests, []);
+    assert.equal(thursday.title, null);
+    assert.equal((await as('lowczyni', 'POST', '/api/world-boss/claim', SECOND + HOUR, { week: '2026-11-23' })).data.error.code, 'no_chest');
+    assert.equal((await first("SELECT COUNT(*) AS count FROM world_bosses WHERE week = '2026-11-23'")).count, 0);
+  });
+
+  test('the band written down at the first attack of a cycle, kept to its end; the next cycle by the levels again', async () => {
+    await player('tropiciel', 'Tropiciel', 45, FIRST + HOUR);
+    const morning = FIRST + 9 * HOUR;
+    assert.equal((await attack('lowczyni', morning)).data.boss.id, 'wb-kotolak');
+    await run("UPDATE characters SET level = 60, class_level = 60 WHERE name IN ('Łowczyni', 'Tropiciel')");
+    // The same cycle: the band of the first attack; Tropiciel had none, so the new band's.
+    assert.equal((await view('lowczyni', SECOND - HOUR)).boss.id, 'wb-kotolak');
+    assert.equal((await attack('lowczyni', SECOND - HOUR)).data.boss.id, 'wb-kotolak');
+    assert.equal((await view('tropiciel', SECOND - HOUR)).boss.id, 'wb-rusalka');
+    // The next cycle: the band by the levels now, and a new day's attacks.
+    const next = await view('lowczyni', SECOND + HOUR);
+    assert.equal(next.boss.id, 'wb-rusalka');
+    assert.equal(next.boss.week, '2026-12-03');
+    assert.equal(next.attacks.left, content.worldBosses.attacksPerDay);
+    assert.equal((await attack('lowczyni', SECOND + HOUR)).data.boss.id, 'wb-rusalka');
+  });
+
+  test('a cycle\'s boss that lived: half the chest at the cycle\'s end, to the end of the next cycle', async () => {
+    await attack('lowczyni', FIRST + HOUR);
+    assert.deepEqual((await view('lowczyni', SECOND - HOUR)).chests, []);
+    const [chest] = (await view('lowczyni', SECOND + HOUR)).chests;
+    assert.deepEqual([chest.week, chest.fallen, chest.lastBlow, chest.startsAt, chest.endsAt, chest.until], ['2026-11-30', false, null, FIRST, SECOND, THIRD]);
+    assert.equal(chest.itemChance, content.worldBosses.chests.find((one) => one.id === chest.size).itemChance * content.worldBosses.unbeaten);
+    // Still there at the end of the next cycle, gone after it.
+    assert.equal((await view('lowczyni', THIRD - HOUR)).chests.length, 1);
+    assert.deepEqual((await view('lowczyni', THIRD + HOUR)).chests, []);
+  });
+
+  test('a fallen cycle\'s boss: its title to the end of the next cycle, its chest open to then and once', async () => {
+    await attack('lowczyni', FIRST + HOUR);
+    await fell('lowczyni', FIRST + 2 * HOUR);
+    assert.equal((await first('SELECT until FROM world_boss_titles')).until, THIRD);
+    const profile = async (now) => (await as('lowczyni', 'GET', '/api/profile/Łowczyni', now)).data.profile.worldBossTitle;
+    assert.equal(await profile(THIRD - HOUR), 'Pogromczyni Kotołaka');
+    assert.equal(await profile(THIRD + HOUR), null);
+    // The chest: open from the fall, through the next cycle, and once.
+    const [now] = (await view('lowczyni', FIRST + 3 * HOUR)).chests;
+    assert.deepEqual([now.week, now.fallen, now.until], ['2026-11-30', true, THIRD]);
+    const later = (await view('lowczyni', THIRD - HOUR)).chests;
+    assert.equal(later.length, 1);
+    const opened = await as('lowczyni', 'POST', '/api/world-boss/claim', THIRD - HOUR, { week: '2026-11-30' });
+    assert.equal(opened.status, 200, JSON.stringify(opened.data).slice(0, 300));
+    assert.equal((await as('lowczyni', 'POST', '/api/world-boss/claim', THIRD - HOUR, { week: '2026-11-30' })).data.error.code, 'claimed');
+    // The fourth cycle has no chest of the first left.
+    assert.deepEqual((await view('lowczyni', FOURTH + HOUR)).chests, []);
   });
 });

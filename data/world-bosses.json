@@ -1,7 +1,8 @@
 {
-  "$comment": "Postrach Krainy (1222–1226, wszystkie w wariancie A, przyjęte przez autora na stronie ocen; src/engine/world-boss.js, src/server/world-boss.js, src/client/world-boss.js; DECISIONS.md, „Postrach Krainy (1222–1226)”). Co tydzień, od poniedziałku od północy czasu polskiego do niedzieli, w każdym przedziale poziomów stoi jeden boss z jednym wspólnym HP dla wszystkich graczy przedziału. Przedziały to krainy z data/regions.json, po kolei (1–25, 26–50, …, 326–350), każda ze swoim bossem z bosses (region: id krainy); postać wyżej niż ostatni przedział bije ostatniego bossa. Przedział postaci liczy się z wyższego z jej poziomów, postaci i klasy (jak blokada poziomu przedmiotów), i zostaje na cały tydzień od pierwszego ataku. attacksPerDay: ataki postaci na dobę. Atak to jedna walka postaci z towarzyszami, którzy poszliby z nią na wyprawę, z pełnym HP i bez mikstur, z bossem na poziomie postaci (wyższym z dwóch poziomów) w granicach przedziału; boss zaczyna walkę z HP, które mu zostało, a atak zbija tyle, ile stracił. Atak nie daje XP, złota ani łupów. hp: boss pojawia się z pierwszym spojrzeniem albo atakiem w tygodniu, a jego HP to attacksPerPlayer średnich ataków (damage) na każdą aktywną postać przedziału z tej chwili (grana postać konta, które było w grze w ostatnich activeDays dniach, z odblokowanym Postrachem Krainy), każda na swoim poziomie w granicach przedziału; bez nikogo jak jedna postać ze środka przedziału. damage: [poziom, średnie obrażenia jednego ataku], zmierzone realistycznymi postaciami z towarzyszami (tools/world-boss-sim.mjs); między punktami po prostej, poniżej pierwszego jak w pierwszym, powyżej ostatniego proporcjonalnie do poziomu. chests: Skrzynia Bossa dla każdej postaci, która biła bossa, po upadku bossa albo po końcu tygodnia; liczy się ostatnia skrzynia, której share osiągnęły obrażenia postaci, a share to część jej udziału, czyli HP bossa podzielonego przez aktywne postacie z chwili, gdy się pojawił. W skrzyni: złoto z goldMinutes minut wyprawy na poziomie postaci w przedziale (zaokrąglone do goldRound), elite sztuk materiału elity krainy przedziału, champion sztuk materiału jej czempiona (każda sztuka z szansą na wyższą rzadkość, jak ze stwora na tym poziomie) i z szansą itemChance przedmiot klasy postaci z tej krainy, na jej poziomie w przedziale, w rzadkości jak w skrzyni czempiona. unbeaten: boss, który przetrwał do niedzieli, odchodzi, a skrzynie są o połowę mniejsze: złoto i szansa na przedmiot razy share, materiały elity razy share zaokrąglone w górę, materiały czempiona w dół. lastBlow: ostatni cios daje do skrzyni przedmiot i złoto z goldMinutes minut. title: najlepsze places postaci według obrażeń bossa, który padł, nosi tytuł bossa przez days dni od jego upadku. Bez Punktów Systemu w nagrodach (1224). bosses: id, region (kraina przedziału), name, female (dla tekstów), description, title (tytuł dla mężczyzny i kobiety), art (obrazek 48 × 48 w src/client/art/monsters/<art>.png, z PixelLab, w wersji wybranej przez autora, gdy jest na liście SPRITES.monsters w src/client/art.js), sprite (stwór z data/monsters.json, którego obrazek stoi w zastępstwie, dopóki boss nie ma własnego), sound (okrzyk: głos voices.<sound>.cry w data/sounds.json, grany na początku walki z bossem; bez niego boss milczy) i walka jak u stwora z monsters.json (family, position, stats, attack, armorFactor, resistances, weaknesses); HP bierze z paska. texts: słowa karty i odpowiedzi gry; {…} wypełnia gra.",
+  "$comment": "Postrach Krainy (1222–1226, wszystkie w wariancie A, przyjęte przez autora na stronie ocen; src/engine/world-boss.js, src/server/world-boss.js, src/client/world-boss.js; DECISIONS.md, „Postrach Krainy (1222–1226)”). W każdym okresie w każdym przedziale poziomów stoi jeden boss z jednym wspólnym HP dla wszystkich graczy przedziału. cycle: od dnia from (poniedziałek 30.11.2026) okres to days dni po kolei, od północy czasu polskiego, liczone od tego dnia, te same dla wszystkich przedziałów; wcześniej był to tydzień, od poniedziałku do niedzieli (DECISIONS.md, „Postrach Krainy co 3 dni (24.11.2026)”). Przedziały to krainy z data/regions.json, po kolei (1–25, 26–50, …, 326–350), każda ze swoim bossem z bosses (region: id krainy); postać wyżej niż ostatni przedział bije ostatniego bossa. Przedział postaci liczy się z wyższego z jej poziomów, postaci i klasy (jak blokada poziomu przedmiotów), i zostaje na cały okres od pierwszego ataku. attacksPerDay: ataki postaci na dobę. Atak to jedna walka postaci z towarzyszami, którzy poszliby z nią na wyprawę, z pełnym HP i bez mikstur, z bossem na poziomie postaci (wyższym z dwóch poziomów) w granicach przedziału; boss zaczyna walkę z HP, które mu zostało, a atak zbija tyle, ile stracił. Atak nie daje XP, złota ani łupów. hp: boss pojawia się z pierwszym spojrzeniem albo atakiem w okresie, a jego HP to attacksPerPlayer średnich ataków (damage) na każdą aktywną postać przedziału z tej chwili (grana postać konta, które było w grze w ostatnich activeDays dniach, z odblokowanym Postrachem Krainy), każda na swoim poziomie w granicach przedziału; bez nikogo jak jedna postać ze środka przedziału. damage: [poziom, średnie obrażenia jednego ataku], zmierzone realistycznymi postaciami z towarzyszami (tools/world-boss-sim.mjs); między punktami po prostej, poniżej pierwszego jak w pierwszym, powyżej ostatniego proporcjonalnie do poziomu. chests: Skrzynia Bossa dla każdej postaci, która biła bossa, po upadku bossa albo po końcu okresu; liczy się ostatnia skrzynia, której share osiągnęły obrażenia postaci, a share to część jej udziału, czyli HP bossa podzielonego przez aktywne postacie z chwili, gdy się pojawił. W skrzyni: złoto z goldMinutes minut wyprawy na poziomie postaci w przedziale (zaokrąglone do goldRound), elite sztuk materiału elity krainy przedziału, champion sztuk materiału jej czempiona (każda sztuka z szansą na wyższą rzadkość, jak ze stwora na tym poziomie) i z szansą itemChance przedmiot klasy postaci z tej krainy, na jej poziomie w przedziale, w rzadkości jak w skrzyni czempiona. unbeaten: boss, który przetrwał do końca okresu, odchodzi, a skrzynie są o połowę mniejsze: złoto i szansa na przedmiot razy share, materiały elity razy share zaokrąglone w górę, materiały czempiona w dół. lastBlow: ostatni cios daje do skrzyni przedmiot i złoto z goldMinutes minut. title: najlepsze places postaci według obrażeń bossa, który padł, nosi tytuł bossa do końca następnego okresu, czyli przez cały czas następnego bossa. Bez Punktów Systemu w nagrodach (1224). bosses: id, region (kraina przedziału), name, female (dla tekstów), description, title (tytuł dla mężczyzny i kobiety), art (obrazek 48 × 48 w src/client/art/monsters/<art>.png, z PixelLab, w wersji wybranej przez autora, gdy jest na liście SPRITES.monsters w src/client/art.js), sprite (stwór z data/monsters.json, którego obrazek stoi w zastępstwie, dopóki boss nie ma własnego), sound (okrzyk: głos voices.<sound>.cry w data/sounds.json, grany na początku walki z bossem; bez niego boss milczy) i walka jak u stwora z monsters.json (family, position, stats, attack, armorFactor, resistances, weaknesses); HP bierze z paska. texts: słowa karty i odpowiedzi gry; {…} wypełnia gra.",
   "attacksPerDay": 3,
   "activeDays": 7,
+  "cycle": { "days": 3, "from": "2026-11-30" },
   "power": 2,
   "hp": {
     "attacksPerPlayer": 7.5
@@ -59,7 +60,7 @@
   ],
   "unbeaten": 0.5,
   "lastBlow": { "goldMinutes": 60, "item": true },
-  "title": { "places": 10, "days": 7 },
+  "title": { "places": 10 },
   "bosses": [
     {
       "id": "wb-pochwist",
@@ -345,21 +346,25 @@
   ],
   "texts": {
     "title": "Postrach Krainy",
-    "lead": "Co tydzień w każdym przedziale poziomów stoi jeden boss. Wszyscy gracze z przedziału biją tego samego stwora.",
+    "lead": "Co {days} dni w każdym przedziale poziomów pojawia się nowy boss. Wszyscy gracze z przedziału biją tego samego stwora.",
     "rules": [
       "Przedział to 25 poziomów, liczonych według wyższego z Twoich poziomów: postaci albo klasy. Każdy przedział ma swojego bossa z krainy tych poziomów.",
-      "Przedział ustala się przy pierwszym ataku w tygodniu i zostaje do niedzieli, nawet gdy awansujesz.",
+      "Przedział ustala się przy pierwszym ataku na bossa i zostaje na cały czas tego bossa, nawet gdy awansujesz.",
       "Masz {attacks} ataki dziennie. Odnawiają się o północy.",
       "Atak to jedna walka Twojej postaci z towarzyszami, z pełnym HP i bez mikstur, z wynikiem od razu. Boss walczy na Twoim poziomie. Atak nie daje XP, złota ani łupów i działa także w trakcie wyprawy.",
       "HP bossa zależy od liczby graczy z przedziału, którzy byli w grze w ostatnim tygodniu.",
       "Gdy boss padnie, każdy, kto go bił, dostaje Skrzynię Bossa ze złotem, materiałami bossa i szansą na przedmiot. Im więcej obrażeń zadasz, tym większa skrzynia: liczy się, ile zadasz w porównaniu z Twoją częścią HP bossa, a nie miejsce w rankingu.",
-      "Najlepsza dziesiątka nosi przez tydzień tytuł bossa, a za ostatni cios w skrzyni czeka przedmiot i dodatkowe złoto.",
-      "Boss zostaje do niedzieli, do północy. Gdy przetrwa, odchodzi, a skrzynie są o połowę mniejsze. W poniedziałek pojawia się nowy.",
-      "Skrzynię otworzysz od upadku bossa albo od końca tygodnia, najpóźniej do końca następnego tygodnia."
+      "Najlepsza dziesiątka nosi tytuł bossa, aż minie czas następnego bossa, a za ostatni cios w skrzyni czeka przedmiot i dodatkowe złoto.",
+      "Każdy boss stoi {days} dni, do północy ostatniego dnia. Gdy przetrwa, odchodzi, a skrzynie są o połowę mniejsze. Zaraz po nim pojawia się nowy.",
+      "Skrzynię otworzysz od upadku bossa albo od jego odejścia, najpóźniej do końca czasu następnego bossa."
     ],
     "band": "Poziomy {min}–{max}",
     "bandOpen": "Poziomy od {min}",
-    "until": "Boss zostaje do niedzieli, do północy.",
+    "days": {
+      "to": ["poniedziałku", "wtorku", "środy", "czwartku", "piątku", "soboty", "niedzieli"],
+      "on": ["w poniedziałek", "we wtorek", "w środę", "w czwartek", "w piątek", "w sobotę", "w niedzielę"]
+    },
+    "stays": "Boss zostaje do {day}, do północy.",
     "attacksLeft": "Ataki na dziś: {left} z {perDay}",
     "newAttacks": "Nowe o północy.",
     "attack": "Atakuj",
@@ -368,7 +373,7 @@
     "fell": "Boss pada!",
     "fallen": "Boss padł {at}.",
     "lastBlow": "Ostatni cios: {name}.",
-    "next": "Nowy boss pojawi się w poniedziałek.",
+    "next": "Nowy boss pojawi się {day}.",
     "log": "Przebieg walki",
     "fightTitle": "Atak na bossa",
     "own": "Twój wkład: {damage} HP, {place}. miejsce.",
@@ -387,14 +392,14 @@
       "large": "Duża",
       "huge": "Wielka"
     },
-    "top": "Najlepsi tygodnia",
+    "top": "Najlepsi gracze",
     "topLine": "Biło: {count}.",
     "noHits": "Boss czeka na pierwszy atak.",
     "you": "Ty: {place}. miejsce, {damage} HP",
     "titleWorn": "Twój tytuł do {until}: {title}.",
     "chestTitle": "Skrzynia Bossa",
-    "chestFallen": "Tydzień {week}: boss padł. Twoja skrzynia: {size}.",
-    "chestUnbeaten": "Tydzień {week}: boss przetrwał. Twoja skrzynia: {size}, ale o połowę mniejsza.",
+    "chestFallen": "{dates}: boss padł. Twoja skrzynia: {size}.",
+    "chestUnbeaten": "{dates}: boss przetrwał. Twoja skrzynia: {size}, ale o połowę mniejsza.",
     "chestContents": "W środku: {gold} złota, materiały bossa ({pieces} szt.) i {chance}% szansy na przedmiot.",
     "chestLastBlow": "Za ostatni cios: przedmiot i {gold} złota więcej.",
     "chestTitleEarned": "{place}. miejsce: tytuł „{title}” do {until}.",
@@ -405,7 +410,7 @@
     "notInBag": "Tego nie ma już w plecaku.",
     "errors": {
       "locked": "Postrach Krainy odblokujesz na poziomie postaci {level}.",
-      "fallen": "Boss już padł. Nowy pojawi się w poniedziałek.",
+      "fallen": "Boss już padł. Nowy pojawi się, gdy minie jego czas.",
       "noAttacks": "Ataki na dziś się skończyły. Nowe od północy.",
       "raced": "Boss albo postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.",
       "noChest": "Nie ma takiej skrzyni do otwarcia.",

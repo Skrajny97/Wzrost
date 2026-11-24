@@ -1,9 +1,11 @@
 // @ts-check
 // The World Bosses (1222–1226, all variant A, accepted by the author on the
 // review page; data/world-bosses.json; src/server/world-boss.js;
-// DECISIONS.md, "Postrach Krainy (1222–1226)"): every week, from Monday to
-// Sunday, one boss for each band of levels, with one HP bar shared by all
-// the band's players. The bands are the lands of data/regions.json in order
+// DECISIONS.md, "Postrach Krainy (1222–1226)" and "Postrach Krainy co 3 dni
+// (24.11.2026)"): in each period, one boss for each band of levels, with one
+// HP bar shared by all the band's players. A period is a week, Monday to
+// Sunday, before `cycle.from`, and `cycle.days` Polish days in a row from
+// it on (worldBossPeriod). The bands are the lands of data/regions.json in order
 // (1–25, 26–50, … 326–350), each with its own boss; a character above the
 // last one fights the last band's boss. A character's band goes by the
 // higher of its two levels, the character's and the class's (as the item
@@ -14,13 +16,13 @@
 // the shared bar. The boss's HP: attacksPerPlayer average attacks (the
 // measured `damage`) for each active character of the band when it came,
 // each at its level in the band. Whoever hit it gets a Skrzynia Bossa when
-// it falls or the week ends: the more damage against the character's share
-// of the HP, the bigger the chest (gold, the band's land's elite and
+// it falls or its period ends: the more damage against the character's
+// share of the HP, the bigger the chest (gold, the band's land's elite and
 // champion materials, a chance at an item of the land), half as big when
-// the boss lived through the week; the last blow puts an item and more gold
-// in it, and the best `title.places` of a fallen boss wear its title for
-// `title.days` days. No Punkty Systemu (1224). Pure: the time, the seeds and
-// the database's state come from the server.
+// the boss lived through its period; the last blow puts an item and more
+// gold in it, and the best `title.places` of a fallen boss wear its title
+// to the end of the next period. No Punkty Systemu (1224). Pure: the time,
+// the seeds and the database's state come from the server.
 
 import { simulateFight } from './combat.js';
 import { combatantView, monsterCombatant, playerCombatant } from './combatant.js';
@@ -29,7 +31,10 @@ import { materialPiece, rarityUpChances } from './crafting.js';
 import { championItemRarity } from './hunt.js';
 import { randomItem } from './items.js';
 import { explorationGold } from './mining.js';
+import { questPeriod, zoneClock, zoneMidnight } from './quests.js';
 import { createRng } from './rng.js';
+
+const DAY = 86400000;
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {Record<string, any>} Boss A boss of data/world-bosses.json `bosses`. */
@@ -69,6 +74,48 @@ export function worldBossBands(content) {
  * @returns {number}
  */
 export const worldBossLevelOf = (level, classLevel) => Math.max(level, classLevel ?? 0);
+
+/**
+ * The days since 1.1.1970 of the calendar day the zone's clock shows at
+ * `ms`.
+ * @param {number} ms
+ * @param {string} timeZone
+ * @returns {number}
+ */
+function zoneDayNumber(ms, timeZone) {
+  const { year, month, day } = zoneClock(ms, timeZone);
+  return Math.round(Date.UTC(year, month - 1, day) / DAY);
+}
+
+/**
+ * The World Boss's period at `now`, the same for every band, on the Polish
+ * clock (the quests' time zone): before `cycle.from` the week, Monday to
+ * Sunday, as the weekly quests have it, the last one ending at that day's
+ * midnight at the latest; from that day on `cycle.days` days in a row,
+ * counted from it (the author, 24.11.2026: a boss every 3 days, from Monday
+ * 30.11.2026, 0:00, as the week before it ends). `key`: the date of its
+ * first day, as the weekly quests' keys, so the keys sort as the periods
+ * do; `startsAt` and `endsAt`: its first and its last midnight.
+ * @param {number} now
+ * @param {Content} content
+ * @returns {{ key: string, startsAt: number, endsAt: number }}
+ */
+export function worldBossPeriod(now, content) {
+  const { timeZone } = content.quests;
+  const { days, from } = rules(content).cycle;
+  const [year, month, day] = String(from).split('-').map(Number);
+  const first = Math.round(Date.UTC(year, month - 1, day) / DAY);
+  const today = zoneDayNumber(now, timeZone);
+  if (today < first) {
+    const week = questPeriod('weekly', now, content);
+    return { ...week, endsAt: Math.min(week.endsAt, zoneMidnight(now, timeZone, first - today)) };
+  }
+  const back = (today - first) % days;
+  const startsAt = zoneMidnight(now, timeZone, -back);
+  const start = zoneClock(startsAt, timeZone);
+  const key = `${start.year}-${String(start.month).padStart(2, '0')}-${String(start.day).padStart(2, '0')}`;
+  return { key, startsAt, endsAt: zoneMidnight(now, timeZone, days - back) };
+}
 
 /**
  * A character's band now (its levels), the last one above them all; null

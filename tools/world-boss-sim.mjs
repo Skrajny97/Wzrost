@@ -1,5 +1,6 @@
 // The World Bosses' numbers (data/world-bosses.json; src/engine/world-boss.js;
-// DECISIONS.md, "Postrach Krainy (1222–1226)"), measured and checked as
+// DECISIONS.md, "Postrach Krainy (1222–1226)" and "Postrach Krainy co 3 dni
+// (24.11.2026)"), measured and checked as
 // tools/guild-beast-sim.mjs does for the Bestia Gildii:
 //   - `damage`: the average damage of one attack on each band's boss at a
 //     few levels of the band (its first, its middle and its last; in the
@@ -12,18 +13,20 @@
 //     --write the table goes into the data;
 //   - the pace: a band of N active characters at the band's middle level,
 //     the boss with the data's HP (attacksPerPlayer attacks of `damage`
-//     each), played over `weeks` weeks: each character plays as one of
+//     each), played over `periods` of the boss (cycle.days days, 3; --days 7
+//     for the weeks before 30.11.2026): each character plays as one of
 //     three kinds (PARTICIPATION: every day, every other day, now and then),
 //     with its three attacks on a day it plays, its damage drawn from the
 //     measured realistic attacks (times --real, 1 by default). How many
-//     days of attacks the boss takes to fall (3.67: on Thursday, after two
-//     of the three rounds), how often it lives through the week, and the
-//     share of the chests of each size.
+//     days of attacks the boss takes to fall (1.67: on the second day,
+//     after two of the three rounds), how often it lives through its
+//     period, and the share of the chests of each size.
 //
 //   node tools/world-boss-sim.mjs                     the damage table and the pace
 //   node tools/world-boss-sim.mjs --write             the same, the table written into data/world-bosses.json
 //   node tools/world-boss-sim.mjs --fights 4          fewer fights a class and level than 16 (faster, rougher)
-//   node tools/world-boss-sim.mjs --pace-only --real 1.5 --weeks 400
+//   node tools/world-boss-sim.mjs --pace-only --real 2 --periods 400
+//   node tools/world-boss-sim.mjs --pace-only --days 7  the pace of the weeks before the cycles
 //   node tools/world-boss-sim.mjs --power 3            the bosses' blows 3 times as strong as a creature's of their level (data: `power`)
 
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -104,11 +107,11 @@ export function measureLevel(band, level, fights, content) {
   };
 }
 
-// One week of a band of `players` characters on a boss of `hp` (`part` each),
-// each character of a kind of PARTICIPATION and with its attacks drawn
-// from `pool` times `real`. The days of attacks it took to fall, or null,
-// and each character's damage for its chest.
-function playWeek({ players, hp, pool, real, rng }) {
+// One period of `days` days of a band of `players` characters on a boss of
+// `hp`, each character of a kind of PARTICIPATION and with its attacks
+// drawn from `pool` times `real`. The days of attacks it took to fall, or
+// null, and each character's damage for its chest.
+function playPeriod({ players, hp, pool, real, rng, days }) {
   const kinds = Array.from({ length: players }, (_, index) => {
     let at = (index + 0.5) / players;
     for (const kind of PARTICIPATION) {
@@ -119,7 +122,7 @@ function playWeek({ players, hp, pool, real, rng }) {
   });
   const dealt = Array.from({ length: players }, () => 0);
   let left = hp;
-  for (let day = 0; day < 7; day++) {
+  for (let day = 0; day < days; day++) {
     const playing = kinds.map((kind) => rng.chance(kind.days));
     for (let round = 0; round < ROUNDS; round++) {
       for (let member = 0; member < players; member++) {
@@ -134,17 +137,17 @@ function playWeek({ players, hp, pool, real, rng }) {
   return { day: null, dealt };
 }
 
-export function simulatePace({ band, level, players, pool, weeks, real }, content) {
+export function simulatePace({ band, level, players, pool, periods, real, days }, content) {
   const levels = Array.from({ length: players }, () => level);
   const { maxHp } = engine.worldBossHp(band, levels, content);
   const part = engine.worldBossPart({ maxHp, players });
   const rng = engine.createRng(`wb-pace:${band.region}:${players}`);
-  const days = [];
+  const falls = [];
   const sizes = {};
   let fighters = 0;
-  for (let week = 0; week < weeks; week++) {
-    const { day, dealt } = playWeek({ players, hp: maxHp, pool, real, rng });
-    days.push(day);
+  for (let period = 0; period < periods; period++) {
+    const { day, dealt } = playPeriod({ players, hp: maxHp, pool, real, rng, days });
+    falls.push(day);
     for (const damage of dealt) {
       if (damage <= 0) continue;
       fighters += 1;
@@ -152,11 +155,11 @@ export function simulatePace({ band, level, players, pool, weeks, real }, conten
       sizes[tier.id] = (sizes[tier.id] ?? 0) + 1;
     }
   }
-  const fallen = days.filter((day) => day !== null).sort((a, b) => a - b);
+  const fallen = falls.filter((day) => day !== null).sort((a, b) => a - b);
   return {
     players,
     maxHp,
-    fallen: fallen.length / weeks,
+    fallen: fallen.length / periods,
     median: fallen.length > 0 ? fallen[Math.floor(fallen.length / 2)] : null,
     mean: fallen.length > 0 ? mean(fallen) : null,
     sizes: Object.fromEntries(Object.entries(sizes).map(([id, count]) => [id, count / Math.max(1, fighters)])),
@@ -171,7 +174,9 @@ function main(args) {
   // 16 fights of each class at each level, two of each draw of the gear:
   // the table of the data was measured so.
   const fights = Number(option(args, 'fights', String(2 * GEAR_SETS)));
-  const weeks = Number(option(args, 'weeks', '300'));
+  const periods = Number(option(args, 'periods', '300'));
+  // The days of a boss: the data's cycle, or 7 for the weeks before it.
+  const days = Number(option(args, 'days', String(content.worldBosses.cycle.days)));
   const real = Number(option(args, 'real', '1'));
   const bands = engine.worldBossBands(content);
   const measured = [];
@@ -200,17 +205,17 @@ function main(args) {
       content.worldBosses = { ...content.worldBosses, damage: measured };
     }
   }
-  console.log(`\nTempo (HP: ${content.worldBosses.hp.attacksPerPlayer} ataków na aktywną postać; gracze: ${PARTICIPATION.map((kind) => `${Math.round(kind.share * 100)}% gra ${Math.round(kind.days * 100)}% dni`).join(', ')}; ataki ×${real}):`);
+  console.log(`\nTempo (boss stoi ${days} dni; HP: ${content.worldBosses.hp.attacksPerPlayer} ataków na aktywną postać; gracze: ${PARTICIPATION.map((kind) => `${Math.round(kind.share * 100)}% gra ${Math.round(kind.days * 100)}% dni`).join(', ')}; ataki ×${real}):`);
   for (const band of bands) {
     const middle = Math.round((Math.max(band.minLevel, content.unlocksById['world-boss']?.level ?? 1) + band.maxLevel) / 2);
     const known = pools.get(band.region);
     const pool = known ? known.realistic.map((one) => one.damage) : measureLevel(band, middle, Math.max(2, Math.round(fights / 2)), content).realistic.map((one) => one.damage);
     console.log(`  ${band.boss.name} (poz. ${middle}):`);
     for (const players of BAND_SIZES) {
-      const pace = simulatePace({ band, level: middle, players, pool, weeks, real }, content);
+      const pace = simulatePace({ band, level: middle, players, pool, periods, real, days }, content);
       const sizes = ['small', 'medium', 'large', 'huge'].map((id) => `${id} ${Math.round((pace.sizes[id] ?? 0) * 100)}%`).join(', ');
       console.log(
-        `    ${String(players).padStart(3)} graczy: pada po ${pace.median === null ? '—' : pace.median.toFixed(2)} dniach (średnio ${pace.mean === null ? '—' : pace.mean.toFixed(2)}), w ${Math.round(pace.fallen * 100)}% tygodni; skrzynie: ${sizes}`,
+        `    ${String(players).padStart(3)} graczy: pada po ${pace.median === null ? '—' : pace.median.toFixed(2)} dniach (średnio ${pace.mean === null ? '—' : pace.mean.toFixed(2)}), w ${Math.round(pace.fallen * 100)}% okresów; skrzynie: ${sizes}`,
       );
     }
   }

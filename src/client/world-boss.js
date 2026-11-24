@@ -1,13 +1,15 @@
 // The World Boss's card on the Walka screen (src/server/world-boss.js;
-// DECISIONS.md, "Postrach Krainy (1222–1226)"; the author: 1222–1226 A): the
-// boss the character fights this week, with its picture (its own once
+// DECISIONS.md, "Postrach Krainy (1222–1226)" and "Postrach Krainy co 3 dni
+// (24.11.2026)"; the author: 1222–1226 A): the boss the character fights
+// in this period (a boss every 3 days from 30.11.2026), until which day it
+// stays and on which the next one comes, with its picture (its own once
 // drawn, else a creature of its land's in its place: art.js), name, band of
 // levels and land, and the HP bar shared by the whole band; the attacks
 // left today and "Atakuj", whose fight plays at once in a sheet with the
 // boss's cry (sound.js, its voice's `cry`); the character's damage, place
 // and chest now with what the next one asks for; its title of a fallen
 // boss; the Skrzynie Bossa to open, and what one held as icons to tap (as
-// the Bestia Gildii's, guild-beast.js); the best of the week, whose names
+// the Bestia Gildii's, guild-beast.js); the best of the boss, whose names
 // open their character cards (profile.js), with the character's own place
 // under them; and the rules under "Jak to działa?". The card asks for the
 // boss itself and takes its words from the answer (data/world-bosses.json,
@@ -31,20 +33,41 @@ import { itemSheet } from './screens/character.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 
-// "23.11–29.11" ("23/11–29/11" in English): a week from the date of its
-// Monday, its key.
-function weekLabel(key) {
-  const monday = new Date(`${key}T12:00:00Z`);
-  const sunday = new Date(monday.getTime() + 6 * 86400000);
-  const separator = language() === 'en' ? '/' : '.';
-  const day = (date) => `${date.getUTCDate()}${separator}${date.getUTCMonth() + 1}`;
-  return `${day(monday)}–${day(sunday)}`;
-}
+// The boss's periods go by the Polish clock (src/engine/world-boss.js,
+// worldBossPeriod), as do their days on the card.
+const ZONE = 'Europe/Warsaw';
+const locale = () => (language() === 'en' ? 'en-GB' : 'pl-PL');
 
-// A day as the page's language writes it ("1.12", "1/12"): the day of `at`.
-const dayOf = (at) => new Intl.DateTimeFormat(language() === 'en' ? 'en-GB' : 'pl-PL', { day: 'numeric', month: 'numeric' }).format(new Date(at));
+// A day as the page's language writes it ("1.12", "01/12"): the day of `at`.
+const dayOf = (at) => new Intl.DateTimeFormat(locale(), { day: 'numeric', month: 'numeric', timeZone: ZONE }).format(new Date(at));
 // The last day before the midnight `until`.
 const lastDay = (until) => dayOf(until - 1);
+
+// "1–3 grudnia", "29 listopada – 1 grudnia" ("1–3 December"): a boss's
+// period from its first midnight to its last, as the guild war's week.
+function periodDates(startsAt, endsAt) {
+  const first = new Date(startsAt);
+  const last = new Date(endsAt - 1);
+  const day = new Intl.DateTimeFormat(locale(), { day: 'numeric', timeZone: ZONE });
+  const full = new Intl.DateTimeFormat(locale(), { day: 'numeric', month: 'long', timeZone: ZONE });
+  const month = new Intl.DateTimeFormat(locale(), { month: 'numeric', timeZone: ZONE });
+  return month.format(first) === month.format(last) ? `${day.format(first)}–${full.format(last)}` : `${full.format(first)} – ${full.format(last)}`;
+}
+
+// The weekday of `at` on the Polish clock, from Monday (0) to Sunday (6).
+function weekdayOf(at) {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'numeric', day: 'numeric', timeZone: ZONE })
+      .formatToParts(new Date(at))
+      .map((part) => [part.type, Number(part.value)]),
+  );
+  return (new Date(Date.UTC(parts.year, parts.month - 1, parts.day)).getUTCDay() + 6) % 7;
+}
+
+// "środy 2 grudnia", "w czwartek 3 grudnia" ("Wednesday 2 December", "on
+// Thursday 3 December"): the day of `at` with its weekday in the form the
+// card's words want (texts.days: `to` after „do”, `on` for when).
+const dayWords = (at, forms) => `${forms[weekdayOf(at)]} ${new Intl.DateTimeFormat(locale(), { day: 'numeric', month: 'long', timeZone: ZONE }).format(new Date(at))}`;
 
 export function worldBossCard() {
   let view = null;
@@ -192,13 +215,13 @@ export function worldBossCard() {
       return [
         hpBar(boss),
         h('p', { class: 'world-boss-fallen', text: [filled(texts.fallen, { at: dateTimeFormat.format(new Date(boss.fallenAt)) }), boss.fallenBy && filled(texts.lastBlow, { name: boss.fallenBy })].filter(Boolean).join(' ') }),
-        h('p', { class: 'muted', text: texts.next }),
+        h('p', { class: 'muted', text: filled(texts.next, { day: dayWords(boss.endsAt, texts.days.on) }) }),
       ];
     }
     const disabled = attacks.left === 0 || Boolean(attacks.blocked);
     return [
       hpBar(boss),
-      h('p', { class: 'muted', text: texts.until }),
+      h('p', { class: 'muted', text: filled(texts.stays, { day: dayWords(boss.endsAt - 1, texts.days.to) }) }),
       h('p', { class: 'world-boss-attacks', text: [filled(texts.attacksLeft, { left: attacks.left, perDay: attacks.perDay }), attacks.left === 0 && texts.newAttacks].filter(Boolean).join('. ') }),
       attacks.blocked && h('p', { class: 'muted', text: attacks.blocked }),
       h('button', {
@@ -225,7 +248,7 @@ export function worldBossCard() {
             own.next && !view.boss.fallen && h('p', { class: 'muted', text: filled(texts.nextSize, { size: texts.nextSizes[own.next.id], damage: formatNumber(own.next.damage), missing: formatNumber(own.next.missing) }) }),
           ]
         : h('p', { class: 'muted', text: texts.noOwn }),
-      title && h('p', { class: 'world-boss-title-worn' }, icon('trophy', { size: 18 }), h('span', { text: filled(texts.titleWorn, { until: dayOf(title.until), title: title.text }) })),
+      title && h('p', { class: 'world-boss-title-worn' }, icon('trophy', { size: 18 }), h('span', { text: filled(texts.titleWorn, { until: lastDay(title.until), title: title.text }) })),
     );
   }
 
@@ -266,10 +289,10 @@ export function worldBossCard() {
         h(
           'div',
           { class: `guild-beast-chest world-boss-chest world-boss-chest--${chest.size}` },
-          h('p', { class: 'world-boss-chest-head', text: filled(chest.fallen ? texts.chestFallen : texts.chestUnbeaten, { week: weekLabel(chest.week), size: texts.sizes[chest.size] }) }),
+          h('p', { class: 'world-boss-chest-head', text: filled(chest.fallen ? texts.chestFallen : texts.chestUnbeaten, { dates: periodDates(chest.startsAt, chest.endsAt), size: texts.sizes[chest.size] }) }),
           h('p', { text: filled(texts.chestContents, { gold: formatNumber(chest.gold), pieces: formatNumber(chest.pieces), chance: Math.round(chest.itemChance * 100) }) }),
           chest.lastBlow && h('p', { class: 'world-boss-chest-extra', text: filled(texts.chestLastBlow, { gold: formatNumber(chest.lastBlow.gold) }) }),
-          chest.title && h('p', { class: 'world-boss-chest-extra' }, icon('trophy', { size: 16 }), h('span', { text: filled(texts.chestTitleEarned, { place: chest.title.place, title: chest.title.text, until: dayOf(chest.title.until) }) })),
+          chest.title && h('p', { class: 'world-boss-chest-extra' }, icon('trophy', { size: 16 }), h('span', { text: filled(texts.chestTitleEarned, { place: chest.title.place, title: chest.title.text, until: lastDay(chest.title.until) }) })),
           h('p', { class: 'muted', text: filled(texts.chestUntil, { until: lastDay(chest.until) }) }),
           h('button', { type: 'button', class: 'button button--system', text: texts.open, onClick: (event) => withButton(event.currentTarget, () => claim(chest.week)) }),
         ),
@@ -277,7 +300,7 @@ export function worldBossCard() {
     );
   }
 
-  // The best of the week by damage, folded under the number of those who
+  // The best of the boss by damage, folded under the number of those who
   // hit the boss; a tap on a name opens its character card (profile.js);
   // the character's own place under them when it is not among them.
   function topPart() {
