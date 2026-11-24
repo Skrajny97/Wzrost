@@ -4353,6 +4353,10 @@ Gracz (poz. 99) przez autora: „Kosmetyczna uwaga. Jak w rankingu ktoś ma nada
 
 Autor zapytał informacyjnie o grę podobną do Stardew Valley, a potem do Coral Island, osadzoną w świecie Insight, skupioną na walce, z profesjami, robioną na boku po trochu jako osobny projekt, w grafice innej niż pixel art. Rozpoznanie (silnik, grafika 3D z AI, budżet telefonu, co skopiować z Insight, plan 10 etapów, nakład i ryzyka) jest w `docs/plans/gra-3d-w-stylu-coral-island.md`. Autor: „Na razie zapisujemy ten plan na przyszłość”. Nic się nie zaczyna, dopóki autor sam tego nie powie; decyzje S1–S3 z końca planu czekają na start.
 
+## Wersja 0.5.12 (24.11.2026): Pradruid w Wieżach (1249 B)
+
+Zob. „Druid: przywołańce na wyprawach i na Arenie (24.11.2026)”, punkt 17: w Wieżach Systemu (Solo i Drużyn) korzenie Dębów wieków Pradruida spowalniają wrogów o połowę słabiej (`towerSummonRoot` 0,5), więc Pradruid wchodzi tam mniej więcej tak wysoko jak najlepsze inne czwarte formy. Wyprawy, Labirynt, Arena i wojny gildii bez zmian.
+
 ## Wersja 0.5.11 (24.11.2026): przywołańce Druida ściągają ciosy wrogów
 
 W tej samej wersji Postrach Krainy przechodzi na rytm co 3 dni od razu, po uwadze autora „Jak w poniedziałek, jak 3 dni od dzisiaj to piątek”: obecni bossowie zostają do czwartku 26.11 do północy, a nowi pojawiają się w piątek 27.11 (`cycle.from` „2026-11-27”, zob. „Postrach Krainy co 3 dni (24.11.2026)”). Wpis „Co nowego?” 0.5.10 ma poprawioną datę.
