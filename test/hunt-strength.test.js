@@ -61,7 +61,9 @@ test('a creature met on an exploration hits harder and has more HP by the streng
     const plain = monsterCombatant({ monsterId, level, id: 'e0' }, content);
     const strong = monsterCombatant({ monsterId, level, id: 'e0', strength: [2.5, 1.8] }, content);
     assert.ok(Math.abs(strong.weapon.max / plain.weapon.max - 2.5) < 1e-9, `damage at ${level}`);
-    assert.ok(Math.abs(strong.maxHp / plain.maxHp - 1.8) < 0.01, `HP at ${level}: ${strong.maxHp} / ${plain.maxHp}`);
+    // HP in whole points: at the 12th level, with the weaker creatures
+    // (24.11.2026), 81 of them, so the rounding moves the share by up to 0.02.
+    assert.ok(Math.abs(strong.maxHp / plain.maxHp - 1.8) < 0.02, `HP at ${level}: ${strong.maxHp} / ${plain.maxHp}`);
     const [unit] = encounterCombatants({ members: [{ monsterId, level }] }, content, { strength: [2.5, 1.8] });
     assert.equal(unit.maxHp, strong.maxHp);
   }

@@ -30,7 +30,9 @@ const GROUP_KINDS = new Set(['sweep', 'whirl']);
 // The foes of a preview show a skill, not the balance: they come without
 // the growth of the late game and the end game (balance.monsters), which a
 // character in common gear and without companions would not stand long
-// enough to show its skill. Made once per content.
+// enough to show its skill, and as they were before balance.monsters.weaker
+// (`weaken` false in foesFor), so that the preview stays as it was. Made
+// once per content.
 /** @type {WeakMap<Content, Content>} */
 const plainContents = new WeakMap();
 /**
@@ -62,7 +64,7 @@ function foesFor(skill, content, level) {
    * @param {number} count
    */
   const foe = (monsterId, index, count, at = level - 2) =>
-    monsterCombatant(/** @type {any} */ ({ monsterId, level: at, id: `e${index}`, groupFactor: groupFactors[count - 1] }), plain);
+    monsterCombatant(/** @type {any} */ ({ monsterId, level: at, id: `e${index}`, groupFactor: groupFactors[count - 1], weaken: false }), plain);
   if (GROUP_KINDS.has(skill.kind) || skill.params.cloud || skill.params.splash) return ['wolf', 'wolf', 'fox'].map((id, index) => foe(id, index, 3));
   if (skill.params.target === 'back' || skill.params.pierce) return [foe('wolf', 0, 2), foe('crow', 1, 2)];
   if (WOUND_KINDS.has(skill.kind) || skill.kind === 'heal') return [foe('boar', 0, 1, level + 2)];

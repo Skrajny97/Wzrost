@@ -3931,6 +3931,42 @@ Autor: „Pomijając Tier powinna być też blokada poziomem na ~30-50 w górę,
 9. **Po angielsku:** „You can equip this item from character or class level 51.”, „From character or class level 51” i „wearable from character or class level 51” (`data/en/strings.json`).
 10. **Pliki:** `data/balance.json`, `data/schemas/balance.schema.json`, `src/engine/items.js` (`levelAllowance`, `wearerLevel`, `itemLevelCap`, `levelFits`, `wearLevelFor`, `wornNow`, kod `item_level` w `equipBlock`, `autoEquip`, `wearLevel` w `itemView`), `src/engine/stats.js`, `src/engine/combatant.js`, `src/engine/hunt.js`, `src/engine/companions.js`, `src/engine/market.js`, `src/server/characters.js` (`unwearTooHigh`), `src/server/inventory.js`, `src/server/fortress.js`, `src/server/hunts.js`, `src/server/towers.js`, `src/server/market.js`, ekran Postaci, Targowisko, Wymiana, Skrzynia Konta i Skrzynia Gildii. Testy: `test/item-level-lock.test.js`.
 
+## Słabsze stwory: 2,5 / 2 / 1,5 raza (24.11.2026)
+
+Autor (24.11.2026): „Trzeba trochę zmniejszyc poziom trudności jednak, bo jest za silne wszystko. Tak z 2,5 raza łatwiej powinno być do 150 poziomu, 150-250 z 2 razy słabsze i od 250 1,5 razy słabsze”, a potem: „wygładź ten poziom trudności oczywiście”.
+
+1. **O ile słabsze.** Każdy stwór jest słabszy według swojego poziomu: do 150. poziomu 2,5 raza, od 150. do 250. coraz mniej, równo od 2,5 do 1,5 raza (na 200., w środku przedziału 150–250, dwa razy), a od 250. 1,5 raza. Bez skoków na 150. i 250. poziomie („wygładź”). Ta liczba dzieli obecną siłę stworów: wzrost od 250. poziomu klasy (0.4.57), od 100. poziomu klasy (0.4.64), siła najnowszego miejsca (0.4.67), Trudnej i Piekielnej wyprawy, Wież i Portali zostają, a podział przychodzi na końcu.
+2. **Co maleje.** Cios i HP stwora, każde przez pierwiastek z tej liczby, tak jak przy dotychczasowych zmianach trudności (trzy razy silniejsze stwory od 250. poziomu klasy to cios i HP po ×1,7321): do 150. poziomu cios i HP po ×0,6325, na 200. po ×0,7071, od 250. po ×0,8165. Razem stwór jest 2,5, 2 i 1,5 raza słabszy: walka trwa krócej, a ciosy są słabsze, więc postać traci w niej mniej więcej tyle razy mniej HP. Liczy się poziom stwora, więc elita (poziom miejsca +1) i czempion (+2) biorą liczbę swojego poziomu.
+3. **Gdzie.** W jednym miejscu, w którym gra buduje każdego stwora do walki (`monsterCombatant` w `src/engine/combatant.js`), więc wszędzie, gdzie walczy się ze stworami: wyprawy (także Szybkie i Błyskawiczne polowania, Trudna i Piekielna wyprawa, wyprawy drużyny), elity i czempioni, Poszukiwani z list gończych, walki zdarzeń i zdarzeń drużyny, obie Wieże, Portale, Labirynt, Sala prób, Bestia Gildii i strażnicy Wyprawy Gildii (biją słabiej, a ich pula HP zostaje, bo liczy się z ataków członków), a przez wyprawy i Wieże także Próby Gildii. Szacowanie zagrożenia walczy w próbnych walkach z tymi samymi stworami, więc samo pokazuje mniejsze zagrożenie: realistyczny Wojownik z towarzyszami na 100. poziomie miał w najnowszym miejscu na wyprawie 4 h szansę omdlenia 44% („bardzo wysokie”), a teraz 0% („niskie”).
+4. **Bez zmian:** Arena, pojedynki i wojny gildii (walczą gracze), nagrody, doświadczenie i łupy. Karty Talii Systemu i podgląd umiejętności w panelu autora biorą stwora bez tej zmiany (`weaken: false`): Atak i Życie karty liczą się ze stosunku ciosu stwora do jego HP, który się nie zmienia, ale przez zaokrąglenie HP 9 z 1370 kart (np. Wilk, Kuna, Komarzysko) zmieniłoby Atak albo Życie o 1. Teksty gry nie podają siły stworów (poza dawnymi wpisami w Nowościach), więc żaden się nie zmienia.
+5. **W danych:** `monsters.weaker` w `data/balance.json` (`$comment` ze słowami autora), `curve`: punkty [poziom stwora, ile razy słabszy] `[[150, 2.5], [250, 1.5]]`, między punktami liniowo, przed pierwszym jak w pierwszym, za ostatnim jak w ostatnim. Pusta lista to stwory sprzed tej zmiany.
+6. **Pomiar** (`tools/difficulty-sim.mjs`, realistyczny gracz z towarzyszami, wyprawa 4 h w najnowszym miejscu, pięć klas, 120 wypraw na klasę, średnia klas; w procentach, przed → po):
+
+   | Poziom postaci (klasy) | Miejsce | Omdlenia | HP na końcu |
+   | --- | --- | --- | --- |
+   | 20 (22) | Żmijowe Zwalisko, 16–20 | 14 → 0 | 52,6 → 81,9 |
+   | 60 (70) | Bobrowe Tamy, 56–60 | 24,5 → 0,5 | 67,9 → 93 |
+   | 100 (119) | Stare Wyrobisko, 96–100 | 23,7 → 0 | 69 → 91,3 |
+   | 140 (162) | Lotne Piaski, 136–140 | 19,5 → 0 | 72,8 → 92,7 |
+   | 160 (185) | Paprociowy Gąszcz, 156–160 | 21,8 → 0 | 70,7 → 90,8 |
+   | 200 (231) | Zaćmiona Polana, 196–200 | 31,8 → 2 | 63,9 → 88,3 |
+   | 240 (270) | Mglisty Jar, 236–240 | 24,3 → 6,7 | 69,6 → 84,8 |
+   | 260 (284) | Wiedźmia Kuchnia, 256–260 | 20,5 → 5,8 | 72,3 → 85,2 |
+   | 300 (327) | Brama Nawii, 296–300 | 20,2 → 10,5 | 73,1 → 82,4 |
+
+   - Postać traci na wyprawie do 160. poziomu 2,6–4,6 raza mniej HP niż dotąd, na 200. ok. 3 razy, a od 240. 1,5–2 raza mniej.
+   - Do 160. poziomu wyprawa 4 h w najnowszym miejscu prawie nigdy nie kończy się już omdleniem, na 200. w 2%, od 240. w 5,8–10,5%. Zasada „mniej więcej jedna wyprawa 4 h na pięć kończy się tam omdleniem” (wybór B autora z 19.11.2026, sekcja „Najnowsze miejsce znów groźne”) już nie obowiązuje, bo autor chce teraz łatwiej. Najwięcej zyskał Mag na 20. poziomie: omdlenia 66,7% → 0%.
+7. **Testy.** Zmienione oczekiwania, z tym samym celem testu:
+   - `test/newest-place.test.js`: realne ryzyko w najnowszym miejscu (i prawie żadne miejsce niżej) oraz wyższe w nim zagrożenie w szacowaniu mierzone na 300. poziomie zamiast na 150., bo na 150. nikt już tam nie mdleje.
+   - `test/threat-trips.test.js`: wyprawy towarzyszy w szacowaniu sprawdzane na Cieniu 300. poziomu zamiast Łucznika 100., a mniej HP na start to ćwierć zamiast połowy. Szacowanie dalej mieści się w kilku punktach od wypraw na 50., 100. i 300. poziomie (na 50. i 100. oba pokazują 0%). To, że sama rekursja pokazuje ułamek ryzyka, sprawdza się już tylko na 300. poziomie (6,6% omdleń, rekursja 3,7%, czyli mniej niż trzy czwarte), a nie na 50. i 100. (co najmniej 10% omdleń, rekursja poniżej połowy), bo tam nikt już nie mdleje.
+   - `test/mana-carry.test.js`: szacowanie z miksturami many sprawdzane na Trudnej wyprawie, bo na zwykłej na 100. poziomie nikt już nie mdleje.
+   - `test/engine.test.js`: wyprawa z łupem kończąca się omdleniem w Kruczych Wykrotach (miejsce wyżej) zamiast w Lisich Jarach; długa wyprawa w jednym miejscu daje teraz ok. 80% tempa krótkich zamiast ok. 63% (próg 85% zamiast 75%); testy czempiona na słabszych postaciach (Mag 40. zamiast 49. w Sercu Uroczyska, Łucznik 14. zamiast 18. w Dziczej Głuszy), bo postać swojego poziomu nie mdleje tam już wcale.
+   - `test/hunt-strength.test.js`: tolerancja zaokrąglenia HP 0,02 zamiast 0,01, bo stwór 12. poziomu ma teraz 81 HP.
+   - `test/brotherhood-perks-2.test.js`: więcej materiałów z Bractwem Łowców liczone z 60 wypraw zamiast 20 (przy 20 obie liczby wyszły równe przez samo losowanie).
+   - `test/companions.test.js`: zagrożenie zależne od relacji z towarzyszem sprawdzane na Trudnej wyprawie (`?hard=1`), bo na zwykłej w Omszałych Głazach jest niskie przy każdej relacji.
+   - `test/party-challenge.test.js`: tolerancja stosunku HP stworów Piekielnej wyprawy do zwykłej 0,075 zamiast 0,03, bo stwory Kruczych Wykrotów mają teraz ok. 30 HP i zaokrąglenie przesuwa stosunek do 0,07.
+   - `test/second-evolution.test.js`: drugie formy dalej porównywane ze stworami z czasu, gdy je ustawiano, więc także bez tej zmiany (jak bez zmian z 19.11.2026); z nią żadna forma tam nie mdleje.
+
 ## Wersja 0.4.93 (22.11.2026): soundtrack w Ustawieniach
 
 Autor: „Podepnij ten film z podpisem soundtrack tam gdzie wszystkie sociale” z linkiem do filmu na YouTube z muzyką z gry (29 minut, 10 utworów, pod każdym kraina z gry). Wiersz „Soundtrack” w Ustawieniach pod Wiki, zrobiony jak pozostałe (`social.places`, id `youtube`): znak YouTube z Simple Icons (CC0), biały na czerwonym kafelku `#FF0000`, i przycisk „Posłuchaj muzyki z gry” (po angielsku „Listen to the game's music”). Link bez dopisku `?feature=shared`, jak link Wattpada bez znaczników udostępniania. Schemat przyjmuje dla niego tylko `https://youtu.be/…` i `https://(www.)youtube.com/…`. Sprawdzone w przeglądarce na 320 px i 1366 px.

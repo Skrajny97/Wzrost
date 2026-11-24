@@ -850,11 +850,13 @@ describe('companions through the API', () => {
     assert.equal((await database.prepare('SELECT COUNT(*) AS count FROM items').first()).count, 0);
     const hero = { classId: row.class_id, level: row.level, xp: row.xp, classLevel: row.class_level, classXp: row.class_xp, points: JSON.parse(row.points), position: row.position, appearance: row.appearance, skills: JSON.parse(row.skills ?? '{}'), evolution: null, professions: {} };
     const areaId = 'mossy-boulders';
+    // A Trudna wyprawa: since the weaker creatures (24.11.2026) a plain
+    // exploration there is of low threat with either bond.
     const expected = (one) => {
-      const samples = threatSamples({ character: hero, equipped: [], areaId, companions: [one] }, content);
+      const samples = threatSamples({ character: hero, equipped: [], areaId, companions: [one], hard: true }, content);
       return estimateThreat({ character: hero, equipped: [], hp: samples.maxHp, areaId }, content, samples);
     };
-    const options = async () => (await call('GET', `/api/hunts/options?area=${areaId}`, { cookie })).data.areas[0].threat;
+    const options = async () => (await call('GET', `/api/hunts/options?area=${areaId}&hard=1`, { cookie })).data.areas[0].threat;
     // The bond changes the threat of some lengths here.
     assert.notDeepEqual(expected(close), expected(companion));
     await write(companion);
