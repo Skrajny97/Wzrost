@@ -390,6 +390,20 @@ export function classLevelFactor(classLevel, curve = []) {
   return from + ((to - from) * (classLevel - fromLevel)) / (toLevel - fromLevel);
 }
 
+// How many times weaker a creature of `level` is (balance.monsters.weaker;
+// the author, 24.11.2026: „Trzeba trochę zmniejszyc poziom trudności
+// jednak, bo jest za silne wszystko. Tak z 2,5 raza łatwiej powinno być do
+// 150 poziomu, 150-250 z 2 razy słabsze i od 250 1,5 razy słabsze”, and
+// then „wygładź ten poziom trudności oczywiście”): points [creature level,
+// times weaker], straight between two, as the first before it and as the
+// last past it; 1 for an empty curve.
+/**
+ * @param {number} level
+ * @param {number[][]} [curve]
+ * @returns {number}
+ */
+export const weakerBy = (level, curve = []) => (curve.length === 0 ? 1 : classLevelFactor(Math.max(level, curve[0][0]), curve));
+
 // The class level that decides how strong the creatures are for those who
 // fight them (the myth game, partyStrength): the highest of the players'
 // own (the characters of a Drużyna's trip, of the Wieża Drużyn or of a
@@ -437,11 +451,15 @@ export function partyStrength(classLevel, players, content) {
 // of Talia Systemu, the skill preview). `players`: the players of a
 // Drużyna who fight it together, for partyStrength (1: a player alone,
 // with its companions or not).
+// `weaken`: false where the creature is no foe of the game's fights, so it
+// keeps its strength without balance.monsters.weaker: the cards of Talia
+// Systemu (the measure of their Atak and Życie) and the skill preview of
+// the author's panel.
 /**
- * @param {{ monsterId: string, level: number, id: string, name?: string, position?: string, side?: string, groupFactor?: number, growth?: number, strength?: number[], classLevel?: number, players?: number }} fighter
+ * @param {{ monsterId: string, level: number, id: string, name?: string, position?: string, side?: string, groupFactor?: number, growth?: number, strength?: number[], classLevel?: number, players?: number, weaken?: boolean }} fighter
  * @param {Content} content
  */
-export function monsterCombatant({ monsterId, level, id, name, position, side = 'enemy', groupFactor = 1, growth = 1, strength = [1, 1], classLevel = 0, players = 1 }, content) {
+export function monsterCombatant({ monsterId, level, id, name, position, side = 'enemy', groupFactor = 1, growth = 1, strength = [1, 1], classLevel = 0, players = 1, weaken = true }, content) {
   const balance = content.balance;
   const monster = content.monstersById[monsterId];
   /** @param {string} key */
@@ -485,6 +503,11 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
   const ramp = 1 + (classLevelFactor(classLevel, balance.monsters.classLevelCurve) - 1) * growth;
   const [partyDamage, partyHp] = partyStrength(classLevel, players, content);
   const [huntDamage, huntHp] = strength;
+  // And every creature weaker again by its own level (weakerBy), on top of
+  // all of it, wherever it is fought: its blows and its HP each by the
+  // square root, so the creature as a whole that many times weaker, as
+  // mythGame makes it three times stronger.
+  const weakened = weaken ? 1 / Math.sqrt(weakerBy(level, balance.monsters.weaker?.curve)) : 1;
   // A creature's natural weapon from one of its attacks: its own, or one of
   // its shapes' (Weles, `shapes`).
   /** @param {Record<string, any>} attack */
@@ -500,7 +523,8 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
       (1 + myth.damage * mythic) *
       ramp *
       partyDamage *
-      huntDamage;
+      huntDamage *
+      weakened;
     return {
       attackName: attack.name,
       category: attack.category,
@@ -543,7 +567,7 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
   const rawHp = balance.monsters.hpBase + balance.character.hpPerVitality * stat('vitality') + balance.monsters.hpPerLevel * level;
   const hpMax = Math.max(
     1,
-    Math.round(rawHp * monster.hpFactor * groupFactor * (1 + mid.hp * stronger) * (1 + coop.hp) * (1 + late.hp * later) * (1 + end.hp * latest) * (1 + myth.hp * mythic) * ramp * partyHp * huntHp),
+    Math.round(rawHp * monster.hpFactor * groupFactor * (1 + mid.hp * stronger) * (1 + coop.hp) * (1 + late.hp * later) * (1 + end.hp * latest) * (1 + myth.hp * mythic) * ramp * partyHp * huntHp * weakened),
   );
   return {
     id,

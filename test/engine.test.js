@@ -131,6 +131,7 @@ import {
   statShares,
   extraValues,
   combatValues,
+  compareWithoutUpgrades,
   equipChange,
   bareItem,
   equipVerdict,
@@ -1042,9 +1043,11 @@ describe('hunts', () => {
 
   test('a faint loses everything the exploration brought, and the penalty comes on top (651 C)', () => {
     const who = { ...newCharacter('warrior'), level: 6, classLevel: 6, xp: 100 };
+    // A place higher than its own (fox-ravines, 6–10): there, without gear,
+    // it no longer faints since the weaker creatures (24.11.2026).
     let found = null;
     for (let i = 0; i < 300 && !found; i++) {
-      const one = simulateHunt({ character: who, equipped: [], hp: 9999, name: 'Pech', areaId: 'fox-ravines', minutes: 240, seed: `strata:${i}` }, content);
+      const one = simulateHunt({ character: who, equipped: [], hp: 9999, name: 'Pech', areaId: 'raven-hollows', minutes: 240, seed: `strata:${i}` }, content);
       if (one.result === 'fainted' && one.xp > 0 && one.gold > 0 && one.items.length > 0 && Object.keys(one.materials).length > 0) found = one;
     }
     assert.ok(found, 'an exploration that wins on the way and then faints');
@@ -1060,7 +1063,7 @@ describe('hunts', () => {
     assert.deepEqual([applied.level, applied.classLevel, applied.classXp, applied.timePoints, applied.levelled], [6, 6, who.classXp, 0, false]);
     assert.ok(applied.penalty > 0);
     assert.equal(applied.xp, 100 - applied.penalty);
-    const report = huntReport({ hunt: lost, applied, character: who, areaId: 'fox-ravines', startedAt: 0, endsAt: 1 }, content);
+    const report = huntReport({ hunt: lost, applied, character: who, areaId: 'raven-hollows', startedAt: 0, endsAt: 1 }, content);
     assert.equal(report.summary.forfeit, content.texts.faintForfeit[0]);
     assert.deepEqual([report.summary.xp, report.summary.gold, report.summary.itemsFound, report.summary.bestFind, report.items], [0, 0, 0, null, []]);
     assert.ok(report.fights.every((fight) => fight.chests === 0));
@@ -1153,8 +1156,10 @@ describe('hunts', () => {
     };
     const short = levelsAfter(30);
     const long = levelsAfter(240);
-    // Four hours give clearly less than eight half-hours would at the same pace.
-    assert.ok(long - 2 < (short - 2) * 8 * 0.75, `30 min: ${short}, 4 h: ${long}`);
+    // Four hours give clearly less than eight half-hours would at the same
+    // pace (since the weaker creatures of 24.11.2026 about 80% of it, before
+    // about 63%).
+    assert.ok(long - 2 < (short - 2) * 8 * 0.85, `30 min: ${short}, 4 h: ${long}`);
     assert.ok(long < 11, `4 h: level ${long}`);
   });
 
@@ -1706,6 +1711,30 @@ describe('item comparisons', () => {
     ]);
     const mail = { base: 'chainmail', slot: 'chest', level: 1, rarity: 'common', armor: 10, affixes: [{ kind: 'suffix', stat: 'armor', value: 2 }] };
     assert.deepEqual(itemLines(mail, content), [{ id: 'armor', label: 'Pancerz', value: 12, text: '+12' }]);
+  });
+
+  // "Bez ulepszeń" on a bag item's card (a player, 24.11.2026: „nie wiem
+  // czy statystyki będą lepsze niż to co mam założone”).
+  test('without upgrades, the find and the worn item count at +0, their gem and stars kept, the rest of the gear as it is', () => {
+    const character = newCharacter('warrior');
+    const sword = { base: 'sword', slot: 'weapon', level: 1, rarity: 'common', affixes: [] };
+    const worn = { ...sword, damage: { min: 10, max: 14 }, upgrade: 10, stars: 2 };
+    const found = { ...sword, damage: { min: 14, max: 18 }, upgrade: 2, gem: 'ruby' };
+    const ring = { base: 'ring', slot: 'ring', level: 1, rarity: 'common', upgrade: 10, affixes: [{ kind: 'prefix', stat: 'strength', value: 20 }] };
+    // With the upgrades the worn sword at +10 hits harder; without, the find's base does.
+    assert.equal(equipChange(character, [worn, ring], found, content).verdict, 'worse');
+    const bare = compareWithoutUpgrades(character, [worn, ring], found, content);
+    assert.equal(bare.verdict, 'better');
+    assert.ok(bare.changes.damage > 0);
+    // The find with its Rubin (+30%), the worn sword with its two stars (+20%).
+    assert.equal(bare.lines.item.find((line) => line.id === 'damage').text, '18–23');
+    assert.equal(bare.lines.worn.find((line) => line.id === 'damage').text, '12–17');
+    // The ring keeps its +10, which raises the damage the change counts.
+    const plain = (item) => ({ ...item, upgrade: 0 });
+    assert.deepEqual(bare, { lines: bare.lines, ...equipChange(character, [plain(worn), ring], plain(found), content) });
+    assert.notDeepEqual(bare.changes, equipChange(character, [plain(worn), plain(ring)], plain(found), content).changes);
+    // Into an empty slot: no worn item's lines.
+    assert.equal(compareWithoutUpgrades(character, [ring], found, content).lines.worn, null);
   });
 });
 
@@ -2453,7 +2482,9 @@ describe('champions', () => {
     const met = faintChances(input, always());
     // In Wiatrołomy a lost champion fight ends the exploration without fainting.
     assert.ok(met[60] <= usual[60] + 1e-9, `${met[60]} vs ${usual[60]}`);
-    const glade = { ...geared('mage', 49), hp: 99999, areaId: 'glade-heart' };
+    // A mage below the place's levels: since the weaker creatures
+    // (24.11.2026) one of its own levels hardly ever faints there.
+    const glade = { ...geared('mage', 40), hp: 99999, areaId: 'glade-heart' };
     assert.ok(faintChances(glade, always())[60] > faintChances(glade, content)[60]);
   });
 
@@ -2469,8 +2500,8 @@ describe('champions', () => {
       assert.ok(avoids.fights.length > 0 && avoids.fights.every((fight) => !fight.elite && !fight.champion), areaId);
     }
     // Without them, fainting in Serce Uroczyska is as likely as with neither
-    // in the game at all.
-    const glade = { ...geared('mage', 49), hp: 99999, areaId: 'glade-heart' };
+    // in the game at all (a mage below the place's levels, as above).
+    const glade = { ...geared('mage', 40), hp: 99999, areaId: 'glade-heart' };
     const none = {
       ...content,
       balance: { ...content.balance, hunt: { ...content.balance.hunt, eliteChancePerFight: 0, championChancePerFight: 0 } },
@@ -2485,7 +2516,9 @@ describe('champions', () => {
     // In the safe Dzicza Głusza every fight would be the champion's: without
     // the box the first lost one is a retreat, with it the regular fights go on.
     const game = always();
-    const hero = { ...geared('archer', 18), hp: 99999, areaId: 'boar-thicket' };
+    // An archer far below the place (since the weaker creatures of
+    // 24.11.2026 one of 18 meets no threat there either way).
+    const hero = { ...geared('archer', 14), hp: 99999, areaId: 'boar-thicket' };
     const threat = estimateThreat(hero, game);
     const avoiding = estimateThreat({ ...hero, avoidRare: true }, game);
     assert.ok(THREAT_LEVELS.indexOf(avoiding[60]) > THREAT_LEVELS.indexOf(threat[60]), `${avoiding[60]} vs ${threat[60]}`);
@@ -2521,8 +2554,9 @@ describe('champions', () => {
     const plain = rareShare(false);
     const seeking = rareShare(true);
     assert.ok(seeking > plain * 1.7 && seeking < plain * 2.3, `${seeking} vs ${plain}`);
-    // Outside a safe region more of them make fainting more likely.
-    const glade = { ...geared('mage', 49), hp: 99999, areaId: 'glade-heart' };
+    // Outside a safe region more of them make fainting more likely (a mage
+    // below the place's levels, as above).
+    const glade = { ...geared('mage', 40), hp: 99999, areaId: 'glade-heart' };
     assert.ok(faintChances({ ...glade, seekRare: true }, content)[240] > faintChances(glade, content)[240]);
     assert.deepEqual(higherThreat({ 15: 'high', 60: 'low' }, { 15: 'moderate', 60: 'very-high' }), { 15: 'high', 60: 'very-high' });
   });

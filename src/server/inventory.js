@@ -6,6 +6,7 @@ import {
   campBonus,
   campLevels,
   combatValues,
+  compareWithoutUpgrades,
   createRng,
   equipBlock,
   gearKey,
@@ -354,12 +355,19 @@ export async function sellItem(context) {
 // What wearing the item (or taking it off) would change: the combat values the
 // stats screen shows, now and after, each change as the game shows it, and
 // the verdict along the class's proposed path of points (gearVerdict in
-// preview.js), with the path's attributes for the card's note.
+// preview.js), with the path's attributes for the card's note. With
+// `?upgrades=off`, "Bez ulepszeń" on a bag item's card: the changes and the
+// verdict as if neither it nor the item worn in its slot had its upgrade,
+// and those two items' lines so, for the card's comparison
+// (compareWithoutUpgrades in preview.js).
 export async function previewItem(context) {
   const { player } = await requirePlayer(context);
   const item = findItem(player, context.params.id);
   const character = engineCharacter(player.row);
   const worn = equippedItems(player);
+  if (!item.equippedSlot && new URL(context.request.url).searchParams.get('upgrades') === 'off') {
+    return json({ itemId: item.id, equipped: false, ...compareWithoutUpgrades(character, worn, item, content()) });
+  }
   const after = item.equippedSlot
     ? worn.filter((candidate) => candidate.id !== item.id)
     : [...worn.filter((candidate) => candidate.equippedSlot !== item.slot), item];

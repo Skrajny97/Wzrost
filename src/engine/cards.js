@@ -194,7 +194,9 @@ const shapesBuilt = new WeakMap();
 
 // Each card's shape: its creature's blow over its HP in a fight at its first
 // home, over the median of all the cards', kept within shapeRange and raised
-// to shapeExponent. Above 1 the card hits harder than it lasts.
+// to shapeExponent. Above 1 the card hits harder than it lasts. The
+// creature as it was before balance.monsters.weaker (`weaken` false), so
+// that no card's Atak or Życie moves by its rounding.
 /**
  * @param {Content} content
  * @returns {Map<string, number>}
@@ -205,7 +207,7 @@ function cardShapes(content) {
   const { shapeExponent, shapeRange } = cardRules(content).stats;
   /** @type {[string, number][]} */
   const ratios = [...cardHomes(content)].map(([id, home]) => {
-    const unit = monsterCombatant({ monsterId: id, level: home.level, id: 'card' }, content);
+    const unit = monsterCombatant({ monsterId: id, level: home.level, id: 'card', weaken: false }, content);
     const blow = ((unit.weapon.min + unit.weapon.max) / 2) * unit.damageScale;
     return [id, blow / Math.max(1, unit.maxHp)];
   });

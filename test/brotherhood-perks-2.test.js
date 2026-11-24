@@ -90,7 +90,10 @@ describe('the Bractwo Zielarzy and the Bractwo Łowców in the engine', () => {
     const count = (hunt) => Object.values(hunt.materials).reduce((sum, pieces) => sum + pieces, 0);
     let plain = 0;
     let more = 0;
-    for (let index = 0; index < 20; index += 1) {
+    // 60 explorations: since the weaker creatures (balance.monsters.weaker,
+    // 24.11.2026) the character beats nearly all of them, and 20 left the
+    // two counts level by the draws alone.
+    for (let index = 0; index < 60; index += 1) {
       const hunt = { character, equipped: [], name: 'Łowca', areaId: 'boar-thicket', minutes: 120, seed: `materials-${index}` };
       plain += count(simulateHunt(hunt, calm));
       more += count(simulateHunt({ ...hunt, materialsMore: 0.2 }, calm));

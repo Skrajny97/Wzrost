@@ -151,6 +151,10 @@ describe('mana between the fights of an exploration (1220 B)', () => {
 
   test("the threat's explorations with companions carry the character's mana and drink the mana potions taken along", () => {
     const level = 100;
+    // A Trudna wyprawa: since the weaker creatures (24.11.2026) a plain
+    // exploration of the newest place hardly ever ends in a faint at this
+    // level, with or without the mana potions counted.
+    const hard = true;
     let estimate = 0;
     let real = 0;
     let without = 0;
@@ -171,14 +175,14 @@ describe('mana between the fights of an exploration (1220 B)', () => {
       const healing = (taken) => ({ count: kit.potions[id], amount: local.potionsById[id].effect.heal, below: kit.healBelow, potions: taken });
       const maxHp = playerCombatant({ character: one.character, equipped: one.equipped, name: 'Próba', area }, local).maxHp;
       const chance = (taken) => {
-        const samples = threatSamples({ character: one.character, equipped: one.equipped, areaId: area.id, companions, healing: healing(taken) }, local);
-        return faintChances({ character: one.character, equipped: one.equipped, hp: maxHp, areaId: area.id, healing: healing(taken) }, local, samples)[240];
+        const samples = threatSamples({ character: one.character, equipped: one.equipped, areaId: area.id, companions, healing: healing(taken), hard }, local);
+        return faintChances({ character: one.character, equipped: one.equipped, hp: maxHp, areaId: area.id, healing: healing(taken), hard }, local, samples)[240];
       };
       estimate += chance(potions);
       without += chance(kit.potions);
       let faints = 0;
       for (let i = 0; i < 120; i++) {
-        const hunt = simulateHunt({ character: one.character, equipped: one.equipped, hp: maxHp, name: 'Próba', areaId: area.id, minutes: 240, seed: `mana-threat:${classId}:${build}:${i}`, companions, potions, healBelow: kit.healBelow }, local);
+        const hunt = simulateHunt({ character: one.character, equipped: one.equipped, hp: maxHp, name: 'Próba', areaId: area.id, minutes: 240, seed: `mana-threat:${classId}:${build}:${i}`, companions, potions, healBelow: kit.healBelow, hard }, local);
         if (hunt.result === 'fainted') faints += 1;
       }
       real += faints / 120;

@@ -261,8 +261,11 @@ describe('the Trudna and the Piekielna wyprawa of a Drużyna, through the API', 
         // The trip's fights, the same in every report, as the mode fights them.
         assert.deepEqual(foes(report.fights.map((fight) => fight.enemies)), foes(reports.Lider.fights.map((fight) => fight.enemies)), who);
         assert.deepEqual(foes(report.fights.map((fight) => fight.enemies)), foes(fought[who].fights.map((fight) => fight.enemiesView)), who);
-        // Its creatures the mode's times as strong as the plain trip's.
-        for (const ratio of hpRatios(plain[who].fights[0].enemiesView, report.fights[0].enemies)) near(ratio, numbers.hp, 0.03);
+        // Its creatures the mode's times as strong as the plain trip's (HP in
+        // whole points: since the weaker creatures of 24.11.2026 those of
+        // Krucze Wykroty have about 30 of them, so the rounding moves the
+        // share by up to 0.07).
+        for (const ratio of hpRatios(plain[who].fights[0].enemiesView, report.fights[0].enemies)) near(ratio, numbers.hp, 0.075);
         // Its own XP and gold as the mode pays them, and on the first fight
         // it wins both ways (the trip's seed decides which, so a weaker
         // member may lose its first one in the mode) the mode's share more

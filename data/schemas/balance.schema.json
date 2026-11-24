@@ -1358,6 +1358,24 @@
             "items": { "type": "number", "minimum": 0 }
           }
         },
+        "weaker": {
+          "type": "object",
+          "description": "Ile razy słabsze są stwory według ich własnego poziomu, na dokładkę do całego wzrostu stworów (autor 24.11.2026: „Trzeba trochę zmniejszyc poziom trudności jednak, bo jest za silne wszystko”). curve: punkty [poziom stwora, ile razy słabszy] rosnąco po poziomie, między punktami liniowo, przed pierwszym jak w pierwszym, za ostatnim jak w ostatnim; pusta lista to stwory bez zmian. Cios i HP dzielą się każde przez pierwiastek z tej liczby, więc stwór jest tyle razy słabszy, jak w mythGame i classLevelCurve. Każda walka ze stworami; bez kart Talii Systemu i podglądu umiejętności.",
+          "additionalProperties": false,
+          "required": ["curve"],
+          "properties": {
+            "$comment": { "type": "string" },
+            "curve": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": { "type": "number", "exclusiveMinimum": 0 }
+              }
+            }
+          }
+        },
         "huntCurve": {
           "type": "array",
           "description": "Siła stworów najnowszego miejsca, czyli tego, które sięga poziomu postaci (albo wyższego), na wyprawach i w próbnych walkach szacowania zagrożenia (bez Wież, walk zdarzeń i Bestii Gildii): punkty [poziom postaci, mnożnik obrażeń, mnożnik HP] rosnąco po poziomie, między punktami liniowo, przed pierwszym bez zmian, za ostatnim jak w ostatnim. Niższe miejsca bez zmian. Towarzysze i drużyna nie wzmacniają stworów (autor: 611 między B a C, 612 C, 613 C); od 250. poziomu klasy gracze Drużyny tak (perPlayer). Od 30. poziomu postaci na wyprawach dochodzi do niej newestPlace (19.11.2026).",

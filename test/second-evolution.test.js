@@ -551,8 +551,10 @@ describe('the second forms in fights', () => {
     const { lateGame, endGame } = content.balance.monsters;
     // Nor the class-level curve of 19.11.2026 (1207 A): from class level 100
     // the creatures grow by the fighter's class level; nor the newest
-    // place's strength of the same day (balance.monsters.newestPlace).
-    const monsters = { ...content.balance.monsters, lateGame: { ...lateGame, damage: 0.25, hp: 0.25 }, endGame: { ...endGame, damage: 0, hp: 0 }, classLevelCurve: [], newestPlace: null };
+    // place's strength of the same day (balance.monsters.newestPlace); nor
+    // the weaker creatures of 24.11.2026 (balance.monsters.weaker), with
+    // which neither form faints there.
+    const monsters = { ...content.balance.monsters, lateGame: { ...lateGame, damage: 0.25, hp: 0.25 }, endGame: { ...endGame, damage: 0, hp: 0 }, classLevelCurve: [], newestPlace: null, weaker: null };
     const challenge = { ...content.balance.challenge, fromLevel: Infinity };
     // And all the mana back after each fight, as the forms were set (before
     // 1220 B, balance.hunt.manaRecoveryAfterFight).
