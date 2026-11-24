@@ -10,6 +10,7 @@
 // level, the tab says so as the other locked modules do.
 
 import { placeArt, resourceArt, residentBust, scrollArt, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
+import { andrzejkiCard, fortuneWaits } from '../andrzejki.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, formatCountdown, formatDecimal, formatHours, formatNumber, saleGold, tradePace } from '../format.js';
@@ -1869,7 +1870,9 @@ export function mountSettlement(container, { params = {} } = {}) {
 
   // A place on the board: its picture at its own size on the ground, its
   // name, and a dot on the Tablica when an order waits, on the Targowisko
-  // when a parcel does, on the Karczma when a mercenary's pay does.
+  // when a parcel does, on the Karczma when a mercenary's pay does, and on
+  // the Zaklinaczka's workshop when tonight's Andrzejki fortune does
+  // (andrzejki.js, 24.11.2026).
   function placeLink(place) {
     const hash = `${SETTLEMENT}/${place.id}`;
     // Under snow while the winter camp stands (December, 1063).
@@ -1888,7 +1891,10 @@ export function mountSettlement(container, { params = {} } = {}) {
       },
       art ? h('span', { class: 'settlement-place-art-box' }, art) : h('span', { class: 'settlement-place-empty' }),
       h('span', { class: 'settlement-place-label', text: place.name }),
-      ((place.id === 'board' && deliverable()) || (place.id === 'market' && data.market?.waiting > 0) || (place.id === 'tavern' && serviceWaiting())) &&
+      ((place.id === 'board' && deliverable()) ||
+        (place.id === 'market' && data.market?.waiting > 0) ||
+        (place.id === 'tavern' && serviceWaiting()) ||
+        (place.id === 'enchanter' && !place.soon && fortuneWaits())) &&
         h('span', { class: 'settlement-place-dot', 'aria-hidden': 'true' }),
     );
     if (art) {
@@ -1990,6 +1996,11 @@ export function mountSettlement(container, { params = {} } = {}) {
         h('button', { type: 'button', class: 'button button--system back-button', onClick: () => leaveView(SETTLEMENT, 1, HISTORY_KEY) }, icon('back', { size: 20 }), t('Powrót')),
       ),
       place.soon && systemPanel(t('{name} otworzy się w jednej z kolejnych aktualizacji gry.', { name: place.name })),
+      // Andrzejki's fortune evening at the Zaklinaczka's, first on her
+      // screen, while an evening is on (andrzejki.js; the author, 24.11.2026:
+      // „To powinno pojawić się w zakładce Osada jak się wejdzie do
+      // Zaklinaczki w jakimś dodatkowym głównym oknie”).
+      place.id === 'enchanter' && !place.soon && !compact && andrzejkiCard(state.character),
       // While Talia Systemu's match is on, its table instead (cards.js).
       resident && !compact && residentCard(resident, place.backdrop, plays),
       // The resident's card table under its bust (904 B, mock-up 910.2).

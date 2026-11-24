@@ -53,7 +53,7 @@ import { BUSY, partyFree, partyWent, skipLines } from './party.js';
 import { mercenaryChoice, servicePanel } from '../mercenaries.js';
 import { combatModes } from './towers.js';
 import { weekLine } from '../weeks.js';
-import { andrzejkiCard, omenLines } from '../andrzejki.js';
+import { omenLines } from '../andrzejki.js';
 import { partyGated } from '../party-gate.js';
 import { guildHelpStrip } from '../guild-help.js';
 import { bannerChip, bannerLine } from '../guild-lands.js';
@@ -476,8 +476,9 @@ export function mountCombat(container, { params, navigate }) {
     // While the character is away, every view shows the exploration. The
     // main view has the shortcut to help in the guild under the top bar
     // while someone waits for it (guild-help.js, 20.11.2026), the week of
-    // the year (weeks.js), the Andrzejki omens running under it and, on the
-    // fortune evenings, their card (andrzejki.js, 1082 C).
+    // the year (weeks.js) and the Andrzejki omens running under it
+    // (andrzejki.js, 1082 C). The fortune evenings' card is at the
+    // Zaklinaczka's in the Osada (24.11.2026).
     if (activity || !region) {
       bossCard ??= worldBossCard();
       fill(
@@ -485,7 +486,6 @@ export function mountCombat(container, { params, navigate }) {
         helpStrip,
         weekLine(character),
         omenLines(character),
-        andrzejkiCard(character),
         h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: t('Walka') })),
         modeTabs(),
         testTools(),

@@ -1,11 +1,17 @@
 // Andrzejki: Wieczór wróżb (1082 C, 1083 C, 1084 A and B; the server's
-// andrzejki.js): on the Walka screen, under the week's line, the card of
-// tonight's evening, the wax on 29 November and the three cups on the 30th,
-// with its picture: a tap pours the wax (its shape's shadow then falls on
-// the wall) or lifts a cup (the wax figurine under it shows), and the omen,
-// its premium for a day and its small reward follow. Each omen still
-// running has a slim line of its own under the week's, with the hour it
-// ends. The words come with the content, in the page's language.
+// andrzejki.js): at the Zaklinaczka's in the Osada, over her own card (the
+// author, 24.11.2026: „To powinno pojawić się w zakładce Osada jak się
+// wejdzie do Zaklinaczki w jakimś dodatkowym głównym oknie”; until then on
+// the Walka screen), the card of tonight's evening, the wax on 29 November
+// and the three cups on the 30th, with its picture: a tap pours the wax (its
+// shape's shadow then falls on the wall) or lifts a cup (the wax figurine
+// under it shows), and the omen with the fortune's words for the player
+// (24.11.2026), its premium for a day and its small reward follow, the
+// words again whenever the card is drawn that evening. Her place on the
+// Osada's board has a dot while tonight's fortune waits. Each omen still
+// running has a slim line of its own under the week's on the Walka screen,
+// with the hour it ends. The words come with the content, in the page's
+// language.
 
 import { goldArt, omenSprite, timePointsArt } from './art.js';
 import { h, icon } from './dom.js';
@@ -53,12 +59,15 @@ function rewardLine(texts, reward) {
 }
 
 // Tonight's fortune told: the shape's shadow on the wall over the wax's
-// picture, or the figurine on the table where the cup stood; then the omen
-// and what it gives.
+// picture, or the figurine on the table where the cup stood; then the omen,
+// the fortune's words under it (the author, 24.11.2026: „Takie skierowane do
+// gracza nie do postaci nawet, subtelnie przełamujące czwartą ścianę”; none
+// for a fortune told before they came) and what the omen gives.
 function result(evening, texts, fresh) {
   const omen = evening.told;
   return [
     h('p', { class: 'andrzejki-result', text: (evening.kind === 'wax' ? texts.waxResult : texts.cupsResult).replace('{omen}', omen.name) }),
+    omen.line && h('p', { class: 'andrzejki-line', text: omen.line }),
     h('p', { class: 'andrzejki-omen', text: texts.omen.replace('{omen}', omen.name).replace('{effect}', omen.effect).replace('{hours}', String(state.character.andrzejki.hours)) }),
     fresh && rewardLine(texts, fresh.reward),
     h('p', { class: 'muted andrzejki-next', text: evening.kind === 'wax' ? texts.toldWax : texts.toldCups }),
@@ -82,6 +91,10 @@ function scene(evening) {
     omen && evening.kind === 'cups' && h('span', { class: `andrzejki-figure andrzejki-figure--cup${omen.cup ?? 2}`, 'aria-hidden': 'true' }, omenSprite(omen.id)),
   );
 }
+
+// Whether tonight's fortune waits to be told: the Zaklinaczka's dot on the
+// Osada's board.
+export const fortuneWaits = (character = state.character) => Boolean(words() && character?.andrzejki?.evening && !character.andrzejki.evening.told);
 
 // The card of tonight's evening, or nothing outside the evenings.
 export function andrzejkiCard(character = state.character) {
