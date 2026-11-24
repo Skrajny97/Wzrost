@@ -4317,6 +4317,10 @@ Gracz (poz. 99) przez autora: „Kosmetyczna uwaga. Jak w rankingu ktoś ma nada
 5. **Brakujący szczegół:** wybrana klasa zostaje przy zmianie kolejności, ale nie po wyjściu z rankingu (wraca „Wszystkie klasy”), jak wybrana profesja.
 6. **Pliki:** `src/client/screens/ranking.js`, `src/client/screens/fame.js`, `src/client/styles.css` (`.ranking-who--parts`, `.ranking-title`, `.ranking-choices`), `src/server/community.js`, `data/en/strings.json`, `tools/layout-check.cjs`. Test: `test/community.test.js` (ranking jednej klasy w każdej kolejności, z ewolucją, stronami i własnym miejscem; nieznana klasa to wszystkie).
 
+## Plan na przyszłość: osobna gra 3D w świecie Insight (24.11.2026)
+
+Autor zapytał informacyjnie o grę podobną do Stardew Valley, a potem do Coral Island, osadzoną w świecie Insight, skupioną na walce, z profesjami, robioną na boku po trochu jako osobny projekt, w grafice innej niż pixel art. Rozpoznanie (silnik, grafika 3D z AI, budżet telefonu, co skopiować z Insight, plan 10 etapów, nakład i ryzyka) jest w `docs/plans/gra-3d-w-stylu-coral-island.md`. Autor: „Na razie zapisujemy ten plan na przyszłość”. Nic się nie zaczyna, dopóki autor sam tego nie powie; decyzje S1–S3 z końca planu czekają na start.
+
 ## Wersja 0.5.8 (24.11.2026): Druid na wyprawach i Pradruid na Arenie
 
 Według sekcji niżej. Autor: „Druid jest za silny na Arenie a za słaby na wyprawach coś z tym musimy zrobić”. Pomiary pokazały, że na Arenie najsilniejszy z tej linii jest Pradruid, a sam Druid jest najsłabszą drugą formą, więc osłabiony jest Pradruid (punkt 7).
