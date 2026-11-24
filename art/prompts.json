@@ -2380,7 +2380,8 @@
       "farming": "highly detailed crisp pixel art scene, fine pixel detail: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands, seen from the side facing right, standing in a small field and hoeing a bed of dark soil with an iron hoe, rows of young green sprouts and a low wooden fence behind, an old scarecrow in the distance, soft morning light, the whole figure and the bed inside the frame",
       "cooking": "highly detailed crisp pixel art scene, fine pixel detail: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands, seen from the side facing right, standing at a big black cauldron hanging over a low fire in an old village kitchen and stirring the soup with a long wooden ladle, steam rising, a wooden table with vegetables and a fish beside it, strings of onions and garlic hanging from the beams, warm firelight, the whole figure and the cauldron inside the frame",
       "farming-water": {"tool": "inpaint", "input": "art/references/scenes/farming-hd.png", "mask": "art/inputs/scenes/farming-water-mask.png", "prompt": "pixel art, the same small hooded figure in a dark navy robe now holding a grey metal watering can by its handle with both glowing ice-blue hands in front of itself, the can tilted forward so its long thin spout points down to the right and a thin stream of water drops pours from the spout onto the green seedlings in the dark soil bed, no hoe, the dark soil bed and the seedlings around, the same fine pixel art style, dark outline, colours and shading as the rest of the picture"},
-      "farming-water-fix": {"tool": "inpaint", "input": "art/references/scenes/farming-water.png", "mask": "art/inputs/scenes/farming-water-fix-mask.png", "prompt": "pixel art, the lower half of a grey metal watering can held in front of a small hooded figure, the can's round bottom closed by a dark outline, the dark navy robe hanging behind and below the can down to the soil, the dark soil bed beside it, the same fine pixel art style, dark outline, colours and shading as the rest of the picture"}
+      "farming-water-fix": {"tool": "inpaint", "input": "art/references/scenes/farming-water.png", "mask": "art/inputs/scenes/farming-water-fix-mask.png", "prompt": "pixel art, the lower half of a grey metal watering can held in front of a small hooded figure, the can's round bottom closed by a dark outline, the dark navy robe hanging behind and below the can down to the soil, the dark soil bed beside it, the same fine pixel art style, dark outline, colours and shading as the rest of the picture"},
+      "cultivation": "highly detailed crisp pixel art scene, fine pixel detail: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands, sitting cross-legged in calm meditation on the grass, facing the viewer, its hands resting on its knees, a soft glowing ice-blue aura around the figure and small motes of light slowly rising from it, in the middle of a ring of old mossy standing stones in a misty forest glade at dusk, the stones in front low enough not to hide the figure, dark spruce trees behind, a soft purple and amber dusk sky, low mist over the grass, calm and mystical Slavic forest fantasy, the whole figure and the whole stone ring inside the frame"
     },
     "pixellab": {
       "references": {
@@ -2412,6 +2413,12 @@
           {
             "path": "art/references/scenes/mining-hd-a.png",
             "usage": "the same small hooded figure: its dark navy cloak, its glowing ice-blue face and hands, its size in the frame and the fine pixel style; only the work and the place are new"
+          }
+        ],
+        "cultivation": [
+          {
+            "path": "art/references/scenes/mining-hd-a.png",
+            "usage": "the same small hooded figure: its dark navy cloak, its glowing ice-blue face and hands, its size in the frame and the fine pixel style; only the pose and the place are new"
           }
         ]
       }
