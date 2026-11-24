@@ -4026,6 +4026,10 @@ Autor: „Podczas Profesji niech latają osobne kulki z bonusami i zasobami jak 
 7. **Tryb testowy:** `POST /api/test/orb { seconds }` przesuwa teraz także trwającą pracę postaci, tak żeby jej następna niezłapana Kulka Profesji przyleciała za podaną liczbę sekund.
 8. **Sprawdzone** na ekranie Zielarstwa z lecącą kulką na 320, 390 i 1366 px: bez przewijania na boki, kulka w obrębie obrazka sceny. Testy: `test/profession-orbs.test.js` (silnik) i `test/profession-orbs-api.test.js` (serwer).
 
+## Wersja 0.5.2 (24.11.2026): wspólny raport drużyny, bez blokad
+
+Według sekcji niżej, bez makiet (nowe linijki, rubryka i sekcja raportu w wyglądzie istniejących ekranów).
+
 ## Drużyna: wspólny raport, bez blokad (24.11.2026)
 
 Autor: „Do tego trzeba też w końcu ogarnąć te drużyny cholerne - niech lider odbiera raport za wszystkich, niech wszyscy mają wspólny, do tego tak zrobić, by to co ma członek do rozdysponowania trafiało typu wolne Punkty statystyk niech sie zbieraja czy punkty umiejętności, ale niech moga isc dalej na wyprawy nawet jak jednego gracza nie ma, niech to sie zbiera, w plecaku zostaja rzeczy do maksymalnego napełnienia a pozniej przepadają dopóki ktos nie posprząta itd.” (24.11.2026). Bez makiet: nowe linijki i sekcja raportu w wyglądzie istniejących ekranów.
