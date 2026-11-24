@@ -49,11 +49,11 @@ const FORMS = [
 const thirds = content.evolutions.filter((evolution) => evolution.stage === 3);
 const fourths = content.evolutions.filter((evolution) => evolution.stage === 4);
 
-// The game's data without the fourth forms (as a deployment has it with
-// FOURTH_EVOLUTION "off").
+// The game's data without the fourth forms and the fifth forms that grow out
+// of them (as a deployment has it with FOURTH_EVOLUTION "off").
 const thirdOnly = (() => {
   const raw = loadData();
-  const fourthIds = new Set(fourths.map((evolution) => evolution.id));
+  const fourthIds = new Set(content.evolutions.filter((evolution) => evolution.stage >= 4).map((evolution) => evolution.id));
   raw.evolutions.evolutions = raw.evolutions.evolutions.filter((evolution) => !fourthIds.has(evolution.id));
   raw.evolutions.skills = raw.evolutions.skills.filter((skill) => !fourthIds.has(skill.evolution));
   return buildContent(raw);
@@ -153,12 +153,12 @@ describe('the fourth evolution in the engine', () => {
     assert.equal(held.classLevel, 300);
     assert.ok(held.classXp > 0);
     assert.ok(held.messages.some((line) => line.includes('u progu ewolucji')));
-    // With the form the class grows on, at 400 waits only for points, and
-    // with them spent grows on past it: there is no fifth form.
+    // With the form the class grows on, at 400 waits for its points, and
+    // with them spent for its fifth form (test/fifth-evolution.test.js).
     assert.equal(applyHunt(ravager(300, { carnage: 1, breach: 0 }), hunt, content).classLevel, 400);
     assert.deepEqual(evolutionBlock(ravager(400, { carnage: 195, breach: 194 }), content), { code: 'skill_points', level: 400 });
-    assert.equal(evolutionBlock(ravager(400, { carnage: 195, breach: 195 }), content), null);
-    assert.ok(applyHunt(ravager(400, { carnage: 195, breach: 195 }), hunt, content).classLevel > 400);
+    assert.deepEqual(evolutionBlock(ravager(400, { carnage: 195, breach: 195 }), content), { code: 'evolve', level: 400 });
+    assert.equal(applyHunt(ravager(400, { carnage: 195, breach: 195 }), hunt, content).classLevel, 400);
     // Without the fourth forms the third form waits at 300 only for points.
     assert.equal(nextFormOf(thirdOnly.evolutionsById['horde-slayer'], thirdOnly), null);
     assert.equal(evolutionBlock(hordeSlayer(300), thirdOnly), null);
@@ -226,7 +226,7 @@ describe('the fourth evolution in the engine', () => {
     assert.equal(skillsView(female, content).pools[0].options[0].path, 'Burzycielka');
   });
 
-  test('the panel shows the one form to take at 300 once the points are spent, and nothing after it', () => {
+  test('the panel shows the one form to take at 300 once the points are spent, and after it the fifth form\'s class level', () => {
     const before = evolutionPanel(hordeSlayer(299), content);
     assert.deepEqual([before.current.id, before.next, before.nextLevel], ['horde-slayer', null, 300]);
     assert.equal(evolutionPanel(hordeSlayer(300, { 'smashing-blow': 145, slaughter: 140 }), content).next, null);
@@ -240,7 +240,7 @@ describe('the fourth evolution in the engine', () => {
     assert.equal(ready.next.skills[1].from, null);
     assert.equal(ready.next.trait.name, 'Gniew bez dna');
     const after = evolutionPanel(ravager(300, {}), content);
-    assert.deepEqual([after.current.id, after.next, after.nextLevel], ['ravager', null, null]);
+    assert.deepEqual([after.current.id, after.next, after.nextLevel], ['ravager', null, 400]);
   });
 
   test('the Pustelnik changes a fourth form for another path\'s fourth form', () => {

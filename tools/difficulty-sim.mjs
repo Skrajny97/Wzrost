@@ -217,19 +217,22 @@ function realisticGear(classId, level, classLevel, plan, content, set = 0, key =
 export const GEAR_SETS = 8;
 
 // The main path's evolution at the class level: the first from class level
-// 50, its second form from 100, its third from 200. `path`: the skill that
+// 50, its second form from 100, its third from 200, its fourth from 300 and
+// its fifth from 400. `path`: the skill that
 // leads another path of the class (tools/class-balance-sim.mjs measures all
 // three).
 export function mainEvolution(classId, classLevel, content, path = null) {
-  const [levelOne, levelTwo, levelThree, levelFour] = content.balance.progression.classEvolutionLevels;
+  const [levelOne, levelTwo, levelThree, levelFour, levelFive] = content.balance.progression.classEvolutionLevels;
   if (classLevel < levelOne) return null;
   const main = path ? content.skillsById[path] : content.skills.find((skill) => skill.classId === classId);
   const first = content.evolutions.find((evolution) => evolution.classId === classId && !evolution.from && evolution.path === main.id);
   // Without the second evolution in the game the first form stays, without
-  // the third the second, and without the fourth the third.
+  // the third the second, without the fourth the third, and without the
+  // fifth the fourth.
   const second = classLevel >= levelTwo ? (engine.nextFormOf?.(first, content) ?? first) : first;
   const third = classLevel >= levelThree ? (engine.nextFormOf?.(second, content) ?? second) : second;
-  return classLevel >= levelFour ? (engine.nextFormOf?.(third, content) ?? third) : third;
+  const fourth = classLevel >= levelFour ? (engine.nextFormOf?.(third, content) ?? third) : third;
+  return classLevel >= levelFive ? (engine.nextFormOf?.(fourth, content) ?? fourth) : fourth;
 }
 
 // The character and gear of a model: `typical` (tools/simulate.mjs) or a

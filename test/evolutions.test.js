@@ -127,8 +127,9 @@ describe('class evolutions in fights', () => {
           assert.doesNotMatch(event.text, /undefined|NaN|\{\w+\}/, `${evolution.id}: ${event.text}`);
         }
       }
-      // The miracle waits for a faint (its own test below).
-      for (const id of evolution.skills.filter((skill) => skill !== 'miracle')) assert.ok(used.has(id), `${evolution.id}: ${id}`);
+      // A miracle waits for a faint (its own test below; Przeznaczenie's in
+      // test/fifth-evolution.test.js).
+      for (const id of evolution.skills.filter((skill) => content.skillsById[skill].kind !== 'miracle')) assert.ok(used.has(id), `${evolution.id}: ${id}`);
     }
   });
 

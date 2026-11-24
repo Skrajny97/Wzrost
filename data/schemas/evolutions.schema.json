@@ -44,6 +44,17 @@
       },
       "description": "Najwyższy poziom umiejętności i punkty czwartej ewolucji (300. poziom klasy), jak thirdForms trzeciej. Gra pokazuje czwarte formy tylko tam, gdzie zmienna FOURTH_EVOLUTION ma „on”."
     },
+    "fifthForms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skillMaxLevel", "lastPointClassLevel", "pointsPerClassLevel"],
+      "properties": {
+        "skillMaxLevel": { "type": "integer", "minimum": 2 },
+        "lastPointClassLevel": { "type": "integer", "minimum": 1, "description": "Ostatni poziom klasy, który daje Punkt Umiejętności po piątej ewolucji." },
+        "pointsPerClassLevel": { "type": "integer", "minimum": 1 }
+      },
+      "description": "Najwyższy poziom umiejętności i punkty piątej ewolucji (400. poziom klasy, 1235), jak fourthForms czwartej. Gra pokazuje piąte formy tylko tam, gdzie zmienna FIFTH_EVOLUTION ma „on”."
+    },
     "evolutions": {
       "type": "array",
       "minItems": 1,
@@ -59,7 +70,7 @@
           "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
           "classId": { "type": "string" },
           "path": { "type": "string", "description": "Pierwsza ewolucja: umiejętność klasy, której ścieżkę prowadzi." },
-          "from": { "type": "string", "description": "Druga i trzecia ewolucja: ewolucja, z której wyrasta." },
+          "from": { "type": "string", "description": "Druga, trzecia, czwarta i piąta ewolucja: ewolucja, z której wyrasta." },
           "name": { "type": "string", "minLength": 1 },
           "nameFemale": { "type": "string", "minLength": 1, "description": "Nazwa dla postaci kobiecej (brak: jak name)." },
           "description": { "type": "string", "minLength": 1, "description": "Opis pod nazwą na karcie ewolucji." },
@@ -122,7 +133,7 @@
           "effect": { "type": "string", "minLength": 1 },
           "kind": { "enum": ["strike", "sweep", "heal", "guard", "buff", "coat", "shield", "evade", "stance", "riposte", "summon", "miracle", "mark", "whirl", "harmony"] },
           "mana": { "type": "integer", "minimum": 0 },
-          "manaShare": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Koszt jako część maks. many (przywołania Arkanisty, Druida i Arcydruida, 934 A, 935 A); mana zostaje na zapas. Na wyprawie razy balance.skills.manaCost.manaShareFactor, w pojedynku raz. Formy Druida płacą 0,125 za każdego przywołańca (pojedyncze przywołanie 0,125, paczka dwóch 0,25), czyli na wyprawie 25% maks. many za przywołańca (DECISIONS.md, „Druid: przywołańce na wyprawach i na Arenie”)." },
+          "manaShare": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Koszt jako część maks. many (przywołania Arkanisty, Druida i Arcydruida, 934 A, 935 A); mana zostaje na zapas. Na wyprawie razy balance.skills.manaCost.manaShareFactor, w pojedynku raz. Formy Druida płacą 0,125 za każdego przywołańca (pojedyncze przywołanie 0,125, paczka dwóch 0,25), czyli na wyprawie 25% maks. many za przywołańca (DECISIONS.md, „Druid: przywołańce na wyprawach i na Arenie”). Odwieczne stado Ojca Puszczy, paczka trzech, kosztuje jak Pradawne stado, z którego wyrasta, 0,25 (DECISIONS.md, „Piąta ewolucja klas”)." },
           "cooldown": { "type": "integer", "minimum": 1 },
           "once": { "const": true },
           "params": {

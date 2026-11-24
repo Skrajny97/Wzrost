@@ -41,8 +41,9 @@ const byId = (list) => lookup(list.map((item) => [item.id, item]));
 
 // The evolutions with their stage: 1 for the first, chosen at the first
 // class level of balance.progression.classEvolutionLevels, 2 for the second
-// form that grows out of one (`from`), at the second, and 3 for the third
-// form that grows out of a second one, at the third.
+// form that grows out of one (`from`), at the second, 3 for the third form
+// that grows out of a second one, at the third, and so on: 4 for the fourth
+// (300) and 5 for the fifth (400).
 /**
  * @param {Raw} raw
  * @returns {Entry[]}
@@ -60,16 +61,16 @@ function stagedEvolutions(raw) {
 }
 
 // The rules of each stage's skills and points: the first evolution's, then
-// the second, third and fourth forms' (data/evolutions.json, secondForms,
-// thirdForms and fourthForms).
+// the second, third, fourth and fifth forms' (data/evolutions.json,
+// secondForms, thirdForms, fourthForms and fifthForms).
 /**
  * @param {Raw} raw
  * @returns {Entry[]}
  */
 function stageRules(raw) {
   if (!raw.evolutions) return [];
-  const { skillMaxLevel, lastPointClassLevel, pointsPerClassLevel, secondForms, thirdForms, fourthForms } = raw.evolutions;
-  return [{ skillMaxLevel, lastPointClassLevel, pointsPerClassLevel }, ...[secondForms, thirdForms, fourthForms].filter(Boolean)];
+  const { skillMaxLevel, lastPointClassLevel, pointsPerClassLevel, secondForms, thirdForms, fourthForms, fifthForms } = raw.evolutions;
+  return [{ skillMaxLevel, lastPointClassLevel, pointsPerClassLevel }, ...[secondForms, thirdForms, fourthForms, fifthForms].filter(Boolean)];
 }
 
 // The evolutions' skills with what they take from their evolution: its class

@@ -140,16 +140,17 @@ function uniqueIds(errors, file, list) {
 // its own, the first the path's skill grown (from). Each has one second form
 // (from: the evolution it grows out of), of the same class, whose first
 // skill grows one of that evolution's two, and each second form one third
-// form the same way (where the data has any), and each third form one
-// fourth form. Their skills have the numbers their kind needs, an effect
-// text naming only numbers they have, and the points of the class levels
-// after each evolution fill both to the top level with none left (the
-// author's 40 + 50 = 45 + 45, then 90 + 100 = 95 + 95, then 190 + 100 =
-// 145 + 145, then 290 + 100 = 195 + 195).
+// form the same way (where the data has any), each third form one fourth
+// form and each fourth form one fifth. Their skills have the numbers their
+// kind needs, an effect text naming only numbers they have, and the points
+// of the class levels after each evolution fill both to the top level with
+// none left (the author's 40 + 50 = 45 + 45, then 90 + 100 = 95 + 95, then
+// 190 + 100 = 145 + 145, then 290 + 100 = 195 + 195, then 390 + 100 = 245 +
+// 245).
 function checkEvolutions(data, { classIds, effectIds, elements, stats }) {
   const errors = [];
   const where = (id) => `evolutions.json: ${id}`;
-  const { evolutions, skills, skillMaxLevel, lastPointClassLevel, pointsPerClassLevel, secondForms, thirdForms, fourthForms } = data.evolutions;
+  const { evolutions, skills, skillMaxLevel, lastPointClassLevel, pointsPerClassLevel, secondForms, thirdForms, fourthForms, fifthForms } = data.evolutions;
   const evolutionIds = uniqueIds(errors, 'evolutions', evolutions);
   const skillIds = uniqueIds(errors, 'evolutions (umiejętności)', skills);
   for (const id of skillIds) if (data.skills.some((skill) => skill.id === id)) errors.push(`${where(id)}: to id ma już umiejętność klasy`);
@@ -172,9 +173,10 @@ function checkEvolutions(data, { classIds, effectIds, elements, stats }) {
     if (evolution.from !== undefined) {
       // A second form: of the class of the evolution it grows out of, one
       // for each, and only out of a first evolution; a third form the same
-      // out of a second one, and a fourth out of a third.
+      // out of a second one, a fourth out of a third and a fifth out of a
+      // fourth.
       const parent = evolutionById.get(evolution.from);
-      if (!parent || stageOf(parent) > 3) errors.push(`${where(evolution.id)} wyrasta z "${evolution.from}", a to nie jest pierwsza, druga ani trzecia ewolucja`);
+      if (!parent || stageOf(parent) > 4) errors.push(`${where(evolution.id)} wyrasta z "${evolution.from}", a to nie jest pierwsza, druga, trzecia ani czwarta ewolucja`);
       else {
         if (parent.classId !== evolution.classId) errors.push(`${where(evolution.id)} ma inną klasę niż "${evolution.from}"`);
         if (grown.has(evolution.from)) errors.push(`${where(evolution.id)}: z "${evolution.from}" wyrasta już inna ewolucja`);
@@ -198,6 +200,9 @@ function checkEvolutions(data, { classIds, effectIds, elements, stats }) {
   }
   if (evolutions.some((evolution) => stageOf(evolution) === 4)) {
     for (const evolution of evolutions) if (stageOf(evolution) === 3 && !grown.has(evolution.id)) errors.push(`${where(evolution.id)} nie ma czwartej ewolucji`);
+  }
+  if (evolutions.some((evolution) => stageOf(evolution) === 5)) {
+    for (const evolution of evolutions) if (stageOf(evolution) === 4 && !grown.has(evolution.id)) errors.push(`${where(evolution.id)} nie ma piątej ewolucji`);
   }
   const evolutionSkillIds = new Set(skills.map((skill) => skill.id));
   for (const skill of skills) {
@@ -249,7 +254,7 @@ function checkEvolutions(data, { classIds, effectIds, elements, stats }) {
     if (thirdForms.lastPointClassLevel >= (data.balance.progression.classEvolutionLevels[3] ?? Infinity)) errors.push('evolutions.json: ostatni Punkt Umiejętności trzeciej ewolucji przychodzi dopiero z czwartą');
     for (const skill of skills) {
       const evolution = evolutionById.get(skill.evolution);
-      const rules = [null, null, secondForms, thirdForms, fourthForms][evolution ? stageOf(evolution) : 1];
+      const rules = [null, null, secondForms, thirdForms, fourthForms, fifthForms][evolution ? stageOf(evolution) : 1];
       if (rules && skill.from !== undefined && evolutionById.get(evolution.from)?.skills.includes(skill.from) === false) {
         errors.push(`${where(skill.id)} rozwija "${skill.from}", a to nie jest umiejętność ewolucji "${evolution.from}"`);
       }
@@ -261,6 +266,14 @@ function checkEvolutions(data, { classIds, effectIds, elements, stats }) {
         errors.push(`evolutions.json: ${2 * thirdForms.skillMaxLevel} punktów sprzed czwartej ewolucji i ${fourth} po niej nie dają dwóch umiejętności po ${fourthForms.skillMaxLevel} poziomów`);
       }
       if (fourthForms.lastPointClassLevel >= (data.balance.progression.classEvolutionLevels[4] ?? Infinity)) errors.push('evolutions.json: ostatni Punkt Umiejętności czwartej ewolucji przychodzi dopiero z piątą');
+      // The fifth forms the same, after the fourth.
+      if (fifthForms) {
+        const fifth = (fifthForms.lastPointClassLevel - fourthForms.lastPointClassLevel) * fifthForms.pointsPerClassLevel;
+        if (2 * fourthForms.skillMaxLevel + fifth !== 2 * fifthForms.skillMaxLevel) {
+          errors.push(`evolutions.json: ${2 * fourthForms.skillMaxLevel} punktów sprzed piątej ewolucji i ${fifth} po niej nie dają dwóch umiejętności po ${fifthForms.skillMaxLevel} poziomów`);
+        }
+        if (fifthForms.lastPointClassLevel >= (data.balance.progression.classEvolutionLevels[5] ?? Infinity)) errors.push('evolutions.json: ostatni Punkt Umiejętności piątej ewolucji przychodzi dopiero z szóstą');
+      }
     }
   }
   return errors;

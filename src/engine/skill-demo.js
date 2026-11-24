@@ -96,11 +96,12 @@ export function skillDemo(skillId, content) {
   const bases = [cls.weapons[0], cls.offhands[0], ...cls.armor];
   const equipped = bases.map((/** @type {string} */ baseId) => generateItem(/** @type {any} */ ({ baseId, level: level - 4 }), gear, content));
   // A wound skill wakes below its mark, so the character starts just above
-  // it; a heal starts below it (a song with no mark, Chór, wounded too), a
+  // it; a heal starts below it (a song with no mark, Chór, wounded too, and a
+  // stance that waits for its user's HP below a mark, Ostatni szał), a
   // miracle near fainting.
   const below = WOUND_KINDS.has(skill.kind)
     ? skill.params.below + 0.1
-    : skill.kind === 'heal' || skill.params.regen
+    : skill.kind === 'heal' || skill.params.regen || (skill.kind === 'stance' && skill.params.below !== undefined)
       ? (skill.params.below ?? 0.8) - 0.1
       : skill.kind === 'miracle'
         ? 0.2
