@@ -2,9 +2,10 @@
 // "Postacie", the Ranking postaci (src/server/community.js): the characters
 // highest by their own level, by their class's or by their highest
 // profession's, or by one profession picked from a list under "Poziom
-// Profesji" (975 B), the levels in their columns (the profession's with its
-// icon, in its own order), and the player's own place among all of them; a
-// tap on a name shows that character (profile.js). "Gildie"
+// Profesji" (975 B), in each order all classes or the one picked from the
+// list "Klasa" (24.11.2026), the levels in their columns (the profession's
+// with its icon, in its own order), and the player's own place among all of
+// them; a tap on a name shows that character (profile.js). "Gildie"
 // (src/server/guild-fame.js): the guilds by their Sława of this week or
 // from the start ("Ten tydzień", "Od początku"), each with its place, its
 // tag and name, its members and its Sława, the character's own guild lit
@@ -197,6 +198,10 @@ function mountCharacterRanking(container) {
   // highest of each character's (the author, 15.11.2026: „by można było
   // wybrac podkategorie czyli konkretne Profesje”; the list of 975 B).
   let profession = null;
+  // In every order: one class's characters, whatever their evolution, or
+  // null for all of them (gracz poz. 45 through the author, 24.11.2026:
+  // „żeby wiedzieć np. czy się jest najlepszym klerykiem”).
+  let classId = null;
   const switcher = h(
     'div',
     { class: 'segmented ranking-by', role: 'group', 'aria-label': t('Kolejność rankingu') },
@@ -215,50 +220,56 @@ function mountCharacterRanking(container) {
       }),
     ),
   );
-  const choice = h('div', { class: 'ranking-professions', hidden: true });
+  const choices = h('div', { class: 'ranking-choices' });
   const place = h('div', { class: 'ranking-place-box' });
   const board = h('div', { class: 'card ranking' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
-  fill(container, switcher, choice, place, board);
+  fill(container, switcher, choices, place, board);
   const pressed = () => {
     for (const option of switcher.children) option.setAttribute('aria-pressed', String(option.dataset.by === by));
   };
-  const asked = () => (by === 'profession' && profession ? `by=profession&profession=${profession}` : `by=${by}`);
+  const asked = () => [by === 'profession' && profession ? `by=profession&profession=${profession}` : `by=${by}`, classId && `class=${classId}`].filter(Boolean).join('&');
   const list = pagedList({ ask: (offset) => `/api/ranking?${asked()}&offset=${offset}`, key: asked, draw: show, board });
 
-  // The professions to pick under "Poziom Profesji", from the answer in the
-  // page's language: "Najwyższa" (the highest of each character's, as
-  // before) or one of them, in a list to open as on the Targowisko.
-  function drawChoice(professions) {
-    choice.hidden = by !== 'profession' || !professions;
-    if (choice.hidden) return fill(choice);
-    const options = [{ id: null, name: t('Najwyższa') }, ...professions];
-    return fill(
-      choice,
+  // A list to open as on the Targowisko (975 B), its label over it: the
+  // options ({ id, name }, the first with the id null), the one picked now
+  // and what a pick does.
+  const choiceList = (id, label, options, picked, choose) =>
+    h(
+      'div',
+      { class: 'market-choice' },
+      h('label', { class: 'bag-sort-label', for: id, text: label }),
       h(
-        'div',
-        { class: 'market-choice ranking-profession-list' },
-        h('label', { class: 'bag-sort-label', for: 'ranking-profession', text: t('Profesja') }),
-        h(
-          'select',
-          {
-            id: 'ranking-profession',
-            class: 'anvil-material market-choice-list',
-            onChange: (event) => {
-              const id = event.currentTarget.value || null;
-              if (id === profession) return;
-              profession = id;
-              list.load(0);
-            },
-          },
-          options.map((option) => h('option', { value: option.id ?? '', selected: option.id === profession, text: option.name })),
-        ),
+        'select',
+        { id, class: 'anvil-material market-choice-list', onChange: (event) => choose(event.currentTarget.value || null) },
+        options.map((option) => h('option', { value: option.id ?? '', selected: option.id === picked, text: option.name })),
       ),
+    );
+
+  // The lists over the table in the page's language: the class, "Wszystkie
+  // klasy" or one of the game's (its content), and under "Poziom Profesji",
+  // from the answer, the profession, "Najwyższa" (the highest of each
+  // character's, as before) or one of them.
+  function drawChoices(professions) {
+    fill(
+      choices,
+      choiceList('ranking-class', t('Klasa'), [{ id: null, name: t('Wszystkie klasy') }, ...state.content.classes], classId, (id) => {
+        if (id === classId) return;
+        classId = id;
+        list.load(0);
+      }),
+      by === 'profession' &&
+        professions &&
+        choiceList('ranking-profession', t('Profesja'), [{ id: null, name: t('Najwyższa') }, ...professions], profession, (id) => {
+          if (id === profession) return;
+          profession = id;
+          list.load(0);
+        }),
     );
   }
 
   function show(answer) {
     const { rows, place: own } = answer;
-    drawChoice(answer.professions);
+    drawChoices(answer.professions);
     fill(place, placeLine(own ? t('Twoje miejsce: {place}.', { place: formatNumber(own) }) : '', answer, t('Moje miejsce'), list.go));
     const sorted = (id) => (id === by ? 'ranking-sorted' : undefined);
     // A column of its own order shows only there.
@@ -293,9 +304,11 @@ function mountCharacterRanking(container) {
                   h(
                     'td',
                     { class: 'ranking-name' },
+                    // The name keeps its room; the tag, the mark and the
+                    // title go under it when the line is short (24.11.2026).
                     h(
                       'span',
-                      { class: 'ranking-who' },
+                      { class: 'ranking-who ranking-who--parts' },
                       icon(CLASS_ICONS[row.classId] ?? 'person', { size: 14, className: 'chat-class' }),
                       framedName(
                         h('button', {
@@ -325,6 +338,8 @@ function mountCharacterRanking(container) {
   }
 
   pressed();
+  // The class's list from the start, not only with the first answer.
+  drawChoices(null);
   list.load(0);
   return { unmount: list.unmount };
 }

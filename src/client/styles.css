@@ -416,12 +416,13 @@ button {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-/* With Górnictwo's minerals, four tabs: two rows of two. */
+/* With one more, the herbs, Górnictwo's minerals or the Spiżarnia, four
+   tabs: two rows of two. */
 .bag-tabs--four {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-/* With the Spiżarnia too, five tabs: three over two, and in one row only
+/* With two of them, five tabs: three over two, and in one row only
    where the bag itself is 560 px wide or more (1057). By the bag's width,
    not the screen's: on a computer and a tablet the bag stands in a narrow
    column beside the character, where five in a row cut "Przedmioty" (the
@@ -463,6 +464,21 @@ button {
 }
 
 .bag-tabs--four .segmented-option:nth-child(n + 3) {
+  border-top: 1px solid var(--system-line);
+}
+
+/* With all three (the herbs' own tab, 24.11.2026), six tabs: two even rows
+   of three at any width, as the bag's column on a computer has no room
+   for six in one row with their counts. */
+.bag-tabs--six {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.bag-tabs--six .segmented-option:nth-child(4) {
+  border-left: 0;
+}
+
+.bag-tabs--six .segmented-option:nth-child(n + 4) {
   border-top: 1px solid var(--system-line);
 }
 
@@ -2448,6 +2464,12 @@ a.segmented-option {
   margin: 0;
   color: var(--text-muted);
   font-size: 13px;
+}
+
+/* The Spiżarnia's groups, Potrawy over Składniki (24.11.2026). */
+.bag-group-title {
+  margin: 4px 0 0;
+  font-size: 16px;
 }
 
 /* Items */
@@ -10244,6 +10266,12 @@ a.profession-square:active {
   color: var(--gold);
 }
 
+/* On another dish's card while a meal is at work: the meal at work ends
+   once it is eaten (24.11.2026). */
+.meal-swap-note {
+  color: var(--danger);
+}
+
 /* A cooking's chip, in the red of a hearth's embers. */
 .chip--dishes {
   border-color: rgba(220, 120, 90, 0.6);
@@ -12287,6 +12315,27 @@ button.farm-plot {
   min-width: 0;
 }
 
+/* A character with its guild's tag, its mark in the chat and its title
+   (the Ranking postaci, the Punkty Sławy): the name keeps its room beside
+   the class's icon, cut with "…" only when it alone is wider than its
+   cell, and what comes after it goes under it, from where the name starts,
+   when the line is short. With all three, the name was squeezed to
+   nothing and could not be tapped (a player, 24.11.2026). The icon stands
+   in the padding: 14 px and the gap of 6 px. */
+.ranking-who--parts {
+  flex-wrap: wrap;
+  row-gap: 0;
+  padding-left: 20px;
+}
+
+.ranking-who--parts > .chat-class {
+  margin-left: -20px;
+}
+
+.ranking-who--parts > .chat-name {
+  max-width: 100%;
+}
+
 .ranking-profession {
   display: inline-flex;
   align-items: center;
@@ -12434,13 +12483,18 @@ button.farm-plot {
   height: 20px;
 }
 
-/* The professions to pick under "Poziom Profesji" (975 B): "Najwyższa" and
-   each profession, in a list to open as on the Targowisko. */
-.ranking-professions[hidden] {
-  display: none;
+/* The lists over the Ranking postaci, to open as on the Targowisko: the
+   class, "Wszystkie klasy" or one of them (24.11.2026), and under "Poziom
+   Profesji" the profession, "Najwyższa" or one of them (975 B); side by
+   side where two fit, one under another on a narrow phone. */
+.ranking-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
 }
 
-.ranking-profession-list {
+.ranking-choices > .market-choice {
+  flex: 1 1 150px;
   max-width: 320px;
 }
 
@@ -29393,7 +29447,8 @@ a.social-button {
 }
 
 /* The title of an achievement worn (1036.3 B): in gold under the name in
-   the profile, small after it in the Ranking. */
+   the profile, small after it in the Ranking (under it when the line is
+   short, cut with "…" only when wider than the whole cell). */
 .profile-worn-title {
   margin: 2px 0 0;
   color: var(--gold);
@@ -29402,10 +29457,12 @@ a.social-button {
 
 .ranking-title {
   display: block;
+  overflow: hidden;
+  max-width: 100%;
   color: var(--gold);
   font-size: 12px;
   line-height: 1.2;
-  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
 }
 
 /* A channel's tab slides into another place (1039.3): held, it lifts above

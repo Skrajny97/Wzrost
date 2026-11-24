@@ -134,8 +134,10 @@ export function bagPantry(row) {
 // words with its portions ("Żurek ×2", the bonuses that many times), and
 // the minutes of explorations it still works for, of how many; null
 // without one, or where the game has no Gotowanie. `swap`: the words
-// asking before another dish takes its place (hunts.js, mealAtStart),
-// {dish}, {current} and {time} filled in by the page.
+// asking before another dish takes its place (hunts.js, mealAtStart), and
+// `note`, the line on another dish's card in the Spiżarnia saying so
+// before "Zjedz" (24.11.2026), {dish}, {current} and {time} filled in by
+// the page.
 export function mealView(row) {
   if (!content().cooking) return null;
   const meal = mealOf(row.meal, content());
@@ -149,7 +151,7 @@ export function mealView(row) {
     portions: meal.portions,
     left: meal.left,
     minutes: content().cooking.meal.minutes,
-    swap: { title: texts.swapTitle[0], text: texts.swapText[0], eat: texts.swapEat[0] },
+    swap: { title: texts.swapTitle[0], text: texts.swapText[0], eat: texts.swapEat[0], note: texts.swapNote[0] },
   };
 }
 

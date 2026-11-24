@@ -430,6 +430,9 @@
       "swapEat": [
         "Eat"
       ],
+      "swapNote": [
+        "Once you eat it, the current meal ({current}) will stop working with {time} of explorations left, and its bonus will be lost."
+      ],
       "noDish": [
         "You have no such dish in the Pantry."
       ]

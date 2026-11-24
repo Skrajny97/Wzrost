@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { giftReward, questPeriod } from '../src/engine/index.js';
+import { classNameOf, giftReward, questPeriod } from '../src/engine/index.js';
 import { acceptFriend, firstKept, inviteFriend } from '../src/server/community.js';
 import { content } from './helpers/content.js';
 import { meanwhile, posted } from './helpers/meanwhile.js';
@@ -31,10 +31,10 @@ describe('Społeczność: Ranking, Znajomi i Upominek', () => {
   const { call, db, signUp } = useServer({ AUTHOR_LOGINS: 'szef' });
   const players = {};
 
-  // An account with a character at the given levels.
-  async function player(login, { level = 5, classLevel = 1 } = {}) {
+  // An account with a character at the given levels, a mage unless said.
+  async function player(login, { level = 5, classLevel = 1, classId = 'mage' } = {}) {
     const { cookie } = await signUp(login);
-    await call('POST', '/api/character', { cookie, body: { name: login, classId: 'mage', appearance: 'female' } });
+    await call('POST', '/api/character', { cookie, body: { name: login, classId, appearance: 'female' } });
     await (await db()).prepare('UPDATE characters SET level = ?, class_level = ? WHERE name = ?').bind(level, classLevel, login).run();
     return cookie;
   }
@@ -118,6 +118,48 @@ describe('Społeczność: Ranking, Znajomi i Upominek', () => {
     const byLevel = (await call('GET', '/api/ranking?by=level&profession=alchemy', { cookie: players.ala })).data;
     assert.equal(byLevel.profession, null);
     assert.equal(byLevel.professions, undefined);
+  });
+
+  // Gracz poz. 45 through the author (24.11.2026): „żeby wiedzieć np. czy
+  // się jest najlepszym klerykiem”.
+  test('the Ranking of one class picked: in every order only its characters, of any evolution, with their places and the own place among them', async () => {
+    const database = await db();
+    const ewa = await player('Ewa', { level: 30, classLevel: 2, classId: 'cleric' });
+    await player('Iga', { level: 6, classLevel: 25, classId: 'cleric' });
+    // Iga has evolved: still a cleric.
+    const evolution = Object.values(content.evolutionsById).find((one) => one.classId === 'cleric');
+    await database.prepare("UPDATE characters SET evolution = ? WHERE name = 'Iga'").bind(evolution.id).run();
+    const clerics = (await call('GET', '/api/ranking?class=cleric', { cookie: players.ola })).data;
+    assert.equal(clerics.classId, 'cleric');
+    assert.deepEqual(clerics.rows.map(({ place, name, classId }) => [place, name, classId]), [
+      [1, 'Ewa', 'cleric'],
+      [2, 'Iga', 'cleric'],
+    ]);
+    assert.equal(clerics.rows[1].className, classNameOf({ classId: 'cleric', evolution: evolution.id, appearance: 'female' }, content));
+    assert.equal(clerics.total, 2);
+    // Ola, a mage, has no place among the clerics; among the mages she has.
+    assert.equal(clerics.place, null);
+    const mages = (await call('GET', '/api/ranking?class=mage', { cookie: players.ola })).data;
+    assert.deepEqual(mages.rows.map(({ name }) => name), ['Ala', 'Ola']);
+    assert.deepEqual([mages.place, mages.total], [2, 2]);
+    // By the class's level, and a page of one at a time, past the end the last.
+    const byClass = (await call('GET', '/api/ranking?by=class&class=cleric', { cookie: ewa })).data;
+    assert.deepEqual(byClass.rows.map(({ place, name }) => [place, name]), [
+      [1, 'Iga'],
+      [2, 'Ewa'],
+    ]);
+    assert.equal(byClass.place, 2);
+    const second = (await call('GET', '/api/ranking?by=class&class=cleric&limit=1&offset=1', { cookie: ewa })).data;
+    assert.deepEqual([second.offset, second.total, second.rows.map(({ place, name, own }) => [place, name, own])], [1, 2, [[2, 'Ewa', true]]]);
+    assert.equal((await call('GET', '/api/ranking?by=class&class=cleric&limit=1&offset=9', { cookie: ewa })).data.offset, 1);
+    // By profession: the clerics who have worked in one.
+    await database.prepare("UPDATE characters SET professions = ? WHERE name IN ('Ala', 'Ewa')").bind(JSON.stringify({ herbalism: { level: 4, xp: 0 } })).run();
+    const workers = (await call('GET', '/api/ranking?by=profession&profession=herbalism&class=cleric', { cookie: ewa })).data;
+    assert.deepEqual([workers.profession, workers.classId, workers.rows.map(({ name }) => name), workers.place], ['herbalism', 'cleric', ['Ewa'], 1]);
+    // An unknown class is all of them.
+    const unknown = (await call('GET', "/api/ranking?class=x') OR 1=1 --", { cookie: ewa })).data;
+    assert.equal(unknown.classId, null);
+    assert.deepEqual(unknown.rows.map(({ name }) => name), ['Ewa', 'Ala', 'Ola', 'Iga']);
   });
 
   test('a friendship starts with an invitation and holds once accepted', async () => {

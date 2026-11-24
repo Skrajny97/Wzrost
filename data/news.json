@@ -1650,6 +1650,11 @@
       "id": "0.4.95",
       "title": "Wersja 0.4.95",
       "body": "- Przedmioty: oprócz Tieru jest teraz blokada poziomu. Przedmiot założysz, gdy jego poziom jest najwyżej o 30 wyższy od Twojego poziomu postaci albo klasy (liczy się wyższy z nich). Od 100. poziomu ten zapas rośnie równo do 50 na 300. poziomie. Wymagany poziom widać na karcie przedmiotu.\n- Za wysokie przedmioty, które postać ma już na sobie, wracają do plecaka przy następnym wczytaniu postaci i od razu przestają liczyć się w walkach. Kupować, wymieniać, przechowywać i wytwarzać takie przedmioty możesz dalej."
+    },
+    {
+      "id": "0.4.96",
+      "title": "Wersja 0.4.96",
+      "body": "- Ranking postaci: nazwa gracza jest zawsze widoczna i zawsze otwiera podgląd postaci, także przy tytule, znaczku moderatora i skrócie gildii. Gdy brakuje miejsca, te dopiski przechodzą pod nazwę.\n- Ranking postaci ma listę „Klasa”: wybierz np. Kleryka, a zobaczysz, które miejsce zajmujesz wśród Kleryków. Ewolucje liczą się do swojej klasy.\n- Plecak: zioła mają własną zakładkę „Zioła”, a Spiżarnia dzieli się na Potrawy i Składniki.\n- Spiżarnia: karta innej potrawy niż obecny posiłek mówi już przed „Zjedz”, że obecny posiłek przestanie działać, a jego premia przepadnie."
     }
   ]
 }
