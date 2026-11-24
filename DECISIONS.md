@@ -3977,6 +3977,10 @@ Autor ocenił na stronie ocen grafiki Drzewa Świata (1240–1242) i w każdej p
    - Niebiańska Łuczniczka: twarz z klatki startowej (oko, brew, nos, usta) w każdej klatce, od pierwszego piksela skóry w wierszu do linii profilu, przesunięta tam, gdzie jest twarz w klatce; włosy, diadem i kucyk zostają z chodu (1109).
 8. **Dźwięki umiejętności:** 16 przyjętych jest w `src/client/audio/sfx/skill-<id>-1.mp3` i w `data/sounds.json` (głośność 0,7, jak pozostałe dźwięki umiejętności). Dla 14 pozostałych opisy w `audio/prompts.json` są nowe: epicko, z mocnym uderzeniem, bez szumu, świstu i gwizdu, a przy Wodzu watahy żywe wilki zamiast upiornych odgłosów. Opisy mają wpływ 0,7, więc ElevenLabs trzyma się ich ściślej. Nagrywają się po dwie wersje na stronę ocen.
 
+## Wersja 0.5.19 (24.11.2026): piąta ewolucja w kodzie, jeszcze wyłączona
+
+Zob. sekcję niżej: 15 piątych form z umiejętnościami, liczbami i zasadami jest w kodzie za przełącznikiem `FIFTH_EVOLUTION`, wyłączonym w grze i w wersji testowej (włączonym w `npm run dev` i testach). Wejdzie, gdy będzie cała grafika: portrety (1245 na stronie ocen), jeźdźcy, chody, odcienie skóry i grafika umiejętności.
+
 ## Piąta ewolucja klas (1235, decyzje autora 24.11.2026)
 
 1. **Zasady z 1235.0 przyjęte** i wszystkie 15 par nazw (1235.1–1235.15): Niepowstrzymany/Niepowstrzymana, Czempion Bogów/Czempionka Bogów, Tarcza Świata, Pan Gwiazd/Pani Gwiazd, Syn Peruna/Córka Peruna, Bóg Łowów/Bogini Łowów, Demiurg, Wcielenie Zimy, Ojciec Puszczy/Matka Puszczy, Serafin/Serafina, Miecz Niebios, Wszechwidzący/Wszechwidząca, Pan Dusz/Pani Dusz, Cesarz Nawii/Cesarzowa Nawii, Król Ciemności/Królowa Ciemności. Angielskie nazwy jak w 1235 (Unstoppable, Champion of the Gods, Shield of the World i tak dalej). Szósta ewolucja według schematu A (1236 A) to osobny etap.

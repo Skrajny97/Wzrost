@@ -1765,6 +1765,11 @@
       "id": "0.5.18",
       "title": "Wersja 0.5.18",
       "body": "- Postrach Krainy i Kultywacja mają teraz w Walce własne zakładki, obok Eksploracji, Portali i Wież. Złota kropka przy zakładce mówi, że czeka Skrzynia Bossa do otwarcia albo raport z Kultywacji.\n- Porównanie przedmiotów mieści się już na najwęższych telefonach, także przy bardzo dużych liczbach obrażeń."
+    },
+    {
+      "id": "0.5.19",
+      "title": "Wersja 0.5.19",
+      "body": "- W tle: piąta ewolucja klas, od 400. poziomu klasy, jest już w kodzie gry. Wejdzie, gdy będzie gotowa cała jej grafika."
     }
   ]
 }
