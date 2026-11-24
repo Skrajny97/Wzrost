@@ -47,7 +47,7 @@ const ORDERS = {
 // the game's professions only, never as the player wrote it.
 const professionOrder = (id) => ({ order: `${professionLevel(id)} DESC, c.level DESC, c.xp DESC, c.id`, where: ` AND ${professionLevel(id)} > 0` });
 
-// GET /api/ranking?by=level|class|profession[&profession=<id>]&offset=…&limit=…:
+// GET /api/ranking?by=level|class|profession[&profession=<id>][&class=<id>]&offset=…&limit=…:
 // one page of the characters highest by the level of the character, of its
 // class, of its highest profession or of the one profession given, with the
 // professions to pick from in the answer (the author, 10.11.2026: „Ranking max 50 postaci +
@@ -55,7 +55,11 @@ const professionOrder = (id) => ({ order: `${professionLevel(id)} DESC, c.level 
 // ranking.page of them from `offset` (ranking-pages.js), each with these
 // levels and its place; how many characters the order has in all, and the
 // player's own place among all of them, for "Moje miejsce". A page past the
-// end, as when the list got shorter meanwhile, comes as the last one.
+// end, as when the list got shorter meanwhile, comes as the last one. With
+// `class`, in every order, only the characters of that class, whatever
+// their evolution, their places and the player's own among them (gracz
+// poz. 45 through the author, 24.11.2026: „żeby wiedzieć np. czy się jest
+// najlepszym klerykiem”); the class comes from the game's classes only.
 export async function ranking(context) {
   const { character, db } = await requireChatter(context);
   const params = new URL(context.request.url).searchParams;
@@ -63,7 +67,11 @@ export async function ranking(context) {
   const by = Object.hasOwn(ORDERS, asked) ? asked : 'level';
   const wanted = by === 'profession' ? params.get('profession') : null;
   const one = wanted && content().professionsById[wanted] ? wanted : null;
-  const { order, where } = one ? professionOrder(one) : ORDERS[by];
+  const askedClass = params.get('class');
+  const classId = askedClass && content().classesById[askedClass] ? askedClass : null;
+  const { order, where: orderWhere } = one ? professionOrder(one) : ORDERS[by];
+  const where = classId ? `${orderWhere} AND c.class_id = ?` : orderWhere;
+  const ofClass = classId ? [classId] : [];
   const page = askedPage(context.request.url);
   const rowsFrom = (offset) =>
     db
@@ -73,13 +81,13 @@ export async function ranking(context) {
          FROM characters c JOIN users u ON u.id = c.user_id
          WHERE c.${OWN_CHARACTERS}${where} ORDER BY ${order} LIMIT ? OFFSET ?`,
       )
-      .bind(page.limit, offset);
+      .bind(...ofClass, page.limit, offset);
   const [first, own, counted] = await db.batch([
     rowsFrom(page.offset),
     db
       .prepare(`SELECT place FROM (SELECT c.id, ROW_NUMBER() OVER (ORDER BY ${order}) AS place FROM characters c WHERE c.${OWN_CHARACTERS}${where}) WHERE id = ?`)
-      .bind(character.id),
-    db.prepare(`SELECT COUNT(*) AS total FROM characters c WHERE c.${OWN_CHARACTERS}${where}`),
+      .bind(...ofClass, character.id),
+    db.prepare(`SELECT COUNT(*) AS total FROM characters c WHERE c.${OWN_CHARACTERS}${where}`).bind(...ofClass),
   ]);
   const { total } = counted.results[0];
   let offset = page.offset;
@@ -91,6 +99,8 @@ export async function ranking(context) {
   return json({
     by,
     profession: one,
+    // The class picked, or null for all of them.
+    classId,
     // The professions to pick from under "Poziom Profesji", in the language
     // of the request.
     ...(by === 'profession' && { professions: content().professions.map(({ id, name }) => ({ id, name })) }),

@@ -13,13 +13,17 @@
 // plecaka" (20.11.2026), the Osada's residents at several standings of the
 // relation (one at the top in seven digits), on an account with the longest login and gold in
 // billions in its Skrzynia Konta (its sheet "Wyjmij złoto" with all of it, and
-// with too much typed). The bag
+// with too much typed), and above it in the Ranking postaci and the Punkty
+// Sławy a member of its guild with all a row can hold (the longest name and
+// title, the moderator's mark, the guild's tag). The bag
 // is checked in "Zaznacz do sprzedaży" too, with an item marked. On each screen,
 // on the tabs TABS opens and in the sheets SHEETS opens over a screen (the
 // Ustawienia and "Zgłoś błąd", with a screenshot picked too), it looks for a
 // page wider than the screen (a sheet that scrolls sideways), text out of
 // its frame and elements past the right edge, and lists text cut with "…"
-// for a look. Before the game, the screens around it: the login and the new
+// for a look. In a ranking's row a character's name has to show whole, or
+// cut with "…" only where it alone is wider than its cell. Before the game,
+// the screens around it: the login and the new
 // account's forms, the choice of a character on an account with two of them,
 // long-named, and the creation of a new one.
 // Run against a dev server (npm run dev) from the repo folder whose local D1
@@ -340,6 +344,21 @@ function audit(frame) {
       found.push({ kind: 'edge', where: label(el), text: `${Math.round(box.right - vw)} px za prawą krawędzią${sheet ? ' okienka' : ''}` });
     }
   }
+  // A character's name in a ranking's row (a player, 24.11.2026: beside a
+  // title, the moderator's mark and a guild's tag the name was squeezed to
+  // nothing and could not be tapped): whole, or cut with "…" only where it
+  // alone is wider than its cell, and the row's parts inside the cell.
+  for (const who of top.querySelectorAll('.ranking-who')) {
+    if (!shown(who)) continue;
+    if (who.scrollWidth > who.clientWidth + 1) found.push({ kind: 'spill', where: label(who), text: `${who.textContent.trim().slice(0, 40)} (${who.scrollWidth} px w ${who.clientWidth} px)` });
+    const name = who.querySelector('.chat-name');
+    if (!name) continue;
+    const box = name.getBoundingClientRect();
+    const room = who.getBoundingClientRect().right - parseFloat(getComputedStyle(who).paddingRight) - box.left;
+    if (box.width + 1 < Math.min(name.scrollWidth, room)) {
+      found.push({ kind: 'name', where: label(who), text: `${name.textContent.slice(0, 40)}: ${Math.round(box.width)} px z ${name.scrollWidth} px` });
+    }
+  }
   // A countdown's digits on one line (setTimer's .timer-run).
   for (const run of top.querySelectorAll('.timer-run')) {
     if (!shown(run)) continue;
@@ -449,6 +468,25 @@ async function main() {
       // and the Gildia tab's help card lists them all.
       `INSERT INTO buildings (character_id, building_id, level, started_at, ends_at)
         SELECT id, 'quarry', 3, ${Date.now() - 600000}, ${Date.now() + 18000000} FROM characters WHERE user_id = (SELECT id FROM users WHERE login = '${reserveLogin}')`,
+    ].join('; '),
+  );
+  // One more member, a level higher, so that it stands first in the Ranking
+  // postaci, and with this week's Punkty Sławy, with all a row can hold
+  // (24.11.2026): the longest name, the longest title worn, the moderator's
+  // mark of its own account and the guild's tag.
+  const marked = `Świętomiłosława${stamp}`.slice(0, 20);
+  const markedLogin = `moderator${stamp}`;
+  const longestTitle = LANG === 'en' ? 'bald-explorer' : 'champion-slayer';
+  sql(
+    [
+      `INSERT INTO users (login, password_hash, created_at, chat_moderator) VALUES ('${markedLogin}', 'x', 1, 1)`,
+      `INSERT INTO characters (user_id, role, name, name_key, class_id, appearance, level, class_level, position, hp, hp_at, created_at, title, achievements, professions)
+        SELECT u.id, 'player', '${marked}', '${marked.toLowerCase()}', 'archer', 'female', 147, 99, c.position, c.hp, c.hp_at, 1, '${longestTitle}', '${JSON.stringify({ [longestTitle]: 1 })}', '${JSON.stringify({ mining: { level: 150, xp: 0 } })}'
+        FROM users u, characters c WHERE u.login = '${markedLogin}' AND c.name = '${name}'`,
+      `INSERT INTO guild_members (character_id, guild_id, role, joined_at)
+        SELECT c.id, m.guild_id, 'member', 2 FROM characters c, guild_members m WHERE c.name = '${marked}' AND m.character_id = (SELECT id FROM characters WHERE name = '${name}')`,
+      `INSERT INTO fame_points (character_id, week, points)
+        SELECT (SELECT id FROM characters WHERE name = '${marked}'), week, 123455 FROM fame_points WHERE character_id = (SELECT id FROM characters WHERE name = '${name}')`,
     ].join('; '),
   );
   // The Arena's Karty (where CARDS is on): the first reserve's deck, the
@@ -564,7 +602,7 @@ async function main() {
   }
   sql(`UPDATE characters SET level = 146, class_level = 99 WHERE name = '${otherNames[0]}'`);
   await first.close();
-  const names = [name, ...otherNames, login, other, `Bractwo Żelaznych ${stamp}`, ...(hired?.name ? [hired.name] : [])];
+  const names = [name, ...otherNames, marked, login, other, `Bractwo Żelaznych ${stamp}`, ...(hired?.name ? [hired.name] : [])];
 
   let problems = 0;
   for (const size of SIZES) {

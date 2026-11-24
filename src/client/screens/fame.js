@@ -79,14 +79,15 @@ export function mountFame(container, { news = null } = {}) {
   }
 
   // A character of a table: its class, its name to tap, its guild's tag
-  // and its mark in the chat, as in the Ranking.
+  // and its mark in the chat, as in the Ranking (the tag and the mark under
+  // the name when the line is short).
   const who = (row) =>
     h(
       'td',
       { class: 'ranking-name' },
       h(
         'span',
-        { class: 'ranking-who' },
+        { class: 'ranking-who ranking-who--parts' },
         icon(CLASS_ICONS[row.classId] ?? 'person', { size: 14, className: 'chat-class' }),
         framedName(
           h('button', {
