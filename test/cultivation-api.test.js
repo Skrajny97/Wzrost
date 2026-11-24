@@ -71,6 +71,15 @@ describe('Kultywacja', () => {
     assert.ok(data.character.features.includes('cultivation'));
   });
 
+  test("XP kept past a level's end (a shorter level of a changed curve) counts on into the next levels", async () => {
+    // Level 3 with 800 XP: the 3rd level takes 270 and the 4th 280 now
+    // (1248 B), so it is level 5 with 250 into it.
+    await (await sql('UPDATE characters SET cultivation_level = 3, cultivation_xp = 800 WHERE name = ?', 'Mnich')).run();
+    const { data } = await as('mnich', 'GET', '/api/character');
+    const { level, xp, xpToNext: next, bonus } = data.character.cultivation;
+    assert.deepEqual({ level, xp, next, bonus }, { level: 5, xp: 250, next: 290, bonus: 0.05 });
+  });
+
   test('a Kultywacja begins for a length an exploration offers, keeping its XP and levels; the character rests', async () => {
     const before = await row('Mnich');
     const answer = await meditate('mnich', 60);

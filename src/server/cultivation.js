@@ -52,8 +52,14 @@ const keptXp = (activity) => {
   return Number.isSafeInteger(xp) && xp > 0 ? xp : 0;
 };
 
-// The Kultywacja's own level and its XP, as the character's row keeps them.
-const progressOf = (row) => ({ level: row.cultivation_level ?? 0, xp: row.cultivation_xp ?? 0 });
+// The Kultywacja's own level and its XP, as the character's row keeps them,
+// with XP that a shorter level of a changed curve (balance.json
+// `cultivation`) no longer holds counted on into the next levels at once
+// (cultivationProgress of no minutes); the next claim writes them so.
+const progressOf = (row) => {
+  const { level, xp } = cultivationProgress({ level: row.cultivation_level ?? 0, xp: row.cultivation_xp ?? 0 }, 0, content());
+  return { level, xp };
+};
 
 // "7" or "1.5": a share in percent, for the System's lines.
 const percent = (share) => Math.round(share * 1000) / 10;
