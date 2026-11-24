@@ -713,6 +713,11 @@ function checkReferences(data) {
     previous = step.huntMinutes;
   }
   if (previous !== maxMinutes) errors.push('unlocks.json: ostatni próg huntMinutes musi odblokować maxMinutes z balance.json');
+  // The Kultywacja's lengths, a slider as a profession's work has.
+  const meditation = data.balance.cultivation.minutes;
+  if (meditation.max < meditation.min || (meditation.max - meditation.min) % meditation.step !== 0) {
+    errors.push('balance.json: cultivation.minutes.max musi wypadać na kroku suwaka od min');
+  }
   const fights = data.balance.hunt.fightsByMinutes;
   if (fights[0][0] > minMinutes) errors.push('balance.json: fightsByMinutes nie obejmuje najkrótszej wyprawy');
   for (let i = 1; i < fights.length; i++) {

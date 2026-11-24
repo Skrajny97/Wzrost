@@ -1501,11 +1501,21 @@
     },
     "cultivation": {
       "type": "object",
-      "description": "Kultywacja (1230 A, src/engine/cultivation.js): postać zamiast wyprawy medytuje tyle, ile może trwać wyprawa. Gdy poziom klasy jest wyższy niż poziom postaci, zdobywa XP postaci: xpFactor razy tyle, ile daje wyprawa tej samej długości w najnowszym miejscu otwartym przez klasę (xpPerHour na najwyższym poziomie tego miejsca), ale najwyżej tyle, ile brakuje do poziomu klasy. Bez XP klasy, łupów i złota. Każda medytacja rozwija też własny poziom Kultywacji (od 0 do maxLevel): punkt XP Kultywacji za minutę. Pierwszy poziom to firstLevelMinutes minut, każdy następny po równo dłużej, aż do lastLevelMinutes na ostatni (z poziomu maxLevel − 1), a czas każdego poziomu jest zaokrąglony do levelRoundMinutes minut (autor 24.11.2026, 1248 B: od 4 godzin na pierwszy poziom do 20 godzin na setny). Każdy poziom daje levelBonus więcej XP postaci z wypraw (samotnych i drużyny), bez XP klasy i bez samej medytacji.",
+      "description": "Kultywacja (1230 A, src/engine/cultivation.js): postać zamiast wyprawy medytuje od minutes.min do minutes.max minut co minutes.step, jak w pracy profesji, każdy od odblokowania (autor 24.11.2026: „I Kultywacja powinna mieć do 8h możliwość Kultywowania a nie jak wyprawa”, „Kultywacja ma działać jak Profesja czyli można ją robić nawet po 10 minut, a nie tylko 1 2 4 i 8 godzin”). Gdy poziom klasy jest wyższy niż poziom postaci, zdobywa XP postaci: xpFactor razy tyle, ile daje wyprawa tej samej długości w najnowszym miejscu otwartym przez klasę (xpPerHour na najwyższym poziomie tego miejsca), ale najwyżej tyle, ile brakuje do poziomu klasy. Bez XP klasy, łupów i złota. Każda medytacja rozwija też własny poziom Kultywacji (od 0 do maxLevel): punkt XP Kultywacji za minutę. Pierwszy poziom to firstLevelMinutes minut, każdy następny po równo dłużej, aż do lastLevelMinutes na ostatni (z poziomu maxLevel − 1), a czas każdego poziomu jest zaokrąglony do levelRoundMinutes minut (autor 24.11.2026, 1248 B: od 4 godzin na pierwszy poziom do 20 godzin na setny). Każdy poziom daje levelBonus więcej XP postaci z wypraw (samotnych i drużyny), bez XP klasy i bez samej medytacji.",
       "additionalProperties": false,
-      "required": ["xpFactor", "firstLevelMinutes", "lastLevelMinutes", "levelRoundMinutes", "maxLevel", "levelBonus"],
+      "required": ["xpFactor", "minutes", "firstLevelMinutes", "lastLevelMinutes", "levelRoundMinutes", "maxLevel", "levelBonus"],
       "properties": {
         "xpFactor": { "type": "number", "exclusiveMinimum": 0 },
+        "minutes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["min", "step", "max"],
+          "properties": {
+            "min": { "type": "integer", "minimum": 1 },
+            "step": { "type": "integer", "minimum": 1 },
+            "max": { "type": "integer", "minimum": 1 }
+          }
+        },
         "firstLevelMinutes": { "type": "integer", "minimum": 1 },
         "lastLevelMinutes": { "type": "integer", "minimum": 1 },
         "levelRoundMinutes": { "type": "integer", "minimum": 1 },

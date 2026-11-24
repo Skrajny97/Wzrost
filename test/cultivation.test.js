@@ -15,6 +15,7 @@ import {
   cultivationBonus,
   cultivationGain,
   cultivationHours,
+  cultivationMinutes,
   cultivationPlan,
   cultivationProgress,
   cultivationRate,
@@ -136,6 +137,31 @@ describe("Kultywacja: its own levels and their bonus", () => {
   });
 });
 
+describe('Kultywacja: its lengths', () => {
+  test("10 minutes to 8 hours every 10, as a profession's work, the same at every level (the author, 24.11.2026)", () => {
+    const lengths = cultivationMinutes(content);
+    assert.equal(lengths.length, 48);
+    assert.deepEqual([lengths[0], lengths[1], lengths.at(-1)], [10, 20, 480]);
+    assert.ok(lengths.every((minutes, index) => minutes === 10 * (index + 1)));
+    // Not an exploration's: its 1 and 5 minutes are not here, its 8 hours are
+    // (an exploration has at most 4).
+    assert.ok(!lengths.includes(1) && !lengths.includes(5));
+    assert.ok(lengths.includes(480) && !huntDurations(500, content).includes(480));
+  });
+
+  test('8 hours give twice the XP of 4, up to the class level; the Kultywacja 480 points', () => {
+    const rate = cultivationRate(124, content);
+    assert.equal(cultivationXp(rate, 480), Math.round(rate * 8));
+    assert.equal(cultivationXp(rate, 480, 1000), 1000);
+    const plan = cultivationPlan({ level: 104, xp: 0, classLevel: 124 }, fresh, cultivationMinutes(content), content);
+    const longest = plan.lengths.at(-1);
+    assert.equal(longest.minutes, 480);
+    assert.equal(longest.xp, Math.min(plan.cap, cultivationXp(rate, 480)));
+    assert.equal(longest.cultivationXp, 480);
+    assert.equal(longest.cultivationLevel, cultivationProgress(fresh, 480, content).level);
+  });
+});
+
 describe('Kultywacja: the plan for the card', () => {
   test("with the class ahead: each length's character XP up to the cap and its level, and the Kultywacja's XP and level", () => {
     const character = { level: 104, xp: 1234, classLevel: 124 };
@@ -249,5 +275,13 @@ describe('Kultywacja in tools/level-gap-sim.mjs', () => {
     assert.equal(week.cultivationLevel, cultivationProgress(fresh, Math.round(week.cultivated * 60), content).level);
     // Without a Kultywacja, no levels.
     assert.equal(project({ variant: VARIANTS.now, from, weeks: [1] }, content)[0].cultivationLevel, 0);
+  });
+
+  test("a day's slot of 8 hours, the longest Kultywacja, meditates twice the hours of 4 while the class is ahead", () => {
+    const week = (slotHours) => project({ variant: VARIANTS.cult4cap, cultivate: 'slot', slotHours, from, weeks: [1] }, content)[0];
+    assert.equal(Math.max(...cultivationMinutes(content)), 8 * 60);
+    assert.equal(week(4).cultivated, 7 * 4);
+    assert.equal(week(8).cultivated, 7 * 8);
+    assert.ok(week(8).cultivationLevel > week(4).cultivationLevel);
   });
 });

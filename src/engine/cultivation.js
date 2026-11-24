@@ -1,12 +1,15 @@
 // @ts-check
 // Kultywacja (1230 A; DECISIONS.md, „Kultywacja (1230 A)”): the character
-// meditates for a length an exploration offers instead of exploring. While
-// its class is ahead, it gets character XP: `xpFactor` (balance.json
-// `cultivation`) times the XP an exploration as long gives in the newest
-// place its class opens, at that place's top level (xpPerHour, as the XP
-// curve was set and tools/level-gap-sim.mjs counts it), but never past the
-// class: at most the XP that brings the character to the start of its
-// class's level. No class XP, loot or gold. Every meditation also grows the
+// meditates instead of exploring, for 10 minutes to 8 hours in steps of 10
+// as at a profession's work, from its unlock on (`minutes`; the author,
+// 24.11.2026: „Kultywacja ma działać jak Profesja czyli można ją robić nawet
+// po 10 minut”, cultivationMinutes). While its class is ahead, it gets
+// character XP: `xpFactor` (balance.json `cultivation`) times the XP an
+// exploration as long gives in the newest place its class opens, at that
+// place's top level (xpPerHour, as the XP curve was set and
+// tools/level-gap-sim.mjs counts it), but never past the class: at most the
+// XP that brings the character to the start of its class's level. No class
+// XP, loot or gold. Every meditation also grows the
 // Kultywacja's own level, 0 to `maxLevel` (the author, 24.11.2026: „Niech
 // Kultywacja ma swoje poziomy (max 100) i daje +1% do XP postaci podczas
 // wypraw”, „wbicie pierwszego poziomu powinno zająć już z 4 godziny”): a
@@ -123,14 +126,26 @@ export function cultivationHours(level, content) {
 }
 
 /**
+ * The lengths of a Kultywacja, in minutes: `minutes.min` to `minutes.max`
+ * every `minutes.step`, the same at every level, as a profession's work
+ * (miningMinutes) and not an exploration's lengths.
+ * @param {Content} content
+ * @returns {number[]}
+ */
+export function cultivationMinutes(content) {
+  const { min, step, max } = content.balance.cultivation.minutes;
+  return Array.from({ length: Math.floor((max - min) / step) + 1 }, (_, index) => min + index * step);
+}
+
+/**
  * Kultywacja for a character now: whether its class is ahead (`open`: the
  * character XP flows), `factor`, the place its XP is counted from (`area`),
  * the XP an hour (`rate`), the XP that brings it to its class's level
  * (`cap`) and the minutes of it that do (`minutes`), whether a meditation
  * would give anything at all (`possible`: the class ahead, or the
- * Kultywacja below its top level), and for each of `durations` (the lengths
- * an exploration offers it) the character XP it gives with the character's
- * level after it, and the Kultywacja's XP with its level after it.
+ * Kultywacja below its top level), and for each of `durations` (its lengths,
+ * cultivationMinutes) the character XP it gives with the character's level
+ * after it, and the Kultywacja's XP with its level after it.
  * @param {Levels} character
  * @param {Progress} progress
  * @param {number[]} durations

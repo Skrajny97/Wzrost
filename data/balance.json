@@ -234,7 +234,7 @@
     "minutes": 10,
     "refillHours": 6
   },
-  "cultivation": { "xpFactor": 4, "firstLevelMinutes": 240, "lastLevelMinutes": 1200, "levelRoundMinutes": 5, "maxLevel": 100, "levelBonus": 0.01 },
+  "cultivation": { "xpFactor": 4, "minutes": { "min": 10, "step": 10, "max": 480 }, "firstLevelMinutes": 240, "lastLevelMinutes": 1200, "levelRoundMinutes": 5, "maxLevel": 100, "levelBonus": 0.01 },
   "parties": { "size": 3, "xpCost": 0.045, "classSpread": 10 },
   "companions": { "classLevelCurve": [[100, 1.4], [330, 1.4], [390, 1]] },
   "journal": { "reports": 50, "towerReports": 50, "portalReports": 40 },

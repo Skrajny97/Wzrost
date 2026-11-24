@@ -1,6 +1,7 @@
 // Kultywacja (1230 A; src/engine/cultivation.js, DECISIONS.md „Kultywacja
-// (1230 A)”) on server time: the character meditates for a length an
-// exploration offers it. While its class is ahead, it gets character XP:
+// (1230 A)”) on server time: the character meditates for 10 minutes to 8
+// hours, as long as a profession's work (cultivationMinutes), from its
+// unlock on. While its class is ahead, it gets character XP:
 // the start keeps the XP of the length at the rate of the class level then,
 // and the claim ("Odbierz raport", claimHunt in hunts.js through
 // finishActivity) gives it, at most what brings the character to its
@@ -17,12 +18,12 @@
 import {
   cultivationBonus,
   cultivationGain,
+  cultivationMinutes,
   cultivationPlan,
   cultivationProgress,
   cultivationRate,
   cultivationXp,
   cultivationXpToNext,
-  huntDurations,
   isUnlocked,
   newestArea,
   playerCombatant,
@@ -79,9 +80,9 @@ export const cultivationPlace = () => ({ placeName: t('Kultywacja') });
 // opens at (data/unlocks.json `cultivation`), null before it: its own level
 // with its XP, the XP to the next level and its share more character XP
 // from explorations (`bonus`), always (the bonuses' list shows it, also
-// while the character is away); at home also the plan
-// (cultivationPlan) for each length an exploration offers; while one runs
-// or waits for its claim, what the claim would give now (`running`).
+// while the character is away); at home also the plan (cultivationPlan)
+// for each of its lengths (cultivationMinutes); while one runs or waits
+// for its claim, what the claim would give now (`running`).
 export function cultivationView(player) {
   const { row, activity } = player;
   if (!isUnlocked(CULTIVATION, row.level, content())) return null;
@@ -106,12 +107,13 @@ export function cultivationView(player) {
     return { ...base, running: { xp: gained, level: after.level, capped, cultivationXp: grown.gained, cultivationLevel: grown.level } };
   }
   if (activity) return base;
-  return { ...base, plan: cultivationPlan(character, progress, huntDurations(row.level, content()), content()) };
+  return { ...base, plan: cultivationPlan(character, progress, cultivationMinutes(content()), content()) };
 }
 
-// POST /api/cultivation { minutes }: a Kultywacja from now on, of a length
-// an exploration offers the character, while it gives something: character
-// XP with the class ahead, or the Kultywacja's own XP below its top level.
+// POST /api/cultivation { minutes }: a Kultywacja from now on, of one of its
+// lengths (cultivationMinutes: 10 minutes to 8 hours every 10, at any
+// level), while it gives something: character XP with the class ahead, or
+// the Kultywacja's own XP below its top level.
 // It keeps the XP of the length at the rate of the class level now and the
 // levels it began with; the HP rested so far is saved, and resting goes on.
 // The character's row is as read, so two taps at once start one (the
@@ -124,7 +126,7 @@ export async function startCultivation(context) {
   if (!isUnlocked(CULTIVATION, row.level, content())) {
     throw new ApiError(403, 'locked', `Kultywację odblokujesz na poziomie postaci ${content().unlocksById[CULTIVATION].level}.`);
   }
-  if (!huntDurations(row.level, content()).includes(body?.minutes)) throw new ApiError(400, 'invalid_duration', 'Wybierz czas Kultywacji.');
+  if (!cultivationMinutes(content()).includes(body?.minutes)) throw new ApiError(400, 'invalid_duration', 'Wybierz czas Kultywacji.');
   const plan = cultivationPlan(engineCharacter(row), progressOf(row), [body.minutes], content());
   if (!plan.possible) {
     throw new ApiError(409, 'nothing_to_gain', 'Twoja postać dogoniła klasę, a Kultywacja ma najwyższy poziom: medytacja nic teraz nie da.');
