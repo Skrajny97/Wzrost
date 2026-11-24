@@ -1,0 +1,19 @@
+{
+  "id": "seraph-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult man seraph, gentle, short dark brown hair and a short beard, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, the highest and most epic form of all, even richer and more splendid than a god, six wings of white fire behind the shoulders, held half folded and close to the body, two up, two to the sides and two down, all six wings small enough to stay well inside the image with wide empty space on both sides and above, the face lit by a soft golden glow, shining white and gold plate armour with a golden sun on the chest, a mantle of soft white and golden flames, holding a tall golden staff topped with a radiant sun cross, the whole staff inside the image, merciful and mighty, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/archangel-male.png",
+      "usage": "the same man: the same face, hair and build, drawn the same way; now in a far grander, even more epic outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08069560827149286
+  },
+  "images": 4
+}

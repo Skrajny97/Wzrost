@@ -1,0 +1,19 @@
+{
+  "id": "wilds-father-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult woman mother of the wilds, the eldest of the druids, tall, long silver-grey hair in braids woven with moss and small flowers, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a godlike ultimate form, grander and more radiant than any legendary hero, the highest and most epic form of all, even richer and more splendid than a god, a crown of antlers sprouting young green leaves, a long cloak of living green vines and leaves, bark-like patterns on the skin of the arms, robes of moss green and earth brown, holding a tall gnarled staff with a small young tree growing out of its top, the whole staff and tree inside the image, the figure alone with no animals and no birds, serene and powerful, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/elder-druid-female.png",
+      "usage": "the same woman: the same face and build, drawn the same way, her hair now silver-grey; now in a far grander, even more epic outfit and weapon of the same kind, not this outfit"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08071636467509799
+  },
+  "images": 4
+}
