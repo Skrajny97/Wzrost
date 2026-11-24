@@ -4150,6 +4150,10 @@ Autor: „Do tego trzeba też w końcu ogarnąć te drużyny cholerne - niech li
    - **Dane i API.** Kolumna `characters.party_meal` (migracja `0172_party_meal.sql`): `{ "dish": id, "auto": true/false }` albo NULL. `PUT /api/party/meal { dish, auto }` przyjmuje potrawę gry po id albo null i pole tak/nie; pole bez potrawy odmawia („Wybierz potrawę do autouzupełniania.”), a brak potrawy zapisuje jako NULL. Drużyna (`GET /api/party`) ma pole `meal` z nazwą potrawy. Słowa w `data/community.json` (`party.texts.meal…`), po angielsku w `data/en/community.json` („Meal for party trips”, „Auto-refill”) i w `data/en/strings.json`.
    - **Kod:** `mealRefill` w `src/engine/cooking.js`, `partyMealOf`, `memberMeal`, `setPartyMeal` i `setOut` w `src/server/parties.js`, `src/server/index.js`, `mealRubric` w `src/client/screens/party.js`. Test: `test/party-meal.test.js` (silnik i API: porcja po skończonym posiłku aż do wyczerpania Spiżarni, działający posiłek innej i tej samej potrawy zostaje, bez pola nic, lider bez zmian, sprawdzanie wyboru). Rubryka sprawdzona na 320, 390 i 1366 px.
 
+## Wersja 0.5.7 (24.11.2026): Wieczór wróżb u Zaklinaczki
+
+Zob. „Andrzejki: Wieczór wróżb (1082–1084…)”, punkty 8–10: wróżba przeniesiona z Walki na górę Pracowni Zaklinaczki w Osadzie, tylko od 20. poziomu postaci (jak Osada), z 40 wróżbami dla gracza (subtelnie przez czwartą ścianę), losowanymi razem z figurką. W grze widać ją dopiero 29.11 od 18:00; zrzuty w 1243 na stronie ocen.
+
 ## Wersja 0.5.6 (24.11.2026): tablica zleceń bez „Odrzuć”
 
 Autor: „Usuń odrzuć z tablicy zleceń zostaw samo przelosowanie”. Karta zlecenia w Osadzie ma już tylko „Oddaj” i kostkę przelosowania (0.4.98), bez „Odrzuć” i bez pytania o odrzucenie; zlecenia tygodnia dalej nie da się ani odrzucić, ani przelosować. Serwer dalej przyjmuje `POST /api/settlement/reject` (stare strony otwarte w przeglądarkach), ale gra już tego nie oferuje. Zbędne teksty („Odrzucić zlecenie?”, „Nowe zlecenie przyjdzie…”) usunięte z `data/en/strings.json`. Tablica poszukiwanych nie miała „Odrzuć”, więc się nie zmienia.
