@@ -1,0 +1,14 @@
+{
+  "id": "whispered-charm",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Zamowa, a living whispered spell of old Slavic charms: only a big pair of pale glowing lips whispering, floating in the air, no head, no body, no woman, no hair, two spinning rings of glowing red and gold rune signs around the lips, loose glowing red threads trailing from them, an abstract magical creature, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, eerie and menacing, floating, full body, the creature alone, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024403984586291845
+  },
+  "images": 1
+}

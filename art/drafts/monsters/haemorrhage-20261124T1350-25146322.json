@@ -1,0 +1,14 @@
+{
+  "id": "haemorrhage",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Krwotok, a living fountain of dark blood: a thick column of glossy crimson blood gushing up out of nothing and splashing at the top into a gaping round mouth with sharp teeth, two arcs of spurting blood curving out like grasping arms ending in claws of droplets, an abstract eerie creature, not a person, no face, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, the creature alone, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023641997147030303
+  },
+  "images": 1
+}

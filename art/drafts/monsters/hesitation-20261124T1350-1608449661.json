@@ -1,0 +1,14 @@
+{
+  "id": "hesitation",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Wahanie, the spirit of hesitation at a crossroads: a living old wooden crossroads signpost, two arrow-shaped boards pointing two opposite ways like arms, a worried carved face on each board looking its own way, a split twisted grey post for a body standing on short root legs, wisps of grey mist around it, not a person, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the signpost alone, no ground, no background, the whole signpost inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02367697672144572
+  },
+  "images": 1
+}

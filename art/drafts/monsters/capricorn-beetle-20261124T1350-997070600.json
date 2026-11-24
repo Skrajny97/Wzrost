@@ -1,0 +1,14 @@
+{
+  "id": "capricorn-beetle",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant great capricorn beetle, one wide chunky shape filling the whole picture, a big glossy black-brown body with a strong pale amber rim light along its back, a wrinkled neck shield, thick strong legs, two thick ridged antennae as long as its body curving back over it, big jaws open, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the beetle alone, no bark, no ground, no background, the whole beetle inside the picture, both antennae too",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023681710815853543
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "oak-leaf",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant living oak leaf as big as a sail, one wide wavy lobed leaf shape filling the whole picture, green with golden-brown edges sharp as blades, glowing yellow veins, two glowing angry eyes and a jagged mouth torn into the middle of the leaf, flying like a ray, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, flying, full body, three-quarter view, the leaf alone, no tree, no branch, no ground, no background, the whole leaf inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02361190044869317
+  },
+  "images": 1
+}

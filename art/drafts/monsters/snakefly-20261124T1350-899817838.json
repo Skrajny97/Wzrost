@@ -1,0 +1,14 @@
+{
+  "id": "snakefly",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant snakefly, one bold chunky shape filling the whole picture, a thick dark blue armoured body, a long thick armoured neck like a snake raising its flat head with big sharp mandibles, four big clear veined wings with dark veins folded like a roof, short thick legs, striking forward, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the insect alone, no bark, no ground, no background, the whole insect inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023643838656107585
+  },
+  "images": 1
+}

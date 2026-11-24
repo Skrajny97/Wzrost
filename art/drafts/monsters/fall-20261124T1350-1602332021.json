@@ -1,0 +1,14 @@
+{
+  "id": "fall",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Upadek, the spirit of falling, one big bold diagonal shape filling the whole picture: a heavy grey-violet hooded figure plunging head first, a huge tattered cloak billowing upward behind it like two broken wings, two long arms stretched down with big clawed hands, two glowing white eyes in the dark hood, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, the figure alone, no ground, no background, the whole figure inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023646773261388143
+  },
+  "images": 1
+}

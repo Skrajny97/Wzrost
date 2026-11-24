@@ -1,0 +1,14 @@
+{
+  "id": "bush-cricket",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant great green bush-cricket, one bold chunky shape filling the whole picture, a bright green body like a big leaf, thick powerful hind legs bent ready to jump, a long curved sword-like ovipositor, two long antennae, strong jaws open, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the insect alone, no leaves, no ground, no background, the whole insect inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023697478647655913
+  },
+  "images": 1
+}

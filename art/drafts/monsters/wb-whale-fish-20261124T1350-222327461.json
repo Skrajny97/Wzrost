@@ -1,0 +1,14 @@
+{
+  "id": "wb-whale-fish",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Ryba-Wieloryb, the gigantic whale-fish of Slavic fairy tales on whose back the world rests, a huge dark grey-blue whale, one wide chunky shape filling the whole picture, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, a small village of wooden huts and green trees standing on its back, barnacles on its skin, a huge eye, its mouth open, its tail raised high to strike, menacing, full body, three-quarter view, the whale alone, no water, no rocks, no ground, no background, the whole whale inside the picture, the tail too",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023869887538909916
+  },
+  "images": 1
+}

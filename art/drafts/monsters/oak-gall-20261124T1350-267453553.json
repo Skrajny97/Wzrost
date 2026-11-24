@@ -1,0 +1,14 @@
+{
+  "id": "oak-gall",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Galas, a living oak gall as big as a head, one round woody ball filling the whole picture, green-brown bark-like skin with a few round holes, a crooked angry face of bark with glowing yellow eyes, two big black and yellow wasps crawling out of the holes, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the gall alone, no leaves, no branch, no ground, no background, the whole gall inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023564744042714438
+  },
+  "images": 1
+}

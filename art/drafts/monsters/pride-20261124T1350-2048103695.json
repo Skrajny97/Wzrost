@@ -1,0 +1,14 @@
+{
+  "id": "pride",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Pycha, the spirit of pride: a huge floating golden mask of a haughty face, one wide shape filling the whole picture, its nose raised high, half-closed disdainful eyes looking down, a thin sneering mouth, a tall crown of sharp golden spikes on top, long purple ribbons streaming down from it, no body, no hands, an abstract creature, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, floating, full body, the mask alone, no ground, no background, the whole mask inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02368471569209629
+  },
+  "images": 1
+}

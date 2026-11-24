@@ -1,0 +1,14 @@
+{
+  "id": "wb-miesiac",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Miesiac, the Moon of Slavic beliefs, a tall pale young shepherd of the stars with a silver glowing face, two curved crescent horns on his head like a sickle moon, a long night-blue cloak full of small stars, holding a big silver crescent sickle, glowing cold silver eyes, one wide chunky shape filling the whole picture, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, majestic and menacing, floating, full body, three-quarter view, the figure alone, no clouds, no ground, no background, the whole figure inside the picture, the sickle too",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023725757820765178
+  },
+  "images": 1
+}
