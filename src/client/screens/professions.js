@@ -1,12 +1,12 @@
 // The Profesje tab: the professions as squares in their rows (`rows` of
 // data/professions.json: the gathering ones on top, each above the one that
-// works with what it brings, and Rzemieślnictwo below; grey until they
+// works with what it brings, and Rzemiosło below; grey until they
 // come), the Zielarstwo screen: the Systemowy Zagajnik, the profession's
 // level and stats, the herbs (those the System still hides are shadows),
 // the herbs to gather and the time, and the gathering under way with
 // "Przewiń", "Przerwij" and its report at the end; and the Alchemia screen
 // in the same way: the Systemowa Pracownia, the recipes, how many potions
-// and the brewing under way; and the Rzemieślnictwo screen: the Systemowy
+// and the brewing under way; and the Rzemiosło screen: the Systemowy
 // Warsztat, the patterns by slot, the rarity, how many items and the order
 // under way, with the parts' exchange and the Przechowalnia in tabs; the
 // Górnictwo screen: the Systemowa Kopalnia, the time, what a digging should
@@ -121,16 +121,16 @@ const percentText = (share) => `${formatNumber(Math.round(share * 100))}%`;
 const workMinutes = (count, each) => Math.ceil(Math.round(count * each * 1000) / 1000);
 
 // The chances that a made item comes out upgraded already, or the level of
-// Rzemieślnictwo it may from.
+// Rzemiosło it may from.
 const upgradesText = (workshop) =>
   workshop.upgrades.length === 0
-    ? t('Od {level}. poziomu Rzemieślnictwa wyrób może wyjść od razu ulepszony.', { level: workshop.upgradesFrom })
+    ? t('Od {level}. poziomu Rzemiosła wyrób może wyjść od razu ulepszony.', { level: workshop.upgradesFrom })
     : t('Wyrób może wyjść od razu ulepszony: {chances}.', { chances: workshop.upgrades.map((tier) => `+${tier.upgrade} (${formatDecimal(tier.chance * 100)}%)`).join(', ') });
 
 // The chances that luck alone makes an item one or two rarities above the
 // ordered one, in the author's words.
 const luckText = (workshop) =>
-  t('Łut szczęścia: {one}% szans na przedmiot o wyższej rzadkości, {two}% szans na przedmiot rzadkości wyższej o 2 stopnie. Szanse rosną co 20 poziomów Rzemieślnictwa.', {
+  t('Łut szczęścia: {one}% szans na przedmiot o wyższej rzadkości, {two}% szans na przedmiot rzadkości wyższej o 2 stopnie. Szanse rosną co 20 poziomów Rzemiosła.', {
     one: formatDecimal(workshop.luck.oneUp * 100),
     two: formatDecimal(workshop.luck.twoUp * 100),
   });
@@ -344,7 +344,7 @@ export function mountProfessions(container, { params, navigate }) {
       renderAlchemy(character);
       return;
     }
-    // Rzemieślnictwo locked in this deployment leads back to the tab.
+    // Rzemiosło locked in this deployment leads back to the tab.
     if (professionId === 'crafting' && !character.professions.workshop) {
       location.replace(HOME);
       return;
@@ -409,7 +409,7 @@ export function mountProfessions(container, { params, navigate }) {
 
   // The squares in their rows (`rows`, data/professions.json): the
   // gathering professions on top, each above the one that works with what it
-  // brings, and Rzemieślnictwo below; without rows the first on top and the
+  // brings, and Rzemiosło below; without rows the first on top and the
   // others below it.
   function triangle(character) {
     const { list, rows } = character.professions;
@@ -1466,7 +1466,7 @@ export function mountProfessions(container, { params, navigate }) {
       list.element,
       h('h3', { class: 'workshop-subtitle', text: t('Rzadkość') }),
       rarityRow,
-      next && h('p', { class: 'muted', text: t('Następna rzadkość: {name}, od {level}. poziomu Rzemieślnictwa.', { name: next.name, level: next.level }) }),
+      next && h('p', { class: 'muted', text: t('Następna rzadkość: {name}, od {level}. poziomu Rzemiosła.', { name: next.name, level: next.level }) }),
       picker,
     );
   }

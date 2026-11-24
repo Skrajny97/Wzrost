@@ -59,7 +59,7 @@
     "itemNotFor": ["Nie dla: {classes}."],
     "itemOtherClasses": ["Przedmioty innych klas wypadają od {level}. poziomu postaci."],
     "itemWear": ["Założysz od {level}. poziomu klasy."],
-    "itemPattern": ["Warsztat: wzór od {level}. poziomu Rzemieślnictwa."],
+    "itemPattern": ["Warsztat: wzór od {level}. poziomu Rzemiosła."],
     "itemJewelPattern": ["Szlifiernia: wzór od {level}. poziomu Jubilerstwa."],
     "itemPatternKnown": ["Warsztat: znasz już ten wzór."],
     "itemJewelPatternKnown": ["Szlifiernia: znasz już ten wzór."],

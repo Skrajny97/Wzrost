@@ -439,7 +439,7 @@ export async function settleDiscoveries(db, player, now) {
 
 // The pattern an item taken apart teaches, or null, with where it is used
 // ("w Szlifierni"): one the Warsztat does not show yet, with
-// Rzemieślnictwo (patternFrom), or one the Szlifiernia does not show yet,
+// Rzemiosło (patternFrom), or one the Szlifiernia does not show yet,
 // with the professions (jewelPatternFrom). The character's `learned`
 // patterns hold both, as the two make different slots.
 export function taughtPattern(item, learned) {
@@ -874,7 +874,7 @@ function settlementWaiting(row, items, now, parcels = 0) {
 }
 
 // What a period's quests are drawn from: the character as it is, whether its
-// Stół rozbiórki stands, which professions it has (Rzemieślnictwo where it
+// Stół rozbiórki stands, which professions it has (Rzemiosło where it
 // works and from its own level, and each profession open at its level, as
 // Górnictwo and Jubilerstwo from 25), whether its Osada is open, its id for
 // the seed and the moment it came, for its first week (quests.js).

@@ -1392,6 +1392,10 @@
     "0.5.14": {
       "title": "Version 0.5.14",
       "body": "- Core: the gem and upgrade descriptions now speak of the Artifacts' values, not their numbers, e.g. “Gem: Agate, +10% to the Artifacts' values”."
+    },
+    "0.5.15": {
+      "title": "Version 0.5.15",
+      "body": "- In Polish, the Crafting profession is now called Rzemiosło."
     }
   }
 }

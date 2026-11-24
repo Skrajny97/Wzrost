@@ -258,8 +258,8 @@ function recipeHint(potion, settlement) {
 // potion (with its mastery's, brewChance) and each recipe, known (with its
 // herbs and the most potions at once) or hidden (a rare one of the
 // herbalist's also until she teaches it, recipeHint); and the Warsztat of
-// Rzemieślnictwo: its place, the slots with their patterns, known (with what
-// one item takes) or hidden, and the rarities, once Rzemieślnictwo opens.
+// Rzemiosło: its place, the slots with their patterns, known (with what
+// one item takes) or hidden, and the rarities, once Rzemiosło opens.
 // Null while the professions are hidden in this deployment or not unlocked
 // yet.
 export function professionsView(row) {
@@ -287,7 +287,7 @@ export function professionsView(row) {
         name: profession.name,
         kind: profession.kind,
         description: profession.description,
-        // Rzemieślnictwo waits locked where it is switched off.
+        // Rzemiosło waits locked where it is switched off.
         soon: Boolean(profession.soon) || (profession.id === workshop.profession && !craftingOn()),
         // A profession that opens later than the tab waits for its level.
         locked: !professionOpen(profession, row.level, content()),
@@ -560,7 +560,7 @@ function jewelView(level, row) {
   };
 }
 
-// The Warsztat at a level of Rzemieślnictwo, for the character's row. What
+// The Warsztat at a level of Rzemiosło, for the character's row. What
 // one item of a pattern takes is told for common gear at the character's
 // level: the parts of the rarity chosen, and the resources times the
 // rarity's step (craftCost). A rarity's minutes are of one item at this

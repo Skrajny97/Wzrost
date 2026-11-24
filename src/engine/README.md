@@ -23,7 +23,7 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 | `builder-spirit.js` | duch budowniczego przy Kamieniu węgielnym: skup zasobów obozu za złoto i to, czego budowy obozu jeszcze potrzebują |
 | `skills.js`, `evolutions.js`, `skill-demo.js` | umiejętności klas, ewolucje klas i podgląd animacji umiejętności dla autora |
 | `potions.js` | mikstury na wyprawach: kiedy postać je pije |
-| `professions.js`, `brewing.js`, `workshop.js`, `crafting.js` | profesje: Zielarstwo, Alchemia, Rzemieślnictwo oraz materiały i Stół rozbiórki |
+| `professions.js`, `brewing.js`, `workshop.js`, `crafting.js` | profesje: Zielarstwo, Alchemia, Rzemiosło oraz materiały i Stół rozbiórki |
 | `encyclopedia.js` | Encyklopedia: co postać już zdobyła, w zakładkach i Tierach |
 | `events.js` | zdarzenia na koniec wyprawy |
 | `party-events.js` | zdarzenia drużynowe na koniec wyprawy drużyny: losowanie z ziarna wyprawy, opcje lidera, wynik dla każdego na jego poziomie, jedna walka całej drużyny, premia drużyny na następną wyprawę i raport członka |

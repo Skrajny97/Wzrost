@@ -1,7 +1,7 @@
 // Parts of the game switched on for a deployment (vars in wrangler.jsonc).
-// Local work and the test version have the professions and Rzemieślnictwo;
+// Local work and the test version have the professions and Rzemiosło;
 // the live game shows Zielarstwo and Alchemia once they are ready, with
-// Rzemieślnictwo locked ("Wkrótce") until it is done. The test version
+// Rzemiosło locked ("Wkrótce") until it is done. The test version
 // takes no new accounts (REGISTRATION "closed"): only the author's, made
 // before. The events at the end of an exploration are on (EVENTS "on"),
 // and the test version (EVENTS "test") also has the outcomes the author has
@@ -67,7 +67,7 @@ export function readFeatures(env) {
 }
 
 export const professionsOn = () => professions;
-// Rzemieślnictwo needs the professions too.
+// Rzemiosło needs the professions too.
 export const craftingOn = () => professions && crafting;
 export const registrationOpen = () => registration;
 // The events at the end of an exploration (events.js), and their drafts.

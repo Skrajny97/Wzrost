@@ -37,7 +37,7 @@ import { meanwhile, posted } from './helpers/meanwhile.js';
 import { useServer } from './helpers/server.js';
 
 describe('Gotowanie in the engine', () => {
-  test('it opens at character level 25, as Górnictwo, next to Rzemieślnictwo, and raises Witalność and Intelekt up to the 200th level', () => {
+  test('it opens at character level 25, as Górnictwo, next to Rzemiosło, and raises Witalność and Intelekt up to the 200th level', () => {
     const cooking = content.professionsById.cooking;
     assert.deepEqual([cooking.name, cooking.unlockLevel, cooking.stats, cooking.maxLevel, cooking.masteryLevel], ['Gotowanie', content.professionsById.mining.unlockLevel, ['vitality', 'intellect'], 200, 100]);
     assert.deepEqual(content.professionRows.at(-1), ['cooking', 'crafting']);

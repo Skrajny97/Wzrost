@@ -48,7 +48,7 @@ function character({ read = intro, level = 20, features = ['community'], away = 
 }
 
 // Told the Społeczność up to the chat's rules (its Szybkie Polowanie waits
-// for the character at home) and the Profesje, never the Rzemieślnictwo,
+// for the character at home) and the Profesje, never the Rzemiosło,
 // which waits for a free worker.
 const toldSoFar = [...intro, ...part('professions'), 'community-welcome', 'community-tabs', 'community-rules'];
 
@@ -68,7 +68,7 @@ test('Szybkie Polowanie is told once the character is home on an inner region, a
   state.character = character({ read: [...toldSoFar, ...part('settlement')], away: true });
   narrator.narrate('#/walka/windfalls/windfalls-edge');
   assert.equal(narrator.narratorIdle(), true);
-  // Home: the Rzemieślnictwo comes first, now that a worker is free.
+  // Home: the Rzemiosło comes first, now that a worker is free.
   state.character = character({ read: [...toldSoFar, ...part('settlement')] });
   narrator.narrate('#/walka/windfalls/windfalls-edge');
   assert.equal(cards().length, 1);
@@ -131,10 +131,10 @@ test('the System words the narrator asks to read in the Profesje unfold', () => 
   panel.remove();
 });
 
-test('the Rzemieślnictwo waiting for a free worker does not begin in the middle of the Osada', () => {
+test('the Rzemiosło waiting for a free worker does not begin in the middle of the Osada', () => {
   state.user = { skipTutorials: false };
   // The Osada began while the character was away; back home, its lead to
-  // the Osada tab goes on, and the Rzemieślnictwo waits for its end.
+  // the Osada tab goes on, and the Rzemiosło waits for its end.
   state.character = character({ read: [...toldSoFar, 'settlement-welcome'] });
   narrator.narrate('#/walka');
   assert.equal(cards().length, 0);

@@ -1241,7 +1241,7 @@ async function openTutorialTests() {
       row(t('Objaśnienie Portali'), t('Od 5. poziomu postaci. Pokonane stopnie zostają.'), repeatPortalsTour, told && isUnlocked('portals')),
       row(t('Objaśnienie Umiejętności'), t('Od 10. poziomu klasy. Postać zapomni wybrane umiejętności.'), repeatSkillsTour, told && isUnlocked('skills')),
       row(t('Objaśnienie Profesji'), t('Od 10. poziomu postaci. Poziomy profesji zostają.'), repeatProfessionsTour, told && Boolean(state.character.professions)),
-      row(t('Objaśnienie Rzemieślnictwa'), t('Od 15. poziomu postaci. Poziomy profesji zostają.'), repeatCraftingTour, told && Boolean(state.character.professions?.workshop)),
+      row(t('Objaśnienie Rzemiosła'), t('Od 15. poziomu postaci. Poziomy profesji zostają.'), repeatCraftingTour, told && Boolean(state.character.professions?.workshop)),
       row(t('Objaśnienie Osady'), t('Od 20. poziomu postaci.'), repeatSettlementTour, told && Boolean(state.character.settlementOpen)),
       row(t('Objaśnienie Górnictwa i Jubilerstwa'), t('Od 25. poziomu postaci. Poziomy profesji zostają.'), repeatMiningTour, told && isUnlocked('mining')),
       row(t('Objaśnienie Labiryntu'), t('Od 30. poziomu postaci. Dzisiejszy Labirynt zostaje.'), repeatLabyrinthTour, told && Boolean(state.character.settlementOpen) && isUnlocked('labyrinth')),
@@ -1429,8 +1429,8 @@ async function repeatSkillsTour() {
 // Test mode: the narrator's Profesje chapter from the start (testing.js).
 async function repeatCraftingTour() {
   const sure = await confirmAction({
-    title: t('Objaśnienie Rzemieślnictwa od nowa?'),
-    text: t('Poziomy profesji zostaną. Narrator objaśni Rzemieślnictwo od początku.'),
+    title: t('Objaśnienie Rzemiosła od nowa?'),
+    text: t('Poziomy profesji zostaną. Narrator objaśni Rzemiosło od początku.'),
     confirmLabel: t('Od nowa'),
   });
   if (!sure) return;

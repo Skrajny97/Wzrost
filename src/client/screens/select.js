@@ -15,7 +15,7 @@ import { t } from '../i18n.js';
 import { CLASS_ICONS } from '../icons.js';
 import { systemPanel, withButton } from '../ui.js';
 
-const WORKS = { herbs: 'Zielarstwo', potions: 'Alchemia', items: 'Rzemieślnictwo', minerals: 'Górnictwo', jewels: 'Jubilerstwo', fish: 'Rybołówstwo', crops: 'Rolnictwo', dishes: 'Gotowanie', mercenary: 'Usługa najemna' };
+const WORKS = { herbs: 'Zielarstwo', potions: 'Alchemia', items: 'Rzemiosło', minerals: 'Górnictwo', jewels: 'Jubilerstwo', fish: 'Rybołówstwo', crops: 'Rolnictwo', dishes: 'Gotowanie', mercenary: 'Usługa najemna' };
 
 // What the character is doing, in a few words.
 function doing(activity) {

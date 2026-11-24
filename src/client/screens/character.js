@@ -2106,7 +2106,7 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
   // profession the scroll opens at), and the smith in the Osada's Kuźnia
   // (326 A).
   const where = (does, scroll) => {
-    const workshop = scroll?.hidden ? t('w Systemowym Warsztacie od {level}. poziomu Rzemieślnictwa', { level: scroll.level }) : t('w Systemowym Warsztacie');
+    const workshop = scroll?.hidden ? t('w Systemowym Warsztacie od {level}. poziomu Rzemiosła', { level: scroll.level }) : t('w Systemowym Warsztacie');
     return `${does} ${
       !state.character.settlementOpen
         ? t('Zrobisz go {where}.', { where: workshop })

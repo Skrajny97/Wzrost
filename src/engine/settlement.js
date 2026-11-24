@@ -254,7 +254,7 @@ export function orderGoods(character, content) {
   for (const rarity of content.rarities) {
     if (met.has(rarity.id) && content.settlement.orders.anyMaterial[rarity.id]) goods.push({ kind: 'material', key: anyMaterialKey(rarity.id) });
   }
-  // The patterns of Rzemieślnictwo the character knows (question 79 A: the
+  // The patterns of Rzemiosło the character knows (question 79 A: the
   // smiths order the Warsztat's items too).
   if (open(content.workshop)) {
     const level = professionState(character.professions, content.workshop.profession).level;

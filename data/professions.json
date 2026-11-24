@@ -59,8 +59,8 @@
     },
     {
       "id": "crafting",
-      "name": "Rzemieślnictwo",
-      "genitive": "Rzemieślnictwa",
+      "name": "Rzemiosło",
+      "genitive": "Rzemiosła",
       "kind": "crafting",
       "unlockLevel": 15,
       "stats": ["strength", "dexterity"],
@@ -274,7 +274,7 @@
       "stopped": ["Wyrób przerwany. Części i zasoby na resztę wróciły."],
       "revealed": ["System odsłania nowe wzory: {patterns}"],
       "rarity": ["System pozwala już wykonywać przedmioty rzadkości: {rarity}"],
-      "hidden": ["Ukryte przez System do {level}. poziomu Rzemieślnictwa."],
+      "hidden": ["Ukryte przez System do {level}. poziomu Rzemiosła."],
       "patternAt": ["w Warsztacie"],
       "busy": ["Postać wykonuje przedmioty. Poczekaj na koniec wyrobu."],
       "claimFirst": ["Wyrób się skończył. Najpierw odbierz raport."],
@@ -589,7 +589,7 @@
     "kinds": {
       "herbs": {"title": "Ostrożne zrywanie", "kicker": "Zielarstwo · na koniec zbierania", "text": "Stuknij „Zerwij!”, gdy znacznik jest w zielonym polu. Każde trafienie: +5% ziół, trzy trafienia: +20%.", "button": "Zerwij!", "bonus": "+{value}% ziół", "place": "system-grove", "look": "plain"},
       "potions": {"title": "Mieszanie", "kicker": "Alchemia · na koniec warzenia", "text": "Stuknij „Zamieszaj!”, gdy znacznik jest w zielonym polu. Każde trafienie: +5% mikstur, trzy trafienia: +20%.", "button": "Zamieszaj!", "bonus": "+{value}% mikstur", "place": "system-workshop", "look": "heat"},
-      "items": {"title": "Kucie", "kicker": "Rzemieślnictwo · na koniec wyrobu", "text": "Stuknij „Uderz!”, gdy młot jest w zielonym polu. Każde trafienie: +1 pkt proc. szansy na wyższą rzadkość, trzy trafienia: +4.", "button": "Uderz!", "bonus": "+{value} pkt proc. szansy na wyższą rzadkość", "place": "system-workbench", "look": "hammer"},
+      "items": {"title": "Kucie", "kicker": "Rzemiosło · na koniec wyrobu", "text": "Stuknij „Uderz!”, gdy młot jest w zielonym polu. Każde trafienie: +1 pkt proc. szansy na wyższą rzadkość, trzy trafienia: +4.", "button": "Uderz!", "bonus": "+{value} pkt proc. szansy na wyższą rzadkość", "place": "system-workbench", "look": "hammer"},
       "minerals": {"title": "Uderzenie w żyłę", "kicker": "Górnictwo · na koniec pracy", "text": "Stuknij „Uderz!”, gdy kilof jest nad żyłą w zielonym polu. Każde trafienie: +5% kamieni i kruszców, trzy trafienia: +20%.", "button": "Uderz!", "bonus": "+{value}% kamieni i kruszców", "place": "system-mine", "look": "hammer"},
       "jewels": {"title": "Szlif", "kicker": "Jubilerstwo · na koniec pracy", "text": "Stuknij „Szlifuj!”, gdy znacznik jest w zielonym polu. Każde trafienie: +1 pkt proc. szansy na wyższą rzadkość, trzy trafienia: +4.", "button": "Szlifuj!", "bonus": "+{value} pkt proc. szansy na wyższą rzadkość", "place": "system-lapidary", "look": "plain"},
       "fish": {"title": "Zacięcie", "kicker": "Rybołówstwo · na koniec połowu", "text": "Ryba bierze! Stuknij „Zatnij!”, gdy spławik jest w zielonym polu. Każde trafienie: +5% ryb, trzy trafienia: +20%.", "button": "Zatnij!", "bonus": "+{value}% ryb", "place": "system-pond", "look": "plain"},

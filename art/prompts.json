@@ -2596,7 +2596,7 @@
     "pixellab": { "style": "src/client/art/settlement/casino.png" }
   },
   "scenes": {
-    "$comment": "Sceny pracy w Systemowej Kopalni i Systemowej Szlifierni (autor: „Systemowa Szlifiernia i Kopalnia musza być zanimowane z tym niebieskim ludkiem podobnie jak w Alchemii i Rzemieślnictwie itp.”): pierwsza klatka, którą potem PixelLab animuje, z tą samą postacią w ciemnym płaszczu z kapturem, ze świecącą błękitną twarzą i dłońmi, co w scenach Zielarstwa, Alchemii i Rzemieślnictwa (src/client/art/scenes), na własnym tle jak one.",
+    "$comment": "Sceny pracy w Systemowej Kopalni i Systemowej Szlifierni (autor: „Systemowa Szlifiernia i Kopalnia musza być zanimowane z tym niebieskim ludkiem podobnie jak w Alchemii i Rzemieślnictwie itp.”): pierwsza klatka, którą potem PixelLab animuje, z tą samą postacią w ciemnym płaszczu z kapturem, ze świecącą błękitną twarzą i dłońmi, co w scenach Zielarstwa, Alchemii i Rzemiosła (src/client/art/scenes), na własnym tle jak one.",
     "width": 128,
     "height": 128,
     "removeBackground": false,

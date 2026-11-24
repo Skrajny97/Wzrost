@@ -1745,6 +1745,11 @@
       "id": "0.5.14",
       "title": "Wersja 0.5.14",
       "body": "- Rdzeń: opisy klejnotu i ulepszania mówią teraz o wartościach Artefaktów, a nie o ich liczbach, np. „Klejnot: Agat, +10% wartości Artefaktów”."
+    },
+    {
+      "id": "0.5.15",
+      "title": "Wersja 0.5.15",
+      "body": "- Profesja Rzemieślnictwo nazywa się teraz Rzemiosło."
     }
   ]
 }

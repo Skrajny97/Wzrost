@@ -375,7 +375,7 @@ const firstAreaTo = (level, content) =>
 
 // Where an item base is made, for its entry (a player's wish of 24.11.2026:
 // from the Encyklopedia straight to the item's pattern): the Warsztat of
-// Rzemieślnictwo or the Szlifiernia of Jubilerstwo, else null. Its line says
+// Rzemiosło or the Szlifiernia of Jubilerstwo, else null. Its line says
 // the profession's level the pattern opens at, or that the character knows
 // it: by that level once the profession is open, or learned by taking such
 // an item apart, which may come earlier. The way there („Do Warsztatu”, „Do

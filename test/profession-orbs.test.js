@@ -119,7 +119,7 @@ describe('what a work\'s orb gives', () => {
         }
       }
     }
-    // Rzemieślnictwo and Jubilerstwo have no product to give.
+    // Rzemiosło and Jubilerstwo have no product to give.
     assert.equal(rules.products.crafting, undefined);
     assert.equal(rules.products.jewelcrafting, undefined);
   });

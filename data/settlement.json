@@ -721,7 +721,7 @@
     "professions": [
       { "id": "gathering", "name": "Zielarstwo", "goods": "herb" },
       { "id": "brewing", "name": "Alchemia", "goods": "potion" },
-      { "id": "crafting", "name": "Rzemieślnictwo", "goods": "part" }
+      { "id": "crafting", "name": "Rzemiosło", "goods": "part" }
     ],
     "gifts": {
       "herb": { "min": 3, "max": 6, "perTenLevels": 1 },
