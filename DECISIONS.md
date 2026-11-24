@@ -4211,6 +4211,10 @@ Autor: „Automatyczne jedzenie w drużynie i w ogóle trzeba ustawić tak mogł
 5. **API.** `PUT /api/party/meal { dish, auto, portions }`: `portions` od 1 do 3, bez niego 3; inna liczba: „Wybierz od 1 do 3 porcji.”. `GET /api/party`: `meal` z `portions` i `mealMost` (najwięcej porcji naraz, `cooking.meal.portions`) dla rubryki.
 6. **Kod i testy.** `portionsWanted` i `mealRefill` (teraz `{ dish, portions }`) w `src/engine/cooking.js`; `partyMealOf`, `memberMeal`, `setPartyMeal` i widok drużyny w `src/server/parties.js`; `mealRubric` w `src/client/screens/party.js`; `mealPicker` w `src/client/screens/combat.js` (w przeglądarce `wzrost.meal-portions`, tylko gdy wybrano mniej niż najwięcej); słowa `party.texts.mealHint` w `data/community.json` i `data/en/community.json`. Testy: `test/party-meal.test.js` (silnik i API: 3 porcje naraz, potem reszta Spiżarni, ×1 i ×2, stary wybór jak ×3, posiłek tej samej potrawy bez dokładania, sprawdzanie liczby), `test/party-meal-page.test.js` (rubryka: ×3 na początku, −/+ zapisuje liczbę z wyborem), `test/meal-picker-page.test.js` („Opcje wyprawy”: start od najwięcej, granice Spiżarni i działającego posiłku, zapamiętana liczba). Rubryka i wybór posiłku z rozwiniętą listą sprawdzone na 320, 360, 375, 390, 414, 430, 768, 1366 i 1920 px, z potrawą o najdłuższej nazwie i 123 456 porcjami: bez przewijania na boki i bez tekstu poza ramką.
 
+## Wersja 0.5.13 (24.11.2026): Tiery XI i XII przedmiotów
+
+Zob. sekcję niżej: 44 nowe przedmioty od 225. i 250. poziomu klasy z ikonami wybranymi przez autora (1239). Wzory do wyrobu dojdą z krainami Drzewa Świata (1246 A).
+
 ## Tiery XI i XII przedmiotów (24.11.2026)
 
 Zadanie: przedmioty na całą grę do 500. poziomu. Krainy sięgają dziś 350. poziomu, a dojdą jeszcze dwie: 351–425 i 426–500 (ewolucje klas na 400. i 500. poziomie klasy). Brakujący szczegół rozstrzygnięty najprostszą zasadą zgodną z dotychczasowymi Tierami.
