@@ -1,0 +1,14 @@
+{
+  "id": "wb-svarozhich",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Swarozyc, the Slavic god of fire, a towering broad-shouldered bearded figure made of living fire, one wide chunky shape with a clean crisp dark outline, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, only a few embers, a fiery bearded face with blazing white eyes, a crown of flames, a big burning axe held up in one hand, standing with feet apart, majestic and menacing, full body, three-quarter view, the figure alone, no tree, no rocks, no ground, no background, the whole figure inside the picture, the whole axe too, with a small margin around it",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023717706225077316
+  },
+  "images": 1
+}
