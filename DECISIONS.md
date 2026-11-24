@@ -3901,6 +3901,10 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 2. Wartość statystyki pokazuje sumę po dodaniu (na zielono, gdy coś dodano). Liczba dodanych punktów stoi w polu, więc „(+N)” przy wartości zniknęło.
 3. Pliki: `src/client/screens/stats.js` (`manualSheet`), `src/client/styles.css` (`.manual-input`), `data/en/strings.json`. `tools/layout-check.cjs` otwiera teraz „Rozdaj ręcznie”; przeszło na 320, 360 i 375 px (dalsze rozmiary przerwała awaria przeglądarki testowej, nie gry).
 
+## Wersja 0.4.95 (24.11.2026): blokada poziomu przedmiotów
+
+Według sekcji niżej, bez makiet (nowa linijka na karcie przedmiotu i przyciski zablokowane jak przy Tierze).
+
 ## Blokada poziomu przedmiotów (24.11.2026)
 
 Autor: „Pomijając Tier powinna być też blokada poziomem na ~30-50 w górę, by nie robić potencjału na smurfkonta i postaci, założone już za wysokie przedmioty będą zdjęte wtedy”.
