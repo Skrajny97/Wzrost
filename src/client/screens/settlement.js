@@ -19,7 +19,7 @@ import { desktopLayout, onLayoutChange } from '../layout-mode.js';
 import { setMusicPlace } from '../music.js';
 import { dayPart } from '../scenes.js';
 import { activityFinished, call, isUnlocked, serverNow, state, unlockInfo } from '../state.js';
-import { closeSheet, confirmAction, howItWorks, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
+import { closeSheet, confirmAction, howItWorks, openSheet, pageHeading, rerollDie, rerollsText, systemPanel, toast, withButton } from '../ui.js';
 import { companionCard } from '../companions.js';
 import { mercenariesCard, mountMercenaryHire, serviceWaiting } from '../mercenaries.js';
 import { askGuildButton } from '../guild-requests.js';
@@ -272,6 +272,27 @@ export function mountSettlement(container, { params = {} } = {}) {
           withButton(button, async () => apply(await call('POST', '/api/settlement/reject', { orderId: order.id })));
         },
       });
+    const ask = order.forms ? countOf(order.count, ...order.forms) : `${formatNumber(order.count)} × ${order.label}`;
+    // The die (24.11.2026): the order drawn anew at once, for free, while
+    // today's rerolls last; not the week's, which cannot be rejected either.
+    // The new order stays unfolded where this one was.
+    const reroll =
+      order.id !== 'weekly' &&
+      data.board.reroll &&
+      rerollDie({
+        label: t('Przelosuj zlecenie: {order}', { order: ask }),
+        rerolls: data.board.reroll,
+        className: 'settlement-reroll',
+        reroll: async () => {
+          const index = data.board.slots.findIndex((slot) => slot.order?.id === order.id);
+          const answer = await call('POST', '/api/settlement/reroll', { orderId: order.id });
+          const fresh = answer.settlement?.board.slots[index]?.order;
+          if (fresh && unfolded.has(order.id)) unfolded.add(fresh.id);
+          playSound('system');
+          toast(t('Nowe zlecenie na tablicy.'));
+          apply(answer);
+        },
+      });
     // Folded, an order shows its name, and a gold dot when it can be delivered.
     return h(
       'details',
@@ -288,7 +309,7 @@ export function mountSettlement(container, { params = {} } = {}) {
           { class: 'settlement-fold-name' },
           order.weekly && h('span', { class: 'settlement-weekly', text: t('Zlecenie tygodnia') }),
           order.special && h('span', { class: 'settlement-weekly', text: t('Zlecenie specjalne') }),
-          h('span', { class: 'settlement-ask', text: order.forms ? countOf(order.count, ...order.forms) : `${formatNumber(order.count)} × ${order.label}` }),
+          h('span', { class: 'settlement-ask', text: ask }),
         ),
         enough && [h('span', { class: 'settlement-fold-dot', 'aria-hidden': 'true' }), h('span', { class: 'visually-hidden', text: t('Można oddać') })],
         icon('chevron', { size: 18, className: 'settlement-fold-chevron' }),
@@ -319,7 +340,7 @@ export function mountSettlement(container, { params = {} } = {}) {
               ? t('Oddasz: {list}.', { list: order.takes.map((one) => `${formatNumber(one.count)} × ${one.name}`).join(', ') })
               : t('Pasuje każdy {name}.', { name: order.forms[0] }),
           }),
-        h('div', { class: 'settlement-actions' }, deliver, reject),
+        h('div', { class: `settlement-actions${reroll ? ' settlement-actions--reroll' : ''}` }, deliver, reject, reroll),
         !enough && orderAsk(order),
       ),
     );
@@ -348,7 +369,10 @@ export function mountSettlement(container, { params = {} } = {}) {
       return h('div', { class: 'card settlement-order settlement-order--empty' }, clock.line);
     });
     const weekly = data.board.weekly ? orderCard({ ...data.board.weekly, weekly: true }) : data.board.weeklyDone && h('p', { class: 'muted', text: t('Zlecenie tygodnia oddane. Następne w poniedziałek.') });
-    return h('section', { class: 'settlement-board' }, h('h2', { class: 'section-title', text: t('Tablica zleceń') }), slots, weekly);
+    // Beside the title, the dice's rerolls left today, while an order has
+    // its die (24.11.2026).
+    const rerolls = data.board.reroll && data.board.slots.some((slot) => slot.order) && h('p', { class: 'board-rerolls', text: rerollsText(data.board.reroll) });
+    return h('section', { class: 'settlement-board' }, h('div', { class: 'board-head' }, h('h2', { class: 'section-title', text: t('Tablica zleceń') }), rerolls), slots, weekly);
   }
 
   // "Akceptacja Bractw" over the board (the author: "Niech przy wejściu do

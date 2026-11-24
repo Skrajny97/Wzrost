@@ -1146,6 +1146,10 @@
       "claimFirst": "Claim your reward from the headman first.",
       "carried": "The character set out on an exploration with this poster. You can drop it or take another after claiming the report.",
       "claimed": "The headman pays {gold} gold and {time} Time Points. Brotherhood of Hunters: +{reputation} reputation.",
+      "rerollHeld": "You cannot reroll the poster you are holding.",
+      "rerollDone": "You cannot reroll a fulfilled poster.",
+      "rerollLimit": "You have no poster rerolls left today. New ones at midnight.",
+      "rerollNone": "The headman has no other poster today.",
       "meet": [
         "The tracks match the headman's wanted poster. Before you: {enemies}.",
         "It's the one from the wanted poster: {enemies}.",

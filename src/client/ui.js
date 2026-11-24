@@ -320,6 +320,33 @@ export async function withButton(button, action) {
   }
 }
 
+// What is left of the day's rerolls of a board in the Osada (`rerolls`:
+// { daily, left }), in words, with when new ones come once none is left.
+export const rerollsText = ({ daily, left }) =>
+  left > 0 ? t('Przelosowania dziś: {left} z {daily}', { left, daily }) : t('Przelosowania dziś: 0 z {daily}. Nowe o północy.', { daily });
+
+// The die by an entry of the Osada's boards, the Tablica zleceń's order or
+// the Poszukiwani's poster (24.11.2026; the author: „potrzeba jeszcze
+// przelosowania tablicy poszukiwanych oraz zleceń (zamiast odrzucania i
+// czekania 12 godzin)”), in the look of the narrator's quests' die (1023 B):
+// a tap draws the entry anew at once (`reroll`). With none of the day's
+// rerolls left it stands disabled, saying when new ones come.
+export function rerollDie({ label, rerolls, reroll, className = '' }) {
+  const none = rerolls.left === 0;
+  return h(
+    'button',
+    {
+      type: 'button',
+      class: `button quest-reroll board-reroll ${className}`.trim(),
+      'aria-label': none ? `${label}. ${rerollsText(rerolls)}` : label,
+      title: none ? rerollsText(rerolls) : label,
+      disabled: none,
+      onClick: (event) => withButton(event.currentTarget, reroll),
+    },
+    icon('dice', { size: 20 }),
+  );
+}
+
 export function meter({ label, value, max, kind }) {
   const fill = h('div', { class: 'meter-fill' });
   const text = h('span', { class: 'meter-value' });

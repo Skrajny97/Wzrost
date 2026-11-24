@@ -91,6 +91,7 @@ import {
   restedHp,
   salvageYield,
   settleBoard,
+  rerollOrder,
   settleCrafting,
   orderCancellable,
   countedAtEnd,
@@ -828,6 +829,13 @@ export const knowingCharacter = (row) => ({ ...engineCharacter(row), met: JSON.p
 // in its own language (orderView in settlement.js).
 export function settlementBoard(row, stored, now) {
   return settleBoard(stored.board, { character: knowingCharacter(row), reputation: stored.reputation, seed: `${row.id}:settlement` }, now, contentIn('pl'));
+}
+
+// The board with one order drawn anew by its die (rerollOrder in the
+// engine), drawn as the board's orders are: for the character as it is,
+// from its seed, in Polish. Null when that order cannot be drawn anew.
+export function settlementReroll(row, stored, board, orderId, now) {
+  return rerollOrder(board, orderId, { character: knowingCharacter(row), reputation: stored.reputation, seed: `${row.id}:settlement` }, now, contentIn('pl'));
 }
 
 // Whether an order on the board, the week's included, can be delivered

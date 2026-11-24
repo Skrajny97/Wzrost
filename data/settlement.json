@@ -185,6 +185,10 @@
     "open": 3,
     "refillMinutes": 720,
     "expireDays": 7,
+    "reroll": {
+      "$comment": "Przelosowanie zlecenia (24.11.2026, po pomyśle gracza „możliwość rollowania tablicy zleceń / poszukiwani”; autor: „potrzeba jeszcze przelosowania tablicy poszukiwanych oraz zleceń (zamiast odrzucania i czekania 12 godzin)”; src/engine/settlement.js: orderRerolls, rerollOrder). Kostka przy zleceniu na Tablicy od razu zmienia je na nowe, wylosowane tak jak każde zlecenie Tablicy, o coś innego niż przelosowane, gdy tylko da się wylosować coś innego, z nowym terminem (expireDays). Za darmo, najwyżej perDay razy na dobę zadań narratora (do północy czasu polskiego), osobno od przelosowań listów gończych (wanted.reroll). Zlecenia tygodnia, którego nie da się odrzucić, nie da się też przelosować, a puste miejsce po oddanym albo odrzuconym zleceniu czeka na nowe jak dotąd (refillMinutes).",
+      "perDay": 3
+    },
     "reputation": 10,
     "relationGain": 2,
     "weekly": { "count": 4, "reward": 5, "reputation": 50 },
@@ -943,6 +947,10 @@
     "reputation": 20,
     "relationGain": 2,
     "loot": { "unique": 70, "epic": 30 },
+    "reroll": {
+      "$comment": "Przelosowanie listu gończego (24.11.2026, po pomyśle gracza „możliwość rollowania tablicy zleceń / poszukiwani”; autor: „potrzeba jeszcze przelosowania tablicy poszukiwanych oraz zleceń (zamiast odrzucania i czekania 12 godzin)”; src/engine/wanted.js: rerollPoster, src/server/wanted.js: rerollWanted). Kostka przy liście, który wisi na tablicy (nie w ręku i nie wypełniony), od razu zmienia go na nowy list z tych samych miejsc dnia, na tych samych zasadach co listy dnia (poziom elity miejsca, nagroda z miejsca o tyle wyżej, o ile listy zeszły): za stworem, którego listu dziś jeszcze nie było, a gdy w miejscach dnia takiego stwora nie ma (przy places równym creatures każde miejsce ma już swój list), za wyjętym spod prawa, którego listu dziś jeszcze nie było, w jednym z tych miejsc; list za wyjętym spod prawa zmienia się na list za innym wyjętym spod prawa. Za darmo, najwyżej perDay razy na dobę zadań narratora (do północy czasu polskiego), osobno od przelosowań zleceń (orders.reroll).",
+      "perDay": 3
+    },
     "variants": [
       { "area": "windfalls-edge", "monster": "wolf", "name": "Wilk Samotnik" },
       { "area": "fox-ravines", "monster": "fox", "name": "Stary Lis" },
@@ -1038,6 +1046,10 @@
       "claimFirst": "Najpierw odbierz nagrodę u sołtysa.",
       "carried": "Postać wyruszyła na wyprawę z tym listem. Porzucisz go albo weźmiesz inny po odebraniu raportu.",
       "claimed": "Sołtys płaci {gold} złota i {time} Punktów Czasu. Bractwo Łowców: +{reputation} przychylności.",
+      "rerollHeld": "Listu, który masz w ręku, nie przelosujesz.",
+      "rerollDone": "Wypełnionego listu nie przelosujesz.",
+      "rerollLimit": "Dziś nie masz już przelosowań listów. Nowe o północy.",
+      "rerollNone": "Sołtys nie ma dziś innego listu.",
       "meet": [
         "Ślady zgadzają się z listem gończym sołtysa. Przed Tobą {enemies}.",
         "To [ta|ten] z listu gończego: {enemies}.",

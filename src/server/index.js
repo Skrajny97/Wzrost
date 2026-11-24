@@ -135,8 +135,8 @@ import { enterTrialHall } from './trial-hall.js';
 import { arenaFight, claimArenaReward, getArena, getArenaDefence, rerollArenaRivals } from './pvp-arena.js';
 import { claimCardArenaReward, getCardArena, playCardArenaTurn, redrawCardArena, rerollCardArena, startCardArenaMatch, surrenderCardArena } from './card-arena.js';
 import { ascendAtEnchantress } from './ascension.js';
-import { buyFromHerbalist, buyMug, chooseReforged, claimStandingReward, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, redrawCandidates, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, setCompanionStay, settlementTests, takeCompanionGift, testSettlement, trainCompanion, unequipCompanion, upgradeCompanionItem } from './settlement.js';
-import { claimWanted, dropWanted, takeWanted } from './wanted.js';
+import { buyFromHerbalist, buyMug, chooseReforged, claimStandingReward, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, redrawCandidates, reforgeAtEnchantress, rejectSettlementOrder, rerollSettlementOrder, sellToHerbalist, setCompanionStay, settlementTests, takeCompanionGift, testSettlement, trainCompanion, unequipCompanion, upgradeCompanionItem } from './settlement.js';
+import { claimWanted, dropWanted, rerollWanted, takeWanted } from './wanted.js';
 import { claimMercenary, listMercenaries, offerMercenary, withdrawMercenary } from './mercenaries.js';
 import { buyFromTanner, sellToTanner } from './tannery.js';
 import { claimResidentPresent, giveToResident } from './resident-gifts.js';
@@ -340,6 +340,7 @@ const routes = [
   ['POST', '/api/settlement/deliver', deliverSettlementOrder],
   ['POST', '/api/settlement/brotherhoods/reward', claimStandingReward],
   ['POST', '/api/settlement/reject', rejectSettlementOrder],
+  ['POST', '/api/settlement/reroll', rerollSettlementOrder],
   ['POST', '/api/settlement/reforge', reforgeAtEnchantress],
   ['POST', '/api/settlement/reforge/choose', chooseReforged],
   ['POST', '/api/settlement/hermit', hermitService],
@@ -347,6 +348,7 @@ const routes = [
   ['POST', '/api/settlement/wanted', takeWanted],
   ['POST', '/api/settlement/wanted/drop', dropWanted],
   ['POST', '/api/settlement/wanted/claim', claimWanted],
+  ['POST', '/api/settlement/wanted/reroll', rerollWanted],
   ['POST', '/api/settlement/hire', hireCompanion],
   ['POST', '/api/settlement/redraw', redrawCandidates],
   // The Karczma's mercenaries (mercenaries.js).

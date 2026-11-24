@@ -1,13 +1,16 @@
 // Poszukiwani on the Osada's Tablica zleceń (619 B; src/server/wanted.js):
 // the sołtys's wanted posters of the day, two by two, each with its
 // target's picture, place and bounty; one in hand at a time, given back or
-// its bounty claimed here once its target has fallen on an exploration.
+// its bounty claimed here once its target has fallen on an exploration. An
+// open poster has its die, which draws it anew (24.11.2026).
 
 import { monsterSprite, placeArt } from './art.js';
 import { h } from './dom.js';
 import { formatNumber } from './format.js';
+import { t } from './i18n.js';
+import { playSound } from './sound.js';
 import { call } from './state.js';
-import { howItWorks, toast, withButton } from './ui.js';
+import { howItWorks, rerollDie, rerollsText, toast, withButton } from './ui.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 // "[female|male]" in the texts, by the target's gender.
@@ -23,8 +26,22 @@ function posterCard(poster, view, apply, label = null) {
       apply(answer);
     });
   const button = (text, path, body, extra = {}) => h('button', { type: 'button', class: 'button wanted-poster-button', text, onClick: act(path, body), ...extra });
+  // The die (24.11.2026): the poster drawn anew at once, for free, while
+  // today's rerolls last.
+  const reroll = () =>
+    view.reroll &&
+    rerollDie({
+      label: t('Przelosuj list: {name}', { name: poster.name }),
+      rerolls: view.reroll,
+      reroll: async () => {
+        const answer = await call('POST', '/api/settlement/wanted/reroll', { posterId: poster.id });
+        playSound('system');
+        toast(t('Nowy list gończy na tablicy.'));
+        apply(answer);
+      },
+    });
   const action = {
-    open: () => button(texts.take, '/api/settlement/wanted', { posterId: poster.id }, { disabled: view.holding }),
+    open: () => h('div', { class: 'wanted-poster-actions' }, button(texts.take, '/api/settlement/wanted', { posterId: poster.id }, { disabled: view.holding }), reroll()),
     taken: () => [h('p', { class: 'wanted-poster-note', text: gendered(filled(texts.hunting, { area: poster.areaName }), poster.female) }), button(texts.drop, '/api/settlement/wanted/drop', null, { class: 'button button--system wanted-poster-button' })],
     beaten: () => [h('p', { class: 'wanted-poster-note wanted-poster-note--beaten', text: gendered(texts.beaten, poster.female) }), button(texts.claim, '/api/settlement/wanted/claim')],
     done: () => h('p', { class: 'wanted-poster-stamp', text: texts.done }),
@@ -58,6 +75,8 @@ export function wantedCard(view, apply) {
     // first (the author's screenshot, 5.11.2026: „Ten opis schowaj pod »Jak
     // to działa?«”).
     howItWorks(null, view.texts.intro),
+    // The dice's rerolls left today, while a poster has its die.
+    view.reroll && view.posters.some((poster) => poster.state === 'open') && h('p', { class: 'board-rerolls wanted-rerolls', text: rerollsText(view.reroll) }),
     h(
       'div',
       { class: 'wanted-posters' },

@@ -117,6 +117,22 @@ export function wantedPlaces(open, content) {
   return { places: open.slice(Math.max(0, end - rules.places), end), shift: open.length - end };
 }
 
+// The places of the day's posters for a character of `classLevel`
+// (`early`: the place the Sala prób opened for it, if any), and for each of
+// them the place whose bounty its poster pays, `shift` places higher.
+/**
+ * @param {number} classLevel
+ * @param {Content} content
+ * @param {string | null} early
+ * @returns {{ places: Area[], paid: (area: Area) => Area }}
+ */
+function dayPlaces(classLevel, content, early) {
+  /** @type {Area[]} */
+  const open = content.areas.filter((/** @type {Area} */ area) => areaOpenFor(area, classLevel, early, content));
+  const { places, shift } = wantedPlaces(open, content);
+  return { places, paid: (area) => open[Math.min(open.indexOf(area) + shift, open.length - 1)] };
+}
+
 // The posters of `day` for a character of `classLevel` (`seed`: the
 // character's own; `early`: the place the Sala prób opened for it, if any,
 // the highest it has): from the places of wantedPlaces, `creatures` of them
@@ -137,12 +153,8 @@ export function wantedPlaces(open, content) {
 export function wantedPosters(classLevel, day, seed, content, early = null) {
   const rules = wantedOf(content);
   if (!rules) return [];
-  /** @type {Area[]} */
-  const open = content.areas.filter((/** @type {Area} */ area) => areaOpenFor(area, classLevel, early, content));
-  const { places, shift } = wantedPlaces(open, content);
+  const { places, paid } = dayPlaces(classLevel, content, early);
   if (places.length === 0) return [];
-  /** @param {Area} area */
-  const paid = (area) => open[Math.min(open.indexOf(area) + shift, open.length - 1)];
   const rng = createRng(`${seed}:${day}:wanted`);
   const order = [...places];
   for (let i = order.length - 1; i > 0; i--) {
@@ -158,6 +170,84 @@ export function wantedPosters(classLevel, day, seed, content, early = null) {
   const outlaw = content.monstersById[rng.pick(rules.outlaws)];
   const hideout = rng.pick(places);
   return [...creatures, poster(day, hideout, outlaw, classLevel, content, paid(hideout))];
+}
+
+// A target's mark among the day's posters: a creature's variant by its
+// place, an outlaw by himself, wherever he hides.
+/** @param {{ kind: string, areaId: string, monsterId: string }} poster */
+const targetOf = (poster) => (poster.kind === 'outlaw' ? `outlaw:${poster.monsterId}` : `creature:${poster.areaId}:${poster.monsterId}`);
+
+// The dice of the posters (24.11.2026; a player's idea, „możliwość
+// rollowania tablicy zleceń / poszukiwani”, and the author: „potrzeba
+// jeszcze przelosowania tablicy poszukiwanych oraz zleceń (zamiast
+// odrzucania i czekania 12 godzin)”): free, the rules' reroll.perDay times
+// a narrator's day, apart from the orders' (settlement.js: orderRerolls).
+// `rerolled`: the posters drawn anew this day (the day's record keeps
+// them, src/server/wanted.js), by the id of each one drawn away.
+/**
+ * @param {Record<string, Poster> | null | undefined} rerolled
+ * @param {Content} content
+ * @returns {{ daily: number, left: number }}
+ */
+export function wantedRerolls(rerolled, content) {
+  const daily = rulesOf(content).reroll.perDay;
+  return { daily, left: Math.max(0, daily - Object.keys(rerolled ?? {}).length) };
+}
+
+// The day's posters with those drawn anew in their places (rerollPoster),
+// a poster drawn anew in its turn too. A poster drawn anew is for a target
+// the day has not had, so no id comes back and the chain ends.
+/**
+ * @param {Poster[]} posters
+ * @param {Record<string, Poster> | null | undefined} rerolled
+ * @returns {Poster[]}
+ */
+export function swappedPosters(posters, rerolled) {
+  if (!rerolled) return posters;
+  return posters.map((first) => {
+    let poster = first;
+    for (let left = Object.keys(rerolled).length; left > 0 && Object.hasOwn(rerolled, poster.id); left -= 1) poster = rerolled[poster.id];
+    return poster;
+  });
+}
+
+// A poster drawn anew by its die in the place of one of the day's, by the
+// rules of the day's posters (wantedPosters): of the same places, at the
+// place's elite's level, for the bounty of the place `shift` places
+// higher, and for a target no poster of the day has had (`seen`: those on
+// the board, those drawn away and the one in hand). A creature's poster
+// brings another creature's variant of those places, and where each of
+// them has had its poster (`places` is `creatures`), an outlaw hiding in
+// one of them, as the day's outlaw is; an outlaw's poster another outlaw,
+// and with no outlaw left, a creature. `count`: which of the day's rerolls
+// it is, for its seed. Null with no such target left.
+/**
+ * @param {{ classLevel: number, day: string, seed: unknown, early?: string | null }} basis
+ * @param {{ kind: string }} replaced
+ * @param {{ kind: string, areaId: string, monsterId: string }[]} seen
+ * @param {number} count
+ * @param {Content} content
+ * @returns {Poster | null}
+ */
+export function rerollPoster({ classLevel, day, seed, early = null }, replaced, seen, count, content) {
+  const rules = wantedOf(content);
+  if (!rules) return null;
+  const { places, paid } = dayPlaces(classLevel, content, early);
+  const known = new Set(seen.map(targetOf));
+  const creatures = places
+    .map((area) => ({ area, variant: rules.variants.find((/** @type {{ area: string }} */ one) => one.area === area.id) }))
+    .filter(({ area, variant }) => variant && !known.has(`creature:${area.id}:${variant.monster}`));
+  /** @type {string[]} */
+  const outlaws = rules.outlaws.filter((/** @type {string} */ id) => content.monstersById[id] && !known.has(`outlaw:${id}`));
+  if (places.length === 0 || (creatures.length === 0 && outlaws.length === 0)) return null;
+  const rng = createRng(`${seed}:${day}:wanted:reroll:${count}`);
+  if (creatures.length > 0 && (replaced.kind !== 'outlaw' || outlaws.length === 0)) {
+    const { area, variant } = rng.pick(creatures);
+    return poster(day, area, variant, classLevel, content, paid(area));
+  }
+  const outlaw = content.monstersById[rng.pick(outlaws)];
+  const hideout = rng.pick(places);
+  return poster(day, hideout, outlaw, classLevel, content, paid(hideout));
 }
 
 // The wanted target a Drużyna's trip seeks (src/server/parties.js), since

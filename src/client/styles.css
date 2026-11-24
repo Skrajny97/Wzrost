@@ -7462,6 +7462,62 @@ a.camp-level-button {
   color: #4a3520;
 }
 
+/* The dice of the Osada's boards (24.11.2026): the quests' die by an order
+   of the Tablica zleceń and on a Poszukiwani's poster, and the day's
+   rerolls left by the board's title. */
+.board-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 12px;
+}
+
+.board-rerolls {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.board-reroll:disabled {
+  cursor: not-allowed;
+}
+
+/* On the board's dark card, the die in the card's colours, as tall as the
+   buttons beside it. */
+.settlement-reroll {
+  width: 44px;
+  height: auto;
+  min-height: 44px;
+  border-color: #5a4a33;
+  color: var(--text);
+}
+
+/* "Weź list" and the die in a row across the poster, the die under it where
+   the poster is too narrow for both. */
+.wanted-poster-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-self: stretch;
+  justify-content: center;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.wanted-poster-actions .wanted-poster-button {
+  flex: 1 1 auto;
+  width: auto;
+}
+
+.wanted-poster .board-reroll {
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  border-color: #6e5a36;
+  color: #2c2216;
+}
+
 .quests-list {
   display: flex;
   flex-direction: column;
@@ -14013,6 +14069,11 @@ button.farm-plot {
 
 .settlement-actions--stack {
   grid-template-columns: 1fr;
+}
+
+/* An order's die (24.11.2026) after "Oddaj" and "Odrzuć". */
+.settlement-actions--reroll {
+  grid-template-columns: 2fr 1fr auto;
 }
 
 /* An order folded to its name; a tap unfolds the rest. */

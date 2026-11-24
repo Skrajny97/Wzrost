@@ -351,15 +351,21 @@ const REDRAWN = ['material', 'resource'];
 // share (goodShare), the gold (`pay` times the market price) and the
 // reputation, a quality one from the brotherhood's quality standing on
 // (question 90 A), and one sentence of the one who orders (question 94 A).
-// `weekly` makes the week's big order.
+// `weekly` makes the week's big order. `avoid`, the order a die draws anew
+// (rerollOrder): never its good again, nor its finer materials of quality,
+// while the character can be asked for anything else.
 /**
- * @param {{ character: Character, reputation?: Record<string, number>, seed: string, weekly?: boolean }} options
+ * @param {{ character: Character, reputation?: Record<string, number>, seed: string, weekly?: boolean, avoid?: { kind: string, key: string } | null }} options
  * @param {Content} content
  */
-export function drawOrder({ character, reputation = {}, seed, weekly = false }, content) {
+export function drawOrder({ character, reputation = {}, seed, weekly = false, avoid = null }, content) {
   const { orders } = content.settlement;
   const rng = createRng(seed);
-  const goods = orderGoods(character, content);
+  const all = orderGoods(character, content);
+  /** @param {{ kind: string, key: string }} good */
+  const avoided = (good) => avoid !== null && good.kind === avoid.kind && good.key === avoid.key;
+  const others = all.filter((good) => !avoided(good));
+  const goods = others.length > 0 ? others : all;
   if (goods.length === 0) return null;
   const brotherhoods = content.settlement.brotherhoods.filter((/** @type {Record<string, any>} */ one) => goods.some((good) => one.goods.includes(good.kind)));
   const brotherhood = rng.pick(brotherhoods);
@@ -371,7 +377,7 @@ export function drawOrder({ character, reputation = {}, seed, weekly = false }, 
   let quality = false;
   if (kind === 'material' && reached(reputation[brotherhood.id] ?? 0, orders.quality.from, content) && rng.chance(orders.quality.chance)) {
     const better = finer(key, content);
-    if (better !== key) {
+    if (better !== key && !avoided({ kind, key: better })) {
       key = better;
       quality = true;
     }
@@ -713,6 +719,59 @@ export function deliverOrder(board, orderId, now, content, sellBonus = 0, week =
     reputation: weekGains({ [order.brotherhood]: order.reputation }, week, 'reputation', `order:${order.id}:${now}`),
     relation: { [orders.resident]: orders.relationGain },
     systemPoints,
+  };
+}
+
+// The dice of the board (24.11.2026; a player's idea, „możliwość
+// rollowania tablicy zleceń / poszukiwani”, and the author: „potrzeba
+// jeszcze przelosowania tablicy poszukiwanych oraz zleceń (zamiast
+// odrzucania i czekania 12 godzin)”): free, orders.reroll.perDay times a
+// narrator's day (to midnight, Polish time), apart from the wanted
+// posters' (wanted.js). The board keeps them (`rerolls`, { day, count }:
+// the day of the last one and how many fell on it) as the Pustelnik's
+// buys are kept (timePointsOffer): a record of a day later than `now`'s (a
+// request begun before midnight, done after one of the new day) leaves
+// none, so the limit never opens anew by going back a day.
+/**
+ * @param {Record<string, any> | null | undefined} board
+ * @param {number} now
+ * @param {Content} content
+ */
+export function orderRerolls(board, now, content) {
+  const daily = content.settlement.orders.reroll.perDay;
+  const day = questPeriod('daily', now, content).key;
+  const kept = board?.rerolls;
+  const used = typeof kept?.day === 'string' && kept.day > day ? daily : kept?.day === day ? kept.count : 0;
+  return { daily, left: Math.max(0, daily - used), day, used };
+}
+
+// One order of the board drawn anew by its die, at once (orderRerolls
+// first): drawn as a slot's next order is (drawOrder, at the board's next
+// turn), asking for another good than the order it replaces while there
+// is another (`avoid`), with a term of its own from now. The week's order,
+// which cannot be rejected, cannot be drawn anew either. Null without such
+// an order on the board or a reroll left today. `owner` as settleBoard's.
+/**
+ * @param {Record<string, any>} board
+ * @param {unknown} orderId
+ * @param {{ character: Character, reputation: Record<string, number>, seed: string }} owner
+ * @param {number} now
+ * @param {Content} content
+ * @returns {Record<string, any> | null}
+ */
+export function rerollOrder(board, orderId, { character, reputation, seed }, now, content) {
+  const { orders } = content.settlement;
+  const rerolls = orderRerolls(board, now, content);
+  const old = orderId === 'weekly' ? null : board.slots.find((/** @type {Record<string, any>} */ slot) => slot.order && slot.order.id === orderId)?.order;
+  if (!old || rerolls.left === 0) return null;
+  const turn = (board.turn ?? 0) + 1;
+  const order = drawOrder({ character, reputation, seed: `${seed}:order:${turn}`, avoid: old }, content);
+  if (!order) return null;
+  return {
+    ...board,
+    slots: board.slots.map((/** @type {Record<string, any>} */ slot) => (slot.order?.id === orderId ? { order: { id: turn, ...order, expiresAt: now + orders.expireDays * 86400000 } } : slot)),
+    turn,
+    rerolls: { day: rerolls.day, count: rerolls.used + 1 },
   };
 }
 
