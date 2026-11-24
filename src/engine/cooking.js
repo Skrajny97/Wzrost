@@ -187,26 +187,44 @@ export function mealOf(stored, content) {
  */
 export const freshMeal = (dishId, content, portions = 1) => ({ dish: dishId, left: content.cooking.meal.minutes, portions });
 
+// The portions of one dish a choice eats at once: as many as it says, one
+// to the most at once, and the most where it says none (a choice kept
+// before 24.11.2026, or none made).
+/**
+ * @param {unknown} portions
+ * @param {Content} content
+ * @returns {number}
+ */
+export function portionsWanted(portions, content) {
+  const most = content.cooking.meal.portions;
+  return Number.isInteger(portions) ? Math.min(most, Math.max(1, /** @type {number} */ (portions))) : most;
+}
+
 // The dish a Drużyna's member eats by its Autouzupełnianie as its party's
 // trip sets out (gracz (poz. 95), 24.11.2026: „posiłki ze spiżarni z
 // zaznaczeniem autouzupełniania do wyczerpania zapasów”; src/server/
-// parties.js): the dish of its choice (`choice`: { dish, auto }, kept in
-// the Drużyna), one portion of it, once its meal has run out (`meal`, as
-// mealOf gives it: null) and while its Spiżarnia (`pantry`, counts by id)
-// has one; null otherwise, and nothing is eaten. A meal at work goes on as
-// eating by hand would leave it: another dish's is never replaced without
-// asking (0.4.73), and the same dish's has not run out yet.
+// parties.js): the dish of its choice (`choice`: { dish, auto, portions },
+// kept in the Drużyna), once its meal has run out (`meal`, as mealOf gives
+// it: null), as many portions of it at once as the choice says, 3 where it
+// says none (the author, 24.11.2026: „Automatyczne jedzenie w drużynie i w
+// ogóle trzeba ustawić tak mogło jeść 3 te same posiłki na raz nie tylko
+// jeden”), or what its Spiżarnia (`pantry`, counts by id) has of them:
+// { dish, portions }; null without one, and nothing is eaten. A meal at
+// work goes on as eating by hand would leave it: another dish's is never
+// replaced without asking (0.4.73), and the same dish's has not run out
+// yet, so it gets no portions on top.
 /**
- * @param {{ dish?: unknown, auto?: unknown } | null | undefined} choice
+ * @param {{ dish?: unknown, auto?: unknown, portions?: unknown } | null | undefined} choice
  * @param {Meal | null} meal
  * @param {Record<string, number>} pantry
  * @param {Content} content
- * @returns {string | null}
+ * @returns {{ dish: string, portions: number } | null}
  */
 export function mealRefill(choice, meal, pantry, content) {
   if (!choice || choice.auto !== true || typeof choice.dish !== 'string' || !content.cooking) return null;
   if (!Object.hasOwn(content.dishesById, choice.dish) || meal) return null;
-  return (pantry[choice.dish] ?? 0) >= 1 ? choice.dish : null;
+  const portions = Math.min(portionsWanted(choice.portions, content), Math.floor(pantry[choice.dish] ?? 0));
+  return portions >= 1 ? { dish: choice.dish, portions } : null;
 }
 
 // An exploration of `minutes` setting out with the meal: what it gets

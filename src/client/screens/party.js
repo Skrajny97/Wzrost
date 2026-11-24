@@ -407,13 +407,16 @@ export function mountParty(container) {
 
   // A member's meal for the party's trips (gracz (poz. 95), 24.11.2026:
   // „posiłki ze spiżarni z zaznaczeniem autouzupełniania do wyczerpania
-  // zapasów”): a dish of its Spiżarnia and „Autouzupełnianie”. As the leader
-  // sends the party out, a member whose meal has run out eats one portion
-  // of it from its own Spiżarnia, while there is one (src/server/parties.js,
-  // memberMeal); a meal at work goes on. Saved at each change (PUT
-  // /api/party/meal), for the next trips too. A dish chosen that the
-  // Spiżarnia has run out of stays in the list, with none. The leader eats
-  // in its own "Opcje wyprawy", so it has no such rubric.
+  // zapasów”): a dish of its Spiżarnia, how many portions of it at once
+  // with −/+ (×1 to ×3, ×3 as it comes; the author, 24.11.2026:
+  // „Automatyczne jedzenie w drużynie i w ogóle trzeba ustawić tak mogło
+  // jeść 3 te same posiłki na raz nie tylko jeden”) and „Autouzupełnianie”.
+  // As the leader sends the party out, a member whose meal has run out eats
+  // those portions of it from its own Spiżarnia, or as many as there are
+  // (src/server/parties.js, memberMeal); a meal at work goes on. Saved at
+  // each change (PUT /api/party/meal), for the next trips too. A dish chosen
+  // that the Spiżarnia has run out of stays in the list, with none. The
+  // leader eats in its own "Opcje wyprawy", so it has no such rubric.
   function mealRubric(own) {
     const texts = state.content.community?.party?.texts;
     if (!own || own.leader || !texts?.mealTitle) return null;
@@ -432,6 +435,8 @@ export function mountParty(container) {
         if (!gone) call('GET', '/api/party').then(show, () => {});
       }
     };
+    const most = view.mealMost ?? 1;
+    let portions = Math.min(most, chosen?.portions ?? most);
     const select = h(
       'select',
       {
@@ -440,25 +445,40 @@ export function mountParty(container) {
         'aria-label': texts.mealTitle,
         onChange: (event) => {
           const dish = event.currentTarget.value || null;
-          save({ dish, auto: Boolean(dish) && box.checked });
+          save({ dish, auto: Boolean(dish) && box.checked, portions });
         },
       },
       h('option', { value: '', selected: !chosen, text: texts.mealPick }),
       choices.map((dish) => h('option', { value: dish.id, selected: dish.id === chosen?.dish, text: texts.mealOption.replace('{dish}', dish.name).replace('{count}', formatNumber(dish.count)) })),
     );
+    const step = (sign) => {
+      portions = Math.max(1, Math.min(most, portions + sign));
+      showPortions();
+      save({ dish: select.value || null, auto: box.checked, portions });
+    };
+    const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('{name}: mniej', { name: t('Porcje') }), text: '−', onClick: () => step(-1) });
+    const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('{name}: więcej', { name: t('Porcje') }), text: '+', onClick: () => step(1) });
+    const value = h('output', { class: 'potion-pick-value', id: 'party-meal-portions' });
+    const showPortions = () => {
+      value.textContent = `×${portions}`;
+      less.disabled = !chosen || portions <= 1;
+      more.disabled = !chosen || portions >= most;
+    };
+    showPortions();
     const box = h('input', {
       type: 'checkbox',
       id: 'party-meal-auto',
       class: 'avoid-rare-box',
       checked: Boolean(chosen?.auto),
       disabled: !chosen,
-      onChange: () => save({ dish: select.value || null, auto: box.checked }),
+      onChange: () => save({ dish: select.value || null, auto: box.checked, portions }),
     });
     return h(
       'section',
       { class: 'potion-picks party-potions party-meal', 'aria-labelledby': 'party-meal-title' },
       h('label', { class: 'duration-head', id: 'party-meal-title', for: 'party-meal-dish', text: texts.mealTitle }),
       select,
+      most > 1 && h('div', { class: 'potion-pick' }, h('span', { class: 'potion-pick-name', text: t('Porcje') }), less, value, more),
       h('label', { class: 'avoid-rare', for: 'party-meal-auto' }, box, h('span', { text: texts.mealAuto })),
       h('p', { class: 'muted', text: texts.mealHint }),
     );
