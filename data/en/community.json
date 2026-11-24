@@ -76,6 +76,7 @@
       "partClassLevel": "class {from} → {to}",
       "partPotions": "Potions",
       "partWorn": "worn",
+      "partLost": "lost",
       "waiting": "The party trip's report was claimed by: {name}. Your share of the loot is already yours.",
       "open": "View report",
       "listed": "Shared report · claimed by: {name}"

@@ -652,9 +652,11 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
                 itemSprite(item),
                 item.name,
               ),
-              // Worn at once in an empty slot, or bought by the scrapper.
+              // Worn at once in an empty slot, bought by the scrapper, or
+              // lost to a full bag.
               item.worn && h('span', { class: 'chip', text: texts.partWorn }),
               item.sold && h('span', { class: 'chip chip--dashed', text: t('sprzedany') }),
+              item.lost && h('span', { class: 'chip chip--dashed', text: texts.partLost }),
             ),
           ),
         ),
@@ -700,8 +702,13 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
               'button',
               { type: 'button', class: 'item-row', onClick: () => findSheet(item) },
               itemSummary(item),
-              // Bought by the scrapper at once, because the bag was full.
-              item.sold ? h('span', { class: 'chip chip--dashed', text: t('sprzedany') }) : findMark(item),
+              // Bought by the scrapper at once, because the bag was full, or
+              // on a Drużyna's trip lost for want of room in it.
+              item.sold
+                ? h('span', { class: 'chip chip--dashed', text: t('sprzedany') })
+                : item.lost
+                  ? h('span', { class: 'chip chip--dashed', text: partyTexts()?.partLost ?? t('sprzedany') })
+                  : findMark(item),
               icon('chevron', { size: 18 }),
             ),
           ),

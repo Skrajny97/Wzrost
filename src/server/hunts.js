@@ -47,6 +47,7 @@ import {
   fightKind,
   kindLine,
   higherThreat,
+  partyBagLost,
   partyPartView,
   hpAfterHunt,
   huntDurations,
@@ -1024,7 +1025,10 @@ async function commitClaims(db, claims, extra = []) {
 // trip by any who went, normally its leader, claims it for every one of
 // them at once, in one batch: each gets all its own claim would give (XP,
 // gold, levels, finds, materials, the potions not drunk back, the quests and
-// all), and its own report in its Dziennik, in its account's language, each
+// all), but for a full bag: its finds go into it up to its places and those
+// beyond them are lost (`partyBag`, huntClaim; the author: „w plecaku
+// zostaja rzeczy do maksymalnego napełnienia a pozniej przepadają dopóki
+// ktos nie posprząta”), and its own report in its Dziennik, in its account's language, each
 // with the same list of what every one got (partyPartView) and who claimed
 // it. What a member would spend, free stat points or Skill Points, waits on
 // the character. Each other member's report is marked for its Walka until
@@ -1065,7 +1069,7 @@ async function claimTrip(db, player, now, trip, { choice, forTrip = false, claim
     const claims = [];
     for (const member of members) {
       const own = member.player.row.id === player.row.id;
-      const claim = await inLanguage(member.language, () => huntClaim(db, member.player, now, { choice: own ? choice : undefined, decideEvent }));
+      const claim = await inLanguage(member.language, () => huntClaim(db, member.player, now, { choice: own ? choice : undefined, decideEvent, partyBag: true }));
       if (claim.event) return claim;
       claims.push({ ...member, claim });
     }
@@ -1163,7 +1167,9 @@ async function tripMembers(db, first, firstId, trip, now) {
 // event } when it waits for a choice first: the exploration's event, or on
 // a Drużyna's trip the party event its leader chooses (`decideEvent`,
 // claimTrip, which decides the trip's party event: its row, or { event }).
-async function huntClaim(db, player, now, { choice, decideEvent = null } = {}) {
+// `partyBag`: the finds a full bag has no place for are lost, as on a
+// Drużyna's trip (claimTrip), instead of the scrapper buying the weakest.
+async function huntClaim(db, player, now, { choice, decideEvent = null, partyBag = false } = {}) {
   const activity = player.activity;
   const row = player.row;
   // The potions taken along and the windows of the potions for a time
@@ -1396,9 +1402,17 @@ async function huntClaim(db, player, now, { choice, decideEvent = null } = {}) {
   const sellBonus = campBonus(levels, 'sellPrice', content());
   const toBag = hunt.items.map((item, index) => index).filter((index) => !autoEquipped.includes(index));
   const candidates = [...bag, ...toBag.map((index) => hunt.items[index])];
-  // The favourites stay (favorites.js): the weakest of the others go. The
-  // claim holds only while the character is as read, its stars too.
-  const sold = bagOverflow(candidates, capacity, gearKey(row.class_id, row.evolution, content()), content(), favoriteIds(row));
+  // On a Drużyna's trip (`partyBag`, claimTrip: every member's, the
+  // leader's too) the finds fill the places the bag has left, the best of
+  // them first, and those beyond them are lost until the player makes room
+  // (the author, 24.11.2026: „w plecaku zostaja rzeczy do maksymalnego
+  // napełnienia a pozniej przepadają dopóki ktos nie posprząta”;
+  // partyBagLost in the engine): the scrapper buys nothing, and nothing in
+  // the bag is touched.
+  const lostFound = partyBag ? partyBagLost(toBag.map((index) => hunt.items[index]), capacity - bag.length, gearKey(row.class_id, row.evolution, content()), content()).map((index) => toBag[index]) : [];
+  // Otherwise the favourites stay (favorites.js): the weakest of the others
+  // go. The claim holds only while the character is as read, its stars too.
+  const sold = partyBag ? [] : bagOverflow(candidates, capacity, gearKey(row.class_id, row.evolution, content()), content(), favoriteIds(row));
   const storedSold = sold.filter((index) => index < bag.length).map((index) => bag[index]);
   const soldStored = storedSold.map((item) => item.id);
   const soldFound = sold.filter((index) => index >= bag.length).map((index) => toBag[index - bag.length]);
@@ -1413,7 +1427,10 @@ async function huntClaim(db, player, now, { choice, decideEvent = null } = {}) {
         }
       : null;
   const report = {
-    ...huntReport({ hunt, applied, character, areaId: area.id, startedAt: activity.started_at, endsAt: activity.ends_at, autoEquipped, overflow }, content()),
+    ...huntReport(
+      { hunt, applied, character, areaId: area.id, startedAt: activity.started_at, endsAt: activity.ends_at, autoEquipped, overflow, lost: lostFound.length > 0 ? { capacity, indices: lostFound } : null },
+      content(),
+    ),
     ...(options.quick && { quick: true }),
     ...(options.flash && { flash: true }),
     // The Drużyna that went, by name (parties.js), and the time the others
@@ -1539,6 +1556,7 @@ async function huntClaim(db, player, now, { choice, decideEvent = null } = {}) {
     items: hunt.items,
     worn: autoEquipped,
     sold: soldFound,
+    lost: lostFound,
     materials: hunt.materials,
     resources: hunt.resources,
     potionsUsed: hunt.potionsUsed,
@@ -1634,8 +1652,9 @@ async function huntClaim(db, player, now, { choice, decideEvent = null } = {}) {
     // the id of an item gone from the bag meanwhile, which the scrapper's
     // price, gems and deletion, counted by the ids read, would then take
     // for the one they sell (the code review, 12.11.2026).
+    // Of a Drużyna's trip, not those lost to a full bag (partyBag).
     ...hunt.items.flatMap((item, index) =>
-      soldFound.includes(index) ? [] : [insertItem.bind(row.id, autoEquipped.includes(index) ? item.slot : null, JSON.stringify(item), now)],
+      soldFound.includes(index) || lostFound.includes(index) ? [] : [insertItem.bind(row.id, autoEquipped.includes(index) ? item.slot : null, JSON.stringify(item), now)],
     ),
     // The cards the creatures left, a copy each (cards.js).
     ...cardUpserts(db, row.id, cardsWon, now),

@@ -14,7 +14,7 @@
 // member's report (src/server/hunts.js, claimTrip).
 
 import { materialView } from './crafting.js';
-import { itemView } from './items.js';
+import { bagOverflow, itemView } from './items.js';
 
 /** @typedef {Record<string, any>} Content */
 /** @typedef {{ classLevel: number }} Member */
@@ -30,6 +30,23 @@ import { itemView } from './items.js';
  *   Talia Systemu's cards the creatures left (their creatures' ids) and
  *   packs of cards.
  */
+
+// The finds a member of a Drużyna's trip loses to a full bag (the author,
+// 24.11.2026: „w plecaku zostaja rzeczy do maksymalnego napełnienia a
+// pozniej przepadają dopóki ktos nie posprząta”): with `room` places left
+// in its bag, the finds beyond them, the weakest of them first by the
+// scrapper's order (bagOverflow: upgraded ones last, then by rarity, use
+// and strength), so the best of them go into the bag. Never an item
+// already in the bag: only the finds are weighed. The indices of `found`
+// lost; none while they fit.
+/**
+ * @param {Record<string, any>[]} found
+ * @param {number} room
+ * @param {string} classId The character's gear (gearKey).
+ * @param {Content} content
+ * @returns {number[]}
+ */
+export const partyBagLost = (found, room, classId, content) => bagOverflow(found, Math.max(0, room), classId, content);
 
 // One member's part of a Drużyna's shared report in the words of `content`'s
 // language: so each member reads every part in its own language.

@@ -258,6 +258,7 @@
   "faintPenalty": ["Porażka. Utracone doświadczenie: {xp}."],
   "faintForfeit": ["Po porażce nic z tej wyprawy nie zostaje: XP, złoto, zasoby, materiały i przedmioty przepadają."],
   "bagOverflow": ["Plecak był pełny ({capacity} miejsc). Złomiarz kupił najsłabsze przedmioty: {count} za {gold} złota."],
+  "bagLost": ["Plecak jest pełny ({capacity} miejsc), więc te łupy wyprawy drużyny przepadły: {items}. Zrób w nim miejsce, a kolejne trafią do plecaka."],
   "autoEquip": ["Założono od razu: {item} ({slot}), bo ten slot był pusty."],
   "blessingFights": ["Błogosławieństwo Ołtarza Systemu ({blessing}) działało w walkach: {fights} z {all}."],
   "brotherhoodMaterials": ["{brotherhood}: +{value}% materiałów ze stworów."],

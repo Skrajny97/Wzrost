@@ -28,6 +28,10 @@ const GOERS =
 // claimTrip), under "Jak to działa?" for the leader and the members.
 const SHARED_REPORT =
   'Raport wyprawy drużyny odbiera za wszystkich ten, kto zrobi to pierwszy, zwykle lider. Każdy od razu dostaje swoje XP i łupy, a w Dzienniku ma wspólny raport z tym, co kto zdobył. Wolne punkty czekają na postać, więc lider może od razu wysłać drużynę dalej, także gdy kogoś nie ma w grze.';
+// A full bag on a party's trip (24.11.2026, the author: „w plecaku zostaja
+// rzeczy do maksymalnego napełnienia a pozniej przepadają dopóki ktos nie
+// posprząta”; hunts.js: huntClaim's `partyBag`).
+const FULL_BAG = 'Łupy z wyprawy drużyny trafiają do plecaka, dopóki jest w nim miejsce, najpierw najlepsze. Te, dla których miejsca zabraknie, przepadają, a rzeczy w plecaku zostają nietknięte.';
 // The companions from the Kwatery in a party: the sentence of 828 A, which
 // 828 B goes like (11.11.2026), under "Jak to działa?".
 const COMPANIONS_STAY = 'Póki jesteś w drużynie, towarzysze zostają w Kwaterach i nie zdobywają XP ani relacji z wypraw.';
@@ -308,6 +312,7 @@ export function mountParty(container) {
             spreadText(view.range.spread),
             t('Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.'),
             t(SHARED_REPORT),
+            t(FULL_BAG),
             t('Bez „Z drużyną” wyprawa jest tylko Twoja, a członkowie też mogą wyruszać na własne wyprawy.'),
             t(COMPANIONS_STAY),
           ])
@@ -316,6 +321,7 @@ export function mountParty(container) {
             spreadText(view.range.spread),
             t('Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.'),
             t(SHARED_REPORT),
+            t(FULL_BAG),
             t(COMPANIONS_STAY),
           ]),
     );

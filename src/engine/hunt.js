@@ -1537,14 +1537,19 @@ function huntersLine(hunt, content) {
 // `autoEquipped`: indices of the finds that went straight into empty slots.
 // `overflow`: what the scrapper bought because the bag was full
 // ({ capacity, count, gold, sold: indices of the finds among them }).
+// `lost`: on a Drużyna's trip, the finds the full bag had no place for
+// ({ capacity, indices }; parties.js, partyBagLost): marked, said in a
+// line with their names in the order found, and never the best find.
 /**
- * @param {{ hunt: Hunt, applied: Record<string, any>, character: Character, areaId: string, startedAt: number, endsAt: number, autoEquipped?: number[], overflow?: any }} options
+ * @param {{ hunt: Hunt, applied: Record<string, any>, character: Character, areaId: string, startedAt: number, endsAt: number, autoEquipped?: number[], overflow?: any, lost?: { capacity: number, indices: number[] } | null }} options
  * @param {Content} content
  */
-export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt, autoEquipped = [], overflow = null }, content) {
+export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt, autoEquipped = [], overflow = null, lost = null }, content) {
   const area = content.areasById[areaId];
+  const gone = new Set(lost?.indices ?? []);
   const best = hunt.items.reduce(
-    (/** @type {Record<string, any>} */ top, /** @type {Item} */ item) => (top === null || itemRank(item, content) > itemRank(top, content) ? item : top),
+    (/** @type {Record<string, any>} */ top, /** @type {Item} */ item, /** @type {number} */ index) =>
+      gone.has(index) ? top : top === null || itemRank(item, content) > itemRank(top, content) ? item : top,
     null,
   );
   return {
@@ -1594,6 +1599,9 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
         return say(content.texts, 'autoEquip', i, { item: itemName(item, content), slot: content.slotsById[item.slot].name });
       }),
       ...(overflow && overflow.count > 0 ? [say(content.texts, 'bagOverflow', 0, overflow)] : []),
+      ...(lost && gone.size > 0
+        ? [say(content.texts, 'bagLost', 0, { capacity: lost.capacity, items: [...gone].sort((a, b) => a - b).map((index) => itemName(hunt.items[index], content)).join(', ') })]
+        : []),
       // The week it set out in, where its effects changed the result
       // ("Tydzień Kuny: +5% złota z walk.", weeks.js), the guild's
       // buildings and its banner over the land, where theirs did
@@ -1612,7 +1620,11 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
         huntersLine(hunt, content),
       ].filter(Boolean),
     ],
-    items: hunt.items.map((/** @type {Item} */ item, /** @type {number} */ index) => ({ ...itemView(item, content), ...(overflow?.sold.includes(index) && { sold: true }) })),
+    items: hunt.items.map((/** @type {Item} */ item, /** @type {number} */ index) => ({
+      ...itemView(item, content),
+      ...(overflow?.sold.includes(index) && { sold: true }),
+      ...(gone.has(index) && { lost: true }),
+    })),
     fights: hunt.fights.map((/** @type {Record<string, any>} */ fight) => ({
       t: fight.t,
       elite: fight.elite,
