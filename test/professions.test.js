@@ -273,7 +273,7 @@ describe('herbalism through the API', () => {
     assert.deepEqual(list.map((profession) => [profession.name, profession.level, profession.soon]), [
       ['Zielarstwo', 1, false],
       ['Alchemia', 1, false],
-      ['Rzemieślnictwo', 1, true],
+      ['Rzemiosło', 1, true],
       ['Górnictwo', 1, false],
       ['Jubilerstwo', 1, false],
       ['Rybołówstwo', 1, false],

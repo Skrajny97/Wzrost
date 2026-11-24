@@ -535,7 +535,7 @@
     "workshop": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Rzemieślnictwo: wyrób ekwipunku z części w miejscu Systemu (src/engine/workshop.js).",
+      "description": "Rzemiosło: wyrób ekwipunku z części w miejscu Systemu (src/engine/workshop.js).",
       "required": [
         "profession",
         "place",

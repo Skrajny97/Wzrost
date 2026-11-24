@@ -261,7 +261,7 @@ export function buildContent(raw) {
     potionsById: byId(raw.professions?.potions ?? []),
     // How potions are drunk on explorations (potions.js).
     potionUse: raw.professions?.potionUse,
-    // The gear Rzemieślnictwo makes (workshop.js).
+    // The gear Rzemiosło makes (workshop.js).
     workshop: raw.professions?.workshop,
     // Górnictwo with the gems and ores it digs (mining.js), Jubilerstwo,
     // which makes jewellery of them and sets gems (jewelcraft.js), and the

@@ -584,8 +584,8 @@ export function mountCombat(container, { params, navigate }) {
     }
     if (activity.kind === 'items') {
       return systemPanel(
-        activityFinished(activity) ? t('Wyrób przedmiotów zakończony. Raport czeka w Rzemieślnictwie.') : t('Postać wykonuje przedmioty w miejscu: {place}.', { place: activity.placeName }),
-        h('a', { class: 'button button--system', href: '#/profesje/rzemieslnictwo', text: t('Do Rzemieślnictwa') }),
+        activityFinished(activity) ? t('Wyrób przedmiotów zakończony. Raport czeka w Rzemiośle.') : t('Postać wykonuje przedmioty w miejscu: {place}.', { place: activity.placeName }),
+        h('a', { class: 'button button--system', href: '#/profesje/rzemieslnictwo', text: t('Do Rzemiosła') }),
       );
     }
     if (activity.kind === 'minerals') {

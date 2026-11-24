@@ -1,4 +1,4 @@
-// Rzemieślnictwo: the Warsztat in the engine (patterns, rarities, cost, time,
+// Rzemiosło: the Warsztat in the engine (patterns, rarities, cost, time,
 // chance, items, report, quests and notifications) and through the API,
 // where the professions show only with PROFESSIONS on.
 
@@ -74,7 +74,7 @@ describe('the Warsztat in the engine', () => {
     assert.equal(knownPatterns(99, [], content).length, 95);
     const at100 = knownPatterns(100, [], content).map((pattern) => pattern.id);
     assert.ok(at100.length === 114 && at100.includes('flamberge') && at100.includes('sabatons') && !at100.includes('cameo'));
-    // Tier VII (814) at the 125th, which Rzemieślnictwo reaches since it goes
+    // Tier VII (814) at the 125th, which Rzemiosło reaches since it goes
     // on to the 200th (825).
     assert.equal(knownPatterns(124, [], content).length, 114);
     const at125 = knownPatterns(125, [], content).map((pattern) => pattern.id);
@@ -269,7 +269,7 @@ describe('the Warsztat in the engine', () => {
     assert.equal(report.stopped, null);
     assert.equal(report.revealed.length, 19);
     assert.ok(report.revealed.includes('war-axe'));
-    assert.ok(report.system.includes('Osiągnięto poziom Rzemieślnictwa: 10'), report.system.join(' | '));
+    assert.ok(report.system.includes('Osiągnięto poziom Rzemiosła: 10'), report.system.join(' | '));
     assert.ok(report.system.includes(`Zdobyto Siłę: +${6 * content.professionsById[content.workshop.profession].statPerLevel}`), report.system.join(' | '));
     assert.ok(report.system.some((line) => line.startsWith('System odsłania nowe wzory: Pałasz, Czekan, Kordelas')));
     assert.ok(report.system.includes('System pozwala już wykonywać przedmioty rzadkości: rzadki'));
@@ -281,19 +281,19 @@ describe('the Warsztat in the engine', () => {
     assert.equal(last.revealed.length, 19);
     assert.ok(last.revealed.includes('flamberge') && last.revealed.includes('cassock') && !last.revealed.includes('cameo') && !last.revealed.includes('coronation-sword'));
     assert.ok(last.system.some((line) => line.startsWith('System odsłania nowe wzory: Flamberg, Topór dwusieczny, Cinquedea')), last.system.join(' | '));
-    // And at the 125th Tier VII (814), now that Rzemieślnictwo goes on to the 200th (825).
+    // And at the 125th Tier VII (814), now that Rzemiosło goes on to the 200th (825).
     const seventh = workshopReport(
       { base: base('axe'), rarityId: 'common', results: [], minutes: 30, startedAt: 0, endsAt: 1, seed: 'r', stopped: false, before: { level: 124, xp: 0 }, after: { level: 125, xp: 0 }, character, xp: 0, work },
       content,
     );
     assert.equal(seventh.revealed.length, 19);
     assert.ok(seventh.revealed.includes('coronation-sword') && seventh.revealed.includes('safian-boots') && !seventh.revealed.includes('pectoral'));
-    assert.ok(seventh.system.includes('Osiągnięto poziom Rzemieślnictwa: 125'), seventh.system.join(' | '));
+    assert.ok(seventh.system.includes('Osiągnięto poziom Rzemiosła: 125'), seventh.system.join(' | '));
     assert.ok(seventh.system.some((line) => line.startsWith('System odsłania nowe wzory: Miecz koronacyjny, Nadziak, Baselard')), seventh.system.join(' | '));
     assert.ok(seventh.profession.xpToNext > 0);
   });
 
-  test('narrator quests ask for items only where Rzemieślnictwo works, count the ones made and pay twice as much', () => {
+  test('narrator quests ask for items only where Rzemiosło works, count the ones made and pay twice as much', () => {
     const character = newCharacter('warrior', { level: 12 });
     const drawn = (hasCrafting, periodId) =>
       Array.from({ length: 60 }, (_, index) => drawQuests(periodId, { character, hasTable: true, hasProfessions: true, hasCrafting, seed: `q${index}` }, content)).flat();
@@ -362,7 +362,7 @@ describe('the Warsztat through the API', () => {
     }
   };
 
-  test('Rzemieślnictwo opens at character level 15, later than the other professions', async () => {
+  test('Rzemiosło opens at character level 15, later than the other professions', async () => {
     await set('level = 14, quests = ?', '{}');
     const before = await character();
     const square = before.professions.list.find((profession) => profession.id === 'crafting');
@@ -375,7 +375,7 @@ describe('the Warsztat through the API', () => {
     assert.equal(before.professions.workshop, null);
     const order = await craft({ baseId: 'sword', rarity: 'common', count: 1 });
     assert.equal(order.status, 403);
-    assert.equal(order.data.error.message, 'Rzemieślnictwo odblokujesz na poziomie postaci 15.');
+    assert.equal(order.data.error.message, 'Rzemiosło odblokujesz na poziomie postaci 15.');
     assert.ok(![...before.quests.daily.quests, ...before.quests.weekly.quests].some((quest) => quest.kind.startsWith('make')));
     await set('level = 15');
     const after = await character();
@@ -407,12 +407,12 @@ describe('the Warsztat through the API', () => {
       formNames: ['Wielki Inkwizytor', 'Pogromca Demonów'],
       classLevel: null,
     });
-    assert.deepEqual(broadsword, { id: 'broadsword', level: 10, hidden: true, hint: 'Ukryte przez System do 10. poziomu Rzemieślnictwa.' });
+    assert.deepEqual(broadsword, { id: 'broadsword', level: 10, hidden: true, hint: 'Ukryte przez System do 10. poziomu Rzemiosła.' });
     assert.equal(workshop.slots[5].patterns[0].classNames, null);
     const [common, rare] = workshop.rarities;
     assert.deepEqual(common, { id: 'common', name: 'pospolity', color: '#9b9b9b', level: 1, step: 1, part: { id: 'scraps', name: 'Ścinki' }, chance: 1, itemMinutes: 30 });
     assert.equal(rare.hidden, true);
-    assert.equal(rare.hint, 'Ukryte przez System do 5. poziomu Rzemieślnictwa.');
+    assert.equal(rare.hint, 'Ukryte przez System do 5. poziomu Rzemiosła.');
   });
 
   test('an order has as many items as the parts and the resources allow, however long it takes', async () => {
@@ -573,7 +573,7 @@ describe('the Warsztat through the API', () => {
 describe('the Warsztat switched off', () => {
   const { call, db, signUp } = useServer({ PROFESSIONS: 'on', CRAFTING: 'off' });
 
-  test('Rzemieślnictwo waits as "Wkrótce": no Warsztat, no orders and no quests for items', async () => {
+  test('Rzemiosło waits as "Wkrótce": no Warsztat, no orders and no quests for items', async () => {
     const { cookie } = await signUp('zamknieta');
     await call('POST', '/api/character', { cookie, body: { name: 'Zamknieta', classId: 'warrior', appearance: 'female' } });
     await (await db()).prepare(`UPDATE characters SET level = 12, xp = 0, parts = '{"scraps":30}', resources = '{"stone":200,"iron-ore":40}'`).run();
@@ -772,7 +772,7 @@ describe('the Warsztat, step 2, through the API', () => {
   test('Zwoje ochronne from level 25 of the profession: shards only, always made, kept for the Kowadło', async () => {
     const locked = await craft({ scroll: true, count: 2 });
     assert.equal(locked.status, 403);
-    assert.equal(locked.data.error.message, 'Ukryte przez System do 25. poziomu Rzemieślnictwa.');
+    assert.equal(locked.data.error.message, 'Ukryte przez System do 25. poziomu Rzemiosła.');
     const hidden = (await character()).professions.workshop.scroll;
     assert.deepEqual([hidden.hidden, hidden.owned, hidden.name], [true, 0, 'Zwój ochronny']);
 

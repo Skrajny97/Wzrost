@@ -2025,14 +2025,14 @@ describe('Time Points and the narrator', () => {
     assert.equal(row.professions, professions);
   });
 
-  test('the Rzemieślnictwo chapter comes after all the others, and test mode starts it again', async () => {
+  test('the Rzemiosło chapter comes after all the others, and test mode starts it again', async () => {
     const { tutorial } = (await call('GET', '/api/content')).data;
     const kept = (line) => line.kind === 'card' || line.kind === 'point' || line.once;
     const chapter = tutorial.lines.filter((line) => kept(line) && line.chapter === 'crafting').map((line) => line.id);
     assert.deepEqual(chapter, ['crafting-welcome', 'crafting-patterns', 'crafting-ending']);
     const at = (id) => tutorial.lines.findIndex((line) => line.id === id);
     assert.ok(at('crafting-welcome') > at('community-ending'));
-    assert.deepEqual(skipWords(tutorial.chapters.crafting), { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Rzemieślnictwo czeka w zakładce Profesje.' });
+    assert.deepEqual(skipWords(tutorial.chapters.crafting), { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Rzemiosło czeka w zakładce Profesje.' });
     const see = (body) => call('POST', '/api/tutorial', { cookie, body });
     await see({ skip: true });
     const before = (await see({ skip: true, chapter: 'skills' })).data.character.tutorial;
@@ -3143,9 +3143,9 @@ describe('Pierwsza wyprawa', () => {
 
 describe('Profesje', () => {
   // In the game Zielarstwo and Alchemia open with the tab at character level
-  // 10 (from version 0.0.9), and Rzemieślnictwo has its square there too
+  // 10 (from version 0.0.9), and Rzemiosło has its square there too
   // (from 0.0.27, CRAFTING on in wrangler.jsonc), its Warsztat from level 15.
-  test('open at level 10 with Zielarstwo, Alchemia and Rzemieślnictwo', async () => {
+  test('open at level 10 with Zielarstwo, Alchemia and Rzemiosło', async () => {
     const cookie = await signUp();
     await newCharacter(cookie);
     await (await db()).prepare('UPDATE characters SET level = 9').run();

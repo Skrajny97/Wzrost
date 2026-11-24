@@ -49,7 +49,7 @@
     // "on" shows the professions (Profesje): Zielarstwo and Alchemia are in
     // the live game from version 0.0.9.
     "PROFESSIONS": "on",
-    // "on" opens Rzemieślnictwo among the professions; off, its square says
+    // "on" opens Rzemiosło among the professions; off, its square says
     // "Wkrótce". In the live game from version 0.0.27.
     "CRAFTING": "on",
     // "on": events at the end of an exploration (src/engine/events.js), in

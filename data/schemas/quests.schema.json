@@ -108,7 +108,7 @@
           },
           "crafting": {
             "type": "boolean",
-            "description": "Tylko tam, gdzie działa Rzemieślnictwo (przełącznik CRAFTING)."
+            "description": "Tylko tam, gdzie działa Rzemiosło (przełącznik CRAFTING)."
           },
           "profession": {
             "type": "string",

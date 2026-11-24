@@ -333,7 +333,7 @@ export function salvageYield(item, content) {
 }
 
 // Jewellery, a base the Szlifiernia sets (a ring, an amulet, a talisman),
-// gives more for Jubilerstwo than for Rzemieślnictwo (the author: „Niech
+// gives more for Jubilerstwo than for Rzemiosło (the author: „Niech
 // wisiory amulety pierscienie itd. dają też z rozbiórki bardziej rzeczy do
 // Jubilerstwa niż do Rzemieślnictwa”): `partsDivisor` times fewer parts, at
 // least one, as many pieces of the ore of its rarity's setting as it would

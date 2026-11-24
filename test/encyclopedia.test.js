@@ -114,7 +114,7 @@ describe('the Encyklopedia in the engine', () => {
       'Wyprawy: wypada od regionu Stare Wyrobisko (poz. 96–100).',
       'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
       'Założysz od 100. poziomu klasy.',
-      'Warsztat: wzór od 100. poziomu Rzemieślnictwa.',
+      'Warsztat: wzór od 100. poziomu Rzemiosła.',
     ]);
     assert.ok(sixth.entries.find((entry) => entry.id === 'cameo').sources.includes('Szlifiernia: wzór od 100. poziomu Jubilerstwa.'));
     // Materials by the highest level of their creature: up to 125 in Tier V,
@@ -164,7 +164,7 @@ describe('the Encyklopedia in the engine', () => {
       'Wyprawy: wypada od regionu Rokitowe Bezdno (poz. 121–125).',
       'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
       'Założysz od 125. poziomu klasy.',
-      'Warsztat: wzór od 125. poziomu Rzemieślnictwa.',
+      'Warsztat: wzór od 125. poziomu Rzemiosła.',
     ]);
     assert.ok(seventh.entries.find((entry) => entry.id === 'pectoral').sources.includes('Szlifiernia: wzór od 125. poziomu Jubilerstwa.'));
     // A Cień's sztylet, which the Nekromanta, the Licz and the Król Nawii no longer wear
@@ -223,7 +223,7 @@ describe('the Encyklopedia in the engine', () => {
       'Wyprawy: wypada od regionu Pogorzelisko (poz. 146–150).',
       'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
       'Założysz od 150. poziomu klasy.',
-      'Warsztat: wzór od 150. poziomu Rzemieślnictwa.',
+      'Warsztat: wzór od 150. poziomu Rzemiosła.',
     ]);
     assert.ok(eighth.entries.find((entry) => entry.id === 'ryngraf').sources.includes('Szlifiernia: wzór od 150. poziomu Jubilerstwa.'));
     // Materials of creatures of levels 176–200 in Tier VIII: Ostępy Nowiu's;
@@ -264,7 +264,7 @@ describe('the Encyklopedia in the engine', () => {
       'Wyprawy: wypada od regionu Matecznik (poz. 171–175).',
       'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
       'Założysz od 175. poziomu klasy.',
-      'Warsztat: wzór od 175. poziomu Rzemieślnictwa.',
+      'Warsztat: wzór od 175. poziomu Rzemiosła.',
     ]);
     assert.ok(ninth.entries.find((entry) => entry.id === 'jurata-necklace').sources.includes('Szlifiernia: wzór od 175. poziomu Jubilerstwa.'));
     const ninthMaterials = view.materials.tiers.find((tier) => tier.name === 'Tier IX');
@@ -300,7 +300,7 @@ describe('the Encyklopedia in the engine', () => {
       'Wyprawy: wypada od regionu Zaćmiona Polana (poz. 196–200).',
       'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
       'Założysz od 200. poziomu klasy.',
-      'Warsztat: wzór od 200. poziomu Rzemieślnictwa.',
+      'Warsztat: wzór od 200. poziomu Rzemiosła.',
     ]);
     assert.ok(tenth.entries.find((entry) => entry.id === 'rzepicha-necklace').sources.includes('Szlifiernia: wzór od 200. poziomu Jubilerstwa.'));
     // The materials of creatures above level 275: Nawia's, and the Łysogóry's
@@ -455,12 +455,12 @@ describe('the Encyklopedia in the engine', () => {
     const way = (id, maker) => patternWay(content.basesById[id], maker, content);
     const levels = (level, professions = {}) => ({ level, classLevel: level, professions });
     // Without the character's levels only the level of the pattern, as before.
-    assert.deepEqual(way('sword', {}), { line: 'Warsztat: wzór od 1. poziomu Rzemieślnictwa.', way: null });
+    assert.deepEqual(way('sword', {}), { line: 'Warsztat: wzór od 1. poziomu Rzemiosła.', way: null });
     assert.equal(patternWay({ id: 'nothing', slot: 'nowhere' }, {}, content), null);
-    // Rzemieślnictwo opens at the 15th level of the character.
+    // Rzemiosło opens at the 15th level of the character.
     assert.deepEqual(way('sword', { levels: levels(10) }), {
-      line: 'Warsztat: wzór od 1. poziomu Rzemieślnictwa.',
-      way: { profession: 'crafting', open: false, reason: 'Rzemieślnictwo otworzy się na 15. poziomie postaci.' },
+      line: 'Warsztat: wzór od 1. poziomu Rzemiosła.',
+      way: { profession: 'crafting', open: false, reason: 'Rzemiosło otworzy się na 15. poziomie postaci.' },
     });
     // The first of a family at once, a later one from the 10th level, one of
     // class level 25 from the 25th; or learned by taking such an item apart.
@@ -468,8 +468,8 @@ describe('the Encyklopedia in the engine', () => {
     assert.deepEqual(way('sword', { levels: crafter }), { line: 'Warsztat: znasz już ten wzór.', way: { profession: 'crafting', open: true, reason: null } });
     assert.equal(way('broadsword', { levels: crafter }).way.open, true);
     assert.deepEqual(way('saber', { levels: crafter }), {
-      line: 'Warsztat: wzór od 25. poziomu Rzemieślnictwa.',
-      way: { profession: 'crafting', open: false, reason: 'Wzór odsłoni się na 25. poziomie Rzemieślnictwa.' },
+      line: 'Warsztat: wzór od 25. poziomu Rzemiosła.',
+      way: { profession: 'crafting', open: false, reason: 'Wzór odsłoni się na 25. poziomie Rzemiosła.' },
     });
     assert.deepEqual(way('saber', { levels: crafter, patterns: ['saber'] }).way, { profession: 'crafting', open: true, reason: null });
     // Jewellery in the Szlifiernia, from the 25th level of the character;
@@ -481,7 +481,7 @@ describe('the Encyklopedia in the engine', () => {
     assert.deepEqual(way('ring', { levels: levels(30) }).way, { profession: 'jewelcrafting', open: true, reason: null });
     assert.equal(way('signet-ring', { levels: levels(30) }).way.reason, 'Wzór odsłoni się na 10. poziomie Jubilerstwa.');
     // Where this deployment hides the profession, no way.
-    assert.deepEqual(way('sword', { levels: crafter, hidden: ['crafting'] }), { line: 'Warsztat: wzór od 1. poziomu Rzemieślnictwa.', way: null });
+    assert.deepEqual(way('sword', { levels: crafter, hidden: ['crafting'] }), { line: 'Warsztat: wzór od 1. poziomu Rzemiosła.', way: null });
     // The entry carries the line and the way.
     const view = encyclopediaView({ discovered: {}, claimed: [], met: [], levels: crafter, patterns: [] }, content);
     const sword = view.items.tiers[0].entries.find((entry) => entry.id === 'sword');
@@ -543,12 +543,12 @@ describe('the Encyklopedia through the API', () => {
 
   test('an item leads to its pattern by the character\'s level and the patterns it learned by taking items apart', async () => {
     const entry = (book, id) => book.items.tiers.flatMap((tier) => tier.entries).find((each) => each.id === id);
-    assert.deepEqual(entry(await read(), 'sword').craft, { profession: 'crafting', open: false, reason: 'Rzemieślnictwo otworzy się na 15. poziomie postaci.' });
+    assert.deepEqual(entry(await read(), 'sword').craft, { profession: 'crafting', open: false, reason: 'Rzemiosło otworzy się na 15. poziomie postaci.' });
     await set(`level = 30, patterns = '["saber"]'`);
     const book = await read();
     assert.deepEqual(entry(book, 'saber').craft, { profession: 'crafting', open: true, reason: null });
     assert.ok(entry(book, 'saber').sources.includes('Warsztat: znasz już ten wzór.'));
-    assert.equal(entry(book, 'bearded-axe').craft.reason, 'Wzór odsłoni się na 25. poziomie Rzemieślnictwa.');
+    assert.equal(entry(book, 'bearded-axe').craft.reason, 'Wzór odsłoni się na 25. poziomie Rzemiosła.');
   });
 
   test('an exploration takes the trophies of its creatures along', async () => {

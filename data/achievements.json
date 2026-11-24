@@ -426,7 +426,7 @@
         {
           "id": "artisan",
           "name": "Rzemieślnik",
-          "goal": "Zdobądź 25. poziom Rzemieślnictwa.",
+          "goal": "Zdobądź 25. poziom Rzemiosła.",
           "count": "professionLevel",
           "profession": "crafting",
           "target": 25,

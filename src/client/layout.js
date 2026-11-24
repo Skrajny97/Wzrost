@@ -29,7 +29,7 @@ import { t } from './i18n.js';
 const WORK_SCREENS = {
   herbs: { href: '#/profesje/zielarstwo', label: 'ZIELARSTWO', profession: 'herbalism' },
   potions: { href: '#/profesje/alchemia', label: 'ALCHEMIA', profession: 'alchemy' },
-  items: { href: '#/profesje/rzemieslnictwo', label: 'RZEMIEŚLNICTWO', profession: 'crafting' },
+  items: { href: '#/profesje/rzemieslnictwo', label: 'RZEMIOSŁO', profession: 'crafting' },
   minerals: { href: '#/profesje/gornictwo', label: 'GÓRNICTWO', profession: 'mining' },
   jewels: { href: '#/profesje/jubilerstwo', label: 'JUBILERSTWO', profession: 'jewelcrafting' },
   fish: { href: '#/profesje/rybolowstwo', label: 'RYBOŁÓWSTWO', profession: 'fishing' },

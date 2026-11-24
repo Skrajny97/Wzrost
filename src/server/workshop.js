@@ -1,4 +1,4 @@
-// Rzemieślnictwo in the Systemowy Warsztat (src/engine/workshop.js): an
+// Rzemiosło in the Systemowy Warsztat (src/engine/workshop.js): an
 // order of as many items of one pattern and rarity as the parts and the
 // resources allow, with no cap on their number or time (the author,
 // 12.11.2026: "Zrób warsztat i szlifiernie zalezna od czesci i materialow

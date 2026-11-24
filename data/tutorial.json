@@ -36,10 +36,10 @@
       "skippedText": "Objaśnienie pominięte. Społeczność czeka w zakładce Społeczność."
     },
     "crafting": {
-      "title": "Rzemieślnictwo",
+      "title": "Rzemiosło",
       "replay": true,
       "skipLabel": "Pomiń objaśnienie",
-      "skippedText": "Objaśnienie pominięte. Rzemieślnictwo czeka w zakładce Profesje."
+      "skippedText": "Objaśnienie pominięte. Rzemiosło czeka w zakładce Profesje."
     },
     "settlement": {
       "title": "Osada",

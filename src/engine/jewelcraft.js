@@ -1,7 +1,7 @@
 // @ts-check
 // Jubilerstwo (data/professions.json: jewelcrafting and minerals): the
 // character makes rings, amulets and talismans in the Systemowa Szlifiernia
-// the way Rzemieślnictwo makes the rest of the gear (workshop.js, 537 A). The
+// the way Rzemiosło makes the rest of the gear (workshop.js, 537 A). The
 // profession's level shows the patterns (a later base of a family from
 // laterPatternLevel, and not before its class level) and the gems: a gem of
 // a rarity gives a jewel that rarity, and each jewel also takes the ore of

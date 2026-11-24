@@ -1,5 +1,5 @@
 // @ts-check
-// Rzemieślnictwo (data/professions.json: workshop): the character makes gear
+// Rzemiosło (data/professions.json: workshop): the character makes gear
 // in the Systemowy Warsztat, one pattern at a time, from parts of the item's
 // rarity and the camp's resources: stone for anything, and wood or iron ore
 // for the families made of them. The profession's level shows the patterns

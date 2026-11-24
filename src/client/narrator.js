@@ -17,7 +17,7 @@
 // After the introduction come its chapters (a line's `chapter`), each at its
 // moment of the game: the Umiejętności at class level 10, the Profesje at
 // character level 10, never before the Umiejętności, the Społeczność at
-// character level 5, after both when they wait, the Rzemieślnictwo at
+// character level 5, after both when they wait, the Rzemiosło at
 // character level 15, the Osada at character level 20, the Ewolucja at
 // class level 50, the Wieże at character level 50, the Górnictwo with
 // the Jubilerstwo at character level 25, the Portale at character level 5
@@ -128,8 +128,8 @@ const quickHuntDue = (read) =>
   read.has('community-rules') && !read.has('community-ending') && Boolean(state.character.quickHunts) && !state.character.activity && noChapterWaits(read);
 const quickHuntHere = (hash, read) => onOpenArea(hash) && quickHuntDue(read);
 
-// The Rzemieślnictwo chapter: once the Warsztat opens (character level 15,
-// where the game has Rzemieślnictwo), after the report that brought it there
+// The Rzemiosło chapter: once the Warsztat opens (character level 15,
+// where the game has Rzemiosło), after the report that brought it there
 // and only when no other chapter waits. Not on the character's screens
 // either. It leads to the Profesje tab, from where the narrator itself opens
 // the Warsztat, points at its patterns and ends there.
@@ -164,7 +164,7 @@ const craftingTrip = (hash, read) => (hash === '#/profesje' && craftingTour(hash
 // the Osada tab and points there at the Tablica zleceń, then at the
 // Zaklinaczka's and the Pustelnik's places.
 const onSettlement = (hash) => hash === '#/osada';
-// A Rzemieślnictwo not begun yet waits only while it could begin: with a
+// A Rzemiosło not begun yet waits only while it could begin: with a
 // free worker and no later chapter told halfway. Meanwhile it holds up none
 // of the chapters after it (664: a character always away never let them
 // come), and it does not cut short one of them begun meanwhile.
@@ -253,7 +253,7 @@ const towersTrip = (hash, read) => (hash === '#/walka' && towersTour(hash, read)
 const onMine = (hash) => hash === '#/profesje/gornictwo';
 const onLapidary = (hash) => hash === '#/profesje/jubilerstwo';
 const towersWaiting = (read) => isUnlocked('towers') && !read.has('towers-ending');
-// As the Rzemieślnictwo's: not begun yet, it holds nothing up while the
+// As the Rzemiosło's: not begun yet, it holds nothing up while the
 // worker is busy (664).
 const miningWaiting = (read) => isUnlocked('mining') && !read.has('mining-ending') && (read.has('mining-welcome') || workerFree());
 // The Portale chapter (738): once the portals open (character level 5),
@@ -542,12 +542,12 @@ const BEATS = {
   'community-tabs': { place: mark('community-tabs'), when: communityHere },
   'community-rules': { place: mark('community-rules'), go: rulesTrip, when: rulesHere },
   'community-ending': { place: mark('quick-hunt'), go: quickHuntTrip, when: quickHuntHere },
-  // The Rzemieślnictwo chapter, after all the others.
+  // The Rzemiosło chapter, after all the others.
   'crafting-welcome': { when: craftingDue },
   'crafting-lead': { place: '.nav-item[href="#/profesje"]', when: (hash, read) => craftingTour(hash, read) && !hash.startsWith('#/profesje') },
   'crafting-patterns': { place: mark('workshop-patterns'), go: craftingTrip, when: craftingHere },
   'crafting-ending': { when: craftingHere },
-  // The Osada chapter, after the Rzemieślnictwo.
+  // The Osada chapter, after the Rzemiosło.
   'settlement-welcome': { when: settlementDue },
   'settlement-lead': { place: '.nav-item[href="#/osada"]', when: (hash, read) => settlementTour(hash, read) && !hash.startsWith('#/osada') },
   'settlement-board': { place: mark('osada-board'), when: settlementHere },

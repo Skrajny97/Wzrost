@@ -43,10 +43,10 @@
   },
   {
     "id": "crafting",
-    "name": "Rzemieślnictwo",
+    "name": "Rzemiosło",
     "level": 15,
     "feature": "crafting",
-    "message": "Odblokowano Rzemieślnictwo. Systemowy Warsztat czeka w zakładce Profesje."
+    "message": "Odblokowano Rzemiosło. Systemowy Warsztat czeka w zakładce Profesje."
   },
   {
     "id": "world-boss",
