@@ -139,8 +139,9 @@ test('every sprite on the list has its file at its size, and every class has its
   const looks = data('appearances').map((look) => look.id);
   const outfits = data('cosmetics').items.filter((item) => item.kind === 'outfit').map((item) => ({ id: item.look }));
   const known = {
-    // The people of the events fight as monsters do.
-    monsters: [...data('monsters'), ...data('events').foes].map((monster) => monster.id),
+    // The people of the events fight as monsters do, and so do the World
+    // Bosses (data/world-bosses.json).
+    monsters: [...data('monsters'), ...data('events').foes, ...data('world-bosses').bosses].map((monster) => monster.id),
     items: data('item-bases').map((base) => base.id),
     // The classes' portraits and their evolutions' (data/evolutions.json),
     // and the outfits' of the Sklep Systemu (skórki, their `look`).

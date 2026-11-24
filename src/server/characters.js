@@ -152,6 +152,7 @@ import { mercenaryBusy, mercenaryPlace, mercenaryRules, serviceEnded } from './m
 import { ACCOUNT_NAMES, ALL_CHARACTERS, looksTaken, nameKey, validateName } from './names.js';
 import { championOf } from './guild-fame.js';
 import { badgesOf, badgeView } from './guild-heroes.js';
+import { worldBossTitleOf } from './world-boss.js';
 import { bannersNow } from './guild-lands.js';
 import { fameNotice } from './fame.js';
 import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
@@ -2117,6 +2118,9 @@ export async function characterProfile(context) {
       // Its badges of the Bohaterowie tygodnia of the week before (1198 A,
       // guild-heroes.js), worn the whole week, whatever its guild now.
       heroes: (await badgesOf(db, found.id, context.now)).map((kind) => badgeView(kind, found.appearance)),
+      // The title of a fallen World Boss it wears for a week (1224 A,
+      // world-boss.js), or null.
+      worldBossTitle: (await worldBossTitleOf(db, found, context.now))?.text ?? null,
       guildInvite,
       relation: mine ? { state: 'self' } : own ? await relationTo(db, own.id, found.id, context.now) : null,
       tradeBlocked: await tradeBlockOf(db, session.userId, found.user_id),

@@ -15,7 +15,9 @@
 // billions in its Skrzynia Konta (its sheet "Wyjmij złoto" with all of it, and
 // with too much typed), and above it in the Ranking postaci and the Punkty
 // Sławy a member of its guild with all a row can hold (the longest name and
-// title, the moderator's mark, the guild's tag). The bag
+// title, the moderator's mark, the guild's tag, a World Boss's title), and on
+// the Walka screen the World Boss of its band with HP in ten digits, the
+// best ten of the week and last week's chest to open. The bag
 // is checked with its six tabs, on its Zioła and Spiżarnia (herbs, dishes,
 // fish and crops by the thousand), and in "Zaznacz do sprzedaży" too, with
 // an item marked. On each screen,
@@ -587,6 +589,41 @@ async function main() {
     .join(', ');
   sql(
     `UPDATE characters SET settlement = json_set(COALESCE(settlement, '{}'), '$.relations', json_set(COALESCE(json_extract(settlement, '$.relations'), '{}'), ${setRelations})) WHERE name = '${name}'`,
+  );
+  // The World Boss of its band on the Walka screen (world-boss.js; 1222–1226
+  // A): Kamienna Baba of the levels 126–150, with HP in ten digits and two
+  // attacks left today; the best ten of the week, the member of the longest
+  // name first, then the guild's reserve, and the character 12th with nine
+  // digits of damage; last week's boss fallen by its blow, its chest waiting
+  // with the last blow's part and the title of the first place, which the
+  // member of the longest name wears in the Ranking too.
+  const weekDay = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].indexOf(new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Warsaw', weekday: 'short' }).format(new Date()));
+  const weekOf = (back) => {
+    const date = new Date(`${day}T12:00:00Z`);
+    date.setUTCDate(date.getUTCDate() - weekDay - 7 * back);
+    return date.toISOString().slice(0, 10);
+  };
+  const now = Date.now();
+  const own = `(SELECT id FROM characters WHERE name = '${name}')`;
+  const boss = (back) => `(SELECT id FROM world_bosses WHERE week = '${weekOf(back)}' AND region = 'pine-dunes')`;
+  // The band's bosses of these two weeks made anew on each run, with whom
+  // they had (the local D1 keeps those of the run before).
+  const bands = `SELECT id FROM world_bosses WHERE region = 'pine-dunes' AND week IN ('${weekOf(0)}', '${weekOf(1)}')`;
+  sql(
+    [
+      `DELETE FROM world_boss_titles WHERE boss_id IN (${bands})`,
+      `DELETE FROM world_boss_fighters WHERE boss_id IN (${bands})`,
+      `DELETE FROM world_bosses WHERE id IN (${bands})`,
+      `INSERT INTO world_bosses (week, region, boss, players, level, max_hp, hp, created_at) VALUES ('${weekOf(0)}', 'pine-dunes', 'wb-stone-baba', 12345, 141, 9876543210, 4567890123, ${now})`,
+      `INSERT INTO world_bosses (week, region, boss, players, level, max_hp, hp, created_at, fallen_at, fallen_by) SELECT '${weekOf(1)}', 'pine-dunes', 'wb-stone-baba', 12345, 141, 9876543210, 0, ${now}, ${now - 3 * 86400000}, id FROM characters WHERE name = '${name}'`,
+      `INSERT INTO world_boss_fighters (week, character_id, boss_id, damage, hits, day, day_hits, created_at) SELECT '${weekOf(0)}', id, ${boss(0)}, 987654321, 21, '${day}', 1, ${now} FROM characters WHERE name = '${marked}'`,
+      `INSERT INTO world_boss_fighters (week, character_id, boss_id, damage, hits, day, day_hits, created_at)
+        SELECT '${weekOf(0)}', id, ${boss(0)}, 900000000 - id, 18, '${day}', 3, ${now} FROM characters WHERE name LIKE 'Rezerwowy${stamp}%'`,
+      `INSERT INTO world_boss_fighters (week, character_id, boss_id, damage, hits, day, day_hits, created_at) SELECT '${weekOf(0)}', ${own}, ${boss(0)}, 123456789, 13, '${day}', 1, ${now}`,
+      `INSERT INTO world_boss_fighters (week, character_id, boss_id, damage, hits, day, day_hits, created_at) SELECT '${weekOf(1)}', ${own}, ${boss(1)}, 1987654321, 21, '${weekOf(1)}', 3, ${now}`,
+      `INSERT INTO world_boss_titles (boss_id, character_id, place, until, created_at) SELECT ${boss(1)}, ${own}, 1, ${now + 4 * 86400000}, ${now}`,
+      `INSERT INTO world_boss_titles (boss_id, character_id, place, until, created_at) SELECT ${boss(1)}, id, 2, ${now + 4 * 86400000}, ${now} FROM characters WHERE name = '${marked}'`,
+    ].join('; '),
   );
   // The picture for "Dołącz zrzut ekranu": a PNG drawn on a canvas, of a
   // computer screen's shape and wider than any sheet, so that its preview

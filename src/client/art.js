@@ -56,6 +56,11 @@ export const SPRITES = {
       'mistletoe-leech', 'kingfisher', 'witch-cauldron', 'witch-broom', 'hedge-witch', 'empty-armor', 'haunted-portrait', 'black-grimoire', 'cuckoo', 'twardowski', 'fire-wheel', 'nutcracker',
       'seeress', 'mortar', 'witch-hare', 'broom-witch', 'dance-frenzy', 'magpie', 'cursed-piper', 'offering-oven', 'wax-doll', 'fate-spinner', 'hen-leg-hut', 'black-goose',
       'burning-skull', 'kostucha', 'baba-yaga',
+      // The World Bosses (data/world-bosses.json `art`; 1226 A), drawn in
+      // PixelLab, as the author chose them on 24.11.2026. A boss not here
+      // shows the creature of its `sprite` in its place (worldBossSprite).
+      'wb-pochwist', 'wb-kotolak', 'wb-rusalka', 'wb-zmora', 'wb-triglav-steed', 'wb-stone-baba', 'wb-borowy',
+      'wb-wapierz', 'wb-czart', 'wb-dziwozona', 'wb-boruta', 'wb-gorynych', 'wb-jaszczur', 'wb-czarnobog',
       // Nawia (276–350) from 19.11.2026.
       'death-boat', 'water-strider', 'nameless', 'bridge-keeper', 'harvestman', 'death-candle', 'mole-cricket', 'forefather', 'giant-mole', 'coffin', 'two-headed-snake', 'candle-snuffer',
       'gatekeeper', 'hourglass', 'shade', 'indrik', 'nyja', 'woolly-rhino', 'bumblebee', 'stampede', 'cockroach', 'house-serpent', 'greed', 'pill-bug',
@@ -804,7 +809,16 @@ const firstSprite = (kind, ids, className) => {
   return null;
 };
 
-export const monsterSprite = (monsterId) => sprite('monsters', monsterId, 'sprite--monster');
+// A World Boss's picture (by its id; publicContent's worldBossArt): its own
+// once on the list of the creatures' sprites, else the creature's in its
+// place.
+export function worldBossSprite(bossId) {
+  const known = state.content?.worldBossArt?.[bossId];
+  if (!known) return null;
+  return sprite('monsters', known.art, 'sprite--monster') ?? sprite('monsters', known.sprite, 'sprite--monster');
+}
+// A creature's sprite, also a World Boss's in a fight's playback.
+export const monsterSprite = (monsterId) => sprite('monsters', monsterId, 'sprite--monster') ?? worldBossSprite(monsterId);
 // The figure a summoning skill puts in fights: its own, else the creature
 // it calls (`figure`: a wolf, a bear, a skeleton, the white wolf as the
 // Basior, the bison as the Tur, as the creatures are drawn), else that of
