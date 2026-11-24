@@ -1256,8 +1256,18 @@ function bestFirst(items) {
 function equipBlockText(item) {
   if (item.equipBlock === 'wrong_class') return t('Twoja klasa nie może go używać.');
   if (item.equipBlock === 'class_level') return t('Założysz go od poziomu klasy {level}.', { level: item.classLevel });
+  if (item.equipBlock === 'item_level') return levelLockText(item);
   return t('Ten slot jest jeszcze zablokowany.');
 }
+
+// Whether an item's own level is still too high for the character to wear
+// it (the level lock beside the Tier, 24.11.2026: equipBlock's
+// 'item_level'): the level it is worn from (`wearLevel`, the item's view)
+// is above the higher of the character's level and its class level. The
+// words for it, on the item's card, the slot's list and the cards of the
+// Targowisko, the Wymiana and the chests.
+export const levelLocked = (item, character) => Boolean(item.wearLevel) && Math.max(character.level ?? 0, character.classLevel ?? 0) < item.wearLevel;
+export const levelLockText = (item) => t('Założysz go od {level}. poziomu postaci albo klasy.', { level: item.wearLevel });
 
 // Whether the character's gear takes an item's kind, as "Załóż" asks: its
 // class's, or its form's own (988: a Nekromanta takes the Mag's kostury and
@@ -1275,8 +1285,9 @@ export const classFits = (item, character) =>
 // the bag's items for this place. Those the character can wear first, the
 // strongest first, each unfolding its comparison with the one worn (as the
 // Kwatery's "Załóż z plecaka" and the Targowisko) with "Załóż"; those it
-// cannot wear yet greyed, with why: its class, or the class level of its
-// Tier, as "Załóż" refuses them (equipBlock in the engine). An item goes
+// cannot wear yet greyed, with why: its class, the class level of its
+// Tier, or its own level above the level lock, as "Załóż" refuses them
+// (equipBlock in the engine). An item goes
 // only to its own slot, in the place of the one there, as "Załóż" puts it
 // on: the game has one ring, one talisman, the off hand as a slot of its
 // own and no two-handed weapons. An empty slot opens the same, without an
@@ -1408,8 +1419,11 @@ function itemCard(item, { equipped, anvil = false, preview: withPreview = true, 
   const busy = onExploration(character);
   const usable = classFits(item, character);
   // A later base of its kind waits for its class level (a Metin2-like tier),
-  // an item from another player too, whatever its own level (inventory.js).
+  // an item from another player too (inventory.js); and one of a level too
+  // high for the character's levels, for the level lock (levelLocked), no
+  // fight would count, so it shows no changes of wearing it either.
   const early = usable && item.classLevel !== null && character.classLevel < item.classLevel;
+  const high = usable && !equipped && levelLocked(item, character);
   const worn = equipped ? null : character.equipment[item.slot];
   const act = (path) => async (event) =>
     withButton(event.currentTarget, async () => {
@@ -1457,7 +1471,7 @@ function itemCard(item, { equipped, anvil = false, preview: withPreview = true, 
     });
   };
 
-  const preview = withPreview && usable && h('div', { class: 'preview', 'aria-live': 'polite' }, h('p', { class: 'muted', text: t('Liczenie zmian…') }));
+  const preview = withPreview && usable && !high && h('div', { class: 'preview', 'aria-live': 'polite' }, h('p', { class: 'muted', text: t('Liczenie zmian…') }));
   return {
     nodes: [
       itemDetails(item),
@@ -1471,6 +1485,7 @@ function itemCard(item, { equipped, anvil = false, preview: withPreview = true, 
       busy && h('p', { class: 'muted', text: busyText(state.character) }),
       !usable && h('p', { class: 'region-warning', text: t('Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.') }),
       early && h('p', { class: 'region-warning', text: t('Ten przedmiot założysz od poziomu klasy {level}.', { level: item.classLevel }) }),
+      high && h('p', { class: 'region-warning', text: t('Ten przedmiot założysz od {level}. poziomu postaci albo klasy.', { level: item.wearLevel }) }),
       !equipped &&
         item.price !== undefined &&
         h('button', { type: 'button', class: 'button button--world', onClick: sell, text: t('Sprzedaj za {gold} złota', { gold: formatNumber(item.price) }) }),
@@ -1484,7 +1499,7 @@ function itemCard(item, { equipped, anvil = false, preview: withPreview = true, 
             ]
           : [
               h('button', { type: 'button', class: 'button button--world', onClick: discard, text: t('Wyrzuć') }),
-              h('button', { type: 'button', class: 'button button--system', disabled: busy || !usable || early, onClick: act('equip'), text: t('Załóż') }),
+              h('button', { type: 'button', class: 'button button--system', disabled: busy || !usable || early || high, onClick: act('equip'), text: t('Załóż') }),
             ],
       ),
     ],
@@ -2281,6 +2296,9 @@ export function itemDetails(item, { small = false } = {}) {
       item.stars > 0 && starsLine(item),
       classLines(item),
       item.classLevel && h('li', { class: 'item-classes', text: t('Od poziomu klasy {level}', { level: item.classLevel }) }),
+      // The level lock: from which level of the character or the class,
+      // whichever is higher, it is worn (wearLevelFor in items.js).
+      item.wearLevel && h('li', { class: 'item-classes', text: t('Od {level}. poziomu postaci albo klasy', { level: item.wearLevel }) }),
       // Raised by the Kowal, once per item (the author, 12.11.2026).
       item.raised && h('li', { class: 'item-classes', text: t('Kowal już przekuł go na wyższą rzadkość: drugi raz się nie da.') }),
       item.price !== undefined && h('li', { class: 'item-price', text: t('U złomiarza: {gold} złota', { gold: formatNumber(item.price) }) }),

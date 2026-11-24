@@ -19,6 +19,7 @@ import {
   rollUpgrade,
   sellPrice,
   upgradeView,
+  wearLevelFor,
 } from '../engine/index.js';
 import { content } from './content.js';
 import {
@@ -144,14 +145,18 @@ export async function equipItem(context) {
   if (item.equippedSlot) throw new ApiError(409, 'already_equipped', 'Ten przedmiot jest już założony.');
   // Every item, an own find or one from a Wymiana, the Targowisko or the
   // Skrzynia Konta, is worn from its Tier, the class level its base asks
-  // for, whatever its own level (the author: "Niech przedmioty z Wymian i
-  // Targowiska działają w oparciu o Tiery a nie poziomy samej broni").
-  // The rules are equipBlock's in the engine, which the Targowisko's "Dla
-  // mnie" and the slot's list of items to wear ask too.
-  const block = equipBlock(item, gearKey(player.row.class_id, player.row.evolution, content()), player.row.class_level, content());
+  // for (the author: "Niech przedmioty z Wymian i Targowiska działają w
+  // oparciu o Tiery a nie poziomy samej broni"), and since 24.11.2026 only
+  // up to the level lock's allowance above the higher of the character's
+  // level and its class level (the author: „Pomijając Tier powinna być też
+  // blokada poziomem na ~30-50 w górę, by nie robić potencjału na
+  // smurfkonta”). The rules are equipBlock's in the engine, which the
+  // Targowisko's "Dla mnie" and the slot's list of items to wear ask too.
+  const block = equipBlock(item, gearKey(player.row.class_id, player.row.evolution, content()), player.row.class_level, content(), player.row.level);
   if (block === 'slot_locked') throw new ApiError(403, 'slot_locked', 'Ten slot jest jeszcze zablokowany.');
   if (block === 'wrong_class') throw new ApiError(403, 'wrong_class', 'Twoja klasa nie może używać tego przedmiotu.');
   if (block === 'class_level') throw new ApiError(403, 'class_level', `Ten przedmiot założysz od poziomu klasy ${baseClassLevel(item.base, content())}.`);
+  if (block === 'item_level') throw new ApiError(403, 'item_level', `Ten przedmiot założysz od ${wearLevelFor(item.level, content())}. poziomu postaci albo klasy.`);
 
   // Whatever was in the slot goes back to the bag first; an item taken from
   // a Zbrojownia's rack frees no place there, so one the sets do not keep

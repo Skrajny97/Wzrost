@@ -29,7 +29,7 @@ import { partPrice } from './shop.js';
 /** @typedef {Record<string, any>} Offer An offer of the Targowisko, as the server reads it. */
 /** @typedef {{ code: string, message: string }} Block Why something cannot be done. */
 /** @typedef {{ key: string, startsAt: number, endsAt: number }} Period A day or a week (questPeriod, quests.js). */
-/** @typedef {{ classId: string, classLevel: number, companions?: Record<string, any>[] | null }} Team The character and its hired companions. */
+/** @typedef {{ classId: string, classLevel: number, level?: number, companions?: Record<string, any>[] | null }} Team The character (its level too, for the level lock) and its hired companions. */
 
 const DAY = 86400000;
 /**
@@ -363,11 +363,12 @@ export function goodsRarity({ kind, key, item }, content) {
   return null;
 }
 
-// Who of `team` can put `item` ({ base, slot }) on now: 'me', the character,
-// as "Załóż" asks (equipBlock: its class and the item's Tier), and the ids
-// of its hired companions who can, as "Załóż z plecaka" in the Kwatery asks
-// (companionWearBlock: one of their places, their class and their level).
-// `team`: { classId, classLevel, companions }.
+// Who of `team` can put `item` ({ base, slot, level }) on now: 'me', the
+// character, as "Załóż" asks (equipBlock: its class, the item's Tier and
+// the level lock), and the ids of its hired companions who can, as "Załóż
+// z plecaka" in the Kwatery asks (companionWearBlock: one of their places,
+// their class and their level, and the character's class level for the
+// level lock). `team`: { classId, classLevel, level, companions }.
 /**
  * @param {Record<string, any>} item
  * @param {Team} team
@@ -376,8 +377,8 @@ export function goodsRarity({ kind, key, item }, content) {
  */
 export function wearersOf(item, team, content) {
   return [
-    ...(equipBlock(item, team.classId, team.classLevel, content) === null ? ['me'] : []),
-    ...(team.companions ?? []).filter((companion) => companionWearBlock(companion, item, content) === null).map((companion) => companion.id),
+    ...(equipBlock(item, team.classId, team.classLevel, content, team.level ?? team.classLevel) === null ? ['me'] : []),
+    ...(team.companions ?? []).filter((companion) => companionWearBlock(companion, item, content, team.classLevel) === null).map((companion) => companion.id),
   ];
 }
 
@@ -439,9 +440,9 @@ const ORDERS = {
   new: (a, b) => b.id - a.id,
 };
 
-// The offers (`offers`: { id, kind, key, count, item: { base, slot, rarity }
-// of an item, startPrice, bid, endsAt, myBid }, the character's own left
-// out) the search `asked` shows, for the character and its companions
+// The offers (`offers`: { id, kind, key, count, item: { base, slot, rarity,
+// level } of an item, startPrice, bid, endsAt, myBid }, the character's own
+// left out) the search `asked` shows, for the character and its companions
 // (`team`, as wearersOf). Each choice that does not fit what is there gives
 // way: an unknown show, kind, class or person, a rarity or a category with
 // nothing in it (as the category chips did, 2.11.2026), an unknown order.

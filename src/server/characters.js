@@ -121,6 +121,8 @@ import {
   weekAt,
   weekRest,
   equipBlock,
+  levelFits,
+  wearerLevel,
   coreSockets,
   freeSockets,
   gemView,
@@ -261,6 +263,39 @@ async function settlePendingGems(db, row, items, activity) {
   });
 }
 
+// The worn items above the level lock (levelFits in the engine; the
+// author, 24.11.2026: „założone już za wysokie przedmioty będą zdjęte
+// wtedy”) taken off at the first look at the character, once, as the gear
+// of a form is made anew at it (regearWorn): into the bag, past its
+// capacity too, as nothing of the character's may be lost (an exploration's
+// claim then sells the weakest of a full bag, as it does), or onto the
+// Zbrojownia's rack when a saved set keeps it. Not on an exploration nor
+// on a mercenary's service, which go on with what they set out with (their
+// fights count no such item, wornNow in the engine): at the first look
+// after them. Only while the character is as read; a look that loses the
+// race leaves it to the next. The version moves with what it wears, as at
+// "Załóż" (inventory.js).
+async function unwearTooHigh(db, row, items, activity) {
+  if (activity?.kind === 'hunt' || activity?.kind === 'mercenary') return items;
+  const level = wearerLevel({ level: row.level, classLevel: row.class_level });
+  const off = items.filter((item) => item.equippedSlot && !levelFits(item, level, content()));
+  if (off.length === 0) return items;
+  let results;
+  try {
+    results = await db.batch([
+      assertion(db, "(SELECT version FROM characters WHERE id = ?) = ? AND NOT EXISTS (SELECT 1 FROM activities WHERE character_id = ? AND kind IN ('hunt', 'mercenary'))", [row.id, row.version, row.id]),
+      ...off.map((item) => db.prepare('UPDATE items SET slot = NULL WHERE id = ? AND character_id = ?').bind(item.id, row.id)),
+      db.prepare('UPDATE characters SET version = version + 1 WHERE id = ?').bind(row.id),
+      db.prepare('SELECT version FROM characters WHERE id = ?').bind(row.id),
+    ]);
+  } catch (error) {
+    if (raced(error)) return items;
+    throw error;
+  }
+  Object.assign(row, results.at(-1).results[0]);
+  return items.map((item) => (off.includes(item) ? { ...item, equippedSlot: null } : item));
+}
+
 // A character's row with its items, activities and camp buildings.
 async function playerOf(db, row) {
   const [items, activities, avatarActivities, avatar2Activities, buildings, parcels, stored] = await db.batch([
@@ -292,10 +327,15 @@ async function playerOf(db, row) {
   return {
     row,
     // equippedSlot is where the item is worn (null in the bag); item.slot is where it can go.
-    items: await settlePendingGems(
+    items: await unwearTooHigh(
       db,
       row,
-      await regearWorn(db, row, items.results.map((item) => ({ id: item.id, equippedSlot: item.slot, ...JSON.parse(item.data) }))),
+      await settlePendingGems(
+        db,
+        row,
+        await regearWorn(db, row, items.results.map((item) => ({ id: item.id, equippedSlot: item.slot, ...JSON.parse(item.data) }))),
+        activities.results[0] ?? null,
+      ),
       activities.results[0] ?? null,
     ),
     // The items of the Przechowalnia, the oldest first, each with its own id
@@ -1878,11 +1918,12 @@ export function characterView(player, now) {
     gear: Object.values(gearLists(gearKey(row.class_id, row.evolution, content()), content())).flat(),
     // With why the character cannot wear one now, if it cannot, as "Załóż"
     // refuses it (equipBlock in the engine): for the list of a slot's items.
+    // One above the level lock has no verdict: no fight would count it.
     bag: bagItems(player)
       .reverse()
       .map((item) => {
-        const block = equipBlock(item, gearKey(row.class_id, row.evolution, content()), row.class_level, content());
-        return { ...toItem(item), verdict: verdict(item), ...(block && { equipBlock: block }) };
+        const block = equipBlock(item, gearKey(row.class_id, row.evolution, content()), row.class_level, content(), row.level);
+        return { ...toItem(item), verdict: block === 'item_level' ? null : verdict(item), ...(block && { equipBlock: block }) };
       }),
     // The herbs and the potions in the bag, which take its places by the stack.
     herbs: bagHerbs(row, sellBonus),

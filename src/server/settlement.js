@@ -791,7 +791,7 @@ function companionsView(player, stored, now) {
         // Wounded until the character rests to full HP, and when that is.
         ...(companion.wounded && rested !== now && { wounded: true, healsAt: rested }),
         gift: giftOf(companion, row, now),
-        wearable: bag.filter((item) => !companionWearBlock(companion, item, content())).map((item) => item.id),
+        wearable: bag.filter((item) => !companionWearBlock(companion, item, content(), row.class_level)).map((item) => item.id),
         bond: bondView(companion, now),
         // Out on the character's exploration: its gear waits for its return,
         // in its words; null at home.
@@ -1266,7 +1266,7 @@ export async function equipCompanion(context) {
   const item = player.items.find((one) => one.id === body.itemId && !one.equippedSlot);
   if (!item) throw new ApiError(404, 'item_not_found', 'Tego przedmiotu nie ma w plecaku.');
   requireOffRack(player, item);
-  const block = companionWearBlock(companion, item, content());
+  const block = companionWearBlock(companion, item, content(), row.class_level);
   if (block) throw new ApiError(403, block.code, block.message);
   const { id, equippedSlot, ...data } = item;
   const { companion: dressed, off } = wearOnCompanion(companion, data);

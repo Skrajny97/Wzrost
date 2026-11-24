@@ -637,8 +637,10 @@ describe('the Próby Gildii through the API', () => {
   test('a fight won in a Wieża moves a trial on only on a floor at most 10 levels below the character, as its note says (488 A)', async () => {
     const id = await idOf('Mistrz');
     // At level 61 floor 1 (of level 50) is 11 levels below, floor 2 ten;
-    // the gear of tests/helpers/climb.js wins them (0.2.11).
-    await run('UPDATE characters SET level = 61, class_level = 50, points = ? WHERE id = ?', JSON.stringify(STRONG), id);
+    // the gear of tests/helpers/climb.js wins them (0.2.11). Its items, of
+    // level 199 and Tier 175, ask for class level 175: the level lock
+    // (24.11.2026) counts the higher of the two levels.
+    await run('UPDATE characters SET level = 61, class_level = 175, points = ? WHERE id = ?', JSON.stringify(STRONG), id);
     await wearClimbingGear(await db(), id);
     await as('mistrz', 'GET', '/api/guild/trials');
     await setBoard([{ kind: 'towers', size: 0, roll: 0 }]);

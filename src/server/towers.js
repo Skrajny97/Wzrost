@@ -247,7 +247,7 @@ export async function enterTower(context) {
   // The chest's item: in an empty slot it is worn at once, else it goes to
   // the bag, and what does not fit there the scrapper buys, the weakest
   // first (as after an exploration).
-  const autoEquipped = autoEquip(equipped, hunt.items, content(), gearKey(row.class_id, row.evolution, content()), row.class_level);
+  const autoEquipped = autoEquip(equipped, hunt.items, content(), gearKey(row.class_id, row.evolution, content()), row.class_level, row.level);
   const levels = campLevels(player.buildings, now, content());
   const bag = bagItems(player);
   const capacity = bagCapacity(levels, content()) - (bagPlaces(player) - bag.length);

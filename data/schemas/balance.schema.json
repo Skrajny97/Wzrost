@@ -289,7 +289,8 @@
         "resistancePerBudget",
         "sellGoldPerLevel",
         "bagSlots",
-        "otherClass"
+        "otherClass",
+        "levelLock"
       ],
       "properties": {
         "budgetBase": {
@@ -343,6 +344,25 @@
           "properties": {
             "fromLevel": { "type": "integer", "minimum": 1 },
             "share": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "levelLock": {
+          "type": "object",
+          "description": "Blokada poziomu przedmiotów: o ile poziomów wyżej niż wyższy z poziomów postaci i klasy może być przedmiot, który postać zakłada. curve: punkty [poziom, zapas] w kolejności poziomów.",
+          "additionalProperties": false,
+          "required": ["curve"],
+          "properties": {
+            "$comment": { "type": "string" },
+            "curve": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": { "type": "integer", "minimum": 0 }
+              }
+            }
           }
         }
       }

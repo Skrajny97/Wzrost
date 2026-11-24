@@ -31,7 +31,7 @@ import { countOf, dateTimeFormat, formatDecimal, formatNumber, tradePace } from 
 import { t } from '../i18n.js';
 import { call, serverNow, state } from '../state.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, systemPanel, toast, withButton } from '../ui.js';
-import { classFits, classLines, compareTable, gemFold, itemSummary, propertyLines, starsLine } from './character.js';
+import { classFits, classLines, compareTable, gemFold, itemSummary, levelLocked, levelLockText, propertyLines, starsLine } from './character.js';
 
 // The tabs and the names of kinds and reasons below are Polish, shown
 // through t(). The Rejestr of the character's trade (the author,
@@ -282,11 +282,12 @@ export const stackButton = (goods, options, actions) =>
 // one the character wears in its slot (the author: "jak klikamy dany
 // przedmiot to nie tylko pojawiają się dane przedmiotu, ale i otwiera
 // porównywarka z aktualnym przedmiotem"), and when the character can wear
-// it: from its Tier, as every item. `opened` keeps the unfolded ones by
-// `key` through the panel's redraws. The Salon Gier shows its prizes so too.
-// `notes: false` leaves out when the character can wear it, as the
-// Rejestr's goods already traded. `wearers` (the server's, wearersOf in the
-// engine) names the companions of `team` who can put it on now: the card
+// it: from its Tier and its own level (the level lock), as every item.
+// `opened` keeps the unfolded ones by `key` through the panel's redraws.
+// The Salon Gier shows its prizes so too. `notes: false` leaves out when
+// the character can wear it, as the Rejestr's goods already traded.
+// `wearers` (the server's, wearersOf in the engine) names the companions
+// of `team` who can put it on now: the card
 // compares it with what each of them wears there too (a player's remark
 // passed on by the author, 11.11.2026), the one shopped for (`first`, "Dla
 // mnie" for a companion) before the character, whose notes then say
@@ -300,6 +301,7 @@ export function itemEntry(item, key, opened, { notes: noted = true, wearers = nu
   const notes = [
     noted && own && !usable && t('Twoja klasa nie może go używać.'),
     noted && own && character.classLevel < (item.classLevel ?? 1) && t('Założysz go od poziomu klasy {level}.', { level: item.classLevel }),
+    noted && own && usable && levelLocked(item, character) && levelLockText(item),
   ].filter(Boolean);
   const companions = (wearers ?? []).map((id) => team.find((companion) => companion.id === id)).filter(Boolean);
   const chosen = companions.find((companion) => companion.id === first);
