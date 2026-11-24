@@ -1,0 +1,14 @@
+{
+  "id": "snakefly-wing",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a pair of narrow smoky dark grey insect wings with bright red veins, side by side, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02312548705779182
+  },
+  "images": 1
+}

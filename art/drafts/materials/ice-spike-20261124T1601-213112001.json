@@ -1,0 +1,14 @@
+{
+  "id": "ice-spike",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a single short thick cone-shaped spike of cloudy white ice standing upright on its broken frosty base, small frost crystals around the base, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02328271057701111
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "walrus-tusk",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "two long straight yellowish-white walrus tusks pointing down side by side from a small piece of grey-brown jawbone, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023122912440194026
+  },
+  "images": 1
+}

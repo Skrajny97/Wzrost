@@ -1,0 +1,14 @@
+{
+  "id": "fungus-sap",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a thick tongue-shaped slab of bright red beefsteak fungus with a pale underside, dripping drops of red sap, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02310653726832072
+  },
+  "images": 1
+}
