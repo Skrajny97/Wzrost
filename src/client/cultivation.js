@@ -1,15 +1,18 @@
 // Kultywacja (1230 A; src/server/cultivation.js, src/engine/cultivation.js):
-// while the class is ahead of the character, the character meditates for a
-// length an exploration offers it, for character XP only. It has a screen of
-// its own (#/kultywacja, mountCultivation), as a profession's, with its scene
-// and its music (data/music.json, place `cultivation`): the levels, the XP
-// of each length up to the class's level and "Medytuj"; while it runs, the
-// timer, "Przewiń" and "Przerwij Kultywację"; then "Odbierz raport". The
-// Walka's main view leads to it with a card (cultivationLink) and, while it
-// runs, with a line as for a profession's work (cultivationBusy). The scene
-// is data/animations.json `cultivation`, a sheet as a work's (scenes.js
-// loopScene). Its texts are written in Polish and shown in the page's
-// language (t(), i18n.js).
+// the character meditates for a length an exploration offers it. While its
+// class is ahead it gets character XP, up to the class's level, and every
+// meditation grows the Kultywacja's own level (0–100), each level a share
+// more character XP from explorations. It has a screen of its own
+// (#/kultywacja, mountCultivation), as a profession's, with its scene and
+// its music (data/music.json, place `cultivation`): its level with the bar
+// to the next one and its bonus, the character's and the class's levels,
+// the XP of each length split into character XP and the Kultywacja's, and
+// "Medytuj"; while it runs, the timer, "Przewiń" and "Przerwij Kultywację";
+// then "Odbierz raport". The Walka's main view leads to it with a card
+// (cultivationLink) and, while it runs, with a line as for a profession's
+// work (cultivationBusy). The scene is data/animations.json `cultivation`,
+// a sheet as a work's (scenes.js loopScene). Its texts are written in
+// Polish and shown in the page's language (t(), i18n.js).
 
 import { fill, h, icon, setTimer } from './dom.js';
 import { dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from './format.js';
@@ -46,29 +49,47 @@ const sheet = () => state.content.animations?.cultivation ?? null;
 // The scene, looping as a work's, in the light of the hour.
 const scene = () => loopScene(sheet(), 'cultivation-scene');
 
+// The meditating figure cut out of the scene's first frame at its own size,
+// for the Kultywacja's bonus among the others (bonuses.js).
+export function cultivationMark() {
+  const art = sheet();
+  if (!art) return null;
+  const mark = h('span', { class: 'cultivation-mark', 'aria-hidden': 'true' });
+  mark.style.setProperty('--sheet', `url("/${art.file}")`);
+  return mark;
+}
+
+// "+7%": a share in percent.
+const percent = (share) => `+${formatNumber(Math.round(share * 1000) / 10)}%`;
+
 // The name of a length, as under the exploration's slider ("krótka"…).
 const lengthName = (minutes) => (state.content.lengths?.find((length) => length.upTo === undefined || minutes <= length.upTo) ?? {}).name ?? '';
 
 // " · poziom 120 → 131" after the XP, or nothing without a new level.
 const newLevels = (before, after) => (after > before ? ` · ${t('poziom {before} → {after}', { before, after })}` : '');
 
-// "Postać 120 · Klasa 140 · do klasy 6 h 40 min", or the levels met.
-const progressLine = (character, plan) =>
-  plan.open
-    ? t('Postać {level} · Klasa {classLevel} · do klasy {time}', { level: character.level, classLevel: character.classLevel, time: formatMinutes(plan.minutes) })
-    : t('Twoja postać dogoniła klasę.');
+// The Kultywacja's bonus, "+7% XP postaci z wypraw".
+const bonusText = (view) => t('{share} XP postaci z wypraw', { share: percent(view.bonus) });
 
 // The Walka's way to the Kultywacja while the character is at home, from
-// its unlock: a card as a land's, its scene behind the words.
+// its unlock: a card as a land's, its scene behind the words, with its
+// level and bonus, and how far the class is.
 export function cultivationLink(character) {
-  const plan = character.cultivation;
+  const view = character.cultivation;
+  const plan = view?.plan;
   if (!plan || character.activity) return null;
   const card = h(
     'a',
     { class: `card region-card region-link cultivation-link${plan.open ? '' : ' cultivation-link--met'}`, href: CULTIVATION_HASH, 'data-guide': 'cultivation', onClick: (event) => openView(event, CULTIVATION_HASH, 'walka') },
-    h('div', { class: 'region-head' }, h('h2', { class: 'card-title', text: t('Kultywacja') }), h('span', { class: 'region-chips' }, h('span', { class: 'chip chip--system', text: t('×{factor} XP postaci', { factor: plan.factor }) }))),
-    h('p', { class: 'region-trait', text: t('Twoja postać medytuje zamiast wyprawy i zdobywa tylko XP postaci, aż dogoni klasę.') }),
-    h('p', { class: 'region-foot' }, h('span', { text: progressLine(character, plan) }), icon('chevron', { size: 20 })),
+    h('div', { class: 'region-head' }, h('h2', { class: 'card-title', text: t('Kultywacja') }), h('span', { class: 'region-chips' }, h('span', { class: 'chip chip--system', text: t('poz. {level}', { level: view.level }) }))),
+    h('p', { class: 'region-trait', text: t('Twoja postać medytuje zamiast wyprawy: zdobywa XP postaci, aż dogoni klasę, i poziomy Kultywacji, które dają więcej XP postaci z wypraw.') }),
+    h(
+      'p',
+      { class: 'region-foot' },
+      // The class's part on one line, not "54 h 28" and "min" below.
+      h('span', {}, `${bonusText(view)} · `, h('span', { class: 'cultivation-foot-class', text: plan.open ? t('do klasy {time}', { time: formatMinutes(plan.minutes) }) : t('postać dogoniła klasę') })),
+      icon('chevron', { size: 20 }),
+    ),
   );
   // The sheet's first frame, as wide as the card (styles.css).
   const art = sheet();
@@ -87,6 +108,26 @@ export const cultivationBusy = (activity) =>
     systemLink(CULTIVATION_HASH, t('Do Kultywacji')),
   );
 
+// The Kultywacja's own level, as a profession's: the level of the top one,
+// the bar to the next, the meditation it still takes and its bonus.
+function levelCard(view) {
+  const top = view.xpToNext === 0;
+  const share = top ? 100 : (view.xp / view.xpToNext) * 100;
+  return h(
+    'section',
+    { class: 'cultivation-level', 'aria-label': t('Poziom Kultywacji {level}', { level: view.level }) },
+    h(
+      'p',
+      { class: 'profession-card-head' },
+      h('strong', { text: t('Poziom Kultywacji {level}', { level: view.level }) }),
+      h('span', { class: 'muted', text: ` ${t('z {max}', { max: view.maxLevel })}` }),
+    ),
+    h('div', { class: 'bar bar--xp', role: 'presentation' }, h('div', { class: 'bar-fill', style: { width: `${share}%` } })),
+    h('p', { class: 'muted', text: top ? t('Najwyższy poziom.') : t('Do następnego poziomu: {time} medytacji.', { time: formatMinutes(view.xpToNext - view.xp) }) }),
+    h('p', { class: 'cultivation-bonus', text: t('Premia: {bonus}.', { bonus: bonusText(view) }) }),
+  );
+}
+
 // The character's and the class's levels, and the XP between them.
 function levelsList(character, plan) {
   const rows = [
@@ -102,33 +143,41 @@ function levelsList(character, plan) {
 }
 
 // What it is, in a few words, and the rest under "Jak to działa?".
-const about = (plan) =>
+const about = (view) =>
   howItWorks(
-    t('Twoja postać medytuje zamiast wyprawy i zdobywa tylko XP postaci: {factor} razy tyle, ile dałaby jej wyprawa tej samej długości w miejscu {place}. Nie zdobywa XP klasy, łupów ani złota.', {
-      factor: plan.factor,
-      place: plan.area.name,
+    t('Twoja postać medytuje zamiast wyprawy. Póki klasa ją wyprzedza, zdobywa XP postaci: {factor} razy tyle, ile dałaby jej wyprawa tej samej długości w miejscu {place}. Każda medytacja rozwija też poziom Kultywacji, a każdy poziom daje {per} XP postaci z wypraw.', {
+      factor: view.plan.factor,
+      place: view.plan.area.name,
+      per: percent(view.perLevel),
     }),
     [
-      t('Kultywacja może trwać tyle samo co wyprawa. W tym czasie postać nie wyrusza na wyprawy, nie pracuje w profesji i nie idzie z Drużyną, ale odpoczywa.'),
-      t('Kultywacja nigdy nie da postaci wyższego poziomu niż klasa: daje najwyżej tyle XP, ile w chwili odbioru raportu brakuje do poziomu klasy. Gdy poziomy się zrównają, Kultywacja poczeka, aż klasa znów wyprzedzi postać.'),
+      t('Kultywacja może trwać tyle samo co wyprawa. W tym czasie postać nie wyrusza na wyprawy, nie pracuje w profesji i nie idzie z Drużyną, ale odpoczywa. Nie zdobywa XP klasy, łupów ani złota.'),
+      t('Kultywacja nigdy nie da postaci wyższego poziomu niż klasa: daje najwyżej tyle XP, ile w chwili odbioru raportu brakuje do poziomu klasy. Gdy poziomy się zrównają, medytacja rozwija już tylko poziom Kultywacji.'),
+      t('Poziom Kultywacji rośnie o punkt za każdą minutę medytacji, do poziomu {max}. Pierwszy poziom to {first} medytacji, a każdy następny trwa dłużej. Premia działa na każdej wyprawie, także z Drużyną, ale nie na XP klasy.', {
+        max: view.maxLevel,
+        first: formatMinutes(view.firstMinutes),
+      }),
       t('Punkty Czasu przewijają ją jak wyprawę. Przerwana nie daje nic.'),
     ],
   );
 
-// The length with a slider over the lengths an exploration offers, the XP
-// of the one chosen up to the class's level, and "Medytuj".
-function picker(character, plan) {
+// The length with a slider over the lengths an exploration offers, what the
+// one chosen gives (the character's XP up to the class's level, and the
+// Kultywacja's own XP), and "Medytuj".
+function picker(character, view) {
+  const { plan } = view;
   const allowed = plan.lengths.map((length) => length.minutes);
   const longest = allowed.at(-1);
   // The length chosen last, else the shortest that catches the class up,
   // else the longest.
   const kept = allowed.indexOf(loadChoice());
-  const enough = allowed.findIndex((minutes) => minutes >= plan.minutes);
+  const enough = plan.open ? allowed.findIndex((minutes) => minutes >= plan.minutes) : -1;
   let index = kept >= 0 ? kept : enough >= 0 ? enough : allowed.length - 1;
 
   const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
   const kind = h('span', { class: 'duration-kind' });
   const gain = h('p', { class: 'cultivation-gain' });
+  const grow = h('p', { class: 'cultivation-gain cultivation-gain--level' });
   const note = h('p', { class: 'muted cultivation-note' });
   const start = h('button', { type: 'button', class: 'button button--system', 'data-guide': 'cultivation-start' });
   const slider = h('input', {
@@ -165,18 +214,26 @@ function picker(character, plan) {
     kind.textContent = lengthName(length.minutes);
     less.disabled = index === 0;
     more.disabled = index === allowed.length - 1;
-    const caught = length.xp >= plan.cap;
-    gain.textContent = `${t('Zdobędziesz: +{xp} XP postaci', { xp: formatNumber(length.xp) })}${newLevels(character.level, length.level)}`;
+    // The character's XP, up to the class's level.
+    const caught = plan.open && length.xp >= plan.cap;
+    gain.textContent = plan.open
+      ? `${t('XP postaci: +{xp}', { xp: formatNumber(length.xp) })}${newLevels(character.level, length.level)}`
+      : t('XP postaci: +0, bo postać dogoniła klasę');
     gain.classList.toggle('cultivation-gain--caught', caught);
+    // The Kultywacja's own XP and level.
+    grow.textContent =
+      length.cultivationXp > 0 ? `${t('Kultywacja: +{xp} XP', { xp: formatNumber(length.cultivationXp) })}${newLevels(view.level, length.cultivationLevel)}` : t('Kultywacja: najwyższy poziom');
     // How long is enough to catch the class up, and that a longer one
-    // gives no more.
-    note.textContent = caught
-      ? length.minutes > plan.minutes
-        ? t('Twoja postać dogoni klasę. Wystarczy {time}: dłuższa Kultywacja nie da więcej XP.', { time: formatMinutes(plan.minutes) })
-        : t('Twoja postać dogoni klasę.')
-      : plan.minutes <= longest
-        ? t('Wystarczy {time}, żeby Twoja postać dogoniła klasę.', { time: formatMinutes(plan.minutes) })
-        : t('Twoja postać dogoni klasę po {time} Kultywacji.', { time: formatMinutes(plan.minutes) });
+    // gives no more character XP.
+    note.textContent = !plan.open
+      ? t('Twoja postać dogoniła klasę (poziom {level}): medytacja rozwija teraz tylko poziom Kultywacji.', { level: character.classLevel })
+      : caught
+        ? length.minutes > plan.minutes
+          ? t('Twoja postać dogoni klasę. Wystarczy {time}: dłuższa Kultywacja nie da więcej XP postaci.', { time: formatMinutes(plan.minutes) })
+          : t('Twoja postać dogoni klasę.')
+        : plan.minutes <= longest
+          ? t('Wystarczy {time}, żeby Twoja postać dogoniła klasę.', { time: formatMinutes(plan.minutes) })
+          : t('Twoja postać dogoni klasę po {time} Kultywacji.', { time: formatMinutes(plan.minutes) });
     start.textContent = t('Medytuj · {time}', { time: formatMinutes(length.minutes) });
   }
   set(index);
@@ -197,17 +254,18 @@ function picker(character, plan) {
       h('p', { class: 'duration-scale', 'aria-hidden': 'true' }, h('span', { text: formatMinutes(allowed[0]) }), h('span', { text: formatMinutes(longest) })),
       character.huntNext && h('p', { class: 'duration-lock', text: t('Dłuższa Kultywacja, do {time}, od poziomu {level}.', { time: formatMinutes(character.huntNext.minutes), level: character.huntNext.level }) }),
     ),
-    gain,
+    h('div', { class: 'cultivation-gains' }, h('p', { class: 'cultivation-gains-title', text: t('Zdobędziesz:') }), gain, grow),
     note,
     h('div', { class: 'start-bar' }, start),
   );
 }
 
-// The Kultywacja's screen: at home, what it is, its levels, the length and
-// "Medytuj" (or the word that the character has caught its class up);
-// while it runs, the timer with the bar, "Przewiń" and "Przerwij
-// Kultywację"; once it has ended, "Odbierz raport". The scene stands on top
-// of each, and the music of the place plays (app.js: the route's music).
+// The Kultywacja's screen: at home, what it is, its own level, the
+// character's and the class's levels, the length and "Medytuj" (or the word
+// that a meditation would give nothing now); while it runs, the timer with
+// the bar, "Przewiń" and "Przerwij Kultywację"; once it has ended, "Odbierz
+// raport". The scene stands on top of each, and the music of the place
+// plays (app.js: the route's music).
 export function mountCultivation(container, { navigate }) {
   let countdown = null;
   let progress = null;
@@ -230,12 +288,12 @@ export function mountCultivation(container, { navigate }) {
   function render() {
     const character = state.character;
     const activity = character.activity;
-    const plan = character.cultivation;
+    const view = character.cultivation;
     countdown = null;
     progress = null;
     skipper = null;
     shownFinished = activity?.kind === 'cultivation' ? activityFinished(activity) : null;
-    if (!isUnlocked('cultivation')) {
+    if (!isUnlocked('cultivation') || !view) {
       const unlock = unlockInfo('cultivation');
       fill(
         container,
@@ -245,13 +303,13 @@ export function mountCultivation(container, { navigate }) {
       return;
     }
     if (activity?.kind === 'cultivation') {
-      fill(container, heading(character), activityView(activity));
+      fill(container, heading(character), activityView(activity, view));
       tick(serverNow());
       return;
     }
     // Busy with another activity: the Kultywacja waits for its end.
-    if (activity || !plan) {
-      fill(container, heading(character), scene(), systemPanel(t('Twoja postać jest teraz zajęta. Kultywację zaczniesz, gdy skończy.'), systemLink(WALKA, t('Do Walki'))));
+    if (activity || !view.plan) {
+      fill(container, heading(character), scene(), levelCard(view), systemPanel(t('Twoja postać jest teraz zajęta. Kultywację zaczniesz, gdy skończy.'), systemLink(WALKA, t('Do Walki'))));
       return;
     }
     fill(
@@ -261,20 +319,26 @@ export function mountCultivation(container, { navigate }) {
         'article',
         { class: 'card cultivation-card', 'aria-label': t('Kultywacja') },
         scene(),
-        about(plan),
-        levelsList(character, plan),
-        plan.open
-          ? picker(character, plan)
-          : systemPanel(t('Twoja postać dogoniła klasę (poziom {level}). Kultywacja ruszy, gdy klasa znów ją wyprzedzi.', { level: character.classLevel })),
+        about(view),
+        levelCard(view),
+        levelsList(character, view.plan),
+        view.plan.possible
+          ? picker(character, view)
+          : systemPanel(t('Twoja postać dogoniła klasę, a Kultywacja ma najwyższy poziom: medytacja nic teraz nie da.')),
       ),
     );
   }
 
   // A Kultywacja under way or ended.
-  function activityView(activity) {
-    const running = state.character.cultivation?.running ?? null;
-    const gainLine =
-      running && h('p', { class: 'system-hint', text: `${t('Twoja postać zdobędzie +{xp} XP postaci', { xp: formatNumber(running.xp) })}${newLevels(state.character.level, running.level)}.` });
+  function activityView(activity, view) {
+    const running = view.running ?? null;
+    const gainLines = running
+      ? [
+          (running.xp > 0 || running.level > state.character.level) &&
+            h('p', { class: 'system-hint', text: `${t('Twoja postać zdobędzie +{xp} XP postaci', { xp: formatNumber(running.xp) })}${newLevels(state.character.level, running.level)}.` }),
+          running.cultivationXp > 0 && h('p', { class: 'system-hint', text: `${t('Kultywacja: +{xp} XP', { xp: formatNumber(running.cultivationXp) })}${newLevels(view.level, running.cultivationLevel)}.` }),
+        ].filter(Boolean)
+      : [];
     if (activityFinished(activity)) {
       const claim = h('button', {
         type: 'button',
@@ -290,7 +354,7 @@ export function mountCultivation(container, { navigate }) {
             navigate(`#/raport/${report.id}`);
           }),
       });
-      return h('div', { class: 'stack' }, scene(), systemPanel(t('Kultywacja zakończona: {time}.', { time: formatMinutes(activity.minutes) }), gainLine, t('Raport czeka na odbiór.'), claim));
+      return h('div', { class: 'stack' }, scene(), systemPanel(t('Kultywacja zakończona: {time}.', { time: formatMinutes(activity.minutes) }), ...gainLines, t('Raport czeka na odbiór.'), claim));
     }
     countdown = h('p', { class: 'countdown', 'aria-live': 'off' });
     progress = h('div', { class: 'bar-fill bar-fill--system' });
@@ -318,7 +382,7 @@ export function mountCultivation(container, { navigate }) {
         t('Kultywacja w toku: {time}.', { time: formatMinutes(activity.minutes) }),
         countdown,
         h('div', { class: 'bar bar--system' }, progress),
-        gainLine,
+        ...gainLines,
         h('p', {
           class: 'system-hint',
           text: t('Raport będzie gotowy o {time}. Do tego czasu postać odpoczywa, a wyprawy, profesje i Drużyna poczekają.', { time: timeFormat.format(new Date(activity.endsAt)) }),
@@ -348,16 +412,21 @@ export function mountCultivation(container, { navigate }) {
   return { update: render, tick };
 }
 
-// The report of a Kultywacja (screens/report.js): its length, the XP and
-// the levels it brought, the System's lines with the free points to spend
-// (`points`, the report screen's own box), and the way back.
+// The report of a Kultywacja (screens/report.js): its length, the
+// character's XP and levels, the Kultywacja's own XP, level and bonus, the
+// System's lines with the free points to spend (`points`, the report
+// screen's own box), and the way back.
 export function cultivationReport(report, heading, points = null) {
   const { summary } = report;
+  const grown = report.cultivation ?? null;
   const rows = [
     [t('XP postaci'), t('+{xp} XP', { xp: formatNumber(report.xp) })],
     [t('Poziom postaci'), summary.levelAfter > summary.levelBefore ? `${formatNumber(summary.levelBefore)} → ${formatNumber(summary.levelAfter)}` : formatNumber(summary.levelBefore)],
     [t('Poziom klasy'), formatNumber(report.classLevel)],
     summary.timePoints > 0 && [t('Punkty Czasu'), `+${formatNumber(summary.timePoints)}`],
+    grown && [t('XP Kultywacji'), t('+{xp} XP', { xp: formatNumber(grown.xp) })],
+    grown && [t('Poziom Kultywacji'), grown.levelAfter > grown.levelBefore ? `${formatNumber(grown.levelBefore)} → ${formatNumber(grown.levelAfter)}` : formatNumber(grown.levelAfter)],
+    grown && [t('Premia z Kultywacji'), bonusText(grown)],
   ].filter(Boolean);
   return [
     heading(t('Raport z Kultywacji'), `${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`),
@@ -370,7 +439,7 @@ export function cultivationReport(report, heading, points = null) {
         { class: 'status-list' },
         rows.map(([label, value]) => h('div', { class: 'status-row' }, h('dt', { text: label }), h('dd', { text: value }))),
       ),
-      report.capped && h('p', { class: 'muted', text: t('Twoja postać dogoniła klasę: Kultywacja dała tyle XP, ile brakowało do poziomu klasy.') }),
+      report.capped && h('p', { class: 'muted', text: t('Twoja postać dogoniła klasę: Kultywacja dała tyle XP postaci, ile brakowało do poziomu klasy.') }),
     ),
     report.system.length > 0 && systemPanel(...report.system, ...[points].filter(Boolean)),
     h('a', { class: 'button button--system', href: CULTIVATION_HASH, text: t('Do Kultywacji') }),
@@ -384,4 +453,5 @@ export const cultivationRowMeta = (report) =>
     { class: 'report-row-meta' },
     h('span', { class: 'chip chip--cultivation', text: t('kultywacja') }),
     ` ${t('+{xp} XP postaci', { xp: formatNumber(report.xp) })}${newLevels(report.levelBefore, report.levelAfter)}`,
+    report.cultivation && ` · ${t('Kultywacja +{xp} XP', { xp: formatNumber(report.cultivation.xp) })}${newLevels(report.cultivation.levelBefore, report.cultivation.levelAfter)}`,
   );

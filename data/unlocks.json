@@ -77,7 +77,7 @@
     "id": "cultivation",
     "name": "Kultywacja",
     "level": 20,
-    "message": "Odblokowano Kultywację. Gdy klasa wyprzedza Twoją postać, w zakładce Walka możesz zamiast wyprawy wybrać medytację: postać zdobywa wtedy dużo więcej XP postaci, aż dogoni klasę."
+    "message": "Odblokowano Kultywację. W zakładce Walka możesz zamiast wyprawy wybrać medytację: rozwija ona poziomy Kultywacji, które dają więcej XP postaci z wypraw, a gdy klasa wyprzedza postać, daje też dużo XP postaci, aż ją dogoni."
   },
   {
     "id": "arena",

@@ -17,7 +17,7 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 | `threat.js` | poziom zagrożenia przed wyprawą |
 | `preview.js` | wartości bojowe i skutek jednego punktu statystyki |
 | `unlocks.js` | kolejność odblokowań samouczka, długości wypraw i regiony wewnętrzne otwierane poziomem klasy |
-| `cultivation.js` | Kultywacja (1230 A): najnowsze miejsce otwarte przez klasę, XP postaci godziny medytacji (`xpFactor` razy wyprawa w tym miejscu), XP do poziomu klasy, plan długości dla karty i odbiór najwyżej do poziomu klasy |
+| `cultivation.js` | Kultywacja (1230 A): najnowsze miejsce otwarte przez klasę, XP postaci godziny medytacji (`xpFactor` razy wyprawa w tym miejscu), XP do poziomu klasy, poziomy Kultywacji (0–100) i ich premia do XP postaci z wypraw (dolicza ją `applyHunt`), plan długości dla karty i odbiór najwyżej do poziomu klasy |
 | `camp.js` | obóz: poziomy budynków w czasie, koszty i czasy budowy, premie (odpoczynek, plecak, ceny złomiarza), magazyny budynków produkcyjnych, zbieranie i całe zapełnienia magazynów, które zbiera Zbieracz Systemu |
 | `exchange.js`, `fire.js`, `shop.js` | wymiana zasobów przy Stole rozbiórki, duch Ogniska (złoto na zasoby) i lada Skupu złomu (części za złoto) |
 | `builder-spirit.js` | duch budowniczego przy Kamieniu węgielnym: skup zasobów obozu za złoto i to, czego budowy obozu jeszcze potrzebują |

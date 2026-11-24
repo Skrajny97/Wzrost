@@ -267,6 +267,8 @@
   "pushHuntBody": ["Eksploracja zakończona: {area}. Raport czeka na odbiór."],
   "pushCultivationTitle": ["Koniec Kultywacji"],
   "pushCultivationBody": ["Kultywacja zakończona. Raport czeka na odbiór."],
+  "cultivationBonus": ["Kultywacja (poziom {level}): +{share}% XP postaci z wyprawy, +{xp} XP."],
+  "cultivationLevelUp": ["Kultywacja osiągnęła poziom {level}: +{share}% XP postaci z wypraw."],
   "pushBuildTitle": ["Koniec budowy"],
   "pushBuildBody": ["{building}: poziom {level} gotowy."],
   "pushStoreTitle": ["Pełny magazyn"],

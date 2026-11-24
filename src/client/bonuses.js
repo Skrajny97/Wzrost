@@ -8,8 +8,9 @@
 // wszędzie").
 
 import { dishSprite, potionSprite } from './art.js';
+import { cultivationMark } from './cultivation.js';
 import { h, icon } from './dom.js';
-import { countOf, formatMinutes } from './format.js';
+import { countOf, formatMinutes, formatNumber } from './format.js';
 import { t } from './i18n.js';
 
 // The fights a bonus has left: they go when a report is claimed
@@ -28,7 +29,10 @@ export function bonusList(character) {
   // The meal at work (cooking.js; 999.5 v2), with the time of explorations
   // it still works for.
   const meal = character?.meal ?? null;
-  if (buffs.length === 0 && !meal) return null;
+  // The Kultywacja's share more character XP from explorations, from its
+  // first level on, for good (cultivation.js, 1230 A).
+  const cultivation = character?.cultivation?.level > 0 ? character.cultivation : null;
+  if (buffs.length === 0 && !meal && !cultivation) return null;
   return h(
     'section',
     { class: 'bonus-list', 'aria-label': t('Aktywne bonusy') },
@@ -60,6 +64,23 @@ export function bonusList(character) {
             { class: 'bonus-text' },
             h('span', { class: 'bonus-name' }, h('strong', { text: t('Posiłek: {dish}', { dish: meal.name }) }), `: ${meal.bonus}`),
             h('span', { class: 'bonus-left', text: t('jeszcze {time} wypraw', { time: formatMinutes(meal.left) }) }),
+          ),
+        ),
+      cultivation &&
+        h(
+          'li',
+          { class: 'bonus-row' },
+          h('span', { class: 'bonus-art', 'aria-hidden': 'true' }, cultivationMark() ?? icon('spirit', { size: 24 })),
+          h(
+            'span',
+            { class: 'bonus-text' },
+            h(
+              'span',
+              { class: 'bonus-name' },
+              h('strong', { text: t('Kultywacja (poziom {level})', { level: cultivation.level }) }),
+              `: ${t('+{share}% XP postaci z wypraw', { share: formatNumber(Math.round(cultivation.bonus * 1000) / 10) })}`,
+            ),
+            h('span', { class: 'bonus-left', text: t('na stałe, bez XP klasy') }),
           ),
         ),
     ),

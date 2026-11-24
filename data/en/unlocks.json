@@ -50,7 +50,7 @@
   },
   "cultivation": {
     "name": "Cultivation",
-    "message": "Cultivation unlocked. When your class is ahead of your character, you can choose meditation instead of an exploration in the Combat tab: your character then gains much more Character XP until it catches up with the class."
+    "message": "Cultivation unlocked. In the Combat tab you can choose meditation instead of an exploration: it raises Cultivation levels, which add Character XP from explorations, and while your class is ahead, it also gives plenty of Character XP until your character catches up."
   },
   "arena": {
     "name": "Arena",

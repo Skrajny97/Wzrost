@@ -130,7 +130,7 @@ import { finishJewels } from './jewelcraft.js';
 import { finishMining } from './mining.js';
 import { finishFishing } from './fishing.js';
 import { finishFarming } from './farming.js';
-import { finishCultivation } from './cultivation.js';
+import { cultivationShare, finishCultivation } from './cultivation.js';
 import { applyPartyEvent, checkedChoice, leaderView, resolveAuto, resolvePartyRow, tripEvent, tripLine } from './party-events.js';
 import { partyGate, threatCrew } from './parties.js';
 import { wantedAfterHunt, wantedGoing, wantedOnTrip } from './wanted.js';
@@ -1386,7 +1386,9 @@ async function huntClaim(db, player, now, { choice, decideEvent = null, partyBag
   // A faint loses everything the exploration brought (faintForfeit, 651 C),
   // and costs XP, less with the Warownia's Kapliczka (427 A).
   hunt = faintForfeit(hunt);
-  const applied = applyHunt(character, hunt, content(), { faintShare: faintShare(campLevels(player.buildings, now, content()), content()) });
+  // The Kultywacja's share more character XP (cultivation.js), the
+  // class's XP as it is.
+  const applied = applyHunt(character, hunt, content(), { faintShare: faintShare(campLevels(player.buildings, now, content()), content()), cultivation: cultivationShare(row) });
   // The companions who went gain XP, one who fell is wounded, and an
   // event's reputation and rumor are kept (settlementAfterHunt); of an
   // older trip's, only in its leader's report.

@@ -1,12 +1,18 @@
 // @ts-check
-// Kultywacja (1230 A; DECISIONS.md, „Kultywacja (1230 A)”): while the class
-// is ahead of the character, the character may meditate for a length an
-// exploration offers instead of exploring, for character XP only: `xpFactor`
-// (balance.json `cultivation`) times the XP an exploration as long gives in
-// the newest place its class opens, at that place's top level (xpPerHour,
-// as the XP curve was set and tools/level-gap-sim.mjs counts it), but never
-// past the class: at most the XP that brings the character to the start of
-// its class's level. No class XP, loot or gold.
+// Kultywacja (1230 A; DECISIONS.md, „Kultywacja (1230 A)”): the character
+// meditates for a length an exploration offers instead of exploring. While
+// its class is ahead, it gets character XP: `xpFactor` (balance.json
+// `cultivation`) times the XP an exploration as long gives in the newest
+// place its class opens, at that place's top level (xpPerHour, as the XP
+// curve was set and tools/level-gap-sim.mjs counts it), but never past the
+// class: at most the XP that brings the character to the start of its
+// class's level. No class XP, loot or gold. Every meditation also grows the
+// Kultywacja's own level, 0 to `maxLevel` (the author, 24.11.2026: „Niech
+// Kultywacja ma swoje poziomy (max 100) i daje +1% do XP postaci podczas
+// wypraw”, „wbicie pierwszego poziomu powinno zająć już z 4 godziny”): a
+// point of its XP a minute, its levels growing as a profession's
+// (`levelMinutes` the first), each one `levelBonus` more character XP from
+// explorations (applyHunt in hunt.js).
 
 import { gainXp, xpPerHour, xpToNext } from './progression.js';
 import { applyWork } from './professions.js';
@@ -15,6 +21,7 @@ import { areaUnlocked } from './unlocks.js';
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {{ id: string, name: string, minLevel: number, maxLevel: number }} Area An inner region (content.areas). */
 /** @typedef {{ level: number, xp: number, classLevel: number }} Levels A character's levels and its XP into its level. */
+/** @typedef {{ level: number, xp: number }} Progress The Kultywacja's own level and its XP into it. */
 
 /**
  * The newest place a class level opens: of the inner regions open to it, the
@@ -63,17 +70,71 @@ export function xpToLevel(level, xp, target, content) {
 export const cultivationXp = (rate, minutes, cap = Infinity) => Math.min(cap, Math.round((rate * minutes) / 60));
 
 /**
- * Kultywacja for a character now: whether it may begin (`open`: its class
- * above it), `factor`, the place its XP is counted from (`area`), the XP an
- * hour (`rate`), the XP that brings it to its class's level (`cap`) and the
- * minutes of it that do (`minutes`), and for each of `durations` (the
- * lengths an exploration offers it) the XP it gives and the character's
- * level after it.
+ * The Kultywacja's own XP from a level to the next, a point a minute of
+ * meditation: (level + 1) times `levelMinutes`, as a profession's levels
+ * grow (professionXpToNext), so the first level takes `levelMinutes`; 0 at
+ * the top.
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number}
+ */
+export function cultivationXpToNext(level, content) {
+  const { levelMinutes, maxLevel } = content.balance.cultivation;
+  return level >= maxLevel ? 0 : (level + 1) * levelMinutes;
+}
+
+/**
+ * The Kultywacja after `minutes` of meditation: its level and XP, and the
+ * XP it took (`gained`: none past the top level).
+ * @param {Progress} progress
+ * @param {number} minutes
+ * @param {Content} content
+ * @returns {Progress & { gained: number }}
+ */
+export function cultivationProgress(progress, minutes, content) {
+  const { maxLevel } = content.balance.cultivation;
+  let left = -progress.xp;
+  for (let at = progress.level; at < maxLevel; at += 1) left += cultivationXpToNext(at, content);
+  const gained = Math.max(0, Math.min(minutes, left));
+  const next = gainXp(progress.level, progress.xp, gained, (level) => cultivationXpToNext(level, content), maxLevel);
+  return { level: next.level, xp: next.xp, gained };
+}
+
+/**
+ * The share more character XP explorations give at a Kultywacja level.
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number}
+ */
+export const cultivationBonus = (level, content) => Math.max(0, level) * content.balance.cultivation.levelBonus;
+
+/**
+ * The hours of meditation from level 0 to a Kultywacja level.
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number}
+ */
+export function cultivationHours(level, content) {
+  let minutes = 0;
+  for (let at = 0; at < level; at += 1) minutes += cultivationXpToNext(at, content);
+  return minutes / 60;
+}
+
+/**
+ * Kultywacja for a character now: whether its class is ahead (`open`: the
+ * character XP flows), `factor`, the place its XP is counted from (`area`),
+ * the XP an hour (`rate`), the XP that brings it to its class's level
+ * (`cap`) and the minutes of it that do (`minutes`), whether a meditation
+ * would give anything at all (`possible`: the class ahead, or the
+ * Kultywacja below its top level), and for each of `durations` (the lengths
+ * an exploration offers it) the character XP it gives with the character's
+ * level after it, and the Kultywacja's XP with its level after it.
  * @param {Levels} character
+ * @param {Progress} progress
  * @param {number[]} durations
  * @param {Content} content
  */
-export function cultivationPlan(character, durations, content) {
+export function cultivationPlan(character, progress, durations, content) {
   const { level, xp, classLevel } = character;
   const area = newestArea(classLevel, content);
   const rate = cultivationRate(classLevel, content);
@@ -82,6 +143,7 @@ export function cultivationPlan(character, durations, content) {
   const toNext = (/** @type {number} */ at) => xpToNext(at, content);
   return {
     open: cap > 0,
+    possible: cap > 0 || progress.level < content.balance.cultivation.maxLevel,
     factor: content.balance.cultivation.xpFactor,
     area: { id: area.id, name: area.name },
     rate: Math.round(rate),
@@ -89,7 +151,8 @@ export function cultivationPlan(character, durations, content) {
     minutes: cap > 0 ? Math.ceil((cap / rate) * 60) : 0,
     lengths: durations.map((minutes) => {
       const gained = cultivationXp(rate, minutes, cap);
-      return { minutes, xp: gained, level: gainXp(level, xp, gained, toNext, maxLevel).level };
+      const grown = cultivationProgress(progress, minutes, content);
+      return { minutes, xp: gained, level: gainXp(level, xp, gained, toNext, maxLevel).level, cultivationXp: grown.gained, cultivationLevel: grown.level };
     }),
   };
 }
