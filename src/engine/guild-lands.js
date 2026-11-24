@@ -12,6 +12,8 @@
 // Of two guilds with as much, the older one (the lower id); no banner
 // where nobody explored. Pure: the minutes are the server's.
 
+import { decimalText } from './text.js';
+
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {{ landId: string, guildId: number, minutes: number }} LandMinutes A guild's minutes in a land in a week. */
 /** @typedef {{ landId: string, guildId: number, minutes: number }} Banner */
@@ -31,6 +33,20 @@ export const landRules = (content) => ({ fame: content.guilds.lands.fame, bonus:
  * @returns {string | null}
  */
 export const landOfArea = (areaId, content) => content.areasById[areaId]?.regionId ?? null;
+
+/**
+ * The report's line of the banner of the character's guild over the land
+ * an exploration set out in (`hunt.banner`, its share more gold and
+ * materials from the creatures), where the exploration brought gold or
+ * materials; null otherwise (a faint loses them all).
+ * @param {Record<string, any>} hunt
+ * @param {Content} content
+ * @returns {string | null}
+ */
+export function bannerLine(hunt, content) {
+  if (!(hunt.banner > 0) || !(hunt.gold > 0 || Object.keys(hunt.materials ?? {}).length > 0)) return null;
+  return content.guilds.lands.texts.report.replace('{bonus}', decimalText(Math.round(hunt.banner * 1000) / 10, content));
+}
 
 // The better of two guilds' minutes in a land: the more minutes, of as
 // many the older guild (the lower id).

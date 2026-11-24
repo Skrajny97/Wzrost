@@ -417,7 +417,13 @@ export function craftLevelFor(rarityId, content) {
  */
 export const craftTakes = (table, rarityId, content) => rarityIndex(rarityId, content) <= table.maxRarity;
 
-// Minutes the table needs for `count` parts of a rarity at its pace.
+// Minutes the table needs for `count` parts of a rarity at its pace: the
+// rarity's craftMinutes for each part, times crafting.minutesFactor (0.05
+// since 24.11.2026, twenty times faster at every level; the author:
+// „zmienię czas trwania i zwiększę kolejkę”, four times faster first, then
+// „jeszcze przyspiesz od nowego poziomu … tak z 5 razy”), at least a
+// minute. An order keeps the minutes it was given: those made before go on
+// as they were.
 /**
  * @param {string} rarityId
  * @param {number} count
@@ -426,7 +432,8 @@ export const craftTakes = (table, rarityId, content) => rarityIndex(rarityId, co
  * @returns {number}
  */
 export function craftMinutes(rarityId, count, pace, content) {
-  return Math.max(1, Math.round((count * content.raritiesById[rarityId].craftMinutes) / pace));
+  const { minutesFactor } = content.balance.crafting;
+  return Math.max(1, Math.round((count * content.raritiesById[rarityId].craftMinutes * minutesFactor) / pace));
 }
 
 // The state at `now`: the parts of every finished order, with its extra

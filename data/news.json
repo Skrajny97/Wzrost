@@ -1640,6 +1640,11 @@
       "id": "0.4.93",
       "title": "Wersja 0.4.93",
       "body": "- Ustawienia: nowy wiersz Soundtrack. Przycisk otwiera na YouTube film z muzyką z gry, a pod każdym utworem jest kraina z gry."
+    },
+    {
+      "id": "0.4.94",
+      "title": "Wersja 0.4.94",
+      "body": "- Stół rozbiórki rozbiera przedmioty 20 razy szybciej, a jego kolejka mieści 30 zleceń zamiast 10. Zlecenia, które już czekają, kończą się w swoim dawnym czasie.\n- Raport z wyprawy pokazuje teraz też premie z budynków Twojej gildii, ze sztandaru gildii w krainie, z błogosławieństwa Ołtarza Systemu i z Bractwa Łowców, gdy coś dały."
     }
   ]
 }

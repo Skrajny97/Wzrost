@@ -50,9 +50,9 @@ const older = (state) => ({ ...state, queue: state.queue.map(({ countsAtEnd: _, 
 
 describe('orders taken off the table, in the engine', () => {
   test('an order leaves with its materials, and the orders after it move up; the one at work loses its work and the next starts now', () => {
-    const materials = { 'wolf-pelt:common': 3, 'fox-pelt:common': 2, 'boar-tusk:rare': 1 };
+    const materials = { 'wolf-pelt:common': 60, 'fox-pelt:common': 40, 'boar-tusk:rare': 20 };
     const { state } = orderMaterials({ ...empty, materials }, Object.keys(materials), plain, 0, createRng('kolejka'), content);
-    // 15 minutes of wolf pelts, 10 of fox pelts, 8 of the boar's tusk.
+    // 15 minutes of wolf pelts, 10 of fox pelts, 8 of the boar's tusks.
     const queue = withIds(state);
     assert.deepEqual(times(queue.queue), [
       ['o0', 0, 15],
@@ -61,13 +61,13 @@ describe('orders taken off the table, in the engine', () => {
     ]);
     const at = 5 * MINUTE;
     const waiting = takeOffQueue(settleCrafting(queue, at), new Set(['o1']), at);
-    assert.deepEqual(waiting.state.materials, { 'fox-pelt:common': 2 });
+    assert.deepEqual(waiting.state.materials, { 'fox-pelt:common': 40 });
     assert.deepEqual(times(waiting.state.queue), [
       ['o0', 0, 15],
       ['o2', 15, 23],
     ]);
     const working = takeOffQueue(settleCrafting(queue, at), new Set(['o0']), at);
-    assert.deepEqual(working.state.materials, { 'wolf-pelt:common': 3 });
+    assert.deepEqual(working.state.materials, { 'wolf-pelt:common': 60 });
     assert.deepEqual(times(working.state.queue), [
       ['o1', 5, 15],
       ['o2', 15, 23],
@@ -81,9 +81,9 @@ describe('orders taken off the table, in the engine', () => {
     assert.deepEqual(
       takeOffQueue(settleCrafting(older(queue), at), new Set(['o1']), at).work.map(({ kind, pieces, orderedAt, cancelled }) => [kind, pieces, orderedAt, cancelled]),
       [
-        ['process', 3, 0, false],
-        ['process', 2, 0, true],
-        ['process', 1, 0, false],
+        ['process', 60, 0, false],
+        ['process', 40, 0, true],
+        ['process', 20, 0, false],
       ],
     );
   });

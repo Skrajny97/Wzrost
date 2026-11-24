@@ -17,7 +17,7 @@ import { decimalText } from './text.js';
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {{ id: string, bonus: 'xp' | 'gold' | 'anvil' | 'rarity', perLevel: number, effect: string }} SeatBuilding A building of data/guilds.json `seat`. */
 /** @typedef {{ gold: number, resource: number }} Amounts */
-/** @typedef {{ maxLevel: number, buildings: SeatBuilding[], cost: { gold: { min: number, perLevel: number }, resource: { min: number, perLevel: number } } }} SeatRules */
+/** @typedef {{ maxLevel: number, buildings: SeatBuilding[], cost: { gold: { min: number, perLevel: number }, resource: { min: number, perLevel: number } }, texts: Record<string, any> }} SeatRules */
 
 /**
  * @param {Content} content
@@ -150,6 +150,32 @@ export function seatHuntBonus(levels, content) {
   const { xp, gold, rarity } = seatBonuses(levels, content);
   const kept = Object.fromEntries(Object.entries({ xp, gold, rarity }).filter(([, share]) => share > 0));
   return Object.keys(kept).length > 0 ? kept : null;
+}
+
+// The report's line of the seat's bonuses an exploration set out with
+// (`hunt.seat`, seatHuntBonus), as the card collection's (cards.js): those
+// that changed its result, the XP and the gold where it brought some, the
+// rarer items where it found any ("Budynki Twojej gildii: +3% XP i +2%
+// złota z wyprawy."); null where none did (a player, 24.11.2026: „nie ma
+// ujęte za budynki gildii”). A faint loses it all, so it has none.
+/**
+ * @param {Record<string, any>} hunt
+ * @param {Content} content
+ * @returns {string | null}
+ */
+export function seatLine(hunt, content) {
+  const seat = hunt.seat;
+  if (!seat) return null;
+  const { texts } = rules(content);
+  const percent = (/** @type {number} */ share) => decimalText(Math.round(share * 1000) / 10, content);
+  const bonuses = [
+    seat.xp > 0 && hunt.xp > 0 && texts.reportXp.replace('{value}', percent(seat.xp)),
+    seat.gold > 0 && hunt.gold > 0 && texts.reportGold.replace('{value}', percent(seat.gold)),
+    seat.rarity > 0 && (hunt.items ?? []).length > 0 && texts.reportRarity.replace('{value}', percent(seat.rarity)),
+  ].filter((part) => typeof part === 'string');
+  if (bonuses.length === 0) return null;
+  const listed = bonuses.length === 1 ? bonuses[0] : texts.both.replace('{first}', bonuses.slice(0, -1).join(', ')).replace('{second}', String(bonuses.at(-1)));
+  return texts.report.replace('{bonuses}', listed);
 }
 
 // What a building gives at a level, in the words of its card: "+3% XP z

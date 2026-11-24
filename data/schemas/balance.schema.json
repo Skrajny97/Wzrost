@@ -953,15 +953,17 @@
     },
     "crafting": {
       "type": "object",
-      "description": "Stół rozbiórki w obozie: przeróbka materiałów i rozbiórka przedmiotów na części, za darmo, w kolejce na czas (craftMinutes w rarities.json).",
+      "description": "Stół rozbiórki w obozie: przeróbka materiałów i rozbiórka przedmiotów na części, za darmo, w kolejce na czas (craftMinutes w rarities.json razy minutesFactor).",
       "additionalProperties": false,
       "required": [
         "salvageBase",
         "salvageLevelStep",
+        "minutesFactor",
         "queueLimit",
         "sellGold"
       ],
       "properties": {
+        "$comment": { "type": "string" },
         "salvageBase": {
           "type": "integer",
           "minimum": 1,
@@ -970,6 +972,11 @@
         "salvageLevelStep": {
           "type": "integer",
           "minimum": 1
+        },
+        "minutesFactor": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Mnożnik czasu każdego zlecenia stołu: minuty to części × craftMinutes rzadkości × minutesFactor / tempo stołu (0,05: 20 razy szybciej niż same craftMinutes)."
         },
         "queueLimit": {
           "type": "integer",

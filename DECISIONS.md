@@ -3905,6 +3905,38 @@ Gracz (poz. 228) przez autora: „Przy resecie mógłby być suwak albo miejsce 
 
 Autor: „Podepnij ten film z podpisem soundtrack tam gdzie wszystkie sociale” z linkiem do filmu na YouTube z muzyką z gry (29 minut, 10 utworów, pod każdym kraina z gry). Wiersz „Soundtrack” w Ustawieniach pod Wiki, zrobiony jak pozostałe (`social.places`, id `youtube`): znak YouTube z Simple Icons (CC0), biały na czerwonym kafelku `#FF0000`, i przycisk „Posłuchaj muzyki z gry” (po angielsku „Listen to the game's music”). Link bez dopisku `?feature=shared`, jak link Wattpada bez znaczników udostępniania. Schemat przyjmuje dla niego tylko `https://youtu.be/…` i `https://(www.)youtube.com/…`. Sprawdzone w przeglądarce na 320 px i 1366 px.
 
+## Wersja 0.4.94 (24.11.2026): Stół rozbiórki 20 razy szybszy, premie gildii w raporcie
+
+Według dwóch sekcji niżej, bez makiet (nowe linijki raportu w istniejącym panelu Systemu).
+
+## Stół rozbiórki: 20 razy szybciej, kolejka 30 (24.11.2026)
+
+Gracz (poz. 228): „aktualnie 8 epickich itemków na stole 10 lv trwa rozebranie 30 h” i „kolejka nastawiona z epików i legend blisko 50-60 przedmiotów zajmuje blisko 2 tygodnie”. Autor: „zmienię czas trwania i zwiększę kolejkę”, a potem: „Stół rozbiórki jeszcze przyspiesz od nowego poziomu który ustaliłeś tak z 5 razy”.
+
+1. **Czas.** Każde zlecenie stołu, rozbiórka i przeróbka, trwa 20 razy krócej, na każdym poziomie stołu: najpierw 4 razy, potem jeszcze 5 razy. Robi to jeden mnożnik w danych, `crafting.minutesFactor` równy 0,05 w `data/balance.json` (opisany w `$comment`). Minuty rzadkości (`craftMinutes` w `data/rarities.json`: 5, 8, 12, 20, 30, 45 i 60 minut na część) i premia poziomu stołu (+10% tempa za poziom) zostają. Zlecenie trwa: części × minuty rzadkości × 0,05 / tempo stołu, zaokrąglone, najmniej minutę.
+2. **Przykład.** 8 epickich przedmiotów na ok. 220. poziomie (po 24 części, razem 192) na stole 10. poziomu (tempo 2): przedtem 192 × 20 / 2 = 1920 minut, czyli ok. 32 h, teraz 96 minut, czyli ok. 1,6 h. Kolejka, która szła blisko 2 tygodnie, skończy się w niecałą dobę.
+3. **Kolejka** mieści 30 zleceń zamiast 10 (`crafting.queueLimit`). Gra pokazuje liczbę z danych („Kolejka (12/30)”, „Kolejka stołu jest pełna (30 zleceń)…”), więc żaden tekst gry nie wymagał zmiany. „Rozbierz kilka” dalej robi jedno zlecenie na każdą rzadkość części.
+4. **Zlecenia złożone wcześniej** kończą się o swojej godzinie: zlecenie dostaje czas przy złożeniu, a gra go potem nie przelicza, także przy „Usuń z kolejki” i przestawianiu (każde zlecenie trwa tyle co dotąd). Po nowemu liczą się tylko nowe zlecenia.
+5. **Teksty.** Liczby czasu i kolejki nie stoją w żadnym tekście gry. Opis budynku i „Przeróbka szybsza o …” mówią o premii poziomu, która zostaje. Zmieniły się opisy w schematach (`data/schemas/balance.schema.json`, `data/schemas/rarities.schema.json`).
+6. **Testy:** `test/engine.test.js` (nowy test: 0,05 i 30, przykład gracza 1920 i 96 minut, każdy poziom 20 razy szybciej), `test/game.test.js`, `test/craft-cancel.test.js` i `test/craft-move.test.js` (pełna kolejka to 30 zleceń).
+
+## Raport wyprawy: premie budynków gildii (24.11.2026)
+
+Gracz (poz. 99): „W raporcie wyprawy jest napisane np. Zwiększenie doświadczenia za kolekcję kart; za zjedzone danie ale nie ma ujęte za budynki gildii.”
+
+Raport wyprawy wymieniał w linijkach Systemu premię tygodnia, wróżby z Andrzejek, opiekuna z Kąciny, kolekcję kart i posiłek, a pomijał inne premie, które wyprawa liczy. Doszły cztery linijki, każda tylko wtedy, gdy premia zmieniła wynik:
+
+1. **Budynki gildii** (Sztandar, Skarbiec i Dom Zwiadowców w Siedzibie Gildii): „Budynki Twojej gildii: +3% XP, +2% złota i +4% szans na rzadsze przedmioty z wyprawy.” XP, gdy wyprawa dała XP, złoto, gdy dała złoto, a rzadsze przedmioty, gdy coś znalazła. Liczby są z chwili wyruszenia, jak sama premia. Po angielsku: „Your guild's buildings: +3% XP, +2% gold and +4% chance of rarer items from the exploration.” (`seat.texts.report`, `reportXp`, `reportGold` i `reportRarity` w `data/guilds.json`).
+2. **Sztandar gildii nad krainą** (Krainy pod sztandarem), gdy wyprawa dała złoto albo materiały: „Sztandar Twojej gildii w tej krainie: +5% złota i materiałów ze stworów.” Po angielsku: „Your guild's banner in this land: +5% gold and materials from creatures.” (`lands.texts.report`).
+3. **Błogosławieństwo Ołtarza Systemu** (Warownia), gdy działało choć w jednej walce, jak linijki mikstur: „Błogosławieństwo Ołtarza Systemu (+10% XP) działało w walkach: 3 z 6.” Po angielsku: „The System Altar's blessing (+10% XP) was active in 3 of 6 fights.” (`blessingFights` w `data/texts.json`).
+4. **Bractwo Łowców**, gdy stwory zostawiły materiały: „Bractwo Łowców: +10% materiałów ze stworów.” Po angielsku: „Brotherhood of Hunters: +10% materials from creatures.” (`brotherhoodMaterials` w `data/texts.json`).
+
+- Opiekun z Kąciny miał już swoją linijkę („Opieka Peruna: +5% XP z walk.”), Trudna i Piekielna wyprawa swój dopisek pod wynikiem, a premia drużyny swoje linijki, więc zostały bez zmian. Bez linijki zostały rzeczy, które nie dodają procentu do łupu, tylko zmieniają szanse spotkań (plotka z Karczmy, elity i czempioni częściej z Bractwem Łowców), albo należą do samej postaci (cecha Tropiciela, Poboczna Siła).
+- Po omdleniu wyprawa traci XP, złoto, materiały i przedmioty, więc linijek budynków, sztandaru i Bractwa wtedy nie ma. Linijka błogosławieństwa zostaje, jak linijki mikstur, bo jego walki i tak się zużyły.
+- Kolejność linijek: tydzień, wróżby, opiekun, budynki gildii, sztandar, kolekcja kart, posiłek, błogosławieństwo, Bractwo Łowców.
+- Sprawdzone w przeglądarce na 320 px i 1366 px: raport członka gildii z linijką budynków, a potem wszystkie cztery nowe linijki naraz w panelu Systemu, bez przewijania na boki i bez błędów strony.
+- Pliki: `src/engine/guild-seat.js` (`seatLine`), `src/engine/guild-lands.js` (`bannerLine`), `src/engine/hunt.js` (wyprawa zapamiętuje premie Siedziby, sztandar, rodzaj błogosławieństwa i premię Bractwa; `huntReport`), `data/guilds.json`, `data/texts.json`, angielskie w `data/en/`, schemat `data/schemas/guilds.schema.json`. Testy w `test/guild-seat.test.js`: linijka po polsku i po angielsku, tylko z premiami, które zmieniły wynik, trzy pozostałe linijki i raport członka gildii przez API.
+
 ## Wersja 0.4.92 (22.11.2026): przycisk Wiki w Ustawieniach
 
 Według sekcji niżej.

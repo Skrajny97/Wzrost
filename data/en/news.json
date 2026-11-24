@@ -1308,6 +1308,10 @@
     "0.4.93": {
       "title": "Version 0.4.93",
       "body": "- Settings: a new Soundtrack row. Its button opens a YouTube video with the game's music, each track over a land from the game."
+    },
+    "0.4.94": {
+      "title": "Version 0.4.94",
+      "body": "- The Salvage Table takes items apart 20 times faster, and its queue holds 30 orders instead of 10. Orders already waiting finish at their old times.\n- The exploration report now also shows the bonuses of your guild's buildings, of your guild's banner in the land, of the System Altar's blessing and of the Brotherhood of Hunters, when they gave something."
     }
   }
 }

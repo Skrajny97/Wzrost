@@ -2373,7 +2373,7 @@ describe('Stół rozbiórki', () => {
   });
 
   test('without the table nothing is made; with it, materials become parts in time, for free', async () => {
-    await stockMaterials({ 'wolf-pelt:common': 3, 'boar-tusk:rare': 1 });
+    await stockMaterials({ 'wolf-pelt:common': 60, 'boar-tusk:rare': 1 });
     const none = await craft({ all: true });
     assert.deepEqual([none.status, none.data.error.code], [409, 'no_table']);
     await tableAt(1);
@@ -2382,19 +2382,21 @@ describe('Stół rozbiórki', () => {
     assert.deepEqual([status, data.ordered], [200, 1]);
     const view = data.character.crafting;
     assert.deepEqual(view.materials.map((material) => material.key), ['boar-tusk:rare']);
-    // Three parts of 5 minutes, 10% faster at level 1: 14 minutes.
+    // 60 parts of 5 minutes, a twentieth of that (minutesFactor), 10% faster at level 1: 14 minutes.
     const [order] = view.queue;
-    assert.deepEqual([order.name, order.count, order.part, order.parts, (order.endsAt - order.startsAt) / 60000], ['Skóra wilka', 3, 'Ścinki', 3, 14]);
+    assert.deepEqual([order.name, order.count, order.part, order.parts, (order.endsAt - order.startsAt) / 60000], ['Skóra wilka', 60, 'Ścinki', 60, 14]);
     assert.deepEqual([data.character.gold, data.character.resources], [before.gold, before.resources]);
     assert.equal(parts(data.character, 'scraps'), 0);
     await wait(14);
     const later = await character();
-    assert.deepEqual([later.crafting.queue.length, parts(later, 'scraps')], [0, 3]);
-    // The next order counts from now, and the parts made stay.
-    await craft({ all: true });
-    await wait(8);
+    assert.deepEqual([later.crafting.queue.length, parts(later, 'scraps')], [0, 60]);
+    // The next order counts from now, and the parts made stay: one tusk
+    // takes the least, a minute.
+    const tusk = (await craft({ all: true })).data.character.crafting.queue[0];
+    assert.equal(tusk.endsAt - tusk.startsAt, 60000);
+    await wait(1);
     const last = await character();
-    assert.deepEqual([parts(last, 'scraps'), parts(last, 'straps'), last.crafting.materials.length], [3, 1, 0]);
+    assert.deepEqual([parts(last, 'scraps'), parts(last, 'straps'), last.crafting.materials.length], [60, 1, 0]);
   });
 
   test('the table takes higher rarities with its levels, and a stack too rare waits', async () => {
@@ -2489,12 +2491,13 @@ describe('Stół rozbiórki', () => {
     const { id, item } = await bagItem('rare', 25);
     const { status, data } = await salvage(id);
     assert.equal(status, 200);
-    // 2 + 25 / 10: 4 Rzemienie, 8 minutes each, 10% faster.
+    // 2 + 25 / 10: 4 Rzemienie, 8 minutes each, a twentieth of that
+    // (minutesFactor), 10% faster: 1.45 minutes, a minute.
     assert.deepEqual([data.salvage.name, data.salvage.part, data.salvage.parts], [itemName(item, content), 'Rzemienie', 4]);
     assert.equal(data.character.bag.length, 0);
-    assert.equal(data.character.crafting.queue[0].endsAt - data.character.crafting.queue[0].startsAt, 29 * 60000);
+    assert.equal(data.character.crafting.queue[0].endsAt - data.character.crafting.queue[0].startsAt, 60000);
     assert.equal((await salvage(id)).status, 404);
-    await wait(29);
+    await wait(1);
     assert.equal(parts(await character(), 'straps'), 4);
   });
 
@@ -2527,14 +2530,14 @@ describe('Stół rozbiórki', () => {
     );
     assert.equal(data.character.bag.length, 0);
     const [straps, scraps] = data.character.crafting.queue;
-    // Two rare items in one order of 4 + 4 Rzemienie, 29 minutes each as one
-    // by one; the common one alone, with its name: 2 Ścinki, 5 minutes each,
-    // 10% faster.
-    assert.deepEqual([straps.name, straps.count, straps.parts, straps.endsAt - straps.startsAt], ['Przedmioty', 2, 8, 58 * 60000]);
-    assert.deepEqual([scraps.name, scraps.count, scraps.parts, scraps.endsAt - scraps.startsAt], [itemName(common.item, content), 1, 2, 9 * 60000]);
+    // Two rare items in one order of 4 + 4 Rzemienie, a minute each as one
+    // by one (8 minutes a part, a twentieth of that, 10% faster); the common
+    // one alone, with its name: 2 Ścinki, the least, a minute.
+    assert.deepEqual([straps.name, straps.count, straps.parts, straps.endsAt - straps.startsAt], ['Przedmioty', 2, 8, 2 * 60000]);
+    assert.deepEqual([scraps.name, scraps.count, scraps.parts, scraps.endsAt - scraps.startsAt], [itemName(common.item, content), 1, 2, 60000]);
     assert.equal(scraps.startsAt, straps.endsAt);
     assert.equal((await salvageMany([first.id])).status, 404);
-    await wait(67);
+    await wait(3);
     const after = await character();
     assert.deepEqual([parts(after, 'straps'), parts(after, 'scraps'), after.crafting.queue.length], [8, 2, 0]);
   });
@@ -2579,9 +2582,9 @@ describe('Stół rozbiórki', () => {
 
   test('"Rozbierz kilka" needs a place in the queue for each kind of part', async () => {
     await tableAt(1);
-    // Nine orders waiting, each an hour more.
+    // One order fewer than the queue takes waiting (29 of 30), each an hour more.
     const hour = 3600000;
-    const waiting = Array.from({ length: 9 }, (_, index) => ({
+    const waiting = Array.from({ length: content.balance.crafting.queueLimit - 1 }, (_, index) => ({
       id: `w${index}`,
       kind: 'material',
       key: 'wolf-pelt:common',

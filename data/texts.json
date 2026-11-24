@@ -259,6 +259,8 @@
   "faintForfeit": ["Po porażce nic z tej wyprawy nie zostaje: XP, złoto, zasoby, materiały i przedmioty przepadają."],
   "bagOverflow": ["Plecak był pełny ({capacity} miejsc). Złomiarz kupił najsłabsze przedmioty: {count} za {gold} złota."],
   "autoEquip": ["Założono od razu: {item} ({slot}), bo ten slot był pusty."],
+  "blessingFights": ["Błogosławieństwo Ołtarza Systemu ({blessing}) działało w walkach: {fights} z {all}."],
+  "brotherhoodMaterials": ["{brotherhood}: +{value}% materiałów ze stworów."],
   "pushHuntTitle": ["Koniec wyprawy"],
   "pushHuntBody": ["Eksploracja zakończona: {area}. Raport czeka na odbiór."],
   "pushBuildTitle": ["Koniec budowy"],
