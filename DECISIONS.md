@@ -4355,6 +4355,8 @@ Autor zapytał informacyjnie o grę podobną do Stardew Valley, a potem do Coral
 
 ## Wersja 0.5.11 (24.11.2026): przywołańce Druida ściągają ciosy wrogów
 
+W tej samej wersji Postrach Krainy przechodzi na rytm co 3 dni od razu, po uwadze autora „Jak w poniedziałek, jak 3 dni od dzisiaj to piątek”: obecni bossowie zostają do czwartku 26.11 do północy, a nowi pojawiają się w piątek 27.11 (`cycle.from` „2026-11-27”, zob. „Postrach Krainy co 3 dni (24.11.2026)”). Wpis „Co nowego?” 0.5.10 ma poprawioną datę.
+
 Zob. „Druid: przywołańce na wyprawach i na Arenie (24.11.2026)”, punkty 10–16: przywołańce Druida, Arcydruida i Pradruida ściągają na siebie ciosy wrogów (także rywala na Arenie i w wojnach gildii), mają dodatkowo 75% maks. HP postaci i stoją ruch dłużej, a siła linii w pojedynkach przeszła z własnych ciosów Druida na przywołańce (bez `duelPower`, z `duelSummonPower`). Przy okazji teksty z liczbą ruchów („przez {turns} swoje ruchy”, „przez {turns} ruchy” w dzienniku walki) odmieniają się teraz według liczby: „1 swój ruch”, „3 swoje ruchy”, „5 swoich ruchów” (`{turns|swój ruch|swoje ruchy|swoich ruchów}`, `counted` w `src/engine/text.js`), bo przy 5 ruchach przywołań wychodziło „na 5 swoje ruchy”. Angielski bez zmian.
 
 ## Wersja 0.5.8 (24.11.2026): Druid na wyprawach i Pradruid na Arenie
