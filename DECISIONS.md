@@ -3944,6 +3944,10 @@ Gracz przez autora: „Brakuje opcji, aby z bestiariusza można było automatycz
 5. **Po angielsku:** „Workshop: you know this pattern.”, „Gem Workshop: you know this pattern.”, „Crafting opens at character level 15.” i „The pattern opens at Crafting level 25.”. Przyciski mają już swoje angielskie słowa: „To the Workshop” i „To the Gem Workshop”.
 6. **Pliki:** `src/engine/encyclopedia.js` (`patternWay`), `src/server/encyclopedia.js`, `src/client/screens/encyclopedia.js`, `src/client/screens/professions.js`, `src/client/app.js`, `src/client/styles.css`, `data/encyclopedia.json`, `data/en/encyclopedia.json`, `data/en/sources.json`, testy w `test/encyclopedia.test.js`. Okno sprawdzone na 320, 390 i 1366 px: bez przewijania na boki i bez tekstu poza ramkami.
 
+## Wersja 0.4.99 (24.11.2026): Kulki Profesji
+
+Według sekcji niżej, bez makiet (kulka z wypraw w innym kolorze nad istniejącą sceną pracy).
+
 ## Kulki Profesji (24.11.2026)
 
 Autor: „Podczas Profesji niech latają osobne kulki z bonusami i zasobami jak podczas wyprawy” (24.11.2026). Wzorem są Kulki Systemu z wyprawy (sekcja „Kulki Systemu na planszy wyprawy”), ale Kulki Profesji są osobne: mają własny limit, własne nagrody, własną barwę i własne komunikaty. Liczby i słowa są w `data/orbs.json` (`professions`, ze schematem), po angielsku w `data/en/orbs.json` („Profession Orb”). Kod: `src/engine/profession-orbs.js`, `src/server/profession-orbs.js` i `src/client/orbs.js`. Brakujące szczegóły rozstrzygnięte najprościej:
