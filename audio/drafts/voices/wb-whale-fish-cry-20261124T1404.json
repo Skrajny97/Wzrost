@@ -1,0 +1,13 @@
+{
+  "id": "wb-whale-fish-cry",
+  "payload": {
+    "text": "a colossal ancient whale gives a deep booming moaning roar that rumbles like an earthquake under the sea, with a great rush of water, no words, video game boss battle cry, close up, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wb-whale-fish-cry-20261124T1404-0.mp3",
+    "audio/drafts/voices/wb-whale-fish-cry-20261124T1404-1.mp3"
+  ],
+  "credits": 72
+}
