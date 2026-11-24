@@ -4,7 +4,9 @@
 // its picture behind the heading, the way back to the Społeczność, the
 // invitations waiting for this character; its guild with the members, the
 // leader and the deputies marked, each with when it was last online as in
-// the Znajomi, and what its role lets it do (invite a
+// the Znajomi and the Sława it brought the guild this week, under a
+// "Sortuj:" by rank, the last time online or the Sława, and what its role
+// lets it do (invite a
 // friend at a tap or anyone by name, take an invitation back, remove, name
 // a deputy, hand the lead over); the Ranking członków under it
 // (guild-ranking.js, 897 A); Pomoc przy budowach i pracy over the guild's
@@ -49,11 +51,31 @@ import { narrate } from '../narrator.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, serverNow, state } from '../state.js';
 import { confirmAction, foldPart, framedName, guildTag, toast, withButton } from '../ui.js';
+import { sortButtons } from './character.js';
 import { seenTag } from './friends.js';
 import { lockedScreen } from './locked.js';
 
 const PAGE = '#/gildia';
 const TAB_KEY = 'insight-guild-tab';
+// The members' "Sortuj:" (a player, 24.11.2026: „widać kiedy byli online i
+// widać też pkt sławy każdego gracza jaki wkład ma, choć mogło by to być w
+// jednym miejscu widoczne”): by rank (the leader, the deputies, the
+// members, the Nowicjusze, each as they joined), the one online last first,
+// or the most Sława of this week first; of two alike, the rank's order. The
+// choice is kept on the device.
+const MEMBER_SORT_KEY = 'insight-guild-member-sort';
+const RANKS = ['leader', 'deputy', 'member', 'novice'];
+const MEMBER_SORTS = [
+  { id: 'rank', label: 'Ranga', by: (a, b) => RANKS.indexOf(a.rank ?? a.role) - RANKS.indexOf(b.rank ?? b.role) },
+  { id: 'seen', label: 'Ostatnio online', by: (a, b) => Number(b.online) - Number(a.online) || (b.lastSeen ?? -1) - (a.lastSeen ?? -1) },
+  { id: 'fame', label: 'Sława', by: (a, b) => (b.weekFame ?? 0) - (a.weekFame ?? 0) },
+];
+let memberSort = 'rank';
+try {
+  memberSort = localStorage.getItem(MEMBER_SORT_KEY) ?? memberSort;
+} catch {
+  // By rank, then.
+}
 const TAB_ICONS = { guild: 'banner', seat: 'keep', expedition: 'tent', beast: 'beast', trials: 'trophy', requests: 'gift', exchange: 'swap', chest: 'coffer', stall: 'shop', war: 'swords' };
 const TAB_MOUNTS = {
   guild: mountGuild,
@@ -461,6 +483,38 @@ function mountGuild(container) {
       }
       return list.length > 0 ? h('div', { class: 'friend-actions' }, list) : null;
     };
+    // A member's Sława of this week under its name, as the Ranking
+    // członków's "Ten tydzień" counts it.
+    const fame = (member) => Object.hasOwn(member, 'weekFame') && h('span', { class: 'guild-member-fame', text: t('Sława w tym tygodniu: {points}', { points: formatNumber(member.weekFame) }) });
+    // The members in the order chosen, drawn anew in place, the list
+    // staying unfolded.
+    const memberList = h('ul', { class: 'friends-list' });
+    const drawMembers = () => {
+      const order = (MEMBER_SORTS.find((one) => one.id === memberSort) ?? MEMBER_SORTS[0]).by;
+      fill(
+        memberList,
+        // Last week's heroes wear their badges by the name (1198 A).
+        [...guild.members].sort(order).map((member) => h('li', { class: 'friend' }, who(member, rankBadge(member), heroBadges(member.heroes), fame(member)), actions(member))),
+      );
+    };
+    drawMembers();
+    const sorter =
+      guild.members.length > 1 &&
+      sortButtons({
+        orders: MEMBER_SORTS.map((one) => ({ id: one.id, label: t(one.label) })),
+        chosen: MEMBER_SORTS.some((one) => one.id === memberSort) ? memberSort : MEMBER_SORTS[0].id,
+        label: t('Kolejność członków'),
+        onPick: (id) => {
+          memberSort = id;
+          try {
+            localStorage.setItem(MEMBER_SORT_KEY, id);
+          } catch {
+            // Kept while the page is open.
+          }
+          sorter.querySelectorAll('.segmented-option').forEach((option, index) => option.setAttribute('aria-pressed', String(MEMBER_SORTS[index].id === id)));
+          drawMembers();
+        },
+      });
     return h(
       'section',
       { class: 'card', 'aria-labelledby': 'guild-title' },
@@ -474,12 +528,8 @@ function mountGuild(container) {
         'details',
         { class: 'guild-members' },
         h('summary', { class: 'guild-members-toggle', text: t('Członkowie ({count}/{size})', { count: guild.members.length, size: guild.size }) }),
-        h(
-          'ul',
-          { class: 'friends-list' },
-          // Last week's heroes wear their badges by the name (1198 A).
-          guild.members.map((member) => h('li', { class: 'friend' }, who(member, rankBadge(member), heroBadges(member.heroes)), actions(member))),
-        ),
+        sorter,
+        memberList,
         // The ranks R4-R1 and the Nowicjusz's days (1062).
         guild.ranksRule && h('p', { class: 'muted', text: guild.ranksRule }),
         // The rule of a leader away (the author, 14.11.2026).

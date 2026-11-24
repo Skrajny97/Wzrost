@@ -3916,6 +3916,20 @@ Gracz (poz. 63) przez autora: „fajne też jakby można było porównać przedm
 5. Po angielsku: „Without upgrades”. Karta sprawdzona na 320, 390 i 1366 px, po polsku i po angielsku, z długą nazwą przedmiotu i liczbami przedmiotów 500. poziomu.
 6. Pliki: `src/engine/preview.js`, `src/server/inventory.js`, `src/client/screens/character.js` (`itemCard`, `compareBare`), `src/client/styles.css`, `data/en/strings.json`, `README.md`. Test: `test/engine.test.js`.
 
+## Wersja 0.5.0 (24.11.2026): aktywność i Sława członków gildii w jednym miejscu
+
+Według sekcji niżej, bez makiet (linijka i rząd „Sortuj:” na istniejącej liście członków). Po 0.4.99 idzie 0.5.0, tak jak po 0.0.99 przyszło 0.1.0.
+
+## Członkowie gildii: aktywność i Sława w jednym miejscu (24.11.2026)
+
+Gracz (poz. 69), moderator gildii, przez autora: „Jeśli chodzi o aktywność to widać kiedy byli online i widać też pkt sławy każdego gracza jaki wkład ma, choć mogło by to być w jednym miejscu widoczne”. Lista członków na karcie gildii pokazywała, kiedy kto był ostatnio online, a Sławę, którą każdy wniósł do gildii, pokazywał tylko Ranking członków niżej na tej samej zakładce.
+
+1. Na liście członków (zakładka „Gildia”, rozwijane „Członkowie”) każdy członek ma pod imieniem, poziomem i „ostatnio online” wiersz „Sława w tym tygodniu: 1 234”. To ta sama liczba co w Rankingu członków w „Aktywność” i „Ten tydzień”: Sława, którą członek wniósł do gildii od poniedziałku od północy czasu polskiego, liczona z tych samych źródeł co Sława gildii. Członek bez Sławy ma 0. Brakujący szczegół: to wkład w Sławę gildii, a nie osobiste Punkty Sławy z zakładki „Sława” w Społeczności, bo gracz pisze o wkładzie.
+2. Nad listą stoi „Sortuj: Ranga | Ostatnio online | Sława”, jak inne sortowania w grze. „Ranga” to kolejność jak dotąd: lider, zastępcy, członkowie, nowicjusze, w każdej randze w kolejności dołączenia (brakujący szczegół: nowicjusz stoi teraz zawsze za członkami R2). „Ostatnio online” stawia najpierw tych, którzy są w grze, potem tych, którzy byli w niej najpóźniej, a na końcu tych, których gra jeszcze nie widziała. „Sława” stawia najpierw największą Sławę tygodnia. Przy równych wartościach zostaje kolejność rang. Wybór pamięta przeglądarka, a lista po zmianie sortowania zostaje rozwinięta.
+3. Serwer podaje Sławę razem z członkami, w tym samym zapytaniu co listę, bez osobnego zapytania na członka (`weekFameJoins` w `src/server/guild-members.js`, pole `weekFame` w `guildView` w `src/server/guilds.js`).
+4. Po angielsku: „Fame this week: 1,234” i „Sort: Rank | Last online | Fame”. Sprawdzone na 320, 360, 390, 430, 1366 i 1920 px z imionami po 20 znaków i Sławą w sześciu cyfrach, po polsku i po angielsku: bez przewijania na boki i bez tekstu poza ramką. Na 320 px „Ostatnio online” mieści się w przycisku w dwóch linijkach.
+5. Pliki: `src/server/guild-members.js`, `src/server/guilds.js`, `src/client/screens/guild.js`, `src/client/styles.css` (`.guild-member-fame`), `data/en/strings.json`. Test: `test/guild-members.test.js`.
+
 ## Wersja 0.4.98 (24.11.2026): przelosowanie zleceń i listów gończych, z encyklopedii do Rzemieślnictwa
 
 Według sekcji „Przelosowanie zleceń i listów gończych” i „Z encyklopedii do Rzemieślnictwa” (obie z 24.11.2026) niżej, bez makiet (kostka i przycisk na istniejących ekranach).

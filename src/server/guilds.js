@@ -30,6 +30,7 @@ import { joinGuildTrials } from './guild-trials.js';
 import { beastJoin } from './guild-beast.js';
 import { chronicle } from './guild-chronicle.js';
 import { badgeView, heroesOf } from './guild-heroes.js';
+import { weekFameJoins } from './guild-members.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 const rules = () => content().guilds;
@@ -106,14 +107,17 @@ export async function guildView(db, characterId, now) {
   // sie osobom które już w jakiejś są").
   if (guild) await db.prepare('DELETE FROM guild_invites WHERE character_id = ?').bind(characterId).run();
   const inviting = guild !== null && guild.role !== 'member';
+  // Each member's Sława of this week, with the members (guild-members.js).
+  const fame = weekFameJoins(guild?.id ?? 0, now, 'c.id');
   const [members, sent, invites, friends, best] = await db.batch([
     db
       .prepare(
-        `SELECT c.id, c.name, c.class_id, c.level, c.role AS played, c.cosmetics, c.appearance, m.role, m.probation_until, u.seen_at
+        `SELECT c.id, c.name, c.class_id, c.level, c.role AS played, c.cosmetics, c.appearance, m.role, m.probation_until, u.seen_at, ${fame.points} AS week_fame
          FROM guild_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id
+         ${fame.joins}
          WHERE m.guild_id = ? ORDER BY CASE m.role WHEN 'leader' THEN 0 WHEN 'deputy' THEN 1 ELSE 2 END, m.joined_at, m.character_id`,
       )
-      .bind(guild?.id ?? 0),
+      .bind(...fame.binds, guild?.id ?? 0),
     db.prepare('SELECT c.id, c.name FROM guild_invites i JOIN characters c ON c.id = i.character_id WHERE i.guild_id = ? ORDER BY i.created_at').bind(guild?.id ?? 0),
     db
       .prepare(
@@ -175,6 +179,11 @@ export async function guildView(db, characterId, now) {
         // „Przydałoby się widzieć kiedy ktoś się zalogował w gildii tak jak u
         // znajomych”): the account's seen_at, null for one never seen.
         lastSeen: row.seen_at ?? null,
+        // The Sława it brought the guild this week, as the Ranking
+        // członków's "Ten tydzień" counts it (a player, 24.11.2026: „widać
+        // kiedy byli online i widać też pkt sławy każdego gracza jaki wkład
+        // ma, choć mogło by to być w jednym miejscu widoczne”).
+        weekFame: row.week_fame,
         // Its badges of last week's heroes, each with its name and tip.
         heroes: (heroes.get(row.id) ?? []).map((kind) => badgeView(kind, row.appearance)),
       })),

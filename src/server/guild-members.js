@@ -156,6 +156,23 @@ export function memberFame(week, guildId = null) {
   ];
 }
 
+// SQL for the Sława each member brought the guild `guildId` in the week
+// around `now`, as "Ten tydzień" of "Aktywność" counts it, for the Gildia's
+// list of members (guilds.js; a player, 24.11.2026: „widać kiedy byli
+// online i widać też pkt sławy każdego gracza jaki wkład ma, choć mogło by
+// to być w jednym miejscu widoczne”): `joins`, a LEFT JOIN of each part
+// summed by character on the character `column` holds, and `points`, their
+// sum, 0 for none, with the joins' binds, so the members come with it in
+// one statement, no compound SELECT (D1 takes no more than 5 terms of one).
+export function weekFameJoins(guildId, now, column) {
+  const parts = memberFame(weeksAround(now).current, guildId);
+  return {
+    joins: parts.map(({ sql }, index) => `LEFT JOIN (SELECT character_id, SUM(points) AS points FROM (${sql}) GROUP BY character_id) fame${index} ON fame${index}.character_id = ${column}`).join('\n'),
+    points: parts.map((_, index) => `COALESCE(fame${index}.points, 0)`).join(' + '),
+    binds: parts.flatMap(({ binds }) => binds),
+  };
+}
+
 // The condition, with its binds, that a week's league of the wars has
 // ended, where the wars are on (a match still being fought would lose its
 // Sława).
