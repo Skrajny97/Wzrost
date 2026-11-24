@@ -333,6 +333,13 @@ export const SPRITES = {
       'snake-maiden-comb', 'dead-water-vial', 'stick-twig', 'simargl-feather', 'blood-knot', 'smith-hammer', 'shackle-link', 'steward-goblet', 'turon-clapper', 'veles-staff', 'mammoth-tusk', 'pseudoscorpion-venom',
       'silence-stone', 'sledge-runner', 'snow-flea-spring', 'oblivion-flower', 'eternal-ice', 'mayfly-wing', 'longing-tear', 'dread-mask', 'tail-knot', 'black-wick', 'ice-eggshell', 'bayun-whisker',
       'ice-diadem', 'marzanna-braid', 'koschei-needle',
+      // Drzewo Świata (351–425), as the author chose them (1244).
+      'horseshoe-crab-shell', 'starfish-arm', 'ray-fin', 'shark-tooth', 'pufferfish-spine', 'swordfish-bill', 'sea-cucumber-skin', 'anglerfish-lure', 'lions-mane-threads', 'walrus-tusk',
+      'haemorrhage-clot', 'charm-thread', 'acorn-shell', 'weevil-snout', 'gall-ink', 'ninth-wave-foam', 'octopus-sucker', 'processionary-hairs', 'tarsier-fur', 'scorpionfly-tail',
+      'fungus-sap', 'shrew-tooth', 'snakefly-wing', 'honeycomb', 'waxworm-cocoon', 'mead', 'jewel-elytron', 'gecko-foot', 'sunray-amber', 'capricorn-antenna',
+      'olm-skin', 'glowing-mycelium', 'pangolin-scale', 'heartwood-resin', 'sloth-moss', 'aphid-honeydew', 'signpost-board', 'ice-spike', 'carpet-tassel', 'thunderstone',
+      'cricket-wing', 'chameleon-scale', 'world-tree-leaf', 'nightcap', 'glowworm-light', 'halo-ring', 'shield-bug-plate', 'ladybird-elytron', 'comet-shard', 'lightning-spark',
+      'golden-mask-shard',
     ],
   },
   // The skills of the classes (data/skills.json), 48×48.
