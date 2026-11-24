@@ -232,18 +232,19 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
   // combatant.js and companions.js are not checked yet: their options are
   // typed by their defaults alone (hp, area).
   const player = playerCombatant(/** @type {any} */ ({ character: weekFighter(character, week), equipped, name, area }), content);
-  // In the Wieże a form may call its summons with a share of their HP
-  // (evolutions.json towerSummonHp; combat.js): the Pradruid's (1249 B, the
-  // author 24.11.2026), whose four summons took every blow meant for it,
-  // so that alone it climbed some 150 floors above the other fourth forms.
-  // Its own form's, whoever fights: the character, a partner or a companion.
+  // In the Wieże a form's summons may root their foes by a share of what
+  // they do elsewhere (evolutions.json towerSummonRoot; combat.js): the
+  // Pradruid's (1249 B, the author 24.11.2026), whose two oaks' roots held
+  // every foe back so that it hardly ever struck, and alone it climbed some
+  // 150 floors above the other fourth forms. Its own form's, whoever
+  // fights: the character, a partner or a companion.
   /**
    * @param {Record<string, any>} unit
    * @param {string | null | undefined} formId
    */
   const inTower = (unit, formId) => {
-    const share = formId ? content.evolutionsById?.[formId]?.towerSummonHp : undefined;
-    return share ? { ...unit, summonHpScale: share } : unit;
+    const share = formId ? content.evolutionsById?.[formId]?.towerSummonRoot : undefined;
+    return share === undefined ? unit : { ...unit, summonRootScale: share };
   };
   const allies = [
     inTower({ ...player, ...(Object.keys(trophies).length > 0 && { trophies }) }, character.evolution),

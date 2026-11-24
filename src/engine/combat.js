@@ -1899,9 +1899,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         // only with room for the whole pack (above).
         const members = p.pack ? p.pack.map((/** @type {Record<string, any>} */ one) => ({ ...p, ...one })) : [p];
         const called = members.map((/** @type {Record<string, any>} */ m, /** @type {number} */ index) => {
-          // In the Wieże the Pradruid calls them with a share of that HP
-          // (1249 B: evolutions.json towerSummonHp; towerFight in towers.js).
-          const hp = Math.max(1, Math.round((pool * m.hp * (1 + (grove?.summonHp ?? 0) + wise) + life) * (actor.summonHpScale ?? 1)));
+          const hp = Math.max(1, Math.round(pool * m.hp * (1 + (grove?.summonHp ?? 0) + wise) + life));
           const name = m.summonName;
           const order = p.pack ? index + 1 : 0;
           const summon = {
@@ -1920,7 +1918,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
             burst: Boolean(m.burst),
             physical: Boolean(m.physical),
             ...(m.howl && { howl: m.howl }),
-            ...(m.root && { root: m.root }),
+            // In the Wieże the Pradruid's roots slow by a share of that
+            // (1249 B: evolutions.json towerSummonRoot; towerFight in towers.js).
+            ...(m.root && { root: m.root * (actor.summonRootScale ?? 1) }),
             // The fourth forms' summons: the bear strikes the foe in front and
             // may stun it, the Dąb wieków heals the party every move.
             ...(m.front && { front: true, stunChance: m.stunChance, stunLabel: m.stunLabel }),
