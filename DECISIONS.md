@@ -3858,6 +3858,10 @@ Autor wybrał na stronie ocen 1233 B: z Krainy bez Słońca droga postaci wychod
 5. **Stwory i World Bossy (1240–1241).** Autor (24.11.2026, przez koordynatora): bez tekstowej listy do zatwierdzenia, od razu grafiki w PixelLab na stronę ocen, przy każdym stworze przegląd powtórek. 51 stworów (po 3 na miejsce, elita i czempion każdej krainy) i 3 bossów World Bossa dla przedziałów 351–375, 376–400 i 401–425 sprawdzonych z 258 stworami gry, przeciwnikami ze zdarzeń, przywołańcami, 14 bossami World Bossa, chowańcami i wierzchowcami, także pod inną nazwą: bez ani jednego ptaka i bez prawie tych samych zwierząt (np. bez kolejnego węża, żaby, wiewiórki, ćmy, kraba obok raka czy żywego dębu obok przywołańców). Lista i grafiki są na stronie ocen; po ocenie autora trafią tutaj z liczbami.
 6. **Pliki:** `data/regions.json`, `data/en/regions.json`, `data/en/glossary.json`, `data/en/scope.json`, `data/en/sources.json`, `data/schemas/regions.schema.json`, `src/engine/content.js`, `src/engine/combat.js`, `src/engine/combatant.js`, `src/engine/hunt.js` (`restedMana`), `src/engine/events.js`, `src/engine/threat.js`, `tools/validate-data.mjs`; testy w `test/world-tree.test.js` i `test/client.test.js`.
 
+## Wersja 0.5.17 (24.11.2026): Drzewo Świata
+
+Zob. sekcje niżej i „Drzewo Świata: krainy 351–425, najpierw bez stworów”: trzy krainy 351–425 (Wyspa Bujan, Wielki Pień, Podniebne Konary) z 51 stworami, materiałami, ikonami i okrzykami wybranymi przez autora (1240–1242, 1244), trzy Postrachy Krainy, wzory Tierów XI i XII (1246 A) i obrażenia Postrachu od 226. poziomu zmierzone na nowo ze sprzętem Tierów XI i XII.
+
 ## Drzewo Świata: stwory, liczby i Postrach Krainy (1240–1242, 24.11.2026)
 
 Autor ocenił na stronie ocen grafiki Drzewa Świata (1240–1242) i w każdej pozycji przyjął jedną wersję. Trzy krainy weszły do danych ze stworami, a znacznik `soon` zniknął z nich (zostaje dla następnych krain, zob. punkt 2 sekcji wyżej). Potem autor ocenił okrzyki stworów i ikony materiałów (1244, punkt 14), więc Drzewo Świata jest gotowe do wdrożenia razem z wzorami Tierów XI i XII (punkt 17).
