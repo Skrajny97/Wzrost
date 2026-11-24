@@ -25,6 +25,7 @@ import {
   jewelMinutes,
   jewelOrderMinutes,
   jewelPatternFrom,
+  jewelPatternLevel,
   jewelReport,
   knownGems,
   knownJewelPatterns,
@@ -195,7 +196,7 @@ describe('Górnictwo in the engine', () => {
     );
   });
 
-  test('the Encyklopedia: every jewel stands in the Tier its Szlifiernia pattern opens at, and says so', () => {
+  test('the Encyklopedia: every jewel stands in the Tier its Szlifiernia pattern opens at, and says so; those of Tiers XI and XII in their own, open at the profession\'s last level (1246 A)', () => {
     const { items } = encyclopediaView({ discovered: {}, claimed: [], met: [] }, content);
     const tierOf = new Map(items.tiers.flatMap((tier) => tier.entries.map((entry) => [entry.id, tier])));
     const rows = jewelBases(content).map((base) => {
@@ -214,6 +215,8 @@ describe('Górnictwo in the engine', () => {
       ['Ryngraf', 'Tier VIII', 'Dodatki', 'Szlifiernia: wzór od 150. poziomu Jubilerstwa.'],
       ['Naszyjnik Juraty', 'Tier IX', 'Dodatki', 'Szlifiernia: wzór od 175. poziomu Jubilerstwa.'],
       ['Naszyjnik Rzepichy', 'Tier X', 'Dodatki', 'Szlifiernia: wzór od 200. poziomu Jubilerstwa.'],
+      ['Naszyjnik Syrenki', 'Tier XI', 'Dodatki', 'Szlifiernia: wzór od 200. poziomu Jubilerstwa.'],
+      ['Naszyjnik Dzidzileli', 'Tier XII', 'Dodatki', 'Szlifiernia: wzór od 200. poziomu Jubilerstwa.'],
       ['Pierścień', 'Tier I', 'Dodatki', 'Szlifiernia: wzór od 1. poziomu Jubilerstwa.'],
       ['Sygnet', 'Tier II', 'Dodatki', 'Szlifiernia: wzór od 10. poziomu Jubilerstwa.'],
       ['Obrączka', 'Tier III', 'Dodatki', 'Szlifiernia: wzór od 25. poziomu Jubilerstwa.'],
@@ -224,6 +227,8 @@ describe('Górnictwo in the engine', () => {
       ['Pierścień Salomona', 'Tier VIII', 'Dodatki', 'Szlifiernia: wzór od 150. poziomu Jubilerstwa.'],
       ['Pierścień Kingi', 'Tier IX', 'Dodatki', 'Szlifiernia: wzór od 175. poziomu Jubilerstwa.'],
       ['Pierścień Bony', 'Tier X', 'Dodatki', 'Szlifiernia: wzór od 200. poziomu Jubilerstwa.'],
+      ['Pierścień Barbary', 'Tier XI', 'Dodatki', 'Szlifiernia: wzór od 200. poziomu Jubilerstwa.'],
+      ['Pierścień Króla Węży', 'Tier XII', 'Dodatki', 'Szlifiernia: wzór od 200. poziomu Jubilerstwa.'],
       ['Talizman', 'Tier I', 'Dodatki', 'Szlifiernia: wzór od 1. poziomu Jubilerstwa.'],
       ['Otoczak', 'Tier II', 'Dodatki', 'Szlifiernia: wzór od 10. poziomu Jubilerstwa.'],
       ['Kieł', 'Tier III', 'Dodatki', 'Szlifiernia: wzór od 25. poziomu Jubilerstwa.'],
@@ -234,12 +239,15 @@ describe('Górnictwo in the engine', () => {
       ['Kamień Alatyr', 'Tier VIII', 'Dodatki', 'Szlifiernia: wzór od 150. poziomu Jubilerstwa.'],
       ['Złoty róg', 'Tier IX', 'Dodatki', 'Szlifiernia: wzór od 175. poziomu Jubilerstwa.'],
       ['Złota kaczka', 'Tier X', 'Dodatki', 'Szlifiernia: wzór od 200. poziomu Jubilerstwa.'],
+      ['Złote jabłko', 'Tier XI', 'Dodatki', 'Szlifiernia: wzór od 200. poziomu Jubilerstwa.'],
+      ['Piorunowa strzałka', 'Tier XII', 'Dodatki', 'Szlifiernia: wzór od 200. poziomu Jubilerstwa.'],
     ]);
-    // The jewels of Tiers XI and XII stand in their Tiers, without a pattern
-    // of the Szlifiernia until their lands come.
+    // The jewels of Tiers XI and XII stand in their Tiers, with a pattern of
+    // the Szlifiernia at the profession's last level since the World Tree's
+    // lands came (1246 A).
     for (const [id, tier] of [['syrenka-necklace', 'Tier XI'], ['barbara-ring', 'Tier XI'], ['golden-apple', 'Tier XI'], ['dzidzilela-necklace', 'Tier XII'], ['snake-king-ring', 'Tier XII'], ['thunderstone', 'Tier XII']]) {
       assert.equal(tierOf.get(id).name, tier, id);
-      assert.ok(!tierOf.get(id).entries.find((entry) => entry.id === id).sources.some((line) => line.startsWith('Szlifiernia')), id);
+      assert.ok(tierOf.get(id).entries.find((entry) => entry.id === id).sources.includes('Szlifiernia: wzór od 200. poziomu Jubilerstwa.'), id);
     }
     // A jewel's card names the same Tier, and no Warsztat base says Szlifiernia.
     for (const base of jewelBases(content)) {
@@ -288,7 +296,7 @@ describe('Górnictwo in the engine', () => {
 });
 
 describe('Jubilerstwo in the engine', () => {
-  test('rings, amulets and talismans, the first of each family at once and the later ones from 10, 25, 50, 75, 100, 125, 150, 175 and 200; the Warsztat makes none of them', () => {
+  test('rings, amulets and talismans, the first of each family at once and the later ones from 10, 25, 50, 75, 100, 125, 150, 175 and 200 (Tiers X, XI and XII); the Warsztat makes none of them', () => {
     assert.deepEqual(knownJewelPatterns(1, [], content).map((base) => base.id), ['amulet', 'ring', 'talisman']);
     assert.equal(knownJewelPatterns(10, [], content).length, 6);
     assert.ok(knownJewelPatterns(25, [], content).some((base) => base.id === 'band-ring'));
@@ -335,17 +343,30 @@ describe('Jubilerstwo in the engine', () => {
     assert.deepEqual([at175.length, ['jurata-necklace', 'kinga-ring', 'golden-horn'].every((id) => at175.includes(id))], [27, true]);
     // Tier X (1086) at the 200th since Nawia's lands came (1086.0 A: until
     // the lands from level 276 its jewels only dropped), or earlier when
-    // taken apart.
+    // taken apart; Tiers XI and XII open there too (below), 3 each.
     assert.equal(knownJewelPatterns(199, [], content).length, 27);
     const at200 = knownJewelPatterns(200, [], content).map((base) => base.id);
-    assert.deepEqual([at200.length, ['rzepicha-necklace', 'bona-ring', 'golden-duck'].every((id) => at200.includes(id))], [30, true]);
+    assert.deepEqual([at200.length, ['rzepicha-necklace', 'bona-ring', 'golden-duck'].every((id) => at200.includes(id))], [30 + 2 * 3, true]);
     assert.ok(knownJewelPatterns(199, ['rzepicha-necklace'], content).some((base) => base.id === 'rzepicha-necklace'));
     assert.equal(jewelPatternFrom({ base: 'rzepicha-necklace' }, [], content), 'rzepicha-necklace');
-    // Tiers XI and XII (DECISIONS.md, „Tiery XI i XII przedmiotów”): their
-    // jewels only drop until their lands come, as Tier X's did before Nawia's.
-    assert.equal(knownJewelPatterns(200, ['syrenka-necklace', 'thunderstone'], content).length, 30);
-    assert.equal(jewelPatternFrom({ base: 'barbara-ring' }, [], content), null);
-    assert.equal(jewelPatternFrom({ base: 'snake-king-ring' }, [], content), null);
+    // Tiers XI and XII (DECISIONS.md, „Tiery XI i XII przedmiotów”, 1246 A)
+    // since the World Tree's lands came: of class levels 225 and 250, past
+    // the profession's last level, so they open at that last level, the
+    // 200th, with Tier X, or earlier when taken apart.
+    const last = content.professionsById[content.jewelcrafting.profession].maxLevel;
+    assert.deepEqual([jewelPatternLevel(content.basesById['barbara-ring'], content), jewelPatternLevel(content.basesById['thunderstone'], content)], [last, last]);
+    const atLast = knownJewelPatterns(last, [], content).map((base) => base.id);
+    assert.deepEqual([atLast.length, ['syrenka-necklace', 'barbara-ring', 'golden-apple', 'dzidzilela-necklace', 'snake-king-ring', 'thunderstone'].every((id) => atLast.includes(id))], [36, true]);
+    for (const id of ['barbara-ring', 'snake-king-ring']) {
+      assert.equal(jewelPatternFrom({ base: id }, [], content), id);
+      assert.equal(jewelPatternFrom({ base: id }, [id], content), null);
+      assert.ok(knownJewelPatterns(60, [id], content).some((base) => base.id === id), id);
+      // A jewel of each, for the ore of its rarity as any other.
+      assert.deepEqual(jewelCost(content.basesById[id], 'rare', 2, content), jewelCost(content.basesById['bona-ring'], 'rare', 2, content));
+      const [result] = craftJewels({ baseId: id, rarityId: 'common', count: 1, level: 360, professionLevel: 200, seed: `tier:${id}` }, content);
+      assert.ok(result.made, id);
+      assert.deepEqual([result.item.base, result.item.level], [id, 360]);
+    }
     const seventh = jewelReport({ ...reportOf, before: { level: 124, xp: 0 }, after: { level: 125, xp: 0 } }, content);
     assert.deepEqual(seventh.revealed, ['pectoral', 'ancestors-ring', 'grzywna']);
     assert.ok(seventh.system.includes('Osiągnięto poziom Jubilerstwa: 125'), seventh.system.join(' | '));

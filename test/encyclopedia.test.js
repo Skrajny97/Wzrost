@@ -315,7 +315,7 @@ describe('the Encyklopedia in the engine', () => {
   // Tier IX for Łysogóry and Tier X for Nawia; from class levels 225 and 250.
   // Until their lands come they only drop, as Tier X did before Nawia's
   // (1086.0 A): no pattern of the Warsztat or the Szlifiernia.
-  test('Tiers XI and XII: their items from class levels 225 and 250 with a set for every class and the accessories, their chests, no patterns yet, and the materials of the creatures above level 350', () => {
+  test('Tiers XI and XII: their items from class levels 225 and 250 with a set for every class and the accessories, their chests, their patterns at the professions\' last level since the World Tree\'s lands (1246 A), and the materials of the creatures above levels 350 and 425', () => {
     const levels = { level: 360, classLevel: 250, professions: {} };
     const view = encyclopediaView({ discovered: {}, claimed: [], met: [], levels }, content);
     const [eleventh, twelfth] = view.items.tiers.slice(-2);
@@ -351,24 +351,31 @@ describe('the Encyklopedia in the engine', () => {
     const found = Object.fromEntries(warrior.bases.map((id) => [`item:${id}`, 1]));
     assert.deepEqual(encyclopediaChest('items:12:warrior', found, [], content).chest, { gold: 1525908, timePoints: 120, systemPoints: 100 });
     // From Kamienny Tron (221–225), the last place of Gołoborza, and from
-    // Zaklęty Dwór (246–250), the last of Jodłowa Puszcza; no pattern line.
+    // Zaklęty Dwór (246–250), the last of Jodłowa Puszcza; their patterns at
+    // the professions' last level, the 200th (1246 A).
     assert.deepEqual(eleventh.entries.find((entry) => entry.id === 'rugievit-sword').sources, [
       'Wyprawy: wypada od regionu Kamienny Tron (poz. 221–225).',
       'Dla klas: Wojownik, Wielki Inkwizytor, Pogromca Demonów, Mściciel Niebios.',
       'Założysz od 225. poziomu klasy.',
+      'Warsztat: wzór od 200. poziomu Rzemiosła.',
     ]);
     assert.deepEqual(twelfth.entries.find((entry) => entry.id === 'thunderstone').sources, [
       'Wyprawy: wypada od regionu Zaklęty Dwór (poz. 246–250).',
       'Dla każdej klasy.',
       'Założysz od 250. poziomu klasy.',
+      'Szlifiernia: wzór od 200. poziomu Jubilerstwa.',
     ]);
-    assert.ok([...eleventh.entries, ...twelfth.entries].every((entry) => !entry.craft && !entry.sources.some((line) => /^(Warsztat|Szlifiernia)/.test(line))));
-    // The materials of creatures above level 350, the champions and elites of
-    // Nawia's last place, in Tier XI, as Tier X took the Łysogóry's above 275.
-    const eleventhMaterials = view.materials.tiers.find((tier) => tier.name === 'Tier XI');
-    assert.deepEqual([eleventhMaterials.range, eleventhMaterials.current], ['poziomy 351–425', true]);
-    assert.ok(eleventhMaterials.entries.length > 0 && eleventhMaterials.entries.every((entry) => entry.id !== 'hut-claw'));
-    assert.equal(view.materials.tiers.at(-1).name, 'Tier XI');
+    assert.ok([...eleventh.entries, ...twelfth.entries].every((entry) => entry.craft && entry.sources.some((line) => /^(Warsztat|Szlifiernia): wzór od 200\. poziomu /.test(line))));
+    // The materials of creatures above level 350 in Tier XI: the creatures,
+    // elite and champion of Nawia's last place, as Tier X took the Łysogóry's
+    // above 275, and the World Tree's; above 425 in Tier XII: the creatures of
+    // the World Tree's last place, Najwyższa Gałąź, its elite and champion.
+    const [eleventhMaterials, twelfthMaterials] = view.materials.tiers.slice(-2);
+    assert.deepEqual([eleventhMaterials.name, eleventhMaterials.range, eleventhMaterials.current], ['Tier XI', 'poziomy 351–425', true]);
+    assert.ok(['koschei-needle', 'horseshoe-crab-shell', 'heartwood-resin', 'halo-ring'].every((id) => eleventhMaterials.entries.some((entry) => entry.id === id)));
+    assert.ok(eleventhMaterials.entries.every((entry) => entry.id !== 'hut-claw'));
+    assert.deepEqual([twelfthMaterials.name, twelfthMaterials.range, twelfthMaterials.current], ['Tier XII', 'poziomy 426–500', false]);
+    assert.deepEqual(twelfthMaterials.entries.map((entry) => entry.id), ['shield-bug-plate', 'ladybird-elytron', 'comet-shard', 'lightning-spark', 'golden-mask-shard']);
   });
 
   test('a full set opens the chest of its tier, a count of discoveries its own chest in turn, each once', () => {
