@@ -3956,6 +3956,24 @@ Raport wyprawy wymieniał w linijkach Systemu premię tygodnia, wróżby z Andrz
 - Sprawdzone w przeglądarce na 320 px i 1366 px: raport członka gildii z linijką budynków, a potem wszystkie cztery nowe linijki naraz w panelu Systemu, bez przewijania na boki i bez błędów strony.
 - Pliki: `src/engine/guild-seat.js` (`seatLine`), `src/engine/guild-lands.js` (`bannerLine`), `src/engine/hunt.js` (wyprawa zapamiętuje premie Siedziby, sztandar, rodzaj błogosławieństwa i premię Bractwa; `huntReport`), `data/guilds.json`, `data/texts.json`, angielskie w `data/en/`, schemat `data/schemas/guilds.schema.json`. Testy w `test/guild-seat.test.js`: linijka po polsku i po angielsku, tylko z premiami, które zmieniły wynik, trzy pozostałe linijki i raport członka gildii przez API.
 
+## Zioła w osobnej zakładce plecaka (24.11.2026)
+
+Gracz (poz. 63) przez autora: „rośliny na alchemie też powinny byc w innych zakładkach niż przedmioty”.
+
+1. **Zakładka „Zioła”** stoi w Plecaku po „Częściach”: Przedmioty, Materiały, Części, Zioła, Minerały, Spiżarnia. Ma liczbę ziół jak inne zakładki („Zioła (1234)”). Widać ją, gdy postać ma zioła albo gdy są otwarte Zielarstwo i Alchemia (razem z zakładką Profesje, od 10. poziomu postaci), tak jak Minerały z Górnictwem i Spiżarnię z Rybołówstwem, Rolnictwem i Gotowaniem. Bez ziół mówi: „Nie masz jeszcze ziół. Zbierzesz je w Zielarstwie.” Wybrana zakładka zostaje, póki strona jest otwarta, jak pozostałe.
+2. **Przedmioty** nie pokazują już ziół, a mikstury zostają tam, gdzie były. Gdy w plecaku są same zioła, Przedmioty mówią „Nie masz przedmiotów. Łupy z wypraw trafiają tutaj.” zamiast „Plecak jest pusty…”.
+3. **Miejsce w plecaku bez zmian:** zioła dalej zajmują miejsca, po 20 sztuk na jedno, a licznik plecaka liczy je jak dotąd. Mówi o tym linijka nad nimi: „Zioła zajmują miejsce w plecaku, po 20 szt. na jedno miejsce.”
+4. **Dalej działa:** karta zioła ze sprzedażą złomiarzowi i wyrzucaniem, teraz z zakładki Zioła, oraz „Zaznacz do sprzedaży” (same przedmioty, jak wcześniej), sprawdzone w przeglądarce, tak jak zioła w „Towarach” Skrzyni Konta i w przepisach Alchemii; Targowisko wystawia zioła (sprawdzone przez API). Wymiana, oferty na czacie, Targowisko, Skrzynia Konta i Warzenie biorą zioła z danych postaci, a nie z zakładki plecaka, więc zmiana ich nie dotyka.
+5. **Sześć zakładek** stoi w dwóch równych rzędach po trzy, na każdej szerokości: na komputerze plecak ma wąską kolumnę obok postaci i sześć w jednym rzędzie się nie mieści. Cztery i pięć zakładek bez zmian.
+6. **Spiżarnia: potrawy osobno.** Ten sam gracz (poz. 63) przez autora: „Fajnie jakby składniki na potrawy i same potrawy były w osobnych kategoriach”, „często się mieszają”. Zakładka Spiżarnia ma dwie grupy z małymi nagłówkami: najpierw „Potrawy”, bo to je zjadasz prosto z plecaka, potem „Składniki” (ryby i plony). Każda grupa w dotychczasowej kolejności, a pusta się nie pokazuje. Jedzenie, sprzedaż karczmarzowi, Wymiana, Targowisko i Skrzynia Konta bez zmian.
+7. **Posiłek: ostrzeżenie już na karcie potrawy.** Gracz (poz. 65) zjadł z plecaka Pieczoną rzepę, potem Grochówkę i stracił premię rzepy: „nie ma tej informacji przed zjedzeniem”. Autor: „za każdym razem powinno mówić że poprzedni idzie out”.
+   - Sprawdzone: „Zjedz” na karcie potrawy w Spiżarni od 0.4.75 pyta okienkiem „Zmienić posiłek?” (te same słowa co w „Opcjach wyprawy”), zanim inna potrawa zastąpi działający posiłek, a serwer odmawia zastąpienia, którego strona nie pokazała (`replaces` i `mealReplaces`, testy w `test/cooking.test.js`). Inna droga to tylko „Opcje wyprawy” („Wyrusz”, Szybkie i Błyskawiczne polowanie, wyprawa Drużyny), z tym samym pytaniem; członkowie Drużyny przy wyruszeniu nic nie jedzą. Żadna droga nie zjada potrawy bez pytania.
+   - Nowe: karta innej potrawy mówi to już przed „Zjedz”, czerwonawą linijką pod posiłkiem, który da: „Po zjedzeniu obecny posiłek (Pieczona rzepa) przestanie działać, choć zostało mu 4 h wypraw, a jego premia przepadnie.” Pytanie po stuknięciu zostaje. Słowa w danych (`cooking.texts.swapNote`), po angielsku: „Once you eat it, the current meal (…) will stop working with … of explorations left, and its bonus will be lost.”
+   - Ta sama potrawa dalej dokłada porcje bez ostrzeżenia, bo nic nie przepada: karta pokazuje posiłek, który wyjdzie („Posiłek: Pieczona rzepa ×2, +30% materiałów ze stworów, przez 4 godziny wypraw.”), a po zjedzeniu to samo mówi komunikat.
+8. **Po angielsku:** „Herbs ({count})”, „You have no herbs yet. You will gather them in Herbalism.”, „Herbs take room in the bag, {stack} to a slot.”, „You have no items. Loot from explorations lands here.”, „Dishes”, „Ingredients” (`data/en/strings.json`).
+9. **Sprawdzone** na 320, 360, 390, 430, 768, 1366 i 1920 px, po polsku i po angielsku, z ziołami (1234), minerałami (3,4 mln), Spiżarnią (5162), materiałami i częściami naraz, a także z czterema zakładkami (postać na 20. poziomie z ziołami, bez minerałów i Spiżarni): bez przewijania na boki i bez tekstu poza ramkami. `tools/layout-check.cjs` daje teraz postaci zioła i Spiżarnię w tysiącach (z Magazynem na 10. poziomie, żeby zioła zmieściły się w plecaku) i otwiera zakładki Zioła i Spiżarnia.
+10. **Pliki:** `src/client/screens/character.js` (`bagSection`, `herbsGrid`, `itemsGrid`, `pantryGrid`, `mealPart`), `src/client/meal.js` (`mealSwapNote`), `src/client/styles.css` (`.bag-tabs--six`, `.bag-group-title`, `.meal-swap-note`), `src/server/professions-view.js` (`mealView`), `data/professions.json`, `data/en/professions.json`, `data/en/sources.json`, `data/en/strings.json`, `tools/layout-check.cjs`, `test/cooking.test.js`.
+
 ## Wersja 0.4.92 (22.11.2026): przycisk Wiki w Ustawieniach
 
 Według sekcji niżej.
@@ -3970,9 +3988,9 @@ Autor: „Podepnij Wiki społecznościową jako przycisk pod grę” z linkiem d
 4. **Słowa:** „Zajrzyj do wiki tworzonej przez graczy”, po angielsku „Browse the players' wiki (in Polish)”, bo wiki jest po polsku.
 5. **Sprawdzone** w przeglądarce: telefon 320 px i 360 px po angielsku, komputer 1366 px; tekst mieści się w przycisku, bez przewijania na boki.
 
-## Wersja 0.4.96 (24.11.2026): ranking z nazwami i filtrem klas
+## Wersja 0.4.96 (24.11.2026): ranking z nazwami i filtrem klas, zakładka Zioła, Spiżarnia i ostrzeżenie o posiłku
 
-Według sekcji niżej, bez makiet (autor: „Wdrażaj od razu, szkoda Twoich zasobów na makiety”; lista klas wygląda jak przyjęta lista profesji z 975 B).
+Według sekcji niżej i sekcji „Zioła w osobnej zakładce plecaka (24.11.2026)” wyżej, bez makiet (autor: „Wdrażaj od razu, szkoda Twoich zasobów na makiety”; lista klas wygląda jak przyjęta lista profesji z 975 B).
 
 ## Ranking: nazwa gracza zawsze widoczna (24.11.2026)
 

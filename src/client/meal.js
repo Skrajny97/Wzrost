@@ -1,7 +1,9 @@
 // The meal (cooking.js): another dish in place of the meal at work, asked
 // first in the game's own words (`meal.swap`, professions-view.js), as the
 // meal at work ends with its bonus lost (hunts.js, mealEaten): on the Walka
-// screen's "Opcje wyprawy" and on a dish's card in the Spiżarnia.
+// screen's "Opcje wyprawy" and on a dish's card in the Spiżarnia, whose
+// card says it before "Zjedz" too (the author, 24.11.2026: „za każdym
+// razem powinno mówić że poprzedni idzie out”).
 
 import { formatMinutes } from './format.js';
 import { confirmAction } from './ui.js';
@@ -17,3 +19,7 @@ export const askMealSwap = (current, dish) =>
     text: filled(current.swap.text, { dish: dish.name, current: current.name, time: formatMinutes(current.left) }),
     confirmLabel: current.swap.eat,
   });
+
+// The line on another dish's card while a meal is at work (`current`): it
+// ends once the dish is eaten, with the time it had left.
+export const mealSwapNote = (current) => filled(current.swap.note, { current: current.name, time: formatMinutes(current.left) });

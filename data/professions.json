@@ -574,6 +574,7 @@
       "swapTitle": ["Zmienić posiłek?"],
       "swapText": ["Postać zje: {dish}. Obecny posiłek ({current}) przestanie działać, choć zostało mu {time} wypraw, a jego premia przepadnie."],
       "swapEat": ["Zjedz"],
+      "swapNote": ["Po zjedzeniu obecny posiłek ({current}) przestanie działać, choć zostało mu {time} wypraw, a jego premia przepadnie."],
       "noDish": ["Nie masz tej potrawy w Spiżarni."]
     }
   },

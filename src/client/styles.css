@@ -416,12 +416,13 @@ button {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-/* With Górnictwo's minerals, four tabs: two rows of two. */
+/* With one more, the herbs, Górnictwo's minerals or the Spiżarnia, four
+   tabs: two rows of two. */
 .bag-tabs--four {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-/* With the Spiżarnia too, five tabs: three over two, and in one row only
+/* With two of them, five tabs: three over two, and in one row only
    where the bag itself is 560 px wide or more (1057). By the bag's width,
    not the screen's: on a computer and a tablet the bag stands in a narrow
    column beside the character, where five in a row cut "Przedmioty" (the
@@ -463,6 +464,21 @@ button {
 }
 
 .bag-tabs--four .segmented-option:nth-child(n + 3) {
+  border-top: 1px solid var(--system-line);
+}
+
+/* With all three (the herbs' own tab, 24.11.2026), six tabs: two even rows
+   of three at any width, as the bag's column on a computer has no room
+   for six in one row with their counts. */
+.bag-tabs--six {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.bag-tabs--six .segmented-option:nth-child(4) {
+  border-left: 0;
+}
+
+.bag-tabs--six .segmented-option:nth-child(n + 4) {
   border-top: 1px solid var(--system-line);
 }
 
@@ -2448,6 +2464,12 @@ a.segmented-option {
   margin: 0;
   color: var(--text-muted);
   font-size: 13px;
+}
+
+/* The Spiżarnia's groups, Potrawy over Składniki (24.11.2026). */
+.bag-group-title {
+  margin: 4px 0 0;
+  font-size: 16px;
 }
 
 /* Items */
@@ -10242,6 +10264,12 @@ a.profession-square:active {
 /* A dish's meal and its bonus (1059), in the gold of the bonuses. */
 .cook-bonus {
   color: var(--gold);
+}
+
+/* On another dish's card while a meal is at work: the meal at work ends
+   once it is eaten (24.11.2026). */
+.meal-swap-note {
+  color: var(--danger);
 }
 
 /* A cooking's chip, in the red of a hearth's embers. */

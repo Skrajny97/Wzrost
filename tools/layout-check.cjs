@@ -16,7 +16,9 @@
 // with too much typed), and above it in the Ranking postaci and the Punkty
 // Sławy a member of its guild with all a row can hold (the longest name and
 // title, the moderator's mark, the guild's tag). The bag
-// is checked in "Zaznacz do sprzedaży" too, with an item marked. On each screen,
+// is checked with its six tabs, on its Zioła and Spiżarnia (herbs, dishes,
+// fish and crops by the thousand), and in "Zaznacz do sprzedaży" too, with
+// an item marked. On each screen,
 // on the tabs TABS opens and in the sheets SHEETS opens over a screen (the
 // Ustawienia and "Zgłoś błąd", with a screenshot picked too), it looks for a
 // page wider than the screen (a sheet that scrolls sideways), text out of
@@ -217,7 +219,11 @@ const TABS = {
   // "Zaznacz do sprzedaży" with an item marked and the bar at the bottom
   // (19.11.2026; their words in data/buildings.json).
   '#/oboz/anvil': [{ name: 'Sortuj › Ulepszenie', tap: '.anvil-items .bag-sort .segmented-option:nth-child(5)' }],
+  // The bag's Zioła and Spiżarnia tabs (24.11.2026), then "Zaznacz do
+  // sprzedaży".
   '#/postac': [
+    said('Zioła'),
+    said('Spiżarnia'),
     { name: 'Zaznacz do sprzedaży', tap: '[data-guide="bag-pick"]' },
     { name: 'Zaznacz do sprzedaży › zaznaczony', tap: '.bag--sale .salvage-pick:not(.salvage-pick--favorite)' },
   ],
@@ -567,6 +573,14 @@ async function main() {
   sql(`INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, '${longest}', 1 FROM characters WHERE name = '${name}'`);
   const gems = { quartz: 123456, agate: 234567, amethyst: 345678, emerald: 456789, sapphire: 567890, ruby: 678901, diamond: 987654 };
   sql(`UPDATE characters SET minerals = '${JSON.stringify(gems)}', professions = json_set(COALESCE(professions, '{}'), '$.jewelcrafting', json('{"level":200,"xp":0}')) WHERE name = '${name}'`);
+  // The bag's six tabs with big numbers (24.11.2026): the herbs in their
+  // own tab, with room for them in the Magazyn at its last level, and the
+  // Spiżarnia's dishes over the fish and crops, each group under its
+  // heading.
+  sql(`INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'loot-shed', 10, 0, 1 FROM characters WHERE name = '${name}'`);
+  const herbs = { comfrey: 834, mugwort: 222, nettle: 129, plantain: 49 };
+  const pantry = { roach: 12345, perch: 567, turnip: 23456, 'baked-turnip': 3, 'pea-soup': 2, zurek: 123 };
+  sql(`UPDATE characters SET herbs = '${JSON.stringify(herbs)}', pantry = '${JSON.stringify(pantry)}' WHERE name = '${name}'`);
   const relations = { enchantress: 760, gamehost: 180, herbalist: 699, merchant: 1234567, innkeeper: 1399, headman: 30 };
   const setRelations = Object.entries(relations)
     .map(([resident, points]) => `'$.${resident}', ${points}`)

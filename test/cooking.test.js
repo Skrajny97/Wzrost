@@ -312,11 +312,14 @@ describe('Gotowanie and the meal through the API', () => {
     assert.equal(started.status, 201, JSON.stringify(started.data));
     const { swap, ...meal } = started.data.character.meal;
     assert.deepEqual(meal, { id: 'zurek', name: 'Żurek', bonus: '+12% XP z wyprawy, +10% szansy na skrzynię wśród znalezisk', portions: 1, left: 180, minutes: 240 });
-    // The words asking before another dish takes its place, filled in by the page.
+    // The words asking before another dish takes its place, and the line
+    // on another dish's card in the Spiżarnia that says so before "Zjedz"
+    // (24.11.2026), filled in by the page.
     assert.deepEqual(swap, {
       title: 'Zmienić posiłek?',
       text: 'Postać zje: {dish}. Obecny posiłek ({current}) przestanie działać, choć zostało mu {time} wypraw, a jego premia przepadnie.',
       eat: 'Zjedz',
+      note: 'Po zjedzeniu obecny posiłek ({current}) przestanie działać, choć zostało mu {time} wypraw, a jego premia przepadnie.',
     });
     assert.deepEqual(pantry(started.data.character), { zurek: 1, turnip: 1 });
     // Called back: the meal and the dish as they were.

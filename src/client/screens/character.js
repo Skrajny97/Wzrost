@@ -7,7 +7,7 @@ import { herbSprite, itemSprite, materialSprite, mineralSprite, pantrySprite, po
 import { bonusList } from '../bonuses.js';
 import { showAchievements } from '../achievements.js';
 import { keepCharacterOrder, orderedCharacters } from '../character-order.js';
-import { askMealSwap } from '../meal.js';
+import { askMealSwap, mealSwapNote } from '../meal.js';
 import { characterLook, portraitLayers } from '../cosmetics.js';
 import { MATERIALS_HINT, materialIcon, materialSheet, materialTitle } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
@@ -138,8 +138,9 @@ export function findMark(item) {
 
 // The eye toggle is remembered while the page is open.
 let gearHidden = false;
-// Which half of the backpack shows: the items, or the materials, which take
-// no room in it. Remembered while the page is open too.
+// Which of the backpack's tabs shows: the items, the materials, the parts,
+// the herbs, the minerals or the Spiżarnia. Remembered while the page is
+// open too.
 let bagTab = 'items';
 
 // How the bag's items and materials are sorted (the author: "dodaj tez
@@ -514,6 +515,13 @@ export function mountCharacter(container, { switchCharacter } = {}) {
     // na 3: Przedmioty, Materiały, Części").
     const parts = state.character.crafting.parts.filter((part) => part.count > 0);
     const partCount = parts.reduce((sum, part) => sum + part.count, 0);
+    // The herbs have their own tab after the parts (a player, 24.11.2026:
+    // „rośliny na alchemie też powinny byc w innych zakładkach niż
+    // przedmioty”) once Zielarstwo and Alchemia open, or while the character
+    // has some; they still take the bag's places, by the stack.
+    const herbs = state.character.herbs ?? [];
+    const herbCount = herbs.reduce((sum, herb) => sum + herb.count, 0);
+    const showHerbs = herbCount > 0 || Boolean(state.character.professions?.gathering) || Boolean(state.character.professions?.brewing);
     // The gems and ores of Górnictwo have their own tab once it opens, or
     // while the character has some.
     const minerals = state.character.minerals ?? [];
@@ -525,15 +533,16 @@ export function mountCharacter(container, { switchCharacter } = {}) {
     const pantry = state.character.pantry ?? [];
     const pantryCount = pantry.reduce((sum, good) => sum + good.count, 0);
     const showPantry = pantryCount > 0 || Boolean(state.character.professions?.fishing) || Boolean(state.character.professions?.farming) || Boolean(state.character.professions?.cooking);
-    const tabCount = 3 + (showMinerals ? 1 : 0) + (showPantry ? 1 : 0);
+    const tabCount = 3 + (showHerbs ? 1 : 0) + (showMinerals ? 1 : 0) + (showPantry ? 1 : 0);
     const grids = {
-      items: () => [scrollsLine(), bag.length > 1 && sortRow('items'), itemsGrid(sortBag('items', bag))],
+      items: () => [scrollsLine(), bag.length > 1 && sortRow('items'), itemsGrid(sortBag('items', bag), herbs)],
       materials: () => [materials.length > 1 && sortRow('materials'), materialsGrid(sortBag('materials', materials))],
       parts: () => partsGrid(parts),
+      herbs: () => herbsGrid(herbs),
       minerals: () => mineralsGrid(minerals),
       pantry: () => pantryGrid(pantry),
     };
-    const hiddenTab = (bagTab === 'minerals' && !showMinerals) || (bagTab === 'pantry' && !showPantry);
+    const hiddenTab = (bagTab === 'herbs' && !showHerbs) || (bagTab === 'minerals' && !showMinerals) || (bagTab === 'pantry' && !showPantry);
     return h(
       'section',
       { class: 'bag', 'aria-labelledby': 'bag-title' },
@@ -545,10 +554,11 @@ export function mountCharacter(container, { switchCharacter } = {}) {
       bagActions(bag),
       h(
         'div',
-        { class: `segmented bag-tabs${tabCount === 4 ? ' bag-tabs--four' : tabCount === 5 ? ' bag-tabs--five' : ''}`, role: 'group', 'aria-label': t('Zawartość plecaka') },
+        { class: `segmented bag-tabs${{ 4: ' bag-tabs--four', 5: ' bag-tabs--five', 6: ' bag-tabs--six' }[tabCount] ?? ''}`, role: 'group', 'aria-label': t('Zawartość plecaka') },
         tab('items', t('Przedmioty')),
         tab('materials', stacked > 0 ? t('Materiały ({count})', { count: formatNumber(stacked) }) : t('Materiały')),
         tab('parts', partCount > 0 ? t('Części ({count})', { count: formatNumber(partCount) }) : t('Części')),
+        showHerbs && tab('herbs', herbCount > 0 ? t('Zioła ({count})', { count: formatNumber(herbCount) }) : t('Zioła')),
         showMinerals && tab('minerals', mineralCount > 0 ? t('Minerały ({count})', { count: formatNumber(mineralCount) }) : t('Minerały')),
         showPantry && tab('pantry', pantryCount > 0 ? t('Spiżarnia ({count})', { count: formatNumber(pantryCount) }) : t('Spiżarnia')),
       ),
@@ -887,37 +897,42 @@ export function mountCharacter(container, { switchCharacter } = {}) {
     );
   }
 
-  // The Spiżarnia (1057): the fish of Rybołówstwo and the crops of
-  // Rolnictwo, a slot for each, outside the bag's room too, as the minerals.
+  // The Spiżarnia (1057): the fish of Rybołówstwo, the crops of Rolnictwo
+  // and the dishes of Gotowanie, a slot for each, outside the bag's room
+  // too, as the minerals. The dishes first, as they are eaten from here,
+  // then the ingredients, each under its heading (a player, 24.11.2026:
+  // „Fajnie jakby składniki na potrawy i same potrawy były w osobnych
+  // kategoriach”, „często się mieszają”), each in the game's order; a group
+  // with nothing in it is left out.
   function pantryGrid(pantry) {
     // The meal at work (cooking.js), with the time of explorations it still works for.
     const meal = state.character.meal;
     const mealNote = meal && h('p', { class: 'bag-note cook-bonus', text: t('Posiłek: {dish}, {bonus}. Jeszcze {time} wypraw.', { dish: meal.name, bonus: meal.bonus, time: formatMinutes(meal.left) }) });
     if (pantry.length === 0) return [mealNote, h('p', { class: 'muted', text: t('Spiżarnia jest pusta. Ryby złowisz w Rybołówstwie, a plony zbierzesz w Rolnictwie.') })];
+    const tile = (good) =>
+      h(
+        'li',
+        {},
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'slot slot--bag slot--pantry',
+            'aria-label': t('{name}, {count} szt.', { name: good.name, count: formatNumber(good.count) }),
+            onClick: () => pantrySheet(good),
+          },
+          pantrySprite(good.id) ?? icon('fish', { size: 24 }),
+          h('span', { class: 'slot-level', text: formatNumber(good.count) }),
+        ),
+      );
+    const groups = [
+      [t('Potrawy'), pantry.filter((good) => good.group === 'dish')],
+      [t('Składniki'), pantry.filter((good) => good.group !== 'dish')],
+    ].filter(([, goods]) => goods.length > 0);
     return [
       mealNote,
       h('p', { class: 'bag-note', text: t('Spiżarnia nie zajmuje miejsca w plecaku.') }),
-      h(
-        'ul',
-        { class: 'bag-grid' },
-        pantry.map((good) =>
-          h(
-            'li',
-            {},
-            h(
-              'button',
-              {
-                type: 'button',
-                class: 'slot slot--bag slot--pantry',
-                'aria-label': t('{name}, {count} szt.', { name: good.name, count: formatNumber(good.count) }),
-                onClick: () => pantrySheet(good),
-              },
-              pantrySprite(good.id) ?? icon('fish', { size: 24 }),
-              h('span', { class: 'slot-level', text: formatNumber(good.count) }),
-            ),
-          ),
-        ),
-      ),
+      groups.map(([title, goods]) => [h('h3', { class: 'bag-group-title', text: title }), h('ul', { class: 'bag-grid' }, goods.map(tile))]),
     ];
   }
 
@@ -926,10 +941,13 @@ export function mountCharacter(container, { switchCharacter } = {}) {
   // ułatwi sprawę”): how many portions with −/+, as many as the Spiżarnia
   // has and the meal has room for (up to 3 of one dish, the meal at work's
   // own on top of its portions), and the meal they make. Another dish than
-  // the meal at work's asks first, as on the Walka screen; on an
-  // exploration the server says to eat after it.
+  // the meal at work's says on its card that the meal at work will end
+  // (the author, 24.11.2026, after a player lost a meal's bonus: „za każdym
+  // razem powinno mówić że poprzedni idzie out”) and asks first, as on the
+  // Walka screen; on an exploration the server says to eat after it.
   function mealPart(good) {
     const current = state.character.meal ?? null;
+    const swapping = Boolean(current) && current.id !== good.id;
     const had = current?.id === good.id ? current.portions : 0;
     const room = Math.max(1, Math.min(good.count, good.stacks.length - had));
     let portions = 1;
@@ -948,7 +966,7 @@ export function mountCharacter(container, { switchCharacter } = {}) {
     set(1);
     const eat = (event) =>
       withButton(event.currentTarget, async () => {
-        if (current && current.id !== good.id && !(await askMealSwap(current, good))) return;
+        if (swapping && !(await askMealSwap(current, good))) return;
         await call('POST', '/api/pantry/eat', { id: good.id, count: portions, replaces: current && { dish: current.id, portions: current.portions } });
         closeSheet();
         const now = state.character.meal;
@@ -956,6 +974,7 @@ export function mountCharacter(container, { switchCharacter } = {}) {
       });
     return [
       text,
+      swapping && h('p', { class: 'sheet-text meal-swap-note', text: mealSwapNote(current) }),
       h('div', { class: 'potion-pick', hidden: room < 2 }, h('span', { class: 'potion-pick-name', text: t('Porcje') }), less, value, more),
       h('button', { type: 'button', class: 'button button--system', onClick: eat, text: t('Zjedz') }),
       h('p', { class: 'sheet-text muted', text: t('Potrawę zjesz teraz albo przy wyruszaniu na wyprawę, w opcjach wyprawy.') }),
@@ -1067,31 +1086,50 @@ export function mountCharacter(container, { switchCharacter } = {}) {
     ];
   }
 
-  function itemsGrid(bag) {
-    const stacked = Object.keys(STACKS).flatMap((kind) => (state.character[kind] ?? []).map((entry) => ({ kind, entry })));
-    if (bag.length === 0 && stacked.length === 0) return h('p', { class: 'muted', text: t('Plecak jest pusty. Łupy z wypraw trafiają tutaj.') });
-    return h(
-      'ul',
-      { class: 'bag-grid' },
-      stacked.flatMap(({ kind, entry }) =>
-        stacksOf(entry, state.character.herbStack).map((count) =>
+  // The herbs' or the potions' stacks, a slot for each, its card under a tap.
+  const stackTiles = (kind, entries) =>
+    entries.flatMap((entry) =>
+      stacksOf(entry, state.character.herbStack).map((count) =>
+        h(
+          'li',
+          {},
           h(
-            'li',
-            {},
-            h(
-              'button',
-              {
-                type: 'button',
-                class: `slot slot--bag ${STACKS[kind].slot}`,
-                'aria-label': t('{name}, {count} szt.', { name: entry.name, count: formatNumber(count) }),
-                onClick: () => stackSheet(kind, entry),
-              },
-              STACKS[kind].art(entry.id),
-              h('span', { class: 'slot-level', text: formatNumber(count) }),
-            ),
+            'button',
+            {
+              type: 'button',
+              class: `slot slot--bag ${STACKS[kind].slot}`,
+              'aria-label': t('{name}, {count} szt.', { name: entry.name, count: formatNumber(count) }),
+              onClick: () => stackSheet(kind, entry),
+            },
+            STACKS[kind].art(entry.id),
+            h('span', { class: 'slot-level', text: formatNumber(count) }),
           ),
         ),
       ),
+    );
+
+  // The herbs by the stack, as they lay among the items before (their own
+  // tab since 24.11.2026): unlike the goods of the other tabs they take the
+  // bag's places, as the line over them says.
+  function herbsGrid(herbs) {
+    if (herbs.length === 0) return h('p', { class: 'muted', text: t('Nie masz jeszcze ziół. Zbierzesz je w Zielarstwie.') });
+    return [
+      h('p', { class: 'bag-note', text: t('Zioła zajmują miejsce w plecaku, po {stack} szt. na jedno miejsce.', { stack: formatNumber(state.character.herbStack) }) }),
+      h('ul', { class: 'bag-grid' }, stackTiles('herbs', herbs)),
+    ];
+  }
+
+  // The items and the potions' stacks; the herbs have their own tab, so a
+  // bag with herbs alone is not empty.
+  function itemsGrid(bag, herbs) {
+    const potions = state.character.potions ?? [];
+    if (bag.length === 0 && potions.length === 0) {
+      return h('p', { class: 'muted', text: herbs.length > 0 ? t('Nie masz przedmiotów. Łupy z wypraw trafiają tutaj.') : t('Plecak jest pusty. Łupy z wypraw trafiają tutaj.') });
+    }
+    return h(
+      'ul',
+      { class: 'bag-grid' },
+      stackTiles('potions', potions),
       bag.map((item) =>
         h(
           'li',
