@@ -1,0 +1,14 @@
+{
+  "id": "wb-boruta",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Boruta, the devil nobleman of Polish legends, a huge broad-shouldered devil lunging forward with a curved silver sabre, one wide chunky shape filling the whole picture, a bold simple silhouette, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, a big horned red devil head taking a large part of the picture, two thick curved black horns, a wide white grin, bright glowing yellow eyes, a pointed black beard, a small dark fur cap with no feather, a simple green kontusz coat with one wide gold sash, a thick red devil tail with a black tuft, one black goat hoof and one red boot, menacing, full body, three-quarter view, the creature alone, no rocks, no ground, no background, the whole creature inside the picture, the whole sabre inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02389442406378852
+  },
+  "images": 1
+}
