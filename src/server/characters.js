@@ -152,7 +152,7 @@ import { mercenaryBusy, mercenaryPlace, mercenaryRules, serviceEnded } from './m
 import { ACCOUNT_NAMES, ALL_CHARACTERS, looksTaken, nameKey, validateName } from './names.js';
 import { championOf } from './guild-fame.js';
 import { badgesOf, badgeView } from './guild-heroes.js';
-import { worldBossTitleOf } from './world-boss.js';
+import { worldBossChestCount, worldBossTitleOf } from './world-boss.js';
 import { bannersNow } from './guild-lands.js';
 import { fameNotice } from './fame.js';
 import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
@@ -2038,12 +2038,18 @@ export function characterView(player, now) {
 // character of last week, its name in gold, with the character's reward
 // waiting (fame.js, 760 A), the week before closed the same way. And the
 // lands' banners of the week, by land, for every land's card (1200 A,
-// guild-lands.js), raised first by championOf when the week is new.
+// guild-lands.js), raised first by championOf when the week is new. And
+// how many Skrzynie Bossa the character may open, for the dot of the
+// Postrach Krainy's tab in the Walka (world-boss.js, 24.11.2026).
 export async function getCharacter(context) {
   const { player } = await requirePlayer(context);
-  const [champion, fame] = await Promise.all([championOf(context.env.DB, context.now), fameNotice(context.env.DB, player.row.id, context.now)]);
+  const [champion, fame, worldBossChests] = await Promise.all([
+    championOf(context.env.DB, context.now),
+    fameNotice(context.env.DB, player.row.id, context.now),
+    worldBossChestCount(context.env.DB, player.row, context.now),
+  ]);
   const landBanners = await bannersNow(context.env.DB, context.now);
-  return json({ character: characterView(player, context.now), championTag: champion?.tag ?? null, fame, landBanners });
+  return json({ character: characterView(player, context.now), championTag: champion?.tag ?? null, fame, landBanners, worldBossChests });
 }
 
 // GET /api/profile/:name: another player's character as everyone may see

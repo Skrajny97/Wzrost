@@ -399,8 +399,9 @@ button {
   color: var(--system-text);
 }
 
-/* The Walka's three parts, Eksploracja, Portale and Wieże, side by side
-   down to a 320 px phone: smaller letters, closer together. */
+/* Three choices side by side down to a 320 px phone (as the Walka's three
+   parts were before the Postrach Krainy and the Kultywacja joined them):
+   smaller letters, closer together. */
 .segmented--three {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -409,6 +410,68 @@ button {
   padding: 0 4px;
   font-size: 12px;
   letter-spacing: 0.03em;
+}
+
+/* The Walka's five parts (combat-modes.js, 24.11.2026): Eksploracja,
+   Portale and Wieże over Postrach Krainy and Kultywacja, in the letters of
+   the three before them; in one row where the switch is 680 px wide or
+   more (a computer from 1366 px; a phone, a tablet and a 1280 px laptop
+   have the two rows), where "Postrach Krainy" with its dot fits in a fifth.
+   By the switch's own width, as the Walka's column on a computer is wider
+   over the lands than over the other parts. A part's news is the gold dot
+   of the Społeczność's tabs right after its name, which stays in the
+   middle: in a corner the players online's tab on a phone's edge covered
+   the Kultywacja's (edge-tabs). */
+.combat-modes-frame {
+  container: combat-modes / inline-size;
+}
+
+.combat-modes {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.combat-modes .segmented-option {
+  grid-column: span 2;
+  padding: 4px;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+}
+
+.combat-modes .segmented-option:nth-child(n + 4) {
+  grid-column: span 3;
+  border-top: 1px solid var(--system-line);
+}
+
+.combat-modes .segmented-option:nth-child(4) {
+  border-left: 0;
+}
+
+.combat-mode-name {
+  position: relative;
+}
+
+.combat-modes .community-dot {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 3px;
+}
+
+@container combat-modes (min-width: 680px) {
+  .combat-modes {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .combat-modes .segmented-option:nth-child(n) {
+    grid-column: auto;
+    border-top: 0;
+  }
+
+  .combat-modes .segmented-option:nth-child(4) {
+    border-left: 1px solid var(--system-line);
+  }
 }
 
 /* The bag's three tabs: items, materials and parts. */
@@ -3398,49 +3461,8 @@ a.segmented-option {
   font-size: 13px;
 }
 
-/* Kultywacja (cultivation.js, 1230 A): its card among the lands, in the
-   System's light, the first frame of its scene's sheet dim behind the words,
-   as wide as the card, around the meditating figure; its screen with the
-   scene on top, the levels, the length and the XP it gives. */
-.cultivation-link {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  border-color: var(--system-line);
-}
-
-.cultivation-link::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: var(--cultivation-art, none) 0 62% / calc(var(--cultivation-frames, 1) * 100%) auto no-repeat;
-  image-rendering: pixelated;
-  opacity: 0.55;
-  pointer-events: none;
-}
-
-.cultivation-link::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(to right, rgba(13, 17, 11, 0.72), rgba(13, 17, 11, 0.25));
-  pointer-events: none;
-}
-
-.cultivation-link--met::before {
-  opacity: 0.3;
-}
-
-.cultivation-link .region-foot {
-  border-top-color: var(--system-line);
-}
-
-.cultivation-foot-class {
-  white-space: nowrap;
-}
-
+/* Kultywacja (cultivation.js, 1230 A): its tab of the Walka with the scene
+   on top, the levels, the length and the XP it gives. */
 .chip--system,
 .chip--cultivation {
   border-color: var(--system-line);
@@ -30971,13 +30993,13 @@ a.social-button {
   }
 }
 
-/* The World Boss (world-boss.js; 1222–1226 A): its card on the Walka
-   screen, framed in the red of a champion in fights, the boss large in the
-   champion's gold beside its name, band and words, its HP bar thicker as
-   the Bestia's; the attack wide under the bar; the character's part, its
-   title in gold, the chests each in the colour of its size and the best of
-   the week with their places. The Bestia's rows and chests (guild-beast.js)
-   lend their shapes. */
+/* The World Boss (world-boss.js; 1222–1226 A): its card on its tab of the
+   Walka (#/postrach, 24.11.2026), framed in the red of a champion in
+   fights, the boss large in the champion's gold beside its name, band and
+   words, its HP bar thicker as the Bestia's; the attack wide under the
+   bar; the character's part, its title in gold, the chests each in the
+   colour of its size and the best of the week with their places. The
+   Bestia's rows and chests (guild-beast.js) lend their shapes. */
 .world-boss {
   border-color: #6b1a1f;
   box-shadow: inset 0 0 0 1px rgba(179, 18, 31, 0.25), 0 0 18px rgba(179, 18, 31, 0.12);

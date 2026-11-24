@@ -51,6 +51,8 @@ describe('the World Boss through the API', () => {
     assert.equal(locked.status, 403);
     assert.equal(locked.data.error.code, 'locked');
     assert.equal((await attack('nowicjusz')).status, 403);
+    // No chest to light the Walka's tab with (24.11.2026).
+    assert.equal((await as('nowicjusz', 'GET', '/api/character')).data.worldBossChests, 0);
   });
 
   test('a band\'s boss of the period: HP for the band\'s active characters, the same for all of them, one row for the band', async () => {
@@ -174,8 +176,10 @@ describe('the World Boss through the API', () => {
   test('the chests wait for each character\'s own visit; the last blow\'s holds an item and more gold; each opens once', async () => {
     await attack('lowczyni');
     await attack('tropiciel');
-    // While the boss stands, this period's chest waits.
+    // While the boss stands, this period's chest waits, and nothing lights
+    // the Postrach Krainy's tab in the Walka (GET /api/character, 24.11.2026).
     assert.deepEqual((await view('lowczyni')).chests, []);
+    assert.equal((await as('lowczyni', 'GET', '/api/character')).data.worldBossChests, 0);
     await run('UPDATE world_bosses SET hp = 2');
     assert.equal((await attack('lowczyni')).data.attack.fell, true);
     // Nothing given to anybody by the fall itself.
@@ -188,6 +192,10 @@ describe('the World Boss through the API', () => {
     assert.ok(mine.lastBlow && mine.lastBlow.gold > 0);
     const [theirs] = (await view('tropiciel')).chests;
     assert.equal(theirs.lastBlow, null);
+    // Each chest to open counted for the tab's dot, in the character's
+    // answer and the World Boss's.
+    assert.equal((await as('lowczyni', 'GET', '/api/character')).data.worldBossChests, 1);
+    assert.equal((await view('lowczyni')).worldBossChests, 1);
     const before = JSON.parse((await first("SELECT materials FROM characters WHERE name = 'Łowczyni'")).materials);
     const opened = await as('lowczyni', 'POST', '/api/world-boss/claim', { week: week() });
     assert.equal(opened.status, 200, JSON.stringify(opened.data).slice(0, 300));
@@ -204,6 +212,8 @@ describe('the World Boss through the API', () => {
     assert.ok(gained.length > 0 && gained.every(([key]) => allowed.some((id) => key.startsWith(`${id}:`))), JSON.stringify(gained));
     assert.match(opened.data.chest.text, /Skrzynia Bossa otwarta/);
     assert.deepEqual(opened.data.chests, []);
+    assert.equal(opened.data.worldBossChests, 0);
+    assert.equal((await as('lowczyni', 'GET', '/api/character')).data.worldBossChests, 0);
     const again = await as('lowczyni', 'POST', '/api/world-boss/claim', { week: week() });
     assert.equal(again.status, 409);
     assert.equal(again.data.error.code, 'claimed');
@@ -227,6 +237,7 @@ describe('the World Boss through the API', () => {
     const { chests } = await view('lowczyni');
     // 400 of a share of 250: the huge chest, half of it.
     assert.equal(chests.length, 1);
+    assert.equal((await as('lowczyni', 'GET', '/api/character')).data.worldBossChests, 1);
     const [chest] = chests;
     assert.equal(chest.week, previous.key);
     assert.equal(chest.fallen, false);
@@ -246,6 +257,7 @@ describe('the World Boss through the API', () => {
     assert.equal(opened.data.chest.gold, chest.gold);
     const fallen = (await view('lowczyni')).chests;
     assert.deepEqual(fallen, []);
+    assert.equal((await as('lowczyni', 'GET', '/api/character')).data.worldBossChests, 0);
   });
 
   test('a full bag keeps a chest with items shut; room again, it opens', async () => {

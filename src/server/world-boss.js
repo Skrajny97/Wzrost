@@ -159,6 +159,14 @@ async function chestsOf(db, row, now) {
     .filter(Boolean);
 }
 
+// How many Skrzynie Bossa the character may open now (chestsOf), none below
+// the World Boss's unlock: for the dot of its tab in the Walka (GET
+// /api/character, characters.js; 24.11.2026).
+export async function worldBossChestCount(db, row, now) {
+  if (!isUnlocked('world-boss', row.level, content())) return 0;
+  return (await chestsOf(db, row, now)).length;
+}
+
 // The words of the card (all but the answers' errors), with the rules'
 // numbers filled in: the attacks of a day and the days of a boss.
 function cardTexts() {
@@ -201,7 +209,9 @@ export const worldBossTitleText = (bossId, appearance) => {
 // (`attacks.blocked`); the best of the boss by damage (title.places of
 // them; a character removed since is left out, its damage stays off the
 // bar) and the character's own damage, place and chest now with the next
-// one; the chests it may open, the title it wears and the card's words.
+// one; the chests it may open (and how many, `worldBossChests`, as GET
+// /api/character has it for the dot of the card's tab), the title it
+// wears and the card's words.
 export async function worldBossView(db, row, now, activity = null) {
   const { current } = periodsAround(now);
   const day = questPeriod('daily', now, content()).key;
@@ -232,6 +242,7 @@ export async function worldBossView(db, row, now, activity = null) {
   const next = fighter ? sizes.find((size) => size.damage > damage) : null;
   const used = fighter && fighter.day === day ? fighter.day_hits : 0;
   const land = content().regionsById[band.region];
+  const chests = await chestsOf(db, row, now);
   return {
     boss: {
       week: boss.week,
@@ -269,7 +280,7 @@ export async function worldBossView(db, row, now, activity = null) {
           next: next ? { id: next.id, damage: next.damage, missing: next.damage - damage } : null,
         }
       : null,
-    chests: (await chestsOf(db, row, now)).map((chest) => ({
+    chests: chests.map((chest) => ({
       week: chest.week,
       boss: content().worldBossesById[chest.boss]?.name ?? chest.boss,
       fallen: chest.fallen,
@@ -283,6 +294,7 @@ export async function worldBossView(db, row, now, activity = null) {
       endsAt: chest.endsAt,
       until: chest.until,
     })),
+    worldBossChests: chests.length,
     title: await worldBossTitleOf(db, row, now),
     texts: cardTexts(),
   };

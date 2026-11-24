@@ -90,9 +90,10 @@ export function notificationsDue({ level, activity, avatarActivity = null, avata
       body: say(texts, 'pushHuntBody', 0, { area: area?.name ?? '' }),
     });
   }
-  // A Kultywacja (cultivation.js), whose report waits in the Walka too.
+  // A Kultywacja (cultivation.js), whose report waits on its tab of the
+  // Walka (24.11.2026; before, a screen the Walka led to).
   if (activity?.kind === 'cultivation' && within(activity.endsAt, from, to)) {
-    due.push({ tag: 'cultivation', url: '#/walka', at: activity.endsAt, title: say(texts, 'pushCultivationTitle', 0), body: say(texts, 'pushCultivationBody', 0) });
+    due.push({ tag: 'cultivation', url: '#/kultywacja', at: activity.endsAt, title: say(texts, 'pushCultivationTitle', 0), body: say(texts, 'pushCultivationBody', 0) });
   }
   // A gathering of herbs (professions.js), a brewing of potions (brewing.js),
   // an order of items (workshop.js), a digging (mining.js) and a work in the

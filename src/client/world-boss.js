@@ -1,5 +1,7 @@
-// The World Boss's card on the Walka screen (src/server/world-boss.js;
-// DECISIONS.md, "Postrach Krainy (1222–1226)" and "Postrach Krainy co 3 dni
+// The World Boss's card on its tab of the Walka, #/postrach (since
+// 24.11.2026; before, on the Eksploracja's screen; src/server/world-boss.js;
+// DECISIONS.md, "Postrach Krainy (1222–1226)", "Postrach Krainy co 3 dni
+// (24.11.2026)" and "Postrach Krainy i Kultywacja jako zakładki Walki
 // (24.11.2026)"; the author: 1222–1226 A): the boss the character fights
 // in this period (a boss every 3 days from 27.11.2026), until which day it
 // stays and on which the next one comes, with its picture (its own once
@@ -14,12 +16,13 @@
 // under them; and the rules under "Jak to działa?". The card asks for the
 // boss itself and takes its words from the answer (data/world-bosses.json,
 // texts), in the page's language; its own few words go through t()
-// (i18n.js). worldBossCard() makes the card once for the Walka screen,
-// which keeps it over its renders; it stays empty below its unlock.
-// `stop()` ends it.
+// (i18n.js). worldBossCard() makes the card once for its screen
+// (mountWorldBoss), which keeps it over its renders; it stays empty below
+// its unlock. `stop()` ends it.
 
 import { createArena } from './arena.js';
 import { itemSprite, worldBossSprite } from './art.js';
+import { combatModes } from './combat-modes.js';
 import { materialIcon, materialSheet, materialTitle } from './craft-table.js';
 import { fill, h, icon } from './dom.js';
 import { dateTimeFormat, formatNumber } from './format.js';
@@ -27,8 +30,8 @@ import { language, t } from './i18n.js';
 import { CLASS_ICONS } from './icons.js';
 import { openProfile } from './profile.js';
 import { playVoice, preloadVoices } from './sound.js';
-import { call, isUnlocked, onCharacterChange, state } from './state.js';
-import { foldPart, howItWorks, openSheet, toast, withButton } from './ui.js';
+import { call, isUnlocked, onCharacterChange, state, unlockInfo } from './state.js';
+import { foldPart, howItWorks, openSheet, systemPanel, toast, withButton } from './ui.js';
 import { itemSheet } from './screens/character.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
@@ -69,7 +72,9 @@ function weekdayOf(at) {
 // card's words want (texts.days: `to` after „do”, `on` for when).
 const dayWords = (at, forms) => `${forms[weekdayOf(at)]} ${new Intl.DateTimeFormat(locale(), { day: 'numeric', month: 'long', timeZone: ZONE }).format(new Date(at))}`;
 
-export function worldBossCard() {
+// `onView` is told each answer shown (null after a failed look): the chests
+// waiting change with it, and so does the dot of its tab (combat-modes.js).
+export function worldBossCard({ onView } = {}) {
   let view = null;
   // The last attack's answer and the last chest opened, while the card stays.
   let last = null;
@@ -82,16 +87,20 @@ export function worldBossCard() {
     if (gone) return;
     view = next;
     render();
+    onView?.(view);
   }
 
   // Asked once the character has the World Boss: the first time the card
-  // shows, and anew when asked to.
+  // shows, and anew when asked to. A failed look says why in the card.
   function refresh() {
     asked = true;
     return call('GET', '/api/world-boss')
       .then(show)
       .catch((error) => {
-        if (!gone) fill(card, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać Postrachu Krainy.') }));
+        if (gone) return;
+        fill(card, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać Postrachu Krainy.') }));
+        card.hidden = false;
+        onView?.(null);
       });
   }
 
@@ -375,4 +384,31 @@ export function worldBossCard() {
     unsubscribe();
   };
   return card;
+}
+
+// The Postrach Krainy's tab of the Walka (#/postrach, 24.11.2026; the
+// author: „Postrach Krainy i Kultywacja powinny byc osobnymi zakładkami w
+// Walce”): the Walka's heading and its switch (combat-modes.js), as over
+// the Portale and the Wieże, then the card, "Wczytywanie…" in its place
+// until the boss comes; below its unlock, the words of the lock.
+export function mountWorldBoss(container, { navigate }) {
+  let card = null;
+  const heading = () => [h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: t('Walka') })), combatModes('world-boss', navigate)];
+
+  function render() {
+    if (!isUnlocked('world-boss')) {
+      const unlock = unlockInfo('world-boss');
+      fill(container, ...heading(), systemPanel(t('Dostęp zablokowany. {name}: od poziomu postaci {level}. Twój poziom: {own}.', { name: unlock?.name ?? t('Postrach Krainy'), level: unlock?.level ?? '', own: state.character.level })));
+      return;
+    }
+    // Each answer shown draws the switch anew, with its dot for the chests.
+    card ??= worldBossCard({ onView: render });
+    fill(container, ...heading(), card.hidden && h('p', { class: 'muted', text: t('Wczytywanie…') }), card);
+  }
+
+  render();
+  return {
+    update: render,
+    unmount: () => card?.stop(),
+  };
 }

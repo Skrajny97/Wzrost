@@ -16,6 +16,7 @@ import { formatCountdown, formatMinutes, formatNumber, formatShort } from './for
 import { SYSTEM_POINTS_ICON } from './icons.js';
 import { MERCENARIES_HASH } from './mercenaries.js';
 import { CULTIVATION_HASH } from './cultivation.js';
+import { combatModeList, combatModeNews } from './combat-modes.js';
 import { anyClaimable, showQuests } from './quests.js';
 import { SECTION_ICONS, SECTION_NEWS, sectionHash } from './screens/community.js';
 import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNow, state, timePointsNow, unlockInfo, walletEntries } from './state.js';
@@ -633,15 +634,16 @@ function navButton(tab, active, onBack) {
 const PROFESSION_ICONS = { herbalism: 'leaf', alchemy: 'flask', crafting: 'hammer', mining: 'ore', jewelcrafting: 'ring', fishing: 'fish', farming: 'sprout', cooking: 'pot' };
 const PLACE_ICONS = { board: 'check', enchanter: 'skills', hermitage: 'hood', stable: 'beast', tavern: 'chat', market: 'coin', tannery: 'pouch', herbalist: 'leaf', forge: 'hammer', casino: 'dice', arena: 'swords' };
 const PARTS = {
-  // Eksploracja, Portale and Wieże, as over the Walka (screens/towers.js).
+  // Eksploracja, Portale, Wieże, Postrach Krainy and Kultywacja, as over the
+  // Walka (combat-modes.js), with the dots of its switch; the Eksploracja's
+  // own lights while an exploration's report waits.
   walka: () => {
-    const portals = unlockInfo('portals');
-    const towers = unlockInfo('towers');
-    return [
-      { id: 'explore', label: t('Eksploracja'), icon: 'beast', href: '#/walka', ready: tabTime('walka').ready, readyText: t('raport czeka') },
-      portals && { id: 'portals', label: t('Portale'), icon: 'coin', href: '#/portale', lock: !isUnlocked('portals') && t('poz. {level}', { level: portals.level }) },
-      towers && { id: 'towers', label: t('Wieże'), icon: 'evolution', href: '#/wieze', lock: !isUnlocked('towers') && t('poz. {level}', { level: towers.level }) },
-    ];
+    const activity = state.character.activity;
+    const report = activity?.kind === 'hunt' && activityFinished(activity) && t('raport czeka');
+    return combatModeList().map((mode) => {
+      const news = mode.id === 'explore' ? report : combatModeNews(mode.id);
+      return { id: mode.id, label: t(mode.label), icon: mode.icon, href: mode.hash, lock: mode.lock, ready: Boolean(news), readyText: news };
+    });
   },
   // The professions as their squares on the tab (screens/professions.js),
   // a work's report lighting its own.

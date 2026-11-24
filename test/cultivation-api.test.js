@@ -327,8 +327,8 @@ describe('Kultywacja', () => {
     assert.equal((await row('Mnich')).level, expected.level);
   });
 
-  test('its end is told on the phone, leading to the Walka', () => {
+  test('its end is told on the phone, leading to its tab of the Walka', () => {
     const due = notificationsDue({ level: LEVEL, activity: { kind: 'cultivation', areaId: 'x', endsAt: 1500 }, buildings: {}, queue: [] }, 1000, 2000, content);
-    assert.deepEqual(due, [{ tag: 'cultivation', url: '#/walka', at: 1500, title: 'Koniec Kultywacji', body: 'Kultywacja zakończona. Raport czeka na odbiór.' }]);
+    assert.deepEqual(due, [{ tag: 'cultivation', url: '#/kultywacja', at: 1500, title: 'Koniec Kultywacji', body: 'Kultywacja zakończona. Raport czeka na odbiór.' }]);
   });
 });
