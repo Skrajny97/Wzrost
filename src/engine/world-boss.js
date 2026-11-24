@@ -92,8 +92,10 @@ function zoneDayNumber(ms, timeZone) {
  * clock (the quests' time zone): before `cycle.from` the week, Monday to
  * Sunday, as the weekly quests have it, the last one ending at that day's
  * midnight at the latest; from that day on `cycle.days` days in a row,
- * counted from it (the author, 24.11.2026: a boss every 3 days, from Monday
- * 30.11.2026, 0:00, as the week before it ends). `key`: the date of its
+ * counted from it (the author, 24.11.2026: a boss every 3 days, from Friday
+ * 27.11.2026, 0:00: „Jak w poniedziałek, jak 3 dni od dzisiaj to piątek”;
+ * the week of 23.11 ends there, with its key). No period runs past that
+ * day's midnight. `key`: the date of its
  * first day, as the weekly quests' keys, so the keys sort as the periods
  * do; `startsAt` and `endsAt`: its first and its last midnight.
  * @param {number} now

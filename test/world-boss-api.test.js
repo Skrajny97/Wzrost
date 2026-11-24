@@ -1,5 +1,5 @@
 // The World Bosses through the API (src/server/world-boss.js; the author:
-// 1222–1226 A, and a boss every 3 days from 30.11.2026): one boss for each
+// 1222–1226 A, and a boss every 3 days from 27.11.2026): one boss for each
 // band of levels and period, with HP for the band's active characters and
 // one bar for all of them; three attacks a day; a character's band written
 // down with its first attack of the period and kept, whatever its levels
@@ -37,7 +37,7 @@ describe('the World Boss through the API', () => {
   const attack = (login) => as(login, 'POST', '/api/world-boss/attack');
   const view = async (login) => (await as(login, 'GET', '/api/world-boss')).data;
   const characterId = async (name) => (await first('SELECT id FROM characters WHERE name = ?', name)).id;
-  // The key of the boss's period now (a week, then 3 days from 30.11.2026).
+  // The key of the boss's period now (a week, then 3 days from 27.11.2026).
   const week = () => worldBossPeriod(Date.now(), content).key;
 
   beforeEach(async () => {
@@ -278,18 +278,20 @@ describe('the World Boss through the API', () => {
 });
 
 // A boss every 3 days (the author, 24.11.2026: „Ewentualnie resp co 3 dni
-// zamiast tygodnia - więcej nagród i zabawy”): the weekly boss of 23–29.11
-// to its Sunday, then from Monday 30.11.2026 cycles of 3 Polish days, each
-// with its own boss, band, chests and titles, on the test clock.
+// zamiast tygodnia - więcej nagród i zabawy”, and „Jak w poniedziałek, jak 3
+// dni od dzisiaj to piątek”): the boss of the week of 23.11 to Thursday
+// 26.11, its week cut there, then from Friday 27.11.2026 cycles of 3
+// Polish days, each with its own boss, band, chests and titles, on the
+// test clock.
 describe('the World Boss every 3 days through the API', () => {
   const { call, db, signUp } = useServer({ TEST_CLOCK: 'on' });
   const cookies = {};
   const run = async (sql, ...binds) => (await db()).prepare(sql).bind(...binds).run();
   const first = async (sql, ...binds) => (await db()).prepare(sql).bind(...binds).first();
   const DAY = 86400000;
-  // The Polish midnights of Monday 23.11.2026, Monday 30.11, Thursday 3.12, Sunday 6.12 and Wednesday 9.12.
+  // The Polish midnights of Monday 23.11.2026, Friday 27.11, Monday 30.11, Thursday 3.12 and Sunday 6.12.
   const MONDAY = Date.parse('2026-11-22T23:00:00Z');
-  const FIRST = Date.parse('2026-11-29T23:00:00Z');
+  const FIRST = Date.parse('2026-11-26T23:00:00Z');
   const SECOND = FIRST + 3 * DAY;
   const THIRD = SECOND + 3 * DAY;
   const FOURTH = THIRD + 3 * DAY;
@@ -312,24 +314,24 @@ describe('the World Boss every 3 days through the API', () => {
   };
 
   beforeEach(async () => {
-    await player('lowczyni', 'Łowczyni', 40, MONDAY + 4 * DAY);
+    await player('lowczyni', 'Łowczyni', 40, MONDAY + DAY);
   });
 
-  test('the last weekly boss stays to Sunday midnight; then a boss every 3 days, its chest and title to the end of the first cycle', async () => {
-    // Sunday 29.11, 23:00: still the week of 23.11.
-    const sunday = FIRST - HOUR;
-    const last = await view('lowczyni', sunday);
+  test('the week of 23.11 ends on Thursday 26.11; then a boss every 3 days, the week\'s chest and title to the end of the first cycle', async () => {
+    // Thursday 26.11, 23:00: still the week of 23.11, which ends at midnight.
+    const thursday = FIRST - HOUR;
+    const last = await view('lowczyni', thursday);
     assert.equal(last.boss.week, '2026-11-23');
     assert.equal(last.boss.startsAt, MONDAY);
     assert.equal(last.boss.endsAt, FIRST);
-    await attack('lowczyni', sunday);
-    await fell('lowczyni', sunday + 1000);
+    await attack('lowczyni', thursday);
+    await fell('lowczyni', thursday + 1000);
     // Its title to the end of the period after it: the first cycle.
     assert.equal((await first('SELECT until FROM world_boss_titles')).until, SECOND);
-    // Monday 30.11, 0:30: the first cycle's boss, new; the week's chest to open to the cycle's end.
-    const monday = FIRST + HOUR / 2;
-    const cycle = await view('lowczyni', monday);
-    assert.equal(cycle.boss.week, '2026-11-30');
+    // Friday 27.11, 0:30: the first cycle's boss, new; the week's chest to open to the cycle's end.
+    const friday = FIRST + HOUR / 2;
+    const cycle = await view('lowczyni', friday);
+    assert.equal(cycle.boss.week, '2026-11-27');
     assert.equal(cycle.boss.startsAt, FIRST);
     assert.equal(cycle.boss.endsAt, SECOND);
     assert.equal(cycle.boss.fallen, false);
@@ -340,11 +342,11 @@ describe('the World Boss every 3 days through the API', () => {
     assert.equal(cycle.title.until, SECOND);
     assert.equal(cycle.texts.rules.join(' ').includes('{'), false);
     assert.match(cycle.texts.lead, /Co 3 dni/);
-    // Thursday 3.12, 0:30: the second cycle; the week's chest and title gone with the first cycle.
-    const thursday = await view('lowczyni', SECOND + HOUR / 2);
-    assert.equal(thursday.boss.week, '2026-12-03');
-    assert.deepEqual(thursday.chests, []);
-    assert.equal(thursday.title, null);
+    // Monday 30.11, 0:30: the second cycle; the week's chest and title gone with the first cycle.
+    const monday = await view('lowczyni', SECOND + HOUR / 2);
+    assert.equal(monday.boss.week, '2026-11-30');
+    assert.deepEqual(monday.chests, []);
+    assert.equal(monday.title, null);
     assert.equal((await as('lowczyni', 'POST', '/api/world-boss/claim', SECOND + HOUR, { week: '2026-11-23' })).data.error.code, 'no_chest');
     assert.equal((await first("SELECT COUNT(*) AS count FROM world_bosses WHERE week = '2026-11-23'")).count, 0);
   });
@@ -361,16 +363,26 @@ describe('the World Boss every 3 days through the API', () => {
     // The next cycle: the band by the levels now, and a new day's attacks.
     const next = await view('lowczyni', SECOND + HOUR);
     assert.equal(next.boss.id, 'wb-rusalka');
-    assert.equal(next.boss.week, '2026-12-03');
+    assert.equal(next.boss.week, '2026-11-30');
     assert.equal(next.attacks.left, content.worldBosses.attacksPerDay);
     assert.equal((await attack('lowczyni', SECOND + HOUR)).data.boss.id, 'wb-rusalka');
+  });
+
+  test('the shortened week\'s boss that lived: half the chest from Friday 27.11, to the end of the first cycle', async () => {
+    await attack('lowczyni', MONDAY + DAY + HOUR);
+    assert.deepEqual((await view('lowczyni', FIRST - HOUR)).chests, []);
+    const [chest] = (await view('lowczyni', FIRST + HOUR)).chests;
+    assert.deepEqual([chest.week, chest.fallen, chest.lastBlow, chest.startsAt, chest.endsAt, chest.until], ['2026-11-23', false, null, MONDAY, FIRST, SECOND]);
+    assert.equal(chest.itemChance, content.worldBosses.chests.find((one) => one.id === chest.size).itemChance * content.worldBosses.unbeaten);
+    assert.equal((await view('lowczyni', SECOND - HOUR)).chests.length, 1);
+    assert.deepEqual((await view('lowczyni', SECOND + HOUR)).chests, []);
   });
 
   test('a cycle\'s boss that lived: half the chest at the cycle\'s end, to the end of the next cycle', async () => {
     await attack('lowczyni', FIRST + HOUR);
     assert.deepEqual((await view('lowczyni', SECOND - HOUR)).chests, []);
     const [chest] = (await view('lowczyni', SECOND + HOUR)).chests;
-    assert.deepEqual([chest.week, chest.fallen, chest.lastBlow, chest.startsAt, chest.endsAt, chest.until], ['2026-11-30', false, null, FIRST, SECOND, THIRD]);
+    assert.deepEqual([chest.week, chest.fallen, chest.lastBlow, chest.startsAt, chest.endsAt, chest.until], ['2026-11-27', false, null, FIRST, SECOND, THIRD]);
     assert.equal(chest.itemChance, content.worldBosses.chests.find((one) => one.id === chest.size).itemChance * content.worldBosses.unbeaten);
     // Still there at the end of the next cycle, gone after it.
     assert.equal((await view('lowczyni', THIRD - HOUR)).chests.length, 1);
@@ -386,12 +398,12 @@ describe('the World Boss every 3 days through the API', () => {
     assert.equal(await profile(THIRD + HOUR), null);
     // The chest: open from the fall, through the next cycle, and once.
     const [now] = (await view('lowczyni', FIRST + 3 * HOUR)).chests;
-    assert.deepEqual([now.week, now.fallen, now.until], ['2026-11-30', true, THIRD]);
+    assert.deepEqual([now.week, now.fallen, now.until], ['2026-11-27', true, THIRD]);
     const later = (await view('lowczyni', THIRD - HOUR)).chests;
     assert.equal(later.length, 1);
-    const opened = await as('lowczyni', 'POST', '/api/world-boss/claim', THIRD - HOUR, { week: '2026-11-30' });
+    const opened = await as('lowczyni', 'POST', '/api/world-boss/claim', THIRD - HOUR, { week: '2026-11-27' });
     assert.equal(opened.status, 200, JSON.stringify(opened.data).slice(0, 300));
-    assert.equal((await as('lowczyni', 'POST', '/api/world-boss/claim', THIRD - HOUR, { week: '2026-11-30' })).data.error.code, 'claimed');
+    assert.equal((await as('lowczyni', 'POST', '/api/world-boss/claim', THIRD - HOUR, { week: '2026-11-27' })).data.error.code, 'claimed');
     // The fourth cycle has no chest of the first left.
     assert.deepEqual((await view('lowczyni', FOURTH + HOUR)).chests, []);
   });

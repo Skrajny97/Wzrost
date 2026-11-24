@@ -1,7 +1,7 @@
 // The World Boss's card on the Walka screen (src/server/world-boss.js;
 // DECISIONS.md, "Postrach Krainy (1222–1226)" and "Postrach Krainy co 3 dni
 // (24.11.2026)"; the author: 1222–1226 A): the boss the character fights
-// in this period (a boss every 3 days from 30.11.2026), until which day it
+// in this period (a boss every 3 days from 27.11.2026), until which day it
 // stays and on which the next one comes, with its picture (its own once
 // drawn, else a creature of its land's in its place: art.js), name, band of
 // levels and land, and the HP bar shared by the whole band; the attacks

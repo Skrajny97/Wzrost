@@ -620,7 +620,7 @@ async function main() {
   // chest waiting with the last blow's part and the title of the first
   // place, which the member of the longest name wears in the Ranking too.
   // The periods' keys as the server has them (worldBossPeriod: weeks, then
-  // 3 days from 30.11.2026).
+  // 3 days from 27.11.2026).
   const engine = await import('../src/engine/index.js');
   const { loadData } = await import('./validate-data.mjs');
   const bossContent = engine.buildContent(loadData());

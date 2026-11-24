@@ -4,8 +4,9 @@
 // band's active characters, an attack with the companions, never more than
 // the HP left, the chests by the damage against a character's share (half
 // as big when the boss lived through its period, the last blow's item and
-// gold), the title, and the boss's periods: the week to Sunday 29.11.2026,
-// then 3 Polish days in a row (the author, 24.11.2026).
+// gold), the title, and the boss's periods: the week of 23.11.2026 to
+// Thursday 26.11, then 3 Polish days in a row from Friday 27.11 (the
+// author, 24.11.2026).
 
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
@@ -203,16 +204,20 @@ describe('the World Bosses', () => {
     assert.ok(half.items.length <= 1);
   });
 
-  test('the boss\'s period: the week to Sunday 29.11.2026, then 3 Polish days in a row from Monday 30.11.2026', () => {
+  test('the boss\'s period: the week of 23.11.2026 ends on Thursday 26.11, then 3 Polish days in a row from Friday 27.11', () => {
     const at = (iso) => Date.parse(iso);
-    assert.deepEqual(rules.cycle, { days: 3, from: '2026-11-30' });
-    // The last week, Monday 23.11 to Sunday 29.11, to its last moment (Polish midnights in UTC).
-    const week = worldBossPeriod(at('2026-11-29T22:59:59Z'), content);
-    assert.deepEqual(week, { key: '2026-11-23', startsAt: at('2026-11-22T23:00:00Z'), endsAt: at('2026-11-29T23:00:00Z') });
-    // Then 30.11–2.12, 3–5.12, … from midnight to midnight.
-    const first = worldBossPeriod(at('2026-11-29T23:00:00Z'), content);
-    assert.deepEqual(first, { key: '2026-11-30', startsAt: at('2026-11-29T23:00:00Z'), endsAt: at('2026-12-02T23:00:00Z') });
-    assert.deepEqual(worldBossPeriod(at('2026-12-02T22:59:59Z'), content), first);
+    assert.deepEqual(rules.cycle, { days: 3, from: '2026-11-27' });
+    // The week before it is a whole week, Monday 16.11 to Sunday 22.11 (Polish midnights in UTC).
+    assert.deepEqual(worldBossPeriod(at('2026-11-20T12:00:00Z'), content), { key: '2026-11-16', startsAt: at('2026-11-15T23:00:00Z'), endsAt: at('2026-11-22T23:00:00Z') });
+    // The week of 23.11 (its bosses came on Tuesday 24.11) keeps its key and ends at the cycles' first midnight, Friday 27.11.
+    const week = worldBossPeriod(at('2026-11-24T12:00:00Z'), content);
+    assert.deepEqual(week, { key: '2026-11-23', startsAt: at('2026-11-22T23:00:00Z'), endsAt: at('2026-11-26T23:00:00Z') });
+    assert.deepEqual(worldBossPeriod(at('2026-11-26T22:59:59Z'), content), week);
+    // Then 27–29.11, 30.11–2.12, 3–5.12, … from midnight to midnight.
+    const first = worldBossPeriod(at('2026-11-26T23:00:00Z'), content);
+    assert.deepEqual(first, { key: '2026-11-27', startsAt: at('2026-11-26T23:00:00Z'), endsAt: at('2026-11-29T23:00:00Z') });
+    assert.deepEqual(worldBossPeriod(at('2026-11-29T22:59:59Z'), content), first);
+    assert.deepEqual(worldBossPeriod(at('2026-11-29T23:00:00Z'), content), { key: '2026-11-30', startsAt: at('2026-11-29T23:00:00Z'), endsAt: at('2026-12-02T23:00:00Z') });
     assert.deepEqual(worldBossPeriod(at('2026-12-02T23:00:00Z'), content), { key: '2026-12-03', startsAt: at('2026-12-02T23:00:00Z'), endsAt: at('2026-12-05T23:00:00Z') });
     // The period before the first cycle is the last week, and the one after a cycle starts at its end.
     assert.deepEqual(worldBossPeriod(first.startsAt - 1, content), week);

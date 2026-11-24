@@ -14,7 +14,7 @@
 //   - the pace: a band of N active characters at the band's middle level,
 //     the boss with the data's HP (attacksPerPlayer attacks of `damage`
 //     each), played over `periods` of the boss (cycle.days days, 3; --days 7
-//     for the weeks before 30.11.2026): each character plays as one of
+//     for the weeks before 27.11.2026): each character plays as one of
 //     three kinds (PARTICIPATION: every day, every other day, now and then),
 //     with its three attacks on a day it plays, its damage drawn from the
 //     measured realistic attacks (times --real, 1 by default). How many
