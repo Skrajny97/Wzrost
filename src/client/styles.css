@@ -2642,6 +2642,14 @@ a.segmented-option {
   white-space: normal;
 }
 
+/* A number breaks only where the table has no room for it, after the dash
+   of a range: a weapon's damage in six digits ("187654–234566") beside a
+   companion's own made the Kwatery's "Załóż z plecaka" stick out of a
+   320 px phone (24.11.2026). Its sign and digits stay together. */
+.compare-table td {
+  white-space: normal;
+}
+
 .compare-table thead th {
   color: var(--text-muted);
   font-size: 11px;
