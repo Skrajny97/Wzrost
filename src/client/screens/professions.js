@@ -65,7 +65,7 @@ const WORK = {
   cooking: { kind: 'dishes', busy: 'Gotuje' },
 };
 // What the character or the Awatar Systemu is doing, by the activity's kind (t()).
-const DOING = { herbs: 'zbiera zioła', potions: 'warzy mikstury', items: 'wykonuje przedmioty', minerals: 'kopie w Kopalni', jewels: 'pracuje w Szlifierni', fish: 'łowi ryby', crops: 'uprawia pole', dishes: 'gotuje', mercenary: 'wykonuje usługę najemną' };
+const DOING = { herbs: 'zbiera zioła', potions: 'warzy mikstury', items: 'wykonuje przedmioty', minerals: 'kopie w Kopalni', jewels: 'pracuje w Szlifierni', fish: 'łowi ryby', crops: 'uprawia pole', dishes: 'gotuje', mercenary: 'wykonuje usługę najemną', cultivation: 'medytuje' };
 const FALLBACK_ICONS = { herbalism: 'leaf', alchemy: 'spirit', crafting: 'hammer', mining: 'ore', jewelcrafting: 'ring', fishing: 'fish', farming: 'sprout', cooking: 'pot' };
 const HERB_CHOICE = 'wzrost.herb-choice';
 const WORKER_CHOICE = 'wzrost.worker-choice';

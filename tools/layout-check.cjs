@@ -79,6 +79,7 @@ const SCREENS = [
   '#/walka',
   '#/walka/windfalls',
   '#/walka/windfalls/windfalls-edge',
+  '#/kultywacja',
   '#/portale',
   '#/wieze',
   '#/postac/rdzen',
@@ -133,6 +134,7 @@ const TRANSLATED = new Set([
   '#/walka',
   '#/walka/windfalls',
   '#/walka/windfalls/windfalls-edge',
+  '#/kultywacja',
   '#/portale',
   '#/wieze',
   '#/postac/rdzen',
@@ -195,6 +197,8 @@ const MEMBERS = GUILDS.members;
 // lines too, 1218).
 const FOLDS = {
   '#/postac/statystyki': '.stat-main[aria-expanded="false"]',
+  // The Kultywacja's "Jak to działa?" (cultivation.js, 1230 A).
+  '#/kultywacja': '.how-more:not([open]) > summary',
   '#/portale': '.portal-toggle[aria-expanded="false"]',
   '#/encyklopedia/cards': 'details.encyclopedia-fold:not([open]) > summary',
   '#/gildia/war': '.war details:not([open]) > summary',

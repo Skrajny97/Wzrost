@@ -126,9 +126,8 @@ function xpTo(state, target, toNext) {
 
 // The top level of the newest place a class level opens.
 function newestTop(classLevel, content) {
-  let top = 1;
-  for (const area of content.areas) if (engine.areaUnlocked(area, classLevel, content)) top = Math.max(top, area.maxLevel);
-  return top;
+  // The game's own (src/engine/cultivation.js), as Kultywacja counts it.
+  return engine.newestArea(classLevel, content).maxLevel;
 }
 
 // The Plac treningowy's level on each day: the Warownia from `fortressDay`,

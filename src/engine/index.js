@@ -42,6 +42,7 @@ export { sharedBonus, simulateFight } from './combat.js';
 export * from './hunt.js';
 export * from './threat.js';
 export * from './unlocks.js';
+export * from './cultivation.js';
 export * from './camp.js';
 export * from './fortress.js';
 export * from './fire.js';

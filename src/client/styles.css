@@ -3398,6 +3398,76 @@ a.segmented-option {
   font-size: 13px;
 }
 
+/* Kultywacja (cultivation.js, 1230 A): its card among the lands, in the
+   System's light, the first frame of its scene's sheet dim behind the words,
+   as wide as the card, around the meditating figure; its screen with the
+   scene on top, the levels, the length and the XP it gives. */
+.cultivation-link {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: var(--system-line);
+}
+
+.cultivation-link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--cultivation-art, none) 0 62% / calc(var(--cultivation-frames, 1) * 100%) auto no-repeat;
+  image-rendering: pixelated;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.cultivation-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to right, rgba(13, 17, 11, 0.72), rgba(13, 17, 11, 0.25));
+  pointer-events: none;
+}
+
+.cultivation-link--met::before {
+  opacity: 0.3;
+}
+
+.cultivation-link .region-foot {
+  border-top-color: var(--system-line);
+}
+
+.chip--system,
+.chip--cultivation {
+  border-color: var(--system-line);
+  color: var(--system);
+}
+
+.cultivation-card {
+  gap: 12px;
+}
+
+.cultivation-card .status-row dd {
+  overflow-wrap: anywhere;
+}
+
+.cultivation-gain {
+  margin: 0;
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 15px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.cultivation-gain--caught {
+  color: var(--gold);
+}
+
+.cultivation-note {
+  margin: 0;
+}
+
 /* Inner regions as circles with a picture of the place, two in a row and
    the odd last one in the middle. */
 .area-grid {

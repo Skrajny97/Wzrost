@@ -35,6 +35,7 @@ import { mountCharacter } from './screens/character.js';
 import { mountCombat } from './screens/combat.js';
 import { mountTowers } from './screens/towers.js';
 import { mountPortals } from './screens/portals.js';
+import { mountCultivation } from './cultivation.js';
 import { mountCore } from './screens/core.js';
 import { mountCommunity } from './screens/community.js';
 import { mountChatScreen } from './screens/chat.js';
@@ -92,6 +93,9 @@ const ROUTES = [
   { pattern: /^#\/walka(?:\/(?<region>[a-z0-9-]+)(?:\/(?<area>[a-z0-9-]+))?)?$/, nav: 'main', tab: 'walka', part: () => 'explore', mount: mountCombat },
   { pattern: /^#\/wieze$/, nav: 'main', tab: 'walka', part: () => 'towers', mount: mountTowers },
   { pattern: /^#\/portale$/, nav: 'main', tab: 'walka', part: () => 'portals', mount: mountPortals },
+  // The Kultywacja's screen with its scene and music, from the Walka's card
+  // (cultivation.js, 1230 A).
+  { pattern: /^#\/kultywacja$/, nav: 'main', tab: 'walka', part: () => 'explore', music: 'cultivation', mount: mountCultivation },
   { pattern: /^#\/postac$/, nav: 'character', tab: 'equipment', mount: mountCharacter },
   { pattern: /^#\/postac\/statystyki$/, nav: 'character', tab: 'stats', mount: mountStats },
   { pattern: /^#\/postac\/umiejetnosci$/, nav: 'character', tab: 'skills', music: 'skills', mount: mountSkills },

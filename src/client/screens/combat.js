@@ -58,6 +58,7 @@ import { partyGated } from '../party-gate.js';
 import { guildHelpStrip } from '../guild-help.js';
 import { bannerChip, bannerLine } from '../guild-lands.js';
 import { worldBossCard } from '../world-boss.js';
+import { cultivationBusy, cultivationLink } from '../cultivation.js';
 
 // Shown through t(), as the page loads its English after this module.
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
@@ -565,6 +566,8 @@ export function mountCombat(container, { params, navigate }) {
   function activityCard(activity) {
     // A mercenary's offer or service lives in the Karczma (mercenaries.js).
     if (activity.kind === 'mercenary') return servicePanel(activity);
+    // A Kultywacja lives on its own screen (cultivation.js).
+    if (activity.kind === 'cultivation') return cultivationBusy(activity);
     // A gathering of herbs, a brewing of potions and an order of items live
     // on their own screens; here they only say so.
     if (activity.kind === 'herbs') {
@@ -712,6 +715,8 @@ export function mountCombat(container, { params, navigate }) {
         ? systemPanel(t('Wiatrołomy to najbezpieczniejsze miejsce na start. Wybierz czas eksploracji i wyrusz.'))
         : unarmed && systemPanel(t('Walczysz gołymi rękami. Załóż broń z plecaka w zakładce Postać, jeśli już ją masz.')),
       wantedStrip(character),
+      // The way to the Kultywacja, from its unlock (cultivation.js).
+      cultivationLink(character),
       landList(character),
     );
   }

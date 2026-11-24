@@ -265,6 +265,8 @@
   "brotherhoodMaterials": ["{brotherhood}: +{value}% materiałów ze stworów."],
   "pushHuntTitle": ["Koniec wyprawy"],
   "pushHuntBody": ["Eksploracja zakończona: {area}. Raport czeka na odbiór."],
+  "pushCultivationTitle": ["Koniec Kultywacji"],
+  "pushCultivationBody": ["Kultywacja zakończona. Raport czeka na odbiór."],
   "pushBuildTitle": ["Koniec budowy"],
   "pushBuildBody": ["{building}: poziom {level} gotowy."],
   "pushStoreTitle": ["Pełny magazyn"],

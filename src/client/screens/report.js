@@ -22,6 +22,7 @@ import { findMark, itemDetails, itemSheet, itemSummary, ownedCopy, storedCopy } 
 import { partyFree, partyWent, skipLines } from './party.js';
 import { portalFightButtons } from './portals.js';
 import { cropsReport, dishesReport, fishReport, herbsReport, itemsReport, jewelsReport, mineralsReport, potionsReport } from './professions.js';
+import { cultivationReport } from '../cultivation.js';
 import { partyGated } from '../party-gate.js';
 
 // "skóra wilka ×2, rzadkie pióro kruka": what beaten creatures left.
@@ -168,7 +169,8 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     // A gathering of herbs, a brewing of potions, an order in the Warsztat,
     // a digging, a work of the Szlifiernia, a fishing, a farming or a
     // cooking has no fights: its own short report.
-    const work = { herbs: herbsReport, potions: potionsReport, items: itemsReport, minerals: mineralsReport, jewels: jewelsReport, fish: fishReport, crops: cropsReport, dishes: dishesReport }[report.kind];
+    // A Kultywacja's too (cultivation.js), with the free points to spend.
+    const work = { herbs: herbsReport, potions: potionsReport, items: itemsReport, minerals: mineralsReport, jewels: jewelsReport, fish: fishReport, crops: cropsReport, dishes: dishesReport, cultivation: (one, head) => cultivationReport(one, head, pointsBox(one)) }[report.kind];
     if (work) {
       fill(container, ...work(report, heading, findSheet));
       // The cauldron bubbles once over a finished brewing, and the hammer

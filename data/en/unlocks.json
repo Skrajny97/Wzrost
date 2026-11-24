@@ -48,6 +48,10 @@
     "name": "Settlement",
     "message": "Settlement unlocked. The residents wait in the Settlement tab."
   },
+  "cultivation": {
+    "name": "Cultivation",
+    "message": "Cultivation unlocked. When your class is ahead of your character, you can choose meditation instead of an exploration in the Combat tab: your character then gains much more Character XP until it catches up with the class."
+  },
   "arena": {
     "name": "Arena",
     "message": "Arena unlocked. In the Settlement tab you can face other players' characters there."

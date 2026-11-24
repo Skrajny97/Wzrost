@@ -74,6 +74,12 @@
     "message": "Odblokowano Osadę. Mieszkańcy czekają w zakładce Osada."
   },
   {
+    "id": "cultivation",
+    "name": "Kultywacja",
+    "level": 20,
+    "message": "Odblokowano Kultywację. Gdy klasa wyprzedza Twoją postać, w zakładce Walka możesz zamiast wyprawy wybrać medytację: postać zdobywa wtedy dużo więcej XP postaci, aż dogoni klasę."
+  },
+  {
     "id": "arena",
     "name": "Arena",
     "level": 25,

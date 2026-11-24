@@ -75,6 +75,17 @@ export function workScene(professionId, activity, { avatar = false } = {}) {
   return { element: h('div', { class: 'scene', 'aria-hidden': 'true' }, stage, shelf.element), update: shelf.update };
 }
 
+// A scene of one sheet looping in its stage in the light of the hour, as a
+// work's figure plays (workScene), without a place, shelf or moments: the
+// Kultywacja's (cultivation.js, data/animations.json `cultivation`). Null
+// without a sheet.
+export function loopScene(sheet, className = '') {
+  if (!sheet) return null;
+  const stage = h('div', { class: `scene-stage scene--${dayPart()}` }, frames(sheet, 'scene-figure'));
+  stage.style.setProperty('--scene-phase', `${(-performance.now() / 1000).toFixed(3)}s`);
+  return h('div', { class: `scene${className ? ` ${className}` : ''}`, 'aria-hidden': 'true' }, stage);
+}
+
 // The Walka scene of an exploration under way: the character in its own look
 // and skin tone (or its evolution's), or the System's figure for a look not
 // drawn walking yet, in the light of its aura, with its trail behind and its

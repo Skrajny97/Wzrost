@@ -266,6 +266,8 @@
   "brotherhoodMaterials": ["{brotherhood}: +{value}% materials from creatures."],
   "pushHuntTitle": ["Exploration over"],
   "pushHuntBody": ["Exploration complete: {area}. Your report is ready to collect."],
+  "pushCultivationTitle": ["Cultivation over"],
+  "pushCultivationBody": ["Cultivation complete. Your report is ready to collect."],
   "pushBuildTitle": ["Build complete"],
   "pushBuildBody": ["{building}: level {level} ready."],
   "pushStoreTitle": ["Store full"],
