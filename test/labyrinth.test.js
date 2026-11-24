@@ -24,6 +24,8 @@ import {
   buyAtMerchant,
   chooseBlessing,
   combatValues,
+  completionLine,
+  completionReward,
   computeStats,
   coreEffects,
   coreResonance,
@@ -46,11 +48,11 @@ import {
   playerCombatant,
   reachableRooms,
   resetLabyrinth,
-  resetPrice,
   resetsLeft,
   roomDanger,
   roomsAhead,
   simulateFight,
+  spentRoom,
   traitValue,
   upgradedArtifact,
 } from '../src/engine/index.js';
@@ -241,7 +243,7 @@ describe('a day of the Labirynt', () => {
     assert.ok(prices.heal > 0 && prices.blessing > prices.heal);
   });
 
-  test('a Labirynt lost starts again once a day (the author, 13.11.2026): the first level, full HP, no blessings, the day\'s rewards kept, for the gold of 150 minutes of exploring', () => {
+  test('a Labirynt lost starts again once a day, for free (the authors, 13.11 and 24.11.2026): the first level, full HP, no blessings, the day\'s rewards kept and the place of the defeat, the furthest of the day', () => {
     const day = '2026-11-13';
     const lost = { ...newLabyrinth({ day, charLevel: 64, companions: [], seed: 'a' }), level: 2, row: 3, room: 1, path: [0, 1, 0, 1], cleared: 1, over: /** @type {const} */ ('fainted'), hp: { me: 0 }, blessings: ['might'], gains: { xp: 5, gold: 7, shards: 2, artifacts: 1 } };
     assert.equal(resetsLeft({ ...lost, over: null }, content), 0);
@@ -249,13 +251,104 @@ describe('a day of the Labirynt', () => {
     assert.equal(resetsLeft(lost, content), 1);
     assert.equal(resetLabyrinth({ ...lost, over: 'done' }, { companions: [], seed: 'b' }, content), null);
     const again = resetLabyrinth(lost, { companions: [], seed: 'b' }, content);
-    assert.deepEqual(again, { ...newLabyrinth({ day, charLevel: 64, companions: [], seed: 'b' }), gains: lost.gains, resets: 1 });
+    assert.deepEqual(again, { ...newLabyrinth({ day, charLevel: 64, companions: [], seed: 'b' }), gains: lost.gains, resets: 1, lost: { level: 2, row: 3 } });
+    // No price any more: the data has none.
+    assert.deepEqual(Object.keys(rules.reset), ['perDay']);
     // Lost again the same day: no second try.
     assert.equal(resetsLeft({ ...again, over: 'fainted' }, content), 0);
     assert.equal(resetLabyrinth({ ...again, over: 'fainted' }, { companions: [], seed: 'c' }, content), null);
-    // Dearer than the gold a day of the Labirynt gives on average (100–140 minutes of exploring).
-    assert.equal(resetPrice(64, content), labyrinthGold(rules.reset.goldMinutes, 64, content));
-    assert.ok(resetPrice(64, content) > labyrinthGold(140, 64, content));
+    // Were there two tries a day, the place of the defeat would stay the furthest.
+    const twice = { ...content, labyrinth: { ...rules, reset: { perDay: 2 } } };
+    assert.deepEqual(resetLabyrinth({ ...again, row: 1, room: 0, over: 'fainted' }, { companions: [], seed: 'c' }, twice)?.lost, { level: 2, row: 3 });
+    assert.deepEqual(resetLabyrinth({ ...again, level: 3, row: 0, room: 0, over: 'fainted' }, { companions: [], seed: 'c' }, twice)?.lost, { level: 3, row: 0 });
+    // Before it the rooms give nothing: the levels before its own and, on its
+    // own, the rows before its row; its row and the rest pay again.
+    assert.equal(spentRoom(again, 1, rules.map.rows), true);
+    assert.equal(spentRoom(again, 2, 2), true);
+    assert.equal(spentRoom(again, 2, 3), false);
+    assert.equal(spentRoom(again, 3, 0), false);
+    assert.equal(spentRoom(lost, 1, 0), false);
+  });
+
+  test('a level completed pays its completion reward with its guardian (a player, level 228; the author, 24.11.2026): the level\'s Odłamki and gold, growing with the level', () => {
+    const last = rules.map.rows;
+    const first = enterRoom(fresh({ row: last - 1, room: 0, path: Array(last).fill(0) }), { row: last, room: 0 }, party, 'g1', content);
+    assert.equal(first.hunt.labyrinth.won, true);
+    const reward = completionReward(1, 30, content);
+    assert.deepEqual(first.completion, reward);
+    assert.equal(reward.shards, rules.levels[0].completion.shards);
+    assert.equal(reward.gold, labyrinthGold(rules.levels[0].completion.goldMinutes, 30, content));
+    // The guardian's fight pays no XP nor gold of its own: all of it is the completion reward.
+    assert.deepEqual(first.gains, { xp: 0, gold: reward.gold, shards: reward.shards });
+    assert.deepEqual(first.state.gains, { xp: 0, gold: reward.gold, shards: reward.shards, artifacts: 1 });
+    assert.equal(first.spent, false);
+    // Growing with the level, the most for the 3rd, the whole Labirynt, and for Piekielny.
+    const amounts = [1, 2, 3, 4].map((level) => completionReward(level, 100, content));
+    amounts.slice(1).forEach((one, index) => assert.ok(one.shards > amounts[index].shards && one.gold > amounts[index].gold, `level ${index + 2}`));
+    // Its words, with the Odłamki in their Polish form for the number.
+    assert.equal(completionLine(2, { shards: 4, gold: 480 }, content), 'Za ukończenie 2. poziomu: +4 Odłamki Rdzenia, +480 złota.');
+    assert.equal(completionLine(4, { shards: 16, gold: 2400 }, content), 'Za ukończenie poziomu Piekielnego: +16 Odłamków Rdzenia, +2400 złota.');
+  });
+
+  test('after starting again the rooms up to the place of the defeat give no rewards, only blessings; from it on the rewards come back; a level completed before pays no completion reward again', () => {
+    const last = rules.map.rows;
+    const spent = rules.texts.spent[0];
+    // A fight of the first row before the place of the defeat: won, its XP,
+    // gold and cards none; the same fight at the place of the defeat pays.
+    const fight = enterRoom(fresh({ resets: 1, lost: { level: 2, row: 0 } }), { row: 0, room: 0 }, { ...party, cards: { maxed: [] } }, 'seed', content);
+    assert.equal(fight.hunt.labyrinth.won, true);
+    assert.equal(fight.spent, true);
+    assert.deepEqual(fight.gains, { xp: 0, gold: 0, shards: 0 });
+    assert.deepEqual([fight.hunt.xp, fight.hunt.gold, fight.hunt.cards], [0, 0, []]);
+    assert.ok(fight.lines.includes(spent));
+    const paid = enterRoom(fresh({ resets: 1, lost: { level: 1, row: 0 } }), { row: 0, room: 0 }, party, 'seed', content);
+    assert.equal(paid.spent, false);
+    assert.ok(paid.gains.xp > 0 && paid.gains.gold > 0);
+    assert.ok(!paid.lines.includes(spent));
+    // A treasure before it is empty; at it, full.
+    const treasure = spotOf('treasure');
+    if (treasure) {
+      const before = (row) => fresh({ row: treasure.row - 1, room: treasure.from, resets: 1, lost: { level: 1, row } });
+      const empty = enterRoom(before(treasure.row + 1), { row: treasure.row, room: treasure.room }, party, 'x', content);
+      assert.deepEqual(empty.gains, { xp: 0, gold: 0, shards: 0 });
+      assert.deepEqual(empty.lines, [spent]);
+      const full = enterRoom(before(treasure.row), { row: treasure.row, room: treasure.room }, party, 'x', content);
+      assert.equal(full.gains.shards, rules.levels[0].shards.treasure);
+    }
+    // An altar and an elite before it: their blessings as ever, the elite's Odłamki and gold none.
+    const altarDay = days.find((day) => labyrinthMap(day, 1, content).rows.some((rooms) => rooms.some((one) => one.type === 'altar')));
+    const altarMap = labyrinthMap(altarDay, 1, content);
+    const altarRow = altarMap.rows.findIndex((rooms) => rooms.some((one) => one.type === 'altar'));
+    const altarRoom = altarMap.rows[altarRow].findIndex((one) => one.type === 'altar');
+    const altarFrom = altarMap.rows[altarRow - 1].findIndex((one) => one.links.includes(altarRoom));
+    const atAltar = enterRoom(fresh({ day: altarDay, row: altarRow - 1, room: altarFrom, resets: 1, lost: { level: 2, row: 0 } }), { row: altarRow, room: altarRoom }, party, 'x', content);
+    assert.equal(atAltar.state.pending.kind, 'blessing');
+    assert.equal(atAltar.state.pending.choices.length, 3);
+    const elite = spotOf('elite');
+    if (elite) {
+      const beaten = enterRoom(fresh({ row: elite.row - 1, room: elite.from, resets: 1, lost: { level: 2, row: 0 } }), { row: elite.row, room: elite.room }, party, 'e', content);
+      if (beaten.hunt.labyrinth.won) {
+        assert.deepEqual(beaten.gains, { xp: 0, gold: 0, shards: 0 });
+        assert.equal(beaten.state.pending.kind, 'blessing');
+        assert.equal(beaten.state.pending.choices.length, 3);
+      }
+    }
+    // The guardian of a level completed before the reset: no Artefakt and no
+    // completion reward again, but the next level and a blessing.
+    const atGuardian = (lost) => fresh({ row: last - 1, room: 0, path: Array(last).fill(0), resets: 1, lost });
+    const again = enterRoom(atGuardian({ level: 2, row: 4 }), { row: last, room: 0 }, party, 'g1', content);
+    assert.equal(again.hunt.labyrinth.won, true);
+    assert.equal(again.artifact, null);
+    assert.equal(again.completion, null);
+    assert.deepEqual(again.gains, { xp: 0, gold: 0, shards: 0 });
+    assert.equal(again.state.gains.artifacts, 0);
+    assert.equal(again.state.level, 2);
+    assert.equal(again.state.cleared, 1);
+    assert.equal(again.state.pending.kind, 'blessing');
+    // The guardian of the level the party lost on pays both, the first time that day.
+    const firstTime = enterRoom(atGuardian({ level: 1, row: 3 }), { row: last, room: 0 }, party, 'g1', content);
+    assert.ok(firstTime.artifact);
+    assert.deepEqual(firstTime.completion, completionReward(1, 30, content));
   });
 
   test('the blessings work in the fights: damage, armour, HP, a first critical blow, a shield, the companions\' damage and the healing after a won fight', () => {

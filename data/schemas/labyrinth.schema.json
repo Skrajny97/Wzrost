@@ -23,7 +23,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "name", "strength", "shards", "artifact"],
+        "required": ["id", "name", "strength", "shards", "artifact", "completion"],
         "properties": {
           "id": { "$ref": "#/definitions/id" },
           "name": { "type": "string", "minLength": 1 },
@@ -38,7 +38,18 @@
               "treasure": { "type": "integer", "minimum": 0 }
             }
           },
-          "artifact": { "$ref": "#/definitions/weights", "description": "Wagi rzadkości Artefaktu strażnika (id z rarities.json)." }
+          "artifact": { "$ref": "#/definitions/weights", "description": "Wagi rzadkości Artefaktu strażnika (id z rarities.json)." },
+          "completion": {
+            "description": "Nagroda za ukończenie poziomu (pokonanie strażnika), tylko za pierwsze ukończenie tego dnia: shards Odłamków Rdzenia i złoto goldMinutes minut eksploracji na poziomie stworów. name: poziom w dopełniaczu, do zdania „Za ukończenie {level}…” („2. poziomu”).",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "shards", "goldMinutes"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "shards": { "type": "integer", "minimum": 0 },
+              "goldMinutes": { "type": "integer", "minimum": 0 }
+            }
+          }
         }
       }
     },
@@ -90,12 +101,11 @@
       }
     },
     "reset": {
-      "description": "Labirynt od nowa po przegranej walce (autor, 13.11.2026): perDay razy dziennie za złoto goldMinutes minut eksploracji na poziomie stworów.",
+      "description": "Labirynt od nowa po przegranej walce (autor, 13.11.2026): perDay razy dziennie, za darmo, a do miejsca porażki komnaty nie dają nagród, tylko błogosławieństwa (autor, 24.11.2026).",
       "type": "object",
       "additionalProperties": false,
-      "required": ["goldMinutes", "perDay"],
+      "required": ["perDay"],
       "properties": {
-        "goldMinutes": { "type": "integer", "minimum": 1 },
         "perDay": { "type": "integer", "minimum": 0 }
       }
     },
@@ -144,8 +154,10 @@
     "texts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["fightStart", "eliteStart", "guardianStart", "won", "lost", "defeat", "shards", "gold", "artifact", "treasure", "spring", "levelCleared", "hellOpen", "dayDone", "coreOpen", "towerArtifact"],
+      "required": ["fightStart", "eliteStart", "guardianStart", "won", "lost", "defeat", "shards", "gold", "artifact", "treasure", "spring", "levelCleared", "hellOpen", "dayDone", "completion", "spent", "coreOpen", "towerArtifact"],
       "properties": {
+        "completion": { "$ref": "#/definitions/texts", "description": "Nagroda za ukończenie poziomu: {level} (levels[].completion.name), {shards}, {gold}." },
+        "spent": { "$ref": "#/definitions/texts", "description": "Komnata przed miejscem porażki po rozpoczęciu od nowa: bez nagród, tylko błogosławieństwa." },
         "fightStart": { "$ref": "#/definitions/texts" },
         "eliteStart": { "$ref": "#/definitions/texts" },
         "guardianStart": { "$ref": "#/definitions/texts" },

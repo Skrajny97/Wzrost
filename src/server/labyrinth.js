@@ -9,11 +9,13 @@
 // of the Dziennik). The Labirynt takes nothing of the character's time,
 // HP or potions: it goes on also during an exploration and the work of a
 // profession, as the Portale (856 A), but not while the character serves
-// as a mercenary. Its XP, gold, Odłamki and Artefakty come at once; a new
-// level heals the character fully, unless it is away on an exploration,
-// whose report settles its HP. The first guardian beaten opens the Rdzeń
-// (855 A). Everything is saved in one batch only while the character is as
-// read (atomic.js).
+// as a mercenary. Its XP, gold, Odłamki and Artefakty come at once, and a
+// level's completion reward with its guardian's win; a new level heals the
+// character fully, unless it is away on an exploration, whose report
+// settles its HP. The first guardian beaten opens the Rdzeń (855 A). After
+// a fight lost the Labirynt starts again for free, its rooms up to the
+// place of the defeat giving only blessings (spentRoom). Everything is
+// saved in one batch only while the character is as read (atomic.js).
 
 import {
   addQuestProgress,
@@ -24,6 +26,8 @@ import {
   buyAtMerchant,
   cardDropText,
   chooseBlessing,
+  completionLine,
+  completionReward,
   enterRoom,
   hpAfterHunt,
   huntKills,
@@ -43,12 +47,12 @@ import {
   packDropText,
   reachableRooms,
   resetLabyrinth,
-  resetPrice,
   resetsLeft,
   roomDanger,
   roomRefusal,
   roomRules,
   roomsAhead,
+  spentRoom,
 } from '../engine/index.js';
 import { say } from '../engine/text.js';
 import { atomically, sameVersion } from './atomic.js';
@@ -128,13 +132,20 @@ function foesOf(state, row, room, type) {
   return encounter.members.map((member) => ({ monsterId: member.monsterId, name: content().monstersById[member.monsterId].name, level: member.level }));
 }
 
+// The rooms whose rewards a place of the defeat takes away (spentRoom): the
+// others give none anyway.
+const REWARDING = ['fight', 'elite', 'treasure', 'guardian'];
+
 // The Labirynt for its page: the day and the levels (cleared, open), the
 // level's map with the party's position, the creatures of every room, the
-// danger of the fights still ahead (899 A) and the Odłamki of the elites and
-// treasures, the rooms it may enter, the fighters with their HP, the
-// blessings taken, a choice waiting (with the merchant's prices), the day's
-// rewards, the Artefakty waiting in the Skrytka Rdzenia (`waiting`) and the
-// words of the rooms.
+// danger of the fights still ahead (899 A), the Odłamki of the elites and
+// treasures and the rooms before the place of the defeat, which give
+// nothing (`spent`), the rooms it may enter, the fighters with their HP,
+// the blessings taken, a choice waiting (with the merchant's prices), the
+// day's rewards, the level's completion reward while its guardian still
+// gives it, whether the party is still before the place of the defeat
+// (`behind`), the Artefakty waiting in the Skrytka Rdzenia (`waiting`) and
+// the words of the rooms.
 function labyrinthView(player, state, now, waiting = 0) {
   const map = labyrinthMap(state.day, state.level, content());
   const reachable = state.over || state.pending ? [] : reachableRooms(map, state.row, state.room);
@@ -155,6 +166,8 @@ function labyrinthView(player, state, now, waiting = 0) {
   const party = { character, equipped, name: player.row.name, companions, trophies: monsterIds.length > 0 ? trophiesFor(player, now, monsterIds) : {}, week: weekFor(player.row, now) };
   const dangerSeed = `danger:${state.day}:${player.row.id}`;
   const dangerOf = (row, index, type) => (ahead.has(`${row}:${index}`) ? roomDanger({ state, type, row, room: index, party, seed: dangerSeed }, content()) : null);
+  const spentOf = (row, type) => REWARDING.includes(type) && spentRoom(state, state.level, row);
+  const completion = spentRoom(state, state.level, map.rows.length - 1) ? null : completionReward(state.level, state.charLevel, content(), player.row.class_level);
   return {
     day: state.day,
     level: state.level,
@@ -177,7 +190,8 @@ function labyrinthView(player, state, now, waiting = 0) {
         links: room.links,
         foes: foes[row][index],
         danger: dangerOf(row, index, room.type),
-        shards: level.shards?.[room.type] ?? null,
+        shards: spentOf(row, room.type) ? null : (level.shards?.[room.type] ?? null),
+        spent: spentOf(row, room.type),
       })),
     ),
     row: state.row,
@@ -201,11 +215,18 @@ function labyrinthView(player, state, now, waiting = 0) {
       ...(pending.kind === 'merchant' && { heal: pending.heal, blessing: pending.blessing, prices, healShare: rules().merchant.heal }),
     },
     gains: state.gains,
+    // The level's completion reward, in words too, while its guardian gives
+    // it: the first time that day (completionReward).
+    completion: completion && { ...completion, text: completionLine(state.level, completion, content()) },
+    // After the Labirynt started again, the place of the defeat and whether
+    // the next rooms are still before it (no rewards there, only blessings).
+    lost: state.lost ?? null,
+    behind: !state.over && spentRoom(state, state.level, state.row + 1),
     // The Artefakty in the Skrytka Rdzenia, not absorbed yet (940): the page
     // offers to take them there.
     waiting,
-    // After a fight lost: the gold of starting again and the tries left today.
-    reset: state.over === 'fainted' ? { price: resetPrice(state.charLevel, content(), player.row.class_level), left: resetsLeft(state, content()) } : null,
+    // After a fight lost: the tries left today to start again, for free.
+    reset: state.over === 'fainted' ? { left: resetsLeft(state, content()) } : null,
     rooms: rules().rooms.map((room) => roomView(room.id)),
   };
 }
@@ -244,8 +265,12 @@ function targetOf(body, state) {
 }
 
 // { level, row, room }: a room entered. A fight is fought at once, its
-// report saved; the gold, XP, Odłamki and an Artefakt come at once, and the
-// first guardian beaten opens the Rdzeń.
+// report saved; the gold, XP, Odłamki and an Artefakt come at once, a
+// guardian's with the level's completion reward the first time that day
+// (in the same batch as the win, so two taps give it once), and the first
+// guardian beaten opens the Rdzeń. Before the place of the defeat, after
+// the Labirynt started again, a room gives nothing but its blessings: no
+// cards, and its creatures count for no quest, Próba nor achievement.
 export async function enterLabyrinth(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -278,7 +303,7 @@ export async function enterLabyrinth(context) {
   // is as read, and every change of the collection changes it too.
   const collection = foes.length > 0 && cardsHere() ? await dropCollection(db, row.id) : null;
   const done = enterRoom(state, target, { character, equipped, name: row.name, companions, trophies, week, cards: collection && { maxed: maxedCards(collection) } }, seed, content());
-  const { hunt, gains, artifact } = done;
+  const { hunt, gains, artifact, completion, spent } = done;
   const next = done.state;
   const texts = rules().texts;
   const lines = [...done.lines];
@@ -286,8 +311,10 @@ export async function enterLabyrinth(context) {
   const core = coreOf(row);
   const opensCore = type === 'guardian' && hunt?.labyrinth.won && !core.open;
   const nextCore = { ...core, open: core.open || Boolean(opensCore), shards: core.shards + gains.shards };
-  if (gains.shards > 0 && type !== 'treasure') lines.push(say(texts, 'shards', 0, { shards: gains.shards }));
-  if (type === 'elite' && hunt?.labyrinth.won) lines.push(say(texts, 'gold', 0, { gold: gains.gold - hunt.gold }));
+  if (type === 'elite' && hunt?.labyrinth.won && !spent) {
+    lines.push(say(texts, 'shards', 0, { shards: gains.shards }));
+    lines.push(say(texts, 'gold', 0, { gold: gains.gold - hunt.gold }));
+  }
   if (artifact) lines.push(say(texts, 'artifact', 0, { artifact: artifactView(artifact, content()).name }));
   // The cards the creatures left (903), each in a line of its own.
   const cardsWon = collection ? (hunt?.cards ?? []) : [];
@@ -297,11 +324,13 @@ export async function enterLabyrinth(context) {
   const packsWon = collection ? (hunt?.packs ?? 0) : 0;
   for (let pack = 0; pack < packsWon; pack += 1) lines.push(packDropText(target.row * 3 + target.room + cardsWon.length + pack, content()));
   // A rare effect card from a guardian beaten (977.3 B), with its line.
-  const effectWon = collection && type === 'guardian' && hunt?.labyrinth.won ? await droppedEffect(db, row.id, seed, effectChance('guardian')) : null;
+  const effectWon = collection && type === 'guardian' && hunt?.labyrinth.won && !spent ? await droppedEffect(db, row.id, seed, effectChance('guardian')) : null;
   if (effectWon) lines.push(effectFoundLine(effectWon.view));
   const cardsShown = [...(cardsWon.length > 0 ? droppedCards(cardsWon, collection) : []), ...packViews(packsWon), ...(effectWon ? [effectWon.view] : [])];
   if (type === 'guardian' && hunt?.labyrinth.won) {
     lines.push(say(texts, 'levelCleared', 0, { level: labyrinthLevel(state.level, content()).name }));
+    // The level's completion reward (completionReward), the first time that day.
+    if (completion) lines.push(completionLine(state.level, completion, content()));
     if (next.over === 'done') lines.push(say(texts, 'dayDone', 0));
     else if (labyrinthLevel(next.level, content()).hell) lines.push(say(texts, 'hellOpen', 0));
   }
@@ -356,10 +385,11 @@ export async function enterLabyrinth(context) {
     system: report.system,
   };
   // The creatures fought join those the character has met (the Bestiariusz),
-  // and the quests and the Próby Gildii count those beaten.
+  // and the quests and the Próby Gildii count those beaten, but not before
+  // the place of the defeat: a free try again would be a way to farm them.
   const fought = hunt ? hunt.fights.flatMap((fight) => fight.enemies.map((enemy) => enemy.monsterId)) : [];
   const met = [...new Set([...JSON.parse(row.met ?? '[]'), ...fought])];
-  const kills = hunt ? huntKills(hunt, content()) : {};
+  const kills = hunt && !spent ? huntKills(hunt, content()) : {};
   const opened = applied ? areasOpened(character.classLevel, applied.classLevel, content()) : 0;
   const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { kills, opened }));
   const healed = applied?.levelled && !away ? hpAfterHunt({ character, applied, hunt, equipped, name: row.name }, content()) : null;
@@ -405,8 +435,9 @@ export async function enterLabyrinth(context) {
     );
   }
   // The Labirynt cleared, its 3rd level's guardian beaten, counts for the
-  // achievements (achievements.js).
-  if (type === 'guardian' && hunt?.labyrinth.won && state.level === 3) statements.push(...featGains(db, row.id, { labyrinths: 1 }));
+  // achievements (achievements.js), once a day: not again before the place
+  // of the defeat.
+  if (type === 'guardian' && hunt?.labyrinth.won && state.level === 3 && !spent) statements.push(...featGains(db, row.id, { labyrinths: 1 }));
   const results = await atomically(db, statements);
   const saved = report ? results[reportAt].meta.last_row_id : null;
   return answer(context, session, {
@@ -414,6 +445,9 @@ export async function enterLabyrinth(context) {
       type,
       won: hunt ? hunt.labyrinth.won : null,
       gains,
+      // Before the place of the defeat: no rewards, only the blessings.
+      spent,
+      completion,
       artifact: artifact ? artifactView(artifact, content()) : null,
       // A fight not won says first that the day's Labirynt is over.
       lines: hunt && !hunt.labyrinth.won ? [hunt.labyrinth.text, ...lines] : lines,
@@ -439,10 +473,10 @@ export async function chooseLabyrinthBlessing(context) {
 }
 
 // After a fight lost, the Labirynt from its first level again (the author,
-// 13.11.2026): once a day, for the gold of resetPrice, with the fighters at
-// full HP, no blessings and the companions going now; the day's rewards
-// stay. Saved only while the character is as read, the gold taken only
-// while it has it.
+// 13.11.2026), once a day, with the fighters at full HP, no blessings and
+// the companions going now; the day's rewards stay. Free since 24.11.2026,
+// its rooms up to the place of the defeat giving only blessings
+// (resetLabyrinth). Saved only while the character is as read.
 export async function resetLabyrinthDay(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -451,13 +485,8 @@ export async function resetLabyrinthDay(context) {
   const state = todayOf(player, context.now);
   const next = resetLabyrinth(state, { companions: companionsOf(player), seed: toHex(crypto.getRandomValues(new Uint8Array(16))) }, content());
   if (!next) throw new ApiError(409, 'no_reset', state.over === 'fainted' ? 'Dziś Labirynt był już zaczęty od nowa. Nowy o północy.' : 'Labirynt można zacząć od nowa tylko po przegranej walce.');
-  const price = resetPrice(state.charLevel, content(), row.class_level);
-  if (row.gold < price) throw new ApiError(409, 'no_gold', t('Brakuje złota: potrzeba {price}.', { price }));
   const db = context.env.DB;
-  await atomically(db, [
-    sameVersion(db, row),
-    db.prepare('UPDATE characters SET gold = gold - ?, labyrinth = ?, version = version + 1 WHERE id = ? AND gold >= ?').bind(price, JSON.stringify(next), row.id, price),
-  ]);
+  await atomically(db, [sameVersion(db, row), db.prepare('UPDATE characters SET labyrinth = ?, version = version + 1 WHERE id = ?').bind(JSON.stringify(next), row.id)]);
   return answer(context, session);
 }
 

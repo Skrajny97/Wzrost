@@ -25148,6 +25148,28 @@ a.social-button {
   height: 14px !important;
 }
 
+/* A room before the place of the defeat, after the Labirynt started again:
+   no rewards there, only blessings (24.11.2026), a coin struck through. */
+.lab-tile-spent {
+  position: absolute;
+  top: 6%;
+  right: 0;
+  display: inline-grid;
+  place-items: center;
+  height: 18px;
+  padding: 0 4px;
+  border: 1px solid rgba(255, 154, 154, 0.7);
+  border-radius: 9px;
+  background: rgba(6, 12, 15, 0.9);
+  pointer-events: none;
+}
+
+.lab-tile-spent img,
+.lab-tile-spent svg {
+  width: 14px;
+  height: 14px;
+}
+
 /* The danger in a room's sheet and the rings in the legend. */
 .lab-danger {
   display: flex;
@@ -25414,6 +25436,67 @@ a.social-button {
 
 .calm .lab-prompt-choice {
   animation: none;
+}
+
+/* After the Labirynt started again, while the party is before the place of
+   the defeat (24.11.2026): the words under the hint, over the board. */
+.lab-prompt--behind {
+  pointer-events: none;
+}
+
+.lab-prompt--behind .lab-hint {
+  position: static;
+  max-width: 100%;
+  transform: none;
+}
+
+.lab-prompt--behind .labyrinth-spent-note {
+  margin: 0;
+  padding: 4px 12px;
+  border: 1px solid rgba(255, 154, 154, 0.55);
+  border-radius: 12px;
+  background: rgba(6, 14, 17, 0.9);
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+/* That rule in words, with a coin struck through (lab-spent-mark), on the
+   entrance and in a room's sheet; the completion reward in the guardian's. */
+.labyrinth-spent-note,
+.labyrinth-completion {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.labyrinth-hero > .labyrinth-spent-note {
+  margin: 6px 0 0;
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.lab-spent-mark {
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+}
+
+.lab-spent-mark::after {
+  position: absolute;
+  top: 50%;
+  right: -2px;
+  left: -2px;
+  height: 2px;
+  margin-top: -1px;
+  border-radius: 1px;
+  background: #ff7a7a;
+  box-shadow: 0 0 0 1px rgba(6, 12, 15, 0.85);
+  content: '';
+  transform: rotate(-40deg);
 }
 
 /* The phone's bottom bar. */
