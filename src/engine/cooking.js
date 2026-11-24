@@ -187,6 +187,28 @@ export function mealOf(stored, content) {
  */
 export const freshMeal = (dishId, content, portions = 1) => ({ dish: dishId, left: content.cooking.meal.minutes, portions });
 
+// The dish a Drużyna's member eats by its Autouzupełnianie as its party's
+// trip sets out (gracz (poz. 95), 24.11.2026: „posiłki ze spiżarni z
+// zaznaczeniem autouzupełniania do wyczerpania zapasów”; src/server/
+// parties.js): the dish of its choice (`choice`: { dish, auto }, kept in
+// the Drużyna), one portion of it, once its meal has run out (`meal`, as
+// mealOf gives it: null) and while its Spiżarnia (`pantry`, counts by id)
+// has one; null otherwise, and nothing is eaten. A meal at work goes on as
+// eating by hand would leave it: another dish's is never replaced without
+// asking (0.4.73), and the same dish's has not run out yet.
+/**
+ * @param {{ dish?: unknown, auto?: unknown } | null | undefined} choice
+ * @param {Meal | null} meal
+ * @param {Record<string, number>} pantry
+ * @param {Content} content
+ * @returns {string | null}
+ */
+export function mealRefill(choice, meal, pantry, content) {
+  if (!choice || choice.auto !== true || typeof choice.dish !== 'string' || !content.cooking) return null;
+  if (!Object.hasOwn(content.dishesById, choice.dish) || meal) return null;
+  return (pantry[choice.dish] ?? 0) >= 1 ? choice.dish : null;
+}
+
 // An exploration of `minutes` setting out with the meal: what it gets
 // (`bonus`: the dish's bonuses and its portions, the share of its time the
 // meal covers, its minutes of the meal, and `last` when it uses the meal

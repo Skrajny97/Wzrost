@@ -74,6 +74,8 @@ import {
   huntDurations,
   isUnlocked,
   longestHunt,
+  mealOf,
+  mealRefill,
   mountOf,
   mountStage,
   partyFit,
@@ -93,7 +95,7 @@ import { beginHunt, finishActivity } from './hunts.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { accountLanguage, runInLanguage, t } from './i18n.js';
-import { potionKnown, potionsOf } from './professions-view.js';
+import { pantryOf, potionKnown, potionsOf } from './professions-view.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 // The most invitations one party may have waiting.
@@ -273,7 +275,7 @@ export async function partyView(db, characterId, now) {
          WHERE i.character_id = ? ORDER BY i.created_at DESC`,
       )
       .bind(characterId),
-    db.prepare('SELECT class_level, settlement, party_potions FROM characters WHERE id = ?').bind(characterId),
+    db.prepare('SELECT class_level, settlement, party_potions, party_meal FROM characters WHERE id = ?').bind(characterId),
   ]);
   const { onlineSeconds } = content().community.trade;
   const list = members.results.map((row) => ({
@@ -326,6 +328,9 @@ export async function partyView(db, characterId, now) {
     // In a party, the potions it takes along as a member (memberPotions):
     // { potions, healBelow } as saved, or null for none.
     potions: party && self.results[0] ? partyPotionsOf(self.results[0]) : null,
+    // And the dish it eats by its Autouzupełnianie (memberMeal): { dish,
+    // auto } as saved, with the dish's name, or null for none.
+    meal: party && self.results[0] ? mealChoiceView(partyMealOf(self.results[0])) : null,
   };
 }
 
@@ -680,6 +685,61 @@ export async function setPartyPotions(context) {
   return answer(db, player.row.id, context.now);
 }
 
+// Posiłek członka drużyny z autouzupełnianiem (gracz (poz. 95), 24.11.2026:
+// „może dodadzą jeszcze posiłki ze spiżarni z zaznaczeniem autouzupełniania
+// do wyczerpania zapasów”): a member, not the leader, chooses in the
+// Drużyna, beside its potions, a dish of its Spiżarnia and
+// „Autouzupełnianie”; as its party's trip sets out, a member whose meal has
+// run out eats one portion of that dish from its own Spiżarnia, while it
+// has one, as eating by hand would (mealRefill in the engine: a meal at
+// work goes on). Kept on its row (characters.party_meal) for later trips
+// and parties: { dish, auto }, or null for none. The leader eats in its own
+// "Opcje wyprawy"; a member that comes to lead keeps its choice for when it
+// is a member again.
+function partyMealOf(row) {
+  try {
+    const kept = JSON.parse(row.party_meal ?? 'null');
+    return kept && typeof kept === 'object' && !Array.isArray(kept) && typeof kept.dish === 'string' ? { dish: kept.dish, auto: kept.auto === true } : null;
+  } catch {
+    return null;
+  }
+}
+
+// The choice as the Drużyna shows it: with the dish's name, for a dish the
+// Spiżarnia has run out of too; null for none, or a dish the game no longer
+// has.
+function mealChoiceView(kept) {
+  const dish = kept && content().cooking ? content().dishesById[kept.dish] : null;
+  return dish ? { ...kept, name: dish.name } : null;
+}
+
+// What a member going on a trip eats of its choice as it sets out, for its
+// start (beginHunt): { meal, mealPortions } with one portion of the dish,
+// or {} for nothing.
+function memberMeal(row) {
+  const dish = mealRefill(partyMealOf(row), content().cooking ? mealOf(row.meal, content()) : null, pantryOf(row), content());
+  return dish ? { meal: dish, mealPortions: 1 } : {};
+}
+
+// PUT /api/party/meal { dish, auto }: a member's choice of the dish of its
+// Autouzupełnianie for its party's trips (memberMeal): a dish of the game
+// by id, or null, and whether to eat it. Saved as it comes, whatever the
+// Spiżarnia holds now: a trip eats what there is as it sets out. A choice
+// of nothing is kept as none. Answers the Drużyna anew.
+export async function setPartyMeal(context) {
+  const { player } = await requirePartyPlayer(context);
+  const db = context.env.DB;
+  const body = await readJson(context.request);
+  const dish = body.dish ?? null;
+  if (dish !== null && (typeof dish !== 'string' || !content().cooking || !Object.hasOwn(content().dishesById, dish))) throw new ApiError(400, 'unknown_dish', 'Nie ma takiej potrawy.');
+  if (typeof (body.auto ?? false) !== 'boolean') throw new ApiError(400, 'invalid_auto', 'Zaznacz albo odznacz autouzupełnianie.');
+  const auto = body.auto === true;
+  if (auto && dish === null) throw new ApiError(400, 'no_dish_chosen', 'Wybierz potrawę do autouzupełniania.');
+  const kept = dish === null ? null : JSON.stringify({ dish, auto });
+  await db.prepare('UPDATE characters SET party_meal = ? WHERE id = ?').bind(kept, player.row.id).run();
+  return answer(db, player.row.id, context.now);
+}
+
 // A party's boon as kept (parties.boon, party-events.js): its { haste, xp,
 // gold } shares, or null for none, or one that does not read.
 function boonOf(text) {
@@ -908,6 +968,9 @@ async function setOut(db, player, body, now, claimed) {
         // Its own potions of its choice, taken from its bag with its start
         // in the batch below (beginHunt), and back with its report.
         ...memberPotions(member.row, body.minutes),
+        // And a portion of the dish of its Autouzupełnianie once its meal
+        // has run out, from its Spiżarnia with its start (memberMeal).
+        ...memberMeal(member.row),
       };
       const setup = await beginHunt(db, member, own, now, {
         party: party_,

@@ -773,7 +773,8 @@ function mealAtStart(player, dishId, minutes, replaces = null, count = 1) {
 // exploration keeps the meal it set out with, and a call back gives back
 // the meal as it was. The meal's time runs only on explorations, so nothing
 // is lost by eating early; a member of a Drużyna eats so before its trip,
-// whose set-out feeds only the leader, and the meal covers the trip.
+// whose set-out feeds the leader by its choice and a member only by its
+// Autouzupełnianie (parties.js: memberMeal), and the meal covers the trip.
 export async function eatDish(context) {
   const { session, player } = await requirePlayer(context);
   const { cooking } = content();
