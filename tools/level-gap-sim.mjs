@@ -8,6 +8,7 @@
 //   node tools/level-gap-sim.mjs --from 150/200           a character at level 150 with class level 200
 //   node tools/level-gap-sim.mjs --hours 10 --at character --no-yard
 //   node tools/level-gap-sim.mjs --variants now,catchup --weeks 1,2,3,4
+//   node tools/level-gap-sim.mjs --variants now,cult3cap,cult2,cult4cap --cultivation catch-up --from 100/119
 //
 // The player (options): `hours` of explorations a day (17.5: four
 // explorations of 4 hours and an hour and a half rewound with Time
@@ -23,6 +24,29 @@
 // realistic player of tools/difficulty-sim.mjs with its companions hardly
 // ever faints in the newest place). The class's waits at its evolution
 // levels are left out: their XP is kept and comes after the wait.
+//
+// Kultywacja (the author 24.11.2026, after turning down the variants above:
+// „coś w rodzaju Kultywacji, która powoduje że postać medytuje i wtedy
+// zdobywa mocno zwiększony XP postaci”): a timed activity the player chooses
+// instead of an exploration as long. The character meditates and gets only
+// character XP: `k` times what an exploration as long gives in the newest
+// place its class opens (the XP an hour of `--at class`, whatever `--at`
+// is). No class XP and no loot; the Avatar and the Plac treningowy work as on
+// any other day. A capped Kultywacja gives XP only while the class level is
+// above the character's and stops at equal levels: the character never
+// passes its class through it. How the player meditates (`--cultivation`,
+// both ways when left out): `slot`, the usual day with one of its 4-hour
+// explorations turned into Kultywacja, the first one in which the class is
+// ahead (with no cap, the first one every day); `catch-up`, every hour of play
+// from the first day until the levels are equal, where the player stops even
+// with no cap, then explorations only. A Kultywacja that reaches equal levels
+// ends there and the rest of its hours are an exploration, as the player
+// would choose its length.
+//
+// Each week: the character's and the class's levels, the gap, and the class
+// level against the game as it is (the class levels a variant costs). A
+// Kultywacja row ends with its hours in all and, catching up, the day the
+// levels were equal.
 
 import { fileURLToPath } from 'node:url';
 import * as engine from '../src/engine/index.js';
@@ -69,6 +93,17 @@ export const VARIANTS = {
     name: 'więcej XP postaci z wypraw (+25% od 50. poziomu postaci)',
     charShare: (level) => (level >= 50 ? 1.25 : 1),
   },
+  // Kultywacja (header): `k` times the character XP of an exploration in the
+  // newest place, with `cap` only while the class is ahead.
+  cult3cap: { name: 'Kultywacja: 3 razy XP postaci, tylko gdy klasa wyżej, do zrównania poziomów', cultivation: { k: 3, cap: true } },
+  cult2: { name: 'Kultywacja: 2 razy XP postaci, zawsze, bez limitu', cultivation: { k: 2, cap: false } },
+  cult4cap: { name: 'Kultywacja: 4 razy XP postaci, tylko gdy klasa wyżej, do zrównania poziomów', cultivation: { k: 4, cap: true } },
+};
+
+// How the player meditates with a Kultywacja variant (header).
+export const CULTIVATION = {
+  slot: 'co dzień jedna 4-godzinna wyprawa zamieniona na Kultywację',
+  'catch-up': 'Kultywacja przez całe dni aż do zrównania poziomów, potem same wyprawy',
 };
 
 // The level and XP after `gained` XP (gainXp without the evolution waits).
@@ -80,6 +115,13 @@ function gain(state, gained, toNext, maxLevel) {
     level += 1;
   }
   return { level, xp };
+}
+
+// The XP from `state` to the start of level `target`.
+function xpTo(state, target, toNext) {
+  let xp = -state.xp;
+  for (let level = state.level; level < target; level++) xp += toNext(level);
+  return xp;
 }
 
 // The top level of the newest place a class level opens.
@@ -107,8 +149,9 @@ function yardLevels(fortressDay, days, content) {
 }
 
 // Day by day: the character's and the class's levels at the end of each
-// week in `weeks`.
-export function project({ variant = VARIANTS.now, hours = 17.5, at = 'class', yard = true, from = null, weeks = [1, 2, 4, 8, 12], fortressDay = 21, avatarDay = 7 }, content) {
+// week in `weeks`, with the hours of Kultywacja so far and, catching up, the
+// day the levels were equal (0: at the start, null: not yet).
+export function project({ variant = VARIANTS.now, cultivate = 'slot', hours = 17.5, at = 'class', yard = true, from = null, weeks = [1, 2, 4, 8, 12], fortressDay = 21, avatarDay = 7 }, content) {
   const { maxLevel } = content.balance.progression;
   const charShare = variant.charShare ?? (() => 1);
   const classShare = variant.classShare ?? (() => 1);
@@ -120,11 +163,41 @@ export function project({ variant = VARIANTS.now, hours = 17.5, at = 'class', ya
   const training = yardLevels(from ? -1000 : fortressDay, days, content);
   let char = { level: from?.level ?? 1, xp: 0 };
   let cls = { level: from?.classLevel ?? 1, xp: 0 };
+  const { cultivation } = variant;
+  let catchingUp = Boolean(cultivation) && cultivate === 'catch-up' && cls.level > char.level;
+  let equalOn = cultivation && cultivate === 'catch-up' && !catchingUp ? 0 : null;
+  let cultivated = 0;
+  // Kultywacja for at most `length` hours: the hours it lasted. With `cap`
+  // it starts only while the class is ahead and ends at equal levels.
+  const meditate = (length, cap) => {
+    if (cap && char.level >= cls.level) return 0;
+    const rate = cultivation.k * engine.xpPerHour(newestTop(cls.level, content), content);
+    const needed = cap ? xpTo(char, cls.level, charToNext) / rate : Infinity;
+    const spent = Math.min(length, needed);
+    char = spent === needed ? { level: cls.level, xp: 0 } : gain(char, rate * spent, charToNext, maxLevel);
+    cultivated += spent;
+    return spent;
+  };
+  // Catching up ends once the levels are equal.
+  const caughtUp = (day) => {
+    if (catchingUp && char.level >= cls.level) [catchingUp, equalOn] = [false, day];
+  };
   const rows = [];
   for (let day = 1; day <= days; day++) {
-    // Explorations of 4 hours, and what is left as a shorter one.
+    // The day's one 4-hour Kultywacja is still to come.
+    let slot = Boolean(cultivation) && cultivate === 'slot';
+    // Explorations of 4 hours, and what is left as a shorter one; the hours
+    // of Kultywacja come out of them.
     for (let left = hours; left > 0; left -= 4) {
-      const length = Math.min(4, left);
+      let length = Math.min(4, left);
+      if (catchingUp) {
+        length -= meditate(length, true);
+        caughtUp(day);
+      } else if (slot && length === 4 && (cls.level > char.level || !cultivation.cap)) {
+        slot = false;
+        length -= meditate(length, cultivation.cap);
+      }
+      if (length <= 0) continue;
       const place = at === 'class' ? newestTop(cls.level, content) : char.level;
       const xp = engine.xpPerHour(place, content) * length;
       const [toCharacter, toClass] = [charShare(char.level, cls.level), classShare(char.level, cls.level)];
@@ -141,7 +214,8 @@ export function project({ variant = VARIANTS.now, hours = 17.5, at = 'class', ya
       const work = engine.workXp(char.level, 24 * 60, content) * content.avatar.share;
       char = gain(char, work, charToNext, maxLevel);
     }
-    if (day % 7 === 0 && weeks.includes(day / 7)) rows.push({ week: day / 7, level: char.level, classLevel: cls.level, gap: cls.level - char.level });
+    caughtUp(day);
+    if (day % 7 === 0 && weeks.includes(day / 7)) rows.push({ week: day / 7, level: char.level, classLevel: cls.level, gap: cls.level - char.level, cultivated, equalOn });
   }
   return rows;
 }
@@ -164,12 +238,27 @@ function main() {
   const from = level ? { level, classLevel } : null;
   const weeks = typeof options.weeks === 'string' ? options.weeks.split(',').map(Number) : [1, 2, 4, 8, 12];
   const ids = typeof options.variants === 'string' ? options.variants.split(',') : Object.keys(VARIANTS);
+  const ways = typeof options.cultivation === 'string' ? options.cultivation.split(',') : Object.keys(CULTIVATION);
+  for (const id of ids) if (!VARIANTS[id]) throw new Error(`No variant ${id}: ${Object.keys(VARIANTS).join(', ')}`);
+  for (const way of ways) if (!CULTIVATION[way]) throw new Error(`No way of meditating ${way}: ${Object.keys(CULTIVATION).join(', ')}`);
   const settings = { hours: Number(options.hours ?? 17.5), at: options.at ?? 'class', yard: !options['no-yard'], from, weeks };
+  // A row for each variant, and for a Kultywacja one, each way of meditating.
+  const runs = ids.flatMap((id) => (VARIANTS[id].cultivation ? ways.map((way) => ({ id, way, label: `${id}/${way}` })) : [{ id, label: id }]));
+  const width = Math.max(8, ...runs.map((run) => run.label.length));
+  const now = project({ ...settings, variant: VARIANTS.now }, content);
+  const days = 7 * Math.max(...weeks);
   console.log(`${settings.hours} h wypraw dziennie, miejsce według poziomu ${settings.at === 'class' ? 'klasy' : 'postaci'}, Plac treningowy: ${settings.yard ? 'tak' : 'nie'}${from ? `, start: postać ${level}, klasa ${classLevel}` : ''}`);
-  console.log(`tydzień: ${weeks.map((week) => String(week).padStart(12)).join('')}   (postać/klasa, różnica)`);
-  for (const id of ids) {
-    const rows = project({ ...settings, variant: VARIANTS[id] }, content);
-    console.log(`${id.padEnd(8)} ${rows.map((row) => `${row.level}/${row.classLevel} ${String(row.gap).padStart(3)}`.padStart(12)).join('')}   ${VARIANTS[id].name}`);
+  console.log(`${'tydzień:'.padEnd(width)}${weeks.map((week) => String(week).padStart(16)).join('')}   (postać/klasa, różnica, klasa względem gry teraz)`);
+  for (const { id, way, label } of runs) {
+    const rows = project({ ...settings, variant: VARIANTS[id], cultivate: way }, content);
+    const cells = rows.map((row, i) => {
+      const change = row.classLevel - now[i].classLevel;
+      return `${row.level}/${row.classLevel} ${String(row.gap).padStart(3)} ${(id === 'now' ? '' : `${change > 0 ? '+' : ''}${change}`).padStart(3)}`.padStart(16);
+    });
+    const { cultivated, equalOn } = rows[rows.length - 1];
+    const equal = equalOn === null ? 'poziomy wciąż nierówne' : equalOn === 0 ? 'poziomy równe od początku' : `zrównanie w ${equalOn}. dniu`;
+    const notes = way ? `; ${CULTIVATION[way]}: ${Math.round(cultivated)} h Kultywacji, ${way === 'catch-up' ? equal : `${(cultivated / days).toFixed(1)} h dziennie`}` : '';
+    console.log(`${label.padEnd(width)}${cells.join('')}   ${VARIANTS[id].name}${notes}`);
   }
 }
 
