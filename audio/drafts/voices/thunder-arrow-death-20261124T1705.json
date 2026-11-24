@@ -1,0 +1,13 @@
+{
+  "id": "thunder-arrow-death",
+  "payload": {
+    "text": "a living stone arrow gives a sharp crack of lightning, a loud electric crackle and a ringing stony clink as it breaks, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/thunder-arrow-death-20261124T1705-0.mp3",
+    "audio/drafts/voices/thunder-arrow-death-20261124T1705-1.mp3"
+  ],
+  "credits": 56
+}

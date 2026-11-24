@@ -1,0 +1,13 @@
+{
+  "id": "sloth-death",
+  "payload": {
+    "text": "a giant sloth gives a long slow high-pitched whistling squeal that dies away, no words, close up, dry, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/sloth-death-20261124T1705-0.mp3",
+    "audio/drafts/voices/sloth-death-20261124T1705-1.mp3"
+  ],
+  "credits": 60
+}

@@ -1,0 +1,13 @@
+{
+  "id": "anglerfish-death",
+  "payload": {
+    "text": "an anglerfish monster gives a loud raspy gurgling screech, its needle teeth clattering, and dies with a wet hiss, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/anglerfish-death-20261124T1705-0.mp3",
+    "audio/drafts/voices/anglerfish-death-20261124T1705-1.mp3"
+  ],
+  "credits": 56
+}

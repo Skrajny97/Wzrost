@@ -1,0 +1,13 @@
+{
+  "id": "glare-death",
+  "payload": {
+    "text": "a blinding spirit of sunlight gives a loud bright ringing shriek that crackles and snaps out like breaking glass, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/glare-death-20261124T1705-0.mp3",
+    "audio/drafts/voices/glare-death-20261124T1705-1.mp3"
+  ],
+  "credits": 52
+}

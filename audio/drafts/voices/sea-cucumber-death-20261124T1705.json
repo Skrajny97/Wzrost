@@ -1,0 +1,13 @@
+{
+  "id": "sea-cucumber-death",
+  "payload": {
+    "text": "a giant sea cucumber gives a loud wet squelching squeal and bursts with a sharp sloppy splat, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/sea-cucumber-death-20261124T1705-0.mp3",
+    "audio/drafts/voices/sea-cucumber-death-20261124T1705-1.mp3"
+  ],
+  "credits": 56
+}

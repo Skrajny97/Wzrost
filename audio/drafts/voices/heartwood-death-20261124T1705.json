@@ -1,0 +1,13 @@
+{
+  "id": "heartwood-death",
+  "payload": {
+    "text": "a giant living wooden heart gives a long loud shrill creaking wail of breaking wood that ends with a sharp splintering crack, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/heartwood-death-20261124T1705-0.mp3",
+    "audio/drafts/voices/heartwood-death-20261124T1705-1.mp3"
+  ],
+  "credits": 64
+}

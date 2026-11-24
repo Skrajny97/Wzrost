@@ -1,0 +1,13 @@
+{
+  "id": "swordfish-death",
+  "payload": {
+    "text": "a big swordfish gives a sharp wet squealing gasp and thrashes its tail in a loud splash that dies away, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/swordfish-death-20261124T1705-0.mp3",
+    "audio/drafts/voices/swordfish-death-20261124T1705-1.mp3"
+  ],
+  "credits": 52
+}

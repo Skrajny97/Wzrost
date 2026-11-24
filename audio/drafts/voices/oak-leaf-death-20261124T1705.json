@@ -1,0 +1,13 @@
+{
+  "id": "oak-leaf-death",
+  "payload": {
+    "text": "a giant living leaf gives a loud sharp crackling rustle and a dry papery tearing sound as it crumbles, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/oak-leaf-death-20261124T1705-0.mp3",
+    "audio/drafts/voices/oak-leaf-death-20261124T1705-1.mp3"
+  ],
+  "credits": 52
+}

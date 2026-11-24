@@ -1,0 +1,13 @@
+{
+  "id": "lions-mane-death",
+  "payload": {
+    "text": "a giant jellyfish gives a long high wet whistling squeal that breaks into a sizzling hiss as it collapses, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/lions-mane-death-20261124T1705-0.mp3",
+    "audio/drafts/voices/lions-mane-death-20261124T1705-1.mp3"
+  ],
+  "credits": 52
+}
