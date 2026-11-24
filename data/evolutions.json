@@ -1259,7 +1259,7 @@
       "effect": "Przywołuje enta na {turns} swoje ruchy. Ent staje przed postacią z HP równym {hp%} jej maks. many i przyjmuje ciosy wrogów. Co ruch bije gałęziami losowego wroga za {power%} obrażeń.",
       "kind": "summon",
       "mana": 20,
-      "manaShare": 0.25,
+      "manaShare": 0.125,
       "cooldown": 10,
       "params": { "hpFrom": "mana", "turns": 4, "hp": [0.3, 0.45], "power": [0.9, 1.5], "physical": true, "summon": "ent", "summonName": "Ent" }
     },
@@ -1272,7 +1272,7 @@
       "effect": "Przywołuje niedźwiedzia na {turns} swoje ruchy. Niedźwiedź staje przed postacią z HP równym {hp%} jej maks. many i przyjmuje ciosy wrogów. Co ruch rwie pazurami losowego wroga za {power%} obrażeń.",
       "kind": "summon",
       "mana": 20,
-      "manaShare": 0.25,
+      "manaShare": 0.125,
       "cooldown": 10,
       "params": { "hpFrom": "mana", "turns": 4, "hp": [0.25, 0.35], "power": [1.2, 1.9], "physical": true, "summon": "bear", "summonName": "Niedźwiedź" }
     },
@@ -1633,7 +1633,7 @@
       "effect": "Przywołuje prastary dąb na {turns|swój ruch|swoje ruchy|swoich ruchów}. Dąb staje przed postacią z HP równym {hp%} jej maks. many i przyjmuje ciosy wrogów. Co ruch bije gałęziami losowego wroga za {power%} obrażeń i oplata go korzeniami: trafiony zwalnia o {root%}.",
       "kind": "summon",
       "mana": 22,
-      "manaShare": 0.25,
+      "manaShare": 0.125,
       "cooldown": 10,
       "params": { "hpFrom": "mana", "turns": 5, "hp": [0.45, 0.6], "power": [1.5, 2.2], "physical": true, "summon": "oak", "summonName": "Prastary dąb", "root": [0.3, 0.5] }
     },
