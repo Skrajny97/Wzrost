@@ -72,7 +72,7 @@ test('Szybkie Polowanie is told once the character is home on an inner region, a
   state.character = character({ read: [...toldSoFar, ...part('settlement')] });
   narrator.narrate('#/walka/windfalls/windfalls-edge');
   assert.equal(cards().length, 1);
-  assert.match(cards()[0].textContent, /System otworzył przed Tobą Rzemieślnictwo/);
+  assert.match(cards()[0].textContent, /System otworzył przed Tobą Rzemiosło/);
   // Then Szybkie Polowanie, pointed at in that inner region.
   state.character = null;
   narrator.narrate();
@@ -144,7 +144,7 @@ test('the Rzemiosło waiting for a free worker does not begin in the middle of t
   state.character = character({ read: [...toldSoFar, ...part('settlement')] });
   narrator.narrate('#/walka');
   assert.equal(cards().length, 1);
-  assert.match(cards()[0].textContent, /System otworzył przed Tobą Rzemieślnictwo/);
+  assert.match(cards()[0].textContent, /System otworzył przed Tobą Rzemiosło/);
 });
 
 // "Testuj samouczki" (app.js) starts a chapter anew: its line comes on the

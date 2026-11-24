@@ -794,7 +794,7 @@
       "kind": "card",
       "chapter": "crafting",
       "text": [
-        "Piętnasty poziom postaci… System otworzył przed Tobą Rzemieślnictwo."
+        "Piętnasty poziom postaci… System otworzył przed Tobą Rzemiosło."
       ],
       "voice": "audio/narration/crafting-welcome.mp3"
     },
@@ -821,7 +821,7 @@
       "kind": "card",
       "chapter": "crafting",
       "text": [
-        "Każdy nowy poziom Rzemieślnictwa odsłoni Ci kolejne wzory. Zajrzyj tu też, gdy rozbierzesz na części wcześniej nierozbierany przedmiot."
+        "Każdy nowy poziom Rzemiosła odsłoni Ci kolejne wzory. Zajrzyj tu też, gdy rozbierzesz na części wcześniej nierozbierany przedmiot."
       ],
       "voice": "audio/narration/crafting-ending.mp3"
     },
