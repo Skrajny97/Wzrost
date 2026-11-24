@@ -28,7 +28,7 @@ import { t } from './i18n.js';
 import { CLASS_ICONS } from './icons.js';
 import { call, onCharacterChange, state } from './state.js';
 import { closeSheet, foldPart, framedName, howItWorks, openSheet, toast, withButton } from './ui.js';
-import { compareTable, itemDetails, itemSheet, itemSummary } from './screens/character.js';
+import { compareTable, itemDetails, itemSheet, itemSummary, levelLocked } from './screens/character.js';
 import { companionCompare } from './screens/market.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
@@ -70,7 +70,9 @@ export function mountGuildChest(container) {
       ? t('nie dla tej klasy')
       : item.wornFrom && item.wornFrom > state.character.classLevel
         ? t('założysz od poziomu klasy {level}', { level: item.wornFrom })
-        : null;
+        : levelLocked(item, state.character)
+          ? t('założysz od {level}. poziomu postaci albo klasy', { level: item.wearLevel })
+          : null;
     const raised = list && item.raised && t('przekuty u Kowala');
     return [filled(texts.from, { name: item.from }), forWhom, when(item.putAt), wear, raised].filter(Boolean).join(' · ');
   }

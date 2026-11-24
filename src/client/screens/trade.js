@@ -22,7 +22,7 @@ import { narratorIdle } from '../narrator.js';
 import { playSound } from '../sound.js';
 import { call, serverNow, state, walletEntries } from '../state.js';
 import { closeSheet, confirmAction, openSheet, pageHeading, toast, withButton } from '../ui.js';
-import { classFits, classLines, gemFold, itemSummary, itemTitle, materialTitle, propertyLines, starsLine } from './character.js';
+import { classFits, classLines, gemFold, itemSummary, itemTitle, levelLocked, levelLockText, materialTitle, propertyLines, starsLine } from './character.js';
 
 const HASH = '#/wymiana';
 const EVERY_MS = 2000;
@@ -288,16 +288,18 @@ export function mountTrade(container, { backHash }) {
   }
 
   // An item of an offer, its properties under a tap; one the character
-  // gets says when it can wear it. An item from a trade is worn from its own
-  // level on (src/server/inventory.js).
+  // gets says when it can wear it: from its Tier and its own level (the
+  // level lock), as every item (src/server/inventory.js).
   function itemEntry(item, mine) {
     const character = state.character;
     const notes = mine
       ? []
       : [
           !classFits(item, character) && t('Twoja klasa nie może go używać.'),
-          // From its own level of the class on, as one from a Wymiana is.
+          // From its Tier's level of the class on, as every item is.
           character.classLevel < (item.classLevel ?? 1) && t('Założysz go od poziomu klasy {level}.', { level: item.classLevel }),
+          // And its own level, for the level lock.
+          classFits(item, character) && levelLocked(item, character) && levelLockText(item),
         ].filter(Boolean);
     return [
       h(

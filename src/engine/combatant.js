@@ -6,7 +6,7 @@ import { coreEffects } from './core.js';
 import { evolutionOf, perClassLevelOf } from './evolutions.js';
 import { budget, cappedChance, damageScale, maxHp, maxMana, potionBonus, speed, weaponDamage } from './formulas.js';
 import { gearDamageOf, gearElementOf, gearKey, statAsOf, weaponScalingOf } from './gear.js';
-import { upgradedItem } from './items.js';
+import { upgradedItem, wornNow } from './items.js';
 import { gearLevel, midGameShare } from './progression.js';
 import { learnedSkills, manaCostRule, skillMana } from './skills.js';
 import { sideStats } from './side-stats.js';
@@ -51,8 +51,12 @@ export const challengeMode = (hard, level, content) => (hard ? (challengeAt(leve
  * @param {{ character: Character, equipped: Item[], hp?: number | null, name: string, area?: Area | null, id?: string, side?: string, statBoost?: Record<string, number> | null, skillStatWeight?: number | null, manaCost?: { base: number, share: number, manaShareFactor?: number } | null }} fighter
  * @param {Content} content
  */
-export function playerCombatant({ character, equipped, hp, name, area, id = 'a0', side = 'ally', statBoost = null, skillStatWeight = null, manaCost = null }, content) {
+export function playerCombatant({ character, equipped: worn, hp, name, area, id = 'a0', side = 'ally', statBoost = null, skillStatWeight = null, manaCost = null }, content) {
   const balance = content.balance;
+  // No item worn above the level lock counts in a fight (wornNow in
+  // items.js), its weapon neither: also a defender's of the Arena or a
+  // guild war who has not come back since the lock came in.
+  const equipped = wornNow(worn, character, content);
   const { totals: stats, bonuses } = computeStats(character, equipped, content);
   const week = character.weekStats ?? null;
   const shares = week && statBoost ? Object.fromEntries([...new Set([...Object.keys(week), ...Object.keys(statBoost)])].map((stat) => [stat, (week[stat] ?? 0) + (statBoost[stat] ?? 0)])) : (week ?? statBoost);

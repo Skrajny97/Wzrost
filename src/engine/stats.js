@@ -5,7 +5,7 @@
 import { coreEffects } from './core.js';
 import { classSpans, levelsIn } from './evolutions.js';
 import { autoPointsOf, gearKey, statAsOf } from './gear.js';
-import { upgradedItem } from './items.js';
+import { upgradedItem, wornNow } from './items.js';
 import { professionStats } from './professions.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
@@ -40,7 +40,8 @@ export function computeStats(character, equipped, content) {
 
   /** @type {Bonuses} */
   const bonuses = { armor: 0, resist: {} };
-  for (const worn of equipped) {
+  // Not an item worn above the level lock (wornNow in items.js).
+  for (const worn of wornNow(equipped, character, content)) {
     const item = upgradedItem(worn, content);
     if (item.armor) bonuses.armor += item.armor;
     // A body armour's zaklęcie żywiołu adds its resistance (settlement.js).

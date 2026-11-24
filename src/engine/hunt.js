@@ -28,7 +28,7 @@ import { simulateFight } from './combat.js';
 import { areaLand, cardBonusLine, cardDrop, cardDropText, cardFrom, lowerLandCards, PACK, packDropText } from './cards.js';
 import { mealEffects, mealLine } from './cooking.js';
 import { addCounts, materialDrops, materialView, materialsText } from './crafting.js';
-import { canUse, itemName, itemRank, itemView, randomItem } from './items.js';
+import { canUse, itemName, itemRank, itemView, levelFits, randomItem, wearerLevel } from './items.js';
 import { TIMED_KINDS, bladeOil, fightPotions } from './potions.js';
 import {
   classXpToNext,
@@ -932,11 +932,18 @@ export function simulateHunt(
   let key = null;
   // An item from a chest. A character without a weapon holds a found one at
   // once, for the rest of the exploration, when its class level lets it wear
-  // it (the code review: it fought with a weapon it could not put on after).
+  // it (the code review: it fought with a weapon it could not put on after),
+  // and the level lock too (levelFits).
   // Not on a trip, whose fights stay the same for every member.
   const take = (/** @type {Item} */ item) => {
     items.push(item);
-    if (!roster && item.slot === 'weapon' && !me.worn.some((/** @type {Item} */ held) => held.slot === 'weapon') && canUse(item.base, gearKey(character.classId, character.evolution, content), content, character.classLevel)) {
+    if (
+      !roster &&
+      item.slot === 'weapon' &&
+      !me.worn.some((/** @type {Item} */ held) => held.slot === 'weapon') &&
+      canUse(item.base, gearKey(character.classId, character.evolution, content), content, character.classLevel) &&
+      levelFits(item, wearerLevel(character), content)
+    ) {
       me.worn = [...me.worn, item];
       me.unit = playerCombatant({ character: me.character, equipped: me.worn, hp: me.hp, name, area }, content);
     }

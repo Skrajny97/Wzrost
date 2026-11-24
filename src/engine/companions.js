@@ -21,7 +21,7 @@
 
 import { classLevelFactor, playerCombatant } from './combatant.js';
 import { evolutionName, evolutionOf, nextFormOf } from './evolutions.js';
-import { baseClassLevel, canUse, generateItem } from './items.js';
+import { baseClassLevel, canUse, generateItem, levelFits, wearLevelFor } from './items.js';
 import { explorationGold } from './mining.js';
 import { gainXp, xpToNext } from './progression.js';
 import { laterPeriod, questPeriod, samePeriod } from './quests.js';
@@ -431,7 +431,9 @@ export const companionBoost = (classLevel, content) => classLevelFactor(classLev
 // traits on top, and the relation's bonus (296 A). `hp` its HP now (full
 // when not given). `classLevel`: the class level of the character it
 // fights for, whose companions hit harder and last longer from the class
-// level the creatures grow from (companionBoost); 0 for none.
+// level the creatures grow from (companionBoost); 0 for none. Its gear
+// counts up to the level lock of the higher of its level and that class
+// level (companionWearBlock).
 /**
  * @param {Companion} companion
  * @param {{ hp?: number | null, area?: Record<string, any> | null, id?: string, classLevel?: number }} fight
@@ -439,7 +441,8 @@ export const companionBoost = (classLevel, content) => classLevelFactor(classLev
  */
 export function companionCombatant(companion, { hp, area, id = 'a1', classLevel = 0 } = {}, content) {
   // Its form's portrait stays off: a companion keeps its own look (896 A).
-  const { evolution: _form, ...unit } = playerCombatant({ character: companionCharacter(companion, content), equipped: companion.gear, hp, name: companion.name, area, id }, content);
+  const character = { ...companionCharacter(companion, content), lockLevel: classLevel };
+  const { evolution: _form, ...unit } = playerCombatant({ character, equipped: companion.gear, hp, name: companion.name, area, id }, content);
   const bonus = traitBonuses(companion, content);
   const bond = bondBonus(companion, content);
   // Its blows (its weapon, as a creature's grow) and its HP, `boost` times.
@@ -684,19 +687,25 @@ export const companionPlace = (slot) => (JEWELRY.includes(slot) ? 'jewelry' : CO
 // Why the companion cannot wear `item` from the character's bag (question
 // 108 A: "gracz zakłada towarzyszowi przedmioty jego klasy z plecaka"), or
 // null: one of its places, its class, and its class level (its level) for
-// the item's Tier, wherever the item came from, as for the character.
+// the item's Tier, wherever the item came from, as for the character. And
+// the level lock (levelFits in items.js) by the higher of its level and
+// `classLevel`, its character's, as it wears its character's finds, which
+// come from the places of that class level (companionCombatant counts the
+// same).
 /**
  * @param {Companion} companion
  * @param {Item} item
  * @param {Content} content
+ * @param {number} [classLevel]
  * @returns {Block | null}
  */
-export function companionWearBlock(companion, item, content) {
+export function companionWearBlock(companion, item, content, classLevel = 0) {
   if (!companionPlace(item.slot)) return { code: 'wrong_slot', message: 'Towarzysz nosi tylko broń, pancerz i jedną sztukę biżuterii: amulet, pierścień albo talizman.' };
   if (!canUse(item.base, companion.classId, content)) return { code: 'wrong_class', message: 'Klasa towarzysza nie może używać tego przedmiotu.' };
   if (!canUse(item.base, companion.classId, content, companion.level)) {
     return { code: 'class_level', message: `Ten przedmiot towarzysz założy od poziomu ${baseClassLevel(item.base, content)}.` };
   }
+  if (!levelFits(item, Math.max(companion.level, classLevel), content)) return { code: 'item_level', message: `Ten przedmiot towarzysz założy od poziomu ${wearLevelFor(item.level, content)}.` };
   return null;
 }
 

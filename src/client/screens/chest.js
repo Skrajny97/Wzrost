@@ -37,7 +37,7 @@ import { countOf, formatNumber } from '../format.js';
 import { t } from '../i18n.js';
 import { call, state, walletEntries } from '../state.js';
 import { closeSheet, openSheet, systemPanel, toast, withButton } from '../ui.js';
-import { bagSortRow, itemSheet, itemSummary, materialTitle, sortBag } from './character.js';
+import { bagSortRow, itemSheet, itemSummary, levelLocked, materialTitle, sortBag } from './character.js';
 
 // The tab open last, kept while the game is open.
 let openTab = 'items';
@@ -677,7 +677,13 @@ export function mountChest(container, onBack) {
   // Who put the item in, and whether this character wears it at once.
   function note(item, character) {
     const from = item.own ? t('Twój przedmiot') : item.from ? t('Od postaci {name}', { name: item.from }) : t('Od postaci, której już nie ma');
-    const wear = !item.usable ? t('nie dla tej klasy') : item.wornFrom && item.wornFrom > character.classLevel ? t('założysz od poziomu klasy {level}', { level: item.wornFrom }) : null;
+    const wear = !item.usable
+      ? t('nie dla tej klasy')
+      : item.wornFrom && item.wornFrom > character.classLevel
+        ? t('założysz od poziomu klasy {level}', { level: item.wornFrom })
+        : levelLocked(item, character)
+          ? t('założysz od {level}. poziomu postaci albo klasy', { level: item.wearLevel })
+          : null;
     return [from, wear].filter(Boolean).join(' · ');
   }
 

@@ -206,6 +206,93 @@ export const baseClassLevel = (baseId, content) => content.basesById[baseId].cla
  */
 export const canUse = (baseId, classId, content, classLevel) => fitsGear(baseId, classId, content) && (classLevel === undefined || classLevel >= baseClassLevel(baseId, content));
 
+// The level lock beside the Tier (balance.items.levelLock; the author,
+// 24.11.2026: „Pomijając Tier powinna być też blokada poziomem na ~30-50 w
+// górę, by nie robić potencjału na smurfkonta i postaci, założone już za
+// wysokie przedmioty będą zdjęte wtedy”): an item is worn up to so many
+// levels above the wearer's level (wearerLevel), so a strong character
+// cannot gear up a low one through a Wymiana, the Targowisko or the
+// Skrzynia Konta. The allowance at a level: the points [level, allowance]
+// of `curve`, straight between two, the first's before it and the last's
+// past it, down to a whole level (30 up to level 100, 40 at 200, 50 from
+// 300 on).
+/**
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number}
+ */
+export function levelAllowance(level, content) {
+  const curve = /** @type {number[][]} */ (content.balance.items.levelLock.curve);
+  const next = curve.findIndex(([at]) => at > level);
+  if (next === 0) return curve[0][1];
+  if (next === -1) return /** @type {number[]} */ (curve.at(-1))[1];
+  const [fromLevel, from] = curve[next - 1];
+  const [toLevel, to] = curve[next];
+  return Math.floor(from + ((to - from) * (level - fromLevel)) / (toLevel - fromLevel));
+}
+
+// The level the lock counts for a character: the higher of its level and
+// its class level. The class level runs well ahead of the level, and the
+// places it opens give items of their own levels, which the character goes
+// on wearing. `lockLevel`: a level it counts beyond its own, a companion's
+// the class level of its character (companionCombatant), as it wears its
+// character's finds.
+/**
+ * @param {{ level?: number, classLevel?: number, lockLevel?: number }} wearer
+ * @returns {number}
+ */
+export const wearerLevel = (wearer) => Math.max(wearer.level ?? 0, wearer.classLevel ?? 0, wearer.lockLevel ?? 0);
+
+// The highest item level worn at `level` (wearerLevel).
+/**
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number}
+ */
+export const itemLevelCap = (level, content) => level + levelAllowance(level, content);
+
+// Whether the lock lets a wearer of `level` (wearerLevel) wear `item`.
+/**
+ * @param {Item} item
+ * @param {number} level
+ * @param {Content} content
+ * @returns {boolean}
+ */
+export const levelFits = (item, level, content) => (item.level ?? 0) <= itemLevelCap(level, content);
+
+// The lowest level (wearerLevel) an item of `itemLevel` is worn from, as
+// its card says it; 1 for one anyone wears.
+/**
+ * @param {number} itemLevel
+ * @param {Content} content
+ * @returns {number}
+ */
+export function wearLevelFor(itemLevel, content) {
+  const most = Math.max(...content.balance.items.levelLock.curve.map((/** @type {number[]} */ point) => point[1]));
+  let level = Math.max(1, itemLevel - most);
+  while (itemLevelCap(level, content) < itemLevel) level += 1;
+  return level;
+}
+
+// The worn items that count for `wearer` (a character, or a companion as
+// companionCombatant makes it, with `lockLevel`): those the lock lets it
+// wear. So no fight, nor any number of the character, counts an item worn
+// above it, also of a character who has not come back since (a defender
+// of the Arena or of a guild war); the server takes such an item off at
+// the character's next look (characters.js). A wearer given without its
+// levels keeps all it wears.
+/**
+ * @param {Item[]} equipped
+ * @param {{ level?: number, classLevel?: number, lockLevel?: number }} wearer
+ * @param {Content} content
+ * @returns {Item[]}
+ */
+export function wornNow(equipped, wearer, content) {
+  if (wearer.level === undefined && wearer.classLevel === undefined && wearer.lockLevel === undefined) return equipped;
+  const cap = itemLevelCap(wearerLevel(wearer), content);
+  return equipped.every((item) => (item.level ?? 0) <= cap) ? equipped : equipped.filter((item) => (item.level ?? 0) <= cap);
+}
+
 // Whether a base is of the gear of a class or a gear key; what no class
 // uses fits anyone.
 /**
@@ -284,11 +371,12 @@ export function regearItem(item, key, content) {
   return next;
 }
 
-// Why a character of `classId` at `classLevel` cannot wear `item` now, as
-// the Postać's "Załóż" refuses it (src/server/inventory.js): its slot is
-// still locked ('slot_locked'), its class cannot use the base
-// ('wrong_class'), or the base's Tier asks for a higher class level
-// ('class_level'), whatever the item's own level; null when it can. The
+// Why a character of `classId` at `classLevel` and `level` cannot wear
+// `item` now, as the Postać's "Załóż" refuses it (src/server/inventory.js):
+// its slot is still locked ('slot_locked'), its class cannot use the base
+// ('wrong_class'), the base's Tier asks for a higher class level
+// ('class_level'), or the item's own level is above the lock of the higher
+// of the two levels ('item_level', levelFits); null when it can. The
 // Targowisko's "Dla mnie" and the slot's list of items to wear (the author,
 // 10.11.2026) ask the same.
 /**
@@ -296,12 +384,14 @@ export function regearItem(item, key, content) {
  * @param {string} classId
  * @param {number} classLevel
  * @param {Content} content
+ * @param {number} [level] The character's level; its class level alone when not given.
  * @returns {string | null}
  */
-export function equipBlock(item, classId, classLevel, content) {
+export function equipBlock(item, classId, classLevel, content, level = classLevel) {
   if (content.slotsById[item.slot]?.locked) return 'slot_locked';
   if (!canUse(item.base, classId, content)) return 'wrong_class';
   if (!canUse(item.base, classId, content, classLevel)) return 'class_level';
+  if (!levelFits(item, Math.max(level, classLevel), content)) return 'item_level';
   return null;
 }
 
@@ -869,7 +959,9 @@ export function itemRank(item, content) {
 }
 
 // Finds that go straight into empty slots: for each slot nothing is worn in,
-// the best item found for it that the class can use. Returns their indices in
+// the best item found for it that the class can use, and, with the class
+// level given, that the level lock lets the character wear (levelFits, by
+// the higher of `level` and the class level). Returns their indices in
 // `items`, in order.
 /**
  * @param {Item[]} equipped
@@ -877,14 +969,16 @@ export function itemRank(item, content) {
  * @param {Content} content
  * @param {string | null} [classId]
  * @param {number} [classLevel]
+ * @param {number} [level] The character's level.
  * @returns {number[]}
  */
-export function autoEquip(equipped, items, content, classId, classLevel) {
+export function autoEquip(equipped, items, content, classId, classLevel, level = classLevel) {
   const worn = new Set(equipped.map((item) => item.slot));
   /** @type {Map<string, number>} */
   const best = new Map();
+  const tooHigh = (/** @type {Item} */ item) => classLevel !== undefined && !levelFits(item, Math.max(level ?? 0, classLevel), content);
   items.forEach((item, index) => {
-    if (worn.has(item.slot) || (classId && !canUse(item.base, classId, content, classLevel))) return;
+    if (worn.has(item.slot) || (classId && !canUse(item.base, classId, content, classLevel)) || tooHigh(item)) return;
     const chosen = best.get(item.slot);
     if (chosen === undefined || itemRank(item, content) > itemRank(items[chosen], content)) best.set(item.slot, index);
   });
@@ -911,6 +1005,7 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap, materials =
   // dopisywać Tiery do przedmiotów").
   const tier = content.encyclopedia.tiers.findLast((/** @type {{ classLevel: number }} */ one) => one.classLevel <= classLevel);
   const gem = gemView(item.gem, content);
+  const wearFrom = wearLevelFor(item.level ?? 1, content);
   return {
     name: itemName(item, content),
     base: item.base,
@@ -941,6 +1036,10 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap, materials =
     // The class level it is worn from by its Tier, wherever it came from, or
     // null when it asks for none.
     classLevel: classLevel > 1 ? classLevel : null,
+    // The level, of the character or of its class, whichever is higher, it
+    // is worn from by its own level (the level lock, wearLevelFor), or null
+    // when it asks for none.
+    wearLevel: wearFrom > 1 ? wearFrom : null,
     price: sellPrice(item, content, sellBonus),
     // The gem set in it in Jubilerstwo, which its numbers above include, and
     // its numbers without the gem and with it, which its card writes side by

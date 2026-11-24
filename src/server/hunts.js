@@ -1170,7 +1170,7 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
   const potionsChanged = drunk.length > 0 || Object.keys(reservedPotions).length > 0;
   const potionsLeft = potionsBack(row, reservedPotions, hunt.potionsUsed);
   // A find for a slot with nothing in it is worn at once.
-  const autoEquipped = autoEquip(equippedItems(player), hunt.items, content(), gearKey(row.class_id, row.evolution, content()), row.class_level);
+  const autoEquipped = autoEquip(equippedItems(player), hunt.items, content(), gearKey(row.class_id, row.evolution, content()), row.class_level, row.level);
   // The rest goes to the bag. When it does not fit, the scrapper buys the
   // weakest items, old or new, at the camp's price. Herbs keep the places
   // their stacks take, and an event's herbs (the Kwiat paproci) take theirs

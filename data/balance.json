@@ -67,7 +67,11 @@
     "resistancePerBudget": 1.0,
     "sellGoldPerLevel": 1,
     "bagSlots": 30,
-    "otherClass": { "fromLevel": 15, "share": 0.25 }
+    "otherClass": { "fromLevel": 15, "share": 0.25 },
+    "levelLock": {
+      "$comment": "Blokada poziomu przedmiotów obok Tieru (DECISIONS.md, „Blokada poziomu przedmiotów”; autor 24.11.2026: „Pomijając Tier powinna być też blokada poziomem na ~30-50 w górę, by nie robić potencjału na smurfkonta i postaci, założone już za wysokie przedmioty będą zdjęte wtedy”). Postać zakłada przedmiot, którego poziom jest najwyżej o zapas wyższy niż wyższy z jej dwóch poziomów, postaci i klasy (poziom klasy wyprzedza poziom postaci, a krainy, które otwiera, dają przedmioty swoich poziomów). curve to punkty [poziom, zapas]: prosto między nimi, przed pierwszym jak pierwszy, za ostatnim jak ostatni, w dół do pełnego poziomu. Zapas 30 do 100. poziomu, potem równo do 50 na 300. (40 na 200.) i 50 wyżej. Towarzysz według wyższego z dwóch: swojego poziomu albo poziomu klasy swojej postaci, bo nosi jej łupy. Za wysoki przedmiot nie liczy się w żadnej walce, a założony schodzi do plecaka przy najbliższym wczytaniu postaci poza wyprawą i usługą najemną (src/engine/items.js: levelAllowance, wornNow; src/server/characters.js: unwearTooHigh). Kupić, wymienić, schować i zrobić go można bez zmian.",
+      "curve": [[100, 30], [300, 50]]
+    }
   },
   "upgrades": {
     "bonusPerLevel": 0.06,

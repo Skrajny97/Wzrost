@@ -396,9 +396,10 @@ describe('Wymiana', () => {
     assert.equal(hunt.data.error.code, 'unknown_recipe');
     const character = (await call('GET', '/api/character', { cookie: players.ala })).data.character;
     assert.equal(character.professions, null);
-    // An item got in a trade is worn by its Tier, as an own find, whatever
-    // its own level (the author: "Niech przedmioty z Wymian i Targowiska
-    // działają w oparciu o Tiery a nie poziomy samej broni").
+    // An item got in a trade is worn by its Tier, as an own find (the
+    // author: "Niech przedmioty z Wymian i Targowiska działają w oparciu o
+    // Tiery a nie poziomy samej broni"), and since 24.11.2026 within the
+    // level lock: at level 30, items up to level 60.
     await (await db()).prepare("UPDATE characters SET level = 30, class_level = 9 WHERE name = 'Ala'").run();
     const strong = await inBag('Ala', { ...amulet(40), traded: 1 });
     assert.equal((await call('POST', `/api/items/${strong}/equip`, { cookie: players.ala })).status, 200);

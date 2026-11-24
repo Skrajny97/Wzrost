@@ -203,14 +203,15 @@ function offerView(row, wearer, team = teamOf(wearer)) {
     leading: row.bidder_id === wearer.id,
     own: row.seller_id === wearer.id,
     myBid: row.my_bid ?? null,
-    ...(item && { equipBlock: equipBlock(item, gearKey(wearer.class_id, wearer.evolution, content()), wearer.class_level, content()), wearers: wearersOf(item, team, content()) }),
+    ...(item && { equipBlock: equipBlock(item, gearKey(wearer.class_id, wearer.evolution, content()), wearer.class_level, content(), wearer.level), wearers: wearersOf(item, team, content()) }),
   };
 }
 
-// The character and its hired companions, for who can put an item on (also
-// the Skrzynia Gildii's cards, guild-chest.js).
+// The character, with its levels for the Tier and the level lock, and its
+// hired companions, for who can put an item on (also the Skrzynia Gildii's
+// cards, guild-chest.js).
 export function teamOf(row) {
-  return { classId: gearKey(row.class_id, row.evolution, content()), classLevel: row.class_level, companions: settlementOf(row).companions ?? [] };
+  return { classId: gearKey(row.class_id, row.evolution, content()), classLevel: row.class_level, level: row.level, companions: settlementOf(row).companions ?? [] };
 }
 
 // The companions for the cards' comparisons: each with its class and level
@@ -473,7 +474,7 @@ const lightOffers = (db, row, now) =>
     .prepare(
       // `IS NOT`: the test version's own offers have no seller.
       `SELECT market_offers.id, kind, good, count, start_price, bid, ends_at, json_extract(item, '$.base') AS base, json_extract(item, '$.slot') AS slot,
-         json_extract(item, '$.rarity') AS rarity, market_bids.amount AS my_bid
+         json_extract(item, '$.rarity') AS rarity, json_extract(item, '$.level') AS item_level, market_bids.amount AS my_bid
        FROM market_offers LEFT JOIN market_bids ON market_bids.offer_id = market_offers.id AND market_bids.character_id = ?
        WHERE state = 'open' AND ends_at > ? AND seller_id IS NOT ?`,
     )
@@ -489,7 +490,7 @@ async function browsed(db, row, team, asked, light) {
       kind: offer.kind,
       key: offer.good,
       count: offer.count,
-      item: offer.kind === 'item' ? { base: offer.base, slot: offer.slot, rarity: offer.rarity } : null,
+      item: offer.kind === 'item' ? { base: offer.base, slot: offer.slot, rarity: offer.rarity, level: offer.item_level } : null,
       startPrice: offer.start_price,
       bid: offer.bid,
       endsAt: offer.ends_at,
