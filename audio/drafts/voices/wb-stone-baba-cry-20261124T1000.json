@@ -1,0 +1,13 @@
+{
+  "id": "wb-stone-baba-cry",
+  "payload": {
+    "text": "a living stone idol gives a harsh guttural groan of grinding stone, rock cracking and crunching as it moves, no words, video game boss battle cry, close up, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wb-stone-baba-cry-20261124T1000-0.mp3",
+    "audio/drafts/voices/wb-stone-baba-cry-20261124T1000-1.mp3"
+  ],
+  "credits": 72
+}

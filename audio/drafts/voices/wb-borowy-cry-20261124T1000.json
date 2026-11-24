@@ -1,0 +1,13 @@
+{
+  "id": "wb-borowy-cry",
+  "payload": {
+    "text": "an ancient forest lord gives a throaty bellowing roar mixed with the loud creak and groan of a giant spruce bending in a storm, no words, video game boss battle cry, close up, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wb-borowy-cry-20261124T1000-0.mp3",
+    "audio/drafts/voices/wb-borowy-cry-20261124T1000-1.mp3"
+  ],
+  "credits": 72
+}

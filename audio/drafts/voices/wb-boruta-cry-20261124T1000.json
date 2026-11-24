@@ -1,0 +1,13 @@
+{
+  "id": "wb-boruta-cry",
+  "payload": {
+    "text": "a devil gives a menacing demonic growl rising into a roar, with the bright ring of a sabre drawn from its scabbard, no words, video game boss battle cry, close up, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wb-boruta-cry-20261124T1000-0.mp3",
+    "audio/drafts/voices/wb-boruta-cry-20261124T1000-1.mp3"
+  ],
+  "credits": 72
+}

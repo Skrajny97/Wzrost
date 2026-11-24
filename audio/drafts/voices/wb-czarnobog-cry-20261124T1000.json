@@ -1,0 +1,13 @@
+{
+  "id": "wb-czarnobog-cry",
+  "payload": {
+    "text": "the god of darkness gives a colossal harsh echoing roar, a cold ominous otherworldly growl that swells like a dark storm, no words, video game boss battle cry, close up, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wb-czarnobog-cry-20261124T1000-0.mp3",
+    "audio/drafts/voices/wb-czarnobog-cry-20261124T1000-1.mp3"
+  ],
+  "credits": 72
+}

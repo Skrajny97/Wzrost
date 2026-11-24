@@ -1,0 +1,13 @@
+{
+  "id": "wb-pochwist-cry",
+  "payload": {
+    "text": "a storm wind spirit gives a furious howling roar, an inhuman voice swelling like a gale, with wind rushing and leaves whipping around it, no words, video game boss battle cry, close up, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wb-pochwist-cry-20261124T1000-0.mp3",
+    "audio/drafts/voices/wb-pochwist-cry-20261124T1000-1.mp3"
+  ],
+  "credits": 72
+}

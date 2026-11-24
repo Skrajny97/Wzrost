@@ -1,0 +1,13 @@
+{
+  "id": "wb-rusalka-cry",
+  "payload": {
+    "text": "a drowned water maiden gives an eerie haunting wailing shriek that echoes as over a lake, with a soft gurgle of water, no words, video game boss battle cry, close up, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wb-rusalka-cry-20261124T1000-0.mp3",
+    "audio/drafts/voices/wb-rusalka-cry-20261124T1000-1.mp3"
+  ],
+  "credits": 72
+}
