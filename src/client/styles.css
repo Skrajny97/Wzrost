@@ -11034,10 +11034,13 @@ button.farm-plot {
   animation: scene-path var(--path-duration) linear var(--scene-phase, 0s) infinite;
 }
 /* The walk's, the trot's, the rider's and the pet's frames at the scene's
-   phase (scenes.js walkScene), in step with the land and the path. */
+   phase (scenes.js walkScene), in step with the land and the path; a
+   work's figure so too (workScene), so a screen drawn anew, as after a
+   catch of a Kulka Profesji, goes on where it was. */
 .scene-walk .scene-frames,
 .scene-walk .scene-ride-mount,
-.scene-walk .scene-ride-rider {
+.scene-walk .scene-ride-rider,
+.scene-stage .scene-frames {
   animation-delay: var(--scene-phase, 0s);
 }
 @keyframes scene-path {
@@ -11707,6 +11710,23 @@ button.farm-plot {
 }
 .calm .orb-burst::after {
   display: none;
+}
+/* The Kulki Profesji over a work's scene (orbs.js, profession-orbs.js):
+   their layer is the work's picture, 256 × 256 at the top in the middle of
+   the scene (scenes.js workScene), and the orb, its glow and the light of a
+   catch take the professions' amber instead of the System's blue. */
+.orb-layer--profession {
+  inset: 0 auto auto 50%;
+  width: 256px;
+  height: 256px;
+  margin-left: -128px;
+}
+.orb--profession,
+.orb-burst-frame--profession .orb-burst img {
+  filter: hue-rotate(-150deg) saturate(1.5);
+}
+.orb-burst-frame--profession {
+  --system: var(--src-professions);
 }
 
 /* Skin tones (ui.js skinSwatches): a dot of each tone, the chosen one ringed. */

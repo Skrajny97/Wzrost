@@ -171,6 +171,7 @@ import { restOmens, weekFactorFor, weekOfCharacter } from './weeks.js';
 import { winterCampView, winterQuestsPeriod } from './winter.js';
 import { andrzejkiView } from './andrzejki.js';
 import { orbsView } from './orbs.js';
+import { workOrbsView } from './profession-orbs.js';
 
 // A character's name (names.js): 2 to 20 signs, the filter of words, and no
 // two players share one, whatever the letter case; neither does a character
@@ -1993,9 +1994,10 @@ export function characterView(player, now) {
     // The narrator's cards seen so far, or null for a character made before
     // the introduction (tutorial.js).
     tutorial: row.tutorial === null ? null : JSON.parse(row.tutorial),
-    // With the Kulki Systemu of an exploration under way: when they come,
-    // never what they give (orbs.js).
-    activity: withOrbs(activityView(activity, row.level, now), orbsView(activity, row, now)),
+    // With the Kulki Systemu of an exploration under way, or the Kulki
+    // Profesji of a work of the character's own: when they come, never
+    // what they give (orbs.js, profession-orbs.js).
+    activity: withOrbs(activityView(activity, row.level, now), orbsView(activity, row, now) ?? workOrbsView(activity, row, now)),
     // The week of the year and the three after it, for the line on the
     // Walka screen and the sheet Tygodnie, with the notice of a new week not
     // told yet (weeks.js), or null where the weeks are off.

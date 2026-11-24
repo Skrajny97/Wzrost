@@ -509,8 +509,16 @@ export function publicContent() {
     animations: { ...data.animations, $comment: undefined },
     // The Kulki Systemu over the Walka scene of an exploration (orbs.js):
     // the orb's picture, the sound of a catch, how long one flies and the
-    // words of its button; when they come is in the character's view.
-    orbs: game.orbs && { art: game.orbs.art, sound: game.orbs.sound, flightSeconds: game.orbs.flightSeconds, texts: { label: game.orbs.texts.label } },
+    // words of its button; when they come is in the character's view. The
+    // Kulki Profesji over a work's scene (profession-orbs.js) fly so too,
+    // with words of their own.
+    orbs: game.orbs && {
+      art: game.orbs.art,
+      sound: game.orbs.sound,
+      flightSeconds: game.orbs.flightSeconds,
+      texts: { label: game.orbs.texts.label },
+      ...(game.orbs.professions && { professions: { texts: { label: game.orbs.professions.texts.label } } }),
+    },
     // The narrator's introduction for a new character (narrator.js), with
     // the Time Points the narrator gives.
     tutorial: { ...data.tutorial, $comment: undefined, startTimePoints: game.balance.timePoints.start },

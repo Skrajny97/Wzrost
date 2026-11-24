@@ -168,6 +168,147 @@
           "type": "string"
         }
       }
+    },
+    "professions": {
+      "description": "Kulki Profesji nad sceną pracy postaci w profesji: te same chwile, okno, obrazek i dźwięk co Kulki Systemu, własny limit i nagrody.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "perDay",
+        "kinds",
+        "resourceShare",
+        "products",
+        "xpMinutes",
+        "texts"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "perDay": {
+          "description": "Najwięcej Kulek Profesji, które postać złapie na dobę zadań dziennych, osobno od Kulek Systemu.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "kinds": {
+          "description": "Wagi rodzajów nagrody: zasoby obozu, wytwór pracy, doświadczenie profesji i Punkty Czasu. Punktów Systemu nie ma.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "resources",
+            "product",
+            "xp",
+            "time"
+          ],
+          "properties": {
+            "resources": {
+              "type": "number",
+              "minimum": 0
+            },
+            "product": {
+              "type": "number",
+              "minimum": 0
+            },
+            "xp": {
+              "type": "number",
+              "minimum": 0
+            },
+            "time": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "resourceShare": {
+          "description": "Zasoby kulki: od, do takiej części zasobów znaleziska (rewards.findResourcePerLevel × poziom postaci).",
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        },
+        "products": {
+          "description": "Sztuki wytworu pracy (od, do) według id profesji; profesja, której tu nie ma, nie daje wytworu.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "xpMinutes": {
+          "description": "Doświadczenie profesji jak z tylu minut jej pracy.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "texts": {
+          "description": "Słowa Kulki Profesji: label przycisku, resources, product, productLost, xp, xpLevel i time w dymku po złapaniu, reszta to odpowiedzi gry na stuknięcie, którego serwer nie przyjmuje.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "label",
+            "resources",
+            "product",
+            "productLost",
+            "xp",
+            "xpLevel",
+            "time",
+            "noWork",
+            "noOrb",
+            "early",
+            "gone",
+            "claimed",
+            "limit"
+          ],
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "resources": {
+              "type": "string"
+            },
+            "product": {
+              "type": "string"
+            },
+            "productLost": {
+              "type": "string"
+            },
+            "xp": {
+              "type": "string"
+            },
+            "xpLevel": {
+              "type": "string"
+            },
+            "time": {
+              "type": "string"
+            },
+            "noWork": {
+              "type": "string"
+            },
+            "noOrb": {
+              "type": "string"
+            },
+            "early": {
+              "type": "string"
+            },
+            "gone": {
+              "type": "string"
+            },
+            "claimed": {
+              "type": "string"
+            },
+            "limit": {
+              "type": "string"
+            }
+          }
+        }
+      }
     }
   }
 }

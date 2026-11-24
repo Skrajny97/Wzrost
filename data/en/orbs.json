@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/orbs.json (src/engine/orbs.js, src/server/orbs.js): the words of the System Orbs over the exploration's scene.",
+  "$comment": "English texts of data/orbs.json (src/engine/orbs.js, src/server/orbs.js): the words of the System Orbs over the exploration's scene, and of the Profession Orbs over a work's scene (`professions`).",
   "texts": {
     "label": "Catch the System Orb",
     "gold": "System Orb: +{amount} gold",
@@ -12,5 +12,22 @@
     "gone": "This System Orb has already faded.",
     "claimed": "This System Orb has already been caught.",
     "limit": "That's all the System Orbs for today ({count}). More after midnight."
+  },
+  "professions": {
+    "texts": {
+      "label": "Catch the Profession Orb",
+      "resources": "Profession Orb: +{amount} {resource}",
+      "product": "Profession Orb: +{amount} × {product}",
+      "productLost": "Profession Orb: +{amount} × {product}. The bag is full, no room for: {lost}.",
+      "xp": "Profession Orb: +{amount} {profession} XP",
+      "xpLevel": "Profession Orb: +{amount} {profession} XP, new level: {level}.",
+      "time": "Profession Orb: +{amount} {points}",
+      "noWork": "Profession Orbs only appear while your character works in a profession.",
+      "noOrb": "There is no such Profession Orb.",
+      "early": "This Profession Orb has not arrived yet.",
+      "gone": "This Profession Orb has already faded.",
+      "claimed": "This Profession Orb has already been caught.",
+      "limit": "That's all the Profession Orbs for today ({count}). More after midnight."
+    }
   }
 }

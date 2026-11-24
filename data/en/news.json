@@ -1328,6 +1328,10 @@
     "0.4.98": {
       "title": "Version 0.4.98",
       "body": "- Order Board and Wanted: every order and every wanted poster has a \"Reroll\" die. It draws a new one in its place at once, with no waiting. Rerolls are free, 3 a day on each board, from midnight. The weekly order cannot be rerolled.\n- Encyclopedia › Items: an item's card has a \"To the Workshop\" or \"To the Gem Workshop\" button. It opens Crafting or Jewelcrafting with that pattern already chosen, and when you do not know the pattern yet, it says from which level you will."
+    },
+    "0.4.99": {
+      "title": "Version 0.4.99",
+      "body": "- Professions: while your character works, amber Profession Orbs fly over its profession's scene. Tap one to catch it: it gives camp resources, the profession's product (e.g. a herb, a mineral or a fish), profession XP or Time Points. About one orb per 10 minutes of work, up to 8 a day, apart from the System Orbs of explorations."
     }
   }
 }

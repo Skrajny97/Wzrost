@@ -25,6 +25,7 @@ import { fill, h, icon, setTimer } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatDecimal, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { language, t } from '../i18n.js';
 import { motionOn } from '../motion.js';
+import { orbField } from '../orbs.js';
 import { workScene } from '../scenes.js';
 import { playSound } from '../sound.js';
 import { activityFinished, buildLocked, call, reportCache, serverNow, state, testModeOn } from '../state.js';
@@ -780,7 +781,8 @@ export function mountProfessions(container, { params, navigate }) {
     const card = h(
       'div',
       { class: 'stack' },
-      ...(timer.scene ? [timer.scene.element] : []),
+      // The character's own work with its Kulki Profesji over it (orbs.js).
+      ...(timer.scene ? [avatar ? timer.scene.element : orbField(activity, timer.scene.element, 'profession')] : []),
       systemPanel(
         what,
         timer.countdown,

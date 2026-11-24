@@ -10,7 +10,12 @@
 // the orb stands still in the scene and fades in and out. None once the
 // day's orbs are caught (`left`), till the day ends (`resetsAt`). The orbs fly
 // in a layer over the scene, cut to its box, so they never cover the buttons
-// around it; only the orb itself takes a tap.
+// around it; only the orb itself takes a tap. The Kulki Profesji over the
+// scene of a work of the character's own on the Profesje screen
+// (src/server/profession-orbs.js; DECISIONS.md, „Kulki Profesji
+// (24.11.2026)”) fly just so, apart: their layer is the work's picture,
+// the orb takes the professions' colour, and a tap goes to their own
+// address.
 
 import { orbArt } from './art.js';
 import { h } from './dom.js';
@@ -31,15 +36,25 @@ const LANES = [22, 52, 82];
 const SPOTS = [0.2, 0.64, 0.4, 0.82];
 // A catch's light lasts this long (ms) at the place the orb was.
 const BURST_MS = 650;
+// The two kinds of orbs: where a tap goes, their words (data/orbs.json) and
+// the classes that set the profession's apart (styles.css).
+const FIELDS = {
+  exploration: { path: '/api/hunts/orb', texts: (rules) => rules.texts, modifier: '' },
+  profession: { path: '/api/professions/orb', texts: (rules) => rules.professions?.texts, modifier: 'profession' },
+};
 
 // The scene of an exploration under way (scenes.js walkScene's element)
-// with its orbs over it, or the scene alone where the exploration has none.
-export function orbField(activity, scene) {
+// with its orbs over it, or the scene alone where the exploration has none;
+// with `kind` "profession", the scene of a work (scenes.js workScene's) with
+// its Kulki Profesji.
+export function orbField(activity, scene, kind = 'exploration') {
   const host = h('div', { class: 'orb-host' }, scene);
   const orbs = activity.orbs;
+  const field = FIELDS[kind];
   const rules = state.content?.orbs;
-  if (!orbs || !rules) return host;
-  const layer = h('div', { class: 'orb-layer' });
+  const texts = rules && field.texts(rules);
+  if (!orbs || !texts) return host;
+  const layer = h('div', { class: `orb-layer${field.modifier ? ` orb-layer--${field.modifier}` : ''}` });
   host.append(layer);
   const flight = rules.flightSeconds * 1000;
   // An orb left to show: its flight not over, not caught, and a day with
@@ -58,7 +73,7 @@ export function orbField(activity, scene) {
       setTimeout(step, at - now);
       return;
     }
-    launch(layer, rules, index, now - at);
+    launch(layer, rules, field, texts, index, now - at);
     index += 1;
     step();
   };
@@ -69,9 +84,9 @@ export function orbField(activity, scene) {
 // Orb `index` in the layer, `elapsed` ms into its flight: across the scene
 // from the left (every other one from the right), or still where its
 // number puts it with the animations off; gone at the flight's end.
-function launch(layer, rules, index, elapsed) {
+function launch(layer, rules, field, texts, index, elapsed) {
   const still = !motionOn();
-  const button = h('button', { type: 'button', class: 'orb', 'aria-label': rules.texts.label }, orbArt(rules.art, SCALE));
+  const button = h('button', { type: 'button', class: `orb${field.modifier ? ` orb--${field.modifier}` : ''}`, 'aria-label': texts.label }, orbArt(rules.art, SCALE));
   const flying = h('div', { class: `orb-flight${still ? ' orb-flight--still' : index % 2 ? ' orb-flight--back' : ''}` }, button);
   flying.style.top = `${LANES[index % LANES.length]}px`;
   if (still) flying.style.left = `calc((100% - ${SIZE}px) * ${SPOTS[index % SPOTS.length]})`;
@@ -79,20 +94,20 @@ function launch(layer, rules, index, elapsed) {
   flying.style.setProperty('--flight', `${rules.flightSeconds}s`);
   // Already this far: the animations start where the flight is now.
   flying.style.setProperty('--since', `${(-elapsed / 1000).toFixed(3)}s`);
-  button.addEventListener('click', () => catchOrb(rules, index, flying, button));
+  button.addEventListener('click', () => catchOrb(rules, field, index, flying, button));
   layer.append(flying);
   setTimeout(() => flying.remove(), Math.max(0, rules.flightSeconds * 1000 - elapsed));
 }
 
 // A tap: the orb bursts into light at once, and the server says what it
 // gave (a coin's sound and a bubble), or why not.
-async function catchOrb(rules, index, flying, button) {
+async function catchOrb(rules, field, index, flying, button) {
   if (flying.classList.contains('orb-flight--caught')) return;
   flying.classList.add('orb-flight--caught');
-  burst(button.getBoundingClientRect(), flying.parentElement.getBoundingClientRect(), button.querySelector('img'));
+  burst(button.getBoundingClientRect(), flying.parentElement.getBoundingClientRect(), button.querySelector('img'), field);
   flying.remove();
   try {
-    const { orb } = await call('POST', '/api/hunts/orb', { index });
+    const { orb } = await call('POST', field.path, { index });
     playSound(rules.sound);
     toast(orb.text);
   } catch (error) {
@@ -103,12 +118,13 @@ async function catchOrb(rules, index, flying, button) {
 // The light of a catch where the orb was (`box`), over the page, so the
 // screen drawn anew with the catch leaves it be, and cut to the scene
 // (`scene`, the orbs' layer) as the orbs are: the orb's own picture (`art`,
-// on the screen already, so it shows at once) bursting with a ring of light.
-function burst(box, scene, art) {
+// on the screen already, so it shows at once) bursting with a ring of light,
+// a Kulka Profesji's in its colour.
+function burst(box, scene, art, field) {
   const light = h('div', { class: 'orb-burst' }, art);
   light.style.left = `${Math.round(box.left - scene.left)}px`;
   light.style.top = `${Math.round(box.top - scene.top)}px`;
-  const frame = h('div', { class: 'orb-burst-frame', 'aria-hidden': 'true' }, light);
+  const frame = h('div', { class: `orb-burst-frame${field.modifier ? ` orb-burst-frame--${field.modifier}` : ''}`, 'aria-hidden': 'true' }, light);
   frame.style.left = `${Math.round(scene.left)}px`;
   frame.style.top = `${Math.round(scene.top)}px`;
   frame.style.width = `${Math.round(scene.width)}px`;

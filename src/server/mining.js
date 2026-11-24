@@ -12,7 +12,7 @@ import { cardSummary, cardUpserts, packGains, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { characterChanged, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
-import { addTo, alreadyClaimed, requireProfessions, takeFromBag, workClaim, workClaimFailed, workGains } from './professions.js';
+import { addTo, alreadyClaimed, requireProfessions, startLevels, takeFromBag, workClaim, workClaimFailed, workGains } from './professions.js';
 import { workFamePoints } from './fame.js';
 import { mineralsOf } from './professions-view.js';
 import { trimReports } from './reports.js';
@@ -44,9 +44,10 @@ export async function startMining(context) {
   const db = context.env.DB;
   const { row } = player;
   // The character's level sets the veins' gold; `begun`, when it really
-  // began; `week`, the week of the year it begins in (weeks.js).
+  // began; `levels`, for its Kulki Profesji (startLevels); `week`, the
+  // week of the year it begins in (weeks.js).
   const week = weekFor(row, now);
-  const options = JSON.stringify({ level: row.level, begun: now, ...(week && { week }) });
+  const options = JSON.stringify({ level: row.level, begun: now, ...startLevels(row), ...(week && { week }) });
   const ends = now + body.minutes * 60000;
   try {
     await db.batch(

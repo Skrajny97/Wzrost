@@ -1665,6 +1665,11 @@
       "id": "0.4.98",
       "title": "Wersja 0.4.98",
       "body": "- Tablica zleceń i Poszukiwani: przy każdym zleceniu i liście gończym jest kostka „Przelosuj”. Od razu losuje nowe w to miejsce, bez czekania. Przelosowania są darmowe, 3 dziennie na każdej tablicy, od północy. Zlecenia tygodniowego nie da się przelosować.\n- Encyklopedia › Przedmioty: karta przedmiotu ma przycisk „Do Warsztatu” albo „Do Szlifierni”. Otwiera Rzemieślnictwo albo Jubilerstwo z tym wzorem już wybranym, a gdy wzoru jeszcze nie znasz, mówi, od którego poziomu będzie."
+    },
+    {
+      "id": "0.4.99",
+      "title": "Wersja 0.4.99",
+      "body": "- Profesje: gdy postać pracuje, nad sceną jej profesji latają bursztynowe Kulki Profesji. Złap kulkę stuknięciem: daje zasoby obozu, produkt tej profesji (np. zioło, minerał albo rybę), doświadczenie profesji albo Punkty Czasu. Średnio jedna kulka na 10 minut pracy, do 8 dziennie, osobno od Kulek Systemu z wypraw."
     }
   ]
 }

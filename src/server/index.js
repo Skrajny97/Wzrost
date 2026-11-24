@@ -85,6 +85,7 @@ import { language, pageDictionary, requestLanguage, runInLanguage, t } from './i
 import { bidOnOffer, buyFromResident, buyOffer, cancelOffer, collectParcels, getMarket, getMarketLog, listOffer, settleMarket } from './market.js';
 import { cancelHunt, claimHunt, eatDish, huntOptions, quickHunt, startHunt } from './hunts.js';
 import { claimOrb } from './orbs.js';
+import { claimWorkOrb } from './profession-orbs.js';
 import { discardItem, equipItem, previewItem, sellItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
 import { markFavorite } from './favorites.js';
 import { discardHerbs, sellHerbs, startGathering } from './professions.js';
@@ -289,6 +290,8 @@ const routes = [
   ['POST', '/api/hunts/quick', quickHunt],
   // A Kulka Systemu caught over the exploration's scene (orbs.js).
   ['POST', '/api/hunts/orb', claimOrb],
+  // A Kulka Profesji caught over a work's scene (profession-orbs.js).
+  ['POST', '/api/professions/orb', claimWorkOrb],
   ['POST', '/api/professions/gather', startGathering],
   ['POST', '/api/herbs/sell', sellHerbs],
   ['POST', '/api/herbs/discard', discardHerbs],
