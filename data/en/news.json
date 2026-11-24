@@ -1348,6 +1348,10 @@
     "0.5.3": {
       "title": "Version 0.5.3",
       "body": "- New: the World Boss. Every week each level band (1–25, 26–50 and so on) gets one boss, and all players of the band hit the same HP bar. You'll find it in Combat from character level 15.\n- You have 3 attacks a day. Taking part earns you a Boss Chest with gold, materials and a chance at an item: the more damage you deal, the bigger the chest. The top ten get a title for a week, and the last blow earns an extra item.\n- If the boss survives until Sunday, the chests are half size. A new one appears on Monday.\n- Big HP numbers in the fight window now have separators."
+    },
+    "0.5.4": {
+      "title": "Version 0.5.4",
+      "body": "- Meals: with Auto-refill in the Party your character eats up to 3 portions of the chosen dish at once (you pick ×1, ×2 or ×3).\n- In the Exploration options a dish starts at as many portions as you can eat now, up to 3, and the game remembers your last choice."
     }
   }
 }

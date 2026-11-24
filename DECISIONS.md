@@ -4143,6 +4143,10 @@ Autor: „Do tego trzeba też w końcu ogarnąć te drużyny cholerne - niech li
    - **Dane i API.** Kolumna `characters.party_meal` (migracja `0172_party_meal.sql`): `{ "dish": id, "auto": true/false }` albo NULL. `PUT /api/party/meal { dish, auto }` przyjmuje potrawę gry po id albo null i pole tak/nie; pole bez potrawy odmawia („Wybierz potrawę do autouzupełniania.”), a brak potrawy zapisuje jako NULL. Drużyna (`GET /api/party`) ma pole `meal` z nazwą potrawy. Słowa w `data/community.json` (`party.texts.meal…`), po angielsku w `data/en/community.json` („Meal for party trips”, „Auto-refill”) i w `data/en/strings.json`.
    - **Kod:** `mealRefill` w `src/engine/cooking.js`, `partyMealOf`, `memberMeal`, `setPartyMeal` i `setOut` w `src/server/parties.js`, `src/server/index.js`, `mealRubric` w `src/client/screens/party.js`. Test: `test/party-meal.test.js` (silnik i API: porcja po skończonym posiłku aż do wyczerpania Spiżarni, działający posiłek innej i tej samej potrawy zostaje, bez pola nic, lider bez zmian, sprawdzanie wyboru). Rubryka sprawdzona na 320, 390 i 1366 px.
 
+## Wersja 0.5.4 (24.11.2026): automatyczne jedzenie do 3 porcji naraz
+
+Według sekcji niżej, bez makiet (wiersz „Porcje” w rubryce posiłku Drużyny i start wyboru porcji w „Opcjach wyprawy”).
+
 ## Automatyczne jedzenie: do 3 porcji naraz (24.11.2026)
 
 Autor: „Automatyczne jedzenie w drużynie i w ogóle trzeba ustawić tak mogło jeść 3 te same posiłki na raz nie tylko jeden” (24.11.2026). Zmienia punkt 11 „Drużyny: wspólny raport, bez blokad” (posiłek członka z autouzupełnianiem) i brakujący szczegół z punktu 3 „Posiłków: do 3 porcji jednej potrawy” (20.11.2026). Bez makiet: jeden rząd „Porcje” z −/+ w istniejącej rubryce, w wyglądzie rzędów mikstur.
