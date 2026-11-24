@@ -1,0 +1,14 @@
+{
+  "id": "przemysl-crown",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the crown of king przemysl the second: a golden royal crown with tall lily shaped points set with large blue sapphires and pearls, a holy golden glow, single inventory item icon",
+  "style": "src/client/art/items/jadwiga-crown.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023211550307167903
+  },
+  "images": 1
+}

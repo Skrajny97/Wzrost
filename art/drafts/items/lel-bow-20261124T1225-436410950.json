@@ -1,0 +1,14 @@
+{
+  "id": "lel-bow",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the bow of lel, the young slavic god of love: a graceful bow of white wood wound with red ribbons and small blooming red roses, a little golden heart at its grip, diagonal, single inventory item icon",
+  "style": "src/client/art/items/jutrzenka-bow.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023741676280127633
+  },
+  "images": 1
+}

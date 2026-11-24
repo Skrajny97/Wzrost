@@ -1,0 +1,14 @@
+{
+  "id": "firebird-quiver",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the quiver of the firebird: a quiver of red and gold leather with golden ornaments, arrows fletched with glowing fiery orange and gold firebird feathers, small sparks, single inventory item icon",
+  "style": "src/client/art/items/zorza-quiver.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023904234163920086
+  },
+  "images": 1
+}

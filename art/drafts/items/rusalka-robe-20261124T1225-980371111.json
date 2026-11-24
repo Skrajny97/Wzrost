@@ -1,0 +1,14 @@
+{
+  "id": "rusalka-robe",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the robe of a rusalka, a slavic water nymph: a long flowing pale green and silver robe dripping with water, woven with river reeds and white water lilies, a faint watery shimmer, single inventory item icon",
+  "style": "src/client/art/items/wanda-robe.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023232333619223704
+  },
+  "images": 1
+}

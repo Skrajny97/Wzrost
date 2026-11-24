@@ -1,0 +1,14 @@
+{
+  "id": "golden-apple",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the golden apple of youth from slavic fairy tales: a shining apple of pure gold with a single green leaf on its stem, a warm golden glow, single inventory item icon",
+  "style": "src/client/art/items/golden-duck.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023332206293106082
+  },
+  "images": 1
+}

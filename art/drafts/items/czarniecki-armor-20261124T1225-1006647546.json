@@ -1,0 +1,14 @@
+{
+  "id": "czarniecki-armor",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the scale armour of hetman stefan czarniecki: a polish karacena breastplate of overlapping dark steel scales with brass rivets, a golden lion head on each shoulder, a leopard skin draped over one shoulder, single inventory item icon",
+  "style": "src/client/art/items/jagiello-armor.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023803490652932063
+  },
+  "images": 1
+}

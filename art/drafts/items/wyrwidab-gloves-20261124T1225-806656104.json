@@ -1,0 +1,14 @@
+{
+  "id": "wyrwidab-gloves",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the gloves of wyrwidab, the legendary strongman who pulled up oaks with his bare hands: a pair of huge thick leather gloves bound with iron bands, oak bark and small green oak leaves caught in their seams, single inventory item icon",
+  "style": "src/client/art/items/lokietek-gloves.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02327056591182285
+  },
+  "images": 1
+}

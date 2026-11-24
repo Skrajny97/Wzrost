@@ -1,0 +1,14 @@
+{
+  "id": "lysiec-cross",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the reliquary cross of the holy cross monastery on lysiec mountain: a golden double-armed cross set with red rubies, a small crystal window at its centre holding a splinter of dark wood, a holy golden glow, diagonal, single inventory item icon",
+  "style": "src/client/art/items/stanislaus-crosier.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024405881772994995
+  },
+  "images": 1
+}

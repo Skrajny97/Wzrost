@@ -1,0 +1,14 @@
+{
+  "id": "kosciuszko-sukmana",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the sukmana of tadeusz kosciuszko from the battle of raclawice: a long peasant coat of light grey-brown wool with red embroidered trims and red tassels on the chest, a red belt, single inventory item icon",
+  "style": "src/client/art/items/sobieski-zupan.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023838118487887916
+  },
+  "images": 1
+}

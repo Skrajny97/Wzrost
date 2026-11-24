@@ -1,0 +1,14 @@
+{
+  "id": "janosik-ciupaga",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the ciupaga of janosik, the legendary highland outlaw of the tatra mountains: a long walking stick of polished dark wood with a small shining brass axe head as its handle, decorated with carved highland patterns and brass rings, diagonal, single inventory item icon",
+  "style": "src/client/art/items/svarozhich-axe.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023282439662509497
+  },
+  "images": 1
+}

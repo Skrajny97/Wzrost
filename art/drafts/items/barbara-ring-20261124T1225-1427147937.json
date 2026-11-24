@@ -1,0 +1,14 @@
+{
+  "id": "barbara-ring",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the ring of queen barbara radziwill: a delicate golden renaissance ring with a large pale blue sapphire framed by tiny pearls, a faint ghostly silver glow, single inventory item icon",
+  "style": "src/client/art/items/bona-ring.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023327873389350044
+  },
+  "images": 1
+}

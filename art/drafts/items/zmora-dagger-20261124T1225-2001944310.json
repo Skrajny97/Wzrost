@@ -1,0 +1,14 @@
+{
+  "id": "zmora-dagger",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the dagger of the zmora, a slavic nightmare spirit that sits on the chests of sleepers: a thin wavy black blade trailing dark purple smoke, a hilt of twisted black horn with a pale moonstone pommel, diagonal, single inventory item icon",
+  "style": "src/client/art/items/marzanna-dagger.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023421667917463515
+  },
+  "images": 1
+}

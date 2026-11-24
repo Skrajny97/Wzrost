@@ -1,0 +1,14 @@
+{
+  "id": "rugievit-sword",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the sword of rugievit, the seven-faced slavic war god of rugia: a long broad steel sword with a crossguard of dark gold carved with small stern faces, a grip wrapped in black leather, a runic blade with a faint red glow, diagonal, single inventory item icon",
+  "style": "src/client/art/items/grunwald-sword.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023367034010781183
+  },
+  "images": 1
+}

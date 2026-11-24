@@ -1,0 +1,14 @@
+{
+  "id": "jagiellonian-globe",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the jagiellonian globe: a small antique golden globe engraved with continents and seas, held in a gilded ring frame on a short ornate stand, a soft magical glow, single inventory item icon",
+  "style": "src/client/art/items/copernicus-sphere.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02315910172610813
+  },
+  "images": 1
+}

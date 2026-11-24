@@ -1,0 +1,14 @@
+{
+  "id": "werewolf-hood",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the hood of a werewolf: a hood made from a dark grey wolf pelt with the wolf's head on top, its ears pricked and its jaws open above the face opening, the inside of the hood dark and empty with no eyes, single inventory item icon",
+  "style": "src/client/art/items/strzygon-hood.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023258074351840553
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "griffin-talon",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the talon of the pomeranian griffin: a large curved golden-brown griffin claw set as a short parrying dagger in a hilt wrapped in red leather, a small griffin head pommel, diagonal, single inventory item icon",
+  "style": "src/client/art/items/basilisk-fang.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02337158780246311
+  },
+  "images": 1
+}

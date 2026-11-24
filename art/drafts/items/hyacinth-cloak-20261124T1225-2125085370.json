@@ -1,0 +1,14 @@
+{
+  "id": "hyacinth-cloak",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the cloak of saint hyacinth, who crossed the flooded vistula river on it: a long black dominican cloak lined with white, its hem wet with blue river water and small waves, a soft holy glow, single inventory item icon",
+  "style": "src/client/art/items/casimir-cope.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02334319870991177
+  },
+  "images": 1
+}

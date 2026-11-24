@@ -1,0 +1,14 @@
+{
+  "id": "jarovit-shield",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the golden shield of jarovit, the slavic god of spring and war, kept in his temple: a large round shield covered in hammered gold plates with a pattern of green spring leaves and a bright sun boss in the middle, a radiant glow, single inventory item icon",
+  "style": "src/client/art/items/lech-shield.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023276840013292104
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "lajkonik-boots",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the boots of the lajkonik, the tatar rider of the krakow legend: a pair of tall red leather tatar boots with curled pointed toes, golden embroidery and small golden bells, single inventory item icon",
+  "style": "src/client/art/items/walgierz-boots.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023288786140441897
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "syrenka-necklace",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the necklace of the warsaw mermaid: a silver necklace of sea shells and pearls with a small silver pendant of a mermaid holding a sword and a round shield, single inventory item icon",
+  "style": "src/client/art/items/rzepicha-necklace.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02396955711830987
+  },
+  "images": 1
+}

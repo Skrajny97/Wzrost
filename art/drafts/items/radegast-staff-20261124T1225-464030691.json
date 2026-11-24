@@ -1,0 +1,14 @@
+{
+  "id": "radegast-staff",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the staff of radegast, the slavic god of the oracle temple of radogoszcz: a tall staff of dark oak topped with a golden boar head holding a glowing amber orb in its tusks, diagonal, single inventory item icon",
+  "style": "src/client/art/items/veles-staff.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023884388575447932
+  },
+  "images": 1
+}
