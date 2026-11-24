@@ -1,0 +1,14 @@
+{
+  "id": "acorn-weevil",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant acorn weevil beetle, a round brown speckled body, an extremely long thin curved snout like a drill, longer than its body, with tiny jaws at its tip, elbowed antennae on the snout, six legs, raising its snout to drill, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the insect alone, no acorns, no ground, no background, the whole insect inside the picture, the whole snout too",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024681651146570845
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "shark",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a big grey shark, a thick torpedo-shaped body with a tall dorsal fin and a pale belly, cold black eyes, huge jaws wide open with rows of white triangular teeth, lunging forward diagonally, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the shark alone, no water, no ground, no background, the whole shark inside the picture, from the snout to the tail",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0234949592827691
+  },
+  "images": 1
+}

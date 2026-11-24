@@ -1,0 +1,14 @@
+{
+  "id": "ninth-wave",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Dziewiata Fala, the ninth wave, the biggest wave of the sea come alive, a towering curling wave of dark blue-green water with a crest of white foam shaped like grasping claws, a fierce face of foam with two glowing pale eyes in the curl, spray flying, an abstract creature of the sea, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the wave alone, no beach, no rocks, no ground, no background, the whole wave inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023663630826102365
+  },
+  "images": 1
+}

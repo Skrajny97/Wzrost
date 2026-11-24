@@ -1,0 +1,14 @@
+{
+  "id": "sea-cucumber",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant sea cucumber as big as a log, a thick leathery dark red-brown body covered in pale warts and rows of tiny tube feet, a crown of branched pale feathery tentacles around its mouth at the front, sticky white threads shooting out of it, rearing up its front end, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the creature alone, no water, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024279357825809058
+  },
+  "images": 1
+}

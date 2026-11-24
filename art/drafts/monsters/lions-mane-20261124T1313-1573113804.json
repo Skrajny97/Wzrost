@@ -1,0 +1,14 @@
+{
+  "id": "lions-mane",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant lion's mane jellyfish, a big glowing translucent orange-red bell like a dome with a frilled edge, a thick mass of long tangled stinging tentacles hanging below it, two dark eye-like shadows inside the bell, floating, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, eerie and menacing, full body, three-quarter view, the jellyfish alone, no water, no ground, no background, the whole jellyfish inside the picture, all the tentacles too",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024220815166261463
+  },
+  "images": 1
+}

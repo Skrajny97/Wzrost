@@ -1,0 +1,14 @@
+{
+  "id": "electric-ray",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant electric ray, a wide round flat dark grey-blue body like a disc with a short thick tail, two small dark eyes on top, bright blue lightning sparks crackling all around its edges, gliding through the air, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view seen slightly from above, the ray alone, no water, no ground, no background, the whole ray inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0236574979701572
+  },
+  "images": 1
+}

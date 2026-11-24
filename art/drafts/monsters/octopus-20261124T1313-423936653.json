@@ -1,0 +1,14 @@
+{
+  "id": "octopus",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a gigantic dark red octopus, one wide chunky shape filling the whole picture, a huge bulbous head with fierce glowing yellow eyes with slit pupils, eight thick tentacles with pale suckers spread wide and curling, two tentacles raised to grab, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the octopus alone, no water, no roots, no ground, no background, the whole octopus inside the picture, all eight tentacles too",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023614595460255943
+  },
+  "images": 1
+}

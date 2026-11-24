@@ -1,0 +1,14 @@
+{
+  "id": "whispered-charm",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Zamowa, a living whispered charm of old Slavic spells, a floating pale old mask-like face with closed eyes and whispering lips, made of woven glowing white-gold threads of light, long trailing ribbons of light covered with glowing rune signs, two thin hands of light raised to cast a spell, an abstract magical creature, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, eerie and menacing, floating, full body, three-quarter view, the creature alone, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02367335814518399
+  },
+  "images": 1
+}

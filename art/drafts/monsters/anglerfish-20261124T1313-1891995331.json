@@ -1,0 +1,14 @@
+{
+  "id": "anglerfish",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant anglerfish, a huge dark brown-black head with a gaping mouth full of long needle teeth, tiny glowing eyes, a long thin rod on its head ending in a bright glowing blue-green lure, a short body with ragged fins, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, lurking, menacing, full body, three-quarter view, the fish alone, no water, no ground, no background, the whole fish inside the picture, the lure too",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023597831489139135
+  },
+  "images": 1
+}

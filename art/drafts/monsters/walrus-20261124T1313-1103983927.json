@@ -1,0 +1,14 @@
+{
+  "id": "walrus",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a huge walrus, a massive wrinkled brown-pink body, two very long white tusks, a bristly moustache, small angry eyes, rearing up on its front flippers, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the walrus alone, no rocks, no ice, no ground, no background, the whole walrus inside the picture, both tusks too",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023542479214562314
+  },
+  "images": 1
+}

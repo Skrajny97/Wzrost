@@ -1,0 +1,14 @@
+{
+  "id": "swordfish",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a big swordfish leaping diagonally upward, a dark blue and silver body, a very long sharp flat sword-like bill pointing forward, a tall sickle-shaped dorsal fin and a crescent tail, a fierce eye, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the fish alone, no water, no ground, no background, the whole fish inside the picture, from the tip of the sword to the tail",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023766821959177658
+  },
+  "images": 1
+}

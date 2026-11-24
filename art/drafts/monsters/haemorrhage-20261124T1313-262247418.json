@@ -1,0 +1,14 @@
+{
+  "id": "haemorrhage",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Krwotok, a living gush of dark red blood, a lunging creature shaped from a thick swirling stream of glossy dark crimson blood, two pale glowing eyes, long dripping clawed arms of blood reaching forward, red droplets flying off, an abstract eerie creature, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the creature alone, no ground, no background, the whole creature inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023499028770022926
+  },
+  "images": 1
+}

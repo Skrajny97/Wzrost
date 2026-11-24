@@ -1,0 +1,14 @@
+{
+  "id": "acorn",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant living acorn as big as a barrel, a glossy brown shell with a rough scaly cap on top like a helmet, an angry face with glowing amber eyes in the shell, two short stubby oak-twig arms, rolling forward, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, menacing, full body, three-quarter view, the acorn alone, no leaves, no ground, no background, the whole acorn inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023601083243052167
+  },
+  "images": 1
+}

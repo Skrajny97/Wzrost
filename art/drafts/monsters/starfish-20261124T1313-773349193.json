@@ -1,0 +1,14 @@
+{
+  "id": "starfish",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant five-armed starfish as big as a shield, thick rough orange-red arms covered in pale knobbly spines, two arms raised like grasping hands, a small round toothy mouth in its centre, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, standing up on two arms, menacing, full body, three-quarter view, the starfish alone, no water, no rocks, no ground, no background, the whole starfish inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02427387604120043
+  },
+  "images": 1
+}

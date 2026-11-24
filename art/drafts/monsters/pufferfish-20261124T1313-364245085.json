@@ -1,0 +1,14 @@
+{
+  "id": "pufferfish",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a giant pufferfish blown up into a round spiky ball, a yellow-brown body with dark spots covered in long sharp spines dripping green venom, small fins and tail, big angry bulging eyes and a small beak-like mouth, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, floating, menacing, full body, three-quarter view, the fish alone, no water, no ground, no background, the whole fish inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02359959956423442
+  },
+  "images": 1
+}
