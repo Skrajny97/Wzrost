@@ -1,7 +1,7 @@
 // Kultywacja on the server (DECISIONS.md, „Kultywacja (1230 A)”): from
-// character level 20 the character meditates for a length an exploration
-// offers it (POST /api/cultivation), busy as at a profession's work
-// meanwhile: no exploration, profession or Drużyna's trip. The claim
+// character level 20 the character meditates for 10 minutes to 8 hours,
+// the lengths of a profession's work (POST /api/cultivation), busy as at
+// such work meanwhile: no exploration, profession or Drużyna's trip. The claim
 // ("Odbierz raport", /api/hunts/claim) gives the character XP kept at the
 // start while the class is ahead, at most up to the class's level at the
 // claim, and the Kultywacja's own XP of its minutes, with a report in the
@@ -11,7 +11,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { cultivationRate, cultivationXp, gainXp, huntDurations, newestArea, notificationsDue, xpToLevel, xpToNext } from '../src/engine/index.js';
+import { cultivationMinutes, cultivationRate, cultivationXp, gainXp, huntDurations, newestArea, notificationsDue, xpToLevel, xpToNext } from '../src/engine/index.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -51,7 +51,7 @@ describe('Kultywacja', () => {
     await player('mnich', 'Mnich');
   });
 
-  test('the card plans each length an exploration offers, up to the class level, with the Kultywacja at level 0', async () => {
+  test("the card plans each length, 10 minutes to 8 hours as a profession's work, up to the class level, with the Kultywacja at level 0", async () => {
     const { data } = await as('mnich', 'GET', '/api/character');
     const { plan, ...own } = data.character.cultivation;
     assert.deepEqual(own, { level: 0, xp: 0, xpToNext: 240, maxLevel: 100, bonus: 0, perLevel: 0.01, firstMinutes: 240, lastMinutes: 1200 });
@@ -62,7 +62,7 @@ describe('Kultywacja', () => {
     assert.equal(plan.cap, xpToLevel(LEVEL, 0, CLASS_LEVEL, content));
     assert.deepEqual(
       plan.lengths.map((length) => length.minutes),
-      huntDurations(LEVEL, content),
+      cultivationMinutes(content),
     );
     const hour = plan.lengths.find((length) => length.minutes === 60);
     assert.equal(hour.xp, cultivationXp(cultivationRate(CLASS_LEVEL, content), 60));
@@ -103,9 +103,14 @@ describe('Kultywacja', () => {
   });
 
   test('refused for a length not offered and before level 20; at equal levels only the Kultywacja grows, and with it at the top nothing begins', async () => {
-    let answer = await meditate('mnich', 7);
-    assert.equal(answer.status, 400);
-    assert.equal(answer.data.error.code, 'invalid_duration');
+    // Off its slider: an exploration's 1 or 5 minutes, past 8 hours, not on
+    // a step of 10, not a number.
+    for (const minutes of [7, 1, 5, 15, 490, 0, '60']) {
+      const answer = await meditate('mnich', minutes);
+      assert.equal(answer.status, 400, String(minutes));
+      assert.equal(answer.data.error.code, 'invalid_duration');
+    }
+    let answer;
     await player('nowy', 'Nowy', { level: 15, classLevel: 19 });
     answer = await meditate('nowy', 30);
     assert.equal(answer.status, 403);
@@ -241,6 +246,28 @@ describe('Kultywacja', () => {
     assert.equal(after.class_xp, before.class_xp + summary.classXp);
     // The bonuses' list on the page shows it, also while the character is away.
     assert.deepEqual([claimed.data.character.cultivation.level, claimed.data.character.cultivation.bonus], [50, 0.5]);
+  });
+
+  test('from its unlock on, up to 8 hours, whatever lengths the explorations have; 8 hours rewound cost 480 Punkty Czasu', async () => {
+    // Level 20: explorations of up to 30 minutes.
+    await player('uczen', 'Uczen', { level: 20, classLevel: 30 });
+    assert.ok(Math.max(...huntDurations(20, content)) < 480);
+    const { data } = await as('uczen', 'GET', '/api/character');
+    assert.deepEqual(
+      data.character.cultivation.plan.lengths.map((length) => length.minutes),
+      cultivationMinutes(content),
+    );
+    const answer = await meditate('uczen', 480);
+    assert.equal(answer.status, 201, JSON.stringify(answer.data));
+    const started = await activity('Uczen');
+    assert.equal(started.minutes, 480);
+    assert.equal(started.ends_at - started.started_at, 480 * MINUTE);
+    assert.equal(JSON.parse(started.options).xp, cultivationXp(cultivationRate(30, content), 480));
+    const before = await row('Uczen');
+    const skipped = await as('uczen', 'POST', '/api/time/skip', { target: 'activity' });
+    assert.equal(skipped.status, 200, JSON.stringify(skipped.data));
+    assert.equal(skipped.data.spent, 480);
+    assert.equal((await row('Uczen')).time_points, before.time_points - 480);
   });
 
   test('Punkty Czasu rewind it as an exploration; "Przerwij" ends it with nothing gained', async () => {

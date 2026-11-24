@@ -18,7 +18,7 @@ import { gemView, generateItem, itemName, itemView } from './items.js';
 import { countList, professionLevelLines, professionProgress } from './professions.js';
 import { createRng } from './rng.js';
 import { say } from './text.js';
-import { metNames } from './workshop.js';
+import { metNames, professionLastLevel } from './workshop.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {Record<string, any>} Base An item base (data/item-bases.json). */
@@ -44,13 +44,15 @@ export const jewelPatternMade = (base, content) => (base.classLevel ?? 1) <= con
 
 // The profession level a base's pattern opens at, as in the Warsztat: the
 // first base of a family at once, a later one from laterPatternLevel, and
-// not before the class level it asks for.
+// not before the class level it asks for, but at the profession's last
+// level at the latest (1246 A: Tiers XI and XII at the 200th).
 /**
  * @param {Base} base
  * @param {Content} content
  * @returns {number}
  */
-export const jewelPatternLevel = (base, content) => (base.classLevel ? Math.max(content.jewelcrafting.laterPatternLevel, base.classLevel) : 1);
+export const jewelPatternLevel = (base, content) =>
+  base.classLevel ? Math.min(professionLastLevel(content.jewelcrafting.profession, content), Math.max(content.jewelcrafting.laterPatternLevel, base.classLevel)) : 1;
 
 // Whether the character knows a jewel's pattern: by the profession's level,
 // or learned by taking such a jewel apart (`learned`, base ids, the same list

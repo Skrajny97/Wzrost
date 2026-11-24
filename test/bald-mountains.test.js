@@ -192,13 +192,14 @@ describe('the blows at the whole line of the Łysogóry', () => {
     });
   }
 
-  // With Nawia's 70 places (test/nawia.test.js): Twardowski stays on the
-  // 50th floor, Baba Jaga waits on the 125th and the Stolem on the 325th.
-  test('in the Wieże the champions wait on their floors: Twardowski on the 50th, Baba Jaga on the 125th, the Stolem on the 325th', () => {
+  // With the World Tree's 85 places (test/world-tree.test.js): Twardowski
+  // stays on the 50th floor, Baba Jaga waits on the 225th and the Stolem on
+  // the 300th (with Nawia's 70 the 125th and the 325th).
+  test('in the Wieże the champions wait on their floors: Twardowski on the 50th, Baba Jaga on the 225th, the Stolem on the 300th', () => {
     const { championEvery } = content.towers.floors;
     const floorOf = (placeId) => Array.from({ length: 1000 }, (_, index) => index + 1).find((one) => one % championEvery === 0 && towerArea(one, content).id === placeId);
-    assert.deepEqual(['cursed-manor', 'stone-throne', 'baba-yaga-hut'].map(floorOf), [50, 325, 125]);
-    for (const [floor, champion] of [[50, 'twardowski'], [325, 'stolem'], [125, 'baba-yaga']]) {
+    assert.deepEqual(['cursed-manor', 'stone-throne', 'baba-yaga-hut'].map(floorOf), [50, 300, 225]);
+    for (const [floor, champion] of [[50, 'twardowski'], [300, 'stolem'], [225, 'baba-yaga']]) {
       const { encounter } = towerFloor(floor, 'any', content);
       assert.equal(encounter.champion, true);
       assert.equal(encounter.members[0].monsterId, champion);

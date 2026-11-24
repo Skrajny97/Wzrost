@@ -9,6 +9,7 @@
 //   node tools/level-gap-sim.mjs --hours 10 --at character --no-yard
 //   node tools/level-gap-sim.mjs --variants now,catchup --weeks 1,2,3,4
 //   node tools/level-gap-sim.mjs --variants now,cult3cap,cult2,cult4cap --cultivation catch-up --from 100/119
+//   node tools/level-gap-sim.mjs --variants now,cult4cap --cultivation slot --slot 8 --from 100/119
 //
 // The player (options): `hours` of explorations a day (17.5: four
 // explorations of 4 hours and an hour and a half rewound with Time
@@ -28,16 +29,20 @@
 // Kultywacja (the author 24.11.2026, after turning down the variants above:
 // „coś w rodzaju Kultywacji, która powoduje że postać medytuje i wtedy
 // zdobywa mocno zwiększony XP postaci”): a timed activity the player chooses
-// instead of an exploration as long. The character meditates and gets only
+// instead of an exploration as long, of 10 minutes to 8 hours as a
+// profession's work (the author 24.11.2026: „I Kultywacja powinna mieć do 8h
+// możliwość Kultywowania a nie jak wyprawa”; cultivationMinutes in the
+// game). The character meditates and gets only
 // character XP: `k` times what an exploration as long gives in the newest
 // place its class opens (the XP an hour of `--at class`, whatever `--at`
 // is). No class XP and no loot; the Avatar and the Plac treningowy work as on
 // any other day. A capped Kultywacja gives XP only while the class level is
 // above the character's and stops at equal levels: the character never
 // passes its class through it. How the player meditates (`--cultivation`,
-// both ways when left out): `slot`, the usual day with one of its 4-hour
-// explorations turned into Kultywacja, the first one in which the class is
-// ahead (with no cap, the first one every day); `catch-up`, every hour of play
+// both ways when left out): `slot`, the usual day with `--slot` hours of its
+// 4-hour explorations (4 when left out, at most the longest Kultywacja: 8,
+// two of them) turned into Kultywacja, from the first one in which the class
+// is ahead (with no cap, the first one every day); `catch-up`, every hour of play
 // from the first day until the levels are equal, where the player stops even
 // with no cap, then explorations only. A Kultywacja that reaches equal levels
 // ends there and the rest of its hours are an exploration, as the player
@@ -107,7 +112,7 @@ export const VARIANTS = {
 
 // How the player meditates with a Kultywacja variant (header).
 export const CULTIVATION = {
-  slot: 'co dzień jedna 4-godzinna wyprawa zamieniona na Kultywację',
+  slot: 'co dzień Kultywacja zamiast wypraw tak samo długich (--slot godzin, bez niego 4)',
   'catch-up': 'Kultywacja przez całe dni aż do zrównania poziomów, potem same wyprawy',
 };
 
@@ -155,7 +160,7 @@ function yardLevels(fortressDay, days, content) {
 // Day by day: the character's and the class's levels at the end of each
 // week in `weeks`, with the hours of Kultywacja so far and, catching up, the
 // day the levels were equal (0: at the start, null: not yet).
-export function project({ variant = VARIANTS.now, cultivate = 'slot', hours = 17.5, at = 'class', yard = true, from = null, weeks = [1, 2, 4, 8, 12], fortressDay = 21, avatarDay = 7 }, content) {
+export function project({ variant = VARIANTS.now, cultivate = 'slot', slotHours = 4, hours = 17.5, at = 'class', yard = true, from = null, weeks = [1, 2, 4, 8, 12], fortressDay = 21, avatarDay = 7 }, content) {
   const { maxLevel } = content.balance.progression;
   const charShare = variant.charShare ?? (() => 1);
   const classShare = variant.classShare ?? (() => 1);
@@ -192,8 +197,8 @@ export function project({ variant = VARIANTS.now, cultivate = 'slot', hours = 17
   };
   const rows = [];
   for (let day = 1; day <= days; day++) {
-    // The day's one 4-hour Kultywacja is still to come.
-    let slot = Boolean(cultivation) && cultivate === 'slot';
+    // The hours of the day's Kultywacja still to come (`slotHours`).
+    let slotLeft = cultivation && cultivate === 'slot' ? slotHours : 0;
     // Explorations of 4 hours, and what is left as a shorter one; the hours
     // of Kultywacja come out of them.
     for (let left = hours; left > 0; left -= 4) {
@@ -201,9 +206,10 @@ export function project({ variant = VARIANTS.now, cultivate = 'slot', hours = 17
       if (catchingUp) {
         length -= meditate(length, true);
         caughtUp(day);
-      } else if (slot && length === 4 && (cls.level > char.level || !cultivation.cap)) {
-        slot = false;
-        length -= meditate(length, cultivation.cap);
+      } else if (slotLeft > 0 && length === 4 && (cls.level > char.level || !cultivation.cap)) {
+        const part = Math.min(length, slotLeft);
+        slotLeft -= part;
+        length -= meditate(part, cultivation.cap);
       }
       if (length <= 0) continue;
       const place = at === 'class' ? newestTop(cls.level, content) : char.level;
@@ -251,7 +257,10 @@ function main() {
   const ways = typeof options.cultivation === 'string' ? options.cultivation.split(',') : Object.keys(CULTIVATION);
   for (const id of ids) if (!VARIANTS[id]) throw new Error(`No variant ${id}: ${Object.keys(VARIANTS).join(', ')}`);
   for (const way of ways) if (!CULTIVATION[way]) throw new Error(`No way of meditating ${way}: ${Object.keys(CULTIVATION).join(', ')}`);
-  const settings = { hours: Number(options.hours ?? 17.5), at: options.at ?? 'class', yard: !options['no-yard'], from, weeks };
+  const settings = { hours: Number(options.hours ?? 17.5), slotHours: Number(options.slot ?? 4), at: options.at ?? 'class', yard: !options['no-yard'], from, weeks };
+  // A Kultywacja lasts at most as long as the game lets it (8 hours).
+  const longest = Math.max(...engine.cultivationMinutes(content)) / 60;
+  if (!(settings.slotHours > 0 && settings.slotHours <= longest)) throw new Error(`--slot: from more than 0 to ${longest} hours`);
   // A row for each variant, and for a Kultywacja one, each way of meditating.
   const runs = ids.flatMap((id) => (VARIANTS[id].cultivation ? ways.map((way) => ({ id, way, label: `${id}/${way}` })) : [{ id, label: id }]));
   const width = Math.max(8, ...runs.map((run) => run.label.length));
@@ -274,7 +283,8 @@ function main() {
     });
     const { cultivated, cultivationLevel, equalOn } = rows[rows.length - 1];
     const equal = equalOn === null ? 'poziomy wciąż nierówne' : equalOn === 0 ? 'poziomy równe od początku' : `zrównanie w ${equalOn}. dniu`;
-    const notes = way ? `; ${CULTIVATION[way]}: ${Math.round(cultivated)} h Kultywacji (jej poziom ${cultivationLevel}), ${way === 'catch-up' ? equal : `${(cultivated / days).toFixed(1)} h dziennie`}` : '';
+    const wayName = way === 'slot' ? `co dzień ${settings.slotHours} h Kultywacji zamiast wypraw` : CULTIVATION[way];
+    const notes = way ? `; ${wayName}: ${Math.round(cultivated)} h Kultywacji (jej poziom ${cultivationLevel}), ${way === 'catch-up' ? equal : `${(cultivated / days).toFixed(1)} h dziennie`}` : '';
     console.log(`${label.padEnd(width)}${cells.join('')}   ${VARIANTS[id].name}${notes}`);
   }
 }

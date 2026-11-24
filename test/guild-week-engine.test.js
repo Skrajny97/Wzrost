@@ -84,10 +84,10 @@ describe('the Bohaterowie tygodnia (1198 A)', () => {
 });
 
 describe('the Krainy pod sztandarem (1200 A)', () => {
-  test('the lands of the Wyprawa Gildii, from Wiatrołomy to Kraina bez Słońca, and a place by its land', () => {
-    assert.equal(content.regions.length, 14);
+  test('the lands of the Wyprawa Gildii, from Wiatrołomy to Podniebne Konary, and a place by its land', () => {
+    assert.equal(content.regions.length, 17);
     assert.equal(content.regions[0].name, 'Wiatrołomy');
-    assert.equal(content.regions.at(-1).name, 'Kraina bez Słońca');
+    assert.equal(content.regions.at(-1).name, 'Podniebne Konary');
     assert.equal(landOfArea('windfalls-edge', content), 'windfalls');
     assert.equal(landOfArea('no-such-place', content), null);
     assert.deepEqual(landRules(content), { fame: 30, bonus: 0.05 });

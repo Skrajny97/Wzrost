@@ -1021,7 +1021,22 @@
       { "area": "road-of-the-dead", "monster": "sledge", "name": "Sanie Bez Woźnicy" },
       { "area": "black-lake", "monster": "ice-block", "name": "Czarny Lodowiec" },
       { "area": "chernobog-stronghold", "monster": "rat-king", "name": "Szczurzy Król Grodu" },
-      { "area": "koschei-castle", "monster": "bayun", "name": "Kot Bajun Bajarz" }
+      { "area": "koschei-castle", "monster": "bayun", "name": "Kot Bajun Bajarz" },
+      { "area": "rocky-cape", "monster": "horseshoe-crab", "name": "Prastary Skrzypłocz" },
+      { "area": "shipwreck-bay", "monster": "shark", "name": "Rekin Ludojad" },
+      { "area": "sea-caves", "monster": "anglerfish", "name": "Żabnica z Głębin" },
+      { "area": "white-stone", "monster": "walrus", "name": "Mors Władca Kamienia" },
+      { "area": "green-oak", "monster": "acorn", "name": "Pierwszy Żołądź" },
+      { "area": "bark-cliffs", "monster": "processionary", "name": "Korowódka bez Końca" },
+      { "area": "fungus-terraces", "monster": "beefsteak-fungus", "name": "Krwawy Ozorek" },
+      { "area": "honey-hives", "monster": "log-hive", "name": "Ul Królowej" },
+      { "area": "amber-cascades", "monster": "jewel-beetle", "name": "Złoty Bogatek" },
+      { "area": "bottomless-hollow", "monster": "capricorn-beetle", "name": "Kozioróg Drążyciel" },
+      { "area": "great-fork", "monster": "sloth", "name": "Stuletni Leniwiec" },
+      { "area": "cloud-bridges", "monster": "hailstone", "name": "Grad Burzowy" },
+      { "area": "sea-of-leaves", "monster": "chameleon", "name": "Kameleon Niewidzialny" },
+      { "area": "moon-cradle", "monster": "sleepwalker", "name": "Lunatyk z Dachu" },
+      { "area": "highest-bough", "monster": "ladybird", "name": "Siedmiokropka" }
     ],
     "outlaws": ["bandit-chief", "poacher", "horse-thief", "smuggler", "arsonist", "highwaywoman", "grave-robber"],
     "texts": {

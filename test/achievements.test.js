@@ -26,12 +26,12 @@ describe('the achievements (1036)', () => {
     await call('POST', '/api/character', { cookie, body: { name: 'Wytrwała', classId: 'mage', appearance: 'female' } });
   });
 
-  test('41 in their groups, none done at first, with the words of the counts that begin now', async () => {
+  test('42 in their groups, none done at first, with the words of the counts that begin now', async () => {
     const { achievements, fresh } = await look();
     // 24, Andrzejki's (1084 A), Nawia's explorer, the Kram Gildii's
     // Strażnik Sztandaru (1202 A) and the 14 smaller ones of the Profesje
     // (20.11.2026).
-    assert.equal(all(achievements).length, 41);
+    assert.equal(all(achievements).length, 42);
     assert.equal(achievements.groups.find((group) => group.id === 'professions').list.length, 17);
     assert.deepEqual(fresh, []);
     assert.ok(all(achievements).every((one) => !one.done));

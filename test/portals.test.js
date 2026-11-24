@@ -54,7 +54,7 @@ describe('the Portale Systemu', () => {
 
   test('a stage past the last land holds the creatures of its last place, at the stage\'s level, and pays more than the stage below', () => {
     const last = content.areas.reduce((top, area) => (area.maxLevel > top.maxLevel ? area : top));
-    for (const stage of [last.maxLevel + 1, 400, rules.maxStage]) {
+    for (const stage of [last.maxLevel + 1, 450, rules.maxStage]) {
       assert.equal(portalArea(stage, content).id, last.id);
       const plan = portalStage(stage, 'far', content);
       assert.equal(plan.level, stage);

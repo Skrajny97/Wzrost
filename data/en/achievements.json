@@ -75,6 +75,14 @@
             "Explorer of Nav",
             "Explorer of Nav"
           ]
+        },
+        "tree-explorer": {
+          "name": "Explorer of the World Tree",
+          "goal": "Reach the World Tree (character level 351).",
+          "title": [
+            "Explorer of the World Tree",
+            "Explorer of the World Tree"
+          ]
         }
       }
     },

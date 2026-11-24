@@ -60,6 +60,13 @@
 // Bez słońca), on both sides. All of them draw random numbers only where they
 // are at work, so fights elsewhere stay as they were.
 //
+// The World Tree's lands (levels 351–425) add two more, on both sides and
+// without a random number of their own: an effect may last a move less
+// (a negative `effectTicks`: Ałatyr, bleeding), never less than one move,
+// and everyone at the front of the formation may fight with a share less
+// armour (`frontArmorMalus`: Wicher). The third, Stromizna, is the rest
+// between fights (`restMalus`: combatant.js and hunt.js).
+//
 // An evolved character (evolutions.js) brings its trait (`feat`) and the
 // evolution's skills. A stance wakes at the start of the character's move,
 // besides its blow, and lasts a few of its own moves (a frenzy, a challenge
@@ -285,9 +292,13 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   // The skills' code and state are made only for a fight where someone has
   // a skill: the threat estimate runs many fights without any.
   const skilled = evolving || allies.some((/** @type {Unit} */ unit) => unit.skills?.length) || enemies.some((/** @type {Unit} */ unit) => unit.skills?.length);
+  // Wicher (the place's trait `frontArmorMalus`): everyone standing at the
+  // front of the formation, on both sides, fights with a share less armour.
+  const gale = trait?.frontArmorMalus ?? 0;
   /** @type {Unit[]} */
   const units = [...allies, ...enemies].map((unit, order) => ({
     ...unit,
+    ...(gale > 0 && unit.position === 'front' && { armor: Math.round(unit.armor * (1 - gale)) }),
     order,
     dots: [],
     interval: tuning.moveTime / unit.speed,
@@ -838,6 +849,8 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   // drunk the moment the effect it cures lands. Toksyny makes a poison
   // stronger and longer, Przewodnik żywiołów an effect of its elements
   // longer; Czarny jad's poison weakens the blows of the poisoned (`weaken`).
+  // The place's trait may make an effect longer (`effectTicks`: Opary torfu)
+  // or, by a negative number, shorter (Ałatyr), never below one move.
   const applyDot = (/** @type {Unit} */ actor, /** @type {Unit} */ target, /** @type {Dot} */ dot, /** @type {number} */ raw, /** @type {number} */ t, /** @type {Vars} */ vars) => {
     if (target.cured?.includes(dot.effect)) return;
     const resisted = cappedChance(target.willRating, actor.level, tuning.willCap, balance);
@@ -847,7 +860,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     const toxic = feat?.kind === 'toxins' && effect.id === 'poisoned';
     const longer = (toxic || (feat?.kind === 'elements' && feat.elements.includes(effect.element)) ? feat.ticks : 0) + (trait?.effectTicks?.[effect.id] ?? 0);
     const perTick = Math.max(1, Math.round(raw * (toxic ? dot.power * (1 + feat.damage) : dot.power)));
-    const ticks = dot.ticks + longer;
+    const ticks = longer < 0 ? Math.max(1, dot.ticks + longer) : dot.ticks + longer;
     const active = target.dots.find((/** @type {Dot} */ each) => each.effect === effect.id);
     if (active) {
       active.ticks = Math.max(active.ticks, ticks);

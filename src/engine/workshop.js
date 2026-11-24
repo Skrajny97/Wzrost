@@ -49,12 +49,24 @@ export const craftableBases = (content) => content.bases.filter((/** @type {Base
 // The profession level a base's pattern opens at: the first base of a family
 // at once, a later one from laterPatternLevel, and not before the class level
 // it asks for (classLevel), so the bases of class level 25 open at the 25th.
+// A class level past the profession's last level opens at that last level
+// (1246 A: Tiers XI and XII, from class level 225 and 250, at the 200th,
+// with no new levels of the profession).
 /**
  * @param {Base} base
  * @param {Content} content
  * @returns {number}
  */
-export const patternLevel = (base, content) => (base.classLevel ? Math.max(content.workshop.laterPatternLevel, base.classLevel) : 1);
+export const patternLevel = (base, content) =>
+  base.classLevel ? Math.min(professionLastLevel(content.workshop.profession, content), Math.max(content.workshop.laterPatternLevel, base.classLevel)) : 1;
+
+// The last level of a profession (data/professions.json maxLevel), or none.
+/**
+ * @param {string} professionId
+ * @param {Content} content
+ * @returns {number}
+ */
+export const professionLastLevel = (professionId, content) => content.professionsById?.[professionId]?.maxLevel ?? Infinity;
 
 // Whether the character knows a base's pattern: by the profession's level,
 // or learned by taking such an item apart (`learned`, base ids).

@@ -89,8 +89,10 @@ describe('Ostępy Nowiu', () => {
     assert.equal(content.monstersById['plague-maiden'].attack.dot.effect, 'poisoned');
     // The first blow at the whole line in the game; since the Łysogóry also
     // the Stolem's, the Kostucha's and Baba Jaga's (test/bald-mountains.test.js),
-    // and since Nawia the Indryk's, Nyja's and Marzanna's (test/nawia.test.js).
-    assert.deepEqual(Object.values(content.monstersById).filter((monster) => monster.attack.cleave).map((monster) => monster.id), ['moon-eater', 'stolem', 'kostucha', 'baba-yaga', 'indrik', 'nyja', 'marzanna']);
+    // since Nawia the Indryk's, Nyja's and Marzanna's (test/nawia.test.js),
+    // and since the World Tree the Galas's, the Ul's, the Piorun Kulisty's
+    // and Pycha's (test/world-tree.test.js).
+    assert.deepEqual(Object.values(content.monstersById).filter((monster) => monster.attack.cleave).map((monster) => monster.id), ['moon-eater', 'stolem', 'kostucha', 'baba-yaga', 'indrik', 'nyja', 'marzanna', 'oak-gall', 'log-hive', 'ball-lightning', 'pride']);
   });
 
   test('Przymrozek makes a chill last one move longer, for the creatures and the characters', () => {
@@ -164,12 +166,13 @@ describe('Cios w cały szyk (666)', () => {
     assert.ok(blowsByMoment(alone, 'e0').every((blows) => blows.length === 1));
   });
 
-  test('in the Wieże the Księżycożerca waits on its champion floor, the 250th; the same seed, the same fight', () => {
-    // Every 25th floor: with 70 places (since Nawia; with 55 the 150th, with
-    // 40 the 200th) the 250th is Zaćmiona Polana's.
+  test('in the Wieże the Księżycożerca waits on its champion floor, the 125th; the same seed, the same fight', () => {
+    // Every 25th floor: with 85 places (since the World Tree; with 70 the
+    // 250th, with 55 the 150th, with 40 the 200th) the 125th is Zaćmiona
+    // Polana's.
     const { championEvery } = content.towers.floors;
     const floor = Array.from({ length: 400 }, (_, index) => index + 1).find((one) => one % championEvery === 0 && towerArea(one, content).id === 'eclipsed-glade');
-    assert.equal(floor, 250);
+    assert.equal(floor, 125);
     assert.equal(towerFloor(floor, 'any', content).encounter.members[0].monsterId, 'moon-eater');
     const climber = newCharacter('warrior', { level: 200, classLevel: 200 });
     const entry = towerFight({ character: { ...climber, points: autoDistribute(climber, content) }, equipped: [], name: 'Wspinacz', floor, seed: 'nów' }, content);

@@ -589,16 +589,20 @@ export function championItemRarity(level, rng, content) {
 // fights spend it from one to the next, as HP; the other fights (the
 // Wieże, the Labirynt, the Portale, the Sala prób, the Arena, the guild
 // wars, the Bestia Gildii) each start full. null (full, nothing spent yet)
-// stays null.
+// stays null. A steep place (the place's trait `restMalus`: Stromizna)
+// gives back a share less of the missing mana, as of the missing HP
+// (combatant.js: recovery).
 /**
  * @param {number | null} mana
  * @param {number} maxMana
  * @param {Content} content
+ * @param {Record<string, any> | null} [trait]
  * @returns {number | null}
  */
-export function restedMana(mana, maxMana, content) {
+export function restedMana(mana, maxMana, content, trait = null) {
   if (mana === null) return null;
-  return mana + Math.round(Math.max(0, maxMana - mana) * content.balance.hunt.manaRecoveryAfterFight);
+  const share = Math.max(0, content.balance.hunt.manaRecoveryAfterFight - (trait?.restMalus ?? 0));
+  return mana + Math.round(Math.max(0, maxMana - mana) * share);
 }
 
 // A player as it fights now, on the way or in an event's fight (events.js):
@@ -1214,7 +1218,7 @@ export function simulateHunt(
         const back = Math.round((fighter.unit.maxHp - fighter.hp) * Math.min(1, fighter.unit.recovery + pace.restBonus));
         if (fighter === me) summary.recovered = back;
         fighter.hp += back;
-        fighter.mana = restedMana(fighter.mana, players[index].maxMana ?? 0, content);
+        fighter.mana = restedMana(fighter.mana, players[index].maxMana ?? 0, content, area.trait);
       });
       for (const mate of fighting.filter((one) => !one.out)) mate.hp += Math.round((mate.unit.maxHp - mate.hp) * Math.min(1, mate.unit.recovery + pace.restBonus));
 

@@ -210,7 +210,8 @@ const which = (test) => [...OWN].filter((id) => test(content.monstersById[id])).
 describe('Nawia', () => {
   test('three lands after the Łysogóry, each of five places of five levels, with its trait, its elite everywhere and its champion in the last place', () => {
     const after = content.regions.indexOf(region('bald-mountain'));
-    assert.deepEqual(content.regions.slice(after + 1).map((one) => one.id), LANDS.map(([id]) => id));
+    // After them the World Tree's (test/world-tree.test.js).
+    assert.deepEqual(content.regions.slice(after + 1, after + 4).map((one) => one.id), LANDS.map(([id]) => id));
     for (const [id, name, from, to, elite, champion, trait] of LANDS) {
       const land = region(id);
       assert.deepEqual([land.land, land.name, land.minLevel, land.maxLevel, land.safe, land.fightBoard], ['Nawia', name, from, to, false, `board-${id}`]);
@@ -288,11 +289,12 @@ describe('Nawia', () => {
     for (const one of variants) assert.ok(PLACES[one.area][2].includes(one.monster), one.area);
   });
 
-  test('in the Wieże every champion still waits on a floor of its own: Nyja on the 200th, Weles on the 275th, Kościej on the 350th', () => {
+  // With the World Tree's 85 places (with Nawia's 70 the 200th, 275th and 350th).
+  test('in the Wieże every champion still waits on a floor of its own: Nyja on the 400th, Weles on the 150th, Kościej on the 325th', () => {
     const { championEvery } = content.towers.floors;
     const floorOf = (placeId) => Array.from({ length: 2000 }, (_, index) => index + 1).find((one) => one % championEvery === 0 && towerArea(one, content).id === placeId);
-    assert.deepEqual(['gate-of-nav', 'veles-court', 'koschei-castle'].map(floorOf), [200, 275, 350]);
-    for (const [floor, champion] of [[200, 'nyja'], [275, 'veles'], [350, 'koschei']]) {
+    assert.deepEqual(['gate-of-nav', 'veles-court', 'koschei-castle'].map(floorOf), [400, 150, 325]);
+    for (const [floor, champion] of [[400, 'nyja'], [150, 'veles'], [325, 'koschei']]) {
       const { encounter } = towerFloor(floor, 'any', content);
       assert.equal(encounter.champion, true);
       assert.equal(encounter.members[0].monsterId, champion);

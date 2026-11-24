@@ -20,7 +20,7 @@ const rules = content.cards;
 // The content with the collection's bonus as given.
 const withBonus = (collection) => ({ ...content, cards: { ...rules, bonuses: { ...rules.bonuses, collection: { ...rules.bonuses.collection, ...collection } } } });
 const allCards = () => [...cardHomes(content).keys()];
-// Every creature of the lands is a card: 207 with the Łysogóry, 258 with Nawia.
+// Every creature of the lands is a card: 207 with the Łysogóry, 258 with Nawia, 309 with the World Tree.
 const ALL = cardHomes(content).size;
 // A collection of the first `count` cards, each with `copies`.
 const collectionOf = (count, copies = 1) => new Map(allCards().slice(0, count).map((id) => [id, copies]));
@@ -63,7 +63,7 @@ describe('Talia Systemu: the collection in the engine', () => {
     const view = cardCollectionView(collectionOf(31), off);
     assert.deepEqual(view.bonus, []);
     assert.equal(view.threshold, null);
-    // Every creature of the lands (207 with the Łysogóry, 258 with Nawia).
+    // Every creature of the lands (207 with the Łysogóry, 258 with Nawia, 309 with the World Tree).
     assert.equal(view.summary, `Kolekcja: 31 z ${ALL}`);
   });
 

@@ -1829,6 +1829,303 @@
         "pl": "Deathless"
       },
       "suffix": "of Koschei"
+    },
+    "horseshoe-crab": {
+      "prefix": {
+        "m": "Armoured",
+        "f": "Armoured",
+        "n": "Armoured",
+        "pl": "Armoured"
+      },
+      "suffix": "of the Horseshoe Crab"
+    },
+    "starfish": {
+      "suffix": "of the Starfish"
+    },
+    "electric-ray": {
+      "suffix": "of the Electric Ray"
+    },
+    "shark": {
+      "prefix": {
+        "m": "Shark",
+        "f": "Shark",
+        "n": "Shark",
+        "pl": "Shark"
+      },
+      "suffix": "of the Shark"
+    },
+    "pufferfish": {
+      "suffix": "of the Pufferfish"
+    },
+    "swordfish": {
+      "suffix": "of the Swordfish"
+    },
+    "sea-cucumber": {
+      "prefix": {
+        "m": "Sticky",
+        "f": "Sticky",
+        "n": "Sticky",
+        "pl": "Sticky"
+      },
+      "suffix": "of the Sea Cucumber"
+    },
+    "anglerfish": {
+      "suffix": "of the Anglerfish"
+    },
+    "lions-mane": {
+      "suffix": "of the Lion's Mane"
+    },
+    "walrus": {
+      "suffix": "of the Walrus"
+    },
+    "haemorrhage": {
+      "prefix": {
+        "m": "Bloody",
+        "f": "Bloody",
+        "n": "Bloody",
+        "pl": "Bloody"
+      },
+      "suffix": "of the Haemorrhage"
+    },
+    "whispered-charm": {
+      "suffix": "of the Whispered Charm"
+    },
+    "acorn": {
+      "prefix": {
+        "m": "Acorn",
+        "f": "Acorn",
+        "n": "Acorn",
+        "pl": "Acorn"
+      },
+      "suffix": "of the World Acorn"
+    },
+    "acorn-weevil": {
+      "suffix": "of the Acorn Weevil"
+    },
+    "oak-gall": {
+      "suffix": "of the Oak Gall"
+    },
+    "ninth-wave": {
+      "prefix": {
+        "m": "Foaming",
+        "f": "Foaming",
+        "n": "Foaming",
+        "pl": "Foaming"
+      },
+      "suffix": "of the Ninth Wave"
+    },
+    "octopus": {
+      "prefix": {
+        "m": "Eight-Armed",
+        "f": "Eight-Armed",
+        "n": "Eight-Armed",
+        "pl": "Eight-Armed"
+      },
+      "suffix": "of the Giant Octopus"
+    },
+    "processionary": {
+      "prefix": {
+        "m": "Stinging",
+        "f": "Stinging",
+        "n": "Stinging",
+        "pl": "Stinging"
+      },
+      "suffix": "of the Processionary"
+    },
+    "tarsier": {
+      "suffix": "of the Tarsier"
+    },
+    "scorpionfly": {
+      "suffix": "of the Scorpionfly"
+    },
+    "beefsteak-fungus": {
+      "prefix": {
+        "m": "Crimson",
+        "f": "Crimson",
+        "n": "Crimson",
+        "pl": "Crimson"
+      },
+      "suffix": "of the Beefsteak Fungus"
+    },
+    "water-shrew": {
+      "suffix": "of the Water Shrew"
+    },
+    "snakefly": {
+      "suffix": "of the Snakefly"
+    },
+    "log-hive": {
+      "prefix": {
+        "m": "Honeyed",
+        "f": "Honeyed",
+        "n": "Honeyed",
+        "pl": "Honeyed"
+      },
+      "suffix": "of the Log Hive"
+    },
+    "waxworm": {
+      "suffix": "of the Waxworm"
+    },
+    "intoxication": {
+      "suffix": "of Intoxication"
+    },
+    "jewel-beetle": {
+      "prefix": {
+        "m": "Gleaming",
+        "f": "Gleaming",
+        "n": "Gleaming",
+        "pl": "Gleaming"
+      },
+      "suffix": "of the Jewel Beetle"
+    },
+    "gecko": {
+      "suffix": "of the Gecko"
+    },
+    "glare": {
+      "prefix": {
+        "m": "Blinding",
+        "f": "Blinding",
+        "n": "Blinding",
+        "pl": "Blinding"
+      },
+      "suffix": "of the Glare"
+    },
+    "capricorn-beetle": {
+      "suffix": "of the Capricorn Beetle"
+    },
+    "olm": {
+      "prefix": {
+        "m": "Pallid",
+        "f": "Pallid",
+        "n": "Pallid",
+        "pl": "Pallid"
+      },
+      "suffix": "of the Dragon's Whelp"
+    },
+    "honey-fungus": {
+      "suffix": "of the Honey Fungus"
+    },
+    "pangolin": {
+      "prefix": {
+        "m": "Scaled",
+        "f": "Scaled",
+        "n": "Scaled",
+        "pl": "Scaled"
+      },
+      "suffix": "of the Pangolin"
+    },
+    "heartwood": {
+      "prefix": {
+        "m": "Ancient",
+        "f": "Ancient",
+        "n": "Ancient",
+        "pl": "Ancient"
+      },
+      "suffix": "of the Heartwood"
+    },
+    "sloth": {
+      "prefix": {
+        "m": "Idle",
+        "f": "Idle",
+        "n": "Idle",
+        "pl": "Idle"
+      },
+      "suffix": "of the Giant Sloth"
+    },
+    "aphid": {
+      "suffix": "of the Aphid"
+    },
+    "hesitation": {
+      "suffix": "of Hesitation"
+    },
+    "hailstone": {
+      "prefix": {
+        "m": "Hailbound",
+        "f": "Hailbound",
+        "n": "Hailbound",
+        "pl": "Hailbound"
+      },
+      "suffix": "of the Hailstone"
+    },
+    "flying-carpet": {
+      "suffix": "of the Flying Carpet"
+    },
+    "thunder-arrow": {
+      "prefix": {
+        "m": "Thunderous",
+        "f": "Thunderous",
+        "n": "Thunderous",
+        "pl": "Thunderous"
+      },
+      "suffix": "of the Thunder Arrow"
+    },
+    "bush-cricket": {
+      "suffix": "of the Bush-Cricket"
+    },
+    "chameleon": {
+      "prefix": {
+        "m": "Shifting",
+        "f": "Shifting",
+        "n": "Shifting",
+        "pl": "Shifting"
+      },
+      "suffix": "of the Chameleon"
+    },
+    "oak-leaf": {
+      "suffix": "of the Oak Leaf"
+    },
+    "sleepwalker": {
+      "prefix": {
+        "m": "Drowsy",
+        "f": "Drowsy",
+        "n": "Drowsy",
+        "pl": "Drowsy"
+      },
+      "suffix": "of the Sleepwalker"
+    },
+    "glowworm": {
+      "suffix": "of the Glowworm"
+    },
+    "moon-halo": {
+      "prefix": {
+        "m": "Luminous",
+        "f": "Luminous",
+        "n": "Luminous",
+        "pl": "Luminous"
+      },
+      "suffix": "of the Moon Halo"
+    },
+    "shield-bug": {
+      "suffix": "of the Shield Bug"
+    },
+    "ladybird": {
+      "prefix": {
+        "m": "Lucky",
+        "f": "Lucky",
+        "n": "Lucky",
+        "pl": "Lucky"
+      },
+      "suffix": "of the Ladybird"
+    },
+    "comet": {
+      "suffix": "of the Comet"
+    },
+    "ball-lightning": {
+      "prefix": {
+        "m": "Crackling",
+        "f": "Crackling",
+        "n": "Crackling",
+        "pl": "Crackling"
+      },
+      "suffix": "of the Ball Lightning"
+    },
+    "pride": {
+      "prefix": {
+        "m": "Haughty",
+        "f": "Haughty",
+        "n": "Haughty",
+        "pl": "Haughty"
+      },
+      "suffix": "of Pride"
     }
   }
 }

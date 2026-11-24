@@ -84,6 +84,24 @@
       "description": "The god of darkness who rules the Sunless Land. Wherever he stands, every light goes out and the frost freezes the blood in your veins. He is the oldest and the most dangerous of the bosses.",
       "title": ["Chernobog Slayer", "Chernobog Slayer"],
       "attack": { "name": "Eternal Darkness", "silence": { "label": "in darkness" } }
+    },
+    "wb-whale-fish": {
+      "name": "Whale-Fish",
+      "description": "A huge fish from the fairy tales with a whole village and its orchards standing on its back. Old beliefs say the world rests on such a fish, and when it stirs, the earth shakes. When it strikes with its tail, a wave floods your whole formation, and whoever it knocks over loses a move.",
+      "title": ["Whale-Fish Slayer", "Whale-Fish Slayer"],
+      "attack": { "name": "Tail Strike", "stun": { "label": "knocked over" } }
+    },
+    "wb-svarozhich": {
+      "name": "Svarozhich",
+      "description": "The god of fire, son of Svarog: a bearded giant of living fire who has always slept in the wood of the World Tree. People woke him by rubbing wood against wood. His burning axe sets you alight, and his fire grows with every blow.",
+      "title": ["Svarozhich Slayer", "Svarozhich Slayer"],
+      "attack": { "name": "Burning Axe" }
+    },
+    "wb-miesiac": {
+      "name": "Myesyats",
+      "description": "Myesyats, the Moon of the old beliefs: a young shepherd of the stars with a silver crescent above his head and the full moon on his arm like a shield. At night he herds the stars like sheep and rests in a cradle of boughs. His crescent cuts until you bleed, and the glow of the full moon spellbinds you so you lose a move.",
+      "title": ["Myesyats Slayer", "Myesyats Slayer"],
+      "attack": { "name": "Silver Crescent", "stun": { "label": "spellbound" } }
     }
   },
   "texts": {

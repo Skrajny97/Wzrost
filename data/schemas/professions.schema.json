@@ -659,7 +659,7 @@
         "patternsUpTo": {
           "type": "integer",
           "minimum": 1,
-          "description": "Najwyższy poziom klasy (classLevel w item-bases.json), do którego Warsztat zna wzory. Bazy wyższych tierów tylko wypadają: ich wzorów nie odsłania ani poziom profesji, ani rozebranie przedmiotu (1086.0 A: Tier X od 200. poziomu klasy do czasu nowych krain)."
+          "description": "Najwyższy poziom klasy (classLevel w item-bases.json), do którego Warsztat zna wzory. Bazy wyższych tierów tylko wypadają: ich wzorów nie odsłania ani poziom profesji, ani rozebranie przedmiotu (1086.0 A: Tier X od 200. poziomu klasy do czasu nowych krain). Wzór bazy z poziomem klasy wyższym niż ostatni poziom profesji (maxLevel) odsłania ten ostatni poziom (1246 A: Tiery XI i XII z krainami Drzewa Świata na 200. poziomie)."
         },
         "partsLevelStep": {
           "type": "integer",

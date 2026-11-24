@@ -15,11 +15,30 @@
       "safe",
       "description",
       "trait",
-      "elite",
       "resources",
       "areas"
     ],
+    "if": {
+      "properties": { "soon": { "const": true } },
+      "required": ["soon"]
+    },
+    "else": {
+      "required": ["elite"],
+      "properties": {
+        "areas": {
+          "items": {
+            "properties": {
+              "encounters": { "minItems": 1 }
+            }
+          }
+        }
+      }
+    },
     "properties": {
+      "soon": {
+        "type": "boolean",
+        "description": "Kraina w przygotowaniu: miejsca, opisy i cecha są gotowe, stwory jeszcze nie (bez elity, spotkań i czempiona). Gry ich nie widzi (src/engine/content.js), a walidator sprawdza, że stoi za gotowymi krainami i ciągnie dalej ich poziomy. Takie krainy stoją na końcu listy."
+      },
       "id": {
         "type": "string",
         "pattern": "^[a-z][a-z0-9-]*$"
@@ -94,8 +113,20 @@
           },
           "effectTicks": {
             "type": "object",
-            "description": "O ile ruchów dłużej trwa efekt (effects.json), u stworów i u postaci.",
-            "additionalProperties": { "type": "integer", "minimum": 1, "maximum": 5 }
+            "description": "O ile ruchów dłużej trwa efekt (effects.json), u stworów i u postaci; liczba ujemna skraca efekt (Ałatyr), najwyżej do jednego ruchu.",
+            "additionalProperties": { "type": "integer", "minimum": -5, "maximum": 5, "not": { "const": 0 } }
+          },
+          "restMalus": {
+            "type": "number",
+            "description": "O taką część mniej brakującego HP i many przywraca odpoczynek między walkami na wyprawie, każdemu z drużyny (Stromizna).",
+            "exclusiveMinimum": 0,
+            "maximum": 0.2
+          },
+          "frontArmorMalus": {
+            "type": "number",
+            "description": "O taką część mniej pancerza ma w walce każdy na przedzie szyku, u stworów i u postaci (Wicher).",
+            "exclusiveMinimum": 0,
+            "maximum": 0.2
           },
           "slowLonger": {
             "type": "object",
@@ -185,7 +216,8 @@
             },
             "encounters": {
               "type": "array",
-              "minItems": 1,
+              "description": "Spotkania: co najmniej jedno, a w krainie w przygotowaniu (soon) jeszcze żadnego.",
+              "minItems": 0,
               "items": {
                 "type": "object",
                 "additionalProperties": false,

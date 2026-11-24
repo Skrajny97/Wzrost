@@ -1400,6 +1400,10 @@
     "0.5.16": {
       "title": "Version 0.5.16",
       "body": "- In Polish, the narrator now says „Rzemiosło” in the Crafting chapter too."
+    },
+    "0.5.17": {
+      "title": "Version 0.5.17",
+      "body": "- The World Tree awaits past Nav, at levels 351–425: the Isle of Buyan, the Great Trunk and the Sky Boughs, 15 places and 51 new creatures with their own ways of fighting, among them the elites Ninth Wave, Pangolin and Ball Lightning and the champions Giant Octopus, Heartwood and Pride.\n- Land traits: on the Isle of Buyan bleeding lasts one turn less, in the Great Trunk the rest between fights restores 5% less HP and mana, and in the Sky Boughs everyone at the front of the line has 5% less armour, creatures and characters alike.\n- The World Boss has three new bands: the Whale-Fish (351–375), Svarozhich (376–400) and Myesyats (401–425).\n- From level 226 the World Boss has more HP, as characters with Tier XI and XII items hit harder.\n- New materials, System Deck cards, Wanted posters and the “Explorer of the World Tree” achievement.\n- The patterns of Tiers XI and XII open at level 200 of Crafting and Jewelcrafting, or earlier by taking such an item apart.\n- Cultivation now works like profession work: choose anything from 10 minutes to 8 hours, in 10-minute steps, right from its unlock."
     }
   }
 }

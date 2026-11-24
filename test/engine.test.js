@@ -1330,7 +1330,7 @@ describe('inner regions', () => {
     }
     // Wiatrołomy: Błędnica in the first three inner regions, Płanetnik deeper.
     assert.deepEqual(content.regionsById.windfalls.areas.map((area) => area.elite), ['wisp', 'wisp', 'wisp', 'planetnik', 'planetnik']);
-    assert.deepEqual(content.regions.map((region) => region.areas.at(-1).champion), ['tusker', 'basilisk', 'water-spirit', 'mud-lord', 'rokita', 'rarog', 'night-huntsman', 'moon-eater', 'stolem', 'twardowski', 'baba-yaga', 'nyja', 'veles', 'koschei']);
+    assert.deepEqual(content.regions.map((region) => region.areas.at(-1).champion), ['tusker', 'basilisk', 'water-spirit', 'mud-lord', 'rokita', 'rarog', 'night-huntsman', 'moon-eater', 'stolem', 'twardowski', 'baba-yaga', 'nyja', 'veles', 'koschei', 'octopus', 'heartwood', 'pride']);
   });
 
   test('Uroczysko Kamieni has its own creatures, none from Wiatrołomy', () => {

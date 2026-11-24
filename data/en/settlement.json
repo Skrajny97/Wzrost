@@ -1122,6 +1122,51 @@
       },
       "bayun": {
         "name": "Bayun the Storyteller"
+      },
+      "horseshoe-crab": {
+        "name": "Ancient Horseshoe Crab"
+      },
+      "shark": {
+        "name": "Man-Eating Shark"
+      },
+      "anglerfish": {
+        "name": "Anglerfish of the Deep"
+      },
+      "walrus": {
+        "name": "Walrus of the Stone"
+      },
+      "acorn": {
+        "name": "The First Acorn"
+      },
+      "processionary": {
+        "name": "Endless Processionary"
+      },
+      "beefsteak-fungus": {
+        "name": "Bleeding Beefsteak"
+      },
+      "log-hive": {
+        "name": "The Queen's Hive"
+      },
+      "jewel-beetle": {
+        "name": "Golden Jewel Beetle"
+      },
+      "capricorn-beetle": {
+        "name": "Capricorn the Borer"
+      },
+      "sloth": {
+        "name": "Hundred-Year Sloth"
+      },
+      "hailstone": {
+        "name": "Storm Hailstone"
+      },
+      "chameleon": {
+        "name": "Unseen Chameleon"
+      },
+      "sleepwalker": {
+        "name": "Rooftop Sleepwalker"
+      },
+      "ladybird": {
+        "name": "Seven-Spot Ladybird"
       }
     },
     "texts": {

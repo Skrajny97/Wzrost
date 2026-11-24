@@ -259,13 +259,13 @@ function tripFaints({ minutes, character, area, player, mates, partners = [], st
       const after = (id) => /** @type {{ hp: number } | undefined} */ (result.units.find((/** @type {{ id: string }} */ unit) => unit.id === id))?.hp ?? 0;
       hp = rested(player, after(player.id));
       const manaLeft = /** @type {{ mana?: number } | undefined} */ (result.units.find((/** @type {{ id: string }} */ unit) => unit.id === player.id))?.mana;
-      mana = restedMana(manaLeft ?? mana, player.maxMana ?? 0, content);
+      mana = restedMana(manaLeft ?? mana, player.maxMana ?? 0, content, area.trait);
       // The other players rest as the character does, and one that fell
       // fights on (simulateHunt).
       partners.forEach((one, index) => {
         partnerHp[index] = rested(one.unit, after(one.unit.id));
         const own = /** @type {{ mana?: number } | undefined} */ (result.units.find((/** @type {{ id: string }} */ unit) => unit.id === one.unit.id))?.mana;
-        partnerMana[index] = restedMana(own ?? partnerMana[index], one.unit.maxMana ?? 0, content);
+        partnerMana[index] = restedMana(own ?? partnerMana[index], one.unit.maxMana ?? 0, content, area.trait);
       });
       mates.forEach((mate, index) => {
         if (mateHp[index] > 0) mateHp[index] = after(mate.id) > 0 ? rested(mate, after(mate.id)) : 0;

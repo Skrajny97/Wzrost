@@ -50,8 +50,57 @@ export function validateData(data = loadData()) {
   if (errors.length === 0 && !foes(worldBossCreatures(data))) {
     for (const error of foes.errors) errors.push(`world-bosses.json/bosses${error.instancePath || ''}: ${error.message}`);
   }
-  // References only make sense once every file has the expected shape.
-  if (errors.length === 0) errors.push(...checkReferences(data));
+  // References only make sense once every file has the expected shape. A
+  // land still being made (`soon`) is checked on its own, and every other
+  // check sees the data as the game does, without it (src/engine/content.js).
+  if (errors.length === 0) {
+    errors.push(...checkSoonLands(data));
+    errors.push(...checkReferences({ ...data, regions: data.regions.filter((region) => !region.soon) }));
+  }
+  return errors;
+}
+
+// The lands being made (regions.json, `soon`): their places and trait are
+// written before their creatures. They stand after every ready land and go
+// on with its levels, their places follow one another without gaps, their
+// ids are their own, their resources are known, and a creature already
+// named in them is one there is.
+function checkSoonLands(data) {
+  const errors = [];
+  const monsters = new Set(data.monsters.map((monster) => monster.id));
+  const resources = new Set(data.resources.map((resource) => resource.id));
+  const ids = new Set();
+  let ready = true;
+  let next = null;
+  for (const region of data.regions) {
+    if (!region.soon) {
+      if (!ready) errors.push(`regions.json: gotowa kraina ${region.id} stoi za krainą w przygotowaniu`);
+      next = region.maxLevel + 1;
+      for (const area of region.areas) ids.add(area.id);
+      ids.add(region.id);
+      continue;
+    }
+    ready = false;
+    if (next !== null && region.minLevel !== next) errors.push(`regions.json: kraina w przygotowaniu ${region.id} powinna zaczynać się od poziomu ${next}`);
+    next = region.maxLevel + 1;
+    if (ids.has(region.id)) errors.push(`regions.json: identyfikator ${region.id} się powtarza`);
+    ids.add(region.id);
+    let level = region.minLevel;
+    for (const area of region.areas) {
+      if (ids.has(area.id)) errors.push(`regions.json: identyfikator ${area.id} się powtarza`);
+      ids.add(area.id);
+      if (area.minLevel !== level) errors.push(`regions.json: ${area.id} powinien zaczynać się od poziomu ${level}`);
+      if (area.minLevel > area.maxLevel) errors.push(`regions.json: ${area.id} ma minLevel większy niż maxLevel`);
+      level = area.maxLevel + 1;
+      const named = [...area.encounters, ...(area.tough ?? [])].flatMap((encounter) => encounter.monsters).concat(area.elite ?? [], area.champion ?? []);
+      for (const id of named) if (!monsters.has(id)) errors.push(`regions.json: ${area.id} ma nieznanego potwora "${id}"`);
+    }
+    if (level !== region.maxLevel + 1) errors.push(`regions.json: regiony wewnętrzne ${region.id} nie kończą się na poziomie ${region.maxLevel}`);
+    if (region.elite && !monsters.has(region.elite)) errors.push(`regions.json: ${region.id} ma nieznaną elitę "${region.elite}"`);
+    for (const id of Object.keys(region.resources)) {
+      if (!resources.has(id)) errors.push(`regions.json: ${region.id} ma nieznany zasób "${id}"`);
+    }
+  }
   return errors;
 }
 
@@ -664,6 +713,11 @@ function checkReferences(data) {
     previous = step.huntMinutes;
   }
   if (previous !== maxMinutes) errors.push('unlocks.json: ostatni próg huntMinutes musi odblokować maxMinutes z balance.json');
+  // The Kultywacja's lengths, a slider as a profession's work has.
+  const meditation = data.balance.cultivation.minutes;
+  if (meditation.max < meditation.min || (meditation.max - meditation.min) % meditation.step !== 0) {
+    errors.push('balance.json: cultivation.minutes.max musi wypadać na kroku suwaka od min');
+  }
   const fights = data.balance.hunt.fightsByMinutes;
   if (fights[0][0] > minMinutes) errors.push('balance.json: fightsByMinutes nie obejmuje najkrótszej wyprawy');
   for (let i = 1; i < fights.length; i++) {

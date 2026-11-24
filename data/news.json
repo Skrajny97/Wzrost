@@ -1755,6 +1755,11 @@
       "id": "0.5.16",
       "title": "Wersja 0.5.16",
       "body": "- Narrator też mówi teraz „Rzemiosło” w rozdziale tej profesji."
+    },
+    {
+      "id": "0.5.17",
+      "title": "Wersja 0.5.17",
+      "body": "- Drzewo Świata czeka za Nawią, na poziomach 351–425: Wyspa Bujan, Wielki Pień i Podniebne Konary, 15 miejsc i 51 nowych stworów z własnymi sposobami walki, w tym elity Dziewiąta Fala, Łuskowiec i Piorun Kulisty oraz czempioni Ośmiornica, Serce Pnia i Pycha.\n- Cechy krain: na Wyspie Bujan krwawienie trwa o jeden ruch krócej, w Wielkim Pniu odpoczynek między walkami przywraca o 5% mniej HP i many, a w Podniebnych Konarach każdy na przedzie szyku ma o 5% mniej pancerza, u stworów i u postaci.\n- Postrach Krainy ma trzy nowe przedziały: Ryba-Wieloryb (351–375), Swarożyc (376–400) i Miesiąc (401–425).\n- Postrach Krainy ma od 226. poziomu więcej HP, bo postacie z przedmiotami Tierów XI i XII biją mocniej.\n- Nowe materiały, karty Talii Systemu, listy gończe i osiągnięcie „Odkrywca Drzewa Świata”.\n- Wzory Tierów XI i XII odsłania 200. poziom Rzemiosła i Jubilerstwa, a rozbiórka takiego przedmiotu jeszcze wcześniej.\n- Kultywacja działa teraz jak praca w profesji: wybierasz od 10 minut do 8 godzin, co 10 minut, od razu po odblokowaniu."
     }
   ]
 }

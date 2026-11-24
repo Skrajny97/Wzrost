@@ -2884,5 +2884,587 @@
     "attack": {
       "name": "Koschei's Sword"
     }
+  },
+  "horseshoe-crab": {
+    "name": "Horseshoe Crab",
+    "counted": [
+      "Horseshoe Crab",
+      "Horseshoe Crabs",
+      "Horseshoe Crabs"
+    ],
+    "attack": {
+      "name": "Dagger Tail"
+    }
+  },
+  "starfish": {
+    "name": "Starfish",
+    "counted": [
+      "Starfish",
+      "Starfish",
+      "Starfish"
+    ],
+    "attack": {
+      "name": "Spiny Arm"
+    }
+  },
+  "electric-ray": {
+    "name": "Electric Ray",
+    "counted": [
+      "Electric Ray",
+      "Electric Rays",
+      "Electric Rays"
+    ],
+    "attack": {
+      "name": "Electric Shock",
+      "stun": {
+        "label": "shocked"
+      }
+    }
+  },
+  "shark": {
+    "name": "Shark",
+    "counted": [
+      "Shark",
+      "Sharks",
+      "Sharks"
+    ],
+    "attack": {
+      "name": "Shark's Jaws"
+    }
+  },
+  "pufferfish": {
+    "name": "Pufferfish",
+    "counted": [
+      "Pufferfish",
+      "Pufferfish",
+      "Pufferfish"
+    ],
+    "attack": {
+      "name": "Venomous Spines"
+    }
+  },
+  "swordfish": {
+    "name": "Swordfish",
+    "counted": [
+      "Swordfish",
+      "Swordfish",
+      "Swordfish"
+    ],
+    "attack": {
+      "name": "Sword Bill"
+    }
+  },
+  "sea-cucumber": {
+    "name": "Sea Cucumber",
+    "counted": [
+      "Sea Cucumber",
+      "Sea Cucumbers",
+      "Sea Cucumbers"
+    ],
+    "attack": {
+      "name": "Sticky Threads"
+    }
+  },
+  "anglerfish": {
+    "name": "Anglerfish",
+    "counted": [
+      "Anglerfish",
+      "Anglerfish",
+      "Anglerfish"
+    ],
+    "attack": {
+      "name": "Needle Maw"
+    }
+  },
+  "lions-mane": {
+    "name": "Lion's Mane",
+    "counted": [
+      "Lion's Mane",
+      "Lion's Manes",
+      "Lion's Manes"
+    ],
+    "attack": {
+      "name": "Stinging Threads"
+    }
+  },
+  "walrus": {
+    "name": "Walrus",
+    "counted": [
+      "Walrus",
+      "Walruses",
+      "Walruses"
+    ],
+    "attack": {
+      "name": "Walrus's Tusks"
+    }
+  },
+  "haemorrhage": {
+    "name": "Haemorrhage",
+    "counted": [
+      "Haemorrhage",
+      "Haemorrhages",
+      "Haemorrhages"
+    ],
+    "attack": {
+      "name": "Bloody Maw"
+    }
+  },
+  "whispered-charm": {
+    "name": "Whispered Charm",
+    "counted": [
+      "Whispered Charm",
+      "Whispered Charms",
+      "Whispered Charms"
+    ],
+    "attack": {
+      "name": "Charm's Whisper",
+      "silence": {
+        "label": "charmed"
+      }
+    }
+  },
+  "acorn": {
+    "name": "World Acorn",
+    "counted": [
+      "World Acorn",
+      "World Acorns",
+      "World Acorns"
+    ],
+    "attack": {
+      "name": "Crushing Fall",
+      "stun": {
+        "label": "crushed"
+      }
+    }
+  },
+  "acorn-weevil": {
+    "name": "Acorn Weevil",
+    "counted": [
+      "Acorn Weevil",
+      "Acorn Weevils",
+      "Acorn Weevils"
+    ],
+    "attack": {
+      "name": "Boring Snout"
+    }
+  },
+  "oak-gall": {
+    "name": "Oak Gall",
+    "counted": [
+      "Oak Gall",
+      "Oak Galls",
+      "Oak Galls"
+    ],
+    "attack": {
+      "name": "Wasp Swarm"
+    }
+  },
+  "ninth-wave": {
+    "name": "Ninth Wave",
+    "counted": [
+      "Ninth Wave",
+      "Ninth Waves",
+      "Ninth Waves"
+    ],
+    "attack": {
+      "name": "The Ninth Wave"
+    }
+  },
+  "octopus": {
+    "name": "Giant Octopus",
+    "counted": [
+      "Giant Octopus",
+      "Giant Octopuses",
+      "Giant Octopuses"
+    ],
+    "attack": {
+      "name": "Tentacles' Grip"
+    }
+  },
+  "processionary": {
+    "name": "Processionary",
+    "counted": [
+      "Processionary",
+      "Processionaries",
+      "Processionaries"
+    ],
+    "attack": {
+      "name": "Stinging Hairs"
+    }
+  },
+  "tarsier": {
+    "name": "Tarsier",
+    "counted": [
+      "Tarsier",
+      "Tarsiers",
+      "Tarsiers"
+    ],
+    "attack": {
+      "name": "Tarsier's Stare",
+      "stun": {
+        "label": "dizzy"
+      }
+    }
+  },
+  "scorpionfly": {
+    "name": "Scorpionfly",
+    "counted": [
+      "Scorpionfly",
+      "Scorpionflies",
+      "Scorpionflies"
+    ],
+    "attack": {
+      "name": "Beak and Sting"
+    }
+  },
+  "beefsteak-fungus": {
+    "name": "Beefsteak Fungus",
+    "counted": [
+      "Beefsteak Fungus",
+      "Beefsteak Fungi",
+      "Beefsteak Fungi"
+    ],
+    "attack": {
+      "name": "Red Sap"
+    }
+  },
+  "water-shrew": {
+    "name": "Water Shrew",
+    "counted": [
+      "Water Shrew",
+      "Water Shrews",
+      "Water Shrews"
+    ],
+    "attack": {
+      "name": "Venomous Saliva"
+    }
+  },
+  "snakefly": {
+    "name": "Snakefly",
+    "counted": [
+      "Snakefly",
+      "Snakeflies",
+      "Snakeflies"
+    ],
+    "attack": {
+      "name": "Snake Neck"
+    }
+  },
+  "log-hive": {
+    "name": "Log Hive",
+    "counted": [
+      "Log Hive",
+      "Log Hives",
+      "Log Hives"
+    ],
+    "attack": {
+      "name": "Bee Swarm"
+    }
+  },
+  "waxworm": {
+    "name": "Waxworm",
+    "counted": [
+      "Waxworm",
+      "Waxworms",
+      "Waxworms"
+    ],
+    "attack": {
+      "name": "Sticky Silk"
+    }
+  },
+  "intoxication": {
+    "name": "Intoxication",
+    "counted": [
+      "Intoxication",
+      "Intoxications",
+      "Intoxications"
+    ],
+    "attack": {
+      "name": "Draught of Mead",
+      "silence": {
+        "label": "tipsy"
+      }
+    }
+  },
+  "jewel-beetle": {
+    "name": "Jewel Beetle",
+    "counted": [
+      "Jewel Beetle",
+      "Jewel Beetles",
+      "Jewel Beetles"
+    ],
+    "attack": {
+      "name": "Hard Mandibles"
+    }
+  },
+  "gecko": {
+    "name": "Gecko",
+    "counted": [
+      "Gecko",
+      "Geckos",
+      "Geckos"
+    ],
+    "attack": {
+      "name": "Drop from Above"
+    }
+  },
+  "glare": {
+    "name": "Glare",
+    "counted": [
+      "Glare",
+      "Glares",
+      "Glares"
+    ],
+    "attack": {
+      "name": "Ray through Amber"
+    }
+  },
+  "capricorn-beetle": {
+    "name": "Great Capricorn Beetle",
+    "counted": [
+      "Great Capricorn Beetle",
+      "Great Capricorn Beetles",
+      "Great Capricorn Beetles"
+    ],
+    "attack": {
+      "name": "Sharp Mandibles"
+    }
+  },
+  "olm": {
+    "name": "Dragon's Whelp",
+    "counted": [
+      "Dragon's Whelp",
+      "Dragon's Whelps",
+      "Dragon's Whelps"
+    ],
+    "attack": {
+      "name": "Blind Bite"
+    }
+  },
+  "honey-fungus": {
+    "name": "Honey Fungus",
+    "counted": [
+      "Honey Fungus",
+      "Honey Fungi",
+      "Honey Fungi"
+    ],
+    "attack": {
+      "name": "Mycelium Lash"
+    }
+  },
+  "pangolin": {
+    "name": "Pangolin",
+    "counted": [
+      "Pangolin",
+      "Pangolins",
+      "Pangolins"
+    ],
+    "attack": {
+      "name": "Pangolin's Claws"
+    }
+  },
+  "heartwood": {
+    "name": "Heartwood",
+    "counted": [
+      "Heartwood",
+      "Heartwoods",
+      "Heartwoods"
+    ],
+    "attack": {
+      "name": "Heartbeat"
+    }
+  },
+  "sloth": {
+    "name": "Giant Sloth",
+    "counted": [
+      "Giant Sloth",
+      "Giant Sloths",
+      "Giant Sloths"
+    ],
+    "attack": {
+      "name": "Mighty Claws"
+    }
+  },
+  "aphid": {
+    "name": "Aphid",
+    "counted": [
+      "Aphid",
+      "Aphids",
+      "Aphids"
+    ],
+    "attack": {
+      "name": "Sucking Proboscis"
+    }
+  },
+  "hesitation": {
+    "name": "Hesitation",
+    "counted": [
+      "Hesitation",
+      "Hesitations",
+      "Hesitations"
+    ],
+    "attack": {
+      "name": "Indecision"
+    }
+  },
+  "hailstone": {
+    "name": "Hailstone",
+    "counted": [
+      "Hailstone",
+      "Hailstones",
+      "Hailstones"
+    ],
+    "attack": {
+      "name": "Ice Spikes",
+      "stun": {
+        "label": "stunned"
+      }
+    }
+  },
+  "flying-carpet": {
+    "name": "Flying Carpet",
+    "counted": [
+      "Flying Carpet",
+      "Flying Carpets",
+      "Flying Carpets"
+    ],
+    "attack": {
+      "name": "Tassel Lash"
+    }
+  },
+  "thunder-arrow": {
+    "name": "Thunder Arrow",
+    "counted": [
+      "Thunder Arrow",
+      "Thunder Arrows",
+      "Thunder Arrows"
+    ],
+    "attack": {
+      "name": "Lightning Strike"
+    }
+  },
+  "bush-cricket": {
+    "name": "Bush-Cricket",
+    "counted": [
+      "Bush-Cricket",
+      "Bush-Crickets",
+      "Bush-Crickets"
+    ],
+    "attack": {
+      "name": "Leap and Bite"
+    }
+  },
+  "chameleon": {
+    "name": "Chameleon",
+    "counted": [
+      "Chameleon",
+      "Chameleons",
+      "Chameleons"
+    ],
+    "attack": {
+      "name": "Whip Tongue"
+    }
+  },
+  "oak-leaf": {
+    "name": "Oak Leaf",
+    "counted": [
+      "Oak Leaf",
+      "Oak Leaves",
+      "Oak Leaves"
+    ],
+    "attack": {
+      "name": "Sharp Edge"
+    }
+  },
+  "sleepwalker": {
+    "name": "Sleepwalker",
+    "counted": [
+      "Sleepwalker",
+      "Sleepwalkers",
+      "Sleepwalkers"
+    ],
+    "attack": {
+      "name": "Sleepy Blow"
+    }
+  },
+  "glowworm": {
+    "name": "Glowworm",
+    "counted": [
+      "Glowworm",
+      "Glowworms",
+      "Glowworms"
+    ],
+    "attack": {
+      "name": "Cold Light"
+    }
+  },
+  "moon-halo": {
+    "name": "Moon Halo",
+    "counted": [
+      "Moon Halo",
+      "Moon Haloes",
+      "Moon Haloes"
+    ],
+    "attack": {
+      "name": "Ring of Light",
+      "silence": {
+        "label": "spellbound"
+      }
+    }
+  },
+  "shield-bug": {
+    "name": "Shield Bug",
+    "counted": [
+      "Shield Bug",
+      "Shield Bugs",
+      "Shield Bugs"
+    ],
+    "attack": {
+      "name": "Choking Stench"
+    }
+  },
+  "ladybird": {
+    "name": "Ladybird",
+    "counted": [
+      "Ladybird",
+      "Ladybirds",
+      "Ladybirds"
+    ],
+    "attack": {
+      "name": "Ladybird's Bite"
+    }
+  },
+  "comet": {
+    "name": "Comet",
+    "counted": [
+      "Comet",
+      "Comets",
+      "Comets"
+    ],
+    "attack": {
+      "name": "Falling Star"
+    }
+  },
+  "ball-lightning": {
+    "name": "Ball Lightning",
+    "counted": [
+      "Ball Lightning",
+      "Ball Lightnings",
+      "Ball Lightnings"
+    ],
+    "attack": {
+      "name": "Storm Discharge"
+    }
+  },
+  "pride": {
+    "name": "Pride",
+    "counted": [
+      "Pride",
+      "Prides",
+      "Prides"
+    ],
+    "attack": {
+      "name": "Look from on High"
+    }
   }
 }

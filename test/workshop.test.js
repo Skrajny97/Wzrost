@@ -27,6 +27,7 @@ import {
   partPrice,
   partSource,
   patternFrom,
+  patternLevel,
   questPeriod,
   questText,
   rollUpgrade,
@@ -90,23 +91,40 @@ describe('the Warsztat in the engine', () => {
     assert.ok(at175.length === 171 && at175.includes('szczerbiec') && at175.includes('waligora-boots') && !at175.includes('jurata-necklace'));
     // Tier X (1086) at the 200th since Nawia's lands came (1086.0 A: until
     // the lands from level 276 it only dropped): its 19 items of the
-    // Warsztat, none of its jewels; taken apart, earlier.
+    // Warsztat, none of its jewels; taken apart, earlier. Tiers XI and XII
+    // open there too (below), 19 each.
     assert.equal(knownPatterns(199, [], content).length, 171);
     const at200 = knownPatterns(200, [], content).map((pattern) => pattern.id);
-    assert.ok(at200.length === 190 && at200.includes('grunwald-sword') && at200.includes('walgierz-boots') && !at200.includes('rzepicha-necklace'));
+    assert.ok(at200.length === 190 + 2 * 19 && at200.includes('grunwald-sword') && at200.includes('walgierz-boots') && !at200.includes('rzepicha-necklace'));
     assert.ok(knownPatterns(199, ['grunwald-sword'], content).some((pattern) => pattern.id === 'grunwald-sword'));
     assert.equal(patternFrom({ base: 'grunwald-sword' }, [], content), 'grunwald-sword');
-    // Tiers XI and XII (DECISIONS.md, „Tiery XI i XII przedmiotów”) only drop
-    // until their lands come (351–425 and 426–500), as Tier X did before
-    // Nawia's: no pattern at the profession's last level, nor from one taken
-    // apart.
-    assert.equal(knownPatterns(content.professionsById[content.workshop.profession].maxLevel, ['rugievit-sword', 'kmicic-gloves'], content).length, 190);
-    assert.equal(patternFrom({ base: 'rugievit-sword' }, [], content), null);
-    assert.equal(patternFrom({ base: 'pozvizd-boots' }, [], content), null);
+    // Tiers XI and XII (DECISIONS.md, „Tiery XI i XII przedmiotów”, 1246 A)
+    // since the World Tree's lands came: of class levels 225 and 250, past the
+    // profession's last level, so both open at that last level, the 200th,
+    // with Tier X (19 items of the Warsztat each); taken apart, earlier.
+    const last = content.professionsById[content.workshop.profession].maxLevel;
+    assert.deepEqual([patternLevel(content.basesById['rugievit-sword'], content), patternLevel(content.basesById['arkona-sword'], content)], [last, last]);
+    assert.ok(knownPatterns(199, [], content).every((pattern) => pattern.classLevel === undefined || pattern.classLevel < 200));
+    const atLast = knownPatterns(last, [], content).map((pattern) => pattern.id);
+    assert.ok(atLast.length === 228 && atLast.includes('rugievit-sword') && atLast.includes('kmicic-gloves') && !atLast.includes('barbara-ring'));
+    for (const id of ['rugievit-sword', 'pozvizd-boots']) {
+      assert.equal(patternFrom({ base: id }, [], content), id);
+      assert.equal(patternFrom({ base: id }, [id], content), null);
+      assert.ok(knownPatterns(60, [id], content).some((pattern) => pattern.id === id), id);
+    }
     // Taking one apart teaches it earlier.
     assert.ok(knownPatterns(10, ['estoc'], content).some((pattern) => pattern.id === 'estoc'));
     assert.ok(knownPatterns(50, ['gothic-armor'], content).some((pattern) => pattern.id === 'gothic-armor'));
     assert.ok(knownPatterns(100, ['maximilian-armor'], content).some((pattern) => pattern.id === 'maximilian-armor'));
+  });
+
+  test('an item of Tier XI and of Tier XII comes out as any other, for the parts and resources of its slot and family, the same as Tier X\'s (1246 A)', () => {
+    for (const baseId of ['rugievit-sword', 'arkona-sword']) {
+      assert.deepEqual(craftCost(content.basesById[baseId], 'epic', 2, 360, content), craftCost(content.basesById['grunwald-sword'], 'epic', 2, 360, content));
+      const [result] = craftItems({ baseId, rarityId: 'common', count: 1, level: 360, professionLevel: 200, seed: `tier:${baseId}` }, content);
+      assert.ok(result.made, baseId);
+      assert.deepEqual([result.item.base, result.item.level, result.item.crafted.rarity], [baseId, 360, 'common']);
+    }
   });
 
   test('the rarities open with the level: rare at 5, unique at 15 and divine at 80', () => {

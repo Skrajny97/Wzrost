@@ -149,11 +149,17 @@ export function buildContent(raw) {
     const here = names.filter((/** @type {Entry} */ name) => creatures.has(name.monster));
     return { prefix: here.filter((name) => name.prefix), suffix: here };
   };
+  // A land still being made (`soon` in regions.json: its places and trait
+  // are written, its creatures not yet) is not in the game: no character
+  // goes there, and the Wieże, the Bestiariusz, the Encyklopedia, the cards
+  // and the World Boss see only the lands that are ready.
   /** @type {Entry[]} */
-  const regions = raw.regions.map((/** @type {Entry} */ region) => ({
-    ...region,
-    areas: areasOf(region).map((area) => ({ ...area, affixNames: affixNames(creaturesOf(area)) })),
-  }));
+  const regions = raw.regions
+    .filter((/** @type {Entry} */ region) => !region.soon)
+    .map((/** @type {Entry} */ region) => ({
+      ...region,
+      areas: areasOf(region).map((area) => ({ ...area, affixNames: affixNames(creaturesOf(area)) })),
+    }));
   const areas = regions.flatMap((region) => region.areas);
   return {
     stats: raw.stats,

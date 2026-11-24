@@ -1,8 +1,9 @@
 // Kultywacja (1230 A; src/server/cultivation.js, src/engine/cultivation.js):
-// the character meditates for a length an exploration offers it. While its
-// class is ahead it gets character XP, up to the class's level, and every
-// meditation grows the Kultywacja's own level (0–100), each level a share
-// more character XP from explorations. It has a screen of its own
+// the character meditates for 10 minutes to 8 hours, as long as a
+// profession's work, chosen on the same slider. While its class is ahead
+// it gets character XP, up to the class's level, and every meditation
+// grows the Kultywacja's own level (0–100), each level a share more
+// character XP from explorations. It has a screen of its own
 // (#/kultywacja, mountCultivation), as a profession's, with its scene and
 // its music (data/music.json, place `cultivation`): its level with the bar
 // to the next one and its bonus, the character's and the class's levels,
@@ -61,9 +62,6 @@ export function cultivationMark() {
 
 // "+7%": a share in percent.
 const percent = (share) => `+${formatNumber(Math.round(share * 1000) / 10)}%`;
-
-// The name of a length, as under the exploration's slider ("krótka"…).
-const lengthName = (minutes) => (state.content.lengths?.find((length) => length.upTo === undefined || minutes <= length.upTo) ?? {}).name ?? '';
 
 // " · poziom 120 → 131" after the XP, or nothing without a new level.
 const newLevels = (before, after) => (after > before ? ` · ${t('poziom {before} → {after}', { before, after })}` : '');
@@ -151,7 +149,10 @@ const about = (view) =>
       per: percent(view.perLevel),
     }),
     [
-      t('Kultywacja może trwać tyle samo co wyprawa. W tym czasie postać nie wyrusza na wyprawy, nie pracuje w profesji i nie idzie z Drużyną, ale odpoczywa. Nie zdobywa XP klasy, łupów ani złota.'),
+      t('Kultywacja trwa od {min} do {max}, jak praca w profesji. W tym czasie postać nie wyrusza na wyprawy, nie pracuje w profesji i nie idzie z Drużyną, ale odpoczywa. Nie zdobywa XP klasy, łupów ani złota.', {
+        min: formatMinutes(view.plan.lengths[0].minutes),
+        max: formatMinutes(view.plan.lengths.at(-1).minutes),
+      }),
       t('Kultywacja nigdy nie da postaci wyższego poziomu niż klasa: daje najwyżej tyle XP, ile w chwili odbioru raportu brakuje do poziomu klasy. Gdy poziomy się zrównają, medytacja rozwija już tylko poziom Kultywacji.'),
       t('Każda minuta medytacji to punkt XP Kultywacji. Pierwszy poziom zajmuje {first}, każdy następny trochę dłużej, aż do {last} na poziom {max}. Premia działa na każdej wyprawie, także z Drużyną, ale nie na XP klasy.', {
         max: view.maxLevel,
@@ -162,9 +163,10 @@ const about = (view) =>
     ],
   );
 
-// The length with a slider over the lengths an exploration offers, what the
-// one chosen gives (the character's XP up to the class's level, and the
-// Kultywacja's own XP), and "Medytuj".
+// The length with a slider over its lengths, 10 minutes to 8 hours as a
+// profession's work has (cultivationMinutes), what the one chosen gives (the
+// character's XP up to the class's level, and the Kultywacja's own XP), and
+// "Medytuj".
 function picker(character, view) {
   const { plan } = view;
   const allowed = plan.lengths.map((length) => length.minutes);
@@ -176,7 +178,6 @@ function picker(character, view) {
   let index = kept >= 0 ? kept : enough >= 0 ? enough : allowed.length - 1;
 
   const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
-  const kind = h('span', { class: 'duration-kind' });
   const gain = h('p', { class: 'cultivation-gain' });
   const grow = h('p', { class: 'cultivation-gain cultivation-gain--level' });
   const note = h('p', { class: 'muted cultivation-note' });
@@ -209,10 +210,9 @@ function picker(character, view) {
     index = Math.min(allowed.length - 1, Math.max(0, next));
     const length = plan.lengths[index];
     slider.value = String(index);
-    slider.setAttribute('aria-valuetext', `${formatMinutes(length.minutes)}, ${lengthName(length.minutes)}`);
+    slider.setAttribute('aria-valuetext', formatMinutes(length.minutes));
     slider.style.setProperty('--fill', `${(index / Math.max(1, allowed.length - 1)) * 100}%`);
     value.textContent = formatMinutes(length.minutes);
-    kind.textContent = lengthName(length.minutes);
     less.disabled = index === 0;
     more.disabled = index === allowed.length - 1;
     // The character's XP, up to the class's level.
@@ -250,10 +250,9 @@ function picker(character, view) {
     h(
       'div',
       { class: 'duration-picker' },
-      h('p', { class: 'duration-head' }, h('span', { class: 'duration-title' }, t('Czas Kultywacji'), kind), value),
+      h('p', { class: 'duration-head' }, h('span', { class: 'duration-title' }, t('Czas Kultywacji')), value),
       h('div', { class: 'duration-row' }, less, slider, more),
       h('p', { class: 'duration-scale', 'aria-hidden': 'true' }, h('span', { text: formatMinutes(allowed[0]) }), h('span', { text: formatMinutes(longest) })),
-      character.huntNext && h('p', { class: 'duration-lock', text: t('Dłuższa Kultywacja, do {time}, od poziomu {level}.', { time: formatMinutes(character.huntNext.minutes), level: character.huntNext.level }) }),
     ),
     h('div', { class: 'cultivation-gains' }, h('p', { class: 'cultivation-gains-title', text: t('Zdobędziesz:') }), gain, grow),
     note,

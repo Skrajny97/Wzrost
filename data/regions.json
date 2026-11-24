@@ -1742,5 +1742,365 @@
         "champion": "koschei"
       }
     ]
+  },
+  {
+    "id": "isle-of-buyan",
+    "land": "Drzewo Świata",
+    "name": "Wyspa Bujan",
+    "minLevel": 351,
+    "maxLevel": 375,
+    "safe": false,
+    "description": "Wyspa na środku morza, z której wyrasta Drzewo Świata: dąb tak wielki, że korzeniami sięga Nawii, a koroną nieba. U jego stóp leży biały kamień Ałatyr, który w starych zaklęciach tamuje krew.",
+    "trait": {
+      "name": "Ałatyr",
+      "description": "Krwawienie trwa o jeden ruch krócej, u stworów i u postaci.",
+      "effectTicks": { "bleeding": -1 }
+    },
+    "elite": "ninth-wave",
+    "resources": { "wood": 3, "stone": 5, "iron-ore": 2 },
+    "fightBoard": "board-isle-of-buyan",
+    "areas": [
+      {
+        "id": "rocky-cape",
+        "name": "Skalisty Przylądek",
+        "minLevel": 351,
+        "maxLevel": 355,
+        "description": "Szary cypel, o który morze bije od zawsze. Fale rozbijają się tu w pył, a nad skałami widać z daleka koronę Drzewa Świata.",
+        "encounters": [
+          { "weight": 18, "monsters": ["horseshoe-crab"] },
+          { "weight": 14, "monsters": ["starfish"] },
+          { "weight": 14, "monsters": ["electric-ray", "electric-ray"] },
+          { "weight": 12, "monsters": ["horseshoe-crab", "electric-ray"] },
+          { "weight": 12, "monsters": ["starfish", "starfish"] },
+          { "weight": 10, "monsters": ["horseshoe-crab", "starfish"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["horseshoe-crab", "starfish", "electric-ray"] },
+          { "weight": 6, "monsters": ["horseshoe-crab", "horseshoe-crab"] },
+          { "weight": 6, "monsters": ["starfish", "electric-ray", "electric-ray"] }
+        ]
+      },
+      {
+        "id": "shipwreck-bay",
+        "name": "Zatoka Rozbitków",
+        "minLevel": 356,
+        "maxLevel": 360,
+        "description": "Płytka zatoka pełna wraków. Morze wyrzuca tu statki, które szukały Bujanu, a w ich kadłubach mieszkają stwory z głębin.",
+        "encounters": [
+          { "weight": 18, "monsters": ["shark"] },
+          { "weight": 14, "monsters": ["pufferfish"] },
+          { "weight": 14, "monsters": ["swordfish", "swordfish"] },
+          { "weight": 12, "monsters": ["shark", "swordfish"] },
+          { "weight": 12, "monsters": ["pufferfish", "pufferfish"] },
+          { "weight": 10, "monsters": ["shark", "pufferfish"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["shark", "pufferfish", "swordfish"] },
+          { "weight": 6, "monsters": ["shark", "shark"] },
+          { "weight": 6, "monsters": ["pufferfish", "swordfish", "swordfish"] }
+        ]
+      },
+      {
+        "id": "sea-caves",
+        "name": "Morskie Groty",
+        "minLevel": 361,
+        "maxLevel": 365,
+        "description": "Groty wymyte przez morze w skałach wyspy. Woda wpływa tu aż pod Drzewo Świata, a w ciemności świecą tylko meduzy.",
+        "encounters": [
+          { "weight": 18, "monsters": ["sea-cucumber"] },
+          { "weight": 14, "monsters": ["anglerfish"] },
+          { "weight": 14, "monsters": ["lions-mane", "lions-mane"] },
+          { "weight": 12, "monsters": ["sea-cucumber", "lions-mane"] },
+          { "weight": 12, "monsters": ["anglerfish", "anglerfish"] },
+          { "weight": 10, "monsters": ["sea-cucumber", "anglerfish"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["sea-cucumber", "anglerfish", "lions-mane"] },
+          { "weight": 6, "monsters": ["sea-cucumber", "sea-cucumber"] },
+          { "weight": 6, "monsters": ["anglerfish", "lions-mane", "lions-mane"] }
+        ]
+      },
+      {
+        "id": "white-stone",
+        "name": "Biały Kamień",
+        "minLevel": 366,
+        "maxLevel": 370,
+        "description": "Biały kamień Ałatyr, ojciec wszystkich kamieni. Kto zna stare zaklęcie, ten szeptem nad nim zatrzyma każdą krew.",
+        "encounters": [
+          { "weight": 18, "monsters": ["walrus"] },
+          { "weight": 14, "monsters": ["haemorrhage"] },
+          { "weight": 14, "monsters": ["whispered-charm", "whispered-charm"] },
+          { "weight": 12, "monsters": ["walrus", "whispered-charm"] },
+          { "weight": 12, "monsters": ["haemorrhage", "haemorrhage"] },
+          { "weight": 10, "monsters": ["walrus", "haemorrhage"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["walrus", "haemorrhage", "whispered-charm"] },
+          { "weight": 6, "monsters": ["walrus", "walrus"] },
+          { "weight": 6, "monsters": ["haemorrhage", "whispered-charm", "whispered-charm"] }
+        ]
+      },
+      {
+        "id": "green-oak",
+        "name": "Pod Zielonym Dębem",
+        "minLevel": 371,
+        "maxLevel": 375,
+        "description": "Stopy Drzewa Świata. Korzenie grube jak wały schodzą tu prosto do morza, a między nimi leżą żołędzie wielkie jak beczki.",
+        "encounters": [
+          { "weight": 18, "monsters": ["acorn"] },
+          { "weight": 14, "monsters": ["acorn-weevil"] },
+          { "weight": 14, "monsters": ["oak-gall", "oak-gall"] },
+          { "weight": 12, "monsters": ["acorn", "oak-gall"] },
+          { "weight": 12, "monsters": ["acorn-weevil", "acorn-weevil"] },
+          { "weight": 10, "monsters": ["acorn", "acorn-weevil"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["acorn", "acorn-weevil", "oak-gall"] },
+          { "weight": 6, "monsters": ["acorn", "acorn"] },
+          { "weight": 6, "monsters": ["acorn-weevil", "oak-gall", "oak-gall"] }
+        ],
+        "champion": "octopus"
+      }
+    ]
+  },
+  {
+    "id": "great-trunk",
+    "land": "Drzewo Świata",
+    "name": "Wielki Pień",
+    "minLevel": 376,
+    "maxLevel": 400,
+    "safe": false,
+    "description": "Pień Drzewa Świata jest tak gruby, że jego kora tworzy urwiska, a po nich spływa żywica i twardnieje w bursztyn. Wspina się tu po hubach wielkich jak tarasy, a dziuple prowadzą w głąb pnia jak jaskinie.",
+    "trait": {
+      "name": "Stromizna",
+      "description": "Odpoczynek między walkami przywraca o 5% mniej HP i many, bo na stromej korze trudno złapać oddech.",
+      "restMalus": 0.05
+    },
+    "elite": "pangolin",
+    "resources": { "wood": 6, "stone": 2, "iron-ore": 2 },
+    "fightBoard": "board-great-trunk",
+    "areas": [
+      {
+        "id": "bark-cliffs",
+        "name": "Korowe Urwiska",
+        "minLevel": 376,
+        "maxLevel": 380,
+        "description": "Pionowe ściany kory pocięte szczelinami jak wąwozy. Wspina się po nich długo, a w dole widać już tylko chmury.",
+        "encounters": [
+          { "weight": 18, "monsters": ["processionary"] },
+          { "weight": 14, "monsters": ["tarsier"] },
+          { "weight": 14, "monsters": ["scorpionfly", "scorpionfly"] },
+          { "weight": 12, "monsters": ["processionary", "scorpionfly"] },
+          { "weight": 12, "monsters": ["tarsier", "tarsier"] },
+          { "weight": 10, "monsters": ["processionary", "tarsier"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["processionary", "tarsier", "scorpionfly"] },
+          { "weight": 6, "monsters": ["processionary", "processionary"] },
+          { "weight": 6, "monsters": ["tarsier", "scorpionfly", "scorpionfly"] }
+        ]
+      },
+      {
+        "id": "fungus-terraces",
+        "name": "Hubowe Tarasy",
+        "minLevel": 381,
+        "maxLevel": 385,
+        "description": "Huby wielkie jak tarasy wyrastają z pnia jedna nad drugą. Na każdej można odpocząć, ale nikt tu nie odpoczywa sam.",
+        "encounters": [
+          { "weight": 18, "monsters": ["beefsteak-fungus"] },
+          { "weight": 14, "monsters": ["water-shrew"] },
+          { "weight": 14, "monsters": ["snakefly", "snakefly"] },
+          { "weight": 12, "monsters": ["beefsteak-fungus", "snakefly"] },
+          { "weight": 12, "monsters": ["water-shrew", "water-shrew"] },
+          { "weight": 10, "monsters": ["beefsteak-fungus", "water-shrew"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["beefsteak-fungus", "water-shrew", "snakefly"] },
+          { "weight": 6, "monsters": ["beefsteak-fungus", "beefsteak-fungus"] },
+          { "weight": 6, "monsters": ["water-shrew", "snakefly", "snakefly"] }
+        ]
+      },
+      {
+        "id": "honey-hives",
+        "name": "Miodowe Barcie",
+        "minLevel": 386,
+        "maxLevel": 390,
+        "description": "Dawne barcie wydrążone w pniu. Miód spływa z nich po korze, a pszczoły bronią go przed każdym, kto się zbliży.",
+        "encounters": [
+          { "weight": 18, "monsters": ["log-hive"] },
+          { "weight": 14, "monsters": ["waxworm"] },
+          { "weight": 14, "monsters": ["intoxication", "intoxication"] },
+          { "weight": 12, "monsters": ["log-hive", "intoxication"] },
+          { "weight": 12, "monsters": ["waxworm", "waxworm"] },
+          { "weight": 10, "monsters": ["log-hive", "waxworm"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["log-hive", "waxworm", "intoxication"] },
+          { "weight": 6, "monsters": ["log-hive", "log-hive"] },
+          { "weight": 6, "monsters": ["waxworm", "intoxication", "intoxication"] }
+        ]
+      },
+      {
+        "id": "amber-cascades",
+        "name": "Bursztynowe Kaskady",
+        "minLevel": 391,
+        "maxLevel": 395,
+        "description": "Żywica spływa tu po korze jak wodospad i twardnieje w bursztyn. W słońcu kaskady świecą tak, że trudno na nie patrzeć.",
+        "encounters": [
+          { "weight": 18, "monsters": ["jewel-beetle"] },
+          { "weight": 14, "monsters": ["gecko"] },
+          { "weight": 14, "monsters": ["glare", "glare"] },
+          { "weight": 12, "monsters": ["jewel-beetle", "glare"] },
+          { "weight": 12, "monsters": ["gecko", "gecko"] },
+          { "weight": 10, "monsters": ["jewel-beetle", "gecko"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["jewel-beetle", "gecko", "glare"] },
+          { "weight": 6, "monsters": ["jewel-beetle", "jewel-beetle"] },
+          { "weight": 6, "monsters": ["gecko", "glare", "glare"] }
+        ]
+      },
+      {
+        "id": "bottomless-hollow",
+        "name": "Bezdenna Dziupla",
+        "minLevel": 396,
+        "maxLevel": 400,
+        "description": "Dziupla, której dna nikt nie widział. Prowadzi w głąb pnia jak jaskinia, a z dołu słychać, jak bije serce Drzewa.",
+        "encounters": [
+          { "weight": 18, "monsters": ["capricorn-beetle"] },
+          { "weight": 14, "monsters": ["olm"] },
+          { "weight": 14, "monsters": ["honey-fungus", "honey-fungus"] },
+          { "weight": 12, "monsters": ["capricorn-beetle", "honey-fungus"] },
+          { "weight": 12, "monsters": ["olm", "olm"] },
+          { "weight": 10, "monsters": ["capricorn-beetle", "olm"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["capricorn-beetle", "olm", "honey-fungus"] },
+          { "weight": 6, "monsters": ["capricorn-beetle", "capricorn-beetle"] },
+          { "weight": 6, "monsters": ["olm", "honey-fungus", "honey-fungus"] }
+        ],
+        "champion": "heartwood"
+      }
+    ]
+  },
+  {
+    "id": "sky-boughs",
+    "land": "Drzewo Świata",
+    "name": "Podniebne Konary",
+    "minLevel": 401,
+    "maxLevel": 425,
+    "safe": false,
+    "description": "Najwyższe konary Drzewa Świata, szerokie jak gościńce, sięgają chmur. Wiatr wieje tu tak, że trudno ustać, a nocą między gałęziami przepływa księżyc.",
+    "trait": {
+      "name": "Wicher",
+      "description": "Każdy na przedzie szyku ma o 5% mniej pancerza, u stworów i u postaci, bo wicher wyrywa tarcze z rąk.",
+      "frontArmorMalus": 0.05
+    },
+    "elite": "ball-lightning",
+    "resources": { "wood": 5, "stone": 1, "iron-ore": 4 },
+    "fightBoard": "board-sky-boughs",
+    "areas": [
+      {
+        "id": "great-fork",
+        "name": "Rozwidlenie",
+        "minLevel": 401,
+        "maxLevel": 405,
+        "description": "Tu pień rozchodzi się w konary szerokie jak gościńce. Każda droga prowadzi wyżej, ale trzeba wybrać jedną.",
+        "encounters": [
+          { "weight": 18, "monsters": ["sloth"] },
+          { "weight": 14, "monsters": ["aphid"] },
+          { "weight": 14, "monsters": ["hesitation", "hesitation"] },
+          { "weight": 12, "monsters": ["sloth", "hesitation"] },
+          { "weight": 12, "monsters": ["aphid", "aphid"] },
+          { "weight": 10, "monsters": ["sloth", "aphid"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["sloth", "aphid", "hesitation"] },
+          { "weight": 6, "monsters": ["sloth", "sloth"] },
+          { "weight": 6, "monsters": ["aphid", "hesitation", "hesitation"] }
+        ]
+      },
+      {
+        "id": "cloud-bridges",
+        "name": "Obłoczne Kładki",
+        "minLevel": 406,
+        "maxLevel": 410,
+        "description": "Wąskie kładki z obłoków rozpięte między konarami. Chmury trzymają wędrowca, dopóki nie spojrzy w dół.",
+        "encounters": [
+          { "weight": 18, "monsters": ["hailstone"] },
+          { "weight": 14, "monsters": ["flying-carpet"] },
+          { "weight": 14, "monsters": ["thunder-arrow", "thunder-arrow"] },
+          { "weight": 12, "monsters": ["hailstone", "thunder-arrow"] },
+          { "weight": 12, "monsters": ["flying-carpet", "flying-carpet"] },
+          { "weight": 10, "monsters": ["hailstone", "flying-carpet"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["hailstone", "flying-carpet", "thunder-arrow"] },
+          { "weight": 6, "monsters": ["hailstone", "hailstone"] },
+          { "weight": 6, "monsters": ["flying-carpet", "thunder-arrow", "thunder-arrow"] }
+        ]
+      },
+      {
+        "id": "sea-of-leaves",
+        "name": "Morze Liści",
+        "minLevel": 411,
+        "maxLevel": 415,
+        "description": "Liście Drzewa Świata falują tu jak morze aż po horyzont. Pod nimi szeleści coś, czego nie widać.",
+        "encounters": [
+          { "weight": 18, "monsters": ["bush-cricket"] },
+          { "weight": 14, "monsters": ["chameleon"] },
+          { "weight": 14, "monsters": ["oak-leaf", "oak-leaf"] },
+          { "weight": 12, "monsters": ["bush-cricket", "oak-leaf"] },
+          { "weight": 12, "monsters": ["chameleon", "chameleon"] },
+          { "weight": 10, "monsters": ["bush-cricket", "chameleon"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["bush-cricket", "chameleon", "oak-leaf"] },
+          { "weight": 6, "monsters": ["bush-cricket", "bush-cricket"] },
+          { "weight": 6, "monsters": ["chameleon", "oak-leaf", "oak-leaf"] }
+        ]
+      },
+      {
+        "id": "moon-cradle",
+        "name": "Kołyska Księżyca",
+        "minLevel": 416,
+        "maxLevel": 420,
+        "description": "Konary wygięte jak kołyska, w której nocą odpoczywa księżyc. Srebrne światło kładzie się na korze, a wokół tańczą świetliki.",
+        "encounters": [
+          { "weight": 18, "monsters": ["sleepwalker"] },
+          { "weight": 14, "monsters": ["glowworm"] },
+          { "weight": 14, "monsters": ["moon-halo", "moon-halo"] },
+          { "weight": 12, "monsters": ["sleepwalker", "moon-halo"] },
+          { "weight": 12, "monsters": ["glowworm", "glowworm"] },
+          { "weight": 10, "monsters": ["sleepwalker", "glowworm"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["sleepwalker", "glowworm", "moon-halo"] },
+          { "weight": 6, "monsters": ["sleepwalker", "sleepwalker"] },
+          { "weight": 6, "monsters": ["glowworm", "moon-halo", "moon-halo"] }
+        ]
+      },
+      {
+        "id": "highest-bough",
+        "name": "Najwyższa Gałąź",
+        "minLevel": 421,
+        "maxLevel": 425,
+        "description": "Ostatnia gałąź Drzewa Świata, ponad chmurami. Stąd widać cały świat, a nad głową huczą burze.",
+        "encounters": [
+          { "weight": 18, "monsters": ["shield-bug"] },
+          { "weight": 14, "monsters": ["ladybird"] },
+          { "weight": 14, "monsters": ["comet", "comet"] },
+          { "weight": 12, "monsters": ["shield-bug", "comet"] },
+          { "weight": 12, "monsters": ["ladybird", "ladybird"] },
+          { "weight": 10, "monsters": ["shield-bug", "ladybird"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["shield-bug", "ladybird", "comet"] },
+          { "weight": 6, "monsters": ["shield-bug", "shield-bug"] },
+          { "weight": 6, "monsters": ["ladybird", "comet", "comet"] }
+        ],
+        "champion": "pride"
+      }
+    ]
   }
 ]
