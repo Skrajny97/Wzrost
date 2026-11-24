@@ -3916,6 +3916,10 @@ Gracz (poz. 63) przez autora: „fajne też jakby można było porównać przedm
 5. Po angielsku: „Without upgrades”. Karta sprawdzona na 320, 390 i 1366 px, po polsku i po angielsku, z długą nazwą przedmiotu i liczbami przedmiotów 500. poziomu.
 6. Pliki: `src/engine/preview.js`, `src/server/inventory.js`, `src/client/screens/character.js` (`itemCard`, `compareBare`), `src/client/styles.css`, `data/en/strings.json`, `README.md`. Test: `test/engine.test.js`.
 
+## Wersja 0.4.98 (24.11.2026): przelosowanie zleceń i listów gończych, z encyklopedii do Rzemieślnictwa
+
+Według sekcji „Przelosowanie zleceń i listów gończych” i „Z encyklopedii do Rzemieślnictwa” (obie z 24.11.2026) niżej, bez makiet (kostka i przycisk na istniejących ekranach).
+
 ## Przelosowanie zleceń i listów gończych (24.11.2026)
 
 Gracz zaproponował „możliwość rollowania tablicy zleceń / poszukiwani”. Autor: „potrzeba jeszcze przelosowania tablicy poszukiwanych oraz zleceń (zamiast odrzucania i czekania 12 godzin)”. Do tej pory niechciane zlecenie można było tylko odrzucić i czekać 12 godzin na nowe, a listu gończego nie dało się wymienić wcale.
