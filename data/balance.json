@@ -155,9 +155,11 @@
     "lateRewards": { "fromClassLevel": 250, "factor": 0.5 }
   },
   "crafting": {
+    "$comment": "Stół rozbiórki (src/engine/crafting.js). Zlecenie trwa: części × craftMinutes rzadkości (rarities.json) × minutesFactor / tempo stołu (1 + 0,1 za poziom). minutesFactor 0,05 od 24.11.2026: rozbiórka i przeróbka 20 razy szybsze na każdym poziomie stołu, a kolejka mieści 30 zleceń zamiast 10. Gracz: 8 epickich przedmiotów na stole 10. poziomu rozbiera się 30 h. Autor: „zmienię czas trwania i zwiększę kolejkę” (najpierw 4 razy szybciej), a potem: „Stół rozbiórki jeszcze przyspiesz od nowego poziomu który ustaliłeś tak z 5 razy”. Np. 8 epickich przedmiotów na ok. 220. poziomie (po 24 części) na stole 10. poziomu: przedtem ok. 32 h, teraz ok. 1,6 h. Zlecenia złożone wcześniej kończą się o swojej godzinie.",
     "salvageBase": 2,
     "salvageLevelStep": 10,
-    "queueLimit": 10,
+    "minutesFactor": 0.05,
+    "queueLimit": 30,
     "sellGold": 10
   },
   "timePoints": {

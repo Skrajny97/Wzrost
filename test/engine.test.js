@@ -2728,8 +2728,29 @@ describe('Stół rozbiórki', () => {
     assert.equal(craftPace({}, content), 0);
     assert.ok(Math.abs(craftPace({ 'craft-table': 1 }, content) - 1.1) < 1e-9);
     assert.ok(Math.abs(craftPace({ 'craft-table': 10 }, content) - 2) < 1e-9);
-    assert.equal(craftMinutes('common', 3, 1, content), 15);
-    assert.equal(craftMinutes('common', 3, 2, content), 8);
+    // 60 parts of 5 minutes, a twentieth of that (minutesFactor): 15
+    // minutes, at twice the pace 7.5, rounded; never less than a minute.
+    assert.equal(craftMinutes('common', 60, 1, content), 15);
+    assert.equal(craftMinutes('common', 60, 2, content), 8);
+    assert.equal(craftMinutes('common', 1, 2, content), 1);
+  });
+
+  test('20 times faster since 24.11.2026 at every level, and 30 orders in the queue (the author: „zmienię czas trwania i zwiększę kolejkę”, „tak z 5 razy”)', () => {
+    assert.deepEqual([content.balance.crafting.minutesFactor, content.balance.crafting.queueLimit], [0.05, 30]);
+    // A player's 8 epic items at item level 220, 24 parts each, on a table
+    // at level 10: 32 hours before, 1.6 hours (96 minutes) now.
+    const table = craftTable({ 'craft-table': 10 }, content);
+    const items = Array.from({ length: 8 }, (_, index) => ({ item: { rarity: 'epic', level: 220 }, name: `Epicki ${index}` }));
+    assert.equal(salvageYield(items[0].item, content).count, 24);
+    const [order] = orderSalvageMany(empty, items, table, 0, rng(), content).queue;
+    assert.equal((order.endsAt - order.startsAt) / MINUTE, 96);
+    const before = { ...content, balance: { ...content.balance, crafting: { ...content.balance.crafting, minutesFactor: 1 } } };
+    assert.equal(craftMinutes('epic', 8 * 24, table.pace, before), 32 * 60);
+    // Every level as much faster as before.
+    for (const level of [1, 5, 10]) {
+      const pace = craftPace({ 'craft-table': level }, content);
+      assert.equal(craftMinutes('legendary', 400, pace, content), Math.round(craftMinutes('legendary', 400, pace, before) / 20));
+    }
   });
 
   test('levels 1 to 5 open the rarities, the levels after add extra parts', () => {
@@ -2768,18 +2789,19 @@ describe('Stół rozbiórki', () => {
   });
 
   test('materials become parts of their rarity, one order after another, for free', () => {
-    const state = { ...empty, materials: { 'wolf-pelt:common': 3, 'boar-tusk:rare': 1 } };
+    const state = { ...empty, materials: { 'wolf-pelt:common': 60, 'boar-tusk:rare': 20 } };
     const { state: next, ordered } = orderMaterials(state, ['wolf-pelt:common', 'boar-tusk:rare', 'fox-pelt:common'], plain, 0, rng(), content);
     assert.equal(ordered, 2);
     assert.deepEqual(next.materials, {});
+    // 60 parts of 5 minutes and 20 of 8, each a twentieth (minutesFactor).
     assert.deepEqual(next.queue.map((order) => [order.startsAt / MINUTE, order.endsAt / MINUTE, order.partId, order.parts]), [
-      [0, 15, 'scraps', 3],
-      [15, 23, 'straps', 1],
+      [0, 15, 'scraps', 60],
+      [15, 23, 'straps', 20],
     ]);
     assert.deepEqual(settleCrafting(next, 14 * MINUTE).parts, {});
-    assert.deepEqual(settleCrafting(next, 15 * MINUTE).parts, { scraps: 3 });
+    assert.deepEqual(settleCrafting(next, 15 * MINUTE).parts, { scraps: 60 });
     const later = settleCrafting(next, 23 * MINUTE);
-    assert.deepEqual([later.parts, later.queue.length, later.done.length], [{ scraps: 3, straps: 1 }, 0, 2]);
+    assert.deepEqual([later.parts, later.queue.length, later.done.length], [{ scraps: 60, straps: 20 }, 0, 2]);
   });
 
   test('a new order waits for the last one, and the queue has a limit', () => {
@@ -2798,15 +2820,16 @@ describe('Stół rozbiórki', () => {
     ];
     const entries = items.map((item, index) => ({ item, name: `Przedmiot ${index}` }));
     const state = orderSalvageMany(empty, entries, plain, 10 * MINUTE, rng(), content);
-    // 4 Rzemienie (32 minutes) and 3 (24); 2 Ścinki (10 minutes) after them.
+    // 4 Rzemienie (1.6 minutes, rounded to 2) and 3 (1.2, to 1), each item
+    // as alone; 2 Ścinki (half a minute, so the least, 1) after them.
     assert.deepEqual(
       state.queue.map((order) => [order.kind, order.name, order.count, order.rarity, order.partId, order.parts, order.startsAt / MINUTE, order.endsAt / MINUTE]),
       [
-        ['item', undefined, 2, 'rare', 'straps', 7, 10, 66],
-        ['item', 'Przedmiot 1', undefined, 'common', 'scraps', 2, 66, 76],
+        ['item', undefined, 2, 'rare', 'straps', 7, 10, 13],
+        ['item', 'Przedmiot 1', undefined, 'common', 'scraps', 2, 13, 14],
       ],
     );
-    assert.deepEqual(settleCrafting(state, 76 * MINUTE).parts, { straps: 7, scraps: 2 });
+    assert.deepEqual(settleCrafting(state, 14 * MINUTE).parts, { straps: 7, scraps: 2 });
   });
 
   test('taking an item apart gives more parts for a higher level and each upgrade', () => {
@@ -2814,10 +2837,11 @@ describe('Stół rozbiórki', () => {
     assert.deepEqual(salvageYield({ rarity: 'rare', level: 25, upgrade: 2 }, content), { partId: 'straps', count: 6 });
     const item = generateItem({ baseId: 'sword', level: 12, rarityId: 'epic' }, createRng('rozbiórka'), content);
     const state = orderSalvage(empty, item, itemName(item, content), { ...plain, pace: 2 }, 10 * MINUTE, rng(), content);
+    // 3 parts of 20 minutes, a twentieth of that, at twice the pace: 1.5, rounded to 2.
     assert.deepEqual(state.queue.map((order) => [order.kind, order.partId, order.parts, order.startsAt / MINUTE, order.endsAt / MINUTE]), [
-      ['item', 'shards', 3, 10, 40],
+      ['item', 'shards', 3, 10, 12],
     ]);
-    assert.deepEqual(settleCrafting(state, 40 * MINUTE).parts, { shards: 3 });
+    assert.deepEqual(settleCrafting(state, 12 * MINUTE).parts, { shards: 3 });
   });
 });
 

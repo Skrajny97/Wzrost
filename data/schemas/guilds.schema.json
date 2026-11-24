@@ -1298,6 +1298,7 @@
             "chip",
             "ownBanner",
             "otherBanner",
+            "report",
             "how",
             "howFame",
             "howMembers"
@@ -1414,6 +1415,11 @@
                   "pattern": "\\{tag\\}"
                 }
               ]
+            },
+            "report": {
+              "description": "Linijka raportu wyprawy w krainie ze sztandarem gildii postaci (guild-lands.js, bannerLine), gdy wyprawa przyniosła złoto albo materiały.",
+              "type": "string",
+              "pattern": "\\{bonus\\}"
             },
             "how": {
               "type": "array",
@@ -2338,12 +2344,33 @@
             "enough",
             "resourceAmount",
             "both",
+            "report",
+            "reportXp",
+            "reportGold",
+            "reportRarity",
             "donated",
             "raised",
             "noGuild",
             "errors"
           ],
           "properties": {
+            "report": {
+              "description": "Linijka raportu wyprawy o premiach budynków (hunt.js, seatLine): {bonuses} to te z reportXp, reportGold i reportRarity, które zmieniły wynik, połączone jak w both.",
+              "type": "string",
+              "pattern": "\\{bonuses\\}"
+            },
+            "reportXp": {
+              "type": "string",
+              "pattern": "\\{value\\}"
+            },
+            "reportGold": {
+              "type": "string",
+              "pattern": "\\{value\\}"
+            },
+            "reportRarity": {
+              "type": "string",
+              "pattern": "\\{value\\}"
+            },
             "how": {
               "type": "array",
               "minItems": 1,

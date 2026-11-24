@@ -260,6 +260,8 @@
   "faintForfeit": ["After a defeat, nothing of this exploration is kept: XP, gold, resources, materials and items are lost."],
   "bagOverflow": ["The bag was full ({capacity} slots). The scrap dealer bought the weakest items: {count} for {gold} gold."],
   "autoEquip": ["Equipped at once: {item} ({slot}), as that slot was empty."],
+  "blessingFights": ["The System Altar's blessing ({blessing}) was active in {fights} of {all} fights."],
+  "brotherhoodMaterials": ["{brotherhood}: +{value}% materials from creatures."],
   "pushHuntTitle": ["Exploration over"],
   "pushHuntBody": ["Exploration complete: {area}. Your report is ready to collect."],
   "pushBuildTitle": ["Build complete"],

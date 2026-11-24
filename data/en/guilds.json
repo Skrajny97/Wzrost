@@ -58,6 +58,10 @@
       "enough": "{what} for this building is already enough for the highest level.",
       "resourceAmount": "{count} {genitive}",
       "both": "{first} and {second}",
+      "report": "Your guild's buildings: {bonuses} from the exploration.",
+      "reportXp": "+{value}% XP",
+      "reportGold": "+{value}% gold",
+      "reportRarity": "+{value}% chance of rarer items",
       "donated": "Donation to the {name}: {amounts}.",
       "raised": "The {name} reaches level {level}!",
       "noGuild": "The Hall is built up by guild members. Join a guild or found your own.",
@@ -937,6 +941,7 @@
       "chip": "Banner of the guild {name} [{tag}] until Sunday",
       "ownBanner": "Your guild's banner: +{bonus}% gold and materials from creatures in this land until Sunday.",
       "otherBanner": "The banner of the guild {name} [{tag}] stands here until Sunday.",
+      "report": "Your guild's banner in this land: +{bonus}% gold and materials from creatures.",
       "how": [
         "Every exploration minute counts for the land of the exploration once the member claims the report. On a party trip each member counts their own minutes.",
         "On Monday at midnight the land goes to the guild with the most minutes. In a tie the older guild wins, and where nobody explored there is no banner.",

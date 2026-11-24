@@ -29,8 +29,8 @@ const untimed = ({ startsAt: _start, endsAt: _end, ...order }) => order;
 
 describe('orders moved in the queue, in the engine', () => {
   // 15 minutes of wolf pelts (at work by minute 5), then 10 of fox pelts, 8
-  // of the boar's tusk and 5 of the viper's scales.
-  const materials = { 'wolf-pelt:common': 3, 'fox-pelt:common': 2, 'boar-tusk:rare': 1, 'viper-scales:common': 1 };
+  // of the boar's tusks and 5 of the viper's scales.
+  const materials = { 'wolf-pelt:common': 60, 'fox-pelt:common': 40, 'boar-tusk:rare': 20, 'viper-scales:common': 20 };
   const ordered = withIds(orderMaterials({ ...empty, materials }, Object.keys(materials), plain, 0, createRng('kolejka'), content).state);
   const at = 5 * MINUTE;
   const queue = settleCrafting(ordered, at);
@@ -102,8 +102,9 @@ describe('orders moved in the queue, through the API', () => {
   const stock = (materials) => run('UPDATE characters SET materials = ? WHERE name = ?', JSON.stringify(materials), NAME);
   const ids = (view) => view.crafting.queue.map((order) => order.id);
   const stored = async (column = 'crafting') => JSON.parse((await first(`SELECT ${column} FROM characters WHERE name = ?`, NAME))[column] ?? 'null');
-  // Three stacks: three orders, the wolf pelts at work.
-  const three = { 'wolf-pelt:common': 3, 'fox-pelt:common': 2, 'boar-tusk:rare': 1 };
+  // Three stacks: three orders, the wolf pelts at work; at the table's
+  // level 1 they take 14, 9 and 7 minutes (minutesFactor).
+  const three = { 'wolf-pelt:common': 60, 'fox-pelt:common': 40, 'boar-tusk:rare': 20 };
 
   beforeEach(async () => {
     ({ cookie } = await signUp('przestawiacz'));
@@ -179,7 +180,7 @@ describe('orders moved in the queue, through the API', () => {
     await refused({ id: fox.id, before: null }, [409, 'order_at_work', texts.errors.atWork]);
     await refused({ id: boar.id, before: fox.id }, [409, 'before_work', texts.errors.beforeWork]);
     const view = await character();
-    assert.deepEqual([ids(view), view.crafting.parts.find((part) => part.id === 'scraps').count], [[fox.id, boar.id], 3]);
+    assert.deepEqual([ids(view), view.crafting.parts.find((part) => part.id === 'scraps').count], [[fox.id, boar.id], 60]);
   });
 
   test('a move read before another change was saved is refused and changes nothing; asked again, it goes through', async () => {
@@ -198,15 +199,20 @@ describe('orders moved in the queue, through the API', () => {
   });
 
   test('a full queue stays full: a move takes no place and gives none', async () => {
-    const keys = ['wolf-pelt:common', 'fox-pelt:common', 'badger-claws:common', 'viper-scales:common', 'hornet-sting:common', 'boar-tusk:rare', 'crow-feather:rare', 'owl-feather:rare', 'spider-moults:rare', 'stag-antler:rare'];
+    // As many stacks as the queue takes (30 since 24.11.2026), of the
+    // rarities a table at level 1 takes, and one more.
+    const limit = content.balance.crafting.queueLimit;
+    const keys = content.materials
+      .filter((material) => ['common', 'rare'].includes(material.rarity))
+      .slice(0, limit + 1)
+      .map((material) => `${material.id}:${material.rarity}`);
     await stock(Object.fromEntries(keys.map((key) => [key, 1])));
-    const full = (await craft(keys)).data.character.crafting;
-    assert.equal(full.queue.length, full.limit);
+    const full = (await craft(keys.slice(0, limit))).data.character.crafting;
+    assert.deepEqual([full.queue.length, full.limit], [limit, limit]);
     const moved = await move({ id: full.queue.at(-1).id, before: full.queue[1].id });
     assert.equal(moved.status, 200, JSON.stringify(moved.data).slice(0, 300));
     assert.deepEqual(ids(moved.data.character), [full.queue[0], full.queue.at(-1), ...full.queue.slice(1, -1)].map((order) => order.id));
-    await stock({ 'marten-fur:rare': 2 });
-    const more = await craft(['marten-fur:rare']);
+    const more = await craft([keys.at(-1)]);
     assert.deepEqual([more.status, more.data.error?.code], [409, 'queue_full']);
   });
 });

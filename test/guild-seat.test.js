@@ -15,6 +15,9 @@ import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
 import {
+  applyHunt,
+  bannerLine,
+  huntReport,
   itemUpgradeCost,
   seatBonuses,
   seatBuilding,
@@ -23,10 +26,12 @@ import {
   seatHuntBonus,
   seatLevelCost,
   seatLevels,
+  seatLine,
   seatProgress,
   simulateHunt,
   withSeatDiscount,
 } from '../src/engine/index.js';
+import { contentIn } from '../src/server/content.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -155,6 +160,50 @@ describe('the Siedziba Gildii in an exploration', () => {
         .flatMap((result) => result.items)
         .filter((item) => item.rarity !== content.rarities[0].id).length;
     assert.ok(rare({ rarity: 1 }) > rare(null));
+  });
+
+  // A player, 24.11.2026: „W raporcie wyprawy jest napisane np. Zwiększenie
+  // doświadczenia za kolekcję kart; za zjedzone danie ale nie ma ujęte za
+  // budynki gildii.”
+  const report = (hunt, words = calm) =>
+    huntReport({ hunt, applied: applyHunt(settled.character, hunt, words), character: settled.character, areaId: 'wolf-circles', startedAt: 0, endsAt: 1 }, words);
+
+  test("the report names the guild buildings' bonuses that changed its result, in Polish and in English", () => {
+    const english = contentIn('en');
+    const found = { seat: { xp: 0.03, gold: 0.02, rarity: 0.04 }, xp: 100, gold: 50, items: [{}] };
+    assert.equal(seatLine(found, content), 'Budynki Twojej gildii: +3% XP, +2% złota i +4% szans na rzadsze przedmioty z wyprawy.');
+    assert.equal(seatLine(found, english), "Your guild's buildings: +3% XP, +2% gold and +4% chance of rarer items from the exploration.");
+    // No items found: no rarer ones; half a percent with its decimal.
+    assert.equal(seatLine({ ...found, items: [] }, content), 'Budynki Twojej gildii: +3% XP i +2% złota z wyprawy.');
+    assert.equal(seatLine({ seat: { xp: 0.005 }, xp: 10, gold: 5, items: [] }, content), 'Budynki Twojej gildii: +0,5% XP z wyprawy.');
+    assert.equal(seatLine({ seat: { xp: 0.005 }, xp: 10, gold: 5, items: [] }, english), "Your guild's buildings: +0.5% XP from the exploration.");
+    // None without a seat, nor after a faint, which loses all of it.
+    assert.equal(seatLine({ xp: 100, gold: 50, items: [{}] }, content), null);
+    assert.equal(seatLine({ ...found, forfeit: true, xp: 0, gold: 0, items: [] }, content), null);
+    // Among the System's lines of an exploration's report; none without a seat.
+    const raised = report(explore({ xp: 0.03, gold: 0.02 }));
+    assert.ok(raised.system.includes('Budynki Twojej gildii: +3% XP i +2% złota z wyprawy.'), raised.system.join(' | '));
+    assert.ok(!report(explore(null)).system.some((line) => line.startsWith('Budynki Twojej gildii')));
+  });
+
+  test("the report names the guild's banner over the land, the Ołtarz's blessing and the Bractwo Łowców too, where they worked", () => {
+    const plain = { ...settled, hp: 9999, name: 'Mira', areaId: 'wolf-circles', minutes: 240, seed: 'siedziba' };
+    const hunt = simulateHunt({ ...plain, banner: 0.05, blessing: { kind: 'xp', bonus: 0.1, fights: 3 }, materialsMore: 0.1 }, calm);
+    assert.ok(hunt.gold > 0 && Object.keys(hunt.materials).length > 0 && hunt.fights.length > 3);
+    const lines = [
+      'Sztandar Twojej gildii w tej krainie: +5% złota i materiałów ze stworów.',
+      `Błogosławieństwo Ołtarza Systemu (+10% XP) działało w walkach: 3 z ${hunt.fights.length}.`,
+      'Bractwo Łowców: +10% materiałów ze stworów.',
+    ];
+    const { system } = report(hunt);
+    for (const line of lines) assert.ok(system.includes(line), `${line} | ${system.join(' | ')}`);
+    const english = contentIn('en');
+    assert.ok(report(hunt, english).system.includes(`The System Altar's blessing (+10% XP) was active in 3 of ${hunt.fights.length} fights.`), report(hunt, english).system.join(' | '));
+    assert.equal(bannerLine(hunt, english), "Your guild's banner in this land: +5% gold and materials from creatures.");
+    // Without them, none of these lines; nor the banner's with neither gold nor materials.
+    const without = report(simulateHunt(plain, calm)).system;
+    assert.ok(lines.every((line) => !without.includes(line)), without.join(' | '));
+    assert.equal(bannerLine({ banner: 0.05, gold: 0, materials: {} }, content), null);
   });
 });
 
@@ -403,6 +452,9 @@ describe('the Siedziba Gildii through the API', () => {
     assert.ok(member.summary.xp > alone.summary.xp);
     assert.ok(member.summary.gold > alone.summary.gold, `${member.summary.gold} for ${alone.summary.gold}`);
     assert.ok(Math.abs(member.summary.gold - alone.summary.gold * 1.1) <= alone.fights.length + 10, `${member.summary.gold} for ${alone.summary.gold}`);
+    // And its report says so, as at the start (a player, 24.11.2026).
+    assert.ok(member.system.includes('Budynki Twojej gildii: +5% XP i +10% złota z wyprawy.'), member.system.join(' | '));
+    assert.ok(!alone.system.some((line) => line.startsWith('Budynki Twojej gildii')), alone.system.join(' | '));
 
     // Out of the guild, the next exploration goes without them.
     assert.equal((await as('mistrz', 'POST', '/api/guild/leave')).status, 200);

@@ -83,6 +83,10 @@
       "enough": "{what} na ten budynek starczy już do najwyższego poziomu.",
       "resourceAmount": "{count} {genitive}",
       "both": "{first} i {second}",
+      "report": "Budynki Twojej gildii: {bonuses} z wyprawy.",
+      "reportXp": "+{value}% XP",
+      "reportGold": "+{value}% złota",
+      "reportRarity": "+{value}% szans na rzadsze przedmioty",
       "donated": "Wpłata na {name}: {amounts}.",
       "raised": "{name} wchodzi na {level}. poziom!",
       "noGuild": "Siedzibę rozbudowują członkowie gildii. Dołącz do gildii albo załóż własną.",
@@ -1082,6 +1086,7 @@
       "chip": "Sztandar gildii {name} [{tag}] do niedzieli",
       "ownBanner": "Sztandar Twojej gildii: do niedzieli +{bonus}% złota i materiałów ze stworów w tej krainie.",
       "otherBanner": "Sztandar gildii {name} [{tag}] stoi tu do niedzieli.",
+      "report": "Sztandar Twojej gildii w tej krainie: +{bonus}% złota i materiałów ze stworów.",
       "how": [
         "Każda minuta wyprawy liczy się dla krainy, w której była wyprawa, gdy członek odbierze raport. Na wyprawie drużyny każdy liczy swoje minuty.",
         "W poniedziałek o północy krainę dostaje gildia z najwięcej minut. Przy remisie wygrywa starsza gildia, a gdzie nikt nie był, sztandaru nie ma.",

@@ -40,13 +40,15 @@ import {
   xpToNext,
 } from './progression.js';
 import { countEvents, createRng } from './rng.js';
-import { nameInText, say, word } from './text.js';
+import { decimalText, nameInText, say, word } from './text.js';
 import { classUnlockMessages, unlockMessages } from './unlocks.js';
 import { classNameOf } from './evolutions.js';
 import { evolutionBlock, skillPoints } from './skills.js';
 import { companionCombatant, gendered, trackerMaterials } from './companions.js';
 import { wantedEncounter, wantedLootRarity, wantedOf, wantedStrength } from './wanted.js';
 import { omenLines, raisedOutcome, weekChance, weekFactor, weekFighter, weekLine } from './weeks.js';
+import { seatLine } from './guild-seat.js';
+import { bannerLine } from './guild-lands.js';
 import { gearKey } from './gear.js';
 import { sideStats } from './side-stats.js';
 import { computeStats } from './stats.js';
@@ -1273,6 +1275,14 @@ export function simulateHunt(
     ...((cardsXp > 1 || cardsGold > 1) && { cardsBonus: { xp: cards?.xp ?? 0, gold: cards?.gold ?? 0 } }),
     // The meal's bonus, for the report's line.
     ...(meal && { meal }),
+    // And the other bonuses it set out with, for their lines: the Siedziba
+    // Gildii's, the share of its guild's banner over the land, the kind of
+    // the Ołtarz's blessing (its fights in blessingFights) and the Bractwo
+    // Łowców's share more materials.
+    ...((seat?.xp > 0 || seat?.gold > 0 || seat?.rarity > 0) && { seat }),
+    ...(bannerShare > 1 && { banner }),
+    ...(blessing && { blessingKind: blessing.kind }),
+    ...(materialsMore > 0 && { materialsMore }),
     hpStart,
     hpEnd: me.hp,
     maxHp: me.unit.maxHp,
@@ -1485,6 +1495,38 @@ function potionsLines(hunt, content) {
   return lines;
 }
 
+// The report's line of the Ołtarz Systemu's blessing the exploration set
+// out with (fortress.js): its name, as the Ołtarz offers it, and the fights
+// it worked in, as the potions' lines ("Błogosławieństwo Ołtarza Systemu
+// (+10% XP) działało w walkach: 3 z 6."); null without one.
+/**
+ * @param {Hunt} hunt
+ * @param {Content} content
+ * @returns {string | null}
+ */
+function blessingLine(hunt, content) {
+  if (!hunt.blessingKind || !(hunt.blessingFights > 0)) return null;
+  const altar = content.buildings.find((/** @type {Record<string, any>} */ building) => building.effect.kind === 'blessing');
+  const blessing = altar?.blessings?.find((/** @type {{ id: string }} */ one) => one.id === hunt.blessingKind);
+  return blessing ? say(content.texts, 'blessingFights', 0, { blessing: blessing.name, fights: hunt.blessingFights, all: hunt.fights.length }) : null;
+}
+
+// The report's line of the Bractwo Łowców's share more materials from the
+// creatures (591 B, materialDrops), where they left some ("Bractwo Łowców:
+// +10% materiałów ze stworów."); null otherwise.
+/**
+ * @param {Hunt} hunt
+ * @param {Content} content
+ * @returns {string | null}
+ */
+function huntersLine(hunt, content) {
+  if (!(hunt.materialsMore > 0) || Object.keys(hunt.materials ?? {}).length === 0) return null;
+  const id = content.settlement?.brotherhoodPerks?.materialDrops?.brotherhood;
+  const brotherhood = content.settlement?.brotherhoods?.find((/** @type {{ id: string }} */ one) => one.id === id);
+  if (!brotherhood) return null;
+  return say(content.texts, 'brotherhoodMaterials', 0, { brotherhood: brotherhood.name, value: decimalText(Math.round(hunt.materialsMore * 1000) / 10, content) });
+}
+
 // `autoEquipped`: indices of the finds that went straight into empty slots.
 // `overflow`: what the scrapper bought because the bag was full
 // ({ capacity, count, gold, sold: indices of the finds among them }).
@@ -1546,10 +1588,22 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
       }),
       ...(overflow && overflow.count > 0 ? [say(content.texts, 'bagOverflow', 0, overflow)] : []),
       // The week it set out in, where its effects changed the result
-      // ("Tydzień Kuny: +5% złota z walk.", weeks.js), and Talia Systemu's
-      // collection, where its bonus did (cards.js), and the meal eaten
-      // before it set out (cooking.js).
-      ...[weekLine(hunt, content), ...omenLines(hunt, content), cardBonusLine(hunt, content), mealLine(hunt, content)].filter(Boolean),
+      // ("Tydzień Kuny: +5% złota z walk.", weeks.js), the guild's
+      // buildings and its banner over the land, where theirs did
+      // (guild-seat.js, guild-lands.js), Talia Systemu's collection, where
+      // its bonus did (cards.js), the meal eaten before it set out
+      // (cooking.js), the Ołtarz's blessing and the Bractwo Łowców (a
+      // player, 24.11.2026: „nie ma ujęte za budynki gildii”).
+      ...[
+        weekLine(hunt, content),
+        ...omenLines(hunt, content),
+        seatLine(hunt, content),
+        bannerLine(hunt, content),
+        cardBonusLine(hunt, content),
+        mealLine(hunt, content),
+        blessingLine(hunt, content),
+        huntersLine(hunt, content),
+      ].filter(Boolean),
     ],
     items: hunt.items.map((/** @type {Item} */ item, /** @type {number} */ index) => ({ ...itemView(item, content), ...(overflow?.sold.includes(index) && { sold: true }) })),
     fights: hunt.fights.map((/** @type {Record<string, any>} */ fight) => ({
