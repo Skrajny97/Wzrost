@@ -1316,6 +1316,10 @@
     "0.4.95": {
       "title": "Version 0.4.95",
       "body": "- Items: besides the Tier there is now a level lock. You can equip an item when its level is at most 30 above your character or class level (whichever is higher). From level 100 this margin grows evenly to 50 at level 300. The item card shows the level it needs.\n- Items that are too high and already worn go back to the bag the next time the character loads, and stop counting in fights at once. You can still buy, trade, store and craft such items."
+    },
+    "0.4.96": {
+      "title": "Version 0.4.96",
+      "body": "- Character ranking: the player's name always shows and always opens the character preview, also next to a title, a moderator mark and a guild tag. When the line is too short, these move under the name.\n- The character ranking has a \"Class\" list: pick e.g. Cleric to see your place among the Clerics. Evolutions count as their base class."
     }
   }
 }

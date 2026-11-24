@@ -3970,6 +3970,10 @@ Autor: „Podepnij Wiki społecznościową jako przycisk pod grę” z linkiem d
 4. **Słowa:** „Zajrzyj do wiki tworzonej przez graczy”, po angielsku „Browse the players' wiki (in Polish)”, bo wiki jest po polsku.
 5. **Sprawdzone** w przeglądarce: telefon 320 px i 360 px po angielsku, komputer 1366 px; tekst mieści się w przycisku, bez przewijania na boki.
 
+## Wersja 0.4.96 (24.11.2026): ranking z nazwami i filtrem klas
+
+Według sekcji niżej, bez makiet (autor: „Wdrażaj od razu, szkoda Twoich zasobów na makiety”; lista klas wygląda jak przyjęta lista profesji z 975 B).
+
 ## Ranking: nazwa gracza zawsze widoczna (24.11.2026)
 
 Gracz (poz. 99) przez autora: „Kosmetyczna uwaga. Jak w rankingu ktoś ma nadany przydomek/tytuł/moderatora i nazwę gildii. To nie widać nazwy gracza i nie da kliknąć w podgląd. Przykład ranking poziomów miejsce 2 i 11.”
