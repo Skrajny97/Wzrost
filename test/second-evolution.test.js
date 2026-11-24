@@ -252,7 +252,8 @@ describe('the second forms in the Arena (992 A)', () => {
   // (evolutions.json duelPower and duelHp): the Wielki Inkwizytor (1% of
   // its duels before), the Druid (9%), the Widmo (21% once those two were
   // stronger), the Władca Piorunów (78%), the Mistrz Łowów (77%) and the
-  // Bastion (79%).
+  // Bastion (79%). The Druid's is in its summons' blows since 24.11.2026
+  // (duelSummonPower; test/druid-summons.test.js).
   test('at level 100 each second form wins 25–75% of its duels against the other paths', () => {
     const result = measure({ level: 100, seeds: 1, model: 'realistic', paths: true }, content);
     const second = content.evolutions.filter((form) => content.evolutionsById[form.from] && !content.evolutionsById[form.from].from).map((form) => form.id);
@@ -344,9 +345,14 @@ describe('the second forms in fights', () => {
     const weak = fight('druid', [plain], [sturdy('boar', 88, 'e0')]);
     const upOf = (result) => result.events.find((event) => event.kind === 'summon' && event.state === 'up');
     assert.equal(upOf(strong).skill, 'ent-summon');
-    // 935 A: out of the Druid's mana, not its HP.
-    assert.equal(upOf(strong).summonHp, Math.max(1, Math.round(druid.maxMana * skillParams(content.skillsById['ent-summon'], 40, content).hp * 1.3)));
-    assert.ok(Math.abs(upOf(strong).summonHp / upOf(weak).summonHp - 1.3) < 0.01);
+    // 935 A: out of the Druid's mana; since 24.11.2026 with 75% of the
+    // Druid's maximum HP on top (`summonLife`, test/druid-summons.test.js),
+    // which Moc puszczy's 30% does not grow.
+    const share = skillParams(content.skillsById['ent-summon'], 40, content).hp;
+    const life = druid.maxHp * druid.feat.summonLife;
+    assert.equal(druid.feat.summonLife, 0.75);
+    assert.equal(upOf(strong).summonHp, Math.max(1, Math.round(druid.maxMana * share * 1.3 + life)));
+    assert.equal(upOf(weak).summonHp, Math.max(1, Math.round(druid.maxMana * share + life)));
     const firstBlow = (result) => result.events.find((event) => event.skill === 'ent-summon' && event.kind === 'hit');
     assert.ok(Math.abs(firstBlow(strong).damage / firstBlow(weak).damage - 1.3) < 0.03, `${firstBlow(strong).damage} / ${firstBlow(weak).damage}`);
     // Two summons at a time (the author, 21.11.2026: „Zmieniamy arcydruid

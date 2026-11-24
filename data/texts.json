@@ -207,6 +207,7 @@
   "bloodMarked": ["{actor}: {skill}. {target} krwawi, a do końca walki krytyki trafiają w ten cel o {crit} pkt proc. częściej."],
   "rooted": ["{target} grzęźnie w korzeniach i zwalnia."],
   "summonHowl": ["Wycie dodaje całej drużynie {howl}% obrażeń."],
+  "summonLure": ["{summon} ściąga na siebie ciosy wrogów."],
   "chargeHit": ["{summon} szarżuje. {target} traci {damage} HP."],
   "chargeMiss": ["{summon} szarżuje, ale {target} uskakuje."],
   "skillShieldRetort": ["Kto w nią uderzy, ten płonie, zwalnia albo traci ruch."],

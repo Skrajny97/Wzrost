@@ -5767,9 +5767,26 @@ export function skillEffects(kit) {
   // while all eyes are on it.
   async function taunt(event, color) {
     const entry = cards.get(event.actor);
-    if (!entry) return;
+    if (entry) await allEyesOn(entry, color);
+  }
+
+  // The Druid's line (24.11.2026): a summon that comes draws the foes'
+  // blows onto itself (its summoner's trait, `lure`), as the Wyzwanie draws
+  // them onto the Strażnik: every foe turns to its card and a red line runs
+  // from each to it. A pack's summons come one after another: once, at the
+  // first.
+  async function lure(event) {
+    if ((event.order ?? 1) > 1) return;
+    const entry = summonedCard(event);
+    if (entry) await allEyesOn(entry, '#e8462f');
+  }
+
+  // Every foe turns to a card: a red "!" over each, a red line from each to
+  // it, and the card glows red.
+  async function allEyesOn(entry, color) {
+    const id = entry.unit.id;
     if (reduced() || !particles) {
-      await Promise.all([ring(event.actor, color, 130, 760), aura(event.actor, color, 2)]);
+      await Promise.all([ring(id, color, 130, 760), aura(id, color, 2)]);
       return;
     }
     const art = artOf(entry.card);
@@ -12301,6 +12318,8 @@ export function skillEffects(kit) {
       default:
         await aura(event.actor, look.color, 1);
     }
+    // The Druid's line: the summon that came draws the foes' blows.
+    if (event.kind === 'summon' && event.lure) await lure(event);
     await wait(120);
   }
 

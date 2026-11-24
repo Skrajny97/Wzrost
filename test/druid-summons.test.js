@@ -11,19 +11,38 @@
 // a pack of two (Zew zwierząt, Gaj wieków, Pradawne stado) half, as
 // before. A duel starts with full mana and pays the data's share once
 // (balance.skills.duelManaCost), and the Druid line's mana never runs
-// short in one: its duels go exactly as before. In the Arena the line's
-// strongest form, the Pradruid (63% of its duels on levels 280–350, the
-// most of the fourth forms), strikes at 0.8 of its strength instead of 0.9
-// (evolutions.json duelPower, 992 A), at the author's word; the Druid, the
-// weakest second form there (38%), and the Arcydruid keep theirs.
+// short in one: the price changes no duel.
+//
+// Then (the same day; the author: „Ogólnie Druid powinien czerpać siłę z
+// przywołańców, niech oni jakoś ściągają aggro i w ogóle niech się
+// wyróżniają”, after players' words: a Druid's plain attack in the Arena's
+// table showed twice anyone's, „one crit and it's over”, and from level 150
+// its summons fell to a single blow and it climbed the Wieża Solo poorly):
+// - in the players' duels the line's own blows are as anyone's (no
+//   duelPower: the Druid had ×1.9, the Arcydruid ×1.3, the Pradruid ×0.8 on
+//   all its blows), and its duel strength is in its summons' blows
+//   (evolutions.json duelSummonPower: Druid 1.35, Arcydruid 0.8, Pradruid
+//   0.42), so the Arena's table shows the attack its blows have;
+// - its summons draw the foes' blows: while one stands, the foes and their
+//   summons choose among such Druids only and the summon in front takes
+//   the blow (the trait's `lure`; combat.js lured, after Wyzwanie's
+//   challenger), which the playback shows (skill-fx.js lure);
+// - each summon has 75% of the Druid's maximum HP on top of its share of
+//   the mana (`summonLife`), in a duel of the HP before the duel's factor;
+// - the Druid's Ent and Bear and the Arcydruid's Zew zwierząt stay 5 moves
+//   instead of 4, and the Pradruid's Pradawne stado, grown from it, 6
+//   instead of 5.
+// DECISIONS.md has the measurements: the Arena, the biggest blows, the
+// summons against elites and champions, explorations, the Wieża Solo and
+// the guild wars' 3v3.
 
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { describe, test } from 'node:test';
 
-import { arenaDuel, buildContent, createRng, duelist, monsterCombatant, playerCombatant, simulateFight, skillCost, skillView } from '../src/engine/index.js';
+import { arenaDuel, buildContent, combatantView, createRng, duelArmorShare, duelHpFactor, duelist, monsterCombatant, playerCombatant, simulateFight, simulateHunt, skillCost, skillView } from '../src/engine/index.js';
 import { measureClass } from '../tools/class-balance-sim.mjs';
-import { playerOf } from '../tools/difficulty-sim.mjs';
+import { GEAR_SETS, newestArea, playerOf, withArea } from '../tools/difficulty-sim.mjs';
 import { loadData } from '../tools/validate-data.mjs';
 import { content } from './helpers/content.js';
 
@@ -105,6 +124,150 @@ describe('the Druid line\'s summons: a quarter of the maximum mana a creature on
   });
 });
 
+describe('the Druid line\'s summons draw the foes\' blows and stand longer', () => {
+  // The game without the trait's lure.
+  const unlured = (() => {
+    const raw = loadData();
+    for (const form of raw.evolutions.evolutions) if (FORMS.includes(form.id)) delete form.trait.params.lure;
+    return buildContent(raw);
+  })();
+  // A Druid at the back with a Wojownik in front, against three sturdy
+  // boars; `data` with or without the trait's lure.
+  const party = (data) => {
+    const { character, equipped } = druidAt(100, data);
+    const druid = { ...playerCombatant({ character, equipped, name: 'Druid' }, data), position: 'back' };
+    const { character: knight, equipped: kit } = playerOf('realistic', 'warrior', 100, data, 0);
+    const warrior = { ...playerCombatant({ character: knight, equipped: kit, name: 'Wojownik', id: 'a1' }, data), position: 'front' };
+    const boars = ['e0', 'e1', 'e2'].map((id) => ({ ...monsterCombatant({ monsterId: 'boar', level: 98, id }, data), hp: 1e6, maxHp: 1e6 }));
+    return simulateFight({ allies: [druid, warrior], enemies: boars, rng: createRng('druid-lure'), content: data, record: true, maxActions: 60 });
+  };
+  // The creatures' blows at the Wojownik while a summon of the Druid stands.
+  const shieldedBlows = (result) => {
+    let standing = 0;
+    let atWarrior = 0;
+    let atSummons = 0;
+    for (const event of result.events) {
+      if (event.kind === 'summon' && event.target === 'a0' && event.state === 'up') standing += 1;
+      else if (event.kind === 'summon' && event.target === 'a0' && ['gone', 'fell'].includes(event.state)) standing -= 1;
+      else if (standing > 0 && event.actor?.startsWith('e') && event.target === 'a1' && ['hit', 'crit', 'dodge'].includes(event.kind)) atWarrior += 1;
+      else if (standing > 0 && event.actor?.startsWith('e') && event.kind === 'summon' && event.state === 'hit') atSummons += 1;
+    }
+    return { atWarrior, atSummons };
+  };
+
+  test('while a summon stands every creature strikes the Druid and the summon takes the blow; without the lure they strike the Wojownik in front too', () => {
+    assert.deepEqual(FORMS.map((id) => content.evolutionsById[id].trait.params.lure), [true, true, true]);
+    const now = shieldedBlows(party(content));
+    assert.equal(now.atWarrior, 0);
+    assert.ok(now.atSummons > 5, `${now.atSummons} blows at the summons`);
+    assert.ok(shieldedBlows(party(unlured)).atWarrior > 0);
+    // The summon's coming says so, and carries it for the playback.
+    const up = party(content).events.find((event) => event.kind === 'summon' && event.state === 'up');
+    assert.equal(up.lure, true);
+    assert.match(up.text, /ściąga na siebie ciosy wrogów\.$/);
+  });
+
+  test('in the players\' fights the foe and its summon go for the Druid too: a Nekromanta and its skeleton strike the Druid\'s summon, not the Wojownik beside it', () => {
+    // As in a guild war (guild-wars.js: duelists, an even fight): the Druid
+    // and a Wojownik against a Nekromanta who outlasts them.
+    const level = 100;
+    const trio = (data) => {
+      const shape = { factor: duelHpFactor(level, level, data), armor: duelArmorShare(level, level, data) };
+      const fighter = (one, name) => ({ character: one.character, equipped: one.equipped, name });
+      const nekromanta = playerOf('realistic', 'shadow', level, data, 0, 'poisoned-blade');
+      assert.equal(nekromanta.character.evolution, 'necromancer');
+      const druid = duelist(fighter(druidAt(level, data), 'Druid'), 'a0', 'ally', shape, data);
+      const warrior = duelist(fighter(playerOf('realistic', 'warrior', level, data, 0), 'Wojownik'), 'a1', 'ally', shape, data);
+      const necro = { ...duelist(fighter(nekromanta, 'Nekromanta'), 'e0', 'enemy', shape, data), hp: 1e6, maxHp: 1e6 };
+      return simulateFight({ allies: [druid, warrior], enemies: [necro], rng: createRng('druid-trio'), content: data, record: true, maxActions: 80, even: true });
+    };
+    // The Nekromanta's own blows and its skeleton's (Wskrzeszenie) at the
+    // Wojownik while a summon of the Druid stands.
+    const atWarrior = (result) => {
+      let standing = 0;
+      const out = { own: 0, skeleton: 0, atSummons: 0 };
+      for (const event of result.events) {
+        if (event.kind === 'summon' && event.target === 'a0' && event.state === 'up') standing += 1;
+        else if (event.kind === 'summon' && event.target === 'a0' && ['gone', 'fell'].includes(event.state)) standing -= 1;
+        else if (standing > 0 && event.actor === 'e0' && event.target === 'a1' && ['hit', 'crit', 'dodge'].includes(event.kind)) out[event.skill === 'raise-dead' ? 'skeleton' : 'own'] += 1;
+        else if (standing > 0 && event.actor === 'e0' && event.kind === 'summon' && event.state === 'hit') out.atSummons += 1;
+      }
+      return out;
+    };
+    const now = atWarrior(trio(content));
+    assert.deepEqual([now.own, now.skeleton], [0, 0]);
+    assert.ok(now.atSummons > 20, `${now.atSummons} blows at the summons`);
+    const without = atWarrior(trio(unlured));
+    assert.ok(without.own > 0 && without.skeleton > 0, JSON.stringify(without));
+  });
+
+  test('the Druid\'s Ent and Bear and the Arcydruid\'s Zew zwierząt stay 5 moves (4 before), the Pradawne stado 6 (5); no later summon of the line stays shorter than the one it grew from', () => {
+    assert.deepEqual(['ent-summon', 'bear-summon', 'bison-call', 'ancient-herd'].map((id) => content.skillsById[id].params.turns), [5, 5, 5, 6]);
+    for (const id of ['oak-awakening', 'bison-call', 'oak-of-ages', 'ancient-herd']) {
+      const skill = content.skillsById[id];
+      assert.ok(skill.params.turns >= content.skillsById[skill.from].params.turns, id);
+    }
+  });
+
+  test('each summon has 75% of the Druid\'s maximum HP on top of its share of the mana', () => {
+    for (const id of FORMS) assert.equal(content.evolutionsById[id].trait.params.summonLife, 0.75);
+    // Not the Arkanista's: its trait has none.
+    assert.equal(content.evolutionsById.arcanist.trait.params.summonLife, undefined);
+  });
+
+  test('its summons stand against an elite and a champion: none falls to the first blow it takes, and no blow takes more than 80% of a summon\'s HP', () => {
+    // The game without the share of the maximum HP.
+    const frail = (() => {
+      const raw = loadData();
+      for (const form of raw.evolutions.evolutions) if (FORMS.includes(form.id)) delete form.trait.params.summonLife;
+      return buildContent(raw);
+    })();
+    // The Druid alone (as in the Wieża Solo) against the newest place's elite
+    // or champion at full HP, as on an exploration (measureRare in
+    // tools/difficulty-sim.mjs: a minute's exploration with a rumour), 16
+    // fights: how many summons came, how many fell to the first blow they
+    // took, and the biggest blow as a share of the summon's HP.
+    const against = (level, kind, data) => {
+      const found = newestArea(level, data);
+      const area = kind === 'elite' ? { ...found, champion: null, id: `${found.id}-elite` } : found;
+      const local = withArea(area, data);
+      const out = { summons: 0, firstBlow: 0, worst: 0 };
+      for (let i = 0; i < 16; i++) {
+        const { character, equipped } = playerOf('realistic', 'mage', level, local, i % GEAR_SETS, 'mana-shield');
+        const hp = playerCombatant({ character, equipped, name: 'Druid', area }, local).maxHp;
+        const [fight] = simulateHunt({ character, equipped, hp, name: 'Druid', areaId: area.id, minutes: 1, seed: `sturdy:${kind}:${level}:${i}`, rumor: 1e9 }, local).fights;
+        assert.ok(fight[kind === 'elite' ? 'elite' : 'champion'], `${level} ${kind}`);
+        const hits = new Map();
+        const full = new Map();
+        for (const event of fight.events) {
+          if (event.kind !== 'summon' || event.target !== 'a0') continue;
+          const key = `${event.summonSkill ?? event.skill}:${event.summonOrder ?? event.order ?? 0}`;
+          if (event.state === 'up') {
+            out.summons += 1;
+            hits.set(key, 0);
+            full.set(key, event.summonHp);
+          } else if (event.state === 'hit') {
+            hits.set(key, hits.get(key) + 1);
+            out.worst = Math.max(out.worst, event.damage / full.get(key));
+          } else if (event.state === 'fell' && hits.get(key) === 1) out.firstBlow += 1;
+        }
+      }
+      return out;
+    };
+    // Before (the 0.5.8 numbers): at level 250 11 of 48 summons fell to the
+    // elite's first blow and a blow took up to 1.8 times a summon's HP; at
+    // level 300 8 of 84 to the champion's, up to 2 times.
+    for (const [level, kind] of [[170, 'elite'], [250, 'elite'], [250, 'champion'], [300, 'champion']]) {
+      const now = against(level, kind, content);
+      assert.ok(now.summons >= 30, `${level} ${kind}: ${now.summons} summons`);
+      assert.equal(now.firstBlow, 0, `${level} ${kind}`);
+      assert.ok(now.worst < 0.8, `${level} ${kind}: a blow took ${now.worst.toFixed(2)} of a summon's HP`);
+    }
+    const weak = against(250, 'elite', frail);
+    assert.ok(weak.firstBlow > 0 && weak.worst > 1, JSON.stringify(weak));
+  });
+});
+
 describe('the Druid line on explorations (tools/class-balance-sim.mjs)', () => {
   // Four-hour explorations of the newest place with companions, the
   // realistic player of tools/difficulty-sim.mjs, 120 of them: before the
@@ -125,16 +288,93 @@ describe('the Druid line on explorations (tools/class-balance-sim.mjs)', () => {
 });
 
 describe('the Druid line in duels', () => {
-  test('the Pradruid strikes at 0.8 of its strength in the players\' duels (0.9 before 24.11.2026); the Druid and the Arcydruid keep 1.9 and 1.3', () => {
-    assert.deepEqual(FORMS.map((id) => content.evolutionsById[id].duelPower), [1.9, 1.3, 0.8]);
-    const { character, equipped } = druidAt(300);
-    assert.equal(character.evolution, 'elder-druid');
-    const plain = playerCombatant({ character, equipped, name: 'Pradruid' }, content);
-    const duel = duelist({ character, equipped, name: 'Pradruid' }, 'a0', 'ally', { factor: 1, armor: 1 }, content);
-    // Its own blows and its summons' (they strike with its damageScale).
-    assert.ok(Math.abs(duel.damageScale - 0.8 * plain.damageScale) < 1e-9);
-    // Its HP as before: no duelHp of its own.
-    assert.equal(duel.maxHp, plain.maxHp);
+  test('its own blows are as anyone\'s, the Arena\'s table shows the attack the fight uses, and its duel strength is in its summons\' blows', () => {
+    // Before: duelPower 1.9, 1.3 and 0.8 on all its blows; the Arena's table
+    // showed a Druid's plain attack nearly twice an Arcymag's with the same
+    // staff and Intelekt.
+    assert.deepEqual(FORMS.map((id) => content.evolutionsById[id].duelPower), [undefined, undefined, undefined]);
+    assert.deepEqual(FORMS.map((id) => content.evolutionsById[id].duelSummonPower), [1.35, 0.8, 0.42]);
+    for (const level of [100, 200, 300]) {
+      const { character, equipped } = druidAt(level);
+      const plain = playerCombatant({ character, equipped, name: 'Druid' }, content);
+      const duel = duelist({ character, equipped, name: 'Druid' }, 'a0', 'ally', { factor: 3, armor: 0.45 }, content);
+      assert.equal(duel.damageScale, plain.damageScale, character.evolution);
+      assert.equal(combatantView(duel, level, content).damage, combatantView(plain, level, content).damage);
+      assert.equal(duel.summonScale, content.evolutionsById[character.evolution].duelSummonPower);
+      assert.equal(duel.baseMaxHp, plain.maxHp);
+      // A summon's blow in a duel: its power times the form's strength.
+      const result = arenaDuel({ attacker: { character, equipped, name: 'Druid' }, defender: { ...playerOf('realistic', 'warrior', level, content, 1), name: 'Rywal' }, seed: `druid-power:${level}` }, content);
+      assert.ok(result.fight.events.some((event) => event.actor === 'a0' && ['hit', 'crit'].includes(event.kind) && content.skillsById[event.skill]?.kind === 'summon'));
+    }
+    // Outside duels nothing of it.
+    const { character, equipped } = druidAt(100);
+    assert.equal(playerCombatant({ character, equipped, name: 'Druid' }, content).summonScale, undefined);
+  });
+
+  test('in a duel its summons strike with the form\'s summon strength and take 75% of the HP before the duel\'s factor', () => {
+    const { character, equipped } = druidAt(100);
+    const duel = duelist({ character, equipped, name: 'Druid' }, 'a0', 'ally', { factor: 3, armor: 0.45 }, content);
+    const rival = { ...monsterCombatant({ monsterId: 'boar', level: 98, id: 'e0' }, content), hp: 1e6, maxHp: 1e6 };
+    const result = simulateFight({ allies: [duel], enemies: [rival], rng: createRng('druid-duel-summon'), content, record: true, maxActions: 20 });
+    const up = result.events.find((event) => event.kind === 'summon' && event.state === 'up' && event.skill === 'ent-summon');
+    const share = duel.skills.find((one) => one.id === 'ent-summon').params.hp;
+    // Not the duel's tripled HP.
+    assert.equal(up.summonHp, Math.max(1, Math.round(duel.maxMana * share * 1.3 + duel.baseMaxHp * 0.75)));
+    assert.ok(duel.maxHp > 2.5 * duel.baseMaxHp);
+  });
+
+  test('no one-sided burst: at levels 90 and 130 a Druid\'s biggest blow takes under a third of a rival\'s duel HP and it never kills in fewer than four of its moves, with its points in Intelekt or in Mądrość too', () => {
+    // Every other class's paths, each draw of the gear, as attacker and as
+    // defender (tools/pvp-arena-sim.mjs pairs them so); the realistic
+    // player's points („Rozdaj według klasy”), all of them in Intelekt, and
+    // all in Mądrość. Before (×1.9 on all its blows): up to 41% and 46% of
+    // the rival's HP and a kill in three moves; the other second forms' own
+    // biggest blows at those levels go up to 70–107% (the Berserker's, the
+    // Wielki Inkwizytor's, the Arcymag's).
+    const builds = { realistic: null, intellect: { intellect: 1 }, wisdom: { wisdom: 1 } };
+    // A draw of the realistic player with all its points in the stats of
+    // `split` (shares).
+    const rebuilt = (one, split) => {
+      if (!split) return one;
+      const total = Object.values(one.character.points).reduce((sum, value) => sum + value, 0);
+      return { ...one, character: { ...one.character, points: Object.fromEntries(Object.entries(split).map(([stat, share]) => [stat, Math.round(total * share)])) } };
+    };
+    for (const level of [90, 130]) {
+      for (const [build, split] of Object.entries(builds)) {
+        const druids = Array.from({ length: GEAR_SETS }, (_, set) => ({ ...rebuilt(playerOf('realistic', 'mage', level, content, set, 'mana-shield'), split), name: 'Druid' }));
+        let biggest = 0;
+        let fastest = Infinity;
+        let kills = 0;
+        for (const cls of content.classes) {
+          if (cls.id === 'mage') continue;
+          for (const [index, skill] of content.skills.filter((one) => one.classId === cls.id).entries()) {
+            for (let set = 0; set < GEAR_SETS; set++) {
+              const rival = { ...playerOf('realistic', cls.id, level, content, (set + 1) % GEAR_SETS, index === 0 ? null : skill.id), name: 'Rywal' };
+              for (const druidFirst of [true, false]) {
+                const duel = arenaDuel({ attacker: druidFirst ? druids[set] : rival, defender: druidFirst ? rival : druids[set], seed: `burst:${level}:${skill.id}:${set}:${druidFirst}` }, content);
+                const me = druidFirst ? 'a0' : 'e0';
+                const foe = druidFirst ? 'e0' : 'a0';
+                const foeHp = [...duel.fight.allies, ...duel.fight.enemies].find((unit) => unit.id === foe).maxHp;
+                const moves = new Set();
+                for (const event of duel.fight.events) {
+                  if (event.actor === me && event.kind !== 'reflect') moves.add(event.t);
+                  if (event.actor === me && event.target === foe && ['hit', 'crit'].includes(event.kind)) biggest = Math.max(biggest, event.damage / foeHp);
+                  if (event.kind === 'kill' && event.target === foe) {
+                    kills += 1;
+                    fastest = Math.min(fastest, moves.size);
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        }
+        const told = `level ${level}, ${build}`;
+        assert.ok(kills > 30, `${told}: ${kills} kills`);
+        assert.ok(biggest < 1 / 3, `${told}: a blow of ${biggest.toFixed(2)} of the rival's HP`);
+        assert.ok(fastest >= 4, `${told}: a kill in ${fastest} moves`);
+      }
+    }
   });
 
   test('the price changes no duel: a Druid and an Arcydruid fight every class as before, move for move', () => {
