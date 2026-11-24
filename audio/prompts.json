@@ -638,7 +638,7 @@
       "pangolin-hurt": { "text": "a huge pangolin gives a deep huffing snort and a hiss of pain with a rattle of scales, no words, video game boss hurt sound, close up, no music", "seconds": 0.7 },
       "pangolin-death": { "text": "a huge pangolin gives a long low huffing groan and falls with a heavy clatter of scales, no words, video game boss death sound, close up, no music", "seconds": 1.6 },
       "heartwood-hurt": { "text": "an ancient living tree heart gives a sharp loud crack of splitting wood and a high creaking screech of pain, no words, video game boss hurt sound, close up, no music", "seconds": 0.7 },
-      "heartwood-death": { "text": "a haunted living tree heart gives a long loud piercing creak like a rusty door hinge with a dry crackle of splinters that fades away, no words, video game boss death sound, close up, no music", "seconds": 1.6 },
+      "heartwood-death": { "text": "an angry wooden tree spirit gives a long shrill wailing shriek with a sizzling hiss of boiling resin and a crackle of burning twigs, no words, close up, dry, no music", "seconds": 1.6 },
       "sloth-hurt": { "text": "a giant sloth gives a high-pitched nasal squeal of pain like a whistling bleat, no words, video game monster hurt sound, close up, dry, no music", "seconds": 0.6 },
       "sloth-death": { "text": "a giant sloth gives a long slow high-pitched whistling squeal that dies away, no words, close up, dry, no music", "seconds": 1.5 },
       "aphid-hurt": { "text": "a giant aphid gives a wet sucking squeak and a soft chitter of pain, no words, video game monster hurt sound, close up, dry, no music", "seconds": 0.5 },
