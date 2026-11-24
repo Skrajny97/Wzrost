@@ -345,14 +345,14 @@
   ],
   "texts": {
     "title": "Postrach Krainy",
-    "lead": "Co tydzień w każdym przedziale poziomów stoi jeden boss. Wszyscy gracze z przedziału biją ten sam pasek HP.",
+    "lead": "Co tydzień w każdym przedziale poziomów stoi jeden boss. Wszyscy gracze z przedziału biją tego samego stwora.",
     "rules": [
       "Przedział to 25 poziomów, liczonych według wyższego z Twoich poziomów: postaci albo klasy. Każdy przedział ma swojego bossa z krainy tych poziomów.",
       "Przedział ustala się przy pierwszym ataku w tygodniu i zostaje do niedzieli, nawet gdy awansujesz.",
       "Masz {attacks} ataki dziennie. Odnawiają się o północy.",
       "Atak to jedna walka Twojej postaci z towarzyszami, z pełnym HP i bez mikstur, z wynikiem od razu. Boss walczy na Twoim poziomie. Atak nie daje XP, złota ani łupów i działa także w trakcie wyprawy.",
       "HP bossa zależy od liczby graczy z przedziału, którzy byli w grze w ostatnim tygodniu.",
-      "Gdy boss padnie, każdy, kto go bił, dostaje Skrzynię Bossa ze złotem, materiałami bossa i szansą na przedmiot. Im więcej obrażeń zadasz, tym większa skrzynia.",
+      "Gdy boss padnie, każdy, kto go bił, dostaje Skrzynię Bossa ze złotem, materiałami bossa i szansą na przedmiot. Im więcej obrażeń zadasz, tym większa skrzynia: liczy się, ile zadasz w porównaniu z Twoją częścią HP bossa, a nie miejsce w rankingu.",
       "Najlepsza dziesiątka nosi przez tydzień tytuł bossa, a za ostatni cios w skrzyni czeka przedmiot i dodatkowe złoto.",
       "Boss zostaje do niedzieli, do północy. Gdy przetrwa, odchodzi, a skrzynie są o połowę mniejsze. W poniedziałek pojawia się nowy.",
       "Skrzynię otworzysz od upadku bossa albo od końca tygodnia, najpóźniej do końca następnego tygodnia."
