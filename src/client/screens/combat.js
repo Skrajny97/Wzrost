@@ -49,7 +49,8 @@ import { skipControl, timePoints } from '../time.js';
 import { formatWait, stableNote, stableWait } from '../stable.js';
 import { confirmAction, lockLabel, openSheet, systemLink, systemPanel, toast, withButton } from '../ui.js';
 import { openEvent } from '../event.js';
-import { BUSY, partyFree, partyWent, skipLines } from './party.js';
+import { partyFree, partyWent, skipLines } from './party.js';
+import { doingText } from '../party-doing.js';
 import { mercenaryChoice, servicePanel } from '../mercenaries.js';
 import { combatModes } from '../combat-modes.js';
 import { weekLine } from '../weeks.js';
@@ -1449,8 +1450,12 @@ export function mountCombat(container, { params, navigate }) {
         return;
       }
       const others = party.members.filter((member) => !member.own);
-      // What keeps each busy one (BUSY, screens/party.js), in the page's language.
-      const busy = others.filter((member) => member.status !== 'free').map((member) => `${member.name} (${t(BUSY[member.status] ?? 'zajęte')})`);
+      // What keeps each busy one home and until when, without the place of
+      // its exploration (../party-doing.js; the author, 25.11.2026:
+      // „powinno być widoczne co robi dany gracz z drużyny i dlaczego nie
+      // może iść na wyprawę”): „Ala (na wyprawie drużyny, wróci o 13:31)”.
+      const at = serverNow();
+      const busy = others.filter((member) => member.status !== 'free').map((member) => `${member.name} (${doingText(member, at, { place: false })})`);
       const now = JSON.stringify([free, busy, party.limits]);
       if (now === said) return;
       said = now;

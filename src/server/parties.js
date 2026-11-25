@@ -71,6 +71,7 @@ import {
   companionsGoingMost,
   companionStays,
   fightKind,
+  helpProfession,
   huntDurations,
   isUnlocked,
   longestHunt,
@@ -239,15 +240,48 @@ const reportWaits = (kind, endsAt, now) => kind !== 'mercenary' && endsAt <= now
 
 // A member's state for the party's list: free (at home, or back with its
 // report waiting, which the party's setting out claims: partyHunt), away
-// (on an exploration), working (at a profession's work) or meditating (in a
-// Kultywacja, cultivation.js). Only the free go along. Whether its player
-// plays it now does not count: before 0.4.59 one
+// (on an exploration), working (at a profession's work), meditating (in a
+// Kultywacja, cultivation.js) or serving (a mercenary's offer or service in
+// the Karczma, mercenaries.js; 'working', „pracuje w profesji”, before
+// 25.11.2026). Only the free go along. Whether its player plays it now does
+// not count: before 0.4.59 one
 // whose player played another character was 'aside' and stayed home (the
 // author, 19.11.2026: „dlaczego system robił błąd kiedy ktoś zmienia
 // postać? przecież trzeba to jakoś rozdzielić”).
+const BUSY_STATUS = { hunt: 'away', cultivation: 'meditating', mercenary: 'serving' };
+
 function memberStatus(row, now) {
   if (!row.activity || reportWaits(row.activity, row.activity_ends, now)) return 'free';
-  return row.activity === 'hunt' ? 'away' : row.activity === 'cultivation' ? 'meditating' : 'working';
+  return BUSY_STATUS[row.activity] ?? 'working';
+}
+
+// What a member is doing, for the Drużyna's list and the Walka's line of
+// those who stay home (the author, 25.11.2026, on the report of gracz (poz.
+// 120), whose Drużyna said only „na wyprawie” by each one: „powinno być
+// widoczne co robi dany gracz z drużyny i dlaczego nie może iść na
+// wyprawę”): null for one free (memberStatus), else its `kind` and when it
+// is free again (`until`, its activity's end). 'trip': on this party's
+// trip, which goes on to its end also when another who went, the leader
+// too, calls itself back (trips.js); 'hunt': on an exploration of its own;
+// each with its `place`. 'work': at a profession's work, with the profession's name
+// (`profession`). 'cultivation': in a Kultywacja. 'mercenary': offering
+// itself in the Karczma, or serving one who hired it (`hired`); an offer or
+// a service over (`ended`, with no `until`) waits for its own player to
+// close it in the Karczma, and the member stays home until then. A Szybkie
+// and a Błyskawiczne polowanie are over as they start (hunts.js), so none
+// is ever away on one.
+function memberDoing(row, partyId, now) {
+  if (memberStatus(row, now) === 'free') return null;
+  const kind = row.activity;
+  if (kind === 'mercenary') return { kind, ...(row.activity_hired ? { hired: true } : {}), ...(row.activity_ends > now ? { until: row.activity_ends } : { ended: true }) };
+  const until = row.activity_ends;
+  if (kind === 'cultivation') return { kind, until };
+  if (kind === 'hunt') {
+    const place = areaFor(row.activity_region, row.level, content())?.name;
+    return { kind: row.activity_party === partyId ? 'trip' : 'hunt', ...(place && { place }), until };
+  }
+  const profession = helpProfession(kind, content())?.name;
+  return { kind: 'work', ...(profession && { profession }), until };
 }
 
 // The stage of the Stajnia's mount of a character's row (327 A): a party's
@@ -256,15 +290,19 @@ const mountOfRow = (row) => (settlementOn() ? mountStage(JSON.parse(row.settleme
 
 // The Drużyna for the page: the party, with its members, the invitations it
 // sent and the limits of its explorations (the lowest member's), and the
-// invitations waiting for this character.
+// invitations waiting for this character. Of a member's activity only what
+// its state and memberDoing need is read: its exploration's options keep
+// the whole trip's roster.
 export async function partyView(db, characterId, now) {
   const party = await partyOf(db, characterId);
   const [members, sent, invites, self] = await db.batch([
     db
       .prepare(
         `SELECT c.id, c.name, c.class_id, c.level, c.class_level, c.role, c.settlement, c.cosmetics, u.seen_at, ${guildTagSql('c.id')} AS guild_tag,
-                (SELECT a.kind FROM activities a WHERE a.character_id = c.id) AS activity, (SELECT a.ends_at FROM activities a WHERE a.character_id = c.id) AS activity_ends
+                a.kind AS activity, a.ends_at AS activity_ends, a.region_id AS activity_region,
+                json_extract(a.options, '$.party.id') AS activity_party, json_extract(a.options, '$.hired') IS NOT NULL AS activity_hired
          FROM party_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id
+         LEFT JOIN activities a ON a.character_id = c.id
          WHERE m.party_id = ? ORDER BY m.joined_at, m.character_id`,
       )
       .bind(party?.id ?? 0),
@@ -280,21 +318,32 @@ export async function partyView(db, characterId, now) {
     db.prepare('SELECT class_level, settlement, party_potions, party_meal FROM characters WHERE id = ?').bind(characterId),
   ]);
   const { onlineSeconds } = content().community.trade;
-  const list = members.results.map((row) => ({
-    id: row.id,
-    name: row.name,
-    guildTag: row.guild_tag ?? null,
-    nameColor: nameColorOf(row.cosmetics),
-    classId: row.class_id,
-    className: content().classesById[row.class_id]?.name ?? '',
-    level: row.level,
-    classLevel: row.class_level,
-    leader: row.id === party?.leaderId,
-    own: row.id === characterId,
-    status: memberStatus(row, now),
-    online: row.role === 'player' && (row.seen_at ?? 0) >= now - onlineSeconds * 1000,
-    mount: mountOfRow(row),
-  }));
+  const list = members.results.map((row) => {
+    const doing = memberDoing(row, party?.id, now);
+    // Its player in the game now (as for a Wymiana, trades.js): playing it
+    // (`online`), or another of its characters (`playsOther`); and when its
+    // account was last seen (`seenAt`, null for one never seen), as the
+    // Znajomi and the Gildia say it (community.js, guilds.js).
+    const seen = (row.seen_at ?? 0) >= now - onlineSeconds * 1000;
+    return {
+      id: row.id,
+      name: row.name,
+      guildTag: row.guild_tag ?? null,
+      nameColor: nameColorOf(row.cosmetics),
+      classId: row.class_id,
+      className: content().classesById[row.class_id]?.name ?? '',
+      level: row.level,
+      classLevel: row.class_level,
+      leader: row.id === party?.leaderId,
+      own: row.id === characterId,
+      status: memberStatus(row, now),
+      ...(doing && { doing }),
+      online: row.role === 'player' && seen,
+      ...(row.role !== 'player' && seen && { playsOther: true }),
+      seenAt: row.seen_at ?? null,
+      mount: mountOfRow(row),
+    };
+  });
   // The limits of the lowest of those who would go now, the leader and the
   // free members, as the start checks them: the longest exploration of the
   // lowest character level, the places of the lowest class level and the

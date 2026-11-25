@@ -11,7 +11,10 @@
 # the walks' keys that need no skeleton: colours to "add" or "drop", boxes of
 # the picture that are "not" skin or the "only" ones that are, "open",
 # "near_not", "rims_below", "span", "pixels" and "not_pixels" (under the
-# frame "0").
+# frame "0"). A rider whose skin its own portrait does not give names the
+# portrait to read the skin from with "portrait": the Cesarzowa Nawii and the
+# Królowa Ciemności (1255) that of their fourth form, the same person, whose
+# grey and lilac skin is nearer the rider's than the fifth form's lighter one.
 #
 # Usage: python3 tools/rider-tones.py [--ids a,b] [--check OUT_DIR]
 import importlib.util
@@ -43,7 +46,7 @@ def main():
         im = Image.open(os.path.join(RIDERS, f'{name}.png')).convert('RGBA')
         walk.save_indexed(im, os.path.join(RIDERS, f'{name}.png'))
         fix = fixes.get(name, {})
-        colours = walk.skin_colours(im, name, fix)
+        colours = walk.skin_colours(im, fix.get('portrait', name), fix)
         skin = walk.skin_pixels(im, colours, fix)
         lums = [walk.luminance(im.getpixel(p)[:3]) for p in skin]
         low, high = (min(lums), max(lums)) if lums else (1, 1)

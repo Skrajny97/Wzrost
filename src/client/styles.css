@@ -16836,6 +16836,25 @@ button.tcard-slot {
   flex: 1 1 auto;
 }
 
+/* Under a Drużyna member's name, on a line of its own (screens/party.js,
+   party-doing.js): what it is doing and until when, then, after a dot that
+   is not read aloud where the browser allows it, whether its player is in
+   the game. */
+.party-doing {
+  flex: 1 0 100%;
+  min-width: 0;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.party-presence::before {
+  content: '·';
+  content: '·' / '';
+  margin: 0 6px;
+}
+
 /* A guild member's rank by its name (1062; screens/guild.js): R4 and R3 in
    the leader's gold, as the party leader's mark, R2 in the System's blue
    (the author, 1017.2: „niech członek bedzie tak podświetlony a nie
