@@ -1,0 +1,23 @@
+{
+  "id": "perun-son-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "a young goddess of thunder, a young woman with light skin, long fair blond hair in a long thick braid lying flat on her back at rest, not flying and not sticking out, a beautiful sharp young woman's face, bareheaded, shining armour of polished gold shaped for a woman with a white lightning mark on the chest over brown leather, a deep crimson hood lying on the shoulders, a long deep crimson cape hanging behind from the shoulders, golden greaves and boots, no golden wheel, no lightning around the body, no bow and nothing in the hands, seen exactly from the side in a strict profile, facing and walking to the right, the nose pointing right and only one eye showing, the chest, belly and hips turned fully to the right and not towards the viewer, only the near arm showing, hanging relaxed beside the body with an empty loosely closed hand, the far arm hidden behind the body, the back and shoulders straight and upright, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the head to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/thunderer-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/perun-son-female.png",
+      "usage": "the character's look in detail: face, hair and braid, armour, crimson hood and cape and colours; the hands empty, without the golden wheel, the lightning and the bow"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen exactly from the side in profile, facing right, upright mid-step, not turned towards the viewer; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0809283664226532
+  },
+  "images": 4
+}

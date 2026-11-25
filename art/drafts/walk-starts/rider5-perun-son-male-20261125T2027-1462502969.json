@@ -1,0 +1,19 @@
+{
+  "id": "rider5-perun-son-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the man of the reference picture riding: a young god of thunder, light skin, long fair blond hair hanging straight down his back, a handsome sharp young face in clean profile, bareheaded, shining armour of polished gold with a white lightning mark on the chest over brown leather, a deep crimson hood lying on the shoulders, a long deep crimson cape hanging behind from the shoulders, golden greaves and boots, no bow, no golden wheel, no lightning around the body and nothing in the hands but the reins; sitting tall and upright astride a saddle that is not drawn, the back straight, not squatting and not crouching, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the knee bent at a right angle, the lower leg hanging vertically straight down from the knee, one whole foot at the bottom with the toes pointing right; the cloak and any long hair hanging down behind the back, not spread out; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the top of the head to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/perun-son-male.png",
+      "usage": "the character's look: this same man, his face, hair, golden armour, crimson hood and cape and colours, drawn the same way; not his standing pose and not the bow, the golden wheel and the lightning"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0810253418551551
+  },
+  "images": 4
+}
