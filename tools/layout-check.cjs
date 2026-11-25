@@ -4,8 +4,9 @@
 // numbers (level 146, almost a million gold, six-digit camp resources), a
 // long name, a build under way in the camp, orders on the Stół rozbiórki's queue and a guild of its own
 // with a long name (its fifteen other members each building, for the
-// shortcut to help on the Walka screen), and a companion hired in the
-// Kwatery, with its five
+// shortcut to help on the Walka screen), a Drużyna it leads with two busy
+// members of the longest names (their lines in the Drużyna and in the
+// Walka), and a companion hired in the Kwatery, with its five
 // places for items and amulets of big numbers in the bag for "Załóż z
 // plecaka" (one worn by the companion), a sword at +10 with three of the
 // Zaklinaczka's stars, an item of the longest name with a gem in it and
@@ -107,6 +108,7 @@ const SCREENS = [
   '#/osada/herbalist/cards',
   '#/osada/market/cards',
   '#/spolecznosc',
+  '#/spolecznosc/druzyna',
   '#/spolecznosc/ranking',
   '#/spolecznosc/slawa',
   '#/czat',
@@ -163,6 +165,7 @@ const TRANSLATED = new Set([
   '#/osada/herbalist/cards',
   '#/osada/market/cards',
   '#/spolecznosc',
+  '#/spolecznosc/druzyna',
   '#/spolecznosc/ranking',
   '#/spolecznosc/slawa',
   '#/czat',
@@ -525,6 +528,34 @@ async function main() {
         SELECT (SELECT id FROM characters WHERE name = '${marked}'), week, 123455 FROM fame_points WHERE character_id = (SELECT id FROM characters WHERE name = '${name}')`,
     ].join('; '),
   );
+  // A Drużyna the character leads (screens/party.js; 25.11.2026, on the
+  // report of gracz (poz. 120): what each member is doing and until when),
+  // with two members of the longest names, each of an account of its own,
+  // both busy, so that the Walka's line under „Z drużyną” names them with
+  // what keeps them home: one on the party's trip to the place of the
+  // longest name, its player away for 25 minutes; the other at Jubilerstwo
+  // for 30 hours (its end with its day), its player playing another of its
+  // characters now. Their class levels keep to the party's spread.
+  const mates = [`Wszechsławowska${stamp}`.slice(0, 20), `Dobrogniewiczka${stamp}`.slice(0, 20)];
+  const partyOwn = `(SELECT id FROM parties WHERE leader_id = (SELECT id FROM characters WHERE name = '${name}'))`;
+  sql(
+    [
+      ...mates.flatMap((mate, index) => [
+        `INSERT INTO users (login, password_hash, created_at, seen_at) VALUES ('druzyna${index}${stamp}', 'x', 1, ${index === 0 ? Date.now() - 25 * 60000 : Date.now()})`,
+        `INSERT INTO characters (user_id, role, name, name_key, class_id, appearance, level, class_level, position, hp, hp_at, created_at)
+          SELECT u.id, '${index === 0 ? 'player' : 'aside'}', '${mate}', '${mate.toLowerCase()}', '${index === 0 ? 'mage' : 'archer'}', 'female', 146, ${index === 0 ? 95 : 104}, c.position, c.hp, c.hp_at, 1
+          FROM users u, characters c WHERE u.login = 'druzyna${index}${stamp}' AND c.name = '${name}'`,
+      ]),
+      `INSERT INTO parties (leader_id, created_at) SELECT id, 1 FROM characters WHERE name = '${name}'`,
+      `INSERT INTO party_members (character_id, party_id, joined_at) SELECT id, ${partyOwn}, 1 FROM characters WHERE name = '${name}'`,
+      ...mates.map((mate, index) => `INSERT INTO party_members (character_id, party_id, joined_at) SELECT id, ${partyOwn}, ${index + 2} FROM characters WHERE name = '${mate}'`),
+      `INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options)
+        SELECT id, 'hunt', 'frozen-caves', 240, ${Date.now() - 600000}, ${Date.now() + 12000000}, 'layout', hp, json_object('party', json_object('id', ${partyOwn}, 'trip', ${Date.now() - 600000}))
+        FROM characters WHERE name = '${mates[0]}'`,
+      `INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options)
+        SELECT id, 'jewels', 'system-gem-works', 1800, ${Date.now()}, ${Date.now() + 30 * 3600000}, 'layout', hp, '{}' FROM characters WHERE name = '${mates[1]}'`,
+    ].join('; '),
+  );
   // The Arena's Karty (where CARDS is on): the first reserve's deck, the
   // starter cards at their top level, so it is a rival there; a match it
   // lost against the character's deck, among its deck's defences; and the
@@ -682,7 +713,7 @@ async function main() {
   }
   sql(`UPDATE characters SET level = 146, class_level = 99 WHERE name = '${otherNames[0]}'`);
   await first.close();
-  const names = [name, ...otherNames, marked, login, other, `Bractwo Żelaznych ${stamp}`, ...(hired?.name ? [hired.name] : [])];
+  const names = [name, ...otherNames, marked, ...mates, login, other, `Bractwo Żelaznych ${stamp}`, ...(hired?.name ? [hired.name] : [])];
 
   let problems = 0;
   for (const size of SIZES) {

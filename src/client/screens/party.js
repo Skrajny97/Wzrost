@@ -1,8 +1,9 @@
 // The Drużyna in the Społeczność (src/server/parties.js), from the character
 // level of data/unlocks.json (the 10th since 0.1.69, 642 B): the
 // invitations waiting for this character; its party with the
-// members and their state (free, on an exploration, at a profession's
-// work), the leader marked, and for the leader "Przekaż przywództwo" and
+// members, under each what it is doing and until when, and whether its
+// player is in the game (memberLine, ../party-doing.js), the leader marked,
+// and for the leader "Przekaż przywództwo" and
 // "Usuń z drużyny" by each other member; the friends to invite at a tap and a name to invite; the
 // invitations sent; and "Opuść drużynę". The leader sends the party out
 // from "Wyrusz" in the Walka (screens/combat.js, "Z drużyną"); each other
@@ -15,8 +16,9 @@ import { fill, h, icon } from '../dom.js';
 import { formatMinutes, formatNumber } from '../format.js';
 import { t } from '../i18n.js';
 import { CLASS_ICONS } from '../icons.js';
+import { doingText, presenceText } from '../party-doing.js';
 import { openProfile } from '../profile.js';
-import { call, isUnlocked, state, unlockInfo } from '../state.js';
+import { call, isUnlocked, serverNow, state, unlockInfo } from '../state.js';
 import { confirmAction, framedName, guildTag, howItWorks, toast, withButton } from '../ui.js';
 
 // Who goes on the party's exploration and who stays (the author's words of
@@ -37,17 +39,13 @@ const FULL_BAG = 'Łupy z wyprawy drużyny trafiają do plecaka, dopóki jest w 
 // 828 B goes like (11.11.2026), under "Jak to działa?".
 const COMPANIONS_STAY = 'Póki jesteś w drużynie, towarzysze zostają w Kwaterach i nie zdobywają XP ani relacji z wypraw.';
 
-// A member's dot (the Znajomi's colours, styles.css) and its words; the
-// busy ones say it beside the name too, as they stay home when the party
-// goes (screens/combat.js). The words are shown in the page's language
-// (t()), here and in the Walka. Which of its player's characters is played
-// does not count: since 0.4.59 one set aside goes on the party's trips too
-// (src/server/parties.js), so no member is 'aside' any more.
-// One meditating in a Kultywacja (cultivation.js) is busy too.
-const DOTS = { free: 'online', away: 'busy', working: 'busy', meditating: 'busy' };
-const STATES = { free: 'może iść na wyprawę', away: 'na wyprawie', working: 'pracuje w profesji', meditating: 'medytuje w Kultywacji' };
-const stateText = (status) => (STATES[status] ? t(STATES[status]) : status);
-export const BUSY = { away: 'na wyprawie', working: 'w profesji', meditating: 'w Kultywacji' };
+// A member's dot (the Znajomi's colours, styles.css): green while it may go
+// on the party's trip, yellow while it is busy (on an exploration, at a
+// profession's work, in a Kultywacja, in the Karczma as a mercenary), its
+// words what it is doing (../party-doing.js). Whether its player is in the
+// game does not count: one whose player is away goes too, and since 0.4.59
+// one set aside (the line under its name says which).
+const DOTS = { free: 'online', away: 'busy', working: 'busy', meditating: 'busy', serving: 'busy' };
 
 // The class levels' spread (the author: "Rozpiętość poziomu klas w Drużynie
 // maks 5 lvl", "niech nie będzie możliwości w ogole bycia w drużynie z kimś
@@ -200,11 +198,14 @@ export function mountParty(container) {
   };
   const button = (label, run, kind = 'world') => h('button', { type: 'button', class: `button button--${kind} button--small`, text: label, onClick: (event) => withButton(event.currentTarget, run) });
 
+  // A member's dot says in words what it is doing; a friend's from the
+  // Znajomi (inviteCard) its own state.
+  const dotWords = (person) => (Object.hasOwn(person, 'leader') ? doingText(person, serverNow()) : person.status);
   const who = (person, ...more) =>
     h(
       'div',
       { class: 'friend-who' },
-      person.status && h('span', { class: `friend-status friend-status--${DOTS[person.status] ?? person.status}`, role: 'img', 'aria-label': stateText(person.status), title: stateText(person.status) }),
+      person.status && h('span', { class: `friend-status friend-status--${DOTS[person.status] ?? person.status}`, role: 'img', 'aria-label': dotWords(person), title: dotWords(person) }),
       icon(CLASS_ICONS[person.classId] ?? 'person', { size: 16, className: 'chat-class' }),
       framedName(
         h('button', {
@@ -224,9 +225,18 @@ export function mountParty(container) {
           class: 'chat-level',
           text: person.classLevel ? t('poz. {level} · klasa {classLevel}', { level: person.level, classLevel: person.classLevel }) : t('poz. {level}', { level: person.level }),
         }),
-      BUSY[person.status] && h('span', { class: 'chat-level party-busy', text: t(BUSY[person.status]) }),
       more,
     );
+
+  // Under a member's name, on a line of its own: what it is doing and until
+  // when, and, but for the character itself, whether its player is in the
+  // game (../party-doing.js): „na wyprawie drużyny: Smolne Doły, wróci o
+  // 13:31 · poza grą od 25 min”.
+  const memberLine = (member) => {
+    const now = serverNow();
+    const presence = member.own ? null : presenceText(member, now);
+    return h('span', { class: 'party-doing' }, h('span', { text: doingText(member, now) }), presence && h('span', { class: 'party-presence', text: presence }));
+  };
 
   function invitesCard() {
     if (view.invites.length === 0) return null;
@@ -284,7 +294,7 @@ export function mountParty(container) {
           h(
             'li',
             { class: 'friend' },
-            who(member, member.leader && h('span', { class: 'party-leader', text: t('Lider') })),
+            who(member, member.leader && h('span', { class: 'party-leader', text: t('Lider') }), memberLine(member)),
             own?.leader &&
               !member.own &&
               h(

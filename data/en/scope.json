@@ -975,6 +975,7 @@
     "src/client/screens/community.js",
     "src/client/screens/friends.js",
     "src/client/screens/party.js",
+    "src/client/party-doing.js",
     "src/client/screens/ranking.js",
     "src/client/screens/shop.js",
     "src/client/screens/shop-points.js",
