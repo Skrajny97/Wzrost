@@ -883,7 +883,7 @@
     "wilds-father-female": {
       "start": "art/references/walks/start/wilds-father-female.png",
       "pose": 2,
-      "description": "an ancient forest goddess, a slim woman with light skin, long silver-grey hair in two braids woven with moss and small flowers hanging straight down her back at rest, not flying, eyes glowing green, a crown of branching brown antlers with small green leaves and white blossoms, a long pale grey robe like birch bark with a green sash, a long cloak of living green vines and moss with small pink and white flowers hanging behind from the shoulders, brown leather boots, a kind wise woman's face in clean profile with one eye, no staff, no roots, no tree of light, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+      "description": "an ancient forest goddess, a slim woman with light skin, long silver-grey hair in two braids woven with moss and small flowers, both braids lying flat on her back under the cloak, hanging straight down at rest, not flying, not swinging, not sticking out, eyes glowing green, a crown of branching brown antlers with small green leaves and white blossoms, a long pale grey robe like birch bark with a green sash, a long cloak of living green vines and moss with small pink and white flowers hanging behind from the shoulders, brown leather boots, a kind wise woman's face in clean profile with one eye, no staff, no roots, no tree of light, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     },
     "seraph-male": {
       "start": "art/references/walks/start/seraph-male.png",
@@ -913,7 +913,7 @@
     "all-seeing-female": {
       "start": "art/references/walks/start/all-seeing-female.png",
       "pose": 2,
-      "description": "a young prophetess who sees every fate, a young woman with light skin, long golden hair hanging straight down her back at rest, not flying, eyes glowing gold, a golden crown, a golden ring of light with runes close behind the head, no wider than the shoulders, long robes of black and gold covered with small golden embroidered eyes, a large golden eye on the chest, a long black and gold cloak hanging behind from the shoulders, brown boots, a beautiful calm young woman's face in clean profile with one eye, no staff, no flying pages, no cards, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+      "description": "a young prophetess who sees every fate, a young woman with light skin, long golden hair lying flat on her back and the cloak, hanging straight down at rest, not flying, not swinging, not blowing back, eyes glowing gold, a golden crown, a golden ring of light with runes close behind the head, no wider than the shoulders, long robes of black and gold covered with small golden embroidered eyes, a large golden eye on the chest, a long black and gold cloak hanging behind from the shoulders, brown boots, a beautiful calm young woman's face in clean profile with one eye, no staff, no flying pages, no cards, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     },
     "soul-lord-male": {
       "start": "art/references/walks/start/soul-lord-male.png",
