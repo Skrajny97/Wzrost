@@ -8,14 +8,20 @@
 // brackets in the Walka's line of those who stay home
 // (src/client/party-doing.js). A leader who calls itself back from the
 // party's trip is home at once, while the others go on with the trip to its
-// end (0.0.75, trips.js): the members then say when they are back.
+// end (0.0.75, trips.js): the members then say when they are back. A
+// mercenary's offer or service over keeps nobody home since 25.11.2026
+// (0.5.2: „nic nie blokuje drużyny”): the party's setting out closes it as
+// the member's own close in the Karczma would, its pay once
+// (src/server/mercenaries.js, closeService).
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
 import { clockAt, doingText, presenceText } from '../src/client/party-doing.js';
 import { dateTimeFormat, timeFormat } from '../src/client/format.js';
+import { partyHunt } from '../src/server/parties.js';
 import { content } from './helpers/content.js';
+import { meanwhile, posted } from './helpers/meanwhile.js';
 import { useServer } from './helpers/server.js';
 
 const MINUTE = 60000;
@@ -39,7 +45,6 @@ describe("a member's words on the page", () => {
     assert.equal(doingText({ status: 'meditating', doing: { kind: 'cultivation', until } }, now), `medytuje w Kultywacji do ${at}`);
     assert.equal(doingText({ status: 'serving', doing: { kind: 'mercenary', until } }, now), `czeka w Karczmie na werbunek do ${at}`);
     assert.equal(doingText({ status: 'serving', doing: { kind: 'mercenary', hired: true, until } }, now), `na usłudze najemnej do ${at}`);
-    assert.equal(doingText({ status: 'serving', doing: { kind: 'mercenary', ended: true } }, now), 'usługa najemna skończona, do zamknięcia w Karczmie');
   });
 
   test('a time 12 hours away or more has its day too', () => {
@@ -115,7 +120,17 @@ describe('the Drużyna says what each member is doing', () => {
     assert.equal(presenceText(druh, now), 'poza grą od 25 min');
   });
 
-  test('a mercenary is no longer „at a profession\'s work”: waiting to be hired, serving, and over with its close waiting in the Karczma', async () => {
+  // Druh offering itself in the Karczma for an hour, hired (for `gold`) or
+  // not, its time over.
+  const offerOver = async (gold) => {
+    const perHour = content.settlement.mercenaries.price.minPerLevel * 30;
+    assert.equal((await as('druh', 'POST', '/api/mercenary/offer', { hours: 1, perHour })).status, 200);
+    if (gold) await (await sql(`UPDATE activities SET options = json_set(options, '$.hired', json(?)) WHERE kind = 'mercenary'`, JSON.stringify({ by: 1, name: 'Ktoś', area: 'Omszałe Głazy', gold }))).run();
+    await (await sql("UPDATE activities SET started_at = started_at - ?, ends_at = ends_at - ? WHERE kind = 'mercenary'", 2 * HOUR, 2 * HOUR)).run();
+  };
+  const gold = async (name) => (await sql('SELECT gold FROM characters WHERE name = ?', name)).first().then((row) => row.gold);
+
+  test('a mercenary is no longer „at a profession\'s work”: waiting to be hired, then serving', async () => {
     await join('druh', 'Druh');
     const perHour = content.settlement.mercenaries.price.minPerLevel * 30;
     assert.equal((await as('druh', 'POST', '/api/mercenary/offer', { hours: 1, perHour })).status, 200);
@@ -125,15 +140,64 @@ describe('the Drużyna says what each member is doing', () => {
     // Hired by another player: it serves to the end of that exploration.
     await (await sql(`UPDATE activities SET options = json_set(options, '$.hired', json('{"by":1,"name":"Ktoś","area":"Omszałe Głazy","gold":60}')) WHERE kind = 'mercenary'`)).run();
     assert.deepEqual((await member('Druh')).doing, { kind: 'mercenary', hired: true, until: (await activity('Druh')).ends_at });
-    // Over: its pay waits in the Karczma for its own player, and until then
-    // it stays home.
-    await (await sql("UPDATE activities SET started_at = started_at - ?, ends_at = ends_at - ? WHERE kind = 'mercenary'", 2 * HOUR, 2 * HOUR)).run();
-    const over = await member('Druh');
-    assert.equal(over.status, 'serving');
-    assert.deepEqual(over.doing, { kind: 'mercenary', hired: true, ended: true });
     const went = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 30 });
     assert.equal(went.data.error.code, 'nobody_free');
-    assert.equal((await activity('Druh')).kind, 'mercenary');
+  });
+
+  test('a service over keeps nobody home: the setting out closes it as the Karczma would, its pay once, and the member hears of it', async () => {
+    await join('druh', 'Druh');
+    await offerOver(60);
+    // Free, „może iść na wyprawę”, though its player has not closed it.
+    const over = await member('Druh');
+    assert.deepEqual([over.status, over.doing], ['free', undefined]);
+    const before = await gold('Druh');
+    const went = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 30 });
+    assert.equal(went.status, 201, JSON.stringify(went.data).slice(0, 400));
+    assert.deepEqual(went.data.went, ['Druh']);
+    // Paid as „Odbierz zapłatę” pays: the fee, and the service gone.
+    assert.equal(await gold('Druh'), before + 60);
+    const trip = await activity('Druh');
+    assert.equal(trip.kind, 'hunt');
+    // Its Walka tells it what the party's setting out closed for it.
+    assert.deepEqual((await as('druh', 'GET', '/api/character')).data.character.activity.party.claimed, { kind: 'mercenary', gold: 60 });
+    // Nothing doubled: its own close finds nothing left.
+    const again = await as('druh', 'POST', '/api/mercenary/claim');
+    assert.equal(again.status, 409);
+    assert.equal(again.data.error.code, 'not_offering');
+    assert.equal(await gold('Druh'), before + 60);
+  });
+
+  test('an offer nobody took is closed with no pay', async () => {
+    await join('druh', 'Druh');
+    await offerOver(0);
+    const before = await gold('Druh');
+    assert.deepEqual((await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 30 })).data.went, ['Druh']);
+    assert.equal(await gold('Druh'), before);
+    assert.deepEqual((await as('druh', 'GET', '/api/character')).data.character.activity.party.claimed, { kind: 'mercenary', gold: 0 });
+  });
+
+  test('closed by its own player at the very moment the party sets out: paid once, and it goes along', async () => {
+    await join('druh', 'Druh');
+    await offerOver(60);
+    const before = await gold('Druh');
+    // The member's own „Odbierz zapłatę” lands just before the setting
+    // out's close of the same service.
+    const database = await db();
+    let own = null;
+    const racing = meanwhile(database, /DELETE FROM activities WHERE character_id = \? AND kind = 'mercenary'/, async () => {
+      own = await as('druh', 'POST', '/api/mercenary/claim');
+    });
+    const answer = await partyHunt({ request: posted('/api/party/hunt', cookies.lider, { areaId: 'windfalls-edge', minutes: 30 }), env: { DB: racing }, now: Date.now() });
+    assert.ok(racing.done);
+    assert.equal(own.status, 200, JSON.stringify(own.data));
+    assert.equal(own.data.paid, 60);
+    assert.equal(answer.status, 201);
+    assert.deepEqual((await answer.json()).went, ['Druh']);
+    assert.equal(await gold('Druh'), before + 60);
+    const trip = await activity('Druh');
+    assert.equal(trip.kind, 'hunt');
+    // Its own close told it already: no mark from the party.
+    assert.equal(JSON.parse(trip.options).claimed, undefined);
   });
 
   test("a leader called back from the party's trip is home at once; the others go on to its end and say so, one on its own exploration says that", async () => {

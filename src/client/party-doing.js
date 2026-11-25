@@ -37,8 +37,9 @@ export function doingText(member, now, { place = true } = {}) {
       return doing.profession ? t('pracuje w profesji {profession} do {time}', { profession: doing.profession, time }) : t('pracuje w profesji do {time}', { time });
     case 'cultivation':
       return t('medytuje w Kultywacji do {time}', { time });
+    // One whose offer or service is over is free: the party's setting out
+    // closes it (src/server/parties.js).
     case 'mercenary':
-      if (doing.ended) return t('usługa najemna skończona, do zamknięcia w Karczmie');
       return doing.hired ? t('na usłudze najemnej do {time}', { time }) : t('czeka w Karczmie na werbunek do {time}', { time });
     default:
       return t('zajęte');

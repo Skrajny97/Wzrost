@@ -94,6 +94,7 @@ import { nameColorOf, wayLook } from './cosmetics.js';
 import { settlementOn } from './features.js';
 import { guildTagSql } from './guilds.js';
 import { beginHunt, finishActivity } from './hunts.js';
+import { closeService } from './mercenaries.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { accountLanguage, runInLanguage, t } from './i18n.js';
@@ -233,10 +234,14 @@ export async function partyOf(db, characterId) {
   return { id: row.id, leaderId: row.leader_id, memberIds: staying };
 }
 
-// Whether a member's activity has ended with a report to claim: an
-// exploration or a profession's work, not a mercenary's offer or service,
-// whose close waits in the Karczma (mercenaries.js).
-const reportWaits = (kind, endsAt, now) => kind !== 'mercenary' && endsAt <= now;
+// Whether a member's activity is over, waiting for its claim or its close:
+// the report of an exploration, a profession's work or a Kultywacja, which
+// the party's setting out claims, or a mercenary's offer or service in the
+// Karczma, which it closes as the member's own close there would
+// (claimForTrip). Since 25.11.2026 (0.5.2: „nic nie blokuje drużyny”);
+// before, a mercenary's over kept the member home until its player closed
+// it in the Karczma.
+const overWaiting = (endsAt, now) => endsAt <= now;
 
 // A member's state for the party's list: free (at home, or back with its
 // report waiting, which the party's setting out claims: partyHunt), away
@@ -251,7 +256,7 @@ const reportWaits = (kind, endsAt, now) => kind !== 'mercenary' && endsAt <= now
 const BUSY_STATUS = { hunt: 'away', cultivation: 'meditating', mercenary: 'serving' };
 
 function memberStatus(row, now) {
-  if (!row.activity || reportWaits(row.activity, row.activity_ends, now)) return 'free';
+  if (!row.activity || overWaiting(row.activity_ends, now)) return 'free';
   return BUSY_STATUS[row.activity] ?? 'working';
 }
 
@@ -265,16 +270,15 @@ function memberStatus(row, now) {
 // too, calls itself back (trips.js); 'hunt': on an exploration of its own;
 // each with its `place`. 'work': at a profession's work, with the profession's name
 // (`profession`). 'cultivation': in a Kultywacja. 'mercenary': offering
-// itself in the Karczma, or serving one who hired it (`hired`); an offer or
-// a service over (`ended`, with no `until`) waits for its own player to
-// close it in the Karczma, and the member stays home until then. A Szybkie
-// and a Błyskawiczne polowanie are over as they start (hunts.js), so none
-// is ever away on one.
+// itself in the Karczma, or serving one who hired it (`hired`); one whose
+// offer or service is over is free, as the party's setting out closes it
+// (overWaiting). A Szybkie and a Błyskawiczne polowanie are over as they
+// start (hunts.js), so none is ever away on one.
 function memberDoing(row, partyId, now) {
   if (memberStatus(row, now) === 'free') return null;
   const kind = row.activity;
-  if (kind === 'mercenary') return { kind, ...(row.activity_hired ? { hired: true } : {}), ...(row.activity_ends > now ? { until: row.activity_ends } : { ended: true }) };
   const until = row.activity_ends;
+  if (kind === 'mercenary') return { kind, ...(row.activity_hired ? { hired: true } : {}), until };
   if (kind === 'cultivation') return { kind, until };
   if (kind === 'hunt') {
     const place = areaFor(row.activity_region, row.level, content())?.name;
@@ -681,8 +685,9 @@ function memberPotions(row, minutes) {
 // The others of a Drużyna as its trip would take them now, for the threat
 // of the trip (hunts.js: huntOptions; gracz (poz. 95), 24.11.2026: „żeby
 // system przeliczał ryzyko wyprawy dla drużyny razem z innymi graczami w
-// drużynie”): the members free now, or back with a report waiting, as the
-// setting out takes them (setOut), each with its character, its gear, its
+// drużynie”): the members free now, or back with a report or a mercenary's
+// close waiting, as the setting out takes them (setOut), each with its
+// character, its gear, its
 // HP as a share of its most in tenths (so the threat is asked anew only as
 // it rests by a tenth) and the potions of its choice (memberPotions; those
 // of the longest trip, the threat's trips taking of each one a fight). Only
@@ -692,7 +697,7 @@ export async function threatCrew(db, player, now) {
   const party = await partyOf(db, player.row.id);
   if (!party || party.leaderId !== player.row.id) return null;
   const others = (await Promise.all(party.memberIds.filter((id) => id !== player.row.id).map((id) => loadCharacter(db, id)))).filter(Boolean);
-  const going = others.filter((other) => !other.activity || reportWaits(other.activity.kind, other.activity.ends_at, now));
+  const going = others.filter((other) => !other.activity || overWaiting(other.activity.ends_at, now));
   if (going.length === 0) return null;
   const longest = content().balance.hunt.maxMinutes;
   return going.map((member) => {
@@ -834,7 +839,11 @@ function snapshot(member, now) {
 // each one's Walka (characters.party_report) instead of `report`; `settled`
 // names them all. Its party event, waiting for the trip's leader, does not
 // hold the party up: it settles itself with its `auto` option (`forTrip`;
-// party-events.js).
+// party-events.js). Since 25.11.2026 a mercenary's offer or service over is
+// closed so too, exactly as the member's own close in the Karczma closes it
+// (closeService in mercenaries.js), with its pay; `report` then says so to
+// the member's Walka: { kind: 'mercenary', gold }. Two closes at once pay
+// once: the other fails, and the member, read again, goes.
 async function claimForTrip(db, member, now, leader) {
   const id = member.row.id;
   const user = await db.prepare('SELECT language FROM users WHERE id = ?').bind(member.row.user_id).first();
@@ -848,6 +857,11 @@ async function claimForTrip(db, member, now, leader) {
       // and no other character's report is claimed for it.
       if (member.row.id !== id || !member.activity) return {};
       const kind = member.activity.kind;
+      if (kind === 'mercenary') {
+        const gold = await closeService(db, member.row, member.activity);
+        const after = await loadCharacter(db, id);
+        return after ? { member: after, report: { kind, gold } } : {};
+      }
       const done = await finishActivity(db, member, now, { forTrip: true, claimer: { id: leader.id, name: leader.name } });
       if (done?.event) return { event: true };
       // Played or set aside, it goes (0.4.59).
@@ -865,7 +879,9 @@ async function claimForTrip(db, member, now, leader) {
 // POST /api/party/hunt { areaId, minutes, ... as "Wyrusz" }: the leader
 // sends the party out. The members free now go, and those back with their
 // report waiting, claimed first (claimForTrip) once the leader's choices
-// are checked; one whose exploration ends in an event stays home, and the
+// are checked, as are those whose mercenary's offer or service is over,
+// closed first as in the Karczma (since 25.11.2026); one whose exploration
+// ends in an event stays home, and the
 // answer says it must choose there first (`notes`). Each of them, the
 // leader too, must have the place and the length open, so the party goes
 // only as far and as long as its lowest member may, and waits as long as
@@ -934,7 +950,7 @@ async function setOut(db, player, body, now, claimed) {
   const others = (await Promise.all(party.memberIds.filter((id) => id !== player.row.id).map((id) => loadCharacter(db, id)))).filter(Boolean);
   // Every free member goes, also one whose player plays another character
   // now: its report waits for it there (0.4.59).
-  const going = others.filter((other) => !other.activity || reportWaits(other.activity.kind, other.activity.ends_at, now));
+  const going = others.filter((other) => !other.activity || overWaiting(other.activity.ends_at, now));
   if (going.length === 0) throw new ApiError(409, 'nobody_free', 'Nikt z drużyny nie jest teraz wolny. Odznacz „Z drużyną” albo poczekaj, aż ktoś skończy swoje zajęcia.');
   const area = typeof body.areaId === 'string' ? areaFor(body.areaId, player.row.level, content()) : undefined;
   if (!area) throw new ApiError(400, 'invalid_area', 'Wybierz miejsce wyprawy.');
@@ -955,7 +971,8 @@ async function setOut(db, player, body, now, claimed) {
   // review) and claims nobody's report.
   await beginHunt(db, player, body, now, { party: { id: party.id }, check: true });
   // Then the members back from an exploration or a work: each report
-  // claimed as its own "Odbierz raport" would claim it, the member as it is
+  // claimed as its own "Odbierz raport" would claim it (a mercenary's offer
+  // or service over closed as in the Karczma), the member as it is
   // after that. One that got busy meanwhile stays home, and so does one
   // whose exploration's event waits for its own choice (an exploration of
   // its own: a trip ends in no event, hunts.js).

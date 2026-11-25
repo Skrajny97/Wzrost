@@ -50,7 +50,7 @@ import { formatWait, stableNote, stableWait } from '../stable.js';
 import { confirmAction, lockLabel, openSheet, systemLink, systemPanel, toast, withButton } from '../ui.js';
 import { openEvent } from '../event.js';
 import { partyFree, partyWent, skipLines } from './party.js';
-import { doingText } from '../party-doing.js';
+import { clockAt, doingText } from '../party-doing.js';
 import { mercenaryChoice, servicePanel } from '../mercenaries.js';
 import { combatModes } from '../combat-modes.js';
 import { weekLine } from '../weeks.js';
@@ -650,9 +650,19 @@ export function mountCombat(container, { params, navigate }) {
       text: t('Przerwij eksplorację'),
       onClick: async (event) => {
         const button = event.currentTarget;
+        // On a Drużyna's trip only the one who stops comes back: the others
+        // who went go on with it to its end (0.0.75, trips.js), and it says
+        // so, with when they are back (25.11.2026: a leader who had stopped
+        // saw its members „na wyprawie” and could take none of them).
+        const goOn = (activity.party?.names ?? []).some((name) => name !== state.character.name);
         const sure = await confirmAction({
           title: t('Przerwać eksplorację?'),
-          text: t('Postać wróci od razu, bez doświadczenia, złota i łupów.'),
+          text: [
+            t('Postać wróci od razu, bez doświadczenia, złota i łupów.'),
+            goOn && t('Wraca tylko ona: reszta drużyny idzie dalej i wróci o {time}.', { time: clockAt(activity.endsAt, serverNow()) }),
+          ]
+            .filter(Boolean)
+            .join(' '),
           confirmLabel: t('Przerwij'),
           danger: true,
         });
@@ -1405,7 +1415,18 @@ export function mountCombat(container, { params, navigate }) {
   // that report, in the Dziennik as any other.
   function partyClaimed(activity) {
     const claimed = activity.party?.claimed;
-    return claimed ? systemPanel(t('Twój czekający raport został odebrany, gdy drużyna wyruszała.'), systemLink(`#/raport/${claimed.id}`, t('Zobacz raport'))) : null;
+    if (!claimed) return null;
+    // A mercenary's offer or service over, closed as the party set out, as
+    // its own close in the Karczma would (src/server/parties.js,
+    // claimForTrip; 25.11.2026): its pay, or the offer nobody took.
+    if (claimed.kind === 'mercenary') {
+      return systemPanel(
+        claimed.gold > 0
+          ? t('Twoja zapłata za usługę najemną została odebrana, gdy drużyna wyruszała: +{gold} zł.', { gold: formatNumber(claimed.gold) })
+          : t('Twoje wygasłe ogłoszenie najemnika zostało zamknięte, gdy drużyna wyruszała.'),
+      );
+    }
+    return systemPanel(t('Twój czekający raport został odebrany, gdy drużyna wyruszała.'), systemLink(`#/raport/${claimed.id}`, t('Zobacz raport')));
   }
 
   // The box "Z drużyną" over "Wyrusz", for a party's leader with members

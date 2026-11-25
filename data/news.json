@@ -1790,6 +1790,11 @@
       "id": "0.5.23",
       "title": "Wersja 0.5.23",
       "body": "- Drużyna: pod imieniem każdego członka widać, co teraz robi i do kiedy, np. „na wyprawie drużyny: Smolne Doły, wróci o 13:31” albo „medytuje w Kultywacji do 14:00”, a także czy jest w grze („poza grą od 25 min”). Członek, który jest najemnikiem, nie ma już błędnego napisu „pracuje w profesji”.\n- Walka: lider widzi przy każdym, kto nie pójdzie na wyprawę drużyny, co robi i o której będzie wolny.\n- Przypomnienie: kto przerwie wyprawę drużyny, sam wraca od razu, a reszta drużyny idzie dalej aż do jej końca. Teraz w Drużynie widać, o której wrócą."
+    },
+    {
+      "id": "0.5.24",
+      "title": "Wersja 0.5.24",
+      "body": "- Drużyna: gdy przerywasz wyprawę drużyny, okienko mówi wprost, że wraca tylko Twoja postać, a reszta drużyny idzie dalej, i podaje, o której wróci.\n- Drużyna: skończona usługa najemna nie trzyma już członka w domu. Gdy lider wyrusza, ten członek od razu dostaje swoją zapłatę i idzie z drużyną."
     }
   ]
 }
