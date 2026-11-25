@@ -1,0 +1,14 @@
+{
+  "id": "world-shield-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Shield of the World, a godlike colossus who has become a living fortress, far bigger and heavier than any knight, massive armour of black basalt and burnished bronze carved like the walls, gates and towers of an ancient hillfort, molten golden light blazing from every crack and seam of the armour as if from the heart of a mountain, glowing golden runes all over it, eyes glowing white-gold, an open-faced helmet crowned with golden battlements, huge pauldrons shaped like two round watchtowers, holding a gigantic round shield shaped like a fortress gate with a glowing golden portal at its centre and a huge stone warhammer with golden runes, a ring of floating stone blocks and glowing runes behind her back close to the body, a warm golden aura behind her, a palette of black basalt, bronze and blazing gold; adult woman, light skin, dark brown hair tied back in a high ponytail, a strong determined face; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08054088226954143
+  },
+  "images": 4
+}

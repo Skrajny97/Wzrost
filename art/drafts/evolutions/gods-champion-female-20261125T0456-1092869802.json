@@ -1,0 +1,14 @@
+{
+  "id": "gods-champion-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Champion of the Gods, a radiant demigod of victory, armour of white marble and blazing gold carved with reliefs of the gods, a great golden lion head on the breastplate, a towering crown of golden sun rays, a huge blazing sunburst behind her like a halo, two great wings of golden light spread behind her shoulders close to the body, a long sapphire blue cape strewn with golden stars, eyes glowing gold, holding a golden sword shining with white light and a round golden shield with a rising sun sending out rays, a palette of white marble, radiant gold and deep sapphire blue; adult woman, light tan skin, dark hair in a long braid, bareheaded with the whole face clearly visible; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0804483711189694
+  },
+  "images": 4
+}

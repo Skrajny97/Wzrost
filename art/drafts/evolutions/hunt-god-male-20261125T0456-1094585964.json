@@ -1,0 +1,14 @@
+{
+  "id": "hunt-god-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the god of the Hunt, a primeval forest god of the wild hunt, a mantle made of the pelt of a giant white wolf, huge curved aurochs horns rising from his head with glowing golden runes, armour of ivory bone and gold, a necklace of great fangs, eyes glowing amber, a pack of spectral white wolves made of glowing light running at his feet and around his legs, holding a great bow made of one golden antler, a palette of ivory white, gold, amber and deep crimson; adult man, light tan skin, light brown hair and a short light brown beard, a rugged face; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08045057678222657
+  },
+  "images": 4
+}

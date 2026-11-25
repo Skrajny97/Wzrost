@@ -1,0 +1,14 @@
+{
+  "id": "dark-king-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the King of Darkness, the king of a night without stars, a black eclipse sun with a thin silver corona burning behind his head, a tall crown of black thorns trailing darkness like smoke, huge tattered wings of living shadow, a cloak dissolving into a starless black void, black armour with glowing silver-white lines, eyes glowing violet, holding two short straight daggers of pure black shadow, small daggers, not swords and not curved blades, one in each hand, a palette of pure black, silver-white light and a little violet; young man, pale skin, long silver hair, a sharp elegant face; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08045254365603129
+  },
+  "images": 4
+}

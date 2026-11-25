@@ -1,0 +1,14 @@
+{
+  "id": "heaven-sword-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Sword of Heaven, a celestial knight of holy fire, armour of polished silver and pale gold with glowing white runes, white light pouring from the joints of the armour, a ring of floating swords of white and ice-blue holy fire behind his back close to the body, eyes burning with white fire, a long white cloak, holding a gigantic sword made of white and blue holy flame, a palette of silver, white and pale ice-blue fire; adult man, warm brown skin, short dark hair, a stern scarred face; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08071795908610026
+  },
+  "images": 4
+}

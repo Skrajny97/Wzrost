@@ -1,0 +1,14 @@
+{
+  "id": "soul-lord-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Lady of Souls, a reaper goddess of death, a hood of black smoke with a silver skull mask, a storm of hundreds of pale white souls swirling behind her like enormous wings close to the body, armour of white bone and black shadow, eyes glowing blood red behind the mask, two huge scythes with blades of glowing crimson light, crimson soul fire around her hands, a palette of black, bone white and blood crimson; adult woman, lean, her face hidden by the silver mask, a few strands of dark hair; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08075412803226047
+  },
+  "images": 4
+}

@@ -1,0 +1,14 @@
+{
+  "id": "star-lord-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Lord of the Stars, a celestial god made of the night sky, his long cloak and the hem of his robe dissolving into a swirling violet and magenta galaxy full of bright stars, ornate armour of radiant pearl white and gold, a diadem of seven floating golden stars above his head, a huge glowing golden crescent moon behind him as a halo, two wings made of glowing constellation lines and stars, eyes glowing white, holding a tall bow of pure white light with an arrow like a falling star with a fiery tail, the whole bow inside the image, a palette of deep violet, magenta, gold and white starlight; young man, light tan skin, black hair tied back in a ponytail, a lean face; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08074099018838671
+  },
+  "images": 4
+}

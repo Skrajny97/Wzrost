@@ -1,0 +1,14 @@
+{
+  "id": "demiurge-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Demiurge, the creator of worlds, a cosmic goddess whose robes are the deep black of space full of newborn stars and golden nebulae, four small glowing worlds of fire, ice, storm and stone orbiting around her, a great ring of golden light and runes behind her, a crown of white crystal shining with light, eyes glowing white, holding a tall staff topped with a blazing newborn sun, floating above the ground, a palette of deep cosmic black, gold and white light with small bright elemental colours; adult woman, tan skin, long dark brown hair, a wise strong face; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.080866819302241
+  },
+  "images": 4
+}

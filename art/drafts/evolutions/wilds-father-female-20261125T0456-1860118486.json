@@ -1,0 +1,14 @@
+{
+  "id": "wilds-father-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Mother of the Wilds, an ancient forest goddess, her robe turning into living roots and moss at the hem, a great crown of antlers sprouting young green leaves and glowing white blossoms, a cloak of living vines with glowing pink and white flowers, glowing green eyes, golden spirit lights and fireflies drifting around her, a great tree of golden light branching behind her close to the body, holding a staff from which a small blossoming tree grows, a palette of silver birch bark, soft gold light, pink and white blossoms and fresh green; adult woman, light skin, long silver-grey hair in braids woven with moss and small flowers, a kind wise face; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08056008166737026
+  },
+  "images": 4
+}

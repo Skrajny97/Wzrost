@@ -1,0 +1,14 @@
+{
+  "id": "navia-emperor-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Emperor of Nav, the undead emperor of the slavic underworld, a colossal crown of black antlers and bones blazing with green soul fire, long robes of ash-grey mist and tarnished gold fading into smoke, a chain of skulls across the chest, a huge cloud of ghostly green souls rising behind him like a dark throne close to the body, eyes glowing green, holding a tall bone staff with a lantern in which a captured soul burns, a palette of ash grey, tarnished gold, bone and green fire; adult man, gaunt, very pale grey skin, sunken cheeks, long black hair; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08086518653233846
+  },
+  "images": 4
+}
