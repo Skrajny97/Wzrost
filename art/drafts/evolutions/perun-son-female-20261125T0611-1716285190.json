@@ -1,0 +1,19 @@
+{
+  "id": "perun-son-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Daughter of Perun, a young goddess of thunder, a bold clean silhouette with big simple shapes and strong contrast, a huge forked bolt of golden lightning arcing over her head like a crown of thunder, eyes blazing white, a golden oak-leaf wreath, a sleek cuirass of dark bronze and gold with a lightning emblem, a long deep crimson cape flowing behind her, holding a great bow of dark oak split by a glowing golden crack of lightning with an arrow of pure white lightning, clean readable pixel art with a few large details and no clutter, a palette of deep crimson, dark bronze, gold and white lightning; young woman, light skin, long fair blond hair in a braid, a beautiful sharp young face, bareheaded, her face clearly visible, well lit and well drawn, with distinct eyes, eyebrows, nose and mouth, not in shadow; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/perun-son-male-draft.png",
+      "usage": "the same design as this man, drawn as a woman: the same outfit, colours, everything around the figure and pose, a slimmer feminine figure; she keeps her own face, skin and hair as described"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08084660993682014
+  },
+  "images": 4
+}

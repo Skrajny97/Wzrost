@@ -1,0 +1,14 @@
+{
+  "id": "world-shield-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Shield of the World, a primordial titan who guards the whole world, far larger than any knight, armour of white stone and gold carved like the walls and towers of a great gord with glowing golden runes, a big round golden shield held close to the body with the World Tree of slavic legend carved on it, its roots and branches glowing emerald and gold, the whole shield inside the image, a dome of golden light arching close behind her like a gate of heaven, white stone towers rising from her shoulders, eyes glowing white-gold, holding a stone warhammer with golden runes, a palette of ivory stone, gold and emerald light; adult woman, light skin, dark brown hair tied back in a high ponytail, a strong determined face, an open helmet, her face clearly visible, well lit and well drawn, with distinct eyes, eyebrows, nose and mouth, not in shadow; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about three quarters of the image height, wide empty space above the head, below the feet and on both sides, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08043999891810948
+  },
+  "images": 4
+}

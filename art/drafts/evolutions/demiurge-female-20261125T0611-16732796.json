@@ -1,0 +1,23 @@
+{
+  "id": "demiurge-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Demiurge, the creator of worlds, a cosmic goddess whose robes are the deep black of space full of newborn stars and golden nebulae, four small glowing worlds of fire, ice, storm and stone orbiting around her, a great ring of golden light and runes behind her, a crown of white crystal shining with light, eyes glowing white, holding a tall staff topped with a blazing newborn sun, floating above the ground, a palette of deep cosmic black, gold and white light with small bright elemental colours; adult woman, fair light skin, long dark brown hair, a bright beautiful face lit by the light of the sun on her staff, her face clearly visible, well lit and well drawn, with distinct eyes, eyebrows, nose and mouth, not in shadow; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/demiurge-female-draft.png",
+      "usage": "this exact design: copy the figure, pose, outfit, crown, everything around the figure, the colours, the size and the place in the picture; only redraw the face so it is clearly visible, well lit and well drawn"
+    },
+    {
+      "path": "art/references/evolutions/primordial-female.png",
+      "usage": "only the face and the light skin of this woman, drawn clearly and well lit; nothing else of this picture: not its clothes, crown, staff or colours"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08044318967395359
+  },
+  "images": 4
+}

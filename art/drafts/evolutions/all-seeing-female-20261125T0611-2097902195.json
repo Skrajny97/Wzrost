@@ -1,0 +1,19 @@
+{
+  "id": "all-seeing-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the All-Seeing, a prophet who sees every fate, robes of black and gold covered with glowing golden embroidered eyes, a huge golden eye of light shining behind her head inside a ring of runes, eyes glowing gold, a large golden eye on the chest, glowing pages and cards of the book of fate circling around her, holding a tall staff with a crystal orb in which images of the future swirl, floating a little above the ground, a palette of black, gold and white light; young woman, light skin, long golden hair, a beautiful calm youthful face, her face clearly visible, well lit and well drawn, with distinct eyes, eyebrows, nose and mouth, not in shadow; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/all-seeing-male-young-draft.png",
+      "usage": "the same design as this man, drawn as a woman: the same outfit, colours, everything around the figure and pose, a slimmer feminine figure; she keeps her own face, skin and hair as described"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08053555014398363
+  },
+  "images": 4
+}

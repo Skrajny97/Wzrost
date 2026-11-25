@@ -1,0 +1,19 @@
+{
+  "id": "star-lord-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Lady of the Stars, a radiant star-knight of the night sky, armour of white and gold starlight that glows softly, a long cape of black space with golden constellations and a band of the milky way, a circlet of seven golden stars floating around her head, a huge golden constellation of an archer drawn in lines of light behind her close to the body, eyes glowing white, drawing a great bow of white light with an arrow of comet fire, no feathered wings, a palette of black space, gold and white starlight; young woman, light tan skin, long straight black hair in a high ponytail, a beautiful slim oval face, her face clearly visible, well lit and well drawn, with distinct eyes, eyebrows, nose and mouth, not in shadow; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/star-lord-male-draft.png",
+      "usage": "the same design as this man, drawn as a woman: the same outfit, colours, everything around the figure and pose, a slimmer feminine figure; she keeps her own face, skin and hair as described"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08044951555464003
+  },
+  "images": 4
+}
