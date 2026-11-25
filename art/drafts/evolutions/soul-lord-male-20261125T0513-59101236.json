@@ -1,0 +1,14 @@
+{
+  "id": "soul-lord-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Lord of Souls, a dark reaper lord who gathers souls, a hood of black smoke with a silver mask shaped like a skull, a storm of hundreds of pale white spirit lights swirling behind him like enormous wings close to the body, armour of white bone and black shadow, eyes glowing crimson behind the mask, two huge scythes with blades of glowing crimson light, a palette of black, bone white and deep crimson; adult man, lean, his face hidden by the silver mask; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08057586163944669
+  },
+  "images": 4
+}
