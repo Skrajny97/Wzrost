@@ -46,9 +46,10 @@ function simulated({ area, local, character, equipped, companions, kit, maxHp },
 }
 
 describe('the companions\' explorations', () => {
-  // A Cień of level 300: since the weaker creatures (24.11.2026) a realistic
-  // player of level 100 with companions hardly ever faints in the newest
-  // place, so nothing there would move the estimate.
+  // A Cień of level 300: since the weaker creatures (24.11.2026, halfway
+  // back since 25.11.2026) a realistic player of level 100 with companions
+  // hardly ever faints in the newest place, so little there would move the
+  // estimate.
   const one = realistic('shadow', 300, 0);
   const samples = threatSamples({ character: one.character, equipped: one.equipped, areaId: one.area.id, companions: one.companions, healing: one.healing }, one.local);
 
@@ -74,7 +75,13 @@ describe('the companions\' explorations', () => {
     const chances = (input) => faintChances({ character: one.character, equipped: one.equipped, hp: one.maxHp, areaId: one.area.id, healing: one.healing, ...input }, one.local, samples);
     const longest = content.balance.hunt.maxMinutes;
     for (const trip of samples.trips) near(chances({})[trip.minutes], trip.by.at(-1), 1e-9);
-    assert.ok(chances({ hp: one.maxHp * 0.25 })[longest] > chances({})[longest]);
+    // Less HP at the start moves it where nothing makes up for it: the
+    // potions left out of the estimate, since this build's Duże mikstury
+    // (50% each) heal more than any of its sample fights costs, so with them
+    // a quarter of the HP is as good as full (with the creatures halfway,
+    // 25.11.2026, and without the weaker creatures alike; from 24.11 a
+    // quarter moved it by less than a point). Without them: 24% → 29%.
+    assert.ok(chances({ hp: one.maxHp * 0.25, healing: null })[longest] > chances({ healing: null })[longest]);
     // Avoided, only the explorations that met no elite nor champion count
     // (each weighed by how much likelier its other fights are so).
     const went = samples.trips.at(-1);
@@ -101,9 +108,11 @@ describe('the estimate against explorations as the game runs them', () => {
   // 19.11.2026 the recursion alone showed a fraction of it. 120, not 60,
   // since the side stats (1218): at level 100 the first 60 of each build
   // came to 31.2% fainted against the estimate's 36.8%, while 240 of them
-  // come to 33.6%. Since the weaker creatures (24.11.2026) none of them
-  // faints at levels 50 and 100 (the estimate shows none either), and at
-  // 300 about 6.6% on 4 hours, where the recursion alone shows 3.7%.
+  // come to 33.6%. Since the weaker creatures (24.11.2026) hardly any of
+  // them faints at levels 50 and 100: none from 24.11, about 1.5% on 4 hours
+  // since they stand halfway (25.11.2026), the estimate as much and the
+  // recursion alone none. At 300 about 9.3% on 4 hours (6.6% from 24.11),
+  // where the recursion alone shows 6.4% (3.7%).
   for (const level of [50, 100, 300]) {
     test(`level ${level}: 1 and 4 hours`, () => {
       const rows = { 60: { estimate: 0, real: 0, before: 0 }, 240: { estimate: 0, real: 0, before: 0 } };

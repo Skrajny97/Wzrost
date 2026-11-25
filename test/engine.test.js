@@ -1261,8 +1261,8 @@ describe('hunts', () => {
     const short = levelsAfter(30);
     const long = levelsAfter(240);
     // Four hours give clearly less than eight half-hours would at the same
-    // pace (since the weaker creatures of 24.11.2026 about 80% of it, before
-    // about 63%).
+    // pace (about 73% of it since the creatures stand halfway, 25.11.2026;
+    // 80% with the weaker creatures of 24.11.2026, about 63% before them).
     assert.ok(long - 2 < (short - 2) * 8 * 0.85, `30 min: ${short}, 4 h: ${long}`);
     assert.ok(long < 11, `4 h: level ${long}`);
   });

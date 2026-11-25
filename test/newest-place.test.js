@@ -184,9 +184,10 @@ describe('on an exploration', () => {
 
   test('the newest place against the lower ones, as measured (tools/difficulty-sim.mjs): a real risk there, almost none a place lower, none two lower', () => {
     // At the 300th level: since the weaker creatures (24.11.2026) a 4-hour
-    // exploration of the newest place hardly ever ends in a faint below the
-    // 200th (none at the 150th, where this was measured before), and from
-    // the 240th about 6–10% of them.
+    // exploration of the newest place seldom ends in a faint below the 200th
+    // (at the 150th, where this was measured before, none from 24.11 and
+    // about 1% since they stand halfway, 25.11.2026), and from the 240th
+    // about 10–17% of them (6–10% from 24.11).
     const level = 300;
     const rate = (offset, party = 1) =>
       ['warrior', 'mage'].reduce((sum, classId) => sum + measureCell({ model: 'realistic', classId, level, minutes: 240, hunts: 30, offset, party }, content).faintRate, 0) / 2;
