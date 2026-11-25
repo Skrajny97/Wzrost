@@ -1,0 +1,23 @@
+{
+  "id": "navia-emperor-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Empress of Nav, the deathless god-empress of the slavic underworld, towering and terrible, armour of black iron and bone, a tall crown of black iron spikes ringed with cold blue soul fire, a vast mantle of black smoke and hundreds of pale blue ghostly souls spreading behind her like the gates of the underworld, close to the body, two huge spectral skeletal hands of blue light rising behind her shoulders, eyes glowing cold blue, holding a tall black sceptre crowned with a lantern in which a captured soul blazes blue, a palette of black iron, bone white and cold blue-white soul fire; adult woman, clearly a woman with a feminine figure and a slim waist, gaunt, very pale grey skin, very long straight black hair flowing from under the crown over her shoulders and down her back, a beautiful gaunt feminine face with high cheekbones, full dark lips and long eyelashes, her face clearly visible, well lit and well drawn, with distinct eyes, eyebrows, nose and mouth, not in shadow; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/navia-emperor-male-draft.png",
+      "usage": "the same design as this man, drawn as a woman: the same outfit, colours, everything around the figure and pose, but clearly a woman, with a slim feminine figure, a narrow waist and armour shaped for a woman; she keeps her own face, skin and hair as described, not his"
+    },
+    {
+      "path": "art/references/evolutions/navia-king-female.png",
+      "usage": "only her face, her very long black hair and her slim feminine figure; nothing else of this picture: not its antler crown, dress, green fire or colours"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08085888078477647
+  },
+  "images": 4
+}
