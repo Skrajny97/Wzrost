@@ -90,6 +90,7 @@
   "heaven-sword-female": { "only": [[40, 24, 51, 39]] },
   "all-seeing-male": { "only": [[41, 17, 50, 33], [51, 47, 59, 55]] },
   "all-seeing-female": { "only": [[40, 26, 48, 36], [49, 50, 57, 57]] },
+  "navia-emperor-male": { "add": ["6c777d", "7d878d"], "only": [[41, 26, 47, 35]] },
   "navia-emperor-female": { "portrait": "navia-king-female", "only": [[38, 20, 46, 32]] },
   "dark-king-male": { "add": ["c1c0d0", "858498"], "drop": ["aaa9ae"], "only": [[46, 24, 55, 37]] },
   "dark-king-female": { "portrait": "dark-prince-female", "only": [[45, 30, 56, 40]] }
