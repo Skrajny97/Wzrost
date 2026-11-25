@@ -1,0 +1,23 @@
+{
+  "id": "star-lord-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Lady of the Stars, a beautiful young goddess of the night sky, a slender young woman with a graceful feminine figure, a narrow waist and slim arms and legs; one strong idea: a huge thin crescent moon of glowing silver light behind her, its two horns curving up past her shoulders, close to the body, with one bright white star shining between them above her head; simple elegant armour of deep midnight indigo with silver edges, shaped for a woman, with a fitted breastplate, a long indigo cape lined with silver, a slim silver circlet, holding a tall silver longbow upright in one hand, a palette of only deep indigo, silver and pale gold light; her own pretty young woman's face with soft cheeks, a small chin, large dark eyes with long eyelashes and full lips, light warm peach skin, lit by soft silver moonlight, long straight black hair in a high ponytail falling down her back, her face clearly visible, well lit and well drawn, with distinct eyes with dark pupils, eyebrows, nose and mouth, not in shadow; standing tall in the middle of the image, the whole figure from the top of the star to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, clean readable pixel art with bold simple shapes, strong contrast and a few large details, no clutter, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/world-shield-male.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/star-lord-male.png",
+      "usage": "this man's design drawn for a woman: the same huge silver crescent moon with the one white star above the head, the same indigo and silver armour, cape, circlet and silver longbow, the same colours, drawing style, size and place in the picture; not his face, not his hair and not his broad body: she is a slender woman with her own face"
+    },
+    {
+      "path": "art/references/evolutions/celestial-archer-female-face.png",
+      "usage": "her face and hair: this same young woman's face, her large dark eyes, her light warm skin and her long black ponytail, drawn the same way; nothing else of this picture, not the tiara"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08117268787489997
+  },
+  "images": 4
+}
