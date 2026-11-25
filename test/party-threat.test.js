@@ -45,9 +45,16 @@ describe('the threat with the party (engine)', () => {
   });
 
   test('the others setting out at a tenth of their HP make it more dangerous than at full HP', () => {
-    const weak = threatSamples({ character, equipped, areaId, partners: partners.map((one) => ({ ...one, hpShare: 0.1 })) }, content);
-    const tired = chances(weak);
-    const fresh = chances(party);
+    // On a Trudna wyprawa: on a plain one this party's 4-hour trips here end
+    // in a faint neither from full HP nor with the others at a tenth since
+    // the creatures stand halfway (25.11.2026; from 24.11 only 2 of the 100
+    // with the others tired), so nothing there would tell the two apart. On
+    // a Trudna wyprawa 10% against 30%.
+    const hard = true;
+    const harder = (samples) => faintChances({ character, equipped, hp: samples.maxHp, areaId, hard }, content, samples);
+    const weak = threatSamples({ character, equipped, areaId, partners: partners.map((one) => ({ ...one, hpShare: 0.1 })), hard }, content);
+    const tired = harder(weak);
+    const fresh = harder(threatSamples({ character, equipped, areaId, partners, hard }, content));
     assert.ok(tired[240] > fresh[240], `${tired[240]} > ${fresh[240]}`);
   });
 

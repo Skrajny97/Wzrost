@@ -1408,6 +1408,18 @@
     "0.5.18": {
       "title": "Version 0.5.18",
       "body": "- The World Boss and Cultivation now have their own tabs in Combat, next to Exploration, Portals and Towers. A gold dot on a tab tells you a Boss Chest is waiting to be opened or a Cultivation report is ready.\n- The item comparison now fits on the narrowest phones, even with very large damage numbers."
+    },
+    "0.5.19": {
+      "title": "Version 0.5.19",
+      "body": "- Behind the scenes: the fifth class evolution, from class level 400, is already in the game's code. It will open once all its art is ready."
+    },
+    "0.5.20": {
+      "title": "Version 0.5.20",
+      "body": "- Fight replay: when a summon, such as a Necromancer's skeleton, takes a spell or blow aimed at all enemies, like Meteor Shower, the effect now lands on its card and its HP loss shows at once. Before, it looked as if the spell did nothing. The fight itself was always counted correctly."
+    },
+    "0.5.21": {
+      "title": "Version 0.5.21",
+      "body": "- Creatures are stronger again. They now sit halfway between the original ones and those of version 0.4.97: up to level 150 they are 1.75 times weaker than the original ones (it was 2.5), then less and less, down to 1.25 times from level 250 (it was 1.5). This applies to every fight with creatures: explorations, Wanted posters, Towers, Portals, the Labyrinth and the Guild Beast. The places' danger estimate already counts the new strength."
     }
   }
 }

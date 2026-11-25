@@ -399,9 +399,11 @@ export function classLevelFactor(classLevel, curve = []) {
 // the author, 24.11.2026: „Trzeba trochę zmniejszyc poziom trudności
 // jednak, bo jest za silne wszystko. Tak z 2,5 raza łatwiej powinno być do
 // 150 poziomu, 150-250 z 2 razy słabsze i od 250 1,5 razy słabsze”, and
-// then „wygładź ten poziom trudności oczywiście”): points [creature level,
-// times weaker], straight between two, as the first before it and as the
-// last past it; 1 for an empty curve.
+// then „wygładź ten poziom trudności oczywiście”; on 25.11.2026, when a
+// player found it too easy, „Daj coś pomiędzy ostatnimi dwoma poziomami
+// trudności”: since then halfway, 1.75 up to 150 and 1.25 from 250): points
+// [creature level, times weaker], straight between two, as the first
+// before it and as the last past it; 1 for an empty curve.
 /**
  * @param {number} level
  * @param {number[][]} [curve]

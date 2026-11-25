@@ -8,11 +8,19 @@
 // almost always, level 2 usually, level 3 about half the time and
 // Piekielny rarely. With --core, the same with a full Rdzeń of the level
 // (coreFor) to measure what it gives; --explore measures the explorations
-// of difficulty-sim.mjs with and without that Rdzeń.
+// of difficulty-sim.mjs with and without that Rdzeń. With --danger, also
+// the board's colours as the party sees them before it picks a room
+// (roomDanger, 899 A), level by level: on entering a level every fight of
+// it (green, yellow or red), the share of the roads from the entrance to
+// the guardian with only green fights on them and of the boards all green,
+// and at each choice of two rooms or more the share where every fight on
+// offer is green (the way chosen does not matter). The colours have their
+// own seeds, so the days go exactly as without --danger.
 //
 //   node tools/labyrinth-sim.mjs                         levels 30–200, 40 days each, every class
 //   node tools/labyrinth-sim.mjs --levels 50,100 --days 80 --model low
 //   node tools/labyrinth-sim.mjs --core --explore --levels 50,100,200
+//   node tools/labyrinth-sim.mjs --danger --levels 60,107,200 --set 'monsters.weaker.curve=[]'
 
 import { fileURLToPath } from 'node:url';
 import * as engine from '../src/engine/index.js';
@@ -58,12 +66,60 @@ export function coreFor(level, content, { rarity, upgrade, gem } = {}) {
   return { open: true, shards: 0, gem: gemId, absorbed };
 }
 
+// The colours of the board (--danger) for each level of the Labirynt, added
+// up over the days: boards seen, fights by colour, roads and roads with only
+// green fights, boards all green, choices and choices with only green fights.
+export const newDanger = () => ({ levels: [1, 2, 3, 4].map(() => ({ boards: 0, easy: 0, even: 0, deadly: 0, roads: 0, greenRoads: 0, allGreen: 0, choices: 0, greenChoices: 0 })) });
+
+// What the board shows the party before it picks one of `rooms` (roomDanger,
+// as the server's view, for the party of the day's fights: no trophies nor
+// week): at a level's entrance every fight of the level and the roads
+// through them, at every choice the fights on offer. `into`: the level's
+// counts of newDanger.
+function lookAtBoard({ state, map, rooms, party, seed, into }, content) {
+  const colour = (row, room) => engine.roomDanger({ state, type: map.rows[row][room].type, row, room, party, seed }, content);
+  const green = (one) => !one || one === 'easy';
+  let offered;
+  if (state.row < 0) {
+    const colours = map.rows.map((list, row) => list.map((_, room) => colour(row, room)));
+    into.boards += 1;
+    for (const one of colours.flat()) if (one) into[one] += 1;
+    if (colours.flat().every(green)) into.allGreen += 1;
+    // The roads from the entrance (any room of the first row) to the
+    // guardian: all of them, and those with only green fights on them.
+    let all = map.rows[0].map(() => 1);
+    let greenOnly = colours[0].map((one) => (green(one) ? 1 : 0));
+    for (let row = 0; row + 1 < map.rows.length; row++) {
+      const nextAll = map.rows[row + 1].map(() => 0);
+      const nextGreen = map.rows[row + 1].map(() => 0);
+      map.rows[row].forEach((room, index) => {
+        for (const link of room.links) {
+          nextAll[link] += all[index];
+          nextGreen[link] += greenOnly[index];
+        }
+      });
+      all = nextAll;
+      greenOnly = nextGreen.map((count, room) => (green(colours[row + 1][room]) ? count : 0));
+    }
+    into.roads += all[0];
+    into.greenRoads += greenOnly[0];
+    offered = rooms.map((room) => colours[0][room]);
+  } else offered = rooms.map((room) => colour(state.row + 1, room));
+  const fights = offered.filter(Boolean);
+  if (rooms.length > 1 && fights.length > 0) {
+    into.choices += 1;
+    if (fights.every(green)) into.greenChoices += 1;
+  }
+}
+
 // One day of the Labirynt for a player: the levels it clears. The
 // creatures stand halfway between the character's and the class's level
-// (labyrinthCharLevel, the author 13.11.2026).
-function playDay({ player, companions, day, seed }, content) {
+// (labyrinthCharLevel, the author 13.11.2026). `danger`: newDanger's
+// counts to add the board's colours to (--danger), or null.
+function playDay({ player, companions, day, seed, danger = null }, content) {
   let state = engine.newLabyrinth({ day, charLevel: engine.labyrinthCharLevel(player.character), companions, seed });
   const rng = engine.createRng(`${seed}:choices`);
+  const party = { character: player.character, equipped: player.equipped, name: 'Symulacja', companions };
   for (let step = 0; step < 60 && !state.over; step++) {
     if (state.pending) {
       if (state.pending.kind === 'merchant') {
@@ -78,13 +134,14 @@ function playDay({ player, companions, day, seed }, content) {
     const map = engine.labyrinthMap(state.day, state.level, content);
     const rooms = engine.reachableRooms(map, state.row, state.room);
     if (rooms.length === 0) break;
+    if (danger) lookAtBoard({ state, map, rooms, party, seed: `danger:${seed}`, into: danger.levels[state.level - 1] }, content);
     const target = { row: state.row + 1, room: pickRoom(state, map, rooms, rng) };
-    state = engine.enterRoom(state, target, { character: player.character, equipped: player.equipped, name: 'Symulacja', companions }, `${seed}:${step}`, content).state;
+    state = engine.enterRoom(state, target, party, `${seed}:${step}`, content).state;
   }
   return state.cleared;
 }
 
-export function measureLabyrinth({ model = 'realistic', classId, level, days, core = null }, content) {
+export function measureLabyrinth({ model = 'realistic', classId, level, days, core = null, danger = null }, content) {
   const cleared = [0, 0, 0, 0, 0];
   for (let i = 0; i < days; i++) {
     const base = playerOf(model, classId, level, content, i % 8);
@@ -92,7 +149,7 @@ export function measureLabyrinth({ model = 'realistic', classId, level, days, co
     const plan = base.plan ?? { companions: 2, companionGear: 'rare', companionUpgrade: 0, bond: 1, variant: model };
     const companions = companionsOf({ ...plan, companions: 2 }, level, i, content);
     const day = `sim-${String(i).padStart(4, '0')}`;
-    const levels = playDay({ player, companions, level, day, seed: `labyrinth-sim:${model}:${classId}:${level}:${i}` }, content);
+    const levels = playDay({ player, companions, level, day, seed: `labyrinth-sim:${model}:${classId}:${level}:${i}`, danger }, content);
     cleared[levels] += 1;
   }
   // The share of days each level was cleared (level n: n or more cleared).
@@ -130,8 +187,10 @@ function main() {
   for (const level of levels) {
     const totals = [0, 0, 0, 0];
     const coreTotals = [0, 0, 0, 0];
+    // The board's colours of every class together (--danger).
+    const danger = options.danger ? newDanger() : null;
     for (const classId of classes) {
-      const rates = measureLabyrinth({ model, classId, level, days }, content);
+      const rates = measureLabyrinth({ model, classId, level, days, danger }, content);
       rates.forEach((rate, index) => (totals[index] += rate / classes.length));
       let line = `${model.padEnd(10)} ${classId.padEnd(8)} ${String(level).padStart(3)}  poziom 1 ${pct(rates[0])}  2 ${pct(rates[1])}  3 ${pct(rates[2])}  Piekielny ${pct(rates[3])}`;
       if (options.core) {
@@ -142,6 +201,18 @@ function main() {
       console.log(line);
     }
     console.log(`${'średnio'.padEnd(19)} ${String(level).padStart(3)}  poziom 1 ${pct(totals[0])}  2 ${pct(totals[1])}  3 ${pct(totals[2])}  Piekielny ${pct(totals[3])}${options.core ? `   z Rdzeniem: ${coreTotals.map(pct).join(' ')}` : ''}`);
+    // The board's colours, level by level and for levels 1–3 together.
+    if (danger) {
+      const together = Object.fromEntries(Object.keys(danger.levels[0]).map((key) => [key, danger.levels.slice(0, 3).reduce((sum, one) => sum + one[key], 0)]));
+      const share = (part, whole) => (whole > 0 ? `${((part / whole) * 100).toFixed(1)}%`.padStart(6) : '     –');
+      for (const [name, one] of [...danger.levels.map((counts, index) => [index === 3 ? 'Piekielny' : `poziom ${index + 1}`, counts]), ['poziomy 1–3', together]]) {
+        const fights = one.easy + one.even + one.deadly;
+        if (one.boards === 0) continue;
+        console.log(
+          `  plansza ${name.padEnd(11)} (${String(one.boards).padStart(3)} plansz): walki zielone ${share(one.easy, fights)}, żółte ${share(one.even, fights)}, czerwone ${share(one.deadly, fights)}; drogi całe zielone ${share(one.greenRoads, one.roads)}; plansze całe zielone ${share(one.allGreen, one.boards)}; wybory same zielone ${share(one.greenChoices, one.choices)}`,
+        );
+      }
+    }
     if (options.explore) {
       for (const classId of classes) {
         const hunts = Number(options.hunts ?? 100);

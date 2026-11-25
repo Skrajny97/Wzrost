@@ -62,14 +62,20 @@ const fourthOnly = (() => {
 // levels' slowdown (a character of level 345 is of class level 412, 350 of
 // 417 and 380 of 451), against the creatures as the fourth forms were tuned
 // with (the fourth evolution's test): the forms are compared with each other,
-// not with the newest creatures, which change with every new land.
+// not with the newest creatures, which change with every new land. The
+// weaker creatures too as on 24.11.2026, when the fifth forms were tuned
+// (balance.monsters.weaker 2.5 / 1.5): since 25.11.2026 they stand halfway
+// (1.75 / 1.25), 1.2 times stronger at these levels, and there the Demiurg,
+// tuned level with its Stwórca Żywiołów (88.8% of HP left against 88.4%,
+// killing 1.04 times quicker), ends with 87.0% against 87.9%, killing 1.07
+// times quicker; every other fifth form passes there too.
 const tuned = (data) => ({
   ...data,
   balance: {
     ...data.balance,
     progression: { ...data.balance.progression, lateLevels: undefined },
     rewards: { ...data.balance.rewards, lateRewards: undefined },
-    monsters: { ...data.balance.monsters, mythGame: { ...data.balance.monsters.mythGame, damage: 0, hp: 0 }, classLevelCurve: [], newestPlace: null },
+    monsters: { ...data.balance.monsters, mythGame: { ...data.balance.monsters.mythGame, damage: 0, hp: 0 }, classLevelCurve: [], newestPlace: null, weaker: { curve: [[150, 2.5], [250, 1.5]] } },
   },
 });
 
