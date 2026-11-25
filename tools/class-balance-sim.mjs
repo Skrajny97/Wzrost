@@ -35,7 +35,7 @@ export function measureClass({ model, classId, level, minutes, hunts, path = nul
   const plan = players[0].plan;
   const kit = roadKit(plan, area, minutes, local);
   const penalty = engine.faintPenalty(level, engine.xpToNext(level, content), content);
-  const totals = { defeats: 0, endHp: 0, xp: 0, gold: 0, killed: 0, killTime: 0, fights: 0, taken: 0 };
+  const totals = { defeats: 0, endHp: 0, endHpSquares: 0, xp: 0, gold: 0, killed: 0, killTime: 0, fights: 0, taken: 0 };
   for (let i = 0; i < hunts; i++) {
     const { character, equipped } = players[i % GEAR_SETS];
     const maxHp = maxHps[i % GEAR_SETS];
@@ -51,7 +51,9 @@ export function measureClass({ model, classId, level, minutes, hunts, path = nul
     }
     totals.xp += kept.xp;
     totals.gold += kept.gold;
-    totals.endHp += hunt.hpEnd / hunt.maxHp;
+    const left = hunt.hpEnd / hunt.maxHp;
+    totals.endHp += left;
+    totals.endHpSquares += left * left;
     for (const fight of hunt.fights) {
       if (fight.events.length === 0) continue;
       totals.fights += 1;
@@ -62,6 +64,7 @@ export function measureClass({ model, classId, level, minutes, hunts, path = nul
     }
   }
   const hours = (hunts * minutes) / 60;
+  const endHp = totals.endHp / hunts;
   return {
     model,
     classId,
@@ -70,7 +73,10 @@ export function measureClass({ model, classId, level, minutes, hunts, path = nul
     area: area.id,
     evolution: players[0].character.evolution ?? null,
     defeats: totals.defeats / hunts,
-    endHp: totals.endHp / hunts,
+    endHp,
+    // The standard error of endHp: about how far another draw of as many
+    // explorations may put it.
+    endHpError: hunts > 1 ? Math.sqrt(Math.max(0, totals.endHpSquares - hunts * endHp * endHp) / (hunts - 1) / hunts) : 0,
     xpPerHour: totals.xp / hours,
     goldPerHour: totals.gold / hours,
     killSpeed: (100 * totals.killed) / Math.max(1, totals.killTime),
