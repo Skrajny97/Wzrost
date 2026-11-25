@@ -4686,6 +4686,10 @@ Gracz (poz. 99) przez autora: „Kosmetyczna uwaga. Jak w rankingu ktoś ma nada
 
 Autor zapytał informacyjnie o grę podobną do Stardew Valley, a potem do Coral Island, osadzoną w świecie Insight, skupioną na walce, z profesjami, robioną na boku po trochu jako osobny projekt, w grafice innej niż pixel art. Rozpoznanie (silnik, grafika 3D z AI, budżet telefonu, co skopiować z Insight, plan 10 etapów, nakład i ryzyka) jest w `docs/plans/gra-3d-w-stylu-coral-island.md`. Autor: „Na razie zapisujemy ten plan na przyszłość”. Nic się nie zaczyna, dopóki autor sam tego nie powie; decyzje S1–S3 z końca planu czekają na start.
 
+## Wersja 0.5.20 (25.11.2026): czary na wszystkich wrogów w odtwarzaniu walki
+
+Zob. sekcję niżej: walka liczyła się dobrze, a poprawione jest odtwarzanie (efekt czaru na karcie przywołańca, który przyjął cios).
+
 ## Deszcz meteorów i przywołańce: zgłoszenie gracza (poz. 97) (25.11.2026)
 
 Gracz (poz. 97) przez autora: „Zauważyłem że gdy atakując nekromantę, przy ‚deszczu meteorów’ szkielet przyjmuje ten czar na siebie ale nie traci on życia, w efekcie czar ten nie robi nic ani nekromancie ani przywołańcowi” („Bynajmniej takie odnoszę wrażenie”).

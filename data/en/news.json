@@ -1412,6 +1412,10 @@
     "0.5.19": {
       "title": "Version 0.5.19",
       "body": "- Behind the scenes: the fifth class evolution, from class level 400, is already in the game's code. It will open once all its art is ready."
+    },
+    "0.5.20": {
+      "title": "Version 0.5.20",
+      "body": "- Fight replay: when a summon, such as a Necromancer's skeleton, takes a spell or blow aimed at all enemies, like Meteor Shower, the effect now lands on its card and its HP loss shows at once. Before, it looked as if the spell did nothing. The fight itself was always counted correctly."
     }
   }
 }
