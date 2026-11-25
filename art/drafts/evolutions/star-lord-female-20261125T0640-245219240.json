@@ -1,0 +1,23 @@
+{
+  "id": "star-lord-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Lady of the Stars, a radiant star-knight of the night sky, armour of white and gold starlight that glows softly, a long cape of black space with golden constellations and a band of the milky way, a circlet of seven golden stars floating around her head, a huge golden constellation of an archer drawn in lines of light behind her close to the body, drawing a great bow of white light with an arrow of comet fire, no feathered wings, a palette of black space, gold and white starlight; young woman, clearly a woman with a feminine figure and a slim waist, very fair pale peach skin, large dark eyes with long eyelashes, long straight black hair in a high ponytail reaching down her back, a beautiful slim oval face with full lips, her face clearly visible, well lit and well drawn, with distinct eyes, eyebrows, nose and mouth, not in shadow; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/star-lord-male-draft.png",
+      "usage": "the same design as this man, drawn as a woman: the same outfit, colours, everything around the figure and pose, but clearly a woman, with a slim feminine figure, a narrow waist and armour shaped for a woman; she keeps her own face, skin and hair as described, not his"
+    },
+    {
+      "path": "art/references/evolutions/celestial-archer-female-face.png",
+      "usage": "only the face of this woman: draw her face like this, with her very fair pale skin, her dark eyes and her black hair; nothing else of this picture, not the silver tiara"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08054796518219842
+  },
+  "images": 4
+}
