@@ -1,0 +1,14 @@
+{
+  "id": "navia-emperor-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Emperor of Nav, the deathless god-emperor of the slavic underworld, towering and terrible, armour of black iron and bone, a tall crown of black iron spikes ringed with cold blue soul fire, a vast mantle of black smoke and hundreds of pale blue ghostly souls spreading behind him like the gates of the underworld, close to the body, two huge spectral skeletal hands of blue light rising behind his shoulders, eyes glowing cold blue, holding a tall black sceptre crowned with a lantern in which a captured soul blazes blue, a palette of black iron, bone white and cold blue-white soul fire; adult man, gaunt, very pale grey skin, sunken cheeks, long black hair, his face clearly visible, well lit and well drawn, with distinct eyes, eyebrows, nose and mouth, not in shadow; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08081880084673564
+  },
+  "images": 4
+}

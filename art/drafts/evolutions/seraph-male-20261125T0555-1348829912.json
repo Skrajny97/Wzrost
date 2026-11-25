@@ -1,0 +1,19 @@
+{
+  "id": "seraph-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "a blazing seraph, the highest of all angels, six huge wings of white-hot fire with golden and orange flames, two raised, two spread and two lowered, close to the body and inside the image, a blazing sun disk burning behind his head, his face lit by golden light, eyes glowing white, ornate golden armour with a burning sun on the chest, a long robe of living orange and crimson flames, holding a tall golden staff topped with a blazing sun cross, floating a little above the ground, a palette of blazing gold, orange and crimson with white-hot light; adult man, tan skin, short dark brown hair and a short dark brown beard, a gentle strong face, his face clearly visible, well lit and well drawn, with distinct eyes, eyebrows, nose and mouth, not in shadow; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/seraph-female.png",
+      "usage": "the same design as this woman, drawn as a man: the same outfit, colours, wings, everything around the figure and pose, a broader masculine figure; he keeps his own face, skin, hair and beard as described"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08054106844796075
+  },
+  "images": 4
+}

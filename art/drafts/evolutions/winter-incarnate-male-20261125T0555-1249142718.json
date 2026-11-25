@@ -1,0 +1,19 @@
+{
+  "id": "winter-incarnate-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "Winter Incarnate, the embodiment of eternal winter, a towering figure whose arms and legs turn into living ice crystal, a huge cloak of swirling blizzard snow streaming around him, armour of dark midnight-blue ice glowing from within, a tall crown of long icicles, the green and violet lights of an aurora borealis flowing from his shoulders like a second cloak, eyes glowing pale cyan, holding a sceptre topped with a frozen blazing star, no halo and no ring behind the head, a palette of midnight blue, icy teal and the green and violet of the aurora; adult man, fair skin touched by frost with rosy cheeks, long white hair and a long white beard, a warm human face of skin, not of ice, white eyebrows, his face clearly visible, well lit and well drawn, with distinct eyes, eyebrows, nose and mouth, not in shadow; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/winter-incarnate-male-draft.png",
+      "usage": "this exact design: copy the figure, pose, outfit, crown, everything around the figure, the colours, the size and the place in the picture; only redraw the face so it is clearly visible, well lit and well drawn"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08052001357078552
+  },
+  "images": 4
+}

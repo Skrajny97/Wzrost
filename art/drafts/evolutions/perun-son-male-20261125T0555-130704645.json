@@ -1,0 +1,14 @@
+{
+  "id": "perun-son-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Son of Perun, a young god of thunder, a bold clean silhouette with big simple shapes and strong contrast, a huge forked bolt of golden lightning arcing over his head like a crown of thunder, eyes blazing white, a golden oak-leaf wreath, a sleek cuirass of dark bronze and gold with a lightning emblem, a long deep crimson cape flowing behind him, holding a great bow of dark oak split by a glowing golden crack of lightning with an arrow of pure white lightning, clean readable pixel art with a few large details and no clutter, a palette of deep crimson, dark bronze, gold and white lightning; young man, light skin, long fair blond hair blowing in the wind, a handsome sharp young face, bareheaded, his face clearly visible, well lit and well drawn, with distinct eyes, eyebrows, nose and mouth, not in shadow; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0808341109222836
+  },
+  "images": 4
+}

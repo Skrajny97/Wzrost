@@ -1,0 +1,19 @@
+{
+  "id": "dark-king-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Queen of Darkness, the queen of a night without stars, a black eclipse sun with a thin silver corona burning behind her head, a tall crown of black thorns trailing darkness like smoke, huge tattered wings of living shadow, a cloak dissolving into a starless black void, black armour with glowing silver-white lines, eyes glowing violet, holding two short straight daggers of pure black shadow, small daggers, not swords and not curved blades, one in each hand, a palette of pure black, silver-white light and a little violet; young woman, pale skin, long silver hair, a sharp elegant face, her face clearly visible, well lit and well drawn, with distinct eyes, eyebrows, nose and mouth, not in shadow; standing in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/dark-king-male.png",
+      "usage": "the same design as this man, drawn as a woman: the same outfit, colours, everything around the figure and pose, a slimmer feminine figure; she keeps her own face, skin and hair as described"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08090053333176507
+  },
+  "images": 4
+}
