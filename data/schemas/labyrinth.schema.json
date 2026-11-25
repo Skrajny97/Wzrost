@@ -55,6 +55,27 @@
     },
     "eliteStrength": { "$ref": "#/definitions/pair" },
     "guardianStrength": { "$ref": "#/definitions/pair" },
+    "fit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cost", "share", "least"],
+      "description": "Labirynt na miarę drużyny (1253, labyrinthFit): siła stworów, przy której drużyna w pełnym HP i bez błogosławieństw traci w dziennej walce odniesienia (1. poziom, 1. rząd, 1. komnata) średnio cost swojego HP, razy share, nie mniej niż least. Bez fit Labirynt jest taki sam dla każdej drużyny.",
+      "properties": {
+        "cost": { "$ref": "#/definitions/share" },
+        "share": { "type": "number", "exclusiveMinimum": 0 },
+        "least": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "strongRooms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["chance", "strength"],
+      "description": "Silne komnaty (1253): w rzędzie poziomu poza pierwszym z szansą chance jedna ze zwykłych walk, a jej stwory mają [obrażenia, HP] razy strength. Najwyżej jedna w rzędzie, więc zawsze da się ją ominąć.",
+      "properties": {
+        "chance": { "$ref": "#/definitions/share" },
+        "strength": { "$ref": "#/definitions/pair" }
+      }
+    },
     "map": {
       "type": "object",
       "additionalProperties": false,

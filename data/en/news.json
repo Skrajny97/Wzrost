@@ -1420,6 +1420,10 @@
     "0.5.21": {
       "title": "Version 0.5.21",
       "body": "- Creatures are stronger again. They now sit halfway between the original ones and those of version 0.4.97: up to level 150 they are 1.75 times weaker than the original ones (it was 2.5), then less and less, down to 1.25 times from level 250 (it was 1.5). This applies to every fight with creatures: explorations, Wanted posters, Towers, Portals, the Labyrinth and the Guild Beast. The places' danger estimate already counts the new strength."
+    },
+    "0.5.22": {
+      "title": "Version 0.5.22",
+      "body": "- Labyrinth: the creatures now match your party, and some chambers on the map are strong, ordinary fights with much stronger creatures, usually with a red ring. A row has at most one, so you can always go around it: watch the rings, because the whole way decides the day."
     }
   }
 }

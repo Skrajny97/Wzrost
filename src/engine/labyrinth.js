@@ -44,7 +44,7 @@ import { weekFactor, weekFighter } from './weeks.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {import('./rng.js').Rng} Rng */
-/** @typedef {{ type: string, links: number[] }} Room A room of a level's map and the rooms of the next row it leads to. */
+/** @typedef {{ type: string, links: number[], strong?: boolean }} Room A room of a level's map, the rooms of the next row it leads to and whether it is a strong room (strongRooms). */
 /** @typedef {{ level: number, rows: Room[][] }} LabyrinthMap A level's rows of rooms, the guardian's alone in the last. */
 /** @typedef {{ kind: 'blessing', from: string, choices: string[] } | { kind: 'merchant', heal: boolean, blessing: boolean, choices: string[] | null }} Pending A choice the party has to make before it goes on. */
 /**
@@ -172,6 +172,23 @@ export function labyrinthMap(day, level, content) {
     });
   }
   for (const room of rows[rows.length - 1]) room.links = [0];
+  // The strong rooms (strongRooms; 1253, a player of level 107: „Labirynt
+  // jest nudny i nie ważne jaką drogę wybierasz i tak wszystko jest na
+  // zielono”): in a row of the level after the first, with the chance
+  // strongRooms.chance, one of its ordinary fights, whose creatures are
+  // strongRooms.strength times stronger (labyrinthStrength). At most one a
+  // row, and every room leads to two rooms of the next row or more, so
+  // there is always a way around it; the first row, where every level
+  // starts, has none. Drawn from a seed of their own, so the rooms and the
+  // roads are what they would be without them.
+  const strong = rules(content).strongRooms;
+  if (strong) {
+    const draw = createRng(`labyrinth:${day}:${level}:strong`);
+    for (const rooms of rows.slice(1)) {
+      const fights = rooms.filter((room) => room.type === 'fight');
+      if (draw.chance(strong.chance) && fights.length > 0 && rooms.length > 1) draw.pick(fights).strong = true;
+    }
+  }
   rows.push([{ type: 'guardian', links: [] }]);
   return { level, rows };
 }
@@ -241,20 +258,100 @@ export function labyrinthFoes({ day, level, row, room, type, charLevel }, conten
 // How strong the creatures of a room are, [damage, HP]: as those of the
 // newest place of exploration at the character's level, times the level's
 // strength (Piekielny twice the third's, 854 A), an elite's and a
-// guardian's on top.
+// guardian's on top, a strong room's (`strong`, strongRooms), and times
+// `fit`, how much stronger they are against this party (labyrinthFit; 1
+// for the Labirynt as it is for everyone).
 /**
  * @param {number} level
  * @param {string} type
  * @param {number} charLevel
  * @param {Content} content
+ * @param {number} [fit]
+ * @param {boolean} [strong]
  * @returns {[number, number]}
  */
-export function labyrinthStrength(level, type, charLevel, content) {
+export function labyrinthStrength(level, type, charLevel, content, fit = 1, strong = false) {
   const [baseDamage, baseHp] = exploreStrength({ minLevel: charLevel, maxLevel: charLevel }, charLevel, content);
   const [damage, hp] = labyrinthLevel(level, content).strength;
   const [moreDamage, moreHp] = type === 'elite' ? rules(content).eliteStrength : type === 'guardian' ? rules(content).guardianStrength : [1, 1];
-  return [baseDamage * damage * moreDamage, baseHp * hp * moreHp];
+  const [strongDamage, strongHp] = strong && rules(content).strongRooms ? rules(content).strongRooms.strength : [1, 1];
+  return [baseDamage * damage * moreDamage * strongDamage * fit, baseHp * hp * moreHp * strongHp * fit];
 }
+
+// The Labirynt against the party (fit in data/labyrinth.json; 1253, a
+// player of level 107: „Labirynt jest nudny i nie ważne jaką drogę
+// wybierasz i tak wszystko jest na zielono”): how many times stronger its
+// creatures are, in their blows and their HP alike, so that a party
+// stronger than the Labirynt needs meets them stronger too, and the board
+// shows every party a mix of easy and harder fights. The party is measured
+// as it is now, its gear, Rdzeń and the day's companions, at full HP and
+// without blessings, trophies or the week's: in the day's reference fight
+// (level 1, row 0, room 0, the same creatures for everyone that day) the
+// strength at which it loses fit.cost of its HP on average (a fight not won
+// all of it), by FIT_STEPS steps of a bisection in log space between 1 and
+// FIT_MOST, FIT_SAMPLES fights each, seeded by the day's seed, so the same
+// party gets the same answer all day; then fit.share of it, never less than
+// fit.least. The blessings, the HP kept along the way and the trophies stay
+// the party's own edge. Measured anew with each fight and each look at the
+// board, so a change of gear changes it at once and the creatures always
+// meet the party that fights them. 1 where the data has no fit.
+const FIT_SAMPLES = 2;
+const FIT_STEPS = 6;
+const FIT_MOST = 32;
+
+/**
+ * @param {LabyrinthState} state
+ * @param {{ character: Record<string, any>, equipped: Record<string, any>[], name: string, companions?: Record<string, any>[] }} party
+ * @param {Content} content
+ * @returns {number}
+ */
+export function labyrinthFit(state, party, content) {
+  const fit = rules(content).fit;
+  if (!fit) return 1;
+  const plan = labyrinthFoes({ day: state.day, level: 1, row: 0, room: 0, type: 'fight', charLevel: state.charLevel }, content);
+  const area = content.areasById[plan.areaId];
+  const rested = { ...state, hp: Object.fromEntries(Object.keys(state.hp).map((key) => [key, 1])), blessings: [] };
+  const allies = labyrinthFighters(rested, { character: party.character, equipped: party.equipped, name: party.name, companions: party.companions, area }, content).map((fighter) => fighter.unit);
+  const before = allies.reduce((sum, unit) => sum + unit.hp, 0);
+  const [damage, hp] = labyrinthStrength(1, 'fight', state.charLevel, content);
+  const classLevel = party.character.classLevel ?? 0;
+  /** @param {number} times */
+  const cost = (times) => {
+    let lost = 0;
+    for (let i = 0; i < FIT_SAMPLES; i++) {
+      const enemies = encounterCombatants(plan.encounter, content, { strength: [damage * times, hp * times], classLevel });
+      const fight = simulateFight({ allies: allies.map((unit) => ({ ...unit })), enemies, rng: createRng(`${state.seed}:fit:${i}`), content, trait: area.trait });
+      if (fight.won !== true) {
+        lost += 1;
+        continue;
+      }
+      const after = allies.reduce((sum, unit) => sum + Math.max(0, fight.units.find((/** @type {{ id: string }} */ one) => one.id === unit.id)?.hp ?? 0), 0);
+      lost += (before - after) / before;
+    }
+    return lost / FIT_SAMPLES;
+  };
+  let low = 0;
+  let high = Math.log(FIT_MOST);
+  for (let step = 0; step < FIT_STEPS; step++) {
+    const middle = (low + high) / 2;
+    if (cost(Math.exp(middle)) < fit.cost) low = middle;
+    else high = middle;
+  }
+  // A party that loses that much already at the Labirynt's own strength
+  // stays at it; one that never does gets the most.
+  const times = low === 0 ? 1 : high === Math.log(FIT_MOST) ? FIT_MOST : Math.exp((low + high) / 2);
+  return Math.max(fit.least, times * fit.share);
+}
+
+// Whether a room of the day's map is a strong room (labyrinthMap).
+/**
+ * @param {{ day: string, level: number }} state
+ * @param {number} row
+ * @param {number} room
+ * @param {Content} content
+ * @returns {boolean}
+ */
+export const strongRoom = (state, row, room, content) => Boolean(labyrinthMap(state.day, state.level, content).rows[row]?.[room]?.strong);
 
 // The gold of `minutes` of exploring at the character's level, in the place
 // that holds its level: the elites', the treasures' and the merchant's
@@ -537,7 +634,7 @@ const DEADLY_LOSSES = 0.25;
 const EASY_COST = 0.4;
 
 /**
- * @param {{ state: LabyrinthState, type: string, row: number, room: number, party: { character: Record<string, any>, equipped: Record<string, any>[], name: string, companions?: Record<string, any>[], trophies?: Record<string, any>, week?: Record<string, any> | null }, seed: string }} options
+ * @param {{ state: LabyrinthState, type: string, row: number, room: number, party: { character: Record<string, any>, equipped: Record<string, any>[], name: string, companions?: Record<string, any>[], trophies?: Record<string, any>, week?: Record<string, any> | null, fit?: number }, seed: string }} options
  * @param {Content} content
  * @returns {string | null} One of DANGER_LEVELS, or null for a room without a fight.
  */
@@ -550,7 +647,7 @@ export function roomDanger({ state, type, row, room, party, seed }, content) {
   if (!standing.some((fighter) => fighter.key === 'me')) return 'deadly';
   const allies = standing.map((fighter) => (fighter.key === 'me' && Object.keys(trophies).length > 0 ? { ...fighter.unit, trophies } : fighter.unit));
   const before = allies.reduce((sum, unit) => sum + unit.hp, 0);
-  const strength = labyrinthStrength(state.level, type, state.charLevel, content);
+  const strength = labyrinthStrength(state.level, type, state.charLevel, content, party.fit ?? labyrinthFit(state, party, content), strongRoom(state, row, room, content));
   let fought = 0;
   let lost = 0;
   let cost = 0;
@@ -645,7 +742,7 @@ export function roomRefusal(state, map, target) {
 /**
  * @param {LabyrinthState} state
  * @param {{ row: number, room: number }} target
- * @param {{ character: Record<string, any>, equipped: Record<string, any>[], name: string, companions?: Record<string, any>[], trophies?: Record<string, any>, week?: Record<string, any> | null, cards?: { maxed?: string[] } | null }} party
+ * @param {{ character: Record<string, any>, equipped: Record<string, any>[], name: string, companions?: Record<string, any>[], trophies?: Record<string, any>, week?: Record<string, any> | null, cards?: { maxed?: string[] } | null, fit?: number }} party
  * @param {string} seed
  * @param {Content} content
  */
@@ -788,7 +885,7 @@ export const leaveMerchant = (state) => (state.pending?.kind === 'merchant' && !
 // (`cards`). Before the place of the defeat (spentRoom), no XP, gold nor
 // cards.
 /**
- * @param {{ state: LabyrinthState, type: string, row: number, room: number, party: { character: Record<string, any>, equipped: Record<string, any>[], name: string, companions?: Record<string, any>[], trophies?: Record<string, any>, week?: Record<string, any> | null, cards?: { maxed?: string[] } | null }, seed: string }} options
+ * @param {{ state: LabyrinthState, type: string, row: number, room: number, party: { character: Record<string, any>, equipped: Record<string, any>[], name: string, companions?: Record<string, any>[], trophies?: Record<string, any>, week?: Record<string, any> | null, cards?: { maxed?: string[] } | null, fit?: number }, seed: string }} options
  * @param {Content} content
  * @returns {Record<string, any>}
  */
@@ -803,7 +900,7 @@ export function labyrinthFight({ state, type, row, room, party, seed }, content)
   const me = fighters[0];
   const standing = fighters.filter((fighter) => fighter.unit.hp > 0);
   const allies = standing.map((fighter) => (fighter.key === 'me' && Object.keys(trophies).length > 0 ? { ...fighter.unit, trophies } : fighter.unit));
-  const strength = labyrinthStrength(state.level, type, state.charLevel, content);
+  const strength = labyrinthStrength(state.level, type, state.charLevel, content, party.fit ?? labyrinthFit(state, party, content), strongRoom(state, row, room, content));
   // From the character's class level 250 they are stronger still (the myth
   // game, monsterCombatant).
   const enemies = encounterCombatants(plan.encounter, content, { strength, classLevel: character.classLevel ?? 0 });
