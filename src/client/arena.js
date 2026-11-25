@@ -19,6 +19,7 @@ import { motionOn } from './motion.js';
 import { lookOf, skillEffects } from './skill-fx.js';
 import { playHit, playMoment, playSound, playVoice, preloadVoices } from './sound.js';
 import { state } from './state.js';
+import { sweepMoment } from './sweep-landing.js';
 
 // The fields' labels and the results are shown through t(), as the page
 // loads its English after this module.
@@ -434,11 +435,12 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   const summonsOf = (owner) => [...summoned.values()].filter((decoy) => decoy.owner === owner);
   const squadOf = (owner, skill) => summonsOf(owner).filter((decoy) => decoy.skill === skill);
   // The summon an event is about: by its skill (of several, the first still
-  // standing), else the summoner's only one.
-  const summonFor = (event) => {
+  // standing), else the summoner's only one. `passed`: the cards of summons
+  // that fell earlier in a sweep's moment, not played yet (sweepOf).
+  const summonFor = (event, passed = null) => {
     const squad = squadOf(event.target, event.summonSkill ?? event.skill);
     const own = event.summonOrder ? squad.find((decoy) => decoy.order === event.summonOrder) : null;
-    return own ?? squad.find((decoy) => !decoy.down) ?? squad[0] ?? summonsOf(event.target)[0] ?? null;
+    return own ?? squad.find((decoy) => !decoy.down && !passed?.has(decoy.unit.id)) ?? squad[0] ?? summonsOf(event.target)[0] ?? null;
   };
   function summonPlace(owner, card) {
     const at = FIELDS.findIndex(([position]) => position === owner.position);
@@ -575,10 +577,13 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       // A skill wakes: a sweep's wave over the foes, or an aura on its user.
       if (!event.targets) skills.status(event.actor, event.skillName);
       if (event.shield !== undefined) shieldUp(event);
-      // (962: a sweep's look knows the foes its blows reach and its turn.)
-      const casting = skills.cast(event.targets ? { ...acting, ...sweepOf(event) } : acting);
+      // (962: a sweep's look knows the foes its blows reach and its turn;
+      // it lands on the card of a summon that takes a foe's blow, not on
+      // that foe's, 25.11.2026.)
+      const sweep = event.targets ? { ...acting, ...sweepOf(event) } : acting;
+      const casting = skills.cast(sweep);
       const look = lookOf(acting);
-      fxs.cast(acting, look);
+      fxs.cast(sweep, look);
       if (!event.targets) fxs.glint(acting.actor, look.color);
       await casting;
       line();
@@ -679,19 +684,25 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
         return;
       }
       if (event.state === 'hit') {
-        const blow = fxs.blow(event, actor, decoy.unit, null);
-        await fxs.strike(
-          actor,
-          decoy.unit,
-          () => {
-            playHit(actor.sound, false);
-            summonState(event);
-            fxs.hit(blow);
-            float(decoy.unit.id, `−${event.damage}`, 'hit');
-            line();
-          },
-          { blow },
-        );
+        // A blow at many (a sweep's, a cloud's, a cleave's: `sweep`,
+        // 25.11.2026) lands at once with the others, on the summon's card
+        // the sweep's look has just crossed (sweepOf); any other blow comes
+        // at the summon as a blow of its own.
+        const look = event.sweep && event.skill ? lookOf(event) : null;
+        const blow = fxs.blow(event, actor, decoy.unit, look);
+        const impact = () => {
+          playHit(actor.sound, false);
+          summonState(event);
+          fxs.hit(blow);
+          float(decoy.unit.id, `−${event.damage}`, 'hit');
+          line();
+        };
+        if (event.sweep) {
+          impact();
+          await later(240);
+          return;
+        }
+        await fxs.strike(actor, decoy.unit, impact, { blow });
         return;
       }
       const id = run;
@@ -832,32 +843,15 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   }
 
   // 962: what a sweep's look needs of its moment: the foes its blows reach
-  // (not those that dodge or block them, or whose summon takes them), and
-  // which of its turns it is (Huragan stali turns twice). 964: its blows in
-  // the order they land, the dodged ones too (`blows`), and the foes its
-  // effect takes hold of (`affected`, the Klątwa rozkładu's). The fourth
-  // forms: the foes its blows fell (`felled`, the Taniec kosy's souls).
+  // (not those that dodge or block them), and which of its turns it is
+  // (Huragan stali turns twice). 964: its blows in the order they land, the
+  // dodged ones too (`blows`), and the foes its effect takes hold of
+  // (`affected`, the Klątwa rozkładu's). The fourth forms: the foes its
+  // blows fell (`felled`, the Taniec kosy's souls). 25.11.2026: a foe whose
+  // summon takes its blow by the summon's card, among the cards the look
+  // lands on (`targets`) too (sweep-landing.js).
   function sweepOf(event) {
-    const at = fight.events.indexOf(event);
-    const struck = [];
-    const blows = [];
-    const affected = [];
-    const felled = [];
-    for (let next = at + 1; next < fight.events.length; next++) {
-      const coming = fight.events[next];
-      if (coming.t !== event.t || coming.kind === 'skill') break;
-      const own = coming.sweep && coming.actor === event.actor;
-      if (own && (coming.kind === 'hit' || coming.kind === 'crit')) struck.push(coming.target);
-      if (own && (coming.kind === 'hit' || coming.kind === 'crit' || coming.kind === 'dodge')) blows.push({ target: coming.target, hit: coming.kind !== 'dodge' });
-      if (coming.kind === 'effect' && coming.actor === event.actor) affected.push(coming.target);
-      if (coming.kind === 'kill' && struck.includes(coming.target)) felled.push(coming.target);
-    }
-    let turn = 1;
-    for (let back = at - 1; back >= 0 && fight.events[back].t === event.t; back--) {
-      const earlier = fight.events[back];
-      if (earlier.kind === 'skill' && earlier.actor === event.actor && earlier.skill === event.skill) turn += 1;
-    }
-    return { struck, turn, blows, affected, felled };
+    return sweepMoment(fight.events, fight.events.indexOf(event), (coming, fallen) => summonFor(coming, fallen)?.unit.id ?? null);
   }
 
   // 963: what a party heal's look needs of its moment: the members its
