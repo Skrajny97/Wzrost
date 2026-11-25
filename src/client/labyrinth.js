@@ -318,6 +318,8 @@ function mountView(container, { navigate, board }) {
       t(
         'Wchodzi postać i do dwóch towarzyszy z Kwater, jak na wyprawę, o każdej porze, także w czasie wyprawy i pracy w profesji. Poziom to sześć rzędów komnat i strażnik na końcu; z komnaty prowadzą drogi do dwóch albo trzech komnat następnego rzędu. HP przechodzi z walki do walki, bez mikstur. Walka nie wygrana kończy Labirynt na dziś. Nagrody przychodzą od razu, po każdej zdobytej komnacie, więc nic nie przepada. Za zwykłą walkę zgarniesz PD i złoto, za elitę i skarb Odłamki Rdzenia i złoto, a za strażnika Artefakt do Rdzenia. Po elicie, strażniku i na ołtarzu wybierasz jedno z trzech błogosławieństw, które działa do końca dnia. Postęp przepada o północy.',
       ),
+      t('Labirynt mierzy siłę Twojej drużyny (ekwipunek, Rdzeń i towarzysze) i do niej dobiera siłę stworów, więc każda drużyna spotyka w nim walki łatwe i trudne. Twoją przewagą są błogosławieństwa, HP zachowane po drodze i dobrze wybrana droga.'),
+      t('Na planszy bywają silne komnaty: zwykła walka, ale z dużo mocniejszymi stworami, zwykle z czerwoną obwódką. W rzędzie jest najwyżej jedna, więc zawsze da się ją ominąć.'),
       t('Za pierwsze dziś ukończenie poziomu, czyli pokonanie jego strażnika, zgarniesz dodatkowo Odłamki Rdzenia i złoto: im dalszy poziom, tym więcej, a najwięcej za 3. poziom i Piekielny.'),
       t('Po przegranej walce Labirynt można raz dziennie zacząć od nowa, za darmo. Do miejsca porażki komnaty nie dają nagród, tylko błogosławieństwa.'),
     ]);

@@ -4706,6 +4706,131 @@ Gracz (poz. 107): „popraw poziom trudności wcześniej było za trudno a teraz
    - Pełne `npm test` (dwa pliki naraz, 2981 testów) przeszło poza czterema testami z poprawek wyżej (piąte formy, sztandar gildii, zagrożenie z drużyną, mikstury), a po poprawkach ich pliki przechodzą w całości. Przechodzą też `npm run typecheck`, `tools/validate-data.mjs` i `tools/i18n-check.mjs --stamp` (bez nowych tekstów do tłumaczenia).
 8. **Pliki:** `data/balance.json`, `src/engine/combatant.js` (komentarz przy `weakerBy`), `tools/labyrinth-sim.mjs` (`--danger`), testy z punktu 7: `test/threat-trips.test.js`, `test/fifth-evolution.test.js`, `test/guild-week-engine.test.js`, `test/party-threat.test.js`, `test/potions.test.js`, `test/newest-place.test.js`, `test/engine.test.js`.
 
+## Labirynt na miarę drużyny i silne komnaty (1253 C, 25.11.2026)
+
+Wariant C pytania 1253 na stronie ocen, do wyboru autora: warianty A i B razem. Zasady każdej części są w sekcjach „Labirynt na miarę drużyny (1253 A, 25.11.2026)” i „Silne komnaty w Labiryncie (1253 B, 25.11.2026)” niżej, a ich pomiary dotyczą każdej części osobno.
+
+1. **Razem:** siła stworów komnaty to siła poziomu, razy elita albo strażnik (0,6), razy silna komnata (6), razy siła na miarę drużyny (`labyrinthStrength(level, type, charLevel, content, fit, strong)`). Drużynę mierzy walka w 1. rzędzie 1. poziomu, gdzie silnych komnat nie ma, więc silne komnaty pomiaru nie zmieniają. Silna komnata jest zawsze 6 razy mocniejsza od zwykłej walki tej samej drużyny, więc dla każdej drużyny czerwona.
+2. **Na ekranie** oba zdania w „Jak to działa?” Labiryntu, najpierw o sile na miarę drużyny, potem o silnych komnatach (po polsku i po angielsku, jak w A i B). Bez makiet.
+3. **Pomiar** (`tools/labyrinth-sim.mjs --danger`, pięć klas po 80 dni na poziom, postać z dwoma towarzyszami). W komórkach, jak w sekcji „Stwory pośrodku…”, dla poziomów 1–3 razem: walki zielone przy wejściu na poziom; plansze całe zielone; dni z przejściem 3. poziomu; dni z przejściem Piekielnego, w procentach, dla gracza z narzędzia, który wybiera komnaty rozważnie, ale nie patrzy na obwódki:
+
+   | Poziom postaci | Gracz | Dziś (0.5.21) | C |
+   | --- | --- | --- | --- |
+   | 60 | realistyczny | 98,7; 90; 95,8; 18,3 | 79; 10,3; 15,8; 2,5 |
+   | 60 | „low” | 90,7; 59; 42,3; 1,3 | 79,2; 9,4; 14,5; 0,5 |
+   | 107 | realistyczny | 100; 99,8; 100; 72,8 | 79,4; 10,6; 13; 1,3 |
+   | 107 | „low” | 97,9; 88,1; 92,2; 8,8 | 80; 10,8; 14; 1,8 |
+   | 200 | realistyczny | 99,7; 97,3; 99,3; 55,3 | 80,7; 11,6; 17; 4,5 |
+   | 200 | „low” | 95; 75,5; 75,8; 2,7 | 80,3; 10,1; 18; 3 |
+
+   Dni z przejściem 3. poziomu u gracza, który patrzy na obwódki (`--player colours`), i u gracza, który klika na ślepo (`--player random`), w procentach:
+
+   | Poziom postaci | Gracz | Dziś: obwódki / na ślepo | C: obwódki / na ślepo |
+   | --- | --- | --- | --- |
+   | 60 | realistyczny | 96 / 91 | 65,5 / 6,5 |
+   | 60 | „low” | 46 / 29,5 | 68,5 / 5,3 |
+   | 107 | realistyczny | 100 / 99,8 | 65,8 / 6,3 |
+   | 107 | „low” | 91,3 / 82,5 | 66,8 / 7 |
+   | 200 | realistyczny | 99,3 / 98 | 67,5 / 6,8 |
+   | 200 | „low” | 76,3 / 62 | 73,3 / 7,5 |
+
+   - Gracz, który patrzy na obwódki, ma Labirynt prawie taki jak w A, każdy, słabszy i silniejszy, na każdym poziomie: 1. poziom prawie zawsze, 2. w 85–92% dni, 3. w 65–73%, a Piekielny w 6–18%.
+   - Plansza cała zielona to 9–12% plansz zamiast 59–100%, a czerwonych jest ok. 18% walk.
+   - Klikający na ślepo kończy 3. poziom w 5–8% dni, a 1. tylko w 45–55%. Gracz z narzędzia, który wybiera rozważnie, ale nie patrzy na obwódki, kończy 1. poziom w 56–61% dni, a 3. w 13–18%: bez patrzenia na obwódki Labirynt jest teraz bardzo trudny.
+4. **Nagrody za ukończenie (0.5.1)** zostają, jak są. Gracz, który patrzy na obwódki, zgarnia za ukończenie mniej więcej tyle co w A (dobrze wyposażony na 107. poziomie ok. 14,5 Odłamka dziennie zamiast ok. 28), a ten, kto nie patrzy, dużo mniej.
+5. **Testy:** obie nowe części `test/labyrinth.test.js`, z A i z B (siła silnej komnaty sprawdzana bez siły na miarę drużyny: `labyrinthStrength(…, 1, true)`). `test/labyrinth.test.js`, `test/labyrinth-api.test.js`, `test/labyrinth-report-first.test.js` i testy Labiryntu w `test/card-sources.test.js`, `test/mana-carry.test.js`, `test/newest-place.test.js`, `test/cards-api.test.js`, `test/parties.test.js`, `test/class-level-curves.test.js` i `test/myth-game.test.js` przechodzą, tak jak `npm run typecheck`, `tools/validate-data.mjs` i `tools/i18n-check.mjs`.
+6. **Pliki:** te z A i z B razem.
+
+## Labirynt na miarę drużyny (1253 A, 25.11.2026)
+
+Wariant A pytania 1253 na stronie ocen, do wyboru autora. Gracz (poz. 107): „Labirynt jest nudny i nie ważne jaką drogę wybierasz i tak wszystko jest na zielono” oraz „Jak dla dziecka byle klikać nie ważne co bo i tak zrobisz go”. Stwory pośrodku (0.5.21) tego nie zmieniły: dobrze wyposażony gracz na 107. poziomie dalej ma zielone wszystkie walki poziomów 1–3 i przechodzi cały Labirynt każdego dnia (sekcja „Stwory pośrodku: 1,75 / 1,5 / 1,25 raza”, punkt 6).
+
+1. **Skąd problem.** Siła Labiryntu jest jedna dla wszystkich, a drużyny różnią się bardzo. Miarą jest siła stworów, przy której drużyna w pełnym HP traci w zwykłej walce 1. poziomu 15% HP: dobrze wyposażony gracz („realistyczny” z `tools/difficulty-sim.mjs`) wytrzymuje stwory 3 razy mocniejsze niż dziś na 60. poziomie, 6,7 raza na 107. i 5 razy na 200., a słabiej wyposażony („low”, pod którego stroiliśmy Labirynt 13.11.2026) 2,3, 3,9 i 3,3 raza. Jedna stała siła nie pasuje więc do nikogo. Zmierzone i odrzucone:
+   - Wszystkie poziomy mocniejsze o 25%: dobrze wyposażony gracz na 107. poziomie dalej ma zielone 99,5% walk i przechodzi 3. poziom każdego dnia, a słabiej wyposażony na 60. poziomie przechodzi 2. poziom już tylko w 52% dni (dziś 92%). O 50%: na 107. poziomie dalej 98,6% zielonych, a słabszy na 60. poziomie przechodzi 2. poziom w 18% dni.
+   - Mocniejszy tylko 3. poziom i Piekielny (×1,75 i ×3,5 zamiast ×1,35 i ×2,7): na 107. poziomie dalej 99,6% zielonych walk i 3. poziom codziennie, a słabszy gracz na 60. poziomie przechodzi 3. poziom w 15–20% dni (dziś 42–46%).
+   - Przy jednakowym mnożeniu wszystkiego najpierw rośnie strażnik: pojedynczy silny stwór ma dużo bardziej stromy próg niż grupa. Na 107. poziomie przy sile ×3 zwykła walka kosztowała dobrze wyposażoną drużynę ok. 8% HP, a strażnika wygrywała w co drugiej walce, więc o dniu decydował sam strażnik, a droga dalej nie miała znaczenia (patrzący na obwódki przechodził 3. poziom w 13% dni, klikający na ślepo w 4%).
+2. **Na czym polega.** Labirynt mierzy drużynę i dobiera do niej siłę stworów (`labyrinthFit` w `src/engine/labyrinth.js`, `fit` w `data/labyrinth.json`):
+   - Drużyna taka, jak teraz (ekwipunek, Rdzeń i towarzysze dnia), w pełnym HP i bez błogosławieństw, trofeów i premii tygodnia, walczy próbnie w walce odniesienia dnia: 1. poziom, 1. rząd, 1. komnata, ta sama dla wszystkich tego dnia. Szukana jest siła stworów, przy której traci w niej średnio 15% HP (`fit.cost`; przegrana liczy się jak całe HP), w 6 krokach po 2 próbne walki, z ziarna dnia postaci, więc ta sama drużyna dostaje tego dnia ten sam wynik.
+   - Stwory każdej komnaty mają połowę tej siły (`fit.share` 0,5), w ciosie i w HP, ale nigdy mniej niż dziś (`fit.least` 1). Słaba drużyna spotyka więc stwory takie jak dotąd, a silniejsza odpowiednio mocniejsze. Na 107. poziomie dobrze wyposażony gracz spotyka stwory średnio 2,9 raza mocniejsze niż dziś, a słabiej wyposażony 1,9 raza; na 60. poziomie 1,9 i 1,3 raza.
+   - Siła liczy się od nowa przy każdej walce i każdym spojrzeniu na planszę, z drużyną, która walczy. Zdjęcie ekwipunku przed wejściem nic nie daje: stwory zawsze stają przed tą drużyną, którą zmierzono.
+   - Błogosławieństwa, HP zachowane po drodze i trofea Encyklopedii nie wchodzą do pomiaru, więc zostają przewagą drużyny, a o wyniku decydują wybory na planszy.
+3. **Elity i strażnicy słabsi względem zwykłych walk** (`eliteStrength` i `guardianStrength` 0,6, było 1), z powodu z punktu 1: bez tego przy mocniejszych stworach o dniu decydowałby strażnik. Teraz większość dni kończy się na drodze, a nie na strażniku (na 107. poziomie u dobrze wyposażonego gracza 202 z 348 porażek w zwykłej walce, dziś 1 ze 101).
+4. **Bez zmian:** nagrody (także za ukończenie poziomu), poziom stworów (pośrodku między poziomem postaci i klasy), mapa i rodzaje komnat, źródła, kupiec, błogosławieństwa, obwódki i ich progi (899 A) oraz stwory poza Labiryntem.
+5. **Na ekranie** jedno zdanie w „Jak to działa?” Labiryntu: „Labirynt mierzy siłę Twojej drużyny (ekwipunek, Rdzeń i towarzysze) i do niej dobiera siłę stworów, więc każda drużyna spotyka w nim walki łatwe i trudne. Twoją przewagą są błogosławieństwa, HP zachowane po drodze i dobrze wybrana droga.” Po angielsku: „The Labyrinth measures your party (gear, Core and companions) and sets the creatures' strength to match, so every party meets easy fights and hard ones there. Your edge is the blessings, the HP you keep along the way and a well-chosen path.” Bez makiet: to zdanie w istniejącym objaśnieniu.
+6. **Pomiar** (`tools/labyrinth-sim.mjs --danger`, pięć klas po 80 dni na poziom, postać z dwoma towarzyszami). W komórkach, jak w sekcji „Stwory pośrodku…”, dla poziomów 1–3 razem: walki zielone przy wejściu na poziom; plansze całe zielone; dni z przejściem 3. poziomu; dni z przejściem Piekielnego, w procentach, dla gracza z narzędzia, który wybiera komnaty rozważnie, ale nie patrzy na obwódki:
+
+   | Poziom postaci | Gracz | Dziś (0.5.21) | A |
+   | --- | --- | --- | --- |
+   | 60 | realistyczny | 98,7; 90; 95,8; 18,3 | 90,4; 76,2; 63,3; 12 |
+   | 60 | „low” | 90,7; 59; 42,3; 1,3 | 90,7; 75,4; 63,3; 3,8 |
+   | 107 | realistyczny | 100; 99,8; 100; 72,8 | 91,1; 77,6; 59,5; 10,3 |
+   | 107 | „low” | 97,9; 88,1; 92,2; 8,8 | 92,7; 80; 61,8; 6,5 |
+   | 200 | realistyczny | 99,7; 97,3; 99,3; 55,3 | 93; 79,3; 64,3; 12,5 |
+   | 200 | „low” | 95; 75,5; 75,8; 2,7 | 93; 80; 69; 9 |
+
+   Czy droga ma znaczenie (nowa opcja `--player`): dni z przejściem 3. poziomu u gracza, który patrzy na obwódki (`--player colours`: nie wchodzi do czerwonej komnaty, gdy może wejść gdzie indziej), i u gracza, który klika na ślepo (`--player random`), w procentach:
+
+   | Poziom postaci | Gracz | Dziś: obwódki / na ślepo | A: obwódki / na ślepo |
+   | --- | --- | --- | --- |
+   | 60 | realistyczny | 96 / 91 | 68 / 51,2 |
+   | 60 | „low” | 46 / 29,5 | 70,3 / 45 |
+   | 107 | realistyczny | 100 / 99,8 | 65,5 / 48 |
+   | 107 | „low” | 91,3 / 82,5 | 68,3 / 50,5 |
+   | 200 | realistyczny | 99,3 / 98 | 68,3 / 54,3 |
+   | 200 | „low” | 76,3 / 62 | 74 / 56,8 |
+
+   - Każdy gracz, słabszy i silniejszy, na każdym poziomie ma teraz podobny Labirynt: 1. poziom prawie zawsze, 2. w 86–93% dni, 3. w 65–74% dni, a Piekielny w 7–18% dni (u gracza, który patrzy na obwódki). Dziś 3. poziom przechodzi się w 46–100% dni, a Piekielny w 1–75%, zależnie od wyposażenia i poziomu.
+   - Klikający na ślepo przechodzi 3. poziom o 14–25 punktów rzadziej niż ten, kto patrzy na obwódki; dziś dobrze wyposażony gracz przechodzi go tak samo bez patrzenia.
+   - Przy wejściu na poziom plansza dalej jest w większości zielona (drużyna ma wtedy pełne HP), ale w miarę utraty HP walki robią się żółte i czerwone. Obwódki mówią prawdę: 83–90% porażek gracza, który na nie patrzy, przychodzi w walce, która przy wyborze była czerwona.
+   - Słabiej wyposażony gracz na 60. poziomie ma łatwiej niż dziś (3. poziom w 70% dni zamiast 46%), bo jego stwory zostają, a elity i strażnicy słabną.
+7. **Nagrody za ukończenie (0.5.1)** zostają, jak są, i dalej spełniają swój cel: ukończenie poziomu daje więcej niż celowa porażka. Silniejszy gracz zgarnie jednak mniej dziennie, bo rzadziej kończy 3. poziom i Piekielny: dobrze wyposażony gracz na 107. poziomie, który patrzy na obwódki, dostaje za ukończenie poziomów średnio ok. 14,5 Odłamka dziennie zamiast ok. 28 i 2,7 Artefaktu zamiast 3,7, w tym Artefakt z Piekielnego w 13% dni zamiast 75%. Słabiej wyposażony gracz na 60. poziomie zgarnie więcej niż dziś (ok. 14 Odłamków zamiast 11). Jeśli Rdzeń ma rosnąć jak dotąd, nagrody za ukończenie można później podnieść; ta zmiana ich nie rusza.
+8. **Koszt:** pomiar to 12 próbnych walk przy każdym spojrzeniu na planszę (liczony raz na całą planszę, `labyrinthView` w `src/server/labyrinth.js`) i przy każdej walce. Lokalnie ok. 13–27 ms (mediana, do ok. 110 ms), a cała plansza z obwódkami 35–47 ms zamiast 25–33 ms.
+9. **Testy:** `test/labyrinth.test.js`, nowa część „the Labirynt against the party (1253)”: silniejsza drużyna spotyka mocniejsze stwory, słaba takie jak dotąd, ten sam wynik przez cały dzień, mniej ekwipunku to słabsze stwory, bez `fit` w danych Labirynt taki jak dotąd; HP, błogosławieństwa, trofea i premia tygodnia nie zmieniają pomiaru; stwory każdej komnaty mocniejsze tyle razy w ciosie i HP, a plansza i walka liczą go tak samo jak serwer. Dotychczasowe testy Labiryntu przechodzą bez zmian: `test/labyrinth.test.js`, `test/labyrinth-api.test.js` i testy Labiryntu w `test/card-sources.test.js`, `test/mana-carry.test.js`, `test/newest-place.test.js`, `test/cards-api.test.js`, `test/parties.test.js`, `test/class-level-curves.test.js` i `test/myth-game.test.js`. Przechodzą też `npm run typecheck`, `tools/validate-data.mjs` i `tools/i18n-check.mjs`.
+10. **Pliki:** `data/labyrinth.json` (`fit`, `eliteStrength`, `guardianStrength`, `$comment`), `data/schemas/labyrinth.schema.json`, `src/engine/labyrinth.js` (`labyrinthFit`, `labyrinthStrength`, `roomDanger`, `labyrinthFight`), `src/server/labyrinth.js`, `src/client/labyrinth.js`, `data/en/strings.json`, `tools/labyrinth-sim.mjs` (pomiar raz na dzień i opcja `--player`), `test/labyrinth.test.js`.
+
+## Silne komnaty w Labiryncie (1253 B, 25.11.2026)
+
+Wariant B pytania 1253 na stronie ocen, do wyboru autora. Gracz (poz. 107): „Labirynt jest nudny i nie ważne jaką drogę wybierasz i tak wszystko jest na zielono” oraz „Jak dla dziecka byle klikać nie ważne co bo i tak zrobisz go”. Stwory pośrodku (0.5.21) tego nie zmieniły: dobrze wyposażony gracz na 107. poziomie dalej ma zielone wszystkie walki poziomów 1–3 i przechodzi cały Labirynt każdego dnia (sekcja „Stwory pośrodku: 1,75 / 1,5 / 1,25 raza”, punkt 6).
+
+1. **Skąd problem.** Zwykłe walki jednego poziomu mają tę samą siłę i różnią się tylko stworami i krainą, więc dla drużyny w pełnym HP są prawie tak samo trudne: dla dobrze wyposażonego gracza wszystkie zielone i nie ma między czym wybierać. Mocniejsze stwory w całym Labiryncie zmieniają kolor wszystkich komnat naraz i najpierw robią ze strażnika ścianę, której nie da się ominąć. Na 107. poziomie przy sile wszystkiego ×3 dobrze wyposażony gracz dalej miał zielone 81% walk, a 3. poziom przechodził w 13% dni, jeśli patrzył na obwódki, i w 4%, jeśli klikał na ślepo, bo o dniu decydował strażnik. B zostawia siłę Labiryntu, a na każdej planszy stawia kilka komnat wyraźnie groźniejszych od reszty.
+2. **Na czym polega.** W każdym rzędzie poziomu poza pierwszym, z szansą 40% (`strongRooms.chance` w `data/labyrinth.json`), jedna ze zwykłych walk jest silną komnatą: jej stwory są 6 razy mocniejsze w ciosie i w HP (`strongRooms.strength`; `labyrinthMap` i `labyrinthStrength` w `src/engine/labyrinth.js`). Elity, strażnicy i komnaty bez walki zostają jak są.
+   - Najwyżej jedna w rzędzie, a z każdej komnaty prowadzą co najmniej dwie drogi, więc zawsze da się ją ominąć. Pierwszy rząd, od którego zaczyna się każdy poziom, nie ma ich wcale (brakujący szczegół: tak najprościej, a wejście na poziom zostaje spokojne).
+   - Poziom ma średnio 1,6 silnej komnaty, a 15% poziomów żadnej; to ok. 19% zwykłych walk.
+   - Losowane z osobnego ziarna dnia, więc komnaty i drogi są takie jak bez nich, a silne komnaty te same dla wszystkich graczy tego dnia.
+   - Silna komnata wygląda na planszy jak zwykła walka, a jej groźbę pokazuje obwódka, dla prawie każdej drużyny czerwona (brakujący szczegół: bez nowego znaku, bo obwódka już to mówi). Nagrody ma takie jak zwykła walka.
+3. **Dlaczego 6 razy.** Dobrze wyposażony gracz na 107. poziomie wytrzymuje stwory 6,7 raza mocniejsze niż dziś (przy takiej sile traci w zwykłej walce 1. poziomu 15% HP), więc słabsza silna komnata byłaby dla niego dalej zielona. W próbie (20 dni na klasę, wtedy jeszcze z silnymi komnatami także w 1. rzędzie) przy 5 razach klikający na ślepo przechodził u niego 3. poziom w 50% dni, a przy 6 razach w 28%. Dla słabszej drużyny silna komnata i tak jest czerwona.
+4. **Bez zmian:** siła zwykłych walk, elit i strażników, nagrody (także za ukończenie poziomu), poziom stworów, rodzaje komnat i ich wagi, źródła, kupiec, błogosławieństwa, obwódki i ich progi (899 A) oraz stwory poza Labiryntem.
+5. **Na ekranie** jedno zdanie w „Jak to działa?” Labiryntu: „Na planszy bywają silne komnaty: zwykła walka, ale z dużo mocniejszymi stworami, zwykle z czerwoną obwódką. W rzędzie jest najwyżej jedna, więc zawsze da się ją ominąć.” Po angielsku: „Some chambers on the map are strong: an ordinary fight, but with much stronger creatures, usually with a red ring. A row has at most one, so there is always a way around it.” Bez makiet: to zdanie w istniejącym objaśnieniu.
+6. **Pomiar** (`tools/labyrinth-sim.mjs --danger`, pięć klas po 80 dni na poziom, postać z dwoma towarzyszami). W komórkach, jak w sekcji „Stwory pośrodku…”, dla poziomów 1–3 razem: walki zielone przy wejściu na poziom; plansze całe zielone; dni z przejściem 3. poziomu; dni z przejściem Piekielnego, w procentach, dla gracza z narzędzia, który wybiera komnaty rozważnie, ale nie patrzy na obwódki:
+
+   | Poziom postaci | Gracz | Dziś (0.5.21) | B |
+   | --- | --- | --- | --- |
+   | 60 | realistyczny | 98,7; 90; 95,8; 18,3 | 85,9; 22,6; 35,3; 5 |
+   | 60 | „low” | 90,7; 59; 42,3; 1,3 | 79,3; 12,9; 9,8; 0,8 |
+   | 107 | realistyczny | 100; 99,8; 100; 72,8 | 91,5; 45,8; 59; 26 |
+   | 107 | „low” | 97,9; 88,1; 92,2; 8,8 | 84,5; 18,8; 29,8; 2 |
+   | 200 | realistyczny | 99,7; 97,3; 99,3; 55,3 | 88,6; 33,7; 47,3; 13,8 |
+   | 200 | „low” | 95; 75,5; 75,8; 2,7 | 81,2; 11,9; 20; 0,5 |
+
+   Czy droga ma znaczenie (nowa opcja `--player`): dni z przejściem 3. poziomu u gracza, który patrzy na obwódki (`--player colours`: nie wchodzi do czerwonej komnaty, gdy może wejść gdzie indziej), i u gracza, który klika na ślepo (`--player random`), w procentach:
+
+   | Poziom postaci | Gracz | Dziś: obwódki / na ślepo | B: obwódki / na ślepo |
+   | --- | --- | --- | --- |
+   | 60 | realistyczny | 96 / 91 | 93,5 / 21 |
+   | 60 | „low” | 46 / 29,5 | 48,5 / 3,8 |
+   | 107 | realistyczny | 100 / 99,8 | 96,5 / 44,5 |
+   | 107 | „low” | 91,3 / 82,5 | 91 / 15,3 |
+   | 200 | realistyczny | 99,3 / 98 | 96,5 / 28 |
+   | 200 | „low” | 76,3 / 62 | 73,8 / 10,5 |
+
+   - Kto patrzy na obwódki, ma Labirynt prawie taki jak dziś: 3. poziom w 48–97% dni, Piekielny w 2–71% (dziś 46–100% i 1–75%).
+   - Kto klika na ślepo, przechodzi 3. poziom w 4–45% dni zamiast 30–100%, a już 1. poziom tylko w 51–95% dni. Gracz z narzędzia, który wybiera rozważnie, ale bez patrzenia na obwódki, wypada pomiędzy (tabela wyżej).
+   - Plansza cała zielona to teraz 12–46% plansz zamiast 59–100%. Wciąż najwięcej u dobrze wyposażonego gracza na 107. poziomie, bo na 1. poziomie silna komnata bywa dla niego jeszcze zielona.
+   - B nie robi Labiryntu trudniejszym dla uważnego, dobrze wyposażonego gracza: na 107. poziomie dalej przechodzi 3. poziom w 97% dni, a Piekielny w 71%.
+7. **Nagrody za ukończenie (0.5.1)** zostają, jak są, i dalej pasują: kto patrzy na obwódki, kończy poziomy prawie tak często jak dziś, więc zgarnia prawie tyle samo. Mniej dostaje tylko ten, kto klika na ślepo.
+8. **Testy:** `test/labyrinth.test.js`, nowa część „the strong rooms (1253)”: najwyżej jedna w rzędzie, tylko zwykła walka, żadnej w pierwszym rzędzie, z każdej komnaty droga do komnaty, która nie jest silna, komnaty i drogi takie jak bez nich, mniej więcej tyle, ile mówi szansa; stwory silnej komnaty mocniejsze tyle razy w ciosie i HP w walce, a obwódka nigdy nie jest łagodniejsza niż bez niej. Dotychczasowe testy Labiryntu przechodzą bez zmian: `test/labyrinth.test.js`, `test/labyrinth-api.test.js`, `test/labyrinth-report-first.test.js` i testy Labiryntu w `test/card-sources.test.js`, `test/mana-carry.test.js`, `test/newest-place.test.js`, `test/cards-api.test.js`, `test/parties.test.js`, `test/class-level-curves.test.js` i `test/myth-game.test.js`. Testy API wchodzą do komnat 1. rzędu dzisiejszej mapy, więc silna komnata w 1. rzędzie zależałaby od daty i czasem by je psuła; to drugi powód, dla którego 1. rząd ich nie ma. Przechodzą też `npm run typecheck`, `tools/validate-data.mjs` i `tools/i18n-check.mjs`.
+9. **Pliki:** `data/labyrinth.json` (`strongRooms`, `$comment`), `data/schemas/labyrinth.schema.json`, `src/engine/labyrinth.js` (`labyrinthMap`, `labyrinthStrength`, `strongRoom`, `roomDanger`, `labyrinthFight`), `src/client/labyrinth.js`, `data/en/strings.json`, `tools/labyrinth-sim.mjs` (opcja `--player`), `test/labyrinth.test.js`.
+
 ## Wersja 0.4.93 (22.11.2026): soundtrack w Ustawieniach
 
 Autor: „Podepnij ten film z podpisem soundtrack tam gdzie wszystkie sociale” z linkiem do filmu na YouTube z muzyką z gry (29 minut, 10 utworów, pod każdym kraina z gry). Wiersz „Soundtrack” w Ustawieniach pod Wiki, zrobiony jak pozostałe (`social.places`, id `youtube`): znak YouTube z Simple Icons (CC0), biały na czerwonym kafelku `#FF0000`, i przycisk „Posłuchaj muzyki z gry” (po angielsku „Listen to the game's music”). Link bez dopisku `?feature=shared`, jak link Wattpada bez znaczników udostępniania. Schemat przyjmuje dla niego tylko `https://youtu.be/…` i `https://(www.)youtube.com/…`. Sprawdzone w przeglądarce na 320 px i 1366 px.
