@@ -1237,6 +1237,14 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   // Druid's line) the one called first stands in front; when it falls, the
   // next takes its place. The events name the summon's skill (summonSkill)
   // and, in a pack, its place (summonOrder), so the playback finds its card.
+  // A blow at many takes no other way: a sweep's blow meant for the summoner
+  // (Deszcz meteorów at a Nekromanta, a cloud's, a cleave's) lands on the
+  // summon in front, the summoner keeps its HP, and the summon loses the
+  // blow's damage, all of it while it has HP for it. The hit names the
+  // blow's skill and that it was one of many (`sweep`), so the playback
+  // lands it on the summon's card with the sweep's other blows (a player,
+  // level 97, 24.11.2026: the meteors fell on the Nekromanta, who lost
+  // nothing, and the skeleton's hit came after them as a blow of its own).
   const summonTakes = (/** @type {Unit} */ actor, /** @type {Unit} */ owner, /** @type {number} */ t, /** @type {Move} */ move) => {
     const decoy = owner.summons[0];
     const weapon = actor.weapon;
@@ -1254,6 +1262,8 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       state: 'hit',
       actor: actor.id,
       target: owner.id,
+      ...(move.skill && { skill: move.skill.id, skillName: move.skill.name }),
+      ...(move.sweep && { sweep: true }),
       summon: decoy.name,
       summonSkill: decoy.skill.id,
       ...(decoy.order && { summonOrder: decoy.order }),

@@ -1770,6 +1770,11 @@
       "id": "0.5.19",
       "title": "Wersja 0.5.19",
       "body": "- W tle: piąta ewolucja klas, od 400. poziomu klasy, jest już w kodzie gry. Wejdzie, gdy będzie gotowa cała jej grafika."
+    },
+    {
+      "id": "0.5.20",
+      "title": "Wersja 0.5.20",
+      "body": "- Odtwarzanie walki: gdy przywołaniec, np. szkielet Nekromanty, przyjmuje na siebie czar albo cios na wszystkich wrogów, taki jak Deszcz meteorów, efekt spada teraz na jego kartę i od razu widać, ile HP stracił. Wcześniej wyglądało to tak, jakby czar nic nie robił. Sama walka zawsze liczyła się dobrze."
     }
   ]
 }
