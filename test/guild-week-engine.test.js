@@ -168,7 +168,13 @@ describe('the Krainy pod sztandarem (1200 A)', () => {
     let materialsBanner = 0;
     const count = (hunt) => Object.values(hunt.materials).reduce((sum, one) => sum + one, 0);
     const fightGold = (hunt) => hunt.fights.reduce((sum, fight) => sum + fight.gold, 0);
-    for (let index = 0; index < 60; index += 1) {
+    // 240 explorations: the banner's extra materials change the loot's
+    // draws after them, so the two explorations part ways, and 60 of them
+    // left the share anywhere between 1.01 and 1.09. Since the creatures
+    // stand halfway (25.11.2026) this warrior faints on about a fifth of
+    // them here (from 24.11 on hardly any), which parts them more: 60 came
+    // to 1.012, 240 come to 1.036.
+    for (let index = 0; index < 240; index += 1) {
       const hunt = (banner) => simulateHunt({ character, equipped, hp: 99999, name: 'Mira', areaId: 'boar-thicket', minutes: 240, seed: `sztandar:${index}`, banner }, content);
       const plain = hunt(0);
       const raised = hunt(0.05);

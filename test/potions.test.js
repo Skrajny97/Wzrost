@@ -284,8 +284,15 @@ describe('potions in fights', () => {
   });
 
   test('healing potions taken along lower the chance of fainting', () => {
-    const { character, equipped } = typicalCharacter('shadow', 20, content);
-    const input = { character, equipped, hp: 9999, areaId: 'mossy-boulders' };
+    // A Cień of level 22 in Pajęczy Parów (31–35), whose fights cost it HP
+    // one after another: 2.6% an hour, 1.7% with the potions (under four
+    // fifths of it too with the weaker creatures of 24.11.2026 and without
+    // them). Since the creatures stand halfway (25.11.2026) the one of level
+    // 20 in Omszałe Głazy, where this was measured before, faints there
+    // almost only against the elite, which beats it every time, potions or
+    // not (3.9% an hour, 3.7% with them).
+    const { character, equipped } = typicalCharacter('shadow', 22, content);
+    const input = { character, equipped, hp: 9999, areaId: 'spider-gully' };
     const samples = threatSamples(input, calm);
     const plain = faintChances(input, calm, samples);
     const none = faintChances({ ...input, healing: { count: 0, amount: 0.2, below: 0.4 } }, calm, samples);

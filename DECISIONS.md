@@ -4567,6 +4567,8 @@ Autor: „Pomijając Tier powinna być też blokada poziomem na ~30-50 w górę,
 
 ## Słabsze stwory: 2,5 / 2 / 1,5 raza (24.11.2026)
 
+*Zmienione 25.11.2026: stwory stoją pośrodku, słabsze 1,75 / 1,5 / 1,25 raza, zob. „Stwory pośrodku: 1,75 / 1,5 / 1,25 raza”. Zasada (punkty 1–5) zostaje, zmieniły się liczby.*
+
 Autor (24.11.2026): „Trzeba trochę zmniejszyc poziom trudności jednak, bo jest za silne wszystko. Tak z 2,5 raza łatwiej powinno być do 150 poziomu, 150-250 z 2 razy słabsze i od 250 1,5 razy słabsze”, a potem: „wygładź ten poziom trudności oczywiście”.
 
 1. **O ile słabsze.** Każdy stwór jest słabszy według swojego poziomu: do 150. poziomu 2,5 raza, od 150. do 250. coraz mniej, równo od 2,5 do 1,5 raza (na 200., w środku przedziału 150–250, dwa razy), a od 250. 1,5 raza. Bez skoków na 150. i 250. poziomie („wygładź”). Ta liczba dzieli obecną siłę stworów: wzrost od 250. poziomu klasy (0.4.57), od 100. poziomu klasy (0.4.64), siła najnowszego miejsca (0.4.67), Trudnej i Piekielnej wyprawy, Wież i Portali zostają, a podział przychodzi na końcu.
@@ -4600,6 +4602,67 @@ Autor (24.11.2026): „Trzeba trochę zmniejszyc poziom trudności jednak, bo je
    - `test/companions.test.js`: zagrożenie zależne od relacji z towarzyszem sprawdzane na Trudnej wyprawie (`?hard=1`), bo na zwykłej w Omszałych Głazach jest niskie przy każdej relacji.
    - `test/party-challenge.test.js`: tolerancja stosunku HP stworów Piekielnej wyprawy do zwykłej 0,075 zamiast 0,03, bo stwory Kruczych Wykrotów mają teraz ok. 30 HP i zaokrąglenie przesuwa stosunek do 0,07.
    - `test/second-evolution.test.js`: drugie formy dalej porównywane ze stworami z czasu, gdy je ustawiano, więc także bez tej zmiany (jak bez zmian z 19.11.2026); z nią żadna forma tam nie mdleje.
+
+## Stwory pośrodku: 1,75 / 1,5 / 1,25 raza (25.11.2026)
+
+Gracz (poz. 107): „popraw poziom trudności wcześniej było za trudno a teraz jest za łatwo. Labirynt jest nudny i nie ważne jaką drogę wybierasz i tak wszystko jest na zielono” oraz „Jak dla dziecka byle klikać nie ważne co bo i tak zrobisz go”. Autor: „teraz jest za łatwo”, a potem: „Daj coś pomiędzy ostatnimi dwoma poziomami trudności”.
+
+1. **O ile słabsze.** Pośrodku między dwoma ostatnimi poziomami trudności: stworami sprzed 24.11.2026 (bez osłabienia) i osłabionymi 24.11.2026 o 2,5 / 2 / 1,5 raza (sekcja „Słabsze stwory: 2,5 / 2 / 1,5 raza”). Każda liczba to środek między 1 a dotychczasową: do 150. poziomu stwora 1,75 raza słabsze (było 2,5), od 150. do 250. coraz mniej, równo od 1,75 do 1,25 raza (na 200. 1,5 raza, było 2), a od 250. 1,25 raza (było 1,5). Cios i HP maleją jak dotąd, każde przez pierwiastek z tej liczby: do 150. po ×0,756 (było ×0,632), na 200. po ×0,816 (było ×0,707), od 250. po ×0,894 (było ×0,816). Wobec 24.11.2026 stwór jest więc 1,43 raza silniejszy do 150. poziomu, 1,33 raza na 200. i 1,2 raza od 250. Bez skoków na 150. i 250. poziomie, jak dotąd.
+2. **Gdzie.** Wszędzie tam, gdzie działało osłabienie z 24.11.2026 (jego punkt 3), także w Labiryncie: wyprawy (z Szybkimi i Błyskawicznymi polowaniami, Trudną i Piekielną wyprawą i wyprawami drużyny), elity i czempioni, Poszukiwani, walki zdarzeń, obie Wieże, Portale, Labirynt, Sala prób, Bestia Gildii, strażnicy Wyprawy Gildii i szacowanie zagrożenia, które samo pokazuje nowe ryzyko. Bez zmian zostaje to, czego osłabienie nie dotyczyło (Arena, pojedynki i wojny gildii, karty Talii Systemu, podgląd umiejętności, nagrody, doświadczenie i łupy), i siła najnowszego miejsca (`monsters.newestPlace`).
+3. **W danych:** `monsters.weaker.curve` w `data/balance.json` to `[[150, 1.75], [250, 1.25]]` (było `[[150, 2.5], [250, 1.5]]`), a w `$comment` są słowa gracza i autora.
+4. **Pomiar wypraw** (`tools/difficulty-sim.mjs`, realistyczny gracz z towarzyszami, wyprawa 4 h w najnowszym miejscu, pięć klas, 600 wypraw na klasę, średnia klas; dzisiejszy sprzęt z Tierami XI i XII i dzisiejsza krzywa najnowszego miejsca). W komórkach omdlenia i HP na końcu, w procentach. „Bez osłabienia” to pusta `curve`, czyli siła stworów sprzed 24.11.2026 przy dzisiejszym sprzęcie:
+
+   | Poziom postaci (klasy) | Miejsce | Bez osłabienia | 2,5 / 2 / 1,5 (24.11) | 1,75 / 1,5 / 1,25 (teraz) |
+   | --- | --- | --- | --- | --- |
+   | 20 (22) | Żmijowe Zwalisko, 16–20 | 13,6; HP 52,6 | 0; HP 82 | 0,5; HP 71,1 |
+   | 60 (70) | Bobrowe Tamy, 56–60 | 24,1; HP 68 | 0,6; HP 92,6 | 4,1; HP 87,5 |
+   | 100 (119) | Stare Wyrobisko, 96–100 | 23,1; HP 69,9 | 0; HP 91,3 | 0,7; HP 88,7 |
+   | 140 (162) | Lotne Piaski, 136–140 | 16,9; HP 75,8 | 0,1; HP 93,5 | 0,6; HP 90,7 |
+   | 160 (185) | Paprociowy Gąszcz, 156–160 | 19,7; HP 72,5 | 0,1; HP 91,8 | 1,2; HP 88,7 |
+   | 200 (231) | Zaćmiona Polana, 196–200 | 28,6; HP 66,5 | 1,4; HP 89,2 | 7,1; HP 83,4 |
+   | 240 (270) | Mglisty Jar, 236–240 | 21; HP 72,9 | 5,9; HP 87 | 12; HP 81,1 |
+   | 260 (284) | Wiedźmia Kuchnia, 256–260 | 19,4; HP 73,8 | 5,1; HP 86,9 | 10,5; HP 81,7 |
+   | 300 (327) | Brama Nawii, 296–300 | 19,9; HP 74,3 | 9,5; HP 83,7 | 14,4; HP 79,2 |
+   | 350 (392) | Zamek Kościeja, 346–350 | 20,7; HP 75,1 | 12,7; HP 82,4 | 16,6; HP 78,8 |
+   | 400 (454) | Bezdenna Dziupla, 396–400 | 13,8; HP 83,1 | 6,4; HP 90,4 | 9,7; HP 87,5 |
+
+   - Postać traci teraz na wyprawie 1,2–1,7 raza więcej HP niż przy osłabieniu z 24.11.2026 (najwięcej na 20., 60. i 200. poziomie), a wyprawa 4 h w najnowszym miejscu kończy się omdleniem do 160. poziomu w 0,5–4% przypadków, na 200. w 7%, a od 240. w 10–17%.
+   - „Pośrodku” w liczbie osłabienia to jeszcze nie środek w omdleniach: bez osłabienia postać traci na 60.–200. poziomie 2–2,7 raza więcej HP niż teraz i mdleje w 17–29% wypraw. Stwór 1,75 raza słabszy ma 57% siły sprzed 24.11.2026, a 2,5 raza słabszy 40%, więc do 200. poziomu wynik leży bliżej osłabienia z 24.11.2026. Od 240. poziomu jest mniej więcej w środku.
+   - Ta sama tabela ze 120 wyprawami na klasę, jak 24.11.2026, różni się od tej o najwyżej 3 punkty, ale na 300. poziomie odwraca kolejność przez sam przypadek (bez osłabienia 17,3, teraz 16,7; przy 600 wyprawach 19,9 i 14,4). Przy 120 wyprawach „bez osłabienia” daje do 100. poziomu dokładnie liczby „przed” z tabeli z 24.11.2026, a wyżej trochę niższe (np. 200. poziom 31,8 → 28,2, 240. 24,3 → 20,5), bo gra od tamtej pory się zmieniła (np. Tiery XI i XII od 226. poziomu).
+   - Dla porównania, gdyby i to było za łatwo: 1,5 / 1,15 raza (`[[150, 1.5], [250, 1.15]]`, ten sam pomiar) daje omdlenia do 160. poziomu w 1,8–7,7% wypraw, na 200. w 12,1%, a od 240. w 11–18% (HP na końcu 66,7–89 do 160. poziomu, 77,6–86,1 od 200.).
+5. **Elity i czempioni najnowszego miejsca** (`tools/difficulty-sim.mjs --rare 200`, ta sama postać z towarzyszami, pełne HP, zestaw na godzinę wyprawy, 200 walk na klasę; wygrane i HP po wygranej, w procentach):
+
+   | Poziom postaci | Przeciwnik | Bez osłabienia | 2,5 / 2 / 1,5 (24.11) | 1,75 / 1,5 / 1,25 (teraz) |
+   | --- | --- | --- | --- | --- |
+   | 100 | Kikimora, elita, poz. 101 | 98,6; HP 77 | 100; HP 88,4 | 100; HP 85,8 |
+   | 100 | Król Błót, czempion, poz. 102 | 98; HP 79,1 | 100; HP 89,5 | 100; HP 86,8 |
+   | 200 | Morowa Dziewica, elita, poz. 201 | 96,4; HP 78,8 | 100; HP 86,9 | 99,8; HP 84,5 |
+   | 200 | Księżycożerca, czempion, poz. 202 | 86,9; HP 68,4 | 99,9; HP 79,6 | 99,5; HP 77,1 |
+   | 300 | Indryk, elita, poz. 301 | 83,9; HP 77,3 | 97,1; HP 80,5 | 92,8; HP 78,8 |
+   | 300 | Nyja, czempion, poz. 302 | 25,2; HP 70,4 | 48,2; HP 71,2 | 36,1; HP 69,8 |
+
+6. **Labirynt** (`tools/labyrinth-sim.mjs` z nową opcją `--danger`, pięć klas po 40 dni na poziom, postać z dwoma towarzyszami, komnaty wybierane jak dotąd w tym narzędziu, błogosławieństwa losowo). Opcja liczy obwódki planszy tak, jak pokazuje je gra, zanim drużyna wybierze komnatę (`roomDanger`, 899 A): przy wejściu na poziom każdą walkę poziomu (zielona, żółta, czerwona), drogi od wejścia do strażnika z samymi zielonymi walkami i plansze całe zielone, a przy każdym wyborze spośród dwóch komnat albo więcej to, czy wszystkie walki do wyboru są zielone. Obwódki mają własne ziarna, więc dni idą tak samo jak bez tej opcji. Stwory Labiryntu mają poziom po środku między poziomem postaci a klasy (65 przy 60. poziomie postaci, 116 przy 107., 215 przy 200.). W komórkach dla poziomów 1–3 razem: walki zielone; plansze całe zielone (droga nie ma znaczenia); dni z przejściem całego Labiryntu, czyli 3. poziomu; dni z przejściem Piekielnego, w procentach. „Realistyczny” to gracz z tabeli wyżej, a „low” to słabiej wyposażony gracz z `tools/difficulty-sim.mjs`, do którego stroiliśmy Labirynt 13.11.2026 (punkt 25 zasad Labiryntu):
+
+   | Poziom postaci | Gracz | Bez osłabienia | 2,5 / 2 / 1,5 (24.11) | 1,75 / 1,5 / 1,25 (teraz) |
+   | --- | --- | --- | --- | --- |
+   | 60 | realistyczny | 93,5; 68; 60; 5 | 99,8; 97,7; 99; 38 | 98,5; 88,5; 95; 19 |
+   | 60 | „low” | 80,2; 36,8; 13; 0 | 96,4; 75,3; 73; 5 | 91,1; 59,9; 41; 3 |
+   | 107 | realistyczny | 99,1; 93,7; 97; 25 | 100; 100; 100; 92 | 100; 100; 100; 74 |
+   | 107 | „low” | 92,9; 70,4; 60; 1 | 99,7; 97; 99; 33 | 98,1; 88; 92; 9 |
+   | 200 | realistyczny | 98,9; 91,3; 94; 30 | 100; 100; 100; 76 | 99,7; 97,2; 99; 60 |
+   | 200 | „low” | 90,1; 58,6; 44; 0 | 97,9; 87,5; 87; 10 | 95,7; 76; 80; 4 |
+
+   - Z 1,75 / 1,25 Labirynt dalej świeci prawie cały na zielono: na 107. poziomie realistyczny gracz ma zielone wszystkie walki poziomów 1–3 i przechodzi cały Labirynt każdego dnia (Piekielny w 74% dni), a „low” ma zielone 98% walk i 88% plansz i przechodzi cały Labirynt w 92% dni. Przy wyborze komnaty wszystkie walki do wyboru są zielone u realistycznego gracza w 99–100% wyborów, u „low” w 93–99%.
+   - Sama liczba osłabienia nie zmieni tego, na co skarży się gracz: nawet bez osłabienia realistyczny gracz na 107. poziomie widzi zielone 99% walk i 94% plansz, a „low” 93% walk i 70% plansz. Kolumna „Bez osłabienia” to zarazem Labirynt bez osłabienia przy wyprawach z 1,75 / 1,25 (w Labiryncie liczą się tylko jego stwory). To nie jest wdrożone: o Labiryncie autor zdecyduje osobno.
+7. **Testy.** Testy przeniesione 24.11.2026 w inne miejsca, na inne poziomy albo z innymi tolerancjami (punkt 7 sekcji „Słabsze stwory…”) są sprawdzone jeden po drugim i z nowymi liczbami przechodzą bez zmian, więc zostają, jak są: na 100. i 150. poziomie wyprawa 4 h w najnowszym miejscu dalej kończy się omdleniem tylko w ok. 1% przypadków, więc sprawdzenia ryzyka zostają na 300. poziomie i na Trudnej wyprawie, a silniejsze stwory mają więcej HP, więc błędy zaokrągleń HP tylko maleją. Zmieniło się:
+   - `test/threat-trips.test.js`: to, że mniej HP na start podnosi szacowanie, jest sprawdzane bez mikstur w szacowaniu (Cień 300. poziomu, wyprawa 4 h, z ćwiercią HP 29% zamiast 24%). Jego Duże mikstury leczą więcej, niż kosztuje którakolwiek z jego próbnych walk, więc z nimi ćwierć HP liczy się jak pełne: teraz i bez osłabienia tak samo, a przy osłabieniu z 24.11.2026 różnica była mniejsza niż punkt. Komentarze mają nowe liczby: na 50. i 100. poziomie ok. 1,5% omdleń na wyprawach 4 h (szacowanie tyle samo, sama rekursja 0), na 300. 9,3%, a sama rekursja 6,4% (od 24.11: 6,6% i 3,7%).
+   - `test/fifth-evolution.test.js`: piąte formy są porównywane z czwartymi na stworach, z którymi je strojono, więc także ze słabszymi stworami z 24.11.2026 (2,5 / 1,5), tak jak test drugich form porównuje je ze stworami sprzed 24.11.2026. Przy stworach pośrodku Demiurg, ustawiony na równi ze Stwórcą Żywiołów (88,8% HP na końcu wyprawy 4 h na 345. poziomie wobec 88,4%, zabija 1,04 raza szybciej), kończy z 87% wobec 87,9% i zabija 1,07 raza szybciej, więc nie spełnia warunku „co najmniej tyle HP albo wyraźnie szybciej”. Pozostałe 14 piątych form spełnia go także przy nowych stworach. Piąta ewolucja jest wyłączona; przy jej włączaniu warto spojrzeć na Demiurga, który przy nowych stworach jest na wyprawach tylko na równi ze swoją czwartą formą.
+   - `test/guild-week-engine.test.js`: o ok. 5% więcej złota pod sztandarem gildii liczone z 240 wypraw zamiast 60. Więcej materiałów spod sztandaru zmienia losowania łupów po nich, więc obie wyprawy idą dalej inaczej, a wojownik 24. poziomu mdleje teraz w Dziczej Głuszy w mniej więcej co piątej wyprawie 4 h (przy osłabieniu z 24.11.2026 prawie nigdy). Z 60 wypraw wyszło 1,012 zamiast ok. 1,05, z 240 wychodzi 1,036.
+   - `test/party-threat.test.js`: to, że pozostali gracze drużyny z 10% HP podnoszą zagrożenie, sprawdzane na Trudnej wyprawie w Omszałych Głazach (z pełnym HP 10%, z 10% HP 30% na wyprawie 4 h). Na zwykłej wyprawie ta drużyna 28. poziomu nie mdleje teraz w żadnej ze 100 próbnych wypraw, ani z pełnym HP, ani ze zmęczonymi (przy osłabieniu z 24.11.2026 w 2 ze 100 ze zmęczonymi), więc nic by ich nie odróżniło.
+   - `test/potions.test.js`: to, że mikstury leczenia obniżają szansę omdlenia, sprawdzane na Cieniu 22. poziomu w Pajęczym Parowie (31–35) zamiast na Cieniu 20. w Omszałych Głazach: na godzinę 2,6% bez mikstur i 1,7% z nimi (także przy osłabieniu z 24.11.2026 i bez osłabienia mniej niż cztery piąte). Cień 20. poziomu w Omszałych Głazach mdleje teraz prawie tylko w walce z elitą, która wygrywa z nim zawsze, z miksturami czy bez (3,9% i 3,7%).
+   - `test/newest-place.test.js` i `test/engine.test.js`: tylko komentarze z nowymi liczbami (najnowsze miejsce od 240. poziomu ok. 10–17% omdleń; długa wyprawa w jednym miejscu daje ok. 73% tempa krótkich, przy osłabieniu z 24.11.2026 80%, a przed nim 63%).
+   - Pełne `npm test` (dwa pliki naraz, 2981 testów) przeszło poza czterema testami z poprawek wyżej (piąte formy, sztandar gildii, zagrożenie z drużyną, mikstury), a po poprawkach ich pliki przechodzą w całości. Przechodzą też `npm run typecheck`, `tools/validate-data.mjs` i `tools/i18n-check.mjs --stamp` (bez nowych tekstów do tłumaczenia).
+8. **Pliki:** `data/balance.json`, `src/engine/combatant.js` (komentarz przy `weakerBy`), `tools/labyrinth-sim.mjs` (`--danger`), testy z punktu 7: `test/threat-trips.test.js`, `test/fifth-evolution.test.js`, `test/guild-week-engine.test.js`, `test/party-threat.test.js`, `test/potions.test.js`, `test/newest-place.test.js`, `test/engine.test.js`.
 
 ## Wersja 0.4.93 (22.11.2026): soundtrack w Ustawieniach
 
