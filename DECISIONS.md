@@ -4706,6 +4706,10 @@ Gracz (poz. 107): „popraw poziom trudności wcześniej było za trudno a teraz
    - Pełne `npm test` (dwa pliki naraz, 2981 testów) przeszło poza czterema testami z poprawek wyżej (piąte formy, sztandar gildii, zagrożenie z drużyną, mikstury), a po poprawkach ich pliki przechodzą w całości. Przechodzą też `npm run typecheck`, `tools/validate-data.mjs` i `tools/i18n-check.mjs --stamp` (bez nowych tekstów do tłumaczenia).
 8. **Pliki:** `data/balance.json`, `src/engine/combatant.js` (komentarz przy `weakerBy`), `tools/labyrinth-sim.mjs` (`--danger`), testy z punktu 7: `test/threat-trips.test.js`, `test/fifth-evolution.test.js`, `test/guild-week-engine.test.js`, `test/party-threat.test.js`, `test/potions.test.js`, `test/newest-place.test.js`, `test/engine.test.js`.
 
+## Wersja 0.5.22 (25.11.2026): Labirynt na miarę drużyny i silne komnaty
+
+Wybór autora 1253 C. Sekcje A i B niżej opisują obie części, które C łączy.
+
 ## Labirynt na miarę drużyny i silne komnaty (1253 C, 25.11.2026)
 
 Wariant C pytania 1253 na stronie ocen, do wyboru autora: warianty A i B razem. Zasady każdej części są w sekcjach „Labirynt na miarę drużyny (1253 A, 25.11.2026)” i „Silne komnaty w Labiryncie (1253 B, 25.11.2026)” niżej, a ich pomiary dotyczą każdej części osobno.
