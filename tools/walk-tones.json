@@ -128,5 +128,6 @@
   "navia-emperor-male": { "add": ["939e9b", "7e7f7d", "6a6c6a", "636465"], "only": [[67, 26, 77, 40, "head"]] },
   "navia-emperor-female": { "add": ["abb5b8", "9cadad", "8fa1aa", "72868f"], "only": [[66, 22, 76, 36, "head"]] },
   "dark-king-male": { "add": ["c1c0d0", "b2acc2", "9f9eb3", "8f8c9d", "767489", "685b81"], "only": [[66, 22, 75, 35, "head"]] },
-  "dark-king-female": { "only": ["head", "hands"] }
+  "dark-king-female": { "only": ["head", "hands"] },
+  "perun-son-female": { "only": ["head", "hands"], "not_boxes": { "3": [[60, 12, 70, 19]] } }
 }
