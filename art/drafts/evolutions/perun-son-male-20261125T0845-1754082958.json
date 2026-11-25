@@ -1,0 +1,14 @@
+{
+  "id": "perun-son-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Son of Perun, a young god of thunder, one strong idea: the great thunder sign of Perun behind him, a huge glowing golden wheel with six curved petals inside a ring, like a giant sun-shield of light, with a few bright white lightning bolts crackling around its rim, close to the body; shining armour of polished gold with a lightning mark on the chest, a long deep crimson cape, bareheaded with long fair hair blowing in the storm wind, holding a big bow of golden oak crackling with white lightning upright in one hand, his face lit by the golden glow, a palette of only gold, deep crimson and white lightning; young man, light skin, long fair blond hair, a handsome sharp young face, his face clearly visible, well lit and well drawn, with distinct eyes with dark pupils, eyebrows, nose and mouth, not in shadow; standing tall in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, clean readable pixel art with bold simple shapes, strong contrast and a few large details, no clutter, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/world-shield-male.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08050534693400065
+  },
+  "images": 4
+}

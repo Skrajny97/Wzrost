@@ -1,0 +1,14 @@
+{
+  "id": "star-lord-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the Lord of the Stars, a young god of the night sky, one strong idea: a huge thin crescent moon of glowing silver light behind him, its two horns curving up past his shoulders, close to the body, with one bright white star shining between them above his head; simple elegant armour of deep midnight indigo with silver edges, a long indigo cape lined with silver, a slim silver circlet, holding a tall silver longbow upright in one hand, his face lit by soft silver moonlight, a palette of only deep indigo, silver and pale gold light; young man, light tan skin, black hair tied back in a ponytail, a handsome lean face, his face clearly visible, well lit and well drawn, with distinct eyes with dark pupils, eyebrows, nose and mouth, not in shadow; standing tall in the middle of the image, the whole figure from the top of the head to the feet, with everything around it, inside the image, the figure about four fifths of the image height, empty space on every side, nothing touching the edges of the image, clean readable pixel art with bold simple shapes, strong contrast and a few large details, no clutter, crisp clean outlines, mythic, overwhelming and radiant, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/world-shield-male.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0805595526960161
+  },
+  "images": 4
+}
