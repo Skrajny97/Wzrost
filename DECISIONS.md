@@ -4603,6 +4603,10 @@ Autor (24.11.2026): „Trzeba trochę zmniejszyc poziom trudności jednak, bo je
    - `test/party-challenge.test.js`: tolerancja stosunku HP stworów Piekielnej wyprawy do zwykłej 0,075 zamiast 0,03, bo stwory Kruczych Wykrotów mają teraz ok. 30 HP i zaokrąglenie przesuwa stosunek do 0,07.
    - `test/second-evolution.test.js`: drugie formy dalej porównywane ze stworami z czasu, gdy je ustawiano, więc także bez tej zmiany (jak bez zmian z 19.11.2026); z nią żadna forma tam nie mdleje.
 
+## Wersja 0.5.21 (25.11.2026): stwory pośrodku
+
+Według sekcji niżej, wybór autora „Daj coś pomiędzy ostatnimi dwoma poziomami trudności”.
+
 ## Stwory pośrodku: 1,75 / 1,5 / 1,25 raza (25.11.2026)
 
 Gracz (poz. 107): „popraw poziom trudności wcześniej było za trudno a teraz jest za łatwo. Labirynt jest nudny i nie ważne jaką drogę wybierasz i tak wszystko jest na zielono” oraz „Jak dla dziecka byle klikać nie ważne co bo i tak zrobisz go”. Autor: „teraz jest za łatwo”, a potem: „Daj coś pomiędzy ostatnimi dwoma poziomami trudności”.
