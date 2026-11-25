@@ -13,6 +13,8 @@
 // and walks beside it on the way, in its own look (654 A).
 // Hired, it serves until that exploration ends (called back early, or
 // skipped, with it) and cannot take the offer back; then it claims its pay.
+// An offer or a service over is closed by its Drużyna's setting out too,
+// as its own claim would close it (closeService; 25.11.2026).
 // It gets nothing else and loses nothing: no XP, no loot, its HP as it
 // rests.
 
@@ -120,18 +122,16 @@ export async function withdrawMercenary(context) {
   return json({ text: words().withdrawn, character: characterView(await loadPlayer(db, session.userId), context.now) });
 }
 
-// POST /api/mercenary/claim: the pay of a service that ended, or an offer
-// whose hours passed with nobody hiring the character closed. Once: the
-// batch holds only while the activity is there.
-export async function claimMercenary(context) {
-  const { session, player } = await requirePlayer(context);
-  const { row, activity } = player;
+// The close of a mercenary's offer or service over (`activity`, its end
+// passed), of the character of `row`: the pay of a service to it, nothing
+// for an offer nobody took, and the activity gone. In one batch that holds
+// only while the activity is there as read, so of two closes at once (its
+// own in the Karczma, claimMercenary, and its Drużyna's setting out,
+// parties.js) one pays and the other answers that it was closed. Gives the
+// gold paid.
+export async function closeService(db, row, activity) {
   const offer = offerOf(activity);
-  if (!offer) throw new ApiError(409, 'not_offering', words().notOffering);
-  const now = context.now;
-  if (activity.ends_at > now) throw new ApiError(409, 'not_finished', offer.hired ? words().busyHired : words().busy);
   const gold = offer.hired?.gold ?? 0;
-  const db = context.env.DB;
   const here = "character_id = ? AND kind = 'mercenary' AND started_at = ?";
   await atomically(
     db,
@@ -145,6 +145,21 @@ export async function claimMercenary(context) {
     ],
     () => new ApiError(409, 'claimed', words().notOffering),
   );
+  return gold;
+}
+
+// POST /api/mercenary/claim: the pay of a service that ended, or an offer
+// whose hours passed with nobody hiring the character closed. Once: the
+// batch holds only while the activity is there (closeService).
+export async function claimMercenary(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row, activity } = player;
+  const offer = offerOf(activity);
+  if (!offer) throw new ApiError(409, 'not_offering', words().notOffering);
+  const now = context.now;
+  if (activity.ends_at > now) throw new ApiError(409, 'not_finished', offer.hired ? words().busyHired : words().busy);
+  const db = context.env.DB;
+  const gold = await closeService(db, row, activity);
   return json({ paid: gold, text: gold > 0 ? filled(words().paid, { gold: number(gold) }) : words().expired, character: characterView(await loadPlayer(db, session.userId), now) });
 }
 
