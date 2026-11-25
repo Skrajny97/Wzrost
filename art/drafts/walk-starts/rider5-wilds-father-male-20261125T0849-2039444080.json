@@ -1,0 +1,19 @@
+{
+  "id": "rider5-wilds-father-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the man of the reference picture riding: an ancient forest god, an old man with weathered light skin, a long grey beard and long grey hair, a kind wise face in clean profile, eyes glowing green, a great crown of branching brown antlers with small green leaves and white blossoms, a long pale grey robe like birch bark with a green sash, a long cloak of living green vines and moss with small pink and white flowers hanging behind from the shoulders, the robe hanging down along the leg, a brown leather shoe, no staff, no tree of light and nothing in the hands but the reins; sitting tall and upright astride a saddle that is not drawn, the back straight, not squatting and not crouching, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the knee bent at a right angle, the lower leg hanging vertically straight down from the knee, one whole foot at the bottom with the toes pointing right; the cloak and any long hair hanging down behind the back, not spread out; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the tips of the antlers to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/wilds-father-male.png",
+      "usage": "the character's look: this same man, his face, hair, beard, antler crown, robe, vine cloak and colours, drawn the same way; not his standing pose and not the blossoming staff and the tree of light"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08103354774581062
+  },
+  "images": 4
+}

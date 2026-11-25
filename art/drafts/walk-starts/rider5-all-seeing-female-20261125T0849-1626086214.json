@@ -1,0 +1,19 @@
+{
+  "id": "rider5-all-seeing-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the woman of the reference picture riding: a young prophetess who sees every fate, light skin, long golden hair hanging down her back, a beautiful calm youthful face in clean profile, eyes glowing gold, a golden crown, a golden ring of light with runes close behind the head, long robes of black and gold covered with small golden embroidered eyes, a large golden eye on the chest, a long black and gold cloak hanging behind from the shoulders, the robe hanging down along the leg, brown boots, no staff, no pages, no cards and nothing in the hands but the reins; sitting tall and upright astride a saddle that is not drawn, the back straight, not squatting and not crouching, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the knee bent at a right angle, the lower leg hanging vertically straight down from the knee, one whole foot at the bottom with the toes pointing right; the cloak and any long hair hanging down behind the back, not spread out; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the top of the ring of light to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/all-seeing-female.png",
+      "usage": "the character's look: this same woman, her face, golden hair, crown, robes with the golden eyes, ring of light and colours, drawn the same way; not her standing pose and not the staff and the flying pages and cards"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08130502247810364
+  },
+  "images": 4
+}

@@ -1,0 +1,19 @@
+{
+  "id": "rider5-navia-emperor-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the man of the reference picture riding: the deathless god-emperor of the underworld, gaunt, very pale grey skin, sunken cheeks, a skull-like face in clean profile, eyes glowing cold blue, a tall crown of black iron spikes, armour of black iron and bone with a ribcage of white bone on the chest, a skull on the shoulder, a long mantle of black smoke with small pale blue soul sparks hanging behind from the shoulders, its edge clean and outlined, bone and iron greaves, no spectral hands, no sceptre and nothing in the hands but the reins; sitting tall and upright astride a saddle that is not drawn, the back straight, not squatting and not crouching, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the knee bent at a right angle, the lower leg hanging vertically straight down from the knee, one whole foot at the bottom with the toes pointing right; the cloak and any long hair hanging down behind the back, not spread out; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the tips of the crown to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/navia-emperor-male.png",
+      "usage": "the character's look: this same man, his face, crown, armour of iron and bone, smoke mantle and colours, drawn the same way; not his standing pose and not the spectral hands and the lantern sceptre"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08089259998003642
+  },
+  "images": 4
+}

@@ -1,0 +1,19 @@
+{
+  "id": "rider5-navia-emperor-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the woman of the reference picture riding: the deathless god-empress of the underworld, a slim feminine figure, very pale grey skin, a beautiful gaunt feminine face in clean profile, long straight black hair hanging down her back, eyes glowing cold blue, a tall crown of icy blue soul fire spikes, armour of dark steel and black iron with glowing pale blue edges, a long black cloak with small pale blue soul sparks hanging behind from the shoulders, its edge clean and outlined, dark steel greaves and boots, no spectral hands, no sceptre and nothing in the hands but the reins; sitting tall and upright astride a saddle that is not drawn, the back straight, not squatting and not crouching, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the knee bent at a right angle, the lower leg hanging vertically straight down from the knee, one whole foot at the bottom with the toes pointing right; the cloak and any long hair hanging down behind the back, not spread out; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the tips of the crown to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/navia-emperor-female.png",
+      "usage": "the character's look: this same woman, her face, hair, crown, armour, cloak and colours, drawn the same way; not her standing pose and not the spectral hands and the lantern sceptre"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08097638442781237
+  },
+  "images": 4
+}

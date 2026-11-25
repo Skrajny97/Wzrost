@@ -1,0 +1,19 @@
+{
+  "id": "rider5-unstoppable-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the woman of the reference picture riding: a tall strong woman, warm tanned skin with thin glowing cracks of yellow-white magma, long wild red-brown hair in thick braids falling down her back, a fierce face in clean profile, eyes blazing yellow-white, a crown of jagged black obsidian horns with small flames burning between them, black volcanic rock armour with molten gold plates, spiked black pauldrons, golden thigh plates and golden greaves, a mantle of black smoke and glowing orange embers hanging behind from the shoulders, its edge clean and outlined, dark brown boots, no axe and nothing in the hands but the reins; sitting tall and upright astride a saddle that is not drawn, the back straight, not squatting and not crouching, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the knee bent at a right angle, the lower leg hanging vertically straight down from the knee, one whole foot at the bottom with the toes pointing right; the cloak and any long hair hanging down behind the back, not spread out; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the tips of the crown's horns and flames to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/unstoppable-female.png",
+      "usage": "the character's look: this same woman, her face, braids, crown of horns and fire, armour and colours, drawn the same way; not her standing pose and not the war axe"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08098800937334696
+  },
+  "images": 4
+}

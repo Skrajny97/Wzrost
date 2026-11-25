@@ -1,0 +1,19 @@
+{
+  "id": "rider5-world-shield-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the man of the reference picture riding: a mighty guardian of the world, tanned skin, a short dark brown beard, a stern square face in clean profile, eyes glowing white-gold, an open ivory and gold helmet with a tall golden crest, armour of ivory and white gold with thin golden lines like roots, huge rounded golden pauldrons, a deep emerald green tabard with golden trim, a long deep emerald green cape hanging behind from the shoulders, ivory and gold greaves and boots, no shield, no hammer, no dome of light and nothing in the hands but the reins; sitting tall and upright astride a saddle that is not drawn, the back straight, not squatting and not crouching, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the knee bent at a right angle, the lower leg hanging vertically straight down from the knee, one whole foot at the bottom with the toes pointing right; the cloak and any long hair hanging down behind the back, not spread out; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the top of the helmet's crest to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/world-shield-male.png",
+      "usage": "the character's look: this same man, his face, beard, helmet, armour, tabard, cape and colours, drawn the same way; not his standing pose and not the shield, the hammer and the dome of light"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08168029438124763
+  },
+  "images": 4
+}

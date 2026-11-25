@@ -1,0 +1,19 @@
+{
+  "id": "rider5-dark-king-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the woman of the reference picture riding: the queen of a night without stars, a young woman with a slim feminine figure, pale skin, very long silver-white hair hanging down her back, a beautiful feminine face in clean profile, eyes glowing violet, a tall crown of black thorns, a black eclipse disk with a thin silver rim close behind the head, black armour with glowing silver-white lines, huge black feathered wings of shadow folded close behind the back, a long black cloak hanging behind from the shoulders, black heeled boots, no daggers and nothing in the hands but the reins; sitting tall and upright astride a saddle that is not drawn, the back straight, not squatting and not crouching, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the knee bent at a right angle, the lower leg hanging vertically straight down from the knee, one whole foot at the bottom with the toes pointing right; the folded wings, the cloak and any long hair close behind the back, not spread out; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the top of the wings and the crown to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/dark-king-female.png",
+      "usage": "the character's look: this same woman, her face, silver hair, thorn crown, eclipse halo, black wings, armour, cloak and colours, drawn the same way; not her standing pose and not the two daggers"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08100785051451789
+  },
+  "images": 4
+}

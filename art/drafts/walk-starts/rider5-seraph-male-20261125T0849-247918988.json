@@ -1,0 +1,19 @@
+{
+  "id": "rider5-seraph-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the man of the reference picture riding: the highest of all angels, tan skin, short dark brown hair and a short dark brown beard, a gentle strong face in clean profile, eyes glowing white, a blazing golden sun disk close behind the head, large wings of white-hot fire with golden and orange flames folded close behind the back, ornate golden armour with a burning sun on the chest, dark red sleeves, a long robe of orange and crimson flames hanging down along the leg, golden greaves and boots, no staff and nothing in the hands but the reins; sitting tall and upright astride a saddle that is not drawn, the back straight, not squatting and not crouching, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the knee bent at a right angle, the lower leg hanging vertically straight down from the knee, one whole foot at the bottom with the toes pointing right; the folded wings, the cloak and any long hair close behind the back, not spread out; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the top of the wings and the sun disk to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/seraph-male.png",
+      "usage": "the character's look: this same man, his face, hair, beard, sun halo, wings of fire, golden armour, robe of flames and colours, drawn the same way; not his standing pose and not the staff"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08104116021262275
+  },
+  "images": 4
+}

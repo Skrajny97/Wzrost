@@ -1,0 +1,19 @@
+{
+  "id": "rider5-gods-champion-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the woman of the reference picture riding: a radiant demigoddess of victory, light tan skin, dark hair in a long braid falling down her back, a calm face in clean profile, eyes glowing gold, a crown of golden sun rays on the bare head and a ring of golden sun rays close behind the head, white marble and gold plate armour with a golden lion's head on the breastplate, two wings of golden light folded close behind the back, a long sapphire blue cape with small golden stars hanging behind from the shoulders, golden greaves and brown boots, no sword, no shield and nothing in the hands but the reins; sitting tall and upright astride a saddle that is not drawn, the back straight, not squatting and not crouching, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the knee bent at a right angle, the lower leg hanging vertically straight down from the knee, one whole foot at the bottom with the toes pointing right; the folded wings, the cloak and any long hair close behind the back, not spread out; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the tips of the sun rays to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/gods-champion-female.png",
+      "usage": "the character's look: this same woman, her face, braid, crown of sun rays, wings of light, armour, cape and colours, drawn the same way; not her standing pose and not the sword and the shield"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0810233333905538
+  },
+  "images": 4
+}

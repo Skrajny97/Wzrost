@@ -1,0 +1,19 @@
+{
+  "id": "rider5-winter-incarnate-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the woman of the reference picture riding: the embodiment of eternal winter, fair skin with rosy cheeks, long white hair hanging down her back, a calm woman's face in clean profile, eyes glowing pale cyan, a tall crown of long bright blue icicles, armour of dark midnight blue ice with glowing cyan edges and small ice spikes on the shoulders, a long cloak of the violet, teal and green lights of an aurora and of white snow hanging behind from the shoulders, its edge clean and outlined, ice crystal greaves and boots, no sceptre and nothing in the hands but the reins; sitting tall and upright astride a saddle that is not drawn, the back straight, not squatting and not crouching, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the knee bent at a right angle, the lower leg hanging vertically straight down from the knee, one whole foot at the bottom with the toes pointing right; the cloak and any long hair hanging down behind the back, not spread out; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the tips of the icicle crown to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/winter-incarnate-female.png",
+      "usage": "the character's look: this same woman, her face, hair, icicle crown, ice armour, aurora cloak and colours, drawn the same way; not her standing pose and not the sceptre"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08093752336502075
+  },
+  "images": 4
+}
