@@ -804,6 +804,146 @@
       "start": "art/references/walks/start/thunderer-female.png",
       "pose": 2,
       "description": "a tall woman with long golden blond hair in two thick braids hanging straight down at rest, both braids lying flat on her back and shoulders, not flying, not sticking out, a dark steel helmet with two small silver wings at the sides and her face showing, a calm young woman's face in clean profile with one eye, dark blue-grey steel plate armour with gold trim and thin glowing cyan lines, no lightning, no sparks around the body, a long dark grey-blue cloak hanging behind from the shoulders, dark steel boots, one long black bow strapped upright on the back behind the shoulder, the whole bow above the waist and behind the body, never in front of the legs, beside a quiver of blue-fletched arrows, the wings staying folded close behind the back, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "unstoppable-male": {
+      "start": "art/references/walks/start/unstoppable-male.png",
+      "pose": 2,
+      "description": "a huge very muscular warlord man, tanned skin crossed by thin glowing cracks of yellow-white magma, long wild dark brown hair and a thick braided dark brown beard with iron rings, eyes blazing yellow-white, a crown of jagged black obsidian horns with small flames burning between them, black volcanic rock pauldrons with molten gold edges, a bare muscular chest, a wide golden belt, a skirt of black and molten gold plates, a long mantle of black smoke and glowing orange embers hanging behind from the shoulders, its edge clean and outlined, black armoured boots with gold trim, no axe, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "unstoppable-female": {
+      "start": "art/references/walks/start/unstoppable-female.png",
+      "pose": 2,
+      "description": "a tall strong woman, warm tanned skin with thin glowing cracks of yellow-white magma, long wild red-brown hair in thick braids hanging straight down her back at rest, not flying, eyes blazing yellow-white, a crown of jagged black obsidian horns with small flames burning between them, black volcanic rock armour with molten gold plates, spiked black pauldrons, golden thigh plates and golden greaves, a mantle of black smoke and glowing orange embers hanging behind from the shoulders, its edge clean and outlined, dark brown boots, a fierce young woman's face in clean profile with one eye, no axe, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "gods-champion-male": {
+      "start": "art/references/walks/start/gods-champion-male.png",
+      "pose": 2,
+      "description": "a radiant demigod of victory, a man with warm brown skin, short dark curly hair and a short dark beard, eyes glowing gold, a crown of golden sun rays on the bare head, white marble and gold plate armour with a golden lion's head on the breastplate, a sapphire blue skirt with golden trim, two small wings of golden light folded close behind the shoulders, a long sapphire blue cape with small golden stars hanging behind from the shoulders, white and gold greaves and boots, no sword, no shield, the wings staying folded close behind the back, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "gods-champion-female": {
+      "start": "art/references/walks/start/gods-champion-female.png",
+      "pose": 2,
+      "description": "a radiant demigoddess of victory, a woman with light tan skin, dark hair in a long braid hanging straight down her back at rest, not flying, eyes glowing gold, a crown of golden sun rays on the bare head and a ring of golden sun rays close behind the head, white marble and gold plate armour with a golden lion's head on the breastplate, two wings of golden light folded close behind the back, a long sapphire blue cape with small golden stars hanging behind from the shoulders, golden greaves and brown boots, a calm young woman's face in clean profile with one eye, no sword, no shield, the wings staying folded close behind the back, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "world-shield-male": {
+      "start": "art/references/walks/start/world-shield-male.png",
+      "pose": 2,
+      "description": "a mighty guardian of the world, a broad man with tanned skin, a short dark brown beard, a stern square face, eyes glowing white-gold, an open ivory and gold helmet with a tall golden crest, armour of ivory and white gold with thin golden lines like roots, huge rounded golden pauldrons, a deep emerald green tabard with golden trim, a long deep emerald green cape hanging behind from the shoulders, ivory and gold greaves and boots, no shield, no hammer, no dome of light, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "world-shield-female": {
+      "start": "art/references/walks/start/world-shield-female.png",
+      "pose": 2,
+      "description": "a mighty guardian of the world, a woman with a slim feminine figure, light skin, dark brown hair in a long high ponytail hanging straight down her back from under the helmet at rest, not flying, an open ivory and gold helmet with a tall golden crest, armour of ivory and white gold shaped for a woman with thin golden lines like roots, huge rounded golden pauldrons, a deep emerald green tabard with golden trim, a long deep emerald green cape hanging behind from the shoulders, ivory and gold greaves and boots, a strong beautiful young woman's face in clean profile with one eye, no shield, no hammer, no dome of light, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "star-lord-male": {
+      "start": "art/references/walks/start/star-lord-male.png",
+      "pose": 2,
+      "description": "a young god of the night sky, a young man with light tan skin, black hair tied back in a ponytail hanging down his back at rest, not flying, a handsome lean face lit by soft silver light, a slim silver circlet, simple elegant plate armour of deep midnight indigo with silver edges, a long indigo cape lined with silver hanging behind from the shoulders, indigo greaves and boots with silver edges, no crescent moon, no star, no bow, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "perun-son-male": {
+      "start": "art/references/walks/start/perun-son-male.png",
+      "pose": 2,
+      "description": "a young god of thunder, a young man with light skin, long fair blond hair hanging straight down his back at rest, not flying and not blowing in the wind, a handsome sharp young face, bareheaded, shining armour of polished gold with a white lightning mark on the chest over brown leather, a deep crimson hood lying on the shoulders, a long deep crimson cape hanging behind from the shoulders, golden greaves and boots, no golden wheel, no lightning around the body, no bow, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "hunt-god-male": {
+      "start": "art/references/walks/start/hunt-god-male.png",
+      "pose": 2,
+      "description": "a primeval god of the hunt, a man with light tan skin, light brown hair and a short light brown beard, a rugged face, eyes glowing amber, the head of a giant white wolf worn as a hood with huge curved golden-brown aurochs horns rising from it, the white wolf pelt hanging down his back as a long fur mantle, armour of ivory bone and gold, a necklace of great fangs, a deep crimson sash and skirt, brown leather bracers, ivory greaves and brown boots, no bow, no spirit wolves, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "hunt-god-female": {
+      "start": "art/references/walks/start/hunt-god-female.png",
+      "pose": 2,
+      "description": "a primeval goddess of the hunt, a woman with light tan skin, long light brown hair in braids hanging straight down her back at rest, not flying, eyes glowing amber, the head of a giant white wolf worn as a hood with huge curved golden-brown aurochs horns rising from it, the white wolf pelt hanging down her back as a long fur mantle, a deep crimson bodice, a necklace of great fangs, brown leather belts, olive brown trousers, ivory greaves and brown boots, a strong young woman's face in clean profile with one eye, no bow, no knife, no spirit wolves, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "demiurge-male": {
+      "start": "art/references/walks/start/demiurge-male.png",
+      "pose": 2,
+      "description": "the creator of worlds, a man with warm brown skin, long dark brown hair and a short dark brown beard, a wise strong face, eyes glowing white, a crown of white crystal shining with light, long robes of deep cosmic black and dark blue full of tiny stars with golden trim and golden nebula patterns, a golden ochre tunic, a dark violet lining, a long starry cloak hanging behind from the shoulders, brown boots, no staff, no orbiting worlds, no ring of runes, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "demiurge-female": {
+      "start": "art/references/walks/start/demiurge-female.png",
+      "pose": 2,
+      "description": "the creator of worlds, a slim woman with fair light skin, long wavy dark brown hair hanging straight down her back at rest, not flying, eyes glowing white, a small tiara of white crystal shining with light, a long gown of deep cosmic black and dark blue full of tiny stars with golden trim and golden nebula patterns, wide sleeves, the gown down to the ankles, soft dark slippers, a bright beautiful young woman's face in clean profile with one eye, no staff, no orbiting worlds, no ring of runes, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "winter-incarnate-male": {
+      "start": "art/references/walks/start/winter-incarnate-male.png",
+      "pose": 2,
+      "description": "the embodiment of eternal winter, an old man with fair skin touched by frost and rosy cheeks, long white hair and a long white beard, white eyebrows, a warm human face, eyes glowing pale cyan, a tall crown of long pale icicles, a thick white fur collar, armour of green-teal ice crystal plates over dark midnight blue, a long cloak of the green, teal and violet lights of an aurora hanging behind from the shoulders, its edge clean and outlined, ice crystal greaves and dark boots, no sceptre, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "winter-incarnate-female": {
+      "start": "art/references/walks/start/winter-incarnate-female.png",
+      "pose": 2,
+      "description": "the embodiment of eternal winter, a young woman with fair skin and rosy cheeks, long white hair hanging straight down her back at rest, not flying, eyes glowing pale cyan, a tall crown of long bright blue icicles, armour of dark midnight blue ice with glowing cyan edges and small ice spikes on the shoulders, a long cloak of the violet, teal and green lights of an aurora and of white snow hanging behind from the shoulders, its edge clean and outlined, ice crystal greaves and boots, a calm young woman's face in clean profile with one eye, no sceptre, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "wilds-father-male": {
+      "start": "art/references/walks/start/wilds-father-male.png",
+      "pose": 2,
+      "description": "an ancient forest god, an old man with weathered light skin, a long grey beard and long grey hair, a kind wise face, eyes glowing green, a great crown of branching brown antlers with small green leaves and white blossoms, a long pale grey robe like birch bark with a green sash, a long cloak of living green vines and moss with small pink and white flowers hanging behind from the shoulders, brown leather shoes, no staff, no tree of light, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "wilds-father-female": {
+      "start": "art/references/walks/start/wilds-father-female.png",
+      "pose": 2,
+      "description": "an ancient forest goddess, a slim woman with light skin, long silver-grey hair in two braids woven with moss and small flowers hanging straight down her back at rest, not flying, eyes glowing green, a crown of branching brown antlers with small green leaves and white blossoms, a long pale grey robe like birch bark with a green sash, a long cloak of living green vines and moss with small pink and white flowers hanging behind from the shoulders, brown leather boots, a kind wise woman's face in clean profile with one eye, no staff, no roots, no tree of light, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "seraph-male": {
+      "start": "art/references/walks/start/seraph-male.png",
+      "pose": 2,
+      "description": "the highest of all angels, a man with tan skin, short dark brown hair and a short dark brown beard, a gentle strong face, eyes glowing white, a blazing golden sun disk close behind the head, large wings of white-hot fire with golden and orange flames folded close behind the back, ornate golden armour with a burning sun on the chest, dark red sleeves, a long robe of orange and crimson flames, golden greaves and boots, no staff, the wings staying folded close behind the back, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "seraph-female": {
+      "start": "art/references/walks/start/seraph-female.png",
+      "pose": 2,
+      "description": "the highest of all angels, a woman with light tan skin, long dark brown hair hanging straight down her back at rest, not flying, eyes glowing white, a blazing golden sun disk close behind the head, large wings of white-hot fire with golden and orange flames folded close behind the back, ornate golden armour with a burning sun on the chest, dark red sleeves, a long robe of orange and crimson flames, golden boots, a gentle young woman's face in clean profile with one eye, no staff, no fire in the hand, the wings staying folded close behind the back, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "heaven-sword-male": {
+      "start": "art/references/walks/start/heaven-sword-male.png",
+      "pose": 2,
+      "description": "a slim celestial knight of ordinary size, not broad, a man with warm brown skin, short dark hair, a stern scarred face, eyes burning with white fire, slim plate armour of polished silver and pale gold with glowing white runes, a long white cloak hanging behind from the shoulders, a few small white and ice-blue holy flames close around the head, silver greaves and boots, no sword, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "heaven-sword-female": {
+      "start": "art/references/walks/start/heaven-sword-female.png",
+      "pose": 2,
+      "description": "a celestial knight of holy fire, a woman with warm brown skin, long dark hair hanging straight down her back at rest, not flying, eyes burning with white fire, plate armour of polished silver and pale gold with glowing white runes, shaped for a woman, a long white cloak hanging behind from the shoulders, a thin aura of white and ice-blue holy flame close around the head and shoulders, silver greaves and boots, a stern young woman's face in clean profile with one eye, no sword, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "all-seeing-male": {
+      "start": "art/references/walks/start/all-seeing-male.png",
+      "pose": 2,
+      "description": "a slim young prophet who sees every fate, a young man with light skin, long straight silver-white hair hanging straight down his back at rest, not flying, a youthful handsome clean-shaven face, no beard, eyes glowing gold, a small thin golden ring of light close behind the head, no wider than the shoulders, long robes of black and gold covered with small golden embroidered eyes, a large golden eye on the chest, a long black and gold cloak hanging behind from the shoulders, brown boots, no staff, no flying pages, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "all-seeing-female": {
+      "start": "art/references/walks/start/all-seeing-female.png",
+      "pose": 2,
+      "description": "a young prophetess who sees every fate, a young woman with light skin, long golden hair hanging straight down her back at rest, not flying, eyes glowing gold, a golden crown, a golden ring of light with runes close behind the head, no wider than the shoulders, long robes of black and gold covered with small golden embroidered eyes, a large golden eye on the chest, a long black and gold cloak hanging behind from the shoulders, brown boots, a beautiful calm young woman's face in clean profile with one eye, no staff, no flying pages, no cards, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "soul-lord-male": {
+      "start": "art/references/walks/start/soul-lord-male.png",
+      "pose": 2,
+      "description": "a tall reaper lord in a deep black hood of smoke, the face hidden behind a silver mask shaped like a skull with glowing crimson eyes, black armour with white bone plates shaped like ribs on the chest, spiked bone pauldrons, a dark belt, a long tattered black cloak hanging behind from the shoulders, black boots with pale bone knee guards, no spirit lights, no ghosts, no scythes, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "soul-lord-female": {
+      "start": "art/references/walks/start/soul-lord-female.png",
+      "pose": 2,
+      "description": "a slim reaper lady in a deep black hood of smoke, a few strands of dark red-brown hair, the face hidden behind a silver mask shaped like a skull with glowing crimson eyes, black armour with white bone plates shaped like ribs on the chest, spiked bone pauldrons, a dark belt, a long tattered black cloak hanging behind from the shoulders, black boots with pale bone knee guards, no spirit lights, no ghosts, no scythes, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "navia-emperor-male": {
+      "start": "art/references/walks/start/navia-emperor-male.png",
+      "pose": 2,
+      "description": "the deathless god-emperor of the underworld, a gaunt man with very pale grey skin, sunken cheeks, a skull-like face, eyes glowing cold blue, a tall crown of black iron spikes, armour of black iron and bone with a ribcage of white bone on the chest, a skull on the shoulder, a long mantle of black smoke with small pale blue soul sparks hanging behind from the shoulders, its edge clean and outlined, bone and iron greaves, no spectral hands, no lantern sceptre, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "navia-emperor-female": {
+      "start": "art/references/walks/start/navia-emperor-female.png",
+      "pose": 2,
+      "description": "the deathless god-empress of the underworld, a woman with a slim feminine figure, very pale grey skin, long straight black hair hanging straight down her back at rest, not flying, eyes glowing cold blue, a tall crown of icy blue soul fire spikes, armour of dark steel and black iron with glowing pale blue edges, a long black cloak with small pale blue soul sparks hanging behind from the shoulders, its edge clean and outlined, dark steel greaves and boots, a beautiful gaunt young woman's face in clean profile with one eye, no spectral hands, no lantern sceptre, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "dark-king-male": {
+      "start": "art/references/walks/start/dark-king-male.png",
+      "pose": 2,
+      "description": "the king of a night without stars, a young man with pale skin, long silver-white hair hanging straight down his back at rest, not flying, a sharp elegant face, eyes glowing violet, a tall crown of black thorns, a black eclipse disk with a thin silver rim close behind the head, black armour with glowing silver-white lines, huge black feathered wings of shadow folded close behind the back, a long black cloak hanging behind from the shoulders, black boots, no daggers, the wings staying folded close behind the back, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "dark-king-female": {
+      "start": "art/references/walks/start/dark-king-female.png",
+      "pose": 2,
+      "description": "the queen of a night without stars, a young woman with a slim feminine figure, pale skin, very long silver-white hair hanging straight down her back at rest, not flying, eyes glowing violet, a tall crown of black thorns, a black eclipse disk with a thin silver rim close behind the head, black armour with glowing silver-white lines, huge black feathered wings of shadow folded close behind the back, a long black cloak hanging behind from the shoulders, black heeled boots, a beautiful young woman's face in clean profile with one eye, no daggers, the wings staying folded close behind the back, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     }
   }
 }
