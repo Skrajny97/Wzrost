@@ -1,0 +1,23 @@
+{
+  "id": "navia-emperor-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the deathless god-emperor of the underworld, a gaunt man with very pale grey skin, sunken cheeks, a skull-like face, eyes glowing cold blue, a tall crown of black iron spikes, armour of black iron and bone with a ribcage of white bone on the chest, a skull on the shoulder, a long mantle of black smoke with small pale blue soul sparks hanging behind from the shoulders, its edge clean and outlined, bone and iron greaves, no spectral hands, no lantern sceptre and nothing in the hands, seen exactly from the side in a strict profile, facing and walking to the right, the nose pointing right and only one eye showing, the chest, belly and hips turned fully to the right and not towards the viewer, only the near arm showing, hanging relaxed beside the body with an empty loosely closed hand, the far arm hidden behind the body, the back and shoulders straight and upright, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the crown to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/navia-king-male.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/navia-emperor-male.png",
+      "usage": "the character's look in detail: face, crown, armour of iron and bone, smoke mantle and colours; the hands empty, without the spectral hands and the lantern sceptre"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen exactly from the side in profile, facing right, upright mid-step, not turned towards the viewer; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08124409010675218
+  },
+  "images": 4
+}

@@ -1,0 +1,27 @@
+{
+  "id": "dark-king-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the king of a night without stars, a young man with pale skin, long silver-white hair hanging straight down his back at rest, not flying, a sharp elegant face, eyes glowing violet, a tall crown of black thorns, a black eclipse disk with a thin silver rim close behind the head, black armour with glowing silver-white lines, huge black feathered wings of shadow folded close behind the back, a long black cloak hanging behind from the shoulders, black boots, no daggers and nothing in the hands, the wings staying folded close behind the back, seen exactly from the side in a strict profile, facing and walking to the right, the nose pointing right and only one eye showing, the chest, belly and hips turned fully to the right and not towards the viewer, only the near arm showing, hanging relaxed beside the body with an empty loosely closed hand, the far arm hidden behind the body, the back and shoulders straight and upright, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the wings to the feet and the whole wings inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/dark-prince-male.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/riders/dark-king-male.png",
+      "usage": "the same character seen from the side: face, silver hair, thorn crown, eclipse halo, black wings, armour, cloak, colours and drawing style; not the sitting pose and not the hands on the reins: he stands and walks"
+    },
+    {
+      "path": "art/references/evolutions/dark-king-male.png",
+      "usage": "the character's look in detail: face, silver hair, thorn crown, eclipse halo, black wings, armour, cloak and colours; the hands empty, without the two daggers"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen exactly from the side in profile, facing right, upright mid-step, not turned towards the viewer; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08209089011616177
+  },
+  "images": 4
+}

@@ -1,0 +1,27 @@
+{
+  "id": "heaven-sword-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "a celestial knight of holy fire, a woman with warm brown skin, long dark hair hanging straight down her back at rest, not flying, eyes burning with white fire, plate armour of polished silver and pale gold with glowing white runes, shaped for a woman, a long white cloak hanging behind from the shoulders, a thin aura of white and ice-blue holy flame close around the head and shoulders, silver greaves and boots, a stern young woman's face in clean profile with one eye, no sword and nothing in the hands, seen exactly from the side in a strict profile, facing and walking to the right, the nose pointing right and only one eye showing, the chest, belly and hips turned fully to the right and not towards the viewer, only the near arm showing, hanging relaxed beside the body with an empty loosely closed hand, the far arm hidden behind the body, the back and shoulders straight and upright, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the head and its flames to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/heaven-avenger-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/riders/heaven-sword-female.png",
+      "usage": "the same character seen from the side: face, hair, armour, cloak, holy glow, colours and drawing style; not the sitting pose and not the hands on the reins: she stands and walks"
+    },
+    {
+      "path": "art/references/evolutions/heaven-sword-female.png",
+      "usage": "the character's look in detail: face, hair, armour, cloak, holy glow and colours; the hands empty, without the sword"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen exactly from the side in profile, facing right, upright mid-step, not turned towards the viewer; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08100788129700555
+  },
+  "images": 4
+}

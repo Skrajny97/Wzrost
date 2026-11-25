@@ -1,0 +1,27 @@
+{
+  "id": "unstoppable-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "a huge very muscular warlord man, tanned skin crossed by thin glowing cracks of yellow-white magma, long wild dark brown hair and a thick braided dark brown beard with iron rings, eyes blazing yellow-white, a crown of jagged black obsidian horns with small flames burning between them, black volcanic rock pauldrons with molten gold edges, a bare muscular chest, a wide golden belt, a skirt of black and molten gold plates, a long mantle of black smoke and glowing orange embers hanging behind from the shoulders, its edge clean and outlined, black armoured boots with gold trim, no axe and nothing in the hands, seen exactly from the side in a strict profile, facing and walking to the right, the nose pointing right and only one eye showing, the chest, belly and hips turned fully to the right and not towards the viewer, only the near arm showing, hanging relaxed beside the body with an empty loosely closed hand, the far arm hidden behind the body, the back and shoulders straight and upright, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the tips of the crown's horns and flames to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/ravager-male.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/riders/unstoppable-male.png",
+      "usage": "the same character seen from the side: face, hair, beard, crown of horns and fire, armour, smoke mantle, colours and drawing style; not the sitting pose and not the hands on the reins: he stands and walks"
+    },
+    {
+      "path": "art/references/evolutions/unstoppable-male.png",
+      "usage": "the character's look in detail: face, hair, beard, crown of horns and fire, armour, smoke mantle and colours; the hands empty, without the war axe"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen exactly from the side in profile, facing right, upright mid-step, not turned towards the viewer; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08277073301209344
+  },
+  "images": 4
+}

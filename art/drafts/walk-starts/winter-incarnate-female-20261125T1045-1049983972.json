@@ -1,0 +1,27 @@
+{
+  "id": "winter-incarnate-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the embodiment of eternal winter, a young woman with fair skin and rosy cheeks, long white hair hanging straight down her back at rest, not flying, eyes glowing pale cyan, a tall crown of long bright blue icicles, armour of dark midnight blue ice with glowing cyan edges and small ice spikes on the shoulders, a long cloak of the violet, teal and green lights of an aurora and of white snow hanging behind from the shoulders, its edge clean and outlined, ice crystal greaves and boots, a calm young woman's face in clean profile with one eye, no sceptre and nothing in the hands, seen exactly from the side in a strict profile, facing and walking to the right, the nose pointing right and only one eye showing, the chest, belly and hips turned fully to the right and not towards the viewer, only the near arm showing, hanging relaxed beside the body with an empty loosely closed hand, the far arm hidden behind the body, the back and shoulders straight and upright, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the tips of the icicle crown to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/frost-god-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/riders/winter-incarnate-female.png",
+      "usage": "the same character seen from the side: face, hair, icicle crown, ice armour, aurora cloak, colours and drawing style; not the sitting pose and not the hands on the reins: she stands and walks"
+    },
+    {
+      "path": "art/references/evolutions/winter-incarnate-female.png",
+      "usage": "the character's look in detail: face, hair, icicle crown, ice armour, aurora cloak and colours; the hands empty, without the sceptre"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen exactly from the side in profile, facing right, upright mid-step, not turned towards the viewer; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08081405194600423
+  },
+  "images": 4
+}

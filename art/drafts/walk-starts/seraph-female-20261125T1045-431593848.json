@@ -1,0 +1,27 @@
+{
+  "id": "seraph-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the highest of all angels, a woman with light tan skin, long dark brown hair hanging straight down her back at rest, not flying, eyes glowing white, a blazing golden sun disk close behind the head, large wings of white-hot fire with golden and orange flames folded close behind the back, ornate golden armour with a burning sun on the chest, dark red sleeves, a long robe of orange and crimson flames, golden boots, a gentle young woman's face in clean profile with one eye, no staff, no fire in the hand and nothing in the hands, the wings staying folded close behind the back, seen exactly from the side in a strict profile, facing and walking to the right, the nose pointing right and only one eye showing, the chest, belly and hips turned fully to the right and not towards the viewer, only the near arm showing, hanging relaxed beside the body with an empty loosely closed hand, the far arm hidden behind the body, the back and shoulders straight and upright, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the wings to the feet and the whole wings inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/archangel-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/riders/seraph-female.png",
+      "usage": "the same character seen from the side: face, hair, sun halo, wings of fire, golden armour, robe of flames, colours and drawing style; not the sitting pose and not the hands on the reins: she stands and walks"
+    },
+    {
+      "path": "art/references/evolutions/seraph-female.png",
+      "usage": "the character's look in detail: face, hair, sun halo, wings of fire, golden armour, robe of flames and colours; the hands empty, without the staff and the fire in her hand"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen exactly from the side in profile, facing right, upright mid-step, not turned towards the viewer; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0814403518570794
+  },
+  "images": 4
+}

@@ -1,0 +1,27 @@
+{
+  "id": "gods-champion-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "a radiant demigod of victory, a man with warm brown skin, short dark curly hair and a short dark beard, eyes glowing gold, a crown of golden sun rays on the bare head, white marble and gold plate armour with a golden lion's head on the breastplate, a sapphire blue skirt with golden trim, two small wings of golden light folded close behind the shoulders, a long sapphire blue cape with small golden stars hanging behind from the shoulders, white and gold greaves and boots, no sword, no shield and nothing in the hands, the wings staying folded close behind the back, seen exactly from the side in a strict profile, facing and walking to the right, the nose pointing right and only one eye showing, the chest, belly and hips turned fully to the right and not towards the viewer, only the near arm showing, hanging relaxed beside the body with an empty loosely closed hand, the far arm hidden behind the body, the back and shoulders straight and upright, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the tips of the crown's sun rays to the feet and the whole wings inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/immortal-male.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/riders/gods-champion-male.png",
+      "usage": "the same character seen from the side: face, hair, beard, crown of sun rays, wings of light, armour, cape, colours and drawing style; not the sitting pose and not the hands on the reins: he stands and walks"
+    },
+    {
+      "path": "art/references/evolutions/gods-champion-male.png",
+      "usage": "the character's look in detail: face, hair, beard, crown of sun rays, wings of light, armour, cape and colours; the hands empty, without the sword and the shield"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen exactly from the side in profile, facing right, upright mid-step, not turned towards the viewer; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08102416472964817
+  },
+  "images": 4
+}
