@@ -7,8 +7,9 @@
 // guardians' Artefakty by the levels' rarities, their sizes and elements;
 // the sockets; the numbers of the traits with the upgrades and the gem;
 // the costs of the upgrades, the Odłamki of a break and of a dissolved
-// Artefakt; the resonance; the Rdzeń in the stats and the fights; and the
-// danger of the rooms ahead on the board (899 A).
+// Artefakt; the resonance; the Rdzeń in the stats and the fights; the
+// danger of the rooms ahead on the board (899 A); the Labirynt measured
+// against the party (labyrinthFit, 1253); and the strong rooms (1253).
 
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
@@ -31,12 +32,15 @@ import {
   coreResonance,
   coreSockets,
   createRng,
+  DANGER_LEVELS,
   dissolveShards,
   enterRoom,
   exploreStrength,
   freeSockets,
   labyrinthAreas,
+  labyrinthFight,
   labyrinthFighters,
+  labyrinthFit,
   labyrinthFoes,
   labyrinthGold,
   labyrinthMap,
@@ -413,6 +417,106 @@ describe('the danger of the rooms on the board (899 A)', () => {
     const before = JSON.stringify(state);
     assert.equal(roomDanger({ state, type: 'fight', row: 0, room: 0, party: strong, seed: 'danger' }, content), 'deadly');
     assert.equal(JSON.stringify(state), before);
+  });
+});
+
+describe('the Labirynt against the party (1253)', () => {
+  const { character, equipped } = strongClimber();
+  const strong = { character, equipped, name: 'Wspinacz', companions: [] };
+  const naked = { character: newCharacter('mage', { level: 30, classLevel: 30 }), equipped: [], name: 'Nagi', companions: [] };
+  const fresh = (fields = {}) => ({ ...newLabyrinth({ day: '2026-11-12', charLevel: 30, companions: [], seed: 'test' }), ...fields });
+
+  test('a party stronger than the Labirynt needs meets its creatures stronger, a weak one as they are (fit.least); the same answer all day', () => {
+    const fit = labyrinthFit(fresh(), strong, content);
+    assert.ok(fit > rules.fit.least * 2, String(fit));
+    assert.equal(labyrinthFit(fresh(), strong, content), fit);
+    assert.equal(labyrinthFit(fresh(), naked, content), rules.fit.least);
+    // Less gear, weaker creatures.
+    const lighter = labyrinthFit(fresh({ charLevel: 150 }), { ...strong, equipped: equipped.filter((item) => item.slot !== 'weapon') }, content);
+    assert.ok(lighter < labyrinthFit(fresh({ charLevel: 150 }), strong, content), String(lighter));
+    // Without the fit in the data the Labirynt is the same for everyone.
+    const { fit: _, ...plain } = rules;
+    assert.equal(labyrinthFit(fresh(), strong, { ...content, labyrinth: plain }), 1);
+  });
+
+  test('the HP kept, the blessings and the trophies do not change it: they stay the party\'s own edge', () => {
+    const state = fresh({ charLevel: 150 });
+    const fit = labyrinthFit(state, strong, content);
+    assert.equal(labyrinthFit({ ...state, hp: { me: 0.2 }, blessings: ['might', 'vigour', 'ward'] }, strong, content), fit);
+    const { encounter } = labyrinthFoes({ day: state.day, level: 1, row: 0, room: 0, type: 'fight', charLevel: 150 }, content);
+    const trophies = Object.fromEntries(encounter.members.map((member) => [member.monsterId, 5]));
+    assert.equal(labyrinthFit(state, { ...strong, trophies, week: { number: 1, effects: [{ kind: 'stat', stat: 'strength', value: 20 }] } }, content), fit);
+  });
+
+  test('every room\'s creatures that much stronger, in their blows and their HP; the board and the fight measure it as the server does', () => {
+    const base = labyrinthStrength(2, 'fight', 30, content);
+    assert.deepEqual(labyrinthStrength(2, 'fight', 30, content, 1.7), [base[0] * 1.7, base[1] * 1.7]);
+    const state = fresh({ charLevel: 150 });
+    const fit = labyrinthFit(state, strong, content);
+    // roomDanger and labyrinthFight measure it themselves, as given.
+    assert.equal(roomDanger({ state, type: 'fight', row: 0, room: 0, party: strong, seed: 'danger' }, content), roomDanger({ state, type: 'fight', row: 0, room: 0, party: { ...strong, fit }, seed: 'danger' }, content));
+    const fight = (party) => labyrinthFight({ state, type: 'fight', row: 0, room: 0, party, seed: 'walka' }, content);
+    const measured = fight(strong);
+    assert.deepEqual(measured.fights[0].events, fight({ ...strong, fit }).fights[0].events);
+    // Twice the fit, twice the creatures' HP.
+    const hp = (one) => one.fights[0].enemiesView.reduce((sum, enemy) => sum + enemy.maxHp, 0);
+    const ratio = hp(fight({ ...strong, fit: 2 })) / hp(fight({ ...strong, fit: 1 }));
+    assert.ok(Math.abs(ratio - 2) < 0.02, String(ratio));
+  });
+});
+
+describe('the strong rooms (1253)', () => {
+  const { strongRooms: _, ...plain } = rules;
+  const without = { ...content, labyrinth: plain };
+
+  test('at most one a row after the first, an ordinary fight, about the data\'s chance a row; the rooms and roads as without them; always a way around', () => {
+    let marked = 0;
+    let rows = 0;
+    for (const day of days) {
+      for (const level of [1, 2, 3, 4]) {
+        const map = labyrinthMap(day, level, content);
+        assert.deepEqual(
+          map.rows.map((rooms) => rooms.map(({ type, links }) => ({ type, links }))),
+          labyrinthMap(day, level, without).rows,
+        );
+        // The first row, where every level starts, has none.
+        assert.ok(map.rows[0].every((room) => !room.strong));
+        map.rows.slice(1, -1).forEach((rooms, index) => {
+          const row = index + 1;
+          rows += 1;
+          const strong = rooms.filter((room) => room.strong);
+          assert.ok(strong.length <= 1, `${day} ${level} row ${row}`);
+          assert.ok(strong.every((room) => room.type === 'fight'));
+          marked += strong.length;
+          // From every room of the row before, a room that is not strong.
+          for (const from of map.rows[row - 1]) assert.ok(from.links.some((next) => !rooms[next].strong), `${day} ${level} row ${row}`);
+        });
+        assert.ok(!map.rows.at(-1)[0].strong);
+      }
+    }
+    // Fewer than the chance a row: a row without an ordinary fight has none.
+    assert.ok(marked / rows > rules.strongRooms.chance * 0.6 && marked / rows <= rules.strongRooms.chance, `${marked} / ${rows}`);
+  });
+
+  test('their creatures strongRooms.strength times stronger, in their blows and HP, in the fight and on the board', () => {
+    const [damage, hp] = rules.strongRooms.strength;
+    const base = labyrinthStrength(2, 'fight', 60, content);
+    assert.deepEqual(labyrinthStrength(2, 'fight', 60, content, 1, true), [base[0] * damage, base[1] * hp]);
+    // An elite and the guardian are never strong rooms; the flag alone changes nothing for them in the map.
+    const day = days.find((one) => labyrinthMap(one, 1, content).rows.some((rooms) => rooms.some((room) => room.strong)));
+    const map = labyrinthMap(day, 1, content);
+    const row = map.rows.findIndex((rooms) => rooms.some((room) => room.strong));
+    const room = map.rows[row].findIndex((one) => one.strong);
+    const { character, equipped } = strongClimber();
+    const party = { character, equipped, name: 'Wspinacz', companions: [] };
+    const state = newLabyrinth({ day, charLevel: 60, companions: [], seed: 'test' });
+    const enemyHp = (data) => labyrinthFight({ state, type: 'fight', row, room, party, seed: 'walka' }, data).fights[0].enemiesView.reduce((sum, enemy) => sum + enemy.maxHp, 0);
+    const ratio = enemyHp(content) / enemyHp(without);
+    assert.ok(Math.abs(ratio - hp) < 0.02 * hp, String(ratio));
+    // The board shows it: a strong room is never safer than the same room would be.
+    const weak = { character: newCharacter('mage', { level: 60, classLevel: 60 }), equipped: [], name: 'Słaby', companions: [] };
+    const rank = (data) => DANGER_LEVELS.indexOf(roomDanger({ state, type: 'fight', row, room, party: weak, seed: 'danger' }, data));
+    assert.ok(rank(content) >= rank(without));
   });
 });
 

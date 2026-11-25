@@ -15,12 +15,20 @@
 // the guardian with only green fights on them and of the boards all green,
 // and at each choice of two rooms or more the share where every fight on
 // offer is green (the way chosen does not matter). The colours have their
-// own seeds, so the days go exactly as without --danger.
+// own seeds, so the days go exactly as without --danger. With --player,
+// another player picks the rooms (PLAYERS, 1253): `colours` the careful one
+// who also reads the board's colours, never a red fight while another room
+// is open and a yellow one only when no green one or room without a fight
+// is, and `random` one who just clicks (a player of level 107: „Jak dla
+// dziecka byle klikać nie ważne co bo i tak zrobisz go”): any open room,
+// the first blessing offered, the merchant left without buying. How far
+// apart the two get is how much the way chosen matters.
 //
 //   node tools/labyrinth-sim.mjs                         levels 30–200, 40 days each, every class
 //   node tools/labyrinth-sim.mjs --levels 50,100 --days 80 --model low
 //   node tools/labyrinth-sim.mjs --core --explore --levels 50,100,200
 //   node tools/labyrinth-sim.mjs --danger --levels 60,107,200 --set 'monsters.weaker.curve=[]'
+//   node tools/labyrinth-sim.mjs --danger --levels 60,107,200 --player random
 
 import { fileURLToPath } from 'node:url';
 import * as engine from '../src/engine/index.js';
@@ -28,16 +36,27 @@ import { companionsOf, contentWith, newestArea, playerOf, roadKit, withArea } fr
 
 const LEVELS = [30, 50, 75, 100, 150, 200];
 
-// The rooms a careful player prefers, by how wounded the party is.
-function pickRoom(state, map, rooms, rng) {
+// The players who pick the rooms (--player): careful, careful reading the
+// colours, and one who just clicks.
+export const PLAYERS = ['careful', 'colours', 'random'];
+
+// The rooms a careful player prefers, by how wounded the party is; with
+// `colourOf` (the `colours` player) only among the open rooms of the best
+// colour, a room without a fight as green; the `random` player any of them.
+function pickRoom(state, map, rooms, rng, picks = 'careful', colourOf = null) {
   const types = rooms.map((index) => ({ index, type: map.rows[state.row + 1][index].type }));
+  if (picks === 'random') return rng.pick(types).index;
   const hp = Object.values(state.hp);
   const low = state.hp.me < 0.5 || hp.some((share) => share <= 0) || hp.reduce((sum, share) => sum + share, 0) / hp.length < 0.55;
   const order = low ? ['spring', 'merchant', 'altar', 'treasure', 'fight', 'elite', 'guardian'] : ['altar', 'treasure', 'elite', 'fight', 'spring', 'merchant', 'guardian'];
   const healthy = state.hp.me > 0.75;
-  const ranked = types
-    .filter((one) => healthy || one.type !== 'elite' || types.every((other) => other.type === 'elite'))
-    .sort((a, b) => order.indexOf(a.type) - order.indexOf(b.type) || rng.next() - 0.5);
+  let open = types.filter((one) => healthy || one.type !== 'elite' || types.every((other) => other.type === 'elite'));
+  if (colourOf && open.length > 0) {
+    const rank = (one) => engine.DANGER_LEVELS.indexOf(colourOf(state.row + 1, one.index) ?? 'easy');
+    const best = Math.min(...open.map(rank));
+    open = open.filter((one) => rank(one) === best);
+  }
+  const ranked = open.sort((a, b) => order.indexOf(a.type) - order.indexOf(b.type) || rng.next() - 0.5);
   return (ranked[0] ?? types[0]).index;
 }
 
@@ -115,33 +134,43 @@ function lookAtBoard({ state, map, rooms, party, seed, into }, content) {
 // One day of the Labirynt for a player: the levels it clears. The
 // creatures stand halfway between the character's and the class's level
 // (labyrinthCharLevel, the author 13.11.2026). `danger`: newDanger's
-// counts to add the board's colours to (--danger), or null.
-function playDay({ player, companions, day, seed, danger = null }, content) {
+// counts to add the board's colours to (--danger), or null; `picks` the
+// player who picks the rooms (PLAYERS).
+function playDay({ player, companions, day, seed, danger = null, picks = 'careful' }, content) {
   let state = engine.newLabyrinth({ day, charLevel: engine.labyrinthCharLevel(player.character), companions, seed });
   const rng = engine.createRng(`${seed}:choices`);
   const party = { character: player.character, equipped: player.equipped, name: 'Symulacja', companions };
+  // The Labirynt against the party (labyrinthFit): the same all day, as the
+  // party's gear does not change here, so measured once.
+  party.fit = engine.labyrinthFit(state, party, content);
   for (let step = 0; step < 60 && !state.over; step++) {
     if (state.pending) {
       if (state.pending.kind === 'merchant') {
+        if (picks === 'random') {
+          state = engine.leaveMerchant(state) ?? { ...state, pending: null };
+          continue;
+        }
         const hurt = Object.values(state.hp).some((share) => share < 0.6);
         const bought = hurt && !state.pending.heal ? engine.buyAtMerchant(state, 'heal', content) : null;
         state = bought ?? engine.leaveMerchant(state) ?? { ...state, pending: null };
         continue;
       }
-      state = engine.chooseBlessing(state, rng.pick(state.pending.choices));
+      state = engine.chooseBlessing(state, picks === 'random' ? state.pending.choices[0] : rng.pick(state.pending.choices));
       continue;
     }
     const map = engine.labyrinthMap(state.day, state.level, content);
     const rooms = engine.reachableRooms(map, state.row, state.room);
     if (rooms.length === 0) break;
     if (danger) lookAtBoard({ state, map, rooms, party, seed: `danger:${seed}`, into: danger.levels[state.level - 1] }, content);
-    const target = { row: state.row + 1, room: pickRoom(state, map, rooms, rng) };
+    // The colours as the board shows them (the seed of lookAtBoard's).
+    const colourOf = picks === 'colours' ? (row, room) => engine.roomDanger({ state, type: map.rows[row][room].type, row, room, party, seed: `danger:${seed}` }, content) : null;
+    const target = { row: state.row + 1, room: pickRoom(state, map, rooms, rng, picks, colourOf) };
     state = engine.enterRoom(state, target, party, `${seed}:${step}`, content).state;
   }
   return state.cleared;
 }
 
-export function measureLabyrinth({ model = 'realistic', classId, level, days, core = null, danger = null }, content) {
+export function measureLabyrinth({ model = 'realistic', classId, level, days, core = null, danger = null, picks = 'careful' }, content) {
   const cleared = [0, 0, 0, 0, 0];
   for (let i = 0; i < days; i++) {
     const base = playerOf(model, classId, level, content, i % 8);
@@ -149,7 +178,7 @@ export function measureLabyrinth({ model = 'realistic', classId, level, days, co
     const plan = base.plan ?? { companions: 2, companionGear: 'rare', companionUpgrade: 0, bond: 1, variant: model };
     const companions = companionsOf({ ...plan, companions: 2 }, level, i, content);
     const day = `sim-${String(i).padStart(4, '0')}`;
-    const levels = playDay({ player, companions, level, day, seed: `labyrinth-sim:${model}:${classId}:${level}:${i}`, danger }, content);
+    const levels = playDay({ player, companions, level, day, seed: `labyrinth-sim:${model}:${classId}:${level}:${i}`, danger, picks }, content);
     cleared[levels] += 1;
   }
   // The share of days each level was cleared (level n: n or more cleared).
@@ -183,6 +212,8 @@ function main() {
   const classes = typeof options.classes === 'string' ? options.classes.split(',') : content.classes.map((cls) => cls.id);
   const days = Number(options.days ?? 40);
   const model = typeof options.model === 'string' ? options.model : 'realistic';
+  const picks = typeof options.player === 'string' ? options.player : 'careful';
+  if (!PLAYERS.includes(picks)) throw new Error(`--player: ${PLAYERS.join(', ')}`);
   const pct = (value) => `${(value * 100).toFixed(0)}%`.padStart(4);
   for (const level of levels) {
     const totals = [0, 0, 0, 0];
@@ -190,9 +221,9 @@ function main() {
     // The board's colours of every class together (--danger).
     const danger = options.danger ? newDanger() : null;
     for (const classId of classes) {
-      const rates = measureLabyrinth({ model, classId, level, days, danger }, content);
+      const rates = measureLabyrinth({ model, classId, level, days, danger, picks }, content);
       rates.forEach((rate, index) => (totals[index] += rate / classes.length));
-      let line = `${model.padEnd(10)} ${classId.padEnd(8)} ${String(level).padStart(3)}  poziom 1 ${pct(rates[0])}  2 ${pct(rates[1])}  3 ${pct(rates[2])}  Piekielny ${pct(rates[3])}`;
+      let line = `${picks === 'careful' ? model.padEnd(10) : `${model} ${picks}`.padEnd(18)} ${classId.padEnd(8)} ${String(level).padStart(3)}  poziom 1 ${pct(rates[0])}  2 ${pct(rates[1])}  3 ${pct(rates[2])}  Piekielny ${pct(rates[3])}`;
       if (options.core) {
         const withCore = measureLabyrinth({ model, classId, level, days, core: coreFor(level, content) }, content);
         withCore.forEach((rate, index) => (coreTotals[index] += rate / classes.length));

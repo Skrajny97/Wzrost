@@ -36,6 +36,7 @@ import {
   labyrinthCharLevel,
   labyrinthDay,
   labyrinthFighters,
+  labyrinthFit,
   labyrinthFoes,
   labyrinthLevel,
   labyrinthLevels,
@@ -164,6 +165,9 @@ function labyrinthView(player, state, now, waiting = 0) {
   const ahead = state.over ? new Set() : roomsAhead(map, state.row, state.room);
   const monsterIds = [...new Set(foes.flat().flatMap((list) => (list ?? []).map((foe) => foe.monsterId)))];
   const party = { character, equipped, name: player.row.name, companions, trophies: monsterIds.length > 0 ? trophiesFor(player, now, monsterIds) : {}, week: weekFor(player.row, now) };
+  // The Labirynt against this party (labyrinthFit), measured once for the
+  // whole board, as each fight measures it again.
+  if (ahead.size > 0) party.fit = labyrinthFit(state, party, content());
   const dangerSeed = `danger:${state.day}:${player.row.id}`;
   const dangerOf = (row, index, type) => (ahead.has(`${row}:${index}`) ? roomDanger({ state, type, row, room: index, party, seed: dangerSeed }, content()) : null);
   const spentOf = (row, type) => REWARDING.includes(type) && spentRoom(state, state.level, row);
