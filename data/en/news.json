@@ -1424,6 +1424,10 @@
     "0.5.22": {
       "title": "Version 0.5.22",
       "body": "- Labyrinth: the creatures now match your party, and some chambers on the map are strong, ordinary fights with much stronger creatures, usually with a red ring. A row has at most one, so you can always go around it: watch the rings, because the whole way decides the day."
+    },
+    "0.5.23": {
+      "title": "Version 0.5.23",
+      "body": "- Party: under each member's name you can now see what they are doing and until when, e.g. \"on the party's exploration: Tar Pits, back at 13:31\" or \"meditating in Cultivation until 14:00\", and whether they are online (\"offline for 25 min\"). A member serving as a mercenary no longer shows the wrong \"working in a profession\".\n- Combat: the leader sees, for each member who won't go on the party's exploration, what they are doing and when they will be free.\n- A reminder: whoever stops a party's exploration comes back alone at once, and the rest of the party carries on to its end. The Party now shows when they will be back."
     }
   }
 }
