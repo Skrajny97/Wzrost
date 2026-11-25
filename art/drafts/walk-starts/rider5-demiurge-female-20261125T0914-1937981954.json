@@ -1,0 +1,19 @@
+{
+  "id": "rider5-demiurge-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the woman of the reference picture riding: the creator of worlds, a slim woman, fair light skin, long wavy dark brown hair hanging down her back, a bright beautiful face in clean profile, eyes glowing white, a small tiara of white crystal shining with light, a long gown of deep cosmic black and dark blue full of tiny stars with golden trim and golden nebula patterns, wide sleeves, the gown split for riding and falling down behind the leg, dark blue riding trousers on the leg, a dark blue boot, no staff, no orbiting worlds, no ring of runes and nothing in the hands but the reins; sitting tall and upright astride a saddle that is not drawn, the back straight, not squatting and not crouching, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the knee bent at a right angle, the lower leg hanging vertically straight down from the knee, one whole foot at the bottom with the toes pointing right; the cloak and any long hair hanging down behind the back, not spread out; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the top of the crystal tiara to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/demiurge-female.png",
+      "usage": "the character's look: this same woman, her face, hair, crystal tiara, starry gown and colours, drawn the same way; not her standing pose and not the staff, the orbiting worlds and the ring of runes"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08157559853129917
+  },
+  "images": 4
+}

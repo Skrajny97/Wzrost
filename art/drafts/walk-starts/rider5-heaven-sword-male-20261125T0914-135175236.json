@@ -1,0 +1,19 @@
+{
+  "id": "rider5-heaven-sword-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the man of the reference picture riding: a celestial knight of holy fire, warm brown skin, short dark hair, a stern scarred face in clean profile, eyes burning with white fire, plate armour of polished silver and pale gold with glowing white runes, a long white cloak hanging behind from the shoulders, a thin aura of white and ice-blue holy flame close around the head and shoulders, silver greaves and boots, no sword and nothing in the hands but the reins; sitting tall and upright astride a saddle that is not drawn, the back straight, not squatting and not crouching, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee, the knee bent at a right angle, the lower leg hanging vertically straight down from the knee, one whole foot at the bottom with the toes pointing right; the cloak and any long hair hanging down behind the back, not spread out; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the top of the holy flames to the sole of the foot inside the picture, the rider about three quarters of the picture height, a figure of ordinary size, with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/heaven-sword-male.png",
+      "usage": "the character's look: this same man, his face, hair, armour, cloak, holy glow and colours, drawn the same way; not his standing pose and not the sword"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08163246528307597
+  },
+  "images": 4
+}
