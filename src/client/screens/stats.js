@@ -67,6 +67,9 @@ function openExtra(character) {
       notes.filter(Boolean).map((note) => h('dd', { class: 'extra-note', text: note })),
     );
   const rating = (value, stat, cap) => t('ocena {value} ({stat}), najwyżej {cap}', { value: formatNumber(value), stat, cap: percent(cap) });
+  // The stat the dodge and the speed come from: Zręczność, or the one the
+  // character's form counts it as (988, `countsAs`: the Nekromanta's Intelekt).
+  const agile = character.stats.find((stat) => stat.id === 'dexterity')?.countsAs?.name ?? t('Zręczność');
   // The Rdzeń's share in a number, where its Artefakty give one (preview.js).
   const fromCore = (share) => share > 0 && t('Rdzeń +{share}%', { share: formatDecimal(share * 100) });
   const group = (title, ...rows) => [h('h3', { class: 'extra-title', text: title }), h('dl', { class: 'extra-list' }, rows)];
@@ -111,14 +114,14 @@ function openExtra(character) {
     group(
       t('Obrona'),
       row(t('Pancerz'), formatNumber(armor.total), armorFrom.join(' · '), t('redukcja obrażeń fizycznych {percent}', { percent: percent(armor.reduction) })),
-      row(t('Unik'), percent(dodge.chance), rating(dodge.rating, t('Zręczność'), dodge.cap), fromCore(dodge.core)),
+      row(t('Unik'), percent(dodge.chance), rating(dodge.rating, agile, dodge.cap), fromCore(dodge.core)),
       row(t('Odporność na efekty'), percent(effectResist.chance), rating(effectResist.rating, t('Wola'), effectResist.cap), fromCore(effectResist.core)),
     ),
     group(
       t('Atak'),
       row(t('Trafienie krytyczne'), percent(crit.chance), rating(crit.rating, t('Percepcja'), crit.cap), fromCore(crit.core)),
       row(t('Mnożnik krytyka'), `×${formatPrecise(crit.multiplier)}`, t('tyle razy mocniej uderza cios krytyczny')),
-      row(t('Szybkość'), formatPrecise(extra.speed), t('im wyższa, tym częściej postać rusza się w walce (Zręczność)'), fromCore(extra.speedCore)),
+      row(t('Szybkość'), formatPrecise(extra.speed), t('im wyższa, tym częściej postać rusza się w walce ({stat})', { stat: agile }), fromCore(extra.speedCore)),
     ),
     group(
       t('Zdrowie'),
@@ -448,7 +451,9 @@ export function mountStats(container) {
           formatNumber(stat.total + extra),
         ),
       ),
-      h('span', { class: 'stat-effect', text: stat.effect }),
+      // A stat the character's form counts as another (988, `countsAs`)
+      // says so instead of what the stat does elsewhere.
+      h('span', { class: 'stat-effect', text: stat.countsAs ? t('Każdy punkt liczy się u Ciebie jako {stat}.', { stat: stat.countsAs.name }) : stat.effect }),
       h('span', { class: 'source-bar', 'aria-hidden': 'true' }, segments),
     );
     const add = canAdd
@@ -475,19 +480,30 @@ export function mountStats(container) {
     );
   }
 
+  // What a stat gives, and its points by source. Where the character's form
+  // counts a stat as another (988; a gracz at level 86, 26.11.2026: the
+  // Wielki Inkwizytor's Intelekt showed 0 from everywhere), that stat says
+  // how many of its points count as the other, by source, as they all are
+  // in the other's (`countsAs`), and the other how many of its points are
+  // that stat's (`counted`): „w tym Intelekt: 594”.
   function statDetail(stat, sources, id) {
     const effects = EFFECTS.filter((effect) => stat.gives[effect.key] !== undefined);
+    const as = stat.countsAs;
+    const sourceLine = (values, shown) => shown.map((source) => `${t(source.label)} ${formatNumber(values[source.id])}`).join(' · ');
     return h(
       'div',
       { class: 'stat-detail', id },
       h(
         'p',
         { class: 'stat-detail-title' },
-        effects.length > 0
-          ? t('{name} {total} daje teraz:', { name: stat.name, total: formatNumber(stat.total) })
-          : t('{name} nie zmienia dziś Twoich wartości bojowych.', { name: stat.name }),
+        as
+          ? t('{name} {total} liczy się u Ciebie jako {stat}:', { name: stat.name, total: formatNumber(as.total), stat: as.name })
+          : effects.length > 0
+            ? t('{name} {total} daje teraz:', { name: stat.name, total: formatNumber(stat.total) })
+            : t('{name} nie zmienia dziś Twoich wartości bojowych.', { name: stat.name }),
       ),
-      effects.length > 0 &&
+      !as &&
+        effects.length > 0 &&
         h(
           'ul',
           { class: 'stat-detail-list' },
@@ -496,8 +512,9 @@ export function mountStats(container) {
       h(
         'p',
         { class: 'stat-detail-sources' },
-        sources.map((source) => `${t(source.label)} ${formatNumber(stat.sources[source.id])}`).join(' · '),
+        as ? sourceLine(as.sources, sources.filter((source) => source.id in as.sources)) : sourceLine(stat.sources, sources),
       ),
+      (stat.counted ?? []).map((one) => h('p', { class: 'stat-detail-sources', text: t('w tym {name}: {count}', { name: one.name, count: formatNumber(one.total) }) })),
     );
   }
 

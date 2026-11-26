@@ -12,16 +12,25 @@ import { professionStats } from './professions.js';
 /** @typedef {Record<string, any>} Character A character as the engine gets it (classId, level, classLevel, points…). */
 /** @typedef {{ class: number, character: number, professions: number, equipment: number, core: number }} Source Where a stat's points come from. */
 /** @typedef {{ armor: number, resist: Record<string, number> }} Bonuses */
+/**
+ * The points of a stat the character's form counts as another (`as`, 988):
+ * `to`, that other stat, and the points by where they come from, all of
+ * them in that stat's sources now.
+ * @typedef {{ to: string, class: number, character: number, professions: number, equipment: number }} Moved
+ */
 
 // Totals and their sources (the segments of the source bar on the stats
 // screen). After the class's evolution its levels grow by the evolution's
 // growth, from the level after the evolution on, and after the second form
-// by the form's, from the level after it (classSpans).
+// by the form's, from the level after it (classSpans). `moved`: the stats
+// the form counts as others, with their points by source (Moved), for the
+// stats screen to say where those points went (a gracz at level 86,
+// 26.11.2026: a Wielki Inkwizytor's Intelekt showed 0 from everywhere).
 /**
  * @param {Character} character
  * @param {Record<string, any>[]} equipped
  * @param {Content} content
- * @returns {{ totals: Record<string, number>, sources: Record<string, Source>, bonuses: Bonuses }}
+ * @returns {{ totals: Record<string, number>, sources: Record<string, Source>, bonuses: Bonuses, moved: Record<string, Moved> }}
  */
 export function computeStats(character, equipped, content) {
   const cls = content.classesById[character.classId];
@@ -61,13 +70,16 @@ export function computeStats(character, equipped, content) {
   // inną klasą stawał”) counts every point of a stat as another's, from the
   // class, the character, the professions and the gear alike (`as`: the
   // Nekromanta's and the Licz's Zręczność is their Intelekt).
+  /** @type {Record<string, Moved>} */
+  const moved = {};
   for (const [from, to] of Object.entries(statAsOf(gearKey(character.classId, character.evolution, content), content))) {
-    const moved = sources[from];
+    const out = sources[from];
     const into = sources[to];
-    if (!moved || !into) continue;
+    if (!out || !into) continue;
+    moved[from] = { to, class: out.class, character: out.character, professions: out.professions, equipment: out.equipment };
     for (const part of /** @type {(keyof Source)[]} */ (['class', 'character', 'professions', 'equipment'])) {
-      into[part] += moved[part];
-      moved[part] = 0;
+      into[part] += out[part];
+      out[part] = 0;
     }
   }
 
@@ -83,7 +95,7 @@ export function computeStats(character, equipped, content) {
     const s = sources[stat];
     totals[stat] = s.class + s.character + s.professions + s.equipment + s.core;
   }
-  return { totals, sources, bonuses };
+  return { totals, sources, bonuses, moved };
 }
 
 // Each character level gives as many points as there are stats, each class

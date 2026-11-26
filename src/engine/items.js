@@ -11,7 +11,7 @@
 // raising them further (ascension.js).
 
 import { rarityNeedView } from './crafting.js';
-import { gearLists, gearWearers } from './gear.js';
+import { gearLists, gearWearers, statAsOf } from './gear.js';
 import { budget, weaponDamage } from './formulas.js';
 import { say, word } from './text.js';
 
@@ -874,6 +874,30 @@ export function gemProperties(raw, content) {
   });
 }
 
+// What each line of an item's numbers counts as for a gear key whose form
+// counts a stat as another (`as`, 988; statAsOf in gear.js): the name of
+// that other stat on a line of the stat counted so ("Siła" on the
+// Intelekt of a Wielki Inkwizytor's helmet), null on any other line, one
+// for one with itemProperties and gemProperties; null for an item with no
+// such line. Its card says so beside the line (a gracz at level 86,
+// 26.11.2026: the helmet's „Intelekt: +70 (+81)” did not tell that its
+// Intelekt is the character's Siła).
+/**
+ * @param {Item} raw
+ * @param {string} key A gear key (gearKey in gear.js).
+ * @param {Content} content
+ * @returns {(string | null)[] | null}
+ */
+export function propertiesAs(raw, key, content) {
+  const counted = statAsOf(key, content);
+  if (Object.keys(counted).length === 0) return null;
+  const lines = propertyParts(upgradedItem(raw, content), raw, content).map(({ stat }) => {
+    const to = stat ? counted[stat] : undefined;
+    return to ? content.statsById[to].name : null;
+  });
+  return lines.some(Boolean) ? lines : null;
+}
+
 // Marks the end of a line's number while the line is written from its
 // template (propertyParts), which can put words after it: a character no
 // text of the game has.
@@ -883,23 +907,26 @@ const NUMBER_END = '\u0000';
 // upgraded, and raised by its gem or not; `raw`, the item as kept, tells its
 // own armor from the armor an upgrade gives), each cut where its number ends:
 // `text` up to there and `rest` after it, with `number`, the number as the
-// line writes it, or null in a line no gem raises.
+// line writes it, or null in a line no gem raises, and `stat`, what the
+// line gives ("intellect", "armor", "resist.fire"), or null for its damage
+// and its zaklęcie żywiołu's share.
 /**
  * @param {Item} item
  * @param {Item} raw
  * @param {Content} content
- * @returns {{ text: string, number: string | null, rest: string }[]}
+ * @returns {{ text: string, number: string | null, rest: string, stat: string | null }[]}
  */
 function propertyParts(item, raw, content) {
-  /** @type {{ text: string, number: string | null, rest: string }[]} */
+  /** @type {{ text: string, number: string | null, rest: string, stat: string | null }[]} */
   const parts = [];
   /**
    * @param {string} line
    * @param {string | null} number
+   * @param {string | null} [stat]
    */
-  const add = (line, number) => {
+  const add = (line, number, stat = null) => {
     const [text, rest = ''] = line.split(NUMBER_END);
-    parts.push({ text, number, rest });
+    parts.push({ text, number, rest, stat });
   };
   if (item.damage) {
     const { min, max } = item.damage;
@@ -911,16 +938,16 @@ function propertyParts(item, raw, content) {
   // An item's own armor comes first; the armor an upgrade gives an item
   // without any, like a talisman, after its stats.
   const armor = item.armor ? word(content, 'Pancerz: +{armor}', { armor: `${item.armor}${NUMBER_END}` }) : null;
-  if (armor && raw.armor) add(armor, `+${item.armor}`);
+  if (armor && raw.armor) add(armor, `+${item.armor}`, 'armor');
   for (const { stat, value } of [...(item.implicit ? [item.implicit] : []), ...item.affixes]) {
-    add(`${propertyName(stat, content)}: +${value}`, `+${value}`);
+    add(`${propertyName(stat, content)}: +${value}`, `+${value}`, stat);
   }
-  if (armor && !raw.armor) add(armor, `+${item.armor}`);
+  if (armor && !raw.armor) add(armor, `+${item.armor}`, 'armor');
   // The Zaklinaczka's zaklęcie żywiołu (settlement.js), which no gem raises.
   if (item.imbue?.share) {
     add(word(content, 'Zaklęcie żywiołu: {percent}% obrażeń jako {element}', { percent: Math.round(item.imbue.share * 100), element: content.elementsById[item.imbue.element].name }), null);
   }
-  if (item.imbue?.stat) add(word(content, 'Zaklęcie żywiołu: {stat} +{value}', { stat: propertyName(item.imbue.stat, content), value: item.imbue.value }), null);
+  if (item.imbue?.stat) add(word(content, 'Zaklęcie żywiołu: {stat} +{value}', { stat: propertyName(item.imbue.stat, content), value: item.imbue.value }), null, item.imbue.stat);
   return parts;
 }
 
