@@ -1810,6 +1810,11 @@
       "id": "0.5.27",
       "title": "Wersja 0.5.27",
       "body": "- Gdy Twoja ewolucja liczy jedną statystykę jako inną (np. Intelekt Wielkiego Inkwizytora jako Siłę albo Zręczność Nekromanty jako Intelekt), gra mówi to wprost. Na karcie przedmiotu przy takiej linii stoi „u Ciebie jako Siła”.\n- W Statystykach wiersz Intelektu pokazuje, ile jego punktów i skąd liczy się jako Siła, a wiersz Siły, ile z niej to Intelekt. Liczby w walce się nie zmieniły: te punkty działały już wcześniej, tylko nie było tego widać."
+    },
+    {
+      "id": "0.5.28",
+      "title": "Wersja 0.5.28",
+      "body": "- Encyklopedia: więcej skrzyń za odkrycia, bo w grze jest więcej materiałów, mikstur i ziół. Nowe progi: mikstury 20, 24, 28 i 31, zioła 16 i 18, materiały 125, 175, 225, 275 i 309. Jeśli masz już tyle odkryć, nowe skrzynie czekają na otwarcie."
     }
   ]
 }

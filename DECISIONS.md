@@ -3384,6 +3384,19 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
+## Wersja 0.5.28 (26.11.2026): więcej skrzyń za odkrycia w Encyklopedii
+
+## Więcej skrzyń za odkrycia w Encyklopedii (26.11.2026)
+
+Autor: „Powinno być więcej skrzyń za odkrycia w Encyklopedii, skoro jest więcej materiałów itp.”. Progi odkryć (`milestones` w `data/encyclopedia.json`) kończyły się na 16 miksturach, 13 ziołach i 88 materiałach, a gra ma dziś 31 mikstur, 18 ziół i 309 materiałów. Części (7) i minerały (10) miały już próg na całość.
+
+1. **Nowe progi**, dopisane za dotychczasowymi, więc otwarte skrzynie zostają otwarte (skrzynia to `zakładka:próg`):
+   - mikstury: 20, 24, 28 i 31 (do tej pory 4, 8, 12 i 16);
+   - zioła: 16 i 18 (do tej pory 3, 6, 9 i 13);
+   - materiały: 125, 175, 225, 275 i 309 (do tej pory 10, 25, 50 i 88).
+2. **Nagrody** idą dalej po tej samej liście skrzyń (`chests`): kolejny próg daje kolejną skrzynię. Ostatnia skrzynia materiałów (309) daje 97 658 złota, 90 Punktów Czasu i 100 Punktów Systemu, ostatnia mikstur (31) 39 063 złota, ostatnia ziół (18) 6250 złota.
+3. **Postacie, które mają już więcej odkryć,** od razu widzą nowe skrzynie do otwarcia.
+
 ## Wersja 0.5.27 (26.11.2026): statystyki liczone jako inna widać na ekranie
 
 ## Statystyki liczone jako inna (26.11.2026)
@@ -4132,6 +4145,17 @@ Zob. sekcję niżej: 15 piątych form z umiejętnościami, liczbami i zasadami j
      - Sześć skrzydeł jak Skrzydła światłości: trzy pary skrzydeł z białego ognia, każda obraca się wokół swojej nasady.
      - Nowe: Zew tura (tur wychodzi z mgły nad mokradłem, parska i tupie, a jego cios to dwa rogi), Narodziny słońca (iskra z dłoni Demiurga zapala na niebie słońce, które zostaje i samo daje pierwszy promień, bez mrugnięcia między nimi; `orb: 'sun'` w `src/client/arena-fx.js`), Płaszcz zimy (płaszcz ze śniegu z fałdami i futrzanym brzegiem spływa na całą drużynę) i Tchnienie życia (skrzydlate serce ze złotego światła nad piersią Serafina).
      - Brakujący szczegół: Białą watahę i Początek świata nagrano do końca walki, żeby w filmie były gryzące po kolei wilki i trzy padające ofiary, a nagrania puszczano po jednym, bo przy trzech naraz przeglądarka gubiła klatki. Na stronie ocen jako 1268.1–1268.10.
+   - **Animacje umiejętności, część 3 (1269, 26.11.2026).** Dziesięć umiejętności Miecza Niebios, Wszechwidzącego, Pana Dusz, Cesarza Nawii i Króla Ciemności, tak samo jak części 1 i 2. Rozwinięte:
+     - Ognisty miecz jak Dzień gniewu, ale w białym ogniu: niebo ciemnieje i przebija się przez nie białe światło, wielki miecz z białego ognia (miecz Wyroku) przebija wroga aż do ziemi pod kolumną białego ognia, a gdy wróg pada, kometa z białego ognia przeskakuje na następnego i miecz spada znowu, bez nowej nazwy nad Mieczem Niebios;
+     - Przeznaczenie jak Odwrócenie losu, z księgą losu nad większą klepsydrą, złotą kolumną światła, w której poległy wstaje w swoich barwach, i złotymi łańcuchami losu na wrogach;
+     - Ostatnie żniwo jak Ścięcie dusz, z większą kosą i ostatnim łukiem z trzech cięć, a dusza ściętego dołącza do dusz krążących wokół Pana Dusz (cios kosy we wroga obok ma własny wygląd, jak przy Ścięciu dusz: `look.harvest` w `src/client/arena.js`);
+     - Wieczny legion jak Legion Nawii, z zielonym niebem i bramą zielonego ognia pod każdym rycerzem; rycerz, który wstaje znowu, ma własny wygląd (zielony ogień pod szarą kartą, kości wracają na miejsce);
+     - Tysiąc cieni jak Cios z cienia: Król rozpada się w dym, przy każdym wrogu pokazują się trzy jego ciemne kopie i tną go z każdej strony, a potem Król zostaje w cieniu.
+     - Nowe: Zastęp niebios (niebo w złotych promieniach, snopy światła, Świetliści rycerze z 1264 zstępują z blasku i tną białym ogniem), Księga losu (księga otwiera się nad Wszechwidzącym, jej karty krążą wokół drużyny, kontra pokazuje kartę z okiem nad wrogiem), Lament dusz (blade twarze dusz, tym więcej, im więcej wrogów padło, i wielka zawodząca twarz nad szykiem wrogów), Pomór (wiatr zarazy z paszczy wielkiej czaszki, muchy, życie wrogów płynie do Cesarza) i Noc bez gwiazd (gwiazdy gasną jedna po drugiej, a karty drużyny zostają w ciemności, dopóki trwa noc: znak `unit--starless`, zdejmowany, gdy noc mija).
+     - Brakujący szczegół: gdy drugi ważny moment umiejętności przychodzi w walce dużo później (kontra Księgi losu, drugi cios Ostatniego żniwa, drugi Lament dusz, rycerz Wiecznego legionu wstający znowu), film ma dwie części przedzielone 0,35 s czerni. Na stronie ocen jako 1269.1–1269.10.
+     - Poprawki części 1 i 2: dwie klasy przegrywały z późniejszymi regułami w `styles.css`, więc nie działał ich własny filtr (słońce Triumfu miało zwykłą poświatę, a skrzydła Sześciu skrzydeł złotą zamiast białego ognia). Mają teraz wyższą szczegółowość (`.fx-wing.fx-wing--fire`), tak jak miecz i kolumna białego ognia Ognistego miecza. Filmy, w których plansza rosła w trakcie walki (przywołańce, wiersz stanu pod kartą), nagrane od nowa na wyższym ekranie i przycięte do najniższego miejsca przycisków, bo ucinało trzeciego wilka Białej watahy, łosia Odwiecznego stada i przyciski pod planszą.
+     - Plansza walki z pięcioma przywołańcami Ojca Puszczy naraz (dwa Odwieczne dęby i całe Odwieczne stado), sam i w drużynie, sprawdzona na telefonach od 320 do 430 px i na komputerze 1366 i 1920 px: nic nie wychodzi poza ramki, ale jest za wysoka (760 px, w drużynie 900 px), bo przywołańce stają tylko przed postacią. Propozycja (przywołaniec może stanąć też w polu samej postaci) jest na stronie ocen jako 1270; w grze bez zmian do decyzji autora.
+     - Przy okazji naprawiona Lodowa nawałnica: `skill-fx.js` miał dwie funkcje `starfall()` w jednym zakresie i późniejsza (Deszcz gwiazd) zastępowała wcześniejszą, więc gwiazdy lodu Lodowej nawałnicy rzucały błąd w walce i w podglądzie. Gwiazda lodu ma teraz własną nazwę (`iceStarFall()`), a `test/client.test.js` sprawdza parserem TypeScriptu, że żaden moduł klienta nie deklaruje dwa razy tej samej funkcji w jednym zakresie.
 10. **Pliki:** `data/evolutions.json` i `data/en/evolutions.json` (15 form, 30 umiejętności, `fifthForms`), `data/schemas/evolutions.schema.json`, `data/texts.json` i `data/en/texts.json` (słowa walki), `data/en/strings.json`, `data/en/scope.json`, `data/en/sources.json`, `src/engine/combat.js`, `src/engine/content.js`, `src/engine/skill-demo.js`, `src/server/features.js`, `src/server/content.js`, `src/server/evolutions.js`, `wrangler.jsonc`, `package.json` (`npm run dev`), `test/helpers/server.js`, `tools/validate-data.mjs`, `tools/difficulty-sim.mjs`, `tools/evolution-sim.mjs` (`--fifth`), testy w punkcie 7.
 
 ## Piąta ewolucja przy stworach pośrodku (25.11.2026)

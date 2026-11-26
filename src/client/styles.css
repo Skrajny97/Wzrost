@@ -28522,7 +28522,7 @@ a.social-button {
   filter: drop-shadow(0 0 1px rgba(40, 24, 0, 0.95)) drop-shadow(0 0 5px #ffd76a) drop-shadow(0 0 12px rgba(255, 224, 138, 0.65));
 }
 
-.fx-sun--triumph {
+.fx-sun.fx-sun--triumph {
   mix-blend-mode: screen;
   filter: drop-shadow(0 0 10px #ffe08a);
 }
@@ -28843,7 +28843,7 @@ a.social-button {
 }
 
 /* The Sześć skrzydeł: wings of white fire. */
-.fx-wing--fire {
+.fx-wing.fx-wing--fire {
   filter: brightness(1.3) saturate(0.6) drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 9px #dff4ff) drop-shadow(0 0 14px rgba(255, 224, 138, 0.7));
 }
 
@@ -28870,6 +28870,132 @@ a.social-button {
   background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), #fff6cf 30%, rgba(255, 210, 122, 0.9) 75%, rgba(255, 179, 71, 0.6));
   box-shadow: 0 0 10px 3px rgba(255, 210, 122, 0.75), 0 0 22px 6px rgba(255, 179, 71, 0.35);
   mix-blend-mode: screen;
+}
+
+/* The fifth forms' skills, batch 3 (skill-fx.js): the Ognisty miecz's
+   sky split by white light, its sword and column of white fire; the
+   Przeznaczenie's and the Księga losu's book of fate and its pages; the
+   Ostatnie żniwo's great scythe and small souls; the Lament
+   dusz's scream and great wailing face; the Wieczny legion's green sky
+   and gate; the Pomór's plague wind and skull; the Noc bez gwiazd's
+   starless sky and the party's cards veiled in it. */
+.fx-skyrift,
+.fx-fatebook,
+.fx-fatepage,
+.fx-wailing,
+.fx-plaguewind,
+.fx-plagueskull {
+  position: absolute;
+  pointer-events: none;
+}
+
+.fx-skyrift {
+  width: var(--size, 160px);
+  height: calc(var(--size, 160px) * 0.55);
+  transform-origin: 50% 0;
+  background: radial-gradient(ellipse 50% 100% at 50% 0%, rgba(255, 255, 255, 0.95), rgba(223, 244, 255, 0.7) 30%, rgba(159, 216, 255, 0.25) 60%, rgba(159, 216, 255, 0) 80%);
+  mix-blend-mode: screen;
+}
+
+.fx-sentence.fx-sentence--fire {
+  filter: saturate(0) brightness(1.45) drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 6px #bfe4ff) drop-shadow(0 0 13px rgba(159, 216, 255, 0.85));
+}
+
+.fx-judgment.fx-judgment--holyfire {
+  background: linear-gradient(90deg, rgba(159, 216, 255, 0), rgba(159, 216, 255, 0.85) 16%, #eef8ff 36%, #ffffff 50%, #eef8ff 64%, rgba(159, 216, 255, 0.85) 84%, rgba(159, 216, 255, 0));
+}
+
+.fx-fatebook {
+  width: var(--size, 100px);
+  aspect-ratio: 100 / 64;
+  filter: drop-shadow(0 0 2px #fff6cf) drop-shadow(0 0 9px #ffe08a);
+}
+
+.fx-fatepage {
+  width: var(--size, 18px);
+  aspect-ratio: 20 / 26;
+  filter: drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 5px #c9b7ff);
+}
+
+/* A page turning over in the book: it turns about the book's spine, its
+   left edge. */
+.fx-fatepage--turn {
+  transform-origin: 0 50%;
+}
+
+.fx-fatebook svg,
+.fx-fatepage svg,
+.fx-wailing svg,
+.fx-plagueskull svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.fx-scythe--great {
+  filter: drop-shadow(0 0 1px rgba(10, 24, 16, 0.9)) drop-shadow(0 0 8px var(--fx)) drop-shadow(0 0 16px rgba(230, 255, 240, 0.6));
+}
+
+.fx-soul--small {
+  width: 10px;
+  height: 14px;
+}
+
+.fx-roar--wail {
+  filter: drop-shadow(0 0 3px #9fe8c0) drop-shadow(0 0 8px rgba(159, 232, 192, 0.7));
+}
+
+.fx-wailing {
+  width: var(--size, 120px);
+  aspect-ratio: 80 / 96;
+  filter: drop-shadow(0 0 6px rgba(159, 232, 192, 0.85)) drop-shadow(0 0 16px rgba(217, 255, 240, 0.5));
+}
+
+.fx-sky--navia {
+  background: linear-gradient(180deg, rgba(6, 26, 14, 0.86), rgba(12, 46, 26, 0.55) 55%, rgba(12, 46, 26, 0.25));
+}
+
+.fx-circle--navia {
+  filter: drop-shadow(0 0 3px #3dd47a) drop-shadow(0 0 9px #1f8a4c);
+}
+
+/* The Pomór's wind: clouds of sick yellow-green, twice the width of the
+   foes' row, blown across it. */
+.fx-plaguewind {
+  left: 0;
+  top: 0;
+  width: 200%;
+  height: 100%;
+  background:
+    radial-gradient(ellipse 18% 40% at 12% 55%, rgba(197, 240, 138, 0.55), rgba(197, 240, 138, 0) 70%),
+    radial-gradient(ellipse 20% 46% at 34% 40%, rgba(156, 204, 101, 0.6), rgba(156, 204, 101, 0) 70%),
+    radial-gradient(ellipse 18% 42% at 56% 62%, rgba(197, 240, 138, 0.55), rgba(197, 240, 138, 0) 70%),
+    radial-gradient(ellipse 20% 44% at 78% 45%, rgba(156, 204, 101, 0.6), rgba(156, 204, 101, 0) 70%),
+    linear-gradient(90deg, rgba(110, 150, 50, 0), rgba(110, 150, 50, 0.32) 20%, rgba(110, 150, 50, 0.32) 80%, rgba(110, 150, 50, 0));
+  filter: blur(3px);
+}
+
+.fx-plagueskull {
+  width: var(--size, 90px);
+  aspect-ratio: 80 / 88;
+  filter: drop-shadow(0 0 4px rgba(197, 240, 138, 0.85)) drop-shadow(0 0 12px rgba(111, 154, 58, 0.7));
+}
+
+.fx-sky--starless {
+  background: linear-gradient(180deg, rgba(2, 1, 8, 0.94), rgba(6, 4, 18, 0.86) 50%, rgba(6, 4, 18, 0.7));
+}
+
+/* The Noc bez gwiazd: the party's cards veiled in the dark while the night
+   lasts, their figures dim and faint. */
+.unit--starless {
+  box-shadow: inset 0 0 26px rgba(2, 1, 10, 0.92), 0 0 0 1px rgba(90, 76, 140, 0.55);
+}
+
+.unit--starless .unit-art > img,
+.unit--starless .unit-art > svg {
+  opacity: 0.55;
+  filter: brightness(0.5) saturate(0.7);
 }
 
 /* 963: the evolved Kleryk's skills (skill-fx.js, arena-fx.js): the Odnowa's
