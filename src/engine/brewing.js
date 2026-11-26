@@ -52,7 +52,8 @@ export function teachingPoints(settlement, content) {
 // System always, a rare one once the herbalist has taught it, that is once
 // the points that count for it (teachingPoints) have reached its standing.
 // Brewing it still waits for its level, as with any recipe. Using a potion
-// waits for the character's level instead (potionUsable in potions.js, 1272).
+// takes the recipe or the potion's level of the character (potionUsable in
+// potions.js, 1272).
 /**
  * @param {Recipe} potion
  * @param {SettlementPoints} settlement

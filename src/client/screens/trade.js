@@ -323,8 +323,8 @@ export function mountTrade(container, { backHash }) {
   }
 
   // Herbs, potions, materials, minerals or camp resources of an offer; a
-  // potion the character gets above its level says from which one it may
-  // use it (1272).
+  // potion the character could not use yet says from which level of the
+  // character, or of Alchemia, it may (1272).
   function stackEntry(stack, mine) {
     const art = stack.card
       ? cardThumb(stack.face)
@@ -345,7 +345,7 @@ export function mountTrade(container, { backHash }) {
       h('span', { class: 'potion-pick-art' }, art),
       h('span', { class: 'trade-stack-name', text: stack.name }),
       h('span', { class: 'trade-stack-count', text: `×${formatNumber(stack.count)}` }),
-      !mine && stack.potion && stack.usable === false && h('p', { class: 'region-warning trade-note', text: t('Tej mikstury użyjesz od {level}. poziomu postaci.', { level: stack.level }) }),
+      !mine && stack.potion && stack.usable === false && h('p', { class: 'region-warning trade-note', text: t('Tej mikstury użyjesz od {level}. poziomu postaci albo z Alchemią na {level}. poziomie.', { level: stack.level }) }),
     );
   }
 

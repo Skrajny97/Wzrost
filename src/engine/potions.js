@@ -14,8 +14,8 @@
 // na ilość walk w wyprawie a nie na czas"); each one drunk adds its fights
 // to those left, and an exploration uses up the fights they worked in as its
 // report is claimed, whenever they were drunk (claimWindows). Potions not
-// drunk stay in the bag. A potion is used from its level of the character
-// (potionUsable), whoever brewed it.
+// drunk stay in the bag. A potion is used from its level of the character,
+// or with its recipe known, whoever brewed it (potionUsable).
 
 import { countedForm } from './text.js';
 
@@ -45,26 +45,33 @@ export const timedKind = (potion) => TIMED_KINDS.find((kind) => potion.effect[ki
 // Whether a character at `level` may use a potion: drink it, put it on the
 // blade, take it on an exploration or have it drunk in a fight. It may from
 // the potion's level of the character on, with or without Alchemia (1272,
-// 26.11.2026); until then the potion waits in the bag, to be sold, thrown
-// away or traded. Before, it needed the potion's recipe: Alchemia at least
-// at its level, and for a rare one of the herbalist's her teaching. Brewing
-// still does (knownPotions in brewing.js).
+// 26.11.2026), or, as before, with the potion's recipe known (`known`:
+// Alchemia at least at its level, and for a rare one of the herbalist's her
+// teaching; the server's potionKnown), so no one loses a potion it could use
+// before, and an alchemist ahead of its character keeps all it brews. Until
+// then the potion waits in the bag, to be sold, thrown away or traded.
+// Brewing still needs the recipe (knownPotions in brewing.js).
 /**
  * @param {{ level: number }} potion
  * @param {number} level
+ * @param {boolean} [known]
  */
-export const potionUsable = (potion, level) => level >= potion.level;
+export const potionUsable = (potion, level, known = false) => known || level >= potion.level;
 
 // The potions of `have` (counts by id) a character at `level` may use
-// (potionUsable); ids of no potion are left out.
+// (potionUsable), `knows` telling whether it knows a potion's recipe; ids
+// of no potion are left out.
 /**
  * @param {Record<string, number>} have
  * @param {number} level
  * @param {Content} content
+ * @param {(potion: Record<string, any>) => boolean} [knows]
  * @returns {Record<string, number>}
  */
-export const usablePotions = (have, level, content) =>
-  Object.fromEntries(Object.entries(have).filter(([id]) => Object.hasOwn(content.potionsById, id) && potionUsable(content.potionsById[id], level)));
+export const usablePotions = (have, level, content, knows = () => false) =>
+  Object.fromEntries(
+    Object.entries(have).filter(([id]) => Object.hasOwn(content.potionsById, id) && potionUsable(content.potionsById[id], level, knows(content.potionsById[id]))),
+  );
 
 // The most of a potion an exploration with `fights` fights takes along: one
 // fern brew, of the others one for each fight.

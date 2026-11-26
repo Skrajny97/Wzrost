@@ -2,8 +2,8 @@
 // mana one when a skill lacks mana, an antidote when poisoned, a fern brew on
 // fainting, each kind once a fight and the strongest first), taken along and
 // counted in the threat, the strengthening potions from the bag, counted in
-// fights, each from its level of the character (1272), and all of it
-// through the API.
+// fights, each from its level of the character or with its recipe known
+// (1272), and all of it through the API.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -329,9 +329,9 @@ describe('potions in fights', () => {
   });
 
   // 1272 (26.11.2026): from the potion's level of the character, with or
-  // without Alchemia, no longer from its recipe.
-  test('a potion is used from its level of the character on, and the fights get only those', () => {
-    const at = (id, level) => potionUsable(content.potionsById[id], level);
+  // without Alchemia, or, as before, with its recipe known.
+  test('a potion is used from its level of the character on or with its recipe, and the fights get only those', () => {
+    const at = (id, level, known) => potionUsable(content.potionsById[id], level, known);
     for (const [id, level] of [
       ['greater-healing', 45],
       ['great-healing-balm', 105],
@@ -339,12 +339,18 @@ describe('potions in fights', () => {
     ]) {
       assert.equal(content.potionsById[id].level, level, id);
       assert.deepEqual([at(id, level - 1), at(id, level), at(id, level + 1)], [false, true, true], id);
+      // Its recipe known (Alchemia at its level), at any level.
+      assert.equal(at(id, 1, true), true, id);
     }
-    // Of a bag, those of the character's level, and no id of no potion.
+    // Of a bag, those of the character's level and those whose recipes it
+    // knows, and no id of no potion.
     const bag = { 'lesser-healing': 3, healing: 2, 'greater-healing': 2, 'living-water': 1, nothing: 4 };
     assert.deepEqual(usablePotions(bag, 44, content), { 'lesser-healing': 3, healing: 2 });
     assert.deepEqual(usablePotions(bag, 45, content), { 'lesser-healing': 3, healing: 2, 'greater-healing': 2 });
     assert.deepEqual(usablePotions(bag, 180, content), { 'lesser-healing': 3, healing: 2, 'greater-healing': 2, 'living-water': 1 });
+    const alchemy = (level) => (potion) => potion.level <= level;
+    assert.deepEqual(usablePotions(bag, 5, content, alchemy(45)), { 'lesser-healing': 3, healing: 2, 'greater-healing': 2 });
+    assert.deepEqual(usablePotions(bag, 5, content, alchemy(5)), { 'lesser-healing': 3 });
     // So a fight drinks the strongest healing potion of the character's
     // level, and the living water only from its own.
     assert.equal(fightPotions(usablePotions(bag, 44, content), 0.4, content).heal.id, 'healing');
@@ -520,8 +526,9 @@ describe('potions through the API', () => {
   });
 
   test('the potions of later levels: what goes along, what is drunk or put on the blade', async () => {
-    // At the fern brew's level of the character (1272).
-    await set(`level = 90, potions = '{"antidote":1,"stoneskin-brew":1,"aconite-oil":1,"fern-brew":2}'`);
+    // Alchemia at the 90th knows their recipes, so the character uses them
+    // at its 10th level too (1272: the recipe or the character's level).
+    await set(`professions = '{"alchemy":{"level":90,"xp":0}}', potions = '{"antidote":1,"stoneskin-brew":1,"aconite-oil":1,"fern-brew":2}'`);
     const { potions } = await character();
     assert.deepEqual(potions.map((potion) => [potion.id, potion.fight, potion.drink, potion.carry, potion.verb]), [
       ['antidote', 'cure', false, null, 'Wypij'],
@@ -555,29 +562,43 @@ describe('potions through the API', () => {
   });
 
   // 1272 (26.11.2026): a potion bought or got in a Wymiana is used from its
-  // level of the character, whoever brewed it; brewing still needs Alchemia.
-  test('a potion above the character’s level is neither drunk nor taken along; at its level it is, with no Alchemia at all', async () => {
-    await set(`professions = '{}', potions = '{"healing":2,"speed":1,"greater-healing":2}'`);
-    assert.deepEqual((await character()).potions.map((potion) => [potion.id, potion.level, potion.usable]), [
+  // level of the character, whoever brewed it, or, as before, with its
+  // recipe known; brewing still needs Alchemia.
+  test('a potion above both the character’s level and its Alchemia is neither drunk nor taken along; either level is enough', async () => {
+    // At the 10th level of the character with Alchemia at the 5th.
+    await set(`potions = '{"healing":2,"speed":2,"greater-healing":2}'`);
+    const usable = async () => (await character()).potions.map((potion) => [potion.id, potion.level, potion.usable]);
+    assert.deepEqual(await usable(), [
       ['healing', 10, true],
       ['speed', 24, false],
       ['greater-healing', 45, false],
     ]);
     const early = await drink('speed');
-    assert.deepEqual([early.status, early.data.error.code, early.data.error.message], [409, 'potion_level', 'Tej mikstury użyjesz od 24. poziomu postaci.']);
+    assert.deepEqual([early.status, early.data.error.code, early.data.error.message], [409, 'potion_level', 'Tej mikstury użyjesz od 24. poziomu postaci albo z Alchemią na 24. poziomie.']);
     const away = await hunt({ potions: { 'greater-healing': 1 } });
-    assert.deepEqual([away.status, away.data.error.code, away.data.error.message], [400, 'potion_level', 'Dużą miksturę leczenia zabierzesz na wyprawę od 45. poziomu postaci.']);
-    // The one of its level is drunk, with no Alchemia, and brewing it still
-    // needs Alchemia at the potion's level.
-    await set('hp = ?, hp_at = ?', 10, Date.now());
+    assert.deepEqual(
+      [away.status, away.data.error.code, away.data.error.message],
+      [400, 'potion_level', 'Dużą miksturę leczenia zabierzesz na wyprawę od 45. poziomu postaci albo z Alchemią na 45. poziomie.'],
+    );
+    // The one of the character's level is drunk with no Alchemia at all,
+    // and brewing it still needs Alchemia at the potion's level.
+    await set(`professions = '{}', hp = ?, hp_at = ?`, 10, Date.now());
     assert.equal((await drink('healing')).status, 200);
     const brew = (recipe) => call('POST', '/api/professions/brew', { cookie, body: { recipe, count: 1 } });
     await set(`herbs = '{"comfrey":4,"plantain":4}'`);
     assert.equal((await brew('healing')).data.error.code, 'unknown_recipe');
 
-    // At the 45th level all of them, still with no Alchemia.
-    await set('level = 45');
-    assert.ok((await character()).potions.every((potion) => potion.usable));
+    // Alchemia at the 45th, at the 10th level of the character: its recipes
+    // known, both are used.
+    await set(`professions = '{"alchemy":{"level":45,"xp":0}}'`);
+    assert.ok((await usable()).every(([, , yes]) => yes));
+    assert.equal((await drink('speed')).status, 200);
+    assert.equal((await hunt({ potions: { 'greater-healing': 1 } })).status, 201);
+    await call('POST', '/api/hunts/cancel', { cookie });
+
+    // With no Alchemia, at the 45th level of the character, the same.
+    await set(`professions = '{}', level = 45`);
+    assert.ok((await usable()).every(([, , yes]) => yes));
     assert.equal((await drink('speed')).status, 200);
     assert.equal((await hunt({ potions: { 'greater-healing': 1 } })).status, 201);
   });

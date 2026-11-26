@@ -1113,7 +1113,8 @@ export function mountCombat(container, { params, navigate }) {
       );
     // Potions to take along, once the character carries some that work in fights.
     const use = character.professions?.potionUse;
-    // One above the character's level stays home until it gets there (1272).
+    // One the character may not use yet stays home: above its level, with
+    // its recipe unknown (1272).
     const carried = use && !first ? (character.potions ?? []).filter((potion) => potion.fight && potion.usable) : [];
     potions = carried.length > 0 ? potionPicker(carried, use) : null;
     // A dish of the Spiżarnia to eat as it sets out (cooking.js), in place

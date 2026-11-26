@@ -342,15 +342,16 @@ export function mountParty(container) {
 
   // A member's potions for the party's trips (the author, 20.11.2026:
   // „Powinna byc opcja zabierania przez reszte drużyny jakos mikstur
-  // zdrowia i many”): each healing and mana potion of the bag that the
-  // character's level allows (1272), with −/+, and the healing mark, as in
-  // the Walka's "Opcje wyprawy" (screens/combat.js), of each at most as
-  // many as the longest trip it may go on has fights. As the leader sends
-  // the party out, the server takes from the bag what there is of it, as
-  // many as that trip's fights allow, and what is not drunk comes back with
-  // the report (src/server/parties.js, memberPotions). A choice of a potion
-  // the bag has run out of stays for when it has one again. The leader
-  // takes its own in "Opcje wyprawy", so it has no such rubric.
+  // zdrowia i many”): each healing and mana potion of the bag the character
+  // may use (1272: from its level or with its recipe), with −/+, and the
+  // healing mark, as in the Walka's "Opcje wyprawy" (screens/combat.js), of
+  // each at most as many as the longest trip it may go on has fights. As
+  // the leader sends the party out, the server takes from the bag what
+  // there is of it, as many as that trip's fights allow, and what is not
+  // drunk comes back with the report (src/server/parties.js,
+  // memberPotions). A choice of a potion the bag has run out of stays for
+  // when it has one again. The leader takes its own in "Opcje wyprawy", so
+  // it has no such rubric.
   function potionsRubric(own) {
     const texts = state.content.community?.party?.texts;
     const use = state.character.professions?.potionUse;

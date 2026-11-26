@@ -183,15 +183,15 @@ function masteryText(table, texts, level) {
   return chance > 0 ? say(texts, 'mastery', 0, { chance: decimalText(chance * 100, content()) }) : null;
 }
 
-// Whether the character knows the recipe of a potion, so that it may brew
-// it: Alchemia open and at least at the potion's level, and for a rare
-// recipe of the herbalist's her teaching too (recipeTaught, 121 A: by the
-// relation with her or the reputation of the Bractwo Zielarzy). Using a
-// potion needs no recipe since 1272 (26.11.2026), only the character's level
-// (potionUsable in the engine's potions.js); until then the recipe was
-// needed for that too (the author's Wymiana, 27.10.2026: "Jeśli gracz w
-// wyniku wymiany wejdzie w posiadanie mikstury jakiejś przed odblokowaniem
-// jej receptury albo w ogóle nawet Profesji Alchemii to nie może jej użyć").
+// Whether the character knows the recipe of a potion: Alchemia open and at
+// least at the potion's level, and for a rare recipe of the herbalist's her
+// teaching too (recipeTaught, 121 A: by the relation with her or the
+// reputation of the Bractwo Zielarzy). Brewing needs it. Using a potion
+// needs it or, since 1272 (26.11.2026), the potion's level of the character
+// (potionUsableBy); until then only the recipe (the author's Wymiana,
+// 27.10.2026: "Jeśli gracz w wyniku wymiany wejdzie w posiadanie mikstury
+// jakiejś przed odblokowaniem jej receptury albo w ogóle nawet Profesji
+// Alchemii to nie może jej użyć").
 export function potionKnown(row, potion) {
   if (!professionsOn() || !isUnlocked('professions', row.level, content())) return false;
   const alchemy = content().professions.find((profession) => profession.id === content().brewing.profession);
@@ -199,9 +199,16 @@ export function potionKnown(row, potion) {
   return professionOpen(alchemy, row.level, content()) && potion.level <= level && (!potion.taught || recipeTaught(potion, settlementPointsOf(row), content()));
 }
 
-// The potions the character carries that it may use: those whose level it
-// has reached (potionUsable, 1272).
-export const usablePotionsOf = (row) => usablePotions(potionsOf(row), row.level, content());
+// Whether the character may use a potion (1272, potionUsable in the
+// engine's potions.js): from the potion's level of the character, or with
+// its recipe known (potionKnown), as before, so no one loses a potion it
+// could use before, and an alchemist ahead of its character keeps all it
+// brews. Drinking, taking along, a party member's potions, the threat, the
+// Sala prób and the Wymiana's view all ask this.
+export const potionUsableBy = (row, potion) => potionUsable(potion, row.level, potionKnown(row, potion));
+
+// The potions the character carries that it may use (potionUsableBy).
+export const usablePotionsOf = (row) => usablePotions(potionsOf(row), row.level, content(), (potion) => potionKnown(row, potion));
 
 // The herbs in the bag, one entry for each herb, with the scrapper's price of
 // one at the camp's Skup złomu (sellBonus). The page splits them into stacks.
@@ -224,7 +231,7 @@ export function bagHerbs(row, sellBonus) {
 // explorations (`carry` of them at most, null for one each fight), a healing
 // potion and a potion for a time can be drunk from the bag (`drink`, with
 // its `verb`), and all of it only from the potion's `level` of the character
-// on (`usable`, 1272).
+// on or with its recipe known (`usable`, potionUsableBy, 1272).
 export function bagPotions(row, sellBonus) {
   const potions = potionsOf(row);
   return content().potions
@@ -243,7 +250,7 @@ export function bagPotions(row, sellBonus) {
       drink: Boolean(potion.effect.heal || timedKind(potion)),
       verb: potion.verb ?? t('Wypij'),
       level: potion.level,
-      usable: potionUsable(potion, row.level),
+      usable: potionUsableBy(row, potion),
     }));
 }
 

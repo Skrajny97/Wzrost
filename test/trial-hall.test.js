@@ -200,11 +200,12 @@ describe('the Sala prób through the API', () => {
     assert.equal(left, 3 - (report.potionsUsed?.[heal.id] ?? 0));
   });
 
-  test('a potion above the character’s level stays in the bag, as on an exploration; one of its level is drunk with no Alchemia', async () => {
+  test('a potion above the character’s level and its Alchemia stays in the bag, as on an exploration; one of its level is drunk with no Alchemia', async () => {
     // The code review found the trial drinking a potion got in a Wymiana
     // that no exploration took along. Since 1272 (26.11.2026) an
     // exploration takes a potion from its level of the character, whoever
-    // brewed it: Probant, at the 30th, has no Alchemia at all.
+    // brewed it, or with its recipe known: Probant, at the 30th, has no
+    // Alchemia at all.
     const [usable, ...stronger] = content.potions.filter((potion) => potion.effect.heal).sort((a, b) => a.level - b.level);
     const above = stronger.at(-1);
     assert.ok(usable.level <= 30 && above.level > 30);
