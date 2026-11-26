@@ -2,7 +2,7 @@
 // both offers, the first confirmation freezing them and the second making
 // the trade at once; a player offline, proposals turned down too often, a
 // player blocked and trades turned off; a potion from a trade waits for its
-// recipe, an item for the character's level.
+// level of the character (1272), an item for the character's level.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -359,6 +359,18 @@ describe('Wymiana', () => {
     assert.equal((await call('GET', '/api/profile/Ala', { cookie: players.ola })).data.profile.tradeBlocked, false);
   });
 
+  // 1272 (26.11.2026): the warning under the other side's offer.
+  test("the other side's offer tells from which level of the character each potion works", async () => {
+    const offered = { 'lesser-healing': 2, 'greater-healing': 1 };
+    await (await db()).prepare("UPDATE characters SET potions = ? WHERE name = 'Ola'").bind(JSON.stringify(offered)).run();
+    const id = await opened();
+    assert.equal((await trade(players.ola, 'offer', { id, offer: { potions: offered } })).status, 200);
+    const seen = async () => Object.fromEntries((await current(players.ala)).theirs.potions.map((potion) => [potion.id, [potion.level, potion.usable]]));
+    assert.deepEqual(await seen(), { 'lesser-healing': [1, true], 'greater-healing': [45, false] });
+    await (await db()).prepare("UPDATE characters SET level = 45 WHERE name = 'Ala'").run();
+    assert.deepEqual(await seen(), { 'lesser-healing': [1, true], 'greater-healing': [45, true] });
+  });
+
   test('opens at character level 20 for both sides, and a trade begun below it moves nothing', async () => {
     const { minLevel } = content.community.trade;
     const ola = (await row('Ola')).id;
@@ -386,16 +398,20 @@ describe('Wymiana', () => {
     assert.deepEqual([(await row('Ala')).gold, (await row('Ola')).gold], [500, 500]);
   });
 
-  test('a potion from a trade waits for its recipe, an item for its Tier, whatever its own level', async () => {
-    const potion = content.potions.find((entry) => entry.effect.heal);
-    // Below the Profesje's level the recipe is unknown.
-    await (await db()).prepare("UPDATE characters SET level = 6, potions = ? WHERE name = 'Ala'").bind(JSON.stringify({ [potion.id]: 3 })).run();
-    const drunk = await call('POST', '/api/potions/drink', { cookie: players.ala, body: { potionId: potion.id } });
-    assert.equal(drunk.data.error.code, 'unknown_recipe');
-    const hunt = await call('POST', '/api/hunts', { cookie: players.ala, body: { areaId: 'windfalls-edge', minutes: 5, potions: { [potion.id]: 1 }, healBelow: 0.4 } });
-    assert.equal(hunt.data.error.code, 'unknown_recipe');
+  test('a potion from a trade waits for its level of the character, an item for its Tier, whatever its own level', async () => {
+    // 1272 (26.11.2026): with no Alchemia at all, below the Profesje's
+    // level, the Zwykła mikstura leczenia (10) waits for the 10th level of
+    // the character, the Mniejsza (1) is drunk at once.
+    await (await db()).prepare("UPDATE characters SET level = 6, hp = 1, hp_at = ?, potions = ? WHERE name = 'Ala'").bind(Date.now(), JSON.stringify({ 'lesser-healing': 3, healing: 2 })).run();
     const character = (await call('GET', '/api/character', { cookie: players.ala })).data.character;
     assert.equal(character.professions, null);
+    assert.deepEqual(character.potions.map((potion) => [potion.id, potion.usable]), [['lesser-healing', true], ['healing', false]]);
+    const drink = (potionId) => call('POST', '/api/potions/drink', { cookie: players.ala, body: { potionId } });
+    const drunk = await drink('healing');
+    assert.deepEqual([drunk.data.error.code, drunk.data.error.message], ['potion_level', 'Tej mikstury użyjesz od 10. poziomu postaci.']);
+    const hunt = await call('POST', '/api/hunts', { cookie: players.ala, body: { areaId: 'windfalls-edge', minutes: 5, potions: { healing: 1 }, healBelow: 0.4 } });
+    assert.deepEqual([hunt.data.error.code, hunt.data.error.message], ['potion_level', 'Zwykłą miksturę leczenia zabierzesz na wyprawę od 10. poziomu postaci.']);
+    assert.equal((await drink('lesser-healing')).status, 200);
     // An item got in a trade is worn by its Tier, as an own find (the
     // author: "Niech przedmioty z Wymian i Targowiska działają w oparciu o
     // Tiery a nie poziomy samej broni"), and since 24.11.2026 within the

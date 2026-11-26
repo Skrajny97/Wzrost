@@ -226,6 +226,16 @@ describe('brewing through the API', () => {
     assert.equal((await call('POST', '/api/herbs/sell', { cookie, body: { herbId: 'mugwort', count: 1 } })).status, 200);
   });
 
+  // 1272 (26.11.2026): using a potion takes only the character's level,
+  // brewing it still the potion's level of Alchemia.
+  test('brewing still needs Alchemia at the potion’s level, though the character may already drink the potion', async () => {
+    await set(`herbs = '{"comfrey":4,"plantain":4}', potions = '{"healing":1}', hp = 1, hp_at = ${Date.now()}`);
+    assert.equal((await brew({ recipe: 'healing', count: 1 })).data.error.code, 'unknown_recipe');
+    assert.equal((await call('POST', '/api/potions/drink', { cookie, body: { potionId: 'healing' } })).status, 200);
+    await set(`professions = '{"alchemy":{"level":10,"xp":0}}'`);
+    assert.equal((await brew({ recipe: 'healing', count: 1 })).status, 201);
+  });
+
   test('the report brings the potions, the profession\'s levels and the character\'s XP', async () => {
     await set(`herbs = '{"comfrey":36}'`);
     await brew({ recipe: 'lesser-healing', count: 12 });

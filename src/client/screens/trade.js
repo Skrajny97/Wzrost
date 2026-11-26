@@ -112,7 +112,7 @@ export function tradeBanner() {
 // each with its name.
 const stacksOf = (offer) => [
   ...offer.herbs.map((stack) => ({ ...stack, herb: true })),
-  ...offer.potions,
+  ...offer.potions.map((stack) => ({ ...stack, potion: true })),
   ...(offer.materials ?? []).map((stack) => ({ ...stack, name: materialTitle(stack), material: true })),
   ...(offer.minerals ?? []).map((stack) => ({ ...stack, mineral: true })),
   ...(offer.resources ?? []).map((stack) => ({ ...stack, resource: true })),
@@ -323,7 +323,8 @@ export function mountTrade(container, { backHash }) {
   }
 
   // Herbs, potions, materials, minerals or camp resources of an offer; a
-  // potion whose recipe the character does not know waits for it.
+  // potion the character gets above its level says from which one it may
+  // use it (1272).
   function stackEntry(stack, mine) {
     const art = stack.card
       ? cardThumb(stack.face)
@@ -344,7 +345,7 @@ export function mountTrade(container, { backHash }) {
       h('span', { class: 'potion-pick-art' }, art),
       h('span', { class: 'trade-stack-name', text: stack.name }),
       h('span', { class: 'trade-stack-count', text: `×${formatNumber(stack.count)}` }),
-      !mine && !stack.herb && !stack.material && !stack.mineral && !stack.resource && !stack.scroll && !stack.pantry && !stack.card && !stack.known && h('p', { class: 'region-warning trade-note', text: t('Nie znasz jej receptury, więc jej nie użyjesz.') }),
+      !mine && stack.potion && stack.usable === false && h('p', { class: 'region-warning trade-note', text: t('Tej mikstury użyjesz od {level}. poziomu postaci.', { level: stack.level }) }),
     );
   }
 

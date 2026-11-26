@@ -26,6 +26,7 @@ import {
   parseStack,
   potionHerbs,
   potionPrice,
+  potionUsable,
   potionsDone,
   minigameExtra,
   professionState,
@@ -286,7 +287,8 @@ export async function sellPotions(context) {
 // chosen, each adding its fights, with no top to them (the author: "Niech nie
 // bedzie maksymalnego limitu na trwanie bonusów typu z mikstur"). A healing potion
 // is drunk one at a time. A mana potion, an antidote and the fern brew work
-// only by themselves in fights.
+// only by themselves in fights. Any of them from its level of the character
+// on, with or without Alchemia (potionUsable, 1272).
 export async function drinkPotion(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
@@ -297,8 +299,8 @@ export async function drinkPotion(context) {
   if (!potion.effect.heal && !kind) {
     throw new ApiError(409, 'fight_only', potion.effect.mana ? 'Ta mikstura działa sama w walce, gdy zabraknie many na umiejętność.' : 'Ta mikstura działa sama na wyprawie.');
   }
-  // One got in a Wymiana waits for its recipe (DECISIONS.md, "Wymiana").
-  if (!potionKnown(player.row, potion)) throw new ApiError(409, 'unknown_recipe', `Nie znasz jeszcze receptury: ${potion.name}.`);
+  // One above the character's level waits for it, whoever brewed it (1272).
+  if (!potionUsable(potion, player.row.level)) throw new ApiError(409, 'potion_level', `Tej mikstury użyjesz od ${potion.level}. poziomu postaci.`);
   const texts = content().potionUse.texts;
   const now = context.now;
   let also;

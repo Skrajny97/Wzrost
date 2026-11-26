@@ -200,21 +200,26 @@ describe('the Sala prób through the API', () => {
     assert.equal(left, 3 - (report.potionsUsed?.[heal.id] ?? 0));
   });
 
-  test('a potion whose recipe the character does not know stays in the bag, as on an exploration', async () => {
-    // The code review: the trial drank a potion got in a Wymiana before its
-    // recipe, which no exploration takes along. A new Alchemia knows the
-    // weakest healing only.
-    const [known, ...stronger] = content.potions.filter((potion) => potion.effect.heal).sort((a, b) => a.level - b.level);
-    const unknown = stronger.at(-1);
-    assert.ok(unknown.level > 1);
-    await set('potions = ?', JSON.stringify({ [known.id]: 3, [unknown.id]: 3 }));
-    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5, potions: { [unknown.id]: 1 } } })).data.error.code, 'unknown_recipe');
+  test('a potion above the character’s level stays in the bag, as on an exploration; one of its level is drunk with no Alchemia', async () => {
+    // The code review found the trial drinking a potion got in a Wymiana
+    // that no exploration took along. Since 1272 (26.11.2026) an
+    // exploration takes a potion from its level of the character, whoever
+    // brewed it: Probant, at the 30th, has no Alchemia at all.
+    const [usable, ...stronger] = content.potions.filter((potion) => potion.effect.heal).sort((a, b) => a.level - b.level);
+    const above = stronger.at(-1);
+    assert.ok(usable.level <= 30 && above.level > 30);
+    await set('potions = ?', JSON.stringify({ [usable.id]: 3, [above.id]: 3 }));
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5, potions: { [above.id]: 1 } } })).data.error.code, 'potion_level');
     const entered = await enter();
     assert.equal(entered.status, 200, JSON.stringify(entered.data).slice(0, 300));
     const { report } = entered.data;
-    assert.equal(report.potionsUsed?.[unknown.id], undefined);
+    assert.equal(report.potionsUsed?.[above.id], undefined);
+    // With no gear, the creatures of the place tested take its HP below
+    // the mark, so it drinks one.
+    const drunk = report.potionsUsed?.[usable.id] ?? 0;
+    assert.ok(drunk > 0, JSON.stringify(report.potionsUsed ?? {}));
     const bag = JSON.parse((await row()).potions);
-    assert.equal(bag[unknown.id], 3);
-    assert.equal(bag[known.id] ?? 0, 3 - (report.potionsUsed?.[known.id] ?? 0));
+    assert.equal(bag[above.id], 3);
+    assert.equal(bag[usable.id] ?? 0, 3 - drunk);
   });
 });

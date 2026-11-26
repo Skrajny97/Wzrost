@@ -63,6 +63,7 @@ import {
   nextHuntUnlock,
   optionCost,
   optionLock,
+  potionUsable,
   potionsPerKind,
   questCreatures,
   rareCatchUp,
@@ -120,7 +121,7 @@ import { favoriteIds } from './favorites.js';
 import { fallenGems, gemNamed, gemsBackSql, soldGold } from './inventory.js';
 import { perkOf } from './perks.js';
 import { finishGathering } from './professions.js';
-import { herbsOf, knownPotionsOf, pantryOf, potionKnown, potionsOf } from './professions-view.js';
+import { herbsOf, pantryOf, potionsOf, usablePotionsOf } from './professions-view.js';
 import { finishCooking } from './cooking.js';
 import { minigameOutcome } from './minigame.js';
 import { openPartyReport, trimReports } from './reports.js';
@@ -242,7 +243,7 @@ function healingFor(player, params) {
   const below = healBelowChoices.includes(asked) ? asked : healBelow;
   const line = (kind, countKey, kindKey) => {
     const count = Number(params.get(countKey) ?? 0);
-    return Number.isInteger(count) && count > 0 ? kindLine(knownPotionsOf(player.row), kind, params.get(kindKey), count, content()) : [];
+    return Number.isInteger(count) && count > 0 ? kindLine(usablePotionsOf(player.row), kind, params.get(kindKey), count, content()) : [];
   };
   const heal = line('heal', 'heal', 'kind');
   const mana = line('mana', 'mana', 'manaKind');
@@ -252,9 +253,10 @@ function healingFor(player, params) {
   return { count: amounts.length, amount: amounts[0] ?? 0, amounts, below, potions };
 }
 
-// The potions an exploration of `minutes` takes along (potions.js): known
-// ones that work in fights, of each at most as many as the character has
-// and as the exploration has fights, and one fern brew.
+// The potions an exploration of `minutes` takes along (potions.js): those
+// that work in fights and whose level the character has reached
+// (potionUsable, 1272), of each at most as many as the character has and as
+// the exploration has fights, and one fern brew.
 function takenPotions(player, asked, minutes) {
   if (asked === undefined || asked === null) return {};
   if (typeof asked !== 'object' || Array.isArray(asked)) throw new ApiError(400, 'invalid_potions', 'Wybierz mikstury na wyprawę.');
@@ -266,8 +268,10 @@ function takenPotions(player, asked, minutes) {
     if (!potion || !fightKind(potion)) throw new ApiError(400, 'invalid_potions', 'Tej mikstury nie zabiera się na wyprawę.');
     const limit = Math.min(have[id] ?? 0, carryLimit(potion, most));
     if (!Number.isInteger(count) || count < 0 || count > limit) throw new ApiError(400, 'invalid_potions', `Zabierz od 0 do ${limit} sztuk.`);
-    // One got in a Wymiana waits for its recipe (DECISIONS.md, "Wymiana").
-    if (count > 0 && !potionKnown(player.row, potion)) throw new ApiError(400, 'unknown_recipe', `Nie znasz jeszcze receptury: ${potion.name}.`);
+    // One above the character's level waits for it, whoever brewed it (1272).
+    if (count > 0 && !potionUsable(potion, player.row.level)) {
+      throw new ApiError(400, 'potion_level', `${potion.counted[0]} zabierzesz na wyprawę od ${potion.level}. poziomu postaci.`);
+    }
     if (count > 0) taken[id] = count;
   }
   return taken;

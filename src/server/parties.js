@@ -83,6 +83,7 @@ import {
   partyRange,
   partyStayText,
   portionsWanted,
+  potionUsable,
   potionsPerKind,
   tripWanted,
   wantedTarget,
@@ -98,7 +99,7 @@ import { closeService } from './mercenaries.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { accountLanguage, runInLanguage, t } from './i18n.js';
-import { pantryOf, potionKnown, potionsOf } from './professions-view.js';
+import { pantryOf, potionsOf } from './professions-view.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 // The most invitations one party may have waiting.
@@ -661,10 +662,10 @@ function memberPotion(id) {
 }
 
 // What a member going on a trip of `minutes` takes along of its choice, by
-// a "Wyrusz"'s rules (takenPotions in hunts.js): the potions whose recipes
-// it knows, of each at most as many as its bag holds and as the trip has
-// fights; and its healing mark. { potions, healBelow } for its start
-// (beginHunt), or {} for none.
+// a "Wyrusz"'s rules (takenPotions in hunts.js): the potions whose level it
+// has reached (potionUsable, 1272), of each at most as many as its bag
+// holds and as the trip has fights; and its healing mark. { potions,
+// healBelow } for its start (beginHunt), or {} for none.
 function memberPotions(row, minutes) {
   const kept = partyPotionsOf(row);
   if (!kept) return {};
@@ -673,7 +674,7 @@ function memberPotions(row, minutes) {
   const potions = {};
   for (const [id, count] of Object.entries(kept.potions)) {
     const potion = memberPotion(id);
-    if (!potion || !Number.isInteger(count) || !potionKnown(row, potion)) continue;
+    if (!potion || !Number.isInteger(count) || !potionUsable(potion, row.level)) continue;
     const take = Math.min(count, have[id] ?? 0, carryLimit(potion, most));
     if (take > 0) potions[id] = take;
   }
