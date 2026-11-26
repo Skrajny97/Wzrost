@@ -498,13 +498,17 @@
         "texts": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["bought", "busy", "claimFirst", "pushTitle"],
-          "description": "bought: po zakupie; busy i claimFirst: gdy Awatar dostaje nową pracę, choć jeszcze pracuje albo czeka na odbiór raportu; pushTitle: tytuł powiadomienia na telefonie o końcu jego pracy (treść jest ta sama co przy postaci).",
+          "required": ["bought", "busy", "claimFirst", "pushTitle", "meditating", "meditated", "cultivationTaken", "pushCultivationTitle"],
+          "description": "bought: po zakupie; busy i claimFirst: gdy Awatar dostaje nową pracę, choć jeszcze pracuje albo czeka na odbiór raportu; pushTitle: tytuł powiadomienia na telefonie o końcu jego pracy (treść jest ta sama co przy postaci). Kultywacja Awatarem (26.11.2026): meditating i meditated: gdy Awatar dostaje pracę albo Kultywację, choć jeszcze medytuje albo czeka na odbiór raportu Kultywacji; cultivationTaken: gdy Kultywację chce zacząć ktoś inny, a medytuje ten Awatar (naraz medytuje tylko jeden); pushCultivationTitle: tytuł powiadomienia o końcu jego Kultywacji (treść jak przy postaci).",
           "properties": {
             "bought": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
             "busy": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
             "claimFirst": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
-            "pushTitle": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+            "pushTitle": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+            "meditating": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+            "meditated": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+            "cultivationTaken": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+            "pushCultivationTitle": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
           }
         },
         "second": {
@@ -520,12 +524,16 @@
             "texts": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["bought", "busy", "claimFirst", "pushTitle"],
+              "required": ["bought", "busy", "claimFirst", "pushTitle", "meditating", "meditated", "cultivationTaken", "pushCultivationTitle"],
               "properties": {
                 "bought": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
                 "busy": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
                 "claimFirst": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
-                "pushTitle": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+                "pushTitle": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+                "meditating": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+                "meditated": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+                "cultivationTaken": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+                "pushCultivationTitle": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
               }
             }
           }

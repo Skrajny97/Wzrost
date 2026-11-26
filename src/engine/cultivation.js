@@ -16,6 +16,12 @@
 // point of its XP a minute, from 4 hours for the first level to 20 for the
 // hundredth (the author's 1248 B, cultivationXpToNext), each one
 // `levelBonus` more character XP from explorations (applyHunt in hunt.js).
+// An Awatar Systemu may meditate instead of the character (DECISIONS.md,
+// „Kultywacja Awatarem (26.11.2026)”; the author: „Do tego trzeba pozwolić
+// robić Kultywację Awatarem. Ale tylko jednym na raz”): the Kultywacja's XP
+// whole, as its profession's work (avatar.professionShare), and its
+// `share` of the character XP (avatar.share, a quarter; cultivationKept,
+// cultivationPlan), under the same cap.
 
 import { gainXp, xpPerHour, xpToNext } from './progression.js';
 import { applyWork } from './professions.js';
@@ -71,6 +77,20 @@ export function xpToLevel(level, xp, target, content) {
  * @returns {number}
  */
 export const cultivationXp = (rate, minutes, cap = Infinity) => Math.min(cap, Math.round((rate * minutes) / 60));
+
+/**
+ * The character XP a Kultywacja of `minutes` keeps at its start, at `rate`
+ * XP an hour: all of it for the character's own (`share` 1), and an Awatar
+ * Systemu's `share` of it for the Awatar's (avatar.share, a quarter),
+ * rounded as the Awatar's share of a profession's work is (workGains in
+ * src/server/professions.js). The claim caps it at the class
+ * (cultivationGain).
+ * @param {number} rate
+ * @param {number} minutes
+ * @param {number} [share]
+ * @returns {number}
+ */
+export const cultivationKept = (rate, minutes, share = 1) => Math.round(cultivationXp(rate, minutes) * share);
 
 /**
  * The Kultywacja's own XP from a level to the next, a point a minute of
@@ -145,13 +165,17 @@ export function cultivationMinutes(content) {
  * would give anything at all (`possible`: the class ahead, or the
  * Kultywacja below its top level), and for each of `durations` (its lengths,
  * cultivationMinutes) the character XP it gives with the character's level
- * after it, and the Kultywacja's XP with its level after it.
+ * after it, and the Kultywacja's XP with its level after it. With `share`
+ * below 1 the same for an Awatar Systemu meditating (cultivationKept): its
+ * share of the character XP, at that pace to the class (`rate`,
+ * `minutes`), and the Kultywacja's XP whole.
  * @param {Levels} character
  * @param {Progress} progress
  * @param {number[]} durations
  * @param {Content} content
+ * @param {number} [share]
  */
-export function cultivationPlan(character, progress, durations, content) {
+export function cultivationPlan(character, progress, durations, content, share = 1) {
   const { level, xp, classLevel } = character;
   const area = newestArea(classLevel, content);
   const rate = cultivationRate(classLevel, content);
@@ -163,11 +187,12 @@ export function cultivationPlan(character, progress, durations, content) {
     possible: cap > 0 || progress.level < content.balance.cultivation.maxLevel,
     factor: content.balance.cultivation.xpFactor,
     area: { id: area.id, name: area.name },
-    rate: Math.round(rate),
+    share,
+    rate: Math.round(rate * share),
     cap,
-    minutes: cap > 0 ? Math.ceil((cap / rate) * 60) : 0,
+    minutes: cap > 0 && share > 0 ? Math.ceil((cap / (rate * share)) * 60) : 0,
     lengths: durations.map((minutes) => {
-      const gained = cultivationXp(rate, minutes, cap);
+      const gained = Math.min(cap, cultivationKept(rate, minutes, share));
       const grown = cultivationProgress(progress, minutes, content);
       return { minutes, xp: gained, level: gainXp(level, xp, gained, toNext, maxLevel).level, cultivationXp: grown.gained, cultivationLevel: grown.level };
     }),

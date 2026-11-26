@@ -15,7 +15,11 @@
       "bought": ["System utkał Awatara. Czeka na pracę w Profesjach."],
       "busy": ["Awatar Systemu już pracuje. Poczekaj na koniec jego pracy."],
       "claimFirst": ["Awatar Systemu skończył pracę. Najpierw odbierz jego raport."],
-      "pushTitle": ["Praca Awatara Systemu zakończona"]
+      "pushTitle": ["Praca Awatara Systemu zakończona"],
+      "meditating": ["Awatar Systemu medytuje. Poczekaj na koniec jego Kultywacji."],
+      "meditated": ["Awatar Systemu skończył Kultywację. Najpierw odbierz jego raport."],
+      "cultivationTaken": ["Kultywację robi już Awatar Systemu. Naraz medytuje tylko jeden."],
+      "pushCultivationTitle": ["Koniec Kultywacji Awatara Systemu"]
     },
     "second": {
       "$comment": "Drugi Awatar Systemu (1066; autor: „A czy jest szansa by można było mieć dwa Awatary Systemu przy czym drugi bardzo drogi - za 200000 złota?”): kupiony po pierwszym, pracuje obok postaci i pierwszego Awatara, tak samo jak on (share i professionShare wyżej). Karta zakupu i dwie karty w pracy według makiet 1070.1 i 1070.2.",
@@ -26,7 +30,11 @@
         "bought": ["System utkał drugiego Awatara. Czeka na pracę w Profesjach."],
         "busy": ["Drugi Awatar Systemu już pracuje. Poczekaj na koniec jego pracy."],
         "claimFirst": ["Drugi Awatar Systemu skończył pracę. Najpierw odbierz jego raport."],
-        "pushTitle": ["Praca Drugiego Awatara Systemu zakończona"]
+        "pushTitle": ["Praca Drugiego Awatara Systemu zakończona"],
+        "meditating": ["Drugi Awatar Systemu medytuje. Poczekaj na koniec jego Kultywacji."],
+        "meditated": ["Drugi Awatar Systemu skończył Kultywację. Najpierw odbierz jego raport."],
+        "cultivationTaken": ["Kultywację robi już Drugi Awatar Systemu. Naraz medytuje tylko jeden."],
+        "pushCultivationTitle": ["Koniec Kultywacji Drugiego Awatara Systemu"]
       }
     }
   },

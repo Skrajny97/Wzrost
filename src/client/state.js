@@ -186,6 +186,35 @@ export const filledForCollector = (character = state.character, now = serverNow(
 // A second of slack, so the page never asks for a report before the server has it.
 export const activityFinished = (activity, now = serverNow()) => Boolean(activity) && now >= activity.endsAt + 1000;
 
+// What the character or an Awatar Systemu is doing, by its activity's kind,
+// in the words after its name ("Postać kopie w Kopalni"; t(), an
+// exploration "jest na wyprawie"): the Profesje's notes on who is busy
+// (screens/professions.js) and the Kultywacja's (cultivation.js).
+export const DOING = {
+  herbs: 'zbiera zioła',
+  potions: 'warzy mikstury',
+  items: 'wykonuje przedmioty',
+  minerals: 'kopie w Kopalni',
+  jewels: 'pracuje w Szlifierni',
+  fish: 'łowi ryby',
+  crops: 'uprawia pole',
+  dishes: 'gotuje',
+  mercenary: 'wykonuje usługę najemną',
+  cultivation: 'medytuje w Kultywacji',
+};
+
+// The Kultywacja going on, or waiting for its report, of the character or of
+// one of its Awatary (cultivation.js; one at a time, „Kultywacja Awatarem”,
+// 26.11.2026), as { activity, avatar }: `avatar` false, true (the first
+// Awatar) or 2 (the second); null when nobody meditates.
+export function meditationOf(character = state.character) {
+  if (character?.activity?.kind === 'cultivation') return { activity: character.activity, avatar: false };
+  const avatar = character?.professions?.avatar;
+  if (avatar?.activity?.kind === 'cultivation') return { activity: avatar.activity, avatar: true };
+  if (avatar?.second?.activity?.kind === 'cultivation') return { activity: avatar.second.activity, avatar: 2 };
+  return null;
+}
+
 // While the character explores, or offers itself or serves as a mercenary
 // in the Karczma (mercenaries.js), what its fights are counted with waits:
 // its gear, stat points, skills and evolution (the server's

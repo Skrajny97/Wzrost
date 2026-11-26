@@ -1448,6 +1448,10 @@
     "0.5.28": {
       "title": "Version 0.5.28",
       "body": "- Encyclopedia: more chests for discoveries, because the game has more materials, potions and herbs. New thresholds: potions 20, 24, 28 and 31, herbs 16 and 18, materials 125, 175, 225, 260 and 290. If you already have that many discoveries, the new chests are waiting to be opened.\n- \"Set out again\" on a report now does the same as \"Set out\": your character eats the remembered meal (once the previous one has run out) and takes the potions from the Exploration options, also when a leader sets out again with the party. Before, it went without a new meal and without potions."
+    },
+    "0.5.29": {
+      "title": "Version 0.5.29",
+      "body": "- Cultivation: the System Avatar or the Second System Avatar can now meditate instead of your character. Pick it under \"Who meditates\", and your character stays free meanwhile, e.g. for an exploration. From the Avatar's meditation your character gets all the Cultivation XP and a quarter of the Character XP. Only one meditates at a time, and a meditating Avatar does no profession work."
     }
   }
 }

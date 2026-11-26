@@ -15,7 +15,7 @@
 
 import { $$, h } from './dom.js';
 import { t } from './i18n.js';
-import { activityFinished, isUnlocked, state, unlockInfo } from './state.js';
+import { activityFinished, isUnlocked, meditationOf, state, unlockInfo } from './state.js';
 import { lockLabel } from './ui.js';
 
 // The parts in their order, with the address of each, its icon in the
@@ -33,9 +33,11 @@ export const COMBAT_MODES = [
 // What lights a part, in a few words for a screen reader, or nothing: a
 // Skrzynia Bossa to open (state.worldBossChests, from GET /api/character
 // and the World Boss's answers) and a Kultywacja's report.
+// The Kultywacja's report is the character's or an Awatar's (meditationOf,
+// 26.11.2026): either waits on its tab.
 const MODE_NEWS = {
   'world-boss': () => (state.worldBossChests ?? 0) > 0 && t('czeka do odebrania'),
-  cultivation: () => state.character?.activity?.kind === 'cultivation' && activityFinished(state.character.activity) && t('raport czeka'),
+  cultivation: () => activityFinished(meditationOf(state.character)?.activity) && t('raport czeka'),
 };
 
 // The parts this deployment has (one whose unlock the content lacks is
