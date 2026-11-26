@@ -840,10 +840,20 @@
       "pose": 2,
       "description": "a young god of the night sky, a young man with light tan skin, black hair tied back in a ponytail hanging down his back at rest, not flying, a handsome lean face lit by soft silver light, a slim silver circlet, simple elegant plate armour of deep midnight indigo with silver edges, a long indigo cape lined with silver hanging behind from the shoulders, indigo greaves and boots with silver edges, no crescent moon, no star, no bow, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     },
+    "star-lord-female": {
+      "start": "art/references/walks/start/star-lord-female.png",
+      "pose": 2,
+      "description": "a young goddess of the night sky, a slender young woman with light warm skin, long straight black hair in a high ponytail falling straight down from the top of the head and lying flat on her back in every frame, heavy and still, the same as in the first frame, never swept back, never flying out behind the head and never blown by wind, her own pretty young woman's face the same in every frame, lit by soft silver light, a slim silver circlet, simple elegant armour of deep midnight indigo with silver edges shaped for a woman, a long indigo cape lined with silver hanging behind from the shoulders, indigo greaves and boots with silver edges, no crescent moon, no star, no bow, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
     "perun-son-male": {
       "start": "art/references/walks/start/perun-son-male.png",
       "pose": 2,
       "description": "a young god of thunder, a young man with light skin, long fair blond hair hanging straight down his back at rest, not flying and not blowing in the wind, a handsome sharp young face, bareheaded, shining armour of polished gold with a white lightning mark on the chest over brown leather, a deep crimson hood lying on the shoulders, a long deep crimson cape hanging behind from the shoulders, golden greaves and boots, no golden wheel, no lightning around the body, no bow, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "perun-son-female": {
+      "start": "art/references/walks/start/perun-son-female.png",
+      "pose": 2,
+      "description": "a young goddess of thunder, a young woman with light skin, long fair blond hair hanging straight down her back at rest, lying flat on the back, not flying and not sticking out, a beautiful sharp young woman's face, bareheaded, shining armour of polished gold shaped for a woman with a white lightning mark on the chest over brown leather, a deep crimson hood lying on the shoulders, a long deep crimson cape hanging behind from the shoulders, golden greaves and boots, no golden wheel, no lightning around the body, no bow, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     },
     "hunt-god-male": {
       "start": "art/references/walks/start/hunt-god-male.png",

@@ -69,8 +69,9 @@ const KINDS = {
   storm: { glow: '#c9b7ff', specks: ['#ffffff', '#ece6ff', '#b9a8ff'] },
 };
 // 961: the shots that go on through their target into the next
-// (Przebijający strzał, Strzał w serce, Mistrzowski strzał).
-const THROUGH = new Set(['pierce', 'heart', 'master']);
+// (Przebijający strzał, Strzał w serce, Mistrzowski strzał; the fifth
+// forms' Kometa).
+const THROUGH = new Set(['pierce', 'heart', 'master', 'comet']);
 const DUST = ['#b9ab92', '#8d806b', '#6f6453'];
 const HEAL = ['#e3f5a8', '#b6e388', '#7fd36b'];
 
@@ -1654,8 +1655,9 @@ export function createFx(kit) {
       // Drawn back (a bow's string, a spell gathering), then let go: the
       // card's recoil plays on while the projectile flies.
       if (magic) tint(from, color, 0.45, 300);
-      // (961: the Mistrzowski strzał draws its bowstring to the ear.)
-      const long = style.orb === 'master';
+      // (961: the Mistrzowski strzał draws its bowstring to the ear, and
+      // so does the Kometa.)
+      const long = style.orb === 'master' || style.orb === 'comet';
       await animate(
         from,
         [
@@ -1697,6 +1699,17 @@ export function createFx(kit) {
       await (style.orb === 'master' ? masterArrow(a, b, color) : shadeArrow(a, b));
       if (id !== run()) return;
       if (style.orb === 'master') shotFrom = { actor: actor.id, point: b };
+      onImpact();
+      await settle();
+      await later(300);
+      return;
+    }
+    // The fifth forms: the Kometa's arrow loosed up into the sky comes down
+    // on its foe as a comet.
+    if (style.orb === 'comet' && motion()) {
+      await cometFall(a, b, color);
+      if (id !== run()) return;
+      shotFrom = { actor: actor.id, point: b };
       onImpact();
       await settle();
       await later(300);
@@ -2145,11 +2158,16 @@ export function createFx(kit) {
     const distance = Math.hypot(dx, dy) || 1;
     const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
     const master = style.orb === 'master';
-    const arrow = h('span', { class: master ? 'fx-masterarrow' : 'projectile projectile--arrow projectile--glow projectile--tail', 'aria-hidden': 'true' });
+    // (The fifth forms: the Kometa ploughs on through the formation, a
+    // comet of fire.)
+    const comet = style.orb === 'comet';
+    const arrow = h('span', { class: comet ? 'fx-comet' : master ? 'fx-masterarrow' : 'projectile projectile--arrow projectile--glow projectile--tail', 'aria-hidden': 'true' });
     arrow.style.setProperty('--fx', style.color);
+    if (comet) arrow.style.setProperty('--size', `${Math.round(Math.min(90, distance * 0.7))}px`);
     fx.append(arrow);
     const flight = Math.round(Math.max(110, Math.min(200, distance * 0.6)));
-    const streak = mark(`fx-trail${master ? ' fx-trail--master' : ''}`, start, { '--fx': style.color });
+    if (comet) specks.trail({ from: start, to: b, duration: flight, colors: ['#ffffff', '#fff1c9', '#ffd27a', '#ff8a3d'], rate: 140, sizes: [1.2, 2.6], life: [240, 480], shape: 'ember' });
+    const streak = mark(`fx-trail${comet ? ' fx-trail--comet' : master ? ' fx-trail--master' : ''}`, start, { '--fx': style.color });
     streak.style.width = `${Math.round(distance)}px`;
     const along = `translate(0px, -50%) rotate(${angle.toFixed(1)}deg)`;
     animate(
@@ -2254,6 +2272,47 @@ export function createFx(kit) {
       { duration: flight, easing: 'ease-in' },
     );
     arrow.remove();
+  }
+
+  // The Kometa: the arrow flies up out of sight, and comes down out of the
+  // sky on its foe as a comet, its blazing head and long tail of fire
+  // shedding sparks; from high over the field, out to the side of its foe
+  // toward the stage's middle (skill-fx.js cometFrom() aims from the same
+  // place).
+  async function cometFall(a, b, color) {
+    const up = h('span', { class: 'fx-masterarrow', 'aria-hidden': 'true' });
+    up.style.setProperty('--fx', color);
+    fx.append(up);
+    const rise = Math.max(60, a.y + 30);
+    await animate(
+      up,
+      [
+        { transform: `translate(${a.x}px, ${a.y}px) rotate(-90deg) scale(0.8)`, opacity: 0 },
+        { opacity: 1, offset: 0.15 },
+        { transform: `translate(${a.x}px, ${a.y - rise}px) rotate(-90deg) scale(0.8)`, opacity: 1 },
+      ],
+      { duration: 170, easing: 'ease-in' },
+    );
+    up.remove();
+    const width = stage.clientWidth;
+    const way = b.x < width / 2 ? 1 : -1;
+    const from = { x: clamp(b.x + way * Math.min(150, width * 0.38), 8, Math.max(8, width - 8)), y: -30 };
+    const dx = b.x - from.x;
+    const dy = b.y - from.y;
+    const angle = Math.atan2(dy, dx);
+    const comet = mark('fx-comet', from, { '--fx': color, '--size': `${Math.round(Math.min(130, Math.hypot(dx, dy) * 0.55))}px` });
+    const fall = 320;
+    specks.trail({ from, to: b, duration: fall, colors: ['#ffffff', '#fff1c9', '#ffd27a', '#ff8a3d'], rate: 170, sizes: [1.2, 2.8], life: [260, 540], shape: 'ember' });
+    await animate(
+      comet,
+      [
+        { transform: `translate(0px, 0px) rotate(${angle.toFixed(4)}rad) scaleX(0.4)`, opacity: 0 },
+        { opacity: 1, offset: 0.12 },
+        { transform: `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) rotate(${angle.toFixed(4)}rad) scaleX(1)`, opacity: 1 },
+      ],
+      { duration: fall, easing: 'ease-in' },
+    );
+    comet.remove();
   }
 
   // The Strzał z ukrycia's arrow: dark, unseen along its way until it is

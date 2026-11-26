@@ -1432,6 +1432,10 @@
     "0.5.24": {
       "title": "Version 0.5.24",
       "body": "- Party: when you stop a party's exploration, the window now says plainly that only your character comes back, and that the rest of the party carries on, with the time they'll be back.\n- Party: a finished mercenary service no longer keeps a member at home. When the leader sets out, that member gets their pay at once and goes along with the party."
+    },
+    "0.5.25": {
+      "title": "Version 0.5.25",
+      "body": "- Labyrinth: level 1 no longer has strong chambers, so almost everyone clears it again. Strong chambers stay on levels 2 and 3 and on the Hellish level, and before you enter one the game asks whether you are sure."
     }
   }
 }

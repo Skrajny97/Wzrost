@@ -363,6 +363,11 @@ export const SPRITES = {
       'carnage', 'breach', 'glory-hurricane', 'champion-challenge', 'mountain-wrath', 'titan-shield', 'heaven-arrow', 'star-rain', 'perun-storm', 'ball-lightning',
       'pack-chief', 'bear-call', 'primal-chaos', 'elemental', 'ice-eternity', 'ice-heart', 'oak-of-ages', 'divine-healing', 'wings-of-light',
       'day-of-wrath', 'pillar-of-light', 'clairvoyance', 'fate-reversal', 'soul-harvest', 'scythe-dance', 'navia-legion', 'navia-mist', 'eternal-night', 'shadow-strike',
+      // The fifth forms' skills at class level 400, as the author accepted
+      // them (1265).
+      'devastation', 'last-frenzy', 'gods-hurricane', 'triumph', 'earth-wrath', 'stronghold', 'comet', 'constellation', 'perun-arrows', 'storm-eye',
+      'white-pack', 'aurochs-call', 'world-genesis', 'sunbirth', 'great-frost', 'winter-cloak', 'eternal-grove', 'eternal-herd', 'six-wings', 'breath-of-life',
+      'fiery-sword', 'heavenly-host', 'destiny', 'book-of-fate', 'last-harvest', 'soul-lament', 'eternal-legion', 'pestilence', 'thousand-shadows', 'starless-night',
     ],
   },
   // The character walking in place on the Walka scene, <class>-<look> or an
@@ -639,8 +644,10 @@ export const SPRITES = {
   summons: {
     size: 48,
     fit: true,
-    // The Stwórca Żywiołów's Żywiołak (1140; drawn in PixelLab, 19.11.2026).
-    ids: ['elemental-summon', 'toxic-slime', 'ent-summon', 'oak-awakening', 'elemental'],
+    // The Stwórca Żywiołów's Żywiołak (1140; drawn in PixelLab, 19.11.2026)
+    // and the Miecz Niebios's Świetlisty rycerz of the Zastęp niebios (1264,
+    // version 2; drawn in PixelLab, 26.11.2026).
+    ids: ['elemental-summon', 'toxic-slime', 'ent-summon', 'oak-awakening', 'elemental', 'heavenly-host'],
   },
   // The Osada (data/settlement.json): its places on the board, by the
   // place's id, each cut to its outline, the Targowisko in the middle the

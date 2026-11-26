@@ -156,6 +156,18 @@ export const SKILL_LOOKS = {
   'navia-mist': { color: '#4ade80', cast: 'poison' },
   'eternal-night': { color: '#a690e8', cast: 'dance' },
   'shadow-strike': { color: '#ff3b5c', impact: 'shadow', teleport: true, big: true },
+  // The fifth forms' skills ("Piąta ewolucja klas"), each in a look of its
+  // own (below).
+  devastation: { color: '#ff6a2a', cast: 'sweep' },
+  'last-frenzy': { color: '#e8462f', cast: 'bless' },
+  'gods-hurricane': { color: '#ffe08a', cast: 'sweep' },
+  triumph: { color: '#ffd24d', cast: 'bless' },
+  'earth-wrath': { color: '#8fe3a8', cast: 'sweep' },
+  stronghold: { color: '#f2d675', cast: 'shield' },
+  comet: { color: '#ffb347', impact: 'aim', glow: true, big: true },
+  constellation: { color: '#d6e4ff', cast: 'rain' },
+  'perun-arrows': { color: '#fff2a8', cast: 'rain' },
+  'storm-eye': { color: '#ffd76a', cast: 'holy' },
   // The skeleton Żniwo raises (combat.js RISEN).
   risen: { color: '#8fbf5a', cast: 'poison' },
 };
@@ -477,6 +489,43 @@ Object.assign(SKILL_LOOKS['navia-mist'], { mist: true, struck: true });
 // shadow until its next move (Cios z cienia).
 Object.assign(SKILL_LOOKS['eternal-night'], { nightfall: true, stance: 'unit--night', teleport: true });
 Object.assign(SKILL_LOOKS['shadow-strike'], { ambush: true, stance: 'unit--vanished' });
+
+// The fifth forms' skills in looks of their own: a grown skill's look the
+// look of the skill it grows from, bigger, a new skill's its own. After the
+// 0.3.43 loop: `crescent`, `hexwall` and `reticle` set to false override
+// what it set.
+// The Niepowstrzymany: cracks of lava out of its stamp and a tide of lava
+// over the whole formation, every foe it reaches burning and raked by
+// molten cleaves (Spustoszenie); its heart pounding, the blood of its
+// wounds drawn back and the beast inside it roaring, its card burning
+// crimson while the frenzy lasts (Ostatni szał).
+Object.assign(SKILL_LOOKS.devastation, { crescent: false, lavaflood: true });
+Object.assign(SKILL_LOOKS['last-frenzy'], { bloodrage: true, stance: 'unit--frenzy' });
+// The Czempion Bogów: three spins each blessed by a shaft of light, swords
+// of light round the foes and a golden flash across them all, the heavens
+// opening at the third (Huragan bogów); its sword raised to the sky and
+// struck by a golden thunderbolt, its light on the whole party (Triumf).
+Object.assign(SKILL_LOOKS['gods-hurricane'], { crescent: false, godstorm: true });
+SKILL_LOOKS.triumph.triumph = true;
+// The Tarcza Świata: its shield with the Drzewo Świata driven into the
+// ground, the ground splitting under the whole formation in a rift of
+// light, pillars of rune stone tossing the foes (Gniew ziemi); a gród's
+// bank and palisade rising along the party's front, every card of the
+// party shielded (Ostoja).
+Object.assign(SKILL_LOOKS['earth-wrath'], { crescent: false, worldwrath: true, dazed: true });
+Object.assign(SKILL_LOOKS.stronghold, { hexwall: false, stronghold: true });
+// The Pan Gwiazd: an arrow into the sky falling back on its foe as a comet
+// and ploughing on through every row behind, leaving fire (Kometa); the
+// seven stars of the Wielki Wóz over the field, every star loosing an
+// arrow of starlight with each of its moves (Gwiazdozbiór).
+Object.assign(SKILL_LOOKS.comet, { orb: 'comet', through: true, reticle: false, cometfall: true, kind: 'fire' });
+Object.assign(SKILL_LOOKS.constellation, { constellation: true, kind: 'arcane', struck: true });
+// The Syn Peruna: Perun's sign of thunder in a black sky and arrows of
+// lightning out of it at every foe, leaping on from foe to foe (Strzały
+// Peruna); a ring of storm round it with a calm in its middle, lightning
+// out of the ring at every foe on each of its moves (Oko burzy).
+Object.assign(SKILL_LOOKS['perun-arrows'], { perunarrows: true, kind: 'storm', struck: true, jolted: true });
+Object.assign(SKILL_LOOKS['storm-eye'], { stormeye: true, kind: 'lightning', struck: true, stance: 'unit--stormeye' });
 
 // 960: the summoning circles, drawn flat on the ground. A druid's: two
 // rings, a wreath of leaves between them and a triskele inside; an
@@ -9448,8 +9497,9 @@ export function skillEffects(kit) {
   function stanceOver(event) {
     const look = lookOf(event);
     const entry = cards.get(event.target);
-    // (The Skrzydła światłości's shields leave every card of the party.)
-    if (look.lightwings && entry) {
+    // (The Skrzydła światłości's shields leave every card of the party, and
+    // so do the Ostoja's.)
+    if ((look.lightwings || look.stronghold) && entry) {
       for (const member of standing(entry.unit.side)) {
         member.card.classList.remove('unit--shielded');
         if (!reduced()) rimGlow(member.card, look.color, 400);
@@ -9467,6 +9517,18 @@ export function skillEffects(kit) {
     if (look.nightfall) {
       const art = artOf(entry.card);
       particles.burst({ x: art.x + art.width / 2, y: art.y + art.height * 0.6, area: { width: figureOf(art) * 0.8, height: art.height * 0.5 }, count: 10, colors: SHADE, angle: -Math.PI / 2, spread: 0.6, speed: [15, 45], gravity: -40, drag: 1.4, life: [600, 900], size: [3, 5], shape: 'dust' });
+      rimGlow(entry.card, look.color, 500);
+      return;
+    }
+    // (The fifth forms: the Ostatni szał burns out in smoke and embers; the
+    // calm of the Oko burzy leaves the Syn Peruna's card.)
+    if (look.bloodrage) {
+      const art = artOf(entry.card);
+      particles.burst({ x: art.x + art.width / 2, y: art.y + art.height * 0.6, area: { width: figureOf(art) * 0.8, height: art.height * 0.5 }, count: 10, colors: SMOKE, angle: -Math.PI / 2, spread: 0.6, speed: [15, 45], gravity: -40, drag: 1.4, life: [600, 900], size: [3, 5], shape: 'dust' });
+      particles.burst({ x: art.x + art.width / 2, y: art.y + art.height * 0.6, area: { width: figureOf(art) * 0.7, height: art.height * 0.4 }, count: 8, colors: RAGE, angle: -Math.PI / 2, spread: 0.6, speed: [20, 60], gravity: -40, drag: 1.4, life: [400, 700], size: [1.1, 2], shape: 'ember' });
+      return;
+    }
+    if (look.stormeye) {
       rimGlow(entry.card, look.color, 500);
       return;
     }
@@ -12134,6 +12196,1271 @@ export function skillEffects(kit) {
     shake(5, 380);
   }
 
+  // ——— The fifth forms' skills, batch 1 ———
+
+  // The Spustoszenie's tide of lava, `width` × `height`: a crest of tongues
+  // of lava at its top, white-gold, and the molten body under it darkening
+  // to embers (each with its own gradient's id).
+  let tides = 0;
+  function lavaTideArt(width, height) {
+    const w = Math.round(width);
+    const hgt = Math.round(height);
+    tides += 1;
+    const id = `fx-lavatide-${tides}`;
+    const random = seeded(29);
+    const crest = Math.round(Math.max(10, hgt * 0.12));
+    const bumps = Math.max(5, Math.round(w / 40));
+    const ys = Array.from({ length: bumps + 1 }, () => crest + (random() - 0.5) * crest * 0.6);
+    let top = `M0 ${ys[0].toFixed(1)}`;
+    for (let k = 0; k < bumps; k++) {
+      const x0 = (k / bumps) * w;
+      const x1 = ((k + 1) / bumps) * w;
+      const peak = Math.min(ys[k], ys[k + 1]) - crest * (0.5 + random() * 0.7);
+      top += `C${(x0 + (x1 - x0) * 0.3).toFixed(1)} ${peak.toFixed(1)} ${(x0 + (x1 - x0) * 0.7).toFixed(1)} ${peak.toFixed(1)} ${x1.toFixed(1)} ${ys[k + 1].toFixed(1)}`;
+    }
+    return (
+      `<svg width="${w}" height="${hgt}" viewBox="0 0 ${w} ${hgt}" preserveAspectRatio="none" aria-hidden="true">` +
+      `<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">` +
+      '<stop offset="0" stop-color="#fff4d6" stop-opacity="0.95"/><stop offset="0.1" stop-color="#ffd27a" stop-opacity="0.85"/>' +
+      '<stop offset="0.3" stop-color="#ff8a3d" stop-opacity="0.68"/><stop offset="0.62" stop-color="#e8462f" stop-opacity="0.45"/>' +
+      '<stop offset="1" stop-color="#7a1408" stop-opacity="0"/></linearGradient></defs>' +
+      `<path d="${top}V${hgt}H0Z" fill="url(#${id})"/>` +
+      `<path class="fx-lavatide-crest" d="${top}" fill="none" stroke="#fff1c9" stroke-width="2.4" stroke-linejoin="round"/></svg>`
+    );
+  }
+
+  // The Spustoszenie (the Pogrom grown): the sky over the arena reddens,
+  // magma cracks open over the Niepowstrzymany's figure and it stamps into
+  // the ground: cracks full of lava run out from its feet toward the foes,
+  // and a tide of lava washes up over their whole formation; every foe it
+  // reaches bursts into flames, and molten cleaves rake it (more of them
+  // the deeper the Niepowstrzymany's own wounds), its armour splitting
+  // red-hot and throwing off its plates.
+  async function devastation(event, color, targets) {
+    const entry = cards.get(event.actor);
+    const foes = targets.map((id) => cards.get(id)).filter(Boolean);
+    if (!entry || foes.length === 0 || reduced() || !particles) {
+      await arc(color);
+      return;
+    }
+    const { now, max } = hpOf(entry);
+    const fury = Math.min(1, Math.max(0, 1 - now / max));
+    const cleaves = 2 + Math.round(fury * 3);
+    const width = stageWidth();
+    const height = stageHeight();
+    const own = artOf(entry.card);
+    const size = figureOf(own);
+    const box = boxOf(entry.card);
+    const ally = entry.unit.side === 'ally';
+    // (The foes' formation, the row the lava washes over, kept to its box.)
+    const rows = boxOf(row(ally ? 'enemy' : 'ally'));
+    const clip = spark('fx-clip', { x: rows.x, y: rows.y });
+    clip.style.width = `${rows.width}px`;
+    clip.style.height = `${rows.height}px`;
+    const sky = spark('fx-sky fx-sky--doom', { x: 0, y: 0 });
+    sky.style.width = `${width}px`;
+    sky.style.height = `${height}px`;
+    const total = 2300 + foes.length * 90;
+    animate(sky, [{ opacity: 0 }, { opacity: 0.85 + fury * 0.15, offset: 0.12 }, { opacity: 0.8, offset: 0.75 }, { opacity: 0 }], { duration: total, easing: 'ease-out' }).then(() => sky.remove());
+    // Magma in its own figure, and it gathers itself to stamp.
+    glassCracks(entry, own, size, HOT_CRACKS, 0, 1300, 'fx-hotcrack');
+    rimGlow(entry.card, '#ff6a2a', 1300);
+    tintCard(entry.card, '#ff5a1f', [{ opacity: 0 }, { opacity: 0.5 + fury * 0.25, offset: 0.25 }, { opacity: 0.35, offset: 0.7 }, { opacity: 0 }], 1300);
+    particles.burst({ x: own.x + own.width / 2, y: own.y + own.height * 0.6, area: { width: size * 0.7, height: own.height * 0.4 }, count: 16, colors: FIRE, angle: -Math.PI / 2, spread: 0.5, speed: [30, 100], gravity: -40, drag: 1.4, life: [420, 800], size: [1.2, 2.6], shape: 'ember' });
+    const toward = ally ? -1 : 1;
+    animate(
+      entry.card,
+      [
+        { transform: 'translate(0px, 0px) scale(1)' },
+        { transform: 'translate(0px, 0px) scale(0.93)', offset: 0.18 },
+        { transform: `translate(0px, ${(toward * 10).toFixed(1)}px) scale(1.12)`, offset: 0.32, easing: 'ease-in' },
+        { transform: `translate(0px, ${(toward * 8).toFixed(1)}px) scale(1.08)`, offset: 0.7 },
+        { transform: 'translate(0px, 0px) scale(1)' },
+      ],
+      { duration: 900, easing: 'ease-in-out', composite: 'add' },
+    );
+    // The stamp: the ground cracks open with lava toward every foe.
+    const stampAt = { x: box.x + box.width / 2, y: ally ? box.y - 3 : box.y + box.height + 3 };
+    const edge = ally ? rows.y + rows.height + 3 : rows.y - 3;
+    const ground = groundLayer(total);
+    // (Foes in one column: their cracks' ends a little apart.)
+    const ends = [];
+    for (const foe of foes) {
+      let x = centerOf(foe.card).x;
+      while (ends.some((end) => Math.abs(end.x - x) < 14)) x += 16;
+      ends.push({ x: inside(x, 4, width), y: edge });
+    }
+    const random = seeded(17 + foes.length);
+    const lines = ends.map((to) => {
+      const points = [stampAt];
+      const dx = to.x - stampAt.x;
+      const dy = to.y - stampAt.y;
+      const length = Math.hypot(dx, dy) || 1;
+      for (let k = 1; k < 5; k++) {
+        const sideways = (random() - 0.5) * 14;
+        points.push({ x: stampAt.x + (dx * k) / 5 - (dy / length) * sideways, y: stampAt.y + (dy * k) / 5 + (dx / length) * sideways });
+      }
+      points.push(to);
+      return `M${points.map((point) => `${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join('L')}`;
+    });
+    const lava = h('span', { class: 'fx-lava' });
+    lava.innerHTML =
+      `<svg width="${Math.round(width)}" height="${Math.round(height)}" viewBox="0 0 ${Math.round(width)} ${Math.round(height)}" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-linejoin="round">` +
+      lines.map((d) => `<path class="fx-lava-crust" pathLength="100" d="${d}" stroke-width="16"/>`).join('') +
+      lines.map((d) => `<path class="fx-lava-glow" pathLength="100" d="${d}" stroke-width="11"/>`).join('') +
+      lines.map((d) => `<path class="fx-lava-core" pathLength="100" d="${d}" stroke-width="4.4"/>`).join('') +
+      '</g></svg>';
+    ground.append(lava);
+    const stamp = 290;
+    drawLines(lava, stamp, 320);
+    animate(lava, [{ opacity: 1 }, { opacity: 1, offset: 0.7 }, { opacity: 0 }], { duration: total - 200, easing: 'ease-in' }).then(() => lava.remove());
+    const mark = anchor(total);
+    after(stamp, mark, () => {
+      shake(4 + fury * 2, 460);
+      flash('#ff6a2a', 0.16 + fury * 0.08, 480);
+      const wave = spark('fx-shockwave', stampAt, { '--fx': '#ff6a2a' });
+      wave.style.width = `${Math.round(Math.min(box.width * 1.8, (Math.min(stampAt.x, width - stampAt.x) - 2) * 2))}px`;
+      animate(
+        wave,
+        [
+          { transform: 'translate(-50%, -50%) scale(0.15)', opacity: 1 },
+          { transform: 'translate(-50%, -50%) scale(1)', opacity: 0 },
+        ],
+        { duration: 520, easing: 'ease-out' },
+      ).then(() => wave.remove());
+      particles.burst({ x: stampAt.x, y: stampAt.y, area: { width: box.width * 0.6, height: 4 }, count: 16, colors: FIRE, angle: ally ? -Math.PI / 2 : Math.PI / 2, spread: 0.9, speed: [90, 220], gravity: 160, drag: 1.4, life: [380, 700], size: [1.2, 2.6], shape: 'ember' });
+      particles.burst({ x: stampAt.x, y: stampAt.y, count: 10, colors: SMOKE, angle: -Math.PI / 2, spread: 1, speed: [20, 60], gravity: -30, drag: 1.6, life: [700, 1100], size: [4, 8], shape: 'dust' });
+    });
+    for (const [k, end] of ends.entries()) {
+      after(stamp + 300 + k * 30, mark, () => {
+        particles.burst({ x: end.x, y: end.y, count: 10, colors: FIRE, angle: ally ? -Math.PI / 2 : Math.PI / 2, spread: 0.7, speed: [60, 170], gravity: -30, drag: 1.4, life: [380, 700], size: [1.2, 2.4], shape: 'ember' });
+        const pool = spark('fx-lavapool', end, { '--size': `${Math.round(Math.max(30, size * 0.7))}px` });
+        animate(
+          pool,
+          [
+            { transform: 'translate(-50%, -50%) scale(0.2)', opacity: 0 },
+            { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.2, easing: 'ease-out' },
+            { transform: 'translate(-50%, -50%) scale(1.05)', opacity: 0.9, offset: 0.7 },
+            { transform: 'translate(-50%, -50%) scale(0.8)', opacity: 0 },
+          ],
+          { duration: 1400 },
+        ).then(() => pool.remove());
+      });
+    }
+    // The tide of lava over the foes' formation, rising from the side the
+    // cracks reach.
+    const tideAt = stamp + 340;
+    const tideFor = 760;
+    const tide = h('span', { class: `fx-lavatide${ally ? '' : ' fx-lavatide--down'}` });
+    tide.innerHTML = lavaTideArt(rows.width, rows.height);
+    clip.append(tide);
+    animate(
+      tide,
+      [
+        { transform: `translateY(${ally ? 100 : -100}%)`, opacity: 1 },
+        { transform: `translateY(${ally ? -55 : 55}%)`, opacity: 1, offset: 0.78 },
+        { transform: `translateY(${ally ? -75 : 75}%)`, opacity: 0 },
+      ],
+      { duration: tideFor + 500, delay: tideAt, easing: 'cubic-bezier(0.3, 0.2, 0.5, 1)', fill: 'backwards' },
+    ).then(() => clip.remove());
+    // (Embers off its crest as it rises.)
+    for (let k = 0; k < 4; k++) {
+      after(tideAt + k * 180, mark, () => {
+        const share = (k + 1) / 5;
+        const y = ally ? rows.y + rows.height * (1 - share) : rows.y + rows.height * share;
+        particles.burst({ x: rows.x + rows.width / 2, y, area: { width: rows.width * 0.9, height: 6 }, count: 10, colors: FIRE, angle: ally ? -Math.PI / 2 : Math.PI / 2, spread: 0.7, speed: [40, 120], gravity: -40, drag: 1.4, life: [380, 700], size: [1.2, 2.4], shape: 'ember' });
+      });
+    }
+    // Every foe it reaches burns, and the cleaves rake it.
+    const hit = reached(event, targets);
+    let end = tideAt;
+    foes.forEach((foe, index) => {
+      const point = figurePoint(foe.card, 0.5);
+      const art = artOf(foe.card);
+      const figure = figureOf(art);
+      const share = ally ? (rows.y + rows.height - point.y) / rows.height : (point.y - rows.y) / rows.height;
+      const reachAt = tideAt + Math.max(0, Math.min(1, share)) * tideFor * 0.78;
+      after(reachAt, mark, () => {
+        animate(foe.card, [{ filter: 'brightness(2.2) sepia(0.6) saturate(2.4) hue-rotate(-18deg)' }, { filter: 'brightness(1)' }], { duration: 520, easing: 'ease-out' });
+        tintCard(foe.card, '#ff5a1f', [{ opacity: 0 }, { opacity: 0.55, offset: 0.25 }, { opacity: 0 }], 900);
+      });
+      if (!hit.includes(foe.unit.id)) return;
+      flames(foe.card, { flameArt: FLAME, holy: false, count: 5, tall: 0.72, duration: 1400, delay: reachAt });
+      const lean = index % 2 ? 1 : -1;
+      const start = reachAt + 120;
+      for (let k = 0; k < cleaves; k++) {
+        const delay = start + k * 105;
+        const turn = lean * (24 + k * 7);
+        const radians = (turn * Math.PI) / 180;
+        const shift = (k - (cleaves - 1) / 2) * figure * (0.72 / cleaves);
+        const across = { x: point.x - Math.sin(radians) * shift, y: point.y + Math.cos(radians) * shift };
+        cutAt(across, turn, figure * 1.2, k % 2 ? '#ffd27a' : '#ff6a2a', { delay, duration: 420, bend: 8 * lean, width: 1.4 });
+        after(delay, mark, () => particles.burst({ x: across.x, y: across.y, count: 8, colors: FIRE, angle: radians + (k % 2 ? 0 : Math.PI), spread: 0.55, speed: [130, 290], life: [200, 380], size: [1.1, 2.2], shape: 'spark', drag: 3.2 }));
+      }
+      const split = start + cleaves * 105;
+      end = Math.max(end, split);
+      after(split, mark, () => {
+        glassCracks(foe, art, figure, HOT_CRACKS, 0, 700, 'fx-hotcrack');
+        platesOff(point, figure, Math.atan2(point.y - centerOf(entry.card).y, point.x - centerOf(entry.card).x), 4);
+        particles.burst({ x: point.x, y: point.y, count: 10, colors: PLATES, speed: [90, 230], life: [320, 560], size: [1.4, 2.6], shape: 'shard', gravity: 480, drag: 1.4 });
+      });
+    });
+    after(tideAt + tideFor * 0.4, mark, () => shake(3 + fury * 2, 420));
+    // (The blows' numbers come as the last armour gives way.)
+    await wait(end + 160);
+  }
+
+  // The Ostatni szał's beast: a horned head roaring, of shadow and embers.
+  const BEAST_SHADE =
+    '<svg viewBox="-50 -52 100 100" aria-hidden="true">' +
+    '<g fill="#2a0b07" stroke="#ff6a2a" stroke-width="1.8" stroke-linejoin="round">' +
+    '<path d="M-17 -20C-31 -26 -41 -38 -39 -51C-33 -41 -25 -36 -11 -32Z"/><path d="M17 -20C31 -26 41 -38 39 -51C33 -41 25 -36 11 -32Z"/>' +
+    '<path d="M0 -36C17 -36 26 -24 26 -8C26 8 19 20 11 29L0 36L-11 29C-19 20 -26 8 -26 -8C-26 -24 -17 -36 0 -36Z"/></g>' +
+    '<path d="M-18 -14L-5 -7M18 -14L5 -7" stroke="#ff8a3d" stroke-width="2.6" stroke-linecap="round"/>' +
+    '<path d="M-15 -7L-6 -4L-14 -1Z M15 -7L6 -4L14 -1Z" fill="#ffe28a"/>' +
+    '<path d="M-13 7C-9 23 9 23 13 7C7 11 -7 11 -13 7Z" fill="#ff5a1f" stroke="#2a0b07" stroke-width="1.2"/>' +
+    '<path d="M-10 8L-8 15L-6 9Z M10 8L8 15L6 9Z M-3 20L0 15L3 20Z" fill="#fff1c9"/></svg>';
+
+  // The Ostatni szał: the Niepowstrzymany's blood boils over: its heart
+  // pounds three times, each beat harder, the blood of its wounds is drawn
+  // back into it, then the shade of the beast inside it rises over its card
+  // and roars: waves of the roar roll out, red and black, the arena
+  // reddens and the foes flinch; its card burns crimson while the frenzy
+  // lasts.
+  async function lastFrenzy(id, color) {
+    const entry = cards.get(id);
+    if (!entry) return;
+    if (reduced() || !particles) {
+      entry.card.classList.add('unit--frenzy');
+      await Promise.all([ring(id, color, 130, 760), aura(id, color, 2)]);
+      return;
+    }
+    const card = entry.card;
+    const art = artOf(card);
+    const figure = figureOf(art);
+    const width = stageWidth();
+    const x = art.x + art.width / 2;
+    const chest = figurePoint(card, 0.55);
+    const beats = [0.06, 0.13, 0.26, 0.33, 0.46, 0.53];
+    const strength = [0.6, 0, 0.8, 0, 1, 0];
+    animate(card, [{ transform: 'scale(1)' }, ...beats.map((offset, k) => ({ transform: `scale(${(1 + strength[k] * 0.08).toFixed(3)})`, offset })), { transform: 'scale(1)' }], { duration: 1500, easing: 'ease-in-out', composite: 'add' });
+    tintCard(card, '#8a1020', [{ opacity: 0 }, ...beats.map((offset, k) => ({ opacity: 0.2 + strength[k] * 0.45, offset })), { opacity: 0.3, offset: 0.62 }, { opacity: 0 }], 1500);
+    const picture = pictureIn(card);
+    if (picture) {
+      const glow = (share) => `drop-shadow(0 0 ${(1 + share * 5).toFixed(1)}px rgba(255, 40, 24, ${(0.3 + share * 0.7).toFixed(2)})) brightness(${(1 - share * 0.18).toFixed(2)}) saturate(${(1 + share * 0.6).toFixed(2)})`;
+      animate(picture, [{ filter: glow(0) }, ...beats.map((offset, k) => ({ filter: glow(strength[k]), offset })), { filter: glow(0.6), offset: 0.7 }, { filter: 'drop-shadow(0 0 1px rgba(255, 40, 24, 0)) brightness(1) saturate(1)' }], { duration: 1500, easing: 'ease-in-out' });
+    }
+    const mark = anchor(1700);
+    // The blood of its wounds drawn back into it with the beats.
+    for (const delay of [60, 380]) after(delay, mark, () => gatherTo(chest, figure * 0.9, BLOOD, { count: 14, life: 340 }));
+    for (const [k, offset] of [0.06, 0.26, 0.46].entries()) {
+      after(offset * 1500, mark, () => {
+        flash('#8a1020', 0.08 + k * 0.05, 300);
+        shake(1.5 + k, 220, true);
+      });
+    }
+    // The beast's shade rises out of it and roars.
+    const size = Math.round(Math.max(44, Math.min(figure * 1.45, (Math.min(x, width - x) - 2) * 2)));
+    const top = { x, y: Math.max(size * 0.5 + 2, art.y + art.height * 0.28) };
+    const shade = spark('fx-beastshade', top, { '--size': `${size}px` });
+    shade.innerHTML = BEAST_SHADE;
+    animate(
+      shade,
+      [
+        { transform: 'translate(-50%, -50%) translateY(14px) scale(0.6)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) translateY(14px) scale(0.6)', opacity: 0, offset: 0.4 },
+        { transform: 'translate(-50%, -50%) translateY(0px) scale(1)', opacity: 0.92, offset: 0.55, easing: 'ease-out' },
+        { transform: 'translate(-50%, -50%) translateY(-3px) scale(1.12)', opacity: 0.92, offset: 0.68 },
+        { transform: 'translate(-50%, -50%) translateY(-6px) scale(1.18)', opacity: 0 },
+      ],
+      { duration: 1700, easing: 'ease-in-out' },
+    ).then(() => shade.remove());
+    after(980, mark, () => {
+      card.classList.add('unit--frenzy');
+      flash('#b3263b', 0.22, 480);
+      shake(5, 460);
+      for (let k = 0; k < 4; k++) {
+        const wave = spark('fx-ragewave fx-ragewave--beast', top, { '--fx': k % 2 ? '#ff8a3d' : '#e8462f', '--size': `${Math.round(figure * (1.5 + k * 0.3))}px` });
+        wave.innerHTML = RAGE_WAVE;
+        animate(
+          wave,
+          [
+            { transform: 'translate(-50%, -50%) scale(0.4)', opacity: 1 },
+            { transform: 'translate(-50%, -50%) scale(1.9)', opacity: 0 },
+          ],
+          { duration: 640, delay: k * 100, easing: 'ease-out', fill: 'backwards' },
+        ).then(() => wave.remove());
+      }
+      particles.burst({ x, y: art.y + art.height * 0.6, area: { width: figure * 0.8, height: art.height * 0.5 }, count: 16, colors: RAGE, angle: -Math.PI / 2, spread: 0.7, speed: [40, 120], gravity: -40, drag: 1.4, life: [420, 800], size: [1.2, 2.4], shape: 'ember' });
+      particles.burst({ x, y: art.y + art.height * 0.7, area: { width: figure * 0.8, height: art.height * 0.4 }, count: 10, colors: SMOKE, angle: -Math.PI / 2, spread: 0.6, speed: [20, 60], gravity: -40, drag: 1.4, life: [700, 1100], size: [3, 6], shape: 'dust' });
+      for (const foe of foesOf(entry)) animate(foe.card, [{ transform: 'translateY(0px)' }, { transform: 'translateY(-4px)', offset: 0.3 }, { transform: 'translateY(0px)' }], { duration: 380, delay: 120, composite: 'add' });
+    });
+    await wait(1550);
+  }
+
+  // A shaft of light from the top of the stage down on a card's figure,
+  // `wide` across, for `duration`.
+  function shaftOn(card, wide, { delay = 0, duration = 700 } = {}) {
+    const art = artOf(card);
+    const box = boxOf(card);
+    const x = art.x + art.width / 2;
+    const column = spark('fx-lightpillar', { x, y: 0 });
+    column.style.width = `${Math.round(Math.min(wide, (Math.min(x, stageWidth() - x) - 1) * 2))}px`;
+    column.style.height = `${Math.round(box.y + box.height * 0.8)}px`;
+    return animate(
+      column,
+      [
+        { transform: 'translate(-50%, 0) scale(0.1, 0)', opacity: 1 },
+        { transform: 'translate(-50%, 0) scale(0.1, 1)', opacity: 1, offset: 0.2 },
+        { transform: 'translate(-50%, 0) scale(1, 1)', opacity: 0.95, offset: 0.4, easing: 'ease-out' },
+        { transform: 'translate(-50%, 0) scale(0.6, 1)', opacity: 0 },
+      ],
+      { duration, delay, fill: 'backwards' },
+    ).then(() => column.remove());
+  }
+
+  // The Huragan bogów (the Huragan chwały grown): three spins, each blessed
+  // by the gods: a shaft of light comes down on the Czempion as it turns,
+  // and swords of light (more and bigger than the Huragan chwały's golden
+  // blades) fly out of it into a storm round the foes, cutting every foe
+  // as they pass; each spin ends in one golden flash across the whole
+  // formation, all its cuts at once; at the third the heavens open over
+  // the arena in rays of gold and the stands roar.
+  async function godsHurricane(event, color, targets) {
+    const foes = targets.map((id) => cards.get(id)).filter(Boolean);
+    const champion = cards.get(event.actor);
+    if (!champion || foes.length === 0 || reduced() || !particles) {
+      await arc(color);
+      return;
+    }
+    const turn = Math.min(3, event.turn ?? 1);
+    const spin = turn === 2 ? -1 : 1;
+    const own = figurePoint(champion.card, 0.5);
+    const ownFigure = figureOf(artOf(champion.card));
+    const picture = pictureIn(champion.card);
+    if (picture) animate(picture, [0, 0.25, 0.5, 0.75, 1].map((offset, k) => ({ transform: `scaleX(${k % 2 ? -1 : 1})`, offset })), { duration: 300, easing: 'linear', composite: 'add' });
+    shaftOn(champion.card, ownFigure * (0.9 + turn * 0.15), { duration: 760 });
+    rimGlow(champion.card, '#fff6cf', 700);
+    const blur = spark('fx-steelswirl fx-steelswirl--gold', own, { '--fx': '#ffffff', '--size': `${Math.round(ownFigure * 1.55)}px` });
+    blur.innerHTML = STEEL_SWIRL;
+    animate(
+      blur,
+      [
+        { transform: 'translate(-50%, -50%) rotate(0deg) scale(0.7)', opacity: 0 },
+        { transform: `translate(-50%, -50%) rotate(${spin * 280}deg) scale(1)`, opacity: 1, offset: 0.4 },
+        { transform: `translate(-50%, -50%) rotate(${spin * 660}deg) scale(1.15)`, opacity: 0 },
+      ],
+      { duration: 420, easing: 'linear' },
+    ).then(() => blur.remove());
+    const boxes = foes.map((foe) => boxOf(foe.card));
+    const figure = figureOf(artOf(foes[0].card));
+    const width = stageWidth();
+    const left = Math.min(...boxes.map((box) => box.x));
+    const right = Math.max(...boxes.map((box) => box.x + box.width));
+    const top = Math.min(...boxes.map((box) => box.y));
+    const bottom = Math.max(...boxes.map((box) => box.y + box.height));
+    const middle = { x: (left + right) / 2, y: top + (bottom - top) * 0.45 };
+    const bladeLength = Math.round(Math.max(40, figure * 0.72));
+    const across = Math.min((right - left) / 2 + figure * 0.12, Math.min(middle.x, width - middle.x) - bladeLength * 0.5 - 2);
+    const deep = Math.max(figure * 0.4, (bottom - top) * 0.36);
+    const duration = [900, 800, 740][turn - 1];
+    const count = [7, 9, 12][turn - 1];
+    const laps = [1.1, 1.3, 1.6][turn - 1];
+    const gale = spark('fx-gale fx-gale--gold fx-gale--divine', middle, { '--fx': color });
+    gale.style.width = `${Math.round(across * 2.15)}px`;
+    gale.style.height = `${Math.round(deep * 2.15)}px`;
+    gale.innerHTML = GALE;
+    animate(
+      gale,
+      [
+        { transform: 'translate(-50%, -50%) rotate(0deg) scale(0.6)', opacity: 0 },
+        { transform: `translate(-50%, -50%) rotate(${spin * 130}deg) scale(1)`, opacity: 1, offset: 0.25 },
+        { transform: `translate(-50%, -50%) rotate(${spin * 400}deg) scale(1.03)`, opacity: 0.9, offset: 0.75 },
+        { transform: `translate(-50%, -50%) rotate(${spin * 520}deg) scale(1.12)`, opacity: 0 },
+      ],
+      { duration, easing: 'linear' },
+    ).then(() => gale.remove());
+    const steps = 20;
+    const join = 0.22;
+    const swords = Array.from({ length: count }, (_, k) => {
+      const blade = spark('fx-hblade fx-hblade--divine', { x: 0, y: 0 }, { '--size': `${bladeLength}px` });
+      blade.innerHTML = SWORD;
+      blade.style.opacity = '0';
+      const phase = (k / count) * Math.PI * 2;
+      const lane = 0.74 + (k % 3) * 0.13;
+      const points = Array.from({ length: steps + 1 }, (_, step) => {
+        const share = step / steps;
+        const angle = phase + spin * share * laps * Math.PI * 2;
+        const path = { x: middle.x + Math.cos(angle) * across * lane, y: middle.y + Math.sin(angle) * deep * lane };
+        const out = Math.min(1, share / join);
+        const pull = 1 - (1 - out) * (1 - out);
+        return { x: own.x + (path.x - own.x) * pull, y: own.y + (path.y - own.y) * pull, angle, out };
+      });
+      const frames = points.map((point, step) => {
+        const next = points[Math.min(steps, step + 1)];
+        const prev = points[Math.max(0, step - 1)];
+        const facing = (Math.atan2(next.y - prev.y, next.x - prev.x) * 180) / Math.PI;
+        const near = point.out < 1 ? 0.7 + point.out * 0.3 : 0.84 + Math.sin(point.angle) * 0.18;
+        return {
+          transform: `translate(${point.x.toFixed(1)}px, ${point.y.toFixed(1)}px) translate(-50%, -50%) rotate(${facing.toFixed(1)}deg) scale(${near.toFixed(2)})`,
+          opacity: step === 0 || step === steps ? 0 : 1,
+        };
+      });
+      return animate(blade, frames, { duration, delay: 60 + k * 16, easing: 'linear', fill: 'backwards' }).then(() => blade.remove());
+    });
+    const mark = anchor(duration + 1800);
+    const hit = reached(event, targets);
+    const struck = foes.filter((foe) => hit.includes(foe.unit.id));
+    struck.forEach((foe, index) => {
+      const point = figurePoint(foe.card, 0.5);
+      const phase = Math.atan2((point.y - middle.y) / deep, (point.x - middle.x) / across);
+      const way = Math.atan2(Math.cos(phase) * deep * spin, -Math.sin(phase) * across * spin);
+      for (const share of [0.3, 0.55, 0.8]) after(duration * share + index * 40, mark, () => bladeThrough(foe, way, GOLD));
+    });
+    after(duration * 0.3, mark, () => shake(2 + turn * 0.7, 340));
+    // The spin's end: one golden flash across the whole formation, and
+    // every foe's cut at once.
+    after(duration, mark, () => {
+      const band = spark('fx-goldflash', middle, { '--fx': color });
+      band.style.width = `${Math.round(Math.min(right - left + figure * 0.6, (Math.min(middle.x, width - middle.x) - 2) * 2))}px`;
+      animate(
+        band,
+        [
+          { transform: 'translate(-50%, -50%) scaleX(0.05)', opacity: 1 },
+          { transform: 'translate(-50%, -50%) scaleX(1)', opacity: 1, offset: 0.25 },
+          { transform: 'translate(-50%, -50%) scaleX(1) scaleY(0.3)', opacity: 0 },
+        ],
+        { duration: 420, easing: 'ease-out' },
+      ).then(() => band.remove());
+      flash('#fff6cf', 0.14 + turn * 0.04, 300);
+      struck.forEach((foe, index) => {
+        const point = figurePoint(foe.card, 0.5);
+        cutAt(point, (index % 2 ? 1 : -1) * 18 * spin, figure * 1.15, spinCut(turn), { duration: 360, bend: 5, width: 1.1 });
+        animate(foe.card, [{ filter: 'brightness(2.6) saturate(0.5)' }, { filter: 'brightness(1)' }], { duration: 340, easing: 'ease-out' });
+        bleed(foe.card, point, Math.atan2(point.y - own.y, point.x - own.x), { count: 5, drips: 1 });
+      });
+    });
+    // The third spin: the heavens open in rays of gold, and the stands roar.
+    if (turn === 3) {
+      after(duration * 0.8, mark, () => {
+        const size = Math.round(Math.min(width * 0.9, 260));
+        const sun = spark('fx-godrays', { x: width / 2, y: 0 }, { '--size': `${size}px` });
+        animate(
+          sun,
+          [
+            { transform: 'translate(-50%, -50%) rotate(0deg) scale(0.3)', opacity: 0 },
+            { transform: 'translate(-50%, -50%) rotate(12deg) scale(1)', opacity: 0.9, offset: 0.3, easing: 'ease-out' },
+            { transform: 'translate(-50%, -50%) rotate(30deg) scale(1.05)', opacity: 0.75, offset: 0.75 },
+            { transform: 'translate(-50%, -50%) rotate(40deg) scale(1.1)', opacity: 0 },
+          ],
+          { duration: 1500 },
+        ).then(() => sun.remove());
+        crowdRoar(champion, color);
+        shaftOn(champion.card, ownFigure * 1.5, { duration: 1100 });
+      });
+    }
+    await Promise.all(swords);
+    await wait(turn === 3 ? 260 : 120);
+  }
+
+  // The Triumf's sword, upright: a broad blade, a golden guard with
+  // wings, its grip and pommel.
+  const TRIUMPH_SWORD =
+    '<svg viewBox="-14 -60 28 88" aria-hidden="true">' +
+    '<path d="M0 -58L5.4 -48V8H-5.4V-48Z" fill="#fff6dc" stroke="#7a5410" stroke-width="1.6" stroke-linejoin="round"/>' +
+    '<path d="M0 -52V5" stroke="#ffffff" stroke-width="1.4" opacity="0.9"/><path d="M2.6 -46V5" stroke="#f2c14e" stroke-width="1" opacity="0.8"/>' +
+    '<path d="M-13 7C-9 4 -4 5 0 8C4 5 9 4 13 7L11 12C7 9.5 3 10.5 0 13C-3 10.5 -7 9.5 -11 12Z" fill="#f2c14e" stroke="#3a2814" stroke-width="1.4" stroke-linejoin="round"/>' +
+    '<path d="M-2.4 12.5H2.4V22H-2.4Z" fill="#6b4f2a" stroke="#2a1a0a" stroke-width="1.2"/>' +
+    '<circle cy="24.5" r="3.4" fill="#f2c14e" stroke="#3a2814" stroke-width="1.3"/></svg>';
+
+  // The Triumf: the Czempion raises its sword to the sky and the sky
+  // answers: a golden thunderbolt strikes the sword's point with a crack of
+  // thunder, a sun of gold flares behind it, and its light runs to every
+  // card of the party, which glows gold (the gods are on their side).
+  async function triumph(id, color) {
+    const entry = cards.get(id);
+    if (!entry) return;
+    if (reduced() || !particles) {
+      await Promise.all([ring(id, color, 130, 760), aura(id, color, 2)]);
+      return;
+    }
+    const card = entry.card;
+    const art = artOf(card);
+    const figure = figureOf(art);
+    const width = stageWidth();
+    const x = inside(art.x + art.width / 2, figure * 0.3, width);
+    // (Its guard at the figure's hands, raised `lift` over them; its point
+    // three quarters of its height over its guard.)
+    // (Its guard over the skill's name popping up over the card.)
+    const length = Math.round(Math.max(56, Math.min(figure * 1.3, art.y + art.height * 0.9)));
+    const hilt = { x, y: art.y + art.height * 0.45 };
+    const lift = Math.round(Math.min(figure * 0.62, Math.max(0, hilt.y - length * 0.75 - 4)));
+    const tip = { x, y: hilt.y - lift - length * 0.75 };
+    const sword = spark('fx-triumphsword', hilt, { '--size': `${length}px` });
+    sword.innerHTML = TRIUMPH_SWORD;
+    animate(
+      sword,
+      [
+        { transform: 'translate(-50%, -77%) translateY(10px) scale(0.6)', opacity: 0 },
+        { transform: `translate(-50%, -77%) translateY(${-lift}px) scale(1)`, opacity: 1, offset: 0.22, easing: 'ease-out' },
+        { transform: `translate(-50%, -77%) translateY(${-lift}px) scale(1)`, opacity: 1, offset: 0.75 },
+        { transform: `translate(-50%, -77%) translateY(${-lift - 6}px) scale(1.04)`, opacity: 0 },
+      ],
+      { duration: 1600, easing: 'ease-in-out' },
+    ).then(() => sword.remove());
+    rimGlow(card, color, 900);
+    const mark = anchor(2000);
+    after(300, mark, () => twinkle(tip, '#ffffff', figure * 0.5));
+    // The sky answers.
+    after(460, mark, () => {
+      lightning({ x: inside(tip.x + 14, 4, width), y: 0 }, tip, { color: '#ffe08a', jag: 1.1, forks: 2, width: 1.6, duration: 520 });
+      flash('#fff6cf', 0.3, 420);
+      shake(4, 360, true);
+      particles.burst({ x: tip.x, y: tip.y, count: 18, colors: ['#ffffff', '#fff6cf', '#ffe08a', '#f2c14e'], speed: [100, 260], drag: 2.6, life: [260, 520], size: [1, 2.2], shape: 'spark' });
+      animate(sword, [{ filter: 'brightness(2.4)' }, { filter: 'brightness(1)' }], { duration: 600, easing: 'ease-out' });
+      const size = Math.round(Math.max(44, Math.min(figure * 1.5, (Math.min(tip.x, width - tip.x) - 2) * 2)));
+      const sun = spark('fx-sun fx-sun--triumph', tip, { '--size': `${size}px` });
+      sun.innerHTML = SUN;
+      animate(
+        sun,
+        [
+          { transform: 'translate(-50%, -50%) rotate(0deg) scale(0.2)', opacity: 0 },
+          { transform: 'translate(-50%, -50%) rotate(20deg) scale(1)', opacity: 0.95, offset: 0.25, easing: 'ease-out' },
+          { transform: 'translate(-50%, -50%) rotate(45deg) scale(1.08)', opacity: 0.8, offset: 0.7 },
+          { transform: 'translate(-50%, -50%) rotate(60deg) scale(1.15)', opacity: 0 },
+        ],
+        { duration: 1100 },
+      ).then(() => sun.remove());
+    });
+    // Its light on the whole party.
+    const party = standing(entry.unit.side);
+    party.forEach((member, index) => {
+      const delay = 640 + index * 90;
+      if (member !== entry) after(delay, mark, () => particles.trail({ from: tip, to: figurePoint(member.card, 0.4), duration: 260, colors: GOLD, rate: 120, sizes: [1, 2], life: [260, 460], shape: 'mote' }));
+      after(delay + 200, mark, () => {
+        rimGlow(member.card, color, 800);
+        groundRing(member.unit.id, color, { duration: 760 });
+        tintCard(member.card, '#ffe08a', [{ opacity: 0 }, { opacity: 0.35, offset: 0.3 }, { opacity: 0 }], 700);
+        const art2 = artOf(member.card);
+        particles.burst({ x: art2.x + art2.width / 2, y: art2.y + art2.height * 0.7, area: { width: figureOf(art2) * 0.7, height: art2.height * 0.4 }, count: 10, colors: GOLD, angle: -Math.PI / 2, spread: 0.6, speed: [30, 90], gravity: -40, drag: 1.2, life: [500, 850], size: [1.1, 2.1], shape: 'mote' });
+      });
+    });
+    await wait(1400 + party.length * 90);
+  }
+
+  // The Tarcza Świata's shield: a great heater of ivory and gold, the Drzewo
+  // Świata in gold on its emerald field.
+  const WORLD_SHIELD =
+    '<svg viewBox="0 0 40 48" aria-hidden="true">' +
+    '<path d="M20 1.5L38 6.5V21C38 33.5 30 41.5 20 46.5C10 41.5 2 33.5 2 21V6.5Z" fill="#e9dcc0" stroke="#3a2a10" stroke-width="2" stroke-linejoin="round"/>' +
+    '<path d="M20 5L34.5 9V21C34.5 31 28 38 20 42.5C12 38 5.5 31 5.5 21V9Z" fill="#1f7a4c" stroke="#f2c14e" stroke-width="1.6" stroke-linejoin="round"/>' +
+    '<g class="fx-world-tree" fill="none" stroke="#ffe08a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M20 36V15"/><path d="M20 21L13.5 15.5M20 21L26.5 15.5M20 27L12 23M20 27L28 23"/>' +
+    '<path d="M20 36L15 39.5M20 36L25 39.5M20 33L13.5 35M20 33L26.5 35"/><circle cx="20" cy="13.5" r="2.4" fill="#ffe08a"/></g>' +
+    '<path d="M8.5 11L14 9.4" stroke="#fffaf0" stroke-width="1.7" stroke-linecap="round" opacity="0.85"/></svg>';
+
+  // The Gniew ziemi (the Gniew góry grown): the Tarcza Świata raises its
+  // great shield with the Drzewo Świata and drives it into the ground: a
+  // shockwave of gold and green, cracks of light run from it to the foes,
+  // and the ground splits under their whole formation in a rift of golden
+  // light; shafts of light burst up out of it, the foes' formation is
+  // thrown up, and pillars of rune stone, taller than the Gniew góry's,
+  // burst up under every foe, tossing it.
+  async function earthWrath(event, color, targets) {
+    const entry = cards.get(event.actor);
+    const foes = targets.map((id) => cards.get(id)).filter(Boolean);
+    if (!entry || foes.length === 0 || reduced() || !particles) {
+      await arc(color);
+      return;
+    }
+    const width = stageWidth();
+    const own = boxOf(entry.card);
+    const ally = entry.unit.side === 'ally';
+    const figure = figureOf(artOf(entry.card));
+    const slamAt = { x: own.x + own.width / 2, y: ally ? own.y - 2 : own.y + own.height + 2 };
+    const shieldSize = Math.round(Math.max(34, figure * 0.75));
+    const shield = spark('fx-worldshield', slamAt, { '--size': `${shieldSize}px` });
+    shield.innerHTML = WORLD_SHIELD;
+    const slam = 480;
+    animate(
+      shield,
+      [
+        { transform: 'translate(-50%, -100%) translateY(0px) scale(0.6)', opacity: 0 },
+        { transform: `translate(-50%, -100%) translateY(${(-shieldSize * 0.6).toFixed(1)}px) scale(1.08)`, opacity: 1, offset: 0.3, easing: 'ease-in' },
+        { transform: 'translate(-50%, -100%) translateY(0px) scale(1.1, 0.88)', opacity: 1, offset: 0.4 },
+        { transform: 'translate(-50%, -100%) translateY(0px) scale(1)', opacity: 1, offset: 0.55 },
+        { transform: 'translate(-50%, -100%) translateY(0px) scale(1)', opacity: 0 },
+      ],
+      { duration: 1200, easing: 'ease-out' },
+    ).then(() => shield.remove());
+    const enemyRow = row(ally ? 'enemy' : 'ally');
+    const formation = boxOf(enemyRow);
+    const riftY = ally ? formation.y + formation.height + 3 : formation.y - 3;
+    const total = slam + 2000;
+    const ground = groundLayer(total);
+    after(slam, ground, () => {
+      shake(8, 600);
+      flash(color, 0.16, 380);
+      particles.burst({ x: slamAt.x, y: slamAt.y, area: { width: own.width * 0.8, height: 6 }, count: 14, colors: DUST, speed: [40, 130], life: [650, 1000], size: [4, 9], shape: 'dust', gravity: -16, drag: 2 });
+      particles.burst({ x: slamAt.x, y: slamAt.y, count: 14, colors: STONE, angle: ally ? -Math.PI / 2 : Math.PI / 2, spread: 1.2, speed: [110, 260], life: [380, 660], size: [1.6, 3], shape: 'shard', gravity: 600, drag: 1 });
+      for (const [k, delay] of [0, 110, 220].entries()) {
+        const wave = spark('fx-shockwave', slamAt, { '--fx': ['#ffe08a', color, '#ffffff'][k] });
+        wave.style.width = `${Math.round(Math.min(own.width * (2.4 - k * 0.4), (Math.min(slamAt.x, width - slamAt.x) - 2) * 2))}px`;
+        animate(
+          wave,
+          [
+            { transform: 'translate(-50%, -50%) scale(0.15)', opacity: 0.95 },
+            { transform: 'translate(-50%, -50%) scale(1)', opacity: 0 },
+          ],
+          { duration: 600, delay, easing: 'ease-out', fill: 'backwards' },
+        ).then(() => wave.remove());
+      }
+    });
+    // The cracks of light from the shield to the rift, and the rift across
+    // the whole formation.
+    const random = seeded(19 + foes.length);
+    const jag = (from, to, parts, sway) => {
+      const points = [from];
+      const dx = to.x - from.x;
+      const dy = to.y - from.y;
+      const length = Math.hypot(dx, dy) || 1;
+      for (let k = 1; k < parts; k++) {
+        const sideways = (random() - 0.5) * sway;
+        points.push({ x: from.x + (dx * k) / parts - (dy / length) * sideways, y: from.y + (dy * k) / parts + (dx / length) * sideways });
+      }
+      points.push(to);
+      return points;
+    };
+    const feet = foes.map((foe) => ({ x: centerOf(foe.card).x, y: riftY }));
+    const lines = feet.map((point) => jag(slamAt, point, 5, 14));
+    const riftLeft = Math.max(4, formation.x + 4);
+    const riftRight = Math.min(width - 4, formation.x + formation.width - 4);
+    const rift = jag({ x: riftLeft, y: riftY }, { x: riftRight, y: riftY }, 12, 10);
+    const d = (line) => `M${line.map((point) => `${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join('L')}`;
+    const cracks = h('span', { class: 'fx-lava fx-worldrift' });
+    cracks.innerHTML =
+      `<svg width="${Math.round(width)}" height="${Math.round(stageHeight())}" viewBox="0 0 ${Math.round(width)} ${Math.round(stageHeight())}" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-linejoin="round">` +
+      lines.map((line) => `<path class="fx-worldrift-glow" pathLength="100" d="${d(line)}" stroke-width="8"/>`).join('') +
+      lines.map((line) => `<path class="fx-worldrift-core" pathLength="100" d="${d(line)}" stroke-width="2.8"/>`).join('') +
+      `<path class="fx-worldrift-glow" pathLength="100" d="${d(rift)}" stroke-width="15"/><path class="fx-worldrift-core" pathLength="100" d="${d(rift)}" stroke-width="5"/>` +
+      '</g></svg>';
+    ground.append(cracks);
+    const paths = [...cracks.querySelectorAll('path')];
+    for (const line of paths) {
+      line.setAttribute('stroke-dasharray', '100 100');
+      line.setAttribute('stroke-dashoffset', '100');
+    }
+    paths.forEach((line, k) => {
+      const main = k >= paths.length - 2;
+      animate(line, [{ strokeDashoffset: 100 }, { strokeDashoffset: 0 }], { duration: main ? 320 : 280, delay: slam + 40 + (main ? 260 : 0), easing: 'ease-in', fill: 'both' });
+    });
+    animate(cracks, [{ opacity: 1 }, { opacity: 1, offset: 0.72 }, { opacity: 0 }], { duration: total - 100, easing: 'ease-in' }).then(() => cracks.remove());
+    // The rift opens: shafts of light up out of it over the foes, and the
+    // whole formation thrown up.
+    const opens = slam + 40 + 260 + 320;
+    after(opens, ground, () => {
+      shake(6, 520, true);
+      flash('#fff6cf', 0.2, 420);
+      animate(enemyRow, [{ transform: 'translateY(0px)' }, { transform: `translateY(${ally ? -7 : 7}px)`, offset: 0.25, easing: 'ease-out' }, { transform: 'translateY(0px)' }], { duration: 520, composite: 'add' });
+      particles.burst({ x: (riftLeft + riftRight) / 2, y: riftY, area: { width: riftRight - riftLeft, height: 4 }, count: 22, colors: ['#ffffff', '#fff6cf', '#ffe08a', color], angle: ally ? -Math.PI / 2 : Math.PI / 2, spread: 0.3, speed: [60, 180], drag: 1.4, life: [500, 900], size: [1, 2.2], shape: 'mote' });
+      particles.burst({ x: (riftLeft + riftRight) / 2, y: riftY, area: { width: riftRight - riftLeft, height: 4 }, count: 14, colors: STONE, angle: ally ? -Math.PI / 2 : Math.PI / 2, spread: 0.9, speed: [100, 220], gravity: 560, drag: 1, life: [380, 620], size: [1.6, 2.8], shape: 'shard' });
+      const shafts = Math.max(3, Math.round((riftRight - riftLeft) / 80));
+      for (let k = 0; k < shafts; k++) {
+        const share = (k + 0.5) / shafts;
+        const beam = spark('fx-riftlight', { x: riftLeft + (riftRight - riftLeft) * share, y: riftY }, { '--fx': color });
+        beam.style.height = `${Math.round((ally ? riftY - formation.y : formation.y + formation.height - riftY) * 0.62)}px`;
+        beam.style.width = `${Math.round(Math.min(34, ((riftRight - riftLeft) / shafts) * 0.5))}px`;
+        if (!ally) beam.style.transformOrigin = '50% 0';
+        animate(
+          beam,
+          [
+            { transform: `translate(-50%, ${ally ? -100 : 0}%) scaleY(0)`, opacity: 0.9 },
+            { transform: `translate(-50%, ${ally ? -100 : 0}%) scaleY(1)`, opacity: 0.85, offset: 0.3, easing: 'ease-out' },
+            { transform: `translate(-50%, ${ally ? -100 : 0}%) scale(0.5, 1)`, opacity: 0 },
+          ],
+          { duration: 760, delay: k * 50, fill: 'backwards' },
+        ).then(() => beam.remove());
+      }
+    });
+    // The pillars under every foe, tossing it.
+    const hit = reached(event, targets);
+    foes.forEach((foe, index) => {
+      const art = artOf(foe.card);
+      const base = { x: art.x + art.width / 2, y: art.y + art.height + 2 };
+      const delay = opens + 120 + index * 70;
+      const pillar = Math.round(Math.max(24, figureOf(art) * 0.48));
+      [-0.36, -0.12, 0.06, 0.28, 0.42].forEach((dx, k) => {
+        const rock = spark('fx-rock fx-rock--rune fx-rock--world', { x: base.x + dx * figureOf(art), y: base.y }, { '--fx': color, '--size': `${Math.round(pillar * (k === 2 ? 1 : k % 2 ? 0.82 : 0.66))}px` });
+        rock.innerHTML = RUNE_ROCK;
+        const tilt = (dx * 40).toFixed(1);
+        animate(
+          rock,
+          [
+            { transform: `translate(-50%, -100%) rotate(${tilt}deg) scaleY(0)`, opacity: 1 },
+            { transform: `translate(-50%, -100%) rotate(${tilt}deg) scaleY(1.2)`, opacity: 1, offset: 0.15, easing: 'ease-out' },
+            { transform: `translate(-50%, -100%) rotate(${tilt}deg) scaleY(1)`, opacity: 1, offset: 0.25 },
+            { transform: `translate(-50%, -100%) rotate(${tilt}deg) scaleY(1)`, opacity: 1, offset: 0.7 },
+            { transform: `translate(-50%, -100%) rotate(${tilt}deg) scaleY(0.2)`, opacity: 0 },
+          ],
+          { duration: 940, delay: delay + k * 35, easing: 'ease-in', fill: 'backwards' },
+        ).then(() => rock.remove());
+      });
+      after(delay, ground, () => {
+        groundRing(foe.unit.id, '#ffe08a', { scale: 1.2, duration: 700 });
+        if (!hit.includes(foe.unit.id)) return;
+        animate(
+          foe.card,
+          [
+            { transform: 'translateY(0px) rotate(0deg)' },
+            { transform: `translateY(-19px) rotate(${index % 2 ? 4 : -4}deg)`, offset: 0.3, easing: 'ease-in' },
+            { transform: 'translateY(3px) rotate(0deg)', offset: 0.62 },
+            { transform: 'translateY(0px) rotate(0deg)' },
+          ],
+          { duration: 540, easing: 'ease-out', composite: 'add' },
+        );
+        animate(foe.card, [{ filter: 'brightness(2) sepia(0.3) saturate(1.4)' }, { filter: 'brightness(1)' }], { duration: 420, easing: 'ease-out' });
+        particles.burst({ x: base.x, y: base.y, area: { width: figureOf(art), height: 4 }, count: 10, colors: DUST, angle: -Math.PI / 2, spread: 1.2, speed: [30, 100], life: [600, 950], size: [4, 8], shape: 'dust', gravity: -16, drag: 2 });
+        particles.burst({ x: base.x, y: base.y, count: 12, colors: STONE, angle: -Math.PI / 2, spread: 1.1, speed: [110, 260], life: [380, 640], size: [1.6, 3], shape: 'shard', gravity: 620, drag: 1 });
+        particles.burst({ x: base.x, y: base.y - figureOf(art) * 0.2, count: 8, colors: ['#ffffff', '#ffe08a', color], angle: -Math.PI / 2, spread: 0.8, speed: [60, 170], life: [260, 480], size: [1, 1.9], shape: 'spark', drag: 3 });
+      });
+    });
+    await wait(opens + 120 + foes.length * 70 + 460);
+  }
+
+  // A palisade of sharpened stakes on an earthen bank, `width` × `height`:
+  // a wall of a gród.
+  function palisadeArt(width, height) {
+    const w = Math.round(width);
+    const hgt = Math.round(height);
+    const bank = Math.round(hgt * 0.3);
+    const step = 9;
+    const stakes = [];
+    for (let x = 2; x < w - 2; x += step) {
+      const right = Math.min(w - 2, x + step - 1.5);
+      const mid = (x + right) / 2;
+      const lift = (Math.round(x / step) % 3) * 2;
+      stakes.push(`M${x.toFixed(1)} ${hgt - bank}V${(9 + lift).toFixed(1)}L${mid.toFixed(1)} ${(1 + lift).toFixed(1)}L${right.toFixed(1)} ${(9 + lift).toFixed(1)}V${hgt - bank}Z`);
+    }
+    const band = (y) => `<path d="M2 ${y}H${w - 2}" stroke="#2a1a0a" stroke-width="2.2"/><path d="M2 ${y}H${w - 2}" stroke="#c9a24a" stroke-width="1" opacity="0.9"/>`;
+    return (
+      `<svg width="${w}" height="${hgt}" viewBox="0 0 ${w} ${hgt}" aria-hidden="true">` +
+      `<path d="M0 ${hgt}C${(w * 0.1).toFixed(1)} ${(hgt - bank * 1.4).toFixed(1)} ${(w * 0.9).toFixed(1)} ${(hgt - bank * 1.4).toFixed(1)} ${w} ${hgt}Z" fill="#5c4024" stroke="#2a1a0a" stroke-width="1.4"/>` +
+      `<g fill="#8a6a3a" stroke="#2a1a0a" stroke-width="1.3" stroke-linejoin="round">${stakes.map((s) => `<path d="${s}"/>`).join('')}</g>` +
+      band(Math.round(hgt * 0.34)) +
+      band(Math.round(hgt * 0.56)) +
+      '</svg>'
+    );
+  }
+
+  // The Ostoja: the Tarcza Świata drives its great shield into the ground
+  // before it like the first stake of a gród's wall: an earthen bank heaves
+  // up along the party's whole front and a palisade of sharpened stakes
+  // rises on it, spreading out from the shield, glowing gold; behind it a
+  // golden light settles over every card of the party, each taking its
+  // shield, kept while the Ostoja holds.
+  async function stronghold(id, color) {
+    const entry = cards.get(id);
+    if (!entry) return;
+    if (reduced() || !particles) {
+      await bubble(id, color);
+      return;
+    }
+    const party = standing(entry.unit.side);
+    const boxes = party.map((member) => boxOf(member.card));
+    const ally = entry.unit.side === 'ally';
+    const figure = figureOf(artOf(entry.card));
+    const width = stageWidth();
+    const own = boxOf(entry.card);
+    const front = ally ? Math.min(...boxes.map((box) => box.y)) : Math.max(...boxes.map((box) => box.y + box.height));
+    // (Along the whole row of the party, wherever its cards stand.)
+    const line = boxOf(row(entry.unit.side));
+    const left = Math.max(2, line.x + 2);
+    const right = Math.min(width - 2, line.x + line.width - 2);
+    const x = own.x + own.width / 2;
+    // The shield driven down into the ground before it.
+    const shieldSize = Math.round(Math.max(30, figure * 0.6));
+    const shieldAt = { x, y: ally ? front + 2 : front - 2 };
+    const shield = spark('fx-worldshield', shieldAt, { '--size': `${shieldSize}px` });
+    shield.innerHTML = WORLD_SHIELD;
+    animate(
+      shield,
+      [
+        { transform: `translate(-50%, -100%) translateY(${(-shieldSize * 0.9).toFixed(1)}px) scale(0.7)`, opacity: 0 },
+        { transform: `translate(-50%, -100%) translateY(${(-shieldSize * 0.7).toFixed(1)}px) scale(1)`, opacity: 1, offset: 0.2, easing: 'ease-in' },
+        { transform: 'translate(-50%, -100%) translateY(0px) scale(1.06, 0.92)', opacity: 1, offset: 0.3 },
+        { transform: 'translate(-50%, -100%) translateY(0px) scale(1)', opacity: 1, offset: 0.4 },
+        { transform: 'translate(-50%, -100%) translateY(0px) scale(1)', opacity: 1, offset: 0.82 },
+        { transform: 'translate(-50%, -100%) translateY(0px) scale(1)', opacity: 0 },
+      ],
+      { duration: 1800, easing: 'ease-out' },
+    ).then(() => shield.remove());
+    // The bank and its palisade along the party's front.
+    const height = Math.round(Math.max(28, Math.min(figure * 0.6, 48)));
+    const wall = spark('fx-palisade', { x: left, y: ally ? front - height + 10 : front - 10 }, { '--fx': color });
+    wall.style.width = `${Math.round(right - left)}px`;
+    wall.style.height = `${height}px`;
+    if (!ally) wall.style.transform = 'scaleY(-1)';
+    wall.innerHTML = palisadeArt(right - left, height);
+    const from = `${(((x - left) / Math.max(1, right - left)) * 100).toFixed(1)}%`;
+    animate(
+      wall,
+      [
+        { clipPath: `inset(100% calc(100% - ${from}) 0 ${from})`, opacity: 1 },
+        { clipPath: `inset(100% calc(100% - ${from}) 0 ${from})`, opacity: 1, offset: 0.17 },
+        { clipPath: `inset(55% 0 0 0)`, opacity: 1, offset: 0.32, easing: 'ease-out' },
+        { clipPath: 'inset(0% 0 0 0)', opacity: 1, offset: 0.45, easing: 'ease-out' },
+        { clipPath: 'inset(0% 0 0 0)', opacity: 0.95, offset: 0.85 },
+        { clipPath: 'inset(0% 0 0 0)', opacity: 0 },
+      ],
+      { duration: 1900 },
+    ).then(() => wall.remove());
+    const mark = anchor(2000);
+    after(360, mark, () => {
+      shake(3.5, 300, true);
+      flash(color, 0.12, 320);
+      particles.burst({ x: shieldAt.x, y: shieldAt.y, area: { width: shieldSize, height: 4 }, count: 12, colors: DUST, speed: [30, 90], life: [600, 950], size: [4, 7], shape: 'dust', gravity: -16, drag: 2 });
+    });
+    after(620, mark, () => {
+      particles.burst({ x: (left + right) / 2, y: ally ? front - 4 : front + 4, area: { width: right - left, height: 4 }, count: 18, colors: DUST, angle: -Math.PI / 2, spread: 0.9, speed: [20, 70], life: [600, 950], size: [3, 7], shape: 'dust', gravity: -12, drag: 2 });
+      particles.burst({ x: (left + right) / 2, y: ally ? front - height * 0.6 : front + height * 0.6, area: { width: right - left, height: height * 0.5 }, count: 16, colors: GOLD, angle: -Math.PI / 2, spread: 0.5, speed: [20, 60], gravity: -30, drag: 1.2, life: [700, 1100], size: [1, 2], shape: 'mote' });
+    });
+    // The golden light over the party behind the wall.
+    party.forEach((member, index) => {
+      const delay = 820 + index * 90;
+      after(delay, mark, () => {
+        rimGlow(member.card, color, 800);
+        tintCard(member.card, '#ffe08a', [{ opacity: 0 }, { opacity: 0.3, offset: 0.3 }, { opacity: 0 }], 700);
+        member.card.classList.add('unit--shielded');
+        member.card.style.setProperty('--shield', color);
+        const art = artOf(member.card);
+        particles.burst({ x: art.x + art.width / 2, y: art.y + art.height * 0.2, area: { width: figureOf(art) * 0.8, height: 4 }, count: 8, colors: GOLD, angle: Math.PI / 2, spread: 0.3, speed: [20, 50], gravity: 60, drag: 1, life: [500, 800], size: [1, 1.8], shape: 'mote' });
+      });
+    });
+    await wait(1450 + party.length * 90);
+  }
+
+  // The Kometa, while its bowstring is drawn (arena-fx.js): high over its
+  // foe a star kindles and grows, the Pan Gwiazd's card glows, and a line
+  // of starlight runs from the star down through its foe and every foe
+  // behind it, where the comet will go.
+  function cometAim(event, color) {
+    const target = cards.get(event.target);
+    const shooter = cards.get(event.actor);
+    if (!target || !shooter) return;
+    if (reduced() || !particles) {
+      ring(event.target, color, 70, 420);
+      return;
+    }
+    const art = artOf(shooter.card);
+    const figure = figureOf(art);
+    rimGlow(shooter.card, '#cfe0ff', 800);
+    twinkle({ x: art.x + art.width / 2, y: art.y + Math.max(8, art.height * 0.12) }, '#ffffff', figure * 0.8);
+    const to = centerOf(target.card);
+    const width = stageWidth();
+    const sky = { x: cometFrom(to, width).x, y: 10 };
+    twinkle(sky, '#ffffff', figure * 0.9, 220);
+    twinkle(sky, color, figure * 0.6, 380);
+    sightOf(sky, to, color, 300, 700);
+    behindOf(target.card).forEach((card, index) => sightOf(to, centerOf(card), color, 420 + index * 60, 560 - index * 40));
+  }
+
+  // Where the Kometa comes from: high over the field, out to the side of
+  // its foe toward the stage's middle (arena-fx.js cometFall() too).
+  function cometFrom(to, width) {
+    const way = to.x < width / 2 ? 1 : -1;
+    return { x: inside(to.x + way * Math.min(150, width * 0.38), 6, width), y: -30 };
+  }
+
+  // The Kometa lands: a blast of white fire on its foe, a ring of fire at
+  // its feet and flames rising up it; going on through every foe behind,
+  // it leaves fire on the ground along its way and the flames on each.
+  function cometHit(event, look) {
+    const target = cards.get(event.target);
+    const shooter = cards.get(event.actor);
+    if (!target || !shooter) return;
+    if (reduced() || !particles) {
+      pierce(event, look.color);
+      burst(event.target, look.color, 70);
+      return;
+    }
+    const card = target.card;
+    const to = centerOf(card);
+    const box = boxOf(card);
+    const art = artOf(card);
+    const figure = figureOf(art);
+    const width = stageWidth();
+    const big = !event.pierced;
+    const ahead = event.pierced ? aheadOf(card) : null;
+    const from = ahead ? centerOf(ahead) : cometFrom(to, width);
+    const way = Math.atan2(to.y - from.y, to.x - from.x);
+    pierceAlong(card, way, look.color);
+    twinkle(to, '#ffffff', figure * (big ? 1.4 : 0.95));
+    burst(event.target, '#fff1c9', Math.round(figure * (big ? 1.5 : 1)));
+    ring(event.target, look.color, Math.round(figure * (big ? 2 : 1.4)), 520);
+    particles.burst({ x: to.x, y: to.y, count: big ? 26 : 16, colors: ['#ffffff', '#fff1c9', ...FIRE], speed: [120, 320], life: [300, 620], size: [1.1, 2.6], shape: 'ember', drag: 2.2 });
+    particles.burst({ x: to.x, y: to.y, count: big ? 12 : 6, colors: ['#ffffff', '#cfe0ff', '#fff6cf'], speed: [80, 220], life: [300, 600], size: [1, 2], shape: 'mote', drag: 2.6 });
+    animate(card, [{ filter: 'brightness(2.6) sepia(0.4) saturate(1.8)' }, { filter: 'brightness(1)' }], { duration: 600, easing: 'ease-out' });
+    flames(card, { flameArt: FLAME, holy: false, count: big ? 6 : 4, tall: big ? 0.8 : 0.62, duration: 1200 });
+    const foot = { x: art.x + art.width / 2, y: box.y + box.height - 6 };
+    const wave = spark('fx-shockwave', foot, { '--fx': '#ff8a3d' });
+    wave.style.width = `${Math.round(Math.min(box.width * (big ? 1.5 : 1.1), (Math.min(foot.x, width - foot.x) - 2) * 2))}px`;
+    animate(
+      wave,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.15)', opacity: 1 },
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 0 },
+      ],
+      { duration: 520, easing: 'ease-out' },
+    ).then(() => wave.remove());
+    if (big) {
+      flash('#ffd27a', 0.22, 380);
+      shake(5.5, 420);
+    } else {
+      shake(3, 260);
+    }
+    // Fire left on the ground along its way through the formation.
+    if (ahead) {
+      const start = centerOf(ahead);
+      for (let k = 1; k <= 3; k++) {
+        const share = k / 4;
+        const at = { x: start.x + (to.x - start.x) * share, y: start.y + (to.y - start.y) * share };
+        const tongue = spark('fx-groundfire', at, { '--size': `${Math.round(figure * 0.4)}px` });
+        tongue.innerHTML = FLAME;
+        animate(
+          tongue,
+          [
+            { transform: 'translate(-50%, -100%) scale(0.3, 0.1)', opacity: 0 },
+            { transform: 'translate(-50%, -100%) scale(1, 1.1)', opacity: 1, offset: 0.25, easing: 'ease-out' },
+            { transform: 'translate(-50%, -100%) scale(0.9, 0.95)', opacity: 0.95, offset: 0.6 },
+            { transform: 'translate(-50%, -100%) scale(0.4, 0.6)', opacity: 0 },
+          ],
+          { duration: 1100, delay: k * 40, easing: 'ease-in-out', fill: 'backwards' },
+        ).then(() => tongue.remove());
+      }
+    }
+  }
+
+  // Where the Gwiazdozbiór shines: the seven stars of the Wielki Wóz high
+  // over the foes, its handle to the left, fitted to the stage.
+  function constellationAt(side) {
+    const width = stageWidth();
+    const foes = row(side);
+    const reach = foes ? boxOf(foes) : { x: 0, y: 0, width, height: stageHeight() * 0.45 };
+    const span = Math.min(reach.width * 0.84, 320);
+    const x0 = reach.x + (reach.width - span) / 2;
+    const tall = Math.min(reach.height * 0.42, span * 0.42);
+    const y0 = reach.y + reach.height * 0.12;
+    const shape = [
+      [0, 0.08],
+      [0.18, 0.02],
+      [0.34, 0.16],
+      [0.5, 0.34],
+      [0.53, 0.86],
+      [0.88, 1],
+      [0.95, 0.44],
+    ];
+    return shape.map(([sx, sy]) => ({ x: x0 + sx * span, y: y0 + sy * tall }));
+  }
+
+  // The Gwiazdozbiór over the field: night, its seven stars and the lines
+  // between them (`slow`: drawn star by star as it wakes), for `duration`.
+  function constellationUp(side, duration, slow) {
+    const width = stageWidth();
+    const height = stageHeight();
+    const night = spark('fx-sky fx-sky--night', { x: 0, y: 0 });
+    night.style.width = `${width}px`;
+    night.style.height = `${Math.round(height * 0.62)}px`;
+    animate(night, [{ opacity: 0 }, { opacity: slow ? 1 : 0.8, offset: slow ? 0.15 : 0.2 }, { opacity: slow ? 0.9 : 0.75, offset: 0.8 }, { opacity: 0 }], { duration, easing: 'ease-out' }).then(() => night.remove());
+    const stars = constellationAt(side);
+    const random = seeded(37);
+    if (slow) for (let k = 0; k < 8; k++) twinkle({ x: width * (0.05 + random() * 0.9), y: height * (0.03 + random() * 0.4) }, '#ffffff', 6 + random() * 6, 200 + k * 110);
+    const step = slow ? 130 : 25;
+    const lead = slow ? 260 : 60;
+    const d = `M${stars.map((star) => `${star.x.toFixed(1)} ${star.y.toFixed(1)}`).join('L')}L${stars[3].x.toFixed(1)} ${stars[3].y.toFixed(1)}`;
+    const lines = spark('fx-constellation', { x: 0, y: 0 });
+    lines.innerHTML = `<svg width="${Math.round(width)}" height="${Math.round(height)}" viewBox="0 0 ${Math.round(width)} ${Math.round(height)}" aria-hidden="true"><path class="fx-constellation-glow" pathLength="100" d="${d}"/><path class="fx-constellation-line" pathLength="100" d="${d}"/></svg>`;
+    drawLines(lines, lead + step * 2, slow ? 900 : 200);
+    animate(lines, [{ opacity: 1 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }], { duration, easing: 'ease-in' }).then(() => lines.remove());
+    const marks = stars.map((star, k) => {
+      const dot = spark('fx-star', star, { '--size': `${k === 3 ? 13 : 11}px` });
+      animate(
+        dot,
+        [
+          { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
+          { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 1, offset: 0.08 },
+          { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.16 },
+          { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.85 },
+          { transform: 'translate(-50%, -50%) scale(0.6)', opacity: 0 },
+        ],
+        { duration: duration - lead - k * step, delay: lead + k * step, fill: 'backwards' },
+      ).then(() => dot.remove());
+      return dot;
+    });
+    return { stars, night, marks };
+  }
+
+  // The Gwiazdozbiór: as it wakes, night falls over the arena and the seven
+  // stars of the Wielki Wóz kindle one by one over the foes and join into
+  // their sign, which flares, and the Pan Gwiazd's card glows with it; on
+  // each of its moves after, the sign shines again and every one of its
+  // stars looses an arrow of starlight at the foes, the stars' arrows
+  // landing in bursts of light.
+  async function constellation(event, color, targets) {
+    const archer = cards.get(event.actor);
+    if (!archer || reduced() || !particles) {
+      await (targets.length ? rain(color, targets) : Promise.all([ring(event.actor, color, 130, 760), aura(event.actor, color, 2)]));
+      return;
+    }
+    const side = archer.unit.side === 'ally' ? 'enemy' : 'ally';
+    if (targets.length === 0) {
+      const sky = constellationUp(side, 2100, true);
+      const mark = anchor(2100);
+      after(1400, mark, () => {
+        flash('#d6e4ff', 0.14, 380);
+        sky.stars.forEach((star, k) => twinkle(star, '#ffffff', 22, k * 30));
+        const art = artOf(archer.card);
+        rimGlow(archer.card, color, 800);
+        particles.trail({ from: sky.stars[3], to: { x: art.x + art.width / 2, y: art.y + art.height * 0.3 }, duration: 320, colors: ['#ffffff', '#d6e4ff', '#9fb8ff'], rate: 110, sizes: [1, 2], life: [300, 520], shape: 'mote' });
+      });
+      await wait(1750);
+      return;
+    }
+    const sky = constellationUp(side, 1500, false);
+    const foes = targets.map((id) => cards.get(id)).filter(Boolean);
+    const mark = anchor(1500);
+    const shots = sky.stars.map((star, k) => {
+      const foe = foes[k % foes.length];
+      if (!foe) return Promise.resolve();
+      const box = boxOf(foe.card);
+      const random = seeded(k * 13 + 5);
+      const land = { x: box.x + box.width * (0.3 + random() * 0.4), y: box.y + box.height * (0.3 + random() * 0.3) };
+      return wait(260 + k * 70).then(() => {
+        if (!mark.isConnected) return;
+        twinkle(star, '#ffffff', 16);
+        particles.trail({ from: star, to: land, duration: 300, colors: ['#ffffff', '#d6e4ff', color], rate: 90, sizes: [1, 2], life: [200, 380], shape: 'mote' });
+        return shootingStar(star, land, 0, color).then(() => {
+          if (!mark.isConnected) return;
+          twinkle(land, '#ffffff', figureOf(artOf(foe.card)) * 0.55);
+          particles.burst({ x: land.x, y: land.y, count: 8, colors: ['#ffffff', '#d6e4ff', color], speed: [70, 190], life: [240, 440], size: [1, 2], shape: 'mote', drag: 2.6 });
+          animate(foe.card, [{ filter: 'brightness(2) saturate(0.7)' }, { filter: 'brightness(1)' }], { duration: 320, easing: 'ease-out' });
+        });
+      });
+    });
+    after(240, mark, () => flash('#d6e4ff', 0.08, 260));
+    await Promise.all(shots);
+    await wait(120);
+  }
+
+  // An arrow of Perun's lightning: a bolt flickering from one point to
+  // another with an arrowhead of light flying along it ahead of its
+  // flicker.
+  function boltArrow(from, to, color, { delay = 0, width = 1.4, jag = 1, forks = 1 } = {}) {
+    const angle = Math.atan2(to.y - from.y, to.x - from.x);
+    const head = spark('fx-boltarrow', from, { '--fx': color });
+    const flight = Math.round(Math.max(90, Math.min(170, Math.hypot(to.x - from.x, to.y - from.y) * 0.45)));
+    lightning(from, to, { color, jag, forks, width, duration: 440, delay: delay + flight * 0.6 });
+    return animate(
+      head,
+      [
+        { transform: `translate(0px, 0px) rotate(${angle.toFixed(4)}rad) scale(0.6)`, opacity: 0 },
+        { opacity: 1, offset: 0.2 },
+        { transform: `translate(${(to.x - from.x).toFixed(1)}px, ${(to.y - from.y).toFixed(1)}px) rotate(${angle.toFixed(4)}rad) scale(1)`, opacity: 1 },
+      ],
+      { duration: flight, delay, easing: 'ease-in', fill: 'backwards' },
+    ).then(() => head.remove());
+  }
+
+  // The Strzały Peruna (the Burza Peruna grown): the whole sky blackens and
+  // Perun's sign of thunder kindles in it, great and golden, turning; out
+  // of it arrows of lightning shoot down at every foe in the order of the
+  // blows, each bursting on its foe, and then each arrow leaps on to the
+  // next foe it seeks, as the blows go on.
+  async function perunArrows(event, color, targets) {
+    const caster = cards.get(event.actor);
+    const blows = event.blows?.length ? event.blows.map((blow) => blow.target) : targets;
+    const order = [...new Set(blows)].filter((id) => cards.get(id));
+    if (!caster || order.length === 0 || reduced() || !particles) {
+      await rain(color, targets);
+      return;
+    }
+    const width = stageWidth();
+    const height = stageHeight();
+    const leaps = [];
+    for (let k = 1; k < blows.length; k++) if (blows[k] !== blows[k - 1] && cards.get(blows[k]) && cards.get(blows[k - 1])) leaps.push([blows[k - 1], blows[k]]);
+    const strikeAt = 560;
+    const leapAt = strikeAt + order.length * 150 + 180;
+    const total = leapAt + leaps.length * 150 + 900;
+    const sky = stormSky(total, true);
+    const size = Math.round(Math.min(width * 0.46, height * 0.3, 180));
+    const center = { x: width / 2, y: Math.round(Math.max(size * 0.5 + 4, height * 0.16)) };
+    const sign = spark('fx-sign fx-sign--perun', center, { '--fx': '#ffd76a', '--size': `${size}px` });
+    sign.innerHTML = THUNDER_SIGN;
+    sign.querySelectorAll('.fx-sign-stroke').forEach((stroke, index) => {
+      stroke.setAttribute('stroke-dasharray', '100 100');
+      stroke.setAttribute('stroke-dashoffset', '100');
+      animate(stroke, [{ strokeDashoffset: 100 }, { strokeDashoffset: 0 }], { duration: 200, delay: 40 + index * 45, easing: 'ease-in-out', fill: 'both' });
+    });
+    animate(
+      sign,
+      [
+        { transform: 'translate(-50%, -50%) rotate(-30deg) scale(0.8)', opacity: 0.85 },
+        { transform: 'translate(-50%, -50%) rotate(0deg) scale(1)', opacity: 0.9, offset: 0.25 },
+        { transform: 'translate(-50%, -50%) rotate(40deg) scale(1)', opacity: 0.8, offset: 0.8 },
+        { transform: 'translate(-50%, -50%) rotate(60deg) scale(1.1)', opacity: 0 },
+      ],
+      { duration: total - 300, easing: 'ease-out' },
+    ).then(() => sign.remove());
+    after(strikeAt - 120, sky, () => {
+      flash('#fff7d6', 0.3, 400);
+      shake(3.5, 320);
+      animate(sign, [{ filter: 'brightness(2)' }, { filter: 'brightness(1)' }], { duration: 400, easing: 'ease-out' });
+      stormSparks(center, 18);
+    });
+    const strikes = [];
+    order.forEach((id, index) => {
+      strikes.push(
+        after(strikeAt + index * 150, sky, () => {
+          const entry = cards.get(id);
+          if (!entry) return;
+          const point = figurePoint(entry.card, 0.5);
+          const angle = Math.atan2(point.y - center.y, point.x - center.x);
+          const start = { x: center.x + Math.cos(angle) * size * 0.45, y: center.y + Math.sin(angle) * size * 0.45 };
+          return boltArrow(start, point, color, { width: 1.6, forks: 2 }).then(() => {
+            if (!sky.isConnected) return;
+            stormSparks(point, 14);
+            shocked(entry, 3);
+            ring(id, color, Math.round(figureOf(artOf(entry.card)) * 1.5), 420);
+            particles.burst({ x: point.x, y: point.y, count: 8, colors: ['#ffffff', '#ffd76a', '#e8462f'], speed: [100, 240], life: [200, 380], size: [1, 2], shape: 'spark', drag: 3.5 });
+            shake(3, 220);
+          });
+        }),
+      );
+    });
+    leaps.forEach(([from, to], index) => {
+      strikes.push(
+        after(leapAt + index * 150, sky, () => {
+          const a = cards.get(from);
+          const b = cards.get(to);
+          if (!a || !b) return;
+          const start = figurePoint(a.card, 0.5);
+          const end = figurePoint(b.card, 0.5);
+          particles.trail({ from: start, to: end, duration: 160, colors: ['#ffffff', color], rate: 120, sizes: [1, 2], life: [160, 300], shape: 'mote' });
+          return boltArrow(start, end, color, { width: 1.1, jag: 1.5, forks: 1 }).then(() => {
+            if (!sky.isConnected) return;
+            stormSparks(end, 10);
+            shocked(b, 2.4);
+          });
+        }),
+      );
+    });
+    await Promise.all(strikes);
+    await wait(240);
+  }
+
+  // The Oko burzy round a card: storm clouds turning in a ring round its
+  // figure, lightning running through them, and a calm golden light in the
+  // middle, for `duration`.
+  function stormRing(entry, duration, { delay = 0 } = {}) {
+    const art = artOf(entry.card);
+    const figure = figureOf(art);
+    const width = stageWidth();
+    const height = stageHeight();
+    const middle = { x: art.x + art.width / 2, y: art.y + art.height * 0.5 };
+    const radius = Math.round(Math.max(30, Math.min(figure * 0.78, middle.x - 4, width - middle.x - 4, middle.y - 4, height - middle.y - 4)));
+    const ring2 = spark('fx-stormring', middle, { '--size': `${radius * 2}px` });
+    const puffs = 16;
+    const random = seeded(43);
+    for (let k = 0; k < puffs; k++) {
+      const puff = h('span', { class: 'fx-stormring-puff' });
+      const angle = (k / puffs) * Math.PI * 2 + (random() - 0.5) * 0.3;
+      const size = Math.round(radius * (0.42 + random() * 0.3));
+      const out = radius * (0.78 + (random() - 0.5) * 0.16);
+      puff.style.left = `${(radius + Math.cos(angle) * out - size / 2).toFixed(1)}px`;
+      puff.style.top = `${(radius + Math.sin(angle) * out - size / 2).toFixed(1)}px`;
+      puff.style.width = `${size}px`;
+      puff.style.height = `${size}px`;
+      ring2.append(puff);
+    }
+    const calm = spark('fx-stormcalm', middle, { '--size': `${Math.round(radius * 1.15)}px` });
+    animate(
+      ring2,
+      [
+        { transform: 'translate(-50%, -50%) rotate(0deg) scale(1.5)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) rotate(140deg) scale(1)', opacity: 1, offset: 0.25 },
+        { transform: 'translate(-50%, -50%) rotate(420deg) scale(1)', opacity: 1, offset: 0.8 },
+        { transform: 'translate(-50%, -50%) rotate(540deg) scale(1.1)', opacity: 0 },
+      ],
+      { duration, delay, easing: 'linear', fill: 'backwards' },
+    ).then(() => ring2.remove());
+    animate(
+      calm,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.3)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 0.9, offset: 0.3 },
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 0.8, offset: 0.8 },
+        { transform: 'translate(-50%, -50%) scale(1.1)', opacity: 0 },
+      ],
+      { duration, delay, easing: 'ease-out', fill: 'backwards' },
+    ).then(() => calm.remove());
+    return { ring: ring2, middle, radius };
+  }
+
+  // The Oko burzy: as it wakes, the sky darkens and storm clouds gather
+  // round the Syn Peruna and turn round it in a ring, lightning running
+  // through them, while in their middle it stands in a calm golden light;
+  // its card keeps the calm while the storm lasts. On each of its moves
+  // after, the ring of storm turns round it again and lightning strikes
+  // out of it at every foe.
+  async function stormEye(event, color, targets) {
+    const entry = cards.get(event.actor);
+    if (!entry) return;
+    if (targets.length === 0) entry.card.classList.add('unit--stormeye');
+    if (reduced() || !particles) {
+      await (targets.length ? beams(color, targets) : Promise.all([ring(event.actor, color, 130, 760), aura(event.actor, color, 2)]));
+      return;
+    }
+    if (targets.length === 0) {
+      const sky = stormSky(2000, true);
+      const storm = stormRing(entry, 1900);
+      for (const delay of [500, 820, 1120, 1420]) {
+        after(delay, sky, () => {
+          const angle = delay * 0.01;
+          const at = { x: storm.middle.x + Math.cos(angle) * storm.radius * 0.85, y: storm.middle.y + Math.sin(angle) * storm.radius * 0.85 };
+          crackle(at, storm.radius * 0.45, '#ece6ff', 2);
+        });
+      }
+      after(620, sky, () => {
+        flash('#ffe08a', 0.12, 360);
+        rimGlow(entry.card, color, 900);
+        tintCard(entry.card, '#ffe08a', [{ opacity: 0 }, { opacity: 0.3, offset: 0.3 }, { opacity: 0 }], 800);
+        particles.burst({ x: storm.middle.x, y: storm.middle.y, count: 12, colors: ['#ffffff', '#fff6cf', '#ffe08a'], speed: [20, 60], drag: 1.6, life: [600, 900], size: [1, 1.9], shape: 'mote' });
+      });
+      await wait(1600);
+      return;
+    }
+    const sky = stormSky(1500, true);
+    const storm = stormRing(entry, 1300);
+    after(180, sky, () => rimGlow(entry.card, color, 600));
+    const strikes = targets.map((id, index) =>
+      after(300 + index * 110, sky, () => {
+        const foe = cards.get(id);
+        if (!foe) return;
+        const point = figurePoint(foe.card, 0.5);
+        const angle = Math.atan2(point.y - storm.middle.y, point.x - storm.middle.x);
+        const from = { x: storm.middle.x + Math.cos(angle) * storm.radius * 0.85, y: storm.middle.y + Math.sin(angle) * storm.radius * 0.85 };
+        lightning(from, point, { color: '#fff2a8', jag: 1.3, forks: 2, width: 1.25, duration: 460 });
+        stormSparks(point, 10);
+        shocked(foe, 2.6);
+        if (index === 0) {
+          flash('#fff6cf', 0.14, 280);
+          shake(2.5, 240);
+        }
+      }),
+    );
+    await Promise.all(strikes);
+    await wait(300);
+  }
+
   async function cast(event) {
     const look = lookOf(event);
     const targets = event.targets ?? [];
@@ -12227,6 +13554,10 @@ export function skillEffects(kit) {
         else if (look.glory) await gloryHurricane(event, look.color, targets);
         else if (look.mountain) await mountainWrath(event, look.color, targets);
         else if (look.reaping) await scytheDance(event, look.color, targets);
+        // The fifth forms' sweeps.
+        else if (look.lavaflood) await devastation(event, look.color, targets);
+        else if (look.godstorm) await godsHurricane(event, look.color, targets);
+        else if (look.worldwrath) await earthWrath(event, look.color, targets);
         // 964: the evolved Cień's whirls.
         else if (look.shadowwhirl) await shadowWhirl(event, look.color, targets);
         else if (look.bladerain) await bladeStorm(event, look.color, targets);
@@ -12246,6 +13577,8 @@ export function skillEffects(kit) {
         else if (look.pyre) await pyreFire(event, look.color, targets);
         // The fourth forms: the Słup światła.
         else if (look.pillar) await lightPillar(event, look.color, targets);
+        // The fifth forms: the Oko burzy.
+        else if (look.stormeye) await stormEye(event, look.color, targets);
         else await (look.braid ? braid(event, look.color, targets) : look.runes ? exorcise(look.color, targets) : beams(look.color, targets));
         break;
       case 'rain':
@@ -12254,6 +13587,9 @@ export function skillEffects(kit) {
         else if (look.starfall) await starfall(event, look.color, targets);
         else if (look.skysplit) await skySplit(event, look.color, targets);
         else if (look.chaos) await primalChaos(event, look.color, targets);
+        // The fifth forms: the Gwiazdozbiór, the Strzały Peruna.
+        else if (look.constellation) await constellation(event, look.color, targets);
+        else if (look.perunarrows) await perunArrows(event, look.color, targets);
         else await (look.meteors ? meteors(event, look, targets) : look.volley ? volley(event, look.color, targets) : rain(look.color, targets));
         break;
       case 'bless':
@@ -12263,6 +13599,9 @@ export function skillEffects(kit) {
         else if (look.prism && event.kind === 'summon') await Promise.all([summonCreature(event, look), prismForm(event)]);
         else if (look.ancient && event.kind === 'summon') await Promise.all([summonCreature(event, look), ancientOak(event, look.color)]);
         else if (look.arrival && event.kind === 'summon') await (HUNT_CALLS.has(look.arrival) ? huntCall(event, look) : summonCreature(event, look));
+        // The fifth forms' stances: the Ostatni szał, the Triumf.
+        else if (look.bloodrage) await lastFrenzy(event.actor, look.color);
+        else if (look.triumph) await triumph(event.actor, look.color);
         // The fourth forms: the Jasnowidzenie's eye over the party.
         else if (look.seer) await clairvoyance(event.actor, look.color);
         else if (look.harmony) await harmony(event.actor, look.color);
@@ -12302,6 +13641,8 @@ export function skillEffects(kit) {
         else if (look.rampart) await rampart(event.actor, look.color);
         else if (look.iceheart) await iceHeart(event.actor, look.color);
         else if (look.lightwings) await wingsOfLight(event.actor, look.color);
+        // The fifth forms: the Ostoja.
+        else if (look.stronghold) await stronghold(event.actor, look.color);
         else if (look.dome) await dome(event.actor, look.color);
         else await (look.hexwall ? hexShield(event.actor, look.color) : bubble(event.actor, look.color));
         break;
@@ -12394,6 +13735,8 @@ export function skillEffects(kit) {
     // line through the formation, the Strzał z ukrycia's hiding.
     if (look.heart) heartMark(event.target, look.color);
     else if (look.comet) starAim(event, look.color);
+    // The fifth forms: the Kometa's star over its foe.
+    else if (look.cometfall) cometAim(event, look.color);
     else if (look.sightline) sightline(event, look.color);
     else if (look.hidden) hide(event);
     else if (look.reticle) reticle(event.target, look.color);
@@ -12436,6 +13779,8 @@ export function skillEffects(kit) {
     if (look.breach) return breachHit(event, look.color);
     if (look.challenger) return championStrike(event, look.color);
     if (look.comet) return starHit(event, look);
+    // The fifth forms' blows.
+    if (look.cometfall) return cometHit(event, look);
     if (look.orb === 'globe') return globeStrike(event, look.color);
     if (look.chief) return chiefBite(event);
     if (look.grizzly) return bearMaul(event, look.color);

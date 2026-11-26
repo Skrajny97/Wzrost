@@ -76,6 +76,10 @@
   "gods-champion-female": { "only": [[46, 30, 56, 43], [50, 64, 58, 72], [54, 55, 60, 61]] },
   "world-shield-male": { "add": ["cf8f5c", "c1855d"], "only": [[40, 29, 48, 39]] },
   "world-shield-female": { "only": [[39, 28, 46, 38]] },
+  "star-lord-male": { "only": [[39, 24, 50, 37], [52, 51, 59, 58]] },
+  "star-lord-female": { "only": [[37, 31, 46, 42], [51, 55, 57, 61]] },
+  "perun-son-male": { "drop": ["d5a369"], "only": [[44, 27, 52, 41], [55, 49, 65, 58]] },
+  "perun-son-female": { "drop": ["ac7b3d", "e0b15c"], "only": [[44, 29, 51, 39], [55, 53, 60, 60]] },
   "hunt-god-male": { "only": [[40, 25, 49, 41], [50, 49, 62, 59]] },
   "hunt-god-female": { "only": [[36, 27, 48, 43], [32, 41, 44, 57], [49, 51, 58, 59]] },
   "demiurge-male": { "add": ["ac7a51", "8a6042", "806146"], "only": [[40, 18, 47, 30], [50, 44, 60, 52]] },
@@ -90,6 +94,7 @@
   "heaven-sword-female": { "only": [[40, 24, 51, 39]] },
   "all-seeing-male": { "only": [[41, 17, 50, 33], [51, 47, 59, 55]] },
   "all-seeing-female": { "only": [[40, 26, 48, 36], [49, 50, 57, 57]] },
+  "navia-emperor-male": { "add": ["6c777d", "7d878d"], "only": [[41, 26, 47, 35]] },
   "navia-emperor-female": { "portrait": "navia-king-female", "only": [[38, 20, 46, 32]] },
   "dark-king-male": { "add": ["c1c0d0", "858498"], "drop": ["aaa9ae"], "only": [[46, 24, 55, 37]] },
   "dark-king-female": { "portrait": "dark-prince-female", "only": [[45, 30, 56, 40]] }

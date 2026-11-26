@@ -33,8 +33,9 @@ const RESULTS = { true: 'Zwycięstwo', false: 'Porażka', null: 'Odwrót', draw:
 // The events of a unit's own move, as its actor (a counter is not one).
 const MOVES = new Set(['hit', 'crit', 'dodge']);
 // 964: the marks a stance leaves on its card while it holds (skill-fx.js
-// `stance`: the Zniknięcie's faint figure, the Cień-sobowtór's shadow).
-const STANCE_MARKS = ['unit--vanished', 'unit--doubled'];
+// `stance`: the Zniknięcie's faint figure, the Cień-sobowtór's shadow; the
+// fifth forms' Ostatni szał and Oko burzy).
+const STANCE_MARKS = ['unit--vanished', 'unit--doubled', 'unit--frenzy', 'unit--stormeye'];
 const SPEED_KEY = 'wzrost.fight-speed';
 // The fight's tempo, one tap to the next and back to the first; 4× since
 // 0.2.98 (a player, poz. 45, 12.11.2026: „Czy możemy wprowadzić tempo walk

@@ -179,10 +179,13 @@ export function labyrinthMap(day, level, content) {
   // strongRooms.strength times stronger (labyrinthStrength). At most one a
   // row, and every room leads to two rooms of the next row or more, so
   // there is always a way around it; the first row, where every level
-  // starts, has none. Drawn from a seed of their own, so the rooms and the
-  // roads are what they would be without them.
+  // starts, has none, and neither has a level whose strongRooms is false
+  // (Poziom 1 since 26.11.2026, the author: „I co zrobiłeś z Labiryntem, że
+  // teraz ludzie padają jak muchy na pierwszym poziomie już”). Drawn from a
+  // seed of their own, so the rooms and the roads are what they would be
+  // without them.
   const strong = rules(content).strongRooms;
-  if (strong) {
+  if (strong && labyrinthLevel(level, content).strongRooms !== false) {
     const draw = createRng(`labyrinth:${day}:${level}:strong`);
     for (const rooms of rows.slice(1)) {
       const fights = rooms.filter((room) => room.type === 'fight');

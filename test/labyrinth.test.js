@@ -57,6 +57,7 @@ import {
   roomsAhead,
   simulateFight,
   spentRoom,
+  strongRoom,
   traitValue,
   upgradedArtifact,
 } from '../src/engine/index.js';
@@ -483,7 +484,7 @@ describe('the strong rooms (1253)', () => {
         assert.ok(map.rows[0].every((room) => !room.strong));
         map.rows.slice(1, -1).forEach((rooms, index) => {
           const row = index + 1;
-          rows += 1;
+          if (rules.levels[level - 1].strongRooms !== false) rows += 1;
           const strong = rooms.filter((room) => room.strong);
           assert.ok(strong.length <= 1, `${day} ${level} row ${row}`);
           assert.ok(strong.every((room) => room.type === 'fight'));
@@ -503,13 +504,13 @@ describe('the strong rooms (1253)', () => {
     const base = labyrinthStrength(2, 'fight', 60, content);
     assert.deepEqual(labyrinthStrength(2, 'fight', 60, content, 1, true), [base[0] * damage, base[1] * hp]);
     // An elite and the guardian are never strong rooms; the flag alone changes nothing for them in the map.
-    const day = days.find((one) => labyrinthMap(one, 1, content).rows.some((rooms) => rooms.some((room) => room.strong)));
-    const map = labyrinthMap(day, 1, content);
+    const day = days.find((one) => labyrinthMap(one, 2, content).rows.some((rooms) => rooms.some((room) => room.strong)));
+    const map = labyrinthMap(day, 2, content);
     const row = map.rows.findIndex((rooms) => rooms.some((room) => room.strong));
     const room = map.rows[row].findIndex((one) => one.strong);
     const { character, equipped } = strongClimber();
     const party = { character, equipped, name: 'Wspinacz', companions: [] };
-    const state = newLabyrinth({ day, charLevel: 60, companions: [], seed: 'test' });
+    const state = { ...newLabyrinth({ day, charLevel: 60, companions: [], seed: 'test' }), level: 2 };
     const enemyHp = (data) => labyrinthFight({ state, type: 'fight', row, room, party, seed: 'walka' }, data).fights[0].enemiesView.reduce((sum, enemy) => sum + enemy.maxHp, 0);
     const ratio = enemyHp(content) / enemyHp(without);
     assert.ok(Math.abs(ratio - hp) < 0.02 * hp, String(ratio));
@@ -517,6 +518,48 @@ describe('the strong rooms (1253)', () => {
     const weak = { character: newCharacter('mage', { level: 60, classLevel: 60 }), equipped: [], name: 'Słaby', companions: [] };
     const rank = (data) => DANGER_LEVELS.indexOf(roomDanger({ state, type: 'fight', row, room, party: weak, seed: 'danger' }, data));
     assert.ok(rank(content) >= rank(without));
+  });
+});
+
+describe('Poziom 1 without strong rooms (26.11.2026)', () => {
+  // The author: „I co zrobiłeś z Labiryntem, że teraz ludzie padają jak
+  // muchy na pierwszym poziomie już”: 95% of the days lost on Poziom 1 were
+  // lost in a strong room (DECISIONS.md, „Labirynt: Poziom 1 znów do
+  // przejścia”).
+  test('Poziom 1 has none, Poziomy 2, 3 and Piekielny keep them; strongRoom says what the map says; the level\'s flag in the data decides', () => {
+    assert.equal(rules.levels[0].strongRooms, false);
+    const counts = [0, 0, 0, 0];
+    for (const day of days) {
+      for (const level of [1, 2, 3, 4]) {
+        labyrinthMap(day, level, content).rows.forEach((rooms, row) =>
+          rooms.forEach((room, index) => {
+            if (room.strong) counts[level - 1] += 1;
+            assert.equal(strongRoom({ day, level }, row, index, content), Boolean(room.strong), `${day} ${level} ${row}:${index}`);
+          }),
+        );
+      }
+    }
+    assert.equal(counts[0], 0);
+    for (const level of [2, 3, 4]) assert.ok(counts[level - 1] > days.length, `level ${level}: ${counts[level - 1]} in ${days.length} days`);
+    // With the flag on, Poziom 1 would have them again.
+    const levels = rules.levels.map((level, index) => (index === 0 ? { ...level, strongRooms: true } : level));
+    const back = { ...content, labyrinth: { ...rules, levels } };
+    assert.ok(days.some((day) => labyrinthMap(day, 1, back).rows.some((rooms) => rooms.some((room) => room.strong))));
+  });
+
+  test('a fight of Poziom 1 is as strong as an ordinary one: no room of it is six times stronger', () => {
+    const { character, equipped } = strongClimber();
+    const party = { character, equipped, name: 'Wspinacz', companions: [] };
+    const levels = rules.levels.map((level, index) => (index === 0 ? { ...level, strongRooms: true } : level));
+    const back = { ...content, labyrinth: { ...rules, levels } };
+    const day = days.find((one) => labyrinthMap(one, 1, back).rows.some((rooms) => rooms.some((room) => room.strong)));
+    const row = labyrinthMap(day, 1, back).rows.findIndex((rooms) => rooms.some((room) => room.strong));
+    const room = labyrinthMap(day, 1, back).rows[row].findIndex((one) => one.strong);
+    const state = newLabyrinth({ day, charLevel: 60, companions: [], seed: 'test' });
+    const enemyHp = (data) => labyrinthFight({ state, type: 'fight', row, room, party: { ...party, fit: 1 }, seed: 'walka' }, data).fights[0].enemiesView.reduce((sum, enemy) => sum + enemy.maxHp, 0);
+    // The room that was strong is now an ordinary fight, 1 time, not 6.
+    const ratio = enemyHp(back) / enemyHp(content);
+    assert.ok(Math.abs(ratio - rules.strongRooms.strength[1]) < 0.02 * rules.strongRooms.strength[1], String(ratio));
   });
 });
 

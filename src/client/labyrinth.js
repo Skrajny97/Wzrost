@@ -319,7 +319,7 @@ function mountView(container, { navigate, board }) {
         'Wchodzi postać i do dwóch towarzyszy z Kwater, jak na wyprawę, o każdej porze, także w czasie wyprawy i pracy w profesji. Poziom to sześć rzędów komnat i strażnik na końcu; z komnaty prowadzą drogi do dwóch albo trzech komnat następnego rzędu. HP przechodzi z walki do walki, bez mikstur. Walka nie wygrana kończy Labirynt na dziś. Nagrody przychodzą od razu, po każdej zdobytej komnacie, więc nic nie przepada. Za zwykłą walkę zgarniesz PD i złoto, za elitę i skarb Odłamki Rdzenia i złoto, a za strażnika Artefakt do Rdzenia. Po elicie, strażniku i na ołtarzu wybierasz jedno z trzech błogosławieństw, które działa do końca dnia. Postęp przepada o północy.',
       ),
       t('Labirynt mierzy siłę Twojej drużyny (ekwipunek, Rdzeń i towarzysze) i do niej dobiera siłę stworów, więc każda drużyna spotyka w nim walki łatwe i trudne. Twoją przewagą są błogosławieństwa, HP zachowane po drodze i dobrze wybrana droga.'),
-      t('Na planszy bywają silne komnaty: zwykła walka, ale z dużo mocniejszymi stworami, zwykle z czerwoną obwódką. W rzędzie jest najwyżej jedna, więc zawsze da się ją ominąć.'),
+      t('Od 2. poziomu na planszy bywają silne komnaty: zwykła walka, ale z dużo mocniejszymi stworami, zwykle z czerwoną obwódką. W rzędzie jest najwyżej jedna, więc zawsze da się ją ominąć, a przed wejściem do niej gra zapyta, czy na pewno chcesz wejść.'),
       t('Za pierwsze dziś ukończenie poziomu, czyli pokonanie jego strażnika, zgarniesz dodatkowo Odłamki Rdzenia i złoto: im dalszy poziom, tym więcej, a najwięcej za 3. poziom i Piekielny.'),
       t('Po przegranej walce Labirynt można raz dziennie zacząć od nowa, za darmo. Do miejsca porażki komnaty nie dają nagród, tylko błogosławieństwa.'),
     ]);
@@ -746,10 +746,24 @@ function mountView(container, { navigate, board }) {
           type: 'button',
           class: 'button button--system',
           text: t('Wejdź'),
-          onClick: (event) => withButton(event.currentTarget, () => enter(row, index)),
+          onClick: (event) => withButton(event.currentTarget, () => (room.strong ? enterStrong(row, index) : enter(row, index))),
         }),
       ),
     );
+  }
+
+  // A strong room (1253 B) asks first, so that nobody walks in by accident
+  // (the author, 26.11.2026: „I co zrobiłeś z Labiryntem, że teraz ludzie
+  // padają jak muchy na pierwszym poziomie już”): „Wejdź” goes in, „Wybierz
+  // inną” back to the board, to pick another room.
+  async function enterStrong(row, index) {
+    const sure = await confirmAction({
+      title: t('Wejść do silnej komnaty?'),
+      text: t('To silna komnata: stwory są tu kilka razy mocniejsze niż zwykle, a porażka kończy dzisiejszy Labirynt.'),
+      confirmLabel: t('Wejdź'),
+      cancelLabel: t('Wybierz inną'),
+    });
+    if (sure) await enter(row, index);
   }
 
   async function enter(row, index) {
