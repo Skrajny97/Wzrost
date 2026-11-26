@@ -843,7 +843,7 @@
     "star-lord-female": {
       "start": "art/references/walks/start/star-lord-female.png",
       "pose": 2,
-      "description": "a young goddess of the night sky, a slender young woman with light warm skin, long straight black hair in a high ponytail hanging down her back at rest, lying flat on the back, not flying and not sticking out, a pretty young woman's face lit by soft silver light, a slim silver circlet, simple elegant armour of deep midnight indigo with silver edges shaped for a woman, a long indigo cape lined with silver hanging behind from the shoulders, indigo greaves and boots with silver edges, no crescent moon, no star, no bow, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+      "description": "a young goddess of the night sky, a slender young woman with light warm skin, long straight black hair in a high ponytail falling straight down from the top of the head and lying flat on her back in every frame, heavy and still, the same as in the first frame, never swept back, never flying out behind the head and never blown by wind, her own pretty young woman's face the same in every frame, lit by soft silver light, a slim silver circlet, simple elegant armour of deep midnight indigo with silver edges shaped for a woman, a long indigo cape lined with silver hanging behind from the shoulders, indigo greaves and boots with silver edges, no crescent moon, no star, no bow, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     },
     "perun-son-male": {
       "start": "art/references/walks/start/perun-son-male.png",
