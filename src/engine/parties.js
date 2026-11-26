@@ -91,6 +91,37 @@ export function partyPartView(part, content) {
   };
 }
 
+// The share of its fights' XP each player gets on a Drużyna's trip of
+// `players` players (1274 A, 26.11.2026). A party may skip its trip's time
+// together while only the one who skips pays (time.js), so it levelled far
+// faster than a player with its companions (a player, poz. 134: the game
+// leans too much on finding two others for a party); the author: „lepiej
+// osłabić drużyny na przykład uzyskiwanego expa mocno”. Each other player
+// takes parties.tripXpCost: a trio 0.64 instead of 0.91 (30% less), a duo
+// 0.82 instead of 0.955 (14% less). The character's class gets the same
+// XP. A player beside it in the Wieża Drużyn and a mercenary take
+// parties.xpCost, as before (towers.js, hunt.js).
+/**
+ * @param {number} players
+ * @param {Content} content
+ * @returns {number}
+ */
+export const partyTripXpShare = (players, content) => 1 - (players - 1) * content.balance.parties.tripXpCost;
+
+// How much less XP, in whole percent, each player gets from a Drużyna's
+// trip of `players` than from an exploration with companions in the places
+// of the party's other players (two; companionsGoingMost in companions.js),
+// for the Drużyna's "Jak to działa?": 32 in a trio and 13 in a duo.
+/**
+ * @param {number} players
+ * @param {Content} content
+ * @returns {number}
+ */
+export function partyTripXpLess(players, content) {
+  const withCompanions = 1 - (content.balance.parties.size - 1) * content.settlement.companions.xpCost;
+  return Math.round(100 * (1 - partyTripXpShare(players, content) / withCompanions));
+}
+
 /** @param {Content} content @returns {number} */
 const spreadOf = (content) => content.balance.parties.classSpread;
 

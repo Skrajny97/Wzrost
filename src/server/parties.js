@@ -82,6 +82,7 @@ import {
   partyFit,
   partyRange,
   partyStayText,
+  partyTripXpLess,
   portionsWanted,
   potionsPerKind,
   tripWanted,
@@ -373,6 +374,9 @@ export async function partyView(db, characterId, now) {
     },
     // The class levels a character invited now may have, and the spread.
     range: { ...partyRange(levels, content()), spread: content().balance.parties.classSpread },
+    // How much less XP, in percent, each gets from a trip of a trio and of
+    // a duo than with two companions (1274 A), for "Jak to działa?".
+    tripXpLess: { trio: partyTripXpLess(3, content()), duo: partyTripXpLess(2, content()) },
     invites: invites.results.map((row) => ({ partyId: row.party_id, invitedBy: row.invited_by, members: row.members ?? '', at: row.created_at })),
     unlockLevel: unlock().level,
     // Out of a party, the one question before making or joining one, when

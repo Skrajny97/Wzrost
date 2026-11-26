@@ -3384,6 +3384,41 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
+## Wersja 0.5.32 (26.11.2026): mniej XP z wypraw drużyny (1274 A)
+
+## Drużyna a gra w pojedynkę (1274 A, 26.11.2026)
+
+Gracz (poz. 134) napisał przez autora, że gra za bardzo zależy od znalezienia dwóch osób do drużyny: drużyna przewija czas wspólnie, więc awansuje bardzo szybko (do pierwszej dziesiątki w 3–4 dni), a gracz sam, z towarzyszami z Kwater, nie nadąża. Autor odpisał, że osobna opłata Punktami Czasu u każdego członka psułaby się, gdy ktoś nie ma Punktów Czasu, i zaproponował: „lepiej osłabić drużyny na przykład uzyskiwanego expa mocno albo coś”. Na stronie ocen wybrał 1274 A (30% mniej XP z wypraw drużyny), a odrzucił 1274 B (XP za przewinięty czas tylko dla tego, kto za niego zapłacił).
+
+1. **Przyczyna.** Przewinięcie wyprawy drużyny skraca ją wszystkim, a płaci tylko ten, kto przewija („Wspólny czas wyprawy drużyny”, 1.11.2026). Trio przewija więc Punktami Czasu trzech osób, a każdy dostaje XP za całą wyprawę. Poza tym drużyna nie miała przewagi w XP: na godzinę wyprawy dostawała 88–98% XP gracza z towarzyszami, idzie tylko tam, gdzie wejdzie najniższy z jej graczy, a Trudna i Piekielna wyprawa nie dają jej więcej XP niż zwykła wyprawa w najnowsze miejsce (punkt 4).
+2. **Zasada.** Na wyprawie drużyny każdy gracz obok zabiera 18% XP z walk zamiast 4,5% (`parties.tripXpCost` w `data/balance.json`). W trio każdy dostaje 64% XP zamiast 91%, czyli o 30% mniej niż dotąd, a w duecie 82% zamiast 95,5%, czyli o 14% mniej. Klasa dostaje XP wyprawy, więc też o tyle mniej. Premia za skład z dokumentu projektowego (solo +10% XP, w duecie +5%, w trio bez premii) jest teraz na wyprawach drużyny taka: solo +10%, w duecie −10%, w trio −30%, wobec XP bez premii. Duet traci mniej, bo przewija Punktami Czasu dwóch osób, nie trzech (wyrównałoby go ok. 19%).
+3. **Bez zmian:**
+   - wyprawa w pojedynkę i z towarzyszami z Kwater (każdy zabiera 3%);
+   - najemnik z Karczmy dalej zabiera 4,5% (`parties.xpCost`), bo nie przewija czasu za zleceniodawcę;
+   - Wieża Drużyn: gracz obok dalej zabiera 4,5%, bo w Wieżach nie ma czego przewijać;
+   - zdarzenia drużynowe na końcu wyprawy, jak dotąd bez kosztu za graczy, premia Kultywacji (liczona na końcu, jak dotąd), złoto i łupy.
+
+   Szybkie i Błyskawiczne polowanie nie bywają wyprawą drużyny, więc ich to nie dotyczy.
+4. **Pomiar** (silnik gry, realistyczny gracz z `tools/difficulty-sim.mjs`, 5 klas po 200 zwykłych wypraw 4 h w najnowsze miejsce; omdlenie zabiera całą wyprawę i daje karę XP, jak w grze). Dzień gracza: 4 godziny gry wyprawa za wyprawą, poza grą 4-godzinne wyprawy rano, w południe i na noc, a wszystkie Punkty Czasu idą na przewijanie wypraw. Punktów Czasu jest ok. 290 dziennie: 48 z zegara, 60 za czas w grze, ok. 90 z zadań i serii dni, ok. 60 z Prób Gildii, Upominków i listów gończych oraz ok. 30 z awansów i odłamków czasu. XP postaci z wypraw na dzień, w mln, na 50., 100. i 150. poziomie (w nawiasie: część XP gracza z towarzyszami):
+
+   | | Dziś | 1274 A |
+   | --- | --- | --- |
+   | Sam z towarzyszami | 1,02 / 2,30 / 3,45 | bez zmian |
+   | Trio, przewijają wszyscy | 1,48 / 3,36 / 4,49 (145 / 146 / 130%) | 1,03 / 2,34 / 3,13 (101 / 102 / 91%) |
+   | Trio, przewija jedna osoba | 0,99 / 2,25 / 3,02 (96 / 98 / 88%) | 0,69 / 1,57 / 2,11 (67 / 68 / 61%) |
+
+   - Na godzinę zwykłej wyprawy w najnowsze miejsce (XP netto): sam z towarzyszami 49,1 / 110,7 / 166,0 tys., trio dotąd 47,3 / 108,0 / 145,6 tys. (96 / 98 / 88%), a teraz ok. 33,3 / 75,9 / 102,4 tys. (68 / 69 / 62%).
+   - Trudna wyprawa w najnowsze miejsce kończy się omdleniem w 37–52% wypraw samemu i w 27–42% w trio. O miejsce niżej obie strony nie mdleją, ale dostają mniej XP niż ze zwykłej wyprawy w najnowsze miejsce.
+   - Piekielna wyprawa o miejsce niżej: na 100. i 150. poziomie trio mdleje w 1–3% wypraw, a gracz z towarzyszami w 26–39%. Tu przewaga drużyny zostaje, ale w złocie i łupach, nie w XP.
+   - Ile trzeba uciąć, zależy od tego, ile się gra. Przy dniu z tabeli wyrównuje 31 / 31,5 / 23%. Gdy poza 4 godzinami gry idzie tylko wyprawa na noc (8 godzin wypraw zamiast 16), trzeba 42 / 43 / 36%, a z 30% takie trio ma ok. 120% XP (na 150. poziomie 108%). Przy 200 Punktach Czasu dziennie zamiast 260 spoza wypraw i awansów wystarczy 27 / 27 / 19%.
+   - Drużyna, która nie przewija, ma teraz 61–68% XP gracza z towarzyszami, który też nie przewija (dotąd 88–98%).
+   - Odrzucony wariant 1274 B dawałby trio, w którym przewijają wszyscy, 96 / 98 / 88%, bez zmian dla drużyn, które nie przewijają.
+5. **Na ekranie.** W Społeczności, w Drużynie, pod „Jak to działa?”, po zdaniu o wspólnym czasie stoi: „Drużyna może wspólnie przewijać czas, więc z wyprawy drużyny każdy dostaje mniej XP niż z wyprawy z dwoma towarzyszami: w trio o 32%, a w duecie o 13%.” Gracz porównuje drużynę z wyprawą z towarzyszami, a nie z dawną zasadą, więc zdanie podaje liczby wobec dwóch towarzyszy (64% wobec 94% i 82% wobec 94%). Liczby liczy serwer z danych (`tripXpLess` w widoku Drużyny). Zagrożenie i ekran Walki nie pokazują XP wyprawy, więc nic więcej się nie zmienia. To jedno zdanie w istniejącym miejscu, więc bez makiet. Po angielsku od razu (zasada z 6.11.2026).
+6. **Brakujące szczegóły, rozstrzygnięte najprościej:**
+   - Wyprawa liczy walki przy odbiorze raportu, więc wyprawa drużyny, która wyruszyła przed tą zmianą, kończy się już według nowej zasady.
+   - Kto zawrócił z wyprawy drużyny, nie liczy się do jej składu, więc wyprawa dwóch pozostałych liczy się jak duet.
+7. **Kod i testy.** Silnik: `partyTripXpShare` i `partyTripXpLess` w `src/engine/parties.js`, `partyXp` w `simulateHunt` (`src/engine/hunt.js`). Serwer: `tripXpLess` w `partyView` (`src/server/parties.js`). Strona: zdanie w `src/client/screens/party.js`, po angielsku w `data/en/strings.json`. Dane: `parties.tripXpCost` ze schematem. Testy: `test/party-trip-xp.test.js` (w trio każda walka wyprawy daje o 30% mniej XP, w duecie o 14%, klasa tak samo; w pojedynkę, z towarzyszem, z najemnikiem i w Wieży Drużyn bez zmian; liczby „Jak to działa?”) i `test/party-trip-xp-page.test.js` (zdanie u lidera i u członka).
+
 ## Wersja 0.5.31 (26.11.2026): Arena przez mechanikę, bez mnożników pojedynków (1271 B)
 
 ## Arena przez mechanikę (1271 B, 26.11.2026)
@@ -13552,7 +13587,7 @@ Autor: „sprawdz klatka po klatce to wideo i zobacz ze na komputerze nie da sie
 
 Autor: „Postać z drużyny moze przewijać eksplorację ale to nie przewija wszystkim, a musi nawet jesli nie jest liderem. Musi być wspólny timer. Niech ta drużyna daje jakies korzyści sensowne w ten sposób.”, „I niech sie wyswietla komunikat na górze innym graczom z drużyny w ekranie Walki i w raporcie - xxx przewinął czas o xxx” oraz „I jeśli dwie osoby z drużyny pójdą na wyprawę  a trzecia w tym czasie nie mogła to niech się nie okaże, że jednak 3 walczą”.
 
-1. **Wspólny czas.** Wyprawy członków z jednego wyjścia drużyny mają wspólny czas. „Przewiń” dowolnego członka, także nie lidera, skraca je wszystkim o tyle samo. Płaci Punktami Czasu tylko ta osoba, która przewija, i na tym polega korzyść z drużyny. Testowy przycisk „Pomiń czas” na wersji testowej też kończy wyprawę całej drużynie.
+1. **Wspólny czas.** Wyprawy członków z jednego wyjścia drużyny mają wspólny czas. „Przewiń” dowolnego członka, także nie lidera, skraca je wszystkim o tyle samo. Płaci Punktami Czasu tylko ta osoba, która przewija, i na tym polega korzyść z drużyny. Testowy przycisk „Pomiń czas” na wersji testowej też kończy wyprawę całej drużynie. *Od 26.11.2026 wyprawa drużyny daje za to mniej XP: zob. „Drużyna a gra w pojedynkę (1274 A, 26.11.2026)”.*
 2. **Komunikat.** Pozostali widzą u góry ekranu Walki w czasie wyprawy i w raporcie: „Radomir przewinął czas o 8 min.” Słowo dopasowuje się do wyglądu postaci, „przewinęła” przy postaci kobiecej, jak w kwestiach narratora i towarzyszy (brakujący szczegół). Kilka przewinięć jednej osoby sumuje się w jeden wpis. Ekran otwarty u innych członków dowiaduje się o przewinięciu przy sprawdzaniu czatu, najpóźniej po 15 sekundach, i odświeża czas.
 3. **Walczą tylko ci, którzy wyruszyli.** Członek przy profesji albo na własnej wyprawie i tak nie wyrusza. Jeśli ktoś zajmie się czymś w tej samej chwili, w której lider wyrusza, wyprawy pozostałych zapisują się bez niego: nie walczy u nich i nie ma go w składzie. Gdy członek przerwie wyprawę w trakcie, znika z walk i ze składu pozostałych (brakujący szczegół). Wolne miejsca w drużynie zajmują jak dotąd towarzysze z Kwater, więc przy dwóch graczach w walce mogą stać trzy postacie: dwie graczy i towarzysz.
 4. **Opis.** Karta drużyny mówi: „Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.”, a ekran wyprawy: „Wyprawa drużyny ma wspólny czas: przewinięcie skraca ją wszystkim.” Okno „Przewinąć czas?” zaczyna się od „Wyprawa drużyny, dla wszystkich”.
@@ -13739,7 +13774,7 @@ Autor: „Następnie przygotuj podwaliny a najlepiej cały system Drużyn. Wdró
 3. **Wychodzenie.** Członek opuszcza drużynę jednym przyciskiem, np. gdy chce zająć się profesjami. *Zmienione 1.11.2026: przy profesji nie trzeba wychodzić z drużyny, zob. „Drużyna a profesje, zapraszanie do Gildii ze znajomych”.* Lider może też usunąć członka i cofnąć zaproszenie. Gdy lider odchodzi, drużynę prowadzi ta postać, która dołączyła najwcześniej. Drużyna bez członków znika.
 4. **Wyprawa drużyny.** Lider wybiera w Walce miejsce i czas, zaznacza „Z drużyną: …” i stuka „Wyrusz”. Idą ci członkowie, którzy nie mają innych zajęć i grają tą postacią. Każdy z nich musi mieć to miejsce i ten czas odblokowane, więc drużyna idzie najwyżej tam i tak długo, jak najniższa postać. Postać z innymi zajęciami zostaje w obozie. *Warunek „grają tą postacią” jest nieaktualny: idzie też postać, którą gracz akurat nie gra, zob. „Drużyna niezależna od zmiany postaci”.*
 5. **Walka i łupy.** Każdy członek dostaje własną wyprawę w to samo miejsce, na ten sam czas, a pozostali walczą przy nim tacy, jacy byli przy wyjściu, każdy z własnym HP. Każdy dostaje własny raport, złoto, przedmioty i materiały. Raport podaje skład drużyny. Mikstury i tropienie lider wybiera tylko dla siebie (brakujący szczegół).
-6. **Kara za skład.** Jak w dokumencie projektowym: solo +10% XP, w duecie +5%, w trio bez premii. Każdy członek drużyny zabiera pozostałym 4,5% ich XP z walk. Wolne miejsca do trzech zajmują towarzysze z Kwater: w trio żaden nie idzie, a w duecie jeden. *Od 0.0.83 drużyna poluje bez towarzyszy z Kwater: zob. „Towarzysze: ulepszanie przedmiotów i pobyt w kwaterze”, punkt 10.*
+6. **Kara za skład.** Jak w dokumencie projektowym: solo +10% XP, w duecie +5%, w trio bez premii. Każdy członek drużyny zabiera pozostałym 4,5% ich XP z walk. Wolne miejsca do trzech zajmują towarzysze z Kwater: w trio żaden nie idzie, a w duecie jeden. *Od 0.0.83 drużyna poluje bez towarzyszy z Kwater: zob. „Towarzysze: ulepszanie przedmiotów i pobyt w kwaterze”, punkt 10.* *Od 26.11.2026 na wyprawie drużyny każdy gracz obok zabiera 18%: zob. „Drużyna a gra w pojedynkę (1274 A, 26.11.2026)”.*
 7. **Na razie bez:** Szybkiego Polowania drużyną i wspólnego zagrożenia przed wyprawą (lider widzi zagrożenie swojej postaci). Wieże dojdą później. *Wspólne zagrożenie jest od 24.11.2026: zob. „Drużyna: wspólny raport, bez blokad”, punkt 10.*
 8. **Migracja bazy:** 0063 (tabele `parties`, `party_members`, `party_invites`).
 
