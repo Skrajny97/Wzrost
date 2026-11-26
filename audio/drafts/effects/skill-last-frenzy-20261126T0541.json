@@ -1,0 +1,13 @@
+{
+  "id": "skill-last-frenzy",
+  "payload": {
+    "text": "a berserker going into a last bloody frenzy: a loud savage war scream, then a roaring burst of fire and three fast heavy axe hits on steel armour with sharp metallic clangs, epic and cinematic, punchy and clean, no heartbeat, no hiss, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-last-frenzy-20261126T0541-0.mp3",
+    "audio/drafts/effects/skill-last-frenzy-20261126T0541-1.mp3"
+  ],
+  "credits": 72
+}
