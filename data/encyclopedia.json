@@ -39,9 +39,9 @@
     { "gold": 1525908, "timePoints": 120, "systemPoints": 100 }
   ],
   "milestones": {
-    "potions": [4, 8, 12, 16],
-    "herbs": [3, 6, 9, 13],
-    "materials": [10, 25, 50, 88],
+    "potions": [4, 8, 12, 16, 20, 24, 28, 31],
+    "herbs": [3, 6, 9, 13, 16, 18],
+    "materials": [10, 25, 50, 88, 125, 175, 225, 275, 309],
     "parts": [3, 5, 7],
     "minerals": [3, 6, 10]
   },

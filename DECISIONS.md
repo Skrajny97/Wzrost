@@ -3384,6 +3384,19 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
+## Wersja 0.5.28 (26.11.2026): więcej skrzyń za odkrycia w Encyklopedii
+
+## Więcej skrzyń za odkrycia w Encyklopedii (26.11.2026)
+
+Autor: „Powinno być więcej skrzyń za odkrycia w Encyklopedii, skoro jest więcej materiałów itp.”. Progi odkryć (`milestones` w `data/encyclopedia.json`) kończyły się na 16 miksturach, 13 ziołach i 88 materiałach, a gra ma dziś 31 mikstur, 18 ziół i 309 materiałów. Części (7) i minerały (10) miały już próg na całość.
+
+1. **Nowe progi**, dopisane za dotychczasowymi, więc otwarte skrzynie zostają otwarte (skrzynia to `zakładka:próg`):
+   - mikstury: 20, 24, 28 i 31 (do tej pory 4, 8, 12 i 16);
+   - zioła: 16 i 18 (do tej pory 3, 6, 9 i 13);
+   - materiały: 125, 175, 225, 275 i 309 (do tej pory 10, 25, 50 i 88).
+2. **Nagrody** idą dalej po tej samej liście skrzyń (`chests`): kolejny próg daje kolejną skrzynię. Ostatnia skrzynia materiałów (309) daje 97 658 złota, 90 Punktów Czasu i 100 Punktów Systemu, ostatnia mikstur (31) 39 063 złota, ostatnia ziół (18) 6250 złota.
+3. **Postacie, które mają już więcej odkryć,** od razu widzą nowe skrzynie do otwarcia.
+
 ## Wersja 0.5.27 (26.11.2026): statystyki liczone jako inna widać na ekranie
 
 ## Statystyki liczone jako inna (26.11.2026)

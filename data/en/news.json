@@ -1444,6 +1444,10 @@
     "0.5.27": {
       "title": "Version 0.5.27",
       "body": "- When your evolution counts one stat as another (e.g. the Grand Inquisitor's Intellect as Strength, or the Necromancer's Dexterity as Intellect), the game now says so. On the item card such a line reads \"counts as Strength\".\n- In Stats the Intellect row shows how many of its points count as Strength and where they come from, and the Strength row how much of it is Intellect. The numbers in fights have not changed: these points already worked before, it just wasn't shown."
+    },
+    "0.5.28": {
+      "title": "Version 0.5.28",
+      "body": "- Encyclopedia: more chests for discoveries, because the game has more materials, potions and herbs. New thresholds: potions 20, 24, 28 and 31, herbs 16 and 18, materials 125, 175, 225, 275 and 309. If you already have that many discoveries, the new chests are waiting to be opened."
     }
   }
 }
