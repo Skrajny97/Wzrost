@@ -3483,14 +3483,15 @@ export function skillEffects(kit) {
       const middle = { x: art.x + art.width / 2, y: art.y + art.height * 0.5 };
       return [-0.22, 0.2, 0].map((dx, step) => {
         const spot = { x: middle.x + dx * figure, y: middle.y + (step === 2 ? 0.06 : -0.06) * figure };
-        return starfall(id, spot, figure, 140 + index * 110 + step * 190, mark, step === 2);
+        return iceStarFall(id, spot, figure, 140 + index * 110 + step * 190, mark, step === 2);
       });
     });
     await Promise.all(landings);
   }
 
-  // One star of ice falling and breaking where it lands.
-  function starfall(id, point, figure, delay, mark, last) {
+  // One star of ice falling and breaking where it lands. (Its own name: the
+  // fourth forms' starfall() below is another function.)
+  function iceStarFall(id, point, figure, delay, mark, last) {
     const size = Math.round(figure * (last ? 0.46 : 0.34));
     const star = spark('fx-icestar', { x: 0, y: 0 }, { '--size': `${size}px` });
     star.innerHTML = ICE_STAR;
