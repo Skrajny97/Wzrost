@@ -421,7 +421,7 @@
       "description": "The lord of thunderbolts. When they draw the bow, the sky darkens and lightning leaps from enemy to enemy.",
       "trait": {
         "name": "Lord of the Storm",
-        "text": "Every arrow has a 35% chance to add 60% lightning damage, and the target then loses 40% speed. The bolt from the struck arrowhead leaps on to every next enemy in turn, each time 25% weaker."
+        "text": "Every arrow has a 35% chance to add 60% lightning damage, and the target then loses 20% speed. The bolt from the struck arrowhead leaps on to every next enemy in turn, each time 25% weaker."
       }
     },
     "beast-lord": {
@@ -460,7 +460,7 @@
       "description": "The oldest of the druids. The forest grows from their wisdom, and its creatures stand by them in battle.",
       "trait": {
         "name": "Roots of the World",
-        "text": "+50% mana and up to four summons at once: two Oaks of Ages, the Bison and the Bear. 6% of mana comes back every turn, and summons have 40% more HP and deal 40% more damage. Every 20 points of Wisdom give the summons another 1% HP and damage. Each summon also gets an extra 75% of the character's max HP and draws the enemies' blows onto itself. In the System Towers the Oaks of Ages' roots slow enemies only a fifth as much."
+        "text": "+50% mana and up to four summons at once: two Oaks of Ages, the Bison and the Bear. 6% of mana comes back every turn, and summons have 40% more HP and deal 40% more damage. Every 20 points of Wisdom give the summons another 1% HP. Each summon also gets an extra 75% of the character's max HP and draws the enemies' blows onto itself. In the System Towers the Oaks of Ages' roots slow enemies 15% more."
       }
     },
     "archangel": {
@@ -598,7 +598,7 @@
       "description": "The wilds have heeded this voice forever. At a single word oaks rise from the ground and the herd charges into battle.",
       "trait": {
         "name": "Soul of the Wilds",
-        "text": "+60% mana and up to five summons at once: two Eternal Oaks, the Bison, the Bear and the Elk. 7% of mana comes back every turn, and summons have 60% more HP and deal 50% more damage. Every 15 points of Wisdom give the summons another 1% HP and damage. Each summon also gets an extra 75% of the character's max HP and draws the enemies' blows onto itself. In the System Towers the Eternal Oaks' roots slow enemies only a fifth as much."
+        "text": "+60% mana and up to five summons at once: two Eternal Oaks, the Bison, the Bear and the Elk. 7% of mana comes back every turn, and summons have 60% more HP and deal 50% more damage. Every 15 points of Wisdom give the summons another 1% HP. Each summon also gets an extra 75% of the character's max HP and draws the enemies' blows onto itself. In the System Towers the Eternal Oaks' roots slow enemies 63% less."
       }
     },
     "seraph": {
@@ -1002,13 +1002,13 @@
       "name": "Final Verdict",
       "style": "attack",
       "description": "The verdict falls before the enemy does. Holy fire finishes what steel began.",
-      "effect": "A sacred verdict dealing {power%} damage to an enemy with less than {below%} HP left."
+      "effect": "A sacred verdict dealing {power%} damage to an enemy with less than {below%} HP left. A lone enemy is struck at any HP."
     },
     "pyre": {
       "name": "Pyre",
       "style": "area",
       "description": "Holy fire kindles beneath the Grand Inquisitor's enemies. It burns for as long as the Inquisitor wills it.",
-      "effect": "For {turns} of the character's turns, holy fire burns the enemies: on each of the character's turns, every enemy takes {power%} sacred damage."
+      "effect": "For {turns} of the character's turns, holy fire burns the enemies: on each of the character's turns, every enemy takes {power%} sacred damage, and a lone enemy {single%}."
     },
     "choir": {
       "name": "Choir",
@@ -1220,7 +1220,7 @@
       "name": "Last Judgment",
       "style": "attack",
       "description": "Every sinner awaits the day of judgment. The Demon Slayer brings it sooner.",
-      "effect": "A sacred verdict dealing {power%} damage to an enemy with less than {below%} HP left. Spirits and demons take {familyBonus%} more."
+      "effect": "A sacred verdict dealing {power%} damage to an enemy with less than {below%} HP left. Spirits and demons take {familyBonus%} more. A lone enemy is struck at any HP."
     },
     "holy-seal": {
       "name": "Holy Seal",
@@ -1310,7 +1310,7 @@
       "name": "Wrath of the Mountain",
       "style": "area",
       "description": "The Titan strikes the ground with the shield like an avalanche. The earth cracks under the whole enemy line.",
-      "effect": "A blow of the shield at the ground deals every enemy {power%} damage, without a miss, and a single enemy {single%}. Every enemy struck may lose its next turn ({stunChance%} chance).",
+      "effect": "A blow of the shield at the ground deals every enemy {power%} damage, without a miss and through all armour, and a single enemy {single%}. Every enemy struck may lose its next turn ({stunChance%} chance).",
       "params": {
         "stunLabel": "stunned"
       }
@@ -1443,7 +1443,7 @@
       "name": "Divine Healing",
       "style": "healing",
       "description": "The Archangel spreads their arms, and light falls on the party like rain.",
-      "effect": "Once a fight, when HP falls below {below%}, heals the whole party by {heal%.1} of max HP and 1 HP for every {wisdomPerHp} points of Wisdom, and removes bad effects from it. Then for {hotTurns|turn|turns|turns} heals each by {hot%} of max HP."
+      "effect": "When HP falls below {below%}, heals the whole party by {heal%.1} of max HP and 1 HP for every {wisdomPerHp} points of Wisdom, and removes bad effects from it. Then for {hotTurns|turn|turns|turns} heals each by {hot%} of max HP."
     },
     "wings-of-light": {
       "name": "Wings of Light",
@@ -1455,7 +1455,7 @@
       "name": "Day of Wrath",
       "style": "attack",
       "description": "Heaven passes its sentence. When one sinner falls, the judgement goes on.",
-      "effect": "A sacred sentence of {power%} damage at an enemy with less than {below%} HP left. Spirits and demons take {familyBonus%} more. When the target falls, the sentence falls on the next enemy for {onKill%} damage."
+      "effect": "A sacred sentence of {power%} damage at an enemy with less than {below%} HP left. Spirits and demons take {familyBonus%} more. When the target falls, the sentence falls on the next enemy for {onKill%} damage. A lone enemy is struck at any HP."
     },
     "pillar-of-light": {
       "name": "Pillar of Light",
@@ -1545,7 +1545,7 @@
       "name": "Wrath of the Earth",
       "style": "area",
       "description": "The Shield of the World strikes the ground, and the ground answers. It cracks under the whole enemy line, as if the world wanted to throw them off.",
-      "effect": "A blow of the shield into the ground deals every enemy {power%} damage, without a miss, and a single enemy {single%}. Every enemy struck has a {stunChance%} chance to lose its next turn.",
+      "effect": "A blow of the shield into the ground deals every enemy {power%} damage, without a miss and through all armour, and a single enemy {single%}. Every enemy struck has a {stunChance%} chance to lose its next turn.",
       "params": {
         "stunLabel": "stunned"
       }
@@ -1685,7 +1685,7 @@
       "name": "Fiery Sword",
       "style": "attack",
       "description": "A sword of white fire falls like a sentence from heaven. When one sinner falls, the fire seeks the next, until no one is left.",
-      "effect": "A sacred sentence dealing {power%} damage to an enemy with less than {below%} HP left. Spirits and demons take {familyBonus%} more. When the target falls, the sentence falls on the next enemy for {onKill%} damage, and so on, as long as they keep falling."
+      "effect": "A sacred sentence dealing {power%} damage to an enemy with less than {below%} HP left. Spirits and demons take {familyBonus%} more. When the target falls, the sentence falls on the next enemy for {onKill%} damage, and so on, as long as they keep falling. A lone enemy is struck at any HP."
     },
     "heavenly-host": {
       "name": "Heavenly Host",

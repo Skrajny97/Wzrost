@@ -20,9 +20,12 @@
 // its summons fell to a single blow and it climbed the Wieża Solo poorly):
 // - in the players' duels the line's own blows are as anyone's (no
 //   duelPower: the Druid had ×1.9, the Arcydruid ×1.3, the Pradruid ×0.8 on
-//   all its blows), and its duel strength is in its summons' blows
-//   (evolutions.json duelSummonPower: Druid 1.35, Arcydruid 0.8, Pradruid
-//   0.42), so the Arena's table shows the attack its blows have;
+//   all its blows), so the Arena's table shows the attack its blows have;
+//   its duel strength was in its summons' blows (duelSummonPower: Druid
+//   1.35, Arcydruid 0.8, Pradruid 0.42) until 1271 B, and since then no
+//   form has a strength of its own in duels (DECISIONS.md, „Arena przez
+//   mechanikę (1271 B, 26.11.2026)”): the Pradruid's Wisdom gives its
+//   summons HP only and its oaks root half as much, everywhere;
 // - its summons draw the foes' blows: while one stands, the foes and their
 //   summons choose among such Druids only and the summon in front takes
 //   the blow (the trait's `lure`; combat.js lured, after Wyzwanie's
@@ -233,7 +236,7 @@ describe('the Druid line\'s summons draw the foes\' blows and stand longer', () 
     assert.equal(content.evolutionsById.arcanist.trait.params.summonLife, undefined);
   });
 
-  test('its summons stand against an elite and a champion: none falls to the first blow it takes, and no blow takes more than 90% of a summon\'s HP', () => {
+  test('its summons stand against an elite and a champion: none falls to the first blow it takes, and no blow takes more than 97% of a summon\'s HP', () => {
     // The game without the share of the maximum HP.
     const frail = (() => {
       const raw = loadData();
@@ -276,12 +279,16 @@ describe('the Druid line\'s summons draw the foes\' blows and stand longer', () 
     // elite's first blow and a blow took up to 1.8 times a summon's HP; at
     // level 300 8 of 84 to the champion's, up to 2 times. With 75% of the
     // Druid's HP the biggest blow took 0.37–0.74 of a summon's HP until the
-    // gear of Tiers XI and XII (0.5.13), with it 0.37–0.81.
+    // gear of Tiers XI and XII (0.5.13), with it 0.37–0.81 and 0.89 at level
+    // 300 (the bound was 0.9). Since 1271 B the Pradruid's oaks root half as
+    // much, so the champion of level 300 strikes its summons more often (39
+    // blows over the 16 fights instead of 26, as big as before) and the
+    // biggest of them took 0.95.
     for (const [level, kind] of [[170, 'elite'], [250, 'elite'], [250, 'champion'], [300, 'champion']]) {
       const now = against(level, kind, content);
       assert.ok(now.summons >= 30, `${level} ${kind}: ${now.summons} summons`);
       assert.equal(now.firstBlow, 0, `${level} ${kind}`);
-      assert.ok(now.worst < 0.9, `${level} ${kind}: a blow took ${now.worst.toFixed(2)} of a summon's HP`);
+      assert.ok(now.worst < 0.97, `${level} ${kind}: a blow took ${now.worst.toFixed(2)} of a summon's HP`);
     }
     const weak = against(250, 'elite', frail);
     assert.ok(weak.firstBlow > 0 && weak.worst > 1, JSON.stringify(weak));
@@ -308,38 +315,39 @@ describe('the Druid line on explorations (tools/class-balance-sim.mjs)', () => {
 });
 
 describe('the Druid line in duels', () => {
-  test('its own blows are as anyone\'s, the Arena\'s table shows the attack the fight uses, and its duel strength is in its summons\' blows', () => {
-    // Before: duelPower 1.9, 1.3 and 0.8 on all its blows; the Arena's table
-    // showed a Druid's plain attack nearly twice an Arcymag's with the same
-    // staff and Intelekt.
-    assert.deepEqual(FORMS.map((id) => content.evolutionsById[id].duelPower), [undefined, undefined, undefined]);
-    assert.deepEqual(FORMS.map((id) => content.evolutionsById[id].duelSummonPower), [1.35, 0.8, 0.42]);
+  test('its own blows and its summons\' are as on an exploration, and the Arena\'s table shows the attack the fight uses (1271 B: no strength of its own in duels)', () => {
+    // Before 0.5.11: duelPower 1.9, 1.3 and 0.8 on all its blows, and the
+    // Arena's table showed a Druid's plain attack nearly twice an Arcymag's
+    // with the same staff and Intelekt; until 1271 B its summons' blows
+    // 1.35, 0.8 and 0.42 times as strong in duels (duelSummonPower).
+    for (const key of ['duelPower', 'duelHp', 'duelSummonPower']) assert.deepEqual(FORMS.map((id) => content.evolutionsById[id][key]), [undefined, undefined, undefined], key);
     for (const level of [100, 200, 300]) {
       const { character, equipped } = druidAt(level);
       const plain = playerCombatant({ character, equipped, name: 'Druid' }, content);
       const duel = duelist({ character, equipped, name: 'Druid' }, 'a0', 'ally', { factor: 3, armor: 0.45 }, content);
       assert.equal(duel.damageScale, plain.damageScale, character.evolution);
       assert.equal(combatantView(duel, level, content).damage, combatantView(plain, level, content).damage);
-      assert.equal(duel.summonScale, content.evolutionsById[character.evolution].duelSummonPower);
+      assert.equal(duel.summonScale, undefined);
       assert.equal(duel.baseMaxHp, plain.maxHp);
-      // A summon's blow in a duel: its power times the form's strength.
+      // Its summons strike in a duel.
       const result = arenaDuel({ attacker: { character, equipped, name: 'Druid' }, defender: { ...playerOf('realistic', 'warrior', level, content, 1), name: 'Rywal' }, seed: `druid-power:${level}` }, content);
       assert.ok(result.fight.events.some((event) => event.actor === 'a0' && ['hit', 'crit'].includes(event.kind) && content.skillsById[event.skill]?.kind === 'summon'));
     }
-    // Outside duels nothing of it.
-    const { character, equipped } = druidAt(100);
-    assert.equal(playerCombatant({ character, equipped, name: 'Druid' }, content).summonScale, undefined);
   });
 
-  test('in a duel its summons strike with the form\'s summon strength and take 75% of the HP before the duel\'s factor', () => {
+  test('in a duel its summons take 75% of the HP before the duel\'s factor on top of their share of the mana, as on an exploration', () => {
     const { character, equipped } = druidAt(100);
-    const duel = duelist({ character, equipped, name: 'Druid' }, 'a0', 'ally', { factor: 3, armor: 0.45 }, content);
-    const rival = { ...monsterCombatant({ monsterId: 'boar', level: 98, id: 'e0' }, content), hp: 1e6, maxHp: 1e6 };
-    const result = simulateFight({ allies: [duel], enemies: [rival], rng: createRng('druid-duel-summon'), content, record: true, maxActions: 20 });
-    const up = result.events.find((event) => event.kind === 'summon' && event.state === 'up' && event.skill === 'ent-summon');
+    // The duel's HP and the HP before its factor.
+    const [duel, even] = [3, 1].map((factor) => duelist({ character, equipped, name: 'Druid' }, 'a0', 'ally', { factor, armor: 0.45 }, content));
+    const summonHp = (unit) => {
+      const rival = { ...monsterCombatant({ monsterId: 'boar', level: 98, id: 'e0' }, content), hp: 1e6, maxHp: 1e6 };
+      const result = simulateFight({ allies: [unit], enemies: [rival], rng: createRng('druid-duel-summon'), content, record: true, maxActions: 20 });
+      return result.events.find((event) => event.kind === 'summon' && event.state === 'up' && event.skill === 'ent-summon').summonHp;
+    };
     const share = duel.skills.find((one) => one.id === 'ent-summon').params.hp;
     // Not the duel's tripled HP.
-    assert.equal(up.summonHp, Math.max(1, Math.round(duel.maxMana * share * 1.3 + duel.baseMaxHp * 0.75)));
+    assert.equal(summonHp(duel), Math.max(1, Math.round(duel.maxMana * share * 1.3 + duel.baseMaxHp * 0.75)));
+    assert.equal(summonHp(duel), summonHp(even));
     assert.ok(duel.maxHp > 2.5 * duel.baseMaxHp);
   });
 
@@ -350,7 +358,11 @@ describe('the Druid line in duels', () => {
     // all in Mądrość. Before (×1.9 on all its blows): up to 41% and 46% of
     // the rival's HP and a kill in three moves; the other second forms' own
     // biggest blows at those levels go up to 70–107% (the Berserker's, the
-    // Wielki Inkwizytor's, the Arcymag's).
+    // Wielki Inkwizytor's, the Arcymag's). Enough kills to tell the fastest:
+    // since 1271 B (no strength of its own in duels, until then ×1.35 on its
+    // summons' blows) the Druid with all its points in Intelekt or in
+    // Mądrość kills 21–47 times in 192 duels (31–62 before), its biggest
+    // blow 0.19–0.24 of the rival's HP, its fastest kill in 4–7 moves.
     const builds = { realistic: null, intellect: { intellect: 1 }, wisdom: { wisdom: 1 } };
     // A draw of the realistic player with all its points in the stats of
     // `split` (shares).
@@ -390,7 +402,7 @@ describe('the Druid line in duels', () => {
           }
         }
         const told = `level ${level}, ${build}`;
-        assert.ok(kills > 30, `${told}: ${kills} kills`);
+        assert.ok(kills >= 20, `${told}: ${kills} kills`);
         assert.ok(biggest < 1 / 3, `${told}: a blow of ${biggest.toFixed(2)} of the rival's HP`);
         assert.ok(fastest >= 4, `${told}: a kill in ${fastest} moves`);
       }
@@ -415,15 +427,20 @@ describe('the Druid line in duels', () => {
   });
 });
 
-describe('the Pradruid in the Wieże (1249 B)', () => {
+describe('the Pradruid in the Wieże (1249 B, re-tuned in 1271 B)', () => {
   // The author's choice 1249 B: the Pradruid weaker in the Wieże only, so
   // that it climbs about as high as the best other fourth form at every
   // level. The two oaks' roots pushed every move of its foe back, so the foe
   // hardly ever struck and the Pradruid climbed some 200 floors above the
-  // other fourth forms (less HP for its summons hardly changed that). Now
-  // its roots slow at a fifth of their strength there (evolutions.json
+  // other fourth forms (less HP for its summons hardly changed that), so
+  // its roots slowed at a fifth of their strength there (evolutions.json
   // towerSummonRoot; a half until the gear of Tiers XI and XII, 0.5.13).
-  // `whole`: the game without it.
+  // 1271 B took Wisdom out of its summons' blows and halved its oaks'
+  // roots everywhere: with the roots' full strength it climbed 15% below
+  // the best other fourth form, so in the Wieże they now slow 15% more
+  // (1.15), and the Ojciec Puszczy's at 37% of their strength (0.37; with
+  // more it climbed without end at level 400). `whole`: the game without
+  // the Pradruid's share.
   const whole = (() => {
     const raw = loadData();
     delete raw.evolutions.evolutions.find((form) => form.id === 'elder-druid').towerSummonRoot;
@@ -432,18 +449,18 @@ describe('the Pradruid in the Wieże (1249 B)', () => {
   const share = content.evolutionsById['elder-druid'].towerSummonRoot;
   const pradruid = { ...druidAt(300), name: 'Pradruid' };
 
-  test('only the Pradruid has a share of its roots\' strength in the Wieże, a fifth, and its trait says so in Polish and in English (and the Ojciec Puszczy grown from it, the same)', () => {
-    assert.equal(share, 0.2);
-    // The fifth form of the line keeps the rule (test/fifth-evolution.test.js).
-    assert.deepEqual(content.evolutions.filter((form) => form.towerSummonRoot !== undefined).map((form) => form.id), ['elder-druid', 'wilds-father']);
+  test('only the Pradruid and the Ojciec Puszczy have a share of their roots\' strength in the Wieże, 1.15 and 0.37, and their traits say so in Polish and in English', () => {
+    assert.equal(share, 1.15);
+    // The fifth form of the line has its own (test/fifth-evolution.test.js).
+    assert.deepEqual(content.evolutions.filter((form) => form.towerSummonRoot !== undefined).map((form) => [form.id, form.towerSummonRoot]), [['elder-druid', 1.15], ['wilds-father', 0.37]]);
     assert.equal(pradruid.character.evolution, 'elder-druid');
-    assert.ok(content.evolutionsById['elder-druid'].trait.text.endsWith('W Wieżach Systemu korzenie Dębów wieków spowalniają wrogów pięć razy słabiej.'));
+    assert.ok(content.evolutionsById['elder-druid'].trait.text.endsWith('W Wieżach Systemu korzenie Dębów wieków spowalniają wrogów o 15% mocniej.'));
     const english = JSON.parse(readFileSync(new URL('../data/en/evolutions.json', import.meta.url), 'utf8'));
-    assert.ok(english.evolutions['elder-druid'].trait.text.endsWith("In the System Towers the Oaks of Ages' roots slow enemies only a fifth as much."));
+    assert.ok(english.evolutions['elder-druid'].trait.text.endsWith("In the System Towers the Oaks of Ages' roots slow enemies 15% more."));
   });
 
-  test('a rooted foe of a summoner with that share moves again sooner: half the delay of the roots', () => {
-    // The Pradruid alone against a sturdy creature, with the share
+  test('a rooted foe moves again later with the Pradruid\'s share (above 1) and sooner with the Ojciec Puszczy\'s (below 1) than at the roots\' full strength', () => {
+    // The Pradruid alone against a sturdy creature, with a share
     // (summonRootScale, as towerFight gives it) and without.
     const fight = (scale) => {
       const unit = { ...playerCombatant({ character: pradruid.character, equipped: pradruid.equipped, name: 'Pradruid' }, content), ...(scale && { summonRootScale: scale }) };
@@ -456,9 +473,12 @@ describe('the Pradruid in the Wieże (1249 B)', () => {
       assert.ok(rooted > 0);
       return { at: events[rooted].t, next: events.slice(rooted + 1).find((event) => event.actor === 'e0').t };
     };
-    const [half, full] = [nextMove(fight(share)), nextMove(fight(null))];
-    assert.equal(half.at, full.at);
-    assert.ok(half.next < full.next, `${half.next} vs ${full.next}`);
+    const full = nextMove(fight(null));
+    const stronger = nextMove(fight(share));
+    const weaker = nextMove(fight(content.evolutionsById['wilds-father'].towerSummonRoot));
+    assert.deepEqual([stronger.at, weaker.at], [full.at, full.at]);
+    assert.ok(stronger.next > full.next, `${stronger.next} vs ${full.next}`);
+    assert.ok(weaker.next < full.next, `${weaker.next} vs ${full.next}`);
   });
 
   test('in a Wieża the share is the Pradruid\'s, whoever it fights as: the climber, a partner or a companion; nobody else\'s', () => {
@@ -499,7 +519,7 @@ describe('the Pradruid in the Wieże (1249 B)', () => {
     assert.deepEqual(now, then);
   });
 
-  test('alone at level 300 it climbs the Wieża Solo about as high as the best other fourth form (within 7%), and without the share far higher', () => {
+  test('alone at level 300 it climbs the Wieża Solo about as high as the best other fourth form (within 7%), and without the share lower (1271 B; far higher until then)', () => {
     // Each path's realistic player, each draw of its gear, climbs as in the
     // measurement (DECISIONS.md, „Druid: przywołańce na wyprawach i na
     // Arenie”, point 17): from a floor some 40 levels below it, every floor
@@ -539,6 +559,10 @@ describe('the Pradruid in the Wieże (1249 B)', () => {
     const best = Math.max(...others);
     const now = climbs('mage', 'mana-shield', content);
     assert.ok(Math.abs(now / best - 1) <= 0.07, `the Pradruid ${now}, the best other fourth form ${best}`);
-    assert.ok(climbs('mage', 'mana-shield', whole) > 1.2 * best);
+    // With its roots' full strength (1271 B: Wisdom no longer in its
+    // summons' blows, its oaks' roots halved) more than 7% lower; until
+    // 1271 B more than 20% higher.
+    const without = climbs('mage', 'mana-shield', whole);
+    assert.ok(without < 0.93 * best, `the Pradruid without the share ${without}, the best other fourth form ${best}`);
   });
 });

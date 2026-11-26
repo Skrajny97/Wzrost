@@ -566,9 +566,11 @@ describe('the fourth forms against the third forms (tools/class-balance-sim.mjs,
   });
 
   test('in the Arena at levels 260 and 300 each fourth form wins 25–75% of its duels against the other paths, and the duels last a few rounds', () => {
-    // Fourteen fourth forms have their own strength in the players' duels
-    // (evolutions.json duelPower, duelHp): the Tytan, a shield for its
-    // party, strikes little in a duel of one against one.
+    // Until 1271 B fourteen fourth forms had their own strength in the
+    // players' duels (evolutions.json duelPower, duelHp): the Tytan, a
+    // shield for its party, struck little in a duel of one against one. Now
+    // no form has, and its shockwave passes all armour and strikes a lone
+    // foe harder, everywhere.
     // Class levels about 320 and 365 (the tuned curve).
     for (const level of [260, 300]) {
       const result = measure({ level, seeds: 1, model: 'realistic', paths: true }, tuned(content));

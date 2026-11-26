@@ -1,5 +1,5 @@
 {
-  "$comment": "Ewolucje klas (DECISIONS.md, „Ewolucje: odpowiedzi autora” i „Ewolucje: budowa”). Na pierwszym poziomie z balance.progression.classEvolutionLevels (50.) gracz wybiera ewolucję jednej ze swoich dwóch ścieżek (path: umiejętność, która ją prowadzi). Ewolucja daje nową nazwę klasy, przyrost statystyk od następnego poziomu klasy (growth zamiast growth klasy, perClassLevel opcjonalnie zamiast HP i many klasy), stałą cechę (trait: kind i params mówią walce, co robi) i dwie umiejętności (skills: pierwsza to rozwinięta umiejętność ścieżki, from). Dotychczasowe umiejętności znikają, a ich Punkty Umiejętności wracają do rozdania. Umiejętności ewolucji rosną do skillMaxLevel, a ich liczby w params to [poziom 1, poziom skillMaxLevel], równo między nimi. Kolejne punkty dają poziomy klasy do lastPointClassLevel, po pointsPerClassLevel. Druga ewolucja (DECISIONS.md, „Druga ewolucja klas”): na drugim poziomie z classEvolutionLevels (100.) każda ewolucja ma jedną dalszą postać (from: ewolucja, z której wyrasta), bez wyboru. Ma nazwę męską (name) i żeńską (nameFemale, brak: jak name), opis (description), mocniejszą cechę, przyrost statystyk od 101. poziomu klasy i dwie umiejętności: pierwsza rozwija jedną z umiejętności pierwszej ewolucji (from), druga jest nowa. Ich zasady punktów są w secondForms, jak skillMaxLevel, lastPointClassLevel i pointsPerClassLevel pierwszej. Trzecia ewolucja (DECISIONS.md, „Trzecia ewolucja klas”): na trzecim poziomie z classEvolutionLevels (200.) każda dalsza postać ma jedną trzecią formę (from: dalsza postać, z której wyrasta), przyjmowaną tak samo, z zasadami punktów w thirdForms. Gra pokazuje trzecie formy tylko tam, gdzie zmienna THIRD_EVOLUTION ma „on”. Czwarta ewolucja (DECISIONS.md, „Czwarta ewolucja klas”): na czwartym poziomie z classEvolutionLevels (300.) każda trzecia forma ma jedną czwartą formę, przyjmowaną tak samo, z zasadami punktów w fourthForms; gra pokazuje je tylko tam, gdzie i THIRD_EVOLUTION, i FOURTH_EVOLUTION mają „on”. Piąta ewolucja (DECISIONS.md, „Piąta ewolucja klas”): na piątym poziomie z classEvolutionLevels (400.) każda czwarta forma ma jedną piątą formę, przyjmowaną tak samo, z zasadami punktów w fifthForms; gra pokazuje je tylko tam, gdzie mają „on” THIRD_EVOLUTION, FOURTH_EVOLUTION i FIFTH_EVOLUTION. duelPower i duelHp: siła ciosów i HP formy tylko w pojedynkach Areny. towerSummonRoot (1249 B): część siły korzeni przywołańców formy w Wieżach Systemu (Solo i Drużyn); Pradruid ma 0,2, bo korzenie jego dwóch dębów odsuwały każdy ruch stwora, więc w Wieży Solo wchodził nawet ponad 200 pięter wyżej niż inne czwarte formy, a z 20% siły korzeni wchodzi tak wysoko jak najlepsza z nich (pomiar z wyposażeniem do Tieru XII, 0.5.13).",
+  "$comment": "Ewolucje klas (DECISIONS.md, „Ewolucje: odpowiedzi autora” i „Ewolucje: budowa”). Na pierwszym poziomie z balance.progression.classEvolutionLevels (50.) gracz wybiera ewolucję jednej ze swoich dwóch ścieżek (path: umiejętność, która ją prowadzi). Ewolucja daje nową nazwę klasy, przyrost statystyk od następnego poziomu klasy (growth zamiast growth klasy, perClassLevel opcjonalnie zamiast HP i many klasy), stałą cechę (trait: kind i params mówią walce, co robi) i dwie umiejętności (skills: pierwsza to rozwinięta umiejętność ścieżki, from). Dotychczasowe umiejętności znikają, a ich Punkty Umiejętności wracają do rozdania. Umiejętności ewolucji rosną do skillMaxLevel, a ich liczby w params to [poziom 1, poziom skillMaxLevel], równo między nimi. Kolejne punkty dają poziomy klasy do lastPointClassLevel, po pointsPerClassLevel. Druga ewolucja (DECISIONS.md, „Druga ewolucja klas”): na drugim poziomie z classEvolutionLevels (100.) każda ewolucja ma jedną dalszą postać (from: ewolucja, z której wyrasta), bez wyboru. Ma nazwę męską (name) i żeńską (nameFemale, brak: jak name), opis (description), mocniejszą cechę, przyrost statystyk od 101. poziomu klasy i dwie umiejętności: pierwsza rozwija jedną z umiejętności pierwszej ewolucji (from), druga jest nowa. Ich zasady punktów są w secondForms, jak skillMaxLevel, lastPointClassLevel i pointsPerClassLevel pierwszej. Trzecia ewolucja (DECISIONS.md, „Trzecia ewolucja klas”): na trzecim poziomie z classEvolutionLevels (200.) każda dalsza postać ma jedną trzecią formę (from: dalsza postać, z której wyrasta), przyjmowaną tak samo, z zasadami punktów w thirdForms. Gra pokazuje trzecie formy tylko tam, gdzie zmienna THIRD_EVOLUTION ma „on”. Czwarta ewolucja (DECISIONS.md, „Czwarta ewolucja klas”): na czwartym poziomie z classEvolutionLevels (300.) każda trzecia forma ma jedną czwartą formę, przyjmowaną tak samo, z zasadami punktów w fourthForms; gra pokazuje je tylko tam, gdzie i THIRD_EVOLUTION, i FOURTH_EVOLUTION mają „on”. Piąta ewolucja (DECISIONS.md, „Piąta ewolucja klas”): na piątym poziomie z classEvolutionLevels (400.) każda czwarta forma ma jedną piątą formę, przyjmowaną tak samo, z zasadami punktów w fifthForms; gra pokazuje je tylko tam, gdzie mają „on” THIRD_EVOLUTION, FOURTH_EVOLUTION i FIFTH_EVOLUTION. Od 1271 B żadna forma nie ma własnej siły w pojedynkach (Arena, wojny gildii): formy wyrównują ich umiejętności i cechy, takie same wszędzie (DECISIONS.md, „Arena przez mechanikę (1271 B, 26.11.2026)”). towerSummonRoot (1249 B, dostrojone w 1271 B): siła korzeni przywołańców formy w Wieżach Systemu (Solo i Drużyn) jako część ich siły poza Wieżami, tak żeby forma wchodziła w Wieży Solo mniej więcej tak wysoko jak najlepsza inna forma tej samej ewolucji. Pradruid ma 1,15: od 1271 B Mądrość nie dodaje ciosom jego przywołańców, a korzenie Dębów wieków mają połowę dawnej siły, więc z pełną siłą korzeni wchodziłby na 300. poziomie 15% niżej niż najlepsza inna czwarta forma (do 1271 B miał 0,2, bo wchodził o ponad 200 pięter wyżej). Ojciec Puszczy ma 0,37: z większą częścią na 400. poziomie wspina się bez końca.",
   "skillMaxLevel": 45,
   "lastPointClassLevel": 99,
   "pointsPerClassLevel": 1,
@@ -174,7 +174,6 @@
     },
     {
       "id": "bastion",
-      "duelHp": 0.8,
       "classId": "warrior",
       "from": "guardian",
       "name": "Bastion",
@@ -196,7 +195,6 @@
     },
     {
       "id": "thunder-lord",
-      "duelPower": 0.9,
       "classId": "archer",
       "from": "storm-archer",
       "name": "Władca Piorunów",
@@ -208,7 +206,6 @@
     },
     {
       "id": "master-hunter",
-      "duelPower": 0.9,
       "classId": "archer",
       "from": "hunter",
       "name": "Mistrz Łowów",
@@ -242,7 +239,6 @@
     },
     {
       "id": "druid",
-      "duelSummonPower": 1.35,
       "classId": "mage",
       "from": "arcanist",
       "name": "Druid",
@@ -266,7 +262,6 @@
     },
     {
       "id": "grand-inquisitor",
-      "duelPower": 2,
       "classId": "cleric",
       "from": "inquisitor",
       "name": "Wielki Inkwizytor",
@@ -319,7 +314,6 @@
     },
     {
       "id": "phantom",
-      "duelPower": 1.2,
       "classId": "shadow",
       "from": "night-dancer",
       "name": "Widmo",
@@ -361,7 +355,6 @@
     },
     {
       "id": "bow-master",
-      "duelPower": 1.12,
       "classId": "archer",
       "from": "marksman",
       "name": "Mistrz Łuku",
@@ -384,7 +377,6 @@
     },
     {
       "id": "wild-lord",
-      "duelPower": 0.9,
       "classId": "archer",
       "from": "master-hunter",
       "name": "Władca Puszczy",
@@ -417,7 +409,6 @@
     },
     {
       "id": "archdruid",
-      "duelSummonPower": 0.8,
       "classId": "mage",
       "from": "druid",
       "name": "Arcydruid",
@@ -430,7 +421,6 @@
     },
     {
       "id": "saint",
-      "duelPower": 1.2,
       "classId": "cleric",
       "from": "miracle-worker",
       "name": "Święty",
@@ -442,7 +432,6 @@
     },
     {
       "id": "demon-slayer",
-      "duelPower": 1.2,
       "classId": "cleric",
       "from": "grand-inquisitor",
       "name": "Pogromca Demonów",
@@ -466,7 +455,6 @@
     },
     {
       "id": "godslayer",
-      "duelPower": 1.08,
       "classId": "shadow",
       "from": "kingslayer",
       "name": "Bogobójca",
@@ -478,7 +466,6 @@
     },
     {
       "id": "lich",
-      "duelPower": 0.9,
       "classId": "shadow",
       "from": "necromancer",
       "name": "Licz",
@@ -489,7 +476,6 @@
     },
     {
       "id": "shadow-lord",
-      "duelPower": 1.05,
       "classId": "shadow",
       "from": "phantom",
       "name": "Władca Cieni",
@@ -501,7 +487,6 @@
     },
     {
       "id": "ravager",
-      "duelPower": 1.2,
       "classId": "warrior",
       "from": "horde-slayer",
       "name": "Burzyciel",
@@ -513,7 +498,6 @@
     },
     {
       "id": "immortal",
-      "duelPower": 0.7,
       "classId": "warrior",
       "from": "arena-legend",
       "name": "Nieśmiertelny",
@@ -525,8 +509,6 @@
     },
     {
       "id": "titan",
-      "duelHp": 1.9,
-      "duelPower": 2.3,
       "classId": "warrior",
       "from": "colossus",
       "name": "Tytan",
@@ -549,19 +531,17 @@
     },
     {
       "id": "thunderer",
-      "duelPower": 0.85,
       "classId": "archer",
       "from": "perun-chosen",
       "name": "Gromowładny",
       "nameFemale": "Gromowładna",
       "description": "Władca piorunów. Gdy napina łuk, niebo czernieje, a błyskawice skaczą od wroga do wroga.",
       "growth": { "intellect": 7, "perception": 2, "vitality": 2 },
-      "trait": { "name": "Władca burzy", "text": "Każda strzała ma 35% szans dodać 60% obrażeń od elektryczności, a trafiony traci wtedy 40% szybkości. Piorun z trafionego grotu przeskakuje po kolei na każdego następnego wroga, za każdym razem o 25% słabszy.", "kind": "charged", "params": { "chance": 0.35, "power": 0.6, "element": "lightning", "slow": 0.4, "chain": true, "chainAll": true, "chainDecay": 0.25 } },
+      "trait": { "name": "Władca burzy", "text": "Każda strzała ma 35% szans dodać 60% obrażeń od elektryczności, a trafiony traci wtedy 20% szybkości. Piorun z trafionego grotu przeskakuje po kolei na każdego następnego wroga, za każdym razem o 25% słabszy.", "kind": "charged", "params": { "chance": 0.35, "power": 0.6, "element": "lightning", "slow": 0.2, "chain": true, "chainAll": true, "chainDecay": 0.25 } },
       "skills": ["perun-storm", "ball-lightning"]
     },
     {
       "id": "beast-lord",
-      "duelPower": 0.62,
       "classId": "archer",
       "from": "wild-lord",
       "name": "Pan Zwierząt",
@@ -573,7 +553,6 @@
     },
     {
       "id": "primordial",
-      "duelPower": 1.15,
       "classId": "mage",
       "from": "elemental-avatar",
       "name": "Stwórca Żywiołów",
@@ -585,7 +564,6 @@
     },
     {
       "id": "frost-god",
-      "duelPower": 1.5,
       "classId": "mage",
       "from": "frost-monarch",
       "name": "Lodowy Bóg",
@@ -597,8 +575,7 @@
     },
     {
       "id": "elder-druid",
-      "duelSummonPower": 0.42,
-      "towerSummonRoot": 0.2,
+      "towerSummonRoot": 1.15,
       "classId": "mage",
       "from": "archdruid",
       "name": "Pradruid",
@@ -606,13 +583,11 @@
       "description": "Najstarszy z druidów. Puszcza rośnie z jego mądrości, a jej stworzenia stają przy nim do walki.",
       "perClassLevel": { "hp": 6, "mana": 7 },
       "growth": { "intellect": 5, "wisdom": 3, "vitality": 3 },
-      "trait": { "name": "Korzenie świata", "text": "+50% many i do czterech przywołańców naraz: dwa Dęby wieków, Żubr i Niedźwiedź. Co ruch wraca 6% many, a przywołańce mają o 40% więcej HP i zadają o 40% więcej obrażeń. Każde 20 punktów Mądrości daje przywołańcom jeszcze 1% HP i obrażeń. Każdy przywołaniec ma dodatkowo 75% maks. HP postaci i ściąga na siebie ciosy wrogów. W Wieżach Systemu korzenie Dębów wieków spowalniają wrogów pięć razy słabiej.", "kind": "arcana", "params": { "mana": 0.5, "regen": 0.06, "summonHp": 0.4, "summonPower": 0.4, "summons": 4, "wisdomPer": 20, "summonLife": 0.75, "lure": true } },
+      "trait": { "name": "Korzenie świata", "text": "+50% many i do czterech przywołańców naraz: dwa Dęby wieków, Żubr i Niedźwiedź. Co ruch wraca 6% many, a przywołańce mają o 40% więcej HP i zadają o 40% więcej obrażeń. Każde 20 punktów Mądrości daje przywołańcom jeszcze 1% HP. Każdy przywołaniec ma dodatkowo 75% maks. HP postaci i ściąga na siebie ciosy wrogów. W Wieżach Systemu korzenie Dębów wieków spowalniają wrogów o 15% mocniej.", "kind": "arcana", "params": { "mana": 0.5, "regen": 0.06, "summonHp": 0.4, "summonPower": 0.4, "summons": 4, "wisdomPer": 20, "summonLife": 0.75, "lure": true, "wisdomPower": false } },
       "skills": ["oak-of-ages", "ancient-herd"]
     },
     {
       "id": "archangel",
-      "duelHp": 1.15,
-      "duelPower": 1.9,
       "classId": "cleric",
       "from": "saint",
       "name": "Archanioł",
@@ -624,7 +599,6 @@
     },
     {
       "id": "heaven-avenger",
-      "duelPower": 1.65,
       "classId": "cleric",
       "from": "demon-slayer",
       "name": "Mściciel Niebios",
@@ -637,7 +611,6 @@
     },
     {
       "id": "seer",
-      "duelPower": 1.5,
       "classId": "cleric",
       "from": "prophet",
       "name": "Wieszcz",
@@ -649,7 +622,6 @@
     },
     {
       "id": "soul-reaper",
-      "duelPower": 1.7,
       "classId": "shadow",
       "from": "godslayer",
       "name": "Żniwiarz Dusz",
@@ -661,7 +633,6 @@
     },
     {
       "id": "navia-king",
-      "duelPower": 0.9,
       "classId": "shadow",
       "from": "lich",
       "name": "Król Nawii",
@@ -673,7 +644,6 @@
     },
     {
       "id": "dark-prince",
-      "duelPower": 0.85,
       "classId": "shadow",
       "from": "shadow-lord",
       "name": "Książę Ciemności",
@@ -685,7 +655,6 @@
     },
     {
       "id": "unstoppable",
-      "duelPower": 1.2,
       "classId": "warrior",
       "from": "ravager",
       "name": "Niepowstrzymany",
@@ -697,7 +666,6 @@
     },
     {
       "id": "gods-champion",
-      "duelPower": 0.95,
       "classId": "warrior",
       "from": "immortal",
       "name": "Czempion Bogów",
@@ -709,8 +677,6 @@
     },
     {
       "id": "world-shield",
-      "duelHp": 1.9,
-      "duelPower": 2.5,
       "classId": "warrior",
       "from": "titan",
       "name": "Tarcza Świata",
@@ -732,7 +698,6 @@
     },
     {
       "id": "perun-son",
-      "duelPower": 1.3,
       "classId": "archer",
       "from": "thunderer",
       "name": "Syn Peruna",
@@ -744,7 +709,6 @@
     },
     {
       "id": "hunt-god",
-      "duelPower": 0.55,
       "classId": "archer",
       "from": "beast-lord",
       "name": "Bóg Łowów",
@@ -756,7 +720,6 @@
     },
     {
       "id": "demiurge",
-      "duelPower": 1.5,
       "classId": "mage",
       "from": "primordial",
       "name": "Demiurg",
@@ -767,7 +730,6 @@
     },
     {
       "id": "winter-incarnate",
-      "duelPower": 1.0,
       "classId": "mage",
       "from": "frost-god",
       "name": "Wcielenie Zimy",
@@ -778,8 +740,7 @@
     },
     {
       "id": "wilds-father",
-      "duelSummonPower": 0.42,
-      "towerSummonRoot": 0.2,
+      "towerSummonRoot": 0.37,
       "classId": "mage",
       "from": "elder-druid",
       "name": "Ojciec Puszczy",
@@ -787,13 +748,11 @@
       "description": "Puszcza słucha tego głosu od zawsze. Na jedno słowo z ziemi wstają dęby, a stado rusza do walki.",
       "perClassLevel": { "hp": 7, "mana": 8 },
       "growth": { "intellect": 6, "wisdom": 3, "vitality": 4 },
-      "trait": { "name": "Dusza puszczy", "text": "+60% many i do pięciu przywołańców naraz: dwa Odwieczne dęby, Żubr, Niedźwiedź i Łoś. Co ruch wraca 7% many, a przywołańce mają o 60% więcej HP i zadają o 50% więcej obrażeń. Każde 15 punktów Mądrości daje przywołańcom jeszcze 1% HP i obrażeń. Każdy przywołaniec ma dodatkowo 75% maks. HP postaci i ściąga na siebie ciosy wrogów. W Wieżach Systemu korzenie Odwiecznych dębów spowalniają wrogów pięć razy słabiej.", "kind": "arcana", "params": { "mana": 0.6, "regen": 0.07, "summonHp": 0.6, "summonPower": 0.5, "summons": 5, "wisdomPer": 15, "summonLife": 0.75, "lure": true } },
+      "trait": { "name": "Dusza puszczy", "text": "+60% many i do pięciu przywołańców naraz: dwa Odwieczne dęby, Żubr, Niedźwiedź i Łoś. Co ruch wraca 7% many, a przywołańce mają o 60% więcej HP i zadają o 50% więcej obrażeń. Każde 15 punktów Mądrości daje przywołańcom jeszcze 1% HP. Każdy przywołaniec ma dodatkowo 75% maks. HP postaci i ściąga na siebie ciosy wrogów. W Wieżach Systemu korzenie Odwiecznych dębów spowalniają wrogów o 63% słabiej.", "kind": "arcana", "params": { "mana": 0.6, "regen": 0.07, "summonHp": 0.6, "summonPower": 0.5, "summons": 5, "wisdomPer": 15, "summonLife": 0.75, "lure": true, "wisdomPower": false } },
       "skills": ["eternal-grove", "eternal-herd"]
     },
     {
       "id": "seraph",
-      "duelHp": 1.15,
-      "duelPower": 1.5,
       "classId": "cleric",
       "from": "archangel",
       "name": "Serafin",
@@ -805,7 +764,6 @@
     },
     {
       "id": "heaven-sword",
-      "duelPower": 1.5,
       "classId": "cleric",
       "from": "heaven-avenger",
       "name": "Miecz Niebios",
@@ -816,7 +774,6 @@
     },
     {
       "id": "all-seeing",
-      "duelPower": 1.5,
       "classId": "cleric",
       "from": "seer",
       "name": "Wszechwidzący",
@@ -828,7 +785,6 @@
     },
     {
       "id": "soul-lord",
-      "duelPower": 2.1,
       "classId": "shadow",
       "from": "soul-reaper",
       "name": "Pan Dusz",
@@ -840,7 +796,6 @@
     },
     {
       "id": "navia-emperor",
-      "duelPower": 1.1,
       "classId": "shadow",
       "from": "navia-king",
       "name": "Cesarz Nawii",
@@ -852,7 +807,6 @@
     },
     {
       "id": "dark-king",
-      "duelPower": 1.05,
       "classId": "shadow",
       "from": "dark-prince",
       "name": "Król Ciemności",
@@ -1294,7 +1248,7 @@
       "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}, odzyskuje {heal%} maks. HP i na {turns|swój ruch|swoje ruchy|swoich ruchów} zyskuje {armor%} pancerza więcej. W tym czasie odbija {reflect%} przyjętych obrażeń.",
       "kind": "guard",
       "mana": 16,
-      "params": { "below": 0.9, "heal": [0.08, 0.12], "armor": [0.25, 0.5], "turns": [8, 10], "reflect": [2.0, 3.0] }
+      "params": { "below": 0.9, "heal": [0.08, 0.12], "armor": [0.25, 0.5], "turns": [8, 10], "reflect": [1.6, 2.4] }
     },
     {
       "id": "shield-wall",
@@ -1344,7 +1298,7 @@
       "kind": "sweep",
       "mana": 16,
       "cooldown": 3,
-      "params": { "power": [1.45, 2.2], "single": [2.3, 3.4], "category": "magical", "element": "lightning", "stunChance": [0.15, 0.3], "stunLabel": "porażony" }
+      "params": { "power": [1.45, 2.2], "single": [2.0, 2.95], "category": "magical", "element": "lightning", "stunChance": [0.15, 0.3], "stunLabel": "porażony" }
     },
     {
       "id": "thunder-orb",
@@ -1356,7 +1310,7 @@
       "kind": "stance",
       "mana": 16,
       "cooldown": 6,
-      "params": { "turns": 4, "pet": true, "power": [0.4, 0.8], "category": "magical", "element": "lightning", "words": "stanceOrb" }
+      "params": { "turns": 4, "pet": true, "power": [0.25, 0.5], "category": "magical", "element": "lightning", "words": "stanceOrb" }
     },
     {
       "id": "harpoon",
@@ -1368,7 +1322,7 @@
       "effect": "Strzał za {power%} obrażeń. Trafiony traci najbliższy ruch i krwawi przez {dotTicks|swój ruch|swoje ruchy|swoich ruchów}, tracąc po {dotPower%} obrażeń strzału.",
       "kind": "strike",
       "mana": 16,
-      "cooldown": 4,
+      "cooldown": 5,
       "params": { "power": [1.8, 2.6], "stun": true, "stunLabel": "przyszpilony", "dotEffect": "bleeding", "dotChance": 1, "dotPower": [0.25, 0.4], "dotTicks": 5 }
     },
     {
@@ -1490,11 +1444,11 @@
       "name": "Ostateczny wyrok",
       "style": "atak",
       "description": "Wyrok zapada, zanim wróg upadnie. Święty ogień kończy to, co zaczęła stal.",
-      "effect": "Wyrok sakrum za {power%} obrażeń we wroga, któremu zostało mniej niż {below%} HP.",
+      "effect": "Wyrok sakrum za {power%} obrażeń we wroga, któremu zostało mniej niż {below%} HP. Jedynego wroga wyrok trafia przy każdym jego HP.",
       "kind": "strike",
       "mana": 16,
       "cooldown": 3,
-      "params": { "power": [2.4, 3.8], "category": "magical", "element": "sacred", "below": 0.5 }
+      "params": { "power": [2.4, 3.8], "category": "magical", "element": "sacred", "below": 0.5, "loneAny": true }
     },
     {
       "id": "pyre",
@@ -1502,11 +1456,11 @@
       "name": "Stos",
       "style": "grupa",
       "description": "Pod wrogami Wielkiego Inkwizytora zapala się święty ogień. Płonie, póki on tego chce.",
-      "effect": "Przez {turns|swój ruch|swoje ruchy|swoich ruchów} święty ogień pali wrogów: co ruch postaci każdy wróg dostaje {power%} obrażeń sakrum.",
+      "effect": "Przez {turns|swój ruch|swoje ruchy|swoich ruchów} święty ogień pali wrogów: co ruch postaci każdy wróg dostaje {power%} obrażeń sakrum, a jedyny wróg {single%}.",
       "kind": "stance",
       "mana": 18,
       "cooldown": 5,
-      "params": { "turns": 3, "cloud": true, "power": [0.4, 0.8], "category": "magical", "element": "sacred", "words": "stancePyre", "tickWords": "pyreStrike" }
+      "params": { "turns": 3, "cloud": true, "power": [0.4, 0.8], "single": [1.6, 3.2], "category": "magical", "element": "sacred", "words": "stancePyre", "tickWords": "pyreStrike" }
     },
     {
       "id": "choir",
@@ -1593,7 +1547,7 @@
       "kind": "whirl",
       "mana": 16,
       "cooldown": 4,
-      "params": { "blows": 5, "power": [0.9, 1.2] }
+      "params": { "blows": 5, "power": [1.1, 1.45] }
     },
     {
       "id": "shadow-double",
@@ -1873,11 +1827,11 @@
       "name": "Sąd ostateczny",
       "style": "atak",
       "description": "Na dzień sądu czeka każdy grzesznik. Pogromca Demonów przynosi go wcześniej.",
-      "effect": "Wyrok sakrum za {power%} obrażeń we wroga, któremu zostało mniej niż {below%} HP. Duchy i demony dostają o {familyBonus%} więcej.",
+      "effect": "Wyrok sakrum za {power%} obrażeń we wroga, któremu zostało mniej niż {below%} HP. Duchy i demony dostają o {familyBonus%} więcej. Jedynego wroga wyrok trafia przy każdym jego HP.",
       "kind": "strike",
       "mana": 18,
       "cooldown": 3,
-      "params": { "power": [5.4, 7.2], "category": "magical", "element": "sacred", "below": 0.6, "family": "spirit", "familyBonus": [0.3, 0.6] }
+      "params": { "power": [5.4, 7.2], "category": "magical", "element": "sacred", "below": 0.6, "loneAny": true, "family": "spirit", "familyBonus": [0.3, 0.6] }
     },
     {
       "id": "holy-seal",
@@ -2027,7 +1981,7 @@
       "kind": "sweep",
       "mana": 20,
       "cooldown": 3,
-      "params": { "power": [0.9, 1.72], "single": [2.4, 4.6], "undodgeable": true, "spins": 3, "dotEffect": "bleeding", "dotChance": 1, "dotPower": [0.3, 0.57], "dotTicks": 3 }
+      "params": { "power": [0.9, 1.72], "single": [2.4, 4.6], "undodgeable": true, "spins": 3, "dotEffect": "bleeding", "dotChance": 1, "dotPower": [0.1, 0.19], "dotTicks": 3 }
     },
     {
       "id": "champion-challenge",
@@ -2048,11 +2002,11 @@
       "name": "Gniew góry",
       "style": "grupa",
       "description": "Tytan uderza tarczą w ziemię jak lawina. Pęka grunt pod całym szykiem wrogów.",
-      "effect": "Uderzenie tarczą w ziemię zadaje każdemu wrogowi {power%} obrażeń, bez chybień, a jednemu wrogowi {single%}. Każdy trafiony wróg ma {stunChance%} szans stracić najbliższy ruch.",
+      "effect": "Uderzenie tarczą w ziemię zadaje każdemu wrogowi {power%} obrażeń, bez chybień i przez cały pancerz, a jednemu wrogowi {single%}. Każdy trafiony wróg ma {stunChance%} szans stracić najbliższy ruch.",
       "kind": "sweep",
       "mana": 20,
       "cooldown": 4,
-      "params": { "power": [2.04, 3.91], "single": [2.4, 4.6], "undodgeable": true, "stunChance": [0.24, 0.46], "stunLabel": "ogłuszony" }
+      "params": { "power": [2.04, 3.91], "single": [4.8, 9.2], "undodgeable": true, "armorIgnore": 1, "stunChance": [0.24, 0.46], "stunLabel": "ogłuszony" }
     },
     {
       "id": "titan-shield",
@@ -2102,7 +2056,7 @@
       "kind": "sweep",
       "mana": 20,
       "cooldown": 3,
-      "params": { "power": [2.3, 4.4], "single": [3.5, 6.7], "category": "magical", "element": "lightning", "stunChance": [0.24, 0.46], "stunLabel": "porażony", "chainChance": 1, "chainPower": [0.6, 1.15] }
+      "params": { "power": [2.3, 4.4], "single": [3.5, 6.7], "category": "magical", "element": "lightning", "stunChance": [0.12, 0.23], "stunLabel": "porażony", "chainChance": 1, "chainPower": [0.6, 1.15] }
     },
     {
       "id": "ball-lightning",
@@ -2114,7 +2068,7 @@
       "kind": "stance",
       "mana": 18,
       "cooldown": 6,
-      "params": { "turns": 4, "orb": true, "power": [1.0, 1.92], "category": "magical", "element": "lightning", "stunChance": [0.12, 0.23], "stunLabel": "porażony", "words": "stanceBallLightning" }
+      "params": { "turns": 4, "orb": true, "power": [0.6, 1.15], "category": "magical", "element": "lightning", "stunChance": [0.12, 0.23], "stunLabel": "porażony", "words": "stanceBallLightning" }
     },
     {
       "id": "pack-chief",
@@ -2209,7 +2163,7 @@
         "hp": [0.2, 0.34],
         "power": [0.8, 1.53],
         "physical": true,
-        "root": [0.3, 0.57],
+        "root": [0.15, 0.28],
         "partyHeal": [0.018, 0.034],
         "pack": [
           { "summon": "oak", "summonName": "Dąb wieków" },
@@ -2246,10 +2200,10 @@
       "name": "Boskie uzdrowienie",
       "style": "leczenie",
       "description": "Archanioł rozkłada ręce, a światło spływa na drużynę jak deszcz.",
-      "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}, leczy całą drużynę o {heal%.1} maks. HP i 1 HP za każde {wisdomPerHp} punktów Mądrości oraz zdejmuje z niej złe efekty. Potem przez {hotTurns|swój ruch|swoje ruchy|swoich ruchów} leczy każdego po {hot%} maks. HP.",
+      "effect": "Gdy HP spadnie poniżej {below%}, leczy całą drużynę o {heal%.1} maks. HP i 1 HP za każde {wisdomPerHp} punktów Mądrości oraz zdejmuje z niej złe efekty. Potem przez {hotTurns|swój ruch|swoje ruchy|swoich ruchów} leczy każdego po {hot%} maks. HP.",
       "kind": "heal",
-      "once": true,
       "mana": 24,
+      "cooldown": 6,
       "params": { "below": 0.65, "heal": [0.72, 1.38], "wisdomPerHp": 8, "party": true, "cleanse": true, "hot": [0.17, 0.32], "hotTurns": 6 }
     },
     {
@@ -2271,11 +2225,11 @@
       "name": "Dzień gniewu",
       "style": "atak",
       "description": "Niebo wydaje wyrok. Gdy jeden grzesznik padnie, sąd idzie dalej.",
-      "effect": "Wyrok sakrum za {power%} obrażeń we wroga, któremu zostało mniej niż {below%} HP. Duchy i demony dostają o {familyBonus%} więcej. Gdy cel padnie, wyrok spada na następnego wroga za {onKill%} obrażeń.",
+      "effect": "Wyrok sakrum za {power%} obrażeń we wroga, któremu zostało mniej niż {below%} HP. Duchy i demony dostają o {familyBonus%} więcej. Gdy cel padnie, wyrok spada na następnego wroga za {onKill%} obrażeń. Jedynego wroga wyrok trafia przy każdym jego HP.",
       "kind": "strike",
       "mana": 20,
       "cooldown": 3,
-      "params": { "power": [6.0, 11.5], "category": "magical", "element": "sacred", "below": 0.7, "family": "spirit", "familyBonus": [0.54, 1.03], "onKill": 0.5 }
+      "params": { "power": [6.0, 11.5], "category": "magical", "element": "sacred", "below": 0.7, "loneAny": true, "family": "spirit", "familyBonus": [0.54, 1.03], "onKill": 0.5 }
     },
     {
       "id": "pillar-of-light",
@@ -2287,7 +2241,7 @@
       "kind": "sweep",
       "mana": 20,
       "cooldown": 4,
-      "params": { "power": [1.5, 2.88], "single": [2.3, 4.4], "category": "magical", "element": "sacred", "blind": [0.18, 0.34], "blindTurns": 2 }
+      "params": { "power": [1.5, 2.88], "single": [3.5, 6.6], "category": "magical", "element": "sacred", "blind": [0.18, 0.34], "blindTurns": 2 }
     },
     {
       "id": "clairvoyance",
@@ -2324,7 +2278,7 @@
       "effect": "Cios kosą za {power%} obrażeń, zawsze krytyczny. Wroga z mniej niż {killBelow%} HP zabija od razu (poza czempionami) i takiego szuka najpierw. Kosa trafia też wroga obok celu, za {cleave%} obrażeń.",
       "kind": "strike",
       "mana": 18,
-      "cooldown": 3,
+      "cooldown": 2,
       "params": { "power": [3.9, 7.47], "alwaysCrit": true, "killBelow": 0.3, "cleave": [0.3, 0.57] }
     },
     {
@@ -2425,7 +2379,7 @@
       "kind": "sweep",
       "mana": 22,
       "cooldown": 3,
-      "params": { "power": [0.95, 2.09], "single": [2.52, 5.54], "undodgeable": true, "spins": 3, "dotEffect": "bleeding", "dotChance": 1, "dotPower": [0.32, 0.7], "dotTicks": 3 }
+      "params": { "power": [0.95, 2.09], "single": [2.52, 5.54], "undodgeable": true, "spins": 3, "dotEffect": "bleeding", "dotChance": 1, "dotPower": [0.16, 0.35], "dotTicks": 3 }
     },
     {
       "id": "triumph",
@@ -2446,11 +2400,11 @@
       "name": "Gniew ziemi",
       "style": "grupa",
       "description": "Tarcza Świata uderza w ziemię, a ziemia odpowiada. Pęka pod całym szykiem wrogów, jakby świat chciał ich zrzucić.",
-      "effect": "Uderzenie tarczą w ziemię zadaje każdemu wrogowi {power%} obrażeń, bez chybień, a jednemu wrogowi {single%}. Każdy trafiony wróg ma {stunChance%} szans stracić najbliższy ruch.",
+      "effect": "Uderzenie tarczą w ziemię zadaje każdemu wrogowi {power%} obrażeń, bez chybień i przez cały pancerz, a jednemu wrogowi {single%}. Każdy trafiony wróg ma {stunChance%} szans stracić najbliższy ruch.",
       "kind": "sweep",
       "mana": 22,
       "cooldown": 4,
-      "params": { "power": [2.14, 4.71], "single": [2.52, 5.54], "undodgeable": true, "stunChance": [0.25, 0.55], "stunLabel": "ogłuszony" }
+      "params": { "power": [2.14, 4.71], "single": [5.0, 11.0], "undodgeable": true, "armorIgnore": 1, "stunChance": [0.25, 0.55], "stunLabel": "ogłuszony" }
     },
     {
       "id": "stronghold",
@@ -2670,11 +2624,11 @@
       "name": "Ognisty miecz",
       "style": "atak",
       "description": "Miecz z białego ognia spada jak wyrok z nieba. Gdy jeden grzesznik padnie, ogień szuka następnego, aż nikt nie zostanie.",
-      "effect": "Wyrok sakrum za {power%} obrażeń we wroga, któremu zostało mniej niż {below%} HP. Duchy i demony dostają o {familyBonus%} więcej. Gdy cel padnie, wyrok spada na następnego wroga za {onKill%} obrażeń, i tak dalej, dopóki kolejni padają.",
+      "effect": "Wyrok sakrum za {power%} obrażeń we wroga, któremu zostało mniej niż {below%} HP. Duchy i demony dostają o {familyBonus%} więcej. Gdy cel padnie, wyrok spada na następnego wroga za {onKill%} obrażeń, i tak dalej, dopóki kolejni padają. Jedynego wroga wyrok trafia przy każdym jego HP.",
       "kind": "strike",
       "mana": 22,
       "cooldown": 3,
-      "params": { "power": [6.3, 13.86], "category": "magical", "element": "sacred", "below": 0.75, "family": "spirit", "familyBonus": [0.57, 1.25], "onKill": 0.6, "chain": true }
+      "params": { "power": [6.3, 13.86], "category": "magical", "element": "sacred", "below": 0.75, "loneAny": true, "family": "spirit", "familyBonus": [0.57, 1.25], "onKill": 0.6, "chain": true }
     },
     {
       "id": "heavenly-host",
@@ -2722,8 +2676,8 @@
       "effect": "Cios kosą za {power%} obrażeń, zawsze krytyczny. Wroga z mniej niż {killBelow%} HP zabija od razu (poza czempionami) i takiego szuka najpierw. Kosa trafia też wroga obok celu, za {cleave%} obrażeń.",
       "kind": "strike",
       "mana": 20,
-      "cooldown": 3,
-      "params": { "power": [4.1, 9.02], "alwaysCrit": true, "killBelow": 0.35, "cleave": [0.32, 0.7] }
+      "cooldown": 2,
+      "params": { "power": [5.3, 11.7], "alwaysCrit": true, "killBelow": 0.35, "cleave": [0.32, 0.7] }
     },
     {
       "id": "soul-lament",

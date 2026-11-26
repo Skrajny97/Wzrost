@@ -1,7 +1,9 @@
 // The Arena in the Osada (src/engine/pvp-arena.js, src/server/pvp-arena.js;
 // the author's 762 A): its rules in the engine (the unlock, the duel's
-// determinism, its move limit and draw, the HP factor that keeps a duel a
-// few rounds long at every level, the ratings, the season, the rivals and
+// determinism, its move limit and judge (the damage dealt since 1271 B) and
+// draw, the HP factor that keeps a duel a few rounds long at every level,
+// every summon's HP from the HP before it (1271 B), the ratings, the
+// season, the rivals and
 // their draws anew, a defence's log from the defender's side and the
 // rewards) and through the API (the 25th level, five fights a day, rivals
 // never of the player's own account, "Losuj innych" five times a day and
@@ -21,16 +23,20 @@ import {
   arenaRewardTiers,
   arenaSeason,
   arenaWeek,
+  createRng,
   defenderFight,
   drawRivals,
   duelArmorShare,
   duelHpFactor,
+  duelist,
   expectedScore,
+  monsterCombatant,
   playerCombatant,
   ratingChanges,
   ratingStakes,
   rerollsLeft,
   seasonRating,
+  simulateFight,
   unlockMessages,
 } from '../src/engine/index.js';
 import { measure } from '../tools/pvp-arena-sim.mjs';
@@ -110,27 +116,86 @@ describe("the Arena's rules", () => {
     assert.equal(arenaDuel({ attacker, defender, seed: 'armour' }, withDuel({ armorCurve: undefined })).fight.allies[0].armor, playerCombatant({ ...attacker }, content).armor);
   });
 
-  test('after the move limit the judge ends the duel: more HP left wins, about as much is a draw', () => {
+  test('after the move limit the judge ends the duel: the bigger share of the rival\'s HP dealt wins, about as much is a draw (1271 B)', () => {
     const attacker = fighter('warrior', 100, 'Ala');
     const defender = fighter('cleric', 100, 'Bolek');
-    // No move at all: both at full HP, a draw, and the judge's words close the log.
+    // No move at all: nothing dealt, a draw, and the judge's words close the log.
     const none = arenaDuel({ attacker, defender, seed: 'limit' }, withDuel({ maxMoves: 0 }));
     assert.equal(none.limit, true);
     assert.equal(none.result, 'draw');
     assert.equal(none.fight.draw, true);
     assert.equal(none.fight.won, null);
     assert.equal(none.fight.events.at(-1).kind, 'limit');
-    // A few moves: whoever has the bigger share of its HP left wins.
+    assert.match(none.fight.events.at(-1).text, /prawie tyle samo obrażeń/);
+    // A few moves: whoever dealt the bigger share of its rival's HP wins,
+    // and the judge's words give both shares.
     for (const seed of ['a', 'b', 'c', 'd']) {
       const duel = arenaDuel({ attacker, defender, seed }, withDuel({ maxMoves: 3, drawMargin: 0 }));
       if (!duel.limit) continue;
       assert.equal(duel.moves, 3);
-      const { attacker: mine, defender: theirs } = duel.shares;
+      const { attacker: mine, defender: theirs } = duel.dealt;
       assert.equal(duel.result, mine === theirs ? 'draw' : mine > theirs ? 'win' : 'loss');
+      if (duel.result === 'draw') continue;
+      const [ahead, more, less] = duel.result === 'win' ? ['Ala', mine, theirs] : ['Bolek', theirs, mine];
+      assert.equal(duel.fight.events.at(-1).text, `Po 3 ruchach walkę kończy sędzia: postać ${ahead} zadała rywalowi więcej obrażeń (${Math.round(more * 100)}% jego HP wobec ${Math.round(less * 100)}%).`);
     }
     // Within drawMargin it is a draw.
     const wide = arenaDuel({ attacker, defender, seed: 'a' }, withDuel({ maxMoves: 3, drawMargin: 1 }));
     assert.equal(wide.result, 'draw');
+  });
+
+  test('healing no longer wins by waiting: a Kleryk who heals back to full loses to the rival who dealt it more (1271 B)', () => {
+    // Until 1271 B the one with the bigger share of its HP left won.
+    const archer = fighter('archer', 100, 'Ala');
+    const cleric = fighter('cleric', 100, 'Bolek', 1);
+    let healed = 0;
+    for (const seed of ['a', 'b', 'c', 'd', 'e', 'f']) {
+      const duel = arenaDuel({ attacker: archer, defender: cleric, seed }, withDuel({ maxMoves: 3, drawMargin: 0 }));
+      assert.equal(duel.limit, true);
+      assert.equal(duel.result, duel.dealt.attacker > duel.dealt.defender ? 'win' : 'loss', seed);
+      if (duel.result === 'win' && duel.shares.defender > duel.shares.attacker) healed += 1;
+    }
+    assert.ok(healed >= 3, `${healed} of 6`);
+  });
+
+  test('what a shield takes of a blow counts as dealt by the one who struck it, the HP lost as before (1271 B)', () => {
+    // A shield of 30% of the maximum HP at the start (the Rdzeń's
+    // `openingShield`) against a sturdy boar's blows.
+    const unit = { ...playerCombatant(fighter('warrior', 40, 'Ala'), content), openingShield: 0.3 };
+    const boar = { ...monsterCombatant({ monsterId: 'boar', level: 40, id: 'e0' }, content), hp: 1e6, maxHp: 1e6 };
+    const fight = simulateFight({ allies: [unit], enemies: [boar], rng: createRng('shield-dealt'), content, record: true, maxActions: 30 });
+    const absorbed = fight.events.reduce((sum, event) => sum + (event.absorbed ?? 0), 0);
+    assert.ok(absorbed > 0);
+    assert.equal(fight.dealt.e0, fight.taken.a0 + absorbed);
+    assert.equal(fight.taken.a0, unit.maxHp - fight.units.find((one) => one.id === 'a0').hp);
+  });
+
+  test('in a duel every summon has the HP it has outside duels: its share of the HP before the duel\'s factor (1271 B)', () => {
+    // Until 1271 B a wolf's, a skeleton's or a knight's share of the duel's
+    // grown HP stood several times as long as anywhere else (the Druid
+    // line's summons had the HP before the factor since 24.11.2026). Each
+    // path's realistic player at levels 100 and 300: its first summon in a
+    // fight with the duel's factor and without.
+    const summoners = new Set();
+    for (const level of [100, 300]) {
+      for (const cls of content.classes) {
+        for (const [index, skill] of content.skills.filter((one) => one.classId === cls.id).entries()) {
+          const one = playerOf('realistic', cls.id, level, content, 0, index === 0 ? null : skill.id);
+          const summonHp = (factor) => {
+            const unit = duelist({ character: one.character, equipped: one.equipped, name: 'Przywoływacz' }, 'a0', 'ally', { factor, armor: 1 }, content);
+            const boar = { ...monsterCombatant({ monsterId: 'boar', level, id: 'e0' }, content), hp: 1e7, maxHp: 1e7 };
+            const result = simulateFight({ allies: [unit], enemies: [boar], rng: createRng(`summon-hp:${level}:${skill.id}`), content, record: true, maxActions: 30 });
+            return result.events.find((event) => event.kind === 'summon' && event.state === 'up')?.summonHp;
+          };
+          const plain = summonHp(1);
+          if (plain === undefined) continue;
+          assert.equal(summonHp(4), plain, `${level} ${one.character.evolution}`);
+          summoners.add(one.character.evolution);
+        }
+      }
+    }
+    // The Druid's, the Nekromanta's, the Mistrz Łowów's lines and more.
+    assert.ok(summoners.size >= 6, [...summoners].join(', '));
   });
 
   test('over the classes, a duel lasts a few rounds at every level and the judge ends few (tools/pvp-arena-sim.mjs)', () => {

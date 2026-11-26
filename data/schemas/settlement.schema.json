@@ -759,7 +759,7 @@
             },
             "thirdFormHp": { "type": "number", "minimum": 1, "description": "Gdy choć jedna strona ma trzecią formę ewolucji (200. poziom klasy), HP obu stron jest jeszcze tyle razy większe, bo trzecie formy biją mocniej względem swojego HP (tools/pvp-arena-sim.mjs). Bez tego: 1." },
         "maxMoves": { "type": "integer", "minimum": 2, "description": "Po tylu ruchach obu stron razem walkę kończy sędzia." },
-            "drawMargin": { "type": "number", "minimum": 0, "maximum": 1, "description": "Remis, gdy części HP, które zostały obu stronom, różnią się najwyżej o tyle." }
+            "drawMargin": { "type": "number", "minimum": 0, "maximum": 1, "description": "Remis, gdy części HP rywala, które zadała każda ze stron, różnią się najwyżej o tyle (od 1271 B; wcześniej: części HP, które zostały obu stronom)." }
           }
         },
         "rating": {

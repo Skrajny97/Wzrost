@@ -300,11 +300,14 @@ export function matchFights({ duelsA, duelsB, triosA, triosB }, _content) {
 // them, the factor grown as a duel's where a third form fights
 // (thirdFormHp). The side with someone still standing wins; one that goes on and on
 // is ended by the judge after battle.movesPerFighter moves for each fighter,
-// the side with the bigger share of its HP left winning, or a draw when the
-// shares differ by battle.drawMargin at most, the judge's words closing the
-// log. `result`: 'a', 'b' or 'draw'; `standing`, the indexes of the fighters
-// of each side still on their feet; `fight`, for the playback
-// (src/client/arena.js), from side A's place.
+// the side that dealt the other the bigger share of its fighters' HP
+// together winning (what their shields and summons took too, healed back
+// or not, as the Arena's judge since 1271 B; until then the bigger share
+// of HP left won), or a draw when the shares differ by battle.drawMargin at
+// most, the judge's words closing the log. `result`: 'a', 'b' or 'draw';
+// `standing`, the indexes of the fighters of each side still on their
+// feet; `dealt`, the share of the other side's HP each side dealt; `fight`,
+// for the playback (src/client/arena.js), from side A's place.
 /**
  * @param {{ sideA: Fighter[], sideB: Fighter[], seed: string | number }} battleOf
  * @param {Content} content
@@ -323,25 +326,34 @@ export function warBattle({ sideA, sideB, seed }, content) {
   const fight = simulateFight(/** @type {any} */ ({ allies, enemies, rng: createRng(`guild-war:${seed}`), content, record: true, maxActions: moves, even: true }));
   /** @type {Map<string, number>} */
   const hpOf = new Map(fight.units.map((/** @type {{ id: string, hp: number }} */ unit) => [unit.id, unit.hp]));
-  /** @param {Record<string, any>[]} units */
-  const left = (units) => units.reduce((sum, unit) => sum + Math.max(0, hpOf.get(unit.id) ?? 0), 0) / units.reduce((sum, unit) => sum + unit.maxHp, 0);
+  // The share of the other side's HP together a side dealt.
+  /**
+   * @param {Record<string, any>[]} own
+   * @param {Record<string, any>[]} other
+   */
+  const dealt = (own, other) => own.reduce((sum, unit) => sum + (fight.dealt[unit.id] ?? 0), 0) / other.reduce((sum, unit) => sum + unit.maxHp, 0);
+  const shares = { a: dealt(allies, enemies), b: dealt(enemies, allies) };
   const limit = fight.won === null;
   /** @type {'a' | 'b' | 'draw'} */
   let result;
   if (!limit) result = fight.won ? 'a' : 'b';
   else {
-    const lead = left(allies) - left(enemies);
+    const lead = shares.a - shares.b;
     result = Math.abs(lead) <= battle.drawMargin ? 'draw' : lead > 0 ? 'a' : 'b';
   }
   /** @type {Record<string, any>[]} */
   const events = [...fight.events];
-  if (limit) events.push({ t: (events.at(-1)?.t ?? 0) + 1, kind: 'limit', text: say(texts, result === 'draw' ? 'limitDraw' : 'limitWin', 0, { moves }) });
+  if (limit) {
+    const [mine, theirs] = result === 'b' ? [shares.b, shares.a] : [shares.a, shares.b];
+    events.push({ t: (events.at(-1)?.t ?? 0) + 1, kind: 'limit', text: say(texts, result === 'draw' ? 'limitDraw' : 'limitWin', 0, { moves, mine: Math.round(mine * 100), theirs: Math.round(theirs * 100) }) });
+  }
   /** @param {Record<string, any>[]} units */
   const standing = (units) => units.flatMap((unit, index) => ((hpOf.get(unit.id) ?? 0) > 0 ? [index] : []));
   return {
     result,
     limit,
     standing: { a: standing(allies), b: standing(enemies) },
+    dealt: shares,
     fight: {
       allies: allies.map((unit) => combatantView(unit, Math.round(average(sideB)), content)),
       enemies: enemies.map((unit) => combatantView(unit, Math.round(average(sideA)), content)),

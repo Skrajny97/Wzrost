@@ -181,11 +181,12 @@ function playDay({ player, companions, day, seed, danger = null, picks = 'carefu
 
 // The share of days each level was cleared, for `days` days of a class
 // and level. `companions`: how many go with the character (0–2); `confirm`
-// and `stop` as in playDay.
-export function measureLabyrinth({ model = 'realistic', classId, level, days, core = null, danger = null, picks = 'careful', companions: count = 2, confirm = false, stop = 0 }, content) {
+// and `stop` as in playDay; `path`: the skill that leads another evolution
+// path of the class (difficulty-sim.mjs playerOf), the main one by default.
+export function measureLabyrinth({ model = 'realistic', classId, level, days, core = null, danger = null, picks = 'careful', companions: count = 2, confirm = false, stop = 0, path = null }, content) {
   const cleared = [0, 0, 0, 0, 0];
   for (let i = 0; i < days; i++) {
-    const base = playerOf(model, classId, level, content, i % 8);
+    const base = playerOf(model, classId, level, content, i % 8, path);
     const player = core ? { ...base, character: { ...base.character, core } } : base;
     const plan = base.plan ?? { companions: 2, companionGear: 'rare', companionUpgrade: 0, bond: 1, variant: model };
     const companions = count > 0 ? companionsOf({ ...plan, companions: count }, level, i, content) : [];
