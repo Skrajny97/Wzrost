@@ -3384,6 +3384,8 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
+## Wersja 0.5.31 (26.11.2026): Arena przez mechanikę, bez mnożników pojedynków (1271 B)
+
 ## Arena przez mechanikę (1271 B, 26.11.2026)
 
 Gracz (poz. 106) napisał, że Druid ma na Arenie dwa razy większy atak niż Mag od obrażeń, Arcymag Żywiołów jest do niczego, a Arcykapłana nie da się zranić, bo ciągle się leczy. Autor (26.11.2026): „trzeba rozwiązać balans postaci inaczej niż przez te modyfikatory na arenie, to trzeba dogłębnie z pozycji mechanik i musisz to przeanalizować a modyfikatory te takie narzucane z góry na arenie usunąć”. Z trzech wariantów 1271 (A: same zasady pojedynku, B: zasady i poprawki 18 form, C: B i punkty klasy w pojedynkach) autor wybrał B, a A i C odrzucił.
