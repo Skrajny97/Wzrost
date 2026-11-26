@@ -72,9 +72,11 @@
     // (19.11.2026: „lecimy z ewolucjami”).
     "FOURTH_EVOLUTION": "on",
     // "on" adds the fifth forms at class level 400 ("Piąta ewolucja klas",
-    // 1235, src/server/content.js). Off until the author has accepted all
-    // their art; on in tests and `npm run dev`.
-    "FIFTH_EVOLUTION": "",
+    // 1235, src/server/content.js). In the live game once the author had
+    // accepted all their art (portraits, walks, rides, skin tones, the
+    // skills' icons, sounds and looks, the Świetlisty rycerz and the fight
+    // board with five summons; 26.11.2026).
+    "FIFTH_EVOLUTION": "on",
     // "on" opens the Osada (src/server/settlement.js) from character level
     // 20: parts I–III, in the live game from version 0.0.68 (the author:
     // "Wdrażaj 0.0.68 z Osadą"). Its auctions settle with the cron below.
@@ -185,9 +187,8 @@
         "THIRD_EVOLUTION": "on",
         // Their fourth forms at class level 300, as in the game.
         "FOURTH_EVOLUTION": "on",
-        // Their fifth forms at class level 400, off as in the game until
-        // their art is done.
-        "FIFTH_EVOLUTION": "",
+        // Their fifth forms at class level 400, as in the game.
+        "FIFTH_EVOLUTION": "on",
         // The Osada (src/server/settlement.js), only here until it is ready.
         "SETTLEMENT": "on",
         // The Warownia (src/server/fortress.js), as in the game.
