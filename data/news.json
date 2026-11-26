@@ -1814,7 +1814,7 @@
     {
       "id": "0.5.28",
       "title": "Wersja 0.5.28",
-      "body": "- Encyklopedia: więcej skrzyń za odkrycia, bo w grze jest więcej materiałów, mikstur i ziół. Nowe progi: mikstury 20, 24, 28 i 31, zioła 16 i 18, materiały 125, 175, 225, 275 i 309. Jeśli masz już tyle odkryć, nowe skrzynie czekają na otwarcie."
+      "body": "- Encyklopedia: więcej skrzyń za odkrycia, bo w grze jest więcej materiałów, mikstur i ziół. Nowe progi: mikstury 20, 24, 28 i 31, zioła 16 i 18, materiały 125, 175, 225, 260 i 290. Jeśli masz już tyle odkryć, nowe skrzynie czekają na otwarcie.\n- „Wyrusz ponownie” w raporcie robi teraz to samo co „Wyrusz”: postać zje zapamiętany posiłek (gdy poprzedni już nie działa) i zabierze mikstury z „Opcji wyprawy”, także gdy lider rusza ponownie z drużyną. Dotąd szła wtedy bez nowego posiłku i bez mikstur."
     }
   ]
 }

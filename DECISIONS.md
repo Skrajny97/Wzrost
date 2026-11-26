@@ -3384,7 +3384,7 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
-## Wersja 0.5.28 (26.11.2026): więcej skrzyń za odkrycia w Encyklopedii
+## Wersja 0.5.28 (26.11.2026): więcej skrzyń za odkrycia w Encyklopedii, „Wyrusz ponownie” z posiłkiem i miksturami
 
 ## Więcej skrzyń za odkrycia w Encyklopedii (26.11.2026)
 
@@ -3393,8 +3393,8 @@ Autor: „Powinno być więcej skrzyń za odkrycia w Encyklopedii, skoro jest wi
 1. **Nowe progi**, dopisane za dotychczasowymi, więc otwarte skrzynie zostają otwarte (skrzynia to `zakładka:próg`):
    - mikstury: 20, 24, 28 i 31 (do tej pory 4, 8, 12 i 16);
    - zioła: 16 i 18 (do tej pory 3, 6, 9 i 13);
-   - materiały: 125, 175, 225, 275 i 309 (do tej pory 10, 25, 50 i 88).
-2. **Nagrody** idą dalej po tej samej liście skrzyń (`chests`): kolejny próg daje kolejną skrzynię. Ostatnia skrzynia materiałów (309) daje 97 658 złota, 90 Punktów Czasu i 100 Punktów Systemu, ostatnia mikstur (31) 39 063 złota, ostatnia ziół (18) 6250 złota.
+   - materiały: 125, 175, 225, 260 i 290 (do tej pory 10, 25, 50 i 88). Ostatni próg jest niżej niż 309 wpisów, bo walidator (`test/world-tree.test.js`) liczy materiały także bez krain, które nie są jeszcze gotowe (wtedy jest ich 292), a próg nie może być większy niż liczba wpisów. Pierwsze wdrożenie 0.5.28 z progiem 309 nie przeszło przez ten test.
+2. **Nagrody** idą dalej po tej samej liście skrzyń (`chests`): kolejny próg daje kolejną skrzynię. Ostatnia skrzynia materiałów (290) daje 97 658 złota, 90 Punktów Czasu i 100 Punktów Systemu, ostatnia mikstur (31) 39 063 złota, ostatnia ziół (18) 6250 złota.
 3. **Postacie, które mają już więcej odkryć,** od razu widzą nowe skrzynie do otwarcia.
 
 ## Wersja 0.5.27 (26.11.2026): statystyki liczone jako inna widać na ekranie
@@ -4560,6 +4560,17 @@ Dwie poprawki po „Drużyna: co robi każdy członek”, najprostsze w duchu 0.
    - Członek dowiaduje się o tym w Walce, tam gdzie gra mówi o raporcie odebranym przy wyruszeniu: „Twoja zapłata za usługę najemną została odebrana, gdy drużyna wyruszała: +60 zł.” albo „Twoje wygasłe ogłoszenie najemnika zostało zamknięte, gdy drużyna wyruszała.”
    - Linijka „usługa najemna skończona, do zamknięcia w Karczmie” z 0.5.23 zniknęła, a z nią `ended` w `GET /api/party`.
 3. **Kod.** `closeService` w `src/server/mercenaries.js` (wspólne dla `claimMercenary` i wyruszenia drużyny), `overWaiting` i `claimForTrip` w `src/server/parties.js` (w opcjach wyprawy członka `claimed` to wtedy `{ kind: 'mercenary', gold }`), `partyClaimed` i pytanie przy „Przerwij eksplorację” w `src/client/screens/combat.js`, angielski w `data/en/strings.json`. Testy w `test/party-doing.test.js`: usługa po czasie zamknięta przy wyruszeniu z zapłatą raz (własne zamknięcie potem nic nie znajduje), ogłoszenie bez zapłaty i zamknięcie przez gracza w tej samej chwili (zapłata raz, członek idzie).
+
+## Wersja 0.5.28 (26.11.2026): „Wyrusz ponownie” z posiłkiem i miksturami
+
+## Wyrusz ponownie z drużyną i posiłek (26.11.2026)
+
+Gracz (poz. 202) zgłosił: „Jak jesteś liderem drużyny i klikasz powtórz wyprawę, to nie dodaje z automatu jedzenia” (26.11.2026). Bez makiet: wygląd się nie zmienia.
+
+1. **Przyczyna.** „Wyrusz ponownie” w raporcie wysyłało tylko miejsce, czas i pola zapamiętane w telefonie (elity, tropienie, Trudna i Piekielna wyprawa). Pomijało posiłek i mikstury z „Opcji wyprawy”, które „Wyrusz” bierze z pamięci przeglądarki. Postać nie jadła więc zapamiętanej potrawy, gdy jej posiłek się skończył, i szła bez mikstur. Tak było u lidera z drużyną i tak samo przy wyprawie samemu. Członkowie drużyny jedli i zabierali swoje (autouzupełnianie, mikstury z Drużyny), bo to dodaje serwer przy każdym wyruszeniu drużyny.
+2. **Teraz.** „Wyrusz ponownie”, z drużyną i bez, wysyła posiłek i mikstury tak samo jak „Wyrusz” na ekranie miejsca, zanim gracz cokolwiek w nim zmieni. Gdy żaden posiłek nie działa, postać zjada zapamiętaną potrawę w zapamiętanej liczbie porcji (najwyżej tyle, ile ma w Spiżarni). Działający posiłek idzie dalej, a inna potrawa nigdy go nie zastępuje bez pytania. Mikstury i próg leczenia są takie jak zapamiętany wybór, przycięte do liczby walk tej wyprawy. Obie drogi liczą to tym samym kodem.
+3. **Brakujący szczegół: najemnik i Strażnica zostają przy „Wyrusz”.** Najemnika wybiera się na ekranie miejsca, gdzie widać jego opłatę, a po wyprawie z nim i tak przestaje być wybrany. Tropionego stwora Strażnicy telefon nie zapamiętuje.
+4. **Kod i testy.** `src/client/hunt-supplies.js` (wybór mikstur i posiłku przeniesiony z `src/client/screens/combat.js`, `keptSupplies` dla `src/client/screens/report.js`). Testy: `test/report-again-page.test.js` (lider z drużyną i postać sama: „Wyrusz ponownie” wysyła to samo co „Wyrusz”, także przy działającym posiłku, bez zapamiętanej potrawy i bez potrawy w Spiżarni), `test/party-meal.test.js` (posiłek lidera i autouzupełnianie członka na tej samej wyprawie drużyny, z linijką posiłku w raporcie każdego).
 
 ## Wersja 0.5.26 (26.11.2026): mikstury od poziomu postaci albo z recepturą
 

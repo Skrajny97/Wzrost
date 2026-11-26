@@ -960,6 +960,7 @@
     "src/client/layout.js",
     "src/client/news.js",
     "src/client/party-gate.js",
+    "src/client/hunt-supplies.js",
     "src/client/push.js",
     "src/client/screenshot.js",
     "src/client/side.js",
