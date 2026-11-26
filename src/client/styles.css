@@ -28668,6 +28668,196 @@ a.social-button {
   box-shadow: inset 0 0 16px rgba(255, 224, 138, 0.35), 0 0 0 1px rgba(255, 215, 106, 0.75), 0 0 9px 2px rgba(56, 50, 86, 0.9), 0 0 18px 4px rgba(255, 215, 106, 0.3);
 }
 
+/* The fifth forms' skills, batch 2 (skill-fx.js, arena-fx.js): the Biała
+   wataha's great moon, the Zew tura's mist over a marsh, the Początek
+   świata's void and the world born in it, the Narodziny słońca's sun, its
+   corona and warm light, the Wielki mróz's blizzard and great crystal, the
+   Płaszcz zimy's cloak of snow, the Odwieczny gaj's golden roots and
+   canopy, the Odwieczne stado's wall, the Sześć skrzydeł's wings of white
+   fire and the Tchnienie życia's winged heart. */
+.fx-moon--great {
+  box-shadow: 0 0 calc(var(--size, 40px) * 0.5) calc(var(--size, 40px) * 0.16) rgba(232, 238, 248, 0.6), 0 0 calc(var(--size, 40px) * 1.2) calc(var(--size, 40px) * 0.3) rgba(201, 216, 240, 0.25);
+}
+
+.fx-marshmist,
+.fx-genesis,
+.fx-newsun,
+.fx-corona,
+.fx-wintercloak,
+.fx-canopy,
+.fx-herdwall,
+.fx-wingedheart {
+  position: absolute;
+  pointer-events: none;
+}
+
+.fx-marshmist {
+  width: var(--size, 120px);
+  height: calc(var(--size, 120px) * 0.42);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 55%, rgba(244, 248, 252, 0.9), rgba(214, 226, 238, 0.5) 45%, rgba(214, 226, 238, 0) 72%);
+  filter: blur(3px);
+}
+
+.fx-sky--genesis {
+  background:
+    radial-gradient(ellipse 60% 30% at 50% 14%, rgba(150, 90, 190, 0.35), rgba(150, 90, 190, 0) 70%),
+    linear-gradient(180deg, rgba(6, 4, 22, 0.92), rgba(18, 10, 40, 0.8) 55%, rgba(18, 10, 40, 0.55));
+}
+
+/* The world born in the Początek świata: a small globe of the four
+   elements turning. */
+.fx-genesis {
+  width: var(--size, 60px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, #ffffff 0 8%, rgba(255, 255, 255, 0) 20%),
+    conic-gradient(#ff8a3d, #ffd27a, #bfe8ff, #8fd3ff, #d9ccff, #a39a89, #ff8a3d);
+  box-shadow: 0 0 14px 5px rgba(255, 210, 122, 0.75), 0 0 34px 10px rgba(191, 232, 255, 0.4);
+}
+
+.fx-newsun {
+  width: var(--size, 120px);
+  aspect-ratio: 1;
+  filter: drop-shadow(0 0 6px #ffe08a) drop-shadow(0 0 14px rgba(255, 179, 71, 0.8));
+}
+
+.fx-newsun svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.fx-corona {
+  width: var(--size, 180px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 246, 207, 0.85) 0 12%, rgba(255, 210, 122, 0.45) 30%, rgba(255, 138, 61, 0.15) 52%, rgba(255, 138, 61, 0) 70%);
+  mix-blend-mode: screen;
+}
+
+/* The arena warming in the new sun's light. */
+.fx-sky--sun {
+  background: radial-gradient(ellipse 80% 60% at 50% 8%, rgba(255, 224, 138, 0.38), rgba(255, 179, 71, 0.16) 45%, rgba(255, 179, 71, 0) 75%);
+  mix-blend-mode: screen;
+}
+
+/* The Wielki mróz's blizzard: a pale cold sky over the whole arena. */
+.fx-sky--blizzard {
+  background: linear-gradient(180deg, rgba(214, 238, 255, 0.4), rgba(180, 220, 250, 0.22) 50%, rgba(180, 220, 250, 0.1));
+}
+
+.fx-iceprison--great {
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 10px rgba(143, 211, 255, 0.8));
+}
+
+.fx-wintercloak svg {
+  display: block;
+  overflow: visible;
+}
+
+.fx-wintercloak-body {
+  fill: rgba(232, 246, 255, 0.42);
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 1.6;
+}
+
+.fx-wintercloak-edge {
+  stroke: #ffffff;
+  stroke-width: 2.4;
+  filter: drop-shadow(0 0 4px #bfe8ff);
+}
+
+.fx-wintercloak-fold {
+  stroke: rgba(255, 255, 255, 0.5);
+  stroke-width: 1.2;
+}
+
+.fx-wintercloak-shade {
+  stroke: rgba(120, 170, 220, 0.4);
+  stroke-width: 2.2;
+}
+
+/* The cloak's fur trim: round tufts of white along its top. */
+.fx-wintercloak-fur {
+  stroke: #ffffff;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-dasharray: 0.1 5;
+  opacity: 0.9;
+}
+
+.fx-wintercloak-flakes {
+  stroke: #ffffff;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+
+.fx-wintercloak {
+  filter: drop-shadow(0 0 6px rgba(191, 232, 255, 0.7));
+}
+
+.fx-roots--golden .fx-roots-glow {
+  stroke: #ffe08a;
+  opacity: 0.85;
+}
+
+.fx-roots--golden .fx-roots-core {
+  stroke: #8a6a2a;
+}
+
+/* The Odwieczny gaj's canopy of light over the party. */
+.fx-canopy {
+  width: var(--size, 200px);
+  height: calc(var(--size, 200px) * 0.28);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 70%, rgba(255, 246, 207, 0.5), rgba(214, 240, 160, 0.3) 45%, rgba(159, 211, 107, 0) 72%);
+  mix-blend-mode: screen;
+}
+
+/* The Odwieczne stado standing as a wall: a band of golden light along
+   its front. */
+.fx-herdwall {
+  height: 14px;
+  transform-origin: 50% 50%;
+  border-radius: 7px;
+  background: linear-gradient(180deg, rgba(255, 224, 138, 0), rgba(255, 224, 138, 0.75) 45%, #fff6cf 55%, rgba(255, 224, 138, 0));
+  box-shadow: 0 0 12px rgba(255, 224, 138, 0.7);
+}
+
+/* The Sześć skrzydeł: wings of white fire. */
+.fx-wing--fire {
+  filter: brightness(1.3) saturate(0.6) drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 9px #dff4ff) drop-shadow(0 0 14px rgba(255, 224, 138, 0.7));
+}
+
+.fx-wingedheart {
+  width: var(--size, 60px);
+  aspect-ratio: 120 / 100;
+  filter: drop-shadow(0 0 3px #ffffff) drop-shadow(0 0 10px #ffe08a);
+}
+
+.fx-wingedheart svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* The Narodziny słońca's ray of sunlight (arena-fx.js sunRay()). */
+.fx-sunray {
+  position: absolute;
+  height: 10px;
+  pointer-events: none;
+  transform-origin: 0 50%;
+  border-radius: 5px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), #fff6cf 30%, rgba(255, 210, 122, 0.9) 75%, rgba(255, 179, 71, 0.6));
+  box-shadow: 0 0 10px 3px rgba(255, 210, 122, 0.75), 0 0 22px 6px rgba(255, 179, 71, 0.35);
+  mix-blend-mode: screen;
+}
+
 /* 963: the evolved Kleryk's skills (skill-fx.js, arena-fx.js): the Odnowa's
    sprouts, the Wielka odnowa's rising light, the Cudowne uzdrowienie's orb
    and ribbons, the Cud's shaft and wings, the Wielkie błogosławieństwo's
