@@ -1800,6 +1800,11 @@
       "id": "0.5.25",
       "title": "Wersja 0.5.25",
       "body": "- Labirynt: na 1. poziomie nie ma już silnych komnat, więc znów przechodzi go prawie każdy. Silne komnaty zostają na 2. i 3. poziomie oraz na Piekielnym, a przed wejściem do silnej komnaty gra pyta, czy na pewno chcesz wejść."
+    },
+    {
+      "id": "0.5.26",
+      "title": "Wersja 0.5.26",
+      "body": "- Mikstury: oprócz receptury w Alchemii wystarczy teraz poziom postaci. Miksturę wypijesz i zabierzesz na wyprawę od jej poziomu postaci (np. Dużą miksturę leczenia od 45. poziomu) albo, jak dotąd, z Alchemią na jej poziomie. Przydadzą się więc też mikstury z Targowiska i z Wymiany. Warzenie się nie zmienia.\n- Walka: Lodowa nawałnica znów pokazuje całą animację: lodowe gwiazdy spadają na wrogów i pękają, a po nich zostaje szron. Wcześniej animacja urywała się na początku."
     }
   ]
 }

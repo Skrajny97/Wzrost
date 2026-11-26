@@ -4521,6 +4521,8 @@ Dwie poprawki po „Drużyna: co robi każdy członek”, najprostsze w duchu 0.
    - Linijka „usługa najemna skończona, do zamknięcia w Karczmie” z 0.5.23 zniknęła, a z nią `ended` w `GET /api/party`.
 3. **Kod.** `closeService` w `src/server/mercenaries.js` (wspólne dla `claimMercenary` i wyruszenia drużyny), `overWaiting` i `claimForTrip` w `src/server/parties.js` (w opcjach wyprawy członka `claimed` to wtedy `{ kind: 'mercenary', gold }`), `partyClaimed` i pytanie przy „Przerwij eksplorację” w `src/client/screens/combat.js`, angielski w `data/en/strings.json`. Testy w `test/party-doing.test.js`: usługa po czasie zamknięta przy wyruszeniu z zapłatą raz (własne zamknięcie potem nic nie znajduje), ogłoszenie bez zapłaty i zamknięcie przez gracza w tej samej chwili (zapłata raz, członek idzie).
 
+## Wersja 0.5.26 (26.11.2026): mikstury od poziomu postaci albo z recepturą
+
 ## Mikstury od poziomu postaci (1272, 26.11.2026)
 
 Gracz zapytał, czemu nie może użyć mikstury kupionej albo otrzymanej w Wymianie. Dotąd miksturę można było wypić albo zabrać na wyprawę tylko ze znaną recepturą, czyli z Alchemią na poziomie co najmniej poziomu mikstury (punkt 9 „Wymiany”). Mikstura z Targowiska albo z Wymiany leżała więc często w plecaku bez pożytku, a alchemicy nie mieli prawie komu sprzedawać. Propozycja 1272: poziom postaci zamiast receptury. Autor: „wprowadź”. Przed wdrożeniem doszedł warunek, że nikt nie traci mikstury, której mógł użyć dotąd, więc znana receptura dalej wystarcza.
