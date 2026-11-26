@@ -3,8 +3,9 @@
 // character of its class, at level 20 with the skill at level 10 (an
 // evolution's skill: of the evolution, at level 60 with the skill at 20; a
 // second form's: at level 110 with the skill at 40; a third form's: at level
-// 210 with the skill at 60), against foes that show the skill off. It is never part of the game: the author's panel plays it
-// to check how each skill looks.
+// 210 with the skill at 60, as the fourth and fifth forms'), against foes
+// that show the skill off. It is never part of the game: the author's panel
+// plays it to check how each skill looks.
 
 import { simulateFight } from './combat.js';
 import { combatantView, monsterCombatant, playerCombatant } from './combatant.js';
@@ -55,7 +56,7 @@ function plainMonsters(content) {
  * @param {Content} content
  * @param {number} level
  */
-function foesFor(skill, content, level) {
+function foesFor(skill, content, level, stage = 1) {
   const groupFactors = content.balance.hunt.groupFactors;
   const plain = plainMonsters(content);
   /**
@@ -65,6 +66,18 @@ function foesFor(skill, content, level) {
    */
   const foe = (monsterId, index, count, at = level - 2) =>
     monsterCombatant(/** @type {any} */ ({ monsterId, level: at, id: `e${index}`, groupFactor: groupFactors[count - 1], weaken: false }), plain);
+  // The fifth forms' new rules, shown whole (the earlier forms' previews
+  // stay as they were): a comet through every row behind its foe (Kometa)
+  // needs a foe in each row; three foes frozen at once (Wielki mróz), three
+  // that stand the blow; a sentence going on from a fallen foe to the next
+  // (Ognisty miecz), the scythe's foe beside its foe (Ostatnie żniwo) and
+  // knights felled by the foes' blows to rise again (Wieczny legion), a
+  // group.
+  if (stage >= 5) {
+    if (skill.params.pierceAll) return [foe('wolf', 0, 3), foe('fox', 1, 3), foe('crow', 2, 3)];
+    if ((skill.params.targets ?? 1) > 1) return ['bear', 'wraith', 'boar'].map((id, index) => foe(id, index, 3, level + 2));
+    if (skill.params.chain || skill.params.cleave || skill.params.returns) return ['wolf', 'wolf', 'fox'].map((id, index) => foe(id, index, 3));
+  }
   if (GROUP_KINDS.has(skill.kind) || skill.params.cloud || skill.params.splash) return ['wolf', 'wolf', 'fox'].map((id, index) => foe(id, index, 3));
   if (skill.params.target === 'back' || skill.params.pierce) return [foe('wolf', 0, 2), foe('crow', 1, 2)];
   if (WOUND_KINDS.has(skill.kind) || skill.kind === 'heal') return [foe('boar', 0, 1, level + 2)];
@@ -111,6 +124,8 @@ export function skillDemo(skillId, content) {
   // The first fight that shows the skill whole: what it may cause by chance
   // (a burn, a paralysis), a guard's end and a miracle's won fight too; else
   // the first that shows the skill at all.
+  /** @param {FightEvent} event */
+  const blow = (event) => event.skill === skillId && (event.kind === 'hit' || event.kind === 'crit');
   /** @param {FightEvent[]} events */
   const used = (events) => events.some((event) => event.skill === skillId);
   /** @param {{ events: FightEvent[], won?: boolean | null }} fight */
@@ -119,7 +134,11 @@ export function skillDemo(skillId, content) {
     (!skill.params.dotEffect || events.some((event) => event.kind === 'effect')) &&
     (!skill.params.stunChance || events.some((event) => event.kind === 'stun')) &&
     (skill.kind !== 'guard' || events.some((event) => event.kind === 'fade')) &&
-    (skill.kind !== 'miracle' || won === true);
+    (skill.kind !== 'miracle' || won === true) &&
+    // (The fifth forms: a sentence that fells one foe after another in one
+    // moment; a knight that rises again.)
+    (!skill.params.chain || events.some((event) => blow(event) && event.hp <= 0 && events.some((other) => other !== event && blow(other) && other.t === event.t && other.hp <= 0))) &&
+    (!skill.params.returns || events.some((event) => event.kind === 'summon' && event.state === 'up' && event.skill === skillId && event.order));
   /** @type {any} */
   let result = null;
   /** @type {any} */
@@ -127,7 +146,7 @@ export function skillDemo(skillId, content) {
   /** @type {{ result: any, enemies: any } | null} */
   let fallback = null;
   for (let attempt = 0; attempt < 30; attempt++) {
-    enemies = foesFor(skill, content, level);
+    enemies = foesFor(skill, content, level, evolution?.stage ?? 1);
     result = simulateFight({ allies: [player], enemies, rng: createRng(`demo:${skillId}:${attempt}`), content, record: true });
     if (whole(result)) break;
     if (!fallback && used(result.events)) fallback = { result, enemies };

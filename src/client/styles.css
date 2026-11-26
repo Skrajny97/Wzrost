@@ -28348,6 +28348,326 @@ a.social-button {
   box-shadow: 0 0 20px 7px color-mix(in srgb, var(--fx) 70%, transparent), 0 0 40px 12px color-mix(in srgb, var(--fx) 30%, transparent);
 }
 
+/* The fifth forms' skills, batch 1 (skill-fx.js, arena-fx.js): the
+   Spustoszenie's cracks of lava and its tide over the foes, the Ostatni
+   szał's beast and the Niepowstrzymany's card in its frenzy, the Huragan
+   bogów's swords of light, its golden flash and the rays of the opened
+   heavens, the Triumf's raised sword, the Tarcza Świata's shield with the
+   Drzewo Świata, the Gniew ziemi's rift and its light, the Ostoja's
+   palisade, the Kometa and its fire, the Gwiazdozbiór's stars and sign,
+   the Strzały Peruna's arrows of lightning and sign, and the Oko burzy's
+   ring of storm, its calm and the Syn Peruna's card in it. */
+.fx-lava,
+.fx-lavatide,
+.fx-beastshade,
+.fx-goldflash,
+.fx-godrays,
+.fx-triumphsword,
+.fx-worldshield,
+.fx-riftlight,
+.fx-palisade,
+.fx-comet,
+.fx-groundfire,
+.fx-constellation,
+.fx-star,
+.fx-boltarrow,
+.fx-stormring,
+.fx-stormring-puff,
+.fx-stormcalm {
+  position: absolute;
+  pointer-events: none;
+}
+
+.fx-lava,
+.fx-constellation {
+  left: 0;
+  top: 0;
+}
+
+.fx-lava svg,
+.fx-constellation svg,
+.fx-palisade svg {
+  display: block;
+  overflow: visible;
+}
+
+.fx-beastshade svg,
+.fx-triumphsword svg,
+.fx-worldshield svg,
+.fx-groundfire svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.fx-lava-crust {
+  stroke: #2a0a06;
+  opacity: 0.9;
+}
+
+.fx-lava-glow {
+  stroke: #ff5a1f;
+  opacity: 0.95;
+  filter: blur(2px);
+}
+
+.fx-lava-core {
+  stroke: #ffe28a;
+}
+
+/* The tide of lava rising over the foes' formation (its crest at its top;
+   coming down over a formation below, at its bottom). */
+.fx-lavatide {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  mix-blend-mode: screen;
+}
+
+.fx-lavatide svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fx-lavatide--down svg {
+  transform: scaleY(-1);
+}
+
+.fx-lavatide-crest {
+  filter: drop-shadow(0 0 3px #ffb347);
+}
+
+/* A pool of lava where the Spustoszenie's cracks reach the foes. */
+.fx-lavapool {
+  position: absolute;
+  width: var(--size, 40px);
+  aspect-ratio: 3 / 1;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(ellipse, #fff1c9 0 14%, #ffb347 32%, #e8462f 56%, rgba(122, 20, 8, 0) 74%);
+  mix-blend-mode: screen;
+}
+
+.fx-ragewave--beast {
+  filter: drop-shadow(0 0 4px var(--fx)) drop-shadow(0 0 2px #1e0806);
+}
+
+.fx-beastshade {
+  width: var(--size, 60px);
+  aspect-ratio: 1;
+  filter: drop-shadow(0 0 4px #ff3a1a) drop-shadow(0 0 12px rgba(232, 70, 47, 0.65));
+}
+
+/* The Ostatni szał: the Niepowstrzymany's card burning crimson while the
+   frenzy lasts. */
+.unit--frenzy {
+  box-shadow: inset 0 0 20px rgba(150, 14, 18, 0.7), 0 0 0 1px rgba(255, 96, 56, 0.75), 0 0 14px rgba(232, 70, 47, 0.6);
+}
+
+.unit--frenzy .unit-art > img,
+.unit--frenzy .unit-art > svg {
+  filter: drop-shadow(0 0 2px rgba(255, 60, 30, 0.9)) saturate(1.2);
+}
+
+.fx-hblade--divine {
+  filter: sepia(1) saturate(1.5) hue-rotate(-6deg) brightness(1.4) drop-shadow(0 0 1px rgba(60, 40, 0, 0.9)) drop-shadow(0 0 5px #fff1c9) drop-shadow(0 0 9px #ffd76a);
+}
+
+.fx-gale--divine {
+  filter: drop-shadow(0 0 3px #fff1c9) drop-shadow(0 0 7px var(--fx));
+}
+
+/* The Huragan bogów's golden flash across the foes' formation. */
+.fx-goldflash {
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 50%, #ffffff 0 22%, rgba(255, 246, 207, 0.95) 40%, rgba(255, 215, 106, 0.7) 60%, rgba(255, 215, 106, 0) 74%);
+  filter: drop-shadow(0 0 6px #ffd76a);
+}
+
+/* The opened heavens: rays of gold out of the top of the arena. */
+.fx-godrays {
+  width: var(--size, 200px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 6%, rgba(255, 246, 207, 0.5) 14%, rgba(255, 246, 207, 0) 32%),
+    repeating-conic-gradient(rgba(255, 236, 170, 0.6) 0deg 5deg, rgba(255, 236, 170, 0) 5deg 15deg);
+  -webkit-mask-image: radial-gradient(circle, #000 18%, rgba(0, 0, 0, 0.5) 45%, transparent 70%);
+  mask-image: radial-gradient(circle, #000 18%, rgba(0, 0, 0, 0.5) 45%, transparent 70%);
+  mix-blend-mode: screen;
+}
+
+/* The Triumf's sword raised to the sky, upright. */
+.fx-triumphsword {
+  height: var(--size, 60px);
+  aspect-ratio: 28 / 88;
+  filter: drop-shadow(0 0 1px rgba(40, 24, 0, 0.95)) drop-shadow(0 0 5px #ffd76a) drop-shadow(0 0 12px rgba(255, 224, 138, 0.65));
+}
+
+.fx-sun--triumph {
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 10px #ffe08a);
+}
+
+.fx-worldshield {
+  width: var(--size, 40px);
+  aspect-ratio: 40 / 48;
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.6)) drop-shadow(0 0 5px rgba(255, 224, 138, 0.85));
+}
+
+.fx-world-tree {
+  filter: drop-shadow(0 0 1.5px #ffe08a);
+}
+
+.fx-worldrift-glow {
+  stroke: #ffd76a;
+  opacity: 0.9;
+  filter: blur(2.5px);
+}
+
+.fx-worldrift-core {
+  stroke: #fffbe8;
+}
+
+/* Light bursting up out of the Gniew ziemi's rift. */
+.fx-riftlight {
+  transform-origin: 50% 100%;
+  background: linear-gradient(0deg, rgba(255, 251, 232, 0.95), rgba(255, 224, 138, 0.55) 38%, rgba(255, 224, 138, 0.18) 72%, rgba(255, 224, 138, 0));
+  filter: blur(2.5px);
+  mix-blend-mode: screen;
+}
+
+.fx-rock--world {
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7)) drop-shadow(0 0 3px #ffe08a) drop-shadow(0 0 6px color-mix(in srgb, var(--fx) 70%, transparent));
+}
+
+.fx-palisade {
+  transform-origin: 50% 50%;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7)) drop-shadow(0 0 3px #ffe08a) drop-shadow(0 0 7px rgba(242, 214, 117, 0.55));
+}
+
+/* The Kometa: its blazing head at its right end, its tail of fire behind. */
+.fx-comet {
+  left: 0;
+  top: 0;
+  width: var(--size, 90px);
+  height: 8px;
+  margin-left: calc(-1 * var(--size, 90px));
+  margin-top: -4px;
+  transform-origin: 100% 50%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(255, 90, 31, 0), rgba(255, 106, 42, 0.5) 35%, rgba(255, 179, 71, 0.85) 70%, #fff1c9 92%, #ffffff);
+  filter: drop-shadow(0 0 4px #ff8a3d) drop-shadow(0 0 10px rgba(255, 179, 71, 0.7));
+}
+
+.fx-comet::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin-top: -9px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0 30%, #fff1c9 45%, #ffb347 62%, rgba(255, 138, 61, 0) 74%);
+  box-shadow: 0 0 12px 4px rgba(255, 179, 71, 0.75);
+}
+
+.fx-trail--comet {
+  height: 6px;
+  background: linear-gradient(90deg, transparent, rgba(255, 106, 42, 0.7) 45%, #ffd27a 85%, #ffffff);
+  box-shadow: 0 0 12px #ff8a3d;
+}
+
+.fx-groundfire {
+  width: calc(var(--size, 20px) * 20 / 28);
+  height: var(--size, 20px);
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 0 4px rgba(255, 140, 50, 0.85));
+}
+
+.fx-constellation-glow,
+.fx-constellation-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fx-constellation-glow {
+  stroke: #9fb8ff;
+  stroke-width: 4;
+  opacity: 0.6;
+  filter: blur(2px);
+}
+
+.fx-constellation-line {
+  stroke: #eef3ff;
+  stroke-width: 1.3;
+}
+
+.fx-star {
+  width: var(--size, 11px);
+  height: var(--size, 11px);
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0 30%, #d6e4ff 48%, rgba(159, 184, 255, 0) 72%);
+  box-shadow: 0 0 8px 3px rgba(190, 210, 255, 0.7);
+}
+
+/* An arrow of Perun's lightning: its head at its right end. */
+.fx-boltarrow {
+  width: 26px;
+  height: 4px;
+  margin: -2px 0 0 -26px;
+  transform-origin: 100% 50%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), color-mix(in srgb, var(--fx) 70%, #ffffff) 50%, #ffffff);
+  box-shadow: 0 0 8px 2px var(--fx);
+}
+
+.fx-boltarrow::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  right: -11px;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 13px solid #ffffff;
+  filter: drop-shadow(0 0 4px var(--fx)) drop-shadow(0 0 2px #e8462f);
+}
+
+.fx-sign--perun {
+  filter: drop-shadow(0 0 1px #ffffff) drop-shadow(0 0 8px var(--fx)) drop-shadow(0 0 16px rgba(232, 70, 47, 0.55));
+}
+
+/* The Oko burzy: storm clouds turning in a ring, and the calm in it. */
+.fx-stormring {
+  width: var(--size, 80px);
+  height: var(--size, 80px);
+}
+
+.fx-stormring-puff {
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 34%, rgba(156, 160, 184, 0.95), rgba(78, 80, 104, 0.95) 42%, rgba(42, 42, 62, 0.9) 60%, rgba(30, 30, 46, 0) 74%);
+  filter: blur(0.6px) drop-shadow(0 0 3px rgba(190, 200, 255, 0.35));
+}
+
+.fx-stormcalm {
+  width: var(--size, 60px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 246, 207, 0.6) 0 28%, rgba(255, 224, 138, 0.28) 52%, rgba(255, 224, 138, 0) 70%);
+  mix-blend-mode: screen;
+}
+
+/* The Syn Peruna's card in the calm of the Oko burzy while it lasts. */
+.unit--stormeye {
+  box-shadow: inset 0 0 16px rgba(255, 224, 138, 0.35), 0 0 0 1px rgba(255, 215, 106, 0.75), 0 0 9px 2px rgba(56, 50, 86, 0.9), 0 0 18px 4px rgba(255, 215, 106, 0.3);
+}
+
 /* 963: the evolved Kleryk's skills (skill-fx.js, arena-fx.js): the Odnowa's
    sprouts, the Wielka odnowa's rising light, the Cudowne uzdrowienie's orb
    and ribbons, the Cud's shaft and wings, the Wielkie błogosławieństwo's
