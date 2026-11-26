@@ -1,6 +1,7 @@
 // The potions and the meal of an exploration's "Opcje wyprawy" on the Walka
 // (screens/combat.js): what the character takes along and what it eats as
-// it sets out, each choice remembered in this browser. "Wyrusz ponownie" on
+// it sets out, each choice remembered in this browser for the character
+// alone (keptChoice in state.js; gracz, 26.11.2026). "Wyrusz ponownie" on
 // a report (screens/report.js) sends them as the place's screen would, with
 // what this browser remembers (keptSupplies; gracz (poz. 202), 26.11.2026:
 // „Jak jesteś liderem drużyny i klikasz powtórz wyprawę, to nie dodaje z
@@ -12,6 +13,7 @@ import { h, icon } from './dom.js';
 import { formatMinutes } from './format.js';
 import { t } from './i18n.js';
 import { askMealSwap } from './meal.js';
+import { keepChoice, keptChoice } from './state.js';
 
 // The potions to take along and the healing mark: { potions: { [id]: count },
 // picks: { heal, mana }, strengths: { heal, mana }, counts: { heal, mana },
@@ -27,21 +29,15 @@ const MEAL_PORTIONS_KEY = 'wzrost.meal-portions';
 // name of the row.
 const POTION_GROUPS = { heal: 'Leczenie', mana: 'Mana' };
 
-function loadChoice(key) {
+function loadChoice(key, character) {
   try {
-    return JSON.parse(localStorage.getItem(key)) ?? {};
+    return JSON.parse(keptChoice(key, character)) ?? {};
   } catch {
     return {};
   }
 }
 
-function saveChoice(choice, key) {
-  try {
-    localStorage.setItem(key, JSON.stringify(choice));
-  } catch {
-    // Without storage the page simply forgets the last choice.
-  }
-}
+const saveChoice = (choice, key, character) => keepChoice(key, JSON.stringify(choice), character);
 
 // The fights of an exploration of `minutes`, and so the most potions of a
 // kind it takes along (potionsPerKind in the engine).
@@ -55,7 +51,7 @@ const fightsFor = (use, minutes) => use.fightsByMinutes.filter(([from]) => from 
 export function supplyPickers(character, onChange) {
   const use = character.professions?.potionUse;
   const carried = use ? (character.potions ?? []).filter((potion) => potion.fight && potion.usable) : [];
-  return { potions: carried.length > 0 ? potionPicker(carried, use, onChange) : null, meal: mealPicker(character) };
+  return { potions: carried.length > 0 ? potionPicker(character, carried, use, onChange) : null, meal: mealPicker(character) };
 }
 
 // What "Wyrusz" sends of them: the potions taken along with the healing
@@ -106,14 +102,8 @@ function mealPicker(character) {
   if (dishes.length === 0) return null;
   // The most portions of one dish at once (cooking.meal.portions).
   const atOnce = dishes[0].stacks.length;
-  let stored = null;
-  let storedPortions = 0;
-  try {
-    stored = localStorage.getItem(MEAL_KEY);
-    storedPortions = Number(localStorage.getItem(MEAL_PORTIONS_KEY));
-  } catch {
-    // Without storage nothing is remembered.
-  }
+  const stored = keptChoice(MEAL_KEY, character);
+  const storedPortions = Number(keptChoice(MEAL_PORTIONS_KEY, character));
   // How many portions a dish picked starts at: as many as last chosen,
   // the most without a choice, then as many as there is room for (show).
   let wanted = Number.isInteger(storedPortions) && storedPortions >= 1 && storedPortions < atOnce ? storedPortions : atOnce;
@@ -147,12 +137,7 @@ function mealPicker(character) {
     portions = Math.max(1, Math.min(room(picked), portions + sign));
     if (!current) {
       wanted = portions >= room(picked) ? atOnce : portions;
-      try {
-        if (wanted < atOnce) localStorage.setItem(MEAL_PORTIONS_KEY, String(wanted));
-        else localStorage.removeItem(MEAL_PORTIONS_KEY);
-      } catch {
-        // Without storage nothing is remembered.
-      }
+      keepChoice(MEAL_PORTIONS_KEY, wanted < atOnce ? String(wanted) : null, character);
     }
     show();
   };
@@ -194,14 +179,7 @@ function mealPicker(character) {
                 if (dish?.id !== picked?.id) portions = wanted;
                 picked = dish;
                 // The choice made with no meal at work is the one remembered.
-                if (!current) {
-                  try {
-                    if (dish) localStorage.setItem(MEAL_KEY, dish.id);
-                    else localStorage.removeItem(MEAL_KEY);
-                  } catch {
-                    // Without storage nothing is remembered.
-                  }
-                }
+                if (!current) keepChoice(MEAL_KEY, dish ? dish.id : null, character);
                 show();
               },
             },
@@ -243,8 +221,8 @@ function mealPicker(character) {
 // The wish is kept apart from what a shorter length allows, so it comes
 // back with a longer one. A change is saved, then `onChange()`: the place's
 // screen asks for the threat again.
-function potionPicker(carried, use, onChange) {
-  const stored = loadChoice(POTION_KEY);
+function potionPicker(character, carried, use, onChange) {
+  const stored = loadChoice(POTION_KEY, character);
   const wanted = { ...stored.potions };
   const picks = { ...stored.picks };
   // How strong the kind picked is, for when the bag runs out of it.
@@ -252,7 +230,7 @@ function potionPicker(carried, use, onChange) {
   const counts = { ...stored.counts };
   let below = use.healBelowChoices.includes(stored.healBelow) ? stored.healBelow : use.healBelow;
   let fights = 1;
-  const save = () => saveChoice({ potions: wanted, picks, strengths, counts, healBelow: below }, POTION_KEY);
+  const save = () => saveChoice({ potions: wanted, picks, strengths, counts, healBelow: below }, POTION_KEY, character);
   const changed = () => {
     save();
     onChange?.();

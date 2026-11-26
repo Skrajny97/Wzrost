@@ -28,6 +28,8 @@ import {
   hellHuntOn,
   huntOptionsOpen,
   isUnlocked,
+  keepChoice,
+  keptChoice,
   reportCache,
   restRate,
   seekRareOn,
@@ -62,26 +64,22 @@ import { cultivationBusy } from '../cultivation.js';
 
 // Shown through t(), as the page loads its English after this module.
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
+// The length last chosen at each place, kept in this browser for the
+// character alone (keptChoice in state.js).
 const CHOICE_KEY = 'wzrost.hunt-choice';
 const HOME = '#/walka';
 // How long a party leader's box "Z drużyną" stands before it is asked again.
 const PARTY_FRESH_MS = 20000;
 
-function loadChoice(key = CHOICE_KEY) {
+function loadChoice() {
   try {
-    return JSON.parse(localStorage.getItem(key)) ?? {};
+    return JSON.parse(keptChoice(CHOICE_KEY)) ?? {};
   } catch {
     return {};
   }
 }
 
-function saveChoice(choice, key = CHOICE_KEY) {
-  try {
-    localStorage.setItem(key, JSON.stringify(choice));
-  } catch {
-    // Without storage the page simply forgets the last choice.
-  }
-}
+const saveChoice = (choice) => keepChoice(CHOICE_KEY, JSON.stringify(choice));
 
 // What the threat rating depends on, apart from HP.
 // Each item whole (an upgrade, a reforged affix or an element keeps its

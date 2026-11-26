@@ -816,7 +816,9 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
               trackQuests: trackQuestsOn(),
               trackUnknown: trackUnknownOn(),
               // The potions and the meal of "Opcje wyprawy" as this browser
-              // keeps them, as "Wyrusz" sends them, alone and with the
+              // keeps them for the character (each its own, like the boxes
+              // above and below: state.js, keptChoice; gracz, 26.11.2026),
+              // as "Wyrusz" sends them, alone and with the
               // Drużyna, whose members eat and take their own (gracz (poz.
               // 202), 26.11.2026: „Jak jesteś liderem drużyny i klikasz
               // powtórz wyprawę, to nie dodaje z automatu jedzenia”).

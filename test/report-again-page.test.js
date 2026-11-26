@@ -19,9 +19,12 @@ const { challenge, hunt } = data('balance');
 const { potionUse } = data('professions');
 const area = { id: 'windfalls-edge', name: 'Skraj Wiatrołomów', minLevel: 1, maxLevel: 5, unlockClassLevel: 1, description: 'Polana.', dangers: [] };
 const region = { id: 'windfalls', name: 'Wiatrołomy', minLevel: 1, maxLevel: 10, areas: [area] };
-const MEAL_KEY = 'wzrost.meal-choice';
-const PORTIONS_KEY = 'wzrost.meal-portions';
-const POTION_KEY = 'wzrost.potion-choice';
+// What this browser keeps for the character, under its id (state.js,
+// keptChoice).
+const ID = 7;
+const MEAL_KEY = `wzrost.meal-choice.${ID}`;
+const PORTIONS_KEY = `wzrost.meal-portions.${ID}`;
+const POTION_KEY = `wzrost.potion-choice.${ID}`;
 const member = (name, own) => ({ name, own, leader: own, status: 'free' });
 // The party the leader sends out, with a member free now.
 const leading = { members: [member('Próbna', true), member('Druhna', false)], limits: { minutes: 60, minutesBy: 'Druhna', classLevel: 30, classLevelBy: 'Druhna', mount: { shorter: 0, by: 'Druhna' } } };
@@ -106,6 +109,7 @@ beforeEach(() => {
 // bag and dishes in its Spiżarnia, and this meal at work.
 function character({ inParty, meal = null }) {
   return {
+    id: ID,
     name: 'Próbna',
     level: 30,
     classLevel: 30,
@@ -150,7 +154,7 @@ const started = () => sent.filter((one) => one.method === 'POST').at(-1);
 // they come: with "Z drużyną" ticked when the character leads a party.
 async function setOut() {
   const { mountCombat } = await import('../src/client/screens/combat.js');
-  stored.set('wzrost.hunt-choice', JSON.stringify({ [area.id]: 15 }));
+  stored.set(`wzrost.hunt-choice.${ID}`, JSON.stringify({ [area.id]: 15 }));
   const screen = globalThis.document.createElement('main');
   globalThis.document.body.append(screen);
   const view = mountCombat(screen, { params: { region: region.id, area: area.id }, navigate() {} });

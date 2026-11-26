@@ -58,6 +58,7 @@ beforeEach(() => {
 // A leader of level 30 with both boxes open, at home.
 function character() {
   return {
+    id: 7,
     name: 'Próbna',
     level: 30,
     classLevel: 30,
