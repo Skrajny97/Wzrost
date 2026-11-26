@@ -1,0 +1,14 @@
+{
+  "id": "last-frenzy",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the head of a roaring horned berserker with a wild dark beard and blazing red eyes, engulfed in red flames, drops of blood flying around it, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023928981900109187
+  },
+  "images": 1
+}

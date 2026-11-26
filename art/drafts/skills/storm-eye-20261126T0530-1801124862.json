@@ -1,0 +1,14 @@
+{
+  "id": "storm-eye",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "the eye of a huge storm: a ring of dark swirling storm clouds and lightning bolts spinning around a clear calm circle of bright golden light in the middle, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02321874218877157
+  },
+  "images": 1
+}

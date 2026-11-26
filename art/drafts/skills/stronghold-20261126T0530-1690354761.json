@@ -1,0 +1,14 @@
+{
+  "id": "stronghold",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a wooden palisade of sharpened logs on an earthen rampart, a large round ivory and gold shield with a green tree emblem planted in the ground in front of it, a soft golden glow of protection, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023332100788116455
+  },
+  "images": 1
+}

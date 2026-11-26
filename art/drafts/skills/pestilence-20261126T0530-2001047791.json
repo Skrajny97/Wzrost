@@ -1,0 +1,14 @@
+{
+  "id": "pestilence",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a cracked black skull breathing out a thick sickly yellow-green plague cloud, flies and drops of poison swirling in it, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023237797349717884
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "six-wings",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "six great wings of white and golden fire spread wide in three pairs around a blazing golden light in the middle, flames along their feathers, grander and more radiant, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/wings-of-light.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023388775971094768
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "breath-of-life",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a warm golden breath of light blowing as a gentle spiral of wind from a small radiant sun, carrying white feathers and tiny healing sparkles, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02333015455394321
+  },
+  "images": 1
+}

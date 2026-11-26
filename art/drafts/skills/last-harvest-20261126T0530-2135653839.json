@@ -1,0 +1,14 @@
+{
+  "id": "last-harvest",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a gigantic scythe of pale glowing blue light swinging in a full wide arc, a crescent trail of cold light behind its blade, ghostly white souls flying up from the cut into a swirl above it, grander and more deadly, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/soul-harvest.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023314997418085737
+  },
+  "images": 1
+}

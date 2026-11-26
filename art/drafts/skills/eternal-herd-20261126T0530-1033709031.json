@@ -1,0 +1,14 @@
+{
+  "id": "eternal-herd",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a charging European bison with lowered horns leading a brown bear and a moose with wide palmate antlers running beside it, a cloud of dust and green leaves behind them, grander and more powerful, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/bison-call.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024349988423877294
+  },
+  "images": 1
+}

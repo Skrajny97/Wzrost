@@ -1,0 +1,14 @@
+{
+  "id": "world-genesis",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a newborn world bursting apart in a cosmic explosion: a glowing planet splitting open with fire, ice shards, lightning and rocks flying out of it, golden stars and a dark nebula around it, grander and more powerful, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/primal-chaos.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023290249444537694
+  },
+  "images": 1
+}

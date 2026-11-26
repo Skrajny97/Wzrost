@@ -1,0 +1,14 @@
+{
+  "id": "book-of-fate",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "an ornate book of fate with a deep blue cover and a glowing golden eye on it, golden pages flying out of it and circling around it in a ring, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02341913224580553
+  },
+  "images": 1
+}

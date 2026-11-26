@@ -1,0 +1,14 @@
+{
+  "id": "soul-lament",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a swirling storm of screaming ghostly white and pale blue souls with wide open mouths bursting outward in a ring-shaped shockwave, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023229565251032515
+  },
+  "images": 1
+}

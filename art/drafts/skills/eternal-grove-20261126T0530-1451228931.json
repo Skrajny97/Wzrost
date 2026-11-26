@@ -1,0 +1,14 @@
+{
+  "id": "eternal-grove",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "two enormous ancient oak trees with wise faces in their bark and glowing green eyes standing side by side, their golden-green crowns joined above, glowing green roots spreading over the ground, green healing light between them, grander and more ancient, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/oak-of-ages.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02344015060573154
+  },
+  "images": 1
+}

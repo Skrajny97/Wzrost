@@ -1,0 +1,14 @@
+{
+  "id": "comet",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a huge blazing arrow like a comet plunging diagonally down from the sky, its head of white-hot silver light and a long tail of fire and starlight behind it, sparks scattering, grander and more powerful, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/heaven-arrow.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02343416072675917
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "sunbirth",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "an open hand raised high with a blazing newborn white and golden sun igniting above its palm, rays of light and fire bursting out in all directions, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023299094847997033
+  },
+  "images": 1
+}

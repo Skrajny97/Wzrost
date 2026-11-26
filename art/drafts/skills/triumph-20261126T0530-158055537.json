@@ -1,0 +1,14 @@
+{
+  "id": "triumph",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a golden sword raised straight up to the sky, a bright golden lightning bolt striking its tip from a parting storm cloud, rays of divine light around the blade, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023378650492986045
+  },
+  "images": 1
+}

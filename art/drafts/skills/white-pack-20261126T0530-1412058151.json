@@ -1,0 +1,14 @@
+{
+  "id": "white-pack",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "three great white wolves running and leaping forward together with glowing pale blue eyes and bared fangs, a pale full moon behind them, grander and more powerful, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/pack-chief.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02338165985679627
+  },
+  "images": 1
+}

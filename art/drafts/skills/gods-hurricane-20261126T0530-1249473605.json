@@ -1,0 +1,14 @@
+{
+  "id": "gods-hurricane",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a blazing golden sword spinning inside a huge triple whirlwind of pure golden light, divine rays shining down on it from above, golden sparks, grander and more divine, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/glory-hurricane.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024030887934790718
+  },
+  "images": 1
+}

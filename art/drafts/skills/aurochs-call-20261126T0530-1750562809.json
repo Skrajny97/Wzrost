@@ -1,0 +1,14 @@
+{
+  "id": "aurochs-call",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a huge black aurochs bull with long pale forward-curving horns and a pale stripe along its back stepping out of white marsh mist, head lowered with its horns forward, side view, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023315858652750654
+  },
+  "images": 1
+}

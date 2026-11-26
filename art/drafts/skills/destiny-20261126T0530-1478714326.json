@@ -1,0 +1,14 @@
+{
+  "id": "destiny",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a large ornate golden hourglass turning upside down with its glowing sand flowing upward, a ring of golden runes glowing behind it, grander and more powerful, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/fate-reversal.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023229030365837948
+  },
+  "images": 1
+}

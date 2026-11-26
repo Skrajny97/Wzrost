@@ -1,0 +1,14 @@
+{
+  "id": "starless-night",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "two huge black feathered wings of night folding over a dark sky, the last stars going out between them and turning into wisps of violet smoke, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024089499220742123
+  },
+  "images": 1
+}

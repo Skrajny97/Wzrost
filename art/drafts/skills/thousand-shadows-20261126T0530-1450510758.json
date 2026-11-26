@@ -1,0 +1,14 @@
+{
+  "id": "thousand-shadows",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "many dark violet shadow silhouettes bursting out in all directions from one point, each slashing with a glowing violet dagger, a swirl of black and violet shadow, grander and more powerful, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/shadow-strike.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02323642352464464
+  },
+  "images": 1
+}

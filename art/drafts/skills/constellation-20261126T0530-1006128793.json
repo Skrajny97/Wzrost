@@ -1,0 +1,14 @@
+{
+  "id": "constellation",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a constellation of seven bright white stars joined by thin silver lines across a round dark indigo patch of night sky, a small glowing arrow shooting out of each star, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023353521969477337
+  },
+  "images": 1
+}

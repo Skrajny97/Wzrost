@@ -1,0 +1,14 @@
+{
+  "id": "fiery-sword",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a gigantic sword made of white and pale blue holy flame plunging straight down from a split radiant sky, white fire leaping from its point onward in a jagged chain of flame, grander and more powerful, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/day-of-wrath.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02335769309722053
+  },
+  "images": 1
+}

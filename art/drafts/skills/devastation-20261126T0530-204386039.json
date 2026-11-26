@@ -1,0 +1,14 @@
+{
+  "id": "devastation",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a colossal double-bladed war axe of black volcanic stone with glowing molten lava cracks sweeping in a wide burning arc, a wave of molten lava and fire flowing behind it, embers flying, grander and more devastating, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/carnage.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023895174343744913
+  },
+  "images": 1
+}

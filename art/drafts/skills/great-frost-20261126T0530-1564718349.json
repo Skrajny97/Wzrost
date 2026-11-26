@@ -1,0 +1,14 @@
+{
+  "id": "great-frost",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "three dark figures frozen solid inside three tall jagged crystals of clear blue ice standing close together, a white freezing blizzard and frost spikes around them, grander and colder, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/ice-eternity.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023243114255693226
+  },
+  "images": 1
+}

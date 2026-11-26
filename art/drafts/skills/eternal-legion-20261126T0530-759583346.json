@@ -1,0 +1,14 @@
+{
+  "id": "eternal-legion",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "three armoured skeleton knights with green glowing eyes, dark helmets, shields and swords rising again from cracked earth in green ghost fire, grander and more menacing, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/navia-legion.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02382436907280816
+  },
+  "images": 1
+}
