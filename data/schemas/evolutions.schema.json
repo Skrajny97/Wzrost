@@ -87,10 +87,7 @@
             "description": "988: broń, druga ręka i zbroja (rodziny z item-bases.json), których ta forma i jej następne formy używają zamiast klasowych, np. kostury i fokusy Maga u Nekromanty i Licza (src/engine/gear.js)."
           },
           "weaponDamage": { "type": "number", "exclusiveMinimum": 0, "maximum": 2, "description": "988: część obrażeń, którą bronie tej formy i jej następnych form biją u niej (np. 0,8: kostury Nekromanty biją o 20% słabiej niż u Maga, bo zostaje mu szybkość, unik i HP Cienia)." },
-          "duelPower": { "type": "number", "exclusiveMinimum": 0, "maximum": 3, "description": "992 A: mnożnik obrażeń tej formy w pojedynkach graczy (Arena, wojny gildii), samej tej formy, bez jej następnych form, żeby każda druga forma wygrywała 25–75% pojedynków (na 100. poziomie), a trzecia na 200. i średnio na poziomach 210–290 (od 0.3.95)." },
-          "duelHp": { "type": "number", "exclusiveMinimum": 0, "maximum": 3, "description": "992 A: mnożnik HP tej formy w pojedynkach graczy, jak duelPower (np. 0,8 dla Bastionu, który wygrywa wytrzymałością)." },
-          "duelSummonPower": { "type": "number", "exclusiveMinimum": 0, "maximum": 3, "description": "Mnożnik ciosów przywołańców tej formy w pojedynkach graczy (Arena, wojny gildii), samej tej formy, ponad duelPower (24.11.2026: linia Druida ma siłę w przywołańcach, a jej własne ciosy liczą się w pojedynku jak u innych)." },
-          "towerSummonRoot": { "type": "number", "minimum": 0, "maximum": 1, "description": "1249 B: część siły korzeni przywołańców tej formy (o ile trafiony wróg zwalnia) w Wieżach Systemu (Wieża Solo i Wieża Drużyn), samej tej formy, także u gracza Drużyny i towarzysza; poza Wieżami pełna siła. Pradruid: korzenie jego dwóch dębów odsuwały każdy ruch stwora, więc w Wieży Solo wchodził ok. 150 pięter wyżej niż inne czwarte formy." },
+          "towerSummonRoot": { "type": "number", "minimum": 0, "maximum": 2, "description": "1249 B (dostrojone w 1271 B): siła korzeni przywołańców tej formy (o ile trafiony wróg zwalnia) w Wieżach Systemu (Wieża Solo i Wieża Drużyn) jako część ich siły poza Wieżami, samej tej formy, także u gracza Drużyny i towarzysza: poniżej 1 korzenie spowalniają tam słabiej, powyżej 1 mocniej. Cel: forma wchodzi w Wieży Solo mniej więcej tak wysoko jak najlepsza inna forma tej samej ewolucji." },
           "scaling": { "type": "string", "enum": ["strength", "dexterity", "intellect", "wisdom"], "description": "988: statystyka, którą biją bronie tej formy i jej następnych form zamiast swojej." },
           "as": { "type": "object", "additionalProperties": { "type": "string", "enum": ["strength", "dexterity", "intellect", "wisdom", "vitality", "endurance", "perception", "will"] }, "description": "988: każdy punkt jednej statystyki tej formy i jej następnych form liczy się jako innej, z klasy, z punktów, z profesji i z przedmiotów (np. Zręczność Nekromanty jako Intelekt), a statystyka, która przejmuje jej miejsce, daje też szybkość i unik." },
           "autoPoints": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 }, "description": "988: rozkład „Rozdaj według klasy” tej formy i jej następnych form zamiast klasowego; jego największa część to główna statystyka (Rdzeń)." },
@@ -110,7 +107,12 @@
               "name": { "type": "string", "minLength": 1 },
               "text": { "type": "string", "minLength": 1 },
               "kind": { "type": "string", "minLength": 1 },
-              "params": { "type": "object" }
+              "params": {
+                "type": "object",
+                "properties": {
+                  "wisdomPower": { "const": false, "description": "1271 B: punkty Mądrości (wisdomPer) dają przywołańcom tylko HP, a nie siłę ciosów (Pradruid, Ojciec Puszczy): ciosy przywołańców rosną z Intelektem postaci jak u innych, a nie bez końca z Mądrością." }
+                }
+              }
             }
           },
           "skills": { "type": "array", "items": { "type": "string" }, "minItems": 2, "maxItems": 2, "description": "Pierwsza rozwija umiejętność (from): ścieżki u pierwszej ewolucji, jedną z umiejętności ewolucji, z której wyrasta, u drugiej i trzeciej. Druga jest nowa." }
@@ -139,6 +141,8 @@
           "params": {
             "type": "object",
             "properties": {
+              "loneAny": { "const": true, "description": "1271 B: wyrok (cios z below) trafia jedynego wroga przy każdym jego HP, a nie dopiero poniżej below (wyroki Inkwizytorów): jeden na jednego nie czeka połowy walki." },
+              "single": { "anyOf": [{ "type": "number" }, { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 }], "description": "Siła ciosu w jedynego wroga: zamachu (sweep) i, od 1271 B, chmury (stance z cloud, Stos), zamiast power." },
               "pack": {
                 "type": "array",
                 "minItems": 2,

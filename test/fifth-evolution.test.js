@@ -439,17 +439,20 @@ describe('the fifth forms in fights', () => {
     }
     // As the whole Druid line since 0.5.11 (test/druid-summons.test.js): the
     // summons draw the foes' blows and have 75% of the character's maximum HP
-    // on top, and the strength in duels is in the summons, as the Pradruid's.
+    // on top; as the Pradruid's since 1271 B, its Wisdom gives them HP only,
+    // and no strength of its own in duels.
     const elder = content.evolutionsById['elder-druid'];
     const father = content.evolutionsById['wilds-father'];
     assert.equal(father.trait.params.lure, true);
     assert.equal(father.trait.params.summonLife, elder.trait.params.summonLife);
-    assert.equal(father.duelPower, undefined);
-    assert.equal(father.duelSummonPower, elder.duelSummonPower);
-    // In the Wieże its oaks' roots slow at a fifth of their strength, as the
-    // Pradruid's (1249 B), and its trait says so.
-    assert.equal(father.towerSummonRoot, elder.towerSummonRoot);
-    assert.ok(father.trait.text.endsWith('W Wieżach Systemu korzenie Odwiecznych dębów spowalniają wrogów pięć razy słabiej.'));
+    assert.deepEqual([father.trait.params.wisdomPower, elder.trait.params.wisdomPower], [false, false]);
+    assert.deepEqual([father.duelPower, father.duelSummonPower], [undefined, undefined]);
+    // In the Wieże its oaks' roots slow at 37% of their strength, a share of
+    // its own since 1271 B (the Pradruid's 1.15; both a fifth before), so it
+    // climbs about as high as the best other fifth form, and its trait says
+    // so.
+    assert.equal(father.towerSummonRoot, 0.37);
+    assert.ok(father.trait.text.endsWith('W Wieżach Systemu korzenie Odwiecznych dębów spowalniają wrogów o 63% słabiej.'));
     const standingNames = (result) => {
       const standing = new Map();
       let most = [];
@@ -567,7 +570,11 @@ describe('the fifth forms against the fourth forms (tools/class-balance-sim.mjs,
 
   test('in the Arena at levels 350 and 380 each fifth form wins 25–75% of its duels against the other paths, and the duels last a few rounds', () => {
     // Class levels about 417 and 451 (the tuned curve): every path is a
-    // fifth form, each with its own strength in duels (duelPower, duelHp).
+    // fifth form. No form has a strength of its own in duels since 1271 B
+    // (until then duelPower, duelHp): the Miecz Niebios's verdict strikes a
+    // lone foe at any HP, the Tarcza Świata's shockwave passes all armour,
+    // the Pan Dusz reaps every second move and the Czempion Bogów's rival
+    // bleeds less, everywhere.
     for (const level of [350, 380]) {
       const result = measure({ level, seeds: 1, model: 'realistic', paths: true }, tuned(content));
       assert.deepEqual(Object.keys(result.paths).sort(), [...FORMS].sort());

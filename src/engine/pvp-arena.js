@@ -113,8 +113,15 @@ export function duelArmorShare(levelA, levelB, content) {
 // blows it takes (Nieugięty, Niezłomny, Wyzwanie, Lustro many) counts in
 // the same share (question 780): a rival's blows are far bigger than a
 // creature's, the reflections were measured against, and a reflection
-// passes any armour, so a Bastion won most of its duels on them alone. The
-// guild wars' battles (guild-wars.js) make their fighters so too.
+// passes any armour, so a Bastion won most of its duels on them alone. Its
+// summons take their share of the HP before the factor (`baseMaxHp`,
+// combat.js; 1271 B): a share of the grown HP stood several times as long
+// as the same summon does anywhere else. Every form fights by the same
+// rules: since 1271 B no form has a strength of its own in duels (the
+// author: „trzeba rozwiązać balans postaci inaczej niż przez te
+// modyfikatory na arenie”), the forms are evened out by their skills and
+// traits, which work alike everywhere. The guild wars' battles
+// (guild-wars.js) make their fighters so too.
 /**
  * @param {Fighter} fighter
  * @param {string} id
@@ -136,25 +143,16 @@ export function duelist({ character, equipped, name }, id, side, { factor, armor
     /** @type {any} */ ({ character, equipped, name, id, side, skillStatWeight: content.balance.skills.duelSkillStatWeight ?? 0, manaCost: content.balance.skills.duelManaCost ?? null }),
     content,
   );
-  // The form's own strength in the players' duels (992 A: the second forms
-  // the Arena's numbers left outside 25–75% of their duels): its blows'
-  // share (evolutions.json `duelPower`) and its HP's (`duelHp`), of that
-  // form alone, not its next forms. The Druid's line (24.11.2026) has its
-  // strength in its summons instead (`duelSummonPower`: their blows, on top
-  // of the form's own), so its own blows are as anyone's.
-  const form = content.evolutionsById?.[character.evolution];
-  const maxHp = Math.max(1, Math.round(unit.maxHp * factor * (form?.duelHp ?? 1)));
+  const maxHp = Math.max(1, Math.round(unit.maxHp * factor));
   return {
     ...unit,
     maxHp,
     hp: maxHp,
-    // The HP before the duel's factor: the Druid's summons take their share
-    // of it (combat.js, `summonLife`).
+    // The HP before the duel's factor: every summon takes its share of it
+    // (combat.js).
     baseMaxHp: unit.maxHp,
     armor: Math.round(unit.armor * armor),
     reflectShare: armor,
-    damageScale: unit.damageScale * (form?.duelPower ?? 1),
-    ...(form?.duelSummonPower && { summonScale: form.duelSummonPower }),
   };
 }
 
@@ -162,11 +160,16 @@ export function duelist({ character, equipped, name }, id, side, { factor, armor
 // name }) with the rival's (`defender`), from the server's `seed`: the same
 // characters and seed give the same fight. A fight may end one-sided or go
 // on and on (two healers): after duel.maxMoves moves of both sides together
-// the judge ends it, and the one with the bigger share of its HP left wins,
-// or it is a draw when the shares differ by duel.drawMargin at most; the
-// log then ends with the judge's words. `result` is the attacker's: 'win',
-// 'loss' or 'draw'; `fight` is for the playback (src/client/arena.js), as a
-// report's fight. `record: false` skips the log (the simulation).
+// the judge ends it, and the one that dealt the other the bigger share of
+// its HP wins (its blows, effects, thrown-back blows and summons, what its
+// rival's shields and summons took too, healed back or not: 1271 B, so that
+// healing no longer wins by waiting; until then the bigger share of HP
+// left won), or it is a draw when the shares differ by duel.drawMargin at
+// most; the log then ends with the judge's words. `result` is the
+// attacker's: 'win', 'loss' or 'draw'; `shares`, each side's share of its
+// HP left, and `dealt`, the share of the other's HP each dealt; `fight` is
+// for the playback (src/client/arena.js), as a report's fight. `record:
+// false` skips the log (the simulation).
 /**
  * @param {{ attacker: Fighter, defender: Fighter, seed: string | number }} duelists
  * @param {Content} content
@@ -185,20 +188,21 @@ export function arenaDuel({ attacker, defender, seed }, content, { record = true
   /** @param {Record<string, any>} unit */
   const left = (unit) => Math.max(0, fight.units.find((/** @type {{ id: string }} */ one) => one.id === unit.id)?.hp ?? 0) / unit.maxHp;
   const shares = { attacker: left(ally), defender: left(enemy) };
+  const dealt = { attacker: (fight.dealt[ally.id] ?? 0) / enemy.maxHp, defender: (fight.dealt[enemy.id] ?? 0) / ally.maxHp };
   const limit = fight.won === null;
   /** @type {Result} */
   let result;
   if (!limit) result = fight.won ? 'win' : 'loss';
-  else if (Math.abs(shares.attacker - shares.defender) <= duel.drawMargin) result = 'draw';
-  else result = shares.attacker > shares.defender ? 'win' : 'loss';
+  else if (Math.abs(dealt.attacker - dealt.defender) <= duel.drawMargin) result = 'draw';
+  else result = dealt.attacker > dealt.defender ? 'win' : 'loss';
   /** @type {Record<string, any>[]} */
   const events = [...fight.events];
   if (limit && record) {
-    const ahead = result === 'win' ? ally : enemy;
+    const [ahead, mine, theirs] = result === 'win' ? [ally, dealt.attacker, dealt.defender] : [enemy, dealt.defender, dealt.attacker];
     events.push({
       t: (events.at(-1)?.t ?? 0) + 1,
       kind: 'limit',
-      text: say(texts, result === 'draw' ? 'limitDraw' : 'limitWin', 0, { moves: duel.maxMoves, name: ahead.name }),
+      text: say(texts, result === 'draw' ? 'limitDraw' : 'limitWin', 0, { moves: duel.maxMoves, name: ahead.name, mine: Math.round(mine * 100), theirs: Math.round(theirs * 100) }),
     });
   }
   return {
@@ -206,6 +210,7 @@ export function arenaDuel({ attacker, defender, seed }, content, { record = true
     limit,
     moves: fight.actions,
     shares,
+    dealt,
     hpFactor: factor,
     fight: {
       allies: [combatantView(ally, enemy.level, content)],

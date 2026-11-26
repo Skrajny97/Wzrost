@@ -470,7 +470,7 @@
   "arena": {
     "texts": {
       "intro": "In the Arena you face other players' characters. Your rival need not be in the game: their character defends itself.",
-      "rules": "Fights a day: {perDay}, from midnight. You pick one of three rivals with a similar rating, and the fight takes place at once: your character against the rival's character as it is saved now, with its stats, gear, skills and evolution, but without companions, mercenaries and potions. Both sides have more HP than usual, so that the fight lasts a few rounds: {hpFactor} times as much for two characters of your level. After {moves} moves the judge ends the fight: whoever has more HP left wins, and when both have almost the same left, it is a draw.",
+      "rules": "Fights a day: {perDay}, from midnight. You pick one of three rivals with a similar rating, and the fight takes place at once: your character against the rival's character as it is saved now, with its stats, gear, skills and evolution, but without companions, mercenaries and potions. Both sides have more HP than usual, so that the fight lasts a few rounds: {hpFactor} times as much for two characters of your level. Summons have as much HP as on explorations. After {moves} moves the judge ends the fight: whoever dealt a bigger share of the rival's HP wins, counting the damage the rival healed afterwards, and when both dealt almost the same, it is a draw.",
       "rerollRule": "If the rivals don't suit you, you can reroll them for others with a similar rating. Rerolls a day: {rerolls}, from midnight. A reroll does not use up a fight.",
       "armorRule": "Armour protects less here than on explorations, as characters wear far more of it than creatures do: for two characters of your level, {armor}% of the armour counts. The same share of the damage reflected by skills counts.",
       "ratingRules": "The rating starts at {start}. A win raises it and a loss lowers it, the more so the bigger the gap between the ratings: a win against a higher-rated rival brings you more. When someone challenges your character, its rating moves less. On the first day of each month a new season begins: every rating then moves {share}% of the way back to {start}.",
@@ -494,8 +494,8 @@
       "loss": "Fight with {name}: lost.",
       "draw": "Fight with {name}: a draw.",
       "change": "Rating: {before} → {after} ({change})",
-      "limitWin": ["After {moves} moves the judge ends the fight: {name} has more HP left."],
-      "limitDraw": ["After {moves} moves the judge ends the fight: both sides have almost the same HP left, so it is a draw."],
+      "limitWin": ["After {moves} moves the judge ends the fight: {name} dealt the rival more damage ({mine}% of its HP against {theirs}%)."],
+      "limitDraw": ["After {moves} moves the judge ends the fight: both sides dealt each other almost the same damage, so it is a draw."],
       "defences": "Recent defences",
       "defencesNew": "Recent defences ({count} new)",
       "noDefences": "No one has challenged your character lately.",

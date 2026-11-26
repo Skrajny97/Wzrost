@@ -107,8 +107,8 @@ export const beastJoinHp = (level, share, content) => Math.max(0, Math.round(sha
 // `power` (strikePower in guild-strike.js: the class of the day, the
 // rally, a Cios strengthened by a podcięcie or a podcięcie's half) makes
 // every blow of the character, its effects and its summons that many times
-// as strong, as the Arena's duelPower does, so the playback shows the blows
-// as they were.
+// as strong (its damage scale), so the playback shows the blows as they
+// were.
 /**
  * @param {{ character: Record<string, any>, equipped: Record<string, any>[], name: string, beast: Beast, seed: unknown, trophies?: Record<string, any>, power?: number }} attack
  * @param {Content} content

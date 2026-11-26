@@ -111,8 +111,10 @@ describe('the estimate against explorations as the game runs them', () => {
   // come to 33.6%. Since the weaker creatures (24.11.2026) hardly any of
   // them faints at levels 50 and 100: none from 24.11, about 1.5% on 4 hours
   // since they stand halfway (25.11.2026), the estimate as much and the
-  // recursion alone none. At 300 about 9.3% on 4 hours (6.6% from 24.11),
-  // where the recursion alone shows 6.4% (3.7%).
+  // recursion alone none. At 300 about 8.4% on 4 hours since the forms'
+  // changes of 1271 B (9.3% from 25.11, 6.6% from 24.11), where the
+  // recursion alone shows 7.5% (6.4%, 3.7%): still less, if by less than a
+  // quarter now.
   for (const level of [50, 100, 300]) {
     test(`level ${level}: 1 and 4 hours`, () => {
       const rows = { 60: { estimate: 0, real: 0, before: 0 }, 240: { estimate: 0, real: 0, before: 0 } };
@@ -135,7 +137,7 @@ describe('the estimate against explorations as the game runs them', () => {
       for (const minutes of [60, 240]) {
         const { estimate, real, before } = Object.fromEntries(Object.entries(rows[minutes]).map(([key, sum]) => [key, sum / builds]));
         near(estimate, real, minutes === 60 ? 0.03 : 0.05);
-        if (minutes === 240 && level === 300) assert.ok(real >= 0.05 && before < real * 0.75, `before: ${before}, real: ${real}`);
+        if (minutes === 240 && level === 300) assert.ok(real >= 0.05 && before < real * 0.95, `before: ${before}, real: ${real}`);
       }
     });
   }

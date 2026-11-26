@@ -295,11 +295,21 @@ describe("the guild wars' rules", () => {
     const uneven = warBattle({ sideA: strong, sideB: weak, seed: 'war-2' }, content);
     assert.equal(uneven.result, 'a');
     assert.equal(uneven.fight.allies.length, 3);
-    // The judge ends a battle that goes on: more HP left wins, as much is a draw.
-    const judged = warBattle({ sideA: ours, sideB: theirs, seed: 'war-1' }, { ...content, guilds: { ...content.guilds, war: { ...war, battle: { movesPerFighter: 0, drawMargin: 0.02 } } } });
+    // The judge ends a battle that goes on: the side that dealt the other the
+    // bigger share of its HP wins (1271 B; until then the bigger share of HP
+    // left), as much is a draw.
+    const judgedBy = (movesPerFighter) => warBattle({ sideA: ours, sideB: theirs, seed: 'war-1' }, { ...content, guilds: { ...content.guilds, war: { ...war, battle: { movesPerFighter, drawMargin: 0.02 } } } });
+    const judged = judgedBy(0);
     assert.equal(judged.limit, true);
     assert.equal(judged.result, 'draw');
+    assert.deepEqual(judged.dealt, { a: 0, b: 0 });
     assert.equal(judged.fight.events.at(-1).kind, 'limit');
+    const short = judgedBy(1);
+    assert.equal(short.limit, true);
+    const lead = short.dealt.a - short.dealt.b;
+    assert.equal(short.result, Math.abs(lead) <= 0.02 ? 'draw' : lead > 0 ? 'a' : 'b');
+    assert.ok(short.dealt.a > 0 && short.dealt.b > 0);
+    if (short.result !== 'draw') assert.match(short.fight.events.at(-1).text, /zadała rywalom więcej obrażeń \(\d+% ich HP wobec \d+%\)/);
     // Watched from side B: its team at the bottom, its result its own.
     const turned = warFightFor(battle.fight, 'b');
     assert.deepEqual(turned.allies.map((unit) => unit.name), theirs.map((one) => one.name));

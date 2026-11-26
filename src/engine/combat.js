@@ -129,6 +129,13 @@
 // sun that burns (`orb` with an effect), shields that slow, a tomb of ice
 // for three, a sentence that goes on from foe to foe (`chain`), a raising
 // that heals the party and stops the foes, and a curse that weakens.
+//
+// The Arena through its mechanics (1271 B) adds a verdict that strikes a
+// lone foe at any HP (`loneAny`), a cloud's stronger blow at a lone foe
+// (`single`, as a sweep's) and summons whose Wisdom bonus is HP only (a
+// trait's `wisdomPower` false); in a players' duel every summon's HP counts
+// from the HP before the duel's factor (`baseMaxHp`), and what a shield
+// took counts as dealt (`dealt`, the duel's judge).
 
 // The Rdzeń's large Artefakty (core.js) and the blessings of the Labirynt
 // Systemu (labyrinth.js) shape a unit with a few marks of its own: a share
@@ -448,6 +455,12 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     // Znak śmierci keeps count of what its foe takes.
     if (target.doom) target.doom.taken += amount;
   };
+  // What a shield took of a unit's blow or effect counts as dealt by it too
+  // (the players' duels' judge weighs what each side took, 1271 B); the HP
+  // the target lost stays as it was.
+  const shieldTook = (/** @type {string | undefined} */ source, /** @type {number} */ amount) => {
+    if (source && amount > 0) dealt[source] += amount;
+  };
 
   // Borowina (the place's trait `healBonus`): the allies' healing, by
   // skills and potions, gives back a share more HP. No random numbers.
@@ -763,6 +776,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     const shelter = unit.shelter ? 1 - (unit.shelter.frost ?? 0) : 1;
     const full = Math.max(1, Math.round(raw * (1 - reduction(unit.resist.frost ?? 0, winter.level, balance)) * (1 + (unit.weak?.frost ?? 0)) * shelter));
     const absorbed = unit.shield ? absorb(unit, full) : 0;
+    shieldTook(winter.id, absorbed);
     const amount = bearable(unit, full - absorbed);
     damage(unit, amount, winter.id);
     const effect = content.effectsById.chilled;
@@ -785,6 +799,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       const shelter = evolving && unit.shelter ? 1 - (unit.shelter[dot.element] ?? 0) : 1;
       const raw = Math.max(1, Math.round(dot.perTick * (1 - resisted) * (1 + (unit.weak?.[dot.element] ?? 0)) * shelter));
       const absorbed = unit.shield ? absorb(unit, raw) : 0;
+      shieldTook(dot.source, absorbed);
       const amount = bearable(unit, raw - absorbed);
       damage(unit, amount, dot.source);
       dot.ticks -= 1;
@@ -834,7 +849,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     const source = king ?? killer;
     const feat = source?.feat;
     if (!source || feat?.kind !== 'toxins' || !feat.raise || source.hp <= 0 || source.summons.length >= summonLimit(source)) return;
-    const hp = Math.max(1, Math.round(source.maxHp * feat.raiseHp));
+    // In a players' duel of the HP before the duel's factor, as every
+    // summon's (`baseMaxHp`, 1271 B).
+    const hp = Math.max(1, Math.round((source.baseMaxHp ?? source.maxHp) * feat.raiseHp));
     const name = feat.raiseName;
     // The summon's blows go under the trait's name.
     source.summons.push({
@@ -1529,6 +1546,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     const below = Math.max(move.killBelow ?? 0, feat?.kind === 'precision' && feat.killBelow && ownBlow(move) ? feat.killBelow : 0);
     const slain = below > 0 && !target.champion && target.hp < below * target.maxHp && !unstoppable(target);
     const absorbed = target.shield && !slain ? absorb(target, amount) : 0;
+    shieldTook(actor.id, absorbed);
     amount -= absorbed;
     if (slain) amount = Math.max(amount, target.hp);
     amount = bearable(target, amount);
@@ -1805,10 +1823,16 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     return further.find((/** @type {Unit} */ unit) => (DEPTH[unit.position] ?? 0) === next);
   };
 
+  // Whether a verdict (a strike that waits for a foe below its mark, Wyrok)
+  // may go now: a foe in sight below the mark, or a lone foe in sight at
+  // any HP where the skill says so (`loneAny`: the Inkwizytorzy's verdicts,
+  // 1271 B, so that one against one they do not wait out half the fight).
+  const verdictOpen = (/** @type {Unit[]} */ seen, /** @type {Params} */ p) => (p.loneAny && seen.length === 1) || seen.some((unit) => unit.hp < p.below * unit.maxHp);
+
   // Who a skill's blow goes to: the back (Cios w plecy, Egzekucja), the foe
   // with the most HP (Strzał z ukrycia), the weakest of those below the
-  // mark (Wyrok), else the usual target; each of those in sight (Ukryty w
-  // mroku).
+  // mark (Wyrok; a lone foe at any HP with `loneAny`), else the usual
+  // target; each of those in sight (Ukryty w mroku).
   const skillTarget = (/** @type {Unit} */ actor, /** @type {Unit[]} */ opponents, /** @type {Params} */ p) => {
     const seen = inSight(opponents);
     // Cios ostateczny looks first for a foe it kills at once, the lowest on
@@ -1826,7 +1850,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     }
     if (p.target === 'back') return furthestBack(actor, seen);
     if (p.target === 'strongest') return seen.reduce((/** @type {Unit} */ best, /** @type {Unit} */ unit) => (unit.hp > best.hp ? unit : best));
-    if (p.below !== undefined) {
+    if (p.below !== undefined && !(p.loneAny && seen.length === 1)) {
       return seen.filter((/** @type {Unit} */ unit) => unit.hp < p.below * unit.maxHp).reduce((/** @type {Unit | null} */ best, /** @type {Unit} */ unit) => (!best || unit.hp / unit.maxHp < best.hp / best.maxHp ? unit : best), /** @type {Unit | null} */ (null));
     }
     return pickTarget(actor, seen);
@@ -1993,9 +2017,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         if (!party.some((unit) => unit.hp < p.below * unit.maxHp)) continue;
       }
       // Strzał z ukrycia works only on the first move; Wyrok waits for a foe
-      // in sight below its mark.
+      // in sight below its mark (verdictOpen).
       if (p.opener && actor.moves > 0) continue;
-      if (p.below !== undefined && skill.kind === 'strike' && !inSight(opponents).some((/** @type {Unit} */ unit) => unit.hp < p.below * unit.maxHp)) continue;
+      if (p.below !== undefined && skill.kind === 'strike' && !verdictOpen(inSight(opponents), p)) continue;
       // A character has one summon at a time (the Druid's line two, three
       // and four): another summoning skill waits until there is room, a
       // pack (Zew zwierząt, Gaj wieków) room for all of it, and none calls
@@ -2106,21 +2130,26 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         // Moc puszczy: summons with more HP and stronger blows.
         const grove = evolving && (actor.feat?.kind === 'arcana' || actor.feat?.summonPower) ? actor.feat : null;
         // Korzenie świata: every `wisdomPer` points of Wisdom give the summons
-        // one percent more HP and power.
+        // one percent more HP and power; with the trait's `wisdomPower` false
+        // (the Pradruid's and the Ojciec Puszczy's since 1271 B) more HP only:
+        // their blows grow with the Druid's Intelekt as anyone's do, and
+        // Wisdom no longer adds to them without a limit.
         const wise = grove?.wisdomPer ? (actor.wisdom ?? 0) / grove.wisdomPer / 100 : 0;
+        // In a players' duel (the Arena, the guild wars) every summon's HP is
+        // a share of the HP before the duel's factor (`baseMaxHp`, duelist in
+        // pvp-arena.js; 1271 B), so a summon takes as many blows there as
+        // anywhere, as the Druid's line's did since 24.11.2026: a wolf's or a
+        // knight's share of the grown HP stood several times as long.
+        const hpBase = actor.baseMaxHp ?? actor.maxHp;
         // The Arkanista's line calls its summons out of mana (934 A, 935 A):
         // their HP is a share of the summoner's maximum mana, not its HP.
-        const pool = p.hpFrom === 'mana' ? (actor.maxMana ?? 0) : actor.maxHp;
+        const pool = p.hpFrom === 'mana' ? (actor.maxMana ?? 0) : hpBase;
         // The Druid's line (24.11.2026): each summon has a share of the
         // summoner's maximum HP on top (its trait's `summonLife`), so it
         // grows with the Druid's level and Witalność too, not only with its
-        // mana; in a players' duel the HP before the duel's factor
-        // (`baseMaxHp`, duelist in pvp-arena.js), so a summon takes as many
-        // blows there as anywhere.
-        const life = grove?.summonLife ? (actor.baseMaxHp ?? actor.maxHp) * grove.summonLife : 0;
-        // In a players' duel a form may have its summons' own strength
-        // (evolutions.json duelSummonPower; duelist in pvp-arena.js).
-        const stronger = (1 + (grove?.summonPower ?? 0) + wise) * (actor.summonScale ?? 1);
+        // mana.
+        const life = grove?.summonLife ? hpBase * grove.summonLife : 0;
+        const stronger = 1 + (grove?.summonPower ?? 0) + (grove?.wisdomPower === false ? 0 : wise);
         // The slime's poison: a share of the summoner's average blow a move.
         const raw = ((actor.weapon.min + actor.weapon.max) / 2) * actor.damageScale;
         // Zew zwierząt and Gaj wieków call a pack at once (`pack`,
@@ -2149,8 +2178,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
             burst: Boolean(m.burst),
             physical: Boolean(m.physical),
             ...(m.howl && { howl: m.howl }),
-            // In the Wieże the Pradruid's roots slow by a share of that
-            // (1249 B: evolutions.json towerSummonRoot; towerFight in towers.js).
+            // In the Wieże the Druid line's roots slow by a share of that
+            // (1249 B, re-tuned in 1271 B: evolutions.json towerSummonRoot;
+            // towerFight in towers.js).
             ...(m.root && { root: m.root * (actor.summonRootScale ?? 1) }),
             // The fourth forms' summons: the bear strikes the foe in front and
             // may stun it, the Dąb wieków heals the party every move.
@@ -2416,6 +2446,8 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         regen: p.regen,
         heal: p.heal === undefined ? undefined : p.heal * care,
         power: p.power,
+        // A cloud's blow at a lone foe, as a sweep's `single` (Stos, 1271 B).
+        single: p.single,
         category: p.category,
         element: p.element,
         // The second forms' stances: a roar that weakens the other side, a
@@ -2480,8 +2512,10 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         const foes = foesOf(actor);
         if (foes.length === 0) continue;
         log(() => ({ t, kind: 'skill', actor: actor.id, skill: skill.id, skillName: skill.name, targets: foes.map((unit) => unit.id), text: say(texts, stance.tickWords ?? 'cloudStrike', actions, { skill: skill.name }) }));
+        // A lone foe takes the cloud's `single` where it has one.
+        const power = foes.length === 1 && stance.single !== undefined ? stance.single : stance.power;
         for (const foe of foes) {
-          if (foe.hp > 0 && actor.hp > 0) strike(actor, foe, t, { skill, power: stance.power, category: stance.category, element: stance.element, sweep: true, cloud: true, ...(stance.undodgeable && { undodgeable: true }) });
+          if (foe.hp > 0 && actor.hp > 0) strike(actor, foe, t, { skill, power, category: stance.category, element: stance.element, sweep: true, cloud: true, ...(stance.undodgeable && { undodgeable: true }) });
         }
       } else if (stance.orb) {
         // Kula piorunów: lightning at the foe with the most HP, which may
@@ -2619,6 +2653,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         events,
         // Each unit's HP, and its mana where the fight counted it (skilled).
         units: units.map((unit) => ({ id: unit.id, hp: unit.hp, ...(skilled && { mana: unit.mana }) })),
+        // By unit: what its blows, effects, thrown-back blows and summons
+        // took from the other side (its HP, its summons and its shields),
+        // and what it lost of its own HP.
         dealt,
         taken,
         drunk,

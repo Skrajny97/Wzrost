@@ -775,8 +775,8 @@
         "On Sunday at {hour} the league ends. 1st place collects {first} and {firstItems} of champion rarity for the Guild Chest, 2nd place {second} and {secondItems}, and 3rd place {third}. A place brings its prize only when someone is below it in the table.",
         "For every fight you win you collect {gold} gold, and for a won match you fought in, {systemPoints}."
       ],
-      "limitWin": ["After {moves} moves the judge ends the battle: the team with more HP left wins."],
-      "limitDraw": ["After {moves} moves the judge ends the battle: both teams have almost the same HP left, so it is a draw."],
+      "limitWin": ["After {moves} moves the judge ends the battle: the team that dealt its rivals more damage wins ({mine}% of their HP against {theirs}%)."],
+      "limitDraw": ["After {moves} moves the judge ends the battle: both teams dealt each other almost the same damage, so it is a draw."],
       "errors": {
         "locked": "You will unlock guilds at character level {level}.",
         "noGuild": "You are not in a guild.",

@@ -634,17 +634,23 @@ describe('the third forms in fights', () => {
     assert.deepEqual(heals.slice(0, 2).map((event) => event.target).sort(), ['a0', 'a1']);
   });
 
-  test('Wielki egzorcyzm burns spirits; Sąd ostateczny waits for a foe below 60% and strikes spirits harder; Pieczęć świętości: the sealed foe takes more and heals no more', () => {
+  test('Wielki egzorcyzm burns spirits; Sąd ostateczny waits for a foe below 60% among two or more, strikes a lone foe at any HP (1271 B) and spirits harder; Pieczęć świętości: the sealed foe takes more and heals no more', () => {
     const burns = (monsterId) => fight(`egzorcyzm:${monsterId}`, [form('demon-slayer', { only: [] })], [sturdy(monsterId, 'e0')]).events.some((event) => event.kind === 'effect' && event.effect === 'Oparzenie');
     assert.equal(burns('wraith'), true);
     assert.equal(burns('boar'), false);
-    // A foe a little above 60% HP: the judgment waits for plain blows to
-    // bring it below.
-    const waited = fight('sad', [form('demon-slayer', { only: ['last-judgment'] })], [sturdy('boar', 'e0', { hp: 124000 })]);
+    // Two foes a little above 60% HP: the judgment waits for plain blows to
+    // bring one below.
+    const waited = fight('sad', [form('demon-slayer', { only: ['last-judgment'] })], [sturdy('boar', 'e0', { hp: 121000 }), sturdy('wolf', 'e1', { hp: 121000 })]);
     const judged = waited.events.findIndex((event) => event.skill === 'last-judgment' && BLOWS.includes(event.kind));
     assert.ok(judged > 0);
     assert.ok(waited.events[judged].hp + waited.events[judged].damage < 0.6 * 200000);
     assert.ok(waited.events.slice(0, judged).some((event) => event.actor === 'a0' && !event.skill && BLOWS.includes(event.kind)));
+    // A lone foe at full HP: the judgment comes with the first move, as
+    // one against one it would wait out half the fight (1271 B).
+    const lone = fight('sad', [form('demon-slayer', { only: ['last-judgment'] })], [sturdy('boar', 'e0')]);
+    const first = lone.events.find((event) => event.actor === 'a0' && ['hit', 'crit', 'dodge'].includes(event.kind));
+    assert.equal(first.skill, 'last-judgment');
+    assert.equal(paramOf(form('demon-slayer'), 'last-judgment', 'loneAny'), true);
     const judge = form('demon-slayer', { only: ['last-judgment'] });
     const firstJudgment = (unit, monsterId) => fight(`sad:${monsterId}`, [unit], [sturdy(monsterId, 'e0', { hp: 100000 })]).events.find((event) => event.skill === 'last-judgment' && BLOWS.includes(event.kind)).damage;
     near(firstJudgment(judge, 'wraith') / firstJudgment(withParam(judge, 'last-judgment', 'familyBonus', 0), 'wraith'), 1 + paramOf(judge, 'last-judgment', 'familyBonus'), 0.02, 'Sąd ostateczny');
@@ -827,12 +833,14 @@ describe('the third forms against the second forms (tools/class-balance-sim.mjs,
   });
 
   test('in the Arena at level 200 each third form wins 25–75% of its duels against the other paths, and the duels last a few rounds', () => {
-    // The Pogromca Demonów wins the fewest: the Inkwizytor's line stays the
-    // weaker one in duels (779 A). Seven third forms have their own strength
-    // in the players' duels (evolutions.json duelPower, 992 A; 0.3.93 and
-    // 0.3.95): the Tier IX gear and the skills at their full strength (class
-    // level 299) left the Arcydruid, the Pogromca Demonów and the main paths
-    // of the Łucznik, Kleryk and Cień weak, and the Władca Puszczy too strong.
+    // The Inkwizytor's line was the weaker one in duels (779 A). Until
+    // 1271 B seven third forms had their own strength in the players' duels
+    // (evolutions.json duelPower, 992 A; 0.3.93 and 0.3.95): the Tier IX gear
+    // and the skills at their full strength (class level 299) left the
+    // Arcydruid, the Pogromca Demonów and the main paths of the Łucznik,
+    // Kleryk and Cień weak, and the Władca Puszczy too strong. Now no form
+    // has, and the Pogromca Demonów's Sąd ostateczny strikes a lone foe at
+    // any HP, everywhere.
     const result = measure({ level: 200, seeds: 1, model: 'realistic', paths: true }, content);
     assert.deepEqual(Object.keys(result.paths).sort(), [...FORMS].sort());
     for (const [id, share] of Object.entries(result.paths)) assert.ok(share >= 0.25 && share <= 0.75, `${id} wins ${share}`);

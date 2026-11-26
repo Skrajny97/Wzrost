@@ -233,11 +233,14 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
   // typed by their defaults alone (hp, area).
   const player = playerCombatant(/** @type {any} */ ({ character: weekFighter(character, week), equipped, name, area }), content);
   // In the Wieże a form's summons may root their foes by a share of what
-  // they do elsewhere (evolutions.json towerSummonRoot; combat.js): the
-  // Pradruid's (1249 B, the author 24.11.2026), whose two oaks' roots held
+  // they do elsewhere (evolutions.json towerSummonRoot; combat.js), so that
+  // the form climbs about as high as the best other form of its evolution
+  // (1249 B, the author 24.11.2026): the Pradruid's two oaks' roots held
   // every foe back so that it hardly ever struck, and alone it climbed some
-  // 150 floors above the other fourth forms. Its own form's, whoever
-  // fights: the character, a partner or a companion.
+  // 150 floors above the other fourth forms; since 1271 B, which took
+  // Wisdom out of its summons' blows and halved its oaks' roots everywhere,
+  // its share is above 1, the Ojciec Puszczy's below. Its own form's,
+  // whoever fights: the character, a partner or a companion.
   /**
    * @param {Record<string, any>} unit
    * @param {string | null | undefined} formId

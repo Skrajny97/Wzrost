@@ -3601,7 +3601,7 @@
           }
         },
         "battle": {
-          "description": "Bitwa 5 na 5 (798 A): sędzia kończy ją po movesPerFighter ruchach na każdego walczącego; przy różnicy części HP najwyżej drawMargin jest remis.",
+          "description": "Bitwa 5 na 5 (798 A): sędzia kończy ją po movesPerFighter ruchach na każdego walczącego; wygrywa strona, która zadała drugiej większą część jej HP razem (1271 B), a przy różnicy najwyżej drawMargin jest remis.",
           "type": "object",
           "additionalProperties": false,
           "required": [

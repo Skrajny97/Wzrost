@@ -245,15 +245,17 @@ describe('the second evolution in the engine', () => {
   });
 });
 
-describe('the second forms in the Arena (992 A)', () => {
+describe('the second forms in the Arena (992 A, 1271 B)', () => {
   // As the third forms at level 200 (third-evolution.test.js): at level 100
-  // each second form wins 25–75% of its duels against the other paths. Six
-  // of them have their own strength in the players' duels for it
-  // (evolutions.json duelPower and duelHp): the Wielki Inkwizytor (1% of
-  // its duels before), the Druid (9%), the Widmo (21% once those two were
-  // stronger), the Władca Piorunów (78%), the Mistrz Łowów (77%) and the
-  // Bastion (79%). The Druid's is in its summons' blows since 24.11.2026
-  // (duelSummonPower; test/druid-summons.test.js).
+  // each second form wins 25–75% of its duels against the other paths.
+  // Until 1271 B six of them had their own strength in the players' duels
+  // for it (evolutions.json duelPower and duelHp, 992 A; the Druid's in its
+  // summons' blows, duelSummonPower). Since then no form has, and the forms
+  // are evened out by their skills and traits, the same everywhere
+  // (DECISIONS.md, „Arena przez mechanikę (1271 B, 26.11.2026)”): the
+  // Wielki Inkwizytor's verdict strikes a lone foe at any HP, the Władca
+  // Piorunów's ball and the Mistrz Łowów's harpoon come weaker or rarer, the
+  // Bastion throws back less and the Widmo's Burza ostrzy is stronger.
   test('at level 100 each second form wins 25–75% of its duels against the other paths', () => {
     const result = measure({ level: 100, seeds: 1, model: 'realistic', paths: true }, content);
     const second = content.evolutions.filter((form) => content.evolutionsById[form.from] && !content.evolutionsById[form.from].from).map((form) => form.id);
@@ -261,20 +263,24 @@ describe('the second forms in the Arena (992 A)', () => {
     for (const [id, share] of Object.entries(result.paths)) assert.ok(share >= 0.25 && share <= 0.75, `${id} wins ${share}`);
   });
 
-  test('the strength is the form\'s own: in duels only, and not its third form\'s', () => {
-    const inquisitor = content.evolutionsById['grand-inquisitor'];
-    // The Pogromca Demonów has its own (×1.2 since 0.3.95), not the
-    // Wielki Inkwizytor's ×2.
-    assert.deepEqual([inquisitor.duelPower, content.evolutionsById['demon-slayer'].duelPower], [2, 1.2]);
+  test('no form has a strength of its own in duels: a duelist strikes as on an exploration, its HP grown by the duel\'s factor alone', () => {
+    for (const form of content.evolutions) {
+      for (const key of ['duelPower', 'duelHp', 'duelSummonPower']) assert.equal(form[key], undefined, `${form.id} ${key}`);
+    }
+    // The Wielki Inkwizytor struck twice as hard in duels until 1271 B, the
+    // Pogromca Demonów 1.2 times, and the Bastion had 80% of the HP.
     const { character, equipped } = typicalCharacter('cleric', 100, content);
-    const fighter = { character: { ...character, classLevel: 120, evolution: 'grand-inquisitor' }, equipped, name: 'Inkwizytor' };
-    const plain = playerCombatant(fighter, content);
-    const duel = duelist(fighter, 'a0', 'ally', { factor: 1, armor: 1 }, content);
-    assert.ok(Math.abs(duel.damageScale - 2 * plain.damageScale) < 1e-9);
-    const slayer = { character: { ...character, classLevel: 200, evolution: 'demon-slayer' }, equipped, name: 'Pogromca' };
-    assert.ok(Math.abs(duelist(slayer, 'a0', 'ally', { factor: 1, armor: 1 }, content).damageScale - 1.2 * playerCombatant(slayer, content).damageScale) < 1e-9);
-    const bastion = { character: { ...typicalCharacter('warrior', 100, content).character, classLevel: 120, evolution: 'bastion' }, equipped: typicalCharacter('warrior', 100, content).equipped, name: 'Bastion' };
-    assert.equal(duelist(bastion, 'a0', 'ally', { factor: 1, armor: 1 }, content).maxHp, Math.round(playerCombatant(bastion, content).maxHp * 0.8));
+    const warrior = typicalCharacter('warrior', 100, content);
+    for (const fighter of [
+      { character: { ...character, classLevel: 120, evolution: 'grand-inquisitor' }, equipped, name: 'Inkwizytor' },
+      { character: { ...character, classLevel: 200, evolution: 'demon-slayer' }, equipped, name: 'Pogromca' },
+      { character: { ...warrior.character, classLevel: 120, evolution: 'bastion' }, equipped: warrior.equipped, name: 'Bastion' },
+    ]) {
+      const plain = playerCombatant(fighter, content);
+      const duel = duelist(fighter, 'a0', 'ally', { factor: 3, armor: 1 }, content);
+      assert.equal(duel.damageScale, plain.damageScale, fighter.name);
+      assert.equal(duel.maxHp, Math.round(plain.maxHp * 3), fighter.name);
+    }
   });
 });
 
