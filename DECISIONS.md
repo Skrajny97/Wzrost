@@ -3384,6 +3384,8 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
+## Wersja 0.5.27 (26.11.2026): statystyki liczone jako inna widać na ekranie
+
 ## Statystyki liczone jako inna (26.11.2026)
 
 Gracz (poz. 86), Wielki Inkwizytor: po ewolucji z Inkwizytora główną statystyką jest Siła, a punkty rozdane w Intelekt przeszły do Siły, ale przedmioty mają dalej Intelekt, np. hełm z dwiema liniami „Intelekt: +70 (+81)”. Statystyki pokazywały Intelekt 0 z dopiskiem „Intelekt nie zmienia dziś Twoich wartości bojowych.” i „klasa 0 · postać 0 · profesje 0 · ekwipunek 0 · Rdzeń 0”, a Siłę 1721 jako „klasa 158 · postać 727 · profesje 365 · ekwipunek 449 · Rdzeń 23”.
