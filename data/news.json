@@ -1820,6 +1820,11 @@
       "id": "0.5.29",
       "title": "Wersja 0.5.29",
       "body": "- Kultywacja: zamiast postaci może teraz medytować Awatar Systemu albo Drugi Awatar Systemu. Wybierzesz go w „Kto medytuje”, a postać jest w tym czasie wolna, np. na wyprawę. Z medytacji Awatara postać dostaje całe XP Kultywacji i ćwierć XP postaci. Naraz medytuje tylko jeden, a medytujący Awatar nie pracuje w profesjach."
+    },
+    {
+      "id": "0.5.30",
+      "title": "Wersja 0.5.30",
+      "body": "- Plansza walki: przywołańce stają też w polu swojej postaci, więc plansza z wieloma przywołańcami jest niższa i mieści się na ekranie. Nazwy stworów i postaci na kartach są zawsze w jednej linii: długie nazwy mają mniejszą czcionkę, zamiast zawijać się."
     }
   ]
 }
