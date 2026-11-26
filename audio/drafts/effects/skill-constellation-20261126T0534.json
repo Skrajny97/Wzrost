@@ -1,0 +1,13 @@
+{
+  "id": "skill-constellation",
+  "payload": {
+    "text": "a constellation lighting up in the night sky: bright crystal chimes ringing one after another like stars igniting, then a rapid volley of magical arrows hitting with crisp impacts, epic, clean, no guitar, no strings, no twang, no plucked sound, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-constellation-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-constellation-20261126T0534-1.mp3"
+  ],
+  "credits": 80
+}

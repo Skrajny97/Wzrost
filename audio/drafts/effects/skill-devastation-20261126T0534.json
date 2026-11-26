@@ -1,0 +1,13 @@
+{
+  "id": "skill-devastation",
+  "payload": {
+    "text": "an epic cinematic rampage like lava through a forest: a furious roar, then three massive heavy axe impacts crunching through armour, each with a roaring burst of fire, the last one a huge deep booming hit with crackling flames, punchy and clean, no hiss, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-devastation-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-devastation-20261126T0534-1.mp3"
+  ],
+  "credits": 80
+}

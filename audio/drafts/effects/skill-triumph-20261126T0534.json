@@ -1,0 +1,13 @@
+{
+  "id": "skill-triumph",
+  "payload": {
+    "text": "a champion raising a sword to the sky: a bright ringing metallic sword shing, a huge thunderclap answering from the sky and a mighty crowd cheering in triumph, epic and cinematic, clean, no hiss, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-triumph-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-triumph-20261126T0534-1.mp3"
+  ],
+  "credits": 80
+}

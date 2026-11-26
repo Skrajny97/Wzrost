@@ -1,0 +1,13 @@
+{
+  "id": "skill-world-genesis",
+  "payload": {
+    "text": "the birth of a new world: a huge cosmic explosion, then fire roaring, ice shattering, lightning cracking and rocks crashing all at once, with a bright heavenly choir chord at the end, epic and cinematic, clean, no hiss, no music",
+    "duration_seconds": 2.2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-world-genesis-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-world-genesis-20261126T0534-1.mp3"
+  ],
+  "credits": 88
+}

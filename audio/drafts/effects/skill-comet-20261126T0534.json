@@ -1,0 +1,13 @@
+{
+  "id": "skill-comet",
+  "payload": {
+    "text": "a blazing comet crashing down from the sky: a roaring fiery rush as it streaks down, then a huge explosive impact tearing through several targets in a row with bursts of fire and crackling flames, loud, epic and powerful, cinematic, clean, no guitar, no strings, no twang, no plucked sound, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-comet-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-comet-20261126T0534-1.mp3"
+  ],
+  "credits": 72
+}

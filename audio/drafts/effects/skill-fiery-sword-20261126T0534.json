@@ -1,0 +1,13 @@
+{
+  "id": "skill-fiery-sword",
+  "payload": {
+    "text": "a sword of white fire falling from heaven: a deep heavenly bell toll, a roaring blast of holy fire striking down with a massive cinematic impact, then two more fiery strikes in a chain, epic, apocalyptic, clean, no hiss, no music",
+    "duration_seconds": 2.2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-fiery-sword-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-fiery-sword-20261126T0534-1.mp3"
+  ],
+  "credits": 88
+}

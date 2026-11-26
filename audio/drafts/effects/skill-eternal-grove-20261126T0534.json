@@ -1,0 +1,13 @@
+{
+  "id": "skill-eternal-grove",
+  "payload": {
+    "text": "two ancient giant oaks rising from the ground: roots tearing out of the earth, loud deep creaking and groaning wood, branches cracking, then a warm magical healing chime, epic, clean, no wind, no hiss, no music",
+    "duration_seconds": 2.2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-eternal-grove-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-eternal-grove-20261126T0534-1.mp3"
+  ],
+  "credits": 88
+}

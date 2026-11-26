@@ -1,0 +1,13 @@
+{
+  "id": "skill-perun-arrows",
+  "payload": {
+    "text": "the thunder god's lightning arrows: a deafening thunderclap, then several sharp lightning bolts striking one target after another with loud electric cracks and crackling sparks, epic, cinematic, powerful, clean, no hiss, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-perun-arrows-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-perun-arrows-20261126T0534-1.mp3"
+  ],
+  "credits": 80
+}

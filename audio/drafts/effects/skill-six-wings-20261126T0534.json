@@ -1,0 +1,13 @@
+{
+  "id": "skill-six-wings",
+  "payload": {
+    "text": "six wings of holy fire spreading wide: a powerful beating of great wings, a roaring burst of holy fire and a bright heavenly choir chord, epic and cinematic, clean, no hiss, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-six-wings-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-six-wings-20261126T0534-1.mp3"
+  ],
+  "credits": 80
+}

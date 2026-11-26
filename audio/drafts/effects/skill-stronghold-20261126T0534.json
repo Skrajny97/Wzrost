@@ -1,0 +1,13 @@
+{
+  "id": "skill-stronghold",
+  "payload": {
+    "text": "a huge shield planted in the ground like a fortress wall: a heavy metallic clang, a solid thud of earth and a bright resonant hum of a magic barrier rising, epic, clean, no hiss, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-stronghold-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-stronghold-20261126T0534-1.mp3"
+  ],
+  "credits": 64
+}

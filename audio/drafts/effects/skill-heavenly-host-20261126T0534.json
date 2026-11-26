@@ -1,0 +1,13 @@
+{
+  "id": "skill-heavenly-host",
+  "payload": {
+    "text": "heaven opening and shining knights coming down: a bright heavenly choir swell, armoured knights landing with heavy metallic clanks and swords drawn with a ringing shing, epic and cinematic, clean, no hiss, no music",
+    "duration_seconds": 2.2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-heavenly-host-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-heavenly-host-20261126T0534-1.mp3"
+  ],
+  "credits": 88
+}

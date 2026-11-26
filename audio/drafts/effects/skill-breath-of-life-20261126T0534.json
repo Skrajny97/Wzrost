@@ -1,0 +1,13 @@
+{
+  "id": "skill-breath-of-life",
+  "payload": {
+    "text": "a warm breath of life healing the party: a warm swelling heavenly choir chord rising, clear crystal chimes and a soft glowing magical pulse, gentle and pure, clean, no hiss, no wind, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-breath-of-life-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-breath-of-life-20261126T0534-1.mp3"
+  ],
+  "credits": 80
+}

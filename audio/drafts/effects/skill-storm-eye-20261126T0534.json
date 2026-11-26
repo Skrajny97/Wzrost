@@ -1,0 +1,13 @@
+{
+  "id": "skill-storm-eye",
+  "payload": {
+    "text": "standing in the eye of a storm: rolling thunder and crackling lightning all around, then a sudden calm and one deep clear resonant tone, epic and cinematic, clean, no wind, no whistle, no hiss, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-storm-eye-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-storm-eye-20261126T0534-1.mp3"
+  ],
+  "credits": 80
+}

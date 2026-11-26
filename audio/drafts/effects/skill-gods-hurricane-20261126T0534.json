@@ -1,0 +1,13 @@
+{
+  "id": "skill-gods-hurricane",
+  "payload": {
+    "text": "a divine sword whirling three times in a blazing spin: three powerful ringing steel slashes, each with a bright golden impact, then a heavenly choir chord and a huge crowd roaring, epic and cinematic, clean, no whistle, no hiss, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-gods-hurricane-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-gods-hurricane-20261126T0534-1.mp3"
+  ],
+  "credits": 80
+}

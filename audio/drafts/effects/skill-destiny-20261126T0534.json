@@ -1,0 +1,13 @@
+{
+  "id": "skill-destiny",
+  "payload": {
+    "text": "destiny rewritten: a deep resonant clock toll, a heavy ancient book page turning, a powerful reversed magical swell and a bright resonant chime, mystical and epic, clean, no hiss, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-destiny-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-destiny-20261126T0534-1.mp3"
+  ],
+  "credits": 80
+}

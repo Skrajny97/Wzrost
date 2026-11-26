@@ -1,0 +1,13 @@
+{
+  "id": "skill-last-frenzy",
+  "payload": {
+    "text": "a berserker going into a last bloody frenzy: a deep heavy heartbeat, a savage furious roar, then a roaring burst of fire and a massive punchy impact, epic and cinematic, clean, no hiss, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-last-frenzy-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-last-frenzy-20261126T0534-1.mp3"
+  ],
+  "credits": 72
+}

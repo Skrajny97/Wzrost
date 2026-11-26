@@ -1,0 +1,13 @@
+{
+  "id": "skill-eternal-legion",
+  "payload": {
+    "text": "an undying legion rising again: the ground cracking open, many skeleton knights rising with rattling bones and heavy clanking armour, swords drawn with a ringing shing and a dark powerful war horn, loud and clear, dark and epic, no music",
+    "duration_seconds": 2.5,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-eternal-legion-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-eternal-legion-20261126T0534-1.mp3"
+  ],
+  "credits": 100
+}

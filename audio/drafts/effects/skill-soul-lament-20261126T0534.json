@@ -1,0 +1,13 @@
+{
+  "id": "skill-soul-lament",
+  "payload": {
+    "text": "gathered souls screaming at once: a powerful rising chorus of ghostly wailing voices exploding into a massive magical shockwave boom, dark and epic, cinematic, clean, no whistle, no hiss, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-soul-lament-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-soul-lament-20261126T0534-1.mp3"
+  ],
+  "credits": 80
+}

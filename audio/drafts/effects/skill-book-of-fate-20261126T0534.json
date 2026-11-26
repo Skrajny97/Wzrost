@@ -1,0 +1,13 @@
+{
+  "id": "skill-book-of-fate",
+  "payload": {
+    "text": "a book of fate opening: a heavy leather book cover thudding open, pages turning fast in a magical whirl and a clear mystical crystal chime, magical, clean, no hiss, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-book-of-fate-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-book-of-fate-20261126T0534-1.mp3"
+  ],
+  "credits": 72
+}

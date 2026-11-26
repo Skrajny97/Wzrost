@@ -1,0 +1,13 @@
+{
+  "id": "skill-winter-cloak",
+  "payload": {
+    "text": "a cloak of snow and frost wrapping the party: soft crunching snow, a bright glassy freezing crackle and a gentle ringing icy chime, magical, clean, no wind, no hiss, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-winter-cloak-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-winter-cloak-20261126T0534-1.mp3"
+  ],
+  "credits": 72
+}

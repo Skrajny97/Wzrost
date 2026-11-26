@@ -1,0 +1,13 @@
+{
+  "id": "skill-pestilence",
+  "payload": {
+    "text": "a deadly plague spreading: a thick poisonous cloud bursting open with a wet heavy impact, thick bubbling and a dark ominous swell, dark fantasy, clean, no hiss, no whispers, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-pestilence-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-pestilence-20261126T0534-1.mp3"
+  ],
+  "credits": 72
+}

@@ -1,0 +1,13 @@
+{
+  "id": "skill-eternal-herd",
+  "payload": {
+    "text": "a herd of great forest beasts charging: heavy hooves thundering, a bison bellowing, a bear roaring and a moose calling, then a heavy ramming impact, wild and epic, natural animal sounds, clean, no music",
+    "duration_seconds": 2.2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-eternal-herd-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-eternal-herd-20261126T0534-1.mp3"
+  ],
+  "credits": 88
+}

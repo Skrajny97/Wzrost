@@ -1,0 +1,13 @@
+{
+  "id": "skill-aurochs-call",
+  "payload": {
+    "text": "a huge ancient aurochs bull: a deep powerful bellowing low, heavy hooves stamping on wet ground and a loud snort as it lowers its horns, wild and epic, natural animal sounds, clean, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-aurochs-call-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-aurochs-call-20261126T0534-1.mp3"
+  ],
+  "credits": 80
+}

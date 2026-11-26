@@ -1,0 +1,13 @@
+{
+  "id": "skill-starless-night",
+  "payload": {
+    "text": "every star going out: a dark resonant gong swallowing all sound, a cold ominous swell and a single soft fading chime in the darkness, dark fantasy, cinematic, clean, no hiss, no wind, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-starless-night-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-starless-night-20261126T0534-1.mp3"
+  ],
+  "credits": 80
+}

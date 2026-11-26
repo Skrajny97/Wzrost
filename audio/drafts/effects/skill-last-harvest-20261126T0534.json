@@ -1,0 +1,13 @@
+{
+  "id": "skill-last-harvest",
+  "payload": {
+    "text": "a reaper's last great scythe swing: a loud deep metallic ring, a huge brutal slicing impact, then a cold choir of ghostly voices rising, dark and epic, clean, no whistle, no hiss, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-last-harvest-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-last-harvest-20261126T0534-1.mp3"
+  ],
+  "credits": 80
+}

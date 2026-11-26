@@ -1,0 +1,13 @@
+{
+  "id": "skill-great-frost",
+  "payload": {
+    "text": "three enemies locked in ice at once: fast loud crackling and creaking ice growing, then three hard crystalline crunches ringing like breaking glass and a heavy icy impact, epic, clean, no wind, no hiss, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-great-frost-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-great-frost-20261126T0534-1.mp3"
+  ],
+  "credits": 80
+}

@@ -1,0 +1,13 @@
+{
+  "id": "skill-earth-wrath",
+  "payload": {
+    "text": "a colossal shield slammed into the ground: a massive booming impact, the whole earth splitting open with a loud sharp cracking roar, rock slabs breaking and crashing down, epic and cinematic, punchy and clean, no hiss, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.7
+  },
+  "files": [
+    "audio/drafts/effects/skill-earth-wrath-20261126T0534-0.mp3",
+    "audio/drafts/effects/skill-earth-wrath-20261126T0534-1.mp3"
+  ],
+  "credits": 80
+}
