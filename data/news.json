@@ -1835,6 +1835,11 @@
       "id": "0.5.32",
       "title": "Wersja 0.5.32",
       "body": "- Drużyna: wyprawa drużyny daje teraz mniej XP, bo drużyna może wspólnie przewijać czas. W trio dostajesz z niej o 30% mniej XP niż dotąd, a w duecie o 14% mniej. Wyprawy w pojedynkę i z towarzyszami oraz Wieża Drużyn bez zmian.\n- „Opcje wyprawy” są teraz osobne dla każdej postaci: Trudna i Piekielna wyprawa, pola, czas wyprawy, posiłek i mikstury. Po przejściu na inną postać nic się nie przenosi, także w „Wyrusz ponownie”, więc nie wyruszysz przez przypadek na Piekielną wyprawę ustawioną na innej postaci. Dotychczasowe ustawienia dostaje postać, którą pierwszą wejdziesz w Walkę."
+    },
+    {
+      "id": "0.5.33",
+      "title": "Wersja 0.5.33",
+      "body": "- Piąta ewolucja: od 400. poziomu klasy każda czwarta forma może przejść w swoją piątą.\n- Każda piąta forma ma dwie nowe umiejętności oraz nowy wygląd, chód i jazdę wierzchem.\n- Nowe przywołańce, m.in. Świetliści rycerze Miecza Niebios, tur Boga Łowów i łoś w stadzie Ojca Puszczy."
     }
   ]
 }
