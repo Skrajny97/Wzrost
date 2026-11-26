@@ -5,6 +5,7 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { dirname, join, relative } from 'node:path';
 import { test } from 'node:test';
 
@@ -25,6 +26,34 @@ test('every client module parses', () => {
     const result = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
     assert.equal(result.status, 0, `${relative(CLIENT, file)}: ${result.stderr}`);
   }
+});
+
+// A function declared twice in one function's body is no error in
+// JavaScript: the later one silently replaces the earlier, so every call of
+// the first goes to the second (skill-fx.js had two starfall(): the Lodowa
+// nawałnica's stars of ice called the fourth forms' star rain and threw,
+// 26.11.2026). Checked with TypeScript's parser, scope by scope.
+test('no client module declares a function twice in one scope', () => {
+  const ts = createRequire(import.meta.url)('typescript');
+  const twice = [];
+  for (const file of files) {
+    const source = ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+    const visit = (node) => {
+      if (node.statements) {
+        const seen = new Map();
+        for (const statement of node.statements) {
+          if (!ts.isFunctionDeclaration(statement) || !statement.name) continue;
+          const line = source.getLineAndCharacterOfPosition(statement.getStart()).line + 1;
+          const name = statement.name.text;
+          if (seen.has(name)) twice.push(`${relative(CLIENT, file)}: ${name}() at lines ${seen.get(name)} and ${line}`);
+          else seen.set(name, line);
+        }
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
+  }
+  assert.deepEqual(twice, []);
 });
 
 test('relative imports name existing files and exports', () => {
