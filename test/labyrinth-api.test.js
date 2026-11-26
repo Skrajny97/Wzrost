@@ -99,6 +99,8 @@ describe('the Labirynt Systemu through the API', () => {
         if (['fight', 'elite', 'guardian'].includes(room.type)) assert.ok(['easy', 'even', 'deadly'].includes(room.danger), `${room.type}: ${room.danger}`);
         else assert.equal(room.danger, null);
         assert.equal(room.shards, content.labyrinth.levels[0].shards[room.type] ?? null);
+        // Poziom 1 has no strong rooms (26.11.2026), and the board says so.
+        assert.equal(room.strong, false);
       }
     }
     assert.equal(labyrinth.fighters[0].key, 'me');
@@ -326,6 +328,12 @@ describe('the Labirynt Systemu through the API', () => {
     assert.ok(won.room.artifact.name.includes('Artefakt'));
     assert.ok(won.report.system.some((line) => line.includes('Rdzeń się otwiera')));
     assert.equal(won.labyrinth.level, 2);
+    // Poziom 2's board says which rooms are strong, as the day's map has them
+    // (the page asks before one is entered, 26.11.2026).
+    assert.deepEqual(
+      won.labyrinth.map.map((row) => row.map((room) => room.strong)),
+      labyrinthMap(today(), 2, content).rows.map((row) => row.map((room) => Boolean(room.strong))),
+    );
     assert.equal(won.labyrinth.row, -1);
     assert.equal(won.labyrinth.levels[0].cleared, true);
     assert.equal(won.labyrinth.pending.kind, 'blessing');
