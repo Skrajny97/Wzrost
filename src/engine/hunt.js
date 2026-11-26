@@ -49,6 +49,7 @@ import { wantedEncounter, wantedLootRarity, wantedOf, wantedStrength } from './w
 import { omenLines, raisedOutcome, weekChance, weekFactor, weekFighter, weekLine } from './weeks.js';
 import { seatLine } from './guild-seat.js';
 import { bannerLine } from './guild-lands.js';
+import { partyTripXpShare } from './parties.js';
 import { gearKey } from './gear.js';
 import { sideStats } from './side-stats.js';
 import { computeStats } from './stats.js';
@@ -811,10 +812,13 @@ export function simulateHunt(
   // The other players of a Drużyna (src/server/parties.js) fight beside the
   // character as they were when the leader set out, each with its own HP,
   // out once fallen, as the companions, first in the line after the
-  // character; each one along takes parties.xpCost of the character's XP
-  // (the design document: solo +10% XP, duo +5%, a full party no bonus).
-  const others = roster ? fighters.length - 1 : partners.length;
-  const partyXp = 1 - companions.length * content.settlement.companions.xpCost - others * content.balance.parties.xpCost;
+  // character. On a trip each one along takes parties.tripXpCost of the
+  // character's XP, as the party skips time together (1274 A:
+  // partyTripXpShare in parties.js); a mercenary (`partners`) takes
+  // parties.xpCost, as every player once did (the design document: solo
+  // +10% XP, duo +5%, a full party no bonus).
+  const playersXp = roster ? partyTripXpShare(fighters.length, content) : 1 - partners.length * content.balance.parties.xpCost;
+  const partyXp = playersXp - companions.length * content.settlement.companions.xpCost;
   // Before the trips' roster, the other players fought beside the character
   // as mates, out once fallen; on a trip they fight as the character does.
   const friends = (roster ? [] : partners).map((/** @type {any} */ partner, /** @type {number} */ index) => {

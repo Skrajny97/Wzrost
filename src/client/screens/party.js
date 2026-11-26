@@ -51,6 +51,12 @@ const DOTS = { free: 'online', away: 'busy', working: 'busy', meditating: 'busy'
 // maks 5 lvl", "niech nie będzie możliwości w ogole bycia w drużynie z kimś
 // o rozpiętości lvli wyzszej niz 5"; src/server/parties.js).
 const spreadText = (spread) => t('Poziomy klas w drużynie mogą się różnić najwyżej o {spread}. Kto przez awans odstanie bardziej, wypada z drużyny.', { spread });
+// The XP of a party's trip (1274 A, 26.11.2026; the author: „lepiej
+// osłabić drużyny na przykład uzyskiwanego expa mocno”): less than with
+// two companions, as the party skips time together; the numbers from the
+// server (parties.js: tripXpLess), none from an older one.
+const tripXpText = (less) =>
+  less ? [t('Drużyna może wspólnie przewijać czas, więc z wyprawy drużyny każdy dostaje mniej XP niż z wyprawy z dwoma towarzyszami: w trio o {trio}%, a w duecie o {duo}%.', less)] : [];
 
 // The fights of an exploration of `minutes`, and so the most potions of one
 // it takes along (potionsPerKind in the engine; fightsFor in combat.js).
@@ -324,6 +330,7 @@ export function mountParty(container) {
             t(GOERS),
             spreadText(view.range.spread),
             t('Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.'),
+            ...tripXpText(view.tripXpLess),
             t(SHARED_REPORT),
             t(FULL_BAG),
             t('Bez „Z drużyną” wyprawa jest tylko Twoja, a członkowie też mogą wyruszać na własne wyprawy.'),
@@ -333,6 +340,7 @@ export function mountParty(container) {
             t(GOERS),
             spreadText(view.range.spread),
             t('Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.'),
+            ...tripXpText(view.tripXpLess),
             t(SHARED_REPORT),
             t(FULL_BAG),
             t(COMPANIONS_STAY),

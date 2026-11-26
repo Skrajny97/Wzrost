@@ -14,8 +14,11 @@ import { narratorPage, settled } from './helpers/narrator-page.js';
 const page = narratorPage();
 const area = { id: 'windfalls-edge', name: 'Skraj Wiatrołomów', minLevel: 1, maxLevel: 5, unlockClassLevel: 1, description: 'Polana.', dangers: [] };
 const region = { id: 'windfalls', name: 'Wiatrołomy', minLevel: 1, maxLevel: 10, areas: [area] };
-const MEAL_KEY = 'wzrost.meal-choice';
-const PORTIONS_KEY = 'wzrost.meal-portions';
+// What this browser keeps for the character, under its id (state.js,
+// keptChoice).
+const ID = 7;
+const MEAL_KEY = `wzrost.meal-choice.${ID}`;
+const PORTIONS_KEY = `wzrost.meal-portions.${ID}`;
 // A dish of the Spiżarnia as the server shows it (bagPantry): its meals of
 // one to three portions.
 const dish = (id, name, count) => ({
@@ -74,6 +77,7 @@ beforeEach(() => {
 // A character of level 30 at home, with these dishes and this meal at work.
 function character(pantry, meal = null) {
   return {
+    id: ID,
     name: 'Próbna',
     level: 30,
     classLevel: 30,

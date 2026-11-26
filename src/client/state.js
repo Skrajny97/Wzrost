@@ -232,160 +232,156 @@ export const unlockInfo = (id) => state.content.unlocks.find((unlock) => unlock.
 // Reports fetched or just claimed, so opening one again needs no request.
 export const reportCache = new Map();
 
-// Whether explorations avoid the elite and the champion (the box by
-// "Wyrusz", and "Wyrusz ponownie" in a report); kept in this browser.
-const AVOID_KEY = 'wzrost.avoid-rare';
-let avoidRare = readAvoidRare();
+// The choices of an exploration (the length of each place, the boxes of
+// "Opcje wyprawy" below, the potions and the meal of hunt-supplies.js) are
+// each character's own: this device keeps them apart under the character's
+// id, "wzrost.hard-hunt.12", and another character of the account finds its
+// own, or none (gracz, 26.11.2026: „Przenosi ustawienia trudności jak
+// przejdziesz między swoimi postaciami na koncie”: a Piekielna wyprawa
+// chosen on one character went out with another). Before, the device kept
+// one of each for all its characters, under these keys: they go once, all
+// together, to the character played when one of them is first read.
+const SHARED_KEYS = [
+  'wzrost.hunt-choice',
+  'wzrost.avoid-rare',
+  'wzrost.seek-rare',
+  'wzrost.track-quests',
+  'wzrost.track-unknown',
+  'wzrost.hard-hunt',
+  'wzrost.hell-hunt',
+  'wzrost.potion-choice',
+  'wzrost.meal-choice',
+  'wzrost.meal-portions',
+];
 
-function readAvoidRare() {
-  try {
-    return localStorage.getItem(AVOID_KEY) === 'on';
-  } catch {
-    return false;
+// The key of a choice of `character` on this device; null without one.
+const ownKey = (key, character) => (character?.id == null ? null : `${key}.${character.id}`);
+
+// The choices kept for all the characters become this one's; one it
+// already has of its own stays.
+function adoptShared(character) {
+  for (const key of SHARED_KEYS) {
+    const shared = localStorage.getItem(key);
+    if (shared === null) continue;
+    const own = ownKey(key, character);
+    if (localStorage.getItem(own) === null) localStorage.setItem(own, shared);
+    localStorage.removeItem(key);
   }
 }
 
-export const avoidRareOn = () => avoidRare;
+// A choice of the character as this device keeps it, or null: none kept,
+// no character, or no storage.
+export function keptChoice(key, character = state.character) {
+  const own = ownKey(key, character);
+  if (own === null) return null;
+  try {
+    adoptShared(character);
+    return localStorage.getItem(own);
+  } catch {
+    return null;
+  }
+}
+
+// Keeps a choice of the character on this device; null forgets it.
+export function keepChoice(key, value, character = state.character) {
+  const own = ownKey(key, character);
+  if (own === null) return;
+  try {
+    if (value === null) localStorage.removeItem(own);
+    else localStorage.setItem(own, value);
+  } catch {
+    // Without storage the page simply forgets it.
+  }
+}
+
+// A box of "Opcje wyprawy" of the character played now, off at first: read
+// once from this device, then as the page last set it for the character,
+// so that without storage a change lasts until the page is closed.
+const boxes = new Map();
+
+function boxOn(key) {
+  const own = ownKey(key, state.character);
+  if (own === null) return false;
+  if (!boxes.has(own)) boxes.set(own, keptChoice(key) === 'on');
+  return boxes.get(own);
+}
+
+function setBox(key, value) {
+  const own = ownKey(key, state.character);
+  if (own === null) return;
+  boxes.set(own, value);
+  keepChoice(key, value ? 'on' : 'off');
+}
+
+// Whether explorations avoid the elite and the champion (the box by
+// "Wyrusz", and "Wyrusz ponownie" in a report).
+const AVOID_KEY = 'wzrost.avoid-rare';
+
+export const avoidRareOn = () => boxOn(AVOID_KEY);
 
 export function setAvoidRare(value) {
-  avoidRare = value;
-  try {
-    localStorage.setItem(AVOID_KEY, value ? 'on' : 'off');
-  } catch {
-    // Without storage the choice lasts until the page is closed.
-  }
-  if (value && seekRare) setSeekRare(false);
+  setBox(AVOID_KEY, value);
+  if (value && boxOn(SEEK_KEY)) setBox(SEEK_KEY, false);
 }
 
 // Whether explorations seek the elite and the champion instead (the box
-// "Trop elity i czempiony" under the avoiding one, and "Wyrusz ponownie");
-// kept in this browser. Only one of the two is on at a time.
+// "Trop elity i czempiony" under the avoiding one, and "Wyrusz ponownie").
+// Only one of the two is on at a time.
 const SEEK_KEY = 'wzrost.seek-rare';
-let seekRare = readSeekRare();
 
-function readSeekRare() {
-  try {
-    return localStorage.getItem(SEEK_KEY) === 'on' && !avoidRare;
-  } catch {
-    return false;
-  }
-}
-
-export const seekRareOn = () => seekRare;
+export const seekRareOn = () => boxOn(SEEK_KEY) && !boxOn(AVOID_KEY);
 
 export function setSeekRare(value) {
-  seekRare = value;
-  try {
-    localStorage.setItem(SEEK_KEY, value ? 'on' : 'off');
-  } catch {
-    // Without storage the choice lasts until the page is closed.
-  }
-  if (value && avoidRare) setAvoidRare(false);
+  setBox(SEEK_KEY, value);
+  if (value && boxOn(AVOID_KEY)) setBox(AVOID_KEY, false);
 }
 
 // Whether explorations track the creatures of the narrator's quests (the box
-// under the Bestiariusz, and "Wyrusz ponownie"); kept in this browser.
+// under the Bestiariusz, and "Wyrusz ponownie").
 const TRACK_KEY = 'wzrost.track-quests';
-let trackQuests = readTrackQuests();
 
-function readTrackQuests() {
-  try {
-    return localStorage.getItem(TRACK_KEY) === 'on';
-  } catch {
-    return false;
-  }
-}
-
-export const trackQuestsOn = () => trackQuests;
+export const trackQuestsOn = () => boxOn(TRACK_KEY);
 
 export function setTrackQuests(value) {
-  trackQuests = value;
-  try {
-    localStorage.setItem(TRACK_KEY, value ? 'on' : 'off');
-  } catch {
-    // Without storage the choice lasts until the page is closed.
-  }
+  setBox(TRACK_KEY, value);
 }
 
 // Whether explorations track the creatures not met yet ("Trop nieznane
-// stwory", under the quests' box, and "Wyrusz ponownie"); kept in this
-// browser too.
+// stwory", under the quests' box, and "Wyrusz ponownie").
 const UNKNOWN_KEY = 'wzrost.track-unknown';
-let trackUnknown = readTrackUnknown();
 
-function readTrackUnknown() {
-  try {
-    return localStorage.getItem(UNKNOWN_KEY) === 'on';
-  } catch {
-    return false;
-  }
-}
-
-export const trackUnknownOn = () => trackUnknown;
+export const trackUnknownOn = () => boxOn(UNKNOWN_KEY);
 
 export function setTrackUnknown(value) {
-  trackUnknown = value;
-  try {
-    localStorage.setItem(UNKNOWN_KEY, value ? 'on' : 'off');
-  } catch {
-    // Without storage the choice lasts until the page is closed.
-  }
+  setBox(UNKNOWN_KEY, value);
 }
 
 // Whether explorations go as a Trudna wyprawa (629 A: the box in "Opcje
-// wyprawy" from the level the server opens it at, and "Wyrusz ponownie");
-// kept in this browser. Only one of it and the Piekielna is on at a time.
+// wyprawy" from the level the server opens it at, and "Wyrusz ponownie").
+// Only one of it and the Piekielna is on at a time.
 const HARD_KEY = 'wzrost.hard-hunt';
-let hardHunt = readHardHunt();
 
-function readHardHunt() {
-  try {
-    return localStorage.getItem(HARD_KEY) === 'on';
-  } catch {
-    return false;
-  }
-}
-
-export const hardHuntOn = () => hardHunt;
+export const hardHuntOn = () => boxOn(HARD_KEY);
 
 export function setHardHunt(value) {
-  hardHunt = value;
-  try {
-    localStorage.setItem(HARD_KEY, value ? 'on' : 'off');
-  } catch {
-    // Without storage the choice lasts until the page is closed.
-  }
-  if (value && hellHunt) setHellHunt(false);
+  setBox(HARD_KEY, value);
+  if (value && boxOn(HELL_KEY)) setBox(HELL_KEY, false);
 }
 
 // Whether explorations go as a Piekielna wyprawa instead (the box under the
-// Trudna's, the author, 19.11.2026, and "Wyrusz ponownie"); kept in this
-// browser too.
+// Trudna's, the author, 19.11.2026, and "Wyrusz ponownie").
 const HELL_KEY = 'wzrost.hell-hunt';
-let hellHunt = readHellHunt();
 
-function readHellHunt() {
-  try {
-    return localStorage.getItem(HELL_KEY) === 'on' && !hardHunt;
-  } catch {
-    return false;
-  }
-}
-
-export const hellHuntOn = () => hellHunt;
+export const hellHuntOn = () => boxOn(HELL_KEY) && !boxOn(HARD_KEY);
 
 export function setHellHunt(value) {
-  hellHunt = value;
-  try {
-    localStorage.setItem(HELL_KEY, value ? 'on' : 'off');
-  } catch {
-    // Without storage the choice lasts until the page is closed.
-  }
-  if (value && hardHunt) setHardHunt(false);
+  setBox(HELL_KEY, value);
+  if (value && boxOn(HARD_KEY)) setBox(HARD_KEY, false);
 }
 
 // "Opcje wyprawy" on the Walka screen stays as the player left it, folded
-// (the author: "rozwijaną zakładką") or unfolded; folded at first.
+// (the author: "rozwijaną zakładką") or unfolded; folded at first. How the
+// screen shows, not a choice of the exploration: one for the whole device.
 const OPTIONS_KEY = 'wzrost.hunt-options';
 let optionsOpen = readOptionsOpen();
 
