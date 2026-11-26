@@ -345,7 +345,7 @@ export function itemEntry(item, key, opened, { notes: noted = true, wearers = nu
 export function companionCompare(companion, item) {
   const worn = (companion.wear.find((place) => place.slot === item.slot) ?? companion.wear.find((place) => place.slot === 'jewelry'))?.item ?? null;
   return worn
-    ? compareTable(item, worn, { title: t('Porównanie z tym, co nosi {name}', { name: companion.name }), wornLabel: t('Nosi') })
+    ? compareTable(item, worn, { title: t('Porównanie z tym, co nosi {name}', { name: companion.name }), wornLabel: t('Nosi'), counted: {} })
     : h('p', { class: 'muted', text: t('W tym miejscu {name} nic teraz nie nosi.', { name: companion.name }) });
 }
 

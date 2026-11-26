@@ -3345,7 +3345,7 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
 
 1. **Zasada** (`src/engine/gear.js`, pola form w `data/evolutions.json`; kolejne formy dziedziczą to, czego nie zmienią same):
    - `gear` to broń i druga ręka innej klasy, a `scaling` to statystyka, którą biją bronie klasy.
-   - `as`: każdy punkt jednej statystyki liczy się jako innej, z poziomów klasy, z punktów, z profesji i z przedmiotów. Statystyka na miejscu Zręczności daje też szybkość i unik.
+   - `as`: każdy punkt jednej statystyki liczy się jako innej, z poziomów klasy, z punktów, z profesji i z przedmiotów. Statystyka na miejscu Zręczności daje też szybkość i unik. Od 26.11.2026 mówią o tym karty przedmiotów i Statystyki (zob. „Statystyki liczone jako inna”).
    - `autoPoints` to rozkład „Rozdaj według klasy”, a jego największa część to główna statystyka.
    - `weaponDamage` to część obrażeń broni w rękach tej formy.
    - Sprawdzanie, co postać może założyć, łup, Koło Fortuny, Targowisko i skrzynie idą według formy (`gearKey`).
@@ -3383,6 +3383,22 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Warsztat podsuwa najpierw wzór broni formy, np. Nekromancie kostur, a nie sztylet Cienia.
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
+
+## Wersja 0.5.27 (26.11.2026): statystyki liczone jako inna widać na ekranie
+
+## Statystyki liczone jako inna (26.11.2026)
+
+Gracz (poz. 86), Wielki Inkwizytor: po ewolucji z Inkwizytora główną statystyką jest Siła, a punkty rozdane w Intelekt przeszły do Siły, ale przedmioty mają dalej Intelekt, np. hełm z dwiema liniami „Intelekt: +70 (+81)”. Statystyki pokazywały Intelekt 0 z dopiskiem „Intelekt nie zmienia dziś Twoich wartości bojowych.” i „klasa 0 · postać 0 · profesje 0 · ekwipunek 0 · Rdzeń 0”, a Siłę 1721 jako „klasa 158 · postać 727 · profesje 365 · ekwipunek 449 · Rdzeń 23”.
+
+1. **Liczby były dobre, brakowało słów.** U Wielkiego Inkwizytora i jego dalszych form każdy punkt Intelektu liczy się jako Siła, z klasy, z rozdanych punktów, z profesji i z przedmiotów (988.5 A), więc Intelekt hełmu był w „ekwipunek 449” Siły. Żadna strona tego nie mówiła. Broń i zbroja zmienione na rodzaje Wojownika zostają (988.6 A, 991 A).
+2. **Teraz**, u każdej formy z `as`, także dalszej, która je dziedziczy (aż do piątych form): Wielki Inkwizytor i Pogromca Demonów liczą Intelekt jako Siłę, Nekromanta, Licz, Strzelec Burzy, Władca Piorunów i Wybraniec Peruna Zręczność jako Intelekt, a Łowca, Mistrz Łowów i Władca Puszczy Zręczność jako Siłę.
+   - **Karta przedmiotu** postaci, z plecaka i założonego, także w okienku po najechaniu myszą na komputerze: na końcu linii takiej statystyki „Intelekt: +70 (+81), u Ciebie jako Siła”, tylko na przedmiocie, który forma może założyć. W „Porównaniu z założonym” to samo pod nazwą wiersza: „u Ciebie jako Siła”, ale nie przy porównaniu z tym, co nosi towarzysz.
+   - **Statystyki, wiersz Intelektu:** zamiast opisu statystyki „Każdy punkt liczy się u Ciebie jako Siła.”, a po rozwinięciu, zamiast „nie zmienia dziś…”, „Intelekt 2584 liczy się u Ciebie jako Siła:” i skąd te punkty: „klasa 155 · postać 1000 · profesje 648 · ekwipunek 781”.
+   - **Wiersz Siły** po rozwinięciu ma pod źródłami „w tym Intelekt: 2584”.
+   - **Parametry dodatkowe:** unik i szybkość podają statystykę, z której idą: u Nekromanty, Licza i linii Strzelca Burzy „(Intelekt)”, a u linii Łowcy „(Siła)”, zamiast „(Zręczność)”.
+   - Po angielsku: „Intellect: +70 (+81), counts as Strength”, „Every point counts as Strength for you.”, „Intellect 2,584 counts as Strength for you:”, „of which Intellect: 2,584”.
+   - Postać, której forma nic nie liczy jako innej, widzi wszystko jak dotąd.
+3. **Kod.** `computeStats` (`src/engine/stats.js`) zwraca też `moved`: punkty przeniesione do innej statystyki według źródeł. Widok postaci daje przy statystykach `countsAs` i `counted` (`countedStat` w `src/server/characters.js`), a przy przedmiotach postaci `propertiesAs` (`src/engine/items.js`). Strona: `statRow`, `statDetail` i `openExtra` w `src/client/screens/stats.js`, `propertyLines` i `compareTable` w `src/client/screens/character.js`. Testy: `test/counted-stats.test.js` i `test/counted-stats-page.test.js`.
 
 ## Zwój Niepamięci (989; 15.11.2026, od 0.3.64)
 

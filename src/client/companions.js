@@ -91,7 +91,7 @@ function wearChoice(companion, item, put) {
       'div',
       { class: 'wear-choice-body' },
       worn
-        ? compareTable(item, worn, { title: t('Porównanie z tym, co nosi {name}', { name: companion.name }), wornLabel: t('Nosi') })
+        ? compareTable(item, worn, { title: t('Porównanie z tym, co nosi {name}', { name: companion.name }), wornLabel: t('Nosi'), counted: {} })
         : h('p', { class: 'muted', text: t('W tym miejscu {name} nic teraz nie nosi.', { name: companion.name }) }),
       h('button', { type: 'button', class: 'button button--system', text: t('Załóż'), onClick: put }),
     ),
