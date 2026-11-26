@@ -34,8 +34,9 @@ const RESULTS = { true: 'Zwycięstwo', false: 'Porażka', null: 'Odwrót', draw:
 const MOVES = new Set(['hit', 'crit', 'dodge']);
 // 964: the marks a stance leaves on its card while it holds (skill-fx.js
 // `stance`: the Zniknięcie's faint figure, the Cień-sobowtór's shadow; the
-// fifth forms' Ostatni szał and Oko burzy).
-const STANCE_MARKS = ['unit--vanished', 'unit--doubled', 'unit--frenzy', 'unit--stormeye'];
+// fifth forms' Ostatni szał and Oko burzy, and the Noc bez gwiazd's dark
+// over every card of the party).
+const STANCE_MARKS = ['unit--vanished', 'unit--doubled', 'unit--frenzy', 'unit--stormeye', 'unit--starless'];
 const SPEED_KEY = 'wzrost.fight-speed';
 // The fight's tempo, one tap to the next and back to the first; 4× since
 // 0.2.98 (a player, poz. 45, 12.11.2026: „Czy możemy wprowadzić tempo walk
@@ -768,8 +769,8 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
         // (964: the Znak śmierci's wounds given back come as a sweep's blow
         // with a look of their own.)
         // (The Ścięcie dusz's blade catching the foe beside is its sweep's
-        // blow, with a look of its own.)
-        if (look && (!event.sweep || look.echo || look.reaper)) skills.impact(event);
+        // blow, with a look of its own, and so is the Ostatnie żniwo's.)
+        if (look && (!event.sweep || look.echo || look.reaper || look.harvest)) skills.impact(event);
         float(target.id, strong ? `−${event.damage}!` : `−${event.damage}`, strong ? 'crit' : 'hit');
         // The part of the blow from the weapon's element, in its colour,
         // under the damage (914).

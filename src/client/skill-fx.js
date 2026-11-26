@@ -178,6 +178,16 @@ export const SKILL_LOOKS = {
   'eternal-herd': { color: '#c8a26a', cast: 'bless' },
   'six-wings': { color: '#fffdf6', cast: 'shield' },
   'breath-of-life': { color: '#ffe9a8', cast: 'heal' },
+  'fiery-sword': { color: '#eef8ff', impact: 'heavy', glow: true, big: true },
+  'heavenly-host': { color: '#ffe08a', cast: 'bless' },
+  destiny: { color: '#ffe08a', cast: 'heal' },
+  'book-of-fate': { color: '#c9b7ff', cast: 'bless' },
+  'last-harvest': { color: '#9fe8c0', impact: 'shadow', big: true },
+  'soul-lament': { color: '#9fe8c0', cast: 'sweep' },
+  'eternal-legion': { color: '#3dd47a', cast: 'poison' },
+  pestilence: { color: '#c5f08a', cast: 'poison' },
+  'thousand-shadows': { color: '#ff3b5c', cast: 'sweep' },
+  'starless-night': { color: '#a690e8', cast: 'dance' },
   // The skeleton Żniwo raises (combat.js RISEN).
   risen: { color: '#8fbf5a', cast: 'poison' },
 };
@@ -563,6 +573,33 @@ Object.assign(SKILL_LOOKS['eternal-herd'], { arrival: 'aurochs', orb: 'maul', ki
 // and a warm breath over the party (Tchnienie życia).
 Object.assign(SKILL_LOOKS['six-wings'], { hexwall: false, sixwings: true });
 SKILL_LOOKS['breath-of-life'].breathoflife = true;
+// The Miecz Niebios: a great sword of white fire plunging through its foe
+// under a column of white fire, going on to the next foe while they fall
+// (Ognisty miecz); the Świetliści rycerze coming down out of the opened
+// sky and cutting with white fire (Zastęp niebios).
+Object.assign(SKILL_LOOKS['fiery-sword'], { orb: 'heavens', kind: 'sacred', fierysword: true });
+Object.assign(SKILL_LOOKS['heavenly-host'], { orb: 'lunge', kind: 'sacred', host: true });
+// The Wszechwidzący: the book of fate and a great hourglass over the
+// arena, the fallen one rising, the foes bound in chains of fate
+// (Przeznaczenie); the book's pages circling the party, its counters
+// (Księga losu).
+SKILL_LOOKS.destiny.destiny = true;
+SKILL_LOOKS['book-of-fate'].fatebook = true;
+// The Pan Dusz: a great scythe in the last arc, the souls it reaps joining
+// those round it (Ostatnie żniwo); the gathered souls screaming and
+// flying at every foe (Lament dusz).
+SKILL_LOOKS['last-harvest'].harvest = true;
+Object.assign(SKILL_LOOKS['soul-lament'], { crescent: false, lament: true, struck: true });
+// The Cesarz Nawii: the dead knights out of a gate of green fire, rising
+// again when they fall (Wieczny legion); a plague wind over every foe
+// (Pomór).
+Object.assign(SKILL_LOOKS['eternal-legion'], { arrival: 'navia', orb: 'lunge', undying: true });
+Object.assign(SKILL_LOOKS.pestilence, { plague: true, struck: true });
+// The Król Ciemności: its shadows at every foe at once, in the shadow
+// after (Tysiąc cieni); a night with its stars going out, the party
+// veiled in it (Noc bez gwiazd).
+Object.assign(SKILL_LOOKS['thousand-shadows'], { crescent: false, shadows: true, struck: true, stance: 'unit--vanished' });
+Object.assign(SKILL_LOOKS['starless-night'], { starless: true, stance: 'unit--starless' });
 
 // 960: the summoning circles, drawn flat on the ground. A druid's: two
 // rings, a wreath of leaves between them and a triskele inside; an
@@ -9546,6 +9583,14 @@ export function skillEffects(kit) {
       }
       return;
     }
+    // (The Noc bez gwiazd ends: the dark lifts off every card of the party.)
+    if (look.starless && entry) {
+      for (const member of standing(entry.unit.side)) {
+        member.card.classList.remove('unit--starless');
+        if (!reduced()) rimGlow(member.card, look.color, 400);
+      }
+      return;
+    }
     if (!look.stance || !entry || reduced() || !particles) return;
     // (The Tarcza tytana's light leaves the Tytan's card.)
     if (look.rampart) {
@@ -14463,12 +14508,1080 @@ export function skillEffects(kit) {
     await wait(420);
   }
 
+  // ——— The fifth forms' skills, batch 3 ———
+
+  // White fire: the Ognisty miecz's and the Świetliści rycerze's.
+  const HOLY_FIRE = ['#ffffff', '#eef8ff', '#bfe4ff', '#ffe9a8'];
+
+  // The Ognisty miecz's last verdict (its moment and its foe), for a
+  // verdict that goes on from a fallen foe to the next in the same moment.
+  let lastSword = null;
+  // (Its foe already down: not the same fight played again.)
+  const swordGoesOn = (event) => Boolean(lastSword && lastSword.t === event.t && lastSword.target !== event.target && cards.get(lastSword.target)?.card.classList.contains('unit--down'));
+
+  // The Ognisty miecz, before its blow (the Dzień gniewu's sky, grown): the
+  // sky over the arena darkens and white light breaks through it over the
+  // foe it judges, white embers falling; high over the foe a great sword of
+  // white fire shows, hangs a moment and plunges through the foe into the
+  // ground as the blow lands. A verdict going on from a fallen foe needs no
+  // new sky: a comet of white fire leaps out of the fallen one to the next,
+  // and the sword falls again.
+  function swordFalls(event) {
+    const entry = cards.get(event.target);
+    if (!entry || reduced() || !particles) return;
+    const fallen = swordGoesOn(event) ? cards.get(lastSword.target) : null;
+    const card = entry.card;
+    const width = stageWidth();
+    const box = boxOf(card);
+    const art = artOf(card);
+    const figure = figureOf(art);
+    const x = art.x + art.width / 2;
+    const foot = box.y + box.height - 4;
+    if (fallen) {
+      fallOn('ice', figurePoint(fallen.card, 0.4), figurePoint(card, 0.45), { duration: 220, size: Math.round(Math.max(14, figure * 0.32)) });
+    } else {
+      const sky = spark('fx-sky fx-sky--judgment', { x: 0, y: 0 });
+      sky.style.width = `${width}px`;
+      sky.style.height = `${Math.round(Math.min(stageHeight(), foot + 34))}px`;
+      animate(sky, [{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 0.9, offset: 0.75 }, { opacity: 0 }], { duration: 1900, easing: 'ease-out' }).then(() => sky.remove());
+      const across = Math.round(Math.min(figure * 2.2, (Math.min(x, width - x) - 2) * 2));
+      const rift = spark('fx-skyrift', { x, y: 0 }, { '--size': `${across}px` });
+      animate(
+        rift,
+        [
+          { transform: 'translate(-50%, 0) scale(0.2, 0.4)', opacity: 0 },
+          { transform: 'translate(-50%, 0) scale(1, 1)', opacity: 1, offset: 0.25, easing: 'ease-out' },
+          { transform: 'translate(-50%, 0) scale(1.05, 1)', opacity: 0.85, offset: 0.7 },
+          { transform: 'translate(-50%, 0) scale(0.9, 0.8)', opacity: 0 },
+        ],
+        { duration: 1500 },
+      ).then(() => rift.remove());
+      const spread = Math.min(box.width * 2, (Math.min(x, width - x) - 4) * 2);
+      particles.burst({ x, y: 6, area: { width: spread, height: 4 }, count: 18, colors: HOLY_FIRE, angle: Math.PI / 2, spread: 0.3, speed: [50, 130], gravity: 140, drag: 0.7, life: [700, 1000], size: [1.2, 2.4], shape: 'ember' });
+    }
+    // The sword, its point (at 98% of its height) going through the foe
+    // to its foot as the blow lands (arena-fx.js, 460 ms after its call).
+    const height = Math.round(Math.max(56, Math.min(figure * 1.5, foot - 8)));
+    const sword = spark('fx-sentence fx-sentence--fire', { x, y: 0 }, { '--size': `${height}px` });
+    sword.innerHTML = SENTENCE_SWORD;
+    const end = foot - height * 0.98;
+    const start = Math.min(end - figure * 0.9, 2);
+    const delay = fallen ? 140 : 0;
+    const duration = 900 - delay;
+    const land = (460 - delay) / duration;
+    const at = (top, scale = 1) => `translate(-50%, ${top.toFixed(1)}px) scale(${scale})`;
+    animate(
+      sword,
+      [
+        { transform: at(start - 12, 0.9), opacity: 0 },
+        { transform: at(start), opacity: 1, offset: 0.14 },
+        { transform: at(start - 5), opacity: 1, offset: land - 0.22, easing: 'cubic-bezier(0.55, 0, 1, 0.45)' },
+        { transform: at(end + 4), opacity: 1, offset: land },
+        { transform: at(end), opacity: 1, offset: land + 0.05 },
+        { transform: at(end), opacity: 1, offset: 0.82 },
+        { transform: at(end - 8), opacity: 0 },
+      ],
+      { duration, delay, fill: 'backwards' },
+    ).then(() => sword.remove());
+    twinkle({ x, y: Math.max(6, start + height * 0.25) }, '#ffffff', figure * 0.5, delay + 110);
+    // White fire left along its fall.
+    after(delay + duration * (land - 0.22), sword, () => particles.trail({ from: { x, y: Math.max(4, start + height * 0.9) }, to: { x, y: foot - 6 }, duration: Math.round(duration * 0.22), colors: HOLY_FIRE, rate: 120, sizes: [1, 2.2], life: [240, 420], shape: 'ember' }));
+  }
+
+  // The Ognisty miecz's verdict lands (the Dzień gniewu's, grown): as its
+  // sword goes through the foe, a column of white and pale blue fire
+  // crashes down on it out of the sky, a ring of holy fire runs out at its
+  // feet, white flames climb it and the arena flashes white.
+  function swordStrike(event, color) {
+    const entry = cards.get(event.target);
+    if (!entry) return;
+    const fallen = swordGoesOn(event);
+    lastSword = { t: event.t, target: event.target };
+    if (reduced() || !particles) {
+      burst(event.target, color, 90);
+      ring(event.target, color, 110, 420);
+      return;
+    }
+    const card = entry.card;
+    const art = artOf(card);
+    const box = boxOf(card);
+    const figure = figureOf(art);
+    const width = stageWidth();
+    const x = art.x + art.width / 2;
+    const foot = box.y + box.height - 4;
+    const beam = spark('fx-judgment fx-judgment--holyfire', { x, y: 0 });
+    beam.style.width = `${Math.round(Math.min(box.width * (fallen ? 0.75 : 1), figure * 1.3, (Math.min(x, width - x) - 2) * 2))}px`;
+    beam.style.height = `${Math.round(foot)}px`;
+    animate(
+      beam,
+      [
+        { transform: 'translate(-50%, 0) scaleY(0)', opacity: 1 },
+        { transform: 'translate(-50%, 0) scaleY(1)', opacity: 1, offset: 0.12 },
+        { transform: 'translate(-50%, 0) scale(1.25, 1)', opacity: 1, offset: 0.3 },
+        { transform: 'translate(-50%, 0) scale(1, 1)', opacity: 0.85, offset: 0.62 },
+        { transform: 'translate(-50%, 0) scale(0.3, 1)', opacity: 0 },
+      ],
+      { duration: 900, easing: 'ease-out' },
+    ).then(() => beam.remove());
+    const wave = spark('fx-shockwave', { x, y: foot }, { '--fx': '#bfe4ff' });
+    wave.style.width = `${Math.round(Math.min(box.width * 1.7, (Math.min(x, width - x) - 2) * 2))}px`;
+    animate(
+      wave,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.15)', opacity: 1 },
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 0 },
+      ],
+      { duration: 560, easing: 'ease-out' },
+    ).then(() => wave.remove());
+    flames(card, { flameArt: HOLY_FLAME, count: 6, tall: 0.7, duration: 1100 });
+    particles.burst({ x, y: foot, area: { width: figure, height: 6 }, count: 18, colors: HOLY_FIRE, angle: -Math.PI / 2, spread: 1.1, speed: [80, 230], gravity: -40, drag: 1.6, life: [400, 800], size: [1.2, 2.6], shape: 'ember' });
+    particles.burst({ x, y: art.y + art.height * 0.5, count: 14, colors: ['#ffffff', '#eef8ff', color], speed: [120, 280], drag: 2.6, life: [260, 480], size: [1, 2], shape: 'spark' });
+    tintCard(card, '#cfeaff', [{ opacity: 0 }, { opacity: 0.55, offset: 0.2 }, { opacity: 0 }], 800);
+    animate(card, [{ filter: 'brightness(2.6) saturate(0.4)' }, { filter: 'brightness(1)' }], { duration: 700, easing: 'ease-out' });
+    flash('#eef8ff', fallen ? 0.16 : 0.28, 420);
+    shake(fallen ? 4.5 : 6.5, 460);
+  }
+
+  // The Zastęp niebios: the sky over the party opens in rays of gold, and
+  // a shaft of light comes down on each knight's place; the Świetliści
+  // rycerze descend out of the light one after another, land with a ring
+  // of holy fire and stand before the Miecz Niebios, shining, white
+  // feathers drifting down round them.
+  async function heavenlyHost(event, look) {
+    const owner = cards.get(event.actor);
+    const knights = summonsOfEvent(event);
+    if (!owner || knights.length === 0 || reduced() || !particles) {
+      await Promise.all([ring(event.actor, look.color, 130, 760), aura(event.actor, look.color, 2)]);
+      return;
+    }
+    const width = stageWidth();
+    const boxes = knights.map((knight) => boxOf(knight.card));
+    const middle = (Math.min(...boxes.map((box) => box.x)) + Math.max(...boxes.map((box) => box.x + box.width))) / 2;
+    const size = Math.round(Math.min(width * 0.95, 300));
+    const rays = spark('fx-godrays', { x: middle, y: 0 }, { '--size': `${size}px` });
+    animate(
+      rays,
+      [
+        { transform: 'translate(-50%, -50%) rotate(0deg) scale(0.3)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) rotate(10deg) scale(1)', opacity: 0.9, offset: 0.25, easing: 'ease-out' },
+        { transform: 'translate(-50%, -50%) rotate(26deg) scale(1.05)', opacity: 0.75, offset: 0.8 },
+        { transform: 'translate(-50%, -50%) rotate(34deg) scale(1.1)', opacity: 0 },
+      ],
+      { duration: 2300 },
+    ).then(() => rays.remove());
+    const mark = anchor(2500);
+    after(120, mark, () => flash('#fff6cf', 0.2, 420));
+    knights.forEach((knight, index) => {
+      const card = knight.card;
+      const box = boxes[index];
+      const art = artOf(card);
+      const figure = figureOf(art);
+      const delay = 360 + index * 280;
+      shaftOn(card, Math.min(box.width, figure * 1.25), { delay, duration: 1200 });
+      // (It comes down out of the light, unseen until then.)
+      const drop = Math.round(Math.max(24, Math.min(box.y, 80)));
+      animate(
+        card,
+        [
+          { transform: `translateY(${-drop}px) scale(0.92)`, opacity: 0, filter: 'brightness(3) saturate(0)' },
+          { transform: `translateY(${(-drop * 0.45).toFixed(1)}px) scale(0.96)`, opacity: 1, filter: 'brightness(2.4) saturate(0.3)', offset: 0.45, easing: 'cubic-bezier(0.5, 0, 0.9, 0.6)' },
+          { transform: 'translateY(3px) scale(1.03, 0.97)', opacity: 1, filter: 'brightness(1.6) saturate(0.7)', offset: 0.8 },
+          { transform: 'translateY(0px) scale(1)', opacity: 1, filter: 'brightness(1) saturate(1)' },
+        ],
+        { duration: 640, delay: delay + 220, fill: 'backwards' },
+      );
+      after(delay + 740, mark, () => {
+        const foot = { x: box.x + box.width / 2, y: box.y + box.height - 6 };
+        const wave = spark('fx-shockwave', foot, { '--fx': '#ffe08a' });
+        wave.style.width = `${Math.round(Math.min(box.width * 1.5, (Math.min(foot.x, width - foot.x) - 2) * 2))}px`;
+        animate(
+          wave,
+          [
+            { transform: 'translate(-50%, -50%) scale(0.15)', opacity: 1 },
+            { transform: 'translate(-50%, -50%) scale(1)', opacity: 0 },
+          ],
+          { duration: 520, easing: 'ease-out' },
+        ).then(() => wave.remove());
+        flames(card, { flameArt: HOLY_FLAME, count: 4, tall: 0.45, duration: 900 });
+        particles.burst({ x: foot.x, y: foot.y, area: { width: box.width * 0.7, height: 4 }, count: 14, colors: [...HOLY_FIRE, '#ffe08a'], angle: -Math.PI / 2, spread: 0.8, speed: [50, 150], gravity: -30, drag: 1.4, life: [500, 800], size: [1, 2.2], shape: 'mote' });
+        leaves({ x: foot.x, y: art.y + art.height * 0.1 }, { count: 5, reach: figure * 0.45, colors: ['#ffffff', '#fffdf6', '#fff6cf'] });
+        rimGlow(card, '#ffe08a', 900);
+        twinkle(figurePoint(card, 0.25), '#ffffff', figure * 0.6, 120);
+        shake(3, 280, true);
+      });
+    });
+    await wait(360 + knights.length * 280 + 1000);
+  }
+
+  // A Świetlisty rycerz's blow: a cut of white fire, holy sparks, and pale
+  // flames licking up its foe.
+  function holyCut(event, color) {
+    const entry = cards.get(event.target);
+    if (!entry) return;
+    if (reduced() || !particles) {
+      burst(event.target, color, 70);
+      return;
+    }
+    const point = figurePoint(entry.card, 0.5);
+    const figure = figureOf(artOf(entry.card));
+    cutAt(point, -36, figure * 1.15, '#bfe4ff', { duration: 400, bend: 8, width: 1.5 });
+    cutAt({ x: point.x + 2, y: point.y + 2 }, -36, figure, '#ffffff', { delay: 40, duration: 360, bend: 6, width: 0.8 });
+    particles.burst({ x: point.x, y: point.y, count: 12, colors: [...HOLY_FIRE, '#ffe08a'], speed: [100, 240], drag: 3, life: [220, 420], size: [1, 2], shape: 'spark' });
+    flames(entry.card, { flameArt: HOLY_FLAME, count: 3, tall: 0.42, duration: 760 });
+    tintCard(entry.card, '#eef8ff', [{ opacity: 0 }, { opacity: 0.4, offset: 0.25 }, { opacity: 0 }], 520);
+  }
+
+  // The book of fate: an open book in gold, its pages written in runes,
+  // an eye on each.
+  const FATE_BOOK =
+    '<svg viewBox="-50 -32 100 64" aria-hidden="true">' +
+    '<path d="M-48 -26C-30 -30 -12 -28 0 -22C12 -28 30 -30 48 -26V26C30 22 12 24 0 30C-12 24 -30 22 -48 26Z" fill="#7a4a12" stroke="#3a2008" stroke-width="2" stroke-linejoin="round"/>' +
+    '<path d="M-44 -22C-28 -25 -12 -23 -1 -18V25C-12 20 -28 19 -44 22Z" fill="#fff6dc" stroke="#c99a2e" stroke-width="1.4" stroke-linejoin="round"/>' +
+    '<path d="M44 -22C28 -25 12 -23 1 -18V25C12 20 28 19 44 22Z" fill="#fff6dc" stroke="#c99a2e" stroke-width="1.4" stroke-linejoin="round"/>' +
+    '<g fill="none" stroke="#b8862a" stroke-width="1.6" stroke-linecap="round">' +
+    '<path d="M-38 -12H-10M-38 -4H-14M-38 12H-18"/><path d="M10 -12H38M14 -4H38M18 12H38"/></g>' +
+    '<g fill="none" stroke="#7b5fc7" stroke-width="1.4"><path d="M-34 4C-30 0 -22 0 -18 4C-22 8 -30 8 -34 4Z"/><path d="M18 4C22 0 30 0 34 4C30 8 22 8 18 4Z"/></g>' +
+    '<circle cx="-26" cy="4" r="1.8" fill="#7b5fc7"/><circle cx="26" cy="4" r="1.8" fill="#7b5fc7"/></svg>';
+  // One of its pages, torn out and flying: a leaf with lines of runes and
+  // an eye.
+  const FATE_PAGE =
+    '<svg viewBox="-10 -13 20 26" aria-hidden="true"><path d="M-9 -12H9V12H-9Z" fill="#fff6dc" stroke="#c99a2e" stroke-width="1.2" stroke-linejoin="round"/>' +
+    '<path d="M-6 -7H6M-6 -3H4M-6 7H6" stroke="#b8862a" stroke-width="1.2" stroke-linecap="round"/>' +
+    '<path d="M-5 2C-2 -0.5 2 -0.5 5 2C2 4.5 -2 4.5 -5 2Z" fill="none" stroke="#7b5fc7" stroke-width="1"/><circle cy="2" r="1.2" fill="#7b5fc7"/></svg>';
+
+  // A page turning in an open book of fate (its spine at `point`): it
+  // rises from the right side over the spine and settles on the left.
+  function turnPage(point, size, delay) {
+    const page = spark('fx-fatepage fx-fatepage--turn', point, { '--size': `${Math.round(size * 0.44)}px` });
+    page.innerHTML = FATE_PAGE;
+    return animate(
+      page,
+      [
+        { transform: 'translate(0, -50%) perspective(240px) rotateY(0deg)', opacity: 1 },
+        { transform: 'translate(0, -56%) perspective(240px) rotateY(-90deg)', opacity: 1, offset: 0.5 },
+        { transform: 'translate(0, -50%) perspective(240px) rotateY(-180deg)', opacity: 1, offset: 0.9 },
+        { transform: 'translate(0, -50%) perspective(240px) rotateY(-180deg)', opacity: 0 },
+      ],
+      { duration: 700, delay, easing: 'ease-in-out', fill: 'backwards' },
+    ).then(() => page.remove());
+  }
+
+  // The Przeznaczenie's book and hourglass over the arena, from its heal to
+  // its foes' lost moves (they go by themselves if those never come).
+  let fateBook = null;
+
+  // The book of fate opens high over the middle of the arena and a page
+  // turns over in it; under it a great hourglass, bigger than the
+  // Odwrócenie losu's, appears and turns over, with a flash.
+  function fateBookUp() {
+    const width = stageWidth();
+    const size = Math.round(Math.min(120, width * 0.32));
+    const point = { x: width / 2, y: Math.round(Math.max(size * 0.34 + 4, stageHeight() * 0.09)) };
+    const book = spark('fx-fatebook', point, { '--size': `${size}px` });
+    book.innerHTML = FATE_BOOK;
+    animate(
+      book,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.3, 0.1)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1, 1)', opacity: 1, offset: 0.4, easing: 'ease-out' },
+        { transform: 'translate(-50%, -50%) scale(1, 1)', opacity: 1 },
+      ],
+      { duration: 600, fill: 'forwards' },
+    );
+    turnPage(point, size, 380);
+    const glassSize = Math.round(size * 0.72);
+    const glassAt = { x: point.x, y: point.y + size * 0.3 + glassSize * 0.5 };
+    const glass = spark('fx-hourglass fx-hourglass--fate', glassAt, { '--fx': '#ffe08a', '--size': `${glassSize}px` });
+    glass.innerHTML = FATE_GLASS;
+    animate(
+      glass,
+      [
+        { transform: 'translate(-50%, -50%) rotate(0deg) scale(0.3)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) rotate(0deg) scale(0.3)', opacity: 0, offset: 0.35 },
+        { transform: 'translate(-50%, -50%) rotate(0deg) scale(1)', opacity: 1, offset: 0.55, easing: 'cubic-bezier(0.6, 0, 0.3, 1)' },
+        { transform: 'translate(-50%, -50%) rotate(180deg) scale(1.08)', opacity: 1, offset: 0.9 },
+        { transform: 'translate(-50%, -50%) rotate(180deg) scale(1)', opacity: 1 },
+      ],
+      { duration: 1200, fill: 'forwards' },
+    );
+    after(1060, book, () => {
+      flash('#ffe08a', 0.24, 460);
+      shake(3, 300, true);
+      particles.burst({ x: glassAt.x, y: glassAt.y, count: 20, colors: [...GOLD, '#c9b7ff'], speed: [60, 180], drag: 2.2, life: [400, 700], size: [1, 2.2], shape: 'mote' });
+    });
+    const state = { book, glass, point: glassAt };
+    fateBook = state;
+    wait(7000).then(() => fateBookDown(state));
+    return state;
+  }
+
+  // The book and the hourglass fade away, their work done.
+  function fateBookDown(state) {
+    if (fateBook === state) fateBook = null;
+    for (const element of [state.book, state.glass]) {
+      if (!element.isConnected || element.dataset.going) continue;
+      element.dataset.going = '1';
+      animate(element, [{ opacity: 1 }, { opacity: 0 }], { duration: 420, easing: 'ease-in', fill: 'forwards' }).then(() => element.remove());
+    }
+  }
+
+  // The Przeznaczenie's heal (the Odwrócenie losu's, grown): the card of
+  // the fallen one lies grey; the book of fate opens over the arena, its
+  // page turns, the hourglass under it turns over, and a column of golden
+  // light pours down on the fallen one, who rises out of it in its
+  // colours again; the rest of the party glows gold as its HP comes back.
+  async function destinyHeal(event, color) {
+    const entry = cards.get(event.target);
+    if (!entry || reduced() || !particles) {
+      await plainHeal(event, color);
+      return;
+    }
+    const card = entry.card;
+    const art = artOf(card);
+    const box = boxOf(card);
+    const figure = figureOf(art);
+    let lead = 0;
+    if (!event.place || !fateBook?.book.isConnected) {
+      fateBookUp();
+      lead = 1060;
+    }
+    // (The one the Przeznaczenie turns back from death: the party's heal
+    // comes to it first.)
+    const fallen = !event.place;
+    if (fallen) {
+      const whole = lead + 1100;
+      animate(
+        card,
+        [
+          { filter: 'grayscale(1) brightness(0.55)', transform: 'translateY(4px)' },
+          { filter: 'grayscale(1) brightness(0.55)', transform: 'translateY(4px)', offset: (lead + 380) / whole },
+          { filter: 'grayscale(0) brightness(1.9)', transform: 'translateY(-6px)', offset: (lead + 700) / whole, easing: 'ease-out' },
+          { filter: 'grayscale(0) brightness(1)', transform: 'translateY(0px)' },
+        ],
+        { duration: whole, easing: 'ease-in-out' },
+      );
+    }
+    const top = { x: art.x + art.width / 2, y: box.y + 6 };
+    const mark = anchor(lead + 1500);
+    after(lead, mark, () => {
+      if (fateBook) particles.trail({ from: fateBook.point, to: top, duration: 300, colors: GOLD, rate: 140, sizes: [1, 2], life: [260, 460], shape: 'mote' });
+      if (fallen) shaftOn(card, Math.min(box.width, figure * 1.2), { duration: 1000 });
+    });
+    after(lead + 200, mark, () => particles.burst({ x: top.x, y: top.y, area: { width: figure * 0.9, height: 4 }, count: 18, colors: GOLD, angle: Math.PI / 2, spread: 0.2, speed: [50, 110], gravity: 220, drag: 0.8, life: [500, 800], size: [1, 1.8], shape: 'mote' }));
+    after(lead + 400, mark, () => {
+      healed(event);
+      if (fallen) rise(card, { width: figure * 0.9, full: 1, duration: 900 });
+      tintCard(card, '#ffe08a', [{ opacity: 0 }, { opacity: 0.45, offset: 0.3 }, { opacity: 0 }], 800);
+      groundRing(entry.unit.id, color, { duration: 800, scale: 1.2 });
+      twinkle(figurePoint(card, 0.3), '#ffffff', figure * 0.7);
+    });
+    await wait(lead + (fallen ? 1000 : 700));
+  }
+
+  // The Przeznaczenie over the foes: golden sand streams from the turned
+  // hourglass to every foe, golden chains of fate wind round it, the hands
+  // of a clock over it run back, and it stands still and grey (it loses
+  // its next move).
+  async function destinyFreeze(event, color, targets) {
+    const foes = targets.map((id) => cards.get(id)).filter(Boolean);
+    if (foes.length === 0 || reduced() || !particles) {
+      await Promise.all(targets.map((id) => ring(id, color, 100, 600)));
+      return;
+    }
+    let lead = 0;
+    let state = fateBook?.book.isConnected ? fateBook : null;
+    if (!state) {
+      state = fateBookUp();
+      lead = 1060;
+    }
+    const step = 120;
+    const mark = anchor(lead + 2000 + foes.length * step);
+    foes.forEach((foe, index) => {
+      const delay = lead + index * step;
+      const center = figurePoint(foe.card, 0.5);
+      const figure = figureOf(artOf(foe.card));
+      after(delay, mark, () => particles.trail({ from: state.point, to: center, duration: 320, colors: GOLD, rate: 130, sizes: [1, 2], life: [260, 460], shape: 'mote' }));
+      const clock = spark('fx-clock', center, { '--fx': '#ffe08a', '--size': `${Math.round(figure * 0.95)}px` });
+      clock.innerHTML = CLOCK + CLOCK_HANDS;
+      animate(
+        clock,
+        [
+          { transform: 'translate(-50%, -50%) scale(0.4)', opacity: 0 },
+          { transform: 'translate(-50%, -50%) scale(1)', opacity: 0.95, offset: 0.2, easing: 'ease-out' },
+          { transform: 'translate(-50%, -50%) scale(1)', opacity: 0.9, offset: 0.8 },
+          { transform: 'translate(-50%, -50%) scale(1.1)', opacity: 0 },
+        ],
+        { duration: 1400, delay: delay + 280, fill: 'backwards' },
+      ).then(() => clock.remove());
+      animate(clock.lastElementChild, [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-1080deg)' }], { duration: 1400, delay: delay + 280, easing: 'cubic-bezier(0.4, 0, 0.6, 1)', fill: 'backwards' });
+      // The chains, winding round it from above, over the clock.
+      const chains = spark('fx-chains', { x: center.x, y: center.y + figure * 0.1 }, { '--size': `${Math.round(figure * 1.2)}px` });
+      chains.innerHTML = CHAINS;
+      animate(
+        chains,
+        [
+          { transform: 'translate(-50%, -50%) translateY(-24px) scale(1.25) rotate(-12deg)', opacity: 0 },
+          { transform: 'translate(-50%, -50%) translateY(0px) scale(1) rotate(0deg)', opacity: 1, offset: 0.22, easing: 'ease-out' },
+          { transform: 'translate(-50%, -50%) scale(1.04, 0.92)', opacity: 1, offset: 0.3 },
+          { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.8 },
+          { transform: 'translate(-50%, -50%) scale(1.06)', opacity: 0 },
+        ],
+        { duration: 1400, delay: delay + 360, fill: 'backwards' },
+      ).then(() => chains.remove());
+      after(delay + 420, mark, () => {
+        animate(foe.card, [{ filter: 'grayscale(0) brightness(1)' }, { filter: 'grayscale(1) brightness(0.72) sepia(0.25)', offset: 0.2 }, { filter: 'grayscale(1) brightness(0.72) sepia(0.25)', offset: 0.8 }, { filter: 'grayscale(0) brightness(1)' }], { duration: 1320 });
+        kit.float(foe.unit.id, t('traci ruch'), 'effect');
+      });
+      after(delay + 560, mark, () => particles.burst({ x: center.x, y: center.y, count: 8, colors: GOLD, speed: [40, 110], drag: 2.4, life: [300, 520], size: [1, 2], shape: 'spark' }));
+    });
+    after(lead + 800 + foes.length * step, mark, () => fateBookDown(state));
+    await wait(lead + 1400 + foes.length * step);
+  }
+
+  // The Księga losu: the book of fate opens over the Wszechwidzący and its
+  // pages turn; then they tear out and fly to every card of the party,
+  // three to each, and circle round it, each with an eye that sees the
+  // blow coming; the cards glow violet and gold.
+  async function bookOfFate(id, color) {
+    const entry = cards.get(id);
+    if (!entry) return;
+    if (reduced() || !particles) {
+      await Promise.all([ring(id, color, 130, 760), aura(id, color, 2)]);
+      return;
+    }
+    const width = stageWidth();
+    const art = artOf(entry.card);
+    const figure = figureOf(art);
+    const x = art.x + art.width / 2;
+    const size = Math.round(Math.max(54, Math.min(figure * 1.2, (Math.min(x, width - x) - 2) * 2)));
+    // (Over the figure, under the skill's name over its card.)
+    const point = { x, y: Math.max(size * 0.32 + 2, art.y + art.height * 0.42) };
+    const book = spark('fx-fatebook', point, { '--size': `${size}px` });
+    book.innerHTML = FATE_BOOK;
+    animate(
+      book,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.3, 0.1)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1, 1)', opacity: 1, offset: 0.18, easing: 'ease-out' },
+        { transform: 'translate(-50%, -50%) scale(1, 1)', opacity: 1, offset: 0.85 },
+        { transform: 'translate(-50%, -56%) scale(1.05)', opacity: 0 },
+      ],
+      { duration: 2100 },
+    ).then(() => book.remove());
+    turnPage(point, size, 300);
+    turnPage(point, size, 520);
+    const mark = anchor(2500);
+    after(400, mark, () => {
+      flash(color, 0.14, 380);
+      particles.burst({ x: point.x, y: point.y, count: 14, colors: ['#ffffff', '#fff6cf', '#c9b7ff'], speed: [60, 160], drag: 2.4, life: [400, 700], size: [1, 2], shape: 'mote' });
+    });
+    const party = standing(entry.unit.side);
+    party.forEach((member, index) => {
+      const middle = figurePoint(member.card, 0.5);
+      const reach = figureOf(artOf(member.card));
+      // (Its orbit kept on the stage.)
+      const across = Math.max(14, Math.min(reach * 0.6, middle.x - 10, width - middle.x - 10));
+      const deep = across * 0.45;
+      const delay = 640 + index * 120;
+      for (let k = 0; k < 3; k++) {
+        const page = spark('fx-fatepage', point, { '--size': `${Math.round(Math.max(14, reach * 0.26))}px` });
+        page.innerHTML = FATE_PAGE;
+        const phase = (k / 3) * Math.PI * 2;
+        const frames = Array.from({ length: 17 }, (_, step) => {
+          const share = step / 16;
+          const fly = Math.min(1, share / 0.3);
+          const angle = phase + share * Math.PI * 2.4;
+          const orbit = { x: middle.x + Math.cos(angle) * across, y: middle.y + Math.sin(angle) * deep };
+          const at = { x: point.x + (orbit.x - point.x) * fly, y: point.y + (orbit.y - point.y) * fly };
+          return { transform: `translate(${(at.x - point.x).toFixed(1)}px, ${(at.y - point.y).toFixed(1)}px) translate(-50%, -50%) rotate(${(Math.sin(angle) * 16).toFixed(1)}deg) scale(${(0.85 + Math.sin(angle) * 0.15).toFixed(2)})`, opacity: step === 0 || step === 16 ? 0 : 1 };
+        });
+        animate(page, frames, { duration: 1500, delay: delay + k * 60, easing: 'linear', fill: 'backwards' }).then(() => page.remove());
+      }
+      after(delay + 480, mark, () => {
+        rimGlow(member.card, color, 900);
+        tintCard(member.card, '#e6dcff', [{ opacity: 0 }, { opacity: 0.32, offset: 0.3 }, { opacity: 0 }], 800);
+        twinkle(figurePoint(member.card, 0.3), '#efe8ff', Math.max(9, reach * 0.3));
+      });
+    });
+    await wait(1700 + party.length * 120);
+  }
+
+  // A blow the Księga losu foresaw, answered at once: a page of the book
+  // flashes over the foe that struck, its eye open, and violet and gold
+  // cuts cross through the foe.
+  function pageCounter(event, color) {
+    const entry = cards.get(event.target);
+    if (!entry) return;
+    if (reduced() || !particles) {
+      burst(event.target, color, 70);
+      return;
+    }
+    const art = artOf(entry.card);
+    const figure = figureOf(art);
+    const point = figurePoint(entry.card, 0.45);
+    const page = spark('fx-fatepage', { x: art.x + art.width / 2, y: art.y + art.height * 0.2 }, { '--size': `${Math.round(figure * 0.38)}px` });
+    page.innerHTML = FATE_PAGE;
+    animate(
+      page,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.4) rotate(-20deg)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1) rotate(0deg)', opacity: 1, offset: 0.25 },
+        { transform: 'translate(-50%, -50%) scale(1) rotate(0deg)', opacity: 1, offset: 0.7 },
+        { transform: 'translate(-50%, -60%) scale(1.1) rotate(8deg)', opacity: 0 },
+      ],
+      { duration: 760 },
+    ).then(() => page.remove());
+    cutAt(point, 35, figure * 1.15, color, { duration: 380, bend: 6, width: 1.3 });
+    cutAt(point, -35, figure * 0.95, '#ffe08a', { delay: 80, duration: 340, bend: -5, width: 1 });
+    particles.burst({ x: point.x, y: point.y, count: 12, colors: ['#ffffff', '#fff6cf', color], speed: [100, 220], drag: 3, life: [200, 380], size: [1, 2], shape: 'spark' });
+  }
+
+  // Small souls circling the Pan Dusz's figure (the Ostatnie żniwo's soul
+  // joining the others), then fading.
+  function soulSwirl(card, count) {
+    const art = artOf(card);
+    const figure = figureOf(art);
+    const middle = { x: art.x + art.width / 2, y: art.y + art.height * 0.5 };
+    const across = Math.max(12, Math.min(figure * 0.55, middle.x - 8, stageWidth() - middle.x - 8));
+    for (let k = 0; k < count; k++) {
+      const soul = spark('fx-soul fx-soul--small', middle, { '--fx': '#9fe8c0' });
+      const phase = (k / count) * Math.PI * 2;
+      const frames = Array.from({ length: 13 }, (_, step) => {
+        const share = step / 12;
+        const angle = phase + share * Math.PI * 2;
+        return { transform: `translate(${(Math.cos(angle) * across).toFixed(1)}px, ${(Math.sin(angle) * across * 0.45 - share * 8).toFixed(1)}px) translate(-50%, -50%) scale(${(0.75 + Math.sin(angle) * 0.2).toFixed(2)})`, opacity: step === 0 || step === 12 ? 0 : 0.9 };
+      });
+      animate(soul, frames, { duration: 1400, delay: k * 40, easing: 'linear', fill: 'backwards' }).then(() => soul.remove());
+    }
+  }
+
+  // The Ostatnie żniwo, before its blow (the Ścięcie dusz's, grown): a great
+  // spectral scythe, bigger than the Ścięcie dusz's, rises over its foe and
+  // draws back, its blade glinting, pale motes rising off the foe.
+  function harvestRaise(event, color) {
+    const entry = cards.get(event.target);
+    if (!entry || reduced() || !particles) return;
+    const art = artOf(entry.card);
+    const figure = figureOf(art);
+    const width = stageWidth();
+    const x = art.x + art.width / 2;
+    const size = Math.round(Math.max(44, Math.min(figure * 1.7, (Math.min(x, width - x) - 2) * 1.4)));
+    const point = { x, y: Math.max(size * 0.6, art.y + art.height * 0.32) };
+    const scythe = spark('fx-scythe fx-scythe--great', point, { '--fx': color, '--size': `${size}px` });
+    scythe.innerHTML = SCYTHE;
+    animate(
+      scythe,
+      [
+        { transform: 'translate(-50%, -50%) rotate(40deg) scale(0.7)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) rotate(-30deg) scale(1)', opacity: 1, offset: 0.35, easing: 'ease-out' },
+        { transform: 'translate(-50%, -50%) rotate(-42deg) scale(1.03)', opacity: 1, offset: 0.85 },
+        { transform: 'translate(-50%, -50%) rotate(-42deg) scale(1)', opacity: 0 },
+      ],
+      { duration: 760, easing: 'ease-in-out' },
+    ).then(() => scythe.remove());
+    twinkle({ x: point.x - size * 0.25, y: point.y - size * 0.35 }, '#ffffff', size * 0.45, 300);
+    particles.burst({ x, y: art.y + art.height * 0.8, area: { width: figure * 0.8, height: 6 }, count: 10, colors: SOUL, angle: -Math.PI / 2, spread: 0.5, speed: [15, 45], gravity: -30, drag: 1.4, life: [600, 900], size: [1, 1.8], shape: 'mote' });
+  }
+
+  // A soul reaped by the Ostatnie żniwo: out of a foe its blow killed, to
+  // the Pan Dusz, where it joins the souls circling it; out of one still
+  // standing only a pale shiver.
+  function harvested(event, point, color) {
+    const reaper = cards.get(event.actor);
+    if (reaper && event.hp !== undefined && event.hp <= 0) {
+      soulFlight(point, figurePoint(reaper.card, 0.45), color, 180).then(() => {
+        if (reaper.card.isConnected) {
+          soulSwirl(reaper.card, 5);
+          rimGlow(reaper.card, color, 700);
+        }
+      });
+    } else {
+      particles.burst({ x: point.x, y: point.y, count: 6, colors: SOUL, angle: -Math.PI / 2, spread: 0.5, speed: [20, 50], gravity: -30, drag: 1.4, life: [400, 600], size: [1, 1.8], shape: 'mote' });
+    }
+  }
+
+  // The Ostatnie żniwo's blow: the great scythe sweeps through its foe in
+  // the last arc, wider and brighter than the Ścięcie dusz's, in a flash
+  // of pale light (a foe under its mark falls at once); its soul flies to
+  // the Pan Dusz and joins the others.
+  function harvestReap(event, color) {
+    const entry = cards.get(event.target);
+    if (!entry) return;
+    if (reduced() || !particles) {
+      burst(event.target, color, 90);
+      return;
+    }
+    const card = entry.card;
+    const figure = figureOf(artOf(card));
+    const point = figurePoint(card, 0.5);
+    cutAt(point, -28, figure * 1.85, '#e6fff0', { duration: 500, bend: 30, width: 2 });
+    cutAt({ x: point.x + 3, y: point.y + 4 }, -28, figure * 1.6, color, { delay: 40, duration: 460, bend: 26, width: 1.2 });
+    cutAt({ x: point.x - 2, y: point.y - 3 }, -28, figure * 1.3, '#ffffff', { delay: 80, duration: 420, bend: 20, width: 0.7 });
+    burst(event.target, '#e6fff0', Math.round(figure * 1.4));
+    ring(event.target, color, Math.round(figure * 1.9), 520);
+    particles.burst({ x: point.x, y: point.y, count: 20, colors: [...SOUL, color], angle: Math.PI * 0.85, spread: 0.8, speed: [120, 300], drag: 2.8, life: [260, 520], size: [1.1, 2.4], shape: 'spark' });
+    animate(card, [{ filter: 'brightness(2.6) saturate(0.3)' }, { filter: 'brightness(1)' }], { duration: 700, easing: 'ease-out' });
+    flash('#e6fff0', 0.18, 360);
+    shake(5, 380);
+    harvested(event, point, color);
+  }
+
+  // The Ostatnie żniwo's blade catching the foe beside its foe (its own
+  // blow, a sweep's): the end of the great arc cuts it, pale and cold.
+  function harvestCleave(event, color) {
+    const entry = cards.get(event.target);
+    if (!entry) return;
+    if (reduced() || !particles) {
+      burst(event.target, color, 60);
+      return;
+    }
+    const point = figurePoint(entry.card, 0.5);
+    const figure = figureOf(artOf(entry.card));
+    cutAt(point, -28, figure * 1.3, '#e6fff0', { duration: 420, bend: 22, width: 1.4 });
+    particles.burst({ x: point.x, y: point.y, count: 10, colors: [...SOUL, color], angle: Math.PI * 0.85, spread: 0.6, speed: [90, 220], drag: 3, life: [200, 400], size: [1, 2], shape: 'spark' });
+    animate(entry.card, [{ filter: 'brightness(2) saturate(0.4)' }, { filter: 'brightness(1)' }], { duration: 460, easing: 'ease-out' });
+    harvested(event, point, color);
+  }
+
+  // A great wailing face of souls (the Lament dusz's): pale, its mouth open
+  // in a scream.
+  const WAILING_FACE =
+    '<svg viewBox="-40 -48 80 96" aria-hidden="true"><path d="M0 -46C26 -46 34 -24 32 -2C30 22 18 44 0 46C-18 44 -30 22 -32 -2C-34 -24 -26 -46 0 -46Z" fill="#d9fff0" fill-opacity="0.42" stroke="#e6fff0" stroke-width="1.6"/>' +
+    '<ellipse cx="-12" cy="-10" rx="6.5" ry="9" fill="#0f2a1c"/><ellipse cx="12" cy="-10" rx="6.5" ry="9" fill="#0f2a1c"/>' +
+    '<ellipse cy="20" rx="9" ry="15" fill="#0f2a1c"/><path d="M-20 -24Q-12 -30 -4 -24M20 -24Q12 -30 4 -24" fill="none" stroke="#9fe8c0" stroke-width="1.8" stroke-linecap="round"/></svg>';
+
+  // The Lament dusz: the souls the Pan Dusz has gathered rise round it as
+  // pale faces, the more the more foes have fallen in the fight; they
+  // scream all at once, the scream rolling out in pale waves, a great
+  // wailing face of souls looms over the foes' formation, and the faces fly
+  // at the foes, each into one; the foes flash pale, and life flows back
+  // from them to the Pan Dusz.
+  async function soulLament(event, color, targets) {
+    const entry = cards.get(event.actor);
+    const foes = targets.map((id) => cards.get(id)).filter(Boolean);
+    if (!entry || foes.length === 0 || reduced() || !particles) {
+      await Promise.all(targets.map((id) => ring(id, color, 100, 600)));
+      return;
+    }
+    const width = stageWidth();
+    const art = artOf(entry.card);
+    const figure = figureOf(art);
+    const middle = { x: art.x + art.width / 2, y: art.y + art.height * 0.5 };
+    const souls = [...cards.values()].filter((other) => other.unit.side !== entry.unit.side && !other.unit.summon && other.card.classList.contains('unit--down')).length;
+    const count = Math.min(9, 4 + souls * 2);
+    const across = Math.max(16, Math.min(figure * 0.75, middle.x - 12, width - middle.x - 12));
+    const faceSize = Math.round(Math.max(14, figure * 0.28));
+    // Where each face circles to, round the Pan Dusz (from its middle).
+    const orbit = (k) => {
+      const angle = (k / count) * Math.PI * 2 + Math.PI * 1.6;
+      return { x: Math.cos(angle) * across, y: Math.sin(angle) * across * 0.5 - 10 };
+    };
+    const faces = Array.from({ length: count }, (_, k) => {
+      const face = spark('fx-wraith', middle, { '--size': `${faceSize}px` });
+      face.innerHTML = WRAITH_FACE;
+      const phase = (k / count) * Math.PI * 2;
+      const frames = Array.from({ length: 11 }, (_, step) => {
+        const share = step / 10;
+        const angle = phase + share * Math.PI * 1.6;
+        const reach = Math.min(1, share * 2.5);
+        return { transform: `translate(${(Math.cos(angle) * across * reach).toFixed(1)}px, ${(Math.sin(angle) * across * 0.5 * reach - share * 10).toFixed(1)}px) translate(-50%, -50%) scale(${(0.6 + share * 0.4).toFixed(2)})`, opacity: step === 0 ? 0 : 0.9 };
+      });
+      animate(face, frames, { duration: 760, delay: k * 40, easing: 'ease-out', fill: 'both' });
+      return face;
+    });
+    tintCard(entry.card, '#9fe8c0', [{ opacity: 0 }, { opacity: 0.35, offset: 0.4 }, { opacity: 0 }], 900);
+    const mark = anchor(2700);
+    // The scream.
+    after(820, mark, () => {
+      flash('#d9fff0', 0.16, 380);
+      shake(3, 320);
+      for (let k = 0; k < 3; k++) {
+        const wave = spark('fx-roar fx-roar--wail', middle, { '--fx': '#d9fff0', '--size': `${Math.round(Math.min(figure * (1.5 + k * 0.4), (Math.min(middle.x, width - middle.x) - 2) * 2))}px` });
+        wave.innerHTML = ROAR;
+        animate(
+          wave,
+          [
+            { transform: 'translate(-50%, -50%) scale(0.3)', opacity: 0 },
+            { transform: 'translate(-50%, -50%) scale(0.8)', opacity: 1, offset: 0.3 },
+            { transform: 'translate(-50%, -50%) scale(1.3)', opacity: 0 },
+          ],
+          { duration: 560, delay: k * 110, easing: 'ease-out', fill: 'backwards' },
+        ).then(() => wave.remove());
+      }
+    });
+    // The great face over the foes' formation, the bigger the more souls.
+    const boxes = foes.map((foe) => boxOf(foe.card));
+    const left = Math.min(...boxes.map((box) => box.x));
+    const right = Math.max(...boxes.map((box) => box.x + box.width));
+    const top = Math.min(...boxes.map((box) => box.y));
+    const bottom = Math.max(...boxes.map((box) => box.y + box.height));
+    const greatSize = Math.round(Math.min(right - left, (bottom - top) * 0.8, 120 + souls * 15));
+    const great = spark('fx-wailing', { x: (left + right) / 2, y: top + (bottom - top) * 0.45 }, { '--size': `${greatSize}px` });
+    great.innerHTML = WAILING_FACE;
+    animate(
+      great,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.5)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(0.5)', opacity: 0, offset: 0.35 },
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 0.8, offset: 0.55, easing: 'ease-out' },
+        { transform: 'translate(-50%, -50%) scale(1.12)', opacity: 0.7, offset: 0.8 },
+        { transform: 'translate(-50%, -50%) scale(1.25)', opacity: 0 },
+      ],
+      { duration: 2000 },
+    ).then(() => great.remove());
+    // The faces fly at the foes, each into one in turn.
+    const hit = reached(event, targets);
+    const flights = faces.map((face, k) => {
+      const foe = foes[k % foes.length];
+      const from = orbit(k);
+      const land = figurePoint(foe.card, 0.45);
+      const to = { x: land.x - middle.x, y: land.y - middle.y };
+      const lift = { x: (from.x + to.x) / 2, y: Math.min(from.y, to.y) - 24 };
+      const frames = Array.from({ length: 9 }, (_, step) => {
+        const share = step / 8;
+        const x = (1 - share) * (1 - share) * from.x + 2 * (1 - share) * share * lift.x + share * share * to.x;
+        const y = (1 - share) * (1 - share) * from.y + 2 * (1 - share) * share * lift.y + share * share * to.y;
+        return { transform: `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -50%) scale(${(1 + share * 0.3).toFixed(2)})`, opacity: step === 8 ? 0 : 0.95 };
+      });
+      return animate(face, frames, { duration: 440, delay: 1000 + k * 60, easing: 'ease-in', fill: 'backwards' }).then(() => {
+        face.remove();
+        if (!mark.isConnected || !hit.includes(foe.unit.id)) return;
+        animate(foe.card, [{ filter: 'brightness(2.2) saturate(0.2)' }, { filter: 'brightness(1)' }], { duration: 380, easing: 'ease-out' });
+        particles.burst({ x: land.x, y: land.y, count: 8, colors: SOUL, speed: [60, 160], drag: 2.4, life: [300, 520], size: [1, 2], shape: 'mote' });
+      });
+    });
+    // Life flowing back to the Pan Dusz, as each foe's blow lands (arena.js
+    // plays a sweep's blows 240 ms apart once its look has gone).
+    const lands = 1000 + 440 + Math.min(foes.length - 1, count - 1) * 60;
+    foes.forEach((foe, index) => {
+      if (!hit.includes(foe.unit.id)) return;
+      after(lands + 120 + index * 240, mark, () => particles.trail({ from: figurePoint(foe.card, 0.5), to: figurePoint(entry.card, 0.45), duration: 420, colors: ['#ffffff', ...SOUL], rate: 100, sizes: [1, 2], life: [300, 560], shape: 'mote' }));
+    });
+    after(lands + 520 + foes.length * 240, mark, () => rimGlow(entry.card, color, 700));
+    // (The rest of the souls fly on while the blows land.)
+    await Promise.race([Promise.all(flights), wait(lands)]);
+  }
+
+  // A tongue of the green fire of Nawia.
+  const NAVIA_FLAME = FLAME.replace('#ff7a2e', '#1f8a4c').replace('#ffd27a', '#3dd47a').replace('#fff6d6', '#d9ffe6');
+
+  // The Wieczny legion (the Legion Nawii, grown): the sky darkens green, a
+  // gate of Nawia's green fire opens on the ground under each knight's
+  // place, green fire bursting out of it, the ground cracks open there and
+  // the dead knights climb out together (legionRise()), their eyes burning
+  // green. A knight that
+  // fell rises again where it fell: green fire flares under its grey card,
+  // its bones gather back into it and it stands up whole.
+  async function eternalLegion(event, look) {
+    // (A knight rising again: one card, named by its place.)
+    if (event.order && !event.count) {
+      await knightReturns(event, look);
+      return;
+    }
+    const owner = cards.get(event.actor);
+    const knights = summonsOfEvent(event);
+    if (!owner || knights.length === 0 || reduced() || !particles) {
+      await legionRise(event, look);
+      return;
+    }
+    const width = stageWidth();
+    const height = stageHeight();
+    const sky = spark('fx-sky fx-sky--navia', { x: 0, y: 0 });
+    sky.style.width = `${width}px`;
+    sky.style.height = `${height}px`;
+    animate(sky, [{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 0.85, offset: 0.75 }, { opacity: 0 }], { duration: 2200, easing: 'ease-out' }).then(() => sky.remove());
+    const mark = anchor(2300);
+    for (const knight of knights) {
+      const box = boxOf(knight.card);
+      const x = box.x + box.width / 2;
+      const ground = box.y + box.height - 8;
+      // (About its figure: a computer's wide card gets no gate as wide as itself.)
+      const across = Math.round(Math.min(box.width * 1.15, figureOf(artOf(knight.card)) * 1.9, (Math.min(x, width - x) - 2) * 2));
+      const gate = spark('fx-circle fx-circle--navia', { x, y: ground }, { '--fx': '#3dd47a', '--size': `${across}px` });
+      gate.innerHTML = NECRO_CIRCLE;
+      const flat = 'translate(-50%, -50%) scale(1, 0.32)';
+      animate(
+        gate,
+        [
+          { transform: `${flat} rotate(-60deg) scale(0.2)`, opacity: 0 },
+          { transform: `${flat} rotate(0deg) scale(1)`, opacity: 1, offset: 0.2 },
+          { transform: `${flat} rotate(50deg) scale(1)`, opacity: 1, offset: 0.75 },
+          { transform: `${flat} rotate(70deg) scale(1.1)`, opacity: 0 },
+        ],
+        { duration: 2100 },
+      ).then(() => gate.remove());
+      for (let k = 0; k < 4; k++) after(100 + k * 150, mark, () => particles.burst({ x, y: ground, area: { width: across * 0.8, height: 6 }, count: 8, colors: NAVIA_FIRE, angle: -Math.PI / 2, spread: 0.6, speed: [40, 120], gravity: -40, drag: 1.4, life: [500, 900], size: [1.2, 2.4], shape: 'ember' }));
+    }
+    await legionRise(event, look);
+    if (!mark.isConnected) return;
+    knights.forEach((knight, index) => {
+      const art = artOf(knight.card);
+      for (const side of [-0.12, 0.12]) twinkle({ x: art.x + art.width * (0.5 + side), y: art.y + art.height * 0.28 }, '#9dffb0', 12, index * 90);
+    });
+    await wait(240);
+  }
+
+  // A knight of the Wieczny legion rising again where it fell: green fire
+  // flares under its grey card, bones gather back into it, and it stands
+  // up whole with a ring of green fire.
+  async function knightReturns(event, look) {
+    const entry = summonedCard(event);
+    if (!entry || reduced() || !particles) {
+      await aura(event.actor, look.color, 1);
+      return;
+    }
+    const card = entry.card;
+    const box = boxOf(card);
+    const art = artOf(card);
+    const figure = figureOf(art);
+    const middle = figurePoint(card, 0.55);
+    const ground = box.y + box.height - 8;
+    const mark = anchor(1600);
+    particles.burst({ x: middle.x, y: ground, area: { width: box.width * 0.7, height: 6 }, count: 14, colors: NAVIA_FIRE, angle: -Math.PI / 2, spread: 0.6, speed: [40, 130], gravity: -40, drag: 1.4, life: [500, 900], size: [1.2, 2.4], shape: 'ember' });
+    flames(card, { flameArt: NAVIA_FLAME, holy: false, count: 4, tall: 0.4, duration: 900 });
+    after(120, mark, () => gatherTo(middle, figure * 0.9, ['#efe8d8', '#cfc6a8', '#9dffb0'], { count: 16, life: 360 }));
+    animate(
+      card,
+      [
+        { transform: 'translateY(8px) scale(0.92)', filter: 'grayscale(1) brightness(0.55)' },
+        { transform: 'translateY(6px) scale(0.94)', filter: 'grayscale(1) brightness(0.7)', offset: 0.3 },
+        { transform: 'translateY(-4px) scale(1.04)', filter: 'grayscale(0) brightness(1.7) hue-rotate(40deg)', offset: 0.62, easing: 'ease-out' },
+        { transform: 'translateY(0px) scale(1)', filter: 'grayscale(0) brightness(1)' },
+      ],
+      { duration: 1000, easing: 'ease-in-out' },
+    );
+    after(600, mark, () => {
+      groundRing(entry.unit.id, '#3dd47a', { scale: 1.2, duration: 760 });
+      rimGlow(card, look.color, 800);
+      shake(2.5, 260);
+      for (const side of [-0.12, 0.12]) twinkle({ x: art.x + art.width * (0.5 + side), y: art.y + art.height * 0.28 }, '#9dffb0', 12);
+    });
+    await wait(1100);
+  }
+
+  // A knight of the Wieczny legion strikes (the Legion Nawii's cut, grown):
+  // its blade cuts with the green fire of Nawia twice, green flames lick
+  // up the foe and venom drips from it.
+  function eternalCut(event, color) {
+    legionCut(event, color);
+    const entry = cards.get(event.target);
+    if (!entry || reduced() || !particles) return;
+    const point = figurePoint(entry.card, 0.5);
+    const figure = figureOf(artOf(entry.card));
+    cutAt(point, -40, figure * 0.95, '#9dffb0', { delay: 70, duration: 360, bend: 8, width: 1.1 });
+    flames(entry.card, { flameArt: NAVIA_FLAME, holy: false, count: 3, tall: 0.42, duration: 760 });
+  }
+
+  // A skull of the plague of Nawia, its jaw hanging open, breathing out
+  // the pestilence.
+  const PLAGUE_SKULL =
+    '<svg viewBox="-40 -44 80 88" aria-hidden="true"><path d="M0 -42C24 -42 34 -24 32 -6C31 4 26 10 22 14V24H-22V14C-26 10 -31 4 -32 -6C-34 -24 -24 -42 0 -42Z" fill="#c8d6a0" fill-opacity="0.55" stroke="#e6ffb0" stroke-width="1.8" stroke-linejoin="round"/>' +
+    '<ellipse cx="-12" cy="-6" rx="8" ry="9" fill="#1a2a0c"/><ellipse cx="12" cy="-6" rx="8" ry="9" fill="#1a2a0c"/><circle cx="-12" cy="-6" r="2.6" fill="#c5f08a"/><circle cx="12" cy="-6" r="2.6" fill="#c5f08a"/>' +
+    '<path d="M0 6L-4 14H4Z" fill="#1a2a0c"/><path d="M-18 28H18L14 42H-14Z" fill="#c8d6a0" fill-opacity="0.5" stroke="#e6ffb0" stroke-width="1.6" stroke-linejoin="round"/>' +
+    '<path d="M-10 24V30M-3 24V31M4 24V31M11 24V30" stroke="#1a2a0c" stroke-width="2"/></svg>';
+
+  // The Pomór: a plague wind of Nawia blows over the whole formation of
+  // the foes in sick yellow-green clouds, out of the open jaws of a great
+  // skull looming over them; swarms of flies whirl round every foe; the
+  // foes sicken green and sag, venom dripping off them (they are weaker),
+  // and their life flows away in green wisps to the Cesarz Nawii.
+  async function pestilence(event, color, targets) {
+    const foes = targets.map((id) => cards.get(id)).filter(Boolean);
+    const emperor = cards.get(event.actor);
+    if (!emperor || foes.length === 0 || reduced() || !particles) {
+      await Promise.all(targets.map((id) => ring(id, color, 100, 600)));
+      return;
+    }
+    const lines = boxOf(row(emperor.unit.side === 'ally' ? 'enemy' : 'ally'));
+    const clip = spark('fx-clip', { x: lines.x, y: lines.y });
+    clip.style.width = `${lines.width}px`;
+    clip.style.height = `${lines.height}px`;
+    const wind = h('span', { class: 'fx-plaguewind' });
+    clip.append(wind);
+    animate(
+      wind,
+      [
+        { transform: 'translateX(-70%)', opacity: 0 },
+        { transform: 'translateX(-25%)', opacity: 0.95, offset: 0.35, easing: 'ease-out' },
+        { transform: 'translateX(0%)', opacity: 0.85, offset: 0.75 },
+        { transform: 'translateX(15%)', opacity: 0 },
+      ],
+      { duration: 2000 },
+    ).then(() => clip.remove());
+    const skullSize = Math.round(Math.min(lines.width * 0.42, lines.height * 0.75, 130));
+    const skull = spark('fx-plagueskull', { x: lines.x + lines.width / 2, y: lines.y + lines.height * 0.42 }, { '--size': `${skullSize}px` });
+    skull.innerHTML = PLAGUE_SKULL;
+    animate(
+      skull,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.6)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 0.8, offset: 0.3, easing: 'ease-out' },
+        { transform: 'translate(-50%, -48%) scale(1.06)', opacity: 0.75, offset: 0.7 },
+        { transform: 'translate(-50%, -45%) scale(1.12)', opacity: 0 },
+      ],
+      { duration: 1900 },
+    ).then(() => skull.remove());
+    const mark = anchor(2300);
+    after(500, mark, () => {
+      flash('#c5f08a', 0.12, 380);
+      shake(2.5, 300);
+      particles.burst({ x: lines.x + lines.width / 2, y: lines.y + lines.height * 0.42 + skullSize * 0.38, area: { width: skullSize * 0.4, height: 6 }, count: 16, colors: ['#c8d6a0', '#9ccc65', '#6f9a3a'], angle: Math.PI / 2, spread: 1.3, speed: [40, 120], gravity: 20, drag: 1.2, life: [700, 1100], size: [3, 6], shape: 'dust' });
+    });
+    const hit = reached(event, targets);
+    foes.forEach((foe, index) => {
+      const point = figurePoint(foe.card, 0.5);
+      const figure = figureOf(artOf(foe.card));
+      // The flies.
+      for (let k = 0; k < 3; k++) after(380 + index * 90 + k * 180, mark, () => particles.burst({ x: point.x, y: point.y, area: { width: figure * 0.8, height: figure * 0.6 }, count: 7, colors: ['#1a2a0c', '#2e3f14', '#3a4a1a'], speed: [30, 80], drag: 1, life: [500, 800], size: [0.9, 1.5], shape: 'mote' }));
+      if (!hit.includes(foe.unit.id)) return;
+      after(520 + index * 90, mark, () => {
+        tintCard(foe.card, '#9ccc65', [{ opacity: 0 }, { opacity: 0.55, offset: 0.3 }, { opacity: 0.4, offset: 0.7 }, { opacity: 0 }], 1300);
+        animate(foe.card, [{ transform: 'translateY(0px) scale(1)' }, { transform: 'translateY(3px) scale(0.96)', offset: 0.35 }, { transform: 'translateY(0px) scale(1)' }], { duration: 700, easing: 'ease-in-out', composite: 'add' });
+        particles.burst({ x: point.x, y: point.y + figure * 0.2, count: 8, colors: VENOM, angle: Math.PI / 2, spread: 0.5, speed: [20, 60], gravity: 300, drag: 1, life: [500, 800], size: [1.2, 2], shape: 'drop' });
+      });
+      // (Its life flows to the Cesarz as its blow lands: arena.js plays a
+      // sweep's blows 240 ms apart once its look has gone.)
+      after(1350 + index * 240, mark, () => particles.trail({ from: point, to: figurePoint(emperor.card, 0.45), duration: 460, colors: NAVIA_FIRE, rate: 110, sizes: [1, 2.2], life: [300, 600], shape: 'mote' }));
+    });
+    after(1750 + foes.length * 240, mark, () => {
+      rimGlow(emperor.card, color, 700);
+      tintCard(emperor.card, '#3dd47a', [{ opacity: 0 }, { opacity: 0.3, offset: 0.3 }, { opacity: 0 }], 600);
+    });
+    await wait(1250);
+  }
+
+  // The Tysiąc cieni (the Cios z cienia, grown): the Król Ciemności bursts
+  // into black smoke where it stands and its shadows dash out across the
+  // field, three to every foe, dark copies of it showing round each; each
+  // foe is cut over and over by crimson and violet blades out of them;
+  // then the shadows run back together into one, and it stays in the
+  // shadow (no one can hit it) until its next move.
+  async function thousandShadows(event, color, targets) {
+    const entry = cards.get(event.actor);
+    const foes = targets.map((id) => cards.get(id)).filter(Boolean);
+    if (!entry || foes.length === 0 || reduced() || !particles) {
+      if (entry) entry.card.classList.add('unit--vanished');
+      await arc(color);
+      return;
+    }
+    const width = stageWidth();
+    const art = artOf(entry.card);
+    const figure = figureOf(art);
+    const from = figurePoint(entry.card, 0.5);
+    // It bursts into smoke, its figure going dark.
+    const smoke = spark('fx-smoke', from, { '--size': `${Math.round(Math.min(figure * 1.5, (Math.min(from.x, width - from.x) - 2) * 2))}px` });
+    animate(
+      smoke,
+      [
+        { transform: 'translate(-50%, -50%) scale(0.4)', opacity: 0 },
+        { transform: 'translate(-50%, -50%) scale(1.1)', opacity: 0.95, offset: 0.35 },
+        { transform: 'translate(-50%, -50%) scale(1.4)', opacity: 0 },
+      ],
+      { duration: 800, easing: 'ease-out' },
+    ).then(() => smoke.remove());
+    const picture = pictureIn(entry.card);
+    if (picture) animate(picture, [{ opacity: 1, filter: 'none' }, { opacity: 0.12, filter: 'brightness(0.2)', offset: 0.2 }, { opacity: 0.12, filter: 'brightness(0.2)', offset: 0.85 }, { opacity: 0.28, filter: VANISHED }], { duration: 1600, easing: 'ease-in-out' });
+    particles.burst({ x: from.x, y: from.y, area: { width: figure * 0.8, height: figure * 0.6 }, count: 18, colors: SHADE, speed: [40, 120], gravity: -30, drag: 1.4, life: [600, 1000], size: [3, 6], shape: 'dust' });
+    // The shadows dash out to every foe, three to each, a dark copy of the
+    // Król showing where each lands.
+    const source = entry.card.querySelector('.unit-art');
+    const sart = source ? boxOf(source) : null;
+    const mark = anchor(2400);
+    const hit = reached(event, targets);
+    foes.forEach((foe, index) => {
+      const point = figurePoint(foe.card, 0.5);
+      const reach = figureOf(artOf(foe.card));
+      for (let k = 0; k < 3; k++) {
+        const delay = 200 + index * 70 + k * 60;
+        const end = { x: point.x + (k - 1) * reach * 0.38, y: point.y + (k % 2 ? -1 : 1) * reach * 0.1 };
+        dashStreak(from, end, '#3a2c58', delay, 200);
+        if (source) after(delay + 120, mark, () => shadowCopy(source, sart, { x: end.x - sart.x - sart.width / 2, y: end.y - sart.y - sart.height / 2 }, end.x < from.x ? -1 : 1, false));
+      }
+      if (!hit.includes(foe.unit.id)) return;
+      // The cuts out of the shadows round it.
+      [-50, 30, -15, 60, -70].forEach((angle, k) => cutAt(point, angle, reach * (1.05 + (k % 2) * 0.15), k % 2 ? '#a690e8' : color, { delay: 420 + index * 70 + k * 70, duration: 360, bend: k % 2 ? -6 : 6, width: 1.2 }));
+      after(420 + index * 70, mark, () => {
+        animate(foe.card, [{ filter: 'brightness(0.4)' }, { filter: 'brightness(1.8) sepia(0.4) saturate(2) hue-rotate(-30deg)', offset: 0.5 }, { filter: 'brightness(1)' }], { duration: 640, easing: 'ease-out' });
+        particles.burst({ x: point.x, y: point.y, count: 14, colors: ['#ffffff', '#ffd0d8', color, ...SHADE_SPARKS], speed: [120, 260], drag: 3, life: [240, 440], size: [1.1, 2.2], shape: 'spark' });
+      });
+    });
+    after(460, mark, () => {
+      flash('#2a1f40', 0.24, 520);
+      shake(4.5, 420);
+    });
+    // The shadows run back together into one, and it stays in the shadow.
+    after(1150, mark, () => {
+      for (const foe of foes) dashStreak(figurePoint(foe.card, 0.5), from, '#3a2c58', 0, 200);
+      gatherTo(from, figure * 0.9, SHADE_SPARKS, { count: 14, life: 300 });
+    });
+    after(1380, mark, () => entry.card.classList.add('unit--vanished'));
+    await wait(1500);
+  }
+
+  // The Noc bez gwiazd: night falls over the arena with all its stars, and
+  // then the stars go out one by one until the dark is whole; the cards of
+  // the party sink out of sight into it, and the foes look about them,
+  // blind. The party's cards stay veiled in the dark while the night lasts.
+  async function starlessNight(event, color) {
+    const entry = cards.get(event.actor);
+    if (!entry) return;
+    const party = standing(entry.unit.side);
+    if (reduced() || !particles) {
+      for (const member of party) member.card.classList.add('unit--starless');
+      await aura(event.actor, color, 1);
+      return;
+    }
+    const width = stageWidth();
+    const height = stageHeight();
+    const night = spark('fx-sky fx-sky--starless', { x: 0, y: 0 });
+    night.style.width = `${width}px`;
+    night.style.height = `${height}px`;
+    animate(night, [{ opacity: 0 }, { opacity: 0.7, offset: 0.2 }, { opacity: 1, offset: 0.6 }, { opacity: 0.95, offset: 0.85 }, { opacity: 0 }], { duration: 2500 }).then(() => night.remove());
+    const random = seeded(59);
+    const stars = Array.from({ length: 14 }, (_, k) => {
+      const at = { x: width * (0.04 + random() * 0.92), y: height * (0.03 + random() * 0.55) };
+      const star = spark('fx-star', at, { '--size': `${Math.round(5 + random() * 5)}px` });
+      // (They come out together, and go out one after another.)
+      const shown = 150 + k * 25;
+      const out = 1000 + k * 60;
+      const life = out + 220 - shown;
+      animate(
+        star,
+        [
+          { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
+          { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 200 / life },
+          { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: (out - shown) / life },
+          { transform: 'translate(-50%, -50%) scale(1.6)', opacity: 0.5, offset: (out + 90 - shown) / life },
+          { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
+        ],
+        { duration: life, delay: shown, fill: 'backwards' },
+      ).then(() => star.remove());
+      return { at, out };
+    });
+    const mark = anchor(2700);
+    for (const { at, out } of stars) after(out + 90, mark, () => particles.burst({ x: at.x, y: at.y, count: 3, colors: SHADE_SPARKS, speed: [10, 30], drag: 2, life: [300, 500], size: [1, 1.6], shape: 'mote' }));
+    // The party sinks out of sight.
+    party.forEach((member, index) => {
+      after(1700 + index * 80, mark, () => {
+        member.card.classList.add('unit--starless');
+        rimGlow(member.card, color, 700);
+        const art = artOf(member.card);
+        particles.burst({ x: art.x + art.width / 2, y: art.y + art.height * 0.7, area: { width: figureOf(art) * 0.9, height: art.height * 0.4 }, count: 12, colors: SHADE, angle: -Math.PI / 2, spread: 0.6, speed: [15, 45], gravity: -30, drag: 1.4, life: [700, 1100], size: [3, 6], shape: 'dust' });
+      });
+    });
+    // The foes look about them, blind.
+    after(1900, mark, () => {
+      for (const foe of foesOf(entry)) animate(foe.card, [{ transform: 'translateX(0px)' }, { transform: 'translateX(-4px)', offset: 0.25 }, { transform: 'translateX(4px)', offset: 0.6 }, { transform: 'translateX(0px)' }], { duration: 760, easing: 'ease-in-out', composite: 'add' });
+    });
+    await wait(2300);
+  }
+
   async function cast(event) {
     const look = lookOf(event);
     const targets = event.targets ?? [];
     // (The Odwrócenie losu's name was called over its heal: its foes'
-    // stopped moves come with no second call.)
-    if (!(look.fate && targets.length > 0)) {
+    // stopped moves come with no second call; so do the Przeznaczenie's.)
+    if (!((look.fate || look.destiny) && targets.length > 0)) {
       playSkill(artChain(event.skill), look.cast === 'sweep' ? 'swing' : look.cast === 'rain' ? 'shot' : 'magic');
       callout(event.actor, event.skillName, look.color);
     }
@@ -14543,6 +15656,13 @@ export function skillEffects(kit) {
       await wait(120);
       return;
     }
+    // The fifth forms: the Przeznaczenie's chains of fate over the foes,
+    // after its heal.
+    if (look.destiny && targets.length > 0) {
+      await destinyFreeze(event, look.color, targets);
+      await wait(120);
+      return;
+    }
     switch (look.cast) {
       case 'sweep':
         // 962: the evolved Wojownik's sweeps.
@@ -14560,6 +15680,8 @@ export function skillEffects(kit) {
         else if (look.lavaflood) await devastation(event, look.color, targets);
         else if (look.godstorm) await godsHurricane(event, look.color, targets);
         else if (look.worldwrath) await earthWrath(event, look.color, targets);
+        else if (look.lament) await soulLament(event, look.color, targets);
+        else if (look.shadows) await thousandShadows(event, look.color, targets);
         // 964: the evolved Cień's whirls.
         else if (look.shadowwhirl) await shadowWhirl(event, look.color, targets);
         else if (look.bladerain) await bladeStorm(event, look.color, targets);
@@ -14603,6 +15725,7 @@ export function skillEffects(kit) {
         else if (look.aurochs5 && event.kind === 'summon') await aurochsCall(event, look);
         else if (look.grove && event.kind === 'summon') await Promise.all([summonCreature(event, look), eternalGrove(event, look.color)]);
         else if (look.herd && event.kind === 'summon') await eternalHerd(event, look);
+        else if (look.host && event.kind === 'summon') await heavenlyHost(event, look);
         else if (look.chief && event.kind === 'summon') await chiefCall(event, look);
         else if (look.grizzly && event.kind === 'summon') await summonCreature(event, look).then(() => bearRears(event, look.color));
         else if (look.prism && event.kind === 'summon') await Promise.all([summonCreature(event, look), prismForm(event)]);
@@ -14611,6 +15734,8 @@ export function skillEffects(kit) {
         // The fifth forms' stances: the Ostatni szał, the Triumf.
         else if (look.bloodrage) await lastFrenzy(event.actor, look.color);
         else if (look.triumph) await triumph(event.actor, look.color);
+        // The fifth forms: the Księga losu's pages round the party.
+        else if (look.fatebook) await bookOfFate(event.actor, look.color);
         // The fourth forms: the Jasnowidzenie's eye over the party.
         else if (look.seer) await clairvoyance(event.actor, look.color);
         else if (look.harmony) await harmony(event.actor, look.color);
@@ -14634,9 +15759,13 @@ export function skillEffects(kit) {
         // 964: the evolved Cień's venoms and its dead: a summon's coming, the
         // slime's spit (its burst once it fell), the black venom, the curse.
         // (The fourth forms: the Legion Nawii's two knights, the Mgła Nawii.)
-        if (look.knights && event.kind === 'summon') await legionRise(event, look);
+        // (The fifth forms: the Wieczny legion's knights and their coming
+        // back, the Pomór.)
+        if (look.undying && event.kind === 'summon') await eternalLegion(event, look);
+        else if (look.knights && event.kind === 'summon') await legionRise(event, look);
         else if (look.arrival && event.kind === 'summon') await summonCreature(event, look);
         else if (look.mist && targets.length > 0) await naviaMist(event, look.color, targets);
+        else if (look.plague && targets.length > 0) await pestilence(event, look.color, targets);
         else if (look.spit && targets.length > 0) await (cards.get(event.actor)?.card.classList.contains('unit--down') ? slimeBurst(event, look.color, targets) : spit(event, look.color));
         else if (look.blackvenom) await blackVenom(event.actor, look.color);
         else if (look.curse && targets.length > 0) await curse(event, look.color, targets);
@@ -14665,6 +15794,8 @@ export function skillEffects(kit) {
         else if (look.darksun) await darkSun(event, look.color);
         // The fourth forms: the Wieczna noc.
         else if (look.nightfall) await eternalNight(event, look.color);
+        // The fifth forms: the Noc bez gwiazd.
+        else if (look.starless) await starlessNight(event, look.color);
         else await (look.afterimages ? dance(event.actor, look.color) : ghosts(event.actor, look.color));
         break;
       default:
@@ -14697,6 +15828,8 @@ export function skillEffects(kit) {
     // and its warmth over the next moves.
     grove: [null, groveTick],
     breathoflife: [lifeBreathHeal, lifeBreathTick],
+    // The Przeznaczenie's: the fallen one first, then the rest of the party.
+    destiny: [destinyHeal, destinyHeal],
   };
 
   // A heal: green sparks and the HP that came back. A guard instead flashes
@@ -14705,7 +15838,7 @@ export function skillEffects(kit) {
   async function heal(event) {
     const look = lookOf(event);
     // (963: a party heal's name is called over its first heal only.)
-    const again = event.place > 0 && (look.sprout || look.uplift || look.radiance || look.divine || look.fate || look.breathoflife);
+    const again = event.place > 0 && (look.sprout || look.uplift || look.radiance || look.divine || look.fate || look.breathoflife || look.destiny);
     if (!event.quiet && !again) {
       playSkill(artChain(event.skill), 'effect');
       callout(event.actor, event.skillName, look.color);
@@ -14744,8 +15877,8 @@ export function skillEffects(kit) {
     const look = lookOf(event);
     playSkill(artChain(event.skill));
     // (A Dzień gniewu going on to the next foe is the same verdict: no new
-    // call.)
-    if (!(look.wrath && wrathGoesOn(event))) callout(event.actor, event.skillName, look.color);
+    // call; so is an Ognisty miecz.)
+    if (!(look.wrath && wrathGoesOn(event)) && !(look.fierysword && swordGoesOn(event))) callout(event.actor, event.skillName, look.color);
     // 961: the Strzał w serce's beating heart, the Mistrzowski strzał's
     // line through the formation, the Strzał z ukrycia's hiding.
     if (look.heart) heartMark(event.target, look.color);
@@ -14780,6 +15913,10 @@ export function skillEffects(kit) {
     // noc's pool of shadow, the Cios z cienia's smoke.
     if (look.wrath) wrathSky(event);
     if (look.reaper && !event.sweep) scytheRaise(event, look.color);
+    // The fifth forms: the Ognisty miecz's sword falling, the Ostatnie
+    // żniwo's great scythe raised.
+    if (look.fierysword) swordFalls(event);
+    if (look.harvest && !event.sweep) harvestRaise(event, look.color);
     if (look.nightfall && event.counter) nightPool(event);
     if (look.ambush) shadowMelt(event);
   }
@@ -14804,6 +15941,11 @@ export function skillEffects(kit) {
     if (look.greatfrost) return greatFrostHit(event, look.color);
     if (look.grove) return groveLash(event, look.color);
     if (look.herd) return herdBlow(event, look.color);
+    if (look.fierysword) return swordStrike(event, look.color);
+    if (look.host) return holyCut(event, look.color);
+    if (look.fatebook && event.counter) return pageCounter(event, look.color);
+    if (look.harvest) return event.sweep ? harvestCleave(event, look.color) : harvestReap(event, look.color);
+    if (look.undying) return eternalCut(event, look.color);
     if (look.orb === 'globe') return globeStrike(event, look.color);
     if (look.chief) return chiefBite(event);
     if (look.grizzly) return bearMaul(event, look.color);
