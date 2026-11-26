@@ -4352,11 +4352,40 @@ summary {
   background: rgba(13, 17, 11, 0.85);
 }
 
+/* A card's name, always on one line (the author, 1270, 26.11.2026: „Nazwa
+   stwora musi być zawsze w jednej linii a nie zawijać się”): at the cards'
+   13 px while it fits its card, else as much smaller as it needs, down to
+   7.5 px as the HP line, and under that with its letters a little closer
+   (up to 0.06 em). Only a name wider still (twenty wide signs on a 320 px
+   phone) ends in "…", and is whole in the name's title, the card's label,
+   the participants' table and the fight's log. --name-em and --name-chars
+   (arena.js sizeName): how wide the name is in em in this font and how
+   many signs it has. Its line is 15 px high at any size, so the cards
+   stay level; its box reaches 2 px above and below the line, so the clip
+   spares accents and tails. */
 .unit-name {
-  font-size: 13px;
+  container-type: inline-size;
+  height: 19px;
+  margin-block: -2px;
+  padding-block: 2px;
+  overflow: hidden;
+  font-size: 7.5px;
   font-weight: 700;
-  line-height: 1.15;
-  overflow-wrap: anywhere;
+  line-height: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unit-name-line {
+  vertical-align: top;
+  font-size: 13px;
+}
+
+@supports (width: 1cqi) {
+  .unit-name-line {
+    font-size: clamp(7.5px, 99cqi / var(--name-em, 1), 13px);
+    letter-spacing: clamp(-0.06em, (99cqi - 7.5px * var(--name-em, 1)) / var(--name-chars, 1), 0px);
+  }
 }
 
 .unit-level,

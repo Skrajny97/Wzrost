@@ -404,6 +404,20 @@ function audit(frame) {
     const out = rects.some((rect) => rect.left < box.left - 1 || rect.right > box.right + 1);
     if (out || lines > 2) found.push({ kind: 'spill', where: label(line.closest('.unit') ?? line), text: `HP „${line.textContent}” ${out ? 'wychodzi poza kartę' : `łamie się na ${lines} linijki`}` });
   }
+  // A fight card's name (arena.js; the author, 1270, 26.11.2026: „Nazwa
+  // stwora musi być zawsze w jednej linii a nie zawijać się”): on one line,
+  // as small as it needs; one too wide even so is cut with "…" (listed for
+  // a look, as the other cuts).
+  for (const line of top.querySelectorAll('.unit-name-line')) {
+    if (!shown(line)) continue;
+    const range = document.createRange();
+    range.selectNodeContents(line);
+    const lines = new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size;
+    const where = label(line.closest('.unit') ?? line);
+    if (lines > 1) found.push({ kind: 'spill', where, text: `imię „${line.textContent}” łamie się na ${lines} linijki` });
+    const box = line.parentElement;
+    if (box.scrollWidth > box.clientWidth + 1) found.push({ kind: 'cut', where, text: line.textContent.slice(0, 40) });
+  }
   // One line for each element: an element past the edge drags its children.
   const seen = new Set();
   return found.filter((one) => {

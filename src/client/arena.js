@@ -19,6 +19,7 @@ import { motionOn } from './motion.js';
 import { lookOf, skillEffects } from './skill-fx.js';
 import { playHit, playMoment, playSound, playVoice, preloadVoices } from './sound.js';
 import { state } from './state.js';
+import { summonField } from './summon-place.js';
 import { sweepMoment } from './sweep-landing.js';
 
 // The fields' labels and the results are shown through t(), as the page
@@ -92,6 +93,27 @@ function emWidth(text) {
   return ruler ? ruler.measureText(text).width / 100 : text.length * 0.63;
 }
 
+// How wide a card's name is in em in its font (styles.css, .unit-name:
+// --font-world at 700), for its size on one line (.unit-name-line); without
+// a canvas, at 0.75 em a sign, wider than most. `fresh`: measured anew, as
+// the page's fonts have come since (a name measured before them got a
+// fallback font's width).
+let nameRuler;
+function nameEm(text, fresh = false) {
+  if (nameRuler === undefined || fresh) {
+    nameRuler = document.createElement('canvas').getContext('2d');
+    if (nameRuler) nameRuler.font = `700 100px ${getComputedStyle(document.documentElement).getPropertyValue('--font-world').trim() || 'serif'}`;
+  }
+  return nameRuler ? nameRuler.measureText(text).width / 100 : [...text].length * 0.75;
+}
+
+// A card's name on one line, at the size that fits it (styles.css,
+// .unit-name-line): how wide it is in em and how many signs it has.
+function sizeName(line, text, fresh = false) {
+  line.style.setProperty('--name-em', nameEm(text, fresh).toFixed(3));
+  line.style.setProperty('--name-chars', String(Math.max(1, [...text].length)));
+}
+
 // How wide in em the HP line of a card of `maxHp` can get in a fight, for
 // its size (styles.css, .unit-hp-line): `one` on one line, `two` the wider
 // of its two lines when the maximum goes to the second. The HP is at most
@@ -146,6 +168,12 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     const shieldFill = h('div', { class: 'unit-shield-fill' });
     const shieldBar = h('div', { class: 'unit-shield', hidden: true }, shieldFill);
     const level = h('span', { class: 'unit-level', text: t('poz. {level}', { level: unit.level }) });
+    // The name on one line, as small as it needs (the author, 1270: „Nazwa
+    // stwora musi być zawsze w jednej linii a nie zawijać się”); a name cut
+    // with "…" at the last is whole in its title, the card's label, the
+    // participants' table and the fight's log.
+    const nameLine = h('span', { class: 'unit-name-line', text: unit.name });
+    sizeName(nameLine, unit.name);
     // The character's head and shoulders (older reports have no look: male),
     // the monster's sprite or a summon's figure, with the level in its
     // corner; without one, the vector bust or the old line icon beside the
@@ -176,14 +204,14 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
             h('span', { class: 'unit-icon' }, icon(person ? CLASS_ICONS[unit.classId] ?? 'person' : unit.family, { size: 24 })),
             level,
           ),
-      h('span', { class: 'unit-name', text: unit.name }),
+      h('span', { class: 'unit-name', title: unit.name }, nameLine),
       h('div', { class: 'unit-hp' }, hpFill),
       manaFill && h('div', { class: 'unit-mana' }, manaFill),
       shieldBar,
       hpText,
       status,
     );
-    cards.set(unit.id, { card, hpFill, hpText, hpLine, status, shieldBar, shieldFill, manaFill, unit });
+    cards.set(unit.id, { card, hpFill, hpText, hpLine, nameLine, status, shieldBar, shieldFill, manaFill, unit });
     return card;
   }
 
@@ -217,6 +245,17 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   if (boardPicture) {
     arena.classList.add('arena--board');
     arena.style.setProperty('--arena-board', `url("${boardPicture}")`);
+  }
+  // The cards' names measured again once the page's fonts have come: a
+  // fight shown before them measured its names in a fallback font.
+  if (document.fonts && document.fonts.status !== 'loaded') {
+    document.fonts.ready.then(() => {
+      let fresh = true;
+      for (const entry of cards.values()) {
+        sizeName(entry.nameLine, entry.unit.name, fresh);
+        fresh = false;
+      }
+    });
   }
 
   // Animations through the Web Animations API, so they can all be cancelled.
@@ -447,12 +486,16 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   function summonPlace(owner, card) {
     const at = FIELDS.findIndex(([position]) => position === owner.position);
     const ahead = FIELDS.slice(0, Math.max(0, at)).reverse().map(([position]) => fields.get(`${owner.side} ${position}`));
-    // With every field ahead taken, the one with the fewest cards, the
-    // nearest of equals: the Pradruid's four stand two by two, not three in
-    // one column (21.11.2026).
-    const free = ahead.find((field) => !field.querySelector('.unit'));
-    const fewest = ahead.reduce((best, field) => (best === null || field.querySelectorAll('.unit').length < best.querySelectorAll('.unit').length ? field : best), null);
-    if (free || fewest) (free ?? fewest).append(card);
+    // The first free field ahead; with every field ahead taken, the one with
+    // the fewest cards, the nearest of equals (the Pradruid's four stand two
+    // by two, 21.11.2026), or the summoner's own where it has fewer than
+    // all of them (1270: the Ojciec Puszczy's five two, two and two),
+    // summon-place.js.
+    const own = at >= 0 ? (fields.get(`${owner.side} ${owner.position}`) ?? null) : null;
+    const count = (field) => field.querySelectorAll('.unit').length;
+    const index = summonField(ahead.map(count), own && count(own));
+    if (index >= 0 && index < ahead.length) ahead[index].append(card);
+    // In its summoner's own field (and with no field at all): before it.
     else cards.get(owner.id)?.card.before(card);
   }
   function summonUp(event, quiet) {
