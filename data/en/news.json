@@ -1452,6 +1452,10 @@
     "0.5.29": {
       "title": "Version 0.5.29",
       "body": "- Cultivation: the System Avatar or the Second System Avatar can now meditate instead of your character. Pick it under \"Who meditates\", and your character stays free meanwhile, e.g. for an exploration. From the Avatar's meditation your character gets all the Cultivation XP and a quarter of the Character XP. Only one meditates at a time, and a meditating Avatar does no profession work."
+    },
+    "0.5.30": {
+      "title": "Version 0.5.30",
+      "body": "- Fight board: summons can also stand in their summoner's own field, so a board with many summons is lower and fits on the screen. Names of creatures and characters on the cards always stay on one line: long names get a smaller font instead of wrapping."
     }
   }
 }
