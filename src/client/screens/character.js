@@ -1183,7 +1183,7 @@ export function mountCharacter(container, { switchCharacter } = {}) {
     const sell = h('button', { type: 'button', class: 'button button--system' });
     const drink =
       entry.drink &&
-      entry.known !== false &&
+      entry.usable !== false &&
       h('button', {
         type: 'button',
         class: 'button button--system',
@@ -1248,10 +1248,11 @@ export function mountCharacter(container, { switchCharacter } = {}) {
       ),
       [
         // A healing potion or a potion for a time is drunk, or the oil put
-        // on the blade, one at a time (potions.js); one from a Wymiana waits
-        // for its recipe.
-        entry.known === false && h('p', { class: 'region-warning', text: t('Tej mikstury nie użyjesz, póki nie poznasz jej receptury w Alchemii.') }),
-        exploring && entry.known !== false && h('p', { class: 'muted', text: t('Leczyć się można po powrocie z wyprawy.') }),
+        // on the blade, one at a time (potions.js); one above the
+        // character's level whose recipe it does not know waits for either
+        // (1272).
+        entry.usable === false && h('p', { class: 'region-warning', text: t('Tej mikstury użyjesz od {level}. poziomu postaci albo z Alchemią na {level}. poziomie.', { level: entry.level }) }),
+        exploring && entry.usable !== false && h('p', { class: 'muted', text: t('Leczyć się można po powrocie z wyprawy.') }),
         drink,
         h('div', { class: 'herb-count' }, less, value, more, all),
         h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: t('Wyrzuć') }), sell),

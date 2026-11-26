@@ -6,7 +6,9 @@
 // game, and the Pracownia shows a shadow that says where it comes from;
 // taught, it still waits for its level of Alchemia, as any recipe. Her shelf
 // holds its herbs from that standing, a trade or an order that reaches it
-// names the recipes, and the Encyklopedia tells where they come from.
+// names the recipes, and the Encyklopedia tells where they come from. A
+// potion of such a recipe works, as any, with its recipe known, or from its
+// level of the character, taught or not (1272).
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -219,21 +221,28 @@ describe("Jagna's rare recipes through the API", () => {
     assert.equal((await brew(owlBrew)).status, 201);
   });
 
-  test('a potion of a recipe not taught yet is neither drunk nor taken along, as one got in a Wymiana', async () => {
-    await set(`level = 70, class_level = 70, professions = '{"alchemy":{"level":100,"xp":0}}', potions = '{"bearskin-brew":2,"burn-brew":2}'`);
+  // 1272 (26.11.2026): until then such a potion waited only for Jagna to
+  // teach its recipe, as one got in a Wymiana waited for its recipe.
+  test('a potion of a rare recipe works once Jagna has taught it with Alchemia at its level, or from its level of the character, taught or not', async () => {
+    // At the 30th level of the character, Alchemia at the 100th knows no
+    // rare recipe before Jagna teaches it.
+    await set(`level = 30, class_level = 30, professions = '{"alchemy":{"level":100,"xp":0}}', potions = '{"bearskin-brew":2,"burn-brew":2}'`);
     const drink = (potionId) => call('POST', '/api/potions/drink', { cookie, body: { potionId } });
     const hunt = (potions) => call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30, potions } });
-    assert.deepEqual((await character()).potions.map((potion) => [potion.id, potion.known]), [['bearskin-brew', false], ['burn-brew', false]]);
-    assert.equal((await drink('bearskin-brew')).data.error.code, 'unknown_recipe');
-    assert.equal((await hunt({ 'burn-brew': 1 })).data.error.code, 'unknown_recipe');
+    const usable = async () => (await character()).potions.map((potion) => [potion.id, potion.usable]);
+    assert.deepEqual(await usable(), [['bearskin-brew', false], ['burn-brew', false]]);
+    const refused = await drink('bearskin-brew');
+    assert.deepEqual([refused.data.error.code, refused.data.error.message], ['potion_level', 'Tej mikstury użyjesz od 44. poziomu postaci albo z Alchemią na 44. poziomie.']);
 
-    // The relation alone teaches the first three, the Bractwo the last ones
-    // (whose standing also makes a potion for a time last longer, 589 C).
+    // The relation alone teaches the first three, so the recipe is known.
     await osada(points('trusted'));
+    assert.deepEqual(await usable(), [['bearskin-brew', true], ['burn-brew', false]]);
     assert.equal((await drink('bearskin-brew')).data.text, 'Postać wypija Wywar niedźwiedziej skóry. Pancerz większy o 30% przez 2 walki.');
-    assert.equal((await hunt({ 'burn-brew': 1 })).data.error.code, 'unknown_recipe');
+    const early = await hunt({ 'burn-brew': 1 });
+    assert.deepEqual([early.data.error.code, early.data.error.message], ['potion_level', 'Wywar od oparzeń zabierzesz na wyprawę od 60. poziomu postaci albo z Alchemią na 60. poziomie.']);
 
-    await osada(points('trusted'), points('friend'));
+    // At its level of the character it goes along untaught, with no Alchemia.
+    await set(`level = 60, professions = '{}'`);
     assert.equal((await hunt({ 'burn-brew': 1 })).status, 201);
   });
 

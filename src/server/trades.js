@@ -28,7 +28,7 @@ import { withoutFavorites } from './favorites.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { OWN_CHARACTERS } from './roles.js';
-import { herbsOf, mineralsOf, pantryOf, potionKnown, potionsOf } from './professions-view.js';
+import { herbsOf, mineralsOf, pantryOf, potionUsableBy, potionsOf } from './professions-view.js';
 import { scrollAdds, scrollById, scrollsEnough, scrollsOf } from './scroll-goods.js';
 
 const LIVE = ['proposed', 'open', 'locked'];
@@ -132,8 +132,9 @@ function requireLive(trade) {
 
 // The trade as one of its two characters sees it: the other one (and
 // whether that player is online), both offers with the items described and
-// the potions whose recipes this character knows, who confirmed first, and
-// when it lapses.
+// each potion's level and whether this character may use it, from that
+// level or with its recipe known (`usable`, potionUsableBy, 1272), who
+// confirmed first, and when it lapses.
 async function tradeView(db, trade, character, now) {
   const side = sideOf(trade, character.id);
   const mine = offerOf(trade[offerColumn(side)]);
@@ -142,7 +143,7 @@ async function tradeView(db, trade, character, now) {
   const [others, items, viewers] = await db.batch([
     db.prepare('SELECT c.id, c.name, c.role, u.seen_at FROM characters c JOIN users u ON u.id = c.user_id WHERE c.id = ?').bind(side === 'from' ? trade.to_id : trade.from_id),
     db.prepare(`SELECT id, data FROM items WHERE id IN (${ids.map(() => '?').join() || 'NULL'})`).bind(...ids),
-    db.prepare('SELECT level, professions FROM characters WHERE id = ?').bind(character.id),
+    db.prepare('SELECT level, professions, settlement FROM characters WHERE id = ?').bind(character.id),
   ]);
   const other = others.results[0];
   const viewer = viewers.results[0];
@@ -153,7 +154,7 @@ async function tradeView(db, trade, character, now) {
     herbs: Object.entries(offer.herbs).map(([id, count]) => ({ id, name: content().herbsById[id]?.name ?? id, count })),
     potions: Object.entries(offer.potions).map(([id, count]) => {
       const potion = content().potionsById[id];
-      return { id, name: potion?.name ?? id, count, known: Boolean(potion && viewer && potionKnown(viewer, potion)) };
+      return { id, name: potion?.name ?? id, count, level: potion?.level ?? null, usable: Boolean(potion && viewer && potionUsableBy(viewer, potion)) };
     }),
     materials: Object.entries(offer.materials)
       .filter(([key]) => knownStack(key, content()))

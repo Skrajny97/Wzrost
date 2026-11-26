@@ -34,7 +34,7 @@
 import { itemSprite, monsterSprite } from './art.js';
 import { h } from './dom.js';
 import { t } from './i18n.js';
-import { birdFrames, boltArt, BONE_HAND, curve, FANGS, FLICKER, HARPOON, HOLY_SPEAR, ICE_LANCE, ICE_STAR, ORB_ARCS, SENTENCE_SWORD } from './skill-fx.js';
+import { birdFrames, boltArt, BONE_HAND, curve, FANGS, FLICKER, HARPOON, HOLY_SPEAR, ICE_LANCE, ICE_STAR, ORB_ARCS, SENTENCE_SWORD, SUN } from './skill-fx.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 // At most so many specks at once in an arena, so a phone keeps up.
@@ -1552,6 +1552,8 @@ export function createFx(kit) {
       if (style.orb === 'thunder-orb') return zap(from, b, style.color, onImpact, settle, id);
       // The Gromowładny's great ball over the battlefield strikes.
       if (style.orb === 'globe') return globeZap(b, style.color, onImpact, settle, id);
+      // The fifth forms: the Narodziny słońca's sun shines its ray.
+      if (style.orb === 'sun') return sunRay(b, style.color, onImpact, settle, id);
       if (THROUGH.has(style.orb) && style.blow?.event?.pierced) return onward(actor, a, b, style, onImpact, settle, id);
       // 962: the Miażdżący cios's force goes on through its target into
       // the one behind.
@@ -2144,6 +2146,64 @@ export function createFx(kit) {
     const bolt = mark('fx-zap', { x: made.x, y: made.y }, { '--fx': color });
     bolt.innerHTML = made.html;
     animate(bolt, FLICKER, { duration: 480 }).then(() => bolt.remove());
+    onImpact();
+    await settle();
+    await later(300);
+  }
+
+  // The Narodziny słońca's sun over the battlefield flares and shines a ray
+  // of sunlight down on its foe (skill-fx.js sunAt() kindles it in the same
+  // place).
+  async function sunRay(b, color, onImpact, settle, id) {
+    const width = stage.clientWidth;
+    const size = Math.round(Math.min(64, width * 0.16));
+    const point = { x: width / 2, y: Math.round(Math.max(size * 1.15, stage.clientHeight * 0.11)) };
+    // (The sun the Narodziny słońca has just kindled, if it still burns,
+    // shines this ray itself: skill-fx.js sunbirth() holds it.)
+    const held = fx.querySelector('.fx-newsun[data-held]');
+    const sun = held ?? mark('fx-newsun', point, { '--size': `${Math.round(size * 2.1)}px` });
+    if (held) delete held.dataset.held;
+    else sun.innerHTML = SUN;
+    playSound('magic');
+    const at = (scale, turn) => `translate(-50%, -50%) scale(${scale}) rotate(${turn}deg)`;
+    animate(
+      sun,
+      held
+        ? [
+            { transform: getComputedStyle(held).transform, opacity: 1 },
+            { transform: at(1.15, 130), opacity: 1, offset: 0.4 },
+            { transform: at(1, 145), opacity: 1, offset: 0.7 },
+            { transform: at(0.7, 160), opacity: 0 },
+          ]
+        : [
+            { transform: at(0.4, 0), opacity: 0 },
+            { transform: at(1, 20), opacity: 1, offset: 0.25 },
+            { transform: at(1.15, 30), opacity: 1, offset: 0.4 },
+            { transform: at(1, 45), opacity: 1, offset: 0.7 },
+            { transform: at(0.7, 60), opacity: 0 },
+          ],
+      { duration: 900, easing: 'ease-out', fill: 'forwards' },
+    ).then(() => sun.remove());
+    specks.burst({ x: point.x, y: point.y, count: 12, colors: ['#ffffff', '#fff6cf', '#ffd27a'], speed: [50, 140], life: [240, 420], size: [1, 2], shape: 'mote', drag: 3 });
+    await later(320);
+    if (id !== run()) return;
+    const dx = b.x - point.x;
+    const dy = b.y - point.y;
+    const ray = mark('fx-sunray', point, { '--fx': color });
+    ray.style.width = `${Math.round(Math.hypot(dx, dy))}px`;
+    const along = `translate(0, -50%) rotate(${Math.atan2(dy, dx).toFixed(4)}rad)`;
+    animate(
+      ray,
+      [
+        { transform: `${along} scaleX(0)`, opacity: 1 },
+        { transform: `${along} scaleX(1)`, opacity: 1, offset: 0.25 },
+        { transform: `${along} scaleX(1) scaleY(1.4)`, opacity: 0.9, offset: 0.55 },
+        { transform: `${along} scaleX(1) scaleY(0.2)`, opacity: 0 },
+      ],
+      { duration: 560, easing: 'ease-out' },
+    ).then(() => ray.remove());
+    await later(120);
+    if (id !== run()) return;
     onImpact();
     await settle();
     await later(300);

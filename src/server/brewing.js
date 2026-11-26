@@ -42,7 +42,7 @@ import { takenBefore, trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { addTo, alreadyClaimed, insertWork, requireProfessions, takeFromBag, workClaim, workClaimFailed, workGains } from './professions.js';
 import { workFamePoints } from './fame.js';
-import { herbsOf, potionKnown, potionsOf, settlementPointsOf } from './professions-view.js';
+import { herbsOf, potionKnown, potionUsableBy, potionsOf, settlementPointsOf } from './professions-view.js';
 import { perkOf } from './perks.js';
 import { trimReports } from './reports.js';
 import { tripOf } from './trips.js';
@@ -286,7 +286,8 @@ export async function sellPotions(context) {
 // chosen, each adding its fights, with no top to them (the author: "Niech nie
 // bedzie maksymalnego limitu na trwanie bonusów typu z mikstur"). A healing potion
 // is drunk one at a time. A mana potion, an antidote and the fern brew work
-// only by themselves in fights.
+// only by themselves in fights. Any of them from its level of the character
+// on, or with its recipe known (potionUsableBy, 1272).
 export async function drinkPotion(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
@@ -297,8 +298,11 @@ export async function drinkPotion(context) {
   if (!potion.effect.heal && !kind) {
     throw new ApiError(409, 'fight_only', potion.effect.mana ? 'Ta mikstura działa sama w walce, gdy zabraknie many na umiejętność.' : 'Ta mikstura działa sama na wyprawie.');
   }
-  // One got in a Wymiana waits for its recipe (DECISIONS.md, "Wymiana").
-  if (!potionKnown(player.row, potion)) throw new ApiError(409, 'unknown_recipe', `Nie znasz jeszcze receptury: ${potion.name}.`);
+  // One above the character's level whose recipe it does not know waits
+  // for either (1272).
+  if (!potionUsableBy(player.row, potion)) {
+    throw new ApiError(409, 'potion_level', `Tej mikstury użyjesz od ${potion.level}. poziomu postaci albo z Alchemią na ${potion.level}. poziomie.`);
+  }
   const texts = content().potionUse.texts;
   const now = context.now;
   let also;
