@@ -32,7 +32,7 @@ import { toHex } from './encoding.js';
 import { trialProgress } from './guild-trials.js';
 import { ApiError, json } from './http.js';
 import { companionsGoing } from './hunts.js';
-import { knownPotionsOf, potionsOf } from './professions-view.js';
+import { potionsOf, usablePotionsOf } from './professions-view.js';
 import { requireOpen } from './settlement.js';
 
 const path = (key) => `$."${key}"`;
@@ -112,10 +112,11 @@ export async function enterTrialHall(context) {
   const companions = companionsGoing(player, now);
   const trophies = trophiesFor(player, now, areaDangers(area, content()).map((danger) => danger.monsterId));
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  // Only the potions whose recipes the character knows are drunk, as on an
-  // exploration (potionKnown; the code review: one got in a Wymiana before
-  // its recipe was drunk here).
-  const hunt = trialHallFights({ character, equipped, name: row.name, area, seed, potions: knownPotionsOf(row), companions, trophies }, content());
+  // Only the potions the character may use are drunk, from their level of
+  // the character or with their recipes known, as on an exploration
+  // (potionUsableBy, 1272; the code review had found one got in a Wymiana
+  // drunk here before its recipe).
+  const hunt = trialHallFights({ character, equipped, name: row.name, area, seed, potions: usablePotionsOf(row), companions, trophies }, content());
   const applied = applyHunt(character, hunt, content());
   const won = hunt.hall.won;
 

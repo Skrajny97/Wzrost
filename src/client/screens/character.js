@@ -102,6 +102,16 @@ function pathNames() {
   return names.length > 0 ? names.join(', ') : null;
 }
 
+// The stats the character's form counts as others (988, `countsAs` of its
+// stats), each with the name of the one it counts as: { intellect: 'Siła' }
+// for a Wielki Inkwizytor, none for most.
+const countedStats = () => Object.fromEntries((state.character?.stats ?? []).filter((stat) => stat.countsAs).map((stat) => [stat.id, stat.countsAs.name]));
+
+// The words after a line of an item's card whose stat the character's form
+// counts as another (`propertiesAs`, from the server for the character's own
+// items): „Intelekt: +70 (+81), u Ciebie jako Siła”.
+const countedNote = (name) => name && h('span', { class: 'item-counted', text: `, ${t('u Ciebie jako {stat}', { stat: name })}` });
+
 // The mark of a bag item: a green triangle up, a red one down, both for a
 // trade-off (drawn in CSS, so that no font lacks them), with the word in a
 // list and alone in the corner of a tile. None for an item that changes
@@ -1183,7 +1193,7 @@ export function mountCharacter(container, { switchCharacter } = {}) {
     const sell = h('button', { type: 'button', class: 'button button--system' });
     const drink =
       entry.drink &&
-      entry.known !== false &&
+      entry.usable !== false &&
       h('button', {
         type: 'button',
         class: 'button button--system',
@@ -1248,10 +1258,11 @@ export function mountCharacter(container, { switchCharacter } = {}) {
       ),
       [
         // A healing potion or a potion for a time is drunk, or the oil put
-        // on the blade, one at a time (potions.js); one from a Wymiana waits
-        // for its recipe.
-        entry.known === false && h('p', { class: 'region-warning', text: t('Tej mikstury nie użyjesz, póki nie poznasz jej receptury w Alchemii.') }),
-        exploring && entry.known !== false && h('p', { class: 'muted', text: t('Leczyć się można po powrocie z wyprawy.') }),
+        // on the blade, one at a time (potions.js); one above the
+        // character's level whose recipe it does not know waits for either
+        // (1272).
+        entry.usable === false && h('p', { class: 'region-warning', text: t('Tej mikstury użyjesz od {level}. poziomu postaci albo z Alchemią na {level}. poziomie.', { level: entry.level }) }),
+        exploring && entry.usable !== false && h('p', { class: 'muted', text: t('Leczyć się można po powrocie z wyprawy.') }),
         drink,
         h('div', { class: 'herb-count' }, less, value, more, all),
         h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: t('Wyrzuć') }), sell),
@@ -1599,8 +1610,10 @@ function itemCard(item, { equipped, anvil = false, preview: withPreview = true, 
 // a weapon, the armor and each stat, and by how much the item has more or
 // less of it (for damage, of its average). Also for an item of the
 // Targowisko (market.js) and, with its own words, for what a companion
-// wears (companions.js). `title`: a text, or nodes (bareTitle).
-export function compareTable(item, worn, { title = t('Porównanie z założonym'), wornLabel = t('Założony') } = {}) {
+// wears (companions.js). `title`: a text, or nodes (bareTitle). `counted`:
+// the stats counted as others, named under their rows (countedStats, the
+// character's; none for a companion's gear).
+export function compareTable(item, worn, { title = t('Porównanie z założonym'), wornLabel = t('Założony'), counted = countedStats() } = {}) {
   const ids = [...new Set([...item.lines, ...worn.lines].map((line) => line.id))];
   const lineOf = (of, id) => of.lines.find((line) => line.id === id);
   return h(
@@ -1632,7 +1645,7 @@ export function compareTable(item, worn, { title = t('Porównanie z założonym'
           return h(
             'tr',
             {},
-            h('th', { scope: 'row', text: (mine ?? theirs).label }),
+            h('th', { scope: 'row' }, (mine ?? theirs).label, counted[id] && [' ', h('span', { class: 'compare-as', text: t('u Ciebie jako {stat}', { stat: counted[id] }) })]),
             h('td', { class: 'num', text: mine?.text ?? '—' }),
             h('td', { class: 'num', text: theirs?.text ?? '—' }),
             h('td', {
@@ -2350,10 +2363,13 @@ export function classLines(item) {
 // „Obrażenia: 58–90 (64–99) (fizyczne)” (gemProperties in items.js). Short
 // lists and the comparisons keep the numbers with the gem alone
 // (`properties`), and so does a card kept from before, without the pairs.
+// A line of a stat the character's form counts as another ends with that
+// one's name (countedNote; `propertiesAs`, one for one with the lines).
 export function propertyLines(item) {
-  if (!item.gem || !item.gemProperties) return item.properties.map((line) => h('li', { text: line }));
-  return item.gemProperties.map(({ text, gem, rest }) =>
-    h('li', {}, text, gem && [' ', h('span', { class: 'item-gem-value', vars: { '--rarity': item.gem.color }, text: `(${gem})` })], rest),
+  const as = item.propertiesAs ?? [];
+  if (!item.gem || !item.gemProperties) return item.properties.map((line, index) => h('li', {}, line, countedNote(as[index])));
+  return item.gemProperties.map(({ text, gem, rest }, index) =>
+    h('li', {}, text, gem && [' ', h('span', { class: 'item-gem-value', vars: { '--rarity': item.gem.color }, text: `(${gem})` })], rest, countedNote(as[index])),
   );
 }
 

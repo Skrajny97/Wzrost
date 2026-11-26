@@ -1436,6 +1436,14 @@
     "0.5.25": {
       "title": "Version 0.5.25",
       "body": "- Labyrinth: level 1 no longer has strong chambers, so almost everyone clears it again. Strong chambers stay on levels 2 and 3 and on the Hellish level, and before you enter one the game asks whether you are sure."
+    },
+    "0.5.26": {
+      "title": "Version 0.5.26",
+      "body": "- Potions: besides the recipe in Alchemy, your character's level is now enough. You can drink a potion and take it on explorations from its character level (e.g. a Greater Healing Potion from level 45) or, as before, with Alchemy at its level. So potions from the Marketplace and Trades are useful too. Brewing is unchanged.\n- Fight: Ice Storm shows its whole animation again: stars of ice fall on the foes and shatter, leaving frost behind. Before, the animation broke off at the start."
+    },
+    "0.5.27": {
+      "title": "Version 0.5.27",
+      "body": "- When your evolution counts one stat as another (e.g. the Grand Inquisitor's Intellect as Strength, or the Necromancer's Dexterity as Intellect), the game now says so. On the item card such a line reads \"counts as Strength\".\n- In Stats the Intellect row shows how many of its points count as Strength and where they come from, and the Strength row how much of it is Intellect. The numbers in fights have not changed: these points already worked before, it just wasn't shown."
     }
   }
 }

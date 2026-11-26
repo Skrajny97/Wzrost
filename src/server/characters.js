@@ -104,6 +104,7 @@ import {
   spentPoints,
   spiritLeast,
   pointSources,
+  propertiesAs,
   statShares,
   unlockedFeatures,
   upgradeCost,
@@ -1718,13 +1719,31 @@ function withWinterQuests(quests, row, now) {
   return winter ? { ...quests, winter } : quests;
 }
 
+// A stat's row on the stats screen where the character's form counts a
+// stat as another (`as`, 988; `moved` of computeStats): on the stat counted
+// so, `countsAs`, the stat it counts as, with its points there by where they
+// come from; on that other stat, `counted`, the stats counted as it, with
+// their points. Nothing on the others. A gracz at level 86, 26.11.2026: the
+// Wielki Inkwizytor's Intelekt showed 0 from everywhere and „nie zmienia
+// dziś Twoich wartości bojowych”, its helmet's Intelekt hidden in Siła.
+function countedStat(id, moved) {
+  const parts = (one) => ({ class: one.class, character: one.character, professions: one.professions, equipment: one.equipment });
+  const sum = (one) => one.class + one.character + one.professions + one.equipment;
+  const out = moved[id];
+  const into = Object.entries(moved).filter(([, one]) => one.to === id);
+  return {
+    ...(out && { countsAs: { id: out.to, name: content().statsById[out.to].name, total: sum(out), sources: parts(out) } }),
+    ...(into.length > 0 && { counted: into.map(([from, one]) => ({ id: from, name: content().statsById[from].name, total: sum(one) })) }),
+  };
+}
+
 export function characterView(player, now) {
   const { row, items, activity } = player;
   const character = engineCharacter(row);
   const spent = spentPoints(character);
   const equipped = equippedItems(player);
   const professions = professionsView(row);
-  const { totals, sources } = computeStats(character, equipped, content());
+  const { totals, sources, moved } = computeStats(character, equipped, content());
   const { hp, maxHp, combatant, rest } = currentHp(player, now);
   const values = combatValues(character, equipped, content());
   const shares = statShares(character, equipped, content());
@@ -1764,10 +1783,19 @@ export function characterView(player, now) {
   // The items the player marked with a star (favorites.js), which are not
   // taken apart nor sold to the scrapper.
   const favorites = favoriteIds(row);
+  // On an item its form wears, the lines of a stat the form counts as
+  // another (988), with the name of that one (propertiesAs in the engine),
+  // for its card: „Intelekt: +70, u Ciebie jako Siła”.
+  const key = gearKey(row.class_id, row.evolution, content());
+  const countedLines = (item) => {
+    const lines = propertiesAs(item, key, content());
+    return lines && canUse(item.base, key, content()) ? { propertiesAs: lines } : {};
+  };
   // An item as the page shows it; one of the bag or worn also with its star.
   const itemOf = (item) => ({
     id: item.id,
     ...itemView(item, content(), { sellBonus, upgradeCap, materials, anvilDiscount, anvilWeek }),
+    ...countedLines(item),
     salvage: salvage(item),
   });
   const toItem = (item) => ({ ...itemOf(item), ...(favorites.has(item.id) && { favorite: true }) });
@@ -1922,6 +1950,7 @@ export function characterView(player, now) {
       total: totals[stat.id],
       sources: sources[stat.id],
       gives: shares[stat.id],
+      ...countedStat(stat.id, moved),
     })),
     combat: {
       damage: `${values.damageMin}–${values.damageMax}`,

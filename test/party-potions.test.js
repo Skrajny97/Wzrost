@@ -9,7 +9,8 @@
 // A member without a choice takes nothing, as before; the leader takes its
 // own in "Opcje wyprawy". Each player pays only for what it drank (the
 // engine's hunt.js, by combat.js's `drinkers`), also when two carry the
-// same potion.
+// same potion. A member takes only the potions it may use: from their level
+// of the character or with their recipes known (1272).
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -153,6 +154,36 @@ describe("a Drużyna's members take their own potions along", () => {
     // The leader went without potions, as it chose none.
     assert.deepEqual(kept.party.roster[0].potions, {});
     assert.deepEqual(await bag('Lider'), { 'lesser-healing': 4 });
+  });
+
+  // 1272 (26.11.2026): from the potion's level of the character, or, as
+  // before, with its recipe known.
+  test('a member takes along only the potions it may use: from their level of the character or with their recipes', async () => {
+    await (await sql(`UPDATE characters SET professions = '{}', potions = '{"lesser-healing":3,"greater-healing":2}' WHERE name = 'Druh'`)).run();
+    assert.equal((await as('druh', 'PUT', '/api/party/potions', { potions: { 'lesser-healing': 2, 'greater-healing': 2 } })).status, 200);
+    // Five minutes: two fights, at the 30th level with no Alchemia, without
+    // the Duża (45).
+    const went = await as('lider', 'POST', '/api/party/hunt', { areaId: 'boar-thicket', minutes: 5 });
+    assert.equal(went.status, 201, JSON.stringify(went.data).slice(0, 300));
+    assert.deepEqual((await options('Druh')).potions, { 'lesser-healing': 2 });
+    assert.deepEqual(await bag('Druh'), { 'lesser-healing': 1, 'greater-healing': 2 });
+    await claimAll(5, ['Lider', 'Druh', 'Trzeci']);
+    const takes = async () => {
+      const going = await as('lider', 'POST', '/api/party/hunt', { areaId: 'boar-thicket', minutes: 5 });
+      assert.equal(going.status, 201, JSON.stringify(going.data).slice(0, 300));
+      const taken = (await options('Druh')).potions['greater-healing'];
+      await claimAll(5, ['Lider', 'Druh', 'Trzeci']);
+      return taken;
+    };
+
+    // With Alchemia at the 45th, at the 30th level, it takes the Duża.
+    const full = `potions = '{"lesser-healing":3,"greater-healing":2}'`;
+    await (await sql(`UPDATE characters SET ${full}, professions = '{"alchemy":{"level":45,"xp":0}}' WHERE name = 'Druh'`)).run();
+    assert.equal(await takes(), 2);
+    // So it does at the 45th level with no Alchemia.
+    await (await sql(`UPDATE characters SET level = 45`)).run();
+    await (await sql(`UPDATE characters SET ${full}, professions = '{}' WHERE name = 'Druh'`)).run();
+    assert.equal(await takes(), 2);
   });
 
   test("the leader's own choice in the Drużyna waits until it is a member; the new leader takes those of its Opcje wyprawy", async () => {

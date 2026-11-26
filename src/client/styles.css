@@ -2642,6 +2642,14 @@ a.segmented-option {
   white-space: normal;
 }
 
+/* Under a row's name, the stat the character's form counts it as (988):
+   „u Ciebie jako Siła” (character.js compareTable). */
+.compare-as {
+  display: block;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
 /* A number breaks only where the table has no room for it, after the dash
    of a range: a weapon's damage in six digits ("187654–234566") beside a
    companion's own made the Kwatery's "Załóż z plecaka" stick out of a
@@ -3926,6 +3934,12 @@ summary {
   color: var(--rarity, var(--text));
   font-weight: 600;
   white-space: nowrap;
+}
+
+/* After a line of a stat the character's form counts as another (988,
+   character.js propertyLines): „, u Ciebie jako Siła”. */
+.item-counted {
+  color: var(--text-muted);
 }
 
 .threat-note {
