@@ -1795,6 +1795,11 @@
       "id": "0.5.24",
       "title": "Wersja 0.5.24",
       "body": "- Drużyna: gdy przerywasz wyprawę drużyny, okienko mówi wprost, że wraca tylko Twoja postać, a reszta drużyny idzie dalej, i podaje, o której wróci.\n- Drużyna: skończona usługa najemna nie trzyma już członka w domu. Gdy lider wyrusza, ten członek od razu dostaje swoją zapłatę i idzie z drużyną."
+    },
+    {
+      "id": "0.5.25",
+      "title": "Wersja 0.5.25",
+      "body": "- Labirynt: na 1. poziomie nie ma już silnych komnat, więc znów przechodzi go prawie każdy. Silne komnaty zostają na 2. i 3. poziomie oraz na Piekielnym, a przed wejściem do silnej komnaty gra pyta, czy na pewno chcesz wejść."
     }
   ]
 }
