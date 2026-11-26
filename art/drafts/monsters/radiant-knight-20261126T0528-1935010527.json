@@ -1,0 +1,14 @@
+{
+  "id": "radiant-knight",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Swietlisty Rycerz, a radiant knight of heaven come down out of holy light: a tall knight in gleaming white and silver plate armour with pale gold trim, white light pouring from the joints of the armour, a closed silver helmet with a glowing white visor slit and no face visible, a thin ring of golden light above the helmet, a short white cloak, a long sword of white and pale ice-blue holy flame raised in one gauntlet, a white kite shield with a golden sun on the other arm, noble and powerful, standing on both feet, full body, three-quarter view facing right, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, the knight alone, no ground, no rocks, no clouds, no background, the whole figure and the whole sword inside the picture",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024011283881293404
+  },
+  "images": 1
+}
