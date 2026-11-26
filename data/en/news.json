@@ -1464,6 +1464,10 @@
     "0.5.32": {
       "title": "Version 0.5.32",
       "body": "- Party: a party exploration now gives less XP, because a party can skip time together. In a trio you get 30% less XP from it than before, and in a duo 14% less. Solo explorations, explorations with companions and the Party Tower are unchanged.\n- Exploration options are now separate for each character: the Hard and Hellish exploration, the boxes, the length, the meal and the potions. Nothing carries over when you switch characters, also in \"Set out again\", so you won't set out by accident on a Hellish exploration chosen on another character. Your current settings go to the character you first open Combat with."
+    },
+    "0.5.33": {
+      "title": "Version 0.5.33",
+      "body": "- The fifth evolution: from class level 400 each fourth form can grow into its fifth.\n- Every fifth form has two new skills and a new look, walk and riding.\n- New summons, among them the Sword of Heaven's Shining knights, the God of the Hunt's aurochs and the elk in the Father of the Wilds' herd."
     }
   }
 }

@@ -1,7 +1,7 @@
 // The fifth evolution ("Piąta ewolucja klas", 1235): at class level 400 each
 // of the 15 fourth forms grows into one further form, where the deployment
 // has the fifth forms on (FIFTH_EVOLUTION, with FOURTH_EVOLUTION and
-// THIRD_EVOLUTION; off in the live game until their art is done). The class
+// THIRD_EVOLUTION; on in the live game once all their art was in). The class
 // waits there until the form is taken, the form's skills take every Skill
 // Point back and grow to level 245, the names have a woman's form, the
 // Pustelnik changes it with the other paths' fifth forms, every new skill and

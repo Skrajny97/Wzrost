@@ -120,6 +120,13 @@ export const SPRITES = {
       'primordial-female', 'primordial-male', 'frost-god-female', 'frost-god-male', 'elder-druid-female', 'elder-druid-male',
       'archangel-female', 'archangel-male', 'heaven-avenger-female', 'heaven-avenger-male', 'seer-female', 'seer-male',
       'soul-reaper-female', 'soul-reaper-male', 'navia-king-female', 'navia-king-male', 'dark-prince-female', 'dark-prince-male',
+      // The fifth forms at class level 400, as the author accepted them
+      // (1251–1258), shown only where FIFTH_EVOLUTION is on.
+      'unstoppable-female', 'unstoppable-male', 'gods-champion-female', 'gods-champion-male', 'world-shield-female', 'world-shield-male',
+      'star-lord-female', 'star-lord-male', 'perun-son-female', 'perun-son-male', 'hunt-god-female', 'hunt-god-male',
+      'demiurge-female', 'demiurge-male', 'winter-incarnate-female', 'winter-incarnate-male', 'wilds-father-female', 'wilds-father-male',
+      'seraph-female', 'seraph-male', 'heaven-sword-female', 'heaven-sword-male', 'all-seeing-female', 'all-seeing-male',
+      'soul-lord-female', 'soul-lord-male', 'navia-emperor-female', 'navia-emperor-male', 'dark-king-female', 'dark-king-male',
       // The outfits of the Sklep Systemu (skórki, 763 A), <look>-<appearance>.
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
@@ -157,6 +164,14 @@ export const SPRITES = {
       'frost-god-male': 50, 'elder-druid-female': 50, 'elder-druid-male': 50, 'archangel-female': 46, 'archangel-male': 47,
       'heaven-avenger-female': 49, 'heaven-avenger-male': 50, 'seer-female': 50, 'seer-male': 52, 'soul-reaper-female': 46,
       'soul-reaper-male': 52, 'navia-king-female': 51, 'navia-king-male': 51, 'dark-prince-female': 49, 'dark-prince-male': 49,
+      // The fifth forms, measured as the fourth; the Pan and Pani Dusz, whose
+      // faces are under a mask, on the mask.
+      'unstoppable-female': 51, 'unstoppable-male': 52, 'gods-champion-female': 49, 'gods-champion-male': 52, 'world-shield-female': 51,
+      'world-shield-male': 51, 'star-lord-female': 50, 'star-lord-male': 48, 'perun-son-female': 48, 'perun-son-male': 50,
+      'hunt-god-female': 51, 'hunt-god-male': 51, 'demiurge-female': 48, 'demiurge-male': 49, 'winter-incarnate-female': 50,
+      'winter-incarnate-male': 51, 'wilds-father-female': 50, 'wilds-father-male': 51, 'seraph-female': 49, 'seraph-male': 49,
+      'heaven-sword-female': 50, 'heaven-sword-male': 52, 'all-seeing-female': 48, 'all-seeing-male': 49, 'soul-lord-female': 48,
+      'soul-lord-male': 48, 'navia-emperor-female': 50, 'navia-emperor-male': 51, 'dark-king-female': 50, 'dark-king-male': 49,
     },
     perches: {
       'warrior-female': [32, 38], 'warrior-male': [34, 40], 'archer-female': [34, 41], 'archer-male': [35, 36], 'mage-female': [34, 41],
@@ -194,6 +209,16 @@ export const SPRITES = {
       'frost-god-male': [35, 26], 'elder-druid-female': [35, 26], 'elder-druid-male': [35, 26], 'archangel-female': [31, 26], 'archangel-male': [32, 26],
       'heaven-avenger-female': [34, 26], 'heaven-avenger-male': [35, 26], 'seer-female': [35, 43], 'seer-male': [37, 28], 'soul-reaper-female': [37, 37],
       'soul-reaper-male': [37, 26], 'navia-king-female': [36, 26], 'navia-king-male': [36, 29], 'dark-prince-female': [34, 26], 'dark-prince-male': [34, 26],
+      // The fifth forms, as the fourth; the Demiurg (woman) on her hair at
+      // the shoulder, below the world of fire on her ring.
+      'unstoppable-female': [36, 26], 'unstoppable-male': [37, 26], 'gods-champion-female': [34, 26], 'gods-champion-male': [37, 26],
+      'world-shield-female': [36, 26], 'world-shield-male': [36, 26], 'star-lord-female': [35, 26], 'star-lord-male': [33, 26],
+      'perun-son-female': [33, 26], 'perun-son-male': [35, 26], 'hunt-god-female': [36, 26], 'hunt-god-male': [36, 26],
+      'demiurge-female': [31, 42], 'demiurge-male': [34, 26], 'winter-incarnate-female': [35, 32], 'winter-incarnate-male': [36, 30],
+      'wilds-father-female': [35, 26], 'wilds-father-male': [36, 26], 'seraph-female': [34, 28], 'seraph-male': [34, 26],
+      'heaven-sword-female': [35, 30], 'heaven-sword-male': [37, 26], 'all-seeing-female': [33, 26], 'all-seeing-male': [34, 26],
+      'soul-lord-female': [33, 26], 'soul-lord-male': [33, 26], 'navia-emperor-female': [35, 26], 'navia-emperor-male': [36, 26],
+      'dark-king-female': [35, 26], 'dark-king-male': [34, 33],
     },
     // `petSpots`: a pet's own place on a portrait where its usual one would
     // cover what the figure holds at the shoulder (a falcon, a staff's head,
@@ -210,6 +235,10 @@ export const SPRITES = {
         // perches: it sits on the other one, on the white wolf's pelt.
         'wild-lord-female': [56, 14],
         'skin-dawn-female': [51, 14], 'skin-dawn-male': [50, 12], 'skin-eclipse-female': [49, 10], 'skin-eclipse-male': [49, 8],
+        // The Serafin's and the Serafina's staff holds its sun at the
+        // shoulder where the raven perches: it sits on the other shoulder,
+        // by the halo.
+        'seraph-female': [53, 15], 'seraph-male': [53, 13],
       },
       wisp: {
         'arcanist-female': [-3, 52], 'arcanist-male': [-3, 52], 'archmage-female': [-1, 11], 'archmage-male': [-1, 11],
@@ -242,6 +271,12 @@ export const SPRITES = {
       'primordial-female', 'primordial-male', 'frost-god-female', 'frost-god-male', 'elder-druid-female', 'elder-druid-male',
       'archangel-female', 'archangel-male', 'heaven-avenger-female', 'heaven-avenger-male', 'seer-female', 'seer-male',
       'soul-reaper-female', 'soul-reaper-male', 'navia-king-female', 'navia-king-male', 'dark-prince-female', 'dark-prince-male',
+      // The fifth forms at class level 400, shown only where FIFTH_EVOLUTION is on.
+      'unstoppable-female', 'unstoppable-male', 'gods-champion-female', 'gods-champion-male', 'world-shield-female', 'world-shield-male',
+      'star-lord-female', 'star-lord-male', 'perun-son-female', 'perun-son-male', 'hunt-god-female', 'hunt-god-male',
+      'demiurge-female', 'demiurge-male', 'winter-incarnate-female', 'winter-incarnate-male', 'wilds-father-female', 'wilds-father-male',
+      'seraph-female', 'seraph-male', 'heaven-sword-female', 'heaven-sword-male', 'all-seeing-female', 'all-seeing-male',
+      'soul-lord-female', 'soul-lord-male', 'navia-emperor-female', 'navia-emperor-male', 'dark-king-female', 'dark-king-male',
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
       'skin-dawn-female', 'skin-dawn-male', 'skin-eclipse-female', 'skin-eclipse-male',
@@ -404,6 +439,13 @@ export const SPRITES = {
       'primordial-male', 'frost-god-female', 'frost-god-male', 'elder-druid-female', 'elder-druid-male', 'archangel-female', 'archangel-male',
       'heaven-avenger-female', 'heaven-avenger-male', 'seer-female', 'seer-male', 'soul-reaper-female', 'soul-reaper-male',
       'navia-king-female', 'navia-king-male', 'dark-prince-female', 'dark-prince-male',
+      // The fifth forms at class level 400, as the author accepted them (1257,
+      // 1259, 1261, 1263), shown only where FIFTH_EVOLUTION is on.
+      'unstoppable-female', 'unstoppable-male', 'gods-champion-female', 'gods-champion-male', 'world-shield-female', 'world-shield-male',
+      'star-lord-female', 'star-lord-male', 'perun-son-female', 'perun-son-male', 'hunt-god-female', 'hunt-god-male',
+      'demiurge-female', 'demiurge-male', 'winter-incarnate-female', 'winter-incarnate-male', 'wilds-father-female', 'wilds-father-male',
+      'seraph-female', 'seraph-male', 'heaven-sword-female', 'heaven-sword-male', 'all-seeing-female', 'all-seeing-male',
+      'soul-lord-female', 'soul-lord-male', 'navia-emperor-female', 'navia-emperor-male', 'dark-king-female', 'dark-king-male',
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
       'skin-dawn-female', 'skin-dawn-male', 'skin-eclipse-female', 'skin-eclipse-male',
@@ -797,6 +839,13 @@ export const SPRITES = {
       'primordial-female', 'primordial-male', 'frost-god-female', 'frost-god-male', 'elder-druid-female', 'elder-druid-male',
       'archangel-female', 'archangel-male', 'heaven-avenger-female', 'heaven-avenger-male', 'seer-female', 'seer-male',
       'soul-reaper-female', 'soul-reaper-male', 'navia-king-female', 'navia-king-male', 'dark-prince-female', 'dark-prince-male',
+      // The fifth forms at class level 400, as the author accepted them (1255,
+      // 1260, 1262; all in the large box), shown only where FIFTH_EVOLUTION is on.
+      'unstoppable-female', 'unstoppable-male', 'gods-champion-female', 'gods-champion-male', 'world-shield-female', 'world-shield-male',
+      'star-lord-female', 'star-lord-male', 'perun-son-female', 'perun-son-male', 'hunt-god-female', 'hunt-god-male',
+      'demiurge-female', 'demiurge-male', 'winter-incarnate-female', 'winter-incarnate-male', 'wilds-father-female', 'wilds-father-male',
+      'seraph-female', 'seraph-male', 'heaven-sword-female', 'heaven-sword-male', 'all-seeing-female', 'all-seeing-male',
+      'soul-lord-female', 'soul-lord-male', 'navia-emperor-female', 'navia-emperor-male', 'dark-king-female', 'dark-king-male',
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
       'skin-dawn-female', 'skin-dawn-male', 'skin-eclipse-female', 'skin-eclipse-male',
