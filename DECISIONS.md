@@ -3384,7 +3384,7 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
-## Wersja 0.5.32 (26.11.2026): mniej XP z wypraw drużyny (1274 A)
+## Wersja 0.5.32 (26.11.2026): mniej XP z wypraw drużyny (1274 A), ustawienia wyprawy osobno dla każdej postaci
 
 ## Drużyna a gra w pojedynkę (1274 A, 26.11.2026)
 

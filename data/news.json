@@ -1830,6 +1830,11 @@
       "id": "0.5.31",
       "title": "Wersja 0.5.31",
       "body": "- Arena i wojny gildii bez mnożników: żadna forma nie ma już osobnej siły ani HP tylko w pojedynkach. Postać bije tam tak samo jak na wyprawach.\n- W pojedynkach przywołańce mają tyle HP co na wyprawach. Po 80 ruchach sędzia daje wygraną temu, kto zadał rywalowi większą część jego HP, także tę, którą rywal potem wyleczył, więc samo leczenie nie wygrywa już na przeczekanie.\n- W każdej walce, także na wyprawach, silniejsi są: Wielki Inkwizytor, Pogromca Demonów i Mściciel Niebios (wyrok trafia jedynego wroga przy każdym jego HP, a Stos i Słup światła mocniej biją jednego wroga), Tytan (uderzenie tarczą przechodzi przez cały pancerz i mocniej bije jednego wroga), Archanioł (Boskie uzdrowienie co 6 ruchów zamiast raz na walkę), Żniwiarz Dusz (kosa co 2 ruchy) oraz Widmo (mocniejsza Burza ostrzy).\n- Słabsi są: Władca Piorunów (słabsza Kula piorunów i Grom z nieba w jednego wroga), Gromowładny (słabsza Kula piorunów, rzadsze ogłuszenia i mniejsze spowolnienie), Mistrz Łowów (Harpun co 5 ruchów), Bastion (Nieugięty odbija mniej), Nieśmiertelny (słabsze krwawienie po huraganie) oraz Pradruid (Mądrość daje przywołańcom już tylko HP, a korzenie Dębów wieków spowalniają o połowę słabiej).\n- W Wieżach Systemu korzenie Dębów wieków spowalniają o 15% mocniej niż poza nimi, więc Pradruid wchodzi w Wieży Solo mniej więcej tak wysoko jak najlepsze inne formy."
+    },
+    {
+      "id": "0.5.32",
+      "title": "Wersja 0.5.32",
+      "body": "- Drużyna: wyprawa drużyny daje teraz mniej XP, bo drużyna może wspólnie przewijać czas. W trio dostajesz z niej o 30% mniej XP niż dotąd, a w duecie o 14% mniej. Wyprawy w pojedynkę i z towarzyszami oraz Wieża Drużyn bez zmian.\n- „Opcje wyprawy” są teraz osobne dla każdej postaci: Trudna i Piekielna wyprawa, pola, czas wyprawy, posiłek i mikstury. Po przejściu na inną postać nic się nie przenosi, także w „Wyrusz ponownie”, więc nie wyruszysz przez przypadek na Piekielną wyprawę ustawioną na innej postaci. Dotychczasowe ustawienia dostaje postać, którą pierwszą wejdziesz w Walkę."
     }
   ]
 }
