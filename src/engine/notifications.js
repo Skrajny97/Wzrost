@@ -95,6 +95,22 @@ export function notificationsDue({ level, activity, avatarActivity = null, avata
   if (activity?.kind === 'cultivation' && within(activity.endsAt, from, to)) {
     due.push({ tag: 'cultivation', url: '#/kultywacja', at: activity.endsAt, title: say(texts, 'pushCultivationTitle', 0), body: say(texts, 'pushCultivationBody', 0) });
   }
+  // An Awatar's Kultywacja (26.11.2026), told the same way under a title
+  // that names it, with a tag of its own.
+  for (const [work, avatar] of /** @type {[Activity | null, true | 2][]} */ ([
+    [avatarActivity, true],
+    [avatar2Activity, 2],
+  ])) {
+    if (work?.kind !== 'cultivation' || !within(work.endsAt, from, to)) continue;
+    const own = avatar === 2 ? content.avatar.second.texts : content.avatar.texts;
+    due.push({
+      tag: avatar === 2 ? 'avatar2-cultivation' : 'avatar-cultivation',
+      url: '#/kultywacja',
+      at: work.endsAt,
+      title: say(own, 'pushCultivationTitle', 0),
+      body: say(texts, 'pushCultivationBody', 0),
+    });
+  }
   // A gathering of herbs (professions.js), a brewing of potions (brewing.js),
   // an order of items (workshop.js), a digging (mining.js) and a work in the
   // Szlifiernia (jewelcraft.js), told the same way, and so the work

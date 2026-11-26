@@ -20,9 +20,15 @@
 // bought once the first is, for avatar.second.price, and works the same way
 // beside the character and the first one: its work sits in
 // avatar2_activities, and the requests name it with `avatar: 2`.
+//
+// Either may meditate in a Kultywacja instead of a work, in the same slot
+// (cultivation.js, „Kultywacja Awatarem”, 26.11.2026): its claim and its
+// "Przerwij" are here too, the latter ending it with nothing, as the
+// character's own.
 
 import { finishBrewing } from './brewing.js';
 import { content } from './content.js';
+import { finishCultivation } from './cultivation.js';
 import { avatarAsked, avatarTexts, avatarWorkOf, characterView, loadPlayer, requirePlayer, workTable } from './characters.js';
 import { ApiError, json, readJson } from './http.js';
 import { finishGathering, requireProfessions } from './professions.js';
@@ -34,7 +40,17 @@ import { finishFarming } from './farming.js';
 import { finishCooking } from './cooking.js';
 import { minigameOutcome } from './minigame.js';
 
-const FINISH = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting, minerals: finishMining, jewels: finishJewels, fish: finishFishing, crops: finishFarming, dishes: finishCooking };
+const FINISH = {
+  herbs: finishGathering,
+  potions: finishBrewing,
+  items: finishCrafting,
+  minerals: finishMining,
+  jewels: finishJewels,
+  fish: finishFishing,
+  crops: finishFarming,
+  dishes: finishCooking,
+  cultivation: finishCultivation,
+};
 
 // The body of a request that may come without one.
 const bodyOf = async (request) => ((request.headers.get('Content-Type') ?? '').startsWith('application/json') ? await readJson(request) : {});
@@ -76,7 +92,9 @@ export async function claimAvatar(context) {
   const body = await bodyOf(context.request);
   const avatar = avatarAsked(body) === 2 ? 2 : true;
   const activity = avatarWork(player, avatar);
-  if (activity.ends_at > now) throw new ApiError(409, 'not_finished', avatar === 2 ? 'Praca Drugiego Awatara Systemu jeszcze trwa.' : 'Praca Awatara Systemu jeszcze trwa.');
+  if (activity.ends_at > now) {
+    throw new ApiError(409, 'not_finished', activity.kind === 'cultivation' ? 'Kultywacja jeszcze trwa.' : avatar === 2 ? 'Praca Drugiego Awatara Systemu jeszcze trwa.' : 'Praca Awatara Systemu jeszcze trwa.');
+  }
   const db = context.env.DB;
   const done = await FINISH[activity.kind](db, player, now, { avatar, minigame: minigameOutcome(activity, body.minigame, now) });
   // A work whose recipe or pattern the game no longer has gave back what it
@@ -86,14 +104,15 @@ export async function claimAvatar(context) {
 }
 
 // Calling the Awatar back early (`avatar: 2`: the second), as the
-// character: a gathering or a digging brings nothing, and a brewing, an order
-// in the Warsztat or of jewels keeps what is done, with its report.
+// character: a gathering, a digging or a Kultywacja brings nothing, and a
+// brewing, an order in the Warsztat or of jewels keeps what is done, with
+// its report.
 export async function cancelAvatar(context) {
   const { session, player } = await requirePlayer(context);
   const now = context.now;
   const avatar = avatarAsked(await bodyOf(context.request)) === 2 ? 2 : true;
   const activity = avatarWork(player, avatar);
-  if (activity.ends_at <= now) throw new ApiError(409, 'claim_first', avatarTexts(avatar).claimFirst[0]);
+  if (activity.ends_at <= now) throw new ApiError(409, 'claim_first', (activity.kind === 'cultivation' ? avatarTexts(avatar).meditated : avatarTexts(avatar).claimFirst)[0]);
   const db = context.env.DB;
   const stop = { potions: finishBrewing, items: finishCrafting, jewels: finishJewels, dishes: finishCooking }[activity.kind];
   const stopped = stop ? await stop(db, player, now, { stop: true, avatar }) : null;

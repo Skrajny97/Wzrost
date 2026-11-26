@@ -996,6 +996,9 @@ export const avatarAsked = (body) => (body?.avatar === 2 ? 2 : body?.avatar === 
 // Who does a profession's work: the character at home, or with `avatar` in
 // the request its Awatar Systemu (true) or its second Awatar (2), bought and
 // free (avatar.js), while the character may be away or at work itself.
+// The same for a Kultywacja (cultivation.js): an Awatar meditating is busy
+// for a work too, as it is one slot (the author, 26.11.2026: „żeby użycie
+// go zajmowało też slot tego z Profesji”), and says so in its own words.
 export async function requireWorker(context, body) {
   const avatar = avatarAsked(body);
   if (!avatar) return { ...(await requireIdlePlayer(context)), avatar: false };
@@ -1005,7 +1008,8 @@ export async function requireWorker(context, body) {
   const work = avatarWorkOf(found.player, avatar);
   if (work) {
     const texts = avatarTexts(avatar);
-    throw work.ends_at <= context.now ? new ApiError(409, 'claim_first', texts.claimFirst[0]) : new ApiError(409, 'busy', texts.busy[0]);
+    const [ended, going] = work.kind === 'cultivation' ? [texts.meditated, texts.meditating] : [texts.claimFirst, texts.busy];
+    throw work.ends_at <= context.now ? new ApiError(409, 'claim_first', ended[0]) : new ApiError(409, 'busy', going[0]);
   }
   return { ...found, avatar };
 }
@@ -1900,8 +1904,9 @@ export function characterView(player, now) {
     // An order of the Osada that can be delivered now lights its tab.
     settlementWaiting: settlementWaiting(row, items, now, player.marketWaiting) || serviceEnded(player.activity, now),
     huntDurations: huntDurations(row.level, content()),
-    // The Kultywacja's card on the Walka screen (cultivation.js), or null
-    // before its unlock and while another activity goes on.
+    // The Kultywacja's tab of the Walka (cultivation.js), or null before its
+    // unlock: its level always, its plans for whoever may meditate (the
+    // character at home, an Awatar free), or the meditation going on.
     cultivation: cultivationView(player),
     // The Karczma's mercenaries (mercenaries.js): what the character may
     // offer and ask, or null below their level.

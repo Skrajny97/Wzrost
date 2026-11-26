@@ -15,6 +15,7 @@ import {
   cultivationBonus,
   cultivationGain,
   cultivationHours,
+  cultivationKept,
   cultivationMinutes,
   cultivationPlan,
   cultivationProgress,
@@ -220,6 +221,41 @@ describe('Kultywacja: the plan for the card', () => {
         ],
       );
     }
+  });
+
+  test("an Awatar's plan (26.11.2026): its share of the character XP up to the same cap, the Kultywacja's XP whole", () => {
+    const share = content.avatar.share;
+    assert.equal(share, 0.25);
+    const character = { level: 104, xp: 1234, classLevel: 124 };
+    const progress = { level: 2, xp: 600 };
+    const durations = cultivationMinutes(content);
+    const own = cultivationPlan(character, progress, durations, content);
+    const plan = cultivationPlan(character, progress, durations, content, share);
+    const rate = cultivationRate(124, content);
+    assert.deepEqual([own.share, plan.share], [1, share]);
+    assert.equal(plan.cap, own.cap);
+    assert.equal(plan.open, own.open);
+    assert.equal(plan.possible, own.possible);
+    assert.deepEqual([plan.factor, plan.area], [own.factor, own.area]);
+    assert.equal(plan.rate, Math.round(rate * share));
+    assert.equal(plan.minutes, Math.ceil((plan.cap / (rate * share)) * 60));
+    plan.lengths.forEach((length, index) => {
+      // A quarter of what the character's own meditation keeps, rounded as
+      // an Awatar's share of a work is.
+      const kept = Math.round(cultivationXp(rate, length.minutes) * share);
+      assert.equal(cultivationKept(rate, length.minutes, share), kept);
+      assert.equal(length.xp, Math.min(plan.cap, kept));
+      assert.equal(length.level, gainXp(104, 1234, length.xp, toNext, maxLevel).level);
+      assert.ok(length.xp <= own.lengths[index].xp);
+      assert.equal(length.cultivationXp, own.lengths[index].cultivationXp);
+      assert.equal(length.cultivationLevel, own.lengths[index].cultivationLevel);
+    });
+    // The character's own keeps it whole, as before.
+    for (const minutes of [10, 60, 480]) assert.equal(cultivationKept(rate, minutes), cultivationXp(rate, minutes));
+    // Long enough, the share reaches the cap too, never past it.
+    const near = cultivationPlan({ level: 123, xp: 0, classLevel: 124 }, fresh, [480], content, share);
+    assert.equal(near.lengths[0].xp, Math.min(near.cap, Math.round(cultivationXp(rate, 480) * share)));
+    assert.ok(near.lengths[0].level <= 124);
   });
 
   test('at equal levels with the Kultywacja at its top, a meditation would give nothing', () => {

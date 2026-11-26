@@ -28,7 +28,8 @@ import { motionOn } from '../motion.js';
 import { orbField } from '../orbs.js';
 import { workScene } from '../scenes.js';
 import { playSound } from '../sound.js';
-import { activityFinished, buildLocked, call, reportCache, serverNow, state, testModeOn } from '../state.js';
+import { CULTIVATION_HASH } from '../cultivation.js';
+import { DOING, activityFinished, buildLocked, call, reportCache, serverNow, state, testModeOn } from '../state.js';
 import { skipControl } from '../time.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, splitLead, systemPanel, toast, withButton } from '../ui.js';
 import { transmuteForm } from '../transmute.js';
@@ -64,8 +65,8 @@ const WORK = {
   farming: { kind: 'crops', busy: 'Uprawia pole' },
   cooking: { kind: 'dishes', busy: 'Gotuje' },
 };
-// What the character or the Awatar Systemu is doing, by the activity's kind (t()).
-const DOING = { herbs: 'zbiera zioła', potions: 'warzy mikstury', items: 'wykonuje przedmioty', minerals: 'kopie w Kopalni', jewels: 'pracuje w Szlifierni', fish: 'łowi ryby', crops: 'uprawia pole', dishes: 'gotuje', mercenary: 'wykonuje usługę najemną', cultivation: 'medytuje' };
+// What the character or the Awatar Systemu is doing is DOING (state.js), by
+// the activity's kind (t()).
 const FALLBACK_ICONS = { herbalism: 'leaf', alchemy: 'spirit', crafting: 'hammer', mining: 'ore', jewelcrafting: 'ring', fishing: 'fish', farming: 'sprout', cooking: 'pot' };
 const HERB_CHOICE = 'wzrost.herb-choice';
 const WORKER_CHOICE = 'wzrost.worker-choice';
@@ -510,6 +511,15 @@ export function mountProfessions(container, { params, navigate }) {
       return card;
     }
     const done = activityFinished(work);
+    // Meditating in a Kultywacja instead of a work, in the same slot
+    // (cultivation.js, 26.11.2026): its time, and the way to it.
+    if (work.kind === 'cultivation') {
+      card.append(
+        h('p', { text: done ? t('Kultywacja zakończona. Raport czeka w Kultywacji.') : t('Medytuje w Kultywacji do {time}.', { time: timeFormat.format(new Date(work.endsAt)) }) }),
+        h('a', { class: 'button button--world', href: CULTIVATION_HASH, text: done ? t('Odbierz raport') : t('Do Kultywacji') }),
+      );
+      return card;
+    }
     card.append(
       h('p', { text: done ? t('Praca skończona. Raport czeka na odbiór.') : `${t(WORK[work.profession].busy)}: ${work.placeName}.` }),
       h('a', { class: 'button button--world', href: HASHES[work.profession] ?? HOME, text: done ? t('Odbierz raport') : t('Zobacz pracę') }),

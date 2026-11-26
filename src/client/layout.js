@@ -324,7 +324,8 @@ function showAvatarDrop(open) {
   if (open) updateTopbar();
 }
 
-// What an Awatar does, in its tab under AWATARY.
+// What an Awatar does, in its tab under AWATARY: a work, or a Kultywacja in
+// the same slot (cultivation.js, 26.11.2026).
 const AVATAR_DOING = {
   herbs: 'Zbiera zioła w Zagajniku',
   potions: 'Warzy mikstury',
@@ -334,7 +335,12 @@ const AVATAR_DOING = {
   fish: 'Łowi ryby',
   crops: 'Uprawia pole',
   dishes: 'Gotuje potrawy',
+  cultivation: 'Medytuje w Kultywacji',
 };
+
+// Where an Awatar's strip or tab leads: its work's screen, or the
+// Kultywacja's while it meditates.
+const avatarHref = (work) => (work.kind === 'cultivation' ? CULTIVATION_HASH : (WORK_SCREENS[work.kind]?.href ?? '#/profesje'));
 
 // The tabs of both Awatary (`works`: [work, label], the first's first), each
 // with what it does and its time, or that its report waits; a tap on one
@@ -351,7 +357,7 @@ function avatarTabs(works, now) {
         topbar.avatarTabTimes.push([work, time]);
         return h(
           'a',
-          { class: 'activity activity--avatar avatar-tab', href: WORK_SCREENS[work.kind]?.href ?? '#/profesje', onClick: () => showAvatarDrop(false) },
+          { class: 'activity activity--avatar avatar-tab', href: avatarHref(work), onClick: () => showAvatarDrop(false) },
           h('span', { class: 'avatar-tab-head' }, h('span', { class: 'activity-label', text: label }), h('span', { class: 'avatar-tab-what', text: t(AVATAR_DOING[work.kind] ?? 'Pracuje') })),
           time,
         );
@@ -515,12 +521,14 @@ export function updateTopbar(now = serverNow()) {
     const screen = WORK_SCREENS[shown.kind];
     const finished = activityFinished(shown, now);
     topbar.avatarWork.classList.toggle('activity--done', finished);
-    topbar.avatarWork.setAttribute('href', both ? '#/profesje' : screen ? screen.href : '#/profesje');
+    // One Awatar meditating (cultivation.js) leads to the Kultywacja.
+    topbar.avatarWork.setAttribute('href', both ? '#/profesje' : avatarHref(shown));
     topbar.avatarLabel.textContent = both ? `${t('AWATARY')} ${topbar.avatarDrop.hidden ? '▾' : '▴'}` : label;
     if (finished) topbar.avatarTime.textContent = t('RAPORT');
     else setTimer(topbar.avatarTime, formatCountdown(shown.endsAt - now));
+    const left = finished ? t('raport czeka') : topbar.avatarTime.textContent;
     const what = [screen && t(screen.label), shown.placeName].filter(Boolean).join(' · ');
-    topbar.avatarWork.setAttribute('aria-label', `${t('praca Awatara')}: ${what}, ${finished ? t('raport czeka') : topbar.avatarTime.textContent}`);
+    topbar.avatarWork.setAttribute('aria-label', shown.kind === 'cultivation' ? `${t('Awatar medytuje w Kultywacji')}, ${left}` : `${t('praca Awatara')}: ${what}, ${left}`);
     if (both) {
       topbar.avatarWork.setAttribute('aria-expanded', String(!topbar.avatarDrop.hidden));
       topbar.avatarWork.setAttribute('aria-controls', 'avatar-drop');
@@ -561,6 +569,8 @@ const TIMED = {
 // łowi czy tam cokolwiek robi w profesjach to żeby też było widać ten czas
 // na pasku po lewej”, „tak jak wtedy gdy nasza postać to robi”); `byAvatar`
 // says it is the Awatar's. With two Awatary (1066) the one that ends first.
+// An Awatar's Kultywacja counts here too, as it takes the Awatar's slot of
+// the Profesje (cultivation.js, 26.11.2026).
 function tabTime(id, now = serverNow()) {
   const activity = state.character?.activity;
   const own = activity && TIMED[id].kinds.includes(activity.kind) ? activity : null;
@@ -756,7 +766,9 @@ export function updateNavTimers(now = serverNow()) {
     item.classList.toggle('nav-item--ready', ready);
     if (running) setTimer(label, formatCountdown(work.endsAt - now));
     else label.textContent = t(tab.label);
-    item.setAttribute('aria-label', [t(tab.label), running && `${byAvatar ? t('praca Awatara') : t(tab.doing)}: ${label.textContent}`, ready && t('raport czeka')].filter(Boolean).join(', '));
+    // An Awatar meditating counts down on Profesje too, as its slot's.
+    const whose = byAvatar ? (work.kind === 'cultivation' ? t('Kultywacja Awatara') : t('praca Awatara')) : t(tab.doing);
+    item.setAttribute('aria-label', [t(tab.label), running && `${whose}: ${label.textContent}`, ready && t('raport czeka')].filter(Boolean).join(', '));
   }
   const camp = $(`#nav-main > .nav-item[href="${CAMP_TAB.href}"]`);
   const label = camp && $('.nav-label', camp);

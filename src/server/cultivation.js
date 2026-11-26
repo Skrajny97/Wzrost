@@ -14,15 +14,30 @@
 // Drużyna's trip, and it rests. Punkty Czasu rewind it as any activity
 // (time.js), and "Przerwij" (cancelHunt in hunts.js) ends it with nothing
 // gained, as an exploration.
+//
+// An Awatar Systemu may meditate instead (DECISIONS.md, „Kultywacja
+// Awatarem (26.11.2026)”; the author: „Do tego trzeba pozwolić robić
+// Kultywację Awatarem. Ale tylko jednym na raz i żeby użycie go zajmowało
+// też slot tego z Profesji. Żeby były powiązane ale niech tylko jeden na raz
+// może robić”): with `avatar` in the start's request (true, or 2 for the
+// second), its Kultywacja sits where its profession's work does
+// (avatar_activities, avatar2_activities), so it takes no work meanwhile
+// (requireWorker in characters.js), while the character is free for
+// anything. Its claim and its "Przerwij" are the Awatar's (avatar.js), and
+// Punkty Czasu rewind it as its work (time.js, `avatar`, `avatar2`). It
+// brings the Kultywacja's XP whole and its share of the character XP
+// (avatar.share, a quarter; cultivationKept), under the same cap at the
+// claim. One meditates at a time, the character or an Awatar
+// (meditationOf, cultivationTaken).
 
 import {
   cultivationBonus,
   cultivationGain,
+  cultivationKept,
   cultivationMinutes,
   cultivationPlan,
   cultivationProgress,
   cultivationRate,
-  cultivationXp,
   cultivationXpToNext,
   isUnlocked,
   newestArea,
@@ -30,12 +45,13 @@ import {
 } from '../engine/index.js';
 import { say } from '../engine/text.js';
 import { content } from './content.js';
-import { characterView, currentHp, engineCharacter, equippedItems, loadPlayer, requireIdlePlayer } from './characters.js';
+import { avatarMark, avatarTexts, avatarWorkOf, characterView, currentHp, engineCharacter, equippedItems, loadPlayer, requireWorker, workOf, workTable } from './characters.js';
 import { toHex } from './encoding.js';
-import { characterChanged, raced, sameVersion } from './atomic.js';
+import { assertion, characterChanged, raced } from './atomic.js';
+import { professionsOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
-import { alreadyClaimed, workClaim, workClaimFailed } from './professions.js';
+import { alreadyClaimed, requireProfessions, workClaim, workClaimFailed } from './professions.js';
 import { trimReports } from './reports.js';
 
 // The activity's kind (activities.kind) and its report's.
@@ -46,6 +62,42 @@ const MINUTE = 60000;
 // (characters.js): still meditating, or its report waiting.
 export const cultivationBusy = (finished) =>
   finished ? new ApiError(409, 'claim_first', 'Kultywacja się skończyła. Najpierw odbierz jej raport.') : new ApiError(409, 'busy', 'Postać medytuje. Poczekaj na koniec Kultywacji.');
+
+// The Kultywacja going on or waiting for its claim, of the character or of
+// one of its Awatary, as { activity, avatar } (`avatar`: false, true for
+// the first Awatar, 2 for the second, as workTable names them), or null:
+// one at a time (the author, 26.11.2026: „tylko jeden na raz”).
+function meditationOf(player) {
+  for (const avatar of [false, true, 2]) {
+    const activity = avatar ? avatarWorkOf(player, avatar) : player.activity;
+    if (activity?.kind === CULTIVATION) return { activity, avatar };
+  }
+  return null;
+}
+
+// Why no other Kultywacja begins while `one` (meditationOf) goes on, or
+// waits for its claim, in words that name who meditates.
+function cultivationTaken({ activity, avatar }, now) {
+  const ended = activity.ends_at <= now;
+  if (!avatar) {
+    return ended
+      ? new ApiError(409, 'claim_first', 'Postać skończyła Kultywację. Najpierw odbierz jej raport.')
+      : new ApiError(409, 'busy', 'Kultywację robi już postać. Naraz medytuje tylko jeden.');
+  }
+  const texts = avatarTexts(avatar);
+  return ended ? new ApiError(409, 'claim_first', texts.meditated[0]) : new ApiError(409, 'busy', texts.cultivationTaken[0]);
+}
+
+// SQL: nobody meditates, neither the character nor an Awatar, for the head
+// of a start's batch (three binds of the character's id).
+const NOBODY_MEDITATES = ['activities', 'avatar_activities', 'avatar2_activities']
+  .map((table) => `NOT EXISTS (SELECT 1 FROM ${table} WHERE character_id = ? AND kind = '${CULTIVATION}')`)
+  .join(' AND ');
+
+// Whether an Awatar Systemu bought is free to meditate now (not at work, not
+// meditating), where the deployment shows the professions it belongs to.
+const avatarFree = (player) =>
+  professionsOn() && ((Boolean(player.row.avatar_at) && !player.avatarActivity) || (Boolean(player.row.avatar2_at) && !player.avatar2Activity));
 
 // The XP the start kept, a whole number (0 for anything else).
 const keptXp = (activity) => {
@@ -81,8 +133,10 @@ export const cultivationPlace = () => ({ placeName: t('Kultywacja') });
 // with its XP, the XP to the next level and its share more character XP
 // from explorations (`bonus`), always (the bonuses' list shows it, also
 // while the character is away); at home also the plan (cultivationPlan)
-// for each of its lengths (cultivationMinutes); while one runs or waits
-// for its claim, what the claim would give now (`running`).
+// for each of its lengths (cultivationMinutes), and with an Awatar free the
+// plan of its meditation (`avatarPlan`: its share of the character XP); while
+// one runs or waits for its claim, the character's or an Awatar's, what the
+// claim would give now (`running`, with `avatar` for an Awatar's).
 export function cultivationView(player) {
   const { row, activity } = player;
   if (!isUnlocked(CULTIVATION, row.level, content())) return null;
@@ -99,71 +153,106 @@ export function cultivationView(player) {
     perLevel: levelBonus,
     firstMinutes: cultivationXpToNext(0, content()),
     lastMinutes: cultivationXpToNext(maxLevel - 1, content()),
+    // Once an Awatar is bought, its share of the character XP, for the
+    // words of its meditation.
+    ...(professionsOn() && row.avatar_at && { avatarShare: content().avatar.share }),
   };
   const character = engineCharacter(row);
-  if (activity?.kind === CULTIVATION) {
-    const { gained, capped, after } = cultivationGain(character, keptXp(activity), content());
-    const grown = cultivationProgress(progress, activity.minutes, content());
-    return { ...base, running: { xp: gained, level: after.level, capped, cultivationXp: grown.gained, cultivationLevel: grown.level } };
+  const meditation = meditationOf(player);
+  if (meditation) {
+    const { gained, capped, after } = cultivationGain(character, keptXp(meditation.activity), content());
+    const grown = cultivationProgress(progress, meditation.activity.minutes, content());
+    return { ...base, running: { xp: gained, level: after.level, capped, cultivationXp: grown.gained, cultivationLevel: grown.level, ...avatarMark(meditation.avatar) } };
   }
-  if (activity) return base;
-  return { ...base, plan: cultivationPlan(character, progress, cultivationMinutes(content()), content()) };
+  const lengths = cultivationMinutes(content());
+  return {
+    ...base,
+    ...(!activity && { plan: cultivationPlan(character, progress, lengths, content()) }),
+    ...(avatarFree(player) && { avatarPlan: cultivationPlan(character, progress, lengths, content(), content().avatar.share) }),
+  };
 }
 
-// POST /api/cultivation { minutes }: a Kultywacja from now on, of one of its
-// lengths (cultivationMinutes: 10 minutes to 8 hours every 10, at any
-// level), while it gives something: character XP with the class ahead, or
-// the Kultywacja's own XP below its top level.
-// It keeps the XP of the length at the rate of the class level now and the
-// levels it began with; the HP rested so far is saved, and resting goes on.
-// The character's row is as read, so two taps at once start one (the
-// activities' table holds one for each character).
+// POST /api/cultivation { minutes, avatar? }: a Kultywacja from now on, of
+// one of its lengths (cultivationMinutes: 10 minutes to 8 hours every 10, at
+// any level), while it gives something: character XP with the class ahead,
+// or the Kultywacja's own XP below its top level. The character at home
+// meditates, or with `avatar` its Awatar Systemu (true) or second Awatar
+// (2), bought and free (requireWorker), while the character does anything;
+// and only while nobody else meditates (meditationOf).
+// It keeps the XP of the length at the rate of the class level now, an
+// Awatar's share of it for an Awatar's (cultivationKept), and the levels it
+// began with; the character's own saves the HP rested so far, and resting
+// goes on. The batch holds only while nobody meditates, and the
+// character's own only while its row is as read, so two taps at once, or
+// the character's and an Awatar's start at once, begin one (each table
+// holds one activity for each character).
 export async function startCultivation(context) {
-  const { session, player } = await requireIdlePlayer(context);
   const body = await readJson(context.request);
+  const { session, player, avatar } = await requireWorker(context, body);
   const { row } = player;
   const now = context.now;
   if (!isUnlocked(CULTIVATION, row.level, content())) {
     throw new ApiError(403, 'locked', `Kultywację odblokujesz na poziomie postaci ${content().unlocksById[CULTIVATION].level}.`);
   }
+  // The Awatar comes with the Profesje tab, where it is bought.
+  if (avatar) requireProfessions(player);
   if (!cultivationMinutes(content()).includes(body?.minutes)) throw new ApiError(400, 'invalid_duration', 'Wybierz czas Kultywacji.');
-  const plan = cultivationPlan(engineCharacter(row), progressOf(row), [body.minutes], content());
+  const other = meditationOf(player);
+  if (other) throw cultivationTaken(other, now);
+  const share = avatar ? content().avatar.share : 1;
+  const plan = cultivationPlan(engineCharacter(row), progressOf(row), [body.minutes], content(), share);
   if (!plan.possible) {
     throw new ApiError(409, 'nothing_to_gain', 'Twoja postać dogoniła klasę, a Kultywacja ma najwyższy poziom: medytacja nic teraz nie da.');
   }
   // The XP of the whole length, also at equal levels: the claim gives what
   // the class's level lets then (cultivationGain).
-  const xp = cultivationXp(cultivationRate(row.class_level, content()), body.minutes);
-  const { hp } = currentHp(player, now);
+  const xp = cultivationKept(cultivationRate(row.class_level, content()), body.minutes, share);
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const options = JSON.stringify({ xp, levels: { level: row.level, classLevel: row.class_level } });
+  const place = newestArea(row.class_level, content()).id;
+  const ends = now + body.minutes * MINUTE;
   const db = context.env.DB;
-  try {
-    await db.batch([
-      sameVersion(db, row),
+  const ids = [row.id, row.id, row.id];
+  let statements;
+  if (avatar) {
+    statements = [
+      assertion(db, NOBODY_MEDITATES, ids),
+      db
+        .prepare(`INSERT INTO ${workTable(avatar)} (character_id, kind, region_id, minutes, started_at, ends_at, seed, options) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+        .bind(row.id, CULTIVATION, place, body.minutes, now, ends, seed, options),
+    ];
+  } else {
+    const { hp } = currentHp(player, now);
+    statements = [
+      assertion(db, `(SELECT version FROM characters WHERE id = ?) = ? AND ${NOBODY_MEDITATES}`, [row.id, row.version, ...ids]),
       db
         .prepare('INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
-        .bind(row.id, CULTIVATION, newestArea(row.class_level, content()).id, body.minutes, now, now + body.minutes * MINUTE, seed, hp, options),
+        .bind(row.id, CULTIVATION, place, body.minutes, now, ends, seed, hp, options),
       db.prepare('UPDATE characters SET hp = ?, hp_at = ?, version = version + 1 WHERE id = ?').bind(hp, now, row.id),
-    ]);
+    ];
+  }
+  try {
+    await db.batch(statements);
   } catch (error) {
     if (raced(error)) throw characterChanged();
-    if (String(error?.message).includes('constraint')) throw new ApiError(409, 'busy', 'Postać jest już zajęta.');
+    if (String(error?.message).includes('constraint')) throw new ApiError(409, 'busy', avatar ? avatarTexts(avatar).busy[0] : 'Postać jest już zajęta.');
     throw error;
   }
   return json({ character: characterView(await loadPlayer(db, session.userId), now) }, 201);
 }
 
-// The report of a Kultywacja that ended (finishActivity in hunts.js): the
-// character XP kept at its start, at most what brings the character to its
-// class's level now (cultivationGain), its new levels with their Time
-// Points, and full HP at a new level, as after a work's XP; and the
-// Kultywacja's own XP of its minutes, with its new level and its System
-// line. Saved only while the Kultywacja is still there and the character is
-// as read (workClaim), so a claim and a "Przerwij" at once give it once or
-// not at all.
-export async function finishCultivation(db, player, now) {
-  const { row, activity } = player;
+// The report of a Kultywacja that ended (finishActivity in hunts.js; with
+// `avatar`, an Awatar's, claimAvatar in avatar.js): the character XP kept
+// at its start, at most what brings the character to its class's level now
+// (cultivationGain), its new levels with their Time Points, and full HP at
+// a new level, as after a work's XP; and the Kultywacja's own XP of its
+// minutes, with its new level and its System line. An Awatar's report names
+// it, as its work's does (`avatar`, „Wykonawca”). Saved only while the
+// Kultywacja is still there and the character is as read (workClaim), so a
+// claim and a "Przerwij" at once give it once or not at all.
+export async function finishCultivation(db, player, now, { avatar = false } = {}) {
+  const { row } = player;
+  const { table, activity, key } = workOf(player, avatar);
   const character = engineCharacter(row);
   const full = keptXp(activity);
   const { gained, capped, after } = cultivationGain(character, full, content());
@@ -175,6 +264,8 @@ export async function finishCultivation(db, player, now) {
   const report = {
     kind: CULTIVATION,
     placeName: t('Kultywacja'),
+    // Who meditated: an Awatar (avatarMark), or the character.
+    ...avatarMark(avatar),
     // The place its XP was counted from (newestArea at its start).
     ...(area && { areaName: area.name }),
     minutes: activity.minutes,
@@ -196,6 +287,7 @@ export async function finishCultivation(db, player, now) {
   };
   const listed = {
     placeName: report.placeName,
+    ...avatarMark(avatar),
     minutes: report.minutes,
     xp: gained,
     levelBefore: row.level,
@@ -207,21 +299,21 @@ export async function finishCultivation(db, player, now) {
   let results;
   try {
     results = await db.batch([
-      workClaim(db, row, 'activities', activity),
+      workClaim(db, row, table, activity),
       db
         .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
-        .bind(row.id, `${row.id}:${activity.started_at}`, CULTIVATION, now, JSON.stringify(listed), JSON.stringify(report)),
+        .bind(row.id, key, CULTIVATION, now, JSON.stringify(listed), JSON.stringify(report)),
       trimReports(db, row.id, CULTIVATION),
       db
         .prepare(
           `UPDATE characters SET level = ?, xp = ?, time_points = time_points + ?, cultivation_level = ?, cultivation_xp = ?${hp === null ? '' : ', hp = ?, hp_at = ?'}, version = version + 1 WHERE id = ?`,
         )
         .bind(after.level, after.xp, after.timePoints, grown.level, grown.xp, ...(hp === null ? [] : [hp, now]), row.id),
-      db.prepare('DELETE FROM activities WHERE character_id = ? AND started_at = ?').bind(row.id, activity.started_at),
+      db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at),
     ]);
   } catch (error) {
     if (String(error?.message).includes('UNIQUE')) throw alreadyClaimed();
-    if (raced(error)) throw await workClaimFailed(db, row, 'activities', activity);
+    if (raced(error)) throw await workClaimFailed(db, row, table, activity);
     throw error;
   }
   return { id: results[1].meta.last_row_id, report };

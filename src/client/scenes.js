@@ -77,11 +77,12 @@ export function workScene(professionId, activity, { avatar = false } = {}) {
 
 // A scene of one sheet looping in its stage in the light of the hour, as a
 // work's figure plays (workScene), without a place, shelf or moments: the
-// Kultywacja's (cultivation.js, data/animations.json `cultivation`). Null
+// Kultywacja's (cultivation.js, data/animations.json `cultivation`); with
+// `avatar`, an Awatar Systemu's, in the System's light as its work. Null
 // without a sheet.
-export function loopScene(sheet, className = '') {
+export function loopScene(sheet, className = '', { avatar = false } = {}) {
   if (!sheet) return null;
-  const stage = h('div', { class: `scene-stage scene--${dayPart()}` }, frames(sheet, 'scene-figure'));
+  const stage = h('div', { class: `scene-stage scene--${dayPart()}${avatar ? ' scene--avatar' : ''}` }, frames(sheet, 'scene-figure'));
   stage.style.setProperty('--scene-phase', `${(-performance.now() / 1000).toFixed(3)}s`);
   return h('div', { class: `scene${className ? ` ${className}` : ''}`, 'aria-hidden': 'true' }, stage);
 }

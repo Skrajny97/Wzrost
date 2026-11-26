@@ -16,6 +16,18 @@
       ],
       "pushTitle": [
         "System Avatar's work complete"
+      ],
+      "meditating": [
+        "The System Avatar is meditating. Wait until its Cultivation is over."
+      ],
+      "meditated": [
+        "The System Avatar has finished its Cultivation. Claim its report first."
+      ],
+      "cultivationTaken": [
+        "The System Avatar is already in Cultivation. Only one can meditate at a time."
+      ],
+      "pushCultivationTitle": [
+        "System Avatar's Cultivation over"
       ]
     },
     "second": {
@@ -33,6 +45,18 @@
         ],
         "pushTitle": [
           "Second System Avatar's work complete"
+        ],
+        "meditating": [
+          "The Second System Avatar is meditating. Wait until its Cultivation is over."
+        ],
+        "meditated": [
+          "The Second System Avatar has finished its Cultivation. Claim its report first."
+        ],
+        "cultivationTaken": [
+          "The Second System Avatar is already in Cultivation. Only one can meditate at a time."
+        ],
+        "pushCultivationTitle": [
+          "Second System Avatar's Cultivation over"
         ]
       }
     }

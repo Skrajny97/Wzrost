@@ -5,7 +5,8 @@
 // part still locked shut with its level, as the Portale and the Wieże were;
 // a gold dot on the Postrach Krainy while a Skrzynia Bossa waits and on the
 // Kultywacja once a meditation has ended, never on a part still locked; a
-// part whose unlock the deployment lacks left out.
+// part whose unlock the deployment lacks left out. An Awatar's Kultywacja
+// ended lights the Kultywacja as the character's does (26.11.2026).
 
 import assert from 'node:assert/strict';
 import { after, before, describe, test } from 'node:test';
@@ -120,6 +121,22 @@ describe("the Walka's switch", () => {
     );
     character(ALL, { kind: 'hunt', endsAt: Date.now() - 5000 });
     assert.ok(shown().options.every((one) => one.dot === null));
+  });
+
+  test("an Awatar's Kultywacja ended lights the Kultywacja too, its work ended not (26.11.2026)", () => {
+    state.worldBossChests = 0;
+    const withAvatars = (first, second = null) => {
+      character(ALL);
+      state.character.professions = { avatar: { owned: true, activity: first, second: { owned: true, activity: second } } };
+    };
+    withAvatars({ kind: 'cultivation', endsAt: Date.now() + 60000 });
+    assert.equal(option(shown().options, 'cultivation').dot, null);
+    withAvatars({ kind: 'cultivation', endsAt: Date.now() - 5000 });
+    assert.equal(option(shown().options, 'cultivation').dot, 'raport czeka');
+    withAvatars(null, { kind: 'cultivation', endsAt: Date.now() - 5000 });
+    assert.equal(option(shown().options, 'cultivation').dot, 'raport czeka');
+    withAvatars({ kind: 'herbs', endsAt: Date.now() - 5000 });
+    assert.equal(option(shown().options, 'cultivation').dot, null);
   });
 
   test('a part whose unlock the deployment lacks is left out', () => {
