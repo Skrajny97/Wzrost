@@ -1,0 +1,14 @@
+{
+  "id": "heavenly-host",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "two big shining knights in white and silver plate armour standing side by side, each raising a sword of white and pale blue holy flame, golden halos above their helmets, a radiant golden light behind them, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.024341990159776478
+  },
+  "images": 1
+}

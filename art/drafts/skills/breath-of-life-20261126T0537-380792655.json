@@ -1,0 +1,14 @@
+{
+  "id": "breath-of-life",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "a glowing red-gold heart with two small white feathered wings, wrapped in a soft swirl of warm golden light like a breath of wind, small healing sparkles around it, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02336808261701796
+  },
+  "images": 1
+}

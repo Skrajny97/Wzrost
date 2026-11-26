@@ -1,0 +1,14 @@
+{
+  "id": "soul-lament",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "one huge screaming ghostly face made of swirling pale blue and white souls, its mouth wide open, ring-shaped shockwaves of pale blue sound bursting out from it, small ghosts flying in the waves, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023401972300635444
+  },
+  "images": 1
+}

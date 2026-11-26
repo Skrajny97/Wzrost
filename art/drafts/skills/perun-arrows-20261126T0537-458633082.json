@@ -1,0 +1,14 @@
+{
+  "id": "perun-arrows",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "three big arrows made of white and blue lightning flying side by side diagonally up to the right, their arrowheads crackling with sparks, jagged lightning trails behind them, a small golden thunder wheel glowing behind their tails, no cloud, grander and more powerful, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/perun-storm.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02331692363887363
+  },
+  "images": 1
+}
