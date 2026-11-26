@@ -4926,6 +4926,48 @@ Wariant B pytania 1253 na stronie ocen, do wyboru autora. Gracz (poz. 107): „L
 8. **Testy:** `test/labyrinth.test.js`, nowa część „the strong rooms (1253)”: najwyżej jedna w rzędzie, tylko zwykła walka, żadnej w pierwszym rzędzie, z każdej komnaty droga do komnaty, która nie jest silna, komnaty i drogi takie jak bez nich, mniej więcej tyle, ile mówi szansa; stwory silnej komnaty mocniejsze tyle razy w ciosie i HP w walce, a obwódka nigdy nie jest łagodniejsza niż bez niej. Dotychczasowe testy Labiryntu przechodzą bez zmian: `test/labyrinth.test.js`, `test/labyrinth-api.test.js`, `test/labyrinth-report-first.test.js` i testy Labiryntu w `test/card-sources.test.js`, `test/mana-carry.test.js`, `test/newest-place.test.js`, `test/cards-api.test.js`, `test/parties.test.js`, `test/class-level-curves.test.js` i `test/myth-game.test.js`. Testy API wchodzą do komnat 1. rzędu dzisiejszej mapy, więc silna komnata w 1. rzędzie zależałaby od daty i czasem by je psuła; to drugi powód, dla którego 1. rząd ich nie ma. Przechodzą też `npm run typecheck`, `tools/validate-data.mjs` i `tools/i18n-check.mjs`.
 9. **Pliki:** `data/labyrinth.json` (`strongRooms`, `$comment`), `data/schemas/labyrinth.schema.json`, `src/engine/labyrinth.js` (`labyrinthMap`, `labyrinthStrength`, `strongRoom`, `roomDanger`, `labyrinthFight`), `src/client/labyrinth.js`, `data/en/strings.json`, `tools/labyrinth-sim.mjs` (opcja `--player`), `test/labyrinth.test.js`.
 
+## Labirynt: Poziom 1 znów do przejścia (26.11.2026)
+
+Autor (26.11.2026): „I co zrobiłeś z Labiryntem, że teraz ludzie padają jak muchy na pierwszym poziomie już”. W pomiarze 1253 C było już widać, że kto klika na ślepo, kończy 1. poziom tylko w 45–55% dni.
+
+1. **Skąd problem.** Pomiar `tools/labyrinth-sim.mjs`: gracz „realistyczny” z `tools/difficulty-sim.mjs`, pięć klas po 60 dni, czyli 300 dni w każdej komórce; postać sama, z jednym i z dwoma towarzyszami; poziomy postaci 30, 50, 80, 110, 150 i 200; dzień tylko do końca 1. poziomu. Dni z przejściem 1. poziomu w procentach, średnio z 18 komórek, w nawiasie najmniej i najwięcej:
+
+   | Gracz | 0.5.20 | 0.5.21 (silniejsze stwory) | 0.5.22 (dziś) | Po zmianie |
+   | --- | --- | --- | --- | --- |
+   | klika na ślepo | 97,8 (79–100) | 93,6 (49–100) | 51,8 (45–59) | 97,8 (94–100) |
+   | wybiera rozważnie, ale nie patrzy na obwódki | 98,1 (80–100) | 94 (48–100) | 61,6 (55–69) | 98,7 (97–100) |
+   | patrzy na obwódki | 98,5 (83–100) | 94,8 (54–100) | 97,6 (94–100) | 99 (97–100) |
+
+   - Winne są silne komnaty. W 0.5.22 aż 95% dni przegranych na 1. poziomie kończy się w silnej komnacie (4586 z 4805). Drużyna weszła do silnej komnaty 5433 razy i przegrała w 84% z nich. Kto klika na ślepo, przegrywa w niej w 46% dni, a kto wybiera rozważnie, ale nie patrzy na obwódki, w 37% dni.
+   - Strażnik, elity i zwykłe walki zatrzymują drużynę na 1. poziomie razem w ok. 1,4% dni w 0.5.22 i 1,5% po zmianie, rzadziej niż w 0.5.20 (1,9%).
+   - Silniejsze stwory z 0.5.21 zaszkodziły na 1. poziomie tylko samej postaci, bez towarzyszy, na 50. i 80. poziomie: strażnik (rzadziej elita) zatrzymywał ją w 27–52% dni, a w 0.5.20 w 7–21%. Słabsi strażnicy i elity z 0.5.22 (0,6) wyrównali to z nawiązką.
+   - Siła na miarę drużyny (`fit`) też nie jest przyczyną: z nią, ale bez silnych komnat, 1. poziom przechodzi się w 94–100% dni.
+   - Słabiej wyposażony gracz („low” z `tools/difficulty-sim.mjs`, 100 dni w komórce) tak samo: w 0.5.22 przechodził 1. poziom średnio w 49% dni, gdy klikał na ślepo, i w 54%, gdy wybierał rozważnie bez patrzenia na obwódki, a 92% jego porażek na 1. poziomie przychodziło w silnej komnacie. Po zmianie w 95% i 97% dni, więcej niż w 0.5.20 (87–88%, bo tam sama postać na 50. i 80. poziomie często przegrywała ze strażnikiem).
+2. **Zmiana:**
+   - 1. poziom nie ma silnych komnat. Nowe pole poziomu `strongRooms` w `data/labyrinth.json`: false na 1. poziomie, true na 2., 3. i Piekielnym (bez tego pola poziom je ma). Siła 1. poziomu (0,65), siła na miarę drużyny oraz słabsze elity i strażnicy (0,6) zostają: bez silnych komnat 1. poziom wraca do 0.5.20, więc nie trzeba ich ruszać.
+   - Przed wejściem do silnej komnaty gra pyta: „Wejść do silnej komnaty?”, „To silna komnata: stwory są tu kilka razy mocniejsze niż zwykle, a porażka kończy dzisiejszy Labirynt.”, z przyciskami „Wybierz inną” i „Wejdź”. „Wybierz inną” wraca na planszę, a do zwykłej komnaty wchodzi się jak dotąd, bez pytania. Po angielsku: „Enter a strong chamber?”, „This is a strong chamber: the creatures here are several times stronger than usual, and a defeat ends today's Labyrinth.”, „Choose another” i „Enter”. To zwykłe okienko potwierdzenia gry (`confirmAction`, jak „Zacząć Labirynt od nowa?”), więc bez makiet; sprawdzone w przeglądarce na telefonie 320 px i na komputerze 1366 px.
+   - Zdanie w „Jak to działa?”: „Od 2. poziomu na planszy bywają silne komnaty: zwykła walka, ale z dużo mocniejszymi stworami, zwykle z czerwoną obwódką. W rzędzie jest najwyżej jedna, więc zawsze da się ją ominąć, a przed wejściem do niej gra zapyta, czy na pewno chcesz wejść.” Po angielsku: „From level 2 on, some chambers on the map are strong: an ordinary fight, but with much stronger creatures, usually with a red ring. A row has at most one, so there is always a way around it, and before you go in the game asks whether you are sure.”
+   - Serwer podaje przy każdej komnacie planszy, czy jest silna (`strong` w `GET /api/labyrinth`).
+3. **Pomiar całych dni po zmianie** (pięć klas po 40 dni, czyli 200 dni w komórce, poziomy postaci jak wyżej). Postać z dwoma towarzyszami; w komórkach dni z przejściem 1., 2. i 3. poziomu oraz Piekielnego w procentach, średnio z sześciu poziomów postaci:
+
+   | Gracz | 0.5.22 (dziś) | Po zmianie | Po zmianie, gdy na pytanie zawsze wybiera inną komnatę |
+   | --- | --- | --- | --- |
+   | patrzy na obwódki | 98,7; 88,6; 66; 18 | 99,3; 87,8; 65,4; 17 | – (do czerwonej komnaty i tak nie wchodzi) |
+   | wybiera rozważnie, ale nie patrzy na obwódki | 63,1; 40,2; 19,3; 3,4 | 99,4; 61,3; 26,7; 4,3 | 99,4; 89; 64,1; 14,3 |
+   | klika na ślepo | 54,7; 26,9; 7,9; 0,3 | 98,4; 45,8; 12,1; 0,3 | 98,4; 83,2; 55,4; 7,4 |
+
+   - Wyzwanie silnych graczy, powód 1253 C, zostaje: kto patrzy na obwódki, przechodzi 3. poziom w 65% dni, a Piekielny w 17%, tak jak w 0.5.22 (na poszczególnych poziomach postaci 59–71% i 13–24%). Sama postać: 3. poziom w 54,5% dni, Piekielny w 11,5% (dziś 54% i 10,5%).
+   - Kto nie patrzy na obwódki, przechodzi teraz 1. poziom prawie zawsze, ale na 2. i dalszych poziomach silne komnaty dalej go zatrzymują, jeśli wchodzi do nich mimo pytania: 3. poziom w 12–27% dni.
+   - Pytanie zmienia to tylko u tego, kto go słucha: gracz, który na nie zawsze wybiera inną komnatę, przechodzi 3. poziom w 55–64% dni, a Piekielny w 7–14%. To mniej więcej Labirynt z samą siłą na miarę drużyny (1253 A: 3. poziom w 45–57% dni u klikającego na ślepo), więc dalej nie jest „byle klikać”.
+   - Plansza 1. poziomu jest teraz prawie zawsze cała zielona (`--danger`, 50 plansz na 60., 107. i 200. poziomie: 96–98% plansz), jak przed 1253. Czerwone komnaty i wybór drogi zaczynają się od 2. poziomu: cała zielona jest tam 14–18% plansz, a na 3. poziomie 0–7%.
+4. **Testy:**
+   - `test/labyrinth.test.js`: 1. poziom bez silnych komnat, a 2., 3. i Piekielny z nimi; `strongRoom` mówi to samo co mapa; decyduje pole poziomu w danych; komnata, która byłaby silna, ma na 1. poziomie zwykłą siłę. Dotychczasowe testy silnych komnat liczą je na poziomach, które je mają, a ich siłę sprawdzają na 2. poziomie.
+   - `test/labyrinth-api.test.js`: plansza 1. poziomu nie ma silnych komnat, a plansza 2. poziomu podaje je tak jak mapa dnia.
+   - `test/labyrinth-strong-room.test.js` (nowy): pytanie tylko przy silnej komnacie; „Wybierz inną” wraca na planszę bez wejścia, a „Wejdź” wchodzi; do zwykłej komnaty bez pytania.
+   - `test/labyrinth-first-level.test.js` (nowy): gracz, który klika na ślepo, na poziomach postaci 30, 50, 80 i 110, sam i z dwoma towarzyszami (po 6 dni na klasę), przechodzi 1. poziom średnio w co najmniej 85% dni, a na każdym poziomie postaci w co najmniej 75%. Teraz 95%, a z silnymi komnatami na 1. poziomie 60%.
+   - `tools/labyrinth-sim.mjs`: nowe opcje `--companions 0|1|2`, `--stop 1` (dzień tylko do końca 1. poziomu) i `--confirm` (gracz zapytany przed silną komnatą wybiera inną, gdy może).
+5. **Pliki:** `data/labyrinth.json` (`levels[].strongRooms`, `$comment`), `data/schemas/labyrinth.schema.json`, `src/engine/labyrinth.js` (`labyrinthMap`), `src/server/labyrinth.js` (`strong` na planszy), `src/client/labyrinth.js` (pytanie i „Jak to działa?”), `data/en/strings.json`, `tools/labyrinth-sim.mjs`, testy wyżej.
+
 ## Wersja 0.4.93 (22.11.2026): soundtrack w Ustawieniach
 
 Autor: „Podepnij ten film z podpisem soundtrack tam gdzie wszystkie sociale” z linkiem do filmu na YouTube z muzyką z gry (29 minut, 10 utworów, pod każdym kraina z gry). Wiersz „Soundtrack” w Ustawieniach pod Wiki, zrobiony jak pozostałe (`social.places`, id `youtube`): znak YouTube z Simple Icons (CC0), biały na czerwonym kafelku `#FF0000`, i przycisk „Posłuchaj muzyki z gry” (po angielsku „Listen to the game's music”). Link bez dopisku `?feature=shared`, jak link Wattpada bez znaczników udostępniania. Schemat przyjmuje dla niego tylko `https://youtu.be/…` i `https://(www.)youtube.com/…`. Sprawdzone w przeglądarce na 320 px i 1366 px.

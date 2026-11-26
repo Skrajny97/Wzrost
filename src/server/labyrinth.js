@@ -139,7 +139,8 @@ const REWARDING = ['fight', 'elite', 'treasure', 'guardian'];
 
 // The Labirynt for its page: the day and the levels (cleared, open), the
 // level's map with the party's position, the creatures of every room, the
-// danger of the fights still ahead (899 A), the Odłamki of the elites and
+// danger of the fights still ahead (899 A), the strong rooms (the page asks
+// before one is entered), the Odłamki of the elites and
 // treasures and the rooms before the place of the defeat, which give
 // nothing (`spent`), the rooms it may enter, the fighters with their HP,
 // the blessings taken, a choice waiting (with the merchant's prices), the
@@ -196,6 +197,9 @@ function labyrinthView(player, state, now, waiting = 0) {
         danger: dangerOf(row, index, room.type),
         shards: spentOf(row, room.type) ? null : (level.shards?.[room.type] ?? null),
         spent: spentOf(row, room.type),
+        // A strong room (strongRooms): the page asks before the party
+        // goes in (26.11.2026).
+        strong: Boolean(room.strong),
       })),
     ),
     row: state.row,
