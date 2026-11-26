@@ -1154,6 +1154,156 @@
         "seconds": 1.3,
         "influence": 0.7
       },
+      "skill-devastation": {
+        "text": "an epic cinematic rampage like lava through a forest: a furious roar, then three massive heavy axe impacts crunching through armour, each with a roaring burst of fire, the last one a huge deep booming hit with crackling flames, punchy and clean, no hiss, no music",
+        "seconds": 2.0,
+        "influence": 0.7
+      },
+      "skill-last-frenzy": {
+        "text": "a berserker going into a last bloody frenzy: a deep heavy heartbeat, a savage furious roar, then a roaring burst of fire and a massive punchy impact, epic and cinematic, clean, no hiss, no music",
+        "seconds": 1.8,
+        "influence": 0.7
+      },
+      "skill-gods-hurricane": {
+        "text": "a divine sword whirling three times in a blazing spin: three powerful ringing steel slashes, each with a bright golden impact, then a heavenly choir chord and a huge crowd roaring, epic and cinematic, clean, no whistle, no hiss, no music",
+        "seconds": 2.0,
+        "influence": 0.7
+      },
+      "skill-triumph": {
+        "text": "a champion raising a sword to the sky: a bright ringing metallic sword shing, a huge thunderclap answering from the sky and a mighty crowd cheering in triumph, epic and cinematic, clean, no hiss, no music",
+        "seconds": 2.0,
+        "influence": 0.7
+      },
+      "skill-earth-wrath": {
+        "text": "a colossal shield slammed into the ground: a massive booming impact, the whole earth splitting open with a loud sharp cracking roar, rock slabs breaking and crashing down, epic and cinematic, punchy and clean, no hiss, no music",
+        "seconds": 2.0,
+        "influence": 0.7
+      },
+      "skill-stronghold": {
+        "text": "a huge shield planted in the ground like a fortress wall: a heavy metallic clang, a solid thud of earth and a bright resonant hum of a magic barrier rising, epic, clean, no hiss, no music",
+        "seconds": 1.6,
+        "influence": 0.7
+      },
+      "skill-comet": {
+        "text": "a blazing comet crashing down from the sky: a roaring fiery rush as it streaks down, then a huge explosive impact tearing through several targets in a row with bursts of fire and crackling flames, loud, epic and powerful, cinematic, clean, no guitar, no strings, no twang, no plucked sound, no music",
+        "seconds": 1.8,
+        "influence": 0.7
+      },
+      "skill-constellation": {
+        "text": "a constellation lighting up in the night sky: bright crystal chimes ringing one after another like stars igniting, then a rapid volley of magical arrows hitting with crisp impacts, epic, clean, no guitar, no strings, no twang, no plucked sound, no music",
+        "seconds": 2.0,
+        "influence": 0.7
+      },
+      "skill-perun-arrows": {
+        "text": "the thunder god's lightning arrows: a deafening thunderclap, then several sharp lightning bolts striking one target after another with loud electric cracks and crackling sparks, epic, cinematic, powerful, clean, no hiss, no music",
+        "seconds": 2.0,
+        "influence": 0.7
+      },
+      "skill-storm-eye": {
+        "text": "standing in the eye of a storm: rolling thunder and crackling lightning all around, then a sudden calm and one deep clear resonant tone, epic and cinematic, clean, no wind, no whistle, no hiss, no music",
+        "seconds": 2.0,
+        "influence": 0.7
+      },
+      "skill-white-pack": {
+        "text": "a whole pack of great wolves: several powerful wolf howls together in a mighty chorus, then fast running paws, fierce snarling growls and several heavy bites, wild and epic, natural animal sounds, clean, no music",
+        "seconds": 2.2,
+        "influence": 0.7
+      },
+      "skill-aurochs-call": {
+        "text": "a huge ancient aurochs bull: a deep powerful bellowing low, heavy hooves stamping on wet ground and a loud snort as it lowers its horns, wild and epic, natural animal sounds, clean, no music",
+        "seconds": 2.0,
+        "influence": 0.7
+      },
+      "skill-world-genesis": {
+        "text": "the birth of a new world: a huge cosmic explosion, then fire roaring, ice shattering, lightning cracking and rocks crashing all at once, with a bright heavenly choir chord at the end, epic and cinematic, clean, no hiss, no music",
+        "seconds": 2.2,
+        "influence": 0.7
+      },
+      "skill-sunbirth": {
+        "text": "a new sun igniting in the sky: a rising bright choir swell, then a huge blazing burst of fire with a powerful explosive impact and crackling flames, epic and cinematic, clean, no hiss, no music",
+        "seconds": 2.0,
+        "influence": 0.7
+      },
+      "skill-great-frost": {
+        "text": "three enemies locked in ice at once: fast loud crackling and creaking ice growing, then three hard crystalline crunches ringing like breaking glass and a heavy icy impact, epic, clean, no wind, no hiss, no music",
+        "seconds": 2.0,
+        "influence": 0.7
+      },
+      "skill-winter-cloak": {
+        "text": "a cloak of snow and frost wrapping the party: soft crunching snow, a bright glassy freezing crackle and a gentle ringing icy chime, magical, clean, no wind, no hiss, no music",
+        "seconds": 1.8,
+        "influence": 0.7
+      },
+      "skill-eternal-grove": {
+        "text": "two ancient giant oaks rising from the ground: roots tearing out of the earth, loud deep creaking and groaning wood, branches cracking, then a warm magical healing chime, epic, clean, no wind, no hiss, no music",
+        "seconds": 2.2,
+        "influence": 0.7
+      },
+      "skill-eternal-herd": {
+        "text": "a herd of great forest beasts charging: heavy hooves thundering, a bison bellowing, a bear roaring and a moose calling, then a heavy ramming impact, wild and epic, natural animal sounds, clean, no music",
+        "seconds": 2.2,
+        "influence": 0.7
+      },
+      "skill-six-wings": {
+        "text": "six wings of holy fire spreading wide: a powerful beating of great wings, a roaring burst of holy fire and a bright heavenly choir chord, epic and cinematic, clean, no hiss, no music",
+        "seconds": 2.0,
+        "influence": 0.7
+      },
+      "skill-breath-of-life": {
+        "text": "a warm breath of life healing the party: a warm swelling heavenly choir chord rising, clear crystal chimes and a soft glowing magical pulse, gentle and pure, clean, no hiss, no wind, no music",
+        "seconds": 2.0,
+        "influence": 0.7
+      },
+      "skill-fiery-sword": {
+        "text": "a sword of white fire falling from heaven: a deep heavenly bell toll, a roaring blast of holy fire striking down with a massive cinematic impact, then two more fiery strikes in a chain, epic, apocalyptic, clean, no hiss, no music",
+        "seconds": 2.2,
+        "influence": 0.7
+      },
+      "skill-heavenly-host": {
+        "text": "heaven opening and shining knights coming down: a bright heavenly choir swell, armoured knights landing with heavy metallic clanks and swords drawn with a ringing shing, epic and cinematic, clean, no hiss, no music",
+        "seconds": 2.2,
+        "influence": 0.7
+      },
+      "skill-destiny": {
+        "text": "destiny rewritten: a deep resonant clock toll, a heavy ancient book page turning, a powerful reversed magical swell and a bright resonant chime, mystical and epic, clean, no hiss, no music",
+        "seconds": 2.0,
+        "influence": 0.7
+      },
+      "skill-book-of-fate": {
+        "text": "a book of fate opening: a heavy leather book cover thudding open, pages turning fast in a magical whirl and a clear mystical crystal chime, magical, clean, no hiss, no music",
+        "seconds": 1.8,
+        "influence": 0.7
+      },
+      "skill-last-harvest": {
+        "text": "a reaper's last great scythe swing: a loud deep metallic ring, a huge brutal slicing impact, then a cold choir of ghostly voices rising, dark and epic, clean, no whistle, no hiss, no music",
+        "seconds": 2.0,
+        "influence": 0.7
+      },
+      "skill-soul-lament": {
+        "text": "gathered souls screaming at once: a powerful rising chorus of ghostly wailing voices exploding into a massive magical shockwave boom, dark and epic, cinematic, clean, no whistle, no hiss, no music",
+        "seconds": 2.0,
+        "influence": 0.7
+      },
+      "skill-eternal-legion": {
+        "text": "an undying legion rising again: the ground cracking open, many skeleton knights rising with rattling bones and heavy clanking armour, swords drawn with a ringing shing and a dark powerful war horn, loud and clear, dark and epic, no music",
+        "seconds": 2.5,
+        "influence": 0.7
+      },
+      "skill-pestilence": {
+        "text": "a deadly plague spreading: a thick poisonous cloud bursting open with a wet heavy impact, thick bubbling and a dark ominous swell, dark fantasy, clean, no hiss, no whispers, no music",
+        "seconds": 1.8,
+        "influence": 0.7
+      },
+      "skill-thousand-shadows": {
+        "text": "a thousand shadow blades striking at once: a deep dark magical boom, then a rapid flurry of many sharp blade slashes and stab impacts all around, punchy and epic, cinematic, clean, no whoosh, no hiss, no music",
+        "seconds": 2.0,
+        "influence": 0.7
+      },
+      "skill-starless-night": {
+        "text": "every star going out: a dark resonant gong swallowing all sound, a cold ominous swell and a single soft fading chime in the darkness, dark fantasy, cinematic, clean, no hiss, no wind, no music",
+        "seconds": 2.0,
+        "influence": 0.7
+      },
       "potion": {
         "text": "a person drinks from a small glass bottle: two big gulps, the sound of liquid swallowed in the throat, close up, realistic foley, no music",
         "seconds": 1.5,
