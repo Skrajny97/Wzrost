@@ -24,6 +24,7 @@ import { portalFightButtons } from './portals.js';
 import { cropsReport, dishesReport, fishReport, herbsReport, itemsReport, jewelsReport, mineralsReport, potionsReport } from './professions.js';
 import { cultivationReport } from '../cultivation.js';
 import { partyGated } from '../party-gate.js';
+import { keptSupplies } from '../hunt-supplies.js';
 
 // "skóra wilka ×2, rzadkie pióro kruka": what beaten creatures left.
 const materialsText = (materials) => materials.map((material) => (material.count > 1 ? `${material.label} ×${material.count}` : material.label)).join(', ');
@@ -814,6 +815,12 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
               seekRare: seekRareOn(),
               trackQuests: trackQuestsOn(),
               trackUnknown: trackUnknownOn(),
+              // The potions and the meal of "Opcje wyprawy" as this browser
+              // keeps them, as "Wyrusz" sends them, alone and with the
+              // Drużyna, whose members eat and take their own (gracz (poz.
+              // 202), 26.11.2026: „Jak jesteś liderem drużyny i klikasz
+              // powtórz wyprawę, to nie dodaje z automatu jedzenia”).
+              ...keptSupplies(state.character, report.minutes),
               // The Trudna or the Piekielna as the boxes are kept, with the
               // Drużyna too (parties.js).
               ...(character.hardHunt && hardHuntOn() && { hard: true }),

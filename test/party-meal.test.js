@@ -185,6 +185,29 @@ describe('a member\'s meal for the party\'s trips (API)', () => {
     assert.equal(await meal('Lider'), null);
   });
 
+  // The dish of the leader's "Opcje wyprawy", sent by "Wyrusz" and, since
+  // 26.11.2026, by "Wyrusz ponownie z drużyną" alike (screens/report.js,
+  // hunt-supplies.js; gracz (poz. 202): „Jak jesteś liderem drużyny i
+  // klikasz powtórz wyprawę, to nie dodaje z automatu jedzenia”).
+  test("the leader's dish sent with the trip is eaten from its own Spiżarnia on the same trip as a member's Autouzupełnianie, and each report tells its meal", async () => {
+    await (await sql(`UPDATE characters SET pantry = '{"zurek":5,"pea-soup":1}' WHERE name = 'Druh'`)).run();
+    assert.equal((await as('druh', 'PUT', '/api/party/meal', { dish: 'zurek', auto: true, portions: 1 })).status, 200);
+    const went = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 30, meal: 'pea-soup', mealPortions: 1, mealReplaces: null });
+    assert.equal(went.status, 201, JSON.stringify(went.data).slice(0, 300));
+    assert.deepEqual(went.data.went, ['Druh']);
+    assert.deepEqual(await pantry('Lider'), { zurek: 2, 'pea-soup': 0 });
+    assert.deepEqual(await meal('Lider'), { dish: 'pea-soup', left: content.cooking.meal.minutes - 30, portions: 1 });
+    assert.deepEqual((await trip('Lider')).mealBack, { before: null, eaten: 'pea-soup', count: 1 });
+    assert.deepEqual(await pantry('Druh'), { zurek: 4, 'pea-soup': 1 });
+    assert.deepEqual(await meal('Druh'), { dish: 'zurek', left: content.cooking.meal.minutes - 30, portions: 1 });
+    await (await sql('UPDATE activities SET started_at = started_at - 1800000, ends_at = ends_at - 1800000')).run();
+    const leader = await as('lider', 'POST', '/api/hunts/claim');
+    assert.equal(leader.status, 200, JSON.stringify(leader.data).slice(0, 300));
+    assert.ok(leader.data.report.system.some((line) => line.startsWith('Posiłek (Grochówka)')), JSON.stringify(leader.data.report.system));
+    const member = (await as('druh', 'POST', '/api/hunts/claim')).data.report;
+    assert.ok(member.system.some((line) => line.startsWith('Posiłek (Żurek)')), JSON.stringify(member.system));
+  });
+
   test('the choice checked: a dish of the game, the box a yes or no, the box only with a dish, and 1 to 3 portions', async () => {
     const wrong = async (body, code) => {
       const answer = await as('druh', 'PUT', '/api/party/meal', body);
