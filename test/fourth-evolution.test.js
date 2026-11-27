@@ -193,11 +193,13 @@ describe('the fourth evolution in the engine', () => {
     assert.deepEqual(view.evolution, { level: 400, need: 'skill_points' });
     // At the level the 290 points bring it to at once (145 each), a grown
     // skill strikes, heals and calls at least as strongly as its root at the
-    // top level (a summon's HP counted for all it calls at once, and a
-    // pack's blows too: Gaj wieków's two oaks, each weaker than the
-    // Arcydruid's one, 21.11.2026). The Pradruid's Pradawne stado grows Zew
-    // zwierząt too, with weaker beasts: four summons at once keep the
-    // Pradruid in the Arena's band (1221 A).
+    // top level (a summon's HP and blows counted for all it calls at once,
+    // as the fifth forms' test counts them: Gaj wieków's two oaks, each
+    // weaker than the Arcydruid's one, 21.11.2026; Legion Nawii's two
+    // knights, each weaker than the Licz's one since its Armia umarłych
+    // struck half as hard again, 1277 A). The Pradruid's Pradawne stado
+    // grows Zew zwierząt too, with weaker beasts: four summons at once keep
+    // the Pradruid in the Arena's band (1221 A).
     for (const form of fourths) {
       const grown = content.skillsById[form.skills[0]];
       const root = skillParams(content.skillsById[grown.from], 145, content);
@@ -205,7 +207,7 @@ describe('the fourth evolution in the engine', () => {
       const called = now.pack?.length ?? Math.round(now.count ?? 1);
       for (const key of ['power', 'single', 'heal', 'hp']) {
         if (typeof root[key] !== 'number') continue;
-        const counted = key === 'hp' || (key === 'power' && now.pack) ? now[key] * called : now[key];
+        const counted = key === 'hp' || (key === 'power' && grown.kind === 'summon') ? now[key] * called : now[key];
         assert.ok(counted >= root[key] - 1e-9, `${grown.id} ${key}: ${counted} vs ${grown.from} ${root[key]}`);
       }
     }

@@ -361,8 +361,10 @@ describe('the Druid line in duels', () => {
     // Wielki Inkwizytor's, the Arcymag's). Enough kills to tell the fastest:
     // since 1271 B (no strength of its own in duels, until then ×1.35 on its
     // summons' blows) the Druid with all its points in Intelekt or in
-    // Mądrość kills 21–47 times in 192 duels (31–62 before), its biggest
-    // blow 0.19–0.24 of the rival's HP, its fastest kill in 4–7 moves.
+    // Mądrość kills 21–47 times in 192 duels (31–62 before), and since
+    // 1277 A, with a stronger Nekromanta among its rivals, 18–41 times; its
+    // biggest blow 0.19–0.24 of the rival's HP, its fastest kill in 4–7
+    // moves, as before.
     const builds = { realistic: null, intellect: { intellect: 1 }, wisdom: { wisdom: 1 } };
     // A draw of the realistic player with all its points in the stats of
     // `split` (shares).
@@ -402,7 +404,7 @@ describe('the Druid line in duels', () => {
           }
         }
         const told = `level ${level}, ${build}`;
-        assert.ok(kills >= 20, `${told}: ${kills} kills`);
+        assert.ok(kills >= 15, `${told}: ${kills} kills`);
         assert.ok(biggest < 1 / 3, `${told}: a blow of ${biggest.toFixed(2)} of the rival's HP`);
         assert.ok(fastest >= 4, `${told}: a kill in ${fastest} moves`);
       }
