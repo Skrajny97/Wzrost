@@ -1845,6 +1845,11 @@
       "id": "0.5.34",
       "title": "Wersja 0.5.34",
       "body": "- Po angielsku rozbiórka przedmiotów to teraz „Disassemble”, a Stół rozbiórki to „Disassembly Table”. Raport wyprawy podaje nazwę poszukiwanego w języku gry, także gdy wyprawa wyruszyła w innym. Po angielsku jest też „is cooking” przy gotowaniu."
+    },
+    {
+      "id": "0.5.35",
+      "title": "Wersja 0.5.35",
+      "body": "- Biały wilk z Białej watahy Boga Łowów i Odwieczny dąb Ojca Puszczy mają w walce własny wygląd: śnieżnobiałego wilka i prastary, świecący dąb.\n- Po angielsku narrator mówi już „Disassembly Table” zamiast „Salvage Table”."
     }
   ]
 }
