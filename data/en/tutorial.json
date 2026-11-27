@@ -341,7 +341,7 @@
     },
     "camp-craft-table": {
       "text": [
-        "At the Salvage Table you will turn creature materials into parts. You can also take apart the items you do not need there. The parts will come in handy once you learn the professions."
+        "At the Disassembly Table you will turn creature materials into parts. You can also disassemble the items you do not need there. The parts will come in handy once you learn the professions."
       ],
       "voice": "audio/narration/en/camp-craft-table.mp3"
     },
@@ -788,13 +788,13 @@
     },
     "crafting-patterns": {
       "text": [
-        "Here you will make weapons and armour from patterns. You will get the parts for them at the Salvage Table, or buy them from the scrap dealer."
+        "Here you will make weapons and armour from patterns. You will get the parts for them at the Disassembly Table, or buy them from the scrap dealer."
       ],
       "voice": "audio/narration/en/crafting-patterns.mp3"
     },
     "crafting-ending": {
       "text": [
-        "Each new level of Crafting will reveal more patterns to you. Look in here too when you salvage an item you have never taken apart before."
+        "Each new level of Crafting will reveal more patterns to you. Look in here too when you disassemble an item you have never disassembled before."
       ],
       "voice": "audio/narration/en/crafting-ending.mp3"
     },

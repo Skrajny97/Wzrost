@@ -1468,6 +1468,10 @@
     "0.5.33": {
       "title": "Version 0.5.33",
       "body": "- The fifth evolution: from class level 400 each fourth form can grow into its fifth.\n- Every fifth form has two new skills and a new look, walk and riding.\n- New summons, among them the Sword of Heaven's Shining knights, the God of the Hunt's aurochs and the elk in the Father of the Wilds' herd."
+    },
+    "0.5.34": {
+      "title": "Version 0.5.34",
+      "body": "- In English, taking items apart is now \"Disassemble\", and the Salvage Table is the \"Disassembly Table\". An exploration's report names the wanted target in the game's language, also when the exploration set out in another one. Cooking now reads \"is cooking\" in English too."
     }
   }
 }

@@ -45,7 +45,7 @@ import { classUnlockMessages, unlockMessages } from './unlocks.js';
 import { classNameOf } from './evolutions.js';
 import { evolutionBlock, skillPoints } from './skills.js';
 import { companionCombatant, gendered, trackerMaterials } from './companions.js';
-import { wantedEncounter, wantedLootRarity, wantedOf, wantedStrength } from './wanted.js';
+import { wantedEncounter, wantedLootRarity, wantedName, wantedOf, wantedStrength } from './wanted.js';
 import { omenLines, raisedOutcome, weekChance, weekFactor, weekFighter, weekLine } from './weeks.js';
 import { seatLine } from './guild-seat.js';
 import { bannerLine } from './guild-lands.js';
@@ -973,10 +973,13 @@ export function simulateHunt(
   // (tripWanted), drawn from the trip's seed, so it comes in the same fight
   // of every member's report; a member whose poster it is not (`own` false)
   // fights it as a strong foe, paid as its fight is, with no trophy, no
-  // spoils and no poster fulfilled.
+  // spoils and no poster fulfilled. Its name is the data's in the content's
+  // language (wantedName), not the one kept as the exploration set out, so
+  // a report claimed in English names it in English even when the
+  // exploration began in Polish (a player's report, 27.11.2026).
   // Read only where `sought` is, which needs both.
   const rules = /** @type {Record<string, any>} */ (wantedOf(content));
-  const sought = rules && wanted && wanted.areaId === area.id && !first ? wanted : null;
+  const sought = rules && wanted && wanted.areaId === area.id && !first ? { ...wanted, name: wantedName(wanted, content) } : null;
   const own = Boolean(sought) && sought.own !== false;
   const wantedRng = /** @type {Rng} */ (sought ? createRng(`${seed}:wanted`) : null);
   const sighting = { met: false, beaten: false };

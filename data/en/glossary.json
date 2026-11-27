@@ -267,8 +267,18 @@
         },
         {
           "pl": "Stół rozbiórki",
-          "en": "Salvage Table",
-          "note": "rozbiórka na części to w grach „salvage”"
+          "en": "Disassembly Table",
+          "note": "rozbiórka na części to „disassembly” (gracz, 27.11.2026; wcześniej „Salvage Table”)"
+        },
+        {
+          "pl": "Rozbierz",
+          "en": "Disassemble",
+          "note": "przycisk rozbiórki przedmiotu na części; „rozebrać” to „disassemble”, nie „salvage” (gracz, 27.11.2026)"
+        },
+        {
+          "pl": "rozbiórka",
+          "en": "disassembly",
+          "note": "rozbiórka przedmiotu na Stole rozbiórki (gracz, 27.11.2026)"
         },
         {
           "pl": "Kwatery",

@@ -153,7 +153,7 @@
       "Trophy won: +{percent}% damage against {monster}."
     ],
     "partTable": [
-      "Salvage Table: from materials and items of the same rarity."
+      "Disassembly Table: from materials and items of the same rarity."
     ],
     "partExchange": [
       "Part exchange in the Workshop: {rate} × {part} for one."
