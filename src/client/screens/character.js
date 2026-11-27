@@ -2340,7 +2340,7 @@ const bareTitle = (title) => [title, ' ', h('span', { class: 'compare-bare-mark'
 
 // `tier`: its Tier too, after its level (the Targowisko's lists, the author:
 // „Na targowisku nie widać tierów przedmiotów a musi być”).
-export function itemSummary(item, { stats = false, tier = false } = {}) {
+export function itemSummary(item, { stats = false, tier = false, art: withArt = true } = {}) {
   const text = h(
     'span',
     { class: 'item-summary' },
@@ -2355,7 +2355,9 @@ export function itemSummary(item, { stats = false, tier = false } = {}) {
     // With `stats`, its numbers in one line too, to tell items of one name apart.
     stats && item.properties?.length > 0 && h('span', { class: 'item-stats', text: item.properties.join(' · ') }),
   );
-  const art = itemSprite(item);
+  // Without `art` the words alone, for a row that shows the picture apart
+  // (the Skrzynia Konta's "Wyjmij zaznaczone", chest.js).
+  const art = withArt && itemSprite(item);
   return art ? h('span', { class: 'item-summary-art' }, art, text) : text;
 }
 

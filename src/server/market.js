@@ -900,13 +900,16 @@ export function takenOff(column, taken) {
   };
 }
 
+// The kinds of goods whose pieces got from others foreign_stacks keeps.
+export const FOREIGN_KINDS = ['herb', 'potion', 'material', 'part', 'mineral'];
+
 // The goods got from other players count as a trade's for the Encyklopedia
 // (ownDiscoveries in the engine), as those of the Wymiana do: the parts too,
 // which it has a tab of (the code review, 12.11.2026: a part bought from
 // another player was a discovery).
 export function foreign(adds) {
   const keyed = {};
-  for (const kind of ['herb', 'potion', 'material', 'part', 'mineral']) for (const [key, count] of Object.entries(adds[kind] ?? {})) keyed[`${kind}:${key}`] = count;
+  for (const kind of FOREIGN_KINDS) for (const [key, count] of Object.entries(adds[kind] ?? {})) keyed[`${kind}:${key}`] = count;
   return counted('foreign_stacks', keyed);
 }
 

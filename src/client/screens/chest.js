@@ -28,16 +28,21 @@
 // sheet that asks how much: a field, the quick amounts and "Wszystko". Its
 // words and quick amounts come from the data (camp.json chest.gold), with
 // the chest's answer.
+//
+// And many things at once (a player's idea the author passed on, 27.11.2026:
+// taking things out one by one is tedious): "Wyjmij wszystko" and "Wyjmij
+// zaznaczone" over each tab's list (see takeButtons).
 
-import { goldArt, herbSprite, materialSprite, mineralSprite, pantrySprite, potionSprite, resourceArt, scrollArt } from '../art.js';
+import { goldArt, herbSprite, itemSprite, materialSprite, mineralSprite, pantrySprite, potionSprite, resourceArt, scrollArt } from '../art.js';
 import { cardAtLevel, cardFace, cardThumb } from '../cards.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
 import { t } from '../i18n.js';
+import { itemIcon } from '../icons.js';
 import { call, state, walletEntries } from '../state.js';
 import { closeSheet, openSheet, systemPanel, toast, withButton } from '../ui.js';
-import { bagSortRow, itemSheet, itemSummary, levelLocked, materialTitle, sortBag } from './character.js';
+import { bagSortRow, itemSheet, itemSummary, itemTitle, levelLocked, materialTitle, sortBag } from './character.js';
 
 // The tab open last, kept while the game is open.
 let openTab = 'items';
@@ -127,6 +132,11 @@ function ownGoods(character) {
 // `onBack` leads back to the camp's board.
 export function mountChest(container, onBack) {
   let chest = null;
+  // "Wyjmij zaznaczone" (takeButtons): the tab whose list is being marked
+  // and the marks (an item's id, a good's "kind:id"), null outside it; and
+  // the bar's sum, redrawn on each mark.
+  let marking = null;
+  let updateBar = () => {};
 
   async function load() {
     try {
@@ -201,6 +211,7 @@ export function mountChest(container, onBack) {
 
   function itemsTab(character) {
     const room = chest.slots - chest.items.length;
+    const picking = marking?.tab === 'items';
     return [
       h(
         'section',
@@ -209,50 +220,62 @@ export function mountChest(container, onBack) {
         h('div', { class: 'chest-head' }, h('span', { class: 'chest-art' }, materialSprite('chest')), h('h2', { class: 'section-title', text: t('W skrzyni · {count} / {slots}', { count: chest.items.length, slots: chest.slots }) })),
         chest.items.length === 0
           ? h('p', { class: 'muted', text: t('Skrzynia jest pusta. Włóż do niej przedmiot z plecaka.') })
-          : h(
-              'ul',
-              { class: 'chest-list' },
-              chest.items.map((item) =>
-                h(
-                  'li',
-                  { class: 'chest-row' },
-                  h('span', { class: 'chest-item' }, itemSummary(item), h('span', { class: 'chest-note', text: note(item, character) })),
-                  h('button', {
-                    type: 'button',
-                    class: 'button button--system button--small',
-                    text: t('Wyjmij'),
-                    onClick: act('/api/chest/take', { id: item.id }, t('{name}: w plecaku.', { name: item.name })),
-                  }),
+          : [
+              picking ? h('p', { class: 'bag-note', text: t('Wybierz przedmioty do wyjęcia. Ponowny wybór odznacza przedmiot.') }) : takeButtons('items'),
+              h(
+                'ul',
+                { class: 'chest-list' },
+                chest.items.map((item) =>
+                  picking
+                    ? pickRow(item.id, {
+                        art: itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
+                        color: item.color,
+                        label: [itemTitle(item), item.rarityName, item.slotName, t('poziom {level}', { level: item.level })].join(', '),
+                        words: h('span', { class: 'chest-item' }, itemSummary(item, { art: false }), h('span', { class: 'chest-note', text: note(item, character) })),
+                      })
+                    : h(
+                        'li',
+                        { class: 'chest-row' },
+                        h('span', { class: 'chest-item' }, itemSummary(item), h('span', { class: 'chest-note', text: note(item, character) })),
+                        h('button', {
+                          type: 'button',
+                          class: 'button button--system button--small',
+                          text: t('Wyjmij'),
+                          onClick: act('/api/chest/take', { id: item.id }, t('{name}: w plecaku.', { name: item.name })),
+                        }),
+                      ),
                 ),
               ),
-            ),
+            ],
       ),
-      h(
-        'section',
-        { class: 'card chest-section', 'aria-label': t('Plecak') },
-        h('h2', { class: 'section-title', text: t('Plecak · {items}', { items: countOf(character.bag.length, 'przedmiot', 'przedmioty', 'przedmiotów') }) }),
-        character.bag.length > 1 && bagSortRow('items', render),
-        character.bag.length === 0
-          ? h('p', { class: 'muted', text: t('W plecaku nie ma przedmiotów.') })
-          : h(
-              'ul',
-              { class: 'chest-list' },
-              sortBag('items', character.bag).map((item) =>
-                h(
-                  'li',
-                  { class: 'chest-row' },
-                  h('button', { type: 'button', class: 'chest-item chest-item--bag', onClick: () => itemSheet(item, { equipped: false }) }, itemSummary(item)),
-                  h('button', {
-                    type: 'button',
-                    class: 'button button--world button--small',
-                    disabled: room <= 0,
-                    text: t('Włóż'),
-                    onClick: act('/api/chest/put', { itemId: item.id }, t('{name}: w Skrzyni Konta.', { name: item.name })),
-                  }),
+      picking
+        ? markBar(chest.items, (item) => item.id, (ids) => ({ items: ids }))
+        : h(
+            'section',
+            { class: 'card chest-section', 'aria-label': t('Plecak') },
+            h('h2', { class: 'section-title', text: t('Plecak · {items}', { items: countOf(character.bag.length, 'przedmiot', 'przedmioty', 'przedmiotów') }) }),
+            character.bag.length > 1 && bagSortRow('items', render),
+            character.bag.length === 0
+              ? h('p', { class: 'muted', text: t('W plecaku nie ma przedmiotów.') })
+              : h(
+                  'ul',
+                  { class: 'chest-list' },
+                  sortBag('items', character.bag).map((item) =>
+                    h(
+                      'li',
+                      { class: 'chest-row' },
+                      h('button', { type: 'button', class: 'chest-item chest-item--bag', onClick: () => itemSheet(item, { equipped: false }) }, itemSummary(item)),
+                      h('button', {
+                        type: 'button',
+                        class: 'button button--world button--small',
+                        disabled: room <= 0,
+                        text: t('Włóż'),
+                        onClick: act('/api/chest/put', { itemId: item.id }, t('{name}: w Skrzyni Konta.', { name: item.name })),
+                      }),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-      ),
+          ),
     ];
   }
 
@@ -270,6 +293,114 @@ export function mountChest(container, onBack) {
       ),
       button,
     );
+
+  // Under a good in the chest: whose pieces they are; under a card, also the
+  // level the character has it at (cardNote).
+  const goodNote = (good) =>
+    isCard(good) ? cardNote(good) : good.own >= good.count ? t('Twoje') : good.own > 0 ? t('Twoje: {count} szt.', { count: formatNumber(good.own) }) : t('Od innych postaci');
+
+  // --- Many things at once ------------------------------------------------
+  //
+  // "Wyjmij wszystko" and "Wyjmij zaznaczone" (a player's idea the author
+  // passed on, 27.11.2026: taking things out one by one is tedious;
+  // DECISIONS.md, "Skrzynia konta: wyjmij wszystko i zaznaczone
+  // (27.11.2026)") over a tab's list. "Wyjmij wszystko" takes out all of
+  // it, the goods whole. "Wyjmij zaznaczone" turns the list into the bag's
+  // "Zaznacz do sprzedaży" (character.js): each thing in the bag's tile,
+  // which a tap marks with the frame, the glow and the tick of "Rozbierz
+  // kilka", and the bar at the bottom of the screen with how many are
+  // marked, "Anuluj" and the take-out. One request either way
+  // (takeManyFromChest on the server): what fits in the bag comes out, in
+  // the chest's order, and the message says how many of how many.
+
+  const goodKey = (good) => `${good.kind}:${good.id}`;
+
+  const takeButtons = (tab) =>
+    h(
+      'div',
+      { class: 'bag-actions' },
+      h('button', { type: 'button', class: 'button button--system button--small', 'data-chest-take': 'all', text: t('Wyjmij wszystko'), onClick: (event) => takeMany(event.currentTarget, { all: tab }) }),
+      h('button', {
+        type: 'button',
+        class: 'button button--system button--small',
+        'data-chest-take': 'pick',
+        text: t('Wyjmij zaznaczone'),
+        onClick: () => {
+          marking = { tab, marked: new Set() };
+          render();
+        },
+      }),
+    );
+
+  // A thing of the list to mark (`key`): its picture in the bag's tile,
+  // which holds the mark, as in "Rozbierz kilka", and its words beside it,
+  // a tap on which marks it too.
+  function pickRow(key, { art, color = null, label, words }) {
+    const tile = h(
+      'button',
+      {
+        type: 'button',
+        class: 'slot slot--bag salvage-pick',
+        vars: color ? { '--rarity': color } : {},
+        'aria-pressed': String(marking.marked.has(key)),
+        'aria-label': label,
+        onClick: () => {
+          if (marking.marked.has(key)) marking.marked.delete(key);
+          else marking.marked.add(key);
+          tile.setAttribute('aria-pressed', String(marking.marked.has(key)));
+          updateBar();
+        },
+      },
+      art,
+      h('span', { class: 'salvage-check', 'aria-hidden': 'true' }, icon('check', { size: 14 })),
+    );
+    return h('li', { class: 'chest-row chest-row--pick' }, tile, h('span', { class: 'chest-pick-words', onClick: () => tile.click() }, words));
+  }
+
+  // The bar at the bottom of the screen while marking, as the bag's sale
+  // bar: how many of `things` are marked, "Anuluj" and "Wyjmij zaznaczone"
+  // with their number, which sends `request` of their keys.
+  function markBar(things, keyOf, request) {
+    const marked = () => things.map(keyOf).filter((key) => marking.marked.has(key));
+    const sum = h('p', { class: 'sale-bar-sum', role: 'status' });
+    const go = h('button', { type: 'button', class: 'button button--system', 'data-chest-take': 'marked', onClick: (event) => takeMany(event.currentTarget, request(marked())) });
+    updateBar = () => {
+      const count = marked().length;
+      sum.textContent = count > 0 ? t('Zaznaczone: {count}', { count: formatNumber(count) }) : t('Nic jeszcze nie zaznaczono.');
+      go.textContent = count > 0 ? t('Wyjmij zaznaczone ({count})', { count: formatNumber(count) }) : t('Wyjmij zaznaczone');
+      go.disabled = count === 0;
+    };
+    updateBar();
+    const cancel = () => {
+      marking = null;
+      render();
+    };
+    return h('div', { class: 'sale-bar' }, h('div', { class: 'sale-bar-head' }, sum, h('button', { type: 'button', class: 'button button--world button--small', text: t('Anuluj'), onClick: cancel })), go);
+  }
+
+  // Many things out in one request (`body`: { all } of a tab, or { items }
+  // or { goods } marked); the message says how many came out, and of how
+  // many when the bag had no room for some. A chest changed meanwhile
+  // (409) is read again, with the marks of what is still in it.
+  function takeMany(button, body) {
+    const items = (body.all ?? (body.items ? 'items' : 'goods')) === 'items';
+    return withButton(button, async () => {
+      let taken;
+      try {
+        ({ chest, taken } = await call('POST', '/api/chest/take-many', body));
+      } catch (error) {
+        if (error.status === 409) await load();
+        throw error;
+      }
+      marking = null;
+      toast(
+        taken.count < taken.of
+          ? t('Wyjęto {count} z {all}. Reszta została w Skrzyni, bo w plecaku zabrakło miejsca.', { count: formatNumber(taken.count), all: formatNumber(taken.of) })
+          : t('Wyjęto {what}.', { what: items ? countOf(taken.count, 'przedmiot', 'przedmioty', 'przedmiotów') : countOf(taken.count, 'towar', 'towary', 'towarów') }),
+      );
+      render();
+    });
+  }
 
   // "Sortuj:" over the character's own goods, in the look of the bag's.
   const goodSortRow = () =>
@@ -305,6 +436,7 @@ export function mountChest(container, onBack) {
 
   function goodsTab(character) {
     const own = ownGoods(character);
+    const picking = marking?.tab === 'goods';
     return [
       h(
         'section',
@@ -312,37 +444,49 @@ export function mountChest(container, onBack) {
         h('div', { class: 'chest-head' }, h('span', { class: 'chest-art' }, materialSprite('chest')), h('h2', { class: 'section-title', text: t('W skrzyni') })),
         chest.goods.length === 0
           ? h('p', { class: 'muted', text: t('W skrzyni nie ma towarów. Włóż je niżej: mikstury, zioła, materiały, minerały albo zasoby obozu.') })
-          : h(
-              'ul',
-              { class: 'chest-list' },
-              chest.goods.map((good) =>
-                isCard(good)
-                  ? goodRow(good, cardNote(good), h('button', { type: 'button', class: 'button button--system button--small', text: words().take, onClick: () => cardSheet(good, false) }))
-                  : goodRow(
-                      good,
-                      good.own >= good.count ? t('Twoje') : good.own > 0 ? t('Twoje: {count} szt.', { count: formatNumber(good.own) }) : t('Od innych postaci'),
-                      h('button', { type: 'button', class: 'button button--system button--small', text: t('Wyjmij'), onClick: () => amountSheet(good, false) }),
-                    ),
-              ),
-            ),
-      ),
-      h(
-        'section',
-        { class: 'card chest-section', 'aria-label': t('Twoje towary') },
-        h('h2', { class: 'section-title', text: t('Twoje towary') }),
-        own.length > 0 && goodSortRow(),
-        own.length === 0 && !chest.cards
-          ? h('p', { class: 'muted', text: t('Postać nie ma teraz żadnych towarów.') })
-          : own.map(([title, goods]) => [
-              h('h3', { class: 'profile-section', text: title }),
+          : [
+              picking
+                ? h('p', { class: 'bag-note', text: t('Wybierz towary do wyjęcia. Wyjdą w całości, ze wszystkimi sztukami. Ponowny wybór odznacza towar.') })
+                : takeButtons('goods'),
               h(
                 'ul',
                 { class: 'chest-list' },
-                sortGoods(goods).map((good) => goodRow(good, null, h('button', { type: 'button', class: 'button button--world button--small', text: t('Włóż'), onClick: () => amountSheet(good, true) }))),
+                chest.goods.map((good) =>
+                  picking
+                    ? pickRow(goodKey(good), {
+                        art: goodArt(good, 32),
+                        label: t('{name}, {count} szt.', { name: good.name, count: formatNumber(good.count) }),
+                        words: [
+                          h('span', { class: 'chest-item' }, h('span', { class: 'chest-good-name', text: good.name }), h('span', { class: 'chest-note', text: goodNote(good) })),
+                          h('span', { class: 'chest-good-count', text: `×${formatNumber(good.count)}` }),
+                        ],
+                      })
+                    : isCard(good)
+                      ? goodRow(good, goodNote(good), h('button', { type: 'button', class: 'button button--system button--small', text: words().take, onClick: () => cardSheet(good, false) }))
+                      : goodRow(good, goodNote(good), h('button', { type: 'button', class: 'button button--system button--small', text: t('Wyjmij'), onClick: () => amountSheet(good, false) })),
+                ),
               ),
-            ]),
-        chest.cards && cardsGroup(),
+            ],
       ),
+      picking
+        ? markBar(chest.goods, goodKey, (keys) => ({ goods: keys }))
+        : h(
+            'section',
+            { class: 'card chest-section', 'aria-label': t('Twoje towary') },
+            h('h2', { class: 'section-title', text: t('Twoje towary') }),
+            own.length > 0 && goodSortRow(),
+            own.length === 0 && !chest.cards
+              ? h('p', { class: 'muted', text: t('Postać nie ma teraz żadnych towarów.') })
+              : own.map(([title, goods]) => [
+                  h('h3', { class: 'profile-section', text: title }),
+                  h(
+                    'ul',
+                    { class: 'chest-list' },
+                    sortGoods(goods).map((good) => goodRow(good, null, h('button', { type: 'button', class: 'button button--world button--small', text: t('Włóż'), onClick: () => amountSheet(good, true) }))),
+                  ),
+                ]),
+            chest.cards && cardsGroup(),
+          ),
     ];
   }
 
@@ -619,6 +763,11 @@ export function mountChest(container, onBack) {
     const character = state.character;
     const tabs = chest && Array.isArray(chest.goods);
     const tab = tabs ? openTab : 'items';
+    if (marking) {
+      const there = new Set(chest?.locked ? [] : marking.tab === 'items' ? (chest?.items ?? []).map((item) => item.id) : (chest?.goods ?? []).map(goodKey));
+      for (const key of marking.marked) if (!there.has(key)) marking.marked.delete(key);
+      if (there.size === 0 || marking.tab !== tab) marking = null;
+    }
     fill(
       container,
       h(
@@ -662,6 +811,7 @@ export function mountChest(container, onBack) {
                       'aria-selected': String(tab === id),
                       onClick: () => {
                         openTab = id;
+                        marking = null;
                         render();
                       },
                     },

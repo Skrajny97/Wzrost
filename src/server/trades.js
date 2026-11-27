@@ -419,7 +419,7 @@ const keyPath = (alias) => `'$."' || ${alias}.key || '"'`;
 // to its own: one bound value however many stacks there are (D1 takes at
 // most 100 in a statement, which a Wymiana of many kinds of goods went past,
 // the code review), and the column's other stacks untouched.
-const addedStacks = (column) =>
+export const addedStacks = (column) =>
   `json_patch(${column}, (SELECT json_group_object(d.key, COALESCE(json_extract(characters.${column}, ${keyPath('d')}), 0) + d.value) FROM json_each(?) AS d))`;
 
 // Everything moves at once, or nothing: one statement fails the whole
