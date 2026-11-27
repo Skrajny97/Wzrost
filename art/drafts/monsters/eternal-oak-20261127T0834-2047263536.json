@@ -1,0 +1,14 @@
+{
+  "id": "eternal-oak",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Odwieczny Dab, the eternal oak as old as the world, awakened: a huge ancient oak tree come alive, mightier and older than any oak, a very thick gnarled trunk with a wise ancient bearded face in the bark and glowing green eyes, an enormous wide rounded crown of deep green and golden oak leaves shining with warm golden light, thin glowing golden cracks in the bark, two massive bough arms reaching out from the trunk, great gnarled roots it stands on, moss on its bark, majestic and protective, not menacing, the whole tree from the roots to the top of the crown, three-quarter view facing right, a bold simple silhouette, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, the creature alone, no rocks, no ground, no background, the whole tree inside the picture with a little empty space above the crown and below the roots, nothing cut off at the edges",
+  "style": "src/client/art/monsters/leshy.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.02491010288280911
+  },
+  "images": 1
+}
