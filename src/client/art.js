@@ -689,7 +689,7 @@ export const SPRITES = {
     // The Stwórca Żywiołów's Żywiołak (1140; drawn in PixelLab, 19.11.2026)
     // and the Miecz Niebios's Świetlisty rycerz of the Zastęp niebios (1264,
     // version 2; drawn in PixelLab, 26.11.2026).
-    ids: ['elemental-summon', 'toxic-slime', 'ent-summon', 'oak-awakening', 'elemental', 'heavenly-host'],
+    ids: ['elemental-summon', 'toxic-slime', 'ent-summon', 'oak-awakening', 'elemental', 'heavenly-host', 'white-pack', 'eternal-grove'],
   },
   // The Osada (data/settlement.json): its places on the board, by the
   // place's id, each cut to its outline, the Targowisko in the middle the

@@ -3384,6 +3384,13 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
+## Wersja 0.5.35 (27.11.2026): Biały wilk i Odwieczny dąb, angielskie nagrania z Disassembly Table
+
+## Biały wilk i Odwieczny dąb (1275) oraz nagrania 1276 w grze (27.11.2026)
+
+1. **1275:** autor przyjął Białego wilka w wersji 2 i Odwieczny dąb w wersji 1 (pozostałe odrzucone). Są w `src/client/art/summons/white-pack.png` i `eternal-grove.png`, na liście `summons` w `src/client/art.js`, kluczem umiejętności (Biała wataha Boga Łowów, Odwieczny gaj Ojca Puszczy), jak Świetlisty rycerz. `summonSprite` bierze najpierw własny obrazek umiejętności, więc wilk nie jest już szarym Basiorem (`alpha-wolf`), a dąb Prastarym dębem Arcydruida. Wejście przywołańca w walce bierze obrazek z karty, bez zmian w kodzie. Biały basior Wodza watahy dalej ma obrazek Basiora.
+2. **1276:** autor przyjął nowe angielskie nagrania z „Disassembly Table”: `camp-craft-table` i `crafting-patterns` w podejściu 1, `crafting-ending` w podejściu 2. Zastąpiły pliki w `src/client/audio/narration/en/` pod tymi samymi nazwami, więc dane się nie zmieniły (punkt 2 sekcji 0.5.34 jest tym załatwiony).
+
 ## Wersja 0.5.34 (27.11.2026): poprawki angielskiej wersji
 
 ## Poprawki angielskiej wersji od gracza (27.11.2026)

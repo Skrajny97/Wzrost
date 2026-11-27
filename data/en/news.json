@@ -1472,6 +1472,10 @@
     "0.5.34": {
       "title": "Version 0.5.34",
       "body": "- In English, taking items apart is now \"Disassemble\", and the Salvage Table is the \"Disassembly Table\". An exploration's report names the wanted target in the game's language, also when the exploration set out in another one. Cooking now reads \"is cooking\" in English too."
+    },
+    "0.5.35": {
+      "title": "Version 0.5.35",
+      "body": "- The White Wolf of the God of the Hunt's White Pack and the Father of the Wilds' Eternal Oak have their own look in fights: a snow-white wolf and an ancient glowing oak.\n- In English the narrator now says \"Disassembly Table\" instead of \"Salvage Table\"."
     }
   }
 }
