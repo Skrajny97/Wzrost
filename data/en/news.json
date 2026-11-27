@@ -1476,6 +1476,10 @@
     "0.5.35": {
       "title": "Version 0.5.35",
       "body": "- The White Wolf of the God of the Hunt's White Pack and the Father of the Wilds' Eternal Oak have their own look in fights: a snow-white wolf and an ancient glowing oak.\n- In English the narrator now says \"Disassembly Table\" instead of \"Salvage Table\"."
+    },
+    "0.5.36": {
+      "title": "Version 0.5.36",
+      "body": "- In the bag, an item's card has a \"List at the Marketplace\" button: it opens the Marketplace's price window with that item, so you only set the price and confirm. Herbs, potions, materials, parts, minerals and pantry goods have it too (once the Settlement is open)."
     }
   }
 }

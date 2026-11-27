@@ -148,7 +148,7 @@ import { buildingOn, craftingOn, fortressOn, labyrinthOn, professionsOn, settlem
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { assertion, atomically, characterChanged, raced, sameVersion } from './atomic.js';
-import { marketRemoval } from './market.js';
+import { bagMarket, marketRemoval } from './market.js';
 import { mercenaryBusy, mercenaryPlace, mercenaryRules, serviceEnded } from './mercenaries.js';
 import { ACCOUNT_NAMES, ALL_CHARACTERS, looksTaken, nameKey, validateName } from './names.js';
 import { championOf } from './guild-fame.js';
@@ -315,14 +315,16 @@ async function playerOf(db, row) {
     // Siedziba, whose levels give it its bonuses (guild-seat.js).
     // The patron of its guild from the Kącina, the latest counted
     // (guild-shrine.js, 1201 A), whose effects weekFor gives it while its
-    // week lasts.
+    // week lasts. When its open offers at the Targowisko end, for the
+    // places left there (bagMarket in market.js).
     db
       .prepare(
         `SELECT (SELECT COUNT(*) FROM market_parcels WHERE character_id = ?) AS waiting, ${guildTagSql('?')} AS guild_tag,
            EXISTS (SELECT 1 FROM party_members WHERE character_id = ?) AS in_party, ${guildSeatSql('?')} AS guild_seat,
-           ${guildPatronSql('?')} AS guild_patron`,
+           ${guildPatronSql('?')} AS guild_patron,
+           (SELECT json_group_array(ends_at) FROM market_offers WHERE seller_id = ? AND state = 'open') AS market_ends`,
       )
-      .bind(row.id, row.id, row.id, row.id, row.id),
+      .bind(row.id, row.id, row.id, row.id, row.id, row.id),
     // What the Warsztat and the Szlifiernia made, waiting in the
     // Przechowalnia out of the bag (storage.js).
     db.prepare('SELECT id, data FROM storage_items WHERE character_id = ? ORDER BY id').bind(row.id),
@@ -351,8 +353,10 @@ async function playerOf(db, row) {
     // and of the second Awatar (1066).
     avatarActivity: avatarActivities.results[0] ?? null,
     avatar2Activity: avatar2Activities.results[0] ?? null,
-    // What waits to be collected at the Targowisko (market.js).
+    // What waits to be collected at the Targowisko (market.js), and when
+    // each of its offers open there ends.
     marketWaiting: parcels.results[0]?.waiting ?? 0,
+    marketEnds: JSON.parse(parcels.results[0]?.market_ends ?? '[]'),
     guildTag: parcels.results[0]?.guild_tag ?? null,
     // A membership the spread of class levels or a party of one has ended
     // ends here too (partyOf), as soon as the character is loaded. Since
@@ -1894,6 +1898,10 @@ export function characterView(player, now) {
     core: labyrinthOn() && coreOf(row).open ? coreSummary(row) : null,
     // Whether the character has the Osada (the narrator's Osada chapter).
     settlementOpen: settlementOpen(row),
+    // The Targowisko for "Wystaw na Targowisku" on the bag's cards: its
+    // numbers and the offers open now (bagMarket in market.js), or null
+    // without the Osada.
+    market: settlementOpen(row) ? bagMarket(row, player.marketEnds ?? [], now) : null,
     // A name the filter blocks (names.js): the game asks for a new one, and
     // nothing else goes on until it has it.
     nameBlocked: blockedName(row.name, content()),

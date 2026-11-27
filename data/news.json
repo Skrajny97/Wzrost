@@ -1850,6 +1850,11 @@
       "id": "0.5.35",
       "title": "Wersja 0.5.35",
       "body": "- Biały wilk z Białej watahy Boga Łowów i Odwieczny dąb Ojca Puszczy mają w walce własny wygląd: śnieżnobiałego wilka i prastary, świecący dąb.\n- Po angielsku narrator mówi już „Disassembly Table” zamiast „Salvage Table”."
+    },
+    {
+      "id": "0.5.36",
+      "title": "Wersja 0.5.36",
+      "body": "- W plecaku karta przedmiotu ma przycisk „Wystaw na Targowisku”: otwiera okno ceny z Targowiska z tym przedmiotem, więc wystarczy wpisać cenę i zatwierdzić. Mają go też zioła, mikstury, materiały, części, minerały i towary Spiżarni (od otwarcia Osady)."
     }
   ]
 }

@@ -3384,6 +3384,25 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
+## Wersja 0.5.36 (27.11.2026): „Wystaw na Targowisku” z plecaka
+
+## Wystaw z plecaka (27.11.2026)
+
+Propozycja gracza, przekazana przez autora: „zauważyłem brak możliwości wystawienia przedmiotu bezpośrednio z menu plecaka. Po uaktualnieniu wybieram przedmiot i gdzieś pomiędzy Sprzedaj, Wyrzuć, Rozbierz nowa akcja Wystaw.”
+
+1. **Przycisk.** Karta przedmiotu w plecaku ma pod „Sprzedaj za … złota” przycisk „Wystaw na Targowisku”, a pod nim zostają „Wyrzuć” i „Załóż”. Stuknięcie otwiera okno ceny z Targowiska z tym przedmiotem już wybranym: cena u złomiarza, zdanie o czasie licytacji i opłacie (to samo, które na Targowisku stoi w oknie wyboru towaru), cena wywoławcza, „Kup teraz”, suwak czasu licytacji, „Anuluj” i „Wystaw”. Gracz zostaje w plecaku. Po „Wystaw” okno się zamyka, przedmiot znika z plecaka, a gra mówi: „Wystawione na Targowisku.” Oferta czeka na Targowisku w zakładce „Moje”.
+2. **Zasady jak na Targowisku.** Plecak wysyła to samo żądanie co Targowisko (`POST /api/market/list`), więc obowiązuje wszystko z „Osada, część III: Targowisko” i późniejszych zmian: limit ofert, czas licytacji od 1 do 24 godzin (z Kompanią Kupców dłużej), opłata od sprzedaży i najwyższa cena. Ulubiony przedmiot też da się wystawić i traci gwiazdkę, jak na Targowisku. Postać nie musi być w obozie, bo plecak działa także na wyprawie i przy profesji (zob. „Plecak poza obozem i mikstury na drogę”).
+3. **Kiedy przycisku nie ma albo jest wyszarzony.**
+    - Przed otwarciem Osady (20. poziom postaci) przycisku nie ma, tak jak części „Zaklinaczka” na karcie przedmiotu.
+    - Karta przedmiotu założonego go nie ma, tak jak nie ma na niej „Sprzedaj” ani „Wyrzuć”. Nie ma go też kopia przedmiotu z raportu. Przedmiot ze stojaka w Zbrojowni nie leży w plecaku.
+    - Gdy postać ma już tyle ofert, ile pozwala Kompania Kupców (5 i jedna więcej na każdy stopień ponad pierwszy), przycisk jest wyszarzony, a nad nim stoi zdanie, które w tej sytuacji mówi serwer: „Masz już 5 ofert na Targowisku. Wystawisz więcej, gdy któraś się skończy.”
+    - Gra nie ma przedmiotów przypisanych do postaci ani takich, których nie wolno wystawić, więc innych przypadków nie ma.
+4. **Inne rzeczy z plecaka.** Ten sam przycisk mają karty ziół, mikstur, materiałów, części, minerałów oraz ryb, plonów i potraw ze Spiżarni, bo Targowisko je przyjmuje. Okno ceny zaczyna od liczby sztuk wybranej na karcie, a pole „Ile sztuk” da się zmienić. Karta części nie ma wyboru liczby, więc okno zaczyna od wszystkich, jak na Targowisku. Zwoje nie mają w plecaku własnej karty (stoją w jednym wierszu nad przedmiotami), więc wystawia się je dalej z Targowiska.
+5. **Brakujący szczegół: skąd plecak zna limit.** Widok postaci (`market`) ma liczby okna ceny (opłata, czasy licytacji, najwyższa cena, limit ofert) i liczbę ofert otwartych teraz. Oferta po czasie, której Targowisko jeszcze nie rozliczyło, nie zajmuje już miejsca. Przed otwarciem Osady `market` to null. Serwer sprawdza wszystko jeszcze raz przy wystawianiu.
+6. **Teksty.** Nowych tekstów nie ma: przycisk, zdanie o limicie i zdanie o czasie i opłacie gra już miała, także po angielsku („List at the Marketplace”).
+7. **Bez makiet.** To jeden przycisk w istniejącym oknie i istniejące okno Targowiska, więc zmiana wchodzi bez makiet, jak filtr Tier (zob. „Targowisko: wyszukiwanie i porównanie z towarzyszem”, punkt 10).
+8. **Sprawdzone:** `test/market-bag.test.js` (widok postaci i wystawianie przez API), `test/market-bag-page.test.js` (przycisk, powód wyszarzenia i okno ceny na stronie) oraz testy Targowiska, klienta i tłumaczeń. W przeglądarce na 320 i 1366 px, po polsku i po angielsku. `tools/layout-check.cjs` otwiera teraz kartę przedmiotu z przyciskiem i okno ceny na wszystkich dziewięciu rozmiarach ekranu.
+
 ## Wersja 0.5.35 (27.11.2026): Biały wilk i Odwieczny dąb, angielskie nagrania z Disassembly Table
 
 ## Biały wilk i Odwieczny dąb (1275) oraz nagrania 1276 w grze (27.11.2026)
