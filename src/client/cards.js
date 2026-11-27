@@ -1009,6 +1009,22 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
       );
     const count = chosen.size;
     const ready = count === view.deckSize;
+    // „Najlepsza możliwa” (the author, 27.11.2026: „bierze najwyższe możliwe
+    // statystyki + rozkład kart 4/4/4 jeśli chodzi o typy”): the strongest
+    // deck of the collection, as the server finds it (bestDeck in the
+    // engine), chosen at once; the player may still change it by hand and
+    // saves it with „Zapisz talię”, as any deck. A line says when a type,
+    // or the whole collection, has too few cards for it.
+    const chooseBest = () => {
+      const best = view.best;
+      if (!best) return;
+      chosen = new Set(best.cards);
+      const names = best.short.map((id) => typeOf(id)?.name ?? id);
+      if (best.missing > 0) toast(t('Za mało kart na pełną talię: wybrane są wszystkie, jakie masz.'));
+      else if (names.length === 1) toast(t('Za mało kart typu {type}: brakujące miejsca zajęły najlepsze karty innych typów.', { type: names[0] }));
+      else if (names.length > 1) toast(t('Za mało kart typów {types}: brakujące miejsca zajęły najlepsze karty innego typu.', { types: listOf(names) }));
+      render();
+    };
     const save = (event) =>
       withButton(event.currentTarget, async () => {
         const answer = await call('POST', '/api/cards/deck', { cards: [...chosen], slot: buildingSlot, ...(effects.slots > 0 && { effects: [...chosenEffects] }) });
@@ -1052,6 +1068,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
       { class: 'card stack cards-builder', 'data-guide': 'cards-builder' },
       h('h3', { class: 'section-title', text: view.decks ? t('Ułóż talię {slot}', { slot: buildingSlot }) : t('Ułóż talię') }),
       h('p', { class: 'muted', text: t('Wybierz {size} kart z kolekcji. Najlepiej po kilka każdego typu: Siła bije Zręczność, Zręczność Magię, a Magia Siłę.', { size: view.deckSize }) }),
+      view.best && h('div', { class: 'cards-builder-best' }, h('button', { type: 'button', class: 'button button--system', 'data-guide': 'cards-best', text: t('Najlepsza możliwa'), onClick: chooseBest })),
       bar(),
       h(
         'div',

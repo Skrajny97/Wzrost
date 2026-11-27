@@ -16287,6 +16287,16 @@ button.tcard-slot {
   width: auto;
 }
 
+/* „Najlepsza możliwa” (27.11.2026): under the builder's words, as wide as
+   its name. */
+.cards-builder-best {
+  display: flex;
+}
+
+.cards-builder-best .button {
+  width: auto;
+}
+
 .cards-filter {
   flex-wrap: wrap;
   overflow: visible;

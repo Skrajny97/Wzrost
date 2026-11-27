@@ -7,7 +7,8 @@
 // zgarniesz podwójną stawkę, the tier's reward of the day once a day and its
 // card at the first win, a draw's stake back, a surrender lost; the cards
 // the creatures of an exploration leave in the report and the collection;
-// the saved decks (938), one played with a tap; the reserve drawn anew once
+// the saved decks (938), one played with a tap; the strongest deck of the
+// collection („Najlepsza możliwa”); the reserve drawn anew once
 // a match before the first turn; the cards gone with the character and the
 // account; and the cards of the
 // sources of 903: a profession's work, a Próba Gildii finished, an attack
@@ -19,6 +20,7 @@ import { beforeEach, describe, test } from 'node:test';
 
 import {
   areaLand,
+  bestDeck,
   cardHomes,
   cardKind,
   cardRarity,
@@ -281,6 +283,31 @@ describe('Talia Systemu through the API', () => {
     assert.equal(saved.status, 200);
     assert.ok(saved.data.cards.deck.includes('boar') && !saved.data.cards.deck.includes(ids[0]));
     assert.equal(saved.data.cards.collection.find((card) => card.id === 'boar').level, 2);
+  });
+
+  test('„Najlepsza możliwa” (27.11.2026): the tab brings the strongest deck of the collection, four of each type, saved as any deck', async () => {
+    await call('POST', '/api/cards/starter', { cookie });
+    // Five more cards of Siła, one on its second level, and one of Magia on
+    // its third.
+    for (const [id, copies] of [['octopus', 1], ['heartwood', 1], ['acorn', 1], ['boar', 2], ['pride', 3]]) {
+      await (await db()).prepare('INSERT INTO cards (character_id, monster_id, copies, created_at) SELECT id, ?, ?, 1 FROM characters').bind(id, copies).run();
+    }
+    const view = await tab();
+    const collection = new Map(view.collection.map((card) => [card.id, card.copies]));
+    assert.deepEqual(view.best, bestDeck(collection, content));
+    assert.deepEqual([view.best.cards.length, view.best.short, view.best.missing], [rules.deckSize, [], 0]);
+    assert.ok(['octopus', 'heartwood', 'acorn', 'pride'].every((id) => view.best.cards.includes(id)));
+    // Saved in its slot as any deck, and played from now on, stronger than
+    // the starter deck by the strength the Arena counts.
+    const saved = await call('POST', '/api/cards/deck', { cookie, body: { cards: view.best.cards, slot: 2 } });
+    assert.equal(saved.status, 200);
+    assert.deepEqual([...saved.data.cards.deck].sort(), [...view.best.cards].sort());
+    const [starter, best] = saved.data.cards.decks.slots;
+    assert.deepEqual([saved.data.cards.decks.active, best.whole], [2, true]);
+    assert.deepEqual(best.types.map((type) => type.count), [4, 4, 4]);
+    assert.ok(best.strength > starter.strength);
+    // The tab after it brings the same best deck.
+    assert.deepEqual(saved.data.cards.best, view.best);
   });
 
   test('saved decks (938): up to five in their slots, one played from now on with a tap, a whole one only', async () => {
