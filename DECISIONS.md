@@ -3384,6 +3384,39 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
+## Cień i ścieżka Nekromanty (1277 A, 27.11.2026)
+
+Gracz zapytał przez autora: „Czy Cień to najsłabsza klasa w grze? Obrażenia nawet z krytykami nie są nawet do porównania z resztą klas na tym samym levelu.” Pomiar pokazał, że nie, ale jedna ścieżka Cienia była wyraźnie słabsza od reszty gry. Autor wybrał 1277 A: mocniejsze umiejętności Nekromanty i Licza. Wariant B (sam Nekromanta) odrzucił.
+
+1. **Jak mierzone.** Realistyczny gracz z `tools/difficulty-sim.mjs`, każda klasa i każda ścieżka: na 35. i 40. poziomie (klasa przed pierwszą ewolucją), na 60. i 75. (pierwsze formy), na 100., 125. i 150. (drugie) oraz na 200. i 225. (trzecie). Ciosy z walk wypraw w najnowszym miejscu poziomu, wyprawy z towarzyszami i bez nich (`tools/class-balance-sim.mjs`, 240 wypraw na komórkę), Arena wszystkich ścieżek (`tools/pvp-arena-sim.mjs --paths all`, 4 ziarna) i Wieża Solo (32 wspinaczki z pominięciem pięter, na których czekają elity i czempioni, bo na nich dziś zatrzymuje się każda forma).
+2. **Pojedynczy cios Cienia jest najmniejszy w grze**, i tu gracz ma rację. Sztylet ma najsłabszą bazę ze wszystkich broni (od 0,85 do 1,32; łuk i kostur od 0,95 do 1,48, miecz od 1,2 do 1,86, topór od 1,3 do 2,02), a pancerz stworów zabiera ciosom fizycznym 18–28%, zaklęciom prawie nic. Zwykły cios w stwora najnowszego miejsca, postać bez towarzyszy:
+
+   | Poziom | Cień | Wojownik | Łucznik | Mag | Kleryk |
+   | --- | --- | --- | --- | --- | --- |
+   | 40. | 158 | 200 | 169 | 214 | 183 |
+   | 100. | Królobójca 452 | Berserker 932 | Strzelec Wyborowy 662 | Arcymag Żywiołów 898 | Cudotwórca 568 |
+   | 200. | Bogobójca 1286 | Pogromca Hord 2253 | Mistrz Łuku 1390 | Awatar Żywiołów 2522 | Święty 1715 |
+
+   Krytyk mnoży cios przez 1,5 jak u wszystkich, mocniej tylko na ścieżce Skrytobójcy (1,95–2,4).
+3. **Cień rusza się za to dwa razy częściej.** Ma 2,2–3 ruchy na 100 jednostek czasu walki (Wojownik, Mag i Kleryk 1–1,6), trafia krytycznie w 16–23% ciosów (oni w 5–16%) i unika ok. 23% ciosów (oni 1–8%). W całej walce zadaje po Łuczniku najwięcej obrażeń ze wszystkich klas, na każdym zmierzonym poziomie o 15–28% więcej niż średnia klas, i po Łuczniku najszybciej zabija. Na wyprawach każda klasa ma tyle samo walk na godzinę (6 walk i 10–11 stworów), więc XP zależy tylko od omdleń. W Wieży Solo Cień wchodzi tak wysoko jak średnia klas (±3%). Na Arenie przed zmianą wygrywał 79–83% pojedynków na 35. i 40. poziomie, 49–52% na 60. i 75. i 37–46% na 100.–225., najmniej przez Nekromantę (26–36%) i Widmo (35–41%).
+4. **Słaba była ścieżka Truciciela, Nekromanty i Licza.** Bije głównie trucizną i przywołańcami. Nowe Zatrucie tylko odnawia stare i działa w ruchach zatrutego wroga, więc szybkość Cienia go nie pomnaża. Nekromanta nie ma umiejętności z ciosem, a jego kostur bije 80% tego, co u Maga (988). Licz traci grupową Klątwę rozkładu. Walki trwały więc dłużej, towarzysze częściej padali (na 4-godzinnej wyprawie 0,41 na 100. poziomie wobec 0,09 u Królobójcy, u Licza na 200. poziomie 0,86), a potem mdlała sama postać. Z towarzyszami Nekromanta i Licz zabijali 15–23% wolniej od pozostałych form i mdleli na 4-godzinnych wyprawach w 6–10% (inne drugie formy ok. 1,5%) i 19–25% (inne trzecie formy 4–10%). Nekromanta wygrywał na Arenie 26–36% pojedynków.
+5. **Zmiana (1277 A)** w `data/evolutions.json`, w każdej walce, także u towarzyszy Cienia na tej ścieżce (towarzysz od 100. poziomu przyjmuje formę swojej ścieżki):
+
+   | Umiejętność | Było | Jest |
+   | --- | --- | --- |
+   | Wskrzeszenie (Nekromanta): cios szkieletu | 50–90% | 75–135% |
+   | Klątwa rozkładu (Nekromanta): Zatrucie co ruch | 25–40% | 37,5–60% |
+   | Armia umarłych (Licz): cios rycerza | 90–130% | 135–195% |
+
+   Opisy umiejętności biorą liczby z danych, więc same podają nowe, po polsku i po angielsku. Truciciel, Dotyk śmierci, kostur (80%), Król Nawii i Cesarz Nawii bez zmian.
+6. **Przed → po** (z towarzyszami; tempo zabijania na godzinnych wyprawach wobec średniej pozostałych form, omdlenia na 4-godzinnych):
+   - Nekromanta na 100., 125. i 150. poziomie: tempo zabijania −21%, −17% i −17% → −12%, −8% i −9%; omdlenia 9,6%, 7,1% i 6,2% → 5,8%, 2,5% i 2,5% (pozostałe formy 1,4–1,7%); Arena 31%, 36% i 26% → 41%, 51% i 40%; Wieża Solo 75 → 82 i 125 → 141 piętro (średnio 82 i 142).
+   - Licz na 200. i 225. poziomie: tempo zabijania −23% i −15% → −13% i −8%; omdlenia 25,4% i 18,8% → 10,4% i 14,6% (pozostałe formy 4,4% i 10,2%); Arena 36% i 43% → 52% i 59% (na 260. 44% → 59%); Wieża Solo 234 → 247 i 250 → 262 piętro (średnio 235 i 256).
+   - Cień jako klasa wygrywa na Arenie 42–51% pojedynków zamiast 37–46%. Inne formy tracą najwyżej 4 punkty (Druid na 125. poziomie: 35% → 31%), a na wyprawach z towarzyszem-Nekromantą trochę zyskują. W ustawieniach testów każda forma dalej wygrywa 25–75% pojedynków (drugie formy na 100. poziomie, trzecie na 200. i średnio na 210.–290., czwarte na 260. i 300., piąte na 350. i 380.), a każda klasa 30–70%. Król Nawii dalej wyraźnie przewyższa Licza (test czwartych form).
+7. **Odrzucone przy pomiarze:** kostur 0,9 albo 1,0 zamiast 0,8 dla całej linii (Cesarz Nawii wygrywał wtedy na 350. poziomie 75,5% albo 78% pojedynków, a zmiana samego Nekromanty i Licza dawałaby Królowi Nawii słabszy kostur niż Liczowi), Dotyk śmierci o połowę mocniejszy (Licz średnio 80% pojedynków na 210.–290. poziomie), Armia umarłych dwa razy mocniejsza (77%), mocniejsze szkielety z cechy Licza (bez skutku, bo wstają rzadko), Czarny jad Truciciela o połowę mocniejszy (tempo zabijania +1–2%, bo trucizna się nie sumuje; Truciciel zostaje ok. 18% wolniejszy od pozostałych pierwszych form) i mocniejszy sztylet (podstawowy Cień już wygrywa 79–83% pojedynków na 35. i 40. poziomie).
+8. **Brakujący szczegół: Legion Nawii a Armia umarłych.** Rycerz z Armii umarłych Licza na najwyższym poziomie bije teraz za 195%, a każdy z dwóch rycerzy Legionu Nawii Króla Nawii na 145. poziomie umiejętności za 134%. Razem biją za 268%, więc Legion dalej jest mocniejszy. Test czwartych form liczy więc ciosy przywołańców razem dla wszystkich, których umiejętność przywołuje naraz, tak jak test piątych form (dotąd tylko dla stad, jak Gaj wieków).
+9. **Testy:** `test/necro-line.test.js` (liczby w danych, słowa umiejętności po polsku i po angielsku, Nekromanta na Arenie co najmniej 35% pojedynków na 100. poziomie i Licz co najmniej 45% na 200.; przed zmianą 31% i 39%), poprawiony test czwartych form (punkt 8) oraz testy ewolucji, Areny, umiejętności i towarzyszy. W `test/druid-summons.test.js` test „bez jednostronnych ciosów” liczy najszybsze zabicie z co najmniej 15 zabić zamiast 20: Druid z wszystkimi punktami w Intelekcie zabija na 90. poziomie mocniejszego Nekromantę rzadziej i ma 18 zabić na 192 pojedynki zamiast 21. Jego największy cios i najszybsze zabicie się nie zmieniły (0,24 HP rywala, 7 ruchów).
+
 ## Wersja 0.5.36 (27.11.2026): „Wystaw na Targowisku” z plecaka
 
 ## Wystaw z plecaka (27.11.2026)
