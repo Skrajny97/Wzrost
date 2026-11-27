@@ -1865,6 +1865,11 @@
       "id": "0.5.38",
       "title": "Wersja 0.5.38",
       "body": "- Talia Systemu: w „Ułóż talię” jest przycisk „Najlepsza możliwa”. Od razu wybiera z Twojej kolekcji najsilniejsze karty, po 4 każdego typu. Możesz je jeszcze zmienić, a potem stuknij „Zapisz talię”."
+    },
+    {
+      "id": "0.5.39",
+      "title": "Wersja 0.5.39",
+      "body": "- Skrzynia Konta: nad listą są przyciski „Wyjmij wszystko” i „Wyjmij zaznaczone”. Zaznaczasz rzeczy stuknięciem, jak przy sprzedaży w plecaku, i wyjmujesz je naraz. Towary wychodzą w całości, a gdy w plecaku zabraknie miejsca, reszta zostaje w Skrzyni."
     }
   ]
 }

@@ -1488,6 +1488,10 @@
     "0.5.38": {
       "title": "Version 0.5.38",
       "body": "- System Deck: \"Build deck\" has a new \"Best possible\" button. It picks the strongest cards of your collection at once, 4 of each type. You can still change them, then tap \"Save deck\"."
+    },
+    "0.5.39": {
+      "title": "Version 0.5.39",
+      "body": "- Account Chest: above the list there are \"Take out all\" and \"Take out selected\" buttons. Tap things to mark them, as when selling from the bag, and take them out at once. Goods come out whole, and when the bag runs out of room, the rest stays in the Chest."
     }
   }
 }

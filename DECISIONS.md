@@ -3384,6 +3384,8 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
+## Wersja 0.5.39 (27.11.2026): Skrzynia konta z „Wyjmij wszystko” i „Wyjmij zaznaczone”
+
 ## Skrzynia konta: wyjmij wszystko i zaznaczone (27.11.2026)
 
 Propozycja gracza, przekazana przez autora: przyciski „Wyjmij wszystko” i „Wyjmij zaznaczone” w Skrzyni Konta, bo wyjmowanie rzeczy pojedynczo jest męczące.
