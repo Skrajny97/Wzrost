@@ -1,0 +1,14 @@
+{
+  "id": "white-wolf",
+  "tool": "pixellab create-image-pro-flash",
+  "description": "Bialy Wilk, a great white wolf of the primeval forest: a huge powerful heavy-built wolf with thick pure snow-white fur with soft pale silver shading, a heavy shaggy white mane on its neck and chest, glowing pale ice-blue eyes, bared white fangs, a big bushy white tail, standing firmly on all four legs in a proud fearless stance with its head held high, noble and fierce, full body, three-quarter view facing right, a bold simple silhouette filling the whole picture, few big readable shapes, strong light and dark contrast, a crisp dark outline, little fine detail, the creature alone, no rocks, no ground, no background, the whole wolf inside the picture, nothing cut off at the edges",
+  "style": "src/client/art/summons/heavenly-host.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.023864831894132826
+  },
+  "images": 1
+}
