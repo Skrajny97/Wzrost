@@ -3384,6 +3384,19 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
+## Wersja 0.5.39 (27.11.2026): Skrzynia konta z „Wyjmij wszystko” i „Wyjmij zaznaczone”
+
+## Skrzynia konta: wyjmij wszystko i zaznaczone (27.11.2026)
+
+Propozycja gracza, przekazana przez autora: przyciski „Wyjmij wszystko” i „Wyjmij zaznaczone” w Skrzyni Konta, bo wyjmowanie rzeczy pojedynczo jest męczące.
+
+1. **Przyciski.** W zakładkach „Przedmioty” i „Towary”, nad listą tego, co leży w skrzyni, stoją „Wyjmij wszystko” i „Wyjmij zaznaczone”. Brakujący szczegół: działają na listę swojej zakładki, w „Przedmiotach” na przedmioty, a w „Towarach” na towary i karty Talii. Złoto ma dalej własne „Wyjmij”, a „Wyjmij” przy każdej rzeczy zostaje. Przy pustej liście przycisków nie ma.
+2. **Zaznaczanie jak w plecaku.** „Wyjmij zaznaczone” zmienia listę w zaznaczanie z „Zaznacz do sprzedaży”: każda rzecz stoi w kafelku plecaka obok swojej nazwy, a stuknięcie w kafelek albo w nazwę zaznacza ją ramką, poświatą i ptaszkiem z „Rozbierz kilka”. Ponowne stuknięcie odznacza. Na dole ekranu stoi pasek ze sprzedaży: „Zaznaczone: 2” (albo „Nic jeszcze nie zaznaczono.”), „Anuluj” i „Wyjmij zaznaczone (2)”. Na czas zaznaczania nie ma części „Plecak” ani „Twoje towary”, a zmiana zakładki kończy zaznaczanie.
+3. **Jedno żądanie, jedna paczka zapisów** (`POST /api/chest/take-many`: `{ all: "items" }` albo `{ all: "goods" }`, a dla zaznaczonych `{ items }` albo `{ goods }`). Dwa stuknięcia naraz wyjmują każdą rzecz raz.
+4. **Zasady pojedynczego „Wyjmij”** obowiązują każdą rzecz: kłódka do 20. poziomu postaci, przedmiot innej postaci przychodzi oznaczony jako ze Skrzyni Konta, sztuki innych postaci jako zdobyte od innych (Encyklopedia ich nie liczy), a wyjmować można także w trakcie wyprawy. Towar wychodzi w całości, ze wszystkimi sztukami, a karta ze wszystkimi kopiami. Gdy zaznaczonej rzeczy nie ma już w skrzyni, nic nie wychodzi: gra mówi „Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz.” i wczytuje skrzynię od nowa.
+5. **Pełny plecak.** Rzeczy wychodzą w kolejności skrzyni (przedmioty tak, jak je włożono, a towary tak, jak stoją na liście), każda, jeśli plecak ma na nią miejsce. Przedmiot zajmuje jedno miejsce, zioła i mikstury tyle, ile nowych stosów zrobią, a reszta towarów żadnego. Co się nie mieści, zostaje w skrzyni, a gra mówi: „Wyjęto 12 z 20. Reszta została w Skrzyni, bo w plecaku zabrakło miejsca.” (nie „plecak jest pełny”, bo stos ziół może potrzebować dwóch miejsc, gdy wolne jest jedno). Gdy wyszło wszystko: „Wyjęto 3 przedmioty.” albo „Wyjęto 4 towary.”. Gdy nie mieści się nic: „Za mało miejsca w plecaku. Zrób w nim miejsce, żeby coś wyjąć.”
+6. **Sprawdzone:** `test/chest-take-many.test.js` (API: wszystko, zaznaczone, pełny plecak, dwa stuknięcia naraz i odmowy) i `test/chest-take-many-page.test.js` (przyciski i zaznaczanie na stronie). W przeglądarce na 320 i 1366 px, po polsku.
+
 ## Wersja 0.5.38 (27.11.2026): Najlepsza możliwa talia
 
 ## Najlepsza możliwa talia (27.11.2026)

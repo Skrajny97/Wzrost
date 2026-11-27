@@ -5665,6 +5665,30 @@ a.camp-level-button {
   white-space: nowrap;
 }
 
+/* "Wyjmij zaznaczone" (27.11.2026): a thing of the chest's list in the
+   bag's tile, marked as in "Rozbierz kilka" (.salvage-pick), its words
+   beside it; the bar under the list is the bag's sale bar (.sale-bar). */
+.chest-row--pick {
+  justify-content: flex-start;
+}
+
+.chest-row--pick > .slot {
+  flex: none;
+}
+
+.chest-pick-words {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.chest-pick-words .chest-item {
+  flex: 1;
+}
+
 .chest-sheet-title {
   display: flex;
   align-items: center;

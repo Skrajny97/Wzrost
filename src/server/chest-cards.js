@@ -117,3 +117,11 @@ export async function takeCardFromChest(context, session, player, { kind, id, co
     changed,
   );
 }
+
+// The statements that put the cards taken out of the chest whole into the
+// character's collection ("Wyjmij wszystko" and "Wyjmij zaznaczone",
+// takeManyFromChest in chest.js): each `taken` { kind, id, count, foreign }
+// with all its copies, those of others as from others, as takeCardFromChest
+// does.
+export const cardsTaken = (db, characterId, taken, now) =>
+  taken.map(({ kind, id, count, foreign }) => addCopies(db, kind, characterId, id, count, CARD_KINDS[kind].traded ? foreign : 0, now));

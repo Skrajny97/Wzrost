@@ -20,18 +20,20 @@
 // another character come as got from others (foreign_stacks), as a
 // Wymiana's (account-chest.js in the engine). And Talia Systemu's cards,
 // from the character's collection into the collection of another
-// (chest-cards.js; the mock-ups of 19.11.2026).
+// (chest-cards.js; the mock-ups of 19.11.2026). Many things come out at
+// once with "Wyjmij wszystko" and "Wyjmij zaznaczone" (takeManyFromChest).
 
 import { CHEST_GOODS, bagCapacity, campLevels, canUse, chestTakes, gearKey, itemView, knownStack, materialView, tradedLeaving } from '../engine/index.js';
 import { assertion, atomically } from './atomic.js';
 import { bagPlaces, characterView, chestLock, loadPlayer, requireOffRack, requirePlayer } from './characters.js';
-import { cardGoodView, chestCards, isCardGood, putCardInChest, takeCardFromChest } from './chest-cards.js';
+import { cardGoodView, cardsTaken, chestCards, isCardGood, putCardInChest, takeCardFromChest } from './chest-cards.js';
 import { content } from './content.js';
 import { withoutFavorites } from './favorites.js';
 import { ApiError, json, readJson } from './http.js';
 import { numberText } from './i18n.js';
-import { counted, foreign, takenOff } from './market.js';
-import { SCROLL_COLUMNS, scrollGoods, scrollHeld } from './scroll-goods.js';
+import { FOREIGN_KINDS, counted, foreign, takenOff } from './market.js';
+import { SCROLL_COLUMNS, scrollAdds, scrollGoods, scrollHeld } from './scroll-goods.js';
+import { addedStacks } from './trades.js';
 
 // The chest holds as many items as the bag of the character played, with
 // its camp's upgrades of the bag (the author, 16.11.2026: „Zwiększ
@@ -71,18 +73,19 @@ function goodView(kind, id) {
   return rank < 0 ? null : { name: list[rank].name, rank, sortName: '' };
 }
 
+// Goods ({ kind, view }: goodView's) in the chest's order: kind by kind in
+// CHEST_GOODS's order, then as goodView places them among their kind.
+const chestOrder = (a, b) => CHEST_GOODS.indexOf(a.kind) - CHEST_GOODS.indexOf(b.kind) || a.view.rank - b.view.rank || a.view.sortName.localeCompare(b.view.sortName, 'pl');
+
 // The goods in the chest by good: how many pieces in all, and how many of
 // them are the character's own, kind by kind in CHEST_GOODS's order; a card
 // with its name alone, its face and the copies of it the character has
 // (`have`, by "kind:id", chestCards), for what taking it would give.
 function goodsOf(rows, have = new Map()) {
   return rows
-    .map((row) => ({ row, view: CHEST_GOODS.includes(row.kind) ? goodView(row.kind, row.good) : null }))
+    .map((row) => ({ row, kind: row.kind, view: CHEST_GOODS.includes(row.kind) ? goodView(row.kind, row.good) : null }))
     .filter(({ view }) => view)
-    .sort(
-      (a, b) =>
-        CHEST_GOODS.indexOf(a.row.kind) - CHEST_GOODS.indexOf(b.row.kind) || a.view.rank - b.view.rank || a.view.sortName.localeCompare(b.view.sortName, 'pl'),
-    )
+    .sort(chestOrder)
     .map(({ row, view }) => ({
       kind: row.kind,
       id: row.good,
@@ -406,7 +409,164 @@ async function moveGold(context, put) {
   return answer(context, session);
 }
 
-async function answer(context, session) {
+// --- Many things at once ---------------------------------------------------
+//
+// "Wyjmij wszystko" and "Wyjmij zaznaczone" (a player's idea the author passed
+// on, 27.11.2026: taking things out one by one is tedious; DECISIONS.md,
+// "Skrzynia konta: wyjmij wszystko i zaznaczone (27.11.2026)"): everything of
+// one tab of the chest (`all`: "items" or "goods", the cards with the goods),
+// or the things marked (`items`: the chest's ids of items, `goods`: goods as
+// "kind:id"), in one request. Each thing comes out as a single take-out
+// takes it, a good whole, with all its pieces: in the chest's order (the
+// items as they were put in, then the goods as the chest lists them) each
+// comes out while the bag has the places it needs, and what does not fit
+// stays; the answer says how many came out of how many (`taken`). A thing
+// marked that is no longer in the chest takes nothing out ("changed
+// meanwhile": the page reads the chest again). One batch, valid only while
+// the character and the chest's rows taken are as read, so two taps at
+// once take each thing once. The goods' pieces go into each column as one
+// JSON object (addedStacks), so any number of them stays within D1's 100
+// bound values.
+
+const TAKE_ALL = ['items', 'goods'];
+const invalidTake = () => new ApiError(400, 'invalid_take', 'Wybierz, co wyjąć ze Skrzyni Konta.');
+
+// A good named "kind:id" (a material's id has a colon of its own:
+// "material:wolf-pelt:rare"), or null for one the chest does not take.
+function goodOfKey(key) {
+  if (typeof key !== 'string') return null;
+  const at = key.indexOf(':');
+  const kind = key.slice(0, at);
+  const id = key.slice(at + 1);
+  return at > 0 && CHEST_GOODS.includes(kind) && goodView(kind, id) ? { kind, id } : null;
+}
+
+// What a request asks for: `all` of a tab, or the lists of the things
+// marked, at least one, each named once.
+function askedMany(body) {
+  if (body.all !== undefined) {
+    if (!TAKE_ALL.includes(body.all)) throw invalidTake();
+    return { all: body.all, items: [], goods: [] };
+  }
+  const { items = [], goods = [] } = body;
+  if (!Array.isArray(items) || !Array.isArray(goods) || items.length + goods.length === 0) throw invalidTake();
+  if (!items.every((id) => Number.isSafeInteger(id) && id > 0) || new Set(items).size !== items.length) throw invalidTake();
+  if (!goods.every((key) => goodOfKey(key)) || new Set(goods).size !== goods.length) throw invalidTake();
+  return { all: null, items, goods };
+}
+
+// POST /api/chest/take-many { all } | { items, goods }: many things out of
+// the chest at once, as above.
+export async function takeManyFromChest(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const asked = askedMany(await readJson(context.request));
+  const db = context.env.DB;
+  const user = session.userId;
+  const [itemRows, goodRows] = await db.batch([
+    db
+      .prepare('SELECT id FROM chest_items WHERE user_id = ? AND (? OR id IN (SELECT value FROM json_each(?))) ORDER BY id')
+      .bind(user, asked.all === 'items' ? 1 : 0, JSON.stringify(asked.items)),
+    db
+      .prepare("SELECT id, character_id, kind, good, count, traded FROM chest_goods WHERE user_id = ? AND (? OR kind || ':' || good IN (SELECT value FROM json_each(?))) ORDER BY id")
+      .bind(user, asked.all === 'goods' ? 1 : 0, JSON.stringify(asked.goods)),
+  ]);
+  const items = itemRows.results.map((one) => one.id);
+  // The goods by good, those the data knows, in the chest's order.
+  const byGood = new Map();
+  for (const one of goodRows.results) {
+    const key = `${one.kind}:${one.good}`;
+    if (!byGood.has(key)) byGood.set(key, { kind: one.kind, id: one.good, view: CHEST_GOODS.includes(one.kind) ? goodView(one.kind, one.good) : null, rows: [] });
+    byGood.get(key).rows.push({ id: one.id, characterId: one.character_id, count: one.count, traded: one.traded });
+  }
+  const goods = [...byGood.values()].filter((good) => good.view).sort(chestOrder);
+  const all = items.length + goods.length;
+  // Nothing there, or a thing marked gone meanwhile: the page missed a change.
+  if (all === 0 || (!asked.all && all !== asked.items.length + asked.goods.length)) throw changed();
+  // An item takes a place of the bag, and a herb or a potion as many places
+  // as the new stacks it makes (bagRoom); the rest takes none.
+  const { stack } = content().professionRules;
+  let free = bagCapacity(campLevels(player.buildings, context.now, content()), content()) - bagPlaces(player);
+  const takenItems = [];
+  for (const id of items) {
+    if (free < 1) break;
+    takenItems.push(id);
+    free -= 1;
+  }
+  const takenGoods = [];
+  for (const good of goods) {
+    const count = good.rows.reduce((sum, one) => sum + one.count, 0);
+    const have = IN_BAG.has(good.kind) ? heldOf(row, COLUMNS[good.kind], good.id) : 0;
+    const places = IN_BAG.has(good.kind) ? Math.ceil((have + count) / stack) - Math.ceil(have / stack) : 0;
+    if (places > free) continue;
+    free -= places;
+    takenGoods.push({ ...good, count, foreign: chestTakes(good.rows, row.id, count).foreign });
+  }
+  const taken = takenItems.length + takenGoods.length;
+  if (taken === 0) throw new ApiError(409, 'bag_full', 'Za mało miejsca w plecaku. Zrób w nim miejsce, żeby coś wyjąć.');
+  // What the character gets, column by column: the pieces of others as got
+  // from others (foreign in market.js), a scroll in its own column (1061),
+  // a card into the collection (chest-cards.js).
+  const adds = {};
+  const others = {};
+  const scrolls = {};
+  const cards = [];
+  for (const good of takenGoods) {
+    if (isCardGood(good.kind)) cards.push(good);
+    else if (good.kind === 'scroll') scrolls[good.id] = good.count;
+    else {
+      adds[COLUMNS[good.kind]] = { ...adds[COLUMNS[good.kind]], [good.id]: good.count };
+      if (FOREIGN_KINDS.includes(good.kind) && good.foreign > 0) others[`${good.kind}:${good.id}`] = good.foreign;
+    }
+  }
+  const columns = Object.entries(adds);
+  const scrolled = scrollAdds(scrolls);
+  const anyOthers = Object.keys(others).length > 0;
+  const rowsTaken = takenGoods.flatMap((good) => good.rows);
+  const conditions = ['(SELECT version FROM characters WHERE id = ?) = ?'];
+  const binds = [row.id, row.version];
+  if (takenItems.length > 0) {
+    conditions.push('(SELECT COUNT(*) FROM chest_items WHERE user_id = ? AND id IN (SELECT value FROM json_each(?))) = ?');
+    binds.push(user, JSON.stringify(takenItems), takenItems.length);
+  }
+  if (rowsTaken.length > 0) {
+    conditions.push(
+      "NOT EXISTS (SELECT 1 FROM json_each(?) AS s WHERE NOT EXISTS (SELECT 1 FROM chest_goods g WHERE g.id = json_extract(s.value, '$[0]') AND g.user_id = ? AND g.count = json_extract(s.value, '$[1]') AND g.traded = json_extract(s.value, '$[2]')))",
+    );
+    binds.push(JSON.stringify(rowsTaken.map((one) => [one.id, one.count, one.traded])), user);
+  }
+  await atomically(
+    db,
+    [
+      assertion(db, conditions.join(' AND '), binds),
+      ...(takenItems.length > 0
+        ? [
+            // One the character put in itself comes back as it was (takeFromChest).
+            db
+              .prepare(
+                `INSERT INTO items (character_id, slot, data, created_at)
+                 SELECT ?, NULL, CASE WHEN character_id = ? THEN data ELSE json_set(data, '$.chest', 1) END, created_at FROM chest_items
+                 WHERE user_id = ? AND id IN (SELECT value FROM json_each(?)) ORDER BY id`,
+              )
+              .bind(row.id, row.id, user, JSON.stringify(takenItems)),
+            db.prepare('DELETE FROM chest_items WHERE user_id = ? AND id IN (SELECT value FROM json_each(?))').bind(user, JSON.stringify(takenItems)),
+          ]
+        : []),
+      ...(rowsTaken.length > 0 ? [db.prepare('DELETE FROM chest_goods WHERE user_id = ? AND id IN (SELECT value FROM json_each(?))').bind(user, JSON.stringify(rowsTaken.map((one) => one.id)))] : []),
+      ...cardsTaken(db, row.id, cards, context.now),
+      db
+        .prepare(
+          `UPDATE characters SET ${columns.map(([column]) => `${column} = ${addedStacks(column)}, `).join('')}foreign_stacks = ${anyOthers ? addedStacks('foreign_stacks') : 'foreign_stacks'}${scrolled.sql}, version = version + 1 WHERE id = ?`,
+        )
+        .bind(...columns.map(([, counts]) => JSON.stringify(counts)), ...(anyOthers ? [JSON.stringify(others)] : []), ...scrolled.binds, row.id),
+    ],
+    changed,
+  );
+  return answer(context, session, { taken: { count: taken, of: all } });
+}
+
+async function answer(context, session, extra = {}) {
   const player = await loadPlayer(context.env.DB, session.userId);
-  return json({ chest: await chestView(context.env.DB, player, context.now), character: characterView(player, context.now) });
+  return json({ chest: await chestView(context.env.DB, player, context.now), character: characterView(player, context.now), ...extra });
 }
