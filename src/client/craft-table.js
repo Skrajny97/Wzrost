@@ -14,6 +14,7 @@ import { reorderable } from './reorder.js';
 import { playSound } from './sound.js';
 import { call, state, testModeOn } from './state.js';
 import { afterSheet, closeSheet, confirmAction, openSheet, systemPanel, toast, withButton } from './ui.js';
+import { bagListing } from './screens/market.js';
 
 // A material's picture, or the line icon of the family of creatures that
 // leaves it until the picture is drawn; a part's picture or a hammer.
@@ -125,6 +126,8 @@ export function materialSheet(material, start = 1) {
       built && needs === null && full && h('p', { class: 'system-hint', text: t('Kolejka stołu jest pełna ({limit} zleceń). Poczekaj, aż skończy się pierwsze.', { limit: crafting.limit }) }),
     ),
     h('div', { class: 'herb-count' }, less, value, more, all),
+    // The Targowisko's "Wystaw" from here (bagListing), the pieces chosen above to start with.
+    bagListing({ kind: 'material', key: material.key, name: materialTitle(material), count: material.count, scrap: material.price }, () => count),
     h('div', { class: 'sheet-actions' }, process, sell),
   );
 }

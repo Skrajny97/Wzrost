@@ -517,6 +517,33 @@ async function browsed(db, row, team, asked, light) {
   return { ...found, offers: found.ids.map((id) => byId.get(id)).filter(Boolean) };
 }
 
+// The numbers of putting up an offer: the character's own fee and longest
+// auction, by the Kompania Kupców (592), the longest without it, which the
+// hours start at, the shortest, the highest price, and how many offers it
+// may have open at once (240 A).
+function listingNumbers(reputation) {
+  const { minHours, maxPrice, hours: usualHours } = tuning();
+  return {
+    fee: brotherhoodPerk('marketFee', reputation, content()),
+    hours: brotherhoodPerk('auctionHours', reputation, content()),
+    usualHours,
+    minHours,
+    maxPrice,
+    limit: offerLimit(reputation, content()),
+  };
+}
+
+// The Targowisko for "Wystaw na Targowisku" on a card of the bag (a
+// player's proposal passed on by the author, 27.11.2026: „brak możliwości
+// wystawienia przedmiotu bezpośrednio z menu plecaka”), in the character's
+// view: the numbers of putting up an offer and the offers open now (`open`).
+// `ends`: when each of the character's open offers ends, as playerOf reads
+// them; one past its end is settled at the next request to the Targowisko
+// and holds no place any more.
+export function bagMarket(row, ends, now) {
+  return { ...listingNumbers(settlementOf(row).reputation), open: ends.filter((at) => at > now).length };
+}
+
 async function marketView(db, player, now, asked = {}) {
   const { row } = player;
   const stored = settlementOf(row);
@@ -528,16 +555,9 @@ async function marketView(db, player, now, asked = {}) {
   ]);
   const [found, cards] = await Promise.all([browsed(db, row, team, asked, light.results), marketCards(db, row)]);
   const day = questPeriod('daily', now, content()).key;
-  const { minHours, reputation, maxPrice, browse } = tuning();
+  const { reputation, browse } = tuning();
   return {
-    // The character's own fee and longest auction, by the Kompania Kupców
-    // (592), and the longest without it, which the hours start at.
-    fee: brotherhoodPerk('marketFee', stored.reputation, content()),
-    hours: brotherhoodPerk('auctionHours', stored.reputation, content()),
-    usualHours: tuning().hours,
-    minHours,
-    maxPrice,
-    limit: offerLimit(stored.reputation, content()),
+    ...listingNumbers(stored.reputation),
     // The page of the search (browseOffers): the offers in its order, how
     // many it found in all, how many each choice holds, the search as made,
     // and how many more "Pokaż kolejne" adds, up to the most.

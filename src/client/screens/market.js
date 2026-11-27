@@ -15,6 +15,10 @@
 // The Osada's place screen mounts the panel once and keeps it while it
 // redraws itself, so a redraw never asks the server again.
 //
+// The price sheet of "Wystaw" opens from the bag's cards too, with their
+// goods chosen ("Wystaw na Targowisku", bagListing; a player's proposal
+// passed on by the author, 27.11.2026).
+//
 // Talia Systemu's cards too, where the game has them (`market.cards`;
 // DECISIONS.md, "Karty Talii: Skrzynia Konta, Targowisko i Wymiana"): their
 // copies go up and are bought as goods, with tabs of their own, each offer
@@ -412,6 +416,176 @@ export function numberField(id, label, value, least, most) {
   return { element, read };
 }
 
+// What the scrapper pays for the goods, under their name while the player
+// chooses what to put up (the author: "Niech przy wyborze czegoś do
+// wystawienia na licytacji pokazuje za ile dany przedmiot idzie u
+// złomiarza"); goods he does not buy, as parts, show nothing.
+// The Spiżarnia's goods go to the innkeeper Zbylut instead (`innkeeper`).
+const scrapText = (price, each = false, innkeeper = false) =>
+  typeof price === 'number'
+    ? innkeeper
+      ? t('U karczmarza: {gold} zł za sztukę', { gold: formatDecimal(price) })
+      : each
+        ? t('U złomiarza: {gold} zł za sztukę', { gold: formatDecimal(price) })
+        : t('U złomiarza: {gold} zł', { gold: formatDecimal(price) })
+    : null;
+
+// How long an offer may last and what the Targowisko takes of a sale, over
+// the goods to put up; `numbers`: the Targowisko's (listingNumbers on the
+// server).
+const listingText = (numbers) =>
+  t('Ofertę wystawisz na {hours}. Przy sprzedaży Targowisko bierze {fee}% ceny.', {
+    hours: `${numbers.minHours}–${countOf(numbers.hours, 'godzinę', 'godziny', 'godzin')}`,
+    fee: formatDecimal(numbers.fee * 100),
+  });
+
+// The auction's length, an hour a step from the shortest to the longest
+// (the author: "Czas licytacji powinien moc byc do wyboru od 1h do 24h po
+// godzinie suwak sie przesuwający"). It starts at the usual longest, 24 h,
+// also when the Kompania Kupców lets the character go on longer (592).
+function hoursPicker({ minHours, hours: longest, usualHours }) {
+  let hours = Math.min(longest, usualHours ?? longest);
+  const text = (value) => `${formatNumber(value)} h`;
+  const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
+  const slider = h('input', {
+    type: 'range',
+    class: 'duration-slider',
+    min: minHours,
+    max: longest,
+    step: 1,
+    value: hours,
+    'aria-label': t('Czas licytacji'),
+    onInput: () => set(Number(slider.value)),
+  });
+  const stepButton = (sign, label) =>
+    h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': label, text: sign < 0 ? '−' : '+', onClick: () => set(hours + sign) });
+  const less = stepButton(-1, t('Krócej'));
+  const more = stepButton(1, t('Dłużej'));
+  function set(next) {
+    hours = Math.min(longest, Math.max(minHours, next));
+    slider.value = String(hours);
+    slider.setAttribute('aria-valuetext', countOf(hours, 'godzina', 'godziny', 'godzin'));
+    slider.style.setProperty('--fill', `${((hours - minHours) / Math.max(1, longest - minHours)) * 100}%`);
+    value.textContent = text(hours);
+    less.disabled = hours === minHours;
+    more.disabled = hours === longest;
+  }
+  set(hours);
+  const element = h(
+    'div',
+    { class: 'duration-picker' },
+    h('p', { class: 'duration-head' }, h('span', { class: 'duration-title' }, t('Czas licytacji')), value),
+    h('div', { class: 'duration-row' }, less, slider, more),
+    h('p', { class: 'duration-scale', 'aria-hidden': 'true' }, h('span', { text: text(minHours) }), h('span', { text: text(longest) })),
+  );
+  return { element, read: () => hours };
+}
+
+// The second step of "Wystaw": the goods chosen, their count for a stack,
+// the starting price, "Kup teraz" and the auction's length. `numbers`: the
+// Targowisko's (its own answer, or the character's `market` for the bag);
+// `send(button, body)` puts the offer up. From the bag (bagListing) the
+// sheet comes without the Targowisko's list of goods, so `intro` says over
+// the fields what that list says (how long and what the Targowisko takes),
+// and a stack starts at the pieces chosen on its card (`pieces`), not all
+// of them. `opened` keeps a card's face unfolded, as the panel does.
+export function priceSheet(goods, numbers, { send, intro = false, pieces = goods.count, opened = new Set() }) {
+  const { maxPrice } = numbers;
+  const count =
+    goods.kind === 'item'
+      ? null
+      : numberField('market-count', t('Ile sztuk (masz {count})', { count: formatNumber(goods.count) }), Math.min(goods.count, Math.max(1, pieces)), 1, goods.count);
+  const start = numberField('market-start', t('Cena wywoławcza (zł)'), null, 1, maxPrice);
+  const now = numberField('market-buy-now', t('„Kup teraz” (zł, może zostać puste)'), null, 1, maxPrice);
+  const length = hoursPicker(numbers);
+  const scrap = scrapText(goods.scrap, goods.kind !== 'item', goods.kind === 'pantry');
+  // A card: its line, its face under a tap (as on the offers), and the
+  // decks its last copies put up leave incomplete (as the Skrzynia Konta
+  // says).
+  const card = isCardKind(goods.kind);
+  const decks = card ? (goods.decks ?? []).map((deck) => (deck.name ? `„${deck.name}”` : String(deck.slot))) : [];
+  const warn =
+    decks.length > 0 &&
+    h('p', {
+      class: 'region-warning chest-card-warn',
+      text: decks.length > 1 ? filled(cardWord('putDecks'), { decks: decks.join(', ') }) : filled(cardWord('putDeck'), { deck: decks[0] }),
+    });
+  if (warn && count) {
+    const input = count.element.querySelector('input');
+    const check = () => (warn.hidden = Number(input.value) !== goods.count);
+    input.addEventListener('input', check);
+    check();
+  }
+  // The fields read, or what is wrong with them.
+  const list = (event) => {
+    let body;
+    try {
+      body = {
+        kind: goods.kind,
+        ...(goods.kind === 'item' ? { itemId: goods.itemId } : { key: goods.key, count: count.read() }),
+        startPrice: start.read(),
+        buyNow: now.read(true),
+        hours: length.read(),
+      };
+    } catch (error) {
+      toast(error.message);
+      return;
+    }
+    send(event.currentTarget, body);
+  };
+  openSheet(
+    h('h2', { class: 'sheet-title', text: goods.name }),
+    card && h('div', { class: 'market-price-card' }, stackEntry(goods, `price:${goods.kind}:${goods.key}`, opened)),
+    scrap && h('p', { class: 'muted market-scrap', text: scrap }),
+    intro && h('p', { class: 'sheet-text', text: listingText(numbers) }),
+    count && h('p', { class: 'sheet-text', text: t('Cena dotyczy wszystkich wystawionych sztuk razem.') }),
+    count?.element,
+    warn,
+    start.element,
+    now.element,
+    length.element,
+    h(
+      'div',
+      { class: 'sheet-actions' },
+      h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }),
+      h('button', { type: 'button', class: 'button button--system', text: t('Wystaw'), onClick: list }),
+    ),
+  );
+}
+
+// "Wystaw na Targowisku" on a card of the bag (a player's proposal passed
+// on by the author, 27.11.2026: „brak możliwości wystawienia przedmiotu
+// bezpośrednio z menu plecaka”): the Targowisko's own price sheet over the
+// bag, with these goods chosen, wherever the character may put them up
+// (its `market`: null before the Osada opens, so nothing then). With as
+// many offers open as the Kompania Kupców allows, the button stands
+// disabled, with why over it. `goods`: as the Targowisko's list of goods
+// gives them ({ kind, itemId or key, name, count, scrap }); `pieces()`: the
+// pieces of a stack its card has chosen, when it has a choice. Put up, the
+// goods leave the bag at once (the answer's character) and the sheet
+// closes.
+export function bagListing(goods, pieces = () => goods.count) {
+  const numbers = state.character?.market;
+  if (!numbers) return null;
+  const full = numbers.open >= numbers.limit;
+  const send = (button, body) =>
+    withButton(button, async () => {
+      await call('POST', '/api/market/list', body);
+      closeSheet();
+      toast(t('Wystawione na Targowisku.'));
+    });
+  return [
+    full && h('p', { class: 'muted', text: t('Masz już {count} ofert na Targowisku. Wystawisz więcej, gdy któraś się skończy.', { count: formatNumber(numbers.limit) }) }),
+    h('button', {
+      type: 'button',
+      class: 'button button--world',
+      disabled: full,
+      text: t('Wystaw na Targowisku'),
+      onClick: () => priceSheet(goods, numbers, { send, intro: true, pieces: pieces() }),
+    }),
+  ];
+}
+
 // The Targowisko's panel in `holder`: it loads its own data and redraws
 // itself. `refresh` redraws it from what it has, as the character changes.
 export function mountMarket(holder) {
@@ -640,25 +814,13 @@ export function mountMarket(holder) {
     );
   }
 
-  // What the scrapper pays for the goods, under their name while the player
-  // chooses what to put up (the author: "Niech przy wyborze czegoś do
-  // wystawienia na licytacji pokazuje za ile dany przedmiot idzie u
-  // złomiarza"); goods he does not buy, as parts, show nothing.
-  // The Spiżarnia's goods go to the innkeeper Zbylut instead (`innkeeper`).
-  const scrapText = (price, each = false, innkeeper = false) =>
-    typeof price === 'number'
-      ? innkeeper
-        ? t('U karczmarza: {gold} zł za sztukę', { gold: formatDecimal(price) })
-        : each
-          ? t('U złomiarza: {gold} zł za sztukę', { gold: formatDecimal(price) })
-          : t('U złomiarza: {gold} zł', { gold: formatDecimal(price) })
-      : null;
   const pickWithScrap = (summary, text) => (text ? h('span', { class: 'market-pick-goods' }, summary, h('span', { class: 'muted market-scrap', text })) : summary);
 
-  // "Wystaw": the goods first, then the count and the prices.
+  // "Wystaw": the goods first, then the count and the prices (priceSheet).
+  const listed = (button, body) => act(button, '/api/market/list', body, t('Wystawione na Targowisku.'));
   function listSheet() {
     const { items, stacks } = market.sellable;
-    const choose = (goods) => h('button', { type: 'button', class: 'button button--world button--small', text: t('Wybierz'), onClick: () => priceSheet(goods) });
+    const choose = (goods) => h('button', { type: 'button', class: 'button button--world button--small', text: t('Wybierz'), onClick: () => priceSheet(goods, market, { send: listed, opened }) });
     // The bag's items as goods, so that the filters sort them with the stacks.
     const goods = [...items.map((item) => ({ kind: 'item', item })), ...stacks];
     const picks = (shown) => {
@@ -705,117 +867,10 @@ export function mountMarket(holder) {
     };
     openSheet(
       h('h2', { class: 'sheet-title', text: t('Wystaw na Targowisku') }),
-      h('p', {
-        class: 'sheet-text',
-        text: t('Ofertę wystawisz na {hours}. Przy sprzedaży Targowisko bierze {fee}% ceny.', {
-          hours: `${market.minHours}–${countOf(market.hours, 'godzinę', 'godziny', 'godzin')}`,
-          fee: formatDecimal(market.fee * 100),
-        }),
-      }),
+      h('p', { class: 'sheet-text', text: listingText(market) }),
       goods.length === 0
         ? h('p', { class: 'muted', text: t('W plecaku nie ma nic do wystawienia. Założonych przedmiotów się nie wystawia.') })
         : filtered(goods, sellCategory, filters.sellable, picks),
-    );
-  }
-
-  // The auction's length, an hour a step from the shortest to the longest
-  // (the author: "Czas licytacji powinien moc byc do wyboru od 1h do 24h po
-  // godzinie suwak sie przesuwający"). It starts at the usual longest, 24 h,
-  // also when the Kompania Kupców lets the character go on longer (592).
-  function hoursPicker() {
-    const { minHours, hours: longest } = market;
-    let hours = Math.min(longest, market.usualHours ?? longest);
-    const text = (value) => `${formatNumber(value)} h`;
-    const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
-    const slider = h('input', {
-      type: 'range',
-      class: 'duration-slider',
-      min: minHours,
-      max: longest,
-      step: 1,
-      value: hours,
-      'aria-label': t('Czas licytacji'),
-      onInput: () => set(Number(slider.value)),
-    });
-    const stepButton = (sign, label) =>
-      h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': label, text: sign < 0 ? '−' : '+', onClick: () => set(hours + sign) });
-    const less = stepButton(-1, t('Krócej'));
-    const more = stepButton(1, t('Dłużej'));
-    function set(next) {
-      hours = Math.min(longest, Math.max(minHours, next));
-      slider.value = String(hours);
-      slider.setAttribute('aria-valuetext', countOf(hours, 'godzina', 'godziny', 'godzin'));
-      slider.style.setProperty('--fill', `${((hours - minHours) / Math.max(1, longest - minHours)) * 100}%`);
-      value.textContent = text(hours);
-      less.disabled = hours === minHours;
-      more.disabled = hours === longest;
-    }
-    set(hours);
-    const element = h(
-      'div',
-      { class: 'duration-picker' },
-      h('p', { class: 'duration-head' }, h('span', { class: 'duration-title' }, t('Czas licytacji')), value),
-      h('div', { class: 'duration-row' }, less, slider, more),
-      h('p', { class: 'duration-scale', 'aria-hidden': 'true' }, h('span', { text: text(minHours) }), h('span', { text: text(longest) })),
-    );
-    return { element, read: () => hours };
-  }
-
-  function priceSheet(goods) {
-    const { maxPrice } = market;
-    const count = goods.kind === 'item' ? null : numberField('market-count', t('Ile sztuk (masz {count})', { count: formatNumber(goods.count) }), goods.count, 1, goods.count);
-    const start = numberField('market-start', t('Cena wywoławcza (zł)'), null, 1, maxPrice);
-    const now = numberField('market-buy-now', t('„Kup teraz” (zł, może zostać puste)'), null, 1, maxPrice);
-    const length = hoursPicker();
-    const scrap = scrapText(goods.scrap, goods.kind !== 'item', goods.kind === 'pantry');
-    // A card: its line, its face under a tap (as on the offers), and the
-    // decks its last copies put up leave incomplete (as the Skrzynia Konta
-    // says).
-    const card = isCardKind(goods.kind);
-    const decks = card ? (goods.decks ?? []).map((deck) => (deck.name ? `„${deck.name}”` : String(deck.slot))) : [];
-    const warn =
-      decks.length > 0 &&
-      h('p', {
-        class: 'region-warning chest-card-warn',
-        text: decks.length > 1 ? filled(cardWord('putDecks'), { decks: decks.join(', ') }) : filled(cardWord('putDeck'), { deck: decks[0] }),
-      });
-    if (warn && count) {
-      const input = count.element.querySelector('input');
-      const check = () => (warn.hidden = Number(input.value) !== goods.count);
-      input.addEventListener('input', check);
-      check();
-    }
-    openSheet(
-      h('h2', { class: 'sheet-title', text: goods.name }),
-      card && h('div', { class: 'market-price-card' }, stackEntry(goods, `price:${goods.kind}:${goods.key}`, opened)),
-      scrap && h('p', { class: 'muted market-scrap', text: scrap }),
-      count && h('p', { class: 'sheet-text', text: t('Cena dotyczy wszystkich wystawionych sztuk razem.') }),
-      count?.element,
-      warn,
-      start.element,
-      now.element,
-      length.element,
-      h(
-        'div',
-        { class: 'sheet-actions' },
-        h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }),
-        h('button', {
-          type: 'button',
-          class: 'button button--system',
-          text: t('Wystaw'),
-          onClick: submit(
-            '/api/market/list',
-            () => ({
-              kind: goods.kind,
-              ...(goods.kind === 'item' ? { itemId: goods.itemId } : { key: goods.key, count: count.read() }),
-              startPrice: start.read(),
-              buyNow: now.read(true),
-              hours: length.read(),
-            }),
-            t('Wystawione na Targowisku.'),
-          ),
-        }),
-      ),
     );
   }
 

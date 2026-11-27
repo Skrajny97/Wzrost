@@ -1,7 +1,7 @@
 // The character screen: a 3:4 portrait with five equipment slots on each side,
 // an eye that hides the slots, and the bag with items that are not worn.
-// The item card also upgrades the item on the camp's Kowadło and takes a bag
-// item apart on the Stół rozbiórki.
+// The item card also upgrades the item on the camp's Kowadło, takes a bag
+// item apart on the Stół rozbiórki and puts it up at the Targowisko.
 
 import { herbSprite, itemSprite, materialSprite, mineralSprite, pantrySprite, potionSprite, resourceArt, scrollArt } from '../art.js';
 import { bonusList } from '../bonuses.js';
@@ -22,6 +22,7 @@ import { slideInRow } from '../slide-row.js';
 import { itemTip, setTipRenderer } from '../item-tip.js';
 import { afterSheet, closeSheet, confirmAction, openSheet, pageHeading, systemLink, systemPanel, toast, withButton } from '../ui.js';
 import { bust } from './select.js';
+import { bagListing } from './market.js';
 import { transmutePart } from '../transmute.js';
 
 // The words of these tables are written in Polish and shown in the page's
@@ -264,10 +265,11 @@ function stacksOf(entry, stack) {
 }
 
 // What the bag holds by the stack: herbs and potions, each with its picture,
-// its slot class and its address in the API (/api/herbs/…, /api/potions/…).
+// its slot class, its address in the API (/api/herbs/…, /api/potions/…) and
+// its kind of goods on the Targowisko (bagListing).
 const STACKS = {
-  herbs: { art: (id) => herbSprite(id) ?? icon('leaf', { size: 24 }), slot: 'slot--herb', api: 'herbs', key: 'herbId', discard: 'Wyrzucić zioła?' },
-  potions: { art: (id) => potionSprite(id) ?? icon('flask', { size: 24 }), slot: 'slot--potion', api: 'potions', key: 'potionId', discard: 'Wyrzucić mikstury?' },
+  herbs: { art: (id) => herbSprite(id) ?? icon('leaf', { size: 24 }), slot: 'slot--herb', api: 'herbs', key: 'herbId', discard: 'Wyrzucić zioła?', goods: 'herb' },
+  potions: { art: (id) => potionSprite(id) ?? icon('flask', { size: 24 }), slot: 'slot--potion', api: 'potions', key: 'potionId', discard: 'Wyrzucić mikstury?', goods: 'potion' },
 };
 
 // The account's characters as round busts over the Postać tab, the one
@@ -796,6 +798,8 @@ export function mountCharacter(container, { switchCharacter } = {}) {
         h('p', { class: 'sheet-text', text: t('Z części Warsztat wykonuje przedmioty, a przy wymianie 10 części daje 1 część rzadszą.') }),
       ),
       workshop && h('a', { class: 'button button--world', href: '#/profesje/rzemieslnictwo', onClick: closeSheet, text: t('Do Warsztatu') }),
+      // The Targowisko's "Wystaw" from here (bagListing), all the parts to start with.
+      bagListing({ kind: 'part', key: part.id, name: part.name, count: part.count }),
     );
   }
 
@@ -901,6 +905,8 @@ export function mountCharacter(container, { switchCharacter } = {}) {
       ),
       h('div', { class: 'herb-count' }, less, value, more, all),
       jeweller && h('a', { class: 'button button--world', href: '#/profesje/jubilerstwo', onClick: closeSheet, text: t('Do Szlifierni') }),
+      // The Targowisko's "Wystaw" from here (bagListing), the pieces chosen above to start with.
+      bagListing({ kind: 'mineral', key: mineral.id, name: mineral.name, count: mineral.count, scrap: mineral.price }, () => count),
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: t('Wyrzuć') }), sell),
       // The przemiana of this gem into the next one (913 B), under selling.
       transmutePart(mineral, { onDone: closeSheet }),
@@ -1062,6 +1068,8 @@ export function mountCharacter(container, { switchCharacter } = {}) {
         : crop
           ? state.character.professions?.farming && h('a', { class: 'button button--world', href: '#/profesje/rolnictwo', onClick: closeSheet, text: t('Do Rolnictwa') })
           : state.character.professions?.fishing && h('a', { class: 'button button--world', href: '#/profesje/rybolowstwo', onClick: closeSheet, text: t('Do Rybołówstwa') }),
+      // The Targowisko's "Wystaw" from here (bagListing), the pieces chosen above to start with.
+      bagListing({ kind: 'pantry', key: good.id, name: good.name, count: good.count, scrap: good.price }, () => count),
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: t('Wyrzuć') }), sell),
     );
   }
@@ -1265,6 +1273,8 @@ export function mountCharacter(container, { switchCharacter } = {}) {
         exploring && entry.usable !== false && h('p', { class: 'muted', text: t('Leczyć się można po powrocie z wyprawy.') }),
         drink,
         h('div', { class: 'herb-count' }, less, value, more, all),
+        // The Targowisko's "Wystaw" from here (bagListing), the pieces chosen above to start with.
+        bagListing({ kind: STACKS[kind].goods, key: entry.id, name: entry.name, count: entry.count, scrap: entry.price }, () => count),
         h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: t('Wyrzuć') }), sell),
       ],
     );
@@ -1588,6 +1598,10 @@ function itemCard(item, { equipped, anvil = false, preview: withPreview = true, 
       !equipped &&
         item.price !== undefined &&
         h('button', { type: 'button', class: 'button button--world', onClick: sell, text: t('Sprzedaj za {gold} złota', { gold: formatNumber(item.price) }) }),
+      // Put up at the Targowisko, as its own "Wystaw" takes the bag's items
+      // (bagListing in market.js; a player's proposal, 27.11.2026): only an
+      // item in the bag, not one worn or a report's copy.
+      !equipped && inBag(item) && bagListing({ kind: 'item', itemId: item.id, name: itemTitle(item), count: 1, scrap: item.price }),
       h(
         'div',
         { class: 'sheet-actions' },
@@ -1658,6 +1672,10 @@ export function compareTable(item, worn, { title = t('Porównanie z założonym'
     ),
   );
 }
+
+// Whether an item is in the bag now: a report's copy has no id, and one
+// worn, on a rack of the Zbrojownia or gone is not there.
+const inBag = (item) => item.id !== undefined && state.character.bag.some((one) => one.id === item.id);
 
 // Where an item is now: in the bag or worn.
 function ownedItem(id) {

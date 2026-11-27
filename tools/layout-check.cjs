@@ -23,7 +23,9 @@
 // in the arena (the cards' HP lines inside their cards). The bag
 // is checked with its six tabs, on its Zioła and Spiżarnia (herbs, dishes,
 // fish and crops by the thousand), and in "Zaznacz do sprzedaży" too, with
-// an item marked. On each screen,
+// an item marked; then the card of its item of the longest name, with
+// "Wystaw na Targowisku", and the Targowisko's price sheet it opens. On
+// each screen,
 // on the tabs TABS opens and in the sheets SHEETS opens over a screen (the
 // Ustawienia and "Zgłoś błąd", with a screenshot picked too), it looks for a
 // page wider than the screen (a sheet that scrolls sideways), text out of
@@ -233,12 +235,14 @@ const TABS = {
   // (19.11.2026; their words in data/buildings.json).
   '#/oboz/anvil': [{ name: 'Sortuj › Ulepszenie', tap: '.anvil-items .bag-sort .segmented-option:nth-child(5)' }],
   // The bag's Zioła and Spiżarnia tabs (24.11.2026), then "Zaznacz do
-  // sprzedaży".
+  // sprzedaży", left again for the items, whose cards SHEETS opens.
   '#/postac': [
     said('Zioła'),
     said('Spiżarnia'),
     { name: 'Zaznacz do sprzedaży', tap: '[data-guide="bag-pick"]' },
     { name: 'Zaznacz do sprzedaży › zaznaczony', tap: '.bag--sale .salvage-pick:not(.salvage-pick--favorite)' },
+    { name: 'Zaznacz do sprzedaży › Anuluj', tap: '.bag--sale .sale-bar-head .button--small' },
+    said('Przedmioty'),
   ],
   // Jubilerstwo's „Oprawianie”: the figure and „Z plecaka” under it
   // (20.11.2026).
@@ -289,8 +293,13 @@ const SHEETS = {
     { name: 'Rozdaj ręcznie', anew: true, tap: `button:text-is("${said('Rozdaj ręcznie')}")`, ready: '.manual-list > .manual-stat:first-child .manual-input', words: true },
     { name: 'Co nowego?', anew: true, tap: '.topbar .news-button', ready: '.news-entries > .news-entry:first-child .news-text .news-link' },
   ],
+  // The card of the bag's first item, the newest, of the longest name, with
+  // "Wystaw na Targowisku" by "Sprzedaj" (27.11.2026), and the Targowisko's
+  // price sheet it opens; the Ustawienia after them, that sheet closed.
   '#/postac': [
-    { name: 'Ustawienia', tap: '.topbar .settings-button', ready: `h2.sheet-title:text-is("${said('Ustawienia')}")`, words: true },
+    { name: 'karta przedmiotu', tap: '.bag .bag-grid > li:first-child .slot--bag', ready: `button:text-is("${said('Wystaw na Targowisku')}")`, words: true },
+    { name: 'Wystaw na Targowisku', tap: `#sheet button:text-is("${said('Wystaw na Targowisku')}")`, ready: '#market-start', words: true },
+    { name: 'Ustawienia', anew: true, tap: '.topbar .settings-button', ready: `h2.sheet-title:text-is("${said('Ustawienia')}")`, words: true },
     { name: 'Zgłoś błąd', tap: `#sheet button:text-is("${said('Zgłoś błąd')}")`, ready: `h2.sheet-title:text-is("${said('Zgłoś błąd')}")`, words: true },
     { name: 'zrzut ekranu', pick: '#sheet input[type="file"]', ready: '.bug-shot-preview' },
   ],
