@@ -19,7 +19,7 @@
 // start (cardRatingStakes) and moves the ratings at its end. Pure: the
 // server gives the time and the seeds.
 
-import { cardStats, cardType } from './cards.js';
+import { cardStrength, cardType } from './cards.js';
 import { arenaDay, arenaReward, arenaRewardTiers } from './pvp-arena.js';
 import { laterPeriod } from './quests.js';
 import { createRng } from './rng.js';
@@ -102,16 +102,12 @@ export function cardRatingStakes(attackerRating, defenderRating, content) {
 }
 
 // A deck's strength, as the rivals show it (900 A): the Atak and Życie of
-// its cards at their levels, all summed.
+// its cards at their levels, all summed (cardStrength).
 /**
  * @param {DeckCard[]} cards
  * @param {Content} content
  */
-export const deckStrength = (cards, content) =>
-  cards.reduce((sum, card) => {
-    const { attack, life } = cardStats(card.id, card.level, content);
-    return sum + attack + life;
-  }, 0);
+export const deckStrength = (cards, content) => cards.reduce((sum, card) => sum + cardStrength(card.id, card.level, content), 0);
 
 // How many cards of each type a deck has, in the order of the types, each
 // with its name and icon.

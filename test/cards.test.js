@@ -1,7 +1,8 @@
 // Talia Systemu in the engine (src/engine/cards.js; DECISIONS.md, "Talia
 // Systemu: gra karciana w Salonie Gier", 871–877): the cards of the
 // creatures living in the lands, their types, rarities, Atak and Życie, their
-// levels; the starter deck and the decks; a match's setup by the seed, the
+// levels; the starter deck and the decks, and the strongest deck of a
+// collection, four of each type („Najlepsza możliwa”); a match's setup by the seed, the
 // rival's lines first, the player's turn and its checks, the blows of a
 // round (the type advantage, the card with none opposite), the cards beaten,
 // the reserves drawn, the end and the rounds' limit; the heroes' skills with
@@ -14,16 +15,19 @@ import { describe, test } from 'node:test';
 
 import {
   autoTurn,
+  bestDeck,
   cardDrop,
   cardHomes,
   cardKind,
   cardLevel,
   cardRarity,
   cardStats,
+  cardStrength,
   cardType,
   cardsLeft,
   createRng,
   deckBlock,
+  deckStrength,
   faintForfeit,
   firstWinCard,
   heroSkill,
@@ -159,6 +163,112 @@ describe('Talia Systemu: the cards', () => {
     assert.equal(deckBlock([...starterDeck(content).slice(1), 'basilisk'], owned, content).code, 'invalid_deck');
     assert.equal(deckBlock([...starterDeck(content).slice(1), 'boar'], owned, content), null);
     assert.equal(deckBlock('wolf', owned, content).code, 'invalid_deck');
+  });
+});
+
+describe('Talia Systemu: „Najlepsza możliwa” (27.11.2026)', () => {
+  // A collection of these cards, each with its copies (1 unless given).
+  const collectionOf = (...entries) => new Map(entries.map((entry) => (Array.isArray(entry) ? entry : [entry, 1])));
+  const strengthOf = (collection, id) => cardStrength(id, cardLevel(collection.get(id), content), content);
+  const ofType = (ids, type) => ids.filter((id) => cardType(id, content) === type);
+  const each = rules.deckSize / rules.types.length;
+
+  test('a card\'s strength is its Atak and Życie at its level, as a deck\'s strength adds them up', () => {
+    const { attack, life } = cardStats('fox', 3, content);
+    assert.equal(cardStrength('fox', 3, content), attack + life);
+    assert.equal(deckStrength(starter(), content), starterDeck(content).reduce((sum, id) => sum + cardStrength(id, 1, content), 0));
+  });
+
+  test('the four strongest cards of each type, four of each (4/4/4), each card once, a deck the rules allow', () => {
+    // Every card of the game, at levels from 1 to 5 and more copies than
+    // the top level counts.
+    const collection = new Map([...cardHomes(content).keys()].map((id, index) => [id, 1 + (index % 7)]));
+    const best = bestDeck(collection, content);
+    assert.equal(rules.types.length, 3);
+    assert.equal(each, 4);
+    assert.equal(best.cards.length, rules.deckSize);
+    assert.equal(new Set(best.cards).size, best.cards.length);
+    assert.deepEqual([best.short, best.missing], [[], 0]);
+    assert.equal(deckBlock(best.cards, new Set(collection.keys()), content), null);
+    for (const type of rules.types) {
+      const chosen = ofType(best.cards, type.id);
+      assert.equal(chosen.length, each, type.id);
+      const left = ofType([...collection.keys()], type.id).filter((id) => !chosen.includes(id));
+      // None of those left is stronger than the weakest chosen.
+      assert.ok(Math.min(...chosen.map((id) => strengthOf(collection, id))) >= Math.max(...left.map((id) => strengthOf(collection, id))), type.id);
+    }
+    // The same collection in another order: the same deck.
+    assert.deepEqual(bestDeck(new Map([...collection].reverse()), content), best);
+  });
+
+  test('four of each type even when a fifth of one type is stronger than the four of another', () => {
+    // Eight strong cards of Siła against the starter's Zręczność and Magia.
+    const strong = ['octopus', 'heartwood', 'stolem', 'koschei', 'acorn', 'beefsteak-fungus', 'pangolin', 'ninth-wave'];
+    assert.ok(strong.every((id) => cardType(id, content) === 'strength'));
+    const collection = collectionOf(...strong, ...starterDeck(content));
+    const best = bestDeck(collection, content);
+    const strongest = [...strong, ...ofType(starterDeck(content), 'strength')].sort((a, b) => strengthOf(collection, b) - strengthOf(collection, a)).slice(0, each);
+    assert.deepEqual(ofType(best.cards, 'strength').sort(), strongest.sort());
+    assert.deepEqual(ofType(best.cards, 'dexterity').sort(), ofType(starterDeck(content), 'dexterity').sort());
+    assert.deepEqual(ofType(best.cards, 'intellect').sort(), ofType(starterDeck(content), 'intellect').sort());
+    // The fifth Siła is stronger than every card of Zręczność, yet stays out.
+    const fifth = [...strong].sort((a, b) => strengthOf(collection, b) - strengthOf(collection, a))[each];
+    assert.ok(!best.cards.includes(fifth));
+    assert.ok(ofType(best.cards, 'dexterity').every((id) => strengthOf(collection, id) < strengthOf(collection, fifth)));
+  });
+
+  test('a card\'s level counts, and of two cards as strong the rarer goes in, then the one of the higher level', () => {
+    // Five cards of Zręczność, the starter's four of Siła and of Magia.
+    const others = [...ofType(starterDeck(content), 'strength'), ...ofType(starterDeck(content), 'intellect')];
+    const strong = ['two-headed-snake', 'rat-king', 'aphid'];
+    // Lis (pospolity) and Łasica (rzadka): as strong on the first level.
+    assert.equal(cardStrength('fox', 1, content), cardStrength('weasel', 1, content));
+    assert.ok(content.rarities.findIndex((one) => one.id === cardRarity('weasel', content)) > content.rarities.findIndex((one) => one.id === cardRarity('fox', content)));
+    let best = bestDeck(collectionOf(...others, ...strong, 'fox', 'weasel'), content);
+    assert.ok(best.cards.includes('weasel') && !best.cards.includes('fox'));
+    // On the second level Lis is stronger.
+    best = bestDeck(collectionOf(...others, ...strong, ['fox', 2], 'weasel'), content);
+    assert.ok(best.cards.includes('fox') && !best.cards.includes('weasel'));
+    // Five of Siła: Borsuk on the second level and Jenot on the first, as
+    // strong and as rare; the higher level goes in.
+    const rest = [...ofType(starterDeck(content), 'dexterity'), ...ofType(starterDeck(content), 'intellect')];
+    const tough = ['octopus', 'heartwood', 'stolem'];
+    assert.equal(cardStrength('badger', 2, content), cardStrength('raccoon-dog', 1, content));
+    assert.equal(cardRarity('badger', content), cardRarity('raccoon-dog', content));
+    best = bestDeck(collectionOf(...rest, ...tough, ['badger', 2], 'raccoon-dog'), content);
+    assert.ok(best.cards.includes('badger') && !best.cards.includes('raccoon-dog'));
+    assert.deepEqual([best.cards.length, best.short, best.missing], [rules.deckSize, [], 0]);
+  });
+
+  test('a type with fewer than four cards: its places go to the best cards left of the other types', () => {
+    const strength = ['octopus', 'heartwood', 'stolem', 'koschei', 'wolf', 'badger'];
+    const dexterity = ['two-headed-snake', 'rat-king', 'aphid', 'fox', 'squirrel', 'viper'];
+    const collection = collectionOf(...strength, ...dexterity, 'phantasm', 'fume-spirit');
+    const best = bestDeck(collection, content);
+    assert.deepEqual([best.short, best.missing], [['intellect'], 0]);
+    assert.equal(best.cards.length, rules.deckSize);
+    assert.equal(deckBlock(best.cards, new Set(collection.keys()), content), null);
+    assert.deepEqual(ofType(best.cards, 'intellect').sort(), ['fume-spirit', 'phantasm']);
+    // The four best of each other type, and the two best of those left.
+    const top = (ids) => [...ids].sort((a, b) => strengthOf(collection, b) - strengthOf(collection, a));
+    const left = top([...top(strength).slice(each), ...top(dexterity).slice(each)]).slice(0, 2);
+    assert.deepEqual(best.cards.filter((id) => cardType(id, content) !== 'intellect').sort(), [...top(strength).slice(0, each), ...top(dexterity).slice(0, each), ...left].sort());
+    // Two types short: the third fills all the places left.
+    const two = bestDeck(collectionOf(...strength, 'acorn', 'beefsteak-fungus', 'pangolin', 'ninth-wave', 'fox', 'phantasm'), content);
+    assert.deepEqual([two.short, two.missing, two.cards.length], [['dexterity', 'intellect'], 0, rules.deckSize]);
+    assert.equal(ofType(two.cards, 'strength').length, rules.deckSize - 2);
+  });
+
+  test('a collection of fewer cards than a deck: all of them, and the places left empty', () => {
+    const collection = collectionOf('wolf', 'badger', 'raccoon-dog', 'squirrel', 'fox', 'phantasm', 'reedling');
+    const best = bestDeck(collection, content);
+    assert.deepEqual([...best.cards].sort(), [...collection.keys()].sort());
+    assert.deepEqual([best.short, best.missing], [['strength', 'dexterity', 'intellect'], rules.deckSize - 7]);
+    // Not a whole deck: it cannot be saved till more cards come.
+    assert.equal(deckBlock(best.cards, new Set(collection.keys()), content).code, 'invalid_deck');
+    assert.deepEqual(bestDeck(new Map(), content), { cards: [], short: ['strength', 'dexterity', 'intellect'], missing: rules.deckSize });
+    // What is no card of the game is left out.
+    assert.deepEqual(bestDeck(collectionOf('wolf', 'not-a-card', 'bear-strength'), content).cards, ['wolf']);
   });
 });
 

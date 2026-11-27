@@ -1484,6 +1484,10 @@
     "0.5.37": {
       "title": "Version 0.5.37",
       "body": "- The Necromancer and the Lich are stronger: Raise Dead's skeleton strikes for 75–135% damage instead of 50–90%, Curse of Decay's poison is half as strong again (37.5–60% instead of 25–40%), and Army of the Dead's knight strikes for 135–195% instead of 90–130%."
+    },
+    "0.5.38": {
+      "title": "Version 0.5.38",
+      "body": "- System Deck: \"Build deck\" has a new \"Best possible\" button. It picks the strongest cards of your collection at once, 4 of each type. You can still change them, then tap \"Save deck\"."
     }
   }
 }

@@ -1860,6 +1860,11 @@
       "id": "0.5.37",
       "title": "Wersja 0.5.37",
       "body": "- Nekromanta i Licz są silniejsi: szkielet z Wskrzeszenia bije za 75–135% obrażeń zamiast 50–90%, Klątwa rozkładu zatruwa wrogów o połowę mocniej (37,5–60% zamiast 25–40%), a rycerz z Armii umarłych bije za 135–195% zamiast 90–130%."
+    },
+    {
+      "id": "0.5.38",
+      "title": "Wersja 0.5.38",
+      "body": "- Talia Systemu: w „Ułóż talię” jest przycisk „Najlepsza możliwa”. Od razu wybiera z Twojej kolekcji najsilniejsze karty, po 4 każdego typu. Możesz je jeszcze zmienić, a potem stuknij „Zapisz talię”."
     }
   ]
 }

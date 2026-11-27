@@ -34,6 +34,7 @@
 
 import {
   aboveTiers,
+  bestDeck,
   cardHomes,
   cardLevel,
   cardsLeft,
@@ -557,7 +558,8 @@ function packView(row, game, collection) {
 const effectFirst = (number, game) => (game.effectTiers.includes(number) ? null : (effectRules(content())?.firstWin[number - 1] ?? null));
 
 // The Salon's third tab for the page: the words and rules, the collection
-// with the deck marked, the hero, Szczęsny's tiers with their stakes and the
+// with the deck marked and the strongest deck it gives („Najlepsza możliwa”
+// in the builder), the hero, Szczęsny's tiers with their stakes and the
 // rewards still waiting, the day's pack (902 C), the residents' tables (904
 // B), the day's staked matches, the running match as the page sees it
 // (matchView) with its opponent, and the last match finished.
@@ -607,6 +609,9 @@ async function cardsView(db, player, now) {
     collection: [...collection].map(([id, copies]) => cardView(id, copies, content(), { copies, inDeck: Boolean(deck?.includes(id)) })),
     deck,
     decks,
+    // „Najlepsza możliwa” in the builder (27.11.2026): the strongest deck of
+    // the collection, four cards of each type (bestDeck).
+    best: bestDeck(collection, content()),
     // The effect cards (976, 977): those the character has, with their
     // levels, the deck in play's, the slots and the words.
     effects: {

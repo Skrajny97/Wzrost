@@ -238,6 +238,19 @@ export function cardStats(id, level, content) {
   return { attack: Math.max(1, Math.round(stats.attack * shape * might)), life: Math.max(1, Math.round((stats.life / shape) * might)) };
 }
 
+// A card's strength at a level: its Atak and Życie, summed. A deck's strength
+// (deckStrength in card-arena.js, under the saved decks and by the Arena's
+// rivals) is its cards'; „Najlepsza możliwa” (bestDeck) ranks the cards by it.
+/**
+ * @param {string} id
+ * @param {number} level
+ * @param {Content} content
+ */
+export function cardStrength(id, level, content) {
+  const { attack, life } = cardStats(id, level, content);
+  return attack + life;
+}
+
 // A type as the page shows it: its id, name and icon.
 /**
  * @param {string} type
@@ -532,6 +545,42 @@ export function deckBlock(ids, owned, content) {
   if (new Set(ids).size !== ids.length) return { code: 'invalid_deck', message: 'Każda karta może być w talii tylko raz.' };
   if (ids.some((id) => !isCard(id, content) || !owned.has(id))) return { code: 'invalid_deck', message: 'W talii mogą być tylko karty z Twojej kolekcji.' };
   return null;
+}
+
+// „Najlepsza możliwa” (the author, 27.11.2026: „bierze najwyższe możliwe
+// statystyki + rozkład kart 4/4/4 jeśli chodzi o typy”): the strongest deck
+// the collection (the copies of each card) gives, as deckBlock allows it.
+// The cards rank by their strength at their levels (cardStrength), then the
+// rarer, then the higher level, then by id. The best deckSize / types of
+// each type (4/4/4); the places a type has too few cards for go to the best
+// cards left of the others (`short`: those types). A collection of fewer
+// cards than a deck takes them all (`missing`: the places left empty).
+/**
+ * @param {Map<string, number>} collection
+ * @param {Content} content
+ * @returns {{ cards: string[], short: string[], missing: number }}
+ */
+export function bestDeck(collection, content) {
+  const { deckSize, types } = cardRules(content);
+  const rarities = content.rarities.map((/** @type {{ id: string }} */ rarity) => rarity.id);
+  const ranked = [...collection]
+    .filter(([id, copies]) => isCard(id, content) && copies > 0)
+    .map(([id, copies]) => {
+      const level = cardLevel(copies, content);
+      return { id, type: cardType(id, content), strength: cardStrength(id, level, content), rarity: rarities.indexOf(cardRarity(id, content)), level };
+    })
+    .sort((a, b) => b.strength - a.strength || b.rarity - a.rarity || b.level - a.level || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  const each = Math.floor(deckSize / types.length);
+  /** @type {string[]} */
+  const short = [];
+  const picked = types.flatMap((/** @type {{ id: string }} */ type) => {
+    const ofType = ranked.filter((card) => card.type === type.id).slice(0, each);
+    if (ofType.length < each) short.push(type.id);
+    return ofType;
+  });
+  const rest = ranked.filter((card) => !picked.includes(card)).slice(0, deckSize - picked.length);
+  const cards = [...picked, ...rest].map((card) => card.id);
+  return { cards, short, missing: deckSize - cards.length };
 }
 
 // --- Szczęsny --------------------------------------------------------------
