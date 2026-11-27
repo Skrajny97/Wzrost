@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/buildings.json, by the building's id (src/engine/overlay.js): the camp's buildings. The Quarters (settlement) and the seven buildings of the Stronghold (fortress) follow the camp's: Plac treningowy Training Yard, Zbrojownia Armoury, Sala trofeów Trophy Hall, Strażnica Watchtower, Ołtarz Systemu System Altar, Szklarnia Greenhouse, Kapliczka Shrine. An effect's {value} and {hours} come from the code (src/engine/camp.js, effectText): a share as \"10%\", hours as \"2 h\", a count as a number; the Salvage Table's effect follows its highest rarity with a small first letter.",
+  "$comment": "English texts of data/buildings.json, by the building's id (src/engine/overlay.js): the camp's buildings. The Quarters (settlement) and the seven buildings of the Stronghold (fortress) follow the camp's: Plac treningowy Training Yard, Zbrojownia Armoury, Sala trofeów Trophy Hall, Strażnica Watchtower, Ołtarz Systemu System Altar, Szklarnia Greenhouse, Kapliczka Shrine. An effect's {value} and {hours} come from the code (src/engine/camp.js, effectText): a share as \"10%\", hours as \"2 h\", a count as a number; the Disassembly Table's effect follows its highest rarity with a small first letter.",
   "sawmill": {
     "name": "Sawmill",
     "description": "A saw and a sawhorse under a lean-to. Slowly turns fallen trunks into wood.",
@@ -87,8 +87,8 @@
     }
   },
   "craft-table": {
-    "name": "Salvage Table",
-    "description": "A simple table with tools. For free, over time, it turns creature materials and salvaged items into parts for making items. Here you can also trade one camp resource for another.",
+    "name": "Disassembly Table",
+    "description": "A simple table with tools. For free, over time, it turns creature materials and disassembled items into parts for making items. Here you can also trade one camp resource for another.",
     "effect": { "text": "Processing {value} faster" },
     "exchange": {
       "title": "Resource exchange",
@@ -98,7 +98,7 @@
     "queue": {
       "cancel": "Remove from queue",
       "cancelAll": "Remove all",
-      "old": "Salvage from before version 0.1.65 will finish on its own.",
+      "old": "Disassembly from before version 0.1.65 will finish on its own.",
       "move": "Move in the queue: {what}",
       "moveHint": "Hold ≡ and drag an order to a new place. The order at work stays first, and the “Ready at” times are counted anew.",
       "confirm": {
@@ -113,10 +113,10 @@
         "later": "The next orders will start sooner.",
         "counted": "Quests will lose what they counted for this work.",
         "countedGuild": "Quests and Guild Trials will lose what they counted for this work.",
-        "minerals": "You will give back the gems and ores from salvage: {minerals}.",
-        "pattern": "The System will hide the pattern from salvage again: {patterns}.",
-        "patterns": "The System will hide the patterns from salvage again: {patterns}.",
-        "kept": "Salvage from before version 0.1.65 will stay in the queue.",
+        "minerals": "You will give back the gems and ores from disassembly: {minerals}.",
+        "pattern": "The System will hide the pattern from disassembly again: {patterns}.",
+        "patterns": "The System will hide the patterns from disassembly again: {patterns}.",
+        "kept": "Disassembly orders from before version 0.1.65 will stay in the queue.",
         "yes": "Remove",
         "no": "Keep"
       },
@@ -127,9 +127,9 @@
       "errors": {
         "gone": "This order is no longer in the queue.",
         "empty": "There are no orders in the queue to remove.",
-        "old": "This salvage from before version 0.1.65 cannot be undone, as the item is gone. It will finish on its own.",
+        "old": "This disassembly from before version 0.1.65 cannot be undone, as the item is gone. It will finish on its own.",
         "bagFull": "The bag cannot hold the items from the queue (slots needed: {need}, free: {free}). Make room in it.",
-        "minerals": "The gems and ores from salvage are missing: {minerals}. Without them the item will not go back to the bag.",
+        "minerals": "The gems and ores from disassembly are missing: {minerals}. Without them the item will not go back to the bag.",
         "rewarded": "The reward for the quest “{quest}” has already been collected, and without this work it would not be done. Remove fewer orders or wait until the table finishes them.",
         "patternInUse": "Items are being made right now from the pattern “{pattern}” this item taught. Remove the order once that work is done.",
         "atWork": "The table is already working on this, so this order stays first.",

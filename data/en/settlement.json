@@ -331,7 +331,7 @@
       "lockedButton": "From the standing “{standing}”",
       "noGold": "Not enough gold",
       "noParts": "Not enough parts",
-      "partsHint": "You can buy parts at the scrap dealer's counter and at the Marketplace, and the Salvage Table makes them from salvaged items.",
+      "partsHint": "You can buy parts at the scrap dealer's counter and at the Marketplace, and the Disassembly Table makes them from disassembled items.",
       "success": "The Enchantress has set a star",
       "successText": "The item now has {stars} of {max} stars, and each of its values has grown.",
       "failure": "Not this time",

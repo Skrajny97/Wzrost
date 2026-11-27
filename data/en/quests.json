@@ -45,11 +45,11 @@
       "counted": ["new region", "new regions", "new regions"]
     },
     "process": {
-      "text": "Process {count} {noun} at the Salvage Table.",
+      "text": "Process {count} {noun} at the Disassembly Table.",
       "counted": ["material", "materials", "materials"]
     },
     "salvage": {
-      "text": "Salvage {count} {noun} at the Salvage Table.",
+      "text": "Disassemble {count} {noun} at the Disassembly Table.",
       "counted": ["item", "items", "items"]
     },
     "gather": {

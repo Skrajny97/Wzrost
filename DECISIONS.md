@@ -3384,6 +3384,17 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
+## Poprawki angielskiej wersji od gracza (27.11.2026)
+
+Gracz, który gra po angielsku, napisał: „mam kilka uwag do wersji językowej po angielsku, jest trochę drobnych błędów w tłumaczeniach mobków / akcji itp.”, „Salvage -> Disassemble (Rozbierz ekwipunek)” i „Potwory z listy poszukiwanych nie są tłumaczone niektóre”.
+
+1. **Disassemble zamiast Salvage.** Rozbiórka przedmiotu to po angielsku „disassemble”: „Rozbierz” to „Disassemble”, „Rozbierz kilka” to „Disassemble several”, „rozbiórka” to „disassembly”, a Stół rozbiórki to Disassembly Table. Tak jest w plecaku, na stole i w jego kolejce, w komunikatach, zadaniach, Próbach Gildii, Encyklopedii i kwestiach narratora. Słownik nazw (`data/en/glossary.json`) ma Stół rozbiórki, „Rozbierz” i „rozbiórkę”, więc `npm test` nie przepuści z powrotem „Salvage”. Dawne wpisy „Co nowego?” zostają bez zmian.
+2. **Nagrania do powtórzenia.** Trzy angielskie kwestie narratora mają nowy tekst, a ich nagrania mówią jeszcze „Salvage Table”: `camp-craft-table`, `crafting-patterns` i `crafting-ending`. Nowe nagrania tym samym głosem („NarratorEn”) przechodzą przez stronę odsłuchu.
+3. **Poszukiwani.** Wszystkie 85 odmian stworów i 7 wyjętych spod prawa ma angielskie nazwy. Lista gończa bierze nazwę z danych w języku strony (`wantedName`), także dla listu wziętego, gdy gra była po polsku. Polskie litery mają tylko imiona: dwóch wyjętych spod prawa (Wojsław the Blaze, Ścibor the Digger) i sołtysa Bogumiła. Zostają zgodnie z „Odpowiedź autora: bez nazw fonetycznych” (6.11.2026, punkt 4). Ich zmiana to pytanie do autora.
+4. **Raport wyprawy z listem gończym.** Raport brał nazwę poszukiwanego z chwili wyruszenia, więc wyprawa, która wyruszyła po polsku, miała polską nazwę także w raporcie odebranym po angielsku. Teraz silnik bierze ją z danych w języku raportu (`simulateHunt`).
+5. **Gotowanie.** „Postać gotuje” (gdy pracę wykonuje Awatar) i znacznik „gotowanie” w Dzienniku nie miały angielskiego, bo sprawdzanie tłumaczeń bierze pojedyncze słowo bez polskich liter za identyfikator. Teraz to „is cooking” i „cooking”.
+6. **Test:** `test/english-monsters.test.js` sprawdza angielskie nazwy, formy liczby i ataki wszystkich stworów z `data/monsters.json` (z elitami i czempionami) i przeciwników ze zdarzeń, nazwy odmian Poszukiwanych oraz listy gończe i raport wyprawy po angielsku.
+
 ## Wersja 0.5.33 (26.11.2026): piąta ewolucja klas w grze
 
 Zob. „Piąta ewolucja klas”, punkt 9: cała grafika przyjęta przez autora (portrety, jeźdźcy, chody, odcienie skóry, Świetlisty rycerz, ikony, dźwięki i animacje 30 umiejętności, plansza z pięcioma przywołańcami w 1273), więc `FIFTH_EVOLUTION` ma „on” w grze i na wersji testowej (`wrangler.jsonc`, jak `FOURTH_EVOLUTION` w 0.4.45), a portrety, chody i jeźdźcy piątych form są w listach `src/client/art.js`. Pełne testy (3063) i przejście wprowadzenia przeszły przed wdrożeniem.

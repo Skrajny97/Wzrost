@@ -83,9 +83,9 @@
   "shrine": {
     "name": "Temple",
     "gods": {
-      "perun": { "name": "Perun", "genitive": "Perun's", "title": "god of thunder and war", "domainText": "fights, Towers, explorations and salvaging loot" },
+      "perun": { "name": "Perun", "genitive": "Perun's", "title": "god of thunder and war", "domainText": "fights, Towers, explorations and disassembling loot" },
       "weles": { "name": "Veles", "genitive": "Veles's", "title": "god of wealth and the wilds", "domainText": "fights, explorations, Settlement orders and Requests" },
-      "swarog": { "name": "Svarog", "genitive": "Svarog's", "title": "god of fire and the forge", "domainText": "the Anvil, the Workshop and the Salvage Table" },
+      "swarog": { "name": "Svarog", "genitive": "Svarog's", "title": "god of fire and the forge", "domainText": "the Anvil, the Workshop and the Disassembly Table" },
       "mokosz": { "name": "Mokosh", "genitive": "Mokosh's", "title": "goddess of the earth and herbs", "domainText": "herbs, potions, processing materials and Settlement orders" }
     },
     "texts": {
@@ -356,8 +356,8 @@
       "gatherAny": { "text": "Gather {count} {noun} in total.", "counted": ["herb", "herbs", "herbs"] },
       "brewAny": { "text": "Brew {count} {noun} in total.", "counted": ["potion", "potions", "potions"] },
       "makeAny": { "text": "Craft {count} {noun} in the Workshop.", "counted": ["item", "items", "items"], "note": "Successful crafts count." },
-      "process": { "text": "Process {count} {noun} at the Salvage Table.", "counted": ["material", "materials", "materials"] },
-      "salvage": { "text": "Salvage {count} {noun} at the Salvage Table.", "counted": ["item", "items", "items"] },
+      "process": { "text": "Process {count} {noun} at the Disassembly Table.", "counted": ["material", "materials", "materials"] },
+      "salvage": { "text": "Disassemble {count} {noun} at the Disassembly Table.", "counted": ["item", "items", "items"] },
       "orders": { "text": "Complete {count} {noun} in the Settlement.", "counted": ["order", "orders", "orders"] },
       "upgrade": { "text": "Upgrade items at the Anvil {count} {noun}.", "counted": ["time", "times", "times"], "note": "Successful upgrades count." },
       "gifts": { "text": "Give guild members {count} {noun} in the Guild Requests.", "counted": ["piece", "pieces", "pieces"] }
@@ -366,7 +366,7 @@
       "towers": "The Towers open at character level {level}.",
       "professions": "The Professions open at character level {level}.",
       "crafting": "Crafting opens at character level {level}.",
-      "table": "Build the Salvage Table in the camp first.",
+      "table": "Build the Disassembly Table in the camp first.",
       "settlement": "The Settlement opens at character level {level}.",
       "anvil": "Build the Anvil in the camp first.",
       "off": "This part of the game is not here yet."
