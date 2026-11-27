@@ -3384,6 +3384,8 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
+## Wersja 0.5.34 (27.11.2026): poprawki angielskiej wersji
+
 ## Poprawki angielskiej wersji od gracza (27.11.2026)
 
 Gracz, który gra po angielsku, napisał: „mam kilka uwag do wersji językowej po angielsku, jest trochę drobnych błędów w tłumaczeniach mobków / akcji itp.”, „Salvage -> Disassemble (Rozbierz ekwipunek)” i „Potwory z listy poszukiwanych nie są tłumaczone niektóre”.

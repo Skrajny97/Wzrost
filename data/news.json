@@ -1840,6 +1840,11 @@
       "id": "0.5.33",
       "title": "Wersja 0.5.33",
       "body": "- Piąta ewolucja: od 400. poziomu klasy każda czwarta forma może przejść w swoją piątą.\n- Każda piąta forma ma dwie nowe umiejętności oraz nowy wygląd, chód i jazdę wierzchem.\n- Nowe przywołańce, m.in. Świetliści rycerze Miecza Niebios, tur Boga Łowów i łoś w stadzie Ojca Puszczy."
+    },
+    {
+      "id": "0.5.34",
+      "title": "Wersja 0.5.34",
+      "body": "- Po angielsku rozbiórka przedmiotów to teraz „Disassemble”, a Stół rozbiórki to „Disassembly Table”. Raport wyprawy podaje nazwę poszukiwanego w języku gry, także gdy wyprawa wyruszyła w innym. Po angielsku jest też „is cooking” przy gotowaniu."
     }
   ]
 }
