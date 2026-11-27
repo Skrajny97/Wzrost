@@ -3384,6 +3384,8 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
+## Wersja 0.5.37 (27.11.2026): silniejszy Nekromanta i Licz (1277 A)
+
 ## Cień i ścieżka Nekromanty (1277 A, 27.11.2026)
 
 Gracz zapytał przez autora: „Czy Cień to najsłabsza klasa w grze? Obrażenia nawet z krytykami nie są nawet do porównania z resztą klas na tym samym levelu.” Pomiar pokazał, że nie, ale jedna ścieżka Cienia była wyraźnie słabsza od reszty gry. Autor wybrał 1277 A: mocniejsze umiejętności Nekromanty i Licza. Wariant B (sam Nekromanta) odrzucił.

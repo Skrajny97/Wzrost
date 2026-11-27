@@ -1480,6 +1480,10 @@
     "0.5.36": {
       "title": "Version 0.5.36",
       "body": "- In the bag, an item's card has a \"List at the Marketplace\" button: it opens the Marketplace's price window with that item, so you only set the price and confirm. Herbs, potions, materials, parts, minerals and pantry goods have it too (once the Settlement is open)."
+    },
+    "0.5.37": {
+      "title": "Version 0.5.37",
+      "body": "- The Necromancer and the Lich are stronger: Raise Dead's skeleton strikes for 75–135% damage instead of 50–90%, Curse of Decay's poison is half as strong again (37.5–60% instead of 25–40%), and Army of the Dead's knight strikes for 135–195% instead of 90–130%."
     }
   }
 }
