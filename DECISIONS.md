@@ -3384,6 +3384,15 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
+## Wersja 0.5.41 (28.11.2026): szare paski wszystkich minigier
+
+## Szare paski minigier (1278 B, 28.11.2026)
+
+Gracz zgłosił, że w Alchemii pasek minigry jest kolorowy, a w innych profesjach szary. Do tej pory Alchemia i Gotowanie miały pasek ciepła (od zimnego do przypalonego), a pozostałe sześć minigier szary. Na stronie ocen były dwa warianty (1278): A, każda praca w swoich barwach, i B, wszystkie szare. Autor: „zrób same szare te minigry”.
+
+1. Pasek każdej minigry jest szary, także w Alchemii i Gotowaniu.
+2. Znaczniki zostają: płomyk w Alchemii i Gotowaniu, młot w Rzemiośle i Górnictwie, spławik w pozostałych. Zielone pole trafienia bez zmian.
+
 ## Wersja 0.5.40 (28.11.2026): zwijane grupy w Wymianie, Skrzyni konta i na Stole rozbiórki
 
 ## Zwijane grupy materiałów i kart (28.11.2026)

@@ -10637,9 +10637,10 @@ a.profession-square:active {
 
 /* The mini-game at a work's report (1006; minigame.js): the place's picture
    over the work's name, the bar with its green zone and the marker running
-   to and fro, the three tries, a line of the state and "Pomiń". The bar of
-   Alchemia and Gotowanie is a scale of heat, and the hammer's of the
-   Warsztat and Górnictwo has a hammer's head for its marker. */
+   to and fro, the three tries, a line of the state and "Pomiń". Every bar
+   is plain (1278 B, 28.11.2026: Alchemia's and Gotowanie's had a scale of
+   heat, the others not); the marker of Alchemia and Gotowanie is a flame,
+   and the hammer's of the Warsztat and Górnictwo a hammer's head. */
 .minigame {
   display: flex;
   flex-direction: column;
@@ -10679,10 +10680,6 @@ a.profession-square:active {
   border: 1px solid var(--system-line);
   border-radius: 4px;
   background: var(--bg-deep);
-}
-
-.minigame-gauge--heat {
-  background: linear-gradient(90deg, #2c4f6b, #3f6b4a 35%, #a8742f 70%, #8f2e22);
 }
 
 .minigame-zone {
