@@ -194,22 +194,40 @@ export const scrollMinutes = (level, content, faster = 0, scroll = content.works
  */
 export const scrollOrderMinutes = (count, level, content, faster = 0, scroll = content.workshop.scroll) => wholeMinutes(count * scrollMinutes(level, content, faster, scroll));
 
-// The parts one item of a base takes at an item level: those of its slot and
-// one more for every partsLevelStep levels, so the parts for an item always
-// cost more at the Skup złomu than the dealer pays for it (test/workshop.test.js).
+// The parts of its slot one item of a base takes at an item level, which the
+// camp's resources count by too: all of them (`parts`) from fullCostLevel
+// on, and below it the share of them its level is of fullCostLevel, rounded
+// up, at least one. So a low item costs less, as the scrapper pays less for
+// it too (a player, 28.11.2026: „Fajnie jakby koszta się skalowały”, and the
+// author: „Słuszna uwaga”).
 /**
  * @param {Base} base
  * @param {number} level
  * @param {Content} content
  * @returns {number}
  */
-export const craftParts = (base, level, content) => content.workshop.parts[base.slot] + Math.floor(level / content.workshop.partsLevelStep);
+export function slotParts(base, level, content) {
+  const { parts, fullCostLevel } = content.workshop;
+  return Math.max(1, Math.ceil((parts[base.slot] * Math.min(level, fullCostLevel)) / fullCostLevel));
+}
+
+// The parts one item of a base takes at an item level: those of its slot
+// (slotParts) and one more for every partsLevelStep levels, so the parts for
+// an item always cost more at the Skup złomu than the dealer pays for it
+// (test/workshop.test.js).
+/**
+ * @param {Base} base
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number}
+ */
+export const craftParts = (base, level, content) => slotParts(base, level, content) + Math.floor(level / content.workshop.partsLevelStep);
 
 // What `count` items of a base and rarity at an item level take: the parts
 // of the rarity (craftParts), by id, and the camp's resources, by id: stone
-// per part of the slot and rarity step for anything, and as much of `extra`
-// per part of the slot and step in wood or iron ore for the families made of
-// them.
+// per part of the slot (slotParts) and rarity step for anything, and as much
+// of `extra` per part of the slot and step in wood or iron ore for the
+// families made of them.
 /**
  * @param {Base} base
  * @param {string} rarityId
@@ -219,8 +237,8 @@ export const craftParts = (base, level, content) => content.workshop.parts[base.
  * @returns {{ parts: Record<string, number>, resources: Record<string, number> }}
  */
 export function craftCost(base, rarityId, count, level, content) {
-  const { parts, resources } = content.workshop;
-  const each = parts[base.slot];
+  const { resources } = content.workshop;
+  const each = slotParts(base, level, content);
   const step = rarityStep(rarityId, content);
   const family = base.family ?? base.id;
   const extra = Object.entries(/** @type {Record<string, string[]>} */ (resources.families)).find(([, families]) => families.includes(family))?.[0];

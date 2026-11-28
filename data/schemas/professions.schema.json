@@ -556,6 +556,7 @@
         "laterPatternLevel",
         "patternsUpTo",
         "partsLevelStep",
+        "fullCostLevel",
         "upgrades",
         "scroll",
         "steadyScroll",
@@ -673,6 +674,11 @@
           "type": "integer",
           "minimum": 1,
           "description": "Co tyle poziomów przedmiotu wyrób bierze o jedną część więcej, niż podaje parts (koszt rośnie z poziomem, więc części zawsze kosztują u złomiarza więcej, niż on płaci za wyrób; test w test/workshop.test.js)."
+        },
+        "fullCostLevel": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Od tego poziomu przedmiotu wyrób bierze wszystkie części slotu (parts) i pełne zasoby obozu. Niżej bierze mniej części slotu, w proporcji do poziomu (poziom / fullCostLevel), zaokrąglone w górę, co najmniej 1, a zasoby liczą się od tych części. Części co partsLevelStep poziomów dochodzą jak dotąd (gracz, 28.11.2026: „Fajnie jakby koszta się skalowały”)."
         },
         "luck": {
           "type": "object",

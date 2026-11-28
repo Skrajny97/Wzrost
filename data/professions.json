@@ -227,6 +227,7 @@
     "laterPatternLevel": 10,
     "patternsUpTo": 250,
     "partsLevelStep": 10,
+    "fullCostLevel": 100,
     "upgrades": [
       { "upgrade": 1, "level": 10, "chance": 0.1, "perLevel": 0.005, "max": 0.4 },
       { "upgrade": 2, "level": 25, "chance": 0.05, "perLevel": 0.0025, "max": 0.2 },

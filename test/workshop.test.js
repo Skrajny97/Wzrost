@@ -135,13 +135,15 @@ describe('the Warsztat in the engine', () => {
     assert.equal(craftRarities(80, content).length, 7);
   });
 
+  // At the 250th item level, past fullCostLevel: all the parts of the slot,
+  // 25 more for the level, and the slot's full resources.
   test('an item takes parts of its rarity and stone, and iron ore or wood for its family, more with each rarity up', () => {
-    assert.deepEqual(craftCost(base('sword'), 'common', 1, 1, content), { parts: { scraps: 6 }, resources: { stone: 18, 'iron-ore': 6 } });
-    assert.deepEqual(craftCost(base('bow'), 'rare', 2, 1, content), { parts: { straps: 12 }, resources: { stone: 72, wood: 24 } });
-    assert.deepEqual(craftCost(base('broadsword'), 'epic', 1, 1, content), { parts: { shards: 6 }, resources: { stone: 72, 'iron-ore': 24 } });
-    assert.deepEqual(craftCost(base('pavise'), 'common', 1, 1, content), { parts: { scraps: 4 }, resources: { stone: 12, wood: 4 } });
-    assert.deepEqual(craftCost(base('hood'), 'common', 1, 1, content), { parts: { scraps: 4 }, resources: { stone: 12 } });
-    assert.deepEqual(craftCost(base('gloves'), 'common', 3, 1, content), { parts: { scraps: 9 }, resources: { stone: 27 } });
+    assert.deepEqual(craftCost(base('sword'), 'common', 1, 250, content), { parts: { scraps: 31 }, resources: { stone: 18, 'iron-ore': 6 } });
+    assert.deepEqual(craftCost(base('bow'), 'rare', 2, 250, content), { parts: { straps: 62 }, resources: { stone: 72, wood: 24 } });
+    assert.deepEqual(craftCost(base('broadsword'), 'epic', 1, 250, content), { parts: { shards: 31 }, resources: { stone: 72, 'iron-ore': 24 } });
+    assert.deepEqual(craftCost(base('pavise'), 'common', 1, 250, content), { parts: { scraps: 29 }, resources: { stone: 12, wood: 4 } });
+    assert.deepEqual(craftCost(base('hood'), 'common', 1, 250, content), { parts: { scraps: 29 }, resources: { stone: 12 } });
+    assert.deepEqual(craftCost(base('gloves'), 'common', 3, 250, content), { parts: { scraps: 84 }, resources: { stone: 27 } });
   });
 
   test('a common item takes half an hour at level 1, each rarity up twice as long, each level 1% less, down to half', () => {
@@ -355,6 +357,13 @@ describe('the Warsztat in the engine', () => {
 describe('the Warsztat through the API', () => {
   const { call, db, signUp } = useServer({ PROFESSIONS: 'on', CRAFTING: 'on' });
   let cookie;
+  // What one item takes at the character's level 15 (craftCost): below
+  // fullCostLevel a share of its slot's parts and resources (28.11.2026).
+  const one = (baseId, rarityId = 'common') => {
+    const { parts, resources } = craftCost(base(baseId), rarityId, 1, 15, content);
+    return { parts: Object.values(parts)[0], stone: resources.stone, ore: resources['iron-ore'] ?? 0 };
+  };
+  const swordCost = one('sword');
 
   beforeEach(async () => {
     ({ cookie } = await signUp('kowalka'));
@@ -412,11 +421,12 @@ describe('the Warsztat through the API', () => {
       id: 'sword',
       name: 'Miecz',
       level: 1,
-      // 6 for a weapon and 1 more for the character's level 15.
-      parts: 7,
+      // A weapon's 6 parts cut to the character's level 15, and 1 more for
+      // the level, with the resources of those parts.
+      parts: swordCost.parts,
       resources: [
-        { id: 'stone', name: 'Kamień', amount: 18 },
-        { id: 'iron-ore', name: 'Ruda żelaza', amount: 6 },
+        { id: 'stone', name: 'Kamień', amount: swordCost.stone },
+        { id: 'iron-ore', name: 'Ruda żelaza', amount: swordCost.ore },
       ],
       // Its kind and classes, with the forms that wear it too (988).
       family: 'sword',
@@ -437,7 +447,7 @@ describe('the Warsztat through the API', () => {
     // The author, 12.11.2026: "Zrób warsztat i szlifiernie zalezna od czesci
     // i materialow po prostu", "bez ograniczeń czasowych". Before, 5 items
     // at most, 2.5 h at the profession's first level.
-    await set(`parts = '{"scraps":140}', resources = '{"stone":360,"iron-ore":120}'`);
+    await set(`parts = '{"scraps":${20 * swordCost.parts}}', resources = '{"stone":${20 * swordCost.stone},"iron-ore":${20 * swordCost.ore}}'`);
     const started = await craft({ baseId: 'sword', rarity: 'common', count: 20 });
     assert.equal(started.status, 201, JSON.stringify(started.data));
     assert.deepEqual([started.data.character.activity.count, started.data.character.activity.minutes], [20, 600]);
@@ -456,12 +466,12 @@ describe('the Warsztat through the API', () => {
     assert.equal(await error({ baseId: 'sword', rarity: 'common', count: 1.5 }), 'invalid_count');
     assert.equal((await craft({ baseId: 'sword', rarity: 'common', count: 1 })).data.error === undefined, true);
     await call('POST', '/api/hunts/cancel', { cookie });
-    await set(`parts = '{"scraps":5}'`);
+    await set(`parts = '{"scraps":${swordCost.parts - 1}}'`);
     assert.equal(await error({ baseId: 'sword', rarity: 'common', count: 1 }), 'no_parts');
-    await set(`parts = '{"scraps":30}', resources = '{"stone":17,"iron-ore":40}'`);
+    await set(`parts = '{"scraps":30}', resources = '{"stone":${swordCost.stone - 1},"iron-ore":40}'`);
     const short = await craft({ baseId: 'sword', rarity: 'common', count: 1 });
     assert.equal(short.data.error.code, 'no_resources');
-    assert.equal(short.data.error.message, 'Brakuje zasobów: Kamień (potrzeba 18).');
+    assert.equal(short.data.error.message, `Brakuje zasobów: Kamień (potrzeba ${swordCost.stone}).`);
     await set(`resources = '{"wood":50,"stone":200,"iron-ore":40}'`);
     // A full bag stops nothing: the items wait in the Przechowalnia (842).
     await addItems(30);
@@ -478,9 +488,9 @@ describe('the Warsztat through the API', () => {
     assert.equal(after.activity.rarityName, 'pospolity');
     assert.equal(after.activity.count, 2);
     assert.equal(after.activity.minutes, 60);
-    // 7 parts for each sword at the character's level 15.
-    assert.deepEqual(parts(after), { scraps: 16 });
-    assert.deepEqual(after.resources, { wood: 50, stone: 164, 'iron-ore': 28 });
+    // The parts and resources of two swords at the character's level 15.
+    assert.deepEqual(parts(after), { scraps: 30 - 2 * swordCost.parts });
+    assert.deepEqual(after.resources, { wood: 50, stone: 200 - 2 * swordCost.stone, 'iron-ore': 40 - 2 * swordCost.ore });
     assert.ok(after.regen, 'HP keeps coming back while crafting');
     const hunt = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 1 } });
     assert.equal(hunt.data.error.message, 'Postać wykonuje przedmioty. Poczekaj na koniec wyrobu.');
@@ -490,10 +500,11 @@ describe('the Warsztat through the API', () => {
   test('the parts of the table\'s orders done by now count, and the queue keeps the rest', async () => {
     const now = Date.now();
     const queue = [
-      { id: 'a', kind: 'material', key: 'wolf-pelt:common', count: 4, partId: 'scraps', parts: 4, bonus: 0, startsAt: now - 7200000, endsAt: now - 3600000 },
+      { id: 'a', kind: 'material', key: 'wolf-pelt:common', count: 1, partId: 'scraps', parts: 1, bonus: 0, startsAt: now - 7200000, endsAt: now - 3600000 },
       { id: 'b', kind: 'material', key: 'wolf-pelt:common', count: 3, partId: 'scraps', parts: 3, bonus: 0, startsAt: now - 3600000, endsAt: now + 3600000 },
     ];
-    await set(`parts = '{"scraps":3}', crafting = ?`, JSON.stringify(queue));
+    // A part short of a sword without the order done.
+    await set(`parts = '{"scraps":${swordCost.parts - 1}}', crafting = ?`, JSON.stringify(queue));
     const started = await craft({ baseId: 'sword', rarity: 'common', count: 1 });
     assert.equal(started.status, 201);
     assert.deepEqual(parts(started.data.character), {});
@@ -529,8 +540,9 @@ describe('the Warsztat through the API', () => {
     assert.equal(after.professions.list[2].level, crafted.level);
     assert.equal(after.stats.find((stat) => stat.id === 'strength').sources.professions, (crafted.level - 1) * content.professionsById[content.workshop.profession].statPerLevel);
     // Nothing comes back from an order made in full.
-    assert.deepEqual(parts(after), { scraps: 16 });
-    assert.deepEqual(after.resources, { wood: 50, stone: 164, 'iron-ore': 28 });
+    const axe = one('axe');
+    assert.deepEqual(parts(after), { scraps: 30 - 2 * axe.parts });
+    assert.deepEqual(after.resources, { wood: 50, stone: 200 - 2 * axe.stone, 'iron-ore': 40 - 2 * axe.ore });
     const { data } = await call('GET', '/api/reports', { cookie });
     assert.equal(data.reports[0].kind, 'items');
     assert.deepEqual(data.reports[0].items, [{ name: 'Topór', count: 2 }]);
@@ -547,11 +559,12 @@ describe('the Warsztat through the API', () => {
     const { report, character: after } = (await call('POST', '/api/hunts/claim', { cookie })).data;
     assert.equal(report.items.length + report.failed, 5);
     assert.ok(report.items.every((item) => item.rarity === 'divine'));
-    // 5 parts for each helmet at level 15, and stone 3 × 4 parts of the slot
-    // × step 7 and iron ore 1 × 4 × 7.
-    assert.deepEqual(parts(after), { 'star-shard': 5 });
-    assert.equal(after.resources.stone, 2000 - 84 * 5 + 84 * report.failed);
-    assert.equal(after.resources['iron-ore'], 500 - 28 * 5 + 28 * report.failed);
+    // The parts of each helmet at level 15, and stone 3 × the slot's parts
+    // at that level × step 7 and iron ore 1 × those parts × 7.
+    const helmet = one('helmet', 'divine');
+    assert.deepEqual(parts(after), { 'star-shard': 30 - 5 * helmet.parts });
+    assert.equal(after.resources.stone, 2000 - helmet.stone * 5 + helmet.stone * report.failed);
+    assert.equal(after.resources['iron-ore'], 500 - helmet.ore * 5 + helmet.ore * report.failed);
     assert.equal(report.failedText === null, report.failed === 0);
   });
 
@@ -573,9 +586,9 @@ describe('the Warsztat through the API', () => {
     assert.equal(report.stopped, 'Wyrób przerwany. Części i zasoby na resztę wróciły.');
     assert.equal(report.profession.xp, 40);
     assert.equal(after.activity, null);
-    // 21 parts taken for the three, 14 back for the two not done.
-    assert.deepEqual(parts(after), { scraps: 23 });
-    assert.deepEqual(after.resources, { wood: 50, stone: 182, 'iron-ore': 34 });
+    // The parts of three swords taken, those of the two not done back.
+    assert.deepEqual(parts(after), { scraps: 30 - swordCost.parts });
+    assert.deepEqual(after.resources, { wood: 50, stone: 200 - swordCost.stone, 'iron-ore': 40 - swordCost.ore });
     assert.equal(after.professions.storage.items.filter((item) => item.base === 'sword').length, 1);
   });
 
@@ -614,28 +627,61 @@ describe('the Warsztat switched off', () => {
 });
 
 describe('the Warsztat, step 2, in the engine', () => {
-  test('an item takes one more part every 10 item levels, and the resources stay those of its slot', () => {
-    assert.deepEqual([1, 9, 10, 15, 99, 100, 500].map((level) => craftParts(base('sword'), level, content)), [6, 6, 7, 7, 15, 16, 56]);
+  // The data with another fullCostLevel: 100 and 50 are the variants A and
+  // B of 1279 (DECISIONS.md, „Rzemiosło: koszty rosną z poziomem
+  // przedmiotu”).
+  const fullAt = (fullCostLevel) => ({ ...content, workshop: { ...content.workshop, fullCostLevel } });
+  const slotBases = Object.keys(content.workshop.parts).map((slot) => craftableBases(content).find((candidate) => candidate.slot === slot));
+
+  test('an item takes one more part every 10 item levels, and below fullCostLevel only a share of its slot\'s parts and resources', () => {
+    const levels = [1, 9, 10, 15, 25, 50, 75, 99, 100, 500];
+    assert.deepEqual(levels.map((level) => craftParts(base('sword'), level, fullAt(100))), [1, 1, 2, 2, 4, 8, 12, 15, 16, 56]);
+    assert.deepEqual(levels.map((level) => craftParts(base('helmet'), level, fullAt(100))), [1, 1, 2, 2, 3, 7, 10, 13, 14, 54]);
+    assert.deepEqual(levels.map((level) => craftParts(base('sword'), level, fullAt(50))), [1, 2, 3, 3, 5, 11, 13, 15, 16, 56]);
+    assert.deepEqual(levels.map((level) => craftParts(base('helmet'), level, fullAt(50))), [1, 1, 2, 3, 4, 9, 11, 13, 14, 54]);
     assert.equal(craftParts(base('gloves'), 510, content), 54);
-    assert.deepEqual(craftCost(base('sword'), 'common', 2, 15, content), { parts: { scraps: 14 }, resources: { stone: 36, 'iron-ore': 12 } });
+    // The player's legendary helmet at the 25th level: 3 Bursztyny, 15 stone
+    // and 5 iron ore in A, 4, 30 and 10 in B (before: 6, 60 and 20).
+    assert.deepEqual(craftCost(base('helmet'), 'legendary', 1, 25, fullAt(100)), { parts: { amber: 3 }, resources: { stone: 15, 'iron-ore': 5 } });
+    assert.deepEqual(craftCost(base('helmet'), 'legendary', 1, 25, fullAt(50)), { parts: { amber: 4 }, resources: { stone: 30, 'iron-ore': 10 } });
+    // From fullCostLevel on, as before it.
+    assert.deepEqual(craftCost(base('sword'), 'common', 2, 100, fullAt(100)), { parts: { scraps: 32 }, resources: { stone: 36, 'iron-ore': 12 } });
+    assert.deepEqual(craftCost(base('sword'), 'common', 2, 15, fullAt(1)), { parts: { scraps: 14 }, resources: { stone: 36, 'iron-ore': 12 } });
+    // A higher item never takes less, and every item takes a part of its
+    // slot and some stone, and its family's resource.
+    for (const fullCostLevel of [content.workshop.fullCostLevel, 100, 50]) {
+      for (const each of [...slotBases, base('bow')]) {
+        let before = { parts: 1, stone: 1, extra: 0 };
+        for (let level = 1; level <= 510; level++) {
+          const { parts, resources } = craftCost(each, 'epic', 1, level, fullAt(fullCostLevel));
+          const now = { parts: Object.values(parts)[0], stone: resources.stone, extra: resources.wood ?? resources['iron-ore'] ?? 0 };
+          assert.ok(now.parts >= before.parts && now.stone >= before.stone && now.extra >= before.extra, `${each.id} at ${level}, full at ${fullCostLevel}`);
+          before = now;
+        }
+      }
+    }
   });
 
   // The author's rule (R16): the parts of an item cost more at the Skup
   // złomu than the dealer pays for that item, for every rarity, slot, level
   // of the Skup złomu (which raises what he pays too) and item level, and
-  // the upgrades an item comes with add nothing to his price.
+  // the upgrades an item comes with add nothing to his price. It holds for
+  // any fullCostLevel, as an item takes at least one part of its slot: the
+  // data's, those of the variants A and B (1279) and the extremes.
   test('the parts of a made item cost more than the scrapper pays for it', () => {
     const bench = content.buildingsById['scrap-bench'];
-    const bases = Object.keys(content.workshop.parts).map((slot) => craftableBases(content).find((candidate) => candidate.slot === slot));
-    for (let level = 1; level <= bench.maxLevel; level++) {
-      const bonus = campBonus({ 'scrap-bench': level }, 'sellPrice', content);
-      for (const { partId, price } of shopOffer(level, content)) {
-        const rarityId = content.partsById[partId].rarity;
-        for (const each of bases) {
-          for (let itemLevel = 1; itemLevel <= 510; itemLevel++) {
-            const parts = craftParts(each, itemLevel, content);
-            const item = { base: each.id, slot: each.slot, level: itemLevel, rarity: rarityId, affixes: [], upgrade: 5, crafted: { parts, upgrade: 5 } };
-            assert.ok(price * parts > sellPrice(item, content, bonus), `${each.id} ${partId} at level ${level}, item level ${itemLevel}`);
+    for (const fullCostLevel of new Set([content.workshop.fullCostLevel, 100, 50, 1, 510])) {
+      const data = fullAt(fullCostLevel);
+      for (let level = 1; level <= bench.maxLevel; level++) {
+        const bonus = campBonus({ 'scrap-bench': level }, 'sellPrice', content);
+        for (const { partId, price } of shopOffer(level, content)) {
+          const rarityId = content.partsById[partId].rarity;
+          for (const each of slotBases) {
+            for (let itemLevel = 1; itemLevel <= 510; itemLevel++) {
+              const parts = craftParts(each, itemLevel, data);
+              const item = { base: each.id, slot: each.slot, level: itemLevel, rarity: rarityId, affixes: [], upgrade: 5, crafted: { parts, upgrade: 5 } };
+              assert.ok(price * parts > sellPrice(item, content, bonus), `${each.id} ${partId} at level ${level}, item level ${itemLevel}, full at ${fullCostLevel}`);
+            }
           }
         }
       }
@@ -660,7 +706,7 @@ describe('the Warsztat, step 2, in the engine', () => {
     // and the upgrade it came with.
     const order = (professionLevel, seed) => craftItems({ baseId: 'sword', rarityId: 'common', count: 5, level: 20, professionLevel, seed }, content);
     const plain = order(9, 'u').map((result) => result.item);
-    assert.ok(plain.every((item) => item.upgrade === undefined && item.crafted.parts === 8 && item.crafted.upgrade === 0));
+    assert.ok(plain.every((item) => item.upgrade === undefined && item.crafted.parts === craftParts(base('sword'), 20, content) && item.crafted.upgrade === 0));
     let upgraded = 0;
     for (let index = 0; index < 200; index++) {
       for (const { item } of order(100, `u${index}`)) {
@@ -857,7 +903,7 @@ describe('the Warsztat, step 2, through the API', () => {
     assert.deepEqual([data.salvage.pattern, data.salvage.patternAt], ['Pałasz', 'w Warsztacie']);
     const broadsword = data.character.professions.workshop.slots[0].patterns.find((pattern) => pattern.id === 'broadsword');
     assert.equal(broadsword.learned, true);
-    assert.equal(broadsword.parts, 7);
+    assert.equal(broadsword.parts, craftParts(base('broadsword'), 15, content));
     assert.equal((await craft({ baseId: 'broadsword', rarity: 'common', count: 1 })).status, 201);
   });
 
