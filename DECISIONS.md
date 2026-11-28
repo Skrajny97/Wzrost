@@ -3384,6 +3384,10 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
+## Bez reklam (1280 C, 28.11.2026)
+
+Autor zapytał, czy podpiąć reklamy z nagrodą (najwyżej 1 długa albo 2–3 krótkie dziennie): zysk dla autora i dodatkowe źródło nagród dla graczy. Przeanalizowane: jedyna droga dla gry w przeglądarce i w aplikacji ze Sklepu Play to H5 Games Ads z AdSense, w zamkniętej becie, z wnioskiem bez gwarancji zgody. Do tego okno zgody na reklamy przy wejściu do gry, zmiana polityki prywatności i formularzy Sklepu Play, a przy obecnej liczbie graczy zysk rzędu kilkudziesięciu do kilkuset złotych miesięcznie. Decyzja autora: 1280 C, gra nie ma reklam.
+
 ## Wersja 0.5.41 (28.11.2026): szare paski wszystkich minigier
 
 ## Szare paski minigier (1278 B, 28.11.2026)
