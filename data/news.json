@@ -1870,6 +1870,11 @@
       "id": "0.5.39",
       "title": "Wersja 0.5.39",
       "body": "- Skrzynia Konta: nad listą są przyciski „Wyjmij wszystko” i „Wyjmij zaznaczone”. Zaznaczasz rzeczy stuknięciem, jak przy sprzedaży w plecaku, i wyjmujesz je naraz. Towary wychodzą w całości, a gdy w plecaku zabraknie miejsca, reszta zostaje w Skrzyni."
+    },
+    {
+      "id": "0.5.40",
+      "title": "Wersja 0.5.40",
+      "body": "- Długie listy zwijają się teraz pod nagłówkami. Stuknij nagłówek grupy, np. „Materiały”, żeby ją zwinąć albo rozwinąć, a gra zapamięta to na Twoim urządzeniu. Tak jest w Twojej ofercie w Wymianie, w Towarach Skrzyni Konta (lista „W skrzyni” dzieli się na grupy według rodzaju) i na Stole rozbiórki, gdzie materiały dzielą się według rzadkości."
     }
   ]
 }

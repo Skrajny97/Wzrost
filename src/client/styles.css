@@ -9033,6 +9033,60 @@ a.camp-level-button {
   font-size: 16px;
 }
 
+/* A group of a long list that folds under its heading (fold.js): the
+   heading's whole line is the button, the rows' count muted after the
+   name and the caret at the far end, as the Portale's. */
+.fold-head {
+  margin: 8px 0 4px;
+}
+
+.fold-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fold-title {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.fold-count {
+  flex: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.fold-caret {
+  flex: none;
+  margin-left: auto;
+  padding-left: 8px;
+  color: var(--text-muted);
+}
+
+.fold-caret::before {
+  content: '▾';
+}
+
+.fold-toggle[aria-expanded='true'] .fold-caret::before {
+  content: '▴';
+}
+
+.fold-body {
+  padding-top: 4px;
+}
+
 /* The author's look at a player's numbers (1019): label and value in two
    columns, in the System's colours, as a System panel. */
 .profile-inspect {

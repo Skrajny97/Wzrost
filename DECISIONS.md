@@ -3384,6 +3384,21 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
 
+## Wersja 0.5.40 (28.11.2026): zwijane grupy w Wymianie, Skrzyni konta i na Stole rozbiórki
+
+## Zwijane grupy materiałów i kart (28.11.2026)
+
+Prośba gracza (poz. 229), przekazana przez autora: „żeby można było zwijać materiały w tradzie i w skrzyni i tak samo karty w tradzie”, „Bo jak masz tego dużo to musisz dużo przewijać” i „Tak jak i zwinięcie materiałów na stole rozbiórki na podgrupy najlepiej”.
+
+1. **Nagłówek, który zwija.** Nagłówek grupy na długiej liście jest przyciskiem na całą szerokość wiersza: nazwa grupy, w nawiasie liczba pozycji i strzałka ▴/▾ na końcu, jak w Portalach (`src/client/fold.js`). Stuknięcie zwija albo rozwija grupę.
+2. **Gdzie.**
+    - Wymiana, okno „Twoja oferta”: każda grupa (Zasoby obozu, Przedmioty z plecaka, Zioła, Mikstury, Materiały, Minerały, Zwoje, Spiżarnia, Karty). Złoto zostaje na górze, bez zwijania.
+    - Skrzynia konta, zakładka „Towary”: lista „W skrzyni”, dotąd jedna długa lista, dzieli się na grupy według rodzaju towaru, w kolejności skrzyni (karty obu rodzajów razem), także przy „Wyjmij zaznaczone”. W „Twoich towarach” zwijają się grupy, które już tam były. Wiersz „Karty” z „Włóż kartę” zostaje bez zwijania, bo jest pod nim jeden wiersz.
+    - Stół rozbiórki, zakładka „Materiały”: podgrupy według rzadkości („Pospolite”, „Rzadkie”, „Unikalne”, „Epickie”, „Legendarne”, „Mityczne”, „Boskie”), bo od rzadkości zależy, jaką część da stół. Zaznaczone materiały i „Przerób zaznaczone” działają także w zwiniętej grupie.
+3. **Brakujące szczegóły, rozstrzygnięte najprościej:** grupa jest otwarta, dopóki gracz jej nie zwinie, a zwinięte gra pamięta na urządzeniu (jak „Sortuj:” w Skrzyni), osobno w każdym miejscu; liczba w nawiasie to liczba pozycji listy, a nie sztuk; bez makiet, bo to drobna zmiana istniejących list.
+4. **Po angielsku** nagłówki biorą istniejące nazwy grup („Materials”, „Cards”…) i rzadkości („Common”, „Rare”…), więc nowych tekstów nie ma.
+5. **Sprawdzone:** w przeglądarce po polsku, na telefonie i komputerze: trzy miejsca, zwijanie i pamięć po odświeżeniu, bez przewijania na boki; `tools/layout-check.cjs`; `test/chest-take-many-page.test.js`, `test/market-bag-page.test.js` i `test/client.test.js`.
+
 ## Wersja 0.5.39 (27.11.2026): Skrzynia konta z „Wyjmij wszystko” i „Wyjmij zaznaczone”
 
 ## Skrzynia konta: wyjmij wszystko i zaznaczone (27.11.2026)

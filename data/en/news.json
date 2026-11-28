@@ -1492,6 +1492,10 @@
     "0.5.39": {
       "title": "Version 0.5.39",
       "body": "- Account Chest: above the list there are \"Take out all\" and \"Take out selected\" buttons. Tap things to mark them, as when selling from the bag, and take them out at once. Goods come out whole, and when the bag runs out of room, the rest stays in the Chest."
+    },
+    "0.5.40": {
+      "title": "Version 0.5.40",
+      "body": "- Long lists now fold under their headings. Tap a group's heading, e.g. \"Materials\", to fold or unfold it, and the game remembers it on your device. This works in your offer in Trade, in the Account Chest's Goods (the \"In the chest\" list is split into groups by kind) and on the Disassembly Table, where materials are grouped by rarity."
     }
   }
 }
