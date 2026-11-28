@@ -3401,7 +3401,7 @@ Prośba gracza (1279), z którą autor się zgodził („Słuszna uwaga”): „
 9. **Wybór autora:** wariant A, na stronie ocen (1279, 28.11.2026), gdzie były tabele dziś, A i B.
 10. **Skąd liczby:** złoto części według ceny złomiarza przy Skupie złomu na 10. poziomie, kamień i ruda po 5 złota u ducha ognia, złoto z wypraw z `expectedExploration` (wyprawa 4-godzinna w miejscu tego poziomu, przy typowym poziomie klasy z `tools/simulate.mjs`, bez sprzedaży łupu).
 11. **Po angielsku:** w grze nie ma nowych tekstów.
-12. **Pliki:** `data/professions.json`, `data/schemas/professions.schema.json`, `src/engine/workshop.js` (`slotParts`, `craftParts`, `craftCost`). Testy: `test/workshop.test.js` (koszt według poziomu w A i B, wyższy przedmiot nigdy tańszy, zasada złomiarza dla wartości z danych, A, B i skrajnych). Testy API Warsztatu i `test/avatar.test.js` liczą koszt z `craftCost`, więc przechodzą przy A i przy B.
+12. **Pliki:** `data/professions.json`, `data/schemas/professions.schema.json`, `src/engine/workshop.js` (`slotParts`, `craftParts`, `craftCost`). Testy: `test/workshop.test.js` (koszt według poziomu w A i B, wyższy przedmiot nigdy tańszy, zasada złomiarza dla wartości z danych, A, B oraz 1 i 510). Testy API Warsztatu i `test/avatar.test.js` liczą koszt z `craftCost`, więc przechodzą przy A i przy B.
 
 ## Bez reklam (1280 C, 28.11.2026)
 

@@ -1500,6 +1500,10 @@
     "0.5.41": {
       "title": "Version 0.5.41",
       "body": "- Profession mini-games now share the same grey bar. Until now only Alchemy and Cooking had a coloured one."
+    },
+    "0.5.42": {
+      "title": "Version 0.5.42",
+      "body": "- Crafting: items below level 100 now take fewer parts, less stone and less ore, the lower their level the fewer. For example, a legendary helmet at level 25 takes 3 Amber instead of 6. From level 100 on the cost is unchanged."
     }
   }
 }
