@@ -1991,7 +1991,7 @@ Brakujące szczegóły kroku 1 rozstrzygnięte najprościej. Wszystko działa ty
 1. **Miejsce.** Systemowy Warsztat, z opisem w szkicu do poprawy przez autora. Ekran ma układ Pracowni: sloty (broń, pancerz, druga ręka, hełm, rękawice, buty), wzory wybranego slotu, rzadkość i liczbę sztuk. Biżuteria i talizmany nie mają wzorów, bo nie mają części w R11.
 2. **Wzory.** Pierwsza baza każdej rodziny jest znana od 1. poziomu profesji, a późniejsza (ta od 10. poziomu klasy) od 10. poziomu profesji. Ukryte wzory są cieniami, jak zioła i przepisy. Ekran zaczyna od wzoru dla klasy postaci, ale można wykonać każdy.
 3. **Rzadkości.** Rzadki od 5. poziomu profesji, unikalny od 15., epicki od 25., legendarny od 40., mityczny od 60., boski od 80. Szanse są te z odpowiedzi (R23), każdy poziom po 1. dodaje 0,5 pkt proc.
-4. **Zasoby.** Na każdą część i każdy stopień rzadkości (pospolity 1, rzadki 2 i dalej) 3 kamienie, a do metalu tyle samo co części rudy żelaza, do łuków, kosturów i tarcz drewna. Pospolity miecz: 6 Ścinków, 18 kamieni i 6 rudy żelaza.
+4. **Zasoby.** Na każdą część i każdy stopień rzadkości (pospolity 1, rzadki 2 i dalej) 3 kamienie, a do metalu tyle samo co części rudy żelaza, do łuków, kosturów i tarcz drewna. Pospolity miecz: 6 Ścinków, 18 kamieni i 6 rudy żelaza. *Od 28.11.2026 poniżej 100. poziomu przedmiotu mniej części slotu i zasobów: zob. „Rzemiosło: koszty rosną z poziomem przedmiotu”.*
 5. **Czas.** Pospolity przedmiot 1 godzina na 1. poziomie, każda rzadkość wyżej dwa razy dłużej, a każdy poziom profesji skraca go o 1%, najwyżej o połowę, jak w Alchemii. Zlecenie zaokrągla się w górę do pełnej minuty. Postać odpoczywa w czasie wyrobu, jak w Zagajniku i Pracowni. *Od 0.0.51 pospolity przedmiot trwa 30 minut: zob. „Uwagi autora po 0.0.50”, punkt 2.*
 6. **Nazwy afiksów** (R4, R5) pochodzą od stworów, które postać spotkała w walkach. Przed pierwszym spotkaniem przedmiot ma zwykłe nazwy afiksów.
 7. **Części ze Stołu.** Warsztat liczy też części ze skończonych zleceń Stołu rzemieślniczego, tak jak sakiewka.
@@ -2203,7 +2203,7 @@ Krok 2 z planu w „Rzemiosło: odpowiedzi autora” (R8, R14–R19), na razie t
 4. **Wzory z rozbiórki** (R14). Rozebranie przedmiotu późniejszej bazy (od 10. poziomu klasy, np. Pałasza) od razu odsłania jej wzór w Warsztacie, bez czekania na 10. poziom profesji (`patterns`). Karta przedmiotu zapowiada to przy Rozbiórce, a kafelek wzoru ma dopisek „z rozbiórki”. Wzór dochodzi tylko wtedy, gdy Rzemiosło jest włączone.
 5. **Rozbiórka wyrobu** (R19). Wyrób pamięta, ile części zużył i z jakim ulepszeniem wyszedł (`crafted`). Na Stole rozbiórki oddaje połowę tych części, zaokrągloną w dół, i po jednej za każde ulepszenie z Kowadła ponad to z Warsztatu. Łup rozbiera się jak dotąd.
 6. **Ceny złomiarza** (R16):
-    - Wyrób bierze o jedną część więcej co 10 poziomów przedmiotu (`partsLevelStep`): miecz na 1. poziomie 6 części, na 15. poziomie 7, na 500. poziomie 56. Zasoby obozu liczą się dalej od części slotu.
+    - Wyrób bierze o jedną część więcej co 10 poziomów przedmiotu (`partsLevelStep`): miecz na 1. poziomie 6 części, na 15. poziomie 7, na 500. poziomie 56. Zasoby obozu liczą się dalej od części slotu. *Od 28.11.2026 części slotu i zasoby poniżej 100. poziomu przedmiotu maleją z poziomem (miecz na 1. poziomie 1 część, na 15. poziomie 2): zob. „Rzemiosło: koszty rosną z poziomem przedmiotu”.*
     - Złomiarz płaci za wyrób jak za łup tej rzadkości. Za ulepszenia, z którymi wyrób wyszedł, nie dopłaca, bo nikt za nie nie płacił złotem.
     - Test sprawdza zasadę autora: części na wyrób kosztują w Skupie złomu więcej, niż złomiarz za niego płaci, dla każdej rzadkości, slotu, poziomu Skupu i poziomu przedmiotu od 1 do 510.
     - Bez dodatkowych części na wysokich poziomach zasada by nie działała. Np. rękawice na 500. poziomie kosztowały 3 części za 69 złota, a złomiarz płaciłby za nie 1000 złota.
@@ -3383,6 +3383,29 @@ Autor: „Licz i Nekromanta tak jak pewnie inne ewolucje powinny zaczac uzywac i
     - Warsztat podsuwa najpierw wzór broni formy, np. Nekromancie kostur, a nie sztylet Cienia.
     - Narzędzie symulacji (`tools/difficulty-sim.mjs`) bierze dla formy z własnym ekwipunkiem także jej zbroję.
     - Liczby zbroi z portretów (991 A, `tools/pvp-arena-sim.mjs`, `tools/class-balance-sim.mjs`): na Arenie Pogromca Demonów wygrywa 32% pojedynków zamiast 28%, Licz 60% zamiast 61%, Nekromanta 58% zamiast 59%. Na wyprawach prawie bez zmian: Wielki Inkwizytor przyjmuje kilka punktów procentowych mniej obrażeń.
+
+## Wersja 0.5.42 (28.11.2026): koszty Rzemiosła rosną z poziomem przedmiotu
+
+## Rzemiosło: koszty rosną z poziomem przedmiotu (28.11.2026)
+
+Prośba gracza (1279), z którą autor się zgodził („Słuszna uwaga”): „Dostosowanie kosztów i poziomów do klasy wykonywanej broni. Trochę bez sensu, że mogę zrobić legendarny hełm od 25 poziomu, ale nie opłaca mi się go zrobić dla kogoś bo koszta produkcji raczej przerastają możliwości kupna postaci na niskim levelu. Fajnie jakby koszta się skalowały.”
+
+1. **Co było.** Wyrób brał wszystkie części slotu (broń i pancerz 6, druga ręka i hełm 4, rękawice i buty 3) i jedną więcej co 10 poziomów przedmiotu, a kamienia i rudy albo drewna zawsze tyle samo. Niski przedmiot kosztował więc prawie tyle co wysoki. Legendarny hełm na 25. poziomie: 6 Bursztynów, 60 kamieni i 20 rudy żelaza, ok. 2600 złota, czyli 6,7 godziny złota z wypraw postaci tego poziomu. Ten sam hełm na 200. poziomie to 3,1 godziny.
+2. **Zasada (wariant A).** Od 100. poziomu przedmiotu (`fullCostLevel` w `workshop` w `data/professions.json`) wyrób bierze wszystkie części slotu, jak dotąd. Niżej bierze ich mniej, w proporcji do poziomu: na 50. poziomie połowę, na 25. ćwierć. Jedna część więcej co 10 poziomów (`partsLevelStep`) zostaje. Kamień, ruda i drewno liczą się, jak dotąd, od części slotu, więc maleją razem z nimi, a rzadkość mnoży je jak przedtem.
+3. **Brakujący szczegół, rozstrzygnięty najprościej:** część slotu zaokrągla się w górę, więc każdy przedmiot bierze co najmniej jedną część slotu, kamień i zasób swojej rodziny (`slotParts` w `src/engine/workshop.js`).
+4. **Liczby w A** (hełm / miecz, części na przedmiot każdej rzadkości): 15. poziom 2 / 2 zamiast 5 / 7, 25. poziom 3 / 4 zamiast 6 / 8, 50. poziom 7 / 8 zamiast 9 / 11, 75. poziom 10 / 12 zamiast 11 / 13. Kamień i ruda na stopień rzadkości: 3 + 1 zamiast 12 + 4 przy hełmie na 15. i 25. poziomie, 6 + 2 na 50., 9 + 3 na 75. Legendarny hełm na 25. poziomie: 3 Bursztyny, 15 kamieni i 5 rudy, ok. 1200 złota, 3,1 godziny wypraw. Od 25. do 200. poziomu taki hełm kosztuje teraz podobnie: 3,1–3,9 godziny.
+5. **Wysokie poziomy.** Od 100. poziomu przedmiotu koszt jest taki jak dotąd.
+6. **Zasada złomiarza zostaje** (R16): części na przedmiot kosztują w Skupie złomu więcej, niż złomiarz za niego płaci, przy każdej rzadkości, slocie, poziomie Skupu i poziomie przedmiotu od 1 do 510. Trzyma się przy każdym `fullCostLevel`, bo przedmiot bierze co najmniej jedną część slotu i jedną więcej co 10 poziomów.
+7. **Bez zmian:** czas wyrobu, szanse, rzadkości i zwoje. Przedmiot dalej wychodzi na poziomie postaci, która go robi. Rozebrany wyrób oddaje połowę części, które naprawdę zużył (zapisanych w przedmiocie), więc stare wyroby oddają tyle co dotąd. Zlecenia Osady na wyroby płacą jak dotąd według kosztu wyrobu (`craftBuyCost` w `src/engine/settlement.js`), więc poniżej 100. poziomu mniej.
+8. **Wariant B** (łagodniejszy, tylko inna liczba w danych): `fullCostLevel` = 50, taniej tylko poniżej 50. poziomu: hełm / miecz na 15. poziomie 3 / 3 części, na 25. 4 / 5, legendarny hełm na 25. poziomie 4 Bursztyny, 30 kamieni i 10 rudy, ok. 1700 złota (4,3 godziny).
+9. **Wybór autora:** wariant A, na stronie ocen (1279, 28.11.2026), gdzie były tabele dziś, A i B.
+10. **Skąd liczby:** złoto części według ceny złomiarza przy Skupie złomu na 10. poziomie, kamień i ruda po 5 złota u ducha ognia, złoto z wypraw z `expectedExploration` (wyprawa 4-godzinna w miejscu tego poziomu, przy typowym poziomie klasy z `tools/simulate.mjs`, bez sprzedaży łupu).
+11. **Po angielsku:** w grze nie ma nowych tekstów.
+12. **Pliki:** `data/professions.json`, `data/schemas/professions.schema.json`, `src/engine/workshop.js` (`slotParts`, `craftParts`, `craftCost`). Testy: `test/workshop.test.js` (koszt według poziomu w A i B, wyższy przedmiot nigdy tańszy, zasada złomiarza dla wartości z danych, A, B oraz 1 i 510). Testy API Warsztatu i `test/avatar.test.js` liczą koszt z `craftCost`, więc przechodzą przy A i przy B.
+
+## Bez reklam (1280 C, 28.11.2026)
+
+Autor zapytał, czy podpiąć reklamy z nagrodą (najwyżej 1 długa albo 2–3 krótkie dziennie): zysk dla autora i dodatkowe źródło nagród dla graczy. Przeanalizowane: jedyna droga dla gry w przeglądarce i w aplikacji ze Sklepu Play to H5 Games Ads z AdSense, w zamkniętej becie, z wnioskiem bez gwarancji zgody. Do tego okno zgody na reklamy przy wejściu do gry, zmiana polityki prywatności i formularzy Sklepu Play, a przy obecnej liczbie graczy zysk rzędu kilkudziesięciu do kilkuset złotych miesięcznie. Decyzja autora: 1280 C, gra nie ma reklam.
 
 ## Wersja 0.5.41 (28.11.2026): szare paski wszystkich minigier
 

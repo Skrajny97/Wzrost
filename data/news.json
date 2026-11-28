@@ -1880,6 +1880,11 @@
       "id": "0.5.41",
       "title": "Wersja 0.5.41",
       "body": "- Minigry w profesjach mają teraz jednakowy, szary pasek. Do tej pory tylko Alchemia i Gotowanie miały kolorowy."
+    },
+    {
+      "id": "0.5.42",
+      "title": "Wersja 0.5.42",
+      "body": "- Rzemiosło: przedmioty poniżej 100. poziomu biorą teraz mniej części, kamienia i rudy, tym mniej, im niższy poziom. Na przykład legendarny hełm na 25. poziomie bierze 3 Bursztyny zamiast 6. Od 100. poziomu koszt się nie zmienia."
     }
   ]
 }

@@ -7,7 +7,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { notificationsDue, workProfession, workXp } from '../src/engine/index.js';
+import { craftCost, notificationsDue, workProfession, workXp } from '../src/engine/index.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -139,7 +139,9 @@ describe('Awatar Systemu', () => {
     assert.equal(started.status, 201);
     assert.equal(started.data.character.activity, null);
     assert.equal(started.data.character.professions.avatar.activity.kind, 'items');
-    assert.deepEqual(started.data.character.resources, { wood: 50, stone: 164, 'iron-ore': 28 });
+    // What two swords take at the character's level 15 (craftCost).
+    const { resources } = craftCost(content.basesById.sword, 'common', 2, 15, content);
+    assert.deepEqual(started.data.character.resources, { wood: 50, stone: 200 - resources.stone, 'iron-ore': 40 - resources['iron-ore'] });
     await age(120);
     const { report, character: after } = (await call('POST', '/api/avatar/claim', { cookie })).data;
     assert.equal(report.kind, 'items');
