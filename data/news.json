@@ -1875,6 +1875,11 @@
       "id": "0.5.40",
       "title": "Wersja 0.5.40",
       "body": "- Długie listy zwijają się teraz pod nagłówkami. Stuknij nagłówek grupy, np. „Materiały”, żeby ją zwinąć albo rozwinąć, a gra zapamięta to na Twoim urządzeniu. Tak jest w Twojej ofercie w Wymianie, w Towarach Skrzyni Konta (lista „W skrzyni” dzieli się na grupy według rodzaju) i na Stole rozbiórki, gdzie materiały dzielą się według rzadkości."
+    },
+    {
+      "id": "0.5.41",
+      "title": "Wersja 0.5.41",
+      "body": "- Minigry w profesjach mają teraz jednakowy, szary pasek. Do tej pory tylko Alchemia i Gotowanie miały kolorowy."
     }
   ]
 }
