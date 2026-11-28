@@ -37,6 +37,7 @@ import { goldArt, herbSprite, itemSprite, materialSprite, mineralSprite, pantryS
 import { cardAtLevel, cardFace, cardThumb } from '../cards.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
+import { foldGroup } from '../fold.js';
 import { countOf, formatNumber } from '../format.js';
 import { t } from '../i18n.js';
 import { itemIcon } from '../icons.js';
@@ -434,6 +435,26 @@ export function mountChest(container, onBack) {
       ),
     );
 
+  // The chest's goods kind by kind, each kind under a heading that folds
+  // (fold.js; a player through the author, 28.11.2026: „żeby można było
+  // zwijać materiały w tradzie i w skrzyni”), the cards of both kinds
+  // together; `row` draws a good's row. The chest lists them kind by kind
+  // already (CHEST_GOODS in the engine).
+  function goodGroups(goods, row) {
+    const groups = [];
+    for (const good of goods) {
+      const kind = isCard(good) ? 'card' : good.kind;
+      if (groups.at(-1)?.kind === kind) groups.at(-1).goods.push(good);
+      else groups.push({ kind, goods: [good] });
+    }
+    return groups.map((group) => foldGroup(`chest-in-${group.kind}`, goodsTitle(group.kind), group.goods.length, h('ul', { class: 'chest-list' }, group.goods.map(row))));
+  }
+
+  const goodsTitle = (kind) =>
+    ({ resource: t('Zasoby obozu'), potion: t('Mikstury'), herb: t('Zioła'), material: t('Materiały'), part: t('Części'), mineral: t('Minerały'), scroll: t('Zwoje'), pantry: t('Spiżarnia') })[kind] ??
+    words().group ??
+    t('Karty');
+
   function goodsTab(character) {
     const own = ownGoods(character);
     const picking = marking?.tab === 'goods';
@@ -448,23 +469,19 @@ export function mountChest(container, onBack) {
               picking
                 ? h('p', { class: 'bag-note', text: t('Wybierz towary do wyjęcia. Wyjdą w całości, ze wszystkimi sztukami. Ponowny wybór odznacza towar.') })
                 : takeButtons('goods'),
-              h(
-                'ul',
-                { class: 'chest-list' },
-                chest.goods.map((good) =>
-                  picking
-                    ? pickRow(goodKey(good), {
-                        art: goodArt(good, 32),
-                        label: t('{name}, {count} szt.', { name: good.name, count: formatNumber(good.count) }),
-                        words: [
-                          h('span', { class: 'chest-item' }, h('span', { class: 'chest-good-name', text: good.name }), h('span', { class: 'chest-note', text: goodNote(good) })),
-                          h('span', { class: 'chest-good-count', text: `×${formatNumber(good.count)}` }),
-                        ],
-                      })
-                    : isCard(good)
-                      ? goodRow(good, goodNote(good), h('button', { type: 'button', class: 'button button--system button--small', text: words().take, onClick: () => cardSheet(good, false) }))
-                      : goodRow(good, goodNote(good), h('button', { type: 'button', class: 'button button--system button--small', text: t('Wyjmij'), onClick: () => amountSheet(good, false) })),
-                ),
+              goodGroups(chest.goods, (good) =>
+                picking
+                  ? pickRow(goodKey(good), {
+                      art: goodArt(good, 32),
+                      label: t('{name}, {count} szt.', { name: good.name, count: formatNumber(good.count) }),
+                      words: [
+                        h('span', { class: 'chest-item' }, h('span', { class: 'chest-good-name', text: good.name }), h('span', { class: 'chest-note', text: goodNote(good) })),
+                        h('span', { class: 'chest-good-count', text: `×${formatNumber(good.count)}` }),
+                      ],
+                    })
+                  : isCard(good)
+                    ? goodRow(good, goodNote(good), h('button', { type: 'button', class: 'button button--system button--small', text: words().take, onClick: () => cardSheet(good, false) }))
+                    : goodRow(good, goodNote(good), h('button', { type: 'button', class: 'button button--system button--small', text: t('Wyjmij'), onClick: () => amountSheet(good, false) })),
               ),
             ],
       ),
@@ -477,14 +494,18 @@ export function mountChest(container, onBack) {
             own.length > 0 && goodSortRow(),
             own.length === 0 && !chest.cards
               ? h('p', { class: 'muted', text: t('Postać nie ma teraz żadnych towarów.') })
-              : own.map(([title, goods]) => [
-                  h('h3', { class: 'profile-section', text: title }),
-                  h(
-                    'ul',
-                    { class: 'chest-list' },
-                    sortGoods(goods).map((good) => goodRow(good, null, h('button', { type: 'button', class: 'button button--world button--small', text: t('Włóż'), onClick: () => amountSheet(good, true) }))),
+              : own.map(([title, goods]) =>
+                  foldGroup(
+                    `chest-own-${goods[0].kind}`,
+                    title,
+                    goods.length,
+                    h(
+                      'ul',
+                      { class: 'chest-list' },
+                      sortGoods(goods).map((good) => goodRow(good, null, h('button', { type: 'button', class: 'button button--world button--small', text: t('Włóż'), onClick: () => amountSheet(good, true) }))),
+                    ),
                   ),
-                ]),
+                ),
             chest.cards && cardsGroup(),
           ),
     ];

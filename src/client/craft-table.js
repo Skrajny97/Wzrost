@@ -8,6 +8,7 @@
 
 import { materialSprite } from './art.js';
 import { h, icon } from './dom.js';
+import { foldGroup } from './fold.js';
 import { countOf, formatCountdown, formatDecimal, formatMinutes, formatNumber, saleGold, timeFormat } from './format.js';
 import { t } from './i18n.js';
 import { reorderable } from './reorder.js';
@@ -139,6 +140,25 @@ let tableTab = 'materials';
 const markedMaterials = new Map();
 const markedItems = new Set();
 
+// The materials by rarity, each rarity under a heading that folds
+// (fold.js; a player through the author, 28.11.2026: „zwinięcie materiałów
+// na stole rozbiórki na podgrupy”): the rarity tells the part the table
+// makes. The server lists them by rarity already.
+function byRarity(materials) {
+  const groups = [];
+  for (const material of materials) {
+    if (groups.at(-1)?.rarity === material.rarity) groups.at(-1).materials.push(material);
+    else groups.push({ rarity: material.rarity, materials: [material] });
+  }
+  return groups;
+}
+
+// "Pospolite", "Rzadkie"… in the page's language.
+function rarityHeading(id) {
+  const word = state.content.rarities?.find((rarity) => rarity.id === id)?.forms?.pl ?? id;
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
 // The Materiały tab: a tap on a material opens its card for as many pieces
 // as chosen, and its tick marks it to go to the table with the others marked
 // (the author: "Dodajmy jeszcze opcje zaznaczania roznych materialow w Stole
@@ -255,7 +275,8 @@ function materialsTab(crafting, built, full) {
   update();
   return [
     built && h('p', { class: 'craft-note', text: t('Stuknij materiał, żeby przerobić albo sprzedać wybraną liczbę sztuk. Zaznacz kilka, żeby przerobić je naraz: pod zaznaczonym wybierzesz, ile sztuk.') }),
-    h('ul', { class: 'craft-list' }, crafting.materials.map(row)),
+    // Spread: the tab lays out its body one level deep (craftTableSection).
+    ...byRarity(crafting.materials).map(({ rarity, materials }) => foldGroup(`craft-${rarity}`, rarityHeading(rarity), materials.length, h('ul', { class: 'craft-list' }, materials.map(row)))),
     built &&
       h(
         'div',

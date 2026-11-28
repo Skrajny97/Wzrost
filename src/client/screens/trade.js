@@ -16,6 +16,7 @@ import { cardThumb } from '../cards.js';
 import { liveTrade, tradeSeen } from '../chat-news.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
+import { foldGroup } from '../fold.js';
 import { formatCountdown, formatNumber } from '../format.js';
 import { t } from '../i18n.js';
 import { narratorIdle } from '../narrator.js';
@@ -474,23 +475,26 @@ export function mountTrade(container, { backHash }) {
         refresh();
       }
     };
-    const section = (title, ...children) => [h('h3', { class: 'profile-section', text: title }), children];
+    // Each kind folds under its heading, as the player left it (fold.js).
+    const section = (kind, title, count, ...children) => foldGroup(`trade-${kind}`, title, count, ...children);
     openSheet(
       h('h2', { class: 'sheet-title', text: t('Twoja oferta') }),
       h('p', { class: 'sheet-text', text: t('Co dasz postaci {name}? Zapisana oferta od razu pokaże się po drugiej stronie.', { name: view.other.name }) }),
       gold.element,
-      resources.length > 0 && section(t('Zasoby obozu'), resources.map((entry) => entry.element)),
+      resources.length > 0 && section('resource', t('Zasoby obozu'), resources.length, resources.map((entry) => entry.element)),
       section(
+        'item',
         t('Przedmioty z plecaka'),
+        character.bag.length,
         character.bag.length === 0 ? h('p', { class: 'muted', text: t('W plecaku nie ma przedmiotów. Założonych nie wymienisz.') }) : [count, h('ul', { class: 'item-list' }, items)],
       ),
-      herbs.length > 0 && section(t('Zioła'), herbs.map((entry) => entry.element)),
-      potions.length > 0 && section(t('Mikstury'), potions.map((entry) => entry.element)),
-      materials.length > 0 && section(t('Materiały'), materials.map((entry) => entry.element)),
-      minerals.length > 0 && section(t('Minerały'), minerals.map((entry) => entry.element)),
-      scrolls.length > 0 && section(t('Zwoje'), scrolls.map((entry) => entry.element)),
-      pantry.length > 0 && section(t('Spiżarnia'), pantry.map((entry) => entry.element)),
-      ownCards.length > 0 && section(words.group, cardFields.map((entry) => entry.element), busyCards, h('p', { class: 'muted', text: words.rule })),
+      herbs.length > 0 && section('herb', t('Zioła'), herbs.length, herbs.map((entry) => entry.element)),
+      potions.length > 0 && section('potion', t('Mikstury'), potions.length, potions.map((entry) => entry.element)),
+      materials.length > 0 && section('material', t('Materiały'), materials.length, materials.map((entry) => entry.element)),
+      minerals.length > 0 && section('mineral', t('Minerały'), minerals.length, minerals.map((entry) => entry.element)),
+      scrolls.length > 0 && section('scroll', t('Zwoje'), scrolls.length, scrolls.map((entry) => entry.element)),
+      pantry.length > 0 && section('pantry', t('Spiżarnia'), pantry.length, pantry.map((entry) => entry.element)),
+      ownCards.length > 0 && section('card', words.group, ownCards.length, cardFields.map((entry) => entry.element), busyCards, h('p', { class: 'muted', text: words.rule })),
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }), button(t('Zapisz ofertę'), 'system', save)),
     );
   }
